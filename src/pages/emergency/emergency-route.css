@@ -31,7 +31,7 @@
   border-radius: var(--cdl-clinical-radius, var(--radius-lg, 12px));
   background: var(--ed-surface-raised);
   box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
-  padding: var(--ed-space-3);
+  padding: var(--ed-space-4, 16px);
 }
 
 .emergency-route-situation-brief--info {
@@ -66,16 +66,16 @@
 
 .emergency-route-situation-brief__label {
   color: var(--ed-text-meta);
-  font-size: var(--ed-type-meta);
-  font-weight: 600;
-  letter-spacing: 0.03em;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
 .emergency-route-situation-brief__value {
   color: var(--ed-text-primary);
   font-size: var(--ed-type-section);
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1.35;
 }
 
@@ -220,16 +220,17 @@
   display: block;
   color: var(--metric-color, var(--ed-text-primary));
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 28px;
+  font-size: 30px;
+  font-weight: 700;
   line-height: 1;
 }
 
 .emergency-route-metric-card__label {
   display: block;
   color: var(--ed-text-secondary);
-  font-size: var(--ed-type-body);
-  font-weight: 600;
-  letter-spacing: 0.03em;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 

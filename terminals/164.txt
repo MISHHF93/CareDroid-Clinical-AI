@@ -1,0 +1,30 @@
+---
+pid: 27224
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cd \"C:\\Users\\borah\\CareDroid-Clinical-AI\"; node node_modules/vitest/vitest.mjs run src/routing/canonicalAppRoutes.deepLink.test.tsx 2>&1 | Select-Object -Last 25"
+started_at: 2026-07-01T02:48:03.667Z
+running_for_ms: 33440003 
+---
+
+                    <path
+ Test Files  1 failed (1)
+      Tests  1 failed | 10 passed (11)
+   Start at  22:48:04
+   Duration  14.90s (transform 7.00s, setup 243ms, import 7.01s, tests 6.05s, environment 1.38s)
+
+                      d="M3 15a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1l0 -4"
+                    />
+                  </svg>
+                  <span
+...
+ ❯ src/routing/canonicalAppRoutes.deepLink.test.tsx:254:46
+    252|
+    253|     await waitFor(() =>
+    254|       expect(screen.getByTestId('location')).toHaveTextContent('/emerg…
+       |                                              ^
+    255|     );
+    256|   }, 20_000);
+ ❯ runWithExpensiveErrorDiagnosticsDisabled node_modules/@testing-library/dom/dist/config.js:47:12
+ ❯ checkCallback node_modules/@testing-library/dom/dist/wait-for.js:124:77
+ ❯ Timeout.checkRealTimersCallback node_modules/@testing-library/dom/dist/wait-for.js:118:16
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯

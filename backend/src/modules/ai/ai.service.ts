@@ -36,6 +36,8 @@ interface RateLimitConfig {
 interface AiModelPricing {
   inputPer1kTokens: number;
   outputPer1kTokens: number;
+  /** Cache read tokens are billed at ~10% of normal input cost */
+  cacheReadPer1kTokens: number;
 }
 
 @Injectable()
@@ -105,7 +107,7 @@ export class AIService {
 
     // Claude Sonnet pricing estimate (USD per 1K tokens).
     this.aiPricing = new Map([
-      [UNIFIED_AI_MODEL, { inputPer1kTokens: 0.003, outputPer1kTokens: 0.015 }],
+      [UNIFIED_AI_MODEL, { inputPer1kTokens: 0.003, outputPer1kTokens: 0.015, cacheReadPer1kTokens: 0.0003 }],
     ]);
 
     // Legacy LLM function schema. Canonical executor IDs/aliases live in
@@ -208,14 +210,22 @@ export class AIService {
   /**
    * Calculate cost in USD based on model and token usage
    */
-  private calculateCost(model: string, inputTokens: number, outputTokens: number): number {
+  private calculateCost(
+    model: string,
+    inputTokens: number,
+    outputTokens: number,
+    cacheReadTokens = 0,
+  ): number {
     const pricing = this.aiPricing.get(model);
     if (!pricing) {
       return 0;
     }
-    const inputCost = (inputTokens / 1000) * pricing.inputPer1kTokens;
+    // Cache-read tokens already consumed cache creation budget; bill at reduced rate.
+    const billableInputTokens = Math.max(0, inputTokens - cacheReadTokens);
+    const inputCost = (billableInputTokens / 1000) * pricing.inputPer1kTokens;
+    const cacheReadCost = (cacheReadTokens / 1000) * pricing.cacheReadPer1kTokens;
     const outputCost = (outputTokens / 1000) * pricing.outputPer1kTokens;
-    return inputCost + outputCost;
+    return inputCost + cacheReadCost + outputCost;
   }
 
   async invokeLLM(userId: string, prompt: string, context?: any) {
@@ -255,6 +265,7 @@ export class AIService {
         config.model,
         response.usage.inputTokens,
         response.usage.outputTokens,
+        response.usage.cacheReadInputTokens,
       );
       this.metricsService.recordOpenaiCost(config.model, userId, costUsd);
       const aiUsageMetadata = this.buildAiUsageMetadata(
@@ -367,6 +378,7 @@ export class AIService {
         config.model,
         response.usage.inputTokens,
         response.usage.outputTokens,
+        response.usage.cacheReadInputTokens,
       );
       this.metricsService.recordOpenaiCost(config.model, userId, costUsd);
       const aiUsageMetadata = this.buildAiUsageMetadata(
@@ -801,6 +813,7 @@ export class AIService {
         config.model,
         response.usage.inputTokens,
         response.usage.outputTokens,
+        response.usage.cacheReadInputTokens,
       );
       this.metricsService.recordOpenaiCost(config.model, userId, costUsd);
       const aiUsageMetadata = this.buildAiUsageMetadata(

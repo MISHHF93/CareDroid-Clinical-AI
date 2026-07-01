@@ -1,0 +1,20 @@
+---
+pid: 7860
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cmd /c \"cd /d C:\\Users\\borah\\CareDroid-Clinical-AI && node node_modules/vitest/vitest.mjs run src/config/caredroidDesignLanguage.test.ts src/styles/designLanguageFit.test.ts src/styles/layout-engine.test.ts src/pages/emergency/emergencyRouteShared.visibility.test.tsx\""
+started_at: 2026-07-01T03:28:19.391Z
+running_for_ms: 31019998 
+---
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+ ✓ src/styles/designLanguageFit.test.ts (9 tests) 19ms
+ ✓ src/pages/emergency/emergencyRouteShared.visibility.test.tsx (4 tests) 78ms
+ ✓ src/config/caredroidDesignLanguage.test.ts (6 tests) 14ms
+ ✓ src/styles/layout-engine.test.ts (5 tests) 9ms
+
+ Test Files  4 passed (4)
+      Tests  24 passed (24)
+   Start at  23:28:20
+   Duration  16.29s (transform 3.65s, setup 1.91s, import 5.44s, tests 120ms, environment 7.71s)
+

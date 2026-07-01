@@ -1,0 +1,19 @@
+---
+pid: 11964
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cd \"C:\\Users\\borah\\CareDroid-Clinical-AI\"; node node_modules/vitest/vitest.mjs run src/styles/medicalThemeAudit.test.ts src/config/designSystem.test.ts src/styles/designTokens.test.ts 2>&1"
+started_at: 2026-07-01T01:21:43.668Z
+running_for_ms: 4914997  
+---
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+ ✓ src/styles/medicalThemeAudit.test.ts (8 tests) 161ms
+ ✓ src/styles/designTokens.test.ts (15 tests) 19ms
+ ✓ src/config/designSystem.test.ts (4 tests) 12ms
+
+ Test Files  3 passed (3)
+      Tests  27 passed (27)
+   Start at  21:21:45
+   Duration  18.57s (transform 208ms, setup 3.67s, import 882ms, tests 191ms, environment 12.63s)
+

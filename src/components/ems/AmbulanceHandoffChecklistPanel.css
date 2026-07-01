@@ -1,8 +1,9 @@
 .amb-handoff-checklist {
-  border: 1px solid var(--border-subtle, rgba(148, 163, 184, 0.35));
-  border-radius: 10px;
+  border: 1px solid var(--cdl-clinical-border, rgba(148, 163, 184, 0.5));
+  border-radius: var(--cdl-clinical-radius, 12px);
   padding: 0.85rem 1rem;
-  background: var(--surface-elevated, var(--medical-surface-card, #ffffff));
+  background: var(--app-surface-1, #ffffff);
+  box-shadow: var(--cdl-clinical-shadow-rest, 0 1px 3px rgba(15, 23, 42, 0.06));
   margin-top: 0.65rem;
 }
 
@@ -116,9 +117,9 @@
 .amb-handoff-checklist__notes textarea {
   width: 100%;
   border-radius: 6px;
-  border: 1px solid var(--border-subtle, rgba(148, 163, 184, 0.35));
-  background: var(--surface, rgba(2, 6, 23, 0.35));
-  color: inherit;
+  border: 1px solid var(--cdl-clinical-border, rgba(148, 163, 184, 0.5));
+  background: var(--app-surface-1, #ffffff);
+  color: var(--medical-ink, #111827);
   padding: 0.35rem 0.45rem;
   font: inherit;
 }

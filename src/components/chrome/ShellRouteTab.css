@@ -4,11 +4,15 @@
   justify-content: space-between;
   gap: 14px;
   flex-shrink: 0;
-  min-height: var(--cdl-route-tab-height, 44px);
-  padding: 8px var(--cdl-header-padding-inline, 18px);
-  border-bottom: 1px solid color-mix(in srgb, var(--medical-border) 90%, transparent);
-  background: var(--cdl-route-tab-bg, var(--medical-white));
-  box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--medical-accent) 12%, transparent);
+  min-height: var(--cdl-route-tab-height, 52px);
+  padding: 10px var(--cdl-header-padding-inline, 18px);
+  border-bottom: 1px solid color-mix(in srgb, var(--medical-border) 80%, transparent);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(14,165,233,0.025) 100%),
+    var(--cdl-route-tab-bg, var(--medical-white));
+  box-shadow:
+    inset 0 -1px 0 color-mix(in srgb, var(--medical-accent) 16%, transparent),
+    0 1px 4px rgba(15, 23, 42, 0.04);
 }
 
 .shell-route-tab__title-stack {
@@ -28,9 +32,9 @@
 .shell-route-tab__eyebrow {
   flex-shrink: 0;
   padding: 4px 10px;
-  border: 1px solid color-mix(in srgb, var(--medical-accent) 28%, var(--medical-border));
+  border: 1px solid color-mix(in srgb, var(--medical-accent) 32%, var(--medical-border));
   border-radius: var(--app-radius-pill, 999px);
-  background: color-mix(in srgb, var(--medical-accent) 8%, var(--medical-white));
+  background: color-mix(in srgb, var(--medical-accent) 10%, var(--medical-white));
   color: var(--medical-accent-hover);
   font-size: 10px;
   font-weight: 800;
@@ -38,6 +42,7 @@
   line-height: 1;
   text-transform: uppercase;
   white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(14, 165, 233, 0.1);
 }
 
 .shell-route-tab__title-block {
@@ -51,9 +56,9 @@
 .shell-route-tab__title {
   margin: 0;
   color: var(--medical-ink);
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
   line-height: 1.2;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -63,7 +68,7 @@
 .shell-route-tab__subtitle {
   margin: 0;
   color: var(--medical-ink-muted);
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.35;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -79,6 +84,16 @@
 
 .shell-route-tab__help {
   min-height: 30px;
+}
+
+/* ── EmsOffloadGauge: shrink ring for the tight route-tab context ─── */
+.shell-route-tab .cdl-ems-offload-gauge {
+  padding: 4px 8px;
+  gap: 5px;
+}
+.shell-route-tab .cdl-ems-offload-gauge__ring {
+  width: 20px;
+  height: 20px;
 }
 
 @media (max-width: 768px) {

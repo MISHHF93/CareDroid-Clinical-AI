@@ -1,0 +1,16 @@
+---
+pid: 15968
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cmd /c \"cd /d C:\\Users\\borah\\CareDroid-Clinical-AI && node scripts/capture-dashboard-resize-audit.mjs\""
+started_at: 2026-07-01T03:45:32.481Z
+running_for_ms: 29990009 
+---
+Capturing dashboard @ 375x812
+Capturing dashboard @ 768x1024
+Capturing dashboard @ 1024x768
+Capturing dashboard @ 1280x720
+Capturing dashboard @ 1440x900
+Capturing dashboard @ 1920x1080
+Capturing command-center @ 375x812
+Capturing command-center @ 768x1024
+Capturing command-center @ 1024x768

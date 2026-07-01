@@ -264,14 +264,16 @@
 }
 
 .ems-pipeline__row--warning {
-  border-left-color: color-mix(in srgb, var(--status-warning) 48%, transparent);
-  background: color-mix(in srgb, var(--status-warning) 5%, var(--app-surface-1, #ffffff));
+  border-left-width: 3px;
+  border-left-color: color-mix(in srgb, var(--status-warning) 72%, transparent);
+  background: color-mix(in srgb, var(--status-warning) 6%, var(--app-surface-1, #ffffff));
 }
 
 .ems-pipeline__row--critical,
 .ems-pipeline__row--arrived {
-  border-left-color: color-mix(in srgb, var(--status-critical) 48%, transparent);
-  background: color-mix(in srgb, var(--status-critical) 4%, var(--app-surface-1, #ffffff));
+  border-left-width: 3px;
+  border-left-color: color-mix(in srgb, var(--status-critical) 75%, transparent);
+  background: color-mix(in srgb, var(--status-critical) 5%, var(--app-surface-1, #ffffff));
 }
 
 .ems-pipeline__row--critical {

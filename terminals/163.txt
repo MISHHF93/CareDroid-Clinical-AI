@@ -1,0 +1,7 @@
+---
+pid: 7468
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "node node_modules/typescript/bin/tsc --noEmit -p tsconfig.frontend.json"
+started_at: 2026-07-01T02:42:14.432Z
+running_for_ms: 85007    
+---

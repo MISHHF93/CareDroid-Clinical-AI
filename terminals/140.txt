@@ -1,0 +1,40 @@
+---
+pid: 19836
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cd C:\\Users\\borah\\CareDroid-Clinical-AI; node node_modules/vitest/vitest.mjs run src/test/NotificationService.test.ts src/navigation/profileNavigateCoverage.test.tsx src/config/unified-navigation.config.test.ts 2>&1"
+started_at: 2026-07-01T00:41:24.795Z
+running_for_ms: 7334993  
+---
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+ ✓ src/config/unified-navigation.config.test.ts (13 tests) 36ms
+ ❯ src/navigation/profileNavigateCoverage.test.tsx (1 test | 1 failed) 38ms
+     × documents wired surfaces using profile navigation helpers 33ms
+ ✓ src/test/NotificationService.test.ts (22 tests) 42ms
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  1 failed | 35 passed (36)
+   Start at  20:41:26
+   Duration  13.17s (transform 2.00s, setup 1.97s, import 2.99s, tests 115ms, environment 6.93s)
+
+node : 
+At line:1 char:42
++ ... linical-AI; node node_modules/vitest/vitest.mjs run src/test/Notifica ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  src/navigation/profileNavigateCoverage.test.tsx > profileNavigateCoverage > documents wired surfaces using 
+profile navigation helpers
+Error: ENOENT: no such file or directory, open 'C:\Users\borah\CareDroid-Clinical-AI\src\pages\CommandDashboard.jsx'
+ ❯ src/navigation/profileNavigateCoverage.test.tsx:43:22
+     41|   it('documents wired surfaces using profile navigation helpers', () =…
+     42|     const wired = WIRED_SURFACE_FILES.filter((relativePath) => {
+     43|       const source = readFileSync(join(root, relativePath), 'utf8');
+       |                      ^
+     44|       return (
+     45|         source.includes('useProfileNavigate') ||
+ ❯ src/navigation/profileNavigateCoverage.test.tsx:42:39
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯

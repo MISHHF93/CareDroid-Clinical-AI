@@ -3,7 +3,7 @@ pid: 14024
 cwd: "C:\Users\borah\CareDroid-Clinical-AI"
 command: "cmd /c \"cd /d C:\\Users\\borah\\CareDroid-Clinical-AI && node_modules\\.bin\\vite build 2>&1\""
 started_at: 2026-06-30T23:56:35.395Z
-running_for_ms: 1275003  
+running_for_ms: 10025001 
 ---
 vite v7.3.5 building client environment for production...
 transforming...

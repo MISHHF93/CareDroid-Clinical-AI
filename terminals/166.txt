@@ -1,0 +1,151 @@
+---
+pid: 2688
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cmd /c \"cd /d C:\\Users\\borah\\CareDroid-Clinical-AI\\backend && npm run build\""
+started_at: 2026-07-01T03:09:21.944Z
+running_for_ms: 32159998 
+---
+
+> caredroid-clinical-ai-backend@1.0.0 prebuild
+> rimraf dist
+
+
+> caredroid-clinical-ai-backend@1.0.0 build
+> nest build
+
+Found 30 error(s).
+
+src/modules/emergency-os/emergency-os.workflow-orchestration.service.ts:54:55 - error TS2345: Argument of type 'readonly Readonly<{ id: string; category: AdministrativeAutomationCategory; status: AdministrativeAutomationStatus; patientId?: string; ... 18 more ...; route?: string; }>[]' is not assignable to parameter of type 'Readonly<{ id: string; category: AdministrativeAutomationCategory; status: AdministrativeAutomationStatus; patientId?: string; ... 18 more ...; route?: string; }>[]'.
+  The type 'readonly Readonly<{ id: string; category: AdministrativeAutomationCategory; status: AdministrativeAutomationStatus; patientId?: string; ... 18 more ...; route?: string; }>[]' is 'readonly' and cannot be assigned to the mutable type 'Readonly<{ id: string; category: AdministrativeAutomationCategory; status: AdministrativeAutomationStatus; patientId?: string; ... 18 more ...; route?: string; }>[]'.
+
+54     const result = reviewAdministrativeAutomationTask(this.taskQueue, input, {
+                                                         ~~~~~~~~~~~~~~
+src/modules/emergency-os/emergency-os.workflow-orchestration.service.ts:68:7 - error TS4104: The type 'readonly Readonly<{ id: string; category: AdministrativeAutomationCategory; status: AdministrativeAutomationStatus; patientId?: string; ... 18 more ...; route?: string; }>[]' is 'readonly' and cannot be assigned to the mutable type 'Readonly<{ id: string; category: AdministrativeAutomationCategory; status: AdministrativeAutomationStatus; patientId?: string; ... 18 more ...; route?: string; }>[]'.
+
+68       existingTasks: this.taskQueue,
+         ~~~~~~~~~~~~~
+
+  ../src/services/unifiedClinicalWorkflowOrchestrator.ts:458:3
+    458   existingTasks?: AdministrativeAutomationTask[];
+          ~~~~~~~~~~~~~
+    The expected type comes from property 'existingTasks' which is declared here on type '{ patients?: Patient[]; staff?: Staff[]; referrals?: Referral[]; alerts?: Alert[]; emsArrivals?: EMSArrival[]; capacity?: CapacitySnapshot; existingTasks?: Readonly<...>[]; now?: Date; }'
+../src/components/whiteboard/emsAwarenessModel.ts:7:43 - error TS6142: Module '../EMSPressureScore' was resolved to 'C:/Users/borah/CareDroid-Clinical-AI/src/components/EMSPressureScore.tsx', but '--jsx' is not set.
+
+7 import { calculateEMSPressureScore } from '../EMSPressureScore';
+                                            ~~~~~~~~~~~~~~~~~~~~~
+../src/config/apiEnv.ts:4:46 - error TS1343: The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', or 'nodenext'.
+
+4 export const DEFAULT_API_TIMEOUT_MS = Number(import.meta.env?.VITE_API_TIMEOUT_MS) || 30000;
+                                               ~~~~~~~~~~~
+../src/config/apiEnv.ts:4:58 - error TS2339: Property 'env' does not exist on type 'ImportMeta'.
+
+4 export const DEFAULT_API_TIMEOUT_MS = Number(import.meta.env?.VITE_API_TIMEOUT_MS) || 30000;
+                                                           ~~~
+../src/config/appConfig.ts:2:17 - error TS1343: The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', or 'nodenext'.
+
+2   const value = import.meta.env?.[key];
+                  ~~~~~~~~~~~
+../src/config/appConfig.ts:2:29 - error TS2339: Property 'env' does not exist on type 'ImportMeta'.
+
+2   const value = import.meta.env?.[key];
+                              ~~~
+../src/config/appConfig.ts:24:41 - error TS1343: The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', or 'nodenext'.
+
+24 const isProductionBuild = () => Boolean(import.meta.env?.PROD);
+                                           ~~~~~~~~~~~
+../src/config/appConfig.ts:24:53 - error TS2339: Property 'env' does not exist on type 'ImportMeta'.
+
+24 const isProductionBuild = () => Boolean(import.meta.env?.PROD);
+                                                       ~~~
+../src/engine/continuousPatientFlowEngine.ts:185:46 - error TS2367: This comparison appears to be unintentional because the types 'JourneyEventType' and '"FollowUpScheduled"' have no overlap.
+
+185     return patient.timeline?.some((event) => event.type === 'FollowUpScheduled') ? 'follow-up' : 'discharge';
+                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../src/services/apiClient.ts:104:16 - error TS1343: The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', or 'nodenext'.
+
+104 const isDev = !import.meta.env.VITEST &&
+                   ~~~~~~~~~~~
+../src/services/apiClient.ts:104:28 - error TS2339: Property 'env' does not exist on type 'ImportMeta'.
+
+104 const isDev = !import.meta.env.VITEST &&
+                               ~~~
+../src/services/apiClient.ts:106:92 - error TS1343: The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', or 'nodenext'.
+
+106   (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || import.meta?.env?.DEV);
+                                                                                               ~~~~~~~~~~~
+../src/services/apiClient.ts:106:105 - error TS2339: Property 'env' does not exist on type 'ImportMeta'.
+
+106   (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || import.meta?.env?.DEV);
+                                                                                                            ~~~
+../src/services/apiClient.ts:350:20 - error TS2554: Expected 0-1 arguments, but got 2.
+
+350     super(message, cause ? { cause } : undefined);
+                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../src/services/apiClient.ts:462:3 - error TS2322: Type 'AxiosRequestHeaders | {}' is not assignable to type 'AxiosRequestHeaders'.
+  Type '{}' is not assignable to type 'AxiosRequestHeaders'.
+    Type '{}' is missing the following properties from type 'AxiosHeaders': set, get, has, delete, and 24 more.
+
+462   config.headers = config.headers || {};
+      ~~~~~~~~~~~~~~
+../src/services/devBackendAuth.ts:23:5 - error TS1343: The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', or 'nodenext'.
+
+23     import.meta?.env?.DEV);
+       ~~~~~~~~~~~
+../src/services/devBackendAuth.ts:23:18 - error TS2339: Property 'env' does not exist on type 'ImportMeta'.
+
+23     import.meta?.env?.DEV);
+                    ~~~
+../src/services/queueIntelligenceService.ts:168:34 - error TS2339: Property 'oldestPatient' does not exist on type '{}'.
+
+168     const oldestPatient = (state.oldestPatient || {}) as Record<string, any>;
+                                     ~~~~~~~~~~~~~
+../src/services/queueIntelligenceService.ts:171:27 - error TS2339: Property 'count' does not exist on type '{}'.
+
+171       count: Number(state.count || 0),
+                              ~~~~~
+../src/services/queueIntelligenceService.ts:172:30 - error TS2339: Property 'waitTime' does not exist on type '{}'.
+
+172       waitTime: Number(state.waitTime || 0),
+                                 ~~~~~~~~
+../src/services/queueIntelligenceService.ts:179:24 - error TS2339: Property 'riskLevel' does not exist on type '{}'.
+
+179       riskLevel: state.riskLevel || 'low',
+                           ~~~~~~~~~
+../src/services/queueIntelligenceService.ts:180:32 - error TS2339: Property 'throughput' does not exist on type '{}'.
+
+180       throughput: Number(state.throughput || 0),
+                                   ~~~~~~~~~~
+../src/services/unifiedClinicalWorkflowOrchestrator.ts:157:11 - error TS2367: This comparison appears to be unintentional because the types 'JourneyEventType' and '"Handoff"' have no overlap.
+
+157           event.type === 'Handoff' ||
+              ~~~~~~~~~~~~~~~~~~~~~~~~
+../src/services/unifiedClinicalWorkflowOrchestrator.ts:710:5 - error TS2322: Type '"administrative_automation_reviewed"' is not assignable to type 'WorkflowActionType'.
+
+710     type: 'administrative_automation_reviewed',
+        ~~~~
+
+  ../src/types/emergency.ts:866:3
+    866   type: WorkflowActionType;
+          ~~~~
+    The expected type comes from property 'type' which is declared here on type 'WorkflowActionInput'
+../src/services/unifiedClinicalWorkflowOrchestrator.ts:721:7 - error TS2322: Type '{ ok: boolean; detail: string; }' is not assignable to type 'string | number | boolean'.
+
+721       execution,
+          ~~~~~~~~~
+../src/store/emergencyStore.ts:65:8 - error TS6142: Module '../services/emergencySettingsApi' was resolved to 'C:/Users/borah/CareDroid-Clinical-AI/src/services/emergencySettingsApi.tsx', but '--jsx' is not set.
+
+65 } from '../services/emergencySettingsApi';
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../src/store/emergencyStore.ts:1683:12 - error TS1343: The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', or 'nodenext'.
+
+1683   Boolean((import.meta as ImportMeta & { env?: { DEV?: boolean } }).env?.DEV);
+                ~~~~~~~~~~~
+../src/store/emergencyStore.ts:5783:5 - error TS1343: The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', or 'nodenext'.
+
+5783 if (import.meta.env.DEV && typeof window !== 'undefined') {
+         ~~~~~~~~~~~
+../src/store/emergencyStore.ts:5783:17 - error TS2339: Property 'env' does not exist on type 'ImportMeta'.
+
+5783 if (import.meta.env.DEV && typeof window !== 'undefined') {
+                     ~~~
+

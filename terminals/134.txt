@@ -1,0 +1,15 @@
+---
+pid: 30612
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cd C:\\Users\\borah\\CareDroid-Clinical-AI; node node_modules/vitest/vitest.mjs run src/lib/navigation.test.ts src/config/unified-navigation.config.test.ts src/routing/canonicalRouteTree.routesA.test.tsx 2>&1 | Select-Object -Last 8"
+started_at: 2026-07-01T00:24:01.291Z
+running_for_ms: 8380013  
+---
+     ✓ /emergency/patients consumes patientId context without another lookup  364ms
+ ✓ src/config/unified-navigation.config.test.ts (13 tests) 19ms
+
+ Test Files  3 passed (3)
+      Tests  29 passed (29)
+   Start at  20:24:02
+   Duration  15.85s (transform 4.29s, setup 953ms, import 6.04s, tests 1.80s, environment 6.38s)
+

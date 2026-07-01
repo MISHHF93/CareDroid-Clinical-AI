@@ -15,9 +15,9 @@
   font-size: 0.75rem;
   padding: 4px 8px;
   border-radius: 8px;
-  border: 1px solid var(--app-panel-border, rgba(255, 255, 255, 0.14));
-  background: var(--app-overlay-on-surface, rgba(255, 255, 255, 0.04));
-  color: var(--text-color, var(--medical-ink, #111827));
+  border: 1px solid var(--medical-border, #e2e8f0);
+  background: var(--app-surface-1, #ffffff);
+  color: var(--medical-ink, #111827);
   max-width: 180px;
 }
 
@@ -70,14 +70,15 @@
 .profile-role-switcher__menu-item span {
   font-size: 0.8rem;
   font-weight: 600;
+  color: var(--medical-ink, #111827);
 }
 
 .profile-role-switcher__menu-item small {
   font-size: 0.68rem;
-  color: var(--muted-text, #9ca3af);
+  color: var(--medical-ink-muted, #6b7280);
 }
 
 .profile-role-switcher__menu-item:hover,
 .profile-role-switcher__menu-item.is-active {
-  background: color-mix(in srgb, var(--app-accent-interactive) 12%, transparent);
+  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 10%, var(--medical-accent-tint, #e0f2fe));
 }

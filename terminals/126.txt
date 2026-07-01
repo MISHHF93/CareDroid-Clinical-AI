@@ -3,7 +3,7 @@ pid: 26360
 cwd: "C:\Users\borah\CareDroid-Clinical-AI"
 command: "cd C:\\Users\\borah\\CareDroid-Clinical-AI; npm.cmd run test:responsive-regression 2>&1"
 started_at: 2026-06-30T23:15:44.880Z
-running_for_ms: 3725004  
+running_for_ms: 12475008 
 ---
 
 > caredroid-clinical-ai@1.0.0 test:responsive-regression

@@ -1,0 +1,3295 @@
+---
+pid: 3800
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cd \"C:\\Users\\borah\\CareDroid-Clinical-AI\"; node node_modules/vitest/vitest.mjs run src/styles/designTokens.test.ts src/styles/medicalThemeAudit.test.ts src/styles/visualConsistencySweep.test.ts src/config/designSystem.test.ts src/config/semanticColorSystem.test.ts 2>&1"
+started_at: 2026-07-01T01:20:23.226Z
+running_for_ms: 4995009  
+---
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+ ❯ src/styles/medicalThemeAudit.test.ts (8 tests | 1 failed) 277ms
+     ✓ loads every normalization layer through the design-system entry 3ms
+     ✓ defines medical card surface contracts with paired bg/fg tokens 1ms
+     ✓ locks theme preference off and standard theme to light 1ms
+     ✓ does not ship a dark theme token block 1ms
+     ✓ maps emergency and native-ai text to medical ink, not white fallbacks 0ms
+     ✓ avoids dark navy panel backgrounds in product CSS 4ms
+     × replaces legacy royal blue accents with sky blue in product code 207ms
+     ✓ avoids white-on-light card text fallbacks in product card CSS 52ms
+ ✓ src/styles/designTokens.test.ts (15 tests) 26ms
+ ✓ src/styles/visualConsistencySweep.test.ts (4 tests) 10ms
+ ✓ src/config/designSystem.test.ts (4 tests) 13ms
+ ✓ src/config/semanticColorSystem.test.ts (3 tests) 11ms
+node : 
+At line:1 char:44
++ ... inical-AI"; node node_modules/vitest/vitest.mjs run src/styles/design ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  src/styles/medicalThemeAudit.test.ts > medical theme full-scale audit > replaces legacy royal blue accents with 
+sky blue in product code
+AssertionError: expected '* {\n  margin: 0;\n  padding: 0;\n  b…' not to match /#2563eb\b/i
+- Expected:
+/#2563eb\b/i
++ Received:
+"* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+/* Numeric primitives (--space-*, --radius-*, --font-*) live in src/styles/primitives.css */
+/* Smooth scrolling */
+html {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  height: auto;
+  min-height: 100%;
+  scroll-behavior: smooth;
+  overflow-x: clip;
+  overflow-y: auto;
+  overscroll-behavior-x: none;
+  overscroll-behavior-y: auto;
+}
+body {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  height: auto;
+  min-height: 100dvh;
+  overflow-x: clip;
+  overflow-y: auto;
+  background: var(--app-bg);
+  color: var(--app-fg);
+  overscroll-behavior-x: none;
+  overscroll-behavior-y: auto;
+  -webkit-text-size-adjust: 100%;
+}
+#root {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  height: auto;
+  min-height: 100dvh;
+  min-height: var(--app-viewport-height, 100dvh);
+  position: relative;
+  box-sizing: border-box;
+  overflow-x: clip;
+  overflow-y: visible;
+  overscroll-behavior-x: none;
+  display: flex;
+  flex-direction: column;
+}
+html.app-scroll-locked,
+body.app-scroll-locked {
+  overflow: hidden !important;
+}
+#root > * {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+}
+.app-scroll-container {
+  overflow-y: auto;
+  overflow-x: clip;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable;
+  scroll-padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
+}
+.app-local-scroll-y {
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: clip;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable;
+}
+.app-local-scroll-x {
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+/* Textarea auto-resize */
+textarea {
+  field-sizing: content;
+}
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+.app-shell {
+  font-family:
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+}
+.card {
+  background: var(--surface-1);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--compact-panel-radius, var(--radius-lg));
+  box-shadow: var(--compact-shadow, none);
+}
+.card-subtle {
+  background: var(--surface-2);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--compact-card-radius, var(--radius-md));
+}
+.btn-primary {
+  background: var(--accent-gradient);
+  color: var(--navy-ink);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 12px 18px;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: var(--app-min-touch-target, 44px);
+  box-sizing: border-box;
+}
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--panel-border);
+  color: var(--text-color);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  cursor: pointer;
+  min-height: var(--app-min-touch-target, 44px);
+  box-sizing: border-box;
+}
+.badge {
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  border: 1px solid var(--panel-border);
+}
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+@keyframes glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--app-accent) 18%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--app-accent) 22%, transparent);
+  }
+}
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+/* Utility Animation Classes */
+.animate-fade-in {
+  animation: fadeIn 0.4s var(--ease-smooth);
+}
+.animate-slide-in-right {
+  animation: slideInRight 0.4s var(--ease-smooth);
+}
+.animate-slide-in-left {
+  animation: slideInLeft 0.4s var(--ease-smooth);
+}
+.animate-slide-up {
+  animation: slideUp 0.4s var(--ease-smooth);
+}
+.animate-scale-in {
+  animation: scaleIn 0.3s var(--ease-bounce);
+}
+.animate-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}
+/* Page Transitions */
+.page-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 0.4s var(--ease-smooth),
+    transform 0.4s var(--ease-smooth);
+}
+.page-exit {
+  opacity: 1;
+}
+.page-exit-active {
+  opacity: 0;
+  transition: opacity 0.3s var(--ease-smooth);
+}
+/* Hover Effects */
+.hover-lift {
+  transition:
+    transform 0.2s var(--ease-smooth),
+    box-shadow 0.2s var(--ease-smooth);
+}
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-1);
+}
+.hover-glow:hover {
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--app-accent) 24%, transparent);
+}
+/* Focus States */
+*:focus-visible {
+  outline: 2px solid var(--app-accent-interactive);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+/* Smooth Transitions */
+a,
+button,
+input,
+select,
+textarea {
+  transition:
+    background-color var(--motion-transition-fast),
+    border-color var(--motion-transition-fast),
+    color var(--motion-transition-fast),
+    opacity var(--motion-transition-fast),
+    box-shadow var(--motion-transition-fast),
+    transform var(--motion-transition-fast);
+}
+/* Backdrop Blur Utility */
+.backdrop-blur {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+.backdrop-blur-sm {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.backdrop-blur-lg {
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+}
+/* Gradient Text */
+.gradient-text {
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+/* Loading Skeleton */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 25%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.05) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading var(--motion-skeleton-duration, 1.15s) var(--motion-ease-standard) infinite;
+  border-radius: var(--radius-sm);
+}
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+/* Route loaders & marketing shell (token-driven) */
+.page-loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.page-loader-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid var(--panel-border);
+  border-top-color: var(--accent-green);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+.page-loader-label {
+  font-size: var(--font-14);
+  color: var(--muted-text);
+}
+.app-init-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+  min-height: 100vh;
+  width: 100%;
+  max-width: 100%;
+  background: var(--navy-bg);
+  color: var(--text-color);
+  box-sizing: border-box;
+  padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0) env(safe-area-inset-bottom, 0)
+    env(safe-area-inset-left, 0);
+}
+.welcome-page-root {
+  min-height: clamp(540px, calc(var(--app-viewport-height, 100dvh) - 180px), 860px);
+  width: 100%;
+  max-width: 100%;
+  background: var(--navy-bg);
+  color: var(--text-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(12px, 4vw, 40px) 0;
+  box-sizing: border-box;
+}
+.welcome-page-inner {
+  text-align: center;
+  width: min(100%, 980px);
+  max-width: 100%;
+}
+.welcome-page-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-6);
+  color: var(--accent-1, var(--accent-1));
+}
+.welcome-page-title {
+  font-size: clamp(1.8rem, 4vw, 4.75rem);
+  font-weight: 700;
+  margin-bottom: var(--space-4);
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.welcome-page-lead {
+  max-width: 760px;
+  margin-inline: auto;
+  font-size: clamp(1rem, 1.2vw, 1.4rem);
+  color: var(--muted-text);
+  margin-bottom: clamp(24px, 4svh, 40px);
+  line-height: 1.6;
+}
+.welcome-page-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(var(--space-3), 2vw, var(--space-5));
+  margin-bottom: clamp(24px, 4svh, 40px);
+}
+.welcome-page-card {
+  min-width: 0;
+  padding: clamp(var(--space-4), 2vw, var(--space-6));
+  background: color-mix(in srgb, var(--accent-green) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent-green) 32%, transparent);
+  border-radius: var(--radius-md);
+  text-align: left;
+}
+.welcome-page-card-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.welcome-page-card-title--icon {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-color);
+}
+.welcome-page-card-title--icon .nav-icon-svg {
+  flex-shrink: 0;
+  color: var(--accent-1, var(--accent-1));
+}
+.welcome-page-card-desc {
+  font-size: clamp(var(--font-14), 1vw, var(--font-16));
+  color: var(--muted-text);
+}
+.welcome-page-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3);
+}
+.welcome-page-cta,
+.welcome-page-dev-cta {
+  padding: 14px 32px;
+  font-size: var(--font-16);
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  box-shadow: var(--shadow-1);
+  min-height: var(--app-min-touch-target, 44px);
+}
+.welcome-page-cta {
+  background: var(--accent-gradient);
+  color: var(--app-accent-contrast);
+  border: none;
+}
+.welcome-page-dev-cta {
+  background: color-mix(in srgb, var(--accent-green) 16%, transparent);
+  color: var(--text-color);
+  border: 1px solid color-mix(in srgb, var(--accent-green) 48%, transparent);
+}
+.welcome-page-cta:hover,
+.welcome-page-dev-cta:hover {
+  box-shadow: var(--shadow-2);
+}
+.welcome-page-dev-note {
+  margin: var(--space-3) auto 0;
+  max-width: 620px;
+  font-size: var(--font-14);
+  color: var(--muted-text);
+}
+.welcome-page-dev-note code {
+  font-size: 0.85em;
+  color: var(--accent-2);
+}
+.welcome-page-footnote {
+  margin-top: var(--space-6);
+  font-size: var(--font-14);
+  color: var(--muted-text);
+}
+@media (max-width: 760px) {
+  .welcome-page-root {
+    align-items: flex-start;
+    min-height: auto;
+  }
+  .welcome-page-inner {
+    width: min(100%, 640px);
+  }
+  .welcome-page-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 420px) {
+  .welcome-page-icon {
+    margin-bottom: var(--space-4);
+  }
+  .welcome-page-lead {
+    line-height: 1.45;
+  }
+  .welcome-page-card {
+    border-radius: var(--radius-lg);
+  }
+  .welcome-page-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .welcome-page-cta,
+  .welcome-page-dev-cta {
+    width: min(100%, 320px);
+    margin-inline: auto;
+  }
+}
+html,
+body,
+#root {
+  min-width: 0;
+  min-height: 100svh;
+}
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+button,
+[role='button'],
+a,
+input,
+select,
+textarea {
+  touch-action: manipulation;
+}
+.emergency-app-shell,
+.emergency-app-shell * {
+  -webkit-tap-highlight-color: transparent;
+}
+.ed-skip-link {
+  position: fixed;
+  inset-block-start: var(--space-2, 8px);
+  inset-inline-start: var(--space-2, 8px);
+  z-index: var(--z-toast, 1200);
+  padding: var(--space-2, 8px) var(--space-3, 12px);
+  border: 1px solid var(--app-accent-interactive, var(--status-info, #0ea5e9));
+  border-radius: var(--radius-md, 8px);
+  background: var(--color-elevated, var(--app-surface-1, #ffffff));
+  color: var(--color-text-primary, var(--medical-ink, #111827));
+  font-size: var(--font-size-sm, 0.875rem);
+  font-weight: 700;
+  text-decoration: none;
+  transform: translateY(calc(-100% - var(--space-4, 16px)));
+  transition: transform 160ms var(--ease-smooth, ease);
+}
+.ed-skip-link:focus,
+.ed-skip-link:focus-visible {
+  transform: translateY(0);
+  outline: 2px solid var(--app-accent-interactive, var(--status-info, #0ea5e9));
+  outline-offset: 2px;
+}
+@media (max-width: 768px) {
+  .emergency-app-shell button,
+  .emergency-app-shell [role='button'],
+  .emergency-app-shell input,
+  .emergency-app-shell select,
+  .emergency-app-shell textarea {
+    min-height: 44px;
+  }
+}
+.app-scroll-container {
+  min-height: 0;
+  min-width: 0;
+  overflow-anchor: none;
+  contain: layout paint;
+  scroll-padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
+}
+.app-keyboard-visible .app-scroll-container {
+  scroll-padding-bottom: max(16px, var(--app-keyboard-inset-bottom, 0px));
+}
+@supports (height: 100dvh) {
+  #root {
+    min-height: 100dvh;
+  }
+  .app-keyboard-visible #root {
+    min-height: var(--app-viewport-height, 100dvh);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+/**
+ * @deprecated Palette and semantics live in src/styles/design-system.css.
+ * Retained as a no-op import target for legacy tooling; do not add tokens here.
+ */
+/**
+ * CareDroid visual responsive standards.
+ * Late-loaded guardrail layer for readable typography, balanced spacing,
+ * wrapping controls, and non-crowded app surfaces across phone, tablet,
+ * desktop, and wide command-center screens.
+ */
+:root {
+  --app-readable-body-size: 15px;
+  --app-readable-small-size: 13px;
+  --app-readable-caption-size: 12px;
+  --app-readable-title-size: 30px;
+  --app-readable-heading-size: 22px;
+  --app-readable-card-title-size: 17px;
+  --app-readable-line-height: 1.55;
+  --app-readable-heading-line-height: 1.22;
+  --app-visual-page-max: min(100%, 1680px);
+  --app-visual-readable-max: 1120px;
+  --app-visual-page-gutter: 24px;
+  --app-visual-section-gap: 22px;
+  --app-visual-panel-gap: 18px;
+  --app-visual-header-padding: 24px;
+  --app-visual-card-padding: 20px;
+  --app-visual-control-gap: 10px;
+  --app-visual-control-height: 44px;
+  --app-visual-grid-min: minmax(min(100%, 260px), 1fr);
+  --app-visual-grid-min-compact: minmax(min(100%, 220px), 1fr);
+  --font-size-sm: var(--app-readable-small-size);
+  --font-size-base: var(--app-readable-body-size);
+  --font-size-md: var(--app-readable-body-size);
+  --font-size-lg: var(--app-readable-card-title-size);
+  --font-size-xl: var(--app-readable-heading-size);
+  --font-size-2xl: var(--app-readable-title-size);
+  --app-body-size: var(--app-readable-body-size);
+  --app-caption-size: var(--app-readable-caption-size);
+  --app-card-title-size: var(--app-readable-card-title-size);
+  --app-section-title-size: var(--app-readable-heading-size);
+  --app-page-title-size: var(--app-readable-title-size);
+  --app-card-padding-compact: 16px;
+  --app-card-padding-standard: var(--app-visual-card-padding);
+  --app-card-padding-dashboard: var(--app-visual-card-padding);
+  --app-card-padding-tool: var(--app-visual-card-padding);
+  --app-card-padding-calculator: var(--app-visual-card-padding);
+  --component-card-padding: var(--app-visual-card-padding);
+  --component-card-gap: var(--app-visual-panel-gap);
+  --compact-page-gap: var(--app-visual-section-gap);
+  --compact-panel-gap: var(--app-visual-panel-gap);
+  --compact-card-padding: var(--app-visual-card-padding);
+  --compact-panel-padding: var(--app-visual-header-padding);
+  --compact-control-height: var(--app-visual-control-height);
+  --app-button-height: var(--app-visual-control-height);
+  --app-input-height: var(--app-visual-control-height);
+  --component-button-height: var(--app-visual-control-height);
+  --type-body-line-height: var(--app-readable-line-height);
+  --type-small-line-height: 1.5;
+  --type-heading-line-height: var(--app-readable-heading-line-height);
+  --type-subheading-line-height: 1.3;
+}
+@media (max-width: 768px) {
+  :root {
+    --app-readable-body-size: 15px;
+    --app-readable-title-size: 24px;
+    --app-readable-heading-size: 20px;
+    --app-visual-page-gutter: 16px;
+    --app-visual-section-gap: 18px;
+    --app-visual-panel-gap: 14px;
+    --app-visual-header-padding: 18px;
+    --app-visual-card-padding: 16px;
+    --app-visual-control-height: 46px;
+  }
+}
+@media (min-width: 1600px) {
+  :root {
+    --app-readable-body-size: 16px;
+    --app-readable-small-size: 14px;
+    --app-readable-caption-size: 12px;
+    --app-readable-title-size: 34px;
+    --app-readable-heading-size: 24px;
+    --app-readable-card-title-size: 18px;
+    --app-visual-page-gutter: 32px;
+    --app-visual-section-gap: 26px;
+    --app-visual-panel-gap: 20px;
+    --app-visual-header-padding: 28px;
+    --app-visual-card-padding: 22px;
+  }
+}
+@media (min-width: 2200px) {
+  :root {
+    --app-readable-body-size: 17px;
+    --app-readable-title-size: 38px;
+    --app-readable-heading-size: 28px;
+    --app-visual-page-max: min(100%, 1880px);
+    --app-visual-page-gutter: 40px;
+    --app-visual-section-gap: 30px;
+  }
+}
+:is(.app-shell, .emergency-app-shell) {
+  font-size: var(--app-readable-body-size);
+  line-height: var(--app-readable-line-height);
+  text-rendering: optimizeLegibility;
+}
+:is(.app-shell, .emergency-app-shell) :is(
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    p,
+    li,
+    dd,
+    dt,
+    span,
+    strong,
+    small,
+    label,
+    button,
+    a,
+    th,
+    td
+  ) {
+  min-width: 0;
+  max-width: 100%;
+  letter-spacing: 0;
+  /* break-word: splits only words that are individually too long for the container.
+     'anywhere' was breaking every word at the container edge, causing single-character
+     vertical stacking in narrow patient card columns. */
+  overflow-wrap: break-word;
+}
+:is(.app-shell, .emergency-app-shell) :is(h1, .cd-page-shell__title, [class*='__title']) {
+  font-size: var(--app-readable-title-size);
+  line-height: var(--app-readable-heading-line-height);
+}
+:is(.app-shell, .emergency-app-shell) :is(h2, .cd-section-header__title) {
+  font-size: var(--app-readable-heading-size);
+}
+:is(.app-shell, .emergency-app-shell) :is(h3, h4, [class*='card__title'], [class*='panel__title']) {
+  font-size: var(--app-readable-card-title-size);
+}
+:is(.app-shell, .emergency-app-shell) :is(p, li, dd, dt, td, input, select, textarea) {
+  font-size: var(--app-readable-body-size);
+  line-height: var(--app-readable-line-height);
+}
+:is(.app-shell, .emergency-app-shell) :is(small, figcaption, [class*='caption'], [class*='meta'], [class*='eyebrow']) {
+  font-size: var(--app-readable-caption-size);
+  line-height: 1.45;
+}
+:is(.app-shell, .emergency-app-shell) :is(
+    .cd-page-shell,
+    .emergency-route-page,
+    .help-hub-page,
+    .emergency-analytics,
+    .emergency-settings,
+    .integration-hub-page,
+    .tools-overview-shell,
+    .team-management,
+    .system-health-page
+  ) {
+  width: 100%;
+  max-width: var(--app-visual-page-max);
+  margin-inline: auto;
+  padding: var(--app-visual-page-gutter);
+}
+:is(.app-shell, .emergency-app-shell) :is(.cd-page-shell, .emergency-route-page) {
+  gap: var(--app-visual-section-gap);
+}
+:is(.app-shell, .emergency-app-shell) :is(.cd-page-shell__content, .emergency-route-page__content) {
+  gap: var(--app-visual-section-gap);
+}
+:is(.app-shell, .emergency-app-shell) :is(
+    .cd-page-header,
+    .emergency-route-page__hero,
+    [class$='-hero'],
+    [class*='-hero '],
+    [class$='-header'],
+    [class*='-header ']
+  ) {
+  align-items: flex-start;
+  gap: var(--app-visual-panel-gap);
+  padding: var(--app-visual-header-padding);
+}
+:is(.app-shell, .emergency-app-shell) :is(
+    .card,
+    [class$='-card'],
+    [class*='-card '],
+    [class$='-panel'],
+    [class*='-panel '],
+    [class$='-widget'],
+    [class*='-widget '],
+    .cd-dashboard-section,
+    .cd-surface,
+    .cd-hero-panel
+  ) {
+  padding: var(--app-visual-card-padding);
+}
+:is(.app-shell, .emergency-app-shell) :is(
+    .cd-dashboard-grid,
+    .emergency-route-metric-grid,
+    .emergency-route-signal-grid,
+    .emergency-route-patient-grid,
+    .dashboard-card-grid,
+    .metric-grid,
+    .stats-grid,
+    .summary-grid,
+    [class*='grid']
+  ) {
+  gap: var(--app-visual-panel-gap);
+}
+:is(.app-shell, .emergency-app-shell) :is(
+    .cd-dashboard-grid--cards,
+    .cd-dashboard-grid--summary,
+    .emergency-route-metric-grid,
+    .emergency-route-signal-grid,
+    .dashboard-card-grid,
+    .metric-grid,
+    .stats-grid,
+    .summary-grid
+  ) {
+  grid-template-columns: repeat(auto-fit, var(--app-visual-grid-min));
+}
+:is(.app-shell, .emergency-app-shell) :is(
+    button,
+    a[role='button'],
+    [role='button'],
+    input:not([type='checkbox']):not([type='radio']),
+    select,
+    textarea
+  ) {
+  min-height: var(--app-visual-control-height);
+  font-size: max(15px, var(--app-readable-body-size));
+}
+:is(.app-shell, .emergency-app-shell) :is(
+    button,
+    a[role='button'],
+    [role='button'],
+    .help-topic__related-btn,
+    .help-hub__tab
+  ) {
+  white-space: normal;
+  text-wrap: pretty;
+}
+:is(.app-shell, .emergency-app-shell) :is(
+    [class*='actions'],
+    [class*='controls'],
+    [class*='toolbar'],
+    [class*='filters'],
+    .cd-action-row,
+    .help-hub__tabs,
+    .emergency-route-chip-row
+  ) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--app-visual-control-gap);
+}
+:is(.app-shell, .emergency-app-shell) :is(
+    [class*='badge'],
+    [class*='chip'],
+    [class*='pill'],
+    [class*='tag'],
+    .cd-metric-chip
+  ) {
+  min-height: 28px;
+  align-items: center;
+  white-space: normal;
+  text-align: start;
+}
+@media (max-width: 900px) {
+  :is(.app-shell, .emergency-app-shell) :is(
+      .cd-workspace-split,
+      .cd-workspace-split--balanced,
+      .cd-workspace-split--wide,
+      .cd-dashboard-grid--split,
+      .emergency-route-queue-row,
+      .emergency-route-signal-row,
+      .help-hub__journey-step
+    ) {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  :is(.app-shell, .emergency-app-shell) :is(
+      .cd-section-header,
+      .cd-dashboard-card__header,
+      .cd-tool-card__header,
+      .cd-insight-card__header,
+      .emergency-route-page__title-row
+    ) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+@media (max-width: 520px) {
+  :is(.app-shell, .emergency-app-shell) :is(
+      .cd-page-shell,
+      .emergency-route-page,
+      .help-hub-page,
+      .emergency-analytics,
+      .emergency-settings
+    ) {
+    padding-inline: 12px;
+  }
+  :is(.app-shell, .emergency-app-shell) :is(
+      .cd-dashboard-grid--cards,
+      .cd-dashboard-grid--summary,
+      .emergency-route-metric-grid,
+      .emergency-route-signal-grid,
+      .dashboard-card-grid,
+      .metric-grid,
+      .stats-grid,
+      .summary-grid
+    ) {
+    grid-template-columns: repeat(auto-fit, var(--app-visual-grid-min-compact));
+  }
+}
+/**
+ * Visual consistency sweep.
+ * Late-loaded normalizers for legacy page CSS that predates the canonical
+ * CareDroid primitives. Keep behavior local to the app shell.
+ */
+:root {
+  --app-visual-page-max: var(--app-fluid-container-max-wide);
+  --app-visual-page-gap: var(--compact-page-gap, var(--app-fluid-section-gap));
+  --app-visual-panel-gap: var(--compact-panel-gap, var(--app-space-md));
+  --app-visual-header-padding: var(--compact-panel-padding, var(--app-card-padding-standard));
+  --app-visual-card-padding: var(--compact-card-padding, var(--app-card-padding-compact));
+  --app-visual-table-cell-padding: var(--app-space-sm);
+  --app-visual-control-gap: var(--app-space-sm);
+  --app-visual-control-radius: var(--compact-card-radius, var(--app-radius-md));
+  --app-visual-panel-radius: var(--compact-panel-radius, var(--app-radius-lg));
+  --app-normalized-dashboard-grid-min: minmax(min(100%, var(--app-grid-card-min-density, 14rem)), 1fr);
+}
+:is(.app-shell, .emergency-app-shell) :is(
+    [class$='-page'],
+    [class*='-page '],
+    [class$='-dashboard'],
+    [class*='-dashboard '],
+    .calculators-content,
+    .clinical-tool-catalog,
+    .org-page,
+    .biometric-container,
+    .consent-container,
+    .app-shell-page-body > main
+  ) {
+  min-width: 0;
+  width: 100%;
+  max-width: var(--app-visual-page-max);
+  margin-inline: auto;
+}
+:is(.app-shell, .emergency-app-shell) :is(
+    [class$='-page'],
+    [class*='-page '],
+    [class$='-dashboard'],
+    [class*='-dashboard '],
+    .calculators-content,
+    .clinical-tool-catalog,
+    .org-page
+  ) {
+  gap: var(--app-visual-page-gap);
+}
+/* Final normalization pass: one dashboard/card/form/table/search language. */
+:is(.app-shell, .emergency-app-shell) :is(
+    .analytics-summary,
+    .cost-summary,
+    .header-stats,
+    .platform-kpi-grid,
+    .dashboard-card-grid,
+    .metric-grid,
+    .stats-grid,
+    .summary-grid
+  ) {
+  display: grid;
+  gap: var(--app-visual-panel-gap);
+  grid-template-columns: repeat(auto-fit, var(--app-normalized-dashboard-grid-min));
+  min-width: 0;
+}
+:is(.app-shell, .emergency-app-shell) :is(
+    .analytics-grid,
+    .cost-grid,
+    .platform-workflow-layout,
+    .platform-result-grid,
+    .operating-card-grid,
+    .tools-grid,
+    .command-action-grid,
+    .command-launch-grid
+  ) {
+  gap: var(--app-visual-page-gap);
+  min-width: 0;
+}
+:is(.app-shell, .emergency-app-shell) :is(
+    .cd-page-header,
+    [class$='-hero'],
+    [class*='-hero '],
+    [class$='-page-header'],
+    [class*='-page-header '],
+    .analytics-header,
+    .cost-header,
+    .biometric-header,
+    .consent-header
+  ) {
+  min-width: 0;
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-visual-panel-radius);
+  background: var(--app-surface);
+  box-shadow: var(--app-elevation-none);
+  padding: var(--app-visual-header-padding);
+}
+:is(.app-shell, .emergency-app-shell) :is(
+    .cd-page-header,
+    [class$='-hero'],
+    [class*='-hero '],
+    [class$='-page-header'],
+    [class*='-page-header '],
+    .analytics-header,
+    .cost-header
+  )
+  :is(h1, .cd-page-header__title) {
+  color: var(--app-text-primary);
+  font-size: var(--app-type-title);
+  line-height: 1.16;
+  letter-spacing: -0.02em;
+}
+:is(.app-shell, .emergency-app-shell) :is(
+    .cd-page-header,
+    [class$='-hero'],
+    [class*='-hero '],
+    [class$='-page-header'],
+    [class*='-page-header '],
+    .analytics-header,
+    .cost-header
+  )
+  :is(p, .cd-page-header__description, [class*='subtitle'], [class*='description']) {
+  color: var(--app-text-secondary);
+  font-size: var(--app-type-body);
+  line-height: var(--type-body-line-height);
+}
+:is(.app-shell, .emergency-app-shell) :is(h1, h2, h3, h4, h5, h6) {
+  color: var(--app-text-primary);
+  font-family: inherit;
+  line-height: var(--type-heading-line-height);
+}
+:is(.app-shell, .emergency-app-shell) :is(h2, h3) {
+  letter-spacing: -0.01em;
+}
+:is(.app-shell, .emergency-app-shell) :is(p, li, td, th, label, input, select, textarea, button, a) {
+  font-family: inherit;
+}
+:is(.app-shell, .emergency-app-shell) :is(
+    .card,
+    [class$='-card'],
+    [class*='-card '],
+    [class$='-panel'],
+    [class*='-panel '],
+    [class$='-widget'],
+    [class*='-widget '],
+    [class$='-notice'],
+    [class*='-notice '],
+    [class$='-state'],
+    [class*='-state ']
+  ) {
+  min-width: 0;
+  border-color: var(--app-border);
+  border-radius: var(--app-visual-panel-radius);
+  background-color: var(--app-surface);
+  color: var(--app-text-primary);
+  box-shadow: var(--app-elevation-none);
+}
+:is(.app-shell, .emergency-app-shell) :is(
+    .summary-card,
+    .cost-card,
+    .analytics-panel,
+    .cost-panel,
+    .tool-card-large,
+    .platform-result-card,
+    .platform-panel,
+    .operating-card,
+    .operating-drilldown,
+    .device-summary-card,
+    .medical-iot-card
+  ) {
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-visual-panel-radius);
+  background: var(--app-surface);
+  box-shadow: var(--app-elevation-none);
+}
+:is(.app-shell, .emergency-app-shell) :is(
+    [class$='-card'],
+    [class*='-card '],
+    [class$='-panel'],
+    [class*='-panel '],
+    [class$='-widget'],
+    [class*='-widget '],
+    [class$='-notice'],
+    [class*='-notice '],
+    [class$='-state'],
+    [class*='-state ']
+  ):not(.card):not(.cd-metric-card):not(.cd-insight-card):not(.cd-status-widget) {
+  padding: var(--app-visual-card-padding);
+}
+:is(.app-shell, .emergency-app-shell) :is(
+    .card,
+    [class$='-card'],
+    [class*='-card '],
+    [class$='-panel'],
+    [class*='-panel '],
+    [class$='-widget'],
+    [class*='-widget ']
+  )
+  :is(h2, h3, h4) {
+  font-size: var(--app-type-subheading);
+  line-height: var(--type-subheading-line-height);
+}
+:is(.app-shell, .emergency-app-shell) :is(button, a)[class*='btn'],
+:is(.app-shell, .emergency-app-shell) :is(button, a)[class*='button'],
+:is(.app-shell, .emergency-app-shell) :is(button, a)[class*='action'],
+:is(.app-shell, .emergency-app-shell) :is(button, a)[class*='control'] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--app-visual-control-gap);
+  min-height: var(--app-button-height);
+  border-radius: var(--app-visual-control-radius);
+  font-size: var(--app-type-small);
+  font-weight: 650;
+  line-height: 1.2;
+  text-decoration: none;
+  white-space: normal;
+}
+:is(.app-shell, .emergency-app-shell) :is(
+    button[class*='secondary'],
+    a[class*='secondary'],
+    button[class*='ghost'],
+    a[class*='ghost'],
+    button[class*='tertiary'],
+    a[class*='tertiary']
+  ) {
+  border-color: var(--app-border);
+  background-color: var(--app-surface-raised);
+  color: var(--app-text-primary);
+}
+:is(.app-shell, .emergency-app-shell) :is(
+    button[class*='icon'],
+    a[class*='icon'],
+    button[class*='marker'],
+    button[class*='toggle']
+  ) {
+  flex: 0 0 auto;
+}
+:is(.app-shell, .emergency-app-shell) :is(button, a) :is(svg, .nav-icon, [class*='icon']) {
+  width: var(--app-icon-size-sm);
+  height: var(--app-icon-size-sm);
+}
+:is(.app-shell, .emergency-app-shell) :is(input:not([type='checkbox']):not([type='radio']), select, textarea) {
+  min-height: var(--app-input-height);
+  border: 1px solid var(--app-input-border);
+  border-radius: var(--app-visual-control-radius);
+  background: var(--app-input-bg);
+  color: var(--app-text-primary);
+  font-size: max(var(--text-input-min), var(--app-type-small));
+  line-height: var(--type-body-line-height);
+}
+:is(.app-shell, .emergency-app-shell) :is(form, fieldset, [class*='form'], [class*='filter'], [class*='controls']) {
+  min-width: 0;
+}
+:is(.app-shell, .emergency-app-shell) :is(
+    .cd-filter-panel,
+    [role='search'],
+    [class$='-controls'],
+    [class*='-controls '],
+    [class$='-filters'],
+    [class*='-filters '],
+    [class$='-toolbar'],
+    [class*='-toolbar ']
+  ) {
+  gap: var(--app-visual-control-gap);
+}
+:is(.app-shell, .emergency-app-shell) :is(.cd-form-field, [class*='input-group'], [class*='field']) {
+  display: grid;
+  gap: var(--app-space-xs);
+}
+:is(.app-shell, .emergency-app-shell) label {
+  gap: var(--app-space-xs);
+}
+:is(.app-shell, .emergency-app-shell) :is(label, legend, th, [class*='label']) {
+  color: var(--app-text-muted);
+  font-size: var(--app-type-caption);
+  font-weight: 750;
+}
+:is(.app-shell, .emergency-app-shell) :is([class*='table-wrap'], [class*='table-wrapper'], [class*='table-container']) 
+{
+  max-width: 100%;
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-visual-panel-radius);
+  overflow-x: auto;
+  overflow-y: hidden;
+  background: var(--app-surface);
+}
+:is(.app-shell, .emergency-app-shell) :is(
+    .cd-table-wrap,
+    .catalog-table-wrap,
+    .device-fleet-table-wrap,
+    .hospital-map-table-wrap,
+    .user-table-wrapper,
+    .logs-table-container,
+    .tool-card-table-wrap,
+    .fleet-data-table-wrap
+  ) {
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-visual-panel-radius);
+  background: var(--app-surface);
+  overflow-x: auto;
+}
+:is(.app-shell, .emergency-app-shell) table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--app-text-primary);
+  font-size: var(--app-type-small);
+}
+:is(.app-shell, .emergency-app-shell) :is(th, td) {
+  padding: var(--app-visual-table-cell-padding);
+  border-bottom: 1px solid var(--app-border);
+  text-align: left;
+  vertical-align: top;
+}
+:is(.app-shell, .emergency-app-shell) th {
+  background: var(--app-table-header-bg);
+  color: var(--app-text-muted);
+  font-size: var(--app-type-caption);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+/* Preserve explicit hierarchy on the primary shell/dashboard surfaces. */
+:is(.app-shell, .emergency-app-shell) .app-shell-route-identity {
+  border-left: 3px solid var(--app-accent-interactive);
+  background: color-mix(in srgb, var(--app-surface-glass) 82%, transparent);
+  box-shadow: var(--shadow-1);
+}
+:is(.app-shell, .emergency-app-shell) .command-hero {
+  padding: clamp(18px, 2.4vw, 28px);
+  background:
+    linear-gradient(135deg, var(--workspace-os-surface, var(--app-surface-2)), transparent 58%),
+    var(--app-surface-1);
+  box-shadow: var(--app-elevation-card, var(--shadow-1));
+}
+:is(.app-shell, .emergency-app-shell) .command-hero h1 {
+  font-size: clamp(1.75rem, 3vw, 2.75rem);
+  line-height: 1.05;
+}
+:is(.app-shell, .emergency-app-shell) .command-panel {
+  background: color-mix(in srgb, var(--app-surface-1) 94%, var(--app-bg));
+  box-shadow: var(--app-elevation-none);
+}
+:is(.app-shell, .emergency-app-shell) .command-compact-action--primary {
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--workspace-os-accent, var(--app-accent-interactive)) 22%, var(--app-surface-2)),
+      var(--app-surface-2)
+    );
+  box-shadow: var(--app-elevation-card, var(--shadow-1));
+}
+:is(.app-shell, .emergency-app-shell) :is([class*='badge'], [class*='chip'], [class*='pill'], [class*='tag']) {
+  border-radius: var(--app-radius-pill);
+  font-size: var(--app-type-caption);
+  line-height: 1.2;
+}
+@media (max-width: 768px) {
+  :is(.app-shell, .emergency-app-shell) :is(
+      .cd-page-header,
+      [class$='-hero'],
+      [class*='-hero '],
+      [class$='-page-header'],
+      [class*='-page-header '],
+      .analytics-header,
+      .cost-header
+    ) {
+    padding: var(--app-card-padding-compact);
+  }
+  :is(.app-shell, .emergency-app-shell) :is(
+      button[class*='btn'],
+      a[class*='btn'],
+      button[class*='button'],
+      a[class*='button'],
+      button[class*='action'],
+      a[class*='action']
+    ):not([class*='icon']):not([class*='marker']):not([class*='toggle']) {
+    width: 100%;
+  }
+}
+/**
+ * CareDroid Design Tokens — single source of truth
+ * Namespace: --cd-*
+ *
+ * Layer structure:
+ *   1. Primitive palette  (raw hsl values, not used directly in UI)
+ *   2. Semantic tokens    (what components reference)
+ *   3. Clinical tokens    (ED-specific: acuity, breach, capacity)
+ *
+ * Usage: reference --cd-* in component CSS. Never use raw palette values in components.
+ */
+/* ──────────────────────────────────────�
+──────────────────────
+   1. PRIMITIVE PALETTE  (hsl channels — compose with hsl())
+───────────────────────────────────────�
+───────────────────── */
+:root {
+  /* Sky / Brand ramp */
+  --cd-palette-sky-50:  199 100% 97%;
+  --cd-palette-sky-100: 199 100% 93%;
+  --cd-palette-sky-200: 198  98% 85%;
+  --cd-palette-sky-300: 199  89% 74%;
+  --cd-palette-sky-400: 200  85% 62%;
+  --cd-palette-sky-500: 200  98% 48%;   /* --color-primary */
+  --cd-palette-sky-600: 201  96% 40%;
+  --cd-palette-sky-700: 201  90% 32%;
+  --cd-palette-sky-800: 201  84% 24%;
+  --cd-palette-sky-900: 202  80% 16%;
+  /* Neutral / Slate ramp */
+  --cd-palette-slate-50:  210  40% 98%;
+  --cd-palette-slate-100: 210  40% 96%;
+  --cd-palette-slate-200: 214  32% 91%;
+  --cd-palette-slate-300: 213  27% 84%;
+  --cd-palette-slate-400: 215  20% 65%;
+  --cd-palette-slate-500: 215  16% 47%;
+  --cd-palette-slate-600: 215  19% 35%;
+  --cd-palette-slate-700: 215  25% 27%;
+  --cd-palette-slate-800: 217  33% 17%;
+  --cd-palette-slate-900: 222  47% 11%;
+  /* Functional palette */
+  --cd-palette-green-400: 142  71% 45%;
+  --cd-palette-green-500: 142  72% 29%;
+  --cd-palette-green-600: 142  76% 23%;
+  --cd-palette-amber-400: 43  96% 56%;
+  --cd-palette-amber-500: 38  92% 50%;
+  --cd-palette-amber-600: 32  95% 44%;
+  --cd-palette-orange-400: 21  90% 58%;
+  --cd-palette-orange-500: 21  90% 48%;
+  --cd-palette-red-400:   0  84% 60%;
+  --cd-palette-red-500:   0  72% 51%;
+  --cd-palette-red-600:   0  74% 42%;
+  --cd-palette-red-700:   0  74% 34%;
+  --cd-palette-violet-500: 250  76% 62%;
+  --cd-palette-violet-600: 250  76% 52%;
+  --cd-palette-white: 0 0% 100%;
+  --cd-palette-black: 0 0% 0%;
+}
+/* ──────────────────────────────────────�
+──────────────────────
+   2. SEMANTIC TOKENS — light mode (default)
+───────────────────────────────────────�
+───────────────────── */
+:root,
+[data-theme=\"light\"] {
+  /* — Background — */
+  --cd-bg-base:     hsl(var(--cd-palette-sky-50));      /* page */
+  --cd-bg-surface:  hsl(var(--cd-palette-white));       /* card, panel */
+  --cd-bg-elevated: hsl(var(--cd-palette-white));       /* modal, popover */
+  --cd-bg-sunken:   hsl(var(--cd-palette-slate-100));   /* input, code block */
+  --cd-bg-overlay:  hsl(var(--cd-palette-black) / .45);
+  /* — Foreground — */
+  --cd-text-primary:   hsl(var(--cd-palette-slate-900));
+  --cd-text-secondary: hsl(var(--cd-palette-slate-500));
+  --cd-text-disabled:  hsl(var(--cd-palette-slate-400));
+  --cd-text-inverse:   hsl(var(--cd-palette-white));
+  --cd-text-brand:     hsl(var(--cd-palette-sky-600));
+  --cd-text-danger:    hsl(var(--cd-palette-red-600));
+  /* — Border — */
+  --cd-border-subtle:  hsl(var(--cd-palette-sky-100));
+  --cd-border-default: hsl(var(--cd-palette-slate-200));
+  --cd-border-strong:  hsl(var(--cd-palette-slate-300));
+  --cd-border-brand:   hsl(var(--cd-palette-sky-400));
+  --cd-border-danger:  hsl(var(--cd-palette-red-400));
+  --cd-border-focus:   hsl(var(--cd-palette-sky-500));
+  /* — Brand — */
+  --cd-brand-bg:          hsl(var(--cd-palette-sky-500));
+  --cd-brand-bg-hover:    hsl(var(--cd-palette-sky-600));
+  --cd-brand-bg-active:   hsl(var(--cd-palette-sky-700));
+  --cd-brand-bg-subtle:   hsl(var(--cd-palette-sky-50));
+  --cd-brand-fg:          hsl(var(--cd-palette-white));
+  --cd-brand-fg-subtle:   hsl(var(--cd-palette-sky-600));
+  /* — Status: Info — */
+  --cd-info-bg:     hsl(var(--cd-palette-sky-500));
+  --cd-info-bg-subtle: hsl(var(--cd-palette-sky-50));
+  --cd-info-border: hsl(var(--cd-palette-sky-200));
+  --cd-info-text:   hsl(var(--cd-palette-sky-700));
+  /* — Status: Success — */
+  --cd-success-bg:        hsl(var(--cd-palette-green-400));
+  --cd-success-bg-subtle: hsl(142 72% 95%);
+  --cd-success-border:    hsl(142 71% 80%);
+  --cd-success-text:      hsl(var(--cd-palette-green-600));
+  /* — Status: Warning — */
+  --cd-warning-bg:        hsl(var(--cd-palette-amber-400));
+  --cd-warning-bg-subtle: hsl(43 96% 95%);
+  --cd-warning-border:    hsl(43 96% 78%);
+  --cd-warning-text:      hsl(var(--cd-palette-amber-600));
+  /* — Status: Danger — */
+  --cd-danger-bg:        hsl(var(--cd-palette-red-500));
+  --cd-danger-bg-subtle: hsl(0 72% 96%);
+  --cd-danger-border:    hsl(0 84% 82%);
+  --cd-danger-text:      hsl(var(--cd-palette-red-600));
+  /* — Interactive states — */
+  --cd-interactive-bg-hover:  hsl(var(--cd-palette-slate-50));
+  --cd-interactive-bg-active: hsl(var(--cd-palette-slate-100));
+  --cd-interactive-bg-selected: hsl(var(--cd-palette-sky-50));
+  /* — Semantic aliases used by domain components — */
+  --cd-bg-hover:       var(--cd-interactive-bg-hover);
+  --cd-danger-icon:    hsl(var(--cd-palette-red-600));
+  --cd-warning-icon:   hsl(var(--cd-palette-amber-600));
+  --cd-info-icon:      hsl(var(--cd-palette-sky-600));
+  --cd-transition-base: var(--cd-transition-normal);
+}
+/* ──────────────────────────────────────�
+──────────────────────
+   2b. SEMANTIC TOKENS — dark mode
+───────────────────────────────────────�
+───────────────────── */
+[data-theme=\"dark\"] {
+  --cd-bg-base:     hsl(var(--cd-palette-slate-900));
+  --cd-bg-surface:  hsl(var(--cd-palette-slate-800));
+  --cd-bg-elevated: hsl(var(--cd-palette-slate-700));
+  --cd-bg-sunken:   hsl(222 47% 8%);
+  --cd-bg-overlay:  hsl(var(--cd-palette-black) / .65);
+  --cd-text-primary:   hsl(var(--cd-palette-slate-50));
+  --cd-text-secondary: hsl(var(--cd-palette-slate-400));
+  --cd-text-disabled:  hsl(var(--cd-palette-slate-600));
+  --cd-text-inverse:   hsl(var(--cd-palette-slate-900));
+  --cd-text-brand:     hsl(var(--cd-palette-sky-300));
+  --cd-text-danger:    hsl(var(--cd-palette-red-400));
+  --cd-border-subtle:  hsl(var(--cd-palette-slate-700));
+  --cd-border-default: hsl(var(--cd-palette-slate-600));
+  --cd-border-strong:  hsl(var(--cd-palette-slate-500));
+  --cd-border-brand:   hsl(var(--cd-palette-sky-500));
+  --cd-border-danger:  hsl(var(--cd-palette-red-500));
+  --cd-border-focus:   hsl(var(--cd-palette-sky-400));
+  --cd-brand-bg:          hsl(var(--cd-palette-sky-500));
+  --cd-brand-bg-hover:    hsl(var(--cd-palette-sky-400));
+  --cd-brand-bg-active:   hsl(var(--cd-palette-sky-300));
+  --cd-brand-bg-subtle:   hsl(var(--cd-palette-sky-900));
+  --cd-brand-fg:          hsl(var(--cd-palette-white));
+  --cd-brand-fg-subtle:   hsl(var(--cd-palette-sky-300));
+  --cd-info-bg:           hsl(var(--cd-palette-sky-500));
+  --cd-info-bg-subtle:    hsl(var(--cd-palette-sky-900));
+  --cd-info-border:       hsl(var(--cd-palette-sky-700));
+  --cd-info-text:         hsl(var(--cd-palette-sky-300));
+  --cd-success-bg:        hsl(var(--cd-palette-green-400));
+  --cd-success-bg-subtle: hsl(142 72% 8%);
+  --cd-success-border:    hsl(142 71% 22%);
+  --cd-success-text:      hsl(142 71% 55%);
+  --cd-warning-bg:        hsl(var(--cd-palette-amber-400));
+  --cd-warning-bg-subtle: hsl(43 96% 8%);
+  --cd-warning-border:    hsl(43 96% 22%);
+  --cd-warning-text:      hsl(var(--cd-palette-amber-400));
+  --cd-danger-bg:        hsl(var(--cd-palette-red-500));
+  --cd-danger-bg-subtle: hsl(0 72% 8%);
+  --cd-danger-border:    hsl(0 74% 22%);
+  --cd-danger-text:      hsl(var(--cd-palette-red-400));
+  --cd-interactive-bg-hover:    hsl(var(--cd-palette-slate-700));
+  --cd-interactive-bg-active:   hsl(var(--cd-palette-slate-600));
+  --cd-interactive-bg-selected: hsl(var(--cd-palette-sky-900));
+  --cd-bg-hover:       var(--cd-interactive-bg-hover);
+  --cd-danger-icon:    hsl(var(--cd-palette-red-400));
+  --cd-warning-icon:   hsl(var(--cd-palette-amber-400));
+  --cd-info-icon:      hsl(var(--cd-palette-sky-400));
+}
+/* ──────────────────────────────────────�
+──────────────────────
+   3. CLINICAL TOKENS — ED-specific (mode-independent base)
+───────────────────────────────────────�
+───────────────────── */
+:root {
+  /* Acuity / Priority */
+  --cd-acuity-p1:         hsl(0   74% 42%);   /* Immediate   — deep red */
+  --cd-acuity-p1-bg:      hsl(0   74% 96%);
+  --cd-acuity-p1-border:  hsl(0   74% 78%);
+  --cd-acuity-p2:         hsl(21  90% 45%);   /* Emergent    — orange */
+  --cd-acuity-p2-bg:      hsl(21  90% 96%);
+  --cd-acuity-p2-border:  hsl(21  90% 75%);
+  --cd-acuity-p3:         hsl(38  92% 44%);   /* Urgent      — amber */
+  --cd-acuity-p3-bg:      hsl(43  96% 95%);
+  --cd-acuity-p3-border:  hsl(43  96% 72%);
+  --cd-acuity-p4:         hsl(142 72% 29%);   /* Semi-urgent — green */
+  --cd-acuity-p4-bg:      hsl(142 72% 95%);
+  --cd-acuity-p4-border:  hsl(142 71% 72%);
+  --cd-acuity-p5:         hsl(var(--cd-palette-sky-600));   /* Non-urgent  — blue */
+  --cd-acuity-p5-bg:      hsl(var(--cd-palette-sky-50));
+  --cd-acuity-p5-border:  hsl(var(--cd-palette-sky-200));
+  /* Breach / Timer states */
+  --cd-breach-safe:     hsl(142 72% 29%);
+  --cd-breach-watch:    hsl(38  92% 44%);
+  --cd-breach-warning:  hsl(21  90% 45%);
+  --cd-breach-imminent: hsl(0   74% 42%);
+  --cd-breach-breached: hsl(0   74% 34%);
+  /* Capacity states */
+  --cd-capacity-normal:   hsl(142 72% 29%);   /* < 70% */
+  --cd-capacity-elevated: hsl(38  92% 44%);   /* 70–85% */
+  --cd-capacity-high:     hsl(21  90% 45%);   /* 85–95% */
+  --cd-capacity-crisis:   hsl(0   74% 42%);   /* > 95% */
+  /* Sepsis / flags */
+  --cd-flag-sepsis:      hsl(0   74% 42%);
+  --cd-flag-lwbs:        hsl(21  90% 45%);
+  --cd-flag-highRisk:    hsl(250 76% 52%);
+  --cd-flag-boarding:    hsl(215 19% 35%);
+}
+/* ──────────────────────────────────────�
+──────────────────────
+   4. SPACING SCALE  (4px grid)
+───────────────────────────────────────�
+───────────────────── */
+:root {
+  --cd-space-px:  1px;
+  --cd-space-0:   0;
+  --cd-space-0-5: 2px;
+  --cd-space-1:   4px;
+  --cd-space-1-5: 6px;
+  --cd-space-2:   8px;
+  --cd-space-2-5: 10px;
+  --cd-space-3:   12px;
+  --cd-space-3-5: 14px;
+  --cd-space-4:   16px;
+  --cd-space-5:   20px;
+  --cd-space-6:   24px;
+  --cd-space-7:   28px;
+  --cd-space-8:   32px;
+  --cd-space-10:  40px;
+  --cd-space-12:  48px;
+  --cd-space-14:  56px;
+  --cd-space-16:  64px;
+  --cd-space-20:  80px;
+  --cd-space-24:  96px;
+  --cd-space-32:  128px;
+  /* Fluid spacing (clamped for responsive layouts) */
+  --cd-space-fluid-sm:  clamp(8px,  1.5vw, 12px);
+  --cd-space-fluid-md:  clamp(12px, 2vw,   20px);
+  --cd-space-fluid-lg:  clamp(16px, 2.5vw, 28px);
+  --cd-space-fluid-xl:  clamp(24px, 3.5vw, 40px);
+  --cd-space-fluid-2xl: clamp(32px, 5vw,   64px);
+  /* Page layout */
+  --cd-layout-gutter:        clamp(12px, 2.5vw, 24px);
+  --cd-layout-max-content:   72rem;    /* 1152px */
+  --cd-layout-max-wide:      88rem;    /* 1408px */
+  --cd-layout-sidebar-width: 240px;
+  --cd-layout-topbar-height: 56px;
+}
+/* ──────────────────────────────────────�
+──────────────────────
+   5. TYPOGRAPHY SCALE
+───────────────────────────────────────�
+───────────────────── */
+:root {
+  --cd-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --cd-font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  /* Size scale */
+  --cd-text-2xs:  10px;
+  --cd-text-xs:   11px;
+  --cd-text-sm:   13px;
+  --cd-text-md:   15px;   /* base */
+  --cd-text-lg:   17px;
+  --cd-text-xl:   20px;
+  --cd-text-2xl:  24px;
+  --cd-text-3xl:  30px;
+  --cd-text-4xl:  36px;
+  --cd-text-5xl:  48px;
+  /* Line heights */
+  --cd-leading-tight:   1.2;
+  --cd-leading-snug:    1.3;
+  --cd-leading-normal:  1.5;
+  --cd-leading-relaxed: 1.6;
+  /* Font weights */
+  --cd-font-regular:  400;
+  --cd-font-medium:   500;
+  --cd-font-semibold: 600;
+  --cd-font-bold:     700;
+  /* Letter spacing */
+  --cd-tracking-tight:  -0.02em;
+  --cd-tracking-normal:  0;
+  --cd-tracking-wide:    0.025em;
+  --cd-tracking-wider:   0.05em;
+  --cd-tracking-widest:  0.1em;
+}
+/* ──────────────────────────────────────�
+──────────────────────
+   6. BORDER RADIUS
+───────────────────────────────────────�
+───────────────────── */
+:root {
+  --cd-radius-none: 0;
+  --cd-radius-xs:   2px;
+  --cd-radius-sm:   4px;
+  --cd-radius-md:   6px;
+  --cd-radius-lg:   8px;
+  --cd-radius-xl:   12px;
+  --cd-radius-2xl:  16px;
+  --cd-radius-3xl:  24px;
+  --cd-radius-full: 9999px;
+}
+/* ──────────────────────────────────────�
+──────────────────────
+   7. SHADOWS / ELEVATION
+───────────────────────────────────────�
+───────────────────── */
+:root {
+  --cd-shadow-none: none;
+  --cd-shadow-xs:   0 1px 2px hsl(var(--cd-palette-slate-900) / .05);
+  --cd-shadow-sm:   0 1px 3px hsl(var(--cd-palette-slate-900) / .07),
+                    0 1px 2px hsl(var(--cd-palette-slate-900) / .06);
+  --cd-shadow-md:   0 4px 6px  hsl(var(--cd-palette-slate-900) / .07),
+                    0 2px 4px  hsl(var(--cd-palette-slate-900) / .06);
+  --cd-shadow-lg:   0 10px 15px hsl(var(--cd-palette-slate-900) / .08),
+                    0  4px  6px hsl(var(--cd-palette-slate-900) / .05);
+  --cd-shadow-xl:   0 20px 25px hsl(var(--cd-palette-slate-900) / .10),
+                    0  8px 10px hsl(var(--cd-palette-slate-900) / .06);
+  --cd-shadow-2xl:  0 25px 50px hsl(var(--cd-palette-slate-900) / .18);
+  /* Focus ring — consistent across all interactive elements */
+  --cd-shadow-focus: 0 0 0 3px hsl(var(--cd-palette-sky-500) / .35);
+  --cd-shadow-focus-danger: 0 0 0 3px hsl(var(--cd-palette-red-500) / .30);
+}
+/* ──────────────────────────────────────�
+──────────────────────
+   8. MOTION / ANIMATION
+───────────────────────────────────────�
+───────────────────── */
+:root {
+  --cd-duration-instant: 0ms;
+  --cd-duration-fast:    80ms;
+  --cd-duration-normal:  150ms;
+  --cd-duration-slow:    250ms;
+  --cd-duration-slower:  400ms;
+  --cd-ease-standard:  cubic-bezier(.4,  0,   .2, 1);   /* material ease */
+  --cd-ease-decelerate: cubic-bezier(0,  0,   .2, 1);   /* enter */
+  --cd-ease-accelerate: cubic-bezier(.4, 0,    1, 1);   /* exit */
+  --cd-ease-spring:    cubic-bezier(.34, 1.56, .64, 1); /* spring overshoot */
+  --cd-ease-bounce:    cubic-bezier(.68, -.55, .265, 1.55);
+  --cd-transition-fast:   var(--cd-duration-fast)   var(--cd-ease-standard);
+  --cd-transition-normal: var(--cd-duration-normal) var(--cd-ease-standard);
+  --cd-transition-slow:   var(--cd-duration-slow)   var(--cd-ease-standard);
+}
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --cd-duration-fast:   0ms;
+    --cd-duration-normal: 0ms;
+    --cd-duration-slow:   0ms;
+    --cd-duration-slower: 0ms;
+  }
+}
+/* ──────────────────────────────────────�
+──────────────────────
+   9. Z-INDEX SCALE
+───────────────────────────────────────�
+───────────────────── */
+:root {
+  --cd-z-base:      0;
+  --cd-z-raised:    10;
+  --cd-z-dropdown:  100;
+  --cd-z-sticky:    200;
+  --cd-z-overlay:   300;
+  --cd-z-modal:     400;
+  --cd-z-popover:   500;
+  --cd-z-toast:     600;
+  --cd-z-tooltip:   700;
+}
+/* ──────────────────────────────────────�
+──────────────────────
+   10. COMPONENT SIZE CONTRACTS
+───────────────────────────────────────�
+───────────────────── */
+:root {
+  /* Touch targets (WCAG 2.5.5) */
+  --cd-touch-min:         44px;
+  --cd-touch-comfortable: 48px;
+  /* Control heights */
+  --cd-control-height-xs: 24px;
+  --cd-control-height-sm: 32px;
+  --cd-control-height-md: 40px;
+  --cd-control-height-lg: 48px;
+  /* Control padding (horizontal) */
+  --cd-control-px-sm: 10px;
+  --cd-control-px-md: 14px;
+  --cd-control-px-lg: 18px;
+  /* Icon sizes */
+  --cd-icon-xs: 12px;
+  --cd-icon-sm: 16px;
+  --cd-icon-md: 20px;
+  --cd-icon-lg: 24px;
+  --cd-icon-xl: 32px;
+  /* Breakpoints (reference only — use literal px in @media queries) */
+  --cd-bp-sm:   480px;
+  --cd-bp-md:   768px;
+  --cd-bp-lg:  1024px;
+  --cd-bp-xl:  1280px;
+  --cd-bp-2xl: 1536px;
+}
+/**
+ * Semantic palette (--app-*). CareDroid standard medical theme on every layer.
+ */
+html,
+html[data-theme='light'] {
+  color-scheme: light;
+  --app-blur-glass: 16px;
+  --app-bg: #f0f9ff;
+  --app-navy-ink: #111827;
+  --app-fg: #111827;
+  --app-fg-muted: #6b7280;
+  --app-panel-bg: #ffffff;
+  --app-panel-border: #e0f2fe;
+  --app-surface-0: #f0f9ff;
+  --app-surface-1: #ffffff;
+  --app-surface-2: #ffffff;
+  --app-surface-elevated: #ffffff;
+  --app-surface-muted: #f0f9ff;
+  --app-surface-glass: rgba(255, 255, 255, 0.88);
+  --app-border-subtle: #e0f2fe;
+  --app-divider-on-surface: color-mix(in srgb, var(--app-fg) 12%, transparent);
+  --app-overlay-on-surface: color-mix(in srgb, var(--app-fg) 7%, transparent);
+  --app-overlay-on-surface-strong: color-mix(in srgb, var(--app-fg) 14%, transparent);
+  --app-shadow-1: 0 8px 20px rgba(14, 165, 233, 0.06);
+  --app-shadow-2: 0 16px 36px rgba(14, 165, 233, 0.08);
+  --app-accent: #0ea5e9;
+  --app-accent-2: #38bdf8;
+  --app-accent-interactive: #0ea5e9;
+  --app-accent-hover: #0284c7;
+  --app-danger: #ef4444;
+  --app-warning: #f59e0b;
+  --app-success: #22c55e;
+  --app-info: #0ea5e9;
+  --app-focus: rgba(14, 165, 233, 0.18);
+  --app-focus-ring-aa: #0284c7;
+  --app-hover: rgba(14, 165, 233, 0.08);
+  --app-disabled: #9ca3af;
+  --app-input-bg: #ffffff;
+  --app-input-bg-hover: #ffffff;
+  --app-input-border: #e5e7eb;
+  --app-table-header-bg: color-mix(in srgb, #f0f9ff 78%, #ffffff);
+  --app-table-row-hover: rgba(14, 165, 233, 0.055);
+  --app-accent-contrast: #ffffff;
+  --app-danger-contrast: #fff7f7;
+  --app-warning-contrast: #1f1600;
+  --app-success-contrast: #04111f;
+  --app-on-solid: #ffffff;
+  --app-mesh-cyan: color-mix(in srgb, #0ea5e9 3%, transparent);
+  --app-mesh-green: transparent;
+  --app-scrollbar-track: color-mix(in srgb, #f0f9ff 72%, #ffffff);
+  --app-scrollbar-thumb: color-mix(in srgb, #0ea5e9 24%, #e0f2fe);
+  --app-scrollbar-thumb-hover: color-mix(in srgb, #0ea5e9 40%, #e0f2fe);
+  --app-code-bg: #f0f9ff;
+  --app-tool-card-body-bg: rgba(255, 255, 255, 0.98);
+  --app-tool-card-body-fg: #111827;
+  --app-chart-1: #0ea5e9;
+  --app-chart-2: #22c55e;
+  --app-chart-3: #f59e0b;
+  --app-chart-4: #ef4444;
+  --app-chart-5: #38bdf8;
+  --app-chart-6: #6b7280;
+  --sidebar-gradient-from: #ffffff;
+  --sidebar-gradient-to: #f0f9ff;
+  --sidebar-fg: var(--app-fg);
+  --sidebar-fg-muted: var(--app-fg-muted);
+  --sidebar-fg-subtle: color-mix(in srgb, var(--app-fg) 42%, transparent);
+  --sidebar-border: var(--app-panel-border);
+  --sidebar-divider: var(--app-border-subtle);
+  --sidebar-shadow: 2px 0 10px rgba(14, 165, 233, 0.06);
+  --sidebar-item-hover-bg: color-mix(
+    in srgb,
+    var(--app-accent-interactive) 12%,
+    var(--app-surface-1)
+  );
+  --sidebar-item-hover-fg: var(--app-fg);
+  --sidebar-item-hover-border: color-mix(in srgb, var(--app-accent-interactive) 26%, transparent);
+  --sidebar-item-active-bg: color-mix(
+    in srgb,
+    var(--app-accent-interactive) 18%,
+    var(--app-surface-1)
+  );
+  --sidebar-item-active-fg: var(--app-accent-interactive);
+  --sidebar-item-active-border: color-mix(in srgb, var(--app-accent-interactive) 38%, transparent);
+  --sidebar-focus-ring: var(--app-accent-interactive);
+  --sidebar-surface-muted: var(--app-panel-bg);
+  --sidebar-control-bg: color-mix(in srgb, var(--app-navy-ink) 5%, transparent);
+  --sidebar-control-border: var(--app-panel-border);
+  --sidebar-control-fg: var(--app-fg-muted);
+  --sidebar-control-hover-bg: color-mix(in srgb, var(--app-navy-ink) 8%, transparent);
+  --sidebar-control-hover-fg: var(--app-fg);
+  --sidebar-cta-from: var(--app-accent-interactive);
+  --sidebar-cta-to: color-mix(in srgb, var(--app-accent-interactive) 65%, var(--medical-sky-600, #0284c7));
+  --sidebar-cta-fg: var(--app-on-solid);
+  --sidebar-cta-shadow: 0 2px 8px color-mix(in srgb, var(--app-accent-interactive) 16%, transparent);
+  --sidebar-logo-surface: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--app-accent-interactive) 88%, var(--app-on-solid)),
+    color-mix(in srgb, var(--app-accent-interactive) 48%, var(--medical-sky-600, #0284c7))
+  );
+  --sidebar-logo-shadow: 0 2px 8px
+    color-mix(in srgb, var(--app-accent-interactive) 14%, transparent);
+  --sidebar-avatar-gradient: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--app-accent) 92%, var(--app-on-solid)),
+    var(--app-accent)
+  );
+  --sidebar-avatar-fg: var(--app-navy-ink);
+  --sidebar-avatar-ring: color-mix(in srgb, var(--app-accent) 84%, var(--app-on-solid));
+  --sidebar-tool-surface: var(--app-panel-bg);
+  --sidebar-tool-surface-hover: color-mix(in srgb, var(--app-navy-ink) 6%, transparent);
+  --sidebar-tool-border: var(--app-panel-border);
+  --sidebar-tool-border-hover: color-mix(in srgb, var(--app-navy-ink) 14%, transparent);
+  --sidebar-tool-name-fg: color-mix(in srgb, var(--app-fg) 78%, transparent);
+  --sidebar-action-surface: var(--app-panel-bg);
+  --sidebar-action-hover-surface: color-mix(in srgb, var(--app-navy-ink) 6%, transparent);
+  --sidebar-action-fg: var(--app-fg-muted);
+  --sidebar-action-hover-fg: var(--app-fg);
+  --sidebar-chip-bg: color-mix(in srgb, var(--app-navy-ink) 5%, transparent);
+  --sidebar-chip-border: var(--app-panel-border);
+  --sidebar-chip-fg: var(--app-fg-muted);
+  --sidebar-chip-hover-fg: var(--app-fg);
+  --sidebar-hipaa-bg: color-mix(in srgb, var(--app-accent) 10%, transparent);
+  --sidebar-hipaa-border: color-mix(in srgb, var(--app-accent) 24%, transparent);
+  --sidebar-hipaa-fg: color-mix(in srgb, var(--app-accent) 92%, var(--medical-ink, #111827));
+  --sidebar-signout-bg: color-mix(in srgb, var(--app-danger) 10%, transparent);
+  --sidebar-signout-border: color-mix(in srgb, var(--app-danger) 28%, transparent);
+  --sidebar-signout-fg: var(--app-danger);
+  --sidebar-signout-hover-bg: color-mix(in srgb, var(--app-danger) 16%, transparent);
+  --sidebar-signout-hover-border: color-mix(in srgb, var(--app-danger) 40%, transparent);
+  --sidebar-signout-hover-fg: color-mix(in srgb, var(--app-danger) 92%, #450a0a);
+  --sidebar-tool-action-bg: color-mix(
+    in srgb,
+    var(--app-surface-elevated) 75%,
+    var(--app-on-solid)
+  );
+  --sidebar-tool-action-border: color-mix(in srgb, var(--app-navy-ink) 10%, transparent);
+  --sidebar-tool-action-fg: var(--app-fg-muted);
+  --sidebar-mobile-drawer-shadow: 8px 0 22px rgba(14, 165, 233, 0.08);
+}
+/**
+ * CareDroid semantic authoring aliases.
+ * New component CSS should use these --app-* tokens instead of raw colors.
+ */
+html {
+  --app-background: var(--app-bg);
+  --app-surface: var(--app-surface-1);
+  --app-surface-raised: var(--app-surface-elevated);
+  --app-border: var(--app-panel-border);
+  --app-border-strong: color-mix(in srgb, var(--app-fg) 22%, transparent);
+  --app-text-primary: var(--app-fg);
+  --app-text-secondary: color-mix(in srgb, var(--app-fg) 76%, transparent);
+  --app-text-muted: var(--app-fg-muted);
+  --app-accent-action: var(--app-accent-interactive);
+  --app-elevation-none: none;
+  --app-elevation-subtle: var(--app-shadow-1);
+  --app-elevation-card: var(--app-shadow-1);
+  --app-elevation-overlay: var(--app-shadow-2);
+  --motion-fast: 120ms;
+  --motion-normal: 180ms;
+  --motion-slow: 240ms;
+  --animation-fast: var(--motion-fast);
+  --animation-base: var(--motion-normal);
+  --animation-slow: var(--motion-slow);
+  --motion-duration-fast: var(--motion-fast);
+  --motion-duration-normal: var(--motion-normal);
+  --motion-duration-slow: var(--motion-slow);
+  --motion-ease-standard: cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-transition-fast: var(--motion-duration-fast) var(--motion-ease-standard);
+  --motion-transition-normal: var(--motion-duration-normal) var(--motion-ease-standard);
+  --motion-transition-slow: var(--motion-duration-slow) var(--motion-ease-standard);
+  --motion-hover-lift-y: -1px;
+  --motion-enter-distance: 6px;
+  --motion-skeleton-duration: 1.15s;
+  --app-status-online: var(--app-success);
+  --app-status-offline: var(--app-fg-muted);
+  --app-status-degraded: var(--app-warning);
+  --app-status-demo: var(--app-info);
+  --app-status-unsupported: color-mix(in srgb, var(--app-fg) 48%, transparent);
+  --app-status-critical: var(--app-danger);
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    --motion-fast: 1ms;
+    --motion-normal: 1ms;
+    --motion-slow: 1ms;
+    --animation-fast: 1ms;
+    --animation-base: 1ms;
+    --animation-slow: 1ms;
+    --motion-duration-fast: 1ms;
+    --motion-duration-normal: 1ms;
+    --motion-duration-slow: 1ms;
+    --motion-hover-lift-y: 0;
+    --motion-enter-distance: 0;
+  }
+}
+/**
+ * Body mesh, scrollbars, liquid surface utilities, motion preferences.
+ */
+body {
+  margin: 0;
+  max-width: 100%;
+  min-height: 100dvh;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+    'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background:
+    radial-gradient(circle at 50% 0%, var(--app-mesh-cyan), transparent 42%),
+    radial-gradient(circle at 18% 22%, var(--app-mesh-green), transparent 46%),
+    var(--app-bg);
+  color: var(--text-color);
+  overflow-x: clip;
+  overflow-y: auto;
+  transition:
+    background var(--motion-transition-slow, 240ms cubic-bezier(0.22, 1, 0.36, 1)),
+    color var(--motion-transition-normal, 180ms cubic-bezier(0.22, 1, 0.36, 1));
+}
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--app-scrollbar-track);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--app-scrollbar-thumb);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--app-scrollbar-thumb-hover);
+}
+.surface-glass {
+  background: var(--app-surface-glass);
+  -webkit-backdrop-filter: blur(var(--app-blur-glass, 18px));
+  backdrop-filter: blur(var(--app-blur-glass, 18px));
+  border: 1px solid var(--app-panel-border);
+  box-shadow: var(--app-shadow-1);
+  border-radius: var(--radius-lg);
+}
+.surface-elevated {
+  background: var(--app-surface-elevated);
+  border: 1px solid var(--app-panel-border);
+  box-shadow: var(--app-shadow-2);
+  border-radius: var(--radius-md);
+}
+.surface-motion {
+  transition:
+    background-color var(--motion-transition-normal),
+    border-color var(--motion-transition-normal),
+    box-shadow var(--motion-transition-normal),
+    transform var(--motion-transition-normal);
+}
+.surface-motion:hover,
+.surface-motion:focus-within {
+  transform: translateY(var(--motion-hover-lift-y, -1px));
+}
+@media (prefers-reduced-motion: reduce) {
+  body {
+    transition: none;
+  }
+  .animate-fade-in,
+  .animate-slide-in-right,
+  .animate-slide-in-left,
+  .animate-slide-up,
+  .animate-scale-in,
+  .animate-pulse,
+  .animate-glow,
+  .dashboard-msg-thinking {
+    animation: none !important;
+  }
+  .hover-lift {
+    transition: none;
+  }
+  .surface-motion:hover,
+  .surface-motion:focus-within {
+    transform: none;
+  }
+  a,
+  button,
+  input,
+  select,
+  textarea {
+    transition: none;
+  }
+}
+/* Global themed defaults and legacy component normalisation. */
+:where(input, select, textarea) {
+  background: var(--app-input-bg);
+  border-color: var(--app-input-border);
+  color: var(--app-fg);
+  caret-color: var(--app-accent);
+}
+:where(input, select, textarea):hover:not(:disabled) {
+  background: var(--app-input-bg-hover);
+  border-color: color-mix(in srgb, var(--app-accent) 32%, var(--app-input-border));
+}
+:where(input, select, textarea):focus-visible,
+:where(button, [role='button'], a[href], summary, [tabindex]:not([tabindex='-1'])):focus-visible {
+  outline: 3px solid var(--app-focus-ring-aa, var(--app-accent-interactive));
+  outline-offset: 3px;
+  border-color: var(--app-accent);
+  box-shadow: 0 0 0 6px var(--app-focus);
+}
+:where(input, select, textarea):focus:not(:focus-visible) {
+  border-color: var(--app-accent);
+  box-shadow: 0 0 0 2px var(--app-focus);
+}
+:where(input, select, textarea)::placeholder {
+  color: var(--app-fg-muted);
+}
+:where(input, select, textarea, button):disabled,
+:where([aria-disabled='true']) {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+:where(select) {
+  color-scheme: light;
+}
+:where(option, optgroup) {
+  background: var(--app-surface-elevated);
+  color: var(--app-fg);
+}
+:where(button, [role='button'], input:not([type='hidden']), select, textarea) {
+  touch-action: manipulation;
+}
+:where(button, [role='button']) {
+  min-height: var(--app-min-touch-target, 44px);
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+:where(table) {
+  color: var(--app-fg);
+}
+:where(thead, th) {
+  background: var(--app-table-header-bg);
+  color: var(--app-fg);
+}
+:where(tr:hover) {
+  background: var(--app-table-row-hover);
+}
+/* Medical tools and legacy panels that previously fell back to white/light defaults. */
+:where(
+  .tool-header,
+  .tool-content,
+  .clinical-insights-panel,
+  .tools-workspace,
+  .tools-recent,
+  .tools-recent-card,
+  .tool-card-large,
+  .calculator-card,
+  .calculator-inputs,
+  .calculator-results,
+  .lab-input-panel,
+  .lab-results-panel,
+  .drug-results,
+  .drug-interaction-card,
+  .protocol-card,
+  .simple-tool-result-panel,
+  .simple-tool-chip-btn,
+  .diagnosis-panel,
+  .diagnosis-card,
+  .form-section,
+  .settings-section,
+  .analytics-card,
+  .cost-card,
+  .notification-card,
+  .audit-card,
+  .stat-card,
+  .empty-state,
+  .modal,
+  .drawer,
+  .dropdown-menu
+) {
+  background: var(--app-surface-1) !important;
+  border-color: var(--app-panel-border) !important;
+  color: var(--app-fg);
+  box-shadow: var(--app-shadow-1);
+}
+:where(
+  .tools-recent-card,
+  .tool-card-large,
+  .calculator-card,
+  .drug-interaction-card,
+  .protocol-card,
+  .diagnosis-card,
+  .simple-tool-chip-btn
+):hover {
+  background: color-mix(in srgb, var(--app-surface-1) 88%, var(--app-accent) 8%) !important;
+  border-color: color-mix(in srgb, var(--app-accent) 42%, var(--app-panel-border)) !important;
+}
+:where(
+  .tool-shortcut-badge,
+  .tool-card-action,
+  .calc-checkbox-group,
+  .calc-breakdown-item,
+  .calc-interpretation-box,
+  .lab-value-item,
+  .lab-clear-button,
+  .lab-load-example-button,
+  .calc-reset-btn,
+  .btn-back-to-tools
+) {
+  background: var(--app-surface-2) !important;
+  border-color: var(--app-panel-border) !important;
+  color: var(--app-fg-muted);
+}
+:where(
+  .calc-calculate-btn,
+  .lab-add-button,
+  .lab-interpret-button,
+  .btn-primary
+) {
+  background: var(--accent-gradient) !important;
+  color: var(--app-accent-contrast) !important;
+}
+:where(.btn-danger, .btn-remove-med:hover, .lab-value-remove:hover) {
+  background: linear-gradient(135deg, var(--app-danger), color-mix(in srgb, var(--app-danger) 78%, #f0f9ff)) 
+!important;
+  color: var(--app-danger-contrast) !important;
+}
+:where(.medication-input, .calc-input-field, .calc-select-field, .context-input, .context-select, .context-textarea, 
+.lab-input-field, .simple-tool-search-input, .diagnosis-field) {
+  background: var(--app-input-bg) !important;
+  border-color: var(--app-input-border) !important;
+  color: var(--app-fg) !important;
+}
+:where(.tool-header-info p, .section-subtitle, .calculator-description, .calc-input-help, .lab-input-label, 
+.context-label, .tool-card-muted) {
+  color: var(--app-fg-muted) !important;
+}
+/**
+ * Maps historical variable names to semantic --app-* tokens.
+ *
+ * Authoring guide:
+ * - Prefer --app-* from theme-tokens.css for new CSS (especially --app-fg, --app-surface-1,
+ *   --app-panel-border, --app-divider-on-surface, --app-overlay-on-surface).
+ * - Legacy aliases below stay for existing components; migrate toward --app-* when touching files.
+ */
+html {
+  --navy-bg: var(--app-bg);
+  --navy-ink: var(--app-navy-ink);
+  --navy-lighter: var(--app-surface-elevated);
+  --text-color: var(--app-fg);
+  --text-primary: var(--app-fg);
+  --muted-text: var(--app-fg-muted);
+  --text-muted: var(--app-fg-muted);
+  --text-secondary: var(--app-fg-muted);
+  --panel-bg: var(--app-panel-bg);
+  --panel-background: var(--app-surface-1);
+  --panel-hover: var(--app-hover);
+  --panel-border: var(--app-panel-border);
+  --border-color: var(--app-panel-border);
+  --surface-0: var(--app-surface-0);
+  --surface-1: var(--app-surface-1);
+  --surface-2: var(--app-surface-2);
+  --surface-muted: var(--app-surface-muted);
+  --surface-glass: var(--app-surface-glass);
+  --border-subtle: var(--app-border-subtle);
+  --divider-on-surface: var(--app-divider-on-surface);
+  --overlay-on-surface: var(--app-overlay-on-surface);
+  --shadow-1: var(--app-shadow-1);
+  --shadow-2: var(--app-shadow-2);
+  --accent-1: var(--app-accent);
+  --accent-2: var(--app-accent-2);
+  --accent-cyan: var(--app-accent-2);
+  --accent-green: var(--app-accent);
+  --accent-hover: var(--app-accent-hover);
+  --accent-gradient: linear-gradient(135deg, var(--app-accent-interactive), var(--app-accent-2));
+  --gradient-accent: linear-gradient(135deg, var(--app-accent-interactive), var(--app-accent-2));
+  --danger: var(--app-danger);
+  --error-color: var(--app-danger);
+  --warning: var(--app-warning);
+  --success: var(--app-success);
+  --success-color: var(--app-success);
+  --info: var(--app-info);
+  --input-bg: var(--app-input-bg);
+  --input-border: var(--app-input-border);
+  --focus-ring: var(--app-focus);
+  --disabled: var(--app-disabled);
+  --primary-color: var(--app-accent-interactive);
+  --primary-hover: var(--app-accent-hover);
+  --chart-1: var(--app-chart-1);
+  --chart-2: var(--app-chart-2);
+  --chart-3: var(--app-chart-3);
+  --chart-4: var(--app-chart-4);
+  --chart-5: var(--app-chart-5);
+  --chart-6: var(--app-chart-6);
+  --space-2xs: var(--space-1);
+  --nav-glyph-muted: var(--sidebar-fg-muted);
+}
+/**
+ * Layer 2 — platform-wide text hierarchy for the locked light medical theme.
+ * Loaded after color-normalization.css.
+ */
+html,
+html[data-theme='light'],
+:is(.app-shell, .emergency-app-shell) {
+  color: var(--app-text-primary, var(--medical-text-body));
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+:is(.app-shell, .emergency-app-shell) :is(h1, h2, h3, h4, h5, h6) {
+  color: var(--medical-text-heading);
+  font-weight: 700;
+  line-height: 1.25;
+}
+:is(.app-shell, .emergency-app-shell) p {
+  color: var(--medical-text-body);
+  line-height: 1.5;
+}
+:is(.app-shell, .emergency-app-shell) :is(label, legend, .form-label, [class*='__label']) {
+  color: var(--medical-text-muted);
+  font-weight: 600;
+}
+:is(.app-shell, .emergency-app-shell) :is(small, .text-caption, [class*='__caption'], [class*='-caption']) {
+  color: var(--medical-text-subtle);
+}
+:is(.app-shell, .emergency-app-shell) :is(
+    [class*='__meta'],
+    [class*='-meta'],
+    [class*='__eyebrow'],
+    [class*='-eyebrow'],
+    [class*='__hint'],
+    [class*='-hint'],
+    [class*='__subtitle'],
+    [class*='-subtitle']
+  ) {
+  color: var(--medical-text-muted);
+}
+:is(.app-shell, .emergency-app-shell) a:not([class*='btn']):not([class*='button']):not([role='button']) {
+  color: var(--medical-text-link);
+  text-decoration-color: color-mix(in srgb, var(--medical-text-link) 35%, transparent);
+}
+:is(.app-shell, .emergency-app-shell)
+  a:not([class*='btn']):not([class*='button']):not([role='button']):hover {
+  color: var(--medical-text-link-hover);
+}
+:is(.app-shell, .emergency-app-shell) :is(input, select, textarea)::placeholder {
+  color: var(--medical-text-placeholder);
+  opacity: 1;
+}
+:is(.app-shell, .emergency-app-shell) :is(input, select, textarea):disabled,
+:is(.app-shell, .emergency-app-shell) [aria-disabled='true'] {
+  color: var(--medical-text-disabled);
+}
+/* Calculator modals inherit medical ink hierarchy */
+.clinical-calculator-modal {
+  color: var(--medical-text-body);
+}
+.clinical-calculator-modal :is(h1, h2, h3, h4, h5, h6, strong) {
+  color: var(--medical-text-heading);
+}
+.clinical-calculator-modal :is(label, th) {
+  color: var(--medical-text-muted);
+}
+.clinical-calculator-modal :is(small, .calc-text-subtle) {
+  color: var(--medical-text-subtle);
+}
+.clinical-calculator-modal .calc-text-muted {
+  color: var(--medical-text-muted);
+}
+/* Copilot / safety panels — light medical surfaces */
+:is(
+    .diagnostic-safety-dashboard,
+    .patient-card-copilot,
+    .copilot-risk-layer-panel,
+    .ai-transparency-dashboard
+  ) {
+  color: var(--medical-text-body);
+  background: var(--medical-surface-card);
+  border-color: var(--medical-border);
+}
+:is(.diagnostic-safety-dashboard, .patient-card-copilot) :is(h1, h2, h3, h4, h5, h6, [class*='__title']) {
+  color: var(--medical-text-heading);
+}
+:is(.diagnostic-safety-dashboard, .patient-card-copilot) :is([class*='__subtitle'], [class*='__toggle']) {
+  color: var(--medical-text-muted);
+}
+:is(.diagnostic-safety-dashboard, .patient-card-copilot) [class*='__eyebrow'] {
+  color: var(--medical-text-link);
+}
+/**
+ * Layer 3 — final surface + shadow normalization for the locked light medical theme.
+ * Loaded after text-normalization.css.
+ */
+:root {
+  --nai-surface: var(--medical-surface-card, #ffffff);
+  --nai-surface-elevated: var(--medical-surface-card, #ffffff);
+  --nai-border: var(--medical-border, #e0f2fe);
+  --nai-text: var(--medical-text-body, #111827);
+  --nai-muted: var(--medical-text-muted, #6b7280);
+  --nai-accent: var(--medical-accent, #0ea5e9);
+  --surface-elevated: var(--medical-surface-card, #ffffff);
+  --app-surface-card: var(--medical-surface-card, #ffffff);
+}
+/* Native AI command suite — light medical, not dark overlay */
+.native-ai-command-suite,
+.native-ai-command-suite .clinical-acuity-leaderboard,
+.native-ai-command-suite .drift-monitoring-panel,
+.native-ai-command-suite .ai-transparency-dashboard,
+.native-ai-command-suite .copilot-risk-layer-panel {
+  color: var(--nai-text);
+}
+:is(.app-shell, .emergency-app-shell) :is(
+    [class*='-panel'],
+    [class*='-card'],
+    [class*='-strip'],
+    [class*='-dashboard'],
+    [class*='-board']
+  ):not([class*='--danger']):not([class*='--critical']):not([class*='--dark']) {
+  --component-surface-fallback: var(--medical-surface-card, #ffffff);
+  --component-border-fallback: var(--medical-border, #e0f2fe);
+}
+:is(.app-shell, .emergency-app-shell) :is(
+    .operational-strip__chip,
+    .charge-nurse-operational-strip__chip,
+    .whiteboard-alert-rail__item
+  ) {
+  --strip-tint-base: var(--medical-surface-card, #ffffff);
+}
+/**
+ * App-wide responsive typography, spacing, and touch targets.
+ * Loaded after layout-breakpoints.css; feature CSS may override locally.
+ */
+/* Type, spacing, and touch tokens: design-tokens.css (loaded before this file) */
+/* —— App-wide fit contract: keep every surface inside its container —— */
+.app-shell,
+.app-shell *,
+.app-shell *::before,
+.app-shell *::after {
+  box-sizing: border-box;
+}
+.app-shell :is(
+    main,
+    section,
+    article,
+    header,
+    footer,
+    nav,
+    aside,
+    form,
+    fieldset,
+    label,
+    .card,
+    [class*='card'],
+    [class*='panel'],
+    [class*='grid'],
+    [class*='row'],
+    [class*='content'],
+    [class*='body']
+  ) {
+  min-width: 0;
+  max-width: 100%;
+}
+.app-shell :is(
+    .command-dashboard,
+    .operating-workspace,
+    .dashboard-root,
+    .profile-page,
+    .settings-page,
+    .live-map-page,
+    .hospital-map-page,
+    .medical-iot-page,
+    .device-fleet-page,
+    .fleet-live-map-page,
+    .ops-demo-page,
+    .platform-admin-page,
+    .team-management,
+    .customer-portal-page
+  ) {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: clip;
+}
+.app-shell :is(p, li, dd, dt, small, span, strong, h1, h2, h3, h4, h5, h6) {
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+.app-shell :is(button, a.btn, .btn, input, select, textarea, summary, [role='button']) {
+  max-width: 100%;
+}
+.app-shell :is(button, a.btn, .btn, [role='button'], .launch-action-card) {
+  min-width: 0;
+  white-space: normal;
+  text-align: center;
+}
+.app-shell :is(button, a.btn, .btn) > :is(svg, .nav-icon, [class*='icon']) {
+  flex: 0 0 auto;
+}
+.app-shell :is(input:not([type='checkbox']):not([type='radio']), select, textarea) {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  min-height: var(--app-input-height, var(--compact-control-height, 38px));
+  border-radius: var(--compact-card-radius, var(--app-radius-md));
+  font-size: max(var(--text-input-min, 16px), 0.95rem);
+}
+.app-shell :is(table) {
+  width: 100%;
+  max-width: 100%;
+  border-collapse: collapse;
+}
+.app-shell :is(.table-wrap, .table-wrapper, [class*='table-container'], [class*='table-scroll']) {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+.app-shell :is(img, svg, canvas, video, iframe) {
+  max-width: 100%;
+}
+.app-shell :is([class*='map'], [class*='chart'], [class*='visualization']) {
+  min-width: 0;
+}
+.app-shell :is(
+    [class*='card'],
+    [class*='panel'],
+    [class*='summary'],
+    [class*='metric'],
+    [class*='tile']
+  ) {
+  min-width: 0;
+}
+.app-shell :is(
+    [class*='actions'],
+    [class*='controls'],
+    [class*='toolbar'],
+    [class*='filters'],
+    [class*='header']
+  ) {
+  min-width: 0;
+  max-width: 100%;
+}
+.app-shell :is([class*='actions'], [class*='controls'], [class*='toolbar']) {
+  flex-wrap: wrap;
+}
+.app-shell :is(:focus-visible) {
+  outline: var(--app-focus-ring-width, 2px) solid var(--app-focus-ring-aa, var(--app-accent-interactive));
+  outline-offset: var(--app-focus-ring-offset, 2px);
+}
+/* —— Headings: prevent overflow in primary app surfaces —— */
+.app-scroll-container h1,
+.app-scroll-container h2,
+:is(
+    .tool-page,
+    .calculators-content,
+    .clinical-tool-catalog,
+    .analytics-dashboard,
+    .cost-analytics-dashboard,
+    .tools-overview,
+    .audit-logs-container,
+      .profile-page,
+      .settings-page,
+      .operating-workspace,
+      .command-dashboard,
+      .live-map-page,
+      .hospital-map-page,
+      .medical-iot-page,
+      .device-fleet-page,
+      .fleet-live-map-page,
+      .ops-demo-page,
+    [class*='fleet-page'],
+    [class*='fleet-dashboard'],
+    [class*='predictive-maintenance'],
+    [class*='route-optimizer']
+  )
+  :is(h1, h2, h3) {
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: break-word;
+  word-break: normal;
+  line-height: 1.3;
+}
+.analytics-header h1,
+.analytics-page-title {
+  font-size: var(--app-type-title);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+  min-width: 0;
+}
+.tools-overview .header-content h1 {
+  font-size: var(--app-type-display);
+  max-width: 100%;
+}
+.tools-overview .header-subtitle {
+  font-size: var(--app-type-body);
+  overflow-wrap: break-word;
+}
+.cost-header h1,
+.cost-header-title {
+  font-size: var(--app-type-title);
+  overflow-wrap: break-word;
+}
+/* —— Long clinical / tool names —— */
+.catalog-tool-name-cell,
+.calculator-name,
+.calculator-panel-title-text,
+.tools-chat-only-name,
+.tools-recent-name,
+.tool-name,
+.recent-tool-name,
+.sidebar-tool-label,
+.catalog-tool-name-cell strong {
+  overflow-wrap: break-word;
+  word-break: normal;
+  min-width: 0;
+  max-width: 100%;
+}
+/* —— Icon + text rows —— */
+.calculator-panel-title,
+.calculator-card-header,
+.tool-header-left,
+.analytics-page-title,
+.fleet-page-header h1,
+.tool-result-card-header,
+.catalog-tool-name-cell {
+  min-width: 0;
+  max-width: 100%;
+}
+.calculator-panel-title > svg,
+.calculator-panel-title [class*='nav-icon'],
+.calculator-panel-title [class*='icon'],
+.tool-header-icon,
+.analytics-page-title-icon,
+.tool-result-card-icon {
+  flex-shrink: 0;
+}
+/* —— Badges, chips, pills —— */
+[class*='badge'],
+[class*='chip'],
+[class*='pill'],
+[class*='tag'],
+.badge,
+.catalog-badge,
+.catalog-inline-badge,
+.tool-category-badge,
+.tool-shortcut-badge,
+.tool-card-pill,
+.tool-card-tag,
+.analytics-badge {
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-break: normal;
+  box-sizing: border-box;
+}
+.catalog-category-chips,
+.tool-header-meta,
+.analytics-header-actions {
+  flex-wrap: wrap;
+}
+/* —— Form control spacing (dense clinical forms) —— */
+.calculators-content .calc-input-group,
+.calculators-content .calc-input-row,
+.tool-page .input-wrapper,
+.tool-page .input-field,
+.app-scroll-container select.input-field,
+.app-scroll-container textarea.input-field {
+  margin-bottom: var(--app-space-field);
+}
+.calculators-content .calc-input-group:last-child,
+.calculators-content .calc-has-bled-criteria,
+.calculators-content .calc-timi-criteria {
+  margin-bottom: var(--app-space-field-lg);
+}
+/* —— Touch targets (primary actions; not icon-only / sr-only) —— */
+@media (max-width: 640px) {
+  .app-scroll-container
+    :is(
+      button.btn,
+      a.btn,
+      .btn,
+      .btn-primary,
+      .btn-secondary,
+      .btn-ghost,
+      .btn-danger,
+      .btn-success,
+      .btn-share-tool,
+      .catalog-btn,
+      .calc-calculate-btn,
+      .calc-chat-assisted-card,
+      .tools-chat-only-card,
+      .tool-card-large,
+      .btn-chat-tool
+    ):not(.btn-icon-only):not([class*='sr-only']) {
+    min-height: var(--app-min-touch-target, 44px);
+    touch-action: manipulation;
+  }
+  .app-scroll-container input:not([type='checkbox']):not([type='radio']),
+  .app-scroll-container select,
+  .app-scroll-container textarea,
+  .calc-input-field,
+  .calc-select-field {
+    min-height: var(--app-min-touch-target, 44px);
+    font-size: max(var(--text-input-min), var(--text-body));
+  }
+}
+/* —— Card padding on small screens —— */
+@media (max-width: 640px) {
+  :is(
+      .tool-header,
+      .calculator-card,
+      .summary-card,
+      .cost-card,
+      .analytics-panel,
+      .catalog-stat,
+      .tool-card-large,
+      .launch-action-card,
+      .operating-card,
+      .operating-drilldown,
+      .profile-overview-card,
+      .settings-privacy-card,
+      .settings-billing-card,
+      .command-panel,
+      .command-hero,
+      .tip-card
+    ) {
+    padding: var(--app-card-padding-compact);
+  }
+  .tool-page,
+  .command-dashboard,
+  .operating-workspace,
+  .profile-page,
+  .settings-page,
+  .live-map-page,
+  .hospital-map-page,
+  .medical-iot-page,
+  .device-fleet-page,
+  .fleet-live-map-page,
+  .ops-demo-page,
+  .platform-admin-page,
+  .team-management,
+  .customer-portal-page {
+    padding: var(--app-mobile-page-padding, var(--app-page-padding-compact));
+  }
+  .calculators-content,
+  .clinical-tool-catalog {
+    padding: var(--app-page-padding-compact);
+  }
+}
+/* —— Warning / disclaimer callouts: visible but not layout-breaking —— */
+@media (max-width: 640px) {
+  :is(
+      .clinical-ds-disclaimer,
+      .tool-card-notice,
+      .calc-qsofa-disclaimer,
+      .calc-news2-disclaimer,
+      .calc-child-pugh-disclaimer,
+      .calc-has-bled-disclaimer,
+      .calc-meld-disclaimer,
+      .calc-timi-disclaimer,
+      .calc-validation-errors,
+      .calc-has-bled-anticoag-warning,
+      .calc-news2-scale2-warning,
+      .calc-phq9-q9-inline-warning,
+      .calc-phq9-q9-form-warning,
+      .calc-phq9-q9-result-warning,
+      .calc-phq9-high-symptom-warning,
+      .calc-gad7-severe-warning,
+      .calc-gad7-moderate-warning,
+      .calc-interpretation-box
+    ) {
+    padding: var(--app-callout-padding-compact);
+    font-size: var(--app-type-caption);
+    line-height: 1.5;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-wrap: break-word;
+    word-break: normal;
+  }
+  .calc-interpretation-title {
+    font-size: var(--app-type-body);
+  }
+  .tools-tips {
+    padding: clamp(20px, 5vw, 32px);
+  }
+  .tools-tips h2,
+  .tools-tips-title {
+    font-size: var(--app-type-heading);
+    flex-wrap: wrap;
+    text-align: center;
+  }
+}
+@media (max-width: 320px) {
+  .tools-overview .header-stats {
+    gap: var(--space-md);
+  }
+  .stat-number {
+    font-size: clamp(1.5rem, 8vw, 2rem);
+  }
+}
+/**
+ * Reception / registration desk — shared surface tokens and accents.
+ * Import once on the reception route (ReceptionWorkspace).
+ */
+.reception-workspace {
+  --reception-accent: var(--app-accent-interactive, var(--status-info, #0ea5e9));
+  --reception-accent-strong: color-mix(in srgb, var(--reception-accent) 14%, var(--ed-surface-raised, 
+var(--medical-surface-card, #ffffff)));
+  --reception-accent-border: color-mix(in srgb, var(--reception-accent) 38%, var(--ed-border-subtle, 
+var(--medical-border, #e0f2fe)));
+  --reception-surface-card: var(--color-card, var(--ed-surface-overlay, var(--medical-surface-card, #ffffff)));
+  --reception-surface-inset: var(--color-elevated, var(--ed-surface-raised, var(--medical-surface-page, #f0f9ff)));
+  --reception-text-primary: var(--ed-text-primary, var(--color-text-primary, var(--medical-ink, #111827)));
+  --reception-text-secondary: var(--ed-text-secondary, var(--color-text-secondary, var(--medical-ink-muted, #6b7280)));
+  --reception-border: var(--ed-border-subtle, var(--color-border-subtle, var(--medical-border, #e0f2fe)));
+  --reception-radius-lg: var(--ed-radius-lg, 14px);
+  --reception-radius-md: var(--ed-radius-md, 10px);
+  --reception-success: var(--status-success, #34d399);
+  --reception-warning: var(--status-warning, #fbbf24);
+  --reception-danger: var(--status-danger, #f87171);
+}
+.reception-workspace .emergency-route-page__hero,
+.reception-workspace .arrival-dashboard,
+.reception-workspace .reception-work-queues,
+.reception-workspace .recent-arrivals,
+.reception-workspace .reception-quick-intake-inline .reception-quick-intake {
+  border-color: var(--reception-border);
+  background: var(--reception-surface-card);
+  color: var(--reception-text-primary);
+}
+.reception-workspace .reception-pipeline-shell__stage {
+  border-color: var(--reception-border);
+  background: var(--reception-surface-inset);
+  color: var(--reception-text-secondary);
+}
+.reception-workspace .reception-pipeline-shell__stage--active {
+  border-color: var(--reception-accent-border);
+  background: var(--reception-accent-strong);
+  color: var(--reception-text-primary);
+}
+.reception-workspace .arrival-control-summary__metric {
+  border-color: var(--reception-border);
+  background: var(--reception-surface-inset);
+  color: var(--reception-text-primary);
+}
+.reception-workspace .arrival-control-summary__metric:not(:disabled):hover {
+  border-color: var(--reception-accent-border);
+  background: var(--reception-accent-strong);
+}
+.reception-workspace .reception-work-queues__tab--active,
+.reception-workspace .reception-desk-toolbar__action--active {
+  border-color: var(--reception-accent-border);
+  background: var(--reception-accent-strong);
+  color: var(--reception-text-primary);
+}
+.reception-workspace .reception-workspace__action--primary {
+  border-color: var(--reception-accent-border);
+  background: var(--reception-accent-strong);
+}
+.reception-workspace .reception-workspace__banner {
+  border-color: color-mix(in srgb, var(--reception-success) 42%, transparent);
+  background: color-mix(in srgb, var(--reception-success) 14%, var(--reception-surface-inset));
+}
+/**
+ * Numeric design primitives — spacing, radii, type scale, motion.
+ * Semantic aliases (--space-xs, --app-radius-*) live in design-tokens.css.
+ * Do not duplicate palette colors here.
+ */
+:root {
+  /* Spacing (4px grid) */
+  --space-0-5: 2px;
+  --space-1: 4px;
+  --space-1-5: 6px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 48px;
+  --space-10: 40px;
+  --space-12: 48px;
+  /* Mobile-first fluid spacing */
+  --space-fluid-1: clamp(4px, 1vw, 6px);
+  --space-fluid-2: clamp(8px, 1.5vw, 10px);
+  --space-fluid-3: clamp(12px, 2vw, 14px);
+  --space-fluid-4: clamp(16px, 2.5vw, 20px);
+  --space-fluid-5: clamp(20px, 3vw, 24px);
+  --space-fluid-6: clamp(24px, 3.5vw, 32px);
+  /* Radius — aligned with compact clinical surfaces (12px cards, 16px panels) */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-pill: 999px;
+  /* Type scale (px) */
+  --font-10: 10px;
+  --font-11: 11px;
+  --font-12: 12px;
+  --font-13: 13px;
+  --font-14: 14px;
+  --font-15: 15px;
+  --font-16: 16px;
+  --font-18: 18px;
+  --font-20: 20px;
+  --font-22: 22px;
+  --font-24: 24px;
+  --font-28: 28px;
+  --font-36: 36px;
+  /* Fluid typography */
+  --text-display-fluid: clamp(1.55rem, 2.8vw + 0.65rem, 2.55rem);
+  --text-title-fluid: clamp(1.28rem, 2.2vw + 0.58rem, 1.85rem);
+  --text-heading-fluid: clamp(1rem, 1.5vw + 0.55rem, 1.22rem);
+  --text-body-fluid: clamp(0.875rem, 1vw + 0.5rem, 0.95rem);
+  --text-caption-fluid: clamp(0.75rem, 1vw + 0.45rem, 0.8125rem);
+  /* Semantic text aliases (static fallbacks; fluid aliases in design-tokens.css) */
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-md: 16px;
+  --text-lg: 18px;
+  --text-xl: 22px;
+  /* Motion */
+  --motion-fast: 120ms;
+  --motion-normal: 180ms;
+  --motion-slow: 240ms;
+  --animation-fast: var(--motion-fast);
+  --animation-base: var(--motion-normal);
+  --animation-slow: var(--motion-slow);
+  --motion-duration-fast: var(--motion-fast);
+  --motion-duration-normal: var(--motion-normal);
+  --motion-duration-slow: var(--motion-slow);
+  --motion-ease-standard: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-smooth: var(--motion-ease-standard);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --ease-elastic: cubic-bezier(0.68, -0.6, 0.32, 1.6);
+  --motion-transition-fast: var(--motion-duration-fast) var(--motion-ease-standard);
+  --motion-transition-normal: var(--motion-duration-normal) var(--motion-ease-standard);
+  --motion-transition-slow: var(--motion-duration-slow) var(--motion-ease-standard);
+  /* Component sizing */
+  --component-card-padding: 20px;
+  --component-card-gap: 16px;
+  --component-button-height: 40px;
+  --component-button-radius: var(--radius-md);
+  /* Elevation */
+  --elevation-none: none;
+  --elevation-card: 0 8px 20px rgba(14, 165, 233, 0.06);
+  --elevation-floating: 0 16px 36px rgba(14, 165, 233, 0.08);
+  --elevation-modal: 0 24px 60px rgba(14, 165, 233, 0.12);
+  /* Root font size — responsive baseline */
+  font-size: clamp(15px, 0.22vw + 14px, 17px);
+}
+/**
+ * Practitioner compact layout — global flatter chrome for pilot / manual onboarding.
+ * Activated when data-practitioner-compact is set on <main> (pilot cleanup mode).
+ */
+[data-practitioner-compact] {
+  --ed-page-pad: 10px 12px;
+  --ed-section-gap: 8px;
+  --ed-whiteboard-card-min: 220px;
+  --app-shell-content-padding-y: 8px;
+  --cd-page-stack-gap: 10px;
+  --cd-page-title-size: 18px;
+  --cd-page-subtitle-size: 12px;
+}
+[data-practitioner-compact] .app-shell-main-content {
+  padding-top: var(--app-shell-content-padding-y, 8px);
+}
+/* App header + session chrome */
+[data-practitioner-compact] .emergency-header {
+  min-height: 48px;
+  padding: 6px 12px;
+}
+[data-practitioner-compact] .emergency-header__title {
+  font-size: 15px;
+}
+[data-practitioner-compact] .session-chrome-bar {
+  min-height: 32px;
+  padding: 4px 10px;
+}
+[data-practitioner-compact] .caredroid-header--pilot-metrics .caredroid-header__topbar {
+  gap: 10px;
+}
+[data-practitioner-compact] .caredroid-header--pilot-metrics .caredroid-header__central-status {
+  max-width: min(48vw, 360px);
+}
+[data-practitioner-compact] .sidebar-nav__item {
+  min-height: 36px;
+  padding: 6px 10px;
+}
+/* PageShell / CareDroid primitives */
+[data-practitioner-compact] .cd-page-shell {
+  gap: var(--cd-page-stack-gap, 10px);
+  padding: 10px 12px 16px;
+}
+[data-practitioner-compact] .cd-page-shell__title {
+  font-size: var(--cd-page-title-size, 18px);
+}
+[data-practitioner-compact] .cd-page-shell__description {
+  font-size: var(--cd-page-subtitle-size, 12px);
+}
+[data-practitioner-compact] .cd-page-stack {
+  gap: var(--cd-page-stack-gap, 10px);
+}
+[data-practitioner-compact] .cd-surface {
+  padding: 10px 12px;
+}
+/* Whiteboard */
+.emergency-whiteboard-page--practitioner-compact .emergency-whiteboard-page__hero {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  justify-content: space-between;
+  padding: 8px 12px;
+}
+.emergency-whiteboard-page--practitioner-compact .emergency-whiteboard-page__hero > div:first-child {
+  align-items: baseline;
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  min-width: 0;
+}
+.emergency-whiteboard-page--practitioner-compact .emergency-whiteboard-page__title {
+  font-size: 16px;
+  margin: 0;
+}
+.emergency-whiteboard-page--practitioner-compact .emergency-whiteboard-page__stats--bar {
+  padding: 0;
+}
+.emergency-whiteboard-page--practitioner-compact .emergency-whiteboard-page__stat {
+  flex: 1 1 auto;
+  min-height: 44px;
+  min-width: 0;
+  padding: 6px 10px;
+}
+.emergency-whiteboard-page--practitioner-compact .emergency-whiteboard-page__stats--bar {
+  flex-wrap: nowrap;
+  gap: 0;
+}
+.emergency-whiteboard-page--practitioner-compact .emergency-whiteboard-page__stat-value {
+  font-size: 18px;
+}
+.emergency-whiteboard-page--practitioner-compact .emergency-whiteboard-page__stat-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+[data-practitioner-compact] .operational-strip--dense {
+  max-width: 100%;
+}
+.emergency-whiteboard-page--practitioner-compact .emergency-whiteboard-page__awareness-banner {
+  gap: 8px;
+  padding: 8px 12px;
+}
+
+.emergency-whiteboard-page--practitioner-compact .emergency-whiteboard-page__awareness-banner-title {
+ Test Files  1 failed | 4 passed (5)
+      Tests  1 failed | 33 passed (34)
+   Start at  21:20:26
+   Duration  31.75s (transform 421ms, setup 6.38s, import 1.39s, tests 337ms, environment 20.29s)
+
+  font-size: 12px;
+}
+.emergency-whiteboard-page--practitioner-compact .emergency-whiteboard-page__awareness-chip {
+  font-size: 11px;
+  padding: 4px 10px;
+}
+.emergency-whiteboard-page--practitioner-compact .emergency-whiteboard-page__controls {
+  gap: 8px;
+  padding: 8px 12px;
+}
+.emergency-whiteboard-page--practitioner-compact .emergency-whiteboard-page__filter-chip {
+  font-size: 12px;
+  padding: 6px 11px;
+}
+.emergency-whiteboard-page--practitioner-compact .emergency-whiteboard-page__grid {
+  gap: 8px !important;
+  padding: 8px 12px !important;
+}
+.emergency-whiteboard-page--practitioner-compact .emergency-whiteboard-page__card-key {
+  display: none;
+}
+/* Reception */
+.reception-workspace--practitioner-compact {
+  gap: 8px;
+  padding: 0 0 16px;
+}
+.reception-workspace--practitioner-compact .reception-workspace__intro {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+}
+.reception-workspace--practitioner-compact .reception-workspace__intro h1 {
+  font-size: 18px;
+}
+.reception-workspace--practitioner-compact .reception-workspace__data-source {
+  margin: 0;
+}
+.reception-workspace--practitioner-compact .reception-desk-toolbar {
+  padding: 10px 12px;
+  gap: 8px;
+}
+.reception-workspace--practitioner-compact .reception-desk-toolbar__action {
+  min-height: 36px;
+  font-size: 12px;
+}
+/* Profile shell */
+[data-practitioner-compact] .profile-settings-shell {
+  gap: 10px;
+  padding: 10px 12px 20px;
+}
+[data-practitioner-compact] .profile-settings-shell__header {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  justify-content: space-between;
+}
+[data-practitioner-compact] .profile-settings-shell__header h1 {
+  font-size: 18px;
+  margin: 0;
+}
+[data-practitioner-compact] .profile-settings-shell__nav {
+  gap: 6px;
+}
+[data-practitioner-compact] .profile-settings-shell__nav a {
+  font-size: 12px;
+  padding: 6px 10px;
+}
+[data-practitioner-compact] .profile-page {
+  gap: 10px;
+}
+[data-practitioner-compact] .profile-overview-grid {
+  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+[data-practitioner-compact] .profile-overview-card {
+  padding: 10px 12px;
+}
+[data-practitioner-compact] .profile-card__subtitle,
+[data-practitioner-compact] .settings-card__subtitle {
+  display: none;
+}
+/* Settings */
+[data-practitioner-compact] .settings-page {
+  gap: 10px;
+  padding: 10px 12px 20px;
+}
+[data-practitioner-compact] .settings-card__title {
+  font-size: 18px;
+}
+[data-practitioner-compact] .settings-section {
+  gap: 8px;
+  padding: 10px 12px;
+}
+/* Tools overview */
+[data-practitioner-compact] .tools-overview {
+  gap: 10px;
+  padding: 10px 12px 20px;
+}
+[data-practitioner-compact] .tools-overview-header .header-content h1 {
+  font-size: 18px;
+}
+[data-practitioner-compact] .tools-overview-header .header-subtitle {
+  font-size: 12px;
+  margin: 4px 0 0;
+}
+[data-practitioner-compact] .tools-discovery-controls {
+  gap: 8px;
+}
+[data-practitioner-compact] .tools-filter-tabs {
+  gap: 6px;
+}
+[data-practitioner-compact] .tools-filter-tab {
+  font-size: 12px;
+  padding: 6px 10px;
+}
+[data-practitioner-compact] .tools-grid {
+  gap: 8px;
+}
+[data-practitioner-compact] .tool-card {
+  padding: 10px 12px;
+}
+/* Tool page layout */
+[data-practitioner-compact] .tool-page .cd-page-shell__description {
+  display: none;
+}
+[data-practitioner-compact] .tool-header-actions {
+  gap: 6px;
+}
+[data-practitioner-compact] .tool-content {
+  padding: 10px 12px;
+}
+/* Patient cards */
+[data-practitioner-compact] .patient-card {
+  gap: 6px;
+}
+[data-practitioner-compact] .patient-card__meta-grid {
+  gap: 4px;
+}
+/* Copilot — chat-first dock aligned with compact page chrome */
+[data-practitioner-compact] .ed-copilot-panel__header {
+  min-height: 40px;
+  padding: 6px 10px;
+}
+[data-practitioner-compact] .ed-copilot-shell__tabs {
+  padding: 6px 10px;
+  gap: 4px;
+}
+[data-practitioner-compact] .ed-copilot-shell__tab {
+  min-height: 30px;
+  font-size: 10px;
+  padding: 4px 7px;
+}
+[data-practitioner-compact] .ed-copilot-launch {
+  right: 12px;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  padding: 8px 12px;
+  font-size: 12px;
+}
+[data-practitioner-compact] .app-shell-main-content--mobile-nav {
+  padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+}
+/* Emergency satellite routes */
+.emergency-route-page--practitioner-compact {
+  gap: 8px;
+  padding: 8px 12px 16px;
+}
+.emergency-route-page--practitioner-compact .emergency-route-page__hero {
+  align-items: center;
+  gap: 8px 12px;
+  padding: 8px 12px;
+}
+.emergency-route-page--practitioner-compact .emergency-route-page__title {
+  font-size: 18px;
+}
+[data-practitioner-compact] .ed-data-source,
+[data-practitioner-compact] .emergency-route-data-source,
+[data-practitioner-compact] .emergency-route-metric-strip,
+[data-practitioner-compact] .emergency-route-metric-grid {
+  display: none;
+}
+[data-practitioner-compact] .emergency-route-page__description {
+  display: none;
+}
+.emergency-route-page--practitioner-compact .emergency-route-metric-strip {
+  padding: 6px 10px;
+}
+.emergency-route-page--practitioner-compact .emergency-route-situation-brief {
+  padding: 6px 10px;
+}
+.emergency-route-page--practitioner-compact .emergency-route-situation-brief__list {
+  gap: 8px 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.emergency-route-page--practitioner-compact .emergency-route-situation-brief__value {
+  font-size: var(--ed-type-body);
+}
+.emergency-route-page--practitioner-compact .emergency-route-patient-grid {
+  gap: 8px;
+}
+.emergency-route-page--practitioner-compact .emergency-route-queue-row {
+  padding: 8px 10px;
+}
+/* EMS pipeline */
+[data-practitioner-compact] .ems-pipeline__section-heading h2 {
+  font-size: 15px;
+}
+[data-practitioner-compact] .ems-pipeline__source--compact {
+  font-size: 12px;
+  margin: 0;
+}
+[data-practitioner-compact] .ems-pipeline__offload-anchor {
+  display: none;
+}
+/* Shift summary */
+.shift-summary--practitioner-compact {
+  gap: 8px;
+  padding: 8px 12px 16px;
+}
+.shift-summary--practitioner-compact .shift-summary__hero {
+  align-items: center;
+  gap: 8px 12px;
+  padding: 8px 12px;
+}
+.shift-summary--practitioner-compact .shift-summary__header-card {
+  gap: 8px;
+  padding: 8px 12px;
+}
+.shift-summary--practitioner-compact .shift-summary__stat-grid {
+  gap: 8px;
+}
+.shift-summary--practitioner-compact .shift-summary__stat {
+  min-height: 52px;
+  padding: 8px 10px;
+}
+.shift-summary--practitioner-compact .shift-summary__section-header h2 {
+  font-size: 16px;
+}
+.shift-summary--practitioner-compact .shift-summary__section-header p {
+  display: none;
+}
+/* Department Pulse */
+.emergency-pulse--practitioner-compact {
+  gap: 8px;
+  padding: 8px 12px 16px;
+}
+.emergency-pulse--practitioner-compact .emergency-pulse__hero {
+  padding: 8px 12px;
+}
+.emergency-pulse--practitioner-compact .emergency-pulse__timebar {
+  padding: 6px 10px;
+}
+.emergency-pulse__stat-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  border: 1px solid var(--ed-border-subtle, rgba(148, 163, 184, 0.2));
+  border-radius: 12px;
+  padding: 8px 10px;
+}
+.emergency-pulse__stat-strip-item {
+  align-items: baseline;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  gap: 6px;
+  padding: 2px 4px;
+}
+.emergency-pulse__stat-strip-item strong {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 16px;
+}
+.emergency-pulse__stat-strip-item span {
+  color: var(--ed-text-secondary, #94a3b8);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.emergency-pulse__bottleneck--compact {
+  border-radius: 10px;
+  font-size: 13px;
+  margin: 0;
+  padding: 8px 10px;
+}
+.emergency-pulse--practitioner-compact .emergency-pulse__panel {
+  padding: 10px 12px;
+}
+.emergency-pulse--practitioner-compact .emergenc...
+ ❯ src/styles/medicalThemeAudit.test.ts:102:27
+    100|
+    101|     expect(productCode).not.toMatch(/#2563EB|#2563eb/);
+    102|     expect(cssBundle).not.toMatch(/#2563eb\b/i);
+       |                           ^
+    103|   });
+    104|
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯

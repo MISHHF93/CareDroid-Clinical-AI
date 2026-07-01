@@ -1,0 +1,2261 @@
+---
+pid: 12220
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cd \"C:\\Users\\borah\\CareDroid-Clinical-AI\"; node node_modules/vitest/vitest.mjs run --pool=threads --maxWorkers=1 src/test/routePagesSmoke.test.tsx src/App.permissions.test.tsx src/config/canonicalConfig.contract.test.ts src/config/unified-navigation.config.test.ts src/navigation/profileNavigateCoverage.test.tsx 2>&1"
+started_at: 2026-07-01T01:43:37.688Z
+running_for_ms: 3604997  
+---
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+ ❯ src/config/canonicalConfig.contract.test.ts (9 tests | 1 failed) 55ms
+     ✓ keeps active route aliases in routes.config and consumed by App/route health 15ms
+     ✓ keeps canonical route records as the source for generated protected aliases 5ms
+     ✓ declares the compact clinical OS route surface in the canonical route map 3ms
+     ✓ keeps calculator manifest as a toolInventory projection 11ms
+     ✓ keeps user-facing tools, navigation destinations, and workspaces unique 1ms
+     ✓ routes API clients through api.config and auth.config 5ms
+     ✓ projects feature flags through featureFlags.config before env/auth consumers 1ms
+     ✓ normalizes frontend environment config and deployment metadata 1ms
+     × centralizes theme and layout contracts without page-owned viewport shells 8ms
+ ❯ src/App.permissions.test.tsx (15 tests | 2 failed) 27ms
+     × mounts the active CareDroid pages through the single AppShell route tree 16ms
+     ✓ /tools/ambient-scribe is not mounted as an App page route 1ms
+     ✓ /tools/differential-ai is not mounted as an App page route 0ms
+     ✓ /tools/timeline-ai is not mounted as an App page route 1ms
+     ✓ /tools/patient-summary-ai is not mounted as an App page route 0ms
+     ✓ /tools/order-set-ai is not mounted as an App page route 0ms
+     ✓ /tools/ai-explainability is not mounted as an App page route 0ms
+     ✓ /tools/guideline-rag is not mounted as an App page route 0ms
+     ✓ /tools/clinical-audit is not mounted as an App page route 0ms
+     ✓ /marketplace is not mounted as an App page route 0ms
+     ✓ /enterprise-readiness is not mounted as an App page route 0ms
+     ✓ /platform-admin is not mounted as an App page route 0ms
+     ✓ /success-center is not mounted as an App page route 0ms
+     ✓ /fleet/command is not mounted as an App page route 0ms
+     × redirects retired product roots and platform surfaces into CareDroid 2ms
+stdout | src/test/routePagesSmoke.test.tsx > Route pages smoke — non-empty render > 'clinical-alerts' at '/clinical/alerts' renders primary content
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782870251440-mliybe',
+  alertId: 'alert-smoke',
+  action: 'synced',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-01T01:44:11.440Z',
+  source: 'clinical-alerts-api',
+  metadata: { backend: true }
+}
+
+ ❯ src/test/routePagesSmoke.test.tsx (178 tests | 15 failed) 46016ms
+     ✓ 'dashboard' at '/dashboard' renders primary content  682ms
+     ✓ 'executive' at '/executive' renders primary content  300ms
+     ✓ 'discover' at '/discover' renders primary content 102ms
+     ✓ 'workflows' at '/workflows' renders primary content 83ms
+     ✓ 'operations' at '/operations' renders primary content 101ms
+     ✓ 'tools-overview' at '/tools' renders primary content  518ms
+     ✓ 'protocols' at '/protocols' renders primary content 177ms
+     ✓ 'research' at '/research' renders primary content 89ms
+     ✓ 'documentation' at '/documentation' renders primary content 122ms
+     ✓ 'knowledge-graph' at '/knowledge-graph' renders primary content 91ms
+     × 'predictive-analytics' at '/predictive-analytics' renders primary content 1107ms
+     ✓ 'clinical-decision-support' at '/clinical-decision-support' renders primary content 84ms
+     ✓ 'competencies' at '/competencies' renders primary content 70ms
+     ✓ 'credentials' at '/credentials' renders primary content 71ms
+     ✓ 'simulation' at '/simulation' renders primary content 67ms
+     ✓ 'simulation-scenario' at '/simulation/sepsis-deterioration' renders primary content 72ms
+     ✓ 'simulation-outcomes' at '/simulation/outcomes' renders primary content 69ms
+     ✓ 'laboratory' at '/laboratory' renders primary content 72ms
+     ✓ '3d-viewer' at '/3d-viewer' renders primary content 78ms
+     ✓ 'live-map' at '/live-map' renders primary content 78ms
+     × 'hospital-map' at '/hospital-map' renders primary content 1062ms
+     ✓ 'medical-iot' at '/medical-iot' renders primary content 246ms
+     ✓ 'devices' at '/devices' renders primary content 91ms
+     ✓ 'clinical-alerts' at '/clinical/alerts' renders primary content 217ms
+     ✓ 'calculators-library-filter' at '/tools/calculators' renders primary content  1547ms
+     ✓ 'ambient-scribe' at '/tools/ambient-scribe' renders primary content 135ms
+     ✓ 'calculator-recommender-ai' at '/tools/calculator-recommender' renders primary content 136ms
+     ✓ 'guideline-rag' at '/tools/guideline-rag' renders primary content 151ms
+     ✓ 'differential-ai' at '/tools/differential-ai' renders primary content 168ms
+     ✓ 'timeline-ai' at '/tools/timeline-ai' renders primary content 154ms
+     ✓ 'patient-summary-ai' at '/tools/patient-summary-ai' renders primary content 235ms
+     ✓ 'order-set-ai' at '/tools/order-set-ai' renders primary content 205ms
+     ✓ 'ai-explainability' at '/tools/ai-explainability' renders primary content 198ms
+     ✓ 'clinical-audit' at '/tools/clinical-audit' renders primary content 164ms
+     ✓ 'artifacts' at '/artifacts' renders primary content 104ms
+     ✓ 'memory' at '/memory' renders primary content 113ms
+     ✓ 'training' at '/training' renders primary content 163ms
+     ✓ 'analytics' at '/analytics' renders primary content 99ms
+     ✓ 'knowledge-hub' at '/knowledge-hub' renders primary content 80ms
+     ✓ 'workflow-mining' at '/workflow-mining' renders primary content 80ms
+     ✓ 'workspace-dependency-graph' at '/workspace-dependency-graph' renders primary content 105ms
+     ✓ 'organization-intelligence' at '/organization-intelligence' renders primary content 150ms
+     ✓ 'department-intelligence' at '/department-intelligence' renders primary content 97ms
+     ✓ 'product-intelligence' at '/product-intelligence' renders primary content 104ms
+     ✓ 'expansion-opportunities' at '/expansion-opportunities' renders primary content 82ms
+     ✓ 'maturity-assessment' at '/maturity-assessment' renders primary content 93ms
+     ✓ 'feature-flags' at '/feature-flags' renders primary content 79ms
+     ✓ 'plugins' at '/plugins' renders primary content 72ms
+     ✓ 'dependency-map' at '/dependency-map' renders primary content 102ms
+     ✓ 'dependency-graph' at '/dependency-graph' renders primary content 93ms
+     ✓ 'data-lineage' at '/data-lineage' renders primary content 78ms
+     ✓ 'self-diagnostics' at '/self-diagnostics' renders primary content 82ms
+     ✓ 'costs' at '/costs' renders primary content 75ms
+     ✓ 'ai-evaluation' at '/ai-evaluation' renders primary content 72ms
+     ✓ 'ai-command-center' at '/ai-command-center' renders primary content 176ms
+     ✓ 'business-brain' at '/business-brain' renders primary content 87ms
+     ✓ 'integrations-platform' at '/integrations' renders primary content 154ms
+     ✓ 'workflow-builder-ai' at '/tools/workflow-builder-ai' renders primary content 119ms
+     ✓ 'patient-workspace-platform' at '/patients/demo-patient/workspace' renders primary content 153ms
+     ✓ 'soap-builder' at '/tools/soap-builder' renders primary content 152ms
+     ✓ 'ai-governance-center' at '/ai-governance' renders primary content 146ms
+     ✓ 'llm-security-dashboard' at '/security' renders primary content 157ms
+     ✓ 'regulatory-enterprise' at '/regulatory' renders primary content 154ms
+     ✓ 'equity-monitoring-enterprise' at '/equity' renders primary content 163ms
+     ✓ 'human-review-enterprise' at '/human-review' renders primary content 172ms
+     ✓ 'privacy-enterprise' at '/privacy' renders primary content 186ms
+     ✓ 'system-health-enterprise' at '/system-health' renders primary content 213ms
+     ✓ 'saas-health-enterprise' at '/saas-health' renders primary content 121ms
+     ✓ 'governance-registry-enterprise' at '/governance-registry' renders primary content 110ms
+     ✓ 'governance-platform' at '/governance' renders primary content 220ms
+     ✓ 'governance-clinical' at '/governance/clinical' renders primary content 207ms
+     ✓ 'ai-security-platform' at '/governance/ai-security' renders primary content 226ms
+     ✓ 'regulatory-classification' at '/governance/regulatory' renders primary content 267ms
+     ✓ 'validation-sandbox' at '/governance/validation' renders primary content 231ms
+     ✓ 'human-review-queue' at '/review' renders primary content 234ms
+     ✓ 'audit-trail-spine' at '/audit' renders primary content 184ms
+     ✓ 'deployment-observability' at '/operations/observability' renders primary content 151ms
+     ✓ 'fleet-live-map' at '/fleet/map' renders primary content 120ms
+     ✓ 'fleet-command' at '/fleet/command' renders primary content 103ms
+     ✓ 'fleet-route-optimizer' at '/fleet/route-optimizer' renders primary content 82ms
+     ✓ 'fleet-predictive-maintenance' at '/fleet/predictive-maintenance' renders primary content 86ms
+     × major pages render non-empty content in light mode 1750ms
+     × major pages render non-empty content in dark mode 1633ms
+     ✓ 'dashboard' survives compact viewport mock 78ms
+     ✓ 'executive' survives compact viewport mock 185ms
+     ✓ 'discover' survives compact viewport mock 85ms
+     ✓ 'workflows' survives compact viewport mock 122ms
+     ✓ 'operations' survives compact viewport mock 128ms
+     ✓ 'tools-overview' survives compact viewport mock  416ms
+     ✓ 'protocols' survives compact viewport mock 129ms
+     ✓ 'research' survives compact viewport mock 72ms
+     ✓ 'documentation' survives compact viewport mock 94ms
+     ✓ 'knowledge-graph' survives compact viewport mock 76ms
+     × 'predictive-analytics' survives compact viewport mock 1077ms
+     ✓ 'clinical-decision-support' survives compact viewport mock 82ms
+     ✓ 'competencies' survives compact viewport mock 79ms
+     ✓ 'credentials' survives compact viewport mock 83ms
+     ✓ 'simulation' survives compact viewport mock 70ms
+     ✓ 'simulation-scenario' survives compact viewport mock 78ms
+     ✓ 'simulation-outcomes' survives compact viewport mock 80ms
+     ✓ 'laboratory' survives compact viewport mock 86ms
+     ✓ '3d-viewer' survives compact viewport mock 79ms
+     ✓ 'live-map' survives compact viewport mock 95ms
+     × 'hospital-map' survives compact viewport mock 1075ms
+     ✓ 'medical-iot' survives compact viewport mock 185ms
+     ✓ 'devices' survives compact viewport mock 101ms
+     ✓ 'clinical-alerts' survives compact viewport mock 178ms
+     ✓ 'calculators-library-filter' survives compact viewport mock  1336ms
+     ✓ 'ambient-scribe' survives compact viewport mock 138ms
+     ✓ 'calculator-recommender-ai' survives compact viewport mock 175ms
+     ✓ 'guideline-rag' survives compact viewport mock 189ms
+     ✓ 'differential-ai' survives compact viewport mock 183ms
+     ✓ 'timeline-ai' survives compact viewport mock 208ms
+     ✓ 'patient-summary-ai' survives compact viewport mock 156ms
+     ✓ 'order-set-ai' survives compact viewport mock 200ms
+     ✓ 'ai-explainability' survives compact viewport mock 170ms
+     ✓ 'clinical-audit' survives compact viewport mock 159ms
+     ✓ 'artifacts' survives compact viewport mock 85ms
+     ✓ 'memory' survives compact viewport mock 78ms
+     ✓ 'training' survives compact viewport mock 146ms
+     ✓ 'analytics' survives compact viewport mock 84ms
+     ✓ 'knowledge-hub' survives compact viewport mock 67ms
+     ✓ 'workflow-mining' survives compact viewport mock 88ms
+     ✓ 'workspace-dependency-graph' survives compact viewport mock 82ms
+     ✓ 'organization-intelligence' survives compact viewport mock 123ms
+     ✓ 'department-intelligence' survives compact viewport mock 74ms
+     ✓ 'product-intelligence' survives compact viewport mock 94ms
+     ✓ 'expansion-opportunities' survives compact viewport mock 79ms
+     ✓ 'maturity-assessment' survives compact viewport mock 92ms
+     ✓ 'feature-flags' survives compact viewport mock 93ms
+     ✓ 'plugins' survives compact viewport mock 85ms
+     ✓ 'dependency-map' survives compact viewport mock 76ms
+     ✓ 'dependency-graph' survives compact viewport mock 77ms
+     ✓ 'data-lineage' survives compact viewport mock 71ms
+     ✓ 'self-diagnostics' survives compact viewport mock 69ms
+     ✓ 'costs' survives compact viewport mock 70ms
+     ✓ 'ai-evaluation' survives compact viewport mock 83ms
+     ✓ 'ai-command-center' survives compact viewport mock 179ms
+     ✓ 'business-brain' survives compact viewport mock 67ms
+     ✓ 'integrations-platform' survives compact viewport mock 122ms
+     ✓ 'workflow-builder-ai' survives compact viewport mock 129ms
+     ✓ 'patient-workspace-platform' survives compact viewport mock 132ms
+     ✓ 'soap-builder' survives compact viewport mock 138ms
+     ✓ 'ai-governance-center' survives compact viewport mock 133ms
+     ✓ 'llm-security-dashboard' survives compact viewport mock 137ms
+     ✓ 'regulatory-enterprise' survives compact viewport mock 134ms
+     ✓ 'equity-monitoring-enterprise' survives compact viewport mock 179ms
+     ✓ 'human-review-enterprise' survives compact viewport mock 164ms
+     ✓ 'privacy-enterprise' survives compact viewport mock 128ms
+     ✓ 'system-health-enterprise' survives compact viewport mock 155ms
+     ✓ 'saas-health-enterprise' survives compact viewport mock 84ms
+     ✓ 'governance-registry-enterprise' survives compact viewport mock 81ms
+     ✓ 'governance-platform' survives compact viewport mock 134ms
+     ✓ 'governance-clinical' survives compact viewport mock 166ms
+     ✓ 'ai-security-platform' survives compact viewport mock 139ms
+     ✓ 'regulatory-classification' survives compact viewport mock 112ms
+     ✓ 'validation-sandbox' survives compact viewport mock 113ms
+     ✓ 'human-review-queue' survives compact viewport mock 139ms
+     ✓ 'audit-trail-spine' survives compact viewport mock 113ms
+     ✓ 'deployment-observability' survives compact viewport mock 108ms
+     ✓ 'fleet-live-map' survives compact viewport mock 76ms
+     ✓ 'fleet-command' survives compact viewport mock 87ms
+     ✓ 'fleet-route-optimizer' survives compact viewport mock 114ms
+     ✓ 'fleet-predictive-maintenance' survives compact viewport mock 75ms
+     × renders core UX surfaces without empty content at 320px 1431ms
+     × renders core UX surfaces without empty content at 360px 1449ms
+     × renders core UX surfaces without empty content at 390px 1527ms
+     × renders core UX surfaces without empty content at 412px 1488ms
+     × renders core UX surfaces without empty content at 430px 1441ms
+     × renders core UX surfaces without empty content at 768px 1579ms
+     × renders core UX surfaces without empty content at 1024px 1457ms
+     × renders core UX surfaces without empty content at 1280px 1436ms
+     × renders core UX surfaces without empty content at 1440px 1508ms
+     ✓ 'qsofa' renders scrollable calculator content  303ms
+     ✓ 'news2' renders scrollable calculator content 294ms
+     ✓ 'has-bled' renders scrollable calculator content  341ms
+     ✓ 'phq9' renders scrollable calculator content  334ms
+     ✓ 'ascvd-risk' renders scrollable calculator content 294ms
+ ✓ src/config/unified-navigation.config.test.ts (13 tests) 36ms
+ ✓ src/navigation/profileNavigateCoverage.test.tsx (1 test) 71ms
+node : 
+At line:1 char:44
++ ... inical-AI"; node node_modules/vitest/vitest.mjs run --pool=threads -- ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+⎯⎯⎯⎯⎯⎯ Failed Tests 18 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  src/App.permissions.test.tsx > App CareDroid route contract > mounts the active CareDroid pages through the 
+single AppShell route tree
+AssertionError: expected [ '/auth-callback', …(27) ] to deeply equal [ '/auth-callback', …(18) ]
+- Expected
++ Received
+  [
+    "/auth-callback",
+    "/shared/tools/:shareId",
++   "/emergency/command-center",
+    "/emergency/whiteboard",
+    "/emergency/patients",
++   "/emergency/journey",
++   "/emergency/dispatch",
+    "/emergency/ems",
++   "/emergency/ed-readiness",
+    "/emergency/reception",
+    "/emergency/intake",
+    "/emergency/queues",
+    "/emergency/reassessment",
+    "/emergency/capacity",
+    "/emergency/boarding",
+    "/emergency/referrals",
+    "/emergency/copilot",
++   "/emergency/documentation",
+    "/emergency/tools",
+    "/emergency/pulse",
+    "/emergency/shift",
+    "/emergency/analytics",
++   "/emergency/diagnostics",
++   "/emergency/handoffs",
++   "/emergency/reports",
+    "/emergency/alerts",
+    "/emergency/settings",
++   "/emergency/help",
+  ]
+ ❯ src/App.permissions.test.tsx:41:41
+     39|     expect(appSource).toContain('<Outlet />');
+     40|
+     41|     expect(ACTIVE_EMERGENCY_PAGE_PATHS).toEqual(EMERGENCY_PAGE_ALL_REN…
+       |                                         ^
+     42|   });
+     43|
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/18]⎯
+ FAIL  src/App.permissions.test.tsx > App CareDroid route contract > redirects retired product roots and platform 
+surfaces into CareDroid
+AssertionError: /hospital-map: expected null to be truthy
+- Expected:
+true
++ Received:
+null
+ ❯ src/App.permissions.test.tsx:78:9
+     76|           (appSource.includes(`path="${path}"`) ? CANONICAL_ROUTES.eme…
+     77|         path,
+     78|       ).toBeTruthy();
+       |         ^
+     79|     }
+     80|
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/18]⎯
+ FAIL  src/config/canonicalConfig.contract.test.ts > canonical configuration contract > centralizes theme and layout 
+contracts without page-owned viewport shells
+Error: ENOENT: no such file or directory, open 'C:\Users\borah\CareDroid-Clinical-AI\src\layout\AppShell.tsx'
+ ❯ read src/config/canonicalConfig.contract.test.ts:29:24
+     27| const __dirname = dirname(fileURLToPath(import.meta.url));
+     28| const srcRoot = join(__dirname, '..');
+     29| const read = (path) => readFileSync(join(srcRoot, path), 'utf8');
+       |                        ^
+     30|
+     31| describe('canonical configuration contract', () => {
+ ❯ src/config/canonicalConfig.contract.test.ts:211:12
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/18]⎯
+ FAIL  src/test/routePagesSmoke.test.tsx > Route pages smoke — non-empty render > 'predictive-analytics' at 
+'/predictive-analytics' renders primary content
+TestingLibraryElementError: Unable to find role="heading" and name `/predictive analytics dashboard/i`
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <main
+      style="background: rgb(240, 249, 255); min-height: 100vh; padding: 24px 28px; font-family: Inter, system-ui, 
+sans-serif;"
+    >
+      <div
+        style="margin-bottom: 20px;"
+      >
+        <h1
+          style="margin: 0px; font-size: 22px; font-weight: 800; color: rgb(17, 24, 39);"
+        >
+          Predictive Analytics
+        </h1>
+        <p
+          style="margin: 2px 0px 0px; font-size: 13px; color: rgb(107, 114, 128);"
+        >
+          Deterioration � Sepsis � Readmission � ICU transfer � Device & fleet risk
+        </p>
+      </div>
+      <div
+        style="background: rgb(254, 252, 232); border: 1px solid rgb(217, 119, 6); border-radius: 8px; padding: 8px 
+14px; font-size: 12px; color: rgb(120, 53, 15); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;"
+      >
+        <span
+          style="font-weight: 700;"
+        >
+          Demo models
+        </span>
+         � predictions shown are not live patient, device, or fleet data. Connect live data pipelines to activate 
+real predictions.
+      </div>
+      <div
+        style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;"
+      >
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 140px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Models active
+          </div>
+          <div
+            style="font-size: 20px; font-weight: 800; color: rgb(17, 24, 39); line-height: 1.15;"
+          >
+            6
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 140px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            High / Critical
+          </div>
+          <div
+            style="font-size: 20px; font-weight: 800; color: rgb(239, 68, 68); line-height: 1.15;"
+          >
+            3
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 140px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Avg risk score
+          </div>
+          <div
+            style="font-size: 20px; font-weight: 800; color: rgb(17, 24, 39); line-height: 1.15;"
+          >
+            67/100
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 140px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Highest risk
+          </div>
+          <div
+            style="font-size: 20px; font-weight: 800; color: rgb(249, 115, 22); line-height: 1.15;"
+          >
+            Sepsis risk
+          </div>
+        </div>
+      </div>
+      <div
+        style="margin-bottom: 18px;"
+      >
+        <input
+          placeholder="Search models, domains, signals�"
+          style="width: 100%; max-width: 420px; padding: 8px 14px; font-size: 13px; border: 1.5px solid rgb(224, 242, 
+254); border-radius: 8px; background: rgb(255, 255, 255); color: rgb(17, 24, 39); outline: none; box-sizing: 
+border-box;"
+          type="text"
+          value=""
+        />
+      </div>
+      <div
+        style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px;"
+      >
+        <div
+          style="background: rgb(255, 255, 255); border-width: 1.5px 1.5px 1.5px 4px; border-style: solid; 
+border-color: rgba(249, 115, 22, 0.267) rgba(249, 115, 22, 0.267) rgba(249, 115, 22, 0.267) rgb(249, 115, 22); 
+border-image: none; border-radius: 12px; padding: 16px 18px; cursor: pointer;"
+        >
+          <div
+            style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px;"
+          >
+            <div
+              style="flex: 1 1 0%;"
+            >
+              <div
+                style="font-weight: 700; font-size: 15px; color: rgb(17, 24, 39);"
+              >
+                Deterioration risk
+              </div>
+              <div
+                style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 2px;"
+              >
+                Clinical surveillance
+                 � 
+                Next 6 hours
+              </div>
+            </div>
+            <span
+              style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: 
+rgb(249, 115, 22); background: rgb(255, 247, 237); border: 1px solid rgba(249, 115, 22, 0.333); border-radius: 20px; 
+padding: 3px 10px; flex-shrink: 0;"
+            >
+              high
+            </span>
+          </div>
+          <div
+            style="...
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <main
+      style="background: rgb(240, 249, 255); min-height: 100vh; padding: 24px 28px; font-family: Inter, system-ui, 
+sans-serif;"
+    >
+      <div
+        style="margin-bottom: 20px;"
+      >
+        <h1
+          style="margin: 0px; font-size: 22px; font-weight: 800; color: rgb(17, 24, 39);"
+        >
+          Predictive Analytics
+        </h1>
+        <p
+          style="margin: 2px 0px 0px; font-size: 13px; color: rgb(107, 114, 128);"
+        >
+          Deterioration � Sepsis � Readmission � ICU transfer � Device & fleet risk
+        </p>
+      </div>
+      <div
+        style="background: rgb(254, 252, 232); border: 1px solid rgb(217, 119, 6); border-radius: 8px; padding: 8px 
+14px; font-size: 12px; color: rgb(120, 53, 15); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;"
+      >
+        <span
+          style="font-weight: 700;"
+        >
+          Demo models
+        </span>
+         � predictions shown are not live patient, device, or fleet data. Connect live data pipelines to activate 
+real predictions.
+      </div>
+      <div
+        style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;"
+      >
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 140px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Models active
+          </div>
+          <div
+            style="font-size: 20px; font-weight: 800; color: rgb(17, 24, 39); line-height: 1.15;"
+          >
+            6
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 140px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            High / Critical
+          </div>
+          <div
+            style="font-size: 20px; font-weight: 800; color: rgb(239, 68, 68); line-height: 1.15;"
+          >
+            3
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 140px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Avg risk score
+          </div>
+          <div
+            style="font-size: 20px; font-weight: 800; color: rgb(17, 24, 39); line-height: 1.15;"
+          >
+            67/100
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 140px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Highest risk
+          </div>
+          <div
+            style="font-size: 20px; font-weight: 800; color: rgb(249, 115, 22); line-height: 1.15;"
+          >
+            Sepsis risk
+          </div>
+        </div>
+      </div>
+      <div
+        style="margin-bottom: 18px;"
+      >
+        <input
+          placeholder="Search models, domains, signals�"
+          style="width: 100%; max-width: 420px; padding: 8px 14px; font-size: 13px; border: 1.5px solid rgb(224, 242, 
+254); border-radius: 8px; background: rgb(255, 255, 255); color: rgb(17, 24, 39); outline: none; box-sizing: 
+border-box;"
+          type="text"
+          value=""
+        />
+      </div>
+      <div
+        style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px;"
+      >
+        <div
+          style="background: rgb(255, 255, 255); border-width: 1.5px 1.5px 1.5px 4px; border-style: solid; 
+border-color: rgba(249, 115, 22, 0.267) rgba(249, 115, 22, 0.267) rgba(249, 115, 22, 0.267) rgb(249, 115, 22); 
+border-image: none; border-radius: 12px; padding: 16px 18px; cursor: pointer;"
+        >
+          <div
+            style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px;"
+          >
+            <div
+              style="flex: 1 1 0%;"
+            >
+              <div
+                style="font-weight: 700; font-size: 15px; color: rgb(17, 24, 39);"
+              >
+                Deterioration risk
+              </div>
+              <div
+                style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 2px;"
+              >
+                Clinical surveillance
+                 � 
+                Next 6 hours
+              </div>
+            </div>
+            <span
+              style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: 
+rgb(249, 115, 22); background: rgb(255, 247, 237); border: 1px solid rgba(249, 115, 22, 0.333); border-radius: 20px; 
+padding: 3px 10px; flex-shrink: 0;"
+            >
+              high
+            </span>
+          </div>
+          <div
+            style="...
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/test/routePagesSmoke.test.tsx:876:29
+    874|         });
+    875|       } else {
+    876|         expect(await screen.findByRole('heading', { level: 1, name: he…
+       |                             ^
+    877|       }
+    878|
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/18]⎯
+ FAIL  src/test/routePagesSmoke.test.tsx > Route pages smoke — non-empty render > 'hospital-map' at '/hospital-map' 
+renders primary content
+TestingLibraryElementError: Unable to find role="heading" and name `/^hospital map$/i`
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <main
+      style="background: rgb(240, 249, 255); min-height: 100vh; padding: 24px 28px; font-family: Inter, system-ui, 
+sans-serif;"
+    >
+      <div
+        style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; 
+margin-bottom: 20px;"
+      >
+        <div>
+          <h1
+            style="margin: 0px; font-size: 22px; font-weight: 800; color: rgb(17, 24, 39);"
+          >
+            Hospital Bed Map
+          </h1>
+          <p
+            style="margin: 2px 0px 0px; font-size: 13px; color: rgb(107, 114, 128);"
+          >
+            Real-time capacity � boarding � diversion status across all units
+          </p>
+        </div>
+        <div
+          style="display: flex; align-items: center; gap: 10px;"
+        >
+          <span
+            style="font-size: 11px; font-weight: 600; color: rgb(120, 53, 15); background: rgb(254, 252, 232); border: 
+1px solid rgb(217, 119, 6); border-radius: 20px; padding: 3px 10px;"
+          >
+            Demo data
+          </span>
+          <button
+            style="background: rgb(14, 165, 233); color: rgb(255, 255, 255); border: medium; border-radius: 8px; 
+padding: 7px 14px; font-size: 13px; font-weight: 600; cursor: pointer; opacity: 1;"
+          >
+            Refresh
+          </button>
+        </div>
+      </div>
+      <div
+        style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;"
+      >
+        <div
+          style="background: rgb(255, 255, 255); border-width: 1.5px 1.5px 1.5px 4px; border-style: solid; 
+border-color: rgba(245, 158, 11, 0.267) rgba(245, 158, 11, 0.267) rgba(245, 158, 11, 0.267) rgb(245, 158, 11); 
+border-image: none; border-radius: 12px; padding: 14px 18px; flex: 1 1 160px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Capacity score
+          </div>
+          <div
+            style="font-size: 32px; font-weight: 900; color: rgb(245, 158, 11); line-height: 1;"
+          >
+            68
+            <span
+              style="font-size: 14px; font-weight: 400; color: rgb(107, 114, 128);"
+            >
+              /100
+            </span>
+          </div>
+          <div
+            style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 4px;"
+          >
+            Elevated
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 130px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Total beds
+          </div>
+          <div
+            style="font-size: 24px; font-weight: 800; color: rgb(17, 24, 39);"
+          >
+            194
+          </div>
+          <div
+            style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 3px;"
+          >
+            across all units
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 130px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Occupied
+          </div>
+          <div
+            style="font-size: 24px; font-weight: 800; color: rgb(17, 24, 39);"
+          >
+            148
+          </div>
+          <div
+            style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 3px;"
+          >
+            76% occupancy
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 130px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Available
+          </div>
+          <div
+            style="font-size: 24px; font-weight: 800; color: rgb(34, 197, 94);"
+          >
+            46
+          </div>
+          <div
+            style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 3px;"
+          >
+            beds open now
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 130px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Boarding
+          </div>
+          <div
+            style="font-size: 24px; font-weight: 800; color: rgb(245, 158, 11);"
+          >
+            10
+          </div>
+          <div
+            style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 3px;"
+          >
+            patients waiting
+          </div>
+        </div>
+        <div
+          style=
+gnored nodes: comments, script, style
+<body>
+  <div>
+    <main
+      style="background: rgb(240, 249, 255); min-height: 100vh; padding: 24px 28px; font-family: Inter, system-ui, 
+sans-serif;"
+    >
+      <div
+        style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; 
+margin-bottom: 20px;"
+      >
+        <div>
+          <h1
+            style="margin: 0px; font-size: 22px; font-weight: 800; color: rgb(17, 24, 39);"
+          >
+            Hospital Bed Map
+          </h1>
+          <p
+            style="margin: 2px 0px 0px; font-size: 13px; color: rgb(107, 114, 128);"
+          >
+            Real-time capacity � boarding � diversion status across all units
+          </p>
+        </div>
+        <div
+          style="display: flex; align-items: center; gap: 10px;"
+        >
+          <span
+            style="font-size: 11px; font-weight: 600; color: rgb(120, 53, 15); background: rgb(254, 252, 232); border: 
+1px solid rgb(217, 119, 6); border-radius: 20px; padding: 3px 10px;"
+          >
+            Demo data
+          </span>
+          <button
+            style="background: rgb(14, 165, 233); color: rgb(255, 255, 255); border: medium; border-radius: 8px; 
+padding: 7px 14px; font-size: 13px; font-weight: 600; cursor: pointer; opacity: 1;"
+          >
+            Refresh
+          </button>
+        </div>
+      </div>
+      <div
+        style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;"
+      >
+        <div
+          style="background: rgb(255, 255, 255); border-width: 1.5px 1.5px 1.5px 4px; border-style: solid; 
+border-color: rgba(245, 158, 11, 0.267) rgba(245, 158, 11, 0.267) rgba(245, 158, 11, 0.267) rgb(245, 158, 11); 
+border-image: none; border-radius: 12px; padding: 14px 18px; flex: 1 1 160px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Capacity score
+          </div>
+          <div
+            style="font-size: 32px; font-weight: 900; color: rgb(245, 158, 11); line-height: 1;"
+          >
+            68
+            <span
+              style="font-size: 14px; font-weight: 400; color: rgb(107, 114, 128);"
+            >
+              /100
+            </span>
+          </div>
+          <div
+            style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 4px;"
+          >
+            Elevated
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 130px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Total beds
+          </div>
+          <div
+            style="font-size: 24px; font-weight: 800; color: rgb(17, 24, 39);"
+          >
+            194
+          </div>
+          <div
+            style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 3px;"
+          >
+            across all units
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 130px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Occupied
+          </div>
+          <div
+            style="font-size: 24px; font-weight: 800; color: rgb(17, 24, 39);"
+          >
+            148
+          </div>
+          <div
+            style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 3px;"
+          >
+            76% occupancy
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 130px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Available
+          </div>
+          <div
+            style="font-size: 24px; font-weight: 800; color: rgb(34, 197, 94);"
+          >
+            46
+          </div>
+          <div
+            style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 3px;"
+          >
+            beds open now
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 130px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Boarding
+          </div>
+          <div
+            style="font-size: 24px; font-weight: 800; color: rgb(245, 158, 11);"
+          >
+            10
+          </div>
+          <div
+            style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 3px;"
+          >
+            patients waiting
+          </div>
+        </div>
+        <div
+          style=
+aitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/test/routePagesSmoke.test.tsx:876:29
+    874|         });
+    875|       } else {
+    876|         expect(await screen.findByRole('heading', { level: 1, name: he…
+       |                             ^
+    877|       }
+    878|
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/18]⎯
+ FAIL  src/test/routePagesSmoke.test.tsx > Route pages smoke — light and dark theme render > major pages render 
+non-empty content in light mode
+ FAIL  src/test/routePagesSmoke.test.tsx > Route pages smoke — light and dark theme render > major pages render 
+non-empty content in dark mode
+TestingLibraryElementError: Unable to find role="heading" and name `/^hospital map$/i`
+Ignored nodes: comments, script, style
+<body>
+  <div />
+  <div />
+  <div>
+    <main
+      style="background: rgb(240, 249, 255); min-height: 100vh; padding: 24px 28px; font-family: Inter, system-ui, 
+sans-serif;"
+    >
+      <div
+        style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; 
+margin-bottom: 20px;"
+      >
+        <div>
+          <h1
+            style="margin: 0px; font-size: 22px; font-weight: 800; color: rgb(17, 24, 39);"
+          >
+            Hospital Bed Map
+          </h1>
+          <p
+            style="margin: 2px 0px 0px; font-size: 13px; color: rgb(107, 114, 128);"
+          >
+            Real-time capacity � boarding � diversion status across all units
+          </p>
+        </div>
+        <div
+          style="display: flex; align-items: center; gap: 10px;"
+        >
+          <span
+            style="font-size: 11px; font-weight: 600; color: rgb(120, 53, 15); background: rgb(254, 252, 232); border: 
+1px solid rgb(217, 119, 6); border-radius: 20px; padding: 3px 10px;"
+          >
+            Demo data
+          </span>
+          <button
+            style="background: rgb(14, 165, 233); color: rgb(255, 255, 255); border: medium; border-radius: 8px; 
+padding: 7px 14px; font-size: 13px; font-weight: 600; cursor: pointer; opacity: 1;"
+          >
+            Refresh
+          </button>
+        </div>
+      </div>
+      <div
+        style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;"
+      >
+        <div
+          style="background: rgb(255, 255, 255); border-width: 1.5px 1.5px 1.5px 4px; border-style: solid; 
+border-color: rgba(245, 158, 11, 0.267) rgba(245, 158, 11, 0.267) rgba(245, 158, 11, 0.267) rgb(245, 158, 11); 
+border-image: none; border-radius: 12px; padding: 14px 18px; flex: 1 1 160px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Capacity score
+          </div>
+          <div
+            style="font-size: 32px; font-weight: 900; color: rgb(245, 158, 11); line-height: 1;"
+          >
+            68
+            <span
+              style="font-size: 14px; font-weight: 400; color: rgb(107, 114, 128);"
+            >
+              /100
+            </span>
+          </div>
+          <div
+            style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 4px;"
+          >
+            Elevated
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 130px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Total beds
+          </div>
+          <div
+            style="font-size: 24px; font-weight: 800; color: rgb(17, 24, 39);"
+          >
+            194
+          </div>
+          <div
+            style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 3px;"
+          >
+            across all units
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 130px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Occupied
+          </div>
+          <div
+            style="font-size: 24px; font-weight: 800; color: rgb(17, 24, 39);"
+          >
+            148
+          </div>
+          <div
+            style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 3px;"
+          >
+            76% occupancy
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 130px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Available
+          </div>
+          <div
+            style="font-size: 24px; font-weight: 800; color: rgb(34, 197, 94);"
+          >
+            46
+          </div>
+          <div
+            style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 3px;"
+          >
+            beds open now
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 130px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Boarding
+          </div>
+          <div
+            style="font-size: 24px; font-weight: 800; color: rgb(245, 158, 11);"
+          >
+            10
+          </div>
+          <div
+            style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 3px;"
+          >
+            patients waiting
+          </div>
+        </div>
+        
+gnored nodes: comments, script, style
+<body>
+  <div />
+  <div />
+  <div>
+    <main
+      style="background: rgb(240, 249, 255); min-height: 100vh; padding: 24px 28px; font-family: Inter, system-ui, 
+sans-serif;"
+    >
+      <div
+        style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; 
+margin-bottom: 20px;"
+      >
+        <div>
+          <h1
+            style="margin: 0px; font-size: 22px; font-weight: 800; color: rgb(17, 24, 39);"
+          >
+            Hospital Bed Map
+          </h1>
+          <p
+            style="margin: 2px 0px 0px; font-size: 13px; color: rgb(107, 114, 128);"
+          >
+            Real-time capacity � boarding � diversion status across all units
+          </p>
+        </div>
+        <div
+          style="display: flex; align-items: center; gap: 10px;"
+        >
+          <span
+            style="font-size: 11px; font-weight: 600; color: rgb(120, 53, 15); background: rgb(254, 252, 232); border: 
+1px solid rgb(217, 119, 6); border-radius: 20px; padding: 3px 10px;"
+          >
+            Demo data
+          </span>
+          <button
+            style="background: rgb(14, 165, 233); color: rgb(255, 255, 255); border: medium; border-radius: 8px; 
+padding: 7px 14px; font-size: 13px; font-weight: 600; cursor: pointer; opacity: 1;"
+          >
+            Refresh
+          </button>
+        </div>
+      </div>
+      <div
+        style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;"
+      >
+        <div
+          style="background: rgb(255, 255, 255); border-width: 1.5px 1.5px 1.5px 4px; border-style: solid; 
+border-color: rgba(245, 158, 11, 0.267) rgba(245, 158, 11, 0.267) rgba(245, 158, 11, 0.267) rgb(245, 158, 11); 
+border-image: none; border-radius: 12px; padding: 14px 18px; flex: 1 1 160px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Capacity score
+          </div>
+          <div
+            style="font-size: 32px; font-weight: 900; color: rgb(245, 158, 11); line-height: 1;"
+          >
+            68
+            <span
+              style="font-size: 14px; font-weight: 400; color: rgb(107, 114, 128);"
+            >
+              /100
+            </span>
+          </div>
+          <div
+            style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 4px;"
+          >
+            Elevated
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 130px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Total beds
+          </div>
+          <div
+            style="font-size: 24px; font-weight: 800; color: rgb(17, 24, 39);"
+          >
+            194
+          </div>
+          <div
+            style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 3px;"
+          >
+            across all units
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 130px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Occupied
+          </div>
+          <div
+            style="font-size: 24px; font-weight: 800; color: rgb(17, 24, 39);"
+          >
+            148
+          </div>
+          <div
+            style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 3px;"
+          >
+            76% occupancy
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 130px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Available
+          </div>
+          <div
+            style="font-size: 24px; font-weight: 800; color: rgb(34, 197, 94);"
+          >
+            46
+          </div>
+          <div
+            style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 3px;"
+          >
+            beds open now
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 130px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Boarding
+          </div>
+          <div
+            style="font-size: 24px; font-weight: 800; color: rgb(245, 158, 11);"
+          >
+            10
+          </div>
+          <div
+            style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 3px;"
+          >
+            patients waiting
+          </div>
+        </div>
+        
+aitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/test/routePagesSmoke.test.tsx:913:26
+    911|         } else {
+    912|           expect(
+    913|             await screen.findByRole('heading', { level: 1, name: route…
+       |                          ^
+    914|           ).toBeInTheDocument();
+    915|         }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/18]⎯
+ FAIL  src/test/routePagesSmoke.test.tsx > Route pages smoke — compact viewport (no crash) > 'predictive-analytics' 
+survives compact viewport mock
+TestingLibraryElementError: Unable to find role="heading" and name `/predictive analytics dashboard/i`
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <main
+      style="background: rgb(240, 249, 255); min-height: 100vh; padding: 24px 28px; font-family: Inter, system-ui, 
+sans-serif;"
+    >
+      <div
+        style="margin-bottom: 20px;"
+      >
+        <h1
+          style="margin: 0px; font-size: 22px; font-weight: 800; color: rgb(17, 24, 39);"
+        >
+          Predictive Analytics
+        </h1>
+        <p
+          style="margin: 2px 0px 0px; font-size: 13px; color: rgb(107, 114, 128);"
+        >
+          Deterioration � Sepsis � Readmission � ICU transfer � Device & fleet risk
+        </p>
+      </div>
+      <div
+        style="background: rgb(254, 252, 232); border: 1px solid rgb(217, 119, 6); border-radius: 8px; padding: 8px 
+14px; font-size: 12px; color: rgb(120, 53, 15); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;"
+      >
+        <span
+          style="font-weight: 700;"
+        >
+          Demo models
+        </span>
+         � predictions shown are not live patient, device, or fleet data. Connect live data pipelines to activate 
+real predictions.
+      </div>
+      <div
+        style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;"
+      >
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 140px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Models active
+          </div>
+          <div
+            style="font-size: 20px; font-weight: 800; color: rgb(17, 24, 39); line-height: 1.15;"
+          >
+            6
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 140px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            High / Critical
+          </div>
+          <div
+            style="font-size: 20px; font-weight: 800; color: rgb(239, 68, 68); line-height: 1.15;"
+          >
+            3
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 140px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Avg risk score
+          </div>
+          <div
+            style="font-size: 20px; font-weight: 800; color: rgb(17, 24, 39); line-height: 1.15;"
+          >
+            67/100
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 140px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Highest risk
+          </div>
+          <div
+            style="font-size: 20px; font-weight: 800; color: rgb(249, 115, 22); line-height: 1.15;"
+          >
+            Sepsis risk
+          </div>
+        </div>
+      </div>
+      <div
+        style="margin-bottom: 18px;"
+      >
+        <input
+          placeholder="Search models, domains, signals�"
+          style="width: 100%; max-width: 420px; padding: 8px 14px; font-size: 13px; border: 1.5px solid rgb(224, 242, 
+254); border-radius: 8px; background: rgb(255, 255, 255); color: rgb(17, 24, 39); outline: none; box-sizing: 
+border-box;"
+          type="text"
+          value=""
+        />
+      </div>
+      <div
+        style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px;"
+      >
+        <div
+          style="background: rgb(255, 255, 255); border-width: 1.5px 1.5px 1.5px 4px; border-style: solid; 
+border-color: rgba(249, 115, 22, 0.267) rgba(249, 115, 22, 0.267) rgba(249, 115, 22, 0.267) rgb(249, 115, 22); 
+border-image: none; border-radius: 12px; padding: 16px 18px; cursor: pointer;"
+        >
+          <div
+            style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px;"
+          >
+            <div
+              style="flex: 1 1 0%;"
+            >
+              <div
+                style="font-weight: 700; font-size: 15px; color: rgb(17, 24, 39);"
+              >
+                Deterioration risk
+              </div>
+              <div
+                style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 2px;"
+              >
+                Clinical surveillance
+                 � 
+                Next 6 hours
+              </div>
+            </div>
+            <span
+              style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: 
+rgb(249, 115, 22); background: rgb(255, 247, 237); border: 1px solid rgba(249, 115, 22, 0.333); border-radius: 20px; 
+padding: 3px 10px; flex-shrink: 0;"
+            >
+              high
+            </span>
+          </div>
+          <div
+            style="...
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <main
+      style="background: rgb(240, 249, 255); min-height: 100vh; padding: 24px 28px; font-family: Inter, system-ui, 
+sans-serif;"
+    >
+      <div
+        style="margin-bottom: 20px;"
+      >
+        <h1
+          style="margin: 0px; font-size: 22px; font-weight: 800; color: rgb(17, 24, 39);"
+        >
+          Predictive Analytics
+        </h1>
+        <p
+          style="margin: 2px 0px 0px; font-size: 13px; color: rgb(107, 114, 128);"
+        >
+          Deterioration � Sepsis � Readmission � ICU transfer � Device & fleet risk
+        </p>
+      </div>
+      <div
+        style="background: rgb(254, 252, 232); border: 1px solid rgb(217, 119, 6); border-radius: 8px; padding: 8px 
+14px; font-size: 12px; color: rgb(120, 53, 15); margin-bottom: 16px; display: flex; align-items: center; gap: 8px;"
+      >
+        <span
+          style="font-weight: 700;"
+        >
+          Demo models
+        </span>
+         � predictions shown are not live patient, device, or fleet data. Connect live data pipelines to activate 
+real predictions.
+      </div>
+      <div
+        style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;"
+      >
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 140px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Models active
+          </div>
+          <div
+            style="font-size: 20px; font-weight: 800; color: rgb(17, 24, 39); line-height: 1.15;"
+          >
+            6
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 140px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            High / Critical
+          </div>
+          <div
+            style="font-size: 20px; font-weight: 800; color: rgb(239, 68, 68); line-height: 1.15;"
+          >
+            3
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 140px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Avg risk score
+          </div>
+          <div
+            style="font-size: 20px; font-weight: 800; color: rgb(17, 24, 39); line-height: 1.15;"
+          >
+            67/100
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 140px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Highest risk
+          </div>
+          <div
+            style="font-size: 20px; font-weight: 800; color: rgb(249, 115, 22); line-height: 1.15;"
+          >
+            Sepsis risk
+          </div>
+        </div>
+      </div>
+      <div
+        style="margin-bottom: 18px;"
+      >
+        <input
+          placeholder="Search models, domains, signals�"
+          style="width: 100%; max-width: 420px; padding: 8px 14px; font-size: 13px; border: 1.5px solid rgb(224, 242, 
+254); border-radius: 8px; background: rgb(255, 255, 255); color: rgb(17, 24, 39); outline: none; box-sizing: 
+border-box;"
+          type="text"
+          value=""
+        />
+      </div>
+      <div
+        style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px;"
+      >
+        <div
+          style="background: rgb(255, 255, 255); border-width: 1.5px 1.5px 1.5px 4px; border-style: solid; 
+border-color: rgba(249, 115, 22, 0.267) rgba(249, 115, 22, 0.267) rgba(249, 115, 22, 0.267) rgb(249, 115, 22); 
+border-image: none; border-radius: 12px; padding: 16px 18px; cursor: pointer;"
+        >
+          <div
+            style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px;"
+          >
+            <div
+              style="flex: 1 1 0%;"
+            >
+              <div
+                style="font-weight: 700; font-size: 15px; color: rgb(17, 24, 39);"
+              >
+                Deterioration risk
+              </div>
+              <div
+                style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 2px;"
+              >
+                Clinical surveillance
+                 � 
+                Next 6 hours
+              </div>
+            </div>
+            <span
+              style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: 
+rgb(249, 115, 22); background: rgb(255, 247, 237); border: 1px solid rgba(249, 115, 22, 0.333); border-radius: 20px; 
+padding: 3px 10px; flex-shrink: 0;"
+            >
+              high
+            </span>
+          </div>
+          <div
+            style="...
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/test/routePagesSmoke.test.tsx:950:29
+    948|         });
+    949|       } else {
+    950|         expect(await screen.findByRole('heading', { level: 1, name: he…
+       |                             ^
+    951|       }
+    952|
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/18]⎯
+ FAIL  src/test/routePagesSmoke.test.tsx > Route pages smoke — compact viewport (no crash) > 'hospital-map' survives 
+compact viewport mock
+TestingLibraryElementError: Unable to find role="heading" and name `/^hospital map$/i`
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <main
+      style="background: rgb(240, 249, 255); min-height: 100vh; padding: 24px 28px; font-family: Inter, system-ui, 
+sans-serif;"
+    >
+      <div
+        style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; 
+margin-bottom: 20px;"
+      >
+        <div>
+          <h1
+            style="margin: 0px; font-size: 22px; font-weight: 800; color: rgb(17, 24, 39);"
+          >
+            Hospital Bed Map
+          </h1>
+          <p
+            style="margin: 2px 0px 0px; font-size: 13px; color: rgb(107, 114, 128);"
+          >
+            Real-time capacity � boarding � diversion status across all units
+          </p>
+        </div>
+        <div
+          style="display: flex; align-items: center; gap: 10px;"
+        >
+          <span
+            style="font-size: 11px; font-weight: 600; color: rgb(120, 53, 15); background: rgb(254, 252, 232); border: 
+1px solid rgb(217, 119, 6); border-radius: 20px; padding: 3px 10px;"
+          >
+            Demo data
+          </span>
+          <button
+            style="background: rgb(14, 165, 233); color: rgb(255, 255, 255); border: medium; border-radius: 8px; 
+padding: 7px 14px; font-size: 13px; font-weight: 600; cursor: pointer; opacity: 1;"
+          >
+            Refresh
+          </button>
+        </div>
+      </div>
+      <div
+        style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;"
+      >
+        <div
+          style="background: rgb(255, 255, 255); border-width: 1.5px 1.5px 1.5px 4px; border-style: solid; 
+border-color: rgba(245, 158, 11, 0.267) rgba(245, 158, 11, 0.267) rgba(245, 158, 11, 0.267) rgb(245, 158, 11); 
+border-image: none; border-radius: 12px; padding: 14px 18px; flex: 1 1 160px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Capacity score
+          </div>
+          <div
+            style="font-size: 32px; font-weight: 900; color: rgb(245, 158, 11); line-height: 1;"
+          >
+            68
+            <span
+              style="font-size: 14px; font-weight: 400; color: rgb(107, 114, 128);"
+            >
+              /100
+            </span>
+          </div>
+          <div
+            style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 4px;"
+          >
+            Elevated
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 130px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Total beds
+          </div>
+          <div
+            style="font-size: 24px; font-weight: 800; color: rgb(17, 24, 39);"
+          >
+            194
+          </div>
+          <div
+            style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 3px;"
+          >
+            across all units
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 130px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Occupied
+          </div>
+          <div
+            style="font-size: 24px; font-weight: 800; color: rgb(17, 24, 39);"
+          >
+            148
+          </div>
+          <div
+            style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 3px;"
+          >
+            76% occupancy
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 130px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Available
+          </div>
+          <div
+            style="font-size: 24px; font-weight: 800; color: rgb(34, 197, 94);"
+          >
+            46
+          </div>
+          <div
+            style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 3px;"
+          >
+            beds open now
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 130px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Boarding
+          </div>
+          <div
+            style="font-size: 24px; font-weight: 800; color: rgb(245, 158, 11);"
+          >
+            10
+          </div>
+          <div
+            style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 3px;"
+          >
+            patients waiting
+          </div>
+        </div>
+        <div
+          style=
+gnored nodes: comments, script, style
+<body>
+
+  <div>
+    <main
+      style="background: rgb(240, 249, 255); min-height: 100vh; padding: 24px 28px; font-family: Inter, system-ui, 
+sans-serif;"
+    >
+      <div
+        style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; 
+margin-bottom: 20px;"
+      >
+        <div>
+          <h1
+            style="margin: 0px; font-size: 22px; font-weight: 800; color: rgb(17, 24, 39);"
+          >
+            Hospital Bed Map
+          </h1>
+          <p
+            style="margin: 2px 0px 0px; font-size: 13px; color: rgb(107, 114, 128);"
+          >
+            Real-time capacity � boarding � diversion status across all units
+          </p>
+        </div>
+        <div
+          style="display: flex; align-items: center; gap: 10px;"
+        >
+          <span
+            style="font-size: 11px; font-weight: 600; color: rgb(120, 53, 15); background: rgb(254, 252, 232); border: 
+1px solid rgb(217, 119, 6); border-radius: 20px; padding: 3px 10px;"
+          >
+            Demo data
+          </span>
+          <button
+            style="background: rgb(14, 165, 233); color: rgb(255, 255, 255); border: medium; border-radius: 8px; 
+padding: 7px 14px; font-size: 13px; font-weight: 600; cursor: pointer; opacity: 1;"
+          >
+            Refresh
+          </button>
+        </div>
+      </div>
+      <div
+        style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;"
+      >
+        <div
+          style="background: rgb(255, 255, 255); border-width: 1.5px 1.5px 1.5px 4px; border-style: solid; 
+border-color: rgba(245, 158, 11, 0.267) rgba(245, 158, 11, 0.267) rgba(245, 158, 11, 0.267) rgb(245, 158, 11); 
+border-image: none; border-radius: 12px; padding: 14px 18px; flex: 1 1 160px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Capacity score
+          </div>
+          <div
+            style="font-size: 32px; font-weight: 900; color: rgb(245, 158, 11); line-height: 1;"
+          >
+            68
+            <span
+              style="font-size: 14px; font-weight: 400; color: rgb(107, 114, 128);"
+            >
+              /100
+            </span>
+          </div>
+          <div
+            style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 4px;"
+          >
+            Elevated
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 130px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Total beds
+          </div>
+          <div
+            style="font-size: 24px; font-weight: 800; color: rgb(17, 24, 39);"
+          >
+            194
+          </div>
+          <div
+            style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 3px;"
+          >
+            across all units
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 130px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Occupied
+          </div>
+          <div
+            style="font-size: 24px; font-weight: 800; color: rgb(17, 24, 39);"
+          >
+            148
+          </div>
+          <div
+            style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 3px;"
+          >
+            76% occupancy
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 130px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Available
+          </div>
+          <div
+            style="font-size: 24px; font-weight: 800; color: rgb(34, 197, 94);"
+          >
+            46
+          </div>
+          <div
+            style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 3px;"
+          >
+            beds open now
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 130px; min-width: 0px;"
+        >
+          <div
+ Test Files  3 failed | 2 passed (5)
+      Tests  18 failed | 198 passed (216)
+   Start at  21:43:40
+   Duration  80.70s (transform 8.21s, setup 4.41s, import 12.42s, tests 46.20s, environment 15.47s)
+
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Boarding
+          </div>
+          <div
+            style="font-size: 24px; font-weight: 800; color: rgb(245, 158, 11);"
+          >
+            10
+          </div>
+          <div
+            style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 3px;"
+          >
+            patients waiting
+          </div>
+        </div>
+        <div
+          style=
+aitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/test/routePagesSmoke.test.tsx:950:29
+    948|         });
+    949|       } else {
+    950|         expect(await screen.findByRole('heading', { level: 1, name: he…
+       |                             ^
+    951|       }
+    952|
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/18]⎯
+ FAIL  src/test/routePagesSmoke.test.tsx > Route pages smoke — requested responsive matrix > renders core UX 
+surfaces without empty content at 320px
+ FAIL  src/test/routePagesSmoke.test.tsx > Route pages smoke — requested responsive matrix > renders core UX 
+surfaces without empty content at 360px
+ FAIL  src/test/routePagesSmoke.test.tsx > Route pages smoke — requested responsive matrix > renders core UX 
+surfaces without empty content at 390px
+ FAIL  src/test/routePagesSmoke.test.tsx > Route pages smoke — requested responsive matrix > renders core UX 
+surfaces without empty content at 412px
+ FAIL  src/test/routePagesSmoke.test.tsx > Route pages smoke — requested responsive matrix > renders core UX 
+surfaces without empty content at 430px
+ FAIL  src/test/routePagesSmoke.test.tsx > Route pages smoke — requested responsive matrix > renders core UX 
+surfaces without empty content at 768px
+ FAIL  src/test/routePagesSmoke.test.tsx > Route pages smoke — requested responsive matrix > renders core UX 
+surfaces without empty content at 1024px
+ FAIL  src/test/routePagesSmoke.test.tsx > Route pages smoke — requested responsive matrix > renders core UX 
+surfaces without empty content at 1280px
+ FAIL  src/test/routePagesSmoke.test.tsx > Route pages smoke — requested responsive matrix > renders core UX 
+surfaces without empty content at 1440px
+TestingLibraryElementError: Unable to find role="heading" and name `/^hospital map$/i`
+Ignored nodes: comments, script, style
+<body>
+  <div />
+  <div />
+  <div>
+    <main
+      style="background: rgb(240, 249, 255); min-height: 100vh; padding: 24px 28px; font-family: Inter, system-ui, 
+sans-serif;"
+    >
+      <div
+        style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; 
+margin-bottom: 20px;"
+      >
+        <div>
+          <h1
+            style="margin: 0px; font-size: 22px; font-weight: 800; color: rgb(17, 24, 39);"
+          >
+            Hospital Bed Map
+          </h1>
+          <p
+            style="margin: 2px 0px 0px; font-size: 13px; color: rgb(107, 114, 128);"
+          >
+            Real-time capacity � boarding � diversion status across all units
+          </p>
+        </div>
+        <div
+          style="display: flex; align-items: center; gap: 10px;"
+        >
+          <span
+            style="font-size: 11px; font-weight: 600; color: rgb(120, 53, 15); background: rgb(254, 252, 232); border: 
+1px solid rgb(217, 119, 6); border-radius: 20px; padding: 3px 10px;"
+          >
+            Demo data
+          </span>
+          <button
+            style="background: rgb(14, 165, 233); color: rgb(255, 255, 255); border: medium; border-radius: 8px; 
+padding: 7px 14px; font-size: 13px; font-weight: 600; cursor: pointer; opacity: 1;"
+          >
+            Refresh
+          </button>
+        </div>
+      </div>
+      <div
+        style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;"
+      >
+        <div
+          style="background: rgb(255, 255, 255); border-width: 1.5px 1.5px 1.5px 4px; border-style: solid; 
+border-color: rgba(245, 158, 11, 0.267) rgba(245, 158, 11, 0.267) rgba(245, 158, 11, 0.267) rgb(245, 158, 11); 
+border-image: none; border-radius: 12px; padding: 14px 18px; flex: 1 1 160px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Capacity score
+          </div>
+          <div
+            style="font-size: 32px; font-weight: 900; color: rgb(245, 158, 11); line-height: 1;"
+          >
+            68
+            <span
+              style="font-size: 14px; font-weight: 400; color: rgb(107, 114, 128);"
+            >
+              /100
+            </span>
+          </div>
+          <div
+            style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 4px;"
+          >
+            Elevated
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 130px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Total beds
+          </div>
+          <div
+            style="font-size: 24px; font-weight: 800; color: rgb(17, 24, 39);"
+          >
+            194
+          </div>
+          <div
+            style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 3px;"
+          >
+            across all units
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 130px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Occupied
+          </div>
+          <div
+            style="font-size: 24px; font-weight: 800; color: rgb(17, 24, 39);"
+          >
+            148
+          </div>
+          <div
+            style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 3px;"
+          >
+            76% occupancy
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 130px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Available
+          </div>
+          <div
+            style="font-size: 24px; font-weight: 800; color: rgb(34, 197, 94);"
+          >
+            46
+          </div>
+          <div
+            style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 3px;"
+          >
+            beds open now
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 130px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Boarding
+          </div>
+          <div
+            style="font-size: 24px; font-weight: 800; color: rgb(245, 158, 11);"
+          >
+            10
+          </div>
+          <div
+            style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 3px;"
+          >
+            patients waiting
+          </div>
+        </div>
+        
+gnored nodes: comments, script, style
+<body>
+  <div />
+  <div />
+  <div>
+    <main
+      style="background: rgb(240, 249, 255); min-height: 100vh; padding: 24px 28px; font-family: Inter, system-ui, 
+sans-serif;"
+    >
+      <div
+        style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; 
+margin-bottom: 20px;"
+      >
+        <div>
+          <h1
+            style="margin: 0px; font-size: 22px; font-weight: 800; color: rgb(17, 24, 39);"
+          >
+            Hospital Bed Map
+          </h1>
+          <p
+            style="margin: 2px 0px 0px; font-size: 13px; color: rgb(107, 114, 128);"
+          >
+            Real-time capacity � boarding � diversion status across all units
+          </p>
+        </div>
+        <div
+          style="display: flex; align-items: center; gap: 10px;"
+        >
+          <span
+            style="font-size: 11px; font-weight: 600; color: rgb(120, 53, 15); background: rgb(254, 252, 232); border: 
+1px solid rgb(217, 119, 6); border-radius: 20px; padding: 3px 10px;"
+          >
+            Demo data
+          </span>
+          <button
+            style="background: rgb(14, 165, 233); color: rgb(255, 255, 255); border: medium; border-radius: 8px; 
+padding: 7px 14px; font-size: 13px; font-weight: 600; cursor: pointer; opacity: 1;"
+          >
+            Refresh
+          </button>
+        </div>
+      </div>
+      <div
+        style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px;"
+      >
+        <div
+          style="background: rgb(255, 255, 255); border-width: 1.5px 1.5px 1.5px 4px; border-style: solid; 
+border-color: rgba(245, 158, 11, 0.267) rgba(245, 158, 11, 0.267) rgba(245, 158, 11, 0.267) rgb(245, 158, 11); 
+border-image: none; border-radius: 12px; padding: 14px 18px; flex: 1 1 160px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Capacity score
+          </div>
+          <div
+            style="font-size: 32px; font-weight: 900; color: rgb(245, 158, 11); line-height: 1;"
+          >
+            68
+            <span
+              style="font-size: 14px; font-weight: 400; color: rgb(107, 114, 128);"
+            >
+              /100
+            </span>
+          </div>
+          <div
+            style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 4px;"
+          >
+            Elevated
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 130px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Total beds
+          </div>
+          <div
+            style="font-size: 24px; font-weight: 800; color: rgb(17, 24, 39);"
+          >
+            194
+          </div>
+          <div
+            style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 3px;"
+          >
+            across all units
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 130px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Occupied
+          </div>
+          <div
+            style="font-size: 24px; font-weight: 800; color: rgb(17, 24, 39);"
+          >
+            148
+          </div>
+          <div
+            style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 3px;"
+          >
+            76% occupancy
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 130px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Available
+          </div>
+          <div
+            style="font-size: 24px; font-weight: 800; color: rgb(34, 197, 94);"
+          >
+            46
+          </div>
+          <div
+            style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 3px;"
+          >
+            beds open now
+          </div>
+        </div>
+        <div
+          style="background: rgb(255, 255, 255); border: 1px solid rgb(224, 242, 254); border-radius: 12px; padding: 
+14px 18px; flex: 1 1 130px; min-width: 0px;"
+        >
+          <div
+            style="font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: 
+rgb(156, 163, 175); margin-bottom: 6px;"
+          >
+            Boarding
+          </div>
+          <div
+            style="font-size: 24px; font-weight: 800; color: rgb(245, 158, 11);"
+          >
+            10
+          </div>
+          <div
+            style="font-size: 12px; color: rgb(107, 114, 128); margin-top: 3px;"
+          >
+            patients waiting
+          </div>
+        </div>
+        
+aitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/test/routePagesSmoke.test.tsx:986:26
+    984|         } else {
+    985|           expect(
+    986|             await screen.findByRole('heading', { level: 1, name: route…
+       |                          ^
+    987|           ).toBeInTheDocument();
+    988|         }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/18]⎯

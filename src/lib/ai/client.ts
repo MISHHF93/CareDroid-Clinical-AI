@@ -41,6 +41,10 @@ export interface AIUsage {
   inputTokens: number;
   outputTokens: number;
   totalTokens: number;
+  /** Tokens read from prompt cache (billed at ~10% of normal input cost) */
+  cacheReadInputTokens: number;
+  /** Tokens written to prompt cache on this request */
+  cacheCreationInputTokens: number;
 }
 
 export interface ToolCall {
@@ -124,7 +128,7 @@ export const UNIFIED_AI_MODEL = 'claude-sonnet-4-6';
 export const DEFAULT_AI_MAX_TOKENS = 1000;
 
 const ANTHROPIC_MESSAGES_URL = 'https://api.anthropic.com/v1/messages';
-const ANTHROPIC_VERSION = '2023-06-01';
+const ANTHROPIC_VERSION = '2024-10-22';
 
 const EMERGENCY_AI_ROUTES = {
   copilot: '/api/emergency/copilot/message',
@@ -340,6 +344,7 @@ async function callAnthropicAI(
 
   const maxTokens = request.maxTokens || DEFAULT_AI_MAX_TOKENS;
   const usage = emptyUsage();
+  const requestId = `cd-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
   const departmentContext =
     (request.context as DepartmentContext | undefined) ||
     runtime?.contextResolver?.() ||
@@ -351,7 +356,7 @@ async function callAnthropicAI(
   const body = {
     model: UNIFIED_AI_MODEL,
     max_tokens: maxTokens,
-    system: withDepartmentContext(request.systemPrompt, departmentContext),
+    system: buildCachedSystemBlocks(withDepartmentContext(request.systemPrompt, departmentContext)),
     messages: request.messages,
     tools: tools.length ? tools : undefined,
     stream: request.stream === true,
@@ -364,6 +369,8 @@ async function callAnthropicAI(
         'Content-Type': 'application/json',
         'x-api-key': apiKey,
         'anthropic-version': ANTHROPIC_VERSION,
+        'anthropic-beta': 'prompt-caching-2024-07-31',
+        'x-request-id': requestId,
       },
       body: JSON.stringify(body),
     });
@@ -405,6 +412,21 @@ async function callAnthropicAI(
 
 function readApiKey(): string | undefined {
   return typeof process !== 'undefined' ? process.env.ANTHROPIC_API_KEY ?? '' : '';
+}
+
+const DEPARTMENT_CONTEXT_SEPARATOR = 'Department context is provided for situational awareness.';
+
+function buildCachedSystemBlocks(systemPrompt: string): unknown {
+  const sepIdx = systemPrompt.indexOf(DEPARTMENT_CONTEXT_SEPARATOR);
+  if (sepIdx === -1) {
+    return [{ type: 'text', text: systemPrompt, cache_control: { type: 'ephemeral' } }];
+  }
+  const stableBase = systemPrompt.slice(0, sepIdx).trimEnd();
+  const dynamicPart = systemPrompt.slice(sepIdx).trimStart();
+  return [
+    { type: 'text', text: stableBase, cache_control: { type: 'ephemeral' } },
+    { type: 'text', text: dynamicPart },
+  ];
 }
 
 function withDepartmentContext(systemPrompt: string, explicitContext?: DepartmentContext): string {
@@ -558,6 +580,8 @@ function applyUsage(target: AIUsage, source: any) {
   if (!source) return;
   target.inputTokens = source.input_tokens ?? target.inputTokens;
   target.outputTokens = source.output_tokens ?? target.outputTokens;
+  target.cacheReadInputTokens = source.cache_read_input_tokens ?? target.cacheReadInputTokens;
+  target.cacheCreationInputTokens = source.cache_creation_input_tokens ?? target.cacheCreationInputTokens;
   target.totalTokens = target.inputTokens + target.outputTokens;
 }
 
@@ -566,6 +590,8 @@ function emptyUsage(): AIUsage {
     inputTokens: 0,
     outputTokens: 0,
     totalTokens: 0,
+    cacheReadInputTokens: 0,
+    cacheCreationInputTokens: 0,
   };
 }
 

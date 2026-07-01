@@ -1,0 +1,7 @@
+---
+pid: 21232
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cd \"C:\\Users\\borah\\CareDroid-Clinical-AI\"; node node_modules/typescript/bin/tsc --noEmit -p tsconfig.frontend.json 2>&1"
+started_at: 2026-07-01T01:29:46.146Z
+running_for_ms: 4435008  
+---

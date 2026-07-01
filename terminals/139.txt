@@ -1,0 +1,85 @@
+---
+pid: 27060
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cd C:\\Users\\borah\\CareDroid-Clinical-AI; node node_modules/vitest/vitest.mjs run src/test/NotificationService.test.ts src/navigation/profileNavigateCoverage.test.tsx src/config/unified-navigation.config.test.ts src/config/routes.config.test.ts 2>&1"
+started_at: 2026-07-01T00:38:57.037Z
+running_for_ms: 7484990  
+---
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+ ❯ src/navigation/profileNavigateCoverage.test.tsx (1 test | 1 failed) 20ms
+     × documents wired surfaces using profile navigation helpers 14ms
+ ✓ src/test/NotificationService.test.ts (22 tests) 45ms
+ ❯ src/config/unified-navigation.config.test.ts (13 tests | 1 failed) 52ms
+     × exports the exact requested CareDroid nav items in order 23ms
+     ✓ keeps every item complete and route-backed 7ms
+     ✓ scopes pilot mode to core ED nav and hides extension surfaces 3ms
+     ✓ uses distinct pilot sidebar icon keys for visual scanning 1ms
+     ✓ shows the pilot surface to admin and read-only users 2ms
+     ✓ resolves requested feature gate aliases to registered feature ids 1ms
+     ✓ hides standalone intake nav for registration clerks 1ms
+     ✓ scopes reception clerk pilot nav to front-desk utilities 2ms
+     ✓ hides extension integrations nav in pilot while keeping settings 1ms
+     ✓ annotates navigation items with normalized suite metadata 1ms
+     ✓ assigns suite metadata to every pilot visible nav item 3ms
+     ✓ keeps physician navigation whiteboard-first with workflows on patient cards 1ms
+     ✓ normalizes aliases and defaults unknown roles consistently 1ms
+
+ Test Files  2 failed | 1 passed (3)
+      Tests  2 failed | 34 passed (36)
+   Start at  20:38:58
+   Duration  15.96s (transform 2.38s, setup 2.29s, import 3.56s, tests 116ms, environment 8.85s)
+
+node : 
+At line:1 char:42
++ ... linical-AI; node node_modules/vitest/vitest.mjs run src/test/Notifica ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  src/config/unified-navigation.config.test.ts > unified navigation config > exports the exact requested 
+CareDroid nav items in order
+AssertionError: expected [ { id: 'reception', …(4) }, …(32) ] to deeply equal [ { id: 'reception', …(4) }, 
+…(33) ]
+- Expected
++ Received
+@@ -188,17 +188,10 @@
+      "label": "Fleet",
+      "route": "/fleet/command",
+    },
+    {
+      "featureGate": null,
+-     "icon": "activity",
+-     "id": "surveillance",
+-     "label": "Surveillance",
+-     "route": "/surveillance/nexus",
+-   },
+-   {
+-     "featureGate": null,
+      "icon": "list-check",
+      "id": "simulation",
+      "label": "Simulation",
+      "route": "/simulation",
+    },
+ ❯ src/config/unified-navigation.config.test.ts:265:23
+    263|   it('exports the exact requested CareDroid nav items in order', () =>…
+    264|     expect(DEFAULT_ROUTE).toBe('/emergency/reception');
+    265|     expect(NAV_ITEMS).toEqual(REQUESTED_ITEMS);
+       |                       ^
+    266|     expect(
+    267|       NAVIGATION_ITEMS.map(({ id, label, icon, route, featureGate }) =…
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+ FAIL  src/navigation/profileNavigateCoverage.test.tsx > profileNavigateCoverage > documents wired surfaces using 
+profile navigation helpers
+Error: ENOENT: no such file or directory, open 'C:\Users\borah\CareDroid-Clinical-AI\src\pages\Operations.jsx'
+ ❯ src/navigation/profileNavigateCoverage.test.tsx:43:22
+     41|   it('documents wired surfaces using profile navigation helpers', () =…
+     42|     const wired = WIRED_SURFACE_FILES.filter((relativePath) => {
+     43|       const source = readFileSync(join(root, relativePath), 'utf8');
+       |                      ^
+     44|       return (
+     45|         source.includes('useProfileNavigate') ||
+ ❯ src/navigation/profileNavigateCoverage.test.tsx:42:39
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯

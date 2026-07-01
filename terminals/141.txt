@@ -1,0 +1,43 @@
+---
+pid: 28836
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cd C:\\Users\\borah\\CareDroid-Clinical-AI; node node_modules/vitest/vitest.mjs run src/services/emergencyCareJourneyOrchestrator.test.ts src/services/receptionIntakeOrchestrator.test.ts src/services/dispatchIntakeService.test.ts 2>&1"
+started_at: 2026-07-01T00:45:00.205Z
+running_for_ms: 7120002  
+---
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+ ✓ src/services/receptionIntakeOrchestrator.test.ts (8 tests) 159ms
+ ❯ src/services/emergencyCareJourneyOrchestrator.test.ts (2 tests | 1 failed) 28ms
+     ✓ chains dispatch through EMS arrival and hospital pre-alert 10ms
+     × resolves linked call id from CAD-created EMS arrivals 12ms
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 9 passed (10)
+   Start at  20:45:02
+   Duration  15.63s (transform 2.71s, setup 1.79s, import 5.51s, tests 187ms, environment 7.28s)
+
+node : 
+At line:1 char:42
++ ... linical-AI; node node_modules/vitest/vitest.mjs run src/services/emer ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  src/services/emergencyCareJourneyOrchestrator.test.ts > emergencyCareJourneyOrchestrator > resolves linked call 
+id from CAD-created EMS arrivals
+AssertionError: expected null to be truthy
+- Expected:
+true
++ Received:
+null
+ ❯ src/services/emergencyCareJourneyOrchestrator.test.ts:69:18
+     67|       }).id,
+     68|     );
+     69|     expect(call).toBeTruthy();
+       |                  ^
+     70|
+     71|     const callId = call!.callId!;
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯

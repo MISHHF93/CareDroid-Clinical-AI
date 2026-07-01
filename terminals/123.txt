@@ -3,7 +3,7 @@ pid: 28068
 cwd: "C:\Users\borah\CareDroid-Clinical-AI"
 command: "Set-Location \"C:\\Users\\borah\\CareDroid-Clinical-AI\"; npm.cmd run build 2>&1 | Select-Object -Last 15"
 started_at: 2026-06-30T23:07:23.693Z
-running_for_ms: 4225005  
+running_for_ms: 12975008 
 ---
 dist/assets/SmartIntake-BiSED3Md.js                           78.55 kB │ gzip:  19.56 kB
 dist/assets/EmergencySettings-DevWjTob.js                     89.67 kB │ gzip:  14.55 kB

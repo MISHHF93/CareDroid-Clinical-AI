@@ -1,0 +1,46 @@
+---
+pid: 10872
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cd \"C:\\Users\\borah\\CareDroid-Clinical-AI\"; node node_modules/vitest/vitest.mjs run --pool=threads --maxWorkers=1 src/App.permissions.test.tsx src/config/canonicalConfig.contract.test.ts src/test/routePagesSmoke.test.tsx 2>&1"
+started_at: 2026-07-01T01:50:21.716Z
+running_for_ms: 3200001  
+---
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+stdout | src/test/routePagesSmoke.test.tsx > Route pages smoke — non-empty render > 'clinical-alerts' at '/clinical/alerts' renders primary content
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782870642569-gjoszc',
+  alertId: 'alert-smoke',
+  action: 'synced',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-01T01:50:42.569Z',
+  source: 'clinical-alerts-api',
+  metadata: { backend: true }
+}
+
+ ✓ src/test/routePagesSmoke.test.tsx (178 tests) 44812ms
+     ✓ 'dashboard' at '/dashboard' renders primary content  533ms
+     ✓ 'tools-overview' at '/tools' renders primary content  495ms
+     ✓ 'calculators-library-filter' at '/tools/calculators' renders primary content  1065ms
+     ✓ major pages render non-empty content in light mode  2399ms
+     ✓ major pages render non-empty content in dark mode  2418ms
+     ✓ 'calculators-library-filter' survives compact viewport mock  972ms
+     ✓ renders core UX surfaces without empty content at 320px  2217ms
+     ✓ renders core UX surfaces without empty content at 360px  2318ms
+     ✓ renders core UX surfaces without empty content at 390px  2097ms
+     ✓ renders core UX surfaces without empty content at 412px  2257ms
+     ✓ renders core UX surfaces without empty content at 430px  2043ms
+     ✓ renders core UX surfaces without empty content at 768px  2148ms
+     ✓ renders core UX surfaces without empty content at 1024px  2055ms
+     ✓ renders core UX surfaces without empty content at 1280px  2246ms
+     ✓ renders core UX surfaces without empty content at 1440px  2149ms
+ ✓ src/config/canonicalConfig.contract.test.ts (9 tests) 35ms
+ ✓ src/App.permissions.test.tsx (15 tests) 17ms
+
+ Test Files  3 passed (3)
+      Tests  202 passed (202)
+   Start at  21:50:23
+   Duration  69.05s (transform 7.98s, setup 2.85s, import 11.53s, tests 44.86s, environment 8.66s)
+

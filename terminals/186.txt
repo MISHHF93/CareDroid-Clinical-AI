@@ -1,0 +1,300 @@
+---
+pid: 31964
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "npm.cmd run test:run -- src/components/Header.centralControl.test.tsx src/components/chrome/SessionChromeBar.test.tsx src/components/SidebarNotificationPanel.test.tsx src/components/Sidebar.test.tsx"
+started_at: 2026-07-01T05:19:23.412Z
+running_for_ms: 34700007 
+---
+
+> caredroid-clinical-ai@1.0.0 test:run
+> vitest run src/components/Header.centralControl.test.tsx src/components/chrome/SessionChromeBar.test.tsx src/components/SidebarNotificationPanel.test.tsx src/components/Sidebar.test.tsx
+
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+Error: useSystemConfig must be used within SystemConfigProvider
+    at useSystemConfig (C:/Users/borah/CareDroid-Clinical-AI/src/contexts/SystemConfigContext.tsx:152:11)
+    at SidebarChromeControls (C:/Users/borah/CareDroid-Clinical-AI/src/components/sidebar/SidebarChromeControls.tsx:31:63)
+    at renderWithHooks (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:15486:18)
+    at mountIndeterminateComponent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:20103:13)
+    at beginWork (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:21626:16)
+    at HTMLUnknownElement.callCallback (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:4164:14)
+    at HTMLUnknownElement.callTheUserObjectsOperation (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\generated\idl\EventListener.js:26:30)
+    at innerInvokeEventListeners (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:360:16)
+    at invokeEventListeners (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:296:3)
+    at HTMLUnknownElementImpl._dispatch (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:243:9)
+stderr | src/components/Sidebar.test.tsx > Sidebar unified navigation rendering > renders only the requested CareDroid pages for admin users
+The above error occurred in the <SidebarChromeControls> component:
+
+    at SidebarChromeControls (C:/Users/borah/CareDroid-Clinical-AI/src/components/sidebar/SidebarChromeControls.tsx:43:78)
+    at nav
+    at aside
+    at Sidebar (C:/Users/borah/CareDroid-Clinical-AI/src/components/Sidebar.tsx:127:20)
+    at Router (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-router\dist\umd\react-router.development.js:1203:17)
+    at MemoryRouter (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-router\dist\umd\react-router.development.js:1097:7)
+    at RouterWithFutureDefaults (C:/Users/borah/CareDroid-Clinical-AI/src/test/setup.ts:12:41)
+    at UserProvider (C:/Users/borah/CareDroid-Clinical-AI/src/contexts/UserContext.tsx:240:25)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+
+stderr | src/components/Sidebar.test.tsx > Sidebar unified navigation rendering > renders only read-only visible pages and marks the active route
+The above error occurred in the <SidebarChromeControls> component:
+
+    at SidebarChromeControls (C:/Users/borah/CareDroid-Clinical-AI/src/components/sidebar/SidebarChromeControls.tsx:43:78)
+    at nav
+    at aside
+    at Sidebar (C:/Users/borah/CareDroid-Clinical-AI/src/components/Sidebar.tsx:127:20)
+    at Router (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-router\dist\umd\react-router.development.js:1203:17)
+    at MemoryRouter (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-router\dist\umd\react-router.development.js:1097:7)
+    at RouterWithFutureDefaults (C:/Users/borah/CareDroid-Clinical-AI/src/test/setup.ts:12:41)
+    at UserProvider (C:/Users/borah/CareDroid-Clinical-AI/src/contexts/UserContext.tsx:240:25)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+
+stderr | src/components/Sidebar.test.tsx > Sidebar unified navigation rendering > marks Medical Tools active without also activating Whiteboard
+The above error occurred in the <SidebarChromeControls> component:
+
+    at SidebarChromeControls (C:/Users/borah/CareDroid-Clinical-AI/src/components/sidebar/SidebarChromeControls.tsx:43:78)
+    at nav
+    at aside
+    at Sidebar (C:/Users/borah/CareDroid-Clinical-AI/src/components/Sidebar.tsx:127:20)
+    at Router (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-router\dist\umd\react-router.development.js:1203:17)
+    at MemoryRouter (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-router\dist\umd\react-router.development.js:1097:7)
+    at RouterWithFutureDefaults (C:/Users/borah/CareDroid-Clinical-AI/src/test/setup.ts:12:41)
+    at UserProvider (C:/Users/borah/CareDroid-Clinical-AI/src/contexts/UserContext.tsx:240:25)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+
+stderr | src/components/Sidebar.test.tsx > Sidebar unified navigation rendering > renders distinct icon keys for each pilot sidebar item
+The above error occurred in the <SidebarChromeControls> component:
+
+    at SidebarChromeControls (C:/Users/borah/CareDroid-Clinical-AI/src/components/sidebar/SidebarChromeControls.tsx:43:78)
+    at nav
+    at aside
+    at Sidebar (C:/Users/borah/CareDroid-Clinical-AI/src/components/Sidebar.tsx:127:20)
+    at Router (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-router\dist\umd\react-router.development.js:1203:17)
+    at MemoryRouter (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-router\dist\umd\react-router.development.js:1097:7)
+    at RouterWithFutureDefaults (C:/Users/borah/CareDroid-Clinical-AI/src/test/setup.ts:12:41)
+    at UserProvider (C:/Users/borah/CareDroid-Clinical-AI/src/contexts/UserContext.tsx:240:25)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+
+stderr | src/components/Sidebar.test.tsx > Sidebar unified navigation rendering > renders store-derived alert and reassessment badges without explicit navigation props
+The above error occurred in the <SidebarChromeControls> component:
+
+    at SidebarChromeControls (C:/Users/borah/CareDroid-Clinical-AI/src/components/sidebar/SidebarChromeControls.tsx:43:78)
+    at nav
+    at aside
+    at Sidebar (C:/Users/borah/CareDroid-Clinical-AI/src/components/Sidebar.tsx:127:20)
+    at Router (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-router\dist\umd\react-router.development.js:1203:17)
+    at MemoryRouter (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-router\dist\umd\react-router.development.js:1097:7)
+    at RouterWithFutureDefaults (C:/Users/borah/CareDroid-Clinical-AI/src/test/setup.ts:12:41)
+    at UserProvider (C:/Users/borah/CareDroid-Clinical-AI/src/contexts/UserContext.tsx:240:25)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+
+stderr | src/components/Sidebar.test.tsx > Sidebar unified navigation rendering > keeps feature-gated navigation items visible when their feature is disabled
+The above error occurred in the <SidebarChromeControls> component:
+
+    at SidebarChromeControls (C:/Users/borah/CareDroid-Clinical-AI/src/components/sidebar/SidebarChromeControls.tsx:43:78)
+    at nav
+    at aside
+    at Sidebar (C:/Users/borah/CareDroid-Clinical-AI/src/components/Sidebar.tsx:127:20)
+    at Router (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-router\dist\umd\react-router.development.js:1203:17)
+    at MemoryRouter (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-router\dist\umd\react-router.development.js:1097:7)
+    at RouterWithFutureDefaults (C:/Users/borah/CareDroid-Clinical-AI/src/test/setup.ts:12:41)
+    at UserProvider (C:/Users/borah/CareDroid-Clinical-AI/src/contexts/UserContext.tsx:240:25)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+
+ ❯ src/components/Sidebar.test.tsx (6 tests | 6 failed) 481ms
+     × renders only the requested CareDroid pages for admin users 129ms
+     × renders only read-only visible pages and marks the active route 32ms
+     × marks Medical Tools active without also activating Whiteboard 66ms
+     × renders distinct icon keys for each pilot sidebar item 99ms
+     × renders store-derived alert and reassessment badges without explicit navigation props 98ms
+     × keeps feature-gated navigation items visible when their feature is disabled 53ms
+Error: useSystemConfig must be used within SystemConfigProvider
+    at useSystemConfig (C:/Users/borah/CareDroid-Clinical-AI/src/contexts/SystemConfigContext.tsx:152:11)
+    at SidebarChromeControls (C:/Users/borah/CareDroid-Clinical-AI/src/components/sidebar/SidebarChromeControls.tsx:31:63)
+    at renderWithHooks (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:15486:18)
+    at mountIndeterminateComponent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:20103:13)
+    at beginWork (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:21626:16)
+    at HTMLUnknownElement.callCallback (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:4164:14)
+    at HTMLUnknownElement.callTheUserObjectsOperation (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\generated\idl\EventListener.js:26:30)
+    at innerInvokeEventListeners (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:360:16)
+    at invokeEventListeners (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:296:3)
+    at HTMLUnknownElementImpl._dispatch (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:243:9)
+Error: useSystemConfig must be used within SystemConfigProvider
+    at useSystemConfig (C:/Users/borah/CareDroid-Clinical-AI/src/contexts/SystemConfigContext.tsx:152:11)
+    at SidebarChromeControls (C:/Users/borah/CareDroid-Clinical-AI/src/components/sidebar/SidebarChromeControls.tsx:31:63)
+    at renderWithHooks (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:15486:18)
+    at mountIndeterminateComponent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:20103:13)
+    at beginWork (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:21626:16)
+    at HTMLUnknownElement.callCallback (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:4164:14)
+    at HTMLUnknownElement.callTheUserObjectsOperation (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\generated\idl\EventListener.js:26:30)
+    at innerInvokeEventListeners (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:360:16)
+    at invokeEventListeners (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:296:3)
+    at HTMLUnknownElementImpl._dispatch (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:243:9)
+Error: useSystemConfig must be used within SystemConfigProvider
+    at useSystemConfig (C:/Users/borah/CareDroid-Clinical-AI/src/contexts/SystemConfigContext.tsx:152:11)
+    at SidebarChromeControls (C:/Users/borah/CareDroid-Clinical-AI/src/components/sidebar/SidebarChromeControls.tsx:31:63)
+    at renderWithHooks (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:15486:18)
+    at mountIndeterminateComponent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:20103:13)
+    at beginWork (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:21626:16)
+    at HTMLUnknownElement.callCallback (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:4164:14)
+    at HTMLUnknownElement.callTheUserObjectsOperation (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\generated\idl\EventListener.js:26:30)
+    at innerInvokeEventListeners (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:360:16)
+    at invokeEventListeners (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:296:3)
+    at HTMLUnknownElementImpl._dispatch (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:243:9)
+Error: useSystemConfig must be used within SystemConfigProvider
+    at useSystemConfig (C:/Users/borah/CareDroid-Clinical-AI/src/contexts/SystemConfigContext.tsx:152:11)
+    at SidebarChromeControls (C:/Users/borah/CareDroid-Clinical-AI/src/components/sidebar/SidebarChromeControls.tsx:31:63)
+    at renderWithHooks (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:15486:18)
+    at mountIndeterminateComponent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:20103:13)
+    at beginWork (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:21626:16)
+    at HTMLUnknownElement.callCallback (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:4164:14)
+    at HTMLUnknownElement.callTheUserObjectsOperation (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\generated\idl\EventListener.js:26:30)
+    at innerInvokeEventListeners (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:360:16)
+    at invokeEventListeners (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:296:3)
+    at HTMLUnknownElementImpl._dispatch (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:243:9)
+Error: useSystemConfig must be used within SystemConfigProvider
+    at useSystemConfig (C:/Users/borah/CareDroid-Clinical-AI/src/contexts/SystemConfigContext.tsx:152:11)
+    at SidebarChromeControls (C:/Users/borah/CareDroid-Clinical-AI/src/components/sidebar/SidebarChromeControls.tsx:31:63)
+    at renderWithHooks (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:15486:18)
+    at mountIndeterminateComponent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:20103:13)
+    at beginWork (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:21626:16)
+    at HTMLUnknownElement.callCallback (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:4164:14)
+    at HTMLUnknownElement.callTheUserObjectsOperation (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\generated\idl\EventListener.js:26:30)
+    at innerInvokeEventListeners (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:360:16)
+    at invokeEventListeners (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:296:3)
+    at HTMLUnknownElementImpl._dispatch (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:243:9)
+Error: useSystemConfig must be used within SystemConfigProvider
+    at useSystemConfig (C:/Users/borah/CareDroid-Clinical-AI/src/contexts/SystemConfigContext.tsx:152:11)
+    at SidebarChromeControls (C:/Users/borah/CareDroid-Clinical-AI/src/components/sidebar/SidebarChromeControls.tsx:31:63)
+    at renderWithHooks (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:15486:18)
+    at mountIndeterminateComponent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:20103:13)
+    at beginWork (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:21626:16)
+    at HTMLUnknownElement.callCallback (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:4164:14)
+    at HTMLUnknownElement.callTheUserObjectsOperation (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\generated\idl\EventListener.js:26:30)
+    at innerInvokeEventListeners (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:360:16)
+    at invokeEventListeners (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:296:3)
+    at HTMLUnknownElementImpl._dispatch (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:243:9)
+Error: useSystemConfig must be used within SystemConfigProvider
+    at useSystemConfig (C:/Users/borah/CareDroid-Clinical-AI/src/contexts/SystemConfigContext.tsx:152:11)
+    at SidebarChromeControls (C:/Users/borah/CareDroid-Clinical-AI/src/components/sidebar/SidebarChromeControls.tsx:31:63)
+    at renderWithHooks (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:15486:18)
+    at mountIndeterminateComponent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:20103:13)
+    at beginWork (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:21626:16)
+    at HTMLUnknownElement.callCallback (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:4164:14)
+    at HTMLUnknownElement.callTheUserObjectsOperation (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\generated\idl\EventListener.js:26:30)
+    at innerInvokeEventListeners (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:360:16)
+    at invokeEventListeners (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:296:3)
+    at HTMLUnknownElementImpl._dispatch (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:243:9)
+Error: useSystemConfig must be used within SystemConfigProvider
+    at useSystemConfig (C:/Users/borah/CareDroid-Clinical-AI/src/contexts/SystemConfigContext.tsx:152:11)
+    at SidebarChromeControls (C:/Users/borah/CareDroid-Clinical-AI/src/components/sidebar/SidebarChromeControls.tsx:31:63)
+    at renderWithHooks (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:15486:18)
+    at mountIndeterminateComponent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:20103:13)
+    at beginWork (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:21626:16)
+    at HTMLUnknownElement.callCallback (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:4164:14)
+    at HTMLUnknownElement.callTheUserObjectsOperation (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\generated\idl\EventListener.js:26:30)
+    at innerInvokeEventListeners (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:360:16)
+    at invokeEventListeners (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:296:3)
+    at HTMLUnknownElementImpl._dispatch (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:243:9)
+Error: useSystemConfig must be used within SystemConfigProvider
+    at useSystemConfig (C:/Users/borah/CareDroid-Clinical-AI/src/contexts/SystemConfigContext.tsx:152:11)
+    at SidebarChromeControls (C:/Users/borah/CareDroid-Clinical-AI/src/components/sidebar/SidebarChromeControls.tsx:31:63)
+    at renderWithHooks (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:15486:18)
+    at mountIndeterminateComponent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:20103:13)
+    at beginWork (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:21626:16)
+    at HTMLUnknownElement.callCallback (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:4164:14)
+    at HTMLUnknownElement.callTheUserObjectsOperation (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\generated\idl\EventListener.js:26:30)
+    at innerInvokeEventListeners (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:360:16)
+    at invokeEventListeners (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:296:3)
+    at HTMLUnknownElementImpl._dispatch (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:243:9)
+Error: useSystemConfig must be used within SystemConfigProvider
+    at useSystemConfig (C:/Users/borah/CareDroid-Clinical-AI/src/contexts/SystemConfigContext.tsx:152:11)
+    at SidebarChromeControls (C:/Users/borah/CareDroid-Clinical-AI/src/components/sidebar/SidebarChromeControls.tsx:31:63)
+    at renderWithHooks (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:15486:18)
+    at mountIndeterminateComponent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:20103:13)
+    at beginWork (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:21626:16)
+    at HTMLUnknownElement.callCallback (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:4164:14)
+    at HTMLUnknownElement.callTheUserObjectsOperation (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\generated\idl\EventListener.js:26:30)
+    at innerInvokeEventListeners (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:360:16)
+    at invokeEventListeners (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:296:3)
+    at HTMLUnknownElementImpl._dispatch (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:243:9)
+Error: useSystemConfig must be used within SystemConfigProvider
+    at useSystemConfig (C:/Users/borah/CareDroid-Clinical-AI/src/contexts/SystemConfigContext.tsx:152:11)
+    at SidebarChromeControls (C:/Users/borah/CareDroid-Clinical-AI/src/components/sidebar/SidebarChromeControls.tsx:31:63)
+    at renderWithHooks (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:15486:18)
+    at mountIndeterminateComponent (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:20103:13)
+    at beginWork (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:21626:16)
+    at HTMLUnknownElement.callCallback (C:\Users\borah\CareDroid-Clinical-AI\node_modules\react-dom\cjs\react-dom.development.js:4164:14)
+    at HTMLUnknownElement.callTheUserObjectsOperation (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\generated\idl\EventListener.js:26:30)
+    at innerInvokeEventListeners (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:360:16)
+    at invokeEventListeners (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:296:3)
+    at HTMLUnknownElementImpl._dispatch (C:\Users\borah\CareDroid-Clinical-AI\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:243:9)
+ ✓ src/components/SidebarNotificationPanel.test.tsx (1 test) 435ms
+     ✓ opens from the notification shell event and lists alerts  430ms
+ ✓ src/components/Header.centralControl.test.tsx (2 tests) 892ms
+     ✓ renders a slim contextual header with search and create actions  738ms
+ ❯ src/components/chrome/SessionChromeBar.test.tsx (2 tests | 1 failed) 58ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+
+     × renders nothing when no status segments are active 35ms
+     ✓ renders dev status segment on local dev hosts 17ms
+
+ Test Files  2 failed | 2 passed (4)
+      Tests  7 failed | 4 passed (11)
+   Start at  01:19:26
+   Duration  26.64s (transform 4.51s, setup 2.47s, import 8.49s, tests 1.87s, environment 11.62s)
+
+ FAIL  src/components/Sidebar.test.tsx > Sidebar unified navigation rendering > renders only the requested CareDroid pages for admin users
+ FAIL  src/components/Sidebar.test.tsx > Sidebar unified navigation rendering > renders only read-only visible pages and marks the active route
+ FAIL  src/components/Sidebar.test.tsx > Sidebar unified navigation rendering > marks Medical Tools active without also activating Whiteboard
+ FAIL  src/components/Sidebar.test.tsx > Sidebar unified navigation rendering > renders distinct icon keys for each pilot sidebar item
+ FAIL  src/components/Sidebar.test.tsx > Sidebar unified navigation rendering > renders store-derived alert and reassessment badges without explicit navigation props
+ FAIL  src/components/Sidebar.test.tsx > Sidebar unified navigation rendering > keeps feature-gated navigation items visible when their feature is disabled
+Error: useSystemConfig must be used within SystemConfigProvider
+ ❯ useSystemConfig src/contexts/SystemConfigContext.tsx:152:11
+    150|   const context = useContext(SystemConfigContext);
+    151|   if (!context) {
+    152|     throw new Error('useSystemConfig must be used within SystemConfigP…
+       |           ^
+    153|   }
+    154|   return context;
+ ❯ SidebarChromeControls src/components/sidebar/SidebarChromeControls.tsx:31:63
+ ❯ renderWithHooks node_modules/react-dom/cjs/react-dom.development.js:15486:18
+ ❯ mountIndeterminateComponent node_modules/react-dom/cjs/react-dom.development.js:20103:13
+ ❯ beginWork node_modules/react-dom/cjs/react-dom.development.js:21626:16
+ ❯ beginWork$1 node_modules/react-dom/cjs/react-dom.development.js:27465:14
+ ❯ performUnitOfWork node_modules/react-dom/cjs/react-dom.development.js:26599:12
+ ❯ workLoopSync node_modules/react-dom/cjs/react-dom.development.js:26505:5
+ ❯ renderRootSync node_modules/react-dom/cjs/react-dom.development.js:26473:7
+ ❯ recoverFromConcurrentError node_modules/react-dom/cjs/react-dom.development.js:25889:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯
+
+ FAIL  src/components/chrome/SessionChromeBar.test.tsx > SessionChromeBar > renders nothing when no status segments are active
+Error: expect(element).toBeEmptyDOMElement()
+
+Received:
+  "<div class="session-chrome-bar session-chrome-bar--status-only" role="status" aria-live="polite"><div class="session-chrome-bar__segments"><span class="session-chrome-bar__segment"><strong>Dev</strong><span>Local session</span></span></div></div>"
+ ❯ src/components/chrome/SessionChromeBar.test.tsx:36:23
+     34|   it('renders nothing when no status segments are active', () => {
+     35|     const { container } = render(<SessionChromeBar />);
+     36|     expect(container).toBeEmptyDOMElement();
+       |                       ^
+     37|   });
+     38|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯
+

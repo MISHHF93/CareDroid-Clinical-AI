@@ -82,9 +82,9 @@
   min-width: 220px;
   padding: 8px;
   border-radius: 12px;
-  border: 1px solid var(--app-panel-border);
-  background: var(--panel-bg, #111);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--medical-border, #e2e8f0);
+  background: var(--app-surface-1, #ffffff);
+  box-shadow: 0 4px 6px rgba(15, 23, 42, 0.04), 0 12px 32px rgba(15, 23, 42, 0.12);
 }
 
 .account-menu__section {
@@ -94,7 +94,7 @@
 }
 
 .account-menu__section + .account-menu__section {
-  border-top: 1px solid var(--app-divider-on-surface, rgba(255, 255, 255, 0.08));
+  border-top: 1px solid var(--medical-border, #e2e8f0);
   margin-top: 4px;
   padding-top: 8px;
 }
@@ -107,14 +107,14 @@
   border: none;
   border-radius: 8px;
   background: transparent;
-  color: var(--text-color);
+  color: var(--medical-ink, #111827);
   font-size: 0.85rem;
   cursor: pointer;
   text-decoration: none;
 }
 
 .account-menu__item:hover {
-  background: var(--app-overlay-on-surface);
+  background: var(--medical-slate-100, #f1f5f9);
 }
 
 .account-menu__item--danger {
@@ -127,7 +127,8 @@
   padding: 2px 8px;
   border-radius: 999px;
   font-size: 0.68rem;
-  background: color-mix(in srgb, var(--app-accent) 16%, transparent);
+  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 12%, var(--medical-accent-tint, #e0f2fe));
+  color: var(--medical-accent-hover, #0284c7);
 }
 
 .account-menu__section--profiles {
@@ -140,7 +141,7 @@
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--muted-text);
+  color: var(--medical-ink-subtle, #9ca3af);
 }
 
 @media (max-width: 720px) {

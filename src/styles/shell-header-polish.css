@@ -7,7 +7,7 @@
   --cdl-header-height: 52px;
   --cdl-header-padding-block: 8px;
   --cdl-header-padding-inline: var(--app-layout-page-gutter-inline, 18px);
-  --cdl-route-tab-height: 44px;
+  --cdl-route-tab-height: 52px;
   --cdl-route-tab-bg: var(--medical-white);
   --cdl-chrome-stack-height: calc(
     var(--cdl-header-height) + var(--cdl-route-tab-height) + var(--cdl-alarm-dock-estimate, 0px)

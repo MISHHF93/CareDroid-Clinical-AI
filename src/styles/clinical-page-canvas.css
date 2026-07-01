@@ -5,24 +5,24 @@
  */
 
 :root {
-  --cdl-clinical-canvas-top-glow: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 5%, transparent);
+  --cdl-clinical-canvas-top-glow: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 8%, transparent);
   --cdl-clinical-canvas-base: var(--medical-surface-page, #f8fafc);
-  --cdl-clinical-border: color-mix(in srgb, var(--medical-border, #e2e8f0) 48%, transparent);
-  --cdl-clinical-border-strong: color-mix(in srgb, var(--medical-border, #e2e8f0) 68%, transparent);
-  --cdl-clinical-border-focus: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 32%, transparent);
+  --cdl-clinical-border: color-mix(in srgb, var(--medical-border, #e2e8f0) 60%, transparent);
+  --cdl-clinical-border-strong: color-mix(in srgb, var(--medical-border, #e2e8f0) 80%, transparent);
+  --cdl-clinical-border-focus: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 42%, transparent);
   --cdl-clinical-radius: 12px;
   --cdl-clinical-radius-sm: 10px;
   --cdl-clinical-radius-lg: 14px;
   --cdl-clinical-shadow-rest:
-    0 1px 2px rgba(15, 23, 42, 0.03),
-    0 4px 14px rgba(15, 23, 42, 0.04);
+    0 1px 3px rgba(15, 23, 42, 0.06),
+    0 4px 16px rgba(15, 23, 42, 0.08);
   --cdl-clinical-shadow-hover:
-    0 2px 6px rgba(15, 23, 42, 0.05),
-    0 10px 24px rgba(15, 23, 42, 0.06);
-  --cdl-clinical-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.72);
-  --cdl-clinical-panel-padding: clamp(14px, 1.6vw, 18px);
+    0 4px 8px rgba(15, 23, 42, 0.09),
+    0 12px 28px rgba(15, 23, 42, 0.11);
+  --cdl-clinical-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.88);
+  --cdl-clinical-panel-padding: clamp(14px, 1.6vw, 20px);
   --cdl-clinical-card-padding: clamp(12px, 1.4vw, 16px);
-  --cdl-clinical-section-gap: clamp(16px, 2vw, 22px);
+  --cdl-clinical-section-gap: clamp(16px, 2vw, 24px);
   --cdl-clinical-motion: 180ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -30,7 +30,7 @@
 .emergency-app-shell,
 .emergency-app-shell .app-shell-main-content {
   background:
-    radial-gradient(ellipse 140% 60% at 50% -8%, var(--cdl-clinical-canvas-top-glow), transparent 58%),
+    radial-gradient(ellipse 160% 70% at 50% -10%, var(--cdl-clinical-canvas-top-glow), transparent 64%),
     var(--cdl-clinical-canvas-base);
 }
 
@@ -71,6 +71,29 @@
     border-color var(--cdl-clinical-motion),
     box-shadow var(--cdl-clinical-motion),
     transform var(--cdl-clinical-motion);
+}
+
+/* Hover lift — tighter focus ring on interactive surfaces */
+:is(.app-shell, .emergency-app-shell) :is(
+    .cdl-surface,
+    .cd-dashboard-section,
+    .cd-hero-panel,
+    .cd-surface,
+    .cd-dashboard-card,
+    .cd-tool-card,
+    .cd-insight-card,
+    .cd-metric-card,
+    .cd-status-widget,
+    .emergency-route-card,
+    .emergency-route-metric-card,
+    .emergency-route-situation-brief,
+    .hospital-command-center__metric-card,
+    .hospital-command-center__status,
+    .hospital-command-center__panel,
+    .patient-card,
+    .staff-card
+  ):hover:not(.emergency-route-situation-brief):not(.cd-state) {
+  border-color: var(--cdl-clinical-border-strong);
 }
 
 /* Legacy page cards/panels/widgets — override visual-consistency flat boxes */

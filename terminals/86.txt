@@ -3,7 +3,7 @@ pid: 26836
 cwd: "C:\Users\borah\CareDroid-Clinical-AI"
 command: "Set-Location \"C:\\Users\\borah\\CareDroid-Clinical-AI\"; npm.cmd run test:run:frontend -- src/navigation/primaryNavigation.test.ts src/navigation/profileRouteLaunch.test.ts src/layout/AppShell.navigation.test.tsx src/test/routePagesSmoke.test.tsx --reporter=dot"
 started_at: 2026-06-30T22:10:29.506Z
-running_for_ms: 7640003  
+running_for_ms: 16389994 
 ---
 
 > caredroid-clinical-ai@1.0.0 test:run:frontend

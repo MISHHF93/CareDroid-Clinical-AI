@@ -1,0 +1,724 @@
+/* ══════════════════════════════════════════════════════════════════
+   CLINICAL FIGMA POLISH
+   Precision visual layer — loads last so all rules are authoritative.
+   Every rule here is a deliberate, scoped upgrade, not a blanket reset.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────────
+   1. SITUATION BRIEF GRAPHIC CARDS
+      (HAPPENING NOW / NEEDS ATTENTION / OWNER / NEXT ACTION)
+   ───────────────────────────────────────────────────────────────── */
+
+/* Outer container — lift and separate from page canvas */
+.emergency-route-situation-brief {
+  border-radius: 16px;
+  border: 1px solid var(--cdl-clinical-border, var(--medical-border, #e2e8f0));
+  box-shadow:
+    0 1px 3px rgba(15, 23, 42, 0.04),
+    0 4px 16px rgba(15, 23, 42, 0.07);
+}
+
+/* Individual card */
+.cdl-situation-graphic-card {
+  padding: 14px 16px;
+  border-radius: 13px;
+  border: 1px solid var(--cdl-clinical-border, var(--medical-border, #e2e8f0));
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 3px 10px rgba(15, 23, 42, 0.07);
+  transition: box-shadow 140ms ease, transform 140ms ease;
+}
+
+.cdl-situation-graphic-card:hover {
+  box-shadow:
+    0 2px 6px rgba(15, 23, 42, 0.06),
+    0 8px 24px rgba(15, 23, 42, 0.11);
+  transform: translateY(-1px);
+}
+
+/* Decorative motif — turn it into a soft watermark */
+.cdl-situation-graphic-card__motif {
+  inset-inline-end: 8px;
+  inset-block-start: 8px;
+  width: 72px;
+  height: 72px;
+  opacity: 0.07;
+  transition: opacity 160ms ease;
+}
+
+.cdl-situation-graphic-card:hover .cdl-situation-graphic-card__motif {
+  opacity: 0.11;
+}
+
+/* Icon badge — more prominent square pill */
+.cdl-situation-graphic-card .cdl-graphic-icon-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.10);
+}
+
+/* Label — crisper micro-type */
+.cdl-situation-graphic-card__label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+}
+
+/* Value — clearer reading size */
+.cdl-situation-graphic-card__value {
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+/* Accent left rail — use ::before so it's immune to border shorthand cascade */
+.cdl-situation-graphic-card::before {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: 3px;
+  border-radius: 13px 0 0 13px;
+  background: var(--medical-border, #e2e8f0);
+}
+
+.cdl-situation-graphic-card--information::before {
+  background: var(--status-info, #0ea5e9);
+}
+
+.cdl-situation-graphic-card--warning::before {
+  background: var(--status-warning, #f59e0b);
+}
+
+.cdl-situation-graphic-card--critical::before {
+  background: var(--status-critical, #ef4444);
+}
+
+.cdl-situation-graphic-card--action::before {
+  background: color-mix(in srgb, var(--medical-accent, #0ea5e9) 70%, #6366f1);
+}
+
+/* Tinted backgrounds — use !important to win over any cascade-order issues */
+.cdl-situation-graphic-card--information {
+  background: color-mix(in srgb, var(--status-info, #0ea5e9) 5%, #fff) !important;
+}
+
+.cdl-situation-graphic-card--warning {
+  background: color-mix(in srgb, var(--status-warning, #f59e0b) 6%, #fff) !important;
+}
+
+.cdl-situation-graphic-card--critical {
+  background: color-mix(in srgb, var(--status-critical, #ef4444) 6%, #fff) !important;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   2. GRAPHIC ICON BADGES (global)
+   ───────────────────────────────────────────────────────────────── */
+
+.cdl-graphic-icon-badge {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.cdl-graphic-icon-badge--information {
+  box-shadow: 0 1px 4px rgba(14, 165, 233, 0.22);
+}
+
+.cdl-graphic-icon-badge--warning {
+  box-shadow: 0 1px 4px rgba(245, 158, 11, 0.22);
+}
+
+.cdl-graphic-icon-badge--critical {
+  box-shadow: 0 1px 4px rgba(239, 68, 68, 0.22);
+}
+
+.cdl-graphic-icon-badge--brand {
+  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.26);
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   3. DEPARTMENT STAFF BAR — Team cards
+   ───────────────────────────────────────────────────────────────── */
+
+.department-staff-bar {
+  padding: 14px 16px;
+  border-radius: 14px;
+  box-shadow:
+    0 1px 3px rgba(15, 23, 42, 0.04),
+    0 4px 14px rgba(15, 23, 42, 0.07);
+}
+
+.department-staff-bar__card {
+  width: 220px;
+  min-width: 220px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  box-shadow:
+    0 1px 3px rgba(15, 23, 42, 0.04),
+    0 3px 9px rgba(15, 23, 42, 0.07);
+  transition: box-shadow 140ms ease, transform 140ms ease;
+}
+
+.department-staff-bar__card:hover {
+  box-shadow:
+    0 2px 6px rgba(15, 23, 42, 0.06),
+    0 6px 18px rgba(15, 23, 42, 0.10);
+  transform: translateY(-1px);
+}
+
+/* Charge nurse card — amber gradient surface */
+.department-staff-bar__card--charge {
+  border-color: rgba(245, 158, 11, 0.55);
+  background: linear-gradient(
+    148deg,
+    rgba(245, 158, 11, 0.09) 0%,
+    rgba(245, 158, 11, 0.03) 100%
+  );
+  box-shadow:
+    0 1px 3px rgba(245, 158, 11, 0.10),
+    0 3px 10px rgba(245, 158, 11, 0.13);
+}
+
+.department-staff-bar__name {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.department-staff-bar__title {
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+/* CHARGE badge */
+.department-staff-bar__badge {
+  padding: 3px 10px;
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  border-color: rgba(245, 158, 11, 0.52);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  background: rgba(245, 158, 11, 0.16);
+  color: #92400e;
+}
+
+/* Responsibility chips — solid, readable blue pills */
+.department-staff-bar__chip {
+  padding: 4px 9px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #1e40af;
+  background: #dbeafe;
+  border: none;
+  line-height: 1.2;
+}
+
+/* Patient count chip inside staff card — stronger ink */
+.department-staff-bar__patient-count {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--medical-ink, #111827);
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   4. ROLE OPERATIONAL SUMMARY STRIP — Whiteboard overview cards
+   ───────────────────────────────────────────────────────────────── */
+
+.role-operational-summary__card {
+  padding: 14px 16px;
+  border-radius: 13px;
+  box-shadow:
+    0 1px 3px rgba(15, 23, 42, 0.04),
+    0 3px 10px rgba(15, 23, 42, 0.07);
+  transition: box-shadow 140ms ease, transform 140ms ease;
+}
+
+.role-operational-summary__card:hover {
+  box-shadow:
+    0 2px 6px rgba(15, 23, 42, 0.06),
+    0 8px 22px rgba(15, 23, 42, 0.10);
+  transform: translateY(-1px);
+}
+
+/* Tone: left accent rail */
+.role-operational-summary__card--critical {
+  border-left: 3px solid var(--semantic-critical, #b91c1c);
+}
+
+.role-operational-summary__card--warning {
+  border-left: 3px solid var(--semantic-attention, #b45309);
+}
+
+.role-operational-summary__card--healthy {
+  border-left: 3px solid var(--semantic-healthy, #15803d);
+}
+
+.role-operational-summary__title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  margin-bottom: 8px;
+}
+
+.role-operational-summary__lines li {
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   5. OPERATIONAL STRIP — EMS stat bar metrics
+   ───────────────────────────────────────────────────────────────── */
+
+.operational-strip--compact {
+  box-shadow:
+    0 1px 3px rgba(15, 23, 42, 0.04),
+    0 4px 12px rgba(15, 23, 42, 0.06);
+}
+
+/* Individual metric tile — more defined surface */
+.operational-strip__metric,
+.operational-strip__action {
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 32%, var(--app-surface-1, #ffffff));
+  border: 1px solid var(--medical-border, #e2e8f0);
+  transition: background 100ms ease, border-color 100ms ease;
+}
+
+.operational-strip__metric:hover,
+.operational-strip__action:hover {
+  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 56%, var(--app-surface-1, #ffffff));
+  border-color: var(--cdl-clinical-border, var(--medical-border, #cbd5e1));
+}
+
+/* Value — larger, bolder */
+.operational-strip__metric strong,
+.operational-strip__action strong {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* Label — refined micro-type */
+.operational-strip__metric span,
+.operational-strip__action span {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--medical-ink-muted, #6b7280);
+}
+
+/* Dense variant (the inline EMS strip) */
+.operational-strip--dense .operational-strip__metric,
+.operational-strip--dense .operational-strip__action {
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 28%, var(--app-surface-1, #ffffff));
+  border: 1px solid var(--medical-border, #e2e8f0);
+}
+
+.operational-strip--dense .operational-strip__metric strong,
+.operational-strip--dense .operational-strip__action strong {
+  font-size: 13.5px;
+  font-weight: 700;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   6. SIDEBAR NAVIGATION
+   ───────────────────────────────────────────────────────────────── */
+
+/* Nav item — slightly more rounded, consistent left rail */
+.sidebar-nav-item {
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-size: 13px;
+}
+
+/* Active item — stronger filled state */
+.sidebar-nav-item--active {
+  background: color-mix(
+    in srgb,
+    var(--cdl-sidebar-item-bg-active, var(--medical-accent-tint, #e0f2fe)) 80%,
+    var(--medical-white, #fff)
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 1px 3px rgba(14, 165, 233, 0.08);
+}
+
+/* Section group labels — refined micro-caps */
+.sidebar-nav-group__label {
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  padding: 6px 10px 2px;
+  color: var(--cdl-sidebar-group-label-fg, var(--medical-ink-subtle, #9ca3af));
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   7. CRITICAL ALERT BANNER
+   ───────────────────────────────────────────────────────────────── */
+
+.critical-alert-banner {
+  border-radius: 10px;
+  font-size: 13.5px;
+  gap: 12px;
+}
+
+.critical-alert-banner--critical {
+  background: color-mix(in srgb, #ef4444 8%, var(--app-surface-1, #fff));
+  border: 1.5px solid color-mix(in srgb, #ef4444 32%, transparent);
+}
+
+.critical-alert-banner--high {
+  background: color-mix(in srgb, #f59e0b 8%, var(--app-surface-1, #fff));
+  border: 1.5px solid color-mix(in srgb, #f59e0b 28%, transparent);
+}
+
+.critical-alert-banner__link {
+  padding: 5px 14px;
+  border-radius: 7px;
+  font-size: 12.5px;
+  font-weight: 700;
+  border-width: 1.5px;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   8. RECEPTION WORK QUEUE TABS
+   ───────────────────────────────────────────────────────────────── */
+
+.reception-work-queues__tab {
+  min-height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1.5px solid var(--color-border-subtle, var(--medical-border, #e2e8f0));
+  background: var(--medical-white, #fff);
+  color: var(--medical-ink-muted, #6b7280);
+  font-size: 12.5px;
+  font-weight: 600;
+  transition: background 110ms ease, border-color 110ms ease, color 110ms ease;
+}
+
+.reception-work-queues__tab:hover:not(.reception-work-queues__tab--active) {
+  border-color: var(--app-accent-interactive, #0ea5e9);
+  color: var(--medical-ink, #111827);
+  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 5%, var(--medical-white, #fff));
+}
+
+/* Active tab — solid filled */
+.reception-work-queues__tab--active {
+  background: var(--app-accent-interactive, #0ea5e9);
+  border-color: var(--app-accent-interactive, #0ea5e9);
+  color: #ffffff;
+  box-shadow: 0 1px 4px rgba(14, 165, 233, 0.28);
+}
+
+/* Count badge */
+.reception-work-queues__count {
+  min-width: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.reception-work-queues__tab:not(.reception-work-queues__tab--active) .reception-work-queues__count {
+  background: var(--medical-slate-100, #f1f5f9);
+  color: var(--medical-ink, #111827);
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   9. PATIENT CARDS
+   ───────────────────────────────────────────────────────────────── */
+
+.patient-card {
+  border-radius: 12px;
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 3px 8px rgba(15, 23, 42, 0.06);
+  transition: box-shadow 140ms ease, transform 140ms ease;
+}
+
+.patient-card:hover {
+  box-shadow:
+    0 2px 6px rgba(15, 23, 42, 0.06),
+    0 6px 16px rgba(15, 23, 42, 0.09);
+  transform: translateY(-1px);
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   10. GENERAL CARD ELEVATION SYSTEM
+       Any card with .cdl-zone or .emergency-route-card gets
+       the layered shadow treatment.
+   ───────────────────────────────────────────────────────────────── */
+
+.emergency-route-card {
+  border-radius: 14px;
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 4px 12px rgba(15, 23, 42, 0.07);
+}
+
+/* EMS offload gauge badge — refined */
+.cdl-ems-offload-gauge {
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(14, 165, 233, 0.14);
+  gap: 6px;
+}
+
+/* Reception flow steps — stronger label */
+.cdl-reception-flow-graphic__label {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+/* Route graphic badge — remove glow on light mode */
+.cdl-route-graphic-badge__glow {
+  background: none;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   11. STAT BADGE / METRIC COUNTERS
+   ───────────────────────────────────────────────────────────────── */
+
+/* Critical alerts badge on the sidebar */
+.sidebar-nav-item .sidebar-nav-item__badge {
+  font-weight: 800;
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  border-radius: 999px;
+  padding: 1px 6px;
+  box-shadow: 0 1px 3px rgba(185, 28, 28, 0.20);
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   12. OPERATIONAL ALARM DOCK (alert strip between header and content)
+   ───────────────────────────────────────────────────────────────── */
+
+.operational-alarm-dock {
+  font-size: 13.5px;
+}
+
+.operational-alarm-dock__alert {
+  border-radius: 10px;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   13. JOURNEY PROGRESS RAIL — EMS stage stepper
+   ───────────────────────────────────────────────────────────────── */
+
+.ed-journey-progress-rail__step-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.ed-journey-progress-rail__step--active .ed-journey-progress-rail__step-label {
+  font-weight: 800;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   14. CHROME HEADER — fix accidental wildcard rule interference
+       Two broad attribute selectors in the global CSS layer match
+       chrome header elements unintentionally:
+
+       A) [class*="-header "] matches .caredroid-header because the
+          multi-class string "caredroid-header caredroid-header--compact"
+          contains "-header " (first token followed by a space). This
+          injects padding: 24px, which shifts the topbar 24px below the
+          header boundary and causes header content to overflow into the
+          route-tab zone — the visible "layer on top" the user sees.
+
+       B) [class*="actions"] matches .caredroid-header__actions and sets
+          flex-wrap: wrap. On the Reception page the --primary search bar
+          (420 px) + account menu (300 px) exceed the container width,
+          wrapping the account menu to a second row. The 94-px tall
+          actions div, centred in the 52-px topbar, clips the top of the
+          Register button and hides the account menu below the boundary.
+
+       Fixes:
+         – Reset the erroneous padding to 0 so the topbar sits flush at y:0
+         – Remove border-bottom/shadow so header + route tab form one zone
+         – Enforce nowrap on the actions row in the chrome context
+         – Trim the --primary search bar so it never triggers wrapping
+   ───────────────────────────────────────────────────────────────── */
+
+/* Fix A + visual unification */
+.emergency-app-shell__main-column .caredroid-header--slim {
+  padding: 0;
+  border-bottom-color: transparent;
+  box-shadow: none;
+}
+
+/* Fix B — prevent actions from wrapping to a second row */
+.emergency-app-shell__main-column .caredroid-header__actions {
+  flex-wrap: nowrap;
+}
+
+/* Reception --primary search: bring width in line so all items fit in one row
+   (Register 78px + this 340px + role-switcher 197px + account 300px + 3×12px gap = 951px < 1007px) */
+.emergency-app-shell__main-column .caredroid-header__lookup--primary {
+  width: min(26vw, 340px);
+  min-width: 200px;
+  height: 34px;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   15. VISUAL WEIGHT PASS — eliminate ghost/illusional elements
+       Many buttons, tabs, and chips render as near-invisible because
+       they use transparent or very-light-tint surfaces against a
+       white canvas with only a hairline light-blue or light-gray
+       border. This section gives every interactive element a tangible,
+       readable visual body.
+   ───────────────────────────────────────────────────────────────── */
+
+/* ── 15A. Alarm dock action buttons ──────────────────────────────
+   Pure-white buttons on a tinted critical/warning dock surface
+   read as unpressable ghosts. Give them a slate-tinted fill and
+   stronger border so they pop against the dock background.       */
+
+.operational-alarm-dock__actions button {
+  background: var(--medical-slate-50, #f8fafc);
+  border-color: var(--cdl-clinical-border, #cbd5e1);
+  border-width: 1.5px;
+  color: var(--medical-ink, #111827);
+}
+
+/* Ghost "All alerts" link — fully transparent = invisible.
+   Promote to a readable ink tone with a visible underline weight. */
+.operational-alarm-dock__ghost {
+  background: transparent !important;
+  border-color: transparent !important;
+  color: var(--medical-ink-muted, #6b7280) !important;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ── 15B. Journey progress rail — upcoming step rings ────────────
+   The default #cbd5e1 border on upcoming markers is too pale.
+   Darken to slate-400 so all 6 stages are clearly present.       */
+
+.ed-journey-rail__phase--upcoming .ed-journey-rail__marker,
+.ed-journey-rail__phase:not(.ed-journey-rail__phase--complete):not(.ed-journey-rail__phase--active) .ed-journey-rail__marker {
+  border-color: #94a3b8;
+  background: var(--medical-slate-50, #f8fafc);
+  color: #64748b;
+}
+
+.ed-journey-rail__phase--upcoming .ed-journey-rail__label,
+.ed-journey-rail__phase:not(.ed-journey-rail__phase--complete):not(.ed-journey-rail__phase--active) .ed-journey-rail__label {
+  color: #475569;
+}
+
+/* ── 15C. Reception toolbar action buttons ───────────────────────
+   The pale --reception-surface-inset + #e0f2fe border = nearly
+   invisible on a white card. Promote to a concrete slate surface. */
+
+.reception-desk-toolbar__action {
+  background: var(--medical-slate-50, #f8fafc) !important;
+  border-color: #94a3b8 !important;
+  border-width: 1.5px !important;
+  color: var(--medical-ink, #111827) !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.reception-desk-toolbar__action:hover:not(:disabled) {
+  background: var(--medical-slate-100, #f1f5f9) !important;
+  border-color: #64748b !important;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.08);
+}
+
+/* Primary "Register" button — keep its blue accent stronger */
+.reception-desk-toolbar__action--primary {
+  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 12%, #fff) !important;
+  border-color: rgba(14, 165, 233, 0.55) !important;
+  color: var(--app-accent-interactive, #0369a1) !important;
+}
+
+.reception-desk-toolbar__action--primary:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 20%, #fff) !important;
+}
+
+/* Escalate button — keep red accent */
+.reception-desk-toolbar__action--escalate {
+  background: color-mix(in srgb, #ef4444 10%, #fff) !important;
+  border-color: rgba(239, 68, 68, 0.45) !important;
+  color: #b91c1c !important;
+}
+
+/* ── 15D. Reception toolbar queue count tabs ─────────────────────
+   Same pale-surface + light-blue-border problem as 15C.
+   Inactive queue tabs need visible body; active tab keeps blue.  */
+
+.reception-desk-toolbar__queue-tab {
+  background: var(--medical-slate-50, #f8fafc) !important;
+  border-color: #94a3b8 !important;
+  border-width: 1.5px !important;
+  color: #374151 !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.reception-desk-toolbar__queue-tab:hover:not(.reception-desk-toolbar__action--active) {
+  background: var(--medical-slate-100, #f1f5f9) !important;
+  border-color: #64748b !important;
+}
+
+.reception-desk-toolbar__action--active.reception-desk-toolbar__queue-tab,
+.reception-desk-toolbar__queue-tab.reception-desk-toolbar__action--active {
+  background: var(--app-accent-interactive, #0ea5e9) !important;
+  border-color: var(--app-accent-interactive, #0ea5e9) !important;
+  color: #ffffff !important;
+  box-shadow: 0 1px 4px rgba(14, 165, 233, 0.28);
+}
+
+/* ── 15E. Unified intake phase nav (Registration tabs) ───────────
+   Pure-white inactive buttons with faint border = ghost text label.
+   Give them a concrete pill surface and clear inactive/active split. */
+
+.unified-intake-phase-nav__btn {
+  background: var(--medical-slate-50, #f8fafc) !important;
+  border-color: #94a3b8 !important;
+  border-width: 1.5px !important;
+  color: #374151 !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  font-weight: 600;
+}
+
+.unified-intake-phase-nav__btn.is-active {
+  background: color-mix(in srgb, var(--reception-command-primary, #2563eb) 12%, #fff) !important;
+  border-color: color-mix(in srgb, var(--reception-command-primary, #2563eb) 55%, #94a3b8) !important;
+  color: var(--reception-command-primary-strong, #1d4ed8) !important;
+  box-shadow: 0 1px 4px rgba(37, 99, 235, 0.14);
+  font-weight: 700;
+}
+
+/* ── 15F. Quick complaint chips ──────────────────────────────────
+   --reception-command-inset may resolve to a near-transparent
+   value. Anchor with a solid off-white slate base.               */
+
+.reception-quick-complaints__chip {
+  background: var(--medical-slate-50, #f8fafc) !important;
+  border-color: #94a3b8 !important;
+  border-width: 1.5px !important;
+  color: #374151 !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+}
+
+.reception-quick-complaints__chip.is-active,
+.reception-quick-complaints__chip:hover {
+  background: color-mix(in srgb, var(--reception-command-primary, #2563eb) 10%, #fff) !important;
+  border-color: color-mix(in srgb, var(--reception-command-primary, #2563eb) 50%, #94a3b8) !important;
+  color: var(--reception-command-primary-strong, #1d4ed8) !important;
+}
+
+/* ── 15G. Reception work-queue tabs (inactive state) ─────────────
+   Section 8 sets white background — still low-contrast on white
+   card. Promote inactive tabs to slate-50 so they read as pills. */
+
+.reception-work-queues__tab:not(.reception-work-queues__tab--active) {
+  background: var(--medical-slate-50, #f8fafc);
+  border-color: #94a3b8;
+  border-width: 1.5px;
+  color: #374151;
+}

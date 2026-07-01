@@ -1,0 +1,65 @@
+---
+pid: 28880
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "node -e \"
+const { chromium } = require('@playwright/test');
+const { mkdirSync } = require('fs');
+const { join } = require('path');
+const { seedQaAuth, installQaNetworkStubs, dismissOverlays, waitForAppReady } = require('./e2e/responsive-qa.helpers.mjs');
+
+(async () => {
+  const out = join(process.cwd(), 'qa', 'shell-ux-audit');
+  mkdirSync(out, { recursive: true });
+  const browser = await chromium.launch({ headless: true });
+  const page = await browser.newPage();
+  await seedQaAuth(page);
+  await installQaNetworkStubs(page);
+  const shots = [
+    { name: 'desktop-whiteboard', w: 1440, h: 900, path: '/emergency/whiteboard' },
+    { name: 'desktop-command-center', w: 1440, h: 900, path: '/emergency/command-center' },
+    { name: 'desktop-notifications-open', w: 1440, h: 900, path: '/emergency/whiteboard', openNotifications: true },
+    { name: 'mobile-whiteboard', w: 375, h: 812, path: '/emergency/whiteboard' },
+  ];
+  for (const s of shots) {
+    await page.setViewportSize({ width: s.w, height: s.h });
+    await page.goto('http://localhost:8000' + s.path, { waitUntil: 'domcontentloaded' });
+    await waitForAppReady(page);
+    await page.waitForTimeout(500);
+    await dismissOverlays(page);
+    if (s.openNotifications) {
+      const bell = page.locator('.caredroid-header__notification-trigger');
+      if (await bell.count()) await bell.click();
+      await page.waitForTimeout(300);
+    }
+    const metrics = await page.evaluate(() => {
+      const header = document.querySelector('.caredroid-header');
+      const session = document.querySelector('.session-chrome-bar');
+      const sidebar = document.querySelector('.sidebar');
+      const main = document.querySelector('.app-shell-main-content');
+      const notif = document.querySelector('.emergency-os-notification-center');
+      const rect = (el) => el ? { top: el.getBoundingClientRect().top, height: el.getBoundingClientRect().height, left: el.getBoundingClientRect().left, width: el.getBoundingClientRect().width } : null;
+      return {
+        header: rect(header),
+        sessionChrome: rect(session),
+        sidebar: rect(sidebar),
+        main: rect(main),
+        notif: rect(notif),
+        chromeStackHeight: [header, session].filter(Boolean).reduce((sum, el) => sum + el.getBoundingClientRect().height, 0),
+        sidebarTop: sidebar?.getBoundingClientRect().top,
+        headerTop: header?.getBoundingClientRect().top,
+      };
+    });
+    const file = join(out, s.name + '.png');
+    await page.screenshot({ path: file, fullPage: false });
+    console.log(JSON.stringify({ shot: s.name, file, metrics }));
+  }
+  await browser.close();
+})();
+\""
+started_at: 2026-07-01T05:12:57.188Z
+running_for_ms: 35085000 
+---
+{"shot":"desktop-whiteboard","file":"C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\shell-ux-audit\\desktop-whiteboard.png","metrics":{"header":{"top":0,"height":49,"left":232,"width":1208},"sessionChrome":{"top":49,"height":53,"left":232,"width":1208},"sidebar":{"top":0,"height":900,"left":0,"width":232},"main":{"top":102,"height":798,"left":232,"width":1208},"notif":null,"chromeStackHeight":102,"sidebarTop":0,"headerTop":0}}
+{"shot":"desktop-command-center","file":"C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\shell-ux-audit\\desktop-command-center.png","metrics":{"header":{"top":0,"height":49,"left":232,"width":1208},"sessionChrome":{"top":49,"height":53,"left":232,"width":1208},"sidebar":{"top":0,"height":900,"left":0,"width":232},"main":{"top":102,"height":798,"left":232,"width":1208},"notif":null,"chromeStackHeight":102,"sidebarTop":0,"headerTop":0}}
+{"shot":"desktop-notifications-open","file":"C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\shell-ux-audit\\desktop-notifications-open.png","metrics":{"header":{"top":0,"height":49,"left":232,"width":1208},"sessionChrome":{"top":49,"height":53,"left":232,"width":1208},"sidebar":{"top":0,"height":900,"left":0,"width":232},"main":{"top":102,"height":798,"left":232,"width":1208},"notif":{"top":41,"height":640,"left":986,"width":440},"chromeStackHeight":102,"sidebarTop":0,"headerTop":0}}
+{"shot":"mobile-whiteboard","file":"C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\shell-ux-audit\\mobile-whiteboard.png","metrics":{"header":{"top":0,"height":48,"left":0,"width":375},"sessionChrome":{"top":48,"height":165,"left":0,"width":375},"sidebar":{"top":740,"height":72,"left":0,"width":375},"main":{"top":213,"height":599,"left":0,"width":375},"notif":null,"chromeStackHeight":213,"sidebarTop":740,"headerTop":0}}

@@ -1,0 +1,212 @@
+---
+pid: 2644
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cmd /c \"cd /d C:\\Users\\borah\\CareDroid-Clinical-AI && npm run build\""
+started_at: 2026-07-01T07:45:13.881Z
+running_for_ms: 25950002 
+---
+
+> caredroid-clinical-ai@1.0.0 build
+> npm run validate:assets && vite build
+
+
+> caredroid-clinical-ai@1.0.0 validate:assets
+> node scripts/validate-assets.mjs
+
+Asset validation passed.
+vite v7.3.5 building client environment for production...
+transforming...
+✓ 9424 modules transformed.
+rendering chunks...
+[plugin vite:reporter] 
+(!) C:/Users/borah/CareDroid-Clinical-AI/src/services/offlineService.ts is dynamically imported by C:/Users/borah/CareDroid-Clinical-AI/src/utils/deferStartupTasks.ts but also statically imported by C:/Users/borah/CareDroid-Clinical-AI/src/contexts/OfflineProvider.tsx, C:/Users/borah/CareDroid-Clinical-AI/src/pages/tools/DrugChecker.tsx, C:/Users/borah/CareDroid-Clinical-AI/src/services/syncService.ts, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter] 
+(!) C:/Users/borah/CareDroid-Clinical-AI/src/services/aiChiefOrchestrator.ts is dynamically imported by C:/Users/borah/CareDroid-Clinical-AI/src/services/careDroidAiApi.ts, C:/Users/borah/CareDroid-Clinical-AI/src/store/emergencyStore.ts but also statically imported by C:/Users/borah/CareDroid-Clinical-AI/src/components/CopilotPanel.tsx, C:/Users/borah/CareDroid-Clinical-AI/src/components/HandoffBriefGenerator.tsx, C:/Users/borah/CareDroid-Clinical-AI/src/components/copilot/PatientCardCopilot.tsx, C:/Users/borah/CareDroid-Clinical-AI/src/pages/emergency/SmartIntake.tsx, C:/Users/borah/CareDroid-Clinical-AI/src/services/alertLifecycleOrchestrator.ts, C:/Users/borah/CareDroid-Clinical-AI/src/services/clinicalChatService.ts, C:/Users/borah/CareDroid-Clinical-AI/src/services/intakeArtifactCapture.ts, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter] 
+(!) C:/Users/borah/CareDroid-Clinical-AI/src/services/alertLifecycleOrchestrator.ts is dynamically imported by C:/Users/borah/CareDroid-Clinical-AI/src/components/AppShell.tsx, C:/Users/borah/CareDroid-Clinical-AI/src/services/NotificationService.ts, C:/Users/borah/CareDroid-Clinical-AI/src/store/emergencyStore.ts, C:/Users/borah/CareDroid-Clinical-AI/src/store/emergencyStore.ts, C:/Users/borah/CareDroid-Clinical-AI/src/store/emergencyStore.ts but also statically imported by C:/Users/borah/CareDroid-Clinical-AI/src/engine/alertEngine.ts, C:/Users/borah/CareDroid-Clinical-AI/src/pages/ClinicalAlertsPage.tsx, C:/Users/borah/CareDroid-Clinical-AI/src/store/emergencyOperationalSync.ts, dynamic import will not move module into another chunk.
+
+[plugin vite:reporter] 
+(!) C:/Users/borah/CareDroid-Clinical-AI/src/services/devBackendAuth.ts is dynamically imported by C:/Users/borah/CareDroid-Clinical-AI/src/services/apiClient.ts but also statically imported by C:/Users/borah/CareDroid-Clinical-AI/src/components/AppShell.tsx, C:/Users/borah/CareDroid-Clinical-AI/src/components/native-ai/DriftMonitoringPanel.tsx, C:/Users/borah/CareDroid-Clinical-AI/src/contexts/TenantContext.tsx, C:/Users/borah/CareDroid-Clinical-AI/src/hooks/useNativeAiBackendSync.ts, C:/Users/borah/CareDroid-Clinical-AI/src/hooks/useNativeAiDashboardData.ts, dynamic import will not move module into another chunk.
+
+computing gzip size...
+dist/index.html                                                  2.50 kB │ gzip:   0.79 kB
+dist/assets/ToolApiErrorBanner-CfugQrBI.css                      0.56 kB │ gzip:   0.31 kB
+dist/assets/ApiStateBanner-CNXwlEFj.css                          0.64 kB │ gzip:   0.35 kB
+dist/assets/mobileCalculator-PaskG3W8.css                        0.81 kB │ gzip:   0.29 kB
+dist/assets/DispatchConsole-8HgNKBF4.css                         1.28 kB │ gzip:   0.57 kB
+dist/assets/StateSourceNotice-DI4CTImU.css                       1.29 kB │ gzip:   0.49 kB
+dist/assets/TimelineAi-Db_AjLuB.css                              1.33 kB │ gzip:   0.55 kB
+dist/assets/Alert-kkUR_1uy.css                                   1.35 kB │ gzip:   0.47 kB
+dist/assets/SharedToolSession-BjGvGXF5.css                       1.35 kB │ gzip:   0.59 kB
+dist/assets/IntegrationHubPage-ctC-yscb.css                      1.54 kB │ gzip:   0.54 kB
+dist/assets/ProfileSettingsShell-B4CJ0I1M.css                    1.64 kB │ gzip:   0.55 kB
+dist/assets/ProfileIdentityPages-C5LyCkWj.css                    1.81 kB │ gzip:   0.61 kB
+dist/assets/OperationalPresentationFrame-CbU6Vdf-.css            1.96 kB │ gzip:   0.56 kB
+dist/assets/OperationalHistoryPanel-DO_taf4p.css                 2.05 kB │ gzip:   0.65 kB
+dist/assets/IntegrationStatusPanel-D-dhXQqh.css                  2.26 kB │ gzip:   0.72 kB
+dist/assets/ClinicalDocumentationAssistant-BEzCIvXw.css          2.54 kB │ gzip:   0.74 kB
+dist/assets/PlatformGovernanceWorkspace-BKv2Q5s6.css             2.76 kB │ gzip:   0.86 kB
+dist/assets/AdminOperationsShell-4oQf109n.css                    2.94 kB │ gzip:   0.88 kB
+dist/assets/BottleneckPanels-Bmr2QHwU.css                        3.05 kB │ gzip:   0.94 kB
+dist/assets/Protocols-D1WgFAZV.css                               3.16 kB │ gzip:   0.90 kB
+dist/assets/SystemHealth-Ct0a0Caw.css                            3.29 kB │ gzip:   1.04 kB
+dist/assets/ProfileSettings-BfHVBmhp.css                         3.49 kB │ gzip:   1.02 kB
+dist/assets/PatientRoomDisplay-COTpDaJA.css                      3.87 kB │ gzip:   1.13 kB
+dist/assets/HospitalCommandCenter-DDWvbcDc.css                   3.99 kB │ gzip:   1.06 kB
+dist/assets/OrganizationPages-DY_JDtdt.css                       4.30 kB │ gzip:   1.19 kB
+dist/assets/AutomationAuditTrail-CGOxuDSm.css                    4.61 kB │ gzip:   1.13 kB
+dist/assets/button-CjmNH7q1.css                                  4.69 kB │ gzip:   1.25 kB
+dist/assets/SelfArrivalCheckIn-9_oqLTmP.css                      4.81 kB │ gzip:   1.30 kB
+dist/assets/index-Bygz8c04.css                                   4.93 kB │ gzip:   1.31 kB
+dist/assets/DataQualityRiskPanel-B-DYPxLR.css                    5.36 kB │ gzip:   1.24 kB
+dist/assets/CommercialPages-CU-gfMgY.css                         5.46 kB │ gzip:   1.34 kB
+dist/assets/EmsOffloadAttentionStrip-Cy_9LOlT.css                5.67 kB │ gzip:   1.25 kB
+dist/assets/DrugChecker-DVsp3_Cs.css                             5.70 kB │ gzip:   1.56 kB
+dist/assets/index-DSAJC19E.css                                   6.48 kB │ gzip:   1.55 kB
+dist/assets/Profile-C9HyBktd.css                                 8.04 kB │ gzip:   1.65 kB
+dist/assets/EmergencyAnalytics-DonhFHIy.css                      8.35 kB │ gzip:   1.73 kB
+dist/assets/useDisplayAutoRefresh-JUewuNn5.css                   9.04 kB │ gzip:   1.93 kB
+dist/assets/TeamManagement-BDYvB9k5.css                          9.34 kB │ gzip:   2.01 kB
+dist/assets/FeatureManagement-ByAodD9E.css                      10.01 kB │ gzip:   2.17 kB
+dist/assets/NotificationPreferences-CvpiO_c3.css                10.29 kB │ gzip:   2.40 kB
+dist/assets/ReassessmentDrawer-BNLBDjBC.css                     11.09 kB │ gzip:   2.38 kB
+dist/assets/SmartIntake-0P4urTeO.css                            11.29 kB │ gzip:   1.89 kB
+dist/assets/LabInterpreter-D0u-Me_K.css                         13.39 kB │ gzip:   2.66 kB
+dist/assets/ClinicalAlertsPage-DZIcjIAW.css                     13.57 kB │ gzip:   2.40 kB
+dist/assets/ReferralPanel-DAHbVCaD.css                          13.98 kB │ gzip:   2.27 kB
+dist/assets/EmergencySettings-BGDZhsWL.css                      14.11 kB │ gzip:   2.52 kB
+dist/assets/ReceptionWorkspace-TWwkD4BQ.css                     24.58 kB │ gzip:   4.33 kB
+dist/assets/EMSPipeline-DR_IKEhQ.css                            25.32 kB │ gzip:   4.20 kB
+dist/assets/PatientDetailPanel-BVlCPTKu.css                     27.54 kB │ gzip:   5.02 kB
+dist/assets/ToolsOverview-iYcrinfV.css                          28.28 kB │ gzip:   4.72 kB
+dist/assets/calculators-Kf0rSDj2.css                            91.25 kB │ gzip:  14.87 kB
+dist/assets/index-D2VlePbP.css                                 124.14 kB │ gzip:  17.48 kB
+dist/assets/index-Dq5ZSXgA.css                                 376.57 kB │ gzip:  59.04 kB
+dist/assets/complaintRouter-DEyDlxFQ.js                          0.27 kB │ gzip:   0.23 kB
+dist/assets/useProfileShellProps-DwFzwRI7.js                     0.28 kB │ gzip:   0.20 kB
+dist/assets/receptionQuickIntakeService-CyCxT2fU.js              0.30 kB │ gzip:   0.22 kB
+dist/assets/CommercialPages-DtvX7kg2.js                          0.53 kB │ gzip:   0.34 kB
+dist/assets/FleetLiveMap-MYMduknQ.js                             0.61 kB │ gzip:   0.29 kB
+dist/assets/FleetDashboard-DsjYDX-L.js                           0.61 kB │ gzip:   0.29 kB
+dist/assets/Medical3DViewer-iaw6ydIs.js                          0.65 kB │ gzip:   0.31 kB
+dist/assets/DeviceFleetManagement-DceogLQx.js                    0.71 kB │ gzip:   0.32 kB
+dist/assets/ToolApiErrorBanner-CnAFo0OT.js                       0.86 kB │ gzip:   0.40 kB
+dist/assets/ApiStateBanner-DGfWYycU.js                           0.94 kB │ gzip:   0.43 kB
+dist/assets/Alert-C-f5-HlJ.js                                    1.27 kB │ gzip:   0.48 kB
+dist/assets/crashReportingService-CW4IVXnX.js                    1.41 kB │ gzip:   0.68 kB
+dist/assets/HelpHubPage-CbEMAu7V.js                              1.42 kB │ gzip:   0.68 kB
+dist/assets/emergencyTransportApi-D6vn7RgH.js                    1.68 kB │ gzip:   0.86 kB
+dist/assets/OperationalPresentationFrame-D75WlgtU.js             1.72 kB │ gzip:   0.56 kB
+dist/assets/button-DTUXFgNH.js                                   1.79 kB │ gzip:   0.61 kB
+dist/assets/receptionScreenModel-DI-qCSm-.js                     2.65 kB │ gzip:   1.11 kB
+dist/assets/StateSourceNotice-COtM06kA.js                        2.75 kB │ gzip:   1.00 kB
+dist/assets/clinicalIntelligenceApi-D_C18fQ6.js                  3.28 kB │ gzip:   0.71 kB
+dist/assets/mobileCalculator-COhovrCq.js                         3.92 kB │ gzip:   1.80 kB
+dist/assets/AdminOperationsShell-KVHhwsIl.js                     4.04 kB │ gzip:   1.22 kB
+dist/assets/ProfileSettingsShell-IZ0dF6h4.js                     4.34 kB │ gzip:   1.06 kB
+dist/assets/OperationalHistoryPanel-BLK3tlMi.js                  4.44 kB │ gzip:   1.16 kB
+dist/assets/WhiteboardDisplayRoute-Cdi-gHQh.js                   4.57 kB │ gzip:   1.64 kB
+dist/assets/ProcedureGuide-DTx1EPtR.js                           4.92 kB │ gzip:   1.58 kB
+dist/assets/SharedToolSession-CdRuyaxq.js                        5.48 kB │ gzip:   1.19 kB
+dist/assets/ProfileSecurity-DD8yHlAL.js                          6.45 kB │ gzip:   1.28 kB
+dist/assets/ProfileActivity-C5tDCCCS.js                          6.61 kB │ gzip:   1.46 kB
+dist/assets/AdminOperationsHome-BWAw0Jie.js                      7.00 kB │ gzip:   2.05 kB
+dist/assets/BillingPage-B7rwPIdu.js                              7.15 kB │ gzip:   1.64 kB
+dist/assets/ProfileWorkspaces-Cdjbfu00.js                        7.52 kB │ gzip:   1.68 kB
+dist/assets/emergencyCareJourneyOrchestrator-kdksQi2M.js         7.53 kB │ gzip:   2.67 kB
+dist/assets/UsagePage-BoY8s79w.js                                7.61 kB │ gzip:   1.76 kB
+dist/assets/NephrologyAssistantPage-NeKtPy7c.js                  7.93 kB │ gzip:   2.39 kB
+dist/assets/GastroenterologyAssistantPage-hOr5EQDZ.js            8.13 kB │ gzip:   2.38 kB
+dist/assets/PulmonologyAssistantPage-D1kOAkTS.js                 8.18 kB │ gzip:   2.42 kB
+dist/assets/EndocrineMetabolicAssistantPage-ScmEIFk4.js          8.43 kB │ gzip:   2.41 kB
+dist/assets/HEARTScore-B9ocPU-P.js                               8.44 kB │ gzip:   2.56 kB
+dist/assets/PediatricsObgynAssistantPage-C94UFkmn.js             8.53 kB │ gzip:   2.42 kB
+dist/assets/PsychiatryAssistantPage-B6RRk_Ae.js                  8.61 kB │ gzip:   2.37 kB
+dist/assets/NeurologyAssistantPage-DRW8adLd.js                   8.61 kB │ gzip:   2.54 kB
+dist/assets/NotificationService-DviFpKmI.js                      8.63 kB │ gzip:   2.68 kB
+dist/assets/CardiologyAssistantPage-BizFLIJU.js                  8.87 kB │ gzip:   2.69 kB
+dist/assets/syncService-BCrmBXCk.js                              9.32 kB │ gzip:   2.47 kB
+dist/assets/DiagnosisAssistant-7o61Km7h.js                       9.48 kB │ gzip:   2.02 kB
+dist/assets/clinicalChatService-BlmAHo9i.js                      9.51 kB │ gzip:   3.62 kB
+dist/assets/qSOFA-CK6F56Bn.js                                    9.95 kB │ gzip:   2.91 kB
+dist/assets/ProfileSettings-cgyrqN6P.js                         10.09 kB │ gzip:   2.82 kB
+dist/assets/ClinicalAudit-5_aS68qW.js                           11.12 kB │ gzip:   2.16 kB
+dist/assets/simulation-Cm_FxecO.js                              11.20 kB │ gzip:   4.65 kB
+dist/assets/BottleneckPanels-Brf2ESE9.js                        11.71 kB │ gzip:   1.66 kB
+dist/assets/SystemHealth-Brs-3bq0.js                            11.88 kB │ gzip:   3.16 kB
+dist/assets/GuidelineRag-DuPRAsGh.js                            12.57 kB │ gzip:   2.54 kB
+dist/assets/AiExplainability-CV9J-yjq.js                        12.84 kB │ gzip:   2.34 kB
+dist/assets/ProfileToolPreferences-B0v-Pl7A.js                  13.51 kB │ gzip:   2.60 kB
+dist/assets/ProfilePreferences-BhWW9stb.js                      13.91 kB │ gzip:   2.20 kB
+dist/assets/AmbientScribe-DaQ10dOs.js                           14.17 kB │ gzip:   3.22 kB
+dist/assets/IntegrationStatusPanel-D-rTbbQw.js                  14.18 kB │ gzip:   3.58 kB
+dist/assets/ReassessmentDrawer-nC_bWEJX.js                      14.30 kB │ gzip:   3.53 kB
+dist/assets/IntegrationHubPage-9HOdk0i6.js                      14.50 kB │ gzip:   2.64 kB
+dist/assets/DifferentialAi-DDL4Jysq.js                          14.54 kB │ gzip:   2.62 kB
+dist/assets/PediatricDrugCalc-B6ed2okg.js                       14.91 kB │ gzip:   3.28 kB
+dist/assets/CalculatorRecommender-DzWW5sBE.js                   15.27 kB │ gzip:   3.93 kB
+dist/assets/OrderSetAi-CbFlY5rw.js                              15.57 kB │ gzip:   2.85 kB
+dist/assets/AutomationAuditTrail-DqjpIWj_.js                    15.66 kB │ gzip:   2.38 kB
+dist/assets/EmsOffloadAttentionStrip-DRJ19UNy.js                15.96 kB │ gzip:   2.03 kB
+dist/assets/PatientSummaryAi-DlBMcppL.js                        16.25 kB │ gzip:   3.04 kB
+dist/assets/HospitalMapDashboard-BnWPNT4g.js                    17.17 kB │ gzip:   3.45 kB
+dist/assets/Protocols-BG0Tt-pO.js                               17.26 kB │ gzip:   3.34 kB
+dist/assets/EdStaffWorkflowAdmin-FP9nClA7.js                    17.37 kB │ gzip:   3.19 kB
+dist/assets/DrugChecker-BP5rOJcE.js                             17.48 kB │ gzip:   3.36 kB
+dist/assets/receptionIntakeOrchestrator-CWlj_CNn.js             18.13 kB │ gzip:   6.16 kB
+dist/assets/TimelineAi-CLrX8QGG.js                              18.46 kB │ gzip:   3.33 kB
+dist/assets/ClinicalDocumentationAssistant-BHrJ_RHW.js          18.68 kB │ gzip:   4.01 kB
+dist/assets/ClinicalAlertsPage-Dnu5R9HM.js                      19.18 kB │ gzip:   3.54 kB
+dist/assets/PlatformGovernanceWorkspace-BnHMbBDj.js             19.37 kB │ gzip:   4.69 kB
+dist/assets/commandCenterThroughputModel-BVzVl313.js            19.95 kB │ gzip:   5.89 kB
+dist/assets/index-B_uNsCcS.js                                   21.92 kB │ gzip:   5.28 kB
+dist/assets/TeamManagement-DaHbc7PR.js                          22.11 kB │ gzip:   4.13 kB
+dist/assets/PatientRoomDisplay-BNg3MIoZ.js                      22.46 kB │ gzip:   4.56 kB
+dist/assets/calculators-hospital-operations-BZluqOic.js         22.50 kB │ gzip:   4.20 kB
+dist/assets/CommandPalette-DXC-7bfk.js                          22.61 kB │ gzip:   7.45 kB
+dist/assets/MedicalIotDashboard-rRtRrhLD.js                     22.79 kB │ gzip:   5.62 kB
+dist/assets/NotificationPreferences-Bh12E_i7.js                 23.36 kB │ gzip:   4.09 kB
+dist/assets/DataQualityRiskPanel-B5AcYPcV.js                    23.65 kB │ gzip:   5.94 kB
+dist/assets/useDisplayAutoRefresh-D_HaNvZv.js                   25.90 kB │ gzip:   5.30 kB
+dist/assets/calculators-endocrine-metabolic-B2dSyYjr.js         27.36 kB │ gzip:   6.00 kB
+dist/assets/SelfArrivalCheckIn-HBdOhvRl.js                      28.91 kB │ gzip:   5.57 kB
+dist/assets/calculators-neurology-gJjQu0WT.js                   29.37 kB │ gzip:   6.61 kB
+dist/assets/ReferralPanel-CB_pCfMz.js                           31.06 kB │ gzip:   6.09 kB
+dist/assets/calculators-psychiatry-screening-ESqowXzK.js        31.13 kB │ gzip:   7.37 kB
+dist/assets/LabInterpreter-CJZ-9cki.js                          31.16 kB │ gzip:   4.81 kB
+dist/assets/calculators-nephrology-D-RkOl5K.js                  32.30 kB │ gzip:   7.12 kB
+dist/assets/calculators-pulmonology-CtL52ur1.js                 32.41 kB │ gzip:   7.96 kB
+dist/assets/Profile-NInVMFcw.js                                 33.11 kB │ gzip:   6.11 kB
+dist/assets/FeatureManagement-BsRFEedF.js                       33.35 kB │ gzip:   6.50 kB
+dist/assets/vendor-icons-7ASLwGX0.js                            39.19 kB │ gzip:  12.00 kB
+dist/assets/EmergencyAnalytics-grPLqOSu.js                      40.45 kB │ gzip:   6.65 kB
+dist/assets/calculators-pediatrics-obgyn-C9EoWjd5.js            41.49 kB │ gzip:   8.67 kB
+dist/assets/DispatchConsole-Civ9bTkc.js                         41.81 kB │ gzip:   7.06 kB
+dist/assets/calculators-emergency-critical-care-BbnUXPUp.js     42.50 kB │ gzip:   9.12 kB
+dist/assets/vendor-network-D8Bd_SR2.js                          43.22 kB │ gzip:  16.92 kB
+dist/assets/vendor-firebase-Duup2K5V.js                         45.78 kB │ gzip:  13.94 kB
+dist/assets/calculators-hepatology-gi-WageQcSw.js               47.62 kB │ gzip:   7.77 kB
+dist/assets/HospitalCommandCenter-DaFATIVV.js                   48.82 kB │ gzip:   8.59 kB
+dist/assets/index-CG1DwqMY.js                                   49.23 kB │ gzip:  11.35 kB
+dist/assets/calculators-cardiology-DUfIPobX.js                  50.81 kB │ gzip:   8.61 kB
+dist/assets/calculators-mental-health-DoN7DyDc.js               54.35 kB │ gzip:   9.91 kB
+dist/assets/HelpHub-BqIcVGIl.js                                 65.55 kB │ gzip:  16.03 kB
+dist/assets/FullJourneyOperatingPage-DArvFm2P.js                73.75 kB │ gzip:  10.76 kB
+dist/assets/EMSPipeline-qnJyYHrr.js                             75.56 kB │ gzip:  13.58 kB
+dist/assets/SmartIntake-CDsmqwqh.js                             78.48 kB │ gzip:  19.53 kB
+dist/assets/ReceptionWorkspace-BguAOzWp.js                      81.57 kB │ gzip:  12.53 kB
+dist/assets/EmergencySettings-Cn_h_QYD.js                       89.68 kB │ gzip:  14.54 kB
+dist/assets/vendor-idb-Bib3O8JS.js                              98.08 kB │ gzip:  32.06 kB
+dist/assets/ToolsOverview-CXp0JScd.js                          123.07 kB │ gzip:  24.10 kB
+dist/assets/PatientDetailPanel-C4ipHg-b.js                     132.67 kB │ gzip:  26.40 kB
+dist/assets/OrganizationPages-jDmloe8t.js                      153.29 kB │ gzip:  20.33 kB
+dist/assets/vendor-charts-BW1-kPI2.js                          252.01 kB │ gzip:  65.75 kB
+dist/assets/calculators-general-clinical-BeYoQ9hZ.js           287.08 kB │ gzip:  48.65 kB
+dist/assets/index-DomcwR06.js                                  380.83 kB │ gzip:  69.21 kB
+dist/assets/vendor-B4RKYvm-.js                                 559.12 kB │ gzip: 176.42 kB
+dist/assets/index-qH8nR4Ew.js                                  784.12 kB │ gzip: 181.05 kB
+dist/assets/data-navigation-Bei4Np-S.js                        979.36 kB │ gzip: 210.31 kB
+dist/assets/calculators-DFrJEzF5.js                          1,142.43 kB │ gzip: 282.06 kB
+✓ built in 23.14s

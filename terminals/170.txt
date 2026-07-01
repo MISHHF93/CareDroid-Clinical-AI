@@ -1,0 +1,143 @@
+---
+pid: 25368
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cmd /c \"cd /d C:\\Users\\borah\\CareDroid-Clinical-AI && node scripts\\run-closure-audit-sequence.mjs\""
+started_at: 2026-07-01T03:12:21.138Z
+running_for_ms: 31979999 
+---
+Closure audit regeneration @ 29e0bce486e140c8ba250e61a2a7cdd43ea8c041
+
+→ npm run feature-coverage-matrix:write-docs
+
+> caredroid-clinical-ai@1.0.0 feature-coverage-matrix:write-docs
+> node scripts/write-feature-coverage-matrix.mjs
+
+
+> caredroid-clinical-ai@1.0.0 test:run
+> vitest run src/data/featureCoverageMatrix.report.test.js
+
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+No test files found, exiting with code 1
+
+→ npm run saas-compliance-audit:write-docs
+filter: src/data/featureCoverageMatrix.report.test.js
+include: **/*.{test,spec}.?(c|m)[jt]s?(x)
+exclude:  **/node_modules/**, **/dist/**, **/cypress/**, **/.{idea,git,cache,output,temp}/**, **/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build,eslint,prettier}.config.*, **/backend/**, **/e2e/**, **/features/future-modules/_review/**, src/pages/WorkspaceHome.test.jsx, tests/integration/**
+
+FAILED: feature-coverage-matrix:write-docs
+
+> caredroid-clinical-ai@1.0.0 saas-compliance-audit:write-docs
+> node scripts/write-saas-compliance-audit.mjs
+
+
+> caredroid-clinical-ai@1.0.0 test:run
+> vitest run src/data/saasComplianceAudit.report.test.js
+
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+No test files found, exiting with code 1
+
+→ npm run orphan-detection:write-docs
+filter: src/data/saasComplianceAudit.report.test.js
+include: **/*.{test,spec}.?(c|m)[jt]s?(x)
+exclude:  **/node_modules/**, **/dist/**, **/cypress/**, **/.{idea,git,cache,output,temp}/**, **/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build,eslint,prettier}.config.*, **/backend/**, **/e2e/**, **/features/future-modules/_review/**, src/pages/WorkspaceHome.test.jsx, tests/integration/**
+
+FAILED: saas-compliance-audit:write-docs
+
+> caredroid-clinical-ai@1.0.0 orphan-detection:write-docs
+> node scripts/write-orphan-detection-report.mjs
+
+
+> caredroid-clinical-ai@1.0.0 test:run
+> vitest run src/data/orphanDetectionAudit.report.test.js
+
+
+No test files found, exiting with code 1
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+→ npm run duplicate-system-audit:write-docs
+filter: src/data/orphanDetectionAudit.report.test.js
+include: **/*.{test,spec}.?(c|m)[jt]s?(x)
+exclude:  **/node_modules/**, **/dist/**, **/cypress/**, **/.{idea,git,cache,output,temp}/**, **/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build,eslint,prettier}.config.*, **/backend/**, **/e2e/**, **/features/future-modules/_review/**, src/pages/WorkspaceHome.test.jsx, tests/integration/**
+
+FAILED: orphan-detection:write-docs
+
+> caredroid-clinical-ai@1.0.0 duplicate-system-audit:write-docs
+> node scripts/write-duplicate-system-audit.mjs
+
+
+> caredroid-clinical-ai@1.0.0 test:run
+> vitest run src/data/duplicateSystemAudit.report.test.js
+
+
+No test files found, exiting with code 1
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+filter: src/data/duplicateSystemAudit.report.test.js
+include: **/*.{test,spec}.?(c|m)[jt]s?(x)
+exclude:  **/node_modules/**, **/dist/**, **/cypress/**, **/.{idea,git,cache,output,temp}/**, **/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build,eslint,prettier}.config.*, **/backend/**, **/e2e/**, **/features/future-modules/_review/**, src/pages/WorkspaceHome.test.jsx, tests/integration/**
+
+FAILED: duplicate-system-audit:write-docs
+→ npm run product-packaging-audit:write-docs
+
+> caredroid-clinical-ai@1.0.0 product-packaging-audit:write-docs
+> node scripts/write-product-packaging-audit.mjs
+
+
+> caredroid-clinical-ai@1.0.0 test:run
+> vitest run src/data/productPackagingAudit.report.test.js
+
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+No test files found, exiting with code 1
+
+filter: src/data/productPackagingAudit.report.test.js
+include: **/*.{test,spec}.?(c|m)[jt]s?(x)
+exclude:  **/node_modules/**, **/dist/**, **/cypress/**, **/.{idea,git,cache,output,temp}/**, **/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build,eslint,prettier}.config.*, **/backend/**, **/e2e/**, **/features/future-modules/_review/**, src/pages/WorkspaceHome.test.jsx, tests/integration/**
+
+→ npm run exposure:write-docs
+FAILED: product-packaging-audit:write-docs
+
+> caredroid-clinical-ai@1.0.0 exposure:write-docs
+> node scripts/write-backend-exposure-report.mjs
+
+
+> caredroid-clinical-ai@1.0.0 test:run
+> vitest run --testTimeout 120000 src/data/backendFrontendExposure.report.test.js
+
+
+No test files found, exiting with code 1
+
+filter: src/data/backendFrontendExposure.report.test.js
+include: **/*.{test,spec}.?(c|m)[jt]s?(x)
+exclude:  **/node_modules/**, **/dist/**, **/cypress/**, **/.{idea,git,cache,output,temp}/**, **/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build,eslint,prettier}.config.*, **/backend/**, **/e2e/**, **/features/future-modules/_review/**, src/pages/WorkspaceHome.test.jsx, tests/integration/**
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+→ npm run contract:write-docs
+FAILED: exposure:write-docs
+
+> caredroid-clinical-ai@1.0.0 contract:write-docs
+> node scripts/write-backend-frontend-tool-contract.mjs
+
+
+> caredroid-clinical-ai@1.0.0 test:run
+> vitest run src/data/backendFrontendToolContract.report.test.js
+
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+No test files found, exiting with code 1
+
+filter: src/data/backendFrontendToolContract.report.test.js
+include: **/*.{test,spec}.?(c|m)[jt]s?(x)
+exclude:  **/node_modules/**, **/dist/**, **/cypress/**, **/.{idea,git,cache,output,temp}/**, **/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build,eslint,prettier}.config.*, **/backend/**, **/e2e/**, **/features/future-modules/_review/**, src/pages/WorkspaceHome.test.jsx, tests/integration/**
+
+FAILED: contract:write-docs
+7 step(s) failed.

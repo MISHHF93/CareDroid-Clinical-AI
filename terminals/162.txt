@@ -1,0 +1,19 @@
+---
+pid: 228
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "node node_modules/vitest/vitest.mjs run src/services/aiChiefOrchestrator.test.ts src/services/alertLifecycleOrchestrator.test.ts src/config/designSystem.test.ts"
+started_at: 2026-07-01T02:40:08.321Z
+running_for_ms: 209958   
+---
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+ ✓ src/services/alertLifecycleOrchestrator.test.ts (6 tests) 28ms
+ ✓ src/services/aiChiefOrchestrator.test.ts (6 tests) 31ms
+ ✓ src/config/designSystem.test.ts (4 tests) 13ms
+
+ Test Files  3 passed (3)
+      Tests  16 passed (16)
+   Start at  22:40:09
+   Duration  17.70s (transform 1.04s, setup 2.34s, import 1.68s, tests 72ms, environment 12.43s)
+

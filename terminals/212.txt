@@ -1,0 +1,33 @@
+---
+pid: 4800
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cmd /c \"cd /d C:\\Users\\borah\\CareDroid-Clinical-AI && npm run build\""
+started_at: 2026-07-01T07:41:37.860Z
+running_for_ms: 26164986 
+---
+
+> caredroid-clinical-ai@1.0.0 build
+> npm run validate:assets && vite build
+
+
+> caredroid-clinical-ai@1.0.0 validate:assets
+> node scripts/validate-assets.mjs
+
+Asset validation passed.
+vite v7.3.5 building client environment for production...
+transforming...
+✓ 9423 modules transformed.
+✗ Build failed in 19.06s
+error during build:
+[vite:css] [postcss] postcss-import: C:\Users\borah\CareDroid-Clinical-AI\src\styles\clinical-ultrawide-layer.css:42:34: Unclosed bracket
+file: C:\Users\borah\CareDroid-Clinical-AI\src\styles\clinical-ultrawide-layer.css:42:33 (C:/Users/borah/CareDroid-Clinical-AI/src/styles/design-system.css)
+    at Input.error (C:\Users\borah\CareDroid-Clinical-AI\node_modules\postcss\lib\input.js:135:16)
+    at Parser.unclosedBracket (C:\Users\borah\CareDroid-Clinical-AI\node_modules\postcss\lib\parser.js:586:22)
+    at Parser.other (C:\Users\borah\CareDroid-Clinical-AI\node_modules\postcss\lib\parser.js:432:35)
+    at Parser.parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\postcss\lib\parser.js:479:16)
+    at parse (C:\Users\borah\CareDroid-Clinical-AI\node_modules\postcss\lib\parse.js:11:12)
+    at get root (C:\Users\borah\CareDroid-Clinical-AI\node_modules\postcss\lib\no-work-result.js:43:14)
+    at Result.get [as root] (C:\Users\borah\CareDroid-Clinical-AI\node_modules\postcss\lib\no-work-result.js:76:21)
+    at loadImportContent (file:///C:/Users/borah/CareDroid-Clinical-AI/node_modules/vite/dist/node/chunks/postcss-import.js:408:33)
+    at async Promise.all (index 0)
+    at async resolveImportId (file:///C:/Users/borah/CareDroid-Clinical-AI/node_modules/vite/dist/node/chunks/postcss-import.js:387:20)

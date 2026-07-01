@@ -3,7 +3,7 @@ pid: 30320
 cwd: "C:\Users\borah\CareDroid-Clinical-AI"
 command: "cmd /c \"cd /d C:\\Users\\borah\\CareDroid-Clinical-AI && node_modules\\.bin\\vitest run src/data/clinicalToolAliasSync.test.ts src/data/backendFrontendToolContract.test.ts src/data/backendFrontendToolContract.report.test.ts src/data/toolContractMatrix.test.ts src/data/backendFrontendExposure.test.ts --reporter=dot 2>&1\""
 started_at: 2026-06-30T23:52:39.953Z
-running_for_ms: 1509997  
+running_for_ms: 10260002 
 ---
 
  RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI

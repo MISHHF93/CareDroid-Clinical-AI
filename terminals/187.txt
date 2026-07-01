@@ -1,0 +1,467 @@
+---
+pid: 31012
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "npm.cmd run test:run -- src/components/Header.centralControl.test.tsx src/components/chrome/SessionChromeBar.test.tsx src/components/SidebarNotificationPanel.test.tsx src/components/Sidebar.test.tsx"
+started_at: 2026-07-01T05:20:53.757Z
+running_for_ms: 34609993 
+---
+
+> caredroid-clinical-ai@1.0.0 test:run
+> vitest run src/components/Header.centralControl.test.tsx src/components/chrome/SessionChromeBar.test.tsx src/components/SidebarNotificationPanel.test.tsx src/components/Sidebar.test.tsx
+
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+ ❯ src/components/Sidebar.test.tsx (6 tests | 1 failed) 3481ms
+     ✓ renders only the requested CareDroid pages for admin users  1031ms
+     ✓ renders only read-only visible pages and marks the active route 114ms
+     ✓ marks Medical Tools active without also activating Whiteboard  312ms
+     ✓ renders distinct icon keys for each pilot sidebar item  317ms
+     × renders store-derived alert and reassessment badges without explicit navigation props 1046ms
+     ✓ keeps feature-gated navigation items visible when their feature is disabled  657ms
+ ✓ src/components/chrome/SessionChromeBar.test.tsx (1 test) 56ms
+ ✓ src/components/Header.centralControl.test.tsx (2 tests) 884ms
+     ✓ renders a slim contextual header with search and create actions  765ms
+ ✓ src/components/SidebarNotificationPanel.test.tsx (1 test) 339ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+     ✓ opens from the notification shell event and lists alerts  333ms
+
+ Test Files  1 failed | 3 passed (4)
+      Tests  1 failed | 9 passed (10)
+   Start at  01:20:56
+   Duration  24.80s (transform 4.44s, setup 1.90s, import 7.85s, tests 4.76s, environment 8.88s)
+
+ FAIL  src/components/Sidebar.test.tsx > Sidebar unified navigation rendering > renders store-derived alert and reassessment badges without explicit navigation props
+TestingLibraryElementError: Unable to find role="link" and name `/queues/i`
+
+Ignored nodes: comments, script, style
+<nav
+  aria-label="Emergency desktop navigation"
+  class="sidebar-desktop-nav"
+>
+  <div
+    aria-label="Emergency utility navigation"
+    class="sidebar-desktop-nav__utility"
+  >
+    <a
+      aria-label="Medical Tools"
+      class="sidebar-nav-item sidebar-nav-item--utility"
+      data-icon-key="clinical-tools"
+      data-nav-id="tools"
+      href="/emergency/tools"
+      title="Medical Tools"
+    >
+      <svg
+        class="tabler-icon tabler-icon-stethoscope sidebar-nav-item__icon"
+        fill="none"
+        height="18"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        viewBox="0 0 24 24"
+        width="18"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M6 4h-1a2 2 0 0 0 -2 2v3.5a5.5 5.5 0 0 0 11 0v-3.5a2 2 0 0 0 -2 -2h-1"
+        />
+        <path
+          d="M8 15a6 6 0 1 0 12 0v-3"
+        />
+        <path
+          d="M11 3v2"
+        />
+        <path
+          d="M6 3v2"
+        />
+        <path
+          d="M18 10a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"
+        />
+      </svg>
+      <span
+        class="sidebar-nav-item__label"
+      >
+        Medical Tools
+      </span>
+      <span
+        class="sidebar-nav-item__tooltip"
+      >
+        Medical Tools
+      </span>
+    </a>
+    <a
+      aria-label="Account"
+      class="sidebar-nav-item sidebar-nav-item--utility"
+      data-icon-key="account"
+      data-nav-id="account"
+      href="/profile"
+      title="Account"
+    >
+      <svg
+        class="tabler-icon tabler-icon-user-circle sidebar-nav-item__icon"
+        fill="none"
+        height="18"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        viewBox="0 0 24 24"
+        width="18"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"
+        />
+        <path
+          d="M9 10a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"
+        />
+        <path
+          d="M6.168 18.849a4 4 0 0 1 3.832 -2.849h4a4 4 0 0 1 3.834 2.855"
+        />
+      </svg>
+      <span
+        class="sidebar-nav-item__label"
+      >
+        Account
+      </span>
+      <span
+        class="sidebar-nav-item__tooltip"
+      >
+        Account
+      </span>
+    </a>
+  </div>
+  <div
+    aria-label="Demo user switcher"
+    class="sidebar-desktop-nav__demo-switcher"
+  >
+    <label
+      class="demo-user-switcher"
+    >
+      <div
+        class="demo-user-switcher__header"
+      >
+        Demo user 
+        <span
+          class="demo-user-switcher__badge"
+        >
+          DEMO
+        </span>
+      </div>
+      <select
+        aria-label="Switch demo user"
+        class="demo-user-switcher__select"
+      >
+        <option
+          value="demo-maya-chen"
+        >
+          Dr. Maya Chen
+           (
+          Emergency Physician
+          )
+        </option>
+        <option
+          value="demo-omar-patel"
+        >
+          Nurse Omar Patel
+           (
+          Charge Nurse
+          )
+        </option>
+        <option
+          value="demo-sofia-alvarez"
+        >
+          Nurse Sofia Alvarez
+           (
+          Triage Nurse
+          )
+        </option>
+        <option
+          value="demo-grace-kim"
+        >
+          Grace Kim
+           (
+          Registration Clerk
+          )
+        </option>
+        <option
+          value="demo-aisha-morgan"
+        >
+          Dr. Aisha Morgan
+           (
+          ED Director
+          )
+        </option>
+        <option
+          value="demo-leo-brooks"
+        >
+          Leo Brooks
+           (
+          Patient Flow Coordinator
+          )
+        </option>
+        <option
+          value="demo-samuel-okafor"
+        >
+          Dr. Samuel Okafor
+           (
+          Specialist
+          )
+        </option>
+        <option
+          value="demo-elena-rossi"
+        >
+          Dr. Elena Rossi
+           (
+          Specialist
+          )
+        </option>
+        <option
+          value="demo-priya-shah"
+        >
+          Priya Shah
+           (
+          Pharmacist
+          )
+        </option>
+        <option
+          value="demo-marcus-lee"
+        >
+          Marcus Lee
+           (
+          Lab Technician
+          )
+        </option>
+        <option
+          value="demo-hannah-wright"
+        >
+          Hannah Wright
+           (
+          Radiology Technician
+          )
+        </option>
+        <option
+          value="demo-jordan-miles"
+        >
+          Jordan Miles
+           (
+          Hospital Admin
+          )
+        </option>
+        <option
+          value="demo-riley-thompson"
+        >
+          Riley Thompson
+           (
+          IT Admin
+          )
+        </option>
+        <option
+          value="demo-morgan-ellis"
+        >
+          mMorgan Ellis
+           (
+          Quality & Safety Officer
+          )
+        </option>
+        <option
+          value="demo-alex-rivera"
+        >
+          Alex Rivera
+           (
+          Paramedic
+          )
+        </option>
+        <option
+          value="demo-viewer"
+        >
+          Demo Viewer
+           (
+          Demo Observer
+          )
+        </option>
+      </select>
+    </label>
+  </div>
+</nav>
+
+Ignored nodes: comments, script, style
+<html>
+  <head />
+  <body>
+    <div>
+      <aside
+        aria-label="Emergency navigation"
+        class="sidebar"
+      >
+        <div
+          aria-hidden="true"
+          class="sidebar__brand"
+        >
+          <div
+            class="sidebar__brand-mark"
+          >
+            C
+          </div>
+          <span
+            class="sidebar__brand-name"
+          >
+            CareDroid
+          </span>
+        </div>
+        <nav
+          aria-label="Emergency desktop navigation"
+          class="sidebar-desktop-nav"
+        >
+          <div
+            aria-label="Emergency utility navigation"
+            class="sidebar-desktop-nav__utility"
+          >
+            <a
+              aria-label="Medical Tools"
+              class="sidebar-nav-item sidebar-nav-item--utility"
+              data-icon-key="clinical-tools"
+              data-nav-id="tools"
+              href="/emergency/tools"
+              title="Medical Tools"
+            >
+              <svg
+                class="tabler-icon tabler-icon-stethoscope sidebar-nav-item__icon"
+                fill="none"
+                height="18"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="18"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M6 4h-1a2 2 0 0 0 -2 2v3.5a5.5 5.5 0 0 0 11 0v-3.5a2 2 0 0 0 -2 -2h-1"
+                />
+                <path
+                  d="M8 15a6 6 0 1 0 12 0v-3"
+                />
+                <path
+                  d="M11 3v2"
+                />
+                <path
+                  d="M6 3v2"
+                />
+                <path
+                  d="M18 10a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"
+                />
+              </svg>
+              <span
+                class="sidebar-nav-item__label"
+              >
+                Medical Tools
+              </span>
+              <span
+                class="sidebar-nav-item__tooltip"
+              >
+                Medical Tools
+              </span>
+            </a>
+            <a
+              aria-label="Account"
+              class="sidebar-nav-item sidebar-nav-item--utility"
+              data-icon-key="account"
+              data-nav-id="account"
+              href="/profile"
+              title="Account"
+            >
+              <svg
+                class="tabler-icon tabler-icon-user-circle sidebar-nav-item__icon"
+                fill="none"
+                height="18"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="18"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"
+                />
+                <path
+                  d="M9 10a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"
+                />
+                <path
+                  d="M6.168 18.849a4 4 0 0 1 3.832 -2.849h4a4 4 0 0 1 3.834 2.855"
+                />
+              </svg>
+              <span
+                class="sidebar-nav-item__label"
+              >
+                Account
+              </span>
+              <span
+                class="sidebar-nav-item__tooltip"
+              >
+                Account
+              </span>
+            </a>
+          </div>
+          <div
+            aria-label="Demo user switcher"
+            class="sidebar-desktop-nav__demo-switcher"
+          >
+            <label
+              class="demo-user-switcher"
+            >
+              <div
+                class="demo-user-switcher__header"
+              >
+                Demo user 
+                <span
+                  class="demo-user-switcher__badge"
+                >
+                  DEMO
+                </span>
+              </div>
+              <select
+                aria-label="Switch demo user"
+                class="demo-user-switcher__select"
+              >
+                <option
+                  value="demo-maya-chen"
+                >
+                  Dr. Maya Chen
+                   (
+                  Emergency Physician
+                  )
+                </option>
+                <option
+                  value="demo-omar-patel"
+                >
+                  Nurse Omar Patel
+                   (
+                  Charge Nurse
+                  )
+                </option>
+                <option
+                  value="demo-sofia-alvarez"
+                >
+                  Nurse Sofia Alvarez
+                   (
+                  Triage Nurse
+                  )
+       ...
+ ❯ Proxy.waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ src/components/Sidebar.test.tsx:143:11
+    141|     );
+    142|
+    143|     await waitFor(() => {
+       |           ^
+    144|       expect(desktopNav.getByRole('link', { name: /queues/i })).toBeTr…
+    145|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+

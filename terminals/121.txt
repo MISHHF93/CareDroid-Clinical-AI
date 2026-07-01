@@ -3,7 +3,7 @@ pid: 13116
 cwd: "C:\Users\borah\CareDroid-Clinical-AI"
 command: "Set-Location \"C:\\Users\\borah\\CareDroid-Clinical-AI\"; npm.cmd run test:alias-sync; npm.cmd run test:contract-matrix; npm.cmd run test:backend-exposure"
 started_at: 2026-06-30T22:57:57.406Z
-running_for_ms: 4790000  
+running_for_ms: 13540004 
 ---
 
 > caredroid-clinical-ai@1.0.0 test:alias-sync

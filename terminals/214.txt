@@ -1,0 +1,49 @@
+---
+pid: 6580
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cmd /c \"cd /d C:\\Users\\borah\\CareDroid-Clinical-AI && set QA_BASE_URL=http://localhost:4173 && npm run qa:shell-responsive\""
+started_at: 2026-07-01T07:47:44.611Z
+running_for_ms: 25799995 
+---
+
+> caredroid-clinical-ai@1.0.0 qa:shell-responsive
+> node scripts/capture-shell-responsive-screenshots.mjs
+
+Capturing whiteboard @ 390x844
+Capturing whiteboard @ 768x1024
+Capturing whiteboard @ 1440x900
+Capturing whiteboard @ 1920x1080
+Capturing whiteboard @ 2560x1440
+Capturing whiteboard @ 3440x1440
+Capturing command-center @ 390x844
+Capturing command-center @ 768x1024
+Capturing command-center @ 1440x900
+Capturing command-center @ 1920x1080
+Capturing command-center @ 2560x1440
+Capturing command-center @ 3440x1440
+Capturing ems @ 390x844
+Capturing ems @ 768x1024
+Capturing ems @ 1440x900
+Capturing ems @ 1920x1080
+Capturing ems @ 2560x1440
+Capturing ems @ 3440x1440
+Capturing reception @ 390x844
+Capturing reception @ 768x1024
+Capturing reception @ 1440x900
+Capturing reception @ 1920x1080
+Capturing reception @ 2560x1440
+Capturing reception @ 3440x1440
+Capturing copilot @ 390x844
+Capturing copilot @ 768x1024
+Capturing copilot @ 1440x900
+Capturing copilot @ 1920x1080
+Capturing copilot @ 2560x1440
+Capturing copilot @ 3440x1440
+Capturing tools @ 390x844
+Capturing tools @ 768x1024
+Capturing tools @ 1440x900
+Capturing tools @ 1920x1080
+Capturing tools @ 2560x1440
+Capturing tools @ 3440x1440
+Wrote qa/shell-ux-audit/responsive/shell-responsive-report.json
+Captured 36/36; overflow issues: 0

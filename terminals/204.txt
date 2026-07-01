@@ -1,0 +1,75 @@
+---
+pid: 7440
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cd \"C:\\Users\\borah\\CareDroid-Clinical-AI\"; npm.cmd run qa:shell-responsive"
+started_at: 2026-07-01T06:52:18.537Z
+running_for_ms: 29124999 
+---
+
+> caredroid-clinical-ai@1.0.0 qa:shell-responsive
+> node scripts/capture-shell-responsive-screenshots.mjs
+
+Capturing whiteboard @ 390x844
+Capturing whiteboard @ 768x1024
+  failed: page.waitForFunction: Timeout 120000ms exceeded.
+Capturing whiteboard @ 1440x900
+  failed: page.waitForFunction: Timeout 120000ms exceeded.
+Capturing whiteboard @ 1920x1080
+  failed: page.waitForFunction: Timeout 120000ms exceeded.
+Capturing whiteboard @ 2560x1440
+  failed: page.waitForFunction: Timeout 120000ms exceeded.
+Capturing whiteboard @ 3440x1440
+  failed: page.waitForFunction: Timeout 120000ms exceeded.
+Capturing command-center @ 390x844
+  failed: page.waitForFunction: Timeout 120000ms exceeded.
+Capturing command-center @ 768x1024
+  failed: page.waitForFunction: Timeout 120000ms exceeded.
+Capturing command-center @ 1440x900
+  failed: page.waitForFunction: Timeout 120000ms exceeded.
+Capturing command-center @ 1920x1080
+  failed: page.waitForFunction: Timeout 120000ms exceeded.
+Capturing command-center @ 2560x1440
+  failed: page.waitForFunction: Timeout 120000ms exceeded.
+Capturing command-center @ 3440x1440
+  failed: page.waitForFunction: Timeout 120000ms exceeded.
+Capturing ems @ 390x844
+  failed: page.waitForFunction: Timeout 120000ms exceeded.
+Capturing ems @ 768x1024
+  failed: page.waitForFunction: Timeout 120000ms exceeded.
+Capturing ems @ 1440x900
+  failed: page.waitForFunction: Timeout 120000ms exceeded.
+Capturing ems @ 1920x1080
+  failed: page.waitForFunction: Timeout 120000ms exceeded.
+Capturing ems @ 2560x1440
+  failed: page.waitForFunction: Timeout 120000ms exceeded.
+Capturing ems @ 3440x1440
+  failed: page.waitForFunction: Timeout 120000ms exceeded.
+Capturing reception @ 390x844
+  failed: page.waitForFunction: Timeout 120000ms exceeded.
+Capturing reception @ 768x1024
+  failed: page.waitForFunction: Timeout 120000ms exceeded.
+Capturing reception @ 1440x900
+  failed: page.waitForFunction: Timeout 120000ms exceeded.
+Capturing reception @ 1920x1080
+  failed: page.waitForFunction: Timeout 120000ms exceeded.
+Capturing reception @ 2560x1440
+  failed: page.waitForFunction: Timeout 120000ms exceeded.
+Capturing reception @ 3440x1440
+  failed: page.waitForFunction: Timeout 120000ms exceeded.
+Capturing copilot @ 390x844
+  failed: page.waitForFunction: Timeout 120000ms exceeded.
+Capturing copilot @ 768x1024
+  failed: page.waitForFunction: Timeout 120000ms exceeded.
+Capturing copilot @ 1440x900
+  failed: page.waitForFunction: Timeout 120000ms exceeded.
+Capturing copilot @ 1920x1080
+Capturing copilot @ 2560x1440
+Capturing copilot @ 3440x1440
+Capturing tools @ 390x844
+Capturing tools @ 768x1024
+Capturing tools @ 1440x900
+Capturing tools @ 1920x1080
+Capturing tools @ 2560x1440
+Capturing tools @ 3440x1440
+Wrote qa/shell-ux-audit/responsive/shell-responsive-report.json
+Captured 10/36; overflow issues: 0

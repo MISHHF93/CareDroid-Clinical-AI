@@ -1,0 +1,88 @@
+---
+pid: 24212
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "node node_modules/vitest/vitest.mjs run src/services/clinicalChatService.test.ts src/config/semanticColorSystem.test.ts"
+started_at: 2026-07-01T02:30:54.272Z
+running_for_ms: 765003   
+---
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+stdout | src/services/clinicalChatService.test.ts > clinicalChatService > sendClinicalChatMessage routes COPILOT_CHAT through AI Chief orchestrator
+[AI_AUDIT] {
+  userId: 'current-user',
+  tenantId: 'default-tenant',
+  purpose: 'CareDroid operational support',
+  module: 'ed-copilot',
+  action: 'ai_chat_request',
+  result: 'allowed',
+  requestType: 'COPILOT_CHAT',
+  inputPreview: 'capacity status',
+  safety: { requiresHumanReview: true, blocked: false, reasons: [] },
+  timestamp: '2026-07-01T02:31:02.336Z'
+}
+
+stdout | src/services/clinicalChatService.test.ts > clinicalChatService > sendClinicalChatMessage posts JSON
+[AI_AUDIT] {
+  userId: 'current-user',
+  tenantId: 'default-tenant',
+  purpose: 'CareDroid operational support',
+  module: 'ed-copilot',
+  action: 'ai_chat_request',
+  result: 'allowed',
+  requestType: 'UNKNOWN',
+  inputPreview: 'hi',
+  safety: { requiresHumanReview: true, blocked: false, reasons: [] },
+  timestamp: '2026-07-01T02:31:02.343Z'
+}
+
+stdout | src/services/clinicalChatService.test.ts > clinicalChatService > sendClinicalChatMessage includes matching knowledge base articles before assistant routing
+[AI_AUDIT] {
+  userId: 'current-user',
+  tenantId: 'default-tenant',
+  purpose: 'CareDroid operational support',
+  module: 'ed-copilot',
+  action: 'ai_chat_request',
+  result: 'allowed',
+  requestType: 'UNKNOWN',
+  inputPreview: 'How do I fix tenant context access?',
+  safety: { requiresHumanReview: true, blocked: false, reasons: [] },
+  timestamp: '2026-07-01T02:31:02.345Z'
+}
+
+stdout | src/services/clinicalChatService.test.ts > clinicalChatService > sendClinicalChatMessage includes sanitized memory fabric context when provided
+[AI_AUDIT] {
+  userId: 'current-user',
+  tenantId: 'default-tenant',
+  purpose: 'CareDroid operational support',
+  module: 'ed-copilot',
+  action: 'ai_chat_request',
+  result: 'allowed',
+  requestType: 'UNKNOWN',
+  inputPreview: 'Use my workspace context',
+  safety: { requiresHumanReview: true, blocked: false, reasons: [] },
+  timestamp: '2026-07-01T02:31:02.347Z'
+}
+
+stdout | src/services/clinicalChatService.test.ts > clinicalChatService > sendClinicalChatMessage includes SaaS workspace context when provided
+[AI_AUDIT] {
+  userId: 'current-user',
+  tenantId: 'default-tenant',
+  purpose: 'CareDroid operational support',
+  module: 'ed-copilot',
+  action: 'ai_chat_request',
+  result: 'allowed',
+  requestType: 'UNKNOWN',
+  inputPreview: 'what should I use for chest pain?',
+  safety: { requiresHumanReview: true, blocked: false, reasons: [] },
+  timestamp: '2026-07-01T02:31:02.349Z'
+}
+
+ ✓ src/services/clinicalChatService.test.ts (13 tests) 105ms
+ ✓ src/config/semanticColorSystem.test.ts (4 tests) 15ms
+
+ Test Files  2 passed (2)
+      Tests  17 passed (17)
+   Start at  22:30:55
+   Duration  13.40s (transform 929ms, setup 1.34s, import 1.04s, tests 120ms, environment 9.90s)
+

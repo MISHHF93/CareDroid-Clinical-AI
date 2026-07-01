@@ -1,0 +1,24 @@
+---
+pid: 4792
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cd \"C:\\Users\\borah\\CareDroid-Clinical-AI\"; node node_modules/typescript/bin/tsc --noEmit -p tsconfig.frontend.json 2>&1"
+started_at: 2026-07-01T01:23:15.771Z
+running_for_ms: 4825006  
+---
+src/pages/emergency/index.tsx(2325,15): error TS2322: Type 'EmergencyOsSettings' is not assignable to type 'null | undefined'.
+src/pages/emergency/ReceptionWorkspace.tsx(525,9): error TS2322: Type 'string' is not assignable to type 'null | undefined'.
+src/services/aiChiefOrchestrator.ts(286,60): error TS2339: Property 'userRole' does not exist on type 'Record<string, unknown> | DepartmentContext'.
+  Property 'userRole' does not exist on type 'DepartmentContext'.
+src/services/aiChiefOrchestrator.ts(386,55): error TS2345: Argument of type '{ requestType: "COPILOT_CHAT"; message: string; messages: { role: "user"; content: string; }[]; patientId: string | undefined; sourceScreen: string; profile: Readonly<{ id: string; employeeId: string; ... 44 more ...; lastActiveAt: string; }> | null | undefined; context: { ...; }; }' is not assignable to parameter of type 'AIChiefConversationalRequest'.
+  Property 'systemPrompt' is missing in type '{ requestType: "COPILOT_CHAT"; message: string; messages: { role: "user"; content: string; }[]; patientId: string | undefined; sourceScreen: string; profile: Readonly<{ id: string; employeeId: string; ... 44 more ...; lastActiveAt: string; }> | null | undefined; context: { ...; }; }' but required in type 'AIRequest'.
+src/services/alertLifecycleOrchestrator.ts(141,5): error TS2322: Type '"alert_lifecycle"' is not assignable to type 'WorkflowActionType'.
+src/services/alertLifecycleOrchestrator.ts(245,7): error TS2322: Type '{} | null' is not assignable to type 'string | number | boolean | null | undefined'.
+  Type '{}' is not assignable to type 'string | number | boolean | null | undefined'.
+src/services/alertLifecycleOrchestrator.ts(272,7): error TS2322: Type '{} | null' is not assignable to type 'string | number | boolean | null | undefined'.
+  Type '{}' is not assignable to type 'string | number | boolean | null | undefined'.
+src/services/emergencyCareJourneyOrchestrator.ts(39,31): error TS2322: Type '"Urgent"' is not assignable to type 'EMSSeverity'.
+src/services/emergencyCareJourneyOrchestrator.ts(40,3): error TS2322: Type '"Stable"' is not assignable to type 'EMSSeverity'.
+src/services/emergencyCareJourneyOrchestrator.ts(68,5): error TS2322: Type '"unknown" | "male" | "female"' is not assignable to type 'Sex'.
+  Type '"unknown"' is not assignable to type 'Sex'. Did you mean '"Unknown"'?
+src/services/receptionIntakeOrchestrator.ts(680,7): error TS2741: Property '"self-check-in"' is missing in type '{ 'walk-in': "walk-in"; EMS: "ambulance-arrival"; referral: "referral"; transfer: "transfer"; police: "staff-created-emergency"; }' but required in type 'Record<ArrivalMode, ReceptionArrivalType>'.
+src/store/emergencyStore.ts(4489,11): error TS2322: Type 'unknown' is not assignable to type 'string | undefined'.
