@@ -47,6 +47,13 @@
 
 .hospital-command-center__actions .cdl-command-action-card {
   min-height: 11rem;
+  max-width: 100%;
+}
+
+@media (min-width: 2560px) {
+  .hospital-command-center__actions .cdl-command-action-card {
+    min-height: 10rem;
+  }
 }
 
 .sidebar-nav-item--active .sidebar-nav-item__icon {

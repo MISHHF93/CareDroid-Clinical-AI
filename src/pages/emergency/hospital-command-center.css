@@ -67,6 +67,13 @@
   line-height: 1.35;
 }
 
+.hospital-command-center__actions {
+  display: grid;
+  gap: var(--app-layout-panel-gap, var(--ed-space-3, 12px));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  align-items: stretch;
+}
+
 .hospital-command-center__panels {
   display: grid;
   gap: var(--app-layout-panel-gap, var(--ed-space-3, 12px));

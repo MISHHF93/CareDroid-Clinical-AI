@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-07-01T07:28:22.188Z",
-  "baseUrl": "http://localhost:4173",
+  "generatedAt": "2026-07-01T07:48:44.208Z",
+  "baseUrl": "http://localhost:4173 ",
   "outputDir": "qa/shell-ux-audit/responsive",
   "previewDir": "qa/shell-ux-audit/responsive/previews",
   "previewViewport": {
@@ -100,7 +100,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:27:21.881Z",
+      "startedAt": "2026-07-01T07:47:46.135Z",
       "finalUrl": "http://localhost:4173/emergency/whiteboard",
       "heading": "Board",
       "screenshotPath": "qa/shell-ux-audit/responsive/whiteboard--390x844.png",
@@ -130,7 +130,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:27:23.302Z",
+      "startedAt": "2026-07-01T07:47:47.577Z",
       "finalUrl": "http://localhost:4173/emergency/whiteboard",
       "heading": "Board",
       "screenshotPath": "qa/shell-ux-audit/responsive/whiteboard--768x1024.png",
@@ -160,7 +160,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:27:24.627Z",
+      "startedAt": "2026-07-01T07:47:48.875Z",
       "finalUrl": "http://localhost:4173/emergency/whiteboard",
       "heading": "Board",
       "screenshotPath": "qa/shell-ux-audit/responsive/whiteboard--1440x900.png",
@@ -190,7 +190,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:27:25.957Z",
+      "startedAt": "2026-07-01T07:47:50.256Z",
       "finalUrl": "http://localhost:4173/emergency/whiteboard",
       "heading": "Board",
       "screenshotPath": "qa/shell-ux-audit/responsive/whiteboard--1920x1080.png",
@@ -220,7 +220,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:27:27.251Z",
+      "startedAt": "2026-07-01T07:47:51.607Z",
       "finalUrl": "http://localhost:4173/emergency/whiteboard",
       "heading": "Board",
       "screenshotPath": "qa/shell-ux-audit/responsive/whiteboard--2560x1440.png",
@@ -230,10 +230,10 @@
         "docScrollWidth": 2560,
         "shellWidth": 2328,
         "shellLeft": 232,
-        "pageWidth": 1880,
-        "pageLeft": 452,
-        "pageMaxWidth": "min(100%, 1880px)",
-        "shellPaddingInline": "40px"
+        "pageWidth": 2100,
+        "pageLeft": 342,
+        "pageMaxWidth": "min(100%, 2100px)",
+        "shellPaddingInline": "48px"
       },
       "docOverflowPx": 0,
       "error": ""
@@ -250,7 +250,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:27:28.577Z",
+      "startedAt": "2026-07-01T07:47:52.927Z",
       "finalUrl": "http://localhost:4173/emergency/whiteboard",
       "heading": "Board",
       "screenshotPath": "qa/shell-ux-audit/responsive/whiteboard--3440x1440.png",
@@ -260,10 +260,10 @@
         "docScrollWidth": 3440,
         "shellWidth": 3208,
         "shellLeft": 232,
-        "pageWidth": 1880,
-        "pageLeft": 892,
-        "pageMaxWidth": "min(100%, 1880px)",
-        "shellPaddingInline": "40px"
+        "pageWidth": 2400,
+        "pageLeft": 632,
+        "pageMaxWidth": "min(100%, 2400px)",
+        "shellPaddingInline": "48px"
       },
       "docOverflowPx": 0,
       "error": ""
@@ -280,7 +280,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:27:29.970Z",
+      "startedAt": "2026-07-01T07:47:54.278Z",
       "finalUrl": "http://localhost:4173/emergency/command-center",
       "heading": "Real-Time ED Operations",
       "screenshotPath": "qa/shell-ux-audit/responsive/command-center--390x844.png",
@@ -310,7 +310,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:27:31.323Z",
+      "startedAt": "2026-07-01T07:47:55.669Z",
       "finalUrl": "http://localhost:4173/emergency/command-center",
       "heading": "Real-Time ED Operations",
       "screenshotPath": "qa/shell-ux-audit/responsive/command-center--768x1024.png",
@@ -340,7 +340,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:27:32.754Z",
+      "startedAt": "2026-07-01T07:47:57.117Z",
       "finalUrl": "http://localhost:4173/emergency/command-center",
       "heading": "Real-Time ED Operations",
       "screenshotPath": "qa/shell-ux-audit/responsive/command-center--1440x900.png",
@@ -370,7 +370,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:27:34.088Z",
+      "startedAt": "2026-07-01T07:47:58.543Z",
       "finalUrl": "http://localhost:4173/emergency/command-center",
       "heading": "Real-Time ED Operations",
       "screenshotPath": "qa/shell-ux-audit/responsive/command-center--1920x1080.png",
@@ -400,7 +400,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:27:35.516Z",
+      "startedAt": "2026-07-01T07:47:59.984Z",
       "finalUrl": "http://localhost:4173/emergency/command-center",
       "heading": "Real-Time ED Operations",
       "screenshotPath": "qa/shell-ux-audit/responsive/command-center--2560x1440.png",
@@ -410,10 +410,10 @@
         "docScrollWidth": 2560,
         "shellWidth": 2328,
         "shellLeft": 232,
-        "pageWidth": 1880,
-        "pageLeft": 452,
-        "pageMaxWidth": "min(100%, 1880px)",
-        "shellPaddingInline": "40px"
+        "pageWidth": 2100,
+        "pageLeft": 342,
+        "pageMaxWidth": "min(100%, 2100px)",
+        "shellPaddingInline": "48px"
       },
       "docOverflowPx": 0,
       "error": ""
@@ -430,7 +430,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:27:36.920Z",
+      "startedAt": "2026-07-01T07:48:01.580Z",
       "finalUrl": "http://localhost:4173/emergency/command-center",
       "heading": "Real-Time ED Operations",
       "screenshotPath": "qa/shell-ux-audit/responsive/command-center--3440x1440.png",
@@ -440,10 +440,10 @@
         "docScrollWidth": 3440,
         "shellWidth": 3208,
         "shellLeft": 232,
-        "pageWidth": 1880,
-        "pageLeft": 892,
-        "pageMaxWidth": "min(100%, 1880px)",
-        "shellPaddingInline": "40px"
+        "pageWidth": 2400,
+        "pageLeft": 632,
+        "pageMaxWidth": "min(100%, 2400px)",
+        "shellPaddingInline": "48px"
       },
       "docOverflowPx": 0,
       "error": ""
@@ -460,7 +460,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:27:38.368Z",
+      "startedAt": "2026-07-01T07:48:03.085Z",
       "finalUrl": "http://localhost:4173/emergency/ems",
       "heading": "EMS Coordination",
       "screenshotPath": "qa/shell-ux-audit/responsive/ems--390x844.png",
@@ -490,7 +490,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:27:41.154Z",
+      "startedAt": "2026-07-01T07:48:05.883Z",
       "finalUrl": "http://localhost:4173/emergency/ems",
       "heading": "EMS Coordination",
       "screenshotPath": "qa/shell-ux-audit/responsive/ems--768x1024.png",
@@ -520,7 +520,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:27:44.469Z",
+      "startedAt": "2026-07-01T07:48:08.750Z",
       "finalUrl": "http://localhost:4173/emergency/ems",
       "heading": "EMS Coordination",
       "screenshotPath": "qa/shell-ux-audit/responsive/ems--1440x900.png",
@@ -550,7 +550,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:27:48.024Z",
+      "startedAt": "2026-07-01T07:48:12.069Z",
       "finalUrl": "http://localhost:4173/emergency/ems",
       "heading": "EMS Coordination",
       "screenshotPath": "qa/shell-ux-audit/responsive/ems--1920x1080.png",
@@ -580,7 +580,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:27:51.038Z",
+      "startedAt": "2026-07-01T07:48:14.824Z",
       "finalUrl": "http://localhost:4173/emergency/ems",
       "heading": "EMS Coordination",
       "screenshotPath": "qa/shell-ux-audit/responsive/ems--2560x1440.png",
@@ -590,10 +590,10 @@
         "docScrollWidth": 2560,
         "shellWidth": 2328,
         "shellLeft": 232,
-        "pageWidth": 1880,
-        "pageLeft": 452,
-        "pageMaxWidth": "min(100%, 1880px)",
-        "shellPaddingInline": "40px"
+        "pageWidth": 2100,
+        "pageLeft": 342,
+        "pageMaxWidth": "min(100%, 2100px)",
+        "shellPaddingInline": "48px"
       },
       "docOverflowPx": 0,
       "error": ""
@@ -610,7 +610,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:27:53.784Z",
+      "startedAt": "2026-07-01T07:48:16.804Z",
       "finalUrl": "http://localhost:4173/emergency/ems",
       "heading": "EMS Coordination",
       "screenshotPath": "qa/shell-ux-audit/responsive/ems--3440x1440.png",
@@ -620,10 +620,10 @@
         "docScrollWidth": 3440,
         "shellWidth": 3208,
         "shellLeft": 232,
-        "pageWidth": 1880,
-        "pageLeft": 892,
-        "pageMaxWidth": "min(100%, 1880px)",
-        "shellPaddingInline": "40px"
+        "pageWidth": 2400,
+        "pageLeft": 632,
+        "pageMaxWidth": "min(100%, 2400px)",
+        "shellPaddingInline": "48px"
       },
       "docOverflowPx": 0,
       "error": ""
@@ -640,7 +640,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:27:56.822Z",
+      "startedAt": "2026-07-01T07:48:18.668Z",
       "finalUrl": "http://localhost:4173/emergency/reception",
       "heading": "Arrival Dashboard",
       "screenshotPath": "qa/shell-ux-audit/responsive/reception--390x844.png",
@@ -670,7 +670,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:27:58.516Z",
+      "startedAt": "2026-07-01T07:48:20.287Z",
       "finalUrl": "http://localhost:4173/emergency/reception",
       "heading": "Arrival Dashboard",
       "screenshotPath": "qa/shell-ux-audit/responsive/reception--768x1024.png",
@@ -700,7 +700,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:27:59.702Z",
+      "startedAt": "2026-07-01T07:48:21.601Z",
       "finalUrl": "http://localhost:4173/emergency/reception",
       "heading": "Arrival Dashboard",
       "screenshotPath": "qa/shell-ux-audit/responsive/reception--1440x900.png",
@@ -730,7 +730,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:28:00.974Z",
+      "startedAt": "2026-07-01T07:48:22.937Z",
       "finalUrl": "http://localhost:4173/emergency/reception",
       "heading": "Arrival Dashboard",
       "screenshotPath": "qa/shell-ux-audit/responsive/reception--1920x1080.png",
@@ -760,7 +760,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:28:02.336Z",
+      "startedAt": "2026-07-01T07:48:24.231Z",
       "finalUrl": "http://localhost:4173/emergency/reception",
       "heading": "Arrival Dashboard",
       "screenshotPath": "qa/shell-ux-audit/responsive/reception--2560x1440.png",
@@ -770,10 +770,10 @@
         "docScrollWidth": 2560,
         "shellWidth": 2328,
         "shellLeft": 232,
-        "pageWidth": 1880,
-        "pageLeft": 452,
-        "pageMaxWidth": "min(100%, 1880px)",
-        "shellPaddingInline": "40px"
+        "pageWidth": 2100,
+        "pageLeft": 342,
+        "pageMaxWidth": "min(100%, 2100px)",
+        "shellPaddingInline": "48px"
       },
       "docOverflowPx": 0,
       "error": ""
@@ -790,7 +790,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:28:03.708Z",
+      "startedAt": "2026-07-01T07:48:25.558Z",
       "finalUrl": "http://localhost:4173/emergency/reception",
       "heading": "Arrival Dashboard",
       "screenshotPath": "qa/shell-ux-audit/responsive/reception--3440x1440.png",
@@ -800,10 +800,10 @@
         "docScrollWidth": 3440,
         "shellWidth": 3208,
         "shellLeft": 232,
-        "pageWidth": 1880,
-        "pageLeft": 892,
-        "pageMaxWidth": "min(100%, 1880px)",
-        "shellPaddingInline": "40px"
+        "pageWidth": 2400,
+        "pageLeft": 632,
+        "pageMaxWidth": "min(100%, 2400px)",
+        "shellPaddingInline": "48px"
       },
       "docOverflowPx": 0,
       "error": ""
@@ -820,7 +820,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:28:05.069Z",
+      "startedAt": "2026-07-01T07:48:26.910Z",
       "finalUrl": "http://localhost:4173/emergency/whiteboard",
       "heading": "Board",
       "screenshotPath": "qa/shell-ux-audit/responsive/copilot--390x844.png",
@@ -850,7 +850,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:28:06.593Z",
+      "startedAt": "2026-07-01T07:48:28.379Z",
       "finalUrl": "http://localhost:4173/emergency/whiteboard",
       "heading": "Board",
       "screenshotPath": "qa/shell-ux-audit/responsive/copilot--768x1024.png",
@@ -880,7 +880,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:28:07.970Z",
+      "startedAt": "2026-07-01T07:48:29.901Z",
       "finalUrl": "http://localhost:4173/emergency/whiteboard",
       "heading": "Board",
       "screenshotPath": "qa/shell-ux-audit/responsive/copilot--1440x900.png",
@@ -910,7 +910,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:28:09.510Z",
+      "startedAt": "2026-07-01T07:48:31.431Z",
       "finalUrl": "http://localhost:4173/emergency/whiteboard",
       "heading": "Board",
       "screenshotPath": "qa/shell-ux-audit/responsive/copilot--1920x1080.png",
@@ -940,7 +940,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:28:11.050Z",
+      "startedAt": "2026-07-01T07:48:33.031Z",
       "finalUrl": "http://localhost:4173/emergency/whiteboard",
       "heading": "Board",
       "screenshotPath": "qa/shell-ux-audit/responsive/copilot--2560x1440.png",
@@ -950,10 +950,10 @@
         "docScrollWidth": 2560,
         "shellWidth": 2028,
         "shellLeft": 232,
-        "pageWidth": 1880,
-        "pageLeft": 302,
-        "pageMaxWidth": "min(100%, 1880px)",
-        "shellPaddingInline": "40px"
+        "pageWidth": 1924,
+        "pageLeft": 280,
+        "pageMaxWidth": "min(100%, 2100px)",
+        "shellPaddingInline": "48px"
       },
       "docOverflowPx": 0,
       "error": ""
@@ -970,7 +970,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:28:12.685Z",
+      "startedAt": "2026-07-01T07:48:34.450Z",
       "finalUrl": "http://localhost:4173/emergency/whiteboard",
       "heading": "Board",
       "screenshotPath": "qa/shell-ux-audit/responsive/copilot--3440x1440.png",
@@ -980,10 +980,10 @@
         "docScrollWidth": 3440,
         "shellWidth": 2908,
         "shellLeft": 232,
-        "pageWidth": 1880,
-        "pageLeft": 742,
-        "pageMaxWidth": "min(100%, 1880px)",
-        "shellPaddingInline": "40px"
+        "pageWidth": 2400,
+        "pageLeft": 482,
+        "pageMaxWidth": "min(100%, 2400px)",
+        "shellPaddingInline": "48px"
       },
       "docOverflowPx": 0,
       "error": ""
@@ -1000,7 +1000,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:28:14.220Z",
+      "startedAt": "2026-07-01T07:48:35.930Z",
       "finalUrl": "http://localhost:4173/emergency/tools",
       "heading": "Medical Tools",
       "screenshotPath": "qa/shell-ux-audit/responsive/tools--390x844.png",
@@ -1030,7 +1030,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:28:15.578Z",
+      "startedAt": "2026-07-01T07:48:37.251Z",
       "finalUrl": "http://localhost:4173/emergency/tools",
       "heading": "Medical Tools",
       "screenshotPath": "qa/shell-ux-audit/responsive/tools--768x1024.png",
@@ -1060,7 +1060,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:28:16.801Z",
+      "startedAt": "2026-07-01T07:48:38.548Z",
       "finalUrl": "http://localhost:4173/emergency/tools",
       "heading": "Medical Tools",
       "screenshotPath": "qa/shell-ux-audit/responsive/tools--1440x900.png",
@@ -1090,7 +1090,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:28:18.112Z",
+      "startedAt": "2026-07-01T07:48:39.848Z",
       "finalUrl": "http://localhost:4173/emergency/tools",
       "heading": "Medical Tools",
       "screenshotPath": "qa/shell-ux-audit/responsive/tools--1920x1080.png",
@@ -1120,7 +1120,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:28:19.382Z",
+      "startedAt": "2026-07-01T07:48:41.276Z",
       "finalUrl": "http://localhost:4173/emergency/tools",
       "heading": "Medical Tools",
       "screenshotPath": "qa/shell-ux-audit/responsive/tools--2560x1440.png",
@@ -1130,10 +1130,10 @@
         "docScrollWidth": 2560,
         "shellWidth": 2328,
         "shellLeft": 232,
-        "pageWidth": 1856,
-        "pageLeft": 464,
-        "pageMaxWidth": "min(100%, 1880px)",
-        "shellPaddingInline": "40px"
+        "pageWidth": 2076,
+        "pageLeft": 354,
+        "pageMaxWidth": "min(100%, 2100px)",
+        "shellPaddingInline": "48px"
       },
       "docOverflowPx": 0,
       "error": ""
@@ -1150,7 +1150,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:28:20.745Z",
+      "startedAt": "2026-07-01T07:48:42.769Z",
       "finalUrl": "http://localhost:4173/emergency/tools",
       "heading": "Medical Tools",
       "screenshotPath": "qa/shell-ux-audit/responsive/tools--3440x1440.png",
@@ -1160,10 +1160,10 @@
         "docScrollWidth": 3440,
         "shellWidth": 3208,
         "shellLeft": 232,
-        "pageWidth": 1856,
-        "pageLeft": 904,
-        "pageMaxWidth": "min(100%, 1880px)",
-        "shellPaddingInline": "40px"
+        "pageWidth": 2376,
+        "pageLeft": 644,
+        "pageMaxWidth": "min(100%, 2400px)",
+        "shellPaddingInline": "48px"
       },
       "docOverflowPx": 0,
       "error": ""

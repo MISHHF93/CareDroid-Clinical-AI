@@ -12,7 +12,7 @@
     --app-visual-grid-min: minmax(min(100%, 300px), 1fr);
     --ed-whiteboard-card-min-ultrawide: 320px;
     --app-ultrawide-metric-columns: 4;
-    --app-ultrawide-action-columns: 2;
+    --app-ultrawide-action-min: 280px;
   }
 
   .emergency-app-shell .app-shell-main-content {
@@ -39,14 +39,19 @@
       .hospital-command-center__metric-grid,
       .hospital-command-center__panels
     ) {
-    grid-template-columns: repeat(
-      auto-fill,
-      minmax(min(100%, calc((100% - (var(--app-ultrawide-metric-columns) - 1) * var(--app-layout-panel-gap)) / var(--app-ultrawide-metric-columns)), 1fr)
-    );
+    grid-template-columns: repeat(var(--app-ultrawide-metric-columns), minmax(0, 1fr));
   }
 
   .emergency-app-shell .app-shell-main-content .hospital-command-center__actions {
-    grid-template-columns: repeat(var(--app-ultrawide-action-columns), minmax(0, 1fr));
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(min(100%, var(--app-ultrawide-action-min, 280px)), 1fr)
+    );
+  }
+
+  .emergency-app-shell .cdl-zone--primary-actions {
+    display: block;
+    width: 100%;
   }
 
   .emergency-app-shell .app-shell-main-content .emergency-route-patient-grid,
@@ -77,7 +82,7 @@
     --app-grid-card-min: 18rem;
     --ed-whiteboard-card-min-ultrawide: 340px;
     --app-ultrawide-metric-columns: 5;
-    --app-ultrawide-action-columns: 2;
+    --app-ultrawide-action-min: 300px;
   }
 
   .emergency-app-shell .app-shell-main-content .emergency-route-situation-brief__list--graphic {
@@ -86,6 +91,14 @@
 
   .emergency-app-shell .app-shell-main-content .hospital-command-center__metric-grid {
     grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .emergency-app-shell .app-shell-main-content .hospital-command-center__actions {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  }
+
+  .emergency-whiteboard-page__command-layer-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
   }
 
   .emergency-whiteboard-page__mission {
