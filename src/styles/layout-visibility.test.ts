@@ -5,7 +5,8 @@ import { describe, it, expect } from 'vitest';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const layoutVisibilityCss = readFileSync(join(__dirname, 'layout-visibility.css'), 'utf8');
-const appShellCss = readFileSync(join(dirname(__dirname), 'layout', 'AppShell.css'), 'utf8');
+const appShellCss = readFileSync(join(dirname(__dirname), 'components/app-shell.css'), 'utf8');
+const layoutEngineCss = readFileSync(join(__dirname, 'layout-engine.css'), 'utf8');
 const calculatorsCss = readFileSync(
   join(dirname(__dirname), 'pages', 'tools', 'Calculators.css'),
   'utf8'
@@ -63,12 +64,16 @@ describe('layout-visibility.css', () => {
 
 describe('AppShell.css — scroll vs conversation', () => {
   it('CareDroid main shell owns the route scrollport without clipping route content', () => {
-    expect(appShellCss).toMatch(
-      /\.ed-os-shell__body\s*\{[\s\S]*grid-template-columns:\s*minmax\(0,\s*1fr\) var\(--ed-copilot-width\)/
-    );
-    expect(appShellCss).toMatch(
-      /\.ed-os-main,\s*[\s\S]*\.app-shell-main-content\s*\{[\s\S]*overflow:\s*auto/
-    );
+    expect(appShellCss).toMatch(/\.emergency-app-shell__main-column\s*\{[\s\S]*overflow:\s*hidden/);
+    expect(appShellCss).toMatch(/\.app-shell-main-content\s*\{[\s\S]*overflow:\s*auto/);
+  });
+});
+
+describe('layout-engine.css — unified content grid', () => {
+  it('defines shell-owned gutters and zeroes duplicate page padding', () => {
+    expect(layoutEngineCss).toContain('--app-layout-content-max');
+    expect(layoutEngineCss).toMatch(/padding-inline:\s*0/);
+    expect(layoutEngineCss).toContain('.hospital-command-center');
   });
 });
 

@@ -67,6 +67,10 @@ html[data-theme='light'] {
   --semantic-healthy-fg: var(--semantic-healthy);
   --semantic-information-fg: var(--semantic-information);
   --semantic-inactive-fg: var(--semantic-inactive);
+  --semantic-warning-fg: var(--semantic-warning);
+  --semantic-ai-assistance-fg: var(--semantic-ai-assistance);
+  --semantic-operational-status-fg: var(--semantic-operational-status);
+  --semantic-infrastructure-health-fg: var(--semantic-infrastructure-health);
 
   /* —— Status aliases for Tailwind + legacy —— */
   --status-success: var(--app-success);

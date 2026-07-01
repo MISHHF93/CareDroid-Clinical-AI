@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import PatientCard from '../../components/PatientCard';
 import HelpTrigger from '../../components/help/HelpTrigger';
 import EdJourneyProgressRail from '../../components/emergency/EdJourneyProgressRail';
-import { PageShell } from '../../components/ui/CareDroidPrimitives';
+import { OperationalPageTemplate, PageShell } from '../../components/ui/CareDroidPrimitives';
 import { PatientFlag, PatientState } from '../../types/emergency';
 import { resolveEdDataFreshness, resolveEdSourceLabel } from '../../utils/edDataSource';
 import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
@@ -52,11 +52,18 @@ export function WorkflowSituationBrief({
     return null;
   }
 
+  const cdlTone =
+    tone === 'info' ? 'information' : tone === 'neutral' ? 'inactive' : tone;
+
   return (
     <section
       className={[
         'emergency-route-situation-brief',
+        'cdl-situation-brief',
+        'cdl-zone',
+        'cdl-zone--operational-summary',
         `emergency-route-situation-brief--${tone}`,
+        tone !== 'neutral' ? `cdl-situation-brief--${cdlTone}` : '',
         className,
       ]
         .filter(Boolean)
@@ -130,6 +137,12 @@ export function EmergencyRoutePage({
   maturity = undefined,
   situationBrief = undefined,
   showJourneyRail = true,
+  surfaceClassName = '',
+  primaryActions = undefined,
+  supportingContext = undefined,
+  analytics = undefined,
+  history = undefined,
+  operationalSummaryExtra = undefined,
 }: any = {}) {
   const surfaces = usePractitionerSurfaceVisibility();
   const operatingSurface = useEdOperatingSurface();
@@ -157,22 +170,40 @@ export function EmergencyRoutePage({
       titleId={titleId}
       description={showDescription ? description : undefined}
       actions={headerActions}
-      className={`emergency-route-page cd-page-shell${
-        compactLayout ? ' emergency-route-page--practitioner-compact' : ''
-      }`}
-      headerClassName="emergency-route-page__hero"
+      className={[
+        'emergency-route-page',
+        'cd-page-shell',
+        compactLayout ? 'emergency-route-page--practitioner-compact' : '',
+        surfaceClassName,
+      ]
+        .filter(Boolean)
+        .join(' ')}
+      headerClassName="emergency-route-page__hero cdl-zone cdl-zone--identity"
       contentClassName="emergency-route-page__content"
       aria-label={title}
     >
-      {showJourneyRail && operatingSurface.phaseId ? (
-        <EdJourneyProgressRail
-          activePhaseId={operatingSurface.phaseId}
-          ownerRole={operatingSurface.ownerRole}
-          priorityLabel={operatingSurface.priority}
-        />
-      ) : null}
-      {resolvedSituationBrief ? <WorkflowSituationBrief {...resolvedSituationBrief} /> : null}
-      {children}
+      <OperationalPageTemplate
+        zones={{
+          operationalSummary: (
+            <>
+              {showJourneyRail && operatingSurface.phaseId ? (
+                <EdJourneyProgressRail
+                  activePhaseId={operatingSurface.phaseId}
+                  ownerRole={operatingSurface.ownerRole}
+                  priorityLabel={operatingSurface.priority}
+                />
+              ) : null}
+              {resolvedSituationBrief ? <WorkflowSituationBrief {...resolvedSituationBrief} /> : null}
+              {operationalSummaryExtra}
+            </>
+          ),
+          primaryActions,
+          activeWork: children,
+          supportingContext,
+          analytics,
+          history,
+        }}
+      />
     </PageShell>
   );
 }

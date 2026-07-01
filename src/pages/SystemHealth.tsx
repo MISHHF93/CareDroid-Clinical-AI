@@ -7,9 +7,9 @@ import {
   normalizeHealthPayload,
 } from '../services/systemHealthService';
 import {
+  CareDroidPage,
   DashboardGrid,
   DashboardSection,
-  PageShell,
   Surface,
 } from '../components/ui/CareDroidPrimitives';
 import './SystemHealth.css';
@@ -114,10 +114,10 @@ export default function SystemHealth() {
   );
 
   return (
-    <PageShell
+    <CareDroidPage
       className="system-health-page"
       contentClassName="cd-page-stack cd-page-stack--compact system-health-page__content"
-      eyebrow="Deployment truth panel"
+      eyebrow="Infrastructure health"
       title="Deployment Observability"
       titleId="system-health-title"
       description={
@@ -128,67 +128,73 @@ export default function SystemHealth() {
         </>
       }
       actions={
-        <Link className="system-health-link" to="/version">
+        <Link className="system-health-link cd-btn cd-btn--secondary cd-btn--sm" to="/version">
           Public version page
         </Link>
       }
-    >
-
-      <Surface
-        as="section"
-        className={`system-health-verdict ${statusClass(comparison.status)}`}
-        aria-live="polite"
-      >
-        <div>
-          <span className="system-health-status-pill">{comparison.status}</span>
-          <h2>{comparison.label}</h2>
-          <p>{comparison.detail}</p>
-          {state.message ? <p className="system-health-message">{state.message}</p> : null}
-        </div>
-      </Surface>
-
-      <DashboardSection className="system-health-section" title="Frontend Version Metadata" titleId="frontend-version-title">
-        <MetadataGrid rows={frontendRows} />
-      </DashboardSection>
-
-      <DashboardSection className="system-health-section" title="Backend Health" titleId="backend-health-title">
-        <MetadataGrid rows={backendRows} />
-      </DashboardSection>
-
-      <DashboardSection className="system-health-section" title="Vercel Environment Status" titleId="vercel-env-title">
-        <MetadataGrid rows={vercelRows} />
-      </DashboardSection>
-
-      <DashboardSection className="system-health-section" title="Health Endpoints" titleId="health-endpoints-title">
-        <DashboardGrid className="system-health-endpoint-grid">
-          <article>
-            <h3>/health</h3>
-            <p>{state.backendProbe?.ok ? 'Reachable backend probe.' : 'Probe unavailable.'}</p>
-            <pre>
-              {JSON.stringify(
-                state.backendProbe?.data || { status: state.backendProbe?.message || 'checking' },
-                null,
-                2
-              )}
-            </pre>
-          </article>
-          <article>
-            <h3>/api/system-health</h3>
-            <p>
-              {state.systemHealth?.ok
-                ? 'Authenticated deployment metadata.'
-                : 'Authenticated metadata unavailable.'}
-            </p>
-            <pre>
-              {JSON.stringify(
-                state.systemHealth?.data || { status: state.systemHealth?.message || 'checking' },
-                null,
-                2
-              )}
-            </pre>
-          </article>
-        </DashboardGrid>
-      </DashboardSection>
-    </PageShell>
+      zones={{
+        operationalSummary: (
+          <Surface
+            as="section"
+            className={`system-health-verdict cdl-health-widget--infrastructure ${statusClass(comparison.status)}`}
+            aria-live="polite"
+          >
+            <div>
+              <span className="system-health-status-pill">{comparison.status}</span>
+              <h2>{comparison.label}</h2>
+              <p>{comparison.detail}</p>
+              {state.message ? <p className="system-health-message">{state.message}</p> : null}
+            </div>
+          </Surface>
+        ),
+        activeWork: (
+          <>
+            <DashboardSection className="system-health-section" title="Frontend Version Metadata" titleId="frontend-version-title">
+              <MetadataGrid rows={frontendRows} />
+            </DashboardSection>
+            <DashboardSection className="system-health-section" title="Backend Health" titleId="backend-health-title">
+              <MetadataGrid rows={backendRows} />
+            </DashboardSection>
+          </>
+        ),
+        supportingContext: (
+          <DashboardSection className="system-health-section" title="Vercel Environment Status" titleId="vercel-env-title">
+            <MetadataGrid rows={vercelRows} />
+          </DashboardSection>
+        ),
+        history: (
+          <DashboardSection className="system-health-section" title="Health Endpoints" titleId="health-endpoints-title">
+            <DashboardGrid className="system-health-endpoint-grid">
+              <article className="cd-surface-card">
+                <h3>/health</h3>
+                <p>{state.backendProbe?.ok ? 'Reachable backend probe.' : 'Probe unavailable.'}</p>
+                <pre>
+                  {JSON.stringify(
+                    state.backendProbe?.data || { status: state.backendProbe?.message || 'checking' },
+                    null,
+                    2
+                  )}
+                </pre>
+              </article>
+              <article className="cd-surface-card">
+                <h3>/api/system-health</h3>
+                <p>
+                  {state.systemHealth?.ok
+                    ? 'Authenticated deployment metadata.'
+                    : 'Authenticated metadata unavailable.'}
+                </p>
+                <pre>
+                  {JSON.stringify(
+                    state.systemHealth?.data || { status: state.systemHealth?.message || 'checking' },
+                    null,
+                    2
+                  )}
+                </pre>
+              </article>
+            </DashboardGrid>
+          </DashboardSection>
+        ),
+      }}
+    />
   );
 }

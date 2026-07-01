@@ -2,7 +2,6 @@
 
 .emergency-route-page {
   min-height: 100%;
-  padding: var(--ed-space-4);
   background: var(--ed-surface-base);
   color: var(--ed-text-primary);
 }

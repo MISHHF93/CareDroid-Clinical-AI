@@ -1,0 +1,235 @@
+/**
+ * CareDroid unified layout engine — single responsive content grid for the ED OS.
+ * Owns shell gutters, content max-width, page templates, and grid rhythm.
+ * Page-specific CSS must not reintroduce horizontal padding or competing max-widths.
+ */
+
+:root {
+  --app-layout-content-max: var(--app-visual-page-max, min(100%, 1680px));
+  --app-layout-readable-max: var(--app-visual-readable-max, 1120px);
+  --app-layout-page-gutter-inline: var(--app-shell-page-gutter-inline, var(--app-visual-page-gutter, 24px));
+  --app-layout-page-gutter-block: var(--app-shell-page-gutter-block, clamp(12px, 2vw, 24px));
+  --app-layout-section-gap: var(--app-visual-section-gap, var(--compact-page-gap, 22px));
+  --app-layout-panel-gap: var(--app-visual-panel-gap, var(--compact-panel-gap, 18px));
+  --app-layout-header-height: var(--app-shell-header-height, 56px);
+}
+
+@media (max-width: 768px) {
+  :root {
+    --app-layout-page-gutter-inline: clamp(12px, 3.2vw, 16px);
+    --app-layout-page-gutter-block: clamp(10px, 2.5vw, 16px);
+  }
+}
+
+@media (min-width: 1280px) and (max-width: 1599px) {
+  :root {
+    --app-layout-page-gutter-inline: clamp(20px, 2vw, 28px);
+  }
+}
+
+@media (min-width: 1600px) {
+  :root {
+    --app-layout-content-max: min(100%, 1680px);
+    --app-layout-page-gutter-inline: clamp(24px, 2vw, 32px);
+  }
+}
+
+@media (min-width: 2200px) {
+  :root {
+    --app-layout-content-max: min(100%, 1880px);
+    --app-layout-page-gutter-inline: clamp(28px, 2.2vw, 40px);
+  }
+}
+
+/* —— App shell main column: owns page gutters —— */
+.emergency-app-shell .app-shell-main-content {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding-inline: var(--app-layout-page-gutter-inline);
+  padding-block: var(--app-layout-page-gutter-block);
+  scroll-padding-top: calc(var(--app-layout-header-height) + var(--app-layout-page-gutter-block));
+}
+
+.emergency-app-shell .app-shell-main-content > * {
+  width: 100%;
+  max-width: var(--app-layout-content-max);
+  margin-inline: auto;
+  min-width: 0;
+}
+
+/* —— Canonical page templates (no duplicate horizontal padding) —— */
+.emergency-app-shell .app-shell-main-content :is(
+    .cd-page-shell,
+    .emergency-route-page,
+    .help-hub-page,
+    .emergency-analytics,
+    .emergency-settings,
+    .emergency-pulse,
+    .shift-summary,
+    .integration-hub-page,
+    .tools-overview-shell,
+    .team-management,
+    .system-health-page,
+    .hospital-command-center,
+    .emergency-whiteboard-page,
+    .emergency-os-page,
+    .smart-intake,
+    .ems-pipeline,
+    .referral-panel
+  ) {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: var(--app-layout-content-max);
+  margin-inline: auto;
+  padding-inline: 0;
+  padding-block: 0;
+  gap: var(--app-layout-section-gap);
+}
+
+.emergency-app-shell .app-shell-main-content :is(
+    .cd-page-shell__content,
+    .emergency-route-page__content
+  ) {
+  gap: var(--app-layout-section-gap);
+}
+
+/* —— Page headers / heroes align to content grid —— */
+.emergency-app-shell .app-shell-main-content :is(
+    .cd-page-header,
+    .emergency-route-page__hero
+  ) {
+  width: 100%;
+  margin-inline: 0;
+  padding: var(--app-layout-panel-gap);
+  gap: var(--app-layout-panel-gap);
+}
+
+.emergency-app-shell .app-shell-main-content .cd-page-header__content {
+  max-width: min(100%, var(--app-layout-readable-max));
+}
+
+/* —— Unified dashboard / metric grids —— */
+.emergency-app-shell .app-shell-main-content :is(
+    .cd-dashboard-grid,
+    .emergency-route-metric-grid,
+    .emergency-route-signal-grid,
+    .emergency-route-patient-grid,
+    .hospital-command-center__metric-grid,
+    .hospital-command-center__panels,
+    .hospital-command-center__actions,
+    .dashboard-card-grid,
+    .metric-grid,
+    .stats-grid,
+    .summary-grid
+  ) {
+  display: grid;
+  gap: var(--app-layout-panel-gap);
+  min-width: 0;
+  width: 100%;
+}
+
+.emergency-app-shell .app-shell-main-content :is(
+    .cd-dashboard-grid--cards,
+    .cd-dashboard-grid--summary,
+    .cd-dashboard-grid--metrics,
+    .emergency-route-metric-grid,
+    .emergency-route-signal-grid,
+    .hospital-command-center__metric-grid,
+    .hospital-command-center__panels,
+    .hospital-command-center__actions,
+    .dashboard-card-grid,
+    .metric-grid,
+    .stats-grid,
+    .summary-grid
+  ) {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--app-grid-card-min, 14rem)), 1fr));
+}
+
+.emergency-app-shell .app-shell-main-content .cd-dashboard-grid--dense,
+.emergency-app-shell .app-shell-main-content .hospital-command-center__metric-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+}
+
+/* —— Toolbars, action rows, chip rows —— */
+.emergency-app-shell .app-shell-main-content :is(
+    .cd-action-row,
+    .cd-section-header__actions,
+    .emergency-route-page__actions,
+    .emergency-route-chip-row,
+    [class*='toolbar'],
+    [class*='-actions']
+  ) {
+  align-items: center;
+  gap: var(--app-visual-control-gap, 10px);
+}
+
+/* —— Header chrome aligns to shell grid —— */
+.caredroid-header--compact .caredroid-header__topbar {
+  padding-inline: var(--app-layout-page-gutter-inline);
+  gap: var(--app-layout-panel-gap);
+}
+
+.caredroid-header__page-title {
+  text-align: center;
+}
+
+/* —— Whiteboard: section padding via layout tokens (not page-level duplicate) —— */
+.emergency-app-shell .app-shell-main-content .emergency-whiteboard-page__hero,
+.emergency-app-shell .app-shell-main-content .emergency-whiteboard-page__mission,
+.emergency-app-shell .app-shell-main-content .emergency-whiteboard-page__controls,
+.emergency-app-shell .app-shell-main-content .emergency-whiteboard-page__grid {
+  padding-inline: 0 !important;
+  padding-block: var(--app-layout-panel-gap) !important;
+}
+
+.emergency-app-shell .app-shell-main-content .emergency-whiteboard-page__hero {
+  padding-block-start: 0 !important;
+}
+
+/* —— Full-bleed operational canvases inside the content max —— */
+.emergency-app-shell .app-shell-main-content .cd-overflow-canvas,
+.emergency-app-shell .app-shell-main-content .ed-responsive-table {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* —— Practitioner compact: preserve density without breaking grid —— */
+[data-practitioner-compact='true'] .app-shell-main-content {
+  --app-layout-section-gap: var(--compact-page-gap, 12px);
+  --app-layout-panel-gap: var(--compact-panel-gap, 10px);
+}
+
+[data-practitioner-compact='true'] .app-shell-main-content :is(.cd-page-shell, .emergency-route-page) {
+  padding: 0;
+}
+
+@media (max-width: 900px) {
+  .caredroid-header__center {
+    justify-content: flex-start;
+  }
+
+  .caredroid-header--pilot-metrics .caredroid-header__central-status {
+    max-width: 100%;
+  }
+
+  .emergency-app-shell .app-shell-main-content :is(
+      .cd-workspace-split,
+      .cd-workspace-split--balanced,
+      .cd-workspace-split--wide,
+      .cd-dashboard-grid--split
+    ) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 520px) {
+  .emergency-app-shell .app-shell-main-content :is(
+      .cd-dashboard-grid--cards,
+      .cd-dashboard-grid--summary,
+      .emergency-route-metric-grid,
+      .hospital-command-center__metric-grid
+    ) {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 11.5rem), 1fr));
+  }
+}

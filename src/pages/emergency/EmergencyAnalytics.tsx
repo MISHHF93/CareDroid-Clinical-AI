@@ -25,7 +25,7 @@ import {
 import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermissions';
 import { summarizeTriageBreachAnalytics } from '../../services/triageBreachTimer';
 import EdDataSourceBanner from '../../components/emergency/EdDataSourceBanner';
-import { PageShell } from '../../components/ui/CareDroidPrimitives';
+import { CareDroidPage } from '../../components/ui/CareDroidPrimitives';
 import { MaturityChip } from './emergencyRouteShared';
 import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
 import useEdRouteDataContext from '../../hooks/useEdRouteDataContext';
@@ -200,7 +200,7 @@ export default function EmergencyAnalytics() {
   ];
 
   return (
-    <PageShell
+    <CareDroidPage
       as="section"
       eyebrow="Analytics"
       title="Department Analytics"
@@ -233,7 +233,7 @@ export default function EmergencyAnalytics() {
 
       {emergencyAnalytics.status === 'loading' ? (
         <p className="emergency-analytics__state emergency-analytics__state--loading" role="status" aria-live="polite">
-          Loading analytics…
+          Loading analyticsï¿½
         </p>
       ) : null}
       {statusMessage && surfaces.analytics.showDescriptions ? (
@@ -285,19 +285,19 @@ export default function EmergencyAnalytics() {
           <ChartCard title="Capacity" subtitle="Central node score and band">
             <strong>{centralSnapshot.capacityStatus.score} {centralSnapshot.capacityStatus.band}</strong>
             <small className="emergency-analytics__source">
-              {centralSnapshot.capacityStatus.occupiedRooms} rooms occupied · {centralSnapshot.capacityStatus.totalPatients} active records
+              {centralSnapshot.capacityStatus.occupiedRooms} rooms occupied ï¿½ {centralSnapshot.capacityStatus.totalPatients} active records
             </small>
           </ChartCard>
           <ChartCard title="EMS Pressure" subtitle="Inbound and critical pressure">
             <strong>{formatPressure(centralSnapshot.emsPressure.status)}</strong>
             <small className="emergency-analytics__source">
-              {centralSnapshot.emsPressure.inbound} inbound · {centralSnapshot.emsPressure.criticalInbound} critical
+              {centralSnapshot.emsPressure.inbound} inbound ï¿½ {centralSnapshot.emsPressure.criticalInbound} critical
             </small>
           </ChartCard>
           <ChartCard title="Boarding" subtitle="Boarding escalation state">
             <strong>{centralSnapshot.boardingStatus.boarders}</strong>
             <small className="emergency-analytics__source">
-              {formatPressure(centralSnapshot.boardingStatus.risk)} risk · source central node boardingStatus
+              {formatPressure(centralSnapshot.boardingStatus.risk)} risk ï¿½ source central node boardingStatus
             </small>
           </ChartCard>
           <ChartCard title="Queue Health" subtitle="Breaches and oldest wait">
@@ -311,14 +311,14 @@ export default function EmergencyAnalytics() {
           <ChartCard title="Reassessment" subtitle="Due and overdue">
             <strong>{centralSnapshot.reassessmentStatus.due}</strong>
             <small className="emergency-analytics__source">
-              {centralSnapshot.reassessmentStatus.overdue} overdue · next action remains human reviewed
+              {centralSnapshot.reassessmentStatus.overdue} overdue ï¿½ next action remains human reviewed
             </small>
           </ChartCard>
           <ChartCard title="Triage breach timer" subtitle="Arrival to triage against site target">
             <strong>{triageBreachAnalytics.summary.breachedCount}</strong>
             <small className="emergency-analytics__source">
-              {triageBreachAnalytics.summary.breachRiskCount} at risk · target{' '}
-              {triageBreachAnalytics.summary.targetMinutes}m · longest{' '}
+              {triageBreachAnalytics.summary.breachRiskCount} at risk ï¿½ target{' '}
+              {triageBreachAnalytics.summary.targetMinutes}m ï¿½ longest{' '}
               {triageBreachAnalytics.summary.longestElapsedLabel}
             </small>
           </ChartCard>
@@ -327,10 +327,10 @@ export default function EmergencyAnalytics() {
             <small className="emergency-analytics__source">
               {firstAlert ? `${firstAlert.severity}: ${firstAlert.title}` : 'All clear'}
               {metricLinkedAlerts.length
-                ? ` · ${metricLinkedAlerts.map((entry) => `${entry.label} ${entry.count}`).join(' · ')}`
+                ? ` ï¿½ ${metricLinkedAlerts.map((entry) => `${entry.label} ${entry.count}`).join(' ï¿½ ')}`
                 : ''}
               {groupedOperationalAlerts.unmapped.length
-                ? ` · ${groupedOperationalAlerts.unmapped.length} other`
+                ? ` ï¿½ ${groupedOperationalAlerts.unmapped.length} other`
                 : ''}
             </small>
           </ChartCard>
@@ -350,7 +350,7 @@ export default function EmergencyAnalytics() {
             <strong>{breachCauses.reduce((sum, [, count]) => sum + count, 0)}</strong>
             <small className="emergency-analytics__source">
               {breachCauses.length
-                ? breachCauses.map(([cause, count]) => `${cause.replace(/_/g, ' ')} ${count}`).join(' · ')
+                ? breachCauses.map(([cause, count]) => `${cause.replace(/_/g, ' ')} ${count}`).join(' ï¿½ ')
                 : 'No projected breach causes'}
             </small>
           </ChartCard>
@@ -358,7 +358,7 @@ export default function EmergencyAnalytics() {
             <ChartCard title="Operational Intelligence" subtitle="Rule-based baseline health">
               <strong>{intelligenceSnapshot.modelHealth.status}</strong>
               <small className="emergency-analytics__source">
-                {intelligenceSnapshot.mode} · {intelligenceSnapshot.recommendations.length} advisory recommendations ·{' '}
+                {intelligenceSnapshot.mode} ï¿½ {intelligenceSnapshot.recommendations.length} advisory recommendations ï¿½{' '}
                 {intelligenceSnapshot.disclaimers.operational}
               </small>
             </ChartCard>
@@ -492,8 +492,8 @@ export default function EmergencyAnalytics() {
           <ChartCard title="Avg Triage Time" subtitle="Arrival-to-triage target tracking">
             <strong>{avgTriageMins}</strong>
             <small className="emergency-analytics__source">
-              {triageBreachAnalytics.summary.breachedCount} breach{triageBreachAnalytics.summary.breachedCount !== 1 ? 'es' : ''} ·{' '}
-              {triageBreachAnalytics.summary.breachRiskCount} at risk · target {triageBreachAnalytics.summary.targetMinutes}m
+              {triageBreachAnalytics.summary.breachedCount} breach{triageBreachAnalytics.summary.breachedCount !== 1 ? 'es' : ''} ï¿½{' '}
+              {triageBreachAnalytics.summary.breachRiskCount} at risk ï¿½ target {triageBreachAnalytics.summary.targetMinutes}m
             </small>
           </ChartCard>
         </div>
@@ -595,6 +595,6 @@ export default function EmergencyAnalytics() {
           </>
         ) : null}
       </div>
-    </PageShell>
+    </CareDroidPage>
   );
 }

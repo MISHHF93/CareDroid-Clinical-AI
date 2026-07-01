@@ -47,6 +47,34 @@ export const SEMANTIC_COLOR_ROLES = Object.freeze({
     border: 'var(--semantic-inactive-border)',
     cssVar: '--semantic-inactive',
   }),
+  warning: Object.freeze({
+    label: 'Warning / caution threshold',
+    fg: MEDICAL_TYPE.statusWarning,
+    bg: 'var(--semantic-warning-bg)',
+    border: 'var(--semantic-warning-border)',
+    cssVar: '--semantic-warning',
+  }),
+  ai_assistance: Object.freeze({
+    label: 'AI assistance / recommendations',
+    fg: 'var(--semantic-ai-assistance)',
+    bg: 'var(--semantic-ai-assistance-bg)',
+    border: 'var(--semantic-ai-assistance-border)',
+    cssVar: '--semantic-ai-assistance',
+  }),
+  operational_status: Object.freeze({
+    label: 'Live operational status',
+    fg: 'var(--semantic-operational-status)',
+    bg: 'var(--semantic-operational-status-bg)',
+    border: 'var(--semantic-operational-status-border)',
+    cssVar: '--semantic-operational-status',
+  }),
+  infrastructure_health: Object.freeze({
+    label: 'Infrastructure / service health',
+    fg: 'var(--semantic-infrastructure-health)',
+    bg: 'var(--semantic-infrastructure-health-bg)',
+    border: 'var(--semantic-infrastructure-health-border)',
+    cssVar: '--semantic-infrastructure-health',
+  }),
 });
 
 export type SemanticColorRole = keyof typeof SEMANTIC_COLOR_ROLES;
@@ -55,8 +83,15 @@ export type SemanticColorRole = keyof typeof SEMANTIC_COLOR_ROLES;
 export const OPERATIONAL_TONE_TO_SEMANTIC: Readonly<Record<string, SemanticColorRole>> =
   Object.freeze({
     critical: 'critical',
-    warning: 'attention',
+    warning: 'warning',
     watch: 'attention',
+    ai: 'ai_assistance',
+    copilot: 'ai_assistance',
+    recommendation: 'ai_assistance',
+    operational: 'operational_status',
+    live: 'operational_status',
+    infrastructure: 'infrastructure_health',
+    service: 'infrastructure_health',
     urgent: 'urgent',
     high: 'urgent',
     stable: 'healthy',

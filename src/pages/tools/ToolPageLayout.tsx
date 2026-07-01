@@ -17,7 +17,7 @@ import ClinicalDecisionSupportDisclaimer from '../../components/clinical/Clinica
 import { useNotificationActions } from '../../hooks/useNotificationActions';
 import {
   ActionRow,
-  PageShell,
+  CareDroidPage,
   Surface,
 } from '../../components/ui/CareDroidPrimitives';
 import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
@@ -180,7 +180,7 @@ const ToolPageLayout = ({
   );
 
   return (
-    <PageShell
+    <CareDroidPage
       as="section"
       className={`tool-page${embedded ? ' tool-page--embedded' : ''}`}
       contentClassName="cd-page-stack cd-page-stack--compact tool-page__content"
@@ -197,14 +197,14 @@ const ToolPageLayout = ({
               <span>Whiteboard</span>
             </span>
           </button>
-          <span className="breadcrumb-separator">›</span>
+          <span className="breadcrumb-separator">ï¿½</span>
           <button type="button" onClick={() => profileNavigate('/tools')} className="breadcrumb-link">
             <span className="breadcrumb-link-inner">
               <NavIcon icon={CHROME_ICONS.tools} size={16} decorative />
               <span>Tools</span>
             </span>
           </button>
-          <span className="breadcrumb-separator">›</span>
+          <span className="breadcrumb-separator">ï¿½</span>
           <span className="breadcrumb-current">{tool.name}</span>
         </div>
       ) : null}
@@ -373,7 +373,7 @@ const ToolPageLayout = ({
           onClose={() => setShowShareModal(false)}
         />
       )}
-    </PageShell>
+    </CareDroidPage>
   );
 };
 

@@ -10,15 +10,7 @@
   background: var(--ed-surface-raised, #f8fafc);
 }
 
-.hospital-command-center__status--critical {
-  border-color: color-mix(in srgb, var(--status-critical, #dc2626) 40%, var(--ed-border-subtle, #e2e8f0));
-  background: color-mix(in srgb, var(--status-critical, #dc2626) 6%, var(--ed-surface-raised, #f8fafc));
-}
-
-.hospital-command-center__status--warning {
-  border-color: color-mix(in srgb, var(--status-warning, #d97706) 35%, var(--ed-border-subtle, #e2e8f0));
-  background: color-mix(in srgb, var(--status-warning, #d97706) 6%, var(--ed-surface-raised, #f8fafc));
-}
+/* Tone overrides owned by caredroid-design-language.css semantic tokens */
 
 .hospital-command-center__status-line {
   margin: 0;
@@ -34,11 +26,7 @@
   color: var(--ed-text-meta, #64748b);
 }
 
-.hospital-command-center__metric-grid {
-  display: grid;
-  gap: var(--ed-space-3, 12px);
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
-}
+/* Metric grid rhythm owned by layout-engine.css */
 
 .hospital-command-center__metric-card {
   display: grid;
@@ -57,17 +45,7 @@
   box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
 }
 
-.hospital-command-center__metric-card--critical {
-  border-color: color-mix(in srgb, var(--status-critical, #dc2626) 45%, var(--ed-border-subtle, #e2e8f0));
-}
-
-.hospital-command-center__metric-card--warning {
-  border-color: color-mix(in srgb, var(--status-warning, #d97706) 40%, var(--ed-border-subtle, #e2e8f0));
-}
-
-.hospital-command-center__metric-card--watch {
-  border-color: color-mix(in srgb, var(--app-accent-interactive, #2563eb) 30%, var(--ed-border-subtle, #e2e8f0));
-}
+/* Metric card semantic borders owned by caredroid-design-language.css */
 
 .hospital-command-center__metric-value {
   font-size: 22px;
@@ -91,8 +69,9 @@
 
 .hospital-command-center__panels {
   display: grid;
-  gap: var(--ed-space-3, 12px);
+  gap: var(--app-layout-panel-gap, var(--ed-space-3, 12px));
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  align-items: start;
 }
 
 .hospital-command-center__panel-list {
@@ -131,16 +110,4 @@
   flex-shrink: 0;
 }
 
-.hospital-command-center__severity--critical {
-  color: var(--status-critical, #dc2626);
-}
-
-.hospital-command-center__severity--warning {
-  color: var(--status-warning, #d97706);
-}
-
-.hospital-command-center__actions {
-  display: grid;
-  gap: var(--ed-space-3, 12px);
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
-}
+/* Severity colors owned by caredroid-design-language.css */

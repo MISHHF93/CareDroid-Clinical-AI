@@ -45,7 +45,7 @@ import { fetchToolExecutorCatalog } from '../../services/clinicalToolsApi';
 import { HUMAN_REVIEW_DISCLAIMER } from '../../lib/ai/safety/policy';
 import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
 import { PILOT_CUSTOMER_MODE } from '../../config/unified-navigation.config';
-import { PageShell } from '../../components/ui/CareDroidPrimitives';
+import { CareDroidPage } from '../../components/ui/CareDroidPrimitives';
 import { CAREDROID_PRODUCT } from '../../config/caredroidProduct.config';
 import './ToolsOverview.css';
 
@@ -554,7 +554,7 @@ function UnknownActiveToolSurface({ requestedTool, onClose }) {
         <div>
           <span className="tools-execution-badge tools-execution-badge--catalog">Not found</span>
           <h2>Tool not found</h2>
-          <p>No Medical Tools entry matches “{requestedTool}”. Check the spelling or search the catalog below.</p>
+          <p>No Medical Tools entry matches ï¿½{requestedTool}ï¿½. Check the spelling or search the catalog below.</p>
         </div>
         <button type="button" className="tools-active-surface__close" onClick={onClose}>
           Back to catalog
@@ -1050,7 +1050,7 @@ const ToolsOverview = () => {
 
   return (
     <div className={`tools-overview${PILOT_CUSTOMER_MODE.enabled ? ' tools-overview--compact' : ''}`}>
-      <PageShell
+      <CareDroidPage
         eyebrow="Clinical decision support"
         title={roleIntelligenceProfile.toolsTitle || workspaceExperience.toolsTitle || 'Medical Tools'}
         description={surfaces.tools.showOverviewContextRow ? toolsDescription : CAREDROID_PRODUCT.safetyShort}
@@ -1117,7 +1117,7 @@ const ToolsOverview = () => {
                 type="search"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Try pe-score, bleeding risk, kidney function…"
+                placeholder="Try pe-score, bleeding risk, kidney functionï¿½"
                 aria-label="Search all tools"
               />
             </label>
@@ -1525,7 +1525,7 @@ const ToolsOverview = () => {
         </div>
       </div>
       ) : null}
-      </PageShell>
+      </CareDroidPage>
     </div>
   );
 };

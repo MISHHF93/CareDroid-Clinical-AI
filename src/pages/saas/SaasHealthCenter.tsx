@@ -11,7 +11,7 @@ import {
   InfoNotice,
   LoadingState,
   MetricCard,
-  PageShell,
+  CareDroidPage,
   StatusBadge,
   Surface,
 } from '../../components/ui/CareDroidPrimitives';
@@ -114,16 +114,16 @@ export default function SaasHealthCenter() {
   );
 
   return (
-    <PageShell
+    <CareDroidPage
       className="saas-health-page"
       contentClassName="cd-page-stack cd-page-stack--compact saas-health-page__content"
-      eyebrow="Platform operations"
+      eyebrow="Infrastructure health"
       title="SaaS Health Center"
       titleId="saas-health-title"
       description="What is happening across CareDroid platform services, who owns each check, and what needs attention before clinical workflows degrade."
       actions={
         <ActionRow align="end">
-          <Link className="saas-health-link" to="/system-health">
+          <Link className="saas-health-link cd-btn cd-btn--secondary cd-btn--sm" to="/system-health">
             Deployment observability
           </Link>
           <Button variant="primary" size="sm" loading={loading} onClick={load}>
@@ -131,123 +131,111 @@ export default function SaasHealthCenter() {
           </Button>
         </ActionRow>
       }
-    >
-      {loading && !bundle ? (
-        <LoadingState title="Loading platform health" description="Probing SaaS health and service registry." />
-      ) : null}
-
-      {health ? (
-        <Surface
-          as="section"
-          className={`saas-health-verdict ${verdictClass(health.status)}`}
-          aria-live="polite"
-        >
-          <div>
-            <StatusBadge status={healthCheckStatusToWidgetTone(health.status)}>
-              {health.label || health.status}
-            </StatusBadge>
-            <h2>Platform status: {health.label || health.status}</h2>
-            <p>
-              {summary
-                ? `${summary.healthy ?? 0} healthy, ${summary.warning ?? 0} attention, ${summary.critical ?? 0} critical of ${summary.total ?? checks.length} checks.`
-                : 'Health summary unavailable.'}
-            </p>
-            {health.generatedAt ? (
-              <time className="saas-health-verdict__time" dateTime={health.generatedAt}>
-                Generated {new Date(health.generatedAt).toLocaleString()}
-              </time>
+      zones={{
+        operationalSummary: (
+          <>
+            {loading && !bundle ? (
+              <LoadingState title="Loading platform health" description="Probing SaaS health and service registry." />
             ) : null}
-            {error ? (
-              <InfoNotice tone="warning" label="Probe warning" detail={error} />
-            ) : null}
-          </div>
-        </Surface>
-      ) : null}
-
-      {summary ? (
-        <DashboardGrid variant="summary" className="saas-health-metrics">
-          <MetricCard
-            label="Healthy"
-            value={summary.healthy ?? 0}
-            tone="healthy"
-            helper="Checks passing"
-          />
-          <MetricCard
-            label="Attention"
-            value={summary.warning ?? 0}
-            tone="attention"
-            helper="Guarded or degraded"
-          />
-          <MetricCard
-            label="Critical"
-            value={summary.critical ?? 0}
-            tone="critical"
-            helper="Requires IT action"
-          />
-          <MetricCard
-            label="Active bottlenecks"
-            value={bottlenecks?.analytics.activeCount ?? 0}
-            tone={(bottlenecks?.analytics.criticalCount ?? 0) > 0 ? 'critical' : 'information'}
-            helper="Operational constraints"
-          />
-        </DashboardGrid>
-      ) : null}
-
-      <DashboardSection
-        className="saas-health-section"
-        title="Platform health checks"
-        titleId="saas-health-checks-title"
-        description="Each check reports owner evidence, recommended action, and current severity."
-      >
-        <div className="saas-health-check-list">
-          {checks.map((check) => (
-            <HealthCheckRow key={check.id} check={check} />
-          ))}
-        </div>
-      </DashboardSection>
-
-      {bottlenecks ? (
-        <DashboardSection
-          className="saas-health-section"
-          title="Operational bottlenecks"
-          titleId="saas-health-bottlenecks-title"
-          description="Live constraints from the unified service registry affecting ED throughput."
-        >
-          <BottleneckCommandPanel registry={bottlenecks} />
-        </DashboardSection>
-      ) : null}
-
-      {registryServices.length > 0 ? (
-        <DashboardSection
-          className="saas-health-section"
-          title="Canonical service registry"
-          titleId="saas-health-registry-title"
-          description="Integrated services consumed by this health surface — no parallel health APIs."
-        >
-          <ul className="saas-health-service-list">
-            {registryServices.map((service) => (
-              <ServiceRegistryRow key={service.serviceName} service={service} />
-            ))}
-          </ul>
-        </DashboardSection>
-      ) : null}
-
-      {bundle ? (
-        <DashboardSection
-          className="saas-health-section"
-          title="Health endpoints"
-          titleId="saas-health-endpoints-title"
-        >
-          <DashboardGrid className="saas-health-endpoint-grid">
-            {Object.entries(bundle.registry.endpoints).map(([key, path]) => (
-              <Surface as="article" tone="nested" key={key} className="saas-health-endpoint-card">
-                <h3>{path}</h3>
-                <p>{key}</p>
+            {health ? (
+              <Surface
+                as="section"
+                className={`saas-health-verdict cdl-health-widget--infrastructure ${verdictClass(health.status)}`}
+                aria-live="polite"
+              >
+                <div>
+                  <StatusBadge status={healthCheckStatusToWidgetTone(health.status)}>
+                    {health.label || health.status}
+                  </StatusBadge>
+                  <h2>Platform status: {health.label || health.status}</h2>
+                  <p>
+                    {summary
+                      ? `${summary.healthy ?? 0} healthy, ${summary.warning ?? 0} attention, ${summary.critical ?? 0} critical of ${summary.total ?? checks.length} checks.`
+                      : 'Health summary unavailable.'}
+                  </p>
+                  {health.generatedAt ? (
+                    <time className="saas-health-verdict__time" dateTime={health.generatedAt}>
+                      Generated {new Date(health.generatedAt).toLocaleString()}
+                    </time>
+                  ) : null}
+                  {error ? (
+                    <InfoNotice tone="warning" label="Probe warning" detail={error} />
+                  ) : null}
+                </div>
               </Surface>
-            ))}
+            ) : null}
+          </>
+        ),
+        analytics: summary ? (
+          <DashboardGrid variant="summary" className="saas-health-metrics">
+            <MetricCard label="Healthy" value={summary.healthy ?? 0} tone="healthy" helper="Checks passing" />
+            <MetricCard label="Attention" value={summary.warning ?? 0} tone="attention" helper="Guarded or degraded" />
+            <MetricCard label="Critical" value={summary.critical ?? 0} tone="critical" helper="Requires IT action" />
+            <MetricCard
+              label="Active bottlenecks"
+              value={bottlenecks?.analytics.activeCount ?? 0}
+              tone={(bottlenecks?.analytics.criticalCount ?? 0) > 0 ? 'critical' : 'information'}
+              helper="Operational constraints"
+            />
           </DashboardGrid>
-        </DashboardSection>
-      ) : null}
-    </PageShell>
+        ) : null,
+        activeWork: (
+          <>
+            <DashboardSection
+              className="saas-health-section"
+              title="Platform health checks"
+              titleId="saas-health-checks-title"
+              description="Each check reports owner evidence, recommended action, and current severity."
+            >
+              <div className="saas-health-check-list">
+                {checks.map((check) => (
+                  <HealthCheckRow key={check.id} check={check} />
+                ))}
+              </div>
+            </DashboardSection>
+            {bottlenecks ? (
+              <DashboardSection
+                className="saas-health-section"
+                title="Operational bottlenecks"
+                titleId="saas-health-bottlenecks-title"
+                description="Live constraints from the unified service registry affecting ED throughput."
+              >
+                <BottleneckCommandPanel registry={bottlenecks} />
+              </DashboardSection>
+            ) : null}
+          </>
+        ),
+        supportingContext: registryServices.length > 0 ? (
+          <DashboardSection
+            className="saas-health-section"
+            title="Canonical service registry"
+            titleId="saas-health-registry-title"
+            description="Integrated services consumed by this health surface — no parallel health APIs."
+          >
+            <ul className="saas-health-service-list">
+              {registryServices.map((service) => (
+                <ServiceRegistryRow key={service.serviceName} service={service} />
+              ))}
+            </ul>
+          </DashboardSection>
+        ) : null,
+        history: bundle ? (
+          <DashboardSection
+            className="saas-health-section"
+            title="Health endpoints"
+            titleId="saas-health-endpoints-title"
+          >
+            <DashboardGrid className="saas-health-endpoint-grid">
+              {Object.entries(bundle.registry.endpoints).map(([key, path]) => (
+                <Surface as="article" tone="nested" key={key} className="saas-health-endpoint-card cd-surface-card">
+                  <h3>{path}</h3>
+                  <p>{key}</p>
+                </Surface>
+              ))}
+            </DashboardGrid>
+          </DashboardSection>
+        ) : null,
+      }}
+    />
   );
 }

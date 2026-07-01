@@ -1,0 +1,560 @@
+/**
+ * CareDroid Design Language (CDL) — unified visual identity for the ED Operating System.
+ * Loaded after layout-engine.css; harmonizes semantic surfaces, page zones, and components.
+ * Do not add page-specific visual hacks — extend tokens and zone classes here.
+ */
+@import '../components/primitives/Button.css';
+
+:root {
+  /* —— Extended semantic operational colors —— */
+  --semantic-warning: var(--semantic-attention);
+  --semantic-warning-bg: var(--semantic-attention-bg);
+  --semantic-warning-border: var(--semantic-attention-border);
+
+  --semantic-ai-assistance: #6366f1;
+  --semantic-ai-assistance-bg: #eef2ff;
+  --semantic-ai-assistance-border: #4f46e5;
+
+  --semantic-operational-status: #0891b2;
+  --semantic-operational-status-bg: #ecfeff;
+  --semantic-operational-status-border: #0e7490;
+
+  --semantic-infrastructure-health: #475569;
+  --semantic-infrastructure-health-bg: #f1f5f9;
+  --semantic-infrastructure-health-border: #64748b;
+
+  /* —— CDL rhythm (inherits layout-engine gutters) —— */
+  --cdl-zone-gap: var(--app-layout-section-gap);
+  --cdl-panel-gap: var(--app-layout-panel-gap);
+  --cdl-zone-padding: var(--cdl-panel-gap);
+  --cdl-secondary-opacity: 0.72;
+  --cdl-tertiary-opacity: 0.56;
+
+  /* —— Motion —— */
+  --cdl-motion-fast: 120ms;
+  --cdl-motion-standard: 180ms;
+  --cdl-motion-emphasis: 260ms;
+  --cdl-motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* —— Operational page composition —— */
+.cdl-operational-page {
+  align-content: start;
+  display: grid;
+  gap: var(--cdl-zone-gap);
+  min-width: 0;
+  width: 100%;
+}
+
+.cdl-zone {
+  align-content: start;
+  display: grid;
+  gap: var(--cdl-panel-gap);
+  min-width: 0;
+  width: 100%;
+}
+
+.cdl-zone--identity {
+  /* PageShell / PageHeader owns identity — zone marker only when nested */
+  gap: var(--cdl-panel-gap);
+}
+
+.cdl-zone--operational-summary {
+  /* Highest scan priority after identity */
+}
+
+.cdl-zone--primary-actions {
+  align-items: center;
+  grid-auto-flow: column;
+  justify-content: flex-start;
+}
+
+.cdl-zone--active-work {
+  /* Primary workflow canvas */
+}
+
+.cdl-zone--supporting-context,
+.cdl-zone--analytics {
+  opacity: 1;
+}
+
+.cdl-zone--history {
+  color: var(--semantic-inactive);
+  font-size: var(--app-type-small);
+}
+
+.cdl-zone--supporting-context .cdl-zone__label,
+.cdl-zone--analytics .cdl-zone__label,
+.cdl-zone--history .cdl-zone__label {
+  color: var(--app-text-muted);
+  font-size: var(--app-type-caption);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+/* —— Semantic surfaces (operational meaning, not decoration) —— */
+.cdl-surface {
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-lg);
+  background: var(--app-surface);
+  padding: var(--cdl-zone-padding);
+}
+
+.cdl-surface--critical {
+  border-color: var(--semantic-critical-border);
+  background: var(--semantic-critical-bg);
+  color: var(--semantic-critical);
+}
+
+.cdl-surface--urgent {
+  border-color: var(--semantic-urgent-border);
+  background: var(--semantic-urgent-bg);
+  color: var(--semantic-urgent);
+}
+
+.cdl-surface--warning,
+.cdl-surface--attention {
+  border-color: var(--semantic-warning-border);
+  background: var(--semantic-warning-bg);
+  color: var(--semantic-warning);
+}
+
+.cdl-surface--healthy {
+  border-color: var(--semantic-healthy-border);
+  background: var(--semantic-healthy-bg);
+  color: var(--semantic-healthy);
+}
+
+.cdl-surface--information {
+  border-color: var(--semantic-information-border);
+  background: var(--semantic-information-bg);
+  color: var(--semantic-information);
+}
+
+.cdl-surface--inactive {
+  border-color: var(--semantic-inactive-border);
+  background: var(--semantic-inactive-bg);
+  color: var(--semantic-inactive);
+  opacity: var(--cdl-secondary-opacity);
+}
+
+.cdl-surface--ai-assistance {
+  border-color: var(--semantic-ai-assistance-border);
+  background: var(--semantic-ai-assistance-bg);
+  color: var(--semantic-ai-assistance);
+}
+
+.cdl-surface--operational-status {
+  border-color: var(--semantic-operational-status-border);
+  background: var(--semantic-operational-status-bg);
+  color: var(--semantic-operational-status);
+}
+
+.cdl-surface--infrastructure-health {
+  border-color: var(--semantic-infrastructure-health-border);
+  background: var(--semantic-infrastructure-health-bg);
+  color: var(--semantic-infrastructure-health);
+}
+
+/* —— Situation brief: unified operational summary (ED routes + command center) —— */
+.emergency-route-situation-brief,
+.cdl-situation-brief {
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-lg);
+  background: var(--app-surface);
+  padding: var(--cdl-zone-padding);
+}
+
+.emergency-route-situation-brief--info,
+.cdl-situation-brief--information {
+  border-color: color-mix(in srgb, var(--semantic-information) 28%, var(--app-border));
+  background: var(--semantic-information-bg);
+}
+
+.emergency-route-situation-brief--warning,
+.cdl-situation-brief--warning,
+.cdl-situation-brief--attention {
+  border-color: color-mix(in srgb, var(--semantic-warning) 34%, var(--app-border));
+  background: var(--semantic-warning-bg);
+}
+
+.emergency-route-situation-brief--critical,
+.cdl-situation-brief--critical {
+  border-color: color-mix(in srgb, var(--semantic-critical) 38%, var(--app-border));
+  background: var(--semantic-critical-bg);
+}
+
+.emergency-route-situation-brief__list,
+.cdl-situation-brief__list {
+  display: grid;
+  gap: var(--cdl-panel-gap);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.emergency-route-situation-brief__label,
+.cdl-situation-brief__label {
+  color: var(--app-text-muted);
+  font-size: var(--app-type-caption);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.emergency-route-situation-brief__value,
+.cdl-situation-brief__value {
+  color: var(--app-text);
+  font-size: var(--app-type-subheading);
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+/* —— AI recommendation panels —— */
+.cdl-ai-panel,
+.cd-insight-card--ai {
+  border-color: var(--semantic-ai-assistance-border);
+  background: var(--semantic-ai-assistance-bg);
+}
+
+.cdl-ai-panel__eyebrow {
+  color: var(--semantic-ai-assistance);
+  font-size: var(--app-type-caption);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* —— Service / infrastructure health widgets —— */
+.cdl-health-widget--infrastructure,
+.cd-status-widget--infrastructure {
+  border-color: var(--semantic-infrastructure-health-border);
+}
+
+.cdl-health-widget--infrastructure .cd-status-widget__header span,
+.cd-status-widget--infrastructure .cd-status-widget__header span {
+  color: var(--semantic-infrastructure-health);
+}
+
+/* —— Component harmonization: metric cards use semantic accent —— */
+.cd-metric-card--critical,
+.emergency-route-metric-card[style*='--metric-color'] {
+  --metric-color: var(--semantic-critical);
+}
+
+.cd-metric-card--warning,
+.cd-metric-card--attention {
+  border-color: color-mix(in srgb, var(--semantic-warning) 24%, var(--app-border));
+}
+
+.cd-metric-card--healthy,
+.cd-metric-card--success {
+  border-color: color-mix(in srgb, var(--semantic-healthy) 24%, var(--app-border));
+}
+
+.cd-info-notice--ai {
+  border-color: var(--semantic-ai-assistance-border);
+  background: var(--semantic-ai-assistance-bg);
+  color: var(--semantic-ai-assistance);
+}
+
+/* —— Interaction model: predictable focus and hover —— */
+.cdl-operational-page :is(button, a, [role='button'], input, select, textarea):focus-visible {
+  outline: var(--app-focus-ring);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cdl-operational-page *,
+  .emergency-app-shell * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* —— Role density hooks (shell applies data attributes) —— */
+[data-screen-density='simple-fast'] .cdl-zone--analytics,
+[data-screen-density='simple-fast'] .cdl-zone--history {
+  display: none;
+}
+
+[data-screen-density='high-operational'] .cdl-zone--operational-summary,
+[data-screen-density='metric-aggregate'] .cdl-zone--analytics {
+  gap: calc(var(--cdl-panel-gap) * 0.85);
+}
+
+[data-practitioner-compact='true'] .cdl-operational-page {
+  --cdl-zone-gap: var(--compact-page-gap, 12px);
+  --cdl-panel-gap: var(--compact-panel-gap, 10px);
+}
+
+/* —— Layout engine: register CDL page templates —— */
+.emergency-app-shell .app-shell-main-content :is(
+    .cdl-operational-page,
+    .cd-page-shell.cdl-operational-page,
+    .system-health-page,
+    .commercial-page,
+    .tools-overview-shell,
+    .integration-hub-page,
+    .saas-health-page,
+    .executive-command-page,
+    .help-hub-page,
+    .emergency-analytics,
+    .emergency-settings,
+    .emergency-pulse,
+    .training-dashboard,
+    .org-page,
+    .tool-page
+  ) {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: var(--app-layout-content-max);
+  margin-inline: auto;
+  padding-inline: 0;
+  padding-block: 0;
+  gap: var(--cdl-zone-gap);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Component harmonization — legacy aliases inherit CDL tokens
+   ══════════════════════════════════════════════════════════════════ */
+
+/* Cards & panels */
+.emergency-route-card,
+.cd-surface-card {
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-lg);
+  background: var(--app-surface);
+  box-shadow: var(--app-elevation-none);
+  padding: var(--cdl-zone-padding);
+}
+
+.emergency-route-card.cd-surface-card,
+.emergency-route-card.cdl-surface {
+  padding: var(--cdl-zone-padding);
+}
+
+.emergency-route-section-card__header {
+  align-items: flex-start;
+  display: flex;
+  gap: var(--cdl-panel-gap);
+  justify-content: space-between;
+  margin-bottom: var(--cdl-panel-gap);
+  min-width: 0;
+}
+
+.emergency-route-section-card__header strong {
+  color: var(--app-text);
+  font-size: var(--app-type-subheading);
+  font-weight: 600;
+}
+
+.emergency-route-section-card__lead {
+  color: var(--app-text-muted);
+  font-size: var(--app-type-small);
+  line-height: 1.45;
+  margin: var(--app-space-xs) 0 0;
+}
+
+/* Buttons — emergency route actions align to cd-btn */
+.emergency-route-filter-banner__btn,
+.emergency-route-help-trigger {
+  align-items: center;
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-md);
+  background: var(--app-surface);
+  color: var(--app-text);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: var(--app-type-small);
+  font-weight: 600;
+  gap: var(--app-space-xs);
+  justify-content: center;
+  min-height: var(--app-control-height-sm, 32px);
+  padding: 0 var(--app-space-md);
+  text-decoration: none;
+  transition:
+    border-color var(--cdl-motion-fast) var(--cdl-motion-ease),
+    background-color var(--cdl-motion-fast) var(--cdl-motion-ease),
+    color var(--cdl-motion-fast) var(--cdl-motion-ease);
+}
+
+.emergency-route-filter-banner__btn:hover,
+.emergency-route-filter-banner__btn:focus-visible,
+.emergency-route-help-trigger:hover,
+.emergency-route-help-trigger:focus-visible {
+  border-color: var(--semantic-information-border);
+  background: var(--semantic-information-bg);
+  color: var(--semantic-information);
+  outline: var(--app-focus-ring);
+  outline-offset: 2px;
+}
+
+.emergency-route-filter-banner__btn.cd-btn,
+.emergency-route-help-trigger.cd-btn {
+  /* explicit cd-btn class wins cascade specificity */
+}
+
+/* Tabs & chips */
+.emergency-route-view-tabs__btn {
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-pill, 999px);
+  background: var(--app-surface-muted);
+  color: var(--app-text-muted);
+  font-size: var(--app-type-small);
+  font-weight: 600;
+  min-height: var(--app-control-height-sm, 32px);
+  padding: 0 var(--app-space-md);
+  transition: border-color var(--cdl-motion-fast) var(--cdl-motion-ease);
+}
+
+.emergency-route-view-tabs__btn--active {
+  border-color: var(--semantic-information-border);
+  background: var(--semantic-information-bg);
+  color: var(--semantic-information);
+}
+
+.emergency-route-maturity-chip--demo {
+  border-color: var(--semantic-warning-border);
+  background: var(--semantic-warning-bg);
+  color: var(--semantic-warning);
+}
+
+.emergency-route-maturity-chip--preview {
+  border-color: var(--semantic-information-border);
+  background: var(--semantic-information-bg);
+  color: var(--semantic-information);
+}
+
+.emergency-route-maturity-chip--planned {
+  border-color: var(--semantic-inactive-border);
+  background: var(--semantic-inactive-bg);
+  color: var(--semantic-inactive);
+}
+
+/* Metric cards */
+.emergency-route-metric-card,
+.hospital-command-center__metric-card {
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-lg);
+  background: var(--app-surface);
+}
+
+.emergency-route-metric-card[style*='--metric-color'],
+.hospital-command-center__metric-card--critical {
+  border-color: color-mix(in srgb, var(--semantic-critical) 35%, var(--app-border));
+}
+
+.hospital-command-center__metric-card--warning {
+  border-color: color-mix(in srgb, var(--semantic-warning) 35%, var(--app-border));
+}
+
+.hospital-command-center__metric-card--watch {
+  border-color: color-mix(in srgb, var(--semantic-operational-status) 30%, var(--app-border));
+}
+
+.hospital-command-center__metric-value,
+.emergency-route-metric-card__value {
+  color: var(--app-text);
+  font-size: var(--app-type-heading);
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.hospital-command-center__metric-label,
+.emergency-route-metric-card__label {
+  color: var(--app-text-muted);
+  font-size: var(--app-type-caption);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Command center status — semantic operational tones */
+.hospital-command-center__status--critical {
+  border-color: var(--semantic-critical-border) !important;
+  background: var(--semantic-critical-bg) !important;
+  color: var(--semantic-critical);
+}
+
+.hospital-command-center__status--warning {
+  border-color: var(--semantic-warning-border) !important;
+  background: var(--semantic-warning-bg) !important;
+  color: var(--semantic-warning);
+}
+
+.hospital-command-center__severity--critical {
+  color: var(--semantic-critical);
+}
+
+.hospital-command-center__severity--warning {
+  color: var(--semantic-warning);
+}
+
+/* Banners, alerts, empty states */
+.emergency-route-banner--error,
+.emergency-route-empty {
+  border-color: var(--semantic-critical-border);
+  background: var(--semantic-critical-bg);
+  color: var(--semantic-critical);
+}
+
+.emergency-route-banner:not(.emergency-route-banner--error) {
+  border-color: var(--semantic-information-border);
+  background: var(--semantic-information-bg);
+  color: var(--semantic-information);
+}
+
+.emergency-route-data-source--stale {
+  border-color: var(--semantic-warning-border);
+  color: var(--semantic-warning);
+}
+
+/* Infrastructure / system health */
+.system-health-status--ok {
+  border-color: var(--semantic-healthy-border);
+  background: var(--semantic-healthy-bg);
+}
+
+.system-health-status--danger {
+  border-color: var(--semantic-critical-border);
+  background: var(--semantic-critical-bg);
+}
+
+.system-health-status--warn {
+  border-color: var(--semantic-warning-border);
+  background: var(--semantic-warning-bg);
+}
+
+.system-health-status-pill {
+  color: var(--semantic-infrastructure-health);
+  font-size: var(--app-type-caption);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Patient / staff cards inherit surface rhythm */
+.patient-card,
+.staff-card {
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-lg);
+  background: var(--app-surface);
+  box-shadow: var(--app-elevation-none);
+}
+
+/* Loading & error states */
+.cd-state--loading {
+  border-color: var(--semantic-information-border);
+  background: var(--semantic-information-bg);
+}
+
+.cd-state--unsupported {
+  border-color: var(--semantic-inactive-border);
+  background: var(--semantic-inactive-bg);
+}

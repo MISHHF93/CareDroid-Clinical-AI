@@ -315,6 +315,13 @@ button.caredroid-header__copilot-pill:focus-visible {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--app-accent-interactive, var(--status-info, var(--app-info))) 18%, transparent);
 }
 
+.caredroid-header__notification-trigger {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .caredroid-header__notification-badge {
   position: absolute;
   inset-block-start: -6px;

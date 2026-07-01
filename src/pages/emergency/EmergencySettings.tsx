@@ -29,7 +29,7 @@ import {
 } from '../../services/emergencyOsApi';
 import { EMERGENCY_OS_BRANDING } from '../../config/emergencyOsBranding.config';
 import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
-import { PageShell } from '../../components/ui/CareDroidPrimitives';
+import { CareDroidPage } from '../../components/ui/CareDroidPrimitives';
 import { listScreenModesForSettings } from '../../config/careDroidScreenModes';
 import {
   PUBLIC_DISPLAY_PRIVACY_OPTIONS,
@@ -750,7 +750,7 @@ export default function EmergencySettings() {
   };
 
   return (
-    <PageShell
+    <CareDroidPage
       as="section"
       eyebrow="Department settings"
       title="CareDroid Settings"
@@ -761,7 +761,7 @@ export default function EmergencySettings() {
       }
       actions={
         <strong className="emergency-settings__module-count">
-          {loading ? 'Loading…' : `${enabledCount} modules`}
+          {loading ? 'Loadingï¿½' : `${enabledCount} modules`}
         </strong>
       }
       className="emergency-settings cd-page-shell"
@@ -785,7 +785,7 @@ export default function EmergencySettings() {
         title="ED-18 Walkthrough Dataset"
         subtitle={
           surfaces.settings.showWalkthroughDetail
-            ? 'Loads 18 representative active patients across every queue state — enough to demo the full ED journey without overwhelming practitioners.'
+            ? 'Loads 18 representative active patients across every queue state ï¿½ enough to demo the full ED journey without overwhelming practitioners.'
             : undefined
         }
         action={
@@ -858,7 +858,7 @@ export default function EmergencySettings() {
               <small>{integrationHubEnvelope?.source || 'local settings fallback'}</small>
               <p>
                 <Link to={CANONICAL_ROUTES.integrationHub}>Open Integration Hub dashboard</Link>
-                {' · '}
+                {' ï¿½ '}
                 <Link to={CANONICAL_ROUTES.cosmosViewer}>Cosmos Viewer</Link>
               </p>
             </div>
@@ -1018,7 +1018,7 @@ export default function EmergencySettings() {
             value={draft.publicDisplayPrivacy || 'standard'}
             options={PUBLIC_DISPLAY_PRIVACY_OPTIONS.map((option) => [
               option.id,
-              `${option.label} — ${option.description}`,
+              `${option.label} ï¿½ ${option.description}`,
             ])}
             onChange={(value) => updateDraft({ publicDisplayPrivacy: value })}
           />
@@ -1027,7 +1027,7 @@ export default function EmergencySettings() {
             value={draft.wallDisplayMonitorPrivacy || 'operational'}
             options={WALL_DISPLAY_MONITOR_PRIVACY_OPTIONS.map((option) => [
               option.id,
-              `${option.label} — ${option.description}`,
+              `${option.label} ï¿½ ${option.description}`,
             ])}
             onChange={(value) => updateDraft({ wallDisplayMonitorPrivacy: value })}
           />
@@ -1158,7 +1158,7 @@ export default function EmergencySettings() {
                   <strong>{log.title || log.type}</strong>
                   <p>{log.summary}</p>
                   <small>
-                    {log.source} · {patientAuditLabel(log.patientId, patients)}
+                    {log.source} ï¿½ {patientAuditLabel(log.patientId, patients)}
                   </small>
                 </div>
                 <div>
@@ -1511,7 +1511,7 @@ export default function EmergencySettings() {
             <div>
               <strong>Compliance and audit</strong>
               <p>
-                {aiGovernanceCompliance?.totalInteractions ?? 0} audited interactions ·{' '}
+                {aiGovernanceCompliance?.totalInteractions ?? 0} audited interactions ï¿½{' '}
                 {Math.round((aiGovernanceCompliance?.humanReviewRate || 0) * 100)}% human review rate
               </p>
               <small>
@@ -1534,11 +1534,11 @@ export default function EmergencySettings() {
             <div>
               <strong>Copilot runtime config</strong>
               <p>
-                {copilotService.provider || draft.aiSettings.provider} ·{' '}
+                {copilotService.provider || draft.aiSettings.provider} ï¿½{' '}
                 {copilotService.model || draft.aiSettings.model}
               </p>
               <small>
-                {copilotService.auditLevel || 'full'} audit · {copilotService.status || 'settings'} status
+                {copilotService.auditLevel || 'full'} audit ï¿½ {copilotService.status || 'settings'} status
               </small>
             </div>
           </article>
@@ -1546,11 +1546,11 @@ export default function EmergencySettings() {
             <div>
               <strong>ML model governance</strong>
               <p>
-                Deterioration: {deteriorationService.status || 'future'} · Federated EMS:{' '}
+                Deterioration: {deteriorationService.status || 'future'} ï¿½ Federated EMS:{' '}
                 {federatedEmsService.status || 'future'}
               </p>
               <small>
-                {aiStatusCounts.active || 0} active · {aiStatusCounts.future || 0} future ·{' '}
+                {aiStatusCounts.active || 0} active ï¿½ {aiStatusCounts.future || 0} future ï¿½{' '}
                 {aiStatusCounts['local-deterministic'] || 0} deterministic
               </small>
             </div>
@@ -2076,6 +2076,6 @@ export default function EmergencySettings() {
           ))}
         </div>
       </Section>
-    </PageShell>
+    </CareDroidPage>
   );
 }

@@ -4,7 +4,7 @@ import { isPractitionerCleanupEnabled } from '../../config/practitionerCleanup.c
 import { mapLiveSourceStatusToNormalized } from '../../config/integrationStatusModel';
 import IntegrationStatusBadge from '../../components/integrations/IntegrationStatusBadge';
 import IntegrationStatusPanel from '../../components/integrations/IntegrationStatusPanel';
-import { PageShell } from '../../components/ui/CareDroidPrimitives';
+import { CareDroidPage } from '../../components/ui/CareDroidPrimitives';
 import { useIntegrationHub } from '../../hooks/useIntegrationHub';
 import './IntegrationHubPage.css';
 
@@ -31,58 +31,63 @@ export default function IntegrationHubPage() {
       : 'unknown';
 
   return (
-    <PageShell
+    <CareDroidPage
       as="div"
-      eyebrow="Integrations"
+      eyebrow="Infrastructure health"
       title="Integration Hub"
       description="Connector status, review queue, and recent interoperability events."
       actions={
         <div className="integration-hub-page__actions">
-          <Link to={CANONICAL_ROUTES.emergencySettings}>Emergency Settings</Link>
-          <button type="button" onClick={() => void refresh()}>
+          <Link className="cd-btn cd-btn--secondary cd-btn--sm" to={CANONICAL_ROUTES.emergencySettings}>
+            Emergency Settings
+          </Link>
+          <button type="button" className="cd-btn cd-btn--primary cd-btn--sm" onClick={() => void refresh()}>
             Refresh
           </button>
         </div>
       }
-      className="integration-hub-page cd-page-shell"
+      className="integration-hub-page"
       headerClassName="integration-hub-page__hero"
       contentClassName="integration-hub-page__content"
       aria-label="Integration Hub"
-    >
-      <IntegrationStatusPanel liveSources={sources} />
-
-      <div className="integration-hub-page__cards" aria-label="Integration Hub summary">
-        <article>
-          <strong>Backend envelope</strong>
-          <p>
-            {status === 'loading'
-              ? 'Loading...'
-              : status === 'error'
-                ? error
-                : `${sources.length} source(s) from ${envelope?.module || 'Integration Hub'}.`}
-          </p>
-          <small>{envelope?.source || 'backend-fixture'}</small>
-        </article>
-        <article>
-          <strong>Interoperability spine</strong>
-          <p>{connectionState.replace(/_/g, ' ')}</p>
-          <small>/api/interoperability/summary</small>
-        </article>
-        <article>
-          <strong>Review queue</strong>
-          <p>
-            {reviewQueue.length
-              ? `${reviewQueue.length} item(s) require staff awareness.`
-              : 'No review items returned.'}
-          </p>
-        </article>
-        <article>
-          <strong>Recent events</strong>
-          <p>{recentEvents.length ? `${recentEvents.length} event(s) loaded.` : 'No events yet.'}</p>
-        </article>
-      </div>
-
-      <section className="integration-hub-page__section" aria-label="Integration sources">
+      zones={{
+        operationalSummary: (
+          <>
+            <IntegrationStatusPanel liveSources={sources} />
+            <div className="integration-hub-page__cards" aria-label="Integration Hub summary">
+              <article className="cd-surface-card cdl-health-widget--infrastructure">
+                <strong>Backend envelope</strong>
+                <p>
+                  {status === 'loading'
+                    ? 'Loading...'
+                    : status === 'error'
+                      ? error
+                      : `${sources.length} source(s) from ${envelope?.module || 'Integration Hub'}.`}
+                </p>
+                <small>{envelope?.source || 'backend-fixture'}</small>
+              </article>
+              <article className="cd-surface-card cdl-health-widget--infrastructure">
+                <strong>Interoperability spine</strong>
+                <p>{connectionState.replace(/_/g, ' ')}</p>
+                <small>/api/interoperability/summary</small>
+              </article>
+              <article className="cd-surface-card">
+                <strong>Review queue</strong>
+                <p>
+                  {reviewQueue.length
+                    ? `${reviewQueue.length} item(s) require staff awareness.`
+                    : 'No review items returned.'}
+                </p>
+              </article>
+              <article className="cd-surface-card">
+                <strong>Recent events</strong>
+                <p>{recentEvents.length ? `${recentEvents.length} event(s) loaded.` : 'No events yet.'}</p>
+              </article>
+            </div>
+          </>
+        ),
+        activeWork: (
+          <section className="integration-hub-page__section" aria-label="Integration sources">
         <h2>Sources</h2>
         {sources.length ? (
           <table className="integration-hub-page__table">
@@ -115,20 +120,20 @@ export default function IntegrationHubPage() {
         ) : (
           <p className="integration-hub-page__empty">No integration sources returned.</p>
         )}
-      </section>
-
-      {gaps.length ? (
-        <section className="integration-hub-page__section" aria-label="Remaining gaps">
-          <h2>Remaining gaps</h2>
-          <ul>
-            {gaps.map((gap) => (
-              <li key={gap}>{gap}</li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-
-      <section className="integration-hub-page__section" aria-label="Recent integration events">
+          </section>
+        ),
+        supportingContext: gaps.length ? (
+          <section className="integration-hub-page__section" aria-label="Remaining gaps">
+            <h2>Remaining gaps</h2>
+            <ul>
+              {gaps.map((gap) => (
+                <li key={gap}>{gap}</li>
+              ))}
+            </ul>
+          </section>
+        ) : null,
+        history: (
+          <section className="integration-hub-page__section" aria-label="Recent integration events">
         <h2>Recent events</h2>
         {recentEvents.length ? (
           <table className="integration-hub-page__table">
@@ -156,7 +161,9 @@ export default function IntegrationHubPage() {
             No persisted interoperability events yet. Ingest via POST /api/interoperability/events.
           </p>
         )}
-      </section>
-    </PageShell>
+          </section>
+        ),
+      }}
+    />
   );
 }

@@ -8,7 +8,7 @@ import {
   DashboardSection,
   LoadingState,
   MetricCard,
-  PageShell,
+  CareDroidPage,
   StatusBadge,
   Surface,
 } from '../../components/ui/CareDroidPrimitives';
@@ -83,7 +83,7 @@ export default function ExecutiveCommandCenter() {
   const compare = shift?.comparison;
 
   return (
-    <PageShell
+    <CareDroidPage
       className="executive-command-page"
       contentClassName="cd-page-stack cd-page-stack--compact executive-command-page__content"
       eyebrow="Administrator / executive"
@@ -100,12 +100,12 @@ export default function ExecutiveCommandCenter() {
           </Button>
         </ActionRow>
       }
-    >
-      {loading && !analytics ? (
-        <LoadingState title="Loading executive dashboard" description="Fetching shift KPIs, platform health, and surge status." />
-      ) : null}
-
-      <DashboardGrid variant="summary" className="executive-kpi-grid">
+      zones={{
+        operationalSummary: loading && !analytics ? (
+          <LoadingState title="Loading executive dashboard" description="Fetching shift KPIs, platform health, and surge status." />
+        ) : null,
+        analytics: (
+          <DashboardGrid variant="summary" className="executive-kpi-grid">
         <MetricCard
           label="Patients seen"
           value={shift?.patientsSeen ?? '—'}
@@ -143,9 +143,10 @@ export default function ExecutiveCommandCenter() {
           tone={shift?.lwbsCount > 0 ? 'attention' : 'healthy'}
           helper="left without being seen"
         />
-      </DashboardGrid>
-
-      <DashboardGrid variant="cards" className="executive-panel-grid">
+          </DashboardGrid>
+        ),
+        activeWork: (
+          <DashboardGrid variant="cards" className="executive-panel-grid">
         {platformChecks.length > 0 ? (
           <DashboardSection
             className="executive-panel"
@@ -242,11 +243,12 @@ export default function ExecutiveCommandCenter() {
             </dl>
           </DashboardSection>
         ) : null}
-      </DashboardGrid>
-
-      {lastRefreshed ? (
-        <p className="executive-refreshed">Last refreshed {lastRefreshed.toLocaleTimeString()}</p>
-      ) : null}
-    </PageShell>
+          </DashboardGrid>
+        ),
+        history: lastRefreshed ? (
+          <p className="executive-refreshed cdl-surface cdl-surface--inactive">Last refreshed {lastRefreshed.toLocaleTimeString()}</p>
+        ) : null,
+      }}
+    />
   );
 }

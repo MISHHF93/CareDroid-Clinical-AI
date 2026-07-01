@@ -73,16 +73,6 @@
   -webkit-overflow-scrolling: touch;
 }
 
-.app-shell-main-content > * {
-  max-width: min(100%, 1680px);
-  margin-inline: auto;
-  width: 100%;
-}
-
-.emergency-app-shell--density-compact .app-shell-main-content {
-  padding-inline: var(--app-space-md, 12px);
-}
-
 .app-shell-main-content--mobile-nav {
   padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px));
 }

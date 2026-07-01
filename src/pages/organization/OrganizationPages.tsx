@@ -6,7 +6,7 @@ import Button from '../../components/ui/button';
 import {
   ActionRow,
   DashboardGrid,
-  PageShell,
+  CareDroidPage,
 } from '../../components/ui/CareDroidPrimitives';
 import { useOrganizationContext } from '../../contexts/OrganizationContext';
 import { useUserIdentity } from '../../contexts/UserIdentityContext';
@@ -78,7 +78,7 @@ export function OrganizationDashboard() {
   const packs = platformContext?.entitledPacks || [];
 
   return (
-    <PageShell
+    <CareDroidPage
       className="org-page"
       contentClassName="cd-page-stack cd-page-stack--compact org-page__content"
       title={organization?.name || 'Organization'}
@@ -119,7 +119,7 @@ export function OrganizationDashboard() {
           <h2>Tenant</h2>
           <p>{tenant?.tenantId || organization?.slug || 'No tenant selected'}</p>
           <p className="org-pack-meta">
-            {branding?.displayName || organization?.name || 'CareDroid'} · {tenant?.complianceMode || 'hipaa'}
+            {branding?.displayName || organization?.name || 'CareDroid'} ï¿½ {tenant?.complianceMode || 'hipaa'}
           </p>
         </Card>
 
@@ -166,7 +166,7 @@ export function OrganizationDashboard() {
       <Button variant="ghost" onClick={() => refreshPlatformContext()}>
         Refresh platform context
       </Button>
-    </PageShell>
+    </CareDroidPage>
   );
 }
 
@@ -232,7 +232,7 @@ export function OrganizationSettings() {
   }, [branding, organization, subscription]);
 
   const createOrganization = async () => {
-    setStatus('Creating…');
+    setStatus('Creatingï¿½');
     try {
       const slug = form.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
       await PlatformAssetsApi.createOrganization({
@@ -259,7 +259,7 @@ export function OrganizationSettings() {
 
   const saveOrganization = async () => {
     if (!organization?.id) return;
-    setStatus('Saving…');
+    setStatus('Savingï¿½');
     try {
       const result = await saveOrganizationSettings({
         name: form.name,
@@ -509,7 +509,7 @@ export function PackMarketplace() {
       setStatus('Create an organization first.');
       return;
     }
-    setStatus(enabled ? 'Disabling…' : 'Enabling…');
+    setStatus(enabled ? 'Disablingï¿½' : 'Enablingï¿½');
     try {
       if (enabled) {
         await PlatformAssetsApi.removePack(organization.id, packId);
@@ -554,7 +554,7 @@ export function PackMarketplace() {
                 <div>
                   <h2>{pack.name}</h2>
                   <p className="org-pack-meta">
-                    {pack.includedAssetCount || pack.assetIds?.length || 0} assets · {pack.pricingTier} tier
+                    {pack.includedAssetCount || pack.assetIds?.length || 0} assets ï¿½ {pack.pricingTier} tier
                   </p>
                 </div>
                 <span className={`org-status-pill org-status-pill--${installed ? 'enabled' : 'available'}`}>
@@ -609,7 +609,7 @@ export function PackMarketplace() {
                   {(pack.includedAssets || []).slice(0, expanded ? 99 : 5).map((asset) => (
                     <li key={asset.id}>
                       <span>{asset.title || asset.id}</span>
-                      <small>{asset.type || asset.category || 'asset'} {asset.route ? `· ${asset.route}` : ''}</small>
+                      <small>{asset.type || asset.category || 'asset'} {asset.route ? `ï¿½ ${asset.route}` : ''}</small>
                     </li>
                   ))}
                 </ul>
@@ -801,7 +801,7 @@ export function PlatformAnalyticsPage() {
         <ul>
           {packs.map((pack) => (
             <li key={pack.id}>
-              {pack.name} — {pack.assetIds?.length || 0} assets
+              {pack.name} ï¿½ {pack.assetIds?.length || 0} assets
             </li>
           ))}
         </ul>
@@ -952,7 +952,7 @@ export function CustomerSuccessDashboard() {
                 <Card key={product.id} className="org-card">
                   <h2>{product.name}</h2>
                   <p className="org-pack-meta">
-                    {product.enabledAssetCount} enabled assets · {product.usageCount} usage events
+                    {product.enabledAssetCount} enabled assets ï¿½ {product.usageCount} usage events
                   </p>
                   <div className="org-chip-list">
                     {(product.expectedOutcomes || []).slice(0, 4).map((outcome) => (
@@ -975,9 +975,9 @@ export function CustomerSuccessDashboard() {
           <Card className="org-card">
             <h2>Data sources</h2>
             <p>
-              Usage events: {dashboard.sources?.usageEvents || 0} · Audit events:{' '}
-              {dashboard.sources?.auditEvents || 0} · Entitlements:{' '}
-              {dashboard.sources?.enabledEntitlements || 0} · Products:{' '}
+              Usage events: {dashboard.sources?.usageEvents || 0} ï¿½ Audit events:{' '}
+              {dashboard.sources?.auditEvents || 0} ï¿½ Entitlements:{' '}
+              {dashboard.sources?.enabledEntitlements || 0} ï¿½ Products:{' '}
               {dashboard.sources?.products || 0}
             </p>
           </Card>
@@ -1136,7 +1136,7 @@ export function OrganizationIntelligenceProfile() {
             <h2>Identity</h2>
             <p>{profile.organization.name}</p>
             <p className="org-pack-meta">
-              Tenant: {profile.organization.tenantId} · Subscription: {profile.organization.subscriptionTier}
+              Tenant: {profile.organization.tenantId} ï¿½ Subscription: {profile.organization.subscriptionTier}
             </p>
             <span className={`org-status-pill org-status-pill--${profile.organization.healthStatus}`}>
               {profile.organization.healthStatus}
@@ -1239,7 +1239,7 @@ export function AssetLifecycleAdmin() {
   );
 
   const setLifecycle = async (assetId, lifecycle) => {
-    setStatus('Updating…');
+    setStatus('Updatingï¿½');
     try {
       await PlatformAssetsApi.updateAssetLifecycle(assetId, lifecycle);
       load();
@@ -1371,7 +1371,7 @@ export function DepartmentsPage() {
           <Card className="org-card">
             <h2>{selectedDepartment.name}</h2>
             <p className="org-pack-meta">
-              {selectedDepartment.packCount} packs · {selectedDepartment.assetCount} assets ·{' '}
+              {selectedDepartment.packCount} packs ï¿½ {selectedDepartment.assetCount} assets ï¿½{' '}
               {selectedDepartment.userCount} users
             </p>
           </Card>
@@ -1385,7 +1385,7 @@ export function DepartmentsPage() {
                     <span>{pack.name}</span>
                     <small>
                       {pack.assetIds?.length || 0} department assets
-                      {pack.enabled ? ' · enabled' : ''}
+                      {pack.enabled ? ' ï¿½ enabled' : ''}
                     </small>
                   </li>
                 ))}
@@ -1405,9 +1405,9 @@ export function DepartmentsPage() {
                       {asset.route ? <Link to={asset.route}>{asset.title || asset.id}</Link> : asset.title || asset.id}
                     </span>
                     <small>
-                      {asset.assetType} · primary: {asset.primaryDepartment}
+                      {asset.assetType} ï¿½ primary: {asset.primaryDepartment}
                       {asset.secondaryDepartments?.length
-                        ? ` · secondary: ${asset.secondaryDepartments.join(', ')}`
+                        ? ` ï¿½ secondary: ${asset.secondaryDepartments.join(', ')}`
                         : ''}
                     </small>
                     <small>Roles: {(asset.recommendedRoles || []).join(', ') || 'none'}</small>
@@ -1429,8 +1429,8 @@ export function DepartmentsPage() {
                     <span>{user.displayName}</span>
                     <small>
                       {user.role}
-                      {user.roleProfileId ? ` · ${user.roleProfileId}` : ''}
-                      {user.specialty ? ` · ${user.specialty}` : ''}
+                      {user.roleProfileId ? ` ï¿½ ${user.roleProfileId}` : ''}
+                      {user.specialty ? ` ï¿½ ${user.specialty}` : ''}
                     </small>
                   </li>
                 ))}
@@ -1498,7 +1498,7 @@ export function ServiceLinesPage() {
           <Card className="org-card">
             <h2>{selectedServiceLine.name}</h2>
             <p className="org-pack-meta">
-              {selectedServiceLine.departmentCount} departments · {selectedServiceLine.packCount} packs ·{' '}
+              {selectedServiceLine.departmentCount} departments ï¿½ {selectedServiceLine.packCount} packs ï¿½{' '}
               {selectedServiceLine.assetCount} assets
             </p>
           </Card>
@@ -1511,7 +1511,7 @@ export function ServiceLinesPage() {
                   <li key={department.id}>
                     <span>{department.name}</span>
                     <small>
-                      {department.packCount} packs · {department.assetCount} assets
+                      {department.packCount} packs ï¿½ {department.assetCount} assets
                     </small>
                   </li>
                 ))}
@@ -1530,7 +1530,7 @@ export function ServiceLinesPage() {
                     <span>{pack.name}</span>
                     <small>
                       {pack.assetIds?.length || 0} service-line assets
-                      {pack.enabled ? ' · enabled' : ''}
+                      {pack.enabled ? ' ï¿½ enabled' : ''}
                     </small>
                   </li>
                 ))}
@@ -1550,7 +1550,7 @@ export function ServiceLinesPage() {
                       {asset.route ? <Link to={asset.route}>{asset.title || asset.id}</Link> : asset.title || asset.id}
                     </span>
                     <small>
-                      {asset.assetType} · departments: {(asset.departmentIds || []).join(', ') || asset.primaryDepartment}
+                      {asset.assetType} ï¿½ departments: {(asset.departmentIds || []).join(', ') || asset.primaryDepartment}
                     </small>
                     <small>Packs: {(asset.packIds || []).join(', ') || 'none'}</small>
                   </li>
@@ -1810,7 +1810,7 @@ export function TenantAdministrationCenter() {
             />
           </label>
           <p className="org-pack-meta">
-            Tenant: {admin?.profile?.tenantId || organization.slug || 'current tenant'} ·{' '}
+            Tenant: {admin?.profile?.tenantId || organization.slug || 'current tenant'} ï¿½{' '}
             {admin?.profile?.complianceMode || 'hipaa'}
           </p>
         </Card>
@@ -1882,7 +1882,7 @@ export function TenantAdministrationCenter() {
             </select>
           </label>
           <p className="org-pack-meta">
-            Status: {admin?.subscriptions?.current?.status || 'active'} · source:{' '}
+            Status: {admin?.subscriptions?.current?.status || 'active'} ï¿½ source:{' '}
             {admin?.subscriptions?.current?.source || 'tenant'}
           </p>
         </Card>
@@ -1977,7 +1977,7 @@ export function TenantAdministrationCenter() {
             <li>{rolePreviewSummary.navigationRoutes.length} navigation routes</li>
             <li>{rolePreviewSummary.allowedWorkspaces.join(', ')}</li>
             <li>
-              Emergency: {rolePreviewSummary.emergencyRole || 'none'} · TrackMind:{' '}
+              Emergency: {rolePreviewSummary.emergencyRole || 'none'} ï¿½ TrackMind:{' '}
               {rolePreviewSummary.trackMindRole || 'none'}
             </li>
           </ul>
@@ -2003,7 +2003,7 @@ export function TenantAdministrationCenter() {
                     <strong>{workspace.label}</strong>
                     <small>{workspace.description}</small>
                     <small>
-                      {workspace.subscriptionTier} · {workspace.allowedOrganizationTypes.join(', ')}
+                      {workspace.subscriptionTier} ï¿½ {workspace.allowedOrganizationTypes.join(', ')}
                     </small>
                     {enabled && (
                       <>
@@ -2087,7 +2087,7 @@ export function TenantAdministrationCenter() {
               <li key={user.membershipId || user.userId}>
                 <span>{user.displayName}</span>
                 <small>
-                  {user.membershipRole} · {user.roleProfileId || 'no role profile'}
+                  {user.membershipRole} ï¿½ {user.roleProfileId || 'no role profile'}
                 </small>
                 {user.specialty && <small>{user.specialty}</small>}
               </li>

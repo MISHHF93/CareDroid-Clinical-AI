@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS } from '../../navigation/iconRegistry';
-import { DashboardGrid, MetricCard, PageShell } from '../../components/ui/CareDroidPrimitives';
+import { CareDroidPage, DashboardGrid, MetricCard } from '../../components/ui/CareDroidPrimitives';
 import {
   LOCAL_TRAINING_DASHBOARD,
   createTrainingRun,
@@ -113,76 +113,82 @@ export default function TrainingDashboard() {
   };
 
   return (
-    <PageShell
+    <CareDroidPage
       className="training-dashboard"
-      eyebrow="AI model pipeline"
+      eyebrow="AI assistance"
       title="Training Dashboard"
       titleId="training-dashboard-title"
       description="Manage data preparation, labeling, embeddings, LoRA tuning, evaluation, and deployment for prompt engineering, RAG, LoRA, and MoE routing."
       leadingIcon={<NavIcon icon={CHROME_ICONS.brain} size={30} />}
       actions={
-        <button type="button" onClick={handleCreateRun} disabled={creating}>
+        <button type="button" className="cd-btn cd-btn--primary cd-btn--sm" onClick={handleCreateRun} disabled={creating}>
           {creating ? 'Queueing...' : 'Queue training run'}
         </button>
       }
-    >
-
-      {notice && <p className="training-notice">{notice}</p>}
-
-      <DashboardGrid variant="metrics" className="training-metrics" aria-label="Evaluation metrics">
-        <MetricCard label="Accuracy" value={formatMetric('accuracy', metrics.accuracy)} />
-        <MetricCard label="Hallucination rate" value={formatMetric('hallucinationRate', metrics.hallucinationRate)} />
-        <MetricCard label="Precision" value={formatMetric('precision', metrics.precision)} />
-        <MetricCard label="Latency" value={formatMetric('latencyMs', metrics.latencyMs)} />
-        <MetricCard label="Cost" value={formatMetric('costUsd', metrics.costUsd)} />
-      </DashboardGrid>
-
-      <section className="training-progress-panel">
-        <div className="training-panel-heading">
-          <div>
-            <h2>Pipeline Progress</h2>
-            <p>
-              {loading ? 'Loading pipeline state...' : `${progress}% through latest tracked run`}
-            </p>
-          </div>
-          <span>{latestRun?.status || 'ready'}</span>
-        </div>
-        <div className="training-progress-track" aria-hidden>
-          <div style={{ width: `${progress}%` }} />
-        </div>
-      </section>
-
-      <section className="training-layout">
-        <div className="training-pipeline">
-          {pipeline.map((stage, index) => (
-            <PipelineStage key={stage.id} stage={stage} index={index} />
-          ))}
-        </div>
-
-        <aside className="training-side">
-          <section className="training-panel">
-            <h2>Capabilities</h2>
-            <div className="training-capabilities">
-              {(dashboard.capabilities || []).map((capability) => (
-                <article key={capability.id}>
-                  <strong>{capability.name}</strong>
-                  <span>{capability.status}</span>
-                  <p>{capability.description}</p>
-                </article>
-              ))}
-            </div>
-          </section>
-
-          <section className="training-panel">
-            <h2>Quality Gates</h2>
-            <div className="training-gates">
-              {(dashboard.qualityGates || []).map((gate) => (
-                <QualityGate key={gate.id} gate={gate} />
-              ))}
-            </div>
-          </section>
-
-          <section className="training-panel">
+      zones={{
+        operationalSummary: notice ? (
+          <p className="training-notice cdl-ai-panel cd-info-notice cd-info-notice--ai">{notice}</p>
+        ) : null,
+        analytics: (
+          <DashboardGrid variant="metrics" className="training-metrics" aria-label="Evaluation metrics">
+            <MetricCard label="Accuracy" value={formatMetric('accuracy', metrics.accuracy)} tone="healthy" />
+            <MetricCard label="Hallucination rate" value={formatMetric('hallucinationRate', metrics.hallucinationRate)} tone="attention" />
+            <MetricCard label="Precision" value={formatMetric('precision', metrics.precision)} />
+            <MetricCard label="Latency" value={formatMetric('latencyMs', metrics.latencyMs)} />
+            <MetricCard label="Cost" value={formatMetric('costUsd', metrics.costUsd)} />
+          </DashboardGrid>
+        ),
+        activeWork: (
+          <>
+            <section className="training-progress-panel cdl-surface cdl-surface--ai-assistance">
+              <div className="training-panel-heading">
+                <div>
+                  <h2>Pipeline Progress</h2>
+                  <p>
+                    {loading ? 'Loading pipeline state...' : `${progress}% through latest tracked run`}
+                  </p>
+                </div>
+                <span>{latestRun?.status || 'ready'}</span>
+              </div>
+              <div className="training-progress-track" aria-hidden>
+                <div style={{ width: `${progress}%` }} />
+              </div>
+            </section>
+            <section className="training-layout">
+              <div className="training-pipeline">
+                {pipeline.map((stage, index) => (
+                  <PipelineStage key={stage.id} stage={stage} index={index} />
+                ))}
+              </div>
+            </section>
+          </>
+        ),
+        supportingContext: (
+          <aside className="training-side">
+            <section className="training-panel cd-surface-card">
+              <h2>Capabilities</h2>
+              <div className="training-capabilities">
+                {(dashboard.capabilities || []).map((capability) => (
+                  <article key={capability.id}>
+                    <strong>{capability.name}</strong>
+                    <span>{capability.status}</span>
+                    <p>{capability.description}</p>
+                  </article>
+                ))}
+              </div>
+            </section>
+            <section className="training-panel cd-surface-card">
+              <h2>Quality Gates</h2>
+              <div className="training-gates">
+                {(dashboard.qualityGates || []).map((gate) => (
+                  <QualityGate key={gate.id} gate={gate} />
+                ))}
+              </div>
+            </section>
+          </aside>
+        ),
+        history: (
+          <section className="training-panel cd-surface-card cdl-surface cdl-surface--inactive">
             <h2>Recent Runs</h2>
             {(dashboard.runs || []).length ? (
               <div className="training-runs">
@@ -202,8 +208,8 @@ export default function TrainingDashboard() {
               <p className="training-empty">No training runs queued yet.</p>
             )}
           </section>
-        </aside>
-      </section>
-    </PageShell>
+        ),
+      }}
+    />
   );
 }

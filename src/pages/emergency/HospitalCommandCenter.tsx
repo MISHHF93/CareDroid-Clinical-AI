@@ -143,6 +143,7 @@ export default function HospitalCommandCenter() {
 
   return (
     <EmergencyRoutePage
+      surfaceClassName="hospital-command-center"
       eyebrow="Hospital Command Center"
       title="Real-Time ED Operations"
       description={`One operational picture for ${roleLabel} — actionable metrics only, no historical reporting widgets.`}
@@ -159,192 +160,200 @@ export default function HospitalCommandCenter() {
         tone: snapshot.tone === 'critical' ? 'critical' : snapshot.tone === 'warning' ? 'warning' : 'neutral',
       }}
       actions={
-        <Link to={CANONICAL_ROUTES.emergencyWhiteboard} className="emergency-route-filter-banner__btn">
+        <Link to={CANONICAL_ROUTES.emergencyWhiteboard} className="emergency-route-filter-banner__btn cd-btn cd-btn--secondary cd-btn--sm">
           Open whiteboard
         </Link>
       }
-    >
-      <EdDataSourceBanner
-        envelope={{
-          source: backendAvailable ? 'backend' : 'local-store-fallback',
-          generatedAt: snapshot.generatedAt,
-        }}
-        loading={false}
-      />
-
-      <div
-        className={`hospital-command-center__status hospital-command-center__status--${snapshot.tone}`}
-        role="status"
-      >
-        <p className="hospital-command-center__status-line">{snapshot.statusLine}</p>
-        <div className="hospital-command-center__status-meta">
-          <span>{CAREDROID_PRODUCT.safetyShort}</span>
-          <span>Role view: {roleLabel}</span>
-          <span>
-            3-min: {snapshot.threeMinuteCompliance.compliant ? 'compliant' : 'breach'}
-          </span>
-        </div>
-      </div>
-
-      <section className="emergency-route-card">
-        <div className="emergency-route-section-card__header">
-          <div>
-            <strong>Critical actions</strong>
-            <p className="emergency-route-section-card__lead">
-              Prioritized from dispatch, readiness, alerts, AI review, bottlenecks, and staff routing.
-            </p>
+      operationalSummaryExtra={
+        <>
+          <EdDataSourceBanner
+            envelope={{
+              source: backendAvailable ? 'backend' : 'local-store-fallback',
+              generatedAt: snapshot.generatedAt,
+            }}
+            loading={false}
+          />
+          <div
+            className={`hospital-command-center__status cdl-surface cdl-surface--operational-status hospital-command-center__status--${snapshot.tone}`}
+            role="status"
+          >
+            <p className="hospital-command-center__status-line">{snapshot.statusLine}</p>
+            <div className="hospital-command-center__status-meta">
+              <span>{CAREDROID_PRODUCT.safetyShort}</span>
+              <span>Role view: {roleLabel}</span>
+              <span>
+                3-min: {snapshot.threeMinuteCompliance.compliant ? 'compliant' : 'breach'}
+              </span>
+            </div>
           </div>
-        </div>
-        <div className="hospital-command-center__actions">
-          {workflowActions.map((action) => (
-            <ActionCard key={action.id} action={action} />
-          ))}
-        </div>
-      </section>
-
-      <section className="emergency-route-card">
-        <div className="emergency-route-section-card__header">
-          <div>
-            <strong>Administrative automation review</strong>
-            <p className="emergency-route-section-card__lead">
-              Approve, modify, or override automated routing, handoffs, summaries, triage prep,
-              notifications, assignments, queue priority, and escalations.
-            </p>
-          </div>
-        </div>
-        <AdministrativeAutomationReviewPanel />
-      </section>
-
-      <section className="emergency-route-card">
-        <div className="emergency-route-section-card__header">
-          <div>
-            <strong>Continuous patient flow</strong>
-            <p className="emergency-route-section-card__lead">
-              Real-time workflow state, ownership, wait timers, bottlenecks, and AI next-step guidance.
-            </p>
-          </div>
-        </div>
-        <PatientFlowStatusPanel />
-      </section>
-
-      <section className="emergency-route-card">
-        <div className="emergency-route-section-card__header">
-          <div>
-            <strong>Live operational metrics</strong>
-            <p className="emergency-route-section-card__lead">
-              Actionable signals for {roleLabel} — tap a metric to open the owning workflow.
-            </p>
-          </div>
-          <span className="emergency-route-journey-card__count">{visibleMetrics.length}</span>
-        </div>
-        <div className="hospital-command-center__metric-grid">
-          {visibleMetrics.map((metric) => (
-            <Link
-              key={metric.id}
-              to={metric.route || CANONICAL_ROUTES.emergencyCommandCenter}
-              className={`hospital-command-center__metric-card hospital-command-center__metric-card--${metric.tone}`}
-            >
-              <span className="hospital-command-center__metric-value">{metric.value}</span>
-              <span className="hospital-command-center__metric-label">{metric.label}</span>
-              <span className="hospital-command-center__metric-detail">{metric.detail}</span>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      <div className="hospital-command-center__panels">
-        <section className="emergency-route-card">
+        </>
+      }
+      primaryActions={
+        <section className="emergency-route-card cd-surface-card">
           <div className="emergency-route-section-card__header">
-            <strong>Service bottlenecks</strong>
-            <span className="emergency-route-journey-card__count">{snapshot.bottlenecks.length}</span>
+            <div>
+              <strong>Critical actions</strong>
+              <p className="emergency-route-section-card__lead">
+                Prioritized from dispatch, readiness, alerts, AI review, bottlenecks, and staff routing.
+              </p>
+            </div>
           </div>
-          {snapshot.bottlenecks.length === 0 ? (
-            <p className="emergency-route-section-card__lead">No active bottleneck signals.</p>
-          ) : (
-            <ul className="hospital-command-center__panel-list">
-              {snapshot.bottlenecks.map((item) => (
-                <li key={item.id} className="hospital-command-center__panel-row">
-                  <div>
-                    <strong>{item.title}</strong>
-                    {item.ownerRole ? <p>Owner: {item.ownerRole}</p> : null}
-                  </div>
-                  <span
-                    className={`hospital-command-center__severity hospital-command-center__severity--${
-                      item.severity === 'critical' ? 'critical' : 'warning'
-                    }`}
-                  >
-                    {item.severity}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          )}
+          <div className="hospital-command-center__actions">
+            {workflowActions.map((action) => (
+              <ActionCard key={action.id} action={action} />
+            ))}
+          </div>
         </section>
-
-        <section className="emergency-route-card">
+      }
+      activeWork={
+        <>
+          <section className="emergency-route-card cd-surface-card">
+            <div className="emergency-route-section-card__header">
+              <div>
+                <strong>Continuous patient flow</strong>
+                <p className="emergency-route-section-card__lead">
+                  Real-time workflow state, ownership, wait timers, bottlenecks, and AI next-step guidance.
+                </p>
+              </div>
+            </div>
+            <PatientFlowStatusPanel />
+          </section>
+          <section className="emergency-route-card cd-surface-card">
+            <div className="emergency-route-section-card__header">
+              <div>
+                <strong>Administrative automation review</strong>
+                <p className="emergency-route-section-card__lead">
+                  Approve, modify, or override automated routing, handoffs, summaries, triage prep,
+                  notifications, assignments, queue priority, and escalations.
+                </p>
+              </div>
+            </div>
+            <AdministrativeAutomationReviewPanel />
+          </section>
+        </>
+      }
+      analytics={
+        <section className="emergency-route-card cd-surface-card">
           <div className="emergency-route-section-card__header">
-            <strong>Unresolved alerts</strong>
-            <span className="emergency-route-journey-card__count">
-              {snapshot.unresolvedAlerts.length}
-            </span>
+            <div>
+              <strong>Live operational metrics</strong>
+              <p className="emergency-route-section-card__lead">
+                Actionable signals for {roleLabel} — tap a metric to open the owning workflow.
+              </p>
+            </div>
+            <span className="emergency-route-journey-card__count">{visibleMetrics.length}</span>
           </div>
-          {snapshot.unresolvedAlerts.length === 0 ? (
-            <p className="emergency-route-section-card__lead">All critical alerts acknowledged.</p>
-          ) : (
-            <ul className="hospital-command-center__panel-list">
-              {snapshot.unresolvedAlerts.map((alert) => (
-                <li key={alert.id} className="hospital-command-center__panel-row">
-                  <div>
-                    <strong>{alert.title}</strong>
-                    <p>Acknowledgement required before next clinical action</p>
-                  </div>
-                  <Link to={alert.route} className="emergency-route-filter-banner__btn">
-                    Review
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-
-        <section className="emergency-route-card">
-          <div className="emergency-route-section-card__header">
-            <strong>AI recommendations</strong>
-            <span className="emergency-route-journey-card__count">
-              {snapshot.aiRecommendations.length}
-            </span>
+          <div className="hospital-command-center__metric-grid">
+            {visibleMetrics.map((metric) => (
+              <Link
+                key={metric.id}
+                to={metric.route || CANONICAL_ROUTES.emergencyCommandCenter}
+                className={`hospital-command-center__metric-card hospital-command-center__metric-card--${metric.tone}`}
+              >
+                <span className="hospital-command-center__metric-value">{metric.value}</span>
+                <span className="hospital-command-center__metric-label">{metric.label}</span>
+                <span className="hospital-command-center__metric-detail">{metric.detail}</span>
+              </Link>
+            ))}
           </div>
-          {snapshot.aiRecommendations.length === 0 ? (
-            <p className="emergency-route-section-card__lead">
-              No pending CareDroid Copilot recommendations —{' '}
-              <Link to={CANONICAL_ROUTES.emergencyCopilot}>open copilot</Link> for case context.
-            </p>
-          ) : (
-            <ul className="hospital-command-center__panel-list">
-              {snapshot.aiRecommendations.map((rec) => (
-                <li key={rec.id} className="hospital-command-center__panel-row">
-                  <div>
-                    <strong>{rec.action}</strong>
-                    <p>{rec.rationale}</p>
-                  </div>
-                  <Link
-                    to={rec.route || CANONICAL_ROUTES.emergencyCopilot}
-                    className="emergency-route-filter-banner__btn"
-                  >
-                    Review
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
         </section>
-      </div>
+      }
+      supportingContext={
+        <div className="hospital-command-center__panels">
+          <section className="emergency-route-card cd-surface-card">
+            <div className="emergency-route-section-card__header">
+              <strong>Service bottlenecks</strong>
+              <span className="emergency-route-journey-card__count">{snapshot.bottlenecks.length}</span>
+            </div>
+            {snapshot.bottlenecks.length === 0 ? (
+              <p className="emergency-route-section-card__lead">No active bottleneck signals.</p>
+            ) : (
+              <ul className="hospital-command-center__panel-list">
+                {snapshot.bottlenecks.map((item) => (
+                  <li key={item.id} className="hospital-command-center__panel-row">
+                    <div>
+                      <strong>{item.title}</strong>
+                      {item.ownerRole ? <p>Owner: {item.ownerRole}</p> : null}
+                    </div>
+                    <span
+                      className={`hospital-command-center__severity hospital-command-center__severity--${
+                        item.severity === 'critical' ? 'critical' : 'warning'
+                      }`}
+                    >
+                      {item.severity}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
 
-      <div role="note" className="emergency-route-card emergency-route-copilot-hint">
-        {CAREDROID_PRODUCT.safetyLine} Historical analytics and shift reports live under{' '}
-        <Link to={CANONICAL_ROUTES.emergencyAnalytics}>Analytics</Link> — this command center shows
-        only what needs action now.
-      </div>
-    </EmergencyRoutePage>
+          <section className="emergency-route-card cd-surface-card">
+            <div className="emergency-route-section-card__header">
+              <strong>Unresolved alerts</strong>
+              <span className="emergency-route-journey-card__count">
+                {snapshot.unresolvedAlerts.length}
+              </span>
+            </div>
+            {snapshot.unresolvedAlerts.length === 0 ? (
+              <p className="emergency-route-section-card__lead">All critical alerts acknowledged.</p>
+            ) : (
+              <ul className="hospital-command-center__panel-list">
+                {snapshot.unresolvedAlerts.map((alert) => (
+                  <li key={alert.id} className="hospital-command-center__panel-row">
+                    <div>
+                      <strong>{alert.title}</strong>
+                      <p>Acknowledgement required before next clinical action</p>
+                    </div>
+                    <Link to={alert.route} className="emergency-route-filter-banner__btn cd-btn cd-btn--secondary cd-btn--sm">
+                      Review
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+
+          <section className="emergency-route-card cd-surface-card cdl-ai-panel">
+            <div className="emergency-route-section-card__header">
+              <strong className="cdl-ai-panel__eyebrow">AI recommendations</strong>
+              <span className="emergency-route-journey-card__count">
+                {snapshot.aiRecommendations.length}
+              </span>
+            </div>
+            {snapshot.aiRecommendations.length === 0 ? (
+              <p className="emergency-route-section-card__lead">
+                No pending CareDroid Copilot recommendations —{' '}
+                <Link to={CANONICAL_ROUTES.emergencyCopilot}>open copilot</Link> for case context.
+              </p>
+            ) : (
+              <ul className="hospital-command-center__panel-list">
+                {snapshot.aiRecommendations.map((rec) => (
+                  <li key={rec.id} className="hospital-command-center__panel-row">
+                    <div>
+                      <strong>{rec.action}</strong>
+                      <p>{rec.rationale}</p>
+                    </div>
+                    <Link
+                      to={rec.route || CANONICAL_ROUTES.emergencyCopilot}
+                      className="emergency-route-filter-banner__btn cd-btn cd-btn--secondary cd-btn--sm"
+                    >
+                      Review
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        </div>
+      }
+      history={
+        <div role="note" className="emergency-route-card emergency-route-copilot-hint cdl-surface cdl-surface--inactive">
+          {CAREDROID_PRODUCT.safetyLine} Historical analytics and shift reports live under{' '}
+          <Link to={CANONICAL_ROUTES.emergencyAnalytics}>Analytics</Link> — this command center shows
+          only what needs action now.
+        </div>
+      }
+    />
   );
 }

@@ -20,7 +20,7 @@ import {
   Priority,
 } from '../../../types/emergency';
 import type { Alert, CapacitySnapshot, Patient, Referral, Staff, WorkflowActionLog } from '../../../types/emergency';
-import { PageShell } from '../../../components/ui/CareDroidPrimitives';
+import { CareDroidPage } from '../../../components/ui/CareDroidPrimitives';
 import EdDataSourceBanner from '../../../components/emergency/EdDataSourceBanner';
 import { usePractitionerSurfaceVisibility } from '../../../contexts/PractitionerVisibilityContext';
 import useEdRouteDataContext from '../../../hooks/useEdRouteDataContext';
@@ -536,9 +536,9 @@ export default function DepartmentPulse() {
   ];
 
   return (
-    <PageShell
+    <CareDroidPage
       as="section"
-      eyebrow="Analytics"
+      eyebrow="Operational status"
       title="Department Pulse"
       titleId="emergency-pulse-title"
       description={
@@ -706,6 +706,6 @@ export default function DepartmentPulse() {
           </div>
         </section>
       ) : null}
-    </PageShell>
+    </CareDroidPage>
   );
 }

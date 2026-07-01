@@ -171,7 +171,6 @@
   width: 100%;
   max-width: var(--app-visual-page-max);
   margin-inline: auto;
-  padding: var(--app-visual-page-gutter);
 }
 
 :is(.app-shell, .emergency-app-shell) :is(.cd-page-shell, .emergency-route-page) {
@@ -313,16 +312,6 @@
 }
 
 @media (max-width: 520px) {
-  :is(.app-shell, .emergency-app-shell) :is(
-      .cd-page-shell,
-      .emergency-route-page,
-      .help-hub-page,
-      .emergency-analytics,
-      .emergency-settings
-    ) {
-    padding-inline: 12px;
-  }
-
   :is(.app-shell, .emergency-app-shell) :is(
       .cd-dashboard-grid--cards,
       .cd-dashboard-grid--summary,

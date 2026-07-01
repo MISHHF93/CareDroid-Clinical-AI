@@ -1,4 +1,5 @@
 import React, { HTMLAttributes, LabelHTMLAttributes, TableHTMLAttributes } from 'react';
+import { CDL_PAGE_ZONES, type CdlPageZoneId } from '../../config/caredroidDesignLanguage';
 import Badge from './Badge';
 import Card from './card';
 import PageHeader from './PageHeader';
@@ -604,6 +605,115 @@ export function UnsupportedState({
       <h3>{title}</h3>
       <p>{description}</p>
       {action ? <div className="cd-state__action">{action}</div> : null}
+    </div>
+  );
+}
+
+export type OperationalPageZones = {
+  operationalSummary?: React.ReactNode;
+  primaryActions?: React.ReactNode;
+  activeWork?: React.ReactNode;
+  supportingContext?: React.ReactNode;
+  analytics?: React.ReactNode;
+  history?: React.ReactNode;
+};
+
+interface OperationalZoneProps {
+  zoneId: CdlPageZoneId;
+  children?: React.ReactNode;
+  showLabel?: boolean;
+  className?: string;
+}
+
+export function OperationalZone({
+  zoneId,
+  children,
+  showLabel = false,
+  className = '',
+}: OperationalZoneProps) {
+  if (children == null || children === false) return null;
+  const zone = CDL_PAGE_ZONES[zoneId];
+  return (
+    <section
+      className={[zone.className, className].filter(Boolean).join(' ')}
+      aria-label={zone.label}
+      data-cdl-zone={zone.id}
+    >
+      {showLabel ? <p className="cdl-zone__label">{zone.label}</p> : null}
+      {children}
+    </section>
+  );
+}
+
+interface OperationalPageTemplateProps extends HTMLAttributes<HTMLDivElement> {
+  zones?: OperationalPageZones;
+  children?: React.ReactNode;
+  showZoneLabels?: boolean;
+  className?: string;
+}
+
+/**
+ * Canonical ED OS page composition — identity lives in PageShell; zones answer operational questions.
+ */
+interface CareDroidPageProps extends HeaderProps, HTMLAttributes<HTMLElement> {
+  zones?: OperationalPageZones;
+  showZoneLabels?: boolean;
+}
+
+/**
+ * Canonical non-emergency page shell — PageShell identity + CDL zone composition.
+ */
+export function CareDroidPage({
+  zones,
+  showZoneLabels = false,
+  children,
+  className = '',
+  headerClassName = '',
+  contentClassName = '',
+  ...shellProps
+}: CareDroidPageProps) {
+  return (
+    <PageShell
+      {...shellProps}
+      className={['cd-page-shell', className].filter(Boolean).join(' ')}
+      headerClassName={['cdl-zone cdl-zone--identity', headerClassName].filter(Boolean).join(' ')}
+      contentClassName={['cd-page-shell__content', contentClassName].filter(Boolean).join(' ')}
+    >
+      <OperationalPageTemplate zones={zones} showZoneLabels={showZoneLabels}>
+        {children}
+      </OperationalPageTemplate>
+    </PageShell>
+  );
+}
+
+export function OperationalPageTemplate({
+  zones = {},
+  children,
+  showZoneLabels = false,
+  className = '',
+  ...props
+}: OperationalPageTemplateProps) {
+  const activeWork = zones.activeWork ?? children;
+  return (
+    <div className={['cdl-operational-page', className].filter(Boolean).join(' ')} {...props}>
+      <OperationalZone zoneId="operationalSummary" showLabel={showZoneLabels}>
+        {zones.operationalSummary}
+      </OperationalZone>
+      <OperationalZone zoneId="primaryActions" showLabel={showZoneLabels}>
+        {zones.primaryActions}
+      </OperationalZone>
+      <OperationalZone zoneId="activeWork" showLabel={showZoneLabels}>
+        {activeWork}
+      </OperationalZone>
+      <OperationalZone zoneId="supportingContext" showLabel={showZoneLabels}>
+        {zones.supportingContext}
+      </OperationalZone>
+      <OperationalZone zoneId="analytics" showLabel={showZoneLabels}>
+        {zones.analytics}
+      </OperationalZone>
+      <OperationalZone zoneId="history" showLabel={showZoneLabels}>
+        {zones.history}
+      </OperationalZone>
     </div>
   );
 }

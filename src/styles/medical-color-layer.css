@@ -54,4 +54,16 @@
   --semantic-attention-border: #b45309;
   --semantic-healthy-border: #166534;
   --semantic-information-border: rgba(14, 165, 233, 0.45);
+  --semantic-warning: var(--semantic-attention);
+  --semantic-warning-bg: var(--semantic-attention-bg);
+  --semantic-warning-border: var(--semantic-attention-border);
+  --semantic-ai-assistance: #6366f1;
+  --semantic-ai-assistance-bg: #eef2ff;
+  --semantic-ai-assistance-border: #4f46e5;
+  --semantic-operational-status: #0891b2;
+  --semantic-operational-status-bg: #ecfeff;
+  --semantic-operational-status-border: #0e7490;
+  --semantic-infrastructure-health: #475569;
+  --semantic-infrastructure-health-bg: #f1f5f9;
+  --semantic-infrastructure-health-border: #64748b;
 }

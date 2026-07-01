@@ -55,3 +55,23 @@ export const DESIGN_DENSITY_PRESETS = Object.freeze({
 });
 
 export type DesignDensityPreset = keyof typeof DESIGN_DENSITY_PRESETS;
+
+export {
+  CDL_PRINCIPLES,
+  CDL_PAGE_ZONES,
+  CDL_EXTENDED_SEMANTIC_ROLES,
+  CDL_SEMANTIC_ROLE_ORDER,
+  CDL_TONE_TO_SEMANTIC,
+  CDL_MOTION,
+  CDL_ACCESSIBILITY,
+  CDL_ICONOGRAPHY,
+  CDL_ROLE_DENSITY,
+  CDL_FOUNDATION,
+  CDL_COMPONENT_PREFIXES,
+  CDL_COMPONENT_STANDARDS,
+  resolveCdlSemanticRole,
+  cdlSemanticSurfaceClass,
+  cdlZoneClassName,
+  type CdlPageZoneId,
+  type CdlSemanticRole,
+} from './caredroidDesignLanguage';

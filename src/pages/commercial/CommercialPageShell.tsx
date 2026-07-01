@@ -1,8 +1,8 @@
-import { PageShell } from '../../components/ui/CareDroidPrimitives';
+import { CareDroidPage } from '../../components/ui/CareDroidPrimitives';
 
 export default function CommercialPageShell({ title, subtitle, children = undefined, actions = null }) {
   return (
-    <PageShell
+    <CareDroidPage
       as="div"
       className="commercial-page"
       headerClassName="commercial-header"
@@ -12,6 +12,6 @@ export default function CommercialPageShell({ title, subtitle, children = undefi
       actions={actions}
     >
       {children}
-    </PageShell>
+    </CareDroidPage>
   );
 }
