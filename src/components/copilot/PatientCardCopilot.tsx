@@ -7,7 +7,7 @@ import {
   PATIENT_STATUS_SUMMARY_PROMPT,
   SAFETY_BOUNDED_ASSISTANT_LABEL,
 } from '../../config/copilotSafety.config';
-import { callAI } from '../../lib/ai/client';
+import { requestAiChiefConversational } from '../../services/aiChiefOrchestrator';
 import { getAIPrompt } from '../../lib/ai/promptRegistry';
 import usePatientOrchestration from '../../hooks/usePatientOrchestration';
 import { buildCopilotPatientArtifactContext } from '../../services/patientAiContext';
@@ -104,11 +104,12 @@ export default function PatientCardCopilot({
       setLoading(true);
 
       try {
-        const response = await callAI({
+        const response = await requestAiChiefConversational({
           requestType: trimmed === PATIENT_STATUS_SUMMARY_PROMPT ? 'CLINICAL_SUMMARY' : 'COPILOT_CHAT',
           systemPrompt,
           message: trimmed,
           patientId: patient.id,
+          sourceScreen: 'patient_card_copilot',
           context: {
             aiRequest: {
               requestType: trimmed === PATIENT_STATUS_SUMMARY_PROMPT ? 'CLINICAL_SUMMARY' : 'COPILOT_CHAT',

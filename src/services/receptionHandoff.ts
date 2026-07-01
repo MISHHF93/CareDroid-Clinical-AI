@@ -341,6 +341,14 @@ export function completeIntakeHandoff(
     isBackendCapabilityEnabled('emergencyTriageAssist') ||
     isBackendCapabilityEnabled('emergencyReceptionHandoff');
 
+  void import('./emergencyCareJourneyOrchestrator').then(({ onPatientArrivalAtReception, onRapidIntakeCompleted }) => {
+    onPatientArrivalAtReception(patientId, { actorName });
+    const latest = store.patients.find((entry) => entry.id === patientId);
+    if (latest) {
+      onRapidIntakeCompleted(latest, { actorName });
+    }
+  });
+
   return {
     receptionPath: `${CANONICAL_ROUTES.emergencyReception}?arrived=${encodeURIComponent(patientId)}`,
     whiteboardPath: buildWhiteboardPath(patientId, encounterResult.encounterId),

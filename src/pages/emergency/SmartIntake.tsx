@@ -28,7 +28,7 @@ import {
   mapFieldReviewDecision,
   verificationStepFromQuery,
 } from '../../utils/verificationWorkflow';
-import { callAI } from '../../lib/ai/client';
+import { requestAiChiefConversational } from '../../services/aiChiefOrchestrator';
 import { getAIPrompt } from '../../lib/ai/promptRegistry';
 import { HUMAN_REVIEW_DISCLAIMER } from '../../lib/ai/safety/policy';
 import { RECEPTION_COPY } from '../../components/reception/receptionCopy';
@@ -704,8 +704,10 @@ export default function SmartIntake({
         .filter((field) => field.status !== 'verified')
         .map((field) => field.field)
         .join(', ');
-      const response = await callAI({
+      const response = await requestAiChiefConversational({
         requestType: 'INTAKE_SUGGESTION',
+        domain: 'intake',
+        sourceScreen: 'smart_intake',
         systemPrompt: `${getAIPrompt('smart-intake-assistant').prompt}\n${HUMAN_REVIEW_DISCLAIMER}`,
         message: [
           `Smart Intake session ${sessionId}.`,

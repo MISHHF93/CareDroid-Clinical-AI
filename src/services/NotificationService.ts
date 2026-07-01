@@ -344,7 +344,7 @@ export const NotificationService = {
    */
   subscribeToNotifications(onNotification, onError) {
     if (!isBackendCapabilityEnabled('notificationStream')) {
-      logger.info('Notification stream API not available — skipping SSE subscription');
+      logger.info('Notification stream API not available ï¿½ skipping SSE subscription');
       const unavailableResponse = makeNotificationStreamDisabledResponse();
       const error: any = new Error('Real-time notification stream is not available on this server.');
       error.unavailableResponse = unavailableResponse;
@@ -375,6 +375,12 @@ export const NotificationService = {
     eventSource.onmessage = (event) => {
       try {
         const notification = JSON.parse(event.data);
+        void import('./alertLifecycleOrchestrator').then(({ ingestNotificationStreamEvent, ingestUnifiedAlert }) => {
+          const unified = ingestNotificationStreamEvent(notification);
+          if (unified) {
+            ingestUnifiedAlert(unified, { sourceScreen: 'notification-stream' });
+          }
+        });
         onNotification(notification);
       } catch (error: any) {
         logger.error('Error parsing notification', { error });

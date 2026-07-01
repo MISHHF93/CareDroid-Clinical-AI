@@ -10,9 +10,9 @@ vi.mock('./apiClient', () => ({
   getApiErrorMessage,
 }));
 
-import { requestCareDroidAI, CARE_DROID_AI_NODE_PATH } from './careDroidAiApi';
+import { transportCareDroidAINode, CARE_DROID_AI_NODE_PATH } from './careDroidAiApi';
 
-describe('requestCareDroidAI', () => {
+describe('transportCareDroidAINode', () => {
   beforeEach(() => {
     vi.spyOn(console, 'info').mockImplementation(() => undefined);
     apiFetch.mockReset();
@@ -27,7 +27,7 @@ describe('requestCareDroidAI', () => {
   it('falls back to the local safe AI node when the backend request fails', async () => {
     apiFetch.mockRejectedValue(new Error('network down'));
 
-    const response = await requestCareDroidAI({
+    const response = await transportCareDroidAINode({
       intent: 'wait_time_prediction',
       input: {
         queueLength: 8,

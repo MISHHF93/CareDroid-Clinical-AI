@@ -272,6 +272,9 @@ function CADDispatchPanel({
       return;
     }
     updateCallStatus(call.id, 'dispatched');
+    void import('../../services/emergencyCareJourneyOrchestrator').then(({ onEmsUnitDispatched }) =>
+      onEmsUnitDispatched(call, result),
+    );
     onDispatched(result);
     setDispatching(false);
   }
@@ -414,6 +417,7 @@ function EDPreAlertPanel({
     const eta = new Date(Date.now() + (assignment.estimatedResponseMinutes ?? 8) * 60_000).toISOString();
     createReadinessPlan({
       callId: call.id,
+      linkedEmsArrivalId: call.linkedEmsArrivalId || `ems-${call.id}`,
       preparedBy: 'dispatcher-current',
       expectedArrivalAt: eta,
       activatedResources: resources,
@@ -794,6 +798,9 @@ export default function DispatchConsole() {
 
   function handleStatusChange(id: string, status: EmergencyCall['status']) {
     updateCallStatus(id, status);
+    void import('../../services/emergencyCareJourneyOrchestrator').then(({ onDispatchCallStatusChange }) =>
+      onDispatchCallStatusChange(id, status),
+    );
     refresh();
   }
 

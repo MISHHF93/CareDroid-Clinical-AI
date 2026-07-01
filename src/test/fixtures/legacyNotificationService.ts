@@ -8,9 +8,9 @@
 
 import { resolveApiRoot } from '../../config/api.config';
 import { isBackendCapabilityEnabled } from '../../config/backendApiCapabilities';
-import { recordAutomationBlocked } from '../automationAuditLogger';
-import { makeNotificationSendDisabledResponse } from '../disabledBackendMocks';
-import { reportApiError } from '../apiErrorHandling';
+import { recordAutomationBlocked } from '../../services/automationAuditLogger';
+import { makeNotificationSendDisabledResponse } from '../../services/disabledBackendMocks';
+import { reportApiError } from '../../services/apiErrorHandling';
 
 const getDefaultApiBaseUrl = () => resolveApiRoot();
 

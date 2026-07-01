@@ -8,7 +8,7 @@ import { useEmergencyStore } from '../store/emergencyStore';
 import { useEDCopilot } from '../hooks/useEmergencyOs';
 import useOperationalIntelligence from '../hooks/useOperationalIntelligence';
 import type { CareDroidCentralNodeSnapshot } from '../central-node/careDroidCentralNode';
-import { callAI } from '../lib/ai/client';
+import { requestAiChiefConversational } from '../services/aiChiefOrchestrator';
 import { getAIPrompt } from '../lib/ai/promptRegistry';
 import { HUMAN_REVIEW_DISCLAIMER } from '../lib/ai/safety/policy';
 import {
@@ -28,6 +28,7 @@ import {
 } from '../services/copilotRecommendationDiscovery';
 import { formatWhatHappensNextForCopilot } from '../services/whatHappensNextGuidance';
 import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+import useAiChiefRouting from '../hooks/useAiChiefRouting';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import { navigateProfileAware } from '../navigation/profileRouteLaunch';
 import usePatientOrchestration from '../hooks/usePatientOrchestration';
@@ -226,6 +227,7 @@ function buildDepartmentPrompt({
   referrals,
   patientOrchestrationPrompt,
   patientToolRecommendationsPrompt,
+  aiChiefVisibleScenarios,
 }: {
   patients: Patient[];
   alerts: Alert[];
@@ -239,6 +241,7 @@ function buildDepartmentPrompt({
   referrals?: ReturnType<typeof useEmergencyStore.getState>['referrals'];
   patientOrchestrationPrompt?: string;
   patientToolRecommendationsPrompt?: string;
+  aiChiefVisibleScenarios?: string[];
 }) {
   const activePatients = patients.filter(isActivePatient);
   const highRiskPatients = activePatients.filter(isHighRiskPatient);
@@ -321,6 +324,9 @@ function buildDepartmentPrompt({
       : null,
     patientOrchestrationPrompt || null,
     patientToolRecommendationsPrompt || null,
+    aiChiefVisibleScenarios?.length
+      ? `AI Chief alert scenarios visible to this role: ${aiChiefVisibleScenarios.join(', ')}. Route recommendations to suggested owners; escalation roles apply when unacknowledged.`
+      : null,
   ].filter((line): line is string => Boolean(line)).join('\n');
 }
 
@@ -426,6 +432,7 @@ export function CopilotPanel() {
   const intelligenceSnapshot = operationalIntelligence.snapshot;
   const { saasRole } = useEffectiveUserProfile();
   const emergencyRole = useEmergencyRolePermissions();
+  const { visibleScenarios: aiChiefVisibleScenarios } = useAiChiefRouting();
   const practitionerSurfaces = usePractitionerSurfaceVisibility();
   const copilotSurfaces = practitionerSurfaces.copilot;
   const copilotLimits = resolveCopilotRuntimeLimits();
@@ -740,6 +747,7 @@ export function CopilotPanel() {
       referrals,
       patientOrchestrationPrompt,
       patientToolRecommendationsPrompt,
+      aiChiefVisibleScenarios,
     });
     const quickActionResolution = resolveCopilotQuickActionFromSnapshot(promptText, {
       centralSnapshot,
@@ -809,12 +817,13 @@ export function CopilotPanel() {
         patientOrchestration,
       );
 
-      const response = await callAI({
+      const response = await requestAiChiefConversational({
         requestType: COPILOT_PLATFORM.identity.requestType,
         systemPrompt,
         message: promptText,
         messages: requestMessages,
         patientId: selectedPatient?.id,
+        sourceScreen: 'copilot_panel',
         context: {
           aiRequest: {
             requestType: COPILOT_PLATFORM.identity.requestType,

@@ -52,8 +52,8 @@
 }
 
 .cd-role-widget-card:focus-visible {
-  box-shadow: 0 0 0 2px var(--app-accent, #2563eb);
-  border-color: var(--app-accent, #2563eb);
+  box-shadow: 0 0 0 2px var(--app-accent, #0ea5e9);
+  border-color: var(--app-accent, #0ea5e9);
 }
 
 .cd-role-widget-card__title {

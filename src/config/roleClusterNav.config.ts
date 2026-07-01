@@ -14,7 +14,7 @@
  * via EMERGENCY_TO_HOSPITAL_ROLE so legacy callers continue to resolve correctly.
  */
 
-import { CANONICAL_ROUTES } from './routes.config';
+import { CANONICAL_PILOT_VISIBLE_NAV_IDS, CANONICAL_ROUTES } from './routes.config';
 
 // ─── Home routes (per hospital role) ─────────────────────────────────────────
 
@@ -70,7 +70,7 @@ export const HOSPITAL_ROLE_NAV_IDS: Readonly<Record<string, readonly string[]>> 
 
   // ── Cluster B: Reception & Intake ──────────────────────────────────────────
   registration_clerk: Object.freeze([
-    'reception', 'queues', 'patients', 'alerts', 'help',
+    'reception', 'patients', 'pulse', 'shift', 'alerts', 'help',
   ]),
 
   // ── Cluster C: Nursing & Triage ────────────────────────────────────────────
@@ -89,12 +89,12 @@ export const HOSPITAL_ROLE_NAV_IDS: Readonly<Record<string, readonly string[]>> 
 
   // ── Cluster D: Physicians ──────────────────────────────────────────────────
   emergency_physician: Object.freeze([
-    'whiteboard', 'patients', 'queues', 'reassessment', 'diagnostics',
-    'referrals', 'handoffs', 'copilot', 'alerts', 'predictive-analytics', 'tools', 'shift', 'analytics', 'help',
+    'whiteboard', 'patients', 'copilot', 'tools', 'analytics', 'command-center',
+    'alerts', 'diagnostics', 'handoffs', 'reports', 'help',
   ]),
   attending_physician: Object.freeze([
-    'whiteboard', 'patients', 'queues', 'reassessment', 'diagnostics',
-    'referrals', 'handoffs', 'copilot', 'alerts', 'predictive-analytics', 'tools', 'shift', 'analytics', 'help',
+    'whiteboard', 'patients', 'copilot', 'tools', 'analytics', 'command-center',
+    'alerts', 'diagnostics', 'handoffs', 'reports', 'help',
   ]),
   resident_physician: Object.freeze([
     'whiteboard', 'patients', 'queues', 'reassessment', 'diagnostics',
@@ -119,14 +119,8 @@ export const HOSPITAL_ROLE_NAV_IDS: Readonly<Record<string, readonly string[]>> 
   patient_flow_coordinator: Object.freeze([
     'queues', 'whiteboard', 'patients', 'capacity', 'hospital-map', 'handoffs', 'alerts', 'pulse', 'shift', 'help',
   ]),
-  hospital_admin: Object.freeze([
-    'whiteboard', 'analytics', 'capacity', 'hospital-map', 'patients', 'handoffs', 'pulse',
-    'executive', 'predictive-analytics', 'reports', 'audit', 'alerts', 'copilot', 'admin', 'settings', 'help',
-  ]),
-  ed_director: Object.freeze([
-    'whiteboard', 'patients', 'queues', 'capacity', 'hospital-map', 'analytics', 'handoffs',
-    'referrals', 'executive', 'predictive-analytics', 'copilot', 'alerts', 'pulse', 'shift', 'reports', 'settings', 'admin', 'help',
-  ]),
+  hospital_admin: CANONICAL_PILOT_VISIBLE_NAV_IDS,
+  ed_director: CANONICAL_PILOT_VISIBLE_NAV_IDS,
   quality_safety_officer: Object.freeze([
     'reports', 'analytics', 'predictive-analytics', 'executive', 'whiteboard', 'hospital-map', 'patients', 'diagnostics',
     'alerts', 'copilot', 'admin', 'audit', 'help',
@@ -136,15 +130,11 @@ export const HOSPITAL_ROLE_NAV_IDS: Readonly<Record<string, readonly string[]>> 
   it_admin: Object.freeze([
     'settings', 'admin', 'medical-iot', 'audit', 'alerts', 'help',
   ]),
-  super_admin: Object.freeze([
-    'whiteboard', 'patients', 'queues', 'capacity', 'hospital-map', 'analytics',
-    'predictive-analytics', 'executive', 'ai-center', 'medical-iot', 'reports',
-    'alerts', 'copilot', 'tools', 'settings', 'admin', 'audit', 'fleet', 'help',
-  ]),
+  super_admin: CANONICAL_PILOT_VISIBLE_NAV_IDS,
 
   // ── Cluster H: Demo / Observer ─────────────────────────────────────────────
   demo_observer: Object.freeze([
-    'whiteboard', 'patients', 'alerts', 'analytics', 'copilot', 'help',
+    'whiteboard', 'analytics', 'help',
   ]),
 });
 
@@ -195,5 +185,5 @@ export function getHomeRouteForRole(role: string | null | undefined): string {
  */
 export function getNavItemIdsForRole(role: string | null | undefined): readonly string[] {
   const hospitalRole = resolveToHospitalRole(role);
-  return HOSPITAL_ROLE_NAV_IDS[hospitalRole] || HOSPITAL_ROLE_NAV_IDS.demo_observer;
+  return HOSPITAL_ROLE_NAV_IDS[hospitalRole] || HOSPITAL_ROLE_NAV_IDS.emergency_physician;
 }

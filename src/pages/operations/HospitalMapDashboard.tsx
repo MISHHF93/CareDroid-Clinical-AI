@@ -214,10 +214,10 @@ export default function HospitalMapDashboard() {
       >
         <div>
           <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: MEDICAL_THEME.ink }}>
-            Hospital Bed Map
+            Hospital Map
           </h1>
           <p style={{ margin: '2px 0 0', fontSize: 13, color: MEDICAL_THEME.inkMuted }}>
-            Real-time capacity · boarding · diversion status across all units
+            Real-time capacity ï¿½ boarding ï¿½ diversion status across all units
           </p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -268,7 +268,7 @@ export default function HospitalMapDashboard() {
               opacity: loading ? 0.6 : 1,
             }}
           >
-            {loading ? 'Updating…' : 'Refresh'}
+            {loading ? 'Updatingï¿½' : 'Refresh'}
           </button>
         </div>
       </div>
@@ -351,7 +351,7 @@ export default function HospitalMapDashboard() {
               <div style={{ flex: 1, height: 7, borderRadius: 4, background: MEDICAL_THEME.border, overflow: 'hidden' }}>
                 <div style={{ height: '100%', width: `${point.score ?? 50}%`, borderRadius: 4, background: (point.score ?? 50) < 60 ? '#ef4444' : (point.score ?? 50) < 78 ? '#f59e0b' : '#22c55e' }} />
               </div>
-              <span style={{ flex: '0 0 30px', textAlign: 'right', fontWeight: 700, color: (point.score ?? 50) < 60 ? '#ef4444' : (point.score ?? 50) < 78 ? '#f59e0b' : '#22c55e' }}>{point.score ?? '—'}</span>
+              <span style={{ flex: '0 0 30px', textAlign: 'right', fontWeight: 700, color: (point.score ?? 50) < 60 ? '#ef4444' : (point.score ?? 50) < 78 ? '#f59e0b' : '#22c55e' }}>{point.score ?? 'ï¿½'}</span>
             </div>
           ))}
         </div>
@@ -359,7 +359,7 @@ export default function HospitalMapDashboard() {
 
       {last && (
         <div style={{ fontSize: 11, color: MEDICAL_THEME.inkSubtle, textAlign: 'right' }}>
-          Updated {last.toLocaleTimeString()} · auto-refreshes every 60s
+          Updated {last.toLocaleTimeString()} ï¿½ auto-refreshes every 60s
         </div>
       )}
     </main>

@@ -44,6 +44,7 @@ import WaitingRoomCommunicationBadge from './waiting-room/WaitingRoomCommunicati
 import TriageBreachBadge from './triage/TriageBreachBadge';
 import { isAwaitingTriage } from '../services/triageBreachTimer';
 import { selectReassessmentTimerForPatient } from '../engine/reassessmentTimerEngine';
+import { getActiveTimerForPatient } from '../engine/threeMinuteTimerEngine';
 import { findPatientReferralAwareness } from './whiteboard/referralAwarenessModel';
 import { buildDataQualitySnapshot, getPatientDataQualityRisks } from '../services/dataQualityDiscovery';
 import useEmergencyDisplayPrivacy from '../hooks/useEmergencyDisplayPrivacy';
@@ -433,13 +434,15 @@ function PatientCard({
   const scores = scoreBadges(patient);
   const waitStatusColor = hasLwbsRisk ? '#EF4444' : hasLongWait ? '#F59E0B' : waitColor(minutesWaiting);
   const priorityLabel = PriorityLabel[displayPriority] || String(displayPriority);
+  const activeResponseTimer = getActiveTimerForPatient(patient.id);
+  const threeMinuteTimerStart = activeResponseTimer?.startedAt || patient.arrivalTime;
   const showThreeMinuteTimer =
     (displayPriority === 'P1' || displayPriority === 'P2') &&
     (patient.state === PatientState.Arrival ||
       patient.state === PatientState.Registration ||
       patient.state === PatientState.Triage ||
       patient.state === PatientState.Waiting) &&
-    Boolean(patient.arrivalTime);
+    Boolean(threeMinuteTimerStart);
   const signalBadges = getSignalBadges({
     patient,
     arrival,
@@ -581,7 +584,7 @@ function PatientCard({
       ? reassessmentTimer.overdueLabel || 'Overdue'
       : reassessmentTimer?.stage === 'due'
         ? reassessmentTimer.dueInLabel || 'Due'
-        : reassessmentTimer?.dueInLabel || '—';
+        : reassessmentTimer?.dueInLabel || 'ï¿½';
 
   if (layout === 'row') {
     return (
@@ -703,8 +706,8 @@ function PatientCard({
         <span className="patient-card__priority-code">{displayPriority}</span>
         <span className="patient-card__priority-label">{priorityLabel}</span>
         <span className="patient-card__state-pill">{whiteboardStateLabel}</span>
-        {showThreeMinuteTimer && (
-          <ThreeMinuteTimer startTime={patient.arrivalTime} compact />
+        {showThreeMinuteTimer && threeMinuteTimerStart && (
+          <ThreeMinuteTimer startTime={threeMinuteTimerStart} compact />
         )}
         <WhiteboardOperationalIconStrip
           patient={patient}
@@ -809,7 +812,7 @@ function PatientCard({
                 title={signalBadges
                   .slice(maxPatientCardBadges)
                   .map((signal) => signal.label)
-                  .join(' · ')}
+                  .join(' ï¿½ ')}
               >
                 +{signalBadges.length - maxPatientCardBadges}
               </span>
@@ -885,7 +888,7 @@ function PatientCard({
           </span>
           <span className={tempAbnormal ? 'patient-card__vital patient-card__vital--warning patient-card__vital-temp' : 'patient-card__vital patient-card__vital-temp'}>
             <small>Temp</small>
-            <strong>{temp ?? '--'}°</strong>
+            <strong>{temp ?? '--'}ï¿½</strong>
           </span>
         </div>
       ) : null}
@@ -932,7 +935,7 @@ function PatientCard({
                     title={visibleFlags
                       .slice(maxPatientCardBadges)
                       .map((flag) => flagLabels[flag])
-                      .join(' · ')}
+                      .join(' ï¿½ ')}
                   >
                     +{overflow}
                   </span>

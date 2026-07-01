@@ -649,6 +649,13 @@ export async function createPatientAndRouteFromReception(
     });
   }
 
+  void import('./emergencyCareJourneyOrchestrator').then(({ onRapidIntakeCompleted }) =>
+    onRapidIntakeCompleted(enrichedPatient, {
+      criticalAlertId,
+      actorName,
+    }),
+  );
+
   return {
     patient: {
       ...enrichedPatient,
@@ -676,6 +683,7 @@ const ARRIVAL_MODE_TO_RECEPTION_TYPE: Record<ArrivalMode, ReceptionArrivalType> 
   referral: 'referral',
   transfer: 'transfer',
   police: 'staff-created-emergency',
+  'self-check-in': 'walk-in',
 };
 
 const COMPLAINT_FLAG_LABELS: Record<string, string> = {

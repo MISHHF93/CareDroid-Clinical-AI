@@ -867,6 +867,7 @@ export type ActivateSurgePayload = {
 
 export type CopilotQueryOptions = {
   userRole?: string;
+  patientId?: string;
   context?: Record<string, unknown>;
 } & Record<string, unknown>;
 
@@ -1912,6 +1913,7 @@ const workflowTitles: Record<WorkflowActionType, string> = {
   provincial_data_viewed: 'Provincial data viewed',
   integration_event_received: 'Integration event received',
   clinical_score_saved: 'Clinical score saved',
+  alert_lifecycle: 'Alert lifecycle',
 };
 
 type WorkflowActionInput = Omit<
@@ -2491,6 +2493,7 @@ interface EmergencyStoreState {
   appendCopilotMessage: (message: EmergencyCopilotMessage) => void;
   upsertEmsIncomingPatient: (patient: EmsIncomingPatient) => void;
   addAlert: (alert: Alert) => void;
+  ingestPreparedAlert: (alert: Alert) => void;
   markAlertRead: (alertId: string) => void;
   acknowledgeAlert: (alertId: string) => void;
   dismissAlert: (alertId: string) => void;
@@ -3180,7 +3183,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
             {
               type: 'whiteboard_automation' as import('../types/emergency').WorkflowActionType,
               title: 'Diagnosis recorded',
-              summary: `${input.diagnosis} — whiteboard advanced to awaiting disposition.`,
+              summary: `${input.diagnosis} ï¿½ whiteboard advanced to awaiting disposition.`,
               patientId,
               source: 'physician-diagnosis',
             },
@@ -3293,12 +3296,14 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
     },
 
     movePatientToState: (patientId, to, staffIdOrOptions = 's3', note) => {
+      const options =
+        typeof staffIdOrOptions === 'string'
+          ? { staffId: staffIdOrOptions, note }
+          : staffIdOrOptions;
+      const staffId = options.staffId || 's3';
+      const fromState = get().patients.find((patient) => patient.id === patientId)?.state;
+
       set((state) => {
-        const options =
-          typeof staffIdOrOptions === 'string'
-            ? { staffId: staffIdOrOptions, note }
-            : staffIdOrOptions;
-        const staffId = options.staffId || 's3';
         const beforePatient = state.patients.find((patient) => patient.id === patientId);
         const patients = state.patients.map((patient) => {
           if (patient.id !== patientId) return patient;
@@ -3402,9 +3407,18 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         },
         { patientId, source: 'patient-journey-engine' },
       );
+
+      const transitioned = nextState.patients.find((patient) => patient.id === patientId);
+      if (fromState && transitioned && transitioned.state !== fromState) {
+        void import('../services/emergencyCareJourneyOrchestrator').then(({ syncJourneyFromPatientStateTransition }) =>
+          syncJourneyFromPatientStateTransition(patientId, fromState, transitioned.state, {
+            actorId: staffId,
+          }),
+        );
+      }
     },
 
-    dischargePatient: (patientId, options: any = {}) =>
+    dischargePatient: (patientId, options: any = {}) => {
       set((state) => {
         const staffId = options.staffId || 's3';
         const patients = state.patients.map((patient) =>
@@ -3434,7 +3448,12 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
             details: { toState: PatientState.Discharge, note: options.note || null },
           }),
         };
-      }),
+      });
+
+      void import('../services/emergencyCareJourneyOrchestrator').then(({ onHandoffComplete }) =>
+        onHandoffComplete(patientId, { actorId: options.staffId, actorRole: 'emergency_physician' }),
+      );
+    },
 
     assignStaff: (patientId, staffId, options: any = {}) =>
       set((state) => {
@@ -3695,7 +3714,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
               ? createWaitingRoomCommunicationLogInput({
                   kind: 'concern-escalated',
                   patientId,
-                  summary: `Concern escalated — ${normalizedFlag} flagged for review.`,
+                  summary: `Concern escalated ï¿½ ${normalizedFlag} flagged for review.`,
                   severity: 'Critical',
                 })
               : null,
@@ -3914,7 +3933,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         input.staffId || patient.assignedStaffId || state.activeShift.chargeStaffId || state.staff[0]?.id || 'system';
       const timestamp = new Date().toISOString();
       const maxSuffix = input.max !== undefined && input.max !== null && input.max !== '' ? `/${input.max}` : '';
-      const noteText = `${input.scoreLabel}: ${input.scoreTotal}${maxSuffix} — ${input.band}`;
+      const noteText = `${input.scoreLabel}: ${input.scoreTotal}${maxSuffix} ï¿½ ${input.band}`;
       const noteBody = input.recommendation ? `${noteText}. ${input.recommendation}` : noteText;
 
       const note: Note = {
@@ -4466,40 +4485,20 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       if (!cleanQuery) throw new Error('Copilot query is required.');
       set((state) => ({ ui: { ...state.ui, error: null } }));
       try {
-        const response = await apiFetch('/api/emergency/copilot/query', {
-          method: 'POST',
-          headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            query: cleanQuery,
-            user_role: options.userRole,
-            context: options.context,
-            ...options,
-          }),
+        const { requestAiChiefCopilotQuery } = await import('../services/aiChiefOrchestrator');
+        const result = await requestAiChiefCopilotQuery(cleanQuery, {
+          userRole: options.userRole,
+          patientId: options.patientId,
+          context: options.context,
+          sourceScreen: 'emergency_store_copilot',
         });
-        const text = await response.text();
-        const raw = text ? JSON.parse(text) : {};
-        if (!response.ok) {
-          throw new Error(
-            stringFrom(firstValue(raw, ['message', 'error', 'detail'])) ||
-              `CareDroid request failed with status ${response.status}.`,
-          );
-        }
-        const data = unwrapData(raw);
         const message: EmergencyCopilotMessage = {
-          id: stringFrom(firstValue(data, ['id', 'messageId'])) || createId('copilot'),
-          query: cleanQuery,
-          response:
-            stringFrom(firstValue(data, ['response', 'answer', 'message', 'content', 'text'])) ||
-            'Emergency Copilot returned no response text.',
-          safetyStatus: String(
-            firstValue(data, ['safetyStatus', 'safety_status', 'safety.status']) || 'unknown',
-          )
-            .toLowerCase()
-            .includes('unsafe')
-            ? 'unsafe'
-            : 'unknown',
-          createdAt: stringFrom(firstValue(data, ['createdAt', 'timestamp'])) || nowIso(),
-          raw,
+          id: result.id,
+          query: result.query,
+          response: result.response,
+          safetyStatus: result.safetyStatus,
+          createdAt: result.createdAt,
+          raw: result.raw,
         };
         get().appendCopilotMessage(message);
         return message;
@@ -4539,7 +4538,14 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       }
 
       if (['alert_created', 'alert_updated', 'emergency_alert', 'notification'].includes(type)) {
-        get().addAlert(normalizeRealtimeAlert(payload));
+        void import('../services/alertLifecycleOrchestrator').then(({ ingestRealtimeAlertPayload, ingestUnifiedAlert }) => {
+          const unified = ingestRealtimeAlertPayload(payload);
+          if (unified) {
+            ingestUnifiedAlert(unified, { sourceScreen: 'emergency-realtime' });
+            return;
+          }
+          get().ingestPreparedAlert(normalizeRealtimeAlert(payload));
+        });
         return;
       }
 
@@ -4762,7 +4768,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         ],
       })),
 
-    addAlert: (alert) =>
+    ingestPreparedAlert: (alert) =>
       set((state) => ({
         alerts: mergeEmergencyAlerts([alert], state.alerts),
         workflowLogs: appendWorkflowLogs(state.workflowLogs, [
@@ -4787,6 +4793,8 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         ]),
       })),
 
+    addAlert: (alert) => get().ingestPreparedAlert(alert),
+
     markAlertRead: (alertId) =>
       set((state) => ({
         alerts: state.alerts.map((alert) =>
@@ -4794,29 +4802,17 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         ),
       })),
 
-    acknowledgeAlert: (alertId) =>
-      set((state) => {
-        const acknowledgedAt = nowIso();
-        return {
-          alerts: state.alerts.map((alert) =>
-            alert.id === alertId
-              ? { ...alert, read: true, acknowledged: true, acknowledgedAt }
-              : alert,
-          ),
-        };
-      }),
+    acknowledgeAlert: (alertId) => {
+      void import('../services/alertLifecycleOrchestrator').then(({ transitionAlertLifecycle }) =>
+        transitionAlertLifecycle(alertId, 'acknowledge', { sourceScreen: 'emergency-store' }),
+      );
+    },
 
-    dismissAlert: (alertId) =>
-      set((state) => {
-        const dismissedAt = nowIso();
-        return {
-          alerts: state.alerts.map((alert) =>
-            alert.id === alertId
-              ? { ...alert, read: true, dismissed: true, dismissedAt }
-              : alert,
-          ),
-        };
-      }),
+    dismissAlert: (alertId) => {
+      void import('../services/alertLifecycleOrchestrator').then(({ transitionAlertLifecycle }) =>
+        transitionAlertLifecycle(alertId, 'dismiss', { sourceScreen: 'emergency-store' }),
+      );
+    },
 
     setCapacity: (capacity) =>
       set((state) => ({
@@ -4954,6 +4950,13 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         },
         { arrivalId, source: 'ems-pipeline' },
       );
+
+      const updatedArrival = nextState.emsArrivals.find((entry) => entry.id === arrivalId);
+      if (updatedArrival?.status && updatedArrival.status !== arrival.status) {
+        void import('../services/emergencyCareJourneyOrchestrator').then(({ onEmsArrivalStatusChange }) =>
+          onEmsArrivalStatusChange(updatedArrival, arrival.status),
+        );
+      }
     },
 
     updateAmbulanceHandoffChecklist: (arrivalId, patch, actor) => {

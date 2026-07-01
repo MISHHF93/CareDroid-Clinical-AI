@@ -67,7 +67,7 @@ export const FRONTEND_API_CALLS = Object.freeze([
   { id: 'notifications-devices-delete', method: 'DELETE', path: '/api/notifications/devices/:token', client: 'NotificationService.js', capability: 'notificationsRest' },
   { id: 'notifications-test', method: 'POST', path: '/api/notifications/test', client: 'NotificationService.js', capability: 'notificationsRest' },
   { id: 'notifications-stream', method: 'GET', path: '/api/notifications/stream', client: 'NotificationService.js', capability: 'notificationStream' },
-  { id: 'notifications-send-channel', method: 'POST', path: '/api/notifications/send/:channel', client: 'notifications/NotificationService.js', capability: 'notificationSendChannel' },
+  { id: 'notifications-send-channel', method: 'POST', path: '/api/notifications/send/:channel', client: 'src/test/fixtures/legacyNotificationService.ts', capability: 'notificationSendChannel' },
 
   { id: 'team-users', method: 'GET', path: '/api/team/users', client: 'TeamManagement.jsx', capability: 'teamManagement' },
   { id: 'team-user-update', method: 'PUT', path: '/api/team/users/:id', client: 'TeamManagement.jsx', capability: 'teamManagement' },

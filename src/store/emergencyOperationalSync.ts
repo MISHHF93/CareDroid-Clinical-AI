@@ -21,6 +21,10 @@ import {
 import { evaluateVitalsAlerts } from '../utils/vitalsAlertPipeline';
 import { applyWhiteboardAutomationToPatients } from '../services/whiteboardAutomationEngine';
 import { buildBottleneckRegistrySnapshot } from '../services/bottleneckRegistry';
+import {
+  prepareOperationalDerivedAlerts,
+  syncDerivedAlertsLifecycle,
+} from '../services/alertLifecycleOrchestrator';
 
 function nowIso(): string {
   return new Date().toISOString();
@@ -350,32 +354,37 @@ export function buildUpdateAlertsPatch(state: {
       message: 'Store alert derivation cycle active.',
     },
   });
-  const derivedAlerts = deriveAlerts(
-    {
-      patients,
-      capacity,
-      emsArrivals: state.emsArrivals,
-      referrals: state.referrals,
-      queues: normalizedQueues,
-      bottleneckAlert: state.bottleneckAlert || null,
-      bottleneckEvents: bottleneckRegistry.activeBottlenecks,
-    },
-    state.alerts,
-    now,
+  const derivedAlerts = prepareOperationalDerivedAlerts(
+    deriveAlerts(
+      {
+        patients,
+        capacity,
+        emsArrivals: state.emsArrivals,
+        referrals: state.referrals,
+        queues: normalizedQueues,
+        bottleneckAlert: state.bottleneckAlert || null,
+        bottleneckEvents: bottleneckRegistry.activeBottlenecks,
+      },
+      state.alerts,
+      now,
+    ),
   );
   const derivedIds = new Set(derivedAlerts.map((alert) => alert.id));
   const manualAlerts = state.alerts.filter(
     (alert) => !derivedIds.has(alert.id) && !isDerivedAlertId(alert.id),
   );
+  const mergedAlerts = triageOperationalAlerts(
+    [...derivedAlerts, ...manualAlerts].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    ),
+  ).visible;
+
+  syncDerivedAlertsLifecycle(state.alerts, mergedAlerts, 'emergencyStore.updateAlerts');
 
   return {
     ...(patients === state.patients ? {} : { patients }),
     capacity,
-    alerts: triageOperationalAlerts(
-      [...derivedAlerts, ...manualAlerts].sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      ),
-    ).visible,
+    alerts: mergedAlerts,
   };
 }
 

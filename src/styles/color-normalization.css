@@ -1,6 +1,6 @@
 /**
  * Layer 1 — normalizes legacy aliases and shell surfaces to the medical palette.
- * Loaded after globals.css so all coloration layers resolve consistently.
+ * Loaded after palette layers via design-system.css so coloration resolves consistently.
  */
 :root,
 html {

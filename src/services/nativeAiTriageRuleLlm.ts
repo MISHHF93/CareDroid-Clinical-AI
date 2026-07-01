@@ -1,4 +1,4 @@
-import { callAI } from '../lib/ai/client';
+import { requestAiChiefConversational } from './aiChiefOrchestrator';
 import { getAIPrompt } from '../lib/ai/promptRegistry';
 import { HUMAN_REVIEW_DISCLAIMER } from '../lib/ai/safety/policy';
 import { Priority } from '../types/emergency';
@@ -22,8 +22,10 @@ export async function parseTriageRuleWithLlm(
   const fallback = parseNaturalLanguageTriageRule(naturalLanguage, options);
 
   try {
-    const response = await callAI({
+    const response = await requestAiChiefConversational({
       requestType: 'TRIAGE_ASSIST',
+      domain: 'triage',
+      sourceScreen: 'triage_rule_builder',
       systemPrompt: `${getAIPrompt('triage-assistant').prompt}\n${HUMAN_REVIEW_DISCLAIMER}`,
       message: [
         'Convert this triage rule into JSON with keys: label, priority (P1-P5), conditions (array of {field, operator, value}).',

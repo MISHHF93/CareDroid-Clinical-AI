@@ -39,7 +39,7 @@ function SummaryStrip({ summary }: { summary: ReturnType<typeof buildPredictiveA
         { label: 'Avg risk score', value: `${summary.averageScore}/100` },
         {
           label: 'Highest risk',
-          value: summary.highestRisk?.title ?? '—',
+          value: summary.highestRisk?.title ?? 'ï¿½',
           accent: BAND_COLOR[summary.highestRisk?.band ?? 'low'],
         },
       ].map(({ label, value, accent }) => (
@@ -143,7 +143,7 @@ function ModelCard({
             {model.title}
           </div>
           <div style={{ fontSize: 12, color: MEDICAL_THEME.inkMuted, marginTop: 2 }}>
-            {model.domain} · {model.horizon}
+            {model.domain} ï¿½ {model.horizon}
           </div>
         </div>
         <span
@@ -170,7 +170,7 @@ function ModelCard({
       {/* Confidence */}
       <div style={{ fontSize: 12, color: MEDICAL_THEME.inkMuted, marginBottom: expanded ? 12 : 0 }}>
         Confidence: <strong style={{ color: MEDICAL_THEME.ink }}>{Math.round(model.confidence * 100)}%</strong>
-        {' · '}
+        {' ï¿½ '}
         {expanded ? 'Hide details ?' : 'Show details ?'}
       </div>
 
@@ -320,10 +320,10 @@ export default function PredictiveAnalyticsDashboard() {
       {/* Header */}
       <div style={{ marginBottom: 20 }}>
         <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: MEDICAL_THEME.ink }}>
-          Predictive Analytics
+          Predictive Analytics Dashboard
         </h1>
         <p style={{ margin: '2px 0 0', fontSize: 13, color: MEDICAL_THEME.inkMuted }}>
-          Deterioration · Sepsis · Readmission · ICU transfer · Device & fleet risk
+          Deterioration ï¿½ Sepsis ï¿½ Readmission ï¿½ ICU transfer ï¿½ Device & fleet risk
         </p>
       </div>
 
@@ -342,7 +342,7 @@ export default function PredictiveAnalyticsDashboard() {
           gap: 8,
         }}
       >
-        <span style={{ fontWeight: 700 }}>Demo models</span> — predictions shown are not live
+        <span style={{ fontWeight: 700 }}>Demo models</span> ï¿½ predictions shown are not live
         patient, device, or fleet data. Connect live data pipelines to activate real predictions.
       </div>
 
@@ -353,7 +353,7 @@ export default function PredictiveAnalyticsDashboard() {
       <div style={{ marginBottom: 18 }}>
         <input
           type="text"
-          placeholder="Search models, domains, signals…"
+          placeholder="Search models, domains, signalsï¿½"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           style={{

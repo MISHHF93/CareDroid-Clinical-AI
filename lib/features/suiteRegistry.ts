@@ -511,6 +511,10 @@ export const NAV_SUITE_ASSIGNMENTS: Readonly<Record<string, CareDroidSuiteId>> =
   audit: 'analytics_simulation_qa',
   'ai-center': 'platform_admin_saas',
   admin: 'platform_admin_saas',
+  'hospital-map': 'telemetry_iot_digital_twin',
+  executive: 'analytics_simulation_qa',
+  'predictive-analytics': 'analytics_simulation_qa',
+  'medical-iot': 'telemetry_iot_digital_twin',
 });
 
 export function getSuiteById(id: CareDroidSuiteId): CareDroidSuite | undefined {

@@ -4,16 +4,25 @@ import {
   buildTriageBreachVisibilitySnapshot,
   hasTriageBreachVisibilityActivity,
 } from '../../services/triageBreachVisibilityModel';
+import type { Patient } from '../../types/emergency';
 import TriageBreachBadge from './TriageBreachBadge';
 import './TriageBreachBadge.css';
 
+type TriageBreachStripProps = {
+  patients?: Patient[];
+  settings?: Record<string, unknown> | null;
+  onSelectPatient?: (patientId: string) => void;
+  className?: string;
+  alwaysShowWhenActive?: boolean;
+};
+
 export default function TriageBreachStrip({
-  patients = [] as any[],
+  patients = [],
   settings = null,
   onSelectPatient,
   className = '',
   alwaysShowWhenActive = true,
-}) {
+}: TriageBreachStripProps) {
   const context = useMemo(() => ({ settings: settings || undefined }), [settings]);
 
   const visibility = useMemo(
@@ -46,8 +55,8 @@ export default function TriageBreachStrip({
         <p className="triage-breach-strip__eyebrow">Arrival to triage</p>
         <h3>Triage breach timer</h3>
         <p className="triage-breach-strip__subtitle">
-          Door-to-triage elapsed time against site thresholds — {snapshot.summary.breachedCount} breached ·{' '}
-          {snapshot.summary.breachRiskCount} approaching · {visibility.rapidReviewFlags} rapid-review · target{' '}
+          Door-to-triage elapsed time against site thresholds ï¿½ {snapshot.summary.breachedCount} breached ï¿½{' '}
+          {snapshot.summary.breachRiskCount} approaching ï¿½ {visibility.rapidReviewFlags} rapid-review ï¿½ target{' '}
           {snapshot.summary.targetMinutes}m
         </p>
       </header>

@@ -323,7 +323,7 @@ function AppShellFrame({ children }: AppShellProps) {
       if (backendReachable) {
         await useEmergencyStore.getState().initializeFromBackend();
       } else {
-        // No backend — stay on local/simulation data; no network calls needed
+        // No backend ï¿½ stay on local/simulation data; no network calls needed
         useEmergencyStore.setState({ backendAvailable: false, persistenceMode: 'local' });
       }
       useEmergencyStore.getState().updateAlerts();
@@ -371,10 +371,12 @@ function AppShellFrame({ children }: AppShellProps) {
     const capacityInterval = screenCapabilities.showCapacityEngine
       ? startCapacityEngine()
       : undefined;
-    const alertsInterval = window.setInterval(
-      () => useEmergencyStore.getState().updateAlerts(),
-      30_000,
-    );
+    const alertsInterval = window.setInterval(() => {
+      useEmergencyStore.getState().updateAlerts();
+      void import('../services/alertLifecycleOrchestrator').then(({ checkUnacknowledgedAlertEscalations }) =>
+        checkUnacknowledgedAlertEscalations(),
+      );
+    }, 30_000);
 
     if (simulationModeActive) {
       void import('../engine/simulation').then((simulation) => {

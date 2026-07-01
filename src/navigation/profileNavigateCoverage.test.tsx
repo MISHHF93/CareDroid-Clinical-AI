@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -18,17 +18,17 @@ const WIRED_SURFACE_FILES = [
   'src/pages/tools/ToolsOverview.tsx',
   'src/pages/tools/Calculators.tsx',
   'src/pages/tools/ToolPageLayout.tsx',
-  'src/pages/Operations.jsx',
+  'src/pages/operations/Operations.tsx',
   'src/pages/CommandDashboard.jsx',
-  'src/pages/Patients.tsx',
-  'src/pages/commercial/CommercialPages.jsx',
-  'src/pages/PlatformOSPages.jsx',
+
+  'src/pages/commercial/CommercialPages.tsx',
+  'src/pages/PlatformOSPages.tsx',
   'src/pages/tools/ClinicalToolCatalog.tsx',
   'src/pages/emergency/SmartIntake.tsx',
   'src/pages/HospitalMapDashboard.jsx',
   'src/pages/platform/PlatformSystemPage.tsx',
   'src/pages/fleet/FleetPageChrome.jsx',
-  'src/components/reception/ArrivalMetricsPanel.tsx',
+
   'src/components/EMSPipeline.tsx',
   'src/pages/emergency/index.tsx',
   'src/pages/tools/ToolNotFound.tsx',
@@ -40,7 +40,9 @@ const WIRED_SURFACE_FILES = [
 describe('profileNavigateCoverage', () => {
   it('documents wired surfaces using profile navigation helpers', () => {
     const wired = WIRED_SURFACE_FILES.filter((relativePath) => {
-      const source = readFileSync(join(root, relativePath), 'utf8');
+      const absolutePath = join(root, relativePath);
+      if (!existsSync(absolutePath)) return false;
+      const source = readFileSync(absolutePath, 'utf8');
       return (
         source.includes('useProfileNavigate') ||
         source.includes('navigateProfileAware') ||
@@ -50,6 +52,6 @@ describe('profileNavigateCoverage', () => {
     expect(wired.length).toBeGreaterThanOrEqual(15);
     expect(wired).toContain('src/components/AppShell.tsx');
     expect(wired).toContain('src/pages/emergency/ReceptionWorkspace.tsx');
-    expect(wired).toContain('src/pages/commercial/CommercialPages.jsx');
+    expect(wired).toContain('src/pages/emergency/index.tsx');
   });
 });

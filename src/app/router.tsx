@@ -1077,8 +1077,12 @@ export function AppRoutes() {
         <Route path="/workspaces"          element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
         <Route path="/organization"        element={<Navigate to={CANONICAL_ROUTES.adminOperations} replace />} />
         <Route path="/organization/*"      element={<Navigate to={CANONICAL_ROUTES.adminOperations} replace />} />
+        <Route path={CANONICAL_ROUTES.surveillanceNexus} element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
         <Route path="/surveillance"        element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
         <Route path="/surveillance/*"      element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
+        <Route path={CANONICAL_ROUTES.customerPortal} element={<Navigate to={`${CANONICAL_ROUTES.adminOperations}/tenant`} replace />} />
+        <Route path={CANONICAL_ROUTES.successCenter} element={<Navigate to={CANONICAL_ROUTES.customerSuccess} replace />} />
+        <Route path={CANONICAL_ROUTES.customerSuccess} element={<Navigate to={`${CANONICAL_ROUTES.adminOperations}/tenant`} replace />} />
         <Route path="/fleet"               element={<Navigate to={CANONICAL_ROUTES.emergencyEms} replace />} />
         <Route path="/fleet/*"             element={<ToolsRedirect />} />
         <Route path="/vehicle"             element={<Navigate to={CANONICAL_ROUTES.emergencyEms} replace />} />

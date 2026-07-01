@@ -1,8 +1,6 @@
 import './theme-init';
-import './styles/tokens.css';
-import './styles/index.css';
+import './styles/design-system.css';
 import './index.css';
-import './globals.css';
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';

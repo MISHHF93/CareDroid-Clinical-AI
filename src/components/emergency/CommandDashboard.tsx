@@ -14,11 +14,10 @@ import {
   type CareDroidAIResponse,
 } from '../../lib/ai/careDroidAI';
 import { BottleneckCommandPanel } from '../bottlenecks/BottleneckPanels';
-import {
-  buildBottleneckRegistrySnapshot,
-  type BottleneckRegistrySnapshot,
-} from '../../services/bottleneckRegistry';
+import type { BottleneckRegistrySnapshot } from '../../services/bottleneckRegistry';
+import { getUnifiedServiceHealthSnapshot } from '../../services/unifiedServiceRegistry';
 import ResponseComplianceCard, { type ComplianceAlert } from './ResponseComplianceCard';
+import { getAllActiveTimers } from '../../engine/threeMinuteTimerEngine';
 import './CommandDashboard.css';
 
 export type CommandDashboardProps = {
@@ -189,10 +188,18 @@ export default function CommandDashboard({
       }),
     [boardingMetrics, capacity, now, patients, rooms, snapshotProp, staff],
   );
+  const activeResponseTimers = useMemo(() => getAllActiveTimers(), [snapshot.updatedAt, now]);
+  const breachedTimers = useMemo(
+    () =>
+      activeResponseTimers.filter(
+        (timer) => Boolean(timer.breachAt) || timer.phase === 'breach' || timer.phase === 'breach_resolved',
+      ),
+    [activeResponseTimers],
+  );
   const bottleneckRegistry = useMemo(
     () =>
       bottleneckRegistryProp ||
-      buildBottleneckRegistrySnapshot({
+      getUnifiedServiceHealthSnapshot({
         generatedAt: snapshot.updatedAt,
         capacityStatus: capacity,
         activePatients: patients.map((patient) => ({
@@ -220,7 +227,7 @@ export default function CommandDashboard({
           stale: false,
           message: 'Command dashboard local snapshot.',
         },
-      }),
+      }).bottlenecks,
     [bottleneckRegistryProp, capacity, patients, snapshot.updatedAt],
   );
 
@@ -282,7 +289,7 @@ export default function CommandDashboard({
               <li key={alert.patientId}>
                 <strong>{alert.patientLabel}</strong>
                 <span>
-                  Risk {alert.probabilityPercent}% · projected {alert.predictedHours}h
+                  Risk {alert.probabilityPercent}% ï¿½ projected {alert.predictedHours}h
                 </span>
                 <small>{alert.action}</small>
               </li>
@@ -299,7 +306,7 @@ export default function CommandDashboard({
               <li key={prediction.patientId}>
                 <strong>{prediction.patientLabel}</strong>
                 <span>
-                  {prediction.orientation.toUpperCase()} · {prediction.probabilityPercent}%
+                  {prediction.orientation.toUpperCase()} ï¿½ {prediction.probabilityPercent}%
                 </span>
               </li>
             ))}
@@ -337,6 +344,16 @@ export default function CommandDashboard({
             ))}
           </ul>
         </section>
+      ) : null}
+
+      {activeResponseTimers.length > 0 ? (
+        <p className="command-dashboard__timer-status" role="status" aria-live="polite">
+          3-minute response: {activeResponseTimers.length} active timer
+          {activeResponseTimers.length === 1 ? '' : 's'}
+          {breachedTimers.length > 0
+            ? ` Â· ${breachedTimers.length} breached`
+            : ''}
+        </p>
       ) : null}
 
       {complianceAlerts && complianceAlerts.length > 0 && (

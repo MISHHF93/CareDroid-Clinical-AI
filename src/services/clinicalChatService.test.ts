@@ -15,7 +15,12 @@ vi.mock('./apiClient', () => ({
   parseApiResponse: vi.fn(async (response) => response.json()),
 }));
 
+vi.mock('./aiChiefOrchestrator', () => ({
+  requestAiChiefConversational: vi.fn(),
+}));
+
 import { apiFetch } from './apiClient';
+import { requestAiChiefConversational } from './aiChiefOrchestrator';
 
 describe('clinicalChatService', () => {
   beforeEach(() => {
@@ -147,6 +152,35 @@ describe('clinicalChatService', () => {
     });
     expect(msg.aiGateway.pipeline[0]).toEqual({ stage: 'ai_gateway', status: 'complete' });
     expect(msg.metadata.aiFoundation.selectedExpert).toBe('operations');
+  });
+
+  it('sendClinicalChatMessage routes COPILOT_CHAT through AI Chief orchestrator', async () => {
+    requestAiChiefConversational.mockResolvedValue({
+      ok: true,
+      status: 200,
+      content: 'Chief response',
+      data: { response: 'Chief response', toolResult: { toolId: 'ed-copilot' } },
+      toolCalls: [],
+      usage: { inputTokens: 1, outputTokens: 1, totalTokens: 2 },
+      requestType: 'COPILOT_CHAT',
+    });
+
+    const res = await sendClinicalChatMessage({
+      message: 'capacity status',
+      requestType: 'COPILOT_CHAT',
+      workspaceContext: { workspaceKey: 'emergency' },
+    });
+
+    expect(res.ok).toBe(true);
+    expect(requestAiChiefConversational).toHaveBeenCalledWith(
+      expect.objectContaining({
+        requestType: 'COPILOT_CHAT',
+        message: 'capacity status',
+      }),
+    );
+    expect(apiFetch).not.toHaveBeenCalled();
+    expect(res.data.response).toBe('Chief response');
+    expect(res.data.metadata.aiChief.orchestrated).toBe(true);
   });
 
   it('sendClinicalChatMessage posts JSON', async () => {

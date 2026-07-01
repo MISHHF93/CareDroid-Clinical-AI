@@ -3,6 +3,7 @@ import { FolderOpen, ShieldCheck } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import HelpTrigger from '../../components/help/HelpTrigger';
 import ReceptionDeskToolbar from '../../components/reception/ReceptionDeskToolbar';
+import ReceptionEscalationAttentionStrip from '../../components/reception/ReceptionEscalationAttentionStrip';
 import ReceptionOperationalRail from '../../components/reception/ReceptionOperationalRail';
 import ReceptionSmartIntakeOverlay from '../../components/reception/ReceptionSmartIntakeOverlay';
 import PreparePatientChooser from '../../components/reception/PreparePatientChooser';
@@ -517,6 +518,13 @@ export default function ReceptionWorkspace() {
               ? 'warning'
               : 'neutral'
         }
+      />
+
+      <ReceptionEscalationAttentionStrip
+        alerts={alerts}
+        roleId={emergencyRole.role}
+        onSelectPatient={selectPatient}
+        className="reception-front-door__escalation-strip"
       />
 
       {receptionDesk.enabled ? (

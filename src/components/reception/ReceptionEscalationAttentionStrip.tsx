@@ -1,9 +1,10 @@
 import React, { useMemo } from 'react';
 import { buildReceptionEscalationAttentionSnapshot } from '../../services/receptionEscalationWorkflow';
+import type { Alert } from '../../types/emergency';
 import './ReceptionEscalationAttentionStrip.css';
 
-function formatTime(timestamp) {
-  if (!timestamp) return '—';
+function formatTime(timestamp: string | null | undefined) {
+  if (!timestamp) return 'ï¿½';
   try {
     return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   } catch {
@@ -11,12 +12,19 @@ function formatTime(timestamp) {
   }
 }
 
+type ReceptionEscalationAttentionStripProps = {
+  alerts?: Alert[];
+  roleId?: string | null;
+  onSelectPatient?: (patientId: string) => void;
+  className?: string;
+};
+
 export default function ReceptionEscalationAttentionStrip({
-  alerts = [] as any[],
+  alerts = [],
   roleId = null,
   onSelectPatient,
   className = '',
-}) {
+}: ReceptionEscalationAttentionStripProps) {
   const snapshot = useMemo(
     () => buildReceptionEscalationAttentionSnapshot(alerts, { roleId, limit: 4 }),
     [alerts, roleId],
@@ -33,8 +41,8 @@ export default function ReceptionEscalationAttentionStrip({
         <p className="reception-escalation-attention-strip__eyebrow">Front desk escalation</p>
         <h3>Reception escalations need response</h3>
         <p className="reception-escalation-attention-strip__subtitle">
-          {snapshot.summary.activeCount} active · {snapshot.summary.criticalCount} critical · triage{' '}
-          {snapshot.summary.triageCount} · charge {snapshot.summary.chargeCount}
+          {snapshot.summary.activeCount} active ï¿½ {snapshot.summary.criticalCount} critical ï¿½ triage{' '}
+          {snapshot.summary.triageCount} ï¿½ charge {snapshot.summary.chargeCount}
         </p>
       </header>
       <ul className="reception-escalation-attention-strip__list">
@@ -50,7 +58,7 @@ export default function ReceptionEscalationAttentionStrip({
               <span className="reception-escalation-attention-strip__title">{row.title}</span>
               <span className="reception-escalation-attention-strip__message">{row.message}</span>
               <span className="reception-escalation-attention-strip__meta">
-                {row.reasonLabel || 'Escalation'} · {row.targetsLabel} · {formatTime(row.createdAt)}
+                {row.reasonLabel || 'Escalation'} ï¿½ {row.targetsLabel} ï¿½ {formatTime(row.createdAt)}
               </span>
             </button>
           </li>

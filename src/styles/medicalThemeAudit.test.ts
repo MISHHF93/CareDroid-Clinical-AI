@@ -19,6 +19,7 @@ const tokenFiles = [
   'styles/card-contrast-normalization.css',
   'config/theme.tokens.ts',
   'config/medicalTheme.constants.ts',
+  'styles/design-system.css',
   'main.tsx',
 ].map((file) => readFileSync(join(srcRoot, file), 'utf8'));
 
@@ -39,15 +40,18 @@ const codeBundle = globSync('src/**/*.{tsx,jsx}', {
   .join('\n');
 
 describe('medical theme full-scale audit', () => {
-  it('loads every normalization layer in main.jsx', () => {
-    const main = tokenFiles[11];
-    expect(main).toContain("import './styles/medical-color-layer.css'");
-    expect(main).toContain("import './styles/medical-type-layer.css'");
-    expect(main).toContain("import './styles/color-normalization.css'");
-    expect(main).toContain("import './styles/text-normalization.css'");
-    expect(main).toContain("import './styles/surface-normalization.css'");
-    expect(main).toContain("import './styles/medical-card-layer.css'");
-    expect(main).toContain("import './styles/card-contrast-normalization.css'");
+  it('loads every normalization layer through the design-system entry', () => {
+    const designSystem = tokenFiles[11];
+    const main = tokenFiles[12];
+    expect(main).toContain("import './styles/design-system.css'");
+    expect(designSystem).toContain("@import './medical-color-layer.css'");
+    expect(designSystem).toContain("@import './medical-type-layer.css'");
+    expect(designSystem).toContain("@import './color-normalization.css'");
+    expect(designSystem).toContain("@import './text-normalization.css'");
+    expect(designSystem).toContain("@import './surface-normalization.css'");
+    expect(designSystem).toContain("@import './medical-card-layer.css'");
+    expect(designSystem).toContain("@import './card-contrast-normalization.css'");
+    expect(designSystem).toContain("@import './design-system-bridge.css'");
   });
 
   it('defines medical card surface contracts with paired bg/fg tokens', () => {

@@ -1,7 +1,7 @@
 /**
  * Canonical programmatic theme token projection.
  * CSS custom properties remain the runtime source of truth in
- * `src/styles/theme-tokens.css` and `src/styles/design-tokens.css`.
+ * `src/styles/design-system.css` (single entry; layers listed below).
  */
 export {
   DESIGN_BREAKPOINTS,
@@ -18,15 +18,21 @@ export {
 export const THEME_CONFIG = Object.freeze({
   standardTheme: 'light',
   themePreferenceEnabled: false,
+  cssEntry: 'src/styles/design-system.css',
   cssTokenSources: Object.freeze([
+    'src/styles/primitives.css',
+    'src/styles/tokens.css',
+    'src/styles/design-tokens.css',
+    'src/styles/theme-tokens.css',
     'src/styles/medical-color-layer.css',
     'src/styles/medical-type-layer.css',
     'src/styles/medical-card-layer.css',
-    'src/styles/theme-tokens.css',
-    'src/styles/design-tokens.css',
+    'src/styles/design-system-bridge.css',
+    'src/styles/theme-legacy-bridge.css',
     'src/styles/color-normalization.css',
     'src/styles/text-normalization.css',
     'src/styles/surface-normalization.css',
     'src/styles/card-contrast-normalization.css',
+    'src/styles/visual-consistency.css',
   ]),
 });

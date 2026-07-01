@@ -842,7 +842,8 @@ export type WorkflowActionType =
   | 'copilot_used'
   | 'provincial_data_viewed'
   | 'integration_event_received'
-  | 'clinical_score_saved';
+  | 'clinical_score_saved'
+  | 'alert_lifecycle';
 
 export interface ClinicalScoreSaveInput {
   patientId: string;
@@ -877,6 +878,14 @@ export interface WorkflowActionLog {
 
 export type AlertSeverity = 'Info' | 'Warning' | 'Critical';
 
+export type AlertLifecycleStatus =
+  | 'open'
+  | 'acknowledged'
+  | 'escalated'
+  | 'resolved'
+  | 'dismissed'
+  | 'expired';
+
 export type AlertType =
   | 'Reassessment'
   | 'Capacity'
@@ -906,6 +915,13 @@ export interface Alert {
   dismissedAt?: ISODateString;
   autoDismissAfter?: number;
   source?: string;
+  lifecycleStatus?: AlertLifecycleStatus;
+  ownerRole?: string;
+  escalationRole?: string;
+  recommendedAction?: string;
+  resolvedAt?: ISODateString;
+  resolutionReason?: string;
+  escalatedAt?: ISODateString;
   metadata?: Record<string, string | number | boolean | null | undefined>;
 }
 

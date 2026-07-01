@@ -13,10 +13,12 @@ import QueueReasonBadge from '../queues/QueueReasonBadge';
 import HighRiskComplaintFlagBadge from '../reception/HighRiskComplaintFlagBadge';
 import ReassessmentTimerBadge from '../reassessment/ReassessmentTimerBadge';
 import ReassessmentTimerStrip from '../reassessment/ReassessmentTimerStrip';
+import WaitingRoomSafetyEscalationStrip from '../waiting-room/WaitingRoomSafetyEscalationStrip';
+import WaitingRoomStatusMessagingStrip from '../patient-experience/WaitingRoomStatusMessagingStrip';
 import './WaitingRoomSafetyBoard.css';
 
 function StatusBadge({ label, tone = 'neutral', title = undefined }: { label?: any; tone?: any; title?: string | undefined }) {
-  if (!label || label === '—') return <span className="waiting-room-safety-board__muted">—</span>;
+  if (!label || label === 'ï¿½') return <span className="waiting-room-safety-board__muted">ï¿½</span>;
   return (
     <span
       className="waiting-room-safety-board__badge"
@@ -52,6 +54,8 @@ export default function WaitingRoomSafetyBoard({
   referrals = ([] as any[]),
   emsArrivals = ([] as any[]),
   workflowLogs = ([] as any[]),
+  alerts = ([] as any[]),
+  capacity = (null as any),
   activeQueueFilter = (null as any),
   settings = (null as any),
   displayMode = false,
@@ -99,7 +103,7 @@ export default function WaitingRoomSafetyBoard({
           <h2 id="waiting-room-safety-board-title">Waiting Room Safety Board</h2>
           <p className="waiting-room-safety-board__subtitle">
             {focused
-              ? 'Post-triage waiting patients — arrival, acuity, vitals, reassessment, fit-to-wait seating, provider and test status.'
+              ? 'Post-triage waiting patients ï¿½ arrival, acuity, vitals, reassessment, fit-to-wait seating, provider and test status.'
               : 'Post-triage waiting patients with vitals, reassessment, provider, test status, and fit-to-sit / fit-to-wait seating review.'}
           </p>
         </div>
@@ -163,6 +167,22 @@ export default function WaitingRoomSafetyBoard({
         </div>
       </header>
 
+      <WaitingRoomSafetyEscalationStrip
+        patients={patients}
+        workflowLogs={workflowLogs}
+        staff={staff}
+        alerts={alerts}
+        onSelectPatient={onSelectPatient}
+        className="waiting-room-safety-board__escalation-strip"
+      />
+      <WaitingRoomStatusMessagingStrip
+        patients={patients}
+        referrals={referrals}
+        capacity={capacity}
+        audience="staff"
+        className="waiting-room-safety-board__status-strip"
+      />
+
       {board.rows.length ? (
         <div className="waiting-room-safety-board__table-wrap">
           <table className="waiting-room-safety-board__table">
@@ -185,8 +205,8 @@ export default function WaitingRoomSafetyBoard({
                 <th scope="col">Experience</th>
                 <th scope="col">Queue reason</th>
                 {!focused ? <th scope="col">Next step</th> : null}
-                <th scope="col">LWBS · advisory</th>
-                <th scope="col">Deterioration · advisory</th>
+                <th scope="col">LWBS ï¿½ advisory</th>
+                <th scope="col">Deterioration ï¿½ advisory</th>
                 <th scope="col">Risk flags</th>
                 {focused ? <th scope="col">Timers</th> : null}
               </tr>
@@ -207,7 +227,7 @@ export default function WaitingRoomSafetyBoard({
                     </button>
                   </th>
                   <td>{row.arrivalTimeLabel}</td>
-                  <td>{row.triageLevel || '—'}</td>
+                  <td>{row.triageLevel || 'ï¿½'}</td>
                   <td className="waiting-room-safety-board__complaint">{row.presentingComplaint}</td>
                   <td>
                     <StatusBadge
@@ -271,7 +291,7 @@ export default function WaitingRoomSafetyBoard({
                           Overdue
                         </button>
                       ) : (
-                        <span className="waiting-room-safety-board__muted">—</span>
+                        <span className="waiting-room-safety-board__muted">ï¿½</span>
                       )}
                     </span>
                   </td>
@@ -339,10 +359,10 @@ export default function WaitingRoomSafetyBoard({
                             : null,
                         ]
                           .filter(Boolean)
-                          .join(' · ')}
+                          .join(' ï¿½ ')}
                       />
                     ) : (
-                      <span className="waiting-room-safety-board__muted">—</span>
+                      <span className="waiting-room-safety-board__muted">ï¿½</span>
                     )}
                   </td>
                   {!focused ? (
@@ -359,10 +379,10 @@ export default function WaitingRoomSafetyBoard({
                         }
                         title={[row.nextStepLabel, row.nextStepGuidance, row.nextStepStaffDetail]
                           .filter(Boolean)
-                          .join(' · ')}
+                          .join(' ï¿½ ')}
                       />
                     ) : (
-                      <span className="waiting-room-safety-board__muted">—</span>
+                      <span className="waiting-room-safety-board__muted">ï¿½</span>
                     )}
                   </td>
                   ) : null}
@@ -375,7 +395,7 @@ export default function WaitingRoomSafetyBoard({
                       />
                     ) : row.lwbsRiskLabel ? (
                       <StatusBadge
-                        label={`${row.lwbsRiskShortLabel || row.lwbsRiskLabel} · advisory`}
+                        label={`${row.lwbsRiskShortLabel || row.lwbsRiskLabel} ï¿½ advisory`}
                         tone={
                           row.lwbsRiskTone === 'critical'
                             ? 'critical'
@@ -385,10 +405,10 @@ export default function WaitingRoomSafetyBoard({
                         }
                         title={[row.lwbsRiskLabel, row.lwbsRiskStaffDetail, row.lwbsRiskScore ? `Score ${row.lwbsRiskScore}/100` : null]
                           .filter(Boolean)
-                          .join(' · ')}
+                          .join(' ï¿½ ')}
                       />
                     ) : (
-                      <span className="waiting-room-safety-board__muted">—</span>
+                      <span className="waiting-room-safety-board__muted">ï¿½</span>
                     )}
                   </td>
                   <td>
@@ -396,7 +416,7 @@ export default function WaitingRoomSafetyBoard({
                       <DeteriorationWatchBadge patient={patient} emsArrivals={emsArrivals} compact />
                     ) : row.deteriorationWatchLabel ? (
                       <StatusBadge
-                        label={`${row.deteriorationWatchShortLabel || row.deteriorationWatchLabel} · advisory`}
+                        label={`${row.deteriorationWatchShortLabel || row.deteriorationWatchLabel} ï¿½ advisory`}
                         tone={
                           row.deteriorationWatchTone === 'critical'
                             ? 'critical'
@@ -406,10 +426,10 @@ export default function WaitingRoomSafetyBoard({
                         }
                         title={[row.deteriorationWatchLabel, row.deteriorationWatchStaffDetail]
                           .filter(Boolean)
-                          .join(' · ')}
+                          .join(' ï¿½ ')}
                       />
                     ) : (
-                      <span className="waiting-room-safety-board__muted">—</span>
+                      <span className="waiting-room-safety-board__muted">ï¿½</span>
                     )}
                   </td>
                   <td>

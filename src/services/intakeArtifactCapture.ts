@@ -1,4 +1,4 @@
-import { callAI } from '../lib/ai/client';
+import { requestAiChiefConversational } from './aiChiefOrchestrator';
 import { getAIPrompt } from '../lib/ai/promptRegistry';
 import { HUMAN_REVIEW_DISCLAIMER } from '../lib/ai/safety/policy';
 import {
@@ -132,8 +132,10 @@ async function tryAiAssistExtraction(
   const fieldKeys = artifact.extractableFields.join(', ');
 
   try {
-    const response = await callAI({
+    const response = await requestAiChiefConversational({
       requestType: 'INTAKE_SUGGESTION',
+      domain: 'intake',
+      sourceScreen: 'intake_artifact_capture',
       systemPrompt: `${getAIPrompt('smart-intake-assistant').prompt}\n${HUMAN_REVIEW_DISCLAIMER}`,
       message: [
         `Extract fields for a ${artifact.label} document.`,
@@ -285,8 +287,8 @@ export async function captureIntakeArtifact({
 
   const auditNote =
     fieldCount > 0
-      ? `${artifact.label}: captured ${fieldCount} field${fieldCount === 1 ? '' : 's'} from "${file.name}" — staff review required.`
-      : `${artifact.label}: document "${file.name}" stored — no structured fields detected; continue manual verification.`;
+      ? `${artifact.label}: captured ${fieldCount} field${fieldCount === 1 ? '' : 's'} from "${file.name}" ï¿½ staff review required.`
+      : `${artifact.label}: document "${file.name}" stored ï¿½ no structured fields detected; continue manual verification.`;
 
   return {
     artifactId: resolvedArtifactId,

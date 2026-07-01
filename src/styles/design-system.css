@@ -1,0 +1,49 @@
+/* CareDroid Design System — single canonical stylesheet entry.
+ * Import only this file (+ index.css for app layout utilities) from main.tsx.
+ * Order: primitives → palette → semantics → layout → normalization.
+ */
+
+/* 0. Numeric primitives (spacing, radii, type, motion) */
+@import './primitives.css';
+
+/* 1. Component token layer (--cd-*) */
+@import './tokens.css';
+
+/* 2. Semantic spacing, typography, touch targets */
+@import './design-tokens.css';
+
+/* 3. App palette (--app-*) */
+@import './theme-tokens.css';
+@import './emergency-tokens.css';
+
+/* 4. Medical theme layers */
+@import './medical-color-layer.css';
+@import './medical-type-layer.css';
+@import './medical-card-layer.css';
+
+/* 5. Cross-namespace bridge (--cd-* ↔ --app-* ↔ --semantic-*) */
+@import './design-system-bridge.css';
+
+/* 6. Theme surfaces & legacy aliases */
+@import './theme-surfaces.css';
+@import './theme-legacy-bridge.css';
+
+/* 7. Layout */
+@import './layout-breakpoints.css';
+@import './layout-visibility.css';
+@import './mobile-first-layout.css';
+
+/* 8. Responsive & performance */
+@import './responsive-ux.css';
+@import './mobile-performance.css';
+@import './mobile-first-recovery.css';
+@import './emergency-responsive.css';
+
+/* 9. Normalization overrides (intentional cascade — last wins) */
+@import './color-normalization.css';
+@import './text-normalization.css';
+@import './surface-normalization.css';
+@import './card-contrast-normalization.css';
+@import './visual-consistency.css';
+@import './practitioner-compact.css';
+@import './visual-responsive-standards.css';

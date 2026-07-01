@@ -26,6 +26,7 @@ import { isReceptionFirstUxEnabled } from '../../config/receptionFirstUx.config'
 import { getCentralControlPolicy } from '../../config/centralControl.config';
 import { EMERGENCY_OS_BRANDING } from '../../config/emergencyOsBranding.config';
 import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermissions';
+import { shouldSuppressOperationalSurface } from '../../config/roleOperationalDashboardModel';
 import useTriageScreen from '../../hooks/useTriageScreen';
 import useChargeNurseScreen from '../../hooks/useChargeNurseScreen';
 import useReceptionScreen from '../../hooks/useReceptionScreen';
@@ -55,6 +56,8 @@ import { resolveScreenDensityProfile } from '../../config/screenDensityModeModel
 import useScreenDensityMode from '../../hooks/useScreenDensityMode';
 import ReassessmentAttentionStrip from '../../components/whiteboard/ReassessmentAttentionStrip';
 import WaitingRoomSafetyBoard from '../../components/whiteboard/WaitingRoomSafetyBoard';
+import TriageBreachStrip from '../../components/triage/TriageBreachStrip';
+import WhatHappensNextStrip from '../../components/guidance/WhatHappensNextStrip';
 
 import WhiteboardWaitingRoomAlertRail from '../../components/whiteboard/WhiteboardWaitingRoomAlertRail';
 import ProviderWaitBreachStrip from '../../components/provider-wait/ProviderWaitBreachStrip';
@@ -305,6 +308,10 @@ export default function EmergencyWhiteboard() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { profileNavigate } = useProfileNavigate();
   const emergencyRole = useEmergencyRolePermissions();
+  const suppressOperationalSurface = useCallback(
+    (surfaceId: string) => shouldSuppressOperationalSurface(surfaceId, emergencyRole.role),
+    [emergencyRole.role],
+  );
   const triage = useTriageScreen();
   const charge = useChargeNurseScreen();
   const reception = useReceptionScreen();
@@ -360,7 +367,8 @@ export default function EmergencyWhiteboard() {
   const surfaces = usePractitionerSurfaceVisibility();
   const showNativeAiCommandSuite =
     surfaces.whiteboard.showNativeAiPanels &&
-    (clinicalAcuityDashboardEnabled || aiTransparencyDashboardEnabled);
+    (clinicalAcuityDashboardEnabled || aiTransparencyDashboardEnabled) &&
+    !suppressOperationalSurface('copilot-multimodal');
   useNativeAiBackendSync(showNativeAiCommandSuite, { force: true });
   const nativeAiRefreshTick = useNativeAiPeriodicRefresh();
   const screenDensity = useScreenDensityMode();
@@ -1961,7 +1969,9 @@ export default function EmergencyWhiteboard() {
             }
           />
         ) : null}
-        {!surfaces.compactLayout && whiteboardDensity.surfaces.secondaryStats.visible ? (
+        {!surfaces.compactLayout &&
+        !suppressOperationalSurface('analytics-charts') &&
+        whiteboardDensity.surfaces.secondaryStats.visible ? (
           <>
         <StatCard value={stats.total} label="Total" />
         <StatCard value={stats.highRisk} label="High Risk" tone={stats.highRisk ? 'critical' : 'success'} />
@@ -2011,7 +2021,9 @@ export default function EmergencyWhiteboard() {
           }
         />
         ) : null}
-        {!surfaces.compactLayout && whiteboardDensity.surfaces.secondaryStats.visible ? (
+        {!surfaces.compactLayout &&
+        !suppressOperationalSurface('analytics-charts') &&
+        whiteboardDensity.surfaces.secondaryStats.visible ? (
         <StatCard
           value={emsAwareness.riskCount}
           label="EMS Risk"
@@ -2028,7 +2040,9 @@ export default function EmergencyWhiteboard() {
           }
         />
         ) : null}
-        {!surfaces.compactLayout && whiteboardDensity.surfaces.secondaryStats.visible ? (
+        {!surfaces.compactLayout &&
+        !suppressOperationalSurface('analytics-charts') &&
+        whiteboardDensity.surfaces.secondaryStats.visible ? (
         <StatCard
           value={
             emsAwareness.awaitingHandoff
@@ -2058,7 +2072,9 @@ export default function EmergencyWhiteboard() {
           }
         />
         ) : null}
-        {!surfaces.compactLayout && whiteboardDensity.surfaces.secondaryStats.visible ? (
+        {!surfaces.compactLayout &&
+        !suppressOperationalSurface('analytics-charts') &&
+        whiteboardDensity.surfaces.secondaryStats.visible ? (
         <StatCard value={stats.boarding} label="Boarding" tone={stats.boarding ? 'warning' : 'success'} />
         ) : null}
         {!surfaces.compactLayout ? (
@@ -2078,7 +2094,9 @@ export default function EmergencyWhiteboard() {
           }
         />
         ) : null}
-        {!surfaces.compactLayout && whiteboardDensity.surfaces.secondaryStats.visible ? (
+        {!surfaces.compactLayout &&
+        !suppressOperationalSurface('analytics-charts') &&
+        whiteboardDensity.surfaces.secondaryStats.visible ? (
         <>
         <StatCard
           value={referralAwareness.buckets.accepted}
@@ -2131,6 +2149,7 @@ export default function EmergencyWhiteboard() {
       ) : null}
 
       {!display.isDisplayMode &&
+      !suppressOperationalSurface('ems-offload-aggregate') &&
       !whiteboardDensity.surfaces.emsAttention.visible &&
       !(physician.isPhysicianScreen && physician.hideEmsOperations) &&
       (!charge.isChargeNurseScreen || charge.showEmsOffloadAggregate) ? (
@@ -2246,6 +2265,7 @@ export default function EmergencyWhiteboard() {
       ) : null}
 
       {surfaces.whiteboard.showCommandDashboard &&
+      !suppressOperationalSurface('mission-control') &&
       charge.isChargeNurseScreen &&
       whiteboardDensity.surfaces.chargeNurseStrip.visible ? (
         <OperationalCommandDashboard
@@ -2315,6 +2335,24 @@ export default function EmergencyWhiteboard() {
 
       {whiteboardDensity.surfaces.waitingRoomSafety.visible ? (
         <>
+          {!display.isDisplayMode &&
+          !((charge.isChargeNurseScreen && !charge.showTriageBreach) ||
+            (triage.isTriageScreen && !triage.showTriageBreach)) ? (
+            <TriageBreachStrip
+              patients={patients}
+              settings={emergencySettings}
+              onSelectPatient={handleWaitingRoomSafetySelect}
+              className="emergency-whiteboard-page__triage-breach-strip"
+            />
+          ) : null}
+          {!display.isDisplayMode ? (
+            <WhatHappensNextStrip
+              patients={patients}
+              referrals={referrals}
+              staff={staff}
+              className="emergency-whiteboard-page__what-next-strip"
+            />
+          ) : null}
           {surfaces.whiteboard.showAlertRails &&
           !display.isDisplayMode &&
           !(physician.isPhysicianScreen && physician.hideWaitingRoomReceptionStrips) ? (
@@ -2356,6 +2394,8 @@ export default function EmergencyWhiteboard() {
             referrals={referrals}
             emsArrivals={emsArrivals}
             workflowLogs={workflowLogs}
+            alerts={alerts}
+            capacity={capacity}
             settings={emergencySettings}
             activeQueueFilter={activeQueueFilter}
             displayMode={display.isDisplayMode}

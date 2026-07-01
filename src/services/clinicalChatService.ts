@@ -1,6 +1,6 @@
 import { apiFetch, buildApiUrl, parseApiResponse } from './apiClient';
 import { buildAIAuditEvent, logAIAuditEvent, previewAIText } from '../lib/ai/audit/logger';
-import { AI_ROUTES } from '../lib/ai/routes';
+import { requestAiChiefConversational } from './aiChiefOrchestrator';
 
 import {
   REGISTRY_ID_TO_ORCHESTRATOR_TOOL,
@@ -19,7 +19,7 @@ export function registryIdToChatToolParam(registryId) {
 }
 
 /**
- * POST /api/chat/message — shared by Dashboard, ChatInterface, and tools.
+ * POST /api/chat/message ï¿½ shared by Dashboard, ChatInterface, and tools.
  * @param {{ message: string, messages?: Array<{role: string, content: string}>, tool?: string, feature?: string, requestType?: string, conversationId?: number|string, authToken?: string|null, workspaceContext?: object, memoryContext?: object, userId?: string, tenantId?: string, patientId?: string, encounterId?: string, purpose?: string, sourceModule?: string }} params
  * @returns {Promise<{ ok: boolean, status: number, data: object }>}
  */
@@ -108,8 +108,64 @@ export async function sendClinicalChatMessage({
     }),
   );
 
-  const route = requestType === 'COPILOT_CHAT' ? AI_ROUTES.edCopilot : '/api/chat/message';
-  const response = await apiFetch(route, {
+  if (requestType === 'COPILOT_CHAT') {
+    const aiResponse = await requestAiChiefConversational({
+      requestType: 'COPILOT_CHAT',
+      systemPrompt: '',
+      message,
+      messages: Array.isArray(messages) && messages.length
+        ? messages.map((entry) => ({
+            role: entry.role === 'assistant' ? 'assistant' : 'user',
+            content: String(entry.content || ''),
+          }))
+        : [{ role: 'user', content: message }],
+      patientId,
+      encounterId,
+      sourceScreen: sourceModule,
+      context: {
+        ...(workspaceContext || {}),
+        aiRequest,
+        ...(memoryContext ? { memoryContext } : {}),
+        knowledgeBaseContext: body.knowledgeBaseContext,
+        edCopilot: {
+          enabled: true,
+          querySource: 'clinical_chat_service',
+          toolsEnabled: Boolean(tool || feature),
+          tool,
+          feature,
+        },
+      },
+    });
+
+    const rawData =
+      aiResponse.data && typeof aiResponse.data === 'object' && !Array.isArray(aiResponse.data)
+        ? (aiResponse.data as Record<string, unknown>)
+        : {};
+    const responseText =
+      typeof rawData.response === 'string'
+        ? rawData.response
+        : typeof aiResponse.content === 'string'
+          ? aiResponse.content
+          : '';
+
+    return {
+      ok: aiResponse.ok,
+      status: aiResponse.status,
+      data: {
+        ...rawData,
+        response: responseText,
+        metadata: {
+          ...(isRecord(rawData.metadata) ? rawData.metadata : {}),
+          aiChief: {
+            orchestrated: true,
+            sourceModule,
+          },
+        },
+      },
+    };
+  }
+
+  const response = await apiFetch('/api/chat/message', {
     method: 'POST',
     headers,
     body: JSON.stringify(body),
@@ -117,6 +173,10 @@ export async function sendClinicalChatMessage({
 
   const data = await parseApiResponse(response, { fallback: {} });
   return { ok: response.ok, status: response.status, data };
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value && typeof value === 'object' && !Array.isArray(value));
 }
 
 export async function suggestClinicalAction({ patientId, context = {} as any, authToken }) {

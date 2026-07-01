@@ -34,9 +34,9 @@ export const RECEPTION_INTAKE_URL_KEYS = [
  * | quickIntake=1      | Reception quick intake modal              |
  * | intake=1           | Smart intake overlay                      |
  * | quickCreate=1      | Reception quick intake modal              |
- * | queue=ems          | Work queues — EMS tab                     |
- * | queue=verification | Work queues — identity verification tab   |
- * | queue=pretriage    | Work queues — pre-triage / handoff tab    |
+ * | queue=ems          | Work queues ï¿½ EMS tab                     |
+ * | queue=verification | Work queues ï¿½ identity verification tab   |
+ * | queue=pretriage    | Work queues ï¿½ pre-triage / handoff tab    |
  * | patientId          | Search context + selected patient         |
  * | q                  | Patient search query                      |
  * | arrived            | Arrival confirmation banner context       |
@@ -104,6 +104,14 @@ export function convertEmsArrivalForReception(arrivalId, options: any = {}) {
     patientId,
     emsArrivalId: arrivalId,
   });
+
+  void import('./emergencyCareJourneyOrchestrator').then(({ onPatientArrivalAtReception, resolveLinkedCallIdForEmsArrival }) =>
+    onPatientArrivalAtReception(patientId, {
+      callId: resolveLinkedCallIdForEmsArrival(arrival),
+      emsArrivalId: arrivalId,
+      actorName: options.actorName,
+    }),
+  );
 
   return {
     ok: true,

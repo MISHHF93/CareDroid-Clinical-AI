@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { callAI, type AIRequest, type AIResponse } from '../lib/ai/client';
+import { type AIRequest, type AIResponse } from '../lib/ai/client';
+import { requestAiChiefHandoffBrief } from '../services/aiChiefOrchestrator';
 import { useEmergencyStore } from '../store/emergencyStore';
 import {
   PatientFlag,
@@ -408,7 +409,7 @@ export default function HandoffBriefGenerator() {
         capacity,
         now: new Date(),
       });
-      const response = await callAI(buildHandoffBriefRequest(context));
+      const response = await requestAiChiefHandoffBrief(buildHandoffBriefRequest(context));
       if (!response.ok) throw new Error(`Handoff brief request failed with status ${response.status}`);
       setBriefText(responseText(response));
     } catch {

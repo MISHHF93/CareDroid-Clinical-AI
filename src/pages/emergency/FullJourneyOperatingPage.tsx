@@ -227,6 +227,59 @@ function JourneyView({ snapshot }: { snapshot: ReturnType<typeof buildFullEmerge
 
       <CommandCenterActionPanel actions={commandActions} />
 
+      <SectionCard
+        title="3-Minute Response Objective"
+        lead="Door-to-action compliance tracked through journey traces and the response timer engine."
+        badge={snapshot.metrics.threeMinuteBreaches ? `${snapshot.metrics.threeMinuteBreaches} breach` : 'on track'}
+      >
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 10 }}>
+          <MetricChip label="Active journeys" value={snapshot.metrics.activeJourneyTraces} />
+          <MetricChip label="3-min breaches" value={snapshot.metrics.threeMinuteBreaches} warn />
+          <MetricChip label="Unacked critical" value={snapshot.metrics.unacknowledgedCriticalAlerts} warn />
+          <MetricChip label="Inbound EMS" value={snapshot.metrics.inboundEms} warn />
+        </div>
+      </SectionCard>
+
+      <SectionCard
+        title="Live Journey Traces"
+        lead="End-to-end signal chain from 911 call through EMS, reception, triage, treatment, and reporting."
+        badge={snapshot.activeTraces?.length ?? 0}
+      >
+        {snapshot.activeTraces?.length ? (
+          <div className="emergency-route-stack" style={{ marginTop: 10 }}>
+            {snapshot.activeTraces.map((trace) => (
+              <article key={trace.traceId} className="emergency-route-queue-row">
+                <div style={{ flex: 1 }}>
+                  <strong style={{ fontSize: 13 }}>{trace.currentStage.replace(/_/g, ' ')}</strong>
+                  <div className="emergency-route-queue-row__patients" style={{ fontSize: 12, marginTop: 2 }}>
+                    {trace.callId ? `Call ${trace.callId}` : 'Walk-in'}
+                    {trace.patientId ? ` · Patient ${trace.patientId}` : ''}
+                    {trace.emsArrivalId ? ` · EMS ${trace.emsArrivalId}` : ''}
+                  </div>
+                  <small className="emergency-route-queue-row__movement" style={{ fontSize: 11 }}>
+                    {trace.signalCount} signals · started {new Date(trace.startedAt).toLocaleTimeString()}
+                  </small>
+                </div>
+                <span
+                  className="emergency-route-queue-row__oldest"
+                  style={{
+                    color: trace.threeMinuteBreachOccurred ? MEDICAL_TYPE.statusCritical : MEDICAL_THEME.inkSubtle,
+                    flexShrink: 0,
+                  }}
+                >
+                  {trace.threeMinuteBreachOccurred ? '3-min breach' : 'compliant'}
+                </span>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <p className="emergency-route-section-card__lead" style={{ marginTop: 10 }}>
+            No active traces yet. Log a call in the Dispatch Console, dispatch a unit, and route through reception to
+            populate the full emergency care journey.
+          </p>
+        )}
+      </SectionCard>
+
       {/* Prehospital tier */}
       <SectionCard
         title="Prehospital Tier"

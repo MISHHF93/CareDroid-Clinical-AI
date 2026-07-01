@@ -39,6 +39,9 @@ export function createDiagnosticOrder(params: DiagnosticOrderParams): Diagnostic
     targetDepartment: params.targetDepartment ?? defaultDepartment(params.type),
   };
   orders.set(order.id, order);
+  void import('./emergencyCareJourneyOrchestrator').then(({ onDiagnosticsOrdered }) =>
+    onDiagnosticsOrdered(params.patientId, { actorId: params.orderedBy, actorRole: 'emergency_physician' }),
+  );
   return order;
 }
 

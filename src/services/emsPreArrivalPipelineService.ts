@@ -33,6 +33,26 @@ export const EMS_PRE_ARRIVAL_WORKFLOW = Object.freeze([
 
 export const EMS_HANDOFF_STATUSES = Object.freeze(['Incoming', 'En Route', 'Arriving', 'Arrived']);
 
+const linkedInboundPatients: any[] = [];
+
+/** Register a CAD-dispatched inbound patient for journey dashboards and pre-arrival metrics. */
+export function registerLinkedInboundPatient(entry: Record<string, unknown>) {
+  linkedInboundPatients.unshift(entry);
+  const max = 24;
+  if (linkedInboundPatients.length > max) {
+    linkedInboundPatients.length = max;
+  }
+}
+
+export function getDispatchLinkedInboundPatients() {
+  return [...linkedInboundPatients];
+}
+
+function mergedIncomingPatients(customPatients?: readonly unknown[]) {
+  if (customPatients) return customPatients;
+  return [...linkedInboundPatients, ...DEFAULT_EMS_INCOMING_PATIENTS];
+}
+
 export const DEFAULT_EMS_INCOMING_PATIENTS = Object.freeze([
   Object.freeze({
     id: 'EMS-1048',
@@ -196,11 +216,11 @@ export const EmsPreArrivalPipelineService = Object.freeze({
     return EMS_PRE_ARRIVAL_WORKFLOW;
   },
 
-  getIncomingPatients(patients = DEFAULT_EMS_INCOMING_PATIENTS) {
+  getIncomingPatients(patients = mergedIncomingPatients()) {
     return Object.freeze(sortIncomingPatients(patients.map(normalizeIncomingPatient)));
   },
 
-  getPreArrivalQueue(patients = DEFAULT_EMS_INCOMING_PATIENTS) {
+  getPreArrivalQueue(patients = mergedIncomingPatients()) {
     const incomingPatients = this.getIncomingPatients(patients);
     return Object.freeze({
       id: 'ems-pre-arrival-queue',
@@ -221,7 +241,7 @@ export const EmsPreArrivalPipelineService = Object.freeze({
     });
   },
 
-  getPreArrivalMetrics(patients = DEFAULT_EMS_INCOMING_PATIENTS) {
+  getPreArrivalMetrics(patients = mergedIncomingPatients()) {
     const queue = this.getPreArrivalQueue(patients);
     const etaValues = queue.incomingPatients.map((patient) => patient.etaMinutes);
     return Object.freeze({
@@ -238,7 +258,7 @@ export const EmsPreArrivalPipelineService = Object.freeze({
     });
   },
 
-  getPreArrivalRecommendations(patients = DEFAULT_EMS_INCOMING_PATIENTS) {
+  getPreArrivalRecommendations(patients = mergedIncomingPatients()) {
     return Object.freeze(
       this.getIncomingPatients(patients)
         .filter((patient) => patient.riskLevel === 'critical' || patient.notificationStatus !== 'sent' || patient.etaMinutes <= 10)
@@ -255,7 +275,7 @@ export const EmsPreArrivalPipelineService = Object.freeze({
     );
   },
 
-  getPreArrivalDashboard(patients = DEFAULT_EMS_INCOMING_PATIENTS) {
+  getPreArrivalDashboard(patients = mergedIncomingPatients()) {
     const queue = this.getPreArrivalQueue(patients);
     return Object.freeze({
       pipelineId: 'ems-handoff-pipeline',

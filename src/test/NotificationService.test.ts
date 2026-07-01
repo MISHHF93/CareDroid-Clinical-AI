@@ -5,7 +5,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import NotificationService, {
   LEGACY_NOTIFICATION_SERVICE_STATUS,
-} from '../services/notifications/NotificationService';
+} from './fixtures/legacyNotificationService';
 
 describe('NotificationService', () => {
   let service;

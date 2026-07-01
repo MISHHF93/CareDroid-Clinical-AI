@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
+  healthCheckStatusToSemanticRole,
+  healthCheckStatusToWidgetTone,
   metricColorForTone,
   resolveSemanticColorRole,
   SEMANTIC_COLOR_ROLES,
@@ -21,5 +23,13 @@ describe('semanticColorSystem', () => {
   it('returns metric accent colors only for non-inactive tones', () => {
     expect(metricColorForTone('critical')).toBe(SEMANTIC_COLOR_ROLES.critical.fg);
     expect(metricColorForTone('neutral')).toBeUndefined();
+  });
+
+  it('maps platform health statuses to semantic roles and widget tones', () => {
+    expect(healthCheckStatusToSemanticRole('healthy')).toBe('healthy');
+    expect(healthCheckStatusToSemanticRole('warning')).toBe('attention');
+    expect(healthCheckStatusToSemanticRole('critical')).toBe('critical');
+    expect(healthCheckStatusToWidgetTone('healthy')).toBe('success');
+    expect(healthCheckStatusToWidgetTone('critical')).toBe('critical');
   });
 });

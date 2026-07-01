@@ -1,7 +1,12 @@
 import { toast } from 'sonner';
 import { useEmergencyStore } from '../store/emergencyStore';
 import type { Alert, Patient } from '../types/emergency';
-import { classifyOperationalAlert, shouldToastOperationalAlert } from './alertClassificationModel';
+import { classifyOperationalAlert } from './alertClassificationModel';
+import {
+  prepareUnifiedAlert,
+  publishAlert,
+  shouldSurfaceAlertToast,
+} from '../services/alertLifecycleOrchestrator';
 
 export {
   deriveAlerts,
@@ -37,18 +42,25 @@ function resolveAction(alert: Alert) {
 }
 
 export function dispatchAlert(input: AlertInput): string {
-  const alert: Alert = {
+  const alertId = publishAlert({
     ...input,
     id: input.id || createId(),
     createdAt: input.createdAt || new Date().toISOString(),
     dismissed: input.dismissed ?? false,
     source: input.source || 'alert-engine',
-  };
+  });
 
-  useEmergencyStore.getState().addAlert(alert);
+  const alert = useEmergencyStore.getState().alerts.find((entry) => entry.id === alertId)
+    || prepareUnifiedAlert({
+      ...input,
+      id: alertId,
+      createdAt: input.createdAt || new Date().toISOString(),
+      dismissed: input.dismissed ?? false,
+      source: input.source || 'alert-engine',
+    });
 
-  if (!shouldToastOperationalAlert(alert)) {
-    return alert.id;
+  if (!shouldSurfaceAlertToast(alert)) {
+    return alertId;
   }
 
   const tier = classifyOperationalAlert(alert);
@@ -60,7 +72,7 @@ export function dispatchAlert(input: AlertInput): string {
       duration: 7000,
       action,
     });
-    return alert.id;
+    return alertId;
   }
 
   toast(alert.title, {
@@ -69,7 +81,7 @@ export function dispatchAlert(input: AlertInput): string {
     action,
   });
 
-  return alert.id;
+  return alertId;
 }
 
 export const dispatch = dispatchAlert;

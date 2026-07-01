@@ -63,6 +63,9 @@ export function createPrehospitalAssessment(params: {
   };
   assessments.set(assessment.id, assessment);
   crewUpdates.set(assessment.id, []);
+  void import('./emergencyCareJourneyOrchestrator').then(({ onDispatchCallStatusChange }) =>
+    onDispatchCallStatusChange(params.callId, 'ems_on_scene', { actorRole: 'paramedic' }),
+  );
   return assessment;
 }
 

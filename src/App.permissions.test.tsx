@@ -54,6 +54,13 @@ describe('App CareDroid route contract', () => {
       NON_ED_WORKSPACE_REDIRECT_ROUTES.map((redirect) => redirect.path),
     );
 
+    const mountedPlatformPaths: Record<string, string> = {
+      '/hospital-map': CANONICAL_ROUTES.hospitalMap,
+      '/medical-iot': CANONICAL_ROUTES.medicalIot,
+      '/devices': CANONICAL_ROUTES.devices,
+      '/live-map': CANONICAL_ROUTES.liveMap,
+    };
+
     for (const path of [
       '/dashboard',
       '/home',
@@ -70,10 +77,15 @@ describe('App CareDroid route contract', () => {
       '/operations',
       '/operations/*',
     ]) {
+      const mountedRoute =
+        mountedPlatformPaths[path] &&
+        (appSource.includes(`path="${mountedPlatformPaths[path]}"`) ||
+          appSource.includes(`path={CANONICAL_ROUTES.${path === '/hospital-map' ? 'hospitalMap' : path === '/medical-iot' ? 'medicalIot' : path === '/live-map' ? 'liveMap' : 'devices'}}`));
       expect(
         redirectsByPath[path] ||
           (nonEdRedirectPaths.has(path) ? CANONICAL_ROUTES.emergencyWhiteboard : null) ||
-          (appSource.includes(`path="${path}"`) ? CANONICAL_ROUTES.emergencyWhiteboard : null),
+          (appSource.includes(`path="${path}"`) ? CANONICAL_ROUTES.emergencyWhiteboard : null) ||
+          mountedRoute,
         path,
       ).toBeTruthy();
     }

@@ -1,5 +1,9 @@
-import { CANONICAL_ROUTES } from './routes.config';
-import { CANONICAL_ROUTE_MAP } from './routes.config';
+import {
+  CANONICAL_PILOT_EXTENSION_NAV_IDS,
+  CANONICAL_PILOT_VISIBLE_NAV_IDS,
+  CANONICAL_ROUTE_MAP,
+  CANONICAL_ROUTES,
+} from './routes.config';
 import {
   EMERGENCY_ROLE_IDS,
   getEmergencyRoleDefinition,
@@ -12,6 +16,7 @@ import {
   getHiddenNavItemIdsForRole,
   sortNavigationItemsForRole,
 } from './emergencyNavPolicy';
+import { getNavItemIdsForRole } from './roleClusterNav.config';
 import { SAAS_USER_ROLES } from './saasProfileConstants';
 import { resolveUserProfileFromSaasRole } from './userProfileCatalog';
 import {
@@ -28,67 +33,28 @@ import { CAREDROID_PERMISSIONS } from '../lib/users/permissions';
 export const DEFAULT_ROUTE = CANONICAL_ROUTES.emergencyReception;
 
 /** Primary ED operating nav shown during pilot customer mode. */
-export const PILOT_CORE_NAV_ITEM_IDS: readonly string[] = Object.freeze([
-  'command-center',
-  'reception',
-  'whiteboard',
-  'dispatch',
-  'ems',
-  'ed-readiness',
-  'patients',
-  'queues',
-  'triage',
-  'reassessment',
-  'alerts',
-  'capacity',
-  'referrals',
-  'diagnostics',
-  'handoffs',
-  'copilot',
-  'tools',
-  'analytics',
-  'reports',
-  'settings',
-  // Extended platform pages (visible to roles that have access)
-  'hospital-map',
-  'executive',
-  'predictive-analytics',
-  'ai-center',
-  'medical-iot',
-]);
+export const PILOT_CORE_NAV_ITEM_IDS: readonly string[] = Object.freeze(
+  CANONICAL_PILOT_VISIBLE_NAV_IDS.filter(
+    (id) => !['pulse', 'shift', 'help', 'audit', 'ai-center', 'admin'].includes(id),
+  ),
+);
 
-/** Secondary utility nav — routable in pilot but deprioritized in the sidebar. */
+/** Secondary utility nav ï¿½ routable in pilot but deprioritized in the sidebar. */
 export const PILOT_UTILITY_NAV_ITEM_IDS: readonly string[] = Object.freeze([
   'pulse',
   'shift',
   'help',
-  'admin',
-  'audit',
 ]);
 
-/** Extension/platform nav — hidden in pilot unless entitlements expand visibility. */
-export const PILOT_EXTENSION_NAV_ITEM_IDS: readonly string[] = Object.freeze([
-  'intake',
-  'integrations',
-  'cosmos',
-  'platform',
-  'fleet',
-  'surveillance',
-  'simulation',
-  'laboratory',
-  'knowledge',
-  'ai-center',
-]);
+/** Extension/platform nav ï¿½ hidden in pilot unless entitlements expand visibility. */
+export const PILOT_EXTENSION_NAV_ITEM_IDS: readonly string[] = CANONICAL_PILOT_EXTENSION_NAV_IDS;
 
-export const PILOT_CUSTOMER_VISIBLE_NAV_ITEM_IDS: readonly string[] = Object.freeze([
-  ...PILOT_CORE_NAV_ITEM_IDS,
-  ...PILOT_UTILITY_NAV_ITEM_IDS,
-]);
+export const PILOT_CUSTOMER_VISIBLE_NAV_ITEM_IDS: readonly string[] = CANONICAL_PILOT_VISIBLE_NAV_IDS;
 
 /** Receptionist-first pilot: front-desk roles see a minimal nav shell. */
 export const PROFILE_SCOPED_PILOT_NAV_IDS: Readonly<Record<string, readonly string[]>> =
   Object.freeze({
-    'registration-clerk': Object.freeze(['reception', 'patients', 'queues', 'help']),
+    'registration-clerk': Object.freeze(['reception', 'patients', 'pulse', 'shift', 'help']),
     student: Object.freeze(['tools', 'platform', 'pulse']),
     steward: Object.freeze(['platform']),
     'racetrack-admin': Object.freeze(['platform']),
@@ -153,17 +119,16 @@ export type NavigationItem = Readonly<{
 const UTILITY_NAV_ITEM_IDS = new Set(['tools', 'platform', 'pulse', 'shift']);
 
 export const NAV_ITEMS: readonly NavItem[] = Object.freeze(
-  CANONICAL_ROUTE_MAP.filter((route) => route.showInNav).map((route) => {
-    const item = {
+  CANONICAL_ROUTE_MAP.filter((route) => route.showInNav)
+    .sort((left, right) => (left.priority ?? 0) - (right.priority ?? 0))
+    .map((route) => {
+    return Object.freeze({
       id: route.id,
       label: route.label,
       icon: route.icon || 'layout-dashboard',
       route: route.path,
       featureGate: route.featureGate || null,
-    } as NavItem;
-    if (route.emergencyRoles?.length) (item as any).roles = route.emergencyRoles;
-    if (route.activePaths?.length) (item as any).activePaths = route.activePaths;
-    return Object.freeze(item);
+    } satisfies NavItem);
   }),
 ) satisfies readonly NavItem[];
 
@@ -318,7 +283,7 @@ export const NAVIGATION_ITEMS = Object.freeze(
       ...item,
       path: item.route,
       featureId: NAV_FEATURE_IDS[item.id as keyof typeof NAV_FEATURE_IDS] || item.id,
-      order: priority,
+      order: index + 1,
       roles: routeRoles,
       allowedRoles: routeRoles,
       requiredPermissions: routeRecord?.requiredPermissions || NAV_REQUIRED_PERMISSIONS[item.id] || [],
@@ -387,14 +352,13 @@ export function getVisibleNavigation(
     return getVisibleNavigationForSaasRole(options.saasRole);
   }
   const normalizedRole = normalizeEmergencyRole(userRole);
-  const hiddenForRole = getHiddenNavItemIdsForRole(normalizedRole, {
-    hideStandaloneIntake: shouldHideStandaloneIntakeNav(normalizedRole),
-  });
+  const allowedNavIds = new Set(getNavItemIdsForRole(normalizedRole));
+  if (shouldHideStandaloneIntakeNav(normalizedRole)) {
+    allowedNavIds.delete('intake');
+  }
 
   const visibleItems = getPilotCustomerNavigationItems(
-    NAVIGATION_ITEMS.filter(
-      (item) => item.roles.includes(normalizedRole) && !hiddenForRole.has(item.id),
-    ),
+    NAVIGATION_ITEMS.filter((item) => allowedNavIds.has(item.id)),
   );
 
   return sortNavigationItemsForRole(visibleItems, normalizedRole);

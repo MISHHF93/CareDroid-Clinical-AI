@@ -194,6 +194,9 @@ function checkEscalations(): void {
       if (threshold.key === 'breach') {
         current.phase = 'breach';
         current.breachAt = current.breachAt ?? new Date().toISOString();
+        void import('../services/emergencyCareJourneyOrchestrator').then(({ onThreeMinuteBreachForPatient }) =>
+          onThreeMinuteBreachForPatient(timer.patientId),
+        );
       } else if (threshold.key === 'escalation_l1') {
         current.phase = 'escalated_l1';
       }

@@ -13,7 +13,8 @@ type CareDroidAIRequestOptions = {
   timeoutMs?: number;
 };
 
-export async function requestCareDroidAI(
+/** Low-level CareDroid AI node transport (backend + local fallback). Prefer `requestAiChiefStructured`. */
+export async function transportCareDroidAINode(
   request: CareDroidAIRequest,
   options: CareDroidAIRequestOptions = {},
 ): Promise<CareDroidAIResponse> {
@@ -53,4 +54,13 @@ export async function requestCareDroidAI(
       ],
     };
   }
+}
+
+/** @deprecated Use `requestAiChiefStructured` from `aiChiefOrchestrator` for canonical routing. */
+export async function requestCareDroidAI(
+  request: CareDroidAIRequest,
+  options: CareDroidAIRequestOptions = {},
+): Promise<CareDroidAIResponse> {
+  const { requestAiChiefStructured } = await import('./aiChiefOrchestrator');
+  return requestAiChiefStructured({ ...request, skipEnrichment: true }, options);
 }

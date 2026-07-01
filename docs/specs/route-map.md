@@ -1,6 +1,13 @@
 # CareDroid Route Map
 
-Canonical route constants live in `src/config/routes.config.ts`.
+Canonical routing is owned by a single map in `src/config/routes.config.ts`:
+
+- `CANONICAL_ROUTES` — stable path constants
+- `CANONICAL_ROUTE_MAP` — route metadata (component, permissions, roles, nav, aliases, landing defaults)
+- `CANONICAL_PILOT_VISIBLE_NAV_IDS` — pilot-customer sidebar allowlist
+- `USER_PROFILE_ROUTE_DEFAULTS` — default landing path per hospital role/profile
+
+Navigation is generated from `CANONICAL_ROUTE_MAP` in `src/config/unified-navigation.config.ts`. Per-role sidebar visibility and ordering come from `src/config/roleClusterNav.config.ts`. Route guards read the same map via `src/lib/navigation.ts` and `CareDroidRouteGuard`.
 
 Core ED routes:
 

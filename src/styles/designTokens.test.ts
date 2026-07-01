@@ -1,5 +1,5 @@
 /**
- * Design token system contracts — semantic spacing, typography, breakpoints, touch.
+ * Design token system contracts ï¿½ semantic spacing, typography, breakpoints, touch.
  */
 
 import { readFileSync } from 'node:fs';
@@ -29,13 +29,16 @@ const indexCss = readFileSync(join(__dirname, '../index.css'), 'utf8');
 const responsiveUxCss = readFileSync(join(__dirname, 'responsive-ux.css'), 'utf8');
 const calculatorsCss = readFileSync(join(__dirname, '../pages/tools/Calculators.css'), 'utf8');
 
-describe('design-tokens.css — semantic token layer', () => {
-  it('is loaded from main.jsx after index.css', () => {
-    const indexPos = mainJsx.indexOf("import './index.css'");
-    const tokensPos = mainJsx.indexOf("import './styles/design-tokens.css'");
-    expect(tokensPos).toBeGreaterThan(-1);
-    expect(indexPos).toBeGreaterThan(-1);
-    expect(tokensPos).toBeGreaterThan(indexPos);
+describe('design-tokens.css ï¿½ semantic token layer', () => {
+  it('is loaded from design-system.css after primitives.css and before normalization', () => {
+    const designSystemCss = readFileSync(join(__dirname, 'design-system.css'), 'utf8');
+    const primitivesPos = designSystemCss.indexOf("@import './primitives.css';");
+    const tokensPos = designSystemCss.indexOf("@import './design-tokens.css';");
+    const normPos = designSystemCss.indexOf("@import './color-normalization.css';");
+    expect(mainJsx).toContain("import './styles/design-system.css'");
+    expect(primitivesPos).toBeGreaterThan(-1);
+    expect(tokensPos).toBeGreaterThan(primitivesPos);
+    expect(normPos).toBeGreaterThan(tokensPos);
   });
 
   it('defines spacing scale xs through xl', () => {
@@ -61,9 +64,10 @@ describe('design-tokens.css — semantic token layer', () => {
     expect(designTokensCss).toContain('--text-mono: var(--font-13)');
     expect(designTokensCss).toContain('--app-type-label: var(--text-small)');
     expect(designTokensCss).toContain('--app-type-helper: var(--text-caption)');
-    expect(indexCss).toContain('--text-caption-fluid:');
-    expect(indexCss).toContain('--font-11: 11px');
-    expect(indexCss).toContain('--font-24: 24px');
+    const primitivesCss = readFileSync(join(__dirname, 'primitives.css'), 'utf8');
+    expect(primitivesCss).toContain('--text-caption-fluid:');
+    expect(primitivesCss).toContain('--font-11: 11px');
+    expect(primitivesCss).toContain('--font-24: 24px');
   });
 
   it('defines breakpoint tiers mobile, tablet, desktop, wide', () => {
@@ -112,7 +116,7 @@ describe('design-tokens.css — semantic token layer', () => {
   });
 });
 
-describe('designTokens.js — JS mirror', () => {
+describe('designTokens.js ï¿½ JS mirror', () => {
   it('maps semantic breakpoint tiers', () => {
     expect(DESIGN_BREAKPOINTS.mobile.max).toBe(767);
     expect(DESIGN_BREAKPOINTS.tablet.min).toBe(768);
@@ -142,7 +146,7 @@ describe('designTokens.js — JS mirror', () => {
   });
 });
 
-describe('tool CSS — token adoption (no scattered 44px in calculators)', () => {
+describe('tool CSS ï¿½ token adoption (no scattered 44px in calculators)', () => {
   it('Calculators.css uses touch-target token for primary controls', () => {
     expect(calculatorsCss).toContain('min-height: var(--touch-target-min)');
     expect(calculatorsCss).not.toMatch(/[^-]min-height:\s*44px/);

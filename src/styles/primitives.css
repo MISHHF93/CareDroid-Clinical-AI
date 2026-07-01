@@ -1,0 +1,98 @@
+/**
+ * Numeric design primitives — spacing, radii, type scale, motion.
+ * Semantic aliases (--space-xs, --app-radius-*) live in design-tokens.css.
+ * Do not duplicate palette colors here.
+ */
+:root {
+  /* Spacing (4px grid) */
+  --space-0-5: 2px;
+  --space-1: 4px;
+  --space-1-5: 6px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 48px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* Mobile-first fluid spacing */
+  --space-fluid-1: clamp(4px, 1vw, 6px);
+  --space-fluid-2: clamp(8px, 1.5vw, 10px);
+  --space-fluid-3: clamp(12px, 2vw, 14px);
+  --space-fluid-4: clamp(16px, 2.5vw, 20px);
+  --space-fluid-5: clamp(20px, 3vw, 24px);
+  --space-fluid-6: clamp(24px, 3.5vw, 32px);
+
+  /* Radius — aligned with compact clinical surfaces (12px cards, 16px panels) */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-pill: 999px;
+
+  /* Type scale (px) */
+  --font-10: 10px;
+  --font-11: 11px;
+  --font-12: 12px;
+  --font-13: 13px;
+  --font-14: 14px;
+  --font-15: 15px;
+  --font-16: 16px;
+  --font-18: 18px;
+  --font-20: 20px;
+  --font-22: 22px;
+  --font-24: 24px;
+  --font-28: 28px;
+  --font-36: 36px;
+
+  /* Fluid typography */
+  --text-display-fluid: clamp(1.55rem, 2.8vw + 0.65rem, 2.55rem);
+  --text-title-fluid: clamp(1.28rem, 2.2vw + 0.58rem, 1.85rem);
+  --text-heading-fluid: clamp(1rem, 1.5vw + 0.55rem, 1.22rem);
+  --text-body-fluid: clamp(0.875rem, 1vw + 0.5rem, 0.95rem);
+  --text-caption-fluid: clamp(0.75rem, 1vw + 0.45rem, 0.8125rem);
+
+  /* Semantic text aliases (static fallbacks; fluid aliases in design-tokens.css) */
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-md: 16px;
+  --text-lg: 18px;
+  --text-xl: 22px;
+
+  /* Motion */
+  --motion-fast: 120ms;
+  --motion-normal: 180ms;
+  --motion-slow: 240ms;
+  --animation-fast: var(--motion-fast);
+  --animation-base: var(--motion-normal);
+  --animation-slow: var(--motion-slow);
+  --motion-duration-fast: var(--motion-fast);
+  --motion-duration-normal: var(--motion-normal);
+  --motion-duration-slow: var(--motion-slow);
+  --motion-ease-standard: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-smooth: var(--motion-ease-standard);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --ease-elastic: cubic-bezier(0.68, -0.6, 0.32, 1.6);
+  --motion-transition-fast: var(--motion-duration-fast) var(--motion-ease-standard);
+  --motion-transition-normal: var(--motion-duration-normal) var(--motion-ease-standard);
+  --motion-transition-slow: var(--motion-duration-slow) var(--motion-ease-standard);
+
+  /* Component sizing */
+  --component-card-padding: 20px;
+  --component-card-gap: 16px;
+  --component-button-height: 40px;
+  --component-button-radius: var(--radius-md);
+
+  /* Elevation */
+  --elevation-none: none;
+  --elevation-card: 0 8px 20px rgba(14, 165, 233, 0.06);
+  --elevation-floating: 0 16px 36px rgba(14, 165, 233, 0.08);
+  --elevation-modal: 0 24px 60px rgba(14, 165, 233, 0.12);
+
+  /* Root font size — responsive baseline */
+  font-size: clamp(15px, 0.22vw + 14px, 17px);
+}

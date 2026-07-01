@@ -200,14 +200,16 @@ describe('canonical configuration contract', () => {
   });
 
   it('centralizes theme and layout contracts without page-owned viewport shells', () => {
+    expect(THEME_CONFIG.cssEntry).toBe('src/styles/design-system.css');
+    expect(THEME_CONFIG.cssTokenSources).toContain('src/styles/design-system-bridge.css');
     expect(THEME_CONFIG.cssTokenSources).toContain('src/styles/theme-tokens.css');
     expect(read('contexts/ThemeContext.tsx')).toContain("from '../config/theme.tokens'");
 
     expect(LAYOUT_SCROLL_CONTRACT.viewportOwner).toBe('AppShell');
     expect(LAYOUT_SCROLL_CONTRACT.primaryScrollContainer).toBe('.app-shell-main-content');
     expect(LAYOUT_SCROLL_CONTRACT.normalPagesCreateViewportScrollShells).toBe(false);
-    expect(read('layout/AppShell.tsx')).toContain("from '../config/layout.config'");
+    expect(read('components/AppShell.tsx')).toContain("from '../config/");
     expect(read('components/app-shell.css')).toContain('.app-shell-main-content');
-    expect(read('layout/AppShell.css')).toContain("@import '../components/app-shell.css'");
+    expect(read('components/AppShell.tsx')).toContain("./app-shell.css");
   });
 });

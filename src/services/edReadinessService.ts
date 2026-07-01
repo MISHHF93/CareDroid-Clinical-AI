@@ -50,6 +50,9 @@ export function createReadinessPlan(params: ReadinessTrigger): EDReadinessPlan {
     status: 'pending',
   };
   readinessPlans.set(plan.id, plan);
+  void import('./emergencyCareJourneyOrchestrator').then(({ onHospitalPreAlert }) =>
+    onHospitalPreAlert(params.callId, params.linkedEmsArrivalId, { actorId: params.preparedBy }),
+  );
   return plan;
 }
 

@@ -1,6 +1,6 @@
 import { Priority, PatientState, type Alert, type CapacitySnapshot, type EMSArrival, type Patient, type Staff } from '../types/emergency';
 import { getDispatchSummary } from './dispatchIntakeService';
-import { getJourneyMetrics } from './emergencySignalService';
+import { getActiveTraces, getJourneyMetrics, type JourneyStage } from './emergencySignalService';
 import { getReadinessSummary } from './edReadinessService';
 import { getPreArrivalDashboard } from './emsPreArrivalPipelineService';
 import { buildBottleneckRegistrySnapshot } from './bottleneckRegistry';
@@ -87,7 +87,7 @@ export const SAAS_SERVICE_JOURNEY_MODULES: readonly ServiceJourneyModule[] = Obj
   { id: 'EDReadinessService', label: 'ED Readiness Service', stageIds: ['ed-readiness'], reuseStatus: 'existing', implementation: 'src/services/edReadinessService.ts', connectedRoutes: ['/emergency/ed-readiness', '/emergency/capacity'] },
   { id: 'PatientIntakeService', label: 'Patient Intake Service', stageIds: ['patient-arrival', 'rapid-intake'], reuseStatus: 'extended', implementation: 'src/services/emergencyIntakeOperatingSystemService.ts and SmartIntake route', connectedRoutes: ['/emergency/intake', '/emergency/reception'] },
   { id: 'TriageService', label: 'Triage Service', stageIds: ['triage', 'treatment-observation'], reuseStatus: 'extended', implementation: 'src/services/triageAssist.ts and src/engine/triageEngine.ts', connectedRoutes: ['/emergency/reception', '/emergency/queues'] },
-  { id: 'AIChiefService', label: 'AI Chief Service', stageIds: ['dispatcher-triage', 'hospital-pre-arrival', 'ai-chief-review'], reuseStatus: 'extended', implementation: 'src/services/careDroidBrainService.ts, src/services/emergencyCopilotApi.ts, src/hooks/useAiChiefRouting.ts', connectedRoutes: ['/emergency/copilot'] },
+  { id: 'AIChiefService', label: 'AI Chief Service', stageIds: ['dispatcher-triage', 'hospital-pre-arrival', 'ai-chief-review'], reuseStatus: 'extended', implementation: 'src/services/careDroidBrainService.ts, src/hooks/useAiChiefRouting.ts', connectedRoutes: ['/emergency/copilot'] },
   { id: 'CriticalAlertService', label: 'Critical Alert Service', stageIds: ['hospital-pre-arrival', 'clinical-action', 'treatment-observation'], reuseStatus: 'extended', implementation: 'src/engine/alertEngine.ts and src/services/clinicalAlertsApi.ts', connectedRoutes: ['/emergency/alerts', '/emergency/whiteboard'] },
   { id: 'ThreeMinuteResponseService', label: 'Three-Minute Response Service', stageIds: ['prehospital-care', 'triage'], reuseStatus: 'existing', implementation: 'src/engine/threeMinuteTimerEngine.ts mounted in src/app/providers.tsx', connectedRoutes: ['/emergency/alerts', '/emergency/whiteboard'] },
   { id: 'StaffRoutingService', label: 'Staff Routing Service', stageIds: ['ambulance-dispatch', 'ed-readiness', 'clinical-action'], reuseStatus: 'existing', implementation: 'src/services/staffRoutingService.ts — routing rules, assignment tracking, workload awareness', connectedRoutes: ['/staff', '/emergency/whiteboard'] },
@@ -106,13 +106,72 @@ function minutesSince(value?: string): number {
   return Number.isFinite(time) ? Math.max(0, Math.round((Date.now() - time) / 60000)) : 0;
 }
 
-function stageStatus(stage: EmergencyJourneyStage, context: { patients: Patient[]; emsArrivals: EMSArrival[]; alerts: Alert[]; capacity?: CapacitySnapshot }) {
+const JOURNEY_STAGE_SIGNALS: Partial<Record<EmergencyJourneyStageId, readonly JourneyStage[]>> = Object.freeze({
+  'emergency-event': ['emergency_event', 'call_received'],
+  'emergency-call': ['call_received'],
+  'dispatcher-triage': ['dispatcher_triage'],
+  'ambulance-dispatch': ['ems_dispatched'],
+  'ems-en-route': ['ems_en_route'],
+  'ems-arrival-scene': ['ems_on_scene', 'prehospital_assessment'],
+  'prehospital-care': ['prehospital_assessment', 'ems_transporting'],
+  'hospital-pre-arrival': ['hospital_pre_notification', 'ed_readiness_activated'],
+  'ed-readiness': ['ed_readiness_activated'],
+  'patient-arrival': ['patient_arrival'],
+  'rapid-intake': ['rapid_intake'],
+  triage: ['triage_assigned'],
+  'ai-chief-review': ['ai_chief_reviewed'],
+  'clinical-action': ['clinical_action', 'treatment_in_progress'],
+  diagnostics: ['diagnostics_ordered'],
+  'treatment-observation': ['treatment_in_progress'],
+  disposition: ['disposition_decided'],
+  'handoff-reporting': ['handoff_complete'],
+  'outcome-tracking': ['outcome_recorded'],
+  'analytics-feedback': ['analytics_fed'],
+});
+
+function traceTouchesStage(trace: { currentStage: JourneyStage; signals: { stage: JourneyStage }[] }, stageId: EmergencyJourneyStageId) {
+  const targets = JOURNEY_STAGE_SIGNALS[stageId];
+  if (!targets?.length) return false;
+  return targets.includes(trace.currentStage) || trace.signals.some((signal) => targets.includes(signal.stage));
+}
+
+function stageStatus(
+  stage: EmergencyJourneyStage,
+  context: { patients: Patient[]; emsArrivals: EMSArrival[]; alerts: Alert[]; capacity?: CapacitySnapshot },
+  traces: ReturnType<typeof getActiveTraces>,
+) {
+  const traceActive = traces.some((trace) => traceTouchesStage(trace, stage.id));
+  if (traceActive) return 'active';
+
   if (stage.id === 'hospital-pre-arrival') return context.emsArrivals.length ? 'active' : 'ready';
   if (stage.id === 'triage') return context.patients.some((patient) => patient.state === PatientState.Triage) ? 'active' : 'ready';
   if (stage.id === 'clinical-action') return context.alerts.some((alert) => alert.severity === 'Critical' && !alert.acknowledged) ? 'attention' : 'ready';
   if (stage.id === 'ed-readiness') return context.capacity?.band === 'Red' ? 'attention' : 'ready';
   if (stage.id === 'disposition') return context.patients.some((patient) => patient.state === PatientState.Disposition || patient.state === PatientState.Admission) ? 'active' : 'ready';
+  if (stage.id === 'ambulance-dispatch' || stage.id === 'ems-en-route') {
+    return context.emsArrivals.some((arrival) => arrival.status === 'Inbound') ? 'active' : 'ready';
+  }
   return 'ready';
+}
+
+function storeArrivalsToPreArrivalPatients(emsArrivals: EMSArrival[]) {
+  return emsArrivals.map((arrival) =>
+    Object.freeze({
+      id: arrival.id,
+      patientLabel: arrival.unitName,
+      unit: arrival.unitName,
+      etaMinutes: arrival.eta,
+      complaint: arrival.chiefComplaint,
+      vitals: {},
+      riskScoreBundle: [],
+      riskIndicators: arrival.severity === 'Critical' ? ['critical-inbound'] : [],
+      riskLevel: arrival.severity === 'Critical' ? 'critical' : 'high',
+      handoffSummary: arrival.notes,
+      notificationStatus: arrival.preArrivalNotification ? 'sent' : 'pending',
+      journeyState: 'ems-prearrival',
+      handoffStatus: arrival.status === 'Inbound' ? 'En Route' : 'Arrived',
+    }),
+  );
 }
 
 export function buildFullEmergencyCareJourneySnapshot(context: {
@@ -127,7 +186,10 @@ export function buildFullEmergencyCareJourneySnapshot(context: {
   const alerts = context.alerts ?? [];
   const activePatients = patients.filter((patient) => patient.state !== PatientState.Discharge);
   const criticalAlerts = alerts.filter((alert) => alert.severity === 'Critical' && !alert.dismissed);
-  const preArrival = getPreArrivalDashboard();
+  const activeTraces = getActiveTraces();
+  const preArrival = getPreArrivalDashboard(
+    emsArrivals.length ? storeArrivalsToPreArrivalPatients(emsArrivals) : undefined,
+  );
   const dispatch = getDispatchSummary();
   const readiness = getReadinessSummary();
   const journeyMetrics = getJourneyMetrics();
@@ -155,7 +217,7 @@ export function buildFullEmergencyCareJourneySnapshot(context: {
     stages: FULL_EMERGENCY_CARE_JOURNEY.map((stage) =>
       Object.freeze({
         ...stage,
-        status: stageStatus(stage, { patients, emsArrivals, alerts, capacity: context.capacity }),
+        status: stageStatus(stage, { patients, emsArrivals, alerts, capacity: context.capacity }, activeTraces),
       }),
     ),
     services: SAAS_SERVICE_JOURNEY_MODULES,
@@ -170,6 +232,19 @@ export function buildFullEmergencyCareJourneySnapshot(context: {
       activeJourneyTraces: journeyMetrics.activeJourneys,
       threeMinuteBreaches: journeyMetrics.breachCount,
     }),
+    activeTraces: activeTraces.map((trace) =>
+      Object.freeze({
+        traceId: trace.traceId,
+        callId: trace.callId,
+        patientId: trace.patientId,
+        emsArrivalId: trace.emsArrivalId,
+        currentStage: trace.currentStage,
+        signalCount: trace.signals.length,
+        threeMinuteBreachOccurred: trace.threeMinuteBreachOccurred,
+        startedAt: trace.startedAt,
+        lastUpdatedAt: trace.lastUpdatedAt,
+      }),
+    ),
     liveServiceSummaries: Object.freeze({
       dispatch,
       cad,

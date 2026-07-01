@@ -4,16 +4,17 @@ import {
   isBackendCapabilityEnabled,
   UNSUPPORTED_CAPABILITY_MESSAGE,
 } from '../config/backendApiCapabilities';
-import {
-  acknowledgeClinicalAlertApi,
-  fetchClinicalAlerts,
-} from '../services/clinicalAlertsApi';
 import { useRolePermissions } from '../hooks/useRolePermissions';
 import { useCareDroidUser } from '../hooks/useCareDroidUser';
 import { CAREDROID_PERMISSIONS } from '../lib/users/permissions';
-import { canOwnAlert, getCompiledRoleLabel } from '../lib/users/canonicalAccess';
-import type { AuditMetadata } from '../lib/users/userTypes';
-import useOperationalIntelligence from '../hooks/useOperationalIntelligence';
+import { getCompiledRoleLabel } from '../lib/users/canonicalAccess';
+import { useEmergencyStore } from '../store/emergencyStore';
+import {
+  filterAlertsForProfile,
+  mapAlertToClinicalDisplay,
+  syncClinicalAlertsFromBackend,
+  transitionAlertLifecycle,
+} from '../services/alertLifecycleOrchestrator';
 import { WorkflowSituationBrief } from './emergency/emergencyRouteShared';
 import './ClinicalAlertsPage.css';
 
@@ -39,39 +40,6 @@ const SEVERITY_FILTERS: { value: AlertSeverity | 'all'; label: string }[] = [
   { value: 'low', label: 'Low' },
 ];
 
-const buildSampleAlerts = (): ClinicalAlert[] => [
-  {
-    id: 'alert-1',
-    timestamp: new Date(Date.now() - 3600000),
-    severity: 'critical',
-    title: 'Critical SOFA Score',
-    description: 'Patient shows signs of multiple organ dysfunction',
-    source: 'SOFA Calculator',
-    status: 'unacknowledged',
-    findings: ['SOFA Score: 15/24', 'Mortality risk: High'],
-  },
-  {
-    id: 'alert-2',
-    timestamp: new Date(Date.now() - 7200000),
-    severity: 'high',
-    title: 'Abnormal Lab Values',
-    description: '3 critical laboratory values detected',
-    source: 'Lab Interpreter',
-    status: 'acknowledged',
-    findings: ['K+: 6.8 mEq/L', 'pH: 7.25', 'HCO3-: 18 mEq/L'],
-  },
-  {
-    id: 'alert-3',
-    timestamp: new Date(Date.now() - 86400000),
-    severity: 'moderate',
-    title: 'Kidney Dysfunction Alert',
-    description: 'GFR indicates moderate to severe kidney disease',
-    source: 'GFR Calculator',
-    status: 'acknowledged',
-    findings: ['GFR: 28 mL/min/1.73m²', 'CKD Stage: 3b'],
-  },
-];
-
 function formatTime(date: Date): string {
   const now = new Date();
   const diff = now.getTime() - new Date(date).getTime();
@@ -88,136 +56,69 @@ const ClinicalAlertsPage = () => {
   const alertsApiEnabled = isBackendCapabilityEnabled('clinicalAlerts');
   const { can, isReadOnly, compiledProfile } = useRolePermissions();
   const { profile } = useCareDroidUser();
-  const operationalIntelligence = useOperationalIntelligence({ screenMode: 'COMMAND_CENTER_SCREEN' });
+  const storeAlerts = useEmergencyStore((state) => state.alerts);
+  const updateAlerts = useEmergencyStore((state) => state.updateAlerts);
   const canAcknowledge = can(CAREDROID_PERMISSIONS.ALERT_ACKNOWLEDGE);
   const canExport = can(CAREDROID_PERMISSIONS.REPORTS_EXPORT);
-  const [alerts, setAlerts] = useState<ClinicalAlert[]>([]);
-  const [filteredAlerts, setFilteredAlerts] = useState<ClinicalAlert[]>([]);
   const [selectedSeverity, setSelectedSeverity] = useState<AlertSeverity | 'all'>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoadingAlerts, setIsLoadingAlerts] = useState(alertsApiEnabled);
   const [apiNotice, setApiNotice] = useState('');
-  const [acknowledgedBottleneckIds, setAcknowledgedBottleneckIds] = useState<Set<string>>(() => new Set());
-  const bottleneckAlerts = useMemo<ClinicalAlert[]>(
-    () =>
-      operationalIntelligence.centralSnapshot.bottleneckRegistry.activeBottlenecks.map((event) => {
-        const ownerLabel = getCompiledRoleLabel(event.ownerRole);
-        const backupLabel = event.backupRole ? getCompiledRoleLabel(event.backupRole) : null;
-        const isAssignedOwner = canOwnAlert(compiledProfile, event.ownerRole);
-        return {
-          id: `bottleneck-${event.id}`,
-          timestamp: new Date(event.detectedAt),
-          severity:
-            event.severity === 'critical'
-              ? 'critical'
-              : event.severity === 'high'
-                ? 'high'
-                : event.severity === 'medium'
-                  ? 'moderate'
-                  : 'low',
-          title: event.title,
-          description: `${event.description} Fallback: ${event.fallbackAction}`,
-          source: `${event.serviceName} / ${event.category.replace(/_/g, ' ')}`,
-          status:
-            event.status === 'acknowledged' || acknowledgedBottleneckIds.has(`bottleneck-${event.id}`)
-              ? 'acknowledged'
-              : 'unacknowledged',
-          findings: [
-            isAssignedOwner ? `You are the designated owner (${ownerLabel})` : `Owner: ${ownerLabel}`,
-            backupLabel ? `Backup: ${backupLabel}` : '',
-            event.responseDeadline
-              ? `Deadline: ${new Date(event.responseDeadline).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
-              : '',
-            event.impactsThreeMinuteTarget ? '3-minute target at risk' : '',
-          ].filter(Boolean),
-        };
-      }),
-    [acknowledgedBottleneckIds, compiledProfile, operationalIntelligence.centralSnapshot.bottleneckRegistry.activeBottlenecks],
-  );
-  const displayAlerts = useMemo(
-    () => [...bottleneckAlerts, ...alerts],
-    [alerts, bottleneckAlerts],
-  );
+
+  useEffect(() => {
+    updateAlerts();
+  }, [updateAlerts]);
 
   useEffect(() => {
     let cancelled = false;
 
     async function loadAlerts() {
       if (!alertsApiEnabled) {
-        const sampleAlerts = buildSampleAlerts();
-        setAlerts(sampleAlerts);
-        setFilteredAlerts(sampleAlerts);
         setIsLoadingAlerts(false);
         return;
       }
 
       setIsLoadingAlerts(true);
-      const result = await fetchClinicalAlerts();
+      const result = await syncClinicalAlertsFromBackend();
       if (cancelled) return;
-
-      if (result.ok) {
-        const resultAny = result as any;
-        const apiAlerts = Array.isArray(resultAny.data?.alerts) ? resultAny.data.alerts : [];
-        setAlerts(apiAlerts);
-        setFilteredAlerts(apiAlerts);
-        setApiNotice(resultAny.data?.safety || '');
-      } else {
-        const sampleAlerts = buildSampleAlerts();
-        setAlerts(sampleAlerts);
-        setFilteredAlerts(sampleAlerts);
-        setApiNotice(`${result.message || 'Unable to load clinical alerts.'} Showing sample alerts on this device only.`);
-      }
+      setApiNotice(result.message);
       setIsLoadingAlerts(false);
     }
 
-    loadAlerts();
-    return () => { cancelled = true; };
+    void loadAlerts();
+    return () => {
+      cancelled = true;
+    };
   }, [alertsApiEnabled]);
 
-  useEffect(() => {
+  const displayAlerts = useMemo(
+    () => filterAlertsForProfile(storeAlerts, compiledProfile).map(mapAlertToClinicalDisplay),
+    [compiledProfile, storeAlerts],
+  );
+
+  const filteredAlerts = useMemo(() => {
     let filtered = displayAlerts;
     if (selectedSeverity !== 'all') {
-      filtered = filtered.filter((a) => a.severity === selectedSeverity);
+      filtered = filtered.filter((alert) => alert.severity === selectedSeverity);
     }
     if (searchTerm) {
       const lc = searchTerm.toLowerCase();
       filtered = filtered.filter(
-        (a) =>
-          a.title.toLowerCase().includes(lc) ||
-          a.description.toLowerCase().includes(lc) ||
-          a.source.toLowerCase().includes(lc),
+        (alert) =>
+          alert.title.toLowerCase().includes(lc) ||
+          alert.description.toLowerCase().includes(lc) ||
+          alert.source.toLowerCase().includes(lc),
       );
     }
-    setFilteredAlerts(filtered);
-  }, [selectedSeverity, searchTerm, displayAlerts]);
+    return filtered;
+  }, [displayAlerts, searchTerm, selectedSeverity]);
 
   const handleAcknowledge = async (alertId: string) => {
-    const audit: AuditMetadata = {
-      createdBy: profile.employeeId,
-      updatedBy: profile.employeeId,
-      acknowledgedBy: profile.employeeId,
-      timestamp: new Date().toISOString(),
-      userRole: profile.role,
-    };
-
-    if (alertsApiEnabled && !alertId.startsWith('bottleneck-')) {
-      const result = await acknowledgeClinicalAlertApi(alertId, {
-        acknowledgedAt: audit.timestamp,
-        audit,
-      } as any);
-      if (!result.ok) {
-        setApiNotice(
-          `${result.message || 'Unable to acknowledge alert on the server.'} Updated locally only.`,
-        );
-      }
-    }
-    if (!alertId.startsWith('bottleneck-')) {
-      setAlerts((prev) =>
-        prev.map((a) => (a.id === alertId ? { ...a, status: 'acknowledged' } : a)),
-      );
-    } else {
-      setAcknowledgedBottleneckIds((prev) => new Set(prev).add(alertId));
-    }
+    await transitionAlertLifecycle(alertId, 'acknowledge', {
+      actorId: profile.employeeId,
+      actorRole: profile.role,
+      sourceScreen: 'clinical-alerts-page',
+    });
   };
 
   const unacknowledgedCount = displayAlerts.filter((a) => a.status === 'unacknowledged').length;

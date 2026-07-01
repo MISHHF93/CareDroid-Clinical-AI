@@ -38,13 +38,14 @@ const disclaimerCss = readFileSync(
 const REQUIRED_RESPONSIVE_VIEWPORT_WIDTHS = Object.freeze([320, 360, 390, 412, 430, 768, 1024, 1280, 1440]);
 
 describe('responsive-ux.css — global normalization', () => {
-  it('is imported from the unified stylesheet after design-tokens.css', () => {
-    expect(mainJsx).toContain("import './styles/index.css'");
-    expect(stylesIndexCss).toContain("@import './design-tokens.css';");
-    expect(stylesIndexCss).toContain("@import './responsive-ux.css';");
-    expect(stylesIndexCss).toContain("@import './mobile-first-layout.css';");
-    const tokensPos = stylesIndexCss.indexOf("@import './design-tokens.css';");
-    const uxPos = stylesIndexCss.indexOf("@import './responsive-ux.css';");
+  it('is imported from the design-system entry after design-tokens.css', () => {
+    const designSystemCss = readFileSync(join(__dirname, 'design-system.css'), 'utf8');
+    expect(mainJsx).toContain("import './styles/design-system.css'");
+    expect(designSystemCss).toContain("@import './design-tokens.css';");
+    expect(designSystemCss).toContain("@import './responsive-ux.css';");
+    expect(designSystemCss).toContain("@import './mobile-first-layout.css';");
+    const tokensPos = designSystemCss.indexOf("@import './design-tokens.css';");
+    const uxPos = designSystemCss.indexOf("@import './responsive-ux.css';");
     expect(uxPos).toBeGreaterThan(tokensPos);
   });
 

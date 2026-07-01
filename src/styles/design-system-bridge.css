@@ -1,0 +1,123 @@
+/**
+ * Unifies --cd-* (component primitives) with --app-* / --medical-* / --semantic-* shells.
+ * Loaded after palette layers so both namespaces resolve to the same visual language.
+ */
+:root,
+html,
+html[data-theme='light'] {
+  /* —— cd → app surface & text —— */
+  --cd-bg-base: var(--app-bg, #f0f9ff);
+  --cd-bg-surface: var(--app-surface-1, #ffffff);
+  --cd-bg-elevated: var(--app-surface-elevated, #ffffff);
+  --cd-bg-sunken: var(--app-surface-muted, #f0f9ff);
+  --cd-text-primary: var(--app-fg, #111827);
+  --cd-text-secondary: var(--app-fg-muted, #6b7280);
+  --cd-text-disabled: var(--medical-ink-subtle, #9ca3af);
+  --cd-text-inverse: var(--app-on-solid, #ffffff);
+  --cd-text-brand: var(--app-accent-hover, #0284c7);
+  --cd-text-danger: var(--semantic-critical, #b91c1c);
+
+  --cd-border-subtle: var(--app-border-subtle, #e0f2fe);
+  --cd-border-default: var(--app-border, #e0f2fe);
+  --cd-border-strong: var(--app-border-strong, #d1d5db);
+  --cd-border-brand: var(--medical-accent-border, rgba(14, 165, 233, 0.35));
+  --cd-border-danger: var(--semantic-critical, #b91c1c);
+  --cd-border-focus: var(--app-accent-interactive, #0ea5e9);
+
+  --cd-brand-bg: var(--app-accent-interactive, #0ea5e9);
+  --cd-brand-bg-hover: var(--app-accent-hover, #0284c7);
+  --cd-brand-bg-subtle: var(--medical-accent-tint, rgba(14, 165, 233, 0.12));
+  --cd-brand-fg: var(--app-on-solid, #ffffff);
+  --cd-brand-fg-subtle: var(--semantic-information, #0284c7);
+
+  --cd-info-bg: var(--app-info, #0ea5e9);
+  --cd-info-bg-subtle: var(--semantic-information-bg, rgba(14, 165, 233, 0.12));
+  --cd-info-border: var(--medical-border, #e0f2fe);
+  --cd-info-text: var(--semantic-information, #0284c7);
+
+  --cd-success-bg: var(--app-success, #22c55e);
+  --cd-success-bg-subtle: var(--semantic-healthy-bg, #ecfdf5);
+  --cd-success-border: var(--medical-success-border, #166534);
+  --cd-success-text: var(--semantic-healthy, #15803d);
+
+  --cd-warning-bg: var(--app-warning, #f59e0b);
+  --cd-warning-bg-subtle: var(--semantic-attention-bg, #fffbeb);
+  --cd-warning-border: var(--semantic-attention, #b45309);
+  --cd-warning-text: var(--semantic-attention, #b45309);
+
+  --cd-danger-bg: var(--app-danger, #ef4444);
+  --cd-danger-bg-subtle: var(--semantic-critical-bg, #fef2f2);
+  --cd-danger-border: var(--semantic-critical, #b91c1c);
+  --cd-danger-text: var(--semantic-critical, #b91c1c);
+
+  --cd-interactive-bg-hover: var(--app-hover, rgba(14, 165, 233, 0.08));
+  --cd-interactive-bg-selected: var(--medical-accent-tint, rgba(14, 165, 233, 0.12));
+
+  /* —— app → cd spacing & radii (single scale) —— */
+  --app-space-xs: var(--cd-space-1, var(--space-1));
+  --app-space-sm: var(--cd-space-2, var(--space-2));
+  --app-space-md: var(--cd-space-3, var(--space-3));
+  --app-space-lg: var(--cd-space-4, var(--space-4));
+  --app-space-xl: var(--cd-space-6, var(--space-6));
+
+  /* —— Operational semantic roles (TS + CSS share names) —— */
+  --semantic-critical-fg: var(--semantic-critical);
+  --semantic-urgent-fg: var(--semantic-urgent);
+  --semantic-attention-fg: var(--semantic-attention);
+  --semantic-healthy-fg: var(--semantic-healthy);
+  --semantic-information-fg: var(--semantic-information);
+  --semantic-inactive-fg: var(--semantic-inactive);
+
+  /* —— Status aliases for Tailwind + legacy —— */
+  --status-success: var(--app-success);
+  --status-warning: var(--app-warning);
+  --status-danger: var(--app-danger);
+  --status-critical: var(--app-danger);
+  --status-info: var(--app-info);
+  --status-emergency: var(--semantic-critical);
+  --status-stable: var(--app-success);
+  --status-inactive: var(--semantic-inactive);
+
+  --capacity-green: var(--app-success);
+  --capacity-yellow: #eab308;
+  --capacity-orange: #f97316;
+  --capacity-red: var(--semantic-critical);
+  --status-orange: var(--capacity-orange);
+
+  --priority-p1: var(--status-emergency);
+  --priority-p2: var(--capacity-orange);
+  --priority-p3: var(--status-warning);
+  --priority-p4: var(--status-success);
+  --priority-p5: var(--semantic-inactive);
+
+  /* —— Clinical acuity → semantic bridge —— */
+  --cd-acuity-p1: var(--semantic-critical);
+  --cd-acuity-p1-bg: var(--semantic-critical-bg);
+  --cd-acuity-p2: var(--semantic-urgent);
+  --cd-acuity-p2-bg: var(--semantic-urgent-bg);
+  --cd-acuity-p3: var(--semantic-attention);
+  --cd-acuity-p3-bg: var(--semantic-attention-bg);
+  --cd-acuity-p4: var(--semantic-healthy);
+  --cd-acuity-p4-bg: var(--semantic-healthy-bg);
+  --cd-acuity-p5: var(--semantic-information);
+  --cd-acuity-p5-bg: var(--semantic-information-bg);
+
+  --cd-breach-safe: var(--semantic-healthy);
+  --cd-breach-watch: var(--semantic-attention);
+  --cd-breach-warning: var(--semantic-urgent);
+  --cd-breach-imminent: var(--semantic-critical);
+  --cd-breach-breached: var(--semantic-critical);
+
+  --cd-capacity-normal: var(--semantic-healthy);
+  --cd-capacity-elevated: var(--semantic-attention);
+  --cd-capacity-high: var(--semantic-urgent);
+  --cd-capacity-crisis: var(--semantic-critical);
+
+  /* —— Role-focused density presets —— */
+  --density-compact-gap: var(--compact-page-gap, clamp(10px, 1.8vw, 16px));
+  --density-compact-padding: var(--compact-card-padding, 16px);
+  --density-standard-gap: var(--app-fluid-section-gap, clamp(10px, 2vw, var(--space-md)));
+  --density-standard-padding: var(--app-card-padding-standard, 20px);
+  --density-roomy-gap: var(--app-page-gap, var(--compact-page-gap));
+  --density-roomy-padding: var(--app-page-padding-roomy, clamp(12px, 2.2vw, var(--space-lg)));
+}

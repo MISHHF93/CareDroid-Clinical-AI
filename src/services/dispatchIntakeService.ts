@@ -8,6 +8,7 @@ import type {
   ISODateString,
 } from '../types/emergency';
 
+
 function generateId(prefix: string): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
@@ -63,6 +64,7 @@ export function createEmergencyCall(params: {
     updatedAt: now(),
   };
   activeCalls.set(call.id, call);
+  void import('./emergencyCareJourneyOrchestrator').then(({ onEmergencyCallLogged }) => onEmergencyCallLogged(call));
   return call;
 }
 
@@ -71,6 +73,9 @@ export function updateCallStatus(callId: EntityId, status: EmergencyCallStatus):
   if (!call) return null;
   const updated: EmergencyCall = { ...call, status, updatedAt: now() };
   activeCalls.set(callId, updated);
+  if (status === 'triaged') {
+    void import('./emergencyCareJourneyOrchestrator').then(({ onDispatcherTriage }) => onDispatcherTriage(callId));
+  }
   return updated;
 }
 
@@ -79,6 +84,9 @@ export function updateCallPriority(callId: EntityId, priority: CallPriority): Em
   if (!call) return null;
   const updated: EmergencyCall = { ...call, callPriority: priority, updatedAt: now() };
   activeCalls.set(callId, updated);
+  if (call.status === 'received') {
+    void import('./emergencyCareJourneyOrchestrator').then(({ onDispatcherTriage }) => onDispatcherTriage(callId));
+  }
   return updated;
 }
 

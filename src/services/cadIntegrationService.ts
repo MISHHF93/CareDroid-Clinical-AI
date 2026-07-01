@@ -206,6 +206,10 @@ export function getActiveAssignments(): DispatchAssignment[] {
   return [...assignments.values()].filter((a) => a.status !== 'available');
 }
 
+export function getAssignmentForCall(callId: EntityId): DispatchAssignment | null {
+  return [...assignments.values()].find((assignment) => assignment.callId === callId) ?? null;
+}
+
 export function getCADEvents(limit = 50): CADEvent[] {
   return cadEvents.slice(-limit);
 }

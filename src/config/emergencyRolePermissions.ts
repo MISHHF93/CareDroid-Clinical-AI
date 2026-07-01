@@ -378,7 +378,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
     label: EMERGENCY_ROLE_LABELS[EMERGENCY_ROLE_IDS.registrationClerk],
     description:
       'Emergency reception role for fast arrival capture, intake drafts, demographics, queue handoff, and critical staff notification without clinical override authority.',
-    routes: [ROUTES.reception, ROUTES.patients, ROUTES.intake, ROUTES.queues, ROUTES.help],
+    routes: [ROUTES.reception, ROUTES.patients, ROUTES.intake, ROUTES.pulse, ROUTES.shift, ROUTES.alerts, ROUTES.help],
     actions: [
       EMERGENCY_ACTIONS.createPatient,
       EMERGENCY_ACTIONS.editPatientDemographics,
@@ -442,7 +442,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
   [EMERGENCY_ROLE_IDS.publicDisplay]: Object.freeze({
     id: EMERGENCY_ROLE_IDS.publicDisplay,
     label: EMERGENCY_ROLE_LABELS[EMERGENCY_ROLE_IDS.publicDisplay],
-    description: 'Public waiting-room display — aggregate status only, no staff actions.',
+    description: 'Public waiting-room display ï¿½ aggregate status only, no staff actions.',
     routes: [ROUTES.whiteboard],
     actions: [EMERGENCY_ACTIONS.displayPublicWaitboard, EMERGENCY_ACTIONS.displayPublicPublish],
     defaultRoute: getDefaultRouteForProfile(EMERGENCY_ROLE_IDS.publicDisplay),
@@ -677,12 +677,12 @@ export function getEmergencyRoleHomeRoute(role, emergencySettings: any = {}) {
   });
 }
 
-/** Fastest reception create — express registration modal on reception workspace. */
+/** Fastest reception create ï¿½ express registration modal on reception workspace. */
 export function getReceptionExpressCreatePath() {
   return `${CANONICAL_ROUTES.emergencyReception}?express=1`;
 }
 
-/** Embedded Smart Intake on reception — zero route hops from arrival dashboard. */
+/** Embedded Smart Intake on reception ï¿½ zero route hops from arrival dashboard. */
 export function getReceptionEmbeddedIntakePath(options: any = {}) {
   const params = new URLSearchParams({ intake: '1', autostart: '1' });
   if (options.step) params.set('step', options.step);
@@ -697,12 +697,12 @@ export function getReceptionSmartIntakePath(options: any = {}) {
   return getReceptionEmbeddedIntakePath(options);
 }
 
-/** Primary reception create path — embedded Smart Intake (legacy alias). */
+/** Primary reception create path ï¿½ embedded Smart Intake (legacy alias). */
 export function getReceptionQuickCreatePath() {
   return getReceptionEmbeddedIntakePath();
 }
 
-/** Role-aware fastest create path — express for registration clerk, Smart Intake for others. */
+/** Role-aware fastest create path ï¿½ express for registration clerk, Smart Intake for others. */
 export function getReceptionPrimaryCreatePath(role) {
   if (isRegistrationClerkRole(role)) {
     return getReceptionExpressCreatePath();

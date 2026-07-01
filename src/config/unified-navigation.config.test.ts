@@ -205,13 +205,6 @@ const REQUESTED_ITEMS = [
     featureGate: null,
   },
   {
-    id: 'surveillance',
-    label: 'Surveillance',
-    icon: 'activity',
-    route: '/surveillance/nexus',
-    featureGate: null,
-  },
-  {
     id: 'simulation',
     label: 'Simulation',
     icon: 'list-check',
@@ -235,7 +228,7 @@ const REQUESTED_ITEMS = [
   {
     id: 'audit',
     label: 'Audit',
-    icon: 'report',
+    icon: 'audit-trail',
     route: '/audit',
     featureGate: null,
   },
@@ -249,7 +242,7 @@ const REQUESTED_ITEMS = [
   {
     id: 'admin',
     label: 'Admin',
-    icon: 'settings',
+    icon: 'admin-console',
     route: '/admin',
     featureGate: null,
   },

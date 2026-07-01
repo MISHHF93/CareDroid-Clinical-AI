@@ -3,18 +3,20 @@ import { toast } from 'sonner';
 import { dispatchAlert } from './alertEngine';
 
 const mocks = vi.hoisted(() => {
-  const addAlert = vi.fn();
+  const ingestPreparedAlert = vi.fn();
   const selectPatient = vi.fn();
   const toastFn = Object.assign(vi.fn(), {
     error: vi.fn(),
     warning: vi.fn(),
   });
+  const alerts: Array<Record<string, unknown>> = [];
 
   return {
-    addAlert,
+    ingestPreparedAlert,
     selectPatient,
     toastFn,
-    getState: vi.fn(() => ({ addAlert, selectPatient })),
+    alerts,
+    getState: vi.fn(() => ({ ingestPreparedAlert, selectPatient, alerts })),
   };
 });
 
@@ -31,7 +33,11 @@ vi.mock('../store/emergencyStore', () => ({
 describe('dispatchAlert', () => {
   beforeEach(() => {
     vi.useRealTimers();
-    mocks.addAlert.mockClear();
+    mocks.alerts.length = 0;
+    mocks.ingestPreparedAlert.mockImplementation((alert) => {
+      mocks.alerts.push(alert);
+    });
+    mocks.ingestPreparedAlert.mockClear();
     mocks.selectPatient.mockClear();
     mocks.toastFn.mockClear();
     mocks.toastFn.error.mockClear();
@@ -51,7 +57,7 @@ describe('dispatchAlert', () => {
     });
 
     expect(id).toBe('alt1781377200000');
-    expect(mocks.addAlert).toHaveBeenCalledWith(
+    expect(mocks.ingestPreparedAlert).toHaveBeenCalledWith(
       expect.objectContaining({
         id,
         severity: 'Critical',
@@ -59,14 +65,14 @@ describe('dispatchAlert', () => {
         message: 'SpO2 88%',
         patientId: 'p1',
         dismissed: false,
-        createdAt: '2026-06-13T19:00:00.000Z',
+        lifecycleStatus: 'open',
       }),
     );
     expect(toast.error).toHaveBeenCalledWith(
       'Critical vitals',
       expect.objectContaining({
         description: 'SpO2 88%',
-        duration: Infinity,
+        duration: 7000,
         action: expect.objectContaining({ label: 'View Patient' }),
       }),
     );
@@ -76,7 +82,7 @@ describe('dispatchAlert', () => {
     expect(mocks.selectPatient).toHaveBeenCalledWith('p1');
   });
 
-  it('toasts high-tier warnings and suppresses informational notices', () => {
+  it('stores warning and info alerts without redundant toasts', () => {
     dispatchAlert({
       severity: 'Warning',
       title: 'Referral unacknowledged',
@@ -88,13 +94,8 @@ describe('dispatchAlert', () => {
       message: 'Preferences saved',
     });
 
-    expect(toast.warning).toHaveBeenCalledWith(
-      'Referral unacknowledged',
-      expect.objectContaining({ description: 'Cardiology - 20m unacknowledged.', duration: 10000 }),
-    );
-    expect(toast).not.toHaveBeenCalledWith(
-      'Saved',
-      expect.objectContaining({ description: 'Preferences saved' }),
-    );
+    expect(mocks.ingestPreparedAlert).toHaveBeenCalledTimes(2);
+    expect(mocks.toastFn).not.toHaveBeenCalled();
+    expect(mocks.toastFn.error).not.toHaveBeenCalled();
   });
 });
