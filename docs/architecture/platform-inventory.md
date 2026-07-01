@@ -191,7 +191,7 @@ Six clinical tool prompts plus ten platform capability entries in `src/data/feat
 
 ```bash
 npm run e2e-matrix:write-docs      # docs/e2e-tool-validation-matrix.md
-npm run contract:write-docs        # docs/backend-frontend-tool-contract.md
+npm run contract:write-docs        # docs/architecture/backend-frontend-tool-contract.md
 npm run tool-matrix:write-docs     # docs/tool-render-execute-matrix.md
 npm run inventory:report           # print summary to stdout
 ```

@@ -249,6 +249,6 @@ Total: 245 user-facing tools have frontend mounted asset projection coverage but
 ## Appendix
 
 - Validation service: `ProductCatalogValidationService` (post-seed reference checks)
-- Related: [solution-packs.md](./solution-packs.md), [saas-compliance-audit.md](./saas-compliance-audit.md)
+- Related: [saas-compliance-audit.md](../operations/saas-compliance-audit.md)
 - Generator: `src/data/productPackagingAudit.ts`
 

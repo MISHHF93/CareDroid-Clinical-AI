@@ -426,5 +426,5 @@ Assets in `SEED_PLATFORM_ASSETS` without pack assignment:
 | `src/data/toolInventory.js` | Canonical tool registry and lifecycleState |
 | `src/data/profileToolSegmentation.ts` | Role visibility heuristics |
 | `src/data/assetInventory.ts` | Mounted frontend asset projection with pack/product/workspace/role/execution/governance metadata |
-| `docs/feature-coverage-matrix.md` | Related coverage audit |
+| `docs/architecture/feature-coverage-matrix.md` | Related coverage audit |
 

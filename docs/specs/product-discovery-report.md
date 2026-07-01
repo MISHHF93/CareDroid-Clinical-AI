@@ -424,14 +424,13 @@ Prompt injection detection and AI output safety guardrails.
 
 | Document | Location | Quality | Current |
 |----------|----------|---------|---------|
-| Platform Inventory | `docs/PLATFORM_INVENTORY.md` | High | Yes |
+| Platform Inventory | `docs/architecture/platform-inventory.md` | High | Yes |
 | Current State Report | `docs/architecture/current-state-report.md` | High | Yes |
-| User Manual | `docs/USER-MANUAL.md` | Medium | Partial |
+| User Manual | `docs/manuals/caredroid-master-user-manual.md` | Medium | Partial |
 | Architecture reports | `docs/architecture/*.md` | Medium | Partial |
-| Emergency OS docs | `docs/emergency-os-*.md` | Medium | Historical |
-| Door-to-doctor intelligence | `docs/door-to-doctor-intelligence.md` | High | Yes |
-| Feature coverage matrix | `docs/feature-coverage-matrix.md` | High | Yes |
-| SaaS bottleneck map | `docs/saas-service-bottleneck-current-service-map.md` | High | Yes |
+| Door-to-doctor intelligence | `docs/workflows/door-to-doctor-intelligence.md` | High | Yes |
+| Feature coverage matrix | `docs/architecture/feature-coverage-matrix.md` | High | Yes |
+| SaaS bottleneck map | `docs/services/service-bottleneck-map.md` | High | Yes |
 | Gap analysis | ❌ Missing | — | — |
 | Role manuals | ❌ Missing | — | — |
 | Workflow specs | ❌ Missing | — | — |
@@ -481,7 +480,7 @@ Prompt injection detection and AI output safety guardrails.
 
 Generated from this report:
 
-1. `docs/PRODUCT_DISCOVERY_REPORT.md` ← **this file**
+1. `docs/specs/product-discovery-report.md` ← **this file**
 2. `docs/architecture/system-architecture.md`
 3. `docs/workflows/patient-journey.md`
 4. `docs/workflows/three-minute-response.md`

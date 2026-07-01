@@ -364,10 +364,10 @@ CareDroid is designed with audit-minded SaaS patterns. **It does not claim HIPAA
 | Document | Audience |
 |----------|----------|
 | [AI Features Reference](docs/AI_FEATURES.md) | Developers, clinical informatics, AI reviewers |
-| [User Manual](docs/USER-MANUAL.md) | ED staff, clinical evaluators, Codespace testers |
-| [Demo Mode Guide](docs/architecture/first-customer-demo-mode.md) | Sales, pilot teams |
-| [Architecture: Chat & Tools Routing](docs/architecture/chat-tools-routing-audit.md) | Developers |
-| [Feature Coverage Matrix](docs/feature-coverage-matrix.md) | Product, clinical informatics |
+| [AI Architecture](docs/ai/ai-documentation.md) | Developers, AI reviewers |
+| [User Manual](docs/manuals/caredroid-master-user-manual.md) | ED staff, clinical evaluators, Codespace testers |
+| [Feature Coverage Matrix](docs/architecture/feature-coverage-matrix.md) | Product, clinical informatics |
+| [System Architecture](docs/architecture/system-architecture.md) | Developers |
 
 ---
 
