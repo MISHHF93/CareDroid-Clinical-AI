@@ -53,6 +53,8 @@ import {
 import { PatientDocumentArtifactService } from './patient-document-artifact.service';
 import { ClinicalDecisionSupportService } from './clinical-decision-support.service';
 import { EmergencyPatientAuditService } from './emergency-patient-audit.service';
+import { PatientFlowService } from './emergency-os.patient-flow.service';
+import { WorkflowOrchestrationService } from './emergency-os.workflow-orchestration.service';
 
 @Module({
   imports: [
@@ -127,6 +129,8 @@ import { EmergencyPatientAuditService } from './emergency-patient-audit.service'
     PatientDocumentArtifactService,
     ClinicalDecisionSupportService,
     EmergencyPatientAuditService,
+    PatientFlowService,
+    WorkflowOrchestrationService,
   ],
 })
 export class EmergencyOsModule {}

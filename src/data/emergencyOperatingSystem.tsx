@@ -92,7 +92,7 @@ export const EMERGENCY_COMMAND_CENTER_WIDGETS = Object.freeze([
     primaryAction: Object.freeze({
       label: 'Open patient flow',
       actionType: 'route',
-      target: '/workspace/emergency/patients',
+      target: '/emergency/patients',
     }),
     secondaryAction: Object.freeze({
       label: 'Summarize flow bottlenecks',
@@ -111,7 +111,7 @@ export const EMERGENCY_COMMAND_CENTER_WIDGETS = Object.freeze([
     primaryAction: Object.freeze({
       label: 'Start triage review',
       actionType: 'route',
-      target: '/workspace/emergency/triage',
+      target: '/triage?queue=pretriage',
     }),
     secondaryAction: Object.freeze({
       label: 'Ask assistant for queue priorities',
@@ -130,7 +130,7 @@ export const EMERGENCY_COMMAND_CENTER_WIDGETS = Object.freeze([
     primaryAction: Object.freeze({
       label: 'Open complaint workflow',
       actionType: 'route',
-      target: '/workspace/emergency/triage',
+      target: '/triage?queue=pretriage',
     }),
     secondaryAction: Object.freeze({
       label: 'Review high-risk summary',
@@ -149,7 +149,7 @@ export const EMERGENCY_COMMAND_CENTER_WIDGETS = Object.freeze([
     primaryAction: Object.freeze({
       label: 'Review EMS handoffs',
       actionType: 'route',
-      target: '/workspace/emergency/pre-arrival',
+      target: '/emergency/ems',
     }),
     secondaryAction: Object.freeze({
       label: 'Summarize offload risk',
@@ -168,7 +168,7 @@ export const EMERGENCY_COMMAND_CENTER_WIDGETS = Object.freeze([
     primaryAction: Object.freeze({
       label: 'Open referral queue',
       actionType: 'route',
-      target: '/workspace/emergency/referrals',
+      target: '/emergency/referrals',
     }),
     secondaryAction: Object.freeze({
       label: 'Prioritize referrals',
@@ -187,7 +187,7 @@ export const EMERGENCY_COMMAND_CENTER_WIDGETS = Object.freeze([
     primaryAction: Object.freeze({
       label: 'Review bed flow',
       actionType: 'route',
-      target: '/workspace/emergency/flow',
+      target: '/emergency/capacity',
     }),
     secondaryAction: Object.freeze({
       label: 'Summarize boarding pressure',
@@ -206,7 +206,7 @@ export const EMERGENCY_COMMAND_CENTER_WIDGETS = Object.freeze([
     primaryAction: Object.freeze({
       label: 'Open equipment status',
       actionType: 'route',
-      target: '/workspace/emergency/iot',
+      target: '/medical-iot',
     }),
     secondaryAction: Object.freeze({
       label: 'Review equipment constraints',
@@ -225,7 +225,7 @@ export const EMERGENCY_COMMAND_CENTER_WIDGETS = Object.freeze([
     primaryAction: Object.freeze({
       label: 'Open surge analytics',
       actionType: 'route',
-      target: '/workspace/emergency/analytics',
+      target: '/emergency/analytics',
     }),
     secondaryAction: Object.freeze({
       label: 'Forecast staffing pressure',
@@ -244,7 +244,7 @@ export const EMERGENCY_COMMAND_CENTER_WIDGETS = Object.freeze([
     primaryAction: Object.freeze({
       label: 'Review critical alerts',
       actionType: 'route',
-      target: '/workspace/emergency/alerts',
+      target: '/emergency/alerts',
     }),
     secondaryAction: Object.freeze({
       label: 'Open escalation guidance',
@@ -559,7 +559,7 @@ export const EMERGENCY_ANALYTICS_EVENTS = Object.freeze([
 ]);
 
 export const EMERGENCY_ANALYTICS_MVP = Object.freeze({
-  route: '/workspace/emergency/analytics',
+  route: '/emergency/analytics',
   title: 'Emergency Analytics MVP',
   goal: 'Provide measurable value by showing ED adoption, workflow lift, and ROI from the first pilot.',
   trackedEvents: EMERGENCY_ANALYTICS_EVENTS,
@@ -635,7 +635,7 @@ export const EMERGENCY_DEMO_TENANT = Object.freeze({
   tenantId: 'emergency-demo-tenant',
   tenantName: 'CareDroid Demo Hospital',
   workspaceId: EMERGENCY_WORKSPACE_ID,
-  workspaceRoute: '/workspace/emergency/demo',
+  workspaceRoute: '/emergency/whiteboard',
   mode: 'demo',
   dataPosture: 'Demo/local data only. No live EHR, ADT, telemetry, protocol, or analytics integration is connected.',
   safetyPosture:
@@ -689,7 +689,7 @@ export const EMERGENCY_DEMO_TENANT = Object.freeze({
       label: 'Stroke window review',
       severity: 'critical',
       detail: 'Demo alert for time-sensitive stroke protocol review.',
-      targetRoute: '/workspace/emergency/evidence',
+      targetRoute: '/emergency/copilot',
       ...EMERGENCY_DEMO_DATA_LABELS,
     }),
     Object.freeze({
@@ -697,7 +697,7 @@ export const EMERGENCY_DEMO_TENANT = Object.freeze({
       label: 'Sepsis risk review',
       severity: 'critical',
       detail: 'Demo alert for qSOFA, NEWS2, lactate workflow, and clinician escalation review.',
-      targetRoute: '/workspace/emergency/triage',
+      targetRoute: '/triage?queue=pretriage',
       ...EMERGENCY_DEMO_DATA_LABELS,
     }),
     Object.freeze({
@@ -705,7 +705,7 @@ export const EMERGENCY_DEMO_TENANT = Object.freeze({
       label: 'Documentation gap',
       severity: 'medium',
       detail: 'Demo alert for missing triage facts before discharge/admission handoff.',
-      targetRoute: '/workspace/emergency/documentation',
+      targetRoute: '/emergency/documentation',
       ...EMERGENCY_DEMO_DATA_LABELS,
     }),
   ]),
@@ -714,28 +714,28 @@ export const EMERGENCY_DEMO_TENANT = Object.freeze({
       id: 'demo-workflow-triage-review',
       label: 'Triage review',
       detail: 'Open chief complaint, vitals, calculators, and clinician-review risk profile.',
-      targetRoute: '/workspace/emergency/triage',
+      targetRoute: '/triage?queue=pretriage',
       ...EMERGENCY_DEMO_DATA_LABELS,
     }),
     Object.freeze({
       id: 'demo-workflow-protocol-retrieval',
       label: 'Protocol retrieval',
       detail: 'Retrieve complaint-specific protocols, evidence, calculators, workflows, and simulations.',
-      targetRoute: '/workspace/emergency/evidence',
+      targetRoute: '/emergency/copilot',
       ...EMERGENCY_DEMO_DATA_LABELS,
     }),
     Object.freeze({
       id: 'demo-workflow-ai-copilot',
       label: 'AI Copilot request',
       detail: 'Ask ED Copilot for explainable workflow guidance with demo complaint and vitals context.',
-      targetRoute: '/workspace/emergency/evidence',
+      targetRoute: '/emergency/copilot',
       ...EMERGENCY_DEMO_DATA_LABELS,
     }),
     Object.freeze({
       id: 'demo-workflow-analytics-review',
       label: 'Analytics review',
       detail: 'Review adoption and ROI signals from sample Emergency Analytics MVP events.',
-      targetRoute: '/workspace/emergency/analytics',
+      targetRoute: '/emergency/analytics',
       ...EMERGENCY_DEMO_DATA_LABELS,
     }),
   ]),
@@ -745,7 +745,7 @@ export const EMERGENCY_DEMO_TENANT = Object.freeze({
       complaint: 'Chest Pain',
       protocol: 'ACS/chest pain pathway',
       summary: 'Demo protocol card for HEART review, ECG/troponin workflow, and cardiology criteria.',
-      targetRoute: '/workspace/emergency/evidence',
+      targetRoute: '/emergency/copilot',
       ...EMERGENCY_DEMO_DATA_LABELS,
     }),
     Object.freeze({
@@ -753,7 +753,7 @@ export const EMERGENCY_DEMO_TENANT = Object.freeze({
       complaint: 'Stroke Symptoms',
       protocol: 'Stroke window workflow',
       summary: 'Demo protocol card for NIHSS, imaging escalation, and neurology review criteria.',
-      targetRoute: '/workspace/emergency/evidence',
+      targetRoute: '/emergency/copilot',
       ...EMERGENCY_DEMO_DATA_LABELS,
     }),
     Object.freeze({
@@ -761,7 +761,7 @@ export const EMERGENCY_DEMO_TENANT = Object.freeze({
       complaint: 'Sepsis Concern',
       protocol: 'Sepsis pathway',
       summary: 'Demo protocol card for qSOFA, NEWS2, lactate/culture workflow, and escalation review.',
-      targetRoute: '/workspace/emergency/evidence',
+      targetRoute: '/emergency/copilot',
       ...EMERGENCY_DEMO_DATA_LABELS,
     }),
     Object.freeze({
@@ -769,7 +769,7 @@ export const EMERGENCY_DEMO_TENANT = Object.freeze({
       complaint: 'Trauma',
       protocol: 'Trauma primary survey',
       summary: 'Demo protocol card for trauma bay workflow, Shock Index, and ATLS context.',
-      targetRoute: '/workspace/emergency/evidence',
+      targetRoute: '/emergency/copilot',
       ...EMERGENCY_DEMO_DATA_LABELS,
     }),
     Object.freeze({
@@ -777,7 +777,7 @@ export const EMERGENCY_DEMO_TENANT = Object.freeze({
       complaint: 'Shortness of Breath',
       protocol: 'Respiratory distress pathway',
       summary: 'Demo protocol card for Wells PE, NEWS2, oxygen escalation, and respiratory review.',
-      targetRoute: '/workspace/emergency/evidence',
+      targetRoute: '/emergency/copilot',
       ...EMERGENCY_DEMO_DATA_LABELS,
     }),
   ]),
@@ -792,7 +792,7 @@ export const EMERGENCY_DEMO_TENANT = Object.freeze({
 });
 
 export const EMERGENCY_ROI_ESTIMATOR = Object.freeze({
-  route: '/workspace/emergency/roi',
+  route: '/emergency/analytics',
   title: 'ED ROI Estimator',
   goal: 'Estimate CareDroid value for sales discovery, onboarding, and pilot planning.',
   inputFields: Object.freeze([
@@ -850,7 +850,7 @@ export const EMERGENCY_ROI_ESTIMATOR = Object.freeze({
 });
 
 export const EMERGENCY_FIRST_CUSTOMER_DEPLOYMENT = Object.freeze({
-  route: '/workspace/emergency/deployment',
+  route: '/emergency/settings',
   title: 'First Customer Deployment Blueprint',
   goal: 'Deploy CareDroid for the first ED customer with minimal operational risk.',
   principle:
@@ -948,7 +948,7 @@ export const EMERGENCY_FIRST_CUSTOMER_DEPLOYMENT = Object.freeze({
 });
 
 export const EMERGENCY_OS_IMPLEMENTATION_SUMMARY = Object.freeze({
-  route: '/workspace/emergency/implementation',
+  route: '/emergency/settings',
   title: 'CareDroid MVP Implementation Summary',
   purpose:
     'Document and display what has been implemented for the ED OS MVP, what markdown plan each capability satisfies, and which live integrations remain intentionally out of scope.',
@@ -959,7 +959,7 @@ export const EMERGENCY_OS_IMPLEMENTATION_SUMMARY = Object.freeze({
     Object.freeze({
       doc: 'door-to-doctor-intelligence.md',
       capability: 'Door-to-Doctor Intelligence',
-      route: '/workspace/emergency/throughput',
+      route: '/emergency/analytics',
       service: 'DoorToDoctorIntelligenceService',
       acceptance: 'Leadership can monitor throughput.',
       status: 'implemented',
@@ -967,7 +967,7 @@ export const EMERGENCY_OS_IMPLEMENTATION_SUMMARY = Object.freeze({
     Object.freeze({
       doc: 'waiting-room-intelligence.md',
       capability: 'Waiting Room Intelligence',
-      route: '/workspace/emergency/waiting-room',
+      route: '/emergency/reception',
       service: 'WaitingRoomIntelligenceService',
       acceptance: 'Waiting room pressure becomes visible.',
       status: 'implemented',
@@ -975,7 +975,7 @@ export const EMERGENCY_OS_IMPLEMENTATION_SUMMARY = Object.freeze({
     Object.freeze({
       doc: 'reassessment-automation.md',
       capability: 'Reassessment Queue',
-      route: '/workspace/emergency/waiting-room',
+      route: '/emergency/reception',
       service: 'ReassessmentAutomationService',
       acceptance: 'Patients do not disappear into the waiting room.',
       status: 'implemented',
@@ -983,7 +983,7 @@ export const EMERGENCY_OS_IMPLEMENTATION_SUMMARY = Object.freeze({
     Object.freeze({
       doc: 'ems-offload-command-center.md',
       capability: 'EMS Offload Command Center',
-      route: '/workspace/emergency/ems',
+      route: '/emergency/ems',
       service: 'EmsOffloadCommandCenterService',
       acceptance: 'EMS pressure becomes measurable.',
       status: 'implemented',
@@ -991,7 +991,7 @@ export const EMERGENCY_OS_IMPLEMENTATION_SUMMARY = Object.freeze({
     Object.freeze({
       doc: 'emergency-resource-board.md',
       capability: 'Emergency Resource Board',
-      route: '/workspace/emergency/resources',
+      route: '/emergency/capacity',
       service: 'EmergencyResourceBoardService',
       acceptance: 'Staff can understand resource availability.',
       status: 'implemented',
@@ -999,7 +999,7 @@ export const EMERGENCY_OS_IMPLEMENTATION_SUMMARY = Object.freeze({
     Object.freeze({
       doc: 'emergency-escalation-engine.md',
       capability: 'Emergency Escalation Engine',
-      route: '/workspace/emergency/escalations',
+      route: '/emergency/alerts',
       service: 'EmergencyEscalationEngineService',
       acceptance: 'Operational issues are surfaced early.',
       status: 'implemented',
@@ -1007,7 +1007,7 @@ export const EMERGENCY_OS_IMPLEMENTATION_SUMMARY = Object.freeze({
     Object.freeze({
       doc: 'emergency-kpi-layer.md',
       capability: 'Emergency KPI Layer',
-      route: '/workspace/emergency/analytics',
+      route: '/emergency/analytics',
       service: 'EmergencyKPILayerService',
       acceptance: 'All metrics originate from one source.',
       status: 'implemented',
@@ -1015,7 +1015,7 @@ export const EMERGENCY_OS_IMPLEMENTATION_SUMMARY = Object.freeze({
     Object.freeze({
       doc: 'emergency-simulation-scenarios.md',
       capability: 'Emergency Simulation Scenarios',
-      route: '/workspace/emergency/simulations',
+      route: '/simulation',
       service: 'EmergencySimulationScenariosService',
       acceptance: 'Training mirrors real operational problems.',
       status: 'implemented',
@@ -1023,7 +1023,7 @@ export const EMERGENCY_OS_IMPLEMENTATION_SUMMARY = Object.freeze({
     Object.freeze({
       doc: 'emergency-demo-environment.md',
       capability: 'Emergency Demo Environment',
-      route: '/workspace/emergency/demo',
+      route: '/emergency/whiteboard',
       service: 'EmergencyDemoEnvironmentService',
       acceptance: 'Prospects can experience ED OS without integrations.',
       status: 'implemented',
@@ -1031,7 +1031,7 @@ export const EMERGENCY_OS_IMPLEMENTATION_SUMMARY = Object.freeze({
     Object.freeze({
       doc: 'first-customer-path.md',
       capability: 'First Customer Path',
-      route: '/workspace/emergency/deployment',
+      route: '/emergency/settings',
       service: 'EMERGENCY_FIRST_CUSTOMER_DEPLOYMENT',
       acceptance: 'CareDroid can be piloted by an Emergency Department without requiring hospital-wide deployment.',
       status: 'implemented',
@@ -1379,7 +1379,7 @@ export const EMERGENCY_FLOW_SAAS_PACKAGING_MODEL = Object.freeze({
 });
 
 export const EMERGENCY_FLOW_INTELLIGENCE_PLATFORM = Object.freeze({
-  route: '/workspace/emergency/flow',
+  route: '/emergency/capacity',
   title: 'Emergency Flow Intelligence Platform',
   positioning:
     'A sellable ED flow, capacity, coordination, and cognitive-load platform for ED directors, COOs, EMS organizations, and hospital operations teams.',
@@ -1403,7 +1403,7 @@ export const EMERGENCY_FLOW_INTELLIGENCE_PLATFORM = Object.freeze({
 });
 
 export const EMERGENCY_ONBOARDING_EXPERIENCE = Object.freeze({
-  route: '/workspace/emergency/onboarding',
+  route: '/emergency/help',
   title: 'CareDroid Onboarding',
   goal: 'Help a new hospital understand CareDroid in 10 minutes.',
   audience: 'ED directors, triage nurses, clinical informatics leads, operations leaders, and implementation teams.',
@@ -1424,7 +1424,7 @@ export const EMERGENCY_ONBOARDING_EXPERIENCE = Object.freeze({
       summary:
         'Show how qSOFA, NEWS2, HEART, Wells PE, Wells DVT, Shock Index, NIHSS, and related calculators launch from ED context.',
       outcome: 'The team sees calculator standardization from chief complaint, vitals, and triage context.',
-      targetRoute: '/workspace/emergency/triage',
+      targetRoute: '/triage?queue=pretriage',
     }),
     Object.freeze({
       id: 'protocols',
@@ -1433,7 +1433,7 @@ export const EMERGENCY_ONBOARDING_EXPERIENCE = Object.freeze({
       summary:
         'Retrieve complaint-specific protocols and evidence for chest pain, stroke symptoms, sepsis concern, trauma, and shortness of breath.',
       outcome: 'The team sees faster protocol lookup with calculators, workflows, and simulations attached.',
-      targetRoute: '/workspace/emergency/evidence',
+      targetRoute: '/emergency/copilot',
     }),
     Object.freeze({
       id: 'ai-copilot',
@@ -1442,7 +1442,7 @@ export const EMERGENCY_ONBOARDING_EXPERIENCE = Object.freeze({
       summary:
         'Explain how ED Copilot turns complaint, vitals, workspace context, and automatically surfaced calculators into review-required workflow guidance.',
       outcome: 'The team understands explainability and that Copilot does not diagnose, order, disposition, or autonomously escalate.',
-      targetRoute: '/workspace/emergency/evidence',
+      targetRoute: '/emergency/copilot',
     }),
     Object.freeze({
       id: 'workflows',
@@ -1451,7 +1451,7 @@ export const EMERGENCY_ONBOARDING_EXPERIENCE = Object.freeze({
       summary:
         'Launch triage review, protocol guidance, automation queues, patient follow-up, and simulation practice from the Emergency Whiteboard.',
       outcome: 'The team sees how CareDroid turns guidance into coordinated next steps.',
-      targetRoute: '/workspace/emergency/automations',
+      targetRoute: '/automation',
     }),
     Object.freeze({
       id: 'analytics',
@@ -1460,7 +1460,7 @@ export const EMERGENCY_ONBOARDING_EXPERIENCE = Object.freeze({
       summary:
         'Review assessments completed, calculators used, protocol retrievals, workflow launches, AI requests, and simulation completion.',
       outcome: 'The team sees how adoption and ROI are measured from the first pilot.',
-      targetRoute: '/workspace/emergency/analytics',
+      targetRoute: '/emergency/analytics',
     }),
   ]),
   walkthrough: Object.freeze([
@@ -1474,31 +1474,31 @@ export const EMERGENCY_ONBOARDING_EXPERIENCE = Object.freeze({
       minute: '1-3',
       title: 'Show calculators in triage',
       instruction: 'Open triage and demonstrate calculator selection from chief complaint and vitals context.',
-      targetRoute: '/workspace/emergency/triage',
+      targetRoute: '/triage?queue=pretriage',
     }),
     Object.freeze({
       minute: '3-5',
       title: 'Retrieve protocols',
       instruction: 'Open evidence, choose a complaint, and show protocols, evidence, calculators, workflows, and simulations.',
-      targetRoute: '/workspace/emergency/evidence',
+      targetRoute: '/emergency/copilot',
     }),
     Object.freeze({
       minute: '5-7',
       title: 'Explain ED AI Copilot',
       instruction: 'Use Copilot guidance and call out reasoning, safety boundary, and clinician review requirement.',
-      targetRoute: '/workspace/emergency/evidence',
+      targetRoute: '/emergency/copilot',
     }),
     Object.freeze({
       minute: '7-9',
       title: 'Launch workflows',
       instruction: 'Open a command center or automation workflow to show how the workspace moves from guidance to action.',
-      targetRoute: '/workspace/emergency/automations',
+      targetRoute: '/automation',
     }),
     Object.freeze({
       minute: '9-10',
       title: 'Close with analytics',
       instruction: 'Open analytics and connect adoption metrics to standardization, time savings, training lift, and expansion.',
-      targetRoute: '/workspace/emergency/analytics',
+      targetRoute: '/emergency/analytics',
     }),
   ]),
   takeaway:

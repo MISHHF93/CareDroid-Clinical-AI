@@ -149,7 +149,9 @@ export type JourneyEventType =
   | 'EMSCriticalBroadcast'
   | 'EMSCriticalChecklistSaved'
   | 'ESCALATION'
-  | 'ESCALATION_CANCELLED';
+  | 'ESCALATION_CANCELLED'
+  | 'Handoff'
+  | 'FollowUpScheduled';
 
 export interface JourneyEvent {
   id: EntityId;
@@ -843,7 +845,8 @@ export type WorkflowActionType =
   | 'provincial_data_viewed'
   | 'integration_event_received'
   | 'clinical_score_saved'
-  | 'alert_lifecycle';
+  | 'alert_lifecycle'
+  | 'administrative_automation_reviewed';
 
 export interface ClinicalScoreSaveInput {
   patientId: string;

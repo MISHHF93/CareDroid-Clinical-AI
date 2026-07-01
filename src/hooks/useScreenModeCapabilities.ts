@@ -32,6 +32,8 @@ export type ScreenModeCapabilities = {
   showEmsCriticalOverlay: boolean;
   showCapacityEngine: boolean;
   showReassessmentEngine: boolean;
+  showPatientFlowEngine: boolean;
+  showAdministrativeAutomationEngine: boolean;
   headerDensity: 'comfortable' | 'compact' | 'wall';
   productLabel: string;
   alertVisibility: 'all' | 'critical' | 'operational' | 'redacted';
@@ -78,6 +80,8 @@ export function resolveScreenModeCapabilities(
     showEmsCriticalOverlay: !isReceptionScreen && !isWallKiosk,
     showCapacityEngine: !isReceptionScreen && !isWallKiosk,
     showReassessmentEngine: !isReceptionScreen && !isWallKiosk,
+    showPatientFlowEngine: !isReceptionScreen && !isWallKiosk,
+    showAdministrativeAutomationEngine: !isReceptionScreen && !isWallKiosk,
     headerDensity: config.density,
     productLabel: isReceptionScreen
       ? EMERGENCY_OS_BRANDING.receptionName

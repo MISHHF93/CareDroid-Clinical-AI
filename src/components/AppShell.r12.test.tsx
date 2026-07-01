@@ -10,6 +10,8 @@ import { startSimulation, stopSimulation } from '../engine/simulation';
 const mocks = vi.hoisted(() => ({
   startCapacityEngine: vi.fn(() => 222),
   startReassessmentEngine: vi.fn(() => 111),
+  startContinuousPatientFlowEngine: vi.fn(() => 333),
+  startAdministrativeAutomationEngine: vi.fn(() => 444),
   startSimulation: vi.fn(() => [333]),
   stopSimulation: vi.fn(),
   startEmergencyRealtime: vi.fn(() => vi.fn()),
@@ -39,6 +41,14 @@ vi.mock('../engine/capacityEngine', () => ({
 
 vi.mock('../engine/reassessmentEngine', () => ({
   startReassessmentEngine: mocks.startReassessmentEngine,
+}));
+
+vi.mock('../engine/continuousPatientFlowEngine', () => ({
+  startContinuousPatientFlowEngine: mocks.startContinuousPatientFlowEngine,
+}));
+
+vi.mock('../engine/administrativeAutomationEngine', () => ({
+  startAdministrativeAutomationEngine: mocks.startAdministrativeAutomationEngine,
 }));
 
 vi.mock('../engine/simulation', () => ({
@@ -149,6 +159,8 @@ describe('AppShell R12 startup wiring', () => {
     expect(mocks.startEmergencyRealtime).toHaveBeenCalledTimes(1);
     expect(startReassessmentEngine).toHaveBeenCalledTimes(1);
     expect(startCapacityEngine).toHaveBeenCalledTimes(1);
+    expect(mocks.startContinuousPatientFlowEngine).toHaveBeenCalledTimes(1);
+    expect(mocks.startAdministrativeAutomationEngine).toHaveBeenCalledTimes(1);
 
     await waitFor(() => expect(startSimulation).toHaveBeenCalledTimes(1));
 

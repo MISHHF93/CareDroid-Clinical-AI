@@ -28,6 +28,8 @@ export const EMERGENCY_OS_API_ENDPOINTS = Object.freeze({
   smartIntakeVerticalSlice: '/api/emergency/intake/vertical-slice',
   queues: '/api/emergency/queues',
   reassessment: '/api/emergency/reassessment',
+  patientFlow: '/api/emergency/patient-flow',
+  workflowOrchestration: '/api/emergency/workflow-orchestration',
   capacity: '/api/emergency/capacity',
   boarding: '/api/emergency/boarding',
   referrals: '/api/emergency/referrals',
@@ -84,6 +86,8 @@ export const ACTIVE_EMERGENCY_OS_API_ENDPOINT_KEYS = Object.freeze([
   'smartIntakeVerticalSlice',
   'queues',
   'reassessment',
+  'patientFlow',
+  'workflowOrchestration',
   'capacity',
   'boarding',
   'referrals',
@@ -188,6 +192,19 @@ export const fetchSmartIntake = () => requestEmergencyJson(EMERGENCY_OS_API_ENDP
 export const fetchEmergencyQueues = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.queues);
 export const fetchReassessmentQueue = () =>
   requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.reassessment);
+export const fetchPatientFlow = (patientId?: string) =>
+  requestEmergencyJson(
+    patientId
+      ? `${EMERGENCY_OS_API_ENDPOINTS.patientFlow}/${encodeURIComponent(patientId)}`
+      : EMERGENCY_OS_API_ENDPOINTS.patientFlow,
+  );
+export const fetchWorkflowOrchestration = () =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.workflowOrchestration);
+export const reviewWorkflowAutomation = (payload: Record<string, unknown>) =>
+  requestEmergencyJson(`${EMERGENCY_OS_API_ENDPOINTS.workflowOrchestration}/review`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
 export const fetchCapacityStatus = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.capacity);
 export const fetchBoardingStatus = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.boarding);
 export const fetchReferrals = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.referrals);
@@ -229,7 +246,7 @@ export const listClinicalCalculatorResults = ({ patientId, calculatorId }: any =
   return requestEmergencyJson(path);
 };
 
-/** Fire-and-forget copilot audit trail — never blocks clinical UI. */
+/** Fire-and-forget copilot audit trail ï¿½ never blocks clinical UI. */
 export function persistCopilotInteractionSafely(payload: any = {}) {
   void recordCopilotInteraction({
     requiresHumanReview: true,
@@ -383,6 +400,9 @@ export default Object.freeze({
   fetchSmartIntake,
   fetchEmergencyQueues,
   fetchReassessmentQueue,
+  fetchPatientFlow,
+  fetchWorkflowOrchestration,
+  reviewWorkflowAutomation,
   fetchCapacityStatus,
   fetchBoardingStatus,
   fetchReferrals,

@@ -46,6 +46,7 @@ const EmergencyShiftSummary  = lazyRoute(() => import('../pages/emergency/shift'
 const EMSPipeline            = lazyRoute(() => import('../components/EMSPipeline'));
 const DispatchConsole        = lazyRoute(() => import('../pages/emergency/DispatchConsole'));
 const FullJourneyOperatingPage = lazyRoute(() => import('../pages/emergency/FullJourneyOperatingPage'));
+const HospitalCommandCenter    = lazyRoute(() => import('../pages/emergency/HospitalCommandCenter'));
 const ReferralPanel          = lazyRoute(() => import('../components/ReferralPanel'));
 const IntegrationHubPage     = lazyRoute(() => import('../pages/integrations/IntegrationHubPage'));
 const SharedToolSession      = lazyRoute(() => import('../pages/tools/SharedToolSession'));
@@ -67,12 +68,7 @@ const PulmonologyAssistantPage        = lazyRoute(() => import('../pages/tools/P
 const HospitalMapDashboard         = lazyRoute(() => import('../pages/operations/HospitalMapDashboard'));
 const MedicalIotDashboard          = lazyRoute(() => import('../pages/operations/MedicalIotDashboard'));
 const DeviceFleetManagement        = lazyRoute(() => import('../pages/operations/DeviceFleetManagement'));
-// Executive
-const ExecutiveCommandCenter       = lazyRoute(() => import('../pages/executive/ExecutiveCommandCenter'));
-// AI
-const AiCommandCenterDashboard     = lazyRoute(() => import('../pages/ai/AiCommandCenterDashboard'));
-// Analytics
-const PredictiveAnalyticsDashboard = lazyRoute(() => import('../pages/analytics/PredictiveAnalyticsDashboard'));
+
 // Fleet
 const FleetDashboard               = lazyRoute(() => import('../pages/fleet/FleetDashboard'));
 const FleetLiveMap                 = lazyRoute(() => import('../pages/fleet/FleetLiveMap'));
@@ -732,8 +728,8 @@ export function AppRoutes() {
           path={CANONICAL_ROUTES.emergencyCommandCenter}
           element={
             <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyWhiteboard}>
-              <LazyRoute label="Loading command center...">
-                <FullJourneyOperatingPage view="journey" />
+              <LazyRoute label="Loading Hospital Command Center...">
+                <HospitalCommandCenter />
               </LazyRoute>
             </EmergencyRouteGuard>
           }
@@ -742,8 +738,8 @@ export function AppRoutes() {
           path={CANONICAL_ROUTES.emergencyJourney}
           element={
             <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyPatients}>
-              <LazyRoute label="Loading journey...">
-                <FullJourneyOperatingPage view="journey" />
+              <LazyRoute label="Loading Hospital Command Center...">
+                <HospitalCommandCenter />
               </LazyRoute>
             </EmergencyRouteGuard>
           }
@@ -1025,18 +1021,6 @@ export function AppRoutes() {
           element={<LazyRoute label="Loading Device Fleet..."><DeviceFleetManagement /></LazyRoute>}
         />
         <Route
-          path={CANONICAL_ROUTES.executive}
-          element={<LazyRoute label="Loading Executive Command Center..."><ExecutiveCommandCenter /></LazyRoute>}
-        />
-        <Route
-          path={CANONICAL_ROUTES.aiCommandCenter}
-          element={<LazyRoute label="Loading AI Command Center..."><AiCommandCenterDashboard /></LazyRoute>}
-        />
-        <Route
-          path={CANONICAL_ROUTES.predictiveAnalytics}
-          element={<LazyRoute label="Loading Predictive Analytics..."><PredictiveAnalyticsDashboard /></LazyRoute>}
-        />
-        <Route
           path={CANONICAL_ROUTES.medical3dViewer}
           element={<LazyRoute label="Loading 3D Anatomy Viewer..."><Medical3DViewer /></LazyRoute>}
         />
@@ -1134,6 +1118,11 @@ export function AppRoutes() {
       <Route path="/operations/:tool"   element={<ToolsRedirect />} />
       <Route path="/digital-twin"       element={<ToolsRedirect />} />
 
+      {/* ── Legacy dashboards → ED OS journey surfaces ── */}
+      <Route path={CANONICAL_ROUTES.executive} element={<Navigate to={CANONICAL_ROUTES.emergencyCommandCenter} replace />} />
+      <Route path={CANONICAL_ROUTES.aiCommandCenter} element={<Navigate to={CANONICAL_ROUTES.emergencyCopilot} replace />} />
+      <Route path={CANONICAL_ROUTES.predictiveAnalytics} element={<Navigate to={CANONICAL_ROUTES.emergencyAnalytics} replace />} />
+
       {/* ── Copilot / AI aliases ── */}
       <Route path="/assistant" element={<EmergencyAliasRedirect to={CANONICAL_ROUTES.emergencyCopilot} />} />
       <Route path="/chat"      element={<EmergencyAliasRedirect to={CANONICAL_ROUTES.emergencyCopilot} />} />
@@ -1141,7 +1130,7 @@ export function AppRoutes() {
       <Route path="/copilot"   element={<EmergencyAliasRedirect to={CANONICAL_ROUTES.emergencyCopilot} />} />
 
       {/* ── Generic fallbacks ── */}
-      <Route path="/dashboard"          element={<EmergencyAliasRedirect to={CANONICAL_ROUTES.emergencyWhiteboard} />} />
+      <Route path="/dashboard"          element={<EmergencyAliasRedirect to={CANONICAL_ROUTES.emergencyCommandCenter} />} />
       <Route path="/home"               element={<EmergencyDefaultRedirect />} />
       <Route path="/app"                element={<EmergencyDefaultRedirect />} />
       <Route path="/mobile"             element={<EmergencyDefaultRedirect />} />

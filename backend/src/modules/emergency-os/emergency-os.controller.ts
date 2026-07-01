@@ -37,6 +37,8 @@ import {
 import { PatientDocumentArtifactService } from './patient-document-artifact.service';
 import { ClinicalDecisionSupportService } from './clinical-decision-support.service';
 import { EmergencyPatientAuditService } from './emergency-patient-audit.service';
+import { PatientFlowService } from './emergency-os.patient-flow.service';
+import { WorkflowOrchestrationService } from './emergency-os.workflow-orchestration.service';
 import type {
   RecordClinicalCalculatorDto,
   RecordCopilotInteractionDto,
@@ -81,6 +83,8 @@ export class EmergencyOsController {
     private readonly documentArtifactService: PatientDocumentArtifactService,
     private readonly clinicalDecisionSupportService: ClinicalDecisionSupportService,
     private readonly patientAuditService: EmergencyPatientAuditService,
+    private readonly patientFlowService: PatientFlowService,
+    private readonly workflowOrchestrationService: WorkflowOrchestrationService,
   ) {}
 
   @Get('whiteboard')
@@ -375,6 +379,26 @@ export class EmergencyOsController {
   @Get('reassessment')
   getReassessment() {
     return this.reassessmentService.getReassessmentQueue();
+  }
+
+  @Get('workflow-orchestration')
+  getWorkflowOrchestration() {
+    return this.workflowOrchestrationService.getWorkflowOrchestration();
+  }
+
+  @Post('workflow-orchestration/review')
+  reviewWorkflowAutomation(@Body() body: import('../../../../src/types/administrativeAutomation').ReviewAdministrativeAutomationInput) {
+    return this.workflowOrchestrationService.reviewTask(body);
+  }
+
+  @Get('patient-flow')
+  getPatientFlow() {
+    return this.patientFlowService.getPatientFlow();
+  }
+
+  @Get('patient-flow/:patientId')
+  getPatientFlowForPatient(@Param('patientId') patientId: string) {
+    return this.patientFlowService.getPatientFlow(patientId);
   }
 
   @Get('capacity')

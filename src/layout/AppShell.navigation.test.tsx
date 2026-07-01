@@ -73,6 +73,14 @@ vi.mock('../engine/reassessmentEngine', () => ({
   startReassessmentEngine: () => 0,
 }));
 
+vi.mock('../engine/continuousPatientFlowEngine', () => ({
+  startContinuousPatientFlowEngine: () => 0,
+}));
+
+vi.mock('../engine/administrativeAutomationEngine', () => ({
+  startAdministrativeAutomationEngine: () => 0,
+}));
+
 vi.mock('../engine/capacityEngine', () => ({
   startCapacityEngine: () => 0,
 }));

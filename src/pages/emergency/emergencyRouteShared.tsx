@@ -1,11 +1,13 @@
 import type { ReactNode } from 'react';
 import PatientCard from '../../components/PatientCard';
 import HelpTrigger from '../../components/help/HelpTrigger';
+import EdJourneyProgressRail from '../../components/emergency/EdJourneyProgressRail';
 import { PageShell } from '../../components/ui/CareDroidPrimitives';
 import { PatientFlag, PatientState } from '../../types/emergency';
 import { resolveEdDataFreshness, resolveEdSourceLabel } from '../../utils/edDataSource';
 import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
 import { metricColorForTone } from '../../config/semanticColorSystem';
+import useEdOperatingSurface from '../../hooks/useEdOperatingSurface';
 import './emergency-route.css';
 
 export type WorkflowSituationTone = 'neutral' | 'info' | 'warning' | 'critical';
@@ -127,10 +129,18 @@ export function EmergencyRoutePage({
   actions = undefined,
   maturity = undefined,
   situationBrief = undefined,
+  showJourneyRail = true,
 }: any = {}) {
   const surfaces = usePractitionerSurfaceVisibility();
+  const operatingSurface = useEdOperatingSurface();
   const compactLayout = surfaces.compactLayout;
   const showDescription = description && surfaces.emergencyRoutes.showDescriptions;
+  const resolvedSituationBrief = situationBrief ?? operatingSurface.situationBrief ?? undefined;
+  const resolvedEyebrow =
+    eyebrow ??
+    (operatingSurface.phaseLabel
+      ? `ED OS · ${operatingSurface.phaseLabel}`
+      : undefined);
   const headerActions = (
     <>
       {actions}
@@ -142,7 +152,7 @@ export function EmergencyRoutePage({
   return (
     <PageShell
       as="section"
-      eyebrow={surfaces.chrome.showPageEyebrow ? eyebrow : undefined}
+      eyebrow={surfaces.chrome.showPageEyebrow ? resolvedEyebrow : undefined}
       title={title}
       titleId={titleId}
       description={showDescription ? description : undefined}
@@ -154,7 +164,14 @@ export function EmergencyRoutePage({
       contentClassName="emergency-route-page__content"
       aria-label={title}
     >
-      {situationBrief ? <WorkflowSituationBrief {...situationBrief} /> : null}
+      {showJourneyRail && operatingSurface.phaseId ? (
+        <EdJourneyProgressRail
+          activePhaseId={operatingSurface.phaseId}
+          ownerRole={operatingSurface.ownerRole}
+          priorityLabel={operatingSurface.priority}
+        />
+      ) : null}
+      {resolvedSituationBrief ? <WorkflowSituationBrief {...resolvedSituationBrief} /> : null}
       {children}
     </PageShell>
   );

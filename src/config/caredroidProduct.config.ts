@@ -5,26 +5,26 @@
 
 export const CAREDROID_PRODUCT = Object.freeze({
   name: 'CareDroid',
-  tagline: 'Reception-first emergency department operating platform',
-  platformLine: 'Reception-first emergency department operations',
+  tagline: 'Emergency Department Operating System',
+  platformLine: 'Emergency Department Operating System',
   firstResolutionLine:
-    'First-resolution ED platform — reception and registration resolve arrivals before clinical handoff.',
+    'One ED OS orchestrating the full patient journey — from emergency call or walk-in through reception, triage, treatment, disposition, and analytics.',
   evolutionSummary:
-    'Evolved from general medtech tooling to an emergency operating layer, then to a reception-first, role-profiled ED platform.',
+    'Consolidated from fragmented dashboards into one emergency department operating system with reception-first arrival resolution and role-profiled journey stages.',
   copilotBadge: 'Copilot',
   copilotName: 'CareDroid Copilot',
   receptionName: 'Arrival Dashboard',
   receptionRoute: '/emergency/reception',
   receptionSummary:
-    'Front-desk operations: see inbound ambulances before arrival, search, prepare patient cards, verify identity, and hand off to triage.',
+    'Reception-first front desk: see inbound ambulances before arrival, search, prepare patient cards, verify identity, and hand off to triage.',
   whiteboardName: 'Department Whiteboard',
   whiteboardRoute: '/emergency/whiteboard',
   safetyLine: 'Decision support only. Human review is required for clinical actions.',
   safetyShort: 'Human-reviewed decision support',
   whiteboardSummary:
-    'Operational awareness for charge nurse, physician, and department displays after reception prepares each patient card.',
+    'Department operating picture — who-next, flow, capacity, and critical actions after reception prepares each patient card.',
   roleFlowSummary:
-    'Reception and registration prepare the patient card first; EMS, triage, charge, and bedside teams consume the shared ED operating picture.',
+    'One journey from call or walk-in through reception, triage, diagnostics, treatment, disposition, and reporting — every surface shows state, owner, and next action.',
   copilotIntro:
     'CareDroid Copilot supports routing, context, evidence, and workflow prompts without making autonomous clinical decisions.',
   copilotRole:

@@ -247,11 +247,14 @@ describe('canonical App routes deep links', () => {
     );
   }, 20_000);
 
-  it('mounts the AI command center route', async () => {
+  it('redirects the AI command center into the ED OS (no standalone dashboard)', async () => {
     render(<AppRouteHarness initialPath="/ai-command-center" />);
 
-    expect(await screen.findByRole('main')).toBeInTheDocument();
-    expect(screen.getByTestId('location')).toHaveTextContent('/ai-command-center');
+    await waitFor(() => {
+      const location = screen.getByTestId('location').textContent || '';
+      expect(location).not.toContain('/ai-command-center');
+      expect(location).toMatch(/\/emergency\//);
+    });
   }, 20_000);
 
   it('mounts local shared tool sessions before wildcard redirects', async () => {

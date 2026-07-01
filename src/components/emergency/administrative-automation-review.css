@@ -1,0 +1,122 @@
+.automation-review {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.automation-review__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.automation-review__lead {
+  margin: 0.25rem 0 0;
+  color: var(--text-muted, #64748b);
+  font-size: 0.875rem;
+}
+
+.automation-review__metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  font-size: 0.8125rem;
+  color: var(--text-muted, #64748b);
+}
+
+.automation-review__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.automation-review__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  background: #f8fafc;
+  border-left: 3px solid #94a3b8;
+}
+
+.automation-review__row--critical {
+  border-left-color: #dc2626;
+}
+
+.automation-review__row--high {
+  border-left-color: #d97706;
+}
+
+.automation-review__row-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.automation-review__category {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #475569;
+}
+
+.automation-review__row p {
+  margin: 0.35rem 0 0;
+  font-size: 0.875rem;
+}
+
+.automation-review__action {
+  color: #334155;
+}
+
+.automation-review__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.35rem;
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.automation-review__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 6.5rem;
+}
+
+.automation-review__btn {
+  border: 1px solid #cbd5e1;
+  border-radius: 0.375rem;
+  padding: 0.3rem 0.55rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: #fff;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+}
+
+.automation-review__btn--approve {
+  background: #0f766e;
+  border-color: #0f766e;
+  color: #fff;
+}
+
+.automation-review__btn--dismiss {
+  color: #64748b;
+}
+
+.automation-review__btn--ghost {
+  background: #f8fafc;
+}
+
+.automation-review__empty,
+.automation-review__safety {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--text-muted, #64748b);
+}

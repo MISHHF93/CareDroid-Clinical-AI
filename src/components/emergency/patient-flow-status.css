@@ -1,0 +1,121 @@
+.patient-flow-status {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.patient-flow-status__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.patient-flow-status__lead {
+  margin: 0.25rem 0 0;
+  color: var(--text-muted, #64748b);
+  font-size: 0.875rem;
+}
+
+.patient-flow-status__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem 1rem;
+  margin: 0;
+}
+
+.patient-flow-status__grid dt {
+  font-size: 0.75rem;
+  color: var(--text-muted, #64748b);
+}
+
+.patient-flow-status__grid dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.patient-flow-status__badge {
+  border-radius: 999px;
+  padding: 0.15rem 0.55rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.patient-flow-status__badge--clear,
+.patient-flow-status__badge--watch {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.patient-flow-status__badge--congestion {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.patient-flow-status__badge--overload,
+.patient-flow-status__badge--handoff-delay {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.patient-flow-status__metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  font-size: 0.875rem;
+  color: var(--text-muted, #64748b);
+}
+
+.patient-flow-status__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.patient-flow-status__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.5rem;
+  background: #f8fafc;
+}
+
+.patient-flow-status__row--critical {
+  border-left: 3px solid #dc2626;
+}
+
+.patient-flow-status__row--warning {
+  border-left: 3px solid #d97706;
+}
+
+.patient-flow-status__row p,
+.patient-flow-status__row span {
+  margin: 0.15rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--text-muted, #64748b);
+}
+
+.patient-flow-status__recommendation,
+.patient-flow-status__reason {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.patient-flow-status__recommendations ul {
+  margin: 0.35rem 0 0;
+  padding-left: 1rem;
+}
+
+.patient-flow-status__empty {
+  margin: 0;
+  color: var(--text-muted, #64748b);
+}
+
+.patient-flow-status__link {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+}

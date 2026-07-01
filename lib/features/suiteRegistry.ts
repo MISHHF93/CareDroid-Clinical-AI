@@ -140,9 +140,10 @@ export const FEATURE_SUITE_ASSIGNMENTS: Readonly<Record<string, FeatureSuiteAssi
     smart_intake: {
       suiteId: 'reception_arrival',
       layer: 'core',
-      maturity: 'demo',
+      maturity: 'live',
       whiteboardLink: 'patient_card',
-      route: '/emergency/intake',
+      route: '/emergency/reception',
+      notes: 'Consolidated into ReceptionWorkspace; standalone intake redirects when reception-first UX is on.',
     },
     intake_ai_suggest: {
       suiteId: 'reception_arrival',
@@ -454,9 +455,9 @@ export const FEATURE_SUITE_ASSIGNMENTS: Readonly<Record<string, FeatureSuiteAssi
     command_predictive_alerts: {
       suiteId: 'charge_nurse_command',
       layer: 'core',
-      maturity: 'demo',
+      maturity: 'live',
       whiteboardLink: 'role_view',
-      route: '/emergency/whiteboard',
+      route: '/emergency/command-center',
     },
     patient_whiteboard: {
       suiteId: 'emergency_whiteboard',

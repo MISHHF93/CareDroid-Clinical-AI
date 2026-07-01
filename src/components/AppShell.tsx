@@ -7,6 +7,8 @@ import ErrorBoundary from './ErrorBoundary';
 import { useEmergencyStore, type EmergencyWebSocketStatus } from '../store/emergencyStore';
 import { startReassessmentEngine } from '../engine/reassessmentEngine';
 import { startCapacityEngine } from '../engine/capacityEngine';
+import { startContinuousPatientFlowEngine } from '../engine/continuousPatientFlowEngine';
+import { startAdministrativeAutomationEngine } from '../engine/administrativeAutomationEngine';
 import { fetchCareDroidCentralNodeSnapshot } from '../services/emergencyOsApi';
 import { probeBackendReachability, isBackendKnownOffline } from '../services/backendReachability';
 import { ensureDevBackendSession } from '../services/devBackendAuth';
@@ -80,6 +82,8 @@ function isPatientFlaggedForReassessment(patient: Patient): boolean {
 const EMERGENCY_OS_PAGE_TITLES: Record<string, string> = {
   '/emergency': `${EMERGENCY_OS_BRANDING.productName} - Board`,
   [CANONICAL_ROUTES.emergencyWhiteboard]: `${EMERGENCY_OS_BRANDING.productName} - Board`,
+  [CANONICAL_ROUTES.emergencyCommandCenter]: `${EMERGENCY_OS_BRANDING.productName} - Hospital Command Center`,
+  [CANONICAL_ROUTES.emergencyJourney]: `${EMERGENCY_OS_BRANDING.productName} - Hospital Command Center`,
   [CANONICAL_ROUTES.emergencyPatients]: `${EMERGENCY_OS_BRANDING.productName} - Patients`,
   [CANONICAL_ROUTES.emergencyEms]: `${EMERGENCY_OS_BRANDING.productName} - EMS Coordination`,
   [CANONICAL_ROUTES.emergencyIntake]: `${EMERGENCY_OS_BRANDING.productName} - Intake`,
@@ -104,6 +108,10 @@ const EMERGENCY_OS_PAGE_TITLES: Record<string, string> = {
 const EMERGENCY_OS_PAGE_SUBTITLES: Record<string, string> = {
   '/emergency': 'Patient flow, capacity, EMS, and reassessment status.',
   [CANONICAL_ROUTES.emergencyWhiteboard]: 'Operational awareness after reception prepares each patient card.',
+  [CANONICAL_ROUTES.emergencyCommandCenter]:
+    'Real-time ED operational awareness — actionable metrics, critical actions, bottlenecks, and compliance.',
+  [CANONICAL_ROUTES.emergencyJourney]:
+    'Real-time ED operational awareness — actionable metrics, critical actions, bottlenecks, and compliance.',
   [CANONICAL_ROUTES.emergencyPatients]: 'Active patient census and patient detail timeline.',
   [CANONICAL_ROUTES.emergencyEms]: 'Inbound EMS coordination, offload pressure, and handoff actions.',
   [CANONICAL_ROUTES.emergencyIntake]: 'Identity verification and patient creation workflow.',
@@ -371,6 +379,12 @@ function AppShellFrame({ children }: AppShellProps) {
     const capacityInterval = screenCapabilities.showCapacityEngine
       ? startCapacityEngine()
       : undefined;
+    const patientFlowInterval = screenCapabilities.showPatientFlowEngine
+      ? startContinuousPatientFlowEngine()
+      : undefined;
+    const administrativeAutomationInterval = screenCapabilities.showAdministrativeAutomationEngine
+      ? startAdministrativeAutomationEngine()
+      : undefined;
     const alertsInterval = window.setInterval(() => {
       useEmergencyStore.getState().updateAlerts();
       void import('../services/alertLifecycleOrchestrator').then(({ checkUnacknowledgedAlertEscalations }) =>
@@ -391,6 +405,10 @@ function AppShellFrame({ children }: AppShellProps) {
       stopRealtime?.();
       if (reassessmentInterval !== undefined) window.clearInterval(reassessmentInterval);
       if (capacityInterval !== undefined) window.clearInterval(capacityInterval);
+      if (patientFlowInterval !== undefined) window.clearInterval(patientFlowInterval);
+      if (administrativeAutomationInterval !== undefined) {
+        window.clearInterval(administrativeAutomationInterval);
+      }
       window.clearInterval(alertsInterval);
       stopSimulation?.();
       startupStartedRef.current = false;
@@ -398,6 +416,8 @@ function AppShellFrame({ children }: AppShellProps) {
   }, [
     screenCapabilities.showCapacityEngine,
     screenCapabilities.showReassessmentEngine,
+    screenCapabilities.showPatientFlowEngine,
+    screenCapabilities.showAdministrativeAutomationEngine,
     simulationModeActive,
   ]);
 

@@ -34,6 +34,7 @@ import HighRiskComplaintFlagBadge from './reception/HighRiskComplaintFlagBadge';
 import FitToWaitBadge from './waiting-room/FitToWaitBadge';
 import PatientExperienceStatusBadge from './patient-experience/PatientExperienceStatusBadge';
 import WhatHappensNextBadge from './guidance/WhatHappensNextBadge';
+import PatientFlowBadge from './emergency/PatientFlowBadge';
 import QueueReasonBadge from './queues/QueueReasonBadge';
 import { isInQueueFlow } from '../services/queueReasonVisibility';
 import { resolvePatientQueueTiming } from '../services/patientQueueTimingModel';
@@ -740,6 +741,7 @@ function PatientCard({
         {cardDensity.showWhatHappensNext ? (
           <WhatHappensNextBadge patient={patient} referrals={referrals} staff={staff} compact showGuidance />
         ) : null}
+        {cardDensity.showWhatHappensNext ? <PatientFlowBadge patient={patient} /> : null}
         {cardDensity.showLwbsAndDeterioration && patient.state === PatientState.Waiting ? (
           <LwbsRiskBadge
             patient={patient}

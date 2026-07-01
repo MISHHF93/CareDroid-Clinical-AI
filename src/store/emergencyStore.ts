@@ -118,6 +118,11 @@ import {
 } from '../services/patientDocumentArtifactApi';
 import type { PatientDocumentArtifact } from '../types/patientDocumentArtifact';
 import { calculateCapacity } from '../engine/capacityEngine';
+import { buildContinuousPatientFlowSnapshot } from '../engine/continuousPatientFlowEngine';
+import {
+  buildAdministrativeAutomationSnapshot,
+  reviewAdministrativeAutomationTask,
+} from '../services/unifiedClinicalWorkflowOrchestrator';
 import { normalizeAlert } from '../engine/alertEngineDerived';
 import {
   registerArrivalControl as registerArrivalControlLayer,
@@ -2400,6 +2405,8 @@ interface EmergencyStoreState {
   thresholds: EmergencyThresholds;
   emergencySettings: EmergencyOsSettings;
   lastPulseView: number | null;
+  patientFlowSnapshot: import('../engine/continuousPatientFlowEngine').ContinuousPatientFlowSnapshot | null;
+  administrativeAutomationQueue: import('../types/administrativeAutomation').AdministrativeAutomationTask[];
 
   addPatient: (patient: Patient, options?: { syncToBackend?: boolean }) => void;
   registerArrivalControl: (
@@ -2477,6 +2484,17 @@ interface EmergencyStoreState {
   setQueueFilter: (filter: string | null) => void;
   setWhiteboardSearchQuery: (query: string) => void;
   setLastPulseView: (timestamp: number) => void;
+  setPatientFlowSnapshot: (
+    snapshot: import('../engine/continuousPatientFlowEngine').ContinuousPatientFlowSnapshot,
+  ) => void;
+  refreshPatientFlow: () => import('../engine/continuousPatientFlowEngine').ContinuousPatientFlowSnapshot;
+  setAdministrativeAutomationQueue: (
+    tasks: import('../types/administrativeAutomation').AdministrativeAutomationTask[],
+  ) => void;
+  refreshAdministrativeAutomations: () => import('../types/administrativeAutomation').AdministrativeAutomationSnapshot;
+  reviewAdministrativeAutomation: (
+    input: import('../types/administrativeAutomation').ReviewAdministrativeAutomationInput,
+  ) => import('../types/administrativeAutomation').AdministrativeAutomationTask | null;
   setLoading: (loading: boolean) => void;
   toggleCopilot: () => void;
   setCopilotOpen: (open: boolean) => void;
@@ -2871,6 +2889,8 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
     thresholds: initialThresholds,
     emergencySettings: initialEmergencySettings,
     lastPulseView: readLastPulseViewTimestamp(),
+    patientFlowSnapshot: null,
+    administrativeAutomationQueue: [],
     alerts: initialScenarioState.alerts || [
       {
         id: 'a1',
@@ -4611,6 +4631,34 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         return;
       }
 
+      if (type === 'workflow_orchestration_updated') {
+        const orchestrationPayload = unwrapData(payload);
+        const tasks =
+          firstValue(orchestrationPayload, ['tasks', 'snapshot.tasks']) ||
+          (orchestrationPayload as { snapshot?: { tasks?: unknown } })?.snapshot?.tasks;
+        if (Array.isArray(tasks)) {
+          set({
+            administrativeAutomationQueue:
+              tasks as import('../types/administrativeAutomation').AdministrativeAutomationTask[],
+          });
+        } else {
+          get().refreshAdministrativeAutomations();
+        }
+        return;
+      }
+
+      if (type === 'patient_flow_updated') {
+        const flowPayload = unwrapData(payload);
+        const snapshot =
+          firstValue(flowPayload, ['patientFlowSnapshot', 'snapshot', 'patientFlow']) || flowPayload;
+        if (snapshot && typeof snapshot === 'object' && 'engineId' in (snapshot as object)) {
+          set({ patientFlowSnapshot: snapshot as import('../engine/continuousPatientFlowEngine').ContinuousPatientFlowSnapshot });
+        } else {
+          get().refreshPatientFlow();
+        }
+        return;
+      }
+
       if (['capacity_updated', 'capacity_changed', 'capacity_score_changed'].includes(type)) {
         const capacity = firstValue(unwrapData(payload), ['capacity', 'capacityStatus']) || payload;
         const capacityRecord = asRecord(capacity);
@@ -4812,6 +4860,63 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       void import('../services/alertLifecycleOrchestrator').then(({ transitionAlertLifecycle }) =>
         transitionAlertLifecycle(alertId, 'dismiss', { sourceScreen: 'emergency-store' }),
       );
+    },
+
+    setPatientFlowSnapshot: (snapshot) =>
+      set({ patientFlowSnapshot: snapshot }),
+
+    refreshPatientFlow: () => {
+      const state = get();
+      const snapshot = buildContinuousPatientFlowSnapshot({
+        patients: state.patients,
+        staff: state.staff,
+        referrals: state.referrals,
+        capacity: state.capacity,
+        alerts: state.alerts,
+        emergencySettings: state.emergencySettings,
+      });
+      set({ patientFlowSnapshot: snapshot });
+      return snapshot;
+    },
+
+    setAdministrativeAutomationQueue: (tasks) => set({ administrativeAutomationQueue: tasks }),
+
+    refreshAdministrativeAutomations: () => {
+      const state = get();
+      const snapshot = buildAdministrativeAutomationSnapshot({
+        patients: state.patients,
+        staff: state.staff,
+        referrals: state.referrals,
+        alerts: state.alerts,
+        emsArrivals: state.emsArrivals,
+        capacity: state.capacity,
+        existingTasks: state.administrativeAutomationQueue,
+      });
+      set({ administrativeAutomationQueue: [...snapshot.tasks] });
+      return snapshot;
+    },
+
+    reviewAdministrativeAutomation: (input) => {
+      const state = get();
+      const result = reviewAdministrativeAutomationTask(
+        state.administrativeAutomationQueue,
+        input,
+        {
+          patients: state.patients,
+          movePatientToState: state.movePatientToState,
+          updatePatient: state.updatePatient,
+          setQueueFilter: state.setQueueFilter,
+          selectPatient: state.selectPatient,
+          recordWorkflowAction: state.recordWorkflowAction,
+          emergencySettings: state.emergencySettings,
+          assignStaff: state.assignStaff,
+          addNote: state.addNote,
+          escalatePatient: state.escalatePatient,
+        },
+      );
+      if (!result.task) return null;
+      set({ administrativeAutomationQueue: result.tasks });
+      return result.task;
     },
 
     setCapacity: (capacity) =>
