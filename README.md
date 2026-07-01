@@ -364,6 +364,7 @@ CareDroid is designed with audit-minded SaaS patterns. **It does not claim HIPAA
 | Document | Audience |
 |----------|----------|
 | [AI Features Reference](docs/AI_FEATURES.md) | Developers, clinical informatics, AI reviewers |
+| [AI Patient Intake](docs/AI_PATIENT_INTAKE.md) | Clinical informatics, registration, EMS coordinators |
 | [Medical KPIs & Biomedical Informatics](docs/MEDICAL_KPIS_AND_BIOMEDICAL_INFORMATICS.md) | Clinical informatics, biomedical engineers, clinical leads |
 | [AI Architecture](docs/ai/ai-documentation.md) | Developers, AI reviewers |
 | [User Manual](docs/manuals/caredroid-master-user-manual.md) | ED staff, clinical evaluators, Codespace testers |
