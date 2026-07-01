@@ -167,9 +167,9 @@
   --sidebar-width-expanded: 248px;
   --sidebar-width-collapsed: 58px;
   --sidebar-drawer-max-width: min(264px, 88vw);
-  --app-shell-header-height: 56px;
-  --app-shell-compact-header-height: 56px;
-  --app-sidebar-header-height: 56px;
+  --app-shell-header-height: var(--cdl-header-height, 52px);
+  --app-shell-compact-header-height: var(--cdl-header-height, 52px);
+  --app-sidebar-header-height: var(--cdl-header-height, 52px);
   --app-sidebar-header-padding-x: 10px;
   --app-mobile-page-padding: var(--app-page-padding-compact);
   --app-desktop-page-padding: var(--app-page-padding-roomy);

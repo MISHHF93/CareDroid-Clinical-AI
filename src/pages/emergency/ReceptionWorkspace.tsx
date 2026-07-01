@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FolderOpen, ShieldCheck } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import HelpTrigger from '../../components/help/HelpTrigger';
+import ArrivalControlSummaryStrip from '../../components/reception/ArrivalControlSummaryStrip';
 import ReceptionDeskToolbar from '../../components/reception/ReceptionDeskToolbar';
 import ReceptionEscalationAttentionStrip from '../../components/reception/ReceptionEscalationAttentionStrip';
 import ReceptionOperationalRail from '../../components/reception/ReceptionOperationalRail';
@@ -35,6 +36,7 @@ import { completeProvisionalIntake } from '../../services/provisionalIdentityInt
 import { WorkflowSituationBrief } from './emergencyRouteShared';
 import './ReceptionWorkspace.css';
 import './emergency-route.css';
+import '../../styles/reception-desk-theme.css';
 
 const EMPTY_DRAFT: ReceptionIntakeDraft = {
   arrivalType: 'walk-in',
@@ -462,7 +464,10 @@ export default function ReceptionWorkspace() {
   };
 
   return (
-    <section className="reception-command reception-front-door" aria-labelledby="reception-command-title">
+    <section
+      className="reception-workspace reception-command reception-front-door"
+      aria-labelledby="reception-command-title"
+    >
       <header className="reception-command-header reception-front-door__header">
         <div>
           <p className="reception-command-header__eyebrow">{RECEPTION_COPY.workspace.eyebrow}</p>
@@ -528,21 +533,32 @@ export default function ReceptionWorkspace() {
       />
 
       {receptionDesk.enabled ? (
-        <ReceptionDeskToolbar
-          canCreatePatient={receptionCapabilities.canCreatePatient}
-          canVerifyIntake={receptionCapabilities.canVerifyIdentity}
-          canEscalateToNurse={receptionCapabilities.canEscalateToNurse}
-          canOpenPrepareChooser={receptionCapabilities.canCaptureArrivalReason}
-          canOpenSmartIntake={receptionCapabilities.canOpenSmartIntake}
-          activeQueueTab={activeQueueTab}
-          onRegisterWalkIn={resetForNextPatient}
-          onCheckIdentity={() => openSmartIntake({ step: 'capture', autostart: true })}
-          onOtherArrivals={() => setShowChooser(true)}
-          onEscalate={() => profileNavigate(`${CANONICAL_ROUTES.emergencyQueues}?queue=pretriage`)}
-          onFocusEms={() => focusQueueTab('ems')}
-          onFocusVerification={() => focusQueueTab('verification')}
-          onFocusPretriage={() => focusQueueTab('pretriage')}
-        />
+        <>
+          <ReceptionDeskToolbar
+            canCreatePatient={receptionCapabilities.canCreatePatient}
+            canVerifyIntake={receptionCapabilities.canVerifyIdentity}
+            canEscalateToNurse={receptionCapabilities.canEscalateToNurse}
+            canOpenPrepareChooser={receptionCapabilities.canCaptureArrivalReason}
+            canOpenSmartIntake={receptionCapabilities.canOpenSmartIntake}
+            activeQueueTab={activeQueueTab}
+            onRegisterWalkIn={resetForNextPatient}
+            onCheckIdentity={() => openSmartIntake({ step: 'capture', autostart: true })}
+            onOtherArrivals={() => setShowChooser(true)}
+            onEscalate={() => profileNavigate(`${CANONICAL_ROUTES.emergencyQueues}?queue=pretriage`)}
+            onFocusEms={() => focusQueueTab('ems')}
+            onFocusVerification={() => focusQueueTab('verification')}
+            onFocusPretriage={() => focusQueueTab('pretriage')}
+          />
+          <ArrivalControlSummaryStrip
+            patients={receptionQueueAll}
+            onMetricSelect={({ queueTab }) => {
+              if (queueTab === 'verification' || queueTab === 'pretriage') {
+                focusQueueTab(queueTab);
+              }
+            }}
+            className="reception-front-door__arrival-summary"
+          />
+        </>
       ) : null}
 
       <Stepper draft={draft} aiAssist={aiAssist} result={result} />

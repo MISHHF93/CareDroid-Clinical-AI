@@ -20,6 +20,7 @@ import {
 } from '../../services/cadIntegrationService';
 import { createReadinessPlan } from '../../services/edReadinessService';
 import type { EmergencyCall, CallPriority, DispatchAssignment } from '../../types/emergency';
+import './DispatchConsole.css';
 
 const CALL_PRIORITY_COLORS: Record<CallPriority, string> = {
   Echo: MEDICAL_TYPE.statusCritical,
@@ -69,12 +70,11 @@ function PriorityBadge({ priority }: { priority: CallPriority }) {
 function SummaryCard({ label, value, highlight }: { label: string; value: number; highlight?: boolean }) {
   return (
     <div
+      className={`dispatch-console__summary-card${highlight && value > 0 ? ' dispatch-console__summary-card--highlight' : ''}`}
       style={{
         padding: '12px 16px',
-        borderRadius: 10,
-        background: MEDICAL_THEME.surfaceCard,
-        border: highlight && value > 0 ? `1px solid ${MEDICAL_TYPE.statusCritical}` : `1px solid ${MEDICAL_THEME.border}`,
         minWidth: 90,
+        border: highlight && value > 0 ? `1px solid ${MEDICAL_TYPE.statusCritical}` : undefined,
       }}
     >
       <div style={{ fontSize: 22, fontWeight: 800, color: highlight && value > 0 ? MEDICAL_TYPE.statusCritical : MEDICAL_THEME.ink }}>
@@ -571,11 +571,9 @@ function CallCard({
 
   return (
     <div
+      className={`dispatch-console__call-card${isOverTarget ? ' dispatch-console__call-card--breach' : ''}`}
       style={{
         padding: 14,
-        borderRadius: 10,
-        border: isOverTarget ? `2px solid ${MEDICAL_TYPE.statusCritical}` : `1px solid ${MEDICAL_THEME.border}`,
-        background: MEDICAL_THEME.surfaceCard,
         display: 'flex',
         flexDirection: 'column',
         gap: 8,
@@ -724,17 +722,7 @@ function CADUnitBoard() {
   }, []);
 
   return (
-    <div
-      style={{
-        padding: 16,
-        borderRadius: 10,
-        border: `1px solid ${MEDICAL_THEME.border}`,
-        background: MEDICAL_THEME.surfaceCard,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 10,
-      }}
-    >
+    <div className="dispatch-console__unit-board" style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <strong style={{ fontSize: 13 }}>CAD Unit Board</strong>
         <span style={{ fontSize: 11, color: MEDICAL_THEME.inkSubtle }}>Auto-refreshes every 5s</span>
@@ -809,25 +797,15 @@ export default function DispatchConsole() {
   ).length;
 
   return (
-    <div
-      style={{
-        padding: 24,
-        minHeight: '100%',
-        background: MEDICAL_THEME.surfacePage,
-        color: MEDICAL_THEME.ink,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 20,
-      }}
-    >
+    <div className="dispatch-console">
       {/* Sticky critical banner */}
       {criticalPending > 0 && (
         <div
+          className="dispatch-console__banner"
           style={{
             padding: '10px 16px',
-            borderRadius: 8,
-            background: 'rgba(239,68,68,0.1)',
-            border: `2px solid ${MEDICAL_TYPE.statusCritical}`,
+            background: 'rgba(239,68,68,0.08)',
+            borderColor: `color-mix(in srgb, ${MEDICAL_TYPE.statusCritical} 35%, var(--cdl-clinical-border, #e2e8f0))`,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -843,35 +821,25 @@ export default function DispatchConsole() {
         </div>
       )}
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
-          <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: MEDICAL_THEME.inkSubtle }}>
-            CareDroid
-          </div>
-          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800 }}>Dispatch Console</h1>
-          <div style={{ fontSize: 13, color: MEDICAL_THEME.inkSubtle, marginTop: 2 }}>
+      <div className="dispatch-console__header">
+        <div className="dispatch-console__title-block">
+          <div className="dispatch-console__eyebrow">CareDroid</div>
+          <h1>Dispatch Console</h1>
+          <div className="dispatch-console__subtitle">
             Emergency call intake · CAD unit dispatch · ED pre-alert
           </div>
         </div>
         <button
+          type="button"
           onClick={() => setShowForm((v) => !v)}
-          style={{
-            padding: '10px 16px',
-            borderRadius: 8,
-            background: showForm ? MEDICAL_THEME.border : MEDICAL_THEME.accent,
-            color: showForm ? MEDICAL_THEME.ink : MEDICAL_THEME.onAccent,
-            fontWeight: 700,
-            fontSize: 13,
-            border: 'none',
-            cursor: 'pointer',
-          }}
+          className={`dispatch-console__primary-btn${showForm ? ' dispatch-console__primary-btn--muted' : ''}`}
         >
           {showForm ? 'Cancel' : '+ Log Call'}
         </button>
       </div>
 
       {/* Summary metrics */}
-      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+      <div className="dispatch-console__summary-row">
         <SummaryCard label="Active Calls" value={summary.total} />
         <SummaryCard label="Echo" value={summary.echoCount} highlight />
         <SummaryCard label="Delta" value={summary.deltaCount} />
@@ -883,14 +851,7 @@ export default function DispatchConsole() {
 
       {/* New call form */}
       {showForm && (
-        <div
-          style={{
-            padding: 20,
-            borderRadius: 12,
-            border: `1px solid ${MEDICAL_THEME.border}`,
-            background: MEDICAL_THEME.surfaceCard,
-          }}
-        >
+        <div className="dispatch-console__form" style={{ padding: 20 }}>
           <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 14 }}>New Emergency Call</div>
           <NewCallForm onCreated={handleCreated} />
         </div>
@@ -901,21 +862,11 @@ export default function DispatchConsole() {
 
       {/* Call list */}
       {calls.length === 0 ? (
-        <div
-          style={{
-            padding: 40,
-            borderRadius: 12,
-            border: `1px solid ${MEDICAL_THEME.border}`,
-            background: MEDICAL_THEME.surfaceCard,
-            textAlign: 'center',
-            color: MEDICAL_THEME.inkSubtle,
-            fontSize: 14,
-          }}
-        >
+        <div className="dispatch-console__empty" style={{ padding: 40, textAlign: 'center', color: MEDICAL_THEME.inkSubtle, fontSize: 14 }}>
           No active calls. Log a call using the button above.
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 12 }}>
+        <div className="dispatch-console__call-grid">
           {calls.map((call) => (
             <CallCard
               key={call.id}
@@ -929,14 +880,8 @@ export default function DispatchConsole() {
 
       <div
         role="note"
-        style={{
-          padding: '10px 14px',
-          borderRadius: 8,
-          background: 'rgba(239,68,68,0.07)',
-          border: `1px solid rgba(239,68,68,0.2)`,
-          fontSize: 12,
-          color: MEDICAL_THEME.inkSubtle,
-        }}
+        className="dispatch-console__notice"
+        style={{ padding: '10px 14px', fontSize: 12, color: MEDICAL_THEME.inkSubtle }}
       >
         CareDroid AI is decision support only. All dispatch decisions must be made by licensed dispatchers following
         local medical protocols. Unit assignment, pre-alert, and ED readiness activation require dispatcher authorization.

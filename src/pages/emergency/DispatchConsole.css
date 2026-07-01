@@ -1,0 +1,66 @@
+.dispatch-console {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cdl-clinical-section-gap, 20px);
+  min-height: 100%;
+  color: var(--medical-ink, #111827);
+}
+
+.dispatch-console__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.dispatch-console__title-block h1 {
+  margin: 0;
+  font-size: 1.375rem;
+  font-weight: 800;
+}
+
+.dispatch-console__eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--medical-ink-muted, #64748b);
+}
+
+.dispatch-console__subtitle {
+  margin-top: 2px;
+  font-size: 0.8125rem;
+  color: var(--medical-ink-muted, #64748b);
+}
+
+.dispatch-console__summary-row,
+.dispatch-console__call-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.dispatch-console__call-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+}
+
+.dispatch-console__primary-btn {
+  padding: 10px 16px;
+  border: none;
+  border-radius: var(--cdl-clinical-radius-sm, 10px);
+  background: var(--app-accent-interactive, #0ea5e9);
+  color: var(--app-on-solid, #ffffff);
+  font-weight: 700;
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+
+.dispatch-console__primary-btn--muted {
+  background: var(--cdl-clinical-border, #e2e8f0);
+  color: var(--medical-ink, #111827);
+}
+
+.dispatch-console__summary-card--highlight {
+  border-color: color-mix(in srgb, var(--status-critical, #ef4444) 35%, var(--cdl-clinical-border)) !important;
+}

@@ -39,12 +39,14 @@
   max-width: min(480px, 100vw);
   height: 100vh;
   max-height: var(--app-viewport-height, 100dvh);
-  background: var(--ed-surface-raised);
-  border-left: 0;
+  background: var(--app-surface-1, var(--ed-surface-raised));
+  border-left: 1px solid var(--cdl-clinical-border, var(--ed-border-subtle));
   z-index: 100;
   overflow-y: auto;
   color: var(--ed-text-primary);
-  box-shadow: -24px 0 60px rgba(0, 0, 0, 0.36);
+  box-shadow:
+    -8px 0 32px rgba(15, 23, 42, 0.08),
+    -2px 0 8px rgba(15, 23, 42, 0.04);
   touch-action: pan-y;
 }
 

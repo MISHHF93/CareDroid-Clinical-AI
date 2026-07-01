@@ -1,13 +1,17 @@
 import React from 'react';
-import { act, render, screen, within } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { UserProvider } from '../contexts/UserContext';
+import { NotificationShellProvider } from '../contexts/NotificationShellContext';
 import EMSCriticalBroadcast from './EMSCriticalBroadcast';
-import { useEmergencyStore } from '../../store/emergencyStore';
+import { useEmergencyStore } from '../store/emergencyStore';
 import { Priority } from '../types/emergency';
 
 const emergencyRoleMock = vi.hoisted(() => ({
   role: 'charge_nurse',
+  roleLabel: 'Charge Nurse',
   can: () => true,
   presentAction: () => ({
     state: 'A',
@@ -20,6 +24,23 @@ const emergencyRoleMock = vi.hoisted(() => ({
 
 vi.mock('../hooks/useEmergencyRolePermissions', () => ({
   useEmergencyRolePermissions: () => emergencyRoleMock,
+}));
+
+vi.mock('../hooks/useNotificationCenter', () => ({
+  useNotificationCenter: () => ({
+    productLabel: 'CareDroid',
+    loading: false,
+    refreshError: null,
+    unreadAlertCount: 0,
+    visibleNotificationAlerts: [],
+    alertTriage: { counts: { critical: 0, high: 0, medium: 0 }, suppressed: [], all: [], visible: [] },
+    showInformationalAlerts: false,
+    setShowInformationalAlerts: vi.fn(),
+    patientById: new Map(),
+    openAlertRoute: vi.fn(),
+    recordAlertAcknowledged: vi.fn(),
+    openPanel: vi.fn(),
+  }),
 }));
 
 const originalState = useEmergencyStore.getState();
@@ -63,10 +84,22 @@ function seedCriticalArrival() {
         emsArrivals: [],
         selectedPatientId: null,
       },
-      true
+      true,
     );
     useEmergencyStore.getState().addEMSArrival(respiratoryFailureArrival());
   });
+}
+
+function renderBroadcast() {
+  return render(
+    <MemoryRouter>
+      <UserProvider>
+        <NotificationShellProvider>
+          <EMSCriticalBroadcast />
+        </NotificationShellProvider>
+      </UserProvider>
+    </MemoryRouter>,
+  );
 }
 
 afterEach(() => {
@@ -76,48 +109,42 @@ afterEach(() => {
 });
 
 describe('EMSCriticalBroadcast', () => {
-  it('minimizes and reopens the respiratory failure checklist', async () => {
-    const user = userEvent.setup();
+  it('uses the compact dock instead of a fullscreen overlay', () => {
     seedCriticalArrival();
+    renderBroadcast();
 
-    render(<EMSCriticalBroadcast />);
-
-    const checklist = screen.getByRole('complementary', {
-      name: /Respiratory Failure Preparation Checklist/i,
-    });
-    await user.click(within(checklist).getByRole('button', { name: /minimize/i }));
-
-    expect(
-      screen.queryByRole('complementary', { name: /Respiratory Failure Preparation Checklist/i })
-    ).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /reopen prep/i })).toBeInTheDocument();
-
-    await user.click(screen.getByRole('button', { name: /reopen prep/i }));
-
-    expect(
-      screen.getByRole('complementary', { name: /Respiratory Failure Preparation Checklist/i })
-    ).toBeInTheDocument();
+    expect(screen.queryByText(/CRITICAL INCOMING/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/Critical EMS inbound/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /hide prep/i })).toBeInTheDocument();
   });
 
-  it('marks prep complete and removes the fixed checklist lane', async () => {
+  it('collapses and reopens the inline prep checklist', async () => {
     const user = userEvent.setup();
     seedCriticalArrival();
+    renderBroadcast();
 
-    render(<EMSCriticalBroadcast />);
+    await user.click(screen.getByRole('button', { name: /hide prep/i }));
+    expect(screen.getByRole('button', { name: /show prep/i })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /show prep/i }));
+    expect(screen.getByRole('button', { name: /hide prep/i })).toBeInTheDocument();
+  });
+
+  it('marks prep complete without a fixed full-height lane', async () => {
+    const user = userEvent.setup();
+    seedCriticalArrival();
+    renderBroadcast();
 
     for (const checkbox of screen.getAllByRole('checkbox')) {
       await user.click(checkbox);
     }
     await user.click(screen.getByRole('button', { name: /mark prep complete/i }));
 
-    expect(
-      screen.queryByRole('complementary', { name: /Respiratory Failure Preparation Checklist/i })
-    ).not.toBeInTheDocument();
     expect(screen.getByText(/Prep complete by/i)).toBeInTheDocument();
     expect(
       useEmergencyStore
         .getState()
-        .emsArrivals.find((arrival) => arrival.id === 'ems-respiratory-failure-test')?.criticalChecklist
+        .emsArrivals.find((arrival) => arrival.id === 'ems-respiratory-failure-test')?.criticalChecklist,
     ).toMatchObject({
       completedByStaffName: expect.any(String),
       completedAt: expect.any(String),

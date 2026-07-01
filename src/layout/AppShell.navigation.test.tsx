@@ -16,6 +16,23 @@ const { navigateMock, shellLocation, emergencyStoreState } = vi.hoisted(() => ({
   shellLocation: { pathname: '/emergency/whiteboard' },
   emergencyStoreState: {
     patients: [],
+    capacity: { band: 'green', occupancy: 0, boarding: 0 },
+    alerts: [],
+    emsArrivals: [],
+    emsIncomingPatients: [],
+    emsUnits: [],
+    referrals: [],
+    staff: [],
+    rooms: [],
+    workflowLogs: [],
+    copilotMessages: [],
+    integrationEvents: [],
+    selectedPatientId: null,
+    activeQueueFilter: null,
+    whiteboardSearchQuery: '',
+    loading: false,
+    backendAvailable: false,
+    websocket: { status: 'idle', mode: 'offline' },
     copilotOpen: false,
     toggleCopilot: vi.fn(),
     setCopilotOpen: vi.fn(),
@@ -23,6 +40,7 @@ const { navigateMock, shellLocation, emergencyStoreState } = vi.hoisted(() => ({
     initializeFromBackend: vi.fn().mockResolvedValue(undefined),
     updateAlerts: vi.fn(),
     setWebSocketStatus: vi.fn(),
+    dispatchWebSocketEvent: vi.fn(),
     emergencySettings: {
       defaultScreenMode: 'clinical',
       readOnlyDisplayMode: false,
@@ -183,7 +201,9 @@ describe('AppShell navigation surfaces', () => {
   });
 
   it('renders required header and content regions once', () => {
-    expect(appShellSource).toContain('pageTitle={currentPage.label}');
+    expect(appShellSource).toContain('<ShellRouteTab');
+    expect(appShellSource).toContain('title={currentPage.label}');
+    expect(appShellSource).toContain('<RouteChromeProvider>');
     expect(appShellSource.match(/role="main"/g)).toHaveLength(1);
     expect(appShellSource).toContain('<CopilotPanel />');
     expect(appShellSource).toContain('<PatientDetailPanel />');

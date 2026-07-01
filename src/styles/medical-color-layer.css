@@ -1,8 +1,19 @@
 /**
- * Layer 0 — canonical CareDroid medical palette (white + sky blue).
- * Every coloration layer should reference these primitives or derived --app-* tokens.
+ * Layer 0 — CareDroid Clinical Design Language (CDL) palette.
+ * Neutral slate structure + sky-blue clinical accent. Every layer references these primitives.
  */
 :root {
+  /* —— Clinical neutrals (structure, not decoration) —— */
+  --medical-slate-50: #f8fafc;
+  --medical-slate-100: #f1f5f9;
+  --medical-slate-200: #e2e8f0;
+  --medical-slate-300: #cbd5e1;
+  --medical-slate-400: #94a3b8;
+  --medical-slate-500: #64748b;
+  --medical-slate-600: #475569;
+  --medical-slate-700: #334155;
+
+  /* —— Clinical accent (sky — trust, clarity, action) —— */
   --medical-sky-50: #f0f9ff;
   --medical-sky-100: #e0f2fe;
   --medical-sky-200: #bae6fd;
@@ -10,32 +21,37 @@
   --medical-sky-400: #38bdf8;
   --medical-sky-500: #0ea5e9;
   --medical-sky-600: #0284c7;
+  --medical-sky-700: #0369a1;
+
   --medical-white: #ffffff;
   --medical-ink: #111827;
-  --medical-ink-muted: #6b7280;
-  --medical-ink-subtle: #9ca3af;
-  --medical-border: var(--medical-sky-100);
+  --medical-ink-muted: #64748b;
+  --medical-ink-subtle: #94a3b8;
+  --medical-border: var(--medical-slate-200);
+  --medical-border-strong: var(--medical-slate-300);
   --medical-accent: var(--medical-sky-500);
   --medical-accent-hover: var(--medical-sky-600);
   --medical-accent-soft: var(--medical-sky-400);
-  --medical-surface-page: var(--medical-sky-50);
+  --medical-surface-page: var(--medical-slate-50);
+  --medical-surface-muted: var(--medical-slate-100);
   --medical-surface-card: var(--medical-white);
-  --medical-shadow-soft: 0 8px 20px rgba(14, 165, 233, 0.06);
-  --medical-shadow-lift: 0 16px 36px rgba(14, 165, 233, 0.08);
-  --medical-accent-tint: rgba(14, 165, 233, 0.12);
-  --medical-accent-border: rgba(14, 165, 233, 0.35);
+  --medical-surface-inset: var(--medical-slate-100);
+  --medical-shadow-soft: 0 4px 14px rgba(15, 23, 42, 0.06);
+  --medical-shadow-lift: 0 12px 32px rgba(15, 23, 42, 0.08);
+  --medical-accent-tint: rgba(14, 165, 233, 0.1);
+  --medical-accent-border: rgba(14, 165, 233, 0.32);
 
-  /* Navigation rail */
+  /* —— Navigation rail —— */
   --nav-surface: var(--medical-white);
-  --nav-surface-muted: var(--medical-sky-50);
+  --nav-surface-muted: var(--medical-slate-50);
   --nav-border: var(--medical-border);
   --nav-fg: var(--medical-ink-muted);
-  --nav-fg-active: var(--medical-accent);
-  --nav-item-hover-bg: color-mix(in srgb, var(--medical-accent) 10%, var(--medical-white));
-  --nav-item-active-bg: color-mix(in srgb, var(--medical-accent) 14%, var(--medical-sky-50));
+  --nav-fg-active: var(--medical-accent-hover);
+  --nav-item-hover-bg: var(--medical-slate-100);
+  --nav-item-active-bg: var(--medical-accent-tint);
   --nav-item-active-border: var(--medical-accent);
 
-  /* Semantic operational colors — use only with clinical meaning */
+  /* —— Semantic operational colors — clinical meaning only —— */
   --semantic-critical: #b91c1c;
   --semantic-critical-bg: #fef2f2;
   --semantic-urgent: #c2410c;
@@ -45,15 +61,15 @@
   --semantic-healthy: #15803d;
   --semantic-healthy-bg: #ecfdf5;
   --semantic-information: #0284c7;
-  --semantic-information-bg: rgba(14, 165, 233, 0.12);
-  --semantic-inactive: #6b7280;
-  --semantic-inactive-bg: #f0f9ff;
+  --semantic-information-bg: rgba(14, 165, 233, 0.1);
+  --semantic-inactive: #64748b;
+  --semantic-inactive-bg: var(--medical-slate-100);
   --semantic-inactive-border: var(--medical-border);
-  --semantic-critical-border: #7f1d1d;
+  --semantic-critical-border: #991b1b;
   --semantic-urgent-border: #c2410c;
   --semantic-attention-border: #b45309;
   --semantic-healthy-border: #166534;
-  --semantic-information-border: rgba(14, 165, 233, 0.45);
+  --semantic-information-border: rgba(14, 165, 233, 0.4);
   --semantic-warning: var(--semantic-attention);
   --semantic-warning-bg: var(--semantic-attention-bg);
   --semantic-warning-border: var(--semantic-attention-border);

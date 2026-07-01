@@ -1,7 +1,8 @@
-import type { ReactNode } from 'react';
+import { useMemo, type ReactNode } from 'react';
 import PatientCard from '../../components/PatientCard';
 import HelpTrigger from '../../components/help/HelpTrigger';
 import EdJourneyProgressRail from '../../components/emergency/EdJourneyProgressRail';
+import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import { OperationalPageTemplate, PageShell } from '../../components/ui/CareDroidPrimitives';
 import { PatientFlag, PatientState } from '../../types/emergency';
 import { resolveEdDataFreshness, resolveEdSourceLabel } from '../../utils/edDataSource';
@@ -154,22 +155,42 @@ export function EmergencyRoutePage({
     (operatingSurface.phaseLabel
       ? `ED OS · ${operatingSurface.phaseLabel}`
       : undefined);
-  const headerActions = (
-    <>
-      {actions}
-      <HelpTrigger variant="button" className="emergency-route-help-trigger" label="Guide" />
-      <MaturityChip maturity={maturity} />
-    </>
+  const headerActions = useMemo(
+    () => (
+      <>
+        {actions}
+        <HelpTrigger variant="button" className="emergency-route-help-trigger" label="Guide" />
+        <MaturityChip maturity={maturity} />
+      </>
+    ),
+    [actions, maturity],
   );
+
+  const routeChrome = useMemo(
+    () => ({
+      eyebrow: surfaces.chrome.showPageEyebrow ? resolvedEyebrow : undefined,
+      title,
+      subtitle: showDescription ? description : undefined,
+      actions: headerActions,
+    }),
+    [
+      description,
+      headerActions,
+      resolvedEyebrow,
+      showDescription,
+      surfaces.chrome.showPageEyebrow,
+      title,
+    ],
+  );
+
+  useRouteChromeRegistration(routeChrome);
 
   return (
     <PageShell
       as="section"
-      eyebrow={surfaces.chrome.showPageEyebrow ? resolvedEyebrow : undefined}
+      suppressHeader
       title={title}
       titleId={titleId}
-      description={showDescription ? description : undefined}
-      actions={headerActions}
       className={[
         'emergency-route-page',
         'cd-page-shell',
@@ -178,7 +199,6 @@ export function EmergencyRoutePage({
       ]
         .filter(Boolean)
         .join(' ')}
-      headerClassName="emergency-route-page__hero cdl-zone cdl-zone--identity"
       contentClassName="emergency-route-page__content"
       aria-label={title}
     >

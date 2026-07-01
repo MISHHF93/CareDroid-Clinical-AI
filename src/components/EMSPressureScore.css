@@ -68,7 +68,8 @@
   border: 0;
   border-radius: var(--radius-lg);
   background: var(--ems-pressure-bg);
-  box-shadow: inset 3px 0 0 var(--ems-pressure-color);
+  border-left: 2px solid color-mix(in srgb, var(--ems-pressure-color) 45%, transparent);
+  box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
   animation: ems-pressure-enter var(--motion-transition-normal) both;
   transition:
     background-color var(--motion-transition-fast),

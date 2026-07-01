@@ -1,0 +1,48 @@
+/**
+ * CareDroid Clinical Shell — sidebar, header, notification rail tokens.
+ * Loaded after medical-color-layer; consumed by shell component CSS.
+ */
+:root {
+  /* Shell layout offsets (sidebar rail → main canvas) */
+  --app-shell-sidebar-offset: var(--cdl-sidebar-width, 232px);
+
+  /* Sidebar */
+  --cdl-sidebar-width: 232px;
+  --cdl-sidebar-bg: var(--medical-white);
+  --cdl-sidebar-border: var(--medical-border);
+  --cdl-sidebar-shadow: 1px 0 0 var(--medical-border), 4px 0 24px rgba(15, 23, 42, 0.04);
+  --cdl-sidebar-brand-height: 44px;
+  --cdl-sidebar-nav-gap: 1px;
+  --cdl-sidebar-group-gap: 4px;
+  --cdl-sidebar-item-height: 40px;
+  --cdl-sidebar-item-radius: 6px;
+  --cdl-sidebar-item-fg: var(--medical-ink-muted);
+  --cdl-sidebar-item-fg-hover: var(--medical-ink);
+  --cdl-sidebar-item-fg-active: var(--medical-accent-hover);
+  --cdl-sidebar-item-bg-hover: var(--medical-slate-100);
+  --cdl-sidebar-item-bg-active: var(--medical-accent-tint);
+  --cdl-sidebar-item-rail-active: var(--medical-accent);
+  --cdl-sidebar-group-label-fg: var(--medical-ink-subtle);
+  --cdl-sidebar-footer-border: var(--medical-border);
+
+  /* Header */
+  --cdl-header-height: 52px;
+  --cdl-route-tab-height: 44px;
+  --cdl-chrome-stack-height: calc(var(--cdl-header-height) + var(--cdl-route-tab-height));
+  --cdl-header-bg: var(--medical-white);
+  --cdl-header-border: var(--medical-border);
+  --cdl-header-title-fg: var(--medical-ink);
+  --cdl-header-meta-fg: var(--medical-ink-muted);
+
+  /* Main canvas */
+  --cdl-canvas-bg: var(--medical-surface-page);
+  --cdl-clinical-canvas-base: var(--medical-surface-page);
+  --cdl-clinical-border: color-mix(in srgb, var(--medical-border) 48%, transparent);
+  --cdl-clinical-shadow-rest: 0 1px 2px rgba(15, 23, 42, 0.03), 0 4px 14px rgba(15, 23, 42, 0.04);
+
+  /* Notification panel */
+  --cdl-notification-bg: var(--medical-slate-50);
+  --cdl-notification-border: var(--medical-border);
+  --cdl-notification-item-bg: var(--medical-white);
+  --cdl-notification-unread-rail: var(--medical-accent);
+}

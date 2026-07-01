@@ -25,6 +25,10 @@ const notificationToastCss = readFileSync(
   join(__dirname, '../components/notifications/NotificationToast.css'),
   'utf8',
 );
+const clinicalCanvasCss = readFileSync(join(__dirname, 'clinical-page-canvas.css'), 'utf8');
+const clinicalTargetsCss = readFileSync(join(__dirname, 'clinical-page-targets.css'), 'utf8');
+const clinicalFlowCss = readFileSync(join(__dirname, 'clinical-operational-flow.css'), 'utf8');
+const clinicalSweepCss = readFileSync(join(__dirname, 'clinical-page-sweep.css'), 'utf8');
 
 describe('CareDroid design language fit contract', () => {
   it('defines shared control, icon, shell, z-index, shadow, and focus tokens', () => {
@@ -49,12 +53,37 @@ describe('CareDroid design language fit contract', () => {
     expect(cdlIndex).toBeGreaterThan(layoutIndex);
   });
 
+  it('loads the clinical page canvas layer after shell chrome polish', () => {
+    const polishIndex = designSystemCss.indexOf("@import './shell-header-polish.css'");
+    const canvasIndex = designSystemCss.indexOf("@import './clinical-page-canvas.css'");
+    const targetsIndex = designSystemCss.indexOf("@import './clinical-page-targets.css'");
+    const flowIndex = designSystemCss.indexOf("@import './clinical-operational-flow.css'");
+    const sweepIndex = designSystemCss.indexOf("@import './clinical-page-sweep.css'");
+    expect(polishIndex).toBeGreaterThan(-1);
+    expect(canvasIndex).toBeGreaterThan(polishIndex);
+    expect(targetsIndex).toBeGreaterThan(canvasIndex);
+    expect(flowIndex).toBeGreaterThan(targetsIndex);
+    expect(sweepIndex).toBeGreaterThan(flowIndex);
+  });
+
   it('applies global fit rules for overflow, forms, media, tables, and focus', () => {
-    expect(responsiveCss).toMatch(/\.app-shell \*:[:\w\s,.*-]*\{[\s\S]*box-sizing:\s*border-box/);
-    expect(responsiveCss).toMatch(/\.app-shell :is\([\s\S]*table[\s\S]*width:\s*100%/);
-    expect(responsiveCss).toMatch(/\.app-shell :is\(input[\s\S]*max-width:\s*100%/);
-    expect(responsiveCss).toMatch(/\.app-shell :is\(img, svg, canvas, video, iframe\)[\s\S]*max-width:\s*100%/);
-    expect(responsiveCss).toMatch(/\.app-shell :is\(:focus-visible\)[\s\S]*outline:/);
+    const shellScope = ':is(.app-shell, .emergency-app-shell)';
+    expect(responsiveCss).toContain(shellScope);
+    expect(responsiveCss).toMatch(
+      /:is\(\.app-shell, \.emergency-app-shell\) \*:[:\w\s,.*-]*\{[\s\S]*box-sizing:\s*border-box/,
+    );
+    expect(responsiveCss).toMatch(
+      /:is\(\.app-shell, \.emergency-app-shell\) :is\([\s\S]*table[\s\S]*width:\s*100%/,
+    );
+    expect(responsiveCss).toMatch(
+      /:is\(\.app-shell, \.emergency-app-shell\) :is\(input[\s\S]*max-width:\s*100%/,
+    );
+    expect(responsiveCss).toMatch(
+      /:is\(\.app-shell, \.emergency-app-shell\) :is\(img, svg, canvas, video, iframe\)[\s\S]*max-width:\s*100%/,
+    );
+    expect(responsiveCss).toMatch(
+      /:is\(\.app-shell, \.emergency-app-shell\) :is\(:focus-visible\)[\s\S]*outline:/,
+    );
   });
 
   it('keeps the AppShell rail and header controls fitted in the viewport', () => {
@@ -118,5 +147,43 @@ describe('CareDroid design language fit contract', () => {
     expect(cdlCss).toContain('.cdl-zone--active-work');
     expect(cdlCss).toContain('--semantic-ai-assistance');
     expect(appShellCss).not.toMatch(/\.app-shell-main-content > \*/);
+  });
+
+  it('defines clinical canvas tokens that soften brutal flat bordered surfaces', () => {
+    [
+      '--cdl-clinical-border',
+      '--cdl-clinical-shadow-rest',
+      '--cdl-clinical-shadow-hover',
+      '--cdl-clinical-radius',
+      '--cdl-clinical-section-gap',
+    ].forEach((token) => {
+      expect(clinicalCanvasCss).toContain(token);
+    });
+    expect(clinicalCanvasCss).toContain(':is(.app-shell, .emergency-app-shell)');
+    expect(clinicalCanvasCss).toMatch(/box-shadow:\s*var\(--cdl-clinical-shadow-rest\)/);
+    expect(clinicalCanvasCss).toContain('.reception-command');
+    expect(clinicalCanvasCss).toContain('.emergency-route-card');
+  });
+
+  it('polishes high-traffic page targets: whiteboard, tools, catalog, patient detail', () => {
+    [
+      '.emergency-whiteboard-page__filter-chip--active',
+      '.tools-overview .tool-card-large',
+      '.clinical-tool-catalog .catalog-table-wrap',
+      '.patient-detail-panel',
+      '.tool-page .tool-header',
+    ].forEach((selector) => {
+      expect(clinicalTargetsCss).toContain(selector);
+    });
+    expect(clinicalTargetsCss).toMatch(/\.patient-detail-panel\s*\{[\s\S]*box-shadow:/);
+    expect(clinicalTargetsCss).not.toMatch(/rgba\(0,\s*0,\s*0,\s*0\.36\)/);
+  });
+
+  it('de-brutalizes EMS pipeline rows and operational metric strips', () => {
+    expect(clinicalFlowCss).toContain('.ems-pipeline__row');
+    expect(clinicalFlowCss).toContain('.operational-strip--compact');
+    expect(clinicalFlowCss).toContain('.pre-arrival-intake');
+    expect(clinicalFlowCss).not.toMatch(/rgba\(31,\s*41,\s*55,\s*0\.86\)/);
+    expect(clinicalFlowCss).not.toMatch(/inset 3px 0 0/);
   });
 });

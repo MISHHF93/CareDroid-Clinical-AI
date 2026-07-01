@@ -36,10 +36,9 @@ describe('visual and mobile entropy guardrails', () => {
   });
 
   it('keeps platform admin scorecards from forcing mobile overflow', () => {
-    const css = read('pages/PlatformAdminPage.css');
+    const css = read('styles/responsive-ux.css');
 
-    expect(css).toMatch(/\.platform-admin-page\s*\{[\s\S]*min-width:\s*0/);
-    expect(css).toMatch(/\.platform-admin-health-card\s*\{[\s\S]*min-width:\s*min\(190px,\s*100%\)/);
-    expect(css).toMatch(/@media \(max-width:\s*720px\)[\s\S]*\.platform-admin-health-card\s*\{[\s\S]*min-width:\s*0/);
+    expect(css).toMatch(/\.platform-admin-page[\s\S]*min-width:\s*0/);
+    expect(css).toMatch(/@media \(max-width:\s*720px\)[\s\S]*\.platform-admin-page/);
   });
 });

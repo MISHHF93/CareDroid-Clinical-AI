@@ -15,11 +15,6 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--ed-space-4);
-  border: 1px solid var(--ed-border-subtle);
-  border-radius: var(--radius-xl, 16px);
-  background: var(--color-card, var(--app-surface-2, #ffffff));
-  padding: var(--ed-space-4);
-  box-shadow: none;
   margin: 0;
 }
 
@@ -32,9 +27,10 @@
 }
 
 .emergency-route-situation-brief {
-  border: 1px solid var(--ed-border-subtle);
-  border-radius: var(--radius-lg, 12px);
+  border: 1px solid var(--cdl-clinical-border, var(--ed-border-subtle));
+  border-radius: var(--cdl-clinical-radius, var(--radius-lg, 12px));
   background: var(--ed-surface-raised);
+  box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
   padding: var(--ed-space-3);
 }
 
@@ -136,9 +132,10 @@
 }
 
 .emergency-route-card {
-  border: 1px solid var(--ed-border-subtle);
-  border-radius: var(--radius-lg, 12px);
+  border: 1px solid var(--cdl-clinical-border, var(--ed-border-subtle));
+  border-radius: var(--cdl-clinical-radius, var(--radius-lg, 12px));
   background: var(--ed-surface-raised);
+  box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
 }
 
 .emergency-route-maturity-chip {
@@ -380,7 +377,11 @@
   gap: var(--ed-space-3);
   align-items: center;
   padding: var(--ed-space-3);
-  border-left: 4px solid var(--queue-accent, var(--app-accent-interactive, var(--status-info)));
+  border: 1px solid var(--cdl-clinical-border, var(--ed-border-subtle));
+  border-left: 2px solid color-mix(in srgb, var(--queue-accent, var(--app-accent-interactive, var(--status-info))) 45%, transparent);
+  border-radius: var(--cdl-clinical-radius, var(--radius-lg, 12px));
+  background: var(--app-surface-1, var(--ed-surface-raised));
+  box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
 }
 
 .emergency-route-queue-row--breached {
@@ -532,7 +533,11 @@
   gap: var(--ed-space-2);
   min-width: 0;
   padding: var(--ed-space-3);
-  border-left: 4px solid var(--command-action-accent, var(--app-accent-interactive, var(--status-info)));
+  border: 1px solid var(--cdl-clinical-border, var(--ed-border-subtle));
+  border-left: 2px solid color-mix(in srgb, var(--command-action-accent, var(--app-accent-interactive, var(--status-info))) 45%, transparent);
+  border-radius: var(--cdl-clinical-radius, var(--radius-lg, 12px));
+  background: var(--app-surface-1, var(--ed-surface-raised));
+  box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
 }
 
 .emergency-command-action--critical {

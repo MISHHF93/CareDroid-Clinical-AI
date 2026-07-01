@@ -2,10 +2,10 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: var(--compact-page-gap, var(--app-space-lg, 16px));
+  gap: var(--cdl-route-header-gap, var(--compact-page-gap, var(--app-space-lg, 16px)));
   width: 100%;
   min-width: 0;
-  margin-bottom: var(--compact-page-gap, var(--app-fluid-section-gap, 16px));
+  margin-bottom: var(--cdl-route-header-gap, var(--app-fluid-section-gap, 20px));
 }
 
 .cd-page-header__content {

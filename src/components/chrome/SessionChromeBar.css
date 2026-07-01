@@ -12,6 +12,23 @@
   font-size: var(--ed-type-body, 12px);
 }
 
+.session-chrome-bar--status-only {
+  flex-wrap: nowrap;
+  min-height: 28px;
+  padding-block: 2px;
+}
+
+@media (max-width: 768px) {
+  .session-chrome-bar--status-only {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .session-chrome-bar--status-only::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 .session-chrome-bar__segments {
   display: flex;
   flex: 1;

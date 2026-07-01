@@ -45,6 +45,7 @@ describe('medical theme full-scale audit', () => {
     const main = tokenFiles[12];
     expect(main).toContain("import './styles/design-system.css'");
     expect(designSystem).toContain("@import './medical-color-layer.css'");
+    expect(designSystem).toContain("@import './medical-shell-layer.css'");
     expect(designSystem).toContain("@import './medical-type-layer.css'");
     expect(designSystem).toContain("@import './color-normalization.css'");
     expect(designSystem).toContain("@import './text-normalization.css'");

@@ -17,7 +17,9 @@
   min-width: 0;
   min-height: 40px;
   border: 0;
-  border-right: 1px solid rgba(31, 41, 55, 0.86);
+  border-right: 0;
+  border-radius: var(--cdl-clinical-radius-sm, 10px);
+  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 38%, var(--app-surface-1, #ffffff));
   background: rgba(255, 255, 255, 0.94);
   color: var(--color-text-secondary, #9ca3af);
   cursor: pointer;

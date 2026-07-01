@@ -1,0 +1,250 @@
+/**
+ * Clinical page targets — high-traffic route polish beyond the global canvas layer.
+ * Whiteboard · Tools · Catalog · Patient detail drawer.
+ */
+
+/* ══════════════════════════════════════════════════════════════════
+   Whiteboard — soften command deck, mission cards, filter chips
+   ══════════════════════════════════════════════════════════════════ */
+
+.emergency-whiteboard-page {
+  background: transparent;
+}
+
+.emergency-whiteboard-page__stats--bar {
+  border-bottom-color: var(--cdl-clinical-border);
+  box-shadow: var(--cdl-clinical-shadow-rest);
+}
+
+.emergency-whiteboard-page__command-layer,
+.emergency-whiteboard-page__mission {
+  border-bottom-color: var(--cdl-clinical-border);
+}
+
+.emergency-whiteboard-page__command-metric,
+.emergency-whiteboard-page__command-metric-btn,
+.emergency-whiteboard-page__mission-card,
+.emergency-whiteboard-page__awareness-card,
+.emergency-whiteboard-page__awareness-panel,
+.emergency-whiteboard-page__inbound-banner-card,
+.emergency-whiteboard-page__inbound-card,
+.emergency-whiteboard-page__arrival-card {
+  border-color: var(--cdl-clinical-border);
+  border-radius: var(--cdl-clinical-radius);
+  box-shadow: var(--cdl-clinical-shadow-rest);
+}
+
+.emergency-whiteboard-page__command-metric-btn:hover:not(:disabled),
+.emergency-whiteboard-page__inbound-banner-card:hover {
+  border-color: var(--cdl-clinical-border-focus);
+  box-shadow: var(--cdl-clinical-shadow-hover);
+}
+
+.emergency-whiteboard-page__filter-chip {
+  border-color: color-mix(in srgb, var(--cdl-clinical-border) 80%, transparent);
+  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 50%, var(--app-surface-1, #ffffff));
+  color: var(--app-text-muted, #64748b);
+  transition:
+    background-color var(--cdl-clinical-motion),
+    border-color var(--cdl-clinical-motion),
+    color var(--cdl-clinical-motion);
+}
+
+.emergency-whiteboard-page__filter-chip--active {
+  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 12%, var(--app-surface-1, #ffffff));
+  border-color: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 30%, transparent);
+  color: var(--app-accent-hover, #0284c7);
+  box-shadow: none;
+}
+
+.emergency-whiteboard-page__filter-chip--reassess:not(.emergency-whiteboard-page__filter-chip--active) {
+  box-shadow: none;
+}
+
+.emergency-whiteboard-page__referral-bucket-chip,
+.emergency-whiteboard-page__awareness-chip,
+.emergency-whiteboard-page__queue-filter-clear {
+  border-color: color-mix(in srgb, var(--cdl-clinical-border) 72%, transparent);
+  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 45%, var(--app-surface-1, #ffffff));
+  box-shadow: none;
+}
+
+.emergency-whiteboard-page__mission-btn,
+.emergency-whiteboard-page__intake-button {
+  border-color: color-mix(in srgb, var(--cdl-clinical-border) 80%, transparent);
+  border-radius: var(--cdl-clinical-radius-sm);
+}
+
+.emergency-whiteboard-page__controls,
+.emergency-whiteboard-page__queue-filter-bar {
+  border-bottom-color: var(--cdl-clinical-border);
+  background: color-mix(in srgb, var(--app-surface-1, #ffffff) 92%, var(--app-surface-muted, #f1f5f9));
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Medical Tools — discovery shell, cards, workspace chrome
+   ══════════════════════════════════════════════════════════════════ */
+
+.tools-overview .tools-discovery-controls,
+.tools-overview .tools-active-surface,
+.tools-overview .tools-execution-legend,
+.tools-overview .tools-workspace,
+.tools-overview .stat,
+.tools-overview .tools-execution-legend__item {
+  border-color: var(--cdl-clinical-border);
+  border-radius: var(--cdl-clinical-radius);
+  box-shadow: var(--cdl-clinical-shadow-rest);
+}
+
+.tools-overview .tool-card-large {
+  border-color: var(--cdl-clinical-border);
+  border-radius: var(--cdl-clinical-radius);
+  box-shadow: var(--cdl-clinical-shadow-rest);
+  transition:
+    border-color var(--cdl-clinical-motion),
+    box-shadow var(--cdl-clinical-motion),
+    transform var(--cdl-clinical-motion);
+}
+
+.tools-overview .tool-card-large:hover {
+  border-color: var(--cdl-clinical-border-focus);
+  box-shadow: var(--cdl-clinical-shadow-hover);
+  transform: translateY(-1px);
+}
+
+.tools-overview .tools-filter-tab,
+.tools-overview .tools-profile-summary span,
+.tools-overview .tools-execution-badge {
+  border-color: color-mix(in srgb, var(--cdl-clinical-border) 72%, transparent);
+  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 45%, var(--app-surface-1, #ffffff));
+  box-shadow: none;
+}
+
+.tools-overview .tools-filter-tab--active {
+  border-color: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 28%, transparent);
+  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 10%, var(--app-surface-1, #ffffff));
+  color: var(--app-accent-hover, #0284c7);
+}
+
+.tools-overview .tools-workspace-os {
+  border-color: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 22%, var(--cdl-clinical-border));
+  border-radius: var(--cdl-clinical-radius);
+  box-shadow: var(--cdl-clinical-shadow-rest);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Clinical tool catalog — stats, table shell, chips
+   ══════════════════════════════════════════════════════════════════ */
+
+.clinical-tool-catalog .catalog-stat,
+.clinical-tool-catalog .catalog-notice,
+.clinical-tool-catalog .catalog-table-wrap {
+  border-color: var(--cdl-clinical-border);
+  border-radius: var(--cdl-clinical-radius);
+  box-shadow: var(--cdl-clinical-shadow-rest);
+}
+
+.clinical-tool-catalog .catalog-category-chip {
+  border-color: color-mix(in srgb, var(--cdl-clinical-border) 72%, transparent);
+  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 45%, var(--app-surface-1, #ffffff));
+  box-shadow: none;
+}
+
+.clinical-tool-catalog .catalog-category-chip--active {
+  border-color: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 28%, transparent);
+  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 10%, var(--app-surface-1, #ffffff));
+  color: var(--app-accent-hover, #0284c7);
+}
+
+.clinical-tool-catalog .catalog-table th {
+  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 50%, var(--app-surface-1, #ffffff));
+  border-bottom-color: var(--cdl-clinical-border);
+}
+
+.clinical-tool-catalog .catalog-table td {
+  border-bottom-color: color-mix(in srgb, var(--cdl-clinical-border) 55%, transparent);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Tool detail pages — header hero card
+   ══════════════════════════════════════════════════════════════════ */
+
+.tool-page .tool-header {
+  border: 1px solid var(--cdl-clinical-border);
+  border-left: 3px solid color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 55%, transparent);
+  border-radius: var(--cdl-clinical-radius-lg);
+  box-shadow: var(--cdl-clinical-shadow-rest);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Patient detail drawer — clinical rail, not brutal slab
+   ══════════════════════════════════════════════════════════════════ */
+
+.patient-detail-panel {
+  background: var(--app-surface-1, #ffffff);
+  border-left: 1px solid var(--cdl-clinical-border);
+  box-shadow:
+    -8px 0 32px rgba(15, 23, 42, 0.08),
+    -2px 0 8px rgba(15, 23, 42, 0.04);
+}
+
+.patient-detail-panel__header {
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 4%, var(--app-surface-1, #ffffff)) 0%,
+      var(--app-surface-1, #ffffff) 100%
+    );
+  border-bottom-color: var(--cdl-clinical-border);
+}
+
+.patient-detail-panel__section {
+  border-bottom-color: color-mix(in srgb, var(--cdl-clinical-border) 55%, transparent);
+}
+
+.patient-detail-panel__badge {
+  border: 1px solid color-mix(in srgb, var(--cdl-clinical-border) 65%, transparent);
+  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 40%, var(--app-surface-1, #ffffff));
+  color: var(--app-text-secondary, #64748b);
+}
+
+.patient-detail-panel__close-btn,
+.patient-detail-panel__field-btn:not(.patient-detail-panel__field-btn--primary) {
+  border-color: color-mix(in srgb, var(--cdl-clinical-border) 80%, transparent);
+  border-radius: var(--cdl-clinical-radius-sm);
+  background: var(--app-surface-1, #ffffff);
+}
+
+.patient-detail-panel__field-btn--primary {
+  border-radius: var(--cdl-clinical-radius-sm);
+  box-shadow: var(--cdl-clinical-shadow-rest);
+}
+
+.patient-detail-vital-tile,
+.patient-detail-note-row,
+.patient-detail-action-panel,
+.patient-detail-workflow-log {
+  border-radius: var(--cdl-clinical-radius-sm) !important;
+  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 35%, var(--app-surface-1, #ffffff)) !important;
+  box-shadow: none !important;
+}
+
+.patient-detail-vitals-form__input,
+.patient-detail-panel__select,
+.patient-detail-panel__textarea {
+  border-color: var(--cdl-clinical-border);
+  border-radius: var(--cdl-clinical-radius-sm);
+  background: var(--app-input-bg, #ffffff);
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.03);
+}
+
+.patient-detail-vitals-trend__toggle {
+  border-color: var(--cdl-clinical-border);
+  background: var(--app-surface-1, #ffffff);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tools-overview .tool-card-large:hover {
+    transform: none;
+  }
+}

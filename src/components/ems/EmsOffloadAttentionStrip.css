@@ -1,11 +1,12 @@
 .ems-offload-attention-strip {
   display: grid;
   gap: 10px;
-  margin: 0 16px 12px;
+  margin: 0 0 12px;
   padding: 12px 14px;
-  border: 1px solid var(--medical-border, #e0f2fe);
-  border-radius: 14px;
+  border: 1px solid var(--cdl-clinical-border, var(--medical-border, #e0f2fe));
+  border-radius: var(--cdl-clinical-radius, 14px);
   background: var(--app-surface-1, #ffffff);
+  box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
 }
 
 .ems-offload-attention-strip__header {
@@ -47,9 +48,9 @@
   justify-items: center;
   min-width: 64px;
   padding: 6px 10px;
-  border: 1px solid #e0f2fe;
-  border-radius: 10px;
-  background: var(--medical-surface-page, #f0f9ff);
+  border: 1px solid var(--cdl-clinical-border, #e0f2fe);
+  border-radius: var(--cdl-clinical-radius-sm, 10px);
+  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 40%, var(--app-surface-1, #ffffff));
 }
 
 .ems-offload-attention-strip__counts strong {
@@ -63,13 +64,13 @@
 }
 
 .ems-offload-attention-strip__counts span[data-tone='critical'] {
-  border-color: #ef4444;
-  background: #7f1d1d33;
+  border-color: color-mix(in srgb, var(--status-critical, #ef4444) 32%, var(--cdl-clinical-border, #e0f2fe));
+  background: color-mix(in srgb, var(--status-critical, #ef4444) 6%, var(--app-surface-1, #ffffff));
 }
 
 .ems-offload-attention-strip__counts span[data-tone='watch'] {
-  border-color: #f59e0b;
-  background: #78350f22;
+  border-color: color-mix(in srgb, var(--status-warning, #f59e0b) 32%, var(--cdl-clinical-border, #e0f2fe));
+  background: color-mix(in srgb, var(--status-warning, #f59e0b) 6%, var(--app-surface-1, #ffffff));
 }
 
 .ems-offload-attention-strip__open {
@@ -97,22 +98,22 @@
   gap: 10px;
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid #e0f2fe;
-  border-radius: 10px;
-  background: var(--medical-surface-page, #f0f9ff);
+  border: 1px solid var(--cdl-clinical-border, #e0f2fe);
+  border-radius: var(--cdl-clinical-radius-sm, 10px);
+  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 35%, var(--app-surface-1, #ffffff));
   color: var(--medical-ink, #111827);
   cursor: pointer;
   text-align: left;
 }
 
 .ems-offload-attention-strip__item[data-tone='critical'] {
-  border-color: #ef4444;
-  background: #7f1d1d18;
+  border-color: color-mix(in srgb, var(--status-critical, #ef4444) 32%, var(--cdl-clinical-border, #e0f2fe));
+  background: color-mix(in srgb, var(--status-critical, #ef4444) 5%, var(--app-surface-1, #ffffff));
 }
 
 .ems-offload-attention-strip__item[data-tone='watch'] {
-  border-color: #f59e0b;
-  background: #78350f12;
+  border-color: color-mix(in srgb, var(--status-warning, #f59e0b) 32%, var(--cdl-clinical-border, #e0f2fe));
+  background: color-mix(in srgb, var(--status-warning, #f59e0b) 5%, var(--app-surface-1, #ffffff));
 }
 
 .ems-offload-attention-strip__item:disabled {

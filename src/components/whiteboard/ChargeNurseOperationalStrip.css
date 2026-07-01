@@ -1,11 +1,14 @@
 .charge-nurse-operational-strip {
   display: grid;
   grid-template-columns: auto repeat(5, minmax(0, 1fr));
-  gap: 1px;
+  gap: 6px;
+  padding: 8px 10px;
   min-width: 0;
   overflow-x: auto;
-  border-bottom: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
-  background: var(--color-surface, var(--app-surface-1, #ffffff));
+  border: 1px solid var(--cdl-clinical-border, var(--color-border-subtle, var(--medical-border, #e0f2fe)));
+  border-radius: var(--cdl-clinical-radius, 12px);
+  background: var(--app-surface-1, #ffffff);
+  box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
   scrollbar-width: thin;
 }
 
@@ -19,8 +22,9 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   white-space: nowrap;
-  border-right: 1px solid rgba(31, 41, 55, 0.86);
-  background: rgba(255, 255, 255, 0.94);
+  border-right: 0;
+  border-radius: var(--cdl-clinical-radius-sm, 10px);
+  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 38%, var(--app-surface-1, #ffffff));
 }
 
 .charge-nurse-operational-strip__metric {
@@ -30,8 +34,9 @@
   min-width: 0;
   min-height: 48px;
   border: 0;
-  border-right: 1px solid rgba(31, 41, 55, 0.86);
-  background: rgba(255, 255, 255, 0.94);
+  border-right: 0;
+  border-radius: var(--cdl-clinical-radius-sm, 10px);
+  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 38%, var(--app-surface-1, #ffffff));
   color: var(--color-text-secondary, #9ca3af);
   cursor: pointer;
   padding: 6px 12px;

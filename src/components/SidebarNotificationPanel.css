@@ -1,0 +1,271 @@
+.nc-backdrop {
+  position: fixed;
+  inset-block-start: var(--cdl-chrome-stack-height, 96px);
+  inset-inline-start: var(--cdl-sidebar-width, 232px);
+  inset-inline-end: 0;
+  inset-block-end: 0;
+  z-index: calc(var(--z-popover, 940) - 1);
+  border: 0;
+  background: rgba(15, 23, 42, 0.1);
+  cursor: pointer;
+}
+
+.nc-panel {
+  position: fixed;
+  inset-block-start: var(--cdl-chrome-stack-height, 96px);
+  inset-block-end: 0;
+  inset-inline-start: var(--cdl-sidebar-width, var(--sidebar-width, 232px));
+  z-index: var(--z-popover, 940);
+  display: flex;
+  flex-direction: column;
+  width: min(380px, calc(100vw - var(--cdl-sidebar-width, 232px)));
+  max-width: calc(100vw - var(--cdl-sidebar-width, 232px));
+  height: auto;
+  max-height: calc(100dvh - var(--cdl-chrome-stack-height, 96px));
+  border-inline-start: 1px solid var(--cdl-notification-border, var(--medical-border));
+  background: var(--cdl-notification-bg, var(--medical-slate-50));
+  color: var(--medical-ink);
+  box-shadow: 8px 0 28px rgba(15, 23, 42, 0.06);
+}
+
+.nc-panel__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 14px 14px 10px;
+  border-bottom: 1px solid var(--medical-border);
+  background: var(--medical-white);
+}
+
+.nc-panel__title-block {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+  color: var(--medical-ink);
+}
+
+.nc-panel__title-block h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.nc-panel__title-block p {
+  margin: 2px 0 0;
+  color: var(--medical-ink-muted);
+  font-size: 12px;
+}
+
+.nc-panel__header-actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 6px;
+}
+
+.nc-panel__text-btn,
+.nc-panel__icon-btn {
+  border: 1px solid var(--medical-border);
+  border-radius: 8px;
+  background: var(--medical-white);
+  color: var(--medical-ink-muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.nc-panel__text-btn {
+  min-height: 30px;
+  padding: 0 8px;
+}
+
+.nc-panel__icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+}
+
+.nc-panel__summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--medical-border);
+  background: var(--medical-white);
+}
+
+.nc-panel__summary span {
+  display: grid;
+  gap: 2px;
+  justify-items: center;
+  padding: 8px 6px;
+  border: 1px solid var(--medical-border);
+  border-radius: 8px;
+  background: var(--medical-slate-50);
+}
+
+.nc-panel__summary strong {
+  font-size: 18px;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.nc-panel__summary small {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--medical-ink-muted);
+}
+
+.nc-panel__summary span[data-tier='critical'] strong {
+  color: var(--status-critical, #ef4444);
+}
+
+.nc-panel__summary span[data-tier='high'] strong {
+  color: var(--status-warning, #f59e0b);
+}
+
+.nc-panel__list {
+  display: grid;
+  gap: 8px;
+  min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 12px 14px;
+  overscroll-behavior: contain;
+}
+
+.nc-item {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--medical-border);
+  border-radius: 10px;
+  background: var(--medical-white);
+}
+
+.nc-item[data-read='false'] {
+  border-left: 3px solid var(--medical-accent);
+}
+
+.nc-item[data-tier='critical'] {
+  border-left-color: var(--status-critical, #ef4444);
+}
+
+.nc-item[data-tier='high'] {
+  border-left-color: var(--status-warning, #f59e0b);
+}
+
+.nc-item__main {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.nc-item__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.nc-item__tier,
+.nc-item__meta time {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--medical-ink-muted);
+}
+
+.nc-item__title {
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+.nc-item__message {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--medical-ink-muted);
+}
+
+.nc-item__context {
+  font-size: 11px;
+  color: var(--medical-ink-subtle);
+}
+
+.nc-item__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.nc-item__actions button {
+  min-height: 28px;
+  padding: 0 8px;
+  border: 1px solid var(--medical-border);
+  border-radius: 8px;
+  background: var(--medical-white);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.nc-item__primary {
+  color: var(--medical-ink);
+}
+
+.nc-item__ghost {
+  background: transparent;
+  color: var(--medical-ink-muted);
+}
+
+.nc-panel__empty {
+  margin: 12px;
+  padding: 20px 14px;
+  border: 1px dashed var(--medical-border);
+  border-radius: 10px;
+  color: var(--medical-ink-muted);
+  font-size: 13px;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.nc-panel__empty--error {
+  border-color: var(--semantic-urgent-border);
+  color: var(--semantic-urgent);
+  background: var(--semantic-urgent-bg);
+}
+
+@media (max-width: 1024px) and (min-width: 769px) {
+  .nc-backdrop,
+  .nc-panel {
+    inset-inline-start: var(--app-shell-sidebar-offset, 56px);
+  }
+
+  .nc-panel {
+    width: min(380px, calc(100vw - var(--app-shell-sidebar-offset, 56px)));
+    max-width: calc(100vw - var(--app-shell-sidebar-offset, 56px));
+  }
+}
+
+@media (max-width: 768px) {
+  .nc-backdrop {
+    inset-inline-start: 0;
+  }
+
+  .nc-panel {
+    inset-inline: 0;
+    width: 100vw;
+    max-width: 100vw;
+    border-inline-start: 0;
+  }
+}

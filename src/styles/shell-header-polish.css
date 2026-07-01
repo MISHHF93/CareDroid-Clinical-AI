@@ -1,0 +1,65 @@
+/**
+ * Shell chrome stack — utility bar + permanent route tab strip.
+ * Identity lives in ShellRouteTab; pages register overrides via RouteChromeContext.
+ */
+
+:root {
+  --cdl-header-height: 52px;
+  --cdl-header-padding-block: 8px;
+  --cdl-header-padding-inline: 18px;
+  --cdl-route-tab-height: 44px;
+  --cdl-route-tab-bg: var(--medical-white);
+  --cdl-chrome-stack-height: calc(
+    var(--cdl-header-height) + var(--cdl-route-tab-height) + var(--cdl-alarm-dock-estimate, 0px)
+  );
+  --cdl-header-shadow: 0 1px 0 rgba(15, 23, 42, 0.05);
+}
+
+/* —— Utility chrome (clock · status · create · search · account) —— */
+.caredroid-header--slim {
+  height: auto;
+  min-height: var(--cdl-header-height);
+  grid-template-rows: minmax(var(--cdl-header-height), auto);
+  background: var(--medical-white);
+  border-bottom: 1px solid color-mix(in srgb, var(--medical-border) 92%, transparent);
+  box-shadow: var(--cdl-header-shadow);
+}
+
+.caredroid-header--slim .caredroid-header__topbar {
+  height: auto;
+  min-height: var(--cdl-header-height);
+  align-items: center;
+  padding: var(--cdl-header-padding-block) var(--cdl-header-padding-inline);
+  gap: 12px;
+}
+
+.caredroid-header--slim .caredroid-header__center {
+  height: auto;
+  min-height: 32px;
+  align-self: center;
+}
+
+.caredroid-header--slim .caredroid-header__actions {
+  align-self: center;
+}
+
+/* —— Hide duplicate in-page headers; shell tab owns identity —— */
+.emergency-app-shell .app-shell-main-content .cd-page-header {
+  display: none;
+}
+
+.emergency-app-shell .reception-workspace .reception-command-header h1,
+.emergency-app-shell .reception-workspace .reception-command-header__eyebrow {
+  display: none;
+}
+
+.emergency-app-shell .app-shell-main-content {
+  scroll-padding-top: calc(var(--cdl-chrome-stack-height) + var(--app-layout-page-gutter-block, 16px));
+}
+
+@media (max-width: 768px) {
+  :root {
+    --cdl-header-padding-inline: 14px;
+    --cdl-chrome-stack-height: calc(var(--cdl-header-height) + 56px);
+  }
+}

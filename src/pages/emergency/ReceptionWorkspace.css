@@ -1,17 +1,17 @@
 .reception-command {
-  --reception-command-bg: #f7fafc;
-  --reception-command-panel: #ffffff;
-  --reception-command-inset: #eef6f7;
-  --reception-command-border: #cddde2;
-  --reception-command-ink: #172027;
-  --reception-command-muted: #5e6f78;
-  --reception-command-primary: #0f766e;
-  --reception-command-primary-strong: #0b5f59;
-  --reception-command-critical: #b91c1c;
-  --reception-command-warning: #b45309;
+  --reception-command-bg: var(--medical-surface-page, #f8fafc);
+  --reception-command-panel: var(--medical-white, #ffffff);
+  --reception-command-inset: var(--medical-slate-100, #f1f5f9);
+  --reception-command-border: var(--medical-border, #e2e8f0);
+  --reception-command-ink: var(--medical-ink, #111827);
+  --reception-command-muted: var(--medical-ink-muted, #64748b);
+  --reception-command-primary: var(--medical-accent-hover, #0284c7);
+  --reception-command-primary-strong: var(--medical-accent-tint, rgba(14, 165, 233, 0.1));
+  --reception-command-critical: var(--semantic-critical, #b91c1c);
+  --reception-command-warning: var(--semantic-attention, #b45309);
   display: grid;
-  gap: 16px;
-  padding: 6px 0 88px;
+  gap: var(--cdl-panel-gap, var(--app-layout-panel-gap, 12px));
+  padding: 4px 0 72px;
   color: var(--reception-command-ink);
 }
 
@@ -34,8 +34,8 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 16px;
-  padding: 18px;
+  gap: 10px;
+  padding: 12px 14px;
   border: 1px solid var(--reception-command-border);
   border-radius: 8px;
   background: var(--reception-command-panel);
@@ -43,8 +43,8 @@
 
 .reception-command-header h1 {
   margin: 0;
-  font-size: 24px;
-  line-height: 1.15;
+  font-size: 18px;
+  line-height: 1.2;
 }
 
 .reception-command-header__eyebrow {
@@ -97,17 +97,18 @@
 
 .reception-command-header__metrics > div,
 .reception-command-help {
-  min-width: 112px;
-  min-height: 56px;
+  min-width: 84px;
+  min-height: 46px;
   border: 1px solid var(--reception-command-border);
   border-radius: 8px;
   background: var(--reception-command-inset);
-  padding: 8px 10px;
+  padding: 6px 8px;
 }
 
 .reception-command-header__metrics strong {
   display: block;
-  font-size: 22px;
+  font-size: 17px;
+  font-variant-numeric: tabular-nums;
   line-height: 1;
 }
 
@@ -739,7 +740,7 @@
 .reception-front-door__body {
   align-items: start;
   display: grid;
-  gap: 16px;
+  gap: var(--cdl-panel-gap, 12px);
   grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
 }
 

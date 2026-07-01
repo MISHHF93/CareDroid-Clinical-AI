@@ -1,0 +1,21 @@
+.caredroid-toast-host [data-sonner-toaster] {
+  --width: min(360px, calc(100vw - 24px));
+}
+
+.caredroid-toast {
+  border: 1px solid #d1d5db !important;
+  border-radius: 10px !important;
+  background: #ffffff !important;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.1) !important;
+  color: #111827 !important;
+  font-size: 13px !important;
+}
+
+.caredroid-toast__title {
+  font-weight: 650 !important;
+}
+
+.caredroid-toast__description {
+  color: #4b5563 !important;
+  font-size: 12px !important;
+}

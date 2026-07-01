@@ -42,7 +42,7 @@ export const ALERT_TIER_TO_LIFECYCLE: Readonly<
   critical: Object.freeze({
     state: 'critical',
     semantic: 'critical',
-    primarySurface: 'header-bell',
+    primarySurface: 'shell-dock',
   }),
   high: Object.freeze({
     state: 'urgent',
@@ -110,7 +110,7 @@ export function resolveAlertLifecycle(
     state: mapping.state,
     semantic: mapping.semantic,
     primarySurface: mapping.primarySurface,
-    showToast: classificationTier === 'critical',
+    showToast: classificationTier === 'critical' || classificationTier === 'high',
     showPersistentBanner: classificationTier === 'critical' || classificationTier === 'high',
     showInHistory: true,
   });

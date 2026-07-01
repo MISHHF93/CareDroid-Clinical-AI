@@ -1,0 +1,302 @@
+/**
+ * Clinical page sweep — final pass across every authenticated shell route.
+ * Neutralizes accent slabs, inset rails, dark strip dividers, and flat boxes.
+ */
+
+/* ══════════════════════════════════════════════════════════════════
+   Page roots — transparent canvas, breathable section rhythm
+   ══════════════════════════════════════════════════════════════════ */
+
+.emergency-app-shell .app-shell-main-content :is(
+    .emergency-route-page,
+    .cd-page-shell,
+    .clinical-alerts-page,
+    .dispatch-console,
+    .smart-intake,
+    .emergency-analytics,
+    .emergency-settings,
+    .help-hub-page,
+    .integration-hub-page,
+    .system-health-page,
+    .saas-health-page,
+    .executive-command-page,
+    .commercial-page,
+    .org-page,
+    .team-management,
+    .profile-page,
+    .profile-settings-page,
+    .training-dashboard,
+    .feature-management-page,
+    .notification-preferences-page,
+    .clinical-documentation-assistant,
+    .referral-panel,
+    .shift-summary,
+    .emergency-pulse,
+    .emergency-whiteboard-page,
+    .ems-pipeline,
+    .tools-overview,
+    .tools-overview-shell,
+    .clinical-tool-catalog,
+    .hospital-command-center,
+    .reception-command,
+    .reception-workspace
+  ) {
+  background: transparent;
+  gap: var(--cdl-clinical-section-gap, var(--app-layout-section-gap));
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Operational strip family — no dark cell walls
+   ══════════════════════════════════════════════════════════════════ */
+
+.emergency-app-shell :is(
+    .charge-nurse-operational-strip,
+    .reception-operational-strip,
+    .operational-handoff-domain-bar,
+    .operational-alert-rail__strip
+  ) {
+  gap: 6px;
+  padding: 8px 10px;
+  border: 1px solid var(--cdl-clinical-border);
+  border-radius: var(--cdl-clinical-radius);
+  background: var(--app-surface-1, #ffffff);
+  box-shadow: var(--cdl-clinical-shadow-rest);
+}
+
+.emergency-app-shell :is(
+    .charge-nurse-operational-strip__metric,
+    .charge-nurse-operational-strip__eyebrow,
+    .reception-operational-strip__metric,
+    .reception-operational-strip__eyebrow,
+    .operational-handoff-domain-bar__metric,
+    .operational-handoff-domain-bar__eyebrow,
+    .operational-alert-rail__chip
+  ) {
+  border-right: 0 !important;
+  border-bottom: 0 !important;
+  border-color: transparent !important;
+  border-radius: var(--cdl-clinical-radius-sm);
+  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 38%, var(--app-surface-1, #ffffff));
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Emergency route surfaces — queue rows, command actions, signals
+   ══════════════════════════════════════════════════════════════════ */
+
+.emergency-app-shell :is(
+    .emergency-route-queue-row,
+    .emergency-command-action,
+    .emergency-route-signal-row,
+    .emergency-route-recommendation,
+    .emergency-route-copilot-hint
+  ) {
+  border: 1px solid var(--cdl-clinical-border);
+  border-left: 2px solid color-mix(in srgb, var(--queue-accent, var(--command-action-accent, var(--app-accent-interactive, #0ea5e9))) 45%, transparent);
+  border-radius: var(--cdl-clinical-radius);
+  background: var(--app-surface-1, #ffffff);
+  box-shadow: var(--cdl-clinical-shadow-rest);
+}
+
+.emergency-app-shell .emergency-route-action-chip,
+.emergency-app-shell .emergency-route-filter-banner__btn,
+.emergency-app-shell .emergency-route-queue-row__patient-btn {
+  border-color: color-mix(in srgb, var(--cdl-clinical-border) 72%, transparent);
+  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 40%, var(--app-surface-1, #ffffff));
+  box-shadow: none;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Clinical alerts · analytics · settings · pulse · admin
+   ══════════════════════════════════════════════════════════════════ */
+
+.emergency-app-shell :is(
+    .clinical-alerts-page .alerts-summary-chip,
+    .clinical-alerts-page .alerts-controls,
+    .clinical-alerts-page .alert-card,
+    .clinical-alerts-page .alerts-readonly-banner,
+    .clinical-alerts-page .alerts-api-notice,
+    .emergency-analytics__card,
+    .emergency-analytics__panel,
+    .emergency-settings__section,
+    .emergency-settings__card,
+    .department-pulse__card,
+    .department-pulse__metric,
+    .system-health-page__card,
+    .system-health-page__panel,
+    .saas-health-page__card,
+    .executive-command-page__card,
+    .integration-hub-page__card,
+    .integration-hub-page__panel,
+    .team-management__card,
+    .admin-operations-home__card,
+    .automation-audit__card,
+    .commercial-page__card,
+    .org-page__card,
+    .profile-page__card,
+    .profile-settings-page__section,
+    .feature-management-page__card,
+    .notification-preferences-page__section,
+    .training-dashboard__card,
+    .help-hub-page__card
+  ) {
+  border-color: var(--cdl-clinical-border);
+  border-radius: var(--cdl-clinical-radius);
+  box-shadow: var(--cdl-clinical-shadow-rest);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Referral · command dashboard · queue panels · whiteboard legacy
+   ══════════════════════════════════════════════════════════════════ */
+
+.emergency-app-shell :is(
+    .referral-panel__card,
+    .referral-panel__task,
+    .referral-panel__bucket,
+    .command-dashboard__card,
+    .command-dashboard__metric,
+    .queue-intelligence-panel,
+    .queue-intelligence-panel__row,
+    .who-next-panel,
+    .workload-balance-panel__card,
+    .staff-workload-panel__card
+  ) {
+  border-color: var(--cdl-clinical-border);
+  border-radius: var(--cdl-clinical-radius);
+  box-shadow: var(--cdl-clinical-shadow-rest);
+}
+
+.emergency-app-shell :is(
+    .referral-panel__task,
+    .command-dashboard__card--success,
+    .command-dashboard__card--warning,
+    .command-dashboard__card--critical,
+    .queue-intelligence-panel__row--selected
+  ) {
+  box-shadow: var(--cdl-clinical-shadow-rest) !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Smart intake · reception panels · copilot hints
+   ══════════════════════════════════════════════════════════════════ */
+
+.emergency-app-shell :is(
+    .smart-intake__step,
+    .smart-intake__candidate,
+    .smart-intake__field,
+    .reception-quick-intake,
+    .ai-triage-assist-panel,
+    .ems-pre-arrival-panel__card,
+    .amb-handoff-checklist
+  ) {
+  border-color: var(--cdl-clinical-border);
+  border-radius: var(--cdl-clinical-radius);
+  box-shadow: var(--cdl-clinical-shadow-rest) !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Tools detail pages — calculators, labs, protocols, AI tools
+   ══════════════════════════════════════════════════════════════════ */
+
+.emergency-app-shell :is(
+    .calculators-content,
+    .calculator-card,
+    .calculator-panel,
+    .lab-interpreter__panel,
+    .drug-checker__panel,
+    .timeline-ai__card,
+    .protocols-page__card,
+    .shared-tool-session__card,
+    .tool-not-found__card
+  ) {
+  border-color: var(--cdl-clinical-border);
+  border-radius: var(--cdl-clinical-radius);
+  box-shadow: var(--cdl-clinical-shadow-rest);
+}
+
+.emergency-app-shell :is(
+    .calculator-result,
+    .lab-result-card,
+    .drug-checker__interaction,
+    .timeline-ai__event
+  ) {
+  border-left-width: 2px;
+  border-left-color: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 40%, var(--cdl-clinical-border));
+  box-shadow: none;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Dispatch console — soften inline-style panels via class hooks
+   ══════════════════════════════════════════════════════════════════ */
+
+.dispatch-console {
+  padding: 0 !important;
+  background: transparent !important;
+  gap: var(--cdl-clinical-section-gap) !important;
+}
+
+.dispatch-console__banner,
+.dispatch-console__panel,
+.dispatch-console__call-card,
+.dispatch-console__unit-board,
+.dispatch-console__empty,
+.dispatch-console__form,
+.dispatch-console__notice,
+.dispatch-console__summary-card {
+  border: 1px solid var(--cdl-clinical-border);
+  border-radius: var(--cdl-clinical-radius);
+  background: var(--app-surface-1, #ffffff);
+  box-shadow: var(--cdl-clinical-shadow-rest);
+}
+
+.dispatch-console__call-card--breach {
+  border-color: color-mix(in srgb, var(--status-critical, #ef4444) 35%, var(--cdl-clinical-border));
+  border-width: 1px;
+  background: color-mix(in srgb, var(--status-critical, #ef4444) 4%, var(--app-surface-1, #ffffff));
+}
+
+.dispatch-console__chip,
+.dispatch-console__status-pill {
+  border-color: color-mix(in srgb, var(--cdl-clinical-border) 72%, transparent);
+  border-radius: var(--cdl-clinical-radius-sm);
+  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 40%, var(--app-surface-1, #ffffff));
+}
+
+.dispatch-console__chip--active,
+.dispatch-console__status-pill--active {
+  border-color: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 28%, transparent);
+  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 10%, var(--app-surface-1, #ffffff));
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Fleet · IoT · 3D viewer · platform governance
+   ══════════════════════════════════════════════════════════════════ */
+
+.emergency-app-shell :is(
+    .fleet-dashboard__card,
+    .fleet-live-map__panel,
+    .medical-iot-card,
+    .device-fleet-card,
+    .hospital-map-dashboard__card,
+    .medical-3d-viewer__panel,
+    .platform-governance__card,
+    .platform-governance__panel
+  ) {
+  border-color: var(--cdl-clinical-border);
+  border-radius: var(--cdl-clinical-radius);
+  box-shadow: var(--cdl-clinical-shadow-rest);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Banners & semantic notices — tint not slab
+   ══════════════════════════════════════════════════════════════════ */
+
+.emergency-app-shell :is(
+    .clinical-alert-banner,
+    .anomaly-banner,
+    .api-state-banner,
+    .escalate-button__panel
+  ) {
+  border-left-width: 2px;
+  border-radius: var(--cdl-clinical-radius-sm);
+  box-shadow: none;
+}

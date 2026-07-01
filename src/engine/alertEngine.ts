@@ -1,12 +1,11 @@
-import { toast } from 'sonner';
 import { useEmergencyStore } from '../store/emergencyStore';
 import type { Alert, Patient } from '../types/emergency';
-import { classifyOperationalAlert } from './alertClassificationModel';
 import {
   prepareUnifiedAlert,
   publishAlert,
   shouldSurfaceAlertToast,
 } from '../services/alertLifecycleOrchestrator';
+import { raiseOperationalAlarm } from '../services/notificationToastPolicy';
 
 export {
   deriveAlerts,
@@ -21,24 +20,6 @@ type AlertInput = Omit<Alert, 'id' | 'createdAt' | 'dismissed'> &
 
 function createId(): string {
   return `alt${Date.now()}`;
-}
-
-function resolveAction(alert: Alert) {
-  if (alert.patientId) {
-    return {
-      label: 'View Patient',
-      onClick: () => useEmergencyStore.getState().selectPatient(alert.patientId || null),
-    };
-  }
-
-  if (alert.actionFn && alert.actionLabel) {
-    return {
-      label: alert.actionLabel,
-      onClick: alert.actionFn,
-    };
-  }
-
-  return undefined;
 }
 
 export function dispatchAlert(input: AlertInput): string {
@@ -59,27 +40,9 @@ export function dispatchAlert(input: AlertInput): string {
       source: input.source || 'alert-engine',
     });
 
-  if (!shouldSurfaceAlertToast(alert)) {
-    return alertId;
+  if (shouldSurfaceAlertToast(alert)) {
+    raiseOperationalAlarm(alert);
   }
-
-  const tier = classifyOperationalAlert(alert);
-  const action = resolveAction(alert);
-
-  if (tier === 'critical' || alert.severity === 'Critical') {
-    toast.error(alert.title, {
-      description: alert.message,
-      duration: 7000,
-      action,
-    });
-    return alertId;
-  }
-
-  toast(alert.title, {
-    description: alert.message,
-    duration: 4000,
-    action,
-  });
 
   return alertId;
 }

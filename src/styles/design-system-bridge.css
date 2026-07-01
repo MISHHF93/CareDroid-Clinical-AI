@@ -6,10 +6,10 @@
 html,
 html[data-theme='light'] {
   /* —— cd → app surface & text —— */
-  --cd-bg-base: var(--app-bg, #f0f9ff);
+  --cd-bg-base: var(--app-bg, #f8fafc);
   --cd-bg-surface: var(--app-surface-1, #ffffff);
   --cd-bg-elevated: var(--app-surface-elevated, #ffffff);
-  --cd-bg-sunken: var(--app-surface-muted, #f0f9ff);
+  --cd-bg-sunken: var(--app-surface-muted, #f1f5f9);
   --cd-text-primary: var(--app-fg, #111827);
   --cd-text-secondary: var(--app-fg-muted, #6b7280);
   --cd-text-disabled: var(--medical-ink-subtle, #9ca3af);

@@ -38,7 +38,7 @@ const REQUESTED_ITEMS = [
   },
   {
     id: 'command-center',
-    label: 'Command Center',
+    label: 'Hospital Command Center',
     icon: 'journey',
     route: '/emergency/command-center',
     featureGate: null,

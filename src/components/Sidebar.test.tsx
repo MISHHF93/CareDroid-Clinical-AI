@@ -1,6 +1,11 @@
+import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('./sidebar/SidebarChromeControls', () => ({
+  default: () => null,
+}));
+
 import { render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { describe, expect, it } from 'vitest';
 import { UserProvider } from '../contexts/UserContext';
 import { getVisibleNavigation } from '../config/unified-navigation.config';
 import { useEmergencyStore } from '../store/emergencyStore';
@@ -161,15 +166,13 @@ describe('Sidebar unified navigation rendering', () => {
       );
 
       expect(
-        within(desktopNav.getByRole('link', { name: 'Whiteboard' })).getByLabelText(
-          '2 active alerts',
-        ),
-      ).toBeTruthy();
-      expect(
         within(desktopNav.getByRole('link', { name: 'Reassess' })).getByLabelText(
           '2 active alerts',
         ),
       ).toBeTruthy();
+      expect(
+        within(desktopNav.getByRole('link', { name: 'Whiteboard' })).queryByLabelText(/active alert/),
+      ).toBeNull();
     } finally {
       useEmergencyStore.setState({
         patients: previousPatients,

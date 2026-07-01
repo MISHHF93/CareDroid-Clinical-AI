@@ -1,12 +1,11 @@
 .ems-pipeline {
   display: grid;
-  grid-template-rows: 64px minmax(0, 1fr);
+  gap: var(--cdl-clinical-section-gap, var(--space-4));
   width: 100%;
   min-width: 0;
-  height: 100%;
   min-height: 0;
-  overflow: hidden;
-  background: var(--color-background);
+  overflow: visible;
+  background: transparent;
   color: var(--color-text-primary);
 }
 
@@ -163,10 +162,10 @@
   display: grid;
   gap: 4px;
   padding: var(--space-3);
-  border: 0;
-  border-radius: var(--component-inner-radius);
-  background: var(--component-inner-row-bg);
-  box-shadow: var(--component-inner-shadow);
+  border: 1px solid var(--cdl-clinical-border, var(--color-border-subtle));
+  border-radius: var(--cdl-clinical-radius, var(--component-inner-radius));
+  background: var(--app-surface-1, var(--component-inner-row-bg));
+  box-shadow: var(--cdl-clinical-shadow-rest, var(--component-inner-shadow));
   animation: ems-row-enter var(--motion-transition-normal) both;
   transition:
     background-color var(--motion-transition-fast),
@@ -226,11 +225,11 @@
   gap: var(--space-3);
   min-width: 0;
   padding: var(--space-3);
-  border: 0;
-  border-left: 4px solid var(--status-info);
-  border-radius: var(--component-inner-radius);
-  background: var(--component-inner-row-bg);
-  box-shadow: var(--component-inner-shadow);
+  border: 1px solid var(--cdl-clinical-border, var(--color-border-subtle));
+  border-left: 2px solid color-mix(in srgb, var(--status-info) 42%, transparent);
+  border-radius: var(--cdl-clinical-radius, var(--component-inner-radius));
+  background: var(--app-surface-1, var(--component-inner-row-bg));
+  box-shadow: var(--cdl-clinical-shadow-rest, var(--component-inner-shadow));
   animation: ems-row-enter var(--motion-transition-normal) both;
   transition:
     background-color var(--motion-transition-fast),
@@ -265,14 +264,14 @@
 }
 
 .ems-pipeline__row--warning {
-  border-left-color: var(--status-warning);
-  background: color-mix(in srgb, var(--status-warning) 8%, transparent);
+  border-left-color: color-mix(in srgb, var(--status-warning) 48%, transparent);
+  background: color-mix(in srgb, var(--status-warning) 5%, var(--app-surface-1, #ffffff));
 }
 
 .ems-pipeline__row--critical,
 .ems-pipeline__row--arrived {
-  border-left-color: var(--status-critical);
-  background: color-mix(in srgb, var(--status-critical) 9%, transparent);
+  border-left-color: color-mix(in srgb, var(--status-critical) 48%, transparent);
+  background: color-mix(in srgb, var(--status-critical) 4%, var(--app-surface-1, #ffffff));
 }
 
 .ems-pipeline__row--critical {

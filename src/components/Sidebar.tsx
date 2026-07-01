@@ -1,7 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import appConfig from '../config/appConfig';
-import DemoUserSwitcher from './auth/DemoUserSwitcher';
 import {
   IconActivity,
   IconAmbulance,
@@ -30,7 +29,7 @@ import {
   IconUsers,
   type Icon,
 } from '@tabler/icons-react';
-import { PatientFlag, type Alert } from '../types/emergency';
+import { PatientFlag } from '../types/emergency';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { useEmergencyStore } from '../store/emergencyStore';
 import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
@@ -46,6 +45,8 @@ import { isRouteAllowedForProfile, resolveUserProfileFromSaasRole } from '../con
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import useScreenModeCapabilities from '../hooks/useScreenModeCapabilities';
 import { groupSidebarNavItems } from '../config/sidebarNavigationGroups';
+import { useNotificationShellOptional } from '../contexts/NotificationShellContext';
+import SidebarChromeControls from './sidebar/SidebarChromeControls';
 import './Sidebar.css';
 
 type SidebarNavItem = {
@@ -144,19 +145,6 @@ function isActiveRoute(pathname: string, item: SidebarNavItem, search = ''): boo
   );
 }
 
-function alertMatchesNavigation(alert: Alert, item: SidebarNavItem): boolean {
-  const id = item.id.toLowerCase();
-  const text = `${alert.type || ''} ${alert.title} ${alert.message} ${alert.source || ''}`.toLowerCase();
-  if (id === 'whiteboard') return true;
-  if (id.includes('capacity')) return text.includes('capacity');
-  if (id.includes('ems')) return text.includes('ems');
-  if (id.includes('boarding')) return text.includes('boarding') || text.includes('boarder');
-  if (id.includes('reassessment')) return text.includes('reassessment') || text.includes('reassess');
-  if (id.includes('referral')) return text.includes('referral') || text.includes('transfer');
-  if (id.includes('queue')) return text.includes('queue') || text.includes('wait');
-  return false;
-}
-
 export function Sidebar({ navigationItems }: SidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -166,9 +154,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
   const copilotOpen = useEmergencyStore((state) => state.copilotOpen);
   const toggleCopilot = useEmergencyStore((state) => state.toggleCopilot);
   const setCopilotOpen = useEmergencyStore((state) => state.setCopilotOpen);
-  const alerts = useEmergencyStore((state) => state.alerts);
   const patients = useEmergencyStore((state) => state.patients);
-  const activeAlerts = useMemo(() => alerts.filter((alert) => !alert.dismissed), [alerts]);
   const reassessmentDueCount = useMemo(
     () =>
       patients.filter((patient) => patient.flags.includes(PatientFlag.ReassessmentDue)).length,
@@ -247,15 +233,36 @@ export function Sidebar({ navigationItems }: SidebarProps) {
   );
   const copilotPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.useCopilot);
   const canUseCopilot = copilotPresentation.visible && copilotPresentation.enabled;
+  const notificationShell = useNotificationShellOptional();
+  const globalUnreadCount = notificationShell?.unreadAlertCount ?? 0;
+
   const navAlertCount = useCallback(
     (item: SidebarNavItem) => {
-      const alertCount = activeAlerts.filter((alert) => alertMatchesNavigation(alert, item)).length;
-      if (item.id === 'reassessment') return Math.max(alertCount, reassessmentDueCount);
-      if (item.id === 'whiteboard') return Math.max(alertCount, reassessmentDueCount);
-      return alertCount;
+      if (item.id === 'alerts') return globalUnreadCount;
+      if (item.id === 'reassessment') return reassessmentDueCount;
+      return 0;
     },
-    [activeAlerts, reassessmentDueCount],
+    [globalUnreadCount, reassessmentDueCount],
   );
+
+  const renderNavCountBadge = (
+    count: number,
+    kind: 'alert' | 'due',
+    ariaLabel: string,
+  ) => {
+    if (count <= 0) return null;
+    return (
+      <span
+        className={[
+          'sidebar-nav-item__count',
+          kind === 'alert' ? 'sidebar-nav-item__count--alert' : 'sidebar-nav-item__count--due',
+        ].join(' ')}
+        aria-label={ariaLabel}
+      >
+        {count > 99 ? '99+' : count}
+      </span>
+    );
+  };
 
   const openDockedCopilot = useCallback(() => {
     setCopilotOpen(true);
@@ -294,8 +301,41 @@ export function Sidebar({ navigationItems }: SidebarProps) {
           data-nav-id={item.id}
           data-icon-key={item.icon}
         >
-          <IconComponent size={18} stroke={2} className="sidebar-nav-item__icon" />
+          <IconComponent size={16} stroke={2} className="sidebar-nav-item__icon" />
           <span className="sidebar-nav-item__label">{item.label}</span>
+          <span className="sidebar-nav-item__tooltip">{item.label}</span>
+        </button>
+      );
+    }
+
+    if (item.id === 'alerts' && notificationShell) {
+      return (
+        <button
+          key={item.id}
+          type="button"
+          className={[
+            'sidebar-nav-item',
+            'sidebar-nav-item--alerts',
+            notificationShell.panelOpen ? 'sidebar-nav-item--active' : '',
+            notificationShell.pulseActive ? 'sidebar-nav-item--pulse' : '',
+          ]
+            .filter(Boolean)
+            .join(' ')}
+          onClick={notificationShell.togglePanel}
+          aria-label={`${item.label}${globalUnreadCount ? `: ${globalUnreadCount} unread` : ''}`}
+          aria-haspopup="dialog"
+          aria-expanded={notificationShell.panelOpen}
+          title={item.label}
+          data-nav-id={item.id}
+          data-icon-key={item.icon}
+        >
+          <IconComponent size={16} stroke={2} className="sidebar-nav-item__icon" />
+          <span className="sidebar-nav-item__label">{item.label}</span>
+          {renderNavCountBadge(
+            globalUnreadCount,
+            'alert',
+            `${globalUnreadCount} unread alert${globalUnreadCount === 1 ? '' : 's'}`,
+          )}
           <span className="sidebar-nav-item__tooltip">{item.label}</span>
         </button>
       );
@@ -319,16 +359,13 @@ export function Sidebar({ navigationItems }: SidebarProps) {
         data-nav-id={item.id}
         data-icon-key={item.icon}
       >
-        <IconComponent size={18} stroke={2} className="sidebar-nav-item__icon" />
+        <IconComponent size={16} stroke={2} className="sidebar-nav-item__icon" />
         <span className="sidebar-nav-item__label">{item.label}</span>
-        {alertCount > 0 ? (
-          <span
-            className="sidebar-nav-item__badge"
-            aria-label={`${alertCount} active alert${alertCount === 1 ? '' : 's'}`}
-          >
-            {alertCount}
-          </span>
-        ) : null}
+        {renderNavCountBadge(
+          alertCount,
+          item.id === 'reassessment' ? 'due' : 'alert',
+          `${alertCount} active alert${alertCount === 1 ? '' : 's'}`,
+        )}
         <span className="sidebar-nav-item__tooltip">{item.label}</span>
       </Link>
     );
@@ -370,6 +407,38 @@ export function Sidebar({ navigationItems }: SidebarProps) {
       );
     }
 
+    if (item.id === 'alerts' && notificationShell) {
+      return (
+        <button
+          key={item.id}
+          type="button"
+          className={[
+            'sidebar-item',
+            notificationShell.panelOpen ? 'sidebar-item--active' : '',
+            notificationShell.pulseActive ? 'sidebar-item--pulse' : '',
+          ]
+            .filter(Boolean)
+            .join(' ')}
+          onClick={() => {
+            setMoreOpen(false);
+            notificationShell.togglePanel();
+          }}
+          aria-label={`${label}${globalUnreadCount ? `: ${globalUnreadCount} unread` : ''}`}
+          aria-expanded={notificationShell.panelOpen}
+          data-nav-id={item.id}
+          data-icon-key={item.icon}
+        >
+          <IconComponent size={20} stroke={2} className="sidebar-nav-item__icon" />
+          {renderNavCountBadge(
+            globalUnreadCount,
+            'alert',
+            `${globalUnreadCount} unread alert${globalUnreadCount === 1 ? '' : 's'}`,
+          )}
+          <label>Alerts</label>
+        </button>
+      );
+    }
+
     const navLink = (
       <Link
         key={item.id}
@@ -383,14 +452,11 @@ export function Sidebar({ navigationItems }: SidebarProps) {
         onClick={() => setMoreOpen(false)}
       >
         <IconComponent size={20} stroke={2} className="sidebar-nav-item__icon" />
-        {alertCount > 0 ? (
-          <span
-            className="sidebar-nav-item__badge"
-            aria-label={`${alertCount} active alert${alertCount === 1 ? '' : 's'}`}
-          >
-            {alertCount}
-          </span>
-        ) : null}
+        {renderNavCountBadge(
+          alertCount,
+          item.id === 'reassessment' ? 'due' : 'alert',
+          `${alertCount} active alert${alertCount === 1 ? '' : 's'}`,
+        )}
         <label>{label}</label>
       </Link>
     );
@@ -399,28 +465,33 @@ export function Sidebar({ navigationItems }: SidebarProps) {
   };
 
   return (
-    <aside className="sidebar" aria-label="Emergency navigation">
-      <div className="sidebar__brand" aria-hidden="true">
-        <div className="sidebar__brand-mark">C</div>
-        <span className="sidebar__brand-name">CareDroid</span>
-      </div>
+    <aside className="sidebar sidebar--clinical" aria-label="Emergency navigation">
+      <header className="sidebar__brand">
+        <div className="sidebar__brand-mark" aria-hidden="true">
+          C
+        </div>
+        <div className="sidebar__brand-copy">
+          <span className="sidebar__brand-name">CareDroid</span>
+          <span className="sidebar__brand-tag">Clinical OS</span>
+        </div>
+      </header>
       <nav className="sidebar-desktop-nav" aria-label="Emergency desktop navigation">
-        {groupedDesktopPrimaryNav.map(({ group, items }) => (
-          <div key={group} className="sidebar-nav-group" role="group" aria-label={group}>
-            <span className="sidebar-nav-group__label">{group}</span>
-            <div className="sidebar-nav-group__items">{items.map(desktopNavLink)}</div>
-          </div>
-        ))}
-        {desktopUtilityNav.length ? (
-          <div className="sidebar-desktop-nav__utility" aria-label="Emergency utility navigation">
-            {desktopUtilityNav.map(desktopNavLink)}
-          </div>
-        ) : null}
-        {(appConfig.features.enableDevAuthBypass || appConfig.features.enableDemoMode) ? (
-          <div className="sidebar-desktop-nav__demo-switcher" aria-label="Demo user switcher">
-            <DemoUserSwitcher variant="compact" />
-          </div>
-        ) : null}
+        <div className="sidebar__body">
+          {groupedDesktopPrimaryNav.map(({ group, items }) => (
+            <div key={group} className="sidebar-nav-group" role="group" aria-label={group}>
+              <span className="sidebar-nav-group__label">{group}</span>
+              <div className="sidebar-nav-group__items">{items.map(desktopNavLink)}</div>
+            </div>
+          ))}
+        </div>
+        <footer className="sidebar__footer">
+          {desktopUtilityNav.length ? (
+            <div className="sidebar-desktop-nav__utility" aria-label="Emergency utility navigation">
+              {desktopUtilityNav.map(desktopNavLink)}
+            </div>
+          ) : null}
+          <SidebarChromeControls />
+        </footer>
       </nav>
       <nav className="sidebar-mobile-nav" aria-label="Emergency mobile navigation">
         {mobilePrimaryNav.map(mobileNavLink)}
@@ -499,14 +570,11 @@ export function Sidebar({ navigationItems }: SidebarProps) {
                   >
                     <IconComponent size={18} stroke={2} />
                     <span>{item.label}</span>
-                    {alertCount > 0 ? (
-                      <span
-                        className="sidebar-nav-item__badge"
-                        aria-label={`${alertCount} active alert${alertCount === 1 ? '' : 's'}`}
-                      >
-                        {alertCount}
-                      </span>
-                    ) : null}
+                    {renderNavCountBadge(
+                      alertCount,
+                      item.id === 'reassessment' ? 'due' : 'alert',
+                      `${alertCount} active alert${alertCount === 1 ? '' : 's'}`,
+                    )}
                   </Link>
                 );
                 return navLink;

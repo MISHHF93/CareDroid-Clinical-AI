@@ -1,0 +1,202 @@
+.operational-alarm-dock {
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--medical-border);
+  background: var(--medical-white);
+}
+
+.emergency-app-shell:has(.operational-alarm-dock) {
+  --cdl-alarm-dock-estimate: 40px;
+}
+
+.operational-alarm-dock__strip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 40px;
+  padding: 8px var(--cdl-header-padding-inline, 18px);
+}
+
+.operational-alarm-dock__strip--critical {
+  background: color-mix(in srgb, var(--status-critical, #ef4444) 7%, var(--medical-white));
+  border-left: 3px solid var(--status-critical, #ef4444);
+}
+
+.operational-alarm-dock__strip--high {
+  background: color-mix(in srgb, var(--status-warning, #f59e0b) 8%, var(--medical-white));
+  border-left: 3px solid var(--status-warning, #f59e0b);
+}
+
+.operational-alarm-dock__strip--complete {
+  background: color-mix(in srgb, var(--status-success, #22c55e) 8%, var(--medical-white));
+  border-left-color: var(--status-success, #22c55e);
+}
+
+.operational-alarm-dock__icon {
+  flex-shrink: 0;
+  color: var(--status-critical, #ef4444);
+}
+
+.operational-alarm-dock__strip--high .operational-alarm-dock__icon {
+  color: var(--status-warning, #f59e0b);
+}
+
+.operational-alarm-dock__copy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.operational-alarm-dock__copy strong {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--medical-ink);
+}
+
+.operational-alarm-dock__copy span {
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--medical-ink-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.operational-alarm-dock__actions {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 6px;
+}
+
+.operational-alarm-dock__actions button {
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid var(--medical-border);
+  border-radius: 8px;
+  background: var(--medical-white);
+  color: var(--medical-ink);
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.operational-alarm-dock__actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.operational-alarm-dock__ghost {
+  background: transparent;
+  color: var(--medical-ink-muted);
+}
+
+.operational-alarm-dock__checklist {
+  display: grid;
+  gap: 10px;
+  max-height: min(240px, 34dvh);
+  overflow: auto;
+  padding: 12px var(--cdl-header-padding-inline, 18px) 14px;
+  border-top: 1px solid var(--medical-border);
+  background: var(--medical-slate-50);
+}
+
+.operational-alarm-dock__checklist-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.operational-alarm-dock__checklist-eyebrow {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--medical-accent-hover);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.operational-alarm-dock__checklist h2 {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.operational-alarm-dock__checklist p {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--medical-ink-muted);
+}
+
+.operational-alarm-dock__checklist-meta {
+  display: grid;
+  gap: 4px;
+  justify-items: end;
+  min-width: 72px;
+}
+
+.operational-alarm-dock__progress {
+  width: 72px;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--medical-border) 70%, transparent);
+}
+
+.operational-alarm-dock__progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--medical-accent);
+}
+
+.operational-alarm-dock__checklist-items {
+  display: grid;
+  gap: 6px;
+}
+
+.operational-alarm-dock__checklist-items label {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px;
+  align-items: start;
+  padding: 8px 10px;
+  border: 1px solid var(--medical-border);
+  border-radius: 8px;
+  background: var(--medical-white);
+  font-size: 12px;
+}
+
+.operational-alarm-dock__item--done {
+  border-color: color-mix(in srgb, var(--status-success) 40%, var(--medical-border));
+  background: color-mix(in srgb, var(--status-success) 6%, var(--medical-white));
+}
+
+.operational-alarm-dock__checklist-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.operational-alarm-dock__secondary {
+  border-top: 1px solid var(--medical-border);
+}
+
+@media (max-width: 768px) {
+  .operational-alarm-dock__strip {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .operational-alarm-dock__copy span {
+    white-space: normal;
+  }
+
+  .operational-alarm-dock__actions {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+}

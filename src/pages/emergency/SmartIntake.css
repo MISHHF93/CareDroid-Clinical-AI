@@ -186,20 +186,20 @@
 }
 
 .smart-intake__field--verified {
-  box-shadow: inset 3px 0 0 var(--status-stable);
+  border-left: 2px solid color-mix(in srgb, var(--status-stable) 45%, transparent);
 }
 
 .smart-intake__field--unverified {
-  box-shadow: inset 3px 0 0 var(--status-info);
+  border-left: 2px solid color-mix(in srgb, var(--status-info) 45%, transparent);
 }
 
 .smart-intake__field--conflicting,
 .smart-intake__field--missing {
-  box-shadow: inset 3px 0 0 var(--status-warning);
+  border-left: 2px solid color-mix(in srgb, var(--status-warning) 45%, transparent);
 }
 
 .smart-intake__field--overridden {
-  box-shadow: inset 3px 0 0 var(--status-critical);
+  border-left: 2px solid color-mix(in srgb, var(--status-critical) 45%, transparent);
 }
 
 .smart-intake__candidate-list button {
@@ -217,7 +217,8 @@
 }
 
 .smart-intake__candidate--selected {
-  box-shadow: inset 3px 0 0 var(--status-info);
+  border-left: 2px solid color-mix(in srgb, var(--status-info) 45%, transparent);
+  box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
 }
 
 .smart-intake__match-explanation {

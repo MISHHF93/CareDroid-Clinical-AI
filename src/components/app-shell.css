@@ -2,12 +2,25 @@
 @import '../styles/emergency-tokens.css';
 
 .emergency-app-shell {
+  --app-shell-sidebar-offset: var(--cdl-sidebar-width, 232px);
   display: flex;
   height: var(--app-viewport-height, 100dvh);
   overflow: hidden;
-  background: var(--ed-surface-base, var(--color-background, var(--medical-surface-page, #f0f9ff)));
-  color: var(--ed-text-primary, var(--color-text-primary, var(--medical-ink, #111827)));
-  font-family: var(--font-ui, Inter, system-ui, sans-serif);
+  background: var(--cdl-canvas-bg, var(--ed-surface-base, var(--medical-surface-page)));
+  color: var(--ed-text-primary, var(--medical-ink));
+  font-family: var(--app-font-family-body, Inter, system-ui, sans-serif);
+}
+
+@media (max-width: 1024px) and (min-width: 769px) {
+  .emergency-app-shell {
+    --app-shell-sidebar-offset: 56px;
+  }
+}
+
+@media (max-width: 768px) {
+  .emergency-app-shell {
+    --app-shell-sidebar-offset: 0px;
+  }
 }
 
 .ed-skip-link {
@@ -42,6 +55,20 @@
   overflow: hidden;
 }
 
+.emergency-app-shell > .sidebar {
+  align-self: stretch;
+}
+
+/* Reception / arrival desk: shell header owns the page title */
+.emergency-app-shell .reception-workspace .reception-command-header__eyebrow,
+.emergency-app-shell .reception-workspace .reception-command-header h1 {
+  display: none;
+}
+
+.emergency-app-shell .app-shell-main-content {
+  background: var(--cdl-canvas-bg, var(--medical-surface-page));
+}
+
 .emergency-app-shell--copilot-open .emergency-app-shell__main-column {
   flex: 1 1 auto;
   min-width: 0;
@@ -54,7 +81,7 @@
 .emergency-wall-kiosk-header {
   padding: var(--ed-space-3, 12px) var(--ed-space-5, 20px);
   border-bottom: 1px solid var(--ed-border-subtle);
-  background: var(--ed-surface-base, var(--color-background, var(--medical-surface-page, #f0f9ff)));
+  background: var(--ed-surface-base, var(--color-background, var(--medical-surface-page)));
 }
 
 .emergency-wall-kiosk-header__safety {

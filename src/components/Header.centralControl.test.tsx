@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it } from 'vitest';
 import { UserProvider } from '../contexts/UserContext';
@@ -24,33 +24,12 @@ describe('Header central control', () => {
     expect(screen.queryByLabelText('Demo CareDroid role')).toBeNull();
   });
 
-  it('renders the global operational command metrics', () => {
+  it('renders a slim contextual header with search and create actions', () => {
     renderHeader();
 
-    const commandContext = screen.getByLabelText('Operational command context');
-    for (const label of [
-      'Patients Today',
-      'Waiting',
-      'Longest Wait',
-      'Average Wait',
-      'EMS Inbound',
-      'Reassessments Due',
-      'Capacity Score',
-      'Boarders',
-      'Referrals Pending',
-    ]) {
-      expect(commandContext).toHaveTextContent(label);
-    }
-  });
-
-  it('opens the mounted Notification Center from the header bell', () => {
-    renderHeader();
-
-    fireEvent.click(screen.getByRole('button', { name: /notification center/i }));
-
-    const dialog = screen.getByRole('dialog', { name: /notification center/i });
-    expect(within(dialog).getByRole('heading', { name: /notification center/i })).toBeInTheDocument();
-    expect(within(dialog).getByRole('button', { name: /mark all read/i })).toBeInTheDocument();
-    expect(within(dialog).getByRole('button', { name: /close/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /create patient/i })).toBeInTheDocument();
+    expect(screen.getByRole('searchbox', { name: /operational search/i })).toBeInTheDocument();
+    expect(screen.queryByLabelText('Operational command context')).toBeNull();
+    expect(screen.queryByRole('button', { name: /notification center/i })).toBeNull();
   });
 });

@@ -1,0 +1,214 @@
+/**
+ * Clinical operational flow — de-brutalize EMS, strips, intake, and handoff surfaces.
+ * Replaces heavy inset rails, dark cell dividers, and nested bordered boxes.
+ */
+
+/* ══════════════════════════════════════════════════════════════════
+   Operational metric strips (EMS · whiteboard · reception)
+   ══════════════════════════════════════════════════════════════════ */
+
+.emergency-app-shell :is(
+    .operational-strip--compact,
+    .operational-strip--command,
+    .charge-nurse-operational-strip,
+    .reception-operational-strip
+  ) {
+  gap: 6px;
+  padding: 8px 10px;
+  border: 1px solid var(--cdl-clinical-border);
+  border-radius: var(--cdl-clinical-radius);
+  background: var(--app-surface-1, #ffffff);
+  box-shadow: var(--cdl-clinical-shadow-rest);
+}
+
+.emergency-app-shell :is(
+    .operational-strip__eyebrow,
+    .operational-strip__metric,
+    .operational-strip__action,
+    .charge-nurse-operational-strip__metric,
+    .reception-operational-strip__metric
+  ) {
+  border-right: 0 !important;
+  border-bottom: 0 !important;
+  border-radius: var(--cdl-clinical-radius-sm);
+  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 38%, var(--app-surface-1, #ffffff));
+}
+
+.emergency-app-shell :is(
+    .operational-strip__metric,
+    .operational-strip__action
+  ):hover:not(:disabled) {
+  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 8%, var(--app-surface-1, #ffffff));
+}
+
+.emergency-app-shell :is(
+    .operational-strip--accent-ems,
+    .operational-strip--accent-reassessment,
+    .operational-strip--accent-referral,
+    .operational-strip--accent-shift-handoff
+  ) {
+  box-shadow: var(--cdl-clinical-shadow-rest);
+}
+
+.emergency-app-shell :is(
+    .operational-strip--accent-ems,
+    .operational-strip--accent-reassessment,
+    .operational-strip--accent-referral
+  ) {
+  border-bottom: 1px solid var(--cdl-clinical-border);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   EMS pipeline page
+   ══════════════════════════════════════════════════════════════════ */
+
+.ems-pipeline {
+  display: grid;
+  gap: var(--cdl-clinical-section-gap, var(--space-4));
+  grid-template-rows: none;
+  min-height: 0;
+  background: transparent;
+}
+
+.ems-pipeline__sections {
+  gap: var(--cdl-clinical-section-gap, var(--space-4));
+  padding: 0;
+}
+
+.ems-pipeline__section {
+  gap: var(--cdl-clinical-card-padding, var(--space-3));
+}
+
+.ems-pipeline__unit-grid article,
+.ems-pipeline__diversion,
+.ems-pipeline__row {
+  border: 1px solid var(--cdl-clinical-border);
+  border-radius: var(--cdl-clinical-radius);
+  background: var(--app-surface-1, #ffffff);
+  box-shadow: var(--cdl-clinical-shadow-rest);
+}
+
+.ems-pipeline__row {
+  border-left: 2px solid color-mix(in srgb, var(--status-info, #0ea5e9) 42%, transparent);
+}
+
+.ems-pipeline__row--warning {
+  border-left-color: color-mix(in srgb, var(--status-warning, #f59e0b) 48%, transparent);
+  background: color-mix(in srgb, var(--status-warning, #f59e0b) 5%, var(--app-surface-1, #ffffff));
+}
+
+.ems-pipeline__row--critical,
+.ems-pipeline__row--arrived {
+  border-left-color: color-mix(in srgb, var(--status-critical, #ef4444) 48%, transparent);
+  background: color-mix(in srgb, var(--status-critical, #ef4444) 4%, var(--app-surface-1, #ffffff));
+}
+
+.ems-pipeline__row-details {
+  border-top-color: color-mix(in srgb, var(--cdl-clinical-border) 55%, transparent);
+}
+
+.ems-pipeline__details-toggle,
+.ems-pipeline__actions button,
+.ems-pipeline__prepared {
+  border-color: color-mix(in srgb, var(--cdl-clinical-border) 80%, transparent);
+  border-radius: var(--cdl-clinical-radius-sm);
+  background: var(--app-surface-1, #ffffff);
+}
+
+.ems-pipeline__empty {
+  border: 1px dashed color-mix(in srgb, var(--cdl-clinical-border) 85%, transparent);
+  border-radius: var(--cdl-clinical-radius);
+  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 30%, var(--app-surface-1, #ffffff));
+}
+
+.ems-pipeline__offload-kpi,
+.ems-pipeline__severity,
+.ems-pipeline__eta {
+  border-color: color-mix(in srgb, var(--cdl-clinical-border) 65%, transparent);
+}
+
+/* EMS child panels */
+.emergency-app-shell :is(
+    .pre-arrival-intake,
+    .ems-offload-attention-strip,
+    .ems-offload-tracker__table-wrap,
+    .amb-handoff-checklist,
+    .ems-pressure--gauge
+  ) {
+  border-color: var(--cdl-clinical-border);
+  border-radius: var(--cdl-clinical-radius);
+  box-shadow: var(--cdl-clinical-shadow-rest);
+}
+
+.emergency-app-shell .pre-arrival-intake {
+  background: var(--app-surface-1, #ffffff);
+}
+
+.emergency-app-shell .ems-offload-attention-strip__counts span,
+.emergency-app-shell .ems-offload-attention-strip__item {
+  border-color: var(--cdl-clinical-border);
+  border-radius: var(--cdl-clinical-radius-sm);
+  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 35%, var(--app-surface-1, #ffffff));
+  box-shadow: none;
+}
+
+.emergency-app-shell .ems-offload-attention-strip__counts span[data-tone='critical'],
+.emergency-app-shell .ems-offload-attention-strip__item[data-tone='critical'] {
+  border-color: color-mix(in srgb, var(--status-critical, #ef4444) 32%, var(--cdl-clinical-border));
+  background: color-mix(in srgb, var(--status-critical, #ef4444) 6%, var(--app-surface-1, #ffffff));
+  color: var(--semantic-critical, #b91c1c);
+}
+
+.emergency-app-shell .ems-offload-attention-strip__counts span[data-tone='watch'],
+.emergency-app-shell .ems-offload-attention-strip__item[data-tone='watch'] {
+  border-color: color-mix(in srgb, var(--status-warning, #f59e0b) 32%, var(--cdl-clinical-border));
+  background: color-mix(in srgb, var(--status-warning, #f59e0b) 6%, var(--app-surface-1, #ffffff));
+}
+
+.emergency-app-shell .ems-offload-attention-strip__open {
+  border-color: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 28%, transparent);
+  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 8%, var(--app-surface-1, #ffffff));
+  color: var(--app-accent-hover, #0284c7);
+}
+
+.emergency-app-shell .ems-pressure--gauge {
+  box-shadow: var(--cdl-clinical-shadow-rest);
+  background: var(--app-surface-1, #ffffff);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Smart intake · analytics · settings route shells
+   ══════════════════════════════════════════════════════════════════ */
+
+.emergency-app-shell :is(
+    .smart-intake__hero,
+    .smart-intake__panel,
+    .smart-intake__status,
+    .smart-intake__disclosure,
+    .smart-intake__actions,
+    .smart-intake__audit,
+    .emergency-analytics__card,
+    .emergency-settings__section,
+    .help-hub-page__card
+  ) {
+  border: 1px solid var(--cdl-clinical-border);
+  border-radius: var(--cdl-clinical-radius);
+  background: var(--app-surface-1, #ffffff);
+  box-shadow: var(--cdl-clinical-shadow-rest);
+}
+
+.emergency-app-shell .smart-intake {
+  background: transparent;
+  padding: 0;
+}
+
+/* Kill inset accent rails on flow cards — use border-left tint only */
+.emergency-app-shell :is(
+    .ems-pressure--gauge,
+    .emergency-whiteboard-page__arrival-card,
+    .emergency-whiteboard-page__inbound-banner-card,
+    .emergency-whiteboard-page__referral-task-btn,
+    .emergency-whiteboard-page__reassess-task-btn
+  ) {
+  box-shadow: var(--cdl-clinical-shadow-rest) !important;
+}

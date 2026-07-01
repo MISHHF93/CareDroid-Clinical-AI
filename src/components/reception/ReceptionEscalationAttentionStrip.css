@@ -2,9 +2,9 @@
   display: grid;
   gap: 10px;
   padding: 12px 14px;
-  border: 1px solid #b45309;
-  border-radius: 12px;
-  background: rgba(69, 26, 3, 0.35);
+  border: 1px solid color-mix(in srgb, var(--reception-warning, var(--status-warning, #f59e0b)) 42%, var(--reception-border, var(--medical-border)));
+  border-radius: var(--reception-radius-lg, 12px);
+  background: color-mix(in srgb, var(--reception-warning, var(--status-warning, #f59e0b)) 10%, var(--reception-surface-card, var(--app-surface-1, #ffffff)));
 }
 
 .reception-escalation-attention-strip__eyebrow {
@@ -18,13 +18,13 @@
 .reception-escalation-attention-strip__header h3 {
   margin: 4px 0 0;
   font-size: 14px;
-  color: #fff7ed;
+  color: var(--reception-text-primary, var(--medical-ink, #111827));
 }
 
 .reception-escalation-attention-strip__subtitle {
   margin: 4px 0 0;
   font-size: 12px;
-  color: var(--medical-status-high-text, #c2410c);
+  color: var(--reception-text-secondary, var(--medical-ink-muted, #6b7280));
 }
 
 .reception-escalation-attention-strip__list {
@@ -40,16 +40,16 @@
   gap: 2px;
   width: 100%;
   text-align: left;
-  border: 1px solid #7c2d12;
-  border-radius: 10px;
-  background: var(--app-surface-1, #ffffff);
-  color: var(--medical-ink, #111827);
+  border: 1px solid var(--reception-border, var(--medical-border));
+  border-radius: var(--reception-radius-md, 10px);
+  background: var(--reception-surface-card, var(--app-surface-1, #ffffff));
+  color: var(--reception-text-primary, var(--medical-ink, #111827));
   cursor: pointer;
   padding: 10px 12px;
 }
 
 .reception-escalation-attention-strip__item[data-severity='Critical'] {
-  border-color: #dc2626;
+  border-color: color-mix(in srgb, var(--reception-danger, var(--status-danger, #ef4444)) 52%, var(--reception-border, var(--medical-border)));
 }
 
 .reception-escalation-attention-strip__item:disabled {
@@ -63,7 +63,7 @@
 
 .reception-escalation-attention-strip__message {
   font-size: 12px;
-  color: var(--medical-text-disabled, #d1d5db);
+  color: var(--reception-text-secondary, var(--medical-ink-muted, #6b7280));
 }
 
 .reception-escalation-attention-strip__meta {

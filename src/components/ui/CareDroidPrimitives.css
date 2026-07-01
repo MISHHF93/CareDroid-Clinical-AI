@@ -91,9 +91,9 @@
 
 .cd-dashboard-section {
   background: var(--app-surface);
-  border: 1px solid var(--app-border);
-  border-radius: var(--compact-panel-radius, var(--app-radius-lg));
-  box-shadow: var(--app-elevation-none);
+  border: 1px solid var(--cdl-clinical-border, var(--app-border));
+  border-radius: var(--cdl-clinical-radius, var(--compact-panel-radius, var(--app-radius-lg)));
+  box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
   display: grid;
   gap: var(--compact-panel-gap, var(--app-space-md));
   min-width: 0;
@@ -154,9 +154,9 @@
 .cd-hero-panel,
 .cd-surface {
   background: var(--app-surface);
-  border: 1px solid var(--app-border);
-  border-radius: var(--compact-panel-radius, var(--app-radius-xl, var(--app-radius-lg)));
-  box-shadow: var(--app-elevation-none);
+  border: 1px solid var(--cdl-clinical-border, var(--app-border));
+  border-radius: var(--cdl-clinical-radius, var(--compact-panel-radius, var(--app-radius-xl, var(--app-radius-lg))));
+  box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
   display: grid;
   gap: var(--compact-panel-gap, var(--app-space-md));
   min-width: 0;
@@ -251,9 +251,9 @@
 .cd-metric-card,
 .cd-status-widget {
   background: var(--app-surface);
-  border: 1px solid var(--app-border);
-  border-radius: var(--app-radius-lg);
-  box-shadow: var(--app-elevation-none);
+  border: 1px solid var(--cdl-clinical-border, var(--app-border));
+  border-radius: var(--cdl-clinical-radius, var(--app-radius-lg));
+  box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
   min-width: 0;
 }
 

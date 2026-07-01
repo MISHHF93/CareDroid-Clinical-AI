@@ -65,15 +65,15 @@
 
 .tool-header {
   background: var(--app-surface-1);
-  border: 1px solid var(--app-border);
-  border-left: 4px solid var(--app-accent-action, var(--app-accent-interactive));
-  border-radius: var(--app-radius-lg, 18px);
+  border: 1px solid var(--cdl-clinical-border, var(--app-border));
+  border-left: 3px solid color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 55%, transparent);
+  border-radius: var(--cdl-clinical-radius-lg, var(--app-radius-lg, 18px));
   padding: 32px;
   margin-bottom: 32px;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  box-shadow: var(--app-elevation-card, var(--app-shadow-1));
+  box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card, var(--app-shadow-1)));
 }
 
 .tool-header-left {

@@ -90,10 +90,10 @@
     .consent-header
   ) {
   min-width: 0;
-  border: 1px solid var(--app-border);
-  border-radius: var(--app-visual-panel-radius);
+  border: 1px solid var(--cdl-clinical-border, var(--app-border));
+  border-radius: var(--cdl-clinical-radius, var(--app-visual-panel-radius));
   background: var(--app-surface);
-  box-shadow: var(--app-elevation-none);
+  box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
   padding: var(--app-visual-header-padding);
 }
 
@@ -156,11 +156,11 @@
     [class*='-state ']
   ) {
   min-width: 0;
-  border-color: var(--app-border);
-  border-radius: var(--app-visual-panel-radius);
+  border-color: var(--cdl-clinical-border, var(--app-border));
+  border-radius: var(--cdl-clinical-radius, var(--app-visual-panel-radius));
   background-color: var(--app-surface);
   color: var(--app-text-primary);
-  box-shadow: var(--app-elevation-none);
+  box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
 }
 
 :is(.app-shell, .emergency-app-shell) :is(
@@ -176,10 +176,10 @@
     .device-summary-card,
     .medical-iot-card
   ) {
-  border: 1px solid var(--app-border);
-  border-radius: var(--app-visual-panel-radius);
+  border: 1px solid var(--cdl-clinical-border, var(--app-border));
+  border-radius: var(--cdl-clinical-radius, var(--app-visual-panel-radius));
   background: var(--app-surface);
-  box-shadow: var(--app-elevation-none);
+  box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
 }
 
 :is(.app-shell, .emergency-app-shell) :is(
@@ -367,7 +367,7 @@
 
 :is(.app-shell, .emergency-app-shell) .command-panel {
   background: color-mix(in srgb, var(--app-surface-1) 94%, var(--app-bg));
-  box-shadow: var(--app-elevation-none);
+  box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
 }
 
 :is(.app-shell, .emergency-app-shell) .command-compact-action--primary {

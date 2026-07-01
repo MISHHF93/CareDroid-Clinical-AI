@@ -22,6 +22,7 @@ interface HeaderProps extends AsProps {
   className?: string;
   headerClassName?: string;
   contentClassName?: string;
+  suppressHeader?: boolean;
 }
 
 export function PageShell({
@@ -36,22 +37,25 @@ export function PageShell({
   className = '',
   headerClassName = '',
   contentClassName = '',
+  suppressHeader = false,
   as: Element = 'section',
   ...props
 }: HeaderProps & HTMLAttributes<HTMLElement>) {
   return (
     <Element className={['cd-page-shell', className].filter(Boolean).join(' ')} {...props}>
-      <PageHeader
-        eyebrow={eyebrow}
-        title={title}
-        titleId={titleId}
-        description={description || subtitle}
-        actions={actions}
-        leadingIcon={leadingIcon}
-        className={headerClassName}
-      >
-        {null}
-      </PageHeader>
+      {!suppressHeader ? (
+        <PageHeader
+          eyebrow={eyebrow}
+          title={title}
+          titleId={titleId}
+          description={description || subtitle}
+          actions={actions}
+          leadingIcon={leadingIcon}
+          className={headerClassName}
+        >
+          {null}
+        </PageHeader>
+      ) : null}
       <div className={['cd-page-shell__content', contentClassName].filter(Boolean).join(' ')}>
         {children}
       </div>

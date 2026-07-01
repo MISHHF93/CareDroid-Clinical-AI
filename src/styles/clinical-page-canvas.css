@@ -1,0 +1,302 @@
+/**
+ * Clinical Page Canvas — anti-brutalism surface layer for all operational pages.
+ * Loaded last in design-system.css; softens flat bordered boxes into warm,
+ * elevated clinical surfaces with breathable spacing and subtle depth.
+ */
+
+:root {
+  --cdl-clinical-canvas-top-glow: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 5%, transparent);
+  --cdl-clinical-canvas-base: var(--medical-surface-page, #f8fafc);
+  --cdl-clinical-border: color-mix(in srgb, var(--medical-border, #e2e8f0) 48%, transparent);
+  --cdl-clinical-border-strong: color-mix(in srgb, var(--medical-border, #e2e8f0) 68%, transparent);
+  --cdl-clinical-border-focus: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 32%, transparent);
+  --cdl-clinical-radius: 12px;
+  --cdl-clinical-radius-sm: 10px;
+  --cdl-clinical-radius-lg: 14px;
+  --cdl-clinical-shadow-rest:
+    0 1px 2px rgba(15, 23, 42, 0.03),
+    0 4px 14px rgba(15, 23, 42, 0.04);
+  --cdl-clinical-shadow-hover:
+    0 2px 6px rgba(15, 23, 42, 0.05),
+    0 10px 24px rgba(15, 23, 42, 0.06);
+  --cdl-clinical-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  --cdl-clinical-panel-padding: clamp(14px, 1.6vw, 18px);
+  --cdl-clinical-card-padding: clamp(12px, 1.4vw, 16px);
+  --cdl-clinical-section-gap: clamp(16px, 2vw, 22px);
+  --cdl-clinical-motion: 180ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* —— Warm canvas with subtle sky glow —— */
+.emergency-app-shell,
+.emergency-app-shell .app-shell-main-content {
+  background:
+    radial-gradient(ellipse 140% 60% at 50% -8%, var(--cdl-clinical-canvas-top-glow), transparent 58%),
+    var(--cdl-clinical-canvas-base);
+}
+
+.emergency-app-shell .app-shell-main-content {
+  --cdl-canvas-bg: transparent;
+}
+
+/* —— Shared clinical surface recipe —— */
+:is(.app-shell, .emergency-app-shell) :is(
+    .cdl-surface,
+    .cd-dashboard-section,
+    .cd-hero-panel,
+    .cd-surface,
+    .cd-dashboard-card,
+    .cd-tool-card,
+    .cd-insight-card,
+    .cd-metric-card,
+    .cd-status-widget,
+    .cd-filter-panel,
+    .cd-info-notice,
+    .cd-state,
+    .cd-surface-card,
+    .emergency-route-card,
+    .emergency-route-metric-card,
+    .emergency-route-situation-brief,
+    .emergency-route-filter-banner,
+    .hospital-command-center__metric-card,
+    .hospital-command-center__status,
+    .hospital-command-center__panel,
+    .patient-card,
+    .staff-card
+  ) {
+  border: 1px solid var(--cdl-clinical-border);
+  border-radius: var(--cdl-clinical-radius);
+  background: var(--app-surface-1, #ffffff);
+  box-shadow: var(--cdl-clinical-shadow-rest), var(--cdl-clinical-shadow-inset);
+  transition:
+    border-color var(--cdl-clinical-motion),
+    box-shadow var(--cdl-clinical-motion),
+    transform var(--cdl-clinical-motion);
+}
+
+/* Legacy page cards/panels/widgets — override visual-consistency flat boxes */
+:is(.app-shell, .emergency-app-shell) :is(
+    .card,
+    [class$='-card']:not([class*='metric-chip']):not([class*='badge']):not([class*='chip']):not([class*='avatar']),
+    [class*='-card ']:not([class*='metric-chip']):not([class*='badge']),
+    [class$='-panel'],
+    [class*='-panel '],
+    [class$='-widget'],
+    [class*='-widget '],
+    [class$='-notice'],
+    [class*='-notice '],
+    [class$='-state'],
+    [class*='-state ']
+  ) {
+  border-color: var(--cdl-clinical-border);
+  border-radius: var(--cdl-clinical-radius);
+  box-shadow: var(--cdl-clinical-shadow-rest);
+}
+
+:is(.app-shell, .emergency-app-shell) :is(
+    .summary-card,
+    .cost-card,
+    .analytics-panel,
+    .cost-panel,
+    .tool-card-large,
+    .platform-result-card,
+    .platform-panel,
+    .operating-card,
+    .operating-drilldown,
+    .device-summary-card,
+    .medical-iot-card
+  ) {
+  border: 1px solid var(--cdl-clinical-border);
+  border-radius: var(--cdl-clinical-radius);
+  background: var(--app-surface-1, #ffffff);
+  box-shadow: var(--cdl-clinical-shadow-rest);
+}
+
+/* Interactive cards lift on hover */
+:is(.app-shell, .emergency-app-shell) :is(
+    a[class$='-card'],
+    a[class*='-card '],
+    button[class$='-card'],
+    .cd-tool-card,
+    .cd-dashboard-card,
+    .hospital-command-center__metric-card,
+    .emergency-route-metric-card
+  ):hover {
+  border-color: var(--cdl-clinical-border-focus);
+  box-shadow: var(--cdl-clinical-shadow-hover);
+  transform: translateY(-1px);
+}
+
+/* Nested / inset surfaces — softer, no heavy shadow stack */
+:is(.app-shell, .emergency-app-shell) :is(
+    .cd-surface--nested,
+    .cd-surface--subtle,
+    .cd-surface-card--muted,
+    .emergency-route-situation-brief
+  ) {
+  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 42%, var(--app-surface-1, #ffffff));
+  box-shadow: none;
+}
+
+/* —— Section rhythm —— */
+:is(.app-shell, .emergency-app-shell) :is(
+    .cd-page-shell,
+    .cd-page-shell__content,
+    .cdl-operational-page,
+    .cd-page-stack,
+    .emergency-route-page__content
+  ) {
+  gap: var(--cdl-clinical-section-gap);
+}
+
+:is(.app-shell, .emergency-app-shell) :is(
+    .cd-dashboard-section,
+    .cd-dashboard-section__content,
+    .cd-dashboard-grid,
+    .cdl-zone
+  ) {
+  gap: var(--cdl-clinical-card-padding);
+}
+
+/* —— Tabs & chips: tint-first, not bordered pills —— */
+:is(.app-shell, .emergency-app-shell) :is(
+    .emergency-route-view-tabs__btn,
+    .emergency-route-maturity-chip,
+    .cd-metric-chip,
+    .reception-command-badge,
+    .reception-command-chip
+  ) {
+  border-color: color-mix(in srgb, var(--cdl-clinical-border) 72%, transparent);
+  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 55%, var(--app-surface-1, #ffffff));
+  box-shadow: none;
+}
+
+:is(.app-shell, .emergency-app-shell) :is(
+    .emergency-route-view-tabs__btn--active,
+    .reception-command-chip--active
+  ) {
+  border-color: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 28%, transparent);
+  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 10%, var(--app-surface-1, #ffffff));
+  color: var(--app-accent-hover, #0284c7);
+  box-shadow: none;
+}
+
+/* —— Secondary controls: ghost over bordered boxes —— */
+:is(.app-shell, .emergency-app-shell) :is(
+    .emergency-route-filter-banner__btn,
+    .emergency-route-help-trigger
+  ) {
+  border-color: color-mix(in srgb, var(--cdl-clinical-border) 80%, transparent);
+  background: color-mix(in srgb, var(--app-surface-1, #ffffff) 88%, var(--app-surface-muted, #f1f5f9));
+  box-shadow: none;
+}
+
+:is(.app-shell, .emergency-app-shell) :is(
+    .emergency-route-filter-banner__btn:hover,
+    .emergency-route-filter-banner__btn:focus-visible,
+    .emergency-route-help-trigger:hover,
+    .emergency-route-help-trigger:focus-visible
+  ) {
+  border-color: var(--cdl-clinical-border-focus);
+  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 8%, var(--app-surface-1, #ffffff));
+  box-shadow: var(--cdl-clinical-shadow-rest);
+}
+
+/* —— Data tables: hairline rows, soft header band —— */
+:is(.app-shell, .emergency-app-shell) :is(.cd-data-table th) {
+  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 55%, var(--app-surface-1, #ffffff));
+  border-bottom-color: var(--cdl-clinical-border);
+}
+
+:is(.app-shell, .emergency-app-shell) :is(.cd-data-table td) {
+  border-bottom-color: color-mix(in srgb, var(--cdl-clinical-border) 55%, transparent);
+}
+
+/* —— Reception desk: soften command panels —— */
+.emergency-app-shell .reception-command :is(
+    .reception-command-header,
+    .reception-command-panel,
+    .reception-desk-toolbar,
+    .reception-queue-panel,
+    .reception-intake-panel,
+    .reception-escalation-strip
+  ) {
+  border-color: var(--cdl-clinical-border);
+  border-radius: var(--cdl-clinical-radius);
+  box-shadow: var(--cdl-clinical-shadow-rest);
+}
+
+.emergency-app-shell .reception-command {
+  gap: var(--cdl-clinical-section-gap);
+}
+
+/* —— Hero panels: gentle accent wash —— */
+:is(.app-shell, .emergency-app-shell) .cd-hero-panel {
+  background:
+    linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 7%, transparent) 0%,
+      transparent 52%
+    ),
+    var(--app-surface-1, #ffffff);
+}
+
+/* —— Semantic surfaces keep meaning, lose harsh edges —— */
+:is(.app-shell, .emergency-app-shell) :is(
+    .cdl-surface--critical,
+    .cdl-surface--urgent,
+    .cdl-surface--warning,
+    .cdl-surface--attention,
+    .cdl-surface--healthy,
+    .cdl-surface--information,
+    .emergency-route-situation-brief--info,
+    .emergency-route-situation-brief--warning,
+    .emergency-route-situation-brief--critical
+  ) {
+  box-shadow: none;
+}
+
+/* —— Form inputs: inset softness —— */
+:is(.app-shell, .emergency-app-shell) :is(
+    input:not([type='checkbox']):not([type='radio']):not([type='range']),
+    select,
+    textarea
+  ) {
+  border-color: var(--cdl-clinical-border);
+  border-radius: var(--cdl-clinical-radius-sm);
+  background: var(--app-input-bg, #ffffff);
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.03);
+  transition: border-color var(--cdl-clinical-motion), box-shadow var(--cdl-clinical-motion);
+}
+
+:is(.app-shell, .emergency-app-shell) :is(
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible
+  ) {
+  border-color: var(--cdl-clinical-border-focus);
+  box-shadow:
+    inset 0 1px 2px rgba(15, 23, 42, 0.03),
+    0 0 0 3px color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 14%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is(.app-shell, .emergency-app-shell) :is(
+      a[class$='-card'],
+      a[class*='-card '],
+      button[class$='-card'],
+      .cd-tool-card,
+      .cd-dashboard-card,
+      .hospital-command-center__metric-card,
+      .emergency-route-metric-card
+    ):hover {
+    transform: none;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --cdl-clinical-section-gap: 14px;
+    --cdl-clinical-panel-padding: 12px;
+    --cdl-clinical-card-padding: 10px;
+  }
+}

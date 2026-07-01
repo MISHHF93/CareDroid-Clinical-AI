@@ -103,7 +103,7 @@ export const ALERT_SOURCE_REGISTRY = Object.freeze([
     domain: 'EMS',
     source: 'alert-ems-critical',
     defaultTier: 'critical',
-    surfaces: ['Header', 'EMSCriticalBroadcast', 'OperationalHandoffDomainBar'],
+    surfaces: ['OperationalAlarmDock', 'SidebarNotificationPanel', 'OperationalHandoffDomainBar'],
   }),
   Object.freeze({
     id: 'referral-escalation',
@@ -332,7 +332,7 @@ export function sortAlertsByClassification(alerts = [] as any[]) {
   );
 }
 
-/** Unified lifecycle envelope for a single alert — toast, banner, and history routing. */
+/** Unified lifecycle envelope for a single alert ï¿½ toast, banner, and history routing. */
 export function resolveOperationalAlertEnvelope(alert: any) {
   const tier = getAlertClassificationTier(alert);
   const resolution = String(alert?.resolutionStatus || alert?.metadata?.resolutionStatus || '');

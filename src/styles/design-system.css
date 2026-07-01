@@ -18,6 +18,7 @@
 
 /* 4. Medical theme layers */
 @import './medical-color-layer.css';
+@import './medical-shell-layer.css';
 @import './medical-type-layer.css';
 @import './medical-card-layer.css';
 
@@ -49,3 +50,8 @@
 @import './visual-responsive-standards.css';
 @import './layout-engine.css';
 @import './caredroid-design-language.css';
+@import './shell-header-polish.css';
+@import './clinical-page-canvas.css';
+@import './clinical-page-targets.css';
+@import './clinical-operational-flow.css';
+@import './clinical-page-sweep.css';

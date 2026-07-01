@@ -1,6 +1,6 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useLocation, useNavigate, type To } from 'react-router-dom';
-import { Toaster } from 'sonner';
+import CareDroidToastHost from './CareDroidToastHost';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import ErrorBoundary from './ErrorBoundary';
@@ -39,6 +39,11 @@ import { useSimulationMode } from '../contexts/SimulationModeContext';
 import { useUserIdentity } from '../contexts/UserIdentityContext';
 import { isSimulationModeActive } from '../services/simulationModeService';
 import SessionChromeBar from './chrome/SessionChromeBar';
+import ShellRouteTab from './chrome/ShellRouteTab';
+import OperationalAlarmDock from './chrome/OperationalAlarmDock';
+import { RouteChromeProvider } from '../contexts/RouteChromeContext';
+import { NotificationShellProvider } from '../contexts/NotificationShellContext';
+import SidebarNotificationPanel from './SidebarNotificationPanel';
 import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
 import { HelpHubProvider, dispatchOpenHelpHub } from '../contexts/HelpHubContext';
 import './app-shell.css';
@@ -53,7 +58,7 @@ import { patientFlags } from '../utils/patientVitals';
 
 const PatientDetailPanel = lazy(() => import('./PatientDetailPanel'));
 const CommandPalette = lazy(() => import('./CommandPalette'));
-const EMSCriticalBroadcast = lazy(() => import('./EMSCriticalBroadcast'));
+
 const ReassessmentDrawer = lazy(() => import('./ReassessmentDrawer'));
 const HelpHub = lazy(() => import('./help/HelpHub'));
 
@@ -222,7 +227,9 @@ export function AppShell({ children }: AppShellProps) {
   return (
     <PractitionerVisibilityProvider>
       <HelpHubProvider>
-        <AppShellFrame>{children}</AppShellFrame>
+        <NotificationShellProvider>
+          <AppShellFrame>{children}</AppShellFrame>
+        </NotificationShellProvider>
       </HelpHubProvider>
     </PractitionerVisibilityProvider>
   );
@@ -565,10 +572,8 @@ function AppShellFrame({ children }: AppShellProps) {
       }
 
       if (e.key.toLowerCase() === 'a' && !e.metaKey && !e.ctrlKey && !e.altKey && !e.repeat) {
-        if (emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyAlerts)) {
-          e.preventDefault();
-          profileNavigate(CANONICAL_ROUTES.emergencyAlerts);
-        }
+        e.preventDefault();
+        document.dispatchEvent(new Event('open-notification-center'));
         return;
       }
 
@@ -775,48 +780,52 @@ function AppShellFrame({ children }: AppShellProps) {
         Skip to main content
       </a>
       {useKioskShell ? null : <Sidebar navigationItems={visibleNavigationItems} />}
+      {!useKioskShell ? <SidebarNotificationPanel /> : null}
       <div className="emergency-app-shell__main-column">
-        {useWallKioskChrome ? (
-          <header className="emergency-wall-kiosk-header">
-            <strong>{screenCapabilities.label}</strong>
-            <span className="emergency-wall-kiosk-header__safety">{EMERGENCY_OS_BRANDING.safetyLine}</span>
-          </header>
-        ) : isPublicWaitingKiosk || isReadOnlyWhiteboardKiosk ? null : (
-          <Header
-            pageTitle={currentPage.label}
-            pageSubtitle={surfaces.chrome.showHeaderSubtitle ? currentPage.subtitle : undefined}
-          />
-        )}
-        {!useKioskShell ? <SessionChromeBar /> : null}
-        <main
-          id="main-content"
-          className={[
-            'app-shell-main-content',
-            isMobileViewport ? 'app-shell-main-content--mobile-nav' : '',
-          ]
-            .filter(Boolean)
-            .join(' ')}
-          role="main"
-          tabIndex={-1}
-          data-screen-density-mode={screenDensityProfile.id}
-          data-practitioner-compact={surfaces.compactLayout ? 'true' : undefined}
-        >
-          <ErrorBoundary
-            key={location.pathname}
-            resetKey={location.pathname}
-            fallbackText={`${screenCapabilities.productLabel} page encountered an error. Refresh to reload.`}
+        <RouteChromeProvider>
+          {useWallKioskChrome ? (
+            <header className="emergency-wall-kiosk-header">
+              <strong>{screenCapabilities.label}</strong>
+              <span className="emergency-wall-kiosk-header__safety">{EMERGENCY_OS_BRANDING.safetyLine}</span>
+            </header>
+          ) : isPublicWaitingKiosk || isReadOnlyWhiteboardKiosk ? null : (
+            <>
+              <Header />
+              <ShellRouteTab title={currentPage.label} subtitle={currentPage.subtitle} />
+              <OperationalAlarmDock showEmsInbound={screenCapabilities.showEmsCriticalOverlay} />
+              {!useKioskShell ? <SessionChromeBar /> : null}
+            </>
+          )}
+          <main
+            id="main-content"
+            className={[
+              'app-shell-main-content',
+              isMobileViewport ? 'app-shell-main-content--mobile-nav' : '',
+            ]
+              .filter(Boolean)
+              .join(' ')}
+            role="main"
+            tabIndex={-1}
+            data-screen-density-mode={screenDensityProfile.id}
+            data-practitioner-compact={surfaces.compactLayout ? 'true' : undefined}
           >
-            <Suspense
-              fallback={
-                <div role="status" className="app-shell-route-loading">
-                  Loading {screenCapabilities.productLabel} page...
-                </div>
-              }
+            <ErrorBoundary
+              key={location.pathname}
+              resetKey={location.pathname}
+              fallbackText={`${screenCapabilities.productLabel} page encountered an error. Refresh to reload.`}
             >
-              {children}
-            </Suspense>
-          </ErrorBoundary>
-        </main>
+              <Suspense
+                fallback={
+                  <div role="status" className="app-shell-route-loading">
+                    Loading {screenCapabilities.productLabel} page...
+                  </div>
+                }
+              >
+                {children}
+              </Suspense>
+            </ErrorBoundary>
+          </main>
+        </RouteChromeProvider>
       </div>
       {!screenCapabilities.isRegistrationScreen && !useKioskShell ? (
       <ErrorBoundary fallbackText="PatientDetailPanel encountered an error. Refresh to reload.">
@@ -847,7 +856,7 @@ function AppShellFrame({ children }: AppShellProps) {
       ) : null}
       <ErrorBoundary fallbackText="Critical broadcast overlay encountered an error.">
         <Suspense fallback={null}>
-          {screenCapabilities.showEmsCriticalOverlay ? <EMSCriticalBroadcast /> : null}
+
         </Suspense>
       </ErrorBoundary>
       {showReassessmentDrawer && screenCapabilities.showReassessAction && !useKioskShell ? (
@@ -879,14 +888,7 @@ function AppShellFrame({ children }: AppShellProps) {
           </Suspense>
         </ErrorBoundary>
       ) : null}
-      <Toaster
-        richColors
-        closeButton
-        position="bottom-right"
-        visibleToasts={2}
-        duration={4000}
-        gap={8}
-      />
+      <CareDroidToastHost />
     </div>
   );
 }

@@ -68,7 +68,7 @@
 }
 
 .ed-journey-rail__link:hover {
-  background: color-mix(in srgb, var(--app-accent-interactive, #2563eb) 8%, transparent);
+  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 8%, transparent);
 }
 
 .ed-journey-rail__marker {
@@ -97,8 +97,8 @@
 }
 
 .ed-journey-rail__phase--active .ed-journey-rail__marker {
-  border-color: var(--app-accent-interactive, #2563eb);
-  background: var(--app-accent-interactive, #2563eb);
+  border-color: var(--app-accent-interactive, #0ea5e9);
+  background: var(--app-accent-interactive, #0ea5e9);
   color: #fff;
 }
 

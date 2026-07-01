@@ -11,7 +11,10 @@
   --app-layout-page-gutter-block: var(--app-shell-page-gutter-block, clamp(12px, 2vw, 24px));
   --app-layout-section-gap: var(--app-visual-section-gap, var(--compact-page-gap, 22px));
   --app-layout-panel-gap: var(--app-visual-panel-gap, var(--compact-panel-gap, 18px));
-  --app-layout-header-height: var(--app-shell-header-height, 56px);
+  --app-layout-header-height: var(
+    --cdl-chrome-stack-height,
+    calc(var(--cdl-header-height, 52px) + var(--cdl-route-tab-height, 44px))
+  );
 }
 
 @media (max-width: 768px) {
@@ -76,7 +79,9 @@
     .emergency-os-page,
     .smart-intake,
     .ems-pipeline,
-    .referral-panel
+    .referral-panel,
+    .dispatch-console,
+    .clinical-alerts-page
   ) {
   box-sizing: border-box;
   width: 100%;
