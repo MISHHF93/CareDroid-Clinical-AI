@@ -4,7 +4,7 @@ Generated: 2026-07-01 (regenerate with `npm run saas-compliance-audit:write-docs
 
 ## Charter reference
 
-**Note:** `CARE_DROID_SAAS_ARCHITECTURE_CHARTER.md` was **not found** in the repository root or `docs/`. This audit applies the charter checklist from the audit request and aligns with [asset-based-platform-migration-report.md](./asset-based-platform-migration-report.md) and [caredroid-platform-transformation-roadmap.md](./caredroid-platform-transformation-roadmap.md).
+**Note:** `CARE_DROID_SAAS_ARCHITECTURE_CHARTER.md` was **not found** in the repository root or `docs/`. This audit applies the charter checklist from the audit request.
 
 ### Charter rules verified
 

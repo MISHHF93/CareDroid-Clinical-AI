@@ -483,8 +483,6 @@ _No automated gaps._
 ## Related docs
 
 - [backend-frontend-tool-contract.md](./backend-frontend-tool-contract.md) — extended columns (discovery, tests, tier)
-- [tool-visibility-matrix.md](./tool-visibility-matrix.md)
-- [e2e-tool-validation-matrix.md](./e2e-tool-validation-matrix.md)
 
 ```bash
 npm run contract:write-docs

@@ -3,7 +3,7 @@
 Generated: 2026-07-01T03:23:15.219Z
 
 > **Source:** `src/data/backendFrontendToolContract.ts` � regenerate with `npm run contract:write-docs`.
-> **Related:** [clinical-tool-executors.md](./clinical-tool-executors.md), [e2e-tool-validation-matrix.md](./e2e-tool-validation-matrix.md).
+> **Related:** [tool-contract-matrix.md](./tool-contract-matrix.md).
 
 ## Summary
 
