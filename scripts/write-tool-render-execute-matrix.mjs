@@ -9,7 +9,7 @@ import { spawnSync } from 'node:child_process';
 
 const result = spawnSync(
   'npm',
-  ['run', 'test:run', '--', 'src/data/toolRenderExecuteMatrix.report.test.js'],
+  ['run', 'test:run', '--', 'src/data/toolRenderExecuteMatrix.report.test.ts'],
   {
     stdio: 'inherit',
     shell: true,

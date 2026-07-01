@@ -17,7 +17,7 @@ if (writeIdx >= 0 && process.argv[writeIdx + 1]) {
 
 const result = spawnSync(
   'npm',
-  ['run', 'test:run', '--', 'src/data/clinicalToolAliasSync.report.test.js'],
+  ['run', 'test:run', '--', 'src/data/clinicalToolAliasSync.report.test.ts'],
   { stdio: 'inherit', shell: true, env: process.env }
 );
 

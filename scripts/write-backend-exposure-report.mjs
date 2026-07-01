@@ -14,7 +14,7 @@ const result = spawnSync(
     '--',
     '--testTimeout',
     '120000',
-    'src/data/backendFrontendExposure.report.test.js',
+    'src/data/backendFrontendExposure.report.test.ts',
   ],
   {
     stdio: 'inherit',
