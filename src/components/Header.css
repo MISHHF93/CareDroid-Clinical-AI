@@ -85,9 +85,12 @@
 
 .caredroid-header__actions {
   display: flex;
-  flex-shrink: 0;
+  flex: 0 1 auto;
+  flex-shrink: 1;
   align-items: center;
   gap: 12px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .caredroid-header__palette-trigger {
@@ -743,27 +746,38 @@ button.caredroid-header__copilot-pill:focus-visible {
 }
 
 @media (max-width: 768px) {
-  .caredroid-header__topbar,
+  .caredroid-header__topbar {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) minmax(0, auto);
+    gap: 8px;
+    overflow: hidden;
+  }
+
+  .caredroid-header__center {
+    display: none;
+  }
+
   .caredroid-header__operational-strip {
     overflow-x: auto;
     scrollbar-width: none;
   }
 
-  .caredroid-header__topbar::-webkit-scrollbar,
   .caredroid-header__operational-strip::-webkit-scrollbar {
     display: none;
   }
 
-  .caredroid-header button,
-  .caredroid-header select {
+  .caredroid-header__icon-button,
+  .caredroid-header__palette-trigger,
+  .caredroid-header__notification-trigger,
+  .account-menu__trigger {
     min-height: 44px !important;
-  }
-
-  .caredroid-header button {
     min-width: 44px !important;
   }
 
-  .caredroid-header button:active {
+  .caredroid-header__icon-button:active,
+  .caredroid-header__palette-trigger:active,
+  .caredroid-header__notification-trigger:active,
+  .account-menu__trigger:active {
     border-color: var(--app-accent-interactive) !important;
     color: var(--medical-ink, #111827) !important;
   }
@@ -776,9 +790,28 @@ button.caredroid-header__copilot-pill:focus-visible {
     display: none;
   }
 
+  .caredroid-header__actions {
+    flex: 0 1 auto;
+    justify-content: flex-end;
+    gap: 6px;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .caredroid-header__actions .profile-role-switcher--compact {
+    display: none;
+  }
+
+  .caredroid-header__palette-trigger,
+  .caredroid-header__workload-trigger {
+    display: none;
+  }
+
   .caredroid-header__lookup {
-    width: 44vw;
-    min-width: 150px;
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
+    max-width: min(42vw, 168px);
   }
 
   .caredroid-header__operational-strip {
@@ -831,8 +864,7 @@ button.caredroid-header__copilot-pill:focus-visible {
   }
 
   .caredroid-header__lookup {
-    width: 38vw;
-    min-width: 118px;
+    max-width: min(36vw, 132px);
   }
 
   .caredroid-header__lookup input {

@@ -40,6 +40,7 @@ __pycache__/
 /qa/playwright-responsive-report.json
 /qa/responsive-qa-summary.json
 /qa/page-screenshots/
+/qa/dashboard-resize-audit/*.png
 /qa/screenshot-backend.sqlite*
 /e2e/.auth/qa-user.json
 .vercel

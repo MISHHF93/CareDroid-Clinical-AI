@@ -69,6 +69,7 @@
     "qa:responsive:retry": "node scripts/retry-responsive-qa-failures.mjs",
     "qa:responsive:report": "node scripts/write-responsive-qa-report.mjs",
     "qa:page-screenshots": "node scripts/capture-emergency-page-screenshots.mjs",
+    "qa:dashboard-resize": "node scripts/capture-dashboard-resize-audit.mjs",
     "test:responsive-regression": "vitest run src/test/routePagesSmoke.test.tsx src/test/responsiveRegression.coverage.test.ts src/pages/tools/ClinicalToolCatalog.launchButtons.test.tsx src/pages/tools/Calculators.formSmoke.test.tsx src/layout/AppShell.navigation.test.tsx src/pages/tools/ClinicalToolCatalog.responsive.test.ts src/pages/tools/Calculators.responsive.test.ts src/styles/responsiveUx.test.ts src/layout/AppShell.layout.test.tsx",
     "test:mobile-performance": "vitest run src/styles/mobilePerformance.test.ts",
     "qa:responsive:chromium": "playwright test e2e/responsive-qa.spec.mjs --config=playwright.config.mjs --project=chromium",

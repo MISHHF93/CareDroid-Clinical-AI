@@ -5,6 +5,8 @@
   border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 12px;
   background: var(--medical-surface-card, #ffffff);
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .department-staff-bar--compact {
@@ -36,13 +38,22 @@
 .department-staff-bar__track {
   display: flex;
   gap: 10px;
+  width: 100%;
+  max-width: 100%;
   overflow-x: auto;
   padding-bottom: 2px;
   scrollbar-gutter: stable;
+  -webkit-overflow-scrolling: touch;
+}
+
+.department-staff-bar__track > [role='listitem'] {
+  flex: 0 0 auto;
+  min-width: auto;
 }
 
 .department-staff-bar__card {
   flex: 0 0 auto;
+  width: 210px;
   min-width: 210px;
   max-width: 280px;
   display: grid;
@@ -71,6 +82,9 @@
   font-size: 14px;
   font-weight: 700;
   line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .department-staff-bar__title {
@@ -115,4 +129,11 @@
   margin: 0;
   color: var(--medical-text-subtle, #9ca3af);
   font-size: 13px;
+}
+
+@media (max-width: 640px) {
+  .department-staff-bar__card {
+    width: min(240px, 78vw);
+    min-width: min(240px, 78vw);
+  }
 }

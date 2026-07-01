@@ -3,7 +3,26 @@ import { chromium } from '@playwright/test';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { EMERGENCY_PAGE_SCREENSHOT_TARGETS } from '../src/data/emergencyPageRenderInventory.js';
+/** Dashboard + ED page paths for screenshot QA (mirrors emergencyPageRenderInventory.ts). */
+const EMERGENCY_PAGE_SCREENSHOT_TARGETS = [
+  { id: 'emergency-command-center', label: 'Command Center', path: '/emergency/command-center', screenshotSlug: '01-emergency-command-center' },
+  { id: 'emergency-whiteboard', label: 'Board', path: '/emergency/whiteboard', screenshotSlug: '02-emergency-whiteboard' },
+  { id: 'emergency-patients', label: 'Emergency Patients', path: '/emergency/patients', screenshotSlug: '03-emergency-patients' },
+  { id: 'emergency-journey', label: 'Full Journey', path: '/emergency/journey', screenshotSlug: '04-emergency-journey' },
+  { id: 'ems-pipeline', label: 'EMS', path: '/emergency/ems', screenshotSlug: '04-ems-pipeline' },
+  { id: 'reception-workspace', label: 'Reception', path: '/emergency/reception', screenshotSlug: '05-reception-workspace' },
+  { id: 'smart-intake', label: 'Smart Intake', path: '/emergency/intake', screenshotSlug: '05-smart-intake' },
+  { id: 'queue-intelligence', label: 'Queue Intelligence', path: '/emergency/queues', screenshotSlug: '06-queue-intelligence' },
+  { id: 'department-pulse', label: 'Department Pulse', path: '/emergency/pulse', screenshotSlug: '15-department-pulse' },
+  { id: 'shift-summary', label: 'Shift Summary', path: '/emergency/shift', screenshotSlug: '16-shift-summary' },
+  { id: 'emergency-analytics', label: 'Emergency Analytics', path: '/emergency/analytics', screenshotSlug: '15-emergency-analytics' },
+  { id: 'emergency-settings', label: 'Emergency Settings', path: '/emergency/settings', screenshotSlug: '18-emergency-settings' },
+  { id: 'emergency-help', label: 'Help Hub', path: '/emergency/help', screenshotSlug: '20-emergency-help' },
+  { id: 'medical-tools', label: 'Medical Tools', path: '/tools', screenshotSlug: '14-medical-tools' },
+  { id: 'executive', label: 'Executive Command', path: '/executive', screenshotSlug: 'executive-command' },
+  { id: 'system-health', label: 'System Health', path: '/system-health', screenshotSlug: 'system-health' },
+  { id: 'saas-health', label: 'SaaS Health', path: '/saas-health', screenshotSlug: 'saas-health' },
+];
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..');

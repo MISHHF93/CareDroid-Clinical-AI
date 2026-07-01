@@ -558,3 +558,17 @@
   border-color: var(--semantic-inactive-border);
   background: var(--semantic-inactive-bg);
 }
+
+/* Sonner toasts — contain within viewport on narrow screens */
+@media (max-width: 768px) {
+  [data-sonner-toaster] {
+    left: var(--app-layout-page-gutter-inline, 12px) !important;
+    right: var(--app-layout-page-gutter-inline, 12px) !important;
+    width: auto !important;
+  }
+
+  [data-sonner-toast] {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}

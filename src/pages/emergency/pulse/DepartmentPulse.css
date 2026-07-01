@@ -163,9 +163,12 @@
 .emergency-pulse__attention-row {
   display: flex;
   gap: 12px;
+  width: 100%;
+  max-width: 100%;
   min-height: 120px;
   overflow-x: auto;
   padding-bottom: 2px;
+  -webkit-overflow-scrolling: touch;
 }
 
 .emergency-pulse__attention-row button {

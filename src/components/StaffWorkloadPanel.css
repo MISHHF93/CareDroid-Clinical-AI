@@ -13,11 +13,18 @@
   transform: translateX(calc(100% + 16px));
   transition: transform 180ms ease;
   pointer-events: none;
+  visibility: hidden;
+}
+
+.staff-workload-panel:not(.staff-workload-panel--open) {
+  clip-path: inset(0 0 0 100%);
 }
 
 .staff-workload-panel--open {
   transform: translateX(0);
   pointer-events: auto;
+  visibility: visible;
+  clip-path: none;
 }
 
 .staff-workload-panel__header {

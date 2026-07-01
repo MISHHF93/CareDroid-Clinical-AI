@@ -38,3 +38,13 @@
   background: #f59e0b;
   box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25);
 }
+
+@media (max-width: 480px) {
+  .simulation-mode-toggle {
+    flex: 0 0 auto;
+    gap: 6px;
+    font-size: 11px;
+    padding: 4px 8px;
+    white-space: nowrap;
+  }
+}

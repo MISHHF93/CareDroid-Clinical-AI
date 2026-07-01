@@ -16,6 +16,11 @@ const ALLOWED_OVERFLOW_ANCESTORS = [
   '.dashboard-recs-row',
   '.journey-timeline__scroller',
   '.patient-detail__data-tabs',
+  '.department-staff-bar__track',
+  '.caredroid-header__operational-strip',
+  '.session-chrome-bar__actions',
+  '.emergency-pulse__attention-row',
+  '.emergency-pulse__staff-row',
 ];
 
 /**
@@ -44,6 +49,7 @@ export async function measurePageOverflow(page) {
     for (const el of nodes) {
       if (!(el instanceof HTMLElement)) continue;
       if (el.closest('[data-qa-ignore-overflow]')) continue;
+      if (el.closest('.staff-workload-panel:not(.staff-workload-panel--open)')) continue;
 
       const style = getComputedStyle(el);
       if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') {
@@ -361,6 +367,16 @@ export async function dismissOverlays(page) {
   if (await backdrop.isVisible().catch(() => false)) {
     await backdrop.click({ force: true }).catch(() => {});
   }
+
+  await page.evaluate(() => {
+    document.dispatchEvent(new Event('close-all-panels'));
+  });
+
+  const toastCloseButtons = page.locator('[data-sonner-toast] [data-close-button]');
+  const toastCount = await toastCloseButtons.count().catch(() => 0);
+  for (let index = 0; index < toastCount; index += 1) {
+    await toastCloseButtons.nth(index).click({ force: true }).catch(() => {});
+  }
 }
 
 /**
@@ -378,6 +394,7 @@ export async function waitForAppReady(page) {
     () => {
       const loader = document.querySelector('.page-loader');
       const shell =
+        document.querySelector('.app-shell-main-content') ||
         document.querySelector('.app-shell-page-body') ||
         document.querySelector('.public-main') ||
         document.querySelector('.legal-page');

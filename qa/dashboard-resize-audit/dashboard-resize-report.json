@@ -1,0 +1,1891 @@
+{
+  "generatedAt": "2026-07-01T04:31:22.405Z",
+  "baseUrl": "http://localhost:8000",
+  "outputDir": "qa/dashboard-resize-audit",
+  "viewports": [
+    {
+      "id": "375x812",
+      "width": 375,
+      "height": 812,
+      "tier": "phone"
+    },
+    {
+      "id": "768x1024",
+      "width": 768,
+      "height": 1024,
+      "tier": "tablet"
+    },
+    {
+      "id": "1024x768",
+      "width": 1024,
+      "height": 768,
+      "tier": "tablet-landscape"
+    },
+    {
+      "id": "1280x720",
+      "width": 1280,
+      "height": 720,
+      "tier": "desktop"
+    },
+    {
+      "id": "1440x900",
+      "width": 1440,
+      "height": 900,
+      "tier": "desktop"
+    },
+    {
+      "id": "1920x1080",
+      "width": 1920,
+      "height": 1080,
+      "tier": "wide"
+    }
+  ],
+  "targets": [
+    {
+      "id": "dashboard",
+      "label": "Dashboard redirect",
+      "path": "/dashboard"
+    },
+    {
+      "id": "command-center",
+      "label": "Hospital Command Center",
+      "path": "/emergency/command-center"
+    },
+    {
+      "id": "whiteboard",
+      "label": "Emergency Whiteboard",
+      "path": "/emergency/whiteboard"
+    },
+    {
+      "id": "department-pulse",
+      "label": "Department Pulse",
+      "path": "/emergency/pulse"
+    },
+    {
+      "id": "emergency-analytics",
+      "label": "Emergency Analytics",
+      "path": "/emergency/analytics"
+    },
+    {
+      "id": "shift-summary",
+      "label": "Shift Summary",
+      "path": "/emergency/shift"
+    },
+    {
+      "id": "executive",
+      "label": "Executive Command Center",
+      "path": "/executive"
+    },
+    {
+      "id": "system-health",
+      "label": "System Health",
+      "path": "/system-health"
+    },
+    {
+      "id": "saas-health",
+      "label": "SaaS Health Center",
+      "path": "/saas-health"
+    },
+    {
+      "id": "tools-overview",
+      "label": "Tools Overview",
+      "path": "/tools"
+    }
+  ],
+  "total": 60,
+  "captured": 59,
+  "captureFailed": 1,
+  "overflowFailed": 0,
+  "results": [
+    {
+      "id": "dashboard",
+      "label": "Dashboard redirect",
+      "path": "/dashboard",
+      "viewport": {
+        "id": "375x812",
+        "width": 375,
+        "height": 812,
+        "tier": "phone"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:25:04.225Z",
+      "finalUrl": "http://localhost:8000/emergency/command-center",
+      "heading": "Real-Time ED Operations",
+      "screenshotPath": "qa/dashboard-resize-audit/dashboard--375x812.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 375,
+        "docScrollWidth": 375,
+        "shellPaddingInline": "12px",
+        "shellWidth": 375,
+        "pageWidth": 343,
+        "pageLeft": 12
+      },
+      "error": ""
+    },
+    {
+      "id": "dashboard",
+      "label": "Dashboard redirect",
+      "path": "/dashboard",
+      "viewport": {
+        "id": "768x1024",
+        "width": 768,
+        "height": 1024,
+        "tier": "tablet"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:25:06.147Z",
+      "finalUrl": "http://localhost:8000/emergency/command-center",
+      "heading": "Real-Time ED Operations",
+      "screenshotPath": "qa/dashboard-resize-audit/dashboard--768x1024.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 768,
+        "docScrollWidth": 768,
+        "shellPaddingInline": "16px",
+        "shellWidth": 768,
+        "pageWidth": 728,
+        "pageLeft": 16
+      },
+      "error": ""
+    },
+    {
+      "id": "dashboard",
+      "label": "Dashboard redirect",
+      "path": "/dashboard",
+      "viewport": {
+        "id": "1024x768",
+        "width": 1024,
+        "height": 768,
+        "tier": "tablet-landscape"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:25:10.249Z",
+      "finalUrl": "http://localhost:8000/emergency/command-center",
+      "heading": "Real-Time ED Operations",
+      "screenshotPath": "qa/dashboard-resize-audit/dashboard--1024x768.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 1024,
+        "docScrollWidth": 1024,
+        "shellPaddingInline": "16px",
+        "shellWidth": 968,
+        "pageWidth": 928,
+        "pageLeft": 72
+      },
+      "error": ""
+    },
+    {
+      "id": "dashboard",
+      "label": "Dashboard redirect",
+      "path": "/dashboard",
+      "viewport": {
+        "id": "1280x720",
+        "width": 1280,
+        "height": 720,
+        "tier": "desktop"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:25:12.272Z",
+      "finalUrl": "http://localhost:8000/emergency/command-center",
+      "heading": "Real-Time ED Operations",
+      "screenshotPath": "qa/dashboard-resize-audit/dashboard--1280x720.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 1280,
+        "docScrollWidth": 1280,
+        "shellPaddingInline": "25.6px",
+        "shellWidth": 1048,
+        "pageWidth": 989,
+        "pageLeft": 258
+      },
+      "error": ""
+    },
+    {
+      "id": "dashboard",
+      "label": "Dashboard redirect",
+      "path": "/dashboard",
+      "viewport": {
+        "id": "1440x900",
+        "width": 1440,
+        "height": 900,
+        "tier": "desktop"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:25:14.423Z",
+      "finalUrl": "http://localhost:8000/emergency/command-center",
+      "heading": "Real-Time ED Operations",
+      "screenshotPath": "qa/dashboard-resize-audit/dashboard--1440x900.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 1440,
+        "docScrollWidth": 1440,
+        "shellPaddingInline": "28px",
+        "shellWidth": 1208,
+        "pageWidth": 1144,
+        "pageLeft": 260
+      },
+      "error": ""
+    },
+    {
+      "id": "dashboard",
+      "label": "Dashboard redirect",
+      "path": "/dashboard",
+      "viewport": {
+        "id": "1920x1080",
+        "width": 1920,
+        "height": 1080,
+        "tier": "wide"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:25:16.372Z",
+      "finalUrl": "http://localhost:8000/emergency/command-center",
+      "heading": "Real-Time ED Operations",
+      "screenshotPath": "qa/dashboard-resize-audit/dashboard--1920x1080.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 1920,
+        "docScrollWidth": 1920,
+        "shellPaddingInline": "32px",
+        "shellWidth": 1688,
+        "pageWidth": 1616,
+        "pageLeft": 264
+      },
+      "error": ""
+    },
+    {
+      "id": "command-center",
+      "label": "Hospital Command Center",
+      "path": "/emergency/command-center",
+      "viewport": {
+        "id": "375x812",
+        "width": 375,
+        "height": 812,
+        "tier": "phone"
+      },
+      "ok": false,
+      "startedAt": "2026-07-01T04:25:18.172Z",
+      "finalUrl": "http://localhost:8000/emergency/command-center",
+      "heading": "",
+      "screenshotPath": "",
+      "overflow": null,
+      "shellMetrics": null,
+      "error": "page.waitForFunction: Timeout 120000ms exceeded."
+    },
+    {
+      "id": "command-center",
+      "label": "Hospital Command Center",
+      "path": "/emergency/command-center",
+      "viewport": {
+        "id": "768x1024",
+        "width": 768,
+        "height": 1024,
+        "tier": "tablet"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:27:18.665Z",
+      "finalUrl": "http://localhost:8000/emergency/command-center",
+      "heading": "Real-Time ED Operations",
+      "screenshotPath": "qa/dashboard-resize-audit/command-center--768x1024.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 768,
+        "docScrollWidth": 768,
+        "shellPaddingInline": "16px",
+        "shellWidth": 768,
+        "pageWidth": 728,
+        "pageLeft": 16
+      },
+      "error": ""
+    },
+    {
+      "id": "command-center",
+      "label": "Hospital Command Center",
+      "path": "/emergency/command-center",
+      "viewport": {
+        "id": "1024x768",
+        "width": 1024,
+        "height": 768,
+        "tier": "tablet-landscape"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:27:20.984Z",
+      "finalUrl": "http://localhost:8000/emergency/command-center",
+      "heading": "Real-Time ED Operations",
+      "screenshotPath": "qa/dashboard-resize-audit/command-center--1024x768.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 1024,
+        "docScrollWidth": 1024,
+        "shellPaddingInline": "16px",
+        "shellWidth": 968,
+        "pageWidth": 928,
+        "pageLeft": 72
+      },
+      "error": ""
+    },
+    {
+      "id": "command-center",
+      "label": "Hospital Command Center",
+      "path": "/emergency/command-center",
+      "viewport": {
+        "id": "1280x720",
+        "width": 1280,
+        "height": 720,
+        "tier": "desktop"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:27:23.203Z",
+      "finalUrl": "http://localhost:8000/emergency/command-center",
+      "heading": "Real-Time ED Operations",
+      "screenshotPath": "qa/dashboard-resize-audit/command-center--1280x720.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 1280,
+        "docScrollWidth": 1280,
+        "shellPaddingInline": "25.6px",
+        "shellWidth": 1048,
+        "pageWidth": 989,
+        "pageLeft": 258
+      },
+      "error": ""
+    },
+    {
+      "id": "command-center",
+      "label": "Hospital Command Center",
+      "path": "/emergency/command-center",
+      "viewport": {
+        "id": "1440x900",
+        "width": 1440,
+        "height": 900,
+        "tier": "desktop"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:27:25.729Z",
+      "finalUrl": "http://localhost:8000/emergency/command-center",
+      "heading": "Real-Time ED Operations",
+      "screenshotPath": "qa/dashboard-resize-audit/command-center--1440x900.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 1440,
+        "docScrollWidth": 1440,
+        "shellPaddingInline": "28px",
+        "shellWidth": 1208,
+        "pageWidth": 1144,
+        "pageLeft": 260
+      },
+      "error": ""
+    },
+    {
+      "id": "command-center",
+      "label": "Hospital Command Center",
+      "path": "/emergency/command-center",
+      "viewport": {
+        "id": "1920x1080",
+        "width": 1920,
+        "height": 1080,
+        "tier": "wide"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:27:27.836Z",
+      "finalUrl": "http://localhost:8000/emergency/command-center",
+      "heading": "Real-Time ED Operations",
+      "screenshotPath": "qa/dashboard-resize-audit/command-center--1920x1080.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 1920,
+        "docScrollWidth": 1920,
+        "shellPaddingInline": "32px",
+        "shellWidth": 1688,
+        "pageWidth": 1616,
+        "pageLeft": 264
+      },
+      "error": ""
+    },
+    {
+      "id": "whiteboard",
+      "label": "Emergency Whiteboard",
+      "path": "/emergency/whiteboard",
+      "viewport": {
+        "id": "375x812",
+        "width": 375,
+        "height": 812,
+        "tier": "phone"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:27:30.169Z",
+      "finalUrl": "http://localhost:8000/emergency/whiteboard",
+      "heading": "",
+      "screenshotPath": "qa/dashboard-resize-audit/whiteboard--375x812.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 375,
+        "docScrollWidth": 375,
+        "shellPaddingInline": "12px",
+        "shellWidth": 375,
+        "pageWidth": null,
+        "pageLeft": null
+      },
+      "error": ""
+    },
+    {
+      "id": "whiteboard",
+      "label": "Emergency Whiteboard",
+      "path": "/emergency/whiteboard",
+      "viewport": {
+        "id": "768x1024",
+        "width": 768,
+        "height": 1024,
+        "tier": "tablet"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:27:37.660Z",
+      "finalUrl": "http://localhost:8000/emergency/whiteboard",
+      "heading": "",
+      "screenshotPath": "qa/dashboard-resize-audit/whiteboard--768x1024.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 768,
+        "docScrollWidth": 768,
+        "shellPaddingInline": "16px",
+        "shellWidth": 768,
+        "pageWidth": null,
+        "pageLeft": null
+      },
+      "error": ""
+    },
+    {
+      "id": "whiteboard",
+      "label": "Emergency Whiteboard",
+      "path": "/emergency/whiteboard",
+      "viewport": {
+        "id": "1024x768",
+        "width": 1024,
+        "height": 768,
+        "tier": "tablet-landscape"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:27:45.234Z",
+      "finalUrl": "http://localhost:8000/emergency/whiteboard",
+      "heading": "",
+      "screenshotPath": "qa/dashboard-resize-audit/whiteboard--1024x768.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 1024,
+        "docScrollWidth": 1024,
+        "shellPaddingInline": "16px",
+        "shellWidth": 968,
+        "pageWidth": null,
+        "pageLeft": null
+      },
+      "error": ""
+    },
+    {
+      "id": "whiteboard",
+      "label": "Emergency Whiteboard",
+      "path": "/emergency/whiteboard",
+      "viewport": {
+        "id": "1280x720",
+        "width": 1280,
+        "height": 720,
+        "tier": "desktop"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:27:52.908Z",
+      "finalUrl": "http://localhost:8000/emergency/whiteboard",
+      "heading": "",
+      "screenshotPath": "qa/dashboard-resize-audit/whiteboard--1280x720.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 1280,
+        "docScrollWidth": 1280,
+        "shellPaddingInline": "25.6px",
+        "shellWidth": 1048,
+        "pageWidth": null,
+        "pageLeft": null
+      },
+      "error": ""
+    },
+    {
+      "id": "whiteboard",
+      "label": "Emergency Whiteboard",
+      "path": "/emergency/whiteboard",
+      "viewport": {
+        "id": "1440x900",
+        "width": 1440,
+        "height": 900,
+        "tier": "desktop"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:28:00.458Z",
+      "finalUrl": "http://localhost:8000/emergency/whiteboard",
+      "heading": "",
+      "screenshotPath": "qa/dashboard-resize-audit/whiteboard--1440x900.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 1440,
+        "docScrollWidth": 1440,
+        "shellPaddingInline": "28px",
+        "shellWidth": 1208,
+        "pageWidth": null,
+        "pageLeft": null
+      },
+      "error": ""
+    },
+    {
+      "id": "whiteboard",
+      "label": "Emergency Whiteboard",
+      "path": "/emergency/whiteboard",
+      "viewport": {
+        "id": "1920x1080",
+        "width": 1920,
+        "height": 1080,
+        "tier": "wide"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:28:08.015Z",
+      "finalUrl": "http://localhost:8000/emergency/whiteboard",
+      "heading": "",
+      "screenshotPath": "qa/dashboard-resize-audit/whiteboard--1920x1080.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 1920,
+        "docScrollWidth": 1920,
+        "shellPaddingInline": "32px",
+        "shellWidth": 1688,
+        "pageWidth": null,
+        "pageLeft": null
+      },
+      "error": ""
+    },
+    {
+      "id": "department-pulse",
+      "label": "Department Pulse",
+      "path": "/emergency/pulse",
+      "viewport": {
+        "id": "375x812",
+        "width": 375,
+        "height": 812,
+        "tier": "phone"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:28:15.574Z",
+      "finalUrl": "http://localhost:8000/emergency/pulse",
+      "heading": "Department Pulse",
+      "screenshotPath": "qa/dashboard-resize-audit/department-pulse--375x812.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 375,
+        "docScrollWidth": 375,
+        "shellPaddingInline": "12px",
+        "shellWidth": 375,
+        "pageWidth": 343,
+        "pageLeft": 12
+      },
+      "error": ""
+    },
+    {
+      "id": "department-pulse",
+      "label": "Department Pulse",
+      "path": "/emergency/pulse",
+      "viewport": {
+        "id": "768x1024",
+        "width": 768,
+        "height": 1024,
+        "tier": "tablet"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:28:47.737Z",
+      "finalUrl": "http://localhost:8000/emergency/pulse",
+      "heading": "Department Pulse",
+      "screenshotPath": "qa/dashboard-resize-audit/department-pulse--768x1024.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 768,
+        "docScrollWidth": 768,
+        "shellPaddingInline": "16px",
+        "shellWidth": 768,
+        "pageWidth": 728,
+        "pageLeft": 16
+      },
+      "error": ""
+    },
+    {
+      "id": "department-pulse",
+      "label": "Department Pulse",
+      "path": "/emergency/pulse",
+      "viewport": {
+        "id": "1024x768",
+        "width": 1024,
+        "height": 768,
+        "tier": "tablet-landscape"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:28:49.972Z",
+      "finalUrl": "http://localhost:8000/emergency/pulse",
+      "heading": "Department Pulse",
+      "screenshotPath": "qa/dashboard-resize-audit/department-pulse--1024x768.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 1024,
+        "docScrollWidth": 1024,
+        "shellPaddingInline": "16px",
+        "shellWidth": 968,
+        "pageWidth": 928,
+        "pageLeft": 72
+      },
+      "error": ""
+    },
+    {
+      "id": "department-pulse",
+      "label": "Department Pulse",
+      "path": "/emergency/pulse",
+      "viewport": {
+        "id": "1280x720",
+        "width": 1280,
+        "height": 720,
+        "tier": "desktop"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:28:51.984Z",
+      "finalUrl": "http://localhost:8000/emergency/pulse",
+      "heading": "Department Pulse",
+      "screenshotPath": "qa/dashboard-resize-audit/department-pulse--1280x720.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 1280,
+        "docScrollWidth": 1280,
+        "shellPaddingInline": "25.6px",
+        "shellWidth": 748,
+        "pageWidth": 689,
+        "pageLeft": 258
+      },
+      "error": ""
+    },
+    {
+      "id": "department-pulse",
+      "label": "Department Pulse",
+      "path": "/emergency/pulse",
+      "viewport": {
+        "id": "1440x900",
+        "width": 1440,
+        "height": 900,
+        "tier": "desktop"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:29:24.258Z",
+      "finalUrl": "http://localhost:8000/emergency/pulse",
+      "heading": "Department Pulse",
+      "screenshotPath": "qa/dashboard-resize-audit/department-pulse--1440x900.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 1440,
+        "docScrollWidth": 1440,
+        "shellPaddingInline": "28px",
+        "shellWidth": 1208,
+        "pageWidth": 1144,
+        "pageLeft": 260
+      },
+      "error": ""
+    },
+    {
+      "id": "department-pulse",
+      "label": "Department Pulse",
+      "path": "/emergency/pulse",
+      "viewport": {
+        "id": "1920x1080",
+        "width": 1920,
+        "height": 1080,
+        "tier": "wide"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:29:26.645Z",
+      "finalUrl": "http://localhost:8000/emergency/pulse",
+      "heading": "Department Pulse",
+      "screenshotPath": "qa/dashboard-resize-audit/department-pulse--1920x1080.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 1920,
+        "docScrollWidth": 1920,
+        "shellPaddingInline": "32px",
+        "shellWidth": 1688,
+        "pageWidth": 1616,
+        "pageLeft": 264
+      },
+      "error": ""
+    },
+    {
+      "id": "emergency-analytics",
+      "label": "Emergency Analytics",
+      "path": "/emergency/analytics",
+      "viewport": {
+        "id": "375x812",
+        "width": 375,
+        "height": 812,
+        "tier": "phone"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:29:28.666Z",
+      "finalUrl": "http://localhost:8000/emergency/analytics",
+      "heading": "Department Analytics",
+      "screenshotPath": "qa/dashboard-resize-audit/emergency-analytics--375x812.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 375,
+        "docScrollWidth": 375,
+        "shellPaddingInline": "12px",
+        "shellWidth": 375,
+        "pageWidth": 343,
+        "pageLeft": 12
+      },
+      "error": ""
+    },
+    {
+      "id": "emergency-analytics",
+      "label": "Emergency Analytics",
+      "path": "/emergency/analytics",
+      "viewport": {
+        "id": "768x1024",
+        "width": 768,
+        "height": 1024,
+        "tier": "tablet"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:29:30.939Z",
+      "finalUrl": "http://localhost:8000/emergency/analytics",
+      "heading": "Department Analytics",
+      "screenshotPath": "qa/dashboard-resize-audit/emergency-analytics--768x1024.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 768,
+        "docScrollWidth": 768,
+        "shellPaddingInline": "16px",
+        "shellWidth": 768,
+        "pageWidth": 728,
+        "pageLeft": 16
+      },
+      "error": ""
+    },
+    {
+      "id": "emergency-analytics",
+      "label": "Emergency Analytics",
+      "path": "/emergency/analytics",
+      "viewport": {
+        "id": "1024x768",
+        "width": 1024,
+        "height": 768,
+        "tier": "tablet-landscape"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:29:33.167Z",
+      "finalUrl": "http://localhost:8000/emergency/analytics",
+      "heading": "Department Analytics",
+      "screenshotPath": "qa/dashboard-resize-audit/emergency-analytics--1024x768.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 1024,
+        "docScrollWidth": 1024,
+        "shellPaddingInline": "16px",
+        "shellWidth": 968,
+        "pageWidth": 928,
+        "pageLeft": 72
+      },
+      "error": ""
+    },
+    {
+      "id": "emergency-analytics",
+      "label": "Emergency Analytics",
+      "path": "/emergency/analytics",
+      "viewport": {
+        "id": "1280x720",
+        "width": 1280,
+        "height": 720,
+        "tier": "desktop"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:29:35.504Z",
+      "finalUrl": "http://localhost:8000/emergency/analytics",
+      "heading": "Department Analytics",
+      "screenshotPath": "qa/dashboard-resize-audit/emergency-analytics--1280x720.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 1280,
+        "docScrollWidth": 1280,
+        "shellPaddingInline": "25.6px",
+        "shellWidth": 1048,
+        "pageWidth": 989,
+        "pageLeft": 258
+      },
+      "error": ""
+    },
+    {
+      "id": "emergency-analytics",
+      "label": "Emergency Analytics",
+      "path": "/emergency/analytics",
+      "viewport": {
+        "id": "1440x900",
+        "width": 1440,
+        "height": 900,
+        "tier": "desktop"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:29:37.731Z",
+      "finalUrl": "http://localhost:8000/emergency/analytics",
+      "heading": "Department Analytics",
+      "screenshotPath": "qa/dashboard-resize-audit/emergency-analytics--1440x900.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 1440,
+        "docScrollWidth": 1440,
+        "shellPaddingInline": "28px",
+        "shellWidth": 1208,
+        "pageWidth": 1144,
+        "pageLeft": 260
+      },
+      "error": ""
+    },
+    {
+      "id": "emergency-analytics",
+      "label": "Emergency Analytics",
+      "path": "/emergency/analytics",
+      "viewport": {
+        "id": "1920x1080",
+        "width": 1920,
+        "height": 1080,
+        "tier": "wide"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:29:39.808Z",
+      "finalUrl": "http://localhost:8000/emergency/analytics",
+      "heading": "Department Analytics",
+      "screenshotPath": "qa/dashboard-resize-audit/emergency-analytics--1920x1080.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 1920,
+        "docScrollWidth": 1920,
+        "shellPaddingInline": "32px",
+        "shellWidth": 1688,
+        "pageWidth": 1616,
+        "pageLeft": 264
+      },
+      "error": ""
+    },
+    {
+      "id": "shift-summary",
+      "label": "Shift Summary",
+      "path": "/emergency/shift",
+      "viewport": {
+        "id": "375x812",
+        "width": 375,
+        "height": 812,
+        "tier": "phone"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:29:42.019Z",
+      "finalUrl": "http://localhost:8000/emergency/shift",
+      "heading": "Emergency Shift Summary",
+      "screenshotPath": "qa/dashboard-resize-audit/shift-summary--375x812.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 375,
+        "docScrollWidth": 375,
+        "shellPaddingInline": "12px",
+        "shellWidth": 375,
+        "pageWidth": 343,
+        "pageLeft": 12
+      },
+      "error": ""
+    },
+    {
+      "id": "shift-summary",
+      "label": "Shift Summary",
+      "path": "/emergency/shift",
+      "viewport": {
+        "id": "768x1024",
+        "width": 768,
+        "height": 1024,
+        "tier": "tablet"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:29:44.077Z",
+      "finalUrl": "http://localhost:8000/emergency/shift",
+      "heading": "Emergency Shift Summary",
+      "screenshotPath": "qa/dashboard-resize-audit/shift-summary--768x1024.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 768,
+        "docScrollWidth": 768,
+        "shellPaddingInline": "16px",
+        "shellWidth": 768,
+        "pageWidth": 728,
+        "pageLeft": 16
+      },
+      "error": ""
+    },
+    {
+      "id": "shift-summary",
+      "label": "Shift Summary",
+      "path": "/emergency/shift",
+      "viewport": {
+        "id": "1024x768",
+        "width": 1024,
+        "height": 768,
+        "tier": "tablet-landscape"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:29:46.109Z",
+      "finalUrl": "http://localhost:8000/emergency/shift",
+      "heading": "Emergency Shift Summary",
+      "screenshotPath": "qa/dashboard-resize-audit/shift-summary--1024x768.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 1024,
+        "docScrollWidth": 1024,
+        "shellPaddingInline": "16px",
+        "shellWidth": 968,
+        "pageWidth": 928,
+        "pageLeft": 72
+      },
+      "error": ""
+    },
+    {
+      "id": "shift-summary",
+      "label": "Shift Summary",
+      "path": "/emergency/shift",
+      "viewport": {
+        "id": "1280x720",
+        "width": 1280,
+        "height": 720,
+        "tier": "desktop"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:29:48.235Z",
+      "finalUrl": "http://localhost:8000/emergency/shift",
+      "heading": "Emergency Shift Summary",
+      "screenshotPath": "qa/dashboard-resize-audit/shift-summary--1280x720.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 1280,
+        "docScrollWidth": 1280,
+        "shellPaddingInline": "25.6px",
+        "shellWidth": 1048,
+        "pageWidth": 989,
+        "pageLeft": 258
+      },
+      "error": ""
+    },
+    {
+      "id": "shift-summary",
+      "label": "Shift Summary",
+      "path": "/emergency/shift",
+      "viewport": {
+        "id": "1440x900",
+        "width": 1440,
+        "height": 900,
+        "tier": "desktop"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:29:50.199Z",
+      "finalUrl": "http://localhost:8000/emergency/shift",
+      "heading": "Emergency Shift Summary",
+      "screenshotPath": "qa/dashboard-resize-audit/shift-summary--1440x900.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 1440,
+        "docScrollWidth": 1440,
+        "shellPaddingInline": "28px",
+        "shellWidth": 1208,
+        "pageWidth": 1144,
+        "pageLeft": 260
+      },
+      "error": ""
+    },
+    {
+      "id": "shift-summary",
+      "label": "Shift Summary",
+      "path": "/emergency/shift",
+      "viewport": {
+        "id": "1920x1080",
+        "width": 1920,
+        "height": 1080,
+        "tier": "wide"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:29:52.225Z",
+      "finalUrl": "http://localhost:8000/emergency/shift",
+      "heading": "Emergency Shift Summary",
+      "screenshotPath": "qa/dashboard-resize-audit/shift-summary--1920x1080.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 1920,
+        "docScrollWidth": 1920,
+        "shellPaddingInline": "32px",
+        "shellWidth": 1688,
+        "pageWidth": 1616,
+        "pageLeft": 264
+      },
+      "error": ""
+    },
+    {
+      "id": "executive",
+      "label": "Executive Command Center",
+      "path": "/executive",
+      "viewport": {
+        "id": "375x812",
+        "width": 375,
+        "height": 812,
+        "tier": "phone"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:29:54.358Z",
+      "finalUrl": "http://localhost:8000/emergency/command-center",
+      "heading": "Real-Time ED Operations",
+      "screenshotPath": "qa/dashboard-resize-audit/executive--375x812.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 375,
+        "docScrollWidth": 375,
+        "shellPaddingInline": "12px",
+        "shellWidth": 375,
+        "pageWidth": 343,
+        "pageLeft": 12
+      },
+      "error": ""
+    },
+    {
+      "id": "executive",
+      "label": "Executive Command Center",
+      "path": "/executive",
+      "viewport": {
+        "id": "768x1024",
+        "width": 768,
+        "height": 1024,
+        "tier": "tablet"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:29:56.435Z",
+      "finalUrl": "http://localhost:8000/emergency/command-center",
+      "heading": "Real-Time ED Operations",
+      "screenshotPath": "qa/dashboard-resize-audit/executive--768x1024.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 768,
+        "docScrollWidth": 768,
+        "shellPaddingInline": "16px",
+        "shellWidth": 768,
+        "pageWidth": 728,
+        "pageLeft": 16
+      },
+      "error": ""
+    },
+    {
+      "id": "executive",
+      "label": "Executive Command Center",
+      "path": "/executive",
+      "viewport": {
+        "id": "1024x768",
+        "width": 1024,
+        "height": 768,
+        "tier": "tablet-landscape"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:29:58.771Z",
+      "finalUrl": "http://localhost:8000/emergency/command-center",
+      "heading": "Real-Time ED Operations",
+      "screenshotPath": "qa/dashboard-resize-audit/executive--1024x768.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 1024,
+        "docScrollWidth": 1024,
+        "shellPaddingInline": "16px",
+        "shellWidth": 968,
+        "pageWidth": 928,
+        "pageLeft": 72
+      },
+      "error": ""
+    },
+    {
+      "id": "executive",
+      "label": "Executive Command Center",
+      "path": "/executive",
+      "viewport": {
+        "id": "1280x720",
+        "width": 1280,
+        "height": 720,
+        "tier": "desktop"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:30:01.091Z",
+      "finalUrl": "http://localhost:8000/emergency/command-center",
+      "heading": "Real-Time ED Operations",
+      "screenshotPath": "qa/dashboard-resize-audit/executive--1280x720.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 1280,
+        "docScrollWidth": 1280,
+        "shellPaddingInline": "25.6px",
+        "shellWidth": 1048,
+        "pageWidth": 989,
+        "pageLeft": 258
+      },
+      "error": ""
+    },
+    {
+      "id": "executive",
+      "label": "Executive Command Center",
+      "path": "/executive",
+      "viewport": {
+        "id": "1440x900",
+        "width": 1440,
+        "height": 900,
+        "tier": "desktop"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:30:03.529Z",
+      "finalUrl": "http://localhost:8000/emergency/command-center",
+      "heading": "Real-Time ED Operations",
+      "screenshotPath": "qa/dashboard-resize-audit/executive--1440x900.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 1440,
+        "docScrollWidth": 1440,
+        "shellPaddingInline": "28px",
+        "shellWidth": 1208,
+        "pageWidth": 1144,
+        "pageLeft": 260
+      },
+      "error": ""
+    },
+    {
+      "id": "executive",
+      "label": "Executive Command Center",
+      "path": "/executive",
+      "viewport": {
+        "id": "1920x1080",
+        "width": 1920,
+        "height": 1080,
+        "tier": "wide"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:30:05.833Z",
+      "finalUrl": "http://localhost:8000/emergency/command-center",
+      "heading": "Real-Time ED Operations",
+      "screenshotPath": "qa/dashboard-resize-audit/executive--1920x1080.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 1920,
+        "docScrollWidth": 1920,
+        "shellPaddingInline": "32px",
+        "shellWidth": 1688,
+        "pageWidth": 1616,
+        "pageLeft": 264
+      },
+      "error": ""
+    },
+    {
+      "id": "system-health",
+      "label": "System Health",
+      "path": "/system-health",
+      "viewport": {
+        "id": "375x812",
+        "width": 375,
+        "height": 812,
+        "tier": "phone"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:30:08.042Z",
+      "finalUrl": "http://localhost:8000/system-health",
+      "heading": "Deployment Observability",
+      "screenshotPath": "qa/dashboard-resize-audit/system-health--375x812.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 375,
+        "docScrollWidth": 375,
+        "shellPaddingInline": "12px",
+        "shellWidth": 375,
+        "pageWidth": 343,
+        "pageLeft": 12
+      },
+      "error": ""
+    },
+    {
+      "id": "system-health",
+      "label": "System Health",
+      "path": "/system-health",
+      "viewport": {
+        "id": "768x1024",
+        "width": 768,
+        "height": 1024,
+        "tier": "tablet"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:30:10.314Z",
+      "finalUrl": "http://localhost:8000/system-health",
+      "heading": "Deployment Observability",
+      "screenshotPath": "qa/dashboard-resize-audit/system-health--768x1024.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 768,
+        "docScrollWidth": 768,
+        "shellPaddingInline": "16px",
+        "shellWidth": 768,
+        "pageWidth": 728,
+        "pageLeft": 16
+      },
+      "error": ""
+    },
+    {
+      "id": "system-health",
+      "label": "System Health",
+      "path": "/system-health",
+      "viewport": {
+        "id": "1024x768",
+        "width": 1024,
+        "height": 768,
+        "tier": "tablet-landscape"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:30:12.302Z",
+      "finalUrl": "http://localhost:8000/system-health",
+      "heading": "Deployment Observability",
+      "screenshotPath": "qa/dashboard-resize-audit/system-health--1024x768.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 1024,
+        "docScrollWidth": 1024,
+        "shellPaddingInline": "16px",
+        "shellWidth": 968,
+        "pageWidth": 928,
+        "pageLeft": 72
+      },
+      "error": ""
+    },
+    {
+      "id": "system-health",
+      "label": "System Health",
+      "path": "/system-health",
+      "viewport": {
+        "id": "1280x720",
+        "width": 1280,
+        "height": 720,
+        "tier": "desktop"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:30:14.645Z",
+      "finalUrl": "http://localhost:8000/system-health",
+      "heading": "Deployment Observability",
+      "screenshotPath": "qa/dashboard-resize-audit/system-health--1280x720.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 1280,
+        "docScrollWidth": 1280,
+        "shellPaddingInline": "25.6px",
+        "shellWidth": 1048,
+        "pageWidth": 989,
+        "pageLeft": 258
+      },
+      "error": ""
+    },
+    {
+      "id": "system-health",
+      "label": "System Health",
+      "path": "/system-health",
+      "viewport": {
+        "id": "1440x900",
+        "width": 1440,
+        "height": 900,
+        "tier": "desktop"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:30:16.941Z",
+      "finalUrl": "http://localhost:8000/system-health",
+      "heading": "Deployment Observability",
+      "screenshotPath": "qa/dashboard-resize-audit/system-health--1440x900.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 1440,
+        "docScrollWidth": 1440,
+        "shellPaddingInline": "28px",
+        "shellWidth": 1208,
+        "pageWidth": 1144,
+        "pageLeft": 260
+      },
+      "error": ""
+    },
+    {
+      "id": "system-health",
+      "label": "System Health",
+      "path": "/system-health",
+      "viewport": {
+        "id": "1920x1080",
+        "width": 1920,
+        "height": 1080,
+        "tier": "wide"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:30:19.338Z",
+      "finalUrl": "http://localhost:8000/system-health",
+      "heading": "Deployment Observability",
+      "screenshotPath": "qa/dashboard-resize-audit/system-health--1920x1080.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 1920,
+        "docScrollWidth": 1920,
+        "shellPaddingInline": "32px",
+        "shellWidth": 1688,
+        "pageWidth": 1616,
+        "pageLeft": 264
+      },
+      "error": ""
+    },
+    {
+      "id": "saas-health",
+      "label": "SaaS Health Center",
+      "path": "/saas-health",
+      "viewport": {
+        "id": "375x812",
+        "width": 375,
+        "height": 812,
+        "tier": "phone"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:30:21.645Z",
+      "finalUrl": "http://localhost:8000/saas-health",
+      "heading": "Deployment Observability",
+      "screenshotPath": "qa/dashboard-resize-audit/saas-health--375x812.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 375,
+        "docScrollWidth": 375,
+        "shellPaddingInline": "12px",
+        "shellWidth": 375,
+        "pageWidth": 343,
+        "pageLeft": 12
+      },
+      "error": ""
+    },
+    {
+      "id": "saas-health",
+      "label": "SaaS Health Center",
+      "path": "/saas-health",
+      "viewport": {
+        "id": "768x1024",
+        "width": 768,
+        "height": 1024,
+        "tier": "tablet"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:30:23.788Z",
+      "finalUrl": "http://localhost:8000/saas-health",
+      "heading": "Deployment Observability",
+      "screenshotPath": "qa/dashboard-resize-audit/saas-health--768x1024.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 768,
+        "docScrollWidth": 768,
+        "shellPaddingInline": "16px",
+        "shellWidth": 768,
+        "pageWidth": 728,
+        "pageLeft": 16
+      },
+      "error": ""
+    },
+    {
+      "id": "saas-health",
+      "label": "SaaS Health Center",
+      "path": "/saas-health",
+      "viewport": {
+        "id": "1024x768",
+        "width": 1024,
+        "height": 768,
+        "tier": "tablet-landscape"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:30:25.962Z",
+      "finalUrl": "http://localhost:8000/saas-health",
+      "heading": "Deployment Observability",
+      "screenshotPath": "qa/dashboard-resize-audit/saas-health--1024x768.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 1024,
+        "docScrollWidth": 1024,
+        "shellPaddingInline": "16px",
+        "shellWidth": 968,
+        "pageWidth": 928,
+        "pageLeft": 72
+      },
+      "error": ""
+    },
+    {
+      "id": "saas-health",
+      "label": "SaaS Health Center",
+      "path": "/saas-health",
+      "viewport": {
+        "id": "1280x720",
+        "width": 1280,
+        "height": 720,
+        "tier": "desktop"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:30:28.247Z",
+      "finalUrl": "http://localhost:8000/saas-health",
+      "heading": "Deployment Observability",
+      "screenshotPath": "qa/dashboard-resize-audit/saas-health--1280x720.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 1280,
+        "docScrollWidth": 1280,
+        "shellPaddingInline": "25.6px",
+        "shellWidth": 1048,
+        "pageWidth": 989,
+        "pageLeft": 258
+      },
+      "error": ""
+    },
+    {
+      "id": "saas-health",
+      "label": "SaaS Health Center",
+      "path": "/saas-health",
+      "viewport": {
+        "id": "1440x900",
+        "width": 1440,
+        "height": 900,
+        "tier": "desktop"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:30:30.467Z",
+      "finalUrl": "http://localhost:8000/saas-health",
+      "heading": "Deployment Observability",
+      "screenshotPath": "qa/dashboard-resize-audit/saas-health--1440x900.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 1440,
+        "docScrollWidth": 1440,
+        "shellPaddingInline": "28px",
+        "shellWidth": 1208,
+        "pageWidth": 1144,
+        "pageLeft": 260
+      },
+      "error": ""
+    },
+    {
+      "id": "saas-health",
+      "label": "SaaS Health Center",
+      "path": "/saas-health",
+      "viewport": {
+        "id": "1920x1080",
+        "width": 1920,
+        "height": 1080,
+        "tier": "wide"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:30:32.779Z",
+      "finalUrl": "http://localhost:8000/saas-health",
+      "heading": "Deployment Observability",
+      "screenshotPath": "qa/dashboard-resize-audit/saas-health--1920x1080.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 1920,
+        "docScrollWidth": 1920,
+        "shellPaddingInline": "32px",
+        "shellWidth": 1688,
+        "pageWidth": 1616,
+        "pageLeft": 264
+      },
+      "error": ""
+    },
+    {
+      "id": "tools-overview",
+      "label": "Tools Overview",
+      "path": "/tools",
+      "viewport": {
+        "id": "375x812",
+        "width": 375,
+        "height": 812,
+        "tier": "phone"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:30:35.106Z",
+      "finalUrl": "http://localhost:8000/emergency/tools",
+      "heading": "CareDroid Console",
+      "screenshotPath": "qa/dashboard-resize-audit/tools-overview--375x812.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 375,
+        "docScrollWidth": 375,
+        "shellPaddingInline": "12px",
+        "shellWidth": 375,
+        "pageWidth": 319,
+        "pageLeft": 24
+      },
+      "error": ""
+    },
+    {
+      "id": "tools-overview",
+      "label": "Tools Overview",
+      "path": "/tools",
+      "viewport": {
+        "id": "768x1024",
+        "width": 768,
+        "height": 1024,
+        "tier": "tablet"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:30:37.886Z",
+      "finalUrl": "http://localhost:8000/emergency/tools",
+      "heading": "CareDroid Console",
+      "screenshotPath": "qa/dashboard-resize-audit/tools-overview--768x1024.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 768,
+        "docScrollWidth": 768,
+        "shellPaddingInline": "16px",
+        "shellWidth": 768,
+        "pageWidth": 704,
+        "pageLeft": 28
+      },
+      "error": ""
+    },
+    {
+      "id": "tools-overview",
+      "label": "Tools Overview",
+      "path": "/tools",
+      "viewport": {
+        "id": "1024x768",
+        "width": 1024,
+        "height": 768,
+        "tier": "tablet-landscape"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:30:40.635Z",
+      "finalUrl": "http://localhost:8000/emergency/tools",
+      "heading": "CareDroid Console",
+      "screenshotPath": "qa/dashboard-resize-audit/tools-overview--1024x768.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 1024,
+        "docScrollWidth": 1024,
+        "shellPaddingInline": "16px",
+        "shellWidth": 968,
+        "pageWidth": 904,
+        "pageLeft": 84
+      },
+      "error": ""
+    },
+    {
+      "id": "tools-overview",
+      "label": "Tools Overview",
+      "path": "/tools",
+      "viewport": {
+        "id": "1280x720",
+        "width": 1280,
+        "height": 720,
+        "tier": "desktop"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:30:43.724Z",
+      "finalUrl": "http://localhost:8000/emergency/tools",
+      "heading": "CareDroid Console",
+      "screenshotPath": "qa/dashboard-resize-audit/tools-overview--1280x720.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 1280,
+        "docScrollWidth": 1280,
+        "shellPaddingInline": "25.6px",
+        "shellWidth": 1048,
+        "pageWidth": 965,
+        "pageLeft": 270
+      },
+      "error": ""
+    },
+    {
+      "id": "tools-overview",
+      "label": "Tools Overview",
+      "path": "/tools",
+      "viewport": {
+        "id": "1440x900",
+        "width": 1440,
+        "height": 900,
+        "tier": "desktop"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:30:47.017Z",
+      "finalUrl": "http://localhost:8000/emergency/tools?source=recommendations&filter=recommended",
+      "heading": "CareDroid Console",
+      "screenshotPath": "qa/dashboard-resize-audit/tools-overview--1440x900.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 1440,
+        "docScrollWidth": 1440,
+        "shellPaddingInline": "28px",
+        "shellWidth": 1208,
+        "pageWidth": 1120,
+        "pageLeft": 272
+      },
+      "error": ""
+    },
+    {
+      "id": "tools-overview",
+      "label": "Tools Overview",
+      "path": "/tools",
+      "viewport": {
+        "id": "1920x1080",
+        "width": 1920,
+        "height": 1080,
+        "tier": "wide"
+      },
+      "ok": true,
+      "startedAt": "2026-07-01T04:31:20.227Z",
+      "finalUrl": "http://localhost:8000/emergency/tools",
+      "heading": "CareDroid Console",
+      "screenshotPath": "qa/dashboard-resize-audit/tools-overview--1920x1080.png",
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "shellMetrics": {
+        "docClientWidth": 1920,
+        "docScrollWidth": 1920,
+        "shellPaddingInline": "32px",
+        "shellWidth": 1688,
+        "pageWidth": 1592,
+        "pageLeft": 276
+      },
+      "error": ""
+    }
+  ],
+  "overflowSummary": []
+}

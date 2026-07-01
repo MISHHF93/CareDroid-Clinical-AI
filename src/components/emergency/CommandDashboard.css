@@ -333,6 +333,10 @@
     padding: 16px;
   }
 
+  .command-dashboard .department-staff-bar {
+    margin-inline: 0;
+  }
+
   .command-dashboard__meta {
     text-align: left;
   }
