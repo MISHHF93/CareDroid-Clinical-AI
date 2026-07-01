@@ -1,6 +1,9 @@
+import { useLocation } from 'react-router-dom';
 import HelpTrigger from '../help/HelpTrigger';
+import { RouteGraphicBadge } from '../graphics/CdlGraphicKit';
 import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
 import { useRouteChrome } from '../../contexts/RouteChromeContext';
+import { getEmergencySurface } from '../../config/emergencyPipelineModel';
 import useEdOperatingSurface from '../../hooks/useEdOperatingSurface';
 import { EMERGENCY_OS_BRANDING } from '../../config/emergencyOsBranding.config';
 import './ShellRouteTab.css';
@@ -11,9 +14,11 @@ type ShellRouteTabProps = {
 };
 
 export default function ShellRouteTab({ title, subtitle }: ShellRouteTabProps) {
+  const location = useLocation();
   const surfaces = usePractitionerSurfaceVisibility();
   const { chrome: routeChrome } = useRouteChrome();
   const operatingSurface = useEdOperatingSurface();
+  const routeSurface = getEmergencySurface(location.pathname);
 
   const showEyebrow = surfaces.chrome.showPageEyebrow;
   const showSubtitle = surfaces.chrome.showHeaderSubtitle;
@@ -34,6 +39,8 @@ export default function ShellRouteTab({ title, subtitle }: ShellRouteTabProps) {
   return (
     <div className="shell-route-tab" role="region" aria-label="Current workspace">
       <div className="shell-route-tab__identity">
+        <RouteGraphicBadge navId={routeSurface?.sidebarNavId} />
+        <div className="shell-route-tab__title-stack">
         {resolvedEyebrow ? (
           <span className="shell-route-tab__eyebrow">{resolvedEyebrow}</span>
         ) : null}
@@ -42,6 +49,7 @@ export default function ShellRouteTab({ title, subtitle }: ShellRouteTabProps) {
           {resolvedSubtitle ? (
             <p className="shell-route-tab__subtitle">{resolvedSubtitle}</p>
           ) : null}
+        </div>
         </div>
       </div>
       {actions ? <div className="shell-route-tab__actions">{actions}</div> : null}

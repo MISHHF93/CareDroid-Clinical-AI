@@ -1,0 +1,232 @@
+/* CDL graphic kit — iconographic treatments for operational UI */
+
+:root {
+  --cdl-graphic-accent-start: #0ea5e9;
+  --cdl-graphic-accent-end: #6366f1;
+  --cdl-graphic-soft-start: #e0f2fe;
+  --cdl-graphic-soft-end: #ede9fe;
+}
+
+.cdl-graphic-icon-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--medical-accent) 10%, var(--medical-white));
+  color: var(--medical-accent-hover);
+  flex-shrink: 0;
+}
+
+.cdl-graphic-icon-badge--sm {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+}
+
+.cdl-graphic-icon-badge--md {
+  width: 36px;
+  height: 36px;
+}
+
+.cdl-graphic-icon-badge--lg {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+}
+
+.cdl-graphic-icon-badge--information {
+  background: color-mix(in srgb, var(--status-info, #0ea5e9) 12%, var(--medical-white));
+  color: var(--status-info, #0ea5e9);
+}
+
+.cdl-graphic-icon-badge--warning {
+  background: color-mix(in srgb, var(--status-warning, #f59e0b) 14%, var(--medical-white));
+  color: var(--status-warning, #d97706);
+}
+
+.cdl-graphic-icon-badge--critical {
+  background: color-mix(in srgb, var(--status-critical, #ef4444) 12%, var(--medical-white));
+  color: var(--status-critical, #dc2626);
+}
+
+.cdl-graphic-icon-badge--action {
+  background: color-mix(in srgb, var(--medical-accent) 14%, var(--medical-white));
+  color: var(--medical-accent-hover);
+}
+
+.cdl-graphic-icon-badge--neutral {
+  background: var(--medical-slate-100);
+  color: var(--medical-ink-muted);
+}
+
+.cdl-graphic-icon-badge--brand {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--cdl-graphic-accent-start) 18%, var(--medical-white)),
+    color-mix(in srgb, var(--cdl-graphic-accent-end) 14%, var(--medical-white))
+  );
+  color: var(--medical-accent-hover);
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--medical-accent) 18%, transparent);
+}
+
+/* Situation brief graphic cards */
+.cdl-situation-graphic-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px 12px;
+  align-items: start;
+  min-width: 0;
+  padding: 12px 14px;
+  border-radius: var(--cdl-clinical-radius, 12px);
+  background: var(--medical-white);
+  border: 1px solid var(--cdl-clinical-border, var(--medical-border));
+  box-shadow: var(--cdl-clinical-shadow-rest);
+  overflow: hidden;
+}
+
+.cdl-situation-graphic-card__motif {
+  position: absolute;
+  inset-inline-end: -6px;
+  inset-block-start: -6px;
+  width: 56px;
+  height: 56px;
+  color: var(--medical-accent);
+  pointer-events: none;
+}
+
+.cdl-situation-graphic-card--information .cdl-situation-graphic-card__motif {
+  color: var(--status-info, #0ea5e9);
+}
+
+.cdl-situation-graphic-card--warning .cdl-situation-graphic-card__motif {
+  color: var(--status-warning, #f59e0b);
+}
+
+.cdl-situation-graphic-card--critical .cdl-situation-graphic-card__motif {
+  color: var(--status-critical, #ef4444);
+}
+
+.cdl-situation-graphic-card__content {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  grid-column: 2;
+}
+
+.cdl-situation-graphic-card .cdl-graphic-icon-badge {
+  grid-row: 1;
+  grid-column: 1;
+  align-self: start;
+}
+
+.cdl-situation-graphic-card__label {
+  color: var(--ed-text-meta, var(--medical-ink-subtle));
+  font-size: var(--ed-type-meta, 11px);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.cdl-situation-graphic-card__value {
+  color: var(--ed-text-primary, var(--medical-ink));
+  font-size: var(--ed-type-section, 13px);
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.emergency-route-situation-brief .cdl-situation-graphic-card {
+  list-style: none;
+}
+
+.emergency-route-situation-brief__list:has(.cdl-situation-graphic-card) {
+  gap: 12px;
+}
+
+/* Metric graphic cards */
+.cdl-metric-graphic-card {
+  position: relative;
+}
+
+.cdl-metric-graphic-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.cdl-metric-graphic-card__ring {
+  width: 36px;
+  height: 36px;
+  color: var(--metric-color, var(--medical-accent));
+  opacity: 0.85;
+}
+
+.cdl-metric-graphic-card__ring svg {
+  width: 100%;
+  height: 100%;
+}
+
+.cdl-metric-graphic-card__bar {
+  margin-top: 8px;
+  height: 4px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--metric-color, var(--medical-border)) 16%, transparent);
+  overflow: hidden;
+}
+
+.cdl-metric-graphic-card__bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--metric-color, var(--medical-accent));
+  opacity: 0.75;
+}
+
+/* Route tab graphic badge */
+.cdl-route-graphic-badge {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.cdl-route-graphic-badge__glow {
+  position: absolute;
+  inset: -4px;
+  border-radius: 16px;
+  background: radial-gradient(
+    circle at 50% 50%,
+    color-mix(in srgb, var(--medical-accent) 22%, transparent),
+    transparent 70%
+  );
+  z-index: -1;
+}
+
+.shell-route-tab__identity:has(.cdl-route-graphic-badge) {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* Empty state illustrations */
+.cdl-graphic-illustration {
+  width: min(120px, 40vw);
+  height: auto;
+  color: var(--medical-ink-subtle);
+}
+
+.operational-empty-state__icon .cdl-graphic-illustration,
+.cd-empty__icon .cdl-graphic-illustration {
+  width: min(140px, 50vw);
+}
+
+.emergency-route-empty--graphic {
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+  padding: var(--ed-space-6, 24px) var(--ed-space-4, 16px);
+}
+
+.emergency-route-empty--graphic .cdl-graphic-illustration {
+  width: min(100px, 36vw);
+}

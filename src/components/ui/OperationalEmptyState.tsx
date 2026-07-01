@@ -1,7 +1,9 @@
+import { CdlEmptyIllustration } from '../graphics/CdlGraphicIllustrations';
+import { resolveEmptyStateGraphic } from '../../config/cdlGraphicModel';
 import './OperationalEmptyState.css';
 
 /**
- * Structured operational empty state — guidance, actions, status, and next steps.
+ * Structured operational empty state ï¿½ guidance, actions, status, and next steps.
  */
 import { dispatchOpenHelpHub } from '../../contexts/HelpHubContext';
 
@@ -29,11 +31,13 @@ export default function OperationalEmptyState({
       aria-label={title || guidance || 'Empty state'}
       {...props}
     >
-      {icon ? (
-        <span className="operational-empty-state__icon" aria-hidden>
-          {icon}
-        </span>
-      ) : null}
+      <span className="operational-empty-state__icon" aria-hidden>
+        {icon == null || (typeof icon === 'string' && icon.length <= 2) ? (
+          <CdlEmptyIllustration variant={resolveEmptyStateGraphic(title || guidance || '')} />
+        ) : (
+          icon
+        )}
+      </span>
       {title ? <h3 className="operational-empty-state__title">{title}</h3> : null}
       {guidance ? <p className="operational-empty-state__guidance">{guidance}</p> : null}
       {status ? (

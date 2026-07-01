@@ -1,0 +1,52 @@
+/**
+ * Clinical graphic layer — elevates static operational UI into iconographic surfaces.
+ * Loaded after clinical-page-sweep; pairs with CdlGraphicKit components.
+ */
+
+.emergency-route-situation-brief__list--graphic {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13.5rem), 1fr));
+}
+
+.emergency-route-metric-grid--graphic {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 10.5rem), 1fr));
+}
+
+.emergency-route-metric-grid--graphic .cdl-metric-graphic-card {
+  min-height: 7.5rem;
+}
+
+.shell-route-tab__title-stack {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.shell-route-tab__identity .cdl-route-graphic-badge {
+  align-self: center;
+}
+
+.cd-empty--graphic .cd-empty__icon {
+  margin-bottom: 4px;
+}
+
+.operational-empty-state .cdl-graphic-illustration {
+  margin-inline: auto;
+}
+
+.emergency-app-shell .cdl-zone--operational-summary .cdl-situation-graphic-card {
+  transition: box-shadow 160ms ease, transform 160ms ease;
+}
+
+.emergency-app-shell .cdl-zone--operational-summary .cdl-situation-graphic-card:hover {
+  box-shadow: var(--cdl-clinical-shadow-hover, 0 4px 18px rgba(15, 23, 42, 0.08));
+}
+
+@media (max-width: 768px) {
+  .shell-route-tab__identity .cdl-route-graphic-badge {
+    display: none;
+  }
+
+  .emergency-route-situation-brief__list--graphic {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -9,6 +9,12 @@ import { resolveEdDataFreshness, resolveEdSourceLabel } from '../../utils/edData
 import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
 import { metricColorForTone } from '../../config/semanticColorSystem';
 import useEdOperatingSurface from '../../hooks/useEdOperatingSurface';
+import {
+  MetricGraphicCard,
+  SituationGraphicCard,
+} from '../../components/graphics/CdlGraphicKit';
+import { CdlEmptyIllustration } from '../../components/graphics/CdlGraphicIllustrations';
+import { resolveEmptyStateGraphic } from '../../config/cdlGraphicModel';
 import './emergency-route.css';
 
 export type WorkflowSituationTone = 'neutral' | 'info' | 'warning' | 'critical';
@@ -71,12 +77,14 @@ export function WorkflowSituationBrief({
         .join(' ')}
       aria-label="Workflow situation summary"
     >
-      <ol className="emergency-route-situation-brief__list">
+      <ol className="emergency-route-situation-brief__list emergency-route-situation-brief__list--graphic">
         {items.map((item) => (
-          <li key={item.id} className="emergency-route-situation-brief__item">
-            <span className="emergency-route-situation-brief__label">{item.label}</span>
-            <span className="emergency-route-situation-brief__value">{item.value}</span>
-          </li>
+          <SituationGraphicCard
+            key={item.id}
+            id={item.id as 'status' | 'attention' | 'owner' | 'nextAction'}
+            label={item.label}
+            value={item.value}
+          />
         ))}
       </ol>
     </section>
@@ -235,20 +243,21 @@ export function MetricGrid({ metrics }) {
   }
 
   return (
-    <div className="emergency-route-metric-grid">
-      {metrics.map((metric) => (
-        <article
-          key={metric.label}
-          className="emergency-route-card emergency-route-metric-card"
-          style={(() => {
-            const accent = metric.tone ? metricColorForTone(metric.tone) : metric.color;
-            return accent ? ({ '--metric-color': accent } as any) : undefined;
-          })()}
-        >
-          <strong className="emergency-route-metric-card__value">{metric.value}</strong>
-          <span className="emergency-route-metric-card__label">{metric.label}</span>
-        </article>
-      ))}
+    <div className="emergency-route-metric-grid emergency-route-metric-grid--graphic">
+      {metrics.map((metric) => {
+        const accent = metric.tone ? metricColorForTone(metric.tone) : metric.color;
+        return (
+          <MetricGraphicCard
+            key={metric.label}
+            label={metric.label}
+            value={metric.value}
+            tone={metric.tone}
+            color={accent}
+            progress={metric.progress}
+            iconKey={metric.iconKey}
+          />
+        );
+      })}
     </div>
   );
 }
@@ -256,8 +265,9 @@ export function MetricGrid({ metrics }) {
 export function PatientGrid({ patients, emptyMessage }) {
   if (!patients.length) {
     return (
-      <div role="status" className="emergency-route-card emergency-route-empty">
-        {emptyMessage}
+      <div role="status" className="emergency-route-card emergency-route-empty emergency-route-empty--graphic">
+        <CdlEmptyIllustration variant={resolveEmptyStateGraphic(emptyMessage)} />
+        <span>{emptyMessage}</span>
       </div>
     );
   }
