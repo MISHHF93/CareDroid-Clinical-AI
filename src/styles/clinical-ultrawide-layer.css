@@ -102,10 +102,6 @@
     grid-template-columns: minmax(320px, 1fr) minmax(360px, 1.1fr) minmax(320px, 0.9fr) !important;
   }
 
-  .shell-route-tab,
-  .caredroid-header--slim {
-    padding-inline: clamp(24px, 2vw, 56px);
-  }
 }
 
 @media (min-width: 3840px) {

@@ -111,18 +111,28 @@ async function captureTarget(page, target, viewport) {
       const pageRoot = document.querySelector(
         '.cd-page-shell, .emergency-route-page, .emergency-whiteboard-page, .reception-workspace',
       );
+      const routeTab = document.querySelector('.shell-route-tab');
+      const headerBar = document.querySelector('.caredroid-header--slim .caredroid-header__topbar');
       const shellRect = shell?.getBoundingClientRect();
       const pageRect = pageRoot?.getBoundingClientRect();
+      const routeTabRect = routeTab?.getBoundingClientRect();
+      const headerBarRect = headerBar?.getBoundingClientRect();
       const styles = shell ? getComputedStyle(shell) : null;
+      const pageLeft = pageRect ? Math.round(pageRect.left) : null;
+      const routeTabLeft = routeTabRect ? Math.round(routeTabRect.left) : null;
+      const headerBarLeft = headerBarRect ? Math.round(headerBarRect.left) : null;
       return {
         docClientWidth: document.documentElement.clientWidth,
         docScrollWidth: document.documentElement.scrollWidth,
         shellWidth: shellRect ? Math.round(shellRect.width) : null,
         shellLeft: shellRect ? Math.round(shellRect.left) : null,
         pageWidth: pageRect ? Math.round(pageRect.width) : null,
-        pageLeft: pageRect ? Math.round(pageRect.left) : null,
+        pageLeft,
         pageMaxWidth: pageRoot ? getComputedStyle(pageRoot).maxWidth : null,
         shellPaddingInline: styles?.paddingInline ?? null,
+        routeTabLeft,
+        headerBarLeft,
+        chromePageDeltaPx: pageLeft != null && routeTabLeft != null ? Math.abs(pageLeft - routeTabLeft) : null,
       };
     });
 

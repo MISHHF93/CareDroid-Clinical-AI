@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-07-01T07:48:44.208Z",
-  "baseUrl": "http://localhost:4173 ",
+  "generatedAt": "2026-07-01T11:58:12.492Z",
+  "baseUrl": "http://localhost:4173",
   "outputDir": "qa/shell-ux-audit/responsive",
   "previewDir": "qa/shell-ux-audit/responsive/previews",
   "previewViewport": {
@@ -100,7 +100,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:47:46.135Z",
+      "startedAt": "2026-07-01T11:57:16.878Z",
       "finalUrl": "http://localhost:4173/emergency/whiteboard",
       "heading": "Board",
       "screenshotPath": "qa/shell-ux-audit/responsive/whiteboard--390x844.png",
@@ -108,12 +108,15 @@
       "layoutMetrics": {
         "docClientWidth": 390,
         "docScrollWidth": 390,
-        "shellWidth": 390,
-        "shellLeft": 0,
+        "shellWidth": 365,
+        "shellLeft": 12,
         "pageWidth": 357,
         "pageLeft": 12,
         "pageMaxWidth": "min(100%, 1680px)",
-        "shellPaddingInline": "12.48px"
+        "shellPaddingInline": "0px",
+        "routeTabLeft": 12,
+        "headerBarLeft": 30,
+        "chromePageDeltaPx": 0
       },
       "docOverflowPx": 0,
       "error": ""
@@ -130,7 +133,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:47:47.577Z",
+      "startedAt": "2026-07-01T11:57:18.155Z",
       "finalUrl": "http://localhost:4173/emergency/whiteboard",
       "heading": "Board",
       "screenshotPath": "qa/shell-ux-audit/responsive/whiteboard--768x1024.png",
@@ -138,12 +141,15 @@
       "layoutMetrics": {
         "docClientWidth": 768,
         "docScrollWidth": 768,
-        "shellWidth": 768,
-        "shellLeft": 0,
+        "shellWidth": 736,
+        "shellLeft": 16,
         "pageWidth": 728,
         "pageLeft": 16,
         "pageMaxWidth": "min(100%, 1680px)",
-        "shellPaddingInline": "16px"
+        "shellPaddingInline": "0px",
+        "routeTabLeft": 16,
+        "headerBarLeft": 34,
+        "chromePageDeltaPx": 0
       },
       "docOverflowPx": 0,
       "error": ""
@@ -160,7 +166,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:47:48.875Z",
+      "startedAt": "2026-07-01T11:57:19.452Z",
       "finalUrl": "http://localhost:4173/emergency/whiteboard",
       "heading": "Board",
       "screenshotPath": "qa/shell-ux-audit/responsive/whiteboard--1440x900.png",
@@ -168,12 +174,15 @@
       "layoutMetrics": {
         "docClientWidth": 1440,
         "docScrollWidth": 1440,
-        "shellWidth": 1208,
-        "shellLeft": 232,
+        "shellWidth": 1152,
+        "shellLeft": 260,
         "pageWidth": 1144,
         "pageLeft": 260,
         "pageMaxWidth": "min(100%, 1680px)",
-        "shellPaddingInline": "28px"
+        "shellPaddingInline": "0px",
+        "routeTabLeft": 260,
+        "headerBarLeft": 284,
+        "chromePageDeltaPx": 0
       },
       "docOverflowPx": 0,
       "error": ""
@@ -190,7 +199,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:47:50.256Z",
+      "startedAt": "2026-07-01T11:57:20.669Z",
       "finalUrl": "http://localhost:4173/emergency/whiteboard",
       "heading": "Board",
       "screenshotPath": "qa/shell-ux-audit/responsive/whiteboard--1920x1080.png",
@@ -198,12 +207,15 @@
       "layoutMetrics": {
         "docClientWidth": 1920,
         "docScrollWidth": 1920,
-        "shellWidth": 1688,
-        "shellLeft": 232,
+        "shellWidth": 1624,
+        "shellLeft": 264,
         "pageWidth": 1616,
         "pageLeft": 264,
         "pageMaxWidth": "min(100%, 1680px)",
-        "shellPaddingInline": "32px"
+        "shellPaddingInline": "0px",
+        "routeTabLeft": 264,
+        "headerBarLeft": 292,
+        "chromePageDeltaPx": 0
       },
       "docOverflowPx": 0,
       "error": ""
@@ -220,7 +232,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:47:51.607Z",
+      "startedAt": "2026-07-01T11:57:22.002Z",
       "finalUrl": "http://localhost:4173/emergency/whiteboard",
       "heading": "Board",
       "screenshotPath": "qa/shell-ux-audit/responsive/whiteboard--2560x1440.png",
@@ -228,12 +240,15 @@
       "layoutMetrics": {
         "docClientWidth": 2560,
         "docScrollWidth": 2560,
-        "shellWidth": 2328,
-        "shellLeft": 232,
-        "pageWidth": 2100,
-        "pageLeft": 342,
+        "shellWidth": 2100,
+        "shellLeft": 346,
+        "pageWidth": 2092,
+        "pageLeft": 346,
         "pageMaxWidth": "min(100%, 2100px)",
-        "shellPaddingInline": "48px"
+        "shellPaddingInline": "0px",
+        "routeTabLeft": 346,
+        "headerBarLeft": 374,
+        "chromePageDeltaPx": 0
       },
       "docOverflowPx": 0,
       "error": ""
@@ -250,7 +265,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:47:52.927Z",
+      "startedAt": "2026-07-01T11:57:23.274Z",
       "finalUrl": "http://localhost:4173/emergency/whiteboard",
       "heading": "Board",
       "screenshotPath": "qa/shell-ux-audit/responsive/whiteboard--3440x1440.png",
@@ -258,12 +273,15 @@
       "layoutMetrics": {
         "docClientWidth": 3440,
         "docScrollWidth": 3440,
-        "shellWidth": 3208,
-        "shellLeft": 232,
-        "pageWidth": 2400,
-        "pageLeft": 632,
+        "shellWidth": 2400,
+        "shellLeft": 636,
+        "pageWidth": 2392,
+        "pageLeft": 636,
         "pageMaxWidth": "min(100%, 2400px)",
-        "shellPaddingInline": "48px"
+        "shellPaddingInline": "0px",
+        "routeTabLeft": 636,
+        "headerBarLeft": 664,
+        "chromePageDeltaPx": 0
       },
       "docOverflowPx": 0,
       "error": ""
@@ -280,7 +298,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:47:54.278Z",
+      "startedAt": "2026-07-01T11:57:24.656Z",
       "finalUrl": "http://localhost:4173/emergency/command-center",
       "heading": "Real-Time ED Operations",
       "screenshotPath": "qa/shell-ux-audit/responsive/command-center--390x844.png",
@@ -288,12 +306,15 @@
       "layoutMetrics": {
         "docClientWidth": 390,
         "docScrollWidth": 390,
-        "shellWidth": 390,
-        "shellLeft": 0,
+        "shellWidth": 365,
+        "shellLeft": 12,
         "pageWidth": 357,
         "pageLeft": 12,
         "pageMaxWidth": "min(100%, 1680px)",
-        "shellPaddingInline": "12.48px"
+        "shellPaddingInline": "0px",
+        "routeTabLeft": 12,
+        "headerBarLeft": 30,
+        "chromePageDeltaPx": 0
       },
       "docOverflowPx": 0,
       "error": ""
@@ -310,7 +331,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:47:55.669Z",
+      "startedAt": "2026-07-01T11:57:25.957Z",
       "finalUrl": "http://localhost:4173/emergency/command-center",
       "heading": "Real-Time ED Operations",
       "screenshotPath": "qa/shell-ux-audit/responsive/command-center--768x1024.png",
@@ -318,12 +339,15 @@
       "layoutMetrics": {
         "docClientWidth": 768,
         "docScrollWidth": 768,
-        "shellWidth": 768,
-        "shellLeft": 0,
+        "shellWidth": 736,
+        "shellLeft": 16,
         "pageWidth": 728,
         "pageLeft": 16,
         "pageMaxWidth": "min(100%, 1680px)",
-        "shellPaddingInline": "16px"
+        "shellPaddingInline": "0px",
+        "routeTabLeft": 16,
+        "headerBarLeft": 34,
+        "chromePageDeltaPx": 0
       },
       "docOverflowPx": 0,
       "error": ""
@@ -340,7 +364,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:47:57.117Z",
+      "startedAt": "2026-07-01T11:57:27.320Z",
       "finalUrl": "http://localhost:4173/emergency/command-center",
       "heading": "Real-Time ED Operations",
       "screenshotPath": "qa/shell-ux-audit/responsive/command-center--1440x900.png",
@@ -348,12 +372,15 @@
       "layoutMetrics": {
         "docClientWidth": 1440,
         "docScrollWidth": 1440,
-        "shellWidth": 1208,
-        "shellLeft": 232,
+        "shellWidth": 1152,
+        "shellLeft": 260,
         "pageWidth": 1144,
         "pageLeft": 260,
         "pageMaxWidth": "min(100%, 1680px)",
-        "shellPaddingInline": "28px"
+        "shellPaddingInline": "0px",
+        "routeTabLeft": 260,
+        "headerBarLeft": 284,
+        "chromePageDeltaPx": 0
       },
       "docOverflowPx": 0,
       "error": ""
@@ -370,7 +397,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:47:58.543Z",
+      "startedAt": "2026-07-01T11:57:28.636Z",
       "finalUrl": "http://localhost:4173/emergency/command-center",
       "heading": "Real-Time ED Operations",
       "screenshotPath": "qa/shell-ux-audit/responsive/command-center--1920x1080.png",
@@ -378,12 +405,15 @@
       "layoutMetrics": {
         "docClientWidth": 1920,
         "docScrollWidth": 1920,
-        "shellWidth": 1688,
-        "shellLeft": 232,
+        "shellWidth": 1624,
+        "shellLeft": 264,
         "pageWidth": 1616,
         "pageLeft": 264,
         "pageMaxWidth": "min(100%, 1680px)",
-        "shellPaddingInline": "32px"
+        "shellPaddingInline": "0px",
+        "routeTabLeft": 264,
+        "headerBarLeft": 292,
+        "chromePageDeltaPx": 0
       },
       "docOverflowPx": 0,
       "error": ""
@@ -400,7 +430,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:47:59.984Z",
+      "startedAt": "2026-07-01T11:57:30.036Z",
       "finalUrl": "http://localhost:4173/emergency/command-center",
       "heading": "Real-Time ED Operations",
       "screenshotPath": "qa/shell-ux-audit/responsive/command-center--2560x1440.png",
@@ -408,12 +438,15 @@
       "layoutMetrics": {
         "docClientWidth": 2560,
         "docScrollWidth": 2560,
-        "shellWidth": 2328,
-        "shellLeft": 232,
-        "pageWidth": 2100,
-        "pageLeft": 342,
+        "shellWidth": 2100,
+        "shellLeft": 346,
+        "pageWidth": 2092,
+        "pageLeft": 346,
         "pageMaxWidth": "min(100%, 2100px)",
-        "shellPaddingInline": "48px"
+        "shellPaddingInline": "0px",
+        "routeTabLeft": 346,
+        "headerBarLeft": 374,
+        "chromePageDeltaPx": 0
       },
       "docOverflowPx": 0,
       "error": ""
@@ -430,7 +463,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:48:01.580Z",
+      "startedAt": "2026-07-01T11:57:31.375Z",
       "finalUrl": "http://localhost:4173/emergency/command-center",
       "heading": "Real-Time ED Operations",
       "screenshotPath": "qa/shell-ux-audit/responsive/command-center--3440x1440.png",
@@ -438,12 +471,15 @@
       "layoutMetrics": {
         "docClientWidth": 3440,
         "docScrollWidth": 3440,
-        "shellWidth": 3208,
-        "shellLeft": 232,
-        "pageWidth": 2400,
-        "pageLeft": 632,
+        "shellWidth": 2400,
+        "shellLeft": 636,
+        "pageWidth": 2392,
+        "pageLeft": 636,
         "pageMaxWidth": "min(100%, 2400px)",
-        "shellPaddingInline": "48px"
+        "shellPaddingInline": "0px",
+        "routeTabLeft": 636,
+        "headerBarLeft": 664,
+        "chromePageDeltaPx": 0
       },
       "docOverflowPx": 0,
       "error": ""
@@ -460,7 +496,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:48:03.085Z",
+      "startedAt": "2026-07-01T11:57:32.801Z",
       "finalUrl": "http://localhost:4173/emergency/ems",
       "heading": "EMS Coordination",
       "screenshotPath": "qa/shell-ux-audit/responsive/ems--390x844.png",
@@ -468,12 +504,15 @@
       "layoutMetrics": {
         "docClientWidth": 390,
         "docScrollWidth": 390,
-        "shellWidth": 390,
-        "shellLeft": 0,
+        "shellWidth": 365,
+        "shellLeft": 12,
         "pageWidth": 357,
         "pageLeft": 12,
         "pageMaxWidth": "min(100%, 1680px)",
-        "shellPaddingInline": "12.48px"
+        "shellPaddingInline": "0px",
+        "routeTabLeft": 12,
+        "headerBarLeft": 30,
+        "chromePageDeltaPx": 0
       },
       "docOverflowPx": 0,
       "error": ""
@@ -490,7 +529,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:48:05.883Z",
+      "startedAt": "2026-07-01T11:57:35.556Z",
       "finalUrl": "http://localhost:4173/emergency/ems",
       "heading": "EMS Coordination",
       "screenshotPath": "qa/shell-ux-audit/responsive/ems--768x1024.png",
@@ -498,12 +537,15 @@
       "layoutMetrics": {
         "docClientWidth": 768,
         "docScrollWidth": 768,
-        "shellWidth": 768,
-        "shellLeft": 0,
+        "shellWidth": 736,
+        "shellLeft": 16,
         "pageWidth": 728,
         "pageLeft": 16,
         "pageMaxWidth": "min(100%, 1680px)",
-        "shellPaddingInline": "16px"
+        "shellPaddingInline": "0px",
+        "routeTabLeft": 16,
+        "headerBarLeft": 34,
+        "chromePageDeltaPx": 0
       },
       "docOverflowPx": 0,
       "error": ""
@@ -520,7 +562,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:48:08.750Z",
+      "startedAt": "2026-07-01T11:57:38.266Z",
       "finalUrl": "http://localhost:4173/emergency/ems",
       "heading": "EMS Coordination",
       "screenshotPath": "qa/shell-ux-audit/responsive/ems--1440x900.png",
@@ -528,12 +570,15 @@
       "layoutMetrics": {
         "docClientWidth": 1440,
         "docScrollWidth": 1440,
-        "shellWidth": 1208,
-        "shellLeft": 232,
+        "shellWidth": 1152,
+        "shellLeft": 260,
         "pageWidth": 1144,
         "pageLeft": 260,
         "pageMaxWidth": "min(100%, 1680px)",
-        "shellPaddingInline": "28px"
+        "shellPaddingInline": "0px",
+        "routeTabLeft": 260,
+        "headerBarLeft": 284,
+        "chromePageDeltaPx": 0
       },
       "docOverflowPx": 0,
       "error": ""
@@ -550,7 +595,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:48:12.069Z",
+      "startedAt": "2026-07-01T11:57:41.166Z",
       "finalUrl": "http://localhost:4173/emergency/ems",
       "heading": "EMS Coordination",
       "screenshotPath": "qa/shell-ux-audit/responsive/ems--1920x1080.png",
@@ -558,12 +603,15 @@
       "layoutMetrics": {
         "docClientWidth": 1920,
         "docScrollWidth": 1920,
-        "shellWidth": 1688,
-        "shellLeft": 232,
+        "shellWidth": 1624,
+        "shellLeft": 264,
         "pageWidth": 1616,
         "pageLeft": 264,
         "pageMaxWidth": "min(100%, 1680px)",
-        "shellPaddingInline": "32px"
+        "shellPaddingInline": "0px",
+        "routeTabLeft": 264,
+        "headerBarLeft": 292,
+        "chromePageDeltaPx": 0
       },
       "docOverflowPx": 0,
       "error": ""
@@ -580,7 +628,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:48:14.824Z",
+      "startedAt": "2026-07-01T11:57:43.934Z",
       "finalUrl": "http://localhost:4173/emergency/ems",
       "heading": "EMS Coordination",
       "screenshotPath": "qa/shell-ux-audit/responsive/ems--2560x1440.png",
@@ -588,12 +636,15 @@
       "layoutMetrics": {
         "docClientWidth": 2560,
         "docScrollWidth": 2560,
-        "shellWidth": 2328,
-        "shellLeft": 232,
-        "pageWidth": 2100,
-        "pageLeft": 342,
+        "shellWidth": 2100,
+        "shellLeft": 346,
+        "pageWidth": 2092,
+        "pageLeft": 346,
         "pageMaxWidth": "min(100%, 2100px)",
-        "shellPaddingInline": "48px"
+        "shellPaddingInline": "0px",
+        "routeTabLeft": 346,
+        "headerBarLeft": 374,
+        "chromePageDeltaPx": 0
       },
       "docOverflowPx": 0,
       "error": ""
@@ -610,7 +661,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:48:16.804Z",
+      "startedAt": "2026-07-01T11:57:45.787Z",
       "finalUrl": "http://localhost:4173/emergency/ems",
       "heading": "EMS Coordination",
       "screenshotPath": "qa/shell-ux-audit/responsive/ems--3440x1440.png",
@@ -618,12 +669,15 @@
       "layoutMetrics": {
         "docClientWidth": 3440,
         "docScrollWidth": 3440,
-        "shellWidth": 3208,
-        "shellLeft": 232,
-        "pageWidth": 2400,
-        "pageLeft": 632,
+        "shellWidth": 2400,
+        "shellLeft": 636,
+        "pageWidth": 2392,
+        "pageLeft": 636,
         "pageMaxWidth": "min(100%, 2400px)",
-        "shellPaddingInline": "48px"
+        "shellPaddingInline": "0px",
+        "routeTabLeft": 636,
+        "headerBarLeft": 664,
+        "chromePageDeltaPx": 0
       },
       "docOverflowPx": 0,
       "error": ""
@@ -640,7 +694,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:48:18.668Z",
+      "startedAt": "2026-07-01T11:57:47.576Z",
       "finalUrl": "http://localhost:4173/emergency/reception",
       "heading": "Arrival Dashboard",
       "screenshotPath": "qa/shell-ux-audit/responsive/reception--390x844.png",
@@ -648,12 +702,15 @@
       "layoutMetrics": {
         "docClientWidth": 390,
         "docScrollWidth": 390,
-        "shellWidth": 390,
-        "shellLeft": 0,
+        "shellWidth": 365,
+        "shellLeft": 12,
         "pageWidth": 357,
         "pageLeft": 12,
-        "pageMaxWidth": "min(100%, 1680px)",
-        "shellPaddingInline": "12.48px"
+        "pageMaxWidth": "100%",
+        "shellPaddingInline": "0px",
+        "routeTabLeft": 12,
+        "headerBarLeft": 30,
+        "chromePageDeltaPx": 0
       },
       "docOverflowPx": 0,
       "error": ""
@@ -670,7 +727,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:48:20.287Z",
+      "startedAt": "2026-07-01T11:57:49.104Z",
       "finalUrl": "http://localhost:4173/emergency/reception",
       "heading": "Arrival Dashboard",
       "screenshotPath": "qa/shell-ux-audit/responsive/reception--768x1024.png",
@@ -678,12 +735,15 @@
       "layoutMetrics": {
         "docClientWidth": 768,
         "docScrollWidth": 768,
-        "shellWidth": 768,
-        "shellLeft": 0,
+        "shellWidth": 736,
+        "shellLeft": 16,
         "pageWidth": 728,
         "pageLeft": 16,
-        "pageMaxWidth": "min(100%, 1680px)",
-        "shellPaddingInline": "16px"
+        "pageMaxWidth": "100%",
+        "shellPaddingInline": "0px",
+        "routeTabLeft": 16,
+        "headerBarLeft": 34,
+        "chromePageDeltaPx": 0
       },
       "docOverflowPx": 0,
       "error": ""
@@ -700,7 +760,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:48:21.601Z",
+      "startedAt": "2026-07-01T11:57:50.355Z",
       "finalUrl": "http://localhost:4173/emergency/reception",
       "heading": "Arrival Dashboard",
       "screenshotPath": "qa/shell-ux-audit/responsive/reception--1440x900.png",
@@ -708,12 +768,15 @@
       "layoutMetrics": {
         "docClientWidth": 1440,
         "docScrollWidth": 1440,
-        "shellWidth": 1208,
-        "shellLeft": 232,
+        "shellWidth": 1152,
+        "shellLeft": 260,
         "pageWidth": 1144,
         "pageLeft": 260,
-        "pageMaxWidth": "min(100%, 1680px)",
-        "shellPaddingInline": "28px"
+        "pageMaxWidth": "100%",
+        "shellPaddingInline": "0px",
+        "routeTabLeft": 260,
+        "headerBarLeft": 284,
+        "chromePageDeltaPx": 0
       },
       "docOverflowPx": 0,
       "error": ""
@@ -730,7 +793,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:48:22.937Z",
+      "startedAt": "2026-07-01T11:57:51.623Z",
       "finalUrl": "http://localhost:4173/emergency/reception",
       "heading": "Arrival Dashboard",
       "screenshotPath": "qa/shell-ux-audit/responsive/reception--1920x1080.png",
@@ -738,12 +801,15 @@
       "layoutMetrics": {
         "docClientWidth": 1920,
         "docScrollWidth": 1920,
-        "shellWidth": 1688,
-        "shellLeft": 232,
+        "shellWidth": 1624,
+        "shellLeft": 264,
         "pageWidth": 1616,
         "pageLeft": 264,
-        "pageMaxWidth": "min(100%, 1680px)",
-        "shellPaddingInline": "32px"
+        "pageMaxWidth": "100%",
+        "shellPaddingInline": "0px",
+        "routeTabLeft": 264,
+        "headerBarLeft": 292,
+        "chromePageDeltaPx": 0
       },
       "docOverflowPx": 0,
       "error": ""
@@ -760,7 +826,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:48:24.231Z",
+      "startedAt": "2026-07-01T11:57:52.892Z",
       "finalUrl": "http://localhost:4173/emergency/reception",
       "heading": "Arrival Dashboard",
       "screenshotPath": "qa/shell-ux-audit/responsive/reception--2560x1440.png",
@@ -768,12 +834,15 @@
       "layoutMetrics": {
         "docClientWidth": 2560,
         "docScrollWidth": 2560,
-        "shellWidth": 2328,
-        "shellLeft": 232,
-        "pageWidth": 2100,
-        "pageLeft": 342,
+        "shellWidth": 2100,
+        "shellLeft": 346,
+        "pageWidth": 2092,
+        "pageLeft": 346,
         "pageMaxWidth": "min(100%, 2100px)",
-        "shellPaddingInline": "48px"
+        "shellPaddingInline": "0px",
+        "routeTabLeft": 346,
+        "headerBarLeft": 374,
+        "chromePageDeltaPx": 0
       },
       "docOverflowPx": 0,
       "error": ""
@@ -790,7 +859,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:48:25.558Z",
+      "startedAt": "2026-07-01T11:57:54.202Z",
       "finalUrl": "http://localhost:4173/emergency/reception",
       "heading": "Arrival Dashboard",
       "screenshotPath": "qa/shell-ux-audit/responsive/reception--3440x1440.png",
@@ -798,12 +867,15 @@
       "layoutMetrics": {
         "docClientWidth": 3440,
         "docScrollWidth": 3440,
-        "shellWidth": 3208,
-        "shellLeft": 232,
-        "pageWidth": 2400,
-        "pageLeft": 632,
+        "shellWidth": 2400,
+        "shellLeft": 636,
+        "pageWidth": 2392,
+        "pageLeft": 636,
         "pageMaxWidth": "min(100%, 2400px)",
-        "shellPaddingInline": "48px"
+        "shellPaddingInline": "0px",
+        "routeTabLeft": 636,
+        "headerBarLeft": 664,
+        "chromePageDeltaPx": 0
       },
       "docOverflowPx": 0,
       "error": ""
@@ -820,7 +892,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:48:26.910Z",
+      "startedAt": "2026-07-01T11:57:55.497Z",
       "finalUrl": "http://localhost:4173/emergency/whiteboard",
       "heading": "Board",
       "screenshotPath": "qa/shell-ux-audit/responsive/copilot--390x844.png",
@@ -828,12 +900,15 @@
       "layoutMetrics": {
         "docClientWidth": 390,
         "docScrollWidth": 390,
-        "shellWidth": 390,
-        "shellLeft": 0,
+        "shellWidth": 365,
+        "shellLeft": 12,
         "pageWidth": 357,
         "pageLeft": 12,
         "pageMaxWidth": "min(100%, 1680px)",
-        "shellPaddingInline": "12.48px"
+        "shellPaddingInline": "0px",
+        "routeTabLeft": 12,
+        "headerBarLeft": 30,
+        "chromePageDeltaPx": 0
       },
       "docOverflowPx": 0,
       "error": ""
@@ -850,7 +925,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:48:28.379Z",
+      "startedAt": "2026-07-01T11:57:56.979Z",
       "finalUrl": "http://localhost:4173/emergency/whiteboard",
       "heading": "Board",
       "screenshotPath": "qa/shell-ux-audit/responsive/copilot--768x1024.png",
@@ -858,12 +933,15 @@
       "layoutMetrics": {
         "docClientWidth": 768,
         "docScrollWidth": 768,
-        "shellWidth": 768,
-        "shellLeft": 0,
+        "shellWidth": 736,
+        "shellLeft": 16,
         "pageWidth": 728,
         "pageLeft": 16,
         "pageMaxWidth": "min(100%, 1680px)",
-        "shellPaddingInline": "16px"
+        "shellPaddingInline": "0px",
+        "routeTabLeft": 16,
+        "headerBarLeft": 34,
+        "chromePageDeltaPx": 0
       },
       "docOverflowPx": 0,
       "error": ""
@@ -880,7 +958,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:48:29.901Z",
+      "startedAt": "2026-07-01T11:57:58.437Z",
       "finalUrl": "http://localhost:4173/emergency/whiteboard",
       "heading": "Board",
       "screenshotPath": "qa/shell-ux-audit/responsive/copilot--1440x900.png",
@@ -888,12 +966,15 @@
       "layoutMetrics": {
         "docClientWidth": 1440,
         "docScrollWidth": 1440,
-        "shellWidth": 908,
-        "shellLeft": 232,
+        "shellWidth": 852,
+        "shellLeft": 260,
         "pageWidth": 844,
         "pageLeft": 260,
         "pageMaxWidth": "min(100%, 1680px)",
-        "shellPaddingInline": "28px"
+        "shellPaddingInline": "0px",
+        "routeTabLeft": 260,
+        "headerBarLeft": 284,
+        "chromePageDeltaPx": 0
       },
       "docOverflowPx": 0,
       "error": ""
@@ -910,7 +991,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:48:31.431Z",
+      "startedAt": "2026-07-01T11:57:59.866Z",
       "finalUrl": "http://localhost:4173/emergency/whiteboard",
       "heading": "Board",
       "screenshotPath": "qa/shell-ux-audit/responsive/copilot--1920x1080.png",
@@ -918,12 +999,15 @@
       "layoutMetrics": {
         "docClientWidth": 1920,
         "docScrollWidth": 1920,
-        "shellWidth": 1388,
-        "shellLeft": 232,
+        "shellWidth": 1324,
+        "shellLeft": 264,
         "pageWidth": 1316,
         "pageLeft": 264,
         "pageMaxWidth": "min(100%, 1680px)",
-        "shellPaddingInline": "32px"
+        "shellPaddingInline": "0px",
+        "routeTabLeft": 264,
+        "headerBarLeft": 292,
+        "chromePageDeltaPx": 0
       },
       "docOverflowPx": 0,
       "error": ""
@@ -940,7 +1024,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:48:33.031Z",
+      "startedAt": "2026-07-01T11:58:01.404Z",
       "finalUrl": "http://localhost:4173/emergency/whiteboard",
       "heading": "Board",
       "screenshotPath": "qa/shell-ux-audit/responsive/copilot--2560x1440.png",
@@ -948,12 +1032,15 @@
       "layoutMetrics": {
         "docClientWidth": 2560,
         "docScrollWidth": 2560,
-        "shellWidth": 2028,
-        "shellLeft": 232,
+        "shellWidth": 1932,
+        "shellLeft": 280,
         "pageWidth": 1924,
         "pageLeft": 280,
         "pageMaxWidth": "min(100%, 2100px)",
-        "shellPaddingInline": "48px"
+        "shellPaddingInline": "0px",
+        "routeTabLeft": 280,
+        "headerBarLeft": 308,
+        "chromePageDeltaPx": 0
       },
       "docOverflowPx": 0,
       "error": ""
@@ -970,7 +1057,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:48:34.450Z",
+      "startedAt": "2026-07-01T11:58:03.002Z",
       "finalUrl": "http://localhost:4173/emergency/whiteboard",
       "heading": "Board",
       "screenshotPath": "qa/shell-ux-audit/responsive/copilot--3440x1440.png",
@@ -978,12 +1065,15 @@
       "layoutMetrics": {
         "docClientWidth": 3440,
         "docScrollWidth": 3440,
-        "shellWidth": 2908,
-        "shellLeft": 232,
-        "pageWidth": 2400,
-        "pageLeft": 482,
+        "shellWidth": 2400,
+        "shellLeft": 486,
+        "pageWidth": 2392,
+        "pageLeft": 486,
         "pageMaxWidth": "min(100%, 2400px)",
-        "shellPaddingInline": "48px"
+        "shellPaddingInline": "0px",
+        "routeTabLeft": 486,
+        "headerBarLeft": 514,
+        "chromePageDeltaPx": 0
       },
       "docOverflowPx": 0,
       "error": ""
@@ -1000,7 +1090,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:48:35.930Z",
+      "startedAt": "2026-07-01T11:58:04.533Z",
       "finalUrl": "http://localhost:4173/emergency/tools",
       "heading": "Medical Tools",
       "screenshotPath": "qa/shell-ux-audit/responsive/tools--390x844.png",
@@ -1008,12 +1098,15 @@
       "layoutMetrics": {
         "docClientWidth": 390,
         "docScrollWidth": 390,
-        "shellWidth": 390,
-        "shellLeft": 0,
+        "shellWidth": 365,
+        "shellLeft": 12,
         "pageWidth": 333,
         "pageLeft": 24,
         "pageMaxWidth": "min(100%, 1680px)",
-        "shellPaddingInline": "12.48px"
+        "shellPaddingInline": "0px",
+        "routeTabLeft": 12,
+        "headerBarLeft": 30,
+        "chromePageDeltaPx": 12
       },
       "docOverflowPx": 0,
       "error": ""
@@ -1030,7 +1123,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:48:37.251Z",
+      "startedAt": "2026-07-01T11:58:05.782Z",
       "finalUrl": "http://localhost:4173/emergency/tools",
       "heading": "Medical Tools",
       "screenshotPath": "qa/shell-ux-audit/responsive/tools--768x1024.png",
@@ -1038,12 +1131,15 @@
       "layoutMetrics": {
         "docClientWidth": 768,
         "docScrollWidth": 768,
-        "shellWidth": 768,
-        "shellLeft": 0,
+        "shellWidth": 736,
+        "shellLeft": 16,
         "pageWidth": 704,
         "pageLeft": 28,
         "pageMaxWidth": "min(100%, 1680px)",
-        "shellPaddingInline": "16px"
+        "shellPaddingInline": "0px",
+        "routeTabLeft": 16,
+        "headerBarLeft": 34,
+        "chromePageDeltaPx": 12
       },
       "docOverflowPx": 0,
       "error": ""
@@ -1060,7 +1156,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:48:38.548Z",
+      "startedAt": "2026-07-01T11:58:07.069Z",
       "finalUrl": "http://localhost:4173/emergency/tools",
       "heading": "Medical Tools",
       "screenshotPath": "qa/shell-ux-audit/responsive/tools--1440x900.png",
@@ -1068,12 +1164,15 @@
       "layoutMetrics": {
         "docClientWidth": 1440,
         "docScrollWidth": 1440,
-        "shellWidth": 1208,
-        "shellLeft": 232,
+        "shellWidth": 1152,
+        "shellLeft": 260,
         "pageWidth": 1120,
         "pageLeft": 272,
         "pageMaxWidth": "min(100%, 1680px)",
-        "shellPaddingInline": "28px"
+        "shellPaddingInline": "0px",
+        "routeTabLeft": 260,
+        "headerBarLeft": 284,
+        "chromePageDeltaPx": 12
       },
       "docOverflowPx": 0,
       "error": ""
@@ -1090,7 +1189,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:48:39.848Z",
+      "startedAt": "2026-07-01T11:58:08.368Z",
       "finalUrl": "http://localhost:4173/emergency/tools",
       "heading": "Medical Tools",
       "screenshotPath": "qa/shell-ux-audit/responsive/tools--1920x1080.png",
@@ -1098,12 +1197,15 @@
       "layoutMetrics": {
         "docClientWidth": 1920,
         "docScrollWidth": 1920,
-        "shellWidth": 1688,
-        "shellLeft": 232,
+        "shellWidth": 1624,
+        "shellLeft": 264,
         "pageWidth": 1592,
         "pageLeft": 276,
         "pageMaxWidth": "min(100%, 1680px)",
-        "shellPaddingInline": "32px"
+        "shellPaddingInline": "0px",
+        "routeTabLeft": 264,
+        "headerBarLeft": 292,
+        "chromePageDeltaPx": 12
       },
       "docOverflowPx": 0,
       "error": ""
@@ -1120,7 +1222,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:48:41.276Z",
+      "startedAt": "2026-07-01T11:58:09.667Z",
       "finalUrl": "http://localhost:4173/emergency/tools",
       "heading": "Medical Tools",
       "screenshotPath": "qa/shell-ux-audit/responsive/tools--2560x1440.png",
@@ -1128,12 +1230,15 @@
       "layoutMetrics": {
         "docClientWidth": 2560,
         "docScrollWidth": 2560,
-        "shellWidth": 2328,
-        "shellLeft": 232,
-        "pageWidth": 2076,
-        "pageLeft": 354,
+        "shellWidth": 2100,
+        "shellLeft": 346,
+        "pageWidth": 2068,
+        "pageLeft": 358,
         "pageMaxWidth": "min(100%, 2100px)",
-        "shellPaddingInline": "48px"
+        "shellPaddingInline": "0px",
+        "routeTabLeft": 346,
+        "headerBarLeft": 374,
+        "chromePageDeltaPx": 12
       },
       "docOverflowPx": 0,
       "error": ""
@@ -1150,7 +1255,7 @@
         "preview": true
       },
       "ok": true,
-      "startedAt": "2026-07-01T07:48:42.769Z",
+      "startedAt": "2026-07-01T11:58:11.021Z",
       "finalUrl": "http://localhost:4173/emergency/tools",
       "heading": "Medical Tools",
       "screenshotPath": "qa/shell-ux-audit/responsive/tools--3440x1440.png",
@@ -1158,12 +1263,15 @@
       "layoutMetrics": {
         "docClientWidth": 3440,
         "docScrollWidth": 3440,
-        "shellWidth": 3208,
-        "shellLeft": 232,
-        "pageWidth": 2376,
-        "pageLeft": 644,
+        "shellWidth": 2400,
+        "shellLeft": 636,
+        "pageWidth": 2368,
+        "pageLeft": 648,
         "pageMaxWidth": "min(100%, 2400px)",
-        "shellPaddingInline": "48px"
+        "shellPaddingInline": "0px",
+        "routeTabLeft": 636,
+        "headerBarLeft": 664,
+        "chromePageDeltaPx": 12
       },
       "docOverflowPx": 0,
       "error": ""
