@@ -1,4 +1,4 @@
-﻿export const EMS_PRE_ARRIVAL_WORKFLOW = Object.freeze([
+export const EMS_PRE_ARRIVAL_WORKFLOW = Object.freeze([
   Object.freeze({
     id: 'ems-assessment',
     label: 'EMS Assessment',

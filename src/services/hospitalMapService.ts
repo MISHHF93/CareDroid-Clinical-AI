@@ -1,4 +1,4 @@
-﻿import { buildDemoHospitalMapSnapshot } from '../data/demoHospitalMapData';
+import { buildDemoHospitalMapSnapshot } from '../data/demoHospitalMapData';
 import { fetchLiveTrackingCapability } from './liveTrackingApi';
 
 export const HOSPITAL_MAP_BACKEND_STATUS = Object.freeze({

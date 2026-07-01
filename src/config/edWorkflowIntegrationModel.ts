@@ -1,6 +1,6 @@
-﻿/**
- * Emergency Department workflow integration — normalizes profile → role → screen → landing
- * and documents the A–Z ED journey across frontend and backend capability contracts.
+/**
+ * Emergency Department workflow integration � normalizes profile ? role ? screen ? landing
+ * and documents the A�Z ED journey across frontend and backend capability contracts.
  */
 import { BACKEND_API_CAPABILITY_STATUS } from './backendApiCapabilities';
 import { CANONICAL_ROUTES } from './routes.config';
@@ -59,7 +59,7 @@ export const ED_WORKFLOW_AZ_STEPS: readonly EdWorkflowAzStep[] = Object.freeze([
     id: 'profile-resolve',
     order: 2,
     title: 'Profile & role resolution',
-    summary: 'Backend /api/profile/me resolves SaaS role → emergency role → screen mode.',
+    summary: 'Backend /api/profile/me resolves SaaS role ? emergency role ? screen mode.',
     laneId: 'entry',
     backendCapabilities: ['operationalProfile', 'userProfile'],
   },
@@ -150,7 +150,7 @@ export const ED_WORKFLOW_AZ_STEPS: readonly EdWorkflowAzStep[] = Object.freeze([
     id: 'persist-session',
     order: 11,
     title: 'Persist identity',
-    summary: 'Start at the platform hub — explore the demo or open admin. Profile saves stay local during the build phase.',
+    summary: 'Start at the platform hub � explore the demo or open admin. Profile saves stay local during the build phase.',
     laneId: 'persist',
     route: CANONICAL_ROUTES.auth,
     backendCapabilities: ['operationalProfile'],

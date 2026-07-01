@@ -1,4 +1,4 @@
-﻿import { PatientFlag, PatientState } from '../../types/emergency';
+import { PatientFlag, PatientState } from '../../types/emergency';
 import { buildWaitingPatientReassessmentTimers } from '../../engine/reassessmentTimerEngine';
 
 /** Existing reassessment surfaces in the product (drawer, header badge, cards, palette, etc.). */

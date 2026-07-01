@@ -1,4 +1,4 @@
-﻿import { getCalculatorToolInventory, getUserFacingToolInventory } from './toolInventory';
+import { getCalculatorToolInventory, getUserFacingToolInventory } from './toolInventory';
 import { SIMULATION_SCENARIOS } from './medicalSimulationCatalog';
 import { PROTOCOL_PATHWAYS } from './protocolPathwayLibrary';
 

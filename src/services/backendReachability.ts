@@ -1,4 +1,4 @@
-﻿const CACHE_MS = 15_000;
+const CACHE_MS = 15_000;
 
 let cache: { at: number; reachable: boolean | null } = {
   at: 0,

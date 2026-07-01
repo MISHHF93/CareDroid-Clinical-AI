@@ -1,4 +1,4 @@
-﻿import { useCallback } from 'react';
+import { useCallback } from 'react';
 import { useNavigate, type NavigateFunction, type To } from 'react-router-dom';
 import { navigateProfileAware } from '../navigation/profileRouteLaunch';
 import { useEmergencyRolePermissions } from './useEmergencyRolePermissions';

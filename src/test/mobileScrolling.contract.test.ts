@@ -12,7 +12,11 @@ const srcRoot = dirname(__dirname);
 
 const indexCss = readFileSync(join(srcRoot, 'index.css'), 'utf8');
 const themeSurfacesCss = readFileSync(join(srcRoot, 'styles/theme-surfaces.css'), 'utf8');
-const appShellCss = readFileSync(join(srcRoot, 'layout/AppShell.css'), 'utf8');
+const appShellCss = readFileSync(join(srcRoot, 'components/app-shell.css'), 'utf8');
+const copilotPanelCss = readFileSync(
+  join(srcRoot, 'components/styles/CopilotPanel-part-01.css'),
+  'utf8',
+);
 const sidebarCss = readFileSync(join(srcRoot, 'components/Sidebar.css'), 'utf8');
 const quickCommandCss = readFileSync(join(srcRoot, 'components/QuickCommandLauncher.css'), 'utf8');
 const drawerCss = readFileSync(join(srcRoot, 'components/ui/Drawer.css'), 'utf8');
@@ -44,13 +48,13 @@ describe('mobile scrolling contracts', () => {
     expect(indexCss).toMatch(
       /html\.app-scroll-locked,\s*body\.app-scroll-locked[\s\S]*overflow:\s*hidden/
     );
-    expect(appShellCss).toMatch(/\.ed-copilot-panel\s*\{[\s\S]*overflow:\s*hidden/);
+    expect(copilotPanelCss).toMatch(/\.ed-copilot-panel\s*\{[\s\S]*overflow:\s*hidden/);
   });
 
   it('keeps normal pages in the main scrollport while preserving chat as a local viewport', () => {
-    expect(appShellCss).toMatch(/\.ed-os-shell\s*\{[\s\S]*overflow:\s*hidden/);
-    expect(appShellCss).toMatch(/\.ed-os-shell__body\s*\{[\s\S]*overflow:\s*hidden/);
-    expect(appShellCss).toMatch(/\.ed-os-main\s*\{[\s\S]*overflow:\s*auto/);
+    expect(appShellCss).toMatch(/\.emergency-app-shell\s*\{[\s\S]*overflow:\s*hidden/);
+    expect(appShellCss).toMatch(/\.emergency-app-shell__main-column\s*\{[\s\S]*overflow:\s*hidden/);
+    expect(appShellCss).toMatch(/\.app-shell-main-content\s*\{[\s\S]*overflow:\s*auto/);
     expect(chatInterfaceCss).toMatch(/\.chat-interface__messages\s*\{[\s\S]*overflow-y:\s*auto/);
     expect(chatInterfaceCss).toMatch(/\.chat-interface__textarea\s*\{[\s\S]*overflow-y:\s*auto/);
   });
@@ -58,7 +62,7 @@ describe('mobile scrolling contracts', () => {
   it('keeps the canonical Sidebar and overlays from creating extra page scroll owners', () => {
     expect(sidebarCss).toMatch(/aside\[aria-label='Emergency navigation'\][\s\S]*position:\s*fixed/);
     expect(sidebarCss).toMatch(/\.sidebar-nav-item:nth-of-type\(n \+ 6\)\s*\{[\s\S]*display:\s*none/);
-    expect(appShellCss).toMatch(/\.ed-copilot-panel\s*\{[\s\S]*overflow:\s*hidden/);
+    expect(copilotPanelCss).toMatch(/\.ed-copilot-panel\s*\{[\s\S]*overflow:\s*hidden/);
     expect(quickCommandCss).toMatch(/\.quick-command\s*\{[\s\S]*pointer-events:\s*none/);
     expect(drawerCss).toMatch(/\.drawer-overlay\s*\{[\s\S]*pointer-events:\s*none/);
     expect(drawerCss).toMatch(/\.drawer-overlay-open\s*\{[\s\S]*pointer-events:\s*auto/);

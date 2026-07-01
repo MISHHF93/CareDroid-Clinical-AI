@@ -1,4 +1,4 @@
-﻿import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { PatientState } from '../types/emergency';
 import { deriveCrisisModeState } from './crisisMode';
 

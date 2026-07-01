@@ -1,4 +1,4 @@
-﻿export const AUTOMATION_STEP_TYPES = Object.freeze({
+export const AUTOMATION_STEP_TYPES = Object.freeze({
   TRIGGER: 'trigger',
   CONDITION: 'condition',
   ACTION: 'action',

@@ -1,4 +1,4 @@
-﻿import { PlatformAssetsApi } from './platformAssetsApi';
+import { PlatformAssetsApi } from './platformAssetsApi';
 
 function disabled(message) {
   return { ok: false, data: null, message };

@@ -1,12 +1,22 @@
-import { useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, Bell, FileText, FolderOpen, Save, ShieldCheck, Sparkles, Timer, UserPlus } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { FolderOpen, ShieldCheck } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import HelpTrigger from '../../components/help/HelpTrigger';
+import ReceptionDeskToolbar from '../../components/reception/ReceptionDeskToolbar';
+import ReceptionOperationalRail from '../../components/reception/ReceptionOperationalRail';
+import ReceptionSmartIntakeOverlay from '../../components/reception/ReceptionSmartIntakeOverlay';
+import PreparePatientChooser from '../../components/reception/PreparePatientChooser';
+import UnifiedIntakePanel from '../../components/reception/UnifiedIntakePanel';
+import { RECEPTION_COPY } from '../../components/reception/receptionCopy';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
+import { CARE_DROID_SCREEN_MODES } from '../../config/careDroidScreenModes';
 import { EMERGENCY_ACTIONS } from '../../config/emergencyRolePermissions';
+import { resolveReceptionScreenCapabilities } from '../../config/receptionScreenModel';
 import { useUser } from '../../contexts/UserContext';
 import useProfileNavigate from '../../hooks/useProfileNavigate';
 import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermissions';
+import useRouteScreenMode from '../../hooks/useRouteScreenMode';
+import useReceptionDeskUi from '../../hooks/useReceptionDeskUi';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { PatientFlag, PatientState, Priority, type Alert, type Patient } from '../../types/emergency';
 import {
@@ -20,30 +30,10 @@ import {
   type ReceptionIntakeDraft,
   type ReceptionRouteResult,
 } from '../../services/receptionIntakeOrchestrator';
+import { completeProvisionalIntake } from '../../services/provisionalIdentityIntake';
+import { WorkflowSituationBrief } from './emergencyRouteShared';
 import './ReceptionWorkspace.css';
 import './emergency-route.css';
-
-const ARRIVAL_TYPES: Array<{ id: ReceptionArrivalType; label: string }> = [
-  { id: 'walk-in', label: 'Walk-in' },
-  { id: 'ambulance-arrival', label: 'Ambulance arrival' },
-  { id: 'ems-prearrival', label: 'EMS pre-arrival' },
-  { id: 'transfer', label: 'Transfer' },
-  { id: 'referral', label: 'Referral' },
-  { id: 'staff-created-emergency', label: 'Staff-created emergency' },
-];
-
-const RED_FLAG_OPTIONS = [
-  'Chest pain',
-  'Shortness of breath',
-  'Stroke symptoms',
-  'Severe bleeding',
-  'Sepsis concern',
-  'Anaphylaxis concern',
-  'Altered mental status',
-  'Severe pain',
-  'Pregnancy emergency',
-  'Self-harm risk',
-];
 
 const EMPTY_DRAFT: ReceptionIntakeDraft = {
   arrivalType: 'walk-in',
@@ -69,17 +59,24 @@ const EMPTY_DRAFT: ReceptionIntakeDraft = {
   notes: '',
 };
 
+type SmartIntakeSession = {
+  step?: string;
+  patientId?: string;
+  mode?: string;
+  artifactId?: string;
+  autostart?: boolean;
+};
+
+type QueueTabId = 'ems' | 'verification' | 'pretriage';
+
 function patientDisplayName(patient: Patient): string {
   return [patient.firstName, patient.lastName].filter(Boolean).join(' ').trim() || patient.name || patient.mrn;
 }
 
 function isReceptionQueuePatient(patient: Patient): boolean {
-  return [
-    PatientState.Arrival,
-    PatientState.Registration,
-    PatientState.Triage,
-    PatientState.Waiting,
-  ].includes(patient.state);
+  return [PatientState.Arrival, PatientState.Registration, PatientState.Triage, PatientState.Waiting].includes(
+    patient.state,
+  );
 }
 
 function isHighRiskPatient(patient: Patient): boolean {
@@ -149,17 +146,57 @@ function isTimerBreached(alert: Alert, now: number): boolean {
   return Number.isFinite(started) && now - started >= 180000;
 }
 
-function Stepper({ draft, aiAssist, result }: { draft: ReceptionIntakeDraft; aiAssist: ReceptionAiIntakeAssist | null; result: ReceptionRouteResult | null }) {
+function mapQueueParamToTab(queueParam: string): QueueTabId {
+  const normalized = queueParam.trim().toLowerCase();
+  if (normalized === 'ems' || normalized.includes('ambulance')) return 'ems';
+  if (normalized === 'verification' || normalized.includes('verify')) return 'verification';
+  return 'pretriage';
+}
+
+function filterQueueByTab(patients: Patient[], tab: QueueTabId): Patient[] {
+  if (tab === 'ems') {
+    return patients.filter(
+      (patient) =>
+        patient.flags.includes(PatientFlag.EMSArrival) ||
+        patient.arrival?.arrivalMode === 'EMS' ||
+        patient.state === PatientState.Arrival,
+    );
+  }
+  if (tab === 'verification') {
+    return patients.filter(
+      (patient) =>
+        patient.registrationStatus === 'provisional' ||
+        patient.registrationStatus === 'in-progress' ||
+        patient.flags.includes(PatientFlag.IdentityPending),
+    );
+  }
+  return patients.filter(
+    (patient) =>
+      patient.triagePending ||
+      patient.state === PatientState.Triage ||
+      patient.state === PatientState.Waiting,
+  );
+}
+
+function Stepper({
+  draft,
+  aiAssist,
+  result,
+}: {
+  draft: ReceptionIntakeDraft;
+  aiAssist: ReceptionAiIntakeAssist | null;
+  result: ReceptionRouteResult | null;
+}) {
   const criticalStarted = Boolean(result?.criticalAlertId || result?.responseTimerId);
   const steps = [
-    { id: 'arrival', label: 'Arrival Type', complete: Boolean(draft.arrivalType) },
+    { id: 'arrival', label: 'Arrival', complete: Boolean(draft.arrivalType) },
     {
       id: 'critical',
-      label: 'Minimum Critical Info',
+      label: 'Life-critical info',
       complete: validateReceptionMinimumCriticalData(draft).length === 0 || detectReceptionRedFlags(draft).length > 0,
     },
-    { id: 'ai', label: 'AI Intake Assist', complete: Boolean(aiAssist) },
-    { id: 'route', label: 'Create Patient & Route', complete: Boolean(result) },
+    { id: 'ai', label: 'AI assist', complete: Boolean(aiAssist) },
+    { id: 'route', label: 'Route to nurse', complete: Boolean(result) },
   ];
 
   return (
@@ -174,7 +211,7 @@ function Stepper({ draft, aiAssist, result }: { draft: ReceptionIntakeDraft; aiA
       ))}
       {criticalStarted ? (
         <li className="reception-command-stepper__item reception-command-stepper__item--critical">
-          <span>3-minute response started</span>
+          <span>3-minute response active</span>
         </li>
       ) : null}
     </ol>
@@ -184,13 +221,16 @@ function Stepper({ draft, aiAssist, result }: { draft: ReceptionIntakeDraft; aiA
 export default function ReceptionWorkspace() {
   const { user } = useUser();
   const { profileNavigate } = useProfileNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const emergencyRole = useEmergencyRolePermissions();
+  const screenMode = useRouteScreenMode();
+  const receptionDesk = useReceptionDeskUi();
   const patients = useEmergencyStore((state) => state.patients);
   const alerts = useEmergencyStore((state) => state.alerts);
   const capacity = useEmergencyStore((state) => state.capacity);
   const selectedPatientId = useEmergencyStore((state) => state.selectedPatientId);
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
+
   const [draft, setDraft] = useState<ReceptionIntakeDraft>(EMPTY_DRAFT);
   const [aiAssist, setAiAssist] = useState<ReceptionAiIntakeAssist | null>(null);
   const [result, setResult] = useState<ReceptionRouteResult | null>(null);
@@ -198,6 +238,21 @@ export default function ReceptionWorkspace() {
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [now, setNow] = useState(() => Date.now());
+  const [activeQueueTab, setActiveQueueTab] = useState<QueueTabId>('pretriage');
+  const [showChooser, setShowChooser] = useState(false);
+  const [smartIntakeSession, setSmartIntakeSession] = useState<SmartIntakeSession | null>(null);
+
+  const receptionCapabilities = useMemo(
+    () =>
+      resolveReceptionScreenCapabilities({
+        screenMode: screenMode || CARE_DROID_SCREEN_MODES.reception,
+        can: emergencyRole.can,
+        presentAction: emergencyRole.presentAction,
+        role: emergencyRole.role,
+        roleLabel: emergencyRole.roleLabel,
+      }),
+    [emergencyRole],
+  );
 
   const currentUserName =
     emergencyRole.canonicalProfile?.preferredName ||
@@ -218,10 +273,19 @@ export default function ReceptionWorkspace() {
     () =>
       aiAssist?.urgencySuggestion === 'critical' ||
       runReceptionAiIntakeAssist(draft).urgencySuggestion === 'critical',
-    [aiAssist?.urgencySuggestion, draft.chiefComplaint, draft.redFlagSymptoms, draft.consciousnessStatus, draft.breathingStatus, draft.visibleDistress, draft.painLevel, draft.arrivalType],
+    [
+      aiAssist?.urgencySuggestion,
+      draft.chiefComplaint,
+      draft.redFlagSymptoms,
+      draft.consciousnessStatus,
+      draft.breathingStatus,
+      draft.visibleDistress,
+      draft.painLevel,
+      draft.arrivalType,
+    ],
   );
 
-  const receptionQueue = useMemo(
+  const receptionQueueAll = useMemo(
     () =>
       patients
         .filter(isReceptionQueuePatient)
@@ -232,10 +296,50 @@ export default function ReceptionWorkspace() {
         }),
     [patients],
   );
+
+  const receptionQueue = useMemo(
+    () => filterQueueByTab(receptionQueueAll, activeQueueTab),
+    [activeQueueTab, receptionQueueAll],
+  );
+
   const criticalAlerts = useMemo(() => alerts.filter(isReceptionCriticalAlert), [alerts]);
   const selectedPatient = useMemo(
     () => (selectedPatientId ? patients.find((patient) => patient.id === selectedPatientId) || null : null),
     [patients, selectedPatientId],
+  );
+
+  const emptyQueueMessage = RECEPTION_COPY.queues.empty[activeQueueTab] || 'No patients in this list.';
+
+  const clearIntakeQueryParams = useCallback(() => {
+    const next = new URLSearchParams(searchParams);
+    ['intake', 'autostart', 'step', 'mode', 'artifactId', 'express', 'quickCreate'].forEach((key) =>
+      next.delete(key),
+    );
+    setSearchParams(next, { replace: true });
+  }, [searchParams, setSearchParams]);
+
+  const resetForNextPatient = useCallback(() => {
+    setDraft({ ...EMPTY_DRAFT });
+    setAiAssist(null);
+    setResult(null);
+    setError('');
+    setStatus('');
+  }, []);
+
+  const updateDraft = useCallback((patch: Partial<ReceptionIntakeDraft>) => {
+    setDraft((current) => ({ ...current, ...patch }));
+    setError('');
+    setStatus('');
+    setResult(null);
+  }, []);
+
+  const openSmartIntake = useCallback(
+    (session: SmartIntakeSession = { autostart: true }) => {
+      if (!receptionCapabilities.canOpenSmartIntake) return;
+      setSmartIntakeSession(session);
+      setShowChooser(false);
+    },
+    [receptionCapabilities.canOpenSmartIntake],
   );
 
   useEffect(() => {
@@ -244,42 +348,65 @@ export default function ReceptionWorkspace() {
   }, []);
 
   useEffect(() => {
+    try {
+      const saved = window.sessionStorage?.getItem('caredroid:reception-draft');
+      if (saved) {
+        const parsed = JSON.parse(saved) as ReceptionIntakeDraft;
+        if (parsed && typeof parsed === 'object') setDraft((current) => ({ ...current, ...parsed }));
+      }
+    } catch {
+      // ignore corrupt draft
+    }
+  }, []);
+
+  useEffect(() => {
     const patientId = searchParams.get('patientId') || searchParams.get('patient') || searchParams.get('arrived');
     if (patientId) selectPatient(patientId);
-  }, [searchParams, selectPatient]);
+    const queueParam = searchParams.get('queue') || searchParams.get('filter');
+    if (queueParam) setActiveQueueTab(mapQueueParamToTab(queueParam));
+    if (searchParams.get('intake') === '1') {
+      openSmartIntake({
+        step: searchParams.get('step') || undefined,
+        patientId: searchParams.get('patientId') || undefined,
+        mode: searchParams.get('mode') || undefined,
+        artifactId: searchParams.get('artifactId') || undefined,
+        autostart: searchParams.get('autostart') !== '0',
+      });
+    }
+    if (searchParams.get('express') === '1' || searchParams.get('quickCreate') === '1') {
+      resetForNextPatient();
+      updateDraft({ arrivalType: 'walk-in' });
+    }
+  }, [openSmartIntake, resetForNextPatient, searchParams, selectPatient, updateDraft]);
 
-  const updateDraft = (patch: Partial<ReceptionIntakeDraft>) => {
-    setDraft((current) => ({ ...current, ...patch }));
-    setError('');
-    setStatus('');
-    setResult(null);
-  };
-
-  const toggleRedFlag = (flag: string) => {
-    const next = new Set(draft.redFlagSymptoms || []);
-    if (next.has(flag)) next.delete(flag);
-    else next.add(flag);
-    updateDraft({ redFlagSymptoms: [...next] });
-  };
+  useEffect(() => {
+    const onSmartIntake = (event: Event) => {
+      const detail = (event as CustomEvent<SmartIntakeSession>).detail || {};
+      openSmartIntake({ autostart: true, ...detail });
+    };
+    const onOpenIntake = () => {
+      resetForNextPatient();
+      setShowChooser(false);
+      setSmartIntakeSession(null);
+    };
+    document.addEventListener('open-reception-smart-intake', onSmartIntake as EventListener);
+    document.addEventListener('open-reception-intake', onOpenIntake);
+    return () => {
+      document.removeEventListener('open-reception-smart-intake', onSmartIntake as EventListener);
+      document.removeEventListener('open-reception-intake', onOpenIntake);
+    };
+  }, [openSmartIntake, resetForNextPatient]);
 
   const saveDraft = () => {
     const storedDraft = { ...draft, id: draft.id || `draft-${Date.now()}`, savedAt: new Date().toISOString() };
     window.sessionStorage?.setItem('caredroid:reception-draft', JSON.stringify(storedDraft));
     setDraft(storedDraft);
-    setStatus('Draft saved. Critical routing remains available.');
-  };
-
-  const runAiAssist = (options: { aiUnavailable?: boolean } = {}) => {
-    const nextAssist = runReceptionAiIntakeAssist(draft, options);
-    setAiAssist(nextAssist);
-    setStatus(options.aiUnavailable ? 'Manual fallback prepared.' : 'AI Intake Assist completed.');
-    setError('');
-    return nextAssist;
+    setStatus('Draft saved locally.');
   };
 
   const createAndRoute = async (options: { aiUnavailable?: boolean } = {}) => {
     if (!canCreatePatient) {
-      setError('Reception profile is not allowed to create patients.');
+      setError('Your profile cannot create patients.');
       return;
     }
 
@@ -296,32 +423,50 @@ export default function ReceptionWorkspace() {
       setResult(routeResult);
       setStatus(
         routeResult.criticalAlertId
-          ? 'Critical alert created. 3-minute response timer started.'
-          : 'Patient created and routed to queue.',
+          ? 'Critical alert sent. 3-minute response timer started.'
+          : RECEPTION_COPY.workspace.sentToTriage,
       );
       selectPatient(routeResult.patientId);
       window.sessionStorage?.removeItem('caredroid:reception-draft');
     } catch (routeError) {
-      setError(routeError instanceof Error ? routeError.message : 'Unable to create and route patient.');
+      setError(routeError instanceof Error ? routeError.message : 'Unable to route patient.');
     } finally {
       setSubmitting(false);
     }
   };
 
-  const resetForNextPatient = () => {
-    setDraft({ ...EMPTY_DRAFT });
-    setAiAssist(null);
+  const handleProvisionalUnknown = () => {
+    if (!canCreatePatient) return;
+    const provisional = completeProvisionalIntake(useEmergencyStore.getState(), 'unknown', {
+      actorName: currentUserName,
+    });
+    setShowChooser(false);
+    setStatus(`${RECEPTION_COPY.chooser.unknown} — ${RECEPTION_COPY.workspace.sentToTriage}`);
+    selectPatient(provisional.patient.id);
     setResult(null);
-    setError('');
-    setStatus('');
+  };
+
+  const handleSmartIntakeHandoff = (handoff: { patientId?: string; receptionPath?: string }) => {
+    setSmartIntakeSession(null);
+    clearIntakeQueryParams();
+    if (handoff?.patientId) selectPatient(handoff.patientId);
+    setStatus(RECEPTION_COPY.workspace.sentToTriage);
+  };
+
+  const focusQueueTab = (tab: QueueTabId) => {
+    setActiveQueueTab(tab);
+    const next = new URLSearchParams(searchParams);
+    next.set('queue', tab === 'ems' ? 'ems' : tab === 'verification' ? 'verification' : 'pretriage');
+    setSearchParams(next, { replace: true });
   };
 
   return (
-    <section className="reception-command" aria-labelledby="reception-command-title">
-      <header className="reception-command-header">
+    <section className="reception-command reception-front-door" aria-labelledby="reception-command-title">
+      <header className="reception-command-header reception-front-door__header">
         <div>
-          <p className="reception-command-header__eyebrow">Reception Command Desk</p>
-          <h1 id="reception-command-title">Emergency Reception</h1>
+          <p className="reception-command-header__eyebrow">{RECEPTION_COPY.workspace.eyebrow}</p>
+          <h1 id="reception-command-title">{RECEPTION_COPY.workspace.title}</h1>
+          <p className="reception-front-door__description">{RECEPTION_COPY.workspace.deskDescription}</p>
           <div className="reception-command-header__meta">
             <span>{currentUserName}</span>
             <span className="reception-command-badge">{emergencyRole.roleLabel || 'Registration Clerk'}</span>
@@ -331,16 +476,66 @@ export default function ReceptionWorkspace() {
         </div>
         <div className="reception-command-header__metrics" aria-label="Reception queue metrics">
           <div>
-            <strong>{receptionQueue.length}</strong>
-            <span>Active queue</span>
+            <strong>{receptionQueueAll.length}</strong>
+            <span>{RECEPTION_COPY.metrics.queueSize}</span>
           </div>
           <div className={criticalAlerts.length ? 'reception-command-metric--critical' : ''}>
             <strong>{criticalAlerts.length}</strong>
-            <span>Critical arrivals</span>
+            <span>Critical</span>
           </div>
           <HelpTrigger variant="button" label="Guide" className="reception-command-help" />
         </div>
       </header>
+
+      <WorkflowSituationBrief
+        status={`${receptionQueueAll.length} patient${receptionQueueAll.length === 1 ? '' : 's'} in reception`}
+        attention={
+          criticalAlerts.length
+            ? `${criticalAlerts.length} critical alert${criticalAlerts.length === 1 ? '' : 's'}`
+            : liveRedFlags.length
+              ? `${liveRedFlags.length} red flag${liveRedFlags.length === 1 ? '' : 's'} in draft`
+              : 'No critical arrivals flagged'
+        }
+        owner={`${currentUserName} · ${emergencyRole.roleLabel || 'Registration Clerk'}`}
+        nextAction={
+          result
+            ? RECEPTION_COPY.workspace.registerNext
+            : smartIntakeSession
+              ? 'Complete identity check, then confirm routing'
+              : criticalNeeded
+                ? 'Complete critical fields and route — 3-minute response if needed'
+                : draft.chiefComplaint
+                  ? missingCriticalFields.length
+                    ? `Complete ${missingCriticalFields.length} required field${missingCriticalFields.length === 1 ? '' : 's'}`
+                    : 'Route patient to triage queue'
+                  : RECEPTION_COPY.workspace.registerWalkIn
+        }
+        tone={
+          criticalAlerts.length || criticalNeeded
+            ? 'critical'
+            : liveRedFlags.length || missingCriticalFields.length
+              ? 'warning'
+              : 'neutral'
+        }
+      />
+
+      {receptionDesk.enabled ? (
+        <ReceptionDeskToolbar
+          canCreatePatient={receptionCapabilities.canCreatePatient}
+          canVerifyIntake={receptionCapabilities.canVerifyIdentity}
+          canEscalateToNurse={receptionCapabilities.canEscalateToNurse}
+          canOpenPrepareChooser={receptionCapabilities.canCaptureArrivalReason}
+          canOpenSmartIntake={receptionCapabilities.canOpenSmartIntake}
+          activeQueueTab={activeQueueTab}
+          onRegisterWalkIn={resetForNextPatient}
+          onCheckIdentity={() => openSmartIntake({ step: 'capture', autostart: true })}
+          onOtherArrivals={() => setShowChooser(true)}
+          onEscalate={() => profileNavigate(`${CANONICAL_ROUTES.emergencyQueues}?queue=pretriage`)}
+          onFocusEms={() => focusQueueTab('ems')}
+          onFocusVerification={() => focusQueueTab('verification')}
+          onFocusPretriage={() => focusQueueTab('pretriage')}
+        />
+      ) : null}
 
       <Stepper draft={draft} aiAssist={aiAssist} result={result} />
 
@@ -351,397 +546,93 @@ export default function ReceptionWorkspace() {
         </div>
       ) : null}
 
-      {missingCriticalFields.length ? (
-        <div className="reception-command-missing" role="status">
-          <AlertTriangle size={18} aria-hidden="true" />
-          <span>Missing critical info: {missingCriticalFields.join(', ')}.</span>
+      <div className="reception-front-door__body">
+        <div className="reception-front-door__main">
+          <UnifiedIntakePanel
+            draft={draft}
+            onDraftChange={updateDraft}
+            aiAssist={aiAssist}
+            onAiAssistChange={setAiAssist}
+            result={result}
+            canCreatePatient={canCreatePatient}
+            submitting={submitting}
+            onSaveDraft={saveDraft}
+            onRoute={createAndRoute}
+            onReset={resetForNextPatient}
+            showQueueRail={false}
+          />
         </div>
-      ) : null}
 
-      <main className="reception-command-grid">
-        <section className="reception-command-panel reception-command-panel--span" aria-labelledby="arrival-type-title">
-          <div className="reception-command-panel__header">
-            <h2 id="arrival-type-title">Fast Arrival Capture</h2>
-          </div>
-          <div className="reception-command-segmented" role="radiogroup" aria-label="Arrival type">
-            {ARRIVAL_TYPES.map((type) => (
-              <button
-                key={type.id}
-                type="button"
-                role="radio"
-                aria-checked={draft.arrivalType === type.id}
-                className={draft.arrivalType === type.id ? 'is-active' : ''}
-                onClick={() => updateDraft({ arrivalType: type.id })}
-              >
-                {type.label}
-              </button>
-            ))}
-          </div>
-        </section>
-
-        <section className="reception-command-panel reception-command-panel--intake" aria-labelledby="critical-intake-title">
-          <div className="reception-command-panel__header">
-            <h2 id="critical-intake-title">Minimum Life-Critical Intake</h2>
-            {liveRedFlags.length ? <span className="reception-command-chip reception-command-chip--critical">{liveRedFlags.length} red flags</span> : null}
-          </div>
-
-          <div className="reception-command-form-grid">
-            <label className="reception-command-field reception-command-field--wide">
-              <span>Chief complaint</span>
-              <textarea
-                value={draft.chiefComplaint}
-                onChange={(event) => updateDraft({ chiefComplaint: event.target.value })}
-                placeholder="Primary symptom or observable emergency"
-                rows={3}
-              />
-            </label>
-            <label className="reception-command-field">
-              <span>Estimated age</span>
-              <input
-                value={draft.estimatedAge}
-                onChange={(event) => updateDraft({ estimatedAge: event.target.value })}
-                inputMode="numeric"
-                placeholder="If DOB unavailable"
-              />
-            </label>
-            <label className="reception-command-field">
-              <span>DOB</span>
-              <input type="date" value={draft.dob} onChange={(event) => updateDraft({ dob: event.target.value })} />
-            </label>
-            <label className="reception-command-field">
-              <span>Sex if known</span>
-              <select value={draft.sex} onChange={(event) => updateDraft({ sex: event.target.value as ReceptionIntakeDraft['sex'] })}>
-                <option value="">Unknown</option>
-                <option value="F">Female</option>
-                <option value="M">Male</option>
-                <option value="Intersex">Intersex</option>
-                <option value="Other">Other</option>
-              </select>
-            </label>
-            <label className="reception-command-field">
-              <span>Consciousness</span>
-              <select
-                value={draft.consciousnessStatus}
-                onChange={(event) => updateDraft({ consciousnessStatus: event.target.value as ReceptionIntakeDraft['consciousnessStatus'] })}
-              >
-                <option value="unknown">Unknown</option>
-                <option value="alert">Alert</option>
-                <option value="confused">Confused</option>
-                <option value="drowsy">Drowsy</option>
-                <option value="unresponsive">Unresponsive</option>
-              </select>
-            </label>
-            <label className="reception-command-field">
-              <span>Breathing</span>
-              <select
-                value={draft.breathingStatus}
-                onChange={(event) => updateDraft({ breathingStatus: event.target.value as ReceptionIntakeDraft['breathingStatus'] })}
-              >
-                <option value="unknown">Unknown</option>
-                <option value="normal">Normal</option>
-                <option value="short-of-breath">Short of breath</option>
-                <option value="labored">Labored</option>
-                <option value="not-breathing">Not breathing</option>
-              </select>
-            </label>
-            <label className="reception-command-field">
-              <span>Visible distress</span>
-              <select
-                value={draft.visibleDistress}
-                onChange={(event) => updateDraft({ visibleDistress: event.target.value as ReceptionIntakeDraft['visibleDistress'] })}
-              >
-                <option value="unknown">Unknown</option>
-                <option value="none">None visible</option>
-                <option value="mild">Mild</option>
-                <option value="moderate">Moderate</option>
-                <option value="severe">Severe</option>
-              </select>
-            </label>
-            <label className="reception-command-field">
-              <span>Pain level</span>
-              <input
-                type="number"
-                min="0"
-                max="10"
-                value={draft.painLevel}
-                onChange={(event) => updateDraft({ painLevel: event.target.value })}
-                placeholder="0-10"
-              />
-            </label>
-            <label className="reception-command-field">
-              <span>Contact / callback</span>
-              <input
-                value={draft.contactCallback}
-                onChange={(event) => updateDraft({ contactCallback: event.target.value })}
-                placeholder="If available"
-              />
-            </label>
-          </div>
-
-          <fieldset className="reception-command-red-flags">
-            <legend>Red flag symptoms</legend>
-            <div>
-              {RED_FLAG_OPTIONS.map((flag) => (
-                <label key={flag} className="reception-command-check">
-                  <input
-                    type="checkbox"
-                    checked={(draft.redFlagSymptoms || []).includes(flag)}
-                    onChange={() => toggleRedFlag(flag)}
-                  />
-                  <span>{flag}</span>
-                </label>
-              ))}
-            </div>
-          </fieldset>
-
-          <div className="reception-command-form-grid reception-command-form-grid--admin">
-            <label className="reception-command-field">
-              <span>Allergies if known</span>
-              <select value={draft.allergiesKnown} onChange={(event) => updateDraft({ allergiesKnown: event.target.value as ReceptionIntakeDraft['allergiesKnown'] })}>
-                <option value="unknown">Unknown</option>
-                <option value="yes">Known</option>
-                <option value="no">None reported</option>
-              </select>
-            </label>
-            <label className="reception-command-field">
-              <span>Allergy details</span>
-              <input value={draft.allergies} onChange={(event) => updateDraft({ allergies: event.target.value })} placeholder="If available" />
-            </label>
-            <label className="reception-command-field">
-              <span>Medications if known</span>
-              <select value={draft.medicationsKnown} onChange={(event) => updateDraft({ medicationsKnown: event.target.value as ReceptionIntakeDraft['medicationsKnown'] })}>
-                <option value="unknown">Unknown</option>
-                <option value="yes">Known</option>
-                <option value="no">None reported</option>
-              </select>
-            </label>
-            <label className="reception-command-field">
-              <span>Medication details</span>
-              <input value={draft.medications} onChange={(event) => updateDraft({ medications: event.target.value })} placeholder="If available" />
-            </label>
-            <label className="reception-command-field">
-              <span>First name</span>
-              <input value={draft.firstName} onChange={(event) => updateDraft({ firstName: event.target.value })} placeholder="Unknown allowed" />
-            </label>
-            <label className="reception-command-field">
-              <span>Last name</span>
-              <input value={draft.lastName} onChange={(event) => updateDraft({ lastName: event.target.value })} placeholder="Unknown allowed" />
-            </label>
-            <label className="reception-command-field">
-              <span>Insurance</span>
-              <select value={draft.insuranceStatus} onChange={(event) => updateDraft({ insuranceStatus: event.target.value as ReceptionIntakeDraft['insuranceStatus'] })}>
-                <option value="unknown">Unknown</option>
-                <option value="captured">Captured</option>
-                <option value="missing">Missing</option>
-                <option value="deferred">Deferred</option>
-              </select>
-            </label>
-            <label className="reception-command-field">
-              <span>Consent</span>
-              <select value={draft.consentStatus} onChange={(event) => updateDraft({ consentStatus: event.target.value as ReceptionIntakeDraft['consentStatus'] })}>
-                <option value="unknown">Unknown</option>
-                <option value="captured">Captured</option>
-                <option value="unable">Unable</option>
-                <option value="deferred">Deferred</option>
-              </select>
-            </label>
-            <label className="reception-command-field">
-              <span>Documents</span>
-              <select value={draft.documentStatus} onChange={(event) => updateDraft({ documentStatus: event.target.value as ReceptionIntakeDraft['documentStatus'] })}>
-                <option value="unknown">Unknown</option>
-                <option value="captured">Captured</option>
-                <option value="missing">Missing</option>
-                <option value="deferred">Deferred</option>
-              </select>
-            </label>
-            <label className="reception-command-field reception-command-field--wide">
-              <span>Reception notes</span>
-              <textarea
-                value={draft.notes || ''}
-                onChange={(event) => updateDraft({ notes: event.target.value })}
-                placeholder="Additional observations for handoff (optional)"
-                rows={2}
-              />
-            </label>
-          </div>
-        </section>
-
-        <aside className="reception-command-panel reception-command-panel--assist" aria-labelledby="ai-assist-title">
-          <div className="reception-command-panel__header">
-            <h2 id="ai-assist-title">AI Intake Assist</h2>
-            <span className="reception-command-chip">Decision support</span>
-          </div>
-          {aiAssist ? (
-            <div className="reception-command-ai">
-              <div className={`reception-command-ai__urgency reception-command-ai__urgency--${aiAssist.urgencySuggestion}`}>
-                <strong>{aiAssist.urgencySuggestion}</strong>
-                <span>Confidence {Math.round(aiAssist.confidence * 100)}%</span>
-              </div>
-              <dl>
-                <div>
-                  <dt>Missing fields</dt>
-                  <dd>{aiAssist.missingCriticalFields.length ? aiAssist.missingCriticalFields.join(', ') : 'None'}</dd>
-                </div>
-                <div>
-                  <dt>Red flags</dt>
-                  <dd>{aiAssist.redFlags.length ? aiAssist.redFlags.join(', ') : 'None detected'}</dd>
-                </div>
-                <div>
-                  <dt>Next action</dt>
-                  <dd>{aiAssist.nextAction}</dd>
-                </div>
-              </dl>
-              <ul className="reception-command-ai__questions">
-                {aiAssist.suggestedQuestions.map((question) => (
-                  <li key={question}>{question}</li>
-                ))}
-              </ul>
-              <p className="reception-command-ai__notice">{aiAssist.safetyNotice}</p>
-            </div>
-          ) : (
-            <div className="reception-command-ai-empty">
-              <div className="reception-command-empty">
-                <Sparkles size={20} aria-hidden="true" />
-                <span>Run assist after critical fields are started.</span>
-              </div>
-              <button
-                type="button"
-                className="reception-command-ai-fallback"
-                onClick={() => runAiAssist({ aiUnavailable: true })}
-                title="Use when AI is unavailable — activates manual intake fallback"
-              >
-                Manual fallback (AI unavailable)
-              </button>
-            </div>
-          )}
-        </aside>
-
-        <section className="reception-command-panel" aria-labelledby="queue-title">
-          <div className="reception-command-panel__header">
-            <h2 id="queue-title">Reception Queue</h2>
-            <span className="reception-command-chip">{receptionQueue.length} active</span>
-          </div>
-          <div className="reception-command-queue">
-            {receptionQueue.length ? (
-              receptionQueue.slice(0, 8).map((patient) => (
-                <button
-                  key={patient.id}
-                  type="button"
-                  className={`reception-command-queue-row${isHighRiskPatient(patient) ? ' reception-command-queue-row--risk' : ''}`}
-                  onClick={() => selectPatient(patient.id)}
-                >
-                  <span>
-                    <strong>{patientDisplayName(patient)}</strong>
-                    <small>{patient.chiefComplaint || patient.complaint || 'Complaint pending'}</small>
-                  </span>
-                  <span>{queueStatus(patient)}</span>
-                  <span>{nextStep(patient)}</span>
-                  <span>{ownerRole(patient)}</span>
-                  <span>{waitMinutes(patient)}m</span>
-                </button>
-              ))
-            ) : (
-              <div className="reception-command-empty">No active reception queue patients.</div>
-            )}
-          </div>
-          {selectedPatient ? (
-            <div className="reception-command-selected" role="status">
-              <strong>{patientDisplayName(selectedPatient)}</strong>
-              <span>{selectedPatient.mrn} · {selectedPatient.state} · {selectedPatient.chiefComplaint}</span>
-              <button
-                type="button"
-                onClick={() => profileNavigate(`${CANONICAL_ROUTES.emergencyPatients}?patientId=${encodeURIComponent(selectedPatient.id)}`)}
-              >
-                <FolderOpen size={16} aria-hidden="true" />
-                Open Patient Profile
-              </button>
-            </div>
-          ) : null}
-        </section>
-
-        <section className="reception-command-panel" aria-labelledby="alerts-title">
-          <div className="reception-command-panel__header">
-            <h2 id="alerts-title">Critical Reception Alerts</h2>
-            <span className={criticalAlerts.length ? 'reception-command-chip reception-command-chip--critical' : 'reception-command-chip'}>
-              {criticalAlerts.length} active
-            </span>
-          </div>
-          <div className="reception-command-alerts">
-            {criticalAlerts.length ? (
-              criticalAlerts.slice(0, 5).map((alert) => (
-                <article
-                  key={alert.id}
-                  className={`reception-command-alert${isTimerBreached(alert, now) ? ' reception-command-alert--breached' : ''}`}
-                >
-                  <div>
-                    <strong>{alert.title}</strong>
-                    <p>{alert.message}</p>
-                    <small>Notify triage nurse / charge nurse / emergency physician</small>
-                  </div>
-                  <div className="reception-command-alert__timer" aria-label="3-minute response timer">
-                    <Timer size={18} aria-hidden="true" />
-                    <span>{formatTimer(alert, now)}</span>
-                  </div>
-                </article>
-              ))
-            ) : (
-              <div className="reception-command-empty">
-                <Bell size={20} aria-hidden="true" />
-                <span>No critical reception alerts.</span>
-              </div>
-            )}
-          </div>
-        </section>
-      </main>
+        <ReceptionOperationalRail
+          queue={receptionQueue}
+          criticalAlerts={criticalAlerts}
+          selectedPatient={selectedPatient}
+          now={now}
+          onSelectPatient={selectPatient}
+          onOpenProfile={(patientId) =>
+            profileNavigate(`${CANONICAL_ROUTES.emergencyPatients}?patientId=${encodeURIComponent(patientId)}`)
+          }
+          patientDisplayName={patientDisplayName}
+          queueStatus={queueStatus}
+          nextStep={nextStep}
+          ownerRole={ownerRole}
+          waitMinutes={waitMinutes}
+          isHighRiskPatient={isHighRiskPatient}
+          formatTimer={formatTimer}
+          isTimerBreached={isTimerBreached}
+          activeQueueTab={RECEPTION_COPY.queues.tabs[activeQueueTab]}
+          emptyQueueMessage={emptyQueueMessage}
+        />
+      </div>
 
       {status || error ? (
-        <div className={`reception-command-toast ${error ? 'reception-command-toast--error' : ''}`} role={error ? 'alert' : 'status'}>
+        <div
+          className={`reception-command-toast ${error ? 'reception-command-toast--error' : ''}`}
+          role={error ? 'alert' : 'status'}
+        >
           {error || status}
         </div>
       ) : null}
 
-      <div className="reception-command-actionbar" aria-label="Reception actions">
-        <button type="button" className="reception-command-actionbar__secondary" onClick={saveDraft}>
-          <Save size={17} aria-hidden="true" />
-          Save Draft
-        </button>
-        <button type="button" className="reception-command-actionbar__secondary" onClick={() => runAiAssist()}>
-          <Sparkles size={17} aria-hidden="true" />
-          Run AI Intake Assist
-        </button>
-        {criticalNeeded ? (
-          <button
-            type="button"
-            className="reception-command-actionbar__critical"
-            disabled={submitting || !canCreatePatient}
-            onClick={() => void createAndRoute()}
-          >
-            <Timer size={17} aria-hidden="true" />
-            Start 3-Minute Response
+      {result ? (
+        <div className="reception-command-selected reception-command-selected--floating" role="status">
+          <strong>Routed: {patientDisplayName(result.patient)}</strong>
+          <button type="button" onClick={() => profileNavigate(result.profileRoute)}>
+            <FolderOpen size={16} aria-hidden="true" />
+            {RECEPTION_COPY.workspace.openPatientCard}
           </button>
-        ) : null}
-        <button
-          type="button"
-          className="reception-command-actionbar__primary"
-          disabled={submitting || !canCreatePatient}
-          onClick={() => void createAndRoute()}
-        >
-          <UserPlus size={17} aria-hidden="true" />
-          {submitting ? 'Routing...' : 'Create Patient & Route'}
-        </button>
-        {result ? (
-          <>
-            <button type="button" className="reception-command-actionbar__secondary" onClick={() => profileNavigate(result.profileRoute)}>
-              <FolderOpen size={17} aria-hidden="true" />
-              Open Patient Profile
-            </button>
-            <button type="button" className="reception-command-actionbar__secondary" onClick={resetForNextPatient}>
-              <FileText size={17} aria-hidden="true" />
-              Next Patient
-            </button>
-          </>
-        ) : null}
-      </div>
+          <button type="button" onClick={resetForNextPatient}>
+            {RECEPTION_COPY.workspace.registerNext}
+          </button>
+        </div>
+      ) : null}
+
+      {showChooser ? (
+        <PreparePatientChooser
+          onClose={() => setShowChooser(false)}
+          onManual={() => {
+            setShowChooser(false);
+            resetForNextPatient();
+          }}
+          onScan={() => openSmartIntake({ step: 'capture', autostart: true })}
+          onSmartIntake={() => openSmartIntake({ autostart: true })}
+          onQuickCreate={() => {
+            setShowChooser(false);
+            resetForNextPatient();
+            updateDraft({ arrivalType: 'walk-in', chiefComplaint: '' });
+          }}
+          onUnknown={handleProvisionalUnknown}
+        />
+      ) : null}
+
+      <ReceptionSmartIntakeOverlay
+        session={smartIntakeSession}
+        onClose={() => {
+          setSmartIntakeSession(null);
+          clearIntakeQueryParams();
+        }}
+        onHandoffComplete={handleSmartIntakeHandoff}
+      />
     </section>
   );
 }

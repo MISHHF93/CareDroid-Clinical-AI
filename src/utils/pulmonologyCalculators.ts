@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Pulmonology Clinical Tools Pack calculator helpers.
  *
  * These helpers provide deterministic scoring and documentation context only.

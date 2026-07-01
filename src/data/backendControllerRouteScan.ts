@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Parse Nest controller decorators and compare to BACKEND_HTTP_ROUTES inventory.
  */
 
@@ -10,7 +10,7 @@ import { BACKEND_HTTP_ROUTES, normalizeRoutePattern } from './backendHttpRouteIn
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const backendSrc = join(__dirname, '../../backend/src');
 
-/** SPA catch-all — not REST API inventory. */
+/** SPA catch-all � not REST API inventory. */
 const SKIP_HANDLER_PATHS = new Set(['*']);
 
 /**

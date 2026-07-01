@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Offline Service - Manages offline data storage and retrieval
  */
 import logger from '../utils/logger';

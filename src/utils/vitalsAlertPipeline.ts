@@ -1,4 +1,4 @@
-﻿export const VITALS_ALERT_ACTIVE_STATUS = 'active';
+export const VITALS_ALERT_ACTIVE_STATUS = 'active';
 
 function isNumber(value) {
   return typeof value === 'number' && Number.isFinite(value);

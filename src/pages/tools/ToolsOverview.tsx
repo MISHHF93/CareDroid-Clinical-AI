@@ -1,4 +1,4 @@
-﻿import { Component, lazy, Suspense, useEffect, useMemo, useState } from 'react';
+import { Component, lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import ClinicalCalculatorHub from '../../components/ClinicalCalculatorHub';
@@ -554,7 +554,7 @@ function UnknownActiveToolSurface({ requestedTool, onClose }) {
         <div>
           <span className="tools-execution-badge tools-execution-badge--catalog">Not found</span>
           <h2>Tool not found</h2>
-          <p>No Medical Tools entry matches “{requestedTool}”. Check the spelling or search the catalog below.</p>
+          <p>No Medical Tools entry matches �{requestedTool}�. Check the spelling or search the catalog below.</p>
         </div>
         <button type="button" className="tools-active-surface__close" onClick={onClose}>
           Back to catalog
@@ -1117,7 +1117,7 @@ const ToolsOverview = () => {
                 type="search"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Try pe-score, bleeding risk, kidney function…"
+                placeholder="Try pe-score, bleeding risk, kidney function�"
                 aria-label="Search all tools"
               />
             </label>
@@ -1227,7 +1227,7 @@ const ToolsOverview = () => {
               <span className="tools-recent-name">Build workflow</span>
               <span className="tools-recent-category">Use selected tools as workflow blocks</span>
             </div>
-            <span className="tools-recent-action">Continue →</span>
+            <span className="tools-recent-action">Continue ?</span>
           </button>
           <button
             type="button"
@@ -1247,7 +1247,7 @@ const ToolsOverview = () => {
               <span className="tools-recent-name">Recommended next action</span>
               <span className="tools-recent-category">Pick the next best route from this context</span>
             </div>
-            <span className="tools-recent-action">Open →</span>
+            <span className="tools-recent-action">Open ?</span>
           </button>
         </div>
       </section>
@@ -1278,7 +1278,7 @@ const ToolsOverview = () => {
                   <span className="tools-recent-name">{tool.name}</span>
                   <span className="tools-recent-category">{tool.category}</span>
                 </div>
-                <span className="tools-recent-action">{primaryActionLabel(tool)} →</span>
+                <span className="tools-recent-action">{primaryActionLabel(tool)} ?</span>
               </button>
             ))}
           </div>
@@ -1296,7 +1296,7 @@ const ToolsOverview = () => {
             className="btn-open-tool"
             onClick={() => setActiveWorkspaceId('all')}
           >
-            Show all tools →
+            Show all tools ?
           </button>
         </div>
       ) : showSearchEmpty ? (
@@ -1310,7 +1310,7 @@ const ToolsOverview = () => {
             className="btn-open-tool"
             onClick={clearSearchAndFilters}
           >
-            Clear search and filters →
+            Clear search and filters ?
           </button>
         </div>
       ) : (
@@ -1411,7 +1411,7 @@ const ToolsOverview = () => {
                     <NavIcon icon={CHROME_ICONS.close} size={16} aria-hidden />
                   </button>
                   <div className="tool-shortcut">
-                    {tool.shortcut ? tool.shortcut.replace('Ctrl+', '⌘') : 'Open'}
+                    {tool.shortcut ? tool.shortcut.replace('Ctrl+', '?') : 'Open'}
                   </div>
                 </div>
               </div>
@@ -1458,7 +1458,7 @@ const ToolsOverview = () => {
                     handleToolClick(tool);
                   }}
                 >
-                  {primaryActionLabel(tool)} →
+                  {primaryActionLabel(tool)} ?
                 </button>
                 {hasMeaningfulAssistantAction(tool) &&
                 !tool.restrictionReason &&

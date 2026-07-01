@@ -1,4 +1,4 @@
-﻿import { apiFetch, getApiErrorMessage, parseApiResponse } from './apiClient';
+import { apiFetch, getApiErrorMessage, parseApiResponse } from './apiClient';
 import { getTenantContext } from './tenantContextStore';
 import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
 import { fetchEmergencySettings, updateEmergencySettings } from './emergencyOsApi';

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Three pilot outcomes that define real-clinic survivability.
  */
 

@@ -1,4 +1,4 @@
-ï»¿import { DEFAULT_EMERGENCY_CTAS_TARGETS } from '../config/emergencySettings.config';
+import { DEFAULT_EMERGENCY_CTAS_TARGETS } from '../config/emergencySettings.config';
 import {
   patientHasHighRiskComplaintFlags,
   patientNeedsRapidReview,
@@ -276,7 +276,7 @@ export function resolveProviderWaitBreachTimer(
   );
   const remainingMinutes = Math.max(0, thresholds.targetMinutes - elapsedMinutes);
   const exceptionNote = thresholds.highRiskException
-    ? ' Â· high-risk wait exception applied'
+    ? ' · high-risk wait exception applied'
     : '';
 
   return {
@@ -290,7 +290,7 @@ export function resolveProviderWaitBreachTimer(
     label: phaseMeta.label,
     shortLabel: phaseMeta.shortLabel,
     tone: phaseMeta.tone,
-    staffDetail: `${formatDuration(elapsedMinutes)} since triage Â· target ${thresholds.targetMinutes}m Â· warning ${thresholds.warningMinutes}m${exceptionNote}`,
+    staffDetail: `${formatDuration(elapsedMinutes)} since triage · target ${thresholds.targetMinutes}m · warning ${thresholds.warningMinutes}m${exceptionNote}`,
     highRiskException: thresholds.highRiskException,
     priority: patient.priority ?? null,
   };
@@ -483,7 +483,7 @@ export function buildProviderWaitBreachAlerts(
       type: 'Operational',
       severity: 'Critical',
       title: 'Provider wait breaches',
-      message: `${snapshot.summary.breachedCount} patients breached triage-to-provider thresholds Â· longest ${snapshot.summary.longestElapsedLabel}`,
+      message: `${snapshot.summary.breachedCount} patients breached triage-to-provider thresholds · longest ${snapshot.summary.longestElapsedLabel}`,
       createdAt: now.toISOString(),
       dismissed: false,
       source: 'provider-wait-breach-timer',
@@ -509,7 +509,7 @@ export function buildProviderWaitBreachAlerts(
       type: 'Operational',
       severity: row.phase === 'breached' ? 'Critical' : 'Warning',
       title: row.label,
-      message: `${row.displayName} Â· ${row.elapsedLabel} elapsed Â· target ${row.targetMinutes}m${row.highRiskException ? ' Â· high-risk exception' : ''}`,
+      message: `${row.displayName} · ${row.elapsedLabel} elapsed · target ${row.targetMinutes}m${row.highRiskException ? ' · high-risk exception' : ''}`,
       patientId: row.patientId,
       createdAt: now.toISOString(),
       dismissed: false,

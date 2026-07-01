@@ -34,6 +34,7 @@ import {
   canAccessEmergencyRoute,
   normalizeEmergencyRole,
 } from '../config/emergencyRolePermissions';
+import { normalizeSaasRole } from '../config/saasProfileConstants';
 
 /**
  * @typedef {'calculator-route'|'chat-assisted'|'tool-page'|'calculator-hub'|'fallback'} RegistryToolLaunchMode
@@ -333,22 +334,27 @@ export function applyRegistryToolLaunch(toolId, handlers) {
     addMessage?.(plan.launch.chatSeed, 'user');
   }
 
-  const saasRole =
-    handlers.context?.roleProfile?.id ||
-    handlers.context?.membership?.roleProfileId ||
-    handlers.context?.saasRole ||
-    handlers.entitlementContext?.roleProfile?.id ||
-    handlers.entitlementContext?.membership?.roleProfileId ||
-    handlers.entitlementContext?.saasRole;
-
   const emergencyRoleId =
     handlers.context?.emergencyRoleId ||
     handlers.entitlementContext?.emergencyRoleId ||
     normalizeEmergencyRole(
       handlers.context?.user?.role ||
         handlers.entitlementContext?.user?.role ||
-        saasRole,
+        handlers.context?.saasRole ||
+        handlers.entitlementContext?.saasRole,
     );
+
+  const saasRole = normalizeSaasRole(
+    handlers.context?.roleProfile?.id ||
+      handlers.context?.membership?.roleProfileId ||
+      handlers.context?.saasRole ||
+      handlers.entitlementContext?.roleProfile?.id ||
+      handlers.entitlementContext?.membership?.roleProfileId ||
+      handlers.entitlementContext?.saasRole ||
+      emergencyRoleId ||
+      handlers.context?.user?.role ||
+      handlers.entitlementContext?.user?.role,
+  );
   const remapped = remapRegistryNavigationForRole(
     { pathname: plan.pathname, search: plan.search || '' },
     {

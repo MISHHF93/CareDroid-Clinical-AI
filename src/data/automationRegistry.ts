@@ -1,4 +1,4 @@
-﻿import { REGISTRY } from './clinicalToolIdContract';
+import { REGISTRY } from './clinicalToolIdContract';
 import { getWorkspaceFunctionalityMode } from '../config/workspace.config';
 import {
   EMERGENCY_ANALYTICS_EVENTS,

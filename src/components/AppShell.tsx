@@ -1,4 +1,4 @@
-﻿import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useLocation, useNavigate, type To } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { Sidebar } from './Sidebar';
@@ -323,7 +323,7 @@ function AppShellFrame({ children }: AppShellProps) {
       if (backendReachable) {
         await useEmergencyStore.getState().initializeFromBackend();
       } else {
-        // No backend — stay on local/simulation data; no network calls needed
+        // No backend � stay on local/simulation data; no network calls needed
         useEmergencyStore.setState({ backendAvailable: false, persistenceMode: 'local' });
       }
       useEmergencyStore.getState().updateAlerts();

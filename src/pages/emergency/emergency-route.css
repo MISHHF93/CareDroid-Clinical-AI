@@ -27,9 +27,61 @@
 .emergency-route-page__eyebrow {
   color: var(--app-accent-interactive, var(--status-info));
   font-size: var(--ed-type-body);
-  font-weight: 900;
-  letter-spacing: 0.08em;
+  font-weight: 600;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
+}
+
+.emergency-route-situation-brief {
+  border: 1px solid var(--ed-border-subtle);
+  border-radius: var(--radius-lg, 12px);
+  background: var(--ed-surface-raised);
+  padding: var(--ed-space-3);
+}
+
+.emergency-route-situation-brief--info {
+  border-color: color-mix(in srgb, var(--app-accent-interactive, var(--status-info)) 28%, var(--ed-border-subtle));
+  background: color-mix(in srgb, var(--app-accent-interactive, var(--status-info)) 6%, var(--ed-surface-raised));
+}
+
+.emergency-route-situation-brief--warning {
+  border-color: color-mix(in srgb, var(--status-warning, #f59e0b) 34%, var(--ed-border-subtle));
+  background: color-mix(in srgb, var(--status-warning, #f59e0b) 8%, var(--ed-surface-raised));
+}
+
+.emergency-route-situation-brief--critical {
+  border-color: color-mix(in srgb, var(--status-critical, #ef4444) 38%, var(--ed-border-subtle));
+  background: color-mix(in srgb, var(--status-critical, #ef4444) 8%, var(--ed-surface-raised));
+}
+
+.emergency-route-situation-brief__list {
+  display: grid;
+  gap: var(--ed-space-3);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.emergency-route-situation-brief__item {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.emergency-route-situation-brief__label {
+  color: var(--ed-text-meta);
+  font-size: var(--ed-type-meta);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.emergency-route-situation-brief__value {
+  color: var(--ed-text-primary);
+  font-size: var(--ed-type-section);
+  font-weight: 500;
+  line-height: 1.35;
 }
 
 .emergency-route-page__title-row {
@@ -95,8 +147,8 @@
   align-items: center;
   border-radius: 999px;
   font-size: var(--ed-type-meta);
-  font-weight: 900;
-  letter-spacing: 0.06em;
+  font-weight: 600;
+  letter-spacing: 0.04em;
   line-height: 1;
   padding: 5px 10px;
   text-transform: uppercase;
@@ -180,8 +232,8 @@
   display: block;
   color: var(--ed-text-secondary);
   font-size: var(--ed-type-body);
-  font-weight: 800;
-  letter-spacing: 0.04em;
+  font-weight: 600;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
 }
 
@@ -226,8 +278,8 @@
   min-width: 260px;
   color: var(--ed-text-secondary);
   font-size: var(--ed-type-meta);
-  font-weight: 900;
-  letter-spacing: 0.06em;
+  font-weight: 600;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
 }
 

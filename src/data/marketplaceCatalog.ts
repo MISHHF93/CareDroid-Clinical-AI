@@ -1,4 +1,4 @@
-﻿export const MARKETPLACE_CATEGORIES = Object.freeze([
+export const MARKETPLACE_CATEGORIES = Object.freeze([
   'asset-packs',
   'workflows',
   'simulations',

@@ -1,4 +1,4 @@
-﻿export const COMPETENCY_DOMAINS = Object.freeze([
+export const COMPETENCY_DOMAINS = Object.freeze([
   'Simulation completion',
   'Skill completion',
   'Certifications',

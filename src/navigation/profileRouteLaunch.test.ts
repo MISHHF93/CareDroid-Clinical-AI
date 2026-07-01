@@ -1,4 +1,4 @@
-﻿import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import {
   navigateProfileAware,

@@ -1,4 +1,4 @@
-﻿import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import logger from '../utils/logger';
 
 const STORAGE_KEY = 'careDroid.toolPrefs.v1';

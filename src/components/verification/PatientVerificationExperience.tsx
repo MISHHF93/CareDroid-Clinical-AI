@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Link2, UserPlus } from 'lucide-react';
 import { VERIFICATION_STEPS } from '../../utils/verificationWorkflow';
 import DuplicateCandidatePanelRaw from './DuplicateCandidatePanel';

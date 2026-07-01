@@ -1,4 +1,4 @@
-ï»¿import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Ambulance, Clock3, Send } from 'lucide-react';
 import {
   PRE_ARRIVAL_FRAMEWORK_LABELS,
@@ -339,7 +339,7 @@ export default function PreArrivalForm({
         <div className="pre-arrival-intake__status">
           {lastPostedUnit ? (
             <span className="pre-arrival-intake__posted">
-              Posted {lastPostedUnit} to whiteboard â€” visible to all staff.
+              Posted {lastPostedUnit} to whiteboard — visible to all staff.
             </span>
           ) : (
             <span>Placeholder card appears on the department whiteboard immediately.</span>
@@ -356,7 +356,7 @@ export default function PreArrivalForm({
           disabled={!canSubmit || submitting || !validation.ok}
         >
           <Send size={15} aria-hidden />
-          {submitting ? 'Postingâ€¦' : 'Post to whiteboard'}
+          {submitting ? 'Posting…' : 'Post to whiteboard'}
         </button>
       </footer>
     </form>

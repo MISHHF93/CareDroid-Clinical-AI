@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { resolveWhatHappensNext } from '../../services/whatHappensNextGuidance';
 import './WhatHappensNextBadge.css';
 
@@ -32,7 +32,7 @@ export default function WhatHappensNextBadge({
           : null,
       ]
         .filter(Boolean)
-        .join(' · ')}
+        .join(' � ')}
     >
       {compact ? `Next: ${snapshot.shortLabel}` : `Next: ${snapshot.label}`}
     </span>

@@ -1,4 +1,4 @@
-ï»¿import { CARE_DROID_SCREEN_MODES } from '../../central-node/careDroidCentralNode';
+import { CARE_DROID_SCREEN_MODES } from '../../central-node/careDroidCentralNode';
 import { EMERGENCY_ROLE_IDS } from '../../config/emergencyRolePermissions';
 import { EMS_SCREEN_WIDGETS } from '../../config/emsScreenModel';
 import { selectEmsOffloadVisibilityMetrics } from '../../services/emsOffloadVisibilityModel';
@@ -21,7 +21,7 @@ export function shouldShowEmsOperationalStrip({ screenMode, roleId, displayMode 
 }
 
 /**
- * EMS command strip â€” inbound units, ETA, receiving area, offload, and pressure.
+ * EMS command strip — inbound units, ETA, receiving area, offload, and pressure.
  */
 export function selectEmsOperationalStrip({
   emsArrivals = [] as any[],
@@ -75,7 +75,7 @@ export function selectEmsOperationalStrip({
       id: 'offload-duration',
       label: visibilityById['offload-duration']?.label || 'Offload duration',
       hint: visibilityById['offload-duration']?.hint || 'Mean scene-to-handoff offload time',
-      value: visibilityById['offload-duration']?.value ?? 'â€”',
+      value: visibilityById['offload-duration']?.value ?? '—',
       surface: EMS_SCREEN_WIDGETS.offloadTimers,
       tone: visibilityById['offload-duration']?.tone || 'neutral',
       whiteboardAction: 'open-offload-tracker',

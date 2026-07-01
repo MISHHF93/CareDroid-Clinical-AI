@@ -1,4 +1,4 @@
-﻿import { CANONICAL_ROUTES, AUTH_PATH_ALIASES } from '../config/routes.config';
+import { CANONICAL_ROUTES, AUTH_PATH_ALIASES } from '../config/routes.config';
 import {
   ADVANCED_SIDEBAR_NAV_ITEMS,
   OPERATIONS_SIDEBAR_NAV_ITEMS,

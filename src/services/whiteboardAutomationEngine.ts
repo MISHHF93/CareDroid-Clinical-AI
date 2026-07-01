@@ -1,4 +1,4 @@
-ï»¿import { isLegalTransition } from '../../engine/journeyEngine';
+import { isLegalTransition } from '../engine/journeyEngine';
 import {
   PatientFlag,
   PatientState,
@@ -306,7 +306,7 @@ export function evaluateWhiteboardAutomation(
   } else if (mseTimer?.overdueMinutes != null) {
     displayState = 'MSE Due';
   } else if (mseTimer?.remainingMinutes != null && mseTimer.remainingMinutes <= 30) {
-    displayState = `MSE Â· ${mseTimer.remainingMinutes}m`;
+    displayState = `MSE · ${mseTimer.remainingMinutes}m`;
   } else if (patient.state === PatientState.Results) {
     displayState = 'Results Review';
   }
@@ -355,7 +355,7 @@ function applyAutomatedStateTransitions(
           makeAutomationEvent(
             nextPatient,
             'StateChange',
-            'Automated whiteboard update: lab result posted â€” nurse review required.',
+            'Automated whiteboard update: lab result posted — nurse review required.',
             timestamp,
             {
               from: patient.state,
@@ -393,7 +393,7 @@ function applyAutomatedStateTransitions(
           makeAutomationEvent(
             nextPatient,
             'StateChange',
-            `Automated whiteboard update: diagnosis recorded â€” awaiting disposition (${diagnosis}).`,
+            `Automated whiteboard update: diagnosis recorded — awaiting disposition (${diagnosis}).`,
             timestamp,
             {
               from: nextPatient.state,

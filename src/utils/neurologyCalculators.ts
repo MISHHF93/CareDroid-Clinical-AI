@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Neurology calculator helpers.
  *
  * Deterministic documentation support only. These helpers do not diagnose

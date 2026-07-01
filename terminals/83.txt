@@ -1,0 +1,17 @@
+---
+pid: 27476
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "Set-Location \"C:\\Users\\borah\\CareDroid-Clinical-AI\"; npm.cmd run lint"
+started_at: 2026-06-30T21:59:30.772Z
+running_for_ms: 8300006  
+---
+
+> caredroid-clinical-ai@1.0.0 lint
+> eslint src
+
+
+C:\Users\borah\CareDroid-Clinical-AI\src\pages\ai\AiCommandCenterDashboard.tsx
+  275:29  error  Unexpected constant truthiness on the left-hand side of a `||` expression  no-constant-binary-expression
+
+✖ 1 problem (1 error, 0 warnings)
+

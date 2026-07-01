@@ -1,0 +1,27 @@
+---
+pid: 9364
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cd \"C:\\Users\\borah\\CareDroid-Clinical-AI\"; npm run build 2>&1 | Select-Object -Last 20"
+started_at: 2026-06-30T19:51:08.087Z
+running_for_ms: 864999   
+---
+dist/assets/calculators-mental-health-Bpwh3Qqk.js             54.35 kB │ gzip:   9.91 kB
+dist/assets/ReceptionWorkspace-B6kwChqv.js                    65.50 kB │ gzip:  10.99 kB
+dist/assets/HelpHub-Bq8Ap0p6.js                               65.55 kB │ gzip:  16.02 kB
+dist/assets/EMSPipeline-CatjB48i.js                           75.46 kB │ gzip:  13.57 kB
+dist/assets/SmartIntake-MxVYrpkS.js                           78.55 kB │ gzip:  19.56 kB
+dist/assets/EmergencySettings-DlyQQpIF.js                     89.67 kB │ gzip:  14.55 kB
+dist/assets/FullJourneyOperatingPage-CbsglUoP.js              96.61 kB │ gzip:  17.28 kB
+dist/assets/vendor-idb-BrimEWmm.js                            98.08 kB │ gzip:  32.06 kB
+dist/assets/ToolsOverview-B3_Z3DNQ.js                        123.12 kB │ gzip:  24.10 kB
+dist/assets/PatientDetailPanel-D0Qkrgwv.js                   132.59 kB │ gzip:  26.36 kB
+dist/assets/clinical-catalog-CV9iXmqz.js                     137.15 kB │ gzip:  21.74 kB
+dist/assets/OrganizationPages-Di7LdRtV.js                    153.27 kB │ gzip:  20.36 kB
+dist/assets/vendor-charts-IPu7hjVZ.js                        252.01 kB │ gzip:  65.75 kB
+dist/assets/calculators-general-clinical-CxJUCqND.js         287.16 kB │ gzip:  48.76 kB
+dist/assets/index--5X21U3r.js                                370.17 kB │ gzip:  69.77 kB
+dist/assets/vendor-D3gJbNnL.js                               559.12 kB │ gzip: 176.40 kB
+dist/assets/index-DQ8obWGC.js                                747.67 kB │ gzip: 176.28 kB
+dist/assets/calculators-nHR6AZJs.js                          950.81 kB │ gzip: 228.47 kB
+dist/assets/data-navigation-BVkh7WqM.js                      980.59 kB │ gzip: 210.20 kB
+✓ built in 28.77s

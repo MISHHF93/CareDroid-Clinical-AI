@@ -1,4 +1,4 @@
-ï»¿import { isEmsRegistrationPatient } from '../components/reception/receptionQueueModel';
+import { isEmsRegistrationPatient } from '../components/reception/receptionQueueModel';
 import { classifyReferralBucket, isClosedReferralStatus } from '../components/whiteboard/referralAwarenessModel';
 import { deriveQueueDestination, deriveTriagePending } from './arrivalControlLayer';
 import {
@@ -127,7 +127,7 @@ function buildSnapshot(
   };
 }
 
-/** Maps internal journey and queue state to a patient-understandable status â€” staff visibility only. */
+/** Maps internal journey and queue state to a patient-understandable status — staff visibility only. */
 export function resolvePatientExperienceStatus(
   patient: Patient,
   context: PatientExperienceContext = {},
@@ -144,7 +144,7 @@ export function resolvePatientExperienceStatus(
     return buildSnapshot(
       patient.arrival.waitingRoomStatus,
       patient,
-      `Arrival status Â· ${patient.arrival.waitingRoomStatus}`,
+      `Arrival status · ${patient.arrival.waitingRoomStatus}`,
       queueDestination,
     );
   }
@@ -158,7 +158,7 @@ export function resolvePatientExperienceStatus(
     return buildSnapshot(
       'awaiting-admission-bed',
       patient,
-      `Internal ${patient.state} Â· pending inpatient bed`,
+      `Internal ${patient.state} · pending inpatient bed`,
       queueDestination,
     );
   }
@@ -167,7 +167,7 @@ export function resolvePatientExperienceStatus(
     return buildSnapshot(
       'preparing-discharge',
       patient,
-      `Internal ${patient.state} Â· discharge planning`,
+      `Internal ${patient.state} · discharge planning`,
       queueDestination,
     );
   }
@@ -176,7 +176,7 @@ export function resolvePatientExperienceStatus(
     return buildSnapshot(
       'waiting-for-specialist-review',
       patient,
-      `Referral ${referral.status}${referral.service || referral.targetDepartment ? ` Â· ${referral.service || referral.targetDepartment}` : ''}`,
+      `Referral ${referral.status}${referral.service || referral.targetDepartment ? ` · ${referral.service || referral.targetDepartment}` : ''}`,
       queueDestination,
     );
   }
@@ -185,7 +185,7 @@ export function resolvePatientExperienceStatus(
     return buildSnapshot(
       'waiting-for-results',
       patient,
-      'Internal Results Â· awaiting clinician review of completed tests',
+      'Internal Results · awaiting clinician review of completed tests',
       queueDestination,
     );
   }
@@ -194,7 +194,7 @@ export function resolvePatientExperienceStatus(
     return buildSnapshot(
       'tests-in-progress',
       patient,
-      `Internal Orders Â· ${Math.max(pendingTestCount(patient), 1)} test pathway active`,
+      `Internal Orders · ${Math.max(pendingTestCount(patient), 1)} test pathway active`,
       queueDestination,
     );
   }
@@ -203,7 +203,7 @@ export function resolvePatientExperienceStatus(
     return buildSnapshot(
       'waiting-for-clinician',
       patient,
-      `Internal Waiting Â· ${queueDestination || 'whiteboard queue'}`,
+      `Internal Waiting · ${queueDestination || 'whiteboard queue'}`,
       queueDestination,
     );
   }
@@ -217,7 +217,7 @@ export function resolvePatientExperienceStatus(
     return buildSnapshot(
       'waiting-for-triage',
       patient,
-      `Internal Triage Â· ${queueDestination}`,
+      `Internal Triage · ${queueDestination}`,
       queueDestination,
     );
   }
@@ -232,7 +232,7 @@ export function resolvePatientExperienceStatus(
     return buildSnapshot(
       'registered',
       patient,
-      `Internal ${patient.state} Â· registration in progress`,
+      `Internal ${patient.state} · registration in progress`,
       queueDestination,
     );
   }
@@ -241,7 +241,7 @@ export function resolvePatientExperienceStatus(
     return buildSnapshot(
       'waiting-for-clinician',
       patient,
-      'Internal Assessment Â· active clinician encounter',
+      'Internal Assessment · active clinician encounter',
       queueDestination,
     );
   }
@@ -249,7 +249,7 @@ export function resolvePatientExperienceStatus(
   return buildSnapshot(
     'registered',
     patient,
-    `Internal ${patient.state} Â· default mapping`,
+    `Internal ${patient.state} · default mapping`,
     queueDestination,
   );
 }
@@ -374,7 +374,7 @@ export function buildPatientExperienceBoardSummary(
 const PUBLIC_PHI_PATTERN =
   /\b(mrn|dob|ssn|@[a-z0-9.-]+\.[a-z]{2,})\b|(?:\b\d{3}-\d{2}-\d{4}\b)|(?:\b\d{2}\/\d{2}\/\d{4}\b)/i;
 
-/** Resolves a PHI-safe public view â€” id and generic label only. */
+/** Resolves a PHI-safe public view — id and generic label only. */
 export function resolvePublicPatientExperienceStatus(
   patient: Patient,
   context: PatientExperienceContext = {},

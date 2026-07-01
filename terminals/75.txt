@@ -1,0 +1,57 @@
+---
+pid: 25456
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cmd /c \"cd /d C:\\Users\\borah\\CareDroid-Clinical-AI && npm run test:run -- src/routing 2>&1\""
+started_at: 2026-06-30T21:17:34.076Z
+running_for_ms: 2325005  
+---
+
+> caredroid-clinical-ai@1.0.0 test:run
+> vitest run src/routing
+
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+ ✓ src/routing/canonicalRouteTree.sidebar.test.tsx (29 tests) 5854ms
+     ✓ loads sidebar destination 'Command Center' ('/emergency/command-center') without an access-denied surface  408ms
+     ✓ loads sidebar destination 'Patients' ('/emergency/patients') without an access-denied surface  365ms
+     ✓ loads sidebar destination 'Reports' ('/emergency/reports') without an access-denied surface  1149ms
+ ✓ src/routing/canonicalRouteTree.routesE.test.tsx (5 tests) 4060ms
+     ✓ /emergency/tools renders Medical Tools inside the active shell  2311ms
+     ✓ /emergency/shift renders Shift Summary inside the active shell  346ms
+     ✓ /emergency/analytics renders the CareDroid analytics route  971ms
+ ✓ src/routing/canonicalAppRoutes.deepLink.test.tsx (11 tests) 3387ms
+     ✓ renders /emergency/ems inside the AppShell  566ms
+     ✓ redirects /settings/features to Feature Flags  993ms
+     ✓ redirects the retired assistant alias to the docked CareDroid Copilot experience  338ms
+ ✓ src/routing/canonicalRouteTree.redirects.test.tsx (11 tests) 2206ms
+     ✓ /tools/catalog redirects to Medical Tools with intent preserved  552ms
+ ✓ src/routing/canonicalRouteTree.routesC.test.tsx (4 tests) 1365ms
+     ✓ /emergency/queues consumes queue filter search params  348ms
+     ✓ /emergency/referrals renders referral candidates from the active patient list  484ms
+ ✓ src/routing/canonicalRouteTree.routesA.test.tsx (4 tests) 1676ms
+     ✓ /emergency/whiteboard renders the active CareDroid whiteboard  605ms
+     ✓ /emergency/patients renders the active patient whiteboard surface  359ms
+     ✓ /emergency/patients consumes patientId context without another lookup  310ms
+     ✓ /emergency/ems renders the active EMS summary route  400ms
+ ✓ src/routing/canonicalRouteTree.routesB.test.tsx (4 tests) 1301ms
+     ✓ /emergency/intake renders Smart Intake inside the route tree  451ms
+     ✓ /emergency/queues consumes the active whiteboard queue filter  387ms
+ ✓ src/routing/canonicalRouteTree.routesD.test.tsx (5 tests) 959ms
+     ✓ /emergency/copilot opens the docked copilot on the whiteboard  378ms
+ ✓ src/routing/canonicalRouteTree.shell.test.tsx (3 tests) 1011ms
+     ✓ keeps primary shell controls and representative sidebar links exposed  718ms
+ ✓ src/routing/sectionLinkInventory.test.ts (33 tests) 24ms
+ ✓ src/routing/canonicalRouteRedirects.test.ts (5 tests) 10ms
+ ✓ src/routing/routeAuthRebuild.test.ts (5 tests) 8ms
+ ✓ src/routing/routeAliasFixtures.test.ts (23 tests) 11ms
+ ✓ src/routing/workspaceSubpageRoutes.test.ts (2 tests) 8ms
+ ✓ src/routing/codexCardRouteMounts.test.ts (3 tests) 8ms
+ ✓ src/routing/authRouteFlow.test.tsx (3 tests) 6ms
+ ✓ src/routing/routeHealth.test.ts (5 tests) 7ms
+
+ Test Files  17 passed (17)
+      Tests  155 passed (155)
+   Start at  17:17:35
+   Duration  70.76s (transform 7.30s, setup 5.05s, import 18.54s, tests 21.90s, environment 21.70s)
+

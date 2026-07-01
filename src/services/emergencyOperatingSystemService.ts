@@ -1,4 +1,4 @@
-﻿import { getWorkspaceAutomations } from '../data/automationRegistry';
+import { getWorkspaceAutomations } from '../data/automationRegistry';
 import ClinicalIntentRouter from '../data/clinicalIntentRouter';
 import {
   EMERGENCY_AI_COPILOT,

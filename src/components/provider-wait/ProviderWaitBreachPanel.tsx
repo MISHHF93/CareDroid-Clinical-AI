@@ -1,4 +1,4 @@
-ï»¿import React, { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import {
   buildProviderWaitVisibilitySnapshot,
   hasProviderWaitVisibilityActivity,
@@ -27,7 +27,7 @@ export default function ProviderWaitBreachPanel({ patients = [] as any[], settin
         <p className="provider-wait-breach-panel__eyebrow">Triage to provider</p>
         <h3>Provider wait breach timer</h3>
         <p className="provider-wait-breach-panel__subtitle">
-          CTAS thresholds Â· approaching from {summary.warningMinutes}m Â· default target{' '}
+          CTAS thresholds · approaching from {summary.warningMinutes}m · default target{' '}
           {summary.defaultTargetMinutes}m
         </p>
       </header>

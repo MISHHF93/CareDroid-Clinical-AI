@@ -1,4 +1,4 @@
-﻿import { getHubChatAssistedTools } from '../data/calculatorHubManifest';
+import { getHubChatAssistedTools } from '../data/calculatorHubManifest';
 import { SIMULATION_SCENARIOS } from '../data/medicalSimulationCatalog';
 import { PROTOCOL_PATHWAYS } from '../data/protocolPathwayLibrary';
 

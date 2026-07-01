@@ -1,4 +1,4 @@
-ï»¿import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import useProfileNavigate from '../../hooks/useProfileNavigate';
 import ApiStateBanner from '../../components/ApiStateBanner';
@@ -103,7 +103,7 @@ export default function PlatformSystemPage({ pack }) {
       <section className="platform-system-hero">
         <div>
           <p className="platform-system-eyebrow">
-            {capability ? `${capability.pack} Â· Tier ${capability.tier}` : 'CareDroid platform'}
+            {capability ? `${capability.pack} · Tier ${capability.tier}` : 'CareDroid platform'}
           </p>
           <h1 id="platform-system-title">{title}</h1>
           <p>{subtitle}</p>
@@ -192,7 +192,7 @@ export default function PlatformSystemPage({ pack }) {
               to={capabilityPath(item, patientId)}
             >
               <span className="platform-capability-card__meta">
-                {item.pack} Â· Tier {item.tier}
+                {item.pack} · Tier {item.tier}
               </span>
               <strong>{item.name}</strong>
               <span>{item.summary}</span>

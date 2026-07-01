@@ -1,4 +1,4 @@
-﻿import { recordUsageEvent } from './subscriptionApi';
+import { recordUsageEvent } from './subscriptionApi';
 
 export const USAGE_EVENT_TYPES = Object.freeze({
   AI_CALL: 'ai_call',

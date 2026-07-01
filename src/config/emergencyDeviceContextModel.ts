@@ -1,5 +1,5 @@
-ï»¿/**
- * Multi-screen device context â€” binds a physical workstation to a CareDroid screen mode.
+/**
+ * Multi-screen device context — binds a physical workstation to a CareDroid screen mode.
  * Same user account, different device contexts; one app shell, no duplicate renderers.
  * Persists per browser; reuses existing kiosk / read-only wall display modes.
  */
@@ -30,7 +30,7 @@ export type EmergencyDeviceContextDefinition = {
   description: string;
   screenMode: CareDroidScreenMode;
   landingRoute: string;
-  /** Reuses wall/kiosk chrome â€” minimal app shell, auto-refresh surfaces. */
+  /** Reuses wall/kiosk chrome — minimal app shell, auto-refresh surfaces. */
   kiosk: boolean;
   /** Maps to existing read-only whiteboard / hallway monitor behavior. */
   readOnlyWall: boolean;
@@ -91,7 +91,7 @@ export const EMERGENCY_DEVICE_CONTEXT_REGISTRY: readonly EmergencyDeviceContextD
     Object.freeze({
       id: EMERGENCY_DEVICE_CONTEXT_IDS.wallDisplay,
       label: 'Wall display',
-      description: 'Hallway / nurse-station read-only operations wall â€” reuses kiosk mode.',
+      description: 'Hallway / nurse-station read-only operations wall — reuses kiosk mode.',
       screenMode: CARE_DROID_SCREEN_MODES.readOnlyWhiteboard,
       landingRoute: getScreenModeDefaultLandingRoute(CARE_DROID_SCREEN_MODES.readOnlyWhiteboard),
       kiosk: true,
@@ -100,7 +100,7 @@ export const EMERGENCY_DEVICE_CONTEXT_REGISTRY: readonly EmergencyDeviceContextD
     Object.freeze({
       id: EMERGENCY_DEVICE_CONTEXT_IDS.publicWaitingDisplay,
       label: 'Public waiting display',
-      description: 'PHI-safe waiting room wall â€” crowd level and wait messaging only.',
+      description: 'PHI-safe waiting room wall — crowd level and wait messaging only.',
       screenMode: CARE_DROID_SCREEN_MODES.publicWaiting,
       landingRoute: getScreenModeDefaultLandingRoute(CARE_DROID_SCREEN_MODES.publicWaiting),
       kiosk: true,

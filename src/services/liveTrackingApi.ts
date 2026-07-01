@@ -1,4 +1,4 @@
-﻿import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
+import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
 import { apiFetchJson, getApiErrorMessage } from './apiClient';
 import { recordAutomationBlocked, recordAutomationFailure } from './automationAuditLogger';
 

@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { MEDICAL_THEME, MEDICAL_TYPE } from '../config/medicalTheme.constants';
 import type { CSSProperties, FormEvent, KeyboardEvent } from 'react';
 import { Patient, PatientFlag, PatientState, Priority, Vitals } from '../types/emergency';
@@ -16,6 +16,7 @@ import {
 } from '../utils/patientDuplicateDetection';
 import DuplicateReviewAlert from './verification/DuplicateReviewAlert';
 import { registerNewArrival } from '../services/arrivalControlLayer';
+import { routeQuickIntakeThroughOrchestrator } from '../services/receptionIntakeOrchestrator';
 import { buildPatientArrivalRecord, syncPatientFromArrival } from '../services/patientArrivalModel';
 import {
   buildHighRiskComplaintPatch,
@@ -63,14 +64,14 @@ type ComplaintCategory =
 type Sex = Patient['sex'];
 
 const CATEGORY_BUTTONS: Array<{ label: ComplaintCategory; icon: string }> = [
-  { label: 'Chest pain', icon: '🫀' },
-  { label: 'Breathing', icon: '🫁' },
-  { label: 'Neuro/Stroke', icon: '🧠' },
-  { label: 'Sepsis', icon: '🩸' },
-  { label: 'Trauma', icon: '🤕' },
-  { label: 'OB/Gyn', icon: '🤰' },
-  { label: 'Pediatric', icon: '🧒' },
-  { label: 'Other', icon: '📋' },
+  { label: 'Chest pain', icon: '??' },
+  { label: 'Breathing', icon: '??' },
+  { label: 'Neuro/Stroke', icon: '??' },
+  { label: 'Sepsis', icon: '??' },
+  { label: 'Trauma', icon: '??' },
+  { label: 'OB/Gyn', icon: '??' },
+  { label: 'Pediatric', icon: '??' },
+  { label: 'Other', icon: '??' },
 ];
 
 const PRIORITY_COLORS: Record<Priority, string> = {
@@ -298,8 +299,54 @@ export default function QuickIntake({
       );
       return;
     }
-    const now = new Date().toISOString();
     const isReceptionIntake = variant === 'reception';
+    const receptionSafetyFlags: import('../types/emergency').QuickSafetyFlag[] =
+      priority === Priority.P1 || priority === Priority.P2
+        ? [PatientFlag.HighRisk as import('../types/emergency').QuickSafetyFlag]
+        : [];
+    if (isReceptionIntake) {
+      setSubmitting(true);
+      setSubmitError('');
+      try {
+        const routeResult = await routeQuickIntakeThroughOrchestrator(
+          {
+            firstName: firstName.trim() || 'Unknown',
+            lastName: lastName.trim() || 'Patient',
+            dob: dob || undefined,
+            healthCard: mrn,
+            phone: '',
+            complaint: complaint.trim() || complaintCategory || 'Unspecified complaint',
+            arrivalMode: 'walk-in',
+            quickSafetyFlags: receptionSafetyFlags,
+            quickNotes: '',
+          },
+          {
+            actorName: emergencyRole.roleLabel || 'Reception',
+            actorStaffId: emergencyRole.canonicalProfile?.employeeId || emergencyRole.canonicalProfile?.id,
+          },
+        );
+        registerNewArrival(
+          {
+            patients: useEmergencyStore.getState().patients,
+            updatePatient: useEmergencyStore.getState().updatePatient,
+            dispatchWebSocketEvent: useEmergencyStore.getState().dispatchWebSocketEvent,
+          },
+          routeResult.patientId,
+          { source: 'quick-intake-reception' },
+        );
+        onAdded(routeResult.patient);
+        onClose();
+      } catch (error: any) {
+        setSubmitError(
+          `${formatApiRecoveryMessage(error, 'intake form')} ${ERROR_RECOVERY_COPY.handoffPending}`,
+        );
+      } finally {
+        setSubmitting(false);
+      }
+      return;
+    }
+
+    const now = new Date().toISOString();
     const completeVitals: Vitals[] = Object.values(vitals).some((value) => value !== undefined)
       ? [{ ...vitals, recordedAt: now, recordedBy: 'intake' }]
       : [];
@@ -527,7 +574,7 @@ export default function QuickIntake({
             </h2>
             <div style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 12, marginTop: 4 }}>
               {variant === 'reception'
-                ? 'Fast registration for front desk — patient enters triage queue after submit.'
+                ? 'Fast registration for front desk � patient enters triage queue after submit.'
                 : `Unified input and escalation for ${centralControl.inputProfile.label}`}
             </div>
           </div>
@@ -683,7 +730,7 @@ export default function QuickIntake({
                 }}
               >
                 <div style={{ color: MEDICAL_TYPE.statusCritical, fontSize: 11, fontWeight: 700, marginBottom: 8 }}>
-                  High-risk complaint flags — staff alert only
+                  High-risk complaint flags � staff alert only
                 </div>
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                   {detectedComplaintFlags.map((flag) => (

@@ -1,4 +1,4 @@
-﻿import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import { dispatchAlert } from '../engine/alertEngine';
 import { useEmergencyStore } from '../store/emergencyStore';
 

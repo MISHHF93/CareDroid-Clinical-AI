@@ -1,4 +1,4 @@
-﻿import {
+import {
   FIRST_CUSTOMER_DEMO_MODE,
   buildFirstCustomerDemoApiEnvelope,
   buildFirstCustomerDemoMode,

@@ -1,4 +1,4 @@
-﻿import { PatientFlag, PatientState } from '../../types/emergency';
+import { PatientFlag, PatientState } from '../../types/emergency';
 import { EMERGENCY_ROLE_IDS } from '../../config/emergencyRolePermissions';
 import { PHYSICIAN_SCREEN_WIDGETS } from '../../config/physicianScreenModel';
 import { summarizeReferralAwareness } from './referralAwarenessModel';
@@ -146,7 +146,7 @@ export function shouldShowPhysicianOperationalStrip({
 }
 
 /**
- * Physician command strip — assigned patients, provider wait, results, referrals, boarders.
+ * Physician command strip � assigned patients, provider wait, results, referrals, boarders.
  */
 export function selectPhysicianOperationalStrip({
   patients = [] as any[],

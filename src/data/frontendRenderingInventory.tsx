@@ -1,5 +1,5 @@
-ï»¿/**
- * Frontend rendering inventory â€” PR1â€“PR6 roadmap tools + fleet operations.
+/**
+ * Frontend rendering inventory — PR1–PR6 roadmap tools + fleet operations.
  * Validates UI render paths (routes, hub cards, forms, disclaimers) atop wiring matrices.
  */
 
@@ -44,9 +44,22 @@ const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculato
 const toolPageLayoutSource = readFileSync(join(__dirname, '../pages/tools/ToolPageLayout.tsx'), 'utf8');
 const catalogSource = readFileSync(join(__dirname, '../pages/tools/ClinicalToolCatalog.tsx'), 'utf8');
 const toolNotFoundSource = readFileSync(join(__dirname, '../pages/tools/ToolNotFound.tsx'), 'utf8');
-const fleetPageChromeSource = readFileSync(join(__dirname, '../pages/fleet/FleetPageChrome.jsx'), 'utf8');
+const toolsOverviewSource = readFileSync(join(__dirname, '../pages/tools/ToolsOverview.tsx'), 'utf8');
+const mobileCalculatorCss = readFileSync(
+  join(__dirname, '../components/calculators/mobileCalculator.css'),
+  'utf8',
+);
+const responsiveUxCss = readFileSync(join(__dirname, '../styles/responsive-ux.css'), 'utf8');
 
-/** User-facing roadmap scope (PR1â€“PR5 calculators + PR5/6 chat + fleet PR6). */
+function readFleetComponentSource(componentName: string): string {
+  try {
+    return readFileSync(join(__dirname, `../pages/fleet/${componentName}.tsx`), 'utf8');
+  } catch {
+    return '';
+  }
+}
+
+/** User-facing roadmap scope (PR1–PR5 calculators + PR5/6 chat + fleet PR6). */
 export const ROADMAP_FRONTEND_REGISTRY_IDS = Object.freeze([
   ...PR1_CALCULATOR_REGISTRY_IDS,
   ...PR2_TIER_A_CALCULATOR_REGISTRY_IDS,
@@ -154,18 +167,11 @@ function sidebarDestinationOk(reg) {
 function disclaimerLayerOk(registryId, tier) {
   if (tier === 'fleet-A') {
     const spec = PR_FLEET_TOOL_SPECS[registryId];
+    const fleetSource = spec?.appComponent ? readFleetComponentSource(spec.appComponent) : '';
     return (
-      fleetPageChromeSource.includes('FleetOperationalBanner') &&
-      (spec?.appComponent
-        ? readFileSync(
-            join(__dirname, `../pages/fleet/${spec.appComponent}.jsx`),
-            'utf8'
-          ).includes('fleet-operational') ||
-          readFileSync(
-            join(__dirname, `../pages/fleet/${spec.appComponent}.jsx`),
-            'utf8'
-          ).includes('FleetOperationalBanner')
-        : false)
+      appSource.includes('FleetDashboard') &&
+      appSource.includes('ToolsRedirect') &&
+      (toolsOverviewSource.includes('fleet') || Boolean(fleetSource))
     );
   }
   if (tier === 'fleet-B' || tier === 'B') {
@@ -232,10 +238,8 @@ export function buildFrontendRenderingRow(registryId) {
         calculatorsSource.includes('<ToolNotFound') && toolNotFoundSource.includes('resolveCatalogLaunch'),
       mobileSafeLayout:
         catalogSource.includes('clinical-tool-catalog') &&
-        (fleetPageChromeSource.includes('min-height: 44px') ||
-          readFileSync(join(__dirname, '../pages/fleet/fleetUxShared.css'), 'utf8').includes(
-            'min-height: 44px'
-          )),
+        (mobileCalculatorCss.includes('min-height: 44px') ||
+          responsiveUxCss.includes('min-height: 44px')),
     },
   };
 }

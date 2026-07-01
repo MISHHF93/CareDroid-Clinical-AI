@@ -1,4 +1,4 @@
-﻿/** Existing referral surfaces in the product. */
+/** Existing referral surfaces in the product. */
 export const REFERRAL_WORKFLOW_ARTIFACTS = Object.freeze([
   Object.freeze({
     id: 'referral-panel',

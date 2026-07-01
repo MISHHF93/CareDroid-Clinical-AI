@@ -1,4 +1,4 @@
-ï»¿import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS, getCalculatorSubIcon } from '../../navigation/iconRegistry';
 import {
@@ -514,8 +514,8 @@ export function CanadianCSpineCalculator({ onResultChange }) {
           <legend>Low-risk criteria and active rotation</legend>
           {CCR_LOW_RISK_META.map((item) => <CheckboxField key={item.key} slug="canadian-c-spine" item={item} checked={lowRisk[item.key]} onChange={(key, value) => setLowRisk((prev) => ({ ...prev, [key]: value }))} />)}
           {[
-            ['activeRotationLeft45', 'Can actively rotate neck 45Â° left'],
-            ['activeRotationRight45', 'Can actively rotate neck 45Â° right'],
+            ['activeRotationLeft45', 'Can actively rotate neck 45° left'],
+            ['activeRotationRight45', 'Can actively rotate neck 45° right'],
           ].map(([key, label]) => <CheckboxField key={key} slug="canadian-c-spine" item={{ key, label }} checked={rotation[key]} onChange={(name, checked) => setRotation((prev) => ({ ...prev, [name]: checked }))} />)}
         </fieldset>
         <div className="calc-actions">

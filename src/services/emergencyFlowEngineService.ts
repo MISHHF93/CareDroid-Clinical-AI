@@ -1,4 +1,4 @@
-﻿import BoardingIntelligenceEngine from './boardingIntelligenceEngine';
+import BoardingIntelligenceEngine from './boardingIntelligenceEngine';
 import EmergencyCapacityIntelligenceService from './emergencyCapacityIntelligenceService';
 import EmergencyDemoEnvironmentService from './emergencyDemoEnvironmentService';
 import { getLiveQueueDashboard } from './queueAssignment';

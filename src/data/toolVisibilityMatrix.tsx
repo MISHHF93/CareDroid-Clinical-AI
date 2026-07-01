@@ -1,6 +1,6 @@
-Ôªø/**
+/**
  * Canonical visibility matrix for medical calculators and clinical tools.
- * Source-derived ‚Äî regenerate: npm run visibility-matrix:write-docs
+ * Source-derived ó regenerate: npm run visibility-matrix:write-docs
  */
 
 import { readFileSync } from 'node:fs';
@@ -251,8 +251,8 @@ function buildVisibilityRow(canonicalId, opts: any = {}) {
       canonicalId,
     category: inventoryRecord?.category ?? normalizeCategory(reg?.category ?? nlu?.category ?? 'tool'),
     tier: formatTierLabel(tier),
-    route: route || '‚Äî',
-    calculatorSlug: builtinSlug || '‚Äî',
+    route: route || 'ó',
+    calculatorSlug: builtinSlug || 'ó',
     registryEntryExists: dedicatedRegistryEntry,
     catalogEntryExists: catalogHasId(canonicalId) || (registryId && catalogHasId(registryId)),
     discoveryEntryExists:
@@ -262,10 +262,10 @@ function buildVisibilityRow(canonicalId, opts: any = {}) {
     backendPatternExists,
     backendExecutorExists,
     frontendComponentExists: Boolean(frontendComponent),
-    frontendComponent: frontendComponent || '‚Äî',
+    frontendComponent: frontendComponent || 'ó',
     rendersInUi: false,
     launchPathWorks: false,
-    currentStatus: '‚Äî',
+    currentStatus: 'ó',
     notes: opts.notes || '',
   };
 
@@ -312,8 +312,8 @@ function formatTierLabel(tier) {
  * @param {ReturnType<typeof buildVisibilityRow>} row
  */
 function deriveStatus(row, { tier, routeExists, catalogLaunchDiffers }) {
-  if (!routeExists && row.route !== '‚Äî' && isKnownToolAreaPath(row.route)) return 'archived route';
-  if (!routeExists && row.route !== '‚Äî') return 'route missing';
+  if (!routeExists && row.route !== 'ó' && isKnownToolAreaPath(row.route)) return 'archived route';
+  if (!routeExists && row.route !== 'ó') return 'route missing';
   if (!row.catalogEntryExists) return 'catalog missing';
   if (!row.frontendComponentExists) return 'component missing';
   if (!row.registryEntryExists && NLU_HUB_ONLY_PROFILE_TOOL_IDS.includes(row.canonicalId)) {
@@ -505,13 +505,13 @@ export function formatToolVisibilityMatrixMarkdown(doc = getToolVisibilityMatrix
     '',
     '## Recommended code fixes (priority order)',
     '',
-    '1. **NLU hub-only sidebar rows** ‚Äî Add `toolRegistry.ts` entries (or a collapsible ‚ÄúMore calculators‚Äù group) for `apache2-calculator`, `curb65-calculator`, `gcs-calculator`, `wells-dvt-calculator` mapped to hub + chat launch (`applyRegistryToolLaunch`).',
-    '2. **Secondary NLU profiles** ‚Äî Optional dedicated sidebar rows for ACLS/ATLS, ABG, dose calculator, antibiotic guide (currently catalog + parent page only).',
-    '3. **`dispatch-ai` catalog flag** ‚Äî use `backendRouted` for NLU/chat support and `postExecutable` for POST `/api/tools/:id/execute` badges.',
-    '4. **Duplicate shortcut labels** ‚Äî Deduplicate `shortcut` strings in `toolRegistry.ts` (PERC/PHQ-9, GRACE/GAD-7, etc.) even if global hotkeys are not wired yet.',
-    '5. **Account route discoverability** ‚Äî Link `Profile` ‚Üí `/profile-settings`, `Settings` ‚Üí `/notifications`; expose `/gdpr` and `/hipaa` from AppShell/header-help navigation if they need authenticated discovery.',
-    '6. **Cost analytics nav** ‚Äî Add sidebar or Analytics sub-link to `/costs` for `VIEW_ANALYTICS` users.',
-    '7. **Onboarding / biometric routes** ‚Äî Link from `ProfileSettings` or `Settings` to `/onboarding` and `/biometric-setup` when product-ready.',
+    '1. **NLU hub-only sidebar rows** ó Add `toolRegistry.ts` entries (or a collapsible ìMore calculatorsî group) for `apache2-calculator`, `curb65-calculator`, `gcs-calculator`, `wells-dvt-calculator` mapped to hub + chat launch (`applyRegistryToolLaunch`).',
+    '2. **Secondary NLU profiles** ó Optional dedicated sidebar rows for ACLS/ATLS, ABG, dose calculator, antibiotic guide (currently catalog + parent page only).',
+    '3. **`dispatch-ai` catalog flag** ó use `backendRouted` for NLU/chat support and `postExecutable` for POST `/api/tools/:id/execute` badges.',
+    '4. **Duplicate shortcut labels** ó Deduplicate `shortcut` strings in `toolRegistry.ts` (PERC/PHQ-9, GRACE/GAD-7, etc.) even if global hotkeys are not wired yet.',
+    '5. **Account route discoverability** ó Link `Profile` ? `/profile-settings`, `Settings` ? `/notifications`; expose `/gdpr` and `/hipaa` from AppShell/header-help navigation if they need authenticated discovery.',
+    '6. **Cost analytics nav** ó Add sidebar or Analytics sub-link to `/costs` for `VIEW_ANALYTICS` users.',
+    '7. **Onboarding / biometric routes** ó Link from `ProfileSettings` or `Settings` to `/onboarding` and `/biometric-setup` when product-ready.',
     '',
     '## Verification',
     '',

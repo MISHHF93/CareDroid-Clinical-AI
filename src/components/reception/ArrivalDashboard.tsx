@@ -1,4 +1,4 @@
-﻿import React, { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { selectReceptionQueues } from './receptionQueueModel';
 import ArrivalControlSummaryStrip from './ArrivalControlSummaryStrip';
 import EmsPreArrivalPanel from './EmsPreArrivalPanel';

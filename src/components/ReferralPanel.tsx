@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { CheckCircle2, Clock3, FilePlus2, Search, Send, XCircle } from 'lucide-react';
 import { PatientState } from '../types/emergency';
@@ -663,7 +663,7 @@ export default function ReferralPanel() {
                 >
                   <strong>{patientName(patient)}</strong>
                   <span>
-                    {patient.mrn} · {patient.chiefComplaint}
+                    {patient.mrn} � {patient.chiefComplaint}
                   </span>
                 </button>
               ))

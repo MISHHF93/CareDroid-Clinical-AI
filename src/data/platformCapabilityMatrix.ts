@@ -1,4 +1,4 @@
-﻿import { existsSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { BACKEND_HTTP_ROUTES, findBackendRoute } from './backendHttpRouteInventory';

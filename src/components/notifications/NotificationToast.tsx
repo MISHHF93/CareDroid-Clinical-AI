@@ -1,4 +1,4 @@
-﻿import { useEffect } from 'react';
+import { useEffect } from 'react';
 import { dispatchAlert } from '../../engine/alertEngine';
 import './NotificationToast.css';
 

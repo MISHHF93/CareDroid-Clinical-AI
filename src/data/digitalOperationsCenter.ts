@@ -1,4 +1,4 @@
-﻿import { CANONICAL_ROUTES } from '../config/routes.config';
+import { CANONICAL_ROUTES } from '../config/routes.config';
 
 export const OPERATIONS_CENTER_SURFACE_IDS = Object.freeze([
   'digital-twin',

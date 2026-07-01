@@ -1,4 +1,4 @@
-ï»¿/**
+/**
  * PHQ-9 and GAD-7 calculator forms (Tier A). Screening-only UX with accessibility affordances.
  */
 
@@ -166,7 +166,7 @@ export function Phq9Calculator({ onResultChange }) {
           </span>
           {isQ9 ? (
             <span className="calc-phq9-q9-badge">
-              <span className="calc-sr-only"> â€” </span>
+              <span className="calc-sr-only"> — </span>
               Safety item
             </span>
           ) : null}
@@ -184,7 +184,7 @@ export function Phq9Calculator({ onResultChange }) {
               .join(' ') || undefined
           }
         >
-          <option value="">Selectâ€¦</option>
+          <option value="">Select…</option>
           {PHQ9_LIKERT_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>
               {opt.label} ({opt.points})
@@ -316,7 +316,7 @@ export function Phq9Calculator({ onResultChange }) {
                 {result.totalScore}
               </div>
               <div className="calc-score-interpretation" aria-hidden="true">
-                of 27 â€” {result.severityLabel}
+                of 27 — {result.severityLabel}
                 {result.question9Elevated ? ' (safety review takes priority)' : ''}
               </div>
             </div>
@@ -465,7 +465,7 @@ export function Gad7Calculator({ onResultChange }) {
               .join(' ') || undefined
           }
         >
-          <option value="">Selectâ€¦</option>
+          <option value="">Select…</option>
           {GAD7_LIKERT_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>
               {opt.label} ({opt.points})
@@ -594,7 +594,7 @@ export function Gad7Calculator({ onResultChange }) {
                 {result.totalScore}
               </div>
               <div className="calc-score-interpretation" aria-hidden="true">
-                of 21 â€” {result.severityLabel}
+                of 21 — {result.severityLabel}
               </div>
             </div>
 

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Role- and screen-mode-aware practitioner layout tiers.
  * Global pilot cleanup stays the default; operational and admin personas restore
  * workflow-critical surfaces without re-enabling demo clutter.

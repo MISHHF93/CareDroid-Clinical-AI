@@ -1,4 +1,4 @@
-﻿import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { PatientFlag, PatientState, Priority } from '../types/emergency';
 
 vi.mock('./queueAssignment', () => ({

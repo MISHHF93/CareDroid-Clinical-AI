@@ -1,4 +1,4 @@
-﻿import appConfig from '../config/appConfig';
+import appConfig from '../config/appConfig';
 import { AUTH_CONFIG } from '../config/auth.config';
 import { API_ROUTES } from '../config/api.config';
 import { setTenantContext } from './tenantContextStore';
@@ -85,7 +85,7 @@ export async function ensureDevBackendSession({ force = false }: any = {}) {
   }
 
   // When local demo auth is allowed and no backend API URL is configured,
-  // skip the network request — it will fail with ECONNREFUSED since there's no backend.
+  // skip the network request � it will fail with ECONNREFUSED since there's no backend.
   const localDemoAllowed = appConfig.features.allowLocalDemoAuth;
   const hasBackendUrl = Boolean(appConfig.api.baseUrl);
   if (localDemoAllowed && !hasBackendUrl && !force) {

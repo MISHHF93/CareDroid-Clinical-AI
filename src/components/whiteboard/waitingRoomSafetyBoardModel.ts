@@ -1,4 +1,4 @@
-ï»¿import {
+import {
   PatientFlag,
   PatientState,
   Priority,
@@ -171,7 +171,7 @@ function minutesSince(timestamp?: string | null, now = new Date()): number {
   return Math.max(0, Math.round((now.getTime() - parsed) / 60000));
 }
 
-export function formatDurationLabel(minutes: number, { unknownLabel = 'â€”' }: any = {}): string {
+export function formatDurationLabel(minutes: number, { unknownLabel = '—' }: any = {}): string {
   if (!Number.isFinite(minutes)) return unknownLabel;
   if (minutes === Number.POSITIVE_INFINITY) return unknownLabel;
   if (minutes < 1) return '<1m';
@@ -182,9 +182,9 @@ export function formatDurationLabel(minutes: number, { unknownLabel = 'â€”' }: a
 }
 
 function formatClockTime(isoTime?: string | null): string {
-  if (!isoTime) return 'â€”';
+  if (!isoTime) return '—';
   const date = new Date(isoTime);
-  if (!Number.isFinite(date.getTime())) return 'â€”';
+  if (!Number.isFinite(date.getTime())) return '—';
   return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 }
 
@@ -209,7 +209,7 @@ function hasFlag(patient: Patient, flag: PatientFlag): boolean {
 
 export function deriveTriageLevelLabel(patient: Patient): string | null {
   if (!patient.triageTime || !patient.priority) return null;
-  return `${patient.priority} Â· ${PriorityLabel[patient.priority]}`;
+  return `${patient.priority} · ${PriorityLabel[patient.priority]}`;
 }
 
 export function deriveHighRiskComplaintFlags(patient: Patient): string[] {
@@ -248,13 +248,13 @@ export function deriveProviderWaitingStatus(
 
   if (!patient.lastAssessedTime) {
     return {
-      label: assigneeName ? `Assigned Â· ${assigneeName}` : 'Assigned Â· not seen',
+      label: assigneeName ? `Assigned · ${assigneeName}` : 'Assigned · not seen',
       tone: 'warning',
     };
   }
 
   return {
-    label: assigneeName ? `Return Â· ${assigneeName}` : 'Return Â· awaiting provider',
+    label: assigneeName ? `Return · ${assigneeName}` : 'Return · awaiting provider',
     tone: 'info',
   };
 }

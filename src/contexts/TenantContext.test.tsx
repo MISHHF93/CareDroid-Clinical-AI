@@ -1,4 +1,4 @@
-﻿import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { TenantContextProvider, TenantRequired, useTenantContext } from './TenantContext';
 import { clearTenantContext, getTenantContext } from '../services/tenantContextStore';

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Pediatrics and OB-GYN calculator helpers.
  *
  * Deterministic decision support only. These helpers do not diagnose pediatric

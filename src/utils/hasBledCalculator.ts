@@ -1,12 +1,12 @@
-ï»¿/**
- * HAS-BLED â€” bleeding risk factors in patients considered for anticoagulation (e.g. atrial fibrillation).
+/**
+ * HAS-BLED — bleeding risk factors in patients considered for anticoagulation (e.g. atrial fibrillation).
  * One point each (maximum 9): Hypertension, Abnormal renal, Abnormal liver, Stroke, Bleeding, Labile INR,
  * Elderly (>65), Drugs, Alcohol.
  *
- * Interpretation: score â‰¥3 suggests higher bleeding risk warranting closer review (not alone for treatment decisions).
+ * Interpretation: score =3 suggests higher bleeding risk warranting closer review (not alone for treatment decisions).
  *
- * Reference: Pisters R, Lane DA, Nieuwlaat R, de Vos CB, Crijns HJ, Lip GY. Europace. 2010;12(7):923â€“928;
- * Lip GYH et al. Eur Heart J. 2010;31(8):1004â€“1019 (HAS-BLED acronym and components).
+ * Reference: Pisters R, Lane DA, Nieuwlaat R, de Vos CB, Crijns HJ, Lip GY. Europace. 2010;12(7):923–928;
+ * Lip GYH et al. Eur Heart J. 2010;31(8):1004–1019 (HAS-BLED acronym and components).
  */
 
 /** @typedef {{ hypertension: boolean, renalDysfunction: boolean, liverDysfunction: boolean, strokeHistory: boolean, bleedingHistory: boolean, labileInr: boolean, ageOver65: boolean, bleedingPredisposingDrugs: boolean, alcoholUse: boolean }} HasBledInputs */
@@ -57,7 +57,7 @@ export function calculateHasBledScore(raw) {
 }
 
 /**
- * @param {number} total 0â€“9
+ * @param {number} total 0–9
  */
 export function interpretHasBled(total) {
   if (!Number.isFinite(total) || total < 0 || total > 9) {
@@ -65,16 +65,16 @@ export function interpretHasBled(total) {
   }
 
   const referenceLine =
-    'Pisters R, Lane DA, Nieuwlaat R, de Vos CB, Crijns HJ, Lip GY. Europace. 2010;12(7):923â€“928; Lip GYH et al. Eur Heart J. 2010;31(8):1004â€“1019.';
+    'Pisters R, Lane DA, Nieuwlaat R, de Vos CB, Crijns HJ, Lip GY. Europace. 2010;12(7):923–928; Lip GYH et al. Eur Heart J. 2010;31(8):1004–1019.';
 
   if (total >= 3) {
     return {
       severity: 'critical',
       label: 'Elevated bleeding-risk signal',
       interpretation:
-        'A HAS-BLED score of 3 or more is associated with higher bleeding risk and should prompt closer clinical review and riskâ€“benefit discussion when anticoagulation is being considered. It does not by itself mandate a specific treatment choice.',
+        'A HAS-BLED score of 3 or more is associated with higher bleeding risk and should prompt closer clinical review and risk–benefit discussion when anticoagulation is being considered. It does not by itself mandate a specific treatment choice.',
       bleedingRiskNote:
-        'Use alongside validated stroke-risk tools (e.g. CHAâ‚‚DSâ‚‚-VASc) and patient preferences; follow local anticoagulation safety pathways.',
+        'Use alongside validated stroke-risk tools (e.g. CHA2DS2-VASc) and patient preferences; follow local anticoagulation safety pathways.',
       referenceLine,
     };
   }
@@ -93,47 +93,47 @@ export function interpretHasBled(total) {
 export const HAS_BLED_CRITERIA_META = [
   {
     key: 'hypertension',
-    shortLabel: 'H â€” Hypertension',
+    shortLabel: 'H — Hypertension',
     help: 'Uncontrolled hypertension: systolic blood pressure repeatedly >160 mmHg (or poorly controlled).',
   },
   {
     key: 'renalDysfunction',
-    shortLabel: 'A â€” Abnormal renal function',
-    help: 'Chronic dialysis, renal transplant, or serum creatinine â‰¥200 Î¼mol/L (â‰ˆ2.3 mg/dL) / severe renal impairment as defined locally.',
+    shortLabel: 'A — Abnormal renal function',
+    help: 'Chronic dialysis, renal transplant, or serum creatinine =200 µmol/L (˜2.3 mg/dL) / severe renal impairment as defined locally.',
   },
   {
     key: 'liverDysfunction',
-    shortLabel: 'A â€” Abnormal liver function',
-    help: 'Cirrhosis or significant chronic hepatic disease (e.g. bilirubin >2Ã— ULN with relevant enzyme elevations) per original criteria.',
+    shortLabel: 'A — Abnormal liver function',
+    help: 'Cirrhosis or significant chronic hepatic disease (e.g. bilirubin >2× ULN with relevant enzyme elevations) per original criteria.',
   },
   {
     key: 'strokeHistory',
-    shortLabel: 'S â€” Stroke history',
+    shortLabel: 'S — Stroke history',
     help: 'Prior stroke or transient ischaemic attack.',
   },
   {
     key: 'bleedingHistory',
-    shortLabel: 'B â€” Bleeding tendency / history',
+    shortLabel: 'B — Bleeding tendency / history',
     help: 'Prior major bleeding, predisposition to bleeding, or relevant haematological abnormality.',
   },
   {
     key: 'labileInr',
-    shortLabel: 'L â€” Labile INR',
+    shortLabel: 'L — Labile INR',
     help: 'Unstable / supratherapeutic INRs if the patient is on a vitamin K antagonist (or poor time in range where used).',
   },
   {
     key: 'ageOver65',
-    shortLabel: 'E â€” Elderly (age >65)',
+    shortLabel: 'E — Elderly (age >65)',
     help: 'Patient age greater than 65 years.',
   },
   {
     key: 'bleedingPredisposingDrugs',
-    shortLabel: 'D â€” Drugs predisposing to bleeding',
+    shortLabel: 'D — Drugs predisposing to bleeding',
     help: 'Concomitant antiplatelet agents, NSAIDs, or other medications that increase bleeding risk (as applicable).',
   },
   {
     key: 'alcoholUse',
-    shortLabel: 'D â€” Alcohol use',
-    help: 'Excessive alcohol use (e.g. â‰¥8 drinks/week in the original operational definition â€” confirm with local guidance).',
+    shortLabel: 'D — Alcohol use',
+    help: 'Excessive alcohol use (e.g. =8 drinks/week in the original operational definition — confirm with local guidance).',
   },
 ];

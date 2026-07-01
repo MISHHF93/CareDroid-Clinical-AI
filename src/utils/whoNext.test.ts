@@ -1,4 +1,4 @@
-﻿import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { PatientState, Priority } from '../types/emergency';
 import {
   createSnooze,
@@ -81,7 +81,7 @@ describe('whoNext scoring', () => {
     expect(recommendation.patient.id).toBe('winner');
     expect(recommendation.room).toBe('Bed 7');
     expect(formatWhoNextForCopilot(recommendation)).toBe(
-      'Suggested next: Sarah Miller (Bed 7) — P2 priority + reassessment due'
+      'Suggested next: Sarah Miller (Bed 7) � P2 priority + reassessment due'
     );
   });
 

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Nephrology Clinical Tools Pack calculator helpers.
  *
  * Deterministic calculation and documentation support only. These helpers do

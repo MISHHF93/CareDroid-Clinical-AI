@@ -1,4 +1,4 @@
-﻿import { buildApiUrl, buildStreamUrl, getStoredAccessToken } from './apiClient';
+import { buildApiUrl, buildStreamUrl, getStoredAccessToken } from './apiClient';
 import { probeBackendReachability } from './backendReachability';
 
 const DEFAULT_POLL_INTERVAL_MS = 30_000;
@@ -206,7 +206,7 @@ export function startEmergencyRealtime({ onEvent, onStatus, onPoll }: any = {}) 
       onStatus?.({
         status: 'reconnecting',
         mode: 'polling',
-        message: 'API offline — using local CareDroid state until backend is available.',
+        message: 'API offline � using local CareDroid state until backend is available.',
         updatedAt: new Date().toISOString(),
       });
       scheduleReconnect();

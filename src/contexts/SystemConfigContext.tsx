@@ -1,4 +1,4 @@
-﻿/**
+/**
  * System Configuration Context
  * Provides system-level configuration to frontend components
  * Manages RAG status, session timeouts, AI usage, subscription, tools

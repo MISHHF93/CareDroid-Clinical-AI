@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS } from '../../navigation/iconRegistry';
 import { DashboardGrid, MetricCard, PageShell } from '../../components/ui/CareDroidPrimitives';
@@ -7,7 +7,7 @@ import {
   createTrainingRun,
   fetchTrainingDashboard,
 } from '../../services/trainingApi';
-import './TrainingDashboard.css';
+import '../TrainingDashboard.css';
 
 const CAPABILITY_LABELS = {
   prompt_engineering: 'Prompt engineering',

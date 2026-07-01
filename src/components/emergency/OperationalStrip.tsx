@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import {
   resolveOperationalPresentation,
@@ -84,7 +84,7 @@ export default function OperationalStrip({
             data-tone={tone}
             onClick={() => interactive && (onMetricSelect as any)?.(metric)}
             disabled={readOnly || !interactive}
-            title={[metric.label, metric.hint].filter(Boolean).join(' · ')}
+            title={[metric.label, metric.hint].filter(Boolean).join(' � ')}
           >
             <strong>{metric.value}</strong>
             <span>{metric.label}</span>

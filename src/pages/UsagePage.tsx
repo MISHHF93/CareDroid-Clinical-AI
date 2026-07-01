@@ -1,4 +1,4 @@
-ï»¿import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Card from '../components/ui/card';
 import { useTenantContext } from '../contexts/TenantContext';
 import PageShellBase from './commercial/CommercialPageShell';
@@ -91,7 +91,7 @@ export default function UsagePage() {
                   <h2>{meter.label}</h2>
                   <strong>{formatNumber(meter.value)}</strong>
                   <p className="commercial-subtitle">
-                    {meter.unit} Â· {meter.events} events Â· billing separated
+                    {meter.unit} · {meter.events} events · billing separated
                   </p>
                 </Card>
               ))}

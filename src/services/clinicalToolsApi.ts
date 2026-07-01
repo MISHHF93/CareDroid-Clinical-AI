@@ -1,4 +1,4 @@
-﻿import { apiFetch, getApiErrorMessage, parseApiResponse } from './apiClient';
+import { apiFetch, getApiErrorMessage, parseApiResponse } from './apiClient';
 import { AUTH_CONFIG } from '../config/auth.config';
 import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
 

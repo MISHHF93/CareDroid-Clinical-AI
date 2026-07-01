@@ -1,4 +1,4 @@
-﻿import {
+import {
   buildRoleTelemetryContext,
   buildSafeSearchBehaviorPayload,
   ROLE_INTELLIGENCE_SIGNALS,

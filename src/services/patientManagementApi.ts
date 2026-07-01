@@ -1,4 +1,4 @@
-﻿import { apiFetchJson, getApiErrorMessage } from './apiClient';
+import { apiFetchJson, getApiErrorMessage } from './apiClient';
 
 export const PATIENT_MANAGEMENT_ENDPOINTS = Object.freeze({
   workspace: (patientId) => `/api/patients/${encodeURIComponent(patientId)}/workspace`,

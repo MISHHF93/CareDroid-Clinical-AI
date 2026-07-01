@@ -1,4 +1,4 @@
-﻿export const PATIENT_JOURNEY_STATES = Object.freeze([
+export const PATIENT_JOURNEY_STATES = Object.freeze([
   Object.freeze({
     id: 'arrival',
     label: 'Arrival',

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Parse backend tool.patterns.ts for drift tests and alias sync.
  * Source of truth for NLU keyword lists: backend CLINICAL_TOOL_PATTERNS.
  */

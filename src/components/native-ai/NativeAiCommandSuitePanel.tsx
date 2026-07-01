@@ -1,4 +1,4 @@
-ï»¿import { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { Patient } from '../../types/emergency';
 import { useNativeAiDashboardData } from '../../hooks/useNativeAiDashboardData';
 import {
@@ -76,16 +76,16 @@ export default function NativeAiCommandSuitePanel({
     <section className={['native-ai-command-suite', className].filter(Boolean).join(' ')} aria-label="Native AI command suite">
       <header className="native-ai-command-suite__header">
         <div>
-          <p className="native-ai-command-suite__eyebrow">Native AI Â· Command suite</p>
+          <p className="native-ai-command-suite__eyebrow">Native AI · Command suite</p>
           <h2>Clinical Acuity &amp; ML Operations</h2>
         </div>
         <div className="native-ai-command-suite__status" aria-label="Native AI backend status">
-          <span data-state={dashboardData.acuitySource}>Acuity Â· {dashboardData.acuitySource}</span>
+          <span data-state={dashboardData.acuitySource}>Acuity · {dashboardData.acuitySource}</span>
           <span data-state={dashboardData.registrySource}>
-            Registry Â· {dashboardData.registryModelCount} models
+            Registry · {dashboardData.registryModelCount} models
           </span>
           <span data-state={dashboardData.driftSource}>
-            Drift Â· {dashboardData.driftAlertCount} alerts
+            Drift · {dashboardData.driftAlertCount} alerts
           </span>
           {dashboardData.connectionError ? (
             <span data-state="error">{dashboardData.connectionError}</span>

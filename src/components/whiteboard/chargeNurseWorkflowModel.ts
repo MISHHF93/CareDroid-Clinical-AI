@@ -1,4 +1,4 @@
-ï»¿import { PatientFlag, PatientState } from '../../types/emergency';
+import { PatientFlag, PatientState } from '../../types/emergency';
 import { CARE_DROID_SCREEN_MODES } from '../../central-node/careDroidCentralNode';
 import { EMERGENCY_ROLE_IDS } from '../../config/emergencyRolePermissions';
 import { CHARGE_NURSE_SCREEN_WIDGETS } from '../../config/chargeNurseScreenModel';
@@ -62,7 +62,7 @@ export function shouldShowChargeNurseOperationalStrip({ screenMode = (undefined 
 }
 
 /**
- * Charge nurse command strip metrics â€” queue health, reassessment, provider wait,
+ * Charge nurse command strip metrics — queue health, reassessment, provider wait,
  * EMS inbound, offload, boarders, referrals, and capacity.
  * Values prefer central-node snapshot; falls back to live patient board counts.
  */
@@ -102,7 +102,7 @@ export function selectChargeNurseOperationalStrip({
     emsAwareness.awaitingHandoff ??
     0;
   const capacityScore = centralSnapshot?.capacityStatus?.score ?? null;
-  const capacityBand = centralSnapshot?.capacityStatus?.band ?? 'â€”';
+  const capacityBand = centralSnapshot?.capacityStatus?.band ?? '—';
   const boarders = centralSnapshot?.boardingStatus?.boarders ?? countBoardingPatients(patients);
   const boardingRisk = centralSnapshot?.boardingStatus?.risk ?? 'normal';
   const referralSummary = summarizeReferralAwareness(referrals);

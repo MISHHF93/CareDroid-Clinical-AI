@@ -1,4 +1,4 @@
-﻿import React, { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import {
   WHAT_HAPPENS_NEXT_STEPS,
   resolveWhatHappensNext,

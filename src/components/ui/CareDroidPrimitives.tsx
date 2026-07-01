@@ -1,4 +1,4 @@
-﻿import React, { HTMLAttributes, LabelHTMLAttributes, TableHTMLAttributes } from 'react';
+import React, { HTMLAttributes, LabelHTMLAttributes, TableHTMLAttributes } from 'react';
 import Badge from './Badge';
 import Card from './card';
 import PageHeader from './PageHeader';

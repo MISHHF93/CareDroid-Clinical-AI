@@ -1,5 +1,5 @@
-ï»¿/**
- * Integration discovery registry â€” no backend imports (Node-safe for audit scripts).
+/**
+ * Integration discovery registry — no backend imports (Node-safe for audit scripts).
  */
 export const INTEGRATION_STATUS = Object.freeze({
   IMPLEMENTED: 'implemented',
@@ -23,13 +23,13 @@ export const INTEGRATION_STATUS_LABELS = Object.freeze({
 
 export const INTEGRATION_STATUS_GUIDANCE = Object.freeze({
   implemented: 'Live connector or production behavior is active.',
-  partial: 'Contracts, UI, or local behavior exist â€” production feed or routing incomplete.',
-  placeholder: 'Demo, catalog, or stub only â€” not production-connected.',
+  partial: 'Contracts, UI, or local behavior exist — production feed or routing incomplete.',
+  placeholder: 'Demo, catalog, or stub only — not production-connected.',
 });
 
 /** @type {readonly import('./integrationStatusModel').IntegrationPoint[]} */
 export const INTEGRATION_POINT_REGISTRY = Object.freeze([
-  // â€”â€” FHIR â€”â€”
+  // —— FHIR ——
   {
     id: 'fhir-r4-connector',
     category: INTEGRATION_CATEGORY.FHIR,
@@ -77,7 +77,7 @@ export const INTEGRATION_POINT_REGISTRY = Object.freeze([
     summary: 'Smart Intake normalizes snapshots when backend path is enabled.',
   },
 
-  // â€”â€” HL7 â€”â€”
+  // —— HL7 ——
   {
     id: 'hl7-adt-interface',
     category: INTEGRATION_CATEGORY.HL7,
@@ -104,7 +104,7 @@ export const INTEGRATION_POINT_REGISTRY = Object.freeze([
     label: 'HL7 MLLP listener',
     status: INTEGRATION_STATUS.PLACEHOLDER,
     surfaces: [],
-    summary: 'Not implemented â€” no ACK/NACK or interface engine adapter.',
+    summary: 'Not implemented — no ACK/NACK or interface engine adapter.',
   },
   {
     id: 'hl7-hub-persistence',
@@ -117,7 +117,7 @@ export const INTEGRATION_POINT_REGISTRY = Object.freeze([
     summary: 'Durable ingest/trace for HL7-shaped events when posted to hub API.',
   },
 
-  // â€”â€” Provincial â€”â€”
+  // —— Provincial ——
   {
     id: 'provincial-ohip-connector',
     category: INTEGRATION_CATEGORY.PROVINCIAL,
@@ -146,7 +146,7 @@ export const INTEGRATION_POINT_REGISTRY = Object.freeze([
     summary: 'Timeline category with demo vs unavailable labels for staff review.',
   },
 
-  // â€”â€” Notification â€”â€”
+  // —— Notification ——
   {
     id: 'ed-operational-alerts',
     category: INTEGRATION_CATEGORY.NOTIFICATION,
@@ -182,7 +182,7 @@ export const INTEGRATION_POINT_REGISTRY = Object.freeze([
     status: INTEGRATION_STATUS.PLACEHOLDER,
     capability: 'notificationStream',
     surfaces: [],
-    summary: 'Capability disabled â€” do not call /api/notifications/stream.',
+    summary: 'Capability disabled — do not call /api/notifications/stream.',
   },
   {
     id: 'email-delivery',
@@ -191,7 +191,7 @@ export const INTEGRATION_POINT_REGISTRY = Object.freeze([
     status: INTEGRATION_STATUS.PLACEHOLDER,
     capability: 'notificationSendChannel',
     surfaces: ['NotificationPreferences', 'EmergencySettings'],
-    summary: 'Preference fields exist; no ED alert â†’ email routing.',
+    summary: 'Preference fields exist; no ED alert ? email routing.',
   },
   {
     id: 'sms-delivery',
@@ -211,14 +211,14 @@ export const INTEGRATION_POINT_REGISTRY = Object.freeze([
     summary: 'Ops config only; not connected to ED alert engine.',
   },
 
-  // â€”â€” Identity â€”â€”
+  // —— Identity ——
   {
     id: 'identity-verification-ui',
     category: INTEGRATION_CATEGORY.IDENTITY,
     label: 'Identity verification workflow',
     status: INTEGRATION_STATUS.IMPLEMENTED,
     surfaces: ['SmartIntake', 'PatientVerificationExperience', 'ReceptionWorkspace'],
-    summary: 'Five-step OCR â†’ duplicate â†’ field review â†’ finalize UI.',
+    summary: 'Five-step OCR ? duplicate ? field review ? finalize UI.',
   },
   {
     id: 'client-duplicate-detection',
@@ -244,7 +244,7 @@ export const INTEGRATION_POINT_REGISTRY = Object.freeze([
     capability: 'emergencySmartIntakeIdentitySession',
     surfaces: ['SmartIntake'],
     backend: 'mpi.service.ts',
-    summary: 'Capability disabled â€” frontend falls back to local duplicate rules.',
+    summary: 'Capability disabled — frontend falls back to local duplicate rules.',
   },
   {
     id: 'backend-ocr-provider',

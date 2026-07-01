@@ -1,4 +1,4 @@
-﻿import { REGISTRY } from './clinicalToolIdContract';
+import { REGISTRY } from './clinicalToolIdContract';
 
 export const COMPLAINT_FIRST_NAVIGATION_STEPS = Object.freeze([
   'Complaint',

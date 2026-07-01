@@ -1,4 +1,4 @@
-﻿import {
+import {
   AUTOMATION_AUDIT_STATUSES,
   logAutomationAuditEvent,
 } from '../data/automationAuditTrail';

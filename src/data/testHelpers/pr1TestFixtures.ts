@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Deterministic fixtures for PR1 Tier-A calculators (qSOFA, NEWS2, Child-Pugh, HAS-BLED).
  */
 
@@ -6,7 +6,7 @@ import { PR1_CALCULATOR_REGISTRY_IDS } from '../clinicalToolIdContract';
 
 export const PR1_TOOL_IDS = Object.freeze([...PR1_CALCULATOR_REGISTRY_IDS]);
 
-/** All 2³ qSOFA criterion combinations → expected score 0–3 */
+/** All 2� qSOFA criterion combinations ? expected score 0�3 */
 export const QSOFA_SCORE_PERMUTATIONS = Object.freeze(
   (() => {
     const rows = [] as any[];
@@ -38,7 +38,7 @@ export const QSOFA_INTERPRETATION_BY_SCORE = Object.freeze([
   { score: 3, severity: 'critical', positiveThreshold: true },
 ]);
 
-/** HAS-BLED interpretHasBled severity — threshold at ≥3 */
+/** HAS-BLED interpretHasBled severity � threshold at =3 */
 export const HAS_BLED_SEVERITY_BY_SCORE = Object.freeze(
   Array.from({ length: 10 }, (_, score) => ({
     score,
@@ -47,7 +47,7 @@ export const HAS_BLED_SEVERITY_BY_SCORE = Object.freeze(
   }))
 );
 
-/** Child-Pugh class and severity for each valid total 5–15 */
+/** Child-Pugh class and severity for each valid total 5�15 */
 export const CHILD_PUGH_CLASS_BY_TOTAL = Object.freeze(
   Array.from({ length: 11 }, (_, i) => {
     const total = i + 5;
@@ -71,7 +71,7 @@ export const CHILD_PUGH_CLASS_BOUNDARIES = Object.freeze([
   { total: 15, childPughClass: 'C' },
 ]);
 
-/** Vitals held constant; only SpO₂ scale differs — expect different spo2 sub-scores */
+/** Vitals held constant; only SpO2 scale differs � expect different spo2 sub-scores */
 export const NEWS2_SCALE_SWITCH_FIXTURE = Object.freeze({
   respiratoryRate: 16,
   spo2: 96,
@@ -82,7 +82,7 @@ export const NEWS2_SCALE_SWITCH_FIXTURE = Object.freeze({
   temperature: 36.8,
 });
 
-/** Scale 2 room-air vs oxygen at high SpO₂ (hypercapnic pathway edge) */
+/** Scale 2 room-air vs oxygen at high SpO2 (hypercapnic pathway edge) */
 export const NEWS2_SCALE2_SPO2_EDGE = Object.freeze({
   spo2: 93,
   respiratoryRate: 16,

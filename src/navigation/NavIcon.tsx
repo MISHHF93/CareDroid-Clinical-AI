@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 
 /**
  * Renders a Lucide icon with theme-aware sizing (default: CSS var --nav-icon-size).

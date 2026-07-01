@@ -1,0 +1,11 @@
+---
+pid: 24096
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cd \"C:\\Users\\borah\\CareDroid-Clinical-AI\"; npm run typecheck:frontend 2>&1 | Select-Object -Last 15"
+started_at: 2026-06-30T19:51:08.087Z
+running_for_ms: 825008   
+---
+
+> caredroid-clinical-ai@1.0.0 typecheck:frontend
+> tsc --noEmit -p tsconfig.frontend.json
+

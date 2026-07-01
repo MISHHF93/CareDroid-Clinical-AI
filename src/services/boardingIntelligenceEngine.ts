@@ -1,4 +1,4 @@
-﻿export const BED_PRESSURE_LEVELS = Object.freeze({
+export const BED_PRESSURE_LEVELS = Object.freeze({
   LOW: 'Low',
   MODERATE: 'Moderate',
   HIGH: 'High',

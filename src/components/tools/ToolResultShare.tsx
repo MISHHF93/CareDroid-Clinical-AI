@@ -1,4 +1,4 @@
-ï»¿import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { getExportService } from '../../services/export/ExportService';
 import { buildSharedSessionUrl, createSharedSession } from '../../utils/sharedSessions';
 import {
@@ -152,7 +152,7 @@ const ToolResultShare = ({ toolName, toolId, results, onClose }) => {
         endpoint: fallback.endpoint,
       });
       setFeedback({
-        text: `${UNSUPPORTED_CAPABILITY_MESSAGE} Use â€œShare Linkâ€ or â€œExportâ€ instead.`,
+        text: `${UNSUPPORTED_CAPABILITY_MESSAGE} Use “Share Link” or “Export” instead.`,
         variant: 'error',
       });
       return;
@@ -295,7 +295,7 @@ const ToolResultShare = ({ toolName, toolId, results, onClose }) => {
                     <span className="share-inline-icon share-inline-icon--spin" aria-hidden>
                       <NavIcon icon={CHROME_ICONS.loader} size={20} />
                     </span>
-                    Exportingâ€¦
+                    Exporting…
                   </>
                 ) : (
                   <>
@@ -343,7 +343,7 @@ const ToolResultShare = ({ toolName, toolId, results, onClose }) => {
                     <span className="share-inline-icon share-inline-icon--spin" aria-hidden>
                       <NavIcon icon={CHROME_ICONS.loader} size={20} />
                     </span>
-                    Sendingâ€¦
+                    Sending…
                   </>
                 ) : (
                   <>

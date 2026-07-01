@@ -1,4 +1,4 @@
-ï»¿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { toast } from 'sonner';
 import {
   RECEPTION_ESCALATION_REASONS,
@@ -45,7 +45,7 @@ export default function ReceptionEscalationQuickActions({
       }
 
       toast.success(RECEPTION_COPY.escalation.submitSuccess, {
-        description: `${record.reasonLabel} Â· nurses notified`,
+        description: `${record.reasonLabel} · nurses notified`,
       });
     } finally {
       setPendingReasonId(null);
@@ -59,7 +59,7 @@ export default function ReceptionEscalationQuickActions({
     >
       <header className="reception-escalation-quick-actions__header">
         <p className="reception-escalation-quick-actions__eyebrow">{RECEPTION_COPY.escalation.eyebrow}</p>
-        <h3>Quick flag â€” stay at desk</h3>
+        <h3>Quick flag — stay at desk</h3>
         <p>One-tap signals to triage or charge nurse without leaving reception.</p>
       </header>
       <div className="reception-escalation-quick-actions__grid">
@@ -80,7 +80,7 @@ export default function ReceptionEscalationQuickActions({
             title={reason.description}
           >
             <strong>{reason.shortLabel}</strong>
-            <small>{reason.notifyTargets.map((t) => (t === 'triage' ? 'Triage' : 'Charge')).join(' Â· ')}</small>
+            <small>{reason.notifyTargets.map((t) => (t === 'triage' ? 'Triage' : 'Charge')).join(' · ')}</small>
           </button>
         ))}
       </div>

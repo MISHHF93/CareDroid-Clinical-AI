@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { resolvePatientExperienceStatus } from '../../services/patientExperienceStatus';
 import { resolvePatientWaitingRoomMessage } from '../../services/waitingRoomStatusMessaging';
 import './PatientExperienceStatusBadge.css';
@@ -37,7 +37,7 @@ export default function PatientExperienceStatusBadge({
         showStaffDetail ? `Internal state: ${snapshot.internalState}` : 'Patient-safe waiting room status',
       ]
         .filter(Boolean)
-        .join(' · ')}
+        .join(' � ')}
     >
       {displayLabel}
     </span>

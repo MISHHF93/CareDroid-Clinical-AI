@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Platform entitlement projection for tool/asset visibility.
  */
 

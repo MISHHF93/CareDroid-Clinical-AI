@@ -1,4 +1,4 @@
-﻿import React, { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import {
   buildWaitingRoomSafetyEscalationSnapshot,
   hasWaitingRoomSafetyEscalationActivity,
@@ -47,7 +47,7 @@ export default function WaitingRoomSafetyEscalationStrip({
           <p className="waiting-room-safety-escalation-strip__eyebrow">Waiting room safety</p>
           <h3>Safety escalation</h3>
           <p className="waiting-room-safety-escalation-strip__subtitle">
-            Waiting patients needing staff re-review — overdue reassessment, abnormal vitals,
+            Waiting patients needing staff re-review � overdue reassessment, abnormal vitals,
             high-risk complaint, long since contact, or worsening symptoms reported.
           </p>
         </div>

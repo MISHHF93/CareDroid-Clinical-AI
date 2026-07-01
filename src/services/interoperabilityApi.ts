@@ -1,4 +1,4 @@
-﻿import { apiFetch, getApiErrorMessage, parseApiResponse } from './apiClient';
+import { apiFetch, getApiErrorMessage, parseApiResponse } from './apiClient';
 
 export const INTEROPERABILITY_API_ENDPOINTS = Object.freeze({
   summary: '/api/interoperability/summary',

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Clinical reference content from Nest clinical module (drugs, protocols).
  */
 

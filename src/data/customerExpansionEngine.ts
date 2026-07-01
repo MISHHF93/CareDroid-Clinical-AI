@@ -1,4 +1,4 @@
-﻿export const EXPANSION_OPPORTUNITY_BANDS = Object.freeze([
+export const EXPANSION_OPPORTUNITY_BANDS = Object.freeze([
   { id: 'high-confidence', label: 'High-confidence expansion', minScore: 85 },
   { id: 'qualified', label: 'Qualified expansion', minScore: 70 },
   { id: 'nurture', label: 'Nurture', minScore: 50 },

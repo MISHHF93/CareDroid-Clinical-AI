@@ -1,4 +1,4 @@
-ï»¿import { PatientFlag, PatientState, Priority } from '../types/emergency';
+import { PatientFlag, PatientState, Priority } from '../types/emergency';
 
 export const CTAS_TARGETS = {
   [Priority.P1]: 0,
@@ -169,14 +169,14 @@ export function formatLongWaitAttentionForCopilot(patients = [] as any[], now = 
   if (!longest) return '';
 
   const { patient, status } = longest;
-  return `ATTENTION: Longest waiting patient â€” ${patientName(patient)}, ${status.waitMinutes}min, ${patient.priority}, ${patient.chiefComplaint || patient.complaintCategory || 'Complaint pending'}`;
+  return `ATTENTION: Longest waiting patient — ${patientName(patient)}, ${status.waitMinutes}min, ${patient.priority}, ${patient.chiefComplaint || patient.complaintCategory || 'Complaint pending'}`;
 }
 
 export function formatLongestWaitBroadcast(patients = [] as any[], now = new Date(), settingsOrTargets: any = {}) {
   const longest = getLongestWaitingPatient(patients, now, settingsOrTargets);
   if (!longest) return '';
   const { patient, status } = longest;
-  return `Longest waiting patient: ${patientName(patient)} ${status.waitMinutes} min Â· ${patient.priority} Â· ${patient.chiefComplaint || patient.complaintCategory}`;
+  return `Longest waiting patient: ${patientName(patient)} ${status.waitMinutes} min · ${patient.priority} · ${patient.chiefComplaint || patient.complaintCategory}`;
 }
 
 export function longWaitShiftMetrics(patients = [] as any[], now = new Date(), settingsOrTargets: any = {}) {

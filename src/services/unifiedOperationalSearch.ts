@@ -1,4 +1,4 @@
-ï»¿import { CANONICAL_ROUTES } from '../config/routes.config';
+import { CANONICAL_ROUTES } from '../config/routes.config';
 import { WHITEBOARD_QUEUE_FILTER } from './queueAssignment';
 import type { EMSArrival, Patient, QueueSummary, Referral } from '../types/emergency';
 import { getExistingEncounterId } from './intakeEncounter';
@@ -89,7 +89,7 @@ function searchPatientHits(patients: Patient[], query: string, limit: number): O
     entityType: 'patient',
     id: `patient-${patient.id}`,
     label: getPatientDisplayName(patient),
-    hint: `${patient.mrn} Â· ${patient.state} Â· ${patient.chiefComplaint || patient.complaint || 'No complaint'} Â· ${matchKind}`,
+    hint: `${patient.mrn} · ${patient.state} · ${patient.chiefComplaint || patient.complaint || 'No complaint'} · ${matchKind}`,
     score,
     patientId: patient.id,
     encounterId: getExistingEncounterId(patient) || undefined,
@@ -114,7 +114,7 @@ function searchEncounterHits(patients: Patient[], query: string, limit: number):
       entityType: 'encounter',
       id: `encounter-${encounterId}`,
       label: encounterId,
-      hint: `${getPatientDisplayName(patient)} Â· ${patient.state} Â· ${patient.chiefComplaint || 'Encounter active'}`,
+      hint: `${getPatientDisplayName(patient)} · ${patient.state} · ${patient.chiefComplaint || 'Encounter active'}`,
       score,
       patientId: patient.id,
       encounterId,
@@ -159,8 +159,8 @@ function searchReferralHits(
     hits.push({
       entityType: 'referral',
       id: `referral-${referral.id}`,
-      label: `${referral.targetDepartment || referral.service || 'Referral'} Â· ${patientLabel}`,
-      hint: `${referral.status} Â· ${referral.urgency || 'Routine'} Â· ${referral.reason || referral.summary || 'Open referral'}`,
+      label: `${referral.targetDepartment || referral.service || 'Referral'} · ${patientLabel}`,
+      hint: `${referral.status} · ${referral.urgency || 'Routine'} · ${referral.reason || referral.summary || 'Open referral'}`,
       score,
       patientId: referral.patientId,
       referralId: referral.id,
@@ -204,8 +204,8 @@ function searchEmsHits(
     hits.push({
       entityType: 'ems',
       id: `ems-${arrival.id}`,
-      label: `${arrival.unitId} Â· ${arrival.chiefComplaint || arrival.prearrivalComplaint || 'EMS case'}`,
-      hint: `${arrival.status} Â· ${arrival.severity} Â· ETA ${arrival.eta}m${patient ? ` Â· ${getPatientDisplayName(patient)}` : ''}`,
+      label: `${arrival.unitId} · ${arrival.chiefComplaint || arrival.prearrivalComplaint || 'EMS case'}`,
+      hint: `${arrival.status} · ${arrival.severity} · ETA ${arrival.eta}m${patient ? ` · ${getPatientDisplayName(patient)}` : ''}`,
       score,
       patientId: arrival.patientId,
       emsArrivalId: arrival.id,
@@ -253,7 +253,7 @@ function searchQueueHits(
         entityType: 'queue',
         id: `queue-${queue.id || queueKey}`,
         label: queueLabel,
-        hint: `${queue.count ?? 0} patients Â· longest ${queue.longestWaitMinutes ?? 0}m`,
+        hint: `${queue.count ?? 0} patients · longest ${queue.longestWaitMinutes ?? 0}m`,
         score: queueScore,
         queueType: queueKey,
       });
@@ -274,8 +274,8 @@ function searchQueueHits(
     hits.push({
       entityType: 'queue',
       id: `queue-patient-${patient.id}`,
-      label: `${queueLabel} Â· ${getPatientDisplayName(patient)}`,
-      hint: `${patient.mrn} Â· ${patient.priority} Â· ${patient.chiefComplaint || 'Queue item'}`,
+      label: `${queueLabel} · ${getPatientDisplayName(patient)}`,
+      hint: `${patient.mrn} · ${patient.priority} · ${patient.chiefComplaint || 'Queue item'}`,
       score: patientScore.score + (queueQueryMatch || 0),
       patientId: patient.id,
       queueType,

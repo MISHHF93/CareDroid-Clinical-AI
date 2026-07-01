@@ -1,10 +1,10 @@
-ï»¿/**
- * GRACE 2.0 ACS admission risk â€” logistic mortality models (continuous admission variables).
+/**
+ * GRACE 2.0 ACS admission risk — logistic mortality models (continuous admission variables).
  *
  * Coefficients align with the GRACE 2.0 admission models used in RiskScorescvd / GRACE publications
- * (Fox KAA et al.; GRACE Investigators. BMJ. 2006;332:1091â€“1100; updated GRACE 2.0 risk tools).
+ * (Fox KAA et al.; GRACE Investigators. BMJ. 2006;332:1091–1100; updated GRACE 2.0 risk tools).
  *
- * Decision support only â€” not for treatment recommendations or ACS diagnosis.
+ * Decision support only — not for treatment recommendations or ACS diagnosis.
  */
 
 export const GRACE_MODEL_VERSION = '2.0-admission-logistic';
@@ -51,7 +51,7 @@ const SIX_MONTH = {
 };
 
 /**
- * Î¼mol/L â†’ mg/dL (creatinine).
+ * µmol/L ? mg/dL (creatinine).
  * @param {number} umolL
  */
 export function creatinineUmolLToMgDl(umolL) {
@@ -61,7 +61,7 @@ export function creatinineUmolLToMgDl(umolL) {
 
 /**
  * @param {number} xb
- * @returns {number} probability 0â€“1
+ * @returns {number} probability 0–1
  */
 export function logisticProbability(xb) {
   if (!Number.isFinite(xb)) return NaN;
@@ -130,7 +130,7 @@ export function validateGraceAcsInputs(raw) {
 
   const creatinineMgDl = Number(raw.creatinineMgDl);
   if (!Number.isFinite(creatinineMgDl) || creatinineMgDl <= 0 || creatinineMgDl > 25) {
-    errors.push('Creatinine must be a positive value in mg/dL (typically â‰¤ 25).');
+    errors.push('Creatinine must be a positive value in mg/dL (typically = 25).');
   }
 
   const killipClass = raw.killipClass;
@@ -197,7 +197,7 @@ export function interpretGraceAcsRisk(result) {
     category === 'low'
       ? 'Low estimated risk (6-month mortality < 3%)'
       : category === 'intermediate'
-        ? 'Intermediate estimated risk (6-month mortality 3â€“8%)'
+        ? 'Intermediate estimated risk (6-month mortality 3–8%)'
         : 'High estimated risk (6-month mortality > 8%)';
 
   const severity =
@@ -207,12 +207,12 @@ export function interpretGraceAcsRisk(result) {
     severity,
     label: categoryLabel,
     riskCategory: category,
-    interpretation: `Estimated in-hospital mortality â‰ˆ ${inHosp.toFixed(1)}%; estimated mortality from discharge to 6 months â‰ˆ ${sixMo.toFixed(1)}% (${categoryLabel.toLowerCase()}). These are population-derived GRACE ACS prognostic estimates for shared decision-making and documentation â€” not a diagnosis and not a treatment directive.`,
+    interpretation: `Estimated in-hospital mortality ˜ ${inHosp.toFixed(1)}%; estimated mortality from discharge to 6 months ˜ ${sixMo.toFixed(1)}% (${categoryLabel.toLowerCase()}). These are population-derived GRACE ACS prognostic estimates for shared decision-making and documentation — not a diagnosis and not a treatment directive.`,
     safetyDisclaimer:
       'GRACE ACS risk stratification supports prognosis discussion in suspected or confirmed ACS. It does not confirm or exclude acute coronary syndrome, does not replace serial ECGs, biomarkers, or imaging, and must not be used alone to withhold or initiate reperfusion, antithrombotic therapy, or invasive strategy. Apply local ACS pathways and clinician judgment.',
     pathwayDisclaimer:
       'Use local acute coronary syndrome protocols for diagnosis, reperfusion eligibility, antithrombotic choices, and disposition. Unstable ACS, STEMI, shock, or arrest require emergency pathways without delay. This tool does not recommend specific treatments or procedures.',
     referenceLine:
-      'GRACE / GRACE 2.0 â€” Global Registry of Acute Coronary Events (Fox KAA et al., BMJ 2006; GRACE 2.0 risk models).',
+      'GRACE / GRACE 2.0 — Global Registry of Acute Coronary Events (Fox KAA et al., BMJ 2006; GRACE 2.0 risk models).',
   };
 }

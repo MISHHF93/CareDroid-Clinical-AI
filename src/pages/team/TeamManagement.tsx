@@ -1,4 +1,4 @@
-﻿import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import './TeamManagement.css';
 import { apiFetch, apiFetchJson, getStoredAccessToken } from '../../services/apiClient';
 import {
@@ -238,7 +238,7 @@ export const TeamManagement = () => {
       {error && (
         <div className="team-error">
           <span>{error}</span>
-          <button onClick={() => setError(null)}>✕</button>
+          <button onClick={() => setError(null)}>?</button>
         </div>
       )}
 
@@ -317,11 +317,11 @@ const UserTable = ({ users, sortConfig, onSort, onEdit, onDelete, actionsDisable
 
   const getStatusIndicator = (status) => {
     const indicators = {
-      active: '🟢',
-      inactive: '⚫',
-      pending: '🟡',
+      active: '??',
+      inactive: '?',
+      pending: '??',
     };
-    return indicators[status] || '⚫';
+    return indicators[status] || '?';
   };
 
   const TableHeaderCell = ({ label, sortKey }) => (
@@ -334,7 +334,7 @@ const UserTable = ({ users, sortConfig, onSort, onEdit, onDelete, actionsDisable
         {label}
         {sortConfig.key === sortKey && (
           <span className="sort-indicator">
-            {sortConfig.direction === 'asc' ? '↑' : '↓'}
+            {sortConfig.direction === 'asc' ? '?' : '?'}
           </span>
         )}
       </button>
@@ -389,7 +389,7 @@ const UserTable = ({ users, sortConfig, onSort, onEdit, onDelete, actionsDisable
                   aria-label={`Edit ${user.name}`}
                   disabled={actionsDisabled}
                 >
-                  ✎
+                  ?
                 </button>
                 <button
                   className="action-btn action-delete"
@@ -398,7 +398,7 @@ const UserTable = ({ users, sortConfig, onSort, onEdit, onDelete, actionsDisable
                   aria-label={`Remove ${user.name}`}
                   disabled={actionsDisabled}
                 >
-                  ✕
+                  ?
                 </button>
               </td>
             </tr>
@@ -440,7 +440,7 @@ const EditUserModal = ({ user, onSave, onCancel, disabled = false }) => {
       <div className="edit-user-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>Edit User</h2>
-          <button className="modal-close" onClick={onCancel}>✕</button>
+          <button className="modal-close" onClick={onCancel}>?</button>
         </div>
 
         <div className="modal-body">
@@ -465,7 +465,7 @@ const EditUserModal = ({ user, onSave, onCancel, disabled = false }) => {
             <div className="permissions-list">
               {roleDefinitions[role]?.map(permission => (
                 <div key={permission} className="permission-item">
-                  <span className="permission-check">✓</span>
+                  <span className="permission-check">?</span>
                   <span className="permission-name">{permission}</span>
                 </div>
               ))}
@@ -516,7 +516,7 @@ const RoleSelector = ({ value, onChange }) => {
     >
       {roles.map(role => (
         <option key={role.id} value={role.id}>
-          {role.label} — {role.description}
+          {role.label} � {role.description}
         </option>
       ))}
     </select>
@@ -547,7 +547,7 @@ const InviteUserModal = ({ email, onEmailChange, onInvite, onCancel, disabled = 
       <div className="invite-user-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>Invite Team Member</h2>
-          <button className="modal-close" onClick={onCancel}>✕</button>
+          <button className="modal-close" onClick={onCancel}>?</button>
         </div>
 
         <div className="modal-body">

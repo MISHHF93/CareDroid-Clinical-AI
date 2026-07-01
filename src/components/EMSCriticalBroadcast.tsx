@@ -1,4 +1,4 @@
-ï»¿import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AlertTriangle } from 'lucide-react';
 import { CRITICAL_CHECKLISTS } from '../config/criticalChecklists';
@@ -71,7 +71,7 @@ function vitalsSummary(vitals) {
     vitals.spo2 != null ? `SpO2 ${vitals.spo2}%` : null,
   ]
     .filter(Boolean)
-    .join(' Â· ') || 'Vitals pending';
+    .join(' · ') || 'Vitals pending';
 }
 
 function resolveCurrentStaff({ user, staff, activeShift }) {
@@ -116,7 +116,7 @@ function arrivalHeadline(arrival, now) {
     `ETA ${etaMinutes(arrival, now)} MIN`,
   ]
     .filter(Boolean)
-    .join(' Â· ');
+    .join(' · ');
 }
 
 export function EMSCriticalCountdownBadge() {
@@ -127,7 +127,7 @@ export function EMSCriticalCountdownBadge() {
   const { label } = countdownParts(arrival, now);
   return (
     <span className="ems-critical-countdown" role="status" aria-label={`${arrival.chiefComplaint} inbound ETA ${label}`}>
-      âš¡ {arrival.chiefComplaint || arrival.prearrivalComplaint} â€” {label}
+      ? {arrival.chiefComplaint || arrival.prearrivalComplaint} — {label}
     </span>
   );
 }
@@ -235,7 +235,7 @@ export default function EMSCriticalBroadcast() {
       {showOverlay ? (
         <section className="ems-critical-overlay" role="alert" aria-live="assertive">
           <AlertTriangle size={72} aria-hidden />
-          <h2>ðŸš¨ CRITICAL INCOMING</h2>
+          <h2>?? CRITICAL INCOMING</h2>
           <p>{arrivalHeadline(arrival, now)}</p>
           <strong>Assigned Bay: {assignedBay}</strong>
         </section>
@@ -285,7 +285,7 @@ export default function EMSCriticalBroadcast() {
           </div>
           <h2>{arrival.criticalChecklist.title}</h2>
           <p>
-            {arrival.unitName} Â· {arrivalHeadline(arrival, now)} Â· {assignedBay}
+            {arrival.unitName} · {arrivalHeadline(arrival, now)} · {assignedBay}
           </p>
           <div className="ems-critical-checklist__progress" aria-label={`${progress}% checklist complete`}>
             <span style={{ width: `${progress}%` }} />
@@ -319,7 +319,7 @@ export default function EMSCriticalBroadcast() {
                 <span>{label}</span>
                 {completion ? (
                   <small>
-                    {completion.checkedByStaffName} Â·{' '}
+                    {completion.checkedByStaffName} ·{' '}
                     {new Date(completion.checkedAt).toLocaleTimeString([], {
                       hour: '2-digit',
                       minute: '2-digit',

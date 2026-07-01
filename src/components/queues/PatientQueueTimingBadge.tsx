@@ -1,4 +1,4 @@
-﻿import React, { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { resolvePatientQueueTiming } from '../../services/patientQueueTimingModel';
 import './PatientQueueTimingBadge.css';
 

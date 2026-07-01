@@ -1,5 +1,5 @@
-﻿/**
- * Role-action matrix — canonical allowed / disabled / hidden / readonly states per role.
+/**
+ * Role-action matrix � canonical allowed / disabled / hidden / readonly states per role.
  * Composes with emergencyPermissionRegistry grants and display context overrides.
  */
 import {
@@ -40,7 +40,7 @@ export type EmergencyRoleActionPresentation = Readonly<{
 
 const K = EMERGENCY_PERMISSION_KEYS;
 
-/** Matrix action → canonical permission key */
+/** Matrix action ? canonical permission key */
 export const EMERGENCY_ROLE_ACTION_PERMISSION: Record<EmergencyRoleActionId, string> =
   Object.freeze({
     [EMERGENCY_ROLE_ACTIONS.patientCreate]: K.patientCreate,
@@ -56,7 +56,7 @@ export const EMERGENCY_ROLE_ACTION_PERMISSION: Record<EmergencyRoleActionId, str
     [EMERGENCY_ROLE_ACTIONS.publicDisplayPublish]: K.displayPublicPublish,
   });
 
-/** Permission key or EMERGENCY_ACTIONS alias → matrix action */
+/** Permission key or EMERGENCY_ACTIONS alias ? matrix action */
 export const PERMISSION_TO_ROLE_ACTION: Record<string, EmergencyRoleActionId> = Object.freeze({
   [K.patientCreate]: EMERGENCY_ROLE_ACTIONS.patientCreate,
   [K.patientDemographicsEdit]: EMERGENCY_ROLE_ACTIONS.demographicsEdit,
@@ -79,7 +79,7 @@ const X = 'hidden' as const;
 const R = 'readonly' as const;
 
 /**
- * Base role-action matrix — Receptionist, Triage Nurse, Charge Nurse, Physician,
+ * Base role-action matrix � Receptionist, Triage Nurse, Charge Nurse, Physician,
  * EMS Handoff Nurse, Manager, Admin, Public Display.
  */
 export const EMERGENCY_ROLE_ACTION_MATRIX: Record<

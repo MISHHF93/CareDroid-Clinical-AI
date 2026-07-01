@@ -1,4 +1,4 @@
-﻿export const KNOWLEDGE_BASE_CATEGORIES = Object.freeze([
+export const KNOWLEDGE_BASE_CATEGORIES = Object.freeze([
   'onboarding',
   'workflows',
   'calculators',

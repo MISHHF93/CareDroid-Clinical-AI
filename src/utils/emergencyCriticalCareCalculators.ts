@@ -1,4 +1,4 @@
-﻿export const EMERGENCY_DECISION_SUPPORT_DISCLAIMER =
+export const EMERGENCY_DECISION_SUPPORT_DISCLAIMER =
   'This tool supports clinical assessment and does not replace physician judgment.';
 
 export const PEDIATRIC_CAUTION =

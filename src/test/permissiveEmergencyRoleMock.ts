@@ -1,4 +1,4 @@
-﻿export const PERMISSIVE_EMERGENCY_ROLE_MOCK = Object.freeze({
+export const PERMISSIVE_EMERGENCY_ROLE_MOCK = Object.freeze({
   role: 'charge_nurse',
   roleLabel: 'Charge Nurse',
   demoRoles: [{ id: 'charge_nurse', label: 'Charge Nurse' }],

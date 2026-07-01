@@ -1,4 +1,4 @@
-﻿import { getUserFacingToolRegistryProjection } from './toolInventory';
+import { getUserFacingToolRegistryProjection } from './toolInventory';
 
 export const PLATFORM_ANALYTICS_EVENT_TYPES = Object.freeze({
   TOOL_USAGE: 'tool_usage',

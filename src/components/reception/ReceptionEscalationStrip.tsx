@@ -1,4 +1,4 @@
-ï»¿import React, { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { summarizeReceptionEscalationBoard } from '../../services/receptionEscalationWorkflow';
 import './ReceptionEscalationStrip.css';
 
@@ -16,7 +16,7 @@ export default function ReceptionEscalationStrip({ alerts = [] as any[], classNa
         <p className="reception-escalation-strip__eyebrow">Front desk escalation</p>
         <h3>Reception escalations</h3>
         <p className="reception-escalation-strip__subtitle">
-          {summary.activeCount} active Â· {summary.criticalCount} critical Â· triage {summary.triageCount} Â· charge{' '}
+          {summary.activeCount} active · {summary.criticalCount} critical · triage {summary.triageCount} · charge{' '}
           {summary.chargeCount}
         </p>
       </header>

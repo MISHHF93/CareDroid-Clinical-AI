@@ -1,4 +1,4 @@
-﻿import {
+import {
   PLUGIN_LIFECYCLE_STATUS,
   PLUGIN_REGISTRY,
   PLUGIN_TYPES,

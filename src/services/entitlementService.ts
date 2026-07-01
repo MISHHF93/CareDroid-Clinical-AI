@@ -1,4 +1,4 @@
-﻿import { FEATURE_FLAG_STATES } from '../config/featureFlags.config';
+import { FEATURE_FLAG_STATES } from '../config/featureFlags.config';
 import {
   ENTITLEMENT_ACCESS_STATES,
   SUBSCRIPTION_TIERS,

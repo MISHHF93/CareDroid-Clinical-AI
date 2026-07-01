@@ -1,5 +1,5 @@
-ï»¿/**
- * Queue audit model â€” length, longest wait, bottlenecks, overdue across all queues.
+/**
+ * Queue audit model — length, longest wait, bottlenecks, overdue across all queues.
  * Node-safe; mirrors live queue predicates from queueAssignment + receptionQueueModel.
  */
 
@@ -148,7 +148,7 @@ function buildQueueAuditRow({
     isBottleneck,
     bottleneckSeverity,
     bottleneckReason: isBottleneck
-      ? `${overdueCount} overdue Â· longest ${formatQueueWaitMinutes(longestWaitMinutes)}`
+      ? `${overdueCount} overdue · longest ${formatQueueWaitMinutes(longestWaitMinutes)}`
       : null,
   };
 }

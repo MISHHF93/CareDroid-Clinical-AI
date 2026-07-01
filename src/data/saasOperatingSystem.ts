@@ -1,4 +1,4 @@
-﻿import { PLATFORM_DASHBOARDS, PLATFORM_TIMELINE_EVENTS, PLATFORM_WORKFLOWS } from './platformOperatingSystem';
+import { PLATFORM_DASHBOARDS, PLATFORM_TIMELINE_EVENTS, PLATFORM_WORKFLOWS } from './platformOperatingSystem';
 import { MARKETPLACE_ITEMS } from './marketplaceCatalog';
 import { buildEnterpriseReadinessModel } from './enterpriseReadiness';
 

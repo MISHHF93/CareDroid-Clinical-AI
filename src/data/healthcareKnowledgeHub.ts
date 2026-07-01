@@ -1,4 +1,4 @@
-﻿export const KNOWLEDGE_HUB_TYPES = Object.freeze([
+export const KNOWLEDGE_HUB_TYPES = Object.freeze([
   'protocol',
   'pathway',
   'calculator',

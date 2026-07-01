@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import {
   COMMUNICATION_KIND_LABELS,
   DEFAULT_COMMUNICATION_SUMMARIES,

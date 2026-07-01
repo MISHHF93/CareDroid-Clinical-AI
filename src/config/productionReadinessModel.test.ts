@@ -1,4 +1,4 @@
-﻿import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
   PRODUCTION_DEPLOYMENT_BLOCKER_CATALOG,
   PRODUCTION_QUICK_WIN_CATALOG,

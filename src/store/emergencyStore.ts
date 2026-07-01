@@ -1,4 +1,4 @@
-ï»¿import { create, type StoreApi, type UseBoundStore } from 'zustand';
+import { create, type StoreApi, type UseBoundStore } from 'zustand';
 import {
   Alert,
   ActiveShift,
@@ -3180,7 +3180,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
             {
               type: 'whiteboard_automation' as import('../types/emergency').WorkflowActionType,
               title: 'Diagnosis recorded',
-              summary: `${input.diagnosis} â€” whiteboard advanced to awaiting disposition.`,
+              summary: `${input.diagnosis} — whiteboard advanced to awaiting disposition.`,
               patientId,
               source: 'physician-diagnosis',
             },
@@ -3695,7 +3695,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
               ? createWaitingRoomCommunicationLogInput({
                   kind: 'concern-escalated',
                   patientId,
-                  summary: `Concern escalated â€” ${normalizedFlag} flagged for review.`,
+                  summary: `Concern escalated — ${normalizedFlag} flagged for review.`,
                   severity: 'Critical',
                 })
               : null,
@@ -3914,7 +3914,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         input.staffId || patient.assignedStaffId || state.activeShift.chargeStaffId || state.staff[0]?.id || 'system';
       const timestamp = new Date().toISOString();
       const maxSuffix = input.max !== undefined && input.max !== null && input.max !== '' ? `/${input.max}` : '';
-      const noteText = `${input.scoreLabel}: ${input.scoreTotal}${maxSuffix} â€” ${input.band}`;
+      const noteText = `${input.scoreLabel}: ${input.scoreTotal}${maxSuffix} — ${input.band}`;
       const noteBody = input.recommendation ? `${noteText}. ${input.recommendation}` : noteText;
 
       const note: Note = {

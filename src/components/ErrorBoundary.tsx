@@ -1,4 +1,4 @@
-﻿import React, { Component } from 'react';
+import React, { Component } from 'react';
 import { MEDICAL_THEME, MEDICAL_TYPE } from '../config/medicalTheme.constants';
 import { apiFetch } from '../services/apiClient';
 import logger from '../utils/logger';

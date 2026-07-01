@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Major routes exercised by responsive regression smoke tests.
  * Aligns with `src/data/responsiveQaMatrix.js` and Playwright QA.
  */

@@ -1,4 +1,4 @@
-﻿import type { Patient, Referral } from '../types/emergency';
+import type { Patient, Referral } from '../types/emergency';
 import {
   auditAllQueues,
   summarizeQueueAudit,

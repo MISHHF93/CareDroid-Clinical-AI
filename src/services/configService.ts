@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Configuration Service
  * Fetches system-level configuration from backend via centralized apiClient.
  */

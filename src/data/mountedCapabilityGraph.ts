@@ -1,4 +1,4 @@
-﻿import { ROUTE_RECORDS } from '../config/routes.config';
+import { ROUTE_RECORDS } from '../config/routes.config';
 import {
   ADVANCED_SIDEBAR_NAV_ITEMS,
   OPERATIONS_SIDEBAR_NAV_ITEMS,

@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import ToolPanel from './ToolPanel';
 import AISourcePanel from './chat/AISourcePanel';
 import AiRouteMetadata from './chat/AiRouteMetadata';
@@ -330,7 +330,7 @@ function buildRequestedEdCopilotSystemPrompt({
     ...activeVitalsAlerts,
     ...activeLongWaitAlerts,
     longWaitAttention || null,
-    longestWaitBroadcast ? `⏱ ${longestWaitBroadcast}` : null,
+    longestWaitBroadcast ? `? ${longestWaitBroadcast}` : null,
     ...enabledToolLines,
     '',
     formatWhatHappensNextForCopilot(activePatients, { referrals }),
@@ -542,7 +542,7 @@ function CopilotActionCard({ action, status, onApply, onDismiss }) {
   return (
     <div className="chat-interface__action-card">
       <div>
-        <strong>⚡ Suggested Action</strong>
+        <strong>? Suggested Action</strong>
         <p>
           Flag {target} for reassessment
           {action.flag ? ` (${action.flag})` : ''}.
@@ -1071,7 +1071,7 @@ const ChatInterface = ({
     } catch {
       onAppendMessage?.(conversationId, {
         role: 'assistant',
-        content: 'Copilot unavailable — check connection',
+        content: 'Copilot unavailable � check connection',
         metadata: {
           isCopilotError: true,
           retryMessage: outgoingText,
@@ -1149,7 +1149,7 @@ const ChatInterface = ({
             >
               {message.role === 'assistant' && (
                 <div className="chat-interface__avatar chat-interface__avatar--assistant" aria-hidden>
-                  🤖
+                  ??
                 </div>
               )}
               <div
@@ -1243,7 +1243,7 @@ const ChatInterface = ({
                   {formatMessageTime(message.timestamp)}
                   {message.ragContext && message.ragContext.sourcesFound > 0 && (
                     <span style={{ marginLeft: '12px', opacity: 0.7 }}>
-                      • {message.ragContext.chunksRetrieved} chunks from{' '}
+                      � {message.ragContext.chunksRetrieved} chunks from{' '}
                       {message.ragContext.sourcesFound} sources
                     </span>
                   )}
@@ -1251,7 +1251,7 @@ const ChatInterface = ({
               </div>
               {message.role === 'user' && (
                 <div className="chat-interface__avatar chat-interface__avatar--user" aria-hidden>
-                  👤
+                  ??
                 </div>
               )}
             </div>
@@ -1260,7 +1260,7 @@ const ChatInterface = ({
         {isLoading && (
           <div className="chat-interface__message-row chat-interface__message-row--assistant">
             <div className="chat-interface__avatar chat-interface__avatar--assistant" aria-hidden>
-              🤖
+              ??
             </div>
             <div className="chat-interface__loading-bubble">
               <div className="chat-interface__speaker-label">

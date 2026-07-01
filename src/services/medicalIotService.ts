@@ -1,4 +1,4 @@
-﻿import { fetchLiveTrackingCapability } from './liveTrackingApi';
+import { fetchLiveTrackingCapability } from './liveTrackingApi';
 
 export const MEDICAL_IOT_BACKEND_STATUS = Object.freeze({
   implemented: true,

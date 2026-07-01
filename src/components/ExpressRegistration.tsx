@@ -1,11 +1,10 @@
-﻿import { MEDICAL_THEME, MEDICAL_TYPE } from '../config/medicalTheme.constants';
+import { MEDICAL_THEME, MEDICAL_TYPE } from '../config/medicalTheme.constants';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties, FormEvent, KeyboardEvent } from 'react';
-import { Patient, PatientState, Priority } from '../types/emergency';
+import { Patient } from '../types/emergency';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
-import { createSmartIntakePatient } from '../services/emergencyOsApi';
 import { ERROR_RECOVERY_COPY, formatApiRecoveryMessage } from '../config/errorRecoveryModel';
 import {
   DUPLICATE_HIGH_CONFIDENCE_THRESHOLD,
@@ -16,8 +15,7 @@ import {
 import DuplicateReviewAlert from './verification/DuplicateReviewAlert';
 import { RECEPTION_COPY } from './reception/receptionCopy';
 import { registerNewArrival } from '../services/arrivalControlLayer';
-import { buildHighRiskComplaintPatch } from '../services/highRiskComplaintFlags';
-import { buildPatientArrivalRecord, syncPatientFromArrival } from '../services/patientArrivalModel';
+import { routeQuickIntakeThroughOrchestrator } from '../services/receptionIntakeOrchestrator';
 
 type ExpressRegistrationProps = {
   onClose: () => void;
@@ -33,14 +31,6 @@ const ARRIVAL_REASON_CHIPS = [
   'Abdominal pain',
   'Feeling unwell',
 ] as const;
-
-function createId(prefix: string): string {
-  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-}
-
-function createMrn(): string {
-  return `ED-${Math.floor(100000 + Math.random() * 900000)}`;
-}
 
 function calculateAge(dob: string): number {
   const dobTime = new Date(dob).getTime();
@@ -72,7 +62,6 @@ export default function ExpressRegistration({
   onProvisionalIntake,
 }: ExpressRegistrationProps) {
   const emergencyRole = useEmergencyRolePermissions();
-  const addPatient = useEmergencyStore((state) => state.addPatient);
   const patients = useEmergencyStore((state) => state.patients);
   const firstNameRef = useRef<HTMLInputElement>(null);
 
@@ -145,76 +134,38 @@ export default function ExpressRegistration({
       return;
     }
 
-    const now = new Date().toISOString();
-    const resolvedMrn = healthCard.trim() || createMrn();
-    const complaintText = arrivalReason.trim();
-    const complaintPatch = buildHighRiskComplaintPatch({
-      chiefComplaint: complaintText,
-      complaintCategory: 'Other',
-      state: PatientState.Registration,
-      triagePending: true,
-    });
-    const arrival = buildPatientArrivalRecord({
-      arrivalMode: 'walk-in',
-      arrivalTimestamp: now,
-      chiefComplaint: complaintText,
-      state: PatientState.Registration,
-      triageAcuity: { code: Priority.P3, status: 'unassigned' },
-      queueDestination: complaintPatch.queueDestination,
-      triagePending: complaintPatch.triagePending ?? true,
-      waitingRoomStatus: 'registered',
-    });
-    const patient = syncPatientFromArrival(
-      {
-        id: createId('patient'),
-        mrn: resolvedMrn,
-        firstName: firstName.trim() || 'Unknown',
-        lastName: lastName.trim() || 'Patient',
-        dob: dob || new Date().toISOString().slice(0, 10),
-        age: dob ? age : 0,
-        sex: 'Other',
-        state: PatientState.Registration,
-        triageTime: undefined,
-        complaintCategory: 'Other',
-        vitals: [],
-        flags: [],
-        notes: [],
-        timeline: [],
-        phone: phone.trim() || undefined,
-        healthCardNumber: healthCard.trim() || undefined,
-        healthCard: healthCard.trim() || undefined,
-        ...complaintPatch,
-      },
-      arrival,
-    ) as Patient;
-
     setSubmitting(true);
     setSubmitError('');
 
     try {
-      const response = await createSmartIntakePatient(patient);
-      const persistedPatient = response?.data?.patient || patient;
-      addPatient(persistedPatient);
-      registerNewArrival(
-        { patients: [...patients, persistedPatient], updatePatient: useEmergencyStore.getState().updatePatient, dispatchWebSocketEvent: useEmergencyStore.getState().dispatchWebSocketEvent },
-        persistedPatient.id,
-        { source: 'express-register' },
+      const routeResult = await routeQuickIntakeThroughOrchestrator(
+        {
+          firstName: firstName.trim() || 'Unknown',
+          lastName: lastName.trim() || 'Patient',
+          dob: dob || undefined,
+          healthCard: healthCard.trim(),
+          phone: phone.trim(),
+          complaint: arrivalReason.trim(),
+          arrivalMode: 'walk-in',
+          quickNotes: '',
+        },
+        {
+          actorName: emergencyRole.roleLabel || 'Reception',
+          actorStaffId: emergencyRole.canonicalProfile?.employeeId || emergencyRole.canonicalProfile?.id,
+        },
       );
-      onAdded(persistedPatient);
-      onClose();
-    } catch (error: any) {
-      addPatient(patient);
       registerNewArrival(
         {
-          patients: [...patients, patient],
+          patients: useEmergencyStore.getState().patients,
           updatePatient: useEmergencyStore.getState().updatePatient,
           dispatchWebSocketEvent: useEmergencyStore.getState().dispatchWebSocketEvent,
         },
-        patient.id,
+        routeResult.patientId,
         { source: 'express-register' },
       );
-      onAdded(patient);
+      onAdded(routeResult.patient);
       onClose();
+    } catch (error: any) {
       setSubmitError(
         `${formatApiRecoveryMessage(error, 'registration form')} ${ERROR_RECOVERY_COPY.handoffPending}`,
       );
@@ -298,7 +249,7 @@ export default function ExpressRegistration({
               cursor: 'pointer',
             }}
           >
-            ×
+            �
           </button>
         </header>
 

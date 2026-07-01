@@ -1,4 +1,4 @@
-ï»¿import BoardingIntelligenceEngine from '../../services/boardingIntelligenceEngine';
+import BoardingIntelligenceEngine from '../../services/boardingIntelligenceEngine';
 import {
   countBoardingPatients,
   countHighRiskPatients,
@@ -16,7 +16,7 @@ export const OPERATIONAL_HANDOFF_DOMAIN_IDS = Object.freeze([
 ]);
 
 function compactHeadline(parts = [] as any[]) {
-  return parts.filter(Boolean).join(' Â· ');
+  return parts.filter(Boolean).join(' · ');
 }
 
 function patientDomainMetrics({ patients = [] as any[], reassessmentDue = null }: any = {}) {
@@ -63,7 +63,7 @@ function emsDomainMetrics(emsSummary) {
         hint: emsSummary.soonestEtaLabel
           ? `Soonest arrival: ${emsSummary.soonestEtaLabel}`
           : 'Ambulances inbound',
-        value: emsSummary.inboundCount || emsSummary.soonestEtaLabel || 'â€”',
+        value: emsSummary.inboundCount || emsSummary.soonestEtaLabel || '—',
         tone:
           emsSummary.soonestEtaMinutes !== null && emsSummary.soonestEtaMinutes <= 10
             ? 'critical'
@@ -192,7 +192,7 @@ function admissionDomainMetrics({ patients = [] as any[], boardingMetrics = null
 }
 
 /**
- * Four-domain operational handoff summaries â€” one glance per workflow lane.
+ * Four-domain operational handoff summaries — one glance per workflow lane.
  */
 export function buildOperationalHandoffDomains({
   patients = ([] as any[]),

@@ -1,4 +1,4 @@
-ï»¿import React from 'react';
+import React from 'react';
 import { resolveQueueReason } from '../../services/queueReasonVisibility';
 import './QueueReasonBadge.css';
 
@@ -29,7 +29,7 @@ export default function QueueReasonBadge({
             ]
               .filter(Boolean)
               .join(' ')}
-            title={[reason.label, reason.staffDetail].filter(Boolean).join(' Â· ')}
+            title={[reason.label, reason.staffDetail].filter(Boolean).join(' · ')}
           >
             {compact ? reason.shortLabel : reason.label}
           </span>
@@ -53,7 +53,7 @@ export default function QueueReasonBadge({
         reasons.length > 1 ? `Also: ${reasons.slice(1).map((reason) => reason.label).join(', ')}` : null,
       ]
         .filter(Boolean)
-        .join(' Â· ')}
+        .join(' · ')}
     >
       {compact ? primaryReason.shortLabel : primaryReason.label}
     </span>

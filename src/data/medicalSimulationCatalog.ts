@@ -1,4 +1,4 @@
-﻿export const SIMULATION_CATEGORIES = Object.freeze([
+export const SIMULATION_CATEGORIES = Object.freeze([
   'Emergency',
   'Critical Care',
   'Nursing',

@@ -1,4 +1,4 @@
-﻿import { apiFetch, getApiErrorMessage, parseApiResponse } from './apiClient';
+import { apiFetch, getApiErrorMessage, parseApiResponse } from './apiClient';
 
 export async function fetchMyAuditLogs(limit = 5) {
   try {

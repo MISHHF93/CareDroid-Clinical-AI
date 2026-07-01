@@ -1,8 +1,8 @@
-﻿/**
- * Frontend ↔ backend NLU alias synchronization and drift reports.
+/**
+ * Frontend ? backend NLU alias synchronization and drift reports.
  *
  * Backend keywords (tool.patterns.ts) drive NLU matching.
- * NLU_TO_REGISTRY_ID holds precise catalog / deep-link aliases only — not every keyword.
+ * NLU_TO_REGISTRY_ID holds precise catalog / deep-link aliases only � not every keyword.
  */
 
 import { readFileSync } from 'node:fs';
@@ -71,7 +71,7 @@ export const PHANTOM_BLOCKED_CATALOG_ALIASES = Object.freeze([
   'medication-checker',
 ]);
 
-/** Over-broad catalog keys — allowed only when explicitly listed (hub navigation). */
+/** Over-broad catalog keys � allowed only when explicitly listed (hub navigation). */
 export const BROAD_CATALOG_ALIASES = Object.freeze(['calculator', 'dispatch']);
 
 /**
@@ -111,7 +111,7 @@ export const ALLOWED_BACKEND_KEYWORD_COLLISIONS = Object.freeze([
   },
 ]);
 
-/** Registry ids shipped in PR1–PR6 + fleet audits. */
+/** Registry ids shipped in PR1�PR6 + fleet audits. */
 export const AUDITED_CLINICAL_REGISTRY_IDS = Object.freeze([
   ...PR1_CALCULATOR_REGISTRY_IDS,
   ...PR2_CALCULATOR_REGISTRY_IDS,
@@ -156,7 +156,7 @@ export const CHAT_ASSISTED_REQUIRED_BACKEND_ALIASES = Object.freeze([
   ...NEXUS_CSPINE_REQUIRED_NLU_ALIASES.map((a) => ({ alias: a, nluToolId: 'nexus-cspine' })),
 ]);
 
-/** All product-required NLU / discovery alias pairs (PR1–PR7 + fleet). */
+/** All product-required NLU / discovery alias pairs (PR1�PR7 + fleet). */
 export const ALL_REQUIRED_CATALOG_ALIAS_PAIRS = Object.freeze([
   ...PR1_ALL_ALIAS_PAIRS,
   ...MELD_ALL_ALIAS_PAIRS,
@@ -184,7 +184,7 @@ export function readToolPatternsSource() {
   return cachedPatternsSource;
 }
 
-/** @returns {Map<string, string>} registryId → primary NLU toolId */
+/** @returns {Map<string, string>} registryId ? primary NLU toolId */
 export function buildRegistryToNluToolIdMap() {
   const map = new Map();
   for (const [nluToolId, registryId] of Object.entries(ORCHESTRATOR_TO_REGISTRY_ID)) {
@@ -357,7 +357,7 @@ export function buildClinicalToolAliasSyncReport(options: any = {}) {
     if (actual !== registryId && slugActual !== registryId) {
       missingCatalogAliases.push({ alias, expected: registryId, actual, slugActual });
     } else if (actual !== registryId && slugActual === registryId) {
-      // phrase missing but slug ok — report as partial
+      // phrase missing but slug ok � report as partial
       if (actual === undefined) {
         missingCatalogAliases.push({ alias, expected: registryId, note: 'slug present, phrase missing' });
       }
@@ -433,13 +433,13 @@ export function buildClinicalToolAliasSyncReport(options: any = {}) {
       (lower.includes('emergency') || lower.includes('trauma') || lower.includes('abc ')) &&
       mentalHealthRegistry.has(registryId)
     ) {
-      highRiskMisroutes.push({ alias, registryId, reason: 'emergency/trauma phrase → mental health tool' });
+      highRiskMisroutes.push({ alias, registryId, reason: 'emergency/trauma phrase ? mental health tool' });
     }
     if (lower.includes('pulmonary embolism') && registryId === REGISTRY.phq9) {
-      highRiskMisroutes.push({ alias, registryId, reason: 'PE phrase → PHQ-9' });
+      highRiskMisroutes.push({ alias, registryId, reason: 'PE phrase ? PHQ-9' });
     }
     if (lower.includes('pulmonary embolism') && registryId === REGISTRY.gad7) {
-      highRiskMisroutes.push({ alias, registryId, reason: 'PE phrase → GAD-7' });
+      highRiskMisroutes.push({ alias, registryId, reason: 'PE phrase ? GAD-7' });
     }
     if (
       (lower === 'screen' || lower === 'screening') &&
@@ -448,7 +448,7 @@ export function buildClinicalToolAliasSyncReport(options: any = {}) {
       highRiskMisroutes.push({
         alias,
         registryId,
-        reason: 'vague screen/screening → mental health or alcohol tool',
+        reason: 'vague screen/screening ? mental health or alcohol tool',
       });
     }
   }
@@ -520,7 +520,7 @@ export function formatAliasSyncReport(report) {
   if (report.unsafeCatalogRoutes.length) {
     lines.push('Unsafe catalog routes:');
     for (const row of report.unsafeCatalogRoutes) {
-      lines.push(`  - ${row.alias} → ${row.registryId} (${row.reason})`);
+      lines.push(`  - ${row.alias} ? ${row.registryId} (${row.reason})`);
     }
   }
   if (report.wrongCatalogTargets.length) {
@@ -550,7 +550,7 @@ export function formatAliasSyncReport(report) {
   if (report.highRiskMisroutes.length) {
     lines.push('High-risk misroutes:');
     for (const row of report.highRiskMisroutes) {
-      lines.push(`  - ${row.alias} → ${row.registryId} (${row.reason})`);
+      lines.push(`  - ${row.alias} ? ${row.registryId} (${row.reason})`);
     }
   }
   if (report.metadataMismatches?.length) {
@@ -572,9 +572,9 @@ export function formatAliasSyncReport(report) {
     }
   }
   if (report.isClean) {
-    lines.push('Status: CLEAN — frontend catalog, backend patterns, and alias map are aligned.');
+    lines.push('Status: CLEAN � frontend catalog, backend patterns, and alias map are aligned.');
   } else {
-    lines.push('Status: DRIFT DETECTED — see sections above.');
+    lines.push('Status: DRIFT DETECTED � see sections above.');
   }
   return lines.join('\n');
 }

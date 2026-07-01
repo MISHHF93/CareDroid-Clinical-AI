@@ -1,4 +1,4 @@
-﻿import { buildProfileToolGraph, buildUserToolProfile } from './profileToolSegmentation';
+import { buildProfileToolGraph, buildUserToolProfile } from './profileToolSegmentation';
 import { applySaasResonanceToToolProfile, resolveSaasToolResonance } from '../config/saasProfileToolResonance';
 import { compileUserProfile } from '../config/userProfileCompiler';
 

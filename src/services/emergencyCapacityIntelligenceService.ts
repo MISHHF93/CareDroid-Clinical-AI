@@ -1,4 +1,4 @@
-﻿export const CAPACITY_RISK_LEVELS = Object.freeze({
+export const CAPACITY_RISK_LEVELS = Object.freeze({
   GREEN: 'Green',
   YELLOW: 'Yellow',
   ORANGE: 'Orange',

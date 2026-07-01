@@ -1,4 +1,4 @@
-﻿import { formatQueueWaitMinutes } from '../../config/queueAuditModel';
+import { formatQueueWaitMinutes } from '../../config/queueAuditModel';
 import './QueueOperationalPanel.css';
 
 export function QueueAuditBadge({ row, limit = 2 }) {

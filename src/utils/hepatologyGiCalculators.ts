@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Hepatology and gastroenterology calculators.
  * Decision support only: these utilities do not diagnose disease, recommend
  * treatment, determine disposition, or replace local hepatology/GI pathways.

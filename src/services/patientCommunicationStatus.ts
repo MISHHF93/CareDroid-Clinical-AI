@@ -1,4 +1,4 @@
-ï»¿import { PatientState, type Patient, type Referral, type Staff, type WorkflowActionLog } from '../types/emergency';
+import { PatientState, type Patient, type Referral, type Staff, type WorkflowActionLog } from '../types/emergency';
 import {
   buildReassessmentTimerSnapshot,
   formatTimerClockTime,
@@ -93,13 +93,13 @@ function latestEventTimestamp(
 export function formatCommunicationStatusTimestamp(
   timestamp: string | null | undefined,
   now: Date,
-  { unknownLabel = 'â€”' }: any = {},
+  { unknownLabel = '—' }: any = {},
 ): string {
   if (!timestamp) return unknownLabel;
   const minutes = minutesSince(timestamp, now);
   const clock = formatTimerClockTime(timestamp);
   if (minutes === null) return clock;
-  return `${clock} Â· ${formatCommunicationDuration(minutes)}`;
+  return `${clock} · ${formatCommunicationDuration(minutes)}`;
 }
 
 function resolveNextCheckpoint(input: {
@@ -160,7 +160,7 @@ function resolveNextCheckpoint(input: {
   return {
     at: null,
     label: 'Routine check-in',
-    detail: 'No checkpoint scheduled â€” maintain routine waiting-room contact.',
+    detail: 'No checkpoint scheduled — maintain routine waiting-room contact.',
   };
 }
 
@@ -258,7 +258,7 @@ export function buildPatientCommunicationStatus(
     communicationOverdueLabel: communicationOverdue
       ? contactMinutes === null
         ? 'No staff contact logged'
-        : `Contact overdue Â· ${formatCommunicationDuration(contactMinutes)}`
+        : `Contact overdue · ${formatCommunicationDuration(contactMinutes)}`
       : null,
     tone,
     timer,
@@ -293,7 +293,7 @@ export function buildPatientCommunicationStatusBoard(
       ? 'No waiting patients to track for communication status.'
       : overdueCount
         ? `${overdueCount} of ${rows.length} waiting patients need staff contact.`
-        : `${rows.length} waiting patients â€” communication checkpoints current.`;
+        : `${rows.length} waiting patients — communication checkpoints current.`;
 
   return Object.freeze({
     rows,

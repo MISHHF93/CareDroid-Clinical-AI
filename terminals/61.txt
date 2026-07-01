@@ -1,0 +1,284 @@
+---
+pid: 13896
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cmd /c \"cd /d C:\\Users\\borah\\CareDroid-Clinical-AI && npm run test:run -- src/routing 2>&1\" | findstr /i \"FAIL FAIL Error ENOENT expected Test Files passed\""
+started_at: 2026-06-30T20:10:53.919Z
+running_for_ms: 6324993  
+---
+> caredroid-clinical-ai@1.0.0 test:run
+> vitest run src/routing
+ ??? src/routing/canonicalRouteTree.routesE.test.tsx (5 tests | 1 failed) 46992ms
+stderr | src/routing/canonicalAppRoutes.deepLink.test.tsx > canonical App routes deep links > redirects the retired assistant alias to CareDroid Copilot
+ ??? src/routing/canonicalAppRoutes.deepLink.test.tsx (11 tests | 8 failed) 17750ms
+stderr | src/routing/canonicalRouteTree.sidebar.test.tsx > canonical route tree ??? sidebar destinations (batch B) > loads sidebar destination 'Analytics' ('/emergency/analytics') without an access-denied surface
+ ??? src/routing/canonicalRouteTree.sidebar.test.tsx (29 tests | 1 failed) 4221ms
+stderr | src/routing/canonicalRouteTree.routesD.test.tsx > canonical route tree ??? copilot aliases > /emergency/copilot renders the active Copilot route context
+Error: [vitest] No "deriveCapacityCrisisState" export is defined on the "../engine/capacityEngine" mock. Did you forget to return it from "vi.mock"?
+    at VitestMocker.createError (file:///C:/Users/borah/CareDroid-Clinical-AI/node_modules/vitest/dist/chunks/startVitestModuleRunner.CCBQZ9DQ.js:62:17)
+    at Object.get (file:///C:/Users/borah/CareDroid-Clinical-AI/node_modules/vitest/dist/chunks/startVitestModuleRunner.CCBQZ9DQ.js:327:16)
+Error: [vitest] No "deriveCapacityCrisisState" export is defined on the "../engine/capacityEngine" mock. Did you forget to return it from "vi.mock"?
+    at VitestMocker.createError (file:///C:/Users/borah/CareDroid-Clinical-AI/node_modules/vitest/dist/chunks/startVitestModuleRunner.CCBQZ9DQ.js:62:17)
+    at Object.get (file:///C:/Users/borah/CareDroid-Clinical-AI/node_modules/vitest/dist/chunks/startVitestModuleRunner.CCBQZ9DQ.js:327:16)
+stderr | src/routing/canonicalRouteTree.routesD.test.tsx > canonical route tree ??? copilot aliases > /emergency/copilot renders the active Copilot route context
+The above error occurred in the <CapacityCrisisMode> component:
+    at ErrorBoundary (C:/Users/borah/CareDroid-Clinical-AI/src/components/ErrorBoundary.tsx:49:5)
+    at ErrorBoundary (C:/Users/borah/CareDroid-Clinical-AI/src/components/ErrorBoundary.tsx:49:5)
+    at RouterWithFutureDefaults (C:/Users/borah/CareDroid-Clinical-AI/src/test/setup.ts:12:41)
+    at AppRouteHarness (C:/Users/borah/CareDroid-Clinical-AI/src/routing/canonicalRouteTree.testShared.tsx:397:28)
+React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary.
+Error: [vitest] No "deriveCapacityCrisisState" export is defined on the "../engine/capacityEngine" mock. Did you forget to return it from "vi.mock"?
+    at VitestMocker.createError (file:///C:/Users/borah/CareDroid-Clinical-AI/node_modules/vitest/dist/chunks/startVitestModuleRunner.CCBQZ9DQ.js:62:17)
+    at Object.get (file:///C:/Users/borah/CareDroid-Clinical-AI/node_modules/vitest/dist/chunks/startVitestModuleRunner.CCBQZ9DQ.js:327:16)
+stderr | src/routing/canonicalRouteTree.routesD.test.tsx > canonical route tree ??? copilot aliases > /assistant redirects to the active Emergency Copilot route
+The above error occurred in the <CapacityCrisisMode> component:
+    at ErrorBoundary (C:/Users/borah/CareDroid-Clinical-AI/src/components/ErrorBoundary.tsx:49:5)
+    at ErrorBoundary (C:/Users/borah/CareDroid-Clinical-AI/src/components/ErrorBoundary.tsx:49:5)
+    at RouterWithFutureDefaults (C:/Users/borah/CareDroid-Clinical-AI/src/test/setup.ts:12:41)
+    at AppRouteHarness (C:/Users/borah/CareDroid-Clinical-AI/src/routing/canonicalRouteTree.testShared.tsx:397:28)
+React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary.
+Error: [vitest] No "deriveCapacityCrisisState" export is defined on the "../engine/capacityEngine" mock. Did you forget to return it from "vi.mock"?
+    at VitestMocker.createError (file:///C:/Users/borah/CareDroid-Clinical-AI/node_modules/vitest/dist/chunks/startVitestModuleRunner.CCBQZ9DQ.js:62:17)
+    at Object.get (file:///C:/Users/borah/CareDroid-Clinical-AI/node_modules/vitest/dist/chunks/startVitestModuleRunner.CCBQZ9DQ.js:327:16)
+stderr | src/routing/canonicalRouteTree.routesD.test.tsx > canonical route tree ??? copilot aliases > /chat redirects to the active Emergency Copilot route
+The above error occurred in the <CapacityCrisisMode> component:
+    at ErrorBoundary (C:/Users/borah/CareDroid-Clinical-AI/src/components/ErrorBoundary.tsx:49:5)
+    at ErrorBoundary (C:/Users/borah/CareDroid-Clinical-AI/src/components/ErrorBoundary.tsx:49:5)
+    at RouterWithFutureDefaults (C:/Users/borah/CareDroid-Clinical-AI/src/test/setup.ts:12:41)
+    at AppRouteHarness (C:/Users/borah/CareDroid-Clinical-AI/src/routing/canonicalRouteTree.testShared.tsx:397:28)
+React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary.
+Error: [vitest] No "deriveCapacityCrisisState" export is defined on the "../engine/capacityEngine" mock. Did you forget to return it from "vi.mock"?
+    at VitestMocker.createError (file:///C:/Users/borah/CareDroid-Clinical-AI/node_modules/vitest/dist/chunks/startVitestModuleRunner.CCBQZ9DQ.js:62:17)
+    at Object.get (file:///C:/Users/borah/CareDroid-Clinical-AI/node_modules/vitest/dist/chunks/startVitestModuleRunner.CCBQZ9DQ.js:327:16)
+Error: [vitest] No "deriveCapacityCrisisState" export is defined on the "../engine/capacityEngine" mock. Did you forget to return it from "vi.mock"?
+    at VitestMocker.createError (file:///C:/Users/borah/CareDroid-Clinical-AI/node_modules/vitest/dist/chunks/startVitestModuleRunner.CCBQZ9DQ.js:62:17)
+    at Object.get (file:///C:/Users/borah/CareDroid-Clinical-AI/node_modules/vitest/dist/chunks/startVitestModuleRunner.CCBQZ9DQ.js:327:16)
+stderr | src/routing/canonicalRouteTree.routesD.test.tsx > canonical route tree ??? copilot aliases > /ai redirects to the active Emergency Copilot route
+The above error occurred in the <CapacityCrisisMode> component:
+    at ErrorBoundary (C:/Users/borah/CareDroid-Clinical-AI/src/components/ErrorBoundary.tsx:49:5)
+    at ErrorBoundary (C:/Users/borah/CareDroid-Clinical-AI/src/components/ErrorBoundary.tsx:49:5)
+    at RouterWithFutureDefaults (C:/Users/borah/CareDroid-Clinical-AI/src/test/setup.ts:12:41)
+    at AppRouteHarness (C:/Users/borah/CareDroid-Clinical-AI/src/routing/canonicalRouteTree.testShared.tsx:397:28)
+React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary.
+Error: [vitest] No "deriveCapacityCrisisState" export is defined on the "../engine/capacityEngine" mock. Did you forget to return it from "vi.mock"?
+    at VitestMocker.createError (file:///C:/Users/borah/CareDroid-Clinical-AI/node_modules/vitest/dist/chunks/startVitestModuleRunner.CCBQZ9DQ.js:62:17)
+    at Object.get (file:///C:/Users/borah/CareDroid-Clinical-AI/node_modules/vitest/dist/chunks/startVitestModuleRunner.CCBQZ9DQ.js:327:16)
+Error: [vitest] No "deriveCapacityCrisisState" export is defined on the "../engine/capacityEngine" mock. Did you forget to return it from "vi.mock"?
+    at VitestMocker.createError (file:///C:/Users/borah/CareDroid-Clinical-AI/node_modules/vitest/dist/chunks/startVitestModuleRunner.CCBQZ9DQ.js:62:17)
+    at Object.get (file:///C:/Users/borah/CareDroid-Clinical-AI/node_modules/vitest/dist/chunks/startVitestModuleRunner.CCBQZ9DQ.js:327:16)
+stderr | src/routing/canonicalRouteTree.routesD.test.tsx > canonical route tree ??? copilot aliases > /copilot redirects to the active Emergency Copilot route
+The above error occurred in the <CapacityCrisisMode> component:
+    at ErrorBoundary (C:/Users/borah/CareDroid-Clinical-AI/src/components/ErrorBoundary.tsx:49:5)
+    at ErrorBoundary (C:/Users/borah/CareDroid-Clinical-AI/src/components/ErrorBoundary.tsx:49:5)
+    at RouterWithFutureDefaults (C:/Users/borah/CareDroid-Clinical-AI/src/test/setup.ts:12:41)
+    at AppRouteHarness (C:/Users/borah/CareDroid-Clinical-AI/src/routing/canonicalRouteTree.testShared.tsx:397:28)
+React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary.
+Error: [vitest] No "deriveCapacityCrisisState" export is defined on the "../engine/capacityEngine" mock. Did you forget to return it from "vi.mock"?
+    at VitestMocker.createError (file:///C:/Users/borah/CareDroid-Clinical-AI/node_modules/vitest/dist/chunks/startVitestModuleRunner.CCBQZ9DQ.js:62:17)
+    at Object.get (file:///C:/Users/borah/CareDroid-Clinical-AI/node_modules/vitest/dist/chunks/startVitestModuleRunner.CCBQZ9DQ.js:327:16)
+Error: [vitest] No "deriveCapacityCrisisState" export is defined on the "../engine/capacityEngine" mock. Did you forget to return it from "vi.mock"?
+    at VitestMocker.createError (file:///C:/Users/borah/CareDroid-Clinical-AI/node_modules/vitest/dist/chunks/startVitestModuleRunner.CCBQZ9DQ.js:62:17)
+    at Object.get (file:///C:/Users/borah/CareDroid-Clinical-AI/node_modules/vitest/dist/chunks/startVitestModuleRunner.CCBQZ9DQ.js:327:16)
+ ??? src/routing/canonicalRouteTree.routesD.test.tsx (5 tests | 5 failed) 6283ms
+ ??? src/routing/canonicalRouteTree.routesA.test.tsx (4 tests | 2 failed) 3906ms
+ ??? src/routing/canonicalRouteTree.routesB.test.tsx (4 tests | 2 failed) 3075ms
+ ??? src/routing/canonicalRouteTree.redirects.test.tsx (11 tests | 4 failed) 2066ms
+ ??? src/routing/canonicalRouteTree.routesC.test.tsx (4 tests | 1 failed) 1833ms
+ ??? src/routing/canonicalRouteTree.shell.test.tsx (3 tests | 2 failed) 647ms
+     ?? routes /workspace without an access-denied or error surface for clinical profiles 181ms
+ ??? src/routing/sectionLinkInventory.test.ts (33 tests | 1 failed) 14ms
+ ??? src/routing/routeAuthRebuild.test.ts (5 tests | 2 failed) 11ms
+ ??? src/routing/authRouteFlow.test.tsx (3 tests | 1 failed) 9ms
+ ??? src/routing/codexCardRouteMounts.test.ts (3 tests | 2 failed) 11ms
+ ??? src/routing/canonicalRouteRedirects.test.ts (5 tests) 8ms
+ ??? src/routing/routeHealth.test.ts (5 tests) 4ms
+ ??? src/routing/workspaceSubpageRoutes.test.ts (2 tests) 5ms
+ ??? src/routing/routeAliasFixtures.test.ts (23 tests) 5ms
+?????????????????? Failed Tests 32 ?????????????????????
+ FAIL  src/routing/authRouteFlow.test.tsx > auth canonical flow wiring > redirects duplicate calculators route aliases into Medical Tools
+AssertionError: expected 'import { Suspense } from \'react\';\r???' to contain 'path="/calculators" element={<ToolsRe???'
+- Expected
++ import ErrorBoundary from '../components/ErrorBoundary';
++ const ProfileSettings       = lazyRoute(() => import('../pages/ProfileSettings'));
++ const ProfileSecurity       = lazyRoute(() => import('../pages/profile/ProfileSecurity'));
++               <ErrorBoundary fallbackText="EmergencyWhiteboard encountered an error. Refresh to reload.">
++               </ErrorBoundary>
++         <Route path={CANONICAL_ROUTES.profileSettings}       element={<LazyRoute label="Loading profile settings..."><ProfileSettings /></LazyRoute>} />
++         <Route path="/profile-settings"                       element={<Navigate to={CANONICAL_ROUTES.profileSettings} replace />} />
++         <Route path="/profile/security"                       element={<LazyRoute label="Loading profile security..."><ProfileSecurity /></LazyRoute>} />
+ ??? src/routing/authRouteFlow.test.tsx:33:23
+ FAIL  src/routing/canonicalAppRoutes.deepLink.test.tsx > canonical App routes deep links > renders /emergency/ems inside the AppShell
+TestingLibraryElementError: Unable to find role="link" and name "EMS"
+ ??? waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ??? node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ??? src/routing/canonicalAppRoutes.deepLink.test.tsx:72:25
+ FAIL  src/routing/canonicalAppRoutes.deepLink.test.tsx > canonical App routes deep links > redirects the retired assistant alias to CareDroid Copilot
+Error: expect(element).toHaveTextContent()
+Expected element to have text content:
+ ??? src/routing/canonicalAppRoutes.deepLink.test.tsx:99:46
+     99|       expect(screen.getByTestId('location')).toHaveTextContent('/emerg???
+ ??? runWithExpensiveErrorDiagnosticsDisabled node_modules/@testing-library/dom/dist/config.js:47:12
+ ??? checkCallback node_modules/@testing-library/dom/dist/wait-for.js:124:77
+ ??? MutationObserver.checkRealTimersCallback node_modules/@testing-library/dom/dist/wait-for.js:118:16
+ FAIL  src/routing/canonicalAppRoutes.deepLink.test.tsx > canonical App routes deep links > mounts the OAuth callback route before wildcard redirects
+TestingLibraryElementError: Unable to find role="heading" and name `/complete sign-in/i`
+ ??? waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ??? node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ??? src/routing/canonicalAppRoutes.deepLink.test.tsx:106:25
+    107|     expect(screen.getByTestId('location')).toHaveTextContent('/auth-ca???
+ FAIL  src/routing/canonicalAppRoutes.deepLink.test.tsx > canonical App routes deep links > mounts the auth route before wildcard redirects
+TestingLibraryElementError: Unable to find role="heading" and name `/^sign in$/i`
+ ??? waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ??? node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ??? src/routing/canonicalAppRoutes.deepLink.test.tsx:113:25
+    114|     expect(screen.getByTestId('location')).toHaveTextContent('/auth');
+ FAIL  src/routing/canonicalAppRoutes.deepLink.test.tsx > canonical App routes deep links > mounts configured sign-in and signup aliases before wildcard redirects
+TestingLibraryElementError: Unable to find role="heading" and name `/^sign in$/i`
+ ??? waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ??? node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ??? src/routing/canonicalAppRoutes.deepLink.test.tsx:120:25
+    121|     expect(screen.getByTestId('location')).toHaveTextContent('/account???
+ FAIL  src/routing/canonicalAppRoutes.deepLink.test.tsx > canonical App routes deep links > redirects configured account creation aliases to signup mode
+TestingLibraryElementError: Unable to find role="heading" and name `/create account for/i`
+ ??? waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ??? node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ??? src/routing/canonicalAppRoutes.deepLink.test.tsx:127:25
+    128|     expect(screen.getByTestId('location')).toHaveTextContent('/auth');
+ FAIL  src/routing/canonicalAppRoutes.deepLink.test.tsx > canonical App routes deep links > mounts the welcome onboarding route before wildcard redirects
+TestingLibraryElementError: Unable to find role="heading" and name `/choose your role/i`
+ ??? waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ??? node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ??? src/routing/canonicalAppRoutes.deepLink.test.tsx:134:25
+    135|     expect(screen.getByTestId('location')).toHaveTextContent('/welcome???
+ FAIL  src/routing/canonicalAppRoutes.deepLink.test.tsx > canonical App routes deep links > mounts personalized discovery instead of the route inventory page
+TestingLibraryElementError: Unable to find role="heading" and name `/discover caredroid capabilities/i`
+ ??? waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ??? node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ??? src/routing/canonicalAppRoutes.deepLink.test.tsx:142:20
+    144|     expect(screen.getByTestId('location')).toHaveTextContent('/discove???
+ FAIL  src/routing/canonicalRouteTree.redirects.test.tsx > canonical route tree ??? legacy redirects > /tools/catalog redirects to Medical Tools with intent preserved
+Error: expect(element).toHaveTextContent()
+Expected element to have text content:
+ ??? src/routing/canonicalRouteTree.redirects.test.tsx:25:51
+     25|     expect(await screen.findByTestId('location')).toHaveTextContent(ex???
+ FAIL  src/routing/canonicalRouteTree.redirects.test.tsx > canonical route tree ??? legacy redirects > /calculators redirects to Medical Tools with intent preserved
+Error: expect(element).toHaveTextContent()
+Expected element to have text content:
+ ??? src/routing/canonicalRouteTree.redirects.test.tsx:25:51
+     25|     expect(await screen.findByTestId('location')).toHaveTextContent(ex???
+ FAIL  src/routing/canonicalRouteTree.redirects.test.tsx > canonical route tree ??? legacy redirects > /fleet/map redirects to Medical Tools with intent preserved
+Error: expect(element).toHaveTextContent()
+Expected element to have text content:
+ ??? src/routing/canonicalRouteTree.redirects.test.tsx:25:51
+     25|     expect(await screen.findByTestId('location')).toHaveTextContent(ex???
+ FAIL  src/routing/canonicalRouteTree.redirects.test.tsx > canonical route tree ??? legacy redirects > /fleet/command redirects to Medical Tools with intent preserved
+Error: expect(element).toHaveTextContent()
+Expected element to have text content:
+ ??? src/routing/canonicalRouteTree.redirects.test.tsx:41:51
+     41|     expect(await screen.findByTestId('location')).toHaveTextContent(ex???
+ FAIL  src/routing/canonicalRouteTree.routesA.test.tsx > canonical route tree ??? whiteboard, patients, ems > /emergency/patients renders the active patient whiteboard surface
+TestingLibraryElementError: Unable to find role="heading" and name "Emergency Patients"
+ ??? waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ??? node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ??? src/routing/canonicalRouteTree.routesA.test.tsx:29:25
+ FAIL  src/routing/canonicalRouteTree.routesA.test.tsx > canonical route tree ??? whiteboard, patients, ems > /emergency/patients consumes patientId context without another lookup
+TestingLibraryElementError: Unable to find role="heading" and name "Emergency Patients"
+ ??? waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ??? node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ??? src/routing/canonicalRouteTree.routesA.test.tsx:38:25
+ FAIL  src/routing/canonicalRouteTree.routesB.test.tsx > canonical route tree ??? intake, capacity, queues > /emergency/capacity renders capacity, rooms, boarding, and discharge pipeline from store
+TestingLibraryElementError: Unable to find role="heading" and name "Capacity"
+      data-testid="location"
+      data-testid="location"
+ ??? waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ??? node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ??? src/routing/canonicalRouteTree.routesB.test.tsx:25:25
+ FAIL  src/routing/canonicalRouteTree.routesB.test.tsx > canonical route tree ??? intake, capacity, queues > /emergency/queues renders queue intelligence from store state
+TestingLibraryElementError: Unable to find role="heading" and name "Queues"
+ ??? waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ??? node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ??? src/routing/canonicalRouteTree.routesB.test.tsx:35:21
+ FAIL  src/routing/canonicalRouteTree.routesC.test.tsx > canonical route tree ??? queues params, reassessment, boarding, referrals > /emergency/boarding renders boarding and discharge capacity detail
+TestingLibraryElementError: Unable to find role="heading" and name "Boarding"
+ ??? waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ??? node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ??? src/routing/canonicalRouteTree.routesC.test.tsx:35:25
+ FAIL  src/routing/canonicalRouteTree.routesD.test.tsx > canonical route tree ??? copilot aliases > /emergency/copilot renders the active Copilot route context
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ??? src/routing/canonicalRouteTree.routesD.test.tsx:15:3
+ FAIL  src/routing/canonicalRouteTree.routesD.test.tsx > canonical route tree ??? copilot aliases > /assistant redirects to the active Emergency Copilot route
+ FAIL  src/routing/canonicalRouteTree.routesD.test.tsx > canonical route tree ??? copilot aliases > /chat redirects to the active Emergency Copilot route
+ FAIL  src/routing/canonicalRouteTree.routesD.test.tsx > canonical route tree ??? copilot aliases > /ai redirects to the active Emergency Copilot route
+ FAIL  src/routing/canonicalRouteTree.routesD.test.tsx > canonical route tree ??? copilot aliases > /copilot redirects to the active Emergency Copilot route
+Error: expect(element).toHaveTextContent()
+Expected element to have text content:
+ ??? src/routing/canonicalRouteTree.routesD.test.tsx:27:53
+     27|       expect(await screen.findByTestId('location')).toHaveTextContent(???
+ FAIL  src/routing/canonicalRouteTree.routesE.test.tsx > canonical route tree ??? tools, pulse, shift, analytics, settings > /emergency/tools renders Medical Tools inside the active shell
+TestingLibraryElementError: Unable to find role="heading" and name `/careDroid tool console/i`
+ ??? waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ??? node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ??? src/routing/canonicalRouteTree.routesE.test.tsx:21:22
+ FAIL  src/routing/canonicalRouteTree.shell.test.tsx > canonical route tree ??? shell and workspace > keeps primary shell controls and representative sidebar links exposed
+AssertionError: Whiteboard: expected undefined to be truthy
+- Expected:
+ ??? src/routing/canonicalRouteTree.shell.test.tsx:42:27
+ FAIL  src/routing/canonicalRouteTree.shell.test.tsx > canonical route tree ??? shell and workspace > routes /workspace without an access-denied or error surface for clinical profiles
+AssertionError: expected [ '/workspace', ???(2) ] to include '/emergency/settings'
+ ??? src/routing/canonicalRouteTree.shell.test.tsx:54:77
+     53|     const location = await screen.findByTestId('location');
+ FAIL  src/routing/canonicalRouteTree.sidebar.test.tsx > canonical route tree ??? sidebar destinations (batch B) > loads sidebar destination 'AI Chief' ('/emergency/copilot') without an access-denied surface
+Error: expect(element).toHaveTextContent()
+Expected element to have text content:
+ ??? src/routing/canonicalRouteTree.sidebar.test.tsx:58:53
+     58|       expect(await screen.findByTestId('location')).toHaveTextContent(???
+ FAIL  src/routing/codexCardRouteMounts.test.ts > Codex issue card route mounts > mounts platform card destinations that have real page implementations
+AssertionError: plans: expected 'import { Suspense } from \'react\';\r???' to contain 'path={CANONICAL_ROUTES.plans}'
+- Expected
++ import ErrorBoundary from '../components/ErrorBoundary';
++ const ProfileSettings       = lazyRoute(() => import('../pages/ProfileSettings'));
++ const ProfileSecurity       = lazyRoute(() => import('../pages/profile/ProfileSecurity'));
++               <ErrorBoundary fallbackText="EmergencyWhiteboard encountered an error. Refresh to reload.">
++               </ErrorBoundary>
++         <Route path={CANONICAL_ROUTES.profileSettings}       element={<LazyRoute label="Loading profile settings..."><ProfileSettings /></LazyRoute>} />
++         <Route path="/profile-settings"                       element={<Navigate to={CANONICAL_ROUTES.profileSettings} replace />} />
++         <Route path="/profile/security"                       element={<LazyRoute label="Loading profile security..."><ProfileSecurity /></LazyRoute>} />
+ ??? expectCanonicalRouteMounted src/routing/codexCardRouteMounts.test.ts:11:32
+ ??? src/routing/codexCardRouteMounts.test.ts:40:7
+ FAIL  src/routing/codexCardRouteMounts.test.ts > Codex issue card route mounts > keeps legacy card destinations wired to active mounted routes
+AssertionError: /two-factor-setup: expected 'import { Suspense } from \'react\';\r???' to contain 'path="/two-factor-setup"'
+- Expected
++ import ErrorBoundary from '../components/ErrorBoundary';
++ const ProfileSettings       = lazyRoute(() => import('../pages/ProfileSettings'));
++ const ProfileSecurity       = lazyRoute(() => import('../pages/profile/ProfileSecurity'));
++               <ErrorBoundary fallbackText="EmergencyWhiteboard encountered an error. Refresh to reload.">
++               </ErrorBoundary>
++         <Route path={CANONICAL_ROUTES.profileSettings}       element={<LazyRoute label="Loading profile settings..."><ProfileSettings /></LazyRoute>} />
++         <Route path="/profile-settings"                       element={<Navigate to={CANONICAL_ROUTES.profileSettings} replace />} />
++         <Route path="/profile/security"                       element={<LazyRoute label="Loading profile security..."><ProfileSecurity /></LazyRoute>} />
+ ??? src/routing/codexCardRouteMounts.test.ts:54:31
+ ??? src/routing/codexCardRouteMounts.test.ts:53:7
+ FAIL  src/routing/routeAuthRebuild.test.ts > canonical route/auth architecture > keeps one AppShell owner for canonical CareDroid routes
+AssertionError: expected [ '/auth-callback', ???(27) ] to deeply equal [ '/auth-callback', ???(18) ]
+- Expected
+ ??? src/routing/routeAuthRebuild.test.ts:35:7
+ FAIL  src/routing/routeAuthRebuild.test.ts > canonical route/auth architecture > keeps fleet and operations routes wired in App.jsx
+AssertionError: expected 'import { Suspense } from \'react\';\r???' to contain 'path="/fleet" element={<Navigate to={???'
+- Expected
++ import ErrorBoundary from '../components/ErrorBoundary';
++ const ProfileSettings       = lazyRoute(() => import('../pages/ProfileSettings'));
++ const ProfileSecurity       = lazyRoute(() => import('../pages/profile/ProfileSecurity'));
++               <ErrorBoundary fallbackText="EmergencyWhiteboard encountered an error. Refresh to reload.">
++               </ErrorBoundary>
++         <Route path={CANONICAL_ROUTES.profileSettings}       element={<LazyRoute label="Loading profile settings..."><ProfileSettings /></LazyRoute>} />
++         <Route path="/profile-settings"                       element={<Navigate to={CANONICAL_ROUTES.profileSettings} replace />} />
++         <Route path="/profile/security"                       element={<LazyRoute label="Loading profile security..."><ProfileSecurity /></LazyRoute>} />
+ ??? src/routing/routeAuthRebuild.test.ts:48:23
+ FAIL  src/routing/sectionLinkInventory.test.ts > section link inventory and route flattening > keeps visible links off deprecated route aliases
+Error: ENOENT: no such file or directory, open 'C:\Users\borah\CareDroid-Clinical-AI\src\pages\PlatformEntryHub.jsx'
+ ??? read src/routing/sectionLinkInventory.test.ts:18:32
+     18| const read = (relativePath) => readFileSync(join(srcRoot, relativePath???
+ ??? src/routing/sectionLinkInventory.test.ts:117:22
+ Test Files  13 failed | 4 passed (17)
+      Tests  32 failed | 123 passed (155)
+   Duration  126.61s (transform 6.03s, setup 4.32s, import 16.01s, tests 86.84s, environment 16.59s)

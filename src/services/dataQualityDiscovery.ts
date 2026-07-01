@@ -1,4 +1,4 @@
-﻿import type { Patient } from '../types/emergency';
+import type { Patient } from '../types/emergency';
 import {
   assessPatientDataQualityRisks,
   summarizeDataQualityRisks,

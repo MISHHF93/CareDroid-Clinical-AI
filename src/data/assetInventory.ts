@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Mounted SaaS asset projection.
  *
  * The backend platform asset catalog remains the commercial source of truth.

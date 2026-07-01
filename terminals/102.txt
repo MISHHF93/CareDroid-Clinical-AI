@@ -1,0 +1,1715 @@
+---
+pid: 6968
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "powershell -NoProfile -ExecutionPolicy Bypass -File \"C:\\Users\\borah\\CareDroid-Clinical-AI\\scripts\\run-validation-report.ps1\""
+started_at: 2026-06-30T22:27:52.124Z
+running_for_ms: 560010   
+---
+
+========== npm run lint ==========
+
+> caredroid-clinical-ai@1.0.0 lint
+> eslint src
+
+EXIT CODE: 0
+0
+
+========== npm run typecheck:frontend ==========
+
+> caredroid-clinical-ai@1.0.0 typecheck:frontend
+> tsc --noEmit -p tsconfig.frontend.json
+
+EXIT CODE: 0
+0
+
+========== npm run test:registry-launch ==========
+
+> caredroid-clinical-ai@1.0.0 test:registry-launch
+> vitest run src/navigation/registryToolLaunch.test.ts src/routes/clinicalToolRoutes.test.ts
+
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+ ❯ src/navigation/registryToolLaunch.test.ts (276 tests | 1 failed) 204ms
+     ✓ getRegistryToolNavigation(qsofa) → calculator-route /emergency/tools 4ms
+     ✓ getRegistryToolNavigation(sofa-score) → calculator-route /emergency/tools 1ms
+     ✓ getRegistryToolNavigation(drug-check) → tool-page /emergency/tools 0ms
+     ✓ getRegistryToolNavigation(fleet-command) → tool-page /emergency/tools 0ms
+     ✓ Tier B wells-pe launches chat-assisted flow 0ms
+     ✓ Tier B perc launches chat-assisted flow 0ms
+     ✓ Tier B grace-acs launches chat-assisted flow 0ms
+     ✓ Tier B nihss launches chat-assisted flow 0ms
+     ✓ Tier B canadian-c-spine launches chat-assisted flow 0ms
+     ✓ Tier B ottawa-ankle launches chat-assisted flow 0ms
+     ✓ Tier B copd-gold launches chat-assisted flow 0ms
+     ✓ Tier B rome-iv-ibs launches chat-assisted flow 0ms
+     ✓ Tier B pecarn-head launches chat-assisted flow 0ms
+     ✓ Tier B nexus-cspine launches chat-assisted flow 0ms
+     ✓ Tier B ecg-interpretation-assistant launches chat-assisted flow 0ms
+     ✓ Tier B stemi-pathway-assistant launches chat-assisted flow 0ms
+     ✓ Tier B acs-workflow-assistant launches chat-assisted flow 0ms
+     ✓ Tier B atrial-fibrillation-assistant launches chat-assisted flow 0ms
+     ✓ Tier B heart-failure-assistant launches chat-assisted flow 0ms
+     ✓ Tier B asthma-exacerbation-assistant launches chat-assisted flow 0ms
+     ✓ Tier B ventilator-support-assistant launches chat-assisted flow 0ms
+     ✓ Tier B oxygen-escalation-helper launches chat-assisted flow 0ms
+     ✓ Tier B copd-workflow-assistant launches chat-assisted flow 0ms
+     ✓ Tier B aki-staging-assistant launches chat-assisted flow 0ms
+     ✓ Tier B dialysis-readiness-helper launches chat-assisted flow 0ms
+     ✓ Tier B electrolyte-disorder-assistant launches chat-assisted flow 0ms
+     ✓ Tier B gi-bleed-workflow-assistant launches chat-assisted flow 1ms
+     ✓ Tier B liver-disease-assistant launches chat-assisted flow 1ms
+     ✓ Tier B pancreatitis-workflow-assistant launches chat-assisted flow 1ms
+     ✓ Tier B diabetes-care-assistant launches chat-assisted flow 0ms
+     ✓ Tier B dka-pathway-assistant launches chat-assisted flow 1ms
+     ✓ Tier B thyroid-disorder-assistant launches chat-assisted flow 0ms
+     ✓ Tier B metabolic-syndrome-assistant launches chat-assisted flow 0ms
+     ✓ Tier B seizure-assistant launches chat-assisted flow 0ms
+     ✓ Tier B stroke-workflow-assistant launches chat-assisted flow 0ms
+     ✓ Tier B headache-red-flag-assistant launches chat-assisted flow 0ms
+     ✓ Tier B vertigo-hints-assistant launches chat-assisted flow 0ms
+     ✓ Tier B neuro-exam-assistant launches chat-assisted flow 0ms
+     ✓ Tier B pediatric-sepsis-assistant launches chat-assisted flow 0ms
+     ✓ Tier B pregnancy-workflow-assistant launches chat-assisted flow 0ms
+     ✓ Tier B neonatal-assessment-assistant launches chat-assisted flow 0ms
+     ✓ Tier B ob-triage-assistant launches chat-assisted flow 0ms
+     ✓ Tier B mental-health-screening-assistant launches chat-assisted flow 0ms
+     ✓ Tier B suicide-risk-workflow-assistant launches chat-assisted flow 0ms
+     ✓ Tier B substance-use-screening-assistant launches chat-assisted flow 0ms
+     ✓ Tier B cognitive-screening-assistant launches chat-assisted flow 0ms
+     ✓ Tier B wells-dvt-calculator launches chat-assisted flow 0ms
+     ✓ Tier B dispatch-ai launches chat-assisted flow 0ms
+     ✓ dispatch-ai uses chat-assisted flow 0ms
+     ✓ NLU profile sofa-calculator resolves via getRegistryToolNavigation 1ms
+     ✓ NLU profile qsofa resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile news2 resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile child-pugh resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile has-bled resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile meld resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile meld-na resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile timi-ua-nstemi resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile ascvd-risk resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile duke-treadmill-score resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile reynolds-risk-score resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile hcm-sudden-death-risk resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile chads2 resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile heart-failure-staging resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile ckd-staging resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile egfr-ckd-epi resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile creatinine-clearance-cg resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile fena resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile feurea resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile kfre resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile bun-creatinine-ratio resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile corrected-sodium resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile free-water-deficit resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile osmolal-gap resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile homa-ir resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile corrected-calcium resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile serum-osmolality resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile bsa resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile ideal-body-weight resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile adjusted-body-weight resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile waist-hip-ratio resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile stop-bang resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile bode-index resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile copd-gold-assessment resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile aa-gradient resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile pao2-fio2-ratio resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile rox-index resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile pneumonia-severity-index resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile asthma-severity-score resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile audit-c resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile phq9 resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile gad7 resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile cage resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile mmse resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile moca-placeholder-workflow resolves via getRegistryToolNavigation 1ms
+     ✓ NLU profile pcl5 resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile mdq resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile epworth-sleepiness-scale resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile columbia-suicide-severity-workflow resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile mental-health-screening-assistant resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile suicide-risk-workflow-assistant resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile substance-use-screening-assistant resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile cognitive-screening-assistant resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile behavioral-analytics-dashboard resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile screening-trend-engine resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile psychiatry-monitoring-dashboard resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile crisis-escalation-audit-log resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile population-screening-dashboard resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile heart-score resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile centor-mcisaac resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile bishop-score resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile apgar-score resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile braden-scale resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile morse-fall-scale resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile ranson-criteria resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile bisap-score resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile fib4 resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile maddrey-discriminant-function resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile apri resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile glasgow-blatchford-score resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile rockall-score resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile framingham-risk resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile apache2-calculator resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile cha2ds2vasc-calculator resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile curb65-calculator resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile gcs-calculator resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile mews resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile revised-trauma-score resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile pews resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile wells-dvt-calculator resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile wells-pe resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile perc resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile grace-acs resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile nihss resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile canadian-c-spine resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile ottawa-ankle resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile pecarn-head resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile nexus-cspine resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile abcd2 resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile hunt-hess-scale resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile ich-score resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile four-score resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile modified-rankin-scale resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile nihss-summary-view resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile pediatric-gcs resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile gestational-age-calculator resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile pediatric-bp-percentile resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile pregnancy-due-date-calculator resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile fenton-growth-chart-helper resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile neonatal-bilirubin-risk-helper resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile pediatric-dose-safety-checker resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile pediatric-sepsis-assistant resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile pregnancy-workflow-assistant resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile neonatal-assessment-assistant resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile ob-triage-assistant resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile neonatal-dashboard resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile maternal-monitoring-dashboard resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile pediatric-command-center resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile growth-trend-analytics resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile perinatal-risk-dashboard resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile seizure-assistant resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile stroke-workflow-assistant resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile headache-red-flag-assistant resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile vertigo-hints-assistant resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile neuro-exam-assistant resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile neuro-telemetry-dashboard resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile stroke-command-center resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile neuro-monitoring-engine resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile eeg-trend-dashboard resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile neurology-timeline-ai resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile shock-index resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile anion-gap resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile rass resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile bed-occupancy-calculator resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile staffing-ratio-calculator resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile turnaround-time-calculator resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile resource-utilization-index resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile copd-gold resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile asthma-exacerbation-assistant resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile aki-staging-assistant resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile dialysis-readiness-helper resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile electrolyte-disorder-assistant resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile ventilator-support-assistant resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile oxygen-escalation-helper resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile copd-workflow-assistant resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile ventilator-monitoring-dashboard resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile respiratory-telemetry-dashboard resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile sleep-apnea-analytics resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile pulmonary-trend-engine resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile respiratory-command-center resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile renal-monitoring-dashboard resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile ckd-progression-predictor resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile dialysis-utilization-tracker resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile electrolyte-trend-engine resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile fluid-balance-monitor resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile diabetes-care-assistant resolves via getRegistryToolNavigation 1ms
+     ✓ NLU profile dka-pathway-assistant resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile thyroid-disorder-assistant resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile metabolic-syndrome-assistant resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile glucose-telemetry-dashboard resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile insulin-trend-engine resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile endocrine-monitoring-system resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile metabolic-analytics resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile continuous-glucose-command-center resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile rome-iv-ibs resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile gi-bleed-workflow-assistant resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile liver-disease-assistant resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile pancreatitis-workflow-assistant resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile gi-surveillance-dashboard resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile hepatic-trend-analytics resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile endoscopy-workflow-assistant resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile cirrhosis-monitoring-engine resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile gi-command-center resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile dispatch-ai resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile hospital-command-assistant resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile resource-allocation-assistant resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile device-recommendation-assistant resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile drug-interactions resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile dose-calculator resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile lab-interpreter resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile abg-interpreter resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile protocol-lookup resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile acls-protocol resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile atls-protocol resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile route-optimizer resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile predictive-maintenance resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile fleet-command resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile digital-operations-center resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile differential-diagnosis resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile differential-ai resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile antibiotic-guide resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile procedures resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile calculator-recommender-ai resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile ecg-interpretation-assistant resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile stemi-pathway-assistant resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile acs-workflow-assistant resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile atrial-fibrillation-assistant resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile heart-failure-assistant resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile cardiac-telemetry-analyzer resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile ecg-trend-engine resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile arrhythmia-risk-classifier resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile remote-cardiology-monitoring-dashboard resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile cardiology-command-center resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile research-evidence-hub resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile clinical-documentation-assistant resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile clinical-knowledge-graph resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile predictive-analytics-dashboard resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile clinical-decision-support resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile competency-platform resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile credentialing-platform resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile simulation-suite resolves via getRegistryToolNavigation 1ms
+     ✓ NLU profile simulation-outcomes resolves via getRegistryToolNavigation 1ms
+     ✓ NLU profile scenario-player resolves via getRegistryToolNavigation 1ms
+     ✓ NLU profile debrief-dashboard resolves via getRegistryToolNavigation 1ms
+     ✓ NLU profile competency-dashboard resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile laboratory-dashboard resolves via getRegistryToolNavigation 1ms
+     ✓ NLU profile medical-3d-viewer resolves via getRegistryToolNavigation 3ms
+     ✓ NLU profile ai-gateway resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile moe-router resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile ai-rag resolves via getRegistryToolNavigation 1ms
+     ✓ NLU profile ai-artifacts resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile ai-memory resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile ai-tool-calling resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile ai-training resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile ai-cost-optimization resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile ai-evaluation resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile ai-command-center resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile ai-governance resolves via getRegistryToolNavigation 0ms
+     ✓ NLU profile ai-security resolves via getRegistryToolNavigation 0ms
+     ✓ covers every toolRegistry path with a known launch mode 12ms
+     ✓ does not produce blank navigation for any frontend-visible inventory record 14ms
+     ✓ does not produce blank launch targets for any user-facing inventory record 29ms
+     ✓ resolves launch plans for every command-visible mounted capability 64ms
+     ✓ denies strict SaaS launches when org entitlements exclude the asset 2ms
+     ✓ does not record, select, seed, or navigate to denied tools 2ms
+     × remaps calculator registry launches to reception embed for registration clerk 14ms
+     ✓ blocks deep links when platform context marks a feature subscription-required 1ms
+ ✓ src/routes/clinicalToolRoutes.test.ts (30 tests) 34ms
+npm.cmd : 
+At C:\Users\borah\CareDroid-Clinical-AI\scripts\run-validation-report.ps1:37 char:43
++ ... p "npm run test:registry-launch" { npm.cmd run test:registry-launch }
++                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  src/navigation/registryToolLaunch.test.ts > registryToolLaunch > remaps calculator registry launches to 
+reception embed for registration clerk
+AssertionError: expected "vi.fn()" to be called with arguments: [ ObjectContaining{…}, …(1) ]
+Received:
+  1st vi.fn() call:
+  [
+-   ObjectContaining {
+-     "pathname": "/emergency/reception",
+-     "search": StringContaining "calc=qsofa",
++   {
++     "pathname": "/emergency/whiteboard",
++     "search": "?access=profile-route-denied",
+    },
+-   ObjectContaining {
++   {
+      "replace": true,
++     "state": {
++       "accessDenied": "profile-route-denied",
++     },
+    },
+  ]
+Number of calls: 1
+ ❯ src/navigation/registryToolLaunch.test.ts:198:31
+    196|     applyRegistryToolLaunch('qsofa', handlers);
+    197|
+    198|     expect(handlers.navigate).toHaveBeenCalledWith(
+       |                               ^
+    199|       expect.objectContaining({
+    200|         pathname: CANONICAL_ROUTES.emergencyReception,
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 305 passed (306)
+   Start at  18:29:34
+   Duration  6.04s (transform 1.09s, setup 758ms, import 1.53s, tests 237ms, environment 3.02s)
+
+EXIT CODE: 1
+1
+
+========== npm run test:responsive-regression ==========
+
+> caredroid-clinical-ai@1.0.0 test:responsive-regression
+> vitest run src/test/routePagesSmoke.test.tsx src/test/responsiveRegression.coverage.test.ts src/pages/tools/ClinicalToolCatalog.launchButtons.test.tsx src/pages/tools/Calculators.formSmoke.test.tsx src/layout/AppShell.navigation.test.tsx src/pages/tools/ClinicalToolCatalog.responsive.test.ts src/pages/tools/Calculators.responsive.test.ts src/styles/responsiveUx.test.ts src/layout/AppShell.layout.test.tsx
+
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+ ❯ src/test/routePagesSmoke.test.tsx (0 test)
+ ❯ src/styles/responsiveUx.test.ts (0 test)
+ ✓ src/pages/tools/Calculators.formSmoke.test.tsx (235 tests) 32179ms
+     ✓ renders calculators hub with chat-assisted section and selection cards  1476ms
+     ✓ '/tools/calculators/resource-utilizati…' route renders non-empty usable calculator form  301ms
+ ❯ src/pages/tools/ClinicalToolCatalog.launchButtons.test.tsx (3 tests | 1 failed) 26612ms
+     ✓ renders catalog search and category quick filters  2747ms
+     × shows launch or open actions for launchable medical catalog rows 22388ms
+     ✓ includes Wells PE launch control discoverable by tool name  1472ms
+ ✓ src/layout/AppShell.navigation.test.tsx (8 tests) 281ms
+ ✓ src/test/responsiveRegression.coverage.test.ts (5 tests) 23ms
+ ✓ src/pages/tools/Calculators.responsive.test.ts (33 tests) 18ms
+ ✓ src/pages/tools/ClinicalToolCatalog.responsive.test.ts (11 tests) 11msnpm.cmd : 
+
+
+ Test Files  3 failed | 5 passed (8)
+      Tests  1 failed | 294 passed (295)
+   Start at  18:29:41
+   Duration  90.61s (transform 3.95s, setup 3.85s, import 7.60s, tests 59.12s, environment 17.14s)
+
+EXIT CODE: 1
+1
+
+========== npm run build ==========
+At C:\Users\borah\CareDroid-Clinical-AI\scripts\run-validation-report.ps1:38 char:49
++ ... est:responsive-regression" { npm.cmd run test:responsive-regression }
++                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+⎯⎯⎯⎯⎯⎯ Failed Suites 2 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  src/test/routePagesSmoke.test.tsx [ src/test/routePagesSmoke.test.tsx ]
+Error: Failed to resolve import "../pages/Artifacts" from "src/test/routePagesSmoke.test.tsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: C:/Users/borah/CareDroid-Clinical-AI/src/test/routePagesSmoke.test.tsx:24:0
+  589 |  const __vi_import_16__ = await import("../pages/tools/ClinicalAudit");
+  590 |  const __vi_import_17__ = await import("../pages/tools/Protocols");
+  591 |  const __vi_import_18__ = await import("../pages/Artifacts");
+      |                                        ^
+  592 |  const __vi_import_19__ = await import("../pages/MemoryDashboard");
+  593 |  const __vi_import_20__ = await import("../pages/TrainingDashboard");
+ ❯ TransformPluginContext._formatLog node_modules/vite/dist/node/chunks/config.js:29079:43
+ ❯ TransformPluginContext.error node_modules/vite/dist/node/chunks/config.js:29076:14
+ ❯ normalizeUrl node_modules/vite/dist/node/chunks/config.js:27199:18
+ ❯ node_modules/vite/dist/node/chunks/config.js:27257:32
+ ❯ TransformPluginContext.transform node_modules/vite/dist/node/chunks/config.js:27225:4
+ ❯ EnvironmentPluginContainer.transform node_modules/vite/dist/node/chunks/config.js:28877:14
+ ❯ loadAndTransform node_modules/vite/dist/node/chunks/config.js:22746:26
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+ FAIL  src/styles/responsiveUx.test.ts [ src/styles/responsiveUx.test.ts ]
+Error: ENOENT: no such file or directory, open 'C:\Users\borah\CareDroid-Clinical-AI\src\layout\AppShell.css'
+ ❯ src/styles/responsiveUx.test.ts:18:21
+     16| const indexCss = readFileSync(join(__dirname, '../index.css'), 'utf8');
+     17| const mainJsx = readFileSync(join(__dirname, '../main.tsx'), 'utf8');
+     18| const appShellCss = readFileSync(join(__dirname, '../layout/AppShell.c…
+       |                     ^
+     19| const quickCommandCss = readFileSync(
+     20|   join(__dirname, '../components/CommandPalette.css'),
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  src/pages/tools/ClinicalToolCatalog.launchButtons.test.tsx > ClinicalToolCatalog — launch buttons > shows 
+launch or open actions for launchable medical catalog rows
+Error: Test timed out in 20000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/pages/tools/ClinicalToolCatalog.launchButtons.test.tsx:74:3
+     72|   }, 20000);
+     73|
+     74|   it('shows launch or open actions for launchable medical catalog rows…
+       |   ^
+     75|     renderCatalog();
+     76|     const launchable = getMedicalToolsCatalogRows().filter((row) => ro…
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+> caredroid-clinical-ai@1.0.0 build
+> npm run validate:assets && vite build
+
+
+> caredroid-clinical-ai@1.0.0 validate:assets
+> node scripts/validate-assets.mjs
+
+Asset validation passed.
+vite v7.3.5 building client environment for production...
+transforming...
+✓ 9369 modules transformed.
+rendering chunks...
+npm.cmd : [plugin vite:reporter] 
+At C:\Users\borah\CareDroid-Clinical-AI\scripts\run-validation-report.ps1:39 char:28
++ Run-Step "npm run build" { npm.cmd run build }
++                            ~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([plugin vite:reporter] :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+(!) C:/Users/borah/CareDroid-Clinical-AI/src/services/offlineService.ts is dynamically imported by 
+C:/Users/borah/CareDroid-Clinical-AI/src/utils/deferStartupTasks.ts but also statically imported by 
+C:/Users/borah/CareDroid-Clinical-AI/src/contexts/OfflineProvider.tsx, 
+C:/Users/borah/CareDroid-Clinical-AI/src/pages/tools/DrugChecker.tsx, 
+C:/Users/borah/CareDroid-Clinical-AI/src/services/syncService.ts, dynamic import will not move module into another 
+chunk.
+[plugin vite:reporter] 
+(!) C:/Users/borah/CareDroid-Clinical-AI/src/services/devBackendAuth.ts is dynamically imported by 
+C:/Users/borah/CareDroid-Clinical-AI/src/services/apiClient.ts but also statically imported by 
+C:/Users/borah/CareDroid-Clinical-AI/src/components/AppShell.tsx, 
+C:/Users/borah/CareDroid-Clinical-AI/src/components/native-ai/DriftMonitoringPanel.tsx, 
+C:/Users/borah/CareDroid-Clinical-AI/src/contexts/TenantContext.tsx, 
+C:/Users/borah/CareDroid-Clinical-AI/src/hooks/useNativeAiBackendSync.ts, 
+C:/Users/borah/CareDroid-Clinical-AI/src/hooks/useNativeAiDashboardData.ts, dynamic import will not move module into 
+another chunk.
+computing gzip size...
+dist/index.html                                                2.50 kB │ gzip:   0.78 kB
+dist/assets/ToolApiErrorBanner-CfugQrBI.css                    0.56 kB │ gzip:   0.31 kB
+dist/assets/ApiStateBanner-CNXwlEFj.css                        0.64 kB │ gzip:   0.35 kB
+dist/assets/mobileCalculator-PaskG3W8.css                      0.81 kB │ gzip:   0.29 kB
+dist/assets/StateSourceNotice-DI4CTImU.css                     1.29 kB │ gzip:   0.49 kB
+dist/assets/TimelineAi-Db_AjLuB.css                            1.33 kB │ gzip:   0.55 kB
+dist/assets/Alert-kkUR_1uy.css                                 1.35 kB │ gzip:   0.47 kB
+dist/assets/SharedToolSession-BjGvGXF5.css                     1.35 kB │ gzip:   0.59 kB
+dist/assets/IntegrationHubPage-ctC-yscb.css                    1.54 kB │ gzip:   0.54 kB
+dist/assets/ProfileSettingsShell-B4CJ0I1M.css                  1.64 kB │ gzip:   0.55 kB
+dist/assets/ProfileIdentityPages-C5LyCkWj.css                  1.81 kB │ gzip:   0.61 kB
+dist/assets/OperationalPresentationFrame-CbU6Vdf-.css          1.96 kB │ gzip:   0.56 kB
+dist/assets/OperationalHistoryPanel-DO_taf4p.css               2.05 kB │ gzip:   0.65 kB
+dist/assets/IntegrationStatusPanel-D-dhXQqh.css                2.26 kB │ gzip:   0.72 kB
+dist/assets/ClinicalDocumentationAssistant-BEzCIvXw.css        2.54 kB │ gzip:   0.74 kB
+dist/assets/PlatformGovernanceWorkspace-BKv2Q5s6.css           2.76 kB │ gzip:   0.86 kB
+dist/assets/AdminOperationsShell-4oQf109n.css                  2.94 kB │ gzip:   0.88 kB
+dist/assets/BottleneckPanels-Bmr2QHwU.css                      3.05 kB │ gzip:   0.94 kB
+dist/assets/Protocols-D1WgFAZV.css                             3.16 kB │ gzip:   0.90 kB
+dist/assets/SystemHealth-Ct0a0Caw.css                          3.29 kB │ gzip:   1.04 kB
+dist/assets/ProfileSettings-BfHVBmhp.css                       3.49 kB │ gzip:   1.02 kB
+dist/assets/PatientRoomDisplay-COTpDaJA.css                    3.87 kB │ gzip:   1.13 kB
+dist/assets/OrganizationPages-DY_JDtdt.css                     4.30 kB │ gzip:   1.19 kB
+dist/assets/AutomationAuditTrail-CGOxuDSm.css                  4.61 kB │ gzip:   1.13 kB
+dist/assets/button-CjmNH7q1.css                                4.69 kB │ gzip:   1.25 kB
+dist/assets/EmsOffloadAttentionStrip-D8Cr9UT4.css              4.71 kB │ gzip:   1.14 kB
+dist/assets/SelfArrivalCheckIn-9_oqLTmP.css                    4.81 kB │ gzip:   1.30 kB
+dist/assets/index-Bygz8c04.css                                 4.93 kB │ gzip:   1.31 kB
+dist/assets/DataQualityRiskPanel-B-DYPxLR.css                  5.36 kB │ gzip:   1.24 kB
+dist/assets/CommercialPages-CU-gfMgY.css                       5.46 kB │ gzip:   1.34 kB
+dist/assets/DrugChecker-DVsp3_Cs.css                           5.70 kB │ gzip:   1.56 kB
+dist/assets/index-BWO7WQD4.css                                 6.42 kB │ gzip:   1.52 kB
+dist/assets/EMSCriticalBroadcast-DiFL7C5R.css                  6.45 kB │ gzip:   1.66 kB
+dist/assets/Profile-C9HyBktd.css                               8.04 kB │ gzip:   1.65 kB
+dist/assets/EmergencyAnalytics-DonhFHIy.css                    8.35 kB │ gzip:   1.73 kB
+dist/assets/useDisplayAutoRefresh-JUewuNn5.css                 9.04 kB │ gzip:   1.93 kB
+dist/assets/TeamManagement-BDYvB9k5.css                        9.34 kB │ gzip:   2.01 kB
+dist/assets/FeatureManagement-ByAodD9E.css                    10.01 kB │ gzip:   2.17 kB
+dist/assets/NotificationPreferences-CvpiO_c3.css              10.29 kB │ gzip:   2.40 kB
+dist/assets/SmartIntake-0P4urTeO.css                          11.29 kB │ gzip:   1.89 kB
+dist/assets/ReceptionWorkspace-BpGNKk0a.css                   11.52 kB │ gzip:   2.26 kB
+dist/assets/LabInterpreter-D0u-Me_K.css                       13.39 kB │ gzip:   2.66 kB
+dist/assets/ClinicalAlertsPage-DZIcjIAW.css                   13.57 kB │ gzip:   2.40 kB
+dist/assets/ReferralPanel-DAHbVCaD.css                        13.98 kB │ gzip:   2.27 kB
+dist/assets/EmergencySettings-BGDZhsWL.css                    14.11 kB │ gzip:   2.52 kB
+dist/assets/EMSPipeline-Dcdp_C4p.css                          24.78 kB │ gzip:   4.14 kB
+dist/assets/PatientDetailPanel-DR0zN34x.css                   27.43 kB │ gzip:   4.97 kB
+dist/assets/ToolsOverview-DElAegZ5.css                        27.95 kB │ gzip:   4.63 kB
+dist/assets/calculators-CVlgElhE.css                          90.72 kB │ gzip:  14.76 kB
+dist/assets/index-WIye2I_5.css                               119.28 kB │ gzip:  16.89 kB
+dist/assets/index-CFWgcSbD.css                               313.28 kB │ gzip:  49.98 kB
+dist/assets/useProfileShellProps-W4aJX9eC.js                   0.27 kB │ gzip:   0.19 kB
+dist/assets/complaintRouter-CGe5KKEr.js                        0.27 kB │ gzip:   0.23 kB
+dist/assets/receptionQuickIntakeService-C59Vnv_Z.js            0.30 kB │ gzip:   0.22 kB
+dist/assets/CommercialPages-C5Mq3ICa.js                        0.53 kB │ gzip:   0.34 kB
+dist/assets/FleetLiveMap-DS2RyS4H.js                           0.61 kB │ gzip:   0.29 kB
+dist/assets/FleetDashboard-CEodeyOB.js                         0.61 kB │ gzip:   0.29 kB
+dist/assets/Medical3DViewer-DYzi70Wn.js                        0.65 kB │ gzip:   0.31 kB
+dist/assets/DeviceFleetManagement-BI-iFUay.js                  0.71 kB │ gzip:   0.32 kB
+dist/assets/ToolApiErrorBanner-DytXeVHe.js                     0.86 kB │ gzip:   0.41 kB
+dist/assets/receptionIntakeBridge-JXyfvNE1.js                  0.88 kB │ gzip:   0.45 kB
+dist/assets/ApiStateBanner-30y5NUwD.js                         0.94 kB │ gzip:   0.43 kB
+dist/assets/Alert-kI8fEbHE.js                                  1.27 kB │ gzip:   0.48 kB
+dist/assets/crashReportingService-DbRJm85Y.js                  1.41 kB │ gzip:   0.68 kB
+dist/assets/HelpHubPage-B_p9tvK_.js                            1.57 kB │ gzip:   0.69 kB
+dist/assets/automationAuditLogger-CO2PHmIm.js                  1.58 kB │ gzip:   0.64 kB
+dist/assets/emergencyTransportApi-Dr-Fvxuq.js                  1.68 kB │ gzip:   0.86 kB
+dist/assets/OperationalPresentationFrame-TYCGGpQL.js           1.72 kB │ gzip:   0.56 kB
+dist/assets/button-D1CqigK2.js                                 1.79 kB │ gzip:   0.61 kB
+dist/assets/staffManagement-DT18vHo5.js                        2.26 kB │ gzip:   1.09 kB
+dist/assets/simulation-BVjceY8s.js                             2.58 kB │ gzip:   1.22 kB
+dist/assets/StateSourceNotice-DipNqQUH.js                      2.75 kB │ gzip:   1.00 kB
+dist/assets/clinicalIntelligenceApi-DuTddA3b.js                3.28 kB │ gzip:   0.71 kB
+dist/assets/mobileCalculator-g7tjih-F.js                       3.92 kB │ gzip:   1.80 kB
+dist/assets/AdminOperationsShell-CNADx8Wp.js                   4.04 kB │ gzip:   1.22 kB
+dist/assets/surgeApi-eAoErcc9.js                               4.17 kB │ gzip:   1.78 kB
+dist/assets/ProfileSettingsShell-BNag87TZ.js                   4.34 kB │ gzip:   1.06 kB
+dist/assets/OperationalHistoryPanel-C0zZMiDM.js                4.43 kB │ gzip:   1.16 kB
+dist/assets/WhiteboardDisplayRoute-Drb3p7cu.js                 4.46 kB │ gzip:   1.59 kB
+dist/assets/ProcedureGuide-PW0_Lcu9.js                         4.98 kB │ gzip:   1.62 kB
+dist/assets/SharedToolSession-DGzV6GLo.js                      5.48 kB │ gzip:   1.19 kB
+dist/assets/edReadinessService-8wAzMEIF.js                     6.37 kB │ gzip:   2.05 kB
+dist/assets/ProfileSecurity-mLc02gEF.js                        6.45 kB │ gzip:   1.28 kB
+dist/assets/ProfileActivity-CHs_OJco.js                        6.60 kB │ gzip:   1.46 kB
+dist/assets/automationAuditApi-CSGkPTGn.js                     6.86 kB │ gzip:   2.44 kB
+dist/assets/AdminOperationsHome-CcIjagT4.js                    7.00 kB │ gzip:   2.04 kB
+dist/assets/BillingPage-CZ1MdPaA.js                            7.15 kB │ gzip:   1.64 kB
+dist/assets/NotificationService-DfPBYSiD.js                    7.46 kB │ gzip:   2.43 kB
+dist/assets/ProfileWorkspaces-RujTQo6b.js                      7.52 kB │ gzip:   1.67 kB
+dist/assets/UsagePage-DXstfhN2.js                              7.61 kB │ gzip:   1.76 kB
+dist/assets/NephrologyAssistantPage-bZmjZRgo.js                7.93 kB │ gzip:   2.39 kB
+dist/assets/GastroenterologyAssistantPage-D_XVIX4J.js          8.13 kB │ gzip:   2.38 kB
+dist/assets/PulmonologyAssistantPage-DMXQhHAM.js               8.18 kB │ gzip:   2.42 kB
+dist/assets/EndocrineMetabolicAssistantPage-CmD0-6J7.js        8.43 kB │ gzip:   2.41 kB
+dist/assets/HEARTScore-BlCdWNqY.js                             8.44 kB │ gzip:   2.56 kB
+dist/assets/PediatricsObgynAssistantPage-BTH4iwej.js           8.52 kB │ gzip:   2.41 kB
+dist/assets/PsychiatryAssistantPage-CgVYXVDA.js                8.61 kB │ gzip:   2.36 kB
+dist/assets/NeurologyAssistantPage-BcIsH276.js                 8.61 kB │ gzip:   2.54 kB
+dist/assets/CardiologyAssistantPage-_vS-lZUg.js                8.87 kB │ gzip:   2.69 kB
+dist/assets/clinicalChatService-CcMsRObZ.js                    9.11 kB │ gzip:   3.55 kB
+dist/assets/syncService-BXUVIGI6.js                            9.41 kB │ gzip:   2.51 kB
+dist/assets/DiagnosisAssistant-CmD3AuAL.js                     9.54 kB │ gzip:   2.06 kB
+dist/assets/qSOFA-C7jWlh4V.js                                  9.95 kB │ gzip:   2.90 kB
+dist/assets/ProfileSettings-k4LBaMLJ.js                       10.09 kB │ gzip:   2.82 kB
+dist/assets/ClinicalAudit-1v4o1YPI.js                         11.12 kB │ gzip:   2.16 kB
+dist/assets/SystemHealth-CAXVwj80.js                          11.62 kB │ gzip:   3.08 kB
+dist/assets/BottleneckPanels-BQZV2DWt.js                      11.71 kB │ gzip:   1.66 kB
+dist/assets/EMSCriticalBroadcast-BL0r-ugr.js                  12.01 kB │ gzip:   3.25 kB
+dist/assets/GuidelineRag-Cf2LZ8G9.js                          12.56 kB │ gzip:   2.54 kB
+dist/assets/AiExplainability-p63eJe-d.js                      12.84 kB │ gzip:   2.34 kB
+dist/assets/ProfileToolPreferences-C3HyS9EI.js                13.50 kB │ gzip:   2.59 kB
+dist/assets/ProfilePreferences-Bv9vITTN.js                    13.91 kB │ gzip:   2.20 kB
+dist/assets/IntegrationHubPage-BumpPSgp.js                    13.99 kB │ gzip:   2.51 kB
+dist/assets/AmbientScribe-D1izDapG.js                         14.17 kB │ gzip:   3.22 kB
+dist/assets/IntegrationStatusPanel-CiYhXaUd.js                14.18 kB │ gzip:   3.59 kB
+dist/assets/ReassessmentDrawer-DJgBZcs6.js                    14.30 kB │ gzip:   3.53 kB
+dist/assets/DifferentialAi-xK7LBnvJ.js                        14.54 kB │ gzip:   2.62 kB
+dist/assets/analytics-Bfx3L_hO.js                             14.64 kB │ gzip:   3.57 kB
+dist/assets/PediatricDrugCalc-BqMUn49N.js                     14.91 kB │ gzip:   3.28 kB
+dist/assets/CalculatorRecommender-BKmwO4EH.js                 15.33 kB │ gzip:   3.96 kB
+dist/assets/OrderSetAi-CwMTLeB6.js                            15.57 kB │ gzip:   2.85 kB
+dist/assets/AutomationAuditTrail-BxqACKEd.js                  15.70 kB │ gzip:   2.39 kB
+dist/assets/EmsOffloadAttentionStrip-Da4qJYwE.js              15.96 kB │ gzip:   2.03 kB
+dist/assets/PatientSummaryAi-C66O5uKg.js                      16.25 kB │ gzip:   3.04 kB
+dist/assets/HospitalMapDashboard-DedKnKvH.js                  16.35 kB │ gzip:   3.22 kB
+dist/assets/ExecutiveCommandCenter-zeL1-eNu.js                17.11 kB │ gzip:   3.46 kB
+dist/assets/Protocols-xkYcKovB.js                             17.32 kB │ gzip:   3.37 kB
+dist/assets/EdStaffWorkflowAdmin-CKzXHrW_.js                  17.37 kB │ gzip:   3.19 kB
+dist/assets/DrugChecker-DjZKnp9w.js                           17.51 kB │ gzip:   3.41 kB
+dist/assets/TimelineAi-BmzSSkjU.js                            18.46 kB │ gzip:   3.32 kB
+dist/assets/ClinicalDocumentationAssistant-2CjQ3lqu.js        18.74 kB │ gzip:   4.03 kB
+dist/assets/PlatformGovernanceWorkspace-CqYlgrV2.js           19.37 kB │ gzip:   4.69 kB
+dist/assets/index-BoJyIdlJ.js                                 21.91 kB │ gzip:   5.27 kB
+dist/assets/ClinicalAlertsPage-N4amWaOE.js                    22.02 kB │ gzip:   4.74 kB
+dist/assets/TeamManagement-Bfklcw72.js                        22.14 kB │ gzip:   4.18 kB
+dist/assets/PatientRoomDisplay-DF-uffTs.js                    22.46 kB │ gzip:   4.56 kB
+dist/assets/calculators-hospital-operations-Dh48l-Yl.js       22.50 kB │ gzip:   4.20 kB
+dist/assets/CommandPalette-D0oU0EMb.js                        22.60 kB │ gzip:   7.46 kB
+dist/assets/MedicalIotDashboard-9JNvT3q8.js                   22.88 kB │ gzip:   5.71 kB
+dist/assets/NotificationPreferences-CLiu6Gfg.js               23.45 kB │ gzip:   4.12 kB
+dist/assets/useDisplayAutoRefresh-BSCiUOL_.js                 25.90 kB │ gzip:   5.29 kB
+dist/assets/DataQualityRiskPanel-T1Khy8fp.js                  26.20 kB │ gzip:   6.86 kB
+dist/assets/calculators-endocrine-metabolic-Akmh5WF5.js       27.36 kB │ gzip:   6.00 kB
+dist/assets/SelfArrivalCheckIn-BSbQFCkq.js                    28.90 kB │ gzip:   5.57 kB
+dist/assets/AiCommandCenterDashboard-B7BwD3Ox.js              29.22 kB │ gzip:   6.73 kB
+dist/assets/calculators-neurology-2uCNczUy.js                 29.37 kB │ gzip:   6.61 kB
+dist/assets/ReferralPanel-DgCJxtGK.js                         31.05 kB │ gzip:   6.09 kB
+dist/assets/calculators-psychiatry-screening-CZUVqBCp.js      31.13 kB │ gzip:   7.38 kB
+dist/assets/LabInterpreter-nFey3pgR.js                        31.16 kB │ gzip:   4.81 kB
+dist/assets/calculators-nephrology-Dr03ZvHQ.js                32.30 kB │ gzip:   7.12 kB
+dist/assets/calculators-pulmonology-bX6SynSp.js               32.41 kB │ gzip:   7.95 kB
+dist/assets/Profile-B-VHBvLI.js                               33.11 kB │ gzip:   6.11 kB
+dist/assets/FeatureManagement-D3wnPpzG.js                     33.35 kB │ gzip:   6.50 kB
+dist/assets/vendor-icons-BeFo2sD6.js                          38.36 kB │ gzip:  11.77 kB
+dist/assets/DispatchConsole-BkhvyWfk.js                       39.85 kB │ gzip:   6.36 kB
+dist/assets/EmergencyAnalytics-CvL4_Ns8.js                    40.44 kB │ gzip:   6.65 kB
+dist/assets/calculators-pediatrics-obgyn-DH9bwFeF.js          41.49 kB │ gzip:   8.67 kB
+dist/assets/calculators-emergency-critical-care-B5vO4Dux.js   42.50 kB │ gzip:   9.12 kB
+dist/assets/vendor-network-D8Bd_SR2.js                        43.22 kB │ gzip:  16.92 kB
+dist/assets/vendor-firebase-D-mp-ySR.js                       45.78 kB │ gzip:  13.94 kB
+dist/assets/calculators-hepatology-gi-DL9KWSxx.js             47.62 kB │ gzip:   7.77 kB
+dist/assets/index-r1_RFeKw.js                                 48.41 kB │ gzip:  11.22 kB
+dist/assets/calculators-cardiology-BGTSHQpx.js                50.81 kB │ gzip:   8.61 kB
+dist/assets/calculators-mental-health-D1lu6Ie0.js             54.35 kB │ gzip:   9.91 kB
+dist/assets/ReceptionWorkspace-CrjJI0Jb.js                    65.50 kB │ gzip:  10.99 kB
+dist/assets/HelpHub-rxdGOmbu.js                               65.55 kB │ gzip:  16.02 kB
+dist/assets/EMSPipeline-D-lPtRqS.js                           75.46 kB │ gzip:  13.57 kB
+dist/assets/SmartIntake-Dd5V23jF.js                           78.55 kB │ gzip:  19.56 kB
+dist/assets/EmergencySettings-DQhw4DpP.js                     89.67 kB │ gzip:  14.55 kB
+dist/assets/FullJourneyOperatingPage-BsRW7iwe.js              96.60 kB │ gzip:  17.28 kB
+dist/assets/vendor-idb-DWuo8uD1.js                            98.08 kB │ gzip:  32.06 kB
+dist/assets/ToolsOverview-CuB6do_U.js                        123.12 kB │ gzip:  24.11 kB
+dist/assets/PatientDetailPanel-DH92zPVu.js                   132.58 kB │ gzip:  26.35 kB
+dist/assets/OrganizationPages--eh2XvHA.js                    153.27 kB │ gzip:  20.36 kB
+dist/assets/vendor-charts-CGatMrls.js                        252.01 kB │ gzip:  65.75 kB
+dist/assets/calculators-general-clinical-BW10Idaf.js         287.16 kB │ gzip:  48.76 kB
+dist/assets/index-B4kQ96Od.js                                378.13 kB │ gzip:  71.85 kB
+dist/assets/vendor-BBvOX3aW.js                               559.12 kB │ gzip: 176.40 kB
+dist/assets/index-VPH26Dea.js                                750.24 kB │ gzip: 177.11 kB
+dist/assets/calculators-Co_Qvjvs.js                          952.70 kB │ gzip: 229.02 kB
+dist/assets/data-navigation-BBefGhxt.js                      980.28 kB │ gzip: 210.06 kB
+✓ built in 27.26s
+EXIT CODE: 0
+0
+
+========== backend npm run build ==========
+
+> caredroid-clinical-ai-backend@1.0.0 prebuild
+> rimraf dist
+
+
+> caredroid-clinical-ai-backend@1.0.0 build
+> nest build
+
+
+> caredroid-clinical-ai-backend@1.0.0 postbuild
+> node scripts/link-main.mjs
+
+EXIT CODE: 0
+0
+
+========== backend npm test ==========
+
+> caredroid-clinical-ai-backend@1.0.0 test
+> jest --runInBand
+
+npm.cmd : PASS src/modules/product-catalog/product-catalog.service.spec.ts (8.127 s)
+At C:\Users\borah\CareDroid-Clinical-AI\scripts\run-validation-report.ps1:41 char:31
++ Run-Step "backend npm test" { npm.cmd test } -WorkingDirectory (Join- ...
++                               ~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (PASS src/module...ec.ts (8.127 s):String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+PASS test/tool-orchestrator.spec.ts
+PASS src/modules/audit/audit.service.spec.ts
+PASS src/modules/clinical-intelligence/clinical-intelligence.service.spec.ts
+FAIL test/tool-calling.spec.ts
+  ● Tool Calling Integration (Batch 15 Phase 1) › Tool-Calling Method (Step 2) › should return response with 
+toolCalls array
+    AI query with tools failed: invalid x-api-key
+      870 |         },
+      871 |       });
+    > 872 |       throw new Error(
+          |             ^
+      873 |         `AI query with tools failed: ${error instanceof Error ? error.message : String(error)}`,
+      874 |       );
+      875 |     }
+      at AIService.invokeLLMWithTools (src/modules/ai/ai.service.ts:872:13)
+      at Object.<anonymous> (test/tool-calling.spec.ts:375:22)
+  ● Tool Calling Integration (Batch 15 Phase 1) › Tool-Calling Method (Step 2) › should handle multi-turn 
+conversations
+    AI query with tools failed: invalid x-api-key
+      870 |         },
+      871 |       });
+    > 872 |       throw new Error(
+          |             ^
+      873 |         `AI query with tools failed: ${error instanceof Error ? error.message : String(error)}`,
+      874 |       );
+      875 |     }
+      at AIService.invokeLLMWithTools (src/modules/ai/ai.service.ts:872:13)
+      at Object.<anonymous> (test/tool-calling.spec.ts:398:22)
+PASS test/rbac.spec.ts
+PASS src/modules/organizations/organizations.service.spec.ts
+PASS test/lab-interpreter.spec.ts
+PASS src/modules/medical-control-plane/intent-classifier/intent-classifier.service.spec.ts
+PASS test/emergency-escalation.spec.ts
+PASS src/modules/subscriptions/subscriptions.service.spec.ts
+PASS src/modules/memory/memory.services.spec.ts
+PASS test/sofa-calculator.spec.ts
+PASS test/drug-checker.spec.ts
+PASS src/modules/encryption/encryption.service.spec.ts (10.333 s)
+PASS src/modules/ai/ai.service.spec.ts
+PASS src/modules/compliance/compliance.service.spec.ts
+PASS src/modules/platform-governance/platform-governance.service.spec.ts
+PASS src/modules/two-factor/two-factor.service.spec.ts
+PASS src/modules/product-catalog/hospital-solution-builder.service.spec.ts
+PASS src/modules/product-catalog/product-catalog.controller.spec.ts
+PASS src/modules/platform-assets/entitlement.service.spec.ts
+PASS src/modules/platform-assets/organization-analytics.service.spec.ts
+FAIL src/modules/auth/auth.service.spec.ts
+  ● AuthService › should be defined
+    Nest can't resolve dependencies of the AuthService (UserRepository, UserProfileRepository, OAuthAccountRepository, 
+SubscriptionRepository, ?, OrganizationMembershipRepository, WorkspaceRepository, WorkspaceMembershipRepository, 
+JwtService, ConfigService, AuditService, TwoFactorService, EmailService). Please make sure that the argument 
+"OrganizationRepository" at index [4] is available in the RootTestModule context.
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If "OrganizationRepository" is a provider, is it part of the current RootTestModule?
+    - If "OrganizationRepository" is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing "OrganizationRepository" */ ]
+      })
+      71 |
+      72 |   beforeEach(async () => {
+    > 73 |     const module: TestingModule = await Test.createTestingModule({
+         |                                   ^
+      74 |       providers: [
+      75 |         AuthService,
+      76 |         {
+      at TestingInjector.lookupComponentInParentModules (node_modules/@nestjs/core/injector/injector.js:262:19)
+      at TestingInjector.resolveComponentInstance (node_modules/@nestjs/core/injector/injector.js:215:33)
+      at TestingInjector.resolveComponentInstance (node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (node_modules/@nestjs/core/injector/injector.js:129:38)
+          at async Promise.all (index 4)
+      at TestingInjector.resolveConstructorParams (node_modules/@nestjs/core/injector/injector.js:144:27)
+      at TestingInjector.loadInstance (node_modules/@nestjs/core/injector/injector.js:70:13)
+      at TestingInjector.loadProvider (node_modules/@nestjs/core/injector/injector.js:98:9)
+      at node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (src/modules/auth/auth.service.spec.ts:73:35)
+  ● AuthService › login › should return access and refresh tokens
+    Nest can't resolve dependencies of the AuthService (UserRepository, UserProfileRepository, OAuthAccountRepository, 
+SubscriptionRepository, ?, OrganizationMembershipRepository, WorkspaceRepository, WorkspaceMembershipRepository, 
+JwtService, ConfigService, AuditService, TwoFactorService, EmailService). Please make sure that the argument 
+"OrganizationRepository" at index [4] is available in the RootTestModule context.
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If "OrganizationRepository" is a provider, is it part of the current RootTestModule?
+    - If "OrganizationRepository" is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing "OrganizationRepository" */ ]
+      })
+      71 |
+      72 |   beforeEach(async () => {
+    > 73 |     const module: TestingModule = await Test.createTestingModule({
+         |                                   ^
+      74 |       providers: [
+      75 |         AuthService,
+      76 |         {
+      at TestingInjector.lookupComponentInParentModules (node_modules/@nestjs/core/injector/injector.js:262:19)
+      at TestingInjector.resolveComponentInstance (node_modules/@nestjs/core/injector/injector.js:215:33)
+      at TestingInjector.resolveComponentInstance (node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (node_modules/@nestjs/core/injector/injector.js:129:38)
+          at async Promise.all (index 4)
+      at TestingInjector.resolveConstructorParams (node_modules/@nestjs/core/injector/injector.js:144:27)
+      at TestingInjector.loadInstance (node_modules/@nestjs/core/injector/injector.js:70:13)
+      at TestingInjector.loadProvider (node_modules/@nestjs/core/injector/injector.js:98:9)
+      at node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (src/modules/auth/auth.service.spec.ts:73:35)
+  ● AuthService › login › should throw error when user not found
+    Nest can't resolve dependencies of the AuthService (UserRepository, UserProfileRepository, OAuthAccountRepository, 
+SubscriptionRepository, ?, OrganizationMembershipRepository, WorkspaceRepository, WorkspaceMembershipRepository, 
+JwtService, ConfigService, AuditService, TwoFactorService, EmailService). Please make sure that the argument 
+"OrganizationRepository" at index [4] is available in the RootTestModule context.
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If "OrganizationRepository" is a provider, is it part of the current RootTestModule?
+    - If "OrganizationRepository" is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing "OrganizationRepository" */ ]
+      })
+      71 |
+      72 |   beforeEach(async () => {
+    > 73 |     const module: TestingModule = await Test.createTestingModule({
+         |                                   ^
+      74 |       providers: [
+      75 |         AuthService,
+      76 |         {
+      at TestingInjector.lookupComponentInParentModules (node_modules/@nestjs/core/injector/injector.js:262:19)
+      at TestingInjector.resolveComponentInstance (node_modules/@nestjs/core/injector/injector.js:215:33)
+      at TestingInjector.resolveComponentInstance (node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (node_modules/@nestjs/core/injector/injector.js:129:38)
+          at async Promise.all (index 4)
+      at TestingInjector.resolveConstructorParams (node_modules/@nestjs/core/injector/injector.js:144:27)
+      at TestingInjector.loadInstance (node_modules/@nestjs/core/injector/injector.js:70:13)
+      at TestingInjector.loadProvider (node_modules/@nestjs/core/injector/injector.js:98:9)
+      at node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (src/modules/auth/auth.service.spec.ts:73:35)
+  ● AuthService › login › should throw error when password is invalid
+    Nest can't resolve dependencies of the AuthService (UserRepository, UserProfileRepository, OAuthAccountRepository, 
+SubscriptionRepository, ?, OrganizationMembershipRepository, WorkspaceRepository, WorkspaceMembershipRepository, 
+JwtService, ConfigService, AuditService, TwoFactorService, EmailService). Please make sure that the argument 
+"OrganizationRepository" at index [4] is available in the RootTestModule context.
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If "OrganizationRepository" is a provider, is it part of the current RootTestModule?
+    - If "OrganizationRepository" is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing "OrganizationRepository" */ ]
+      })
+      71 |
+      72 |   beforeEach(async () => {
+    > 73 |     const module: TestingModule = await Test.createTestingModule({
+         |                                   ^
+      74 |       providers: [
+      75 |         AuthService,
+      76 |         {
+      at TestingInjector.lookupComponentInParentModules (node_modules/@nestjs/core/injector/injector.js:262:19)
+      at TestingInjector.resolveComponentInstance (node_modules/@nestjs/core/injector/injector.js:215:33)
+      at TestingInjector.resolveComponentInstance (node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (node_modules/@nestjs/core/injector/injector.js:129:38)
+          at async Promise.all (index 4)
+      at TestingInjector.resolveConstructorParams (node_modules/@nestjs/core/injector/injector.js:144:27)
+      at TestingInjector.loadInstance (node_modules/@nestjs/core/injector/injector.js:70:13)
+      at TestingInjector.loadProvider (node_modules/@nestjs/core/injector/injector.js:98:9)
+      at node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (src/modules/auth/auth.service.spec.ts:73:35)
+  ● AuthService › createDevSession › requires an explicit development bypass flag
+    Nest can't resolve dependencies of the AuthService (UserRepository, UserProfileRepository, OAuthAccountRepository, 
+SubscriptionRepository, ?, OrganizationMembershipRepository, WorkspaceRepository, WorkspaceMembershipRepository, 
+JwtService, ConfigService, AuditService, TwoFactorService, EmailService). Please make sure that the argument 
+"OrganizationRepository" at index [4] is available in the RootTestModule context.
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If "OrganizationRepository" is a provider, is it part of the current RootTestModule?
+    - If "OrganizationRepository" is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing "OrganizationRepository" */ ]
+      })
+      71 |
+      72 |   beforeEach(async () => {
+    > 73 |     const module: TestingModule = await Test.createTestingModule({
+         |                                   ^
+      74 |       providers: [
+      75 |         AuthService,
+      76 |         {
+      at TestingInjector.lookupComponentInParentModules (node_modules/@nestjs/core/injector/injector.js:262:19)
+      at TestingInjector.resolveComponentInstance (node_modules/@nestjs/core/injector/injector.js:215:33)
+      at TestingInjector.resolveComponentInstance (node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (node_modules/@nestjs/core/injector/injector.js:129:38)
+          at async Promise.all (index 4)
+      at TestingInjector.resolveConstructorParams (node_modules/@nestjs/core/injector/injector.js:144:27)
+      at TestingInjector.loadInstance (node_modules/@nestjs/core/injector/injector.js:70:13)
+      at TestingInjector.loadProvider (node_modules/@nestjs/core/injector/injector.js:98:9)
+      at node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (src/modules/auth/auth.service.spec.ts:73:35)
+  ● AuthService › createDevSession › refuses production even when the bypass flag is set
+    Nest can't resolve dependencies of the AuthService (UserRepository, UserProfileRepository, OAuthAccountRepository, 
+SubscriptionRepository, ?, OrganizationMembershipRepository, WorkspaceRepository, WorkspaceMembershipRepository, 
+JwtService, ConfigService, AuditService, TwoFactorService, EmailService). Please make sure that the argument 
+"OrganizationRepository" at index [4] is available in the RootTestModule context.
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If "OrganizationRepository" is a provider, is it part of the current RootTestModule?
+    - If "OrganizationRepository" is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing "OrganizationRepository" */ ]
+      })
+      71 |
+      72 |   beforeEach(async () => {
+    > 73 |     const module: TestingModule = await Test.createTestingModule({
+         |                                   ^
+      74 |       providers: [
+      75 |         AuthService,
+      76 |         {
+      at TestingInjector.lookupComponentInParentModules (node_modules/@nestjs/core/injector/injector.js:262:19)
+      at TestingInjector.resolveComponentInstance (node_modules/@nestjs/core/injector/injector.js:215:33)
+      at TestingInjector.resolveComponentInstance (node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (node_modules/@nestjs/core/injector/injector.js:129:38)
+          at async Promise.all (index 4)
+      at TestingInjector.resolveConstructorParams (node_modules/@nestjs/core/injector/injector.js:144:27)
+      at TestingInjector.loadInstance (node_modules/@nestjs/core/injector/injector.js:70:13)
+      at TestingInjector.loadProvider (node_modules/@nestjs/core/injector/injector.js:98:9)
+      at node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (src/modules/auth/auth.service.spec.ts:73:35)
+  ● AuthService › register › should create new user and return tokens
+    Nest can't resolve dependencies of the AuthService (UserRepository, UserProfileRepository, OAuthAccountRepository, 
+SubscriptionRepository, ?, OrganizationMembershipRepository, WorkspaceRepository, WorkspaceMembershipRepository, 
+JwtService, ConfigService, AuditService, TwoFactorService, EmailService). Please make sure that the argument 
+"OrganizationRepository" at index [4] is available in the RootTestModule context.
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If "OrganizationRepository" is a provider, is it part of the current RootTestModule?
+    - If "OrganizationRepository" is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing "OrganizationRepository" */ ]
+      })
+      71 |
+      72 |   beforeEach(async () => {
+    > 73 |     const module: TestingModule = await Test.createTestingModule({
+         |                                   ^
+      74 |       providers: [
+      75 |         AuthService,
+      76 |         {
+      at TestingInjector.lookupComponentInParentModules (node_modules/@nestjs/core/injector/injector.js:262:19)
+      at TestingInjector.resolveComponentInstance (node_modules/@nestjs/core/injector/injector.js:215:33)
+      at TestingInjector.resolveComponentInstance (node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (node_modules/@nestjs/core/injector/injector.js:129:38)
+          at async Promise.all (index 4)
+      at TestingInjector.resolveConstructorParams (node_modules/@nestjs/core/injector/injector.js:144:27)
+      at TestingInjector.loadInstance (node_modules/@nestjs/core/injector/injector.js:70:13)
+      at TestingInjector.loadProvider (node_modules/@nestjs/core/injector/injector.js:98:9)
+      at node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (src/modules/auth/auth.service.spec.ts:73:35)
+  ● AuthService › register › should throw error when email already exists
+    Nest can't resolve dependencies of the AuthService (UserRepository, UserProfileRepository, OAuthAccountRepository, 
+SubscriptionRepository, ?, OrganizationMembershipRepository, WorkspaceRepository, WorkspaceMembershipRepository, 
+JwtService, ConfigService, AuditService, TwoFactorService, EmailService). Please make sure that the argument 
+"OrganizationRepository" at index [4] is available in the RootTestModule context.
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If "OrganizationRepository" is a provider, is it part of the current RootTestModule?
+    - If "OrganizationRepository" is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing "OrganizationRepository" */ ]
+      })
+      71 |
+      72 |   beforeEach(async () => {
+    > 73 |     const module: TestingModule = await Test.createTestingModule({
+         |                                   ^
+      74 |       providers: [
+      75 |         AuthService,
+      76 |         {
+      at TestingInjector.lookupComponentInParentModules (node_modules/@nestjs/core/injector/injector.js:262:19)
+      at TestingInjector.resolveComponentInstance (node_modules/@nestjs/core/injector/injector.js:215:33)
+      at TestingInjector.resolveComponentInstance (node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (node_modules/@nestjs/core/injector/injector.js:129:38)
+          at async Promise.all (index 4)
+      at TestingInjector.resolveConstructorParams (node_modules/@nestjs/core/injector/injector.js:144:27)
+      at TestingInjector.loadInstance (node_modules/@nestjs/core/injector/injector.js:70:13)
+      at TestingInjector.loadProvider (node_modules/@nestjs/core/injector/injector.js:98:9)
+      at node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (src/modules/auth/auth.service.spec.ts:73:35)
+PASS src/modules/subscriptions/usage-metering.service.spec.ts
+PASS src/modules/tool-calling/tool-calling.services.spec.ts
+PASS src/modules/platform-assets/platform-assets.service.spec.ts
+PASS src/modules/interoperability/integration-hub.service.spec.ts
+PASS src/modules/platform-assets/asset-registry.service.spec.ts
+PASS src/modules/platform-systems/platform-systems.controller.spec.ts
+PASS src/modules/organizations/organization-onboarding.service.spec.ts
+PASS src/modules/product-catalog/asset-dependency-graph.service.spec.ts
+PASS src/modules/workspaces/workspaces.service.spec.ts
+PASS src/modules/platform-assets/customer-success.service.spec.ts
+PASS src/modules/platform-assets/platform-context.service.spec.ts
+PASS src/modules/medical-control-plane/tool-orchestrator/tool-orchestrator.registry.spec.ts
+PASS src/modules/emergency-os/emergency-os.research.controller.spec.ts
+PASS src/modules/clinical/drug.service.spec.ts
+PASS src/modules/interoperability/integration-automation-router.service.spec.ts
+PASS src/modules/tenant-context/tenant-isolation.guard.spec.ts
+PASS src/modules/product-catalog/value-tracking.service.spec.ts
+PASS src/modules/tenant-context/tenant-context.service.spec.ts
+PASS src/modules/ai-gateway/ai-gateway.service.spec.ts
+PASS src/modules/platform-assets/department-asset-mapping.service.spec.ts
+PASS src/modules/moe-router/moe-router.service.spec.ts
+PASS src/modules/platform-assets/service-line-architecture.service.spec.ts
+PASS src/modules/workspaces/workspace-context.service.spec.ts
+PASS src/modules/ai/foundation/ai-routing-engine.service.spec.ts
+PASS src/modules/product-catalog/product-catalog-validation.service.spec.ts
+PASS src/modules/artifacts/artifacts.service.spec.ts
+PASS src/modules/ai/ai.controller.spec.ts
+PASS src/modules/cost-optimizer/routing-optimizer.service.spec.ts
+PASS src/modules/platform-assets/platform-assets.seed.service.spec.ts
+PASS src/modules/platform-assets/platform-governance-registry.service.spec.ts
+PASS src/modules/rag/citation.service.spec.ts
+PASS src/modules/platform-assets/feature-flag.service.spec.ts
+PASS src/modules/automation-audit/automation-audit.service.spec.ts
+FAIL src/api/health.routes.spec.ts
+  ● Test suite failed to run
+    src/api/health.routes.spec.ts:19:15 - error TS2349: This expression is not callable.
+      Type 'typeof e' has no call signatures.
+    19   const app = express();
+                     ~~~~~~~
+      src/api/health.routes.spec.ts:1:1
+        1 import * as express from 'express';
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        Type originates at this import. A namespace-style import cannot be called or constructed, and will cause a 
+failure at runtime. Consider using a default import or import require here instead.
+    src/api/health.routes.spec.ts:66:28 - error TS2349: This expression is not callable.
+      Type '{ default: SuperTestStatic; Test: typeof Test; agent: typeof TestAgent & ((app?: App, options?: 
+AgentOptions) => TestAgent<Test>); cookies: ExpectCookiesStatic; }' has no call signatures.
+    66     const response = await request(buildApp()).get('/health').expect(200);
+                                  ~~~~~~~
+      src/api/health.routes.spec.ts:2:1
+        2 import * as request from 'supertest';
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        Type originates at this import. A namespace-style import cannot be called or constructed, and will cause a 
+failure at runtime. Consider using a default import or import require here instead.
+    src/api/health.routes.spec.ts:96:28 - error TS2349: This expression is not callable.
+      Type '{ default: SuperTestStatic; Test: typeof Test; agent: typeof TestAgent & ((app?: App, options?: 
+AgentOptions) => TestAgent<Test>); cookies: ExpectCookiesStatic; }' has no call signatures.
+    96     const response = await request(buildApp()).get('/health').expect(503);
+                                  ~~~~~~~
+      src/api/health.routes.spec.ts:2:1
+        2 import * as request from 'supertest';
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        Type originates at this import. A namespace-style import cannot be called or constructed, and will cause a 
+failure at runtime. Consider using a default import or import require here instead.
+PASS src/modules/users/users.service.spec.ts
+PASS src/modules/ai/foundation/ai-response-composer.service.spec.ts
+PASS src/modules/subscriptions/subscription-lifecycle.engine.spec.ts
+PASS src/modules/subscriptions/subscriptions.controller.spec.ts
+PASS src/modules/rag/retrieval.service.spec.ts
+PASS src/modules/platform-systems/platform-systems.service.spec.ts
+FAIL src/modules/product-catalog/asset-based-revenue.service.spec.ts
+  ● AssetBasedRevenueService › gives every asset a complete commercial model row
+    expect(received).toEqual(expected) // deep equality
+    - Expected  -  1
+    + Received  + 17
+    - Array []
+    + Array [
+    +   Object {
+    +     "message": "reception-desk is not linked to a product or core platform product.",
+    +     "packId": "reception-desk",
+    +     "type": "pack-missing-product",
+    +   },
+    +   Object {
+    +     "message": "emergency-clinical is not linked to a product or core platform product.",
+    +     "packId": "emergency-clinical",
+    +     "type": "pack-missing-product",
+    +   },
+    +   Object {
+    +     "message": "trackmind is not linked to a product or core platform product.",
+    +     "packId": "trackmind",
+    +     "type": "pack-missing-product",
+    +   },
+    + ]
+      31 |
+      32 |   it('gives every asset a complete commercial model row', () => {
+    > 33 |     expect(matrix.validationIssues).toEqual([]);
+         |                                     ^
+      34 |
+      35 |     const rowsByAssetId = new Map<string, typeof matrix.rows>();
+      36 |     for (const row of matrix.rows) {
+      at Object.<anonymous> (src/modules/product-catalog/asset-based-revenue.service.spec.ts:33:37)
+PASS src/modules/user-profile/user-preferences.service.spec.ts
+PASS src/app.controller.spec.ts
+PASS src/modules/ai/foundation/ai-context-manager.service.spec.ts
+PASS src/config/environment.config.spec.ts
+PASS src/modules/evaluation/evaluation.service.spec.ts
+PASS src/modules/rag/embedding.service.spec.ts
+PASS src/modules/tenant-context/tenant-context.interceptor.spec.ts
+PASS src/modules/training/training.service.spec.ts
+FAIL src/services/ai-governance.service.spec.ts
+  ● AIGovernanceService › returns the enterprise registry snapshot with governed services and safety rules
+    expect(received).toContain(expected) // indexOf
+    Expected value: "Human review required"
+    Received array: ["Human review required. This is not a replacement for clinical judgment.", "External health 
+record data requires clinician review before use.", "AI-generated content - verify before acting"]
+      21 |       ]),
+      22 |     );
+    > 23 |     expect(snapshot.safetyRules.requiredDisclaimers).toContain('Human review required');
+         |                                                      ^
+      24 |     expect(snapshot.governanceFrameworks).toContain('NIST AI RMF');
+      25 |   });
+      26 |
+      at Object.<anonymous> (src/services/ai-governance.service.spec.ts:23:54)
+PASS src/modules/platform-assets/digital-twin.service.spec.ts
+PASS src/modules/automation-audit/automation-audit.controller.spec.ts
+PASS src/modules/tenant-context/tenant-scope.interceptor.spec.ts
+PASS src/modules/rag/clinical-context.service.spec.ts
+PASS src/modules/platform-assets/platform-assets.controller.spec.ts
+PASS src/modules/hospital-map/device-location.service.spec.ts
+PASS src/modules/observability/observability.module.spec.ts
+PASS src/modules/analytics/services/analytics.service.spec.ts
+PASS src/modules/platform-assets/automation-commercialization.spec.ts
+PASS src/services/service-registry.spec.ts
+PASS test/algorithmic-lookup.benchmark.spec.ts
+PASS src/models/unified-patient.model.spec.ts
+PASS src/modules/auth/identity-provider-registry.service.spec.ts
+PASS test/tool-patterns-pediatrics-obgyn-pack.spec.ts
+PASS src/modules/chat/chat.ed-copilot.spec.ts
+PASS test/tool-patterns-psychiatry-screening-pack.spec.ts
+PASS src/api/routes-registry.spec.ts
+PASS src/modules/medical-control-plane/emergency-escalation/emergency-escalation.service.spec.ts
+PASS test/backend-contract-hardening.spec.ts
+PASS src/modules/notifications/services/notification.service.spec.ts
+PASS src/modules/telemetry/telemetry.service.spec.ts
+PASS src/app.module.spec.ts
+PASS src/modules/fleet/fleet.service.spec.ts
+PASS src/modules/clinical-alerts/clinical-alerts.service.spec.ts
+PASS test/tool-patterns-endocrine-metabolic-pack.spec.ts
+PASS test/tool-patterns-nephrology-pack.spec.ts
+PASS src/modules/governance/governance.services.spec.ts
+PASS test/tool-patterns-pulmonology-pack.spec.ts
+PASS src/modules/chat/chat.assistant-integration.spec.ts
+PASS src/modules/permissions/workspace-permissions.service.spec.ts
+PASS src/modules/fleet/vehicle-tracking.service.spec.ts
+PASS test/tool-patterns-cardiology-pack.spec.ts
+PASS test/tool-patterns-neurology-pack.spec.ts
+PASS src/modules/telemetry/device-registry.service.spec.ts
+PASS src/modules/tenant-context/tenant-data-isolation-audit.service.spec.ts
+PASS src/modules/ai/foundation/ai-gateway.service.spec.ts
+PASS src/modules/llm-security/llm-security.services.spec.ts
+PASS test/tool-patterns-ascvd-risk.spec.ts
+PASS test/tool-patterns-wells-pe.spec.ts
+PASS src/modules/hospital-map/room.service.spec.ts
+PASS test/tool-patterns-grace-acs.spec.ts
+PASS src/modules/metrics/metrics.controller.spec.ts
+PASS test/tool-patterns-nihss.spec.ts
+PASS src/modules/telemetry/alert.service.spec.ts
+PASS src/modules/hospital-map/floor.service.spec.ts
+PASS test/tool-patterns-hospital-scales.spec.ts
+PASS test/tool-patterns-news2.spec.ts
+PASS test/tool-patterns-obstetric-scales.spec.ts
+PASS test/tool-patterns-fib4-bisap.spec.ts
+PASS test/tool-patterns-meld.spec.ts
+PASS test/tool-patterns-timi.spec.ts
+PASS test/tool-patterns-canadian-c-spine.spec.ts
+PASS test/tool-patterns-ottawa-ankle.spec.ts
+PASS src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ai-systems.spec.ts
+PASS src/modules/artifacts/asset-registry.service.spec.ts
+PASS test/tool-patterns-ckd-staging.spec.ts
+PASS test/tool-patterns-stop-bang.spec.ts
+PASS src/modules/workspace-intelligence/search.service.spec.ts
+PASS test/tool-patterns-rome-iv-ibs.spec.ts
+PASS test/tool-patterns-copd-gold.spec.ts
+PASS test/tool-patterns-audit-c.spec.ts
+PASS test/tool-patterns-gad7.spec.ts
+PASS test/tool-patterns-phq9.spec.ts
+PASS test/tool-patterns-perc.spec.ts
+PASS test/tool-patterns-child-pugh.spec.ts
+PASS src/modules/chat/chat.unsupported-tool.spec.ts
+PASS src/modules/auth/auth.controller.spec.ts
+PASS src/modules/clinical-intelligence/timeline.service.spec.ts
+PASS test/tool-patterns-nexus-cspine.spec.ts
+PASS test/tool-patterns-pecarn-head.spec.ts
+PASS test/tool-patterns-heart-score.spec.ts
+PASS test/tool-patterns-has-bled.spec.ts
+PASS test/tool-patterns-abcd2.spec.ts
+PASS src/modules/chat/emergency-ai.controller.spec.ts
+PASS src/modules/emergency-os/emergency-realtime.controller.spec.ts
+PASS src/modules/emergency-os/emergency-realtime.service.spec.ts
+PASS src/modules/user-profile/saas-profile-rbac.config.spec.ts
+PASS src/modules/surveillance/surveillance.module.spec.ts
+PASS src/modules/organizations/tenant-provisioning.service.spec.ts
+PASS src/modules/emergency-os/emergency-os.controller.spec.ts
+PASS src/modules/trackmind/trackmind-rbac.config.spec.ts
+PASS src/modules/emergency-os/patient-arrival.sync.spec.ts
+PASS src/modules/chat/calculator-recommender.service.spec.ts
+PASS src/modules/emergency-os/clinical-decision-support.service.spec.ts
+Summary of all failing tests
+FAIL test/tool-calling.spec.ts
+  ● Tool Calling Integration (Batch 15 Phase 1) › Tool-Calling Method (Step 2) › should return response with 
+toolCalls array
+    AI query with tools failed: invalid x-api-key
+      870 |         },
+      871 |       });
+    > 872 |       throw new Error(
+          |             ^
+      873 |         `AI query with tools failed: ${error instanceof Error ? error.message : String(error)}`,
+      874 |       );
+      875 |     }
+      at AIService.invokeLLMWithTools (src/modules/ai/ai.service.ts:872:13)
+      at Object.<anonymous> (test/tool-calling.spec.ts:375:22)
+  ● Tool Calling Integration (Batch 15 Phase 1) › Tool-Calling Method (Step 2) › should handle multi-turn 
+conversations
+    AI query with tools failed: invalid x-api-key
+      870 |         },
+      871 |       });
+    > 872 |       throw new Error(
+          |             ^
+      873 |         `AI query with tools failed: ${error instanceof Error ? error.message : String(error)}`,
+      874 |       );
+      875 |     }
+      at AIService.invokeLLMWithTools (src/modules/ai/ai.service.ts:872:13)
+      at Object.<anonymous> (test/tool-calling.spec.ts:398:22)
+FAIL src/modules/auth/auth.service.spec.ts
+  ● AuthService › should be defined
+    Nest can't resolve dependencies of the AuthService (UserRepository, UserProfileRepository, OAuthAccountRepository, 
+SubscriptionRepository, ?, OrganizationMembershipRepository, WorkspaceRepository, WorkspaceMembershipRepository, 
+JwtService, ConfigService, AuditService, TwoFactorService, EmailService). Please make sure that the argument 
+"OrganizationRepository" at index [4] is available in the RootTestModule context.
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If "OrganizationRepository" is a provider, is it part of the current RootTestModule?
+    - If "OrganizationRepository" is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing "OrganizationRepository" */ ]
+      })
+      71 |
+      72 |   beforeEach(async () => {
+    > 73 |     const module: TestingModule = await Test.createTestingModule({
+         |                                   ^
+      74 |       providers: [
+      75 |         AuthService,
+      76 |         {
+      at TestingInjector.lookupComponentInParentModules (node_modules/@nestjs/core/injector/injector.js:262:19)
+      at TestingInjector.resolveComponentInstance (node_modules/@nestjs/core/injector/injector.js:215:33)
+      at TestingInjector.resolveComponentInstance (node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (node_modules/@nestjs/core/injector/injector.js:129:38)
+          at async Promise.all (index 4)
+      at TestingInjector.resolveConstructorParams (node_modules/@nestjs/core/injector/injector.js:144:27)
+      at TestingInjector.loadInstance (node_modules/@nestjs/core/injector/injector.js:70:13)
+      at TestingInjector.loadProvider (node_modules/@nestjs/core/injector/injector.js:98:9)
+      at node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (src/modules/auth/auth.service.spec.ts:73:35)
+  ● AuthService › login › should return access and refresh tokens
+    Nest can't resolve dependencies of the AuthService (UserRepository, UserProfileRepository, OAuthAccountRepository, 
+SubscriptionRepository, ?, OrganizationMembershipRepository, WorkspaceRepository, WorkspaceMembershipRepository, 
+JwtService, ConfigService, AuditService, TwoFactorService, EmailService). Please make sure that the argument 
+"OrganizationRepository" at index [4] is available in the RootTestModule context.
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If "OrganizationRepository" is a provider, is it part of the current RootTestModule?
+    - If "OrganizationRepository" is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing "OrganizationRepository" */ ]
+      })
+      71 |
+      72 |   beforeEach(async () => {
+    > 73 |     const module: TestingModule = await Test.createTestingModule({
+         |                                   ^
+      74 |       providers: [
+      75 |         AuthService,
+      76 |         {
+      at TestingInjector.lookupComponentInParentModules (node_modules/@nestjs/core/injector/injector.js:262:19)
+      at TestingInjector.resolveComponentInstance (node_modules/@nestjs/core/injector/injector.js:215:33)
+      at TestingInjector.resolveComponentInstance (node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (node_modules/@nestjs/core/injector/injector.js:129:38)
+          at async Promise.all (index 4)
+      at TestingInjector.resolveConstructorParams (node_modules/@nestjs/core/injector/injector.js:144:27)
+      at TestingInjector.loadInstance (node_modules/@nestjs/core/injector/injector.js:70:13)
+      at TestingInjector.loadProvider (node_modules/@nestjs/core/injector/injector.js:98:9)
+      at node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (src/modules/auth/auth.service.spec.ts:73:35)
+  ● AuthService › login › should throw error when user not found
+    Nest can't resolve dependencies of the AuthService (UserRepository, UserProfileRepository, OAuthAccountRepository, 
+SubscriptionRepository, ?, OrganizationMembershipRepository, WorkspaceRepository, WorkspaceMembershipRepository, 
+JwtService, ConfigService, AuditService, TwoFactorService, EmailService). Please make sure that the argument 
+"OrganizationRepository" at index [4] is available in the RootTestModule context.
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If "OrganizationRepository" is a provider, is it part of the current RootTestModule?
+    - If "OrganizationRepository" is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing "OrganizationRepository" */ ]
+      })
+      71 |
+      72 |   beforeEach(async () => {
+    > 73 |     const module: TestingModule = await Test.createTestingModule({
+         |                                   ^
+      74 |       providers: [
+      75 |         AuthService,
+      76 |         {
+      at TestingInjector.lookupComponentInParentModules (node_modules/@nestjs/core/injector/injector.js:262:19)
+      at TestingInjector.resolveComponentInstance (node_modules/@nestjs/core/injector/injector.js:215:33)
+      at TestingInjector.resolveComponentInstance (node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (node_modules/@nestjs/core/injector/injector.js:129:38)
+          at async Promise.all (index 4)
+      at TestingInjector.resolveConstructorParams (node_modules/@nestjs/core/injector/injector.js:144:27)
+      at TestingInjector.loadInstance (node_modules/@nestjs/core/injector/injector.js:70:13)
+      at TestingInjector.loadProvider (node_modules/@nestjs/core/injector/injector.js:98:9)
+      at node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (src/modules/auth/auth.service.spec.ts:73:35)
+  ● AuthService › login › should throw error when password is invalid
+    Nest can't resolve dependencies of the AuthService (UserRepository, UserProfileRepository, OAuthAccountRepository, 
+SubscriptionRepository, ?, OrganizationMembershipRepository, WorkspaceRepository, WorkspaceMembershipRepository, 
+JwtService, ConfigService, AuditService, TwoFactorService, EmailService). Please make sure that the argument 
+"OrganizationRepository" at index [4] is available in the RootTestModule context.
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If "OrganizationRepository" is a provider, is it part of the current RootTestModule?
+    - If "OrganizationRepository" is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing "OrganizationRepository" */ ]
+      })
+      71 |
+      72 |   beforeEach(async () => {
+    > 73 |     const module: TestingModule = await Test.createTestingModule({
+         |                                   ^
+      74 |       providers: [
+      75 |         AuthService,
+      76 |         {
+      at TestingInjector.lookupComponentInParentModules (node_modules/@nestjs/core/injector/injector.js:262:19)
+      at TestingInjector.resolveComponentInstance (node_modules/@nestjs/core/injector/injector.js:215:33)
+      at TestingInjector.resolveComponentInstance (node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (node_modules/@nestjs/core/injector/injector.js:129:38)
+          at async Promise.all (index 4)
+      at TestingInjector.resolveConstructorParams (node_modules/@nestjs/core/injector/injector.js:144:27)
+      at TestingInjector.loadInstance (node_modules/@nestjs/core/injector/injector.js:70:13)
+      at TestingInjector.loadProvider (node_modules/@nestjs/core/injector/injector.js:98:9)
+      at node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (src/modules/auth/auth.service.spec.ts:73:35)
+  ● AuthService › createDevSession › requires an explicit development bypass flag
+    Nest can't resolve dependencies of the AuthService (UserRepository, UserProfileRepository, OAuthAccountRepository, 
+SubscriptionRepository, ?, OrganizationMembershipRepository, WorkspaceRepository, WorkspaceMembershipRepository, 
+JwtService, ConfigService, AuditService, TwoFactorService, EmailService). Please make sure that the argument 
+"OrganizationRepository" at index [4] is available in the RootTestModule context.
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If "OrganizationRepository" is a provider, is it part of the current RootTestModule?
+    - If "OrganizationRepository" is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing "OrganizationRepository" */ ]
+      })
+      71 |
+      72 |   beforeEach(async () => {
+    > 73 |     const module: TestingModule = await Test.createTestingModule({
+         |                                   ^
+      74 |       providers: [
+      75 |         AuthService,
+      76 |         {
+      at TestingInjector.lookupComponentInParentModules (node_modules/@nestjs/core/injector/injector.js:262:19)
+      at TestingInjector.resolveComponentInstance (node_modules/@nestjs/core/injector/injector.js:215:33)
+      at TestingInjector.resolveComponentInstance (node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (node_modules/@nestjs/core/injector/injector.js:129:38)
+          at async Promise.all (index 4)
+      at TestingInjector.resolveConstructorParams (node_modules/@nestjs/core/injector/injector.js:144:27)
+      at TestingInjector.loadInstance (node_modules/@nestjs/core/injector/injector.js:70:13)
+      at TestingInjector.loadProvider (node_modules/@nestjs/core/injector/injector.js:98:9)
+      at node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (src/modules/auth/auth.service.spec.ts:73:35)
+  ● AuthService › createDevSession › refuses production even when the bypass flag is set
+    Nest can't resolve dependencies of the AuthService (UserRepository, UserProfileRepository, OAuthAccountRepository, 
+SubscriptionRepository, ?, OrganizationMembershipRepository, WorkspaceRepository, WorkspaceMembershipRepository, 
+JwtService, ConfigService, AuditService, TwoFactorService, EmailService). Please make sure that the argument 
+"OrganizationRepository" at index [4] is available in the RootTestModule context.
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If "OrganizationRepository" is a provider, is it part of the current RootTestModule?
+    - If "OrganizationRepository" is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing "OrganizationRepository" */ ]
+      })
+      71 |
+      72 |   beforeEach(async () => {
+    > 73 |     const module: TestingModule = await Test.createTestingModule({
+         |                                   ^
+      74 |       providers: [
+      75 |         AuthService,
+      76 |         {
+      at TestingInjector.lookupComponentInParentModules (node_modules/@nestjs/core/injector/injector.js:262:19)
+      at TestingInjector.resolveComponentInstance (node_modules/@nestjs/core/injector/injector.js:215:33)
+      at TestingInjector.resolveComponentInstance (node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (node_modules/@nestjs/core/injector/injector.js:129:38)
+          at async Promise.all (index 4)
+      at TestingInjector.resolveConstructorParams (node_modules/@nestjs/core/injector/injector.js:144:27)
+      at TestingInjector.loadInstance (node_modules/@nestjs/core/injector/injector.js:70:13)
+      at TestingInjector.loadProvider (node_modules/@nestjs/core/injector/injector.js:98:9)
+      at node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (src/modules/auth/auth.service.spec.ts:73:35)
+  ● AuthService › register › should create new user and return tokens
+    Nest can't resolve dependencies of the AuthService (UserRepository, UserProfileRepository, OAuthAccountRepository, 
+SubscriptionRepository, ?, OrganizationMembershipRepository, WorkspaceRepository, WorkspaceMembershipRepository, 
+JwtService, ConfigService, AuditService, TwoFactorService, EmailService). Please make sure that the argument 
+"OrganizationRepository" at index [4] is available in the RootTestModule context.
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If "OrganizationRepository" is a provider, is it part of the current RootTestModule?
+    - If "OrganizationRepository" is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing "OrganizationRepository" */ ]
+      })
+      71 |
+      72 |   beforeEach(async () => {
+    > 73 |     const module: TestingModule = await Test.createTestingModule({
+         |                                   ^
+      74 |       providers: [
+      75 |         AuthService,
+      76 |         {
+      at TestingInjector.lookupComponentInParentModules (node_modules/@nestjs/core/injector/injector.js:262:19)
+      at TestingInjector.resolveComponentInstance (node_modules/@nestjs/core/injector/injector.js:215:33)
+      at TestingInjector.resolveComponentInstance (node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (node_modules/@nestjs/core/injector/injector.js:129:38)
+          at async Promise.all (index 4)
+      at TestingInjector.resolveConstructorParams (node_modules/@nestjs/core/injector/injector.js:144:27)
+      at TestingInjector.loadInstance (node_modules/@nestjs/core/injector/injector.js:70:13)
+      at TestingInjector.loadProvider (node_modules/@nestjs/core/injector/injector.js:98:9)
+      at node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (src/modules/auth/auth.service.spec.ts:73:35)
+  ● AuthService › register › should throw error when email already exists
+    Nest can't resolve dependencies of the AuthService (UserRepository, UserProfileRepository, OAuthAccountRepository, 
+SubscriptionRepository, ?, OrganizationMembershipRepository, WorkspaceRepository, WorkspaceMembershipRepository, 
+JwtService, ConfigService, AuditService, TwoFactorService, EmailService). Please make sure that the argument 
+"OrganizationRepository" at index [4] is available in the RootTestModule context.
+    Potential solutions:
+    - Is RootTestModule a valid NestJS module?
+    - If "OrganizationRepository" is a provider, is it part of the current RootTestModule?
+    - If "OrganizationRepository" is exported from a separate @Module, is that module imported within RootTestModule?
+      @Module({
+        imports: [ /* the Module containing "OrganizationRepository" */ ]
+      })
+      71 |
+      72 |   beforeEach(async () => {
+    > 73 |     const module: TestingModule = await Test.createTestingModule({
+         |                                   ^
+      74 |       providers: [
+      75 |         AuthService,
+      76 |         {
+      at TestingInjector.lookupComponentInParentModules (node_modules/@nestjs/core/injector/injector.js:262:19)
+      at TestingInjector.resolveComponentInstance (node_modules/@nestjs/core/injector/injector.js:215:33)
+      at TestingInjector.resolveComponentInstance (node_modules/@nestjs/testing/testing-injector.js:19:45)
+      at resolveParam (nodEXIT CODE: 1e_modules/@nestjs/core/injector/injector.js:129:38)
+          at async Promise.all (index 4)
+      at TestingInjector.resolveConstructorParams (node_modules/@nestjs/core/injector/injector.js:144:27)
+      at TestingInjector.loadInstance (node_modules/@nestjs/core/injector/injector.js:70:13)
+      at TestingInjector.loadProvider (node_modules/@nestjs/core/injector/injector.js:98:9)
+      at node_modules/@nestjs/core/injector/instance-loader.js:56:13
+          at async Promise.all (index 3)
+      at TestingInstanceLoader.createInstancesOfProviders (node_modules/@nestjs/core/injector/instance-loader.js:55:9)
+      at node_modules/@nestjs/core/injector/instance-loader.js:40:13
+          at async Promise.all (index 1)
+      at TestingInstanceLoader.createInstances (node_modules/@nestjs/core/injector/instance-loader.js:39:9)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(node_modules/@nestjs/core/injector/instance-loader.js:22:13)
+      at TestingInstanceLoader.createInstancesOfDependencies 
+(node_modules/@nestjs/testing/testing-instance-loader.js:9:9)
+      at TestingModuleBuilder.createInstancesOfDependencies 
+(node_modules/@nestjs/testing/testing-module.builder.js:118:9)
+      at TestingModuleBuilder.compile (node_modules/@nestjs/testing/testing-module.builder.js:74:9)
+      at Object.<anonymous> (src/modules/auth/auth.service.spec.ts:73:35)
+FAIL src/api/health.routes.spec.ts
+  ● Test suite failed to run
+    src/api/health.routes.spec.ts:19:15 - error TS2349: This expression is not callable.
+      Type 'typeof e' has no call signatures.
+    19   const app = express();
+                     ~~~~~~~
+      src/api/health.routes.spec.ts:1:1
+        1 import * as express from 'express';
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        Type originates at this import. A namespace-style import cannot be called or constructed, and will cause a 
+failure at runtime. Consider using a default import or import require here instead.
+    src/api/health.routes.spec.ts:66:28 - error TS2349: This expression is not callable.
+      Type '{ default: SuperTestStatic; Test: typeof Test; agent: typeof TestAgent & ((app?: App, options?: 
+AgentOptions) => TestAgent<Test>); cookies: ExpectCookiesStatic; }' has no call signatures.
+    66     const response = await request(buildApp()).get('/health').expect(200);
+                                  ~~~~~~~
+      src/api/health.routes.spec.ts:2:1
+        2 import * as request from 'supertest';
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        Type originates at this import. A namespace-style import cannot be called or constructed, and will cause a 
+failure at runtime. Consider using a default import or import require here instead.
+    src/api/health.routes.spec.ts:96:28 - error TS2349: This expression is not callable.
+      Type '{ default: SuperTestStatic; Test: typeof Test; agent: typeof TestAgent & ((app?: App, options?: 
+AgentOptions) => TestAgent<Test>); cookies: ExpectCookiesStatic; }' has no call signatures.
+    96     const response = await request(buildApp()).get('/health').expect(503);
+                                  ~~~~~~~
+      src/api/health.routes.spec.ts:2:1
+        2 import * as request from 'supertest';
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        Type originates at this import. A namespace-style import cannot be called or constructed, and will cause a 
+failure at runtime. Consider using a default import or import require here instead.
+FAIL src/modules/product-catalog/asset-based-revenue.service.spec.ts
+  ● AssetBasedRevenueService › gives every asset a complete commercial model row
+    expect(received).toEqual(expected) // deep equality
+    - Expected  -  1
+    + Received  + 17
+    - Array []
+    + Array [
+    +   Object {
+    +     "message": "reception-desk is not linked to a product or core platform product.",
+    +     "packId": "reception-desk",
+    +     "type": "pack-missing-product",
+    +   },
+    +   Object {
+    +     "message": "emergency-clinical is not linked to a product or core platform product.",
+    +     "packId": "emergency-clinical",
+    +     "type": "pack-missing-product",
+    +   },
+    +   Object {
+    +     "message": "trackmind is not linked to a product or core platform product.",
+    +     "packId": "trackmind",
+    +     "type": "pack-missing-product",
+    +   },
+    + ]
+      31 |
+      32 |   it('gives every asset a complete commercial model row', () => {
+    > 33 |     expect(matrix.validationIssues).toEqual([]);
+         |                                     ^
+      34 |
+      35 |     const rowsByAssetId = new Map<string, typeof matrix.rows>();
+      36 |     for (const row of matrix.rows) {
+      at Object.<anonymous> (src/modules/product-catalog/asset-based-revenue.service.spec.ts:33:37)
+FAIL src/services/ai-governance.service.spec.ts
+  ● AIGovernanceService › returns the enterprise registry snapshot with governed services and safety rules
+    expect(received).toContain(expected) // indexOf
+    Expected value: "Human review required"
+    Received array: ["Human review required. This is not a replacement for clinical judgment.", "External health 
+record data requires clinician review before use.", "AI-generated content - verify before acting"]
+      21 |       ]),
+      22 |     );
+    > 23 |     expect(snapshot.safetyRules.requiredDisclaimers).toContain('Human review required');
+         |                                                      ^
+      24 |     expect(snapshot.governanceFrameworks).toContain('NIST AI RMF');
+      25 |   });
+      26 |
+      at Object.<anonymous> (src/services/ai-governance.service.spec.ts:23:54)
+Test Suites: 5 failed, 153 passed, 158 total
+Tests:       12 failed, 1006 passed, 1018 total
+Snapshots:   0 total
+Time:        195.801 s
+
+1
+
+========== SUMMARY ==========
+PASS | exit 0 | npm run lint
+PASS | exit 0 | npm run typecheck:frontend
+FAIL | exit 1 | npm run test:registry-launch
+FAIL | exit 1 | npm run test:responsive-regression
+PASS | exit 0 | npm run build
+PASS | exit 0 | backend npm run build
+FAIL | exit 1 | backend npm test
+Report written to C:\Users\borah\CareDroid-Clinical-AI\validation-report.json

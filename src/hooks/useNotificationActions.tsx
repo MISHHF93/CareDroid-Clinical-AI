@@ -1,4 +1,4 @@
-﻿import { dispatchAlert } from '../engine/alertEngine';
+import { dispatchAlert } from '../engine/alertEngine';
 
 const ALERT_SEVERITY_BY_NOTIFICATION_TYPE = {
   success: 'Info',

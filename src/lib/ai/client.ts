@@ -1,4 +1,4 @@
-﻿import {
+import {
   buildDepartmentContext,
   buildSystemPrompt,
   type DepartmentContext,

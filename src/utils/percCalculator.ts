@@ -1,11 +1,11 @@
-ï»¿/**
- * PERC â€” Pulmonary Embolism Rule-out Criteria.
+/**
+ * PERC — Pulmonary Embolism Rule-out Criteria.
  * All eight criteria must be met (favorable findings) for PERC to be satisfied.
- * Valid only when pre-test probability of PE is already low (~â‰¤15%).
+ * Valid only when pre-test probability of PE is already low (~=15%).
  *
  * Reference: Kline JA, Courtney DM, Kabrhel C, et al. Prospective multicenter
  * evaluation of the pulmonary embolism rule-out criteria. J Thromb Haemost.
- * 2008;6(5):772â€“780; Kline JA et al. Ann Emerg Med. 2004;44(4 Suppl):S26â€“S27.
+ * 2008;6(5):772–780; Kline JA et al. Ann Emerg Med. 2004;44(4 Suppl):S26–S27.
  */
 
 /** @typedef {{
@@ -32,7 +32,7 @@ export const PERC_CRITERIA_META = [
   },
   {
     key: 'spo2AtLeast95',
-    shortLabel: 'SpOâ‚‚ â‰¥ 95% on room air',
+    shortLabel: 'SpO2 = 95% on room air',
     help: 'Oxygen saturation at least 95% while breathing room air.',
   },
   {
@@ -101,13 +101,13 @@ export function interpretPerc(result, opts: any = {}) {
   }
 
   const referenceLine =
-    'Kline JA, Courtney DM, Kabrhel C, et al. J Thromb Haemost. 2008;6(5):772â€“780; Kline JA et al. Ann Emerg Med. 2004.';
+    'Kline JA, Courtney DM, Kabrhel C, et al. J Thromb Haemost. 2008;6(5):772–780; Kline JA et al. Ann Emerg Med. 2004.';
 
   const safetyDisclaimer =
     'PERC applies only when pre-test probability of pulmonary embolism is already low (typically ~15% or less by clinical gestalt or a validated pre-test tool). It does not rule out PE, does not replace clinical judgment, and must not be used in moderate- or high-risk patients.';
 
   const exclusionDisclaimer =
-    'A satisfied PERC assessment in an appropriate low-risk patient may support avoiding further PE testing per local protocol â€” it is not binary proof that pulmonary embolism is absent. If any criterion is unmet, PERC is not satisfied for that purpose.';
+    'A satisfied PERC assessment in an appropriate low-risk patient may support avoiding further PE testing per local protocol — it is not binary proof that pulmonary embolism is absent. If any criterion is unmet, PERC is not satisfied for that purpose.';
 
   if (!opts.lowPretestProbabilityAcknowledged) {
     return {
@@ -128,7 +128,7 @@ export function interpretPerc(result, opts: any = {}) {
       label: 'PERC satisfied (all eight criteria met)',
       percStatus: 'PERC satisfied',
       interpretation:
-        'All eight PERC criteria are met in this entry. In validation studies of low pre-test probability patients, a negative PERC was associated with a very low short-term PE rate â€” still document shared decision-making and follow local pathways. This is not definitive exclusion of pulmonary embolism.',
+        'All eight PERC criteria are met in this entry. In validation studies of low pre-test probability patients, a negative PERC was associated with a very low short-term PE rate — still document shared decision-making and follow local pathways. This is not definitive exclusion of pulmonary embolism.',
       safetyDisclaimer,
       exclusionDisclaimer,
       referenceLine,

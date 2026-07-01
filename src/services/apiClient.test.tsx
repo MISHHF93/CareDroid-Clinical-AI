@@ -1,4 +1,4 @@
-﻿import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { normalizeApiPath } from '../config/api.config';
 
 const mockAppConfig = vi.hoisted(() => ({

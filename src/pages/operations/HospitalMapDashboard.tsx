@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MEDICAL_THEME } from '../../config/medicalTheme.constants';
 import {
   fetchEmergencyCapacityDashboard,
@@ -6,7 +6,7 @@ import {
 } from '../../services/emergencyAnalyticsApi';
 import { fetchEmergencySurgeStatus } from '../../services/surgeApi';
 
-// ── types ─────────────────────────────────────────────────────────────────────
+// -- types ---------------------------------------------------------------------
 
 interface BedUnit {
   id: string;
@@ -18,7 +18,7 @@ interface BedUnit {
   status: 'green' | 'yellow' | 'red' | string;
 }
 
-// ── demo fallback ─────────────────────────────────────────────────────────────
+// -- demo fallback -------------------------------------------------------------
 
 const DEMO_UNITS: BedUnit[] = [
   { id: 'ed',         name: 'Emergency Department', total: 32, occupied: 26, available: 6,  boarding: 4,  status: 'yellow' },
@@ -44,7 +44,7 @@ const DEMO_CAPACITY = {
   source: 'demo',
 };
 
-// ── helpers ───────────────────────────────────────────────────────────────────
+// -- helpers -------------------------------------------------------------------
 
 function occupancyPct(occupied: number, total: number) {
   if (!total) return 0;
@@ -57,7 +57,7 @@ const unitStatusColor: Record<string, string> = {
   green:  '#22c55e',
 };
 
-// ── sub-components ────────────────────────────────────────────────────────────
+// -- sub-components ------------------------------------------------------------
 
 function KpiTile({ label, value, sub, accent }: { label: string; value: string | number; sub?: string; accent?: string }) {
   return (
@@ -139,7 +139,7 @@ function UnitRow({ unit }: { unit: BedUnit }) {
   );
 }
 
-// ── page ──────────────────────────────────────────────────────────────────────
+// -- page ----------------------------------------------------------------------
 
 export default function HospitalMapDashboard() {
   const [capacity, setCapacity] = useState<any>(null);
@@ -217,7 +217,7 @@ export default function HospitalMapDashboard() {
             Hospital Bed Map
           </h1>
           <p style={{ margin: '2px 0 0', fontSize: 13, color: MEDICAL_THEME.inkMuted }}>
-            Real-time capacity · boarding · diversion status across all units
+            Real-time capacity � boarding � diversion status across all units
           </p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -268,7 +268,7 @@ export default function HospitalMapDashboard() {
               opacity: loading ? 0.6 : 1,
             }}
           >
-            {loading ? 'Updating…' : 'Refresh'}
+            {loading ? 'Updating�' : 'Refresh'}
           </button>
         </div>
       </div>
@@ -351,7 +351,7 @@ export default function HospitalMapDashboard() {
               <div style={{ flex: 1, height: 7, borderRadius: 4, background: MEDICAL_THEME.border, overflow: 'hidden' }}>
                 <div style={{ height: '100%', width: `${point.score ?? 50}%`, borderRadius: 4, background: (point.score ?? 50) < 60 ? '#ef4444' : (point.score ?? 50) < 78 ? '#f59e0b' : '#22c55e' }} />
               </div>
-              <span style={{ flex: '0 0 30px', textAlign: 'right', fontWeight: 700, color: (point.score ?? 50) < 60 ? '#ef4444' : (point.score ?? 50) < 78 ? '#f59e0b' : '#22c55e' }}>{point.score ?? '—'}</span>
+              <span style={{ flex: '0 0 30px', textAlign: 'right', fontWeight: 700, color: (point.score ?? 50) < 60 ? '#ef4444' : (point.score ?? 50) < 78 ? '#f59e0b' : '#22c55e' }}>{point.score ?? '�'}</span>
             </div>
           ))}
         </div>
@@ -359,7 +359,7 @@ export default function HospitalMapDashboard() {
 
       {last && (
         <div style={{ fontSize: 11, color: MEDICAL_THEME.inkSubtle, textAlign: 'right' }}>
-          Updated {last.toLocaleTimeString()} · auto-refreshes every 60s
+          Updated {last.toLocaleTimeString()} � auto-refreshes every 60s
         </div>
       )}
     </main>

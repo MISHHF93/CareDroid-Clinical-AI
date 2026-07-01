@@ -17,8 +17,8 @@ describe('reception architecture plan execution', () => {
     const quickIntake = read('components/QuickIntake.tsx');
     const verification = read('components/verification/PatientVerificationExperience.tsx');
 
-    expect(reception).toContain('Unknown allowed');
-    expect(reception).toContain('Open Patient Profile');
+    expect(read('components/reception/UnifiedIntakePanel.tsx')).toContain('Unknown allowed');
+    expect(reception).toContain('RECEPTION_COPY.workspace.openPatientCard');
     expect(reception).toContain('createPatientAndRouteFromReception');
     expect(smartIntake).toContain('PatientVerificationExperience');
     expect(smartIntake).toContain('mergeDuplicateCandidates');
@@ -72,9 +72,11 @@ describe('reception architecture plan execution', () => {
     const orchestrator = read('services/receptionIntakeOrchestrator.ts');
 
     expect(permissions).toContain('getReceptionEmbeddedIntakePath');
-    expect(reception).toContain('Reception Command Desk');
-    expect(reception).toContain('Run AI Intake Assist');
-    expect(reception).toContain('Create Patient & Route');
+    expect(reception).toContain('reception-front-door');
+    expect(reception).toContain('RECEPTION_COPY');
+    expect(reception).toContain('UnifiedIntakePanel');
+    expect(orchestrator).toContain('routeQuickIntakeThroughOrchestrator');
+    expect(orchestrator).toContain('routeSmartIntakeThroughOrchestrator');
     expect(orchestrator).toContain('createPatientAndRouteFromReception');
     expect(orchestrator).toContain('completeReceptionHandoff');
     expect(orchestrator).toContain('buildClientTriageAssist');

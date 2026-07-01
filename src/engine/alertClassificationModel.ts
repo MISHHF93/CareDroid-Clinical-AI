@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Four-tier operational alert taxonomy for CareDroid.
  * Maps canonical Alert records (Info | Warning | Critical) into clinician-facing tiers.
  * Lifecycle surfaces: see alertLifecycleModel.ts.
@@ -332,7 +332,7 @@ export function sortAlertsByClassification(alerts = [] as any[]) {
   );
 }
 
-/** Unified lifecycle envelope for a single alert — toast, banner, and history routing. */
+/** Unified lifecycle envelope for a single alert � toast, banner, and history routing. */
 export function resolveOperationalAlertEnvelope(alert: any) {
   const tier = getAlertClassificationTier(alert);
   const resolution = String(alert?.resolutionStatus || alert?.metadata?.resolutionStatus || '');

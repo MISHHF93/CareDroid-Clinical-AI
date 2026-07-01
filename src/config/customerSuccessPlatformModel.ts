@@ -1,5 +1,5 @@
-ï»¿/**
- * Customer Success Platform â€” onboarding, adoption, utilization, health, support, renewal KPIs.
+/**
+ * Customer Success Platform — onboarding, adoption, utilization, health, support, renewal KPIs.
  * Node-safe; consumes backend customer-success dashboard payloads and org context.
  */
 
@@ -375,7 +375,7 @@ export function buildSupportTracking(dashboard = {} as any, onboarding = {} as a
         priority: 'critical',
         status: 'escalated',
         subject: 'Retention risk review',
-        summary: 'Customer health score indicates high retention risk â€” schedule executive check-in.',
+        summary: 'Customer health score indicates high retention risk — schedule executive check-in.',
         owner: 'Account management',
         route: '/customer-success',
       }),
@@ -453,10 +453,10 @@ export function buildRenewalReadiness({ health, adoption, onboarding, utilizatio
     factors,
     recommendation:
       score >= 80
-        ? 'Account is renewal-ready â€” focus on expansion and referenceability.'
+        ? 'Account is renewal-ready — focus on expansion and referenceability.'
         : score >= 60
           ? 'Close onboarding and enablement gaps before renewal conversation.'
-          : 'Schedule intervention â€” adoption, support, or health signals need immediate attention.',
+          : 'Schedule intervention — adoption, support, or health signals need immediate attention.',
   });
 }
 
@@ -632,7 +632,7 @@ export function auditCustomerSuccessPlatform(options = {} as any) {
 
   return Object.freeze({
     generatedAt: new Date().toISOString(),
-    goal: 'Customer success platform â€” onboarding, adoption, feature utilization, health, support, renewal KPIs',
+    goal: 'Customer success platform — onboarding, adoption, feature utilization, health, support, renewal KPIs',
     assessment,
     featureRegistryCount: FEATURE_UTILIZATION_REGISTRY.length,
     clinicOnboardingStepCount: CLINIC_ONBOARDING_STEPS.length,

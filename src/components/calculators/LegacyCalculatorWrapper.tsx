@@ -1,4 +1,4 @@
-﻿import { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { saveCalculatorResult } from './calculatorSave';
 

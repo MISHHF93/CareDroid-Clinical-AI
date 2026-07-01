@@ -1,5 +1,5 @@
-ï»¿/**
- * Harmonized patient queue timing â€” one elapsed/remaining view per queue scenario.
+/**
+ * Harmonized patient queue timing — one elapsed/remaining view per queue scenario.
  */
 import { buildReassessmentTimerSnapshot } from '../engine/reassessmentTimerEngine';
 import { PatientState, type Patient } from '../types/emergency';
@@ -93,7 +93,7 @@ function fromTriageScenario(
   if (!snapshot) return null;
 
   const remainingLabel = buildRemainingLabel(snapshot.remainingMinutes, null);
-  const compactLabel = `${snapshot.elapsedLabel} Â· ${remainingLabel}`;
+  const compactLabel = `${snapshot.elapsedLabel} · ${remainingLabel}`;
 
   return {
     patientId: patient.id,
@@ -122,7 +122,7 @@ function fromProviderScenario(
   const overdueMinutes =
     snapshot.phase === 'breached' ? Math.max(0, snapshot.elapsedMinutes - snapshot.targetMinutes) : null;
   const remainingLabel = buildRemainingLabel(snapshot.remainingMinutes, overdueMinutes);
-  const compactLabel = `${snapshot.elapsedLabel} Â· ${remainingLabel}`;
+  const compactLabel = `${snapshot.elapsedLabel} · ${remainingLabel}`;
 
   return {
     patientId: patient.id,
@@ -159,7 +159,7 @@ function fromReassessmentScenario(
     : timer.dueInLabel || buildRemainingLabel(timer.minutesUntilDue, null);
   const elapsedMinutes = timer.triageAgeMinutes ?? timer.arrivalAgeMinutes ?? 0;
   const elapsedLabel = timer.triageAgeLabel || timer.arrivalAgeLabel || formatDuration(elapsedMinutes);
-  const compactLabel = `${elapsedLabel} Â· ${remainingLabel}`;
+  const compactLabel = `${elapsedLabel} · ${remainingLabel}`;
 
   return {
     patientId: patient.id,
@@ -174,7 +174,7 @@ function fromReassessmentScenario(
     tone: timer.isOverdue ? 'critical' : timer.tone === 'critical' ? 'critical' : timer.tone === 'watch' ? 'watch' : 'neutral',
     compactLabel,
     rowLabel: compactLabel,
-    staffDetail: `Reassessment ${remainingLabel.toLowerCase()} Â· last vitals ${timer.lastVitalsAgeLabel} ago`,
+    staffDetail: `Reassessment ${remainingLabel.toLowerCase()} · last vitals ${timer.lastVitalsAgeLabel} ago`,
   };
 }
 
@@ -185,7 +185,7 @@ function fromActiveCareScenario(patient: Patient, now: Date): PatientQueueTiming
   const anchor = patient.triageTime || patient.arrivalTime;
   const elapsedMinutes = minutesSince(anchor, now);
   const elapsedLabel = formatDuration(elapsedMinutes);
-  const compactLabel = `${elapsedLabel} Â· In lane`;
+  const compactLabel = `${elapsedLabel} · In lane`;
 
   return {
     patientId: patient.id,

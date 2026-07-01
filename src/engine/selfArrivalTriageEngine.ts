@@ -1,4 +1,4 @@
-import { suggestTriagePriority } from '../../engine/triageEngine';
+import { suggestTriagePriority } from './triageEngine';
 import {
   buildOperationalScoreEnvelope,
   type CareStreamingLane,

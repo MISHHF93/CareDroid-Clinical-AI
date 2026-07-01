@@ -1,5 +1,5 @@
-ï»¿/**
- * TrackMind Platform Intelligence â€” scoring, KPIs, artifacts (Prompts 117â€“136).
+/**
+ * TrackMind Platform Intelligence — scoring, KPIs, artifacts (Prompts 117–136).
  * Node-safe; integrates artifact, lineage, governance, and readiness signals.
  */
 
@@ -52,7 +52,7 @@ function moduleResult(moduleId, label, score, kpis, artifacts = {} as any) {
   });
 }
 
-/** Governed artifact entity types â€” Prompt 117. */
+/** Governed artifact entity types — Prompt 117. */
 export const UNIFIED_ARTIFACT_ENTITY_TYPES = Object.freeze([
   Object.freeze({ type: 'organization', label: 'Organization / tenant', governed: true }),
   Object.freeze({ type: 'track', label: 'Racetrack site', governed: true }),
@@ -93,7 +93,7 @@ export function assessUnifiedArtifactRegistry() {
   );
 }
 
-/** Explicit artifact relationships â€” Prompt 118. */
+/** Explicit artifact relationships — Prompt 118. */
 export const ARTIFACT_RELATIONSHIP_EDGES = Object.freeze([
   Object.freeze({ from: 'organization', to: 'track', type: 'owns', cardinality: '1:N' }),
   Object.freeze({ from: 'track', to: 'patient', type: 'hosts', cardinality: '1:N' }),
@@ -123,7 +123,7 @@ export function assessArtifactRelationshipMapping() {
   );
 }
 
-/** Standard metadata fields â€” Prompt 119. */
+/** Standard metadata fields — Prompt 119. */
 export const ENTERPRISE_METADATA_SCHEMA = Object.freeze([
   Object.freeze({ field: 'id', type: 'uuid', required: true, domains: ['all'] }),
   Object.freeze({ field: 'organizationId', type: 'uuid', required: true, domains: ['all'] }),
@@ -234,7 +234,7 @@ export function assessKpiIntelligence(signals = {} as any) {
       kpi('recommendations', 'Active recommendations', recommendations.length, 3),
       kpi('anomaly-readiness', 'Anomaly readiness fields', 4, 4),
     ],
-    { recommendations, anomalyReadiness, disclaimer: 'Readiness structures â€” not autonomous anomaly detection' },
+    { recommendations, anomalyReadiness, disclaimer: 'Readiness structures — not autonomous anomaly detection' },
   );
 }
 
@@ -310,7 +310,7 @@ export function assessForecastingReadiness() {
     ],
     {
       structures,
-      disclaimer: 'Readiness structures only â€” no production predictive models claimed',
+      disclaimer: 'Readiness structures only — no production predictive models claimed',
       prerequisites: ['Historical telemetry', 'Labeled outcomes', 'Human-reviewed thresholds'],
     },
   );
@@ -546,7 +546,7 @@ export function assessPlatformObservability() {
   );
 }
 
-/** Technical debt registry â€” Prompt 135. */
+/** Technical debt registry — Prompt 135. */
 export const TECHNICAL_DEBT_REGISTRY = Object.freeze([
   Object.freeze({ id: 'TD-001', area: 'backend', summary: 'In-memory ED state', priority: 'P0', effort: 'high', status: 'open' }),
   Object.freeze({ id: 'TD-002', area: 'security', summary: 'Emergency API auth gaps', priority: 'P0', effort: 'medium', status: 'mitigating' }),
@@ -574,7 +574,7 @@ export function assessTechnicalDebtRegistry() {
   );
 }
 
-/** Platform convergence â€” Prompt 136. */
+/** Platform convergence — Prompt 136. */
 export function assessPlatformConvergence(signals = {} as any) {
   const production = auditProductionReadiness(signals);
   const maturity = auditTrackMindMaturity(signals);
@@ -654,7 +654,7 @@ export function buildPlatformIntelligenceAssessment({
   return Object.freeze({
     generatedAt: new Date().toISOString(),
     organizationName,
-    framework: 'TrackMind Platform Intelligence (Prompts 117â€“136)',
+    framework: 'TrackMind Platform Intelligence (Prompts 117–136)',
     overallScore,
     overallStatus: statusFromScore(overallScore),
     modules,
@@ -682,7 +682,7 @@ export function auditPlatformIntelligence(options = {} as any) {
 
   return Object.freeze({
     generatedAt: new Date().toISOString(),
-    goal: 'Platform intelligence audit â€” Prompts 117â€“136',
+    goal: 'Platform intelligence audit — Prompts 117–136',
     assessment,
     moduleScores: Object.fromEntries(
       assessment.modules.map((module) => [module.id, module.assessment.score]),

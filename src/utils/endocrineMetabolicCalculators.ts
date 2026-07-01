@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Endocrine and metabolic calculator helpers.
  *
  * Deterministic calculation and documentation support only. These helpers do

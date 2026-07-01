@@ -1,4 +1,4 @@
-﻿import type { Patient, Referral } from '../types/emergency';
+import type { Patient, Referral } from '../types/emergency';
 import type { CareDroidCentralNodeSnapshot } from '../central-node/careDroidCentralNode';
 import { buildQueueAuditSnapshot } from './queueAuditDiscovery';
 import {

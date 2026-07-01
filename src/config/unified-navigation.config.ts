@@ -1,4 +1,4 @@
-ï»¿import { CANONICAL_ROUTES } from './routes.config';
+import { CANONICAL_ROUTES } from './routes.config';
 import { CANONICAL_ROUTE_MAP } from './routes.config';
 import {
   EMERGENCY_ROLE_IDS,
@@ -57,7 +57,7 @@ export const PILOT_CORE_NAV_ITEM_IDS: readonly string[] = Object.freeze([
   'medical-iot',
 ]);
 
-/** Secondary utility nav â€” routable in pilot but deprioritized in the sidebar. */
+/** Secondary utility nav — routable in pilot but deprioritized in the sidebar. */
 export const PILOT_UTILITY_NAV_ITEM_IDS: readonly string[] = Object.freeze([
   'pulse',
   'shift',
@@ -66,7 +66,7 @@ export const PILOT_UTILITY_NAV_ITEM_IDS: readonly string[] = Object.freeze([
   'audit',
 ]);
 
-/** Extension/platform nav â€” hidden in pilot unless entitlements expand visibility. */
+/** Extension/platform nav — hidden in pilot unless entitlements expand visibility. */
 export const PILOT_EXTENSION_NAV_ITEM_IDS: readonly string[] = Object.freeze([
   'intake',
   'integrations',

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Defer non-critical startup work until after first paint (mobile LCP / INP).
  */
 

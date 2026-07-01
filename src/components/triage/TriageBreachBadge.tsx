@@ -1,4 +1,4 @@
-ï»¿import React from 'react';
+import React from 'react';
 import {
   resolveTriageBreachTimer,
   shouldSurfaceTriageBreach,
@@ -33,10 +33,10 @@ export default function TriageBreachBadge({
       ]
         .filter(Boolean)
         .join(' ')}
-      title={[snapshot.label, snapshot.staffDetail].filter(Boolean).join(' Â· ')}
+      title={[snapshot.label, snapshot.staffDetail].filter(Boolean).join(' · ')}
     >
       {compact ? `Triage ${snapshot.shortLabel}` : snapshot.label}
-      {showElapsed ? ` Â· ${snapshot.elapsedLabel}` : null}
+      {showElapsed ? ` · ${snapshot.elapsedLabel}` : null}
     </span>
   );
 }

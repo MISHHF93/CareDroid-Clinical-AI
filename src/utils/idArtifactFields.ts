@@ -1,4 +1,4 @@
-﻿import type { IdArtifactDemographics } from './idArtifactParser';
+import type { IdArtifactDemographics } from './idArtifactParser';
 
 export type IdentityExtractedField = {
   field: string;

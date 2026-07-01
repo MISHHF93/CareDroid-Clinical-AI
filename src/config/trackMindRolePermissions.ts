@@ -1,5 +1,5 @@
-﻿/**
- * TrackMind role permissions facade — routes, actions, demo roles, and access helpers.
+/**
+ * TrackMind role permissions facade � routes, actions, demo roles, and access helpers.
  */
 import { CANONICAL_ROUTES } from './routes.config';
 import {

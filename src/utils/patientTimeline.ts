@@ -1,4 +1,4 @@
-﻿import type { Alert, JourneyEvent, Patient, PatientFlag, Staff, Vitals, WorkflowActionLog } from '../types/emergency';
+import type { Alert, JourneyEvent, Patient, PatientFlag, Staff, Vitals, WorkflowActionLog } from '../types/emergency';
 
 export type PatientTimelineCategory =
   | 'intake'

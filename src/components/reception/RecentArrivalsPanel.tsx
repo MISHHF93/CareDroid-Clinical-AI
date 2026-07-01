@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import OperationalEmptyState, { OperationalEmptyAction } from '../ui/OperationalEmptyState';
 import { EMPTY_STATE_COPY } from '../../config/emptyStateCopy';
 import { patientLabel } from './receptionQueueModel';
@@ -48,7 +48,7 @@ export default function RecentArrivalsPanel({ patients = [] as any[], onSelectPa
       ) : (
         <OperationalEmptyState
           size="inline"
-          icon="○"
+          icon="?"
           title={copy.empty}
           guidance={EMPTY_STATE_COPY.reception.recentArrivals.guidance}
           status="No registrations in the last 30 minutes."

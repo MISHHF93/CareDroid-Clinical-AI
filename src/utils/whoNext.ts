@@ -1,4 +1,4 @@
-﻿import { PatientState, Priority } from '../types/emergency';
+import { PatientState, Priority } from '../types/emergency';
 import { getSavedScores } from './clinicalScoreEvents';
 
 const ACTIVE_STATES = new Set(
@@ -215,7 +215,7 @@ export function getWhoNextRecommendation({
 
 export function formatWhoNextForCopilot(recommendation) {
   if (!recommendation?.patient) return '';
-  return `Suggested next: ${recommendation.fullName} (${recommendation.room}) — ${recommendation.reason}`;
+  return `Suggested next: ${recommendation.fullName} (${recommendation.room}) � ${recommendation.reason}`;
 }
 
 export function createSnooze(patientId, now = new Date(), minutes = 15) {

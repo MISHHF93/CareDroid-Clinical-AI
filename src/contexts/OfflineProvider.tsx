@@ -1,4 +1,4 @@
-﻿import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { FEATURE_FLAGS } from '../config/featureFlags.config';
 import { OfflineModeBanner, SyncStatus, registerServiceWorker } from '../components/offline/OfflineSupport';
 import offlineService from '../services/offlineService';

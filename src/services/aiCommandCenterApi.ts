@@ -1,4 +1,4 @@
-﻿import {
+import {
   getBackendCapabilityStatus,
   BACKEND_CAPABILITY_STATUS,
 } from '../config/backendApiCapabilities';

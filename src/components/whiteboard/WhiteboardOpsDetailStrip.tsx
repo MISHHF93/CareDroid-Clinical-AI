@@ -1,4 +1,4 @@
-﻿import { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { buildDataQualitySnapshot } from '../../services/dataQualityDiscovery';
 import { buildQueueAuditSnapshot } from '../../services/queueAuditDiscovery';
@@ -72,10 +72,10 @@ export default function WhiteboardOpsDetailStrip({
       >
         <span className="whiteboard-ops-detail-strip__title">Ops detail</span>
         <span className="whiteboard-ops-detail-strip__summary">
-          {summaryParts.join(' · ') || `${signalCount} operational signals`}
+          {summaryParts.join(' � ') || `${signalCount} operational signals`}
         </span>
         <span className="whiteboard-ops-detail-strip__chevron" aria-hidden="true">
-          {expanded ? '▾' : '▸'}
+          {expanded ? '?' : '?'}
         </span>
       </button>
 

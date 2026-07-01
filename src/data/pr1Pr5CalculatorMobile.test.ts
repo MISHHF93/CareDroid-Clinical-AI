@@ -1,5 +1,5 @@
-ï»¿/**
- * PR1â€“PR5 calculator mobile layout contracts (320px usable).
+/**
+ * PR1–PR5 calculator mobile layout contracts (320px usable).
  */
 
 import { readFileSync } from 'node:fs';
@@ -24,7 +24,7 @@ const calculatorsJsx = readFileSync(join(__dirname, '../pages/tools/Calculators.
 const pr4aJsx = readFileSync(join(__dirname, '../pages/tools/pr4aCalculators.tsx'), 'utf8');
 const mentalJsx = readFileSync(join(__dirname, '../pages/tools/mentalHealthCalculators.tsx'), 'utf8');
 
-/** Registry ids â†’ built-in form slugs for PR1â€“PR5 Tier-A forms */
+/** Registry ids ? built-in form slugs for PR1–PR5 Tier-A forms */
 export const PR1_PR5_TIER_A_FORM_SLUGS = Object.freeze([
   'qsofa',
   'news2',
@@ -45,7 +45,7 @@ const PR1_PR5_CHAT_HUB_REGISTRY_IDS = Object.freeze([
   ...PR3_TIER_B_CHAT_CALCULATOR_IDS,
 ]);
 
-describe('PR1â€“PR5 inventory', () => {
+describe('PR1–PR5 inventory', () => {
   it('lists thirteen Tier-A form slugs for PR1, PR2, PR4A, PR5', () => {
     expect(PR1_PR5_TIER_A_FORM_SLUGS).toHaveLength(13);
     expect(PR1_CALCULATOR_REGISTRY_IDS).toHaveLength(4);
@@ -64,7 +64,7 @@ describe('PR1â€“PR5 inventory', () => {
   });
 });
 
-describe('calculators-mobile-pr.css â€” phone layout', () => {
+describe('calculators-mobile-pr.css — phone layout', () => {
   it('is imported from Calculators.jsx', () => {
     expect(calculatorsJsx).toContain("import '../../styles/calculators-mobile-pr.css'");
   });
@@ -99,7 +99,7 @@ describe('calculators-mobile-pr.css â€” phone layout', () => {
   });
 });
 
-describe('PR1â€“PR5 â€” split form + overflow (shared shell)', () => {
+describe('PR1–PR5 — split form + overflow (shared shell)', () => {
   it('uses mobile-first single-column calculator-interface by default', () => {
     expect(mobileFirstCss).toMatch(
       /\.calculator-interface[\s\S]*grid-template-columns:\s*minmax\(0,\s*1fr\)/
@@ -112,7 +112,7 @@ describe('PR1â€“PR5 â€” split form + overflow (shared shell)', () => {
   });
 });
 
-describe('PR1â€“PR5 â€” module hooks', () => {
+describe('PR1–PR5 — module hooks', () => {
   it.each(['qsofa', 'news2', 'child-pugh', 'has-bled', 'meld', 'timi-ua-nstemi'])(
     'Calculators.jsx implements %s with reset and disclaimers',
     (slug) => {

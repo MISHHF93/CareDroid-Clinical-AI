@@ -1,4 +1,4 @@
-﻿import { DATA_QUALITY_RISK_LABELS } from '../../config/dataQualityModel';
+import { DATA_QUALITY_RISK_LABELS } from '../../config/dataQualityModel';
 import './DataQualityRiskPanel.css';
 
 export default function DataQualityRiskBadge({ risks = [] as any[], limit = 2 }) {

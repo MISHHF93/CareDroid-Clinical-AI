@@ -1,4 +1,4 @@
-﻿import { apiFetch, getApiErrorMessage, parseApiResponse } from './apiClient';
+import { apiFetch, getApiErrorMessage, parseApiResponse } from './apiClient';
 import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
 
 function normalizeUnit(vehicle: any = {}) {

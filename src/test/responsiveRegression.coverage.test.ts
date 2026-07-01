@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Documents automated vs manual responsive coverage; guards route inventory drift.
  */
 

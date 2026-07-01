@@ -1,4 +1,4 @@
-ï»¿import type { CareDroidCentralNodeSnapshot } from '../central-node/careDroidCentralNode';
+import type { CareDroidCentralNodeSnapshot } from '../central-node/careDroidCentralNode';
 import type { Patient, Referral } from '../types/emergency';
 import { summarizeWhatHappensNextBoard } from '../services/whatHappensNextGuidance';
 import {
@@ -272,7 +272,7 @@ export function buildCareDroidOperationalIntelligenceSnapshot({
     recommendations.push({
       id: 'rec-review-boarders',
       action: 'Review boarders',
-      rationale: `${centralSnapshot.boardingStatus.boarders} patients boarding Â· ${centralSnapshot.boardingStatus.risk} risk.`,
+      rationale: `${centralSnapshot.boardingStatus.boarders} patients boarding · ${centralSnapshot.boardingStatus.risk} risk.`,
       route: '/emergency/boarding',
       modelOrRuleId: 'rule-boarding-risk-v1',
       version: OI_RULE_BASELINE_VERSION,
@@ -286,7 +286,7 @@ export function buildCareDroidOperationalIntelligenceSnapshot({
     recommendations.push({
       id: 'rec-review-reassessment',
       action: 'Open reassessment queue',
-      rationale: `${centralSnapshot.reassessmentStatus.due} due${centralSnapshot.reassessmentStatus.overdue ? ` Â· ${centralSnapshot.reassessmentStatus.overdue} overdue` : ''}.`,
+      rationale: `${centralSnapshot.reassessmentStatus.due} due${centralSnapshot.reassessmentStatus.overdue ? ` · ${centralSnapshot.reassessmentStatus.overdue} overdue` : ''}.`,
       route: '/emergency/reassessment',
       modelOrRuleId: 'rule-reassessment-priority-v1',
       version: OI_RULE_BASELINE_VERSION,

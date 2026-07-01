@@ -1,5 +1,5 @@
-ï»¿/**
- * Orphan detection â€” routes, pages, components, domain modules, services, APIs, docs.
+/**
+ * Orphan detection — routes, pages, components, domain modules, services, APIs, docs.
  * Regenerate: npm run orphan-detection:write-docs
  */
 
@@ -58,7 +58,7 @@ const MERGE_DUPLICATES = Object.freeze([
     id: 'notification-services-dual',
     primary: 'src/services/NotificationService.ts',
     duplicate: 'src/services/notifications/NotificationService.ts',
-    route: 'â€”',
+    route: '—',
     note: 'Nested service is legacy queue-style compatibility only; active app client is src/services/NotificationService.js.',
   },
 ]);
@@ -474,7 +474,7 @@ function detectOrphanApis() {
       path: call.path,
       client: call.client,
       classification: ORPHAN_CLASSIFICATIONS.LEGACY,
-      evidence: 'Gated stub â€” intentional no-op until backend exists',
+      evidence: 'Gated stub — intentional no-op until backend exists',
     });
   }
 
@@ -614,7 +614,7 @@ export function buildOrphanDetectionReport() {
 }
 
 function escapeCell(v) {
-  return String(v ?? 'â€”').replace(/\|/g, '\\|');
+  return String(v ?? '—').replace(/\|/g, '\\|');
 }
 
 function formatSection(title, rows, columns) {
@@ -646,8 +646,8 @@ export function formatOrphanDetectionMarkdown(report = buildOrphanDetectionRepor
     '| Class | Meaning |',
     '|-------|---------|',
     '| **wire** | Reachable in product intent (nav/inventory) but missing route, import, or API contract |',
-    '| **merge** | Duplicate surface or overlapping module â€” consolidate |',
-    '| **quarantine** | No production consumer â€” archive or delete after review |',
+    '| **merge** | Duplicate surface or overlapping module — consolidate |',
+    '| **quarantine** | No production consumer — archive or delete after review |',
     '| **legacy** | Redirect, alias, gated stub, or deprecated path kept for compatibility |',
     '',
     '## Executive summary',
@@ -679,10 +679,10 @@ export function formatOrphanDetectionMarkdown(report = buildOrphanDetectionRepor
     '',
     '## Critical findings',
     '',
-    '1. **Simulation / lab / 3D workspace styles** â€” `SimulationLaboratoryViewer.css` is an intentional shared style module for active demo pages; no missing page component is required. Class: **legacy**.',
-    '2. **AI agents / platform APIs** â€” platform/product clients are represented in `frontendApiCallsInventory`; current scan has no **wire** findings.',
-    '3. **Chart/export components** â€” legacy barrel-only components have been removed; keep new chart surfaces route-owned. Class: **resolved**.',
-    '4. **Dual registry** â€” hundreds of tools in inventory without dedicated page components (route-only). Class: **legacy** (inventory-first) unless promoting to assets.',
+    '1. **Simulation / lab / 3D workspace styles** — `SimulationLaboratoryViewer.css` is an intentional shared style module for active demo pages; no missing page component is required. Class: **legacy**.',
+    '2. **AI agents / platform APIs** — platform/product clients are represented in `frontendApiCallsInventory`; current scan has no **wire** findings.',
+    '3. **Chart/export components** — legacy barrel-only components have been removed; keep new chart surfaces route-owned. Class: **resolved**.',
+    '4. **Dual registry** — hundreds of tools in inventory without dedicated page components (route-only). Class: **legacy** (inventory-first) unless promoting to assets.',
     '',
   ];
 
@@ -746,7 +746,7 @@ export function formatOrphanDetectionMarkdown(report = buildOrphanDetectionRepor
   );
 
   if (report.apis.length > 120) {
-    lines.push(`_â€¦ and ${report.apis.length - 120} more API rows._`, '');
+    lines.push(`_… and ${report.apis.length - 120} more API rows._`, '');
   }
 
   lines.push(
@@ -757,7 +757,7 @@ export function formatOrphanDetectionMarkdown(report = buildOrphanDetectionRepor
     ])
   );
   if (report.markdown.length > 60) {
-    lines.push(`_â€¦ and ${report.markdown.length - 60} more doc files._`, '');
+    lines.push(`_… and ${report.markdown.length - 60} more doc files._`, '');
   }
 
   lines.push(

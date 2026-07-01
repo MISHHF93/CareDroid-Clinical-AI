@@ -1,11 +1,11 @@
-ï»¿/**
- * Framingham 10-year hard CHD risk â€” ATP III point-based profile (Wilson et al.).
+/**
+ * Framingham 10-year hard CHD risk — ATP III point-based profile (Wilson et al.).
  * Alternative to ACC/AHA PCE (ASCVD) for cardiovascular risk context.
  *
  * Reference: Wilson PWF, et al. Prediction of coronary heart disease using risk factor categories.
- * Circulation. 1998;97(18):1837â€“1847. NHLBI Framingham Heart Study tables.
+ * Circulation. 1998;97(18):1837–1847. NHLBI Framingham Heart Study tables.
  *
- * Decision support only â€” does not recommend statins or other therapies.
+ * Decision support only — does not recommend statins or other therapies.
  */
 
 /** @typedef {'female' | 'male'} FraminghamSex */
@@ -13,7 +13,7 @@
 const MIN_AGE = 30;
 const MAX_AGE = 74;
 
-/** Total points â†’ 10-year hard CHD risk % (Wilson Table 4, selected bands). */
+/** Total points ? 10-year hard CHD risk % (Wilson Table 4, selected bands). */
 const RISK_FROM_POINTS = {
   female: [
     { maxPoints: 8, riskPct: 1 },
@@ -182,18 +182,18 @@ export function interpretFraminghamRisk(tenYearRiskPct) {
   if (!Number.isFinite(tenYearRiskPct) || tenYearRiskPct < 0) return null;
 
   const referenceLine =
-    'Wilson PWF, et al. Prediction of coronary heart disease using risk factor categories. Circulation. 1998;97(18):1837â€“1847.';
+    'Wilson PWF, et al. Prediction of coronary heart disease using risk factor categories. Circulation. 1998;97(18):1837–1847.';
 
   const disclaimer =
-    'Framingham hard CHD risk (not full ASCVD PCE). Does not recommend lipid-lowering or antihypertensive therapy â€” use ACC/AHA guidelines and shared decision-making.';
+    'Framingham hard CHD risk (not full ASCVD PCE). Does not recommend lipid-lowering or antihypertensive therapy — use ACC/AHA guidelines and shared decision-making.';
 
   if (tenYearRiskPct >= 20) {
     return {
       severity: 'critical',
       label: 'High Framingham CHD risk',
-      riskBand: 'â‰¥ 20% 10-year hard CHD risk',
+      riskBand: '= 20% 10-year hard CHD risk',
       interpretation:
-        '10-year hard CHD risk â‰¥20% in ATP III framing â€” high-risk category for prevention discussion per historical guidelines.',
+        '10-year hard CHD risk =20% in ATP III framing — high-risk category for prevention discussion per historical guidelines.',
       disclaimer,
       referenceLine,
     };
@@ -203,9 +203,9 @@ export function interpretFraminghamRisk(tenYearRiskPct) {
     return {
       severity: 'warning',
       label: 'Intermediate Framingham CHD risk',
-      riskBand: '10â€“19% 10-year hard CHD risk',
+      riskBand: '10–19% 10-year hard CHD risk',
       interpretation:
-        'Intermediate risk band â€” intensify risk-factor modification discussion per clinician judgment and current guidelines.',
+        'Intermediate risk band — intensify risk-factor modification discussion per clinician judgment and current guidelines.',
       disclaimer,
       referenceLine,
     };
@@ -216,7 +216,7 @@ export function interpretFraminghamRisk(tenYearRiskPct) {
     label: 'Lower Framingham CHD risk',
     riskBand: '< 10% 10-year hard CHD risk',
     interpretation:
-      'Lower 10-year hard CHD risk in Framingham point tables â€” continue lifestyle counselling and periodic reassessment.',
+      'Lower 10-year hard CHD risk in Framingham point tables — continue lifestyle counselling and periodic reassessment.',
     disclaimer,
     referenceLine,
   };
@@ -229,7 +229,7 @@ export function validateFraminghamInputs(raw) {
   const errors = [] as any[];
   const age = Number(raw.ageYears);
   if (!Number.isFinite(age) || age < MIN_AGE || age > MAX_AGE) {
-    errors.push(`Age must be ${MIN_AGE}â€“${MAX_AGE} years for this Framingham table.`);
+    errors.push(`Age must be ${MIN_AGE}–${MAX_AGE} years for this Framingham table.`);
   }
   if (!raw.sex) errors.push('Select sex.');
   const tc = Number(raw.totalCholesterolMgDl);

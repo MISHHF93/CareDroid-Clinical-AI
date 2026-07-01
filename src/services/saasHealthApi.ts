@@ -1,4 +1,4 @@
-﻿import { apiFetchJson, getApiErrorMessage } from './apiClient';
+import { apiFetchJson, getApiErrorMessage } from './apiClient';
 
 export const SAAS_HEALTH_FALLBACK = Object.freeze({
   status: 'critical',

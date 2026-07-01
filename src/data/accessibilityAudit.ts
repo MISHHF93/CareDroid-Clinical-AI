@@ -1,4 +1,4 @@
-﻿export const ACCESSIBILITY_AUDIT_CATEGORIES = Object.freeze({
+export const ACCESSIBILITY_AUDIT_CATEGORIES = Object.freeze({
   KEYBOARD_NAVIGATION: 'keyboard-navigation',
   SCREEN_READERS: 'screen-readers',
   CONTRAST: 'contrast',

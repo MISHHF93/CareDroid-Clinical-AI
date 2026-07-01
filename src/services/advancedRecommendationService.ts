@@ -1,4 +1,4 @@
-﻿import { apiFetch } from './apiClient';
+import { apiFetch } from './apiClient';
 import { recordAutomationFailure } from './automationAuditLogger';
 import toolRegistry from '../data/toolRegistry';
 import { NLU_TO_REGISTRY_ID } from '../data/clinicalCatalogWiring';

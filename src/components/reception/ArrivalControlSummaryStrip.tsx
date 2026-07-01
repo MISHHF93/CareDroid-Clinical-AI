@@ -1,4 +1,4 @@
-﻿import React, { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { buildArrivalControlSummary } from '../../services/arrivalControlLayer';
 import { RECEPTION_COPY } from './receptionCopy';
 import './ArrivalControlSummaryStrip.css';

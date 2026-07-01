@@ -1,4 +1,4 @@
-﻿import { apiFetch } from './apiClient';
+import { apiFetch } from './apiClient';
 
 export const PlatformAssetsApi = {
   async getContext() {

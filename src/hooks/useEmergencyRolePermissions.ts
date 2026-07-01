@@ -1,4 +1,4 @@
-﻿import { useMemo } from 'react';
+import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
 import { useUserIdentity } from '../contexts/UserIdentityContext';

@@ -1,4 +1,5 @@
-﻿import PatientCard from '../../components/PatientCard';
+import type { ReactNode } from 'react';
+import PatientCard from '../../components/PatientCard';
 import HelpTrigger from '../../components/help/HelpTrigger';
 import { PageShell } from '../../components/ui/CareDroidPrimitives';
 import { PatientFlag, PatientState } from '../../types/emergency';
@@ -6,6 +7,71 @@ import { resolveEdDataFreshness, resolveEdSourceLabel } from '../../utils/edData
 import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
 import { metricColorForTone } from '../../config/semanticColorSystem';
 import './emergency-route.css';
+
+export type WorkflowSituationTone = 'neutral' | 'info' | 'warning' | 'critical';
+
+export type WorkflowSituationBriefProps = {
+  status?: ReactNode;
+  attention?: ReactNode;
+  owner?: ReactNode;
+  nextAction?: ReactNode;
+  tone?: WorkflowSituationTone;
+  className?: string;
+};
+
+const SITUATION_BRIEF_LABELS = Object.freeze({
+  status: 'Happening now',
+  attention: 'Needs attention',
+  owner: 'Owner',
+  nextAction: 'Next action',
+});
+
+export function WorkflowSituationBrief({
+  status,
+  attention,
+  owner,
+  nextAction,
+  tone = 'neutral',
+  className = '',
+}: WorkflowSituationBriefProps) {
+  const surfaces = usePractitionerSurfaceVisibility();
+  if (!surfaces.emergencyRoutes.showSituationBrief) {
+    return null;
+  }
+
+  const items = [
+    { id: 'status', label: SITUATION_BRIEF_LABELS.status, value: status },
+    { id: 'attention', label: SITUATION_BRIEF_LABELS.attention, value: attention },
+    { id: 'owner', label: SITUATION_BRIEF_LABELS.owner, value: owner },
+    { id: 'nextAction', label: SITUATION_BRIEF_LABELS.nextAction, value: nextAction },
+  ].filter((item) => item.value != null && item.value !== '');
+
+  if (!items.length) {
+    return null;
+  }
+
+  return (
+    <section
+      className={[
+        'emergency-route-situation-brief',
+        `emergency-route-situation-brief--${tone}`,
+        className,
+      ]
+        .filter(Boolean)
+        .join(' ')}
+      aria-label="Workflow situation summary"
+    >
+      <ol className="emergency-route-situation-brief__list">
+        {items.map((item) => (
+          <li key={item.id} className="emergency-route-situation-brief__item">
+            <span className="emergency-route-situation-brief__label">{item.label}</span>
+            <span className="emergency-route-situation-brief__value">{item.value}</span>
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+}
 
 const MATURITY_CHIP_LABELS = {
   demo: 'Demo',
@@ -60,6 +126,7 @@ export function EmergencyRoutePage({
   children = undefined,
   actions = undefined,
   maturity = undefined,
+  situationBrief = undefined,
 }: any = {}) {
   const surfaces = usePractitionerSurfaceVisibility();
   const compactLayout = surfaces.compactLayout;
@@ -87,6 +154,7 @@ export function EmergencyRoutePage({
       contentClassName="emergency-route-page__content"
       aria-label={title}
     >
+      {situationBrief ? <WorkflowSituationBrief {...situationBrief} /> : null}
       {children}
     </PageShell>
   );

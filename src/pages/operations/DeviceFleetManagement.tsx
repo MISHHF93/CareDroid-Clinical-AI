@@ -1,1 +1,1 @@
-﻿export default function DeviceFleetManagement() { return <section className="page-container device-fleet-page"><h1>Device Fleet Management</h1><p>CareDroid enterprise healthcare platform.</p></section>; }
+export default function DeviceFleetManagement() { return <section className="page-container device-fleet-page"><h1>Device Fleet Management</h1><p>CareDroid enterprise healthcare platform.</p></section>; }

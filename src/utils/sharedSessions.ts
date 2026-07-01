@@ -1,4 +1,4 @@
-﻿const STORAGE_KEY = 'careDroid.sharedSessions.v1';
+const STORAGE_KEY = 'careDroid.sharedSessions.v1';
 const SHARED_SESSION_RETENTION_DAYS = 30;
 
 const expiresAtForNewSession = () => {

@@ -1,4 +1,4 @@
-﻿import { apiFetchJson, getApiErrorMessage } from './apiClient';
+import { apiFetchJson, getApiErrorMessage } from './apiClient';
 
 const SURFACE_ENDPOINTS = Object.freeze({
   governance: '/api/governance/clinical/readiness',

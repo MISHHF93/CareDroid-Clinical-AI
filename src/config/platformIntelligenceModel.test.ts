@@ -1,4 +1,4 @@
-ï»¿import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
   ARTIFACT_RELATIONSHIP_EDGES,
   PLATFORM_INTELLIGENCE_MODULES,
@@ -9,7 +9,7 @@ import {
 } from './platformIntelligenceModel';
 
 describe('platformIntelligenceModel', () => {
-  it('registers all 20 prompts (117â€“136)', () => {
+  it('registers all 20 prompts (117–136)', () => {
     expect(PLATFORM_INTELLIGENCE_MODULES).toHaveLength(20);
     expect(PLATFORM_INTELLIGENCE_MODULES[0].prompt).toBe(117);
     expect(PLATFORM_INTELLIGENCE_MODULES[19].prompt).toBe(136);
@@ -38,7 +38,7 @@ describe('platformIntelligenceModel', () => {
     expect(convergence.assessment.artifacts.correctiveActions.length).toBeGreaterThan(0);
   });
 
-  it('produces audit artifact for prompts 117â€“136', () => {
+  it('produces audit artifact for prompts 117–136', () => {
     const audit = auditPlatformIntelligence();
     expect(audit.promptsCovered).toEqual([
       117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136,

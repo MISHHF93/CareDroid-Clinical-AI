@@ -1,5 +1,5 @@
-ï»¿/**
- * PR4A calculators â€” ASCVD PCE, CKD staging, STOP-Bang, AUDIT-C.
+/**
+ * PR4A calculators — ASCVD PCE, CKD staging, STOP-Bang, AUDIT-C.
  * Decision-support / screening UX with accessibility affordances.
  */
 
@@ -216,7 +216,7 @@ export function AscvdRiskCalculator({ onResultChange }) {
           </p>
           <p className="calc-disclaimer-detail">
             <strong>Primary prevention context:</strong> PCE estimates 10-year risk of first hard ASCVD event in adults
-            aged 40â€“79. Does not recommend statins or other therapies â€” use with ACC/AHA prevention guidance and shared
+            aged 40–79. Does not recommend statins or other therapies — use with ACC/AHA prevention guidance and shared
             decision-making.
           </p>
         </div>
@@ -271,7 +271,7 @@ export function AscvdRiskCalculator({ onResultChange }) {
                 inputMode="numeric"
               />
               <span className="calc-input-help" id={ascvdAgeHelpId}>
-                Valid range 40â€“79 years for pooled cohort equations.
+                Valid range 40–79 years for pooled cohort equations.
               </span>
             </div>
 
@@ -287,7 +287,7 @@ export function AscvdRiskCalculator({ onResultChange }) {
                 aria-required="true"
                 aria-invalid={fieldInvalid(!sex)}
               >
-                <option value="">Selectâ€¦</option>
+                <option value="">Select…</option>
                 <option value="female">Female</option>
                 <option value="male">Male</option>
               </select>
@@ -305,7 +305,7 @@ export function AscvdRiskCalculator({ onResultChange }) {
                 aria-required="true"
                 aria-invalid={fieldInvalid(!race)}
               >
-                <option value="">Selectâ€¦</option>
+                <option value="">Select…</option>
                 <option value="white">White</option>
                 <option value="african_american">African American</option>
                 <option value="other">Other (uses White coefficients)</option>
@@ -466,7 +466,7 @@ export function AscvdRiskCalculator({ onResultChange }) {
               aria-labelledby={ascvdScoreLabelId}
             >
               <div id={ascvdScoreLabelId} className="calc-score-label">
-                10-year ASCVD risk â€” {result.tenYearRiskPct.toFixed(1)}% (estimated)
+                10-year ASCVD risk — {result.tenYearRiskPct.toFixed(1)}% (estimated)
               </div>
               <div className="calc-score-value" aria-hidden="true">
                 {result.tenYearRiskPct.toFixed(1)}%
@@ -594,7 +594,7 @@ export function CkdStagingCalculator({ onResultChange }) {
             Use as decision-support for clinician-patient discussions.
           </p>
           <p className="calc-disclaimer-detail">
-            <strong>KDIGO staging context:</strong> CKD is defined by kidney damage or GFR &lt;60 for â‰¥3 months. A
+            <strong>KDIGO staging context:</strong> CKD is defined by kidney damage or GFR &lt;60 for =3 months. A
             single eGFR and ACR do not establish chronicity. Does not recommend dialysis or specific drug therapy.
           </p>
         </div>
@@ -661,7 +661,7 @@ export function CkdStagingCalculator({ onResultChange }) {
                 aria-required="true"
                 aria-invalid={fieldInvalid(!sex)}
               >
-                <option value="">Selectâ€¦</option>
+                <option value="">Select…</option>
                 <option value="female">Female</option>
                 <option value="male">Male</option>
               </select>
@@ -691,7 +691,7 @@ export function CkdStagingCalculator({ onResultChange }) {
                   aria-label="Creatinine unit"
                 >
                   <option value="mg_dl">mg/dL</option>
-                  <option value="umol_l">Âµmol/L</option>
+                  <option value="umol_l">µmol/L</option>
                 </select>
               </div>
             </div>
@@ -762,13 +762,13 @@ export function CkdStagingCalculator({ onResultChange }) {
               aria-labelledby={ckdScoreLabelId}
             >
               <div id={ckdScoreLabelId} className="calc-score-label">
-                eGFR (CKD-EPI 2021) â€” {result.egfrMlMin} mL/min/1.73 mÂ²
+                eGFR (CKD-EPI 2021) — {result.egfrMlMin} mL/min/1.73 m²
               </div>
               <div className="calc-score-value" aria-hidden="true">
                 {result.egfrMlMin}
               </div>
               <div className="calc-score-interpretation" aria-hidden="true">
-                mL/min/1.73 mÂ² â€” {result.gfrCategoryLabel}
+                mL/min/1.73 m² — {result.gfrCategoryLabel}
               </div>
             </div>
 
@@ -786,7 +786,7 @@ export function CkdStagingCalculator({ onResultChange }) {
                   <span className="calc-breakdown-score">{result.albuminuriaCategoryLabel}</span>
                 </li>
                 <li className="calc-breakdown-item">
-                  <span className="calc-breakdown-label">Combined GÃ—A stage</span>
+                  <span className="calc-breakdown-label">Combined G×A stage</span>
                   <span className="calc-breakdown-score">{result.combinedStage}</span>
                 </li>
                 <li className="calc-breakdown-item">
@@ -931,7 +931,7 @@ export function StopBangCalculator({ onResultChange }) {
                         aria-describedby={helpId}
                       />
                       <label htmlFor={id} className="calc-checkbox-label">
-                        {row.letter} â€” {row.shortLabel}
+                        {row.letter} — {row.shortLabel}
                       </label>
                     </div>
                     <span className="calc-input-help calc-has-bled-help" id={helpId}>
@@ -978,7 +978,7 @@ export function StopBangCalculator({ onResultChange }) {
                 {result.totalScore}
               </div>
               <div className="calc-score-interpretation" aria-hidden="true">
-                of 8 â€” {result.label}
+                of 8 — {result.label}
               </div>
             </div>
 
@@ -1118,8 +1118,8 @@ export function AuditCCalculator({ onResultChange }) {
         <div className="calc-timi-disclaimer calc-has-bled-disclaimer" role="note">
           <CalcDecisionSupportLead />
           <p className="calc-disclaimer-detail">
-            <strong>Screening only.</strong> AUDIT-C is a brief alcohol consumption screen (0â€“12). Apply sex-specific
-            positive thresholds (â‰¥{AUDIT_C_WOMEN_POSITIVE_THRESHOLD} women, â‰¥{AUDIT_C_MEN_POSITIVE_THRESHOLD} men). It
+            <strong>Screening only.</strong> AUDIT-C is a brief alcohol consumption screen (0–12). Apply sex-specific
+            positive thresholds (={AUDIT_C_WOMEN_POSITIVE_THRESHOLD} women, ={AUDIT_C_MEN_POSITIVE_THRESHOLD} men). It
             does not diagnose alcohol use disorder or provide withdrawal-management advice.
           </p>
         </div>
@@ -1173,7 +1173,7 @@ export function AuditCCalculator({ onResultChange }) {
                     aria-invalid={fieldInvalid(responses[item.key] === '')}
                     aria-describedby={hasValidationErrors ? validationSummaryId : undefined}
                   >
-                    <option value="">Selectâ€¦</option>
+                    <option value="">Select…</option>
                     {item.options.map((opt) => (
                       <option key={opt.value} value={opt.value}>
                         {opt.label} ({opt.points})
@@ -1220,7 +1220,7 @@ export function AuditCCalculator({ onResultChange }) {
                 {result.totalScore}
               </div>
               <div className="calc-score-interpretation" aria-hidden="true">
-                of 12 â€” sex-specific thresholds â‰¥{AUDIT_C_WOMEN_POSITIVE_THRESHOLD} (women) / â‰¥
+                of 12 — sex-specific thresholds ={AUDIT_C_WOMEN_POSITIVE_THRESHOLD} (women) / =
                 {AUDIT_C_MEN_POSITIVE_THRESHOLD} (men)
               </div>
             </div>

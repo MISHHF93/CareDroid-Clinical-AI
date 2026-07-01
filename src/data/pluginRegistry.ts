@@ -1,4 +1,4 @@
-﻿export const PLUGIN_TYPES = Object.freeze({
+export const PLUGIN_TYPES = Object.freeze({
   CALCULATOR: 'calculator',
   PROTOCOL: 'protocol',
   SIMULATION: 'simulation',

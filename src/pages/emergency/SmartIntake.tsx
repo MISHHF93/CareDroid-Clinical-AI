@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useProfileNavigate } from '../../hooks/useProfileNavigate';
 import { FileScan } from 'lucide-react';
@@ -54,6 +54,7 @@ import {
 import { captureIntakeArtifact } from '../../services/intakeArtifactCapture';
 import useFeature from '../../hooks/useFeature';
 import { buildClientTriageAssist } from '../../services/triageAssist';
+import { routeSmartIntakeThroughOrchestrator } from '../../services/receptionIntakeOrchestrator';
 import { mergeExtractedFieldRows } from '../../utils/intakeArtifactFields';
 import {
   getIntakeArtifact,
@@ -317,7 +318,7 @@ export default function SmartIntake({
     if (!fromReception || !provisionalKind) return;
     setActiveStep(0);
     setStatusMessage(
-      `${PROVISIONAL_IDENTITY_PROFILES[provisionalKind].label} — send to triage without waiting for full verification.`,
+      `${PROVISIONAL_IDENTITY_PROFILES[provisionalKind].label} � send to triage without waiting for full verification.`,
     );
   }, [fromReception, intakeMode]);
 
@@ -510,44 +511,59 @@ export default function SmartIntake({
     }
   };
 
-  const addSmartIntakePatientToWhiteboard = (label) => {
+  const addSmartIntakePatientToWhiteboard = async (label) => {
     if (!canCreatePatient) return null;
-    const patient = buildSmartIntakePatient(sessionId, label, extractedFields);
-    const timeline = (Array.isArray(patient.timeline) ? patient.timeline : []).map((event) => ({
-      ...event,
-      patientId: patient.id,
-    }));
-    const patientRecord = {
-      ...patient,
-      vitals: Array.isArray(patient.vitals) ? patient.vitals : [patient.vitals],
-      timeline,
-    };
-    if (nlpTriageExpertEnabled) {
-      const triageAssist = buildClientTriageAssist(patientRecord as any, patients, {
-        handoffSource: 'smart-intake',
-        arrivalReason: patientRecord.chiefComplaint,
-        complaintCategory: patientRecord.complaintCategory,
+    const arrivalContext = resolveIntakeArrivalReason();
+    try {
+      const routeResult = await routeSmartIntakeThroughOrchestrator(extractedFields, {
+        sessionId,
+        complaint: arrivalContext.arrivalReason,
+        actorName: emergencyRole.roleLabel || 'Smart Intake',
+        actorStaffId: emergencyRole.canonicalProfile?.employeeId || emergencyRole.canonicalProfile?.id,
       });
-      patientRecord.triageAssist = triageAssist;
-      patientRecord.triageAssistGeneratedAt = triageAssist.generatedAt;
-      patientRecord.triagePending = true;
+      applyIntakeArrivalContext(store, routeResult.patientId as any, arrivalContext);
+      registerArrivalControl(routeResult.patientId as any, { source: 'smart-intake' });
+      selectPatient(routeResult.patientId as any);
+      if (documentArtifactsEnabled && supplementalCaptureText.trim()) {
+        void extractAndAttachDocumentArtifacts({
+          patientId: routeResult.patientId as any,
+          documentType: selectedArtifact?.label || 'Intake document',
+          sourceType: 'staff_paste',
+          rawText: supplementalCaptureText,
+          sourceState: 'staff_entered',
+          isAiDerived: false,
+        }).catch(() => undefined);
+      }
+      finishIntakeNavigation(routeResult.patientId);
+      return routeResult.patient;
+    } catch {
+      const patient = buildSmartIntakePatient(sessionId, label, extractedFields);
+      const timeline = (Array.isArray(patient.timeline) ? patient.timeline : []).map((event) => ({
+        ...event,
+        patientId: patient.id,
+      }));
+      const patientRecord = {
+        ...patient,
+        vitals: Array.isArray(patient.vitals) ? patient.vitals : [patient.vitals],
+        timeline,
+      };
+      if (nlpTriageExpertEnabled) {
+        const triageAssist = buildClientTriageAssist(patientRecord as any, patients, {
+          handoffSource: 'smart-intake',
+          arrivalReason: patientRecord.chiefComplaint,
+          complaintCategory: patientRecord.complaintCategory,
+        });
+        patientRecord.triageAssist = triageAssist;
+        patientRecord.triageAssistGeneratedAt = triageAssist.generatedAt;
+        patientRecord.triagePending = true;
+      }
+      addPatient(patientRecord as any, { syncToBackend: false });
+      applyIntakeArrivalContext(store, patient.id as any, arrivalContext);
+      registerArrivalControl(patient.id as any, { source: 'smart-intake' });
+      selectPatient(patient.id as any);
+      finishIntakeNavigation(patient.id);
+      return patient;
     }
-    addPatient(patientRecord as any, { syncToBackend: false });
-    applyIntakeArrivalContext(store, patient.id as any, resolveIntakeArrivalReason());
-    registerArrivalControl(patient.id as any, { source: 'smart-intake' });
-    selectPatient(patient.id as any);
-    if (documentArtifactsEnabled && supplementalCaptureText.trim()) {
-      void extractAndAttachDocumentArtifacts({
-        patientId: patient.id as any,
-        documentType: selectedArtifact?.label || 'Intake document',
-        sourceType: 'staff_paste',
-        rawText: supplementalCaptureText,
-        sourceState: 'staff_entered',
-        isAiDerived: false,
-      }).catch(() => undefined);
-    }
-    finishIntakeNavigation(patient.id);
-    return patient;
   };
 
   const hydrateSmartIntakeResult = (result, fallbackPatient) => {
@@ -594,7 +610,7 @@ export default function SmartIntake({
         setActiveStepTracked(SMART_INTAKE_DEMO.steps.length - 1, 'finalize-local-fallback');
       } else {
         setErrorMessage(formatApiRecoveryMessage(error, 'intake confirmation'));
-        setStatusMessage(`${actionLabel} not confirmed — review the error and retry.`);
+        setStatusMessage(`${actionLabel} not confirmed � review the error and retry.`);
       }
     } finally {
       setPendingAction('');
@@ -693,7 +709,7 @@ export default function SmartIntake({
         systemPrompt: `${getAIPrompt('smart-intake-assistant').prompt}\n${HUMAN_REVIEW_DISCLAIMER}`,
         message: [
           `Smart Intake session ${sessionId}.`,
-          'Provide verification hints only — do not suggest triage priority or clinical disposition.',
+          'Provide verification hints only � do not suggest triage priority or clinical disposition.',
           missingFields ? `Fields needing review: ${missingFields}.` : 'All demo fields appear captured.',
           'List 2-3 concise next verification steps for front-desk staff.',
         ].join(' '),
@@ -751,7 +767,7 @@ export default function SmartIntake({
     <>
       {!embedded && !fromReception ? (
       <div className="smart-intake__status" role="status">
-        <strong>Session:</strong> {sessionId} · {statusMessage}
+        <strong>Session:</strong> {sessionId} � {statusMessage}
       </div>
       ) : statusMessage ? (
         <div className="smart-intake__status" role="status">
@@ -764,7 +780,7 @@ export default function SmartIntake({
             {aiHintLoading
               ? fromReception || embedded
                 ? RECEPTION_COPY.identityCheck.aiHelpLoading
-                : 'AI help…'
+                : 'AI help�'
               : fromReception || embedded
                 ? RECEPTION_COPY.identityCheck.aiHelp
                 : 'AI verification help'}

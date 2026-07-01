@@ -1,4 +1,4 @@
-﻿import { CANONICAL_ROUTES } from '../config/routes.config';
+import { CANONICAL_ROUTES } from '../config/routes.config';
 import { getEmergencySurface } from '../config/emergencyPipelineModel';
 import {
   getReceptionEmbeddedIntakePath,

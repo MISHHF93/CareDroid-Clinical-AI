@@ -1,0 +1,11 @@
+---
+pid: 10004
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cmd /c \"cd /d C:\\Users\\borah\\CareDroid-Clinical-AI && node_modules\\.bin\\vitest run src/styles/responsiveUx.test.ts src/test/routePagesSmoke.test.tsx --reporter=dot 2>&1\""
+started_at: 2026-06-30T23:35:18.011Z
+running_for_ms: 2550001  
+---
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+··········x·········x·

@@ -1,4 +1,4 @@
-﻿import { PRACTITIONER_WALKTHROUGH_ACTIVE_CENSUS } from '../config/practitionerCleanup.constants';
+import { PRACTITIONER_WALKTHROUGH_ACTIVE_CENSUS } from '../config/practitionerCleanup.constants';
 import { dedupePatientsByMrn } from '../utils/patientSeedUtils';
 
 export const FIRST_CUSTOMER_DEMO_MODE = Object.freeze({

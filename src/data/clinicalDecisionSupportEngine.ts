@@ -1,4 +1,4 @@
-﻿const DEFAULT_SYMPTOMS =
+const DEFAULT_SYMPTOMS =
   'Chest pain with shortness of breath, diaphoresis, and nausea for two hours.';
 
 const SIGNAL_DEFINITIONS = Object.freeze([

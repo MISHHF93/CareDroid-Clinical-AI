@@ -1,5 +1,5 @@
-Ôªø/**
- * PR8 batch ‚Äî HEART, Centor/McIsaac, Bishop, Apgar, Braden, Morse, Ranson, BISAP, FIB-4, Framingham.
+/**
+ * PR8 batch ó HEART, Centor/McIsaac, Bishop, Apgar, Braden, Morse, Ranson, BISAP, FIB-4, Framingham.
  */
 
 import { useEffect, useRef, useState } from 'react';
@@ -463,7 +463,7 @@ export function HeartScoreCalculator({ onResultChange }) {
         riskCategory: r.riskCategory,
         riskBand: r.riskBand,
       })}
-      disclaimerNote="Chest pain risk stratification only (0‚Äì10). Estimates 6-week MACE risk from validation cohorts; does not diagnose ACS or recommend treatment or disposition."
+      disclaimerNote="Chest pain risk stratification only (0ñ10). Estimates 6-week MACE risk from validation cohorts; does not diagnose ACS or recommend treatment or disposition."
     />
   );
 }
@@ -673,7 +673,7 @@ export function ApgarScoreCalculator({ onResultChange }) {
   const runCalculate = () => {
     const v1 = validateApgarMinuteInputs(minute1);
     const v5 = validateApgarMinuteInputs(minute5);
-    const errors = [...v1.errors, ...v5.errors.map((e) => `5 minutes ‚Äî ${e}`)];
+    const errors = [...v1.errors, ...v5.errors.map((e) => `5 minutes ó ${e}`)];
     setValidationErrors(errors);
     if (!v1.valid || !v5.valid) {
       setResult(null);
@@ -885,11 +885,11 @@ export function RansonCriteriaCalculator({ onResultChange }) {
           }}
         >
           <fieldset className="calc-timi-fieldset">
-            <legend className="calc-timi-legend">At admission (0‚Äì5)</legend>
+            <legend className="calc-timi-legend">At admission (0ñ5)</legend>
             <div className="calc-timi-criteria">{renderGroup(RANSON_ADMISSION_META, admission, setAdmission, 'ranson-adm')}</div>
           </fieldset>
           <fieldset className="calc-timi-fieldset">
-            <legend className="calc-timi-legend">At 48 hours (0‚Äì6)</legend>
+            <legend className="calc-timi-legend">At 48 hours (0ñ6)</legend>
             <div className="calc-timi-criteria">{renderGroup(RANSON_AT_48H_META, at48h, setAt48h, 'ranson-48')}</div>
           </fieldset>
           <div className="calc-actions">
@@ -1014,7 +1014,7 @@ export function Fib4Calculator({ onResultChange }) {
               aria-describedby="fib4-age-help"
             />
             <span className="calc-input-help" id="fib4-age-help">
-              Patient age in years (18‚Äì120).
+              Patient age in years (18ñ120).
             </span>
           </div>
           <div className="calc-form-group">
@@ -1055,7 +1055,7 @@ export function Fib4Calculator({ onResultChange }) {
           </div>
           <div className="calc-form-group">
             <label htmlFor="fib4-plt" className="calc-label">
-              Platelets (√ó10‚Åπ/L)
+              Platelets (◊10?/L)
             </label>
             <input
               id="fib4-plt"
@@ -1068,7 +1068,7 @@ export function Fib4Calculator({ onResultChange }) {
               aria-describedby="fib4-plt-help"
             />
             <span className="calc-input-help" id="fib4-plt-help">
-              Platelet count in √ó10‚Åπ/L (same as 10¬≥/¬µL).
+              Platelet count in ◊10?/L (same as 10≥/µL).
             </span>
           </div>
           <div className="calc-actions">
@@ -1219,7 +1219,7 @@ export function FraminghamRiskCalculator({ onResultChange }) {
         <div className="calc-timi-disclaimer calc-has-bled-disclaimer" role="note">
           <CalcDecisionSupportLead />
           <p className="calc-disclaimer-detail">
-            ATP III Framingham hard CHD risk (Wilson et al.) ‚Äî alternative to ASCVD PCE; ages 30‚Äì74 only.
+            ATP III Framingham hard CHD risk (Wilson et al.) ó alternative to ASCVD PCE; ages 30ñ74 only.
           </p>
         </div>
         <form
@@ -1261,7 +1261,7 @@ export function FraminghamRiskCalculator({ onResultChange }) {
               value={sex}
               onChange={(e) => setSex(e.target.value)}
             >
-              <option value="">Select‚Ä¶</option>
+              <option value="">SelectÖ</option>
               <option value="female">Female</option>
               <option value="male">Male</option>
             </select>

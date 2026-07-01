@@ -1,4 +1,4 @@
-ï»¿import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useEmergencyStore } from '../store/emergencyStore';
 import './EMSPressureScore.css';
 
@@ -109,7 +109,7 @@ export default function EMSPressureScore({ variant = 'badge', className = '' }) 
           <span>EMS Pressure</span>
           <h2>{pressure.band.label}</h2>
           <p>
-            {pressure.incomingUnits} inbound Â· {pressure.awaitingHandoff} awaiting handoff Â· avg
+            {pressure.incomingUnits} inbound · {pressure.awaitingHandoff} awaiting handoff · avg
             offload {pressure.averageOffloadMinutes}m
           </p>
         </div>

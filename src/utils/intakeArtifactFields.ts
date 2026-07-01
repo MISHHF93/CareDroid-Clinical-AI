@@ -1,4 +1,4 @@
-﻿import type { IntakeArtifactDefinition } from '../config/intakeArtifactRegistry';
+import type { IntakeArtifactDefinition } from '../config/intakeArtifactRegistry';
 import type { IdArtifactDemographics } from './idArtifactParser';
 import {
   demographicsToFieldRows,

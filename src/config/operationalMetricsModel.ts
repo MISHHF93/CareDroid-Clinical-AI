@@ -1,4 +1,4 @@
-﻿import { CANONICAL_ROUTES } from './routes.config';
+import { CANONICAL_ROUTES } from './routes.config';
 
 /** Canonical operational metric keys shared across central node + store selectors. */
 export const OPERATIONAL_METRIC_KEYS = Object.freeze([

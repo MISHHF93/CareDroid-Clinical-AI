@@ -1,0 +1,7 @@
+---
+pid: 3024
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "Start-Sleep -Seconds 600; Get-Content \"C:\\Users\\borah\\CareDroid-Clinical-AI\\terminals\\102.txt\" -Tail 200"
+started_at: 2026-06-30T22:29:53.485Z
+running_for_ms: 425000   
+---

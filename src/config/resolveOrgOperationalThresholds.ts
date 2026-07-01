@@ -1,4 +1,4 @@
-﻿import { DEFAULT_EMERGENCY_THRESHOLDS } from '../store/emergencyStore';
+import { DEFAULT_EMERGENCY_THRESHOLDS } from '../store/emergencyStore';
 import { DEFAULT_EMERGENCY_CTAS_TARGETS } from './emergencySettings.config';
 
 /**

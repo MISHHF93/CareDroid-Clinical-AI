@@ -1,5 +1,5 @@
-ï»¿/**
- * TrackMind Enterprise Operating Platform â€” scoring, KPIs, and artifacts (Prompts 99â€“116).
+/**
+ * TrackMind Enterprise Operating Platform — scoring, KPIs, and artifacts (Prompts 99–116).
  * Node-safe; integrates TrackMind maturity, customer success, and survivability signals.
  */
 
@@ -51,7 +51,7 @@ function moduleResult(moduleId, label, score, kpis, artifacts = {} as any) {
   });
 }
 
-/** Anonymized cohort benchmarks â€” no track identifiers exposed. */
+/** Anonymized cohort benchmarks — no track identifiers exposed. */
 export const ANONYMIZED_BENCHMARK_COHORTS = Object.freeze([
   Object.freeze({
     cohortId: 'cohort-tier1',
@@ -638,7 +638,7 @@ export function buildEnterpriseOperatingPlatformAssessment({
   return Object.freeze({
     generatedAt: new Date().toISOString(),
     organizationName,
-    framework: 'TrackMind Enterprise Operating Platform (Prompts 99â€“116)',
+    framework: 'TrackMind Enterprise Operating Platform (Prompts 99–116)',
     overallScore,
     overallStatus: statusFromScore(overallScore),
     modules,
@@ -668,7 +668,7 @@ export function auditEnterpriseOperatingPlatform(options = {} as any) {
 
   return Object.freeze({
     generatedAt: new Date().toISOString(),
-    goal: 'Enterprise operating platform audit â€” Prompts 99â€“116',
+    goal: 'Enterprise operating platform audit — Prompts 99–116',
     assessment,
     moduleScores: Object.fromEntries(
       assessment.modules.map((module) => [module.id, module.assessment.score]),

@@ -1,4 +1,4 @@
-ï»¿import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import useTriageScreen from '../../hooks/useTriageScreen';
 import useReceptionScreen from '../../hooks/useReceptionScreen';
 import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermissions';
@@ -109,9 +109,9 @@ export default function AiTriageAssistPanel({
     >
       <header className="ai-triage-assist__header">
         <div>
-          <p className="ai-triage-assist__eyebrow">Nurse triage sign-off Â· {sourceLabel}</p>
+          <p className="ai-triage-assist__eyebrow">Nurse triage sign-off · {sourceLabel}</p>
           <h3 className="ai-triage-assist__title">
-            Suggested {priorityLabel(priority)} Â· {streamingLaneLabel(String(lane))}
+            Suggested {priorityLabel(priority)} · {streamingLaneLabel(String(lane))}
           </h3>
           <p className="ai-triage-assist__esi">{priorityToEsiLabel(priority)}</p>
         </div>

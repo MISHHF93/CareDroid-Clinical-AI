@@ -1,5 +1,5 @@
-﻿/**
- * Canonical CareDroid role → screen-mode matrix.
+/**
+ * Canonical CareDroid role ? screen-mode matrix.
  * Single resolver for route, role, tenant settings, and wall-display query params.
  */
 import { CANONICAL_ROUTES } from './routes.config';
@@ -18,7 +18,7 @@ import {
 } from './emergencyDeviceContextModel';
 import { coerceScreenModeForRole } from './emergencyScreenModeAccessModel';
 
-/** Stable ED role ids — kept local to avoid circular imports with emergencyRolePermissions.js */
+/** Stable ED role ids � kept local to avoid circular imports with emergencyRolePermissions.js */
 export const EMERGENCY_ROLE_ID = Object.freeze({
   admin: 'admin',
   edManager: 'ed_manager',
@@ -238,7 +238,7 @@ export function resolveRouteScreenMode(
 }
 
 /**
- * Unified screen-mode resolver — used by route hooks and central-node snapshot builder.
+ * Unified screen-mode resolver � used by route hooks and central-node snapshot builder.
  */
 export function resolveEmergencyScreenMode(input: ResolveEmergencyScreenModeInput): CareDroidScreenMode {
   const settings = input.emergencySettings || {};

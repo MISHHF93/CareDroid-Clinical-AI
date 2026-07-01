@@ -1,4 +1,4 @@
-﻿import { ROUTE_RECORDS } from '../config/routes.config';
+import { ROUTE_RECORDS } from '../config/routes.config';
 import {
   ASSET_PACKS,
   SAAS_PRODUCTS,

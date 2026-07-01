@@ -1,4 +1,4 @@
-﻿import React, { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { CARE_DROID_SCREEN_MODES } from '../../config/careDroidScreenModes';
 import { buildCommandCenterFallbackSnapshot } from '../../config/displayAutoRefreshModel';
 import { resolveOperationalPresentation } from '../../config/emergencyOperationalPresentationModel';
@@ -9,9 +9,9 @@ import CommandCenterSurgePanel from './CommandCenterSurgePanel';
 import './CommandCenterThroughputScreen.css';
 
 function trendGlyph(direction) {
-  if (direction === 'up') return '↑';
-  if (direction === 'down') return '↓';
-  return '→';
+  if (direction === 'up') return '?';
+  if (direction === 'down') return '?';
+  return '?';
 }
 
 export default function CommandCenterThroughputScreen({
@@ -236,7 +236,7 @@ export default function CommandCenterThroughputScreen({
             <h3>Data freshness / system health</h3>
             <strong>{resolvedSnapshot.systemHealth.label}</strong>
             <p>
-              {resolvedSnapshot.systemHealth.freshness} · {resolvedSnapshot.systemHealth.detail}
+              {resolvedSnapshot.systemHealth.freshness} � {resolvedSnapshot.systemHealth.detail}
             </p>
           </section>
         ) : null}

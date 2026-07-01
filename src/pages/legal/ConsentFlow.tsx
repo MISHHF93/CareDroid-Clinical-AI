@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import useProfileNavigate from '../../hooks/useProfileNavigate';
 import { Checkbox } from '../../components/forms/Checkbox';
@@ -186,7 +186,7 @@ export const ConsentFlow = ({ onComplete }) => {
               </p>
               <div className="consent-warning">
                 <p>
-                  <strong>⚠️ Important:</strong> CareDroid is a decision support tool only. 
+                  <strong>?? Important:</strong> CareDroid is a decision support tool only. 
                   It is NOT a substitute for professional medical judgment.
                 </p>
               </div>

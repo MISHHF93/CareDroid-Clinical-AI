@@ -1,4 +1,4 @@
-﻿import { CANONICAL_ROUTES, EMERGENCY_OS_TARGET_ROUTES } from './routes.config';
+import { CANONICAL_ROUTES, EMERGENCY_OS_TARGET_ROUTES } from './routes.config';
 import { normalizeEmergencyRole } from './emergencyRolePermissions';
 import { isReceptionFirstUxEnabled } from './receptionFirstUx.config';
 
@@ -231,7 +231,7 @@ export const EMERGENCY_SURFACE_REGISTRY = Object.freeze([
     sidebarNavId: 'pulse',
     standaloneAllowed: true,
     panelKey: null,
-    retainedReason: 'Shift command strip — utility nav',
+    retainedReason: 'Shift command strip � utility nav',
   }),
   Object.freeze({
     id: 'shift',
@@ -242,9 +242,9 @@ export const EMERGENCY_SURFACE_REGISTRY = Object.freeze([
     sidebarNavId: 'shift',
     standaloneAllowed: true,
     panelKey: null,
-    retainedReason: 'Handoff brief — utility nav',
+    retainedReason: 'Handoff brief � utility nav',
   }),
-  // ── Journey-tier surfaces added in the full emergency care rebuild ────────────
+  // -- Journey-tier surfaces added in the full emergency care rebuild ------------
   Object.freeze({
     id: 'command-center',
     label: 'Command Center',
@@ -294,7 +294,7 @@ export const EMERGENCY_SURFACE_REGISTRY = Object.freeze([
     sidebarNavId: null,
     standaloneAllowed: true,
     panelKey: null,
-    retainedReason: 'Clinical documentation assistant — accessible via AI Copilot',
+    retainedReason: 'Clinical documentation assistant � accessible via AI Copilot',
   }),
   Object.freeze({
     id: 'diagnostics',
@@ -345,7 +345,7 @@ export const EMERGENCY_SURFACE_REGISTRY = Object.freeze([
     sidebarNavId: 'help',
     standaloneAllowed: true,
     panelKey: null,
-    retainedReason: 'User manual — utility nav',
+    retainedReason: 'User manual � utility nav',
   }),
 ]);
 

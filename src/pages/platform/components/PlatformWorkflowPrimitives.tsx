@@ -1,4 +1,4 @@
-﻿import ApiStateBanner from '../../../components/ApiStateBanner';
+import ApiStateBanner from '../../../components/ApiStateBanner';
 
 export function PlatformPageShell({ eyebrow, title, summary, error, children }) {
   return (

@@ -1,4 +1,4 @@
-﻿import React, { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { EMPTY_STATE_COPY } from '../../config/emptyStateCopy';
 import ChargeNurseOperationalStrip from './ChargeNurseOperationalStrip';
 import { buildEmsAttentionStripMetrics, summarizeEmsAwareness } from './emsAwarenessModel';

@@ -1,0 +1,15 @@
+---
+pid: 2168
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "Set-Location \"C:\\Users\\borah\\CareDroid-Clinical-AI\"; npm.cmd run build 2>&1 | Select-Object -Last 8"
+started_at: 2026-06-30T23:09:38.042Z
+running_for_ms: 4090009  
+---
+dist/assets/vendor-charts-CGatMrls.js                        252.01 kB │ gzip:  65.75 kB
+dist/assets/calculators-general-clinical-kN3FOWDX.js         287.08 kB │ gzip:  48.65 kB
+dist/assets/index-6rzK0yp5.js                                378.09 kB │ gzip:  71.81 kB
+dist/assets/vendor-BBvOX3aW.js                               559.12 kB │ gzip: 176.40 kB
+dist/assets/index-C-jYTcZZ.js                                751.12 kB │ gzip: 177.31 kB
+dist/assets/calculators-CzeGevtY.js                          953.26 kB │ gzip: 229.10 kB
+dist/assets/data-navigation-C8LA7RLz.js                      980.25 kB │ gzip: 210.06 kB
+✓ built in 15.02s

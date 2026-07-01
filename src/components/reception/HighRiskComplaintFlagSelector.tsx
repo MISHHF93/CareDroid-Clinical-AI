@@ -1,4 +1,4 @@
-﻿import React, { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import {
   detectHighRiskComplaintFlags,
   HIGH_RISK_COMPLAINT_FLAG_DEFINITIONS,
@@ -38,7 +38,7 @@ export default function HighRiskComplaintFlagSelector({
       <div className="high-risk-complaint-selector__header">
         <span className="high-risk-complaint-selector__title">High-risk complaint fast flags</span>
         <span className="high-risk-complaint-selector__advisory">
-          Staff alert only — does not assign triage level
+          Staff alert only � does not assign triage level
         </span>
       </div>
 

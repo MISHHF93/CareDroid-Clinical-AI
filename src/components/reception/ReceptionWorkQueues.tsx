@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { PatientState } from '../../types/emergency';
 import useTriageScreen from '../../hooks/useTriageScreen';
 import useReceptionScreen from '../../hooks/useReceptionScreen';
@@ -114,10 +114,10 @@ export default function ReceptionWorkQueues({
         <p className="reception-work-queues__online-summary" role="status">
           {queueTimingSummary.onlineCount} patient{queueTimingSummary.onlineCount === 1 ? '' : 's'} online
           {queueTimingSummary.dueSoonCount
-            ? ` · ${queueTimingSummary.dueSoonCount} due soon`
+            ? ` � ${queueTimingSummary.dueSoonCount} due soon`
             : ''}
           {queueTimingSummary.breachedCount
-            ? ` · ${queueTimingSummary.breachedCount} overdue`
+            ? ` � ${queueTimingSummary.breachedCount} overdue`
             : ''}
         </p>
       </header>
@@ -255,7 +255,7 @@ export default function ReceptionWorkQueues({
         ) : (
           <OperationalEmptyState
             size="inline"
-            icon="○"
+            icon="?"
             title={emptyCopy[activeTab]}
             guidance={emptyGuidance?.guidance}
             status="Queue is clear for this lane."

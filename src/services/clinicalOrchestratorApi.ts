@@ -1,5 +1,5 @@
-﻿/**
- * POST /api/tools/:id/execute — only for registered orchestrator executors.
+/**
+ * POST /api/tools/:id/execute � only for registered orchestrator executors.
  * Unsupported tools fail explicitly before any network call.
  */
 

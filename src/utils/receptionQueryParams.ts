@@ -1,4 +1,4 @@
-﻿import { CANONICAL_ROUTES } from '../config/routes.config';
+import { CANONICAL_ROUTES } from '../config/routes.config';
 
 /** Canonical patient deep-link keys across reception and whiteboard routes. */
 export const PATIENT_ROUTE_PARAM_KEYS = Object.freeze({
@@ -11,7 +11,7 @@ const ALL_PATIENT_ROUTE_KEYS = Object.values(PATIENT_ROUTE_PARAM_KEYS);
 
 /**
  * Read patient context from reception / whiteboard URL search params.
- * Priority for focusPatientId: queue row → one-shot context → handoff banner.
+ * Priority for focusPatientId: queue row ? one-shot context ? handoff banner.
  */
 export function readPatientRouteContext(searchParams) {
   const contextPatientId = searchParams.get(PATIENT_ROUTE_PARAM_KEYS.context) || '';

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Psychiatry and behavioral-health screening helpers.
  *
  * Screening decision support only. These helpers do not diagnose psychiatric,

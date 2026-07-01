@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { NavIcon } from '../../navigation/NavIcon';
 import { getCalculatorSubIcon, CHROME_ICONS } from '../../navigation/iconRegistry';
 import {

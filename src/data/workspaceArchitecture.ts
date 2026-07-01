@@ -1,4 +1,4 @@
-﻿import { REGISTRY } from './clinicalToolIdContract';
+import { REGISTRY } from './clinicalToolIdContract';
 import { getUserFacingToolRegistryProjection } from './toolInventory';
 import {
   EMERGENCY_ANALYTICS_EVENTS,

@@ -1,4 +1,4 @@
-﻿import { LOCAL_ARTIFACTS } from '../services/artifactsApi';
+import { LOCAL_ARTIFACTS } from '../services/artifactsApi';
 import { getUserFacingToolRegistryProjection } from './toolInventory';
 import {
   CARE_WORKSPACES,

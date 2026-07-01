@@ -1,4 +1,4 @@
-ï»¿import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import useProfileNavigate from '../../hooks/useProfileNavigate';
 import { useConversation } from '../../contexts/ConversationContext';
@@ -371,7 +371,7 @@ const Calculators = ({ embedded = false, onCloseEmbedded, initialCalculatorId = 
               </h2>
               <p className="calc-chat-assisted-lead" role="note">
                 <strong>Decision support only.</strong> Guided chat supports risk stratification, structured exam
-                scoring, or imaging decisions â€” it does not diagnose, rule out disease with certainty, or replace
+                scoring, or imaging decisions — it does not diagnose, rule out disease with certainty, or replace
                 urgent ACS, stroke, trauma, or PE pathways. Use Tab and Enter to launch; emergency care takes
                 priority over completing chat.
               </p>
@@ -417,7 +417,7 @@ const Calculators = ({ embedded = false, onCloseEmbedded, initialCalculatorId = 
                           <span className="calc-chat-assisted-name">{tool.name}</span>
                           {isFleetDispatch ? (
                             <span className="calc-chat-assisted-safety-pill" role="note">
-                              Human approval required â€” no auto-assign
+                              Human approval required — no auto-assign
                             </span>
                           ) : null}
                           <span
@@ -702,7 +702,7 @@ export const CalculatorInterface = ({ calculator, onResultChange, patientContext
 };
 
 /**
- * qSOFA â€” bedside screening (Sepsis-3). Decision support only; not a substitute for clinical judgment.
+ * qSOFA — bedside screening (Sepsis-3). Decision support only; not a substitute for clinical judgment.
  */
 const QSOFACalculator = ({ onResultChange, patientContext = null as any }) => {
   const patientVitals = patientContext?.vitals || {};
@@ -788,7 +788,7 @@ const QSOFACalculator = ({ onResultChange, patientContext = null as any }) => {
           <CalcDecisionSupportLead />
           <p className="calc-disclaimer-detail">
             <strong>Clinical use:</strong> qSOFA is bedside screening in suspected infection. It does not diagnose
-            sepsis. Score â‰¥2 suggests higher risk of poor outcome per Sepsis-3 â€” always interpret in clinical context.
+            sepsis. Score =2 suggests higher risk of poor outcome per Sepsis-3 — always interpret in clinical context.
             Not for use as sole basis for treatment decisions.
           </p>
         </div>
@@ -807,7 +807,7 @@ const QSOFACalculator = ({ onResultChange, patientContext = null as any }) => {
               Respiratory rate (breaths/min)
             </label>
             <span className="calc-input-help" id="qsofa-rr-help">
-              1 point if â‰¥ 22
+              1 point if = 22
             </span>
             <input
               id="qsofa-rr"
@@ -827,7 +827,7 @@ const QSOFACalculator = ({ onResultChange, patientContext = null as any }) => {
               Systolic blood pressure (mmHg)
             </label>
             <span className="calc-input-help" id="qsofa-sbp-help">
-              1 point if â‰¤ 100
+              1 point if = 100
             </span>
             <input
               id="qsofa-sbp"
@@ -872,7 +872,7 @@ const QSOFACalculator = ({ onResultChange, patientContext = null as any }) => {
             GCS total (optional)
           </label>
           <span className="calc-input-help" id="qsofa-gcs-help">
-            3â€“15. If provided and &lt; 15, counts toward mentation criterion. May leave blank if you used
+            3–15. If provided and &lt; 15, counts toward mentation criterion. May leave blank if you used
             "altered mentation" only.
           </span>
           <input
@@ -928,11 +928,11 @@ const QSOFACalculator = ({ onResultChange, patientContext = null as any }) => {
             <div className="calc-breakdown">
               <div className="calc-breakdown-title">Criteria</div>
               <div className="calc-breakdown-item">
-                <span className="calc-breakdown-label">RR â‰¥ 22/min</span>
+                <span className="calc-breakdown-label">RR = 22/min</span>
                 <span className="calc-breakdown-score">{result.criteria.respiratoryRateGte22 ? '1' : '0'}</span>
               </div>
               <div className="calc-breakdown-item">
-                <span className="calc-breakdown-label">SBP â‰¤ 100 mmHg</span>
+                <span className="calc-breakdown-label">SBP = 100 mmHg</span>
                 <span className="calc-breakdown-score">{result.criteria.systolicBpLte100 ? '1' : '0'}</span>
               </div>
               <div className="calc-breakdown-item">
@@ -970,7 +970,7 @@ const QSOFACalculator = ({ onResultChange, patientContext = null as any }) => {
 };
 
 /**
- * NEWS2 â€” RCP standard acute physiology score. Decision support only; follow local escalation policy.
+ * NEWS2 — RCP standard acute physiology score. Decision support only; follow local escalation policy.
  */
 const NEWS2Calculator = ({ onResultChange, patientContext = null as any }) => {
   const patientVitals = patientContext?.vitals || {};
@@ -1075,13 +1075,13 @@ const NEWS2Calculator = ({ onResultChange, patientContext = null as any }) => {
           <p className="calc-disclaimer-detail">
             <strong>Clinical use:</strong> NEWS2 supports detection of acute illness severity and guides monitoring
             frequency and escalation. It is an adjunct to clinical judgement, not a substitute. Follow your
-            organisationâ€™s response policy and senior review where indicated.
+            organisation’s response policy and senior review where indicated.
           </p>
         </div>
 
         <fieldset className="calc-news2-scale-fieldset">
           <legend className="calc-news2-legend" id="news2-scale-legend">
-            SpOâ‚‚ scoring scale
+            SpO2 scoring scale
           </legend>
           <div className="calc-news2-scale-options" role="radiogroup" aria-labelledby="news2-scale-legend">
             <label className="calc-news2-scale-option">
@@ -1094,7 +1094,7 @@ const NEWS2Calculator = ({ onResultChange, patientContext = null as any }) => {
                 onChange={() => setSpo2Scale('1')}
               />
               <span>
-                <strong>Scale 1</strong> â€” usual scale for most patients (target SpOâ‚‚ typically 94â€“98% per BTS when
+                <strong>Scale 1</strong> — usual scale for most patients (target SpO2 typically 94–98% per BTS when
                 using oxygen).
               </span>
             </label>
@@ -1108,8 +1108,8 @@ const NEWS2Calculator = ({ onResultChange, patientContext = null as any }) => {
                 onChange={() => setSpo2Scale('2')}
               />
               <span>
-                <strong>Scale 2</strong> â€” only for patients with a <strong>prescribed</strong> target SpOâ‚‚ range of
-                88â€“92% (e.g. confirmed hypercapnic respiratory failure), under direction of a competent clinician and
+                <strong>Scale 2</strong> — only for patients with a <strong>prescribed</strong> target SpO2 range of
+                88–92% (e.g. confirmed hypercapnic respiratory failure), under direction of a competent clinician and
                 documented in the notes.
               </span>
             </label>
@@ -1117,7 +1117,7 @@ const NEWS2Calculator = ({ onResultChange, patientContext = null as any }) => {
           {spo2Scale === '2' && (
             <div className="calc-news2-scale2-warning" role="alert">
               <strong>Scale 2 warning:</strong> Using Scale 2 inappropriately (e.g. for patients who should be on
-              Scale 1) will mis-score SpOâ‚‚ and may delay recognition of hypoxaemia or cause inappropriate oxygen
+              Scale 1) will mis-score SpO2 and may delay recognition of hypoxaemia or cause inappropriate oxygen
               targets. If unsure, use Scale 1 and seek respiratory / senior advice.
             </div>
           )}
@@ -1137,7 +1137,7 @@ const NEWS2Calculator = ({ onResultChange, patientContext = null as any }) => {
               Respiratory rate (breaths/min)
             </label>
             <span className="calc-input-help" id="news2-rr-help">
-              Values outside 0â€“60 cannot be calculated; use the chart for extreme physiology.
+              Values outside 0–60 cannot be calculated; use the chart for extreme physiology.
             </span>
             <input
               id="news2-rr"
@@ -1154,7 +1154,7 @@ const NEWS2Calculator = ({ onResultChange, patientContext = null as any }) => {
           </div>
           <div className="calc-input-group calc-input-group--grow">
             <label className="calc-input-label" htmlFor="news2-spo2">
-              SpOâ‚‚ (%)
+              SpO2 (%)
             </label>
             <span className="calc-input-help" id="news2-spo2-help">
               Pulse oximetry on current scale ({spo2Scale === '2' ? 'Scale 2' : 'Scale 1'}).
@@ -1189,7 +1189,7 @@ const NEWS2Calculator = ({ onResultChange, patientContext = null as any }) => {
             </label>
           </div>
           <span className="calc-input-help" id="news2-o2-help">
-            NEWS2 adds 2 points when supplemental oxygen is required (Air vs oxygen row), in addition to the SpOâ‚‚
+            NEWS2 adds 2 points when supplemental oxygen is required (Air vs oxygen row), in addition to the SpO2
             score for the scale you selected.
           </span>
         </div>
@@ -1200,7 +1200,7 @@ const NEWS2Calculator = ({ onResultChange, patientContext = null as any }) => {
               Systolic BP (mmHg)
             </label>
             <span className="calc-input-help" id="news2-sbp-help">
-              Values outside 50â€“280 mmHg are blocked from calculation.
+              Values outside 50–280 mmHg are blocked from calculation.
             </span>
             <input
               id="news2-sbp"
@@ -1220,7 +1220,7 @@ const NEWS2Calculator = ({ onResultChange, patientContext = null as any }) => {
               Pulse (bpm)
             </label>
             <span className="calc-input-help" id="news2-pulse-help">
-              Values outside 20â€“220 bpm are blocked from calculation.
+              Values outside 20–220 bpm are blocked from calculation.
             </span>
             <input
               id="news2-pulse"
@@ -1239,10 +1239,10 @@ const NEWS2Calculator = ({ onResultChange, patientContext = null as any }) => {
 
         <div className="calc-input-group">
           <label className="calc-input-label" htmlFor="news2-temp">
-            Temperature (Â°C)
+            Temperature (°C)
           </label>
           <span className="calc-input-help" id="news2-temp-help">
-            Core or equivalent temperature. Values outside 30â€“43 Â°C are blocked from calculation.
+            Core or equivalent temperature. Values outside 30–43 °C are blocked from calculation.
           </span>
             <input
               id="news2-temp"
@@ -1270,7 +1270,7 @@ const NEWS2Calculator = ({ onResultChange, patientContext = null as any }) => {
               aria-describedby="news2-conf-help"
             />
             <label htmlFor="news2-conf" className="calc-checkbox-label">
-              New confusion (or not alert â€” ACVPU not "alert")
+              New confusion (or not alert — ACVPU not "alert")
             </label>
           </div>
           <span className="calc-input-help" id="news2-conf-help">
@@ -1322,7 +1322,7 @@ const NEWS2Calculator = ({ onResultChange, patientContext = null as any }) => {
               </div>
               <div className="calc-breakdown-item">
                 <span className="calc-breakdown-label">
-                  SpOâ‚‚ (scale {result.breakdown.spo2ScaleUsed})
+                  SpO2 (scale {result.breakdown.spo2ScaleUsed})
                 </span>
                 <span className="calc-breakdown-score">{result.breakdown.spo2}</span>
               </div>
@@ -1369,7 +1369,7 @@ const NEWS2Calculator = ({ onResultChange, patientContext = null as any }) => {
         ) : (
           <div className="calc-results-empty">
             <CalcResultsEmptyIcon icon={CHROME_ICONS.clipboardList} />
-            <p>Enter observations, choose SpOâ‚‚ scale, then calculate</p>
+            <p>Enter observations, choose SpO2 scale, then calculate</p>
           </div>
         )}
       </CalcResultsPanel>
@@ -1378,7 +1378,7 @@ const NEWS2Calculator = ({ onResultChange, patientContext = null as any }) => {
 };
 
 /**
- * Child-Pugh â€” cirrhosis severity class. Prognostic index only; not for directing therapy without specialist context.
+ * Child-Pugh — cirrhosis severity class. Prognostic index only; not for directing therapy without specialist context.
  */
 const ChildPughCalculator = ({ onResultChange }) => {
   const [bilirubin, setBilirubin] = useState('');
@@ -1522,7 +1522,7 @@ const ChildPughCalculator = ({ onResultChange }) => {
                   onChange={(e) => setBilirubinUnit(e.target.value)}
                 >
                   <option value="mg_dl">mg/dL</option>
-                  <option value="umol_l">Î¼mol/L</option>
+                  <option value="umol_l">µmol/L</option>
                 </select>
                 <span id="cp-bili-unit-hint" className="calc-sr-only">
                   Milligrams per decilitre or micromoles per litre
@@ -1577,7 +1577,7 @@ const ChildPughCalculator = ({ onResultChange }) => {
             Coagulation (choose one)
           </label>
           <span className="calc-input-help" id="cp-coag-help">
-            Enter <strong>either</strong> INR <strong>or</strong> prothrombin time prolongation vs control (seconds) â€”
+            Enter <strong>either</strong> INR <strong>or</strong> prothrombin time prolongation vs control (seconds) —
             not both.
           </span>
           <select
@@ -1602,7 +1602,7 @@ const ChildPughCalculator = ({ onResultChange }) => {
               INR
             </label>
             <span className="calc-input-help" id="cp-inr-help">
-              0.5â€“15. Values outside this range are blocked from calculation.
+              0.5–15. Values outside this range are blocked from calculation.
             </span>
             <input
               id="cp-inr"
@@ -1624,7 +1624,7 @@ const ChildPughCalculator = ({ onResultChange }) => {
               PT prolongation (seconds above control)
             </label>
             <span className="calc-input-help" id="cp-pt-help">
-              0â€“80 seconds above control. Values outside this range are blocked.
+              0–80 seconds above control. Values outside this range are blocked.
             </span>
             <input
               id="cp-pt"
@@ -1669,8 +1669,8 @@ const ChildPughCalculator = ({ onResultChange }) => {
               onChange={(e) => setEncephalopathy(e.target.value)}
             >
               <option value="none">None</option>
-              <option value="grade12">Grade 1â€“2 (mild)</option>
-              <option value="grade34">Grade 3â€“4 (severe)</option>
+              <option value="grade12">Grade 1–2 (mild)</option>
+              <option value="grade34">Grade 3–4 (severe)</option>
             </select>
           </div>
         </div>
@@ -1712,7 +1712,7 @@ const ChildPughCalculator = ({ onResultChange }) => {
             </div>
 
             <div className="calc-breakdown">
-              <div className="calc-breakdown-title">Components (each 1â€“3)</div>
+              <div className="calc-breakdown-title">Components (each 1–3)</div>
               <div className="calc-breakdown-item">
                 <span className="calc-breakdown-label">Bilirubin (scored as mg/dL)</span>
                 <span className="calc-breakdown-score">{result.breakdown.bilirubin}</span>
@@ -1766,7 +1766,7 @@ const ChildPughCalculator = ({ onResultChange }) => {
 };
 
 /**
- * HAS-BLED â€” bleeding risk factors (anticoagulation context). Decision support only.
+ * HAS-BLED — bleeding risk factors (anticoagulation context). Decision support only.
  */
 const HasBledCalculator = ({ onResultChange }) => {
   const [hypertension, setHypertension] = useState(false);
@@ -1862,7 +1862,7 @@ const HasBledCalculator = ({ onResultChange }) => {
 
         <div className="calc-has-bled-anticoag-warning" role="alert">
           <strong>Anticoagulation safety:</strong> Any anticoagulant carries bleeding risk. This calculator does not
-          recommend starting, stopping, or switching therapy â€” document decisions and monitoring per local policy.
+          recommend starting, stopping, or switching therapy — document decisions and monitoring per local policy.
         </div>
 
         <form
@@ -1970,7 +1970,7 @@ const HasBledCalculator = ({ onResultChange }) => {
 };
 
 /**
- * TIMI â€” UA/NSTEMI risk score (Antman et al.). Decision support only; no treatment recommendations.
+ * TIMI — UA/NSTEMI risk score (Antman et al.). Decision support only; no treatment recommendations.
  */
 const TimiUaNstemiCalculator = ({ onResultChange }) => {
   const resultsRef = useRef(null);
@@ -2028,7 +2028,7 @@ const TimiUaNstemiCalculator = ({ onResultChange }) => {
           <CalcDecisionSupportLead />
           <p className="calc-disclaimer-detail">
             <strong>ACS context:</strong>             Apply only when unstable angina or NSTEMI is already suspected or
-            diagnosed (not for STEMI). TIMI estimates 14-day adverse-event risk in the validation cohort â€” it does not
+            diagnosed (not for STEMI). TIMI estimates 14-day adverse-event risk in the validation cohort — it does not
             confirm ACS and does not direct antiplatelet, anticoagulant, or revascularisation therapy.
           </p>
         </div>
@@ -2148,7 +2148,7 @@ const TimiUaNstemiCalculator = ({ onResultChange }) => {
 };
 
 /**
- * MELD / MELD-Na â€” liver disease severity (UNOS laboratory model). Decision support only.
+ * MELD / MELD-Na — liver disease severity (UNOS laboratory model). Decision support only.
  */
 const MeldCalculator = ({ mode = 'meld', onResultChange }) => {
   const includeMeldNa = mode === 'meld-na';
@@ -2316,7 +2316,7 @@ const MeldCalculator = ({ mode = 'meld', onResultChange }) => {
                 aria-label="Bilirubin unit"
               >
                 <option value="mg_dl">mg/dL</option>
-                <option value="umol_l">Î¼mol/L</option>
+                <option value="umol_l">µmol/L</option>
               </select>
             </div>
             <span className="calc-input-help">Values &lt;1 mg/dL are floored to 1.0 for MELD per UNOS.</span>
@@ -2378,7 +2378,7 @@ const MeldCalculator = ({ mode = 'meld', onResultChange }) => {
                 disabled={onDialysis}
               >
                 <option value="mg_dl">mg/dL</option>
-                <option value="umol_l">Î¼mol/L</option>
+                <option value="umol_l">µmol/L</option>
               </select>
             </div>
             <div className="calc-checkbox-group">
@@ -2428,7 +2428,7 @@ const MeldCalculator = ({ mode = 'meld', onResultChange }) => {
                 inputMode="decimal"
               />
               <span id="meld-sodium-help" className="calc-input-help">
-                mEq/L (mmol/L). Sodium is clamped to 125â€“140 for MELD-Na; MELD-Na will not fall below laboratory MELD.
+                mEq/L (mmol/L). Sodium is clamped to 125–140 for MELD-Na; MELD-Na will not fall below laboratory MELD.
               </span>
             </div>
           ) : null}
@@ -2460,7 +2460,7 @@ const MeldCalculator = ({ mode = 'meld', onResultChange }) => {
                 Laboratory MELD
               </div>
               <div className="calc-score-value">{result.meld}</div>
-              <div className="calc-score-interpretation">6â€“40 (UNOS laboratory model)</div>
+              <div className="calc-score-interpretation">6–40 (UNOS laboratory model)</div>
             </div>
 
             {includeMeldNa && result.meldNa !== null ? (
@@ -2499,7 +2499,7 @@ const MeldCalculator = ({ mode = 'meld', onResultChange }) => {
               </div>
               {includeMeldNa && result.meldForNa !== undefined ? (
                 <div className="calc-breakdown-item">
-                  <span className="calc-breakdown-label">MELD for Na step (â‰¥11 floor)</span>
+                  <span className="calc-breakdown-label">MELD for Na step (=11 floor)</span>
                   <span className="calc-breakdown-score">{result.meldForNa}</span>
                 </div>
               ) : null}
@@ -2645,7 +2645,7 @@ const SOFACalculator = ({ onResultChange }) => {
       <div className="calc-qsofa-disclaimer" role="note">
         <p className="calc-disclaimer-detail">
           <strong>Clinical use:</strong> SOFA scores organ dysfunction for context in sepsis and ICU care.
-          Clinical decision support only â€” does not diagnose sepsis, predict mortality for an individual patient,
+          Clinical decision support only — does not diagnose sepsis, predict mortality for an individual patient,
           or direct therapy. Verify against complete assessment and local protocols.
         </p>
       </div>
@@ -2701,7 +2701,7 @@ const SOFACalculator = ({ onResultChange }) => {
         {/* Coagulation */}
         <div className="calc-input-group">
           <label className="calc-input-label">
-            Platelets (Ã—10Â³/Î¼L)
+            Platelets (×10³/µL)
             <span className="calc-input-help">Normal: 150-400</span>
           </label>
           <input
@@ -2746,7 +2746,7 @@ const SOFACalculator = ({ onResultChange }) => {
 
         <div className="calc-input-group">
           <label className="calc-input-label">
-            Vasopressor Doses (Î¼g/kg/min)
+            Vasopressor Doses (µg/kg/min)
             <span className="calc-input-help">If applicable</span>
           </label>
           <input
@@ -3050,7 +3050,7 @@ const GFRCalculator = ({ onResultChange }) => {
               <div className="calc-score-label">eGFR (CKD-EPI)</div>
               <div className="calc-score-value">
                 {result.gfr}
-                <span className="calc-score-unit">mL/min/1.73mÂ²</span>
+                <span className="calc-score-unit">mL/min/1.73m²</span>
               </div>
               <div className="calc-score-interpretation">
                 CKD Stage {result.stage}
@@ -3220,7 +3220,7 @@ const BMICalculator = ({ onResultChange }) => {
               <div className="calc-score-label">Body Mass Index</div>
               <div className="calc-score-value">
                 {result.bmi}
-                <span className="calc-score-unit">kg/mÂ²</span>
+                <span className="calc-score-unit">kg/m²</span>
               </div>
               <div className="calc-score-interpretation">{result.category}</div>
             </div>
@@ -3236,7 +3236,7 @@ const BMICalculator = ({ onResultChange }) => {
                 <li>Underweight: BMI &lt; 18.5</li>
                 <li>Normal weight: BMI 18.5-24.9</li>
                 <li>Overweight: BMI 25.0-29.9</li>
-                <li>Obese: BMI â‰¥ 30.0</li>
+                <li>Obese: BMI = 30.0</li>
               </ul>
             </div>
             <CalcResultSafetyFooter />
@@ -3253,7 +3253,7 @@ const BMICalculator = ({ onResultChange }) => {
 };
 
 /**
- * CHA2DS2-VASc Calculator (simplified) â€” stroke risk stratum only; no anticoagulation directives.
+ * CHA2DS2-VASc Calculator (simplified) — stroke risk stratum only; no anticoagulation directives.
  */
 const CHA2DS2VAScCalculator = ({ onResultChange }) => {
   const [inputs, setInputs] = useState({
@@ -3296,22 +3296,22 @@ const CHA2DS2VAScCalculator = ({ onResultChange }) => {
       interpretation = 'Low estimated stroke risk stratum (score 0)';
       severity = 'normal';
       recommendation =
-        'Discuss stroke risk with guidelines and shared decision-making â€” this tool does not recommend for or against anticoagulation.';
+        'Discuss stroke risk with guidelines and shared decision-making — this tool does not recommend for or against anticoagulation.';
     } else if (score === 1) {
       interpretation = 'Intermediate estimated stroke risk stratum (score 1)';
       severity = 'normal';
       recommendation =
-        'Discuss stroke and bleeding risk with guidelines â€” does not direct anticoagulant initiation or cessation.';
+        'Discuss stroke and bleeding risk with guidelines — does not direct anticoagulant initiation or cessation.';
     } else if (score === 2) {
       interpretation = 'Moderate estimated stroke risk stratum (score 2)';
       severity = 'warning';
       recommendation =
-        'Higher stroke-risk stratum for discussion with guidelines â€” not a directive to start or stop anticoagulation.';
+        'Higher stroke-risk stratum for discussion with guidelines — not a directive to start or stop anticoagulation.';
     } else {
-      interpretation = 'High estimated stroke risk stratum (score â‰¥3)';
+      interpretation = 'High estimated stroke risk stratum (score =3)';
       severity = 'critical';
       recommendation =
-        'Higher stroke-risk stratum for discussion with guidelines and bleeding-risk assessment (e.g. HAS-BLED) â€” not a directive to start or stop therapy.';
+        'Higher stroke-risk stratum for discussion with guidelines and bleeding-risk assessment (e.g. HAS-BLED) — not a directive to start or stop therapy.';
     }
 
     setResult({ score, interpretation, severity, recommendation });

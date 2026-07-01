@@ -1,4 +1,4 @@
-﻿import { CANONICAL_ROUTES } from '../config/routes.config';
+import { CANONICAL_ROUTES } from '../config/routes.config';
 import { getReceptionEmbeddedIntakePath } from '../config/emergencyRolePermissions';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { enterEmsRegistrationQueue } from './queueAssignment';
@@ -34,9 +34,9 @@ export const RECEPTION_INTAKE_URL_KEYS = [
  * | quickIntake=1      | Reception quick intake modal              |
  * | intake=1           | Smart intake overlay                      |
  * | quickCreate=1      | Reception quick intake modal              |
- * | queue=ems          | Work queues — EMS tab                     |
- * | queue=verification | Work queues — identity verification tab   |
- * | queue=pretriage    | Work queues — pre-triage / handoff tab    |
+ * | queue=ems          | Work queues � EMS tab                     |
+ * | queue=verification | Work queues � identity verification tab   |
+ * | queue=pretriage    | Work queues � pre-triage / handoff tab    |
  * | patientId          | Search context + selected patient         |
  * | q                  | Patient search query                      |
  * | arrived            | Arrival confirmation banner context       |
@@ -57,7 +57,7 @@ export const RECEPTION_PIPELINE_URL_CONTRACT = Object.freeze({
 });
 
 /**
- * Canonical EMS convert chain: chart shell → EMS registration queue → reception verify.
+ * Canonical EMS convert chain: chart shell ? EMS registration queue ? reception verify.
  * Keeps arrival-first continuity across whiteboard, EMS pipeline, and broadcast surfaces.
  */
 export function convertEmsArrivalForReception(arrivalId, options: any = {}) {

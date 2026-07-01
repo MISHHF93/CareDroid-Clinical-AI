@@ -1,4 +1,4 @@
-ï»¿import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import useProfileNavigate from '../../hooks/useProfileNavigate';
 import { useConversation } from '../../contexts/ConversationContext';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
@@ -197,14 +197,14 @@ const ToolPageLayout = ({
               <span>Whiteboard</span>
             </span>
           </button>
-          <span className="breadcrumb-separator">â€º</span>
+          <span className="breadcrumb-separator">›</span>
           <button type="button" onClick={() => profileNavigate('/tools')} className="breadcrumb-link">
             <span className="breadcrumb-link-inner">
               <NavIcon icon={CHROME_ICONS.tools} size={16} decorative />
               <span>Tools</span>
             </span>
           </button>
-          <span className="breadcrumb-separator">â€º</span>
+          <span className="breadcrumb-separator">›</span>
           <span className="breadcrumb-current">{tool.name}</span>
         </div>
       ) : null}

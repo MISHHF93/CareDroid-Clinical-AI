@@ -1,5 +1,5 @@
-ï»¿/**
- * Render / execute smoke matrix â€” every shipped toolâ€™s expected UX mode.
+/**
+ * Render / execute smoke matrix — every shipped tool’s expected UX mode.
  * @see docs/tool-render-execute-matrix.md
  */
 
@@ -256,7 +256,7 @@ export function formatRenderExecuteMarkdown() {
   ];
   for (const row of rows) {
     lines.push(
-      `| \`${row.id}\` | ${row.tier} | ${row.executionMode} | \`${row.smokePath || 'â€”'}\` | ${row.checks.usesPostExecute ? 'yes' : 'â€”'} | ${row.checks.tierBChatSeed ? 'yes' : 'â€”'} | ${row.checks.usesLocalOnly ? 'yes' : 'â€”'} |`,
+      `| \`${row.id}\` | ${row.tier} | ${row.executionMode} | \`${row.smokePath || '—'}\` | ${row.checks.usesPostExecute ? 'yes' : '—'} | ${row.checks.tierBChatSeed ? 'yes' : '—'} | ${row.checks.usesLocalOnly ? 'yes' : '—'} |`,
     );
   }
   lines.push('', '## Checklist columns', '');

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Deterministic fixtures for PR-FLEET comprehensive tests.
  */
 
@@ -70,7 +70,7 @@ export const FLEET_ROUTE_LATE_WINDOW_INPUT = Object.freeze({
   trafficConstraints: { level: 'heavy' },
 });
 
-/** Mid-life vehicle — moderate band */
+/** Mid-life vehicle � moderate band */
 export const FLEET_PM_MODERATE_INPUT = Object.freeze({
   vehicleAgeYears: 11,
   mileage: 120_000,

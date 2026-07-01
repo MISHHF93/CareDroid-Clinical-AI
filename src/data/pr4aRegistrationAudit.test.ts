@@ -1,5 +1,5 @@
-﻿/**
- * PR4A registration audit — cross-system consistency for ASCVD, CKD staging, STOP-Bang, AUDIT-C.
+/**
+ * PR4A registration audit � cross-system consistency for ASCVD, CKD staging, STOP-Bang, AUDIT-C.
  * Complements per-tool wiring tests, pr4aConsistency.test.js, and pr4aCoverage.test.js.
  */
 
@@ -70,7 +70,7 @@ function _extractAppCalculatorRoutes(source) {
   return routes;
 }
 
-describe('PR4A registration audit — canonical ID alignment', () => {
+describe('PR4A registration audit � canonical ID alignment', () => {
   it('keeps PR4A_CALCULATOR_REGISTRY_IDS frozen and matches tier-A slice', () => {
     expect(Object.isFrozen(PR4A_CALCULATOR_REGISTRY_IDS)).toBe(true);
     expect(Object.isFrozen(PR4A_TIER_A_CALCULATOR_REGISTRY_IDS)).toBe(true);
@@ -106,7 +106,7 @@ describe('PR4A registration audit — canonical ID alignment', () => {
   });
 });
 
-describe('PR4A registration audit — routes, deep links, navigation', () => {
+describe('PR4A registration audit � routes, deep links, navigation', () => {
   it.each(PR4A_TOOL_IDS)('%s uses plural /tools/calculators/ path everywhere', (id) => {
     const path = PR4A_ROUTE_BY_REGISTRY_ID[id];
     expect(path).toBe(`${PR4A_HUB_PATH}/${id}`);
@@ -157,7 +157,7 @@ describe('PR4A registration audit — routes, deep links, navigation', () => {
   });
 });
 
-describe('PR4A registration audit — NLU, backend, aliases', () => {
+describe('PR4A registration audit � NLU, backend, aliases', () => {
   it.each(PR4A_TOOL_IDS)('backend tool.patterns.ts declares toolId %s exactly once', (id) => {
     const patterns = parseClinicalToolPatterns(patternsSource);
     const hits = patterns.filter((p) => p.toolId === id);
@@ -165,13 +165,13 @@ describe('PR4A registration audit — NLU, backend, aliases', () => {
   });
 
   it.each(PR4A_REQUIRED_NLU_ALIAS_PAIRS)(
-    'NLU_TO_REGISTRY_ID maps "%s" → %s',
+    'NLU_TO_REGISTRY_ID maps "%s" ? %s',
     (alias, canonical) => {
       expect(NLU_TO_REGISTRY_ID[alias]).toBe(canonical);
     }
   );
 
-  it.each(PR4A_ALL_ALIAS_PAIRS)('resolveRegistryId("%s") → %s', (alias, canonical) => {
+  it.each(PR4A_ALL_ALIAS_PAIRS)('resolveRegistryId("%s") ? %s', (alias, canonical) => {
     expect(resolveRegistryId(alias)).toBe(canonical);
   });
 
@@ -215,7 +215,7 @@ describe('PR4A registration audit — NLU, backend, aliases', () => {
         const slug = aliasToSlug(phrase);
         const inNluMap = NLU_TO_REGISTRY_ID[phrase] === id || NLU_TO_REGISTRY_ID[slug] === id;
         const inBackend = keywords.includes(slug) || keywords.some((k) => k.includes(slug));
-        expect(inNluMap || inBackend, `missing alias coverage for "${phrase}" → ${id}`).toBe(true);
+        expect(inNluMap || inBackend, `missing alias coverage for "${phrase}" ? ${id}`).toBe(true);
       }
     }
   );
@@ -227,7 +227,7 @@ describe('PR4A registration audit — NLU, backend, aliases', () => {
   });
 });
 
-describe('PR4A registration audit — catalog, discovery, sidebar', () => {
+describe('PR4A registration audit � catalog, discovery, sidebar', () => {
   it.each(PR4A_TOOL_IDS)('%s appears exactly once in medical catalog with uiCalculatorSlug', (id) => {
     const rows = getMedicalToolsCatalogRows();
     const matches = rows.filter((r) => r.primaryId === id);
@@ -249,7 +249,7 @@ describe('PR4A registration audit — catalog, discovery, sidebar', () => {
     expect(merged.filter((r) => r.id === id)).toHaveLength(1);
   });
 
-  it.each(PR4A_DISCOVERY_ALIAS_PAIRS)('toolIdAliases documents %s → %s', (aliasId, canonical) => {
+  it.each(PR4A_DISCOVERY_ALIAS_PAIRS)('toolIdAliases documents %s ? %s', (aliasId, canonical) => {
     const row = toolIdAliases.find((a) => a.id === aliasId);
     expect(row?.mapsTo).toBe(canonical);
   });

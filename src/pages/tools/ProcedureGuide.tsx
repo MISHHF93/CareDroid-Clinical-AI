@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import ToolPageLayout from './ToolPageLayout';
 import ToolApiErrorBanner from '../../components/ToolApiErrorBanner';
 import { sendClinicalChatMessage } from '../../services/clinicalChatService';
@@ -97,7 +97,7 @@ const ProcedureGuide = ({ embedded = false, onCloseEmbedded }: any = {}) => {
         ) : (
           <div className="tool-empty-state">
             <div className="tool-empty-state__icon" aria-hidden>
-              ⚕️
+              ??
             </div>
             <p>Search for a procedure or click a common procedure above</p>
           </div>

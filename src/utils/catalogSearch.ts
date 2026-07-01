@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Catalog search, category normalization, and launchability helpers.
  * Used by ClinicalToolCatalog and PR consistency tests.
  */

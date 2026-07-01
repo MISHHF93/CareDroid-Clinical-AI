@@ -1,4 +1,4 @@
-﻿import { resolveWebSocketOrigin } from '../../config/api.config';
+import { resolveWebSocketOrigin } from '../../config/api.config';
 
 const getDefaultWebSocketBaseUrl = () => resolveWebSocketOrigin();
 

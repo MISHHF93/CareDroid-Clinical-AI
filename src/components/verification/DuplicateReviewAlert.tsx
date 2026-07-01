@@ -1,4 +1,4 @@
-ï»¿import React from 'react';
+import React from 'react';
 import { AlertTriangle } from 'lucide-react';
 import { duplicateActionLabel } from '../../utils/patientDuplicateDetection';
 import { RECEPTION_COPY } from '../reception/receptionCopy';
@@ -31,7 +31,7 @@ export default function DuplicateReviewAlert({
         {candidates.slice(0, 3).map((candidate) => (
           <li key={candidate.patientId}>
             <span>
-              {candidate.displayName} Â· {candidate.matchScore}% Â·{' '}
+              {candidate.displayName} · {candidate.matchScore}% ·{' '}
               {duplicateActionLabel(candidate.recommendedAction)}
             </span>
             {onOpenPatient ? (

@@ -1,4 +1,4 @@
-﻿import type { Patient } from '../types/emergency';
+import type { Patient } from '../types/emergency';
 import { getPatientDisplayName, parseDobQuery } from './patientSearch';
 
 export const DUPLICATE_REVIEW_THRESHOLD = 65;

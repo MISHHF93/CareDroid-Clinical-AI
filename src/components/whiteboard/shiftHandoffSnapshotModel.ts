@@ -1,4 +1,4 @@
-﻿import { PatientFlag, PatientState, Priority } from '../../types/emergency';
+import { PatientFlag, PatientState, Priority } from '../../types/emergency';
 import { patientMatchesReassessmentAttention } from './reassessmentVisibilityModel';
 import {
   SHIFT_HANDOFF_CLINICAL_ROLES,
@@ -58,7 +58,7 @@ export function shouldShowShiftHandoffStrip({ roleId = (undefined as string | un
 }
 
 /**
- * Five-metric shift snapshot for nurse/physician handoff — one glance, one click to filter.
+ * Five-metric shift snapshot for nurse/physician handoff � one glance, one click to filter.
  */
 export function selectShiftHandoffMetrics({
   patients = [] as any[],

@@ -364,6 +364,19 @@
   padding: 6px 10px;
 }
 
+.emergency-route-page--practitioner-compact .emergency-route-situation-brief {
+  padding: 6px 10px;
+}
+
+.emergency-route-page--practitioner-compact .emergency-route-situation-brief__list {
+  gap: 8px 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.emergency-route-page--practitioner-compact .emergency-route-situation-brief__value {
+  font-size: var(--ed-type-body);
+}
+
 .emergency-route-page--practitioner-compact .emergency-route-patient-grid {
   gap: 8px;
 }

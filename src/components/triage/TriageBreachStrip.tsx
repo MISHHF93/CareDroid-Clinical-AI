@@ -1,4 +1,4 @@
-ï»¿import React, { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { buildTriageBreachAttentionSnapshot } from '../../services/triageBreachTimer';
 import {
   buildTriageBreachVisibilitySnapshot,
@@ -46,8 +46,8 @@ export default function TriageBreachStrip({
         <p className="triage-breach-strip__eyebrow">Arrival to triage</p>
         <h3>Triage breach timer</h3>
         <p className="triage-breach-strip__subtitle">
-          Door-to-triage elapsed time against site thresholds â€” {snapshot.summary.breachedCount} breached Â·{' '}
-          {snapshot.summary.breachRiskCount} approaching Â· {visibility.rapidReviewFlags} rapid-review Â· target{' '}
+          Door-to-triage elapsed time against site thresholds — {snapshot.summary.breachedCount} breached ·{' '}
+          {snapshot.summary.breachRiskCount} approaching · {visibility.rapidReviewFlags} rapid-review · target{' '}
           {snapshot.summary.targetMinutes}m
         </p>
       </header>

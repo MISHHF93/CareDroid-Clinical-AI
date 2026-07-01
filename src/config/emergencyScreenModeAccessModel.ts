@@ -1,5 +1,5 @@
-﻿/**
- * Screen-mode role access — role allow-lists without KPI policy dependencies.
+/**
+ * Screen-mode role access � role allow-lists without KPI policy dependencies.
  */
 import {
   CARE_DROID_SCREEN_MODES,

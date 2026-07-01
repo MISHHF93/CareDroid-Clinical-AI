@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Canonical layout and scroll behavior configuration.
  *
  * CSS owns rendering details; this module provides the programmatic contract

@@ -1,4 +1,4 @@
-﻿import { apiFetch, getApiErrorMessage, parseApiResponse } from './apiClient';
+import { apiFetch, getApiErrorMessage, parseApiResponse } from './apiClient';
 import { buildArtifactCatalog } from '../data/artifactIntelligence';
 
 function displayLabel(value) {

@@ -1,10 +1,10 @@
-ï»¿/**
- * NEXUS C-Spine Rule â€” cervical spine imaging decision support in blunt trauma.
+/**
+ * NEXUS C-Spine Rule — cervical spine imaging decision support in blunt trauma.
  *
  * Reference: Hoffman JR, et al. Validity of a set of clinical criteria to rule out injury
- * to the cervical spine in patients with blunt trauma. N Engl J Med. 2000;343(2):94â€“99.
+ * to the cervical spine in patients with blunt trauma. N Engl J Med. 2000;343(2):94–99.
  *
- * Decision support only â€” does not clear the cervical spine or replace trauma evaluation.
+ * Decision support only — does not clear the cervical spine or replace trauma evaluation.
  */
 
 export const NEXUS_CSPINE_DISCLAIMER =
@@ -97,15 +97,15 @@ export function interpretNexusCSpine(input) {
   const { imagingIndicatedByRule, triggeredCriteria } = input;
 
   const referenceLine =
-    'Hoffman JR, et al. Validity of a set of clinical criteria to rule out injury to the cervical spine in patients with blunt trauma. N Engl J Med. 2000;343(2):94â€“99.';
+    'Hoffman JR, et al. Validity of a set of clinical criteria to rule out injury to the cervical spine in patients with blunt trauma. N Engl J Med. 2000;343(2):94–99.';
 
   const disclaimer = NEXUS_CSPINE_DISCLAIMER;
 
   if (imagingIndicatedByRule) {
     return {
       severity: 'warning',
-      riskStratumLabel: 'NEXUS criteria present â€” not low-risk by rule',
-      interpretation: `One or more NEXUS criteria are present (${triggeredCriteria.join('; ')}). In the derivation cohort, cervical spine imaging was obtained when criteria were not all absent. This is informational imaging decision support only â€” it does not direct radiography, CT, or clearance.`,
+      riskStratumLabel: 'NEXUS criteria present — not low-risk by rule',
+      interpretation: `One or more NEXUS criteria are present (${triggeredCriteria.join('; ')}). In the derivation cohort, cervical spine imaging was obtained when criteria were not all absent. This is informational imaging decision support only — it does not direct radiography, CT, or clearance.`,
       disclaimer,
       referenceLine,
     };
@@ -115,7 +115,7 @@ export function interpretNexusCSpine(input) {
     severity: 'normal',
     riskStratumLabel: 'NEXUS low-risk stratum (all criteria absent)',
     interpretation:
-      'All five NEXUS criteria are absent in this assessment â€” the patient meets the low-risk stratum in the validated rule. This does not clear the cervical spine or exclude injury with absolute certainty. Continue clinical judgment and local trauma protocols.',
+      'All five NEXUS criteria are absent in this assessment — the patient meets the low-risk stratum in the validated rule. This does not clear the cervical spine or exclude injury with absolute certainty. Continue clinical judgment and local trauma protocols.',
     disclaimer,
     referenceLine,
   };

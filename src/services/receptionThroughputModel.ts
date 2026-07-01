@@ -1,5 +1,5 @@
-ï»¿/**
- * Reception throughput model â€” simulates registration-clerk volume (e.g. 100 patients/day)
+/**
+ * Reception throughput model — simulates registration-clerk volume (e.g. 100 patients/day)
  * using existing workflow paths. Measures clicks, screens, and timing; supports before/after
  * harmonization profiles.
  */
@@ -29,7 +29,7 @@ export const RECEPTION_TIMING_MS = Object.freeze({
 });
 
 /**
- * Workflow profiles â€” `baseline` reflects pre-harmonization UX; `harmonized` reflects
+ * Workflow profiles — `baseline` reflects pre-harmonization UX; `harmonized` reflects
  * express-primary layout, corrected shortcuts, and auto-dismissed handoff banner.
  */
 export const RECEPTION_WORKFLOW_PROFILES = Object.freeze({
@@ -401,7 +401,7 @@ function listHarmonizationWins(baselineProfile, harmonizedProfile, mix, patientC
     },
     {
       id: 'auto-dismiss-handoff',
-      summary: 'Handoff success banner auto-clears â€” no "Next arrival" click per patient.',
+      summary: 'Handoff success banner auto-clears — no "Next arrival" click per patient.',
       clicksSavedPerPatient: 1,
     },
     {

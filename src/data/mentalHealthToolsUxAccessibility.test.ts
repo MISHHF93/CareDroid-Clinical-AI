@@ -1,4 +1,4 @@
-ï»¿/**
+/**
  * UX & accessibility contracts for PHQ-9, GAD-7, COPD GOLD, and Rome IV IBS.
  */
 
@@ -32,7 +32,7 @@ function sliceExportedComponent(source, componentName) {
 const phq9Ui = sliceExportedComponent(mentalHealthUiSource, 'Phq9Calculator');
 const gad7Ui = sliceExportedComponent(mentalHealthUiSource, 'Gad7Calculator');
 
-describe('Mental health calculators â€” hub wiring', () => {
+describe('Mental health calculators — hub wiring', () => {
   it('imports Tier-A calculators and exposes chat-assisted data-calc-id', () => {
     expect(calculatorsSource).toContain("from './mentalHealthCalculators'");
     expect(calculatorsSource).toContain("case 'phq9':");
@@ -100,7 +100,7 @@ describe('GAD-7 UX & accessibility', () => {
   });
 });
 
-describe('Chat-assisted hub â€” COPD GOLD & Rome IV IBS', () => {
+describe('Chat-assisted hub — COPD GOLD & Rome IV IBS', () => {
   it('uses native buttons with accessible names for Tier-B launches', () => {
     expect(calculatorsSource).toContain('chatAssistedLaunchAriaLabelForTool');
     expect(calculatorsSource).toContain('aria-describedby={`calc-chat-assisted-desc-${tool.toolId}`}');

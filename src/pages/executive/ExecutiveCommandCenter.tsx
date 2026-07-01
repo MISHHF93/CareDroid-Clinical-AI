@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MEDICAL_THEME } from '../../config/medicalTheme.constants';
 import {
   buildLocalEmergencyAnalytics,
@@ -7,12 +7,12 @@ import {
 import { fetchSaasHealthCenter, SAAS_HEALTH_FALLBACK } from '../../services/saasHealthApi';
 import { fetchEmergencySurgeStatus } from '../../services/surgeApi';
 
-// ── helpers ───────────────────────────────────────────────────────────────────
+// -- helpers -------------------------------------------------------------------
 
 type HealthStatus = 'healthy' | 'warning' | 'critical' | string;
 
 const min = (v: number | undefined | null) =>
-  v == null || v === 0 ? '—' : `${v} min`;
+  v == null || v === 0 ? '�' : `${v} min`;
 
 const statusColor: Record<HealthStatus, string> = {
   healthy:  '#22c55e',
@@ -20,9 +20,9 @@ const statusColor: Record<HealthStatus, string> = {
   critical: '#ef4444',
 };
 
-const directionLabel: Record<string, string> = { up: '▲', down: '▼', flat: '—' };
+const directionLabel: Record<string, string> = { up: '?', down: '?', flat: '�' };
 
-// ── sub-components ────────────────────────────────────────────────────────────
+// -- sub-components ------------------------------------------------------------
 
 function KpiTile({
   label,
@@ -155,7 +155,7 @@ function HealthCheckRow({ check }: { check: any }) {
   );
 }
 
-// ── page ──────────────────────────────────────────────────────────────────────
+// -- page ----------------------------------------------------------------------
 
 export default function ExecutiveCommandCenter() {
   const [analytics, setAnalytics]   = useState<any>(null);
@@ -220,7 +220,7 @@ export default function ExecutiveCommandCenter() {
             Executive Command Center
           </h1>
           <p style={{ margin: '2px 0 0', fontSize: 13, color: MEDICAL_THEME.inkMuted }}>
-            Operational KPIs · Platform health · Surge status
+            Operational KPIs � Platform health � Surge status
           </p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -256,7 +256,7 @@ export default function ExecutiveCommandCenter() {
               opacity: loading ? 0.6 : 1,
             }}
           >
-            {loading ? 'Loading…' : 'Refresh'}
+            {loading ? 'Loading�' : 'Refresh'}
           </button>
         </div>
       </div>
@@ -265,7 +265,7 @@ export default function ExecutiveCommandCenter() {
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 20 }}>
         <KpiTile
           label="Patients seen"
-          value={shift?.patientsSeen ?? '—'}
+          value={shift?.patientsSeen ?? '�'}
           direction={compare?.patientsSeen?.direction}
           sub="this shift"
         />
@@ -284,20 +284,20 @@ export default function ExecutiveCommandCenter() {
         />
         <KpiTile
           label="Discharge rate"
-          value={shift ? `${shift.dischargeRate}%` : '—'}
+          value={shift ? `${shift.dischargeRate}%` : '�'}
           direction={compare?.dischargeRate?.direction}
           sub={shift ? `${shift.dischargeCount} patients` : undefined}
           accent={shift?.dischargeRate >= 60 ? '#22c55e' : undefined}
         />
         <KpiTile
           label="Admissions"
-          value={shift?.admissionCount ?? '—'}
+          value={shift?.admissionCount ?? '�'}
           direction={compare?.admissionCount?.direction}
           sub={shift ? `${shift.admissionRate}% admission rate` : undefined}
         />
         <KpiTile
           label="LWBS"
-          value={shift?.lwbsCount ?? '—'}
+          value={shift?.lwbsCount ?? '�'}
           direction={compare?.lwbsCount?.direction}
           sub="left without being seen"
           accent={shift?.lwbsCount > 0 ? '#f59e0b' : undefined}
@@ -325,7 +325,7 @@ export default function ExecutiveCommandCenter() {
 
         {/* Capacity trend */}
         {analytics?.capacityHistory?.length > 0 && (
-          <SectionCard title="Capacity Trend — last 8 hrs">
+          <SectionCard title="Capacity Trend � last 8 hrs">
             {(analytics.capacityHistory as any[]).map((point: any) => (
               <div
                 key={point.timestamp}

@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import DuplicateCandidatePanel from '../verification/DuplicateCandidatePanel';
 import { RECEPTION_COPY } from './receptionCopy';
 import './DuplicatePatientBanner.css';

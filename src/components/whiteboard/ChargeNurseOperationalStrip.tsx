@@ -1,4 +1,4 @@
-﻿import React, { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { CARE_DROID_SCREEN_MODES } from '../../config/careDroidScreenModes';
 import { normalizeOperationalStripMetrics } from '../../config/emergencyOperationalPresentationModel';
 import OperationalStrip from '../emergency/OperationalStrip';

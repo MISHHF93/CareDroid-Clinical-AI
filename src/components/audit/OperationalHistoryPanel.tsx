@@ -1,4 +1,4 @@
-﻿import { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   OPERATIONAL_AUDIT_DOMAIN,
   OPERATIONAL_AUDIT_DOMAIN_LABELS,

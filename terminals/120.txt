@@ -1,0 +1,19 @@
+---
+pid: 15044
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "Set-Location \"C:\\Users\\borah\\CareDroid-Clinical-AI\\backend\"; npm.cmd run build 2>&1 | Select-Object -Last 40"
+started_at: 2026-06-30T22:52:51.440Z
+running_for_ms: 5099995  
+---
+
+> caredroid-clinical-ai-backend@1.0.0 prebuild
+> rimraf dist
+
+
+> caredroid-clinical-ai-backend@1.0.0 build
+> nest build
+
+
+> caredroid-clinical-ai-backend@1.0.0 postbuild
+> node scripts/link-main.mjs
+

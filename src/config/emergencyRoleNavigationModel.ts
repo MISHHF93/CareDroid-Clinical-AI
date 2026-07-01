@@ -1,5 +1,5 @@
-﻿/**
- * Role + screen-mode landing navigation — one resolver for post-login, home, and redirects.
+/**
+ * Role + screen-mode landing navigation � one resolver for post-login, home, and redirects.
  * Same AppShell and routes; screen mode selects the landing path and query surface.
  */
 import { CANONICAL_ROUTES, getDefaultRouteForProfile, getRouteByPath } from './routes.config';

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Cardiology Clinical Tools Pack calculators.
  *
  * These helpers intentionally return risk documentation context only. They do

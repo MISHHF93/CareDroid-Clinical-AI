@@ -1,4 +1,4 @@
-ï»¿import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
   ENTERPRISE_PLATFORM_MODULES,
   auditEnterpriseOperatingPlatform,
@@ -6,7 +6,7 @@ import {
 } from './enterpriseOperatingPlatformModel';
 
 describe('enterpriseOperatingPlatformModel', () => {
-  it('registers all 18 prompts (99â€“116)', () => {
+  it('registers all 18 prompts (99–116)', () => {
     expect(ENTERPRISE_PLATFORM_MODULES).toHaveLength(18);
     expect(ENTERPRISE_PLATFORM_MODULES[0].prompt).toBe(99);
     expect(ENTERPRISE_PLATFORM_MODULES[17].prompt).toBe(116);
@@ -31,7 +31,7 @@ describe('enterpriseOperatingPlatformModel', () => {
     expect(benchmarking.assessment.artifacts.cohorts.length).toBeGreaterThan(0);
   });
 
-  it('produces audit artifact covering prompts 99â€“116', () => {
+  it('produces audit artifact covering prompts 99–116', () => {
     const audit = auditEnterpriseOperatingPlatform();
     expect(audit.promptsCovered).toEqual([
       99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116,

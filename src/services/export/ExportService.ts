@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Export & Reporting Service
  * Handles exporting cost data to CSV, PDF, and Excel
  * Also manages custom report generation and scheduling
@@ -261,7 +261,7 @@ class ExportService {
           source: 'local-mock',
         },
       } as any);
-      logger.info('Report generation backend unavailable — exporting local mock report');
+      logger.info('Report generation backend unavailable � exporting local mock report');
       reportApiError({
         title: 'Report generation unavailable',
         message: fallback.message,

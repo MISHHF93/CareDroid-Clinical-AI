@@ -1,5 +1,5 @@
-ï»¿/**
- * Profile- and entitlement-aware navigation â€” use instead of raw navigate() for product surfaces.
+/**
+ * Profile- and entitlement-aware navigation — use instead of raw navigate() for product surfaces.
  */
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { isRouteAllowedForProfile, resolveUserProfileFromSaasRole } from '../config/userProfileCatalog';
@@ -9,6 +9,7 @@ import {
   isStrictSaasEntitlementsEnabled,
 } from '../data/assetEntitlements';
 import { isProfileAssignableForOrganization } from '../config/userProfileSegregation';
+import { normalizeSaasRole } from '../config/saasProfileConstants';
 
 function normalizePath(to) {
   if (typeof to === 'string') return to.split('?')[0];
@@ -18,12 +19,14 @@ function normalizePath(to) {
 
 export function resolveProfileRouteLaunchAccess(path, options: any = {}) {
   const context = options.context || getPlatformEntitlementContext();
-  const saasRole =
+  const saasRole = normalizeSaasRole(
     options.saasRole ||
-    context?.roleProfile?.id ||
-    context?.membership?.roleProfileId ||
-    context?.saasRole ||
-    'student';
+      context?.roleProfile?.id ||
+      context?.membership?.roleProfileId ||
+      context?.saasRole ||
+      context?.emergencyRoleId ||
+      context?.user?.role,
+  );
   const profile = resolveUserProfileFromSaasRole(saasRole);
   const pathname = normalizePath(path);
 
@@ -121,7 +124,7 @@ export function resolveProfileAwareDestination(path, options: any = {}) {
 }
 
 /**
- * Preferred navigation entry point â€” emergency role matrix + SaaS profile bottleneck.
+ * Preferred navigation entry point — emergency role matrix + SaaS profile bottleneck.
  * @param {import('react-router-dom').NavigateFunction} navigate
  * @param {import('react-router-dom').To} to
  */

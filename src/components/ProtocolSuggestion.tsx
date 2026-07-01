@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ExternalLink, X } from 'lucide-react';
 import ClinicalScoreCalculator, {
   CALCULATOR_BY_SUGGESTION_ID,
@@ -269,7 +269,7 @@ export default function ProtocolSuggestion({
     return (
       <OperationalEmptyState
         size="inline"
-        icon="◇"
+        icon="?"
         title={EMPTY_STATE_COPY.protocol.noComplaint.title}
         guidance={EMPTY_STATE_COPY.protocol.noComplaint.guidance}
         nextSteps={EMPTY_STATE_COPY.protocol.noComplaint.nextSteps}
@@ -281,7 +281,7 @@ export default function ProtocolSuggestion({
     return (
       <OperationalEmptyState
         size="inline"
-        icon="◇"
+        icon="?"
         title={EMPTY_STATE_COPY.protocol.noMatch.title}
         guidance={EMPTY_STATE_COPY.protocol.noMatch.guidance}
         nextSteps={EMPTY_STATE_COPY.protocol.noMatch.nextSteps}

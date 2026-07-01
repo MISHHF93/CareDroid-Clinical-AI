@@ -1,4 +1,4 @@
-﻿import './Checkbox.css';
+import './Checkbox.css';
 
 /**
  * Checkbox Component
@@ -42,7 +42,7 @@ export const Checkbox = ({
         />
         <label htmlFor={id} className="checkbox-label">
           <span className="checkbox-box">
-            {checked && <span className="checkbox-check">✓</span>}
+            {checked && <span className="checkbox-check">?</span>}
           </span>
           <span className="checkbox-text">
             <span className="checkbox-label-text">

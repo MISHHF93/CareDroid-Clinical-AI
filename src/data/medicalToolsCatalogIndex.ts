@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Authoritative index of medical tools & calculators for the clinical catalog.
  * Includes everything the NLU layer can route in chat (tool.patterns.ts) plus
  * all sidebar pages and calculator forms in the UI.
@@ -34,7 +34,7 @@ function accessSummary(row) {
   if (row.uiCalculatorSlug) parts.push('Form');
   if (row.chatOnRequest) parts.push('Chat');
   if (row.backendExecutor) parts.push('API');
-  return parts.length ? parts.join(' · ') : 'Chat';
+  return parts.length ? parts.join(' � ') : 'Chat';
 }
 
 function buildFromNlu(nlu) {

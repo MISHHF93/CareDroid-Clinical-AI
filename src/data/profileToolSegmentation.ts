@@ -1,4 +1,4 @@
-﻿const ADMIN_PERMISSIONS = Object.freeze([
+const ADMIN_PERMISSIONS = Object.freeze([
   'CONFIGURE_SYSTEM',
   'MANAGE_USERS',
   'VIEW_AUDIT_LOGS',

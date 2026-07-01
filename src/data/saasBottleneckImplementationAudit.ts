@@ -1,4 +1,4 @@
-﻿/**
+/**
  * SaaS bottleneck architecture implementation scanner.
  *
  * Regenerate: npm run saas-bottleneck-audit:write-docs

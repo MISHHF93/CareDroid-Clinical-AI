@@ -1,4 +1,4 @@
-﻿export const SHOCK_INDEX_DISCLAIMER =
+export const SHOCK_INDEX_DISCLAIMER =
   'Hemodynamic screening support only. Does not diagnose shock, determine resuscitation strategy, or replace urgent escalation for unstable patients.';
 
 export const ANION_GAP_DISCLAIMER =

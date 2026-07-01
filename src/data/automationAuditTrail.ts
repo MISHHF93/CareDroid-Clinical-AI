@@ -1,4 +1,4 @@
-﻿export const AUTOMATION_AUDIT_STATUSES = Object.freeze({
+export const AUTOMATION_AUDIT_STATUSES = Object.freeze({
   SUCCESS: 'success',
   BLOCKED: 'blocked',
   FAILED: 'failed',

@@ -1,4 +1,4 @@
-﻿export const REFERRAL_FLOW_STAGES = Object.freeze([
+export const REFERRAL_FLOW_STAGES = Object.freeze([
   Object.freeze({ id: 'request', label: 'Request', targetMinutes: 10 }),
   Object.freeze({ id: 'classification', label: 'Classification', targetMinutes: 15 }),
   Object.freeze({ id: 'department-queue', label: 'Department Queue', targetMinutes: 30 }),

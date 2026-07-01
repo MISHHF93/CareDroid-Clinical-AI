@@ -1,4 +1,4 @@
-ï»¿import React from 'react';
+import React from 'react';
 import { AlertTriangle } from 'lucide-react';
 import { duplicateActionLabel } from '../../utils/patientDuplicateDetection';
 import './DuplicateCandidatePanel.css';
@@ -57,12 +57,12 @@ export default function DuplicateCandidatePanel({
                 <div>
                   <strong>{candidate.displayName}</strong>
                   <span>
-                    {candidate.matchScore}% Â· {duplicateActionLabel(candidate.recommendedAction)}
+                    {candidate.matchScore}% · {duplicateActionLabel(candidate.recommendedAction)}
                   </span>
                   <small>
                     Matched: {candidate.matchedFields.join(', ') || 'none'}
                     {candidate.conflictingFields.length
-                      ? ` Â· Conflicts: ${candidate.conflictingFields.join(', ')}`
+                      ? ` · Conflicts: ${candidate.conflictingFields.join(', ')}`
                       : ''}
                   </small>
                 </div>
@@ -98,7 +98,7 @@ export default function DuplicateCandidatePanel({
       {onContinueCreate ? (
         <footer className="duplicate-candidate-panel__footer">
           <button type="button" onClick={onContinueCreate}>
-            No match â€” continue verification
+            No match — continue verification
           </button>
         </footer>
       ) : null}

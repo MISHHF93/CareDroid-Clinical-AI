@@ -1,4 +1,4 @@
-ï»¿import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { CARE_DROID_SCREEN_MODES } from '../../config/careDroidScreenModes';
 import { EMERGENCY_OS_BRANDING } from '../../config/emergencyOsBranding.config';
 import { buildDepartmentStatusFallbackSnapshot } from '../../config/displayAutoRefreshModel';
@@ -33,7 +33,7 @@ export default function DepartmentStatusScreen({
   useEffect(() => {
     if (!kioskMode || typeof document === 'undefined') return undefined;
     const previousTitle = document.title;
-    document.title = `${displayTitle} Â· ${EMERGENCY_OS_BRANDING.productName}`;
+    document.title = `${displayTitle} · ${EMERGENCY_OS_BRANDING.productName}`;
     document.documentElement.classList.add('read-only-whiteboard-kiosk-active');
     return () => {
       document.title = previousTitle;
@@ -70,8 +70,8 @@ export default function DepartmentStatusScreen({
           </p>
           <h2>{displayTitle}</h2>
           <p className="department-status-screen__subtitle">
-            {kioskMode ? presentation.pageSubtitle : 'Aggregate operational metrics only Â· no patient names or clinical details'}
-            {privacyLabel ? ` Â· ${privacyLabel}` : ''}
+            {kioskMode ? presentation.pageSubtitle : 'Aggregate operational metrics only · no patient names or clinical details'}
+            {privacyLabel ? ` · ${privacyLabel}` : ''}
           </p>
         </div>
         <div className="department-status-screen__meta">
@@ -121,7 +121,7 @@ export default function DepartmentStatusScreen({
         <footer className="department-status-screen__footer" aria-label="Department monitor notice">
           <p>
             {privacyLabel
-              ? `${privacyLabel} Â· ${EMERGENCY_OS_BRANDING.safetyLine}`
+              ? `${privacyLabel} · ${EMERGENCY_OS_BRANDING.safetyLine}`
               : EMERGENCY_OS_BRANDING.safetyLine}
           </p>
         </footer>

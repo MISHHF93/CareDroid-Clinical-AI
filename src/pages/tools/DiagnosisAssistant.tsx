@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import ToolPageLayout from './ToolPageLayout';
 import { sendClinicalChatMessage } from '../../services/clinicalChatService';
 
@@ -156,7 +156,7 @@ const DiagnosisAssistant = ({ embedded = false, onCloseEmbedded }: any = {}) => 
           ) : (
             <div className="tool-empty-state">
               <div className="tool-empty-state__icon" aria-hidden>
-                🔍
+                ??
               </div>
               <p>Enter patient symptoms and click &quot;Generate DDx&quot; to begin</p>
             </div>

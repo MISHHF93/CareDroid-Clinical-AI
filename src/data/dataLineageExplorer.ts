@@ -1,4 +1,4 @@
-ï»¿import { BACKEND_HTTP_ROUTES } from './backendHttpRouteInventory';
+import { BACKEND_HTTP_ROUTES } from './backendHttpRouteInventory';
 import { FRONTEND_API_CALLS } from './frontendApiCallsInventory';
 import { getCanonicalToolInventory } from './toolInventory';
 
@@ -82,7 +82,7 @@ function makeFlow({
       transformations: transformations.input,
       timestamp: timestamps.input,
       metadata: {
-        route: inventory?.route || inventory?.navigationPath || 'â€”',
+        route: inventory?.route || inventory?.navigationPath || '—',
         sourceKind: inventory?.sourceKind || 'inventory',
       },
     }),
@@ -105,8 +105,8 @@ function makeFlow({
       timestamp: timestamps.tool,
       metadata: {
         inventoryId,
-        launchType: inventory?.launchType || 'â€”',
-        executorStatus: inventory?.executorStatus || 'â€”',
+        launchType: inventory?.launchType || '—',
+        executorStatus: inventory?.executorStatus || '—',
       },
     }),
     lineageStage({
@@ -115,9 +115,9 @@ function makeFlow({
       transformations: transformations.backend,
       timestamp: timestamps.backend,
       metadata: {
-        apiClient: frontendCall?.client || inventory?.apiClient || 'â€”',
-        controller: backendRoute?.controller || 'â€”',
-        service: backendRoute?.controller?.replace(/Controller$/, 'Service') || 'â€”',
+        apiClient: frontendCall?.client || inventory?.apiClient || '—',
+        controller: backendRoute?.controller || '—',
+        service: backendRoute?.controller?.replace(/Controller$/, 'Service') || '—',
       },
     }),
     lineageStage({

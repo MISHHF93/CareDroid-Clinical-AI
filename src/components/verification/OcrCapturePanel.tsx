@@ -1,4 +1,4 @@
-ï»¿import React, { useRef } from 'react';
+import React, { useRef } from 'react';
 import { Camera, Upload } from 'lucide-react';
 import './OcrCapturePanel.css';
 
@@ -110,7 +110,7 @@ export default function OcrCapturePanel({
       {previewDataUrl ? (
         <figure className="ocr-capture-panel__preview">
           <img src={previewDataUrl} alt="Captured identity document preview" />
-          <figcaption>Captured artifact â€” verify extracted values before continuing.</figcaption>
+          <figcaption>Captured artifact — verify extracted values before continuing.</figcaption>
         </figure>
       ) : null}
 
@@ -132,7 +132,7 @@ export default function OcrCapturePanel({
             {extractedPreview.map((field) => (
               <li key={field.field}>
                 <strong>{field.field}</strong>
-                <span>{field.extracted || 'â€”'}</span>
+                <span>{field.extracted || '—'}</span>
               </li>
             ))}
           </ul>

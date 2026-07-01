@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import CrossModuleLinkPanel from '../../components/CrossModuleLinkPanel';
 import ToolPageLayout from './ToolPageLayout';
@@ -153,7 +153,7 @@ const Protocols = ({ embedded = false, onCloseEmbedded }: any = {}) => {
 
         <ApiStateBanner
           loading={catalogLoading}
-          loadingMessage="Loading protocol catalog from server…"
+          loadingMessage="Loading protocol catalog from server�"
           error={catalogError}
           onRetry={loadCatalog}
         />

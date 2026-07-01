@@ -1,4 +1,4 @@
-﻿import { getUserFacingToolInventory } from '../data/toolInventory';
+import { getUserFacingToolInventory } from '../data/toolInventory';
 
 const RECOMMENDATION_RULES = Object.freeze([
   {

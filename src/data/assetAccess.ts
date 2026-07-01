@@ -1,5 +1,5 @@
-﻿/**
- * Client-side asset access projection (single inventory — toolInventory).
+/**
+ * Client-side asset access projection (single inventory � toolInventory).
  * Merges platform context with canonical tools; does not duplicate registry.
  */
 

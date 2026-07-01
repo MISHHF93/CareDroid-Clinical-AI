@@ -1,4 +1,4 @@
-﻿import { apiFetchJson, getApiErrorMessage } from './apiClient';
+import { apiFetchJson, getApiErrorMessage } from './apiClient';
 import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
 import { AIConfigRegistry, AISafetyRules } from '../config/ai.config';
 

@@ -1,12 +1,12 @@
-ï»¿/**
+/**
  * Wells clinical prediction rule for pulmonary embolism (PE).
  * Seven criteria with fractional points (maximum 12.5).
  *
  * Reference: Wells PS, Anderson DR, Rodger M, et al. Derivation of a simple clinical
  * model to categorize patients' probability of pulmonary embolism: increasing the
- * model's utility with the SimpliRED D-dimer. Thromb Haemost. 2000;83(3):416â€“420;
+ * model's utility with the SimpliRED D-dimer. Thromb Haemost. 2000;83(3):416–420;
  * Wells PS et al. Excluding pulmonary embolism at the bedside without diagnostic imaging.
- * Ann Intern Med. 2001;135(2):98â€“107.
+ * Ann Intern Med. 2001;135(2):98–107.
  */
 
 /** @typedef {{
@@ -40,9 +40,9 @@ export const WELLS_PE_CRITERIA_META = [
   },
   {
     key: 'immobilizationOrSurgery',
-    shortLabel: 'Immobilization â‰¥3 days or surgery (past 4 weeks)',
+    shortLabel: 'Immobilization =3 days or surgery (past 4 weeks)',
     points: 1.5,
-    help: 'Bed rest â‰¥3 days or major surgery under general anaesthesia within the previous 4 weeks.',
+    help: 'Bed rest =3 days or major surgery under general anaesthesia within the previous 4 weeks.',
   },
   {
     key: 'previousDvtOrPe',
@@ -106,7 +106,7 @@ export function interpretWellsPe(score) {
   }
 
   const referenceLine =
-    'Wells PS et al. Thromb Haemost. 2000;83(3):416â€“420; Wells PS et al. Ann Intern Med. 2001;135(2):98â€“107.';
+    'Wells PS et al. Thromb Haemost. 2000;83(3):416–420; Wells PS et al. Ann Intern Med. 2001;135(2):98–107.';
 
   const diagnosticDisclaimer =
     'This score estimates pre-test clinical probability only. It does not rule in or rule out pulmonary embolism and must not replace imaging, D-dimer, or institutional PE pathways when indicated.';
@@ -117,7 +117,7 @@ export function interpretWellsPe(score) {
       probabilityBand: 'High probability',
       label: 'High clinical probability of PE',
       interpretation:
-        'A Wells PE score above 6 is associated with a higher likelihood of pulmonary embolism in validation cohorts. Further evaluation (e.g. imaging or pathway-based work-up per local protocol) may be appropriate â€” this tool does not mandate a specific test or treatment.',
+        'A Wells PE score above 6 is associated with a higher likelihood of pulmonary embolism in validation cohorts. Further evaluation (e.g. imaging or pathway-based work-up per local protocol) may be appropriate — this tool does not mandate a specific test or treatment.',
       diagnosticDisclaimer,
       referenceLine,
     };

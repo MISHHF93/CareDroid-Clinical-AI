@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { resolveCommunicationRecency } from '../../services/waitingRoomCommunicationLog';
 import './WaitingRoomCommunicationBadge.css';
 

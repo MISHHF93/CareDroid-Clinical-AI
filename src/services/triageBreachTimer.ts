@@ -1,4 +1,4 @@
-ï»¿import { deriveTriagePending } from './arrivalControlLayer';
+import { deriveTriagePending } from './arrivalControlLayer';
 import {
   PatientState,
   type Alert,
@@ -182,7 +182,7 @@ export function resolveTriageBreachTimer(
     label: phaseMeta.label,
     shortLabel: phaseMeta.shortLabel,
     tone: phaseMeta.tone,
-    staffDetail: `${formatDuration(elapsedMinutes)} since arrival Â· target ${settings.targetMinutes}m Â· warning ${settings.warningMinutes}m`,
+    staffDetail: `${formatDuration(elapsedMinutes)} since arrival · target ${settings.targetMinutes}m · warning ${settings.warningMinutes}m`,
   };
 }
 
@@ -403,7 +403,7 @@ export function buildTriageBreachAlerts(
       type: 'Operational',
       severity: 'Critical',
       title: 'Triage time breaches',
-      message: `${snapshot.summary.breachedCount} patients breached door-to-triage target Â· longest ${snapshot.summary.longestElapsedLabel}`,
+      message: `${snapshot.summary.breachedCount} patients breached door-to-triage target · longest ${snapshot.summary.longestElapsedLabel}`,
       createdAt: now.toISOString(),
       dismissed: false,
       source: 'triage-breach-timer',

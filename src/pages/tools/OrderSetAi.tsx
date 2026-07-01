@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import ApiStateBanner from '../../components/ApiStateBanner';
 import { generateOrderSetAi } from '../../services/clinicalIntelligenceApi';
 import ToolPageLayout from './ToolPageLayout';

@@ -1,4 +1,4 @@
-﻿import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import {
   CARE_WORKSPACES,
   DEFAULT_CARE_WORKSPACE_ID,

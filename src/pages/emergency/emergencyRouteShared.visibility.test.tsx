@@ -2,7 +2,7 @@ import { describe, expect, it, vi, afterEach, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import * as visibilityModule from '../../config/practitionerSurfaceVisibility';
 import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
-import { MetricGrid } from './emergencyRouteShared';
+import { MetricGrid, WorkflowSituationBrief } from './emergencyRouteShared';
 
 vi.mock('../../contexts/PractitionerVisibilityContext', () => ({
   usePractitionerSurfaceVisibility: vi.fn(),
@@ -58,5 +58,48 @@ describe('emergencyRouteShared visibility', () => {
 
     expect(container.querySelector('.emergency-route-metric-grid')).toBeTruthy();
     expect(container.querySelector('.emergency-route-metric-strip')).toBeFalsy();
+  });
+
+  it('renders workflow situation brief with four operational questions', () => {
+    render(
+      <WorkflowSituationBrief
+        status="12 active patients on the board"
+        attention="2 high-risk · 4 waiting"
+        owner="Care team"
+        nextAction="Open the longest-waiting patient"
+        tone="warning"
+      />,
+    );
+
+    expect(screen.getByText('Happening now')).toBeInTheDocument();
+    expect(screen.getByText('Needs attention')).toBeInTheDocument();
+    expect(screen.getByText('Owner')).toBeInTheDocument();
+    expect(screen.getByText('Next action')).toBeInTheDocument();
+    expect(screen.getByText('12 active patients on the board')).toBeInTheDocument();
+    expect(screen.getByText('Open the longest-waiting patient')).toBeInTheDocument();
+  });
+
+  it('keeps situation brief visible when route metrics are suppressed', () => {
+    vi.mocked(usePractitionerSurfaceVisibility).mockReturnValue({
+      ...FULL_SURFACES,
+      active: true,
+      emergencyRoutes: {
+        ...FULL_SURFACES.emergencyRoutes,
+        showMetricCards: false,
+        showSituationBrief: true,
+      },
+    });
+
+    const { container } = render(
+      <WorkflowSituationBrief
+        status="3 patients awaiting triage"
+        attention="1 queue past target wait"
+        owner="Triage nurse"
+        nextAction="Complete triage for oldest wait"
+      />,
+    );
+
+    expect(container.querySelector('.emergency-route-situation-brief')).toBeTruthy();
+    expect(screen.getByText('3 patients awaiting triage')).toBeInTheDocument();
   });
 });

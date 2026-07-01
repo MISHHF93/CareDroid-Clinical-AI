@@ -1,4 +1,4 @@
-﻿import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { getOrgEmergencyBranding } from './emergencyOsBranding.config';
 import { resolveOrgOperationalThresholds } from './resolveOrgOperationalThresholds';
 

@@ -1,5 +1,5 @@
-﻿/**
- * Compliance risk report builder — run via tests or dev tooling.
+/**
+ * Compliance risk report builder � run via tests or dev tooling.
  */
 
 import { readFileSync } from 'node:fs';

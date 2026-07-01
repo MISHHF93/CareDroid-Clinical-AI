@@ -1,5 +1,5 @@
-﻿/**
- * PR1 registration audit — cross-system consistency for qSOFA, NEWS2, Child-Pugh, HAS-BLED.
+/**
+ * PR1 registration audit � cross-system consistency for qSOFA, NEWS2, Child-Pugh, HAS-BLED.
  * Complements pr1CalculatorsWiring.test.js (matrix) and pr1Coverage.test.js (catalog/discovery).
  */
 
@@ -61,7 +61,7 @@ function _extractAppCalculatorRoutes(source) {
   return routes;
 }
 
-describe('PR1 registration audit — canonical ID alignment', () => {
+describe('PR1 registration audit � canonical ID alignment', () => {
   it.each(PR1_TOOL_IDS)('%s uses the same id across registry, NLU, builtin slug, and maps', (id) => {
     const reg = toolRegistryById[id];
     expect(reg?.id).toBe(id);
@@ -84,7 +84,7 @@ describe('PR1 registration audit — canonical ID alignment', () => {
   });
 });
 
-describe('PR1 registration audit — routes & path naming', () => {
+describe('PR1 registration audit � routes & path naming', () => {
   it.each(PR1_TOOL_IDS)('%s uses plural /tools/calculators/ path everywhere', (id) => {
     const path = PR1_ROUTE_BY_REGISTRY_ID[id];
     expect(path).toBe(`/tools/calculators/${id}`);
@@ -120,20 +120,20 @@ describe('PR1 registration audit — routes & path naming', () => {
   });
 });
 
-describe('PR1 registration audit — NLU, backend keywords, aliases', () => {
+describe('PR1 registration audit � NLU, backend keywords, aliases', () => {
   it.each(PR1_TOOL_IDS)('backend tool.patterns.ts declares toolId %s', (id) => {
     const patterns = parseClinicalToolPatterns(patternsSource);
     expect(patterns.some((p) => p.toolId === id)).toBe(true);
   });
 
   it.each(PR1_REQUIRED_NLU_ALIAS_PAIRS)(
-    'NLU_TO_REGISTRY_ID maps catalog alias "%s" → %s',
+    'NLU_TO_REGISTRY_ID maps catalog alias "%s" ? %s',
     (alias, canonical) => {
       expect(NLU_TO_REGISTRY_ID[alias]).toBe(canonical);
     }
   );
 
-  it.each(PR1_ALL_ALIAS_PAIRS)('resolveRegistryId("%s") → %s', (alias, canonical) => {
+  it.each(PR1_ALL_ALIAS_PAIRS)('resolveRegistryId("%s") ? %s', (alias, canonical) => {
     expect(resolveRegistryId(alias)).toBe(canonical);
   });
 
@@ -178,9 +178,9 @@ describe('PR1 registration audit — NLU, backend keywords, aliases', () => {
   );
 });
 
-describe('PR1 registration audit — discovery & catalog', () => {
+describe('PR1 registration audit � discovery & catalog', () => {
   it.each(PR1_DISCOVERY_ALIAS_PAIRS)(
-    'toolIdAliases discovery row for %s → %s',
+    'toolIdAliases discovery row for %s ? %s',
     (aliasId, canonical) => {
       const row = toolIdAliases.find((a) => a.id === aliasId);
       expect(row, `missing toolIdAliases id ${aliasId}`).toBeTruthy();
@@ -211,7 +211,7 @@ describe('PR1 registration audit — discovery & catalog', () => {
   });
 });
 
-describe('PR1 registration audit — sidebar & chat launch', () => {
+describe('PR1 registration audit � sidebar & chat launch', () => {
   it('lists each PR1 tool exactly once in toolRegistry (sidebar visibility)', () => {
     const pr1InRegistry = toolRegistry.filter((t) => PR1_TOOL_IDS.includes(t.id));
     expect(pr1InRegistry).toHaveLength(PR1_TOOL_IDS.length);
@@ -253,7 +253,7 @@ describe('PR1 registration audit — sidebar & chat launch', () => {
   });
 });
 
-describe('PR1 registration audit — global duplicate guards', () => {
+describe('PR1 registration audit � global duplicate guards', () => {
   it('has no duplicate toolIdAliases.id entries project-wide', () => {
     const ids = toolIdAliases.map((a) => a.id);
     expect(new Set(ids).size).toBe(ids.length);

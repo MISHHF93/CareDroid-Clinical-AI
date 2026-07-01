@@ -1,4 +1,4 @@
-﻿import {
+import {
   EMERGENCY_ACTIONS,
   EMERGENCY_ROLE_IDS,
   normalizeEmergencyRole,

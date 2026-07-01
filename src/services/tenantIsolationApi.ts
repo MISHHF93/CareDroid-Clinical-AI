@@ -1,4 +1,4 @@
-﻿import { apiFetchJson, getApiErrorMessage } from './apiClient';
+import { apiFetchJson, getApiErrorMessage } from './apiClient';
 
 export async function fetchTenantDataIsolationAudit() {
   try {

@@ -1,4 +1,4 @@
-﻿const SCORE_EVENT_TYPES = new Set(['SCORE', 'ClinicalScoreSaved']);
+const SCORE_EVENT_TYPES = new Set(['SCORE', 'ClinicalScoreSaved']);
 const RECENT_SCORE_WINDOW_MS = 4 * 60 * 60 * 1000;
 
 function valueFromMetadata(metadata: any = {}, keys = [] as any[]) {

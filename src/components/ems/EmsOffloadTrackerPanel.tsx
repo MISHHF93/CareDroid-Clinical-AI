@@ -1,4 +1,4 @@
-ï»¿import React, { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { buildEmsOffloadTrackerSummary } from '../../services/emsOffloadTracker';
 import './EmsOffloadTrackerPanel.css';
 
@@ -107,15 +107,15 @@ export default function EmsOffloadTrackerPanel({
                     )}
                   </strong>
                   <small>
-                    <PhaseBadge phase={row.phase} /> Â· {row.complaint}
+                    <PhaseBadge phase={row.phase} /> · {row.complaint}
                   </small>
                 </td>
-                <td>{row.dispatchEtaLabel || 'â€”'}</td>
+                <td>{row.dispatchEtaLabel || '—'}</td>
                 <td>{row.ambulanceArrivalLabel}</td>
                 <td>{row.triageHandoffStartLabel}</td>
                 <td>{row.handoffCompleteLabel}</td>
                 <td>{row.offloadDelayLabel}</td>
-                <td>{row.assignedReceivingArea || 'â€”'}</td>
+                <td>{row.assignedReceivingArea || '—'}</td>
                 <td>
                   {row.handoffOwner ? (
                     row.patientId && onSelectPatient ? (
@@ -130,7 +130,7 @@ export default function EmsOffloadTrackerPanel({
                       row.handoffOwner
                     )
                   ) : (
-                    'â€”'
+                    '—'
                   )}
                 </td>
               </tr>

@@ -1,5 +1,5 @@
-﻿/**
- * Smart Intake flow audit — clicks, screen transitions, verification friction.
+/**
+ * Smart Intake flow audit � clicks, screen transitions, verification friction.
  * Node-safe metrics model for QA scripts and in-app guidance.
  */
 

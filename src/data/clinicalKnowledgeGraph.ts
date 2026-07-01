@@ -1,4 +1,4 @@
-﻿export const KNOWLEDGE_GRAPH_NODE_TYPES = Object.freeze([
+export const KNOWLEDGE_GRAPH_NODE_TYPES = Object.freeze([
   'calculator',
   'protocol',
   'simulation',

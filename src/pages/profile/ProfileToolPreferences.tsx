@@ -1,4 +1,4 @@
-ï»¿import { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import Card from '../../components/ui/card';
 import { compileUserProfile } from '../../config/userProfileCompiler';
 import useEffectiveUserProfile from '../../hooks/useEffectiveUserProfile';
@@ -142,7 +142,7 @@ export default function ProfileToolPreferences() {
         <Card>
           <form className="profile-identity-form" onSubmit={(event) => event.preventDefault()}>
             <div className="profile-identity-muted">
-              Assigned role: {saasProfile?.role || profile.role} (admin-managed) Â· default workspace:{' '}
+              Assigned role: {saasProfile?.role || profile.role} (admin-managed) · default workspace:{' '}
               {saasProfile?.defaultWorkspace || profileSettings.defaultWorkspace || activeWorkspaceId}
             </div>
             <label>
@@ -212,7 +212,7 @@ export default function ProfileToolPreferences() {
                 <div>
                   <strong>{tool.name}</strong>
                   <span>
-                    {tool.category} Â· {hiddenToolSet.has(tool.id) ? 'hidden' : `score ${tool.profileScore}`}
+                    {tool.category} · {hiddenToolSet.has(tool.id) ? 'hidden' : `score ${tool.profileScore}`}
                   </span>
                 </div>
                 <div className="profile-identity-actions">

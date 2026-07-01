@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export default function HelpCenter() {
@@ -32,7 +32,7 @@ export default function HelpCenter() {
         },
         {
           q: 'How does CareDroid Copilot work?',
-          a: 'Open Copilot from the header or patient detail drawer. Copilot is case-aware decision support — it surfaces routing, evidence, and workflow prompts without making autonomous clinical decisions.'
+          a: 'Open Copilot from the header or patient detail drawer. Copilot is case-aware decision support � it surfaces routing, evidence, and workflow prompts without making autonomous clinical decisions.'
         },
         {
           q: 'Where do I manage referrals and boarding?',
@@ -45,15 +45,15 @@ export default function HelpCenter() {
       items: [
         {
           q: 'How do I enable two-factor authentication?',
-          a: 'Go to Profile Settings → Security → Two-Factor Authentication. Choose SMS, email, or authenticator app verification.'
+          a: 'Go to Profile Settings ? Security ? Two-Factor Authentication. Choose SMS, email, or authenticator app verification.'
         },
         {
           q: 'Can I delete my account?',
-          a: 'Yes. Go to Profile Settings → Danger Zone → Delete Account. Note: This action is permanent and cannot be undone.'
+          a: 'Yes. Go to Profile Settings ? Danger Zone ? Delete Account. Note: This action is permanent and cannot be undone.'
         },
         {
           q: 'How do I change my password?',
-          a: 'Visit Profile Settings → Change Password. Enter your current password and your new password.'
+          a: 'Visit Profile Settings ? Change Password. Enter your current password and your new password.'
         }
       ]
     },
@@ -119,7 +119,7 @@ export default function HelpCenter() {
               marginBottom: '24px'
             }}
           >
-            ← Back
+            ? Back
           </button>
           
           <h1 style={{
@@ -175,7 +175,7 @@ export default function HelpCenter() {
                   transition: 'transform 0.2s',
                   transform: expandedSection === idx ? 'rotate(180deg)' : 'rotate(0deg)'
                 }}>
-                  ▼
+                  ?
                 </span>
               </button>
 

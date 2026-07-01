@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Lightweight Smart Intake session telemetry for click and transition measurement.
  */
 

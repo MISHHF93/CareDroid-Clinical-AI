@@ -1,4 +1,4 @@
-ï»¿import {
+import {
   buildIntegrationCategorySummaries,
   mergeRegistryWithLiveSources,
   normalizeIntegrationStatusLabel,
@@ -10,7 +10,7 @@ function formatCounts(counts: any = {}) {
   return ['implemented', 'partial', 'placeholder']
     .filter((key) => counts[key])
     .map((key) => `${counts[key]} ${normalizeIntegrationStatusLabel(key).toLowerCase()}`)
-    .join(' Â· ');
+    .join(' · ');
 }
 
 export default function IntegrationStatusPanel({
@@ -42,7 +42,7 @@ export default function IntegrationStatusPanel({
             <p>{category.guidance}</p>
             <span className="integration-status-panel__counts">
               {category.pointCount} integration point{category.pointCount === 1 ? '' : 's'}
-              {formatCounts(category.counts) ? ` Â· ${formatCounts(category.counts)}` : ''}
+              {formatCounts(category.counts) ? ` · ${formatCounts(category.counts)}` : ''}
             </span>
           </article>
         ))}
@@ -68,7 +68,7 @@ export default function IntegrationStatusPanel({
                     {point.liveStatus ? (
                       <span className="integration-status-panel__live">
                         Live source: {point.liveStatus}
-                        {point.liveLastEventAt ? ` Â· ${point.liveLastEventAt}` : ''}
+                        {point.liveLastEventAt ? ` · ${point.liveLastEventAt}` : ''}
                       </span>
                     ) : null}
                   </td>

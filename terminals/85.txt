@@ -1,0 +1,11 @@
+---
+pid: 6232
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "Set-Location \"C:\\Users\\borah\\CareDroid-Clinical-AI\"; npm.cmd run lint"
+started_at: 2026-06-30T22:10:12.136Z
+running_for_ms: 7655009  
+---
+
+> caredroid-clinical-ai@1.0.0 lint
+> eslint src
+

@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MEDICAL_THEME } from '../../config/medicalTheme.constants';
 import {
@@ -8,7 +8,7 @@ import {
   searchPredictiveModels,
 } from '../../data/predictiveAnalyticsDashboard';
 
-// ── constants ─────────────────────────────────────────────────────────────────
+// -- constants -----------------------------------------------------------------
 
 const BAND_COLOR: Record<string, string> = {
   critical: '#ef4444',
@@ -24,7 +24,7 @@ const BAND_BG: Record<string, string> = {
   low:      '#f0fdf4',
 };
 
-// ── sub-components ────────────────────────────────────────────────────────────
+// -- sub-components ------------------------------------------------------------
 
 function SummaryStrip({ summary }: { summary: ReturnType<typeof buildPredictiveAnalyticsSummary> }) {
   return (
@@ -39,7 +39,7 @@ function SummaryStrip({ summary }: { summary: ReturnType<typeof buildPredictiveA
         { label: 'Avg risk score', value: `${summary.averageScore}/100` },
         {
           label: 'Highest risk',
-          value: summary.highestRisk?.title ?? '—',
+          value: summary.highestRisk?.title ?? '�',
           accent: BAND_COLOR[summary.highestRisk?.band ?? 'low'],
         },
       ].map(({ label, value, accent }) => (
@@ -143,7 +143,7 @@ function ModelCard({
             {model.title}
           </div>
           <div style={{ fontSize: 12, color: MEDICAL_THEME.inkMuted, marginTop: 2 }}>
-            {model.domain} · {model.horizon}
+            {model.domain} � {model.horizon}
           </div>
         </div>
         <span
@@ -170,8 +170,8 @@ function ModelCard({
       {/* Confidence */}
       <div style={{ fontSize: 12, color: MEDICAL_THEME.inkMuted, marginBottom: expanded ? 12 : 0 }}>
         Confidence: <strong style={{ color: MEDICAL_THEME.ink }}>{Math.round(model.confidence * 100)}%</strong>
-        {' · '}
-        {expanded ? 'Hide details ▲' : 'Show details ▼'}
+        {' � '}
+        {expanded ? 'Hide details ?' : 'Show details ?'}
       </div>
 
       {/* Expanded detail */}
@@ -213,7 +213,7 @@ function ModelCard({
                   gap: 6,
                 }}
               >
-                <span style={{ color, fontSize: 8 }}>●</span>
+                <span style={{ color, fontSize: 8 }}>?</span>
                 {signal}
               </div>
             ))}
@@ -285,7 +285,7 @@ function ModelCard({
                 marginTop: 4,
               }}
             >
-              Open related module →
+              Open related module ?
             </button>
           )}
         </div>
@@ -294,7 +294,7 @@ function ModelCard({
   );
 }
 
-// ── page ──────────────────────────────────────────────────────────────────────
+// -- page ----------------------------------------------------------------------
 
 export default function PredictiveAnalyticsDashboard() {
   const navigate = useNavigate();
@@ -323,7 +323,7 @@ export default function PredictiveAnalyticsDashboard() {
           Predictive Analytics
         </h1>
         <p style={{ margin: '2px 0 0', fontSize: 13, color: MEDICAL_THEME.inkMuted }}>
-          Deterioration · Sepsis · Readmission · ICU transfer · Device & fleet risk
+          Deterioration � Sepsis � Readmission � ICU transfer � Device & fleet risk
         </p>
       </div>
 
@@ -342,7 +342,7 @@ export default function PredictiveAnalyticsDashboard() {
           gap: 8,
         }}
       >
-        <span style={{ fontWeight: 700 }}>Demo models</span> — predictions shown are not live
+        <span style={{ fontWeight: 700 }}>Demo models</span> � predictions shown are not live
         patient, device, or fleet data. Connect live data pipelines to activate real predictions.
       </div>
 
@@ -353,7 +353,7 @@ export default function PredictiveAnalyticsDashboard() {
       <div style={{ marginBottom: 18 }}>
         <input
           type="text"
-          placeholder="Search models, domains, signals…"
+          placeholder="Search models, domains, signals�"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           style={{

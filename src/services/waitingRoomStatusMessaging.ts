@@ -1,4 +1,4 @@
-ï»¿import {
+import {
   resolvePatientExperienceStatus,
   summarizePatientExperienceStatuses,
   type PatientExperienceContext,
@@ -52,7 +52,7 @@ export const WAITING_ROOM_STATUS_MESSAGE_REGISTRY: readonly WaitingRoomStatusMes
     Object.freeze({
       id: 'registered',
       patientMessage: 'You are registered',
-      staffMessage: 'Registered â€” next step pending',
+      staffMessage: 'Registered — next step pending',
       tone: 'neutral',
       kind: 'process-status',
     }),
@@ -94,7 +94,7 @@ export const WAITING_ROOM_STATUS_MESSAGE_REGISTRY: readonly WaitingRoomStatusMes
     Object.freeze({
       id: 'preparing-discharge',
       patientMessage: 'Preparing for discharge',
-      staffMessage: 'Preparing discharge â€” final paperwork and instructions',
+      staffMessage: 'Preparing discharge — final paperwork and instructions',
       tone: 'stable',
       kind: 'process-status',
     }),
@@ -108,7 +108,7 @@ export const WAITING_ROOM_STATUS_MESSAGE_REGISTRY: readonly WaitingRoomStatusMes
     Object.freeze({
       id: 'longer-wait-advisory',
       patientMessage: 'We are experiencing longer than usual wait times',
-      staffMessage: 'Longer than usual wait times â€” set expectations at the desk',
+      staffMessage: 'Longer than usual wait times — set expectations at the desk',
       tone: 'warning',
       kind: 'advisory',
     }),
@@ -291,7 +291,7 @@ export function buildWaitingRoomStatusMessagingSnapshot(
     advisories,
     escalationMessage,
     longerWaitActive,
-    summaryLine: summaryParts.join(' Â· ') || 'Waiting room status messaging ready',
+    summaryLine: summaryParts.join(' · ') || 'Waiting room status messaging ready',
     updatedAt: input.updatedAt ?? capacity?.updatedAt ?? null,
   };
 }

@@ -15,7 +15,11 @@ const stylesIndexCss = readFileSync(join(__dirname, 'index.css'), 'utf8');
 const mobileFirstRecoveryCss = readFileSync(join(__dirname, 'mobile-first-recovery.css'), 'utf8');
 const indexCss = readFileSync(join(__dirname, '../index.css'), 'utf8');
 const mainJsx = readFileSync(join(__dirname, '../main.tsx'), 'utf8');
-const appShellCss = readFileSync(join(__dirname, '../layout/AppShell.css'), 'utf8');
+const appShellCss = readFileSync(join(__dirname, '../components/app-shell.css'), 'utf8');
+const copilotPanelCss = readFileSync(
+  join(__dirname, '../components/styles/CopilotPanel-part-01.css'),
+  'utf8',
+);
 const quickCommandCss = readFileSync(
   join(__dirname, '../components/CommandPalette.css'),
   'utf8'
@@ -85,17 +89,17 @@ describe('responsive-ux.css — global normalization', () => {
   });
 
   it('uses the main shell scrollport plus local scroll helpers', () => {
-    expect(appShellCss).toMatch(/\.ed-os-shell\s*\{[\s\S]*overflow:\s*hidden/);
-    expect(appShellCss).toMatch(/\.ed-os-shell__body\s*\{[\s\S]*overflow:\s*hidden/);
-    expect(appShellCss).toMatch(/\.ed-os-main\s*\{[\s\S]*overflow:\s*auto/);
-    expect(appShellCss).toMatch(/\.ed-copilot-panel\s*\{[\s\S]*overflow:\s*hidden/);
+    expect(appShellCss).toMatch(/\.emergency-app-shell\s*\{[\s\S]*overflow:\s*hidden/);
+    expect(appShellCss).toMatch(/\.emergency-app-shell__main-column\s*\{[\s\S]*overflow:\s*hidden/);
+    expect(appShellCss).toMatch(/\.app-shell-main-content\s*\{[\s\S]*overflow:\s*auto/);
+    expect(copilotPanelCss).toMatch(/\.ed-copilot-panel\s*\{[\s\S]*overflow:\s*hidden/);
     expect(indexCss).toMatch(/\.app-local-scroll-y\s*\{[\s\S]*overflow-y:\s*auto/);
     expect(indexCss).toMatch(/\.app-local-scroll-x\s*\{[\s\S]*overflow-x:\s*auto/);
   });
 
   it('keeps public and auth routes inside the shared AppShell scrollport', () => {
-    expect(appShellCss).toMatch(/\.ed-os-main\s*\{[\s\S]*min-width:\s*0/);
-    expect(appShellCss).toMatch(/\.ed-os-main\s*\{[\s\S]*min-height:\s*0/);
+    expect(appShellCss).toMatch(/\.app-shell-main-content\s*\{[\s\S]*min-width:\s*0/);
+    expect(appShellCss).toMatch(/\.app-shell-main-content\s*\{[\s\S]*min-height:\s*0/);
     expect(appShellCss).not.toContain('.auth-shell');
     expect(appShellCss).not.toContain('.public-shell');
   });

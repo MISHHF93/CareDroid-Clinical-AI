@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Analytics Service for CareDroid-AI
  * Tracks user behavior, feature usage, and application performance
  */

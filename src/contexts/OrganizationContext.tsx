@@ -1,4 +1,4 @@
-﻿import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { PlatformAssetsApi } from '../services/platformAssetsApi';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { useUser } from './UserContext';

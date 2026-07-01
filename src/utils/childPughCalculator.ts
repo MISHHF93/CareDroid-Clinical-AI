@@ -1,9 +1,9 @@
-ï»¿/**
- * Child-Pugh (Childâ€“Turcotteâ€“Pugh) score for cirrhosis severity.
- * Sum of five components (each 1â€“3 points): total 5â€“15.
- * Class A: 5â€“6, B: 7â€“9, C: 10â€“15.
+/**
+ * Child-Pugh (Child–Turcotte–Pugh) score for cirrhosis severity.
+ * Sum of five components (each 1–3 points): total 5–15.
+ * Class A: 5–6, B: 7–9, C: 10–15.
  *
- * Reference: Pugh RNH et al. Transection of the oesophagus for bleeding oesophageal varices. Br J Surg. 1973;60(8):646â€“649.
+ * Reference: Pugh RNH et al. Transection of the oesophagus for bleeding oesophageal varices. Br J Surg. 1973;60(8):646–649.
  * Child CG, Turcotte JG. Surgery and portal hypertension. 1964.
  */
 
@@ -46,7 +46,7 @@ export function scoreChildPughAscites(level) {
   return null;
 }
 
-/** @param {'none'|'grade12'|'grade34'} level â€” West Haven grades */
+/** @param {'none'|'grade12'|'grade34'} level — West Haven grades */
 export function scoreChildPughEncephalopathy(level) {
   if (level === 'none') return 1;
   if (level === 'grade12') return 2;
@@ -54,13 +54,13 @@ export function scoreChildPughEncephalopathy(level) {
   return null;
 }
 
-/** Î¼mol/L â†’ mg/dL (bilirubin, conventional factor) */
+/** µmol/L ? mg/dL (bilirubin, conventional factor) */
 export function bilirubinUmolLToMgDl(umolL) {
   if (!Number.isFinite(umolL)) return NaN;
   return umolL / 17.104;
 }
 
-/** g/L â†’ g/dL */
+/** g/L ? g/dL */
 export function albuminGlToGdl(gL) {
   if (!Number.isFinite(gL)) return NaN;
   return gL / 10;
@@ -130,7 +130,7 @@ export function sumChildPughScore(breakdown) {
 }
 
 /**
- * @param {number} total 5â€“15
+ * @param {number} total 5–15
  */
 export function interpretChildPughClass(total) {
   if (!Number.isFinite(total) || total < 5 || total > 15) {
@@ -138,7 +138,7 @@ export function interpretChildPughClass(total) {
   }
 
   const referenceLine =
-    'Child CG, Turcotte JG; Pugh RNH et al. Childâ€“Turcotteâ€“Pugh classification (cirrhosis severity).';
+    'Child CG, Turcotte JG; Pugh RNH et al. Child–Turcotte–Pugh classification (cirrhosis severity).';
 
   if (total <= 6) {
     return {
@@ -146,7 +146,7 @@ export function interpretChildPughClass(total) {
       severity: 'normal',
       label: 'Child-Pugh class A',
       interpretation:
-        'Total score 5â€“6 (class A) reflects relatively less hepatic decompensation on this classification than higher classes. A single score does not replace trends, indication-specific criteria, or specialist assessment.',
+        'Total score 5–6 (class A) reflects relatively less hepatic decompensation on this classification than higher classes. A single score does not replace trends, indication-specific criteria, or specialist assessment.',
       referenceLine,
     };
   }
@@ -157,7 +157,7 @@ export function interpretChildPughClass(total) {
       severity: 'warning',
       label: 'Child-Pugh class B',
       interpretation:
-        'Total score 7â€“9 (class B) reflects moderate functional impairment on this scale. Use alongside specialist assessment and serial parameters; it does not by itself determine treatment eligibility.',
+        'Total score 7–9 (class B) reflects moderate functional impairment on this scale. Use alongside specialist assessment and serial parameters; it does not by itself determine treatment eligibility.',
       referenceLine,
     };
   }
@@ -167,7 +167,7 @@ export function interpretChildPughClass(total) {
     severity: 'critical',
     label: 'Child-Pugh class C',
     interpretation:
-      'Total score 10â€“15 (class C) reflects the most severe impairment band in this classification and is often associated with higher peri-procedural risk on prognostic indices â€” clinical decisions still require specialist input and shared decision-making.',
+      'Total score 10–15 (class C) reflects the most severe impairment band in this classification and is often associated with higher peri-procedural risk on prognostic indices — clinical decisions still require specialist input and shared decision-making.',
     referenceLine,
   };
 }
@@ -184,7 +184,7 @@ export function validateChildPughInputs(raw) {
   } else {
     const n = parseFloat(b);
     if (raw.bilirubinUnit === 'umol_l') {
-      if (n < 1 || n > 1200) errors.push('Bilirubin (Î¼mol/L) should be between 1 and 1200.');
+      if (n < 1 || n > 1200) errors.push('Bilirubin (µmol/L) should be between 1 and 1200.');
     } else if (n < 0.1 || n > 50) errors.push('Bilirubin (mg/dL) should be between 0.1 and 50.');
   }
 

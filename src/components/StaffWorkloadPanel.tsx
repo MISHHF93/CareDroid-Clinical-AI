@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState, type ChangeEvent } from 'react';
+import { useEffect, useMemo, useState, type ChangeEvent } from 'react';
 import { toast } from 'sonner';
 import { unifiedAIClient } from '../lib/ai/client';
 import { useEmergencyStore } from '../store/emergencyStore';
@@ -270,7 +270,7 @@ export default function StaffWorkloadPanel({ open, onClose }: StaffWorkloadPanel
         {imbalance ? (
           <section className="staff-workload-panel__imbalance" role="status">
             <strong>
-              ⚠ Workload imbalance - {imbalance.name} has {imbalance.count} patients vs team average of{' '}
+              ? Workload imbalance - {imbalance.name} has {imbalance.count} patients vs team average of{' '}
               {imbalance.average}
             </strong>
             <button type="button" onClick={requestAiSuggestions} disabled={aiStatus === 'loading'}>

@@ -1,16 +1,16 @@
-﻿import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MEDICAL_THEME } from '../../config/medicalTheme.constants';
 import { fetchMedicalIotSnapshot } from '../../services/medicalIotService';
 
-// ── demo data ─────────────────────────────────────────────────────────────────
+// -- demo data -----------------------------------------------------------------
 
 const DEVICE_CATEGORIES = [
-  { id: 'monitor',   label: 'Patient monitors',   icon: '📈' },
-  { id: 'infusion',  label: 'Infusion pumps',      icon: '💉' },
-  { id: 'ventilator',label: 'Ventilators',          icon: '🫁' },
-  { id: 'wearable',  label: 'Wearable sensors',    icon: '📡' },
-  { id: 'imaging',   label: 'Imaging equipment',   icon: '🔬' },
-  { id: 'portable',  label: 'Portable devices',    icon: '🩺' },
+  { id: 'monitor',   label: 'Patient monitors',   icon: '??' },
+  { id: 'infusion',  label: 'Infusion pumps',      icon: '??' },
+  { id: 'ventilator',label: 'Ventilators',          icon: '??' },
+  { id: 'wearable',  label: 'Wearable sensors',    icon: '??' },
+  { id: 'imaging',   label: 'Imaging equipment',   icon: '??' },
+  { id: 'portable',  label: 'Portable devices',    icon: '??' },
 ] as const;
 
 const DEMO_DEVICES = [
@@ -22,11 +22,11 @@ const DEMO_DEVICES = [
   { id: 'dev-006', name: 'Zoll R Series',            category: 'portable',   room: 'ED Bay 1',  battery: 87,  status: 'online',  lastSeen: '45s ago',  alarms: 0 },
   { id: 'dev-007', name: 'Philips SureSigns VS4',    category: 'monitor',    room: 'OBS-2',     battery: 62,  status: 'online',  lastSeen: '1m ago',   alarms: 0 },
   { id: 'dev-008', name: 'Smiths Medical Medfusion', category: 'infusion',   room: 'ICU Bed 2', battery: 15,  status: 'critical',lastSeen: '8m ago',   alarms: 3 },
-  { id: 'dev-009', name: 'Dräger Evita Infinity',    category: 'ventilator', room: 'ICU Bed 6', battery: null, status: 'online', lastSeen: '20s ago',  alarms: 1 },
+  { id: 'dev-009', name: 'Dr�ger Evita Infinity',    category: 'ventilator', room: 'ICU Bed 6', battery: null, status: 'online', lastSeen: '20s ago',  alarms: 1 },
   { id: 'dev-010', name: 'Biobeat BB-613',           category: 'wearable',   room: 'Med-Surg B',battery: 8,   status: 'critical',lastSeen: '15m ago',  alarms: 1 },
 ] as const;
 
-// ── helpers ───────────────────────────────────────────────────────────────────
+// -- helpers -------------------------------------------------------------------
 
 const DEVICE_STATUS_COLOR: Record<string, string> = {
   online:   '#22c55e',
@@ -66,7 +66,7 @@ function mapServiceDevice(d: any) {
   };
 }
 
-// ── sub-components ────────────────────────────────────────────────────────────
+// -- sub-components ------------------------------------------------------------
 
 function StatTile({ label, value, accent }: { label: string; value: number | string; accent?: string }) {
   return (
@@ -118,7 +118,7 @@ function DeviceRow({ device }: { device: typeof DEMO_DEVICES[number] }) {
         fontSize: 13,
       }}
     >
-      <span style={{ fontSize: 16 }}>{cat?.icon ?? '🔧'}</span>
+      <span style={{ fontSize: 16 }}>{cat?.icon ?? '??'}</span>
       <div>
         <div style={{ fontWeight: 600, color: MEDICAL_THEME.ink }}>{device.name}</div>
         <div style={{ fontSize: 11, color: MEDICAL_THEME.inkMuted }}>{device.category}</div>
@@ -156,13 +156,13 @@ function DeviceRow({ device }: { device: typeof DEMO_DEVICES[number] }) {
           {device.alarms}
         </span>
       ) : (
-        <span style={{ fontSize: 11, color: MEDICAL_THEME.inkSubtle }}>—</span>
+        <span style={{ fontSize: 11, color: MEDICAL_THEME.inkSubtle }}>�</span>
       )}
     </div>
   );
 }
 
-// ── page ──────────────────────────────────────────────────────────────────────
+// -- page ----------------------------------------------------------------------
 
 type Device = typeof DEMO_DEVICES[number];
 
@@ -233,7 +233,7 @@ export default function MedicalIotDashboard() {
             Medical IoT Dashboard
           </h1>
           <p style={{ margin: '2px 0 0', fontSize: 13, color: MEDICAL_THEME.inkMuted }}>
-            Device fleet · battery status · active alarms · real-time connectivity
+            Device fleet � battery status � active alarms � real-time connectivity
           </p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -261,7 +261,7 @@ export default function MedicalIotDashboard() {
               cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.6 : 1,
             }}
           >
-            {loading ? 'Scanning…' : 'Refresh'}
+            {loading ? 'Scanning�' : 'Refresh'}
           </button>
         </div>
       </div>
@@ -303,7 +303,7 @@ export default function MedicalIotDashboard() {
         ))}
         <input
           type="text"
-          placeholder="Search devices…"
+          placeholder="Search devices�"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           style={{
@@ -357,7 +357,7 @@ export default function MedicalIotDashboard() {
 
       {lastRefreshed && (
         <div style={{ marginTop: 14, fontSize: 11, color: MEDICAL_THEME.inkSubtle, textAlign: 'right' }}>
-          Scanned {lastRefreshed.toLocaleTimeString()} · auto-refreshes every 30s
+          Scanned {lastRefreshed.toLocaleTimeString()} � auto-refreshes every 30s
         </div>
       )}
     </main>

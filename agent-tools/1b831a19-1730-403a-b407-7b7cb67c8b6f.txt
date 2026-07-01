@@ -1,0 +1,1169 @@
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+x·x·········x····
+npx.cmd : 
+At line:1 char:42
++ ... linical-AI; npx.cmd vitest run src/services/receptionIntakeOrchestrat ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  src/services/receptionWorkflowPlan.test.ts > reception architecture plan execution > wires duplicate prevention 
+across reception surfaces
+AssertionError: expected 'import { useEffect, useMemo, useState…' to contain 'Unknown allowed'
+- Expected
++ Received
+- Unknown allowed
++ import { useEffect, useMemo, useState } from 'react';
++ import { Bell, FolderOpen, ShieldCheck, Timer } from 'lucide-react';
++ import UnifiedIntakePanel from '../../components/reception/UnifiedIntakePanel';
++ import { useSearchParams } from 'react-router-dom';
++ import HelpTrigger from '../../components/help/HelpTrigger';
++ import { CANONICAL_ROUTES } from '../../config/routes.config';
++ import { EMERGENCY_ACTIONS } from '../../config/emergencyRolePermissions';
++ import { useUser } from '../../contexts/UserContext';
++ import useProfileNavigate from '../../hooks/useProfileNavigate';
++ import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermissions';
++ import { useEmergencyStore } from '../../store/emergencyStore';
++ import { PatientFlag, PatientState, Priority, type Alert, type Patient } from '../../types/emergency';
++ import {
++   assertReceptionMutationAllowed,
++   createPatientAndRouteFromReception,
++   detectReceptionRedFlags,
++   runReceptionAiIntakeAssist,
++   validateReceptionMinimumCriticalData,
++   type ReceptionAiIntakeAssist,
++   type ReceptionArrivalType,
++   type ReceptionIntakeDraft,
++   type ReceptionRouteResult,
++ } from '../../services/receptionIntakeOrchestrator';
++ import { WorkflowSituationBrief } from './emergencyRouteShared';
++ import './ReceptionWorkspace.css';
++ import './emergency-route.css';
++ 
++ const EMPTY_DRAFT: ReceptionIntakeDraft = {
++   arrivalType: 'walk-in',
++   chiefComplaint: '',
++   estimatedAge: '',
++   dob: '',
++   sex: '',
++   consciousnessStatus: 'unknown',
++   breathingStatus: 'unknown',
++   visibleDistress: 'unknown',
++   painLevel: '',
++   redFlagSymptoms: [],
++   allergiesKnown: 'unknown',
++   allergies: '',
++   medicationsKnown: 'unknown',
++   medications: '',
++   firstName: '',
++   lastName: '',
++   contactCallback: '',
++   insuranceStatus: 'unknown',
++   consentStatus: 'unknown',
++   documentStatus: 'unknown',
++   notes: '',
++ };
++ 
++ function patientDisplayName(patient: Patient): string {
++   return [patient.firstName, patient.lastName].filter(Boolean).join(' ').trim() || patient.name || patient.mrn;
++ }
++ 
++ function isReceptionQueuePatient(patient: Patient): boolean {
++   return [
++     PatientState.Arrival,
++     PatientState.Registration,
++     PatientState.Triage,
++     PatientState.Waiting,
++   ].includes(patient.state);
++ }
++ 
++ function isHighRiskPatient(patient: Patient): boolean {
++   return (
++     patient.priority === Priority.P1 ||
++     patient.priority === Priority.P2 ||
++     patient.flags.includes(PatientFlag.HighRisk) ||
++     patient.flags.includes(PatientFlag.DeteriorationRisk) ||
++     patient.flags.includes(PatientFlag.SepsisAlert) ||
++     patient.flags.includes(PatientFlag.StrokeCode)
++   );
++ }
++ 
++ function waitMinutes(patient: Patient): number {
++   const time = new Date(patient.arrival?.arrivalTimestamp || patient.arrivalTime || '').getTime();
++   if (!Number.isFinite(time)) return 0;
++   return Math.max(0, Math.round((Date.now() - time) / 60000));
++ }
++ 
+
++ function queueStatus(patient: Patient): string {
++   if (patient.registrationStatus === 'provisional') return 'Temporary identity';
++   if (patient.registrationStatus === 'in-progress') return 'Incomplete registration';
++   if (patient.state === PatientState.Triage || patient.triagePending) return 'Waiting for triage';
++   if (patient.state === PatientState.Waiting) return 'Waiting room';
++   return patient.state;
++ }
++ 
++ function nextStep(patient: Patient): string {
++   if (isHighRiskPatient(patient)) return 'Priority triage review';
++   if (patient.registrationStatus === 'provisional') return 'Demographics follow-up';
++   if (patient.state === PatientState.Triage || patient.triagePending) return 'Triage nurse';
++   return 'Standard queue';
++ }
++ 
++ function ownerRole(patient: Patient): string {
++   if (isHighRiskPatient(patient)) return 'Triage nurse / charge nurse';
++   if (patient.registrationStatus === 'provisional' || patient.state === PatientState.Registration) {
++     return 'Registration clerk';
++   }
++   return 'Triage nurse';
++ }
++ 
++ function isReceptionCriticalAlert(alert: Alert): boolean {
++   return (
++     alert.severity === 'Critical' &&
++     !alert.dismissed &&
++     !alert.acknowledged &&
++     ['reception-critical-intake', 'reception-escalation-workflow', 'three-minute-timer-engine'].includes(
++       String(alert.source || ''),
++     )
++   );
++ }
++ 
++ function formatTimer(alert: Alert, now: number): string {
++   const startedAt = String(alert.metadata?.responseStartedAt || alert.createdAt || '');
++   const started = new Date(startedAt).getTime();
++   if (!Number.isFinite(started)) return '3:00';
++   const remaining = Math.max(0, 180 - Math.floor((now - started) / 1000));
++   const minutes = Math.floor(remaining / 60);
++   const seconds = String(remaining % 60).padStart(2, '0');
++   return `${minutes}:${seconds}`;
++ }
++ 
++ function isTimerBreached(alert: Alert, now: number): boolean {
++   const startedAt = String(alert.metadata?.responseStartedAt || alert.createdAt || '');
++   const started = new Date(startedAt).getTime();
++   return Number.isFinite(started) && now - started >= 180000;
++ }
++ 
++ function Stepper({ draft, aiAssist, result }: { draft: ReceptionIntakeDraft; aiAssist: ReceptionAiIntakeAssist | 
+null; result: ReceptionRouteResult | null }) {
++   const criticalStarted = Boolean(result?.criticalAlertId || result?.responseTimerId);
++   const steps = [
++     { id: 'arrival', label: 'Arrival Type', complete: Boolean(draft.arrivalType) },
++     {
++       id: 'critical',
++       label: 'Minimum Critical Info',
++       complete: validateReceptionMinimumCriticalData(draft).length === 0 || detectReceptionRedFlags(draft).length > 
+0,
++     },
++     { id: 'ai', label: 'AI assist (auto)', complete: Boolean(aiAssist) },
++     { id: 'route', label: 'Route to workflow', complete: Boolean(result) },
++   ];
++ 
++   return (
++     <ol className="reception-command-stepper" aria-label="Reception intake progress">
++       {steps.map((step) => (
++         <li
++           key={step.id}
++           className={`reception-command-stepper__item${step.complete ? ' reception-command-stepper__item--complete' 
+: ''}`}
++         >
++           <span>{step.label}</span>
++         </li>
++       ))}
++       {criticalStarted ? (
++         <li className="reception-command-stepper__item reception-command-stepper__item--critical">
++           <span>3-minute response started</span>
++         </li>
++       ) : null}
++     </ol>
++   );
++ }
++ 
++ export default function ReceptionWorkspace() {
++   const { user } = useUser();
++   const { profileNavigate } = useProfileNavigate();
++   const [searchParams] = useSearchParams();
++   const emergencyRole = useEmergencyRolePermissions();
++   const patients = useEmergencyStore((state) => state.patients);
++   const alerts = useEmergencyStore((state) => state.alerts);
++   const capacity = useEmergencyStore((state) => state.capacity);
++   const selectedPatientId = useEmergencyStore((state) => state.selectedPatientId);
++   const selectPatient = useEmergencyStore((state) => state.selectPatient);
++   const [draft, setDraft] = useState<ReceptionIntakeDraft>(EMPTY_DRAFT);
++   const [aiAssist, setAiAssist] = useState<ReceptionAiIntakeAssist | null>(null);
++   const [result, setResult] = useState<ReceptionRouteResult | null>(null);
++   const [status, setStatus] = useState('');
++   const [error, setError] = useState('');
++   const [submitting, setSubmitting] = useState(false);
++   const [now, setNow] = useState(() => Date.now());
++ 
++   const currentUserName =
++     emergencyRole.canonicalProfile?.preferredName ||
++     emergencyRole.canonicalProfile?.fullName ||
++     user?.name ||
++     user?.email ||
++     'Reception Desk';
++   const hospitalSite =
++     emergencyRole.canonicalProfile?.hospitalSite ||
++     (capacity as { siteName?: string }).siteName ||
++     'Virtual City Hospital';
++   const shiftStatus = emergencyRole.canonicalProfile?.shiftStatus || 'On shift';
++   const canCreatePatient = emergencyRole.canMutate(EMERGENCY_ACTIONS.createPatient);
++   const clinicalOverride = assertReceptionMutationAllowed(emergencyRole.role, EMERGENCY_ACTIONS.triage);
++   const missingCriticalFields = validateReceptionMinimumCriticalData(draft);
++   const liveRedFlags = detectReceptionRedFlags(draft);
++   const criticalNeeded = useMemo(
++     () =>
++       aiAssist?.urgencySuggestion === 'critical' ||
++       runReceptionAiIntakeAssist(draft).urgencySuggestion === 'critical',
++     [aiAssist?.urgencySuggestion, draft.chiefComplaint, draft.redFlagSymptoms, draft.consciousnessStatus, 
+draft.breathingStatus, draft.visibleDistress, draft.painLevel, draft.arrivalType],
++   );
++ 
++   const receptionQueue = useMemo(
++     () =>
++       patients
++         .filter(isReceptionQueuePatient)
++         .sort((left, right) => {
++           const riskDelta = Number(isHighRiskPatient(right)) - Number(isHighRiskPatient(left));
++           if (riskDelta) return riskDelta;
++           return waitMinutes(right) - waitMinutes(left);
++         }),
++     [patients],
++   );
++   const criticalAlerts = useMemo(() => alerts.filter(isReceptionCriticalAlert), [alerts]);
++   const selectedPatient = useMemo(
++     () => (selectedPatientId ? patients.find((patient) => patient.id === selectedPatientId) || null : null),
++     [patients, selectedPatientId],
++   );
++ 
++   useEffect(() => {
++     const timer = window.setInterval(() => setNow(Date.now()), 1000);
++     return () => window.clearInterval(timer);
++   }, []);
++ 
++   useEffect(() => {
++     const patientId = searchParams.get('patientId') || searchParams.get('patient') || searchParams.get('arrived');
++     if (patientId) selectPatient(patientId);
++   }, [searchParams, selectPatient]);
++ 
++   const updateDraft = (patch: Partial<ReceptionIntakeDraft>) => {
++     setDraft((current) => ({ ...current, ...patch }));
++     setError('');
++     setStatus('');
++     setResult(null);
++   };
++ 
++   const saveDraft = () => {
++     const storedDraft = { ...draft, id: draft.id || `draft-${Date.now()}`, savedAt: new Date().toISOString() };
++     window.sessionStorage?.setItem('caredroid:reception-draft', JSON.stringify(storedDraft));
++     setDraft(storedDraft);
++     setStatus('Draft saved. Critical routing remains available.');
++   };
++ 
++   const createAndRoute = async (options: { aiUnavailable?: boolean } = {}) => {
++     if (!canCreatePatient) {
++       setError('Reception profile is not allowed to create patients.');
++       return;
++     }
++ 
++     setSubmitting(true);
++     setError('');
++     setStatus('');
++     try {
++       const routeResult = await createPatientAndRouteFromReception(draft, {
++         actorName: currentUserName,
++         actorStaffId: emergencyRole.canonicalProfile?.employeeId || emergencyRole.canonicalProfile?.id,
++         aiUnavailable: options.aiUnavailable,
++       });
++       setAiAssist(routeResult.aiAssist);
++       setResult(routeResult);
++       setStatus(
++         routeResult.criticalAlertId
++     Test Files  2 failed | 1 passed (3)
+      Tests  3 failed | 14 passed (17)
+   Start at  19:26:49
+   Duration  7.66s (transform 1.30s, setup 1.01s, import 1.75s, tests 116ms, environment 4.21s)
+
+       ? 'Critical alert created. 3-minute response timer started.'
++           : 'Patient created and routed to queue.',
++       );
++       selectPatient(routeResult.patientId);
++       window.sessionStorage?.removeItem('caredroid:reception-draft');
++     } catch (routeError) {
++       setError(routeError instanceof Error ? routeError.message : 'Unable to create and route patient.');
++     } finally {
++       setSubmitting(false);
++     }
++   };
++ 
++   const resetForNextPatient = () => {
++     setDraft({ ...EMPTY_DRAFT });
++     setAiAssist(null);
++     setResult(null);
++     setError('');
++     setStatus('');
++   };
++ 
++   return (
++     <section className="reception-command" aria-labelledby="reception-command-title">
++       <header className="reception-command-header">
++         <div>
++           <p className="reception-command-header__eyebrow">Reception Command Desk</p>
++           <h1 id="reception-command-title">Emergency Reception</h1>
++           <div className="reception-command-header__meta">
++             <span>{currentUserName}</span>
++             <span className="reception-command-badge">{emergencyRole.roleLabel || 'Registration Clerk'}</span>
++             <span>{shiftStatus}</span>
++             <span>{hospitalSite}</span>
++           </div>
++         </div>
++         <div className="reception-command-header__metrics" aria-label="Reception queue metrics">
++           <div>
++             <strong>{receptionQueue.length}</strong>
++             <span>Active queue</span>
++           </div>
++           <div className={criticalAlerts.length ? 'reception-command-metric--critical' : ''}>
++             <strong>{criticalAlerts.length}</strong>
++             <span>Critical arrivals</span>
++           </div>
++           <HelpTrigger variant="button" label="Guide" className="reception-command-help" />
++         </div>
++       </header>
++
++       <WorkflowSituationBrief
++         status={`${receptionQueue.length} patient${receptionQueue.length === 1 ? '' : 's'} in reception queue`}
++         attention={
++           criticalAlerts.length
++             ? `${criticalAlerts.length} critical arrival${criticalAlerts.length === 1 ? '' : 's'} active`
++             : liveRedFlags.length
++               ? `${liveRedFlags.length} red flag${liveRedFlags.length === 1 ? '' : 's'} in current draft`
++               : 'No critical arrivals flagged'
++         }
++         owner={`${currentUserName} · ${emergencyRole.roleLabel || 'Registration Clerk'}`}
++         nextAction={
++           result
++             ? 'Confirm routing, then reset for the next arrival'
++             : criticalNeeded
++               ? 'Complete minimum critical data and create patient route'
++               : draft.chiefComplaint
++                 ? missingCriticalFields.length
++                   ? `Complete ${missingCriticalFields.length} required field${missingCriticalFields.length === 1 ? 
+'' : 's'}, then route`
++                   : 'Run AI assist or create patient and route to queue'
++                 : 'Select arrival type and capture chief complaint'
++         }
++         tone={
++           criticalAlerts.length || criticalNeeded
++             ? 'critical'
++             : liveRedFlags.length || missingCriticalFields.length
++               ? 'warning'
++               : 'neutral'
++         }
++       />
++
++       <Stepper draft={draft} aiAssist={aiAssist} result={result} />
++ 
++       {!clinicalOverride.allowed ? (
++         <div className="reception-command-guardrail" role="note">
++           <ShieldCheck size={18} aria-hidden="true" />
++           <span>{clinicalOverride.reason}</span>
++         </div>
++       ) : null}
++ 
++       <UnifiedIntakePanel
++         draft={draft}
++         onDraftChange={updateDraft}
++         aiAssist={aiAssist}
++         onAiAssistChange={setAiAssist}
++         result={result}
++         canCreatePatient={canCreatePatient}
++         submitting={submitting}
++         onSaveDraft={saveDraft}
++         onRoute={createAndRoute}
++         onReset={resetForNextPatient}
++         queueRail={
++           <section className="reception-command-panel" aria-labelledby="queue-title">
++             <div className="reception-command-panel__header">
++               <h2 id="queue-title">Reception Queue</h2>
++               <span className="reception-command-chip">{receptionQueue.length} active</span>
++             </div>
++             <div className="reception-command-queue">
++               {receptionQueue.length ? (
++                 receptionQueue.slice(0, 8).map((patient) => (
++                   <button
++                     key={patient.id}
++                     type="button"
++                     className={`reception-command-queue-row${isHighRiskPatient(patient) ? ' 
+reception-command-queue-row--risk' : ''}`}
++                     onClick={() => selectPatient(patient.id)}
++                   >
++                     <span>
++                       <strong>{patientDisplayName(patient)}</strong>
++                       <small>{patient.chiefComplaint || patient.complaint || 'Complaint pending'}</small>
++                     </span>
++                     <span>{queueStatus(patient)}</span>
++                     <span>{nextStep(patient)}</span>
++                     <span>{ownerRole(patient)}</span>
++                     <span>{waitMinutes(patient)}m</span>
++                   </button>
++                 ))
++               ) : (
++                 <div className="reception-command-empty">No active reception queue patients.</div>
++               )}
++             </div>
++             {selectedPatient ? (
++               <div className="reception-command-selected" role="status">
++                 <strong>{patientDisplayName(selectedPatient)}</strong>
++                 <span>
++                   {selectedPatient.mrn} · {selectedPatient.state} · {selectedPatient.chiefComplaint}
++                 </span>
++                 <button
++                   type="button"
++                   onClick={() =>
++                     profileNavigate(
++                       `${CANONICAL_ROUTES.emergencyPatients}?patientId=${encodeURIComponent(selectedPatient.id)}`,
++                     )
++                   }
++                 >
++                   <FolderOpen size={16} aria-hidden="true" />
++                   Open Patient Profile
++                 </button>
++               </div>
++             ) : null}
++           </section>
++         }
++         alertsRail={
++           <section className="reception-command-panel" aria-labelledby="alerts-title">
++             <div className="reception-command-panel__header">
++               <h2 id="alerts-title">Critical Reception Alerts</h2>
++               <span
++                 className={
++                   criticalAlerts.length ? 'reception-command-chip reception-command-chip--critical' : 
+'reception-command-chip'
++                 }
++               >
++                 {criticalAlerts.length} active
++               </span>
++             </div>
++             <div className="reception-command-alerts">
++               {criticalAlerts.length ? (
++                 criticalAlerts.slice(0, 5).map((alert) => (
++                   <article
++                     key={alert.id}
++                     className={`reception-command-alert${isTimerBreached(alert, now) ? ' 
+reception-command-alert--breached' : ''}`}
++                   >
++                     <div>
++                       <strong>{alert.title}</strong>
++                       <p>{alert.message}</p>
++                       <small>Notify triage nurse / charge nurse / emergency physician</small>
++                     </div>
++                     <div className="reception-command-alert__timer" aria-label="3-minute response timer">
++                       <Timer size={18} aria-hidden="true" />
++                       <span>{formatTimer(alert, now)}</span>
++                     </div>
++                   </article>
++                 ))
++               ) : (
++                 <div className="reception-command-empty">
++                   <Bell size={20} aria-hidden="true" />
++                   <span>No critical reception alerts.</span>
++                 </div>
++               )}
++             </div>
++           </section>
++         }
++       />
++ 
++       {status || error ? (
++         <div className={`reception-command-toast ${error ? 'reception-command-toast--error' : ''}`} role={error ? 
+'alert' : 'status'}>
++           {error || status}
++         </div>
++       ) : null}
++ 
++       {result ? (
++         <div className="reception-command-selected reception-command-selected--floating" role="status">
++           <strong>Routed: {patientDisplayName(result.patient)}</strong>
++           <button type="button" onClick={() => profileNavigate(result.profileRoute)}>
++             <FolderOpen size={16} aria-hidden="true" />
++             Open Patient Profile
++           </button>
++         </div>
++       ) : null}
++     </section>
++   );
++ }
++
+ ❯ src/services/receptionWorkflowPlan.test.ts:20:23
+     18|     const verification = read('components/verification/PatientVerifica…
+     19|
+     20|     expect(reception).toContain('Unknown allowed');
+       |                       ^
+     21|     expect(reception).toContain('Open Patient Profile');
+     22|     expect(reception).toContain('createPatientAndRouteFromReception');
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+ FAIL  src/pages/emergency/ReceptionWorkspace.test.tsx > Reception Command Desk wiring > mounts one command-desk 
+workflow on the active reception route
+AssertionError: expected 'import { useEffect, useMemo, useState…' to contain 'Life-critical intake'
+- Expected
++ Received
+- Life-critical intake
++ import { useEffect, useMemo, useState } from 'react';
++ import { Bell, FolderOpen, ShieldCheck, Timer } from 'lucide-react';
++ import UnifiedIntakePanel from '../../components/reception/UnifiedIntakePanel';
++ import { useSearchParams } from 'react-router-dom';
++ import HelpTrigger from '../../components/help/HelpTrigger';
++ import { CANONICAL_ROUTES } from '../../config/routes.config';
++ import { EMERGENCY_ACTIONS } from '../../config/emergencyRolePermissions';
++ import { useUser } from '../../contexts/UserContext';
++ import useProfileNavigate from '../../hooks/useProfileNavigate';
++ import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermissions';
++ import { useEmergencyStore } from '../../store/emergencyStore';
++ import { PatientFlag, PatientState, Priority, type Alert, type Patient } from '../../types/emergency';
++ import {
++   assertReceptionMutationAllowed,
++   createPatientAndRouteFromReception,
++   detectReceptionRedFlags,
++   runReceptionAiIntakeAssist,
++   validateReceptionMinimumCriticalData,
++   type ReceptionAiIntakeAssist,
++   type ReceptionArrivalType,
++   type ReceptionIntakeDraft,
++   type ReceptionRouteResult,
++ } from '../../services/receptionIntakeOrchestrator';
++ import { WorkflowSituationBrief } from './emergencyRouteShared';
++ import './ReceptionWorkspace.css';
++ import './emergency-route.css';
++ 
++ const EMPTY_DRAFT: ReceptionIntakeDraft = {
++   arrivalType: 'walk-in',
++   chiefComplaint: '',
++   estimatedAge: '',
++   dob: '',
++   sex: '',
++   consciousnessStatus: 'unknown',
++   breathingStatus: 'unknown',
++   visibleDistress: 'unknown',
++   painLevel: '',
++   redFlagSymptoms: [],
++   allergiesKnown: 'unknown',
++   allergies: '',
++   medicationsKnown: 'unknown',
++   medications: '',
++   firstName: '',
++   lastName: '',
++   contactCallback: '',
++   insuranceStatus: 'unknown',
++   consentStatus: 'unknown',
++   documentStatus: 'unknown',
++   notes: '',
++ };
++ 
++ function patientDisplayName(patient: Patient): string {
++   return [patient.firstName, patient.lastName].filter(Boolean).join(' ').trim() || patient.name || patient.mrn;
++ }
++ 
++ function isReceptionQueuePatient(patient: Patient): boolean {
++   return [
++     PatientState.Arrival,
++     PatientState.Registration,
++     PatientState.Triage,
++     PatientState.Waiting,
++   ].includes(patient.state);
++ }
++ 
++ function isHighRiskPatient(patient: Patient): boolean {
++   return (
++     patient.priority === Priority.P1 ||
++     patient.priority === Priority.P2 ||
++     patient.flags.includes(PatientFlag.HighRisk) ||
++     patient.flags.includes(PatientFlag.DeteriorationRisk) ||
++     patient.flags.includes(PatientFlag.SepsisAlert) ||
++     patient.flags.includes(PatientFlag.StrokeCode)
++   );
++ }
++ 
++ function waitMinutes(patient: Patient): number {
++   const time = new Date(patient.arrival?.arrivalTimestamp || patient.arrivalTime || '').getTime();
++   if (!Number.isFinite(time)) return 0;
++   return Math.max(0, Math.round((Date.now() - time) / 60000));
++ }
++ 
++ function queueStatus(patient: Patient): string {
++   if (patient.registrationStatus === 'provisional') return 'Temporary identity';
++   if (patient.registrationStatus === 'in-progress') return 'Incomplete registration';
++   if (patient.state === PatientState.Triage || patient.triagePending) return 'Waiting for triage';
++   if (patient.state === PatientState.Waiting) return 'Waiting room';
++   return patient.state;
++ }
++ 
++ function nextStep(patient: Patient): string {
++   if (isHighRiskPatient(patient)) return 'Priority triage review';
++   if (patient.registrationStatus === 'provisional') return 'Demographics follow-up';
++   if (patient.state === PatientState.Triage || patient.triagePending) return 'Triage nurse';
++   return 'Standard queue';
++ }
++ 
++ function ownerRole(patient: Patient): string {
++   if (isHighRiskPatient(patient)) return 'Triage nurse / charge nurse';
++   if (patient.registrationStatus === 'provisional' || patient.state === PatientState.Registration) {
++     return 'Registration clerk';
++   }
++   return 'Triage nurse';
++ }
++ 
++ function isReceptionCriticalAlert(alert: Alert): boolean {
++   return (
++     alert.severity === 'Critical' &&
++     !alert.dismissed &&
++     !alert.acknowledged &&
++     ['reception-critical-intake', 'reception-escalation-workflow', 'three-minute-timer-engine'].includes(
++       String(alert.source || ''),
++     )
++   );
++ }
++ 
++ function formatTimer(alert: Alert, now: number): string {
++   const startedAt = String(alert.metadata?.responseStartedAt || alert.createdAt || '');
++   const started = new Date(startedAt).getTime();
++   if (!Number.isFinite(started)) return '3:00';
++   const remaining = Math.max(0, 180 - Math.floor((now - started) / 1000));
++   const minutes = Math.floor(remaining / 60);
++   const seconds = String(remaining % 60).padStart(2, '0');
++   return `${minutes}:${seconds}`;
++ }
++ 
++ function isTimerBreached(alert: Alert, now: number): boolean {
++   const startedAt = String(alert.metadata?.responseStartedAt || alert.createdAt || '');
++   const started = new Date(startedAt).getTime();
++   return Number.isFinite(started) && now - started >= 180000;
++ }
++ 
++ function Stepper({ draft, aiAssist, result }: { draft: ReceptionIntakeDraft; aiAssist: ReceptionAiIntakeAssist | 
+null; result: ReceptionRouteResult | null }) {
++   const criticalStarted = Boolean(result?.criticalAlertId || result?.responseTimerId);
++   const steps = [
++     { id: 'arrival', label: 'Arrival Type', complete: Boolean(draft.arrivalType) },
++     {
++       id: 'critical',
++       label: 'Minimum Critical Info',
++       complete: validateReceptionMinimumCriticalData(draft).length === 0 || detectReceptionRedFlags(draft).length > 
+0,
++     },
++     { id: 'ai', label: 'AI assist (auto)', complete: Boolean(aiAssist) },
++     { id: 'route', label: 'Route to workflow', complete: Boolean(result) },
++   ];
++ 
++   return (
++     <ol className="reception-command-stepper" aria-label="Reception intake progress">
++       {steps.map((step) => (
++         <li
++           key={step.id}
++           className={`reception-command-stepper__item${step.complete ? ' reception-command-stepper__item--complete' 
+: ''}`}
++         >
++           <span>{step.label}</span>
++         </li>
++       ))}
++       {criticalStarted ? (
++         <li className="reception-command-stepper__item reception-command-stepper__item--critical">
++           <span>3-minute response started</span>
++         </li>
++       ) : null}
++     </ol>
++   );
++ }
++ 
++ export default function ReceptionWorkspace() {
++   const { user } = useUser();
++   const { profileNavigate } = useProfileNavigate();
++   const [searchParams] = useSearchParams();
++   const emergencyRole = useEmergencyRolePermissions();
++   const patients = useEmergencyStore((state) => state.patients);
++   const alerts = useEmergencyStore((state) => state.alerts);
++   const capacity = useEmergencyStore((state) => state.capacity);
++   const selectedPatientId = useEmergencyStore((state) => state.selectedPatientId);
++   const selectPatient = useEmergencyStore((state) => state.selectPatient);
++   const [draft, setDraft] = useState<ReceptionIntakeDraft>(EMPTY_DRAFT);
++   const [aiAssist, setAiAssist] = useState<ReceptionAiIntakeAssist | null>(null);
++   const [result, setResult] = useState<ReceptionRouteResult | null>(null);
++   const [status, setStatus] = useState('');
++   const [error, setError] = useState('');
++   const [submitting, setSubmitting] = useState(false);
++   const [now, setNow] = useState(() => Date.now());
++ 
++   const currentUserName =
++     emergencyRole.canonicalProfile?.preferredName ||
++     emergencyRole.canonicalProfile?.fullName ||
++     user?.name ||
++     user?.email ||
++     'Reception Desk';
++   const hospitalSite =
++     emergencyRole.canonicalProfile?.hospitalSite ||
++     (capacity as { siteName?: string }).siteName ||
++     'Virtual City Hospital';
++   const shiftStatus = emergencyRole.canonicalProfile?.shiftStatus || 'On shift';
++   const canCreatePatient = emergencyRole.canMutate(EMERGENCY_ACTIONS.createPatient);
++   const clinicalOverride = assertReceptionMutationAllowed(emergencyRole.role, EMERGENCY_ACTIONS.triage);
++   const missingCriticalFields = validateReceptionMinimumCriticalData(draft);
++   const liveRedFlags = detectReceptionRedFlags(draft);
++   const criticalNeeded = useMemo(
++     () =>
++       aiAssist?.urgencySuggestion === 'critical' ||
++       runReceptionAiIntakeAssist(draft).urgencySuggestion === 'critical',
++     [aiAssist?.urgencySuggestion, draft.chiefComplaint, draft.redFlagSymptoms, draft.consciousnessStatus, 
+draft.breathingStatus, draft.visibleDistress, draft.painLevel, draft.arrivalType],
++   );
++ 
++   const receptionQueue = useMemo(
++     () =>
++       patients
++         .filter(isReceptionQueuePatient)
++         .sort((left, right) => {
++           const riskDelta = Number(isHighRiskPatient(right)) - Number(isHighRiskPatient(left));
++           if (riskDelta) return riskDelta;
++           return waitMinutes(right) - waitMinutes(left);
++         }),
++     [patients],
++   );
++   const criticalAlerts = useMemo(() => alerts.filter(isReceptionCriticalAlert), [alerts]);
++   const selectedPatient = useMemo(
++     () => (selectedPatientId ? patients.find((patient) => patient.id === selectedPatientId) || null : null),
++     [patients, selectedPatientId],
++   );
++ 
++   useEffect(() => {
++     const timer = window.setInterval(() => setNow(Date.now()), 1000);
++     return () => window.clearInterval(timer);
++   }, []);
++ 
++   useEffect(() => {
++     const patientId = searchParams.get('patientId') || searchParams.get('patient') || searchParams.get('arrived');
++     if (patientId) selectPatient(patientId);
++   }, [searchParams, selectPatient]);
++ 
++   const updateDraft = (patch: Partial<ReceptionIntakeDraft>) => {
++     setDraft((current) => ({ ...current, ...patch }));
++     setError('');
++     setStatus('');
++     setResult(null);
++   };
++ 
++   const saveDraft = () => {
++     const storedDraft = { ...draft, id: draft.id || `draft-${Date.now()}`, savedAt: new Date().toISOString() };
++     window.sessionStorage?.setItem('caredroid:reception-draft', JSON.stringify(storedDraft));
++     setDraft(storedDraft);
++     setStatus('Draft saved. Critical routing remains available.');
++   };
++ 
++   const createAndRoute = async (options: { aiUnavailable?: boolean } = {}) => {
++     if (!canCreatePatient) {
++       setError('Reception profile is not allowed to create patients.');
++       return;
++     }
++ 
++     setSubmitting(true);
++     setError('');
++     setStatus('');
++     try {
++       const routeResult = await createPatientAndRouteFromReception(draft, {
++         actorName: currentUserName,
++         actorStaffId: emergencyRole.canonicalProfile?.employeeId || emergencyRole.canonicalProfile?.id,
++         aiUnavailable: options.aiUnavailable,
++       });
++       setAiAssist(routeResult.aiAssist);
++       setResult(routeResult);
++       setStatus(
++         routeResult.criticalAlertId
++           ? 'Critical alert created. 3-minute response timer started.'
++           : 'Patient created and routed to queue.',
++       );
++       selectPatient(routeResult.patientId);
++       window.sessionStorage?.removeItem('caredroid:reception-draft');
++     } catch (routeError) {
++       setError(routeError instanceof Error ? routeError.message : 'Unable to create and route patient.');
++     } finally {
++       setSubmitting(false);
++     }
++   };
++ 
++   const resetForNextPatient = () => {
++     setDraft({ ...EMPTY_DRAFT });
++     setAiAssist(null);
++     setResult(null);
++     setError('');
++     setStatus('');
++   };
++ 
++   return (
++     <section className="reception-command" aria-labelledby="reception-command-title">
++       <header className="reception-command-header">
++         <div>
++           <p className="reception-command-header__eyebrow">Reception Command Desk</p>
++           <h1 id="reception-command-title">Emergency Reception</h1>
++           <div className="reception-command-header__meta">
++             <span>{currentUserName}</span>
++             <span className="reception-command-badge">{emergencyRole.roleLabel || 'Registration Clerk'}</span>
++             <span>{shiftStatus}</span>
++             <span>{hospitalSite}</span>
++           </div>
++         </div>
++         <div className="reception-command-header__metrics" aria-label="Reception queue metrics">
++           <div>
++             <strong>{receptionQueue.length}</strong>
++             <span>Active queue</span>
++           </div>
++           <div className={criticalAlerts.length ? 'reception-command-metric--critical' : ''}>
++             <strong>{criticalAlerts.length}</strong>
++             <span>Critical arrivals</span>
++           </div>
++           <HelpTrigger variant="button" label="Guide" className="reception-command-help" />
++         </div>
++       </header>
++
++       <WorkflowSituationBrief
++         status={`${receptionQueue.length} patient${receptionQueue.length === 1 ? '' : 's'} in reception queue`}
++         attention={
++           criticalAlerts.length
++             ? `${criticalAlerts.length} critical arrival${criticalAlerts.length === 1 ? '' : 's'} active`
++             : liveRedFlags.length
++               ? `${liveRedFlags.length} red flag${liveRedFlags.length === 1 ? '' : 's'} in current draft`
++               : 'No critical arrivals flagged'
++         }
++         owner={`${currentUserName} · ${emergencyRole.roleLabel || 'Registration Clerk'}`}
++         nextAction={
++           result
++             ? 'Confirm routing, then reset for the next arrival'
++             : criticalNeeded
++               ? 'Complete minimum critical data and create patient route'
++               : draft.chiefComplaint
++                 ? missingCriticalFields.length
++                   ? `Complete ${missingCriticalFields.length} required field${missingCriticalFields.length === 1 ? 
+'' : 's'}, then route`
++                   : 'Run AI assist or create patient and route to queue'
++                 : 'Select arrival type and capture chief complaint'
++         }
++         tone={
++           criticalAlerts.length || criticalNeeded
++             ? 'critical'
++             : liveRedFlags.length || missingCriticalFields.length
++               ? 'warning'
++               : 'neutral'
++         }
++       />
++
++       <Stepper draft={draft} aiAssist={aiAssist} result={result} />
++ 
++       {!clinicalOverride.allowed ? (
++         <div className="reception-command-guardrail" role="note">
++           <ShieldCheck size={18} aria-hidden="true" />
++           <span>{clinicalOverride.reason}</span>
++         </div>
++       ) : null}
++ 
++       <UnifiedIntakePanel
++         draft={draft}
++         onDraftChange={updateDraft}
++         aiAssist={aiAssist}
++         onAiAssistChange={setAiAssist}
++         result={result}
++         canCreatePatient={canCreatePatient}
++         submitting={submitting}
++         onSaveDraft={saveDraft}
++         onRoute={createAndRoute}
++         onReset={resetForNextPatient}
++         queueRail={
++           <section className="reception-command-panel" aria-labelledby="queue-title">
++             <div className="reception-command-panel__header">
++               <h2 id="queue-title">Reception Queue</h2>
++               <span className="reception-command-chip">{receptionQueue.length} active</span>
++             </div>
++             <div className="reception-command-queue">
++               {receptionQueue.length ? (
++                 receptionQueue.slice(0, 8).map((patient) => (
++                   <button
++                     key={patient.id}
++                     type="button"
++                     className={`reception-command-queue-row${isHighRiskPatient(patient) ? ' 
+reception-command-queue-row--risk' : ''}`}
++                     onClick={() => selectPatient(patient.id)}
++                   >
++                     <span>
++                       <strong>{patientDisplayName(patient)}</strong>
++                       <small>{patient.chiefComplaint || patient.complaint || 'Complaint pending'}</small>
++                     </span>
++                     <span>{queueStatus(patient)}</span>
++                     <span>{nextStep(patient)}</span>
++                     <span>{ownerRole(patient)}</span>
++                     <span>{waitMinutes(patient)}m</span>
++                   </button>
++                 ))
++               ) : (
++                 <div className="reception-command-empty">No active reception queue patients.</div>
++               )}
++             </div>
++             {selectedPatient ? (
++               <div className="reception-command-selected" role="status">
++                 <strong>{patientDisplayName(selectedPatient)}</strong>
++                 <span>
++                   {selectedPatient.mrn} · {selectedPatient.state} · {selectedPatient.chiefComplaint}
++                 </span>
++                 <button
++                   type="button"
++                   onClick={() =>
++                     profileNavigate(
++                       `${CANONICAL_ROUTES.emergencyPatients}?patientId=${encodeURIComponent(selectedPatient.id)}`,
++                     )
++                   }
++                 >
++                   <FolderOpen size={16} aria-hidden="true" />
++                   Open Patient Profile
++                 </button>
++               </div>
++             ) : null}
++           </section>
++         }
++         alertsRail={
++           <section className="reception-command-panel" aria-labelledby="alerts-title">
++             <div className="reception-command-panel__header">
++               <h2 id="alerts-title">Critical Reception Alerts</h2>
++               <span
++                 className={
++                   criticalAlerts.length ? 'reception-command-chip reception-command-chip--critical' : 
+'reception-command-chip'
++                 }
++               >
++                 {criticalAlerts.length} active
++               </span>
++             </div>
++             <div className="reception-command-alerts">
++               {criticalAlerts.length ? (
++                 criticalAlerts.slice(0, 5).map((alert) => (
++                   <article
++                     key={alert.id}
++                     className={`reception-command-alert${isTimerBreached(alert, now) ? ' 
+reception-command-alert--breached' : ''}`}
++                   >
++                     <div>
++                       <strong>{alert.title}</strong>
++                       <p>{alert.message}</p>
++                       <small>Notify triage nurse / charge nurse / emergency physician</small>
++                     </div>
++                     <div className="reception-command-alert__timer" aria-label="3-minute response timer">
++                       <Timer size={18} aria-hidden="true" />
++                       <span>{formatTimer(alert, now)}</span>
++                     </div>
++                   </article>
++                 ))
++               ) : (
++                 <div className="reception-command-empty">
++                   <Bell size={20} aria-hidden="true" />
++                   <span>No critical reception alerts.</span>
++                 </div>
++               )}
++             </div>
++           </section>
++         }
++       />
++ 
++       {status || error ? (
++         <div className={`reception-command-toast ${error ? 'reception-command-toast--error' : ''}`} role={error ? 
+'alert' : 'status'}>
++           {error || status}
++         </div>
++       ) : null}
++ 
++       {result ? (
++         <div className="reception-command-selected reception-command-selected--floating" role="status">
++           <strong>Routed: {patientDisplayName(result.patient)}</strong>
++           <button type="button" onClick={() => profileNavigate(result.profileRoute)}>
++             <FolderOpen size={16} aria-hidden="true" />
++             Open Patient Profile
++           </button>
++         </div>
++       ) : null}
++     </section>
++   );
++ }
++
+ ❯ src/pages/emergency/ReceptionWorkspace.test.tsx:17:29
+     15|     expect(receptionSource).toContain('Reception Command Desk');
+     16|     expect(receptionSource).toContain('UnifiedIntakePanel');
+     17|     expect(receptionSource).toContain('Life-critical intake');
+       |                             ^
+     18|     expect(receptionSource).toContain('Reception Queue');
+     19|     expect(receptionSource).toContain('Critical Reception Alerts');
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+ FAIL  src/pages/emergency/ReceptionWorkspace.test.tsx > Reception Command Desk wiring > defines the reception profile 
+around reception, patients, queues, intake support, and help
+AssertionError: expected 'import { normalizeEmergencyRole } fro…' to contain 'registration_clerk: [\'reception\', 
+\…'
+- Expected
++ Received
+- registration_clerk: ['reception', 'patients', 'queues', 'help']
++ import { normalizeEmergencyRole } from './emergencyRolePermissions';
++ import { isReceptionFirstUxEnabled, RECEPTION_FIRST_UX } from './receptionFirstUx.config';
++ import { getNavItemIdsForRole, HOSPITAL_ROLE_NAV_IDS } from './roleClusterNav.config';
++ 
++ const RECEPTION_FIRST_NAV_ORDER = Object.freeze([
++   'reception',
++   'patients',
++   'ems',
++   'queues',
++   'whiteboard',
++   'reassessment',
++   'capacity',
++   'hospital-map',
++   'referrals',
++   'copilot',
++   'tools',
++   'analytics',
++   'predictive-analytics',
++   'executive',
++   'ai-center',
++   'medical-iot',
++   'settings',
++   'integrations',
++   'cosmos',
++   'platform',
++   'pulse',
++   'shift',
++   'fleet',
++   'surveillance',
++   'simulation',
++   'laboratory',
++   'knowledge',
++   'audit',
++ ]);
++ 
++ // Derived from cluster config � all 21 hospital roles + legacy emergency role aliases.
++ // Exported for backward compatibility with existing tests.
++ const ROLE_NAV_ORDER_OVERRIDES: Readonly<Record<string, readonly string[]>> = Object.freeze({
++   ...HOSPITAL_ROLE_NAV_IDS,
++   physician:        HOSPITAL_ROLE_NAV_IDS.emergency_physician,
++   ems_user:         HOSPITAL_ROLE_NAV_IDS.paramedic,
++   ed_manager:       HOSPITAL_ROLE_NAV_IDS.ed_director,
++   admin:            HOSPITAL_ROLE_NAV_IDS.hospital_admin,
++   read_only_viewer: HOSPITAL_ROLE_NAV_IDS.demo_observer,
++   public_display:   HOSPITAL_ROLE_NAV_IDS.demo_observer,
++ });
++ 
++ // Hiding is now handled entirely by getHiddenNavItemIdsForRole via the cluster allowlist.
++ const ROLE_NAV_EXCLUDED_OVERRIDES: Readonly<Record<string, readonly string[]>> = Object.freeze({});
++ 
++ export function getRoleNavOrder(role) {
++   const normalizedRole = normalizeEmergencyRole(role);
++   if (isReceptionFirstUxEnabled() && RECEPTION_FIRST_UX.demoteCommandCenterInNav) {
++     const roleOrder = ROLE_NAV_ORDER_OVERRIDES[normalizedRole];
++     if (roleOrder?.length) return roleOrder;
++     return RECEPTION_FIRST_NAV_ORDER;
++   }
++   return ROLE_NAV_ORDER_OVERRIDES[normalizedRole] || null;
++ }
++ 
++ export function getRoleNavExcludedIds(role) {
++   return ROLE_NAV_EXCLUDED_OVERRIDES[normalizeEmergencyRole(role)] || [];
++ }
++ 
++ export function sortNavigationItemsForRole(items: readonly any[], role: string): readonly any[] {
++   const orderedIds = getNavItemIdsForRole(role);
++   const orderIndex = new Map(orderedIds.map((id, i) => [id, i]));
++   return [...items].sort((a, b) => {
++     const ai = orderIndex.get(a.id) ?? Number.MAX_SAFE_INTEGER;
++     const bi = orderIndex.get(b.id) ?? Number.MAX_SAFE_INTEGER;
++     if (ai !== bi) return ai - bi;
++     return (a.order ?? 0) - (b.order ?? 0);
++   });
++ }
++ 
++ // Full list of known sidebar item IDs � used to compute the hidden set from a role's allowlist.
++ const ALL_KNOWN_NAV_ITEM_IDS: readonly string[] = Object.freeze([
++   'command-center', 'reception', 'whiteboard', 'dispatch', 'ems', 'ed-readiness',
++   'patients', 'queues', 'triage', 'reassessment', 'alerts', 'capacity', 'referrals',
++   'diagnostics', 'handoffs', 'copilot', 'tools', 'analytics', 'reports', 'settings',
++   'pulse', 'shift', 'help', 'admin', 'audit',
++   'intake', 'integrations', 'cosmos', 'platform', 'fleet', 'surveillance',
++   'simulation', 'laboratory', 'knowledge', 'ai-center',
++   // Extended platform pages
++   'hospital-map', 'executive', 'predictive-analytics', 'medical-iot',
++ ]);
++ 
++ export function getHiddenNavItemIdsForRole(role: string, options: any = {}): Set<string> {
++   const allowedIds = new Set(getNavItemIdsForRole(role));
++   const hidden = new Set<string>();
++   for (const id of ALL_KNOWN_NAV_ITEM_IDS) {
++     if (!allowedIds.has(id)) hidden.add(id);
++   }
++   if (options.hideStandaloneIntake) hidden.add('intake');
++   return hidden;
++ }
++ 
++ /** Paths that belong conceptually to another nav section when their own item is absent. */
++ const NAV_PARENT_FALLBACK: Record<string, string> = {
++   '/emergency/intake': 'reception',
++   '/emergency/register': 'reception',
++   '/emergency/smart-intake': 'reception',
++ };
++ 
++ /**
++  * Resolve which nav item id is "active" for a given pathname.
++  * Picks the most specific (longest) route match so broad catch-all activePaths
++  * (e.g. whiteboard's "/emergency") don't shadow specific items.
++  * When no item directly matches (e.g. intake is hidden), falls back to the
++  * canonical parent section defined in NAV_PARENT_FALLBACK.
++  */
++ export function resolveActiveNavigationItemId(
++   items: readonly { id: string; route?: string; path?: string; activePaths?: readonly string[] }[],
++   pathname: string,
++   _search?: string,
++ ): string | null {
++   // Pass 1: primary route match (most specific wins)
++   let bestId: string | null = null;
++   let bestLen = -1;
++   for (const item of items) {
++     const primaryRoute = item.route || item.path;
++     if (primaryRoute && (pathname === primaryRoute || pathname.startsWith(primaryRoute + '/'))) {
++       if (primaryRoute.length > bestLen) {
++         bestId = item.id;
++         bestLen = primaryRoute.length;
++       }
++     }
++   }
++   if (bestId) return bestId;
++ 
++   // Pass 2: explicit parent fallback for paths whose own item may be hidden
++   const parentId = NAV_PARENT_FALLBACK[pathname];
++   if (parentId && items.some((item) => item.id === parentId)) return parentId;
++ 
++   // Pass 3: activePaths (broad catch-alls like whiteboard's "/emergency")
++   for (const item of items) {
++     if (item.activePaths) {
++       for (const p of item.activePaths) {
++         if (pathname === p || pathname.startsWith(p + '/')) {
++           if (p.length > bestLen) {
++             bestId = item.id;
++             bestLen = p.length;
++           }
++         }
++       }
++     }
++   }
++   return bestId;
++ }
++ 
++ export { ROLE_NAV_ORDER_OVERRIDES, ROLE_NAV_EXCLUDED_OVERRIDES, RECEPTION_FIRST_NAV_ORDER };
++
+ ❯ src/pages/emergency/ReceptionWorkspace.test.tsx:39:23
+     37|     expect(permissionsSource).toContain('ROUTES.queues');
+     38|     expect(permissionsSource).toContain('ROUTES.help');
+     39|     expect(navSource).toContain("registration_clerk: ['reception', 'pa…
+       |                       ^
+     40|     expect(navSource).toContain("'intake'");
+     41|     expect(navSource).toContain("'settings'");
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯

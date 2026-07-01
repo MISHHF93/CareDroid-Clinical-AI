@@ -1,4 +1,4 @@
-﻿import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
   MULTI_TENANT_CONFIG_DOMAIN,
   MULTI_TENANT_READINESS,

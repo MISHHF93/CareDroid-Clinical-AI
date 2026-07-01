@@ -1,4 +1,4 @@
-﻿import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { X } from 'lucide-react';
 import { sendClinicalChatMessage } from '../services/clinicalChatService';
 import './WorkloadBalancePanel.css';

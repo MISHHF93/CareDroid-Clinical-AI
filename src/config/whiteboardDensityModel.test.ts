@@ -1,4 +1,4 @@
-﻿import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
   WHITEBOARD_DENSITY_TIER,
   auditWhiteboardDensity,

@@ -1,4 +1,4 @@
-﻿import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
   DATA_QUALITY_RISK,
   assessPatientDataQualityRisks,
@@ -32,7 +32,7 @@ describe('dataQualityModel', () => {
       dob: '',
       sex: '',
       mrn: 'TEMP-UNK-123456',
-      chiefComplaint: 'Unknown identity — clinical care priority',
+      chiefComplaint: 'Unknown identity � clinical care priority',
       flags: ['IdentityPending'],
     };
 

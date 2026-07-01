@@ -1,4 +1,4 @@
-﻿const UNKNOWN = 'unknown';
+const UNKNOWN = 'unknown';
 
 function asArray(value) {
   if (Array.isArray(value)) return value.filter(Boolean);

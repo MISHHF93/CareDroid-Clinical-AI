@@ -1,0 +1,53 @@
+---
+pid: 28240
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "Set-Location \"C:\\Users\\borah\\CareDroid-Clinical-AI\"; npm.cmd run test:run:stable -- --reporter=dot 2>&1 | Select-Object -Last 50"
+started_at: 2026-06-30T22:09:54.624Z
+running_for_ms: 7674994  
+---
+
++   if (parentId && items.some((item) => item.id === parentId)) return parentId;
+ Test Files  89 failed | 630 passed (719)
+      Tests  118 failed | 10234 passed (10352)
+   Start at  18:09:57
+   Duration  2011.60s (transform 24.50s, setup 232.83s, import 255.78s, tests 372.85s, environment 987.41s)
+
++ 
++   // Pass 3: activePaths (broad catch-alls like whiteboard's "/emergency")
++   for (const item of items) {
++     if (item.activePaths) {
++       for (const p of item.activePaths) {
++         if (pathname === p || pathname.startsWith(p + '/')) {
++           if (p.length > bestLen) {
++             bestId = item.id;
++             bestLen = p.length;
++           }
++         }
++       }
++     }
++   }
++   return bestId;
++ }
++ 
++ export { ROLE_NAV_ORDER_OVERRIDES, ROLE_NAV_EXCLUDED_OVERRIDES, RECEPTION_FIRST_NAV_ORDER };
++
+ ❯ src/pages/emergency/ReceptionWorkspace.test.tsx:41:23
+     39|     expect(permissionsSource).toContain('ROUTES.queues');
+     40|     expect(permissionsSource).toContain('ROUTES.help');
+     41|     expect(navSource).toContain("registration_clerk: ['reception', 'pa…
+       |                       ^
+     42|     expect(navSource).toContain("'intake'");
+     43|     expect(navSource).toContain("'settings'");
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[137/144]⎯
+ FAIL  src/pages/tools/ToolsOverview.visibility.test.tsx > ToolsOverview complete visibility, search, filters, and 
+launch > labels execution modes from the executor catalog without promoting unsupported local tools
+Error: Test timed out in 10000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/pages/tools/ToolsOverview.visibility.test.tsx:387:3
+    385|   });
+    386|
+    387|   it('labels execution modes from the executor catalog without promoti…
+       |   ^
+    388|     const { container } = renderOverview();
+    389|     showAllTools();
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[138/144]⎯

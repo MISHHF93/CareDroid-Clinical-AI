@@ -3,7 +3,7 @@ import {
   getNextStates,
   isLegalTransition,
   movePatientToState as moveWithJourneyRules,
-} from '../../engine/journeyEngine';
+} from '../engine/journeyEngine';
 import { PatientFlag, PatientState, type Patient } from '../types/emergency';
 import { useEmergencyStore, type useEmergencyStore as UseEmergencyStoreType } from '../store/emergencyStore';
 import QueueIntelligenceService from './queueIntelligenceService';

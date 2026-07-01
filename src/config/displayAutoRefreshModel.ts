@@ -1,4 +1,4 @@
-ï»¿/**
+/**
  * Normalized auto-refresh for wall / kiosk display modes.
  */
 import {
@@ -67,20 +67,20 @@ export function summarizeDisplayRefreshErrors(
   const messages = Object.entries(result.errors)
     .map(([key, message]) => (message ? `${key}: ${message}` : null))
     .filter((entry): entry is string => Boolean(entry));
-  return messages.length ? messages.join(' Â· ') : null;
+  return messages.length ? messages.join(' · ') : null;
 }
 
 export function formatDisplayUpdatedAt(
   timestamp: string | null | undefined,
   now = new Date(),
 ): string {
-  if (!timestamp) return 'â€”';
+  if (!timestamp) return '—';
   try {
     const parsed = new Date(timestamp);
-    if (!Number.isFinite(parsed.getTime())) return 'â€”';
+    if (!Number.isFinite(parsed.getTime())) return '—';
     return parsed.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
   } catch {
-    return 'â€”';
+    return '—';
   }
 }
 
@@ -151,7 +151,7 @@ export function buildDepartmentStatusFallbackSnapshot(
       },
     ],
     updatedAt,
-    summaryLine: 'Live department metrics are temporarily unavailable â€” staff are restoring the feed.',
+    summaryLine: 'Live department metrics are temporarily unavailable — staff are restoring the feed.',
   };
 }
 

@@ -1,4 +1,4 @@
-﻿import { CANONICAL_ROUTES } from '../config/routes.config';
+import { CANONICAL_ROUTES } from '../config/routes.config';
 
 export const FRONTEND_OS_FLOW = Object.freeze([
   Object.freeze({

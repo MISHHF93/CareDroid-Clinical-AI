@@ -1,4 +1,4 @@
-﻿import React, { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { buildWaitingRoomStatusMessagingSnapshot } from '../../services/waitingRoomStatusMessaging';
 import './WaitingRoomStatusMessagingStrip.css';
 

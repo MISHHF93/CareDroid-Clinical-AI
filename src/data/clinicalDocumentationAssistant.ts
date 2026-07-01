@@ -1,4 +1,4 @@
-﻿export const DOCUMENTATION_NOTE_TYPES = Object.freeze([
+export const DOCUMENTATION_NOTE_TYPES = Object.freeze([
   {
     id: 'soap',
     label: 'SOAP note',

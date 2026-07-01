@@ -1,12 +1,12 @@
-ï»¿/**
- * ABCDÂ² score â€” short-term stroke risk after TIA (clinical decision support).
+/**
+ * ABCD² score — short-term stroke risk after TIA (clinical decision support).
  *
  * Reference: Johnston SC, et al. Validation and refinement of predictive models
- * to determine risk of stroke in patients with TIA. Lancet. 2007;369(9558):283â€“292.
+ * to determine risk of stroke in patients with TIA. Lancet. 2007;369(9558):283–292.
  */
 
 export const ABCD2_STROKE_DISCLAIMER =
-  'TIA / stroke risk stratification only. Does not diagnose stroke or TIA and does not recommend specific antithrombotic therapy, admission, or imaging. If acute stroke, crescendo symptoms, or new focal deficit is present, activate emergency stroke pathways immediately â€” do not delay urgent evaluation to complete scoring.';
+  'TIA / stroke risk stratification only. Does not diagnose stroke or TIA and does not recommend specific antithrombotic therapy, admission, or imaging. If acute stroke, crescendo symptoms, or new focal deficit is present, activate emergency stroke pathways immediately — do not delay urgent evaluation to complete scoring.';
 
 /** @typedef {'other' | 'speech_disturbance' | 'unilateral_weakness'} Abcd2ClinicalFeature */
 
@@ -26,8 +26,8 @@ export const ABCD2_CLINICAL_FEATURE_OPTIONS = Object.freeze([
 
 export const ABCD2_DURATION_OPTIONS = Object.freeze([
   { value: 'under_10', label: '< 10 minutes', points: 0 },
-  { value: 'ten_to_59', label: '10â€“59 minutes', points: 1 },
-  { value: 'sixty_plus', label: 'â‰¥ 60 minutes', points: 2 },
+  { value: 'ten_to_59', label: '10–59 minutes', points: 1 },
+  { value: 'sixty_plus', label: '= 60 minutes', points: 2 },
 ]);
 
 /**
@@ -55,7 +55,7 @@ export function abcd2DurationPoints(band) {
 }
 
 /**
- * @param {number} score 0â€“7
+ * @param {number} score 0–7
  * @returns {Abcd2RiskCategory | null}
  */
 export function abcd2RiskCategoryFromScore(score) {
@@ -124,20 +124,20 @@ function riskCategoryLabel(riskCategory) {
 }
 
 /**
- * @param {number} score 0â€“7
+ * @param {number} score 0–7
  */
 export function interpretAbcd2Score(score) {
   const riskCategory = abcd2RiskCategoryFromScore(score);
   if (!riskCategory) return null;
 
   const referenceLine =
-    'Johnston SC, et al. Validation and refinement of predictive models to determine risk of stroke in patients with TIA. Lancet. 2007;369(9558):283â€“292.';
+    'Johnston SC, et al. Validation and refinement of predictive models to determine risk of stroke in patients with TIA. Lancet. 2007;369(9558):283–292.';
 
   const disclaimer = ABCD2_STROKE_DISCLAIMER;
 
   const strokeRiskContextByScore = {
     0: 'Approximate 2-day stroke risk ~1% in validation cohorts',
-    1: 'Approximate 2-day stroke risk ~1â€“2%',
+    1: 'Approximate 2-day stroke risk ~1–2%',
     2: 'Approximate 2-day stroke risk ~2%',
     3: 'Approximate 2-day stroke risk ~3%',
     4: 'Approximate 2-day stroke risk ~4%',
@@ -147,10 +147,10 @@ export function interpretAbcd2Score(score) {
   };
 
   const interpretations = {
-    low: 'Scores of 0â€“3 fall in the lower short-term stroke-risk stratum after TIA in validation studies. Risk stratification for discussion and follow-up planning only.',
+    low: 'Scores of 0–3 fall in the lower short-term stroke-risk stratum after TIA in validation studies. Risk stratification for discussion and follow-up planning only.',
     moderate:
-      'Scores of 4â€“5 fall in the moderate short-term stroke-risk stratum in validation studies. Does not direct admission, imaging timing, or antithrombotic therapy.',
-    high: 'Scores of 6â€“7 fall in the higher short-term stroke-risk stratum in validation studies. Urgent stroke evaluation pathways may already be indicated by presentation â€” this score does not replace them.',
+      'Scores of 4–5 fall in the moderate short-term stroke-risk stratum in validation studies. Does not direct admission, imaging timing, or antithrombotic therapy.',
+    high: 'Scores of 6–7 fall in the higher short-term stroke-risk stratum in validation studies. Urgent stroke evaluation pathways may already be indicated by presentation — this score does not replace them.',
   };
 
   const severity = riskCategory === 'high' ? 'critical' : riskCategory === 'moderate' ? 'warning' : 'normal';
@@ -159,9 +159,9 @@ export function interpretAbcd2Score(score) {
     severity,
     riskCategory,
     riskCategoryLabel: riskCategoryLabel(riskCategory),
-    label: `ABCDÂ² score ${score}`,
+    label: `ABCD² score ${score}`,
     riskBand: `${score} of 7 points`,
-    strokeRiskContext: strokeRiskContextByScore[score] ?? 'â€”',
+    strokeRiskContext: strokeRiskContextByScore[score] ?? '—',
     interpretation: interpretations[riskCategory],
     disclaimer,
     referenceLine,

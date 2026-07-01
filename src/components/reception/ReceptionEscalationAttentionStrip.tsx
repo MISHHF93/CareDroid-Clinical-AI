@@ -1,9 +1,9 @@
-ï»¿import React, { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { buildReceptionEscalationAttentionSnapshot } from '../../services/receptionEscalationWorkflow';
 import './ReceptionEscalationAttentionStrip.css';
 
 function formatTime(timestamp) {
-  if (!timestamp) return 'â€”';
+  if (!timestamp) return '—';
   try {
     return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   } catch {
@@ -33,8 +33,8 @@ export default function ReceptionEscalationAttentionStrip({
         <p className="reception-escalation-attention-strip__eyebrow">Front desk escalation</p>
         <h3>Reception escalations need response</h3>
         <p className="reception-escalation-attention-strip__subtitle">
-          {snapshot.summary.activeCount} active Â· {snapshot.summary.criticalCount} critical Â· triage{' '}
-          {snapshot.summary.triageCount} Â· charge {snapshot.summary.chargeCount}
+          {snapshot.summary.activeCount} active · {snapshot.summary.criticalCount} critical · triage{' '}
+          {snapshot.summary.triageCount} · charge {snapshot.summary.chargeCount}
         </p>
       </header>
       <ul className="reception-escalation-attention-strip__list">
@@ -50,7 +50,7 @@ export default function ReceptionEscalationAttentionStrip({
               <span className="reception-escalation-attention-strip__title">{row.title}</span>
               <span className="reception-escalation-attention-strip__message">{row.message}</span>
               <span className="reception-escalation-attention-strip__meta">
-                {row.reasonLabel || 'Escalation'} Â· {row.targetsLabel} Â· {formatTime(row.createdAt)}
+                {row.reasonLabel || 'Escalation'} · {row.targetsLabel} · {formatTime(row.createdAt)}
               </span>
             </button>
           </li>

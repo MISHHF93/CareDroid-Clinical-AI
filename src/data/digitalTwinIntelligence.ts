@@ -1,4 +1,4 @@
-﻿import {
+import {
   calculateBedOccupancy,
   calculateResourceUtilizationIndex,
 } from '../utils/hospitalOperationsCalculators';

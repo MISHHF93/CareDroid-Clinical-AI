@@ -1,10 +1,10 @@
-ï»¿/**
- * Canadian C-Spine Rule (CCR) â€” imaging decision support in alert, stable blunt trauma.
+/**
+ * Canadian C-Spine Rule (CCR) — imaging decision support in alert, stable blunt trauma.
  *
  * Reference: Stiell IG, et al. The Canadian C-spine rule for radiography in alert and stable trauma patients.
- * JAMA. 2001;286(15):1841â€“1848.
+ * JAMA. 2001;286(15):1841–1848.
  *
- * Decision support only â€” does not clear the c-spine or replace trauma evaluation.
+ * Decision support only — does not clear the c-spine or replace trauma evaluation.
  */
 
 /** @typedef {{
@@ -30,7 +30,7 @@
  * }} CcrApplicabilityInputs */
 
 export const CCR_HIGH_RISK_META = [
-  { key: 'age65OrOlder', label: 'Age â‰¥ 65 years' },
+  { key: 'age65OrOlder', label: 'Age = 65 years' },
   { key: 'dangerousMechanism', label: 'Dangerous mechanism' },
   { key: 'paresthesiasInExtremities', label: 'Paresthesias in extremities' },
 ];
@@ -126,16 +126,16 @@ export function applyCanadianCSpineRule(input) {
 export function ccrApplicabilityWarnings(applicability: any = {}) {
   const warnings = [] as any[];
   if (applicability.gcs15AndStable === false) {
-    warnings.push('Patient is not alert and stable (GCS 15) â€” Canadian C-Spine Rule is not applicable.');
+    warnings.push('Patient is not alert and stable (GCS 15) — Canadian C-Spine Rule is not applicable.');
   }
   if (applicability.bluntTraumaContext === false) {
-    warnings.push('No blunt trauma context â€” confirm indication for CCR.');
+    warnings.push('No blunt trauma context — confirm indication for CCR.');
   }
   if (applicability.unreliableExamOrIntoxication) {
-    warnings.push('Unreliable examination or intoxication â€” do not use CCR; pursue full trauma evaluation.');
+    warnings.push('Unreliable examination or intoxication — do not use CCR; pursue full trauma evaluation.');
   }
   if (applicability.pediatricUnder16) {
-    warnings.push('Age under 16 â€” pediatric cervical spine rules may differ; CCR validation is primarily in adults.');
+    warnings.push('Age under 16 — pediatric cervical spine rules may differ; CCR validation is primarily in adults.');
   }
   return warnings;
 }
@@ -153,13 +153,13 @@ export function interpretCanadianCSpine(result, opts: any = {}) {
   const hasApplicabilityBlock = applicabilityWarnings.length > 0;
 
   const branchInterpretation = {
-    'high-risk': 'At least one high-risk factor is present â€” cervical spine imaging is indicated by the Canadian C-Spine Rule.',
+    'high-risk': 'At least one high-risk factor is present — cervical spine imaging is indicated by the Canadian C-Spine Rule.',
     'not-all-low-risk':
-      'Not all low-risk criteria are met â€” cervical spine imaging is indicated by the Canadian C-Spine Rule.',
+      'Not all low-risk criteria are met — cervical spine imaging is indicated by the Canadian C-Spine Rule.',
     'rom-fail':
-      'All low-risk criteria are met but the patient cannot actively rotate the neck 45Â° left and right â€” imaging is indicated by the rule.',
+      'All low-risk criteria are met but the patient cannot actively rotate the neck 45° left and right — imaging is indicated by the rule.',
     'rom-pass':
-      'All low-risk criteria are met and active rotation 45Â° left and right is possible â€” imaging is not indicated by the Canadian C-Spine Rule (continue clinical assessment per local protocol).',
+      'All low-risk criteria are met and active rotation 45° left and right is possible — imaging is not indicated by the Canadian C-Spine Rule (continue clinical assessment per local protocol).',
   };
 
   const imagingLabel = result.imagingIndicatedByRule
@@ -184,6 +184,6 @@ export function interpretCanadianCSpine(result, opts: any = {}) {
     pathwayDisclaimer:
       'Do not delay primary trauma survey, resuscitation, or urgently indicated imaging to complete this assessment. Follow institutional trauma and cervical spine protocols; clinician judgment overrides this tool.',
     referenceLine:
-      'Stiell IG, et al. The Canadian C-spine rule for radiography in alert and stable trauma patients. JAMA. 2001;286(15):1841â€“1848.',
+      'Stiell IG, et al. The Canadian C-spine rule for radiography in alert and stable trauma patients. JAMA. 2001;286(15):1841–1848.',
   };
 }

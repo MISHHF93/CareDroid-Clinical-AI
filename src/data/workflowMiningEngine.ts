@@ -1,4 +1,4 @@
-﻿export const WORKFLOW_MINING_SIGNAL_TYPES = Object.freeze([
+export const WORKFLOW_MINING_SIGNAL_TYPES = Object.freeze([
   'page_transition',
   'ai_launch',
   'workflow_launch',

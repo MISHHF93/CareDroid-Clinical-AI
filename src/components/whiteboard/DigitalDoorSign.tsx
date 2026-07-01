@@ -1,4 +1,4 @@
-﻿import { useMemo } from 'react';
+import { useMemo } from 'react';
 import type { Patient, Room, Staff } from '../../types/emergency';
 import { buildDigitalDoorSignSnapshot } from '../../utils/digitalDoorSignModel';
 import './DigitalDoorSign.css';
@@ -35,7 +35,7 @@ export default function DigitalDoorSign({
       {snapshot.careTeam.length ? (
         <div className="digital-door-sign__team">
           <span>Care team</span>
-          <p>{snapshot.careTeam.join(' · ')}</p>
+          <p>{snapshot.careTeam.join(' � ')}</p>
         </div>
       ) : null}
 

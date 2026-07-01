@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { MEDICAL_THEME } from '../../config/medicalTheme.constants';
 import ApiStateBanner from '../../components/ApiStateBanner';
 import { generateTimelineAi } from '../../services/clinicalIntelligenceApi';

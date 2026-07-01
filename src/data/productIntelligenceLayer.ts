@@ -1,4 +1,4 @@
-﻿export const PRODUCT_HEALTH_BANDS = Object.freeze([
+export const PRODUCT_HEALTH_BANDS = Object.freeze([
   { id: 'excellent', label: 'Excellent', minScore: 85 },
   { id: 'healthy', label: 'Healthy', minScore: 70 },
   { id: 'watch', label: 'Watch', minScore: 50 },

@@ -1,4 +1,4 @@
-﻿import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { PatientFlag, PatientState, Priority } from '../types/emergency';
 import {
   formatLongWaitAttentionForCopilot,
@@ -54,7 +54,7 @@ describe('long wait rescue helpers', () => {
       now,
     );
 
-    expect(line).toBe('ATTENTION: Longest waiting patient — Long One, 80min, P3, Back pain');
+    expect(line).toBe('ATTENTION: Longest waiting patient � Long One, 80min, P3, Back pain');
   });
 
   it('summarizes long-wait and LWBS shift metrics against CTAS targets', () => {

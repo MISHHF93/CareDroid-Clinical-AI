@@ -1,0 +1,7 @@
+---
+pid: 29300
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "Set-Location \"C:\\Users\\borah\\CareDroid-Clinical-AI\"; npx.cmd vitest run src/test/routePagesSmoke.test.tsx --reporter=dot 2>&1 | Select-Object -Last 25"
+started_at: 2026-06-30T22:42:20.542Z
+running_for_ms: 5730011  
+---

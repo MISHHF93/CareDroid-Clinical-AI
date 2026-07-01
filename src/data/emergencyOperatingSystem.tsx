@@ -1,4 +1,4 @@
-﻿import { REGISTRY } from './clinicalToolIdContract';
+import { REGISTRY } from './clinicalToolIdContract';
 import {
   COMPLAINT_FIRST_NAVIGATION_STEPS,
   CLINICAL_INTENT_ROUTES,

@@ -1,5 +1,5 @@
-ï»¿/**
- * Canonical user profile catalog â€” maps admin-assigned SaaS roles to domain access.
+/**
+ * Canonical user profile catalog — maps admin-assigned SaaS roles to domain access.
  */
 import catalogData from './user-profile-catalog.data.json';
 import { CANONICAL_ROUTES, getDefaultRouteForProfile } from './routes.config';
@@ -323,7 +323,7 @@ export function isSaasRoleCatalogComplete(): boolean {
   return SAAS_USER_ROLES.every((role) => CATALOG_BY_ROLE.has(role));
 }
 
-/** Re-export for frontend â€” mirrors backend saas-profile.constants */
+/** Re-export for frontend — mirrors backend saas-profile.constants */
 export { normalizeSaasRole, SAAS_USER_ROLES, ROLE_PERMISSION_PRESETS } from './saasProfileConstants';
 
 export const DEFAULT_SCREEN_MODE_BY_SAAS_ROLE = Object.freeze(

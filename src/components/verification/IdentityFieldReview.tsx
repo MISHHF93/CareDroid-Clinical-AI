@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { FIELD_STATUS_LABEL, fieldDecisionTone } from '../../utils/verificationWorkflow';
 import './IdentityFieldReview.css';
 

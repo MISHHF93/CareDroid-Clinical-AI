@@ -1,4 +1,4 @@
-﻿import { normalizeEmergencyRole } from './emergencyRolePermissions';
+import { normalizeEmergencyRole } from './emergencyRolePermissions';
 import { isReceptionFirstUxEnabled } from './receptionFirstUx.config';
 import { isReceptionDeskUiEnabled, RECEPTION_DESK_UI } from './receptionDeskUi.config';
 import { CARE_DROID_SCREEN_MODES } from './careDroidScreenModes';

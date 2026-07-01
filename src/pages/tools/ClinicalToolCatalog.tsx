@@ -1,4 +1,4 @@
-Ôªøimport { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
@@ -137,7 +137,7 @@ function StatusBadge({ status }) {
 
 function SortableTh({ label, sortKey, activeKey, sortDir, onSort }) {
   const active = activeKey === sortKey;
-  const indicator = active ? (sortDir === 'asc' ? ' ‚ñ≤' : ' ‚ñº') : '';
+  const indicator = active ? (sortDir === 'asc' ? ' ?' : ' ?') : '';
   return (
     <th>
       <button
@@ -251,19 +251,19 @@ function MedicalToolsTable({ rows, onOpenPath, onLaunch, sortKey, sortDir, onSor
                 <CategoryBadge category={row.category} />
               </td>
               <td data-label="Access">{row.accessSummary}</td>
-              <td data-label="Chat">{row.chatOnRequest ? 'Yes' : '‚Äî'}</td>
+              <td data-label="Chat">{row.chatOnRequest ? 'Yes' : 'ó'}</td>
               <td className="catalog-source-cell" data-label="Page / form">
                 {row.pagePath && <code>{row.pagePath}</code>}
                 {row.uiCalculatorSlug && !row.chatOnlyForm && (
                   <span>
-                    {row.pagePath ? ' ¬∑ ' : ''}
+                    {row.pagePath ? ' ∑ ' : ''}
                     form: <code>{row.uiCalculatorSlug}</code>
                   </span>
                 )}
                 {row.chatOnlyForm && row.pagePath && (
-                  <span>{row.pagePath ? ' ¬∑ ' : ''}hub (chat-assisted)</span>
+                  <span>{row.pagePath ? ' ∑ ' : ''}hub (chat-assisted)</span>
                 )}
-                {!row.pagePath && !row.uiCalculatorSlug && !row.chatOnlyForm && '‚Äî'}
+                {!row.pagePath && !row.uiCalculatorSlug && !row.chatOnlyForm && 'ó'}
               </td>
               <td className="catalog-actions-cell" data-label="Actions">
                 <div className="catalog-actions">
@@ -347,11 +347,11 @@ function DiscoveredRowsTable({ rows, onOpenPath, onLaunch, sortKey, sortDir, onS
               <td data-label="Status">
                 <StatusBadge status={row.status} />
               </td>
-              <td data-label="Category">{row.category ? <CategoryBadge category={row.category} /> : '‚Äî'}</td>
+              <td data-label="Category">{row.category ? <CategoryBadge category={row.category} /> : 'ó'}</td>
               <td className="catalog-source-cell" data-label="Notes / source">
                 {row.mapsTo && (
                   <span>
-                    ‚Üí <code>{row.mapsTo}</code>{' '}
+                    ? <code>{row.mapsTo}</code>{' '}
                   </span>
                 )}
                 {row.apiPath && <span className="catalog-api-hint">{row.apiPath} </span>}
@@ -690,8 +690,8 @@ const ClinicalToolCatalog = () => {
           IDs across this repo ({discoverySummary.nluPatternCount} NLU patterns,{' '}
           {discoverySummary.orchestratorExecutorCount} backend executors,{' '}
           {discoverySummary.phantomOrPlanned} phantom/roadmap IDs,{' '}
-          {discoverySummary.externalCatalogInRepo} external ‚Äú188-tool‚Äù import files). There is no
-          hidden file with 188 calculators‚Äîonly the entries listed below.
+          {discoverySummary.externalCatalogInRepo} external ì188-toolî import files). There is no
+          hidden file with 188 calculatorsóonly the entries listed below.
         </p>
         <div className="catalog-stats">
           <div className="catalog-stat">
@@ -749,7 +749,7 @@ const ClinicalToolCatalog = () => {
         <input
           type="search"
           className="catalog-search"
-          placeholder="Search by name, id, alias, or description‚Ä¶"
+          placeholder="Search by name, id, alias, or descriptionÖ"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           aria-label="Search developer catalog"
@@ -872,7 +872,7 @@ const ClinicalToolCatalog = () => {
         <ul className="catalog-scan-locations">
           {SOURCE_SCAN_LOCATIONS.map((loc) => (
             <li key={loc.path}>
-              <strong>{loc.label}</strong> ‚Äî <code>{loc.path}</code> ({loc.count} entries)
+              <strong>{loc.label}</strong> ó <code>{loc.path}</code> ({loc.count} entries)
             </li>
           ))}
         </ul>
@@ -932,7 +932,7 @@ const ClinicalToolCatalog = () => {
                       <StatusBadge status={row.displayStatus || row.status} />
                     </td>
                     <td data-label="Category">
-                      {row.category ? <CategoryBadge category={row.category} /> : '‚Äî'}
+                      {row.category ? <CategoryBadge category={row.category} /> : 'ó'}
                     </td>
                     <td className="catalog-source-cell" data-label="Source file(s)">
                       {(row.sources || [row.source]).filter(Boolean).join('; ')}
@@ -988,7 +988,7 @@ const ClinicalToolCatalog = () => {
           <ul className="catalog-alias-list">
             {toolIdAliases.map((a) => (
               <li key={a.id}>
-                <code>{a.id}</code> ‚Üí <code>{a.mapsTo}</code> ({a.source})
+                <code>{a.id}</code> ? <code>{a.mapsTo}</code> ({a.source})
               </li>
             ))}
           </ul>
@@ -1001,7 +1001,7 @@ const ClinicalToolCatalog = () => {
           <section className="catalog-section" id="catalog-discovery-sections">
             <h2>Emergency NLU patterns ({emergencyPatternGroups.length})</h2>
             <p className="catalog-section-desc">
-              Keyword groups from emergency.patterns.ts ‚Äî evaluated on every chat message before
+              Keyword groups from emergency.patterns.ts ó evaluated on every chat message before
               clinical tool routing.
             </p>
             <DiscoveredRowsTable
@@ -1032,7 +1032,7 @@ const ClinicalToolCatalog = () => {
           <section className="catalog-section">
             <h2>Tool orchestrator API ({orchestratorApiCapabilities.length})</h2>
             <p className="catalog-section-desc">
-              REST surface beyond execute ‚Äî list, validate, statistics, persisted results.
+              REST surface beyond execute ó list, validate, statistics, persisted results.
             </p>
             <DiscoveredRowsTable
               rows={rowsForStatus('orchestrator')}
@@ -1085,7 +1085,7 @@ const ClinicalToolCatalog = () => {
       >
         <h2>Platform &amp; chat APIs (surfaced)</h2>
         <p className="catalog-section-desc">
-          Backend chat, clinical data, and emergency capabilities‚Äîavailable from dashboard chat and
+          Backend chat, clinical data, and emergency capabilitiesóavailable from dashboard chat and
           integrations, not as separate sidebar shortcuts.
         </p>
         <div className="catalog-table-wrap catalog-table-wrap--stacked">
@@ -1298,7 +1298,7 @@ const ClinicalToolCatalog = () => {
                       {intentRow?.backendRouted && !isOrchestratorRegisteredNlu(id) && (
                         <span
                           className="catalog-inline-badge catalog-inline-badge--muted"
-                          title="NLU profile only ‚Äî not registered for POST /api/tools/:id/execute"
+                          title="NLU profile only ó not registered for POST /api/tools/:id/execute"
                         >
                           NLU API intent
                         </span>
@@ -1307,7 +1307,7 @@ const ClinicalToolCatalog = () => {
                     <td data-label="Category">
                       <CategoryBadge category={tool.category || intentRow?.category} />
                     </td>
-                    <td data-label="UI page">{intentRow?.path || '‚Äî'}</td>
+                    <td data-label="UI page">{intentRow?.path || 'ó'}</td>
                     <td className="catalog-actions-cell" data-label="Actions">
                       <div className="catalog-actions">
                         {intentRow?.path && (

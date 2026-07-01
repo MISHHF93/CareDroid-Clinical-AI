@@ -1,4 +1,4 @@
-﻿import { getCanonicalWorkspaceRegistry } from './workspaceArchitecture';
+import { getCanonicalWorkspaceRegistry } from './workspaceArchitecture';
 
 export const WORKSPACE_DEPENDENCY_TYPES = Object.freeze({
   HANDOFF: 'handoff',

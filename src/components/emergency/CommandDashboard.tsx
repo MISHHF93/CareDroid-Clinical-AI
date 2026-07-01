@@ -1,4 +1,4 @@
-ï»¿import { useMemo } from 'react';
+import { useMemo } from 'react';
 import type { ActiveShift, CapacitySnapshot, Patient, Room, Staff } from '../../types/emergency';
 import DepartmentStaffBar from '../whiteboard/DepartmentStaffBar';
 import { AIRecommendationCard } from '../ai';
@@ -282,7 +282,7 @@ export default function CommandDashboard({
               <li key={alert.patientId}>
                 <strong>{alert.patientLabel}</strong>
                 <span>
-                  Risk {alert.probabilityPercent}% Â· projected {alert.predictedHours}h
+                  Risk {alert.probabilityPercent}% · projected {alert.predictedHours}h
                 </span>
                 <small>{alert.action}</small>
               </li>
@@ -299,7 +299,7 @@ export default function CommandDashboard({
               <li key={prediction.patientId}>
                 <strong>{prediction.patientLabel}</strong>
                 <span>
-                  {prediction.orientation.toUpperCase()} Â· {prediction.probabilityPercent}%
+                  {prediction.orientation.toUpperCase()} · {prediction.probabilityPercent}%
                 </span>
               </li>
             ))}

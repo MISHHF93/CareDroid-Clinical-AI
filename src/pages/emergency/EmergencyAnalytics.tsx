@@ -1,4 +1,4 @@
-ï»¿import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Bar,
@@ -233,7 +233,7 @@ export default function EmergencyAnalytics() {
 
       {emergencyAnalytics.status === 'loading' ? (
         <p className="emergency-analytics__state emergency-analytics__state--loading" role="status" aria-live="polite">
-          Loading analyticsâ€¦
+          Loading analytics…
         </p>
       ) : null}
       {statusMessage && surfaces.analytics.showDescriptions ? (
@@ -285,19 +285,19 @@ export default function EmergencyAnalytics() {
           <ChartCard title="Capacity" subtitle="Central node score and band">
             <strong>{centralSnapshot.capacityStatus.score} {centralSnapshot.capacityStatus.band}</strong>
             <small className="emergency-analytics__source">
-              {centralSnapshot.capacityStatus.occupiedRooms} rooms occupied Â· {centralSnapshot.capacityStatus.totalPatients} active records
+              {centralSnapshot.capacityStatus.occupiedRooms} rooms occupied · {centralSnapshot.capacityStatus.totalPatients} active records
             </small>
           </ChartCard>
           <ChartCard title="EMS Pressure" subtitle="Inbound and critical pressure">
             <strong>{formatPressure(centralSnapshot.emsPressure.status)}</strong>
             <small className="emergency-analytics__source">
-              {centralSnapshot.emsPressure.inbound} inbound Â· {centralSnapshot.emsPressure.criticalInbound} critical
+              {centralSnapshot.emsPressure.inbound} inbound · {centralSnapshot.emsPressure.criticalInbound} critical
             </small>
           </ChartCard>
           <ChartCard title="Boarding" subtitle="Boarding escalation state">
             <strong>{centralSnapshot.boardingStatus.boarders}</strong>
             <small className="emergency-analytics__source">
-              {formatPressure(centralSnapshot.boardingStatus.risk)} risk Â· source central node boardingStatus
+              {formatPressure(centralSnapshot.boardingStatus.risk)} risk · source central node boardingStatus
             </small>
           </ChartCard>
           <ChartCard title="Queue Health" subtitle="Breaches and oldest wait">
@@ -311,14 +311,14 @@ export default function EmergencyAnalytics() {
           <ChartCard title="Reassessment" subtitle="Due and overdue">
             <strong>{centralSnapshot.reassessmentStatus.due}</strong>
             <small className="emergency-analytics__source">
-              {centralSnapshot.reassessmentStatus.overdue} overdue Â· next action remains human reviewed
+              {centralSnapshot.reassessmentStatus.overdue} overdue · next action remains human reviewed
             </small>
           </ChartCard>
           <ChartCard title="Triage breach timer" subtitle="Arrival to triage against site target">
             <strong>{triageBreachAnalytics.summary.breachedCount}</strong>
             <small className="emergency-analytics__source">
-              {triageBreachAnalytics.summary.breachRiskCount} at risk Â· target{' '}
-              {triageBreachAnalytics.summary.targetMinutes}m Â· longest{' '}
+              {triageBreachAnalytics.summary.breachRiskCount} at risk · target{' '}
+              {triageBreachAnalytics.summary.targetMinutes}m · longest{' '}
               {triageBreachAnalytics.summary.longestElapsedLabel}
             </small>
           </ChartCard>
@@ -327,10 +327,10 @@ export default function EmergencyAnalytics() {
             <small className="emergency-analytics__source">
               {firstAlert ? `${firstAlert.severity}: ${firstAlert.title}` : 'All clear'}
               {metricLinkedAlerts.length
-                ? ` Â· ${metricLinkedAlerts.map((entry) => `${entry.label} ${entry.count}`).join(' Â· ')}`
+                ? ` · ${metricLinkedAlerts.map((entry) => `${entry.label} ${entry.count}`).join(' · ')}`
                 : ''}
               {groupedOperationalAlerts.unmapped.length
-                ? ` Â· ${groupedOperationalAlerts.unmapped.length} other`
+                ? ` · ${groupedOperationalAlerts.unmapped.length} other`
                 : ''}
             </small>
           </ChartCard>
@@ -350,7 +350,7 @@ export default function EmergencyAnalytics() {
             <strong>{breachCauses.reduce((sum, [, count]) => sum + count, 0)}</strong>
             <small className="emergency-analytics__source">
               {breachCauses.length
-                ? breachCauses.map(([cause, count]) => `${cause.replace(/_/g, ' ')} ${count}`).join(' Â· ')
+                ? breachCauses.map(([cause, count]) => `${cause.replace(/_/g, ' ')} ${count}`).join(' · ')
                 : 'No projected breach causes'}
             </small>
           </ChartCard>
@@ -358,7 +358,7 @@ export default function EmergencyAnalytics() {
             <ChartCard title="Operational Intelligence" subtitle="Rule-based baseline health">
               <strong>{intelligenceSnapshot.modelHealth.status}</strong>
               <small className="emergency-analytics__source">
-                {intelligenceSnapshot.mode} Â· {intelligenceSnapshot.recommendations.length} advisory recommendations Â·{' '}
+                {intelligenceSnapshot.mode} · {intelligenceSnapshot.recommendations.length} advisory recommendations ·{' '}
                 {intelligenceSnapshot.disclaimers.operational}
               </small>
             </ChartCard>
@@ -492,8 +492,8 @@ export default function EmergencyAnalytics() {
           <ChartCard title="Avg Triage Time" subtitle="Arrival-to-triage target tracking">
             <strong>{avgTriageMins}</strong>
             <small className="emergency-analytics__source">
-              {triageBreachAnalytics.summary.breachedCount} breach{triageBreachAnalytics.summary.breachedCount !== 1 ? 'es' : ''} Â·{' '}
-              {triageBreachAnalytics.summary.breachRiskCount} at risk Â· target {triageBreachAnalytics.summary.targetMinutes}m
+              {triageBreachAnalytics.summary.breachedCount} breach{triageBreachAnalytics.summary.breachedCount !== 1 ? 'es' : ''} ·{' '}
+              {triageBreachAnalytics.summary.breachRiskCount} at risk · target {triageBreachAnalytics.summary.targetMinutes}m
             </small>
           </ChartCard>
         </div>

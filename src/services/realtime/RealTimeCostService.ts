@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Real-Time Cost Tracking Service
  * Provides live cost updates, trending, and alerts via WebSocket
  */

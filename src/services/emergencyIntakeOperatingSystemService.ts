@@ -1,4 +1,4 @@
-﻿import { PATIENT_JOURNEY_STATE_IDS } from '../data/patientJourneyEngine';
+import { PATIENT_JOURNEY_STATE_IDS } from '../data/patientJourneyEngine';
 
 export const INTAKE_WORKFLOW_STAGES = Object.freeze([
   'Patient Arrives',
@@ -993,7 +993,7 @@ function buildPreTriageQueue() {
         Object.freeze({
           patientId: patient.patientId,
           displayName: patient.displayName,
-          demographicSummary: `${patient.age} · ${patient.arrivalMode}`,
+          demographicSummary: `${patient.age} � ${patient.arrivalMode}`,
           queuePosition: DEMO_PATIENTS.indexOf(patient) + 1,
           arrivalOrIntakeTimestamp: `${patient.arrivalMinutesAgo} min ago`,
           complaint: patient.complaint,

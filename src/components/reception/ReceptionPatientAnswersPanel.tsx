@@ -1,4 +1,4 @@
-﻿import React, { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import {
   buildReceptionPatientAnswersSnapshot,
   formatReceptionCheckpointTime,
@@ -128,7 +128,7 @@ export default function ReceptionPatientAnswersPanel({
               <p>
                 <strong>{snapshot.focusedPatient.nextCheckpointLabel}</strong>
                 {snapshot.focusedPatient.nextCheckpointAt
-                  ? ` · ${formatReceptionCheckpointTime(snapshot.focusedPatient.nextCheckpointAt)}`
+                  ? ` � ${formatReceptionCheckpointTime(snapshot.focusedPatient.nextCheckpointAt)}`
                   : null}
               </p>
               {snapshot.focusedPatient.nextCheckpointDetail ? (

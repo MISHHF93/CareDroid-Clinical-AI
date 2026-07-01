@@ -1,4 +1,4 @@
-﻿import { CANONICAL_APP_ROUTE_TREE, CANONICAL_ROUTES } from '../config/routes.config';
+import { CANONICAL_APP_ROUTE_TREE, CANONICAL_ROUTES } from '../config/routes.config';
 
 export const PATIENT_MOVEMENT_STAGES = Object.freeze([
   'Arrival',

@@ -1,4 +1,4 @@
-ï»¿import { buildArrivalControlSnapshot } from './arrivalControlLayer';
+import { buildArrivalControlSnapshot } from './arrivalControlLayer';
 import {
   collectHighRiskComplaintLabels,
   patientHasHighRiskComplaintFlags,
@@ -54,7 +54,7 @@ export type DeteriorationWatchContext = {
   emsArrivals?: EMSArrival[];
 };
 
-const ADVISORY_LABEL = 'Advisory only â€” staff re-review required';
+const ADVISORY_LABEL = 'Advisory only — staff re-review required';
 
 const LEVEL_META: Record<
   Exclude<DeteriorationWatchLevel, 'none'>,
@@ -131,7 +131,7 @@ function detectOverdueVitals(
     return {
       id: 'overdue-vitals',
       label: 'Overdue vitals',
-      detail: `No vitals documented Â· waiting ${waitMinutes}m post-triage`,
+      detail: `No vitals documented · waiting ${waitMinutes}m post-triage`,
       tone: waitMinutes >= priorityThreshold * 2 ? 'critical' : 'watch',
     };
   }
@@ -142,7 +142,7 @@ function detectOverdueVitals(
   return {
     id: 'overdue-vitals',
     label: 'Overdue vitals',
-    detail: `Last vitals ${vitalsAgeMinutes}m ago Â· ${patient.priority} threshold ${overdueThreshold}m`,
+    detail: `Last vitals ${vitalsAgeMinutes}m ago · ${patient.priority} threshold ${overdueThreshold}m`,
     tone: vitalsAgeMinutes >= overdueThreshold * 2 ? 'critical' : 'watch',
   };
 }
@@ -167,8 +167,8 @@ function detectReassessmentDelays(patient: Patient, now: Date): DeteriorationWat
     detail: repeated
       ? `${delaySignals} overdue reassessment signal${delaySignals === 1 ? '' : 's'}`
       : timer.isOverdue
-        ? `Reassessment overdue Â· ${timer.overdueLabel || 'due now'}`
-        : `Reassessment due Â· ${timer.dueInLabel}`,
+        ? `Reassessment overdue · ${timer.overdueLabel || 'due now'}`
+        : `Reassessment due · ${timer.dueInLabel}`,
     tone: repeated || timer.isOverdue ? 'critical' : 'watch',
   };
 }
@@ -183,7 +183,7 @@ function detectHighRiskComplaint(patient: Patient): DeteriorationWatchFactor | n
     id: 'high-risk-complaint',
     label: 'High-risk complaint category',
     detail: labels.length
-      ? `${labels.join(', ')} Â· rapid review context`
+      ? `${labels.join(', ')} · rapid review context`
       : 'High-risk complaint flags active',
     tone: patientNeedsRapidReview(patient) ? 'critical' : 'watch',
   };
@@ -241,7 +241,7 @@ function detectEmsIntakeObservation(
   return {
     id: 'ems-intake-observation',
     label: 'Abnormal EMS / intake observation',
-    detail: observations.join(' Â· '),
+    detail: observations.join(' · '),
     tone,
   };
 }
@@ -306,8 +306,8 @@ export function resolveDeteriorationWatch(
     factors,
     staffDetail: [
       ADVISORY_LABEL,
-      factors.map((factor) => `${factor.label}: ${factor.detail}`).join(' Â· '),
-    ].join(' â€” '),
+      factors.map((factor) => `${factor.label}: ${factor.detail}`).join(' · '),
+    ].join(' — '),
   };
 }
 
@@ -365,7 +365,7 @@ export function buildDeteriorationWatchAlerts(
       id: `deterioration-watch-${snapshot.level}-${patient.id}`,
       type: 'OperationalIntelligence' as const,
       severity: snapshot.level === 'urgent-review' ? ('Critical' as const) : ('Warning' as const),
-      title: `${snapshot.label} â€” ${patientDisplayName(patient)}`,
+      title: `${snapshot.label} — ${patientDisplayName(patient)}`,
       message: `${ADVISORY_LABEL}. ${snapshot.factors.map((factor) => factor.label).join(', ')}.`,
       patientId: patient.id,
       createdAt: patient.arrivalTime || now.toISOString(),

@@ -1,4 +1,4 @@
-﻿import { useMemo } from 'react';
+import { useMemo } from 'react';
 import type { Alert, EMSArrival, Patient, Referral, Staff } from '../../types/emergency';
 import WhiteboardAlertRail from './WhiteboardAlertRail';
 import {

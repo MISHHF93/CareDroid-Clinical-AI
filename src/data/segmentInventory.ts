@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Canonical product segment inventory.
  *
  * This is the segment-level counterpart to `toolInventory.js`: it does not

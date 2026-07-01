@@ -1,0 +1,14 @@
+---
+pid: 26360
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cd C:\\Users\\borah\\CareDroid-Clinical-AI; npm.cmd run test:responsive-regression 2>&1"
+started_at: 2026-06-30T23:15:44.880Z
+running_for_ms: 3725004  
+---
+
+> caredroid-clinical-ai@1.0.0 test:responsive-regression
+> vitest run src/test/routePagesSmoke.test.tsx src/test/responsiveRegression.coverage.test.ts src/pages/tools/ClinicalToolCatalog.launchButtons.test.tsx src/pages/tools/Calculators.formSmoke.test.tsx src/layout/AppShell.navigation.test.tsx src/pages/tools/ClinicalToolCatalog.responsive.test.ts src/pages/tools/Calculators.responsive.test.ts src/styles/responsiveUx.test.ts src/layout/AppShell.layout.test.tsx
+
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+

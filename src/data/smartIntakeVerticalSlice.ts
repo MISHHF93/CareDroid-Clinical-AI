@@ -1,4 +1,4 @@
-﻿import { PatientState, Priority } from '../types/emergency';
+import { PatientState, Priority } from '../types/emergency';
 import { buildPatientArrivalRecord, syncPatientFromArrival } from '../services/patientArrivalModel';
 
 export const SMART_INTAKE_VERTICAL_SLICE_FIXTURE = Object.freeze({

@@ -1,4 +1,4 @@
-ï»¿import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import {
   buildReceptionEscalationTargetsLabel,
@@ -66,7 +66,7 @@ export default function ReceptionEscalationPanel({
       };
       setLastConfirmation(confirmation);
       toast.success(RECEPTION_COPY.escalation.submitSuccess, {
-        description: `${confirmation.reasonLabel} Â· ${confirmation.targetsLabel}`,
+        description: `${confirmation.reasonLabel} · ${confirmation.targetsLabel}`,
       });
       setReasonId(null);
       setDetail('');
@@ -100,7 +100,7 @@ export default function ReceptionEscalationPanel({
           <div className="reception-escalation-panel__confirmation" role="status">
             <strong>{RECEPTION_COPY.escalation.confirmationTitle}</strong>
             <p>
-              {lastConfirmation.reasonLabel} Â· {lastConfirmation.targetsLabel}
+              {lastConfirmation.reasonLabel} · {lastConfirmation.targetsLabel}
             </p>
             <p>{RECEPTION_COPY.escalation.confirmationBody}</p>
             <button type="button" onClick={() => setLastConfirmation(null)}>

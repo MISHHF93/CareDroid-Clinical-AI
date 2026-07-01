@@ -1,4 +1,4 @@
-﻿import {
+import {
   getDemoLiveStateDescription,
   getDemoLiveStateLabel,
 } from '../utils/demoLiveState';

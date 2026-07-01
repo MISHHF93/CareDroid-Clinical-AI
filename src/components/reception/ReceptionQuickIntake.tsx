@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { FormEvent, KeyboardEvent } from 'react';
 import { PatientFlag, type Patient, type ArrivalMode, type QuickSafetyFlag, type HighRiskComplaintFlagId } from '../../types/emergency';
 import { useEmergencyStore } from '../../store/emergencyStore';
@@ -18,11 +18,11 @@ import {
 import DuplicateReviewAlert from '../verification/DuplicateReviewAlert';
 import { RECEPTION_COPY } from './receptionCopy';
 import {
-  buildReceptionQuickIntakePatient,
   calculateAgeFromDob,
-  persistReceptionQuickIntakePatient,
   splitPatientName,
 } from '../../services/receptionQuickIntakeService';
+import { routeQuickIntakeThroughOrchestrator } from '../../services/receptionIntakeOrchestrator';
+import { completeReceptionHandoff } from '../../services/receptionHandoff';
 import HighRiskComplaintFlagSelector from './HighRiskComplaintFlagSelector';
 import './ReceptionQuickIntake.css';
 
@@ -71,7 +71,6 @@ export default function ReceptionQuickIntake({
 }: ReceptionQuickIntakeProps) {
   const emergencyRole = useEmergencyRolePermissions();
   const patients = useEmergencyStore((state) => state.patients);
-  const addPatient = useEmergencyStore((state) => state.addPatient);
   const updatePatient = useEmergencyStore((state) => state.updatePatient);
   const registerArrivalControlForPatient = useEmergencyStore((state) => state.registerArrivalControl);
 
@@ -211,36 +210,46 @@ export default function ReceptionQuickIntake({
       return;
     }
 
-    const patient = buildReceptionQuickIntakePatient(
-      {
-        firstName,
-        lastName,
-        dob: dob || undefined,
-        healthCard,
-        phone,
-        complaint,
-        arrivalMode,
-        quickSafetyFlags,
-        selectedComplaintFlags,
-        quickNotes,
-        existingPatient: selectedPatient,
-      },
-      { actorId: emergencyRole.role },
-    );
-
     setSubmitting(true);
     setSubmitError('');
 
     try {
-      const { patient: persistedPatient } = await persistReceptionQuickIntakePatient(
-        { patients, addPatient, updatePatient },
-        patient,
-        { isNew: !selectedPatient },
-      );
-
-      registerArrivalControlForPatient(persistedPatient.id, { source: 'reception-quick-intake' });
-
-      onCompleted(persistedPatient);
+      if (selectedPatient) {
+        updatePatient(selectedPatient.id, {
+          chiefComplaint: complaint.trim(),
+          complaint: complaint.trim(),
+          quickSafetyFlags,
+          phone: phone.trim() || selectedPatient.phone,
+        });
+        completeReceptionHandoff(useEmergencyStore.getState(), {
+          patientId: selectedPatient.id,
+          source: 'reception-quick-intake',
+          actorName: emergencyRole.roleLabel,
+        });
+        registerArrivalControlForPatient(selectedPatient.id, { source: 'reception-quick-intake' });
+        onCompleted(selectedPatient);
+      } else {
+        const routeResult = await routeQuickIntakeThroughOrchestrator(
+          {
+            firstName,
+            lastName,
+            dob: dob || undefined,
+            healthCard,
+            phone,
+            complaint,
+            arrivalMode,
+            quickSafetyFlags,
+            selectedComplaintFlags,
+            quickNotes,
+          },
+          {
+            actorName: emergencyRole.roleLabel || 'Reception',
+            actorStaffId: emergencyRole.canonicalProfile?.employeeId || emergencyRole.canonicalProfile?.id,
+          },
+        );
+        registerArrivalControlForPatient(routeResult.patientId, { source: 'reception-quick-intake' });
+        onCompleted(routeResult.patient);
+      }
       if (isInline) {
         resetForm();
         searchRef.current?.focus();
@@ -312,7 +321,7 @@ export default function ReceptionQuickIntake({
             onClick={closeWithConfirm}
             aria-label={copy.closeLabel}
           >
-            ×
+            �
           </button>
         ) : null}
       </header>
@@ -334,7 +343,7 @@ export default function ReceptionQuickIntake({
         {selectedPatient ? (
           <div className="reception-quick-intake__selected">
             <span>
-              Using chart: <strong>{getPatientDisplayName(selectedPatient)}</strong> ·{' '}
+              Using chart: <strong>{getPatientDisplayName(selectedPatient)}</strong> �{' '}
               {selectedPatient.mrn}
             </span>
             <button type="button" onClick={clearSelectedPatient}>
@@ -353,7 +362,7 @@ export default function ReceptionQuickIntake({
                 >
                   {getPatientDisplayName(patient)}
                   <small>
-                    {patient.mrn} · DOB {patient.dob || '—'} · {patient.state}
+                    {patient.mrn} � DOB {patient.dob || '�'} � {patient.state}
                   </small>
                 </button>
               </li>

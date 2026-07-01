@@ -1,4 +1,4 @@
-﻿import {
+import {
   FEATURE_FLAG_REGISTRY,
   FEATURE_FLAG_STATES,
   normalizeFeatureFlagState,

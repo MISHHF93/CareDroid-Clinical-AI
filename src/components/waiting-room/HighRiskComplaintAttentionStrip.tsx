@@ -1,4 +1,4 @@
-﻿import React, { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { buildHighRiskComplaintBoardSummary } from '../../services/highRiskComplaintFlags';
 import HighRiskComplaintFlagBadge from '../reception/HighRiskComplaintFlagBadge';
 import './HighRiskComplaintAttentionStrip.css';
@@ -24,7 +24,7 @@ export default function HighRiskComplaintAttentionStrip({
           <p className="high-risk-complaint-strip__eyebrow">Staff alert</p>
           <h3>High-risk complaint flags</h3>
           <p className="high-risk-complaint-strip__subtitle">
-            Fast flags highlight urgency and route to rapid review — they do not autonomously triage.
+            Fast flags highlight urgency and route to rapid review � they do not autonomously triage.
           </p>
         </div>
         <div className="high-risk-complaint-strip__counts">

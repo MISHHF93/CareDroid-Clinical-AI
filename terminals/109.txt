@@ -1,0 +1,99 @@
+---
+pid: 9084
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "Set-Location C:\\Users\\borah\\CareDroid-Clinical-AI; npm.cmd run test:responsive-regression; Write-Host \"EXIT:$LASTEXITCODE\""
+started_at: 2026-06-30T22:30:26.334Z
+running_for_ms: 389989   
+---
+
+> caredroid-clinical-ai@1.0.0 test:responsive-regression
+> vitest run src/test/routePagesSmoke.test.tsx src/test/responsiveRegression.coverage.test.ts src/pages/tools/ClinicalToolCatalog.launchButtons.test.tsx src/pages/tools/Calculators.formSmoke.test.tsx src/layout/AppShell.navigation.test.tsx src/pages/tools/ClinicalToolCatalog.responsive.test.ts src/pages/tools/Calculators.responsive.test.ts src/styles/responsiveUx.test.ts src/layout/AppShell.layout.test.tsx
+
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+ ❯ src/styles/responsiveUx.test.ts (0 test)
+ ❯ src/test/routePagesSmoke.test.tsx (0 test)
+ ✓ src/pages/tools/Calculators.formSmoke.test.tsx (235 tests) 49291ms
+     ✓ renders calculators hub with chat-assisted section and selection cards  2284ms
+     ✓ 'sofa' renders calculator interface, inputs, and calculate action  347ms
+     ✓ 'qsofa' renders calculator interface, inputs, and calculate action  362ms
+     ✓ 'news2' renders calculator interface, inputs, and calculate action  316ms
+     ✓ 'has-bled' renders calculator interface, inputs, and calculate action  314ms
+     ✓ 'egfr-ckd-epi' renders calculator interface, inputs, and calculate action  327ms
+     ✓ 'creatinine-clearance-cg' renders calculator interface, inputs, and calculate action  327ms
+     ✓ 'fena' renders calculator interface, inputs, and calculate action  303ms
+     ✓ 'feurea' renders calculator interface, inputs, and calculate action  358ms
+     ✓ 'kfre' renders calculator interface, inputs, and calculate action  324ms
+     ✓ 'ideal-body-weight' renders calculator interface, inputs, and calculate action  346ms
+     ✓ 'adjusted-body-weight' renders calculator interface, inputs, and calculate action  334ms
+     ✓ 'pneumonia-severity-index' renders calculator interface, inputs, and calculate action  306ms
+     ✓ 'asthma-severity-score' renders calculator interface, inputs, and calculate action  303ms
+     ✓ 'cage' renders calculator interface, inputs, and calculate action  304ms
+     ✓ 'mmse' renders calculator interface, inputs, and calculate action  328ms
+     ✓ 'pcl5' renders calculator interface, inputs, and calculate action  353ms
+     ✓ 'mdq' renders calculator interface, inputs, and calculate action  332ms
+     ✓ 'epworth-sleepiness-scale' renders calculator interface, inputs, and calculate action  333ms
+     ✓ 'columbia-suicide-severity-workflow' renders calculator interface, inputs, and calculate action  330ms
+     ✓ 'heart-score' renders calculator interface, inputs, and calculate action  322ms
+     ✓ 'centor-mcisaac' renders calculator interface, inputs, and calculate action  311ms
+     ✓ 'gestational-age-calculator' renders calculator interface, inputs, and calculate action  331ms
+     ✓ 'pediatric-bp-percentile' renders calculator interface, inputs, and calculate action  423ms
+     ✓ 'pregnancy-due-date-calculator' renders calculator interface, inputs, and calculate action  347ms
+     ✓ 'fenton-growth-chart-helper' renders calculator interface, inputs, and calculate action  335ms
+     ✓ 'ranson-criteria' renders calculator interface, inputs, and calculate action  305ms
+     ✓ '/tools/calculators/fenton-growth-char…' route renders non-empty usable calculator form  318ms
+     ✓ '/tools/calculators/gestational-age-ca…' route renders non-empty usable calculator form  342ms
+     ✓ '/tools/calculators/hunt-hess-scale' route renders non-empty usable calculator form  307ms
+     ✓ '/tools/calculators/pao2-fio2-ratio' route renders non-empty usable calculator form  352ms
+     ✓ has-bled exposes reset control for mobile form completion  308ms
+ ✓ src/pages/tools/ClinicalToolCatalog.launchButtons.test.tsx (3 tests) 22303ms
+     ✓ renders catalog search and category quick filters  1973ms
+     ✓ shows launch or open actions for launchable medical catalog rows  19118ms
+     ✓ includes Wells PE launch control discoverable by tool name  1204ms
+ ✓ src/layout/AppShell.navigation.test.tsx (8 tests) 230ms
+ ✓ src/test/responsiveRegression.coverage.test.ts (5 tests) 18ms
+ ✓ src/pages/tools/Calculators.responsive.test.ts (33 tests) 14ms
+ ✓ src/pages/tools/ClinicalToolCatalog.responsive.test.ts (11 tests) 12ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 2 ⎯⎯⎯⎯⎯⎯⎯
+
+
+ Test Files  2 failed | 6 passed (8)
+      Tests  295 passed (295)
+   Start at  18:30:29
+   Duration  102.48s (transform 4.79s, setup 4.23s, import 8.56s, tests 71.87s, environment 14.94s)
+
+ FAIL  src/styles/responsiveUx.test.ts [ src/styles/responsiveUx.test.ts ]
+Error: ENOENT: no such file or directory, open 'C:\Users\borah\CareDroid-Clinical-AI\src\layout\AppShell.css'
+ ❯ src/styles/responsiveUx.test.ts:18:21
+     16| const indexCss = readFileSync(join(__dirname, '../index.css'), 'utf8');
+     17| const mainJsx = readFileSync(join(__dirname, '../main.tsx'), 'utf8');
+     18| const appShellCss = readFileSync(join(__dirname, '../layout/AppShell.c…
+       |                     ^
+     19| const quickCommandCss = readFileSync(
+     20|   join(__dirname, '../components/CommandPalette.css'),
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/test/routePagesSmoke.test.tsx [ src/test/routePagesSmoke.test.tsx ]
+Error: Failed to resolve import "../pages/Artifacts" from "src/test/routePagesSmoke.test.tsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: C:/Users/borah/CareDroid-Clinical-AI/src/test/routePagesSmoke.test.tsx:24:0
+  589 |  const __vi_import_16__ = await import("../pages/tools/ClinicalAudit");
+  590 |  const __vi_import_17__ = await import("../pages/tools/Protocols");
+  591 |  const __vi_import_18__ = await import("../pages/Artifacts");
+      |                                        ^
+  592 |  const __vi_import_19__ = await import("../pages/MemoryDashboard");
+  593 |  const __vi_import_20__ = await import("../pages/TrainingDashboard");
+ ❯ TransformPluginContext._formatLog node_modules/vite/dist/node/chunks/config.js:29079:43
+ ❯ TransformPluginContext.error node_modules/vite/dist/node/chunks/config.js:29076:14
+ ❯ normalizeUrl node_modules/vite/dist/node/chunks/config.js:27199:18
+ ❯ node_modules/vite/dist/node/chunks/config.js:27257:32
+ ❯ TransformPluginContext.transform node_modules/vite/dist/node/chunks/config.js:27225:4
+ ❯ EnvironmentPluginContainer.transform node_modules/vite/dist/node/chunks/config.js:28877:14
+ ❯ loadAndTransform node_modules/vite/dist/node/chunks/config.js:22746:26
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+EXIT:1

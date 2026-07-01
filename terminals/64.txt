@@ -1,0 +1,438 @@
+---
+pid: 13532
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cmd /c \"cd /d C:\\Users\\borah\\CareDroid-Clinical-AI && npm run test:run -- src/routing 2>&1\""
+started_at: 2026-06-30T20:23:31.216Z
+running_for_ms: 5569991  
+---
+
+> caredroid-clinical-ai@1.0.0 test:run
+> vitest run src/routing
+
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+ ❯ src/routing/canonicalRouteTree.routesD.test.tsx (5 tests | 5 failed) 693ms
+     × /emergency/copilot opens the docked copilot on the whiteboard 282ms
+     × /assistant redirects to the docked Emergency Copilot experience 126ms
+     × /chat redirects to the docked Emergency Copilot experience 99ms
+     × /ai redirects to the docked Emergency Copilot experience 95ms
+     × /copilot redirects to the docked Emergency Copilot experience 87ms
+ ✓ src/routing/canonicalRouteTree.sidebar.test.tsx (29 tests) 4101ms
+     ✓ loads sidebar destination 'Reports' ('/emergency/reports') without an access-denied surface  1085ms
+ ✓ src/routing/canonicalAppRoutes.deepLink.test.tsx (11 tests) 2256ms
+     ✓ renders /emergency/ems inside the AppShell  355ms
+     ✓ redirects /settings/features to Feature Flags  775ms
+ ✓ src/routing/canonicalRouteTree.routesA.test.tsx (4 tests) 891ms
+     ✓ /emergency/whiteboard renders the active CareDroid whiteboard  398ms
+ ✓ src/routing/canonicalRouteTree.redirects.test.tsx (11 tests) 1302ms
+     ✓ /tools/catalog redirects to Medical Tools with intent preserved  316ms
+ ✓ src/routing/canonicalRouteTree.routesC.test.tsx (4 tests) 921ms
+ ✓ src/routing/canonicalRouteTree.routesB.test.tsx (4 tests) 820ms
+ ✓ src/routing/canonicalRouteTree.shell.test.tsx (3 tests) 591ms
+     ✓ keeps primary shell controls and representative sidebar links exposed  392ms
+ ✓ src/routing/routeAuthRebuild.test.ts (5 tests) 7ms
+ ✓ src/routing/canonicalRouteTree.routesE.test.tsx (5 tests) 2466ms
+     ✓ /emergency/tools renders Medical Tools inside the active shell  1315ms
+     ✓ /emergency/analytics renders the CareDroid analytics route  617ms
+ ✓ src/routing/sectionLinkInventory.test.ts (33 tests) 10ms
+ ✓ src/routing/canonicalRouteRedirects.test.ts (5 tests) 7ms
+ ✓ src/routing/routeAliasFixtures.test.ts (23 tests) 6ms
+ ✓ src/routing/workspaceSubpageRoutes.test.ts (2 tests) 5ms
+ ✓ src/routing/authRouteFlow.test.tsx (3 tests) 4ms
+ ✓ src/routing/routeHealth.test.ts (5 tests) 4ms
+ ✓ src/routing/codexCardRouteMounts.test.ts (3 tests) 4ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/routing/canonicalRouteTree.routesD.test.tsx > canonical route tree — copilot aliases > /emergency/copilot opens the docked copilot on the whiteboard
+TestingLibraryElementError: Unable to find an element with the title: /Open CareDroid Copilot/i.
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="emergency-app-shell emergency-app-shell--density-compact emergency-app-shell--screen-density-high-operational emergency-app-shell--copilot-open"
+    >
+      <a
+        class="ed-skip-link"
+        href="#main-content"
+      >
+        Skip to main content
+      </a>
+      <nav
+        aria-label="Emergency desktop navigation"
+      >
+        <a
+          aria-current="page"
+          href="/emergency/whiteboard"
+        >
+          Dashboard
+        </a>
+        <a
+          href="/emergency/ems"
+        >
+          EMS
+        </a>
+        <a
+          href="/emergency/tools"
+        >
+          Medical Tools
+        </a>
+        <a
+          href="/emergency/analytics"
+        >
+          Analytics
+        </a>
+        <a
+          href="/emergency/settings"
+        >
+          Settings
+        </a>
+        <a
+          href="/emergency/patients"
+        >
+          Patients
+        </a>
+        <a
+          href="/emergency/queues"
+        >
+          Queue
+        </a>
+        <a
+          href="/emergency/copilot"
+        >
+          AI Chief
+        </a>
+      </nav>
+      <div
+        class="emergency-app-shell__main-column"
+      >
+        <header>
+          <button
+            type="button"
+          >
+            + Central Intake
+          </button>
+          <div
+            aria-label="Operational command context"
+          />
+        </header>
+        <div
+          aria-live="polite"
+          class="session-chrome-bar session-chrome-bar--with-copilot"
+          role="status"
+        >
+          <div
+            class="session-chrome-bar__segments"
+          >
+            <div
+              aria-label="CareDroid Copilot controls"
+              class="session-chrome-bar__copilot-group"
+              role="group"
+            >
+              <button
+                aria-pressed="true"
+                class="session-chrome-bar__segment session-chrome-bar__segment--copilot session-chrome-bar__segment--active"
+                title="Close CareDroid Copilot (C)"
+                type="button"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="tabler-icon tabler-icon-sparkles "
+                  fill="none"
+                  height="14"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.75"
+                  viewBox="0 0 24 24"
+                  width="14"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M16 18a2 2 0 0 1 2 2a2 2 0 0 1 2 -2a2 2 0 0 1 -2 -2a2 2 0 0 1 -2 2m0 -12a2 2 0 0 1 2 2a2 2 0 0 1 2 -2a2 2 0 0 1 -2 -2a2 2 0 0 1 -2 2m-7 12a6 6 0 0 1 6 -6a6 6 0 0 1 -6 -6a6 6 0 0 1 -6 6a6 6 0 0 1 6 6"
+                  />
+                </svg>
+                <strong>
+                  CareDroid Copilot
+                </strong>
+                <span>
+                  Panel open
+                </span>
+              </button>
+              <button
+                aria-pressed="true"
+                class="session-chrome-bar__pill session-chrome-bar__pill--copilot-tab session-chrome-bar__pill--active"
+                type="button"
+              >
+                Chat
+              </button>
+            </div>
+          </div>
+          <div
+            class="session-chrome-bar__actions"
+          >
+            <button
+              class="session-chrome-bar__pill help-trigger--pill"
+              title="Open CareDroid process guide (?)"
+              type="button"
+            >
+              Guide ?
+            </button>
+            <button
+              aria-controls="session-chrome-demo-drawer"
+              aria-expanded="false"
+              class="session-chrome-bar__pill"
+              type="button"
+            >
+              Demo · 
+              Physician
+            </button>
+          </div>
+        </div>
+        <main
+          class="app-shell-main-content"
+          data-practitioner-compact="true"
+          data-screen-density-mode="high-operational"
+          id="main-content"
+          role="main"
+          tabindex="-1"
+        >
+          <div
+            role="status"
+            style="padding: 24px; color: rgb(156, 163, 175);"
+          >
+            Loading whiteboard...
+          </div>
+        </main>
+      </div>
+      <section
+        aria-atomic="false"
+        aria-label="Notifications alt+T"
+        aria-live="polite"
+        aria-relevant="additions text"
+        tabindex="-1"
+      />
+    </div>
+    <output
+      data-testid="location"
+    >
+      /emergency/whiteboard
+    </output>
+  </div>
+</body>
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/routing/canonicalRouteTree.routesD.test.tsx:21:19
+     19|       await screen.findByTestId('location', { timeout: ROUTE_LOAD_TIME…
+     20|     ).toHaveTextContent('/emergency/whiteboard');
+     21|     expect(screen.getByTitle(/Open CareDroid Copilot/i)).toBeInTheDocu…
+       |                   ^
+     22|   }, ROUTE_LOAD_TIMEOUT);
+     23|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  src/routing/canonicalRouteTree.routesD.test.tsx > canonical route tree — copilot aliases > /assistant redirects to the docked Emergency Copilot experience
+ FAIL  src/routing/canonicalRouteTree.routesD.test.tsx > canonical route tree — copilot aliases > /chat redirects to the docked Emergency Copilot experience
+ FAIL  src/routing/canonicalRouteTree.routesD.test.tsx > canonical route tree — copilot aliases > /ai redirects to the docked Emergency Copilot experience
+ FAIL  src/routing/canonicalRouteTree.routesD.test.tsx > canonical route tree — copilot aliases > /copilot redirects to the docked Emergency Copilot experience
+TestingLibraryElementError: Unable to find an element with the title: /Open CareDroid Copilot/i.
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="emergency-app-shell emergency-app-shell--density-compact emergency-app-shell--screen-density-high-operational emergency-app-shell--copilot-open"
+    >
+      <a
+        class="ed-skip-link"
+        href="#main-content"
+      >
+        Skip to main content
+      </a>
+      <nav
+        aria-label="Emergency desktop navigation"
+      >
+        <a
+          aria-current="page"
+          href="/emergency/whiteboard"
+        >
+          Dashboard
+        </a>
+        <a
+          href="/emergency/ems"
+        >
+          EMS
+        </a>
+        <a
+          href="/emergency/tools"
+        >
+          Medical Tools
+        </a>
+        <a
+          href="/emergency/analytics"
+        >
+          Analytics
+        </a>
+        <a
+          href="/emergency/settings"
+        >
+          Settings
+        </a>
+        <a
+          href="/emergency/patients"
+        >
+          Patients
+        </a>
+        <a
+          href="/emergency/queues"
+        >
+          Queue
+        </a>
+        <a
+          href="/emergency/copilot"
+        >
+          AI Chief
+        </a>
+      </nav>
+      <div
+        class="emergency-app-shell__main-column"
+      >
+        <header>
+          <button
+            type="button"
+          >
+            + Central Intake
+          </button>
+          <div
+            aria-label="Operational command context"
+          />
+        </header>
+        <div
+          aria-live="polite"
+          class="session-chrome-bar session-chrome-bar--with-copilot"
+          role="status"
+        >
+          <div
+            class="session-chrome-bar__segments"
+          >
+            <div
+              aria-label="CareDroid Copilot controls"
+              class="session-chrome-bar__copilot-group"
+              role="group"
+            >
+              <button
+                aria-pressed="true"
+                class="session-chrome-bar__segment session-chrome-bar__segment--copilot session-chrome-bar__segment--active"
+                title="Close CareDroid Copilot (C)"
+                type="button"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="tabler-icon tabler-icon-sparkles "
+                  fill="none"
+                  height="14"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.75"
+                  viewBox="0 0 24 24"
+                  width="14"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M16 18a2 2 0 0 1 2 2a2 2 0 0 1 2 -2a2 2 0 0 1 -2 -2a2 2 0 0 1 -2 2m0 -12a2 2 0 0 1 2 2a2 2 0 0 1 2 -2a2 2 0 0 1 -2 -2a2 2 0 0 1 -2 2m-7 12a6 6 0 0 1 6 -6a6 6 0 0 1 -6 -6a6 6 0 0 1 -6 6a6 6 0 0 1 6 6"
+                  />
+                </svg>
+                <strong>
+                  CareDroid Copilot
+                </strong>
+                <span>
+                  Panel open
+                </span>
+              </button>
+              <button
+                aria-pressed="true"
+                class="session-chrome-bar__pill session-chrome-bar__pill--copilot-tab session-chrome-bar__pill--active"
+                type="button"
+              >
+                Chat
+              </button>
+            </div>
+          </div>
+          <div
+            class="session-chrome-bar__actions"
+          >
+            <button
+              class="session-chrome-bar__pill help-trigger--pill"
+              title="Open CareDroid process guide (?)"
+              type="button"
+            >
+              Guide ?
+            </button>
+            <button
+              aria-controls="session-chrome-demo-drawer"
+              aria-expanded="false"
+              class="session-chrome-bar__pill"
+              type="button"
+            >
+              Demo · 
+              Physician
+            </button>
+          </div>
+        </div>
+        <main
+          class="app-shell-main-content"
+          data-practitioner-compact="true"
+          data-screen-density-mode="high-operational"
+          id="main-content"
+          role="main"
+          tabindex="-1"
+        >
+          <div
+            role="status"
+            style="padding: 24px; color: rgb(156, 163, 175);"
+          >
+            Loading whiteboard...
+          </div>
+        </main>
+      </div>
+      <section
+        aria-atomic="false"
+        aria-label="Notifications alt+T"
+        aria-live="polite"
+        aria-relevant="additions text"
+        tabindex="-1"
+      />
+    </div>
+    <output
+      data-testid="location"
+    >
+      /emergency/whiteboard
+    </output>
+  </div>
+</body>
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/routing/canonicalRouteTree.routesD.test.tsx:32:21
+     30|         '/emergency/whiteboard',
+     31|       );
+     32|       expect(screen.getByTitle(/Open CareDroid Copilot/i)).toBeInTheDo…
+       |                     ^
+     33|     },
+     34|     ROUTE_LOAD_TIMEOUT,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+
+ Test Files  1 failed | 16 passed (17)
+      Tests  5 failed | 150 passed (155)
+   Start at  16:23:32
+   Duration  47.81s (transform 5.44s, setup 3.45s, import 12.64s, tests 14.09s, environment 14.98s)
+

@@ -1,4 +1,4 @@
-﻿import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import appConfig from '../config/appConfig';
 import { AUTH_CONFIG } from '../config/auth.config';
 import { deriveAuthMode } from '../auth/authSession';

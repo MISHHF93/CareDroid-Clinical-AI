@@ -1,4 +1,4 @@
-﻿import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { render } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import ReceptionWorkspace from './ReceptionWorkspace';
@@ -42,11 +42,16 @@ vi.mock('../../hooks/useProfileNavigate', () => ({
 
 vi.mock('../../hooks/useReceptionDeskUi', () => ({
   default: () => ({
+    enabled: true,
     slim: false,
     inlineQuickIntake: false,
     stripMetricIds: null,
     show: () => true,
   }),
+}));
+
+vi.mock('../../hooks/useRouteScreenMode', () => ({
+  default: () => 'reception',
 }));
 
 const originalState = useEmergencyStore.getState();

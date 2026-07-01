@@ -1,4 +1,4 @@
-﻿import { dispatchAlert } from '../engine/alertEngine';
+import { dispatchAlert } from '../engine/alertEngine';
 import logger from '../utils/logger';
 
 const DEFAULT_ERROR_MESSAGE = 'Unable to reach the API. Try again or check backend availability.';

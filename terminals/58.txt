@@ -1,0 +1,25 @@
+---
+pid: 33528
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cd \"C:\\Users\\borah\\CareDroid-Clinical-AI\"; npm run test:run -- src/routing 2>&1 | Select-Object -Last 20"
+started_at: 2026-06-30T19:48:38.131Z
+running_for_ms: 1015002  
+---
+
+ FAIL  src/routing/sectionLinkInventory.test.ts > section link inventory and route flattening > keeps visible links 
+ Test Files  14 failed | 3 passed (17)
+      Tests  33 failed | 122 passed (155)
+   Start at  15:48:39
+   Duration  151.84s (transform 6.12s, setup 6.41s, import 21.42s, tests 94.51s, environment 25.43s)
+
+off deprecated route aliases
+Error: ENOENT: no such file or directory, open 'C:\Users\borah\CareDroid-Clinical-AI\src\pages\PlatformEntryHub.jsx'
+ ❯ read src/routing/sectionLinkInventory.test.ts:18:32
+     16| const __dirname = dirname(fileURLToPath(import.meta.url));
+     17| const srcRoot = join(__dirname, '..');
+     18| const read = (relativePath) => readFileSync(join(srcRoot, relativePath…
+       |                                ^
+     19|
+     20| const visibleLinkInventory = [
+ ❯ src/routing/sectionLinkInventory.test.ts:117:22
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[30/33]⎯

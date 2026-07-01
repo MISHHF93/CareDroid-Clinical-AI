@@ -1,4 +1,4 @@
-﻿import { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import ApiStateBanner from '../../components/ApiStateBanner';
 import { generateAmbientScribeDraft } from '../../services/clinicalIntelligenceApi';
 import ToolPageLayout from './ToolPageLayout';

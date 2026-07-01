@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { MEDICAL_THEME, MEDICAL_TYPE } from '../config/medicalTheme.constants';
 import { apiFetch } from '../services/apiClient';
 import { probeBackendReachability } from '../services/backendReachability';
@@ -124,7 +124,7 @@ export function SystemHealth() {
                 checkedAt: new Date().toISOString(),
                 configured: true,
                 critical: true,
-                error: 'API offline — start with npm run dev:api or npm run dev:fullstack',
+                error: 'API offline � start with npm run dev:api or npm run dev:fullstack',
               },
             },
           });

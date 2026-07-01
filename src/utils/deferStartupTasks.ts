@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Heavy services initialized after first paint (keeps main bundle off critical path).
  */
 

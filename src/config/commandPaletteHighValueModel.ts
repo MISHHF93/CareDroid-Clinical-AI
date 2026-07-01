@@ -1,5 +1,5 @@
-ï»¿/**
- * High-value command palette actions â€” pinned on open to reduce navigation dependency.
+/**
+ * High-value command palette actions — pinned on open to reduce navigation dependency.
  */
 
 export const COMMAND_PALETTE_HIGH_VALUE_ACTION_IDS = Object.freeze([
@@ -11,7 +11,7 @@ export const COMMAND_PALETTE_HIGH_VALUE_ACTION_IDS = Object.freeze([
   'create-referral',
 ]);
 
-/** Route commands duplicated by Quick actions â€” hidden from Navigation group. */
+/** Route commands duplicated by Quick actions — hidden from Navigation group. */
 export const COMMAND_PALETTE_SUPPRESSED_ROUTE_IDS = Object.freeze(
   new Set([
     'open-whiteboard',

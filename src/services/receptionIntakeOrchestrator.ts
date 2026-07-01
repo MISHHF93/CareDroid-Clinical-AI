@@ -15,7 +15,10 @@ import {
   type QuickSafetyFlag,
   type Sex,
 } from '../types/emergency';
-import { calculateAgeFromDob } from './receptionQuickIntakeService';
+import {
+  calculateAgeFromDob,
+  type ReceptionQuickIntakeInput,
+} from './receptionQuickIntakeService';
 import { buildPatientArrivalRecord, syncPatientFromArrival } from './patientArrivalModel';
 import { completeReceptionHandoff } from './receptionHandoff';
 import { buildClientTriageAssist } from './triageAssist';
@@ -64,6 +67,18 @@ export type ReceptionAiIntakeAssist = {
   confidence: number;
   safetyNotice: string;
   manualFallback: boolean;
+};
+
+export const UNIFIED_INTAKE_PHASE = Object.freeze({
+  critical: 'critical',
+  admin: 'admin',
+} as const);
+
+export type UnifiedIntakePhase = (typeof UNIFIED_INTAKE_PHASE)[keyof typeof UNIFIED_INTAKE_PHASE];
+
+export type SmartIntakeFieldRow = {
+  field: string;
+  extracted?: string;
 };
 
 export type ReceptionRouteResult = {
@@ -653,4 +668,199 @@ export async function createPatientAndRouteFromReception(
     redFlags: aiAssist.redFlags,
     clinicalOverrideBlocked: !canReceptionPerformClinicalOverride(EMERGENCY_ROLE_IDS.registrationClerk),
   };
+}
+
+const ARRIVAL_MODE_TO_RECEPTION_TYPE: Record<ArrivalMode, ReceptionArrivalType> = {
+  'walk-in': 'walk-in',
+  EMS: 'ambulance-arrival',
+  referral: 'referral',
+  transfer: 'transfer',
+  police: 'staff-created-emergency',
+};
+
+const COMPLAINT_FLAG_LABELS: Record<string, string> = {
+  chest_pain: 'Chest pain',
+  shortness_of_breath: 'Shortness of breath',
+  stroke_symptoms: 'Stroke symptoms',
+  severe_bleeding: 'Severe bleeding',
+  sepsis_concern: 'Sepsis concern',
+  anaphylaxis_concern: 'Anaphylaxis concern',
+  altered_mental_status: 'Altered mental status',
+  severe_pain: 'Severe pain',
+  pregnancy_emergency: 'Pregnancy emergency',
+  self_harm_risk: 'Self-harm risk',
+};
+
+function fieldValue(fields: SmartIntakeFieldRow[], fieldName: string, fallback = ''): string {
+  return String(fields.find((field) => field.field === fieldName)?.extracted || fallback).trim();
+}
+
+/** Infer minimum critical defaults so compact intake surfaces can route in one click. */
+export function enrichIntakeDraftCriticalDefaults(
+  draft: ReceptionIntakeDraft,
+  hints: { quickSafetyFlags?: QuickSafetyFlag[]; complaint?: string } = {},
+): ReceptionIntakeDraft {
+  const redFlags = detectReceptionRedFlags(draft);
+  const safetyFlags = hints.quickSafetyFlags || [];
+  const complaint = String(hints.complaint || draft.chiefComplaint || '').toLowerCase();
+
+  const consciousnessStatus =
+    draft.consciousnessStatus && draft.consciousnessStatus !== 'unknown'
+      ? draft.consciousnessStatus
+      : redFlags.some((flag) => /unconscious|altered mental/i.test(flag)) || safetyFlags.includes(PatientFlag.DeterioratingNeuro)
+        ? 'confused'
+        : 'alert';
+
+  const breathingStatus =
+    draft.breathingStatus && draft.breathingStatus !== 'unknown'
+      ? draft.breathingStatus
+      : redFlags.some((flag) => /not breathing|labored|shortness/i.test(flag)) || /breath|sob|dyspnea/.test(complaint)
+        ? 'short-of-breath'
+        : 'normal';
+
+  const visibleDistress =
+    draft.visibleDistress && draft.visibleDistress !== 'unknown'
+      ? draft.visibleDistress
+      : redFlags.some((flag) => /severe|collapse|unconscious/i.test(flag)) ||
+          safetyFlags.includes(PatientFlag.HighRisk) ||
+          safetyFlags.includes(PatientFlag.StrokeCode)
+        ? 'severe'
+        : safetyFlags.length
+          ? 'moderate'
+          : 'none';
+
+  const painLevel =
+    draft.painLevel === '' || draft.painLevel === undefined || draft.painLevel === null
+      ? redFlags.some((flag) => /chest|severe pain/i.test(flag)) || /pain|pressure/.test(complaint)
+        ? 8
+        : 2
+      : draft.painLevel;
+
+  const estimatedAge =
+    draft.dob || normalizeAge(draft.estimatedAge)
+      ? draft.estimatedAge
+      : draft.estimatedAge || 30;
+
+  return {
+    ...draft,
+    consciousnessStatus,
+    breathingStatus,
+    visibleDistress,
+    painLevel,
+    estimatedAge,
+  };
+}
+
+export function mapQuickIntakeInputToDraft(input: ReceptionQuickIntakeInput): ReceptionIntakeDraft {
+  const redFlagSymptoms = (input.selectedComplaintFlags || [])
+    .map((flagId) => COMPLAINT_FLAG_LABELS[flagId] || String(flagId).replace(/_/g, ' '))
+    .filter(Boolean);
+
+  return enrichIntakeDraftCriticalDefaults(
+    {
+      arrivalType: ARRIVAL_MODE_TO_RECEPTION_TYPE[input.arrivalMode] || 'walk-in',
+      chiefComplaint: input.complaint.trim(),
+      estimatedAge: input.dob ? '' : '',
+      dob: input.dob || '',
+      sex: input.existingPatient?.sex || '',
+      consciousnessStatus: 'unknown',
+      breathingStatus: 'unknown',
+      visibleDistress: 'unknown',
+      painLevel: '',
+      redFlagSymptoms,
+      allergiesKnown: 'unknown',
+      medicationsKnown: 'unknown',
+      firstName: input.firstName.trim(),
+      lastName: input.lastName.trim(),
+      contactCallback: input.phone?.trim() || '',
+      insuranceStatus: 'unknown',
+      consentStatus: 'unknown',
+      documentStatus: input.healthCard?.trim() ? 'captured' : 'unknown',
+      notes: input.quickNotes?.trim() || '',
+    },
+    { quickSafetyFlags: input.quickSafetyFlags, complaint: input.complaint },
+  );
+}
+
+export function mapSmartIntakeFieldsToDraft(
+  fields: SmartIntakeFieldRow[],
+  options: {
+    arrivalType?: ReceptionArrivalType;
+    complaint?: string;
+    sessionId?: string;
+  } = {},
+): ReceptionIntakeDraft {
+  const chiefComplaint =
+    options.complaint?.trim() ||
+    fieldValue(fields, 'chiefComplaint') ||
+    fieldValue(fields, 'complaint') ||
+    'Smart Intake arrival';
+
+  return enrichIntakeDraftCriticalDefaults({
+    arrivalType: options.arrivalType || 'walk-in',
+    chiefComplaint,
+    estimatedAge: '',
+    dob: fieldValue(fields, 'dateOfBirth'),
+    sex: (fieldValue(fields, 'sex', '') as Sex) || '',
+    consciousnessStatus: 'unknown',
+    breathingStatus: 'unknown',
+    visibleDistress: 'unknown',
+    painLevel: '',
+    redFlagSymptoms: [],
+    allergiesKnown: fieldValue(fields, 'allergies') ? 'yes' : 'unknown',
+    allergies: fieldValue(fields, 'allergies'),
+    medicationsKnown: fieldValue(fields, 'medications') ? 'yes' : 'unknown',
+    medications: fieldValue(fields, 'medications'),
+    firstName: fieldValue(fields, 'firstName') || 'Unknown',
+    lastName: fieldValue(fields, 'lastName') || 'Patient',
+    contactCallback: fieldValue(fields, 'phone'),
+    insuranceStatus: fieldValue(fields, 'healthCardNumber') ? 'captured' : 'deferred',
+    consentStatus: 'deferred',
+    documentStatus: 'captured',
+    notes: options.sessionId ? `Smart Intake session ${options.sessionId}` : '',
+  });
+}
+
+/** Canonical routing entry for compact intake surfaces (quick intake, express registration). */
+export async function routeQuickIntakeThroughOrchestrator(
+  input: ReceptionQuickIntakeInput,
+  options: OrchestratorOptions = {},
+): Promise<ReceptionRouteResult> {
+  const draft = mapQuickIntakeInputToDraft(input);
+  return createPatientAndRouteFromReception(draft, options);
+}
+
+/** Canonical routing entry after Smart Intake identity verification. */
+export async function routeSmartIntakeThroughOrchestrator(
+  fields: SmartIntakeFieldRow[],
+  options: OrchestratorOptions & {
+    arrivalType?: ReceptionArrivalType;
+    complaint?: string;
+    sessionId?: string;
+  } = {},
+): Promise<ReceptionRouteResult> {
+  const draft = mapSmartIntakeFieldsToDraft(fields, {
+    arrivalType: options.arrivalType,
+    complaint: options.complaint,
+    sessionId: options.sessionId,
+  });
+  return createPatientAndRouteFromReception(draft, options);
+}
+
+export function resolveUnifiedIntakePrimaryAction(
+  draft: ReceptionIntakeDraft,
+  aiAssist: ReceptionAiIntakeAssist | null,
+): { label: string; startsThreeMinuteResponse: boolean; tone: 'critical' | 'primary' } {
+  const urgency = aiAssist?.urgencySuggestion || runReceptionAiIntakeAssist(draft).urgencySuggestion;
+  if (urgency === 'critical') {
+    return {
+      label: 'Start 3-minute response & route',
+      startsThreeMinuteResponse: true,
+      tone: 'critical',
+    };
+  }
+  if (urgency === 'high') {
+    return { label: 'Route to priority triage', startsThreeMinuteResponse: false, tone: 'primary' };
+  }
+  return { label: 'Create patient & route', startsThreeMinuteResponse: false, tone: 'primary' };
 }

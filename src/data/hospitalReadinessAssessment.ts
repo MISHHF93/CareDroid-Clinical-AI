@@ -1,4 +1,4 @@
-﻿export const HOSPITAL_READINESS_BANDS = Object.freeze([
+export const HOSPITAL_READINESS_BANDS = Object.freeze([
   { id: 'advanced', label: 'Advanced', minScore: 85 },
   { id: 'ready', label: 'Ready', minScore: 70 },
   { id: 'developing', label: 'Developing', minScore: 50 },

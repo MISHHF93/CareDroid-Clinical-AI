@@ -1,4 +1,4 @@
-ï»¿import { CANONICAL_ROUTES } from '../config/routes.config';
+import { CANONICAL_ROUTES } from '../config/routes.config';
 import { BACKEND_HTTP_ROUTES } from './backendHttpRouteInventory';
 import { FRONTEND_API_CALLS } from './frontendApiCallsInventory';
 import { getCanonicalToolInventory, TOOL_EXECUTOR_STATUS } from './toolInventory';
@@ -27,7 +27,7 @@ function keyFor(method, path) {
 }
 
 function serviceNameFor(controller) {
-  if (!controller || controller === 'â€”') return 'â€”';
+  if (!controller || controller === '—') return '—';
   return controller.replace(/Controller$/, 'Service');
 }
 
@@ -47,14 +47,14 @@ function findFrontendCall(frontendApiCalls, path) {
 }
 
 function endpointFromRow(row) {
-  if (!row?.apiEndpoint || row.apiEndpoint === 'â€”') return null;
+  if (!row?.apiEndpoint || row.apiEndpoint === '—') return null;
   const [method, ...pathParts] = row.apiEndpoint.split(' ');
   if (!method || !pathParts.length) return null;
   return { method, path: pathParts.join(' ') };
 }
 
 function frontendRouteFor(row) {
-  return row.frontendRoute && row.frontendRoute !== 'â€”' ? row.frontendRoute : null;
+  return row.frontendRoute && row.frontendRoute !== '—' ? row.frontendRoute : null;
 }
 
 function makeUiDependency(row, backendByKey) {
@@ -67,16 +67,16 @@ function makeUiDependency(row, backendByKey) {
     frontendRoute: frontendRouteFor(row),
     inventoryEntry: row.canonicalInventoryId || row.registryEntry || row.canonicalId,
     displayName: row.displayName,
-    apiClient: row.frontendApiClient || 'â€”',
-    backendEndpoint: endpoint ? keyFor(endpoint.method, endpoint.path) : 'â€”',
-    backendController: backend?.controller || 'â€”',
+    apiClient: row.frontendApiClient || '—',
+    backendEndpoint: endpoint ? keyFor(endpoint.method, endpoint.path) : '—',
+    backendController: backend?.controller || '—',
     service: serviceNameFor(backend?.controller),
     executor:
       row.backendExecutor === 'yes'
         ? row.orchestratorToolId || 'registered executor'
         : row.backendExecutor === 'n/a'
           ? 'n/a'
-          : 'â€”',
+          : '—',
     status: row.status,
     source: row.kind,
   };
@@ -93,16 +93,16 @@ function makeInventoryDependency(record, backendRoutes, frontendApiCalls) {
     frontendRoute: record.route || record.navigationPath || null,
     inventoryEntry: record.id,
     displayName: record.label || record.id,
-    apiClient: record.apiClient || 'â€”',
-    backendEndpoint: record.endpoint ? keyFor(method, record.endpoint) : 'â€”',
-    backendController: backend?.controller || 'â€”',
+    apiClient: record.apiClient || '—',
+    backendEndpoint: record.endpoint ? keyFor(method, record.endpoint) : '—',
+    backendController: backend?.controller || '—',
     service: serviceNameFor(backend?.controller),
     executor:
       record.executorStatus === TOOL_EXECUTOR_STATUS.REGISTERED
         ? record.orchestratorToolId || 'registered executor'
         : record.executorStatus === TOOL_EXECUTOR_STATUS.PLATFORM
           ? 'platform capability'
-          : 'â€”',
+          : '—',
     status: record.status,
     source: record.sourceKind || 'inventory',
   };
@@ -133,7 +133,7 @@ function detectDuplicateDependencies(dependencies) {
     if (dependency.frontendRoute) {
       byRouteInventory.set(routeKey, [...(byRouteInventory.get(routeKey) || []), dependency]);
     }
-    if (dependency.backendEndpoint !== 'â€”') {
+    if (dependency.backendEndpoint !== '—') {
       const endpointKey = `${dependency.backendEndpoint}|${dependency.apiClient}`;
       byEndpointClient.set(endpointKey, [...(byEndpointClient.get(endpointKey) || []), dependency]);
     }
@@ -162,7 +162,7 @@ export function detectDependencyIssues({
   const contractEndpointKeys = new Set(
     dependencies
       .map((dependency) => dependency.backendEndpoint)
-      .filter((endpoint) => endpoint && endpoint !== 'â€”')
+      .filter((endpoint) => endpoint && endpoint !== '—')
   );
 
   const orphanUi = routeNodes
@@ -249,7 +249,7 @@ export function buildDependencyMap({
       frontendApiCalls: frontendApiCalls.length,
       backendEndpoints: backendRoutes.length,
       services: new Set(backendRoutes.map((route) => serviceNameFor(route.controller))).size,
-      executors: dependencies.filter((dependency) => dependency.executor !== 'â€”' && dependency.executor !== 'n/a').length,
+      executors: dependencies.filter((dependency) => dependency.executor !== '—' && dependency.executor !== 'n/a').length,
       issues: issues.length,
     },
   };

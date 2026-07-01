@@ -5,6 +5,9 @@ import { PatientFlag, PatientState, Priority } from '../types/emergency';
 import {
   assertReceptionMutationAllowed,
   createPatientAndRouteFromReception,
+  mapQuickIntakeInputToDraft,
+  resolveUnifiedIntakePrimaryAction,
+  routeQuickIntakeThroughOrchestrator,
   runReceptionAiIntakeAssist,
   type ReceptionIntakeDraft,
 } from './receptionIntakeOrchestrator';
@@ -134,6 +137,45 @@ describe('receptionIntakeOrchestrator', () => {
         allowed: false,
       }),
     );
+  });
+
+  it('maps compact quick intake into a routable draft with inferred critical defaults', () => {
+    const draft = mapQuickIntakeInputToDraft({
+      firstName: 'Alex',
+      lastName: 'Rivera',
+      complaint: 'Chest pain with shortness of breath',
+      arrivalMode: 'walk-in',
+      quickSafetyFlags: [PatientFlag.HighRisk],
+    });
+    expect(draft.chiefComplaint).toContain('Chest pain');
+    expect(draft.consciousnessStatus).not.toBe('unknown');
+    expect(draft.breathingStatus).not.toBe('unknown');
+    expect(draft.painLevel).toBeGreaterThanOrEqual(2);
+  });
+
+  it('routes quick intake through the same orchestrator path as reception command desk', async () => {
+    const result = await routeQuickIntakeThroughOrchestrator(
+      {
+        firstName: 'Sam',
+        lastName: 'Lee',
+        complaint: 'Feeling faint',
+        arrivalMode: 'walk-in',
+      },
+      { actorName: 'Reception Clerk', now: '2026-06-29T12:30:00.000Z' },
+    );
+    expect(result.patientId).toBeTruthy();
+    expect(useEmergencyStore.getState().patients.some((entry) => entry.id === result.patientId)).toBe(true);
+  });
+
+  it('resolves a single primary action label for critical arrivals', () => {
+    const action = resolveUnifiedIntakePrimaryAction(
+      baseDraft({ chiefComplaint: 'Not breathing', breathingStatus: 'not-breathing', painLevel: 10 }),
+      runReceptionAiIntakeAssist(
+        baseDraft({ chiefComplaint: 'Not breathing', breathingStatus: 'not-breathing', painLevel: 10 }),
+      ),
+    );
+    expect(action.startsThreeMinuteResponse).toBe(true);
+    expect(action.label).toContain('3-minute');
   });
 });
 

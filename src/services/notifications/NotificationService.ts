@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Legacy queue-style notification service.
  *
  * The active app-facing notification client is `src/services/NotificationService.ts`.
@@ -324,7 +324,7 @@ class NotificationService {
       case 'EMERGENCY_ALERT':
         return {
           ...base,
-          subject: `🚨 Emergency Alert`,
+          subject: `?? Emergency Alert`,
           body: notification.message,
           priority: notification.severity === 'critical' ? 'high' : 'normal',
           data: {
@@ -352,12 +352,12 @@ class NotificationService {
         )} / $${limitCost.toFixed(2)} (${percentage}%)`;
 
       case 'EXCEEDED':
-        return `⚠️ Tool ${toolId} cost has exceeded limit: $${currentCost.toFixed(
+        return `?? Tool ${toolId} cost has exceeded limit: $${currentCost.toFixed(
           2
         )} / $${limitCost.toFixed(2)} (${percentage}%)`;
 
       case 'CRITICAL':
-        return `🚨 CRITICAL: Tool ${toolId} cost is critically high: $${currentCost.toFixed(
+        return `?? CRITICAL: Tool ${toolId} cost is critically high: $${currentCost.toFixed(
           2
         )} / $${limitCost.toFixed(2)} (${percentage}%)`;
 

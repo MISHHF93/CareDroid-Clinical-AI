@@ -1,4 +1,4 @@
-﻿export const SHIFT_HANDOFF_SIGNAL_IDS = Object.freeze([
+export const SHIFT_HANDOFF_SIGNAL_IDS = Object.freeze([
   'waiting',
   'highRisk',
   'ems',
@@ -62,7 +62,7 @@ export function evaluateShiftHandoffReadability(surfaces: any = {}) {
     recommendation: passes60SecondTest
       ? 'Operational handoff domain bar surfaces Patient, EMS, Referral, and Admission summaries at login.'
       : missing.includes('highRisk')
-        ? 'Add high-risk count to the primary shift snapshot — it is buried in filters today.'
+        ? 'Add high-risk count to the primary shift snapshot � it is buried in filters today.'
         : missing.includes('referrals')
           ? 'Add referral pending/delayed counts to the operational handoff bar.'
           : 'Mount OperationalHandoffDomainBar at the top of the Whiteboard for clinical roles.',

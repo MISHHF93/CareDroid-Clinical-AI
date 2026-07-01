@@ -1,4 +1,4 @@
-ï»¿import {
+import {
   buildReassessmentTimerSnapshot,
 } from '../engine/reassessmentTimerEngine';
 import {
@@ -263,7 +263,7 @@ export function buildWaitingRoomSafetyEscalationSnapshot(
         displayName: patientDisplayName(patient),
         triggerIds,
         tone: rowTone(triggerIds),
-        detail: triggerIds.map((id) => TRIGGER_LABELS[id]).join(' Â· '),
+        detail: triggerIds.map((id) => TRIGGER_LABELS[id]).join(' · '),
       };
     })
     .filter((row): row is WaitingRoomSafetyEscalationPatientRow => Boolean(row))
@@ -404,7 +404,7 @@ export function buildWaitingRoomSafetyEscalationAlerts(
       id: `waiting-room-safety-escalation-${row.patientId}`,
       type: 'OperationalIntelligence' as const,
       severity: row.tone === 'critical' ? ('Critical' as const) : ('Warning' as const),
-      title: `Waiting room safety â€” ${row.displayName}`,
+      title: `Waiting room safety — ${row.displayName}`,
       message: `${row.detail}. Staff re-review required.`,
       patientId: row.patientId,
       createdAt: now.toISOString(),

@@ -1,4 +1,4 @@
-﻿const SUPPORT_ONLY_COPY =
+const SUPPORT_ONLY_COPY =
   'Operational decision support only. Does not make autonomous dispatch, staffing, admission, discharge, clinical triage, or treatment decisions.';
 
 function toFiniteNumber(value) {

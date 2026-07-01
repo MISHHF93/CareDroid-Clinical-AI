@@ -1,5 +1,5 @@
-ï»¿/**
- * Design token constants â€” mirror CSS custom properties in design-tokens.css.
+/**
+ * Design token constants — mirror CSS custom properties in design-tokens.css.
  * Use for tests, matchMedia, and programmatic layout; prefer CSS vars in stylesheets.
  *
  * @see src/styles/design-tokens.css
@@ -27,7 +27,7 @@ export const DESIGN_BREAKPOINTS_PX = Object.freeze({
   touchEnforceMax: 640,
 });
 
-/** @deprecated Use DESIGN_BREAKPOINTS â€” kept for mobile-first QA imports */
+/** @deprecated Use DESIGN_BREAKPOINTS — kept for mobile-first QA imports */
 export { MOBILE_FIRST_BREAKPOINTS, MOBILE_FIRST_VIEWPORT_WIDTHS } from './breakpoints';
 
 export const DESIGN_SPACING = Object.freeze({

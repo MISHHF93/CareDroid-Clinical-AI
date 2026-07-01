@@ -1,4 +1,4 @@
-ï»¿import {
+import {
   deriveLastNurseContactTime,
   buildReassessmentTimerSnapshot,
 } from '../engine/reassessmentTimerEngine';
@@ -55,7 +55,7 @@ export type LwbsRiskContext = {
   staff?: Staff[];
 };
 
-const ADVISORY_LABEL = 'Advisory only â€” staff review required';
+const ADVISORY_LABEL = 'Advisory only — staff review required';
 
 const LEVEL_BY_SCORE: Array<{ min: number; level: LwbsRiskLevel; label: string; shortLabel: string; tone: LwbsRiskTone }> =
   [
@@ -121,7 +121,7 @@ function scoreWaitDuration(
     label: 'Wait duration',
     points,
     maxPoints: 30,
-    detail: `${waitMinutes}m waiting Â· ${patient.priority} target ${threshold}m (${status.phase})`,
+    detail: `${waitMinutes}m waiting · ${patient.priority} target ${threshold}m (${status.phase})`,
   };
 }
 
@@ -161,7 +161,7 @@ function scoreOverdueReassessment(patient: Patient, now: Date): LwbsRiskFactor {
     detail: repeated
       ? `Repeated overdue reassessment (${overdueSignals} signal${overdueSignals === 1 ? '' : 's'})`
       : timer.isOverdue
-        ? `Reassessment overdue Â· ${timer.overdueLabel || 'due now'}`
+        ? `Reassessment overdue · ${timer.overdueLabel || 'due now'}`
         : 'Reassessment on schedule',
   };
 }
@@ -198,7 +198,7 @@ function scoreLowContactFrequency(patient: Patient, context: LwbsRiskContext, no
     detail:
       contactAgeMinutes === null
         ? 'No documented staff contact since arrival'
-        : `Last staff contact ${contactAgeMinutes}m ago Â· waiting ${waitMinutes}m`,
+        : `Last staff contact ${contactAgeMinutes}m ago · waiting ${waitMinutes}m`,
   };
 }
 
@@ -217,7 +217,7 @@ function scoreWaitingRoomCongestion(context: LwbsRiskContext): LwbsRiskFactor {
     label: 'Waiting-room congestion',
     points,
     maxPoints: 15,
-    detail: `${waitingCount} patient${waitingCount === 1 ? '' : 's'} waiting Â· threshold ${threshold}`,
+    detail: `${waitingCount} patient${waitingCount === 1 ? '' : 's'} waiting · threshold ${threshold}`,
   };
 }
 
@@ -232,7 +232,7 @@ function scoreTimeOfDay(now: Date): LwbsRiskFactor {
     label: 'Time of day',
     points,
     maxPoints: 10,
-    detail: `Local hour ${hour}:00 Â· operational LWBS pattern context`,
+    detail: `Local hour ${hour}:00 · operational LWBS pattern context`,
   };
 }
 
@@ -255,9 +255,9 @@ function scoreComplaintCategory(patient: Patient): LwbsRiskFactor {
     points,
     maxPoints: 5,
     detail: category
-      ? `${category} Â· operational LWBS pattern context`
+      ? `${category} · operational LWBS pattern context`
       : complaint
-        ? 'Complaint captured Â· category unavailable'
+        ? 'Complaint captured · category unavailable'
         : 'No complaint category available',
   };
 }
@@ -297,10 +297,10 @@ export function resolveLwbsRisk(
     factors: activeFactors,
     staffDetail: [
       ADVISORY_LABEL,
-      activeFactors.map((factor) => `${factor.label}: ${factor.detail}`).join(' Â· '),
+      activeFactors.map((factor) => `${factor.label}: ${factor.detail}`).join(' · '),
     ]
       .filter(Boolean)
-      .join(' â€” '),
+      .join(' — '),
   };
 }
 
@@ -350,7 +350,7 @@ export function buildLwbsRiskAdvisoryAlerts(
       id: `lwbs-risk-advisory-${patient.id}`,
       type: 'OperationalIntelligence' as const,
       severity: snapshot.level === 'elevated' ? ('Critical' as const) : ('Warning' as const),
-      title: `${snapshot.label} â€” ${patientDisplayName(patient)}`,
+      title: `${snapshot.label} — ${patientDisplayName(patient)}`,
       message: `${ADVISORY_LABEL}. Score ${snapshot.score}/100 from ${snapshot.factors.map((factor) => factor.label.toLowerCase()).join(', ') || 'operational factors'}.`,
       patientId: patient.id,
       createdAt: patient.arrivalTime || now.toISOString(),

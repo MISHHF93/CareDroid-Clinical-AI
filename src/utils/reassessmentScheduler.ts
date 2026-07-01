@@ -1,4 +1,4 @@
-﻿const ACTIVE_REMINDER_STATUSES = new Set(['pending', 'snoozed']);
+const ACTIVE_REMINDER_STATUSES = new Set(['pending', 'snoozed']);
 export const REASSESSMENT_REMINDER_WARNING_WINDOW_MS = 2 * 60 * 1000;
 export const REASSESSMENT_REMINDER_OVERDUE_MS = 10 * 60 * 1000;
 

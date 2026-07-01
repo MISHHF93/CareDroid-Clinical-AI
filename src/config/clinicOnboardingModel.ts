@@ -1,5 +1,5 @@
-ï»¿/**
- * Clinic onboarding simulation â€” staff, queues, thresholds, alerts, roles.
+/**
+ * Clinic onboarding simulation — staff, queues, thresholds, alerts, roles.
  * Node-safe; documents setup friction and provisioning expectations.
  */
 
@@ -155,7 +155,7 @@ export function evaluateClinicOnboardingStep(step, context: any = {}) {
         blockers.push('Staff roster not saved to organization settings');
       } else {
         status = 'manual';
-        blockers.push('No staff onboarding UI â€” seed roster or settings form required');
+        blockers.push('No staff onboarding UI — seed roster or settings form required');
       }
       break;
     case CLINIC_ONBOARDING_STEP_IDS.QUEUES:
@@ -192,7 +192,7 @@ export function evaluateClinicOnboardingStep(step, context: any = {}) {
       if (emergencyOs.roles?.defaultRoleProfileId) {
         status = flags.edRbacWired ? 'complete' : 'partial';
         if (!flags.edRbacWired) {
-          blockers.push('ED RBAC still uses static matrix â€” role mapping stored but not applied');
+          blockers.push('ED RBAC still uses static matrix — role mapping stored but not applied');
         }
       } else if (context.organization?.defaultRoleProfileId) {
         status = 'partial';

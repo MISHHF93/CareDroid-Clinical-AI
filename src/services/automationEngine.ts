@@ -1,4 +1,4 @@
-﻿import {
+import {
   AUTOMATION_STATUSES,
   getAutomationById,
   getWorkspaceAutomations,

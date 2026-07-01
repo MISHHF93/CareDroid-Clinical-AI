@@ -1,4 +1,4 @@
-﻿import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { PatientFlag, PatientState, Priority } from '../types/emergency';
 import {
   QUEUE_REASON_DEFINITIONS,

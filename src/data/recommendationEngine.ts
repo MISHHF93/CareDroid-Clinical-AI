@@ -1,4 +1,4 @@
-﻿import {
+import {
   buildRoleIntelligenceProfile,
   getRoleDisplayName,
   normalizeRole,

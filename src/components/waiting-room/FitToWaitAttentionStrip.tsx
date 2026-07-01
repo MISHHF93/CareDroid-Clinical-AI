@@ -1,4 +1,4 @@
-﻿import React, { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { buildFitToWaitAttentionSnapshot } from '../../services/fitToWaitPathway';
 import FitToWaitBadge from './FitToWaitBadge';
 import './FitToWaitAttentionStrip.css';
@@ -22,7 +22,7 @@ export default function FitToWaitAttentionStrip({
           <p className="fit-to-wait-attention-strip__eyebrow">Staff review</p>
           <h3>Fit-to-sit / fit-to-wait</h3>
           <p className="fit-to-wait-attention-strip__subtitle">
-            Seating and waiting disposition requires staff classification — never auto-assigned from vitals or complaints.
+            Seating and waiting disposition requires staff classification � never auto-assigned from vitals or complaints.
           </p>
         </div>
         <div className="fit-to-wait-attention-strip__counts">

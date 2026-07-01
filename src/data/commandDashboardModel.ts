@@ -1,4 +1,4 @@
-﻿import { REGISTRY } from './clinicalToolIdContract';
+import { REGISTRY } from './clinicalToolIdContract';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import {
   getUserFacingToolRegistryProjection,

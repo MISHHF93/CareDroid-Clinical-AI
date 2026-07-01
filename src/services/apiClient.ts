@@ -1,4 +1,4 @@
-﻿import axios from 'axios';
+import axios from 'axios';
 import appConfig from '../config/appConfig';
 import { DEFAULT_API_TIMEOUT_MS, normalizeApiPath } from '../config/api.config';
 import { AUTH_CONFIG } from '../config/auth.config';

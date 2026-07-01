@@ -14,6 +14,7 @@ import { CAREDROID_PERMISSIONS } from '../lib/users/permissions';
 import { canOwnAlert, getCompiledRoleLabel } from '../lib/users/canonicalAccess';
 import type { AuditMetadata } from '../lib/users/userTypes';
 import useOperationalIntelligence from '../hooks/useOperationalIntelligence';
+import { WorkflowSituationBrief } from './emergency/emergencyRouteShared';
 import './ClinicalAlertsPage.css';
 
 type AlertSeverity = 'critical' | 'high' | 'moderate' | 'low';
@@ -233,6 +234,22 @@ const ClinicalAlertsPage = () => {
           </p>
         </div>
       </div>
+
+      <WorkflowSituationBrief
+        status={`${displayAlerts.length} active alert${displayAlerts.length === 1 ? '' : 's'}`}
+        attention={
+          unacknowledgedCount > 0
+            ? `${unacknowledgedCount} need acknowledgement`
+            : 'All alerts reviewed'
+        }
+        owner={`${getCompiledRoleLabel(compiledProfile)} owns review on this shift`}
+        nextAction={
+          unacknowledgedCount > 0
+            ? 'Acknowledge highest-severity unreviewed alerts first'
+            : 'Monitor for new clinical and operational alerts'
+        }
+        tone={criticalCount > 0 ? 'critical' : unacknowledgedCount > 0 ? 'warning' : 'neutral'}
+      />
 
       <div className="alerts-summary-strip" role="status" aria-label="Alert summary">
         <span className="alerts-summary-chip">

@@ -1,4 +1,4 @@
-﻿import React, { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import {
   ambulanceHandoffChecklistCompletionPercent,
   formatAmbulanceHandoffDestination,
@@ -39,7 +39,7 @@ export default function AmbulanceHandoffChecklistBadge({
         .filter(Boolean)
         .join(' ')}
       data-tone={tone}
-      title={`Handoff ${completion}% · ${formatAmbulanceHandoffDestination(checklist)}`}
+      title={`Handoff ${completion}% � ${formatAmbulanceHandoffDestination(checklist)}`}
     >
       {checklist.handoffAccepted ? 'Handoff accepted' : `Handoff ${completion}%`}
       {!compact ? (

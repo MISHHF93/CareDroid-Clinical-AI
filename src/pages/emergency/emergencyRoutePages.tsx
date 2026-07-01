@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { MEDICAL_THEME } from '../../config/medicalTheme.constants';
-import { Link, Navigate, useSearchParams } from 'react-router-dom';
+import { Link, Navigate, useLocation, useSearchParams } from 'react-router-dom';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { PatientFlag, PatientState } from '../../types/emergency';
 import { EMERGENCY_OS_BRANDING } from '../../config/emergencyOsBranding.config';
@@ -110,11 +110,28 @@ export function PatientsRoute() {
     setSearchParams(nextParams, { replace: true });
   };
 
+  const highRiskCount = patients.filter(isHighRisk).length;
+  const waitingCount = patients.filter((patient) => patient.state === PatientState.Waiting).length;
+
   return (
     <EmergencyRoutePage
       eyebrow="Patients"
       title="Department Patients"
       description="Find active patients, search by name or MRN, and open a patient card for next steps."
+      situationBrief={{
+        status: `${patients.length} active patient${patients.length === 1 ? '' : 's'} on the board`,
+        attention:
+          highRiskCount || waitingCount
+            ? `${highRiskCount} high-risk · ${waitingCount} waiting`
+            : 'No high-risk or waiting backlog flagged',
+        owner: 'Care team — open a patient card to confirm assignment',
+        nextAction: query
+          ? 'Refine search or open a matching patient card'
+          : requestedPatient
+            ? `Review ${displayPatientName(requestedPatient)} and plan next steps`
+            : 'Search or select a patient for handoff',
+        tone: highRiskCount > 0 ? 'warning' : 'neutral',
+      }}
       actions={
         <label className="emergency-route-search-field">
           Search patients
@@ -192,6 +209,7 @@ export function PatientsRoute() {
 
 export function QueueRoute() {
   const surfaces = usePractitionerSurfaceVisibility();
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const patients = useEmergencyStore((state) => state.patients);
   const staff = useEmergencyStore((state) => state.staff);
@@ -326,11 +344,51 @@ export function QueueRoute() {
     return { totalQueued, breachedQueues };
   }, [filteredQueueRows]);
 
+  const isTriageWorkspace =
+    location.pathname.includes('/triage') ||
+    activeFilterKey === 'pretriage' ||
+    activeFilterKey === 'triage';
+  const triageQueue = filteredQueueRows.find((queue) =>
+    ['triage', 'pretriage'].includes(String(queue.label || queue.type || '').toLowerCase()),
+  );
+  const triageCount = triageQueue?.count ?? triageQueue?.patients?.length ?? 0;
+
   return (
     <EmergencyRoutePage
-      eyebrow="Queues"
-      title="Department Queues"
-      description="See who is waiting, which queues need attention, and where the next handoff is blocked."
+      eyebrow={isTriageWorkspace ? 'Triage' : 'Queues'}
+      title={isTriageWorkspace ? 'Triage Workspace' : 'Department Queues'}
+      description={
+        isTriageWorkspace
+          ? 'Patients awaiting nurse triage. Assign acuity, capture vitals, and route to the waiting or assessment queue.'
+          : 'See who is waiting, which queues need attention, and where the next handoff is blocked.'
+      }
+      situationBrief={{
+        status: isTriageWorkspace
+          ? `${triageCount} patient${triageCount === 1 ? '' : 's'} awaiting triage`
+          : `${queueMetrics.totalQueued} patient${queueMetrics.totalQueued === 1 ? '' : 's'} across ${filteredQueueRows.length} queue${filteredQueueRows.length === 1 ? '' : 's'}`,
+        attention:
+          queueMetrics.breachedQueues > 0
+            ? `${queueMetrics.breachedQueues} queue${queueMetrics.breachedQueues === 1 ? '' : 's'} past target wait`
+            : isTriageWorkspace
+              ? triageCount
+                ? 'Oldest pretriage wait needs first look'
+                : 'Pretriage queue clear'
+              : 'Queues within target waits',
+        owner: isTriageWorkspace
+          ? 'Triage nurse owns acuity assignment'
+          : effectiveQueueFilter
+            ? `${effectiveQueueFilter} queue — charge nurse coordinates`
+            : 'Charge nurse coordinates queue movement',
+        nextAction:
+          queueMetrics.breachedQueues > 0
+            ? 'Escalate oldest waits or reassign coverage'
+            : isTriageWorkspace
+              ? triageCount
+                ? 'Open the longest-waiting patient and complete triage'
+                : 'Monitor arrivals and prep for next pretriage patient'
+              : 'Review longest waits and plan the next handoff',
+        tone: queueMetrics.breachedQueues > 0 ? 'warning' : isTriageWorkspace && triageCount ? 'info' : 'neutral',
+      }}
     >
       <EdDataSourceBanner
         envelope={queues.data}
@@ -520,6 +578,20 @@ export function ReassessmentRoute() {
       eyebrow="Safety"
       title="Reassessment"
       description="Patients due for another look. Open a patient card to review details and update the plan."
+      situationBrief={{
+        status: `${prioritizedDuePatients.length} patient${prioritizedDuePatients.length === 1 ? '' : 's'} due for reassessment`,
+        attention:
+          overdueCount > 0
+            ? `${overdueCount} overdue reassessment${overdueCount === 1 ? '' : 's'}`
+            : prioritizedDuePatients.length
+              ? 'Due patients within safety window'
+              : 'No reassessments due',
+        owner: 'Assigned nurse or physician owns follow-up',
+        nextAction: prioritizedDuePatients.length
+          ? `Open ${displayPatientName(prioritizedDuePatients[0])} and update the plan`
+          : 'Monitor waiting-room patients for change in status',
+        tone: overdueCount > 0 ? 'critical' : prioritizedDuePatients.length ? 'warning' : 'neutral',
+      }}
     >
       <EdDataSourceBanner
         envelope={reassessment.data}
@@ -577,12 +649,55 @@ export function CapacityRoute() {
     setSearchParams(nextParams, { replace: true });
   };
 
+  const longestBoardingMinutes = boarding.data?.data?.longestBoardingMinutes ?? 0;
+  const capacitySituationBrief =
+    activeView === 'boarding'
+      ? {
+          status: `${boardingPatients.length} boarding patient${boardingPatients.length === 1 ? '' : 's'}`,
+          attention:
+            longestBoardingMinutes > 120
+              ? `Longest boarding ${longestBoardingMinutes}m — above target`
+              : boardingPatients.length
+                ? 'Boarding load within routine range'
+                : 'No boarding backlog',
+          owner: 'Bed management / charge nurse owns placement',
+          nextAction:
+            boarding.data?.data?.escalation && boarding.data.data.escalation !== 'No escalation'
+              ? String(boarding.data.data.escalation)
+              : boardingPatients.length
+                ? 'Prioritize longest boarders for disposition or transfer'
+                : 'Monitor inpatient bed availability',
+          tone:
+            longestBoardingMinutes > 240 ? 'critical' : longestBoardingMinutes > 120 ? 'warning' : 'neutral',
+        }
+      : {
+          status: `Capacity band ${capacity.band ?? 'unknown'} · ${availableRooms} rooms available`,
+          attention:
+            blockedRooms > 0
+              ? `${blockedRooms} blocked room${blockedRooms === 1 ? '' : 's'}`
+              : capacity.band === 'critical' || capacity.band === 'surge'
+                ? 'Department at elevated capacity'
+                : 'Room pressure stable',
+          owner: 'Charge nurse and bed coordinator',
+          nextAction:
+            blockedRooms > 0
+              ? 'Clear blocked rooms or reroute incoming patients'
+              : 'Balance arrivals against available treatment space',
+          tone:
+            capacity.band === 'critical' || blockedRooms > 2
+              ? 'warning'
+              : capacity.band === 'surge'
+                ? 'info'
+                : 'neutral',
+        };
+
   return (
     <EmergencyRoutePage
       eyebrow="Flow coordination"
       title="Flow & Capacity"
       maturity={activeView === 'boarding' ? 'demo' : undefined}
       description="Room pressure, boarding load, and department flow in one coordinated view."
+      situationBrief={capacitySituationBrief}
     >
       <FlowCapacityViewTabs activeView={activeView} onViewChange={setActiveView} />
       {activeView === 'boarding' ? (
@@ -882,11 +997,25 @@ export function CopilotRoute() {
   const showUpgradeSignals = surfaces.copilotRoute.showUpgradeSignals;
   const showRouteMetrics = surfaces.copilotRoute.showRouteMetrics;
 
+  const capacityBand = promptContext.capacity?.band ?? capacity.band;
+
   return (
     <EmergencyRoutePage
       eyebrow="Clinical copilot"
       title={EMERGENCY_OS_BRANDING.copilotName}
       description="Human-reviewed workflow support for routing, context, and next-step prompts."
+      situationBrief={{
+        status: `${promptContext.patientCount ?? activePatients.length} active patients · capacity ${capacityBand}`,
+        attention:
+          (promptContext.highRiskCount ?? highRiskPatients.length) > 0
+            ? `${promptContext.highRiskCount ?? highRiskPatients.length} high-risk patient${(promptContext.highRiskCount ?? highRiskPatients.length) === 1 ? '' : 's'} flagged`
+            : 'No high-risk patients flagged in context',
+        owner: 'Clinical team with copilot assist — human review required',
+        nextAction: highRiskPatients.length
+          ? 'Review AI Chief recommendations for highest-risk patients'
+          : `Open the docked ${EMERGENCY_OS_BRANDING.copilotName} panel for routing prompts`,
+        tone: highRiskPatients.length ? 'warning' : 'info',
+      }}
     >
       <EdDataSourceBanner
         envelope={copilot.data}

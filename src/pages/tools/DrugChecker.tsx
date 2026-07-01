@@ -1,4 +1,4 @@
-﻿import { MEDICAL_THEME } from '../../config/medicalTheme.constants';
+import { MEDICAL_THEME } from '../../config/medicalTheme.constants';
 import { useMemo, useState } from 'react';
 import { useUser } from '../../contexts/UserContext';
 import analyticsService from '../../services/analyticsService';
@@ -185,7 +185,7 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded }: any = {}) => {
                     onClick={() => handleRemoveMedication(index)}
                     title="Remove medication"
                   >
-                    ✕
+                    ?
                   </button>
                 )}
               </div>
@@ -213,7 +213,7 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded }: any = {}) => {
               onClick={handleCheck}
               disabled={isChecking || !preflightReady}
             >
-              {isChecking ? '🔄 Checking...' : '🔍 Check Interactions'}
+              {isChecking ? '?? Checking...' : '?? Check Interactions'}
             </button>
           </div>
         </div>
@@ -235,7 +235,7 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded }: any = {}) => {
             {/* Interactions */}
             {results.interactions.length > 0 && (
               <div className="result-card">
-                <h3 className="result-title">⚠️ Drug Interactions Found</h3>
+                <h3 className="result-title">?? Drug Interactions Found</h3>
                 {results.interactions.map((interaction, idx) => (
                   <div
                     key={idx}
@@ -269,7 +269,7 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded }: any = {}) => {
             {/* Warnings */}
             {results.warnings.length > 0 && (
               <div className="result-card">
-                <h3 className="result-title">⚡ Clinical Warnings</h3>
+                <h3 className="result-title">? Clinical Warnings</h3>
                 {results.warnings.map((warning, idx) => {
                   const warningText = typeof warning === 'string' ? warning : warning.warning;
                   return (
@@ -296,7 +296,7 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded }: any = {}) => {
             {/* No Issues */}
             {results.interactions.length === 0 && results.contraindications.length === 0 && (
               <div className="result-card success-card">
-                <h3 className="result-title">✅ No Major Interactions Detected</h3>
+                <h3 className="result-title">? No Major Interactions Detected</h3>
                 <p>The medications checked do not have documented major interactions.</p>
                 <p className="disclaimer">
                   Note: Always consult drug references and clinical judgment for comprehensive assessment.
@@ -308,14 +308,14 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded }: any = {}) => {
 
         {/* Quick Reference */}
         <div className="quick-reference">
-          <h3>💡 Quick Reference</h3>
+          <h3>?? Quick Reference</h3>
           <div className="reference-grid">
             <div className="reference-item">
               <h4>Severity Levels</h4>
               <ul>
-                <li><span className="drug-severity-dot drug-severity-dot--major">●</span> Major: Avoid combination</li>
-                <li><span className="drug-severity-dot drug-severity-dot--moderate">●</span> Moderate: Monitor closely</li>
-                <li><span className="drug-severity-dot drug-severity-dot--minor">●</span> Minor: Usually safe</li>
+                <li><span className="drug-severity-dot drug-severity-dot--major">?</span> Major: Avoid combination</li>
+                <li><span className="drug-severity-dot drug-severity-dot--moderate">?</span> Moderate: Monitor closely</li>
+                <li><span className="drug-severity-dot drug-severity-dot--minor">?</span> Minor: Usually safe</li>
               </ul>
             </div>
             <div className="reference-item">

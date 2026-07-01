@@ -1,4 +1,4 @@
-﻿import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTheme } from './ThemeContext';
 import { useToolPreferences } from './ToolPreferencesContext';
 import { useUser } from './UserContext';

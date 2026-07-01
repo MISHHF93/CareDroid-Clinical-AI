@@ -1,4 +1,4 @@
-ï»¿import { callAI } from '../lib/ai/client';
+import { callAI } from '../lib/ai/client';
 import { getAIPrompt } from '../lib/ai/promptRegistry';
 import { HUMAN_REVIEW_DISCLAIMER } from '../lib/ai/safety/policy';
 import {
@@ -285,8 +285,8 @@ export async function captureIntakeArtifact({
 
   const auditNote =
     fieldCount > 0
-      ? `${artifact.label}: captured ${fieldCount} field${fieldCount === 1 ? '' : 's'} from "${file.name}" â€” staff review required.`
-      : `${artifact.label}: document "${file.name}" stored â€” no structured fields detected; continue manual verification.`;
+      ? `${artifact.label}: captured ${fieldCount} field${fieldCount === 1 ? '' : 's'} from "${file.name}" — staff review required.`
+      : `${artifact.label}: document "${file.name}" stored — no structured fields detected; continue manual verification.`;
 
   return {
     artifactId: resolvedArtifactId,

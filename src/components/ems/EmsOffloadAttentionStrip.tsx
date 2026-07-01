@@ -1,4 +1,4 @@
-﻿import React, { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { buildEmsOffloadAttentionSnapshot } from '../../services/emsOffloadTracker';
 import './EmsOffloadAttentionStrip.css';
 
@@ -93,7 +93,7 @@ export default function EmsOffloadAttentionStrip({
               <span className="ems-offload-attention-strip__primary">
                 <strong>{row.unitLabel}</strong>
                 <small>
-                  <PhaseLabel phase={row.phase} /> · {row.complaint}
+                  <PhaseLabel phase={row.phase} /> � {row.complaint}
                 </small>
               </span>
               <span className="ems-offload-attention-strip__metrics">

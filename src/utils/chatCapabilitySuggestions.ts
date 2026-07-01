@@ -1,4 +1,4 @@
-﻿import { BACKEND_API_CAPABILITIES } from '../config/backendApiCapabilities';
+import { BACKEND_API_CAPABILITIES } from '../config/backendApiCapabilities';
 import { BACKEND_HTTP_ROUTES } from '../data/backendHttpRouteInventory';
 import {
   ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS,

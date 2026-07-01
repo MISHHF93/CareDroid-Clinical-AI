@@ -1,4 +1,4 @@
-ï»¿import { useState } from 'react';
+import { useState } from 'react';
 import ApiStateBanner from '../../components/ApiStateBanner';
 import { queryGuidelineEvidence } from '../../services/clinicalIntelligenceApi';
 import ToolPageLayout from './ToolPageLayout';
@@ -146,7 +146,7 @@ export default function GuidelineRag({ embedded = false, onCloseEmbedded }: any 
                       {result.citations.map((citation) => (
                         <li key={citation.id}>
                           <strong>{citation.title}</strong>
-                          {citation.organization ? ` â€” ${citation.organization}` : ''}
+                          {citation.organization ? ` — ${citation.organization}` : ''}
                           {citation.date ? ` (${citation.date})` : ''}
                           {citation.url ? (
                             <>
@@ -169,7 +169,7 @@ export default function GuidelineRag({ embedded = false, onCloseEmbedded }: any 
                   <ul>
                     {(result.sources || []).map((source) => (
                       <li key={source.chunkId}>
-                        {source.title} Â· chunk {source.chunkIndex ?? 'n/a'} Â· score{' '}
+                        {source.title} · chunk {source.chunkIndex ?? 'n/a'} · score{' '}
                         {Math.round((source.score || 0) * 100)}%
                       </li>
                     ))}

@@ -1,11 +1,11 @@
-ï»¿/**
+/**
  * STOP-Bang questionnaire for obstructive sleep apnea (OSA) screening.
  *
  * Reference: Chung F, et al. STOP questionnaire: a tool to screen patients for obstructive sleep apnea.
- * Anesthesiology. 2008;108(5):812â€“821. Bang component: Chung F, et al. High STOP-Bang score indicates
- * a high probability of obstructive sleep apnea. Br J Anaesth. 2012;108(5):768â€“775.
+ * Anesthesiology. 2008;108(5):812–821. Bang component: Chung F, et al. High STOP-Bang score indicates
+ * a high probability of obstructive sleep apnea. Br J Anaesth. 2012;108(5):768–775.
  *
- * Screening tool only â€” does not diagnose OSA or recommend CPAP or surgery.
+ * Screening tool only — does not diagnose OSA or recommend CPAP or surgery.
  */
 
 /** @typedef {{
@@ -25,49 +25,49 @@ export const STOP_BANG_CRITERIA_META = [
   {
     key: 'snoring',
     shortLabel: 'Snoring (loud enough to be heard through closed doors)',
-    help: 'S â€” Do you snore loudly (louder than talking or loud enough to be heard through closed doors)?',
+    help: 'S — Do you snore loudly (louder than talking or loud enough to be heard through closed doors)?',
     letter: 'S',
   },
   {
     key: 'tiredness',
     shortLabel: 'Tiredness / daytime sleepiness',
-    help: 'T â€” Do you often feel tired, fatigued, or sleepy during the daytime?',
+    help: 'T — Do you often feel tired, fatigued, or sleepy during the daytime?',
     letter: 'T',
   },
   {
     key: 'observedApnea',
     shortLabel: 'Observed apneas during sleep',
-    help: 'O â€” Has anyone observed you stop breathing or choking/gasping during sleep?',
+    help: 'O — Has anyone observed you stop breathing or choking/gasping during sleep?',
     letter: 'O',
   },
   {
     key: 'hypertension',
     shortLabel: 'Hypertension',
-    help: 'P â€” Do you have or are you being treated for high blood pressure?',
+    help: 'P — Do you have or are you being treated for high blood pressure?',
     letter: 'P',
   },
   {
     key: 'bmiOver35',
-    shortLabel: 'BMI > 35 kg/mÂ²',
-    help: 'B â€” Body mass index greater than 35 kg/mÂ².',
+    shortLabel: 'BMI > 35 kg/m²',
+    help: 'B — Body mass index greater than 35 kg/m².',
     letter: 'B',
   },
   {
     key: 'ageOver50',
     shortLabel: 'Age > 50 years',
-    help: 'A â€” Age greater than 50 years.',
+    help: 'A — Age greater than 50 years.',
     letter: 'A',
   },
   {
     key: 'largeNeckCircumference',
     shortLabel: 'Large neck circumference',
-    help: 'N â€” Neck circumference greater than 40 cm (15Â¾ in); original validation used sex-specific cutoffs (>43 cm male, >41 cm female).',
+    help: 'N — Neck circumference greater than 40 cm (15¾ in); original validation used sex-specific cutoffs (>43 cm male, >41 cm female).',
     letter: 'N',
   },
   {
     key: 'maleSex',
     shortLabel: 'Male sex',
-    help: 'G â€” Male gender (sex assigned or self-reported male for screening context).',
+    help: 'G — Male gender (sex assigned or self-reported male for screening context).',
     letter: 'G',
   },
 ];
@@ -108,7 +108,7 @@ export function calculateStopBangScore(raw) {
 }
 
 /**
- * @param {number} score 0â€“8
+ * @param {number} score 0–8
  * @returns {OsaRiskCategory}
  */
 export function categorizeStopBangOsaRisk(score) {
@@ -126,14 +126,14 @@ export function interpretStopBangScore(score) {
 
   const osaRiskCategory = categorizeStopBangOsaRisk(score) as any;
   const referenceLine =
-    'Chung F, et al. STOP questionnaire: a tool to screen patients for obstructive sleep apnea. Anesthesiology. 2008;108(5):812â€“821.';
+    'Chung F, et al. STOP questionnaire: a tool to screen patients for obstructive sleep apnea. Anesthesiology. 2008;108(5):812–821.';
 
   const screeningDisclaimer = 'Screening tool only.';
 
   const categoryLabels = {
-    low: 'Low risk of moderate-to-severe OSA (typical screening band: score 0â€“2)',
-    intermediate: 'Intermediate risk of moderate-to-severe OSA (typical screening band: score 3â€“4)',
-    high: 'High risk of moderate-to-severe OSA (typical screening band: score 5â€“8)',
+    low: 'Low risk of moderate-to-severe OSA (typical screening band: score 0–2)',
+    intermediate: 'Intermediate risk of moderate-to-severe OSA (typical screening band: score 3–4)',
+    high: 'High risk of moderate-to-severe OSA (typical screening band: score 5–8)',
   };
 
   const discussion = {
@@ -153,7 +153,7 @@ export function interpretStopBangScore(score) {
     totalScore: score,
     osaRiskCategory,
     label: categoryLabels[osaRiskCategory],
-    interpretation: `STOP-Bang score ${score} of 8 â€” ${categoryLabels[osaRiskCategory].toLowerCase()}.`,
+    interpretation: `STOP-Bang score ${score} of 8 — ${categoryLabels[osaRiskCategory].toLowerCase()}.`,
     osaRiskDiscussion: discussion[osaRiskCategory],
     screeningDisclaimer,
     safetyDisclaimer:

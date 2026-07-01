@@ -1,4 +1,4 @@
-﻿import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { NavIcon } from '../../navigation/NavIcon';
 
 export default function LaunchActionCard({

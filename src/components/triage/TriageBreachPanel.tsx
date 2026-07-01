@@ -1,4 +1,4 @@
-﻿import React, { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import {
   buildTriageBreachVisibilitySnapshot,
   hasTriageBreachVisibilityActivity,
@@ -27,7 +27,7 @@ export default function TriageBreachPanel({ patients = [] as any[], settings = n
         <p className="triage-breach-panel__eyebrow">Arrival to triage</p>
         <h3>Triage breach timer</h3>
         <p className="triage-breach-panel__subtitle">
-          Target {summary.targetMinutes}m · approaching from {summary.warningMinutes}m
+          Target {summary.targetMinutes}m � approaching from {summary.warningMinutes}m
         </p>
       </header>
       <div className="triage-breach-panel__grid">

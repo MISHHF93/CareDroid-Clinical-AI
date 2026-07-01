@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { getCalculatorSubIcon } from '../../navigation/iconRegistry';
 import {
   CalcDecisionSupportLead as SharedCalcDecisionSupportLead,

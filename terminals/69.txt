@@ -1,0 +1,16 @@
+---
+pid: 26048
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cmd /c \"cd /d C:\\Users\\borah\\CareDroid-Clinical-AI && npm run typecheck:frontend 2>&1\""
+started_at: 2026-06-30T20:46:42.197Z
+running_for_ms: 4174996  
+---
+
+> caredroid-clinical-ai@1.0.0 typecheck:frontend
+> tsc --noEmit -p tsconfig.frontend.json
+
+src/components/primitives/index.ts(5,10): error TS2614: Module '"./Badge"' has no exported member 'Badge'. Did you mean to use 'import Badge from "./Badge"' instead?
+src/components/ui/CareDroidPrimitives.tsx(448,12): error TS2322: Type '{ children: string | number | bigint | true | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | Promise<...>; ... 278 more ...; className: string; }' is not assignable to type 'IntrinsicAttributes & { variant?: BadgeVariant | undefined; size?: BadgeSize | undefined; dot?: boolean | undefined; children?: ReactNode; className?: string | undefined; } & HTMLAttributes<...>'.
+  Property 'tone' does not exist on type 'IntrinsicAttributes & { variant?: BadgeVariant | undefined; size?: BadgeSize | undefined; dot?: boolean | undefined; children?: ReactNode; className?: string | undefined; } & HTMLAttributes<...>'.
+src/components/ui/CareDroidPrimitives.tsx(468,27): error TS2322: Type '{ children: string; key: string; tone: string; compact: true; className: string; }' is not assignable to type 'IntrinsicAttributes & { variant?: BadgeVariant | undefined; size?: BadgeSize | undefined; dot?: boolean | undefined; children?: ReactNode; className?: string | undefined; } & HTMLAttributes<...>'.
+  Property 'tone' does not exist on type 'IntrinsicAttributes & { variant?: BadgeVariant | undefined; size?: BadgeSize | undefined; dot?: boolean | undefined; children?: ReactNode; className?: string | undefined; } & HTMLAttributes<...>'.

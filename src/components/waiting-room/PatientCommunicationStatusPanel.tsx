@@ -1,13 +1,13 @@
-ï»¿import React, { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { buildPatientCommunicationStatusBoard } from '../../services/patientCommunicationStatus';
 import './PatientCommunicationStatusPanel.css';
 
 function formatCheckpointTime(timestamp) {
-  if (!timestamp) return 'â€”';
+  if (!timestamp) return '—';
   try {
     return new Date(timestamp).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
   } catch {
-    return 'â€”';
+    return '—';
   }
 }
 
@@ -19,7 +19,7 @@ export default function PatientCommunicationStatusPanel({
   settings = (null as any),
   className = '',
   title = 'Patient communication status',
-  description = 'Internal waiting-room contact tracking â€” last update, reassessment, vitals, and next checkpoint.',
+  description = 'Internal waiting-room contact tracking — last update, reassessment, vitals, and next checkpoint.',
   onSelectPatient,
   compact = false,
 }) {

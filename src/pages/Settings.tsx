@@ -1,4 +1,4 @@
-ï»¿import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Card from '../components/ui/card';
 import Button from '../components/ui/button';
@@ -104,7 +104,7 @@ const Settings = () => {
         setBillingLoading(false);
         setBillingStatus({
           type: 'idle',
-          message: 'Billing API unavailable in demo mode â€” subscription data stays local during the build phase.',
+          message: 'Billing API unavailable in demo mode — subscription data stays local during the build phase.',
         });
         return;
       }
@@ -521,8 +521,8 @@ const Settings = () => {
                     <div key={provider.id}>
                       <strong>{provider.name}</strong>
                       <span>
-                        {provider.status} Â· {provider.protocol}
-                        {provider.entryPath ? ` Â· ${provider.entryPath}` : ''}
+                        {provider.status} · {provider.protocol}
+                        {provider.entryPath ? ` · ${provider.entryPath}` : ''}
                       </span>
                       <span>{provider.notes}</span>
                     </div>
@@ -575,7 +575,7 @@ const Settings = () => {
                     <div key={domain.id}>
                       <strong>{domain.name}</strong>
                       <span>
-                        {domain.status} Â· {domain.tenantBoundary}
+                        {domain.status} · {domain.tenantBoundary}
                       </span>
                       <span>{domain.residualRisk}</span>
                     </div>

@@ -1,4 +1,4 @@
-﻿import ClinicalIntentRouter from '../data/clinicalIntentRouter';
+import ClinicalIntentRouter from '../data/clinicalIntentRouter';
 import EmergencyCapacityIntelligenceService from './emergencyCapacityIntelligenceService';
 import EmergencyDemoEnvironmentService from './emergencyDemoEnvironmentService';
 import EmergencyWhiteboardService from './emergencyWhiteboardService';

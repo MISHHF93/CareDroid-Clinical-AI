@@ -1,4 +1,4 @@
-﻿export const ENTERPRISE_READINESS_DIMENSIONS = Object.freeze([
+export const ENTERPRISE_READINESS_DIMENSIONS = Object.freeze([
   {
     id: 'sso',
     label: 'SSO readiness',

@@ -1,4 +1,4 @@
-﻿import { apiFetch, getApiErrorMessage, parseApiResponse } from './apiClient';
+import { apiFetch, getApiErrorMessage, parseApiResponse } from './apiClient';
 import { fetchMyAuditLogs } from './auditApi';
 
 async function requestJson(path, options: any = {}) {

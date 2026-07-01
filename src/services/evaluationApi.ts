@@ -1,4 +1,4 @@
-﻿import { apiFetchJson, getApiErrorMessage } from './apiClient';
+import { apiFetchJson, getApiErrorMessage } from './apiClient';
 import {
   BACKEND_CAPABILITY_STATUS,
   getBackendCapabilityStatus,

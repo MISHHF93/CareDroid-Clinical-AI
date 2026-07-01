@@ -1,4 +1,4 @@
-﻿export function minutesRemaining(arrival, now = Date.now()) {
+export function minutesRemaining(arrival, now = Date.now()) {
   const etaMs = new Date(arrival.estimatedArrivalTime || 0).getTime();
   if (!Number.isFinite(etaMs)) return Number(arrival.eta ?? arrival.etaMinutes ?? 0) || 0;
   return Math.max(0, Math.round((etaMs - now) / 60000));

@@ -1,4 +1,4 @@
-﻿import './RiskFactorsList.css';
+import './RiskFactorsList.css';
 import { EMPTY_STATE_COPY } from '../../config/emptyStateCopy';
 
 const RiskFactorsList = ({ factors = [] as any[] }) => {
@@ -11,11 +11,11 @@ const RiskFactorsList = ({ factors = [] as any[] }) => {
   }
 
   const parseRiskFactor = (factor) => {
-    // Parse factors like "SOFA ≥ 13", "K+ = 6.8 mEq/L"
+    // Parse factors like "SOFA = 13", "K+ = 6.8 mEq/L"
     if (typeof factor === 'string') {
       return {
         label: factor,
-        severity: factor.includes('critical') || factor.includes('≥ 13') ? 'critical' : 
+        severity: factor.includes('critical') || factor.includes('= 13') ? 'critical' : 
                  factor.includes('elevated') || factor.includes('abnormal') ? 'high' : 'moderate'
       };
     }
@@ -33,7 +33,7 @@ const RiskFactorsList = ({ factors = [] as any[] }) => {
 
           return (
             <div key={idx} className={`risk-factor-item severity-${severity}`}>
-              <span className="risk-factor-indicator">●</span>
+              <span className="risk-factor-indicator">?</span>
               <span className="risk-factor-text">{displayLabel}</span>
             </div>
           );

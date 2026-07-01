@@ -1,4 +1,4 @@
-ï»¿import { memo, useCallback, useEffect, useMemo, useState, type CSSProperties, type KeyboardEvent, type MouseEvent } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState, type CSSProperties, type KeyboardEvent, type MouseEvent } from 'react';
 import {
   Ambulance,
   ArrowRightLeft,
@@ -581,7 +581,7 @@ function PatientCard({
       ? reassessmentTimer.overdueLabel || 'Overdue'
       : reassessmentTimer?.stage === 'due'
         ? reassessmentTimer.dueInLabel || 'Due'
-        : reassessmentTimer?.dueInLabel || 'â€”';
+        : reassessmentTimer?.dueInLabel || '—';
 
   if (layout === 'row') {
     return (
@@ -809,7 +809,7 @@ function PatientCard({
                 title={signalBadges
                   .slice(maxPatientCardBadges)
                   .map((signal) => signal.label)
-                  .join(' Â· ')}
+                  .join(' · ')}
               >
                 +{signalBadges.length - maxPatientCardBadges}
               </span>
@@ -885,7 +885,7 @@ function PatientCard({
           </span>
           <span className={tempAbnormal ? 'patient-card__vital patient-card__vital--warning patient-card__vital-temp' : 'patient-card__vital patient-card__vital-temp'}>
             <small>Temp</small>
-            <strong>{temp ?? '--'}Â°</strong>
+            <strong>{temp ?? '--'}°</strong>
           </span>
         </div>
       ) : null}
@@ -932,7 +932,7 @@ function PatientCard({
                     title={visibleFlags
                       .slice(maxPatientCardBadges)
                       .map((flag) => flagLabels[flag])
-                      .join(' Â· ')}
+                      .join(' · ')}
                   >
                     +{overflow}
                   </span>

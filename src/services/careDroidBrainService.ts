@@ -1,4 +1,4 @@
-﻿import { createArtifactKnowledgeGraphService } from '../data/artifactKnowledgeGraph';
+import { createArtifactKnowledgeGraphService } from '../data/artifactKnowledgeGraph';
 import { buildArtifactCatalog, validateArtifactCatalog } from '../data/artifactIntelligence';
 import { buildOrganizationIntelligenceProfile } from '../data/organizationIntelligenceProfile';
 import { buildPlatformLearningEngine } from '../data/platformLearningEngine';

@@ -1,4 +1,4 @@
-ï»¿import { buildArrivalControlSummary } from './arrivalControlLayer';
+import { buildArrivalControlSummary } from './arrivalControlLayer';
 import {
   summarizeTriageBreachBoard,
   type TriageBreachBoardSummary,
@@ -101,7 +101,7 @@ function metricValue(
     case 'awaiting-triage':
       return snapshot.awaitingTriageCount;
     case 'longest-untriaged-wait':
-      return snapshot.awaitingTriageCount ? snapshot.longestUntriagedWaitLabel : 'â€”';
+      return snapshot.awaitingTriageCount ? snapshot.longestUntriagedWaitLabel : '—';
     case 'triage-breach-approaching':
       return snapshot.approachingBreachCount;
     case 'triage-breached':
@@ -109,7 +109,7 @@ function metricValue(
     case 'rapid-review-flags':
       return snapshot.rapidReviewFlags;
     default:
-      return 'â€”';
+      return '—';
   }
 }
 
@@ -122,7 +122,7 @@ function metricHint(
     case 'awaiting-triage':
       return 'Patients waiting for triage nurse review';
     case 'longest-untriaged-wait':
-      return `Door-to-triage target ${summary.targetMinutes}m Â· warning ${summary.warningMinutes}m`;
+      return `Door-to-triage target ${summary.targetMinutes}m · warning ${summary.warningMinutes}m`;
     case 'triage-breach-approaching':
       return `Within ${summary.warningMinutes}m of ${summary.targetMinutes}m target`;
     case 'triage-breached':

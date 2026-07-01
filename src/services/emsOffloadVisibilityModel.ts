@@ -1,4 +1,4 @@
-ï»¿import { summarizeEmsAwareness } from '../components/whiteboard/emsAwarenessModel';
+import { summarizeEmsAwareness } from '../components/whiteboard/emsAwarenessModel';
 import type { EMSArrival, Patient, Staff } from '../types/emergency';
 
 export type EmsOffloadVisibilityMetricId =
@@ -50,7 +50,7 @@ export const EMS_OFFLOAD_VISIBILITY_STAFF_SURFACES = Object.freeze([
 ]);
 
 function formatDuration(minutes: number | null | undefined): string {
-  if (minutes == null || !Number.isFinite(minutes) || minutes < 1) return 'â€”';
+  if (minutes == null || !Number.isFinite(minutes) || minutes < 1) return '—';
   if (minutes < 60) return `${minutes}m`;
   const hours = Math.floor(minutes / 60);
   const remainder = minutes % 60;
@@ -87,7 +87,7 @@ export function buildEmsOffloadVisibilitySnapshot(
       ? formatDuration(averageOffloadMinutes)
       : longestOffloadMinutes > 0
         ? formatDuration(longestOffloadMinutes)
-        : 'â€”';
+        : '—';
 
   return {
     inboundCount: awareness.inboundCount,
@@ -151,7 +151,7 @@ function metricValue(
     case 'handoff-pending':
       return snapshot.handoffPendingCount;
     default:
-      return 'â€”';
+      return '—';
   }
 }
 
@@ -166,7 +166,7 @@ function metricHint(
       return `Units past ${snapshot.offloadTargetMinutes}m offload target`;
     case 'offload-duration':
       return snapshot.longestOffloadMinutes
-        ? `Average ${formatDuration(snapshot.averageOffloadMinutes)} Â· longest ${formatDuration(snapshot.longestOffloadMinutes)}`
+        ? `Average ${formatDuration(snapshot.averageOffloadMinutes)} · longest ${formatDuration(snapshot.longestOffloadMinutes)}`
         : 'Mean scene-to-handoff offload time';
     case 'handoff-pending':
       return 'Crews on scene awaiting triage handoff completion';

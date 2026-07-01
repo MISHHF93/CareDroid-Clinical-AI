@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Single visibility map for practitioner / pilot surfaces.
  * Pages read this once instead of scattering shouldSuppress* calls.
  */
@@ -133,6 +133,7 @@ const FULL_VISIBILITY = Object.freeze({
   emergencyRoutes: Object.freeze({
     showDescriptions: true,
     showMetricCards: true,
+    showSituationBrief: true,
     showCrossLinks: true,
     showCapacityUpgradeHarness: true,
     showJourneyEngineCard: true,
@@ -280,6 +281,7 @@ function buildPilotVisibility(context: any = {}) {
       showDescriptions: !c.suppressEmergencyRouteDescriptions,
       showMetricCards:
         !c.suppressEmergencyRouteMetricCards && !c.suppressEmergencyRouteMetrics,
+      showSituationBrief: true,
       showCrossLinks: !c.suppressEmergencyRouteCrossLinks,
       showCapacityUpgradeHarness: !c.suppressCapacityUpgradeHarness,
       showJourneyEngineCard: !c.hidePatientJourneyEngineCard,

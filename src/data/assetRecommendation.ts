@@ -1,4 +1,4 @@
-﻿import { getPlatformEntitlementContext } from './assetEntitlements';
+import { getPlatformEntitlementContext } from './assetEntitlements';
 import { ASSET_ACCESS_STATES, filterVisibleTools, getAssetAwareToolProjection } from './assetAccess';
 
 const ROLE_SUGGESTIONS = Object.freeze({
