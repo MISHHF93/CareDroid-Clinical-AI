@@ -3,7 +3,7 @@ pid: 4952
 cwd: "C:\Users\borah\CareDroid-Clinical-AI"
 command: "cd \"C:\\Users\\borah\\CareDroid-Clinical-AI\"; npm.cmd run preview -- --port 4173 --strictPort"
 started_at: 2026-07-01T07:15:32.805Z
-running_for_ms: 27745006 
+running_for_ms: 30440001 
 ---
 
 > caredroid-clinical-ai@1.0.0 preview

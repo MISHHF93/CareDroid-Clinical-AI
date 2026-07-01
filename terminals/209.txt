@@ -3,7 +3,7 @@ pid: 6772
 cwd: "C:\Users\borah\CareDroid-Clinical-AI"
 command: "cd \"C:\\Users\\borah\\CareDroid-Clinical-AI\"; $env:QA_BASE_URL='http://localhost:4173'; node scripts/debug-playwright-page.mjs"
 started_at: 2026-07-01T07:15:52.071Z
-running_for_ms: 27709999 
+running_for_ms: 30409990 
 ---
 status 200 url http://localhost:4173/emergency/whiteboard
 {

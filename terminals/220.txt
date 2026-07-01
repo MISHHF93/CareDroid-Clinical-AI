@@ -3,7 +3,7 @@ pid: 30980
 cwd: "C:\Users\borah\CareDroid-Clinical-AI"
 command: "cmd /c \"cd /d C:\\Users\\borah\\CareDroid-Clinical-AI && set QA_BASE_URL=http://localhost:4173&& node scripts/capture-shell-responsive-screenshots.mjs\""
 started_at: 2026-07-01T11:54:12.549Z
-running_for_ms: 11009996 
+running_for_ms: 13705005 
 ---
 QA base URL: http://localhost:4173
 Capturing whiteboard @ 390x844

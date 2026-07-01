@@ -3,7 +3,7 @@ pid: 13124
 cwd: "C:\Users\borah\CareDroid-Clinical-AI"
 command: "cd \"C:\\Users\\borah\\CareDroid-Clinical-AI\"; npm.cmd run test:run -- src/styles/designLanguageFit.test.ts src/styles/clinicalPageSweep.test.ts src/styles/visualConsistencySweep.test.ts src/styles/platformShellDimension.test.ts src/config/unified-navigation.config.test.ts src/hooks/useCopilotChromeAccess.test.ts src/layout/AppShell.navigation.test.tsx src/pages/emergency/emergencyPagesSmoke.test.tsx 2>&1"
 started_at: 2026-07-01T06:35:04.621Z
-running_for_ms: 30160013 
+running_for_ms: 32855003 
 ---
 
 > caredroid-clinical-ai@1.0.0 test:run

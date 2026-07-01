@@ -3,7 +3,7 @@ pid: 25920
 cwd: "C:\Users\borah\CareDroid-Clinical-AI"
 command: "cmd /c \"cd /d C:\\Users\\borah\\CareDroid-Clinical-AI && npm test -- --run src/components/Sidebar.test.tsx src/components/SidebarNotificationPanel.test.tsx src/styles/designLanguageFit.test.ts 2>&1\""
 started_at: 2026-07-01T05:52:27.679Z
-running_for_ms: 32715007 
+running_for_ms: 35410001 
 ---
 
 > caredroid-clinical-ai@1.0.0 test

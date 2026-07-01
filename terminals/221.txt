@@ -3,7 +3,7 @@ pid: 30588
 cwd: "C:\Users\borah\CareDroid-Clinical-AI"
 command: "cmd /c \"cd /d C:\\Users\\borah\\CareDroid-Clinical-AI && npm run build && npx vitest run src/styles/clinicalChromeAlignment.test.ts\""
 started_at: 2026-07-01T11:56:55.051Z
-running_for_ms: 10849994 
+running_for_ms: 13545001 
 ---
 
 > caredroid-clinical-ai@1.0.0 build

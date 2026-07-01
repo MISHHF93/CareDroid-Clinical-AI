@@ -3,7 +3,7 @@ pid: 7440
 cwd: "C:\Users\borah\CareDroid-Clinical-AI"
 command: "cd \"C:\\Users\\borah\\CareDroid-Clinical-AI\"; npm.cmd run qa:shell-responsive"
 started_at: 2026-07-01T06:52:18.537Z
-running_for_ms: 29124999 
+running_for_ms: 31820001 
 ---
 
 > caredroid-clinical-ai@1.0.0 qa:shell-responsive

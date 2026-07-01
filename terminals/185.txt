@@ -57,7 +57,7 @@ const { seedQaAuth, installQaNetworkStubs, dismissOverlays, waitForAppReady } = 
 })();
 \""
 started_at: 2026-07-01T05:12:57.188Z
-running_for_ms: 35085000 
+running_for_ms: 37780007 
 ---
 {"shot":"desktop-whiteboard","file":"C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\shell-ux-audit\\desktop-whiteboard.png","metrics":{"header":{"top":0,"height":49,"left":232,"width":1208},"sessionChrome":{"top":49,"height":53,"left":232,"width":1208},"sidebar":{"top":0,"height":900,"left":0,"width":232},"main":{"top":102,"height":798,"left":232,"width":1208},"notif":null,"chromeStackHeight":102,"sidebarTop":0,"headerTop":0}}
 {"shot":"desktop-command-center","file":"C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\shell-ux-audit\\desktop-command-center.png","metrics":{"header":{"top":0,"height":49,"left":232,"width":1208},"sessionChrome":{"top":49,"height":53,"left":232,"width":1208},"sidebar":{"top":0,"height":900,"left":0,"width":232},"main":{"top":102,"height":798,"left":232,"width":1208},"notif":null,"chromeStackHeight":102,"sidebarTop":0,"headerTop":0}}

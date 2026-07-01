@@ -3,7 +3,7 @@ pid: 17364
 cwd: "C:\Users\borah\CareDroid-Clinical-AI"
 command: "cmd /c \"cd /d C:\\Users\\borah\\CareDroid-Clinical-AI && npx vite build 2>&1\""
 started_at: 2026-07-01T05:56:58.479Z
-running_for_ms: 32445006 
+running_for_ms: 35140004 
 ---
 vite v7.3.5 building client environment for production...
 transforming...

@@ -3,7 +3,7 @@ pid: 13424
 cwd: "C:\Users\borah\CareDroid-Clinical-AI"
 command: "cd \"C:\\Users\\borah\\CareDroid-Clinical-AI\"; node scripts/debug-playwright-page.mjs"
 started_at: 2026-07-01T07:14:46.782Z
-running_for_ms: 27775009 
+running_for_ms: 30475009 
 ---
 status 200 url http://localhost:8000/emergency/whiteboard
 {

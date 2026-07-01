@@ -3,7 +3,7 @@ pid: 368
 cwd: "C:\Users\borah\CareDroid-Clinical-AI"
 command: "cd \"C:\\Users\\borah\\CareDroid-Clinical-AI\"; $env:QA_BASE_URL='http://localhost:4173'; node scripts/capture-shell-responsive-screenshots.mjs"
 started_at: 2026-07-01T07:27:21.191Z
-running_for_ms: 27020001 
+running_for_ms: 29719996 
 ---
 Capturing whiteboard @ 390x844
 Capturing whiteboard @ 768x1024

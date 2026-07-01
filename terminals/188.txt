@@ -3,7 +3,7 @@ pid: 19104
 cwd: "C:\Users\borah\CareDroid-Clinical-AI"
 command: "npm.cmd run test:run -- src/components/Header.centralControl.test.tsx src/components/chrome/SessionChromeBar.test.tsx src/components/SidebarNotificationPanel.test.tsx src/components/Sidebar.test.tsx"
 started_at: 2026-07-01T05:22:57.074Z
-running_for_ms: 34484998 
+running_for_ms: 37185005 
 ---
 
 > caredroid-clinical-ai@1.0.0 test:run
