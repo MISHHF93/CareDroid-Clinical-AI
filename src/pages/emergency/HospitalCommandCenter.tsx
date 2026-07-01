@@ -1,5 +1,9 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import {
+  CommandActionGraphicCard,
+  CommandMetricGraphicCard,
+} from '../../components/graphics/CdlGraphicKit';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { CAREDROID_PRODUCT } from '../../config/caredroidProduct.config';
 import { buildCommandCenterWorkflowActions } from '../../config/operationalWorkflow.config';
@@ -22,42 +26,6 @@ import { EmergencyRoutePage } from './emergencyRouteShared';
 import PatientFlowStatusPanel from '../../components/emergency/PatientFlowStatusPanel';
 import AdministrativeAutomationReviewPanel from '../../components/emergency/AdministrativeAutomationReviewPanel';
 import './hospital-command-center.css';
-
-function ActionCard({
-  action,
-}: {
-  action: ReturnType<typeof buildCommandCenterWorkflowActions>[number];
-}) {
-  return (
-    <article
-      className={`emergency-route-card emergency-command-action emergency-command-action--${action.tone}${
-        action.active ? ' emergency-command-action--active' : ''
-      }`}
-    >
-      <div className="emergency-command-action__header">
-        <strong>{action.label}</strong>
-        <span className="emergency-command-action__count">{action.count}</span>
-      </div>
-      <p>{action.reason}</p>
-      <dl className="emergency-command-action__meta">
-        <div>
-          <dt>Owner</dt>
-          <dd>{action.owner}</dd>
-        </div>
-        <div>
-          <dt>Target</dt>
-          <dd>{action.deadlineLabel}</dd>
-        </div>
-      </dl>
-      <div className="emergency-command-action__footer">
-        <span>{action.nextAction}</span>
-        <Link to={action.route} className="emergency-route-filter-banner__btn">
-          Open
-        </Link>
-      </div>
-    </article>
-  );
-}
 
 export default function HospitalCommandCenter() {
   const emergencyRole = useEmergencyRolePermissions();
@@ -200,7 +168,18 @@ export default function HospitalCommandCenter() {
           </div>
           <div className="hospital-command-center__actions">
             {workflowActions.map((action) => (
-              <ActionCard key={action.id} action={action} />
+              <CommandActionGraphicCard
+                key={action.id}
+                label={action.label}
+                count={action.count}
+                reason={action.reason}
+                owner={action.owner}
+                deadlineLabel={action.deadlineLabel}
+                nextAction={action.nextAction}
+                tone={action.tone}
+                active={action.active}
+                route={action.route}
+              />
             ))}
           </div>
         </section>
@@ -245,15 +224,15 @@ export default function HospitalCommandCenter() {
           </div>
           <div className="hospital-command-center__metric-grid">
             {visibleMetrics.map((metric) => (
-              <Link
+              <CommandMetricGraphicCard
                 key={metric.id}
-                to={metric.route || CANONICAL_ROUTES.emergencyCommandCenter}
-                className={`hospital-command-center__metric-card hospital-command-center__metric-card--${metric.tone}`}
-              >
-                <span className="hospital-command-center__metric-value">{metric.value}</span>
-                <span className="hospital-command-center__metric-label">{metric.label}</span>
-                <span className="hospital-command-center__metric-detail">{metric.detail}</span>
-              </Link>
+                id={metric.id}
+                label={metric.label}
+                value={metric.value}
+                detail={metric.detail}
+                tone={metric.tone}
+                route={metric.route || CANONICAL_ROUTES.emergencyCommandCenter}
+              />
             ))}
           </div>
         </section>

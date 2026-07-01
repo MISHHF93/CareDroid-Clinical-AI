@@ -27,6 +27,7 @@ import { EmergencyRoutePage } from '../pages/emergency/emergencyRouteShared';
 import { usePractitionerSurfaceVisibility } from '../contexts/PractitionerVisibilityContext';
 import useEdRouteDataContext from '../hooks/useEdRouteDataContext';
 import { buildPatientsPatientHref } from '../utils/receptionQueryParams';
+import { EmsOffloadGauge, EmsUnitTrackGraphic } from './graphics/CdlGraphicKit';
 import './EMSPipeline.css';
 
 function minutesRemaining(arrival, now) {
@@ -162,8 +163,14 @@ function EMSArrivalRow({
   const showDetails = detailsOpen;
 
   return (
-    <article className={`ems-pipeline__row ems-pipeline__row--${tone}`}>
+    <article className={`ems-pipeline__row ems-pipeline__row--${tone} ems-pipeline__row--graphic`}>
       <div className="ems-pipeline__unit">
+        <EmsUnitTrackGraphic
+          status={arrival.status}
+          unitId={arrival.unitId}
+          breach={offloadBreach}
+          className="ems-pipeline__unit-track"
+        />
         <strong>{arrival.unitId}</strong>
         <span>{unitLabel(arrival)}</span>
       </div>
@@ -562,12 +569,11 @@ export default function EMSPipeline() {
   const headerActions = (
     <>
       {showOffloadSection ? (
-        <span
-          className={`ems-pipeline__offload-kpi${offloadBreachCount ? ' ems-pipeline__offload-kpi--breach' : ''}`}
-          title={`${offloadBreachCount} crews over ${offloadTargetMinutes} minutes`}
-        >
-          Avg offload {avgOffload}m
-        </span>
+        <EmsOffloadGauge
+          minutes={avgOffload}
+          targetMinutes={offloadTargetMinutes}
+          breachCount={offloadBreachCount}
+        />
       ) : null}
       {showPressureWidget ? <EMSPressureScore /> : null}
     </>

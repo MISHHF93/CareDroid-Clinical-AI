@@ -33,6 +33,7 @@ import {
   type ReceptionRouteResult,
 } from '../../services/receptionIntakeOrchestrator';
 import { completeProvisionalIntake } from '../../services/provisionalIdentityIntake';
+import { ReceptionFlowGraphic } from '../../components/graphics/CdlGraphicKit';
 import { WorkflowSituationBrief } from './emergencyRouteShared';
 import './ReceptionWorkspace.css';
 import './emergency-route.css';
@@ -203,6 +204,8 @@ function Stepper({
   ];
 
   return (
+    <div className="reception-command-stepper-shell">
+      <ReceptionFlowGraphic steps={steps} className="reception-command-stepper-shell__graphic" />
     <ol className="reception-command-stepper" aria-label="Reception intake progress">
       {steps.map((step) => (
         <li
@@ -218,6 +221,7 @@ function Stepper({
         </li>
       ) : null}
     </ol>
+    </div>
   );
 }
 

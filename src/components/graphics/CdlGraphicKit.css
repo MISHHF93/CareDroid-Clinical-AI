@@ -230,3 +230,193 @@
 .emergency-route-empty--graphic .cdl-graphic-illustration {
   width: min(100px, 36vw);
 }
+
+/* Patient acuity ring */
+.cdl-patient-acuity-ring {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  color: var(--acuity-color, var(--medical-accent));
+  flex-shrink: 0;
+}
+
+.cdl-patient-acuity-ring__svg {
+  width: 100%;
+  height: 100%;
+}
+
+.cdl-patient-acuity-ring__code {
+  position: absolute;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--acuity-color, var(--medical-ink));
+}
+
+.patient-card__priority-strip--graphic {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.patient-card__acuity-ring {
+  grid-column: 1;
+}
+
+/* EMS unit track */
+.cdl-ems-unit-track {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 6px;
+}
+
+.cdl-ems-unit-track__rail {
+  position: relative;
+  height: 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--medical-border) 40%, transparent);
+  overflow: hidden;
+}
+
+.cdl-ems-unit-track__fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--status-info, #0ea5e9), var(--medical-accent));
+  transition: width 240ms ease;
+}
+
+.cdl-ems-unit-track__mark {
+  position: absolute;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--medical-white);
+  border: 1px solid color-mix(in srgb, var(--medical-border) 70%, transparent);
+  transform: translate(-50%, -50%);
+}
+
+.cdl-ems-unit-track--breach .cdl-ems-unit-track__fill {
+  background: linear-gradient(90deg, var(--status-warning, #f59e0b), var(--status-critical, #ef4444));
+}
+
+.ems-pipeline__row--graphic .ems-pipeline__unit {
+  display: grid;
+  gap: 4px;
+}
+
+/* EMS offload gauge */
+.cdl-ems-offload-gauge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--medical-accent) 8%, var(--medical-white));
+  border: 1px solid color-mix(in srgb, var(--medical-accent) 20%, var(--medical-border));
+}
+
+.cdl-ems-offload-gauge__ring {
+  width: 32px;
+  height: 32px;
+  color: var(--medical-accent);
+  flex-shrink: 0;
+}
+
+.cdl-ems-offload-gauge--breach {
+  background: color-mix(in srgb, var(--status-critical, #ef4444) 8%, var(--medical-white));
+  border-color: color-mix(in srgb, var(--status-critical, #ef4444) 28%, var(--medical-border));
+}
+
+.cdl-ems-offload-gauge--breach .cdl-ems-offload-gauge__ring {
+  color: var(--status-critical, #ef4444);
+}
+
+.cdl-ems-offload-gauge__value {
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* Command center graphic cards */
+.cdl-command-metric-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.cdl-command-metric-card__spark {
+  width: 40px;
+  height: 28px;
+  color: var(--medical-accent);
+  opacity: 0.7;
+}
+
+.cdl-command-action-card__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.cdl-command-action-card__count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 28px;
+  min-height: 28px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--medical-accent) 12%, var(--medical-white));
+  font-size: 13px;
+}
+
+/* Reception flow graphic */
+.cdl-reception-flow-graphic {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 4px;
+  padding: 12px 14px;
+  border-radius: var(--cdl-clinical-radius, 12px);
+  border: 1px solid var(--cdl-clinical-border, var(--medical-border));
+  background: var(--medical-white);
+  box-shadow: var(--cdl-clinical-shadow-rest);
+}
+
+.cdl-reception-flow-graphic__step {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+.cdl-reception-flow-graphic__step--complete .cdl-graphic-icon-badge {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--medical-accent) 24%, transparent);
+}
+
+.cdl-reception-flow-graphic__label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--medical-ink-muted);
+}
+
+.cdl-reception-flow-graphic__connector {
+  width: 18px;
+  height: 2px;
+  margin-inline: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--medical-accent), color-mix(in srgb, var(--medical-border) 80%, transparent));
+}
+
+.reception-command-stepper-shell {
+  display: grid;
+  gap: 10px;
+}

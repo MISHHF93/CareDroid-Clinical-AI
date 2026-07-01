@@ -10,6 +10,10 @@ const graphicLayerCss = readFileSync(join(__dirname, 'clinical-graphic-layer.css
 const routeSharedSource = readFileSync(join(__dirname, '../pages/emergency/emergencyRouteShared.tsx'), 'utf8');
 const shellRouteTabSource = readFileSync(join(__dirname, '../components/chrome/ShellRouteTab.tsx'), 'utf8');
 const emptyStateSource = readFileSync(join(__dirname, '../components/data-display/EmptyState.tsx'), 'utf8');
+const patientCardSource = readFileSync(join(__dirname, '../components/PatientCard.tsx'), 'utf8');
+const emsPipelineSource = readFileSync(join(__dirname, '../components/EMSPipeline.tsx'), 'utf8');
+const commandCenterSource = readFileSync(join(__dirname, '../pages/emergency/HospitalCommandCenter.tsx'), 'utf8');
+const receptionSource = readFileSync(join(__dirname, '../pages/emergency/ReceptionWorkspace.tsx'), 'utf8');
 
 describe('clinical graphic layer', () => {
   it('loads graphic layer after page sweep', () => {
@@ -38,5 +42,24 @@ describe('clinical graphic layer', () => {
   it('renders illustrated empty states by default', () => {
     expect(emptyStateSource).toContain('CdlEmptyIllustration');
     expect(emptyStateSource).toContain('resolveEmptyStateGraphic');
+  });
+
+  it('upgrades patient cards with acuity rings', () => {
+    expect(patientCardSource).toContain('PatientAcuityRing');
+    expect(patientCardSource).toContain('patient-card__priority-strip--graphic');
+  });
+
+  it('upgrades EMS pipeline rows with unit track graphics', () => {
+    expect(emsPipelineSource).toContain('EmsUnitTrackGraphic');
+    expect(emsPipelineSource).toContain('EmsOffloadGauge');
+  });
+
+  it('upgrades command center metrics and actions with graphic cards', () => {
+    expect(commandCenterSource).toContain('CommandMetricGraphicCard');
+    expect(commandCenterSource).toContain('CommandActionGraphicCard');
+  });
+
+  it('adds reception intake flow graphics', () => {
+    expect(receptionSource).toContain('ReceptionFlowGraphic');
   });
 });

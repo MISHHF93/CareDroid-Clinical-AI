@@ -77,6 +77,7 @@ import PostEdOrientationBadge from './predictive/PostEdOrientationBadge';
 import useFeature from '../hooks/useFeature';
 import { usePractitionerSurfaceVisibility } from '../contexts/PractitionerVisibilityContext';
 import { fetchBoardingSignalsForPatient, type BoardingSignals } from '../services/boardingSignals';
+import { PatientAcuityRing } from './graphics/CdlGraphicKit';
 import './PatientCard.css';
 
 type PatientCardWorkflowProfile = 'none' | 'charge' | 'physician';
@@ -611,8 +612,8 @@ function PatientCard({
         style={cardStyle}
         aria-label={patientCardAriaLabel}
       >
-        <div className="patient-card__row-cell patient-card__row-cell--triage" aria-label={`Triage ${displayPriority}`}>
-          <span className="patient-card__row-triage-code">{displayPriority}</span>
+        <div className="patient-card__row-cell patient-card__row-cell--triage patient-card__row-cell--graphic" aria-label={`Triage ${displayPriority}`}>
+          <PatientAcuityRing priority={displayPriority} className="patient-card__row-acuity-ring" />
           <span className="patient-card__row-triage-label">{priorityLabel}</span>
         </div>
 
@@ -703,8 +704,8 @@ function PatientCard({
       style={cardStyle}
       aria-label={patientCardAriaLabel}
     >
-      <div className="patient-card__priority-strip" aria-label={`${displayPriority} ${priorityLabel}`}>
-        <span className="patient-card__priority-code">{displayPriority}</span>
+      <div className="patient-card__priority-strip patient-card__priority-strip--graphic" aria-label={`${displayPriority} ${priorityLabel}`}>
+        <PatientAcuityRing priority={displayPriority} className="patient-card__acuity-ring" />
         <span className="patient-card__priority-label">{priorityLabel}</span>
         <span className="patient-card__state-pill">{whiteboardStateLabel}</span>
         {showThreeMinuteTimer && threeMinuteTimerStart && (

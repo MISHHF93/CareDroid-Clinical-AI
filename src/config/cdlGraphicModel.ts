@@ -71,6 +71,40 @@ export type EmptyStateGraphicVariant =
   | 'copilot'
   | 'generic';
 
+export const COMMAND_METRIC_GRAPHIC_KEYS: Record<string, string> = Object.freeze({
+  'three-minute-compliance': 'activity',
+  'active-patients': 'emergency-patients',
+  'waiting-count': 'queues',
+  'boarding-count': 'boarding',
+  'ems-inbound': 'ems',
+  'unresolved-alerts': 'alerts',
+  'staff-coverage': 'owner',
+  'capacity-band': 'capacity',
+  default: 'activity',
+});
+
+export function resolveCommandMetricGraphicKey(metricId: string): string {
+  return COMMAND_METRIC_GRAPHIC_KEYS[metricId] || COMMAND_METRIC_GRAPHIC_KEYS.default;
+}
+
+export const EMS_PHASE_GRAPHIC_ORDER = Object.freeze([
+  'dispatch',
+  'inbound',
+  'on-scene',
+  'arrival',
+  'handoff',
+  'complete',
+] as const);
+
+export function resolveEmsPhaseProgress(status: string): number {
+  const normalized = status.toLowerCase();
+  if (normalized.includes('complete') || normalized === 'handoff complete') return 100;
+  if (normalized.includes('handoff') || normalized === 'arrived') return 80;
+  if (normalized.includes('scene')) return 55;
+  if (normalized.includes('inbound') || normalized === 'dispatched') return 35;
+  return 15;
+}
+
 export function resolveEmptyStateGraphic(title: string): EmptyStateGraphicVariant {
   const normalized = title.toLowerCase();
   if (normalized.includes('queue') || normalized.includes('waiting')) return 'queue';

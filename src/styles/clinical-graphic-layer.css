@@ -41,6 +41,37 @@
   box-shadow: var(--cdl-clinical-shadow-hover, 0 4px 18px rgba(15, 23, 42, 0.08));
 }
 
+.hospital-command-center__metric-grid .cdl-command-metric-card {
+  min-height: 8.5rem;
+}
+
+.hospital-command-center__actions .cdl-command-action-card {
+  min-height: 11rem;
+}
+
+.sidebar-nav-item--active .sidebar-nav-item__icon {
+  transform: scale(1.08);
+  filter: drop-shadow(0 2px 6px color-mix(in srgb, var(--medical-accent) 35%, transparent));
+  transition: transform 160ms ease, filter 160ms ease;
+}
+
+.sidebar-nav-item--active::after {
+  content: '';
+  position: absolute;
+  inset-inline-end: 6px;
+  inset-block: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--medical-accent);
+  transform: translateY(-50%);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--medical-accent) 18%, transparent);
+}
+
+.sidebar-nav-item {
+  position: relative;
+}
+
 @media (max-width: 768px) {
   .shell-route-tab__identity .cdl-route-graphic-badge {
     display: none;
@@ -48,5 +79,10 @@
 
   .emergency-route-situation-brief__list--graphic {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cdl-reception-flow-graphic {
+    overflow-x: auto;
+    flex-wrap: nowrap;
   }
 }
