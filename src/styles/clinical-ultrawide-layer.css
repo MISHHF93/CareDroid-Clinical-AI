@@ -43,10 +43,7 @@
   }
 
   .emergency-app-shell .app-shell-main-content .hospital-command-center__actions {
-    grid-template-columns: repeat(
-      auto-fit,
-      minmax(min(100%, var(--app-ultrawide-action-min, 280px)), 1fr)
-    );
+    grid-template-columns: repeat(auto-fit, minmax(var(--app-ultrawide-action-min, 280px), 1fr));
   }
 
   .emergency-app-shell .cdl-zone--primary-actions {
@@ -65,7 +62,7 @@
   .emergency-whiteboard-page__command-layer-grid,
   .emergency-whiteboard-page__awareness-grid,
   .emergency-whiteboard-page__inbound-banner-grid {
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)) !important;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)) !important;
   }
 
   .emergency-route-page__content {
@@ -94,7 +91,7 @@
   }
 
   .emergency-app-shell .app-shell-main-content .hospital-command-center__actions {
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   }
 
   .emergency-whiteboard-page__command-layer-grid {
