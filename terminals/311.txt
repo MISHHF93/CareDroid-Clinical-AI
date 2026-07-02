@@ -1,0 +1,502 @@
+---
+pid: 18564
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "Set-Location \"C:\\Users\\borah\\CareDroid-Clinical-AI\"; node node_modules\\vitest\\vitest.mjs run src\\config\\inShellRouteAllowlist.test.ts src\\config\\edApplication.config.test.ts src\\routing\\canonicalRouteRedirects.test.ts src\\routing\\routeAliasFixtures.test.ts src\\routing\\canonicalRouteTree.shell.test.tsx --pool=forks --maxWorkers=1"
+started_at: 2026-07-02T17:29:59.587Z
+running_for_ms: 84997    
+---
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+stdout | src/routing/canonicalRouteTree.shell.test.tsx > canonical route tree — shell and workspace > keeps primary shell controls and representative sidebar links exposed
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1783013406709-1e3h70',
+  alertId: 'alert-reassessment-deterioration-pt-sepsis',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T17:30:06.709Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1783013406709-jm2vkq',
+  alertId: 'alert-long-wait-critical-pt-abdo',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T17:30:06.709Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: 'triage_nurse',
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1783013406709-bcirpm',
+  alertId: 'alert-queue-breach-Assessment',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T17:30:06.709Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1783013406709-yv2tm9',
+  alertId: 'alert-queue-breach-Results',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T17:30:06.709Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1783013406710-g5119t',
+  alertId: 'alert-queue-breach-Reassessment',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T17:30:06.710Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1783013406710-reud5i',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-assessment',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T17:30:06.710Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1783013406710-q90cyf',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-reassessment',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T17:30:06.710Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1783013406710-d9oovk',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-admission',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T17:30:06.710Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Warning',
+    ownerRole: 'triage_nurse',
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1783013406710-wc14wc',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-triage',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T17:30:06.710Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Warning',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1783013406710-ijcvxu',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-waiting',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T17:30:06.710Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Warning',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+
+stdout | src/routing/canonicalRouteTree.shell.test.tsx > canonical route tree — shell and workspace > routes /workspace without an access-denied or error surface for clinical profiles
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1783013406992-q80xlf',
+  alertId: 'alert-reassessment-deterioration-pt-sepsis',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T17:30:06.992Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1783013406992-dp7b60',
+  alertId: 'alert-long-wait-critical-pt-abdo',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T17:30:06.992Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: 'triage_nurse',
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1783013406992-nutngf',
+  alertId: 'alert-queue-breach-Assessment',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T17:30:06.992Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1783013406992-yrs7f0',
+  alertId: 'alert-queue-breach-Results',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T17:30:06.992Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1783013406992-ynfrjp',
+  alertId: 'alert-queue-breach-Reassessment',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T17:30:06.992Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1783013406992-h0we6q',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-assessment',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T17:30:06.992Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1783013406992-x8j12s',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-reassessment',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T17:30:06.992Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1783013406992-8cvm4z',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-admission',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T17:30:06.992Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Warning',
+    ownerRole: 'triage_nurse',
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1783013406992-tk4vvq',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-triage',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T17:30:06.992Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Warning',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1783013406992-pci8pk',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-waiting',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T17:30:06.992Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Warning',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+
+stdout | src/routing/canonicalRouteTree.shell.test.tsx > canonical route tree — shell and workspace > redirects legacy /emergency/simulation into the simulation suite
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1783013407107-6kts7c',
+  alertId: 'alert-reassessment-deterioration-pt-sepsis',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T17:30:07.107Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1783013407107-gvsxbr',
+  alertId: 'alert-long-wait-critical-pt-abdo',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T17:30:07.107Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: 'triage_nurse',
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1783013407107-jss82e',
+  alertId: 'alert-queue-breach-Assessment',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T17:30:07.107Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1783013407107-lsea27',
+  alertId: 'alert-queue-breach-Results',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T17:30:07.107Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1783013407107-73ft7l',
+  alertId: 'alert-queue-breach-Reassessment',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T17:30:07.107Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1783013407107-4aqgq0',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-assessment',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T17:30:07.107Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1783013407107-hm0n0x',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-reassessment',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T17:30:07.107Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1783013407107-pcne0j',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-admission',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T17:30:07.107Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Warning',
+    ownerRole: 'triage_nurse',
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1783013407107-ux05bo',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-triage',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T17:30:07.107Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Warning',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1783013407107-ltu39p',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-waiting',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T17:30:07.107Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Warning',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+
+ ❯ src/routing/canonicalRouteTree.shell.test.tsx (3 tests | 1 failed) 636ms
+     × keeps primary shell controls and representative sidebar links exposed 437ms
+     ✓ routes /workspace without an access-denied or error surface for clinical profiles 125ms
+     ✓ redirects legacy /emergency/simulation into the simulation suite 72ms
+ ✓ src/config/edApplication.config.test.ts (4 tests) 39ms
+ ✓ src/routing/routeAliasFixtures.test.ts (17 tests) 8ms
+ ✓ src/routing/canonicalRouteRedirects.test.ts (5 tests) 8ms
+ ✓ src/config/inShellRouteAllowlist.test.ts (21 tests) 7ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+
+ FAIL  src/routing/canonicalRouteTree.shell.test.tsx > canonical route tree — shell and workspace > keeps primary shell controls and representative sidebar links exposed
+AssertionError: Dashboard: expected undefined to be truthy
+
+- Expected:
+true
+
++ Received:
+undefined
+
+ ❯ src/routing/canonicalRouteTree.shell.test.tsx:42:27
+ Test Files  1 failed | 4 passed (5)
+      Tests  1 failed | 49 passed (50)
+   Start at  13:30:00
+   Duration  16.35s (transform 5.08s, setup 1.31s, import 8.38s, tests 698ms, environment 5.02s)
+
+     40|     for (const label of ['Dashboard', 'Patients', 'Queue']) {
+     41|       const item = PILOT_VISIBLE_NAVIGATION_ITEMS.find((navItem) => na…
+     42|       expect(item, label).toBeTruthy();
+       |                           ^
+     43|       expect(within(desktopNavigation).getByRole('link', { name: label…
+     44|         'href',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+

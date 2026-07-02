@@ -29,6 +29,9 @@ const lazyRoute = lazyWithRetry;
 const lazyNamed = (loader, exportName) =>
   lazyRoute(() => loader().then((module) => ({ default: module[exportName] })));
 
+// ── Platform entry hub ───────────────────────────────────────────────────────
+const PlatformEntryHub = lazyRoute(() => import('../pages/PlatformEntryHub'));
+
 // ── Display / wall mode ──────────────────────────────────────────────────────
 const WhiteboardDisplayRoute = lazyRoute(() => import('../features/whiteboard/WhiteboardDisplayRoute'));
 
@@ -77,9 +80,13 @@ import {
   AUTH_PATH_ALIASES,
   AUTH_SIGNUP_PATH_ALIASES,
   CANONICAL_ROUTES,
+  ED_CANONICAL_ROUTE_ALIASES,
   LEGACY_EMERGENCY_ROUTE_REDIRECTS,
   NON_ED_WORKSPACE_REDIRECT_ROUTES,
+  OUTSIDE_SHELL_ROUTE_REDIRECTS,
+  TRIAGE_PRETRIAGE_ROUTE,
 } from '../config/routes.config';
+import { COMMAND_CENTER_INTELLIGENCE_REDIRECTS } from '../config/hospitalCommandCenterViews.config';
 import { resolveRegistryId } from '../data/clinicalCatalogWiring';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import TrackMindRouteGuard from '../components/TrackMindRouteGuard';
@@ -91,6 +98,8 @@ import {
 import { getPlatformHomeRoute, isReceptionFirstUxEnabled } from '../config/receptionFirstUx.config';
 import { resolvePlatformLanding } from '../config/platformEntryModel';
 import { resolveDemoDefaultLandingRoute } from '../config/demoPersonaModel';
+import { resolveAppStartupRoute } from '../config/appStartupModel';
+import { EntryShell } from '../layouts/EntryShell';
 import { renderToolsConsoleRoutes } from './toolsConsoleRouteTree';
 import { renderGovernanceConsoleRoutes } from './governanceConsoleRouteTree';
 import { renderPlatformConsoleRoutes } from './platformConsoleRouteTree';
@@ -129,7 +138,15 @@ function LazyRoute({ children, label }) {
 // ── Auth / identity helpers ──────────────────────────────────────────────────
 
 function AuthPathsRedirect() {
-  return <Navigate to={resolveDemoDefaultLandingRoute()} replace />;
+  return <Navigate to={resolveAppStartupRoute()} replace />;
+}
+
+function AppStartupRedirect() {
+  const { saasProfile } = useUserIdentity();
+  const destination = resolveAppStartupRoute({
+    saasRole: saasProfile?.role || saasProfile?.saasRole,
+  });
+  return <Navigate to={destination} replace />;
 }
 
 // ── Role-aware route guard ───────────────────────────────────────────────────
@@ -208,7 +225,7 @@ function EmergencyDefaultRedirect() {
   const emergencyRole = useEmergencyRolePermissions();
 
   const destination =
-    resolvePlatformLanding({
+    resolveAppStartupRoute({
       saasRole: saasProfile?.role || saasProfile?.saasRole,
     }) ||
     emergencyRole.landingRoute ||
@@ -445,17 +462,39 @@ function EmergencyAliasRedirect({ to }) {
   return <Navigate to={{ pathname: to, search: location.search, hash: location.hash }} replace />;
 }
 
-function TriageWorkspaceRoute() {
-  const [searchParams] = useSearchParams();
-  if (!searchParams.has('queue') && !searchParams.has('filter') && !searchParams.has('queueFilter')) {
-    return <Navigate to={`${CANONICAL_ROUTES.triage}?queue=pretriage`} replace />;
+function CommandCenterIntelligenceRedirect({ view }: { view: 'executive' | 'ai' | 'predictive' }) {
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  if (!params.has('view')) {
+    params.set('view', view);
   }
   return (
-    <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyQueues}>
-      <EmergencySurfaceRedirect surfaceId="queues">
-        <QueueRoute />
-      </EmergencySurfaceRedirect>
-    </EmergencyRouteGuard>
+    <Navigate
+      to={{
+        pathname: CANONICAL_ROUTES.emergencyCommandCenter,
+        search: params.toString(),
+        hash: location.hash,
+      }}
+      replace
+    />
+  );
+}
+
+function TriagePretriageRedirect() {
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  if (!params.has('queue') && !params.has('filter') && !params.has('queueFilter')) {
+    return <Navigate to={TRIAGE_PRETRIAGE_ROUTE} replace />;
+  }
+  return (
+    <Navigate
+      to={{
+        pathname: CANONICAL_ROUTES.emergencyQueues,
+        search: location.search,
+        hash: location.hash,
+      }}
+      replace
+    />
   );
 }
 
@@ -515,7 +554,7 @@ export function AppRoutes() {
   return (
     <Routes>
       {/* Root */}
-      <Route path="/" element={<EmergencyDefaultRedirect />} />
+      <Route path="/" element={<AppStartupRedirect />} />
 
       {/* Auth — redirect to demo landing, no auth shell needed */}
       {legacyAuthPaths.map((path) => (
@@ -558,85 +597,34 @@ export function AppRoutes() {
         element={<ScreenModeLandingRedirect mode={CARE_DROID_SCREEN_MODES.physician} />}
       />
 
+      {/* Optional orientation — outside operational AppShell */}
+      <Route
+        path={CANONICAL_ROUTES.platformStart}
+        element={
+          <EntryShell>
+            <LazyRoute label="Loading platform entry...">
+              <PlatformEntryHub />
+            </LazyRoute>
+          </EntryShell>
+        }
+      />
+
       {/* ── Main application shell (AppShell) ── */}
       <Route element={<RootLayout />}>
-
-        {/* Entry redirects */}
-        <Route path={CANONICAL_ROUTES.platformStart} element={<EdApplicationEntryRedirect />} />
 
         {renderAdminConsoleRoutes(LazyRoute)}
 
         {/* ── Emergency department core ── */}
         <Route path="/emergency" element={<EmergencyDefaultRedirect />} />
 
-        {/* CareDroid consolidated page architecture */}
-        <Route
-          path={CANONICAL_ROUTES.intake}
-          element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyIntake}>
-              <EmergencyIntakeEntry />
-            </EmergencyRouteGuard>
-          }
-        />
-        <Route
-          path={CANONICAL_ROUTES.queue}
-          element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyQueues}>
-              <EmergencySurfaceRedirect surfaceId="queues">
-                <QueueRoute />
-              </EmergencySurfaceRedirect>
-            </EmergencyRouteGuard>
-          }
-        />
-        <Route path={CANONICAL_ROUTES.triage} element={<TriageWorkspaceRoute />} />
+        {/* Short ED bookmarks → one canonical mount each */}
+        {ED_CANONICAL_ROUTE_ALIASES.map(({ path, to }) => (
+          <Route key={`ed-alias-${path}`} path={path} element={<EmergencyAliasRedirect to={to} />} />
+        ))}
+
+        <Route path={CANONICAL_ROUTES.triage} element={<TriagePretriageRedirect />} />
         <Route path={CANONICAL_ROUTES.patientProfile} element={<PatientProfileRoute />} />
         <Route path="/patients" element={<EmergencyAliasRedirect to={CANONICAL_ROUTES.emergencyPatients} />} />
-        <Route
-          path={CANONICAL_ROUTES.alerts}
-          element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyAlerts}>
-              <LazyRoute label="Loading alerts...">
-                <ClinicalAlertsPage />
-              </LazyRoute>
-            </EmergencyRouteGuard>
-          }
-        />
-        <Route
-          path={CANONICAL_ROUTES.aiChief}
-          element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyCopilot}>
-              <CopilotRoute />
-            </EmergencyRouteGuard>
-          }
-        />
-        <Route
-          path={CANONICAL_ROUTES.departments}
-          element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyCapacity}>
-              <CapacityRoute />
-            </EmergencyRouteGuard>
-          }
-        />
-        <Route
-          path={CANONICAL_ROUTES.analytics}
-          element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyAnalytics}>
-              <LazyRoute label="Loading analytics...">
-                <EmergencyAnalytics />
-              </LazyRoute>
-            </EmergencyRouteGuard>
-          }
-        />
-        <Route
-          path={CANONICAL_ROUTES.settings}
-          element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencySettings}>
-              <LazyRoute label="Loading settings...">
-                <EmergencySettings />
-              </LazyRoute>
-            </EmergencyRouteGuard>
-          }
-        />
 
         <Route
           path={CANONICAL_ROUTES.emergencyWhiteboard}
@@ -683,23 +671,20 @@ export function AppRoutes() {
         <Route
           path={CANONICAL_ROUTES.emergencyCommandCenter}
           element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyWhiteboard}>
+            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyCommandCenter}>
               <LazyRoute label="Loading Hospital Command Center...">
                 <HospitalCommandCenter />
               </LazyRoute>
             </EmergencyRouteGuard>
           }
         />
-        <Route
-          path={CANONICAL_ROUTES.emergencyJourney}
-          element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyPatients}>
-              <LazyRoute label="Loading Hospital Command Center...">
-                <HospitalCommandCenter />
-              </LazyRoute>
-            </EmergencyRouteGuard>
-          }
-        />
+        {COMMAND_CENTER_INTELLIGENCE_REDIRECTS.map(({ path, view }) => (
+          <Route
+            key={`command-center-lens-${path}`}
+            path={path}
+            element={<CommandCenterIntelligenceRedirect view={view} />}
+          />
+        ))}
         <Route
           path={CANONICAL_ROUTES.emergencyEdReadiness}
           element={
@@ -963,32 +948,20 @@ export function AppRoutes() {
           />
         ))}
 
-        {/* ── Retired extension routes → whiteboard ── */}
-        <Route path="/cosmos"              element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
-        <Route path="/cosmos/*"            element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
+        {/* ── In-shell routes not covered by PilotExtensionRouteGuard ── */}
         <Route
           path={CANONICAL_ROUTES.workspace}
           element={<EdApplicationEntryRedirect />}
         />
-        <Route path="/workspaces"          element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
         <Route path="/organization"        element={<Navigate to={CANONICAL_ROUTES.adminOperations} replace />} />
         <Route path="/organization/*"      element={<Navigate to={CANONICAL_ROUTES.adminOperations} replace />} />
-        <Route path={CANONICAL_ROUTES.surveillanceNexus} element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
-        <Route path="/surveillance"        element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
-        <Route path="/surveillance/*"      element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
         <Route path={CANONICAL_ROUTES.customerPortal} element={<Navigate to={`${CANONICAL_ROUTES.adminOperations}/tenant`} replace />} />
         <Route path={CANONICAL_ROUTES.successCenter} element={<Navigate to={CANONICAL_ROUTES.customerSuccess} replace />} />
         <Route path={CANONICAL_ROUTES.customerSuccess} element={<Navigate to={`${CANONICAL_ROUTES.adminOperations}/tenant`} replace />} />
-        <Route path="/fleet"               element={<Navigate to={CANONICAL_ROUTES.emergencyEms} replace />} />
-        <Route path="/fleet/*"             element={<ToolsRedirect />} />
-        <Route path="/vehicle"             element={<Navigate to={CANONICAL_ROUTES.emergencyEms} replace />} />
-        <Route path="/vehicle/*"           element={<Navigate to={CANONICAL_ROUTES.emergencyEms} replace />} />
-        <Route path="/operations-center"   element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
+        <Route path="/fleet"               element={<Navigate to={CANONICAL_ROUTES.fleetCommand} replace />} />
         <Route path="/platform-learning"   element={<Navigate to={CANONICAL_ROUTES.emergencySettings} replace />} />
         <Route path="/audit-logs"          element={<Navigate to={CANONICAL_ROUTES.audit} replace />} />
         <Route path="/ai/evaluation"       element={<Navigate to={CANONICAL_ROUTES.emergencyAnalytics} replace />} />
-        <Route path="/ai/command-center"   element={<Navigate to={CANONICAL_ROUTES.emergencyCopilot} replace />} />
-        <Route path="/ai-command"          element={<Navigate to={CANONICAL_ROUTES.emergencyCopilot} replace />} />
         <Route path="/team"                element={<Navigate to={`${CANONICAL_ROUTES.adminOperations}/team`} replace />} />
 
 
@@ -1012,19 +985,12 @@ export function AppRoutes() {
       <Route path="/operations/:tool"   element={<ToolsRedirect />} />
       <Route path="/digital-twin"       element={<ToolsRedirect />} />
 
-      {/* ── Legacy dashboards → ED OS journey surfaces ── */}
-      <Route path={CANONICAL_ROUTES.executive} element={<Navigate to={CANONICAL_ROUTES.emergencyCommandCenter} replace />} />
-      <Route path={CANONICAL_ROUTES.aiCommandCenter} element={<Navigate to={CANONICAL_ROUTES.emergencyCopilot} replace />} />
-      <Route path={CANONICAL_ROUTES.predictiveAnalytics} element={<Navigate to={CANONICAL_ROUTES.emergencyAnalytics} replace />} />
-
-      {/* ── Copilot / AI aliases ── */}
-      <Route path="/assistant" element={<EmergencyAliasRedirect to={CANONICAL_ROUTES.emergencyCopilot} />} />
-      <Route path="/chat"      element={<EmergencyAliasRedirect to={CANONICAL_ROUTES.emergencyCopilot} />} />
-      <Route path="/ai"        element={<EmergencyAliasRedirect to={CANONICAL_ROUTES.emergencyCopilot} />} />
-      <Route path="/copilot"   element={<EmergencyAliasRedirect to={CANONICAL_ROUTES.emergencyCopilot} />} />
+      {/* ── Retired standalone surfaces → ED OS (outside PilotExtensionRouteGuard) ── */}
+      {OUTSIDE_SHELL_ROUTE_REDIRECTS.map(({ path, to }) => (
+        <Route key={`outside-shell-${path}`} path={path} element={<EmergencyAliasRedirect to={to} />} />
+      ))}
 
       {/* ── Generic fallbacks ── */}
-      <Route path="/dashboard"          element={<EmergencyAliasRedirect to={CANONICAL_ROUTES.emergencyCommandCenter} />} />
       <Route path="/home"               element={<EmergencyDefaultRedirect />} />
       <Route path="/app"                element={<EmergencyDefaultRedirect />} />
       <Route path="/mobile"             element={<EmergencyDefaultRedirect />} />

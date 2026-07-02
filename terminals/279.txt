@@ -1,0 +1,386 @@
+---
+pid: 36680
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "powershell -NoProfile -Command \"Set-Location 'C:\\Users\\borah\\CareDroid-Clinical-AI'; node node_modules\\vitest\\vitest.mjs run src/routing/canonicalRouteTree.redirects.test.tsx -t '/workflows mounts'\""
+started_at: 2026-07-02T05:03:50.407Z
+running_for_ms: 3394997  
+---
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+stdout | src/routing/canonicalRouteTree.redirects.test.tsx > canonical route tree — legacy redirects > /workflows mounts the in-shell canonical route
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968651568-wnuyvw',
+  alertId: 'alert-reassessment-deterioration-pt-sepsis',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:04:11.568Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968651570-fghhlu',
+  alertId: 'alert-long-wait-critical-pt-abdo',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:04:11.570Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: 'triage_nurse',
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968651570-a61xty',
+  alertId: 'alert-queue-breach-Assessment',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:04:11.570Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968651570-elu5om',
+  alertId: 'alert-queue-breach-Results',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:04:11.570Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968651570-i0z25s',
+  alertId: 'alert-queue-breach-Reassessment',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:04:11.570Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968651570-cl9yps',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-assessment',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:04:11.570Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968651571-ynxb5x',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-reassessment',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:04:11.571Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968651571-3iqmef',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-admission',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:04:11.571Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Warning',
+    ownerRole: 'triage_nurse',
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968651571-01zu3r',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-triage',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:04:11.571Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Warning',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968651571-p9nvm3',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-waiting',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:04:11.571Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Warning',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+
+ ❯ src/routing/canonicalRouteTree.redirects.test.tsx (11 tests | 1 failed | 10 skipped) 3294ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+     ↓ /tools/catalog redirects to Medical Tools with intent preserved
+     ↓ /tools/calculators/qsofa redirects to Medical Tools with intent preserved
+     ↓ /tools/calculator/sofa redirects to Medical Tools with intent preserved
+     ↓ /calculators redirects to Medical Tools with intent preserved
+     ↓ /operations/fleet-command redirects to Medical Tools with intent preserved
+     ↓ /tools/lab-interpreter mounts the in-shell canonical route
+     ↓ /maps mounts the in-shell canonical route
+     ↓ /recommendations mounts the in-shell canonical route
+     × /workflows mounts the in-shell canonical route 3290ms
+     ↓ /fleet/command mounts the in-shell canonical route
+     ↓ /fleet/map mounts the in-shell canonical route
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 10 skipped (11)
+   Start at  01:03:54
+   Duration  19.03s (transform 7.89s, setup 726ms, import 11.11s, tests 3.29s, environment 3.43s)
+
+ FAIL  src/routing/canonicalRouteTree.redirects.test.tsx > canonical route tree — legacy redirects > /workflows mounts the in-shell canonical route
+AssertionError: expected null to be truthy
+
+Ignored nodes: comments, script, style
+<html
+  data-theme="light"
+  data-white-label-theme="system"
+  style="color-scheme: light;"
+>
+  <head>
+    <title>
+      CareDroid
+    </title>
+  </head>
+  <body>
+    <div>
+      <div
+        class="emergency-app-shell emergency-app-shell--density-compact emergency-app-shell--screen-density-high-operational"
+      >
+        <a
+          class="ed-skip-link"
+          href="#main-content"
+        >
+          Skip to main content
+        </a>
+        <nav
+          aria-label="Emergency desktop navigation"
+        >
+          <a
+            href="/emergency/whiteboard"
+          >
+            Dashboard
+          </a>
+          <a
+            href="/emergency/ems"
+          >
+            EMS
+          </a>
+          <a
+            href="/emergency/tools"
+          >
+            Medical Tools
+          </a>
+          <a
+            href="/emergency/analytics"
+          >
+            Analytics
+          </a>
+          <a
+            href="/emergency/settings"
+          >
+            Settings
+          </a>
+          <a
+            href="/emergency/patients"
+          >
+            Patients
+          </a>
+          <a
+            href="/emergency/queues"
+          >
+            Queue
+          </a>
+          <a
+            href="/emergency/copilot"
+          >
+            AI Chief
+          </a>
+        </nav>
+        <div
+          class="emergency-app-shell__main-column"
+        >
+          <header>
+            <button
+              type="button"
+            >
+              + Central Intake
+            </button>
+            <div
+              aria-label="Operational command context"
+            />
+          </header>
+          <div
+            aria-label="Current workspace"
+            class="shell-route-tab"
+            role="region"
+          >
+            <div
+              class="shell-route-tab__identity"
+            >
+              <div
+                class="shell-route-tab__title-stack"
+              >
+                <div
+                  class="shell-route-tab__title-block"
+                >
+                  <h1
+                    class="shell-route-tab__title"
+                  >
+                    CareDroid
+                  </h1>
+                </div>
+              </div>
+            </div>
+            <div
+              class="shell-route-tab__actions"
+            >
+              <button
+                class="help-trigger shell-route-tab__help"
+                type="button"
+              >
+                Guide
+              </button>
+            </div>
+          </div>
+          <div
+            class="operational-alarm-dock"
+          >
+            <section
+              aria-live="polite"
+              class="operational-alarm-dock__strip operational-alarm-dock__strip--critical"
+              role="alert"
+            >
+              <svg
+                aria-hidden="true"
+                class="lucide lucide-triangle-alert operational-alarm-dock__icon"
+                fill="none"
+                height="16"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="16"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"
+                />
+                <path
+                  d="M12 9v4"
+                />
+                <path
+                  d="M12 17h.01"
+                />
+              </svg>
+              <div
+                class="operational-alarm-dock__copy"
+              >
+                <strong>
+                  Critical long wait breach
+                </strong>
+                <span>
+                  James Tremblay has waited 56m (P3 limit 30m). Charge nurse and physician notification required.
+                </span>
+              </div>
+              <div
+                class="operational-alarm-dock__actions"
+              >
+                <button
+                  type="button"
+                >
+                  Open patient
+                </button>
+                <button
+                  type="button"
+                >
+                  Acknowledge
+                </button>
+                <button
+                  class="operational-alarm-dock__ghost"
+                  type="button"
+                >
+                  All alerts
+                </button>
+              </div>
+            </section>
+          </div>
+          <main
+            class="app-shell-main-content"
+            data-practitioner-compact="true"
+            data-screen-density-mode="high-operational"
+            id
+
+xpected:
+true
+
++ Received:
+null
+
+ ❯ src/routing/canonicalRouteTree.redirects.test.tsx:47:57
+     45|     if (typeof expected.marker === 'string') {
+     46|       await waitFor(() => {
+     47|         expect(document.querySelector(expected.marker)).toBeTruthy();
+       |                                                         ^
+     48|       });
+     49|       return;
+ ❯ runWithExpensiveErrorDiagnosticsDisabled node_modules/@testing-library/dom/dist/config.js:47:12
+ ❯ checkCallback node_modules/@testing-library/dom/dist/wait-for.js:124:77
+ ❯ Timeout.checkRealTimersCallback node_modules/@testing-library/dom/dist/wait-for.js:118:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+

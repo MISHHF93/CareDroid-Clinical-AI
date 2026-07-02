@@ -32,7 +32,7 @@ export default function HelpCenter() {
         },
         {
           q: 'How does CareDroid Copilot work?',
-          a: 'Open Copilot from the header or patient detail drawer. Copilot is case-aware decision support — it surfaces routing, evidence, and workflow prompts without making autonomous clinical decisions.'
+          a: 'Open Copilot from the header or patient detail drawer. Copilot is case-aware decision support ï¿½ it surfaces routing, evidence, and workflow prompts without making autonomous clinical decisions.'
         },
         {
           q: 'Where do I manage referrals and boarding?',
@@ -133,7 +133,7 @@ export default function HelpCenter() {
           }}>
             Help Center
           </h1>
-          <p style={{ color: 'var(--muted-text)' }}>
+          <p style={{ color: 'var(--app-fg-muted)' }}>
             Find answers to common questions and learn how to use CareDroid
           </p>
         </div>
@@ -180,7 +180,7 @@ export default function HelpCenter() {
               </button>
 
               {expandedSection === idx && (
-                <div style={{ padding: '20px 24px', background: 'rgba(0, 255, 136, 0.05)' }}>
+                <div style={{ padding: '20px 24px', background: 'var(--medical-accent-tint-faint)' }}>
                   <div style={{ display: 'grid', gap: '20px' }}>
                     {section.items.map((item, itemIdx) => (
                       <div key={itemIdx}>
@@ -195,7 +195,7 @@ export default function HelpCenter() {
                         <p style={{
                           margin: 0,
                           fontSize: '14px',
-                          color: 'var(--muted-text)',
+                          color: 'var(--app-fg-muted)',
                           lineHeight: 1.6
                         }}>
                           A: {item.a}
@@ -213,15 +213,15 @@ export default function HelpCenter() {
         <div style={{
           marginTop: '40px',
           padding: '24px',
-          background: 'linear-gradient(135deg, rgba(0, 255, 136, 0.1), rgba(0, 255, 255, 0.1))',
-          border: '1px solid rgba(0, 255, 136, 0.3)',
+          background: 'linear-gradient(135deg, var(--medical-accent-tint), var(--medical-accent-tint))',
+          border: '1px solid color-mix(in srgb, var(--app-accent-interactive) 30%, transparent)',
           borderRadius: '12px',
           textAlign: 'center'
         }}>
           <h2 style={{ margin: '0 0 12px 0', fontSize: '18px', color: 'var(--accent-1)' }}>
             Need Help?
           </h2>
-          <p style={{ margin: '0 0 16px 0', color: 'var(--muted-text)', fontSize: '14px' }}>
+          <p style={{ margin: '0 0 16px 0', color: 'var(--app-fg-muted)', fontSize: '14px' }}>
             Can't find the answer? Contact our support team:
           </p>
           <div style={{ display: 'grid', gap: '12px', fontSize: '14px' }}>

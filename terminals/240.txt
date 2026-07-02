@@ -1,0 +1,8 @@
+---
+pid: 14900
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cd C:\\Users\\borah\\CareDroid-Clinical-AI; npx.cmd tsc --noEmit -p tsconfig.frontend.json > tsc-frontend-out.txt 2>&1; echo EXIT:$LASTEXITCODE; Get-Content tsc-frontend-out.txt -Tail 15"
+started_at: 2026-07-01T22:18:25.164Z
+running_for_ms: 27725000 
+---
+EXIT:0

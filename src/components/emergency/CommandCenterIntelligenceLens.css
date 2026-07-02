@@ -1,0 +1,40 @@
+.command-center-lens__panel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--cd-space-3, 12px);
+}
+
+.command-center-lens__metric {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: var(--cd-space-3, 12px);
+  border-radius: var(--cd-radius-md, 8px);
+  background: var(--cd-surface-nested, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--cd-border-subtle, rgba(255, 255, 255, 0.08));
+}
+
+.command-center-lens__metric-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cd-ink-subtle, #94a3b8);
+}
+
+.command-center-lens__metric-value {
+  font-size: 1.25rem;
+  line-height: 1.2;
+  color: var(--cd-ink, #e2e8f0);
+}
+
+.command-center-lens__metric-detail {
+  font-size: 0.75rem;
+  color: var(--cd-ink-muted, #cbd5e1);
+}
+
+.command-center-lens__loading {
+  margin: 0;
+  color: var(--cd-ink-muted, #cbd5e1);
+  font-size: 0.875rem;
+}

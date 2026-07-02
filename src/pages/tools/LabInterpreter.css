@@ -88,9 +88,9 @@
   gap: 12px;
   margin-bottom: 24px;
   padding: 16px;
-  background: rgba(0, 255, 136, 0.05);
+  background: var(--medical-accent-tint-faint);
   border-radius: 12px;
-  border: 1px solid rgba(0, 255, 136, 0.2);
+  border: 1px solid var(--medical-accent-ring);
   min-width: 0;
   max-width: 100%;
   box-sizing: border-box;
@@ -243,7 +243,7 @@
 }
 
 .lab-values-list::-webkit-scrollbar-thumb {
-  background: rgba(0, 255, 136, 0.3);
+  background: color-mix(in srgb, var(--app-accent-interactive) 30%, transparent);
   border-radius: 3px;
 }
 
@@ -407,7 +407,7 @@
 }
 
 .lab-results-panel::-webkit-scrollbar-thumb {
-  background: rgba(0, 255, 136, 0.3);
+  background: color-mix(in srgb, var(--app-accent-interactive) 30%, transparent);
   border-radius: 4px;
 }
 
@@ -423,7 +423,7 @@
 .lab-spinner {
   width: 48px;
   height: 48px;
-  border: 4px solid rgba(0, 255, 136, 0.2);
+  border: 4px solid var(--medical-accent-ring);
   border-top-color: var(--accent-1);
   border-radius: 50%;
   animation: spin 1s linear infinite;

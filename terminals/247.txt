@@ -1,0 +1,41 @@
+---
+pid: 33984
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "Set-Location C:\\Users\\borah\\CareDroid-Clinical-AI\\backend; npm.cmd run build 2>&1 | Select-Object -Last 40"
+started_at: 2026-07-01T23:13:32.615Z
+running_for_ms: 24415235 
+---
+                            ~~~~~~~~~~~
+Found 33 error(s).../src/services/queueIntelligenceService.ts:168:34 - error TS2339: Property 'oldestPatient' does not exist on type 
+'{}'.
+168     const oldestPatient = (state.oldestPatient || {}) as Record<string, any>;
+                                     ~~~~~~~~~~~~~
+../src/services/queueIntelligenceService.ts:171:27 - error TS2339: Property 'count' does not exist on type '{}'.
+171       count: Number(state.count || 0),
+                              ~~~~~
+../src/services/queueIntelligenceService.ts:172:30 - error TS2339: Property 'waitTime' does not exist on type '{}'.
+172       waitTime: Number(state.waitTime || 0),
+                                 ~~~~~~~~
+../src/services/queueIntelligenceService.ts:179:24 - error TS2339: Property 'riskLevel' does not exist on type '{}'.
+179       riskLevel: state.riskLevel || 'low',
+                           ~~~~~~~~~
+../src/services/queueIntelligenceService.ts:180:32 - error TS2339: Property 'throughput' does not exist on type '{}'.
+180       throughput: Number(state.throughput || 0),
+                                   ~~~~~~~~~~
+../src/store/emergencyStore.ts:65:8 - error TS6142: Module '../services/emergencySettingsApi' was resolved to 
+'C:/Users/borah/CareDroid-Clinical-AI/src/services/emergencySettingsApi.tsx', but '--jsx' is not set.
+65 } from '../services/emergencySettingsApi';
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../src/store/emergencyStore.ts:1683:12 - error TS1343: The 'import.meta' meta-property is only allowed when the 
+'--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', or 'nodenext'.
+1683   Boolean((import.meta as ImportMeta & { env?: { DEV?: boolean } }).env?.DEV);
+                ~~~~~~~~~~~
+../src/store/emergencyStore.ts:5808:5 - error TS1343: The 'import.meta' meta-property is only allowed when the 
+'--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', or 'nodenext'.
+5808 if (import.meta.env.DEV && typeof window !== 'undefined') {
+         ~~~~~~~~~~~
+../src/store/emergencyStore.ts:5808:17 - error TS2339: Property 'env' does not exist on type 'ImportMeta'.
+5808 if (import.meta.env.DEV && typeof window !== 'undefined') {
+                     ~~~
+
+

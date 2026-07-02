@@ -277,7 +277,13 @@ export function getVisibleNavigationForSaasRole(
 export const NAVIGATION_ITEMS = Object.freeze(
   NAV_ITEMS.map((item, index) => {
     const routeRecord = CANONICAL_ROUTE_MAP.find((route) => route.id === item.id);
-    const routeRoles = item.roles || routeRecord?.emergencyRoles || rolesForRoute(item.route);
+    const emergencyRolesFromPath = rolesForRoute(item.route);
+    const routeRoles =
+      item.roles ||
+      routeRecord?.emergencyRoles ||
+      (emergencyRolesFromPath.length > 0 ? emergencyRolesFromPath : undefined) ||
+      routeRecord?.allowedRoles ||
+      [];
     const priority = routeRecord?.priority ?? index + 1;
     return navigationItem({
       ...item,
@@ -290,7 +296,10 @@ export const NAVIGATION_ITEMS = Object.freeze(
       visibleToProfiles: routeRecord?.userProfileVisibility || rolesForRoute(item.route),
       priority,
       emergencySafe:
-        routeRecord?.emergencySafe ?? (item.route.startsWith('/emergency') || item.route === CANONICAL_ROUTES.workspace),
+        routeRecord?.emergencySafe ??
+        (item.route.startsWith('/emergency') ||
+          item.route === CANONICAL_ROUTES.workspace ||
+          item.route === CANONICAL_ROUTES.platformStart),
       readOnlyAllowed: routeRecord?.readOnlyAllowed ?? READ_ONLY_NAV_ITEM_IDS.has(item.id),
       isEmergencyCore: !UTILITY_NAV_ITEM_IDS.has(item.id),
       mobileLabel: item.id === 'reassessment' ? 'Recheck' : item.label,
@@ -309,7 +318,12 @@ export const NAVIGATION_ITEMS = Object.freeze(
           : item.id === 'settings'
             ? [CANONICAL_ROUTES.emergencySettings, '/settings']
             : item.id === 'platform'
-              ? [CANONICAL_ROUTES.workspace, CANONICAL_ROUTES.workspaces, '/app']
+              ? [
+                  CANONICAL_ROUTES.platformStart,
+                  CANONICAL_ROUTES.workspace,
+                  CANONICAL_ROUTES.workspaces,
+                  '/app',
+                ]
             : undefined,
     });
   }),

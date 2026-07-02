@@ -14,13 +14,13 @@
 }
 
 .commercial-subtitle {
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-size: 14px;
   margin: 0;
 }
 
 .commercial-header .cd-page-header__description {
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-size: 14px;
   margin: 0;
 }
@@ -84,7 +84,7 @@
 }
 
 .commercial-error-text {
-  color: #ff6b6b;
+  color: var(--app-danger);
 }
 
 .commercial-asset-action {
@@ -98,7 +98,7 @@
 
 .commercial-card p {
   margin: 0 0 12px;
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-size: 13px;
 }
 
@@ -125,7 +125,7 @@
 
 .commercial-inline-metric span,
 .commercial-opportunity-meta dt {
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -199,7 +199,7 @@
 
 .commercial-step-pill.active {
   border-color: var(--app-accent-interactive);
-  background: rgba(0, 255, 136, 0.1);
+  background: var(--medical-accent-tint);
 }
 
 .commercial-form-row {
@@ -210,7 +210,7 @@
 
 .commercial-form-row label {
   font-size: 13px;
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
 }
 
 .commercial-form-row input,
@@ -268,13 +268,13 @@ button.commercial-chip {
 
 .commercial-chip.selected {
   border-color: var(--app-accent-interactive);
-  background: rgba(0, 255, 136, 0.12);
+  background: var(--medical-accent-tint-mid);
 }
 
 .commercial-compact-list {
   margin: 0;
   padding-left: 18px;
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-size: 13px;
 }
 
@@ -295,7 +295,7 @@ button.commercial-chip {
 }
 
 .commercial-muted {
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-size: 12px;
 }
 
@@ -373,7 +373,7 @@ button.commercial-chip {
 }
 
 .commercial-pathway-asset-row small {
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
 }
 
 .commercial-pathway-ai {

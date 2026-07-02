@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { CHART_PALETTE } from '../../config/colorSchema.registry';
 import { MEDICAL_THEME } from '../../config/medicalTheme.constants';
 import {
   DEMO_PREDICTIVE_ANALYTICS_MODELS,
@@ -11,17 +12,17 @@ import {
 // -- constants -----------------------------------------------------------------
 
 const BAND_COLOR: Record<string, string> = {
-  critical: '#ef4444',
-  high:     '#f97316',
-  moderate: '#f59e0b',
-  low:      '#22c55e',
+  critical: CHART_PALETTE.critical,
+  high: CHART_PALETTE.high,
+  moderate: CHART_PALETTE.moderate,
+  low: CHART_PALETTE.low,
 };
 
 const BAND_BG: Record<string, string> = {
-  critical: '#fef2f2',
-  high:     '#fff7ed',
-  moderate: '#fefce8',
-  low:      '#f0fdf4',
+  critical: CHART_PALETTE.criticalBg,
+  high: CHART_PALETTE.highBg,
+  moderate: CHART_PALETTE.moderateBg,
+  low: CHART_PALETTE.lowBg,
 };
 
 // -- sub-components ------------------------------------------------------------
@@ -34,7 +35,7 @@ function SummaryStrip({ summary }: { summary: ReturnType<typeof buildPredictiveA
         {
           label: 'High / Critical',
           value: summary.highOrCriticalCount,
-          accent: summary.highOrCriticalCount > 0 ? '#ef4444' : '#22c55e',
+          accent: summary.highOrCriticalCount > 0 ? CHART_PALETTE.critical : CHART_PALETTE.low,
         },
         { label: 'Avg risk score', value: `${summary.averageScore}/100` },
         {
@@ -250,7 +251,7 @@ function ModelCard({
                   style={{
                     fontSize: 11,
                     fontWeight: 700,
-                    color: '#fff',
+                    color: MEDICAL_THEME.onAccent,
                     background: color,
                     borderRadius: '50%',
                     width: 18,
@@ -275,7 +276,7 @@ function ModelCard({
               style={{
                 alignSelf: 'flex-start',
                 background: MEDICAL_THEME.accent,
-                color: '#fff',
+                color: MEDICAL_THEME.onAccent,
                 border: 'none',
                 borderRadius: 8,
                 padding: '6px 14px',
@@ -330,12 +331,12 @@ export default function PredictiveAnalyticsDashboard() {
       {/* Demo notice */}
       <div
         style={{
-          background: '#fefce8',
-          border: '1px solid #d97706',
+          background: CHART_PALETTE.moderateBg,
+          border: `1px solid ${CHART_PALETTE.moderate}`,
           borderRadius: 8,
           padding: '8px 14px',
           fontSize: 12,
-          color: '#78350f',
+          color: 'var(--semantic-attention)',
           marginBottom: 16,
           display: 'flex',
           alignItems: 'center',

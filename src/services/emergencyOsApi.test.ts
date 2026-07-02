@@ -83,6 +83,8 @@ describe('emergencyOsApi advanced CareDroid capabilities', () => {
       'smartIntakeVerticalSlice',
       'queues',
       'reassessment',
+      'patientFlow',
+      'workflowOrchestration',
       'capacity',
       'boarding',
       'referrals',
@@ -100,6 +102,7 @@ describe('emergencyOsApi advanced CareDroid capabilities', () => {
       'aiGovernanceCompliance',
       'aiGovernancePromptValidation',
       'settings',
+      'operatingSurface',
     ]);
     expect(REVIEW_ONLY_EMERGENCY_OS_API_ENDPOINT_KEYS).toEqual(
       expect.arrayContaining([

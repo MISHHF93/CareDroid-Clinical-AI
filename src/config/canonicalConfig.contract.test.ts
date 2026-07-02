@@ -40,13 +40,14 @@ describe('canonical configuration contract', () => {
     expect(getRouteAliasTarget('/copilot')).toBe('/emergency/copilot');
     expect(getRouteAliasTarget('/catalog')).toBe('/emergency/tools');
     expect(getRouteAliasTarget('/fleet')).toBe('/fleet/map');
-    expect(getRouteAliasTarget('/home')).toBe('/emergency/whiteboard');
+    expect(getRouteAliasTarget('/home')).toBe('/emergency/reception');
     expect(getRouteAliasTarget('/automation')).toBe('/workflows');
     expect(getRouteAliasTarget('/asset-packs')).toBeNull();
     expect(getRouteAliasTarget('/privacy')).toBeNull();
     expect(getRouteAliasTarget('/operations')).toBeNull();
     expect(ROUTE_ALIAS_GROUPS.assistant.aliases).toBe(ASSISTANT_ROUTE_ALIASES);
-    expect(ROUTE_ALIAS_GROUPS.dashboard.target).toBe('/emergency/whiteboard');
+    expect(ROUTE_ALIAS_GROUPS.dashboard.target).toBe('/emergency/command-center');
+    expect(ROUTE_ALIAS_GROUPS.startup.target).toBe('/emergency/reception');
     expect(ROUTE_ALIAS_GROUPS.assistant.target).toBe('/emergency/copilot');
     expect(ROUTE_ALIAS_GROUPS.tools.target).toBe('/emergency/tools');
     expect(ROUTE_ALIAS_GROUPS.calculators.target).toBe('/emergency/tools');
@@ -71,8 +72,10 @@ describe('canonical configuration contract', () => {
     const routeIds = ROUTE_RECORDS.map((route) => route.id);
 
     expect(new Set(routeIds).size).toBe(routeIds.length);
-    expect(ROUTE_RECORDS_BY_ID.dashboard.path).toBe('/emergency/whiteboard');
-    expect(ROUTE_RECORDS_BY_ID.dashboard.aliases).toContain('/home');
+    expect(ROUTE_RECORDS_BY_ID.dashboard.path).toBe('/emergency/command-center');
+    expect(ROUTE_RECORDS_BY_ID.dashboard.aliases).toContain('/dashboard');
+    expect(ROUTE_RECORDS_BY_ID.startup.path).toBe('/emergency/reception');
+    expect(ROUTE_RECORDS_BY_ID.startup.aliases).toContain('/home');
     expect(ROUTE_RECORDS_BY_ID.assistant.path).toBe('/emergency/copilot');
     expect(ROUTE_RECORDS_BY_ID.tools.path).toBe('/emergency/tools');
     expect(ROUTE_RECORDS_BY_ID.calculators.path).toBe('/emergency/tools');
@@ -82,7 +85,7 @@ describe('canonical configuration contract', () => {
     expect(ROUTE_RECORDS_BY_ID.organizationPacks.aliases).toBe(ORGANIZATION_PACKS_ROUTE_ALIASES);
     expect(PROTECTED_ROUTE_ALIAS_REDIRECTS).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ path: '/home', to: '/emergency/whiteboard', routeId: 'dashboard' }),
+        expect.objectContaining({ path: '/home', to: '/emergency/reception', routeId: 'startup' }),
         expect.objectContaining({ path: '/chat', to: '/emergency/copilot', routeId: 'assistant' }),
         expect.objectContaining({ path: '/automation', to: '/workflows', routeId: 'workflows' }),
       ])

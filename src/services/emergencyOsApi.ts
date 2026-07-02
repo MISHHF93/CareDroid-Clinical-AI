@@ -67,7 +67,20 @@ export const EMERGENCY_OS_API_ENDPOINTS = Object.freeze({
   digitalTwinState: '/api/emergency/digital-twin/state',
   digitalTwinScenario: '/api/emergency/digital-twin/scenario',
   settings: '/api/emergency/settings',
+  operatingSurface: '/api/emergency/operating-surfaces',
 });
+
+export type OperatingSurfaceId =
+  | 'dispatch'
+  | 'department-pulse'
+  | 'shift-summary'
+  | 'diagnostics'
+  | 'handoffs'
+  | 'reports'
+  | 'ed-readiness'
+  | 'command-center'
+  | 'alerts'
+  | 'whiteboard';
 
 export const ACTIVE_EMERGENCY_OS_API_ENDPOINT_KEYS = Object.freeze([
   'centralNodeSnapshot',
@@ -105,6 +118,7 @@ export const ACTIVE_EMERGENCY_OS_API_ENDPOINT_KEYS = Object.freeze([
   'aiGovernanceCompliance',
   'aiGovernancePromptValidation',
   'settings',
+  'operatingSurface',
 ]);
 
 export const REVIEW_ONLY_EMERGENCY_OS_API_ENDPOINT_KEYS = Object.freeze([
@@ -264,6 +278,10 @@ export const fetchCompleteImplementationReadiness = () =>
   requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.implementationReadiness);
 export const fetchEmergencyAnalytics = () =>
   requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.analytics);
+export const fetchEmergencyOperatingSurface = (surfaceId: OperatingSurfaceId) =>
+  requestEmergencyJson(
+    `${EMERGENCY_OS_API_ENDPOINTS.operatingSurface}/${encodeURIComponent(surfaceId)}`,
+  );
 export const fetchEmergencyAiGovernanceRegistry = () =>
   requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.aiGovernanceRegistry);
 export const fetchEmergencyAiGovernanceSafetyRules = () =>

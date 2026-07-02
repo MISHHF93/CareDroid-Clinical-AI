@@ -4,7 +4,9 @@ import { fileURLToPath } from 'node:url';
 import {
   CANONICAL_APP_ROUTE_TREE,
   CANONICAL_ROUTES,
+  ED_CANONICAL_ROUTE_ALIASES,
   LEGACY_EMERGENCY_ROUTE_REDIRECTS,
+  OUTSIDE_SHELL_ROUTE_REDIRECTS,
 } from '../config/routes.config';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -161,6 +163,16 @@ function directAppRouteEntries() {
 function generatedAliasEntries() {
   const aliasEntries = [
     ...LEGACY_EMERGENCY_ROUTE_REDIRECTS.map((alias) => ({
+      path: alias.path,
+      target: alias.to,
+      generatedKind: `${alias.routeId}-alias`,
+    })),
+    ...ED_CANONICAL_ROUTE_ALIASES.map((alias) => ({
+      path: alias.path,
+      target: alias.to,
+      generatedKind: `${alias.routeId}-alias`,
+    })),
+    ...OUTSIDE_SHELL_ROUTE_REDIRECTS.map((alias) => ({
       path: alias.path,
       target: alias.to,
       generatedKind: `${alias.routeId}-alias`,

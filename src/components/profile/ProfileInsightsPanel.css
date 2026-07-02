@@ -29,7 +29,7 @@
 
 .profile-insights-panel__intro p {
   margin: 6px 0 0;
-  color: var(--medical-text-muted, var(--muted-text));
+  color: var(--medical-text-muted, var(--app-fg-muted));
   font-size: 14px;
   line-height: 1.5;
 }
@@ -50,7 +50,7 @@
 }
 
 .profile-insights-sparkline-card > span {
-  color: var(--medical-text-muted, var(--muted-text));
+  color: var(--medical-text-muted, var(--app-fg-muted));
   font-size: 0.78rem;
   font-weight: 800;
   letter-spacing: 0.04em;
@@ -83,7 +83,7 @@
 
 .profile-ai-capabilities__header p {
   margin: 4px 0 0;
-  color: var(--medical-text-muted, var(--muted-text));
+  color: var(--medical-text-muted, var(--app-fg-muted));
   font-size: 13px;
 }
 
@@ -128,7 +128,7 @@
 }
 
 .profile-ai-capability-card__body > span {
-  color: var(--medical-text-muted, var(--muted-text));
+  color: var(--medical-text-muted, var(--app-fg-muted));
   font-size: 12px;
   line-height: 1.45;
 }
@@ -145,7 +145,7 @@
   border-radius: 999px;
   border: 1px solid var(--medical-card-border, var(--panel-border));
   background: var(--medical-card-bg, var(--surface-1));
-  color: var(--medical-text-muted, var(--muted-text));
+  color: var(--medical-text-muted, var(--app-fg-muted));
   font-size: 11px;
   font-weight: 700;
   text-transform: capitalize;

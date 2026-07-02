@@ -61,7 +61,7 @@
   justify-content: space-between;
   padding: 28px 32px;
   border-bottom: 1px solid var(--border-color);
-  background: linear-gradient(135deg, rgba(0, 255, 136, 0.05), rgba(100, 200, 255, 0.05));
+  background: linear-gradient(135deg, var(--medical-accent-tint-faint), var(--medical-accent-tint-faint));
 }
 
 .share-modal-header h2 {
@@ -133,13 +133,13 @@
 
 .share-tab:hover {
   color: var(--text-primary);
-  background: rgba(0, 255, 136, 0.05);
+  background: var(--medical-accent-tint-faint);
 }
 
 .share-tab.active {
   color: var(--accent-1);
   border-bottom-color: var(--accent-1);
-  background: rgba(0, 255, 136, 0.08);
+  background: var(--medical-accent-tint-subtle);
 }
 
 .share-modal-body {
@@ -160,8 +160,8 @@
 }
 
 .share-link-display {
-  background: rgba(0, 255, 136, 0.08);
-  border: 1px solid rgba(0, 255, 136, 0.2);
+  background: var(--medical-accent-tint-subtle);
+  border: 1px solid var(--medical-accent-ring);
   border-radius: 12px;
   padding: 16px;
   display: flex;
@@ -203,8 +203,8 @@
 }
 
 .export-format-option:hover {
-  background: rgba(0, 255, 136, 0.1);
-  border-color: rgba(0, 255, 136, 0.3);
+  background: var(--medical-accent-tint);
+  border-color: color-mix(in srgb, var(--app-accent-interactive) 30%, transparent);
 }
 
 .export-format-option input {
@@ -212,7 +212,7 @@
 }
 
 .export-format-option.selected {
-  background: rgba(0, 255, 136, 0.15);
+  background: var(--medical-accent-tint-strong);
   border-color: var(--accent-1);
 }
 
@@ -353,15 +353,15 @@
 }
 
 .share-message--success {
-  background: rgba(0, 255, 136, 0.15);
-  border: 1px solid rgba(0, 255, 136, 0.3);
+  background: var(--medical-accent-tint-strong);
+  border: 1px solid color-mix(in srgb, var(--app-accent-interactive) 30%, transparent);
   color: var(--accent-1);
 }
 
 .share-message--error {
   background: rgba(255, 107, 107, 0.15);
   border: 1px solid rgba(255, 107, 107, 0.3);
-  color: #ff6b6b;
+  color: var(--app-danger);
 }
 
 .share-message--info {

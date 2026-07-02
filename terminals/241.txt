@@ -1,0 +1,113 @@
+---
+pid: 32936
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cd C:\\Users\\borah\\CareDroid-Clinical-AI; npm.cmd run test:run:stable -- src/config/unifiedAiNodeEntryAudit.test.ts src/config/careDroidUnifiedAiNode.test.ts src/services/careDroidUnifiedAiNode.test.ts src/lib/ai/client.test.ts src/services/clinicalChatService.test.ts src/components/HandoffBriefGenerator.test.tsx src/services/aiChiefOrchestrator.test.ts 2>&1"
+started_at: 2026-07-01T22:25:36.253Z
+running_for_ms: 27290000 
+---
+
+> caredroid-clinical-ai@1.0.0 test:run:stable
+> vitest run --pool=threads --maxWorkers=1 src/config/unifiedAiNodeEntryAudit.test.ts src/config/careDroidUnifiedAiNode.test.ts src/services/careDroidUnifiedAiNode.test.ts src/lib/ai/client.test.ts src/services/clinicalChatService.test.ts src/components/HandoffBriefGenerator.test.tsx src/services/aiChiefOrchestrator.test.ts
+
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+ ✓ src/components/HandoffBriefGenerator.test.tsx (4 tests) 307ms
+stdout | src/services/clinicalChatService.test.ts > clinicalChatService > sendClinicalChatMessage routes COPILOT_CHAT through the unified AI node
+[AI_AUDIT] {
+  userId: 'current-user',
+  tenantId: 'default-tenant',
+  purpose: 'CareDroid operational support',
+  module: 'ed-copilot',
+  action: 'ai_chat_request',
+  result: 'allowed',
+  requestType: 'COPILOT_CHAT',
+  inputPreview: 'capacity status',
+  safety: { requiresHumanReview: true, blocked: false, reasons: [] },
+  timestamp: '2026-07-01T22:25:43.138Z'
+}
+
+stdout | src/services/clinicalChatService.test.ts > clinicalChatService > sendClinicalChatMessage posts JSON
+[AI_AUDIT] {
+  userId: 'current-user',
+  tenantId: 'default-tenant',
+  purpose: 'CareDroid operational support',
+  module: 'ed-copilot',
+  action: 'ai_chat_request',
+  result: 'allowed',
+  requestType: 'UNKNOWN',
+  inputPreview: 'hi',
+  safety: { requiresHumanReview: true, blocked: false, reasons: [] },
+  timestamp: '2026-07-01T22:25:43.144Z'
+}
+
+stdout | src/services/clinicalChatService.test.ts > clinicalChatService > sendClinicalChatMessage includes matching knowledge base articles before assistant routing
+[AI_AUDIT] {
+  userId: 'current-user',
+  tenantId: 'default-tenant',
+  purpose: 'CareDroid operational support',
+  module: 'ed-copilot',
+  action: 'ai_chat_request',
+  result: 'allowed',
+  requestType: 'UNKNOWN',
+  inputPreview: 'How do I fix tenant context access?',
+  safety: { requiresHumanReview: true, blocked: false, reasons: [] },
+  timestamp: '2026-07-01T22:25:43.145Z'
+}
+
+stdout | src/services/clinicalChatService.test.ts > clinicalChatService > sendClinicalChatMessage includes sanitized memory fabric context when provided
+[AI_AUDIT] {
+  userId: 'current-user',
+  tenantId: 'default-tenant',
+  purpose: 'CareDroid operational support',
+  module: 'ed-copilot',
+  action: 'ai_chat_request',
+  result: 'allowed',
+  requestType: 'UNKNOWN',
+  inputPreview: 'Use my workspace context',
+  safety: { requiresHumanReview: true, blocked: false, reasons: [] },
+  timestamp: '2026-07-01T22:25:43.147Z'
+}
+
+stdout | src/services/clinicalChatService.test.ts > clinicalChatService > sendClinicalChatMessage includes SaaS workspace context when provided
+[AI_AUDIT] {
+  userId: 'current-user',
+  tenantId: 'default-tenant',
+  purpose: 'CareDroid operational support',
+  module: 'ed-copilot',
+  action: 'ai_chat_request',
+  result: 'allowed',
+  requestType: 'UNKNOWN',
+  inputPreview: 'what should I use for chest pain?',
+  safety: { requiresHumanReview: true, blocked: false, reasons: [] },
+  timestamp: '2026-07-01T22:25:43.149Z'
+}
+
+ ✓ src/services/clinicalChatService.test.ts (13 tests) 47ms
+stdout | src/lib/ai/client.test.ts > canonical AI client > routes server calls through the unified Anthropic Messages request shape
+[AI] {
+  requestType: 'COPILOT_CHAT',
+  model: 'claude-sonnet-4-6',
+  stream: false,
+  maxTokens: 1000,
+  usage: {
+    inputTokens: 12,
+    outputTokens: 7,
+    totalTokens: 19,
+    cacheReadInputTokens: 0,
+    cacheCreationInputTokens: 0
+  },
+  toolCallCount: 0
+}
+
+ ✓ src/lib/ai/client.test.ts (3 tests) 11ms
+ ✓ src/services/aiChiefOrchestrator.test.ts (6 tests) 17ms
+ ✓ src/config/careDroidUnifiedAiNode.test.ts (6 tests) 11ms
+ ✓ src/services/careDroidUnifiedAiNode.test.ts (6 tests) 13ms
+ ✓ src/config/unifiedAiNodeEntryAudit.test.ts (2 tests) 165ms
+
+ Test Files  7 passed (7)
+      Tests  40 passed (40)
+   Start at  18:25:38
+   Duration  14.57s (transform 958ms, setup 1.58s, import 1.46s, tests 572ms, environment 9.45s)
+

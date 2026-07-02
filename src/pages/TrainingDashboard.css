@@ -62,7 +62,7 @@
 .training-progress-panel p,
 .training-empty,
 .training-runs small {
-  color: var(--app-fg-muted, var(--muted-text));
+  color: var(--app-fg-muted, var(--app-fg-muted));
   line-height: 1.5;
 }
 
@@ -105,7 +105,7 @@
 .training-panel-heading span,
 .training-runs span,
 .training-gate small {
-  color: var(--app-fg-muted, var(--muted-text));
+  color: var(--app-fg-muted, var(--app-fg-muted));
   font-size: var(--font-12, 0.75rem);
 }
 

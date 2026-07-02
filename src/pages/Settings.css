@@ -23,7 +23,7 @@
 
 .settings-card__subtitle {
   margin: 0;
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-size: 14px;
 }
 
@@ -41,7 +41,7 @@
 .settings-platform-strip__description {
   margin: 6px 0 10px;
   font-size: 12px;
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
 }
 
 .settings-platform-strip__actions {
@@ -71,7 +71,7 @@
 
 .settings-toggle-row__description {
   font-size: 12px;
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
 }
 
 .settings-theme-select {
@@ -98,10 +98,10 @@
   display: grid;
   gap: 14px;
   padding: 16px;
-  border: 1px solid rgba(255, 179, 71, 0.34);
+  border: 1px solid color-mix(in srgb, var(--app-warning) 34%, transparent);
   border-radius: 12px;
   background:
-    linear-gradient(135deg, rgba(255, 179, 71, 0.08), rgba(255, 75, 92, 0.06)),
+    linear-gradient(135deg, color-mix(in srgb, var(--app-warning) 8%, transparent), color-mix(in srgb, var(--app-danger) 6%, transparent)),
     var(--surface-1);
 }
 
@@ -109,10 +109,10 @@
   display: grid;
   gap: 14px;
   padding: 16px;
-  border: 1px solid rgba(0, 153, 255, 0.34);
+  border: 1px solid var(--medical-accent-ring-strong);
   border-radius: 12px;
   background:
-    linear-gradient(135deg, rgba(0, 153, 255, 0.08), rgba(0, 255, 136, 0.05)),
+    linear-gradient(135deg, var(--medical-accent-tint-subtle), var(--medical-accent-tint-faint)),
     var(--surface-1);
 }
 
@@ -136,7 +136,7 @@
 .settings-privacy-card p,
 .settings-billing-card p {
   margin: 6px 0 0;
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-size: 13px;
   line-height: 1.5;
 }
@@ -144,26 +144,26 @@
 .settings-privacy-card__badge,
 .settings-billing-card__badge {
   flex: 0 0 auto;
-  border: 1px solid rgba(0, 255, 136, 0.35);
+  border: 1px solid var(--medical-accent-ring-strong);
   border-radius: 999px;
   padding: 4px 10px;
-  background: rgba(0, 255, 136, 0.1);
+  background: var(--medical-accent-tint);
   color: var(--accent-green);
   font-size: 12px;
   font-weight: 800;
 }
 
 .settings-billing-card__badge {
-  border-color: rgba(0, 153, 255, 0.35);
-  background: rgba(0, 153, 255, 0.1);
-  color: #8ed8ff;
+  border-color: var(--medical-accent-ring-strong);
+  background: var(--medical-accent-tint);
+  color: var(--medical-accent-soft);
 }
 
 .settings-privacy-warning {
-  border: 1px solid rgba(255, 179, 71, 0.32);
+  border: 1px solid color-mix(in srgb, var(--app-warning) 32%, transparent);
   border-radius: 10px;
   padding: 12px;
-  background: rgba(255, 179, 71, 0.09);
+  background: color-mix(in srgb, var(--app-warning) 9%, transparent);
   color: var(--text-color);
   font-size: 13px;
   line-height: 1.5;
@@ -207,7 +207,7 @@
 }
 
 .settings-billing-label {
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.04em;
@@ -225,8 +225,8 @@
 .settings-billing-payment-state--past_due,
 .settings-billing-payment-state--incomplete,
 .settings-billing-payment-state--incomplete_expired {
-  border-color: rgba(255, 179, 71, 0.34);
-  background: rgba(255, 179, 71, 0.09);
+  border-color: color-mix(in srgb, var(--app-warning) 34%, transparent);
+  background: color-mix(in srgb, var(--app-warning) 9%, transparent);
 }
 
 .settings-billing-payment-state--canceled {
@@ -287,19 +287,19 @@
 
 .settings-audit-log-item span,
 .settings-audit-log-item time {
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-size: 12px;
   overflow-wrap: anywhere;
 }
 
 .settings-billing-plan-details span {
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
 }
 
 .settings-billing-plan-details ul {
   margin: 0;
   padding-left: 18px;
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
 }
 
 .settings-privacy-drawer__body {
@@ -309,7 +309,7 @@
 
 .settings-privacy-drawer__body p {
   margin: 0;
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-size: 14px;
   line-height: 1.55;
 }
@@ -341,7 +341,7 @@
 }
 
 .settings-destructive-panel strong {
-  color: #ffb4b4;
+  color: var(--semantic-critical);
 }
 
 .settings-destructive-panel p {
@@ -370,12 +370,12 @@
 }
 
 .settings-confirm-field input:focus {
-  border-color: rgba(0, 255, 136, 0.55);
+  border-color: color-mix(in srgb, var(--app-accent-interactive) 55%, transparent);
   box-shadow: 0 0 0 2px var(--app-focus);
 }
 
 .settings-confirm-field code {
-  color: #ffb4b4;
+  color: var(--semantic-critical);
 }
 
 .settings-privacy-status {
@@ -386,21 +386,21 @@
 }
 
 .settings-privacy-status--loading {
-  border: 1px solid rgba(0, 153, 255, 0.35);
-  background: rgba(0, 153, 255, 0.1);
+  border: 1px solid var(--medical-accent-ring-strong);
+  background: var(--medical-accent-tint);
   color: var(--text-color);
 }
 
 .settings-privacy-status--success {
-  border: 1px solid rgba(0, 255, 136, 0.35);
-  background: rgba(0, 255, 136, 0.1);
+  border: 1px solid var(--medical-accent-ring-strong);
+  background: var(--medical-accent-tint);
   color: var(--text-color);
 }
 
 .settings-privacy-status--error {
   border: 1px solid rgba(255, 75, 92, 0.42);
   background: rgba(255, 75, 92, 0.11);
-  color: #ffb4b4;
+  color: var(--semantic-critical);
 }
 
 @media (max-width: 720px) {

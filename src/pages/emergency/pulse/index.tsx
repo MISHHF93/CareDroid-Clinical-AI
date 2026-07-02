@@ -23,7 +23,7 @@ import type { Alert, CapacitySnapshot, Patient, Referral, Staff, WorkflowActionL
 import { CareDroidPage } from '../../../components/ui/CareDroidPrimitives';
 import EdDataSourceBanner from '../../../components/emergency/EdDataSourceBanner';
 import { usePractitionerSurfaceVisibility } from '../../../contexts/PractitionerVisibilityContext';
-import useEdRouteDataContext from '../../../hooks/useEdRouteDataContext';
+import useEmergencyOperatingSurface from '../../../hooks/useEmergencyOperatingSurface';
 import './DepartmentPulse.css';
 
 const LAST_VIEW_KEY = 'caredroid.ed.departmentPulse.lastView.v1';
@@ -494,7 +494,9 @@ export default function DepartmentPulse() {
   const secondsSinceUpdate = Math.max(0, Math.floor((now.getTime() - lastUpdatedAt.getTime()) / 1000));
 
   const surfaces = usePractitionerSurfaceVisibility();
-  const { activeScenarioId, backendAvailable, envelope, loading } = useEdRouteDataContext();
+  const activeScenarioId = useEmergencyStore((state) => state.activeScenarioId);
+  const backendAvailable = useEmergencyStore((state) => state.backendAvailable);
+  const { loading, error, envelope } = useEmergencyOperatingSurface('department-pulse');
   const useCompactStats = !surfaces.pulse.showStatCards;
 
   const statTiles = [
@@ -556,6 +558,7 @@ export default function DepartmentPulse() {
       <EdDataSourceBanner
         envelope={envelope}
         loading={loading}
+        error={error}
         activeScenarioId={activeScenarioId}
         backendAvailable={backendAvailable}
         compact

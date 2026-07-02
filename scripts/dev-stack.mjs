@@ -246,9 +246,9 @@ const spawnManagedProcess = (entry) => {
 const backendAlreadyHealthy = !forceRestart && (await probeBackendHealth(backendPort));
 
 console.log('Starting CareDroid local stack...');
-console.log(`Frontend: ${frontendOrigin}`);
-console.log(`Backend:  http://localhost:${backendPort}`);
-console.log(`Health:   http://localhost:${backendPort}/health`);
+console.log(`App:      ${frontendOrigin}  (API proxied via /api)`);
+console.log(`Backend:  http://localhost:${backendPort}  (internal Nest)`);
+console.log(`Health:   ${frontendOrigin}/health`);
 if (backendAlreadyHealthy) {
   console.log(
     `Backend already healthy on port ${backendPort}; skipping API restart. Use --force-restart to start a new instance.`,

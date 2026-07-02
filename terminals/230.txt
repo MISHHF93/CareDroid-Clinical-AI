@@ -1,0 +1,207 @@
+---
+pid: 24312
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "npm.cmd run test:backend-exposure"
+started_at: 2026-07-01T21:22:17.203Z
+running_for_ms: 31090579 
+---
+
+> caredroid-clinical-ai@1.0.0 test:backend-exposure
+> vitest run src/data/backendFrontendExposure.test.ts src/data/backendFrontendExposure.report.test.ts src/data/backendFrontendToolContract.test.ts src/data/executorMappingAudit.test.ts src/data/backendOrphanAudit.test.ts src/data/backendControllerRouteScan.test.ts src/config/backendApiCapabilities.test.ts src/services/clinicalOrchestratorApi.test.ts src/services/clinicalToolsApi.test.ts src/services/complianceApi.test.ts
+
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+ ❯ src/data/backendOrphanAudit.test.ts (7 tests | 3 failed) 52031ms
+     × passes full orphan assertion (inventory ↔ controllers ↔ policy ↔ frontend) 21272ms
+     × controller scan matches BACKEND_HTTP_ROUTES inventory 71ms
+     ✓ documents every backend-only route in BACKEND_ROUTE_EXPOSURE_POLICY 142ms
+     ✓ scans at least as many controller routes as inventory entries 31ms
+     × exposure scan and orphan audit agree on zero unguarded calls 30366ms
+     ✓ orphaned-backend-functions markdown generator is non-empty 142ms
+     ✓ frontend gated calls each declare a capability gate 0ms
+ ✓ src/data/backendFrontendExposure.test.ts (17 tests) 93687ms
+     ✓ passes with zero unguarded missing routes and no false executor claims  17119ms
+     ✓ inventory covers three POST executors  18752ms
+     ✓ gates known missing routes behind disabled capabilities  15201ms
+     ✓ every frontend inventory entry resolves exposure status  15486ms
+     ✓ gates optional CareDroid frontend calls when the optional runtime is disabled  13714ms
+     ✓ covers demo-backed clinical alerts API routes while keeping stream gated  13287ms
+ ✓ src/data/backendFrontendExposure.report.test.ts (2 tests) 13359ms
+     ✓ scan passes before writing docs  13356ms
+ ✓ src/data/backendFrontendToolContract.test.ts (10 tests) 2002ms
+     ✓ assigns POST executor only to registered orchestrator ids  937ms
+     ✓ documents procedures NLU profile with frontend-only status  1042ms
+ ❯ src/data/backendControllerRouteScan.test.ts (5 tests | 1 failed) 81ms
+     ✓ maps AppController GET health outside /api prefix 1ms
+     ✓ maps empty handler to controller root 0ms
+     ✓ parses tool orchestrator routes 1ms
+     × matches scanned controllers to BACKEND_HTTP_ROUTES 59ms
+     ✓ does not expose duplicate active controller method/path pairs 18ms
+ ✓ src/data/executorMappingAudit.test.ts (6 tests) 10ms
+ ✓ src/services/clinicalOrchestratorApi.test.ts (5 tests) 6ms
+ ✓ src/services/clinicalToolsApi.test.ts (9 tests) 11ms
+ ✓ src/services/complianceApi.test.ts (3 tests) 6ms
+ ✓ src/config/backendApiCapabilities.test.ts (5 tests) 5ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+
+ Test Files  2 failed | 8 passed (10)
+      Tests  4 failed | 65 passed (69)
+   Start at  17:22:18
+   Duration  176.44s (transform 836ms, setup 2.17s, import 1.32s, tests 161.20s, environment 10.06s)
+
+ FAIL  src/data/backendControllerRouteScan.test.ts > backendControllerRouteScan > matches scanned controllers to BACKEND_HTTP_ROUTES
+AssertionError: expected [ { …(4) }, { …(4) }, { …(4) }, …(1) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "controller": "EmergencyOsController",
++     "file": "C:/Users/borah/CareDroid-Clinical-AI/backend/src/modules/emergency-os/emergency-os.controller.ts",
++     "method": "GET",
++     "path": "/api/emergency/patient-flow",
++   },
++   {
++     "controller": "EmergencyOsController",
++     "file": "C:/Users/borah/CareDroid-Clinical-AI/backend/src/modules/emergency-os/emergency-os.controller.ts",
++     "method": "GET",
++     "path": "/api/emergency/patient-flow/:patientId",
++   },
++   {
++     "controller": "EmergencyOsController",
++     "file": "C:/Users/borah/CareDroid-Clinical-AI/backend/src/modules/emergency-os/emergency-os.controller.ts",
++     "method": "GET",
++     "path": "/api/emergency/workflow-orchestration",
++   },
++   {
++     "controller": "EmergencyOsController",
++     "file": "C:/Users/borah/CareDroid-Clinical-AI/backend/src/modules/emergency-os/emergency-os.controller.ts",
++     "method": "POST",
++     "path": "/api/emergency/workflow-orchestration/review",
++   },
++ ]
+
+ ❯ src/data/backendControllerRouteScan.test.ts:47:32
+     45|   it('matches scanned controllers to BACKEND_HTTP_ROUTES', () => {
+     46|     const { missingInInventory, missingInControllers } = compareContro…
+     47|     expect(missingInInventory).toEqual([]);
+       |                                ^
+     48|     expect(missingInControllers).toEqual([]);
+     49|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  src/data/backendOrphanAudit.test.ts > backend orphan audit > passes full orphan assertion (inventory ↔ controllers ↔ policy ↔ frontend)
+AssertionError: Controller routes missing from inventory: GET /api/emergency/patient-flow, GET /api/emergency/patient-flow/:patientId, GET /api/emergency/workflow-orchestration, POST /api/emergency/workflow-orchestration/review: expected [ Array(1) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "Controller routes missing from inventory: GET /api/emergency/patient-flow, GET /api/emergency/patient-flow/:patientId, GET /api/emergency/workflow-orchestration, POST /api/emergency/workflow-orchestration/review",
++ ]
+
+ ❯ src/data/backendOrphanAudit.test.ts:28:39
+     26|   it('passes full orphan assertion (inventory ↔ controllers ↔ policy ↔…
+     27|     const { ok, errors } = assertNoOrphanedBackendFunctionality();
+     28|     expect(errors, errors.join('; ')).toEqual([]);
+       |                                       ^
+     29|     expect(ok).toBe(true);
+     30|   }, HEAVY_ORPHAN_SCAN_TIMEOUT_MS);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  src/data/backendOrphanAudit.test.ts > backend orphan audit > controller scan matches BACKEND_HTTP_ROUTES inventory
+AssertionError: [
+  {
+    "controller": "EmergencyOsController",
+    "method": "GET",
+    "path": "/api/emergency/patient-flow",
+    "file": "C:/Users/borah/CareDroid-Clinical-AI/backend/src/modules/emergency-os/emergency-os.controller.ts"
+  },
+  {
+    "controller": "EmergencyOsController",
+    "method": "GET",
+    "path": "/api/emergency/patient-flow/:patientId",
+    "file": "C:/Users/borah/CareDroid-Clinical-AI/backend/src/modules/emergency-os/emergency-os.controller.ts"
+  },
+  {
+    "controller": "EmergencyOsController",
+    "method": "GET",
+    "path": "/api/emergency/workflow-orchestration",
+    "file": "C:/Users/borah/CareDroid-Clinical-AI/backend/src/modules/emergency-os/emergency-os.controller.ts"
+  },
+  {
+    "controller": "EmergencyOsController",
+    "method": "POST",
+    "path": "/api/emergency/workflow-orchestration/review",
+    "file": "C:/Users/borah/CareDroid-Clinical-AI/backend/src/modules/emergency-os/emergency-os.controller.ts"
+  }
+]: expected [ { …(4) }, { …(4) }, { …(4) }, …(1) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "controller": "EmergencyOsController",
++     "file": "C:/Users/borah/CareDroid-Clinical-AI/backend/src/modules/emergency-os/emergency-os.controller.ts",
++     "method": "GET",
++     "path": "/api/emergency/patient-flow",
++   },
++   {
++     "controller": "EmergencyOsController",
++     "file": "C:/Users/borah/CareDroid-Clinical-AI/backend/src/modules/emergency-os/emergency-os.controller.ts",
++     "method": "GET",
++     "path": "/api/emergency/patient-flow/:patientId",
++   },
++   {
++     "controller": "EmergencyOsController",
++     "file": "C:/Users/borah/CareDroid-Clinical-AI/backend/src/modules/emergency-os/emergency-os.controller.ts",
++     "method": "GET",
++     "path": "/api/emergency/workflow-orchestration",
++   },
++   {
++     "controller": "EmergencyOsController",
++     "file": "C:/Users/borah/CareDroid-Clinical-AI/backend/src/modules/emergency-os/emergency-os.controller.ts",
++     "method": "POST",
++     "path": "/api/emergency/workflow-orchestration/review",
++   },
++ ]
+
+ ❯ src/data/backendOrphanAudit.test.ts:34:77
+     32|   it('controller scan matches BACKEND_HTTP_ROUTES inventory', () => {
+     33|     const { missingInInventory, missingInControllers } = compareContro…
+     34|     expect(missingInInventory, JSON.stringify(missingInInventory, null…
+       |                                                                             ^
+     35|     expect(missingInControllers, JSON.stringify(missingInControllers, …
+     36|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  src/data/backendOrphanAudit.test.ts > backend orphan audit > exposure scan and orphan audit agree on zero unguarded calls
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/data/backendOrphanAudit.test.ts:56:23
+     54|     const orphan = assertNoOrphanedBackendFunctionality();
+     55|     expect(exposure.ok).toBe(true);
+     56|     expect(orphan.ok).toBe(true);
+       |                       ^
+     57|   }, HEAVY_ORPHAN_SCAN_TIMEOUT_MS);
+     58|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+

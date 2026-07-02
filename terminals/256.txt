@@ -1,0 +1,20 @@
+---
+pid: 32552
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "Set-Location C:\\Users\\borah\\CareDroid-Clinical-AI\\backend; npm.cmd run build; Write-Output \"EXITCODE=$LASTEXITCODE\""
+started_at: 2026-07-01T23:57:41.643Z
+running_for_ms: 21765001 
+---
+
+> caredroid-clinical-ai-backend@1.0.0 prebuild
+> rimraf dist
+
+
+> caredroid-clinical-ai-backend@1.0.0 build
+> nest build
+
+
+> caredroid-clinical-ai-backend@1.0.0 postbuild
+> node scripts/link-main.mjs
+
+EXITCODE=0

@@ -4,7 +4,7 @@
  *
  * Configure Cursor / Claude Desktop with command: node
  * args: ["<repo>/mcp/src/server.mjs"]
- * env: CAREDROID_API_URL (default http://localhost:3000), CAREDROID_JWT (Bearer for /api/tools)
+ * env: CAREDROID_API_URL (default http://localhost:8000), CAREDROID_JWT (Bearer for /api/tools)
  */
 
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
@@ -39,14 +39,14 @@ Environment:
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
-| CAREDROID_API_URL | http://localhost:3000 | Backend origin |
+| CAREDROID_API_URL | http://localhost:8000 | App origin (Vite proxies /api to Nest) |
 | CAREDROID_JWT | (empty) | \`Authorization: Bearer …\` for JWT-protected routes |
 
 Clinical tool IDs match the backend registry: \`sofa-calculator\`, \`drug-interactions\`, \`lab-interpreter\`.
 `;
 
 async function executeOnBackend(toolId, parameters, conversationId) {
-  const base = (process.env.CAREDROID_API_URL || 'http://localhost:3000').replace(/\/$/, '');
+  const base = (process.env.CAREDROID_API_URL || 'http://localhost:8000').replace(/\/$/, '');
   const token = process.env.CAREDROID_JWT || '';
   const url = `${base}/api/tools/${encodeURIComponent(toolId)}/execute`;
   const headers = { 'Content-Type': 'application/json' };

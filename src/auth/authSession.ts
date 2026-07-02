@@ -1,5 +1,6 @@
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { resolveClinicalHomeRoute } from '../config/platformEntryModel';
+import { resolveAppStartupRoute } from '../config/appStartupModel';
 import { resolveDemoDefaultLandingRoute } from '../config/demoPersonaModel';
 
 export function sanitizeReturnUrl(returnUrl?: string | null): string {
@@ -19,7 +20,7 @@ export function buildAuthUrl({
   inviteToken?: string;
 } = {}): string {
   const safe = sanitizeReturnUrl(returnUrl);
-  return safe !== '/' ? safe : CANONICAL_ROUTES.platformStart;
+  return safe !== '/' ? safe : resolveAppStartupRoute();
 }
 
 export function resolvePostAuthDestination({

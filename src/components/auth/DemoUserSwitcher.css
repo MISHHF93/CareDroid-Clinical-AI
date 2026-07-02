@@ -12,7 +12,7 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--muted-text, #9ca3af);
+  color: var(--app-fg-muted);
 }
 
 .demo-user-switcher__badge {
@@ -90,7 +90,7 @@
 
 .demo-user-switcher__meta {
   font-size: 0.65rem;
-  color: var(--muted-text, #9ca3af);
+  color: var(--app-fg-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

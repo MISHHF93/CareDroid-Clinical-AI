@@ -1,0 +1,173 @@
+---
+pid: 21544
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "Set-Location C:\\Users\\borah\\CareDroid-Clinical-AI\\backend; npm.cmd run build"
+started_at: 2026-07-01T23:09:16.419Z
+running_for_ms: 24670025 
+---
+
+> caredroid-clinical-ai-backend@1.0.0 prebuild
+> rimraf dist
+
+
+> caredroid-clinical-ai-backend@1.0.0 build
+> nest build
+
+Found 35 error(s).
+
+src/modules/emergency-os/administrative-automation-orchestration.lib.ts:104:52 - error TS2345: Argument of type 'PatientState' is not assignable to parameter of type 'EmergencyPatientState'.
+
+104       patientService.movePatientToState(patientId, state, {
+                                                       ~~~~~
+src/modules/emergency-os/administrative-automation-orchestration.lib.ts:144:52 - error TS2345: Argument of type 'PatientState' is not assignable to parameter of type 'EmergencyPatientState'.
+
+144       patientService.movePatientToState(patientId, patient.state, {
+                                                       ~~~~~~~~~~~~~
+src/modules/emergency-os/administrative-automation-orchestration.lib.ts:152:52 - error TS2345: Argument of type 'PatientState' is not assignable to parameter of type 'EmergencyPatientState'.
+
+152       patientService.movePatientToState(patientId, patient.state, {
+                                                       ~~~~~~~~~~~~~
+src/modules/emergency-os/administrative-automation-orchestration.lib.ts:168:59 - error TS2345: Argument of type '{ readonly patients: Patient[]; movePatientToState: (patientId: string, state: PatientState, options?: {    staffId?: string;    note?: string;}) => Patient; updatePatient: (patientId: string, patch: Partial<Patient>) => Patient; setQueueFilter: () => any; ... 5 more ...; escalatePatient: (patientId: string, input: ...' is not assignable to parameter of type 'ExecuteAutomationStore'.
+  Type '{ readonly patients: Patient[]; movePatientToState: (patientId: string, state: PatientState, options?: {    staffId?: string;    note?: string;}) => Patient; updatePatient: (patientId: string, patch: Partial<Patient>) => Patient; setQueueFilter: () => any; ... 5 more ...; escalatePatient: (patientId: string, input: ...' is not assignable to type 'QueueAssignmentStore'.
+    Types of property 'emergencySettings' are incompatible.
+      Type '{}' is missing the following properties from type 'EmergencyOsSettings': tenantName, defaultWorkspace, defaultScreenMode, enabledScreenModes, and 22 more.
+
+168   return reviewAdministrativeAutomationTask(tasks, input, store);
+                                                              ~~~~~
+src/modules/emergency-os/emergency-os.workflow-orchestration.service.ts:53:24 - error TS2352: Conversion of type '{ arrivals: { patient: EmergencyPatient; etaMinutes: number; offloadRisk: string; handoffStatus: string; }[]; emsArrivals: { id: string; patientId: any; unitId: string; unitName: string; ... 14 more ...; mechanismOfInjury: string; }[]; incomingPatients: { id: string; patientId: any; unitId: string; unitName: string;...' to type '{ emsArrivals?: EMSArrival[]; }' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Types of property 'emsArrivals' are incompatible.
+    Type '{ id: string; patientId: any; unitId: string; unitName: string; crewNames: string[]; patientAge: number; patientSex: "M" | "F" | "Other"; chiefComplaint: string; prearrivalComplaint: string; vitals: EmergencyVitals; ... 8 more ...; mechanismOfInjury: string; }[]' is not comparable to type 'EMSArrival[]'.
+      Type '{ id: string; patientId: any; unitId: string; unitName: string; crewNames: string[]; patientAge: number; patientSex: "M" | "F" | "Other"; chiefComplaint: string; prearrivalComplaint: string; vitals: EmergencyVitals; ... 8 more ...; mechanismOfInjury: string; }' is not comparable to type 'EMSArrival'.
+        Types of property 'vitals' are incompatible.
+          Type 'EmergencyVitals' is not comparable to type 'Vitals'.
+            Index signature for type 'string' is missing in type 'EmergencyVitals'.
+
+53     const emsPayload = this.emsIntakeService.getEMSIntake().data as {
+                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+54       emsArrivals?: EMSArrival[];
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+55     };
+   ~~~~~
+../src/components/whiteboard/emsAwarenessModel.ts:7:43 - error TS6142: Module '../EMSPressureScore' was resolved to 'C:/Users/borah/CareDroid-Clinical-AI/src/components/EMSPressureScore.tsx', but '--jsx' is not set.
+
+7 import { calculateEMSPressureScore } from '../EMSPressureScore';
+                                            ~~~~~~~~~~~~~~~~~~~~~
+../src/config/apiEnv.ts:4:46 - error TS1343: The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', or 'nodenext'.
+
+4 export const DEFAULT_API_TIMEOUT_MS = Number(import.meta.env?.VITE_API_TIMEOUT_MS) || 30000;
+                                               ~~~~~~~~~~~
+../src/config/apiEnv.ts:4:58 - error TS2339: Property 'env' does not exist on type 'ImportMeta'.
+
+4 export const DEFAULT_API_TIMEOUT_MS = Number(import.meta.env?.VITE_API_TIMEOUT_MS) || 30000;
+                                                           ~~~
+../src/config/appConfig.ts:2:17 - error TS1343: The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', or 'nodenext'.
+
+2   const value = import.meta.env?.[key];
+                  ~~~~~~~~~~~
+../src/config/appConfig.ts:2:29 - error TS2339: Property 'env' does not exist on type 'ImportMeta'.
+
+2   const value = import.meta.env?.[key];
+                              ~~~
+../src/config/appConfig.ts:24:41 - error TS1343: The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', or 'nodenext'.
+
+24 const isProductionBuild = () => Boolean(import.meta.env?.PROD);
+                                           ~~~~~~~~~~~
+../src/config/appConfig.ts:24:53 - error TS2339: Property 'env' does not exist on type 'ImportMeta'.
+
+24 const isProductionBuild = () => Boolean(import.meta.env?.PROD);
+                                                       ~~~
+../src/services/apiClient.ts:104:16 - error TS1343: The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', or 'nodenext'.
+
+104 const isDev = !import.meta.env.VITEST &&
+                   ~~~~~~~~~~~
+../src/services/apiClient.ts:104:28 - error TS2339: Property 'env' does not exist on type 'ImportMeta'.
+
+104 const isDev = !import.meta.env.VITEST &&
+                               ~~~
+../src/services/apiClient.ts:106:92 - error TS1343: The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', or 'nodenext'.
+
+106   (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || import.meta?.env?.DEV);
+                                                                                               ~~~~~~~~~~~
+../src/services/apiClient.ts:106:105 - error TS2339: Property 'env' does not exist on type 'ImportMeta'.
+
+106   (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || import.meta?.env?.DEV);
+                                                                                                            ~~~
+../src/services/apiClient.ts:350:20 - error TS2554: Expected 0-1 arguments, but got 2.
+
+350     super(message, cause ? { cause } : undefined);
+                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../src/services/apiClient.ts:462:3 - error TS2322: Type 'AxiosRequestHeaders | {}' is not assignable to type 'AxiosRequestHeaders'.
+  Type '{}' is not assignable to type 'AxiosRequestHeaders'.
+    Type '{}' is missing the following properties from type 'AxiosHeaders': set, get, has, delete, and 24 more.
+
+462   config.headers = config.headers || {};
+      ~~~~~~~~~~~~~~
+../src/services/devBackendAuth.ts:23:5 - error TS1343: The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', or 'nodenext'.
+
+23     import.meta?.env?.DEV);
+       ~~~~~~~~~~~
+../src/services/devBackendAuth.ts:23:18 - error TS2339: Property 'env' does not exist on type 'ImportMeta'.
+
+23     import.meta?.env?.DEV);
+                    ~~~
+../src/services/patientJourneyAiDecisionService.ts:33:34 - error TS2339: Property 'symptoms' does not exist on type 'Patient'.
+
+33   return [complaint, ...(patient.symptoms || [])].filter(Boolean) as string[];
+                                    ~~~~~~~~
+../src/services/patientJourneyAiDecisionService.ts:38:31 - error TS2339: Property 'waitTimeMinutes' does not exist on type 'Patient'.
+
+38   const waitMinutes = patient.waitTimeMinutes ?? patient.waitMinutes ?? 0;
+                                 ~~~~~~~~~~~~~~~
+../src/services/patientJourneyAiDecisionService.ts:38:58 - error TS2339: Property 'waitMinutes' does not exist on type 'Patient'.
+
+38   const waitMinutes = patient.waitTimeMinutes ?? patient.waitMinutes ?? 0;
+                                                            ~~~~~~~~~~~
+../src/services/patientJourneyAiDecisionService.ts:61:79 - error TS2339: Property 'transportMode' does not exist on type 'EMSArrival'.
+
+61     arrivalMode: patient.arrivalMode || patient.source || patient.emsArrival?.transportMode,
+                                                                                 ~~~~~~~~~~~~~
+../src/services/patientJourneyAiDecisionService.ts:62:24 - error TS2339: Property 'allergies' does not exist on type 'Patient'.
+
+62     allergies: patient.allergies || [],
+                          ~~~~~~~~~
+../src/services/patientJourneyAiDecisionService.ts:63:26 - error TS2339: Property 'medications' does not exist on type 'Patient'.
+
+63     medications: patient.medications || patient.emsArrival?.medicationsEnRoute || [],
+                            ~~~~~~~~~~~
+../src/services/queueIntelligenceService.ts:168:34 - error TS2339: Property 'oldestPatient' does not exist on type '{}'.
+
+168     const oldestPatient = (state.oldestPatient || {}) as Record<string, any>;
+                                     ~~~~~~~~~~~~~
+../src/services/queueIntelligenceService.ts:171:27 - error TS2339: Property 'count' does not exist on type '{}'.
+
+171       count: Number(state.count || 0),
+                              ~~~~~
+../src/services/queueIntelligenceService.ts:172:30 - error TS2339: Property 'waitTime' does not exist on type '{}'.
+
+172       waitTime: Number(state.waitTime || 0),
+                                 ~~~~~~~~
+../src/services/queueIntelligenceService.ts:179:24 - error TS2339: Property 'riskLevel' does not exist on type '{}'.
+
+179       riskLevel: state.riskLevel || 'low',
+                           ~~~~~~~~~
+../src/services/queueIntelligenceService.ts:180:32 - error TS2339: Property 'throughput' does not exist on type '{}'.
+
+180       throughput: Number(state.throughput || 0),
+                                   ~~~~~~~~~~
+../src/store/emergencyStore.ts:65:8 - error TS6142: Module '../services/emergencySettingsApi' was resolved to 'C:/Users/borah/CareDroid-Clinical-AI/src/services/emergencySettingsApi.tsx', but '--jsx' is not set.
+
+65 } from '../services/emergencySettingsApi';
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../src/store/emergencyStore.ts:1683:12 - error TS1343: The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', or 'nodenext'.
+
+1683   Boolean((import.meta as ImportMeta & { env?: { DEV?: boolean } }).env?.DEV);
+                ~~~~~~~~~~~
+../src/store/emergencyStore.ts:5808:5 - error TS1343: The 'import.meta' meta-property is only allowed when the '--module' option is 'es2020', 'es2022', 'esnext', 'system', 'node16', or 'nodenext'.
+
+5808 if (import.meta.env.DEV && typeof window !== 'undefined') {
+         ~~~~~~~~~~~
+../src/store/emergencyStore.ts:5808:17 - error TS2339: Property 'env' does not exist on type 'ImportMeta'.
+
+5808 if (import.meta.env.DEV && typeof window !== 'undefined') {
+                     ~~~
+

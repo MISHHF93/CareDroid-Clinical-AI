@@ -1,14 +1,14 @@
 import { Navigate, useLocation } from 'react-router-dom';
-import { getEdApplicationHomeRoute } from '../config/edApplication.config';
+import { CANONICAL_ROUTES } from '../config/routes.config';
 
 /**
- * Platform entry aliases (/start, /) resolve to the ED application home — not a separate product shell.
+ * Legacy platform aliases (/workspace) resolve to the platform entry hub.
  */
 export default function EdApplicationEntryRedirect() {
   const location = useLocation();
   return (
     <Navigate
-      to={{ pathname: getEdApplicationHomeRoute(), search: location.search, hash: location.hash }}
+      to={{ pathname: CANONICAL_ROUTES.platformStart, search: location.search, hash: location.hash }}
       replace
     />
   );

@@ -307,10 +307,10 @@ export const TeamManagement = () => {
 const UserTable = ({ users, sortConfig, onSort, onEdit, onDelete, actionsDisabled = false }) => {
   const getRoleColor = (role) => {
     const colors = {
-      'Admin': { bg: '#ff6b6b', text: 'Admin' },
+      'Admin': { bg: 'var(--app-danger)', text: 'Admin' },
       'Physician': { bg: 'var(--accent-2)', text: 'Physician' },
       'Nurse': { bg: 'var(--accent-1)', text: 'Nurse' },
-      'Student': { bg: '#9c27b0', text: 'Student' },
+      'Student': { bg: 'var(--semantic-ai-assistance)', text: 'Student' },
     };
     return colors[role] || colors['Student'];
   };
@@ -516,7 +516,7 @@ const RoleSelector = ({ value, onChange }) => {
     >
       {roles.map(role => (
         <option key={role.id} value={role.id}>
-          {role.label} — {role.description}
+          {role.label} ï¿½ {role.description}
         </option>
       ))}
     </select>

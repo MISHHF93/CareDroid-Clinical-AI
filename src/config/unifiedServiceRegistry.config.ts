@@ -24,14 +24,21 @@ export type ServiceRegistryDomain = (typeof SERVICE_REGISTRY_DOMAINS)[number];
 /** Services superseded by a canonical orchestrator — kept for audit, not runtime dispatch. */
 export const OBSOLETE_SERVICE_REDIRECTS = Object.freeze({
   'src/services/advancedRecommendationService.ts': 'src/services/aiChiefOrchestrator.ts',
-  'backend/src/services/copilot.service.ts': 'src/services/aiChiefOrchestrator.ts',
+  'backend/src/services/copilot.service.ts': 'backend/src/modules/chat/chat.service.ts',
+  'backend/src/modules/ai/foundation/ai-routing-engine.service.ts':
+    'backend/src/modules/moe-router/moe-router.service.ts',
+  'backend/src/modules/ai/foundation/ai-gateway.service.ts':
+    'backend/src/modules/ai-gateway/ai-gateway.service.ts',
+  'src/pages/executive/ExecutiveCommandCenter.tsx': 'src/pages/emergency/HospitalCommandCenter.tsx',
+  'src/components/emergency/CommandDashboard.tsx':
+    'src/pages/emergency/HospitalCommandCenter.tsx',
 } as const);
 
 /** Runtime surfaces that must consume the unified registry snapshot. */
 export const UNIFIED_SERVICE_REGISTRY_CONSUMERS = Object.freeze([
-  'CommandDashboard',
+  'HospitalCommandCenter',
   'EmergencyAnalytics',
-  'ExecutiveCommandCenter',
+  'CommandDashboard',
   'SystemHealth',
   'SaasHealthCenter',
   'CopilotPanel',

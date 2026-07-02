@@ -8,7 +8,7 @@ const lines = [
   '',
   '1. Start API and UI',
   '   npm run start:all',
-  '   (backend http://localhost:3000, Vite http://localhost:8000 — see vite.config.js proxy /api)',
+  '   (app http://localhost:8000 — Vite proxies /api to Nest; see vite.config.ts)',
   '',
   '2. Sign in, open Dashboard',
   '   Send a chat message; expect 200 on POST /api/chat/message (Network tab).',

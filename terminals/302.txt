@@ -1,0 +1,10 @@
+---
+pid: 29632
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cmd /c \"cd /d C:\\Users\\borah\\CareDroid-Clinical-AI && node node_modules\\vitest\\vitest.mjs run src/routing/canonicalRouteTree.redirects.test.tsx --pool=forks --maxWorkers=1\""
+started_at: 2026-07-02T06:30:03.856Z
+running_for_ms: 50759998 
+---
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+

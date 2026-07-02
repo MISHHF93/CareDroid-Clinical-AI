@@ -1,0 +1,18 @@
+---
+pid: 33680
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cmd /c \"node node_modules\\vitest\\vitest.mjs run src\\test\\routePagesSmoke.test.tsx -t dependency-map\""
+started_at: 2026-07-02T03:40:08.925Z
+running_for_ms: 8420000  
+---
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+ ✓ src/test/routePagesSmoke.test.tsx (178 tests | 176 skipped) 772ms
+     ✓ 'dependency-map' at '/dependency-map' renders primary content  607ms
+
+ Test Files  1 passed (1)
+      Tests  2 passed | 176 skipped (178)
+   Start at  23:40:11
+   Duration  14.40s (transform 6.51s, setup 593ms, import 10.63s, tests 772ms, environment 1.97s)
+

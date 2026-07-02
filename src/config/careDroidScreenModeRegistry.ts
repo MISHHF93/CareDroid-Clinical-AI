@@ -177,7 +177,7 @@ export const CARE_DROID_SCREEN_MODE_REGISTRY: readonly CareDroidScreenModeDefini
       useMinimalAppChrome: false,
       phiVisibility: 'full',
       alertVisibility: 'all',
-      defaultLandingRoute: `${CANONICAL_ROUTES.emergencyReception}?queue=pretriage`,
+      defaultLandingRoute: `${CANONICAL_ROUTES.emergencyQueues}?queue=pretriage`,
       defaultFocus: 'triage-pending-queue',
     }),
     Object.freeze({
@@ -344,7 +344,7 @@ export const CARE_DROID_SCREEN_MODE_REGISTRY: readonly CareDroidScreenModeDefini
       useMinimalAppChrome: false,
       phiVisibility: 'operational',
       alertVisibility: 'all',
-      defaultLandingRoute: CANONICAL_ROUTES.emergencyWhiteboard,
+      defaultLandingRoute: CANONICAL_ROUTES.emergencyCommandCenter,
       defaultFocus: 'arrivals-by-hour',
     }),
     Object.freeze({

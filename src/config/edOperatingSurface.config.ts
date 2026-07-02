@@ -392,7 +392,7 @@ const ROUTE_PREFIX_SURFACE: readonly Readonly<{ prefix: string; surfaceId: strin
     { prefix: CANONICAL_ROUTES.reports, surfaceId: 'reports' },
     { prefix: CANONICAL_ROUTES.intake, surfaceId: 'intake' },
     { prefix: CANONICAL_ROUTES.queue, surfaceId: 'queues' },
-    { prefix: CANONICAL_ROUTES.dashboard, surfaceId: 'whiteboard' },
+    { prefix: CANONICAL_ROUTES.dashboard, surfaceId: 'command-center' },
   ]);
 
 export function resolveEdOperatingSurfaceFromPath(pathname: string): EdOperatingSurfaceDefinition | null {
@@ -424,9 +424,9 @@ export function getEdOperatingSurface(surfaceId: string): EdOperatingSurfaceDefi
 
 /** Consolidated dashboard routes funnel into the ED OS journey surfaces. */
 export const LEGACY_DASHBOARD_REDIRECTS: Readonly<Record<string, string>> = Object.freeze({
-  [CANONICAL_ROUTES.executive]: CANONICAL_ROUTES.emergencyCommandCenter,
-  [CANONICAL_ROUTES.aiCommandCenter]: CANONICAL_ROUTES.emergencyCopilot,
-  [CANONICAL_ROUTES.predictiveAnalytics]: CANONICAL_ROUTES.emergencyAnalytics,
   [CANONICAL_ROUTES.dashboard]: CANONICAL_ROUTES.emergencyCommandCenter,
   [CANONICAL_ROUTES.aiChief]: CANONICAL_ROUTES.emergencyCopilot,
+  [CANONICAL_ROUTES.executive]: `${CANONICAL_ROUTES.emergencyCommandCenter}?view=executive`,
+  [CANONICAL_ROUTES.aiCommandCenter]: `${CANONICAL_ROUTES.emergencyCommandCenter}?view=ai`,
+  [CANONICAL_ROUTES.predictiveAnalytics]: `${CANONICAL_ROUTES.emergencyCommandCenter}?view=predictive`,
 });

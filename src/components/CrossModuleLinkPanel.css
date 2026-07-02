@@ -31,13 +31,13 @@
 
 .cross-module-panel p {
   margin: 0;
-  color: var(--app-fg-muted, var(--muted-text));
+  color: var(--app-fg-muted, var(--app-fg-muted));
   line-height: 1.5;
 }
 
 .cross-module-panel__header > span,
 .cross-module-card span {
-  color: var(--app-fg-muted, var(--muted-text));
+  color: var(--app-fg-muted, var(--app-fg-muted));
   font-size: var(--font-12, 0.75rem);
   font-weight: 800;
   text-transform: uppercase;

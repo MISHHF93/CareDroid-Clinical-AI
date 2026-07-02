@@ -73,7 +73,7 @@ export default function UsagePage() {
         </select>
       }
     >
-      {error && <p style={{ color: '#ff6b6b' }}>{error}</p>}
+      {error && <p style={{ color: 'var(--app-danger)' }}>{error}</p>}
       {isLoading ? (
         <p>Loading usage...</p>
       ) : (
@@ -91,7 +91,7 @@ export default function UsagePage() {
                   <h2>{meter.label}</h2>
                   <strong>{formatNumber(meter.value)}</strong>
                   <p className="commercial-subtitle">
-                    {meter.unit} · {meter.events} events · billing separated
+                    {meter.unit} ï¿½ {meter.events} events ï¿½ billing separated
                   </p>
                 </Card>
               ))}

@@ -59,6 +59,7 @@ import { PatientFlowService } from './emergency-os.patient-flow.service';
 import { AdministrativeAutomationQueueService } from './administrative-automation-queue.service';
 import { AdministrativeAutomationTaskEntity } from './entities/administrative-automation-task.entity';
 import { WorkflowOrchestrationService } from './emergency-os.workflow-orchestration.service';
+import { EmergencyOperatingSurfacesService } from './emergency-os.operating-surfaces.service';
 
 @Module({
   imports: [
@@ -138,6 +139,7 @@ import { WorkflowOrchestrationService } from './emergency-os.workflow-orchestrat
     PatientFlowService,
     AdministrativeAutomationQueueService,
     WorkflowOrchestrationService,
+    EmergencyOperatingSurfacesService,
   ],
 })
 export class EmergencyOsModule {}

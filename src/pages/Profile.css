@@ -24,7 +24,7 @@
 
 .profile-onboarding-banner p {
   margin: 8px 0;
-  color: var(--medical-text-muted, var(--muted-text));
+  color: var(--medical-text-muted, var(--app-fg-muted));
   font-size: 14px;
 }
 
@@ -39,13 +39,13 @@
 
 .profile-card__subtitle {
   margin: 0;
-  color: var(--medical-text-muted, var(--muted-text));
+  color: var(--medical-text-muted, var(--app-fg-muted));
   font-size: 14px;
 }
 
 .profile-card__workspace {
   margin: 12px 0 0;
-  color: var(--medical-text-muted, var(--muted-text));
+  color: var(--medical-text-muted, var(--app-fg-muted));
   font-size: 14px;
 }
 
@@ -82,7 +82,7 @@
 .profile-back-link-wrap {
   margin-top: 18px;
   font-size: 12px;
-  color: var(--medical-text-muted, var(--muted-text));
+  color: var(--medical-text-muted, var(--app-fg-muted));
 }
 
 .profile-back-link {
@@ -177,7 +177,7 @@
 
 .profile-section-header p {
   margin: 4px 0 0;
-  color: var(--medical-text-muted, var(--muted-text));
+  color: var(--medical-text-muted, var(--app-fg-muted));
   font-size: 12px;
   line-height: 1.45;
 }
@@ -210,7 +210,7 @@
 
 .profile-overview-list p {
   margin: 0;
-  color: var(--medical-text-muted, var(--muted-text));
+  color: var(--medical-text-muted, var(--app-fg-muted));
   font-size: 13px;
 }
 
@@ -229,7 +229,7 @@
 
 .profile-competency-status p {
   margin: 0;
-  color: var(--medical-text-muted, var(--muted-text));
+  color: var(--medical-text-muted, var(--app-fg-muted));
   font-size: 13px;
   line-height: 1.5;
 }
@@ -254,7 +254,7 @@
 }
 
 .profile-competency-summary span {
-  color: var(--medical-text-muted, var(--muted-text));
+  color: var(--medical-text-muted, var(--app-fg-muted));
   font-size: 12px;
 }
 
@@ -290,7 +290,7 @@
 }
 
 .profile-preference-list dt {
-  color: var(--medical-text-muted, var(--muted-text));
+  color: var(--medical-text-muted, var(--app-fg-muted));
   font-size: 12px;
   font-weight: 800;
 }
@@ -328,7 +328,7 @@
 .profile-activity-card p,
 .profile-phi-panel p {
   margin: 6px 0 0;
-  color: var(--medical-text-muted, var(--muted-text));
+  color: var(--medical-text-muted, var(--app-fg-muted));
   font-size: 13px;
   line-height: 1.5;
 }
@@ -356,7 +356,7 @@
   border-radius: 12px;
   padding: 14px;
   background: var(--medical-card-bg, var(--surface-1));
-  color: var(--medical-text-muted, var(--muted-text));
+  color: var(--medical-text-muted, var(--app-fg-muted));
   font-size: 13px;
 }
 
@@ -398,14 +398,14 @@
 
 .profile-activity-item__meta {
   margin-top: 3px;
-  color: var(--medical-text-muted, var(--muted-text));
+  color: var(--medical-text-muted, var(--app-fg-muted));
   font-size: 12px;
 }
 
 .profile-activity-pill {
   border: 1px solid var(--medical-card-border, var(--panel-border));
   padding: 4px 8px;
-  color: var(--medical-text-muted, var(--muted-text));
+  color: var(--medical-text-muted, var(--app-fg-muted));
 }
 
 .profile-activity-pill--phi {
@@ -436,7 +436,7 @@
 }
 
 .profile-activity-summary__label {
-  color: var(--medical-text-muted, var(--muted-text));
+  color: var(--medical-text-muted, var(--app-fg-muted));
   font-size: 12px;
 }
 
@@ -455,7 +455,7 @@
   display: grid;
   justify-items: end;
   gap: 6px;
-  color: var(--medical-text-muted, var(--muted-text));
+  color: var(--medical-text-muted, var(--app-fg-muted));
   font-size: 13px;
   text-align: right;
 }

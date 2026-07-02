@@ -27,7 +27,7 @@
 .consent-intro {
   font-size: var(--font-18);
   line-height: 1.7;
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   margin: 0;
 }
 
@@ -52,7 +52,7 @@
 }
 
 .consent-section-optional {
-  border-left: 4px solid var(--muted-text);
+  border-left: 4px solid var(--app-fg-muted);
 }
 
 .consent-section:hover {
@@ -91,7 +91,7 @@
 
 .consent-badge-optional {
   background: rgba(255, 255, 255, 0.05);
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -230,7 +230,7 @@
 /* Footer Note */
 .consent-footer-note {
   font-size: var(--font-12);
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   text-align: center;
   font-style: italic;
   margin: 0;

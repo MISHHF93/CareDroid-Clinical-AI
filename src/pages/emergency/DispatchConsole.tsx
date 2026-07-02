@@ -20,7 +20,11 @@ import {
 } from '../../services/cadIntegrationService';
 import { createReadinessPlan } from '../../services/edReadinessService';
 import type { EmergencyCall, CallPriority, DispatchAssignment } from '../../types/emergency';
+import EdDataSourceBanner from '../../components/emergency/EdDataSourceBanner';
+import useEmergencyOperatingSurface from '../../hooks/useEmergencyOperatingSurface';
+import { EmergencyRoutePage } from './emergencyRouteShared';
 import './DispatchConsole.css';
+import './emergency-route.css';
 
 const CALL_PRIORITY_COLORS: Record<CallPriority, string> = {
   Echo: MEDICAL_TYPE.statusCritical,
@@ -753,6 +757,8 @@ function CADUnitBoard() {
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function DispatchConsole() {
+  const { loading: apiLoading, error: apiError, envelope: apiEnvelope } =
+    useEmergencyOperatingSurface('dispatch');
   const [calls, setCalls] = useState<EmergencyCall[]>([]);
   const [summary, setSummary] = useState<DispatchCallSummary>({
     total: 0, received: 0, dispatched: 0, enRoute: 0, onScene: 0, transporting: 0, echoCount: 0, deltaCount: 0,
@@ -797,38 +803,29 @@ export default function DispatchConsole() {
   ).length;
 
   return (
-    <div className="dispatch-console">
-      {/* Sticky critical banner */}
-      {criticalPending > 0 && (
-        <div
-          className="dispatch-console__banner"
-          style={{
-            padding: '10px 16px',
-            background: 'rgba(239,68,68,0.08)',
-            borderColor: `color-mix(in srgb, ${MEDICAL_TYPE.statusCritical} 35%, var(--cdl-clinical-border, #e2e8f0))`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ fontSize: 18 }}>⚡</span>
-            <strong style={{ color: MEDICAL_TYPE.statusCritical, fontSize: 14 }}>
-              {criticalPending} Echo/Delta call{criticalPending > 1 ? 's' : ''} awaiting dispatch — 3-minute target
-            </strong>
-          </div>
-          <span style={{ fontSize: 12, color: MEDICAL_THEME.inkSubtle }}>Scroll to call card → Dispatch Unit</span>
-        </div>
-      )}
-
-      <div className="dispatch-console__header">
-        <div className="dispatch-console__title-block">
-          <div className="dispatch-console__eyebrow">CareDroid</div>
-          <h1>Dispatch Console</h1>
-          <div className="dispatch-console__subtitle">
-            Emergency call intake · CAD unit dispatch · ED pre-alert
-          </div>
-        </div>
+    <EmergencyRoutePage
+      surfaceClassName="dispatch-console"
+      eyebrow="Pre-arrival"
+      title="Dispatch Console"
+      description="Emergency call intake · CAD unit dispatch · ED pre-alert"
+      situationBrief={{
+        status: `${summary.total} active call${summary.total === 1 ? '' : 's'}`,
+        attention:
+          criticalPending > 0
+            ? `${criticalPending} Echo/Delta awaiting dispatch — 3-minute target`
+            : summary.echoCount + summary.deltaCount > 0
+              ? `${summary.echoCount + summary.deltaCount} priority call${summary.echoCount + summary.deltaCount === 1 ? '' : 's'} in pipeline`
+              : 'No critical calls pending dispatch',
+        owner: 'Dispatcher',
+        nextAction:
+          criticalPending > 0
+            ? 'Dispatch highest-priority unit and send ED pre-alert'
+            : showForm
+              ? 'Complete call intake form'
+              : '+ Log Call when new emergency arrives',
+        tone: criticalPending > 0 ? 'critical' : summary.deltaCount + summary.echoCount > 0 ? 'warning' : 'neutral',
+      }}
+      actions={
         <button
           type="button"
           onClick={() => setShowForm((v) => !v)}
@@ -836,9 +833,32 @@ export default function DispatchConsole() {
         >
           {showForm ? 'Cancel' : '+ Log Call'}
         </button>
-      </div>
-
-      {/* Summary metrics */}
+      }
+      operationalSummaryExtra={
+        criticalPending > 0 ? (
+          <div
+            className="dispatch-console__banner"
+            style={{
+              padding: '10px 16px',
+              background: 'rgba(239,68,68,0.08)',
+              borderColor: `color-mix(in srgb, ${MEDICAL_TYPE.statusCritical} 35%, var(--cdl-clinical-border, #e2e8f0))`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+            role="status"
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 18 }}>⚡</span>
+              <strong style={{ color: MEDICAL_TYPE.statusCritical, fontSize: 14 }}>
+                {criticalPending} Echo/Delta call{criticalPending > 1 ? 's' : ''} awaiting dispatch
+              </strong>
+            </div>
+            <span style={{ fontSize: 12, color: MEDICAL_THEME.inkSubtle }}>Dispatch unit on call card below</span>
+          </div>
+        ) : null
+      }
+      primaryActions={
       <div className="dispatch-console__summary-row">
         <SummaryCard label="Active Calls" value={summary.total} />
         <SummaryCard label="Echo" value={summary.echoCount} highlight />
@@ -848,8 +868,17 @@ export default function DispatchConsole() {
         <SummaryCard label="On Scene" value={summary.onScene} />
         <SummaryCard label="Transporting" value={summary.transporting} />
       </div>
-
-      {/* New call form */}
+      }
+    >
+      <EdDataSourceBanner
+        loading={apiLoading}
+        error={apiError}
+        envelope={{
+          source: apiEnvelope.source,
+          generatedAt: apiEnvelope.generatedAt,
+        }}
+        compact
+      />
       {showForm && (
         <div className="dispatch-console__form" style={{ padding: 20 }}>
           <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 14 }}>New Emergency Call</div>
@@ -886,6 +915,6 @@ export default function DispatchConsole() {
         CareDroid AI is decision support only. All dispatch decisions must be made by licensed dispatchers following
         local medical protocols. Unit assignment, pre-alert, and ED readiness activation require dispatcher authorization.
       </div>
-    </div>
+    </EmergencyRoutePage>
   );
 }

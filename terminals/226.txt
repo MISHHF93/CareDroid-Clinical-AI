@@ -1,0 +1,49 @@
+---
+pid: 27356
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "npm.cmd run test:contract-matrix"
+started_at: 2026-07-01T21:09:16.872Z
+running_for_ms: 31870018 
+---
+
+> caredroid-clinical-ai@1.0.0 test:contract-matrix
+> vitest run src/data/backendFrontendToolContract.test.ts src/data/backendFrontendToolContract.report.test.ts src/data/toolContractMatrix.test.ts
+
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+ ❯ src/data/toolContractMatrix.test.ts (7 tests | 1 failed) 19140ms
+     × maps every backendFrontendContract row to matrix columns 5138ms
+     ✓ includes every NLU profile id  2057ms
+     ✓ marks exactly three NLU tools with POST executors  2776ms
+     ✓ uses only allowed status values  2214ms
+     ✓ marks share-results row as frontend-only (gated)  2344ms
+     ✓ generates markdown with required headers  4604ms
+     ✓ documents tool-contract-matrix.md when committed 1ms
+ ✓ src/data/backendFrontendToolContract.report.test.ts (2 tests) 1915ms
+     ✓ covers every NLU profile and three POST executors  1910ms
+ ✓ src/data/backendFrontendToolContract.test.ts (10 tests) 5076ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/data/toolContractMatrix.test.ts > toolContractMatrix > maps every backendFrontendContract row to matrix columns
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ src/data/toolContractMatrix.test.ts:21:3
+     19|
+     20| describe('toolContractMatrix', () => {
+     21|   it('maps every backendFrontendContract row to matrix columns', () =>…
+       |   ^
+     22|     const contract = buildBackendFrontendContractRows();
+     23|     const matrix = buildToolContractMatrixRows();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+     ✓ assigns POST executor only to registered orchestrator ids  2773ms
+     ✓ documents procedures NLU profile with frontend-only status  2235ms
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  1 failed | 18 passed (19)
+   Start at  17:09:19
+   Duration  44.69s (transform 1.61s, setup 3.74s, import 2.38s, tests 26.13s, environment 11.36s)
+

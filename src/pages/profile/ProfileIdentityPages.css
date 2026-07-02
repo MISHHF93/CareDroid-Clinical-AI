@@ -18,7 +18,7 @@
 
 .profile-identity-page__header p {
   margin: 8px 0 0;
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
 }
 
 .profile-identity-grid {
@@ -40,7 +40,7 @@
 
 .profile-identity-card p,
 .profile-identity-muted {
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
 }
 
 .profile-identity-list {
@@ -65,7 +65,7 @@
 }
 
 .profile-identity-row span {
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-size: 13px;
 }
 

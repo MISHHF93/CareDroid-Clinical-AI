@@ -96,10 +96,12 @@ export const EMERGENCY_PAGE_RENDER_INVENTORY = Object.freeze([
     id: 'emergency-journey',
     label: 'Full Journey',
     path: CANONICAL_ROUTES.emergencyJourney,
-    componentKey: 'FullJourneyOperatingPage',
+    componentKey: 'HospitalCommandCenter',
     navId: 'emergency_journey',
     screenshotSlug: '04-emergency-journey',
+    duplicateRenderPaths: [CANONICAL_ROUTES.emergencyCommandCenter],
     movementStages: PATIENT_MOVEMENT_STAGES,
+    notes: 'Legacy bookmark alias — redirects to Hospital Command Center.',
   }),
   page({
     id: 'emergency-dispatch',

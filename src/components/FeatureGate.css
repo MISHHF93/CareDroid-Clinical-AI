@@ -21,12 +21,12 @@
 
 .feature-gate-placeholder p {
   margin: 0;
-  color: var(--app-text-secondary, var(--muted-text));
+  color: var(--app-text-secondary, var(--app-fg-muted));
   font-size: 0.86rem;
 }
 
 .feature-gate-placeholder a {
-  color: var(--app-accent-interactive, #8ed8ff);
+  color: var(--app-accent-interactive, var(--medical-accent-soft));
   font-size: 0.85rem;
   font-weight: 800;
   text-decoration: none;

@@ -17,8 +17,8 @@ const ToolPanel = ({ tool, feature }) => {
       transform: 'translateX(-50%)',
       maxWidth: '900px',
       width: 'calc(100% - 40px)',
-      background: 'rgba(0, 255, 136, 0.1)',
-      border: '1px solid rgba(0, 255, 136, 0.3)',
+      background: 'var(--medical-accent-tint)',
+      border: '1px solid color-mix(in srgb, var(--app-accent-interactive) 30%, transparent)',
       borderRadius: '12px',
       padding: '20px',
       color: 'var(--text-color)'

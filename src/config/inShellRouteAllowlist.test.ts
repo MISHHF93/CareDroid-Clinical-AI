@@ -23,12 +23,12 @@ describe('inShellRouteAllowlist', () => {
     CANONICAL_ROUTES.aiGovernance,
     CANONICAL_ROUTES.integrationHub,
     CANONICAL_ROUTES.workspace,
+    CANONICAL_ROUTES.platformStart,
   ])('treats %s as an in-shell route', (path) => {
     expect(isInShellRoute(path)).toBe(true);
   });
 
   it.each([
-    '/start',
     '/cosmos',
     '/surveillance',
     '/digital-twin',

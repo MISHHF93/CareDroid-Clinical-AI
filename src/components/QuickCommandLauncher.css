@@ -79,7 +79,7 @@
 
 .quick-command-eyebrow {
   margin: 0 0 4px;
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-size: var(--font-11, 11px);
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -129,7 +129,7 @@
 
 .quick-command-search__icon {
   display: inline-flex;
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
 }
 
 .quick-command-search input {
@@ -172,7 +172,7 @@
 }
 
 .quick-command-shortcut {
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   background: color-mix(in srgb, var(--app-surface-2) 72%, transparent);
 }
 
@@ -194,7 +194,7 @@
 .quick-command-section h3 {
   margin: 0 0 7px;
   padding: 0 4px;
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-size: var(--font-11, 11px);
   font-weight: 850;
   letter-spacing: 0.08em;
@@ -263,7 +263,7 @@
 .quick-command-item__body span,
 .quick-command-item__meta,
 .quick-command-empty {
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-size: var(--font-12, 12px);
 }
 
@@ -288,7 +288,7 @@
   border: 1px solid color-mix(in srgb, var(--panel-border) 72%, transparent);
   border-radius: var(--compact-card-radius, 12px);
   background: color-mix(in srgb, var(--app-surface-2) 62%, transparent);
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-size: var(--font-12, 12px);
   font-weight: 700;
   line-height: 1.35;

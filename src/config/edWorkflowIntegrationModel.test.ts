@@ -13,10 +13,19 @@ describe('edWorkflowIntegrationModel', () => {
     const steps = listEdWorkflowAzSteps();
     expect(steps.length).toBeGreaterThanOrEqual(10);
     expect(steps[0]?.route).toBe(CANONICAL_ROUTES.platformStart);
+    expect(steps.find((step) => step.id === 'clinical-startup')?.route).toBe(
+      CANONICAL_ROUTES.emergencyReception,
+    );
     expect(steps.some((step) => step.emergencyRoleId === EMERGENCY_ROLE_IDS.registrationClerk)).toBe(
       true,
     );
     expect(steps.some((step) => step.emergencyRoleId === EMERGENCY_ROLE_IDS.edManager)).toBe(true);
+    expect(steps.find((step) => step.id === 'triage-acuity')?.route).toBe(
+      `${CANONICAL_ROUTES.emergencyQueues}?queue=pretriage`,
+    );
+    expect(steps.find((step) => step.id === 'command-ops')?.route).toBe(
+      CANONICAL_ROUTES.emergencyCommandCenter,
+    );
   });
 
   it('normalizes profile catalog roles into emergency landing context', () => {
@@ -38,7 +47,7 @@ describe('edWorkflowIntegrationModel', () => {
       },
     });
     expect(context.emergencyRoleId).toBe(EMERGENCY_ROLE_IDS.triageNurse);
-    expect(context.landingRoute).toContain(CANONICAL_ROUTES.emergencyReception);
+    expect(context.landingRoute).toBe(CANONICAL_ROUTES.triage);
   });
 
   it('summarizes backend vs frontend sync expectations', () => {

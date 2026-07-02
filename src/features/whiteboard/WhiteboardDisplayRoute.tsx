@@ -1,24 +1,15 @@
-import { lazy, Suspense, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useCallback, useMemo } from 'react';
+import { Navigate, useSearchParams } from 'react-router-dom';
 import PublicWaitingDisplay from '../../components/whiteboard/PublicWaitingDisplay';
 import { buildPublicWaitingDisplaySnapshot } from '../../components/whiteboard/publicWaitingDisplayModel';
-import { MEDICAL_THEME } from '../../config/medicalTheme.constants';
+import { CANONICAL_ROUTES } from '../../config/routes.config';
+import { CARE_DROID_SCREEN_MODES } from '../../config/careDroidScreenModes';
 import { useEmergencyStore } from '../../store/emergencyStore';
-import { useStableDisplaySnapshot } from '../../hooks/useDisplayAutoRefresh';
-
-const EmergencyWhiteboard = lazy(() => import('../../pages/emergency'));
-
-function DisplayLoadingFallback() {
-  return (
-    <div role="status" style={{ padding: 24, color: MEDICAL_THEME.inkSubtle }}>
-      Loading display whiteboard...
-    </div>
-  );
-}
+import useDisplayAutoRefresh, { useStableDisplaySnapshot } from '../../hooks/useDisplayAutoRefresh';
 
 /**
  * Overhead / waiting-room display route — public-safe by default.
- * ?view=operational shows read-only departmental whiteboard (no PHI identifiers).
+ * ?view=operational redirects to staff read-only whiteboard (AppShell), not a duplicate dashboard.
  */
 export default function WhiteboardDisplayRoute() {
   const [searchParams] = useSearchParams();
@@ -29,6 +20,7 @@ export default function WhiteboardDisplayRoute() {
   const referrals = useEmergencyStore((state) => state.referrals);
   const emsArrivals = useEmergencyStore((state) => state.emsArrivals);
   const emergencySettings = useEmergencyStore((state) => state.emergencySettings);
+  const initializeFromBackend = useEmergencyStore((state) => state.initializeFromBackend);
 
   const publicWaitingSnapshot = useMemo(
     () =>
@@ -47,13 +39,33 @@ export default function WhiteboardDisplayRoute() {
 
   const stableSnapshot = useStableDisplaySnapshot(publicWaitingSnapshot);
 
+  const onRefresh = useCallback(async () => initializeFromBackend(), [initializeFromBackend]);
+
+  const refreshStatus = useDisplayAutoRefresh({
+    enabled: view !== 'operational',
+    screenMode: CARE_DROID_SCREEN_MODES.publicWaiting,
+    settings: {
+      wallDisplayRefreshInterval: emergencySettings?.wallDisplayRefreshInterval,
+    },
+    contentUpdatedAt: stableSnapshot?.updatedAt || null,
+    hasContent: Boolean(stableSnapshot),
+    onRefresh,
+  });
+
+  if (view === 'operational') {
+    return (
+      <Navigate
+        to={`${CANONICAL_ROUTES.emergencyWhiteboard}?display=readonly`}
+        replace
+      />
+    );
+  }
+
   return (
-    <Suspense fallback={<DisplayLoadingFallback />}>
-      {view === 'operational' ? (
-        <EmergencyWhiteboard />
-      ) : (
-        <PublicWaitingDisplay kioskMode snapshot={stableSnapshot} />
-      )}
-    </Suspense>
+    <PublicWaitingDisplay
+      kioskMode
+      snapshot={stableSnapshot}
+      refreshStatus={refreshStatus}
+    />
   );
 }

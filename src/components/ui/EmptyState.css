@@ -59,7 +59,7 @@
 
 .empty-state-description {
   font-size: var(--font-16);
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   margin: 0 0 var(--space-5) 0;
   line-height: 1.6;
 }

@@ -1,0 +1,21 @@
+---
+pid: 25768
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "node node_modules/vitest/vitest.mjs run src/config/canonicalConfig.contract.test.ts src/routing/canonicalRouteRedirects.test.ts src/config/edWorkflowIntegrationModel.test.ts src/config/pageApiBinding.registry.test.ts src/config/consoleRoutePolicy.config.test.ts"
+started_at: 2026-07-02T20:00:52.527Z
+running_for_ms: 2110009  
+---
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+ ✓ src/config/canonicalConfig.contract.test.ts (9 tests) 86ms
+ ✓ src/config/pageApiBinding.registry.test.ts (4 tests) 8ms
+ ✓ src/config/consoleRoutePolicy.config.test.ts (3 tests) 9ms
+ ✓ src/routing/canonicalRouteRedirects.test.ts (5 tests) 13ms
+ ✓ src/config/edWorkflowIntegrationModel.test.ts (4 tests) 7ms
+
+ Test Files  5 passed (5)
+      Tests  25 passed (25)
+   Start at  16:00:54
+   Duration  20.93s (transform 3.33s, setup 2.47s, import 4.73s, tests 124ms, environment 11.79s)
+

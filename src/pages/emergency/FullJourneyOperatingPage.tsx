@@ -17,6 +17,9 @@ import { getDiagnosticsBoard, getDiagnosticsSummary, DIAGNOSTIC_TYPE_LABELS, DIA
 import { getStaffRoutingSummary } from '../../services/staffRoutingService';
 import { getCADSystemSummary } from '../../services/cadIntegrationService';
 import { getPrehospitalSummary, getAllActiveAssessments } from '../../services/prehospitalAssessmentService';
+import EdDataSourceBanner from '../../components/emergency/EdDataSourceBanner';
+import useEmergencyOperatingSurface from '../../hooks/useEmergencyOperatingSurface';
+import type { OperatingSurfaceId } from '../../services/emergencyOsApi';
 import { EmergencyRoutePage, MetricGrid } from './emergencyRouteShared';
 import type { DiagnosticOrder, EDReadinessPlan } from '../../types/emergency';
 import {
@@ -1157,7 +1160,17 @@ function StickyActionBanner({ snapshot }: { snapshot: ReturnType<typeof buildFul
 
 // ── Main page ────────────────────────────────────────────────────────────────
 
+const VIEW_SURFACE_MAP: Partial<Record<ViewId, OperatingSurfaceId>> = {
+  'ed-readiness': 'ed-readiness',
+  diagnostics: 'diagnostics',
+  handoffs: 'handoffs',
+  reports: 'reports',
+};
+
 export default function FullJourneyOperatingPage({ view = 'journey' }: FullJourneyOperatingPageProps) {
+  const surfaceId = VIEW_SURFACE_MAP[view];
+  const { loading: apiLoading, error: apiError, envelope: apiEnvelope } =
+    useEmergencyOperatingSurface(surfaceId);
   const patients = useEmergencyStore((state) => state.patients);
   const staff = useEmergencyStore((state) => state.staff);
   const emsArrivals = useEmergencyStore((state) => state.emsArrivals);
@@ -1178,19 +1191,47 @@ export default function FullJourneyOperatingPage({ view = 'journey' }: FullJourn
     ? snapshot.stages.filter((stage) => selectedStageIds.includes(stage.id as never))
     : snapshot.stages;
 
+  const apiMetrics = (apiEnvelope.data || {}) as Record<string, unknown>;
+  const metrics = surfaceId
+    ? {
+        ...snapshot.metrics,
+        inboundEms:
+          typeof apiMetrics.inboundEms === 'number' ? apiMetrics.inboundEms : snapshot.metrics.inboundEms,
+        criticalAlerts:
+          typeof apiMetrics.criticalAlerts === 'number'
+            ? apiMetrics.criticalAlerts
+            : snapshot.metrics.criticalAlerts,
+        capacityBand:
+          typeof apiMetrics.capacityBand === 'string'
+            ? apiMetrics.capacityBand
+            : snapshot.metrics.capacityBand,
+      }
+    : snapshot.metrics;
+
   return (
     <EmergencyRoutePage eyebrow={copy.eyebrow} title={copy.title} description={copy.description}>
+      {surfaceId ? (
+        <EdDataSourceBanner
+          loading={apiLoading}
+          error={apiError}
+          envelope={{
+            source: apiEnvelope.source,
+            generatedAt: apiEnvelope.generatedAt,
+          }}
+          compact
+        />
+      ) : null}
       {/* Sticky critical action banner — only shown when there's something urgent */}
       <StickyActionBanner snapshot={snapshot} />
 
       <MetricGrid
         metrics={[
-          { label: 'Active patients', value: snapshot.metrics.activePatients },
-          { label: 'P1/P2', value: snapshot.metrics.p1p2Patients, color: '#EF4444' },
-          { label: 'Inbound EMS', value: snapshot.metrics.inboundEms, color: '#F59E0B' },
-          { label: 'Critical alerts', value: snapshot.metrics.criticalAlerts, color: '#DC2626' },
-          { label: 'Capacity', value: snapshot.metrics.capacityBand },
-          { label: '3-min breaches', value: snapshot.metrics.threeMinuteBreaches, color: snapshot.metrics.threeMinuteBreaches ? '#DC2626' : '#10B981' },
+          { label: 'Active patients', value: metrics.activePatients },
+          { label: 'P1/P2', value: metrics.p1p2Patients, color: '#EF4444' },
+          { label: 'Inbound EMS', value: metrics.inboundEms, color: '#F59E0B' },
+          { label: 'Critical alerts', value: metrics.criticalAlerts, color: '#DC2626' },
+          { label: 'Capacity', value: metrics.capacityBand },
+          { label: '3-min breaches', value: metrics.threeMinuteBreaches, color: metrics.threeMinuteBreaches ? '#DC2626' : '#10B981' },
         ]}
       />
 

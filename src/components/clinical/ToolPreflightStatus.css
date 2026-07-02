@@ -3,10 +3,10 @@
   gap: 14px;
   margin: 16px 0;
   padding: 14px;
-  border: 1px solid rgba(0, 255, 136, 0.28);
+  border: 1px solid var(--medical-accent-border);
   border-radius: 14px;
   background:
-    linear-gradient(135deg, rgba(0, 255, 136, 0.08), rgba(0, 153, 255, 0.06)),
+    linear-gradient(135deg, var(--medical-accent-tint-subtle), color-mix(in srgb, var(--app-accent-interactive) 6%, transparent)),
     var(--surface-1);
 }
 
@@ -33,18 +33,18 @@
 
 .tool-preflight__safe-state {
   flex: 0 0 auto;
-  border: 1px solid rgba(255, 179, 71, 0.34);
+  border: 1px solid color-mix(in srgb, var(--app-warning) 34%, transparent);
   border-radius: 999px;
   padding: 5px 10px;
-  background: rgba(255, 179, 71, 0.1);
-  color: #ffd59a;
+  background: color-mix(in srgb, var(--app-warning) 10%, transparent);
+  color: var(--semantic-attention);
   font-size: 12px;
   font-weight: 850;
 }
 
 .tool-preflight__safe-state--ready {
-  border-color: rgba(0, 255, 136, 0.35);
-  background: rgba(0, 255, 136, 0.11);
+  border-color: var(--medical-accent-ring-strong);
+  background: color-mix(in srgb, var(--app-accent-interactive) 11%, transparent);
   color: var(--accent-green);
 }
 
@@ -66,7 +66,7 @@
 }
 
 .tool-preflight__label {
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.04em;
@@ -80,14 +80,14 @@
 
 .tool-preflight small,
 .tool-preflight__muted {
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-size: 12px;
   line-height: 1.35;
 }
 
 .tool-preflight__error,
 .tool-preflight__warning--error {
-  color: #ffb4b4 !important;
+  color: var(--semantic-critical) !important;
 }
 
 .tool-preflight__list {
@@ -100,7 +100,7 @@
 }
 
 .tool-preflight__missing {
-  color: #ffd59a;
+  color: var(--semantic-attention);
 }
 
 .tool-preflight__warnings {
@@ -109,18 +109,18 @@
 }
 
 .tool-preflight__warning {
-  border: 1px solid rgba(255, 179, 71, 0.3);
+  border: 1px solid color-mix(in srgb, var(--app-warning) 30%, transparent);
   border-radius: 10px;
   padding: 8px 10px;
-  background: rgba(255, 179, 71, 0.08);
+  background: color-mix(in srgb, var(--app-warning) 8%, transparent);
   color: var(--text-color);
   font-size: 12px;
   line-height: 1.4;
 }
 
 .tool-preflight__warning--error {
-  border-color: rgba(255, 75, 92, 0.36);
-  background: rgba(255, 75, 92, 0.1);
+  border-color: color-mix(in srgb, var(--app-danger) 36%, transparent);
+  background: color-mix(in srgb, var(--app-danger) 10%, transparent);
 }
 
 @media (max-width: 780px) {

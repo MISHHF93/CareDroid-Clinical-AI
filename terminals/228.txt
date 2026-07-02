@@ -1,0 +1,25 @@
+---
+pid: 15104
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "npm.cmd run test:executor-mapping"
+started_at: 2026-07-01T21:15:02.767Z
+running_for_ms: 31525244 
+---
+
+> caredroid-clinical-ai@1.0.0 test:executor-mapping
+> vitest run src/data/executorMappingAudit.test.ts src/data/unsupportedOrchestratorTools.test.ts src/data/clinicalToolIdContract.test.ts src/data/orchestratorMappingHardening.test.ts src/services/clinicalOrchestratorApi.test.ts
+
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+ ✓ src/data/clinicalToolIdContract.test.ts (25 tests) 48ms
+ ✓ src/data/orchestratorMappingHardening.test.ts (10 tests) 50ms
+ ✓ src/data/executorMappingAudit.test.ts (6 tests) 46ms
+ ✓ src/services/clinicalOrchestratorApi.test.ts (5 tests) 26ms
+ ✓ src/data/unsupportedOrchestratorTools.test.ts (3 tests) 10ms
+
+ Test Files  5 passed (5)
+      Tests  49 passed (49)
+   Start at  17:15:04
+   Duration  23.33s (transform 823ms, setup 3.91s, import 1.15s, tests 180ms, environment 16.03s)
+

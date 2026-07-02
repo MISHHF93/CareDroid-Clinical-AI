@@ -24,7 +24,7 @@
 }
 
 .ai-route-metadata__eyebrow {
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
 }
 
 .ai-route-metadata__review {
@@ -64,7 +64,7 @@
 }
 
 .ai-route-metadata__metrics dt {
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -85,7 +85,7 @@
 }
 
 .ai-route-metadata__pipeline-step {
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-size: 11px;
   font-weight: 700;
 }

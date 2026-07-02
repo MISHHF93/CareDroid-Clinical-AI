@@ -1,0 +1,22 @@
+---
+pid: 26284
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "npm.cmd run build --prefix backend"
+started_at: 2026-07-02T20:09:48.271Z
+running_for_ms: 1575008  
+---
+
+> caredroid-clinical-ai-backend@1.0.0 prebuild
+> rimraf dist
+
+
+> caredroid-clinical-ai-backend@1.0.0 build
+> nest build
+
+Found 1 error(s).
+
+src/modules/emergency-os/emergency-os.operating-surfaces.service.ts:160:70 - error TS2339: Property 'type' does not exist on type 'EmergencyAlert'.
+
+160           complianceBreaches: context.alerts.filter((alert) => alert.type === 'ThreeMinuteBreach').length,
+                                                                         ~~~~
+

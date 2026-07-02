@@ -12,13 +12,13 @@
  * 6. Permissions-Policy header
  * 
  * Run with: node verify-tls-enforcement.js [URL]
- * Example: node verify-tls-enforcement.js https://localhost:3000
+ * Example: node verify-tls-enforcement.js https://localhost:8000
  */
 
 const https = require('https');
 const http = require('http');
 
-const URL = process.argv[2] || 'https://localhost:3000';
+const URL = process.argv[2] || 'https://localhost:8000';
 
 console.log('🔒 TLS 1.3 & Security Headers Verification');
 console.log('='.repeat(50));

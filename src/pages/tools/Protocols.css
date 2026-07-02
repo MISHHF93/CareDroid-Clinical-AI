@@ -33,7 +33,7 @@
 .protocol-library__card small,
 .protocol-library__versions span,
 .protocol-library__eyebrow {
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
 }
 
 .protocol-library__eyebrow {
@@ -57,9 +57,9 @@
 .protocol-library__links a,
 .protocol-library__ai-button,
 .protocol-library__categories button {
-  border: 1px solid rgba(0, 255, 136, 0.28);
+  border: 1px solid var(--medical-accent-border);
   border-radius: 999px;
-  background: rgba(0, 255, 136, 0.08);
+  background: var(--medical-accent-tint-subtle);
   color: var(--accent-green);
   font-size: 13px;
   font-weight: 800;
@@ -76,7 +76,7 @@
 .protocol-library__search-helper {
   grid-column: 1 / -1;
   margin: 0;
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-size: 13px;
 }
 
@@ -127,8 +127,8 @@
 }
 
 .protocol-library__card.is-selected {
-  border-color: rgba(0, 255, 136, 0.7);
-  box-shadow: 0 0 0 1px rgba(0, 255, 136, 0.2);
+  border-color: color-mix(in srgb, var(--app-accent-interactive) 70%, transparent);
+  box-shadow: 0 0 0 1px var(--medical-accent-ring);
 }
 
 .protocol-library__viewer {

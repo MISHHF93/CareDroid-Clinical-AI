@@ -50,7 +50,7 @@ describe('WorkspaceContext', () => {
     it('should load persisted workspaces from localStorage', () => {
       const customWorkspaces = [
         { id: 'icu', name: 'ICU', toolIds: ['tool1', 'tool2'] },
-        { id: 'emergency', name: 'Emergency', toolIds: ['tool1'], color: '#ff6b6b', icon: 'Siren' }
+        { id: 'emergency', name: 'Emergency', toolIds: ['tool1'], color: '#ef4444', icon: 'Siren' }
       ];
 
       localStorage.setItem('careDroid.workspaces.v1', JSON.stringify({
@@ -64,7 +64,7 @@ describe('WorkspaceContext', () => {
       expect(result.current.activeWorkspaceId).toBe('emergency');
       
       const emergencyWs = result.current.workspaces.find(w => w.id === 'emergency');
-      expect(emergencyWs.color).toBe('#ff6b6b');
+      expect(emergencyWs.color).toBe('#ef4444');
       expect(emergencyWs.icon).toBe('Siren');
     });
   });
@@ -352,7 +352,7 @@ describe('WorkspaceContext', () => {
         id: 'colored',
         name: 'Colored Workspace',
         toolIds: [],
-        color: '#ff6b6b'
+        color: '#ef4444'
       };
 
       act(() => {
@@ -360,7 +360,7 @@ describe('WorkspaceContext', () => {
       });
 
       const workspace = result.current.workspaces.find(w => w.id === 'colored');
-      expect(workspace.color).toBe('#ff6b6b');
+      expect(workspace.color).toBe('#ef4444');
     });
 
     it('should support custom icons', () => {

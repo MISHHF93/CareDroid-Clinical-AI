@@ -32,7 +32,7 @@
 .documentation-assistant-eyebrow,
 .documentation-assistant-card p,
 .documentation-assistant-export-status {
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
 }
 
 .documentation-assistant-eyebrow {
@@ -53,9 +53,9 @@
 .documentation-assistant-hero__actions a,
 .documentation-assistant-actions button,
 .documentation-assistant-chip-grid button {
-  border: 1px solid rgba(0, 255, 136, 0.28);
+  border: 1px solid var(--medical-accent-border);
   border-radius: 999px;
-  background: rgba(0, 255, 136, 0.08);
+  background: var(--medical-accent-tint-subtle);
   color: var(--accent-green);
   cursor: pointer;
   font-size: 13px;

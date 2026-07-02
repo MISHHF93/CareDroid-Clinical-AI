@@ -186,13 +186,16 @@ export const CANONICAL_ROUTES = Object.freeze({
   onboarding: '/onboarding',
 });
 
+/** Canonical pre-triage queue landing — architecture target for `/triage` bookmarks. */
+export const TRIAGE_PRETRIAGE_ROUTE = `${CANONICAL_ROUTES.emergencyQueues}?queue=pretriage`;
+
 export const CANONICAL_APP_ROUTE_TREE = Object.freeze([
-  { path: '/', type: 'redirect', to: '/emergency/whiteboard' },
+  { path: '/', type: 'redirect', to: '/emergency/reception' },
   { path: '/auth-callback', type: 'page', componentKey: 'AuthCallback' },
   { path: '/shared/tools/:shareId', type: 'page', componentKey: 'SharedToolSession' },
   { path: '/whiteboard', type: 'redirect', to: '/emergency/whiteboard' },
   { path: '/reception', type: 'redirect', to: '/emergency/reception' },
-  { path: '/triage', type: 'redirect', to: '/triage?queue=pretriage' },
+  { path: '/triage', type: 'redirect', to: TRIAGE_PRETRIAGE_ROUTE },
   { path: '/charge', type: 'redirect', to: '/emergency/whiteboard' },
   { path: '/physician', type: 'redirect', to: '/emergency/whiteboard' },
   { path: '/ems', type: 'redirect', to: '/emergency/ems' },
@@ -200,11 +203,11 @@ export const CANONICAL_APP_ROUTE_TREE = Object.freeze([
   { path: '/copilot', type: 'redirect', to: '/emergency/copilot' },
   { path: '/calculators', type: 'redirect', to: '/emergency/tools' },
   { path: '/admin', type: 'redirect', to: '/admin' },
-  { path: '/emergency', type: 'redirect', to: '/emergency/whiteboard' },
+  { path: '/emergency', type: 'redirect', to: '/emergency/reception' },
   { path: '/emergency/command-center', type: 'page', componentKey: 'HospitalCommandCenter' },
   { path: '/emergency/whiteboard', type: 'page', componentKey: 'EmergencyWhiteboard' },
   { path: '/emergency/patients', type: 'page', componentKey: 'EmergencyPatientsRoute' },
-  { path: '/emergency/journey', type: 'page', componentKey: 'HospitalCommandCenter' },
+  { path: '/emergency/journey', type: 'redirect', to: '/emergency/command-center' },
   { path: '/emergency/dispatch', type: 'page', componentKey: 'DispatchConsole' },
   { path: '/emergency/ems', type: 'page', componentKey: 'EMSPipeline' },
   { path: '/emergency/ed-readiness', type: 'page', componentKey: 'EdReadinessOperatingPage' },
@@ -227,7 +230,7 @@ export const CANONICAL_APP_ROUTE_TREE = Object.freeze([
   { path: '/emergency/alerts', type: 'page', componentKey: 'ClinicalAlertsPage' },
   { path: '/emergency/settings', type: 'page', componentKey: 'EmergencySettingsRoute' },
   { path: '/emergency/help', type: 'page', componentKey: 'HelpHubPage' },
-  { path: '*', type: 'redirect', to: '/emergency/whiteboard' },
+  { path: '*', type: 'redirect', to: '/emergency/reception' },
 ]);
 
 export const EMERGENCY_OS_TARGET_ROUTES = Object.freeze(
@@ -281,8 +284,36 @@ export const FLEET_MAP_ROUTE_ALIASES = Object.freeze([
 ]);
 export const OPERATIONS_ROUTE_ALIASES = Object.freeze(['/operations-center']);
 export const AUDIT_ROUTE_ALIASES = Object.freeze(['/audit-logs']);
-export const HOME_ROUTE_ALIASES = Object.freeze(['/home', '/workspace', '/app', '/whiteboard']);
+/** Legacy bookmarks that should land on clinical startup (reception-first). */
+export const APP_STARTUP_ROUTE_ALIASES = Object.freeze(['/home', '/app']);
+export const HOME_ROUTE_ALIASES = APP_STARTUP_ROUTE_ALIASES;
 export const ORGANIZATION_PACKS_ROUTE_ALIASES = Object.freeze([]);
+
+/**
+ * Short ED paths → single canonical mount (no duplicate page components in router).
+ */
+export const ED_CANONICAL_ROUTE_ALIASES = Object.freeze(
+  [
+    [CANONICAL_ROUTES.intake, CANONICAL_ROUTES.emergencyIntake],
+    [CANONICAL_ROUTES.queue, CANONICAL_ROUTES.emergencyQueues],
+    [CANONICAL_ROUTES.alerts, CANONICAL_ROUTES.emergencyAlerts],
+    [CANONICAL_ROUTES.aiChief, CANONICAL_ROUTES.emergencyCopilot],
+    [CANONICAL_ROUTES.departments, CANONICAL_ROUTES.emergencyCapacity],
+    [CANONICAL_ROUTES.analytics, CANONICAL_ROUTES.emergencyAnalytics],
+    [CANONICAL_ROUTES.settings, CANONICAL_ROUTES.emergencySettings],
+  ].map(([path, to]) => Object.freeze({ path, to, routeId: 'ed-canonical-alias' })),
+);
+
+/** Retired standalone dashboards folded into ED OS — mounted outside AppShell guard. */
+export const OUTSIDE_SHELL_ROUTE_REDIRECTS = Object.freeze(
+  [
+    [CANONICAL_ROUTES.dashboard, CANONICAL_ROUTES.emergencyCommandCenter],
+    ['/assistant', CANONICAL_ROUTES.emergencyCopilot],
+    ['/chat', CANONICAL_ROUTES.emergencyCopilot],
+    ['/ai', CANONICAL_ROUTES.emergencyCopilot],
+    ['/copilot', CANONICAL_ROUTES.emergencyCopilot],
+  ].map(([path, to]) => Object.freeze({ path, to, routeId: 'outside-shell-redirect' })),
+);
 
 export const LEGACY_EMERGENCY_ROUTE_REDIRECTS = Object.freeze(
   [
@@ -297,7 +328,6 @@ export const LEGACY_EMERGENCY_ROUTE_REDIRECTS = Object.freeze(
     ['/boarding', CANONICAL_ROUTES.emergencyBoarding],
     ['/referrals', CANONICAL_ROUTES.emergencyReferrals],
     ['/provincial-health', CANONICAL_ROUTES.emergencyWhiteboard],
-    ['/integrations', CANONICAL_ROUTES.integrationHub],
     ['/integrations/hub', CANONICAL_ROUTES.integrationHub],
     ['/platform/cosmos', CANONICAL_ROUTES.cosmosViewer],
     ['/cosmos', CANONICAL_ROUTES.cosmosViewer],
@@ -311,6 +341,7 @@ export const LEGACY_EMERGENCY_ROUTE_REDIRECTS = Object.freeze(
     ['/scores/*', CANONICAL_ROUTES.emergencyTools],
     ['/emergency/smart-intake', CANONICAL_ROUTES.emergencyIntake],
     ['/emergency/queue', CANONICAL_ROUTES.emergencyQueues],
+    [CANONICAL_ROUTES.emergencyJourney, CANONICAL_ROUTES.emergencyCommandCenter],
     ['/emergency/patient-journey', CANONICAL_ROUTES.emergencyPatients],
     ['/emergency/provincial-health', CANONICAL_ROUTES.emergencyWhiteboard],
     ['/emergency/integrations', CANONICAL_ROUTES.integrationHub],
@@ -328,7 +359,7 @@ export const LEGACY_EMERGENCY_ROUTE_REDIRECTS = Object.freeze(
     ['/workspace/emergency/whiteboard', CANONICAL_ROUTES.emergencyWhiteboard],
     ['/workspace/emergency/intake', CANONICAL_ROUTES.emergencyIntake],
     ['/workspace/emergency/patients', CANONICAL_ROUTES.emergencyPatients],
-    ['/workspace/emergency/journey', CANONICAL_ROUTES.emergencyJourney],
+    ['/workspace/emergency/journey', CANONICAL_ROUTES.emergencyCommandCenter],
     ['/workspace/emergency/queue', CANONICAL_ROUTES.emergencyQueues],
     ['/workspace/emergency/queues', CANONICAL_ROUTES.emergencyQueues],
     ['/workspace/emergency/ems', CANONICAL_ROUTES.emergencyEms],
@@ -378,7 +409,6 @@ export const LEGACY_EMERGENCY_ROUTE_REDIRECTS = Object.freeze(
 );
 
 export const NON_ED_WORKSPACE_REDIRECT_ROUTES = Object.freeze([
-  Object.freeze({ path: '/analytics', moduleName: 'Analytics' }),
   Object.freeze({ path: '/federated-learning', moduleName: 'Federated Learning' }),
   Object.freeze({ path: '/vehicle', moduleName: 'Vehicle Operations' }),
   Object.freeze({ path: '/vehicle/*', moduleName: 'Vehicle Operations' }),
@@ -394,7 +424,7 @@ export const NON_ED_WORKSPACE_REDIRECT_ROUTES = Object.freeze([
 export const WORKSPACE_EMERGENCY_SUBPAGE_REDIRECTS = Object.freeze({
   whiteboard: CANONICAL_ROUTES.emergencyWhiteboard,
   patients: CANONICAL_ROUTES.emergencyPatients,
-  journey: CANONICAL_ROUTES.emergencyJourney,
+  journey: CANONICAL_ROUTES.emergencyCommandCenter,
   'patient-journey': CANONICAL_ROUTES.emergencyPatients,
   queues: CANONICAL_ROUTES.emergencyQueues,
   queue: CANONICAL_ROUTES.emergencyQueues,
@@ -755,9 +785,9 @@ export const CANONICAL_ROUTE_MAP = Object.freeze([
     priority: 20,
     icon: 'layout-dashboard',
     readOnlyAllowed: true,
-    aliases: [CANONICAL_ROUTES.dashboard],
-    activePaths: [CANONICAL_ROUTES.emergencyWhiteboard, '/emergency', CANONICAL_ROUTES.dashboard],
-    breadcrumbs: ['Command', 'Dashboard'],
+    aliases: [],
+    activePaths: [CANONICAL_ROUTES.emergencyWhiteboard, '/emergency/whiteboard'],
+    breadcrumbs: ['Command', 'Whiteboard'],
     helpTopicId: 'whiteboard',
     workflowOwner: 'ED operations',
   }),
@@ -885,9 +915,9 @@ export const CANONICAL_ROUTE_MAP = Object.freeze([
     allowedRoles: ['super_admin', 'ed_director', 'charge_nurse', 'triage_nurse', 'registered_nurse'],
     emergencyRoles: ['admin', 'ed_manager', 'charge_nurse', 'triage_nurse'],
     navigationGroup: 'Clinical',
-    showInNav: false,
     priority: 55,
     icon: 'stethoscope',
+    activePaths: [CANONICAL_ROUTES.triage, `${CANONICAL_ROUTES.triage}?queue=pretriage`],
     breadcrumbs: ['Clinical', 'Triage'],
     helpTopicId: 'triage',
     workflowOwner: 'Triage nurse',
@@ -1164,7 +1194,6 @@ export const CANONICAL_ROUTE_MAP = Object.freeze([
     requiredPermissions: [P.ANALYTICS_READ],
     allowedRoles: ['super_admin', 'hospital_admin', 'ed_director', 'charge_nurse', 'patient_flow_coordinator', 'quality_safety_officer'],
     navigationGroup: 'Operations',
-    showInNav: false,
     priority: 143,
     icon: 'map',
     emergencySafe: false,
@@ -1178,11 +1207,11 @@ export const CANONICAL_ROUTE_MAP = Object.freeze([
     path: CANONICAL_ROUTES.executive,
     label: 'Executive',
     description: 'C-suite KPI dashboard: patient volumes, wait times, LOS, platform health, and surge status.',
-    pageComponent: 'ExecutiveCommandCenter',
+    pageComponent: 'HospitalCommandCenter',
+    redirectTo: `${CANONICAL_ROUTES.emergencyCommandCenter}?view=executive`,
     requiredPermissions: [P.ANALYTICS_READ],
     allowedRoles: ['super_admin', 'hospital_admin', 'ed_director', 'quality_safety_officer'],
     navigationGroup: 'Intelligence',
-    showInNav: false,
     priority: 146,
     icon: 'chart-bar',
     emergencySafe: false,
@@ -1196,11 +1225,11 @@ export const CANONICAL_ROUTE_MAP = Object.freeze([
     path: CANONICAL_ROUTES.predictiveAnalytics,
     label: 'Predictive AI',
     description: 'Predictive risk models for deterioration, readmission, mortality, and overcrowding.',
-    pageComponent: 'PredictiveAnalyticsDashboard',
+    pageComponent: 'HospitalCommandCenter',
+    redirectTo: `${CANONICAL_ROUTES.emergencyCommandCenter}?view=predictive`,
     requiredPermissions: [P.ANALYTICS_READ],
     allowedRoles: ['super_admin', 'hospital_admin', 'ed_director', 'charge_nurse', 'emergency_physician', 'attending_physician', 'quality_safety_officer', 'patient_flow_coordinator'],
     navigationGroup: 'Intelligence',
-    showInNav: false,
     priority: 148,
     icon: 'activity',
     emergencySafe: false,
@@ -1258,7 +1287,6 @@ export const CANONICAL_ROUTE_MAP = Object.freeze([
     icon: 'list-check',
     aliases: [CANONICAL_ROUTES.emergencySimulation],
     emergencySafe: false,
-    redirectTo: CANONICAL_ROUTES.emergencyTools,
     breadcrumbs: ['Intelligence', 'Simulation'],
     helpTopicId: 'tools',
     workflowOwner: 'Education / quality',
@@ -1301,7 +1329,8 @@ export const CANONICAL_ROUTE_MAP = Object.freeze([
     path: CANONICAL_ROUTES.aiCommandCenter,
     label: 'AI Center',
     description: 'AI operations dashboard: model health, expert roster, memory usage, RAG metrics, cost, and audit logs.',
-    pageComponent: 'AiCommandCenterDashboard',
+    pageComponent: 'HospitalCommandCenter',
+    redirectTo: `${CANONICAL_ROUTES.emergencyCommandCenter}?view=ai`,
     requiredPermissions: [P.AI_READ],
     allowedRoles: ['super_admin', 'hospital_admin', 'ed_director', 'it_admin', 'quality_safety_officer'],
     navigationGroup: 'Intelligence',
@@ -1383,10 +1412,10 @@ export const CANONICAL_ROUTE_MAP = Object.freeze([
   }),
   route({
     id: 'platform',
-    path: CANONICAL_ROUTES.workspace,
+    path: CANONICAL_ROUTES.platformStart,
     label: 'Platform',
-    description: 'Platform entry route retained for compatibility.',
-    pageComponent: 'EdApplicationEntryRedirect',
+    description: 'Platform entry hub for role selection, demos, and workspace launch.',
+    pageComponent: 'PlatformEntryHub',
     requiredPermissions: [P.PATIENT_READ],
     allowedRoles: ALL_USER_PROFILES,
     navigationGroup: 'Administration',
@@ -1394,7 +1423,7 @@ export const CANONICAL_ROUTE_MAP = Object.freeze([
     priority: 220,
     icon: 'platform',
     emergencySafe: false,
-    redirectTo: CANONICAL_ROUTES.emergencyWhiteboard,
+    aliases: [CANONICAL_ROUTES.workspace],
     breadcrumbs: ['Administration', 'Platform'],
     helpTopicId: 'platform-start',
     workflowOwner: 'CareDroid platform',
@@ -1504,26 +1533,36 @@ export const ROUTE_RECORDS = Object.freeze([
     navGroup: 'auth',
   }),
   Object.freeze({
-    id: 'dashboard',
-    path: CANONICAL_ROUTES.emergencyWhiteboard,
-    componentKey: 'EmergencyWhiteboard',
+    id: 'startup',
+    path: CANONICAL_ROUTES.emergencyReception,
+    componentKey: 'ReceptionWorkspace',
     layout: 'app',
     auth: 'required',
     status: 'redirect',
-    aliases: HOME_ROUTE_ALIASES,
+    aliases: APP_STARTUP_ROUTE_ALIASES,
+    navGroup: 'primary',
+  }),
+  Object.freeze({
+    id: 'dashboard',
+    path: CANONICAL_ROUTES.emergencyCommandCenter,
+    componentKey: 'HospitalCommandCenter',
+    layout: 'app',
+    auth: 'required',
+    status: 'redirect',
+    aliases: [CANONICAL_ROUTES.dashboard],
     navGroup: 'primary',
   }),
   Object.freeze({
     id: 'executive',
-    path: CANONICAL_ROUTES.executive,
-    componentKey: 'ExecutiveCommandCenter',
+    path: CANONICAL_ROUTES.emergencyCommandCenter,
+    componentKey: 'HospitalCommandCenter',
     layout: 'app',
     auth: 'required',
-    status: 'active',
-    aliases: [],
+    status: 'redirect',
+    aliases: [CANONICAL_ROUTES.executive],
     navGroup: 'advanced',
     notes:
-      'C-suite hospital leadership dashboard for platform value, adoption, operational readiness, compliance, security, and alerts.',
+      'Executive intelligence lens consolidated into Hospital Command Center (?view=executive).',
   }),
   Object.freeze({
     id: 'assistant',
@@ -1537,15 +1576,27 @@ export const ROUTE_RECORDS = Object.freeze([
   }),
   Object.freeze({
     id: 'aiCommandCenter',
-    path: CANONICAL_ROUTES.aiCommandCenter,
-    componentKey: 'AiCommandCenterDashboard',
+    path: CANONICAL_ROUTES.emergencyCommandCenter,
+    componentKey: 'HospitalCommandCenter',
     layout: 'app',
     auth: 'required',
-    status: 'active',
-    aliases: ['/ai/command-center', '/ai-command'],
+    status: 'redirect',
+    aliases: [CANONICAL_ROUTES.aiCommandCenter, '/ai/command-center', '/ai-command'],
     navGroup: 'advanced',
     notes:
-      'Unified AI command surface for Ask, Act, Monitor, Govern, and Learn workflows across CareDroid.',
+      'AI operations lens consolidated into Hospital Command Center (?view=ai).',
+  }),
+  Object.freeze({
+    id: 'predictiveAnalytics',
+    path: CANONICAL_ROUTES.emergencyCommandCenter,
+    componentKey: 'HospitalCommandCenter',
+    layout: 'app',
+    auth: 'required',
+    status: 'redirect',
+    aliases: [CANONICAL_ROUTES.predictiveAnalytics],
+    navGroup: 'advanced',
+    notes:
+      'Predictive intelligence lens consolidated into Hospital Command Center (?view=predictive).',
   }),
   Object.freeze({
     id: 'recommendations',
@@ -2365,8 +2416,12 @@ function aliasesForRoute(id) {
 export const ROUTE_ALIAS_GROUPS = Object.freeze({
   auth: Object.freeze({ target: CANONICAL_ROUTES.platformStart, aliases: aliasesForRoute('auth') }),
   dashboard: Object.freeze({
-    target: CANONICAL_ROUTES.emergencyWhiteboard,
+    target: CANONICAL_ROUTES.emergencyCommandCenter,
     aliases: aliasesForRoute('dashboard'),
+  }),
+  startup: Object.freeze({
+    target: CANONICAL_ROUTES.emergencyReception,
+    aliases: aliasesForRoute('startup'),
   }),
   assistant: Object.freeze({
     target: CANONICAL_ROUTES.emergencyCopilot,

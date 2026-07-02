@@ -18,7 +18,7 @@ describe('authSession', () => {
   });
 
   it('routes legacy auth URL builders to platform entry or safe return paths', () => {
-    expect(buildAuthUrl()).toBe(CANONICAL_ROUTES.platformStart);
+    expect(buildAuthUrl()).toBe(CANONICAL_ROUTES.emergencyReception);
     expect(buildAuthUrl({ returnUrl: '/profile' })).toBe('/profile');
   });
 

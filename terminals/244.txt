@@ -1,0 +1,44 @@
+---
+pid: 13440
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "npm.cmd exec vitest run src/components/emergency/AdministrativeAutomationReviewPanel.test.tsx src/engine/administrativeAutomationEngine.entitlement.test.ts src/services/automationEngine.entitlement.test.ts"
+started_at: 2026-07-01T22:49:21.039Z
+running_for_ms: 25865023 
+---
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+ ✓ src/components/emergency/AdministrativeAutomationReviewPanel.test.tsx (1 test) 585ms
+     ✓ renders AI decision fields from proposedPayload.aiDecision  579ms
+ ❯ src/engine/administrativeAutomationEngine.entitlement.test.ts (2 tests | 1 failed) 36ms
+     ✓ drops routing tasks when strict entitlements exclude the mapped clinical agent 17ms
+     × keeps routing tasks when mapped clinical agent asset is entitled 13ms
+ ✓ src/services/automationEngine.entitlement.test.ts (2 tests) 10ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  1 failed | 4 passed (5)
+   Start at  18:49:27
+   Duration  19.43s (transform 3.55s, setup 2.84s, import 5.39s, tests 631ms, environment 8.99s)
+
+ FAIL  src/engine/administrativeAutomationEngine.entitlement.test.ts > administrativeAutomationEngine entitlement filtering > keeps routing tasks when mapped clinical agent asset is entitled
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/engine/administrativeAutomationEngine.entitlement.test.ts:95:71
+     93|
+     94|     const queue = useEmergencyStore.getState().administrativeAutomatio…
+     95|     expect(queue.some((task) => task.category === 'patient_routing')).…
+       |                                                                       ^
+     96|   });
+     97| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+

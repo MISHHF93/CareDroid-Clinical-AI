@@ -35,6 +35,7 @@ export const OPERATIONS_FLEET_CONSOLE_ROUTES = Object.freeze<OperationsFleetCons
   { path: '/maps', label: 'Live Tracking Map', componentKey: 'liveTrackingMap' },
   { path: '/tracking', label: 'Live Tracking Map', componentKey: 'liveTrackingMap' },
   { path: '/live-tracking', label: 'Live Tracking Map', componentKey: 'liveTrackingMap' },
+  { path: '/fleet/*', label: 'Fleet Command', componentKey: 'fleetDashboard' },
 ]);
 
 export const OPERATIONS_FLEET_CONSOLE_ROUTE_PATHS = Object.freeze(

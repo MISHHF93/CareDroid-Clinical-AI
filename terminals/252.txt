@@ -1,0 +1,23 @@
+---
+pid: 11240
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "Set-Location C:\\Users\\borah\\CareDroid-Clinical-AI\\backend; npm.cmd test -- --testPathPattern=administrative-automation-orchestration"
+started_at: 2026-07-01T23:40:25.831Z
+running_for_ms: 22800009 
+---
+
+> caredroid-clinical-ai-backend@1.0.0 test
+> jest --runInBand --testPathPattern=administrative-automation-orchestration
+
+FAIL src/modules/emergency-os/administrative-automation-orchestration.lib.spec.ts
+  ● Test suite failed to run
+
+    src/modules/emergency-os/administrative-automation-orchestration.lib.spec.ts:40:53 - error TS2339: Property 'requiresClinicianReview' does not exist on type 'unknown'.
+
+    40     expect(routingTask?.proposedPayload.aiDecision?.requiresClinicianReview).toBe(true);
+                                                           ~~~~~~~~~~~~~~~~~~~~~~~
+
+Test Suites: 1 failed, 1 total
+Tests:       0 total
+Snapshots:   0 total
+Time:        26.17 s

@@ -26,7 +26,7 @@
 
 .legal-meta {
   font-size: var(--font-14);
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   margin: 0 0 var(--space-4) 0;
 }
 
@@ -54,7 +54,7 @@
   color: var(--text-color);
   margin: 0 0 var(--space-4) 0;
   padding-bottom: var(--space-3);
-  border-bottom: 2px solid rgba(0, 255, 136, 0.2);
+  border-bottom: 2px solid var(--medical-accent-ring);
 }
 
 .legal-section h3 {
@@ -92,7 +92,7 @@
 /* Highlighted Text */
 .legal-highlight {
   padding: var(--space-4);
-  background: rgba(0, 255, 136, 0.1);
+  background: var(--medical-accent-tint);
   border-left: 4px solid var(--accent-1);
   border-radius: var(--radius-md);
   font-weight: 600;
@@ -159,7 +159,7 @@
 .legal-acknowledgment {
   font-size: var(--font-14);
   font-style: italic;
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   text-align: center;
   padding: var(--space-4);
   background: rgba(255, 255, 255, 0.02);
@@ -193,7 +193,7 @@
 
 .legal-toc a {
   font-size: var(--font-14);
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
 }
 
 .legal-toc a:hover {

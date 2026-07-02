@@ -393,7 +393,7 @@ textarea {
 
 .page-loader-label {
   font-size: var(--font-14);
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
 }
 
 .app-init-screen {
@@ -452,7 +452,7 @@ textarea {
   max-width: 760px;
   margin-inline: auto;
   font-size: clamp(1rem, 1.2vw, 1.4rem);
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   margin-bottom: clamp(24px, 4svh, 40px);
   line-height: 1.6;
 }
@@ -492,7 +492,7 @@ textarea {
 
 .welcome-page-card-desc {
   font-size: clamp(var(--font-14), 1vw, var(--font-16));
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
 }
 
 .welcome-page-actions {
@@ -534,7 +534,7 @@ textarea {
   margin: var(--space-3) auto 0;
   max-width: 620px;
   font-size: var(--font-14);
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
 }
 
 .welcome-page-dev-note code {
@@ -545,7 +545,7 @@ textarea {
 .welcome-page-footnote {
   margin-top: var(--space-6);
   font-size: var(--font-14);
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
 }
 
 @media (max-width: 760px) {

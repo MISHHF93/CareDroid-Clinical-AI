@@ -27,6 +27,9 @@ describe('edOperatingSurface.config', () => {
     expect(resolveEdOperatingSurfaceFromPath(`${CANONICAL_ROUTES.triage}?queue=pretriage`)?.surfaceId).toBe(
       'triage',
     );
+    expect(resolveEdOperatingSurfaceFromPath(CANONICAL_ROUTES.dashboard)?.surfaceId).toBe(
+      'command-center',
+    );
   });
 
   it('assigns P0 priority to first-three-minute surfaces', () => {
@@ -36,16 +39,15 @@ describe('edOperatingSurface.config', () => {
     );
   });
 
-  it('funnels legacy dashboards into ED OS journey surfaces', () => {
-    expect(LEGACY_DASHBOARD_REDIRECTS[CANONICAL_ROUTES.executive]).toBe(
+  it('funnels legacy dashboard aliases into ED OS journey surfaces', () => {
+    expect(LEGACY_DASHBOARD_REDIRECTS[CANONICAL_ROUTES.dashboard]).toBe(
       CANONICAL_ROUTES.emergencyCommandCenter,
     );
-    expect(LEGACY_DASHBOARD_REDIRECTS[CANONICAL_ROUTES.aiCommandCenter]).toBe(
+    expect(LEGACY_DASHBOARD_REDIRECTS[CANONICAL_ROUTES.aiChief]).toBe(
       CANONICAL_ROUTES.emergencyCopilot,
     );
-    expect(LEGACY_DASHBOARD_REDIRECTS[CANONICAL_ROUTES.predictiveAnalytics]).toBe(
-      CANONICAL_ROUTES.emergencyAnalytics,
-    );
+    expect(LEGACY_DASHBOARD_REDIRECTS[CANONICAL_ROUTES.executive]).toBeUndefined();
+    expect(LEGACY_DASHBOARD_REDIRECTS[CANONICAL_ROUTES.aiCommandCenter]).toBeUndefined();
   });
 
   it('exposes owner role and primary decision for each surface', () => {

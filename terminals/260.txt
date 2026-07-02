@@ -1,0 +1,65 @@
+---
+pid: 22452
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cmd /c \"cd /d C:\\Users\\borah\\CareDroid-Clinical-AI\\backend && npm run build 2>&1\""
+started_at: 2026-07-02T01:35:18.916Z
+running_for_ms: 15909997 
+---
+
+> caredroid-clinical-ai-backend@1.0.0 prebuild
+> rimraf dist
+
+
+> caredroid-clinical-ai-backend@1.0.0 build
+> nest build
+
+src/modules/emergency-os/emergency-os.services.ts:789:7 - error TS2322: Type '"staff_assigned"' is not assignable to type 'WorkflowActionType'.
+
+789       type: 'staff_assigned',
+          ~~~~
+
+  src/modules/emergency-os/emergency-os.types.ts:70:3
+    70   type: WorkflowActionType;
+         ~~~~
+    The expected type comes from property 'type' which is declared here on type 'WorkflowActionInput'
+src/modules/emergency-os/emergency-os.services.ts:821:7 - error TS2322: Type '"patient_note_added"' is not assignable to type 'WorkflowActionType'.
+
+821       type: 'patient_note_added',
+          ~~~~
+
+  src/modules/emergency-os/emergency-os.types.ts:70:3
+    70   type: WorkflowActionType;
+         ~~~~
+    The expected type comes from property 'type' which is declared here on type 'WorkflowActionInput'
+src/modules/emergency-os/emergency-os.services.ts:853:7 - error TS2322: Type '"operational_alert_dispatched"' is not assignable to type 'WorkflowActionType'.
+
+853       type: 'operational_alert_dispatched',
+          ~~~~
+
+  src/modules/emergency-os/emergency-os.types.ts:70:3
+    70   type: WorkflowActionType;
+         ~~~~
+    The expected type comes from property 'type' which is declared here on type 'WorkflowActionInput'
+src/modules/emergency-os/emergency-os.services.ts:859:7 - error TS2322: Type 'Record<string, unknown>' is not assignable to type 'Record<string, string | number | boolean>'.
+  'string' index signatures are incompatible.
+    Type 'unknown' is not assignable to type 'string | number | boolean'.
+
+859       metadata: input.metadata,
+          ~~~~~~~~
+
+  src/modules/emergency-os/emergency-os.types.ts:88:3
+    88   metadata: Record<string, string | number | boolean | null>;
+         ~~~~~~~~
+    The expected type comes from property 'metadata' which is declared here on type 'WorkflowActionInput'
+src/modules/emergency-os/emergency-os.services.ts:886:7 - error TS2820: Type '"patient_escalated"' is not assignable to type 'WorkflowActionType'. Did you mean '"patient_created"'?
+
+886       type: 'patient_escalated',
+          ~~~~
+
+  src/modules/emergency-os/emergency-os.types.ts:70:3
+    70   type: WorkflowActionType;
+         ~~~~
+    The expected type comes from property 'type' which is declared here on type 'WorkflowActionInput'
+
+Found 5 error(s).
+

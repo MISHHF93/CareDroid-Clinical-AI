@@ -80,7 +80,7 @@
 }
 
 .loading-message {
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-size: var(--font-16);
   margin: 0;
 }
@@ -90,7 +90,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-size: var(--font-14);
 }
 

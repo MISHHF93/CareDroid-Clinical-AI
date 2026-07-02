@@ -1,0 +1,37 @@
+---
+pid: 14624
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "Set-Location C:\\Users\\borah\\CareDroid-Clinical-AI; node node_modules/vitest/vitest.mjs run src/test/routePagesSmoke.test.tsx --reporter=dot 2>&1 | Select-Object -Last 30"
+started_at: 2026-07-02T03:17:42.244Z
+running_for_ms: 9765699  
+---
+  metadata: {
+    derived: true,
+    severity: 'Warning',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782962285301-s7dz5c',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-waiting',
+  action: 'synced',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T03:18:05.301Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Warning',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+
+·········································································
+
+ Test Files  1 passed (1)
+      Tests  178 passed (178)
+   Start at  23:17:43
+   Duration  43.68s (transform 4.12s, setup 179ms, import 6.53s, tests 36.02s, environment 802ms)
+

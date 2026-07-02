@@ -32,7 +32,7 @@
 .profile-summary-card__eyebrow,
 .profile-summary-card__status {
   margin: 0;
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-size: 12px;
 }
 
@@ -43,7 +43,7 @@
 
 .profile-summary-card__body p {
   margin: 0;
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
 }
 
 .profile-summary-card__meta {
@@ -58,7 +58,7 @@
   border: 1px solid var(--panel-border);
   border-radius: 999px;
   background: var(--panel-background);
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-size: 12px;
   font-weight: 700;
   text-transform: capitalize;

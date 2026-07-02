@@ -1,0 +1,62 @@
+.entry-shell {
+  min-height: var(--app-viewport-height, 100dvh);
+  display: grid;
+  grid-template-rows: auto 1fr;
+  background: var(--cdl-canvas-bg, var(--medical-surface-page));
+  color: var(--medical-ink);
+}
+
+.entry-shell__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--app-panel-border, var(--medical-border));
+  background: var(--app-surface-1, var(--medical-white));
+}
+
+.entry-shell__brand {
+  display: grid;
+  gap: 4px;
+}
+
+.entry-shell__eyebrow {
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--app-fg-muted);
+}
+
+.entry-shell__title {
+  font-size: 1.05rem;
+}
+
+.entry-shell__nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.entry-shell__link {
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--app-panel-border, var(--medical-border));
+  text-decoration: none;
+  color: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.entry-shell__link--primary {
+  border-color: color-mix(in srgb, var(--app-accent-interactive) 45%, transparent);
+  background: color-mix(in srgb, var(--app-accent-interactive) 10%, transparent);
+  color: var(--app-accent-interactive);
+}
+
+.entry-shell__main {
+  overflow: auto;
+  min-width: 0;
+}

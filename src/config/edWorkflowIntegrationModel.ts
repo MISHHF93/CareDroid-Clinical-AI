@@ -1,6 +1,6 @@
 /**
- * Emergency Department workflow integration — normalizes profile ? role ? screen ? landing
- * and documents the A–Z ED journey across frontend and backend capability contracts.
+ * Emergency Department workflow integration ï¿½ normalizes profile ? role ? screen ? landing
+ * and documents the Aï¿½Z ED journey across frontend and backend capability contracts.
  */
 import { BACKEND_API_CAPABILITY_STATUS } from './backendApiCapabilities';
 import { CANONICAL_ROUTES } from './routes.config';
@@ -48,12 +48,21 @@ export type EdWorkflowAzStep = Readonly<{
 export const ED_WORKFLOW_AZ_STEPS: readonly EdWorkflowAzStep[] = Object.freeze([
   {
     id: 'platform-entry',
-    order: 1,
-    title: 'Platform entry',
-    summary: 'Choose sign-in, demo as Dr. Cara George, or admin console.',
+    order: 0,
+    title: 'Platform entry (optional)',
+    summary: 'Orientation hub at /start â€” choose demo path, clinical workspace, or admin console.',
     laneId: 'entry',
     route: CANONICAL_ROUTES.platformStart,
     backendCapabilities: ['operationalProfile', 'workspaces'],
+  },
+  {
+    id: 'clinical-startup',
+    order: 1,
+    title: 'Clinical startup',
+    summary: 'App opens at reception (reception-first UX) or role-matched clinical home.',
+    laneId: 'reception',
+    route: CANONICAL_ROUTES.emergencyReception,
+    backendCapabilities: ['emergencyReceptionSnapshot'],
   },
   {
     id: 'profile-resolve',
@@ -80,7 +89,7 @@ export const ED_WORKFLOW_AZ_STEPS: readonly EdWorkflowAzStep[] = Object.freeze([
     summary: 'Pre-triage queues, breach timers, and triage assist.',
     laneId: 'triage',
     emergencyRoleId: EMERGENCY_ROLE_IDS.triageNurse,
-    route: `${CANONICAL_ROUTES.emergencyReception}?queue=pretriage`,
+    route: `${CANONICAL_ROUTES.emergencyQueues}?queue=pretriage`,
     backendCapabilities: ['emergencyTriageAssist', 'emergencyQueues'],
   },
   {
@@ -120,8 +129,9 @@ export const ED_WORKFLOW_AZ_STEPS: readonly EdWorkflowAzStep[] = Object.freeze([
     summary: 'ED manager command center, analytics, capacity, and boarding.',
     laneId: 'operations',
     emergencyRoleId: EMERGENCY_ROLE_IDS.edManager,
-    route: CANONICAL_ROUTES.emergencyWhiteboard,
+    route: CANONICAL_ROUTES.emergencyCommandCenter,
     backendCapabilities: [
+      'emergencyCentralNode',
       'emergencyOperationalAnalytics',
       'emergencyCapacity',
       'emergencyBoarding',
@@ -150,7 +160,8 @@ export const ED_WORKFLOW_AZ_STEPS: readonly EdWorkflowAzStep[] = Object.freeze([
     id: 'persist-session',
     order: 11,
     title: 'Persist identity',
-    summary: 'Start at the platform hub — explore the demo or open admin. Profile saves stay local during the build phase.',
+    summary:
+      'Clinical startup at reception (or role home); profile and session state persist locally during the build phase.',
     laneId: 'persist',
     route: CANONICAL_ROUTES.auth,
     backendCapabilities: ['operationalProfile'],

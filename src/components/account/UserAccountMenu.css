@@ -67,7 +67,7 @@
 
 .account-menu__meta {
   font-size: 0.68rem;
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;

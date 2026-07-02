@@ -1,0 +1,18 @@
+---
+pid: 18896
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "Set-Location backend; npm.cmd test -- src/modules/auth/auth.service.spec.ts src/api/health.routes.spec.ts"
+started_at: 2026-07-01T21:47:10.280Z
+running_for_ms: 29595005 
+---
+
+> caredroid-clinical-ai-backend@1.0.0 test
+> jest --runInBand src/modules/auth/auth.service.spec.ts src/api/health.routes.spec.ts
+
+PASS src/modules/auth/auth.service.spec.ts (21.463 s)
+PASS src/api/health.routes.spec.ts
+
+Test Suites: 2 passed, 2 total
+Tests:       10 passed, 10 total
+Snapshots:   0 total
+Time:        25.265 s

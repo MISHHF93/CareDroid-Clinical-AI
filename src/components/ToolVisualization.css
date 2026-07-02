@@ -29,7 +29,7 @@
 
 .viz-label {
   font-size: 11px;
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   text-transform: uppercase;
   letter-spacing: 0.4px;
   margin-bottom: 4px;

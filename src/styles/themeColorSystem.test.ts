@@ -26,6 +26,15 @@ const cardCss = readFileSync(join(srcRoot, 'components/ui/card.css'), 'utf8');
 const inputCss = readFileSync(join(srcRoot, 'components/ui/input.css'), 'utf8');
 const badgeCss = readFileSync(join(srcRoot, 'components/ui/Badge.css'), 'utf8');
 const alertCss = readFileSync(join(srcRoot, 'components/ui/Alert.css'), 'utf8');
+const platformEntryCss = readFileSync(join(srcRoot, 'pages/PlatformEntryHub.css'), 'utf8');
+const settingsCss = readFileSync(join(srcRoot, 'pages/Settings.css'), 'utf8');
+const featureMgmtCss = readFileSync(join(srcRoot, 'pages/settings/FeatureManagement.css'), 'utf8');
+const teamMgmtCss = readFileSync(join(srcRoot, 'pages/team/TeamManagement.css'), 'utf8');
+const notificationCss = readFileSync(join(srcRoot, 'components/notifications/NotificationToast.css'), 'utf8');
+const toolPreflightCss = readFileSync(join(srcRoot, 'components/clinical/ToolPreflightStatus.css'), 'utf8');
+
+const LEGACY_NEON_PATTERN =
+  /rgba\(0,\s*255,\s*136|#ff6b6b|#ff5252|#8ed8ff|rgba\(79,\s*70,\s*229/;
 
 describe('theme color system revamp', () => {
   it('defines the standard medical root palette on every color layer', () => {
@@ -117,6 +126,39 @@ describe('theme color system revamp', () => {
     expect(chartCss).toContain('var(--app-fg-muted)');
     expect(chartCss).toContain('var(--app-panel-border)');
     expect(chartCss).toContain('var(--app-surface-1)');
+  });
+
+  it('bridges legacy aliases on :root and html', () => {
+    expect(themeBridgeCss).toMatch(/:root,\s*html\s*\{/);
+    expect(themeBridgeCss).toContain('--muted-text: var(--app-fg-muted)');
+  });
+
+  it('defines accent tint scale for token-native highlights', () => {
+    for (const token of [
+      '--medical-accent-tint-faint',
+      '--medical-accent-tint-subtle',
+      '--medical-accent-tint-mid',
+      '--medical-accent-ring',
+      '--medical-accent-ring-strong',
+    ]) {
+      expect(medicalColorLayerCss).toContain(token);
+    }
+  });
+
+  it('migrates previously neon-heavy surfaces to medical tokens', () => {
+    const migratedCss = [
+      platformEntryCss,
+      settingsCss,
+      featureMgmtCss,
+      teamMgmtCss,
+      notificationCss,
+      toolPreflightCss,
+    ].join('\n');
+
+    expect(migratedCss).not.toMatch(LEGACY_NEON_PATTERN);
+    expect(platformEntryCss).toContain('var(--app-fg-muted)');
+    expect(platformEntryCss).toContain('var(--app-surface-1)');
+    expect(platformEntryCss).not.toContain('rgba(255, 255, 255, 0.03)');
   });
 
   it('keeps shared primitives and tools token-native instead of neon one-offs', () => {

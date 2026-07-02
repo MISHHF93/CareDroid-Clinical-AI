@@ -1,0 +1,22 @@
+---
+pid: 2476
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "Set-Location C:\\Users\\borah\\CareDroid-Clinical-AI; node node_modules/vite/bin/vite.js build 2>&1 | Select-Object -Last 15"
+started_at: 2026-07-02T19:10:11.815Z
+running_for_ms: 5149994  
+---
+dist/assets/SmartIntake-B2w6Tnaa.js                             78.64 kB │ gzip:  19.56 kB
+dist/assets/ReceptionWorkspace-B7DqP9K5.js                      80.32 kB │ gzip:  12.49 kB
+dist/assets/EmergencySettings-t3GON2bj.js                       89.75 kB │ gzip:  14.57 kB
+dist/assets/vendor-idb-f0Hvc77w.js                              98.08 kB │ gzip:  32.06 kB
+dist/assets/PatientDetailPanel-DvwUnn0l.js                     132.67 kB │ gzip:  26.33 kB
+dist/assets/OrganizationPages-Cwl8J1LH.js                      148.23 kB │ gzip:  19.52 kB
+dist/assets/analytics-XSZRFlox.js                              200.17 kB │ gzip:  49.38 kB
+dist/assets/vendor-charts-Bsm8ZDDD.js                          252.02 kB │ gzip:  65.76 kB
+dist/assets/calculators-general-clinical-mT54J3iO.js           287.08 kB │ gzip:  48.65 kB
+dist/assets/index-G-SzIIK-.js                                  377.26 kB │ gzip:  68.81 kB
+dist/assets/vendor-D0KYo3-Y.js                                 559.12 kB │ gzip: 176.54 kB
+dist/assets/index-CUKd6FMo.js                                  922.58 kB │ gzip: 214.71 kB
+dist/assets/data-navigation-CBj7ft1I.js                        996.58 kB │ gzip: 214.37 kB
+dist/assets/calculators-Al5F8eEy.js                          1,173.62 kB │ gzip: 289.84 kB
+✓ built in 18.43s

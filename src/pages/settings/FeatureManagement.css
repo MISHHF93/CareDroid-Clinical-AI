@@ -15,7 +15,7 @@
   border-radius: 18px;
   padding: 20px;
   background:
-    linear-gradient(135deg, rgba(0, 153, 255, 0.1), rgba(0, 255, 136, 0.06)),
+    linear-gradient(135deg, var(--medical-accent-tint), color-mix(in srgb, var(--app-accent-interactive) 6%, transparent)),
     var(--surface-1);
 }
 
@@ -40,7 +40,7 @@
 }
 
 .feature-toggle-panel p {
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   line-height: 1.5;
 }
 
@@ -60,18 +60,18 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  border: 1px solid rgba(0, 153, 255, 0.34);
+  border: 1px solid var(--medical-accent-ring-strong);
   border-radius: 999px;
   padding: 4px 9px;
-  background: rgba(0, 153, 255, 0.1);
-  color: #8ed8ff;
+  background: var(--medical-accent-tint);
+  color: var(--medical-accent-soft);
   font-size: 12px;
   font-weight: 800;
 }
 
 .feature-toggle-panel__suite-badge {
-  border-color: rgba(0, 255, 136, 0.34) !important;
-  background: rgba(0, 255, 136, 0.08) !important;
+  border-color: color-mix(in srgb, var(--app-accent-interactive) 34%, transparent) !important;
+  background: var(--medical-accent-tint-subtle) !important;
   color: #7dffc0 !important;
   max-width: 18rem;
   overflow: hidden;
@@ -118,10 +118,10 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  border: 1px solid rgba(255, 179, 71, 0.42);
+  border: 1px solid color-mix(in srgb, var(--app-warning) 42%, transparent);
   border-radius: 16px;
   padding: 14px 16px;
-  background: rgba(255, 179, 71, 0.11);
+  background: color-mix(in srgb, var(--app-warning) 11%, transparent);
   color: #ffd08a;
 }
 
@@ -130,7 +130,7 @@
 }
 
 .feature-toggle-panel__plan-banner a {
-  border: 1px solid rgba(255, 179, 71, 0.46);
+  border: 1px solid color-mix(in srgb, var(--app-warning) 46%, transparent);
   border-radius: 999px;
   padding: 8px 12px;
   color: #ffe4ad;
@@ -139,20 +139,20 @@
 }
 
 .feature-toggle-panel__fallback-banner {
-  border-color: rgba(0, 153, 255, 0.34);
-  background: rgba(0, 153, 255, 0.1);
-  color: #8ed8ff;
+  border-color: var(--medical-accent-ring-strong);
+  background: var(--medical-accent-tint);
+  color: var(--medical-accent-soft);
   font-weight: 800;
 }
 
 .feature-toggle-panel__surfacing-queue {
   display: grid;
   gap: 14px;
-  border: 1px solid rgba(0, 153, 255, 0.28);
+  border: 1px solid var(--medical-accent-border);
   border-radius: 18px;
   padding: 16px;
   background:
-    linear-gradient(135deg, rgba(0, 153, 255, 0.12), rgba(124, 58, 237, 0.08)),
+    linear-gradient(135deg, var(--medical-accent-tint-mid), color-mix(in srgb, var(--semantic-ai-assistance) 8%, transparent)),
     var(--surface-1);
 }
 
@@ -170,11 +170,11 @@
 }
 
 .feature-toggle-panel__surfacing-header > span {
-  border: 1px solid rgba(0, 153, 255, 0.34);
+  border: 1px solid var(--medical-accent-ring-strong);
   border-radius: 999px;
   padding: 5px 10px;
-  background: rgba(0, 153, 255, 0.1);
-  color: #8ed8ff;
+  background: var(--medical-accent-tint);
+  color: var(--medical-accent-soft);
   font-size: 12px;
   font-weight: 900;
 }
@@ -195,8 +195,8 @@
 }
 
 .feature-toggle-panel__surfacing-card--enabled {
-  border-color: rgba(0, 255, 136, 0.3);
-  box-shadow: inset 0 0 0 1px rgba(0, 255, 136, 0.08);
+  border-color: color-mix(in srgb, var(--app-accent-interactive) 30%, transparent);
+  box-shadow: inset 0 0 0 1px var(--medical-accent-tint-subtle);
 }
 
 .feature-toggle-panel__surfacing-card--locked {
@@ -217,8 +217,8 @@
 
 .feature-toggle-panel__surfacing-title button {
   padding: 8px 12px;
-  border-color: rgba(0, 255, 136, 0.38);
-  background: rgba(0, 255, 136, 0.12);
+  border-color: color-mix(in srgb, var(--app-accent-interactive) 38%, transparent);
+  background: var(--medical-accent-tint-mid);
   color: var(--app-accent-interactive);
 }
 
@@ -228,8 +228,8 @@
   width: 34px;
   height: 34px;
   border-radius: 12px;
-  background: rgba(0, 153, 255, 0.12);
-  color: #8ed8ff;
+  background: var(--medical-accent-tint-mid);
+  color: var(--medical-accent-soft);
 }
 
 .feature-toggle-panel__surfacing-meta {
@@ -245,7 +245,7 @@
 }
 
 .feature-toggle-panel__surfacing-meta dt {
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-size: 12px;
   font-weight: 900;
   text-transform: uppercase;
@@ -267,12 +267,12 @@
 }
 
 .feature-toggle-panel__effort--low {
-  border-color: rgba(0, 255, 136, 0.36);
+  border-color: color-mix(in srgb, var(--app-accent-interactive) 36%, transparent);
   color: var(--app-accent-interactive);
 }
 
 .feature-toggle-panel__effort--medium {
-  border-color: rgba(255, 179, 71, 0.42);
+  border-color: color-mix(in srgb, var(--app-warning) 42%, transparent);
   color: #ffd08a;
 }
 
@@ -289,7 +289,7 @@
 }
 
 .feature-toggle-panel__setup-checklist > span {
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-size: 12px;
   font-weight: 900;
   letter-spacing: 0.04em;
@@ -308,7 +308,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-size: 13px;
 }
 
@@ -317,7 +317,7 @@
   border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 999px;
   padding: 1px 6px;
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-size: 10px;
   font-weight: 900;
   text-align: center;
@@ -329,7 +329,7 @@
 }
 
 .feature-toggle-panel__setup-checklist-item--done span {
-  border-color: rgba(0, 255, 136, 0.36) !important;
+  border-color: color-mix(in srgb, var(--app-accent-interactive) 36%, transparent) !important;
   color: var(--app-accent-interactive) !important;
 }
 
@@ -341,8 +341,8 @@
 }
 
 .feature-toggle-panel__filter--active {
-  border-color: rgba(0, 255, 136, 0.44) !important;
-  background: rgba(0, 255, 136, 0.12) !important;
+  border-color: color-mix(in srgb, var(--app-accent-interactive) 44%, transparent) !important;
+  background: var(--medical-accent-tint-mid) !important;
   color: var(--app-accent-interactive) !important;
 }
 
@@ -376,7 +376,7 @@
 }
 
 .feature-toggle-panel__section-toggle small {
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
 }
 
 .feature-toggle-panel__list {
@@ -397,7 +397,7 @@
 }
 
 .feature-toggle-panel__row--on {
-  border-color: rgba(0, 255, 136, 0.24);
+  border-color: color-mix(in srgb, var(--app-accent-interactive) 24%, transparent);
 }
 
 .feature-toggle-panel__row--off {
@@ -405,7 +405,7 @@
 }
 
 .feature-toggle-panel__row--off .feature-toggle-panel__row-title strong {
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-weight: 700;
 }
 
@@ -424,8 +424,8 @@
   width: 38px;
   height: 38px;
   border-radius: 12px;
-  background: rgba(0, 153, 255, 0.1);
-  color: #8ed8ff;
+  background: var(--medical-accent-tint);
+  color: var(--medical-accent-soft);
 }
 
 .feature-toggle-panel__row-main {
@@ -451,26 +451,26 @@
 
 .feature-toggle-panel__row-main p,
 .feature-toggle-panel__row-meta {
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-size: 13px;
 }
 
 .feature-toggle-panel__row-meta a {
-  color: #8ed8ff;
+  color: var(--medical-accent-soft);
   font-weight: 800;
   text-decoration: none;
 }
 
 .feature-toggle-panel__badge--warning {
-  border-color: rgba(255, 179, 71, 0.42) !important;
-  background: rgba(255, 179, 71, 0.12) !important;
+  border-color: color-mix(in srgb, var(--app-warning) 42%, transparent) !important;
+  background: color-mix(in srgb, var(--app-warning) 12%, transparent) !important;
   color: #ffd08a !important;
 }
 
 .feature-toggle-panel__badge--locked {
   border-color: rgba(148, 163, 184, 0.34) !important;
   background: rgba(148, 163, 184, 0.12) !important;
-  color: var(--muted-text) !important;
+  color: var(--app-fg-muted) !important;
 }
 
 .feature-toggle {
@@ -496,8 +496,8 @@
 }
 
 .feature-toggle--on {
-  border-color: rgba(0, 255, 136, 0.45) !important;
-  background: rgba(0, 255, 136, 0.42) !important;
+  border-color: color-mix(in srgb, var(--app-accent-interactive) 45%, transparent) !important;
+  background: var(--medical-accent-ring-bold) !important;
 }
 
 .feature-toggle--on > span {
@@ -531,7 +531,7 @@
   display: grid;
   gap: 12px;
   width: min(100%, 32rem);
-  border: 1px solid rgba(255, 179, 71, 0.42);
+  border: 1px solid color-mix(in srgb, var(--app-warning) 42%, transparent);
   border-radius: 18px;
   padding: 20px;
   background: var(--surface-1);

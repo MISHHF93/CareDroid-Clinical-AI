@@ -39,6 +39,10 @@ import { ClinicalDecisionSupportService } from './clinical-decision-support.serv
 import { EmergencyPatientAuditService } from './emergency-patient-audit.service';
 import { PatientFlowService } from './emergency-os.patient-flow.service';
 import { WorkflowOrchestrationService } from './emergency-os.workflow-orchestration.service';
+import {
+  EmergencyOperatingSurfacesService,
+  type OperatingSurfaceId,
+} from './emergency-os.operating-surfaces.service';
 import { EntitlementService } from '../platform-assets/entitlement.service';
 import { assertEntitlementLaunchFromRequest } from '../platform-assets/entitlement-launch.util';
 import type {
@@ -87,6 +91,7 @@ export class EmergencyOsController {
     private readonly patientAuditService: EmergencyPatientAuditService,
     private readonly patientFlowService: PatientFlowService,
     private readonly workflowOrchestrationService: WorkflowOrchestrationService,
+    private readonly operatingSurfacesService: EmergencyOperatingSurfacesService,
     private readonly entitlementService: EntitlementService,
   ) {}
 
@@ -382,6 +387,14 @@ export class EmergencyOsController {
   @Get('reassessment')
   getReassessment() {
     return this.reassessmentService.getReassessmentQueue();
+  }
+
+  @Get('operating-surfaces/:surfaceId')
+  getOperatingSurface(
+    @Param('surfaceId') surfaceId: OperatingSurfaceId,
+    @TenantContext() tenantContext?: TenantContextValue,
+  ) {
+    return this.operatingSurfacesService.getSurface(surfaceId, tenantContext);
   }
 
   @Get('workflow-orchestration')

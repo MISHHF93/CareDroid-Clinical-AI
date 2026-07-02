@@ -29,7 +29,7 @@
 
 .team-header-content p {
   font-size: var(--font-16);
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   margin: 0;
 }
 
@@ -66,14 +66,14 @@
   background: rgba(255, 107, 107, 0.1);
   border: 1px solid rgba(255, 107, 107, 0.3);
   border-radius: var(--radius-md);
-  color: #ff6b6b;
+  color: var(--app-danger);
   margin-bottom: var(--space-6);
 }
 
 .team-error button {
   background: none;
   border: none;
-  color: #ff6b6b;
+  color: var(--app-danger);
   cursor: pointer;
   font-size: 18px;
   padding: 0;
@@ -102,7 +102,7 @@
 }
 
 .team-search-input::placeholder {
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
 }
 
 /* Loading State */
@@ -112,14 +112,14 @@
   align-items: center;
   justify-content: center;
   min-height: 400px;
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
 }
 
 .team-loading .spinner {
   width: 40px;
   height: 40px;
   margin-bottom: var(--space-4);
-  border: 3px solid rgba(0, 255, 136, 0.2);
+  border: 3px solid var(--medical-accent-ring);
   border-top-color: var(--accent-1);
   border-radius: 50%;
   animation: spin 1s linear infinite;
@@ -136,7 +136,7 @@
   align-items: center;
   justify-content: center;
   min-height: 400px;
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
 }
 
 .team-empty p {
@@ -146,8 +146,8 @@
 
 .team-empty button {
   padding: var(--space-2) var(--space-4);
-  background: rgba(0, 255, 136, 0.1);
-  border: 1px solid rgba(0, 255, 136, 0.3);
+  background: var(--medical-accent-tint);
+  border: 1px solid color-mix(in srgb, var(--app-accent-interactive) 30%, transparent);
   color: var(--accent-1);
   border-radius: var(--radius-sm);
   cursor: pointer;
@@ -155,7 +155,7 @@
 }
 
 .team-empty button:hover {
-  background: rgba(0, 255, 136, 0.15);
+  background: var(--medical-accent-tint-strong);
 }
 
 /* User Table */
@@ -187,7 +187,7 @@
   text-align: left;
   font-size: var(--font-13);
   font-weight: 600;
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -195,7 +195,7 @@
 .table-sort-btn {
   background: none;
   border: none;
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   cursor: pointer;
   font-size: var(--font-13);
   font-weight: 600;
@@ -273,11 +273,11 @@
 
 .table-email {
   max-width: 250px;
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
 }
 
 .table-date {
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-size: var(--font-13);
 }
 
@@ -317,7 +317,7 @@
 
 .action-delete:hover {
   background: rgba(255, 107, 107, 0.2);
-  color: #ff6b6b;
+  color: var(--app-danger);
 }
 
 /* Edit User Modal */
@@ -426,7 +426,7 @@
 
 .edit-user-details p {
   font-size: var(--font-14);
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   margin: 0;
 }
 
@@ -475,7 +475,7 @@
   align-items: center;
   gap: var(--space-2);
   padding: var(--space-2) var(--space-3);
-  background: rgba(0, 255, 136, 0.05);
+  background: var(--medical-accent-tint-faint);
   border-radius: var(--radius-sm);
 }
 
@@ -492,7 +492,7 @@
 /* Invite Modal */
 .invite-description {
   font-size: var(--font-14);
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   margin-bottom: var(--space-5);
 }
 
@@ -527,7 +527,7 @@
 
 .invite-error {
   font-size: var(--font-12);
-  color: #ff6b6b;
+  color: var(--app-danger);
   margin-top: var(--space-1);
 }
 

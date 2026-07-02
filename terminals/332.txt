@@ -1,0 +1,38 @@
+---
+pid: 8716
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "npm.cmd run build --prefix backend"
+started_at: 2026-07-02T20:07:18.671Z
+running_for_ms: 1724990  
+---
+
+> caredroid-clinical-ai-backend@1.0.0 prebuild
+> rimraf dist
+
+
+> caredroid-clinical-ai-backend@1.0.0 build
+> nest build
+
+Found 5 error(s).
+
+src/modules/emergency-os/emergency-os.operating-surfaces.service.ts:2:15 - error TS2305: Module '"./emergency-os.types"' has no exported member 'Alert'.
+
+2 import type { Alert, EMSArrival, Patient, Referral, WorkflowActionLog } from './emergency-os.types';
+                ~~~~~
+src/modules/emergency-os/emergency-os.operating-surfaces.service.ts:2:22 - error TS2305: Module '"./emergency-os.types"' has no exported member 'EMSArrival'.
+
+2 import type { Alert, EMSArrival, Patient, Referral, WorkflowActionLog } from './emergency-os.types';
+                       ~~~~~~~~~~
+src/modules/emergency-os/emergency-os.operating-surfaces.service.ts:2:34 - error TS2305: Module '"./emergency-os.types"' has no exported member 'Patient'.
+
+2 import type { Alert, EMSArrival, Patient, Referral, WorkflowActionLog } from './emergency-os.types';
+                                   ~~~~~~~
+src/modules/emergency-os/emergency-os.operating-surfaces.service.ts:2:43 - error TS2305: Module '"./emergency-os.types"' has no exported member 'Referral'.
+
+2 import type { Alert, EMSArrival, Patient, Referral, WorkflowActionLog } from './emergency-os.types';
+                                            ~~~~~~~~
+src/modules/emergency-os/emergency-os.operating-surfaces.service.ts:174:67 - error TS2367: This comparison appears to be unintentional because the types 'CapacityBand' and '"red"' have no overlap.
+
+174             { id: 'capacity', label: 'Capacity headroom', status: context.capacity.band === 'red' ? 'attention' : 'ready' },
+                                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+

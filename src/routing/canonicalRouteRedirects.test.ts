@@ -29,10 +29,16 @@ function expectRoutePath(path) {
 describe('canonical route tree', () => {
   it('exports the consolidated CareDroid emergency route tree', () => {
     expect(CANONICAL_APP_ROUTE_TREE.find((route) => route.path === '/')).toEqual(
-      expect.objectContaining({ type: 'redirect', to: '/emergency/whiteboard' }),
+      expect.objectContaining({ type: 'redirect', to: '/emergency/reception' }),
     );
     expect(CANONICAL_APP_ROUTE_TREE.find((route) => route.path === '*')).toEqual(
-      expect.objectContaining({ type: 'redirect', to: '/emergency/whiteboard' }),
+      expect.objectContaining({ type: 'redirect', to: '/emergency/reception' }),
+    );
+    expect(CANONICAL_APP_ROUTE_TREE.find((route) => route.path === '/emergency')).toEqual(
+      expect.objectContaining({ type: 'redirect', to: '/emergency/reception' }),
+    );
+    expect(CANONICAL_APP_ROUTE_TREE.find((route) => route.path === '/triage')).toEqual(
+      expect.objectContaining({ type: 'redirect', to: '/emergency/queues?queue=pretriage' }),
     );
     expect(
       CANONICAL_APP_ROUTE_TREE.filter((route) => route.type === 'page').map((route) => route.path),
@@ -96,18 +102,21 @@ describe('canonical route tree', () => {
     expect(PROTECTED_ROUTE_ALIAS_REDIRECTS).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ path: '/assistant', to: '/emergency/copilot' }),
+        expect.objectContaining({ path: '/home', to: '/emergency/reception', routeId: 'startup' }),
+        expect.objectContaining({
+          path: '/dashboard',
+          to: '/emergency/command-center',
+          routeId: 'dashboard',
+        }),
       ]),
     );
-    expect(PROTECTED_ROUTE_ALIAS_REDIRECTS).not.toEqual(
-      expect.arrayContaining([expect.objectContaining({ path: '/dashboard' })]),
-    );
-    expect(appSource).toContain('path="/dashboard"');
-    expect(appSource).toContain('to={CANONICAL_ROUTES.emergencyWhiteboard}');
+    expect(appSource).toContain('OUTSIDE_SHELL_ROUTE_REDIRECTS.map');
+    expect(appSource).toContain('ED_CANONICAL_ROUTE_ALIASES.map');
     expect(appSource).toContain('path="/tools/*"');
     expect(appSource).toContain('path="/scores/*"');
     expect(appSource).toMatch(/<Route path="\/tools\/\*"\s+element=\{<ToolsRedirect \/>\}/);
     expect(appSource).toMatch(/<Route path="\/calculators\/\*"\s+element=\{<ToolsRedirect \/>\}/);
-    expect(appSource).toContain('to={CANONICAL_ROUTES.emergencyCopilot}');
+    expect(appSource).toContain('COMMAND_CENTER_INTELLIGENCE_REDIRECTS.map');
     expect(appSource).toContain('LEGACY_EMERGENCY_ROUTE_REDIRECTS.map(({ path, to }) => (');
     expect(LEGACY_EMERGENCY_ROUTE_REDIRECTS).toEqual(
       expect.arrayContaining([
@@ -134,9 +143,11 @@ describe('canonical route tree', () => {
     expect(appSource).toContain('element={<NonEdWorkspaceRedirect');
     expect(NON_ED_WORKSPACE_REDIRECT_ROUTES).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ path: '/analytics', moduleName: 'Analytics' }),
         expect.objectContaining({ path: '/federated-learning', moduleName: 'Federated Learning' }),
       ]),
+    );
+    expect(NON_ED_WORKSPACE_REDIRECT_ROUTES).not.toEqual(
+      expect.arrayContaining([expect.objectContaining({ path: '/analytics' })]),
     );
     expect(NON_ED_WORKSPACE_REDIRECT_ROUTES).not.toEqual(
       expect.arrayContaining([

@@ -8,6 +8,7 @@ import { TOOLS_CONSOLE_ROUTE_PATHS } from './toolsConsoleRoutes';
 import { TRAINING_CONSOLE_ROUTE_PATHS } from './trainingConsoleRoutes';
 
 const PLATFORM_ENTRY_ROUTE_PREFIXES = Object.freeze([
+  CANONICAL_ROUTES.platformStart,
   CANONICAL_ROUTES.workspace,
   CANONICAL_ROUTES.integrationHub,
 ]);

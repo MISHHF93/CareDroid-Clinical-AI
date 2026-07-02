@@ -1,0 +1,1777 @@
+---
+pid: 34284
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "powershell -NoProfile -Command \"Set-Location 'C:\\Users\\borah\\CareDroid-Clinical-AI'; node node_modules\\vitest\\vitest.mjs run src/routing/canonicalRouteTree.redirects.test.tsx -t 'mounts the in-shell'\""
+started_at: 2026-07-02T05:01:32.679Z
+running_for_ms: 3535215  
+---
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+stdout | src/routing/canonicalRouteTree.redirects.test.tsx > canonical route tree — legacy redirects > /tools/lab-interpreter mounts the in-shell canonical route
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968518759-uluqo4',
+  alertId: 'alert-reassessment-deterioration-pt-sepsis',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:01:58.759Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968518768-495z89',
+  alertId: 'alert-long-wait-critical-pt-abdo',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:01:58.768Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: 'triage_nurse',
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968518769-6lhj4g',
+  alertId: 'alert-queue-breach-Assessment',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:01:58.769Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968518769-idbqf1',
+  alertId: 'alert-queue-breach-Results',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:01:58.769Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968518769-b9oqeg',
+  alertId: 'alert-queue-breach-Reassessment',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:01:58.769Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968518769-n7alnz',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-assessment',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:01:58.769Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968518769-hc5y2l',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-reassessment',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:01:58.769Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968518769-45lr8d',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-admission',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:01:58.769Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Warning',
+    ownerRole: 'triage_nurse',
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968518769-9fu1kp',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-triage',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:01:58.769Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Warning',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968518769-no2y3s',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-waiting',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:01:58.769Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Warning',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+
+stdout | src/routing/canonicalRouteTree.redirects.test.tsx > canonical route tree — legacy redirects > /maps mounts the in-shell canonical route
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968519296-0r850x',
+  alertId: 'alert-reassessment-deterioration-pt-sepsis',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:01:59.296Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968519297-xrvanw',
+  alertId: 'alert-long-wait-critical-pt-abdo',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:01:59.297Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: 'triage_nurse',
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968519297-zovhqt',
+  alertId: 'alert-queue-breach-Assessment',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:01:59.297Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968519297-xydekn',
+  alertId: 'alert-queue-breach-Results',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:01:59.297Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968519297-xv5sog',
+  alertId: 'alert-queue-breach-Reassessment',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:01:59.297Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968519297-edprua',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-assessment',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:01:59.297Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968519297-okhpqb',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-reassessment',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:01:59.298Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968519298-z9g1ew',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-admission',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:01:59.298Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Warning',
+    ownerRole: 'triage_nurse',
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968519298-p1c12v',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-triage',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:01:59.298Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Warning',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968519298-25n1qt',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-waiting',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:01:59.298Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Warning',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+
+stdout | src/routing/canonicalRouteTree.redirects.test.tsx > canonical route tree — legacy redirects > /recommendations mounts the in-shell canonical route
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968521140-pulpcg',
+  alertId: 'alert-reassessment-deterioration-pt-sepsis',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:02:01.140Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968521140-j7o2dn',
+  alertId: 'alert-long-wait-critical-pt-abdo',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:02:01.140Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: 'triage_nurse',
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968521141-4ymjq3',
+  alertId: 'alert-queue-breach-Assessment',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:02:01.141Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968521141-n02p86',
+  alertId: 'alert-queue-breach-Results',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:02:01.141Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968521141-4ok4ww',
+  alertId: 'alert-queue-breach-Reassessment',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:02:01.141Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968521141-mv8bkc',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-assessment',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:02:01.141Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968521142-e5ll2r',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-reassessment',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:02:01.142Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968521142-jg8i7q',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-admission',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:02:01.142Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Warning',
+    ownerRole: 'triage_nurse',
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968521142-uz0up9',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-triage',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:02:01.142Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Warning',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968521142-amybzw',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-waiting',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:02:01.142Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Warning',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+
+stdout | src/routing/canonicalRouteTree.redirects.test.tsx > canonical route tree — legacy redirects > /workflows mounts the in-shell canonical route
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968522280-ltfopq',
+  alertId: 'alert-reassessment-deterioration-pt-sepsis',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:02:02.280Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968522280-ziu5et',
+  alertId: 'alert-long-wait-critical-pt-abdo',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:02:02.280Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: 'triage_nurse',
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968522280-xi3mar',
+  alertId: 'alert-queue-breach-Assessment',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:02:02.280Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968522280-a64mg8',
+  alertId: 'alert-queue-breach-Results',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:02:02.280Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968522280-17x3xo',
+  alertId: 'alert-queue-breach-Reassessment',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:02:02.280Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968522280-1ohdgu',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-assessment',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:02:02.280Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968522280-75sto8',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-reassessment',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:02:02.280Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968522280-dccs8a',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-admission',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:02:02.280Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Warning',
+    ownerRole: 'triage_nurse',
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968522280-5qjys3',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-triage',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:02:02.280Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Warning',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968522280-eiyfmt',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-waiting',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:02:02.280Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Warning',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+
+stdout | src/routing/canonicalRouteTree.redirects.test.tsx > canonical route tree — legacy redirects > /fleet/command mounts the in-shell canonical route
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968530064-gjpepo',
+  alertId: 'alert-reassessment-deterioration-pt-sepsis',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:02:10.064Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968530064-ig3u4w',
+  alertId: 'alert-long-wait-critical-pt-abdo',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:02:10.064Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: 'triage_nurse',
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968530064-wbalu3',
+  alertId: 'alert-queue-breach-Assessment',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:02:10.064Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968530064-23vqll',
+  alertId: 'alert-queue-breach-Results',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:02:10.064Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968530064-snu3ou',
+  alertId: 'alert-queue-breach-Reassessment',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:02:10.064Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968530064-fbkwe6',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-assessment',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:02:10.064Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968530064-xlp0wi',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-reassessment',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:02:10.064Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968530064-oqifbl',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-admission',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:02:10.064Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Warning',
+    ownerRole: 'triage_nurse',
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968530064-3xi2pi',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-triage',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:02:10.064Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Warning',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968530064-s6pcx3',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-waiting',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:02:10.064Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Warning',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+
+stdout | src/routing/canonicalRouteTree.redirects.test.tsx > canonical route tree — legacy redirects > /fleet/map mounts the in-shell canonical route
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968530197-egsn9k',
+  alertId: 'alert-reassessment-deterioration-pt-sepsis',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:02:10.197Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968530197-5dyr2z',
+  alertId: 'alert-long-wait-critical-pt-abdo',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:02:10.197Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: 'triage_nurse',
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968530197-2ztev6',
+  alertId: 'alert-queue-breach-Assessment',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:02:10.197Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968530197-beda4h',
+  alertId: 'alert-queue-breach-Results',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:02:10.197Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968530197-a5zqe2',
+  alertId: 'alert-queue-breach-Reassessment',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:02:10.197Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968530197-2rebi1',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-assessment',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:02:10.197Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968530197-fmnzb0',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-reassessment',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:02:10.197Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Critical',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968530197-iw4sd5',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-admission',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:02:10.197Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Warning',
+    ownerRole: 'triage_nurse',
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968530197-em965i',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-triage',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:02:10.197Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Warning',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+[ALERT_LIFECYCLE] {
+  id: 'alert-audit-1782968530197-4c0sgl',
+  alertId: 'alert-bottleneck-event-bn-workflow-queue-waiting',
+  action: 'created',
+  actorId: undefined,
+  actorRole: undefined,
+  timestamp: '2026-07-02T05:02:10.197Z',
+  source: 'emergencyStore.updateAlerts',
+  metadata: {
+    derived: true,
+    severity: 'Warning',
+    ownerRole: undefined,
+    lifecycleStatus: 'open'
+  }
+}
+
+ ❯ src/routing/canonicalRouteTree.redirects.test.tsx (11 tests | 2 failed | 5 skipped) 12612ms
+     ↓ /tools/catalog redirects to Medical Tools with intent preserved
+     ↓ /tools/calculators/qsofa redirects to Medical Tools with intent preserved
+     ↓ /tools/calculator/sofa redirects to Medical Tools with intent preserved
+     ↓ /calculators redirects to Medical Tools with intent preserved
+     ↓ /operations/fleet-command redirects to Medical Tools with intent preserved
+     ✓ /tools/lab-interpreter mounts the in-shell canonical route  1520ms
+     ✓ /maps mounts the in-shell canonical route  1629ms
+     × /recommendations mounts the in-shell canonical route 1421ms
+     × /workflows mounts the in-shell canonical route 7741ms
+     ✓ /fleet/command mounts the in-shell canonical route 136ms
+     ✓ /fleet/map mounts the in-shell canonical route 159ms
+Not implemented: navigation to another Document
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/routing/canonicalRouteTree.redirects.test.tsx > canonical route tree — legacy redirects > /recommendations mounts the in-shell canonical route
+TestingLibraryElementError: Unable to find role="heading" and name `/careDroid tool console/i`
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="emergency-app-shell emergency-app-shell--density-compact emergency-app-shell--screen-density-high-operational"
+    >
+      <a
+        class="ed-skip-link"
+        href="#main-content"
+      >
+        Skip to main content
+      </a>
+      <nav
+        aria-label="Emergency desktop navigation"
+      >
+        <a
+          href="/emergency/whiteboard"
+        >
+          Dashboard
+        </a>
+        <a
+          href="/emergency/ems"
+        >
+          EMS
+        </a>
+        <a
+          href="/emergency/tools"
+        >
+          Medical Tools
+        </a>
+        <a
+          href="/emergency/analytics"
+        >
+          Analytics
+        </a>
+        <a
+          href="/emergency/settings"
+        >
+          Settings
+        </a>
+        <a
+          href="/emergency/patients"
+        >
+          Patients
+        </a>
+        <a
+          href="/emergency/queues"
+        >
+          Queue
+        </a>
+        <a
+          href="/emergency/copilot"
+        >
+          AI Chief
+        </a>
+      </nav>
+      <div
+        class="emergency-app-shell__main-column"
+      >
+        <header>
+          <button
+            type="button"
+          >
+            + Central Intake
+          </button>
+          <div
+            aria-label="Operational command context"
+          />
+        </header>
+        <div
+          aria-label="Current workspace"
+          class="shell-route-tab"
+          role="region"
+        >
+          <div
+            class="shell-route-tab__identity"
+          >
+            <div
+              class="shell-route-tab__title-stack"
+            >
+              <div
+                class="shell-route-tab__title-block"
+              >
+                <h1
+                  class="shell-route-tab__title"
+                >
+                  CareDroid
+                </h1>
+              </div>
+            </div>
+          </div>
+          <div
+            class="shell-route-tab__actions"
+          >
+            <button
+              class="help-trigger shell-route-tab__help"
+              type="button"
+            >
+              Guide
+            </button>
+          </div>
+        </div>
+        <div
+          class="operational-alarm-dock"
+        >
+          <section
+            aria-live="polite"
+            class="operational-alarm-dock__strip operational-alarm-dock__strip--critical"
+            role="alert"
+          >
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-triangle-alert operational-alarm-dock__icon"
+              fill="none"
+              height="16"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="16"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"
+              />
+              <path
+                d="M12 9v4"
+              />
+              <path
+                d="M12 17h.01"
+              />
+            </svg>
+            <div
+              class="operational-alarm-dock__copy"
+            >
+              <strong>
+                Critical long wait breach
+              </strong>
+              <span>
+                James Tremblay has waited 56m (P3 limit 30m). Charge nurse and physician notification required.
+              </span>
+            </div>
+            <div
+              class="operational-alarm-dock__actions"
+            >
+              <button
+                type="button"
+              >
+                Open patient
+              </button>
+              <button
+                type="button"
+              >
+                Acknowledge
+              </button>
+              <button
+                class="operational-alarm-dock__ghost"
+                type="button"
+              >
+                All alerts
+              </button>
+            </div>
+          </section>
+        </div>
+        <main
+          class="app-shell-main-content"
+          data-practitioner-compact="true"
+          data-screen-density-mode="high-operational"
+          id="main-content"
+          role="main"
+          tabindex="-1"
+        >
+          <div
+            class="tools-overview tools-overview--compact"
+          >
+            <section
+              class="cd-page-shell cd-page-shell tools-overview-shell"
+            >
+              <header
+                class="cd-page-header cdl-zone cdl-zone--identity"
+              >
+                <div
+                  class=
+
+gnored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="emergency-app-shell emergency-app-shell--density-compact emergency-app-shell--screen-density-high-operational"
+    >
+      <a
+        class="ed-skip-link"
+        href="#main-content"
+      >
+        Skip to main content
+      </a>
+      <nav
+        aria-label="Emergency desktop navigation"
+      >
+        <a
+          href="/emergency/whiteboard"
+        >
+          Dashboard
+        </a>
+        <a
+          href="/emergency/ems"
+        >
+          EMS
+        <
+/a>
+        <a
+          href="/emergency/tools"
+        >
+          Medical Tools
+        </a>
+        <a
+          href="/emergency/analytics"
+        >
+          Analytics
+        </a>
+        <a
+          href="/emergency/settings"
+        >
+          Settings
+        </a>
+        <a
+          href="/emergency/patients"
+        >
+          Patients
+        </a>
+        <a
+          href="/emergency/queues"
+        >
+          Queue
+        </a>
+        <a
+          href="/emergency/copilot"
+        >
+          AI Chief
+        </a>
+      </nav>
+      <div
+        class="emergency-app-shell__main-column"
+      >
+        <header>
+          <button
+            type="button"
+          >
+            + Central Intake
+          </button>
+          <div
+            aria-label="Operational command context"
+          />
+        </header>
+        <div
+          aria-label="Current workspace"
+          class="shell-route-tab"
+          role="region"
+        >
+          <div
+            class="shell-route-tab__identity"
+          >
+            <div
+              class="shell-route-tab__title-stack"
+            >
+              <div
+                class="shell-route-tab__title-block"
+              >
+                <h1
+                  class="shell-route-tab__title"
+                >
+                  CareDroid
+                </h1>
+              </div>
+            </div>
+          </div>
+          <div
+            class="shell-route-tab__actions"
+          >
+            <button
+              class="help-trigger shell-route-tab__help"
+              type="button"
+            >
+              Guide
+            </button>
+          </div>
+        </div>
+        <div
+          class="operational-alarm-dock"
+        >
+          <section
+            aria-live="polite"
+            class="operational-alarm-dock__strip operational-alarm-dock__strip--critical"
+            role="alert"
+          >
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-triangle-alert operational-alarm-dock__icon"
+              fill="none"
+              height="16"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="16"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"
+              />
+              <path
+                d="M12 9v4"
+              />
+              <path
+                d="M12 17h.01"
+              />
+            </svg>
+            <div
+              class="operational-alarm-dock__copy"
+            >
+              <strong>
+                Critical long wait breach
+              </strong>
+              <span>
+                James Tremblay has waited 56m (P3 limit 30m). Charge nurse and physician notification required.
+              </span>
+            </div>
+            <div
+              class="operational-alarm-dock__actions"
+            >
+              <button
+                type="button"
+              >
+                Open patient
+              </button>
+              <button
+                type="button"
+              >
+                Acknowledge
+              </button>
+              <button
+                class="operational-alarm-dock__ghost"
+                type="button"
+              >
+                All alerts
+              </button>
+            </div>
+          </section>
+        </div>
+        <main
+          class="app-shell-main-content"
+          data-practitioner-compact="true"
+          data-screen-density-mode="high-operational"
+          id="main-content"
+          role="main"
+          tabindex="-1"
+        >
+          <div
+            class="tools-overview tools-overview--compact"
+          >
+            <section
+              class="cd-page-shell cd-page-shell tools-overview-shell"
+            >
+              <header
+                class="cd-page-header cdl-zone cdl-zone--identity"
+              >
+                <div
+                  class=
+aitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/routing/canonicalRouteTree.redirects.test.tsx:46:27
+ Test Files  1 failed (1)
+      Tests  2 failed | 4 passed | 5 skipped (11)
+     Errors  1 error
+   Start at  01:01:35
+   Duration  35.11s (transform 12.74s, setup 731ms, import 16.90s, tests 12.61s, environment 3.86s)
+
+     44|
+     45|     if (expected.heading) {
+     46|       expect(await screen.findByRole('heading', { name: expected.headi…
+       |                           ^
+     47|     }
+     48|     if (expected.text) {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/routing/canonicalRouteTree.redirects.test.tsx > canonical route tree — legacy redirects > /workflows mounts the in-shell canonical route
+TestingLibraryElementError: Unable to find role="heading" and name `/^workflows$/i`
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="emergency-app-shell emergency-app-shell--density-compact emergency-app-shell--screen-density-high-operational"
+    >
+      <a
+        class="ed-skip-link"
+        href="#main-content"
+      >
+        Skip to main content
+      </a>
+      <nav
+        aria-label="Emergency desktop navigation"
+      >
+        <a
+          href="/emergency/whiteboard"
+        >
+          Dashboard
+        </a>
+        <a
+          href="/emergency/ems"
+        >
+          EMS
+        </a>
+        <a
+          href="/emergency/tools"
+        >
+          Medical Tools
+        </a>
+        <a
+          href="/emergency/analytics"
+        >
+          Analytics
+        </a>
+        <a
+          href="/emergency/settings"
+        >
+          Settings
+        </a>
+        <a
+          href="/emergency/patients"
+        >
+          Patients
+        </a>
+        <a
+          href="/emergency/queues"
+        >
+          Queue
+        </a>
+        <a
+          href="/emergency/copilot"
+        >
+          AI Chief
+        </a>
+      </nav>
+      <div
+        class="emergency-app-shell__main-column"
+      >
+        <header>
+          <button
+            type="button"
+          >
+            + Central Intake
+          </button>
+          <div
+            aria-label="Operational command context"
+          />
+        </header>
+        <div
+          aria-label="Current workspace"
+          class="shell-route-tab"
+          role="region"
+        >
+          <div
+            class="shell-route-tab__identity"
+          >
+            <div
+              class="shell-route-tab__title-stack"
+            >
+              <div
+                class="shell-route-tab__title-block"
+              >
+                <h1
+                  class="shell-route-tab__title"
+                >
+                  CareDroid
+                </h1>
+              </div>
+            </div>
+          </div>
+          <div
+            class="shell-route-tab__actions"
+          >
+            <button
+              class="help-trigger shell-route-tab__help"
+              type="button"
+            >
+              Guide
+            </button>
+          </div>
+        </div>
+        <div
+          class="operational-alarm-dock"
+        >
+          <section
+            aria-live="polite"
+            class="operational-alarm-dock__strip operational-alarm-dock__strip--critical"
+            role="alert"
+          >
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-triangle-alert operational-alarm-dock__icon"
+              fill="none"
+              height="16"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="16"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"
+              />
+              <path
+                d="M12 9v4"
+              />
+              <path
+                d="M12 17h.01"
+              />
+            </svg>
+            <div
+              class="operational-alarm-dock__copy"
+            >
+              <strong>
+                Critical long wait breach
+              </strong>
+              <span>
+                James Tremblay has waited 56m (P3 limit 30m). Charge nurse and physician notification required.
+              </span>
+            </div>
+            <div
+              class="operational-alarm-dock__actions"
+            >
+              <button
+                type="button"
+              >
+                Open patient
+              </button>
+              <button
+                type="button"
+              >
+                Acknowledge
+              </button>
+              <button
+                class="operational-alarm-dock__ghost"
+                type="button"
+              >
+                All alerts
+              </button>
+            </div>
+          </section>
+        </div>
+        <main
+          class="app-shell-main-content"
+          data-practitioner-compact="true"
+          data-screen-density-mode="high-operational"
+          id="main-content"
+          role="main"
+          tabindex="-1"
+        >
+          <div
+            role="status"
+            style="padding: 24px; color: rgb(148, 163, 184);"
+          >
+            Loading workflows...
+          </div>
+        </main>
+      </div>
+      <section
+        aria-atomic="false"
+        aria-label="Notifications alt+T"
+        aria-live="polite"
+        aria-relevant="additions text"
+        tabindex="-1"
+      />
+    </div>
+    <output
+      data-testid="location"
+    >
+      /workflows
+    </output>
+  </div>
+</body>
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="emergency-app-shell emergency-app-shell--density-compact emergency-app-shell--screen-density-high-operational"
+    >
+      <a
+        class="ed-skip-link"39m
+        href="#main-content"
+      >
+        Skip to main content
+      </a>
+      <nav
+        aria-label="Emergency desktop navigation"
+      >
+        <a
+          href="/emergency/whiteboard"
+        >
+          Dashboard
+        </a>
+        <a
+          href="/emergency/ems"
+        >
+          EMS
+        </a>
+        <a
+          href="/emergency/tools"
+        >
+          Medical Tools
+        </a>
+        <a
+          href="/emergency/analytics"
+        >
+          Analytics
+        </a>
+        <a
+          href="/emergency/settings"
+        >
+          Settings
+        </a>
+        <a
+          href="/emergency/patients"
+        >
+          Patients
+        </a>
+        <a
+          href="/emergency/queues"
+        >
+          Queue
+        </a>
+        <a
+          href="/emergency/copilot"
+        >
+          AI Chief
+        </a>
+      </nav>
+      <div
+        class="emergency-app-shell__main-column"
+      >
+        <header>
+          <button
+            type="button"
+          >
+            + Central Intake
+          </button>
+          <div
+            aria-label="Operational command context"
+          />
+        </header>
+        <div
+          aria-label="Current workspace"
+          class="shell-route-tab"
+          role="region"
+        >
+          <div
+            class="shell-route-tab__identity"
+          >
+            <div
+              class="shell-route-tab__title-stack"
+            >
+              <div
+                class="shell-route-tab__title-block"
+              >
+                <h1
+                  class="shell-route-tab__title"
+                >
+                  CareDroid
+                </h1>
+              </div>
+            </div>
+          </div>
+          <div
+            class="shell-route-tab__actions"
+          >
+            <button
+              class="help-trigger shell-route-tab__help"
+              type="button"
+            >
+              Guide
+            </button>
+          </div>
+        </div>
+        <div
+          class="operational-alarm-dock"
+        >
+          <section
+            aria-live="polite"
+            class="operational-alarm-dock__strip operational-alarm-dock__strip--critical"
+            role="alert"
+          >
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-triangle-alert operational-alarm-dock__icon"
+              fill="none"
+              height="16"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="16"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"
+              />
+              <path
+                d="M12 9v4"
+              />
+              <path
+                d="M12 17h.01"
+              />
+            </svg>
+            <div
+              class="operational-alarm-dock__copy"
+            >
+              <strong>
+                Critical long wait breach
+              </strong>
+              <span>
+                James Tremblay has waited 56m (P3 limit 30m). Charge nurse and physician notification required.
+              </span>
+            </div>
+            <div
+              class="operational-alarm-dock__actions"
+            >
+              <button
+                type="button"
+              >
+                Open patient
+              </button>
+              <button
+                type="button"
+              >
+                Acknowledge
+              </button>
+              <button
+                class="operational-alarm-dock__ghost"
+                type="button"
+              >
+                All alerts
+              </button>
+            </div>
+          </section>
+        </div>
+        <main
+          class="app-shell-main-content"
+          data-practitioner-compact="true"
+          data-screen-density-mode="high-operational"
+          id="main-content"
+          role="main"
+          tabindex="-1"
+        >
+          <div
+            role="status"
+            style="padding: 24px; color: rgb(148, 163, 184);"
+          >
+            Loading workflows...
+          </div>
+        </main>
+      </div>
+      <section
+        aria-atomic="false"
+        aria-label="Notifications alt+T"
+        aria-live="polite"
+        aria-relevant="additions text"
+        tabindex="-1"
+      />
+    </div>
+    <output
+      data-testid="location"
+    >
+      /workflows
+    </output>
+  </div>
+</body>
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/routing/canonicalRouteTree.redirects.test.tsx:46:27
+     44|
+     45|     if (expected.heading) {
+     46|       expect(await screen.findByRole('heading', { name: expected.headi…
+       |                           ^
+     47|     }
+     48|     if (expected.text) {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+⎯⎯⎯⎯⎯⎯ Unhandled Errors ⎯⎯⎯⎯⎯⎯
+
+Vitest caught 1 unhandled error during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.
+
+⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯
+Error: [vitest] No "fetchClinicalToolMetadata" export is defined on the "../services/clinicalToolsApi" mock. Did you forget to return it from "vi.mock"?
+If you need to partially mock a module, you can use "importOriginal" helper inside:
+
+vi.mock(import("../services/clinicalToolsApi"), async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    // your mocked methods
+  }
+})
+
+ ❯ VitestMocker.createError node_modules/vitest/dist/chunks/startVitestModuleRunner.CCBQZ9DQ.js:62:17
+ ❯ Object.get node_modules/vitest/dist/chunks/startVitestModuleRunner.CCBQZ9DQ.js:327:16
+ ❯ loadRemoteStatus src/components/clinical/ToolPreflightStatus.tsx:76:9
+     74|     async function loadRemoteStatus() {
+     75|       const [metadataResult, statsResult] = await Promise.all([
+     76|         fetchClinicalToolMetadata(executableToolId),
+       |         ^
+     77|         fetchToolStatistics(),
+     78|       ]);
+ ❯ src/components/clinical/ToolPreflightStatus.tsx:89:5
+ ❯ commitHookEffectListMount node_modules/react-dom/cjs/react-dom.development.js:23189:26
+ ❯ commitPassiveMountOnFiber node_modules/react-dom/cjs/react-dom.development.js:24970:11
+ ❯ commitPassiveMountEffects_complete node_modules/react-dom/cjs/react-dom.development.js:24930:9
+ ❯ commitPassiveMountEffects_begin node_modules/react-dom/cjs/react-dom.development.js:24917:7
+ ❯ commitPassiveMountEffects node_modules/react-dom/cjs/react-dom.development.js:24905:3
+ ❯ flushPassiveEffectsImpl node_modules/react-dom/cjs/react-dom.development.js:27078:3
+
+This error originated in "src/routing/canonicalRouteTree.redirects.test.tsx" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "/tools/lab-interpreter mounts the in-shell canonical route". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+

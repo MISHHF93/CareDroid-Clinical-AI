@@ -27,7 +27,7 @@
 .consent-history-intro {
   font-size: var(--font-16);
   line-height: 1.7;
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   margin: 0;
 }
 
@@ -112,9 +112,9 @@
 }
 
 .consent-record-status-granted {
-  background: rgba(0, 255, 136, 0.15);
+  background: var(--medical-accent-tint-strong);
   color: var(--accent-1);
-  border: 1px solid rgba(0, 255, 136, 0.3);
+  border: 1px solid color-mix(in srgb, var(--app-accent-interactive) 30%, transparent);
 }
 
 .consent-record-status-revoked {
@@ -150,7 +150,7 @@
 
 .consent-detail-label {
   font-size: var(--font-14);
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
 }
 
 .consent-detail-value {
@@ -163,7 +163,7 @@
 }
 
 .consent-detail-value-no {
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
 }
 
 /* Record Footer */
@@ -178,7 +178,7 @@
   gap: var(--space-4);
   flex-wrap: wrap;
   font-size: var(--font-12);
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
 }
 
 .consent-record-meta span {
@@ -207,7 +207,7 @@
 .consent-history-info p {
   font-size: var(--font-14);
   line-height: 1.7;
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   margin: 0 0 var(--space-2) 0;
 }
 
@@ -218,7 +218,7 @@
 
 .consent-history-info li {
   font-size: var(--font-14);
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   margin-bottom: var(--space-1);
 }
 
@@ -281,7 +281,7 @@
 }
 
 .consent-history-loading p {
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-size: var(--font-16);
 }
 

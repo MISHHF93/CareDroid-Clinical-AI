@@ -7,16 +7,16 @@ import {
 
 describe('pilotExtensionRouteGuard', () => {
   it('defines guarded extension prefixes', () => {
-    expect(PILOT_EXTENSION_ROUTE_REDIRECTS.length).toBeGreaterThan(10);
-    expect(PILOT_EXTENSION_ROUTE_REDIRECTS.map((entry) => entry.prefix)).toContain('/fleet');
+    expect(PILOT_EXTENSION_ROUTE_REDIRECTS.length).toBeGreaterThan(5);
     expect(PILOT_EXTENSION_ROUTE_REDIRECTS.map((entry) => entry.prefix)).toContain('/cosmos');
+    expect(PILOT_EXTENSION_ROUTE_REDIRECTS.map((entry) => entry.prefix)).not.toContain('/fleet');
   });
 
-  it('redirects extension routes during pilot cleanup', () => {
-    expect(resolvePilotExtensionRedirect('/fleet/command')).toBe(CANONICAL_ROUTES.emergencyEms);
+  it('redirects retired extension routes during pilot cleanup', () => {
+    expect(resolvePilotExtensionRedirect('/fleet/command')).toBeNull();
     expect(resolvePilotExtensionRedirect('/cosmos')).toBe(CANONICAL_ROUTES.emergencyWhiteboard);
-    expect(resolvePilotExtensionRedirect('/workspace')).toBe(CANONICAL_ROUTES.emergencySettings);
-    expect(resolvePilotExtensionRedirect('/tools/catalog')).toBe(CANONICAL_ROUTES.emergencyTools);
+    expect(resolvePilotExtensionRedirect('/workspace')).toBeNull();
+    expect(resolvePilotExtensionRedirect('/tools/catalog')).toBeNull();
   });
 
   it('keeps core emergency routes reachable in pilot', () => {
@@ -25,6 +25,10 @@ describe('pilotExtensionRouteGuard', () => {
     expect(resolvePilotExtensionRedirect('/emergency/reception')).toBeNull();
     expect(resolvePilotExtensionRedirect('/emergency/copilot')).toBeNull();
     expect(resolvePilotExtensionRedirect('/emergency/analytics')).toBeNull();
+    expect(resolvePilotExtensionRedirect('/emergency/command-center')).toBeNull();
+    expect(resolvePilotExtensionRedirect('/executive')).toBeNull();
+    expect(resolvePilotExtensionRedirect('/ai-command-center')).toBeNull();
+    expect(resolvePilotExtensionRedirect('/predictive-analytics')).toBeNull();
     // /emergency/intake is a core ED route (SmartIntake page), not an extension redirect
     expect(resolvePilotExtensionRedirect('/emergency/intake')).toBeNull();
   });

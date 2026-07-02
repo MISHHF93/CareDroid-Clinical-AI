@@ -5,7 +5,7 @@ import { CareDroidPage } from '../../../components/ui/CareDroidPrimitives';
 import { EMPTY_STATE_COPY } from '../../../config/emptyStateCopy';
 import EdDataSourceBanner from '../../../components/emergency/EdDataSourceBanner';
 import { usePractitionerSurfaceVisibility } from '../../../contexts/PractitionerVisibilityContext';
-import useEdRouteDataContext from '../../../hooks/useEdRouteDataContext';
+import useEmergencyOperatingSurface from '../../../hooks/useEmergencyOperatingSurface';
 import { useEmergencyStore } from '../../../store/emergencyStore';
 import {
   buildShiftSummary,
@@ -73,7 +73,9 @@ function CapacityBar({ totals }: { totals: ShiftSummary['capacity']['totals'] })
 
 export default function EmergencyShiftSummaryPage() {
   const surfaces = usePractitionerSurfaceVisibility();
-  const { activeScenarioId, backendAvailable, envelope, loading } = useEdRouteDataContext();
+  const activeScenarioId = useEmergencyStore((state) => state.activeScenarioId);
+  const backendAvailable = useEmergencyStore((state) => state.backendAvailable);
+  const { loading, error, envelope } = useEmergencyOperatingSurface('shift-summary');
   const patients = useEmergencyStore((state) => state.patients);
   const staff = useEmergencyStore((state) => state.staff);
   const activeShift = useEmergencyStore((state) => state.activeShift);
@@ -156,6 +158,7 @@ export default function EmergencyShiftSummaryPage() {
             <EdDataSourceBanner
               envelope={envelope}
               loading={loading}
+              error={error}
               activeScenarioId={activeScenarioId}
               backendAvailable={backendAvailable}
               compact

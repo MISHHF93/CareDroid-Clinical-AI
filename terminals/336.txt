@@ -1,0 +1,19 @@
+---
+pid: 1152
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "npm.cmd run build --prefix backend 2>&1"
+started_at: 2026-07-02T20:17:05.012Z
+running_for_ms: 1139978  
+---
+
+> caredroid-clinical-ai-backend@1.0.0 prebuild
+> rimraf dist
+
+
+> caredroid-clinical-ai-backend@1.0.0 build
+> nest build
+
+
+> caredroid-clinical-ai-backend@1.0.0 postbuild
+> node scripts/link-main.mjs
+

@@ -228,7 +228,7 @@ cp .env.example .env
 cp backend/.env.example backend/.env
 ```
 
-Start the full local stack (Vite on :8000 + NestJS on :3000):
+Start the full local stack (single origin on :8000 — Vite proxies API to Nest):
 
 ```bash
 npm start
@@ -238,16 +238,16 @@ Local defaults use **SQLite** and disable optional ML/RAG services so the app bo
 
 | Service | URL |
 |---------|-----|
-| Frontend | http://localhost:8000 |
-| Backend API | http://localhost:3000/api |
-| Health check | http://localhost:3000/health |
-| API docs (Swagger) | http://localhost:3000/api/docs |
+| App (frontend + API) | http://localhost:8000 |
+| API (proxied) | http://localhost:8000/api |
+| Health check | http://localhost:8000/health |
+| API docs (Swagger) | http://localhost:8000/api/docs |
 
 ### Focused commands
 
 ```bash
 npm run dev:web          # Frontend only (Vite on :8000)
-npm run dev:api          # Backend only (Nest on :3000)
+npm run dev:api          # Backend only (Nest on :3000, internal — use :8000 when full stack is running)
 npm run backend:build    # Compile NestJS
 npm run backend:start    # Run compiled backend
 npm run typecheck:frontend
@@ -274,7 +274,7 @@ Key walkthrough surfaces in order:
 
 | Variable | Purpose |
 |----------|---------|
-| `VITE_API_URL` | Leave empty in local dev (Vite proxies `/api` to :3000) |
+| `VITE_API_URL` | Leave empty in local dev (same-origin `/api` via Vite on :8000) |
 | `VITE_ED_SINGLE_APPLICATION` | `true` (default) — activates Emergency OS as single app |
 | `AI_ENABLED` | Enable AI features globally |
 | `ED_COPILOT_AI_ENABLED` | Enable the ED Copilot specifically |

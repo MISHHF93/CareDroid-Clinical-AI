@@ -23,7 +23,7 @@
 .reception-embedded-calculator__hint {
   margin: 4px 0 0;
   font-size: 0.75rem;
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
 }
 
 .reception-embedded-calculator__close {
@@ -38,6 +38,6 @@
 
 .reception-embedded-calculator__loading {
   margin: 0;
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-size: 0.875rem;
 }

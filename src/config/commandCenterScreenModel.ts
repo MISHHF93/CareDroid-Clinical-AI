@@ -90,6 +90,7 @@ export type CommandCenterScreenCapabilities = {
   roleLabel: string;
   defaultFocus: string;
   defaultLandingRoute: string;
+  commandCenterPath: string;
   whiteboardPath: string;
   analyticsPath: string;
   showWidget: (widgetId: string) => boolean;
@@ -131,6 +132,12 @@ export type CommandCenterScreenCapabilities = {
   visibleOperationalSurfaces: string[];
 };
 
+/** Canonical ED command authority — Hospital Command Center route. */
+export function getCommandCenterAuthorityPath(): string {
+  return CANONICAL_ROUTES.emergencyCommandCenter;
+}
+
+/** Patient-flow whiteboard — linked from command center, not a duplicate command surface. */
 export function getCommandCenterWhiteboardPath(): string {
   return CANONICAL_ROUTES.emergencyWhiteboard;
 }
@@ -232,7 +239,8 @@ export function resolveCommandCenterScreenCapabilities(
     role: input.role || '',
     roleLabel: input.roleLabel || 'Command center',
     defaultFocus: definition?.defaultFocus || COMMAND_CENTER_SCREEN_WIDGETS.arrivalsByHour,
-    defaultLandingRoute: definition?.defaultLandingRoute || getCommandCenterWhiteboardPath(),
+    defaultLandingRoute: definition?.defaultLandingRoute || getCommandCenterAuthorityPath(),
+    commandCenterPath: getCommandCenterAuthorityPath(),
     whiteboardPath: getCommandCenterWhiteboardPath(),
     analyticsPath: CANONICAL_ROUTES.emergencyAnalytics,
     showWidget,

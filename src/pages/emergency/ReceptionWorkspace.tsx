@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FolderOpen, ShieldCheck } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
-import HelpTrigger from '../../components/help/HelpTrigger';
+
 import ArrivalControlSummaryStrip from '../../components/reception/ArrivalControlSummaryStrip';
 import ReceptionDeskToolbar from '../../components/reception/ReceptionDeskToolbar';
 import ReceptionEscalationAttentionStrip from '../../components/reception/ReceptionEscalationAttentionStrip';
@@ -34,7 +34,7 @@ import {
 } from '../../services/receptionIntakeOrchestrator';
 import { completeProvisionalIntake } from '../../services/provisionalIdentityIntake';
 import { ReceptionFlowGraphic } from '../../components/graphics/CdlGraphicKit';
-import { WorkflowSituationBrief } from './emergencyRouteShared';
+import { EmergencyRoutePage } from './emergencyRouteShared';
 import './ReceptionWorkspace.css';
 import './emergency-route.css';
 import '../../styles/reception-desk-theme.css';
@@ -467,47 +467,30 @@ export default function ReceptionWorkspace() {
     setSearchParams(next, { replace: true });
   };
 
-  return (
-    <section
-      className="reception-workspace reception-command reception-front-door"
-      aria-labelledby="reception-command-title"
-    >
-      <header className="reception-command-header reception-front-door__header">
-        <div>
-          <p className="reception-command-header__eyebrow">{RECEPTION_COPY.workspace.eyebrow}</p>
-          <h1 id="reception-command-title">{RECEPTION_COPY.workspace.title}</h1>
-          <p className="reception-front-door__description">{RECEPTION_COPY.workspace.deskDescription}</p>
-          <div className="reception-command-header__meta">
-            <span>{currentUserName}</span>
-            <span className="reception-command-badge">{emergencyRole.roleLabel || 'Registration Clerk'}</span>
-            <span>{shiftStatus}</span>
-            <span>{hospitalSite}</span>
-          </div>
-        </div>
-        <div className="reception-command-header__metrics" aria-label="Reception queue metrics">
-          <div>
-            <strong>{receptionQueueAll.length}</strong>
-            <span>{RECEPTION_COPY.metrics.queueSize}</span>
-          </div>
-          <div className={criticalAlerts.length ? 'reception-command-metric--critical' : ''}>
-            <strong>{criticalAlerts.length}</strong>
-            <span>Critical</span>
-          </div>
-          <HelpTrigger variant="button" label="Guide" className="reception-command-help" />
-        </div>
-      </header>
+  const situationTone =
+    criticalAlerts.length || criticalNeeded
+      ? 'critical'
+      : liveRedFlags.length || missingCriticalFields.length
+        ? 'warning'
+        : 'neutral';
 
-      <WorkflowSituationBrief
-        status={`${receptionQueueAll.length} patient${receptionQueueAll.length === 1 ? '' : 's'} in reception`}
-        attention={
+  return (
+    <EmergencyRoutePage
+      surfaceClassName="reception-workspace reception-command reception-front-door"
+      titleId="reception-command-title"
+      eyebrow={RECEPTION_COPY.workspace.eyebrow}
+      title={RECEPTION_COPY.workspace.title}
+      description={RECEPTION_COPY.workspace.deskDescription}
+      situationBrief={{
+        status: `${receptionQueueAll.length} patient${receptionQueueAll.length === 1 ? '' : 's'} in reception`,
+        attention:
           criticalAlerts.length
             ? `${criticalAlerts.length} critical alert${criticalAlerts.length === 1 ? '' : 's'}`
             : liveRedFlags.length
               ? `${liveRedFlags.length} red flag${liveRedFlags.length === 1 ? '' : 's'} in draft`
-              : 'No critical arrivals flagged'
-        }
-        owner={`${currentUserName} · ${emergencyRole.roleLabel || 'Registration Clerk'}`}
-        nextAction={
+              : 'No critical arrivals flagged',
+        owner: `${currentUserName} · ${emergencyRole.roleLabel || 'Registration Clerk'}`,
+        nextAction:
           result
             ? RECEPTION_COPY.workspace.registerNext
             : smartIntakeSession
@@ -518,25 +501,39 @@ export default function ReceptionWorkspace() {
                   ? missingCriticalFields.length
                     ? `Complete ${missingCriticalFields.length} required field${missingCriticalFields.length === 1 ? '' : 's'}`
                     : 'Route patient to triage queue'
-                  : RECEPTION_COPY.workspace.registerWalkIn
-        }
-        tone={
-          criticalAlerts.length || criticalNeeded
-            ? 'critical'
-            : liveRedFlags.length || missingCriticalFields.length
-              ? 'warning'
-              : 'neutral'
-        }
-      />
-
-      <ReceptionEscalationAttentionStrip
-        alerts={alerts}
-        roleId={emergencyRole.role}
-        onSelectPatient={selectPatient}
-        className="reception-front-door__escalation-strip"
-      />
-
-      {receptionDesk.enabled ? (
+                  : RECEPTION_COPY.workspace.registerWalkIn,
+        tone: situationTone,
+      }}
+      actions={
+        <div className="reception-command-header__metrics" aria-label="Reception queue metrics">
+          <div>
+            <strong>{receptionQueueAll.length}</strong>
+            <span>{RECEPTION_COPY.metrics.queueSize}</span>
+          </div>
+          <div className={criticalAlerts.length ? 'reception-command-metric--critical' : ''}>
+            <strong>{criticalAlerts.length}</strong>
+            <span>Critical</span>
+          </div>
+        </div>
+      }
+      operationalSummaryExtra={
+        <>
+          <div className="reception-command-header__meta">
+            <span>{currentUserName}</span>
+            <span className="reception-command-badge">{emergencyRole.roleLabel || 'Registration Clerk'}</span>
+            <span>{shiftStatus}</span>
+            <span>{hospitalSite}</span>
+          </div>
+          <ReceptionEscalationAttentionStrip
+            alerts={alerts}
+            roleId={emergencyRole.role}
+            onSelectPatient={selectPatient}
+            className="reception-front-door__escalation-strip"
+          />
+        </>
+      }
+      primaryActions={
+        receptionDesk.enabled ? (
         <>
           <ReceptionDeskToolbar
             canCreatePatient={receptionCapabilities.canCreatePatient}
@@ -563,34 +560,9 @@ export default function ReceptionWorkspace() {
             className="reception-front-door__arrival-summary"
           />
         </>
-      ) : null}
-
-      <Stepper draft={draft} aiAssist={aiAssist} result={result} />
-
-      {!clinicalOverride.allowed ? (
-        <div className="reception-command-guardrail" role="note">
-          <ShieldCheck size={18} aria-hidden="true" />
-          <span>{clinicalOverride.reason}</span>
-        </div>
-      ) : null}
-
-      <div className="reception-front-door__body">
-        <div className="reception-front-door__main">
-          <UnifiedIntakePanel
-            draft={draft}
-            onDraftChange={updateDraft}
-            aiAssist={aiAssist}
-            onAiAssistChange={setAiAssist}
-            result={result}
-            canCreatePatient={canCreatePatient}
-            submitting={submitting}
-            onSaveDraft={saveDraft}
-            onRoute={createAndRoute}
-            onReset={resetForNextPatient}
-            showQueueRail={false}
-          />
-        </div>
-
+        ) : null
+      }
+      supportingContext={
         <ReceptionOperationalRail
           queue={receptionQueue}
           criticalAlerts={criticalAlerts}
@@ -610,6 +582,31 @@ export default function ReceptionWorkspace() {
           isTimerBreached={isTimerBreached}
           activeQueueTab={RECEPTION_COPY.queues.tabs[activeQueueTab]}
           emptyQueueMessage={emptyQueueMessage}
+        />
+      }
+    >
+      <Stepper draft={draft} aiAssist={aiAssist} result={result} />
+
+      {!clinicalOverride.allowed ? (
+        <div className="reception-command-guardrail" role="note">
+          <ShieldCheck size={18} aria-hidden="true" />
+          <span>{clinicalOverride.reason}</span>
+        </div>
+      ) : null}
+
+      <div className="reception-front-door__main">
+        <UnifiedIntakePanel
+          draft={draft}
+          onDraftChange={updateDraft}
+          aiAssist={aiAssist}
+          onAiAssistChange={setAiAssist}
+          result={result}
+          canCreatePatient={canCreatePatient}
+          submitting={submitting}
+          onSaveDraft={saveDraft}
+          onRoute={createAndRoute}
+          onReset={resetForNextPatient}
+          showQueueRail={false}
         />
       </div>
 
@@ -661,6 +658,6 @@ export default function ReceptionWorkspace() {
         }}
         onHandoffComplete={handleSmartIntakeHandoff}
       />
-    </section>
+    </EmergencyRoutePage>
   );
 }

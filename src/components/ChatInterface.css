@@ -29,7 +29,7 @@
   padding: clamp(18px, 4vw, 30px);
   border-radius: 12px;
   border: 1px dashed var(--panel-border);
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   text-align: center;
 }
 
@@ -107,7 +107,7 @@
 
 .chat-interface__speaker-label {
   margin-bottom: 6px;
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -139,7 +139,7 @@
   content: attr(data-language);
   display: block;
   margin-bottom: 6px;
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-family: inherit;
   font-size: 10px;
   font-weight: 800;
@@ -149,7 +149,7 @@
 
 .chat-interface__meta {
   font-size: 12px;
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   margin-top: 8px;
 }
 
@@ -167,7 +167,7 @@
 
 .chat-interface__action-card p {
   margin: 4px 0 0;
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-size: 13px;
   line-height: 1.4;
 }
@@ -185,7 +185,7 @@
 }
 
 .chat-interface__action-status {
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
@@ -343,7 +343,7 @@
 }
 
 .chat-interface__command-palette > span {
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -465,7 +465,7 @@
 .chat-interface__disclaimer {
   margin-top: 8px;
   font-size: 12px;
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   text-align: center;
 }
 

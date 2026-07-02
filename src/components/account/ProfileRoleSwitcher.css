@@ -6,7 +6,7 @@
 }
 
 .profile-role-switcher__label {
-  color: var(--muted-text, #9ca3af);
+  color: var(--app-fg-muted);
   font-weight: 600;
   white-space: nowrap;
 }

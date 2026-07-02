@@ -1,0 +1,7 @@
+---
+pid: 31300
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cd C:\\Users\\borah\\CareDroid-Clinical-AI; npx.cmd tsc --noEmit -p tsconfig.frontend.json 2>&1 | Select-String -Pattern \"careDroidUnifiedAiNode|CapacityCrisisMode|StaffWorkloadPanel|error TS\""
+started_at: 2026-07-01T22:11:06.386Z
+running_for_ms: 28160015 
+---

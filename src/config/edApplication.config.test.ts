@@ -15,7 +15,8 @@ describe('edApplication.config', () => {
   it('redirects retired extension prefixes into ED surfaces', async () => {
     vi.stubEnv('VITE_ED_SINGLE_APPLICATION', 'true');
     const mod = await import('./edApplication.config');
-    expect(mod.resolveEdExtensionRedirect('/start')).toBe('/emergency/whiteboard');
+    expect(mod.resolveEdExtensionRedirect('/start')).toBeNull();
+    expect(mod.resolveEdExtensionRedirect('/dashboard')).toBe('/emergency/command-center');
     expect(mod.resolveEdExtensionRedirect('/cosmos/viewer')).toBe('/emergency/whiteboard');
     expect(mod.resolveEdExtensionRedirect('/surveillance')).toBe('/emergency/settings');
   });

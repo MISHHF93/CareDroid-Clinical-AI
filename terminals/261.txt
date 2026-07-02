@@ -1,0 +1,22 @@
+---
+pid: 19736
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cmd /c \"cd /d C:\\Users\\borah\\CareDroid-Clinical-AI\\backend && npm run build 2>&1\""
+started_at: 2026-07-02T01:38:42.736Z
+running_for_ms: 15705118 
+---
+
+> caredroid-clinical-ai-backend@1.0.0 prebuild
+> rimraf dist
+
+
+> caredroid-clinical-ai-backend@1.0.0 build
+> nest build
+
+src/modules/emergency-os/emergency-os.services.ts:493:7 - error TS2739: Type '{ patient_created: string; journey_state_changed: string; clinician_assigned: string; reassessment_created: string; reassessment_completed: string; ems_arrival_created: string; ems_converted_to_patient: string; ... 7 more ...; administrative_automation_reviewed: string; }' is missing the following properties from type 'Record<WorkflowActionType, string>': staff_assigned, patient_note_added, operational_alert_dispatched, patient_escalated
+
+493 const WORKFLOW_LOG_TITLES: Record<WorkflowActionType, string> = {
+          ~~~~~~~~~~~~~~~~~~~
+
+Found 1 error(s).
+

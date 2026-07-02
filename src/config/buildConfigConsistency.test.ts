@@ -53,8 +53,9 @@ describe('build and service config consistency', () => {
     expect(devStack).toContain('VITE_API_PROXY_TARGET: backendOrigin');
     expect(devStack).toContain('PORT: backendPort');
     expect(devStack).toContain('FRONTEND_URL: frontendOrigin');
-    expect(devStack).toContain('Frontend: ${frontendOrigin}');
+    expect(devStack).toContain('App:      ${frontendOrigin}');
     expect(devStack).toContain('Backend:  http://localhost:${backendPort}');
+    expect(devStack).toContain('Health:   ${frontendOrigin}/health');
   });
 
   it('keeps optional ML compose enabling tied to the NLU sidecar profile', () => {

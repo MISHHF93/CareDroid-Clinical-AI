@@ -1,10 +1,11 @@
 import { useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import {
   CommandActionGraphicCard,
   CommandMetricGraphicCard,
 } from '../../components/graphics/CdlGraphicKit';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
+import { resolveUnifiedMetricRoute } from '../../config/unifiedOperationalIntelligence.registry';
 import { CARE_DROID_SCREEN_MODES } from '../../config/careDroidScreenModeRegistry';
 import { CAREDROID_PRODUCT } from '../../config/caredroidProduct.config';
 import { buildCommandCenterWorkflowActions } from '../../config/operationalWorkflow.config';
@@ -23,6 +24,9 @@ import {
 import { buildFullEmergencyCareJourneySnapshot } from '../../services/fullEmergencyCareJourneyService';
 import EdDataSourceBanner from '../../components/emergency/EdDataSourceBanner';
 import useEdRouteDataContext from '../../hooks/useEdRouteDataContext';
+import useUnifiedOperatingSurface from '../../hooks/useUnifiedOperatingSurface';
+import { resolveCommandCenterIntelligenceView } from '../../config/hospitalCommandCenterViews.config';
+import CommandCenterIntelligenceLens from '../../components/emergency/CommandCenterIntelligenceLens';
 import { EmergencyRoutePage } from './emergencyRouteShared';
 import PatientFlowStatusPanel from '../../components/emergency/PatientFlowStatusPanel';
 import AdministrativeAutomationReviewPanel from '../../components/emergency/AdministrativeAutomationReviewPanel';
@@ -30,6 +34,9 @@ import CommandCenterInsightsCharts from '../../components/emergency/CommandCente
 import './hospital-command-center.css';
 
 export default function HospitalCommandCenter() {
+  const location = useLocation();
+  const intelligenceView = resolveCommandCenterIntelligenceView(location.search);
+  const operatingSurface = useUnifiedOperatingSurface();
   const emergencyRole = useEmergencyRolePermissions();
   const { backendAvailable } = useEdRouteDataContext();
   const patients = useEmergencyStore((state) => state.patients);
@@ -138,10 +145,14 @@ export default function HospitalCommandCenter() {
         <>
           <EdDataSourceBanner
             envelope={{
-              source: backendAvailable ? 'backend' : 'local-store-fallback',
-              generatedAt: snapshot.generatedAt,
+              source: operatingSurface.hasBackendSnapshot
+                ? 'backend'
+                : backendAvailable
+                  ? 'backend'
+                  : 'local-store-fallback',
+              generatedAt: operatingSurface.apiEnvelope.generatedAt || snapshot.generatedAt,
             }}
-            loading={false}
+            loading={operatingSurface.apiLoading}
           />
           <div
             className={`hospital-command-center__status cdl-surface cdl-surface--operational-status hospital-command-center__status--${snapshot.tone}`}
@@ -233,7 +244,11 @@ export default function HospitalCommandCenter() {
                 value={metric.value}
                 detail={metric.detail}
                 tone={metric.tone}
-                route={metric.route || CANONICAL_ROUTES.emergencyCommandCenter}
+                route={
+                  metric.route ||
+                  resolveUnifiedMetricRoute(metric.id) ||
+                  CANONICAL_ROUTES.emergencyCommandCenter
+                }
               />
             ))}
           </div>
@@ -330,11 +345,14 @@ export default function HospitalCommandCenter() {
         </div>
       }
       history={
-        <div role="note" className="emergency-route-card emergency-route-copilot-hint cdl-surface cdl-surface--inactive">
-          {CAREDROID_PRODUCT.safetyLine} Historical analytics and shift reports live under{' '}
-          <Link to={CANONICAL_ROUTES.emergencyAnalytics}>Analytics</Link> — this command center shows
-          only what needs action now.
-        </div>
+        <>
+          {intelligenceView ? <CommandCenterIntelligenceLens view={intelligenceView} /> : null}
+          <div role="note" className="emergency-route-card emergency-route-copilot-hint cdl-surface cdl-surface--inactive">
+            {CAREDROID_PRODUCT.safetyLine} Historical analytics and shift reports live under{' '}
+            <Link to={CANONICAL_ROUTES.emergencyAnalytics}>Analytics</Link> — this command center shows
+            only what needs action now.
+          </div>
+        </>
       }
     />
   );

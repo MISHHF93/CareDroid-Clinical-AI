@@ -1,0 +1,132 @@
+---
+pid: 13284
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cmd /c \"cd /d C:\\Users\\borah\\CareDroid-Clinical-AI && node node_modules\\vitest\\vitest.mjs run src/routing/canonicalRouteRedirects.test.ts src/config/edApplication.config.test.ts src/config/inShellRouteAllowlist.test.ts src/config/commandCenterScreenModel.test.ts src/config/edRouteAliasRegistry.test.ts src/services/pilotExtensionRouteGuard.test.ts src/config/edOperatingSurface.config.test.ts src/config/unified-navigation.config.test.ts --pool=forks --maxWorkers=1\""
+started_at: 2026-07-02T19:31:14.323Z
+running_for_ms: 3889999  
+---
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+ ✓ src/config/inShellRouteAllowlist.test.ts (24 tests) 18ms
+ ✓ src/services/pilotExtensionRouteGuard.test.ts (3 tests) 11ms
+ ✓ src/config/edApplication.config.test.ts (4 tests) 35ms
+ ❯ src/config/unified-navigation.config.test.ts (13 tests | 2 failed) 55ms
+     × exports the exact requested CareDroid nav items in order 30ms
+     × keeps every item complete and route-backed 6ms
+     ✓ scopes pilot mode to core ED nav and hides extension surfaces 5ms
+     ✓ uses distinct pilot sidebar icon keys for visual scanning 1ms
+     ✓ shows the pilot surface to admin and read-only users 1ms
+     ✓ resolves requested feature gate aliases to registered feature ids 0ms
+     ✓ hides standalone intake nav for registration clerks 0ms
+     ✓ scopes reception clerk pilot nav to front-desk utilities 1ms
+     ✓ hides extension integrations nav in pilot while keeping settings 0ms
+     ✓ annotates navigation items with normalized suite metadata 0ms
+     ✓ assigns suite metadata to every pilot visible nav item 3ms
+     ✓ keeps physician navigation whiteboard-first with workflows on patient cards 1ms
+     ✓ normalizes aliases and defaults unknown roles consistently 1ms
+ ✓ src/config/edOperatingSurface.config.test.ts (5 tests) 5ms
+ ✓ src/routing/canonicalRouteRedirects.test.ts (5 tests) 10ms
+ ✓ src/config/edRouteAliasRegistry.test.ts (3 tests) 6ms
+ ✓ src/config/commandCenterScreenModel.test.ts (4 tests) 6ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+
+ Test Files  1 failed | 7 passed (8)
+      Tests  2 failed | 59 passed (61)
+   Start at  15:31:15
+   Duration  17.43s (transform 1.07s, setup 2.73s, import 1.48s, tests 146ms, environment 11.04s)
+
+ FAIL  src/config/unified-navigation.config.test.ts > unified navigation config > exports the exact requested CareDroid nav items in order
+AssertionError: expected [ { id: 'reception', …(4) }, …(36) ] to deeply equal [ { id: 'reception', …(4) }, …(32) ]
+
+- Expected
++ Received
+
+@@ -41,10 +41,17 @@
+      "label": "ED Readiness",
+      "route": "/emergency/ed-readiness",
+    },
+    {
+      "featureGate": null,
++     "icon": "stethoscope",
++     "id": "triage",
++     "label": "Triage",
++     "route": "/triage",
++   },
++   {
++     "featureGate": null,
+      "icon": "alerts",
+      "id": "alerts",
+      "label": "Critical Alerts",
+      "route": "/emergency/alerts",
+    },
+@@ -101,10 +108,31 @@
+      "featureGate": "capacity_intel",
+      "icon": "capacity",
+      "id": "capacity",
+      "label": "Flow & Capacity",
+      "route": "/emergency/capacity",
++   },
++   {
++     "featureGate": null,
++     "icon": "map",
++     "id": "hospital-map",
++     "label": "Hospital Map",
++     "route": "/hospital-map",
++   },
++   {
++     "featureGate": null,
++     "icon": "chart-bar",
++     "id": "executive",
++     "label": "Executive",
++     "route": "/executive",
++   },
++   {
++     "featureGate": null,
++     "icon": "activity",
++     "id": "predictive-analytics",
++     "label": "Predictive AI",
++     "route": "/predictive-analytics",
+    },
+    {
+      "featureGate": "referral_intel",
+      "icon": "referrals",
+      "id": "referrals",
+@@ -156,11 +184,11 @@
+    {
+      "featureGate": null,
+      "icon": "platform",
+      "id": "platform",
+      "label": "Platform",
+-     "route": "/workspace",
++     "route": "/start",
+    },
+    {
+      "featureGate": null,
+      "icon": "activity",
+      "id": "pulse",
+
+ ❯ src/config/unified-navigation.config.test.ts:258:23
+    256|   it('exports the exact requested CareDroid nav items in order', () =>…
+    257|     expect(DEFAULT_ROUTE).toBe('/emergency/reception');
+    258|     expect(NAV_ITEMS).toEqual(REQUESTED_ITEMS);
+       |                       ^
+    259|     expect(
+    260|       NAVIGATION_ITEMS.map(({ id, label, icon, route, featureGate }) =…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/config/unified-navigation.config.test.ts > unified navigation config > keeps every item complete and route-backed
+AssertionError: Predictive AI: expected 0 to be greater than 0
+ ❯ src/config/unified-navigation.config.test.ts:279:45
+    277|       expect(item.route, item.label).toMatch(/^\//);
+    278|       expect(item.icon, item.label).toMatch(/^[a-z0-9-]+$/);
+    279|       expect(item.roles.length, item.label).toBeGreaterThan(0);
+       |                                             ^
+    280|       expect(typeof item.isEmergencyCore, item.label).toBe('boolean');
+    281|     }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+

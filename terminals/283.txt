@@ -1,0 +1,18 @@
+---
+pid: 30692
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "powershell -NoProfile -Command \"Set-Location 'C:\\Users\\borah\\CareDroid-Clinical-AI'; node node_modules\\vitest\\vitest.mjs run src/config/toolsConsoleRoutes.test.ts src/pages/tools/Calculators.route.test.tsx\""
+started_at: 2026-07-02T05:19:47.515Z
+running_for_ms: 2439998  
+---
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+ ✓ src/pages/tools/Calculators.route.test.tsx (23 tests) 20ms
+ ✓ src/config/toolsConsoleRoutes.test.ts (8 tests) 14ms
+
+ Test Files  2 passed (2)
+      Tests  31 passed (31)
+   Start at  01:19:54
+   Duration  10.36s (transform 1.07s, setup 1.34s, import 1.27s, tests 34ms, environment 6.60s)
+

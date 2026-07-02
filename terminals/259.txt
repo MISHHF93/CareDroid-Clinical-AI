@@ -1,0 +1,15 @@
+---
+pid: 2480
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cmd /c \"cd /d C:\\Users\\borah\\CareDroid-Clinical-AI\\backend && npx jest src/modules/platform-assets/entitlement-launch.util.spec.ts src/modules/fleet/fleet.controller.spec.ts src/modules/emergency-os/administrative-automation-orchestration.lib.spec.ts --no-cache\""
+started_at: 2026-07-02T01:32:58.150Z
+running_for_ms: 16050000 
+---
+PASS src/modules/platform-assets/entitlement-launch.util.spec.ts (18.297 s)
+PASS src/modules/emergency-os/administrative-automation-orchestration.lib.spec.ts (18.943 s)
+PASS src/modules/fleet/fleet.controller.spec.ts (21.842 s)
+
+Test Suites: 3 passed, 3 total
+Tests:       8 passed, 8 total
+Snapshots:   0 total
+Time:        23.132 s

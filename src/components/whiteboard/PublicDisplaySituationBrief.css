@@ -1,0 +1,12 @@
+.public-display-situation-brief {
+  margin: 0 0 16px;
+}
+
+.public-waiting-display--kiosk .public-display-situation-brief {
+  margin-bottom: 20px;
+}
+
+.public-display-situation-brief .cdl-situation-graphic-card__value {
+  font-size: 0.9375rem;
+  line-height: 1.35;
+}

@@ -280,10 +280,15 @@ describe('Vite proxy and ports', () => {
 
   it('keeps local example URLs aligned to Vite dev port and metrics route', () => {
     expect(rootEnvExample).toContain('VITE_PRIVACY_POLICY_URL=http://localhost:8000/privacy');
+    expect(rootEnvExample).toContain('GOOGLE_CALLBACK_URL=http://localhost:8000/api/auth/google/callback');
+    expect(rootEnvExample).toContain('LINKEDIN_CALLBACK_URL=http://localhost:8000/api/auth/linkedin/callback');
     expect(rootEnvExample).not.toMatch(/localhost:5173/);
+    expect(rootEnvExample).not.toMatch(/localhost:4173/);
     expect(backendEnvExample).toContain('FRONTEND_URL=http://localhost:8000');
+    expect(backendEnvExample).toContain('GOOGLE_CALLBACK_URL=http://localhost:8000/api/auth/google/callback');
     expect(backendEnvExample).toContain('STRIPE_SUCCESS_URL=http://localhost:8000/subscription/success');
     expect(backendEnvExample).not.toMatch(/localhost:5173/);
+    expect(backendEnvExample).not.toMatch(/localhost:4173/);
     expect(backendMainSource).toContain('http://localhost:${port}/api/metrics');
     expect(backendMainSource).not.toContain('http://localhost:${port}/metrics');
   });

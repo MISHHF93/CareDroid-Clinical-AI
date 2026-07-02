@@ -58,6 +58,13 @@ const REQUESTED_ITEMS = [
     featureGate: null,
   },
   {
+    id: 'triage',
+    label: 'Triage',
+    icon: 'stethoscope',
+    route: '/triage',
+    featureGate: null,
+  },
+  {
     id: 'alerts',
     label: 'Critical Alerts',
     icon: 'alerts',
@@ -121,6 +128,27 @@ const REQUESTED_ITEMS = [
     featureGate: 'capacity_intel',
   },
   {
+    id: 'hospital-map',
+    label: 'Hospital Map',
+    icon: 'map',
+    route: '/hospital-map',
+    featureGate: null,
+  },
+  {
+    id: 'executive',
+    label: 'Executive',
+    icon: 'chart-bar',
+    route: '/executive',
+    featureGate: null,
+  },
+  {
+    id: 'predictive-analytics',
+    label: 'Predictive AI',
+    icon: 'activity',
+    route: '/predictive-analytics',
+    featureGate: null,
+  },
+  {
     id: 'referrals',
     label: 'Referrals',
     icon: 'referrals',
@@ -173,7 +201,7 @@ const REQUESTED_ITEMS = [
     id: 'platform',
     label: 'Platform',
     icon: 'platform',
-    route: '/workspace',
+    route: '/start',
     featureGate: null,
   },
   {

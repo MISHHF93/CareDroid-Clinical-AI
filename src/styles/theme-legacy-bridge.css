@@ -6,6 +6,7 @@
  *   --app-panel-border, --app-divider-on-surface, --app-overlay-on-surface).
  * - Legacy aliases below stay for existing components; migrate toward --app-* when touching files.
  */
+:root,
 html {
   --navy-bg: var(--app-bg);
   --navy-ink: var(--app-navy-ink);

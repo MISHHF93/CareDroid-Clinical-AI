@@ -39,7 +39,17 @@
   --medical-shadow-soft: 0 4px 14px rgba(15, 23, 42, 0.06);
   --medical-shadow-lift: 0 12px 32px rgba(15, 23, 42, 0.08);
   --medical-accent-tint: rgba(14, 165, 233, 0.1);
+  --medical-accent-tint-faint: color-mix(in srgb, var(--medical-accent) 5%, transparent);
+  --medical-accent-tint-subtle: color-mix(in srgb, var(--medical-accent) 8%, transparent);
+  --medical-accent-tint-mid: color-mix(in srgb, var(--medical-accent) 12%, transparent);
+  --medical-accent-tint-strong: color-mix(in srgb, var(--medical-accent) 15%, transparent);
+  --medical-accent-ring: color-mix(in srgb, var(--medical-accent) 20%, transparent);
+  --medical-accent-ring-strong: color-mix(in srgb, var(--medical-accent) 35%, transparent);
+  --medical-accent-ring-bold: color-mix(in srgb, var(--medical-accent) 42%, transparent);
   --medical-accent-border: rgba(14, 165, 233, 0.32);
+  --medical-danger-fg: var(--semantic-critical);
+  --medical-danger-bg: var(--semantic-critical-bg);
+  --medical-danger-border: var(--semantic-critical-border);
 
   /* —— Navigation rail —— */
   --nav-surface: var(--medical-white);

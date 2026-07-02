@@ -73,8 +73,7 @@ export type EdExtensionRedirect = Readonly<{
  * Non-ED extension paths fold back into the ED application (longest-prefix wins).
  */
 export const ED_EXTENSION_ROUTE_REDIRECTS: readonly EdExtensionRedirect[] = Object.freeze([
-  { prefix: '/start',                     to: ED_APPLICATION.defaultHomeRoute,           reason: 'platform-entry-hub' },
-  { prefix: '/dashboard',                 to: CANONICAL_ROUTES.emergencyWhiteboard,      reason: 'legacy-dashboard' },
+  { prefix: '/dashboard',                 to: CANONICAL_ROUTES.emergencyCommandCenter,   reason: 'legacy-dashboard' },
   { prefix: '/app',                       to: CANONICAL_ROUTES.emergencyWhiteboard,      reason: 'legacy-app-alias' },
 
   { prefix: '/emergency/intake',          to: CANONICAL_ROUTES.emergencyReception,       reason: 'intake-through-reception' },

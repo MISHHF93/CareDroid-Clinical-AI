@@ -44,7 +44,7 @@ export default function HIPAANotice() {
           }}>
             HIPAA Compliance & Addendum
           </h1>
-          <p style={{ color: 'var(--muted-text)' }}>
+          <p style={{ color: 'var(--app-fg-muted)' }}>
             Health Insurance Portability and Accountability Act (HIPAA) compliance information
           </p>
         </div>
@@ -61,7 +61,7 @@ export default function HIPAANotice() {
             <h2 style={{ fontSize: '20px', fontWeight: 600, marginBottom: '12px' }}>
               1. Protected Health Information (PHI)
             </h2>
-            <p style={{ color: 'var(--muted-text)', marginBottom: '8px' }}>
+            <p style={{ color: 'var(--app-fg-muted)', marginBottom: '8px' }}>
               CareDroid is designed to handle Protected Health Information (PHI) in compliance with HIPAA regulations. All medical records, clinical documentation, and patient identifiers are encrypted and secured.
             </p>
           </div>
@@ -70,10 +70,10 @@ export default function HIPAANotice() {
             <h2 style={{ fontSize: '20px', fontWeight: 600, marginBottom: '12px' }}>
               2. Privacy Safeguards
             </h2>
-            <p style={{ color: 'var(--muted-text)', marginBottom: '8px' }}>
+            <p style={{ color: 'var(--app-fg-muted)', marginBottom: '8px' }}>
               We implement the following HIPAA Privacy Rule safeguards:
             </p>
-            <ul style={{ color: 'var(--muted-text)', paddingLeft: '20px' }}>
+            <ul style={{ color: 'var(--app-fg-muted)', paddingLeft: '20px' }}>
               <li>Administrative safeguards: Policies and procedures for access controls</li>
               <li>Physical safeguards: Facility and equipment access controls</li>
               <li>Technical safeguards: Encryption, authentication, audit controls</li>
@@ -85,7 +85,7 @@ export default function HIPAANotice() {
             <h2 style={{ fontSize: '20px', fontWeight: 600, marginBottom: '12px' }}>
               3. Breach Notification
             </h2>
-            <p style={{ color: 'var(--muted-text)' }}>
+            <p style={{ color: 'var(--app-fg-muted)' }}>
               In the unlikely event of a breach of unsecured PHI, we will notify affected individuals, HHS, and if applicable, the media, without unreasonable delay but no later than 60 calendar days after discovery.
             </p>
           </div>
@@ -94,10 +94,10 @@ export default function HIPAANotice() {
             <h2 style={{ fontSize: '20px', fontWeight: 600, marginBottom: '12px' }}>
               4. Patient Rights
             </h2>
-            <p style={{ color: 'var(--muted-text)', marginBottom: '8px' }}>
+            <p style={{ color: 'var(--app-fg-muted)', marginBottom: '8px' }}>
               You have the right to:
             </p>
-            <ul style={{ color: 'var(--muted-text)', paddingLeft: '20px' }}>
+            <ul style={{ color: 'var(--app-fg-muted)', paddingLeft: '20px' }}>
               <li>Request access to your PHI</li>
               <li>Receive an accounting of disclosures</li>
               <li>Request amendment of your records</li>
@@ -107,19 +107,19 @@ export default function HIPAANotice() {
           </div>
 
           <div style={{
-            background: 'rgba(0, 255, 136, 0.1)',
-            border: '1px solid rgba(0, 255, 136, 0.3)',
+            background: 'var(--medical-accent-tint)',
+            border: '1px solid color-mix(in srgb, var(--app-accent-interactive) 30%, transparent)',
             borderRadius: '8px',
             padding: '16px',
             marginBottom: '32px'
           }}>
             <h3 style={{ margin: '0 0 8px 0', color: 'var(--accent-1)' }}>HIPAA Privacy Officer</h3>
-            <p style={{ margin: '0', color: 'var(--muted-text)', fontSize: '14px' }}>
+            <p style={{ margin: '0', color: 'var(--app-fg-muted)', fontSize: '14px' }}>
               For HIPAA-related inquiries: <a href="mailto:hipaa@caredroid.ai" style={{ color: 'var(--accent-1)' }}>hipaa@caredroid.ai</a>
             </p>
           </div>
 
-          <p style={{ color: 'var(--muted-text)', fontSize: '13px' }}>
+          <p style={{ color: 'var(--app-fg-muted)', fontSize: '13px' }}>
             Last Updated: February 2026 | CareDroid maintains full HIPAA compliance and can execute Business Associate Agreements (BAA) upon request
           </p>
         </div>

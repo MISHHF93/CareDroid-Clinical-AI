@@ -44,7 +44,7 @@ export default function GDPRNotice() {
           }}>
             GDPR Notice
           </h1>
-          <p style={{ color: 'var(--muted-text)' }}>
+          <p style={{ color: 'var(--app-fg-muted)' }}>
             General Data Protection Regulation (GDPR) compliance information for EU residents
           </p>
         </div>
@@ -61,10 +61,10 @@ export default function GDPRNotice() {
             <h2 style={{ fontSize: '20px', fontWeight: 600, marginBottom: '12px' }}>
               1. Data Protection Rights
             </h2>
-            <p style={{ color: 'var(--muted-text)', marginBottom: '8px' }}>
+            <p style={{ color: 'var(--app-fg-muted)', marginBottom: '8px' }}>
               Under GDPR, you have the right to:
             </p>
-            <ul style={{ color: 'var(--muted-text)', paddingLeft: '20px' }}>
+            <ul style={{ color: 'var(--app-fg-muted)', paddingLeft: '20px' }}>
               <li>Access your personal data</li>
               <li>Rectify inaccurate data</li>
               <li>Request deletion (Right to be Forgotten)</li>
@@ -79,7 +79,7 @@ export default function GDPRNotice() {
             <h2 style={{ fontSize: '20px', fontWeight: 600, marginBottom: '12px' }}>
               2. Data Processing
             </h2>
-            <p style={{ color: 'var(--muted-text)' }}>
+            <p style={{ color: 'var(--app-fg-muted)' }}>
               We process personal data only with your explicit consent. Your medical and clinical data is encrypted and stored securely according to GDPR Article 32 requirements.
             </p>
           </div>
@@ -88,7 +88,7 @@ export default function GDPRNotice() {
             <h2 style={{ fontSize: '20px', fontWeight: 600, marginBottom: '12px' }}>
               3. Data Retention
             </h2>
-            <p style={{ color: 'var(--muted-text)' }}>
+            <p style={{ color: 'var(--app-fg-muted)' }}>
               Your data is retained only as long as necessary for the purposes stated. You can request deletion at any time, and we will comply within 30 days unless legal obligations require retention.
             </p>
           </div>
@@ -97,25 +97,25 @@ export default function GDPRNotice() {
             <h2 style={{ fontSize: '20px', fontWeight: 600, marginBottom: '12px' }}>
               4. International Transfers
             </h2>
-            <p style={{ color: 'var(--muted-text)' }}>
+            <p style={{ color: 'var(--app-fg-muted)' }}>
               If your data is transferred outside the EU/EEA, we ensure adequate safeguards are in place as per GDPR Chapter 5.
             </p>
           </div>
 
           <div style={{
-            background: 'rgba(0, 255, 136, 0.1)',
-            border: '1px solid rgba(0, 255, 136, 0.3)',
+            background: 'var(--medical-accent-tint)',
+            border: '1px solid color-mix(in srgb, var(--app-accent-interactive) 30%, transparent)',
             borderRadius: '8px',
             padding: '16px',
             marginBottom: '32px'
           }}>
             <h3 style={{ margin: '0 0 8px 0', color: 'var(--accent-1)' }}>Contact Our Data Protection Officer</h3>
-            <p style={{ margin: '0', color: 'var(--muted-text)', fontSize: '14px' }}>
+            <p style={{ margin: '0', color: 'var(--app-fg-muted)', fontSize: '14px' }}>
               For GDPR-related inquiries: <a href="mailto:dpo@caredroid.ai" style={{ color: 'var(--accent-1)' }}>dpo@caredroid.ai</a>
             </p>
           </div>
 
-          <p style={{ color: 'var(--muted-text)', fontSize: '13px' }}>
+          <p style={{ color: 'var(--app-fg-muted)', fontSize: '13px' }}>
             Last Updated: February 2026 | For full GDPR information, see our Privacy Policy
           </p>
         </div>

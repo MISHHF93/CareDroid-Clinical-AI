@@ -42,7 +42,7 @@ import { isSimulationModeActive } from '../services/simulationModeService';
 import SessionChromeBar from './chrome/SessionChromeBar';
 import ShellRouteTab from './chrome/ShellRouteTab';
 import OperationalAlarmDock from './chrome/OperationalAlarmDock';
-import { RouteChromeProvider } from '../contexts/RouteChromeContext';
+import { RouteChromeProvider, useRouteChrome } from '../contexts/RouteChromeContext';
 import { NotificationShellProvider } from '../contexts/NotificationShellContext';
 import SidebarNotificationPanel from './SidebarNotificationPanel';
 import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
@@ -234,6 +234,17 @@ export function AppShell({ children }: AppShellProps) {
       </HelpHubProvider>
     </PractitionerVisibilityProvider>
   );
+}
+
+function RouteChromeReset() {
+  const location = useLocation();
+  const { clearChrome } = useRouteChrome();
+
+  useEffect(() => {
+    clearChrome();
+  }, [clearChrome, location.pathname]);
+
+  return null;
 }
 
 function AppShellFrame({ children }: AppShellProps) {
@@ -785,6 +796,7 @@ function AppShellFrame({ children }: AppShellProps) {
       {!useKioskShell ? <SidebarNotificationPanel /> : null}
       <div className="emergency-app-shell__main-column">
         <RouteChromeProvider>
+          <RouteChromeReset />
           {useWallKioskChrome ? (
             <header className="emergency-wall-kiosk-header">
               <strong>{screenCapabilities.label}</strong>

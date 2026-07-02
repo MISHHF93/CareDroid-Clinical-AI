@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-01T21:27:22.485Z",
+  "generatedAt": "2026-07-02T19:33:01.094Z",
   "goal": "Verify every emergency page is reachable via sidebar, reception embed, or retained route",
   "exposure": {
     "stages": [
@@ -45,7 +45,6 @@
       "/emergency/command-center",
       "/emergency/whiteboard",
       "/emergency/patients",
-      "/emergency/journey",
       "/emergency/dispatch",
       "/emergency/ems",
       "/emergency/ed-readiness",
@@ -85,11 +84,6 @@
       {
         "route": "/emergency/patients",
         "surfaceId": "patients",
-        "via": "sidebar"
-      },
-      {
-        "route": "/emergency/journey",
-        "surfaceId": "journey",
         "via": "sidebar"
       },
       {

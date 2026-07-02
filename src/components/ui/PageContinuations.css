@@ -28,7 +28,7 @@
 
 .page-continuations__panel p {
   margin: 0;
-  color: var(--app-text-muted, var(--muted-text));
+  color: var(--app-text-muted, var(--app-fg-muted));
   font-size: var(--app-type-small, var(--font-14));
   line-height: var(--type-small-line-height, 1.45);
 }
@@ -77,7 +77,7 @@
 }
 
 .page-continuations__links span {
-  color: var(--app-text-muted, var(--muted-text));
+  color: var(--app-text-muted, var(--app-fg-muted));
   font-size: var(--app-type-caption, var(--font-12));
 }
 

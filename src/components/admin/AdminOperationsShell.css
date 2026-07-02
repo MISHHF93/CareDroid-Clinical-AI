@@ -13,7 +13,7 @@
   font-size: 0.72rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
 }
 
 .admin-ops-shell__title {
@@ -23,13 +23,13 @@
 
 .admin-ops-shell__subtitle {
   margin: 8px 0 0;
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   max-width: 720px;
 }
 
 .admin-ops-shell__role {
   margin: 8px 0 0;
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   max-width: 720px;
   font-size: 0.9rem;
 }
@@ -47,7 +47,7 @@
   padding: 8px 12px;
   border-radius: 999px;
   text-decoration: none;
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-size: 0.85rem;
   border: 1px solid transparent;
 }
@@ -87,7 +87,7 @@
 
 .admin-ops-card p,
 .admin-ops-card li {
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-size: 0.875rem;
 }
 
@@ -130,7 +130,7 @@
 }
 
 .admin-ops-table th {
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-weight: 600;
 }
 
@@ -149,7 +149,7 @@
 
 .admin-ops-page-header__lead {
   margin: 0;
-  color: var(--muted-text);
+  color: var(--app-fg-muted);
   font-size: 0.875rem;
   max-width: 720px;
 }

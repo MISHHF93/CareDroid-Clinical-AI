@@ -1,0 +1,16 @@
+---
+pid: 23612
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cd C:\\Users\\borah\\CareDroid-Clinical-AI; npx.cmd tsc --noEmit -p tsconfig.frontend.json 2>&1 | Select-Object -Last 20"
+started_at: 2026-07-01T22:09:09.703Z
+running_for_ms: 28280005 
+---
+src/components/CapacityCrisisMode.tsx(158,9): error TS2353: Object literal may only specify known properties, and 'domain' does not exist in type 'AIRequest & { capabilityId?: string | undefined; platformServiceId?: string | undefined; }'.
+src/components/StaffWorkloadPanel.tsx(239,9): error TS2353: Object literal may only specify known properties, and 'domain' does not exist in type 'AIRequest & { capabilityId?: string | undefined; platformServiceId?: string | undefined; }'.
+src/services/careDroidUnifiedAiNode.ts(73,5): error TS2345: Argument of type '{ context?: Record<string, unknown> | undefined; }' is not assignable to parameter of type 'AIChiefConversationalRequest'.
+  Type '{ context?: Record<string, unknown> | undefined; }' is missing the following properties from type 'AIRequest': systemPrompt, requestType
+src/services/careDroidUnifiedAiNode.ts(74,7): error TS2345: Argument of type 'UnifiedAiConversationalRequest' is not assignable to parameter of type '{ context?: Record<string, unknown> | undefined; }'.
+  Types of property 'context' are incompatible.
+    Type 'Record<string, unknown> | DepartmentContext | undefined' is not assignable to type 'Record<string, unknown> | undefined'.
+      Type 'DepartmentContext' is not assignable to type 'Record<string, unknown>'.
+        Index signature for type 'string' is missing in type 'DepartmentContext'.

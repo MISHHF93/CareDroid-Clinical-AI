@@ -1,0 +1,108 @@
+---
+pid: 5196
+cwd: "C:\Users\borah\CareDroid-Clinical-AI"
+command: "cd C:\\Users\\borah\\CareDroid-Clinical-AI; npm.cmd run test:run:stable -- src/services/patientJourneyAiDecisionService.test.ts src/services/automationEngine.entitlement.test.ts src/services/automationEngine.test.ts 2>&1"
+started_at: 2026-07-01T22:40:25.321Z
+running_for_ms: 26400006 
+---
+
+> caredroid-clinical-ai@1.0.0 test:run:stable
+> vitest run --pool=threads --maxWorkers=1 src/services/patientJourneyAiDecisionService.test.ts src/services/automationEngine.entitlement.test.ts src/services/automationEngine.test.ts
+
+
+ RUN  v4.1.9 C:/Users/borah/CareDroid-Clinical-AI
+
+ ✓ src/services/automationEngine.test.ts (3 tests) 15ms
+stdout | src/services/patientJourneyAiDecisionService.test.ts > patientJourneyAiDecisionService > evaluates triage, intake, and critical assessments through CareDroid AI node
+[AI_AUDIT] {
+  userId: 'unknown',
+  tenantId: 'unknown',
+  module: 'careDroidAI',
+  action: 'route_intent',
+  purpose: 'Support nurse triage prioritization using symptoms, vitals, pain, arrival mode, and capacity. Never make an autonomous triage decision.',
+  result: 'success',
+  requestType: 'triage_recommendation',
+  inputPreview: '{"intent":"triage_recommendation","inputFields":["age","allergies","arrivalMode","chiefComplaint","currentWaitTime","existingConditions","medications","mrn","operationalFlags","painLevel","patientId","patientName","patientState","registrationComplete","sex","symptoms","triageLevel","triagePending","vitals"],"sourceScreen":"administrative_automation_engine"}',
+  outputPreview: '{"status":"success","confidence":0.85,"warningCount":2,"nextActionCount":3}',
+  safety: {
+    requiresHumanReview: true,
+    blocked: false,
+    reasons: [
+      'Emergency red flags require immediate licensed clinician review.',
+      'This AI output is decision support only and must be reviewed by a licensed clinician.'
+    ]
+  },
+  timestamp: '2026-07-01T22:40:44.587Z'
+}
+[AI_AUDIT] {
+  userId: 'unknown',
+  tenantId: 'unknown',
+  module: 'careDroidAI',
+  action: 'route_intent',
+  purpose: 'Normalize intake information, identify missing data, suggest receptionist follow-up questions, and flag urgent symptoms for clinician review.',
+  result: 'success',
+  requestType: 'patient_intake_assist',
+  inputPreview: '{"intent":"patient_intake_assist","inputFields":["age","allergies","arrivalMode","chiefComplaint","currentWaitTime","existingConditions","medications","mrn","operationalFlags","painLevel","patientId","patientName","patientState","registrationComplete","sex","symptoms","triageLevel","triagePending","vitals"],"sourceScreen":"administrative_automation_engine"}',
+  outputPreview: '{"status":"success","confidence":0.68,"warningCount":3,"nextActionCount":3}',
+  safety: {
+    requiresHumanReview: true,
+    blocked: false,
+    reasons: [
+      'Recommended field "arrivalMode" is missing for patient_intake_assist.',
+      'Intake data is incomplete.',
+      'This AI output is decision support only and must be reviewed by a licensed clinician.'
+    ]
+  },
+  timestamp: '2026-07-01T22:40:44.589Z'
+}
+[AI_AUDIT] {
+  userId: 'unknown',
+  tenantId: 'unknown',
+  module: 'careDroidAI',
+  action: 'route_intent',
+  purpose: 'Assess critical alert severity from complaint, symptoms, vitals, pediatric/pregnancy context, acknowledgement state, and red flags. Use possible/suspected language only.',
+  result: 'success',
+  requestType: 'critical_alert_assessment',
+  inputPreview: '{"intent":"critical_alert_assessment","inputFields":["age","allergies","arrivalMode","chiefComplaint","currentWaitTime","existingConditions","medications","mrn","operationalFlags","painLevel","patientId","patientName","patientState","registrationComplete","sex","symptoms","triageLevel","triagePending","vitals"],"sourceScreen":"administrative_automation_engine"}',
+  outputPreview: '{"status":"success","confidence":0.84,"warningCount":2,"nextActionCount":3}',
+  safety: {
+    requiresHumanReview: true,
+    blocked: false,
+    reasons: [
+      'Critical or high alert requires acknowledgement.',
+      'This AI output is decision support only and must be reviewed by a licensed clinician.'
+    ]
+  },
+  timestamp: '2026-07-01T22:40:44.590Z'
+}
+
+stdout | src/services/patientJourneyAiDecisionService.test.ts > patientJourneyAiDecisionService > evaluates triage, intake, and critical assessments through CareDroid AI node
+[AI_AUDIT] {
+  userId: 'unknown',
+  tenantId: 'unknown',
+  module: 'careDroidAI',
+  action: 'route_intent',
+  purpose: 'Summarize patient context for handoff with missing information, active risks, and next workflow actions.',
+  result: 'success',
+  requestType: 'patient_summary',
+  inputPreview: '{"intent":"patient_summary","inputFields":["age","allergies","arrivalMode","chiefComplaint","currentWaitTime","existingConditions","medicalHistory","medications","mrn","operationalFlags","painLevel","patientId","patientName","patientState","registrationComplete","sex","symptoms","triageLevel","triageNotes","triagePending","vitals"],"sourceScreen":"administrative_automation_engine"}',
+  outputPreview: '{"status":"success","confidence":0.66,"warningCount":2,"nextActionCount":2}',
+  safety: {
+    requiresHumanReview: true,
+    blocked: false,
+    reasons: [
+      'Patient summary has incomplete source data.',
+      'This AI output is decision support only and must be reviewed by a licensed clinician.'
+    ]
+  },
+  timestamp: '2026-07-01T22:40:44.591Z'
+}
+
+ ✓ src/services/patientJourneyAiDecisionService.test.ts (2 tests) 23ms
+ ✓ src/services/automationEngine.entitlement.test.ts (2 tests) 14ms
+
+ Test Files  3 passed (3)
+      Tests  7 passed (7)
+   Start at  18:40:31
+   Duration  17.19s (transform 1.33s, setup 3.00s, import 1.55s, tests 52ms, environment 10.84s)
+

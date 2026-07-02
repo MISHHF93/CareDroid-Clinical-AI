@@ -4,6 +4,7 @@ import { EMERGENCY_ACTIONS, EMERGENCY_ROLE_IDS } from './emergencyRolePermission
 import {
   COMMAND_CENTER_PRIMARY_WIDGETS,
   COMMAND_CENTER_SCREEN_WIDGETS,
+  getCommandCenterAuthorityPath,
   getCommandCenterWhiteboardPath,
   resolveCommandCenterScreenCapabilities,
 } from './commandCenterScreenModel';
@@ -21,7 +22,11 @@ describe('commandCenterScreenModel', () => {
     action === 'capacity.manage' ||
     action === 'queue.move';
 
-  it('builds command center whiteboard path', () => {
+  it('routes command authority to Hospital Command Center', () => {
+    expect(getCommandCenterAuthorityPath()).toBe(CANONICAL_ROUTES.emergencyCommandCenter);
+  });
+
+  it('keeps whiteboard path for patient-flow drill-down', () => {
     expect(getCommandCenterWhiteboardPath()).toBe(CANONICAL_ROUTES.emergencyWhiteboard);
   });
 
@@ -81,6 +86,8 @@ describe('commandCenterScreenModel', () => {
     expect(command.hidePatientGrid).toBe(true);
     expect(command.hideCommandLayer).toBe(true);
     expect(command.defaultFocus).toBe(COMMAND_CENTER_SCREEN_WIDGETS.arrivalsByHour);
+    expect(command.commandCenterPath).toBe(CANONICAL_ROUTES.emergencyCommandCenter);
+    expect(command.defaultLandingRoute).toBe(CANONICAL_ROUTES.emergencyCommandCenter);
     expect(command.analyticsPath).toBe(CANONICAL_ROUTES.emergencyAnalytics);
     expect(command.canPerform('central-review')).toBe(true);
   });
