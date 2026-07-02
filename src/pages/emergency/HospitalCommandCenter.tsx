@@ -5,6 +5,7 @@ import {
   CommandMetricGraphicCard,
 } from '../../components/graphics/CdlGraphicKit';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
+import { CARE_DROID_SCREEN_MODES } from '../../config/careDroidScreenModeRegistry';
 import { CAREDROID_PRODUCT } from '../../config/caredroidProduct.config';
 import { buildCommandCenterWorkflowActions } from '../../config/operationalWorkflow.config';
 import {
@@ -40,7 +41,7 @@ export default function HospitalCommandCenter() {
   const patientFlowSnapshot = useEmergencyStore((state) => state.patientFlowSnapshot);
   const administrativeAutomationQueue = useEmergencyStore((state) => state.administrativeAutomationQueue);
   const operationalIntelligence = useOperationalIntelligence({
-    screenMode: 'command_center',
+    screenMode: CARE_DROID_SCREEN_MODES.commandCenter,
     realtime: true,
   });
   const emergencyAnalytics = useEmergencyAnalytics();

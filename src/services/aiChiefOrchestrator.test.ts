@@ -5,6 +5,7 @@ const callAI = vi.hoisted(() => vi.fn());
 
 vi.mock('./careDroidAiApi', () => ({
   transportCareDroidAINode,
+  CARE_DROID_AI_NODE_PATH: '/api/ai/node',
 }));
 
 vi.mock('../lib/ai/client', () => ({
@@ -125,6 +126,10 @@ describe('aiChiefOrchestrator', () => {
         message: 'What should charge nurse do now?',
         context: expect.objectContaining({
           aiChief: expect.objectContaining({ domain: 'copilot_chat' }),
+          unifiedAiNode: expect.objectContaining({
+            nodeId: 'CareDroidUnifiedAINode',
+            route: '/api/ai/node',
+          }),
         }),
       }),
       undefined,

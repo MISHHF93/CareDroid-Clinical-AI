@@ -1,4 +1,5 @@
 import { useCallback, useMemo } from 'react';
+import { buildEnrichedAdministrativeAutomationSnapshot } from '../engine/administrativeAutomationEngine';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { fetchWorkflowOrchestration, reviewWorkflowAutomation } from '../services/emergencyOsApi';
 import type {
@@ -9,7 +10,7 @@ import type {
 
 export function useAdministrativeAutomations() {
   const queue = useEmergencyStore((state) => state.administrativeAutomationQueue);
-  const refreshLocal = useEmergencyStore((state) => state.refreshAdministrativeAutomations);
+  const refreshLocal = useEmergencyStore((state) => state.refreshAdministrativeAutomationsAsync);
   const reviewLocal = useEmergencyStore((state) => state.reviewAdministrativeAutomation);
   const setQueue = useEmergencyStore((state) => state.setAdministrativeAutomationQueue);
   const backendAvailable = useEmergencyStore((state) => state.backendAvailable);
@@ -49,8 +50,18 @@ export function useAdministrativeAutomations() {
         };
         const tasks = envelope?.data?.tasks || envelope?.data?.snapshot?.tasks;
         if (tasks) {
-          setQueue([...tasks]);
-          return envelope.data?.snapshot || snapshot;
+          const state = useEmergencyStore.getState();
+          const enrichedSnapshot = await buildEnrichedAdministrativeAutomationSnapshot({
+            patients: state.patients,
+            staff: state.staff,
+            referrals: state.referrals,
+            alerts: state.alerts,
+            emsArrivals: state.emsArrivals,
+            capacity: state.capacity,
+            existingTasks: tasks,
+          });
+          setQueue([...enrichedSnapshot.tasks]);
+          return enrichedSnapshot;
         }
       } catch {
         // Fall back to local orchestrator snapshot.

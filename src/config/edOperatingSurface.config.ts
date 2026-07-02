@@ -428,6 +428,5 @@ export const LEGACY_DASHBOARD_REDIRECTS: Readonly<Record<string, string>> = Obje
   [CANONICAL_ROUTES.aiCommandCenter]: CANONICAL_ROUTES.emergencyCopilot,
   [CANONICAL_ROUTES.predictiveAnalytics]: CANONICAL_ROUTES.emergencyAnalytics,
   [CANONICAL_ROUTES.dashboard]: CANONICAL_ROUTES.emergencyCommandCenter,
-  [CANONICAL_ROUTES.executive]: CANONICAL_ROUTES.emergencyCommandCenter,
   [CANONICAL_ROUTES.aiChief]: CANONICAL_ROUTES.emergencyCopilot,
 });

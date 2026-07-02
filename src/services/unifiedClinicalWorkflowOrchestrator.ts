@@ -23,23 +23,15 @@ import { recommendRouting, routingForPriority } from './staffRoutingService';
 import { deriveTriagePending } from './arrivalControlLayer';
 import { deriveProviderWaitingStatus } from '../components/whiteboard/waitingRoomSafetyBoardModel';
 import { logAutomationAuditEvent, AUTOMATION_AUDIT_STATUSES } from '../data/automationAuditTrail';
+import {
+  ADMINISTRATIVE_AUTOMATION_SAFETY_STATEMENT,
+  CATEGORY_AUTOMATION_IDS,
+} from '../config/administrativeAutomationCatalog';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { dispatchAlert } from '../engine/alertEngine';
 import { enterTriageQueue, enterWaitingQueue, type QueueAssignmentStore } from './queueAssignment';
 
-const SAFETY_STATEMENT =
-  'Administrative automations are advisory until a licensed clinician approves, modifies, or overrides each task. All actions are audit-logged.';
-
-const CATEGORY_AUTOMATION_IDS: Partial<Record<AdministrativeAutomationCategory, string>> = {
-  patient_routing: 'emergency-queue-routing-assistant',
-  documentation_handoff: 'emergency-disposition-handoff-draft',
-  ai_patient_summary: 'emergency-copilot-shift-summary',
-  triage_preparation: 'emergency-automated-triage-matrix',
-  department_notification: 'emergency-capacity-surge-protocol',
-  staff_assignment: 'emergency-staff-routing-assistant',
-  queue_prioritization: 'emergency-waiting-room-intelligence',
-  escalation_workflow: 'emergency-escalation-engine',
-};
+const SAFETY_STATEMENT = ADMINISTRATIVE_AUTOMATION_SAFETY_STATEMENT;
 
 function patientName(patient: Patient): string {
   return `${patient.firstName || ''} ${patient.lastName || ''}`.trim() || patient.mrn;
@@ -626,7 +618,7 @@ export function reviewAdministrativeAutomationTask(
   store: ExecuteAutomationStore,
 ): { tasks: AdministrativeAutomationTask[]; task: AdministrativeAutomationTask | null; execution?: { ok: boolean; detail: string } } {
   const index = tasks.findIndex((task) => task.id === input.taskId);
-  if (index < 0) return { tasks, task: null };
+  if (index < 0) return { tasks: [...tasks], task: null };
 
   const current = tasks[index];
   const reviewedAt = new Date().toISOString();

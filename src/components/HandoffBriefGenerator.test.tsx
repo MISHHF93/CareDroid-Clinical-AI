@@ -19,14 +19,14 @@ import {
   type Referral,
   type Staff,
 } from '../types/emergency';
-import { requestAiChiefHandoffBrief } from '../services/aiChiefOrchestrator';
+import { invokeUnifiedAiHandoffBrief } from '../services/careDroidUnifiedAiNode';
 
 const emergencyStoreMock = vi.hoisted(() => ({
   state: {} as Record<string, unknown>,
 }));
 
-vi.mock('../services/aiChiefOrchestrator', () => ({
-  requestAiChiefHandoffBrief: vi.fn(),
+vi.mock('../services/careDroidUnifiedAiNode', () => ({
+  invokeUnifiedAiHandoffBrief: vi.fn(),
 }));
 
 vi.mock('../store/emergencyStore', () => {
@@ -235,7 +235,7 @@ describe('HandoffBriefGenerator', () => {
   });
 
   it('calls the unified AI client when generating a brief', async () => {
-    vi.mocked(requestAiChiefHandoffBrief).mockResolvedValue({
+    vi.mocked(invokeUnifiedAiHandoffBrief).mockResolvedValue({
       ok: true,
       status: 200,
       content: 'SHIFT HANDOFF - generated brief',
@@ -256,7 +256,7 @@ describe('HandoffBriefGenerator', () => {
     render(<HandoffBriefGenerator />);
     await userEvent.click(screen.getByRole('button', { name: /generate handoff brief/i }));
 
-    expect(requestAiChiefHandoffBrief).toHaveBeenCalledWith(
+    expect(invokeUnifiedAiHandoffBrief).toHaveBeenCalledWith(
       expect.objectContaining({ requestType: 'HANDOFF_BRIEF' }),
     );
     expect(await screen.findByDisplayValue(/SHIFT HANDOFF - generated brief/i)).toBeInTheDocument();

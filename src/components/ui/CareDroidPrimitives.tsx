@@ -40,7 +40,7 @@ export function PageShell({
   suppressHeader = false,
   as: Element = 'section',
   ...props
-}: HeaderProps & HTMLAttributes<HTMLElement>) {
+}: HeaderProps & Omit<HTMLAttributes<HTMLElement>, 'title'>) {
   return (
     <Element className={['cd-page-shell', className].filter(Boolean).join(' ')} {...props}>
       {!suppressHeader ? (
@@ -659,7 +659,7 @@ interface OperationalPageTemplateProps extends HTMLAttributes<HTMLDivElement> {
 /**
  * Canonical ED OS page composition — identity lives in PageShell; zones answer operational questions.
  */
-interface CareDroidPageProps extends HeaderProps, HTMLAttributes<HTMLElement> {
+interface CareDroidPageProps extends HeaderProps, Omit<HTMLAttributes<HTMLElement>, 'title'> {
   zones?: OperationalPageZones;
   showZoneLabels?: boolean;
 }

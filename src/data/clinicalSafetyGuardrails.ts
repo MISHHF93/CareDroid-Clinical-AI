@@ -1,5 +1,5 @@
 /**
- * Clinical & operational safety guardrails — required copy patterns, audit helpers, checklist.
+ * Clinical & operational safety guardrails ï¿½ required copy patterns, audit helpers, checklist.
  * Consumed by clinicalIntentToolCatalog (chat seed normalization), compliance tests, and UI.
  */
 
@@ -15,7 +15,7 @@ export const AI_DOCUMENTATION_DISCLAIMER_UI =
   'AI-generated content requires review by a qualified clinician before clinical or operational use. Not a substitute for professional judgment.';
 
 export const DRUG_INTERACTION_DISCLAIMER_UI =
-  'Interaction information is educational decision support. Does not recommend specific doses, starts, stops, or switches of therapy — verify with pharmacology references and patient-specific factors.';
+  'Interaction information is educational decision support. Does not recommend specific doses, starts, stops, or switches of therapy ï¿½ verify with pharmacology references and patient-specific factors.';
 
 export const GUARDRAIL_CHECKLIST = Object.freeze([
   {
@@ -85,7 +85,7 @@ const ANTICOAG_THERAPY_FORBIDDEN_RE =
 const ANTICOAG_GUARDRAIL_RE =
   /does not recommend starting|do not recommend starting|not recommend starting|shared decision|institutional.*protocol|stroke-risk|bleeding-risk/i;
 
-/** Affirmative auto-dispatch only — negated forms ("do not auto-dispatch") are required safety copy. */
+/** Affirmative auto-dispatch only ï¿½ negated forms ("do not auto-dispatch") are required safety copy. */
 const FLEET_AUTO_FORBIDDEN_RE =
   /\b(will|should|must|can)\s+auto-?dispatch\b|\bauto-?dispatch(?:ed|ing)?\s+(?:now|immediately)\b|\bassign(s|ed)?\s+vehicle(s)?\s+automatically\b/i;
 
@@ -99,21 +99,21 @@ const DOSE_FORBIDDEN_RE = /\b\d+(\.\d+)?\s*mg\s*\/\s*kg\b|weight-based\s+dose|ca
 
 const APPEND_BLOCKS = Object.freeze({
   decisionSupport:
-    'Clinical decision support only — does not establish a diagnosis or replace clinician judgment. Follow local protocols.',
+    'Clinical decision support only ï¿½ does not establish a diagnosis or replace clinician judgment. Follow local protocols.',
   mentalHealthCrisis:
-    'If self-harm or suicidal ideation is present, prioritize immediate safety assessment and crisis resources (e.g. 988 Suicide & Crisis Lifeline in the U.S. when applicable). Screening only — do not diagnose or recommend medications.',
+    'If self-harm or suicidal ideation is present, prioritize immediate safety assessment and crisis resources (e.g. 988 Suicide & Crisis Lifeline in the U.S. when applicable). Screening only ï¿½ do not diagnose or recommend medications.',
   urgentCare:
-    'If the patient is unstable or may need emergency care, prioritize local emergency, trauma, or stroke pathways — do not delay urgent evaluation to complete this chat.',
+    'If the patient is unstable or may need emergency care, prioritize local emergency, trauma, or stroke pathways ï¿½ do not delay urgent evaluation to complete this chat.',
   peAcs:
-    'Pre-test probability / risk stratification support only — does not confirm or rule out PE or ACS and does not recommend specific imaging, anticoagulation, or disposition.',
+    'Pre-test probability / risk stratification support only ï¿½ does not confirm or rule out PE or ACS and does not recommend specific imaging, anticoagulation, or disposition.',
   anticoag:
-    'Anticoagulation context: do not recommend starting, stopping, or switching anticoagulant or antiplatelet therapy — use guidelines, shared decision-making, and institutional pathways.',
+    'Anticoagulation context: do not recommend starting, stopping, or switching anticoagulant or antiplatelet therapy ï¿½ use guidelines, shared decision-making, and institutional pathways.',
   fleet:
-    'Operational decision support only — does not auto-dispatch, auto-assign vehicles, or modify live routes without explicit human dispatcher approval.',
+    'Operational decision support only ï¿½ does not auto-dispatch, auto-assign vehicles, or modify live routes without explicit human dispatcher approval.',
   aiDocumentation:
-    'AI-assisted documentation and differential lists require review by a qualified clinician before clinical use — not definitive diagnosis or treatment orders.',
+    'AI-assisted documentation and differential lists require review by a qualified clinician before clinical use ï¿½ not definitive diagnosis or treatment orders.',
   doseForbidden:
-    'Educational reference only — do not calculate or recommend patient-specific medication doses (including mg/kg). Direct dosing questions to pharmacy, institutional protocols, or licensed prescribing clinicians.',
+    'Educational reference only ï¿½ do not calculate or recommend patient-specific medication doses (including mg/kg). Direct dosing questions to pharmacy, institutional protocols, or licensed prescribing clinicians.',
 });
 
 /** @type {Record<string, SafetyProfile[]>} */
@@ -368,18 +368,18 @@ export const PRODUCTION_UI_SURFACE_RULES = Object.freeze([
   },
   {
     surfaceId: 'fleet-dashboard',
-    path: 'src/pages/fleet/FleetDashboard.jsx',
+    path: 'src/pages/fleet/FleetDashboard.tsx',
     required: [/Decision support only/i],
     forbidden: [FLEET_AUTO_FORBIDDEN_RE],
   },
   {
     surfaceId: 'route-optimizer',
-    path: 'src/pages/fleet/RouteOptimizer.jsx',
+    path: 'src/pages/fleet/RouteOptimizer.tsx',
     required: [/Decision support only/i, /does not dispatch/i],
   },
   {
     surfaceId: 'predictive-maintenance',
-    path: 'src/pages/fleet/PredictiveMaintenance.jsx',
+    path: 'src/pages/fleet/PredictiveMaintenance.tsx',
     required: [/Decision support only/i],
   },
   {

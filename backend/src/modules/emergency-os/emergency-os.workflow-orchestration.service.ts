@@ -1,13 +1,23 @@
 import { Injectable, Optional } from '@nestjs/common';
 import type { ReviewAdministrativeAutomationInput } from '../../../../src/types/administrativeAutomation';
-import type { AdministrativeAutomationTask } from '../../../../src/types/administrativeAutomation';
-import type { Alert, Patient, Referral, Staff } from '../../../../src/types/emergency';
-import { EmergencyPatientService, ReferralService } from './emergency-os.services';
-import { EmergencyRealtimeService } from './emergency-realtime.service';
+import type { AdministrativeAutomationSnapshot, AdministrativeAutomationTask } from '../../../../src/types/administrativeAutomation';
+import type { Alert, EMSArrival, Patient, Referral, Staff } from '../../../../src/types/emergency';
+import { PlatformAssetsService } from '../platform-assets/platform-assets.service';
+import type { TenantContext } from '../tenant-context/tenant-context.types';
 import {
-  buildBackendAdministrativeAutomationSnapshot,
-  reviewBackendAdministrativeAutomationTask,
-} from './emergency-os.flow-snapshots';
+  buildBackendEnrichedAdministrativeAutomationSnapshot,
+  resolveBackendTenantScope,
+  reviewBackendAdministrativeAutomationWithExecution,
+  type AutomationEngineRuntimeContext,
+} from './administrative-automation-orchestration.lib';
+import { AdministrativeAutomationQueueService } from './administrative-automation-queue.service';
+import {
+  EMSIntakeService,
+  EmergencyPatientService,
+  ReferralService,
+  WorkflowActionLogService,
+} from './emergency-os.services';
+import { EmergencyRealtimeService } from './emergency-realtime.service';
 
 function envelope<T>(title: string, data: T) {
   return {
@@ -20,55 +30,146 @@ function envelope<T>(title: string, data: T) {
 
 @Injectable()
 export class WorkflowOrchestrationService {
-  private taskQueue: AdministrativeAutomationTask[] = [];
+  private readonly fallbackQueues = new Map<string, AdministrativeAutomationTask[]>();
 
   constructor(
     private readonly patientService: EmergencyPatientService,
     private readonly referralService: ReferralService,
+    private readonly emsIntakeService: EMSIntakeService,
+    private readonly workflowLogService: WorkflowActionLogService,
+    @Optional() private readonly platformAssetsService?: PlatformAssetsService,
+    @Optional() private readonly queueService?: AdministrativeAutomationQueueService,
     @Optional() private readonly realtimeService?: EmergencyRealtimeService,
   ) {}
 
-  private context() {
+  private operationalContext() {
     const patients = this.patientService.listPatients() as unknown as Patient[];
     const referrals =
       (this.referralService.getReferrals().data.referrals as unknown as Referral[]) || [];
     const staff = this.patientService.listStaff() as unknown as Staff[];
     const capacity = this.patientService.computeCapacity();
-    return { patients, referrals, staff, capacity, alerts: [] as Alert[] };
+    const alerts = this.patientService.listAlerts() as unknown as Alert[];
+    const emsPayload = this.emsIntakeService.getEMSIntake().data as unknown as {
+      emsArrivals?: EMSArrival[];
+    };
+    const emsArrivals = (emsPayload.emsArrivals || []) as EMSArrival[];
+    return { patients, referrals, staff, capacity, alerts, emsArrivals };
   }
 
-  getWorkflowOrchestration() {
-    const snapshot = buildBackendAdministrativeAutomationSnapshot({
-      ...this.context(),
-      existingTasks: this.taskQueue,
+  private queueKey(organizationId: string, workspaceId: string) {
+    return `${organizationId}::${workspaceId}`;
+  }
+
+  private async resolveEntitlementContext(
+    tenant?: TenantContext,
+  ): Promise<AutomationEngineRuntimeContext> {
+    if (!this.platformAssetsService || !tenant?.organizationId) {
+      return { strictEntitlements: false };
+    }
+
+    const entitledAssetIds = await this.platformAssetsService.resolveEntitledAssetIds({
+      organizationId: tenant.organizationId,
     });
-    this.taskQueue = [...snapshot.tasks];
-    this.publish(snapshot);
+
+    return {
+      entitledAssetIds,
+      strictEntitlements: this.platformAssetsService.isStrictSaasEntitlementsEnabled(),
+      subscriptionTier: String(tenant.subscriptionPlan || 'professional'),
+      workspaceId: tenant.workspaceId,
+      tenant: {
+        id: tenant.organizationId,
+        name: tenant.organizationName,
+      },
+    };
+  }
+
+  private async loadExistingTasks(
+    organizationId: string,
+    workspaceId: string,
+  ): Promise<AdministrativeAutomationTask[]> {
+    const key = this.queueKey(organizationId, workspaceId);
+    if (!this.queueService) return [...(this.fallbackQueues.get(key) || [])];
+    try {
+      const persisted = await this.queueService.listActiveTasks(organizationId, workspaceId);
+      if (persisted.length) return persisted;
+    } catch {
+      // Fall back to in-memory queue when persistence is unavailable.
+    }
+    return [...(this.fallbackQueues.get(key) || [])];
+  }
+
+  private async persistTasks(
+    organizationId: string,
+    workspaceId: string,
+    tasks: AdministrativeAutomationTask[],
+  ) {
+    const key = this.queueKey(organizationId, workspaceId);
+    this.fallbackQueues.set(key, [...tasks]);
+    if (!this.queueService) return;
+    try {
+      await this.queueService.replaceSnapshot(organizationId, workspaceId, tasks);
+    } catch {
+      // In-memory fallback remains authoritative for this request.
+    }
+  }
+
+  private async buildSnapshot(
+    existingTasks: readonly AdministrativeAutomationTask[],
+    tenant?: TenantContext,
+  ): Promise<AdministrativeAutomationSnapshot> {
+    const entitlementContext = await this.resolveEntitlementContext(tenant);
+    return buildBackendEnrichedAdministrativeAutomationSnapshot({
+      ...this.operationalContext(),
+      existingTasks,
+      entitlementContext,
+      tenant,
+    });
+  }
+
+  async getWorkflowOrchestration(tenant?: TenantContext) {
+    const { organizationId, workspaceId } = resolveBackendTenantScope(tenant);
+    const existingTasks = await this.loadExistingTasks(organizationId, workspaceId);
+    const snapshot = await this.buildSnapshot(existingTasks, tenant);
+    await this.persistTasks(organizationId, workspaceId, [...snapshot.tasks]);
+    this.publish(snapshot, tenant);
     return envelope('Unified Clinical Workflow Orchestrator', {
       snapshot,
       tasks: snapshot.tasks,
       metrics: snapshot.metrics,
+      tenant: { organizationId, workspaceId },
     });
   }
 
-  reviewTask(input: ReviewAdministrativeAutomationInput) {
-    const result = reviewBackendAdministrativeAutomationTask(this.taskQueue, input);
-    this.taskQueue = result.tasks;
-    const snapshot = buildBackendAdministrativeAutomationSnapshot({
-      ...this.context(),
-      existingTasks: this.taskQueue,
-    });
-    this.publish(snapshot);
+  async reviewTask(input: ReviewAdministrativeAutomationInput, tenant?: TenantContext) {
+    const { organizationId, workspaceId } = resolveBackendTenantScope(tenant);
+    const existingTasks = await this.loadExistingTasks(organizationId, workspaceId);
+    const reviewResult = reviewBackendAdministrativeAutomationWithExecution(
+      existingTasks,
+      input,
+      this.patientService,
+      this.workflowLogService,
+      tenant,
+    );
+    const snapshot = await this.buildSnapshot(reviewResult.tasks, tenant);
+    await this.persistTasks(organizationId, workspaceId, [...snapshot.tasks]);
+    this.publish(snapshot, tenant);
     return envelope('Automation review recorded', {
-      task: result.task,
+      task: reviewResult.task,
+      execution: reviewResult.execution,
       snapshot,
+      tenant: { organizationId, workspaceId },
     });
   }
 
-  private publish(snapshot: ReturnType<typeof buildBackendAdministrativeAutomationSnapshot>) {
+  private publish(snapshot: AdministrativeAutomationSnapshot, tenant?: TenantContext) {
+    const scope = resolveBackendTenantScope(tenant);
     this.realtimeService?.publish({
       type: 'workflow_orchestration_updated',
-      payload: { snapshot, tasks: snapshot.tasks },
+      payload: {
+        snapshot,
+        tasks: snapshot.tasks,
+        tenant: scope,
+      },
     });
   }
 }

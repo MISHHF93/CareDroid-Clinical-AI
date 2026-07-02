@@ -50,19 +50,15 @@ describe('canonical AI client', () => {
     expect(response.usage.totalTokens).toBe(19);
   });
 
-  it('routes browser CareDroid AI calls through canonical emergency endpoints', async () => {
+  it('routes all browser CareDroid AI calls through the unified node conversational endpoint', async () => {
     vi.stubGlobal('window', {});
     vi.stubGlobal('document', {});
     apiClientMocks.apiFetch.mockResolvedValue(new Response('{}', { status: 200 }));
     apiClientMocks.parseApiResponse.mockResolvedValue({ response: 'Ready for human review.' });
 
-    const cases = [
-      ['INTAKE_SUGGESTION', '/api/emergency/intake/ai/message'],
-      ['CLINICAL_SUMMARY', '/api/emergency/referrals/ai/message'],
-      ['SHIFT_SUMMARY', '/api/emergency/analytics/ai/message'],
-    ] as const;
+    const cases = ['INTAKE_SUGGESTION', 'CLINICAL_SUMMARY', 'SHIFT_SUMMARY', 'COPILOT_CHAT'] as const;
 
-    for (const [requestType, endpoint] of cases) {
+    for (const requestType of cases) {
       await callAI({
         requestType,
         systemPrompt: 'Human review required.',
@@ -70,9 +66,33 @@ describe('canonical AI client', () => {
       });
 
       expect(apiClientMocks.apiFetch).toHaveBeenLastCalledWith(
-        endpoint,
+        '/api/ai/node/conversational',
         expect.objectContaining({ method: 'POST' }),
       );
     }
+  });
+
+  it('routes unified node conversational calls through /api/ai/node/conversational', async () => {
+    vi.stubGlobal('window', {});
+    vi.stubGlobal('document', {});
+    apiClientMocks.apiFetch.mockResolvedValue(new Response('{}', { status: 200 }));
+    apiClientMocks.parseApiResponse.mockResolvedValue({ response: 'Unified node response.' });
+
+    await callAI({
+      requestType: 'COPILOT_CHAT',
+      systemPrompt: 'Human review required.',
+      messages: [{ role: 'user', content: 'Queue status?' }],
+      context: {
+        unifiedAiNode: {
+          nodeId: 'CareDroidUnifiedAINode',
+          route: '/api/ai/node',
+        },
+      },
+    });
+
+    expect(apiClientMocks.apiFetch).toHaveBeenCalledWith(
+      '/api/ai/node/conversational',
+      expect.objectContaining({ method: 'POST' }),
+    );
   });
 });

@@ -15,12 +15,12 @@ vi.mock('./apiClient', () => ({
   parseApiResponse: vi.fn(async (response) => response.json()),
 }));
 
-vi.mock('./aiChiefOrchestrator', () => ({
-  requestAiChiefConversational: vi.fn(),
+vi.mock('./careDroidUnifiedAiNode', () => ({
+  invokeUnifiedAiConversational: vi.fn(),
 }));
 
 import { apiFetch } from './apiClient';
-import { requestAiChiefConversational } from './aiChiefOrchestrator';
+import { invokeUnifiedAiConversational } from './careDroidUnifiedAiNode';
 
 describe('clinicalChatService', () => {
   beforeEach(() => {
@@ -154,8 +154,8 @@ describe('clinicalChatService', () => {
     expect(msg.metadata.aiFoundation.selectedExpert).toBe('operations');
   });
 
-  it('sendClinicalChatMessage routes COPILOT_CHAT through AI Chief orchestrator', async () => {
-    requestAiChiefConversational.mockResolvedValue({
+  it('sendClinicalChatMessage routes COPILOT_CHAT through the unified AI node', async () => {
+    invokeUnifiedAiConversational.mockResolvedValue({
       ok: true,
       status: 200,
       content: 'Chief response',
@@ -172,8 +172,10 @@ describe('clinicalChatService', () => {
     });
 
     expect(res.ok).toBe(true);
-    expect(requestAiChiefConversational).toHaveBeenCalledWith(
+    expect(invokeUnifiedAiConversational).toHaveBeenCalledWith(
       expect.objectContaining({
+        capabilityId: 'copilot',
+        platformServiceId: 'copilot',
         requestType: 'COPILOT_CHAT',
         message: 'capacity status',
       }),

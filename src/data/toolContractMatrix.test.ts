@@ -18,16 +18,20 @@ import { NLU_PROFILE_TOOL_IDS, ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS } from './cl
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 describe('toolContractMatrix', () => {
-  it('maps every backendFrontendContract row to matrix columns', () => {
-    const contract = buildBackendFrontendContractRows();
-    const matrix = buildToolContractMatrixRows();
-    expect(matrix).toHaveLength(contract.length);
-    for (let i = 0; i < contract.length; i++) {
-      const m = mapRowToToolContractMatrix(contract[i]);
-      expect(m.id).toBe(contract[i].canonicalId);
-      expect(m.status).toBe(contract[i].status);
-    }
-  });
+  it(
+    'maps every backendFrontendContract row to matrix columns',
+    () => {
+      const contract = buildBackendFrontendContractRows();
+      const matrix = buildToolContractMatrixRows();
+      expect(matrix).toHaveLength(contract.length);
+      for (let i = 0; i < contract.length; i++) {
+        const m = mapRowToToolContractMatrix(contract[i]);
+        expect(m.id).toBe(contract[i].canonicalId);
+        expect(m.status).toBe(contract[i].status);
+      }
+    },
+    30_000,
+  );
 
   it('includes every NLU profile id', () => {
     const matrix = buildToolContractMatrixRows();

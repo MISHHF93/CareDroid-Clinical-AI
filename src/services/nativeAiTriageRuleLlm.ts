@@ -1,4 +1,4 @@
-import { requestAiChiefConversational } from './aiChiefOrchestrator';
+import { invokeUnifiedAiConversational } from './careDroidUnifiedAiNode';
 import { getAIPrompt } from '../lib/ai/promptRegistry';
 import { HUMAN_REVIEW_DISCLAIMER } from '../lib/ai/safety/policy';
 import { Priority } from '../types/emergency';
@@ -22,7 +22,9 @@ export async function parseTriageRuleWithLlm(
   const fallback = parseNaturalLanguageTriageRule(naturalLanguage, options);
 
   try {
-    const response = await requestAiChiefConversational({
+    const response = await invokeUnifiedAiConversational({
+      capabilityId: 'triageSupport',
+      platformServiceId: 'triageSupport',
       requestType: 'TRIAGE_ASSIST',
       domain: 'triage',
       sourceScreen: 'triage_rule_builder',

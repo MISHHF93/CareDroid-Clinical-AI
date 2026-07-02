@@ -285,6 +285,7 @@ function buildEscalationTasks(patients: Patient[], now: string): AdministrativeA
     );
 }
 
+/** @deprecated Use `buildBackendEnrichedAdministrativeAutomationSnapshot` for full parity. */
 export function buildBackendAdministrativeAutomationSnapshot(input: {
   patients?: Patient[];
   existingTasks?: readonly AdministrativeAutomationTask[];

@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { requestAiChiefStructured } from '../services/aiChiefOrchestrator';
+import { invokeUnifiedAiStructuredByIntent } from '../services/careDroidUnifiedAiNode';
 import type { CareDroidAIRequest, CareDroidAIResponse } from '../../lib/ai/careDroidAI';
 
 type CareDroidAIHookState = {
@@ -24,7 +24,7 @@ export function useCareDroidAI(initialRequest?: CareDroidAIRequest) {
       }
 
       setState((current) => ({ ...current, isLoading: true, error: null }));
-      const response = await requestAiChiefStructured(nextRequest);
+      const response = await invokeUnifiedAiStructuredByIntent(nextRequest);
       setState({
         response,
         isLoading: false,

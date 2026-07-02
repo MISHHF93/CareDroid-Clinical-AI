@@ -382,13 +382,16 @@ export class EmergencyOsController {
   }
 
   @Get('workflow-orchestration')
-  getWorkflowOrchestration() {
-    return this.workflowOrchestrationService.getWorkflowOrchestration();
+  getWorkflowOrchestration(@TenantContext() tenantContext?: TenantContextValue) {
+    return this.workflowOrchestrationService.getWorkflowOrchestration(tenantContext);
   }
 
   @Post('workflow-orchestration/review')
-  reviewWorkflowAutomation(@Body() body: import('../../../../src/types/administrativeAutomation').ReviewAdministrativeAutomationInput) {
-    return this.workflowOrchestrationService.reviewTask(body);
+  reviewWorkflowAutomation(
+    @Body() body: import('../../../../src/types/administrativeAutomation').ReviewAdministrativeAutomationInput,
+    @TenantContext() tenantContext?: TenantContextValue,
+  ) {
+    return this.workflowOrchestrationService.reviewTask(body, tenantContext);
   }
 
   @Get('patient-flow')

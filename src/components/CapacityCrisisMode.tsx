@@ -4,7 +4,7 @@ import {
   type CapacityCrisisState,
 } from '../engine/capacityEngine';
 import { dispatchAlert } from '../engine/alertEngine';
-import { unifiedAIClient } from '../lib/ai/client';
+import { invokeUnifiedAiRequest } from '../services/careDroidUnifiedAiNode';
 import { useEmergencyStore } from '../store/emergencyStore';
 import {
   PatientState,
@@ -145,8 +145,9 @@ export default function CapacityCrisisMode({
     setAiError('');
     setAiSuggestion('');
 
-    unifiedAIClient
-      .request({
+    invokeUnifiedAiRequest({
+        capabilityId: 'analyticsExplanation',
+        platformServiceId: 'analyticsExplanation',
         requestType: 'CAPACITY_CRISIS',
         systemPrompt: aiRequest.systemPrompt,
         messages: [{ role: 'user', content: aiRequest.userMessage }],
@@ -154,6 +155,8 @@ export default function CapacityCrisisMode({
         maxTokens: 260,
         tools: [],
         context: aiRequest.context,
+        domain: 'operational_awareness',
+        sourceScreen: 'capacity_crisis_mode',
       })
       .then((response) => {
         if (cancelled) return;

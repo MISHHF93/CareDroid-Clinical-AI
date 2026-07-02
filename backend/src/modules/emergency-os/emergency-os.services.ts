@@ -505,6 +505,7 @@ const WORKFLOW_LOG_TITLES: Record<WorkflowActionType, string> = {
   provincial_data_viewed: 'Provincial data viewed',
   integration_event_received: 'Integration event received',
   upgrade_harness_used: 'Upgrade harness used',
+  administrative_automation_reviewed: 'Administrative automation reviewed',
 };
 
 type WorkflowActionInput = Omit<

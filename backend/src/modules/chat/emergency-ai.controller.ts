@@ -7,6 +7,69 @@ import { Permission } from '../auth/enums/permission.enum';
 import { ChatService } from './chat.service';
 import { appendRequiredDisclaimer } from '../../../../lib/ai/safetyPolicy';
 
+class UnifiedNodeConversationalDto {
+  @IsString()
+  message: string;
+
+  @IsOptional()
+  @IsArray()
+  messages?: Array<{ role: string; content: string }>;
+
+  @IsOptional()
+  @IsString()
+  requestType?: string;
+
+  @IsOptional()
+  @IsString()
+  systemPrompt?: string;
+
+  @IsOptional()
+  @IsString()
+  patientId?: string;
+
+  @IsOptional()
+  @IsString()
+  encounterId?: string;
+
+  @IsOptional()
+  @IsString()
+  purpose?: string;
+
+  @IsOptional()
+  @IsString()
+  sourceModule?: string;
+
+  @IsOptional()
+  @IsObject()
+  workspaceContext?: Record<string, any>;
+
+  @IsOptional()
+  @IsObject()
+  memoryContext?: Record<string, any>;
+}
+
+const UNIFIED_NODE_CONVERSATIONAL_ROUTES: Record<
+  string,
+  { feature: string; requestType: string }
+> = {
+  COPILOT_CHAT: { feature: 'ed-copilot', requestType: 'COPILOT_CHAT' },
+  INTAKE_SUGGEST: { feature: 'smart-intake-ai', requestType: 'INTAKE_SUGGESTION' },
+  INTAKE_SUGGESTION: { feature: 'smart-intake-ai', requestType: 'INTAKE_SUGGESTION' },
+  CLINICAL_SUMMARY: { feature: 'referral-ai', requestType: 'CLINICAL_SUMMARY' },
+  SHIFT_SUMMARY: { feature: 'analytics-ai', requestType: 'SHIFT_SUMMARY' },
+  HANDOFF_BRIEF: { feature: 'handoff-brief', requestType: 'HANDOFF_BRIEF' },
+  SCORE_ASSIST: { feature: 'clinical-chat', requestType: 'SCORE_ASSIST' },
+  PROTOCOL_SUGGEST: { feature: 'clinical-chat', requestType: 'PROTOCOL_SUGGEST' },
+  TRIAGE_ASSIST: { feature: 'clinical-chat', requestType: 'TRIAGE_ASSIST' },
+  STAFF_BALANCE: { feature: 'ed-copilot', requestType: 'COPILOT_CHAT' },
+  CAPACITY_CRISIS: { feature: 'ed-copilot', requestType: 'COPILOT_CHAT' },
+};
+
+function resolveUnifiedNodeConversationalRoute(requestType: string) {
+  const route = UNIFIED_NODE_CONVERSATIONAL_ROUTES[requestType] || UNIFIED_NODE_CONVERSATIONAL_ROUTES.COPILOT_CHAT;
+  return { feature: route.feature, resolvedRequestType: route.requestType };
+}
+
 class EmergencyAIMessageDto {
   @IsString()
   message: string;
@@ -73,6 +136,25 @@ export class EmergencyAIController {
   @RequirePermission(Permission.USE_AI_CHAT)
   sendAnalyticsAIMessage(@Body() dto: EmergencyAIMessageDto, @Req() req?: any) {
     return this.processEmergencyMessage(dto, req, 'analytics-ai', 'SHIFT_SUMMARY');
+  }
+
+  /** Single conversational entry for CareDroidUnifiedAINode — routes by requestType internally. */
+  @Post('ai/node/conversational')
+  @RequirePermission(Permission.USE_AI_CHAT)
+  sendUnifiedNodeConversational(@Body() dto: UnifiedNodeConversationalDto, @Req() req?: any) {
+    const requestType = dto.requestType || 'COPILOT_CHAT';
+    const { feature, resolvedRequestType } = resolveUnifiedNodeConversationalRoute(requestType);
+    const emergencyDto: EmergencyAIMessageDto = {
+      message: dto.message,
+      messages: dto.messages,
+      patientId: dto.patientId,
+      encounterId: dto.encounterId,
+      purpose: dto.purpose || 'CareDroid unified AI node conversational decision support',
+      sourceModule: dto.sourceModule || 'care-droid-unified-ai-node',
+      workspaceContext: dto.workspaceContext,
+      memoryContext: dto.memoryContext,
+    };
+    return this.processEmergencyMessage(emergencyDto, req, feature, resolvedRequestType);
   }
 
   private async processEmergencyMessage(

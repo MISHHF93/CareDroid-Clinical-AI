@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { type AIRequest, type AIResponse } from '../lib/ai/client';
-import { requestAiChiefHandoffBrief } from '../services/aiChiefOrchestrator';
+import { invokeUnifiedAiHandoffBrief } from '../services/careDroidUnifiedAiNode';
 import { useEmergencyStore } from '../store/emergencyStore';
 import {
   PatientFlag,
@@ -409,7 +409,7 @@ export default function HandoffBriefGenerator() {
         capacity,
         now: new Date(),
       });
-      const response = await requestAiChiefHandoffBrief(buildHandoffBriefRequest(context));
+      const response = await invokeUnifiedAiHandoffBrief(buildHandoffBriefRequest(context));
       if (!response.ok) throw new Error(`Handoff brief request failed with status ${response.status}`);
       setBriefText(responseText(response));
     } catch {

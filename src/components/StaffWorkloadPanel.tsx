@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type ChangeEvent } from 'react';
 import { toast } from 'sonner';
-import { unifiedAIClient } from '../lib/ai/client';
+import { invokeUnifiedAiRequest } from '../services/careDroidUnifiedAiNode';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { PatientState, type Patient, type Staff } from '../types/emergency';
 import './StaffWorkloadPanel.css';
@@ -213,7 +213,9 @@ export default function StaffWorkloadPanel({ open, onClose }: StaffWorkloadPanel
     setAiStatus('loading');
     setAiError('');
     try {
-      const response = await unifiedAIClient.request({
+      const response = await invokeUnifiedAiRequest({
+        capabilityId: 'copilot',
+        platformServiceId: 'copilot',
         requestType: 'STAFF_BALANCE',
         maxTokens: 700,
         tools: [],
@@ -234,6 +236,8 @@ export default function StaffWorkloadPanel({ open, onClose }: StaffWorkloadPanel
           requestType: 'STAFF_BALANCE',
           staffWorkloads: buildAiPayload(workloads, teamAvg),
         },
+        domain: 'routing',
+        sourceScreen: 'staff_workload_panel',
       });
       const responseText =
         typeof response.content === 'string' && response.content.trim()

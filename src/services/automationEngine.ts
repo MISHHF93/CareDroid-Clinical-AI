@@ -1,4 +1,9 @@
 import {
+  buildAutomationEngineContext,
+  isAutomationEntitled,
+  type AutomationEngineRuntimeContext,
+} from '../config/automationEntitlement.config';
+import {
   AUTOMATION_STATUSES,
   getAutomationById,
   getWorkspaceAutomations,
@@ -7,6 +12,12 @@ import {
   AUTOMATION_AUDIT_STATUSES,
   logAutomationAuditEvent,
 } from '../data/automationAuditTrail';
+
+function mergeAutomationContext(
+  context: AutomationEngineRuntimeContext = {},
+): AutomationEngineRuntimeContext {
+  return { ...buildAutomationEngineContext(), ...context };
+}
 
 function conditionResult(condition, context: any = {}) {
   if (/human review/i.test(condition)) {
@@ -21,6 +32,15 @@ function conditionResult(condition, context: any = {}) {
 function shouldBlock(automation, context: any = {}) {
   if (!automation) return 'Automation not found.';
   if (automation.status === AUTOMATION_STATUSES.DISABLED) return 'Automation is disabled.';
+  if (
+    automation.automationId &&
+    !isAutomationEntitled(automation.automationId, {
+      entitledAssetIds: context.entitledAssetIds,
+      strictEntitlements: context.strictEntitlements,
+    })
+  ) {
+    return `Automation "${automation.automationId}" is not entitled for this tenant.`;
+  }
   if (automation.subscriptionTier && context.subscriptionTier) {
     const tierOrder = { free: 0, starter: 1, professional: 2, academic: 2, enterprise: 3, government: 3 };
     if ((tierOrder[context.subscriptionTier] ?? 0) < (tierOrder[automation.subscriptionTier] ?? 0)) {
@@ -67,12 +87,13 @@ function buildAuditEvent(automation, status, context: any = {}, extra: any = {})
 
 export const AutomationEngine = {
   evaluateAutomation(automationId, context: any = {}) {
+    const runtimeContext = mergeAutomationContext(context);
     const automation = getAutomationById(automationId);
     const patientJourneyStates = automation?.patientJourneyStates || automation?.journeyStages || automation?.requiredWorkflows || [];
-    const blockedReason = shouldBlock(automation, context);
+    const blockedReason = shouldBlock(automation, runtimeContext);
     const conditionResults = (automation?.conditions || []).map((condition) => ({
       label: condition,
-      result: conditionResult(condition, context),
+      result: conditionResult(condition, runtimeContext),
     }));
     const failedCondition = conditionResults.find((condition) => !condition.result);
 
@@ -100,7 +121,8 @@ export const AutomationEngine = {
   },
 
   runAutomation(automationId, context: any = {}) {
-    const evaluation = this.evaluateAutomation(automationId, context);
+    const runtimeContext = mergeAutomationContext(context);
+    const evaluation = this.evaluateAutomation(automationId, runtimeContext);
     if (!evaluation.automation) {
       return {
         ...evaluation,
@@ -108,7 +130,7 @@ export const AutomationEngine = {
       };
     }
     const auditEntry = logAutomationAuditEvent(
-      buildAuditEvent(evaluation.automation, evaluation.status, context, {
+      buildAuditEvent(evaluation.automation, evaluation.status, runtimeContext, {
         reason: evaluation.status === AUTOMATION_AUDIT_STATUSES.BLOCKED ? evaluation.reason : '',
       })
     );
@@ -127,8 +149,11 @@ export const AutomationEngine = {
   },
 
   getWorkspaceAutomationState(workspaceId, context: any = {}) {
+    const runtimeContext = mergeAutomationContext(context);
     const automations = getWorkspaceAutomations(workspaceId);
-    const evaluations = automations.map((automation) => this.evaluateAutomation(automation.automationId, context));
+    const evaluations = automations.map((automation) =>
+      this.evaluateAutomation(automation.automationId, runtimeContext),
+    );
     return {
       workspaceId,
       activeAutomations: automations.filter((automation) => automation.status === AUTOMATION_STATUSES.ACTIVE),

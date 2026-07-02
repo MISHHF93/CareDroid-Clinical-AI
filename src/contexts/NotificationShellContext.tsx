@@ -11,6 +11,7 @@ import { useNotificationCenter } from '../hooks/useNotificationCenter';
 
 type NotificationShellContextValue = ReturnType<typeof useNotificationCenter> & {
   panelOpen: boolean;
+  pulseActive: boolean;
   openPanel: () => void;
   closePanel: () => void;
   togglePanel: () => void;

@@ -3,6 +3,106 @@ import useAdministrativeAutomations from '../../hooks/useAdministrativeAutomatio
 import type { AdministrativeAutomationTask } from '../../types/administrativeAutomation';
 import './administrative-automation-review.css';
 
+type AiDecisionPayload = Readonly<{
+  nodeId?: string;
+  generatedAt?: string;
+  intent?: string;
+  triage?: Readonly<{ data?: Readonly<Record<string, unknown>>; redFlags?: readonly string[] }>;
+  intake?: Readonly<{ data?: Readonly<Record<string, unknown>> }>;
+  critical?: Readonly<{ data?: Readonly<Record<string, unknown>>; redFlags?: readonly string[] }>;
+  summary?: Readonly<{ data?: Readonly<Record<string, unknown>> }>;
+  data?: Readonly<Record<string, unknown>>;
+  redFlags?: readonly string[];
+  requiresClinicianReview?: boolean;
+}>;
+
+function readAiDecision(task: AdministrativeAutomationTask): AiDecisionPayload | null {
+  const decision = task.proposedPayload?.aiDecision;
+  if (!decision || typeof decision !== 'object') return null;
+  return decision as AiDecisionPayload;
+}
+
+function readField(data: Readonly<Record<string, unknown>> | undefined, keys: string[]): string {
+  if (!data) return '';
+  for (const key of keys) {
+    const value = data[key];
+    if (value !== undefined && value !== null && String(value).trim()) {
+      return String(value);
+    }
+  }
+  return '';
+}
+
+function AiDecisionBlock({ decision }: { decision: AiDecisionPayload }) {
+  const triageLevel = readField(decision.triage?.data, ['recommendedTriageLevel', 'triageLevel']) ||
+    readField(decision.data, ['riskLevel', 'recommendedTriageLevel']);
+  const severity = readField(decision.critical?.data, ['severity', 'riskLevel']);
+  const missingFields = decision.intake?.data?.missingFields;
+  const summaryText = readField(decision.summary?.data, ['summary', 'headline', 'narrative']);
+  const redFlags = [
+    ...(decision.redFlags || []),
+    ...(decision.triage?.redFlags || []),
+    ...(decision.critical?.redFlags || []),
+  ].filter((flag, index, list) => flag && list.indexOf(flag) === index);
+
+  const hasDetails =
+    Boolean(triageLevel) ||
+    Boolean(severity) ||
+    Boolean(summaryText) ||
+    redFlags.length > 0 ||
+    (Array.isArray(missingFields) && missingFields.length > 0);
+
+  if (!hasDetails) return null;
+
+  return (
+    <div className="automation-review__ai-decision" role="region" aria-label="AI decision support">
+      <div className="automation-review__ai-decision-header">
+        <span>CareDroid AI advisory</span>
+        {decision.requiresClinicianReview ? (
+          <span className="automation-review__ai-badge">Clinician review required</span>
+        ) : null}
+      </div>
+      <dl className="automation-review__ai-fields">
+        {triageLevel ? (
+          <>
+            <dt>Recommended triage</dt>
+            <dd>{triageLevel}</dd>
+          </>
+        ) : null}
+        {severity ? (
+          <>
+            <dt>Critical severity</dt>
+            <dd>{severity}</dd>
+          </>
+        ) : null}
+        {Array.isArray(missingFields) && missingFields.length > 0 ? (
+          <>
+            <dt>Registration gaps</dt>
+            <dd>{missingFields.slice(0, 4).join(', ')}</dd>
+          </>
+        ) : null}
+        {redFlags.length > 0 ? (
+          <>
+            <dt>Red flags</dt>
+            <dd>{redFlags.slice(0, 5).join(' · ')}</dd>
+          </>
+        ) : null}
+        {summaryText ? (
+          <>
+            <dt>Summary</dt>
+            <dd>{summaryText}</dd>
+          </>
+        ) : null}
+      </dl>
+      {decision.intent ? (
+        <p className="automation-review__ai-intent">
+          Intent: {decision.intent.replace(/_/g, ' ')}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
 const CATEGORY_LABELS: Record<AdministrativeAutomationTask['category'], string> = {
   patient_routing: 'Patient routing',
   documentation_handoff: 'Documentation handoff',
@@ -25,6 +125,8 @@ function AutomationRow({
   onDismiss: (taskId: string) => void;
   onOverride: (taskId: string) => void;
 }) {
+  const aiDecision = readAiDecision(task);
+
   return (
     <li className={`automation-review__row automation-review__row--${task.priority}`}>
       <div className="automation-review__row-main">
@@ -33,6 +135,7 @@ function AutomationRow({
           <span className="automation-review__category">{CATEGORY_LABELS[task.category]}</span>
         </div>
         <p>{task.summary}</p>
+        {aiDecision ? <AiDecisionBlock decision={aiDecision} /> : null}
         <p className="automation-review__action">
           <span>Proposed:</span> {task.proposedAction}
         </p>

@@ -1919,6 +1919,7 @@ const workflowTitles: Record<WorkflowActionType, string> = {
   integration_event_received: 'Integration event received',
   clinical_score_saved: 'Clinical score saved',
   alert_lifecycle: 'Alert lifecycle',
+  administrative_automation_reviewed: 'Administrative automation reviewed',
 };
 
 type WorkflowActionInput = Omit<
@@ -2492,6 +2493,9 @@ interface EmergencyStoreState {
     tasks: import('../types/administrativeAutomation').AdministrativeAutomationTask[],
   ) => void;
   refreshAdministrativeAutomations: () => import('../types/administrativeAutomation').AdministrativeAutomationSnapshot;
+  refreshAdministrativeAutomationsAsync: () => Promise<
+    import('../types/administrativeAutomation').AdministrativeAutomationSnapshot
+  >;
   reviewAdministrativeAutomation: (
     input: import('../types/administrativeAutomation').ReviewAdministrativeAutomationInput,
   ) => import('../types/administrativeAutomation').AdministrativeAutomationTask | null;
@@ -4505,8 +4509,10 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       if (!cleanQuery) throw new Error('Copilot query is required.');
       set((state) => ({ ui: { ...state.ui, error: null } }));
       try {
-        const { requestAiChiefCopilotQuery } = await import('../services/aiChiefOrchestrator');
-        const result = await requestAiChiefCopilotQuery(cleanQuery, {
+        const { invokeUnifiedAiCopilotQuery } = await import('../services/careDroidUnifiedAiNode');
+        const result = await invokeUnifiedAiCopilotQuery(cleanQuery, {
+          capabilityId: 'copilot',
+          platformServiceId: 'copilot',
           userRole: options.userRole,
           patientId: options.patientId,
           context: options.context,
@@ -4637,12 +4643,25 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
           firstValue(orchestrationPayload, ['tasks', 'snapshot.tasks']) ||
           (orchestrationPayload as { snapshot?: { tasks?: unknown } })?.snapshot?.tasks;
         if (Array.isArray(tasks)) {
-          set({
-            administrativeAutomationQueue:
-              tasks as import('../types/administrativeAutomation').AdministrativeAutomationTask[],
-          });
+          const state = get();
+          void import('../engine/administrativeAutomationEngine')
+            .then(({ buildEnrichedAdministrativeAutomationSnapshot }) =>
+              buildEnrichedAdministrativeAutomationSnapshot({
+                patients: state.patients,
+                staff: state.staff,
+                referrals: state.referrals,
+                alerts: state.alerts,
+                emsArrivals: state.emsArrivals,
+                capacity: state.capacity,
+                existingTasks:
+                  tasks as import('../types/administrativeAutomation').AdministrativeAutomationTask[],
+              }),
+            )
+            .then((snapshot) => {
+              set({ administrativeAutomationQueue: [...snapshot.tasks] });
+            });
         } else {
-          get().refreshAdministrativeAutomations();
+          void get().refreshAdministrativeAutomationsAsync();
         }
         return;
       }
@@ -4881,19 +4900,37 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
 
     setAdministrativeAutomationQueue: (tasks) => set({ administrativeAutomationQueue: tasks }),
 
+    refreshAdministrativeAutomationsAsync: async () => {
+      const { runAdministrativeAutomationTick } = await import('../engine/administrativeAutomationEngine');
+      return runAdministrativeAutomationTick();
+    },
+
     refreshAdministrativeAutomations: () => {
       const state = get();
-      const snapshot = buildAdministrativeAutomationSnapshot({
-        patients: state.patients,
-        staff: state.staff,
-        referrals: state.referrals,
-        alerts: state.alerts,
-        emsArrivals: state.emsArrivals,
-        capacity: state.capacity,
-        existingTasks: state.administrativeAutomationQueue,
-      });
-      set({ administrativeAutomationQueue: [...snapshot.tasks] });
-      return snapshot;
+      void get().refreshAdministrativeAutomationsAsync();
+      const queue = state.administrativeAutomationQueue;
+      return {
+        engineId: 'unified-clinical-workflow-orchestrator' as const,
+        generatedAt: queue[0]?.updatedAt || new Date().toISOString(),
+        tasks: queue,
+        metrics: {
+          pendingReview: queue.filter((task) => task.status === 'pending_review').length,
+          executedToday: queue.filter((task) => task.status === 'executed').length,
+          overridden: queue.filter((task) => task.status === 'overridden').length,
+          byCategory: {
+            patient_routing: queue.filter((task) => task.category === 'patient_routing').length,
+            documentation_handoff: queue.filter((task) => task.category === 'documentation_handoff').length,
+            ai_patient_summary: queue.filter((task) => task.category === 'ai_patient_summary').length,
+            triage_preparation: queue.filter((task) => task.category === 'triage_preparation').length,
+            department_notification: queue.filter((task) => task.category === 'department_notification').length,
+            staff_assignment: queue.filter((task) => task.category === 'staff_assignment').length,
+            queue_prioritization: queue.filter((task) => task.category === 'queue_prioritization').length,
+            escalation_workflow: queue.filter((task) => task.category === 'escalation_workflow').length,
+          },
+        },
+        safetyStatement:
+          'Administrative automations are advisory until a licensed clinician approves, modifies, or overrides each task.',
+      };
     },
 
     reviewAdministrativeAutomation: (input) => {

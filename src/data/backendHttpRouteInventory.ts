@@ -954,6 +954,9 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
   { method: 'POST', path: '/api/auth/reset-password', controller: 'AuthController' },
 
   { method: 'POST', path: '/api/ai/node', controller: 'AIController' },
+  { method: 'POST', path: '/api/ai/node/conversational', controller: 'EmergencyAIController' },
+  { method: 'GET', path: '/api/emergency/workflow-orchestration', controller: 'EmergencyOsController' },
+  { method: 'POST', path: '/api/emergency/workflow-orchestration/review', controller: 'EmergencyOsController' },
 
   { method: 'GET', path: '/api/emergency/operational-intelligence/alerts', controller: 'EmergencyOsController' },
   { method: 'GET', path: '/api/emergency/operational-intelligence/model-health', controller: 'EmergencyOsController' },

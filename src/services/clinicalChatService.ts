@@ -1,6 +1,6 @@
 import { apiFetch, buildApiUrl, parseApiResponse } from './apiClient';
 import { buildAIAuditEvent, logAIAuditEvent, previewAIText } from '../lib/ai/audit/logger';
-import { requestAiChiefConversational } from './aiChiefOrchestrator';
+import { invokeUnifiedAiConversational } from './careDroidUnifiedAiNode';
 
 import {
   REGISTRY_ID_TO_ORCHESTRATOR_TOOL,
@@ -109,7 +109,9 @@ export async function sendClinicalChatMessage({
   );
 
   if (requestType === 'COPILOT_CHAT') {
-    const aiResponse = await requestAiChiefConversational({
+    const aiResponse = await invokeUnifiedAiConversational({
+      capabilityId: 'copilot',
+      platformServiceId: 'copilot',
       requestType: 'COPILOT_CHAT',
       systemPrompt: '',
       message,

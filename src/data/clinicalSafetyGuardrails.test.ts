@@ -111,7 +111,7 @@ describe('clinicalSafetyGuardrails — fleet / dispatch', () => {
   );
 
   it('fleet dashboard surfaces operational decision-support disclaimer', () => {
-    expect(readSrc('src/pages/fleet/FleetDashboard.jsx')).toMatch(/Decision support only/i);
+    expect(readSrc('src/pages/fleet/FleetDashboard.tsx')).toMatch(/Decision support only/i);
   });
 });
 

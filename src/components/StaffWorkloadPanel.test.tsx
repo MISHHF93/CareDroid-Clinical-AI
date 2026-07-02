@@ -25,10 +25,8 @@ vi.mock('sonner', () => ({
   },
 }));
 
-vi.mock('../lib/ai/client', () => ({
-  unifiedAIClient: {
-    request: vi.fn(),
-  },
+vi.mock('../services/careDroidUnifiedAiNode', () => ({
+  invokeUnifiedAiRequest: vi.fn(),
 }));
 
 vi.mock('../store/emergencyStore', () => ({

@@ -8,7 +8,7 @@ import { useEmergencyStore } from '../store/emergencyStore';
 import { useEDCopilot } from '../hooks/useEmergencyOs';
 import useOperationalIntelligence from '../hooks/useOperationalIntelligence';
 import type { CareDroidCentralNodeSnapshot } from '../central-node/careDroidCentralNode';
-import { requestAiChiefConversational } from '../services/aiChiefOrchestrator';
+import { invokeUnifiedAiConversational } from '../services/careDroidUnifiedAiNode';
 import { getAIPrompt } from '../lib/ai/promptRegistry';
 import { HUMAN_REVIEW_DISCLAIMER } from '../lib/ai/safety/policy';
 import {
@@ -817,7 +817,9 @@ export function CopilotPanel() {
         patientOrchestration,
       );
 
-      const response = await requestAiChiefConversational({
+      const response = await invokeUnifiedAiConversational({
+        capabilityId: 'copilot',
+        platformServiceId: 'copilot',
         requestType: COPILOT_PLATFORM.identity.requestType,
         systemPrompt,
         message: promptText,

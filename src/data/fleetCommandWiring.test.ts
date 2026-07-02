@@ -23,7 +23,7 @@ import { getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { getAllDiscoveredTools, toolIdAliases } from './sourceCodeToolDiscovery';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const fleetDashboardSource = readFileSync(join(__dirname, '../pages/fleet/FleetDashboard.jsx'), 'utf8');
+const fleetDashboardSource = readFileSync(join(__dirname, '../pages/fleet/FleetDashboard.tsx'), 'utf8');
 const patternsSource = readFileSync(
   join(
     __dirname,

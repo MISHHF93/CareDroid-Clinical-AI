@@ -7,6 +7,7 @@ import {
 } from '../../lib/ai/careDroidAI';
 
 export const CARE_DROID_AI_NODE_PATH = '/api/ai/node';
+export const CARE_DROID_AI_NODE_CONVERSATIONAL_PATH = '/api/ai/node/conversational';
 
 type CareDroidAIRequestOptions = {
   signal?: AbortSignal;

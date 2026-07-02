@@ -1,4 +1,4 @@
-import { requestAiChiefConversational } from './aiChiefOrchestrator';
+import { invokeUnifiedAiConversational } from './careDroidUnifiedAiNode';
 import { getAIPrompt } from '../lib/ai/promptRegistry';
 import { HUMAN_REVIEW_DISCLAIMER } from '../lib/ai/safety/policy';
 import {
@@ -132,7 +132,9 @@ async function tryAiAssistExtraction(
   const fieldKeys = artifact.extractableFields.join(', ');
 
   try {
-    const response = await requestAiChiefConversational({
+    const response = await invokeUnifiedAiConversational({
+      capabilityId: 'smartIntakeVerification',
+      platformServiceId: 'smartIntakeVerification',
       requestType: 'INTAKE_SUGGESTION',
       domain: 'intake',
       sourceScreen: 'intake_artifact_capture',

@@ -59,7 +59,8 @@ export type WorkflowActionType =
   | 'copilot_used'
   | 'provincial_data_viewed'
   | 'integration_event_received'
-  | 'upgrade_harness_used';
+  | 'upgrade_harness_used'
+  | 'administrative_automation_reviewed';
 
 export type WorkflowActionSeverity = 'Info' | 'Warning' | 'Critical';
 export type WorkflowActionStatus = 'recorded' | 'pending' | 'completed' | 'failed';

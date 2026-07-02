@@ -35,6 +35,7 @@ import {
   buildBottleneckRegistrySnapshot,
   type BottleneckRegistrySnapshot,
 } from './bottleneckRegistry';
+import { buildUnifiedAiNodeContext } from '../config/careDroidUnifiedAiNode.config';
 import { transportCareDroidAINode } from './careDroidAiApi';
 
 export const AI_CHIEF_ORCHESTRATOR_VERSION = '2026.06.30';
@@ -194,21 +195,23 @@ export function enrichStructuredRequest(
     enrichedInput.bottleneckAnalytics = snapshot.analytics;
   }
 
-  const context: CareDroidAIContext = {
+  const context = buildUnifiedAiNodeContext({
     ...(request.context || {}),
     orchestratorVersion: AI_CHIEF_ORCHESTRATOR_VERSION,
     domain: resolveAIChiefDomain(request.intent),
     sourceScreen: request.context?.sourceScreen || 'ai_chief_orchestrator',
-  };
-
-  if (snapshot) {
-    context.bottleneckRegistry = {
-      generatedAt: snapshot.generatedAt,
-      activeCount: snapshot.analytics.activeCount,
-      criticalCount: snapshot.analytics.criticalCount,
-      threeMinuteRiskStatus: snapshot.threeMinuteRiskProjection.status,
-    };
-  }
+    capabilityId: request.intent,
+    ...(snapshot
+      ? {
+          bottleneckRegistry: {
+            generatedAt: snapshot.generatedAt,
+            activeCount: snapshot.analytics.activeCount,
+            criticalCount: snapshot.analytics.criticalCount,
+            threeMinuteRiskStatus: snapshot.threeMinuteRiskProjection.status,
+          },
+        }
+      : {}),
+  }) as CareDroidAIContext;
 
   return {
     intent: request.intent,
@@ -336,14 +339,14 @@ export async function requestAiChiefConversational(
   const domain = request.domain || conversationalDomain(request.requestType);
   const enriched: AIRequest = {
     ...request,
-    context: {
+    context: buildUnifiedAiNodeContext({
       ...(isRecord(request.context) ? request.context : {}),
       aiChief: {
         orchestratorVersion: AI_CHIEF_ORCHESTRATOR_VERSION,
         domain,
         sourceScreen: request.sourceScreen || 'ai_chief_orchestrator',
       },
-    },
+    }),
   };
 
   try {
@@ -360,7 +363,13 @@ export async function requestAiChiefConversational(
         content: '',
         data: {},
         toolCalls: [],
-        usage: { inputTokens: 0, outputTokens: 0, totalTokens: 0 },
+        usage: {
+          inputTokens: 0,
+          outputTokens: 0,
+          totalTokens: 0,
+          cacheReadInputTokens: 0,
+          cacheCreationInputTokens: 0,
+        },
         requestType: request.requestType,
       },
       message,

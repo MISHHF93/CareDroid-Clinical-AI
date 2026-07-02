@@ -28,7 +28,7 @@ import {
   mapFieldReviewDecision,
   verificationStepFromQuery,
 } from '../../utils/verificationWorkflow';
-import { requestAiChiefConversational } from '../../services/aiChiefOrchestrator';
+import { invokeUnifiedAiConversational } from '../../services/careDroidUnifiedAiNode';
 import { getAIPrompt } from '../../lib/ai/promptRegistry';
 import { HUMAN_REVIEW_DISCLAIMER } from '../../lib/ai/safety/policy';
 import { RECEPTION_COPY } from '../../components/reception/receptionCopy';
@@ -704,7 +704,9 @@ export default function SmartIntake({
         .filter((field) => field.status !== 'verified')
         .map((field) => field.field)
         .join(', ');
-      const response = await requestAiChiefConversational({
+      const response = await invokeUnifiedAiConversational({
+        capabilityId: 'smartIntakeVerification',
+        platformServiceId: 'smartIntakeVerification',
         requestType: 'INTAKE_SUGGESTION',
         domain: 'intake',
         sourceScreen: 'smart_intake',

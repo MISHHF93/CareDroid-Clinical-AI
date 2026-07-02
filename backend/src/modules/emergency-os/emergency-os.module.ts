@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { AuditModule } from '../audit/audit.module';
 import { AuthModule } from '../auth/auth.module';
 import { ChatModule } from '../chat/chat.module';
+import { PlatformAssetsModule } from '../platform-assets/platform-assets.module';
 import { EmergencyOsController } from './emergency-os.controller';
 import { EmergencyRealtimeController } from './emergency-realtime.controller';
 import { EmergencyRealtimeService } from './emergency-realtime.service';
@@ -54,14 +56,18 @@ import { PatientDocumentArtifactService } from './patient-document-artifact.serv
 import { ClinicalDecisionSupportService } from './clinical-decision-support.service';
 import { EmergencyPatientAuditService } from './emergency-patient-audit.service';
 import { PatientFlowService } from './emergency-os.patient-flow.service';
+import { AdministrativeAutomationQueueService } from './administrative-automation-queue.service';
+import { AdministrativeAutomationTaskEntity } from './entities/administrative-automation-task.entity';
 import { WorkflowOrchestrationService } from './emergency-os.workflow-orchestration.service';
 
 @Module({
   imports: [
+    TypeOrmModule.forFeature([AdministrativeAutomationTaskEntity]),
     ConfigModule,
     AuthModule,
     AuditModule,
     ChatModule,
+    PlatformAssetsModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
@@ -130,6 +136,7 @@ import { WorkflowOrchestrationService } from './emergency-os.workflow-orchestrat
     ClinicalDecisionSupportService,
     EmergencyPatientAuditService,
     PatientFlowService,
+    AdministrativeAutomationQueueService,
     WorkflowOrchestrationService,
   ],
 })

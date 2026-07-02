@@ -7,8 +7,13 @@ import { User, UserRole } from '../users/entities/user.entity';
 import { UserProfile } from '../users/entities/user-profile.entity';
 import { OAuthAccount } from '../users/entities/oauth-account.entity';
 import { Subscription } from '../subscriptions/entities/subscription.entity';
+import { Organization } from '../workspaces/entities/organization.entity';
+import { OrganizationMembership } from '../organizations/entities/organization-membership.entity';
+import { Workspace } from '../workspaces/entities/workspace.entity';
+import { WorkspaceMembership } from '../workspaces/entities/workspace-membership.entity';
 import { AuditService } from '../audit/audit.service';
 import { TwoFactorService } from '../two-factor/two-factor.service';
+import { EmailService } from '../email/email.service';
 import * as bcrypt from 'bcrypt';
 
 jest.mock('bcrypt');
@@ -69,6 +74,36 @@ describe('AuthService', () => {
     verifyToken: jest.fn().mockResolvedValue(true),
   };
 
+  const mockOrganizationRepository = {
+    findOne: jest.fn(),
+    create: jest.fn(),
+    save: jest.fn(),
+  };
+
+  const mockOrganizationMembershipRepository = {
+    findOne: jest.fn(),
+    create: jest.fn(),
+    save: jest.fn(),
+  };
+
+  const mockWorkspaceRepository = {
+    findOne: jest.fn(),
+    create: jest.fn(),
+    save: jest.fn(),
+  };
+
+  const mockWorkspaceMembershipRepository = {
+    findOne: jest.fn(),
+    create: jest.fn(),
+    save: jest.fn(),
+  };
+
+  const mockEmailService = {
+    sendEmail: jest.fn(),
+    sendPasswordResetEmail: jest.fn(),
+    sendVerificationEmail: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -98,8 +133,28 @@ describe('AuthService', () => {
           useValue: mockSubscriptionRepository,
         },
         {
+          provide: getRepositoryToken(Organization),
+          useValue: mockOrganizationRepository,
+        },
+        {
+          provide: getRepositoryToken(OrganizationMembership),
+          useValue: mockOrganizationMembershipRepository,
+        },
+        {
+          provide: getRepositoryToken(Workspace),
+          useValue: mockWorkspaceRepository,
+        },
+        {
+          provide: getRepositoryToken(WorkspaceMembership),
+          useValue: mockWorkspaceMembershipRepository,
+        },
+        {
           provide: AuditService,
           useValue: mockAuditService,
+        },
+        {
+          provide: EmailService,
+          useValue: mockEmailService,
         },
         {
           provide: TwoFactorService,

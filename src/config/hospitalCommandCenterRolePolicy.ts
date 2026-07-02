@@ -54,7 +54,7 @@ export const HOSPITAL_COMMAND_ROLE_METRICS: Readonly<
     'department-occupancy',
     'length-of-stay',
     'ai-recommendations',
-  ]),
+  ] as HospitalCommandMetricId[]),
   [EMERGENCY_ROLE_IDS.physician]: Object.freeze([
     'critical-patients',
     'unresolved-alerts',
@@ -66,7 +66,7 @@ export const HOSPITAL_COMMAND_ROLE_METRICS: Readonly<
     'doctors-available',
     'three-minute-compliance',
     'bed-capacity',
-  ]),
+  ] as HospitalCommandMetricId[]),
   [EMERGENCY_ROLE_IDS.triageNurse]: Object.freeze([
     'three-minute-compliance',
     'waiting-patients',
@@ -78,7 +78,7 @@ export const HOSPITAL_COMMAND_ROLE_METRICS: Readonly<
     'nurses-available',
     'service-bottlenecks',
     'ai-recommendations',
-  ]),
+  ] as HospitalCommandMetricId[]),
   [EMERGENCY_ROLE_IDS.dispatcher]: Object.freeze([
     'ems-arrivals',
     'ambulance-eta',
@@ -86,7 +86,7 @@ export const HOSPITAL_COMMAND_ROLE_METRICS: Readonly<
     'critical-patients',
     'service-bottlenecks',
     'unresolved-alerts',
-  ]),
+  ] as HospitalCommandMetricId[]),
   [EMERGENCY_ROLE_IDS.emsCoordinator]: Object.freeze([
     'ems-arrivals',
     'ambulance-eta',
@@ -94,14 +94,14 @@ export const HOSPITAL_COMMAND_ROLE_METRICS: Readonly<
     'waiting-patients',
     'service-bottlenecks',
     'three-minute-compliance',
-  ]),
+  ] as HospitalCommandMetricId[]),
   [EMERGENCY_ROLE_IDS.registrationClerk]: Object.freeze([
     'waiting-patients',
     'ems-arrivals',
     'ambulance-eta',
     'department-occupancy',
     'bed-capacity',
-  ]),
+  ] as HospitalCommandMetricId[]),
 });
 
 const DEFAULT_ROLE_METRICS = HOSPITAL_COMMAND_ROLE_METRICS[EMERGENCY_ROLE_IDS.chargeNurse];
