@@ -1,5 +1,9 @@
 import { PatientState, Priority, type Patient } from '../../../../src/types/emergency';
-import { buildBackendEnrichedAdministrativeAutomationSnapshot } from './administrative-automation-orchestration.lib';
+import type { AdministrativeAutomationTask } from '../../../../src/types/administrativeAutomation';
+import {
+  buildBackendEnrichedAdministrativeAutomationSnapshot,
+  reviewBackendAdministrativeAutomationWithExecution,
+} from './administrative-automation-orchestration.lib';
 
 describe('administrative-automation-orchestration.lib', () => {
   it('builds all automation categories with AI decision payloads', async () => {
@@ -71,5 +75,80 @@ describe('administrative-automation-orchestration.lib', () => {
     });
 
     expect(snapshot.tasks.some((task) => task.category === 'patient_routing')).toBe(false);
+  });
+
+  it('executes staff assignment and documentation handoff on backend approval', () => {
+    const patientService = {
+      movePatientToState: jest.fn(),
+      assignStaffToPatient: jest.fn(),
+      addPatientNote: jest.fn(),
+      dispatchOperationalAlert: jest.fn(),
+      escalatePatient: jest.fn(),
+    };
+    const workflowLogService = { record: jest.fn() };
+
+    const tasks: AdministrativeAutomationTask[] = [
+      {
+        id: 'auto-staff-p1',
+        category: 'staff_assignment',
+        status: 'pending_review',
+        patientId: 'p1',
+        patientName: 'Jamie Lee',
+        title: 'Assign staff',
+        summary: 'Proposed assignment',
+        proposedAction: 'Assign nurse',
+        proposedPayload: { proposedStaffId: 's2', proposedStaffName: 'Nurse Rivera' },
+        ownerRole: 'charge_nurse',
+        priority: 'high',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        humanReviewRequired: true,
+        aiGenerated: true,
+      } as AdministrativeAutomationTask,
+      {
+        id: 'auto-handoff-p1',
+        category: 'documentation_handoff',
+        status: 'pending_review',
+        patientId: 'p1',
+        patientName: 'Jamie Lee',
+        title: 'Handoff draft',
+        summary: 'Disposition handoff draft ready',
+        proposedAction: 'Stage handoff draft',
+        proposedPayload: { handoffType: 'disposition', template: 'SBAR' },
+        ownerRole: 'registered_nurse',
+        priority: 'high',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        humanReviewRequired: true,
+        aiGenerated: true,
+      } as AdministrativeAutomationTask,
+    ];
+
+    reviewBackendAdministrativeAutomationWithExecution(
+      tasks,
+      {
+        taskId: 'auto-staff-p1',
+        decision: 'approve',
+        actorStaffId: 'charge-nurse',
+        actorName: 'Charge Nurse',
+      },
+      patientService as any,
+      workflowLogService as any,
+    );
+
+    reviewBackendAdministrativeAutomationWithExecution(
+      tasks,
+      {
+        taskId: 'auto-handoff-p1',
+        decision: 'approve',
+        actorStaffId: 'charge-nurse',
+        actorName: 'Charge Nurse',
+      },
+      patientService as any,
+      workflowLogService as any,
+    );
+
+    expect(patientService.assignStaffToPatient).toHaveBeenCalledWith('p1', 's2', 'charge-nurse');
+    expect(patientService.addPatientNote).toHaveBeenCalled();
   });
 });

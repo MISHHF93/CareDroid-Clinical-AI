@@ -1,0 +1,125 @@
+.competencies-page {
+  display: grid;
+  gap: var(--compact-panel-gap, 14px);
+  padding: var(--compact-panel-padding, 16px);
+  min-height: 100vh;
+  color: var(--app-fg, var(--medical-text-body, #111827));
+  background: var(--medical-surface-page, var(--app-surface-page, #f8fafc));
+  font-family: Inter, system-ui, sans-serif;
+}
+
+.competencies-page__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.competencies-page__title-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.competencies-page__title-row h1 {
+  margin: 0;
+  font-size: clamp(22px, 3vw, 28px);
+  color: var(--medical-text-heading, var(--app-text-primary));
+}
+
+.competencies-page__title-row p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.competencies-page__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.competencies-page__actions a {
+  min-height: var(--compact-control-height, 40px);
+  padding: 8px 14px;
+  border-radius: var(--compact-panel-radius, 12px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--medical-card-bg, var(--app-surface-1));
+  text-decoration: none;
+  font-size: 13px;
+  color: inherit;
+}
+
+.competencies-page__metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.competencies-page__panels {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  gap: 12px;
+}
+
+.competencies-page__panel {
+  display: grid;
+  gap: 10px;
+  padding: var(--compact-panel-padding, 14px);
+  border-radius: var(--compact-panel-radius, 14px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--medical-card-bg, var(--app-surface-1));
+}
+
+.competencies-page__panel h2,
+.competencies-page__panel h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.competencies-page__panel h3 {
+  font-size: 14px;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.competencies-page__panel ul {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+}
+
+.competencies-page__records {
+  display: grid;
+  gap: 8px;
+}
+
+.competencies-page__record {
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--app-surface-muted, #f8fafc);
+  font-size: 12px;
+}
+
+.competencies-page__record strong {
+  font-size: 14px;
+}
+
+.competencies-page__status--good {
+  color: var(--app-chart-2);
+}
+
+.competencies-page__status--warning {
+  color: var(--app-chart-5);
+}
+
+@media (max-width: 900px) {
+  .competencies-page__metrics,
+  .competencies-page__panels {
+    grid-template-columns: 1fr;
+  }
+}

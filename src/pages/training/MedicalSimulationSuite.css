@@ -1,0 +1,118 @@
+.simulation-suite-page {
+  display: grid;
+  gap: var(--compact-panel-gap, 14px);
+  padding: var(--compact-panel-padding, 16px);
+  min-height: 100vh;
+  color: var(--app-fg, var(--medical-text-body, #111827));
+  background: var(--medical-surface-page, var(--app-surface-page, #f8fafc));
+  font-family: Inter, system-ui, sans-serif;
+}
+
+.simulation-suite-page__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.simulation-suite-page__title-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.simulation-suite-page__title-row h1 {
+  margin: 0;
+  font-size: clamp(22px, 3vw, 28px);
+  color: var(--medical-text-heading, var(--app-text-primary));
+}
+
+.simulation-suite-page__title-row p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.simulation-suite-page__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.simulation-suite-page__actions a {
+  min-height: var(--compact-control-height, 40px);
+  padding: 8px 14px;
+  border-radius: var(--compact-panel-radius, 12px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--medical-card-bg, var(--app-surface-1));
+  text-decoration: none;
+  font-size: 13px;
+  color: inherit;
+}
+
+.simulation-suite-page__metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.simulation-suite-page__charts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.simulation-suite-page__search {
+  min-height: var(--compact-control-height, 40px);
+  padding: 8px 12px;
+  border-radius: var(--compact-panel-radius, 12px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--medical-card-bg, var(--app-surface-1));
+  font-size: 13px;
+}
+
+.simulation-suite-page__section-title {
+  margin: 0;
+  font-size: 16px;
+}
+
+.simulation-suite-page__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 10px;
+}
+
+.simulation-suite-page__card {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  border-radius: var(--compact-panel-radius, 10px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--medical-card-bg, var(--app-surface-1));
+  text-decoration: none;
+  color: inherit;
+  font-size: 12px;
+}
+
+.simulation-suite-page__card strong {
+  font-size: 14px;
+}
+
+.simulation-suite-page__card span {
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.simulation-suite-page__empty {
+  margin: 0;
+  font-size: 13px;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+@media (max-width: 900px) {
+  .simulation-suite-page__metrics,
+  .simulation-suite-page__charts {
+    grid-template-columns: 1fr;
+  }
+}

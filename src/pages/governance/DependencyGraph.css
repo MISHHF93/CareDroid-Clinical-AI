@@ -1,0 +1,163 @@
+.dependency-graph-page {
+  display: grid;
+  gap: var(--compact-panel-gap, 14px);
+  padding: var(--compact-panel-padding, 16px);
+  min-height: 100vh;
+  color: var(--app-fg, var(--medical-text-body, #111827));
+  background: var(--medical-surface-page, var(--app-surface-page, #f8fafc));
+  font-family: Inter, system-ui, sans-serif;
+}
+
+.dependency-graph-page__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.dependency-graph-page__title-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.dependency-graph-page__title-row h1 {
+  margin: 0;
+  font-size: clamp(22px, 3vw, 28px);
+}
+
+.dependency-graph-page__title-row p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.dependency-graph-page__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.dependency-graph-page__actions a {
+  min-height: var(--compact-control-height, 40px);
+  padding: 8px 14px;
+  border-radius: var(--compact-panel-radius, 12px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--medical-card-bg, var(--app-surface-1));
+  text-decoration: none;
+  font-size: 13px;
+  color: inherit;
+}
+
+.dependency-graph-page__metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.dependency-graph-page__charts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.dependency-graph-page__panel {
+  padding: 14px;
+  border-radius: var(--compact-panel-radius, 12px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--medical-card-bg, var(--app-surface-1));
+}
+
+.dependency-graph-page__panel h2 {
+  margin: 0 0 4px;
+  font-size: 16px;
+}
+
+.dependency-graph-page__panel p {
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.dependency-graph-page__table {
+  display: grid;
+  gap: 6px;
+}
+
+.dependency-graph-page__table-head,
+.dependency-graph-page__table-row {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr 1fr 1fr 0.9fr;
+  gap: 8px;
+  align-items: center;
+  font-size: 12px;
+}
+
+.dependency-graph-page__table-head {
+  font-weight: 600;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.dependency-graph-page__issues {
+  display: grid;
+  gap: 8px;
+}
+
+.dependency-graph-page__issue {
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--medical-surface-page, var(--app-surface-page));
+}
+
+.dependency-graph-page__issue strong {
+  display: block;
+  margin-top: 6px;
+}
+
+.dependency-graph-page__issue p {
+  margin: 4px 0 0;
+  font-size: 12px;
+}
+
+.dependency-graph-page__pill {
+  display: inline-flex;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  text-transform: capitalize;
+}
+
+.dependency-graph-page__pill--good {
+  background: color-mix(in srgb, var(--app-status-good, #16a34a) 14%, transparent);
+  color: var(--app-status-good, #16a34a);
+}
+
+.dependency-graph-page__pill--warning {
+  background: color-mix(in srgb, var(--app-status-warning, #d97706) 14%, transparent);
+  color: var(--app-status-warning, #d97706);
+}
+
+.dependency-graph-page__pill--critical {
+  background: color-mix(in srgb, var(--app-status-critical, #dc2626) 14%, transparent);
+  color: var(--app-status-critical, #dc2626);
+}
+
+.dependency-graph-page__pill--neutral {
+  background: color-mix(in srgb, var(--app-text-muted, #64748b) 12%, transparent);
+  color: var(--app-text-muted, #64748b);
+}
+
+@media (max-width: 960px) {
+  .dependency-graph-page__metrics,
+  .dependency-graph-page__charts {
+    grid-template-columns: 1fr;
+  }
+
+  .dependency-graph-page__table-head,
+  .dependency-graph-page__table-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}

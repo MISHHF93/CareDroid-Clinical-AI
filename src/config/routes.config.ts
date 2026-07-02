@@ -301,7 +301,7 @@ export const LEGACY_EMERGENCY_ROUTE_REDIRECTS = Object.freeze(
     ['/integrations/hub', CANONICAL_ROUTES.integrationHub],
     ['/platform/cosmos', CANONICAL_ROUTES.cosmosViewer],
     ['/cosmos', CANONICAL_ROUTES.cosmosViewer],
-    ['/simulation', CANONICAL_ROUTES.emergencyWhiteboard],
+
     ['/shift', CANONICAL_ROUTES.emergencyShift],
     ['/shift-summary', CANONICAL_ROUTES.emergencyShift],
     ['/pulse', CANONICAL_ROUTES.emergencyPulse],
@@ -314,7 +314,7 @@ export const LEGACY_EMERGENCY_ROUTE_REDIRECTS = Object.freeze(
     ['/emergency/patient-journey', CANONICAL_ROUTES.emergencyPatients],
     ['/emergency/provincial-health', CANONICAL_ROUTES.emergencyWhiteboard],
     ['/emergency/integrations', CANONICAL_ROUTES.integrationHub],
-    ['/emergency/simulation', CANONICAL_ROUTES.emergencyWhiteboard],
+    ['/emergency/simulation', CANONICAL_ROUTES.simulation],
     ['/emergency/department-pulse', CANONICAL_ROUTES.emergencyPulse],
     ['/department-pulse', CANONICAL_ROUTES.emergencyPulse],
     [CANONICAL_ROUTES.emergencyAiGovernance, CANONICAL_ROUTES.aiGovernance],
@@ -337,7 +337,7 @@ export const LEGACY_EMERGENCY_ROUTE_REDIRECTS = Object.freeze(
     ['/workspace/emergency/integrations', CANONICAL_ROUTES.emergencyWhiteboard],
     ['/workspace/emergency/capacity', CANONICAL_ROUTES.emergencyCapacity],
     ['/workspace/emergency/boarding', CANONICAL_ROUTES.emergencyBoarding],
-    ['/workspace/emergency/simulation', CANONICAL_ROUTES.emergencyWhiteboard],
+    ['/workspace/emergency/simulation', CANONICAL_ROUTES.simulation],
     ['/workspace/emergency/federated-learning', CANONICAL_ROUTES.emergencyWhiteboard],
     ['/workspace/emergency/digital-twin', CANONICAL_ROUTES.digitalTwin],
     ['/workspace/emergency/tools', CANONICAL_ROUTES.emergencyTools],
@@ -365,10 +365,7 @@ export const LEGACY_EMERGENCY_ROUTE_REDIRECTS = Object.freeze(
     ['/settings/integrations', CANONICAL_ROUTES.emergencySettings],
     ['/settings/features', CANONICAL_ROUTES.featureFlags],
     ['/anatomy-viewer', CANONICAL_ROUTES.medical3dViewer],
-    ['/live-map', CANONICAL_ROUTES.emergencyWhiteboard],
-    ['/live-map/*', CANONICAL_ROUTES.emergencyWhiteboard],
-    ['/operations', CANONICAL_ROUTES.emergencyWhiteboard],
-    ['/operations/*', CANONICAL_ROUTES.emergencyWhiteboard],
+
     // NOTE: /hospital-map, /medical-iot, /devices removed — real pages now exist; explicit routes in router.tsx win
   ].map(([path, to]) =>
     Object.freeze({
@@ -383,11 +380,6 @@ export const LEGACY_EMERGENCY_ROUTE_REDIRECTS = Object.freeze(
 export const NON_ED_WORKSPACE_REDIRECT_ROUTES = Object.freeze([
   Object.freeze({ path: '/analytics', moduleName: 'Analytics' }),
   Object.freeze({ path: '/federated-learning', moduleName: 'Federated Learning' }),
-  Object.freeze({ path: '/governance', moduleName: 'Governance' }),
-  Object.freeze({ path: '/governance/*', moduleName: 'Governance' }),
-  Object.freeze({ path: '/lab', moduleName: 'Laboratory' }),
-  Object.freeze({ path: '/fleet', moduleName: 'Fleet' }),
-  Object.freeze({ path: '/fleet/*', moduleName: 'Fleet' }),
   Object.freeze({ path: '/vehicle', moduleName: 'Vehicle Operations' }),
   Object.freeze({ path: '/vehicle/*', moduleName: 'Vehicle Operations' }),
   Object.freeze({ path: '/research/*', moduleName: 'Research' }),

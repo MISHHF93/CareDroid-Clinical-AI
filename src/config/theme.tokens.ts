@@ -33,6 +33,7 @@ export const THEME_CONFIG = Object.freeze({
     'src/styles/text-normalization.css',
     'src/styles/surface-normalization.css',
     'src/styles/card-contrast-normalization.css',
+    'src/styles/profile-surface-normalization.css',
     'src/styles/visual-consistency.css',
   ]),
 });

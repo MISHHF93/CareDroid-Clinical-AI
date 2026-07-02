@@ -1,18 +1,12 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
+import {
+  PROFILE_SHELL_SECTIONS,
+  resolveProfileShellEyebrow,
+} from '../../config/profileDesignLanguage.config';
 import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
 import './ProfileSettingsShell.css';
-
-const PROFILE_NAV = Object.freeze([
-  { id: 'overview', label: 'Overview', path: CANONICAL_ROUTES.profile },
-  { id: 'settings', label: 'Identity', path: CANONICAL_ROUTES.profileSettings },
-  { id: 'preferences', label: 'Preferences', path: '/profile/preferences' },
-  { id: 'tools', label: 'Tools', path: CANONICAL_ROUTES.profileToolPreferences },
-  { id: 'workspaces', label: 'Workspaces', path: '/profile/workspaces' },
-  { id: 'security', label: 'Security', path: '/profile/security' },
-  { id: 'activity', label: 'Activity', path: '/profile/activity' },
-]);
 
 export default function ProfileSettingsShell({
   title,
@@ -37,7 +31,7 @@ export default function ProfileSettingsShell({
         <div>
           {surfaces.profile.showShellEyebrow ? (
             <p className="profile-settings-shell__eyebrow">
-              {profileCopy?.workspaceEyebrow || 'User profile'}
+              {resolveProfileShellEyebrow(profileCopy)}
             </p>
           ) : null}
           <h1>{title}</h1>
@@ -71,7 +65,7 @@ export default function ProfileSettingsShell({
       </header>
 
       <nav className="profile-settings-shell__nav" aria-label="Profile sections">
-        {PROFILE_NAV.map((item) => {
+        {PROFILE_SHELL_SECTIONS.map((item) => {
           const active =
             location.pathname === item.path ||
             (item.path !== CANONICAL_ROUTES.profile &&

@@ -33,7 +33,9 @@ html {
   --accent-1: var(--app-accent);
   --accent-2: var(--app-accent-2);
   --accent-cyan: var(--app-accent-2);
-  --accent-green: var(--app-accent);
+  --accent-green: var(--app-accent-interactive);
+  --accent-link: var(--app-link-fg, var(--medical-text-link));
+  --link-color: var(--app-link-fg, var(--medical-text-link));
   --accent-hover: var(--app-accent-hover);
   --accent-gradient: linear-gradient(135deg, var(--app-accent-interactive), var(--app-accent-2));
   --gradient-accent: linear-gradient(135deg, var(--app-accent-interactive), var(--app-accent-2));

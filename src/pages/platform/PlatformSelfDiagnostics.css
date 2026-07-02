@@ -1,0 +1,152 @@
+.self-diagnostics-page {
+  display: grid;
+  gap: var(--compact-panel-gap, 14px);
+  padding: var(--compact-panel-padding, 16px);
+  min-height: 100vh;
+  color: var(--app-fg, var(--medical-text-body, #111827));
+  background: var(--medical-surface-page, var(--app-surface-page, #f8fafc));
+  font-family: Inter, system-ui, sans-serif;
+}
+
+.self-diagnostics-page__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.self-diagnostics-page__title-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.self-diagnostics-page__title-row h1 {
+  margin: 0;
+  font-size: clamp(22px, 3vw, 28px);
+}
+
+.self-diagnostics-page__title-row p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.self-diagnostics-page__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.self-diagnostics-page__actions a {
+  min-height: var(--compact-control-height, 40px);
+  padding: 8px 14px;
+  border-radius: var(--compact-panel-radius, 12px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--medical-card-bg, var(--app-surface-1));
+  text-decoration: none;
+  font-size: 13px;
+  color: inherit;
+}
+
+.self-diagnostics-page__metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.self-diagnostics-page__charts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.self-diagnostics-page__panel {
+  padding: 14px;
+  border-radius: var(--compact-panel-radius, 12px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--medical-card-bg, var(--app-surface-1));
+}
+
+.self-diagnostics-page__panel h2 {
+  margin: 0 0 4px;
+  font-size: 16px;
+}
+
+.self-diagnostics-page__panel p {
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.self-diagnostics-page__checks {
+  display: grid;
+  gap: 8px;
+}
+
+.self-diagnostics-page__check {
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--medical-surface-page, var(--app-surface-page));
+  font-size: 12px;
+}
+
+.self-diagnostics-page__check-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.self-diagnostics-page__check-head span:last-child {
+  color: var(--medical-text-muted, var(--app-text-muted));
+  text-transform: capitalize;
+}
+
+.self-diagnostics-page__check p {
+  margin: 4px 0 0;
+}
+
+.self-diagnostics-page__remediation {
+  color: var(--medical-text-muted, var(--app-text-muted));
+  font-style: italic;
+}
+
+.self-diagnostics-page__pill {
+  display: inline-flex;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  text-transform: capitalize;
+}
+
+.self-diagnostics-page__pill--good {
+  background: color-mix(in srgb, var(--app-status-good, #16a34a) 14%, transparent);
+  color: var(--app-status-good, #16a34a);
+}
+
+.self-diagnostics-page__pill--warning {
+  background: color-mix(in srgb, var(--app-status-warning, #d97706) 14%, transparent);
+  color: var(--app-status-warning, #d97706);
+}
+
+.self-diagnostics-page__pill--critical {
+  background: color-mix(in srgb, var(--app-status-critical, #dc2626) 14%, transparent);
+  color: var(--app-status-critical, #dc2626);
+}
+
+.self-diagnostics-page__pill--neutral {
+  background: color-mix(in srgb, var(--app-text-muted, #64748b) 12%, transparent);
+  color: var(--app-text-muted, #64748b);
+}
+
+@media (max-width: 960px) {
+  .self-diagnostics-page__metrics,
+  .self-diagnostics-page__charts {
+    grid-template-columns: 1fr;
+  }
+}

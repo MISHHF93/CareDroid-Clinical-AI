@@ -1,0 +1,179 @@
+.scenario-player-page {
+  display: grid;
+  gap: var(--compact-panel-gap, 14px);
+  padding: var(--compact-panel-padding, 16px);
+  min-height: 100vh;
+  color: var(--app-fg, var(--medical-text-body, #111827));
+  background: var(--medical-surface-page, var(--app-surface-page, #f8fafc));
+  font-family: Inter, system-ui, sans-serif;
+}
+
+.scenario-player-page__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.scenario-player-page__title-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.scenario-player-page__title-row h1 {
+  margin: 0;
+  font-size: clamp(22px, 3vw, 28px);
+  color: var(--medical-text-heading, var(--app-text-primary));
+}
+
+.scenario-player-page__title-row p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.scenario-player-page__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.scenario-player-page__actions a {
+  min-height: var(--compact-control-height, 40px);
+  padding: 8px 14px;
+  border-radius: var(--compact-panel-radius, 12px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--medical-card-bg, var(--app-surface-1));
+  text-decoration: none;
+  font-size: 13px;
+  color: inherit;
+}
+
+.scenario-player-page__metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.scenario-player-page__layout {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.scenario-player-page__panel {
+  display: grid;
+  gap: 10px;
+  padding: var(--compact-panel-padding, 14px);
+  border-radius: var(--compact-panel-radius, 14px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--medical-card-bg, var(--app-surface-1));
+}
+
+.scenario-player-page__panel h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.scenario-player-page__panel p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.scenario-player-page__vitals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.scenario-player-page__vitals span {
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--app-surface-muted, #f8fafc);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+}
+
+.scenario-player-page__labs {
+  display: grid;
+  gap: 6px;
+}
+
+.scenario-player-page__lab-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 8px;
+  font-size: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--medical-card-border, var(--app-panel-border));
+}
+
+.scenario-player-page__lab-row .is-warning {
+  color: var(--app-chart-5);
+  font-weight: 600;
+}
+
+.scenario-player-page__checklist {
+  display: grid;
+  gap: 8px;
+}
+
+.scenario-player-page__check {
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: var(--compact-panel-radius, 10px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--app-surface-muted, #f8fafc);
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.scenario-player-page__check.is-selected {
+  border-color: var(--medical-accent, var(--app-accent));
+  background: var(--medical-card-bg, var(--app-surface-1));
+}
+
+.scenario-player-page__prompts {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+}
+
+.scenario-player-page__integrations {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.scenario-player-page__integrations a {
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  text-decoration: none;
+  font-size: 12px;
+  color: inherit;
+}
+
+.scenario-player-page__debrief-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  font-size: 12px;
+}
+
+.scenario-player-page__debrief-grid div {
+  display: grid;
+  gap: 4px;
+}
+
+@media (max-width: 900px) {
+  .scenario-player-page__metrics,
+  .scenario-player-page__layout,
+  .scenario-player-page__debrief-grid {
+    grid-template-columns: 1fr;
+  }
+}

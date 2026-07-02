@@ -113,7 +113,7 @@ describe('canonical route tree', () => {
       expect.arrayContaining([
         expect.objectContaining({ path: '/pulse', to: '/emergency/pulse' }),
         expect.objectContaining({ path: '/shift', to: '/emergency/shift' }),
-        expect.objectContaining({ path: '/emergency/simulation', to: '/emergency/whiteboard' }),
+        expect.objectContaining({ path: '/emergency/simulation', to: '/simulation' }),
         expect.objectContaining({ path: '/emergency/calculators', to: '/emergency/tools' }),
       ]),
     );
@@ -135,9 +135,14 @@ describe('canonical route tree', () => {
     expect(NON_ED_WORKSPACE_REDIRECT_ROUTES).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ path: '/analytics', moduleName: 'Analytics' }),
-        expect.objectContaining({ path: '/fleet/*', moduleName: 'Fleet' }),
-        expect.objectContaining({ path: '/lab', moduleName: 'Laboratory' }),
-        expect.objectContaining({ path: '/governance/*', moduleName: 'Governance' }),
+        expect.objectContaining({ path: '/federated-learning', moduleName: 'Federated Learning' }),
+      ]),
+    );
+    expect(NON_ED_WORKSPACE_REDIRECT_ROUTES).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ path: '/fleet/*' }),
+        expect.objectContaining({ path: '/lab' }),
+        expect.objectContaining({ path: '/governance/*' }),
       ]),
     );
     expect(NON_ED_WORKSPACE_REDIRECT_ROUTES).not.toEqual(

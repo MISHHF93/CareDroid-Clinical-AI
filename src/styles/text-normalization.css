@@ -49,6 +49,16 @@ html[data-theme='light'],
   text-decoration-color: color-mix(in srgb, var(--medical-text-link) 35%, transparent);
 }
 
+/* Accent fill is for chrome; readable action text on white uses link tokens. */
+:is(.app-shell, .emergency-app-shell)
+  :is(
+    [class*='__link'],
+    [class*='-link']:not([class*='btn']):not([class*='button']),
+    [class*='__cta']:not([class*='--solid']):not([class*='--primary'])
+  ):not([class*='btn']):not([class*='button']):not([role='button']) {
+  color: var(--medical-text-link);
+}
+
 :is(.app-shell, .emergency-app-shell)
   a:not([class*='btn']):not([class*='button']):not([role='button']):hover {
   color: var(--medical-text-link-hover);

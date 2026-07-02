@@ -28,7 +28,7 @@ export const SUITE_FEATURE_ENTITLEMENTS = Object.freeze({
   },
   native_ai_drift_monitoring: {
     featureFlagId: 'ai-clinical-copilot',
-    requiredPlan: (SUBSCRIPTION_TIERS as any).ENTERPRISE,
+    requiredPlan: SUBSCRIPTION_TIERS.INSTITUTIONAL,
     requiredPackIds: ['emergency-department-pack', 'analytics-pack'],
     rolePermissions: ['admin', 'owner', 'charge_nurse'],
     auditCategory: 'native-ai',

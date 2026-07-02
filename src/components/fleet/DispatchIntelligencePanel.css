@@ -1,0 +1,94 @@
+.dispatch-intelligence {
+  display: grid;
+  gap: 12px;
+}
+
+.dispatch-intelligence__header {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.dispatch-intelligence__header h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.dispatch-intelligence__header p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.dispatch-intelligence__metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.dispatch-intelligence__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  gap: 12px;
+}
+
+.dispatch-intelligence__queue {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border-radius: var(--compact-panel-radius, 12px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--app-surface-muted, #f8fafc);
+}
+
+.dispatch-intelligence__queue h3 {
+  margin: 0;
+  font-size: 14px;
+}
+
+.dispatch-intelligence__queue-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--medical-card-bg, var(--app-surface-1));
+}
+
+.dispatch-intelligence__queue-item span {
+  display: block;
+  font-size: 12px;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.dispatch-intelligence__empty,
+.dispatch-intelligence__safety {
+  margin: 0;
+  font-size: 13px;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.dispatch-intelligence__actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.dispatch-intelligence__actions button,
+.dispatch-intelligence__actions a {
+  min-height: var(--compact-control-height, 40px);
+  padding: 8px 14px;
+  border-radius: var(--compact-panel-radius, 10px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--medical-card-bg, var(--app-surface-1));
+  text-decoration: none;
+  cursor: pointer;
+}
+
+@media (max-width: 900px) {
+  .dispatch-intelligence__metrics,
+  .dispatch-intelligence__grid {
+    grid-template-columns: 1fr;
+  }
+}

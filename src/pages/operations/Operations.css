@@ -1,0 +1,159 @@
+.operations-hub {
+  display: grid;
+  gap: var(--compact-panel-gap, 14px);
+  padding: var(--compact-panel-padding, 16px);
+  min-height: 100vh;
+  color: var(--app-fg, var(--medical-text-body, #111827));
+  background: var(--medical-surface-page, var(--app-surface-page, #f8fafc));
+  font-family: Inter, system-ui, sans-serif;
+}
+
+.operations-hub__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.operations-hub__title-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.operations-hub__title-row h1 {
+  margin: 0;
+  font-size: clamp(22px, 3vw, 28px);
+  color: var(--medical-text-heading, var(--app-text-primary));
+}
+
+.operations-hub__title-row p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.operations-hub__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.operations-hub__actions a,
+.operations-hub__actions button {
+  min-height: var(--compact-control-height, 40px);
+  padding: 8px 14px;
+  border-radius: var(--compact-panel-radius, 12px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--medical-card-bg, var(--app-surface-1));
+  text-decoration: none;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.operations-hub__actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.operations-hub__search {
+  min-height: var(--compact-control-height, 40px);
+  padding: 8px 12px;
+  border-radius: var(--compact-panel-radius, 10px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--medical-card-bg, var(--app-surface-1));
+  font-size: 13px;
+  width: min(280px, 100%);
+}
+
+.operations-hub__role {
+  margin: 0;
+  font-size: 13px;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.operations-hub__metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.operations-hub__focus {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: var(--compact-panel-radius, 12px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--medical-card-bg, var(--app-surface-1));
+  font-size: 13px;
+}
+
+.operations-hub__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.operations-hub__surface {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+  border-radius: var(--compact-panel-radius, 12px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--medical-card-bg, var(--app-surface-1));
+  text-decoration: none;
+  color: inherit;
+}
+
+.operations-hub__surface:hover,
+.operations-hub__surface:focus-visible {
+  border-color: var(--app-chart-1);
+  outline: none;
+}
+
+.operations-hub__surface h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.operations-hub__surface p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.operations-hub__surface-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 11px;
+  color: var(--medical-text-subtle, var(--app-text-muted));
+}
+
+.operations-hub__surface-metrics {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.operations-hub__surface-metrics span {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+@media (max-width: 900px) {
+  .operations-hub__metrics {
+    grid-template-columns: 1fr;
+  }
+}
+
+.operations-hub__section-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}

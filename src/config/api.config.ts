@@ -52,7 +52,9 @@ export const API_ROUTES = Object.freeze({
     snapshot: '/api/medical-iot/snapshot',
   }),
   fleet: Object.freeze({
+    snapshot: '/api/fleet/snapshot',
     vehiclesLive: '/api/fleet/vehicles/live',
     routesActive: '/api/fleet/routes/active',
+    alerts: '/api/fleet/alerts',
   }),
 });

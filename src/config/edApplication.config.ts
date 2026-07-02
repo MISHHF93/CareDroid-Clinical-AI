@@ -1,4 +1,5 @@
 import { CANONICAL_ROUTES } from './routes.config';
+import { isInShellRoute } from './inShellRouteAllowlist';
 import { getPlatformHomeRoute } from './receptionFirstUx.config';
 
 /**
@@ -75,21 +76,12 @@ export const ED_EXTENSION_ROUTE_REDIRECTS: readonly EdExtensionRedirect[] = Obje
   { prefix: '/start',                     to: ED_APPLICATION.defaultHomeRoute,           reason: 'platform-entry-hub' },
   { prefix: '/dashboard',                 to: CANONICAL_ROUTES.emergencyWhiteboard,      reason: 'legacy-dashboard' },
   { prefix: '/app',                       to: CANONICAL_ROUTES.emergencyWhiteboard,      reason: 'legacy-app-alias' },
-  { prefix: '/integrations/hub',          to: `${CANONICAL_ROUTES.emergencySettings}#integrations`, reason: 'integration-hub' },
 
   { prefix: '/emergency/intake',          to: CANONICAL_ROUTES.emergencyReception,       reason: 'intake-through-reception' },
   { prefix: '/vehicle',                   to: CANONICAL_ROUTES.emergencyEms,             reason: 'fleet-extension' },
   { prefix: '/surveillance',              to: CANONICAL_ROUTES.emergencySettings,        reason: 'surveillance-extension' },
   { prefix: '/cosmos',                    to: CANONICAL_ROUTES.emergencyWhiteboard,      reason: 'cosmos-extension' },
   { prefix: '/workspaces',                to: CANONICAL_ROUTES.emergencySettings,        reason: 'workspace-platform' },
-  { prefix: '/workspace',                 to: CANONICAL_ROUTES.emergencySettings,        reason: 'workspace-platform' },
-  { prefix: '/discover',                  to: CANONICAL_ROUTES.emergencySettings,        reason: 'discovery-platform' },
-  { prefix: '/knowledge-graph',           to: CANONICAL_ROUTES.emergencyTools,           reason: 'knowledge-extension' },
-  { prefix: '/knowledge-hub',             to: CANONICAL_ROUTES.emergencyTools,           reason: 'knowledge-extension' },
-  { prefix: '/knowledge-base',            to: CANONICAL_ROUTES.emergencyTools,           reason: 'knowledge-extension' },
-  { prefix: '/digital-twin-intelligence', to: CANONICAL_ROUTES.emergencySettings,        reason: 'digital-twin' },
-  { prefix: '/digital-twin',              to: CANONICAL_ROUTES.emergencySettings,        reason: 'digital-twin' },
-  { prefix: '/live-map',                  to: CANONICAL_ROUTES.emergencyEms,             reason: 'live-map-fallback' },
   { prefix: '/operations-center',         to: CANONICAL_ROUTES.emergencyAnalytics,       reason: 'operations-center' },
   { prefix: '/platform-intelligence',     to: CANONICAL_ROUTES.emergencySettings,        reason: 'platform-intelligence' },
   { prefix: '/platform-admin',            to: CANONICAL_ROUTES.emergencySettings,        reason: 'platform-admin' },
@@ -108,6 +100,13 @@ export const ED_EXTENSION_ROUTE_REDIRECTS: readonly EdExtensionRedirect[] = Obje
   // /operations         → Operations page
   // /predictive-analytics → PredictiveAnalyticsDashboard
   // /marketplace        → PluginMarketplace
+  // /integrations/hub   → IntegrationHubPage
+  // /workspace          → EdApplicationEntryRedirect
+  // /discover           → CapabilityDiscovery
+  // /knowledge-graph    → ClinicalKnowledgeGraph
+  // /knowledge-hub      → HealthcareKnowledgeHubPage
+  // /knowledge-base     → (tools console knowledge shortcuts)
+  // /live-map           → LiveTrackingMap (tools console)
 ]);
 
 function readEnvFlag(value: string | undefined, defaultWhenUnset: boolean): boolean {
@@ -131,6 +130,9 @@ export function resolveEdExtensionRedirect(pathname = ''): string | null {
 
   const normalized = pathname.split('?')[0].split('#')[0];
   if (isEdCoreRoute(normalized)) {
+    return null;
+  }
+  if (isInShellRoute(normalized)) {
     return null;
   }
   for (const entry of ED_EXTENSION_ROUTE_REDIRECTS) {

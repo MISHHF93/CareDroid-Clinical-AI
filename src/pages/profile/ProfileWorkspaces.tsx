@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Card from '../../components/ui/card';
 import ProfileSettingsShell from '../../components/profile/ProfileSettingsShell';
 import useProfileShellProps from '../../hooks/useProfileShellProps';
+import { resolveProfileShellSection } from '../../config/profileDesignLanguage.config';
 import { useUserIdentity } from '../../contexts/UserIdentityContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { isFutureWorkspace } from '../../config/workspace.config';
@@ -10,6 +11,7 @@ import './ProfileIdentityPages.css';
 
 export default function ProfileWorkspaces() {
   const { accessSummary, profileCopy } = useProfileShellProps();
+  const workspacesSection = resolveProfileShellSection('workspaces');
   const {
     activeWorkspace,
     workspaces,
@@ -36,8 +38,8 @@ export default function ProfileWorkspaces() {
 
   return (
     <ProfileSettingsShell
-      title="Workspaces"
-      subtitle="Switch active workspace and set your default clinical workspace."
+      title={workspacesSection.pageTitle}
+      subtitle={workspacesSection.pageSubtitle}
       accessSummary={accessSummary}
       profileCopy={profileCopy}
     >

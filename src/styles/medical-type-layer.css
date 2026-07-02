@@ -9,8 +9,8 @@
   --medical-text-subtle: var(--medical-ink-subtle);
   --medical-text-disabled: #d1d5db;
   --medical-text-placeholder: var(--medical-ink-subtle);
-  --medical-text-link: var(--medical-accent);
-  --medical-text-link-hover: var(--medical-accent-hover);
+  --medical-text-link: var(--medical-sky-700);
+  --medical-text-link-hover: var(--medical-sky-600);
   --medical-text-on-accent: #ffffff;
   --medical-text-on-solid: #ffffff;
   --medical-text-inverse: #ffffff;
@@ -29,4 +29,5 @@
   --app-text-muted: var(--medical-text-muted);
   --app-text-subtle: var(--medical-text-subtle);
   --app-text-link: var(--medical-text-link);
+  --app-text-link-hover: var(--medical-text-link-hover);
 }

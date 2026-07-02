@@ -4,6 +4,15 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import ProfileSummaryCard from './ProfileSummaryCard';
 
+vi.mock('../../hooks/useProfileShellProps', () => ({
+  default: () => ({
+    profileCopy: {
+      workspaceEyebrow: 'Provider lane',
+      personaTitle: 'Emergency Physician',
+    },
+  }),
+}));
+
 vi.mock('../../contexts/UserIdentityContext', () => ({
   useUserIdentity: () => ({
     account: {
@@ -29,6 +38,7 @@ describe('ProfileSummaryCard', () => {
       </MemoryRouter>,
     );
 
+    expect(screen.getByText('Provider lane')).toBeInTheDocument();
     expect(screen.getByText('Avery Clinician')).toBeInTheDocument();
     expect(screen.getByText('Emergency Medicine')).toBeInTheDocument();
     expect(screen.getByText('CareDroid General')).toBeInTheDocument();

@@ -5,13 +5,19 @@ import path from 'path';
 const parsedMax = Number.parseInt(process.env.VITEST_MAX_WORKERS ?? '', 10);
 const maxWorkers = Number.isFinite(parsedMax) && parsedMax > 0 ? parsedMax : 1;
 const fileParallelism = maxWorkers > 1;
+const jsdomNavigationPattern = /Not implemented: navigation to another Document/;
 
 export default defineConfig({
   plugins: [react()],
   test: {
     globals: true,
     environment: 'jsdom',
-    pool: 'threads',
+    pool: 'forks',
+    onConsoleLog(log) {
+      if (jsdomNavigationPattern.test(log)) {
+        return false;
+      }
+    },
     exclude: [
       '**/node_modules/**',
       '**/dist/**',
@@ -26,7 +32,7 @@ export default defineConfig({
     ],
     maxWorkers,
     fileParallelism,
-    setupFiles: './src/test/setup.js',
+    setupFiles: './src/test/setup.ts',
     css: true,
     coverage: {
       provider: 'v8',

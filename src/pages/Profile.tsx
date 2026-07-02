@@ -2,7 +2,14 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Card from '../components/ui/card';
 import ProfileSummaryCard from '../components/profile/ProfileSummaryCard';
+import ProfileCopilotCard from '../components/profile/ProfileCopilotCard';
+import ProfileInsightsPanel from '../components/profile/ProfileInsightsPanel';
+import ProfileSectionHeader from '../components/profile/ProfileSectionHeader';
 import ProfileSettingsShell from '../components/profile/ProfileSettingsShell';
+import {
+  resolveProfileOverviewCard,
+  resolveProfileShellSection,
+} from '../config/profileDesignLanguage.config';
 import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
 import { Permission, useUser } from '../contexts/UserContext';
@@ -101,6 +108,14 @@ const Profile = () => {
     () => buildCompetencyCredentialingSnapshot({ role, specialty }),
     [role, specialty]
   );
+  const overviewSection = resolveProfileShellSection('overview');
+  const identityCard = resolveProfileOverviewCard('identity');
+  const recentToolsCard = resolveProfileOverviewCard('recentTools');
+  const competencyCard = resolveProfileOverviewCard('competency');
+  const savedToolsCard = resolveProfileOverviewCard('savedTools');
+  const preferencesCard = resolveProfileOverviewCard('preferences');
+  const activityCard = resolveProfileOverviewCard('activity');
+  const phiCard = resolveProfileOverviewCard('phiVisibility');
 
   useEffect(() => {
     let cancelled = false;
@@ -158,8 +173,8 @@ const Profile = () => {
 
   return (
     <ProfileSettingsShell
-      title="Profile overview"
-      subtitle={profileCopy.profileShellSubtitle}
+      title={overviewSection.pageTitle}
+      subtitle={profileCopy.profileShellSubtitle || overviewSection.pageSubtitle}
       accessSummary={resolvedAccessSummary}
       profileCopy={profileCopy}
     >
@@ -176,11 +191,9 @@ const Profile = () => {
     ) : null}
     <section className="profile-page">
       <Card>
-        <h2 className="profile-card__title">Profile</h2>
-        {surfaces.profile.showNestedSubtitles ? (
-          <p className="profile-card__subtitle">
-            Review your account profile, recent activity, and access visibility.
-          </p>
+        <h2 className="profile-card__title">{identityCard.title}</h2>
+        {surfaces.profile.showNestedSubtitles && identityCard.subtitle ? (
+          <p className="profile-card__subtitle">{identityCard.subtitle}</p>
         ) : null}
         <div className="profile-summary-wrap">
           <ProfileSummaryCard />
@@ -198,12 +211,27 @@ const Profile = () => {
           </p>
         )}
 
+        <ProfileInsightsPanel
+          profileCopy={profileCopy}
+          activityLogs={activityState.logs}
+          activityLoading={activityState.loading}
+          activityTotal={activityState.total}
+          recentTools={recentToolItems}
+          competencySummary={competencySnapshot.summary}
+          showCompetency={surfaces.profile.showCompetencyCard}
+        />
+
         <section className="profile-overview-grid" aria-label="Profile tools and preferences">
+          <ProfileCopilotCard />
+
           <div className="profile-overview-card">
-            <div className="profile-overview-card__header">
-              <h3>Recent tools</h3>
-              <Link to="/profile/activity">View activity</Link>
-            </div>
+            <ProfileSectionHeader
+              title={recentToolsCard.title}
+              iconKey="clinical-tools"
+              accent="action"
+              ctaLabel={recentToolsCard.ctaLabel}
+              ctaPath={recentToolsCard.ctaPath}
+            />
             <div className="profile-overview-list">
               {recentToolItems.length > 0 ? (
                 recentToolItems.slice(0, 3).map((tool) => (
@@ -213,17 +241,21 @@ const Profile = () => {
                   </div>
                 ))
               ) : (
-                <p>No recent tools yet.</p>
+                <p>{recentToolsCard.empty}</p>
               )}
             </div>
           </div>
 
           {surfaces.profile.showCompetencyCard ? (
           <div className="profile-overview-card profile-competency-status">
-            <div className="profile-overview-card__header">
-              <h3>Competency Status</h3>
-              <Link to="/competencies">View competencies</Link>
-            </div>
+            <ProfileSectionHeader
+              title={competencyCard.title}
+              subtitle={competencyCard.subtitle}
+              iconKey="shield-check"
+              accent="information"
+              ctaLabel={competencyCard.ctaLabel}
+              ctaPath={competencyCard.ctaPath}
+            />
             <div className="profile-competency-summary">
               <div>
                 <strong>{competencySnapshot.summary.overallReadiness}%</strong>
@@ -253,10 +285,13 @@ const Profile = () => {
           ) : null}
 
           <div className="profile-overview-card">
-            <div className="profile-overview-card__header">
-              <h3>Saved tools</h3>
-              <Link to="/profile/tool-preferences">Tool preferences</Link>
-            </div>
+            <ProfileSectionHeader
+              title={savedToolsCard.title}
+              iconKey="notes"
+              accent="neutral"
+              ctaLabel={savedToolsCard.ctaLabel}
+              ctaPath={savedToolsCard.ctaPath}
+            />
             <div className="profile-overview-list">
               {savedTools.length > 0 ? (
                 savedTools.slice(0, 3).map((tool) => (
@@ -266,16 +301,19 @@ const Profile = () => {
                   </div>
                 ))
               ) : (
-                <p>Favorite or pin tools to save them here.</p>
+                <p>{savedToolsCard.empty}</p>
               )}
             </div>
           </div>
 
           <div className="profile-overview-card">
-            <div className="profile-overview-card__header">
-              <h3>Preferences</h3>
-              <Link to="/profile/preferences">Edit preferences</Link>
-            </div>
+            <ProfileSectionHeader
+              title={preferencesCard.title}
+              iconKey="settings"
+              accent="neutral"
+              ctaLabel={preferencesCard.ctaLabel}
+              ctaPath={preferencesCard.ctaPath}
+            />
             <dl className="profile-preference-list">
               <div>
                 <dt>Theme</dt>
@@ -296,15 +334,12 @@ const Profile = () => {
         <section className="profile-activity-card" aria-labelledby="profile-activity-title">
           <div className="profile-activity-card__header">
             <div>
-              <h3 id="profile-activity-title">Recent activity</h3>
-              {surfaces.profile.showNestedSubtitles ? (
-              <p>
-                Recent account activity comes from your protected audit log endpoint. Admin-only audit
-                logs remain behind role-based access control.
-              </p>
+              <h3 id="profile-activity-title">{activityCard.title}</h3>
+              {surfaces.profile.showNestedSubtitles && activityCard.subtitle ? (
+              <p>{activityCard.subtitle}</p>
               ) : null}
             </div>
-            <span className="profile-activity-card__badge">My logs</span>
+            <span className="profile-activity-card__badge">{activityCard.badge || 'My logs'}</span>
           </div>
 
           {activityState.loading && (
@@ -362,7 +397,7 @@ const Profile = () => {
           {surfaces.profile.showPhiActivity ? (
           <div className="profile-phi-panel">
             <div>
-              <h4>PHI Access Visibility</h4>
+              <h4>{phiCard.title}</h4>
               {canViewPhiAccess ? (
                 <p>
                   Your role can view PHI access visibility. A limited summary is shown here; the full

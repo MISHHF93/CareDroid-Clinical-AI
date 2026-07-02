@@ -4,6 +4,8 @@ import { ChatService } from './chat.service';
 import { AuthorizationGuard } from '../auth/guards/authorization.guard';
 import { RequirePermission } from '../auth/decorators/permissions.decorator';
 import { Permission } from '../auth/enums/permission.enum';
+import { EntitlementService } from '../platform-assets/entitlement.service';
+import { assertEntitlementLaunchFromRequest } from '../platform-assets/entitlement-launch.util';
 import { MedicalSource } from '../rag/dto/medical-source.dto';
 import { IsArray, IsNumber, IsObject, IsOptional, IsString } from 'class-validator';
 
@@ -127,7 +129,10 @@ interface ChatResponseDto {
 @Controller('chat')
 @UseGuards(AuthGuard('jwt'), AuthorizationGuard)
 export class ChatController {
-  constructor(private chatService: ChatService) {}
+  constructor(
+    private chatService: ChatService,
+    private readonly entitlementService: EntitlementService,
+  ) {}
 
   @Post('message-3d')
   @RequirePermission(Permission.READ_PHI)
@@ -146,6 +151,7 @@ export class ChatController {
   @Post('intent-classify')
   @RequirePermission(Permission.USE_AI_CHAT)
   async classifyIntent(@Body() dto: IntentClassifyDto, @Req() req?: any) {
+    await assertEntitlementLaunchFromRequest(this.entitlementService, req, 'agent-clinical');
     const userId = req?.user?.id || 'anonymous';
     const userRole = req?.user?.role || null;
     return this.chatService.classifyIntentBrief(dto.message, userId, userRole, dto.conversationId);
@@ -154,7 +160,7 @@ export class ChatController {
   @Post('message')
   @RequirePermission(Permission.USE_AI_CHAT)
   async sendMessage(@Body() dto: ChatMessageDto, @Req() req?: any): Promise<ChatResponseDto> {
-    // Extract userId and role from request if authenticated
+    await assertEntitlementLaunchFromRequest(this.entitlementService, req, 'agent-clinical');
     const userId = req?.user?.id || 'anonymous';
     const userRole = req?.user?.role || null;
 

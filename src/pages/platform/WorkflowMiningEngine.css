@@ -1,0 +1,117 @@
+.workflow-mining-page {
+  display: grid;
+  gap: var(--compact-panel-gap, 14px);
+  padding: var(--compact-panel-padding, 16px);
+  min-height: 100vh;
+  color: var(--app-fg, var(--medical-text-body, #111827));
+  background: var(--medical-surface-page, var(--app-surface-page, #f8fafc));
+  font-family: Inter, system-ui, sans-serif;
+}
+
+.workflow-mining-page__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.workflow-mining-page__title-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.workflow-mining-page__title-row h1 {
+  margin: 0;
+  font-size: clamp(22px, 3vw, 28px);
+}
+
+.workflow-mining-page__title-row p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.workflow-mining-page__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.workflow-mining-page__actions a {
+  min-height: var(--compact-control-height, 40px);
+  padding: 8px 14px;
+  border-radius: var(--compact-panel-radius, 12px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--medical-card-bg, var(--app-surface-1));
+  text-decoration: none;
+  font-size: 13px;
+  color: inherit;
+}
+
+.workflow-mining-page__metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.workflow-mining-page__charts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.workflow-mining-page__panel {
+  padding: 14px;
+  border-radius: var(--compact-panel-radius, 12px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--medical-card-bg, var(--app-surface-1));
+}
+
+.workflow-mining-page__panel-head {
+  margin-bottom: 10px;
+}
+
+.workflow-mining-page__panel h2 {
+  margin: 0 0 4px;
+  font-size: 16px;
+}
+
+.workflow-mining-page__panel p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.workflow-mining-page__steps {
+  margin: 0 0 12px;
+  padding-left: 18px;
+  font-size: 13px;
+}
+
+.workflow-mining-page__signals {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  font-size: 13px;
+}
+
+.workflow-mining-page__signals h3 {
+  margin: 0 0 6px;
+  font-size: 14px;
+}
+
+.workflow-mining-page__signals ul {
+  margin: 0;
+  padding-left: 16px;
+}
+
+@media (max-width: 960px) {
+  .workflow-mining-page__metrics,
+  .workflow-mining-page__charts,
+  .workflow-mining-page__signals {
+    grid-template-columns: 1fr;
+  }
+}

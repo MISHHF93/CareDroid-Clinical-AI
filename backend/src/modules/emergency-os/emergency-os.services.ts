@@ -506,6 +506,10 @@ const WORKFLOW_LOG_TITLES: Record<WorkflowActionType, string> = {
   integration_event_received: 'Integration event received',
   upgrade_harness_used: 'Upgrade harness used',
   administrative_automation_reviewed: 'Administrative automation reviewed',
+  staff_assigned: 'Staff assigned',
+  patient_note_added: 'Patient note added',
+  operational_alert_dispatched: 'Operational alert dispatched',
+  patient_escalated: 'Patient escalated',
 };
 
 type WorkflowActionInput = Omit<
@@ -771,6 +775,129 @@ export class EmergencyPatientService {
       ...patch,
     };
     return clone(this.patients[index]);
+  }
+
+  assignStaffToPatient(
+    patientId: string,
+    staffId: string,
+    actorStaffId = 'workflow-orchestrator',
+  ): EmergencyPatient {
+    const index = this.patients.findIndex((patient) => patient.id === patientId);
+    if (index === -1) throw new Error(`Emergency patient ${patientId} not found`);
+    const patient = this.patients[index];
+    this.patients[index] = {
+      ...patient,
+      assignedStaffId: staffId,
+    };
+    this.workflowLogService.record({
+      type: 'staff_assigned',
+      title: 'Staff assigned',
+      summary: `Assigned staff ${staffId} to patient ${patient.firstName} ${patient.lastName}.`,
+      patientId,
+      actorStaffId,
+      source: 'emergency-patient-service',
+      metadata: { staffId },
+    });
+    const updated = clone(this.patients[index]);
+    this.publishPatientBoardRealtime('staff_assigned', { patientId, staffId, patient: updated }, updated);
+    return updated;
+  }
+
+  addPatientNote(
+    patientId: string,
+    text: string,
+    authorId = 'workflow-orchestrator',
+  ): EmergencyPatient {
+    const index = this.patients.findIndex((patient) => patient.id === patientId);
+    if (index === -1) throw new Error(`Emergency patient ${patientId} not found`);
+    const patient = this.patients[index];
+    const note = {
+      id: createId('note'),
+      text,
+      authorId,
+      timestamp: new Date().toISOString(),
+    };
+    this.patients[index] = {
+      ...patient,
+      notes: [...patient.notes, note],
+    };
+    this.workflowLogService.record({
+      type: 'patient_note_added',
+      title: 'Patient note added',
+      summary: 'Administrative automation staged clinician-reviewed note.',
+      patientId,
+      actorStaffId: authorId,
+      source: 'emergency-patient-service',
+      metadata: { noteId: note.id },
+    });
+    const updated = clone(this.patients[index]);
+    this.publishPatientBoardRealtime('patient_note_added', { patientId, note, patient: updated }, updated);
+    return updated;
+  }
+
+  dispatchOperationalAlert(input: {
+    severity: EmergencyAlert['severity'];
+    title: string;
+    message: string;
+    patientId?: string;
+    source?: string;
+    metadata?: Record<string, unknown>;
+  }): EmergencyAlert {
+    const alert: EmergencyAlert = {
+      id: createId('alert'),
+      severity: input.severity,
+      title: input.title,
+      message: input.message,
+      patientId: input.patientId,
+      createdAt: new Date().toISOString(),
+      dismissed: false,
+    };
+    this.alerts.unshift(alert);
+    this.workflowLogService.record({
+      type: 'operational_alert_dispatched',
+      title: input.title,
+      summary: input.message,
+      patientId: input.patientId,
+      source: input.source || 'emergency-patient-service',
+      severity: input.severity === 'Critical' ? 'Critical' : 'Warning',
+      metadata: (input.metadata || {}) as Record<string, string | number | boolean | null>,
+    });
+    this.realtimeService?.publish({ type: 'alert_created', payload: alert });
+    this.realtimeService?.publishBoardMutations();
+    return clone(alert);
+  }
+
+  escalatePatient(patientId: string, actorStaffId: string): EmergencyPatient {
+    const index = this.patients.findIndex((patient) => patient.id === patientId);
+    if (index === -1) throw new Error(`Emergency patient ${patientId} not found`);
+    const patient = this.patients[index];
+    const flags = patient.flags.includes('Escalated')
+      ? patient.flags
+      : [...patient.flags, 'Escalated'];
+    this.patients[index] = {
+      ...patient,
+      flags,
+    };
+    this.dispatchOperationalAlert({
+      severity: 'Critical',
+      title: `Escalation — ${patient.firstName} ${patient.lastName}`,
+      message: 'Administrative automation escalation recorded for clinician follow-up.',
+      patientId,
+      source: 'workflow-orchestrator',
+      metadata: { actorStaffId },
+    });
+    this.workflowLogService.record({
+      type: 'patient_escalated',
+      title: 'Patient escalated',
+      summary: `Escalated patient ${patient.firstName} ${patient.lastName}.`,
+      patientId,
+      actorStaffId,
+      source: 'emergency-patient-service',
+      severity: 'Critical',
+    });
+    const updated = clone(this.patients[index]);
+    this.publishPatientBoardRealtime('patient_escalated', { patientId, patient: updated }, updated);
+    return updated;
   }
 
   computeCapacity(): CapacitySnapshot {

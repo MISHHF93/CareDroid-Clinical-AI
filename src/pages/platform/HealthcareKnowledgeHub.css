@@ -1,0 +1,158 @@
+.knowledge-hub-page {
+  display: grid;
+  gap: var(--compact-panel-gap, 14px);
+  padding: var(--compact-panel-padding, 16px);
+  min-height: 100vh;
+  color: var(--app-fg, var(--medical-text-body, #111827));
+  background: var(--medical-surface-page, var(--app-surface-page, #f8fafc));
+  font-family: Inter, system-ui, sans-serif;
+}
+
+.knowledge-hub-page__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.knowledge-hub-page__title-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.knowledge-hub-page__title-row h1 {
+  margin: 0;
+  font-size: clamp(22px, 3vw, 28px);
+}
+
+.knowledge-hub-page__title-row p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.knowledge-hub-page__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.knowledge-hub-page__actions a {
+  min-height: var(--compact-control-height, 40px);
+  padding: 8px 14px;
+  border-radius: var(--compact-panel-radius, 12px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--medical-card-bg, var(--app-surface-1));
+  text-decoration: none;
+  font-size: 13px;
+  color: inherit;
+}
+
+.knowledge-hub-page__filters {
+  display: grid;
+  grid-template-columns: 1.4fr repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.knowledge-hub-page__filters input,
+.knowledge-hub-page__filters select {
+  min-height: var(--compact-control-height, 40px);
+  padding: 8px 12px;
+  border-radius: var(--compact-panel-radius, 12px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--medical-card-bg, var(--app-surface-1));
+  font-size: 13px;
+}
+
+.knowledge-hub-page__metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.knowledge-hub-page__charts {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.knowledge-hub-page__results {
+  display: grid;
+  gap: 10px;
+}
+
+.knowledge-hub-page__card {
+  padding: 14px;
+  border-radius: var(--compact-panel-radius, 12px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--medical-card-bg, var(--app-surface-1));
+}
+
+.knowledge-hub-page__card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.knowledge-hub-page__card h2 {
+  margin: 0 0 4px;
+  font-size: 16px;
+}
+
+.knowledge-hub-page__card p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.knowledge-hub-page__type {
+  display: inline-flex;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  background: color-mix(in srgb, var(--app-text-muted, #64748b) 12%, transparent);
+  color: var(--app-text-muted, #64748b);
+  white-space: nowrap;
+}
+
+.knowledge-hub-page__meta {
+  margin: 0 0 8px;
+  font-size: 12px;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.knowledge-hub-page__evidence {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.knowledge-hub-page__evidence span {
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  background: color-mix(in srgb, var(--app-chart-4, #6366f1) 12%, transparent);
+}
+
+.knowledge-hub-page__card a {
+  font-size: 13px;
+  color: var(--app-link, #2563eb);
+}
+
+.knowledge-hub-page__empty {
+  margin: 0;
+  font-size: 13px;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+@media (max-width: 960px) {
+  .knowledge-hub-page__filters,
+  .knowledge-hub-page__metrics {
+    grid-template-columns: 1fr;
+  }
+}

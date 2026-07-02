@@ -77,7 +77,9 @@ import PostEdOrientationBadge from './predictive/PostEdOrientationBadge';
 import useFeature from '../hooks/useFeature';
 import { usePractitionerSurfaceVisibility } from '../contexts/PractitionerVisibilityContext';
 import { fetchBoardingSignalsForPatient, type BoardingSignals } from '../services/boardingSignals';
-import { PatientAcuityRing } from './graphics/CdlGraphicKit';
+import { GraphicIconBadge, PatientAcuityRing } from './graphics/CdlGraphicKit';
+import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+import { resolveCopilotChromeLabels } from '../config/profileDesignLanguage.config';
 import './PatientCard.css';
 
 type PatientCardWorkflowProfile = 'none' | 'charge' | 'physician';
@@ -475,6 +477,8 @@ function PatientCard({
   } as CSSProperties;
   const canTransition = emergencyRole.actionEnabled(EMERGENCY_ROLE_ACTIONS.moveQueue);
   const flagsPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.manageFlags);
+  const { profileCopy } = useEffectiveUserProfile();
+  const copilotChrome = useMemo(() => resolveCopilotChromeLabels(profileCopy), [profileCopy]);
   const copilotPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.useCopilot);
   const canManageFlags = flagsPresentation.enabled;
   const canManageReferral = emergencyRole.actionEnabled(EMERGENCY_ROLE_ACTIONS.createReferral);
@@ -1060,11 +1064,22 @@ function PatientCard({
           {workflowProfile === 'physician' && copilotPresentation.visible ? (
             <button
               type="button"
+              className="patient-card__copilot-btn"
               onClick={handleCopilot}
               disabled={!canUseCopilot}
-              title={canUseCopilot ? 'Open ED Copilot for this patient' : 'Copilot unavailable for this role'}
+              aria-label={
+                canUseCopilot
+                  ? `${copilotChrome.openAriaLabel} for this patient`
+                  : copilotChrome.unavailableAriaLabel
+              }
+              title={
+                canUseCopilot
+                  ? `${copilotChrome.openAriaLabel} for this patient`
+                  : copilotChrome.unavailableAriaLabel
+              }
             >
-              AI
+              <GraphicIconBadge iconKey="ed-copilot" accent="brand" size="sm" />
+              <span>{copilotChrome.shortName}</span>
             </button>
           ) : null}
         </div>

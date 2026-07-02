@@ -32,9 +32,10 @@
 }
 
 .profile-settings-back-link {
-  color: var(--accent-green);
+  color: var(--medical-text-link, var(--app-link-fg));
   text-decoration: none;
   align-self: center;
+  font-weight: 700;
 }
 
 .profile-settings-grid {

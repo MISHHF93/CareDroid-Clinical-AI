@@ -6,6 +6,8 @@ import { RequirePermission } from '../auth/decorators/permissions.decorator';
 import { Permission } from '../auth/enums/permission.enum';
 import { ChatService } from './chat.service';
 import { appendRequiredDisclaimer } from '../../../../lib/ai/safetyPolicy';
+import { EntitlementService } from '../platform-assets/entitlement.service';
+import { assertEntitlementLaunchFromRequest } from '../platform-assets/entitlement-launch.util';
 
 class UnifiedNodeConversationalDto {
   @IsString()
@@ -112,7 +114,10 @@ class EmergencyAIMessageDto {
 @Controller()
 @UseGuards(AuthGuard('jwt'), AuthorizationGuard)
 export class EmergencyAIController {
-  constructor(private readonly chatService: ChatService) {}
+  constructor(
+    private readonly chatService: ChatService,
+    private readonly entitlementService: EntitlementService,
+  ) {}
 
   @Post('emergency/copilot/message')
   @RequirePermission(Permission.USE_AI_CHAT)
@@ -163,6 +168,7 @@ export class EmergencyAIController {
     feature: string,
     requestType: string,
   ) {
+    await assertEntitlementLaunchFromRequest(this.entitlementService, req, 'agent-clinical');
     const userId = dto.userId || req?.user?.id || 'anonymous';
     const userRole = req?.user?.role || null;
     const clientAiRequest =

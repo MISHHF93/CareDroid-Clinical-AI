@@ -16,15 +16,9 @@ describe('Medical Tools route alias fixtures', () => {
     ['/tools/calculator/qsofa/', '/emergency/tools?source=calculators&filter=calculator&q=qsofa&open=qsofa'],
     ['/scores/has-bled', '/emergency/tools?source=calculators&filter=calculator&q=has-bled&open=has-bled'],
     ['/tools/quick%20sofa', '/emergency/tools?source=tools&filter=clinical-tools&q=qsofa&open=qsofa'],
-    ['/fleet/live-map', '/emergency/tools?source=operations&filter=operations&q=fleet-live-map&open=fleet-live-map'],
     ['/fleet/route-optimizer', '/emergency/tools?source=operations&filter=operations&q=route-optimizer&open=route-optimizer'],
     ['/operations/route%20optimizer', '/emergency/tools?source=operations&filter=operations&q=route-optimizer&open=route-optimizer'],
-    ['/tracking', '/emergency/tools?source=operations&filter=operations&q=live-tracking-map&open=live-tracking-map'],
     ['/digital-twin', '/emergency/tools?source=operations&filter=operations&q=digital-twin&open=digital-twin'],
-    ['/simulation', '/emergency/tools?source=simulation&filter=simulations&q=simulation-suite&open=simulation-suite'],
-    ['/medical-simulation', '/emergency/tools?source=simulation&filter=simulations&q=simulation-suite&open=simulation-suite'],
-    ['/simulation/outcomes', '/emergency/tools?source=simulation&filter=simulations&q=simulation-outcomes&open=simulation-outcomes'],
-    ['/competencies', '/emergency/tools?source=simulation&filter=simulations&q=competency-platform&open=competency-platform'],
     ['/pharmacy/drug-interactions', '/emergency/tools?source=clinical-tools&filter=clinical-tools&q=drug-check&open=drug-check'],
     ['/radiology/chest-xray', '/emergency/tools?source=workflows&filter=ai-workflows&q=guideline-rag&open=guideline-rag'],
     ['/automation', '/emergency/tools?source=workflows&filter=ai-workflows'],
@@ -32,9 +26,9 @@ describe('Medical Tools route alias fixtures', () => {
     expect(redirectFor(source)).toBe(expected);
   });
 
-  it('preserves unrelated query params while adding redirect intent', () => {
-    expect(redirectFor('/laboratory', '?patientId=p1')).toBe(
-      '/emergency/tools?patientId=p1&source=laboratory&filter=laboratory&q=lab-interp&open=lab-interp',
+  it('preserves unrelated query params while adding redirect intent for retired tool aliases', () => {
+    expect(redirectFor('/pharmacy/drug-interactions', '?patientId=p1')).toBe(
+      '/emergency/tools?patientId=p1&source=clinical-tools&filter=clinical-tools&q=drug-check&open=drug-check',
     );
   });
 

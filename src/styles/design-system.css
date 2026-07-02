@@ -45,6 +45,7 @@
 @import './text-normalization.css';
 @import './surface-normalization.css';
 @import './card-contrast-normalization.css';
+@import './profile-surface-normalization.css';
 @import './visual-consistency.css';
 @import './practitioner-compact.css';
 @import './visual-responsive-standards.css';

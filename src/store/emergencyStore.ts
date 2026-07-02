@@ -4643,19 +4643,11 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
           firstValue(orchestrationPayload, ['tasks', 'snapshot.tasks']) ||
           (orchestrationPayload as { snapshot?: { tasks?: unknown } })?.snapshot?.tasks;
         if (Array.isArray(tasks)) {
-          const state = get();
           void import('../engine/administrativeAutomationEngine')
-            .then(({ buildEnrichedAdministrativeAutomationSnapshot }) =>
-              buildEnrichedAdministrativeAutomationSnapshot({
-                patients: state.patients,
-                staff: state.staff,
-                referrals: state.referrals,
-                alerts: state.alerts,
-                emsArrivals: state.emsArrivals,
-                capacity: state.capacity,
-                existingTasks:
-                  tasks as import('../types/administrativeAutomation').AdministrativeAutomationTask[],
-              }),
+            .then(({ applyBackendAdministrativeAutomationQueue }) =>
+              applyBackendAdministrativeAutomationQueue(
+                tasks as import('../types/administrativeAutomation').AdministrativeAutomationTask[],
+              ),
             )
             .then((snapshot) => {
               set({ administrativeAutomationQueue: [...snapshot.tasks] });

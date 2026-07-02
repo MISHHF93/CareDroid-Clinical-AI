@@ -1,172 +1,203 @@
 .platform-system-page {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  width: 100%;
+  display: grid;
+  gap: var(--compact-panel-gap, 14px);
+  padding: var(--compact-panel-padding, 16px);
+  min-height: 100vh;
+  color: var(--app-fg, var(--medical-text-body, #111827));
+  background: var(--medical-surface-page, var(--app-surface-page, #f8fafc));
+  font-family: Inter, system-ui, sans-serif;
 }
 
-.platform-system-hero,
-.platform-system-section,
-.platform-card {
-  border: 1px solid var(--app-border, rgba(148, 163, 184, 0.24));
-  border-radius: 24px;
-  background: var(--app-surface, var(--medical-surface-page, #f0f9ff));
-  box-shadow: var(--app-shadow-sm, 0 12px 40px rgba(14, 165, 233, 0.06));
-}
-
-.platform-system-hero {
+.platform-system-page__header {
   display: flex;
-  align-items: flex-start;
   justify-content: space-between;
-  gap: 24px;
-  padding: 28px;
-}
-
-.platform-system-hero h1,
-.platform-system-section h2,
-.platform-card h2 {
-  margin: 0 0 10px;
-  color: var(--medical-card-fg, #111827);
-}
-
-.platform-system-hero p,
-.platform-system-section p,
-.platform-card p,
-.platform-card li,
-.platform-card dd,
-.platform-capability-card span {
-  color: var(--app-fg-muted, #64748b);
-}
-
-.platform-system-eyebrow {
-  margin: 0 0 8px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 0.78rem;
-  font-weight: 800;
-  color: var(--app-accent, #0ea5e9);
-}
-
-.platform-system-hero__actions {
-  display: flex;
-  gap: 12px;
+  align-items: flex-start;
+  gap: 14px;
   flex-wrap: wrap;
 }
 
-.platform-system-hero__actions button {
-  border: 0;
-  border-radius: 999px;
-  padding: 10px 16px;
-  background: var(--app-accent, #0ea5e9);
-  color: var(--app-accent-contrast, #fff);
-  font-weight: 800;
+.platform-system-page__title-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.platform-system-page__title-row h1 {
+  margin: 0;
+  font-size: clamp(22px, 3vw, 28px);
+}
+
+.platform-system-page__title-row p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.platform-system-page__eyebrow {
+  margin: 0 0 4px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.platform-system-page__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.platform-system-page__actions a,
+.platform-system-page__actions button {
+  min-height: var(--compact-control-height, 40px);
+  padding: 8px 14px;
+  border-radius: var(--compact-panel-radius, 12px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--medical-card-bg, var(--app-surface-1));
+  text-decoration: none;
+  font-size: 13px;
+  color: inherit;
   cursor: pointer;
 }
 
-.platform-system-grid {
+.platform-system-page__error {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--app-status-warning, #d97706) 30%, transparent);
+  background: color-mix(in srgb, var(--app-status-warning, #d97706) 8%, transparent);
+  font-size: 13px;
+}
+
+.platform-system-page__metrics {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
 }
 
-.platform-card {
-  padding: 20px;
-  min-width: 0;
-}
-
-.platform-card--safety {
-  border-color: rgba(14, 165, 233, 0.36);
-}
-
-.platform-card dl {
+.platform-system-page__charts {
   display: grid;
+  grid-template-columns: 1fr;
   gap: 12px;
+}
+
+.platform-system-page__panel {
+  padding: 14px;
+  border-radius: var(--compact-panel-radius, 12px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--medical-card-bg, var(--app-surface-1));
+}
+
+.platform-system-page__panel h2 {
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+
+.platform-system-page__panel p {
+  margin: 0 0 10px;
+  font-size: 13px;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.platform-system-page__list {
   margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+  color: var(--medical-text-muted, var(--app-text-muted));
 }
 
-.platform-card dt {
-  font-size: 0.78rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--medical-card-fg, #111827);
-}
-
-.platform-card dd {
-  margin: 4px 0 0;
-  overflow-wrap: anywhere;
-}
-
-.platform-card pre {
-  overflow: auto;
-  max-height: 320px;
-  margin: 0;
-  padding: 12px;
-  border-radius: 14px;
-  background: var(--app-code-bg, var(--medical-surface-page, #f0f9ff));
-  color: var(--medical-card-fg, #111827);
-  font-size: 0.82rem;
-}
-
-.platform-system-section {
-  padding: 24px;
-}
-
-.platform-system-section__header {
-  margin-bottom: 18px;
-}
-
-.platform-capability-list {
+.platform-system-page__table {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
+  gap: 6px;
 }
 
-.platform-capability-card {
-  display: flex;
-  flex-direction: column;
+.platform-system-page__table-head,
+.platform-system-page__table-row {
+  display: grid;
+  grid-template-columns: 0.7fr 0.5fr 1.3fr;
   gap: 8px;
-  min-width: 0;
-  padding: 16px;
-  border: 1px solid var(--app-border, rgba(148, 163, 184, 0.24));
-  border-radius: 18px;
-  background: var(--app-bg, #fff);
+  align-items: center;
+  font-size: 13px;
+}
+
+.platform-system-page__table-row--two-col {
+  grid-template-columns: 0.5fr 1.5fr;
+}
+
+.platform-system-page__table-head {
+  font-weight: 600;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.platform-system-page__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.platform-system-page__card {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--medical-surface-page, var(--app-surface-page));
   text-decoration: none;
+  color: inherit;
 }
 
-.platform-capability-card strong {
-  color: var(--medical-card-fg, #111827);
+.platform-system-page__card-meta {
+  font-size: 11px;
+  color: var(--medical-text-muted, var(--app-text-muted));
 }
 
-.platform-capability-card__meta,
-.platform-capability-card__route {
-  font-size: 0.78rem;
-  font-weight: 800;
+.platform-system-page__card strong {
+  font-size: 14px;
 }
 
-.platform-capability-card__route {
-  overflow-wrap: anywhere;
-  color: var(--app-accent, #0ea5e9);
+.platform-system-page__card span {
+  font-size: 12px;
+  color: var(--medical-text-muted, var(--app-text-muted));
 }
 
-@media (max-width: 900px) {
-  .platform-system-hero,
-  .platform-system-grid,
-  .platform-capability-list {
-    grid-template-columns: 1fr;
+.platform-system-page__pill {
+  display: inline-flex;
+  width: fit-content;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.platform-system-page__pill--good {
+  background: color-mix(in srgb, var(--app-status-good, #16a34a) 14%, transparent);
+  color: var(--app-status-good, #16a34a);
+}
+
+.platform-system-page__pill--warning {
+  background: color-mix(in srgb, var(--app-status-warning, #d97706) 14%, transparent);
+  color: var(--app-status-warning, #d97706);
+}
+
+.platform-system-page__pill--critical {
+  background: color-mix(in srgb, var(--app-status-critical, #dc2626) 14%, transparent);
+  color: var(--app-status-critical, #dc2626);
+}
+
+.platform-system-page__pill--neutral {
+  background: color-mix(in srgb, var(--app-text-muted, #64748b) 12%, transparent);
+  color: var(--app-text-muted, #64748b);
+}
+
+@media (max-width: 960px) {
+  .platform-system-page__metrics {
+    grid-template-columns: 1fr 1fr;
   }
 
-  .platform-system-hero {
-    flex-direction: column;
+  .platform-system-page__table-head,
+  .platform-system-page__table-row {
+    grid-template-columns: 1fr 1fr;
   }
 }
-
-@media (max-width: 520px) {
-  .platform-system-hero,
-  .platform-system-section,
-  .platform-card {
-    border-radius: 18px;
-    padding: 16px;
-  }
-}
-

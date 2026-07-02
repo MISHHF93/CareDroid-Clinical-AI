@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Card from '../../components/ui/card';
 import ProfileSettingsShell from '../../components/profile/ProfileSettingsShell';
 import useProfileShellProps from '../../hooks/useProfileShellProps';
+import { resolveProfileShellSection } from '../../config/profileDesignLanguage.config';
 import { useUserIdentity } from '../../contexts/UserIdentityContext';
 import './ProfileIdentityPages.css';
 
@@ -15,12 +16,13 @@ function formatDate(value) {
 
 export default function ProfileSecurity() {
   const { accessSummary, profileCopy } = useProfileShellProps();
+  const securitySection = resolveProfileShellSection('security');
   const { account, security } = useUserIdentity();
 
   return (
     <ProfileSettingsShell
-      title="Security"
-      subtitle="Demo-mode identity summary. Account sign-in flows are disabled during the build phase."
+      title={securitySection.pageTitle}
+      subtitle={securitySection.pageSubtitle}
       accessSummary={accessSummary}
       profileCopy={profileCopy}
     >

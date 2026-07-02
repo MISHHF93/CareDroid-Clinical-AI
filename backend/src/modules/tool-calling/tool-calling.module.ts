@@ -7,6 +7,7 @@ import { FleetModule } from '../fleet';
 import { HospitalMapModule } from '../hospital-map';
 import { PlatformSystemsModule } from '../platform-systems/platform-systems.module';
 import { TelemetryModule } from '../telemetry';
+import { PlatformAssetsModule } from '../platform-assets/platform-assets.module';
 import { ParameterCollectorService } from './parameter-collector.service';
 import { ToolCallingController } from './tool-calling.controller';
 import { ToolExecutionService } from './tool-execution.service';
@@ -23,6 +24,7 @@ import { ValidationService } from './validation.service';
     HospitalMapModule,
     PlatformSystemsModule,
     TelemetryModule,
+    PlatformAssetsModule,
   ],
   controllers: [ToolCallingController],
   providers: [

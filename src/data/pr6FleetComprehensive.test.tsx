@@ -150,8 +150,12 @@ describe('1. Fleet dashboard rendering', () => {
     const summaryGroup = screen.getByRole('group', { name: /Fleet summary metrics/i });
     expect(within(summaryGroup).getByText('Active')).toBeInTheDocument();
     expect(within(summaryGroup).getByText('Avg utilization')).toBeInTheDocument();
-    expect(screen.getByText('Test Van')).toBeInTheDocument();
-    expect(screen.getByText(/Human dispatchers must approve/i)).toBeInTheDocument();
+
+    const vehicleRoster = screen.getByRole('heading', { name: /Vehicle roster/i }).closest('section');
+    expect(vehicleRoster).not.toBeNull();
+    expect(within(vehicleRoster as HTMLElement).getByText('Test Van')).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: /Dispatch intelligence review/i })).toBeInTheDocument();
+    expect(screen.getAllByText(/Human dispatchers must approve/i).length).toBeGreaterThanOrEqual(1);
   });
 
   it('shows operational alert when maintenance or low-energy counts are elevated', async () => {

@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { X } from 'lucide-react';
-import { sendClinicalChatMessage } from '../services/clinicalChatService';
+import { invokeUnifiedAiRequest } from '../services/careDroidUnifiedAiNode';
 import './WorkloadBalancePanel.css';
 
 function formatShiftStart(activeShift) {
@@ -146,39 +146,53 @@ export default function WorkloadBalancePanel({
 
   const suggestRebalance = async () => {
     setAiStatus('loading');
+    const staffWorkloads = workloads.map((member) => ({
+      id: member.id,
+      name: member.displayName,
+      role: member.roleLabel,
+      patientCount: member.assignedCount,
+      patients: (member.assignedPatients || []).map((patient) => ({
+        id: patient.id,
+        name: patientName(patient),
+        complaint: patientComplaint(patient),
+        state: patient.state,
+        priority: patient.priority,
+      })),
+    }));
     try {
-      const response = await sendClinicalChatMessage({
-        message: [
-          'Return JSON only with 2-3 workload rebalance suggestions.',
-          'Schema: {"suggestions":[{"patientId":"","fromStaffId":"","toStaffId":"","reason":""}]}',
-          'Use only the provided staff and patient load data.',
-        ].join('\n'),
-        requestType: 'WORKLOAD_REBALANCE',
-        workspaceContext: {
+      const response = await invokeUnifiedAiRequest({
+        capabilityId: 'copilot',
+        platformServiceId: 'copilot',
+        requestType: 'STAFF_BALANCE',
+        maxTokens: 700,
+        tools: [],
+        systemPrompt:
+          'You suggest Emergency Department staff workload rebalancing. Return JSON only with 2-3 concrete reassignment suggestions and do not make autonomous clinical decisions.',
+        messages: [
+          {
+            role: 'user',
+            content: [
+              'Return JSON only with 2-3 workload rebalance suggestions.',
+              'Schema: {"suggestions":[{"patientId":"","fromStaffId":"","toStaffId":"","reason":""}]}',
+              'Use only the provided staff and patient load data.',
+              JSON.stringify({ staffWorkloads }),
+            ].join('\n'),
+          },
+        ],
+        context: {
+          requestType: 'STAFF_BALANCE',
           workspaceId: 'emergency',
-          staffWorkloads: workloads.map((member) => ({
-            id: member.id,
-            name: member.displayName,
-            role: member.roleLabel,
-            patientCount: member.assignedCount,
-            patients: (member.assignedPatients || []).map((patient) => ({
-              id: patient.id,
-              name: patientName(patient),
-              complaint: patientComplaint(patient),
-              state: patient.state,
-              priority: patient.priority,
-            })),
-          })),
+          staffWorkloads,
         },
-      } as any);
+        domain: 'routing',
+        sourceScreen: 'workload_balance_panel',
+      });
       const text =
-        response.data?.response ||
-        response.data?.message?.content ||
-        response.data?.message ||
-        response.data?.content ||
-        '';
+        typeof response.content === 'string' && response.content.trim()
+          ? response.content
+          : JSON.stringify(response.data || {});
       setAiSuggestions(parseSuggestionResponse(text, localSuggestions));
-      setAiStatus(response.ok ? 'ready' : 'error');
+      setAiStatus('ready');
     } catch (_error: any) {
       setAiSuggestions(localSuggestions);
       setAiStatus('error');

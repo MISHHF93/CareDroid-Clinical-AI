@@ -2,11 +2,13 @@ import React, { useEffect, useMemo, useState } from 'react';
 import Card from '../../components/ui/card';
 import ProfileSettingsShell from '../../components/profile/ProfileSettingsShell';
 import useProfileShellProps from '../../hooks/useProfileShellProps';
+import { resolveProfileShellSection } from '../../config/profileDesignLanguage.config';
 import { useUserIdentity } from '../../contexts/UserIdentityContext';
 import './ProfileIdentityPages.css';
 
 export default function ProfilePreferences() {
   const { accessSummary, profileCopy } = useProfileShellProps();
+  const preferencesSection = resolveProfileShellSection('preferences');
   const { preferences, aiPersonalization, savePreferences, isLoading } = useUserIdentity();
   const [form, setForm] = useState({
     theme: 'system',
@@ -72,8 +74,8 @@ export default function ProfilePreferences() {
 
   return (
     <ProfileSettingsShell
-      title="Preferences"
-      subtitle="Theme, density, AI style, citations, and notification preferences."
+      title={preferencesSection.pageTitle}
+      subtitle={preferencesSection.pageSubtitle}
       accessSummary={accessSummary}
       profileCopy={profileCopy}
     >

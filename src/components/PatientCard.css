@@ -250,6 +250,14 @@
   font-weight: 800;
 }
 
+.patient-card__mission-actions button.patient-card__copilot-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  color: var(--medical-text-link, var(--app-link-fg));
+}
+
 /* Visual QA clarity pass: make triage/state/risk readable without relying on tiny color marks. */
 .patient-card {
   --patient-priority-color: var(--status-info);

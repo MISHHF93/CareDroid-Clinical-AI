@@ -105,6 +105,32 @@ export const ENTITLEMENT_REGISTRY: EntitlementRule[] = [
   },
   {
     assetIds: [
+      'admission-prediction',
+      'journey-prediction',
+      'command-predictive-alerts',
+      'predictive-analytics-dashboard',
+    ],
+    category: EntitlementCategory.AI_AGENTS,
+    featureFlagId: 'predictive-analytics-pack',
+    requiredPlan: SubscriptionTier.PROFESSIONAL,
+    requiredPackIds: ['emergency-department-pack', 'analytics-pack'],
+  },
+  {
+    assetIds: ['patient-whiteboard', 'patient-room-display', 'digital-door-sign'],
+    category: EntitlementCategory.TOOLS,
+    featureFlagId: 'patient-experience-pack',
+    requiredPlan: SubscriptionTier.FREE,
+    requiredPackIds: ['emergency-department-pack'],
+  },
+  {
+    assetIds: ['ems-pre-arrival', 'pre-arrival-activation', 'trauma-team-activation'],
+    category: EntitlementCategory.TOOLS,
+    featureFlagId: 'ems-pre-arrival-pack',
+    requiredPlan: SubscriptionTier.PROFESSIONAL,
+    requiredPackIds: ['emergency-department-pack'],
+  },
+  {
+    assetIds: [
       'agent-clinical',
       'agent-operations',
       'agent-lab',

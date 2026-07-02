@@ -1,5 +1,8 @@
 import { useCallback, useMemo } from 'react';
-import { buildEnrichedAdministrativeAutomationSnapshot } from '../engine/administrativeAutomationEngine';
+import {
+  applyBackendAdministrativeAutomationQueue,
+  mergeBackendAdministrativeAutomationTasks,
+} from '../engine/administrativeAutomationEngine';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { fetchWorkflowOrchestration, reviewWorkflowAutomation } from '../services/emergencyOsApi';
 import type {
@@ -50,18 +53,7 @@ export function useAdministrativeAutomations() {
         };
         const tasks = envelope?.data?.tasks || envelope?.data?.snapshot?.tasks;
         if (tasks) {
-          const state = useEmergencyStore.getState();
-          const enrichedSnapshot = await buildEnrichedAdministrativeAutomationSnapshot({
-            patients: state.patients,
-            staff: state.staff,
-            referrals: state.referrals,
-            alerts: state.alerts,
-            emsArrivals: state.emsArrivals,
-            capacity: state.capacity,
-            existingTasks: tasks,
-          });
-          setQueue([...enrichedSnapshot.tasks]);
-          return enrichedSnapshot;
+          return applyBackendAdministrativeAutomationQueue(tasks);
         }
       } catch {
         // Fall back to local orchestrator snapshot.
@@ -76,9 +68,24 @@ export function useAdministrativeAutomations() {
       const payload = { ...input, actorStaffId };
       if (backendAvailable) {
         try {
-          await reviewWorkflowAutomation(payload as Record<string, unknown>);
+          const envelope = (await reviewWorkflowAutomation(payload as Record<string, unknown>)) as {
+            data?: {
+              task?: AdministrativeAutomationTask | null;
+              snapshot?: AdministrativeAutomationSnapshot;
+            };
+          };
+          const tasks = envelope?.data?.snapshot?.tasks;
+          if (tasks) {
+            const merged = await mergeBackendAdministrativeAutomationTasks(tasks);
+            setQueue([...merged]);
+            return envelope?.data?.task ?? null;
+          }
+          if (envelope?.data?.task) {
+            return envelope.data.task;
+          }
+          return null;
         } catch {
-          // Local review still records audit trail when backend is unavailable.
+          // Fall back to local review when backend is unavailable.
         }
       }
       return reviewLocal(payload);

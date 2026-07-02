@@ -16,6 +16,7 @@ import {
   SAFETY_BOUNDED_ASSISTANT_LABEL,
 } from '../config/copilotSafety.config';
 import { EMERGENCY_OS_BRANDING } from '../config/emergencyOsBranding.config';
+import { resolveCopilotChromeLabels } from '../config/profileDesignLanguage.config';
 import { EMPTY_STATE_COPY } from '../config/emptyStateCopy';
 import OperationalEmptyState, { OperationalEmptyAction } from './ui/OperationalEmptyState';
 import './CopilotPanel.css';
@@ -430,7 +431,8 @@ export function CopilotPanel() {
   const operationalIntelligence = useOperationalIntelligence({ screenMode: routeScreenMode });
   const centralSnapshot = operationalIntelligence.centralSnapshot;
   const intelligenceSnapshot = operationalIntelligence.snapshot;
-  const { saasRole } = useEffectiveUserProfile();
+  const { saasRole, profileCopy } = useEffectiveUserProfile();
+  const copilotChrome = useMemo(() => resolveCopilotChromeLabels(profileCopy), [profileCopy]);
   const emergencyRole = useEmergencyRolePermissions();
   const { visibleScenarios: aiChiefVisibleScenarios } = useAiChiefRouting();
   const practitionerSurfaces = usePractitionerSurfaceVisibility();
@@ -438,8 +440,8 @@ export function CopilotPanel() {
   const copilotLimits = resolveCopilotRuntimeLimits();
   const quickActionLimit = copilotLimits.maxQuickActions;
   const welcomeMessage = useMemo(
-    () => getCopilotWelcomeMessage(copilotSurfaces.compactLayout),
-    [copilotSurfaces.compactLayout],
+    () => getCopilotWelcomeMessage(copilotSurfaces.compactLayout, profileCopy),
+    [copilotSurfaces.compactLayout, profileCopy],
   );
   const [messages, setMessages] = useState<CopilotMessage[]>([
     {
@@ -936,7 +938,7 @@ export function CopilotPanel() {
     <header className="ed-copilot-panel__header">
       <span aria-label="Copilot panel active" className="ed-copilot-panel__live-dot" />
       <div className="ed-copilot-panel__identity">
-        <span>{EMERGENCY_OS_BRANDING.copilotName}</span>
+        <span>{copilotChrome.productName}</span>
         {copilotSurfaces.showSafetyBadge ? (
           <strong>{SAFETY_BOUNDED_ASSISTANT_LABEL}</strong>
         ) : null}
@@ -951,7 +953,7 @@ export function CopilotPanel() {
       <button
         type="button"
         onClick={() => setCopilotOpen(false)}
-        aria-label={`Close ${EMERGENCY_OS_BRANDING.copilotName}`}
+        aria-label={`Close ${copilotChrome.productName}`}
         className="ed-copilot-panel__close"
       >
         X
@@ -961,7 +963,7 @@ export function CopilotPanel() {
 
   const chatContent = (
     <div
-      aria-label={`${EMERGENCY_OS_BRANDING.copilotName} messages`}
+      aria-label={`${copilotChrome.productName} messages`}
       className="ed-copilot-panel__messages"
     >
       {backendCopilot.error ? (
@@ -1214,12 +1216,12 @@ export function CopilotPanel() {
         <input
           value={input}
           onChange={(event) => setInput(event.target.value)}
-          placeholder={`Ask ${EMERGENCY_OS_BRANDING.copilotName}...`}
-          aria-label={`Message ${EMERGENCY_OS_BRANDING.copilotName}`}
+          placeholder={copilotChrome.placeholder}
+          aria-label={copilotChrome.messageAriaLabel}
         />
         <button
           type="submit"
-          aria-label={`Send ${EMERGENCY_OS_BRANDING.copilotName} message`}
+          aria-label={copilotChrome.sendAriaLabel}
           disabled={loading || (!input.trim() && attachments.length === 0)}
         >
           <IconSend size={17} stroke={2.2} />

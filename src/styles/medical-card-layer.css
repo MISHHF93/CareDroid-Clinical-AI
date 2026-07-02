@@ -8,7 +8,7 @@
   --medical-card-fg: var(--medical-text-body, #111827);
   --medical-card-fg-muted: var(--medical-text-muted, #6b7280);
   --medical-card-fg-subtle: var(--medical-text-subtle, #9ca3af);
-  --medical-card-border: var(--medical-border, #e0f2fe);
+  --medical-card-border: var(--medical-border, #e2e8f0);
 
   /* Muted / inset card (sky tint) */
   --medical-card-muted-bg: var(--medical-surface-page, #f0f9ff);

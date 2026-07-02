@@ -1,0 +1,113 @@
+.route-optimizer-page {
+  display: grid;
+  gap: var(--compact-panel-gap, 14px);
+  padding: clamp(16px, 2vw, 28px);
+}
+
+.route-optimizer-page__header {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.route-optimizer-page__header h1 {
+  margin: 0;
+  font-size: clamp(24px, 3vw, 30px);
+}
+
+.route-optimizer-page__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: var(--compact-panel-gap, 14px);
+}
+
+.route-optimizer-page__panel {
+  display: grid;
+  gap: 12px;
+  padding: var(--compact-panel-padding, 14px);
+  border-radius: var(--compact-panel-radius, 14px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--medical-card-bg, var(--app-surface-1));
+}
+
+.route-optimizer-page__field {
+  display: grid;
+  gap: 4px;
+}
+
+.route-optimizer-page__field label {
+  font-size: 12px;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.route-optimizer-page__field input,
+.route-optimizer-page__field select {
+  min-height: var(--compact-control-height, 40px);
+  padding: 8px 10px;
+  border-radius: var(--compact-panel-radius, 10px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--app-surface-elevated, #fff);
+}
+
+.route-optimizer-page__stops {
+  display: grid;
+  gap: 10px;
+}
+
+.route-optimizer-page__stop {
+  display: grid;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: var(--compact-panel-radius, 10px);
+  background: var(--app-surface-muted, #f8fafc);
+}
+
+.route-optimizer-page__stop-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.route-optimizer-page__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.route-optimizer-page__actions button {
+  min-height: var(--compact-control-height, 40px);
+  padding: 8px 14px;
+  border-radius: var(--compact-panel-radius, 10px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--app-surface-elevated, #fff);
+  cursor: pointer;
+}
+
+.route-optimizer-page__actions button[type='submit'] {
+  background: color-mix(in srgb, var(--app-chart-1) 12%, var(--app-surface-1));
+}
+
+.route-optimizer-page__sequence {
+  display: grid;
+  gap: 8px;
+}
+
+.route-optimizer-page__sequence-item {
+  padding: 10px 12px;
+  border-radius: var(--compact-panel-radius, 10px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+}
+
+.route-optimizer-page__warnings {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--medical-text-muted, var(--app-text-muted));
+  font-size: 13px;
+}
+
+@media (max-width: 960px) {
+  .route-optimizer-page__grid {
+    grid-template-columns: 1fr;
+  }
+}

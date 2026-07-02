@@ -1,0 +1,143 @@
+.platform-analytics-page {
+  display: grid;
+  gap: var(--compact-panel-gap, 14px);
+  padding: var(--compact-panel-padding, 16px);
+  min-height: 100vh;
+  color: var(--app-fg, var(--medical-text-body, #111827));
+  background: var(--medical-surface-page, var(--app-surface-page, #f8fafc));
+  font-family: Inter, system-ui, sans-serif;
+}
+
+.platform-analytics-page__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.platform-analytics-page__title-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.platform-analytics-page__title-row h1 {
+  margin: 0;
+  font-size: clamp(22px, 3vw, 28px);
+  color: var(--medical-text-heading, var(--app-text-primary));
+}
+
+.platform-analytics-page__title-row p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.platform-analytics-page__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.platform-analytics-page__actions a {
+  min-height: var(--compact-control-height, 40px);
+  padding: 8px 14px;
+  border-radius: var(--compact-panel-radius, 12px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--medical-card-bg, var(--app-surface-1));
+  text-decoration: none;
+  font-size: 13px;
+  color: inherit;
+}
+
+.platform-analytics-page__metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.platform-analytics-page__charts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.platform-analytics-page__panel {
+  padding: 14px;
+  border-radius: var(--compact-panel-radius, 12px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--medical-card-bg, var(--app-surface-1));
+}
+
+.platform-analytics-page__panel h2 {
+  margin: 0 0 4px;
+  font-size: 16px;
+}
+
+.platform-analytics-page__panel p {
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.platform-analytics-page__table {
+  display: grid;
+  gap: 6px;
+}
+
+.platform-analytics-page__table-head,
+.platform-analytics-page__table-row {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 0.6fr 0.8fr;
+  gap: 8px;
+  align-items: center;
+  font-size: 13px;
+}
+
+.platform-analytics-page__table-head {
+  font-weight: 600;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.platform-analytics-page__pill {
+  display: inline-flex;
+  width: fit-content;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  text-transform: capitalize;
+}
+
+.platform-analytics-page__pill--good {
+  background: color-mix(in srgb, var(--app-status-good, #16a34a) 14%, transparent);
+  color: var(--app-status-good, #16a34a);
+}
+
+.platform-analytics-page__pill--warning {
+  background: color-mix(in srgb, var(--app-status-warning, #d97706) 14%, transparent);
+  color: var(--app-status-warning, #d97706);
+}
+
+.platform-analytics-page__pill--critical {
+  background: color-mix(in srgb, var(--app-status-critical, #dc2626) 14%, transparent);
+  color: var(--app-status-critical, #dc2626);
+}
+
+.platform-analytics-page__pill--neutral {
+  background: color-mix(in srgb, var(--app-text-muted, #64748b) 12%, transparent);
+  color: var(--app-text-muted, #64748b);
+}
+
+@media (max-width: 960px) {
+  .platform-analytics-page__metrics,
+  .platform-analytics-page__charts {
+    grid-template-columns: 1fr;
+  }
+
+  .platform-analytics-page__table-head,
+  .platform-analytics-page__table-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}

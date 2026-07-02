@@ -41,7 +41,7 @@ export const PLATFORM_AI_SERVICE_NODE_MAP: Readonly<Record<string, UnifiedAiNode
       channel: 'conversational',
       domain: 'copilot_chat',
       platformServiceId: 'copilot',
-      requestType: 'COPILOT_QUERY',
+      requestType: 'COPILOT_CHAT',
       route: CARE_DROID_AI_NODE_PATH,
     },
     smartIntakeVerification: {

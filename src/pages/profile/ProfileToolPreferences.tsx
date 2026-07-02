@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import Card from '../../components/ui/card';
 import { compileUserProfile } from '../../config/userProfileCompiler';
 import useEffectiveUserProfile from '../../hooks/useEffectiveUserProfile';
+import { resolveProfileShellSection } from '../../config/profileDesignLanguage.config';
 import ProfileSettingsShell from '../../components/profile/ProfileSettingsShell';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
 import { useUser } from '../../contexts/UserContext';
@@ -35,6 +36,7 @@ export default function ProfileToolPreferences() {
   const { workspaces, activeWorkspaceId, setActiveWorkspaceId } = useWorkspace();
   const tools = useMemo(() => getUserFacingToolRegistryProjection(), []);
   const [status, setStatus] = useState('');
+  const toolsSection = resolveProfileShellSection('tools');
 
   const localActiveWorkspace = useMemo(
     () => workspaces.find((workspace) => workspace.id === activeWorkspaceId),
@@ -134,15 +136,15 @@ export default function ProfileToolPreferences() {
 
   return (
     <ProfileSettingsShell
-      title="Tool preferences"
-      subtitle="Pin or hide tools within your assigned role. Role and workspace access are managed by your administrator."
+      title={toolsSection.pageTitle}
+      subtitle={toolsSection.pageSubtitle}
       accessSummary={resolvedAccessSummary}
       profileCopy={profileCopy}
     >
         <Card>
           <form className="profile-identity-form" onSubmit={(event) => event.preventDefault()}>
             <div className="profile-identity-muted">
-              Assigned role: {saasProfile?.role || profile.role} (admin-managed) · default workspace:{' '}
+              Assigned role: {saasProfile?.role || profile.role} (admin-managed) ï¿½ default workspace:{' '}
               {saasProfile?.defaultWorkspace || profileSettings.defaultWorkspace || activeWorkspaceId}
             </div>
             <label>
@@ -212,7 +214,7 @@ export default function ProfileToolPreferences() {
                 <div>
                   <strong>{tool.name}</strong>
                   <span>
-                    {tool.category} · {hiddenToolSet.has(tool.id) ? 'hidden' : `score ${tool.profileScore}`}
+                    {tool.category} ï¿½ {hiddenToolSet.has(tool.id) ? 'hidden' : `score ${tool.profileScore}`}
                   </span>
                 </div>
                 <div className="profile-identity-actions">

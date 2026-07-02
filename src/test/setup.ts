@@ -107,3 +107,25 @@ window.ResizeObserver = window.ResizeObserver || ResizeObserverMock;
 if (!window.HTMLElement.prototype.scrollIntoView) {
   window.HTMLElement.prototype.scrollIntoView = vi.fn();
 }
+
+// jsdom cannot navigate across documents; stub to avoid noisy integration-test failures.
+if (!('navigation' in window)) {
+  Object.defineProperty(window, 'navigation', {
+    configurable: true,
+    value: {
+      navigate: vi.fn().mockResolvedValue(undefined),
+      back: vi.fn(),
+      forward: vi.fn(),
+      reload: vi.fn(),
+    },
+  });
+}
+
+const jsdomNavigationPattern = /Not implemented: navigation to another Document/;
+const originalConsoleError = console.error.bind(console);
+console.error = (...args) => {
+  if (jsdomNavigationPattern.test(String(args[0] ?? ''))) {
+    return;
+  }
+  originalConsoleError(...args);
+};

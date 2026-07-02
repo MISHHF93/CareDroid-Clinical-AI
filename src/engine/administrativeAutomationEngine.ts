@@ -3,6 +3,8 @@ import {
   isAutomationEntitled,
 } from '../config/automationEntitlement.config';
 import { useEmergencyStore } from '../store/emergencyStore';
+import { ADMINISTRATIVE_AUTOMATION_SAFETY_STATEMENT } from '../config/administrativeAutomationCatalog';
+import { taskNeedsAiEnrichment } from '../services/administrativeAutomationAiUtils';
 import { enrichAdministrativeAutomationSnapshotWithAi } from '../services/enrichAdministrativeAutomationsWithAi';
 import { buildAdministrativeAutomationSnapshot } from '../services/unifiedClinicalWorkflowOrchestrator';
 import type {
@@ -70,6 +72,66 @@ export async function buildEnrichedAdministrativeAutomationSnapshot(
   return finalizeAdministrativeAutomationSnapshot(enriched, entitledTasks);
 }
 
+function buildMetricsFromTasks(tasks: readonly AdministrativeAutomationTask[]) {
+  return Object.freeze({
+    pendingReview: tasks.filter((task) => task.status === 'pending_review').length,
+    executedToday: tasks.filter((task) => task.status === 'executed').length,
+    overridden: tasks.filter((task) => task.status === 'overridden').length,
+    byCategory: Object.freeze(
+      Object.fromEntries(
+        (
+          [
+            'patient_routing',
+            'documentation_handoff',
+            'ai_patient_summary',
+            'triage_preparation',
+            'department_notification',
+            'staff_assignment',
+            'queue_prioritization',
+            'escalation_workflow',
+          ] as AdministrativeAutomationCategory[]
+        ).map((category) => [category, tasks.filter((task) => task.category === category).length]),
+      ) as Record<AdministrativeAutomationCategory, number>,
+    ),
+  });
+}
+
+function buildSnapshotFromTasks(
+  tasks: readonly AdministrativeAutomationTask[],
+  generatedAt?: string,
+): AdministrativeAutomationSnapshot {
+  return Object.freeze({
+    engineId: 'unified-clinical-workflow-orchestrator',
+    generatedAt: generatedAt || tasks[0]?.updatedAt || new Date().toISOString(),
+    tasks: Object.freeze([...tasks]),
+    metrics: buildMetricsFromTasks(tasks),
+    safetyStatement: ADMINISTRATIVE_AUTOMATION_SAFETY_STATEMENT,
+  });
+}
+
+/** Apply backend tasks without rebuilding the queue from local patient state. */
+export async function mergeBackendAdministrativeAutomationTasks(
+  backendTasks: readonly AdministrativeAutomationTask[],
+): Promise<AdministrativeAutomationTask[]> {
+  if (!backendTasks.some(taskNeedsAiEnrichment)) return [...backendTasks];
+
+  const state = useEmergencyStore.getState();
+  const snapshot = buildSnapshotFromTasks(backendTasks);
+  const enriched = await enrichAdministrativeAutomationSnapshotWithAi(snapshot, {
+    patients: state.patients,
+    emsArrivals: state.emsArrivals,
+  });
+  return [...enriched.tasks];
+}
+
+export async function applyBackendAdministrativeAutomationQueue(
+  backendTasks: readonly AdministrativeAutomationTask[],
+): Promise<AdministrativeAutomationSnapshot> {
+  const merged = await mergeBackendAdministrativeAutomationTasks(backendTasks);
+  useEmergencyStore.getState().setAdministrativeAutomationQueue([...merged]);
+  return buildSnapshotFromTasks(merged);
+}
+
 export async function runAdministrativeAutomationTick(now = new Date()) {
   const state = useEmergencyStore.getState();
   const snapshot = await buildEnrichedAdministrativeAutomationSnapshot({
@@ -86,9 +148,14 @@ export async function runAdministrativeAutomationTick(now = new Date()) {
   return snapshot;
 }
 
+export async function runAdministrativeAutomationTickIfLocal(now = new Date()) {
+  if (useEmergencyStore.getState().backendAvailable) return null;
+  return runAdministrativeAutomationTick(now);
+}
+
 export function startAdministrativeAutomationEngine(intervalMs = 45_000): number {
-  void runAdministrativeAutomationTick();
+  void runAdministrativeAutomationTickIfLocal();
   return window.setInterval(() => {
-    void runAdministrativeAutomationTick();
+    void runAdministrativeAutomationTickIfLocal();
   }, intervalMs);
 }

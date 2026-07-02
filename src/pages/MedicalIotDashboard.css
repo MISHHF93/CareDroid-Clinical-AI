@@ -1,0 +1,303 @@
+.medical-iot-page {
+  display: grid;
+  gap: var(--compact-panel-gap, 14px);
+  padding: var(--compact-panel-padding, 16px);
+  min-height: 100vh;
+  color: var(--app-fg, var(--medical-text-body, #111827));
+  background: var(--medical-surface-page, var(--app-surface-page, #f8fafc));
+  font-family: Inter, system-ui, sans-serif;
+}
+
+.medical-iot-page__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.medical-iot-page__title-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.medical-iot-page__title-row h1 {
+  margin: 0;
+  font-size: clamp(22px, 3vw, 28px);
+  color: var(--medical-text-heading, var(--app-text-primary));
+}
+
+.medical-iot-page__title-row p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.medical-iot-page__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.medical-iot-page__actions button {
+  min-height: var(--compact-control-height, 40px);
+  padding: 8px 14px;
+  border-radius: var(--compact-panel-radius, 12px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--medical-accent, var(--app-accent));
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.medical-iot-page__actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.medical-iot-page__badge {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: 20px;
+  padding: 4px 12px;
+}
+
+.medical-iot-page__badge--critical {
+  color: #ef4444;
+  background: #fef2f2;
+  border: 1px solid #ef4444;
+}
+
+.medical-iot-page__badge--demo {
+  color: #78350f;
+  background: #fefce8;
+  border: 1px solid #d97706;
+}
+
+.medical-iot-page__metrics {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.medical-iot-page__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.85fr);
+  gap: var(--compact-panel-gap, 14px);
+}
+
+.medical-iot-page__map-shell,
+.medical-iot-page__side-panel,
+.medical-iot-page__table {
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  border-radius: var(--compact-panel-radius, 14px);
+  background: var(--medical-card-bg, var(--app-surface-1));
+  padding: var(--compact-panel-padding, 14px);
+}
+
+.medical-iot-map-canvas {
+  position: relative;
+  min-height: 360px;
+  border-radius: calc(var(--compact-panel-radius, 14px) - 4px);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--app-chart-2) 6%, var(--app-surface-muted, #f8fafc)) 0%,
+      var(--app-surface-1, #fff) 100%
+    );
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.medical-iot-map-canvas__svg {
+  width: 100%;
+  height: 100%;
+  min-height: 360px;
+}
+
+.medical-iot-map-canvas__grid-line {
+  stroke: color-mix(in srgb, var(--app-chart-3) 18%, transparent);
+  stroke-width: 0.15;
+}
+
+.medical-iot-map-canvas__marker text {
+  font-size: 2px;
+  fill: var(--medical-text-muted, #64748b);
+}
+
+.medical-iot-page__filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.medical-iot-page__filters button {
+  min-height: var(--compact-control-height, 40px);
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--app-surface-muted, #f8fafc);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.medical-iot-page__filters button.is-active {
+  background: var(--medical-accent, var(--app-accent));
+  border-color: var(--medical-accent, var(--app-accent));
+  color: #fff;
+}
+
+.medical-iot-page__search {
+  margin-left: auto;
+  min-height: var(--compact-control-height, 40px);
+  padding: 6px 12px;
+  border-radius: var(--compact-panel-radius, 10px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--medical-card-bg, var(--app-surface-1));
+  font-size: 12px;
+  width: min(220px, 100%);
+}
+
+.medical-iot-page__alerts {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.medical-iot-page__alerts h3 {
+  margin: 0;
+  font-size: 14px;
+}
+
+.medical-iot-page__alert-item {
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--app-surface-muted, #f8fafc);
+}
+
+.medical-iot-page__alert-item span {
+  display: block;
+  font-size: 12px;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.medical-iot-page__table-head,
+.medical-iot-page__device-row {
+  display: grid;
+  grid-template-columns: 32px 1fr 90px 80px 70px 70px 44px;
+  gap: 10px;
+  align-items: center;
+}
+
+.medical-iot-page__table-head {
+  margin-bottom: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--medical-text-subtle, var(--app-text-muted));
+}
+
+.medical-iot-page__device-row {
+  padding: 7px 0;
+  border-bottom: 1px solid var(--medical-card-border, var(--app-panel-border));
+  font-size: 13px;
+}
+
+.medical-iot-page__device-row.is-selected {
+  background: color-mix(in srgb, var(--app-chart-1) 8%, transparent);
+}
+
+.medical-iot-page__device-name {
+  font-weight: 600;
+}
+
+.medical-iot-page__device-meta {
+  font-size: 11px;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.medical-iot-page__battery {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.medical-iot-page__battery-track {
+  width: 32px;
+  height: 8px;
+  border-radius: 3px;
+  background: var(--medical-card-border, var(--app-panel-border));
+  overflow: hidden;
+}
+
+.medical-iot-page__battery-fill {
+  height: 100%;
+  border-radius: 3px;
+}
+
+.medical-iot-page__alarm-pill {
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  background: #ef4444;
+  border-radius: 10px;
+  padding: 1px 7px;
+  text-align: center;
+}
+
+.medical-iot-page__empty,
+.medical-iot-page__footer,
+.medical-iot-page__map-state,
+.medical-iot-page__links {
+  margin: 0;
+  font-size: 12px;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.medical-iot-page__links a {
+  color: inherit;
+}
+
+.medical-iot-page__footer {
+  text-align: right;
+}
+
+.is-critical {
+  color: #ef4444;
+}
+
+.is-warning {
+  color: #f59e0b;
+}
+
+.is-good {
+  color: #22c55e;
+}
+
+@media (max-width: 1100px) {
+  .medical-iot-page__metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .medical-iot-page__layout,
+  .medical-iot-page__metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .medical-iot-page__search {
+    margin-left: 0;
+    width: 100%;
+  }
+}

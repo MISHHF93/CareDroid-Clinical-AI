@@ -1,0 +1,147 @@
+/**
+ * Profile surfaces — readable ink + link contrast on white cards.
+ * Loaded after card-contrast-normalization.css.
+ */
+
+:is(.app-shell, .emergency-app-shell) :is(
+    .profile-settings-shell,
+    .profile-page,
+    .profile-identity-page,
+    .profile-settings-page
+  ) {
+  color: var(--medical-text-body, var(--app-text-primary));
+}
+
+:is(.app-shell, .emergency-app-shell) :is(
+    .profile-settings-shell__header h1,
+    .profile-card__title,
+    .profile-overview-card__header h3,
+    .profile-activity-card h3,
+    .profile-phi-panel h4,
+    .profile-summary-card__body h2,
+    .profile-identity-card h3
+  ) {
+  color: var(--medical-text-heading, var(--app-text-primary));
+}
+
+:is(.app-shell, .emergency-app-shell) :is(
+    .profile-settings-shell__eyebrow,
+    .profile-settings-shell__subtitle,
+    .profile-settings-shell__access,
+    .profile-card__subtitle,
+    .profile-card__workspace,
+    .profile-overview-list p,
+    .profile-competency-status p,
+    .profile-activity-card p,
+    .profile-phi-panel p,
+    .profile-summary-card__eyebrow,
+    .profile-summary-card__body p,
+    .profile-summary-card__status,
+    .profile-copilot-card p,
+    .profile-identity-muted
+  ) {
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+:is(.app-shell, .emergency-app-shell) :is(
+    .profile-nav-links a,
+    .profile-back-link,
+    .profile-overview-card__header a,
+    .profile-overview-row a,
+    .profile-summary-card__link,
+    .profile-settings-back-link,
+    .profile-activity-cta,
+    .profile-identity-row a
+  ) {
+  color: var(--medical-text-link, var(--app-link-fg));
+  text-decoration-color: color-mix(in srgb, var(--medical-text-link, #0369a1) 35%, transparent);
+}
+
+:is(.app-shell, .emergency-app-shell) :is(
+    .profile-nav-links a:hover,
+    .profile-back-link:hover,
+    .profile-overview-card__header a:hover,
+    .profile-overview-row a:hover,
+    .profile-summary-card__link:hover,
+    .profile-settings-back-link:hover,
+    .profile-activity-cta:hover,
+    .profile-identity-row a:hover
+  ) {
+  color: var(--medical-text-link-hover, var(--app-link-hover));
+}
+
+:is(.app-shell, .emergency-app-shell) :is(
+    .profile-overview-card,
+    .profile-activity-item,
+    .profile-competency-summary div,
+    .profile-preference-list div,
+    .profile-overview-row,
+    .profile-identity-card,
+    .profile-identity-row,
+    .profile-settings-shell__access
+  ) {
+  background: var(--medical-card-bg, var(--app-surface-1));
+  border-color: var(--medical-card-border, var(--app-border));
+  color: var(--medical-card-fg, var(--app-text-primary));
+}
+
+.profile-activity-card {
+  border-color: var(--medical-accent-border, rgba(14, 165, 233, 0.32));
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--app-accent-interactive) 6%, transparent),
+      color-mix(in srgb, var(--app-accent-interactive) 3%, transparent)
+    ),
+    var(--medical-card-bg, var(--app-surface-1));
+}
+
+.profile-activity-card__badge,
+.profile-activity-cta {
+  border-color: color-mix(in srgb, var(--app-accent-interactive) 35%, var(--medical-card-border));
+  background: color-mix(in srgb, var(--app-accent-interactive) 10%, var(--medical-card-bg));
+  color: var(--medical-text-link, var(--app-link-fg));
+}
+
+.profile-copilot-card__cta {
+  color: var(--medical-text-link, var(--app-link-fg));
+  border-color: var(--medical-card-border, var(--app-border));
+  background: var(--medical-card-muted-bg, var(--app-surface-muted));
+}
+
+.profile-copilot-card__cta:hover {
+  color: var(--medical-text-link-hover, var(--app-link-hover));
+  border-color: color-mix(in srgb, var(--app-accent-interactive) 28%, var(--medical-card-border));
+  background: color-mix(in srgb, var(--app-accent-interactive) 8%, var(--medical-card-muted-bg));
+}
+
+:is(.app-shell, .emergency-app-shell) .profile-insights-panel,
+:is(.app-shell, .emergency-app-shell) .profile-ai-capability-card {
+  color: var(--medical-card-fg, var(--app-text-primary));
+}
+
+.profile-summary-card__avatar {
+  color: var(--medical-text-link, var(--app-link-fg));
+  background: var(--medical-card-muted-bg, var(--app-surface-muted));
+}
+
+.profile-competency-progress span {
+  background: var(--app-accent-interactive);
+}
+
+.profile-settings-shell__nav a.is-active {
+  color: var(--medical-text-heading, var(--app-text-primary));
+  border-color: color-mix(in srgb, var(--app-accent-interactive) 42%, var(--medical-card-border));
+  background: color-mix(in srgb, var(--app-accent-interactive) 12%, var(--medical-card-bg));
+}
+
+.profile-identity-button {
+  background: var(--app-accent-interactive);
+  color: var(--app-on-solid, #ffffff);
+}
+
+.profile-identity-button--secondary {
+  background: transparent;
+  color: var(--medical-text-link, var(--app-link-fg));
+  border-color: var(--medical-card-border, var(--app-border));
+}

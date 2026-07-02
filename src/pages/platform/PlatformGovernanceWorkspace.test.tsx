@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import PlatformGovernanceWorkspace from './PlatformGovernanceWorkspace';
 
-vi.mock('./PlatformSystemPage.css', () => ({}));
+vi.mock('./PlatformGovernanceWorkspace.css', () => ({}));
 
 const platformGovernanceApiMock = vi.hoisted(() => ({
   fetchPlatformGovernanceSurface: vi.fn(),
@@ -48,7 +48,7 @@ describe('PlatformGovernanceWorkspace governance/security dashboards', () => {
       await screen.findByRole('heading', { level: 1, name: /ai governance center/i }),
     ).toBeVisible();
     expect(screen.getByRole('heading', { name: /dashboard panels/i })).toBeVisible();
-    expect(screen.getByText(/approval Workflow/i)).toBeVisible();
+    expect(screen.getAllByText(/approval Workflow/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/risk Classification/i).length).toBeGreaterThan(0);
     expect(platformGovernanceApiMock.fetchPlatformGovernanceSurface).toHaveBeenCalledWith(
       'governance',
@@ -75,7 +75,7 @@ describe('PlatformGovernanceWorkspace governance/security dashboards', () => {
     expect(
       await screen.findByRole('heading', { level: 1, name: /llm security dashboard/i }),
     ).toBeVisible();
-    expect(screen.getByText(/prompt Injection/i)).toBeVisible();
+    expect(screen.getAllByText(/prompt Injection/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/phi Protection/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/minimize_or_redact/i).length).toBeGreaterThan(0);
     expect(platformGovernanceApiMock.fetchPlatformGovernanceSurface).toHaveBeenCalledWith(

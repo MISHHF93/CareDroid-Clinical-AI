@@ -57,6 +57,21 @@
   margin-bottom: 12px;
 }
 
+.command-center-throughput__section-heading--chart {
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.command-center-throughput__section-heading--chart > div {
+  display: grid;
+  gap: 2px;
+  flex: 1;
+}
+
+.command-center-throughput__section-heading--chart span {
+  display: block;
+}
+
 .command-center-throughput__section-heading h3,
 .command-center-throughput__forecast h3,
 .command-center-throughput__health h3 {

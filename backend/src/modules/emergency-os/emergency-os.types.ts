@@ -60,7 +60,11 @@ export type WorkflowActionType =
   | 'provincial_data_viewed'
   | 'integration_event_received'
   | 'upgrade_harness_used'
-  | 'administrative_automation_reviewed';
+  | 'administrative_automation_reviewed'
+  | 'staff_assigned'
+  | 'patient_note_added'
+  | 'operational_alert_dispatched'
+  | 'patient_escalated';
 
 export type WorkflowActionSeverity = 'Info' | 'Warning' | 'Critical';
 export type WorkflowActionStatus = 'recorded' | 'pending' | 'completed' | 'failed';

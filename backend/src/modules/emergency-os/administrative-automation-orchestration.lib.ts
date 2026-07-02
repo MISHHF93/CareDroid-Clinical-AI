@@ -811,14 +811,85 @@ function executeBackendApprovedTask(
       const patientId = task.patientId;
       if (!patientId) return { ok: false, detail: 'Missing patient for routing.' };
       const target = task.proposedPayload.targetState as PatientState;
+      if (target !== PatientState.Triage && target !== PatientState.Waiting) {
+        return { ok: false, detail: 'Unsupported routing target.' };
+      }
       patientService.movePatientToState(patientId, target as never, {
         staffId: actorStaffId,
         note: `Approved administrative automation: ${task.title}`,
       });
-      return { ok: true, detail: `Patient routed to ${String(target)}.` };
+      return {
+        ok: true,
+        detail:
+          target === PatientState.Triage
+            ? 'Patient routed to triage queue.'
+            : 'Patient routed to waiting queue.',
+      };
+    }
+    case 'staff_assignment': {
+      const patientId = task.patientId;
+      const staffId = task.proposedPayload.proposedStaffId as string | undefined;
+      if (!patientId || !staffId) {
+        return { ok: false, detail: 'Staff assignment requires patient and proposed staff.' };
+      }
+      patientService.assignStaffToPatient(patientId, staffId, actorStaffId);
+      return {
+        ok: true,
+        detail: `Assigned staff ${task.proposedPayload.proposedStaffName || staffId}.`,
+      };
+    }
+    case 'department_notification': {
+      patientService.dispatchOperationalAlert({
+        severity: task.priority === 'critical' ? 'Critical' : 'Warning',
+        title: task.title,
+        message: task.summary,
+        source: 'backend-workflow-orchestrator',
+        metadata: { automationTaskId: task.id, ...task.proposedPayload },
+      });
+      return { ok: true, detail: 'Department notification dispatched.' };
+    }
+    case 'documentation_handoff': {
+      const patientId = task.patientId;
+      if (!patientId) return { ok: false, detail: 'Missing patient for handoff.' };
+      const draft = [
+        '[Automated handoff draft — clinician review required]',
+        `Patient: ${task.patientName}`,
+        `Path: ${task.proposedPayload.handoffType}`,
+        `Template: ${task.proposedPayload.template}`,
+        task.summary,
+      ].join('\n');
+      patientService.addPatientNote(patientId, draft, actorStaffId);
+      return { ok: true, detail: 'Handoff draft added to patient notes.' };
+    }
+    case 'ai_patient_summary': {
+      const patientId = task.patientId;
+      if (!patientId) return { ok: false, detail: 'Missing patient for summary.' };
+      patientService.addPatientNote(
+        patientId,
+        `[AI summary — clinician review required]\n${task.proposedPayload.summaryText || task.summary}`,
+        actorStaffId,
+      );
+      return { ok: true, detail: 'AI summary staged in patient notes.' };
+    }
+    case 'triage_preparation':
+    case 'queue_prioritization':
+    case 'escalation_workflow': {
+      if (task.category === 'escalation_workflow' && task.patientId) {
+        patientService.escalatePatient(task.patientId, actorStaffId);
+      }
+      if (task.category === 'escalation_workflow' && !task.patientId) {
+        patientService.dispatchOperationalAlert({
+          severity: 'Critical',
+          title: task.title,
+          message: task.summary,
+          source: 'backend-workflow-orchestrator',
+          metadata: { automationTaskId: task.id, ...task.proposedPayload },
+        });
+      }
+      return { ok: true, detail: 'Escalation workflow recorded for clinician follow-up.' };
     }
     default:
-      return { ok: true, detail: 'Automation recorded for clinician follow-up.' };
+      return { ok: true, detail: 'Automation recorded without automatic mutation.' };
   }
 }
 

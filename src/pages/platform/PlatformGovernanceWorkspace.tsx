@@ -1,133 +1,40 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import {
+  CategoryBarChart,
+  MetricCard,
+  VisualizationPanel,
+} from '../../components/dashboard/DashboardVisualizations';
+import { GraphicIconBadge } from '../../components/graphics/CdlGraphicKit';
 import StateSourceNotice from '../../components/StateSourceNotice';
+import { CANONICAL_ROUTES } from '../../config/routes.config';
+import {
+  buildPlatformGovernanceSurfaceView,
+  inferPlatformGovernanceSurface,
+} from '../../data/platformGovernanceSurfaces';
 import { getPlatformSystemCapabilityByPath } from '../../data/platformSystems';
 import { fetchPlatformGovernanceSurface } from '../../services/platformGovernanceApi';
-import {
-  PlatformDashboardPanels,
-  PlatformDecisionPanel,
-  PlatformEvidencePanel,
-  PlatformMetricGrid,
-  PlatformPageShell,
-} from './components/PlatformWorkflowPrimitives';
 import { DEMO_LIVE_STATES } from '../../utils/demoLiveState';
-import './PlatformSystemPage.css';
+import {
+  buildGovernancePanelChart,
+  governancePanelTone,
+  governanceSourceTone,
+} from '../../utils/platformGovernanceChartModel';
+import './PlatformGovernanceWorkspace.css';
 
-const SURFACE_BY_PATH = Object.freeze([
-  [/^\/ai-governance/, 'governance'],
-  [/^\/security/, 'ai-security'],
-  [/^\/regulatory/, 'regulatory'],
-  [/^\/equity/, 'equity'],
-  [/^\/human-review/, 'review'],
-  [/^\/system-health/, 'observability'],
-  [/ai-security/, 'ai-security'],
-  [/regulatory/, 'regulatory'],
-  [/equity/, 'equity'],
-  [/validation/, 'validation'],
-  [/^\/review/, 'review'],
-  [/consent/, 'consent'],
-  [/privacy/, 'privacy'],
-  [/^\/audit/, 'audit'],
-  [/observability|incidents/, 'observability'],
-  [/source-provenance|integrations/, 'interoperability'],
-  [/governance/, 'governance'],
-]);
-
-const SURFACE_COPY = Object.freeze({
-  governance: {
-    title: 'Clinical Governance',
-    summary: 'Production readiness, policy state, release gates, and safety blockers for clinical AI operations.',
-  },
-  'ai-security': {
-    title: 'AI Security',
-    summary: 'Prompt firewall, model access, PHI minimization, and security incident controls.',
-  },
-  regulatory: {
-    title: 'Regulatory Classification',
-    summary: 'Capability risk classification, intended use, evidence status, and approval gates.',
-  },
-  equity: {
-    title: 'Equity Monitoring',
-    summary: 'Cohort coverage, missingness, drift, and bias finding review for clinical AI workflows.',
-  },
-  validation: {
-    title: 'Validation Sandbox',
-    summary: 'Synthetic patient scenarios, validation runs, and release evidence before production activation.',
-  },
-  review: {
-    title: 'Human Review Queue',
-    summary: 'Clinician, privacy, governance, and safety review workflows for high-risk actions.',
-  },
-  consent: {
-    title: 'Consent Center',
-    summary: 'Patient consent scope, revocation state, and PHI access gating for AI and documentation.',
-  },
-  privacy: {
-    title: 'Privacy Center',
-    summary: 'Privacy requests, PHI access transparency, export/delete review, and patient data controls.',
-  },
-  audit: {
-    title: 'Audit Trail Spine',
-    summary: 'Reconstruct AI, PHI, policy, review, consent, integration, and deployment events.',
-  },
-  observability: {
-    title: 'Deployment Observability',
-    summary: 'Deployment health, degraded modes, AI safety metrics, and incident readiness.',
-  },
-  interoperability: {
-    title: 'FHIR + HL7 Integration',
-    summary: 'Patient import, observations, medications, labs, encounters, connection states, and source provenance.',
-  },
-});
-
-const ENTERPRISE_ROUTE_COPY = Object.freeze({
-  '/ai-governance': {
-    title: 'AI Governance Center',
-    summary: 'Model inventory, clinical review, risk classification, and release history for governed AI deployment.',
-  },
-  '/security': {
-    title: 'LLM Security Dashboard',
-    summary: 'Blocked prompts, security events, warnings, failed tool calls, PHI protection, and tool permission checks.',
-  },
-  '/regulatory': {
-    title: 'Regulatory Classification',
-    summary: 'Classify tools as informational, CDS, potential SaMD, workflow, or operational capabilities.',
-  },
-  '/equity': {
-    title: 'Bias And Equity Monitoring',
-    summary: 'Model performance, demographic, language, workflow, specialty, fairness, and drift monitoring.',
-  },
-  '/human-review': {
-    title: 'Human Review Queue',
-    summary: 'AI outputs awaiting review with status, reviewer, comments, and accept/reject workflow.',
-  },
-  '/privacy': {
-    title: 'Consent + Privacy Center',
-    summary: 'Consent management, retention policy, data export/delete workflows, and audit access.',
-  },
-  '/system-health': {
-    title: 'Deployment Observability',
-    summary: 'Frontend/backend versions, git commit, build timestamp, API health, environment, and deployment status.',
-  },
-});
-
-function inferSurface(pathname): string {
-  return (SURFACE_BY_PATH.find(([pattern]) => (pattern as any).test(pathname))?.[1] as any) || 'governance';
-}
-
-function countValue(data, key) {
-  if (Array.isArray(data)) return data.length;
-  if (Array.isArray(data?.items)) return data.items.length;
-  if (Array.isArray(data?.events)) return data.events.length;
-  if (data?.counts?.[key] !== undefined) return data.counts[key];
-  return data?.readiness?.blocked ? 'Blocked' : data?.status || 'Ready';
-}
+const GOVERNANCE_ACTIONS = [
+  { label: 'AI governance', route: CANONICAL_ROUTES.aiGovernance },
+  { label: 'LLM security', route: CANONICAL_ROUTES.security },
+  { label: 'Regulatory', route: '/regulatory' },
+  { label: 'Human review', route: CANONICAL_ROUTES.humanReview },
+  { label: 'Governance registry', route: CANONICAL_ROUTES.governanceRegistry },
+  { label: 'Audit trail', route: CANONICAL_ROUTES.audit },
+];
 
 export default function PlatformGovernanceWorkspace() {
   const location = useLocation();
   const capability = getPlatformSystemCapabilityByPath(location.pathname);
-  const surface = inferSurface(location.pathname);
-  const copy = (ENTERPRISE_ROUTE_COPY as any)[location.pathname] || (SURFACE_COPY as any)[surface] || (SURFACE_COPY as any).governance;
+  const surface = inferPlatformGovernanceSurface(location.pathname);
   const [state, setState] = useState<any>({ loading: true, error: '', data: null, sourceStatus: 'loading' });
 
   useEffect(() => {
@@ -147,35 +54,42 @@ export default function PlatformGovernanceWorkspace() {
     };
   }, [location.pathname, surface]);
 
-  const metrics = useMemo(
-    () => [
-      {
-        label: 'Source Status',
-        value: state.sourceStatus,
-        help: 'Live, demo, or local fallback contract state.',
-      },
-      {
-        label: 'Readiness',
-        value: state.data?.readiness?.blocked ? 'Blocked' : state.data?.status || 'Loading',
-        help: 'P0 controls fail closed until configured.',
-      },
-      {
-        label: 'Records',
-        value: countValue(state.data, `${surface}s`),
-        help: 'Durable records or synthetic fallback items for this workflow.',
-      },
-    ],
-    [state.data, state.sourceStatus, surface]
+  const view = useMemo(
+    () =>
+      buildPlatformGovernanceSurfaceView({
+        surface,
+        pathname: location.pathname,
+        apiData: state.data,
+        sourceStatus: state.sourceStatus,
+      }),
+    [surface, location.pathname, state.data, state.sourceStatus],
   );
+  const panelChart = useMemo(() => buildGovernancePanelChart(view.panels), [view.panels]);
 
   return (
-    <PlatformPageShell
-      eyebrow={`${capability?.criticality || 'P0'} platform governance`}
-      title={copy.title || capability?.name}
-      summary={copy.summary || capability?.summary}
-      error={state.error}
-    >
-      <PlatformMetricGrid metrics={metrics} />
+    <main className="governance-workspace-page" aria-label={view.copy.title}>
+      <header className="governance-workspace-page__header">
+        <div className="governance-workspace-page__title-row">
+          <GraphicIconBadge iconKey={view.copy.iconKey || 'shield-check'} accent="brand" size="md" />
+          <div>
+            <p className="governance-workspace-page__eyebrow">
+              {capability?.criticality || 'P0'} platform governance
+            </p>
+            <h1>{view.copy.title || capability?.name}</h1>
+            <p>{view.copy.summary || capability?.summary}</p>
+          </div>
+        </div>
+        <div className="governance-workspace-page__actions">
+          {GOVERNANCE_ACTIONS.map((action) => (
+            <Link key={action.route} to={action.route}>
+              {action.label}
+            </Link>
+          ))}
+        </div>
+      </header>
+
+      {state.error ? <p className="governance-workspace-page__error">{state.error}</p> : null}
+
       <StateSourceNotice
         title="Governance and security source states"
         states={[
@@ -187,18 +101,93 @@ export default function PlatformGovernanceWorkspace() {
         ]}
         details="Governance, security, regulatory, review, privacy, audit, and observability routes show the current source status. Demo or synthetic panels are review artifacts only; unavailable or unsupported controls should not be treated as active production enforcement."
       />
-      <PlatformDecisionPanel />
-      <PlatformDashboardPanels panels={state.data?.panels} />
-      {state.data?.panels ? (
-        <PlatformEvidencePanel
-          title={`${copy.title} Panels`}
-          data={state.data.panels}
-        />
-      ) : null}
-      <PlatformEvidencePanel
-        title={`${copy.title} Contract`}
-        data={state.loading ? { status: 'loading' } : state.data}
-      />
-    </PlatformPageShell>
+
+      <div className="governance-workspace-page__metrics" role="group" aria-label="Governance summary metrics">
+        {view.metrics.map((metric) => (
+          <MetricCard
+            key={metric.label}
+            label={metric.label}
+            value={metric.value}
+            hint={metric.hint}
+            tone={metric.tone as 'good' | 'warning' | 'critical' | 'neutral'}
+          />
+        ))}
+      </div>
+
+      <div className="governance-workspace-page__charts">
+        <VisualizationPanel
+          title="Control panel scores"
+          description="Operational governance and security controls scored for review."
+          badge="Panels"
+        >
+          <CategoryBarChart
+            data={panelChart}
+            title="Control panel scores"
+            color="var(--app-chart-1)"
+            emptyMessage="Panel chart appears when governance controls are registered."
+          />
+        </VisualizationPanel>
+      </div>
+
+      <section className="governance-workspace-page__panel" aria-labelledby="platform-dashboard-panels-title">
+        <h2 id="platform-dashboard-panels-title">Dashboard Panels</h2>
+        <p>Governance and security controls are split into reviewable operational panels.</p>
+        <div className="governance-workspace-page__cards">
+          {view.controls.map((control) => (
+              <article className="governance-workspace-page__card" key={control.id}>
+                <span className="governance-workspace-page__card-meta">{control.label}</span>
+                <strong>{control.summary}</strong>
+                <span className={`governance-workspace-page__pill governance-workspace-page__pill--${governancePanelTone(control.score)}`}>
+                  Score {control.score}
+                </span>
+                <span>{control.detail.slice(0, 220)}</span>
+              </article>
+            ))}
+        </div>
+      </section>
+
+      <section className="governance-workspace-page__panel" aria-labelledby="platform-decision-title">
+        <h2 id="platform-decision-title">Human Review Gate</h2>
+        <p>Approval, rejection, escalation, export, and writeback remain disabled until durable review records are approved.</p>
+        <div className="governance-workspace-page__cards">
+          <article className="governance-workspace-page__card">
+            <strong>Fail-closed behavior</strong>
+            <span>Missing governance, consent, validation, classification, or audit controls block production action.</span>
+          </article>
+          <article className="governance-workspace-page__card">
+            <strong>No autonomous action</strong>
+            <span>CareDroid does not sign notes, place orders, write to an EHR, export PHI, or contact patients automatically.</span>
+          </article>
+        </div>
+      </section>
+
+      <section className="governance-workspace-page__panel" aria-label="Governance controls">
+        <h2>Control registry</h2>
+        <div className="governance-workspace-page__table" role="table">
+          <div className="governance-workspace-page__table-head" role="row">
+            <span role="columnheader">Control</span>
+            <span role="columnheader">Status</span>
+            <span role="columnheader">Evidence</span>
+          </div>
+          {view.controls.map((control) => (
+              <div key={control.id} className="governance-workspace-page__table-row" role="row">
+                <span role="cell">{control.label}</span>
+                <span role="cell">
+                  <span className={`governance-workspace-page__pill governance-workspace-page__pill--${governancePanelTone(control.score)}`}>
+                    {control.summary}
+                  </span>
+                </span>
+                <span role="cell">{control.detail}</span>
+              </div>
+            ))}
+        </div>
+        <p>
+          Source status:{' '}
+          <span className={`governance-workspace-page__pill governance-workspace-page__pill--${governanceSourceTone(state.sourceStatus)}`}>
+            {state.sourceStatus}
+          </span>
+        </p>
+      </section>
+    </main>
   );
 }

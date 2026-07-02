@@ -1,0 +1,113 @@
+.simulation-outcomes-page {
+  display: grid;
+  gap: var(--compact-panel-gap, 14px);
+  padding: var(--compact-panel-padding, 16px);
+  min-height: 100vh;
+  color: var(--app-fg, var(--medical-text-body, #111827));
+  background: var(--medical-surface-page, var(--app-surface-page, #f8fafc));
+  font-family: Inter, system-ui, sans-serif;
+}
+
+.simulation-outcomes-page__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.simulation-outcomes-page__title-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.simulation-outcomes-page__title-row h1 {
+  margin: 0;
+  font-size: clamp(22px, 3vw, 28px);
+  color: var(--medical-text-heading, var(--app-text-primary));
+}
+
+.simulation-outcomes-page__title-row p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.simulation-outcomes-page__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.simulation-outcomes-page__actions a {
+  min-height: var(--compact-control-height, 40px);
+  padding: 8px 14px;
+  border-radius: var(--compact-panel-radius, 12px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--medical-card-bg, var(--app-surface-1));
+  text-decoration: none;
+  font-size: 13px;
+  color: inherit;
+}
+
+.simulation-outcomes-page__metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.simulation-outcomes-page__charts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.simulation-outcomes-page__panels {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.simulation-outcomes-page__panel {
+  display: grid;
+  gap: 10px;
+  padding: var(--compact-panel-padding, 14px);
+  border-radius: var(--compact-panel-radius, 14px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--medical-card-bg, var(--app-surface-1));
+}
+
+.simulation-outcomes-page__panel h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.simulation-outcomes-page__panel ul {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+}
+
+.simulation-outcomes-page__links {
+  display: grid;
+  gap: 8px;
+}
+
+.simulation-outcomes-page__links a {
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  text-decoration: none;
+  font-size: 13px;
+  color: inherit;
+}
+
+@media (max-width: 900px) {
+  .simulation-outcomes-page__metrics,
+  .simulation-outcomes-page__charts,
+  .simulation-outcomes-page__panels {
+    grid-template-columns: 1fr;
+  }
+}

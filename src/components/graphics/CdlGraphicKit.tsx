@@ -95,7 +95,7 @@ export function GraphicIconBadge({
         .join(' ')}
       aria-hidden
     >
-      <IconComponent size={size === 'lg' ? 22 : size === 'sm' ? 14 : 18} stroke={2} />
+      <IconComponent size={size === 'lg' ? 22 : size === 'sm' ? 15 : 18} stroke={size === 'lg' ? 2.25 : 2.1} />
     </span>
   );
 }

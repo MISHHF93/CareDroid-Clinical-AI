@@ -26,6 +26,7 @@ import useEdRouteDataContext from '../../hooks/useEdRouteDataContext';
 import { EmergencyRoutePage } from './emergencyRouteShared';
 import PatientFlowStatusPanel from '../../components/emergency/PatientFlowStatusPanel';
 import AdministrativeAutomationReviewPanel from '../../components/emergency/AdministrativeAutomationReviewPanel';
+import CommandCenterInsightsCharts from '../../components/emergency/CommandCenterInsightsCharts';
 import './hospital-command-center.css';
 
 export default function HospitalCommandCenter() {
@@ -236,6 +237,7 @@ export default function HospitalCommandCenter() {
               />
             ))}
           </div>
+          <CommandCenterInsightsCharts snapshot={snapshot} visibleMetrics={visibleMetrics} />
         </section>
       }
       supportingContext={

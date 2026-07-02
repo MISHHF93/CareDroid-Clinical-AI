@@ -1,0 +1,150 @@
+.command-dashboard-page {
+  display: grid;
+  gap: var(--compact-panel-gap, 14px);
+  padding: var(--compact-panel-padding, 16px);
+  min-height: 100vh;
+  color: var(--app-fg, var(--medical-text-body, #111827));
+  background: var(--medical-surface-page, var(--app-surface-page, #f8fafc));
+  font-family: Inter, system-ui, sans-serif;
+}
+
+.command-dashboard-page__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.command-dashboard-page__title-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.command-dashboard-page__title-row h1 {
+  margin: 0;
+  font-size: clamp(24px, 3vw, 32px);
+  color: var(--medical-text-heading, var(--app-text-primary));
+}
+
+.command-dashboard-page__title-row p {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.command-dashboard-page__actions a {
+  min-height: var(--compact-control-height, 40px);
+  padding: 8px 14px;
+  border-radius: var(--compact-panel-radius, 12px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--medical-card-bg, var(--app-surface-1));
+  text-decoration: none;
+  font-size: 13px;
+}
+
+.command-dashboard-page__metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.command-dashboard-page__charts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.command-dashboard-page__panels {
+  display: grid;
+  gap: 14px;
+}
+
+.command-dashboard-page__panel {
+  display: grid;
+  gap: 10px;
+  padding: var(--compact-panel-padding, 14px);
+  border-radius: var(--compact-panel-radius, 14px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--medical-card-bg, var(--app-surface-1));
+}
+
+.command-dashboard-page__panel h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.command-dashboard-page__panel p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.command-dashboard-page__tool-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.command-dashboard-page__tool-link {
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: var(--compact-panel-radius, 10px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--app-surface-muted, #f8fafc);
+  text-decoration: none;
+  color: inherit;
+}
+
+.command-dashboard-page__tool-link strong {
+  font-size: 13px;
+}
+
+.command-dashboard-page__tool-link span {
+  font-size: 12px;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.command-dashboard-page__prompts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 10px;
+}
+
+.command-dashboard-page__prompt {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  border-radius: var(--compact-panel-radius, 10px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--medical-card-bg, var(--app-surface-1));
+}
+
+.command-dashboard-page__prompt strong {
+  font-size: 14px;
+}
+
+.command-dashboard-page__prompt span {
+  font-size: 12px;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.command-dashboard {
+  padding: var(--compact-panel-padding, 14px);
+  border-radius: var(--compact-panel-radius, 12px);
+}
+
+.command-dashboard button,
+.command-dashboard input {
+  min-height: var(--compact-control-height, 40px);
+}
+
+@media (max-width: 900px) {
+  .command-dashboard-page__metrics,
+  .command-dashboard-page__charts {
+    grid-template-columns: 1fr;
+  }
+}

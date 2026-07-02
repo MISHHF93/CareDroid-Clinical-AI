@@ -22,6 +22,8 @@ import {
 } from './practitionerCleanup.constants';
 import { HUMAN_REVIEW_DISCLAIMER } from '../lib/ai/safety/policy';
 import { COPILOT_RECOMMENDATION_DOMAIN, COPILOT_DOMAIN_PRIORITY } from './copilotRecommendationModel';
+import { getProfileCopilotWelcomeMessage } from './profileDesignLanguage.config';
+import type { ProfileCopyStack } from './userProfileCopyModel';
 
 export type CopilotToolLaunchAction = Readonly<{
   id: string;
@@ -264,11 +266,11 @@ export function getCopilotToolLaunchActions(): readonly CopilotToolLaunchAction[
   return COPILOT_PLATFORM.toolActions as unknown as readonly CopilotToolLaunchAction[];
 }
 
-export function getCopilotWelcomeMessage(compactLayout: boolean): string {
-  if (compactLayout) {
-    return `Ask about patients, queues, capacity, or bottlenecks. ${COPILOT_PLATFORM.safety.disclaimer}`;
-  }
-  return `${COPILOT_PLATFORM.identity.name} is ready. Ask about patients, queues, capacity, boarding, or service bottlenecks.`;
+export function getCopilotWelcomeMessage(
+  compactLayout: boolean,
+  profileCopy?: ProfileCopyStack | null,
+): string {
+  return getProfileCopilotWelcomeMessage(compactLayout, profileCopy);
 }
 
 /** Machine-readable I/O contract for audits, user manual, and integration tests. */

@@ -1,0 +1,27 @@
+.emergency-analytics-charts {
+  display: grid;
+  gap: 14px;
+}
+
+.emergency-analytics-charts__intro {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.emergency-analytics-charts__intro h3 {
+  margin: 0;
+  color: var(--medical-text-heading, var(--app-text-primary));
+  font-size: 16px;
+}
+
+.emergency-analytics-charts__intro p {
+  margin: 4px 0 0;
+  color: var(--medical-text-muted, var(--app-text-muted));
+  font-size: 13px;
+}
+
+.emergency-analytics-charts__grid {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}

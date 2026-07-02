@@ -16,7 +16,8 @@ html {
   --color-text-muted: var(--medical-ink-subtle);
   --color-primary: var(--medical-accent);
   --color-secondary: var(--medical-accent-soft);
-  --color-accent: var(--medical-sky-300, #7dd3fc);
+  --color-accent: var(--medical-accent-hover, #0369a1);
+  --link-color: var(--app-link-fg, var(--medical-text-link));
   --status-info: var(--medical-accent);
   --primary-color: var(--app-accent-interactive);
   --accent-color: var(--app-accent-interactive);

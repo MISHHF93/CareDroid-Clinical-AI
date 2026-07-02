@@ -18,10 +18,12 @@ import { MemoryModule } from '../memory/memory.module';
 import { ArtifactsModule } from '../artifacts/artifacts.module';
 import { EvaluationModule } from '../evaluation/evaluation.module';
 import { PlatformGovernanceModule } from '../platform-governance';
+import { PlatformAssetsModule } from '../platform-assets/platform-assets.module';
 
 @Module({
   imports: [
     AiModule,
+    PlatformAssetsModule,
     IntentClassifierModule,
     ToolOrchestratorModule,
     EmergencyEscalationModule,

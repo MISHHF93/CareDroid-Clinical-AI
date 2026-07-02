@@ -52,6 +52,16 @@ vi.mock('../services/emergencyTransportApi', () => ({
 }));
 
 vi.mock('../services/emergencySettingsApi', () => ({
+  fetchOrganizationEmergencyOsSettings: vi.fn().mockResolvedValue({
+    ok: true,
+    data: {
+      data: {
+        tenantName: 'CareDroid ED',
+        defaultWorkspace: 'emergency-whiteboard',
+        enabledModules: [{ id: 'whiteboard', label: 'Emergency Whiteboard', enabled: true }],
+      },
+    },
+  }),
   fetchEmergencyOsSettings: vi.fn().mockResolvedValue({
     ok: true,
     data: {
@@ -188,17 +198,42 @@ vi.mock('../hooks/useNotificationActions', () => ({
   useNotificationActions: () => ({ error: vi.fn(), success: vi.fn(), info: vi.fn() }),
 }));
 
-vi.mock('../services/clinicalToolsApi', () => ({
-  fetchBackendClinicalTools: vi.fn().mockResolvedValue({ ok: true, tools: [] }),
-  fetchToolExecutorCatalog: vi.fn().mockResolvedValue({
-    ok: true,
-    data: {
-      registeredExecutorToolIds: ['sofa-calculator', 'drug-interactions', 'lab-interpreter'],
-      registryIdToExecutor: {},
-      unsupportedTools: [],
-    },
-  }),
-}));
+vi.mock('../services/clinicalToolsApi', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../services/clinicalToolsApi')>();
+  return {
+    ...actual,
+    fetchBackendClinicalTools: vi.fn().mockResolvedValue({ ok: true, tools: [] }),
+    fetchToolExecutorCatalog: vi.fn().mockResolvedValue({
+      ok: true,
+      data: {
+        registeredExecutorToolIds: ['sofa-calculator', 'drug-interactions', 'lab-interpreter'],
+        registryIdToExecutor: {},
+        unsupportedTools: [],
+      },
+    }),
+    fetchClinicalToolMetadata: vi.fn((toolId) =>
+      Promise.resolve({
+        ok: true,
+        data: { id: toolId, name: toolId, parameters: [] },
+      }),
+    ),
+    fetchToolStatistics: vi.fn().mockResolvedValue({
+      ok: true,
+      data: {
+        totalTools: 3,
+        tools: [
+          { id: 'drug-interactions', name: 'Drug interactions', category: 'diagnostic' },
+          { id: 'lab-interpreter', name: 'Lab interpreter', category: 'diagnostic' },
+          { id: 'sofa-calculator', name: 'SOFA calculator', category: 'calculator' },
+        ],
+      },
+    }),
+    validateClinicalTool: vi.fn().mockResolvedValue({
+      ok: true,
+      data: { valid: true, errors: [], warnings: [], resolvedToolId: 'test-tool' },
+    }),
+  };
+});
 
 vi.mock('../hooks/useTrackMindRolePermissions', async (importOriginal) => {
   const actual = await importOriginal() as any;
@@ -270,13 +305,13 @@ vi.mock('../components/Sidebar', async () => {
   const React = await import('react');
   const { Link, useLocation } = await import('react-router-dom');
   const items = [
-    { label: 'Dashboard', path: '/emergency/whiteboard' },
+    { label: 'Whiteboard', path: '/emergency/whiteboard' },
     { label: 'EMS', path: '/emergency/ems' },
     { label: 'Medical Tools', path: '/emergency/tools' },
     { label: 'Analytics', path: '/emergency/analytics' },
     { label: 'Settings', path: '/emergency/settings' },
     { label: 'Patients', path: '/emergency/patients' },
-    { label: 'Queue', path: '/emergency/queues' },
+    { label: 'Queues', path: '/emergency/queues' },
     { label: 'AI Chief', path: '/emergency/copilot' },
   ];
 
@@ -301,6 +336,14 @@ vi.mock('../components/Sidebar', async () => {
 
   return { Sidebar };
 });
+
+vi.mock('../pages/tools/ToolsOverview', () => ({
+  default: () => (
+    <section className="tools-overview" aria-labelledby="tools-overview-title">
+      <h1 id="tools-overview-title">Medical Tools</h1>
+    </section>
+  ),
+}));
 
 vi.mock('../components/Header', () => ({
   Header: () => (
@@ -382,6 +425,78 @@ vi.mock('../engine/simulation', () => ({
 vi.mock('../services/emergencyRealtimeService', () => ({
   default: () => () => {},
 }));
+
+vi.mock('../services/aiPlatformBootstrap', () => ({
+  bootstrapAiPlatformIntegrations: vi.fn(),
+}));
+
+vi.mock('../services/devBackendAuth', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../services/devBackendAuth')>();
+  return {
+    ...actual,
+    ensureDevBackendSession: vi.fn().mockResolvedValue(undefined),
+  };
+});
+
+vi.mock('../services/backendReachability', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../services/backendReachability')>();
+  return {
+    ...actual,
+    probeBackendReachability: vi.fn().mockResolvedValue(false),
+    isBackendKnownOffline: vi.fn().mockReturnValue(true),
+  };
+});
+
+vi.mock('../services/platformGovernanceApi', () => ({
+  fetchPlatformGovernanceSurface: vi.fn().mockResolvedValue({
+    ok: true,
+    sourceStatus: 'fallback',
+    data: {
+      status: 'local_fallback',
+      readiness: { blocked: false },
+      panels: {
+        approvalWorkflow: { required: true, reasons: ['phi_access'] },
+        riskClassification: { level: 'high', category: 'high_risk_cds' },
+      },
+    },
+  }),
+  evaluatePlatformGate: vi.fn().mockResolvedValue({ ok: true }),
+}));
+
+vi.mock('../config/practitionerCleanup.config', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../config/practitionerCleanup.config')>();
+  return {
+    ...actual,
+    isPractitionerCleanupEnabled: () => false,
+  };
+});
+
+vi.mock('../services/emergencyOsApi', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../services/emergencyOsApi')>();
+  return {
+    ...actual,
+    fetchIntegrationHub: vi.fn().mockResolvedValue({
+      module: 'Integration Hub',
+      source: 'fixture',
+      data: {
+        sources: [{ id: 'ehr', label: 'EHR', status: 'connected' }],
+        reviewQueue: [],
+      },
+      remainingGaps: [],
+    }),
+  };
+});
+
+vi.mock('../services/interoperabilityApi', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../services/interoperabilityApi')>();
+  return {
+    ...actual,
+    fetchInteroperabilitySummary: vi.fn().mockResolvedValue({
+      uiStates: { connectionState: 'connected' },
+    }),
+    fetchIntegrationEvents: vi.fn().mockResolvedValue([]),
+  };
+});
 
 vi.mock('../pages/PlatformNavigationPage', () => ({
   default: () => (

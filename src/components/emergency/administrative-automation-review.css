@@ -9,6 +9,17 @@
   gap: 0.75rem;
 }
 
+.automation-review__header-lead {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.automation-review__charts {
+  margin-top: 4px;
+}
+
 .automation-review__lead {
   margin: 0.25rem 0 0;
   color: var(--text-muted, #64748b);

@@ -12,10 +12,11 @@ const medicalTypeLayerCss = readFileSync(join(__dirname, 'medical-type-layer.css
 const textNormalizationCss = readFileSync(join(__dirname, 'text-normalization.css'), 'utf8');
 const medicalCardLayerCss = readFileSync(join(__dirname, 'medical-card-layer.css'), 'utf8');
 const cardContrastCss = readFileSync(join(__dirname, 'card-contrast-normalization.css'), 'utf8');
+const profileSurfaceCss = readFileSync(join(__dirname, 'profile-surface-normalization.css'), 'utf8');
 const themeBridgeCss = readFileSync(join(__dirname, 'theme-legacy-bridge.css'), 'utf8');
-const appShellCss = readFileSync(join(srcRoot, 'layout/AppShell.css'), 'utf8');
-const commandDashboardCss = readFileSync(join(srcRoot, 'pages/CommandDashboard.css'), 'utf8');
-const medicalIotCss = readFileSync(join(srcRoot, 'pages/MedicalIotDashboard.css'), 'utf8');
+const appShellCss = readFileSync(join(srcRoot, 'components/app-shell.css'), 'utf8');
+const commandDashboardCss = readFileSync(join(srcRoot, 'components/emergency/CommandDashboard.css'), 'utf8');
+const profilePageCss = readFileSync(join(srcRoot, 'pages/Profile.css'), 'utf8');
 const chartCss = readFileSync(join(srcRoot, 'components/dashboard/DashboardVisualizations.css'), 'utf8');
 const toolsOverviewCss = readFileSync(join(srcRoot, 'pages/tools/ToolsOverview.css'), 'utf8');
 const toolPageLayoutCss = readFileSync(join(srcRoot, 'pages/tools/ToolPageLayout.css'), 'utf8');
@@ -28,7 +29,7 @@ const alertCss = readFileSync(join(srcRoot, 'components/ui/Alert.css'), 'utf8');
 
 describe('theme color system revamp', () => {
   it('defines the standard medical root palette on every color layer', () => {
-    expect(themeTokensCss).toMatch(/html,\s*html\[data-theme='light'\][\s\S]*--app-bg:\s*#f0f9ff/);
+    expect(themeTokensCss).toMatch(/html,\s*html\[data-theme='light'\][\s\S]*--app-bg:\s*#f8fafc/);
     expect(themeTokensCss).toMatch(/html,\s*html\[data-theme='light'\][\s\S]*--app-surface-1:\s*#ffffff/);
     expect(themeTokensCss).not.toMatch(/html\[data-theme='dark'\]/);
   });
@@ -61,6 +62,14 @@ describe('theme color system revamp', () => {
   it('uses sky blue as the medical product accent across the standard theme', () => {
     expect(themeTokensCss).toMatch(/html,\s*html\[data-theme='light'\][\s\S]*--app-accent:\s*#0ea5e9/);
     expect(themeTokensCss).toMatch(/html,\s*html\[data-theme='light'\][\s\S]*--app-accent-interactive:\s*#0ea5e9/);
+    expect(themeTokensCss).toMatch(/html,\s*html\[data-theme='light'\][\s\S]*--app-link-fg:\s*#0369a1/);
+    expect(medicalTypeLayerCss).toContain('--medical-text-link: var(--medical-sky-700)');
+  });
+
+  it('normalizes profile surfaces with readable link contrast on white cards', () => {
+    expect(profileSurfaceCss).toContain('.profile-overview-card');
+    expect(profileSurfaceCss).toContain('var(--medical-text-link');
+    expect(themeTokensCss).toContain('--sidebar-item-active-fg: var(--app-fg)');
   });
 
   it('exposes semantic aliases for accents, surfaces, focus, and charts', () => {
@@ -93,12 +102,13 @@ describe('theme color system revamp', () => {
     const keyCss = [
       appShellCss,
       commandDashboardCss,
-      medicalIotCss,
+      profilePageCss,
       chartCss,
       toolsOverviewCss,
     ].join('\n');
 
-    expect(keyCss).not.toMatch(/#0ea5e9|#14b8a6|#764ba2|rgba\(14,\s*165,\s*233|rgba\(20,\s*184,\s*166|rgba\(0,\s*255,\s*136/);
+    expect(keyCss).not.toMatch(/#14b8a6|#764ba2|rgba\(20,\s*184,\s*166|rgba\(0,\s*255,\s*136/);
+    expect(profilePageCss).not.toMatch(/rgba\(0,\s*255,\s*136/);
     expect(keyCss).toContain('var(--app-surface-1)');
     expect(keyCss).toContain('var(--app-accent-interactive)');
   });

@@ -86,4 +86,13 @@ describe('AdministrativeAutomationReviewPanel', () => {
     expect(screen.getByText(/Hypoxia risk/)).toBeInTheDocument();
     expect(screen.getByText('Clinician review required')).toBeInTheDocument();
   });
+
+  it('renders automation queue charts', () => {
+    render(<AdministrativeAutomationReviewPanel />);
+
+    expect(screen.getByText('Queue status')).toBeInTheDocument();
+    expect(screen.getByText('By category')).toBeInTheDocument();
+    expect(screen.getByTestId('distribution-donut-chart')).toBeInTheDocument();
+    expect(screen.getByTestId('category-bar-chart')).toBeInTheDocument();
+  });
 });

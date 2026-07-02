@@ -33,6 +33,7 @@ import { PatientFlag } from '../types/emergency';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { useEmergencyStore } from '../store/emergencyStore';
 import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+import { resolveCopilotChromeLabels } from '../config/profileDesignLanguage.config';
 import {
   getVisibleNavigation,
   type NavigationItem,
@@ -45,6 +46,7 @@ import { isRouteAllowedForProfile, resolveUserProfileFromSaasRole } from '../con
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import useScreenModeCapabilities from '../hooks/useScreenModeCapabilities';
 import { groupSidebarNavItems } from '../config/sidebarNavigationGroups';
+import { GraphicIconBadge } from './graphics/CdlGraphicKit';
 import { useNotificationShellOptional } from '../contexts/NotificationShellContext';
 import SidebarChromeControls from './sidebar/SidebarChromeControls';
 import './Sidebar.css';
@@ -160,7 +162,8 @@ export function Sidebar({ navigationItems }: SidebarProps) {
       patients.filter((patient) => patient.flags.includes(PatientFlag.ReassessmentDue)).length,
     [patients],
   );
-  const { saasRole } = useEffectiveUserProfile();
+  const { saasRole, profileCopy } = useEffectiveUserProfile();
+  const copilotChrome = useMemo(() => resolveCopilotChromeLabels(profileCopy), [profileCopy]);
   const visibleNav: readonly SidebarNavItem[] = useMemo(
     () => navigationItems || getVisibleNavigation(emergencyRole.role, { saasRole }),
     [emergencyRole.role, navigationItems, saasRole],
@@ -301,9 +304,13 @@ export function Sidebar({ navigationItems }: SidebarProps) {
           data-nav-id={item.id}
           data-icon-key={item.icon}
         >
-          <IconComponent size={16} stroke={2} className="sidebar-nav-item__icon" />
-          <span className="sidebar-nav-item__label">{item.label}</span>
-          <span className="sidebar-nav-item__tooltip">{item.label}</span>
+          {item.id === 'copilot' ? (
+            <GraphicIconBadge iconKey="ed-copilot" accent="brand" size="sm" className="sidebar-nav-item__graphic-badge" />
+          ) : (
+            <IconComponent size={16} stroke={2} className="sidebar-nav-item__icon" />
+          )}
+          <span className="sidebar-nav-item__label">{item.id === 'copilot' ? copilotChrome.shortName : item.label}</span>
+          <span className="sidebar-nav-item__tooltip">{item.id === 'copilot' ? copilotChrome.productName : item.label}</span>
         </button>
       );
     }
@@ -504,11 +511,11 @@ export function Sidebar({ navigationItems }: SidebarProps) {
           onClick={toggleCopilot}
           disabled={!canUseCopilot}
           aria-pressed={copilotOpen}
-          aria-label={canUseCopilot ? 'Copilot' : 'Copilot unavailable'}
-          title={canUseCopilot ? 'Copilot' : 'Copilot unavailable'}
+          aria-label={canUseCopilot ? copilotChrome.openAriaLabel : copilotChrome.unavailableAriaLabel}
+          title={canUseCopilot ? copilotChrome.openTitle : copilotChrome.unavailableTitle}
         >
-          <IconRobot size={20} stroke={2} className="sidebar-nav-item__icon" />
-          <label>Copilot</label>
+          <GraphicIconBadge iconKey="ed-copilot" accent="brand" size="sm" className="sidebar-item__graphic-badge" />
+          <label>{copilotChrome.shortName}</label>
         </button>
         ) : null}
         {moreNav.length ? (

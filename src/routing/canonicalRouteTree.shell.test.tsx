@@ -37,7 +37,7 @@ describe('canonical route tree — shell and workspace', () => {
       '/emergency/settings',
     );
 
-    for (const label of ['Dashboard', 'Patients', 'Queue']) {
+    for (const label of ['Medical Tools', 'Patients', 'Queues']) {
       const item = PILOT_VISIBLE_NAVIGATION_ITEMS.find((navItem) => navItem.label === label);
       expect(item, label).toBeTruthy();
       expect(within(desktopNavigation).getByRole('link', { name: label })).toHaveAttribute(
@@ -64,9 +64,9 @@ describe('canonical route tree — shell and workspace', () => {
     expect(screen.queryByText(/unexpected error/i)).toBeNull();
   }, ROUTE_LOAD_TIMEOUT);
 
-  it('redirects retired CareDroid routes to the whiteboard', async () => {
+  it('redirects legacy /emergency/simulation into the simulation suite', async () => {
     renderRoute('/emergency/simulation');
 
-    expect(await screen.findByTestId('location')).toHaveTextContent('/emergency/whiteboard');
+    expect(await screen.findByTestId('location')).toHaveTextContent('/simulation');
   });
 });

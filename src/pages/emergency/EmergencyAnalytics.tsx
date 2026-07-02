@@ -1,19 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  Line,
-  LineChart,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { useAdvancedEmergencyOsUpgradeHarness } from '../../hooks/useEmergencyOs';
 import useOperationalIntelligence from '../../hooks/useOperationalIntelligence';
@@ -33,13 +19,8 @@ import {
   BottleneckList,
   ThreeMinuteRiskIndicator,
 } from '../../components/bottlenecks/BottleneckPanels';
+import EmergencyAnalyticsCharts from '../../components/emergency/EmergencyAnalyticsCharts';
 import './EmergencyAnalytics.css';
-
-const CHART_COLORS = ['#38bdf8', '#22c55e', '#f59e0b', '#f97316', '#ef4444', '#a78bfa'];
-
-function heatBucket(count) {
-  return Math.min(6, Math.round(((count || 0) / 6) * 6));
-}
 
 function ChartCard({ title, subtitle, children }) {
   return (
@@ -50,14 +31,6 @@ function ChartCard({ title, subtitle, children }) {
       </header>
       {children}
     </section>
-  );
-}
-
-function ChartEmpty({ children }) {
-  return (
-    <div className="emergency-analytics__empty">
-      {children}
-    </div>
   );
 }
 
@@ -499,102 +472,13 @@ export default function EmergencyAnalytics() {
         </div>
       )}
 
-      <div className="emergency-analytics__grid">
-        <ChartCard title="Daily Patient Volume" subtitle="Last 7 days">
-          {dailyVolume.length ? (
-            <ResponsiveContainer width="100%" height={220}>
-              <BarChart data={dailyVolume}>
-                <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                <XAxis dataKey="date" tick={{ fontSize: 11 }} />
-                <YAxis allowDecimals={false} tick={{ fontSize: 11 }} />
-                <Tooltip />
-                <Bar dataKey="count" fill="var(--status-info)" radius={[6, 6, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          ) : (
-            <ChartEmpty>No daily patient volume returned.</ChartEmpty>
-          )}
-        </ChartCard>
-
-        {surfaces.analytics.showSecondaryCharts ? (
-          <>
-            <ChartCard title="Hourly Arrival Heatmap" subtitle="Today">
-              {hourlyArrivals.length ? (
-                <div className="emergency-analytics__heatmap">
-                  {hourlyArrivals.map((hour) => (
-                    <span
-                      key={hour.hour}
-                      className={`emergency-analytics__heatmap-cell emergency-analytics__heatmap-cell--${heatBucket(hour.count)}`}
-                      title={`${hour.hour}: ${hour.count} arrivals`}
-                    >
-                      {hour.hour.slice(0, 2)}
-                    </span>
-                  ))}
-                </div>
-              ) : (
-                <ChartEmpty>No hourly arrival data returned.</ChartEmpty>
-              )}
-            </ChartCard>
-
-            <ChartCard title="Average Wait Time Trend" subtitle="7-day">
-              {waitTrend.length ? (
-                <ResponsiveContainer width="100%" height={220}>
-                  <LineChart data={waitTrend}>
-                    <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                    <XAxis dataKey="date" tick={{ fontSize: 11 }} />
-                    <YAxis tick={{ fontSize: 11 }} />
-                    <Tooltip />
-                    <Line
-                      type="monotone"
-                      dataKey="avgWaitMinutes"
-                      name="Avg wait"
-                      stroke="var(--status-warning)"
-                      strokeWidth={2}
-                      dot={false}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              ) : (
-                <ChartEmpty>No wait time trend returned.</ChartEmpty>
-              )}
-            </ChartCard>
-
-            <ChartCard title="Top Chief Complaints" subtitle="Top 10">
-              {topComplaints.length ? (
-                <>
-                  <ResponsiveContainer width="100%" height={220}>
-                    <PieChart>
-                      <Pie
-                        data={topComplaints}
-                        dataKey="count"
-                        nameKey="name"
-                        innerRadius={46}
-                        outerRadius={82}
-                        paddingAngle={2}
-                      >
-                        {topComplaints.map((entry, index) => (
-                          <Cell key={entry.name} fill={CHART_COLORS[index % CHART_COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                    </PieChart>
-                  </ResponsiveContainer>
-                  <div className="emergency-analytics__legend">
-                    {topComplaints.slice(0, 6).map((item, index) => (
-                      <span key={item.name}>
-                        <i className={`emergency-analytics__legend-swatch emergency-analytics__legend-swatch--${index % 6}`} />
-                        {item.name}: {item.count}
-                      </span>
-                    ))}
-                  </div>
-                </>
-              ) : (
-                <ChartEmpty>No complaint mix returned.</ChartEmpty>
-              )}
-            </ChartCard>
-          </>
-        ) : null}
-      </div>
+      <EmergencyAnalyticsCharts
+        dailyVolume={dailyVolume}
+        hourlyArrivals={hourlyArrivals}
+        waitTrend={waitTrend}
+        topComplaints={topComplaints}
+        showSecondaryCharts={surfaces.analytics.showSecondaryCharts}
+      />
     </CareDroidPage>
   );
 }

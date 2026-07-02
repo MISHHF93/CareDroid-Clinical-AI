@@ -39,6 +39,8 @@ import { ClinicalDecisionSupportService } from './clinical-decision-support.serv
 import { EmergencyPatientAuditService } from './emergency-patient-audit.service';
 import { PatientFlowService } from './emergency-os.patient-flow.service';
 import { WorkflowOrchestrationService } from './emergency-os.workflow-orchestration.service';
+import { EntitlementService } from '../platform-assets/entitlement.service';
+import { assertEntitlementLaunchFromRequest } from '../platform-assets/entitlement-launch.util';
 import type {
   RecordClinicalCalculatorDto,
   RecordCopilotInteractionDto,
@@ -85,6 +87,7 @@ export class EmergencyOsController {
     private readonly patientAuditService: EmergencyPatientAuditService,
     private readonly patientFlowService: PatientFlowService,
     private readonly workflowOrchestrationService: WorkflowOrchestrationService,
+    private readonly entitlementService: EntitlementService,
   ) {}
 
   @Get('whiteboard')
@@ -435,7 +438,12 @@ export class EmergencyOsController {
   }
 
   @Get('copilot')
-  getCopilot() {
+  async getCopilot(@Req() request?: Request, @TenantContext() tenantContext?: TenantContextValue) {
+    await assertEntitlementLaunchFromRequest(
+      this.entitlementService,
+      { user: (request as any)?.user, tenantContext },
+      'agent-clinical',
+    );
     return this.copilotService.getCopilotContext();
   }
 
@@ -445,6 +453,11 @@ export class EmergencyOsController {
     @TenantContext() tenantContext?: TenantContextValue,
     @Req() request?: Request,
   ) {
+    await assertEntitlementLaunchFromRequest(
+      this.entitlementService,
+      { user: (request as any)?.user, tenantContext },
+      'agent-clinical',
+    );
     const response = this.copilotService.processQuery(dto || {});
     const patientId =
       typeof dto?.context?.patientId === 'string' ? dto.context.patientId : undefined;

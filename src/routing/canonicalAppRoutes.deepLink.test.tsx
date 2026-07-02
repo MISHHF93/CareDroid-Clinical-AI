@@ -1,3 +1,4 @@
+import './canonicalRouteTree.testShared.tsx';
 import React, { Suspense } from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, useLocation } from 'react-router-dom';
@@ -239,11 +240,17 @@ describe('canonical App routes deep links', () => {
     20_000,
   );
 
-  it('redirects /discover into Medical Tools', async () => {
+  it('keeps /discover on the capability discovery page', async () => {
     render(<AppRouteHarness initialPath="/discover" />);
 
     await waitFor(() =>
-      expect(screen.getByTestId('location')).toHaveTextContent('/emergency/tools'),
+      expect(screen.getByTestId('location')).toHaveTextContent('/discover'),
+    );
+    await waitFor(
+      () => {
+        expect(document.querySelector('.capability-discovery-page')).toBeTruthy();
+      },
+      { timeout: 20_000 },
     );
   }, 20_000);
 

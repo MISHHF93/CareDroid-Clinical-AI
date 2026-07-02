@@ -2,8 +2,11 @@ import React, { useMemo } from 'react';
 import { CARE_DROID_SCREEN_MODES } from '../../config/careDroidScreenModes';
 import { buildCommandCenterFallbackSnapshot } from '../../config/displayAutoRefreshModel';
 import { resolveOperationalPresentation } from '../../config/emergencyOperationalPresentationModel';
+import { buildHourlyArrivalsChart } from '../../utils/commandCenterChartModel';
 import OperationalPresentationFrame from '../emergency/OperationalPresentationFrame';
 import DisplayRefreshStatusBar from '../emergency/DisplayRefreshStatusBar';
+import { GraphicIconBadge } from '../graphics/CdlGraphicKit';
+import { CategoryBarChart } from '../dashboard/DashboardVisualizations';
 import { sortCommandCenterMetrics } from './commandCenterThroughputModel';
 import CommandCenterSurgePanel from './CommandCenterSurgePanel';
 import './CommandCenterThroughputScreen.css';
@@ -91,7 +94,10 @@ export default function CommandCenterThroughputScreen({
   const metrics = sortCommandCenterMetrics(
     resolvedSnapshot.metrics.filter((metric) => visibleMetricIds.has(metric.id)),
   );
-  const maxHourlyCount = Math.max(1, ...resolvedSnapshot.hourlyArrivals.map((entry) => entry.count));
+  const arrivalsChart = useMemo(
+    () => buildHourlyArrivalsChart(resolvedSnapshot.hourlyArrivals || []),
+    [resolvedSnapshot.hourlyArrivals],
+  );
 
   return (
     <OperationalPresentationFrame
@@ -137,33 +143,33 @@ export default function CommandCenterThroughputScreen({
         {resolvedSnapshot.summaryLine}
       </p>
 
-      {showArrivalsByHour && resolvedSnapshot.hourlyArrivals.length ? (
+      {showArrivalsByHour && arrivalsChart.length ? (
         <section className="command-center-throughput__arrivals" aria-label="Arrivals by hour">
-          <div className="command-center-throughput__section-heading">
-            <h3>Arrivals by hour</h3>
-            <span>{resolvedSnapshot.peakHourLabel}</span>
+          <div className="command-center-throughput__section-heading command-center-throughput__section-heading--chart">
+            <GraphicIconBadge iconKey="chart-bar" accent="brand" size="sm" />
+            <div>
+              <h3>Arrivals by hour</h3>
+              <span>{resolvedSnapshot.peakHourLabel}</span>
+            </div>
           </div>
-          <div className="command-center-throughput__hourly-chart">
-            {resolvedSnapshot.hourlyArrivals.map((entry) => (
-              <div key={entry.hour} className="command-center-throughput__hourly-bar">
-                <div
-                  className="command-center-throughput__hourly-fill"
-                  style={{ height: `${Math.max(8, (entry.count / maxHourlyCount) * 100)}%` }}
-                  title={`${entry.hour}: ${entry.count} arrivals`}
-                />
-                <span className="command-center-throughput__hourly-count">{entry.count || ''}</span>
-                <span className="command-center-throughput__hourly-label">{entry.hour.slice(0, 2)}</span>
-              </div>
-            ))}
-          </div>
+          <CategoryBarChart
+            data={arrivalsChart}
+            title="Arrivals by hour"
+            xKey="name"
+            color="var(--app-chart-1)"
+            emptyMessage="Hourly arrival data will appear when analytics syncs."
+          />
         </section>
       ) : null}
 
       {showTrendIndicators && resolvedSnapshot.trendIndicators?.length ? (
         <section className="command-center-throughput__trends" aria-label="Operational trend indicators">
-          <div className="command-center-throughput__section-heading">
-            <h3>Trend indicators</h3>
-            <span>Analytics and operational snapshot deltas</span>
+          <div className="command-center-throughput__section-heading command-center-throughput__section-heading--chart">
+            <GraphicIconBadge iconKey="activity" accent="information" size="sm" />
+            <div>
+              <h3>Trend indicators</h3>
+              <span>Analytics and operational snapshot deltas</span>
+            </div>
           </div>
           <div className="command-center-throughput__trend-grid">
             {resolvedSnapshot.trendIndicators.map((trend) => (
@@ -236,7 +242,7 @@ export default function CommandCenterThroughputScreen({
             <h3>Data freshness / system health</h3>
             <strong>{resolvedSnapshot.systemHealth.label}</strong>
             <p>
-              {resolvedSnapshot.systemHealth.freshness} · {resolvedSnapshot.systemHealth.detail}
+              {resolvedSnapshot.systemHealth.freshness} ï¿½ {resolvedSnapshot.systemHealth.detail}
             </p>
           </section>
         ) : null}

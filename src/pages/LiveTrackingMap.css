@@ -1,0 +1,146 @@
+.live-map-page {
+  display: grid;
+  gap: var(--compact-panel-gap, 14px);
+  padding: clamp(16px, 2vw, 28px);
+  color: var(--app-fg, var(--medical-text-body, #111827));
+}
+
+.live-map-page__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.live-map-page__title-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.live-map-page__title-row h1 {
+  margin: 0;
+  font-size: clamp(24px, 3vw, 32px);
+}
+
+.live-map-page__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.live-map-page__actions a,
+.live-map-page__actions button {
+  min-height: var(--compact-control-height, 40px);
+  padding: 8px 14px;
+  border-radius: var(--compact-panel-radius, 12px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--medical-card-bg, var(--app-surface-1));
+  text-decoration: none;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.live-map-page__filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.live-map-page__filters button {
+  min-height: var(--compact-control-height, 36px);
+  padding: 6px 12px;
+  border-radius: var(--compact-panel-radius, 10px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--app-surface-muted, #f8fafc);
+  cursor: pointer;
+}
+
+.live-map-page__filters button[aria-pressed='true'] {
+  border-color: color-mix(in srgb, var(--app-chart-1) 40%, var(--app-panel-border));
+  background: color-mix(in srgb, var(--app-chart-1) 10%, var(--app-surface-1));
+}
+
+.live-map__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(280px, 0.75fr);
+  gap: var(--compact-panel-gap, 14px);
+}
+
+.live-map__panel,
+.live-map__map-shell {
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  border-radius: var(--compact-panel-radius, 14px);
+  background: var(--medical-card-bg, var(--app-surface-1));
+  padding: var(--compact-panel-padding, 14px);
+}
+
+.live-map-canvas {
+  min-height: 360px;
+  border-radius: calc(var(--compact-panel-radius, 14px) - 4px);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--app-chart-2) 6%, var(--app-surface-muted, #f8fafc)) 0%,
+    var(--app-surface-1, #fff) 100%
+  );
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.live-map-canvas__svg {
+  display: block;
+  min-width: 640px;
+  width: 100%;
+  height: auto;
+}
+
+.live-map-canvas__marker circle {
+  stroke: var(--app-surface-elevated, #fff);
+  stroke-width: 0.45;
+}
+
+.live-map-canvas__marker--fleet circle {
+  fill: var(--app-chart-1);
+}
+
+.live-map-canvas__marker--iot circle {
+  fill: var(--app-chart-3);
+}
+
+.live-map-canvas__marker--selected circle {
+  stroke-width: 0.9;
+  stroke: var(--app-chart-4);
+}
+
+.live-map__marker-list {
+  display: grid;
+  gap: 8px;
+}
+
+.live-map__marker-item {
+  padding: 10px 12px;
+  border-radius: var(--compact-panel-radius, 10px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--app-surface-muted, #f8fafc);
+  text-align: left;
+  cursor: pointer;
+}
+
+.live-map__marker-item--selected {
+  border-color: color-mix(in srgb, var(--app-chart-4) 45%, var(--app-panel-border));
+}
+
+.live-map__state {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+@media (max-width: 960px) {
+  .live-map__layout {
+    grid-template-columns: 1fr;
+  }
+}

@@ -23,6 +23,7 @@ import { DisplayShell } from '../layouts/DisplayShell';
 import { ScreenModeLandingRedirect } from './screenModeRouteRedirects';
 import { CARE_DROID_SCREEN_MODES } from '../config/careDroidScreenModes';
 import { ED_UNIFIED_PUBLIC_ROUTES } from '../domain/constants';
+import { PLATFORM_SYSTEM_CAPABILITIES } from '../data/platformSystems';
 
 const lazyRoute = lazyWithRetry;
 const lazyNamed = (loader, exportName) =>
@@ -63,46 +64,14 @@ const PediatricsObgynAssistantPage    = lazyRoute(() => import('../pages/tools/P
 const PsychiatryAssistantPage         = lazyRoute(() => import('../pages/tools/PsychiatryAssistantPage'));
 const PulmonologyAssistantPage        = lazyRoute(() => import('../pages/tools/PulmonologyAssistantPage'));
 
-// ── Extended platform pages — domain-organised ───────────────────────────────
-// Operations
-const HospitalMapDashboard         = lazyRoute(() => import('../pages/operations/HospitalMapDashboard'));
-const MedicalIotDashboard          = lazyRoute(() => import('../pages/operations/MedicalIotDashboard'));
-const DeviceFleetManagement        = lazyRoute(() => import('../pages/operations/DeviceFleetManagement'));
 
-// Fleet
-const FleetDashboard               = lazyRoute(() => import('../pages/fleet/FleetDashboard'));
-const FleetLiveMap                 = lazyRoute(() => import('../pages/fleet/FleetLiveMap'));
-// Clinical
-const Medical3DViewer              = lazyRoute(() => import('../pages/clinical/Medical3DViewer'));
 
-// ── Admin ────────────────────────────────────────────────────────────────────
-const AdminOperationsShell = lazyRoute(() => import('../components/admin/AdminOperationsShell'));
-const AdminOperationsHome  = lazyRoute(() => import('../pages/admin/AdminOperationsHome'));
-const EdStaffWorkflowAdmin = lazyRoute(() => import('../pages/admin/EdStaffWorkflowAdmin'));
-const TeamManagement       = lazyNamed(() => import('../pages/team/TeamManagement'), 'TeamManagement');
-const SystemHealth         = lazyRoute(() => import('../pages/SystemHealth'));
-const AutomationAuditTrail = lazyRoute(() => import('../pages/AutomationAuditTrail'));
-const PlatformGovernanceWorkspace = lazyRoute(() => import('../pages/platform/PlatformGovernanceWorkspace'));
+const SaasHealthCenter     = lazyRoute(() => import('../pages/saas/SaasHealthCenter'));
+const PlatformSystemPage = lazyRoute(() => import('../pages/platform/PlatformSystemPage'));
 
 // ── Physician tools ──────────────────────────────────────────────────────────
 const ClinicalDocumentationAssistant = lazyRoute(() => import('../pages/ClinicalDocumentationAssistant'));
-const TenantAdministrationCenter = lazyNamed(
-  () => import('../pages/organization/OrganizationPages'),
-  'TenantAdministrationCenter',
-);
 
-// ── User / account ───────────────────────────────────────────────────────────
-const Profile               = lazyRoute(() => import('../pages/Profile'));
-const ProfileSettings       = lazyRoute(() => import('../pages/ProfileSettings'));
-const ProfileActivity       = lazyRoute(() => import('../pages/profile/ProfileActivity'));
-const ProfilePreferences    = lazyRoute(() => import('../pages/profile/ProfilePreferences'));
-const ProfileSecurity       = lazyRoute(() => import('../pages/profile/ProfileSecurity'));
-const ProfileToolPreferences = lazyRoute(() => import('../pages/profile/ProfileToolPreferences'));
-const ProfileWorkspaces     = lazyRoute(() => import('../pages/profile/ProfileWorkspaces'));
-const BillingPage           = lazyRoute(() => import('../pages/BillingPage'));
-const UsagePage             = lazyRoute(() => import('../pages/UsagePage'));
-const NotificationPreferences = lazyRoute(() => import('../pages/NotificationPreferences'));
-const FeatureManagement = lazyRoute(() => import('../pages/settings/FeatureManagement'));
 
 import {
   AUTH_PATH_ALIASES,
@@ -122,6 +91,14 @@ import {
 import { getPlatformHomeRoute, isReceptionFirstUxEnabled } from '../config/receptionFirstUx.config';
 import { resolvePlatformLanding } from '../config/platformEntryModel';
 import { resolveDemoDefaultLandingRoute } from '../config/demoPersonaModel';
+import { renderToolsConsoleRoutes } from './toolsConsoleRouteTree';
+import { renderGovernanceConsoleRoutes } from './governanceConsoleRouteTree';
+import { renderPlatformConsoleRoutes } from './platformConsoleRouteTree';
+import { renderTrainingConsoleRoutes } from './trainingConsoleRouteTree';
+import { renderOperationsFleetConsoleRoutes } from './operationsFleetConsoleRouteTree';
+import { renderProfileConsoleRoutes } from './profileConsoleRouteTree';
+import { renderAdminConsoleRoutes } from './adminConsoleRouteTree';
+import { shouldSuppressPlatformSystemStub } from '../config/platformStubPolicy';
 
 import {
   PatientsRoute,
@@ -587,28 +564,7 @@ export function AppRoutes() {
         {/* Entry redirects */}
         <Route path={CANONICAL_ROUTES.platformStart} element={<EdApplicationEntryRedirect />} />
 
-        {/* ── Admin ── */}
-        <Route
-          path={CANONICAL_ROUTES.adminOperations}
-          element={
-            <CareDroidRouteGuard>
-              <LazyRoute label="Loading admin console...">
-                <AdminOperationsShell />
-              </LazyRoute>
-            </CareDroidRouteGuard>
-          }
-        >
-          <Route index element={<LazyRoute label="Loading admin overview..."><AdminOperationsHome /></LazyRoute>} />
-          <Route path="staff-workflows" element={<LazyRoute label="Loading ED workflows..."><EdStaffWorkflowAdmin /></LazyRoute>} />
-          <Route path="team"            element={<LazyRoute label="Loading team..."><TeamManagement /></LazyRoute>} />
-          <Route path="tenant"          element={<LazyRoute label="Loading tenant admin..."><TenantAdministrationCenter /></LazyRoute>} />
-          <Route path="system-health"   element={<LazyRoute label="Loading system health..."><SystemHealth /></LazyRoute>} />
-          <Route path="audit-trail"     element={<LazyRoute label="Loading audit trail..."><AutomationAuditTrail /></LazyRoute>} />
-        </Route>
-        <Route
-          path={CANONICAL_ROUTES.tenantAdmin}
-          element={<Navigate to={`${CANONICAL_ROUTES.adminOperations}/tenant`} replace />}
-        />
+        {renderAdminConsoleRoutes(LazyRoute)}
 
         {/* ── Emergency department core ── */}
         <Route path="/emergency" element={<EmergencyDefaultRedirect />} />
@@ -959,6 +915,14 @@ export function AppRoutes() {
             </EmergencyRouteGuard>
           }
         />
+        {renderProfileConsoleRoutes(LazyRoute)}
+
+        {/* ── Developer / tools catalog ── */}
+        <Route path={CANONICAL_ROUTES.developerCatalog} element={<ToolsRedirect />} />
+        <Route path={CANONICAL_ROUTES.saasHealth} element={<LazyRoute label="Loading SaaS health..."><SaasHealthCenter /></LazyRoute>} />
+        <Route path="/saas-health/*" element={<LazyRoute label="Loading SaaS health..."><SaasHealthCenter /></LazyRoute>} />
+
+        {renderGovernanceConsoleRoutes(LazyRoute)}
         <Route
           path={CANONICAL_ROUTES.integrationHub}
           element={
@@ -967,75 +931,23 @@ export function AppRoutes() {
             </LazyRoute>
           }
         />
+        {renderToolsConsoleRoutes(LazyRoute)}
 
-        {/* ── User profile & account ── */}
-        <Route path={CANONICAL_ROUTES.profile}               element={<LazyRoute label="Loading profile..."><Profile /></LazyRoute>} />
-        <Route path={CANONICAL_ROUTES.profileSettings}       element={<LazyRoute label="Loading profile settings..."><ProfileSettings /></LazyRoute>} />
-        <Route path="/profile-settings"                       element={<Navigate to={CANONICAL_ROUTES.profileSettings} replace />} />
-        <Route path={CANONICAL_ROUTES.profileToolPreferences} element={<LazyRoute label="Loading tool preferences..."><ProfileToolPreferences /></LazyRoute>} />
-        <Route path="/profile/activity"                       element={<LazyRoute label="Loading profile activity..."><ProfileActivity /></LazyRoute>} />
-        <Route path="/profile/preferences"                    element={<LazyRoute label="Loading profile preferences..."><ProfilePreferences /></LazyRoute>} />
-        <Route path="/profile/security"                       element={<LazyRoute label="Loading profile security..."><ProfileSecurity /></LazyRoute>} />
-        <Route path="/profile/workspaces"                     element={<LazyRoute label="Loading profile workspaces..."><ProfileWorkspaces /></LazyRoute>} />
-        <Route path="/notification-preferences"               element={<LazyRoute label="Loading notification preferences..."><NotificationPreferences /></LazyRoute>} />
-        <Route path={CANONICAL_ROUTES.notifications}           element={<Navigate to="/notification-preferences" replace />} />
+        {PLATFORM_SYSTEM_CAPABILITIES.filter((capability) => !shouldSuppressPlatformSystemStub(capability)).map((capability) => (
+          <Route
+            key={capability.id}
+            path={capability.route}
+            element={
+              <LazyRoute label={`Loading ${capability.name}...`}>
+                <PlatformSystemPage />
+              </LazyRoute>
+            }
+          />
+        ))}
 
-        {/* ── SaaS billing ── */}
-        <Route path={CANONICAL_ROUTES.billing} element={<LazyRoute label="Loading billing..."><BillingPage /></LazyRoute>} />
-        <Route path={CANONICAL_ROUTES.usage}   element={<LazyRoute label="Loading usage..."><UsagePage /></LazyRoute>} />
-
-        {/* ── Developer / tools catalog ── */}
-        <Route path={CANONICAL_ROUTES.developerCatalog} element={<ToolsRedirect />} />
-        <Route path={CANONICAL_ROUTES.featureFlags} element={<LazyRoute label="Loading feature flags..."><FeatureManagement /></LazyRoute>} />
-        <Route path={CANONICAL_ROUTES.systemHealth} element={<LazyRoute label="Loading system health..."><SystemHealth /></LazyRoute>} />
-        <Route path={CANONICAL_ROUTES.saasHealth} element={<LazyRoute label="Loading system health..."><SystemHealth /></LazyRoute>} />
-        <Route path={CANONICAL_ROUTES.audit} element={<CareDroidRouteGuard><LazyRoute label="Loading governance workspace..."><PlatformGovernanceWorkspace /></LazyRoute></CareDroidRouteGuard>} />
-        <Route path={CANONICAL_ROUTES.security} element={<LazyRoute label="Loading governance workspace..."><PlatformGovernanceWorkspace /></LazyRoute>} />
-        <Route path={CANONICAL_ROUTES.regulatory} element={<LazyRoute label="Loading governance workspace..."><PlatformGovernanceWorkspace /></LazyRoute>} />
-        <Route path={CANONICAL_ROUTES.aiGovernance} element={<LazyRoute label="Loading governance workspace..."><PlatformGovernanceWorkspace /></LazyRoute>} />
-        <Route path={CANONICAL_ROUTES.humanReview} element={<LazyRoute label="Loading governance workspace..."><PlatformGovernanceWorkspace /></LazyRoute>} />
-
-        {/* ── Extended platform pages (real pages — placed before legacy redirects so they win) ── */}
-        <Route
-          path={CANONICAL_ROUTES.hospitalMap}
-          element={<LazyRoute label="Loading Hospital Map..."><HospitalMapDashboard /></LazyRoute>}
-        />
-        <Route
-          path="/hospital-map/*"
-          element={<LazyRoute label="Loading Hospital Map..."><HospitalMapDashboard /></LazyRoute>}
-        />
-        <Route
-          path={CANONICAL_ROUTES.medicalIot}
-          element={<LazyRoute label="Loading Medical IoT..."><MedicalIotDashboard /></LazyRoute>}
-        />
-        <Route
-          path="/medical-iot/*"
-          element={<LazyRoute label="Loading Medical IoT..."><MedicalIotDashboard /></LazyRoute>}
-        />
-        <Route
-          path={CANONICAL_ROUTES.devices}
-          element={<LazyRoute label="Loading Device Fleet..."><DeviceFleetManagement /></LazyRoute>}
-        />
-        <Route
-          path="/devices/*"
-          element={<LazyRoute label="Loading Device Fleet..."><DeviceFleetManagement /></LazyRoute>}
-        />
-        <Route
-          path={CANONICAL_ROUTES.medical3dViewer}
-          element={<LazyRoute label="Loading 3D Anatomy Viewer..."><Medical3DViewer /></LazyRoute>}
-        />
-        <Route
-          path={CANONICAL_ROUTES.fleetCommand}
-          element={<LazyRoute label="Loading Fleet Command..."><FleetDashboard /></LazyRoute>}
-        />
-        <Route
-          path={CANONICAL_ROUTES.fleetMap}
-          element={<LazyRoute label="Loading Fleet Live Map..."><FleetLiveMap /></LazyRoute>}
-        />
-        <Route
-          path="/fleet/live-map"
-          element={<LazyRoute label="Loading Fleet Live Map..."><FleetLiveMap /></LazyRoute>}
-        />
+        {renderOperationsFleetConsoleRoutes(LazyRoute)}
+        {renderPlatformConsoleRoutes(LazyRoute)}
+        {renderTrainingConsoleRoutes(LazyRoute)}
 
         {/* ── Legacy emergency route redirects (from routes.config) ── */}
         {LEGACY_EMERGENCY_ROUTE_REDIRECTS.map(({ path, to }) => (
@@ -1071,9 +983,6 @@ export function AppRoutes() {
         <Route path="/fleet/*"             element={<ToolsRedirect />} />
         <Route path="/vehicle"             element={<Navigate to={CANONICAL_ROUTES.emergencyEms} replace />} />
         <Route path="/vehicle/*"           element={<Navigate to={CANONICAL_ROUTES.emergencyEms} replace />} />
-        <Route path="/maps"                element={<ToolsRedirect />} />
-        <Route path="/tracking"            element={<ToolsRedirect />} />
-        <Route path="/live-tracking"       element={<ToolsRedirect />} />
         <Route path="/operations-center"   element={<Navigate to={CANONICAL_ROUTES.emergencyWhiteboard} replace />} />
         <Route path="/platform-learning"   element={<Navigate to={CANONICAL_ROUTES.emergencySettings} replace />} />
         <Route path="/audit-logs"          element={<Navigate to={CANONICAL_ROUTES.audit} replace />} />
@@ -1086,35 +995,20 @@ export function AppRoutes() {
       </Route>{/* end RootLayout */}
 
       {/* ── Tool URL shortcuts (outside shell, handled by ToolsRedirect) ── */}
-      <Route path="/tools"              element={<ToolsRedirect />} />
       <Route path="/tools/*" element={<ToolsRedirect />} />
-      <Route path="/calculators"        element={<ToolsRedirect />} />
-      <Route path="/calculators/*"      element={<ToolsRedirect />} />
+      <Route path="/calculators" element={<ToolsRedirect />} />
+      <Route path="/calculators/*" element={<ToolsRedirect />} />
       <Route path="/scores"             element={<ToolsRedirect />} />
       <Route path="/scores/*"           element={<ToolsRedirect />} />
-      <Route path="/catalog"            element={<ToolsRedirect />} />
-      <Route path="/all-tools"          element={<ToolsRedirect />} />
-      <Route path="/clinical-tools"     element={<ToolsRedirect />} />
-      <Route path="/lab"                element={<ToolsRedirect />} />
-      <Route path="/medical-simulation" element={<ToolsRedirect />} />
-      <Route path="/simulation"        element={<ToolsRedirect />} />
-      <Route path="/simulation/*"      element={<ToolsRedirect />} />
-      <Route path="/competencies"      element={<ToolsRedirect />} />
       <Route path="/pharmacy"           element={<ToolsRedirect />} />
       <Route path="/pharmacy/*"         element={<ToolsRedirect />} />
       <Route path="/radiology"          element={<ToolsRedirect />} />
       <Route path="/radiology/*"        element={<ToolsRedirect />} />
-      <Route path="/recommendations"    element={<ToolsRedirect />} />
       <Route path="/automation"         element={<ToolsRedirect />} />
-      <Route path="/workflows"          element={<ToolsRedirect />} />
-      <Route path="/workflow-mining"    element={<ToolsRedirect />} />
-      <Route path="/discover"           element={<ToolsRedirect />} />
+
       <Route path="/search"             element={<ToolsRedirect />} />
-      <Route path="/knowledge-hub"      element={<ToolsRedirect />} />
       <Route path="/knowledge-base"     element={<ToolsRedirect />} />
-      <Route path="/knowledge-graph"    element={<ToolsRedirect />} />
-      <Route path="/laboratory"         element={<ToolsRedirect />} />
-      <Route path="/fleet/route-optimizer" element={<ToolsRedirect />} />
+
       <Route path="/operations/:tool"   element={<ToolsRedirect />} />
       <Route path="/digital-twin"       element={<ToolsRedirect />} />
 

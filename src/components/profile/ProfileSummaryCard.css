@@ -82,10 +82,10 @@
 }
 
 .profile-summary-card__link {
-  color: var(--app-accent-interactive);
+  color: var(--medical-text-link, var(--app-link-fg));
   text-decoration: none;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 @media (max-width: 720px) {

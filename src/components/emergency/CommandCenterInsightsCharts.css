@@ -1,0 +1,38 @@
+.command-center-insights {
+  display: grid;
+  gap: 14px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--medical-card-border, var(--app-border));
+}
+
+.command-center-insights__intro {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.command-center-insights__intro h3 {
+  margin: 0;
+  color: var(--medical-text-heading, var(--app-text-primary));
+  font-size: 16px;
+}
+
+.command-center-insights__intro p {
+  margin: 4px 0 0;
+  color: var(--medical-text-muted, var(--app-text-muted));
+  font-size: 13px;
+}
+
+.command-center-insights__metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+@media (max-width: 900px) {
+  .command-center-insights__metrics {
+    grid-template-columns: 1fr;
+  }
+}

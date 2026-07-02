@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Card from '../../components/ui/card';
 import ProfileSettingsShell from '../../components/profile/ProfileSettingsShell';
 import useProfileShellProps from '../../hooks/useProfileShellProps';
+import { resolveProfileShellSection } from '../../config/profileDesignLanguage.config';
 import { useUserIdentity } from '../../contexts/UserIdentityContext';
 import './ProfileIdentityPages.css';
 
@@ -38,12 +39,13 @@ function ActivityList({ title, items = [] as any[] }) {
 
 export default function ProfileActivity() {
   const { accessSummary, profileCopy } = useProfileShellProps();
+  const activitySection = resolveProfileShellSection('activity');
   const { activity, audit } = useUserIdentity();
 
   return (
     <ProfileSettingsShell
-      title="Activity"
-      subtitle="Safe recent activity across tools, calculators, AI, fleet, and Medical IoT."
+      title={activitySection.pageTitle}
+      subtitle={activitySection.pageSubtitle}
       accessSummary={accessSummary}
       profileCopy={profileCopy}
     >

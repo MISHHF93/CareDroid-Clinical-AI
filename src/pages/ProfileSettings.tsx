@@ -4,6 +4,10 @@ import Button from '../components/ui/button';
 import Input from '../components/ui/input';
 import ProfileSettingsShell from '../components/profile/ProfileSettingsShell';
 import useProfileShellProps from '../hooks/useProfileShellProps';
+import {
+  resolveProfileSettingsIdentityCopy,
+  resolveProfileShellSection,
+} from '../config/profileDesignLanguage.config';
 import { useUser } from '../contexts/UserContext';
 import { useUserIdentity } from '../contexts/UserIdentityContext';
 import { useNotificationActions } from '../hooks/useNotificationActions';
@@ -69,6 +73,8 @@ const ProfileSettings = ({ authToken }) => {
     ],
   );
   const accountRole = currentProfile.role;
+  const identitySection = resolveProfileShellSection('settings');
+  const identityFormCopy = resolveProfileSettingsIdentityCopy();
 
   useEffect(() => {
     setDisplayName(currentProfile.displayName);
@@ -150,22 +156,22 @@ const ProfileSettings = ({ authToken }) => {
     });
     setStatus({
       type: 'success',
-      message: 'Operational profile saved. Profile, workspace, and audit surfaces now use the latest details.',
+      message: identityFormCopy.saveSuccessMessage,
     });
     success('Profile saved', 'Clinical profile updated.');
   };
 
   return (
     <ProfileSettingsShell
-      title="Identity"
-      subtitle="Clinical profile and institutional details. Your role is assigned by an administrator."
+      title={identitySection.pageTitle}
+      subtitle={identitySection.pageSubtitle}
       accessSummary={accessSummary}
       profileCopy={profileCopy}
     >
         <DashboardSection
           className="profile-settings-section"
-          title="Clinical profile"
-          description="Backend-backed clinical profile and institutional details."
+          title={identityFormCopy.sectionTitle}
+          description={identityFormCopy.sectionDescription}
         >
           {!effectiveAuthToken && (
             <div className="api-state-banner api-state-banner--warning" role="status">

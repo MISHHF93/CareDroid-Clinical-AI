@@ -24,9 +24,11 @@ html[data-theme='light'] {
   --app-shadow-1: 0 4px 14px rgba(15, 23, 42, 0.06);
   --app-shadow-2: 0 12px 32px rgba(15, 23, 42, 0.08);
   --app-accent: #0ea5e9;
-  --app-accent-2: #38bdf8;
+  --app-accent-2: #0284c7;
   --app-accent-interactive: #0ea5e9;
-  --app-accent-hover: #0284c7;
+  --app-accent-hover: #0369a1;
+  --app-link-fg: #0369a1;
+  --app-link-hover: #0284c7;
   --app-danger: #ef4444;
   --app-warning: #f59e0b;
   --app-success: #22c55e;
@@ -80,7 +82,7 @@ html[data-theme='light'] {
     var(--app-accent-interactive) 18%,
     var(--app-surface-1)
   );
-  --sidebar-item-active-fg: var(--app-accent-interactive);
+  --sidebar-item-active-fg: var(--app-fg);
   --sidebar-item-active-border: color-mix(in srgb, var(--app-accent-interactive) 38%, transparent);
   --sidebar-focus-ring: var(--app-accent-interactive);
   --sidebar-surface-muted: var(--app-panel-bg);
@@ -152,6 +154,8 @@ html {
   --app-text-primary: var(--app-fg);
   --app-text-secondary: color-mix(in srgb, var(--app-fg) 76%, transparent);
   --app-text-muted: var(--app-fg-muted);
+  --app-text-link: var(--app-link-fg);
+  --app-text-link-hover: var(--app-link-hover);
   --app-accent-action: var(--app-accent-interactive);
   --app-elevation-none: none;
   --app-elevation-subtle: var(--app-shadow-1);

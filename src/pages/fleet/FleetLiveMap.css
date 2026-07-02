@@ -1,0 +1,228 @@
+.fleet-live-map-page {
+  display: grid;
+  gap: var(--compact-panel-gap, 14px);
+  padding: clamp(16px, 2vw, 28px);
+  color: var(--app-fg, var(--medical-text-body, #111827));
+}
+
+.fleet-live-map-page__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.fleet-live-map-page__title-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.fleet-live-map-page__title-row h1 {
+  margin: 0;
+  font-size: clamp(24px, 3vw, 32px);
+  color: var(--medical-text-heading, var(--app-text-primary));
+}
+
+.fleet-live-map-page__title-row p {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.fleet-live-map-page__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.fleet-live-map-page__actions a,
+.fleet-live-map-page__actions button {
+  min-height: var(--compact-control-height, 40px);
+  padding: 8px 14px;
+  border-radius: var(--compact-panel-radius, 12px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--medical-card-bg, var(--app-surface-1));
+  color: inherit;
+  text-decoration: none;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.fleet-live-map-page__actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.fleet-live-map__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.8fr);
+  gap: var(--compact-panel-gap, 14px);
+}
+
+.fleet-live-map__map-shell,
+.fleet-live-map__panel {
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  border-radius: var(--compact-panel-radius, 14px);
+  background: var(--medical-card-bg, var(--app-surface-1));
+  padding: var(--compact-panel-padding, 14px);
+}
+
+.fleet-live-map-canvas,
+.fleet-map-canvas {
+  position: relative;
+  min-height: 360px;
+  border-radius: calc(var(--compact-panel-radius, 14px) - 4px);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--app-chart-1) 6%, var(--app-surface-muted, #f8fafc)) 0%, var(--app-surface-1, #fff) 100%);
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.fleet-live-map-canvas__svg {
+  display: block;
+  min-width: 640px;
+  width: 100%;
+  height: auto;
+}
+
+.fleet-live-map-canvas__grid-line {
+  stroke: color-mix(in srgb, var(--app-panel-border, #e2e8f0) 70%, transparent);
+  stroke-width: 0.15;
+}
+
+.fleet-live-map-canvas__route {
+  fill: none;
+  stroke-width: 0.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.85;
+}
+
+.fleet-live-map-canvas__marker {
+  cursor: pointer;
+}
+
+.fleet-live-map-canvas__marker circle {
+  stroke: var(--app-surface-elevated, #fff);
+  stroke-width: 0.5;
+}
+
+.fleet-live-map-canvas__marker text {
+  font-size: 2.8px;
+  font-weight: 700;
+  fill: var(--medical-text-heading, #111827);
+}
+
+.fleet-live-map-canvas__marker--selected circle {
+  stroke-width: 0.9;
+  stroke: var(--app-chart-4, #f59e0b);
+}
+
+.fleet-live-map__panel {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+
+.fleet-live-map__panel h2,
+.fleet-live-map__panel h3 {
+  margin: 0;
+  font-size: 15px;
+  color: var(--medical-text-heading, var(--app-text-primary));
+}
+
+.fleet-live-map__metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.fleet-live-map__metric {
+  padding: 10px 12px;
+  border-radius: var(--compact-panel-radius, 10px);
+  background: var(--app-surface-muted, #f8fafc);
+}
+
+.fleet-live-map__metric span {
+  display: block;
+  font-size: 11px;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.fleet-live-map__metric strong {
+  display: block;
+  margin-top: 2px;
+  font-size: 18px;
+}
+
+.fleet-live-map__alerts,
+.fleet-live-map__vehicles {
+  display: grid;
+  gap: 8px;
+}
+
+.fleet-live-map__alert,
+.fleet-live-map__vehicle {
+  padding: 10px 12px;
+  border-radius: var(--compact-panel-radius, 10px);
+  border: 1px solid var(--medical-card-border, var(--app-panel-border));
+  background: var(--app-surface-muted, #f8fafc);
+  text-align: left;
+  width: 100%;
+  cursor: pointer;
+}
+
+.fleet-live-map__alert[data-tone='warning'] {
+  border-left: 3px solid var(--app-status-warning, #f59e0b);
+}
+
+.fleet-live-map__alert[data-tone='critical'] {
+  border-left: 3px solid var(--app-status-critical, #ef4444);
+}
+
+.fleet-live-map__vehicle--selected {
+  border-color: color-mix(in srgb, var(--app-chart-4, #f59e0b) 45%, var(--app-panel-border));
+  background: color-mix(in srgb, var(--app-chart-4, #f59e0b) 8%, var(--app-surface-1, #fff));
+}
+
+.fleet-live-map__vehicle strong,
+.fleet-live-map__alert strong {
+  display: block;
+  font-size: 13px;
+}
+
+.fleet-live-map__vehicle span,
+.fleet-live-map__alert span,
+.fleet-live-map__vehicle small,
+.fleet-live-map__alert small {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.fleet-live-map__state {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: var(--compact-panel-radius, 12px);
+  background: var(--app-surface-muted, #f8fafc);
+  color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+.fleet-live-map__error {
+  display: grid;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: var(--compact-panel-radius, 12px);
+  border: 1px solid color-mix(in srgb, var(--app-status-critical, #ef4444) 30%, transparent);
+}
+
+@media (max-width: 960px) {
+  .fleet-live-map__layout {
+    grid-template-columns: 1fr;
+  }
+}

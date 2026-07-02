@@ -36,7 +36,7 @@
 
 .cdl-graphic-icon-badge--information {
   background: color-mix(in srgb, var(--status-info, #0ea5e9) 12%, var(--medical-white));
-  color: var(--status-info, #0ea5e9);
+  color: var(--medical-accent-hover, #0369a1);
 }
 
 .cdl-graphic-icon-badge--warning {
@@ -51,7 +51,8 @@
 
 .cdl-graphic-icon-badge--action {
   background: color-mix(in srgb, var(--medical-accent) 14%, var(--medical-white));
-  color: var(--medical-accent-hover);
+  color: var(--medical-accent-hover, #0369a1);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--medical-accent) 18%, transparent);
 }
 
 .cdl-graphic-icon-badge--neutral {

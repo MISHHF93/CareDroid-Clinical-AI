@@ -51,5 +51,8 @@ describe('copilotPlatform.config', () => {
   it('formats compact and full welcome messages', () => {
     expect(getCopilotWelcomeMessage(true)).toContain('Ask about patients');
     expect(getCopilotWelcomeMessage(false)).toContain('CareDroid Copilot is ready');
+    expect(getCopilotWelcomeMessage(false, { copilotIntro: 'Document triage findings.' } as any)).toContain(
+      'Document triage findings',
+    );
   });
 });

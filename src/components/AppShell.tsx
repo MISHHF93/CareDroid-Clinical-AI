@@ -31,6 +31,7 @@ import {
 } from '../config/emergencyRolePermissions';
 import { getVisibleNavigation } from '../config/unified-navigation.config';
 import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+import { resolveCopilotChromeLabels } from '../config/profileDesignLanguage.config';
 import { getEmergencySurface } from '../config/emergencyPipelineModel';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import useScreenModeCapabilities from '../hooks/useScreenModeCapabilities';
@@ -284,6 +285,7 @@ function AppShellFrame({ children }: AppShellProps) {
   );
   const { canUseCopilot, showSessionCopilot, hiddenOnReception } = useCopilotChromeAccess();
   const { saasRole, profileCopy } = useEffectiveUserProfile();
+  const copilotChrome = useMemo(() => resolveCopilotChromeLabels(profileCopy), [profileCopy]);
   const profileNavigate = useCallback(
     (to: To, options?: { replace?: boolean; state?: unknown }) =>
       navigateProfileAware(navigate, to, { saasRole, emergencyRole, ...options }),
@@ -848,10 +850,10 @@ function AppShellFrame({ children }: AppShellProps) {
           type="button"
           className="ed-copilot-launch"
           onClick={toggleCopilot}
-          aria-label={`Open ${EMERGENCY_OS_BRANDING.copilotName}`}
-          title={`Open ${EMERGENCY_OS_BRANDING.copilotName} (C)`}
+          aria-label={copilotChrome.openAriaLabel}
+          title={copilotChrome.openTitle}
         >
-          {EMERGENCY_OS_BRANDING.copilotName}
+          {copilotChrome.productName}
         </button>
       ) : null}
       <ErrorBoundary fallbackText="Critical broadcast overlay encountered an error.">

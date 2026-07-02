@@ -13,6 +13,11 @@ import { AuthGuard } from '@nestjs/passport';
 import { ToolExecutionService } from './tool-execution.service';
 import { ToolResolverService } from './tool-resolver.service';
 import { ToolCallingRequest } from './tool-calling.types';
+import { EntitlementService } from '../platform-assets/entitlement.service';
+import {
+  assertEntitlementLaunchFromRequest,
+  resolveToolCallingAssetId,
+} from '../platform-assets/entitlement-launch.util';
 
 @Controller('tool-calling')
 @UseGuards(AuthGuard('jwt'))
@@ -20,11 +25,17 @@ export class ToolCallingController {
   constructor(
     private readonly toolExecutionService: ToolExecutionService,
     private readonly toolResolverService: ToolResolverService,
+    private readonly entitlementService: EntitlementService,
   ) {}
 
   @Post('execute')
   @HttpCode(HttpStatus.OK)
-  execute(@Body() body: ToolCallingRequest, @Request() req: any) {
+  async execute(@Body() body: ToolCallingRequest, @Request() req: any) {
+    await assertEntitlementLaunchFromRequest(
+      this.entitlementService,
+      req,
+      resolveToolCallingAssetId(body.toolId),
+    );
     return this.toolExecutionService.executePrompt({
       ...body,
       userId: req.user?.id || body.userId || 'anonymous',

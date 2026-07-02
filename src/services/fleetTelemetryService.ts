@@ -1,3 +1,4 @@
+import { API_ROUTES } from '../config/api.config';
 import { fetchLiveTrackingCapability } from './liveTrackingApi';
 
 /**
@@ -26,7 +27,7 @@ export const FLEET_LIVE_TRACKING_BACKEND_STATUS = Object.freeze({
 const MOCK_VEHICLES = [
   {
     id: 'VH-101',
-    label: 'Van 101 — North route',
+    label: 'Van 101 ï¿½ North route',
     status: 'occupied',
     maintenanceStatus: 'ok',
     etaMinutes: 18,
@@ -45,7 +46,7 @@ const MOCK_VEHICLES = [
   },
   {
     id: 'VH-204',
-    label: 'Truck 204 — Depot',
+    label: 'Truck 204 ï¿½ Depot',
     status: 'available',
     maintenanceStatus: 'ok',
     etaMinutes: null,
@@ -64,7 +65,7 @@ const MOCK_VEHICLES = [
   },
   {
     id: 'VH-118',
-    label: 'Van 118 — South loop',
+    label: 'Van 118 ï¿½ South loop',
     status: 'active',
     maintenanceStatus: 'ok',
     etaMinutes: 34,
@@ -83,7 +84,7 @@ const MOCK_VEHICLES = [
   },
   {
     id: 'VH-077',
-    label: 'Truck 077 — Workshop',
+    label: 'Truck 077 ï¿½ Workshop',
     status: 'maintenance',
     maintenanceStatus: 'scheduled_service',
     etaMinutes: null,
@@ -102,7 +103,7 @@ const MOCK_VEHICLES = [
   },
   {
     id: 'VH-312',
-    label: 'Van 312 — City center',
+    label: 'Van 312 ï¿½ City center',
     status: 'occupied',
     maintenanceStatus: 'warning',
     etaMinutes: 9,
@@ -121,7 +122,7 @@ const MOCK_VEHICLES = [
   },
   {
     id: 'VH-189',
-    label: 'Truck 189 — Yard',
+    label: 'Truck 189 ï¿½ Yard',
     status: 'available',
     maintenanceStatus: 'ok',
     etaMinutes: null,
@@ -334,11 +335,29 @@ export async function fetchFleetCommandSnapshot(options: any = {}) {
     }
   });
 
+  if (!emptyFleet) {
+    const apiSnapshot = await fetchFleetSnapshotFromApi(signal);
+    if (apiSnapshot) {
+      return {
+        summary: computeSummary(apiSnapshot.vehicles),
+        vehicles: apiSnapshot.vehicles,
+        visualizations: buildFleetVisualizationData(apiSnapshot.vehicles),
+        routes: apiSnapshot.routes,
+        alerts: apiSnapshot.alerts,
+        sourceLabel: apiSnapshot.sourceLabel,
+        message: apiSnapshot.message,
+        fromApi: true,
+      };
+    }
+  }
+
   const vehicles = emptyFleet ? [] : MOCK_VEHICLES.map((v) => ({ ...v }));
+  const alerts = emptyFleet ? [] : buildFleetLiveAlerts(vehicles);
   return {
     summary: computeSummary(vehicles),
     vehicles,
     visualizations: buildFleetVisualizationData(vehicles),
+    alerts,
   };
 }
 
@@ -371,26 +390,17 @@ function buildFleetLiveSummary(vehicles, routes, alerts) {
   };
 }
 
-async function fetchFleetLiveTrackingFromApi(signal) {
-  const [vehiclesResult, routesResult, alertsResult] = await Promise.all([
-    fetchLiveTrackingCapability('fleetLiveTracking', '/api/fleet/vehicles/live', { signal }),
-    fetchLiveTrackingCapability('fleetActiveRoutes', '/api/fleet/routes/active', { signal }),
-    fetchLiveTrackingCapability('fleetAlerts', '/api/fleet/alerts', { signal }),
-  ]);
-
-  if (!vehiclesResult.ok || !routesResult.ok) {
-    return null;
-  }
-
-  const vehicles = (vehiclesResult.payload?.vehicles || []).map((vehicle) => ({
+function normalizeFleetApiSnapshot(result) {
+  const payload = result.payload || {};
+  const vehicles = (payload.vehicles || []).map((vehicle) => ({
     ...vehicle,
     freshness: vehicle.freshness || vehicleFreshness(vehicle),
   }));
-  const routes = routesResult.payload?.routes || [];
-  const alerts = alertsResult.ok ? alertsResult.payload?.alerts || [] : buildFleetLiveAlerts(vehicles);
+  const routes = payload.routes || [];
+  const alerts = payload.alerts || buildFleetLiveAlerts(vehicles);
   const summary = {
     ...buildFleetLiveSummary(vehicles, routes, alerts),
-    ...(vehiclesResult.payload?.summary || {}),
+    ...(payload.summary || {}),
     activeRoutes: routes.filter((route) => route.status === 'active').length,
     delayedRoutes: routes.filter((route) => route.status === 'delayed').length,
     activeAlerts: alerts.length,
@@ -404,12 +414,54 @@ async function fetchFleetLiveTrackingFromApi(signal) {
     alerts,
     backendStatus: FLEET_LIVE_TRACKING_BACKEND_STATUS,
     sourceLabel:
-      vehiclesResult.sourceLabel ||
+      result.sourceLabel ||
       'Backend demo fleet live tracking - replace with real vehicle GPS feeds before operational use',
     message:
-      vehiclesResult.message ||
+      result.message ||
       'Fleet map uses backend demo coordinates only. Verify vehicle location, dispatch status, and route ETAs in the system of record.',
+    fromApi: true,
+    demo: Boolean(result.demo),
   };
+}
+
+async function fetchFleetSnapshotFromApi(signal) {
+  const snapshotResult = await fetchLiveTrackingCapability(
+    'fleetLiveTracking',
+    API_ROUTES.fleet.snapshot,
+    { signal },
+  );
+  if (snapshotResult.ok && snapshotResult.payload) {
+    return normalizeFleetApiSnapshot(snapshotResult);
+  }
+  return null;
+}
+
+async function fetchFleetLiveTrackingFromApi(signal) {
+  const unifiedSnapshot = await fetchFleetSnapshotFromApi(signal);
+  if (unifiedSnapshot) return unifiedSnapshot;
+
+  const [vehiclesResult, routesResult, alertsResult] = await Promise.all([
+    fetchLiveTrackingCapability('fleetLiveTracking', API_ROUTES.fleet.vehiclesLive, { signal }),
+    fetchLiveTrackingCapability('fleetActiveRoutes', API_ROUTES.fleet.routesActive, { signal }),
+    fetchLiveTrackingCapability('fleetAlerts', API_ROUTES.fleet.alerts, { signal }),
+  ]);
+
+  if (!vehiclesResult.ok || !routesResult.ok) {
+    return null;
+  }
+
+  return normalizeFleetApiSnapshot({
+    ...vehiclesResult,
+    payload: {
+      vehicles: vehiclesResult.payload?.vehicles || [],
+      routes: routesResult.payload?.routes || [],
+      alerts: alertsResult.ok ? alertsResult.payload?.alerts || [] : undefined,
+      summary: vehiclesResult.payload?.summary || {},
+    },
+    sourceLabel: vehiclesResult.sourceLabel,
+    message: vehiclesResult.message,
+    demo: vehiclesResult.demo,
+  });
 }
 
 /**

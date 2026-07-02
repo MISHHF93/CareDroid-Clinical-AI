@@ -760,7 +760,7 @@ const PAGE_BY_ID = {
   'equity-monitoring-enterprise': PlatformGovernanceWorkspace,
   'human-review-enterprise': PlatformGovernanceWorkspace,
   'privacy-enterprise': PlatformGovernanceWorkspace,
-  'system-health-enterprise': SystemHealth,
+  'system-health-enterprise': PlatformGovernanceWorkspace,
   'saas-health-enterprise': SaasHealthCenter,
   'governance-clinical': PlatformGovernanceWorkspace,
   'ai-security-platform': PlatformGovernanceWorkspace,

@@ -1,6 +1,17 @@
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import useAdministrativeAutomations from '../../hooks/useAdministrativeAutomations';
 import type { AdministrativeAutomationTask } from '../../types/administrativeAutomation';
+import { GraphicIconBadge } from '../graphics/CdlGraphicKit';
+import {
+  CategoryBarChart,
+  DistributionDonutChart,
+  VisualizationPanel,
+} from '../dashboard/DashboardVisualizations';
+import {
+  buildAutomationCategoryChart,
+  buildAutomationStatusChart,
+} from '../../utils/administrativeAutomationChartModel';
 import './administrative-automation-review.css';
 
 type AiDecisionPayload = Readonly<{
@@ -178,6 +189,14 @@ function AutomationRow({
 
 export function AdministrativeAutomationReviewPanel() {
   const { snapshot, pendingTasks, review } = useAdministrativeAutomations();
+  const statusChart = useMemo(
+    () => buildAutomationStatusChart(snapshot.metrics),
+    [snapshot.metrics],
+  );
+  const categoryChart = useMemo(
+    () => buildAutomationCategoryChart(snapshot.metrics.byCategory),
+    [snapshot.metrics.byCategory],
+  );
 
   const handleApprove = (taskId: string) => {
     void review({ taskId, decision: 'approve', executeOnApprove: true });
@@ -199,23 +218,43 @@ export function AdministrativeAutomationReviewPanel() {
   return (
     <div className="automation-review">
       <header className="automation-review__header">
-        <div>
-          <strong>Administrative automation queue</strong>
-          <p className="automation-review__lead">
-            {snapshot.metrics.pendingReview} pending review · unified orchestration across routing,
-            handoffs, summaries, triage prep, notifications, assignments, queue priority, and escalations
-          </p>
+        <div className="automation-review__header-lead">
+          <GraphicIconBadge iconKey="shield-check" accent="brand" size="md" />
+          <div>
+            <strong>Administrative automation queue</strong>
+            <p className="automation-review__lead">
+              {snapshot.metrics.pendingReview} pending review · unified orchestration across routing,
+              handoffs, summaries, triage prep, notifications, assignments, queue priority, and escalations
+            </p>
+          </div>
         </div>
       </header>
 
-      <div className="automation-review__metrics">
-        {Object.entries(snapshot.metrics.byCategory)
-          .filter(([, count]) => count > 0)
-          .map(([category, count]) => (
-            <span key={category}>
-              {CATEGORY_LABELS[category as AdministrativeAutomationTask['category']]} {count}
-            </span>
-          ))}
+      <div className="automation-review__charts dashboard-visual-grid">
+        <VisualizationPanel
+          title="Queue status"
+          description="Pending review versus executed and overridden automations."
+          badge="Status"
+        >
+          <DistributionDonutChart
+            data={statusChart}
+            title="Automation queue status"
+            emptyMessage="No automation queue activity yet."
+          />
+        </VisualizationPanel>
+        <VisualizationPanel
+          title="By category"
+          description="Automation workload grouped by orchestration category."
+          badge="Category"
+        >
+          <CategoryBarChart
+            data={categoryChart}
+            title="Automation categories"
+            xKey="name"
+            color="var(--app-chart-5)"
+            emptyMessage="No category workload to chart."
+          />
+        </VisualizationPanel>
       </div>
 
       {pendingTasks.length === 0 ? (

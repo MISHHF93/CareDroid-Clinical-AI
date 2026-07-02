@@ -59,6 +59,7 @@ describe('App CareDroid route contract', () => {
       '/medical-iot': CANONICAL_ROUTES.medicalIot,
       '/devices': CANONICAL_ROUTES.devices,
       '/live-map': CANONICAL_ROUTES.liveMap,
+      '/operations': CANONICAL_ROUTES.operations,
     };
 
     for (const path of [
@@ -75,12 +76,11 @@ describe('App CareDroid route contract', () => {
       '/devices',
       '/live-map',
       '/operations',
-      '/operations/*',
     ]) {
       const mountedRoute =
         mountedPlatformPaths[path] &&
         (appSource.includes(`path="${mountedPlatformPaths[path]}"`) ||
-          appSource.includes(`path={CANONICAL_ROUTES.${path === '/hospital-map' ? 'hospitalMap' : path === '/medical-iot' ? 'medicalIot' : path === '/live-map' ? 'liveMap' : 'devices'}}`));
+          appSource.includes(`path={CANONICAL_ROUTES.${path === '/hospital-map' ? 'hospitalMap' : path === '/medical-iot' ? 'medicalIot' : path === '/live-map' ? 'liveMap' : path === '/operations' ? 'operations' : 'devices'}}`));
       expect(
         redirectsByPath[path] ||
           (nonEdRedirectPaths.has(path) ? CANONICAL_ROUTES.emergencyWhiteboard : null) ||
