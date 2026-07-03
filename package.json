@@ -11,7 +11,7 @@
   },
   "scripts": {
     "start": "npm run dev:fullstack",
-    "dev": "vite --strictPort",
+    "dev": "node scripts/dev-stack.mjs",
     "dev:web": "vite --strictPort",
     "dev:api": "node scripts/dev-stack.mjs --backend-only",
     "dev:fullstack": "node scripts/dev-stack.mjs",

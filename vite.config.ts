@@ -84,10 +84,36 @@ const buildInfoFor = (mode: string, env: Record<string, string>) => ({
       : env.VITE_GIT_REPOSITORY || '',
 });
 
+const attachProxyOfflineHandler = (proxy: { on: (event: string, handler: (...args: any[]) => void) => void }) => {
+  proxy.on('error', (_error, _req, res) => {
+    if (!res || typeof res.writeHead !== 'function' || res.headersSent) return;
+    res.writeHead(503, { 'Content-Type': 'application/json' });
+    res.end(
+      JSON.stringify({
+        status: 'offline',
+        message:
+          'CareDroid API is not running. Start it with `npm run dev:fullstack` or `npm run dev:api`.',
+      }),
+    );
+  });
+};
+
 const proxyPaths = (target: string) => ({
-  '/api': { target, changeOrigin: true },
-  '/socket.io': { target, ws: true },
-  '/health': { target, changeOrigin: true },
+  '/api': {
+    target,
+    changeOrigin: true,
+    configure: attachProxyOfflineHandler,
+  },
+  '/socket.io': {
+    target,
+    ws: true,
+    configure: attachProxyOfflineHandler,
+  },
+  '/health': {
+    target,
+    changeOrigin: true,
+    configure: attachProxyOfflineHandler,
+  },
 });
 
 const readPort = (...values: (string | undefined)[]): number => {
@@ -95,7 +121,7 @@ const readPort = (...values: (string | undefined)[]): number => {
     const parsed = Number.parseInt(value || '', 10);
     if (Number.isInteger(parsed) && parsed > 0 && parsed <= 65535) return parsed;
   }
-  return 8000;
+  return 5174;
 };
 
 export default defineConfig(({ mode }) => {

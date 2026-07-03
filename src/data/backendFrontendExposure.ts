@@ -1,5 +1,5 @@
 /**
- * Production exposure scan — matches frontend API inventory to backend routes and capability gates.
+ * Production exposure scan ï¿½ matches frontend API inventory to backend routes and capability gates.
  */
 
 import { readFileSync } from 'node:fs';
@@ -220,7 +220,12 @@ function readVitePortFallback(source, blockName) {
   if (!dynamicMatch) return null;
 
   const readPortDefault = source.match(/const readPort[\s\S]*?return\s+(\d+)/);
-  return readPortDefault ? Number(readPortDefault[1]) : 8000;
+  const frontendLiteral = source.match(/const frontendPort = readPort\([\s\S]*?'(\d{4})',/);
+  return frontendLiteral
+    ? Number(frontendLiteral[1])
+    : readPortDefault
+      ? Number(readPortDefault[1])
+      : 5174;
 }
 
 export function readViteDevConfig() {
@@ -234,7 +239,7 @@ export function readViteDevConfig() {
     previewPort: readVitePortFallback(source, 'preview'),
     proxyTarget: proxyMatch
       ? proxyMatch[0].includes('backendPort')
-        ? 'http://localhost:3000'
+        ? `http://localhost:${source.match(/backendPort = readPort\([\s\S]*?'(\d{4})',/)?.[1] || '3333'}`
         : proxyMatch[1]
       : null,
     proxiesApi: source.includes("'/api'"),
@@ -271,9 +276,9 @@ export function formatBackendExposureReportMarkdown(scan = runBackendFrontendExp
     '',
     '| Setting | Value |',
     '|---------|-------|',
-    `| Frontend dev port | ${vite.devPort ?? '—'} |`,
-    `| Preview port | ${vite.previewPort ?? '—'} |`,
-    `| Proxy target | ${vite.proxyTarget ?? '—'} |`,
+    `| Frontend dev port | ${vite.devPort ?? 'ï¿½'} |`,
+    `| Preview port | ${vite.previewPort ?? 'ï¿½'} |`,
+    `| Proxy target | ${vite.proxyTarget ?? 'ï¿½'} |`,
     `| Proxies \`/api\` | ${vite.proxiesApi ? 'yes' : 'no'} |`,
     `| Proxies \`/health\` | ${vite.proxiesHealth ? 'yes' : 'no'} |`,
     `| Proxies \`/socket.io\` | ${vite.proxiesSocketIo ? 'yes' : 'no'} |`,
@@ -326,14 +331,14 @@ export function formatEndpointMatrixMarkdown(scan = runBackendFrontendExposureSc
     ...scan.analyzed.map((c) => {
       const exposure =
         c.exposure === 'wired' ? '?' : c.exposure === 'gated-stub' ? '?? gated' : '? unguarded';
-      return `| ${c.method} | \`${c.path}\` | ${c.backendController ?? '—'} | ${c.client} | ${exposure} |`;
+      return `| ${c.method} | \`${c.path}\` | ${c.backendController ?? 'ï¿½'} | ${c.client} | ${exposure} |`;
     }),
     '',
     '## Backend route inventory (reference)',
     '',
     ...listBackendRoutePaths().slice(0, 20).map((r) => `- \`${r}\``),
     '',
-    `_…and ${listBackendRoutePaths().length - 20} more in src/data/backendHttpRouteInventory.js_`,
+    `_ï¿½and ${listBackendRoutePaths().length - 20} more in src/data/backendHttpRouteInventory.js_`,
     '',
   ];
   return lines.join('\n');
