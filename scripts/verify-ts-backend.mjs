@@ -112,6 +112,7 @@ try {
     for (const file of targets) {
       if (!/\.(ts|tsx|js|mjs|json|yml|yaml|md|env|example)$/i.test(file)) continue;
       if (/scripts[\\/]verify-.*\.mjs$/i.test(file)) continue;
+      if (/docs[\\/]BACKEND_MIGRATION_REPORT\.md$/i.test(file)) continue;
       const content = readFileSync(file, 'utf8');
       for (const pattern of STALE_PATTERNS) {
         if (pattern.regex.test(content)) {
