@@ -22,6 +22,13 @@ import {
   type PlatformHealthCheck,
   type UnifiedPlatformHealthBundle,
 } from '../../services/unifiedServiceRegistry';
+import { useObservabilityDiagnostics } from '../../hooks/useObservabilityDiagnostics';
+import {
+  fetchServerObservabilityDiagnostics,
+  probeObservabilityHealth,
+  type ObservabilityHealthProbe,
+} from '../../services/observabilityDiagnosticsApi';
+import { OperationalDiagnosticsPanel } from '../../components/observability/OperationalDiagnosticsPanel';
 import './SaasHealthCenter.css';
 
 function verdictClass(status: string | undefined) {
@@ -66,23 +73,32 @@ function ServiceRegistryRow({
 }
 
 export default function SaasHealthCenter() {
+  const clientDiagnostics = useObservabilityDiagnostics();
   const [bundle, setBundle] = useState<UnifiedPlatformHealthBundle | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [observabilityHealth, setObservabilityHealth] = useState<ObservabilityHealthProbe | null>(null);
+  const [serverDiagnostics, setServerDiagnostics] = useState<Record<string, unknown> | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
     setError('');
     try {
-      const next = await fetchUnifiedPlatformHealth({
-        sync: {
-          status: 'saas-health-center',
-          source: 'SaasHealthCenter',
-          stale: false,
-          message: 'SaaS health center refresh.',
-        },
-      });
+      const [next, healthProbe, serverDiag] = await Promise.all([
+        fetchUnifiedPlatformHealth({
+          sync: {
+            status: 'saas-health-center',
+            source: 'SaasHealthCenter',
+            stale: false,
+            message: 'SaaS health center refresh.',
+          },
+        }),
+        probeObservabilityHealth(),
+        fetchServerObservabilityDiagnostics(),
+      ]);
       setBundle(next);
+      setObservabilityHealth(healthProbe);
+      setServerDiagnostics(serverDiag.ok ? (serverDiag.data as Record<string, unknown>) : null);
       if (!next.saas.ok && next.saas.message) {
         setError(next.saas.message);
       }
@@ -220,6 +236,20 @@ export default function SaasHealthCenter() {
           </DashboardSection>
         ) : null,
         history: bundle ? (
+          <>
+          <DashboardSection
+            className="saas-health-section"
+            title="Observability diagnostics"
+            titleId="saas-health-observability-title"
+            description="Workflow traces, slow API calls, and error telemetry for administrator triage."
+          >
+            <OperationalDiagnosticsPanel
+              client={clientDiagnostics}
+              server={serverDiagnostics}
+              observabilityHealth={observabilityHealth}
+              serviceHealth={bottlenecks?.serviceHealth || []}
+            />
+          </DashboardSection>
           <DashboardSection
             className="saas-health-section"
             title="Health endpoints"
@@ -234,6 +264,7 @@ export default function SaasHealthCenter() {
               ))}
             </DashboardGrid>
           </DashboardSection>
+          </>
         ) : null,
       }}
     />

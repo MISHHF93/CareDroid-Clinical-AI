@@ -1,8 +1,0 @@
----
-pid: 2780
-cwd: "C:\Users\borah\CareDroid-Clinical-AI"
-command: "cd \"C:\\Users\\borah\\CareDroid-Clinical-AI\"; node node_modules/typescript/bin/tsc --noEmit -p tsconfig.frontend.json; if ($LASTEXITCODE -eq 0) { Write-Output \"TYPECHECK_OK\" }"
-started_at: 2026-07-01T02:18:03.314Z
-running_for_ms: 1535000  
----
-TYPECHECK_OK

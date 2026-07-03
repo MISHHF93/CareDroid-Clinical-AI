@@ -1,5 +1,5 @@
 /**
- * Role + screen-mode landing navigation — one resolver for post-login, home, and redirects.
+ * Role + screen-mode landing navigation ï¿½ one resolver for post-login, home, and redirects.
  * Same AppShell and routes; screen mode selects the landing path and query surface.
  */
 import { CANONICAL_ROUTES, getDefaultRouteForProfile, getRouteByPath } from './routes.config';
@@ -81,7 +81,9 @@ export function resolveRoleLandingRoute(input: ResolveRoleLandingInput = {}): st
 }
 
 export function resolveRoleHomeNavItemId(input: ResolveRoleLandingInput = {}): string {
-  const defaultRoute = getRouteByPath(getDefaultRouteForProfile(input.role));
+  const landingRoute = getDefaultRouteForProfile(input.role);
+  if (landingRoute.includes('queue=pretriage')) return 'queues';
+  const defaultRoute = getRouteByPath(landingRoute);
   if (defaultRoute?.showInNav) return defaultRoute.id;
   const screenMode = resolveRoleLandingScreenMode(input);
 
@@ -124,6 +126,50 @@ export const ROLE_LANDING_ROUTE_EXPECTATIONS: Record<
   },
   [EMERGENCY_ROLE_ID.physician]: {
     screenMode: CARE_DROID_SCREEN_MODES.physician,
+    routeIncludes: CANONICAL_ROUTES.emergencyWhiteboard,
+  },
+  emergency_physician: {
+    screenMode: CARE_DROID_SCREEN_MODES.physician,
+    routeIncludes: CANONICAL_ROUTES.emergencyWhiteboard,
+  },
+  specialist: {
+    screenMode: CARE_DROID_SCREEN_MODES.physician,
+    routeIncludes: CANONICAL_ROUTES.emergencyPatients,
+  },
+  [EMERGENCY_ROLE_ID.dispatcher]: {
+    screenMode: CARE_DROID_SCREEN_MODES.ems,
+    routeIncludes: CANONICAL_ROUTES.emergencyDispatch,
+  },
+  [EMERGENCY_ROLE_ID.emsCoordinator]: {
+    screenMode: CARE_DROID_SCREEN_MODES.ems,
+    routeIncludes: CANONICAL_ROUTES.emergencyEms,
+  },
+  pharmacist: {
+    screenMode: CARE_DROID_SCREEN_MODES.physician,
+    routeIncludes: CANONICAL_ROUTES.emergencyDiagnostics,
+  },
+  lab_technician: {
+    screenMode: CARE_DROID_SCREEN_MODES.physician,
+    routeIncludes: CANONICAL_ROUTES.emergencyDiagnostics,
+  },
+  radiology_technician: {
+    screenMode: CARE_DROID_SCREEN_MODES.physician,
+    routeIncludes: CANONICAL_ROUTES.emergencyDiagnostics,
+  },
+  patient_flow_coordinator: {
+    screenMode: CARE_DROID_SCREEN_MODES.commandCenter,
+    routeIncludes: CANONICAL_ROUTES.emergencyQueues,
+  },
+  hospital_admin: {
+    screenMode: CARE_DROID_SCREEN_MODES.commandCenter,
+    routeIncludes: CANONICAL_ROUTES.emergencyAnalytics,
+  },
+  it_admin: {
+    screenMode: CARE_DROID_SCREEN_MODES.admin,
+    routeIncludes: CANONICAL_ROUTES.emergencySettings,
+  },
+  demo_observer: {
+    screenMode: CARE_DROID_SCREEN_MODES.readOnlyWhiteboard,
     routeIncludes: CANONICAL_ROUTES.emergencyWhiteboard,
   },
   [EMERGENCY_ROLE_ID.readOnlyViewer]: {

@@ -424,7 +424,7 @@ const RAW_SEED_PRODUCTS = [
     description:
       'ED and EMS flow intelligence for throughput, handoff, dynamic triage, bed pressure, referrals, discharge acceleration, equipment, surge prediction, Copilot, and command-center operations.',
     productType: ProductType.EMERGENCY_DEPARTMENT,
-    packIds: ['emergency-department-pack', 'emergency-medicine'],
+    packIds: ['emergency-department-pack', 'emergency-medicine', 'reception-desk', 'emergency-clinical'],
     highlightAssetIds: [
       'heart-score',
       'sofa-score',
@@ -452,7 +452,7 @@ const RAW_SEED_PRODUCTS = [
     description:
       'Operations command center, hospital digital twin, maps, assets, incidents, fleet overlays, and capacity visibility.',
     productType: ProductType.HOSPITAL_OPERATIONS,
-    packIds: ['hospital-operations', 'digital-twin-pack'],
+    packIds: ['hospital-operations', 'digital-twin-pack', 'trackmind'],
     highlightAssetIds: [
       'digital-operations-center',
       'digital-twin',

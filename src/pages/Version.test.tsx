@@ -14,8 +14,11 @@ describe('Version page', () => {
 
     expect(screen.getByRole('heading', { name: /caredroid build version/i })).toBeInTheDocument();
     expect(screen.getByText('Commit')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /check \/auth/i })).toHaveAttribute('href', '/auth');
-    expect(screen.getByRole('link', { name: /check \/tools/i })).toHaveAttribute('href', '/tools');
+    expect(screen.getByRole('link', { name: /platform entry/i })).toHaveAttribute('href', '/start');
+    expect(screen.getByRole('link', { name: /clinical workspace/i })).toHaveAttribute(
+      'href',
+      '/emergency/whiteboard',
+    );
     expect(buildInfoRows.some((row) => row.label === 'Build time')).toBe(true);
   });
 

@@ -1,6 +1,7 @@
 import { useMemo, type ReactNode } from 'react';
 import PatientCard from '../../components/PatientCard';
 import HelpTrigger from '../../components/help/HelpTrigger';
+import LivingContextualHelpBanner from '../../components/help/LivingContextualHelpBanner';
 import EdJourneyProgressRail from '../../components/emergency/EdJourneyProgressRail';
 import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import { OperationalPageTemplate, PageShell } from '../../components/ui/CareDroidPrimitives';
@@ -9,6 +10,8 @@ import { resolveEdDataFreshness, resolveEdSourceLabel } from '../../utils/edData
 import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
 import { metricColorForTone } from '../../config/semanticColorSystem';
 import useEdOperatingSurface from '../../hooks/useEdOperatingSurface';
+import usePatientWorkflow from '../../hooks/usePatientWorkflow';
+import { useEmergencyStore } from '../../store/emergencyStore';
 import {
   MetricGraphicCard,
   SituationGraphicCard,
@@ -155,9 +158,21 @@ export function EmergencyRoutePage({
 }: any = {}) {
   const surfaces = usePractitionerSurfaceVisibility();
   const operatingSurface = useEdOperatingSurface();
+  const selectedPatientId = useEmergencyStore((state) => state.selectedPatientId);
+  const patientWorkflow = usePatientWorkflow(selectedPatientId);
   const compactLayout = surfaces.compactLayout;
   const showDescription = description && surfaces.emergencyRoutes.showDescriptions;
-  const resolvedSituationBrief = situationBrief ?? operatingSurface.situationBrief ?? undefined;
+  const resolvedSituationBrief = useMemo(() => {
+    const base = situationBrief ?? operatingSurface.situationBrief ?? undefined;
+    if (!patientWorkflow.hasPatient || !patientWorkflow.step) {
+      return base;
+    }
+    return {
+      ...base,
+      owner: base?.owner ?? patientWorkflow.ownerRole,
+      nextAction: base?.nextAction ?? patientWorkflow.primaryAction,
+    };
+  }, [situationBrief, operatingSurface.situationBrief, patientWorkflow]);
   const resolvedEyebrow =
     eyebrow ??
     (operatingSurface.phaseLabel
@@ -217,10 +232,15 @@ export function EmergencyRoutePage({
               {showJourneyRail && operatingSurface.phaseId ? (
                 <EdJourneyProgressRail
                   activePhaseId={operatingSurface.phaseId}
-                  ownerRole={operatingSurface.ownerRole}
+                  ownerRole={patientWorkflow.ownerRole ?? operatingSurface.ownerRole}
                   priorityLabel={operatingSurface.priority}
+                  patientId={selectedPatientId}
+                  encounterId={
+                    (patientWorkflow.patient as { encounterId?: string } | null)?.encounterId ?? null
+                  }
                 />
               ) : null}
+              <LivingContextualHelpBanner />
               {resolvedSituationBrief ? <WorkflowSituationBrief {...resolvedSituationBrief} /> : null}
               {operationalSummaryExtra}
             </>

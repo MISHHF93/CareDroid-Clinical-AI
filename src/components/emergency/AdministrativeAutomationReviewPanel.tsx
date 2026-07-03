@@ -1,17 +1,16 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import useAdministrativeAutomations from '../../hooks/useAdministrativeAutomations';
-import type { AdministrativeAutomationTask } from '../../types/administrativeAutomation';
+import useUnifiedWorkflowAutomation from '../../hooks/useUnifiedWorkflowAutomation';
+import type { WorkflowAutomationItem } from '../../config/unifiedWorkflowAutomationModel';
+import { useEmergencyStore } from '../../store/emergencyStore';
+import { useUser } from '../../contexts/UserContext';
 import { GraphicIconBadge } from '../graphics/CdlGraphicKit';
 import {
   CategoryBarChart,
   DistributionDonutChart,
   VisualizationPanel,
 } from '../dashboard/DashboardVisualizations';
-import {
-  buildAutomationCategoryChart,
-  buildAutomationStatusChart,
-} from '../../utils/administrativeAutomationChartModel';
+import { buildAutomationStatusChart } from '../../utils/administrativeAutomationChartModel';
 import './administrative-automation-review.css';
 
 type AiDecisionPayload = Readonly<{
@@ -27,8 +26,22 @@ type AiDecisionPayload = Readonly<{
   requiresClinicianReview?: boolean;
 }>;
 
-function readAiDecision(task: AdministrativeAutomationTask): AiDecisionPayload | null {
-  const decision = task.proposedPayload?.aiDecision;
+const DOMAIN_LABELS: Record<WorkflowAutomationItem['domain'], string> = {
+  reception: 'Reception',
+  intake: 'Intake',
+  triage: 'Triage',
+  patient_routing: 'Patient routing',
+  notifications: 'Notifications',
+  documentation: 'Documentation',
+  handoffs: 'Handoffs',
+  staff_assignments: 'Staff assignments',
+  analytics: 'Analytics',
+  reporting: 'Reporting',
+  ai_recommendations: 'AI recommendations',
+};
+
+function readAiDecision(task: { proposedPayload?: Readonly<Record<string, unknown>> } | undefined): AiDecisionPayload | null {
+  const decision = task?.proposedPayload?.aiDecision;
   if (!decision || typeof decision !== 'object') return null;
   return decision as AiDecisionPayload;
 }
@@ -114,105 +127,136 @@ function AiDecisionBlock({ decision }: { decision: AiDecisionPayload }) {
   );
 }
 
-const CATEGORY_LABELS: Record<AdministrativeAutomationTask['category'], string> = {
-  patient_routing: 'Patient routing',
-  documentation_handoff: 'Documentation handoff',
-  ai_patient_summary: 'AI patient summary',
-  triage_preparation: 'Triage preparation',
-  department_notification: 'Department notification',
-  staff_assignment: 'Staff assignment',
-  queue_prioritization: 'Queue prioritization',
-  escalation_workflow: 'Escalation workflow',
-};
-
-function AutomationRow({
-  task,
+function WorkflowRow({
+  item,
+  aiDecision,
   onApprove,
+  onAcknowledge,
   onDismiss,
   onOverride,
 }: {
-  task: AdministrativeAutomationTask;
-  onApprove: (taskId: string) => void;
-  onDismiss: (taskId: string) => void;
-  onOverride: (taskId: string) => void;
+  item: WorkflowAutomationItem;
+  aiDecision: AiDecisionPayload | null;
+  onApprove: (itemId: string) => void;
+  onAcknowledge: (itemId: string) => void;
+  onDismiss: (itemId: string) => void;
+  onOverride: (itemId: string) => void;
 }) {
-  const aiDecision = readAiDecision(task);
-
   return (
-    <li className={`automation-review__row automation-review__row--${task.priority}`}>
+    <li className={`automation-review__row automation-review__row--${item.priority}`}>
       <div className="automation-review__row-main">
         <div className="automation-review__row-header">
-          <strong>{task.title}</strong>
-          <span className="automation-review__category">{CATEGORY_LABELS[task.category]}</span>
+          <strong>{item.title}</strong>
+          <span className="automation-review__category">{DOMAIN_LABELS[item.domain]}</span>
         </div>
-        <p>{task.summary}</p>
+        <p>{item.summary}</p>
         {aiDecision ? <AiDecisionBlock decision={aiDecision} /> : null}
         <p className="automation-review__action">
-          <span>Proposed:</span> {task.proposedAction}
+          <span>Proposed:</span> {item.proposedAction}
         </p>
         <div className="automation-review__meta">
-          <span>Owner: {task.ownerRole}</span>
-          {task.aiGenerated ? <span>AI-assisted · review required</span> : null}
+          <span>Owner: {item.ownerRole}</span>
+          <span>{item.source.replace(/_/g, ' ')} · review required</span>
         </div>
       </div>
       <div className="automation-review__actions">
-        {task.route ? (
-          <Link to={task.route} className="automation-review__btn automation-review__btn--ghost">
+        {item.route ? (
+          <Link to={item.route} className="automation-review__btn automation-review__btn--ghost">
             Open
           </Link>
         ) : null}
-        <button
-          type="button"
-          className="automation-review__btn automation-review__btn--approve"
-          onClick={() => onApprove(task.id)}
-        >
-          Approve
-        </button>
-        <button
-          type="button"
-          className="automation-review__btn automation-review__btn--ghost"
-          onClick={() => onOverride(task.id)}
-        >
-          Override
-        </button>
-        <button
-          type="button"
-          className="automation-review__btn automation-review__btn--dismiss"
-          onClick={() => onDismiss(task.id)}
-        >
-          Dismiss
-        </button>
+        {item.oneClickAction === 'approve' ? (
+          <button
+            type="button"
+            className="automation-review__btn automation-review__btn--approve"
+            onClick={() => onApprove(item.id)}
+          >
+            Approve
+          </button>
+        ) : null}
+        {item.oneClickAction === 'acknowledge' ? (
+          <button
+            type="button"
+            className="automation-review__btn automation-review__btn--approve"
+            onClick={() => onAcknowledge(item.id)}
+          >
+            Acknowledge
+          </button>
+        ) : null}
+        {item.linkedTaskId ? (
+          <>
+            <button
+              type="button"
+              className="automation-review__btn automation-review__btn--ghost"
+              aria-label={`Override ${item.title}`}
+              onClick={() => onOverride(item.id)}
+            >
+              Override
+            </button>
+            <button
+              type="button"
+              className="automation-review__btn automation-review__btn--dismiss"
+              aria-label={`Dismiss ${item.title}`}
+              onClick={() => onDismiss(item.id)}
+            >
+              Dismiss
+            </button>
+          </>
+        ) : null}
       </div>
     </li>
   );
 }
 
 export function AdministrativeAutomationReviewPanel() {
-  const { snapshot, pendingTasks, review } = useAdministrativeAutomations();
-  const statusChart = useMemo(
-    () => buildAutomationStatusChart(snapshot.metrics),
-    [snapshot.metrics],
-  );
+  const workflow = useUnifiedWorkflowAutomation({ realtime: true });
+  const adminQueue = useEmergencyStore((state) => state.administrativeAutomationQueue);
+  const { user } = useUser();
+
+  const statusChart = useMemo(() => {
+    const items = workflow.items || [];
+    const metrics = {
+      pendingReview: workflow.pendingCount,
+      executedToday: items.filter((item) => item.status === 'executed').length,
+      overridden: 0,
+    };
+    return buildAutomationStatusChart(metrics);
+  }, [workflow.items, workflow.pendingCount]);
+
   const categoryChart = useMemo(
-    () => buildAutomationCategoryChart(snapshot.metrics.byCategory),
-    [snapshot.metrics.byCategory],
+    () =>
+      Object.entries(workflow.snapshot?.metrics?.byDomain || {})
+        .filter(([, count]) => count > 0)
+        .map(([domain, count]) => ({
+          name: DOMAIN_LABELS[domain as WorkflowAutomationItem['domain']] || domain,
+          value: count,
+        }))
+        .sort((left, right) => right.value - left.value),
+    [workflow.snapshot.metrics.byDomain],
   );
 
-  const handleApprove = (taskId: string) => {
-    void review({ taskId, decision: 'approve', executeOnApprove: true });
+  const linkedTaskById = useMemo(
+    () => new Map(adminQueue.map((task) => [task.id, task])),
+    [adminQueue],
+  );
+
+  const handleApprove = (itemId: string) => {
+    void workflow.reviewItem(itemId, 'approve');
   };
 
-  const handleDismiss = (taskId: string) => {
-    void review({ taskId, decision: 'dismiss', executeOnApprove: false });
+  const handleDismiss = (itemId: string) => {
+    void workflow.reviewItem(itemId, 'dismiss');
   };
 
-  const handleOverride = (taskId: string) => {
-    void review({
-      taskId,
-      decision: 'override',
+  const handleOverride = (itemId: string) => {
+    void workflow.reviewItem(itemId, 'override', {
       overrideReason: 'Clinician chose manual workflow instead of automated action.',
-      executeOnApprove: false,
     });
+  };
+
+  const handleAcknowledge = (itemId: string) => {
+    const actorId = user?.id || user?.email || user?.name || 'clinical-user';
+    workflow.acknowledgeItem(itemId, actorId);
   };
 
   return (
@@ -221,10 +265,10 @@ export function AdministrativeAutomationReviewPanel() {
         <div className="automation-review__header-lead">
           <GraphicIconBadge iconKey="shield-check" accent="brand" size="md" />
           <div>
-            <strong>Administrative automation queue</strong>
+            <strong>Unified workflow automation</strong>
             <p className="automation-review__lead">
-              {snapshot.metrics.pendingReview} pending review · unified orchestration across routing,
-              handoffs, summaries, triage prep, notifications, assignments, queue priority, and escalations
+              {workflow.pendingCount} pending review · reception, intake, triage, routing, notifications,
+              documentation, handoffs, staff assignments, analytics, reporting, and AI recommendations
             </p>
           </div>
         </div>
@@ -233,39 +277,43 @@ export function AdministrativeAutomationReviewPanel() {
       <div className="automation-review__charts dashboard-visual-grid">
         <VisualizationPanel
           title="Queue status"
-          description="Pending review versus executed and overridden automations."
+          description="Pending review versus executed workflow automations."
           badge="Status"
         >
           <DistributionDonutChart
             data={statusChart}
-            title="Automation queue status"
-            emptyMessage="No automation queue activity yet."
+            title="Workflow automation status"
+            emptyMessage="No workflow automation activity yet."
           />
         </VisualizationPanel>
         <VisualizationPanel
-          title="By category"
-          description="Automation workload grouped by orchestration category."
-          badge="Category"
+          title="By domain"
+          description="Automation workload grouped by hospital workflow domain."
+          badge="Domains"
         >
           <CategoryBarChart
             data={categoryChart}
-            title="Automation categories"
+            title="Workflow domains"
             xKey="name"
             color="var(--app-chart-5)"
-            emptyMessage="No category workload to chart."
+            emptyMessage="No domain workload to chart."
           />
         </VisualizationPanel>
       </div>
 
-      {pendingTasks.length === 0 ? (
-        <p className="automation-review__empty">No administrative automations awaiting clinician review.</p>
+      {workflow.pendingItems.length === 0 ? (
+        <p className="automation-review__empty">No workflow automations awaiting clinician review.</p>
       ) : (
         <ul className="automation-review__list">
-          {pendingTasks.slice(0, 8).map((task) => (
-            <AutomationRow
-              key={task.id}
-              task={task}
+          {workflow.pendingItems.slice(0, 8).map((item) => (
+            <WorkflowRow
+              key={item.id}
+              item={item}
+              aiDecision={readAiDecision(
+                item.linkedTaskId ? linkedTaskById.get(item.linkedTaskId) : undefined,
+              )}
               onApprove={handleApprove}
+              onAcknowledge={handleAcknowledge}
               onDismiss={handleDismiss}
               onOverride={handleOverride}
             />
@@ -274,7 +322,7 @@ export function AdministrativeAutomationReviewPanel() {
       )}
 
       <p className="automation-review__safety" role="note">
-        {snapshot.safetyStatement}
+        {workflow.snapshot.safetyStatement}
       </p>
     </div>
   );

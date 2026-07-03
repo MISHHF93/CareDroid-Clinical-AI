@@ -167,7 +167,7 @@ describe('primaryNavigation', () => {
 
   it('keeps only canonical CareDroid sidebar surfaces primary', () => {
     const expected = [
-      ['/emergency', 'whiteboard'],
+      ['/emergency', 'reception'],
       ['/emergency/whiteboard', 'whiteboard'],
       ['/emergency/intake', undefined],
       ['/emergency/ems', 'ems'],

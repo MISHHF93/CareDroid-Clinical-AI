@@ -1,3 +1,5 @@
+> **SUPERSEDED** — Use [docs/generated/ai-capabilities.md](../generated/ai-capabilities.md). Regenerate: `npm run docs:generate`
+
 # AI Chief Spec
 
 **Status:** 16 of 16 intents implemented. All handlers exist in `lib/ai/careDroidAI.ts` (root, not `src/lib/`).  

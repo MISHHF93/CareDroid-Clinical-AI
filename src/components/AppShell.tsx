@@ -1,6 +1,7 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useLocation, useNavigate, type To } from 'react-router-dom';
 import CareDroidToastHost from './CareDroidToastHost';
+import { ConfirmDialogProvider } from './ui/ConfirmDialogProvider';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import ErrorBoundary from './ErrorBoundary';
@@ -9,6 +10,10 @@ import { startReassessmentEngine } from '../engine/reassessmentEngine';
 import { startCapacityEngine } from '../engine/capacityEngine';
 import { startContinuousPatientFlowEngine } from '../engine/continuousPatientFlowEngine';
 import { startAdministrativeAutomationEngine } from '../engine/administrativeAutomationEngine';
+import { startUnifiedWorkflowAutomationEngine } from '../engine/unifiedWorkflowAutomationEngine';
+import { startUnifiedOperationalIntelligenceEngine } from '../engine/unifiedOperationalIntelligenceEngine';
+import { startUnifiedApplicationKnowledgeGraphEngine } from '../engine/unifiedApplicationKnowledgeGraphEngine';
+import { startLivingDocumentationEngine } from '../engine/livingDocumentationEngine';
 import { fetchCareDroidCentralNodeSnapshot } from '../services/emergencyOsApi';
 import { probeBackendReachability, isBackendKnownOffline } from '../services/backendReachability';
 import { ensureDevBackendSession } from '../services/devBackendAuth';
@@ -40,6 +45,11 @@ import { useSimulationMode } from '../contexts/SimulationModeContext';
 import { useUserIdentity } from '../contexts/UserIdentityContext';
 import { isSimulationModeActive } from '../services/simulationModeService';
 import SessionChromeBar from './chrome/SessionChromeBar';
+import HospitalJourneyCommandBar from './emergency/HospitalJourneyCommandBar';
+import AiChiefOrchestrationBar from './ai/AiChiefOrchestrationBar';
+import ThreeMinuteMissionBar from './emergency/ThreeMinuteMissionBar';
+import WorkflowAutomationCommandBar from './emergency/WorkflowAutomationCommandBar';
+import UnifiedOperationalIntelligenceCommandBar from './emergency/UnifiedOperationalIntelligenceCommandBar';
 import ShellRouteTab from './chrome/ShellRouteTab';
 import OperationalAlarmDock from './chrome/OperationalAlarmDock';
 import { RouteChromeProvider, useRouteChrome } from '../contexts/RouteChromeContext';
@@ -226,13 +236,15 @@ function buildEmergencyToolsPath(params: Record<string, string | null | undefine
 
 export function AppShell({ children }: AppShellProps) {
   return (
-    <PractitionerVisibilityProvider>
-      <HelpHubProvider>
-        <NotificationShellProvider>
-          <AppShellFrame>{children}</AppShellFrame>
-        </NotificationShellProvider>
-      </HelpHubProvider>
-    </PractitionerVisibilityProvider>
+    <ConfirmDialogProvider>
+      <PractitionerVisibilityProvider>
+        <HelpHubProvider>
+          <NotificationShellProvider>
+            <AppShellFrame>{children}</AppShellFrame>
+          </NotificationShellProvider>
+        </HelpHubProvider>
+      </PractitionerVisibilityProvider>
+    </ConfirmDialogProvider>
   );
 }
 
@@ -286,14 +298,13 @@ function AppShellFrame({ children }: AppShellProps) {
   const copilotOpen = useEmergencyStore((state) => state.copilotOpen);
   const toggleCopilot = useEmergencyStore((state) => state.toggleCopilot);
   const setCopilotOpen = useEmergencyStore((state) => state.setCopilotOpen);
-  const patients = useEmergencyStore((state) => state.patients);
-  const { active: simulationModeActive } = useSimulationMode();
-
-
-  const reassessmentCount = useMemo(
-    () => patients.filter(isPatientFlaggedForReassessment).length,
-    [patients],
+  const reassessmentCount = useEmergencyStore((state) =>
+    state.patients.reduce(
+      (count, patient) => count + (isPatientFlaggedForReassessment(patient) ? 1 : 0),
+      0,
+    ),
   );
+  const { active: simulationModeActive } = useSimulationMode();
   const { canUseCopilot, showSessionCopilot, hiddenOnReception } = useCopilotChromeAccess();
   const { saasRole, profileCopy } = useEffectiveUserProfile();
   const copilotChrome = useMemo(() => resolveCopilotChromeLabels(profileCopy), [profileCopy]);
@@ -345,6 +356,18 @@ function AppShellFrame({ children }: AppShellProps) {
     let stopRealtime: (() => void) | undefined;
 
     bootstrapAiPlatformIntegrations();
+    let stopObservabilityHeartbeat: (() => void) | undefined;
+    void import('../services/observabilityService').then(({ default: observabilityService }) => {
+      if (cancelled) return;
+      stopObservabilityHeartbeat = observabilityService.startDiagnosticsHeartbeat(120_000);
+      observabilityService.recordEvent({
+        category: 'health',
+        name: 'app_shell_mounted',
+        severity: 'info',
+        source: 'AppShell',
+        metadata: { route: location.pathname },
+      });
+    });
     void (async () => {
       await ensureDevBackendSession();
       const backendReachable = await probeBackendReachability();
@@ -405,6 +428,16 @@ function AppShellFrame({ children }: AppShellProps) {
     const administrativeAutomationInterval = screenCapabilities.showAdministrativeAutomationEngine
       ? startAdministrativeAutomationEngine()
       : undefined;
+    const stopUnifiedWorkflowAutomation = screenCapabilities.showAdministrativeAutomationEngine
+      ? startUnifiedWorkflowAutomationEngine()
+      : undefined;
+    const stopUnifiedOperationalIntelligence = screenCapabilities.showOperationalIntelligenceEngine
+      ? startUnifiedOperationalIntelligenceEngine()
+      : undefined;
+    const stopUnifiedApplicationKnowledgeGraph = screenCapabilities.showOperationalIntelligenceEngine
+      ? startUnifiedApplicationKnowledgeGraphEngine()
+      : undefined;
+    const stopLivingDocumentation = startLivingDocumentationEngine();
     const alertsInterval = window.setInterval(() => {
       useEmergencyStore.getState().updateAlerts();
       void import('../services/alertLifecycleOrchestrator').then(({ checkUnacknowledgedAlertEscalations }) =>
@@ -422,6 +455,7 @@ function AppShellFrame({ children }: AppShellProps) {
 
     return () => {
       cancelled = true;
+      stopObservabilityHeartbeat?.();
       stopRealtime?.();
       if (reassessmentInterval !== undefined) window.clearInterval(reassessmentInterval);
       if (capacityInterval !== undefined) window.clearInterval(capacityInterval);
@@ -429,6 +463,10 @@ function AppShellFrame({ children }: AppShellProps) {
       if (administrativeAutomationInterval !== undefined) {
         window.clearInterval(administrativeAutomationInterval);
       }
+      stopUnifiedWorkflowAutomation?.();
+      stopUnifiedOperationalIntelligence?.();
+      stopUnifiedApplicationKnowledgeGraph?.();
+      stopLivingDocumentation?.();
       window.clearInterval(alertsInterval);
       stopSimulation?.();
       startupStartedRef.current = false;
@@ -437,6 +475,7 @@ function AppShellFrame({ children }: AppShellProps) {
     screenCapabilities.showCapacityEngine,
     screenCapabilities.showReassessmentEngine,
     screenCapabilities.showPatientFlowEngine,
+    screenCapabilities.showOperationalIntelligenceEngine,
     screenCapabilities.showAdministrativeAutomationEngine,
     simulationModeActive,
   ]);
@@ -781,6 +820,7 @@ function AppShellFrame({ children }: AppShellProps) {
     <div
       className={[
         'emergency-app-shell',
+        'cdl-shell',
         screenDensityShellClassName(screenCapabilities.screenMode),
         isPublicWaitingKiosk ? 'emergency-app-shell--public-waiting-kiosk' : '',
         isReadOnlyWhiteboardKiosk ? 'emergency-app-shell--read-only-whiteboard-kiosk' : '',
@@ -807,6 +847,15 @@ function AppShellFrame({ children }: AppShellProps) {
               <Header />
               <ShellRouteTab title={currentPage.label} subtitle={currentPage.subtitle} />
               <OperationalAlarmDock showEmsInbound={screenCapabilities.showEmsCriticalOverlay} />
+              {!useKioskShell ? (
+                <section aria-label="Operational command bars">
+                  <HospitalJourneyCommandBar />
+                  <AiChiefOrchestrationBar />
+                  <UnifiedOperationalIntelligenceCommandBar />
+                  <ThreeMinuteMissionBar />
+                  <WorkflowAutomationCommandBar />
+                </section>
+              ) : null}
               {!useKioskShell ? <SessionChromeBar /> : null}
             </>
           )}

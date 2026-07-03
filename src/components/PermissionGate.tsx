@@ -1,6 +1,7 @@
 import React from 'react';
 import { useUser } from '../contexts/UserContext';
 import { resolveHospitalRole } from '../lib/users/canonicalAccess';
+import useSecurityAccess from '../hooks/useSecurityAccess';
 import logger from '../utils/logger';
 
 /**
@@ -55,18 +56,18 @@ const PermissionGate = ({
   children, 
   fallback = null 
 }) => {
-  const { hasPermission, hasAnyPermission, hasAllPermissions } = useUser();
+  const { can, canAny, canAll } = useSecurityAccess();
 
   // Handle single permission
   if (typeof permission === 'string') {
-    return hasPermission(permission) ? <>{children}</> : <>{fallback}</>;
+    return can(permission) ? <>{children}</> : <>{fallback}</>;
   }
 
   // Handle array of permissions
   if (Array.isArray(permission)) {
     const hasAccess = requireAll 
-      ? hasAllPermissions(permission) 
-      : hasAnyPermission(permission);
+      ? canAll(permission) 
+      : canAny(permission);
     
     return hasAccess ? <>{children}</> : <>{fallback}</>;
   }

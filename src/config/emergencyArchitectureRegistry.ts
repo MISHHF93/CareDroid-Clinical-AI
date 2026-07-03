@@ -268,7 +268,7 @@ export const EMERGENCY_ARCHITECTURE_REGISTRY: readonly EmergencyArchitectureArti
   },
   {
     id: 'layout-app-shell',
-    path: 'src/layout/AppShell.tsx',
+    path: 'src/layouts/AppShell.tsx',
     classification: EMERGENCY_ARCHITECTURE_CLASSIFICATION.LEGACY,
     canonical: 'src/components/AppShell.tsx',
   },

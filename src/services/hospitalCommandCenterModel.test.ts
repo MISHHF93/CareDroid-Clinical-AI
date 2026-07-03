@@ -64,6 +64,69 @@ describe('hospitalCommandCenterModel', () => {
     expect(snapshot.statusLine.length).toBeGreaterThan(0);
   });
 
+  it('prefers backend unified operational intelligence for bottlenecks and recommendations', () => {
+    const snapshot = buildHospitalCommandCenterSnapshot({
+      unifiedOperationalSnapshot: {
+        engineId: 'unified-operational-intelligence',
+        generatedAt: '2026-07-03T12:00:00.000Z',
+        source: 'backend',
+        domainStatuses: [],
+        insights: [
+          {
+            id: 'uoi-bottleneck-1',
+            domain: 'patient_flow',
+            type: 'bottleneck',
+            title: 'Backend queue bottleneck',
+            summary: 'Derived from backend evaluate event.',
+            severity: 'warning',
+            ownerRole: 'charge_nurse',
+            reasonCodes: ['queue_breach'],
+            confidence: 0.9,
+            humanReviewRequired: true,
+            advisoryOnly: true,
+            source: 'backend',
+            updatedAt: '2026-07-03T12:00:00.000Z',
+          },
+          {
+            id: 'uoi-rec-1',
+            domain: 'ai_recommendations',
+            type: 'intervention',
+            title: 'Review triage queue',
+            summary: 'Backend intervention recommendation.',
+            severity: 'info',
+            route: '/emergency/queues',
+            ownerRole: 'ed_manager',
+            reasonCodes: ['queue_breach'],
+            confidence: 0.88,
+            humanReviewRequired: true,
+            advisoryOnly: true,
+            source: 'backend',
+            updatedAt: '2026-07-03T12:00:00.000Z',
+          },
+        ],
+        metrics: {
+          activePatients: 8,
+          waitingPatients: 2,
+          capacityScore: 70,
+          capacityBand: 'Orange',
+          inboundEms: 1,
+          activeBottlenecks: 1,
+          unresolvedAlerts: 0,
+          degradedServices: 0,
+          workflowPendingReview: 0,
+          aiRecommendationCount: 1,
+          congestionPredictions: 0,
+        },
+        safetyStatement: 'Advisory only.',
+        backendEndpoints: [],
+      },
+    });
+
+    expect(snapshot.bottlenecks[0]?.title).toBe('Backend queue bottleneck');
+    expect(snapshot.aiRecommendations[0]?.action).toBe('Review triage queue');
+    expect(snapshot.metrics.find((metric) => metric.id === 'service-bottlenecks')?.value).toBe(1);
+  });
+
   it('filters metrics by role priority order', () => {
     const snapshot = buildHospitalCommandCenterSnapshot();
     const triageIds = resolveHospitalCommandMetricsForRole(EMERGENCY_ROLE_IDS.triageNurse);

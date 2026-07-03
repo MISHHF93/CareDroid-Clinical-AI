@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import StaffWorkloadPanel, {
   detectWorkloadImbalance,
@@ -10,7 +10,8 @@ import StaffWorkloadPanel, {
 import { PatientState, Priority, type Patient, type Staff } from '../types/emergency';
 
 const mocks = vi.hoisted(() => ({
-  toastSuccess: vi.fn(),
+  showActionSuccess: vi.fn(),
+  confirmCareDroidAction: vi.fn(async () => true),
   storeState: {
     staff: [] as Staff[],
     patients: [] as Patient[],
@@ -19,10 +20,9 @@ const mocks = vi.hoisted(() => ({
   },
 }));
 
-vi.mock('sonner', () => ({
-  toast: {
-    success: mocks.toastSuccess,
-  },
+vi.mock('../services/careDroidInteractionFeedback', () => ({
+  confirmCareDroidAction: mocks.confirmCareDroidAction,
+  showActionSuccess: mocks.showActionSuccess,
 }));
 
 vi.mock('../services/careDroidUnifiedAiNode', () => ({
@@ -69,7 +69,8 @@ function patient(overrides: Partial<Patient> = {}): Patient {
 afterEach(() => {
   setMockStoreState([], []);
   vi.restoreAllMocks();
-  mocks.toastSuccess.mockClear();
+  mocks.showActionSuccess.mockClear();
+  mocks.confirmCareDroidAction.mockClear();
 });
 
 describe('StaffWorkloadPanel helpers', () => {
@@ -142,12 +143,10 @@ describe('StaffWorkloadPanel helpers', () => {
 });
 
 describe('StaffWorkloadPanel reassignment', () => {
-  it('confirms, assigns staff, writes a system note, and shows a toast', () => {
+  it('confirms, assigns staff, writes a system note, and shows a toast', async () => {
     const drSingh = staffMember({ id: 'staff-a', name: 'Dr. Singh' });
     const drPark = staffMember({ id: 'staff-b', name: 'Dr. Park' });
     const marcus = patient({ id: 'patient-1', name: 'Marcus Chen', assignedStaffId: drSingh.id });
-    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
-
     setMockStoreState([drSingh, drPark], [marcus]);
 
     render(<StaffWorkloadPanel open onClose={vi.fn()} />);
@@ -158,8 +157,16 @@ describe('StaffWorkloadPanel reassignment', () => {
       target: { value: drPark.id },
     });
 
+    await waitFor(() => {
+      expect(mocks.confirmCareDroidAction).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: 'Reassign patient?',
+          message: 'Move Marcus Chen from Dr. Singh to Dr. Park.',
+        }),
+      );
+    });
+
     const updatedPatient = mocks.storeState.patients.find((candidate) => candidate.id === marcus.id);
-    expect(confirmSpy).toHaveBeenCalledWith('Reassign Marcus Chen from Dr. Singh to Dr. Park?');
     expect(updatedPatient?.assignedStaffId).toBe(drPark.id);
     expect(updatedPatient?.notes).toEqual(
       expect.arrayContaining([
@@ -169,7 +176,7 @@ describe('StaffWorkloadPanel reassignment', () => {
         }),
       ]),
     );
-    expect(mocks.toastSuccess).toHaveBeenCalledWith('Marcus Chen reassigned to Dr. Park');
+    expect(mocks.showActionSuccess).toHaveBeenCalledWith('Marcus Chen reassigned to Dr. Park');
   });
 });
 

@@ -1,7 +1,0 @@
----
-pid: 29356
-cwd: "C:\Users\borah\CareDroid-Clinical-AI"
-command: "Start-Sleep -Seconds 900; foreach ($f in @('109','110','111','102')) { Write-Host \"`n=== terminals\\$f.txt tail ===\"; Get-Content \"C:\\Users\\borah\\CareDroid-Clinical-AI\\terminals\\$f.txt\" -Tail 40 }"
-started_at: 2026-06-30T22:30:43.207Z
-running_for_ms: 375015   
----

@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Logger, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthorizationGuard } from '../auth/guards/authorization.guard';
 import { RequirePermission } from '../auth/decorators/permissions.decorator';
@@ -35,6 +35,8 @@ interface CrashReportDto {
 
 @Controller()
 export class AnalyticsController {
+  private readonly logger = new Logger(AnalyticsController.name);
+
   constructor(private readonly analyticsService: AnalyticsService) {}
 
   @Post('analytics/events')
@@ -93,9 +95,22 @@ export class AnalyticsController {
 
   @Post('crashes')
   async submitCrashReport(@Body() report: CrashReportDto): Promise<{ id: string; status: string }> {
+    const error = report.error || { name: 'Error', message: 'Unknown error', stack: [] };
+    this.logger.error(`Client crash ${report.id}: ${error.message}`, error.stack?.join('\n'));
+
+    await this.analyticsService.trackEvent('client_crash', undefined, report.sessionId, {
+      crashId: report.id,
+      errorName: error.name,
+      errorMessage: error.message,
+      environment: report.environment,
+      breadcrumbCount: report.breadcrumbs?.length || 0,
+      componentStack: (report as { componentStack?: string }).componentStack,
+      correlationId: (report as { correlationId?: string }).correlationId,
+    });
+
     return {
       id: report.id,
-      status: 'submitted',
+      status: 'recorded',
     };
   }
 

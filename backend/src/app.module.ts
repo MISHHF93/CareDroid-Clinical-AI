@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ThrottlerModule } from '@nestjs/throttler';
@@ -85,6 +86,7 @@ import { NativeAiModule } from './modules/native-ai/native-ai.module';
 // Monitoring & Observability
 import { LoggerModule } from './modules/common/logger.module';
 import { MetricsModule } from './modules/metrics/metrics.module';
+import { HttpMetricsInterceptor } from './common/interceptors/http-metrics.interceptor';
 
 function resolveDatabaseClient() {
   const config = getEnvironmentConfig();
@@ -240,6 +242,11 @@ function resolveDatabaseClient() {
     RAGModule,
   ],
   controllers: [AppController],
-  providers: [],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: HttpMetricsInterceptor,
+    },
+  ],
 })
 export class AppModule {}

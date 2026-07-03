@@ -1,3 +1,4 @@
+import { HUMAN_REVIEW_DISCLAIMER } from '../../../lib/ai/safetyPolicy';
 import { AIGovernanceService } from './ai-governance.service';
 
 describe('AIGovernanceService', () => {
@@ -20,7 +21,7 @@ describe('AIGovernanceService', () => {
         'mohPatientMatching',
       ]),
     );
-    expect(snapshot.safetyRules.requiredDisclaimers).toContain('Human review required');
+    expect(snapshot.safetyRules.requiredDisclaimers).toContain(HUMAN_REVIEW_DISCLAIMER);
     expect(snapshot.governanceFrameworks).toContain('NIST AI RMF');
   });
 

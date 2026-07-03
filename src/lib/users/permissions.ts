@@ -169,6 +169,7 @@ export const ROLE_PERMISSIONS: Readonly<Record<HospitalRole, readonly CareDroidP
       P.ALERT_READ,
       P.STAFF_READ,
       P.SETTINGS_READ,
+      P.ANALYTICS_READ,
     ]),
 
     patient_flow_coordinator: Object.freeze([
@@ -177,7 +178,7 @@ export const ROLE_PERMISSIONS: Readonly<Record<HospitalRole, readonly CareDroidP
       P.AI_READ,
       P.ALERT_READ, P.ALERT_ACKNOWLEDGE, P.ALERT_ESCALATE,
       P.STAFF_READ, P.STAFF_ASSIGN,
-      P.ANALYTICS_READ,
+      P.ANALYTICS_READ, P.REPORTS_READ,
     ]),
 
     lab_technician: Object.freeze([
@@ -214,11 +215,14 @@ export const ROLE_PERMISSIONS: Readonly<Record<HospitalRole, readonly CareDroidP
     ]),
 
     it_admin: Object.freeze([
+      P.PATIENT_READ,
       P.SETTINGS_READ, P.SETTINGS_UPDATE,
       P.USERS_READ, P.USERS_CREATE, P.USERS_UPDATE,
       P.AI_READ, P.AI_CONFIGURE,
       P.ALERT_READ,
       P.AUDIT_READ,
+      P.ANALYTICS_READ,
+      P.REPORTS_READ,
     ]),
 
     quality_safety_officer: Object.freeze([

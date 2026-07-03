@@ -32,7 +32,7 @@ export class FirebaseService implements OnModuleInit {
           'Firebase credentials not configured. Push notifications will fail. ' +
           'Set FIREBASE_SERVICE_ACCOUNT or GOOGLE_APPLICATION_CREDENTIALS environment variable.';
         if (process.env.NODE_ENV === 'development') {
-          this.logger.log(message);
+          this.logger.debug('Push notifications disabled in local dev (Firebase not configured).');
         } else {
           this.logger.warn(message);
         }

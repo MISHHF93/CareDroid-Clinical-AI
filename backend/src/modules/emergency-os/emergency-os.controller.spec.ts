@@ -34,6 +34,10 @@ import { ClinicalDecisionSupportService } from './clinical-decision-support.serv
 import { EmergencyPatientAuditService } from './emergency-patient-audit.service';
 import { PatientOrchestrationService } from './emergency-os.orchestration.service';
 import { PatientDocumentArtifactService } from './patient-document-artifact.service';
+import { PatientFlowService } from './emergency-os.patient-flow.service';
+import { WorkflowOrchestrationService } from './emergency-os.workflow-orchestration.service';
+import { EmergencyOperatingSurfacesService } from './emergency-os.operating-surfaces.service';
+import { EntitlementService } from '../platform-assets/entitlement.service';
 
 describe('EmergencyOsController', () => {
   let controller: EmergencyOsController;
@@ -68,6 +72,15 @@ describe('EmergencyOsController', () => {
         EmergencyOsUpgradeHarnessService,
         ClinicalDecisionSupportService,
         EmergencyPatientAuditService,
+        PatientFlowService,
+        WorkflowOrchestrationService,
+        EmergencyOperatingSurfacesService,
+        {
+          provide: EntitlementService,
+          useValue: {
+            assertLaunchAllowed: jest.fn().mockResolvedValue(undefined),
+          },
+        },
         {
           provide: PatientOrchestrationService,
           useValue: {
@@ -100,7 +113,7 @@ describe('EmergencyOsController', () => {
     controller = moduleRef.get(EmergencyOsController);
   });
 
-  it('returns backend envelopes for all normalized CareDroid modules', () => {
+  it('returns backend envelopes for all normalized CareDroid modules', async () => {
     const modules = [
       controller.getWhiteboard(),
       controller.getCentralNodeSnapshot(),
@@ -118,7 +131,7 @@ describe('EmergencyOsController', () => {
       controller.getReferrals(),
       controller.getProvincialHealth(),
       controller.getIntegrations(),
-      controller.getCopilot(),
+      await controller.getCopilot(),
       controller.getAnalytics(),
       controller.getSettings(),
       controller.getImplementationReadiness(),
@@ -205,7 +218,7 @@ describe('EmergencyOsController', () => {
     });
     controller.getProvincialHealth();
     controller.getIntegrations();
-    controller.getCopilot();
+    await controller.getCopilot();
 
     const logs = controller.getWorkflowLogs().data.logs;
     expect(logs).toEqual(

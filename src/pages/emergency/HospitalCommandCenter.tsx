@@ -8,20 +8,23 @@ import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { resolveUnifiedMetricRoute } from '../../config/unifiedOperationalIntelligence.registry';
 import { CARE_DROID_SCREEN_MODES } from '../../config/careDroidScreenModeRegistry';
 import { CAREDROID_PRODUCT } from '../../config/caredroidProduct.config';
-import { buildCommandCenterWorkflowActions } from '../../config/operationalWorkflow.config';
+
 import {
   resolveHospitalCommandMetricsForRole,
   resolveHospitalCommandRoleLabel,
 } from '../../config/hospitalCommandCenterRolePolicy';
 import { useEmergencyStore } from '../../store/emergencyStore';
-import { useOperationalIntelligence } from '../../hooks/useOperationalIntelligence';
+import useAiChiefOrchestrator from '../../hooks/useAiChiefOrchestrator';
+import useUnifiedOperationalIntelligence from '../../hooks/useUnifiedOperationalIntelligence';
+import useUnifiedWorkflowAutomation from '../../hooks/useUnifiedWorkflowAutomation';
+import { mapUnifiedWorkflowItemsToCommandActions } from '../../services/unifiedWorkflowPresentation';
 import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermissions';
 import { useEmergencyAnalytics } from '../../hooks/useEmergencyOs';
 import {
   buildHospitalCommandCenterSnapshot,
   filterHospitalCommandMetrics,
 } from '../../services/hospitalCommandCenterModel';
-import { buildFullEmergencyCareJourneySnapshot } from '../../services/fullEmergencyCareJourneyService';
+
 import EdDataSourceBanner from '../../components/emergency/EdDataSourceBanner';
 import useEdRouteDataContext from '../../hooks/useEdRouteDataContext';
 import useUnifiedOperatingSurface from '../../hooks/useUnifiedOperatingSurface';
@@ -31,6 +34,9 @@ import { EmergencyRoutePage } from './emergencyRouteShared';
 import PatientFlowStatusPanel from '../../components/emergency/PatientFlowStatusPanel';
 import AdministrativeAutomationReviewPanel from '../../components/emergency/AdministrativeAutomationReviewPanel';
 import CommandCenterInsightsCharts from '../../components/emergency/CommandCenterInsightsCharts';
+import UnifiedOperationalIntelligencePanel from '../../components/emergency/UnifiedOperationalIntelligencePanel';
+import UnifiedApplicationKnowledgeGraphPanel from '../../components/emergency/UnifiedApplicationKnowledgeGraphPanel';
+
 import './hospital-command-center.css';
 
 export default function HospitalCommandCenter() {
@@ -48,10 +54,13 @@ export default function HospitalCommandCenter() {
   const emergencySettings = useEmergencyStore((state) => state.emergencySettings);
   const patientFlowSnapshot = useEmergencyStore((state) => state.patientFlowSnapshot);
   const administrativeAutomationQueue = useEmergencyStore((state) => state.administrativeAutomationQueue);
-  const operationalIntelligence = useOperationalIntelligence({
+  const aiChief = useAiChiefOrchestrator({
     screenMode: CARE_DROID_SCREEN_MODES.commandCenter,
     realtime: true,
   });
+  const unifiedWorkflow = useUnifiedWorkflowAutomation({ realtime: true });
+  const unifiedOperationalIntelligence = useUnifiedOperationalIntelligence({ realtime: true });
+  const operationalIntelligence = aiChief.operationalIntelligence;
   const emergencyAnalytics = useEmergencyAnalytics();
 
   const snapshot = useMemo(
@@ -72,6 +81,8 @@ export default function HospitalCommandCenter() {
             | undefined) || [],
         patientFlowSnapshot,
         administrativeAutomationQueue,
+        knowledgeGraphSummary: aiChief.knowledgeGraphSummary,
+        unifiedOperationalSnapshot: unifiedOperationalIntelligence.unifiedSnapshot,
       }),
     [
       alerts,
@@ -83,6 +94,8 @@ export default function HospitalCommandCenter() {
       operationalIntelligence.snapshot,
       patientFlowSnapshot,
       administrativeAutomationQueue,
+      aiChief.knowledgeGraphSummary,
+      unifiedOperationalIntelligence.unifiedSnapshot,
       patients,
       referrals,
       staff,
@@ -99,22 +112,10 @@ export default function HospitalCommandCenter() {
     [snapshot, visibleMetricIds],
   );
 
-  const workflowActions = useMemo(() => {
-    const journey = buildFullEmergencyCareJourneySnapshot({
-      patients,
-      staff,
-      emsArrivals,
-      alerts,
-      capacity,
-    });
-    return buildCommandCenterWorkflowActions({
-      dispatch: journey.liveServiceSummaries.dispatch,
-      readiness: journey.liveServiceSummaries.readiness,
-      metrics: journey.metrics,
-      staffRouting: journey.liveServiceSummaries.staffRouting,
-      bottlenecks: journey.liveServiceSummaries.bottlenecks,
-    }).slice(0, 4);
-  }, [alerts, capacity, emsArrivals, patients, staff]);
+  const workflowActions = useMemo(
+    () => mapUnifiedWorkflowItemsToCommandActions(unifiedWorkflow.pendingItems, 6),
+    [unifiedWorkflow.pendingItems],
+  );
 
   const roleLabel = resolveHospitalCommandRoleLabel(emergencyRole.role);
 
@@ -202,6 +203,18 @@ export default function HospitalCommandCenter() {
           <section className="emergency-route-card cd-surface-card">
             <div className="emergency-route-section-card__header">
               <div>
+                <strong>Unified operational intelligence</strong>
+                <p className="emergency-route-section-card__lead">
+                  Backend-event-driven insights across patient flow, staffing, capacity, alerts,
+                  workflow metrics, service health, and AI recommendations.
+                </p>
+              </div>
+            </div>
+            <UnifiedOperationalIntelligencePanel />
+          </section>
+          <section className="emergency-route-card cd-surface-card">
+            <div className="emergency-route-section-card__header">
+              <div>
                 <strong>Continuous patient flow</strong>
                 <p className="emergency-route-section-card__lead">
                   Real-time workflow state, ownership, wait timers, bottlenecks, and AI next-step guidance.
@@ -213,10 +226,10 @@ export default function HospitalCommandCenter() {
           <section className="emergency-route-card cd-surface-card">
             <div className="emergency-route-section-card__header">
               <div>
-                <strong>Administrative automation review</strong>
+                <strong>Unified workflow automation</strong>
                 <p className="emergency-route-section-card__lead">
-                  Approve, modify, or override automated routing, handoffs, summaries, triage prep,
-                  notifications, assignments, queue priority, and escalations.
+                  One review queue for reception, intake, triage, routing, notifications, documentation,
+                  handoffs, staff assignments, analytics, reporting, and AI recommendations.
                 </p>
               </div>
             </div>
@@ -257,6 +270,18 @@ export default function HospitalCommandCenter() {
       }
       supportingContext={
         <div className="hospital-command-center__panels">
+          <section className="emergency-route-card cd-surface-card">
+            <div className="emergency-route-section-card__header">
+              <div>
+                <strong>Application knowledge graph</strong>
+                <p className="emergency-route-section-card__lead">
+                  Connected patients, staff, departments, alerts, workflows, services, queues, rooms,
+                  beds, diagnostics, and operational events.
+                </p>
+              </div>
+            </div>
+            <UnifiedApplicationKnowledgeGraphPanel />
+          </section>
           <section className="emergency-route-card cd-surface-card">
             <div className="emergency-route-section-card__header">
               <strong>Service bottlenecks</strong>

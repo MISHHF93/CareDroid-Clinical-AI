@@ -1,0 +1,236 @@
+/**
+ * CareDroid Design Language — unified application sweep.
+ * Final cascade layer: harmonizes every shell, page root, and chrome surface.
+ */
+
+@import './cdl-public-page.css';
+
+/* ══════════════════════════════════════════════════════════════════
+   Shell unification — one visual language across contexts
+   ══════════════════════════════════════════════════════════════════ */
+
+.emergency-app-shell.cdl-shell,
+.cdl-shell.emergency-app-shell {
+  /* class alias — emergency-app-shell remains canonical for tests */
+}
+
+.cdl-shell--entry .entry-shell__header {
+  min-height: var(--cdl-header-height, 56px);
+}
+
+.cdl-shell--display .display-shell {
+  background: var(--cdl-canvas-bg, var(--medical-surface-page));
+  color: var(--medical-ink);
+  font-family: var(--app-font-family-body);
+}
+
+.cdl-shell--display .display-shell__brand {
+  border-bottom: 1px solid var(--app-border);
+  background: var(--app-surface);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Responsive operational grid — canonical layout primitives
+   ══════════════════════════════════════════════════════════════════ */
+
+.cdl-grid {
+  display: grid;
+  gap: var(--cdl-panel-gap, var(--app-layout-panel-gap));
+  min-width: 0;
+  width: 100%;
+}
+
+.cdl-grid--metrics {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+}
+
+.cdl-grid--cards {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+}
+
+.cdl-grid--split {
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+}
+
+.cdl-grid--tools {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
+}
+
+@media (max-width: 900px) {
+  .cdl-grid--split {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Typography rhythm — scan hierarchy for operational surfaces
+   ══════════════════════════════════════════════════════════════════ */
+
+.cdl-type-display {
+  color: var(--app-text);
+  font-size: var(--app-type-display);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.cdl-type-heading {
+  color: var(--app-text);
+  font-size: var(--app-type-heading);
+  font-weight: 700;
+  line-height: var(--type-heading-line-height);
+}
+
+.cdl-type-subheading {
+  color: var(--app-text);
+  font-size: var(--app-type-subheading);
+  font-weight: 600;
+  line-height: var(--type-subheading-line-height);
+}
+
+.cdl-type-eyebrow {
+  color: var(--semantic-operational-status);
+  font-size: var(--app-type-caption);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cdl-type-muted {
+  color: var(--app-text-muted);
+  font-size: var(--app-type-small);
+  line-height: var(--type-small-line-height);
+}
+
+.cdl-type-mono {
+  font-family: var(--app-font-family-mono);
+  font-size: var(--app-type-mono);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Page template registry — every authenticated route family
+   ══════════════════════════════════════════════════════════════════ */
+
+.emergency-app-shell .app-shell-main-content :is(
+    .platform-entry,
+    .settings-page,
+    .platform-settings-page,
+    .notification-preferences-page,
+    .profile-settings-page,
+    .billing-page,
+    .usage-page,
+    .consent-flow-page,
+    .consent-history-page
+  ),
+.emergency-app-shell .app-shell-main-content .cd-page-shell.cdl-operational-page {
+  background: transparent;
+  gap: var(--cdl-zone-gap);
+}
+
+.settings-page,
+.platform-settings-page {
+  align-content: start;
+  display: grid;
+  gap: var(--cdl-zone-gap);
+  min-width: 0;
+  width: 100%;
+}
+
+.settings-page .settings-card__title,
+.settings-page h2 {
+  color: var(--app-text);
+  font-size: var(--app-type-heading);
+  font-weight: 700;
+  margin: 0;
+}
+
+.settings-page .settings-card__subtitle {
+  color: var(--app-text-muted);
+  font-size: var(--app-type-small);
+  line-height: 1.5;
+  margin: var(--app-space-xs) 0 0;
+}
+
+.settings-platform-strip,
+.settings-toggle-row,
+.settings-privacy-status {
+  border: 1px solid var(--cdl-clinical-border, var(--app-border));
+  border-radius: var(--cdl-clinical-radius, var(--app-radius-lg));
+  background: var(--app-surface);
+  box-shadow: var(--cdl-clinical-shadow-rest);
+}
+
+.platform-entry {
+  gap: var(--cdl-zone-gap);
+}
+
+.platform-entry__content {
+  display: grid;
+  gap: var(--cdl-zone-gap);
+}
+
+/* Version page inside / outside shell */
+.version-page {
+  gap: var(--cdl-zone-gap);
+}
+
+.version-page__hero,
+.version-page__item {
+  border-color: var(--cdl-clinical-border, var(--app-border));
+  box-shadow: var(--cdl-clinical-shadow-rest);
+}
+
+.version-page__button {
+  border-radius: var(--app-radius-md);
+  font-size: var(--app-type-small);
+  font-weight: 600;
+  min-height: var(--app-control-height-sm, 36px);
+  transition:
+    border-color var(--cdl-motion-fast) var(--cdl-motion-ease),
+    background-color var(--cdl-motion-fast) var(--cdl-motion-ease);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Navigation chrome — sidebar + header token alignment
+   ══════════════════════════════════════════════════════════════════ */
+
+.emergency-app-shell .sidebar {
+  background: var(--cdl-sidebar-bg, var(--app-surface));
+  border-right: 1px solid var(--cdl-sidebar-border, var(--app-border));
+}
+
+.emergency-app-shell .caredroid-header__topbar {
+  background: var(--cdl-header-bg, var(--app-surface));
+  border-bottom: 1px solid var(--cdl-header-border, var(--app-border));
+  min-height: var(--cdl-header-height, 56px);
+}
+
+.emergency-app-shell .sidebar-nav-item--active {
+  border-color: var(--semantic-information-border);
+  background: var(--semantic-information-bg);
+  color: var(--semantic-information);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   Interaction + accessibility — enterprise healthcare baseline
+   ══════════════════════════════════════════════════════════════════ */
+
+.cdl-shell :is(button, a, [role='button'], input, select, textarea):focus-visible,
+.cdl-public-page :is(button, a, [role='button']):focus-visible {
+  outline: var(--app-focus-ring);
+  outline-offset: 2px;
+}
+
+.cdl-interactive-target {
+  min-height: var(--app-control-height-md, 44px);
+  min-width: var(--app-control-height-md, 44px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cdl-shell *,
+  .cdl-public-page * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,5 +1,5 @@
 /**
- * Role-action matrix — canonical allowed / disabled / hidden / readonly states per role.
+ * Role-action matrix ï¿½ canonical allowed / disabled / hidden / readonly states per role.
  * Composes with emergencyPermissionRegistry grants and display context overrides.
  */
 import {
@@ -79,7 +79,7 @@ const X = 'hidden' as const;
 const R = 'readonly' as const;
 
 /**
- * Base role-action matrix — Receptionist, Triage Nurse, Charge Nurse, Physician,
+ * Base role-action matrix ï¿½ Receptionist, Triage Nurse, Charge Nurse, Physician,
  * EMS Handoff Nurse, Manager, Admin, Public Display.
  */
 export const EMERGENCY_ROLE_ACTION_MATRIX: Record<
@@ -139,6 +139,32 @@ export const EMERGENCY_ROLE_ACTION_MATRIX: Record<
     [H.publicDisplayPublish]: X,
   }),
   [EMERGENCY_ROLE_ID.emsUser]: Object.freeze({
+    [H.patientCreate]: A,
+    [H.demographicsEdit]: X,
+    [H.encounterCreate]: X,
+    [H.assignAcuity]: X,
+    [H.moveQueue]: X,
+    [H.completeReassessment]: X,
+    [H.completeEmsHandoff]: A,
+    [H.createReferral]: X,
+    [H.disposition]: X,
+    [H.settingsEdit]: X,
+    [H.publicDisplayPublish]: X,
+  }),
+  [EMERGENCY_ROLE_ID.dispatcher]: Object.freeze({
+    [H.patientCreate]: A,
+    [H.demographicsEdit]: X,
+    [H.encounterCreate]: X,
+    [H.assignAcuity]: X,
+    [H.moveQueue]: X,
+    [H.completeReassessment]: X,
+    [H.completeEmsHandoff]: X,
+    [H.createReferral]: X,
+    [H.disposition]: X,
+    [H.settingsEdit]: X,
+    [H.publicDisplayPublish]: X,
+  }),
+  [EMERGENCY_ROLE_ID.emsCoordinator]: Object.freeze({
     [H.patientCreate]: A,
     [H.demographicsEdit]: X,
     [H.encounterCreate]: X,

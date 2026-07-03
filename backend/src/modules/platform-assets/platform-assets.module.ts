@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuditLog } from '../audit/entities/audit-log.entity';
 import { AutomationAuditModule } from '../automation-audit/automation-audit.module';
@@ -48,7 +48,7 @@ import { ServiceLineArchitectureService } from './service-line-architecture.serv
       Product,
     ]),
     AutomationAuditModule,
-    FleetModule,
+    forwardRef(() => FleetModule),
     UserPreferencesModule,
   ],
   controllers: [PlatformAssetsController],

@@ -4,7 +4,7 @@ import {
   isBackendCapabilityEnabled,
   UNSUPPORTED_CAPABILITY_MESSAGE,
 } from '../config/backendApiCapabilities';
-import { useRolePermissions } from '../hooks/useRolePermissions';
+import useSecurityAccess from '../hooks/useSecurityAccess';
 import { useCareDroidUser } from '../hooks/useCareDroidUser';
 import { CAREDROID_PERMISSIONS } from '../lib/users/permissions';
 import { getCompiledRoleLabel } from '../lib/users/canonicalAccess';
@@ -54,7 +54,7 @@ function formatTime(date: Date): string {
 
 const ClinicalAlertsPage = () => {
   const alertsApiEnabled = isBackendCapabilityEnabled('clinicalAlerts');
-  const { can, isReadOnly, compiledProfile } = useRolePermissions();
+  const { can, readOnly: isReadOnly, compiledProfile } = useSecurityAccess();
   const { profile } = useCareDroidUser();
   const storeAlerts = useEmergencyStore((state) => state.alerts);
   const updateAlerts = useEmergencyStore((state) => state.updateAlerts);

@@ -1,7 +1,9 @@
-import React, { Suspense } from 'react';
+import './_routeTestMocks';
+import './_routeWorkflowTestMocks';
+import React, { Suspense, useEffect, useState } from 'react';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter, useLocation } from 'react-router-dom';
-import { vi } from 'vitest';
+import { beforeAll, vi } from 'vitest';
 import { ThemeProvider } from '../contexts/ThemeContext';
 import { UserProvider } from '../contexts/UserContext';
 import { NotificationProvider } from '../contexts/NotificationContext';
@@ -14,8 +16,30 @@ import { UserIdentityProvider } from '../contexts/UserIdentityContext';
 import { CostTrackingProvider } from '../contexts/CostTrackingContext';
 import { SystemConfigProvider } from '../contexts/SystemConfigContext';
 import { TenantContextProvider } from '../contexts/TenantContext';
-import { AppRoutes } from '../App';
 import { mockUserValue } from '../test/testRenderUtils';
+
+let appRoutesModulePromise: Promise<{ AppRoutes: React.ComponentType }> | null = null;
+
+export function preloadAppRoutesForTests() {
+  appRoutesModulePromise ??= import('../App');
+  return appRoutesModulePromise;
+}
+
+function LazyAppRoutes() {
+  const [AppRoutes, setAppRoutes] = useState<React.ComponentType | null>(null);
+
+  useEffect(() => {
+    void preloadAppRoutesForTests().then((module) => {
+      setAppRoutes(() => module.AppRoutes);
+    });
+  }, []);
+
+  if (!AppRoutes) {
+    return null;
+  }
+
+  return <AppRoutes />;
+}
 
 export const ROUTE_LOAD_TIMEOUT = 30000;
 
@@ -153,44 +177,6 @@ vi.mock('../contexts/UserIdentityContext', async (importOriginal) => {
       refreshMemoryFabricContext: vi.fn(),
       memoryFabricContext: null,
     }),
-  };
-});
-
-vi.mock('../hooks/useEmergencyRolePermissions', async (importOriginal) => {
-  const actual = await importOriginal() as any;
-  const mockEmergencyRole = {
-    role: 'physician',
-    roleLabel: 'Physician',
-    roleDescription: 'Test physician',
-    readOnly: false,
-    landingRoute: '/emergency/whiteboard',
-    defaultRoute: '/emergency/reception',
-    allowedRoutes: [],
-    allowedActions: [],
-    demoRoles: [],
-    permissionContext: {
-      screenMode: 'clinical_workstation',
-      displayParam: null,
-      readOnlyDisplayMode: false,
-      roleReadOnly: false,
-    },
-    canAccessRoute: () => true,
-    nearestRoute: (path) => path || '/emergency/whiteboard',
-    can: () => true,
-    canDisplay: () => true,
-    canMutate: () => true,
-    canMutateSurface: () => true,
-    presentAction: () => ({ visible: true, enabled: true, state: 'enabled', readOnly: false }),
-    actionState: () => 'enabled',
-    actionVisible: () => true,
-    actionEnabled: () => true,
-    actionReadOnly: () => false,
-    switchDemoRole: vi.fn(),
-  };
-  return {
-    ...actual,
-    useEmergencyRolePermissions: () => mockEmergencyRole,
-    default: () => mockEmergencyRole,
   };
 });
 
@@ -375,6 +361,10 @@ vi.mock('../components/EMSCriticalBroadcast', () => ({
   default: () => null,
 }));
 
+vi.mock('../components/EMSPipeline', () => ({
+  default: () => <div data-testid="ems-pipeline-stub">EMS pipeline</div>,
+}));
+
 vi.mock('../engine/capacityEngine', () => ({
   startCapacityEngine: () => 0,
   calculateCapacity: () => ({
@@ -413,9 +403,7 @@ vi.mock('../engine/continuousPatientFlowEngine', () => ({
   startContinuousPatientFlowEngine: () => 0,
 }));
 
-vi.mock('../engine/administrativeAutomationEngine', () => ({
-  startAdministrativeAutomationEngine: () => 0,
-}));
+
 
 vi.mock('../engine/simulation', () => ({
   startSimulation: vi.fn(),
@@ -513,7 +501,9 @@ vi.mock('../pages/PlatformNavigationPage', () => ({
 
 function LocationProbe() {
   const location = useLocation();
-  return <output data-testid="location">{`${location.pathname}${location.search}`}</output>;
+  return (
+    <output data-testid="location">{`${location.pathname}${location.search}${location.hash}`}</output>
+  );
 }
 
 export function AppRouteHarness({ initialPath }) {
@@ -532,7 +522,7 @@ export function AppRouteHarness({ initialPath }) {
                           <ConversationProvider>
                             <SystemConfigProvider>
                               <Suspense fallback={<div>Loading route</div>}>
-                                <AppRoutes />
+                                <LazyAppRoutes />
                                 <LocationProbe />
                               </Suspense>
                             </SystemConfigProvider>
@@ -558,3 +548,7 @@ export function renderRoute(initialPath) {
 export function findRouteHeading(name) {
   return screen.findByRole('heading', { name }, { timeout: ROUTE_LOAD_TIMEOUT });
 }
+
+beforeAll(async () => {
+  await preloadAppRoutesForTests();
+}, ROUTE_LOAD_TIMEOUT);

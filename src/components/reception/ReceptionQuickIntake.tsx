@@ -22,6 +22,7 @@ import {
   splitPatientName,
 } from '../../services/receptionQuickIntakeService';
 import { routeQuickIntakeThroughOrchestrator } from '../../services/receptionIntakeOrchestrator';
+import { confirmCareDroidAction } from '../../services/careDroidInteractionFeedback';
 import { completeReceptionHandoff } from '../../services/receptionHandoff';
 import HighRiskComplaintFlagSelector from './HighRiskComplaintFlagSelector';
 import './ReceptionQuickIntake.css';
@@ -172,7 +173,7 @@ export default function ReceptionQuickIntake({
     searchRef.current?.focus();
   };
 
-  const closeWithConfirm = () => {
+  const closeWithConfirm = async () => {
     if (!onClose) return;
     const hasDraft = Boolean(
       selectedPatient ||
@@ -184,7 +185,17 @@ export default function ReceptionQuickIntake({
         complaint.trim() ||
         quickNotes.trim(),
     );
-    if (!hasDraft || window.confirm('Discard this registration?')) onClose();
+    if (
+      !hasDraft ||
+      (await confirmCareDroidAction({
+        title: 'Discard registration?',
+        message: 'Unsaved registration details will be lost.',
+        confirmLabel: 'Discard',
+        tone: 'danger',
+      }))
+    ) {
+      onClose();
+    }
   };
 
   const submit = async (event?: FormEvent) => {

@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { useAdvancedEmergencyOsUpgradeHarness } from '../../hooks/useEmergencyOs';
 import useOperationalIntelligence from '../../hooks/useOperationalIntelligence';
+import useUnifiedApplicationKnowledgeGraph from '../../hooks/useUnifiedApplicationKnowledgeGraph';
+import UnifiedApplicationKnowledgeGraphPanel from '../../components/emergency/UnifiedApplicationKnowledgeGraphPanel';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import {
   filterOperationalMetrics,
@@ -84,6 +86,7 @@ export default function EmergencyAnalytics() {
   const patients = useEmergencyStore((state) => state.patients);
   const emergencySettings = useEmergencyStore((state) => state.emergencySettings);
   const operationalIntelligence = useOperationalIntelligence({ screenMode: 'COMMAND_CENTER_SCREEN' });
+  const { analyticsSummary } = useUnifiedApplicationKnowledgeGraph();
   const centralSnapshot = operationalIntelligence.centralSnapshot;
   const intelligenceSnapshot = operationalIntelligence.snapshot;
   const centralFreshness = formatCentralFreshness(centralSnapshot);
@@ -337,6 +340,42 @@ export default function EmergencyAnalytics() {
             </ChartCard>
           ) : null}
         </div>
+      </section>
+
+      <section
+        className="emergency-analytics__command-layer"
+        aria-label="Unified application knowledge graph analytics"
+      >
+        <header>
+          <div>
+            <span>Knowledge Graph</span>
+            <h2>Connected Operational Context</h2>
+          </div>
+          <strong>{analyticsSummary.nodeCount} entities · {analyticsSummary.edgeCount} relationships</strong>
+        </header>
+        <div className="emergency-analytics__grid">
+          <ChartCard title="Graph nodes" subtitle="Referenced operational entities">
+            <strong>{analyticsSummary.nodeCount}</strong>
+            <small className="emergency-analytics__source">
+              Patients {analyticsSummary.entityCounts.patient ?? 0} · staff {analyticsSummary.entityCounts.staff ?? 0} · alerts{' '}
+              {analyticsSummary.entityCounts.alert ?? 0}
+            </small>
+          </ChartCard>
+          <ChartCard title="Graph edges" subtitle="Cross-module relationships">
+            <strong>{analyticsSummary.edgeCount}</strong>
+            <small className="emergency-analytics__source">
+              Workflows {analyticsSummary.entityCounts.workflow ?? 0} · events {analyticsSummary.entityCounts.operational_event ?? 0}
+            </small>
+          </ChartCard>
+          <ChartCard title="Critical signals" subtitle="Connected high-severity graph nodes">
+            <strong>{analyticsSummary.connectedCriticalSignals}</strong>
+            <small className="emergency-analytics__source">
+              AI recommendations {analyticsSummary.entityCounts.ai_recommendation ?? 0} · services{' '}
+              {analyticsSummary.entityCounts.service ?? 0}
+            </small>
+          </ChartCard>
+        </div>
+        <UnifiedApplicationKnowledgeGraphPanel />
       </section>
 
       <section

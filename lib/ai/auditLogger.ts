@@ -38,7 +38,15 @@ export function previewAIText(value: unknown, maxLength = 500): string {
   return redacted.slice(0, maxLength);
 }
 
+type AIAuditSink = (event: AIAuditEvent) => void;
+let aiAuditSink: AIAuditSink | null = null;
+
+export function registerAIAuditSink(sink: AIAuditSink): void {
+  aiAuditSink = sink;
+}
+
 export function logAIAuditEvent(event: AIAuditEvent): void {
+  aiAuditSink?.(event);
   if (typeof console !== 'undefined') {
     console.info('[AI_AUDIT]', event);
   }

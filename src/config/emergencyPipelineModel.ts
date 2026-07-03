@@ -231,7 +231,7 @@ export const EMERGENCY_SURFACE_REGISTRY = Object.freeze([
     sidebarNavId: 'pulse',
     standaloneAllowed: true,
     panelKey: null,
-    retainedReason: 'Shift command strip — utility nav',
+    retainedReason: 'Shift command strip ï¿½ utility nav',
   }),
   Object.freeze({
     id: 'shift',
@@ -242,7 +242,7 @@ export const EMERGENCY_SURFACE_REGISTRY = Object.freeze([
     sidebarNavId: 'shift',
     standaloneAllowed: true,
     panelKey: null,
-    retainedReason: 'Handoff brief — utility nav',
+    retainedReason: 'Handoff brief ï¿½ utility nav',
   }),
   // -- Journey-tier surfaces added in the full emergency care rebuild ------------
   Object.freeze({
@@ -294,7 +294,7 @@ export const EMERGENCY_SURFACE_REGISTRY = Object.freeze([
     sidebarNavId: null,
     standaloneAllowed: true,
     panelKey: null,
-    retainedReason: 'Clinical documentation assistant — accessible via AI Copilot',
+    retainedReason: 'Clinical documentation assistant ï¿½ accessible via AI Copilot',
   }),
   Object.freeze({
     id: 'diagnostics',
@@ -345,7 +345,7 @@ export const EMERGENCY_SURFACE_REGISTRY = Object.freeze([
     sidebarNavId: 'help',
     standaloneAllowed: true,
     panelKey: null,
-    retainedReason: 'User manual — utility nav',
+    retainedReason: 'User manual ï¿½ utility nav',
   }),
 ]);
 
@@ -430,6 +430,7 @@ export function isReceptionPipelinePath(pathname, search = '') {
 
 export function getReceptionNavActivePaths() {
   return Object.freeze([
+    '/emergency',
     CANONICAL_ROUTES.emergencyReception,
     `${CANONICAL_ROUTES.emergencyReception}?express=1`,
     `${CANONICAL_ROUTES.emergencyReception}?intake=1`,

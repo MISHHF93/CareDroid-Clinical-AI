@@ -4,11 +4,9 @@ import { useUser } from '../contexts/UserContext';
 import { useUserIdentity } from '../contexts/UserIdentityContext';
 import {
   canMutateEmergencySurface,
-  canPerformEmergencyAction,
   getEmergencyDemoRoles,
   getEmergencyRoleDefinition,
   getNearestEmergencyRoute,
-  hasEmergencyActionPermission,
   isEmergencyReadOnlyRole,
   listPermissionsForRole,
   normalizeEmergencyRole,
@@ -26,12 +24,16 @@ import useRouteScreenMode from './useRouteScreenMode';
 import { useEmergencyStore } from '../store/emergencyStore';
 import {
   canAccessRoute as canAccessCanonicalRoute,
-  canMutateWithCompiledProfile,
   compileCareDroidAccessProfile,
   getCanonicalRoleMapping,
   normalizeCareDroidProfile,
   normalizeCanonicalEmergencyRole,
 } from '../lib/users/canonicalAccess';
+import {
+  buildEmergencySecurityContext,
+  checkEmergencyMutation,
+  checkEmergencyPermission,
+} from '../services/securityAccessService';
 import { getDemoUserById, getDefaultDemoUser } from '../lib/users/demoUsers';
 
 export function useEmergencyRolePermissions() {
@@ -109,6 +111,18 @@ export function useEmergencyRolePermissions() {
     }),
     [emergencySettings?.readOnlyDisplayMode, role, screenMode, searchParams],
   );
+  const securityContext = useMemo(
+    () =>
+      buildEmergencySecurityContext({
+        compiledProfile,
+        emergencyRole: role,
+        permissionsOverrides,
+        permissionContext,
+        readOnly: isEmergencyReadOnlyRole(role),
+      }),
+    [compiledProfile, permissionContext, permissionsOverrides, role],
+  );
+
   const landingRoute = useMemo(
     () =>
       resolveRoleLandingRoute({
@@ -150,22 +164,11 @@ export function useEmergencyRolePermissions() {
       permissionContext,
       canAccessRoute: (path) => canAccessCanonicalRoute(compiledProfile, path),
       nearestRoute: (path) => getNearestEmergencyRoute(role, path),
-      can: (action, context: any = {}) =>
-        hasEmergencyActionPermission(role, action, permissionsOverrides, {
-          ...permissionContext,
-          ...context,
-        }),
+      securityContext,
+      can: (action, context: any = {}) => checkEmergencyPermission(securityContext, action, context),
       canDisplay: (permission, context: any = {}) =>
-        hasEmergencyActionPermission(role, permission, permissionsOverrides, {
-          ...permissionContext,
-          ...context,
-        }),
-      canMutate: (action, context: any = {}) =>
-        canMutateWithCompiledProfile(compiledProfile, action) &&
-        canPerformEmergencyAction(role, action, permissionsOverrides, {
-          ...permissionContext,
-          ...context,
-        }),
+        checkEmergencyPermission(securityContext, permission, context),
+      canMutate: (action, context: any = {}) => checkEmergencyMutation(securityContext, action, context),
       canMutateSurface: (context: any = {}) =>
         !compiledProfile.readOnly &&
         canMutateEmergencySurface(role, { ...permissionContext, ...context }),
@@ -242,7 +245,7 @@ export function useEmergencyRolePermissions() {
         setUser(nextUser);
       },
     }),
-    [compiledProfile, deviceContext.definition?.label, deviceContext.deviceContextId, deviceContext.isKiosk, emergencySettings, landingRoute, permissionContext, permissionsOverrides, role, roleDefinition, roleSubject, setUser, user],
+    [compiledProfile, deviceContext.definition?.label, deviceContext.deviceContextId, deviceContext.isKiosk, emergencySettings, landingRoute, permissionContext, permissionsOverrides, role, roleDefinition, roleSubject, securityContext, setUser, user],
   );
 }
 

@@ -105,12 +105,13 @@ export default defineConfig(({ mode }) => {
     env.VITE_DEV_PORT,
     process.env.FRONTEND_PORT,
     process.env.VITE_DEV_PORT,
+    '5174',
   );
   const backendPort = readPort(
     env.BACKEND_PORT,
     process.env.BACKEND_PORT,
     process.env.PORT,
-    '3000',
+    '3333',
   );
   const proxyTarget = env.VITE_API_PROXY_TARGET || `http://localhost:${backendPort}`;
   const buildInfo = buildInfoFor(mode, env);

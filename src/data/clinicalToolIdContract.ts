@@ -24,44 +24,49 @@
  * @see CANONICAL_TOOL_GROUPS — product grouping for audits and drift tests
  */
 
-/** Bump when registry/NLU lists or maps change incompatibly. */
-export const TOOL_ID_CONTRACT_VERSION = '1.27.0';
+import { CANONICAL_ROUTES } from '../config/routes.config';
 
-/** Shared SPA paths for tool launch (browser-safe). */
+/** Bump when registry/NLU lists or maps change incompatibly. */
+export const TOOL_ID_CONTRACT_VERSION = '1.28.0';
+
+/**
+ * Shared SPA paths for tool launch — projected from `CANONICAL_ROUTES` to prevent route drift.
+ * Fleet detail routes without a top-level canonical key remain as explicit extensions.
+ */
 export const TOOL_LAUNCH_PATHS = Object.freeze({
-  toolsOverview: '/tools',
-  toolsCatalog: '/tools/catalog',
-  calculatorsHub: '/tools/calculators',
-  operationsCenter: '/operations',
-  protocols: '/protocols',
-  research: '/research',
-  documentation: '/documentation',
-  knowledgeGraph: '/knowledge-graph',
-  predictiveAnalytics: '/predictive-analytics',
-  assistant: '/assistant',
-  clinicalDecisionSupport: '/clinical-decision-support',
-  competencies: '/competencies',
-  credentials: '/credentials',
-  simulation: '/simulation',
-  simulationOutcomes: '/simulation/outcomes',
-  laboratory: '/laboratory',
-  medical3dViewer: '/3d-viewer',
-  artifacts: '/artifacts',
-  memory: '/ai-memory',
-  training: '/training',
-  costs: '/costs',
-  aiEvaluation: '/ai-evaluation',
-  aiCommandCenter: '/ai-command-center',
-  aiGovernance: '/ai-governance',
-  aiSecurity: '/security',
-  liveTrackingMap: '/live-map',
-  hospitalMap: '/hospital-map',
-  medicalIot: '/medical-iot',
-  deviceFleet: '/devices',
-  fleetCommand: '/fleet/command',
-  fleetMap: '/fleet/map',
-  predictiveMaintenance: '/fleet/predictive-maintenance',
-  routeOptimizer: '/fleet/route-optimizer',
+  toolsOverview: CANONICAL_ROUTES.tools,
+  toolsCatalog: CANONICAL_ROUTES.developerCatalog,
+  calculatorsHub: CANONICAL_ROUTES.calculators,
+  operationsCenter: CANONICAL_ROUTES.operations,
+  protocols: CANONICAL_ROUTES.protocols,
+  research: CANONICAL_ROUTES.research,
+  documentation: CANONICAL_ROUTES.documentation,
+  knowledgeGraph: CANONICAL_ROUTES.knowledgeGraph,
+  predictiveAnalytics: CANONICAL_ROUTES.predictiveAnalytics,
+  assistant: CANONICAL_ROUTES.assistant,
+  clinicalDecisionSupport: CANONICAL_ROUTES.clinicalDecisionSupport,
+  competencies: CANONICAL_ROUTES.competencies,
+  credentials: CANONICAL_ROUTES.credentials,
+  simulation: CANONICAL_ROUTES.simulation,
+  simulationOutcomes: CANONICAL_ROUTES.simulationOutcomes,
+  laboratory: CANONICAL_ROUTES.laboratory,
+  medical3dViewer: CANONICAL_ROUTES.medical3dViewer,
+  artifacts: CANONICAL_ROUTES.artifacts,
+  memory: CANONICAL_ROUTES.memory,
+  training: CANONICAL_ROUTES.trainingDashboard,
+  costs: CANONICAL_ROUTES.costs,
+  aiEvaluation: CANONICAL_ROUTES.aiEvaluation,
+  aiCommandCenter: CANONICAL_ROUTES.aiCommandCenter,
+  aiGovernance: CANONICAL_ROUTES.aiGovernance,
+  aiSecurity: CANONICAL_ROUTES.security,
+  liveTrackingMap: CANONICAL_ROUTES.liveMap,
+  hospitalMap: CANONICAL_ROUTES.hospitalMap,
+  medicalIot: CANONICAL_ROUTES.medicalIot,
+  deviceFleet: CANONICAL_ROUTES.devices,
+  fleetCommand: CANONICAL_ROUTES.fleetCommand,
+  fleetMap: CANONICAL_ROUTES.fleetMap,
+  predictiveMaintenance: CANONICAL_ROUTES.fleetPredictiveMaintenance,
+  routeOptimizer: CANONICAL_ROUTES.fleetRouteOptimizer,
 });
 
 /** Canonical sidebar / registry ids (`toolRegistry.ts`). */

@@ -74,6 +74,8 @@ describe('caredroidDesignLanguage', () => {
     expect(primitivesSource).toContain('function OperationalPageTemplate');
     expect(primitivesSource).toContain('function OperationalZone');
     expect(primitivesSource).toContain('function CareDroidPage');
+    expect(primitivesSource).toContain('function PublicPageTemplate');
+    expect(primitivesSource).toContain('function OperationalGrid');
     expect(CDL_COMPONENT_PREFIXES).toContain('cdl-zone');
     expect(CDL_COMPONENT_STANDARDS.pageShell.emergencyWrapper).toBe('EmergencyRoutePage');
     expect(CDL_COMPONENT_STANDARDS.aiPanel.tone).toBe('ai_assistance');

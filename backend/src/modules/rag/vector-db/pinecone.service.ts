@@ -58,7 +58,7 @@ export class PineconeService implements IVectorDatabase, OnModuleInit {
         const message =
           'PINECONE_API_KEY is not configured. Vector database functionality will be disabled.';
         if (process.env.NODE_ENV === 'development') {
-          this.logger.log(message);
+          this.logger.debug('RAG vector search disabled in local dev (PINECONE_API_KEY not set).');
         } else {
           this.logger.warn(message);
         }

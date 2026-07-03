@@ -9,9 +9,12 @@ import {
 
 function envelope<T>(title: string, data: T) {
   return {
+    module: 'patient-flow',
     success: true,
     title,
     generatedAt: new Date().toISOString(),
+    source: 'backend-fixture',
+    status: 'active',
     data,
   };
 }

@@ -21,7 +21,8 @@ describe('Medical Tools route alias fixtures', () => {
     ['/digital-twin', '/emergency/tools?source=operations&filter=operations&q=digital-twin&open=digital-twin'],
     ['/pharmacy/drug-interactions', '/emergency/tools?source=clinical-tools&filter=clinical-tools&q=drug-check&open=drug-check'],
     ['/radiology/chest-xray', '/emergency/tools?source=workflows&filter=ai-workflows&q=guideline-rag&open=guideline-rag'],
-    ['/automation', '/emergency/tools?source=workflows&filter=ai-workflows'],
+    ['/automation', '/workflows'],
+    ['/automation-analytics', '/workflows'],
   ])('maps %s to %s', (source, expected) => {
     expect(redirectFor(source)).toBe(expected);
   });

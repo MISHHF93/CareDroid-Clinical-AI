@@ -1,5 +1,6 @@
 import React from 'react';
-import { useRolePermissions } from '../../hooks/useRolePermissions';
+import useSecurityAccess from '../../hooks/useSecurityAccess';
+import type { HospitalRole } from '../../lib/users/userTypes';
 import { useCareDroidUser } from '../../hooks/useCareDroidUser';
 import { getDashboardWidgets, getRoleLabel } from '../../lib/users/roleAccess';
 import './RoleDashboardPanel.css';
@@ -32,7 +33,8 @@ function WidgetCard({ widgetId }: { widgetId: string }) {
 }
 
 export function RoleDashboardPanel({ className = '' }: RoleDashboardPanelProps) {
-  const { role } = useRolePermissions();
+  const { hospitalRole } = useSecurityAccess();
+  const role = (hospitalRole || 'physician') as HospitalRole;
   const { profile } = useCareDroidUser();
   const widgets = getDashboardWidgets(role);
 

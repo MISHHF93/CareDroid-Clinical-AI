@@ -1,0 +1,32 @@
+.patient-journey-badge {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--ed-border-subtle, #e2e8f0);
+  background: color-mix(in srgb, var(--ed-accent, #0ea5e9) 6%, var(--ed-surface-raised, #f8fafc));
+  font-size: var(--ed-type-meta, 11px);
+  color: var(--ed-text-meta, #64748b);
+  text-decoration: none;
+  line-height: 1.3;
+}
+
+.patient-journey-badge:hover {
+  border-color: color-mix(in srgb, var(--ed-accent, #0ea5e9) 35%, transparent);
+  color: var(--ed-text-primary, #0f172a);
+}
+
+.patient-journey-badge__phase {
+  font-weight: 700;
+  color: var(--ed-text-primary, #0f172a);
+}
+
+.patient-journey-badge__stage {
+  color: var(--ed-text-meta, #64748b);
+}
+
+.patient-journey-badge--compact .patient-journey-badge__phase {
+  font-weight: 600;
+}

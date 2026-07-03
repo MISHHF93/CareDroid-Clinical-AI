@@ -1,12 +1,15 @@
 import { Link } from 'react-router-dom';
 import { ED_JOURNEY_PHASES, type EdJourneyPhaseId } from '../../config/edOperatingSurface.config';
 import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
+import { buildPhaseRouteWithPatientContext } from '../../services/patientWorkflowNavigation';
 import './ed-journey-rail.css';
 
 type EdJourneyProgressRailProps = Readonly<{
   activePhaseId: EdJourneyPhaseId | null;
   ownerRole?: string;
   priorityLabel?: string;
+  patientId?: string | null;
+  encounterId?: string | null;
   className?: string;
 }>;
 
@@ -14,10 +17,12 @@ export default function EdJourneyProgressRail({
   activePhaseId,
   ownerRole,
   priorityLabel,
+  patientId = null,
+  encounterId = null,
   className = '',
 }: EdJourneyProgressRailProps) {
   const surfaces = usePractitionerSurfaceVisibility();
-  if (!surfaces.emergencyRoutes.showSituationBrief || !activePhaseId) {
+  if (!surfaces.emergencyRoutes.showJourneyRail || !activePhaseId) {
     return null;
   }
 
@@ -50,7 +55,7 @@ export default function EdJourneyProgressRail({
               className={`ed-journey-rail__phase ed-journey-rail__phase--${state}`}
             >
               <Link
-                to={phase.route}
+                to={buildPhaseRouteWithPatientContext(phase.route, { patientId: patientId ?? undefined, encounterId })}
                 className="ed-journey-rail__link"
                 aria-current={state === 'active' ? 'step' : undefined}
                 title={`${phase.order}. ${phase.label}`}

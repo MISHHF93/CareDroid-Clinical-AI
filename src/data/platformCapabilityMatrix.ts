@@ -6,6 +6,7 @@ import { FRONTEND_API_CALLS } from './frontendApiCallsInventory';
 import { PLATFORM_DASHBOARDS } from './platformOperatingSystem';
 import { PLATFORM_SYSTEM_CAPABILITIES, PLATFORM_SYSTEM_CAPABILITY_BY_ID } from './platformSystems';
 import { getCanonicalToolInventory } from './toolInventory';
+import { CANONICAL_ROUTES } from '../config/routes.config';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, '..', '..');
@@ -235,7 +236,7 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
   {
     id: 'memory',
     capability: 'AI Memory',
-    frontendRoute: '/ai-memory',
+    frontendRoute: CANONICAL_ROUTES.memory,
     inventoryEntry: 'ai-memory',
     aiLaunchAlias: 'show memory',
     backendService: 'ShortMemoryService / LongMemoryService / ClinicalMemoryService',
@@ -245,7 +246,7 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
   {
     id: 'training',
     capability: 'Training Dashboard',
-    frontendRoute: '/training',
+    frontendRoute: CANONICAL_ROUTES.trainingDashboard,
     inventoryEntry: 'ai-training',
     aiLaunchAlias: 'show training',
     backendService: 'TrainingService',
@@ -275,7 +276,7 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
   {
     id: 'costs',
     capability: 'Cost Analytics',
-    frontendRoute: '/costs',
+    frontendRoute: CANONICAL_ROUTES.costs,
     inventoryEntry: 'ai-cost-optimization',
     aiLaunchAlias: 'show costs',
     backendService: 'CostPredictionService / RoutingOptimizerService',

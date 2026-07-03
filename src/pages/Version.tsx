@@ -1,36 +1,38 @@
 import { Link } from 'react-router-dom';
 import { buildInfoRows } from '../config/buildInfo';
+import { PublicPageTemplate, OperationalGrid } from '../components/ui/CareDroidPrimitives';
+import { CANONICAL_ROUTES } from '../config/routes.config';
 import './Version.css';
 
 export default function Version() {
   return (
-    <section className="version-page" aria-labelledby="version-page-title">
-      <div className="version-page__hero">
-        <p className="version-page__eyebrow">Deployment verification</p>
-        <h1 id="version-page-title">CareDroid build version</h1>
-        <p>
-          Use this page to compare local, GitHub, and Vercel builds. The deployed site should show
-          the same commit hash as the latest pushed production source.
-        </p>
-      </div>
-
-      <dl className="version-page__grid">
+    <PublicPageTemplate
+      className="version-page"
+      eyebrow="Deployment verification"
+      title="CareDroid build version"
+      description="Compare local, GitHub, and deployed builds. The production site should show the same commit hash as the latest pushed source."
+      backHref={CANONICAL_ROUTES.platformStart}
+    >
+      <OperationalGrid variant="metrics" className="version-page__grid" as="dl">
         {buildInfoRows.map((row) => (
-          <div className="version-page__item" key={row.label}>
+          <div className="version-page__item cdl-surface" key={row.label}>
             <dt>{row.label}</dt>
             <dd title={row.value}>{row.shortValue || row.value}</dd>
           </div>
         ))}
-      </dl>
+      </OperationalGrid>
 
-      <div className="version-page__actions">
-        <Link to="/auth" className="version-page__button">
-          Check /auth
+      <div className="version-page__actions cdl-zone cdl-zone--primary-actions">
+        <Link to={CANONICAL_ROUTES.platformStart} className="version-page__button cd-btn">
+          Platform entry
         </Link>
-        <Link to="/tools" className="version-page__button version-page__button--secondary">
-          Check /tools
+        <Link
+          to={CANONICAL_ROUTES.emergencyWhiteboard}
+          className="version-page__button version-page__button--secondary cd-btn cd-btn--secondary"
+        >
+          Clinical workspace
         </Link>
       </div>
-    </section>
+    </PublicPageTemplate>
   );
 }

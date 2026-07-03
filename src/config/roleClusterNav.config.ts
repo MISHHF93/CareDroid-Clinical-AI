@@ -14,7 +14,7 @@
  * via EMERGENCY_TO_HOSPITAL_ROLE so legacy callers continue to resolve correctly.
  */
 
-import { CANONICAL_PILOT_VISIBLE_NAV_IDS, CANONICAL_ROUTES } from './routes.config';
+import { CANONICAL_PILOT_VISIBLE_NAV_IDS, CANONICAL_ROUTES, TRIAGE_PRETRIAGE_ROUTE } from './routes.config';
 
 // ─── Home routes (per hospital role) ─────────────────────────────────────────
 
@@ -26,7 +26,7 @@ export const HOSPITAL_ROLE_HOME_ROUTES: Readonly<Record<string, string>> = Objec
   // Cluster B — Reception & Intake
   registration_clerk:       CANONICAL_ROUTES.emergencyReception,
   // Cluster C — Nursing & Triage
-  triage_nurse:             CANONICAL_ROUTES.triage,
+  triage_nurse:             TRIAGE_PRETRIAGE_ROUTE,
   registered_nurse:         CANONICAL_ROUTES.emergencyQueues,
   charge_nurse:             CANONICAL_ROUTES.emergencyWhiteboard,
   // Cluster D — Physicians
@@ -106,18 +106,18 @@ export const HOSPITAL_ROLE_NAV_IDS: Readonly<Record<string, readonly string[]>> 
 
   // ── Cluster E: Ancillary Clinical ──────────────────────────────────────────
   pharmacist: Object.freeze([
-    'diagnostics', 'patients', 'alerts', 'tools', 'help',
+    'diagnostics', 'patients', 'alerts', 'help',
   ]),
   lab_technician: Object.freeze([
-    'diagnostics', 'patients', 'alerts', 'tools', 'help',
+    'diagnostics', 'patients', 'alerts', 'help',
   ]),
   radiology_technician: Object.freeze([
-    'diagnostics', 'patients', 'alerts', 'tools', 'help',
+    'diagnostics', 'patients', 'alerts', 'help',
   ]),
 
   // ── Cluster F: Operations & Leadership ────────────────────────────────────
   patient_flow_coordinator: Object.freeze([
-    'queues', 'whiteboard', 'patients', 'capacity', 'hospital-map', 'handoffs', 'alerts', 'pulse', 'shift', 'help',
+    'queues', 'whiteboard', 'patients', 'capacity', 'hospital-map', 'handoffs', 'reports', 'alerts', 'pulse', 'shift', 'help',
   ]),
   hospital_admin: CANONICAL_PILOT_VISIBLE_NAV_IDS,
   ed_director: CANONICAL_PILOT_VISIBLE_NAV_IDS,
@@ -128,7 +128,7 @@ export const HOSPITAL_ROLE_NAV_IDS: Readonly<Record<string, readonly string[]>> 
 
   // ── Cluster G: IT & Platform ───────────────────────────────────────────────
   it_admin: Object.freeze([
-    'settings', 'admin', 'medical-iot', 'audit', 'alerts', 'help',
+    'settings', 'admin', 'medical-iot', 'audit', 'reports', 'alerts', 'help',
   ]),
   super_admin: CANONICAL_PILOT_VISIBLE_NAV_IDS,
 

@@ -30,7 +30,7 @@ import { LongMemoryService } from '../src/modules/memory/long-memory.service';
 import { ClinicalMemoryService } from '../src/modules/memory/clinical-memory.service';
 import { ArtifactsService } from '../src/modules/artifacts/artifacts.service';
 import { EvaluationService } from '../src/modules/evaluation/evaluation.service';
-import { unifiedAIClient } from '../../src/lib/ai/client';
+import { unifiedAIClient } from '../../lib/ai/serverClient';
 
 describe('Tool Calling Integration (Batch 15 Phase 1)', () => {
   let aiService: AIService;
@@ -297,7 +297,13 @@ describe('Tool Calling Integration (Batch 15 Phase 1)', () => {
       content: 'Default AI response',
       data: {},
       toolCalls: [],
-      usage: { inputTokens: 10, outputTokens: 5, totalTokens: 15 },
+      usage: {
+        inputTokens: 10,
+        outputTokens: 5,
+        totalTokens: 15,
+        cacheReadInputTokens: 0,
+        cacheCreationInputTokens: 0,
+      },
       requestType: 'COPILOT_CHAT',
     });
   });
@@ -368,7 +374,13 @@ describe('Tool Calling Integration (Batch 15 Phase 1)', () => {
             },
           },
         ],
-        usage: { inputTokens: 100, outputTokens: 50, totalTokens: 150 },
+        usage: {
+          inputTokens: 100,
+          outputTokens: 50,
+          totalTokens: 150,
+          cacheReadInputTokens: 0,
+          cacheCreationInputTokens: 0,
+        },
         requestType: 'COPILOT_CHAT',
       });
 
@@ -391,7 +403,13 @@ describe('Tool Calling Integration (Batch 15 Phase 1)', () => {
         content: 'I found a potential interaction.',
         data: {},
         toolCalls: [],
-        usage: { inputTokens: 200, outputTokens: 50, totalTokens: 250 },
+        usage: {
+          inputTokens: 200,
+          outputTokens: 50,
+          totalTokens: 250,
+          cacheReadInputTokens: 0,
+          cacheCreationInputTokens: 0,
+        },
         requestType: 'COPILOT_CHAT',
       });
 

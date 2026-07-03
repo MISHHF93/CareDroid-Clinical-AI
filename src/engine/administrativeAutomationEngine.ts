@@ -13,6 +13,7 @@ import type {
   AdministrativeAutomationTask,
 } from '../types/administrativeAutomation';
 import type { Alert, CapacitySnapshot, EMSArrival, Patient, Referral, Staff } from '../types/emergency';
+import { startWorkflowTrace } from '../services/observabilityTrace';
 
 export type AdministrativeAutomationEngineInput = Readonly<{
   patients: Patient[];
@@ -133,19 +134,34 @@ export async function applyBackendAdministrativeAutomationQueue(
 }
 
 export async function runAdministrativeAutomationTick(now = new Date()) {
-  const state = useEmergencyStore.getState();
-  const snapshot = await buildEnrichedAdministrativeAutomationSnapshot({
-    patients: state.patients,
-    staff: state.staff,
-    referrals: state.referrals,
-    alerts: state.alerts,
-    emsArrivals: state.emsArrivals,
-    capacity: state.capacity,
-    existingTasks: state.administrativeAutomationQueue,
-    now,
+  const trace = startWorkflowTrace('administrative-automation-refresh', {
+    source: 'administrativeAutomationEngine',
+    summary: 'Administrative automation queue refresh',
   });
-  state.setAdministrativeAutomationQueue([...snapshot.tasks]);
-  return snapshot;
+  const state = useEmergencyStore.getState();
+  try {
+    const snapshot = await buildEnrichedAdministrativeAutomationSnapshot({
+      patients: state.patients,
+      staff: state.staff,
+      referrals: state.referrals,
+      alerts: state.alerts,
+      emsArrivals: state.emsArrivals,
+      capacity: state.capacity,
+      existingTasks: state.administrativeAutomationQueue,
+      now,
+    });
+    state.setAdministrativeAutomationQueue([...snapshot.tasks]);
+    trace.end('success', {
+      taskCount: snapshot.tasks.length,
+      pendingReview: snapshot.metrics.pendingReview,
+    });
+    return snapshot;
+  } catch (error: unknown) {
+    trace.end('error', {
+      message: error instanceof Error ? error.message : String(error),
+    });
+    throw error;
+  }
 }
 
 export async function runAdministrativeAutomationTickIfLocal(now = new Date()) {

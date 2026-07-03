@@ -114,6 +114,14 @@ export const CANONICAL_ROUTES = Object.freeze({
   profileToolPreferences: '/profile/tool-preferences',
   settings: '/settings',
   settingsFeatures: '/settings/features',
+  version: '/version',
+  helpCenter: '/help-center',
+  legalPrivacyPolicy: '/legal/privacy-policy',
+  legalTerms: '/legal/terms',
+  legalGdpr: '/legal/gdpr',
+  legalHipaa: '/legal/hipaa',
+  onboardingConsent: '/onboarding/consent',
+  consentHistory: '/legal/consent-history',
   customerPortal: '/customer-portal',
   knowledgeHub: '/knowledge-hub',
   knowledgeBase: '/knowledge-base',
@@ -149,6 +157,11 @@ export const CANONICAL_ROUTES = Object.freeze({
   humanReview: '/human-review',
   assets: '/assets',
   artifacts: '/artifacts',
+  memory: '/memory',
+  trainingDashboard: '/training',
+  costs: '/costs',
+  fleetPredictiveMaintenance: '/fleet/predictive-maintenance',
+  fleetRouteOptimizer: '/fleet/route-optimizer',
   aiModels: '/ai-models',
   aiEvaluation: '/ai-evaluation',
   platformLearningEngine: '/platform-learning-engine',
@@ -300,7 +313,6 @@ export const ED_CANONICAL_ROUTE_ALIASES = Object.freeze(
     [CANONICAL_ROUTES.aiChief, CANONICAL_ROUTES.emergencyCopilot],
     [CANONICAL_ROUTES.departments, CANONICAL_ROUTES.emergencyCapacity],
     [CANONICAL_ROUTES.analytics, CANONICAL_ROUTES.emergencyAnalytics],
-    [CANONICAL_ROUTES.settings, CANONICAL_ROUTES.emergencySettings],
   ].map(([path, to]) => Object.freeze({ path, to, routeId: 'ed-canonical-alias' })),
 );
 
@@ -312,6 +324,8 @@ export const OUTSIDE_SHELL_ROUTE_REDIRECTS = Object.freeze(
     ['/chat', CANONICAL_ROUTES.emergencyCopilot],
     ['/ai', CANONICAL_ROUTES.emergencyCopilot],
     ['/copilot', CANONICAL_ROUTES.emergencyCopilot],
+    [CANONICAL_ROUTES.automation, CANONICAL_ROUTES.workflows],
+    [CANONICAL_ROUTES.automationAnalytics, CANONICAL_ROUTES.workflows],
   ].map(([path, to]) => Object.freeze({ path, to, routeId: 'outside-shell-redirect' })),
 );
 
@@ -390,6 +404,8 @@ export const LEGACY_EMERGENCY_ROUTE_REDIRECTS = Object.freeze(
     ['/handoffs', CANONICAL_ROUTES.emergencyHandoffs],
     ['/reports', CANONICAL_ROUTES.emergencyReports],
     ['/help', CANONICAL_ROUTES.emergencyHelp],
+    [CANONICAL_ROUTES.documentation, CANONICAL_ROUTES.emergencyDocumentation],
+    [CANONICAL_ROUTES.automationAudit, `${CANONICAL_ROUTES.adminOperations}/audit-trail`],
     ['/settings/general', CANONICAL_ROUTES.emergencySettings],
     ['/settings/thresholds', CANONICAL_ROUTES.emergencySettings],
     ['/settings/staff', CANONICAL_ROUTES.emergencySettings],
@@ -420,6 +436,32 @@ export const NON_ED_WORKSPACE_REDIRECT_ROUTES = Object.freeze([
   Object.freeze({ path: '/radiology', moduleName: 'Radiology' }),
   Object.freeze({ path: '/radiology/*', moduleName: 'Radiology' }),
 ]);
+
+/**
+ * In-shell redirects not covered by legacy ED aliases, outside-shell tables, or admin nested routes.
+ * Mounted inside AppShell via router.tsx — keep alias tables here, not inline in the mount table.
+ */
+export const IN_SHELL_ROUTE_REDIRECTS = Object.freeze(
+  [
+    ['/organization', CANONICAL_ROUTES.adminOperations],
+    ['/organization/*', CANONICAL_ROUTES.adminOperations],
+    [CANONICAL_ROUTES.customerPortal, `${CANONICAL_ROUTES.adminOperations}/tenant`],
+    [CANONICAL_ROUTES.successCenter, CANONICAL_ROUTES.customerSuccess],
+    [CANONICAL_ROUTES.customerSuccess, `${CANONICAL_ROUTES.adminOperations}/tenant`],
+    ['/fleet', CANONICAL_ROUTES.fleetCommand],
+    ['/platform-learning', CANONICAL_ROUTES.emergencySettings],
+    [AUDIT_ROUTE_ALIASES[0], CANONICAL_ROUTES.audit],
+    ['/ai/evaluation', CANONICAL_ROUTES.aiEvaluation],
+    ['/team', `${CANONICAL_ROUTES.adminOperations}/team`],
+  ].map(([path, to]) =>
+    Object.freeze({
+      path,
+      to,
+      routeId: 'in-shell-redirect',
+      auth: 'required' as const,
+    }),
+  ),
+);
 
 export const WORKSPACE_EMERGENCY_SUBPAGE_REDIRECTS = Object.freeze({
   whiteboard: CANONICAL_ROUTES.emergencyWhiteboard,
@@ -608,7 +650,7 @@ export const USER_PROFILE_ROUTE_DEFAULTS = Object.freeze({
   ems_coordinator: CANONICAL_ROUTES.emergencyEms,
   paramedic: CANONICAL_ROUTES.emergencyEms,
   registration_clerk: CANONICAL_ROUTES.emergencyReception,
-  triage_nurse: CANONICAL_ROUTES.triage,
+  triage_nurse: TRIAGE_PRETRIAGE_ROUTE,
   charge_nurse: CANONICAL_ROUTES.emergencyWhiteboard,
   registered_nurse: CANONICAL_ROUTES.emergencyQueues,
   emergency_physician: CANONICAL_ROUTES.emergencyWhiteboard,
@@ -619,7 +661,7 @@ export const USER_PROFILE_ROUTE_DEFAULTS = Object.freeze({
   lab_technician: CANONICAL_ROUTES.emergencyDiagnostics,
   radiology_technician: CANONICAL_ROUTES.emergencyDiagnostics,
   patient_flow_coordinator: CANONICAL_ROUTES.emergencyQueues,
-  hospital_admin: CANONICAL_ROUTES.emergencyWhiteboard,
+  hospital_admin: CANONICAL_ROUTES.emergencyAnalytics,
   it_admin: CANONICAL_ROUTES.emergencySettings,
   quality_safety_officer: CANONICAL_ROUTES.emergencyReports,
   demo_observer: CANONICAL_ROUTES.emergencyWhiteboard,
@@ -629,8 +671,8 @@ export const USER_PROFILE_ROUTE_DEFAULTS = Object.freeze({
   ed_manager: CANONICAL_ROUTES.emergencyAnalytics,
   physician: CANONICAL_ROUTES.emergencyWhiteboard,
   ems_user: CANONICAL_ROUTES.emergencyEms,
-  read_only_viewer: CANONICAL_ROUTES.emergencyWhiteboard,
-  public_display: CANONICAL_ROUTES.emergencyWhiteboard,
+  read_only_viewer: `${CANONICAL_ROUTES.emergencyWhiteboard}?display=readonly`,
+  public_display: `${CANONICAL_ROUTES.emergencyWhiteboard}?display=waiting-room`,
 });
 
 export const USER_PROFILE_ROUTE_POLICIES = Object.freeze(
@@ -691,7 +733,8 @@ function normalizeProfileId(value) {
   return String(value || '')
     .trim()
     .toLowerCase()
-    .replace(/-/g, '_');
+    .replace(/-/g, '_')
+    .replace(/\s+/g, '_');
 }
 
 function profileIdFromSubject(subject) {
@@ -797,7 +840,7 @@ export const CANONICAL_ROUTE_MAP = Object.freeze([
     label: 'Dispatch',
     description: 'Emergency call intake and dispatch coordination.',
     pageComponent: 'DispatchConsole',
-    requiredPermissions: [P.PATIENT_CREATE],
+    requiredPermissions: [P.PATIENT_READ],
     allowedRoles: ['super_admin', 'hospital_admin', 'ed_director', 'dispatcher', 'ems_coordinator', 'charge_nurse'],
     navigationGroup: 'Emergency',
     priority: 40,
@@ -863,7 +906,8 @@ export const CANONICAL_ROUTE_MAP = Object.freeze([
     description: 'Patient list and journey overview.',
     pageComponent: 'PatientsRoute',
     requiredPermissions: [P.PATIENT_READ],
-    allowedRoles: [...CLINICAL_PROFILES, ...OPS_PROFILES, 'registration_clerk', 'pharmacist', 'quality_safety_officer', 'demo_observer'],
+    readOnlyAllowed: true,
+    allowedRoles: [...CLINICAL_PROFILES, ...OPS_PROFILES, 'registration_clerk', 'pharmacist', 'lab_technician', 'radiology_technician', 'quality_safety_officer', 'demo_observer'],
     navigationGroup: 'Patients',
     priority: 110,
     icon: 'emergency-patients',
@@ -1146,7 +1190,6 @@ export const CANONICAL_ROUTE_MAP = Object.freeze([
     navigationGroup: 'Administration',
     priority: 190,
     icon: 'settings',
-    aliases: [CANONICAL_ROUTES.settings],
     breadcrumbs: ['Administration', 'Settings'],
     helpTopicId: 'settings',
     workflowOwner: 'IT administrator',
@@ -2367,22 +2410,10 @@ export const ROUTE_RECORDS = Object.freeze([
     layout: 'app',
     auth: 'required',
     status: 'active',
-    aliases: [CANONICAL_ROUTES.automation],
+    aliases: [CANONICAL_ROUTES.automation, CANONICAL_ROUTES.automationAnalytics],
     navGroup: 'secondary',
     notes:
-      'Canonical workflow route. Legacy /automation redirects here to avoid duplicate workflow UI ownership.',
-  }),
-  Object.freeze({
-    id: 'automationAnalytics',
-    path: CANONICAL_ROUTES.automationAnalytics,
-    componentKey: 'AutomationAnalytics',
-    layout: 'app',
-    auth: 'required',
-    status: 'active',
-    aliases: [],
-    navGroup: 'advanced',
-    notes:
-      'Automation analytics across solution packages, workspace automations, audit events, human overrides, and AI recommendation adoption.',
+      'Canonical workflow route. Legacy /automation and /automation-analytics redirect here to avoid duplicate workflow UI ownership.',
   }),
 ]);
 

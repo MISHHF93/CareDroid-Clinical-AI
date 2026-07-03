@@ -1,11 +1,15 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import {
+  ASSISTANT_ROUTE_ALIASES,
   CANONICAL_APP_ROUTE_TREE,
   CANONICAL_ROUTES,
+  IN_SHELL_ROUTE_REDIRECTS,
   LEGACY_EMERGENCY_ROUTE_REDIRECTS,
   NON_ED_WORKSPACE_REDIRECT_ROUTES,
+  OUTSIDE_SHELL_ROUTE_REDIRECTS,
 } from '../config/routes.config';
+import { OPERATIONS_FLEET_CONSOLE_ROUTE_PATHS } from '../config/operationsFleetConsoleRoutes';
 import { getCanonicalAppPagePaths } from '../data/emergencyPageRenderInventory';
 
 const appSource = readFileSync(join(__dirname, '..', 'app', 'router.tsx'), 'utf8');
@@ -36,19 +40,26 @@ describe('canonical route/auth architecture', () => {
   });
 
   it('uses redirects for retired assistant aliases', () => {
-    for (const path of ['/assistant', '/chat', '/ai', '/copilot']) {
-      expect(appSource).toContain(`path="${path}"`);
-      expect(appSource).toContain('to={CANONICAL_ROUTES.emergencyCopilot}');
+    expect(appSource).toContain('OUTSIDE_SHELL_ROUTE_REDIRECTS.map');
+    for (const path of ASSISTANT_ROUTE_ALIASES) {
+      expect(
+        OUTSIDE_SHELL_ROUTE_REDIRECTS.some(
+          (redirect) => redirect.path === path && redirect.to === CANONICAL_ROUTES.emergencyCopilot,
+        ),
+      ).toBe(true);
     }
   });
 
   it('keeps fleet and operations routes wired in router.tsx', () => {
     expect(appSource).toMatch(/<Route path="\/tools\/\*"\s+element=\{<ToolsRedirect \/>\}/);
-    expect(appSource).toContain('CANONICAL_ROUTES.fleetCommand');
-    expect(appSource).toMatch(
-      /path="\/fleet"\s+element=\{<Navigate to=\{CANONICAL_ROUTES\.emergencyEms\}/,
-    );
-    expect(appSource).toContain('CANONICAL_ROUTES.hospitalMap');
+    expect(appSource).toContain('IN_SHELL_ROUTE_REDIRECTS.map');
+    expect(
+      IN_SHELL_ROUTE_REDIRECTS.some(
+        (redirect) => redirect.path === '/fleet' && redirect.to === CANONICAL_ROUTES.fleetCommand,
+      ),
+    ).toBe(true);
+    expect(OPERATIONS_FLEET_CONSOLE_ROUTE_PATHS).toContain(CANONICAL_ROUTES.fleetCommand);
+    expect(OPERATIONS_FLEET_CONSOLE_ROUTE_PATHS).toContain(CANONICAL_ROUTES.hospitalMap);
   });
 
   it('ensures unknown protected routes use role-aware default redirect', () => {

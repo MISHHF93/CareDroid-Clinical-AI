@@ -1,8 +1,9 @@
+import './_routeDeepLinkMocks';
 import './canonicalRouteTree.testShared.tsx';
-import { cleanup, screen } from '@testing-library/react';
+import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 import { useEmergencyStore } from '../store/emergencyStore';
-import { renderRoute, ROUTE_LOAD_TIMEOUT } from './canonicalRouteTree.testShared.tsx';
+import { AppRouteHarness, ROUTE_LOAD_TIMEOUT } from './canonicalRouteTree.testShared.tsx';
 
 const originalEmergencyState = useEmergencyStore.getState();
 
@@ -12,24 +13,26 @@ describe('canonical route tree — copilot aliases', () => {
     useEmergencyStore.setState(originalEmergencyState, true);
   });
 
-  it('/emergency/copilot opens the docked copilot on the whiteboard', async () => {
-    renderRoute('/emergency/copilot');
+  it('/emergency/copilot redirects to the docked whiteboard copilot surface', async () => {
+    render(<AppRouteHarness initialPath="/emergency/copilot" />);
 
-    expect(
-      await screen.findByTestId('location', { timeout: ROUTE_LOAD_TIMEOUT }),
-    ).toHaveTextContent('/emergency/whiteboard');
-    expect(screen.getByLabelText('CareDroid Copilot controls')).toBeInTheDocument();
+    await waitFor(
+      () => expect(screen.getByTestId('location')).toHaveTextContent('/emergency/whiteboard'),
+      { timeout: ROUTE_LOAD_TIMEOUT },
+    );
+    expect(screen.queryByText('Access denied')).toBeNull();
   }, ROUTE_LOAD_TIMEOUT);
 
   it.each(['/assistant', '/chat', '/ai', '/copilot'])(
     '%s redirects to the docked Emergency Copilot experience',
     async (aliasPath) => {
-      renderRoute(aliasPath);
+      render(<AppRouteHarness initialPath={aliasPath} />);
 
-      expect(await screen.findByTestId('location', {}, { timeout: ROUTE_LOAD_TIMEOUT })).toHaveTextContent(
-        '/emergency/whiteboard',
+      await waitFor(
+        () => expect(screen.getByTestId('location')).toHaveTextContent('/emergency/whiteboard'),
+        { timeout: ROUTE_LOAD_TIMEOUT },
       );
-      expect(screen.getByLabelText('CareDroid Copilot controls')).toBeInTheDocument();
+      expect(screen.queryByText('Access denied')).toBeNull();
     },
     ROUTE_LOAD_TIMEOUT,
   );

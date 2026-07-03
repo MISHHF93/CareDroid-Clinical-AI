@@ -1,0 +1,218 @@
+/**
+ * CareDroid public / legal / orientation pages — outside AppShell.
+ * Uses CDL tokens; no legacy navy gradient theme.
+ */
+
+.cdl-public-page {
+  min-height: var(--app-viewport-height, 100dvh);
+  background: var(--cdl-canvas-bg, var(--medical-surface-page));
+  color: var(--medical-ink);
+  font-family: var(--app-font-family-body);
+  padding: var(--app-layout-page-gutter-block) var(--app-layout-page-gutter-inline);
+}
+
+.cdl-public-page__container {
+  display: grid;
+  gap: var(--cdl-zone-gap, var(--app-layout-section-gap));
+  margin-inline: auto;
+  max-width: var(--app-layout-readable-max, 1120px);
+  width: 100%;
+}
+
+.cdl-public-page__identity {
+  display: grid;
+  gap: var(--cdl-panel-gap, var(--app-layout-panel-gap));
+}
+
+.cdl-public-page__back {
+  align-self: start;
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-md);
+  background: var(--app-surface);
+  color: var(--app-text);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: var(--app-type-small);
+  font-weight: 600;
+  gap: var(--app-space-xs);
+  justify-content: center;
+  min-height: var(--app-control-height-sm, 36px);
+  padding: 0 var(--app-space-md);
+  text-decoration: none;
+  transition:
+    border-color var(--cdl-motion-fast) var(--cdl-motion-ease),
+    background-color var(--cdl-motion-fast) var(--cdl-motion-ease);
+  width: fit-content;
+}
+
+.cdl-public-page__back:hover,
+.cdl-public-page__back:focus-visible {
+  border-color: var(--semantic-information-border);
+  background: var(--semantic-information-bg);
+  color: var(--semantic-information);
+  outline: var(--app-focus-ring);
+  outline-offset: 2px;
+}
+
+.cdl-public-page__eyebrow {
+  color: var(--semantic-operational-status);
+  font-size: var(--app-type-caption);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.cdl-public-page__title {
+  color: var(--app-text);
+  font-size: var(--app-type-display, clamp(1.5rem, 4vw, 2rem));
+  font-weight: 800;
+  line-height: var(--type-heading-line-height, 1.2);
+  margin: 0;
+}
+
+.cdl-public-page__description {
+  color: var(--app-text-muted);
+  font-size: var(--app-type-body);
+  line-height: var(--type-body-line-height, 1.55);
+  margin: 0;
+  max-width: 68ch;
+}
+
+.cdl-public-page__content {
+  align-content: start;
+  display: grid;
+  gap: var(--cdl-zone-gap);
+}
+
+.cdl-public-page__prose {
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-lg);
+  background: var(--app-surface);
+  box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
+  display: grid;
+  gap: var(--cdl-panel-gap);
+  padding: var(--cdl-zone-padding);
+}
+
+.cdl-public-page__prose h2,
+.cdl-public-page__prose h3 {
+  color: var(--app-text);
+  font-size: var(--app-type-subheading);
+  font-weight: 600;
+  line-height: 1.35;
+  margin: var(--app-space-md) 0 var(--app-space-xs);
+}
+
+.cdl-public-page__prose h2:first-child,
+.cdl-public-page__prose h3:first-child {
+  margin-top: 0;
+}
+
+.cdl-public-page__prose p,
+.cdl-public-page__prose li {
+  color: var(--app-text-muted);
+  font-size: var(--app-type-small);
+  line-height: 1.6;
+  margin: 0 0 var(--app-space-sm);
+}
+
+.cdl-public-page__prose ul {
+  margin: 0;
+  padding-left: var(--app-space-lg);
+}
+
+.cdl-public-faq {
+  display: grid;
+  gap: var(--cdl-panel-gap);
+}
+
+.cdl-public-faq__section {
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-lg);
+  background: var(--app-surface);
+  box-shadow: var(--cdl-clinical-shadow-rest);
+  overflow: hidden;
+}
+
+.cdl-public-faq__trigger {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: var(--app-text);
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  font-size: var(--app-type-subheading);
+  font-weight: 600;
+  gap: var(--app-space-md);
+  justify-content: space-between;
+  min-height: var(--app-control-height-md, 44px);
+  padding: var(--app-space-md) var(--app-space-lg);
+  text-align: left;
+  width: 100%;
+}
+
+.cdl-public-faq__trigger:focus-visible {
+  outline: var(--app-focus-ring);
+  outline-offset: -2px;
+}
+
+.cdl-public-faq__chevron {
+  color: var(--semantic-operational-status);
+  flex-shrink: 0;
+  font-size: var(--app-type-body);
+  transition: transform var(--cdl-motion-fast) var(--cdl-motion-ease);
+}
+
+.cdl-public-faq__section--open .cdl-public-faq__chevron {
+  transform: rotate(180deg);
+}
+
+.cdl-public-faq__panel {
+  border-top: 1px solid var(--app-border);
+  display: grid;
+  gap: var(--cdl-panel-gap);
+  padding: var(--app-space-md) var(--app-space-lg) var(--app-space-lg);
+}
+
+.cdl-public-faq__item h3 {
+  color: var(--semantic-information);
+  font-size: var(--app-type-small);
+  font-weight: 600;
+  margin: 0 0 var(--app-space-xs);
+}
+
+.cdl-public-faq__item p {
+  color: var(--app-text-muted);
+  font-size: var(--app-type-small);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.cdl-public-page__cta {
+  border: 1px solid var(--semantic-information-border);
+  border-radius: var(--app-radius-lg);
+  background: var(--semantic-information-bg);
+  color: var(--app-text);
+  padding: var(--cdl-zone-padding);
+  text-align: center;
+}
+
+.cdl-public-page__cta h2 {
+  color: var(--semantic-information);
+  font-size: var(--app-type-subheading);
+  margin: 0 0 var(--app-space-sm);
+}
+
+.cdl-public-page__cta p {
+  color: var(--app-text-muted);
+  font-size: var(--app-type-small);
+  margin: 0 0 var(--app-space-md);
+}
+
+.cdl-public-page__cta a {
+  color: var(--semantic-information);
+  font-weight: 600;
+}

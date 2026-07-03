@@ -24,7 +24,9 @@ describe('Copilot operational awareness wiring', () => {
 
   it('feeds central node pressure, queue, reassessment, and alert context into Copilot', () => {
     expect(source).toContain('useRouteScreenMode()');
-    expect(source).toContain('useOperationalIntelligence({ screenMode: routeScreenMode })');
+    expect(source).toContain('useAiChiefOrchestrator({');
+    expect(source).toContain('screenMode: routeScreenMode');
+    expect(source).toContain('aiChiefOrchestrator.centralSnapshot');
     expect(source).toContain('centralSnapshot.emsPressure');
     expect(source).toContain('centralSnapshot.boardingStatus');
     expect(source).toContain('centralSnapshot.queueHealth');

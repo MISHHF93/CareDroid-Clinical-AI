@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import {
   CANONICAL_APP_ROUTE_TREE,
   CANONICAL_ROUTES,
+  IN_SHELL_ROUTE_REDIRECTS,
   LEGACY_EMERGENCY_ROUTE_REDIRECTS,
   NON_ED_WORKSPACE_REDIRECT_ROUTES,
   PROTECTED_ROUTE_ALIAS_REDIRECTS,
@@ -118,6 +119,14 @@ describe('canonical route tree', () => {
     expect(appSource).toMatch(/<Route path="\/calculators\/\*"\s+element=\{<ToolsRedirect \/>\}/);
     expect(appSource).toContain('COMMAND_CENTER_INTELLIGENCE_REDIRECTS.map');
     expect(appSource).toContain('LEGACY_EMERGENCY_ROUTE_REDIRECTS.map(({ path, to }) => (');
+    expect(appSource).toContain('IN_SHELL_ROUTE_REDIRECTS.map');
+    expect(IN_SHELL_ROUTE_REDIRECTS).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ path: '/organization', to: CANONICAL_ROUTES.adminOperations }),
+        expect.objectContaining({ path: '/fleet', to: CANONICAL_ROUTES.fleetCommand }),
+        expect.objectContaining({ path: '/ai/evaluation', to: CANONICAL_ROUTES.aiEvaluation }),
+      ]),
+    );
     expect(LEGACY_EMERGENCY_ROUTE_REDIRECTS).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ path: '/pulse', to: '/emergency/pulse' }),

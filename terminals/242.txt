@@ -1,7 +1,0 @@
----
-pid: 28712
-cwd: "C:\Users\borah\CareDroid-Clinical-AI"
-command: "cd C:\\Users\\borah\\CareDroid-Clinical-AI; npx.cmd tsc --noEmit -p tsconfig.frontend.json 2>&1 | Select-Object -Last 8"
-started_at: 2026-07-01T22:26:28.872Z
-running_for_ms: 27240003 
----

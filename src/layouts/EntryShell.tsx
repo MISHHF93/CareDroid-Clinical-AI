@@ -17,7 +17,7 @@ export function EntryShell({ children }: EntryShellProps) {
   const clinicalHome = resolveAppStartupRoute();
 
   return (
-    <div className="entry-shell">
+    <div className="entry-shell cdl-shell cdl-shell--entry">
       <header className="entry-shell__header">
         <div className="entry-shell__brand">
           <span className="entry-shell__eyebrow">CareDroid · {CAREDROID_PRODUCT.name}</span>

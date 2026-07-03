@@ -53,8 +53,8 @@ export default function PlatformEntryHub() {
     <PageShell
       as="div"
       suppressHeader
-      className="platform-entry"
-      contentClassName="platform-entry__content"
+      className="platform-entry cdl-operational-page"
+      contentClassName="platform-entry__content cdl-zone cdl-zone--active-work"
     >
       {surfaces.chrome.showEntryHubBackendSync ? (
         <p className="platform-entry__sync" role="status">

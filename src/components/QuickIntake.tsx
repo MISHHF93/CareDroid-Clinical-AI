@@ -16,7 +16,11 @@ import {
 } from '../utils/patientDuplicateDetection';
 import DuplicateReviewAlert from './verification/DuplicateReviewAlert';
 import { registerNewArrival } from '../services/arrivalControlLayer';
+import { completeIntakeHandoff } from '../services/receptionHandoff';
+import { confirmCareDroidAction } from '../services/careDroidInteractionFeedback';
 import { routeQuickIntakeThroughOrchestrator } from '../services/receptionIntakeOrchestrator';
+import useProfileNavigate from '../hooks/useProfileNavigate';
+import { notifyWorkflowHandoffComplete } from '../services/workflowNavigationFeedback';
 import { buildPatientArrivalRecord, syncPatientFromArrival } from '../services/patientArrivalModel';
 import {
   buildHighRiskComplaintPatch,
@@ -180,6 +184,7 @@ export default function QuickIntake({
   variant = 'whiteboard',
 }: QuickIntakeProps) {
   const copy = QUICK_INTAKE_COPY[variant];
+  const { profileNavigate } = useProfileNavigate();
   const emergencyRole = useEmergencyRolePermissions();
   const addPatient = useEmergencyStore((state) => state.addPatient);
   const patients = useEmergencyStore((state) => state.patients);
@@ -271,7 +276,7 @@ export default function QuickIntake({
     window.setTimeout(() => complaintInputRef.current?.focus(), 0);
   };
 
-  const closeWithConfirm = () => {
+  const closeWithConfirm = async () => {
     const hasDraft = Boolean(
       complaintCategory ||
       complaint.trim() ||
@@ -283,7 +288,17 @@ export default function QuickIntake({
       vitalsForm.spo2 ||
       vitalsForm.temp,
     );
-    if (!hasDraft || window.confirm('Discard this intake?')) onClose();
+    if (
+      !hasDraft ||
+      (await confirmCareDroidAction({
+        title: 'Discard intake?',
+        message: 'Unsaved intake details will be lost.',
+        confirmLabel: 'Discard',
+        tone: 'danger',
+      }))
+    ) {
+      onClose();
+    }
   };
 
   const submit = async (event?: FormEvent) => {
@@ -334,7 +349,13 @@ export default function QuickIntake({
           routeResult.patientId,
           { source: 'quick-intake-reception' },
         );
+        notifyWorkflowHandoffComplete({
+          patientName: `${routeResult.patient.firstName} ${routeResult.patient.lastName}`.trim(),
+          nextRoute: routeResult.nextRoute,
+          onNavigate: profileNavigate,
+        });
         onAdded(routeResult.patient);
+        profileNavigate(routeResult.nextRoute);
         onClose();
       } catch (error: any) {
         setSubmitError(
@@ -422,6 +443,7 @@ export default function QuickIntake({
       const response = await createSmartIntakePatient(patient);
       const persistedPatient = response?.data?.patient || patient;
       addPatient(persistedPatient);
+      const handoffSource = isReceptionIntake ? 'reception-quick-intake' : 'quick-intake';
       registerNewArrival(
         {
           patients: useEmergencyStore.getState().patients,
@@ -429,12 +451,24 @@ export default function QuickIntake({
           dispatchWebSocketEvent: useEmergencyStore.getState().dispatchWebSocketEvent,
         },
         persistedPatient.id,
-        { source: isReceptionIntake ? 'quick-intake-reception' : 'quick-intake-whiteboard' },
+        { source: handoffSource },
       );
+      const handoff = completeIntakeHandoff(useEmergencyStore.getState(), {
+        patientId: persistedPatient.id,
+        source: handoffSource,
+        actorName: emergencyRole.roleLabel || 'Intake',
+      });
+      notifyWorkflowHandoffComplete({
+        patientName: `${persistedPatient.firstName} ${persistedPatient.lastName}`.trim(),
+        nextRoute: handoff.nextRoute,
+        onNavigate: profileNavigate,
+      });
       onAdded(persistedPatient);
+      profileNavigate(handoff.nextRoute);
       onClose();
     } catch (error: any) {
       addPatient(patient);
+      const handoffSource = isReceptionIntake ? 'reception-quick-intake' : 'quick-intake';
       registerNewArrival(
         {
           patients: useEmergencyStore.getState().patients,
@@ -442,9 +476,20 @@ export default function QuickIntake({
           dispatchWebSocketEvent: useEmergencyStore.getState().dispatchWebSocketEvent,
         },
         patient.id,
-        { source: isReceptionIntake ? 'quick-intake-reception' : 'quick-intake-whiteboard' },
+        { source: handoffSource },
       );
+      const handoff = completeIntakeHandoff(useEmergencyStore.getState(), {
+        patientId: patient.id,
+        source: handoffSource,
+        actorName: emergencyRole.roleLabel || 'Intake',
+      });
+      notifyWorkflowHandoffComplete({
+        patientName: `${patient.firstName} ${patient.lastName}`.trim(),
+        nextRoute: handoff.nextRoute,
+        onNavigate: profileNavigate,
+      });
       onAdded(patient);
+      profileNavigate(handoff.nextRoute);
       onClose();
       setSubmitError(
         `${formatApiRecoveryMessage(error, 'intake form')} ${ERROR_RECOVERY_COPY.handoffPending}`,

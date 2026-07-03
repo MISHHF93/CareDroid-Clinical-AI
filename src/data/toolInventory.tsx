@@ -1187,38 +1187,21 @@ export function getAuditToolInventory(records = getCanonicalToolInventory()) {
     .sort((a, b) => `${a.kind}:${a.label}`.localeCompare(`${b.kind}:${b.label}`));
 }
 
+/**
+ * @deprecated Prefer `getUserFacingToolRegistryProjection` filtered by sidebar visibility.
+ */
 export function getSidebarToolRegistryProjection(records = getCanonicalToolInventory()) {
   if (records === cachedInventory && cachedSidebarToolRegistryProjection) {
     return cachedSidebarToolRegistryProjection;
   }
-  const projection = getSidebarToolInventory(records)
-    .map((record) => {
-      const legacy = toolRegistryById[record.id] || {};
-      const category = legacy.category || presentationCategory(record.category);
-      return {
-        ...legacy,
-        id: record.id,
-        name: record.label || legacy.name || record.id,
-        path: record.route || legacy.path || record.fallbackRoute || TOOL_LAUNCH_PATHS.toolsCatalog,
-        color: legacy.color || DEFAULT_COLOR_BY_CATEGORY[category] || DEFAULT_COLOR_BY_CATEGORY.Other,
-        description: record.safetyCopy || legacy.description || 'Clinical decision support tool',
-        shortcut: legacy.shortcut || null,
-        category,
-        features: legacy.features || [],
-        useCases: legacy.useCases || [],
-        panelTool:
-          legacy.panelTool ||
-          (record.calculatorSlug && record.id !== REGISTRY.calculatorsHub ? REGISTRY.calculatorsHub : undefined),
-        initialCalc: legacy.initialCalc || record.calculatorSlug || undefined,
-        canonicalInventoryId: record.id,
-        launchType: record.launchType,
-        tier: record.tier,
-        nluToolId: record.nluToolId,
-        executorStatus: record.executorStatus,
-        lifecycleState: record.lifecycleState,
-        lifecycleLabel: TOOL_LIFECYCLE_LABELS[record.lifecycleState] || 'Active',
-      };
-    })
+  const sidebarIds = new Set(getSidebarToolInventory(records).map((record) => record.id));
+  const projection = getUserFacingToolRegistryProjection(records)
+    .filter((record) => sidebarIds.has(record.id))
+    .map((record) => ({
+      ...record,
+      canonicalInventoryId: record.id,
+      lifecycleLabel: TOOL_LIFECYCLE_LABELS[record.lifecycleState] || 'Active',
+    }))
     .sort(
       (a, b) =>
         (ALL_REGISTRY_TOOL_ID_ORDER.get(a.id) ?? Number.MAX_SAFE_INTEGER) -

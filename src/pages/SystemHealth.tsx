@@ -6,6 +6,12 @@ import {
   fetchDeploymentTruth,
   normalizeHealthPayload,
 } from '../services/systemHealthService';
+import { useObservabilityDiagnostics } from '../hooks/useObservabilityDiagnostics';
+import { OperationalDiagnosticsPanel } from '../components/observability/OperationalDiagnosticsPanel';
+import {
+  fetchServerObservabilityDiagnostics,
+  probeObservabilityHealth,
+} from '../services/observabilityDiagnosticsApi';
 import {
   CareDroidPage,
   DashboardGrid,
@@ -41,6 +47,7 @@ function MetadataGrid({ rows }) {
 }
 
 export default function SystemHealth() {
+  const clientDiagnostics = useObservabilityDiagnostics();
   const [state, setState] = useState<any>({
     loading: true,
     backendHealth: INITIAL_BACKEND_HEALTH,
@@ -49,13 +56,21 @@ export default function SystemHealth() {
     sourceStatus: 'loading',
     message: '',
   });
+  const [serverDiagnostics, setServerDiagnostics] = useState<Record<string, unknown> | null>(null);
+  const [observabilityHealth, setObservabilityHealth] = useState<{ status?: string } | null>(null);
 
   useEffect(() => {
     let cancelled = false;
 
-    fetchDeploymentTruth().then((result) => {
+    Promise.all([
+      fetchDeploymentTruth(),
+      probeObservabilityHealth(),
+      fetchServerObservabilityDiagnostics(),
+    ]).then(([result, healthProbe, serverDiag]) => {
       if (!cancelled) {
         setState({ loading: false, ...result });
+        setObservabilityHealth(healthProbe);
+        setServerDiagnostics(serverDiag.ok ? (serverDiag.data as Record<string, unknown>) : null);
       }
     });
 
@@ -163,6 +178,18 @@ export default function SystemHealth() {
           </DashboardSection>
         ),
         history: (
+          <>
+          <DashboardSection
+            className="system-health-section"
+            title="Operational diagnostics"
+            titleId="client-observability-title"
+          >
+            <OperationalDiagnosticsPanel
+              client={clientDiagnostics}
+              server={serverDiagnostics}
+              observabilityHealth={observabilityHealth}
+            />
+          </DashboardSection>
           <DashboardSection className="system-health-section" title="Health Endpoints" titleId="health-endpoints-title">
             <DashboardGrid className="system-health-endpoint-grid">
               <article className="cd-surface-card">
@@ -193,6 +220,7 @@ export default function SystemHealth() {
               </article>
             </DashboardGrid>
           </DashboardSection>
+          </>
         ),
       }}
     />

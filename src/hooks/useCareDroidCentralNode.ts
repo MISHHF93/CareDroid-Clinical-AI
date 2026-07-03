@@ -8,7 +8,7 @@ import { useEmergencyStore } from '../store/emergencyStore';
 import { useEmergencyRolePermissions } from './useEmergencyRolePermissions';
 import useRouteScreenMode from './useRouteScreenMode';
 import { fetchCareDroidCentralNodeSnapshot } from '../services/emergencyOsApi';
-import { startEmergencyRealtime } from '../services/emergencyRealtimeService';
+import startEmergencyRealtime from '../services/emergencyRealtimeService';
 
 type UseCareDroidCentralNodeOptions = {
   screenMode?: CareDroidScreenMode;

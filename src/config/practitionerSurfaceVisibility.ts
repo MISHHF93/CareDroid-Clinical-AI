@@ -47,6 +47,7 @@ const FULL_VISIBILITY = Object.freeze({
     showToolChips: true,
     showNativeAiBadges: true,
     showDataQualitySignals: true,
+    showJourneyBadge: true,
     badgeLimit: 2,
   }),
     copilot: Object.freeze({
@@ -134,6 +135,10 @@ const FULL_VISIBILITY = Object.freeze({
     showDescriptions: true,
     showMetricCards: true,
     showSituationBrief: true,
+    showJourneyRail: true,
+    showAiChiefBar: true,
+    showThreeMinuteMissionBar: true,
+    showWorkflowAutomationBar: true,
     showCrossLinks: true,
     showCapacityUpgradeHarness: true,
     showJourneyEngineCard: true,
@@ -194,6 +199,7 @@ function buildPilotVisibility(context: any = {}) {
       showToolChips: !c.suppressPatientCardToolChips,
       showNativeAiBadges: !c.suppressPatientCardNativeAiBadges,
       showDataQualitySignals: !c.suppressPatientCardDataQualitySignals,
+      showJourneyBadge: !c.hidePatientJourneyEngineCard,
       badgeLimit,
     }),
     copilot: Object.freeze({
@@ -282,6 +288,10 @@ function buildPilotVisibility(context: any = {}) {
       showMetricCards:
         !c.suppressEmergencyRouteMetricCards && !c.suppressEmergencyRouteMetrics,
       showSituationBrief: true,
+      showJourneyRail: !c.hidePatientJourneyEngineCard,
+      showAiChiefBar: c.showOperationalCommandBars !== false,
+      showThreeMinuteMissionBar: c.showOperationalCommandBars !== false,
+      showWorkflowAutomationBar: c.showOperationalCommandBars !== false,
       showCrossLinks: !c.suppressEmergencyRouteCrossLinks,
       showCapacityUpgradeHarness: !c.suppressCapacityUpgradeHarness,
       showJourneyEngineCard: !c.hidePatientJourneyEngineCard,

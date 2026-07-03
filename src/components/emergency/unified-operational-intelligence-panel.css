@@ -1,0 +1,156 @@
+.unified-operational-intelligence-panel {
+  display: grid;
+  gap: 12px;
+}
+
+.unified-operational-intelligence-panel--critical {
+  border-color: color-mix(in srgb, var(--status-critical, #dc2626) 35%, transparent);
+}
+
+.unified-operational-intelligence-panel--warning {
+  border-color: color-mix(in srgb, var(--status-warning, #d97706) 30%, transparent);
+}
+
+.unified-operational-intelligence-panel__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.unified-operational-intelligence-panel__identity {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  color: var(--ed-text-primary, #0f172a);
+}
+
+.unified-operational-intelligence-panel__source,
+.unified-operational-intelligence-panel__refreshed {
+  font-size: 11px;
+  color: var(--ed-text-meta, #64748b);
+}
+
+.unified-operational-intelligence-panel__refresh {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.unified-operational-intelligence-panel__error {
+  margin: 0;
+  color: var(--status-critical, #dc2626);
+  font-size: 12px;
+}
+
+.unified-operational-intelligence-panel__safety {
+  margin: 0;
+  font-size: 11px;
+  color: var(--ed-text-meta, #64748b);
+  font-style: italic;
+}
+
+.unified-operational-intelligence-panel__metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  font-size: 11px;
+  color: var(--ed-text-meta, #64748b);
+}
+
+.unified-operational-intelligence-panel__domains {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.unified-operational-intelligence-panel__domain {
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--ed-border-subtle, #e2e8f0);
+  background: var(--ed-surface-raised, #f8fafc);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.unified-operational-intelligence-panel__domain--healthy {
+  color: var(--status-success, #15803d);
+}
+
+.unified-operational-intelligence-panel__domain--watch {
+  color: var(--status-warning, #d97706);
+}
+
+.unified-operational-intelligence-panel__domain--critical {
+  color: var(--status-critical, #dc2626);
+}
+
+.unified-operational-intelligence-panel__empty {
+  margin: 0;
+  font-size: 12px;
+  color: var(--ed-text-meta, #64748b);
+}
+
+.unified-operational-intelligence-panel__insights {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.unified-operational-intelligence-panel__insight {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--ed-border-subtle, #e2e8f0);
+  background: #fff;
+}
+
+.unified-operational-intelligence-panel__insight--critical {
+  border-color: color-mix(in srgb, var(--status-critical, #dc2626) 35%, transparent);
+}
+
+.unified-operational-intelligence-panel__insight--warning {
+  border-color: color-mix(in srgb, var(--status-warning, #d97706) 30%, transparent);
+}
+
+.unified-operational-intelligence-panel__insight-main {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
+}
+
+.unified-operational-intelligence-panel__insight-type {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ed-text-meta, #64748b);
+}
+
+.unified-operational-intelligence-panel__insight-main p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--ed-text-secondary, #334155);
+}
+
+.unified-operational-intelligence-panel__insight-meta {
+  font-size: 10px;
+  color: var(--ed-text-meta, #64748b);
+}
+
+.unified-operational-intelligence-panel__footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

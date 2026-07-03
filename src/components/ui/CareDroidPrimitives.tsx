@@ -1,4 +1,5 @@
 import React, { HTMLAttributes, LabelHTMLAttributes, TableHTMLAttributes } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { CDL_PAGE_ZONES, type CdlPageZoneId } from '../../config/caredroidDesignLanguage';
 import Badge from './Badge';
 import Card from './card';
@@ -55,6 +56,10 @@ export function PageShell({
         >
           {null}
         </PageHeader>
+      ) : title ? (
+        <h1 id={titleId} className="sr-only">
+          {title}
+        </h1>
       ) : null}
       <div className={['cd-page-shell__content', contentClassName].filter(Boolean).join(' ')}>
         {children}
@@ -132,6 +137,24 @@ export function DashboardGrid({ children, variant = 'cards', className = '', as:
   return (
     <Element
       className={['cd-dashboard-grid', `cd-dashboard-grid--${variant}`, className].filter(Boolean).join(' ')}
+      {...props}
+    >
+      {children}
+    </Element>
+  );
+}
+
+/** CDL responsive grid — metrics, cards, split, tools presets. */
+export function OperationalGrid({
+  children,
+  variant = 'cards',
+  className = '',
+  as: Element = 'div',
+  ...props
+}: GridProps) {
+  return (
+    <Element
+      className={['cdl-grid', `cdl-grid--${variant}`, className].filter(Boolean).join(' ')}
       {...props}
     >
       {children}
@@ -687,6 +710,60 @@ export function CareDroidPage({
         {children}
       </OperationalPageTemplate>
     </PageShell>
+  );
+}
+
+interface PublicPageTemplateProps extends HTMLAttributes<HTMLDivElement> {
+  title: React.ReactNode;
+  eyebrow?: React.ReactNode;
+  description?: React.ReactNode;
+  children?: React.ReactNode;
+  backHref?: string;
+  className?: string;
+  contentClassName?: string;
+}
+
+/**
+ * Outside-shell public pages (legal, help, version) — CDL identity + operational content zones.
+ */
+export function PublicPageTemplate({
+  title,
+  eyebrow,
+  description,
+  children,
+  backHref,
+  className = '',
+  contentClassName = '',
+  ...props
+}: PublicPageTemplateProps) {
+  const navigate = useNavigate();
+
+  return (
+    <div className={['cdl-public-page', className].filter(Boolean).join(' ')} {...props}>
+      <div className="cdl-public-page__container">
+        <header className="cdl-public-page__identity cdl-zone cdl-zone--identity">
+          {backHref ? (
+            <Link className="cdl-public-page__back" to={backHref}>
+              ← Back
+            </Link>
+          ) : (
+            <button type="button" className="cdl-public-page__back" onClick={() => navigate(-1)}>
+              ← Back
+            </button>
+          )}
+          {eyebrow ? <p className="cdl-public-page__eyebrow">{eyebrow}</p> : null}
+          <h1 className="cdl-public-page__title">{title}</h1>
+          {description ? <p className="cdl-public-page__description">{description}</p> : null}
+        </header>
+        <div
+          className={['cdl-operational-page', 'cdl-public-page__content', contentClassName]
+            .filter(Boolean)
+            .join(' ')}
+        >
+          {children}
+        </div>
+      </div>
+    </div>
   );
 }
 

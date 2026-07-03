@@ -1,5 +1,6 @@
 /**
- * Legacy MD/RN/PA/Tech permission helpers — delegate to canonical CareDroid registry.
+ * @deprecated Legacy MD/RN/PA/Tech permission helpers — use `config/emergencyRolePermissions` or `useSecurityAccess`.
+ * Retained for registry documentation only; no production imports.
  */
 import {
   hasEmergencyActionPermission,

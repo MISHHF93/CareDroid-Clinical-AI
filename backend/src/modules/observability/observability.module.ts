@@ -1,4 +1,7 @@
-import { Controller, Get, Injectable, Module, UseGuards } from '@nestjs/common';
+import { Controller, Get, Injectable, Module, OnModuleInit, UseGuards } from '@nestjs/common';
+import { registerPlatformTelemetrySink } from '../../common/observability/platform-telemetry-sink';
+import { PlatformTelemetryController } from './platform-telemetry.controller';
+import { PlatformTelemetryService } from './platform-telemetry.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Permissions } from '../auth/decorators/permissions.decorator';
 import { Permission } from '../auth/enums/permission.enum';
@@ -7,8 +10,15 @@ import { PlatformGovernanceModule, PlatformGovernanceService } from '../platform
 import { getEnvironmentConfig } from '../../config/environment.config';
 
 @Injectable()
-export class ObservabilityService {
-  constructor(private readonly platformGovernance: PlatformGovernanceService) {}
+export class ObservabilityService implements OnModuleInit {
+  constructor(
+    private readonly platformGovernance: PlatformGovernanceService,
+    private readonly platformTelemetry: PlatformTelemetryService,
+  ) {}
+
+  onModuleInit() {
+    registerPlatformTelemetrySink(this.platformTelemetry);
+  }
 
   async getSystemHealth() {
     const config = getEnvironmentConfig();
@@ -111,6 +121,13 @@ export class ObservabilityService {
         summary: 'Simulation assets and scenario routes are included in the SaaS health model.',
         evidence: [`simulationStatus=${config.runtime.simulationHealthStatus}`],
       }),
+      this.buildCheck({
+        id: 'observability',
+        label: 'Platform Telemetry',
+        status: this.observabilityTelemetryStatus(),
+        summary: 'Client workflow telemetry, API performance, and crash ingest buffer.',
+        evidence: this.observabilityTelemetryEvidence(),
+      }),
     ];
 
     const status = this.rollupStatus(checks.map((check) => check.status));
@@ -176,6 +193,27 @@ export class ObservabilityService {
   private statusLabel(status: 'healthy' | 'warning' | 'critical') {
     return status === 'healthy' ? 'Healthy' : status === 'warning' ? 'Warning' : 'Critical';
   }
+
+  private observabilityTelemetryStatus(): 'healthy' | 'warning' | 'critical' {
+    const diagnostics = this.platformTelemetry.getDiagnostics();
+    if (diagnostics.totals.errorCount > 25 || diagnostics.totals.crashReports > 10) {
+      return 'critical';
+    }
+    if (diagnostics.totals.slowApiCount > 5 || diagnostics.totals.errorCount > 0) {
+      return 'warning';
+    }
+    return 'healthy';
+  }
+
+  private observabilityTelemetryEvidence(): string[] {
+    const diagnostics = this.platformTelemetry.getDiagnostics();
+    return [
+      `bufferedEvents=${diagnostics.totals.bufferedEvents}`,
+      `slowApiCount=${diagnostics.totals.slowApiCount}`,
+      `errorCount=${diagnostics.totals.errorCount}`,
+      `crashReports=${diagnostics.totals.crashReports}`,
+    ];
+  }
 }
 
 @Controller('system-health')
@@ -204,8 +242,8 @@ export class SaasHealthController {
 
 @Module({
   imports: [PlatformGovernanceModule],
-  controllers: [ObservabilityController, SaasHealthController],
-  providers: [ObservabilityService],
-  exports: [ObservabilityService],
+  controllers: [ObservabilityController, SaasHealthController, PlatformTelemetryController],
+  providers: [ObservabilityService, PlatformTelemetryService],
+  exports: [ObservabilityService, PlatformTelemetryService],
 })
 export class ObservabilityModule {}

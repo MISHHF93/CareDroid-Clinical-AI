@@ -10,6 +10,7 @@ import { CheckCircle2, X } from 'lucide-react';
 import { Priority } from '../types/emergency';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { completeIntakeHandoff } from '../services/receptionHandoff';
+import { confirmCareDroidAction } from '../services/careDroidInteractionFeedback';
 import { formatApiRecoveryMessage } from '../config/errorRecoveryModel';
 import { TriageSuggestionEngine } from '../engine/triageEngine';
 import { buildSmartIntakeVerticalSlicePatient } from '../data/smartIntakeVerticalSlice';
@@ -34,11 +35,11 @@ const SEX_OPTIONS = [
 ];
 
 const CTAS_LABELS = {
-  [Priority.P1]: 'CTAS 1 · Resuscitation',
-  [Priority.P2]: 'CTAS 2 · Emergent',
-  [Priority.P3]: 'CTAS 3 · Urgent',
-  [Priority.P4]: 'CTAS 4 · Semi-Urgent',
-  [Priority.P5]: 'CTAS 5 · Non-Urgent',
+  [Priority.P1]: 'CTAS 1 ï¿½ Resuscitation',
+  [Priority.P2]: 'CTAS 2 ï¿½ Emergent',
+  [Priority.P3]: 'CTAS 3 ï¿½ Urgent',
+  [Priority.P4]: 'CTAS 4 ï¿½ Semi-Urgent',
+  [Priority.P5]: 'CTAS 5 ï¿½ Non-Urgent',
 };
 
 const INITIAL_IDENTITY = {
@@ -185,8 +186,18 @@ export default function NewPatientIntake({ open, onClose, onPatientAdded }) {
 
   if (!open) return null;
 
-  const requestClose = () => {
-    if (dirty && !window.confirm('Discard this quick intake draft?')) return;
+  const requestClose = async () => {
+    if (
+      dirty &&
+      !(await confirmCareDroidAction({
+        title: 'Discard intake draft?',
+        message: 'Unsaved intake details will be lost.',
+        confirmLabel: 'Discard',
+        tone: 'danger',
+      }))
+    ) {
+      return;
+    }
     resetDraft();
     onClose?.();
   };

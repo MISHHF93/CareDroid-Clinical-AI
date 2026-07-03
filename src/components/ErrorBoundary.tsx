@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { MEDICAL_THEME, MEDICAL_TYPE } from '../config/medicalTheme.constants';
-import { apiFetch } from '../services/apiClient';
+import crashReportingService from '../services/crashReportingService';
 import logger from '../utils/logger';
 
 const SESSION_KEY = 'caredroid_session_id';
@@ -20,25 +20,15 @@ const getSessionId = () => {
 };
 
 const reportCrash = (error, errorInfo) => {
-  const payload = {
-    id: `crash-${Date.now()}`,
-    error: {
-      name: error?.name || 'Error',
-      message: error?.message || 'Unknown error',
-      stack: error?.stack ? error.stack.split('\n') : [],
-    },
+  const normalizedError =
+    error instanceof Error
+      ? error
+      : new Error(String(error?.message || error || 'Unknown error'));
+  crashReportingService.captureException(normalizedError, {
     componentStack: errorInfo?.componentStack || '',
-    breadcrumbs: [],
-    timestamp: new Date().toISOString(),
     sessionId: getSessionId(),
-    environment: import.meta?.env?.MODE || 'development',
-  };
-
-  apiFetch('/api/crashes', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  }).catch(() => {});
+    surface: 'ErrorBoundary',
+  });
 };
 
 class ErrorBoundary extends Component<any, any> {

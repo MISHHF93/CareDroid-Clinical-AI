@@ -45,7 +45,7 @@ import WaitingRoomCommunicationBadge from './waiting-room/WaitingRoomCommunicati
 import TriageBreachBadge from './triage/TriageBreachBadge';
 import { isAwaitingTriage } from '../services/triageBreachTimer';
 import { selectReassessmentTimerForPatient } from '../engine/reassessmentTimerEngine';
-import { getActiveTimerForPatient } from '../engine/threeMinuteTimerEngine';
+import { useThreeMinuteMissionStore } from '../store/threeMinuteMissionStore';
 import { findPatientReferralAwareness } from './whiteboard/referralAwarenessModel';
 import { buildDataQualitySnapshot, getPatientDataQualityRisks } from '../services/dataQualityDiscovery';
 import useEmergencyDisplayPrivacy from '../hooks/useEmergencyDisplayPrivacy';
@@ -60,6 +60,7 @@ import {
   type EmergencyDisplayPrivacyPolicy,
 } from '../config/emergencyDisplayPrivacyPolicy';
 import PatientCardToolChips from './orchestration/PatientCardToolChips';
+import PatientJourneyStateBadge from './emergency/PatientJourneyStateBadge';
 import { getRecentSavedScores } from '../utils/clinicalScoreEvents';
 import { hasPatientFlag, latestPatientVitals, patientFlags } from '../utils/patientVitals';
 import WhiteboardOperationalIconStrip from './whiteboard/WhiteboardOperationalIconStrip';
@@ -80,6 +81,7 @@ import { fetchBoardingSignalsForPatient, type BoardingSignals } from '../service
 import { GraphicIconBadge, PatientAcuityRing } from './graphics/CdlGraphicKit';
 import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
 import { resolveCopilotChromeLabels } from '../config/profileDesignLanguage.config';
+import { usePhiViewAudit } from '../hooks/usePhiAccess';
 import './PatientCard.css';
 
 type PatientCardWorkflowProfile = 'none' | 'charge' | 'physician';
@@ -328,6 +330,7 @@ function PatientCard({
   onKeyboardFocus,
 }: PatientCardProps) {
   const emergencyRole = useEmergencyRolePermissions();
+  const effectiveProfile = useEffectiveUserProfile();
   const screenDensity = useScreenDensityMode();
   const patientCardSurfaces = usePractitionerSurfaceVisibility().patientCard;
   const maxPatientCardBadges = patientCardSurfaces.badgeLimit;
@@ -376,6 +379,13 @@ function PatientCard({
     if (patient.documentArtifacts?.length) return;
     syncDocumentArtifactsFromPatient(patient.id);
   }, [documentArtifactsEnabled, patient.documentArtifacts?.length, patient.id, syncDocumentArtifactsFromPatient]);
+
+  usePhiViewAudit(patient.id, {
+    enabled: !readOnlyDisplay && privacyPolicy.tier !== 'public' && !privacyPolicy.aggregateMetricsOnly,
+    source: 'PatientCard',
+    staffId: effectiveProfile?.id || emergencyRole.canonicalProfile?.id,
+    details: { layout, workflowProfile },
+  });
 
   const dataQualitySnapshot = useMemo(
     () => buildDataQualitySnapshot(allPatients),
@@ -438,8 +448,10 @@ function PatientCard({
   const scores = scoreBadges(patient);
   const waitStatusColor = hasLwbsRisk ? '#EF4444' : hasLongWait ? '#F59E0B' : waitColor(minutesWaiting);
   const priorityLabel = PriorityLabel[displayPriority] || String(displayPriority);
-  const activeResponseTimer = getActiveTimerForPatient(patient.id);
-  const threeMinuteTimerStart = activeResponseTimer?.startedAt || patient.arrivalTime;
+  const activeMission = useThreeMinuteMissionStore((state) =>
+    state.missions.find((mission) => mission.patientId === patient.id && !mission.acknowledgedAt),
+  );
+  const threeMinuteTimerStart = activeMission?.startedAt || patient.arrivalTime;
   const showThreeMinuteTimer =
     (displayPriority === 'P1' || displayPriority === 'P2') &&
     (patient.state === PatientState.Arrival ||
@@ -679,6 +691,9 @@ function PatientCard({
 
         <div className="patient-card__row-cell patient-card__row-cell--state">
           <span className="patient-card__state-pill">{whiteboardStateLabel}</span>
+          {patientCardSurfaces.showJourneyBadge ? (
+            <PatientJourneyStateBadge patient={patient} compact linkToRoute={false} />
+          ) : null}
         </div>
       </div>
     );
@@ -712,6 +727,9 @@ function PatientCard({
         <PatientAcuityRing priority={displayPriority} className="patient-card__acuity-ring" />
         <span className="patient-card__priority-label">{priorityLabel}</span>
         <span className="patient-card__state-pill">{whiteboardStateLabel}</span>
+        {patientCardSurfaces.showJourneyBadge ? (
+          <PatientJourneyStateBadge patient={patient} compact />
+        ) : null}
         {showThreeMinuteTimer && threeMinuteTimerStart && (
           <ThreeMinuteTimer startTime={threeMinuteTimerStart} compact />
         )}

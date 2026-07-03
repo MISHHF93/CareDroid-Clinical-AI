@@ -1,7 +1,0 @@
----
-pid: 14232
-cwd: "C:\Users\borah\CareDroid-Clinical-AI"
-command: "cd \"C:\\Users\\borah\\CareDroid-Clinical-AI\"; node node_modules/eslint/bin/eslint.js src --max-warnings 0 2>&1 | Select-Object -First 80"
-started_at: 2026-07-01T01:35:14.334Z
-running_for_ms: 4105003  
----

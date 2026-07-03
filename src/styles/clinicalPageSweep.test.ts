@@ -28,6 +28,10 @@ const SHELL_PAGE_FAMILIES = [
   'emergency-settings',
   'shift-summary',
   'emergency-pulse',
+  'platform-entry',
+  'platform-settings-page',
+  'settings-page',
+  'help-center-page',
 ];
 
 describe('clinical page sweep', () => {
@@ -74,7 +78,7 @@ describe('clinical page sweep', () => {
       'SmartIntake',
       'ReferralPanel',
       'IntegrationHubPage',
-      'SystemHealth',
+      'SaasHealthCenter',
       'Profile',
       'CopilotRoute',
     ].forEach((symbol) => {

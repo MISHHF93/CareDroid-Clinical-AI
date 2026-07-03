@@ -3,6 +3,7 @@ import type { ReviewAdministrativeAutomationInput } from '../../../../src/types/
 import type { AdministrativeAutomationSnapshot, AdministrativeAutomationTask } from '../../../../src/types/administrativeAutomation';
 import type { Alert, EMSArrival, Patient, Referral, Staff } from '../../../../src/types/emergency';
 import { PlatformAssetsService } from '../platform-assets/platform-assets.service';
+import type { EmergencyModuleEnvelope } from './emergency-os.types';
 import type { TenantContext } from '../tenant-context/tenant-context.types';
 import {
   buildBackendEnrichedAdministrativeAutomationSnapshot,
@@ -19,12 +20,14 @@ import {
 } from './emergency-os.services';
 import { EmergencyRealtimeService } from './emergency-realtime.service';
 
-function envelope<T>(title: string, data: T) {
+function envelope<T>(data: T, remainingGaps: string[] = []): EmergencyModuleEnvelope<T> {
   return {
-    success: true,
-    title,
+    module: 'workflow-orchestration',
     generatedAt: new Date().toISOString(),
+    source: 'backend-fixture',
+    status: remainingGaps.length ? 'placeholder' : 'active',
     data,
+    remainingGaps,
   };
 }
 
@@ -132,7 +135,7 @@ export class WorkflowOrchestrationService {
     const snapshot = await this.buildSnapshot(existingTasks, tenant);
     await this.persistTasks(organizationId, workspaceId, [...snapshot.tasks]);
     this.publish(snapshot, tenant);
-    return envelope('Unified Clinical Workflow Orchestrator', {
+    return envelope({
       snapshot,
       tasks: snapshot.tasks,
       metrics: snapshot.metrics,
@@ -153,7 +156,7 @@ export class WorkflowOrchestrationService {
     const snapshot = await this.buildSnapshot(reviewResult.tasks, tenant);
     await this.persistTasks(organizationId, workspaceId, [...snapshot.tasks]);
     this.publish(snapshot, tenant);
-    return envelope('Automation review recorded', {
+    return envelope({
       task: reviewResult.task,
       execution: reviewResult.execution,
       snapshot,

@@ -1,7 +1,0 @@
----
-pid: 24024
-cwd: "C:\Users\borah\CareDroid-Clinical-AI"
-command: "node \"C:\\Users\\borah\\CareDroid-Clinical-AI\\_orphan_audit.mjs\""
-started_at: 2026-07-01T00:32:28.054Z
-running_for_ms: 210003   
----

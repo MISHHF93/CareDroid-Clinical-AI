@@ -28,15 +28,20 @@ import { CANONICAL_ROUTES } from '../config/routes.config';
 import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
 import { EMPTY_STATE_COPY } from '../config/emptyStateCopy';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+import { usePhiViewAudit } from '../hooks/usePhiAccess';
 import { useUpgradeHarnessPatientFlow } from '../hooks/useEmergencyOs';
 import { usePatientTimelineContext } from '../hooks/usePatientTimelineContext';
 import { advancePatientJourneyState, dischargePatientSafely, getDefaultNextPatientState } from '../services/queueAssignment';
+import usePatientWorkflow from '../hooks/usePatientWorkflow';
+import useProfileNavigate from '../hooks/useProfileNavigate';
+import { notifyPatientStepAdvanced } from '../services/workflowNavigationFeedback';
 import PatientExperienceStatusBadge from './patient-experience/PatientExperienceStatusBadge';
 import QueueReasonBadge from './queues/QueueReasonBadge';
 import { isInQueueFlow } from '../services/queueReasonVisibility';
 import DeteriorationWatchBadge from './waiting-room/DeteriorationWatchBadge';
 import WhatHappensNextPanel from './guidance/WhatHappensNextPanel';
 import { buildPatientTimeline } from '../utils/patientTimeline';
+import useUnifiedApplicationKnowledgeGraph from '../hooks/useUnifiedApplicationKnowledgeGraph';
 import { hasRunScores, routeComplaint } from '../engine/complaintRouter';
 import { findMatchingChecklists, type Checklist } from '../config/criticalChecklists';
 import CriticalChecklist from './CriticalChecklist';
@@ -584,6 +589,8 @@ export default function PatientDetailPanel() {
   const [suggestedScores, setSuggestedScores] = useState<string[]>([]);
   const swipeStartYRef = useRef<number | null>(null);
   const [swipeOffset, setSwipeOffset] = useState(0);
+  const { profileNavigate } = useProfileNavigate();
+  const patientWorkflow = usePatientWorkflow(selectedPatientId);
   const upgradePatientFlow = useUpgradeHarnessPatientFlow(
     selectedPatientId,
   ) as UpgradePatientFlowState;
@@ -609,6 +616,10 @@ export default function PatientDetailPanel() {
     () => patients.find((patient) => patient.id === selectedPatientId) || null,
     [patients, selectedPatientId],
   );
+  usePhiViewAudit(selectedPatient?.id, {
+    source: 'PatientDetailPanel',
+    staffId: emergencyRole.canonicalProfile?.id,
+  });
   const openCalculatorHub = useCallback((calculatorId: string) => {
     if (!selectedPatientId) return;
     const params = new URLSearchParams({
@@ -622,6 +633,7 @@ export default function PatientDetailPanel() {
     window.dispatchEvent(new PopStateEvent('popstate'));
   }, [selectedPatientId]);
   const timelineContextState = usePatientTimelineContext(selectedPatientId);
+  const knowledgeGraph = useUnifiedApplicationKnowledgeGraph({ selectedPatientId });
   const patientWorkflowLogs = useMemo(() => {
     if (!selectedPatient) return [];
     const generatedLogs = selectedPatient.timeline.map((event) =>
@@ -669,14 +681,24 @@ export default function PatientDetailPanel() {
   const patientTimeline = useMemo(
     () =>
       selectedPatient
-        ? buildPatientTimeline(selectedPatient, {
-            ...timelineContextState.context,
-            staff,
-            alerts,
-            workflowLogs: patientWorkflowLogs,
-          })
+        ? buildPatientTimeline(
+            selectedPatient,
+            knowledgeGraph.enrichTimelineContext(selectedPatient.id, {
+              ...timelineContextState.context,
+              staff,
+              alerts,
+              workflowLogs: patientWorkflowLogs,
+            }),
+          )
         : [],
-    [alerts, patientWorkflowLogs, selectedPatient, staff, timelineContextState.context],
+    [
+      alerts,
+      knowledgeGraph,
+      patientWorkflowLogs,
+      selectedPatient,
+      staff,
+      timelineContextState.context,
+    ],
   );
   const upgradeFlowSignals = useMemo(
     () => upgradePatientFlowEnvelope?.data?.signals || [],
@@ -1015,10 +1037,17 @@ export default function PatientDetailPanel() {
                     ? 'Advanced from patient detail panel into waiting queue.'
                     : 'Advanced from patient detail panel',
               });
+              const patientName =
+                [selectedPatient.firstName, selectedPatient.lastName].filter(Boolean).join(' ').trim() ||
+                selectedPatient.mrn;
+              notifyPatientStepAdvanced(patientName, nextState, {
+                nextRoute: patientWorkflow.nextRoute ?? undefined,
+                onNavigate: profileNavigate,
+              });
             }}
             disabled={!canTransition || !getDefaultNextPatientState(selectedPatient)}
           >
-            Move to Next State
+            {patientWorkflow.primaryAction || 'Move to next step'}
           </FieldButton>
           ) : null}
         </div>

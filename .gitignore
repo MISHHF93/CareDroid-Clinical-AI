@@ -37,6 +37,10 @@ __pycache__/
 .pytest_cache/
 *.pyc
 
+# Local terminal session logs (Cursor / dev harness)
+/terminals/
+backend/build-out.txt
+
 # Playwright / responsive QA artifacts
 /test-results/
 /playwright-report/

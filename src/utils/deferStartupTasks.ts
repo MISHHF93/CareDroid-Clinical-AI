@@ -4,9 +4,19 @@
 
 import appConfig from '../config/appConfig';
 import logger from './logger';
+import observabilityService from '../services/observabilityService';
 import { runAfterFirstPaint } from './deferStartup';
 
 export function scheduleDeferredStartupTasks() {
+  runAfterFirstPaint(() => {
+    observabilityService.startDiagnosticsHeartbeat();
+  });
+
+  runAfterFirstPaint(async () => {
+    const { flushPendingSecurityAudits } = await import('../services/securityAuditService');
+    void flushPendingSecurityAudits();
+  });
+
   runAfterFirstPaint(async () => {
     const [{ default: CrashReportingService }, { default: AnalyticsService }, { NotificationService }] =
       await Promise.all([

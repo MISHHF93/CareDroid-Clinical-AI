@@ -6,9 +6,12 @@ import { getTenantHeaders } from './tenantContextStore';
 import {
   isBackendKnownOffline,
   isLikelyNetworkError,
+  ensureBackendReachabilityProbed,
   markBackendReachable,
   markBackendUnreachable,
 } from './backendReachability';
+import observabilityService from './observabilityService';
+import { isPublicApiPath as isSecurityPublicApiPath } from './securityAccessService';
 
 // In development, use empty string to let Vite proxy handle routing.
 // VITE_API_URL is treated as an origin only; request paths own the /api prefix.
@@ -87,16 +90,7 @@ const hasUsableAuthorization = (headers) => {
   return !/^Bearer\s*(undefined|null)?$/i.test(value);
 };
 
-const PUBLIC_API_PATH_PATTERNS = [
-  /^\/api\/auth(\/|$)/,
-  /^\/api\/config\/system$/,
-  /^\/api\/emergency(\/|$)/,
-  /^\/api\/native-ai(\/|$)/,
-  /^\/api\/governance(\/|$)/,
-];
-
-const isPublicApiPath = (apiPath) =>
-  PUBLIC_API_PATH_PATTERNS.some((pattern) => pattern.test(apiPath));
+const isPublicApiPath = (apiPath) => isSecurityPublicApiPath(apiPath);
 
 // In development, reduce console noise from expected degraded/disabled services and 401s
 // when running with the local dev-stack (many backends features are intentionally off).
@@ -168,6 +162,21 @@ const DEV_GRACEFUL_EMPTY_PATHS = [
 
 function buildDevOfflineJsonBody(path) {
   const p = normalizeApiPath(path);
+  if (/\/subscriptions\/current/.test(p)) {
+    return { plan: null, status: 'dev-offline', features: [] };
+  }
+  if (/\/organizations\/current/.test(p)) {
+    return { organization: null, engine: null, status: 'dev-offline' };
+  }
+  if (/\/platform\/context/.test(p)) {
+    return { assets: [], packs: [], entitlements: [], status: 'dev-offline' };
+  }
+  if (/\/tenant\/context/.test(p)) {
+    return { tenant: null, organizationId: null, status: 'dev-offline' };
+  }
+  if (/\/workspaces\/context/.test(p)) {
+    return { workspaces: [], activeWorkspaceId: null, status: 'dev-offline' };
+  }
   if (/\/whiteboard|\/patients|\/reassessment/.test(p)) {
     return { patients: [], staff: [], rooms: [], alerts: [], workflowLogs: [], status: 'dev-offline' };
   }
@@ -294,6 +303,10 @@ export const apiFetch = async (path, options: any = {}) => {
     ...fetchOptions
   } = options;
 
+  if (isDev) {
+    await ensureBackendReachabilityProbed();
+  }
+
   await bootstrapDevSessionIfNeeded(path);
   const mergedHeaders = buildRequestHeaders(path, optionHeaders);
 
@@ -312,7 +325,15 @@ export const apiFetch = async (path, options: any = {}) => {
     if (offline) return offline;
   }
 
+  const traceHeaders = observabilityService.buildTraceHeaders();
+  for (const [headerName, headerValue] of Object.entries(traceHeaders)) {
+    setHeaderIfMissing(mergedHeaders, headerName, headerValue);
+  }
+
   const { signal, cleanup } = mergeAbortSignals(timeoutMs, userSignal);
+  const requestStartedAt = performance.now();
+  const apiPath = normalizeApiPath(path);
+  const requestMethod = String(fetchOptions.method || 'GET').toUpperCase();
 
   try {
     const response = await fetch(buildApiUrl(path), {
@@ -320,11 +341,23 @@ export const apiFetch = async (path, options: any = {}) => {
       headers: mergedHeaders,
       signal,
     });
+    observabilityService.recordApiTiming({
+      path: apiPath,
+      method: requestMethod,
+      durationMs: Math.round(performance.now() - requestStartedAt),
+      status: response.status,
+    });
     if (response.ok) {
       markBackendReachable();
     }
     return response;
   } catch (error: any) {
+    observabilityService.recordApiTiming({
+      path: apiPath,
+      method: requestMethod,
+      durationMs: Math.round(performance.now() - requestStartedAt),
+      status: 0,
+    });
     const isTimeoutOrAbort =
       error?.name === 'TimeoutError' ||
       error?.name === 'AbortError' ||

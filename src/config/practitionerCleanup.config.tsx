@@ -1,11 +1,11 @@
 /**
- * Practitioner cleanup — reduces data noise, developer chrome, and extension surfaces
+ * Practitioner cleanup ï¿½ reduces data noise, developer chrome, and extension surfaces
  * while Pilot Customer Mode is active.
  *
  * Pages should prefer `usePractitionerSurfaceVisibility()` from
  * `contexts/PractitionerVisibilityContext.tsx` (or `getPractitionerSurfaceVisibility({ role, screenMode })`
  * outside React) over calling many shouldSuppress* helpers.
- * User-facing documentation: `docs/USER-MANUAL.md` §4.5 and §10.
+ * User-facing documentation: `docs/USER-MANUAL.md` ï¿½4.5 and ï¿½10.
  */
 import { PILOT_CUSTOMER_MODE, PILOT_EXTENSION_NAV_ITEM_IDS } from './unified-navigation.config';
 import { mergeRoleAwarePractitionerDensityProfile } from './practitionerRoleSurfacePolicy';
@@ -31,6 +31,8 @@ export const PRACTITIONER_CLEANUP = Object.freeze({
   /** Hide ApiStateBanner / journey-engine cards on frontline ED routes */
   suppressDeveloperApiBanners: true,
   hidePatientJourneyEngineCard: true,
+  /** Keep AI Chief, three-minute mission, and workflow command bars visible during pilot cleanup */
+  showOperationalCommandBars: true,
   /** Collapse whiteboard hero into operational-awareness layout by default */
   forceOperationalAwareness: true,
   /** Command palette: hide extension/platform nav duplicates */
@@ -43,24 +45,24 @@ export const PRACTITIONER_CLEANUP = Object.freeze({
   showWalkthroughActionOnEmptyBoard: true,
   /** Keep copilot collapsed until clinician opens it */
   suppressCopilotAutoOpen: true,
-  /** Hide deep platform panels on the whiteboard — patient grid + primary stats only */
+  /** Hide deep platform panels on the whiteboard ï¿½ patient grid + primary stats only */
   suppressWhiteboardMissionControl: true,
   suppressWhiteboardQueueIntelligence: true,
   suppressWhiteboardOpsDetail: true,
   suppressWhiteboardNativeAiPanels: true,
   suppressWhiteboardDiagnosticDashboard: true,
   suppressWhiteboardWhoNextPanel: true,
-  /** Reception — queues only; audit/data-quality stays in Settings */
+  /** Reception ï¿½ queues only; audit/data-quality stays in Settings */
   suppressReceptionOperationalHistory: true,
   suppressReceptionDataQualityAudits: true,
-  /** Patient cards — operational signals only, no predictive/AI chips */
+  /** Patient cards ï¿½ operational signals only, no predictive/AI chips */
   suppressPatientCardPredictiveBadges: true,
   suppressPatientCardToolChips: true,
   suppressPatientCardNativeAiBadges: true,
   suppressPatientCardDataQualitySignals: true,
-  /** Analytics — leadership charts only; hide upgrade harness + central-node grid */
+  /** Analytics ï¿½ leadership charts only; hide upgrade harness + central-node grid */
   suppressAnalyticsPlatformLayers: true,
-  /** Flatten nested chrome — one stats row + board, minimal hero copy */
+  /** Flatten nested chrome ï¿½ one stats row + board, minimal hero copy */
   forceCompactLayout: true,
   suppressWhiteboardHeroChrome: true,
   suppressWhiteboardCardKey: true,
@@ -77,19 +79,19 @@ export const PRACTITIONER_CLEANUP = Object.freeze({
   suppressReceptionProcessEducation: true,
   suppressReceptionThroughputCluster: true,
   suppressReceptionCommunicationPanel: true,
-  /** Profile — identity nav + summary only */
+  /** Profile ï¿½ identity nav + summary only */
   suppressProfileShellEyebrow: true,
   suppressProfileAccessSummary: true,
   suppressProfileNestedSubtitles: true,
   suppressProfileCompetencyCard: true,
   suppressProfilePhiActivity: true,
-  /** Copilot route — docked panel is primary; hide upgrade harness cards */
+  /** Copilot route ï¿½ docked panel is primary; hide upgrade harness cards */
   suppressCopilotRouteUpgradeSignals: true,
-  /** Copilot route — hint only; metrics duplicate docked panel context */
+  /** Copilot route ï¿½ hint only; metrics duplicate docked panel context */
   suppressCopilotRouteMetrics: true,
-  /** Developer tool catalog — practitioners use Tools overview */
+  /** Developer tool catalog ï¿½ practitioners use Tools overview */
   suppressDeveloperToolCatalog: true,
-  /** Docked copilot — chat-first; hide secondary tabs and platform chrome */
+  /** Docked copilot ï¿½ chat-first; hide secondary tabs and platform chrome */
   suppressCopilotContextTab: true,
   suppressCopilotSafetyTab: true,
   suppressCopilotStatusStrip: true,
@@ -99,7 +101,7 @@ export const PRACTITIONER_CLEANUP = Object.freeze({
   forceCompactCopilotLayout: true,
   suppressCopilotSafetyBadge: true,
   maxCopilotQuickActions: 2,
-  /** Tools — search + grid; hide platform education chrome */
+  /** Tools ï¿½ search + grid; hide platform education chrome */
   suppressToolsOverviewContextRow: true,
   suppressToolsOverviewExecutionLegend: true,
   suppressToolsOverviewHeaderStats: true,
@@ -107,68 +109,68 @@ export const PRACTITIONER_CLEANUP = Object.freeze({
   suppressToolPageMetaBadges: true,
   suppressToolClinicalIntelligencePanel: true,
   suppressToolShareLocalSession: true,
-  /** Settings — preferences only during pilot */
+  /** Settings ï¿½ preferences only during pilot */
   suppressSettingsPlatformStrip: true,
   suppressSettingsEnterpriseSections: true,
   suppressSettingsNestedSubtitles: true,
   /** App chrome */
   suppressHeaderPageSubtitle: true,
-  /** Admin home — primary links only; hide API status laundry lists */
+  /** Admin home ï¿½ primary links only; hide API status laundry lists */
   suppressAdminSurveillanceDetailList: true,
   suppressAdminSecondaryLinks: true,
-  /** Emergency satellite routes — patients, queues, reassessment, capacity */
+  /** Emergency satellite routes ï¿½ patients, queues, reassessment, capacity */
   suppressEmergencyRouteDescriptions: true,
   suppressEmergencyRouteMetricCards: true,
   suppressEmergencyRouteCrossLinks: true,
   suppressCapacityUpgradeHarness: true,
-  /** EMS — handoff rows first; hide demo fleet grid and duplicate offload panel */
+  /** EMS ï¿½ handoff rows first; hide demo fleet grid and duplicate offload panel */
   suppressEmsFleetUnitGrid: true,
   suppressEmsOffloadTrackerPanel: true,
-  /** Shift summary — volume/queue/handoff only during pilot */
+  /** Shift summary ï¿½ volume/queue/handoff only during pilot */
   suppressShiftSecondarySections: true,
-  /** Department Pulse — attention-first; hide duplicate queue/staff dashboards */
+  /** Department Pulse ï¿½ attention-first; hide duplicate queue/staff dashboards */
   suppressDepartmentPulseDescriptions: true,
   suppressDepartmentPulseStatCards: true,
   suppressDepartmentPulseQueuePanel: true,
   suppressDepartmentPulseStaffPanel: true,
-  /** Emergency settings — walkthrough + thresholds only during pilot */
+  /** Emergency settings ï¿½ walkthrough + thresholds only during pilot */
   suppressEmergencySettingsAuditSections: true,
   suppressEmergencySettingsGovernanceSections: true,
   suppressEmergencySettingsScreenModes: true,
   suppressEmergencySettingsWalkthroughDetail: true,
-  /** TR / triage expert — nurse workflow + copilot drawer; not reception admin UI */
+  /** TR / triage expert ï¿½ nurse workflow + copilot drawer; not reception admin UI */
   suppressReceptionTriageRuleBuilder: true,
   /** Smart intake embedded hero copy */
   suppressSmartIntakeHeroDescription: true,
   suppressSmartIntakeVerificationWarnings: true,
   suppressSmartIntakeVerificationAuditLog: true,
-  /** Analytics — shift KPI strip + primary chart only */
+  /** Analytics ï¿½ shift KPI strip + primary chart only */
   suppressAnalyticsDescriptions: true,
   suppressAnalyticsKpiCards: true,
   suppressAnalyticsSecondaryCharts: true,
-  /** Clinical calculator hub — search + grid; trim hero and card prose */
+  /** Clinical calculator hub ï¿½ search + grid; trim hero and card prose */
   suppressCalculatorHubHeroDescription: true,
   suppressCalculatorHubCardDescriptions: true,
   compactCalculatorHubPatientBar: true,
-  /** Patient room display — in-room board only; no duplicate door sign */
+  /** Patient room display ï¿½ in-room board only; no duplicate door sign */
   suppressPatientRoomDoorSignDuplicate: true,
   /** Hide technical data-source / API freshness lines on frontline screens */
   suppressEdDataSourceBanner: true,
   /** Hide simulation / training banners in session chrome */
   suppressSessionChromeSimulation: true,
-  /** Hide page eyebrows ("Patients", "Queues", etc.) — title only */
+  /** Hide page eyebrows ("Patients", "Queues", etc.) ï¿½ title only */
   suppressPageEyebrows: true,
-  /** Entry hub — hide backend wiring status for manual testers */
+  /** Entry hub ï¿½ hide backend wiring status for manual testers */
   suppressEntryHubBackendSync: true,
-  /** Satellite ED routes — hide metric strips entirely (not just card layout) */
+  /** Satellite ED routes ï¿½ hide metric strips entirely (not just card layout) */
   suppressEmergencyRouteMetrics: true,
-  /** Reception — patient-answers research panel stays in data layer only */
+  /** Reception ï¿½ patient-answers research panel stays in data layer only */
   suppressReceptionPatientAnswersPanel: true,
   /** Keep all roles on the trimmed reception desk layout during pilot */
   forceSlimReceptionDeskForAllRoles: true,
-  /** Operational strips — inline chip layout, no command eyebrow */
+  /** Operational strips ï¿½ inline chip layout, no command eyebrow */
   forceCompactOperationalStrip: true,
-  /** Whiteboard primary stat row — waiting + high risk only */
+  /** Whiteboard primary stat row ï¿½ waiting + high risk only */
   maxPrimaryWhiteboardStats: 2,
 });
 

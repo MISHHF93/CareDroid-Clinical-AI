@@ -310,11 +310,6 @@ export const NAVIGATION_ITEMS = Object.freeze(
             ? item.activePaths
         : item.id === 'reception'
           ? getReceptionNavActivePaths()
-          : item.id === 'whiteboard'
-          ? [
-              CANONICAL_ROUTES.emergencyWhiteboard,
-              '/emergency',
-            ]
           : item.id === 'settings'
             ? [CANONICAL_ROUTES.emergencySettings, '/settings']
             : item.id === 'platform'

@@ -1,3 +1,5 @@
+> **SUPERSEDED** — Use [docs/generated/routes.md](../generated/routes.md). Regenerate: `npm run docs:generate`
+
 # CareDroid Page Map
 
 All pages run inside the shared `AppShell` and expose contextual HelpHub guidance.

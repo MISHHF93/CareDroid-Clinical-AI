@@ -1,0 +1,47 @@
+.cd-contextual-guidance {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.cd-contextual-guidance--ai {
+  border-color: var(--semantic-ai-assistance-border, rgba(147, 112, 219, 0.35));
+}
+
+.cd-contextual-guidance__footer {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.cd-contextual-guidance__help-link {
+  padding: 0.15rem 0.45rem;
+  border: none;
+  background: transparent;
+  color: var(--semantic-info-text, #7eb8ff);
+  font-size: 0.82rem;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.cd-contextual-guidance__help-link:hover {
+  color: var(--text-primary, #e8edf4);
+}
+
+.cd-contextual-guidance__dismiss {
+  margin-left: auto;
+  padding: 0.15rem 0.45rem;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary, #9aa7b8);
+  font-size: 0.82rem;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.cd-contextual-guidance__dismiss:hover {
+  color: var(--text-primary, #e8edf4);
+}

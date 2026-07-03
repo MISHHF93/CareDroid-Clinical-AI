@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { toast } from 'sonner';
+import { showActionError, showActionSuccess } from '../../services/careDroidInteractionFeedback';
 import {
   buildReceptionEscalationTargetsLabel,
   RECEPTION_ESCALATION_REASONS,
@@ -56,7 +56,7 @@ export default function ReceptionEscalationPanel({
       });
 
       if (!record) {
-        toast.error(RECEPTION_COPY.escalation.submitError);
+        showActionError(RECEPTION_COPY.escalation.submitError);
         return;
       }
 
@@ -65,9 +65,10 @@ export default function ReceptionEscalationPanel({
         targetsLabel: buildReceptionEscalationTargetsLabel(record.notifyTargets),
       };
       setLastConfirmation(confirmation);
-      toast.success(RECEPTION_COPY.escalation.submitSuccess, {
-        description: `${confirmation.reasonLabel} · ${confirmation.targetsLabel}`,
-      });
+      showActionSuccess(
+        RECEPTION_COPY.escalation.submitSuccess,
+        `${confirmation.reasonLabel} â€” ${confirmation.targetsLabel}`,
+      );
       setReasonId(null);
       setDetail('');
       setPatientId(defaultPatientId || '');
@@ -100,7 +101,7 @@ export default function ReceptionEscalationPanel({
           <div className="reception-escalation-panel__confirmation" role="status">
             <strong>{RECEPTION_COPY.escalation.confirmationTitle}</strong>
             <p>
-              {lastConfirmation.reasonLabel} · {lastConfirmation.targetsLabel}
+              {lastConfirmation.reasonLabel} ï¿½ {lastConfirmation.targetsLabel}
             </p>
             <p>{RECEPTION_COPY.escalation.confirmationBody}</p>
             <button type="button" onClick={() => setLastConfirmation(null)}>

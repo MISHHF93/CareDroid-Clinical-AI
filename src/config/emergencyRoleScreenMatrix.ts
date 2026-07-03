@@ -18,7 +18,7 @@ import {
 } from './emergencyDeviceContextModel';
 import { coerceScreenModeForRole } from './emergencyScreenModeAccessModel';
 
-/** Stable ED role ids — kept local to avoid circular imports with emergencyRolePermissions.js */
+/** Stable ED role ids ï¿½ kept local to avoid circular imports with emergencyRolePermissions.js */
 export const EMERGENCY_ROLE_ID = Object.freeze({
   admin: 'admin',
   edManager: 'ed_manager',
@@ -27,6 +27,8 @@ export const EMERGENCY_ROLE_ID = Object.freeze({
   physician: 'physician',
   registrationClerk: 'registration_clerk',
   emsUser: 'ems_user',
+  dispatcher: 'dispatcher',
+  emsCoordinator: 'ems_coordinator',
   readOnlyViewer: 'read_only_viewer',
   publicDisplay: 'public_display',
 });
@@ -54,6 +56,8 @@ export const DEFAULT_SCREEN_MODE_BY_ROLE: Record<EmergencyRoleId, CareDroidScree
     [EMERGENCY_ROLE_ID.chargeNurse]: CARE_DROID_SCREEN_MODES.chargeNurse,
     [EMERGENCY_ROLE_ID.physician]: CARE_DROID_SCREEN_MODES.physician,
     [EMERGENCY_ROLE_ID.emsUser]: CARE_DROID_SCREEN_MODES.ems,
+    [EMERGENCY_ROLE_ID.dispatcher]: CARE_DROID_SCREEN_MODES.ems,
+    [EMERGENCY_ROLE_ID.emsCoordinator]: CARE_DROID_SCREEN_MODES.ems,
     [EMERGENCY_ROLE_ID.edManager]: CARE_DROID_SCREEN_MODES.commandCenter,
     [EMERGENCY_ROLE_ID.admin]: CARE_DROID_SCREEN_MODES.admin,
     [EMERGENCY_ROLE_ID.readOnlyViewer]: CARE_DROID_SCREEN_MODES.readOnlyWhiteboard,
@@ -155,9 +159,23 @@ export function resolveDisplayParamScreenMode(
   return null;
 }
 
+const HOSPITAL_PROFILE_SCREEN_MODES: Readonly<Record<string, CareDroidScreenMode>> = Object.freeze({
+  dispatcher: CARE_DROID_SCREEN_MODES.ems,
+  ems_coordinator: CARE_DROID_SCREEN_MODES.ems,
+  pharmacist: CARE_DROID_SCREEN_MODES.physician,
+  lab_technician: CARE_DROID_SCREEN_MODES.physician,
+  radiology_technician: CARE_DROID_SCREEN_MODES.physician,
+  specialist: CARE_DROID_SCREEN_MODES.physician,
+  patient_flow_coordinator: CARE_DROID_SCREEN_MODES.commandCenter,
+  hospital_admin: CARE_DROID_SCREEN_MODES.commandCenter,
+  it_admin: CARE_DROID_SCREEN_MODES.admin,
+  demo_observer: CARE_DROID_SCREEN_MODES.readOnlyWhiteboard,
+});
+
 export function getDefaultScreenModeForRole(role: string): CareDroidScreenMode {
   const normalized = String(role || '').trim().toLowerCase().replace(/-/g, '_');
   const mode =
+    HOSPITAL_PROFILE_SCREEN_MODES[normalized] ||
     DEFAULT_SCREEN_MODE_BY_ROLE[normalized as EmergencyRoleId] ||
     DEFAULT_SCREEN_MODE_BY_ROLE[EMERGENCY_ROLE_ID.physician];
   return mode;
@@ -238,7 +256,7 @@ export function resolveRouteScreenMode(
 }
 
 /**
- * Unified screen-mode resolver — used by route hooks and central-node snapshot builder.
+ * Unified screen-mode resolver ï¿½ used by route hooks and central-node snapshot builder.
  */
 export function resolveEmergencyScreenMode(input: ResolveEmergencyScreenModeInput): CareDroidScreenMode {
   const settings = input.emergencySettings || {};

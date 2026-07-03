@@ -23,6 +23,7 @@ export const PROFILE_CONSOLE_ROUTES = Object.freeze<ProfileConsoleRoute[]>([
   { path: '/notification-preferences', label: 'Notification preferences', componentKey: 'notificationPreferences' },
   { path: CANONICAL_ROUTES.billing, label: 'Billing', componentKey: 'billing' },
   { path: CANONICAL_ROUTES.usage, label: 'Usage', componentKey: 'usage' },
+  { path: CANONICAL_ROUTES.settings, label: 'Platform settings', componentKey: 'platformSettings' },
 ]);
 
 export const PROFILE_CONSOLE_REDIRECT_ROUTES = Object.freeze<ProfileConsoleRedirectRoute[]>([

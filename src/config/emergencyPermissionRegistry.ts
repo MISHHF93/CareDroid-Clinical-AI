@@ -1,5 +1,5 @@
 /**
- * Canonical CareDroid permission registry — actions, routes, screens, and display modes.
+ * Canonical CareDroid permission registry ï¿½ actions, routes, screens, and display modes.
  */
 import { CANONICAL_ROUTES } from './routes.config';
 import {
@@ -27,7 +27,7 @@ export type EmergencyPermissionDefinition = {
   blockedForReadOnlyRole?: boolean;
 };
 
-/** Canonical permission keys — single vocabulary for CareDroid. */
+/** Canonical permission keys ï¿½ single vocabulary for CareDroid. */
 export const EMERGENCY_PERMISSION_KEYS = Object.freeze({
   patientCreate: 'patient.create',
   patientDemographicsEdit: 'patient.demographics.edit',
@@ -257,6 +257,22 @@ export const ROLE_PERMISSION_GRANTS: Record<EmergencyRoleId, readonly string[]> 
     K.emsHandoffComplete,
     K.displayWhiteboardReadonly,
     K.screenEms,
+  ]),
+  [EMERGENCY_ROLE_ID.dispatcher]: Object.freeze([
+    K.patientCreate,
+    K.emsPrepareBay,
+    K.displayWhiteboardReadonly,
+    K.screenEms,
+  ]),
+  [EMERGENCY_ROLE_ID.emsCoordinator]: Object.freeze([
+    K.patientCreate,
+    K.emsPrepareBay,
+    K.emsConvertArrival,
+    K.emsHandoffComplete,
+    K.analyticsView,
+    K.displayWhiteboardReadonly,
+    K.screenEms,
+    K.screenCommandCenter,
   ]),
   [EMERGENCY_ROLE_ID.readOnlyViewer]: Object.freeze([
     K.analyticsView,

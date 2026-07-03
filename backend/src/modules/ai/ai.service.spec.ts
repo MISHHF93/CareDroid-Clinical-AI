@@ -271,6 +271,8 @@ describe('AIService', () => {
           inputTokens: 80,
           outputTokens: 40,
           totalTokens: 120,
+          cacheReadInputTokens: 0,
+          cacheCreationInputTokens: 0,
         },
         requestType: 'COPILOT_CHAT',
       });

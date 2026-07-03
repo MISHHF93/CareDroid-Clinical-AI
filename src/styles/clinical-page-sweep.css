@@ -39,7 +39,11 @@
     .clinical-tool-catalog,
     .hospital-command-center,
     .reception-command,
-    .reception-workspace
+    .reception-workspace,
+    .platform-entry,
+    .platform-settings-page,
+    .settings-page,
+    .help-center-page
   ) {
   background: transparent;
   gap: var(--cdl-clinical-section-gap, var(--app-layout-section-gap));

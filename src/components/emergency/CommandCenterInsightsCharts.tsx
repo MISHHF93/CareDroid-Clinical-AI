@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import useUnifiedApplicationKnowledgeGraph from '../../hooks/useUnifiedApplicationKnowledgeGraph';
 import { GraphicIconBadge } from '../graphics/CdlGraphicKit';
 import {
   CategoryBarChart,
@@ -24,6 +25,7 @@ export default function CommandCenterInsightsCharts({
   snapshot,
   visibleMetrics,
 }: CommandCenterInsightsChartsProps) {
+  const { analyticsSummary } = useUnifiedApplicationKnowledgeGraph();
   const arrivalsChart = useMemo(
     () => buildHourlyArrivalsChart(snapshot.throughput.hourlyArrivals || []),
     [snapshot.throughput.hourlyArrivals],
@@ -61,6 +63,18 @@ export default function CommandCenterInsightsCharts({
           value={String(snapshot.bottlenecks.length)}
           hint="Service constraints"
           tone={snapshot.bottlenecks.length > 0 ? 'warning' : 'neutral'}
+        />
+        <MetricCard
+          label="Graph connections"
+          value={String(analyticsSummary.edgeCount)}
+          hint={`${analyticsSummary.nodeCount} entities linked across ED operations`}
+          tone={analyticsSummary.connectedCriticalSignals > 0 ? 'warning' : 'neutral'}
+        />
+        <MetricCard
+          label="Critical graph signals"
+          value={String(analyticsSummary.connectedCriticalSignals)}
+          hint="Connected alerts, events, and recommendations"
+          tone={analyticsSummary.connectedCriticalSignals > 0 ? 'critical' : 'good'}
         />
       </div>
 

@@ -6,6 +6,7 @@ import { expect, vi } from 'vitest';
 import { render } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { PractitionerVisibilityProvider } from '../contexts/PractitionerVisibilityContext';
+import { RouteChromeProvider } from '../contexts/RouteChromeContext';
 
 export const mockToolPreferencesValue = {
   recordToolAccess: vi.fn(),
@@ -104,15 +105,16 @@ export const mockNotificationsValue = {
  */
 export function renderWithRouter(ui, options: any = {}) {
   const { route = '/', withVisibilityProvider = false } = options;
-  const tree = withVisibilityProvider ? (
+  const inner = withVisibilityProvider ? (
     <PractitionerVisibilityProvider>{ui}</PractitionerVisibilityProvider>
   ) : (
     ui
   );
+  const tree = <RouteChromeProvider>{inner}</RouteChromeProvider>;
   return render(<MemoryRouter initialEntries={[route]}>{tree}</MemoryRouter>);
 }
 
-/** Page smoke helper — mirrors AppShell visibility resolution for isolated page renders. */
+/** Page smoke helper ï¿½ mirrors AppShell visibility resolution for isolated page renders. */
 export function renderPageWithRouter(ui, options: any = {}) {
   return renderWithRouter(ui, { ...options, withVisibilityProvider: true });
 }

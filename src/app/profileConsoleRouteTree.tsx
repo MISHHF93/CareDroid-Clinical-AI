@@ -18,6 +18,7 @@ const ProfileWorkspacesPage = lazyRoute(() => import('../pages/profile/ProfileWo
 const BillingPage = lazyRoute(() => import('../pages/BillingPage'));
 const UsagePage = lazyRoute(() => import('../pages/UsagePage'));
 const NotificationPreferencesPage = lazyRoute(() => import('../pages/NotificationPreferences'));
+const PlatformSettingsPage = lazyRoute(() => import('../pages/Settings'));
 
 const PROFILE_CONSOLE_PAGE_COMPONENTS = Object.freeze({
   profile: ProfilePage,
@@ -30,6 +31,7 @@ const PROFILE_CONSOLE_PAGE_COMPONENTS = Object.freeze({
   billing: BillingPage,
   usage: UsagePage,
   notificationPreferences: NotificationPreferencesPage,
+  platformSettings: PlatformSettingsPage,
 } as const);
 
 type LazyRouteProps = {

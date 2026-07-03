@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState, type ChangeEvent } from 'react';
-import { toast } from 'sonner';
+import { STANDARD_ACTION_FEEDBACK } from '../config/careDroidInteractionModel';
+import { showActionSuccess } from '../services/careDroidInteractionFeedback';
+import { confirmCareDroidAction } from '../services/careDroidInteractionFeedback';
 import { invokeUnifiedAiRequest } from '../services/careDroidUnifiedAiNode';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { PatientState, type Patient, type Staff } from '../types/emergency';
@@ -174,17 +176,25 @@ export default function StaffWorkloadPanel({ open, onClose }: StaffWorkloadPanel
     return () => document.removeEventListener('keydown', closeOnEscape);
   }, [onClose, open]);
 
-  const reassignPatient = (patient: Patient, fromStaff: Staff, toStaff: Staff): boolean => {
+  const reassignPatient = async (
+    patient: Patient,
+    fromStaff: Staff,
+    toStaff: Staff,
+  ): Promise<boolean> => {
     const patientName = getPatientName(patient);
     const currentName = getStaffName(fromStaff);
     const newName = getStaffName(toStaff);
-    const confirmed = window.confirm(`Reassign ${patientName} from ${currentName} to ${newName}?`);
+    const confirmed = await confirmCareDroidAction({
+      title: 'Reassign patient?',
+      message: `Move ${patientName} from ${currentName} to ${newName}.`,
+      confirmLabel: 'Reassign',
+    });
     if (!confirmed) return false;
 
     assignStaff(patient.id, toStaff.id);
     addNote(patient.id, `Reassigned from ${currentName} to ${newName}`, 'system');
     setReassigningPatientId(null);
-    toast.success(`${patientName} reassigned to ${newName}`);
+    showActionSuccess(STANDARD_ACTION_FEEDBACK.reassigned(patientName, newName));
     return true;
   };
 
@@ -196,7 +206,7 @@ export default function StaffWorkloadPanel({ open, onClose }: StaffWorkloadPanel
     const toStaff = activeStaff.find((candidate) => candidate.id === event.target.value);
     event.target.value = '';
     if (!toStaff || toStaff.id === fromStaff.id) return;
-    reassignPatient(patient, fromStaff, toStaff);
+    void reassignPatient(patient, fromStaff, toStaff);
   };
 
   const applySuggestion = (suggestion: StaffBalanceSuggestion) => {

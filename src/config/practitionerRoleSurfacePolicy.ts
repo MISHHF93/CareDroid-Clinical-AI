@@ -27,6 +27,19 @@ const TIER_RANK = Object.freeze({
   admin: 4,
 });
 
+const HOSPITAL_PROFILE_LAYOUT_TIER: Readonly<Record<string, string>> = Object.freeze({
+  dispatcher: PRACTITIONER_LAYOUT_TIERS.clinical,
+  ems_coordinator: PRACTITIONER_LAYOUT_TIERS.operational,
+  pharmacist: PRACTITIONER_LAYOUT_TIERS.clinical,
+  lab_technician: PRACTITIONER_LAYOUT_TIERS.clinical,
+  radiology_technician: PRACTITIONER_LAYOUT_TIERS.clinical,
+  specialist: PRACTITIONER_LAYOUT_TIERS.clinical,
+  patient_flow_coordinator: PRACTITIONER_LAYOUT_TIERS.operational,
+  hospital_admin: PRACTITIONER_LAYOUT_TIERS.admin,
+  it_admin: PRACTITIONER_LAYOUT_TIERS.admin,
+  demo_observer: PRACTITIONER_LAYOUT_TIERS.display,
+});
+
 const ROLE_LAYOUT_TIER = Object.freeze({
   [EMERGENCY_ROLE_IDS.registrationClerk]: PRACTITIONER_LAYOUT_TIERS.minimal,
   [EMERGENCY_ROLE_IDS.triageNurse]: PRACTITIONER_LAYOUT_TIERS.clinical,
@@ -34,6 +47,8 @@ const ROLE_LAYOUT_TIER = Object.freeze({
   [EMERGENCY_ROLE_IDS.chargeNurse]: PRACTITIONER_LAYOUT_TIERS.operational,
   [EMERGENCY_ROLE_IDS.edManager]: PRACTITIONER_LAYOUT_TIERS.operational,
   [EMERGENCY_ROLE_IDS.emsUser]: PRACTITIONER_LAYOUT_TIERS.clinical,
+  [EMERGENCY_ROLE_IDS.dispatcher]: PRACTITIONER_LAYOUT_TIERS.clinical,
+  [EMERGENCY_ROLE_IDS.emsCoordinator]: PRACTITIONER_LAYOUT_TIERS.operational,
   [EMERGENCY_ROLE_IDS.admin]: PRACTITIONER_LAYOUT_TIERS.admin,
   [EMERGENCY_ROLE_IDS.readOnlyViewer]: PRACTITIONER_LAYOUT_TIERS.display,
   [EMERGENCY_ROLE_IDS.publicDisplay]: PRACTITIONER_LAYOUT_TIERS.display,
@@ -110,8 +125,15 @@ const ED_MANAGER_SURFACE_OVERRIDES = Object.freeze({
  * @param {{ role?: string | null, screenMode?: string | null }} [context]
  */
 export function resolvePractitionerLayoutTier(context: any = {}) {
+  const rawRole = String(context.role || EMERGENCY_ROLE_IDS.physician)
+    .trim()
+    .toLowerCase()
+    .replace(/-/g, '_');
   const normalizedRole = normalizeEmergencyRole(context.role || EMERGENCY_ROLE_IDS.physician);
-  const roleTier = ROLE_LAYOUT_TIER[normalizedRole] || PRACTITIONER_LAYOUT_TIERS.clinical;
+  const roleTier =
+    HOSPITAL_PROFILE_LAYOUT_TIER[rawRole] ||
+    ROLE_LAYOUT_TIER[normalizedRole] ||
+    PRACTITIONER_LAYOUT_TIERS.clinical;
   const screenMode = normalizeCareDroidScreenMode(context.screenMode);
   const modeTier = screenMode ? SCREEN_MODE_LAYOUT_TIER[screenMode] : null;
 

@@ -5,6 +5,8 @@ let cache: { at: number; reachable: boolean | null } = {
   reachable: null,
 };
 
+let startupProbePromise: Promise<boolean> | null = null;
+
 export function isLikelyNetworkError(error) {
   if (typeof navigator !== 'undefined' && navigator.onLine === false) return true;
   const message = error instanceof Error ? error.message : String(error || '');
@@ -45,21 +47,6 @@ export async function probeBackendReachability(options: any = {}) {
     return false;
   }
 
-  // When no backend URL is configured (pure local/demo mode), skip the health probe.
-  // The fetch would fail with ERR_CONNECTION_REFUSED since there's no backend listening.
-  // Dynamically import appConfig to avoid circular dependency.
-  if (!force) {
-    try {
-      const { default: appConfig } = await import('../config/appConfig');
-      if (!appConfig.api.baseUrl && appConfig.features.allowLocalDemoAuth) {
-        cache = { at: now, reachable: false };
-        return false;
-      }
-    } catch {
-      // If config import fails, proceed with normal probe
-    }
-  }
-
   try {
     const controller = new AbortController();
     const timeoutMs = Number(options.timeoutMs) || 2500;
@@ -72,4 +59,20 @@ export async function probeBackendReachability(options: any = {}) {
   }
 
   return cache.reachable;
+}
+
+/** One-shot startup probe so dev API calls can short-circuit before ERR_CONNECTION_REFUSED. */
+export function ensureBackendReachabilityProbed(options: any = {}) {
+  if (typeof window === 'undefined') {
+    return Promise.resolve(false);
+  }
+  if (cache.reachable !== null && Date.now() - cache.at < CACHE_MS && !options.force) {
+    return Promise.resolve(cache.reachable);
+  }
+  if (!startupProbePromise || options.force) {
+    startupProbePromise = probeBackendReachability({ force: true, ...options }).finally(() => {
+      startupProbePromise = null;
+    });
+  }
+  return startupProbePromise;
 }

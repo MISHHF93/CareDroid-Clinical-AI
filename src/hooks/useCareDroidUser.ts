@@ -1,9 +1,13 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { useUser } from '../contexts/UserContext';
 import type { CareDroidUserProfile } from '../lib/users/userTypes';
 import { DEMO_USERS, getDemoUserById, getDefaultDemoUser } from '../lib/users/demoUsers';
 import { applyDemoRoleView } from '../config/demoPersonaModel';
-import { compileCareDroidAccessProfile } from '../lib/users/canonicalAccess';
+import { compileCareDroidAccessProfile, normalizeCareDroidProfile } from '../lib/users/canonicalAccess';
+import {
+  buildSecurityContextFromUser,
+  checkPermission,
+} from '../services/securityAccessService';
 
 const STORAGE_KEY = 'cd_demo_user_id';
 
@@ -37,10 +41,14 @@ export type UseCareDroidUserResult = {
 };
 
 export function useCareDroidUser(): UseCareDroidUserResult {
-  const { setUser } = useUser();
+  const { user, setUser } = useUser();
   const [profile, setProfile] = useState<CareDroidUserProfile>(resolveInitialDemoUser);
 
   useEffect(() => {
+    if (user?.caredroidProfile) {
+      setProfile(normalizeCareDroidProfile(user.caredroidProfile as CareDroidUserProfile));
+      return;
+    }
     const storedId = readStoredDemoUserId();
     if (storedId) {
       const stored = getDemoUserById(storedId);
@@ -48,7 +56,14 @@ export function useCareDroidUser(): UseCareDroidUserResult {
         setProfile(stored);
       }
     }
-  }, []);
+  }, [profile.id, user?.caredroidProfile, user?.id]);
+
+  const securityContext = useMemo(() => buildSecurityContextFromUser(user), [user]);
+
+  const can = useCallback(
+    (permission: string): boolean => checkPermission(securityContext, permission),
+    [securityContext],
+  );
 
   const switchDemoUser = useCallback(
     (userId: string) => {
@@ -95,18 +110,12 @@ export function useCareDroidUser(): UseCareDroidUserResult {
     [setUser],
   );
 
-  const hasPermission = useCallback(
-    (permission: string): boolean =>
-      (profile.permissions as string[]).includes(permission),
-    [profile.permissions],
-  );
-
   return {
     profile,
     allDemoUsers: DEMO_USERS,
     switchDemoUser,
-    hasPermission,
-    can: hasPermission,
+    hasPermission: can,
+    can,
   };
 }
 

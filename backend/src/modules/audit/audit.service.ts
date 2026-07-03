@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { createHash } from 'crypto';
+import { recordBackendAuditTelemetry } from '../../common/observability/platform-telemetry-sink';
 import { AuditLog, AuditAction } from './entities/audit-log.entity';
 
 @Injectable()
@@ -83,7 +84,16 @@ export class AuditService {
       integrityVerified: true, // Assume valid when first created
     });
 
-    return this.auditRepository.save(auditLog);
+    const saved = await this.auditRepository.save(auditLog);
+    recordBackendAuditTelemetry({
+      action: data.action,
+      resource: data.resource,
+      userId: data.userId,
+      phiAccessed: data.phiAccessed,
+      organizationId: data.organizationId,
+      metadata: data.metadata,
+    });
+    return saved;
   }
 
   /**
@@ -179,14 +189,19 @@ export class AuditService {
     });
   }
 
-  async findPhiAccess(_startDate: Date, _endDate: Date, organizationId?: string) {
-    return this.auditRepository.find({
-      where: {
-        phiAccessed: true,
-        ...(organizationId ? { organizationId } : {}),
-      },
-      order: { timestamp: 'DESC' },
-    });
+  async findPhiAccess(startDate: Date, endDate: Date, organizationId?: string) {
+    const query = this.auditRepository
+      .createQueryBuilder('log')
+      .where('log.phiAccessed = :phiAccessed', { phiAccessed: true })
+      .andWhere('log.timestamp >= :startDate', { startDate })
+      .andWhere('log.timestamp <= :endDate', { endDate })
+      .orderBy('log.timestamp', 'DESC');
+
+    if (organizationId) {
+      query.andWhere('log.organizationId = :organizationId', { organizationId });
+    }
+
+    return query.getMany();
   }
 
   /**

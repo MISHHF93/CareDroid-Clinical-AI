@@ -1,0 +1,79 @@
+.unified-application-knowledge-graph-panel {
+  display: grid;
+  gap: 12px;
+}
+
+.unified-application-knowledge-graph-panel__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.unified-application-knowledge-graph-panel__identity {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  color: var(--ed-text-primary, #0f172a);
+}
+
+.unified-application-knowledge-graph-panel__refreshed {
+  font-size: 11px;
+  color: var(--ed-text-meta, #64748b);
+}
+
+.unified-application-knowledge-graph-panel__safety {
+  margin: 0;
+  font-size: 11px;
+  color: var(--ed-text-meta, #64748b);
+  font-style: italic;
+}
+
+.unified-application-knowledge-graph-panel__metrics,
+.unified-application-knowledge-graph-panel__patient-context {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  font-size: 11px;
+  color: var(--ed-text-meta, #64748b);
+}
+
+.unified-application-knowledge-graph-panel__sections {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.unified-application-knowledge-graph-panel__sections section {
+  padding: 10px 12px;
+  border: 1px solid var(--ed-border-subtle, #e2e8f0);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.unified-application-knowledge-graph-panel__sections h3 {
+  margin: 0 0 8px;
+  font-size: 12px;
+}
+
+.unified-application-knowledge-graph-panel__sections ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.unified-application-knowledge-graph-panel__sections li {
+  display: grid;
+  gap: 2px;
+  font-size: 11px;
+}
+
+.unified-application-knowledge-graph-panel__empty {
+  margin: 0;
+  color: var(--ed-text-meta, #64748b);
+  font-size: 11px;
+}

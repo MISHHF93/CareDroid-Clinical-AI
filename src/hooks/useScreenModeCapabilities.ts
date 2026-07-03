@@ -33,6 +33,7 @@ export type ScreenModeCapabilities = {
   showCapacityEngine: boolean;
   showReassessmentEngine: boolean;
   showPatientFlowEngine: boolean;
+  showOperationalIntelligenceEngine: boolean;
   showAdministrativeAutomationEngine: boolean;
   headerDensity: 'comfortable' | 'compact' | 'wall';
   productLabel: string;
@@ -81,6 +82,7 @@ export function resolveScreenModeCapabilities(
     showCapacityEngine: !isReceptionScreen && !isWallKiosk,
     showReassessmentEngine: !isReceptionScreen && !isWallKiosk,
     showPatientFlowEngine: !isReceptionScreen && !isWallKiosk,
+    showOperationalIntelligenceEngine: !isReceptionScreen && !isWallKiosk,
     showAdministrativeAutomationEngine: !isReceptionScreen && !isWallKiosk,
     headerDensity: config.density,
     productLabel: isReceptionScreen

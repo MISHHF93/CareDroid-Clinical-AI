@@ -1,3 +1,5 @@
+> **SUPERSEDED** — Use [docs/generated/permissions.md](../generated/permissions.md). Regenerate: `npm run docs:generate`
+
 # Role Permission Map
 
 Canonical permissions live in `src/lib/users/permissions.ts`; canonical role mappings live in `src/lib/users/canonicalAccess.ts`.

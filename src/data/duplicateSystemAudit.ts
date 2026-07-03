@@ -1,5 +1,5 @@
 /**
- * Duplicate system audit — competing sources of truth across routes, nav, inventories, etc.
+ * Duplicate system audit ï¿½ competing sources of truth across routes, nav, inventories, etc.
  * Regenerate: npm run duplicate-system-audit:write-docs
  */
 
@@ -22,6 +22,7 @@ import {
   REGISTRY_ID_TO_ORCHESTRATOR_TOOL,
 } from './clinicalToolIdContract';
 import { BACKEND_EXECUTOR_NLU_TOOL_IDS } from '../config/backendApiCapabilities';
+import { CANONICAL_CONFIGURATION_REGISTRY } from '../config/canonicalConfigurationModel';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(__dirname, '../..');
@@ -50,7 +51,7 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
     id: 'routes',
     title: 'Routes',
     canonical: '`src/config/routes.config.ts` (`CANONICAL_ROUTES`, alias groups)',
-    secondary: '`src/app/router.tsx` (React Router mount table only — must not invent new paths)',
+    secondary: '`src/app/router.tsx` (React Router mount table only ï¿½ must not invent new paths)',
     duplicates: [
       {
         name: 'Canonical route map vs tool launch paths',
@@ -62,13 +63,13 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
           'Import CANONICAL_ROUTES into clinicalToolIdContract (or shared routes module); deprecate overlapping TOOL_LAUNCH_PATHS keys.',
       },
       {
-        name: 'App.jsx inline route table',
-        instances: ['src/App.jsx routes[] (~212 paths)', 'routes.config.js'],
+        name: 'Router mount table vs canonical routes',
+        instances: ['src/app/router.tsx (React Router mount table)', 'routes.config.ts'],
         overlap: null,
-        risk: 'New routes added only in App.jsx bypass alias + nav contracts',
+        risk: 'New routes added only in router.tsx bypass alias + nav contracts',
         action: 'wire',
         recommendation:
-          'Keep App.jsx as renderer; validate every `path:` exists in CANONICAL_ROUTES or ROUTE_ALIAS_GROUPS via routeHealth tests.',
+          'Keep router.tsx as mount table; validate every `path:` exists in CANONICAL_ROUTES or ROUTE_ALIAS_GROUPS via routeHealth tests.',
       },
       {
         name: 'Calculator deep links',
@@ -116,11 +117,11 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
     id: 'layouts',
     title: 'Layouts',
     canonical: '`src/components/AppShell.tsx` (active CareDroid app chrome)',
-    secondary: '`src/layout/AppShell.tsx` (legacy/manual-review shell helper, not runtime-mounted)',
+    secondary: '`src/layouts/AppShell.tsx` (thin re-export shim â€” implementation in `src/components/AppShell.tsx`)',
     duplicates: [
       {
         name: 'Shell variants',
-        instances: ['src/components/AppShell.tsx', 'src/layout/AppShell.tsx'],
+        instances: ['src/components/AppShell.tsx', 'src/layouts/AppShell.tsx'],
         overlap: null,
         risk: 'Legacy shell is not mounted but retained for tests/manual migration review.',
         action: 'legacy',
@@ -170,17 +171,17 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
   {
     id: 'navigation',
     title: 'Navigation',
-    canonical: '`src/config/navigation.config.ts`',
-    secondary: '`src/navigation/primaryNavigation.ts` (re-export shim only)',
+    canonical: '`src/config/unified-navigation.config.ts` (`NAVIGATION_ITEMS`)',
+    secondary: '`src/config/navigation.config.ts` (compat projections: APP_SHELL_NAV_ITEMS, sidebar buckets)',
     duplicates: [
       {
         name: 'Primary nav vs quick command',
         instances: ['PRIMARY_NAV_ITEMS', 'QUICK_COMMAND_DESTINATION_ITEMS'],
         overlap: null,
         risk: 'Duplicate destinations with different labels',
-        action: 'merge',
+        action: 'done',
         recommendation:
-          'Derive QUICK_COMMAND_DESTINATION_ITEMS from PRIMARY_NAV_ITEMS + tool inventory search index.',
+          'QUICK_COMMAND_DESTINATION_ITEMS derives from PRIMARY_NAV_ITEMS in navigation.config.ts.',
       },
       {
         name: 'Legacy path matching',
@@ -270,10 +271,10 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
           'cardiologyCalculators.jsx',
           'pulmonologyCalculators.jsx',
           'nephrologyCalculators.jsx',
-          '…12 pack JSX group files',
+          'ï¿½12 pack JSX group files',
         ],
         overlap: 12,
-        risk: 'Parallel registration vs hub — ids must match inventory',
+        risk: 'Parallel registration vs hub ï¿½ ids must match inventory',
         action: 'legacy',
         recommendation:
           'Keep as composition modules imported by Calculators.jsx; do not register routes separately.',
@@ -298,7 +299,7 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
         name: 'Home vs assistant',
         instances: ['CommandDashboard (/dashboard)', 'ChatInterface ED Copilot panel'],
         overlap: 1,
-        risk: 'Resolved — former Dashboard.jsx assistant page was removed.',
+        risk: 'Resolved ï¿½ former Dashboard.jsx assistant page was removed.',
         action: 'legacy',
         recommendation:
           'Keep /dashboard owned by CommandDashboard and /assistant as an ED Copilot alias into the shell.',
@@ -491,6 +492,39 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
       },
     ],
   },
+  {
+    id: 'configuration',
+    title: 'Configuration',
+    canonical: '`src/config/canonicalConfigurationModel.ts` (`CANONICAL_CONFIGURATION_REGISTRY`)',
+    secondary: '`src/config/canonicalConfiguration.ts` (public barrel)',
+    duplicates: [
+      {
+        name: 'Navigation dual config',
+        instances: ['unified-navigation.config.ts', 'navigation.config.ts (compat)'],
+        overlap: 2,
+        risk: 'New nav items added only to compat projections',
+        action: 'wire',
+        recommendation:
+          'Add to unified-navigation.config.ts first; navigation.config.ts projects for legacy consumers.',
+      },
+      {
+        name: 'Design token split',
+        instances: ['theme.tokens.ts', 'layout/designTokens.ts', 'caredroidDesignLanguage.ts', 'designSystem.ts'],
+        overlap: 4,
+        risk: 'Token drift across CSS and programmatic consumers',
+        action: 'merge',
+        recommendation: 'Import design tokens through designSystem.ts barrel; CSS via design-system.css only.',
+      },
+      {
+        name: 'Env parsing chain',
+        instances: ['appConfig.ts', 'featureFlags.config.ts', 'env.config.ts'],
+        overlap: 3,
+        risk: 'Direct appConfig.features reads bypass FEATURE_FLAGS projection',
+        action: 'wire',
+        recommendation: 'Parse in appConfig; consume FEATURE_FLAGS or ENV_CONFIG everywhere else.',
+      },
+    ],
+  },
 ]);
 
 function ASSISTANT_ROUTE_ALIASES_COUNT() {
@@ -528,12 +562,13 @@ export function buildDuplicateSystemReport() {
       sectionCount: DUPLICATE_AUDIT_SECTIONS.length,
       duplicateFindings: DUPLICATE_AUDIT_SECTIONS.reduce((n, s) => n + s.duplicates.length, 0),
       routeOverlapCount: pathOverlap(CANONICAL_ROUTES, TOOL_LAUNCH_PATHS).length,
+      canonicalConfigurationEntries: CANONICAL_CONFIGURATION_REGISTRY.length,
     },
   };
 }
 
 function escapeCell(v) {
-  return String(v ?? '—').replace(/\|/g, '\\|');
+  return String(v ?? 'ï¿½').replace(/\|/g, '\\|');
 }
 
 export function formatDuplicateSystemAuditMarkdown(report = buildDuplicateSystemReport()) {
@@ -558,27 +593,27 @@ export function formatDuplicateSystemAuditMarkdown(report = buildDuplicateSystem
     '',
     '### Top consolidation priorities',
     '',
-    '1. **Routes** — Single path map in `routes.config.js`; stop duplicating in `TOOL_LAUNCH_PATHS`.',
-    '2. **Inventories** — `toolInventory.js` is the SPA launch authority; `assetInventory.ts` mounts it into product/pack/workspace/role metadata.',
-    '3. **Workspace** — Merge three workspace models under API `enabledToolIds`; dedupe `LEGACY_TOOL_ID_ALIASES`.',
-    '4. **Dashboards** — Keep `CommandDashboard` as home; ED Copilot owns assistant chat in the shell.',
-    '5. **Executors** — Backend `tool-orchestrator.registry.ts` owns ids; frontend mirrors via contract tests only.',
-    '6. **Pack routes** — One pack marketplace URL under organization settings.',
+    '1. **Routes** ï¿½ Single path map in `routes.config.js`; stop duplicating in `TOOL_LAUNCH_PATHS`.',
+    '2. **Inventories** ï¿½ `toolInventory.js` is the SPA launch authority; `assetInventory.ts` mounts it into product/pack/workspace/role metadata.',
+    '3. **Workspace** ï¿½ Merge three workspace models under API `enabledToolIds`; dedupe `LEGACY_TOOL_ID_ALIASES`.',
+    '4. **Dashboards** ï¿½ Keep `CommandDashboard` as home; ED Copilot owns assistant chat in the shell.',
+    '5. **Executors** ï¿½ Backend `tool-orchestrator.registry.ts` owns ids; frontend mirrors via contract tests only.',
+    '6. **Pack routes** ï¿½ One pack marketplace URL under organization settings.',
     '',
     '## Canonical source matrix',
     '',
     '| Domain | Canonical source | Do not duplicate in |',
     '|--------|------------------|---------------------|',
-    '| Routes | `src/config/routes.config.ts` | App.jsx (paths only), TOOL_LAUNCH_PATHS |',
-    '| Router mount | `src/app/router.tsx` | — |',
-    '| Layouts | `src/components/AppShell.tsx` | `src/layout/AppShell.tsx`, page-level shells |',
+    '| Routes | `src/config/routes.config.ts` | router.tsx (invent new paths), TOOL_LAUNCH_PATHS |',
+    '| Router mount | `src/app/router.tsx` | ï¿½ |',
+    '| Layouts | `src/components/AppShell.tsx` | `src/layouts/AppShell.tsx` (shim), page-level shells |',
     '| AppShell rail | `src/components/AppShell.tsx` + `NAVIGATION_ITEMS` | Inline nav arrays |',
     '| Navigation | `src/config/unified-navigation.config.ts` | `navigation.config.js`, `primaryNavigation.js` (shims/projections only) |',
     '| Tool inventory | `src/data/toolInventory.js` | Ad-hoc tool lists in pages |',
     '| Tool ids / NLU | `src/data/clinicalToolIdContract.ts` | Random string ids in components |',
     '| NLU catalog | `src/data/clinicalIntentToolCatalog.ts` | Duplicate registry rows |',
     '| Calculator hub | `src/data/calculatorHubManifest.ts` | Calculators.jsx card arrays |',
-    '| Calculator routes | `src/routes/clinicalToolRoutes.ts` | App.jsx one-off paths |',
+    '| Calculator routes | `src/routes/clinicalToolRoutes.ts` | router.tsx one-off paths |',
     '| Command home | `src/pages/CommandDashboard.jsx` + `commandDashboardModel.ts` | platformOperatingSystem tiles |',
     '| Assistant UI | `src/components/ChatInterface.tsx` (ED Copilot panel) | Removed `Dashboard.jsx` assistant page |',
     '| Auth | `src/config/auth.config.ts` + `routes.config.js` | Inline token keys |',
@@ -587,7 +622,7 @@ export function formatDuplicateSystemAuditMarkdown(report = buildDuplicateSystem
     '| Workspace (UX) | `src/data/workspaceArchitecture.ts` via `workspace.config.js` | Duplicate CARE_WORKSPACES |',
     '| Asset entitlements | `backend/.../platform-asset-seed.data.ts` + DB | `buildAssetRegistry()` demo |',
     '| Asset access (client) | `platformAssetsApi` + `UserIdentityContext` + `assetInventory.ts` | Empty pack/product projections |',
-    '| Tool launch (client) | `toolInventory.js` + `registryToolLaunch.js` | — |',
+    '| Tool launch (client) | `toolInventory.js` + `registryToolLaunch.js` | ï¿½ |',
     '| Executors | `backend/.../tool-orchestrator.registry.ts` | Extra REGISTERED lists in frontend |',
     '',
   ];
@@ -623,7 +658,7 @@ export function formatDuplicateSystemAuditMarkdown(report = buildDuplicateSystem
     lines.push(
       report.appPathsNotInCanonical.map((p) => `- \`${p}\``).join('\n'),
       '',
-      '_Many are dynamic tool routes, org/commercial pages, or profile subpaths — extend CANONICAL_ROUTES or document as extensions._',
+      '_Many are dynamic tool routes, org/commercial pages, or profile subpaths ï¿½ extend CANONICAL_ROUTES or document as extensions._',
       ''
     );
   }

@@ -1,3 +1,5 @@
+> **SUPERSEDED** — Use [docs/generated/routes.md](../generated/routes.md). Regenerate: `npm run docs:generate`
+
 # CareDroid Route Map
 
 Canonical routing is owned by a single map in `src/config/routes.config.ts`:

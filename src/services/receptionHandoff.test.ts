@@ -1,3 +1,4 @@
+import './_workflowTestMocks';
 import { describe, expect, it } from 'vitest';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { PatientState } from '../types/emergency';
@@ -60,6 +61,8 @@ describe('receptionHandoff', () => {
     expect(result.queuesPath).toBe(
       `${CANONICAL_ROUTES.emergencyReception}?queue=${encodeURIComponent('pretriage')}&patient=${encodeURIComponent('patient-123')}`,
     );
+    expect(result.nextRoute).toContain('patient-123');
+    expect(result.nextRoute).toContain(CANONICAL_ROUTES.emergencyQueues);
     expect(result.whiteboardPath).toBe(
       `${CANONICAL_ROUTES.emergencyWhiteboard}?patient=${encodeURIComponent('patient-123')}&encounter=${encodeURIComponent('encounter-patient-123')}`,
     );
@@ -98,7 +101,7 @@ describe('receptionHandoff', () => {
       source: 'whiteboard-central-intake',
     });
 
-    expect(calls).toContain('workflow:intake.complete');
+    expect(calls).toContain('workflow:reception.handoff');
     expect(result.encounterId).toBe('encounter-patient-789');
     expect(result.whiteboardPath).toContain('encounter=');
   });

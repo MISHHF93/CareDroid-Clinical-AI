@@ -12,6 +12,9 @@ const mocks = vi.hoisted(() => ({
   startReassessmentEngine: vi.fn(() => 111),
   startContinuousPatientFlowEngine: vi.fn(() => 333),
   startAdministrativeAutomationEngine: vi.fn(() => 444),
+  startUnifiedWorkflowAutomationEngine: vi.fn(() => vi.fn()),
+  startUnifiedOperationalIntelligenceEngine: vi.fn(() => vi.fn()),
+  startUnifiedApplicationKnowledgeGraphEngine: vi.fn(() => vi.fn()),
   startSimulation: vi.fn(() => [333]),
   stopSimulation: vi.fn(),
   startEmergencyRealtime: vi.fn(() => vi.fn()),
@@ -32,6 +35,7 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('../services/emergencyRealtimeService', () => ({
   default: mocks.startEmergencyRealtime,
+  startEmergencyRealtime: mocks.startEmergencyRealtime,
 }));
 
 vi.mock('../engine/capacityEngine', () => ({
@@ -49,6 +53,23 @@ vi.mock('../engine/continuousPatientFlowEngine', () => ({
 
 vi.mock('../engine/administrativeAutomationEngine', () => ({
   startAdministrativeAutomationEngine: mocks.startAdministrativeAutomationEngine,
+}));
+
+vi.mock('../engine/unifiedWorkflowAutomationEngine', () => ({
+  startUnifiedWorkflowAutomationEngine: mocks.startUnifiedWorkflowAutomationEngine,
+  getLastWorkflowAutomationBackendEvent: vi.fn(() => undefined),
+  scheduleWorkflowAutomationRefresh: vi.fn(),
+}));
+
+vi.mock('../engine/unifiedOperationalIntelligenceEngine', () => ({
+  startUnifiedOperationalIntelligenceEngine: mocks.startUnifiedOperationalIntelligenceEngine,
+  getLastUnifiedOperationalIntelligenceBackendEvent: vi.fn(() => undefined),
+  scheduleUnifiedOperationalIntelligenceRefresh: vi.fn(),
+}));
+
+vi.mock('../engine/unifiedApplicationKnowledgeGraphEngine', () => ({
+  startUnifiedApplicationKnowledgeGraphEngine: mocks.startUnifiedApplicationKnowledgeGraphEngine,
+  handleUnifiedApplicationKnowledgeGraphBackendEvent: vi.fn(),
 }));
 
 vi.mock('../engine/simulation', () => ({
@@ -121,6 +142,12 @@ vi.mock('./ReassessmentDrawer', () => ({
   isPatientFlaggedForReassessment: () => false,
 }));
 
+vi.mock('./emergency/HospitalJourneyCommandBar', () => ({ default: () => null }));
+vi.mock('./ai/AiChiefOrchestrationBar', () => ({ default: () => null }));
+vi.mock('./emergency/ThreeMinuteMissionBar', () => ({ default: () => null }));
+vi.mock('./emergency/WorkflowAutomationCommandBar', () => ({ default: () => null }));
+vi.mock('./emergency/UnifiedOperationalIntelligenceCommandBar', () => ({ default: () => null }));
+
 vi.mock('sonner', () => ({
   Toaster: () => null,
 }));
@@ -161,6 +188,9 @@ describe('AppShell R12 startup wiring', () => {
     expect(startCapacityEngine).toHaveBeenCalledTimes(1);
     expect(mocks.startContinuousPatientFlowEngine).toHaveBeenCalledTimes(1);
     expect(mocks.startAdministrativeAutomationEngine).toHaveBeenCalledTimes(1);
+    expect(mocks.startUnifiedWorkflowAutomationEngine).toHaveBeenCalledTimes(1);
+    expect(mocks.startUnifiedOperationalIntelligenceEngine).toHaveBeenCalledTimes(1);
+    expect(mocks.startUnifiedApplicationKnowledgeGraphEngine).toHaveBeenCalledTimes(1);
 
     await waitFor(() => expect(startSimulation).toHaveBeenCalledTimes(1));
 

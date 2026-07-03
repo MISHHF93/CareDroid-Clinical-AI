@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { X } from 'lucide-react';
 import { invokeUnifiedAiRequest } from '../services/careDroidUnifiedAiNode';
+import { showActionSuccess } from '../services/careDroidInteractionFeedback';
 import './WorkloadBalancePanel.css';
 
 function formatShiftStart(activeShift) {
@@ -99,7 +100,7 @@ export default function WorkloadBalancePanel({
 }) {
   const [expandedStaffIds, setExpandedStaffIds] = useState(() => new Set());
   const [activeReassignPatientId, setActiveReassignPatientId] = useState<any>(null);
-  const [toast, setToast] = useState('');
+
   const [aiStatus, setAiStatus] = useState('idle');
   const [aiSuggestions, setAiSuggestions] = useState<any[]>([]);
   const localSuggestions = useMemo(() => buildLocalSuggestions(workloads), [workloads]);
@@ -116,10 +117,7 @@ export default function WorkloadBalancePanel({
     });
   };
 
-  const showToast = (message) => {
-    setToast(message);
-    window.setTimeout(() => setToast(''), 2400);
-  };
+
 
   const reassignPatient = (patient, fromStaff, toStaffId) => {
     if (!toStaffId || toStaffId === fromStaff.id) return;
@@ -132,7 +130,10 @@ export default function WorkloadBalancePanel({
       reason: 'Workload balance panel reassignment',
     });
     setActiveReassignPatientId(null);
-    showToast(`${patientName(patient)} reassigned to ${toStaff?.displayName || 'selected staff'}.`);
+    showActionSuccess(
+      `${patientName(patient)} reassigned`,
+      `Now assigned to ${toStaff?.displayName || 'selected staff'}.`,
+    );
   };
 
   const applySuggestion = (suggestion) => {
@@ -323,11 +324,7 @@ export default function WorkloadBalancePanel({
         </section>
       </div>
 
-      {toast ? (
-        <div className="workload-balance-panel__toast" role="status">
-          {toast}
-        </div>
-      ) : null}
+
     </aside>
   );
 }

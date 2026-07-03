@@ -9,6 +9,7 @@ import {
   Res,
   HttpCode,
   HttpStatus,
+  HttpException,
 } from '@nestjs/common';
 import { Response, Request } from 'express';
 import { ConfigService } from '@nestjs/config';
@@ -86,6 +87,16 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Development only: explicit local/demo UI access' })
   async devSession(@Req() req: Request) {
+    const nodeEnv = process.env.NODE_ENV || 'development';
+    const productionDemoAuthEnabled =
+      String(process.env.ALLOW_DEMO_AUTH_IN_PRODUCTION || '').toLowerCase() === 'true';
+    if (nodeEnv === 'production' && !productionDemoAuthEnabled) {
+      throw new HttpException(
+        'Dev session is not available in production',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
     const ipAddress = req.ip || '0.0.0.0';
     const userAgent = req.headers['user-agent'] || 'unknown';
     return this.authService.createDevSession(ipAddress, userAgent);

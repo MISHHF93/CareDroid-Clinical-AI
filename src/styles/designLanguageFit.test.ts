@@ -29,6 +29,8 @@ const clinicalCanvasCss = readFileSync(join(__dirname, 'clinical-page-canvas.css
 const clinicalTargetsCss = readFileSync(join(__dirname, 'clinical-page-targets.css'), 'utf8');
 const clinicalFlowCss = readFileSync(join(__dirname, 'clinical-operational-flow.css'), 'utf8');
 const clinicalSweepCss = readFileSync(join(__dirname, 'clinical-page-sweep.css'), 'utf8');
+const unifiedCss = readFileSync(join(__dirname, 'cdl-unified-application.css'), 'utf8');
+const publicPageCss = readFileSync(join(__dirname, 'cdl-public-page.css'), 'utf8');
 
 describe('CareDroid design language fit contract', () => {
   it('defines shared control, icon, shell, z-index, shadow, and focus tokens', () => {
@@ -49,8 +51,10 @@ describe('CareDroid design language fit contract', () => {
   it('loads the CareDroid Design Language after the layout engine', () => {
     const layoutIndex = designSystemCss.indexOf("@import './layout-engine.css'");
     const cdlIndex = designSystemCss.indexOf("@import './caredroid-design-language.css'");
+    const unifiedIndex = designSystemCss.indexOf("@import './cdl-unified-application.css'");
     expect(layoutIndex).toBeGreaterThan(-1);
     expect(cdlIndex).toBeGreaterThan(layoutIndex);
+    expect(unifiedIndex).toBeGreaterThan(cdlIndex);
   });
 
   it('loads the clinical page canvas layer after shell chrome polish', () => {
@@ -123,6 +127,8 @@ describe('CareDroid design language fit contract', () => {
       'OperationalPageTemplate',
       'OperationalZone',
       'CareDroidPage',
+      'PublicPageTemplate',
+      'OperationalGrid',
     ].forEach((symbol) => {
       expect(primitivesSource).toContain(`function ${symbol}`);
     });
@@ -147,6 +153,14 @@ describe('CareDroid design language fit contract', () => {
     expect(cdlCss).toContain('.cdl-zone--active-work');
     expect(cdlCss).toContain('--semantic-ai-assistance');
     expect(appShellCss).not.toMatch(/\.app-shell-main-content > \*/);
+  });
+
+  it('unifies shells, grids, and public pages in the application sweep layer', () => {
+    expect(unifiedCss).toContain('.cdl-grid--metrics');
+    expect(unifiedCss).toContain('.cdl-shell--entry');
+    expect(unifiedCss).toContain('.platform-settings-page');
+    expect(publicPageCss).toContain('.cdl-public-page');
+    expect(appShellJsx).toContain('cdl-shell');
   });
 
   it('defines clinical canvas tokens that soften brutal flat bordered surfaces', () => {

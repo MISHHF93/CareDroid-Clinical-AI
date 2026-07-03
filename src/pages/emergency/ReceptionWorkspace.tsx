@@ -34,6 +34,9 @@ import {
 } from '../../services/receptionIntakeOrchestrator';
 import { completeProvisionalIntake } from '../../services/provisionalIdentityIntake';
 import { ReceptionFlowGraphic } from '../../components/graphics/CdlGraphicKit';
+import ContextualGuidance from '../../components/ui/ContextualGuidance';
+import { showActionError, showActionSuccess } from '../../services/careDroidInteractionFeedback';
+import { notifyWorkflowHandoffComplete } from '../../services/workflowNavigationFeedback';
 import { EmergencyRoutePage } from './emergencyRouteShared';
 import './ReceptionWorkspace.css';
 import './emergency-route.css';
@@ -249,6 +252,16 @@ export default function ReceptionWorkspace() {
   const [showChooser, setShowChooser] = useState(false);
   const [smartIntakeSession, setSmartIntakeSession] = useState<SmartIntakeSession | null>(null);
 
+  useEffect(() => {
+    if (error) {
+      showActionError('Reception action failed', error);
+      setError('');
+    } else if (status) {
+      showActionSuccess(status);
+      setStatus('');
+    }
+  }, [error, status]);
+
   const receptionCapabilities = useMemo(
     () =>
       resolveReceptionScreenCapabilities({
@@ -428,12 +441,16 @@ export default function ReceptionWorkspace() {
       });
       setAiAssist(routeResult.aiAssist);
       setResult(routeResult);
-      setStatus(
-        routeResult.criticalAlertId
-          ? 'Critical alert sent. 3-minute response timer started.'
-          : RECEPTION_COPY.workspace.sentToTriage,
-      );
+      const routedMessage = routeResult.criticalAlertId
+        ? 'Critical alert sent. 3-minute response timer started.'
+        : RECEPTION_COPY.workspace.sentToTriage;
       selectPatient(routeResult.patientId);
+      notifyWorkflowHandoffComplete({
+        patientName: patientDisplayName(routeResult.patient),
+        description: routedMessage,
+        nextRoute: routeResult.nextRoute,
+        onNavigate: profileNavigate,
+      });
       window.sessionStorage?.removeItem('caredroid:reception-draft');
     } catch (routeError) {
       setError(routeError instanceof Error ? routeError.message : 'Unable to route patient.');
@@ -453,11 +470,24 @@ export default function ReceptionWorkspace() {
     setResult(null);
   };
 
-  const handleSmartIntakeHandoff = (handoff: { patientId?: string; receptionPath?: string }) => {
+  const handleSmartIntakeHandoff = (handoff: {
+    patientId?: string;
+    receptionPath?: string;
+    nextRoute?: string;
+    queuesPath?: string;
+  }) => {
     setSmartIntakeSession(null);
     clearIntakeQueryParams();
     if (handoff?.patientId) selectPatient(handoff.patientId);
-    setStatus(RECEPTION_COPY.workspace.sentToTriage);
+    const nextRoute = handoff?.nextRoute || handoff?.queuesPath;
+    notifyWorkflowHandoffComplete({
+      description: RECEPTION_COPY.workspace.sentToTriage,
+      nextRoute,
+      onNavigate: profileNavigate,
+    });
+    if (nextRoute) {
+      profileNavigate(nextRoute);
+    }
   };
 
   const focusQueueTab = (tab: QueueTabId) => {
@@ -610,18 +640,26 @@ export default function ReceptionWorkspace() {
         />
       </div>
 
-      {status || error ? (
-        <div
-          className={`reception-command-toast ${error ? 'reception-command-toast--error' : ''}`}
-          role={error ? 'alert' : 'status'}
-        >
-          {error || status}
-        </div>
+      {!result ? (
+        <ContextualGuidance
+          id="reception-workspace-intake-hint"
+          title="One-step intake routing"
+          detail="Capture complaint and identity, then route — triage assist, encounter, and queue placement sync automatically."
+          tone="info"
+          helpTopicId="reception"
+        />
       ) : null}
 
       {result ? (
         <div className="reception-command-selected reception-command-selected--floating" role="status">
           <strong>Routed: {patientDisplayName(result.patient)}</strong>
+          <button
+            type="button"
+            className="reception-command-selected__primary"
+            onClick={() => profileNavigate(result.nextRoute)}
+          >
+            Continue to triage
+          </button>
           <button type="button" onClick={() => profileNavigate(result.profileRoute)}>
             <FolderOpen size={16} aria-hidden="true" />
             {RECEPTION_COPY.workspace.openPatientCard}

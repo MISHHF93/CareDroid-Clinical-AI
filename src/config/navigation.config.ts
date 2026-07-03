@@ -1,14 +1,18 @@
 /**
  * Compatibility projections for navigation consumers.
  *
- * The CareDroid shell now derives from `unified-navigation.config.ts`.
+ * Canonical source: `unified-navigation.config.ts` (see `canonicalConfigurationModel.ts`).
  * `navigation/primaryNavigation.ts` is still a compatibility re-export.
  */
 import {
   NAVIGATION_ITEMS,
   getPilotCustomerNavigationItems,
 } from './unified-navigation.config';
-import { CANONICAL_ROUTES } from './routes.config';
+import {
+  CANONICAL_ROUTES,
+  FLEET_MAP_ROUTE_ALIASES,
+  LIVE_MAP_ROUTE_ALIASES,
+} from './routes.config';
 import { FEATURE_REGISTRY_BY_ID } from '../../lib/features/featureRegistry';
 
 function appShellNavItemFromUnified(item) {
@@ -63,7 +67,11 @@ export const ACCOUNT_UTILITY_NAV_ITEMS = Object.freeze([
     label: 'Workflows',
     mobileLabel: 'Flows',
     path: CANONICAL_ROUTES.workflows,
-    matchPaths: [CANONICAL_ROUTES.workflows, CANONICAL_ROUTES.automation, CANONICAL_ROUTES.automationAudit],
+    matchPaths: [
+      CANONICAL_ROUTES.workflows,
+      CANONICAL_ROUTES.automation,
+      CANONICAL_ROUTES.automationAnalytics,
+    ],
     showInMobile: false,
     showInSidebar: false,
     disclosure: 'contextual',
@@ -390,13 +398,11 @@ export const OPERATIONS_SIDEBAR_NAV_ITEMS = Object.freeze([
     label: 'Fleet Map',
     mobileLabel: 'Fleet',
     path: CANONICAL_ROUTES.fleetMap,
-    legacyPaths: ['/fleet', '/fleet/live-map', '/fleet/tracking'],
+    legacyPaths: [...FLEET_MAP_ROUTE_ALIASES],
     matchPaths: [
-      '/fleet',
       CANONICAL_ROUTES.fleetMap,
-      '/fleet/command',
-      '/fleet/live-map',
-      '/fleet/tracking',
+      CANONICAL_ROUTES.fleetCommand,
+      ...FLEET_MAP_ROUTE_ALIASES,
     ],
     matchPrefixes: ['/fleet/'],
     showInMobile: false,
@@ -406,8 +412,8 @@ export const OPERATIONS_SIDEBAR_NAV_ITEMS = Object.freeze([
     label: 'Live Map',
     mobileLabel: 'Live',
     path: CANONICAL_ROUTES.liveMap,
-    legacyPaths: ['/maps', '/tracking', '/live-tracking'],
-    matchPaths: [CANONICAL_ROUTES.liveMap, '/maps', '/tracking', '/live-tracking'],
+    legacyPaths: [...LIVE_MAP_ROUTE_ALIASES],
+    matchPaths: [CANONICAL_ROUTES.liveMap, ...LIVE_MAP_ROUTE_ALIASES],
     showInMobile: false,
   },
   {
@@ -776,7 +782,7 @@ export function getPrimaryNavItemForPath(pathname) {
   );
 }
 
-/** Canonical sidebar builder — filters APP_SHELL_NAV_ITEMS by feature gate. */
+/** Canonical sidebar builder ï¿½ filters APP_SHELL_NAV_ITEMS by feature gate. */
 export function buildSidebarItems(isEnabled) {
   return APP_SHELL_NAV_ITEMS.map((item) => {
     const feature = FEATURE_REGISTRY_BY_ID[item.featureId];

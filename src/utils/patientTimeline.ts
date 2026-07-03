@@ -1,3 +1,5 @@
+import type { UnifiedApplicationKnowledgeGraphSnapshot } from '../config/unifiedApplicationKnowledgeGraphModel';
+import { buildKnowledgeGraphTimelineItems } from '../services/unifiedApplicationKnowledgeGraphPresentation';
 import type { Alert, JourneyEvent, Patient, PatientFlag, Staff, Vitals, WorkflowActionLog } from '../types/emergency';
 
 export type PatientTimelineCategory =
@@ -25,6 +27,15 @@ export type PatientTimelineItem = {
   metadata?: Record<string, string | number | boolean | null | undefined>;
 };
 
+export type PatientTimelineKnowledgeGraphContext = {
+  connectedNodeCount: number;
+  alertCount: number;
+  recommendationCount: number;
+  workflowCount: number;
+  departmentIds: string[];
+  staffIds: string[];
+};
+
 export type PatientTimelineContext = {
   staff?: Staff[];
   alerts?: Alert[];
@@ -38,6 +49,8 @@ export type PatientTimelineContext = {
   copilotContext?: Record<string, unknown> | null;
   backendTimelineEvents?: Array<Record<string, unknown>>;
   workflowLogs?: WorkflowActionLog[];
+  knowledgeGraph?: PatientTimelineKnowledgeGraphContext;
+  knowledgeGraphSnapshot?: UnifiedApplicationKnowledgeGraphSnapshot;
 };
 
 export const PATIENT_TIMELINE_CATEGORY_LABELS: Record<PatientTimelineCategory, string> = {
@@ -405,6 +418,12 @@ export function buildPatientTimeline(patient: Patient, context: PatientTimelineC
       connectorRecord: Boolean(provincialRecord),
     },
   });
+
+  if (context.knowledgeGraphSnapshot) {
+    for (const item of buildKnowledgeGraphTimelineItems(patient.id, context.knowledgeGraphSnapshot)) {
+      addItem(items, item);
+    }
+  }
 
   const deduped = new Map<string, PatientTimelineItem>();
   for (const item of items) {

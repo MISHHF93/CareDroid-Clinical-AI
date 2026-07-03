@@ -523,6 +523,8 @@ type WorkflowActionInput = Omit<
     >
   >;
 
+const WORKFLOW_LOG_BUFFER_LIMIT = 500;
+
 @Injectable()
 export class WorkflowActionLogService {
   private readonly logs: WorkflowActionLog[] = [];
@@ -556,8 +558,26 @@ export class WorkflowActionLogService {
       metadata: input.metadata || {},
     };
     this.logs.unshift(log);
+    if (this.logs.length > WORKFLOW_LOG_BUFFER_LIMIT) {
+      this.logs.length = WORKFLOW_LOG_BUFFER_LIMIT;
+    }
     this.realtimeService?.publish({ type: 'workflow_log_created', payload: clone(log) });
     return clone(log);
+  }
+
+  getDiagnostics() {
+    const severityCounts = this.logs.reduce<Record<string, number>>((counts, log) => {
+      const key = log.severity || 'Info';
+      counts[key] = (counts[key] || 0) + 1;
+      return counts;
+    }, {});
+    return {
+      bufferedLogs: this.logs.length,
+      severityCounts,
+      recentTypes: [...new Set(this.logs.slice(0, 20).map((log) => log.type))],
+      oldestTimestamp: this.logs[this.logs.length - 1]?.timestamp,
+      newestTimestamp: this.logs[0]?.timestamp,
+    };
   }
 
   listLogs(patientId?: string): WorkflowActionLog[] {

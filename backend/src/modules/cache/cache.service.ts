@@ -18,7 +18,7 @@ export class CacheService implements OnModuleInit {
       if (process.env.REDIS_ENABLED === 'false' || process.env.REDIS_ENABLED === '0') {
         const message = 'Redis disabled (REDIS_ENABLED=false). Cache service disabled.';
         if (process.env.NODE_ENV === 'development') {
-          this.logger.log(message);
+          this.logger.debug('In-memory fallback only in local dev (REDIS_ENABLED=false).');
         } else {
           this.logger.warn(message);
         }

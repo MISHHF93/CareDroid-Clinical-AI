@@ -56,12 +56,12 @@ const parsePort = (value, fallback, label) => {
 
 const frontendPort = parsePort(
   argValue('--frontend-port') || process.env.FRONTEND_PORT || process.env.VITE_DEV_PORT,
-  '8000',
+  '5174',
   'frontend',
 );
 const backendPort = parsePort(
   argValue('--backend-port') || process.env.BACKEND_PORT || process.env.PORT,
-  '3000',
+  '3333',
   'backend',
 );
 const frontendOrigin = process.env.FRONTEND_URL || `http://localhost:${frontendPort}`;
@@ -110,27 +110,61 @@ if (backendEnv.REDIS_ENABLED !== 'true') {
   backendEnv.REDIS_HOST = '';
 }
 
-const probeBackendHealth = (port) =>
+const isCareDroidHealthPayload = (rawBody = '') => {
+  try {
+    const parsed = JSON.parse(rawBody);
+    if (parsed?.service === 'CareDroid API') return true;
+    if (parsed?.components && typeof parsed?.responseTimeMs === 'number') return true;
+    return /caredroid/i.test(JSON.stringify(parsed));
+  } catch {
+    return false;
+  }
+};
+
+const probeHttpHealth = (port, path = '/health') =>
   new Promise((resolveProbe) => {
     const request = http.get(
       {
         host: '127.0.0.1',
         port,
-        path: '/health',
+        path,
         timeout: 1500,
       },
       (response) => {
-        response.resume();
-        resolveProbe(response.statusCode === 200);
+        let body = '';
+        response.setEncoding('utf8');
+        response.on('data', (chunk) => {
+          body += chunk;
+        });
+        response.on('end', () => {
+          resolveProbe({
+            ok: response.statusCode === 200,
+            body,
+            caredroid: response.statusCode === 200 && isCareDroidHealthPayload(body),
+            foreign:
+              response.statusCode === 200 && !isCareDroidHealthPayload(body),
+          });
+        });
       },
     );
 
     request.on('timeout', () => {
       request.destroy();
-      resolveProbe(false);
+      resolveProbe({ ok: false, body: '', caredroid: false, foreign: false });
     });
-    request.on('error', () => resolveProbe(false));
+    request.on('error', () =>
+      resolveProbe({ ok: false, body: '', caredroid: false, foreign: false }),
+    );
   });
+
+const probeBackendHealth = (port) =>
+  probeHttpHealth(port, '/health').then((result) => result.caredroid);
+
+const probeFrontendProxyHealth = (port) =>
+  probeHttpHealth(port, '/health').then((result) => result.caredroid);
+
+const probeForeignServiceOnPort = (port) =>
+  probeHttpHealth(port, '/health').then((result) => result.foreign);
 
 const sleep = (ms) => new Promise((resolveSleep) => setTimeout(resolveSleep, ms));
 
@@ -234,6 +268,18 @@ const spawnManagedProcess = (entry) => {
       }
     }
 
+    if (entry.name === 'web' && exitCode !== 0) {
+      const proxyHealthy = await probeFrontendProxyHealth(frontendPort);
+      if (proxyHealthy) {
+        console.warn(
+          `[web] port ${frontendPort} is already serving CareDroid (Vite likely already running).`,
+        );
+        console.log(`Open ${frontendOrigin}`);
+        process.exit(0);
+        return;
+      }
+    }
+
     console.error(
       `[${entry.name}] exited${signal ? ` with signal ${signal}` : ` with code ${exitCode}`}`,
     );
@@ -244,6 +290,41 @@ const spawnManagedProcess = (entry) => {
 };
 
 const backendAlreadyHealthy = !forceRestart && (await probeBackendHealth(backendPort));
+const frontendProxyHealthy =
+  !forceRestart && (await probeFrontendProxyHealth(frontendPort));
+const foreignServiceOnBackendPort =
+  !backendAlreadyHealthy && (await probeForeignServiceOnPort(backendPort));
+const foreignServiceOnFrontendPort =
+  !frontendProxyHealthy && (await probeForeignServiceOnPort(frontendPort));
+
+if (foreignServiceOnBackendPort) {
+  console.error(
+    `Port ${backendPort} is already in use by a non-CareDroid service (for example another local app on :3000 or :8000).`,
+  );
+  console.error(
+    `Set BACKEND_PORT to a free port (default 3333) in .env / backend/.env, then rerun npm run dev:fullstack.`,
+  );
+  process.exit(1);
+}
+
+if (foreignServiceOnFrontendPort) {
+  console.error(
+    `Port ${frontendPort} is already in use by a non-CareDroid service (for example another app on :8000).`,
+  );
+  console.error(
+    `Set FRONTEND_PORT / VITE_DEV_PORT to a free port (default 5174) in .env, then rerun npm run dev:fullstack.`,
+  );
+  process.exit(1);
+}
+
+if (!backendOnly && backendAlreadyHealthy && frontendProxyHealthy) {
+  console.log('CareDroid local stack is already running.');
+  console.log(`App:      ${frontendOrigin}`);
+  console.log(`Backend:  http://localhost:${backendPort}`);
+  console.log(`Health:   ${frontendOrigin}/health`);
+  console.log('Use --force-restart to stop and relaunch both processes.');
+  process.exit(0);
+}
 
 console.log('Starting CareDroid local stack...');
 console.log(`App:      ${frontendOrigin}  (API proxied via /api)`);

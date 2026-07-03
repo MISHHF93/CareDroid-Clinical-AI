@@ -28,19 +28,20 @@ import {
   type Referral,
   type Staff,
 } from '../../../../src/types/emergency';
+import { CANONICAL_ROUTES } from '../../../../src/config/routes.config';
 import type { TenantContext } from '../tenant-context/tenant-context.types';
 import type { EmergencyPatientService, WorkflowActionLogService } from './emergency-os.services';
 
 const SAFETY_STATEMENT = ADMINISTRATIVE_AUTOMATION_SAFETY_STATEMENT;
 
 const ROUTES = Object.freeze({
-  emergencyWhiteboard: '/emergency/whiteboard',
-  emergencyCommandCenter: '/emergency/command-center',
-  emergencyHandoffs: '/emergency/handoffs',
-  emergencyCopilot: '/emergency/copilot',
-  emergencyEms: '/emergency/ems',
-  emergencyQueues: '/emergency/queues',
-  emergencyAlerts: '/emergency/alerts',
+  emergencyWhiteboard: CANONICAL_ROUTES.emergencyWhiteboard,
+  emergencyCommandCenter: CANONICAL_ROUTES.emergencyCommandCenter,
+  emergencyHandoffs: CANONICAL_ROUTES.emergencyHandoffs,
+  emergencyCopilot: CANONICAL_ROUTES.emergencyCopilot,
+  emergencyEms: CANONICAL_ROUTES.emergencyEms,
+  emergencyQueues: CANONICAL_ROUTES.emergencyQueues,
+  emergencyAlerts: CANONICAL_ROUTES.emergencyAlerts,
 });
 
 export type AutomationEngineRuntimeContext = {

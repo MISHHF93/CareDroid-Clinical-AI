@@ -12,6 +12,7 @@ import {
   getEffectivePermissions,
 } from '../src/modules/auth/config/role-permissions.config';
 import { Permission, PermissionMetadata } from '../src/modules/auth/enums/permission.enum';
+import { EntitlementService } from '../src/modules/platform-assets/entitlement.service';
 
 /**
  * RBAC (Role-Based Access Control) Tests - Batch 15 Phase 3
@@ -64,6 +65,13 @@ describe('RBAC System (Batch 15 Phase 3)', () => {
           provide: AuditService,
           useValue: {
             log: jest.fn().mockResolvedValue({}),
+          },
+        },
+        {
+          provide: EntitlementService,
+          useValue: {
+            resolveEntitlementsForUser: jest.fn().mockResolvedValue({ entitledPackIds: [] }),
+            assertAssetAccess: jest.fn().mockResolvedValue(undefined),
           },
         },
       ],

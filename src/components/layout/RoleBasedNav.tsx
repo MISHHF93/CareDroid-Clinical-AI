@@ -1,7 +1,8 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { useRolePermissions } from '../../hooks/useRolePermissions';
+import useSecurityAccess from '../../hooks/useSecurityAccess';
 import { getNavVisibleRoutes } from '../../lib/navigation';
+import type { HospitalRole } from '../../lib/users/userTypes';
 
 type RoleBasedNavProps = {
   className?: string;
@@ -9,7 +10,8 @@ type RoleBasedNavProps = {
 };
 
 export default function RoleBasedNav({ className = '', onNavigate }: RoleBasedNavProps) {
-  const { role } = useRolePermissions();
+  const { hospitalRole } = useSecurityAccess();
+  const role = (hospitalRole || 'physician') as HospitalRole;
   const routes = getNavVisibleRoutes(role);
 
   if (!routes.length) return null;

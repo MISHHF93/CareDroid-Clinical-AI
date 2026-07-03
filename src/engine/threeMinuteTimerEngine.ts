@@ -99,6 +99,10 @@ export function startResponseTimer(
     escalationHistory: [],
   });
 
+  void import('../services/threeMinuteMissionService').then(({ syncThreeMinuteMissionsFromEngine }) =>
+    syncThreeMinuteMissionsFromEngine(),
+  );
+
   return timerId;
 }
 
@@ -113,6 +117,10 @@ export function acknowledgeResponseTimer(timerId: string, acknowledgedBy: string
     acknowledgedBy,
     phase: elapsed >= 180 ? 'breach_resolved' : 'acknowledged',
   });
+
+  void import('../services/threeMinuteMissionService').then(({ syncThreeMinuteMissionsFromEngine }) =>
+    syncThreeMinuteMissionsFromEngine(),
+  );
 
   return true;
 }
@@ -212,27 +220,43 @@ function checkEscalations(): void {
       activeTimers.set(timerId, current);
     }
   }
+
+  void import('../services/threeMinuteMissionService').then(({ syncThreeMinuteMissionsFromEngine }) =>
+    syncThreeMinuteMissionsFromEngine(),
+  );
 }
 
-function subscribeToNewCriticalAlerts(): () => void {
-  // Snapshot current alert IDs so we don't re-trigger existing alerts on mount.
-  const seenIds = new Set(useEmergencyStore.getState().alerts.map((a) => a.id));
+function subscribeToMissionTriggers(): () => void {
+  const seenAlertIds = new Set(useEmergencyStore.getState().alerts.map((alert) => alert.id));
+  const seenEmsIds = new Set(useEmergencyStore.getState().emsArrivals.map((arrival) => arrival.id));
+  const seenPatientIds = new Set<string>();
 
   return useEmergencyStore.subscribe((state) => {
-    for (const alert of state.alerts) {
-      if (seenIds.has(alert.id)) continue;
-      seenIds.add(alert.id);
+    let changed = false;
 
-      if (
-        alert.patientId &&
-        !alert.dismissed &&
-        alert.severity === 'Critical' &&
-        alert.source !== 'three-minute-timer-engine'
-      ) {
-        if (!getActiveTimerForPatient(alert.patientId)) {
-          startResponseTimer(alert.patientId, alert.id, 'triage_nurse');
-        }
-      }
+    for (const alert of state.alerts) {
+      if (seenAlertIds.has(alert.id)) continue;
+      seenAlertIds.add(alert.id);
+      changed = true;
+    }
+
+    for (const arrival of state.emsArrivals) {
+      if (seenEmsIds.has(arrival.id)) continue;
+      seenEmsIds.add(arrival.id);
+      changed = true;
+    }
+
+    for (const patient of state.patients) {
+      const signature = `${patient.id}:${patient.state}:${patient.priority}:${(patient.flags || []).join(',')}`;
+      if (seenPatientIds.has(signature)) continue;
+      seenPatientIds.add(signature);
+      changed = true;
+    }
+
+    if (changed) {
+      void import('../services/threeMinuteMissionService').then(({ evaluateThreeMinuteTriggers }) =>
+        evaluateThreeMinuteTriggers(),
+      );
     }
   });
 }
@@ -242,8 +266,12 @@ function subscribeToNewCriticalAlerts(): () => void {
 export function startTimerEngine(): () => void {
   if (engineInterval) return stopTimerEngine;
 
-  unsubscribeStore = subscribeToNewCriticalAlerts();
-  // Check immediately in case timers are already running (e.g. after hot reload).
+  void import('../services/threeMinuteMissionService').then(({ hydrateThreeMinuteMissionsFromStore, evaluateThreeMinuteTriggers }) => {
+    hydrateThreeMinuteMissionsFromStore();
+    evaluateThreeMinuteTriggers();
+  });
+
+  unsubscribeStore = subscribeToMissionTriggers();
   checkEscalations();
   engineInterval = setInterval(checkEscalations, 5000);
 

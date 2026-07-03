@@ -43,7 +43,13 @@ const Button = ({
   };
 
   return (
-    <button className={getClassName()} style={style} disabled={disabled || loading} {...props}>
+    <button
+      className={getClassName()}
+      style={style}
+      disabled={disabled || loading}
+      aria-busy={loading || undefined}
+      {...props}
+    >
       {loading && (
         <span className="btn-spinner">
           <svg className="spinner-icon" viewBox="0 0 24 24">

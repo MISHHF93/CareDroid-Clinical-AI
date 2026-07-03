@@ -8,9 +8,11 @@ const SCAN_ROOTS = ['src/components', 'src/pages', 'src/features', 'src/hooks', 
 const ALLOWED_AI_CHIEF_IMPORTERS = new Set([
   'src/services/aiChiefOrchestrator.ts',
   'src/services/aiChiefOrchestrator.test.ts',
+  'src/services/aiChiefContinuousMonitoringService.ts',
   'src/services/careDroidUnifiedAiNode.ts',
   'src/services/careDroidAiApi.ts',
   'src/services/alertLifecycleOrchestrator.ts',
+  'src/hooks/useAiChiefOrchestrator.ts',
 ]);
 
 const AI_CHIEF_ENTRY_IMPORT =

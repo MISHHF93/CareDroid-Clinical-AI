@@ -46,7 +46,7 @@ export const TARGET_FEATURE_MODULE_CONTRACTS = Object.freeze([
   {
     id: 'triage',
     label: 'Triage',
-    primaryRoute: '/triage',
+    primaryRoute: '/emergency/queues',
     sourceDirectory: 'src/features/triage',
     status: 'compatibility',
     pageFamilies: ['src/features/triage-queue', 'src/components/ClinicalCalculatorHub'],
@@ -88,7 +88,7 @@ export const TARGET_FEATURE_MODULE_CONTRACTS = Object.freeze([
   {
     id: 'command',
     label: 'Command',
-    primaryRoute: '/emergency/analytics',
+    primaryRoute: '/emergency/command-center',
     sourceDirectory: 'src/features/command',
     status: 'planned',
     pageFamilies: ['src/pages/analytics', 'src/pages/executive', 'src/pages/operations', 'src/pages/fleet'],
@@ -108,7 +108,7 @@ export const TARGET_FEATURE_MODULE_CONTRACTS = Object.freeze([
   {
     id: 'tools',
     label: 'Tools',
-    primaryRoute: '/tools',
+    primaryRoute: '/emergency/tools',
     sourceDirectory: 'src/features/tools',
     status: 'planned',
     pageFamilies: ['src/pages/tools'],
@@ -118,7 +118,7 @@ export const TARGET_FEATURE_MODULE_CONTRACTS = Object.freeze([
   {
     id: 'calculators',
     label: 'Calculators',
-    primaryRoute: '/tools/calculators',
+    primaryRoute: '/emergency/tools',
     sourceDirectory: 'src/features/calculators',
     status: 'planned',
     pageFamilies: ['src/pages/tools/*Calculator*', 'src/pages/tools/*Calculators*', 'src/components/ClinicalCalculatorHub'],
@@ -148,7 +148,7 @@ export const TARGET_FEATURE_MODULE_CONTRACTS = Object.freeze([
   {
     id: 'platform',
     label: 'Platform',
-    primaryRoute: '/platform-admin',
+    primaryRoute: '/start',
     sourceDirectory: 'src/features/platform',
     status: 'planned',
     pageFamilies: ['src/pages/platform', 'src/pages/governance', 'src/pages/saas', 'src/pages/commercial', 'src/pages/legal'],
@@ -178,7 +178,7 @@ export const TARGET_FEATURE_MODULE_CONTRACTS = Object.freeze([
   {
     id: 'auth',
     label: 'Auth',
-    primaryRoute: '/auth',
+    primaryRoute: '/start',
     sourceDirectory: 'src/features/auth',
     status: 'planned',
     pageFamilies: ['src/pages/Profile', 'src/pages/profile', 'src/auth'],

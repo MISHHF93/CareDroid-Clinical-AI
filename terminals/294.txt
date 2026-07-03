@@ -1,7 +1,0 @@
----
-pid: 18732
-cwd: "C:\Users\borah\CareDroid-Clinical-AI"
-command: "powershell -NoProfile -Command \"Set-Location 'C:\\Users\\borah\\CareDroid-Clinical-AI'; node node_modules\\vitest\\vitest.mjs run src/routing/canonicalRouteTree.redirects.test.tsx --pool=forks --maxWorkers=1 --reporter=verbose 2>&1 | Select-Object -Last 35\""
-started_at: 2026-07-02T05:54:29.732Z
-running_for_ms: 354984   
----

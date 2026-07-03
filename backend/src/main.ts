@@ -26,6 +26,7 @@ import {
   STATIC_ASSET_RENDER_PATH,
 } from './static-asset-excludes';
 import { ApiExceptionFilter } from './common/filters/api-exception.filter';
+import { LoggingMiddleware } from './middleware/logging.middleware';
 
 function shouldServeFrontendAssets(config: EnvironmentConfig) {
   return config.server.nodeEnv === 'production' && !config.runtime.jestWorkerId;
@@ -158,8 +159,8 @@ async function bootstrap() {
   app.use(Sentry.Handlers.requestHandler());
   app.use(Sentry.Handlers.errorHandler());
 
-  // HTTP request/response logging middleware (temporarily disabled for testing)
-  // app.use(LoggingMiddleware);
+  const loggingMiddleware = new LoggingMiddleware();
+  app.use((req, res, next) => loggingMiddleware.use(req, res, next));
 
   app.enableCors({
     origin: environment.server.corsOrigins,
@@ -174,6 +175,9 @@ async function bootstrap() {
       'X-CareDroid-Role',
       'X-CareDroid-Subscription-Plan',
       'X-CareDroid-Tenant-Source',
+      'X-Request-Id',
+      'X-Correlation-Id',
+      'X-Workflow-Trace-Id',
     ],
   });
 

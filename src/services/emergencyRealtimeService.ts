@@ -1,5 +1,7 @@
 import { buildApiUrl, buildStreamUrl, getStoredAccessToken } from './apiClient';
 import { probeBackendReachability } from './backendReachability';
+import observabilityService from './observabilityService';
+import { startWorkflowTrace } from './observabilityTrace';
 
 const DEFAULT_POLL_INTERVAL_MS = 30_000;
 const MIN_RECONNECT_MS = 10_000;
@@ -162,6 +164,16 @@ function openWebSocket({ path, onEvent, onStatus, scheduleReconnect, onConnected
   return () => socket.close();
 }
 
+function mapRealtimeStatusToHealth(
+  status?: string,
+): 'ok' | 'degraded' | 'offline' | 'reconnecting' {
+  const normalized = String(status || '').toLowerCase();
+  if (normalized === 'connected') return 'ok';
+  if (normalized === 'reconnecting') return 'reconnecting';
+  if (normalized.includes('offline')) return 'offline';
+  return 'degraded';
+}
+
 export function startEmergencyRealtime({ onEvent, onStatus, onPoll }: any = {}) {
   if (typeof window === 'undefined') return () => {};
 
@@ -171,6 +183,33 @@ export function startEmergencyRealtime({ onEvent, onStatus, onPoll }: any = {}) 
   let reconnectTimer: any = null;
   let reconnectAttempt = 0;
   let sseSuspended = false;
+  const sessionTrace = startWorkflowTrace('emergency-realtime-session', {
+    source: 'emergencyRealtimeService',
+    summary: 'Emergency realtime session',
+    metadata: { ssePath: config.ssePath, wsPath: config.wsPath || null },
+  });
+  let lastHealthStatus: string | null = null;
+
+  const emitRealtimeHealth = (statusPayload: Record<string, unknown> = {}) => {
+    const status = String(statusPayload.status || 'unknown');
+    if (status === lastHealthStatus) return;
+    lastHealthStatus = status;
+    observabilityService.recordHealthSignal({
+      name: 'emergency_realtime_status',
+      status: mapRealtimeStatusToHealth(status),
+      source: 'emergencyRealtimeService',
+      message: String(statusPayload.message || status),
+      metadata: {
+        mode: statusPayload.mode,
+        workflow: 'emergency-realtime-session',
+      },
+    });
+  };
+
+  const wrappedOnStatus = (statusPayload: Record<string, unknown>) => {
+    emitRealtimeHealth(statusPayload);
+    onStatus?.(statusPayload);
+  };
 
   const stopCurrentConnections = () => {
     disposers.forEach((dispose: any) => dispose());
@@ -203,10 +242,10 @@ export function startEmergencyRealtime({ onEvent, onStatus, onPoll }: any = {}) 
 
     const reachable = await isBackendReachable();
     if (!reachable) {
-      onStatus?.({
+      wrappedOnStatus({
         status: 'reconnecting',
         mode: 'polling',
-        message: 'API offline — using local CareDroid state until backend is available.',
+        message: 'API offline ï¿½ using local CareDroid state until backend is available.',
         updatedAt: new Date().toISOString(),
       });
       scheduleReconnect();
@@ -222,7 +261,7 @@ export function startEmergencyRealtime({ onEvent, onStatus, onPoll }: any = {}) 
         openEventSource({
           path: config.ssePath,
           onEvent,
-          onStatus,
+          onStatus: wrappedOnStatus,
           scheduleReconnect,
           onConnected: resetReconnectState,
         }),
@@ -235,7 +274,7 @@ export function startEmergencyRealtime({ onEvent, onStatus, onPoll }: any = {}) 
         openWebSocket({
           path: config.wsPath,
           onEvent,
-          onStatus,
+          onStatus: wrappedOnStatus,
           scheduleReconnect,
           onConnected: resetReconnectState,
         }),
@@ -243,7 +282,7 @@ export function startEmergencyRealtime({ onEvent, onStatus, onPoll }: any = {}) 
       return;
     }
 
-    onStatus?.({
+    wrappedOnStatus({
       status: 'reconnecting',
       mode: 'polling',
       message: 'CareDroid realtime unavailable; polling every 30 seconds.',
@@ -256,12 +295,13 @@ export function startEmergencyRealtime({ onEvent, onStatus, onPoll }: any = {}) 
     createPollingLoop({
       intervalMs: config.pollIntervalMs,
       onPoll,
-      onStatus,
+      onStatus: wrappedOnStatus,
     }),
   );
 
   return () => {
     stopped = true;
+    sessionTrace.end('cancelled', { reason: 'dispose' });
     if (reconnectTimer) window.clearTimeout(reconnectTimer);
     stopCurrentConnections();
   };

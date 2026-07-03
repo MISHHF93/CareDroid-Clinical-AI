@@ -1,9 +1,0 @@
----
-pid: 11272
-cwd: "C:\Users\borah\CareDroid-Clinical-AI"
-command: "node -e \"const { chromium } = require('@playwright/test'); const { mkdirSync } = require('fs'); const { join } = require('path'); const { seedQaAuth, installQaNetworkStubs, dismissOverlays, waitForAppReady } = require('./e2e/responsive-qa.helpers.mjs'); (async () => { const out = join(process.cwd(), 'qa', 'shell-ux-audit', 'after'); mkdirSync(out, { recursive: true }); const browser = await chromium.launch({ headless: true }); const page = await browser.newPage(); await seedQaAuth(page); await installQaNetworkStubs(page); for (const s of [{n:'desktop-whiteboard',w:1440,h:900,p:'/emergency/whiteboard'},{n:'mobile-whiteboard',w:375,h:812,p:'/emergency/whiteboard'}]) { await page.setViewportSize({width:s.w,height:s.h}); await page.goto('http://localhost:8000'+s.p); await waitForAppReady(page); await page.waitForTimeout(500); await dismissOverlays(page); const m = await page.evaluate(() => { const h=document.querySelector('.caredroid-header'); const sc=document.querySelector('.session-chrome-bar'); const main=document.querySelector('.app-shell-main-content'); return { header:h?.getBoundingClientRect().height||0, session:sc?.getBoundingClientRect().height||0, mainTop:main?.getBoundingClientRect().top||0 }; }); await page.screenshot({path:join(out,s.n+'.png')}); console.log(s.n, m); } await browser.close(); })();\""
-started_at: 2026-07-01T05:23:50.634Z
-running_for_ms: 37130005 
----
-desktop-whiteboard { header: 49, session: 0, mainTop: 49 }
-mobile-whiteboard { header: 48, session: 0, mainTop: 48 }

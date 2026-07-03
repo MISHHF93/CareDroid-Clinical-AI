@@ -5,6 +5,11 @@ import {
 } from '../engine/administrativeAutomationEngine';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { fetchWorkflowOrchestration, reviewWorkflowAutomation } from '../services/emergencyOsApi';
+import {
+  extractWorkflowOrchestrationTasks,
+  logEmergencyApiWarning,
+  unwrapEmergencyEnvelope,
+} from '../services/emergencyApiHelpers';
 import type {
   AdministrativeAutomationSnapshot,
   AdministrativeAutomationTask,
@@ -48,19 +53,21 @@ export function useAdministrativeAutomations() {
   const refresh = useCallback(async () => {
     if (backendAvailable) {
       try {
-        const envelope = (await fetchWorkflowOrchestration()) as {
-          data?: { tasks?: AdministrativeAutomationTask[]; snapshot?: AdministrativeAutomationSnapshot };
-        };
-        const tasks = envelope?.data?.tasks || envelope?.data?.snapshot?.tasks;
-        if (tasks) {
+        const response = await fetchWorkflowOrchestration();
+        const tasks = extractWorkflowOrchestrationTasks(response) as
+          | AdministrativeAutomationTask[]
+          | null;
+        if (tasks?.length) {
           return applyBackendAdministrativeAutomationQueue(tasks);
         }
-      } catch {
-        // Fall back to local orchestrator snapshot.
+      } catch (error) {
+        logEmergencyApiWarning('useAdministrativeAutomations.refresh', error, {
+          endpoint: '/api/emergency/workflow-orchestration',
+        });
       }
     }
     return refreshLocal();
-  }, [backendAvailable, refreshLocal, setQueue, snapshot]);
+  }, [backendAvailable, refreshLocal]);
 
   const review = useCallback(
     async (input: Omit<ReviewAdministrativeAutomationInput, 'actorStaffId'> & { actorStaffId?: string }) => {
@@ -68,24 +75,28 @@ export function useAdministrativeAutomations() {
       const payload = { ...input, actorStaffId };
       if (backendAvailable) {
         try {
-          const envelope = (await reviewWorkflowAutomation(payload as Record<string, unknown>)) as {
-            data?: {
-              task?: AdministrativeAutomationTask | null;
-              snapshot?: AdministrativeAutomationSnapshot;
-            };
-          };
-          const tasks = envelope?.data?.snapshot?.tasks;
-          if (tasks) {
-            const merged = await mergeBackendAdministrativeAutomationTasks(tasks);
+          const response = await reviewWorkflowAutomation(payload as Record<string, unknown>);
+          const data = unwrapEmergencyEnvelope<{
+            task?: AdministrativeAutomationTask | null;
+            snapshot?: AdministrativeAutomationSnapshot;
+          }>(response);
+          const tasks = data?.snapshot?.tasks ?? extractWorkflowOrchestrationTasks(response);
+          if (Array.isArray(tasks)) {
+            const merged = await mergeBackendAdministrativeAutomationTasks(
+              tasks as AdministrativeAutomationTask[],
+            );
             setQueue([...merged]);
-            return envelope?.data?.task ?? null;
+            return data?.task ?? null;
           }
-          if (envelope?.data?.task) {
-            return envelope.data.task;
+          if (data?.task) {
+            return data.task;
           }
           return null;
-        } catch {
-          // Fall back to local review when backend is unavailable.
+        } catch (error) {
+          logEmergencyApiWarning('useAdministrativeAutomations.review', error, {
+            endpoint: '/api/emergency/workflow-orchestration/review',
+            taskId: payload.taskId,
+          });
         }
       }
       return reviewLocal(payload);

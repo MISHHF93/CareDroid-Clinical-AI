@@ -1,10 +1,12 @@
 import '@testing-library/jest-dom/vitest';
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import AdministrativeAutomationReviewPanel from './AdministrativeAutomationReviewPanel';
 import type { AdministrativeAutomationTask } from '../../types/administrativeAutomation';
+import type { WorkflowAutomationItem } from '../../config/unifiedWorkflowAutomationModel';
 
-const reviewMock = vi.fn();
+const reviewItemMock = vi.fn();
 
 const aiTask: AdministrativeAutomationTask = {
   id: 'auto-route-p-1',
@@ -44,37 +46,88 @@ const aiTask: AdministrativeAutomationTask = {
   updatedAt: '2026-07-01T12:00:00.000Z',
 };
 
-vi.mock('../../hooks/useAdministrativeAutomations', () => ({
+const workflowItem: WorkflowAutomationItem = {
+  id: 'uwa-admin-auto-route-p-1',
+  domain: 'patient_routing',
+  source: 'admin_automation',
+  status: 'pending_review',
+  priority: 'high',
+  title: aiTask.title,
+  summary: aiTask.summary,
+  proposedAction: aiTask.proposedAction,
+  route: '/emergency/whiteboard?patient=p-1',
+  patientId: 'p-1',
+  patientName: 'Jamie Lee',
+  ownerRole: 'Charge Nurse',
+  humanReviewRequired: true,
+  oneClickAction: 'approve',
+  linkedTaskId: aiTask.id,
+  updatedAt: aiTask.updatedAt,
+};
+
+vi.mock('../../hooks/useUnifiedWorkflowAutomation', () => ({
   default: () => ({
     snapshot: {
-      engineId: 'unified-clinical-workflow-orchestrator',
+      engineId: 'unified-workflow-automation',
       generatedAt: aiTask.updatedAt,
-      tasks: [aiTask],
+      items: [workflowItem],
+      pendingReview: 1,
       metrics: {
+        total: 1,
         pendingReview: 1,
-        executedToday: 0,
-        overridden: 0,
-        byCategory: {
+        critical: 0,
+        byDomain: {
+          reception: 0,
+          intake: 0,
+          triage: 0,
           patient_routing: 1,
-          documentation_handoff: 0,
-          ai_patient_summary: 0,
-          triage_preparation: 0,
-          department_notification: 0,
-          staff_assignment: 0,
-          queue_prioritization: 0,
-          escalation_workflow: 0,
+          notifications: 0,
+          documentation: 0,
+          handoffs: 0,
+          staff_assignments: 0,
+          analytics: 0,
+          reporting: 0,
+          ai_recommendations: 0,
         },
+        bySource: {
+          admin_automation: 1,
+          ai_chief: 0,
+          three_minute_mission: 0,
+          backend_event: 0,
+        },
+        clicksSavedEstimate: 3,
       },
       safetyStatement: 'Human review required.',
+      backendEndpoints: [],
     },
-    pendingTasks: [aiTask],
-    review: reviewMock,
+    items: [workflowItem],
+    pendingItems: [workflowItem],
+    pendingCount: 1,
+    reviewItem: reviewItemMock,
+    acknowledgeItem: vi.fn(),
   }),
 }));
 
+vi.mock('../../store/emergencyStore', () => ({
+  useEmergencyStore: (selector: (state: { administrativeAutomationQueue: AdministrativeAutomationTask[] }) => unknown) =>
+    selector({ administrativeAutomationQueue: [aiTask] }),
+}));
+
+vi.mock('../../contexts/UserContext', () => ({
+  useUser: () => ({ user: { id: 'user-1', name: 'Test Clinician' } }),
+}));
+
+function renderPanel() {
+  return render(
+    <MemoryRouter>
+      <AdministrativeAutomationReviewPanel />
+    </MemoryRouter>,
+  );
+}
+
 describe('AdministrativeAutomationReviewPanel', () => {
   it('renders AI decision fields from proposedPayload.aiDecision', () => {
-    render(<AdministrativeAutomationReviewPanel />);
+    renderPanel();
 
     expect(screen.getByRole('region', { name: 'AI decision support' })).toBeInTheDocument();
     expect(screen.getByText('Recommended triage')).toBeInTheDocument();
@@ -88,10 +141,10 @@ describe('AdministrativeAutomationReviewPanel', () => {
   });
 
   it('renders automation queue charts', () => {
-    render(<AdministrativeAutomationReviewPanel />);
+    renderPanel();
 
     expect(screen.getByText('Queue status')).toBeInTheDocument();
-    expect(screen.getByText('By category')).toBeInTheDocument();
+    expect(screen.getByText('By domain')).toBeInTheDocument();
     expect(screen.getByTestId('distribution-donut-chart')).toBeInTheDocument();
     expect(screen.getByTestId('category-bar-chart')).toBeInTheDocument();
   });

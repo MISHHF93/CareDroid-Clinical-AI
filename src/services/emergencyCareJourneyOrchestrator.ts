@@ -354,6 +354,10 @@ export function onRapidIntakeCompleted(
     }
   }
 
+  void import('../engine/unifiedWorkflowAutomationEngine').then(({ scheduleWorkflowAutomationRefresh }) =>
+    scheduleWorkflowAutomationRefresh('journey_state_changed'),
+  );
+
   return updated;
 }
 

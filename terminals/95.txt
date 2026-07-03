@@ -1,7 +1,0 @@
----
-pid: 29352
-cwd: "C:\Users\borah\CareDroid-Clinical-AI"
-command: "Start-Sleep -Seconds 300"
-started_at: 2026-06-30T22:25:20.818Z
-running_for_ms: 694990   
----

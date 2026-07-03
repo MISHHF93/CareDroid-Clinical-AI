@@ -19,6 +19,8 @@ import type { HospitalCommandMetricId } from '../config/hospitalCommandCenterRol
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import type { ContinuousPatientFlowSnapshot } from '../engine/continuousPatientFlowEngine';
 import type { AdministrativeAutomationTask } from '../types/administrativeAutomation';
+import type { DashboardKnowledgeGraphSummary } from './unifiedApplicationKnowledgeGraphPresentation';
+import type { UnifiedOperationalIntelligenceSnapshot } from '../config/unifiedOperationalIntelligenceModel';
 
 export type HospitalCommandTone = 'stable' | 'watch' | 'warning' | 'critical';
 
@@ -69,6 +71,7 @@ export type HospitalCommandCenterSnapshot = Readonly<{
     compliant: boolean;
   }>;
   throughput: CommandCenterThroughputSnapshot;
+  knowledgeGraph?: DashboardKnowledgeGraphSummary;
 }>;
 
 const DOCTOR_ROLES = new Set(['MD', 'Attending', 'Resident', 'PA', 'Consultant']);
@@ -101,6 +104,42 @@ function metricTone(value: number, warnAt: number, criticalAt: number): Hospital
   if (value >= warnAt) return 'warning';
   if (value > 0) return 'watch';
   return 'stable';
+}
+
+function mapUnifiedOperationalBottlenecks(
+  snapshot: UnifiedOperationalIntelligenceSnapshot,
+): readonly HospitalCommandBottleneck[] {
+  return Object.freeze(
+    snapshot.insights
+      .filter((insight) => insight.type === 'bottleneck' || insight.type === 'congestion_prediction')
+      .slice(0, 6)
+      .map((insight) =>
+        Object.freeze({
+          id: insight.id,
+          title: insight.title,
+          severity: insight.severity,
+          ownerRole: insight.ownerRole,
+        }),
+      ),
+  );
+}
+
+function mapUnifiedOperationalRecommendations(
+  snapshot: UnifiedOperationalIntelligenceSnapshot,
+): readonly HospitalCommandAiRecommendation[] {
+  return Object.freeze(
+    snapshot.insights
+      .filter((insight) => insight.type === 'intervention' || insight.type === 'recommendation')
+      .slice(0, 8)
+      .map((insight) =>
+        Object.freeze({
+          id: insight.id,
+          action: insight.title,
+          rationale: insight.summary,
+          route: insight.route,
+        }),
+      ),
+  );
 }
 
 function throughputMetric(
@@ -136,6 +175,8 @@ export function buildHospitalCommandCenterSnapshot(input: {
   hourlyArrivals?: Array<{ hour: string; count: number }>;
   patientFlowSnapshot?: ContinuousPatientFlowSnapshot | null;
   administrativeAutomationQueue?: AdministrativeAutomationTask[];
+  knowledgeGraphSummary?: DashboardKnowledgeGraphSummary;
+  unifiedOperationalSnapshot?: UnifiedOperationalIntelligenceSnapshot | null;
   now?: Date;
 } = {}): HospitalCommandCenterSnapshot {
   const now = input.now || new Date();
@@ -213,8 +254,21 @@ export function buildHospitalCommandCenterSnapshot(input: {
     (alert) => alert.severity === 'Critical' && !alert.dismissed && !alert.acknowledged,
   );
 
-  const bottleneckFindings =
-    journey.liveServiceSummaries.bottlenecks?.activeBottlenecks?.slice(0, 6) || [];
+  const unifiedOperational = input.unifiedOperationalSnapshot;
+  const useBackendOperationalIntelligence = Boolean(
+    unifiedOperational && unifiedOperational.source !== 'degraded',
+  );
+
+  const bottleneckFindings = useBackendOperationalIntelligence
+    ? mapUnifiedOperationalBottlenecks(unifiedOperational!)
+    : journey.liveServiceSummaries.bottlenecks?.activeBottlenecks?.slice(0, 6).map((finding) =>
+        Object.freeze({
+          id: finding.id,
+          title: finding.title,
+          severity: finding.severity,
+          ownerRole: finding.ownerRole,
+        }),
+      ) || [];
 
   const flowRecommendations =
     input.patientFlowSnapshot?.aiRecommendations?.slice(0, 5).map((rec) =>
@@ -227,10 +281,19 @@ export function buildHospitalCommandCenterSnapshot(input: {
           : CANONICAL_ROUTES.emergencyQueues,
       }),
     ) || [];
-  const oiRecommendations = [
-    ...flowRecommendations,
-    ...(input.intelligenceSnapshot?.recommendations?.slice(0, 5) || []),
-  ].slice(0, 8);
+  const oiRecommendations = useBackendOperationalIntelligence
+    ? mapUnifiedOperationalRecommendations(unifiedOperational!)
+    : [
+        ...flowRecommendations,
+        ...(input.intelligenceSnapshot?.recommendations?.slice(0, 5).map((rec) =>
+          Object.freeze({
+            id: rec.id,
+            action: rec.action,
+            rationale: rec.rationale,
+            route: rec.route,
+          }),
+        ) || []),
+      ].slice(0, 8);
 
   const workflowActions = buildCommandCenterWorkflowActions({
     dispatch: journey.liveServiceSummaries.dispatch,
@@ -338,11 +401,19 @@ export function buildHospitalCommandCenterSnapshot(input: {
     {
       id: 'service-bottlenecks',
       label: 'Service bottlenecks',
-      value: bottleneckFindings.length,
+      value: useBackendOperationalIntelligence
+        ? unifiedOperational!.metrics.activeBottlenecks
+        : bottleneckFindings.length,
       detail:
         bottleneckFindings[0]?.title ||
         'No active bottleneck signals',
-      tone: metricTone(bottleneckFindings.length, 1, 3),
+      tone: metricTone(
+        useBackendOperationalIntelligence
+          ? unifiedOperational!.metrics.activeBottlenecks
+          : bottleneckFindings.length,
+        1,
+        3,
+      ),
       route: CANONICAL_ROUTES.emergencyReports,
     },
     {
@@ -394,6 +465,11 @@ export function buildHospitalCommandCenterSnapshot(input: {
   if (pendingAutomations > 0) {
     statusParts.push(`${pendingAutomations} automation${pendingAutomations === 1 ? '' : 's'} to review`);
   }
+  if (input.knowledgeGraphSummary?.criticalNodes.length) {
+    statusParts.push(
+      `${input.knowledgeGraphSummary.criticalNodes.length} connected critical signal${input.knowledgeGraphSummary.criticalNodes.length === 1 ? '' : 's'}`,
+    );
+  }
 
   const statusLine =
     statusParts.length > 0
@@ -414,16 +490,7 @@ export function buildHospitalCommandCenterSnapshot(input: {
     nextAction: topAction?.active ? topAction.nextAction : 'Monitor live metrics and assign next owner',
     tone: overallTone,
     metrics: Object.freeze(metrics),
-    bottlenecks: Object.freeze(
-      bottleneckFindings.map((finding) =>
-        Object.freeze({
-          id: finding.id,
-          title: finding.title,
-          severity: finding.severity,
-          ownerRole: finding.ownerRole,
-        }),
-      ),
-    ),
+    bottlenecks: Object.freeze(bottleneckFindings),
     aiRecommendations: Object.freeze(
       oiRecommendations.map((rec) =>
         Object.freeze({
@@ -451,6 +518,7 @@ export function buildHospitalCommandCenterSnapshot(input: {
       compliant: journey.metrics.threeMinuteBreaches === 0,
     }),
     throughput,
+    knowledgeGraph: input.knowledgeGraphSummary,
   });
 }
 

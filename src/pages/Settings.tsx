@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Card from '../components/ui/card';
+import { CareDroidPage } from '../components/ui/CareDroidPrimitives';
 import Button from '../components/ui/button';
 import { Drawer } from '../components/ui/Drawer';
 import FeatureGate from '../components/FeatureGate';
@@ -104,7 +105,7 @@ const Settings = () => {
         setBillingLoading(false);
         setBillingStatus({
           type: 'idle',
-          message: 'Billing API unavailable in demo mode — subscription data stays local during the build phase.',
+          message: 'Billing API unavailable in demo mode ï¿½ subscription data stays local during the build phase.',
         });
         return;
       }
@@ -329,14 +330,17 @@ const Settings = () => {
     (subscription?.status ? `Backend status: ${subscription.status}` : 'No current subscription returned by the backend.');
 
   return (
-    <div className="settings-page">
+    <CareDroidPage
+      className="platform-settings-page settings-page"
+      eyebrow="Platform administration"
+      title="Settings"
+      description={
+        surfaces.settings.showNestedSubtitles
+          ? 'Configure CareDroid preferences, notifications, billing, and compliance controls.'
+          : undefined
+      }
+    >
       <Card>
-        <h2 className="settings-card__title">Settings</h2>
-        {surfaces.settings.showNestedSubtitles ? (
-          <p className="settings-card__subtitle">
-            Configure CareDroid preferences and notifications.
-          </p>
-        ) : null}
 
         {surfaces.settings.showPlatformStrip && canViewPlatformAdmin ? (
           <div className="settings-platform-strip">
@@ -521,8 +525,8 @@ const Settings = () => {
                     <div key={provider.id}>
                       <strong>{provider.name}</strong>
                       <span>
-                        {provider.status} · {provider.protocol}
-                        {provider.entryPath ? ` · ${provider.entryPath}` : ''}
+                        {provider.status} ï¿½ {provider.protocol}
+                        {provider.entryPath ? ` ï¿½ ${provider.entryPath}` : ''}
                       </span>
                       <span>{provider.notes}</span>
                     </div>
@@ -575,7 +579,7 @@ const Settings = () => {
                     <div key={domain.id}>
                       <strong>{domain.name}</strong>
                       <span>
-                        {domain.status} · {domain.tenantBoundary}
+                        {domain.status} ï¿½ {domain.tenantBoundary}
                       </span>
                       <span>{domain.residualRisk}</span>
                     </div>
@@ -809,7 +813,7 @@ const Settings = () => {
           )}
         </div>
       </Drawer>
-    </div>
+    </CareDroidPage>
   );
 };
 

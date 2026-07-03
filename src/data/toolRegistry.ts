@@ -1,4 +1,5 @@
 import { MEDICAL_THEME } from '../config/medicalTheme.constants';
+import { CANONICAL_ROUTES } from '../config/routes.config';
 /**
  * Clinical tools registry (sidebar, workspaces, deep links).
  *
@@ -3485,7 +3486,7 @@ const toolRegistry = [
   {
     id: 'ai-memory',
     name: 'AI Memory',
-    path: '/ai-memory',
+    path: CANONICAL_ROUTES.memory,
     color: '#DB2777',
     description: 'Short, long, and clinical memory context used to personalize assistant workflows',
     shortcut: 'Ctrl+Alt+M',
@@ -3521,7 +3522,7 @@ const toolRegistry = [
   {
     id: 'ai-training',
     name: 'AI Training Pipeline',
-    path: '/training',
+    path: CANONICAL_ROUTES.trainingDashboard,
     color: '#9333EA',
     description:
       'Training, MoE planning, and model improvement dashboard for governed AI iteration',
@@ -3537,7 +3538,7 @@ const toolRegistry = [
   {
     id: 'ai-cost-optimization',
     name: 'AI Cost Optimization',
-    path: '/costs',
+    path: CANONICAL_ROUTES.costs,
     color: '#16A34A',
     description:
       'Cost optimizer dashboard for model routing, cache usage, and token spend snapshots',

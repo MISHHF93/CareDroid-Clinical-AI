@@ -71,7 +71,7 @@ export const ED_PLATFORM_ENHANCEMENTS: readonly EdPlatformEnhancement[] = [
     maturity: 'partial',
     humanReviewRequired: false,
     primarySurfaces: ['/emergency/boarding', '/emergency/capacity'],
-    implementationHooks: ['backend/src/services/boarding.service.ts', 'src/layout/AppShell.tsx'],
+    implementationHooks: ['backend/src/services/boarding.service.ts', 'src/components/AppShell.tsx'],
     gapSummary: 'Backend boarding APIs are live; frontend intelligence layer still uses demo fixtures in places.',
   },
   {

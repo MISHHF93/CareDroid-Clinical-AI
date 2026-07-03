@@ -231,7 +231,7 @@ export const CARE_DROID_PAGE_ARCHITECTURE = Object.freeze([
   {
     id: 'settings',
     label: 'Settings',
-    path: CANONICAL_ROUTES.settings,
+    path: CANONICAL_ROUTES.emergencySettings,
     targetPath: CANONICAL_ROUTES.emergencySettings,
     icon: 'settings',
     roles: [CARE_DROID_PAGE_ROLES.admin, CARE_DROID_PAGE_ROLES.manager],

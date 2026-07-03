@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useRolePermissions } from './useRolePermissions';
+import useSecurityAccess from './useSecurityAccess';
 import {
   type AlertScenario,
   type AiRecommendationRoute,
@@ -17,28 +17,29 @@ export type UseAiChiefRoutingResult = {
 };
 
 export function useAiChiefRouting(): UseAiChiefRoutingResult {
-  const { compiledProfile } = useRolePermissions();
+  const { compiledProfile } = useSecurityAccess();
+  const profile = compiledProfile!;
 
   const visibleScenarios = useMemo(
-    () => getVisibleScenariosForRole(compiledProfile.role.hospitalRole),
-    [compiledProfile.role.hospitalRole],
+    () => getVisibleScenariosForRole(profile.role.hospitalRole),
+    [profile.role.hospitalRole],
   );
 
   const canSeeScenario = useMemo(
-    () => (scenario: AlertScenario) => isAlertVisibleToCompiledProfile(scenario, compiledProfile),
-    [compiledProfile],
+    () => (scenario: AlertScenario) => isAlertVisibleToCompiledProfile(scenario, profile),
+    [profile],
   );
 
   const getRoutingFor = useMemo(
-    () => (scenario: AlertScenario) => getCanonicalAiRecommendationRoute(scenario, compiledProfile),
-    [compiledProfile],
+    () => (scenario: AlertScenario) => getCanonicalAiRecommendationRoute(scenario, profile),
+    [profile],
   );
 
   const filterByProfile = useMemo(
     () =>
       <T extends { scenario: AlertScenario }>(recommendations: T[]): T[] =>
-        filterAiRecommendationsByProfile(recommendations, compiledProfile),
-    [compiledProfile],
+        filterAiRecommendationsByProfile(recommendations, profile),
+    [profile],
   );
 
   return { visibleScenarios, canSeeScenario, getRoutingFor, filterByProfile };

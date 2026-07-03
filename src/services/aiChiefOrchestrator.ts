@@ -5,6 +5,10 @@
  * handoffs, operational awareness) through CareDroidAI with enrichment and alert routing.
  * Routes conversational copilot/chat requests through the unified AI client.
  * Every request is audited; every structured response requires clinician review.
+ *
+ * Continuous operational monitoring (patient flow, capacity, staffing, bottlenecks,
+ * alerts, service health, EMS, prioritization) lives in aiChiefContinuousMonitoringService
+ * and is consumed through useAiChiefOrchestrator.
  */
 
 import {
@@ -322,20 +326,42 @@ export async function requestAiChiefStructured(
   request: AIChiefStructuredRequest,
   options: { signal?: AbortSignal; timeoutMs?: number } = {},
 ): Promise<CareDroidAIResponse> {
-  const prepared = enrichStructuredRequest(request);
-  const scenario = request.alertScenario || inferAlertScenario(prepared.input, prepared.intent);
-  const route = scenario ? getCanonicalAiRecommendationRoute(scenario, request.profile) : undefined;
+  const { withWorkflowTrace } = await import('./observabilityTrace');
+  return withWorkflowTrace(
+    'ai-chief-request',
+    {
+      source: 'aiChiefOrchestrator',
+      patientId: readPatientId(request.input as Record<string, unknown>),
+      summary: `AI Chief structured request (${request.intent || 'general'})`,
+      metadata: { intent: request.intent, requestType: request.requestType },
+    },
+    async () => {
+      const prepared = enrichStructuredRequest(request);
+      const scenario = request.alertScenario || inferAlertScenario(prepared.input, prepared.intent);
+      const route = scenario ? getCanonicalAiRecommendationRoute(scenario, request.profile) : undefined;
 
-  const response = await transportCareDroidAINode(prepared, options);
-  const routed = applyAlertRoutingToResponse(response, scenario, request.profile);
-  auditStructuredInteraction(prepared, routed, route);
-  return routed;
+      const response = await transportCareDroidAINode(prepared, options);
+      const routed = applyAlertRoutingToResponse(response, scenario, request.profile);
+      auditStructuredInteraction(prepared, routed, route);
+      return routed;
+    },
+  );
 }
 
 export async function requestAiChiefConversational(
   request: AIChiefConversationalRequest,
   runtime?: Parameters<typeof callAI>[1],
 ): Promise<AIResponse> {
+  const { withWorkflowTrace } = await import('./observabilityTrace');
+  return withWorkflowTrace(
+    'ai-chief-request',
+    {
+      source: 'aiChiefOrchestrator',
+      patientId: request.patientId,
+      summary: `AI Chief conversational request (${request.requestType})`,
+      metadata: { requestType: request.requestType },
+    },
+    async () => {
   const domain = request.domain || conversationalDomain(request.requestType);
   const enriched: AIRequest = {
     ...request,
@@ -376,6 +402,8 @@ export async function requestAiChiefConversational(
     );
     throw error;
   }
+    },
+  );
 }
 
 function conversationalDomain(requestType: AIRequestType): AIChiefDomain {

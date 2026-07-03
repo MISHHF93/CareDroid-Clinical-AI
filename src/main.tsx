@@ -7,20 +7,53 @@ import ReactDOM from 'react-dom/client';
 import App from './app/App';
 
 import logger from './utils/logger';
+import observabilityService from './services/observabilityService';
 
 import { scheduleDeferredStartupTasks } from './utils/deferStartupTasks';
 
 import { runAfterFirstPaint } from './utils/deferStartup';
+import { ensureBackendReachabilityProbed } from './services/backendReachability';
+
+observabilityService.initialize();
 
 window.addEventListener('error', (event) => {
-  logger.error('Global error', { error: event.error, stack: event.error?.stack });
+  logger.error('Global error', event.error, { stack: event.error?.stack });
+  if (event.error instanceof Error) {
+    void import('./services/crashReportingService').then(({ default: crashReportingService }) => {
+      crashReportingService.captureException(event.error, { surface: 'window.error' });
+    });
+  } else {
+    observabilityService.recordError({
+      name: 'GlobalError',
+      message: String(event.message || 'Unknown global error'),
+      source: 'window.error',
+    });
+  }
 });
 
 window.addEventListener('unhandledrejection', (event) => {
-  logger.error('Unhandled promise rejection', { reason: event.reason });
+  const reason = event.reason;
+  logger.error('Unhandled promise rejection', reason instanceof Error ? reason : undefined, {
+    reason: reason instanceof Error ? undefined : reason,
+  });
+  if (reason instanceof Error) {
+    void import('./services/crashReportingService').then(({ default: crashReportingService }) => {
+      crashReportingService.captureException(reason, { surface: 'unhandledrejection' });
+    });
+  } else {
+    observabilityService.recordError({
+      name: 'UnhandledRejection',
+      message: String(reason),
+      source: 'unhandledrejection',
+    });
+  }
 });
 
 scheduleDeferredStartupTasks();
+
+if (import.meta.env.DEV) {
+  void ensureBackendReachabilityProbed();
+}
 
 const clearDevelopmentServiceWorkers = () => {
   if (!('serviceWorker' in navigator)) return;

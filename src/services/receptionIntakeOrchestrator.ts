@@ -656,6 +656,10 @@ export async function createPatientAndRouteFromReception(
     }),
   );
 
+  void import('../engine/unifiedWorkflowAutomationEngine').then(({ scheduleWorkflowAutomationRefresh }) =>
+    scheduleWorkflowAutomationRefresh('patient_created'),
+  );
+
   return {
     patient: {
       ...enrichedPatient,
@@ -669,7 +673,7 @@ export async function createPatientAndRouteFromReception(
     criticalAlertId,
     responseTimerId,
     queueName: handoff.queue || 'Triage',
-    nextRoute: handoff.receptionPath,
+    nextRoute: handoff.nextRoute,
     profileRoute: `${CANONICAL_ROUTES.emergencyPatients}?patientId=${encodeURIComponent(enrichedPatient.id)}`,
     missingCriticalFields: aiAssist.missingCriticalFields,
     redFlags: aiAssist.redFlags,

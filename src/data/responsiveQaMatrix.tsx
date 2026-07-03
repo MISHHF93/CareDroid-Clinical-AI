@@ -17,6 +17,7 @@ import {
 } from './clinicalToolIdContract';
 import { toolRegistryById } from './toolRegistry';
 import { MOBILE_FIRST_BREAKPOINTS } from '../config/layout.config';
+import { CANONICAL_ROUTES } from '../config/routes.config';
 
 /** @typedef {{ id: string, width: number, height: number, label: string, tier?: string }} ResponsiveQaViewport */
 /** @typedef {{ id: string, label: string, path: string, category: string, registryId?: string }} ResponsiveQaPage */
@@ -372,7 +373,7 @@ export function buildResponsiveQaPages() {
     {
       id: 'memory',
       label: 'AI Memory Dashboard',
-      path: '/ai-memory',
+      path: CANONICAL_ROUTES.memory,
       category: 'ai-system',
       registryId: REGISTRY.aiMemory,
     },

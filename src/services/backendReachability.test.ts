@@ -29,4 +29,16 @@ describe('backendReachability', () => {
     markBackendUnreachable();
     expect(isBackendKnownOffline()).toBe(true);
   });
+
+  it('probes /health instead of assuming offline in local demo mode', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+      }),
+    );
+    const reachable = await probeBackendReachability({ force: true });
+    expect(reachable).toBe(true);
+    expect(fetch).toHaveBeenCalledWith('/health', expect.any(Object));
+  });
 });

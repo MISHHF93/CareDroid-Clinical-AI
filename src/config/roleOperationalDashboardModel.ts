@@ -162,6 +162,32 @@ const ROLE_FOCUS: Readonly<Record<string, Omit<RoleOperationalFocus, 'roleId' | 
       suppressSurfaces: ['workflow-actions', 'copilot-input'],
       showRoleSummaryCards: ['charge', 'physician', 'nurse'],
     }),
+    [EMERGENCY_ROLE_IDS.dispatcher]: Object.freeze({
+      roleLabel: 'Dispatcher',
+      hierarchyLevels: [
+        INFORMATION_HIERARCHY_LEVELS.L1,
+        INFORMATION_HIERARCHY_LEVELS.L2,
+        INFORMATION_HIERARCHY_LEVELS.L3,
+      ],
+      primaryQuestion: 'Which Echo/Delta calls need unit assignment and ED pre-alert?',
+      primarySurfaces: ['dispatch-queue', 'inbound-critical', 'unit-assignment', 'hospital-pre-alert'],
+      secondarySurfaces: ['ems-status'],
+      suppressSurfaces: ['patient-grid', 'referral-workflow', 'analytics-charts'],
+      showRoleSummaryCards: ['ems'],
+    }),
+    [EMERGENCY_ROLE_IDS.emsCoordinator]: Object.freeze({
+      roleLabel: 'EMS Coordinator',
+      hierarchyLevels: [
+        INFORMATION_HIERARCHY_LEVELS.L1,
+        INFORMATION_HIERARCHY_LEVELS.L2,
+        INFORMATION_HIERARCHY_LEVELS.L3,
+      ],
+      primaryQuestion: 'Which inbound units need offload coordination and ED readiness?',
+      primarySurfaces: ['ems-queue', 'ed-readiness', 'offload-tracker', 'pre-arrival-packets'],
+      secondarySurfaces: ['capacity', 'analytics'],
+      suppressSurfaces: ['referral-workflow', 'patient-mission-control'],
+      showRoleSummaryCards: ['ems', 'charge'],
+    }),
   });
 
 const HOSPITAL_TO_EMERGENCY: Partial<Record<HospitalRole, string>> = Object.freeze({
@@ -177,8 +203,13 @@ const HOSPITAL_TO_EMERGENCY: Partial<Record<HospitalRole, string>> = Object.free
   ed_director: EMERGENCY_ROLE_IDS.edManager,
   it_admin: EMERGENCY_ROLE_IDS.admin,
   paramedic: EMERGENCY_ROLE_IDS.emsUser,
-  ems_coordinator: EMERGENCY_ROLE_IDS.emsUser,
+  ems_coordinator: EMERGENCY_ROLE_IDS.emsCoordinator,
+  dispatcher: EMERGENCY_ROLE_IDS.dispatcher,
   demo_observer: EMERGENCY_ROLE_IDS.readOnlyViewer,
+  pharmacist: EMERGENCY_ROLE_IDS.readOnlyViewer,
+  lab_technician: EMERGENCY_ROLE_IDS.readOnlyViewer,
+  radiology_technician: EMERGENCY_ROLE_IDS.readOnlyViewer,
+  specialist: EMERGENCY_ROLE_IDS.physician,
 });
 
 export function resolveRoleOperationalFocus(

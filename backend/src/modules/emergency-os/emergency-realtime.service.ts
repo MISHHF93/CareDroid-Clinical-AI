@@ -115,6 +115,12 @@ export class EmergencyRealtimeService implements OnModuleInit, OnModuleDestroy {
       if (centralNode) {
         this.publish({ type: 'central_node_snapshot', payload: centralNode.getSnapshot() });
       }
+      const { OperationalIntelligenceService } =
+        require('./emergency-os.operational-intelligence.service') as typeof import('./emergency-os.operational-intelligence.service');
+      const operationalIntelligence = this.moduleRef.get(OperationalIntelligenceService, {
+        strict: false,
+      });
+      operationalIntelligence?.publishRealtimeSignals('central_node_snapshot');
     } catch {
       // Ignore when services are unavailable in test harnesses.
     }

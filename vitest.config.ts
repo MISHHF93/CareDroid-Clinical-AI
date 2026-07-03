@@ -12,7 +12,10 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    pool: 'forks',
+    // threads shares one process — forks OOM/hang on heavy route integration tests (Windows).
+    pool: 'threads',
+    testTimeout: 30_000,
+    hookTimeout: 30_000,
     onConsoleLog(log) {
       if (jsdomNavigationPattern.test(log)) {
         return false;

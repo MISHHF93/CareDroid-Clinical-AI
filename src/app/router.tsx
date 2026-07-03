@@ -1,8 +1,7 @@
 import { Suspense } from 'react';
-import { MEDICAL_THEME, MEDICAL_TYPE } from '../config/medicalTheme.constants';
+import { MEDICAL_THEME } from '../config/medicalTheme.constants';
 import { lazyWithRetry } from '../utils/lazyWithRetry';
 import {
-  Link,
   Navigate,
   Outlet,
   Route,
@@ -81,6 +80,7 @@ import {
   AUTH_SIGNUP_PATH_ALIASES,
   CANONICAL_ROUTES,
   ED_CANONICAL_ROUTE_ALIASES,
+  IN_SHELL_ROUTE_REDIRECTS,
   LEGACY_EMERGENCY_ROUTE_REDIRECTS,
   NON_ED_WORKSPACE_REDIRECT_ROUTES,
   OUTSIDE_SHELL_ROUTE_REDIRECTS,
@@ -107,6 +107,7 @@ import { renderTrainingConsoleRoutes } from './trainingConsoleRouteTree';
 import { renderOperationsFleetConsoleRoutes } from './operationsFleetConsoleRouteTree';
 import { renderProfileConsoleRoutes } from './profileConsoleRouteTree';
 import { renderAdminConsoleRoutes } from './adminConsoleRouteTree';
+import { renderPublicConsoleRoutes } from './publicConsoleRouteTree';
 import { shouldSuppressPlatformSystemStub } from '../config/platformStubPolicy';
 
 import {
@@ -147,77 +148,6 @@ function AppStartupRedirect() {
     saasRole: saasProfile?.role || saasProfile?.saasRole,
   });
   return <Navigate to={destination} replace />;
-}
-
-// ── Role-aware route guard ───────────────────────────────────────────────────
-
-function EmergencyAccessDenied({ requestedPath }) {
-  const emergencyRole = useEmergencyRolePermissions();
-  const fallbackPath = emergencyRole.nearestRoute(requestedPath);
-
-  return (
-    <section
-      style={{
-        minHeight: '100%',
-        display: 'grid',
-        placeItems: 'center',
-        padding: 24,
-        background: MEDICAL_THEME.surfacePage,
-      }}
-    >
-      <div
-        role="alert"
-        style={{
-          maxWidth: 560,
-          border: '1px solid #7F1D1D',
-          borderRadius: 16,
-          background: MEDICAL_THEME.surfaceCard,
-          color: MEDICAL_THEME.ink,
-          padding: 24,
-          boxShadow: 'none',
-        }}
-      >
-        <span
-          style={{
-            color: MEDICAL_TYPE.statusCritical,
-            fontSize: 12,
-            fontWeight: 800,
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-          }}
-        >
-          Access denied
-        </span>
-        <h1 style={{ margin: '6px 0 0', fontSize: 22 }}>CareDroid page unavailable</h1>
-        <p style={{ color: MEDICAL_THEME.inkSubtle, lineHeight: 1.5 }}>
-          {emergencyRole.roleLabel} does not have access to this CareDroid page.
-        </p>
-        <Link
-          to={fallbackPath}
-          style={{
-            display: 'inline-flex',
-            marginTop: 10,
-            borderRadius: 10,
-            background: MEDICAL_THEME.accent,
-            color: MEDICAL_THEME.onAccent,
-            padding: '10px 13px',
-            textDecoration: 'none',
-            fontWeight: 700,
-          }}
-        >
-          Go to permitted CareDroid page
-        </Link>
-      </div>
-    </section>
-  );
-}
-
-function EmergencyRouteGuard({ path, children }) {
-  const emergencyRole = useEmergencyRolePermissions();
-  if (!emergencyRole.canAccessRoute(path)) {
-    return <EmergencyAccessDenied requestedPath={path} />;
-  }
-  return children;
 }
 
 function EmergencyDefaultRedirect() {
@@ -286,6 +216,16 @@ function canonicalToolQuery(slug) {
 
 export function buildEmergencyToolsRedirect(location) {
   const pathname = normalizeRedirectPath(location.pathname);
+  if (
+    pathname === CANONICAL_ROUTES.automation ||
+    pathname === CANONICAL_ROUTES.automationAnalytics
+  ) {
+    return {
+      pathname: CANONICAL_ROUTES.workflows,
+      search: location.search || '',
+      hash: location.hash || '',
+    };
+  }
   const params = new URLSearchParams(location.search);
   const setDefault = (key, value) => {
     if (!params.has(key)) params.set(key, value);
@@ -317,7 +257,7 @@ export function buildEmergencyToolsRedirect(location) {
     setDefault('filter', 'clinical-tools');
     setDefault('q', 'guideline-rag');
     setDefault('open', 'guideline-rag');
-  } else if (pathname === CANONICAL_ROUTES.workflows || pathname === CANONICAL_ROUTES.automation || pathname === CANONICAL_ROUTES.workflowMining) {
+  } else if (pathname === CANONICAL_ROUTES.workflowMining) {
     setDefault('source', 'workflows');
     setDefault('filter', 'ai-workflows');
   } else if (
@@ -561,6 +501,8 @@ export function AppRoutes() {
         <Route key={`legacy-auth-${path}`} path={path} element={<AuthPathsRedirect />} />
       ))}
 
+      {renderPublicConsoleRoutes(LazyRoute, { outsideShellOnly: true })}
+
       {/* Shared tool deep-link (no shell) */}
       <Route
         path="/shared/tools/:shareId"
@@ -629,53 +571,53 @@ export function AppRoutes() {
         <Route
           path={CANONICAL_ROUTES.emergencyWhiteboard}
           element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyWhiteboard}>
+            <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyWhiteboard}>
               <ErrorBoundary fallbackText="EmergencyWhiteboard encountered an error. Refresh to reload.">
                 <LazyRoute label="Loading whiteboard...">
                   <EmergencyWhiteboard />
                 </LazyRoute>
               </ErrorBoundary>
-            </EmergencyRouteGuard>
+            </CareDroidRouteGuard>
           }
         />
         <Route
           path={CANONICAL_ROUTES.emergencyPatients}
           element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyPatients}>
+            <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyPatients}>
               <EmergencySurfaceRedirect surfaceId="patients">
                 <PatientsRoute />
               </EmergencySurfaceRedirect>
-            </EmergencyRouteGuard>
+            </CareDroidRouteGuard>
           }
         />
         <Route
           path={CANONICAL_ROUTES.emergencyEms}
           element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyEms}>
+            <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyEms}>
               <LazyRoute label="Loading EMS pipeline...">
                 <EMSPipeline />
               </LazyRoute>
-            </EmergencyRouteGuard>
+            </CareDroidRouteGuard>
           }
         />
         <Route
           path={CANONICAL_ROUTES.emergencyDispatch}
           element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyDispatch}>
+            <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyDispatch}>
               <LazyRoute label="Loading dispatch console...">
                 <DispatchConsole />
               </LazyRoute>
-            </EmergencyRouteGuard>
+            </CareDroidRouteGuard>
           }
         />
         <Route
           path={CANONICAL_ROUTES.emergencyCommandCenter}
           element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyCommandCenter}>
+            <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyCommandCenter}>
               <LazyRoute label="Loading Hospital Command Center...">
                 <HospitalCommandCenter />
               </LazyRoute>
-            </EmergencyRouteGuard>
+            </CareDroidRouteGuard>
           }
         />
         {COMMAND_CENTER_INTELLIGENCE_REDIRECTS.map(({ path, view }) => (
@@ -688,51 +630,51 @@ export function AppRoutes() {
         <Route
           path={CANONICAL_ROUTES.emergencyEdReadiness}
           element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyEms}>
+            <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyEms}>
               <LazyRoute label="Loading ED readiness...">
                 <FullJourneyOperatingPage view="ed-readiness" />
               </LazyRoute>
-            </EmergencyRouteGuard>
+            </CareDroidRouteGuard>
           }
         />
         <Route
           path={CANONICAL_ROUTES.emergencyDiagnostics}
           element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyTools}>
+            <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyTools}>
               <LazyRoute label="Loading diagnostics...">
                 <FullJourneyOperatingPage view="diagnostics" />
               </LazyRoute>
-            </EmergencyRouteGuard>
+            </CareDroidRouteGuard>
           }
         />
         <Route
           path={CANONICAL_ROUTES.emergencyHandoffs}
           element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyShift}>
+            <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyShift}>
               <LazyRoute label="Loading handoffs...">
                 <FullJourneyOperatingPage view="handoffs" />
               </LazyRoute>
-            </EmergencyRouteGuard>
+            </CareDroidRouteGuard>
           }
         />
         <Route
           path={CANONICAL_ROUTES.emergencyReports}
           element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyAnalytics}>
+            <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyAnalytics}>
               <LazyRoute label="Loading reports...">
                 <FullJourneyOperatingPage view="reports" />
               </LazyRoute>
-            </EmergencyRouteGuard>
+            </CareDroidRouteGuard>
           }
         />
         <Route
           path={CANONICAL_ROUTES.emergencyReception}
           element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyReception}>
+            <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyReception}>
               <LazyRoute label="Loading reception...">
                 <ReceptionWorkspace />
               </LazyRoute>
-            </EmergencyRouteGuard>
+            </CareDroidRouteGuard>
           }
         />
         <Route
@@ -754,153 +696,154 @@ export function AppRoutes() {
         <Route
           path={CANONICAL_ROUTES.emergencyIntake}
           element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyIntake}>
+            <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyIntake}>
               <EmergencyIntakeEntry />
-            </EmergencyRouteGuard>
+            </CareDroidRouteGuard>
           }
         />
         <Route
           path={CANONICAL_ROUTES.emergencyQueues}
           element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyQueues}>
+            <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyQueues}>
               <EmergencySurfaceRedirect surfaceId="queues">
                 <QueueRoute />
               </EmergencySurfaceRedirect>
-            </EmergencyRouteGuard>
+            </CareDroidRouteGuard>
           }
         />
         <Route
           path={CANONICAL_ROUTES.emergencyReassessment}
           element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyReassessment}>
+            <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyReassessment}>
               <ReassessmentRoute />
-            </EmergencyRouteGuard>
+            </CareDroidRouteGuard>
           }
         />
         <Route
           path={CANONICAL_ROUTES.emergencyCapacity}
           element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyCapacity}>
+            <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyCapacity}>
               <CapacityRoute />
-            </EmergencyRouteGuard>
+            </CareDroidRouteGuard>
           }
         />
         <Route
           path={CANONICAL_ROUTES.emergencyBoarding}
           element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyBoarding}>
+            <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyBoarding}>
               <BoardingRoute />
-            </EmergencyRouteGuard>
+            </CareDroidRouteGuard>
           }
         />
         <Route
           path={CANONICAL_ROUTES.emergencyReferrals}
           element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyReferrals}>
+            <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyReferrals}>
               <LazyRoute label="Loading referrals...">
                 <ReferralPanel />
               </LazyRoute>
-            </EmergencyRouteGuard>
+            </CareDroidRouteGuard>
           }
         />
         <Route
           path={CANONICAL_ROUTES.emergencyCopilot}
           element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyCopilot}>
+            <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyCopilot}>
               <CopilotRoute />
-            </EmergencyRouteGuard>
+            </CareDroidRouteGuard>
           }
         />
         <Route
           path={CANONICAL_ROUTES.emergencyDocumentation}
           element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyDocumentation}>
+            <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyDocumentation}>
               <LazyRoute label="Loading documentation assistant...">
                 <ClinicalDocumentationAssistant />
               </LazyRoute>
-            </EmergencyRouteGuard>
+            </CareDroidRouteGuard>
           }
         />
         <Route
           path={CANONICAL_ROUTES.emergencyTools}
           element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyTools}>
+            <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyTools}>
               <LazyRoute label="Loading Medical Tools...">
                 <ToolsOverview />
               </LazyRoute>
-            </EmergencyRouteGuard>
+            </CareDroidRouteGuard>
           }
         />
         {/* ── Specialty clinical tool detail pages (/emergency/tools/<specialty>/:toolId) ── */}
-        <Route path="/emergency/tools/cardiology/:toolId" element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyTools}><LazyRoute label="Loading cardiology assistant..."><CardiologyAssistantPage /></LazyRoute></EmergencyRouteGuard>} />
-        <Route path="/emergency/tools/nephrology/:toolId" element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyTools}><LazyRoute label="Loading nephrology assistant..."><NephrologyAssistantPage /></LazyRoute></EmergencyRouteGuard>} />
-        <Route path="/emergency/tools/neurology/:toolId" element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyTools}><LazyRoute label="Loading neurology assistant..."><NeurologyAssistantPage /></LazyRoute></EmergencyRouteGuard>} />
-        <Route path="/emergency/tools/gastroenterology/:toolId" element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyTools}><LazyRoute label="Loading GI assistant..."><GastroenterologyAssistantPage /></LazyRoute></EmergencyRouteGuard>} />
-        <Route path="/emergency/tools/endocrine/:toolId" element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyTools}><LazyRoute label="Loading endocrine assistant..."><EndocrineMetabolicAssistantPage /></LazyRoute></EmergencyRouteGuard>} />
-        <Route path="/emergency/tools/pediatrics/:toolId" element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyTools}><LazyRoute label="Loading pediatrics assistant..."><PediatricsObgynAssistantPage /></LazyRoute></EmergencyRouteGuard>} />
-        <Route path="/emergency/tools/psychiatry/:toolId" element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyTools}><LazyRoute label="Loading psychiatry assistant..."><PsychiatryAssistantPage /></LazyRoute></EmergencyRouteGuard>} />
-        <Route path="/emergency/tools/pulmonology/:toolId" element={<EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyTools}><LazyRoute label="Loading pulmonology assistant..."><PulmonologyAssistantPage /></LazyRoute></EmergencyRouteGuard>} />
+        <Route path="/emergency/tools/cardiology/:toolId" element={<CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyTools}><LazyRoute label="Loading cardiology assistant..."><CardiologyAssistantPage /></LazyRoute></CareDroidRouteGuard>} />
+        <Route path="/emergency/tools/nephrology/:toolId" element={<CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyTools}><LazyRoute label="Loading nephrology assistant..."><NephrologyAssistantPage /></LazyRoute></CareDroidRouteGuard>} />
+        <Route path="/emergency/tools/neurology/:toolId" element={<CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyTools}><LazyRoute label="Loading neurology assistant..."><NeurologyAssistantPage /></LazyRoute></CareDroidRouteGuard>} />
+        <Route path="/emergency/tools/gastroenterology/:toolId" element={<CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyTools}><LazyRoute label="Loading GI assistant..."><GastroenterologyAssistantPage /></LazyRoute></CareDroidRouteGuard>} />
+        <Route path="/emergency/tools/endocrine/:toolId" element={<CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyTools}><LazyRoute label="Loading endocrine assistant..."><EndocrineMetabolicAssistantPage /></LazyRoute></CareDroidRouteGuard>} />
+        <Route path="/emergency/tools/pediatrics/:toolId" element={<CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyTools}><LazyRoute label="Loading pediatrics assistant..."><PediatricsObgynAssistantPage /></LazyRoute></CareDroidRouteGuard>} />
+        <Route path="/emergency/tools/psychiatry/:toolId" element={<CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyTools}><LazyRoute label="Loading psychiatry assistant..."><PsychiatryAssistantPage /></LazyRoute></CareDroidRouteGuard>} />
+        <Route path="/emergency/tools/pulmonology/:toolId" element={<CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyTools}><LazyRoute label="Loading pulmonology assistant..."><PulmonologyAssistantPage /></LazyRoute></CareDroidRouteGuard>} />
         <Route
           path={CANONICAL_ROUTES.emergencyPulse}
           element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyPulse}>
+            <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyPulse}>
               <LazyRoute label="Loading department pulse...">
                 <EmergencyDepartmentPulse />
               </LazyRoute>
-            </EmergencyRouteGuard>
+            </CareDroidRouteGuard>
           }
         />
         <Route
           path={CANONICAL_ROUTES.emergencyShift}
           element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyShift}>
+            <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyShift}>
               <LazyRoute label="Loading shift summary...">
                 <EmergencyShiftSummary />
               </LazyRoute>
-            </EmergencyRouteGuard>
+            </CareDroidRouteGuard>
           }
         />
         <Route
           path={CANONICAL_ROUTES.emergencyAnalytics}
           element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyAnalytics}>
+            <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyAnalytics}>
               <LazyRoute label="Loading analytics...">
                 <EmergencyAnalytics />
               </LazyRoute>
-            </EmergencyRouteGuard>
+            </CareDroidRouteGuard>
           }
         />
         <Route
           path={CANONICAL_ROUTES.emergencyAlerts}
           element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyAlerts}>
+            <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyAlerts}>
               <LazyRoute label="Loading alerts...">
                 <ClinicalAlertsPage />
               </LazyRoute>
-            </EmergencyRouteGuard>
+            </CareDroidRouteGuard>
           }
         />
         <Route
           path={CANONICAL_ROUTES.emergencySettings}
           element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencySettings}>
+            <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencySettings}>
               <LazyRoute label="Loading settings...">
                 <EmergencySettings />
               </LazyRoute>
-            </EmergencyRouteGuard>
+            </CareDroidRouteGuard>
           }
         />
         <Route
           path={CANONICAL_ROUTES.emergencyHelp}
           element={
-            <EmergencyRouteGuard path={CANONICAL_ROUTES.emergencyHelp}>
+            <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyHelp}>
               <LazyRoute label="Loading guide...">
                 <HelpHubPage />
               </LazyRoute>
-            </EmergencyRouteGuard>
+            </CareDroidRouteGuard>
           }
         />
         {renderProfileConsoleRoutes(LazyRoute)}
+        {renderPublicConsoleRoutes(LazyRoute, { insideShellOnly: true })}
 
         {/* ── Developer / tools catalog ── */}
         <Route path={CANONICAL_ROUTES.developerCatalog} element={<ToolsRedirect />} />
@@ -953,16 +896,9 @@ export function AppRoutes() {
           path={CANONICAL_ROUTES.workspace}
           element={<EdApplicationEntryRedirect />}
         />
-        <Route path="/organization"        element={<Navigate to={CANONICAL_ROUTES.adminOperations} replace />} />
-        <Route path="/organization/*"      element={<Navigate to={CANONICAL_ROUTES.adminOperations} replace />} />
-        <Route path={CANONICAL_ROUTES.customerPortal} element={<Navigate to={`${CANONICAL_ROUTES.adminOperations}/tenant`} replace />} />
-        <Route path={CANONICAL_ROUTES.successCenter} element={<Navigate to={CANONICAL_ROUTES.customerSuccess} replace />} />
-        <Route path={CANONICAL_ROUTES.customerSuccess} element={<Navigate to={`${CANONICAL_ROUTES.adminOperations}/tenant`} replace />} />
-        <Route path="/fleet"               element={<Navigate to={CANONICAL_ROUTES.fleetCommand} replace />} />
-        <Route path="/platform-learning"   element={<Navigate to={CANONICAL_ROUTES.emergencySettings} replace />} />
-        <Route path="/audit-logs"          element={<Navigate to={CANONICAL_ROUTES.audit} replace />} />
-        <Route path="/ai/evaluation"       element={<Navigate to={CANONICAL_ROUTES.emergencyAnalytics} replace />} />
-        <Route path="/team"                element={<Navigate to={`${CANONICAL_ROUTES.adminOperations}/team`} replace />} />
+        {IN_SHELL_ROUTE_REDIRECTS.map(({ path, to }) => (
+          <Route key={`in-shell-${path}`} path={path} element={<EmergencyAliasRedirect to={to} />} />
+        ))}
 
 
       </Route>{/* end RootLayout */}
@@ -977,7 +913,6 @@ export function AppRoutes() {
       <Route path="/pharmacy/*"         element={<ToolsRedirect />} />
       <Route path="/radiology"          element={<ToolsRedirect />} />
       <Route path="/radiology/*"        element={<ToolsRedirect />} />
-      <Route path="/automation"         element={<ToolsRedirect />} />
 
       <Route path="/search"             element={<ToolsRedirect />} />
       <Route path="/knowledge-base"     element={<ToolsRedirect />} />

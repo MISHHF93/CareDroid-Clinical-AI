@@ -4,19 +4,16 @@ import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
 import { postReceptionHandoff } from './emergencyOsApi';
 import { ensureEncounterAfterIntake, type IntakeEncounterSource } from './intakeEncounter';
 import { getArrivalReasonFromPatient } from './intakeEncounterChain';
-import {
-  recordFirstContact,
-  stampArrivalControlLayer,
-  syncArrivalOperationalSurfaces,
-} from './arrivalControlLayer';
-import { syncPatientExperienceOperationalSurfaces } from './patientExperienceStatus';
-import { syncTriageBreachOperationalSurfaces } from './triageBreachTimer';
+import { recordFirstContact, stampArrivalControlLayer } from './arrivalControlLayer';
+import { resolveWorkflowRouteForState } from '../config/unifiedPatientWorkflowModel';
+import { afterPatientWorkflowTransition } from './unifiedPatientWorkflowOrchestrator';
 import { enterTriageQueue, WHITEBOARD_QUEUE_FILTER } from './queueAssignment';
 import { buildClientTriageAssist, refreshTriageAssistFromBackend } from './triageAssist';
 import { stampPatientArrivalAtHandoff } from './patientArrivalModel';
 import { formatSyncRecoveryMessage } from '../config/errorRecoveryModel';
 import { PatientState } from '../types/emergency';
 import type { useEmergencyStore } from '../store/emergencyStore';
+import { startWorkflowTrace } from './observabilityTrace';
 
 export type IntakeHandoffStore = Pick<
   ReturnType<typeof useEmergencyStore.getState>,
@@ -87,6 +84,8 @@ export type IntakeHandoffResult = {
   receptionPath: string;
   whiteboardPath: string;
   queuesPath: string;
+  /** Canonical next surface after handoff — triage queue with patient context. */
+  nextRoute: string;
   encounterId: string | null;
   createdEncounter: boolean;
   queue: string;
@@ -140,64 +139,30 @@ function syncOperationalSurfaces(
     actorName?: string;
     arrivalReason?: string;
     queue?: string;
+    priorState?: PatientState;
   },
 ) {
-  const queue = options.queue || WHITEBOARD_QUEUE_FILTER.triage;
+  afterPatientWorkflowTransition(store, {
+    patientId: options.patientId,
+    fromState: options.priorState || PatientState.Registration,
+    toState: PatientState.Triage,
+    source: 'intake-handoff',
+    actorName: options.actorName,
+    encounterId: options.encounterId,
+  });
+
   store.dispatchWebSocketEvent?.({
     type: 'intake_handoff_complete',
     payload: {
       patientId: options.patientId,
       encounterId: options.encounterId,
       arrivalReason: options.arrivalReason,
-      queue,
+      queue: options.queue || WHITEBOARD_QUEUE_FILTER.triage,
       source: options.source,
       surfaces: 'triage-queue,whiteboard,operational-snapshot',
       generatedAt: new Date().toISOString(),
     },
   });
-
-  store.recordWorkflowAction({
-    type: 'integration_event_received',
-    summary: `Intake chain synced: patient, encounter, arrival reason, and ${queue} queue.`,
-    patientId: options.patientId,
-    actorName: options.actorName,
-    source: 'intake-handoff',
-    metadata: {
-      handoff: 'intake.complete',
-      intakeSource: options.source,
-      patientId: options.patientId,
-      encounterId: options.encounterId,
-      arrivalReason: options.arrivalReason,
-      queue,
-      targetState: PatientState.Triage,
-      surfaces: 'triage-queue,whiteboard,operational-snapshot',
-    },
-  });
-
-  syncArrivalOperationalSurfaces(store as unknown as Parameters<typeof syncArrivalOperationalSurfaces>[0], options.patientId, {
-    destination: 'triage-queue',
-    source: options.source,
-  });
-
-  syncTriageBreachOperationalSurfaces(
-    {
-      patients: store.patients,
-      settings: store.emergencySettings,
-      dispatchWebSocketEvent: store.dispatchWebSocketEvent,
-    },
-    { patientId: options.patientId, source: options.source },
-  );
-
-  syncPatientExperienceOperationalSurfaces(
-    {
-      patients: store.patients,
-      dispatchWebSocketEvent: store.dispatchWebSocketEvent,
-    },
-    { patientId: options.patientId, source: options.source },
-  );
-
-  store.updateCapacity?.();
-  store.updateAlerts?.();
 }
 
 /**
@@ -209,13 +174,22 @@ export function completeIntakeHandoff(
   options: IntakeHandoffOptions,
 ): IntakeHandoffResult {
   const { patientId, source = 'reception', actorName, sessionId } = options;
+  const trace = startWorkflowTrace('patient-intake-handoff', {
+    patientId,
+    source,
+    summary: `Intake handoff (${source})`,
+    metadata: { actorName, sessionId },
+  });
 
   const patient = store.patients.find((entry) => entry.id === patientId);
+  const priorState = patient?.state;
   if (!patient) {
+    trace.end('error', { reason: 'patient_not_found' });
     return {
       receptionPath: CANONICAL_ROUTES.emergencyReception,
       whiteboardPath: CANONICAL_ROUTES.emergencyWhiteboard,
       queuesPath: getTriagePendingQueuePath(),
+      nextRoute: getTriagePendingQueuePath(),
       encounterId: null,
       createdEncounter: false,
       queue: WHITEBOARD_QUEUE_FILTER.triage,
@@ -284,6 +258,7 @@ export function completeIntakeHandoff(
     actorName,
     arrivalReason,
     queue,
+    priorState,
   });
 
   const triageAssist = buildClientTriageAssist(
@@ -349,16 +324,24 @@ export function completeIntakeHandoff(
     }
   });
 
-  return {
+  const result = {
     receptionPath: `${CANONICAL_ROUTES.emergencyReception}?arrived=${encodeURIComponent(patientId)}`,
     whiteboardPath: buildWhiteboardPath(patientId, encounterResult.encounterId),
     queuesPath: getTriagePendingQueuePath(patientId),
+    nextRoute: resolveWorkflowRouteForState(PatientState.Triage, patientId),
     encounterId: encounterResult.encounterId,
     createdEncounter: encounterResult.created,
     queue,
     arrivalReason,
     syncPending,
   };
+  trace.end('success', {
+    encounterId: encounterResult.encounterId,
+    createdEncounter: encounterResult.created,
+    queue,
+    syncPending,
+  });
+  return result;
 }
 
 /** Reception-context alias for completeIntakeHandoff. */

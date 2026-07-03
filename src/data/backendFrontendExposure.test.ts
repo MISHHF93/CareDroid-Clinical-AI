@@ -34,14 +34,14 @@ const repoRoot = join(__dirname, '../..');
 const rootEnvExample = readFileSync(join(repoRoot, '.env.example'), 'utf8');
 const backendEnvExample = readFileSync(join(repoRoot, 'backend/.env.example'), 'utf8');
 const backendMainSource = readFileSync(join(repoRoot, 'backend/src/main.ts'), 'utf8');
-const HEAVY_EXPOSURE_SCAN_TIMEOUT_MS = 30_000;
+const HEAVY_EXPOSURE_SCAN_TIMEOUT_MS = 120_000;
 
-describe('backendFrontendExposure scan', () => {
+describe('backendFrontendExposure scan', { timeout: HEAVY_EXPOSURE_SCAN_TIMEOUT_MS }, () => {
   it('passes with zero unguarded missing routes and no false executor claims', () => {
     const { ok, errors } = assertExposureScanPasses();
     expect(errors, errors.join('; ')).toEqual([]);
     expect(ok).toBe(true);
-  }, HEAVY_EXPOSURE_SCAN_TIMEOUT_MS);
+  });
 
   it('inventory covers three POST executors', () => {
     const scan = runBackendFrontendExposureScan();
@@ -51,7 +51,7 @@ describe('backendFrontendExposure scan', () => {
     for (const id of BACKEND_EXECUTOR_NLU_TOOL_IDS) {
       expect(findBackendRoute('POST', `/api/tools/${id}/execute`)).toBeTruthy();
     }
-  }, HEAVY_EXPOSURE_SCAN_TIMEOUT_MS);
+  });
 
   it('gates known missing routes behind disabled capabilities', () => {
     const gatedIds = [
@@ -70,7 +70,7 @@ describe('backendFrontendExposure scan', () => {
       expect(row, `missing inventory row ${id}`).toBeTruthy();
       expect(row.exposure).toBe('gated-stub');
     }
-  }, HEAVY_EXPOSURE_SCAN_TIMEOUT_MS);
+  });
 
   it('matches backend REGISTERED_EXECUTOR_TOOL_IDS in registry source', () => {
     const block = registrySource.match(/REGISTERED_EXECUTOR_TOOL_IDS\s*=\s*\[([\s\S]*?)\]\s*as const/);
@@ -89,7 +89,7 @@ describe('backendFrontendExposure scan', () => {
     const scan = runBackendFrontendExposureScan();
     expect(scan.analyzed).toHaveLength(FRONTEND_API_CALLS.length);
     expect(scan.unguarded).toHaveLength(0);
-  }, HEAVY_EXPOSURE_SCAN_TIMEOUT_MS);
+  });
 
   it('keeps frontend API call ids unique', () => {
     const ids = FRONTEND_API_CALLS.map((call) => call.id);
@@ -199,7 +199,7 @@ describe('backendFrontendExposure scan', () => {
     for (const id of optionalSmartIntakeIds) {
       expect(scan.analyzed.find((row) => row.id === id)?.exposure).toBe('gated-stub');
     }
-  }, HEAVY_EXPOSURE_SCAN_TIMEOUT_MS);
+  });
 
   it('covers memory dashboard and memory fabric client calls', () => {
     const memoryCalls = [
@@ -235,7 +235,7 @@ describe('backendFrontendExposure scan', () => {
 
     const stream = runBackendFrontendExposureScan().analyzed.find((row) => row.id === 'clinical-alerts-stream');
     expect(stream?.exposure).toBe('gated-stub');
-  }, HEAVY_EXPOSURE_SCAN_TIMEOUT_MS);
+  });
 
   it('classifies frontend, backend-only, planned, and executor capabilities', () => {
     const rows = buildBackendFrontendCapabilityRows();

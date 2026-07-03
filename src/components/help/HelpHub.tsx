@@ -17,6 +17,7 @@ import './HelpHub.css';
 const TABS: { id: HelpHubTab; label: string }[] = [
   { id: 'page', label: 'This screen' },
   { id: 'role', label: 'My role' },
+  { id: 'reference', label: 'Live reference' },
   { id: 'process', label: 'Full process' },
   { id: 'topics', label: 'All topics' },
   { id: 'shortcuts', label: 'Shortcuts' },
@@ -114,6 +115,75 @@ export default function HelpHub({ variant = 'drawer' }: HelpHubProps) {
               <p>No procedure mapped to this screen yet. Try <strong>All topics</strong> or <strong>My role</strong>.</p>
             )}
           </>
+        ) : null}
+
+        {state.tab === 'reference' && help.livingGuidance ? (
+          <div className="help-hub__reference-card help-hub__reference-card--guidance">
+            <h3>{help.livingGuidance.title}</h3>
+            <p>{help.livingGuidance.detail}</p>
+            <p className="help-hub__reference-note">
+              Help topic: <code>{help.livingGuidance.helpTopicId}</code>
+              {help.livingGuidance.workflowStepId ? (
+                <>
+                  {' '}
+                  · Workflow: <code>{help.livingGuidance.workflowStepId}</code>
+                </>
+              ) : null}
+            </p>
+          </div>
+        ) : null}
+
+        {state.tab === 'reference' && help.livingPage ? (
+          <div className="help-hub__reference-card">
+            <h3>{help.livingPage.label}</h3>
+            {help.livingPage.purpose ? <p>{help.livingPage.purpose}</p> : null}
+            {help.livingPage.endpoints.length ? (
+              <>
+                <h4>API endpoints</h4>
+                <ul>
+                  {help.livingPage.endpoints.map((endpoint) => (
+                    <li key={endpoint}>
+                      <code>{endpoint}</code>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            ) : null}
+            {help.livingPage.workflows.length ? (
+              <>
+                <h4>Workflows</h4>
+                <ul>
+                  {help.livingPage.workflows.map((workflow) => (
+                    <li key={workflow}>
+                      <code>{workflow}</code>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            ) : null}
+            {help.livingPage.relatedRoutes.length ? (
+              <>
+                <h4>Related routes</h4>
+                <ul>
+                  {help.livingPage.relatedRoutes.map((route) => (
+                    <li key={route}>
+                      <code>{route}</code>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            ) : null}
+            <p className="help-hub__reference-note">
+              Synced from implementation registries. Regenerate: <code>npm run docs:generate</code>
+            </p>
+          </div>
+        ) : null}
+
+        {state.tab === 'reference' && !help.livingPage ? (
+          <p>
+            No live implementation reference mapped to this path yet. See{' '}
+            <code>docs/generated/README.md</code> for the full catalog.
+          </p>
         ) : null}
 
         {state.tab === 'role' && help.rolePlaybook ? (
@@ -242,8 +312,8 @@ export default function HelpHub({ variant = 'drawer' }: HelpHubProps) {
 
       <footer className="help-hub__footer">
         <p>
-          Press <code>?</code> anywhere to reopen this guide. Practitioner reference:{' '}
-          <code>docs/USER-MANUAL.md</code> · config: <code>src/config/userManual.config.ts</code>
+          Press <code>?</code> anywhere to reopen this guide. Living docs:{' '}
+          <code>docs/generated/README.md</code> · procedures: <code>src/config/userManual.config.ts</code>
         </p>
       </footer>
     </div>

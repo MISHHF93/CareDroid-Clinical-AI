@@ -1,6 +1,7 @@
 import { Injectable, NestMiddleware, Logger } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import * as Sentry from '@sentry/node';
+import { recordBackendHttpTelemetry } from '../common/observability/platform-telemetry-sink';
 
 /**
  * HTTP Request Logging Middleware
@@ -27,10 +28,21 @@ export class LoggingMiddleware implements NestMiddleware {
       Sentry.setUser({ id: userId });
     }
 
-    // Add request ID for tracing
+    const correlationId =
+      String(req.headers['x-correlation-id'] || req.header('x-correlation-id') || '') ||
+      this.generateRequestId();
+    const workflowTraceId = String(
+      req.headers['x-workflow-trace-id'] || req.header('x-workflow-trace-id') || '',
+    );
     const requestId =
       req.headers['x-request-id'] || req.header('x-trace-id') || this.generateRequestId();
     Sentry.setTag('request_id', String(requestId));
+    Sentry.setTag('correlation_id', correlationId);
+    if (workflowTraceId) {
+      Sentry.setTag('workflow_trace_id', workflowTraceId);
+    }
+    res.setHeader('x-correlation-id', correlationId);
+    res.setHeader('x-request-id', String(requestId));
 
     // Intercept response.end() to capture when response is sent
     const originalSend = res.send;
@@ -42,15 +54,28 @@ export class LoggingMiddleware implements NestMiddleware {
       const logEntry = {
         timestamp: new Date().toISOString(),
         requestId,
+        correlationId,
+        workflowTraceId: workflowTraceId || undefined,
         method,
         url: originalUrl,
         statusCode,
         duration: `${duration}ms`,
+        durationMs: duration,
         ip,
         userId: userId || 'anonymous',
-        // Get response size if available
         contentLength: res.get('content-length') || 'unknown',
       };
+
+      recordBackendHttpTelemetry({
+        method,
+        path: originalUrl.split('?')[0] || originalUrl,
+        statusCode,
+        durationMs: duration,
+        correlationId,
+        workflowTraceId: workflowTraceId || undefined,
+        requestId: String(requestId),
+        userId: userId || undefined,
+      });
 
       // Log with appropriate level based on status code
       if (statusCode >= 500) {

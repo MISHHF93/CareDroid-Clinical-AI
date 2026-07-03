@@ -13,13 +13,32 @@ describe('ObservabilityService', () => {
   });
 
   function createService(health: Record<string, string>) {
-    return new ObservabilityService({
-      recentObservability: jest.fn().mockResolvedValue({
-        status: 'synthetic_ready',
-        events: [],
-        health,
-      }),
-    } as any);
+    return new ObservabilityService(
+      {
+        recentObservability: jest.fn().mockResolvedValue({
+          status: 'synthetic_ready',
+          events: [],
+          health,
+        }),
+      } as any,
+      {
+        getDiagnostics: jest.fn().mockReturnValue({
+          engineId: 'platform-telemetry',
+          generatedAt: new Date().toISOString(),
+          totals: {
+            bufferedEvents: 0,
+            crashReports: 0,
+            slowApiCount: 0,
+            errorCount: 0,
+          },
+          categoryCounts: {},
+          recentWorkflow: [],
+          recentErrors: [],
+          slowApiCalls: [],
+          recentCrashes: [],
+        }),
+      } as any,
+    );
   }
 
   it('builds a SaaS health center with all monitored domains', async () => {
@@ -37,7 +56,7 @@ describe('ObservabilityService', () => {
 
     expect(result.status).toBe('warning');
     expect(result.label).toBe('Warning');
-    expect(result.summary.total).toBe(7);
+    expect(result.summary.total).toBe(8);
     expect(result.checks.map((check) => check.id)).toEqual([
       'frontend',
       'backend',
@@ -46,6 +65,7 @@ describe('ObservabilityService', () => {
       'tenant',
       'ai',
       'simulation',
+      'observability',
     ]);
     expect(result.checks.map((check) => check.displayStatus)).toEqual(
       expect.arrayContaining(['Healthy', 'Warning']),

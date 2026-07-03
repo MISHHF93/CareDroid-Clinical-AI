@@ -113,6 +113,8 @@ import {
 } from '../../utils/receptionQueryParams';
 import WhiteboardView from '../../components/whiteboard/WhiteboardView';
 import { completeIntakeHandoff, refreshIntakeHandoffSurfaces } from '../../services/receptionHandoff';
+import { showActionSuccess } from '../../services/careDroidInteractionFeedback';
+import { notifyWorkflowHandoffComplete } from '../../services/workflowNavigationFeedback';
 import { convertEmsArrivalForReception } from '../../services/receptionIntakeBridge';
 import { matchesWhiteboardQueueFilter } from '../../services/queueAssignment';
 import { evaluateWhiteboardOperationalLoad } from '../../components/whiteboard/whiteboardOperationalLoadModel';
@@ -404,7 +406,7 @@ export default function EmergencyWhiteboard() {
   const [showIntake, setShowIntake] = useState(false);
   const [emsOffloadPanelOpen, setEmsOffloadPanelOpen] = useState(false);
   const [queuePanelCollapsed, setQueuePanelCollapsed] = useState(false);
-  const [toast, setToast] = useState('');
+
   const [clockTick, setClockTick] = useState(() => Date.now());
   const createPatientPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.createPatient);
   const prepareBayPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.prepareEmsBay);
@@ -1341,8 +1343,10 @@ export default function EmergencyWhiteboard() {
       );
       return;
     }
-    setToast(`${arrival.unitId} added — complete EMS registration at reception`);
-    window.setTimeout(() => setToast(''), 3200);
+    showActionSuccess(
+      `${arrival.unitId} added`,
+      'Complete EMS registration at reception.',
+    );
     setActiveFilter('EMS');
     whiteboard.refresh();
   }, [
@@ -1362,12 +1366,17 @@ export default function EmergencyWhiteboard() {
         source: 'whiteboard-central-intake',
       });
       refreshIntakeHandoffSurfaces(useEmergencyStore.getState());
-      setToast(`${patient.firstName} ${patient.lastName} added to triage queue`);
-      window.setTimeout(() => setToast(''), 2400);
+      notifyWorkflowHandoffComplete({
+        patientName: `${patient.firstName} ${patient.lastName}`.trim(),
+        description: 'Patient added to triage queue.',
+        nextRoute: handoff.nextRoute,
+        onNavigate: profileNavigate,
+      });
       setQueueFilter(handoff.queue || 'Triage');
+      profileNavigate(handoff.nextRoute);
       whiteboard.refresh();
     },
-    [whiteboard.refresh, setQueueFilter],
+    [profileNavigate, whiteboard.refresh, setQueueFilter],
   );
 
   if (display.isWaitingRoomDisplay && publicWaiting.isKioskMode) {
@@ -2646,11 +2655,7 @@ export default function EmergencyWhiteboard() {
         />
       ) : null}
 
-      {toast ? (
-        <div role="status" className="emergency-whiteboard-page__toast">
-          {toast}
-        </div>
-      ) : null}
+
 
       {whiteboardDensity.surfaces.patientGrid.visible && !whiteboard.loading && activeQueueFilter === 'Triage' && canReviewTriage && selectedPatientId ? (
         <div className="emergency-whiteboard-page__triage-assist-wrap">

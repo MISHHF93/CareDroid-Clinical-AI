@@ -1,6 +1,5 @@
 /**
- * Simple logger utility respecting app configuration log level
- * Integrates with appConfig.logging.level
+ * Structured logger — respects appConfig.logging.level and emits correlation-aware entries.
  */
 
 import appConfig from '../config/appConfig';
@@ -14,6 +13,27 @@ const LOG_LEVELS: Record<LogLevel, number> = {
   error: 3,
 };
 
+type LogContext = Record<string, unknown>;
+
+function resolveCorrelationId(): string | undefined {
+  try {
+    return sessionStorage.getItem('caredroid.observability.correlation') || undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+function formatStructuredEntry(level: LogLevel, message: string, context?: LogContext) {
+  return Object.freeze({
+    timestamp: new Date().toISOString(),
+    level,
+    message,
+    correlationId: resolveCorrelationId(),
+    environment: appConfig.app.environment,
+    ...context,
+  });
+}
+
 class Logger {
   private currentLevel: LogLevel;
 
@@ -26,32 +46,43 @@ class Logger {
     return LOG_LEVELS[level] >= LOG_LEVELS[this.currentLevel];
   }
 
-  debug(message: string, ...args: any[]): void {
-    if (this.shouldLog('debug')) {
-      console.debug(`[DEBUG] ${message}`, ...args);
-    }
+  private emit(level: LogLevel, message: string, context?: LogContext): void {
+    if (!this.shouldLog(level)) return;
+    const entry = formatStructuredEntry(level, message, context);
+    const consoleFn =
+      level === 'debug'
+        ? console.debug
+        : level === 'info'
+          ? console.info
+          : level === 'warn'
+            ? console.warn
+            : console.error;
+    consoleFn(`[${level.toUpperCase()}] ${message}`, entry);
   }
 
-  info(message: string, ...args: any[]): void {
-    if (this.shouldLog('info')) {
-      console.info(`[INFO] ${message}`, ...args);
-    }
+  debug(message: string, context?: LogContext): void {
+    this.emit('debug', message, context);
   }
 
-  warn(message: string, ...args: any[]): void {
-    if (this.shouldLog('warn')) {
-      console.warn(`[WARN] ${message}`, ...args);
-    }
+  info(message: string, context?: LogContext): void {
+    this.emit('info', message, context);
   }
 
-  error(message: string, error?: any, ...args: any[]): void {
-    if (this.shouldLog('error')) {
-      if (error instanceof Error) {
-        console.error(`[ERROR] ${message}`, error.message, error.stack, ...args);
-      } else {
-        console.error(`[ERROR] ${message}`, error, ...args);
-      }
+  warn(message: string, context?: LogContext): void {
+    this.emit('warn', message, context);
+  }
+
+  error(message: string, error?: unknown, context?: LogContext): void {
+    if (!this.shouldLog('error')) return;
+    const errorContext: LogContext = { ...context };
+    if (error instanceof Error) {
+      errorContext.errorName = error.name;
+      errorContext.errorMessage = error.message;
+      errorContext.stack = error.stack;
+    } else if (error !== undefined) {
+      errorContext.error = error;
     }
+    this.emit('error', message, errorContext);
   }
 
   setLevel(level: LogLevel): void {

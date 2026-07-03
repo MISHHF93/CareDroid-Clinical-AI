@@ -407,6 +407,7 @@ function buildRouteAccess(roleMapping: CanonicalRoleMapping, permissions: readon
         CANONICAL_ROUTES.audit,
         CANONICAL_ROUTES.laboratory,
         CANONICAL_ROUTES.emergencyDiagnostics,
+        CANONICAL_ROUTES.emergencyPatients,
       ].includes(route),
     );
   }

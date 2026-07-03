@@ -1016,7 +1016,11 @@ function appendAuditLog(
   input: Parameters<typeof createAuditLogEntry>[0] | null | undefined,
 ): EmergencyAuditLogEntry[] {
   if (!input) return existing;
-  return [createAuditLogEntry(input), ...existing].slice(0, AUDIT_LOG_LIMIT);
+  const entry = createAuditLogEntry(input);
+  void import('../services/securityAuditService').then(({ ingestEmergencyAuditEntries }) =>
+    ingestEmergencyAuditEntries([entry]),
+  );
+  return [entry, ...existing].slice(0, AUDIT_LOG_LIMIT);
 }
 
 const getNested = (source: unknown, path: string): unknown =>
@@ -3434,9 +3438,14 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
 
       const transitioned = nextState.patients.find((patient) => patient.id === patientId);
       if (fromState && transitioned && transitioned.state !== fromState) {
-        void import('../services/emergencyCareJourneyOrchestrator').then(({ syncJourneyFromPatientStateTransition }) =>
-          syncJourneyFromPatientStateTransition(patientId, fromState, transitioned.state, {
+        void import('../services/unifiedPatientWorkflowOrchestrator').then(({ afterPatientWorkflowTransition }) =>
+          afterPatientWorkflowTransition(nextState, {
+            patientId,
+            fromState,
+            toState: transitioned.state,
+            source: 'patient-journey-engine',
             actorId: staffId,
+            actorName: staffId,
           }),
         );
       }
@@ -3474,8 +3483,21 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         };
       });
 
-      void import('../services/emergencyCareJourneyOrchestrator').then(({ onHandoffComplete }) =>
-        onHandoffComplete(patientId, { actorId: options.staffId, actorRole: 'emergency_physician' }),
+      const discharged = get().patients.find((patient) => patient.id === patientId);
+      const priorState =
+        discharged?.timeline?.[discharged.timeline.length - 1]?.fromState ||
+        discharged?.timeline?.[discharged.timeline.length - 1]?.from ||
+        PatientState.Disposition;
+      void import('../services/unifiedPatientWorkflowOrchestrator').then(({ afterPatientWorkflowTransition }) =>
+        afterPatientWorkflowTransition(get(), {
+          patientId,
+          fromState: priorState as PatientState,
+          toState: PatientState.Discharge,
+          source: 'patient-journey-engine',
+          actorId: options.staffId,
+          actorRole: 'emergency_physician',
+          note: options.note,
+        }),
       );
     },
 
@@ -4549,6 +4571,20 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       const payload = record.payload ?? record.data ?? record.record ?? event;
       get().setWebSocketStatus({ lastEventAt: nowIso() });
 
+      void import('../engine/unifiedWorkflowAutomationEngine').then(({ handleWorkflowAutomationBackendEvent }) =>
+        handleWorkflowAutomationBackendEvent(type),
+      );
+
+      void import('../engine/unifiedOperationalIntelligenceEngine').then(
+        ({ handleUnifiedOperationalIntelligenceBackendEvent }) =>
+          handleUnifiedOperationalIntelligenceBackendEvent(type, payload),
+      );
+
+      void import('../engine/unifiedApplicationKnowledgeGraphEngine').then(
+        ({ handleUnifiedApplicationKnowledgeGraphBackendEvent }) =>
+          handleUnifiedApplicationKnowledgeGraphBackendEvent(type),
+      );
+
       if (
         [
           'emergency_snapshot',
@@ -4943,6 +4979,22 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
           escalatePatient: state.escalatePatient,
         },
       );
+      void import('../services/observabilityService').then(({ default: observabilityService }) => {
+        observabilityService.recordWorkflowTelemetry({
+          id: `admin-review-${input.taskId}-${Date.now()}`,
+          type: 'administrative-automation-review',
+          summary: `Review task ${input.taskId} → ${input.decision}`,
+          patientId: result.task?.patientId,
+          source: 'emergencyStore',
+          severity: !result.task ? 'Critical' : input.decision === 'reject' ? 'Warning' : 'Info',
+          timestamp: new Date().toISOString(),
+          metadata: {
+            taskId: input.taskId,
+            decision: input.decision,
+            applied: Boolean(result.task),
+          },
+        });
+      });
       if (!result.task) return null;
       set({ administrativeAutomationQueue: result.tasks });
       return result.task;
@@ -5468,6 +5520,18 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
           ...state.workflowLogs.filter((candidate) => candidate.id !== log.id),
         ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()),
       }));
+      void import('../services/observabilityService').then(({ default: observabilityService }) => {
+        observabilityService.recordWorkflowTelemetry({
+          id: log.id,
+          type: log.type,
+          summary: log.summary,
+          patientId: log.patientId,
+          source: log.source,
+          severity: log.severity,
+          timestamp: log.timestamp,
+          metadata: log.metadata,
+        });
+      });
       return log;
     },
 

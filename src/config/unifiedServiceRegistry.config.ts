@@ -8,6 +8,10 @@ export const UNIFIED_SERVICE_HEALTH_ENDPOINTS = Object.freeze({
   backendProbe: '/health',
   systemHealth: '/api/system-health',
   saasHealth: '/api/saas-health',
+  observabilityHealth: '/api/observability/health',
+  observabilityDiagnostics: '/api/observability/diagnostics',
+  observabilityPerformance: '/api/observability/performance',
+  observabilityTraces: '/api/observability/traces',
 } as const);
 
 export const SERVICE_REGISTRY_DOMAINS = Object.freeze([

@@ -1,0 +1,114 @@
+.three-minute-mission-bar {
+  display: grid;
+  gap: 8px;
+  padding: 8px 16px 10px;
+  border-bottom: 1px solid var(--ed-border-subtle, #e2e8f0);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--status-warning, #d97706) 5%, var(--ed-surface-raised, #f8fafc)),
+    var(--ed-surface-raised, #f8fafc)
+  );
+  font-size: 11px;
+  color: var(--ed-text-meta, #64748b);
+}
+
+.three-minute-mission-bar--breach {
+  border-bottom-color: color-mix(in srgb, var(--status-critical, #dc2626) 40%, transparent);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--status-critical, #dc2626) 8%, var(--ed-surface-raised, #f8fafc)),
+    var(--ed-surface-raised, #f8fafc)
+  );
+}
+
+.three-minute-mission-bar__identity {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  color: var(--ed-text-primary, #0f172a);
+}
+
+.three-minute-mission-bar__breach {
+  color: var(--status-critical, #dc2626);
+  font-weight: 800;
+}
+
+.three-minute-mission-bar__principle {
+  margin: 0;
+  font-style: italic;
+}
+
+.three-minute-mission-bar__missions {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.three-minute-mission-bar__mission {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--ed-border-subtle, #e2e8f0);
+  background: #fff;
+}
+
+.three-minute-mission-bar__mission--breach {
+  border-color: color-mix(in srgb, var(--status-critical, #dc2626) 35%, transparent);
+}
+
+.three-minute-mission-bar__mission-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.three-minute-mission-bar__subject {
+  font-weight: 700;
+  color: var(--ed-text-primary, #0f172a);
+}
+
+.three-minute-mission-bar__trigger {
+  text-transform: capitalize;
+}
+
+.three-minute-mission-bar__owner {
+  font-size: 10px;
+}
+
+.three-minute-mission-bar__actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.three-minute-mission-bar__btn {
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--ed-border-subtle, #e2e8f0);
+  background: #fff;
+  color: var(--ed-text-primary, #0f172a);
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.three-minute-mission-bar__btn--primary {
+  background: var(--ed-accent, #0ea5e9);
+  border-color: transparent;
+  color: #fff;
+}
+
+.three-minute-mission-bar__ai-note {
+  margin: 0;
+  font-size: 10px;
+}

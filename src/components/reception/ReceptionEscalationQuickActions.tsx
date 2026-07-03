@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { toast } from 'sonner';
+import { showActionError, showActionSuccess } from '../../services/careDroidInteractionFeedback';
 import {
   RECEPTION_ESCALATION_REASONS,
   resolveReceptionEscalationReason,
@@ -40,13 +40,14 @@ export default function ReceptionEscalationQuickActions({
       });
 
       if (!record) {
-        toast.error(RECEPTION_COPY.escalation.submitError);
+        showActionError(RECEPTION_COPY.escalation.submitError);
         return;
       }
 
-      toast.success(RECEPTION_COPY.escalation.submitSuccess, {
-        description: `${record.reasonLabel} · nurses notified`,
-      });
+      showActionSuccess(
+        RECEPTION_COPY.escalation.submitSuccess,
+        `${record.reasonLabel} â€” nurses notified`,
+      );
     } finally {
       setPendingReasonId(null);
     }
@@ -59,7 +60,7 @@ export default function ReceptionEscalationQuickActions({
     >
       <header className="reception-escalation-quick-actions__header">
         <p className="reception-escalation-quick-actions__eyebrow">{RECEPTION_COPY.escalation.eyebrow}</p>
-        <h3>Quick flag — stay at desk</h3>
+        <h3>Quick flag ï¿½ stay at desk</h3>
         <p>One-tap signals to triage or charge nurse without leaving reception.</p>
       </header>
       <div className="reception-escalation-quick-actions__grid">
@@ -80,7 +81,7 @@ export default function ReceptionEscalationQuickActions({
             title={reason.description}
           >
             <strong>{reason.shortLabel}</strong>
-            <small>{reason.notifyTargets.map((t) => (t === 'triage' ? 'Triage' : 'Charge')).join(' · ')}</small>
+            <small>{reason.notifyTargets.map((t) => (t === 'triage' ? 'Triage' : 'Charge')).join(' ï¿½ ')}</small>
           </button>
         ))}
       </div>

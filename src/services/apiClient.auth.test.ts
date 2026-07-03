@@ -129,13 +129,22 @@ describe('apiFetch auth header', () => {
     );
   });
 
+  it('short-circuits protected emergency API routes without a token', async () => {
+    localStorage.clear();
+
+    const response = await apiFetch('/api/emergency/whiteboard');
+
+    expect(response.status).toBe(401);
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
   it('lets public CareDroid API routes reach fetch without a token', async () => {
     localStorage.clear();
 
-    await apiFetch('/api/emergency/whiteboard');
+    await apiFetch('/api/auth/dev-session');
 
     expect(fetch).toHaveBeenCalledWith(
-      '/api/emergency/whiteboard',
+      '/api/auth/dev-session',
       expect.objectContaining({
         headers: expect.not.objectContaining({
           Authorization: expect.any(String),

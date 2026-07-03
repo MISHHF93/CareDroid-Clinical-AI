@@ -6,7 +6,8 @@ import { IconSend } from '@tabler/icons-react';
 import { PatientFlag, PatientState, Priority, type Alert, type Patient } from '../types/emergency';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { useEDCopilot } from '../hooks/useEmergencyOs';
-import useOperationalIntelligence from '../hooks/useOperationalIntelligence';
+import useAiChiefOrchestrator from '../hooks/useAiChiefOrchestrator';
+import useUnifiedApplicationKnowledgeGraph from '../hooks/useUnifiedApplicationKnowledgeGraph';
 import type { CareDroidCentralNodeSnapshot } from '../central-node/careDroidCentralNode';
 import { invokeUnifiedAiConversational } from '../services/careDroidUnifiedAiNode';
 import { getAIPrompt } from '../lib/ai/promptRegistry';
@@ -29,7 +30,7 @@ import {
 } from '../services/copilotRecommendationDiscovery';
 import { formatWhatHappensNextForCopilot } from '../services/whatHappensNextGuidance';
 import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
-import useAiChiefRouting from '../hooks/useAiChiefRouting';
+
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import { navigateProfileAware } from '../navigation/profileRouteLaunch';
 import usePatientOrchestration from '../hooks/usePatientOrchestration';
@@ -278,6 +279,7 @@ function buildDepartmentPrompt({
     `3-minute risk projection: ${bottleneckRegistry?.threeMinuteRiskProjection?.status || 'unknown'} - ${bottleneckRegistry?.threeMinuteRiskProjection?.summary || 'No projection available.'}`,
     `Degraded services: ${degradedServices.length ? degradedServices.map((service) => `${service.serviceName} (${service.status})`).join('; ') : 'None'}`,
     'Bottleneck loop intents available: service_bottleneck_analysis, workflow_delay_analysis, fallback_recommendation, three_minute_risk_projection, operational_root_cause_summary.',
+    'AI Chief orchestration continuously monitors patient flow, capacity, staffing, bottlenecks, alerts, service health, EMS arrivals, prioritization, and clinical workflow support. All outputs are advisory and require clinician review.',
     activeBottlenecks.length
       ? [
           'Active bottleneck details:',
@@ -428,13 +430,20 @@ export function CopilotPanel() {
   const appendCopilotMessage = useEmergencyStore((store) => store.appendCopilotMessage);
   const storeCopilotMessages = useEmergencyStore((store) => store.copilotMessages);
   const routeScreenMode = useRouteScreenMode();
-  const operationalIntelligence = useOperationalIntelligence({ screenMode: routeScreenMode });
-  const centralSnapshot = operationalIntelligence.centralSnapshot;
-  const intelligenceSnapshot = operationalIntelligence.snapshot;
+  const aiChiefOrchestrator = useAiChiefOrchestrator({
+    screenMode: routeScreenMode,
+    realtime: true,
+    selectedPatientId,
+  });
+  const operationalIntelligence = aiChiefOrchestrator.operationalIntelligence;
+  const centralSnapshot = aiChiefOrchestrator.centralSnapshot;
+  const intelligenceSnapshot = aiChiefOrchestrator.intelligenceSnapshot;
+  const aiChiefSnapshot = aiChiefOrchestrator.snapshot;
+  const knowledgeGraphContext = useUnifiedApplicationKnowledgeGraph({ selectedPatientId }).copilotContext;
   const { saasRole, profileCopy } = useEffectiveUserProfile();
   const copilotChrome = useMemo(() => resolveCopilotChromeLabels(profileCopy), [profileCopy]);
   const emergencyRole = useEmergencyRolePermissions();
-  const { visibleScenarios: aiChiefVisibleScenarios } = useAiChiefRouting();
+  const { visibleScenarios: aiChiefVisibleScenarios } = aiChiefOrchestrator.aiChiefRouting;
   const practitionerSurfaces = usePractitionerSurfaceVisibility();
   const copilotSurfaces = practitionerSurfaces.copilot;
   const copilotLimits = resolveCopilotRuntimeLimits();
@@ -501,16 +510,39 @@ export function CopilotPanel() {
     () => formatPatientToolRecommendationsForCopilot(patientOrchestration),
     [patientOrchestration],
   );
-  const copilotSnapshot = useMemo(
-    () =>
-      buildCopilotRecommendationSnapshot({
-        centralSnapshot,
-        patients,
-        referrals,
-        emsInbound: centralSnapshot.emsPressure.inbound,
-      }),
-    [centralSnapshot, patients, referrals],
-  );
+  const copilotSnapshot = useMemo(() => {
+    const base = buildCopilotRecommendationSnapshot({
+      centralSnapshot,
+      patients,
+      referrals,
+      emsInbound: centralSnapshot.emsPressure.inbound,
+    });
+    const aiChiefMapped = aiChiefSnapshot.recommendations.map((recommendation) => ({
+      id: recommendation.id,
+      domain: recommendation.domain,
+      action: recommendation.action,
+      detail: recommendation.rationale,
+      route: recommendation.route,
+      severity:
+        recommendation.tone === 'critical'
+          ? 'Critical'
+          : recommendation.tone === 'warning'
+            ? 'Warning'
+            : 'Info',
+      priority: recommendation.priority,
+      generatedAt: aiChiefSnapshot.generatedAt,
+      humanReviewRequired: true,
+      advisoryOnly: true,
+      ownerRole: recommendation.ownerRole,
+    }));
+    const seen = new Set<string>();
+    const recommendations = [...aiChiefMapped, ...base.recommendations].filter((recommendation) => {
+      if (seen.has(recommendation.id)) return false;
+      seen.add(recommendation.id);
+      return true;
+    });
+    return { ...base, recommendations };
+  }, [aiChiefSnapshot, centralSnapshot, patients, referrals]);
   const copilotRecommendations = copilotSnapshot.recommendations;
 
   const openRecommendation = (route?: string) => {
@@ -859,6 +891,13 @@ export function CopilotPanel() {
             activeAlerts: activeOperationalAlerts.length,
             safetyRule: EMERGENCY_OS_BRANDING.safetyLine,
             backendContext: backendCopilotContext,
+            aiChiefSnapshot: {
+              generatedAt: aiChiefSnapshot.generatedAt,
+              metrics: aiChiefSnapshot.metrics,
+              recommendations: aiChiefSnapshot.recommendations,
+              visibleScenarios: aiChiefVisibleScenarios,
+            },
+            knowledgeGraphContext,
             multimodal: {
               enabledInputs: [...COPILOT_PLATFORM.inputs.multimodal.enabledInputs],
               attachments: submittedAttachments.map((attachment) => ({

@@ -16,6 +16,9 @@ import DuplicateReviewAlert from './verification/DuplicateReviewAlert';
 import { RECEPTION_COPY } from './reception/receptionCopy';
 import { registerNewArrival } from '../services/arrivalControlLayer';
 import { routeQuickIntakeThroughOrchestrator } from '../services/receptionIntakeOrchestrator';
+import { confirmCareDroidAction } from '../services/careDroidInteractionFeedback';
+import useProfileNavigate from '../hooks/useProfileNavigate';
+import { notifyWorkflowHandoffComplete } from '../services/workflowNavigationFeedback';
 
 type ExpressRegistrationProps = {
   onClose: () => void;
@@ -61,6 +64,7 @@ export default function ExpressRegistration({
   onOpenVerification,
   onProvisionalIntake,
 }: ExpressRegistrationProps) {
+  const { profileNavigate } = useProfileNavigate();
   const emergencyRole = useEmergencyRolePermissions();
   const patients = useEmergencyStore((state) => state.patients);
   const firstNameRef = useRef<HTMLInputElement>(null);
@@ -103,7 +107,7 @@ export default function ExpressRegistration({
     setDuplicateAcknowledged(false);
   }, [firstName, lastName, dob, healthCard, phone]);
 
-  const closeWithConfirm = () => {
+  const closeWithConfirm = async () => {
     const hasDraft = Boolean(
       firstName.trim() ||
         lastName.trim() ||
@@ -112,7 +116,17 @@ export default function ExpressRegistration({
         phone.trim() ||
         arrivalReason.trim(),
     );
-    if (!hasDraft || window.confirm('Discard this registration?')) onClose();
+    if (
+      !hasDraft ||
+      (await confirmCareDroidAction({
+        title: 'Discard registration?',
+        message: 'Unsaved registration details will be lost.',
+        confirmLabel: 'Discard',
+        tone: 'danger',
+      }))
+    ) {
+      onClose();
+    }
   };
 
   const submit = async (event?: FormEvent) => {
@@ -163,7 +177,13 @@ export default function ExpressRegistration({
         routeResult.patientId,
         { source: 'express-register' },
       );
+      notifyWorkflowHandoffComplete({
+        patientName: `${routeResult.patient.firstName} ${routeResult.patient.lastName}`.trim(),
+        nextRoute: routeResult.nextRoute,
+        onNavigate: profileNavigate,
+      });
       onAdded(routeResult.patient);
+      profileNavigate(routeResult.nextRoute);
       onClose();
     } catch (error: any) {
       setSubmitError(

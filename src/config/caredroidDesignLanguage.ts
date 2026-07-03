@@ -211,14 +211,44 @@ export const CDL_ROLE_DENSITY = Object.freeze({
   public_display: 'public-aggregate',
 });
 
+/** Responsive grid presets — use with `.cdl-grid` + modifier class. */
+export const CDL_GRID = Object.freeze({
+  base: 'cdl-grid',
+  metrics: 'cdl-grid cdl-grid--metrics',
+  cards: 'cdl-grid cdl-grid--cards',
+  split: 'cdl-grid cdl-grid--split',
+  tools: 'cdl-grid cdl-grid--tools',
+});
+
+/** Typography utility classes for operational scan hierarchy. */
+export const CDL_TYPOGRAPHY = Object.freeze({
+  display: 'cdl-type-display',
+  heading: 'cdl-type-heading',
+  subheading: 'cdl-type-subheading',
+  eyebrow: 'cdl-type-eyebrow',
+  muted: 'cdl-type-muted',
+  mono: 'cdl-type-mono',
+});
+
+/** Shell class registry — one language across ED, entry, and display contexts. */
+export const CDL_SHELL = Object.freeze({
+  base: 'cdl-shell',
+  emergency: 'emergency-app-shell cdl-shell',
+  entry: 'cdl-shell cdl-shell--entry',
+  display: 'cdl-shell cdl-shell--display',
+  publicPage: 'cdl-public-page',
+});
+
 export const CDL_FOUNDATION = Object.freeze({
   spacing: DESIGN_SPACING,
   typography: DESIGN_TYPOGRAPHY,
   elevation: DESIGN_ELEVATION,
   breakpoints: DESIGN_BREAKPOINTS_PX,
   cssEntry: 'src/styles/caredroid-design-language.css',
+  applicationSweep: 'src/styles/cdl-unified-application.css',
   pageShellClass: 'cd-page-shell',
   operationalPageClass: 'cdl-operational-page',
+  publicPageClass: 'cdl-public-page',
 });
 
 /** Reusable component class prefixes governed by CDL. */

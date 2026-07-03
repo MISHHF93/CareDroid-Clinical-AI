@@ -1,0 +1,99 @@
+.operational-diagnostics-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.operational-diagnostics-panel__header h2 {
+  margin: 0 0 0.35rem;
+  font-size: 1.05rem;
+}
+
+.operational-diagnostics-panel__header p {
+  margin: 0;
+  color: var(--cd-text-muted, #5f6b7a);
+  font-size: 0.9rem;
+}
+
+.operational-diagnostics-panel__metrics {
+  margin-bottom: 0.25rem;
+}
+
+.operational-diagnostics-panel__grid {
+  align-items: stretch;
+}
+
+.operational-diagnostics-panel__table-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-height: 12rem;
+}
+
+.operational-diagnostics-panel__table-card h3 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.operational-diagnostics-panel__empty {
+  margin: 0;
+  color: var(--cd-text-muted, #5f6b7a);
+  font-size: 0.85rem;
+}
+
+.operational-diagnostics-panel__table-wrap {
+  overflow: auto;
+}
+
+.operational-diagnostics-panel__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.operational-diagnostics-panel__table th,
+.operational-diagnostics-panel__table td {
+  padding: 0.35rem 0.5rem;
+  border-bottom: 1px solid var(--cd-border-subtle, rgba(0, 0, 0, 0.08));
+  text-align: left;
+  vertical-align: top;
+}
+
+.operational-diagnostics-panel__table th {
+  font-weight: 600;
+  color: var(--cd-text-muted, #5f6b7a);
+}
+
+.operational-diagnostics-panel__trace-lookup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.operational-diagnostics-panel__trace-lookup h3 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.operational-diagnostics-panel__trace-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.operational-diagnostics-panel__trace-form input {
+  flex: 1 1 16rem;
+  min-width: 12rem;
+  padding: 0.4rem 0.55rem;
+  border: 1px solid var(--cd-border-subtle, rgba(0, 0, 0, 0.12));
+  border-radius: 0.4rem;
+  font: inherit;
+}
+
+.operational-diagnostics-panel__trace-output {
+  margin: 0;
+  max-height: 14rem;
+  overflow: auto;
+  font-size: 0.75rem;
+}

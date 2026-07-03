@@ -53,7 +53,7 @@ const appConfig = {
     deployment: {
       id: getEnvValue('VITE_DEPLOYMENT_ID', ''),
       region: getEnvValue('VITE_DEPLOYMENT_REGION', ''),
-      commit: getEnvValue('VITE_GIT_COMMIT', ''),
+      commit: getEnvValue('VITE_GIT_COMMIT', getEnvValue('VITE_GIT_COMMIT_SHA', '')),
       branch: getEnvValue('VITE_GIT_BRANCH', ''),
       deployedAt: getEnvValue('VITE_DEPLOYED_AT', getEnvValue('VITE_APP_BUILD_DATE', '')),
     },

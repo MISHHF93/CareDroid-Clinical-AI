@@ -8,7 +8,7 @@ import {
   type ReactNode,
 } from 'react';
 
-export type HelpHubTab = 'page' | 'role' | 'process' | 'topics' | 'shortcuts';
+export type HelpHubTab = 'page' | 'role' | 'process' | 'topics' | 'shortcuts' | 'reference';
 
 type HelpHubState = {
   open: boolean;

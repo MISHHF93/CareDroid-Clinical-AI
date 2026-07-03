@@ -2,6 +2,7 @@ export { AIConfidenceBadge, confidenceTone, normalizeConfidence } from './AIConf
 export { AIInsightPanel } from './AIInsightPanel';
 export { AIReasoningList } from './AIReasoningList';
 export { AIChiefRecommendationCard, AIRecommendationCard } from './AIRecommendationCard';
+export { default as AiChiefOrchestrationBar } from './AiChiefOrchestrationBar';
 export { ClinicalSafetyNotice } from './ClinicalSafetyNotice';
 export { MissingDataAlert } from './MissingDataAlert';
 export { OverrideActionButtons } from './OverrideActionButtons';

@@ -12,7 +12,7 @@ type DisplayShellProps = Readonly<{
  */
 export function DisplayShell({ children }: DisplayShellProps) {
   return (
-    <div className="display-shell" data-care-surface="display">
+    <div className="display-shell cdl-shell cdl-shell--display" data-care-surface="display">
       <header className="display-shell__brand" aria-label="CareDroid display">
         <span className="display-shell__title">{EMERGENCY_OS_BRANDING.productName}</span>
         <span className="display-shell__subtitle">{EMERGENCY_OS_BRANDING.platformLine}</span>
