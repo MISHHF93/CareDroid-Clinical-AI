@@ -189,8 +189,8 @@ export const DEFAULT_AI_RAG_CONFIG: AIRagConfig = Object.freeze({
     namespace: 'medical-docs',
   },
   embeddings: {
-    model: 'local-deterministic-embedding',
-    dimension: 1536,
+    model: 'Xenova/all-mpnet-base-v2',
+    dimension: 768,
     batchSize: 100,
   },
   chunking: {

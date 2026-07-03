@@ -1,6 +1,7 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Pinecone, Index, RecordMetadata } from '@pinecone-database/pinecone';
+import { join } from 'path';
 import {
   IVectorDatabase,
   VectorRecord,
@@ -10,6 +11,7 @@ import {
   VectorMatch,
 } from './vector-db.interface';
 import { ChunkMetadata } from '../dto/rag-context.dto';
+import { InMemoryVectorStore } from './in-memory-vector.store';
 
 /**
  * Pinecone Vector Database Service
@@ -27,6 +29,8 @@ export class PineconeService implements IVectorDatabase, OnModuleInit {
   private dimension: number;
   private namespace: string;
   private initialized = false;
+  private useInMemory = false;
+  private inMemoryStore: InMemoryVectorStore | null = null;
 
   constructor(private readonly configService: ConfigService) {
     const ragConfig = this.configService.get<any>('rag');
@@ -55,14 +59,22 @@ export class PineconeService implements IVectorDatabase, OnModuleInit {
       const apiKey = pineconeConfig.apiKey;
 
       if (!apiKey) {
-        const message =
-          'PINECONE_API_KEY is not configured. Vector database functionality will be disabled.';
-        if (process.env.NODE_ENV === 'development') {
-          this.logger.debug('RAG vector search disabled in local dev (PINECONE_API_KEY not set).');
-        } else {
-          this.logger.warn(message);
-        }
-        return; // Optional for development
+        const persistPath =
+          process.env.RAG_LOCAL_INDEX_PATH ||
+          join(process.cwd(), '.rag-local', 'vectors.json');
+        this.inMemoryStore = new InMemoryVectorStore(
+          this.dimension,
+          'in-memory-local',
+          persistPath,
+        );
+        await this.inMemoryStore.loadFromDisk();
+        this.useInMemory = true;
+        this.initialized = true;
+        const stats = await this.inMemoryStore.getStats();
+        this.logger.log(
+          `RAG using in-memory vector store (${stats.totalVectors} vectors) — set PINECONE_API_KEY for Pinecone.`,
+        );
+        return;
       }
 
       this.logger.log('Initializing Pinecone client...');
@@ -93,9 +105,16 @@ export class PineconeService implements IVectorDatabase, OnModuleInit {
   /**
    * Query the vector database with a query embedding
    */
+  isInMemoryMode(): boolean {
+    return this.useInMemory;
+  }
+
   async query(queryVector: number[], options: VectorQueryOptions): Promise<QueryResult> {
     if (!this.initialized) {
       await this.initialize();
+    }
+    if (this.useInMemory && this.inMemoryStore) {
+      return this.inMemoryStore.query(queryVector, options);
     }
 
     const startTime = Date.now();
@@ -162,6 +181,11 @@ export class PineconeService implements IVectorDatabase, OnModuleInit {
       return;
     }
 
+    if (this.useInMemory && this.inMemoryStore) {
+      await this.inMemoryStore.upsertBatch(records);
+      return;
+    }
+
     try {
       // Convert to Pinecone format
       const vectors = records.map((record) => ({
@@ -201,6 +225,11 @@ export class PineconeService implements IVectorDatabase, OnModuleInit {
       return;
     }
 
+    if (this.useInMemory && this.inMemoryStore) {
+      await this.inMemoryStore.delete(ids);
+      return;
+    }
+
     try {
       await this.getIndexClient().deleteMany(ids);
       this.logger.log(`Deleted ${ids.length} vectors`);
@@ -219,6 +248,11 @@ export class PineconeService implements IVectorDatabase, OnModuleInit {
       await this.initialize();
     }
 
+    if (this.useInMemory && this.inMemoryStore) {
+      await this.inMemoryStore.deleteByFilter(filter);
+      return;
+    }
+
     try {
       const pineconeFilter = this.buildFilter(filter);
       await this.getIndexClient().deleteMany(pineconeFilter);
@@ -234,6 +268,10 @@ export class PineconeService implements IVectorDatabase, OnModuleInit {
    * Get statistics about the index
    */
   async getStats(): Promise<IndexStats> {
+    if (this.useInMemory && this.inMemoryStore) {
+      return this.inMemoryStore.getStats();
+    }
+
     if (!this.initialized && !this.index) {
       throw new Error('Pinecone not initialized');
     }
@@ -260,6 +298,10 @@ export class PineconeService implements IVectorDatabase, OnModuleInit {
    * Check if the vector database is healthy and responsive
    */
   async healthCheck(): Promise<boolean> {
+    if (this.useInMemory && this.inMemoryStore) {
+      return this.inMemoryStore.healthCheck();
+    }
+
     try {
       await this.getStats();
       return true;

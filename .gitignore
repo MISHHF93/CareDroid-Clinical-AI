@@ -28,6 +28,9 @@ dist-ssr
 
 .env
 
+# Local RAG in-memory vector index (dev)
+backend/.rag-local/
+
 # Local databases and Python cache artifacts
 *.sqlite
 *.sqlite-*

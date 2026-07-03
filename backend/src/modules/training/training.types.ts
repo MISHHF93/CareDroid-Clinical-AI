@@ -3,6 +3,7 @@ export type TrainingStageId =
   | 'cleaning'
   | 'labeling'
   | 'embeddings'
+  | 'intent_routing'
   | 'lora_tuning'
   | 'evaluation'
   | 'deployment';

@@ -1,12 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createHash } from 'crypto';
+import { embedTextWithXenova, resolveXenovaModel } from './xenova-embeddings.util';
 
 /**
- * Embeddings Service
- *
- * Generates deterministic local embeddings for semantic search without creating
- * a second external AI API client.
+ * Embedding provider for RAG retrieval.
+ * Supports Xenova semantic embeddings (default), legacy hash vectors, and OpenAI when configured.
  */
 
 @Injectable()
@@ -51,7 +50,7 @@ export class OpenAIEmbeddingsService {
 
   private async fetchEmbedding(text: string, cacheKey: string): Promise<number[]> {
     try {
-      const embedding = this.generateLocalEmbedding(text);
+      const embedding = await this.generateEmbedding(text);
       this.embeddingCache.set(cacheKey, {
         value: embedding,
         expiresAt: Date.now() + this.cacheTtlMs,
@@ -112,8 +111,8 @@ export class OpenAIEmbeddingsService {
           `Processing embedding batch ${i + 1}/${batches.length} (${batch.length} texts)`,
         );
 
-        batch.forEach(([cacheKey, entry]) => {
-          const embedding = this.generateLocalEmbedding(entry.text);
+        for (const [cacheKey, entry] of batch) {
+          const embedding = await this.generateEmbedding(entry.text);
           this.embeddingCache.set(cacheKey, {
             value: embedding,
             expiresAt: Date.now() + this.cacheTtlMs,
@@ -121,7 +120,7 @@ export class OpenAIEmbeddingsService {
           for (const originalIndex of entry.indexes) {
             results[originalIndex] = [...embedding];
           }
-        });
+        }
       }
 
       return results;
@@ -166,7 +165,34 @@ export class OpenAIEmbeddingsService {
     }
   }
 
-  private generateLocalEmbedding(text: string): number[] {
+  private usesXenova(): boolean {
+    const normalized = this.model.toLowerCase();
+    return (
+      normalized.includes('xenova') ||
+      normalized.includes('mpnet') ||
+      normalized.includes('minilm') ||
+      normalized === 'semantic-local'
+    );
+  }
+
+  private async generateEmbedding(text: string): Promise<number[]> {
+    if (this.usesXenova()) {
+      const vector = await embedTextWithXenova(text, resolveXenovaModel(this.model));
+      if (vector.length !== this.dimension) {
+        return this.fitDimension(vector);
+      }
+      return vector;
+    }
+    return this.generateHashEmbedding(text);
+  }
+
+  private fitDimension(vector: number[]): number[] {
+    if (vector.length === this.dimension) return vector;
+    if (vector.length > this.dimension) return vector.slice(0, this.dimension);
+    return [...vector, ...new Array(this.dimension - vector.length).fill(0)];
+  }
+
+  private generateHashEmbedding(text: string): number[] {
     const vector = new Array(this.dimension).fill(0);
     const tokens = String(text || '')
       .toLowerCase()

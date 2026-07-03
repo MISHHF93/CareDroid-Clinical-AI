@@ -103,6 +103,7 @@
     "smoke": "node scripts/print-smoke-checklist.mjs",
     "verify:stack": "node scripts/verify-stack-connection.mjs",
     "verify:ai-stack": "node scripts/verify-ai-stack.mjs",
+    "verify:rag": "node scripts/verify-rag.mjs",
     "lint": "eslint src",
     "lint:all": "npm run lint && cd backend && npm run lint",
     "format": "prettier --write \"src/**/*.{js,jsx,json,css}\"",

@@ -7,25 +7,32 @@ import { registerAs } from '@nestjs/config';
  * Includes settings for vector database, embeddings, and chunking.
  */
 
+const defaultEmbeddingModel =
+  process.env.RAG_MODEL ||
+  process.env.EMBEDDING_MODEL ||
+  process.env.AI_EMBEDDING_MODEL ||
+  'Xenova/all-mpnet-base-v2';
+
 export default registerAs('rag', () => ({
   enabled: process.env.RAG_ENABLED !== 'false',
+  autoBootstrapCorpus: process.env.RAG_AUTO_BOOTSTRAP_CORPUS !== 'false',
   /**
-   * Pinecone Configuration
+   * Pinecone Configuration (falls back to in-memory local store when API key is absent)
    */
   pinecone: {
     apiKey: process.env.PINECONE_API_KEY,
-    indexName: process.env.PINECONE_INDEX_NAME || 'caredroid-medical',
-    dimension: parseInt(process.env.PINECONE_DIMENSION || '1536', 10),
-    environment: process.env.PINECONE_ENVIRONMENT || 'gcp-starter',
-    namespace: process.env.PINECONE_NAMESPACE || '',
+    indexName: process.env.PINECONE_INDEX_NAME || 'caredroid-medical-knowledge',
+    dimension: parseInt(process.env.PINECONE_DIMENSION || process.env.EMBEDDING_DIMENSION || '768', 10),
+    environment: process.env.PINECONE_ENVIRONMENT || 'us-east-1-aws',
+    namespace: process.env.PINECONE_NAMESPACE || 'medical-docs',
   },
 
   /**
    * Embeddings Configuration
    */
   embeddings: {
-    model: process.env.RAG_MODEL || process.env.EMBEDDING_MODEL || 'local-deterministic-embedding',
-    dimension: parseInt(process.env.EMBEDDING_DIMENSION || '1536', 10),
+    model: defaultEmbeddingModel,
+    dimension: parseInt(process.env.EMBEDDING_DIMENSION || '768', 10),
     batchSize: parseInt(process.env.EMBEDDING_BATCH_SIZE || '100', 10),
   },
 

@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { RAGService } from './rag.service';
+import { RAGController } from './rag.controller';
 import { OpenAIEmbeddingsService } from './embeddings/openai-embeddings.service';
 import { PineconeService } from './vector-db/pinecone.service';
 import { CohereRankerService } from './reranking/cohere-ranker.service';
@@ -16,13 +17,13 @@ import { CitationService } from './citation.service';
  * RAG Module
  *
  * Provides Retrieval-Augmented Generation capabilities using:
- * - OpenAI embeddings for semantic encoding
- * - Pinecone vector database for similarity search
+ * - Xenova semantic embeddings (default) with optional Pinecone or in-memory local store
  * - Document chunking for optimal retrieval
  */
 
 @Module({
   imports: [ConfigModule, MetricsModule, CacheModule],
+  controllers: [RAGController],
   providers: [
     RAGService,
     EmbeddingService,

@@ -108,7 +108,7 @@ const buildStackEnv = (frontendPort, backendPort) => {
     NLU_SERVICE_MODE: 'in-process',
     NLU_SERVICE_ENABLED: 'true',
     ANOMALY_DETECTION_ENABLED: 'false',
-    RAG_ENABLED: 'false',
+    RAG_ENABLED: 'true',
     AI_ENABLED: 'false',
     REDIS_ENABLED: 'false',
     REDIS_HOST: '',

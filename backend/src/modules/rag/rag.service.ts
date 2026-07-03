@@ -1,6 +1,9 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { existsSync, readFileSync, readdirSync } from 'fs';
+import { basename, join } from 'path';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PineconeService } from './vector-db/pinecone.service';
+import { ToolMetricsService } from '../metrics/tool-metrics.service';
 import { DocumentChunker } from './utils/document-chunker';
 import { RAGContext, RAGRetrievalOptions } from './dto/rag-context.dto';
 import { IngestDocumentDto } from './dto/medical-source.dto';
@@ -19,10 +22,11 @@ import { CitationService } from './citation.service';
  */
 
 @Injectable()
-export class RAGService {
+export class RAGService implements OnModuleInit {
   private readonly logger = new Logger(RAGService.name);
   private documentChunker: DocumentChunker;
   private readonly enabled: boolean;
+  private readonly autoBootstrapCorpus: boolean;
   private readonly defaultTopK: number;
   private readonly defaultMinScore: number;
   private corpusVersion = 1;
@@ -35,9 +39,11 @@ export class RAGService {
     private readonly citationService: CitationService,
     private readonly vectorDb: PineconeService,
     private readonly configService: ConfigService,
+    private readonly toolMetrics: ToolMetricsService,
   ) {
     const ragConfig = this.configService.get<any>('rag') || {};
     this.enabled = ragConfig?.enabled !== false;
+    this.autoBootstrapCorpus = ragConfig?.autoBootstrapCorpus !== false;
 
     // Wire RAG configuration parameters
     const chunkingConfig = ragConfig.chunking || {};
@@ -53,6 +59,26 @@ export class RAGService {
     this.logger.log(
       `RAG configured: topK=${this.defaultTopK}, minScore=${this.defaultMinScore}, chunkSize=${chunkSize}, overlap=${chunkOverlap}`,
     );
+  }
+
+  async onModuleInit(): Promise<void> {
+    if (!this.enabled || !this.autoBootstrapCorpus) {
+      return;
+    }
+
+    try {
+      await this.vectorDb.initialize();
+      if (!this.vectorDb.isInMemoryMode()) {
+        return;
+      }
+
+      const stats = await this.vectorDb.getStats();
+      if (stats.totalVectors > 0) return;
+      await this.bootstrapStarterCorpus();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.warn(`RAG corpus bootstrap skipped: ${message}`);
+    }
   }
 
   /**
@@ -110,6 +136,11 @@ export class RAGService {
       this.logger.log(
         `Retrieved ${context.chunks.length} chunks from ${context.sources.length} sources (confidence: ${context.confidence.toFixed(2)}, latency: ${latencyMs}ms)`,
       );
+
+      this.toolMetrics.recordRagRetrieval(context.chunks.length);
+      for (const chunk of context.chunks) {
+        this.toolMetrics.recordRagRelevanceScore(chunk.score);
+      }
 
       return context;
     } catch (error) {
@@ -272,6 +303,7 @@ export class RAGService {
    */
   async healthCheck(): Promise<{
     healthy: boolean;
+    mode: 'disabled' | 'in-memory' | 'pinecone';
     components: {
       embeddings: boolean;
       vectorDb: boolean;
@@ -280,6 +312,7 @@ export class RAGService {
     if (!this.enabled) {
       return {
         healthy: true,
+        mode: 'disabled',
         components: {
           embeddings: true,
           vectorDb: true,
@@ -294,11 +327,52 @@ export class RAGService {
 
     return {
       healthy: embeddingsHealthy && vectorDbHealthy,
+      mode: this.vectorDb.isInMemoryMode() ? 'in-memory' : 'pinecone',
       components: {
         embeddings: embeddingsHealthy,
         vectorDb: vectorDbHealthy,
       },
     };
+  }
+
+  private resolveCorpusDirectory(): string | null {
+    const candidates = [
+      join(process.cwd(), 'data', 'medical-knowledge'),
+      join(process.cwd(), '..', 'data', 'medical-knowledge'),
+    ];
+    return candidates.find((dir) => existsSync(dir)) ?? null;
+  }
+
+  private async bootstrapStarterCorpus(): Promise<void> {
+    const corpusDir = this.resolveCorpusDirectory();
+    if (!corpusDir) {
+      this.logger.warn('Starter RAG corpus directory not found (data/medical-knowledge).');
+      return;
+    }
+
+    const files = readdirSync(corpusDir).filter((name) => /\.(md|txt)$/i.test(name));
+    if (files.length === 0) return;
+
+    this.logger.log(`Bootstrapping RAG corpus from ${files.length} file(s) in ${corpusDir}`);
+    let totalChunks = 0;
+
+    for (const fileName of files) {
+      const filePath = join(corpusDir, fileName);
+      const content = readFileSync(filePath, 'utf8');
+      const result = await this.ingest({
+        source: {
+          id: fileName.replace(/\.[^.]+$/, '').toLowerCase(),
+          title: basename(fileName).replace(/\.[^.]+$/, ''),
+          type: 'guideline',
+          organization: 'CareDroid Reference Corpus',
+          specialty: 'emergency medicine',
+        },
+        content,
+      });
+      totalChunks += result.chunksIngested;
+    }
+
+    this.logger.log(`RAG starter corpus ready (${totalChunks} chunks ingested).`);
   }
 
   /**
