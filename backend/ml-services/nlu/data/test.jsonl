@@ -1,9 +1,31 @@
-{"text": "What are the risk factors for stroke?", "intent": "general_query"}
-{"text": "Calculate mortality risk using SOFA", "intent": "clinical_tool"}
-{"text": "Standard protocol for code blue response", "intent": "protocol_search"}
-{"text": "Explain elevated D-dimer results", "intent": "lab_query"}
-{"text": "Configure system security parameters", "intent": "admin_function"}
-{"text": "General information about heart failure", "intent": "general_query"}
-{"text": "Respiratory failure, unable to maintain oxygenation", "intent": "emergency", "subcategory": "respiratory"}
-{"text": "Get patient vital signs trend", "intent": "patient_data"}
-{"text": "Calculate risk scores using available tools", "intent": "clinical_tool"}
+{"text":"What's the difference between type 1 and type 2 diabetes?","intent":"general_clinical_query"}
+{"text":"What medical schools teach this condition?","intent":"general_clinical_query"}
+{"text":"What are the symptoms of acute coronary syndrome?","intent":"general_clinical_query"}
+{"text":"What does a low hemoglobin and hematocrit indicate?","intent":"lab_interpretation"}
+{"text":"Interpret ABG values: pH 7.28, pCO2 50, pO2 60","intent":"lab_interpretation"}
+{"text":"Explain the significance of elevated BNP levels","intent":"lab_interpretation"}
+{"text":"Can you explain these abnormal lab findings?","intent":"lab_interpretation"}
+{"text":"Does adding spironolactone pose a risk with this patient's ACE inhibitor?","intent":"drug_interaction_check"}
+{"text":"What happens if this patient takes both ACE inhibitors and potassium supplements?","intent":"drug_interaction_check"}
+{"text":"Double check compatibility of these IV medications","intent":"drug_interaction_check"}
+{"text":"Third-degree AV block with hemodynamic compromise","intent":"emergency_alert","subcategory":"cardiac"}
+{"text":"Severe burn injury, airway compromise","intent":"emergency_alert","subcategory":"trauma"}
+{"text":"Penetrating chest trauma with hemodynamic instability","intent":"emergency_alert","subcategory":"trauma"}
+{"text":"Determine this patient's respiratory SOFA subscore","intent":"sofa_score_calculation"}
+{"text":"Score this patient's sepsis severity using SOFA criteria","intent":"sofa_score_calculation"}
+{"text":"Assess organ dysfunction score for ICU admission","intent":"sofa_score_calculation"}
+{"text":"Institutional antibiotic protocol for pneumonia","intent":"clinical_guideline_lookup"}
+{"text":"Look up the guideline for managing acute exacerbation of asthma","intent":"clinical_guideline_lookup"}
+{"text":"What's the recommended protocol for DKA management?","intent":"clinical_guideline_lookup"}
+{"text":"Check the patient's intake and output for today","intent":"patient_status_update"}
+{"text":"Check on the patient's current clinical status","intent":"patient_status_update"}
+{"text":"Give me a status summary for this admission","intent":"patient_status_update"}
+{"text":"Arrange transportation for this patient's discharge","intent":"discharge_planning"}
+{"text":"Is this patient a candidate for early discharge?","intent":"discharge_planning"}
+{"text":"Schedule the follow-up appointment before discharge","intent":"discharge_planning"}
+{"text":"Start empiric antibiotics for suspected sepsis","intent":"medication_order"}
+{"text":"Prescribe a PRN order for breakthrough pain","intent":"medication_order"}
+{"text":"Start broad-spectrum antibiotics pending culture results","intent":"medication_order"}
+{"text":"Assess this patient's history for possible autoimmune disease","intent":"diagnosis_support"}
+{"text":"What conditions should be ruled out for this chest pain presentation?","intent":"diagnosis_support"}
+{"text":"What's the differential for acute kidney injury in this case?","intent":"diagnosis_support"}

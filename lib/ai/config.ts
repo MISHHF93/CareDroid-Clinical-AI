@@ -212,7 +212,8 @@ export const DEFAULT_AI_RAG_CONFIG: AIRagConfig = Object.freeze({
 
 export const DEFAULT_AI_NLU_CONFIG: AINluConfig = Object.freeze({
   enabled: true,
-  url: 'http://localhost:8001',
+  // In-process TypeScript NLU at /api/nlu on the Nest backend (no Python sidecar).
+  url: 'http://127.0.0.1:3340/api/nlu',
   timeoutMs: 30000,
   retries: 3,
   confidenceThreshold: 0.7,

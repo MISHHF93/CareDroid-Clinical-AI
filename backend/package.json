@@ -30,7 +30,13 @@
     "migration:generate": "typeorm-ts-node-commonjs -d src/data-source.ts migration:generate",
     "migration:run": "typeorm-ts-node-commonjs -d src/data-source.ts migration:run",
     "migration:revert": "typeorm-ts-node-commonjs -d src/data-source.ts migration:revert",
-    "ingest": "ts-node scripts/ingest-documents.ts"
+    "ingest": "ts-node scripts/ingest-documents.ts",
+    "nlu:prepare-data": "ts-node ml-services/nlu/scripts/prepareData.ts",
+    "nlu:train": "ts-node ml-services/nlu/scripts/train.ts",
+    "nlu:evaluate": "ts-node ml-services/nlu/scripts/evaluate.ts",
+    "nlu:load-test": "ts-node ml-services/nlu/scripts/loadTest.ts",
+    "nlu:cross-validate": "ts-node ml-services/nlu/scripts/crossValidate.ts",
+    "nlu:pipeline": "npm run nlu:prepare-data && npm run nlu:train && npm run nlu:evaluate"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
@@ -46,6 +52,7 @@
     "@nestjs/typeorm": "^10.0.1",
     "@pinecone-database/pinecone": "^6.1.4",
     "@sentry/node": "^7.91.0",
+    "@xenova/transformers": "^2.17.2",
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
@@ -123,7 +130,8 @@
     "rootDir": ".",
     "roots": [
       "src",
-      "test"
+      "test",
+      "ml-services"
     ],
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {

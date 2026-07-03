@@ -6,6 +6,7 @@
   },
   "include": [
     "src/**/*",
+    "ml-services/**/*",
     "../lib/**/*",
     "../src/types/**/*",
     "../types/**/*",

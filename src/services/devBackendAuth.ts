@@ -68,16 +68,17 @@ export function readDevTenantContext() {
   }
 }
 
-/**
- * In local dev, replace the static bypass token with a real backend JWT + tenant context.
- * Safe no-op when not in dev or when a JWT is already stored.
- *
- * Falls back to the local bypass token only when the proxied dev-session route is unreachable.
- */
-export async function ensureDevBackendSession({
+type DevBackendSessionResult = Awaited<ReturnType<typeof resolveDevBackendSession>>;
+
+let inFlightDevSession: Promise<DevBackendSessionResult> | null = null;
+
+async function resolveDevBackendSession({
   force = false,
   timeoutMs = DEV_SESSION_FETCH_TIMEOUT_MS,
-}: any = {}) {
+}: {
+  force?: boolean;
+  timeoutMs?: number;
+} = {}) {
   if (!isDev) return { token: readStoredToken(), source: 'production' };
 
   const existingToken = readStoredToken();
@@ -133,4 +134,31 @@ export async function ensureDevBackendSession({
       error: message,
     };
   }
+}
+
+/**
+ * In local dev, replace the static bypass token with a real backend JWT + tenant context.
+ * Safe no-op when not in dev or when a JWT is already stored.
+ *
+ * Falls back to the local bypass token only when the proxied dev-session route is unreachable.
+ * Concurrent callers share one in-flight request so UserContext and AppShell do not double-fetch.
+ */
+export async function ensureDevBackendSession({
+  force = false,
+  timeoutMs = DEV_SESSION_FETCH_TIMEOUT_MS,
+}: {
+  force?: boolean;
+  timeoutMs?: number;
+} = {}) {
+  if (force) {
+    inFlightDevSession = null;
+  }
+
+  if (!inFlightDevSession) {
+    inFlightDevSession = resolveDevBackendSession({ force, timeoutMs }).finally(() => {
+      inFlightDevSession = null;
+    });
+  }
+
+  return inFlightDevSession;
 }

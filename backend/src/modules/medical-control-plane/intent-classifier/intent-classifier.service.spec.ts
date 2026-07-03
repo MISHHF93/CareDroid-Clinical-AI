@@ -3,7 +3,7 @@
  *
  * Tests the 3-phase intent classification pipeline:
  * - Phase 1: Keyword matching
- * - Phase 2: NLU model (mocked, not yet implemented)
+ * - Phase 2: NLU model (in-process NluService mock)
  * - Phase 3: LLM fallback
  *
  * Critical requirement: 100% recall for emergency detection
@@ -14,6 +14,7 @@ import { IntentClassifierService } from './intent-classifier.service';
 import { AIService } from '../../ai/ai.service';
 import { ConfigService } from '@nestjs/config';
 import { NluMetricsService } from '../../metrics/nlu-metrics.service';
+import { NluService } from '../../../../ml-services/nlu/nlu.service';
 import { PrimaryIntent, EmergencySeverity } from './dto/intent-classification.dto';
 
 describe('IntentClassifierService', () => {
@@ -26,7 +27,16 @@ describe('IntentClassifierService', () => {
   };
 
   const mockConfigService = {
-    get: jest.fn().mockReturnValue('http://localhost:8001'),
+    get: jest.fn().mockReturnValue({
+      enabled: true,
+      mode: 'in-process',
+      url: 'http://127.0.0.1:3340/api/nlu',
+    }),
+  };
+
+  const mockNluService = {
+    load: jest.fn().mockResolvedValue(undefined),
+    predict: jest.fn().mockRejectedValue(new Error('NLU unavailable')),
   };
 
   const mockNluMetricsService = {
@@ -53,6 +63,10 @@ describe('IntentClassifierService', () => {
         {
           provide: NluMetricsService,
           useValue: mockNluMetricsService,
+        },
+        {
+          provide: NluService,
+          useValue: mockNluService,
         },
       ],
     }).compile();
@@ -303,30 +317,29 @@ describe('IntentClassifierService', () => {
   // ========================================
   describe('NLU Integration (Phase 2)', () => {
     it('should use NLU result when confidence is high', async () => {
-      (global as unknown as { fetch?: jest.Mock }).fetch = jest.fn().mockResolvedValue({
-        ok: true,
-        json: async () => ({
-          intent: 'clinical_tool',
-          confidence: 0.92,
-          toolId: 'sofa-calculator',
-          parameters: {},
-        }),
+      mockNluService.predict.mockResolvedValueOnce({
+        intent: 'sofa_score_calculation',
+        confidence: 0.92,
+        labelId: 2,
+        keyTerms: ['sofa'],
+        latencyMs: 5,
       });
 
       const result = await service.classify('Help me with this case');
 
       expect(result.method).toBe('nlu');
       expect(result.primaryIntent).toBe(PrimaryIntent.CLINICAL_TOOL);
+      expect(result.toolId).toBe('sofa_score_calculation');
       expect(result.confidence).toBeGreaterThanOrEqual(0.7);
     });
 
     it('should fall back to LLM when NLU confidence is low', async () => {
-      (global as unknown as { fetch?: jest.Mock }).fetch = jest.fn().mockResolvedValue({
-        ok: true,
-        json: async () => ({
-          intent: 'general_query',
-          confidence: 0.4,
-        }),
+      mockNluService.predict.mockResolvedValueOnce({
+        intent: 'general_clinical_query',
+        confidence: 0.4,
+        labelId: 9,
+        keyTerms: [],
+        latencyMs: 5,
       });
 
       mockAIService.generateStructuredJSON.mockResolvedValue({

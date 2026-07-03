@@ -1,4 +1,6 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, OnModuleInit } from '@nestjs/common';
+import { existsSync, readFileSync } from 'fs';
+import { join } from 'path';
 import { randomUUID } from 'crypto';
 import { MoERouterService } from '../moe-router';
 import {
@@ -21,24 +23,63 @@ const DEFAULT_METRICS: TrainingEvaluationMetrics = {
 };
 
 @Injectable()
-export class TrainingService {
+export class TrainingService implements OnModuleInit {
   private readonly logger = new Logger(TrainingService.name);
   private readonly runs: TrainingRun[] = [
     {
       id: 'training-run-baseline',
-      modelName: 'caredroid-clinical-router',
-      datasetName: 'clinical-intent-eval-v1',
+      modelName: 'caredroid-nlu-intent-classifier',
+      datasetName: 'ml-services/nlu/data',
       currentStage: 'deployment',
       status: 'completed',
       metrics: DEFAULT_METRICS,
-      capabilities: ['prompt_engineering', 'rag', 'moe_routing'],
+      capabilities: ['prompt_engineering', 'moe_routing'],
       createdAt: new Date(Date.now() - 86_400_000).toISOString(),
       updatedAt: new Date(Date.now() - 3_600_000).toISOString(),
-      deploymentTarget: 'assistant-chat',
+      deploymentTarget: 'intent-classifier',
     },
   ];
 
   constructor(private readonly moeRouter: MoERouterService) {}
+
+  onModuleInit(): void {
+    this.syncNluMetricsFromDisk();
+  }
+
+  private syncNluMetricsFromDisk(): void {
+    const metricsPath = join(process.cwd(), 'ml-services', 'nlu', 'metrics.json');
+    if (!existsSync(metricsPath)) return;
+
+    try {
+      const raw = JSON.parse(readFileSync(metricsPath, 'utf8')) as {
+        accuracy?: number;
+        macroPrecision?: number;
+        macroF1?: number;
+        latencyMs?: { mean?: number; p50?: number };
+        testSetSize?: number;
+      };
+
+      const baseline = this.runs.find((run) => run.id === 'training-run-baseline');
+      if (!baseline) return;
+
+      baseline.metrics = {
+        accuracy: raw.accuracy ?? baseline.metrics.accuracy,
+        precision: raw.macroPrecision ?? raw.macroF1 ?? baseline.metrics.precision,
+        hallucinationRate: Math.max(0, 1 - (raw.macroF1 ?? raw.accuracy ?? 0.85)),
+        latencyMs: raw.latencyMs?.p50 ?? raw.latencyMs?.mean ?? baseline.metrics.latencyMs,
+        costUsd: 0,
+      };
+      baseline.datasetName = `nlu-test-${raw.testSetSize ?? 'unknown'}`;
+      baseline.updatedAt = new Date().toISOString();
+      this.logger.log(
+        `Synced NLU training metrics (accuracy=${baseline.metrics.accuracy}, latencyMs=${baseline.metrics.latencyMs})`,
+      );
+    } catch (error) {
+      this.logger.warn(
+        `Unable to read NLU metrics.json: ${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
+  }
 
   getPipeline(): TrainingPipelineStage[] {
     return [
@@ -80,18 +121,20 @@ export class TrainingService {
         supportedCapabilities: ['rag'],
       },
       {
-        id: 'lora_tuning',
-        name: 'LoRA Tuning',
-        description: 'Prepare adapter-tuning jobs and track safe deployment candidates.',
-        status: 'ready',
-        inputs: ['labeled examples'],
-        outputs: ['LoRA adapter candidate', 'training loss report'],
-        supportedCapabilities: ['lora'],
+        id: 'intent_routing',
+        name: 'Intent Routing',
+        description:
+          'Retrain the in-process NLU intent classifier (Xenova embeddings + MLP) for medical control-plane routing.',
+        status: 'completed',
+        inputs: ['labeled intent examples', 'ml-services/nlu/data/*.jsonl'],
+        outputs: ['classifier.json', 'metrics.json'],
+        supportedCapabilities: ['prompt_engineering', 'moe_routing'],
       },
       {
         id: 'evaluation',
         name: 'Evaluation',
-        description: 'Score accuracy, hallucination rate, precision, latency, and cost.',
+        description:
+          'Score LLM output quality (hallucination rate, citation relevance), NLU routing accuracy, latency, and cost.',
         status: 'ready',
         inputs: ['adapter candidate', 'routing plan', 'RAG benchmark set'],
         outputs: ['evaluation metrics', 'quality gates'],

@@ -1,9 +1,25 @@
-{"text": "Generate user activity report", "intent": "admin_function"}
-{"text": "Show patient medical history", "intent": "patient_data"}
-{"text": "Suicidal ideation with active plan", "intent": "emergency", "subcategory": "psychiatric"}
-{"text": "Check for interactions with this medication list", "intent": "clinical_tool"}
-{"text": "What is the normal range for blood pressure?", "intent": "general_query"}
-{"text": "What does elevated lactate mean in this context?", "intent": "lab_query"}
-{"text": "Acute myocardial infarction confirmed, ready for cath lab", "intent": "emergency", "subcategory": "cardiac"}
-{"text": "Show me the ACLS guidelines", "intent": "protocol_search"}
-{"text": "Sepsis management protocol step by step", "intent": "protocol_search"}
+{"text":"How does insulin work in the body?","intent":"general_clinical_query"}
+{"text":"How does the coagulation cascade work?","intent":"general_clinical_query"}
+{"text":"Tell me about diabetes management","intent":"general_clinical_query"}
+{"text":"Interpret this lipid panel for cardiovascular risk","intent":"lab_interpretation"}
+{"text":"Interpret this patient's thyroid panel","intent":"lab_interpretation"}
+{"text":"What is the significance of low platelet count?","intent":"lab_interpretation"}
+{"text":"Can I combine ibuprofen with lisinopril safely?","intent":"drug_interaction_check"}
+{"text":"Does this patient's regimen have any contraindicated combinations?","intent":"drug_interaction_check"}
+{"text":"Multiple trauma from motor vehicle accident","intent":"emergency_alert","subcategory":"trauma"}
+{"text":"Acute aortic dissection with tearing chest pain","intent":"emergency_alert","subcategory":"cardiac"}
+{"text":"Anaphylaxis with airway swelling, epinephrine needed now","intent":"emergency_alert","subcategory":"respiratory"}
+{"text":"Compute the SOFA score from these vitals and labs","intent":"sofa_score_calculation"}
+{"text":"Calculate the SOFA score using these ICU parameters","intent":"sofa_score_calculation"}
+{"text":"Protocol for managing acute renal failure","intent":"clinical_guideline_lookup"}
+{"text":"Advanced cardiac life support guidelines","intent":"clinical_guideline_lookup"}
+{"text":"Look up the sepsis bundle compliance checklist","intent":"clinical_guideline_lookup"}
+{"text":"Export patient labs for last month","intent":"patient_status_update"}
+{"text":"Has the patient's mental status changed since this morning?","intent":"patient_status_update"}
+{"text":"What are the recent values for this patient's labs?","intent":"patient_status_update"}
+{"text":"Prepare discharge instructions for this patient","intent":"discharge_planning"}
+{"text":"Is this patient ready to be discharged home?","intent":"discharge_planning"}
+{"text":"Discontinue the patient's home blood pressure medications","intent":"medication_order"}
+{"text":"Order antiemetics for post-op nausea","intent":"medication_order"}
+{"text":"What's the differential for a patient with hemoptysis?","intent":"diagnosis_support"}
+{"text":"What's the differential for acute onset dyspnea?","intent":"diagnosis_support"}

@@ -14,8 +14,9 @@ services:
       DATABASE_CLIENT: sqlite
       SQLITE_PATH: /data/caredroid.dev.sqlite
       ENABLE_MONGOOSE_EMERGENCY_OS: 'false'
-      NLU_SERVICE_ENABLED: ${NLU_SERVICE_ENABLED:-false}
-      NLU_SERVICE_URL: http://nlu:8001
+      NLU_SERVICE_MODE: ${NLU_SERVICE_MODE:-in-process}
+      NLU_SERVICE_ENABLED: ${NLU_SERVICE_ENABLED:-true}
+      NLU_SERVICE_URL: ${NLU_SERVICE_URL:-http://backend:3000/api/nlu}
       ANOMALY_DETECTION_ENABLED: 'false'
       RAG_ENABLED: 'false'
       AI_ENABLED: ${AI_ENABLED:-false}
@@ -55,32 +56,8 @@ services:
     networks:
       - caredroid-app
 
-  nlu:
-    profiles:
-      - ml
-    build:
-      context: ./backend/ml-services/nlu
-      dockerfile: Dockerfile
-    container_name: caredroid-nlu-app
-    environment:
-      NLU_HOST: 0.0.0.0
-      NLU_PORT: 8001
-      NLU_USE_GPU: 'false'
-      NLU_WORKERS: 2
-      NLU_LOG_LEVEL: info
-      PYTHONUNBUFFERED: 1
-    ports:
-      - '8001:8001'
-    volumes:
-      - nlu_models:/app/models
-      - nlu_cache:/root/.cache/huggingface
-    networks:
-      - caredroid-app
-
 volumes:
   backend_sqlite:
-  nlu_models:
-  nlu_cache:
 
 networks:
   caredroid-app:

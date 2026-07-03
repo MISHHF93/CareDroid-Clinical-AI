@@ -58,15 +58,14 @@ describe('build and service config consistency', () => {
     expect(devStack).toContain('Health:   ${frontendOrigin}/health');
   });
 
-  it('keeps optional ML compose enabling tied to the NLU sidecar profile', () => {
-    const appCompose = read('docker-compose.app.yml');
+  it('keeps optional ML compose enabling in-process NLU on the backend', () => {
     const mlCompose = read('docker-compose.ml.yml');
     const packageJson = read('package.json');
 
-    expect(appCompose).toContain('profiles:');
-    expect(appCompose).toContain('- ml');
+    expect(mlCompose).toContain("NLU_SERVICE_MODE: in-process");
     expect(mlCompose).toContain("NLU_SERVICE_ENABLED: 'true'");
-    expect(mlCompose).toContain('- nlu');
+    expect(mlCompose).toContain('NLU_SERVICE_URL: http://backend:3000/api/nlu');
+    expect(mlCompose).not.toContain('- nlu');
     expect(packageJson).toContain(
       '-f docker-compose.app.yml -f docker-compose.ml.yml --profile ml',
     );
@@ -167,21 +166,20 @@ describe('build and service config consistency', () => {
     expect(viteConfig).toContain('strictPort: true');
   });
 
-  it('normalizes NLU defaults to port 8001', () => {
-    expect(read('backend/.env.example')).toContain('NLU_SERVICE_URL=http://localhost:8001');
-    expect(read('backend/src/config/nlu.config.ts')).toContain('http://localhost:8001');
+  it('normalizes NLU defaults to in-process TypeScript on the Nest backend', () => {
+    expect(read('backend/.env.example')).toContain('NLU_SERVICE_MODE=in-process');
+    expect(read('backend/.env.example')).toContain('NLU_SERVICE_URL=http://127.0.0.1:3340/api/nlu');
+    expect(read('backend/src/config/nlu.config.ts')).toContain("NLU_SERVICE_MODE || 'in-process'");
     expect(read('docker-compose.yml')).toContain(
-      'NLU_SERVICE_URL: ${NLU_SERVICE_URL:-http://nlu:8001}',
+      'NLU_SERVICE_URL: ${NLU_SERVICE_URL:-http://backend:3000/api/nlu}',
     );
+    expect(read('lib/ai/config.ts')).toContain('http://127.0.0.1:3340/api/nlu');
   });
 
-  it('separates backend NLU client threshold from sidecar inference threshold', () => {
+  it('keeps NLU confidence threshold aligned across backend and classifier config', () => {
     expect(read('backend/.env.example')).toContain('NLU_CONFIDENCE_THRESHOLD=0.7');
     expect(read('backend/src/config/nlu.config.ts')).toContain('NLU_CONFIDENCE_THRESHOLD');
-    expect(read('backend/ml-services/nlu/.env.example')).toContain(
-      'NLU_INFERENCE_CONFIDENCE_THRESHOLD=0.5',
-    );
-    expect(read('backend/ml-services/nlu/nlu.config.ts')).toContain('confidenceThreshold: 0.5');
+    expect(read('backend/ml-services/nlu/nlu.config.ts')).toContain('Xenova/all-mpnet-base-v2');
   });
 
   it('provides the root frontend Dockerfile used by docker-compose', () => {

@@ -15,5 +15,5 @@ export const TENANT_CONTEXT_TIMEOUT_MS = 5_000;
 /** Per-dataset cap when hydrating the emergency store from Nest. */
 export const REFRESH_DATASET_TIMEOUT_MS = 4_000;
 
-/** Tighter cap for reception-first startup (whiteboard + EMS + queues + capacity). */
-export const RECEPTION_DATASET_TIMEOUT_MS = 3_500;
+/** Tighter cap for reception-first startup (whiteboard + bundled reception snapshot). */
+export const RECEPTION_DATASET_TIMEOUT_MS = 2_500;

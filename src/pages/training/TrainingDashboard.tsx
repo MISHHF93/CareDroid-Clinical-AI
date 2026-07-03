@@ -115,10 +115,10 @@ export default function TrainingDashboard() {
   return (
     <CareDroidPage
       className="training-dashboard"
-      eyebrow="AI assistance"
-      title="Training Dashboard"
+      eyebrow="AI operations"
+      title="AI Operations Dashboard"
       titleId="training-dashboard-title"
-      description="Manage data preparation, labeling, embeddings, LoRA tuning, evaluation, and deployment for prompt engineering, RAG, LoRA, and MoE routing."
+      description="Track LLM application engineering: prompt versioning, RAG corpus quality, intent-routing metrics, safety evals, and deployment gates. Primary models are hosted (Claude via API); NLU intent routing retrains via backend npm run nlu:pipeline."
       leadingIcon={<NavIcon icon={CHROME_ICONS.brain} size={30} />}
       actions={
         <button type="button" className="cd-btn cd-btn--primary cd-btn--sm" onClick={handleCreateRun} disabled={creating}>

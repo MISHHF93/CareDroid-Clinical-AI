@@ -367,24 +367,33 @@ Full config reference: `readRagConfig()` in [`lib/ai/config.ts`](../lib/ai/confi
 
 ---
 
-## 8. NLU microservice
+## 8. NLU intent classifier (in-process TypeScript)
 
-An optional external Python NLU microservice provides intent classification and entity extraction beyond what the language model handles inline.
+CareDroid does **not** run a separate Python NLU sidecar. Intent routing for the medical control plane uses a small **TypeScript classifier** embedded in the Nest backend at `/api/nlu`:
+
+- **Embeddings:** `Xenova/all-mpnet-base-v2` (frozen, via `@xenova/transformers`)
+- **Head:** MLP softmax over 10 clinical intent classes
+- **Training:** `cd backend && npm run nlu:pipeline` (prepare → train → evaluate)
+- **Fallback:** Rule-based keyword classifier when no trained weights are on disk
+
+This is **intent routing only** — not a foundation model. Primary clinical reasoning uses **Anthropic Claude** (`claude-sonnet-4-6`) plus **RAG** (Pinecone) and deterministic safety rules.
 
 | Parameter | Default |
 |-----------|---------|
-| URL | `http://localhost:8001` |
+| Mode | `in-process` (inject `NluService` in Nest) |
+| URL | `http://127.0.0.1:3340/api/nlu` (or `http://backend:3000/api/nlu` in Docker) |
 | Timeout | 30,000 ms |
 | Retries | 3 |
 | Confidence threshold | 0.70 |
 
 ```bash
+NLU_SERVICE_MODE=in-process
 NLU_SERVICE_ENABLED=true
-NLU_SERVICE_URL=http://localhost:8001
+NLU_SERVICE_URL=http://127.0.0.1:3340/api/nlu
 NLU_CONFIDENCE_THRESHOLD=0.70
 ```
 
-When `NLU_SERVICE_ENABLED=false` (default in local dev), the platform falls back to model-only intent handling with no functional degradation.
+Set `NLU_SERVICE_MODE=http` only if you deploy a separate NLU HTTP service. When `NLU_SERVICE_ENABLED=false`, the intent classifier skips the NLU phase and uses keyword + LLM fallback.
 
 ---
 
@@ -668,8 +677,9 @@ AI audit records are queryable from `/audit` (`PlatformGovernanceWorkspace`) and
 
 | Variable | Default |
 |----------|---------|
+| `NLU_SERVICE_MODE` | `in-process` |
 | `NLU_SERVICE_ENABLED` | `true` |
-| `NLU_SERVICE_URL` | `http://localhost:8001` |
+| `NLU_SERVICE_URL` | `http://127.0.0.1:3340/api/nlu` |
 | `NLU_SERVICE_TIMEOUT` | `30000` |
 | `NLU_SERVICE_RETRIES` | `3` |
 | `NLU_CONFIDENCE_THRESHOLD` | `0.70` |

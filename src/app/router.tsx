@@ -1,6 +1,8 @@
 import { Suspense } from 'react';
 import { MEDICAL_THEME } from '../config/medicalTheme.constants';
 import { lazyWithRetry } from '../utils/lazyWithRetry';
+import { isReceptionFirstUxEnabled } from '../config/receptionFirstUx.config';
+import ReceptionWorkspacePage from '../pages/emergency/ReceptionWorkspace';
 import {
   Navigate,
   Outlet,
@@ -37,7 +39,9 @@ const WhiteboardDisplayRoute = lazyRoute(() => import('../features/whiteboard/Wh
 // ── ED core pages ────────────────────────────────────────────────────────────
 const EmergencyWhiteboard    = lazyRoute(() => import('../pages/emergency'));
 const SmartIntake            = lazyRoute(() => import('../pages/emergency/SmartIntake'));
-const ReceptionWorkspace     = lazyRoute(() => import('../pages/emergency/ReceptionWorkspace'));
+const ReceptionWorkspace = isReceptionFirstUxEnabled()
+  ? ReceptionWorkspacePage
+  : lazyRoute(() => import('../pages/emergency/ReceptionWorkspace'));
 const SelfArrivalCheckIn     = lazyRoute(() => import('../pages/emergency/SelfArrivalCheckIn'));
 const PatientRoomDisplay     = lazyRoute(() => import('../pages/emergency/PatientRoomDisplay'));
 const EmergencyAnalytics     = lazyRoute(() => import('../pages/emergency/EmergencyAnalytics'));
@@ -95,7 +99,7 @@ import {
   getEmergencyRoleHomeRoute,
   getReceptionEmbeddedIntakePath,
 } from '../config/emergencyRolePermissions';
-import { getPlatformHomeRoute, isReceptionFirstUxEnabled } from '../config/receptionFirstUx.config';
+import { getPlatformHomeRoute } from '../config/receptionFirstUx.config';
 import { resolvePlatformLanding } from '../config/platformEntryModel';
 import { resolveDemoDefaultLandingRoute } from '../config/demoPersonaModel';
 import { resolveAppStartupRoute } from '../config/appStartupModel';
@@ -671,9 +675,13 @@ export function AppRoutes() {
           path={CANONICAL_ROUTES.emergencyReception}
           element={
             <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyReception}>
-              <LazyRoute label="Loading reception...">
+              {isReceptionFirstUxEnabled() ? (
                 <ReceptionWorkspace />
-              </LazyRoute>
+              ) : (
+                <LazyRoute label="Loading reception...">
+                  <ReceptionWorkspace />
+                </LazyRoute>
+              )}
             </CareDroidRouteGuard>
           }
         />

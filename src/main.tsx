@@ -13,6 +13,7 @@ import { scheduleDeferredStartupTasks } from './utils/deferStartupTasks';
 
 import { runAfterFirstPaint } from './utils/deferStartup';
 import { ensureBackendReachabilityProbed } from './services/backendReachability';
+import { isReceptionFirstUxEnabled } from './config/receptionFirstUx.config';
 
 observabilityService.initialize();
 
@@ -53,6 +54,10 @@ scheduleDeferredStartupTasks();
 
 if (import.meta.env.DEV) {
   void ensureBackendReachabilityProbed();
+}
+
+if (isReceptionFirstUxEnabled()) {
+  void import('./pages/emergency/ReceptionWorkspace');
 }
 
 const clearDevelopmentServiceWorkers = () => {

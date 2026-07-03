@@ -82,6 +82,7 @@ import { TenantContextModule } from './modules/tenant-context/tenant-context.mod
 import { AutomationAuditModule } from './modules/automation-audit/automation-audit.module';
 import { EmergencyOsModule } from './modules/emergency-os/emergency-os.module';
 import { NativeAiModule } from './modules/native-ai/native-ai.module';
+import { NluModule } from '../ml-services/nlu/nlu.module';
 
 // Monitoring & Observability
 import { LoggerModule } from './modules/common/logger.module';
@@ -231,6 +232,7 @@ function resolveDatabaseClient() {
     AutomationAuditModule,
     EmergencyOsModule,
     NativeAiModule,
+    NluModule,
 
     // Medical Control Plane (Intent Classification, Tool Orchestration)
     MedicalControlPlaneModule,

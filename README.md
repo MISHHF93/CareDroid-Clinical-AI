@@ -158,7 +158,7 @@ CareDroid runs **17 distinct AI services** across generation, prediction, edge i
 | Backend | NestJS 10, TypeORM, SQLite (local dev), PostgreSQL (production) |
 | AI runtime | Anthropic Claude API (default), OpenAI, Azure OpenAI, Gemini, Local |
 | Vector knowledge | Pinecone (RAG for medical knowledge retrieval) |
-| NLU service | External Python NLU microservice (`http://localhost:8001`) |
+| NLU (intent routing) | In-process TypeScript classifier on Nest `/api/nlu` (Xenova embeddings + MLP head) |
 | Anomaly detection | External ML service (`anomaly-detection:5000`) |
 | Real-time | WebSocket + SSE (`WebSocketManager`, `RealTimeCostService`) |
 | MCP tooling | Custom MCP server package (`mcp/`) |
@@ -296,7 +296,8 @@ See `.env.example` for the full variable list.
 | `AI_PROVIDER` | `anthropic` (default), `openai`, `azure-openai`, `gemini` |
 | `ANTHROPIC_API_KEY` | Backend AI key |
 | `PINECONE_API_KEY` | Pinecone API key for RAG |
-| `NLU_SERVICE_URL` | Python NLU microservice URL |
+| `NLU_SERVICE_MODE` | `in-process` (default) or `http` for an external NLU deployment |
+| `NLU_SERVICE_URL` | NLU base URL (default `http://127.0.0.1:3340/api/nlu` when in-process) |
 | `ANOMALY_DETECTION_URL` | Anomaly detection service URL |
 | `REDIS_URL` | Optional Redis cache |
 
@@ -328,7 +329,7 @@ App-only stack:
 npm run compose:app:build
 ```
 
-With optional Python NLU service:
+With NLU enabled in-process on the backend (no separate sidecar):
 
 ```bash
 npm run compose:app:ml

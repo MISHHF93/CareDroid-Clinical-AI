@@ -225,6 +225,22 @@ export const envValidationSchema = Joi.object({
   AI_RATE_LIMIT_PRO: Joi.number().integer().min(0).default(1000),
   AI_RATE_LIMIT_INSTITUTIONAL: Joi.number().integer().min(0).default(10000),
 
+  NLU_SERVICE_MODE: Joi.string().valid('in-process', 'http').default('in-process'),
+  NLU_SERVICE_ENABLED: booleanSchema.default(true),
+  NLU_SERVICE_URL: Joi.string().uri({ allowRelative: false }).allow('').optional(),
+  NLU_SERVICE_TIMEOUT: Joi.number().integer().min(1).default(30000),
+  NLU_SERVICE_RETRIES: Joi.number().integer().min(0).default(3),
+  NLU_CONFIDENCE_THRESHOLD: Joi.number().min(0).max(1).default(0.7),
+
+  RAG_ENABLED: booleanSchema.default(false),
+  PINECONE_API_KEY: Joi.string().allow('').optional(),
+  PINECONE_INDEX_NAME: Joi.string().allow('').optional(),
+  PINECONE_ENVIRONMENT: Joi.string().allow('').optional(),
+  PINECONE_NAMESPACE: Joi.string().allow('').optional(),
+
+  ANOMALY_DETECTION_ENABLED: booleanSchema.default(false),
+  ANOMALY_DETECTION_URL: Joi.string().uri().allow('').optional(),
+
   VIDEO_PROVIDER: Joi.string().valid('mock', 'zoom', 'twilio', 'daily').default('mock'),
   ZOOM_API_KEY: Joi.string().allow('').optional(),
 

@@ -286,6 +286,7 @@ function AppShellFrame({ children }: AppShellProps) {
     !isReadOnlyWhiteboardKiosk;
   const useKioskShell = useWallKioskChrome || isPublicWaitingKiosk || isReadOnlyWhiteboardKiosk;
   const startupStartedRef = useRef(false);
+  const receptionRouteInitialMountRef = useRef(true);
   const previousSimulationModeRef = useRef<boolean | null>(null);
   const [showPalette, setShowPalette] = useState(false);
   const [showReassessmentDrawer, setShowReassessmentDrawer] = useState(false);
@@ -493,6 +494,10 @@ function AppShellFrame({ children }: AppShellProps) {
 
   useEffect(() => {
     if (!location.pathname.startsWith(CANONICAL_ROUTES.emergencyReception)) return;
+    if (receptionRouteInitialMountRef.current) {
+      receptionRouteInitialMountRef.current = false;
+      return;
+    }
     void useEmergencyStore.getState().refreshAllData({ scope: 'reception', silent: true });
   }, [location.pathname]);
 

@@ -73,6 +73,7 @@ import {
   fetchEmergencyWorkflowLogs,
   fetchReassessmentQueue,
   fetchReferrals,
+  fetchReceptionSnapshot,
   createSmartIntakePatient,
 } from '../services/emergencyOsApi';
 import { apiFetch } from '../services/apiClient';
@@ -861,6 +862,7 @@ export type EmergencyDashboardRefreshResult = {
   boarding?: unknown;
   ems?: unknown;
   queues?: unknown;
+  receptionSnapshot?: unknown;
   reassessment?: unknown;
   referrals?: unknown;
   workflowLogs?: unknown;
@@ -877,11 +879,10 @@ export type EmergencyRefreshOptions = {
 
 export type EmergencyBackendInitOptions = EmergencyRefreshOptions;
 
+/** One bundled Nest snapshot replaces separate EMS + queues + capacity calls on reception. */
 const RECEPTION_REFRESH_DATASETS = Object.freeze([
   { key: 'whiteboard', label: 'whiteboard', fetcher: fetchEmergencyWhiteboard },
-  { key: 'capacity', label: 'capacity', fetcher: fetchCapacityStatus },
-  { key: 'ems', label: 'EMS', fetcher: fetchEMSIntake },
-  { key: 'queues', label: 'queues', fetcher: fetchEmergencyQueues },
+  { key: 'receptionSnapshot', label: 'reception', fetcher: fetchReceptionSnapshot },
 ] as const);
 
 const FULL_REFRESH_DATASETS = Object.freeze([
@@ -4339,7 +4340,13 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         set((state) => ({ loading: true, ui: { ...state.ui, loading: true, error: null } }));
       }
 
-      await get().initializeFlags();
+      const flagsInit =
+        scope === 'reception'
+          ? get().initializeFlags()
+          : await get().initializeFlags();
+      if (scope === 'reception') {
+        void flagsInit;
+      }
 
       if (isSimulationModeActive()) {
         const scenarioId = getInitialEdScenarioId();
@@ -4378,9 +4385,10 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
           firstValue(capacityData, ['capacity'])) as
           | CapacitySnapshot
           | undefined;
-        const emsArrivals = extractEmsIncomingPatients(result.ems) as unknown as EMSArrival[];
+        const receptionBundle = result.receptionSnapshot ?? result.ems ?? result.queues;
+        const emsArrivals = extractEmsIncomingPatients(receptionBundle) as unknown as EMSArrival[];
         const referrals = extractReferrals(result.referrals);
-        const queues = extractQueueSummaries(result.queues);
+        const queues = extractQueueSummaries(receptionBundle);
         const reassessmentPatients = asArray<Patient>(
           firstValue(unwrapData(result.reassessment), ['patients']),
         );
@@ -4489,24 +4497,42 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         { data?: unknown; error?: string }
       >;
       const whiteboard = byKey.whiteboard ?? {};
+      const receptionSnapshot = byKey.receptionSnapshot ?? {};
       const capacity = byKey.capacity ?? {};
       const boarding = byKey.boarding ?? {};
-      const ems = byKey.ems ?? {};
-      const queues = byKey.queues ?? {};
+      const ems =
+        scope === 'reception' && receptionSnapshot.data
+          ? receptionSnapshot
+          : byKey.ems ?? {};
+      const queues =
+        scope === 'reception' && receptionSnapshot.data
+          ? receptionSnapshot
+          : byKey.queues ?? {};
       const reassessment = byKey.reassessment ?? {};
       const referrals = byKey.referrals ?? {};
       const workflowLogs = byKey.workflowLogs ?? {};
-      const errors = Object.fromEntries(
-        Object.entries({ whiteboard, capacity, boarding, ems, queues, reassessment, referrals, workflowLogs })
-          .filter(([, result]) => result.error)
-          .map(([key, result]) => [key, result.error as string]),
-      );
+      const errorEntries: Array<[string, string]> = [];
+      for (const [key, result] of Object.entries({
+        whiteboard,
+        capacity,
+        boarding,
+        ems,
+        queues,
+        receptionSnapshot,
+        reassessment,
+        referrals,
+        workflowLogs,
+      })) {
+        if (result.error) errorEntries.push([key, result.error]);
+      }
+      const errors = Object.fromEntries(errorEntries);
       const operationalAlerts = extractOperationalAlertsFromEmergencyModules({
         whiteboard: whiteboard.data,
-        capacity: capacity.data,
+        capacity: capacity.data ?? receptionSnapshot.data,
         boarding: boarding.data,
         ems: ems.data,
         queues: queues.data,
+        receptionSnapshot: receptionSnapshot.data,
         reassessment: reassessment.data,
         referrals: referrals.data,
         workflowLogs: workflowLogs.data,
@@ -4546,6 +4572,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         boarding: boarding.data,
         ems: ems.data,
         queues: queues.data,
+        receptionSnapshot: receptionSnapshot.data,
         reassessment: reassessment.data,
         referrals: referrals.data,
         workflowLogs: workflowLogs.data,

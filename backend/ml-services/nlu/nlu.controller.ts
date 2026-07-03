@@ -10,7 +10,7 @@ import {
   HttpStatus,
   OnModuleInit,
 } from '@nestjs/common';
-import { nluService, type PredictResult, type BatchPredictResult } from './nlu.service';
+import { NluService, type PredictResult, type BatchPredictResult } from './nlu.service';
 import { INTENT_CLASSES, type IntentClass } from './nlu.config';
 
 interface PredictRequestDto {
@@ -34,13 +34,15 @@ interface HealthResponse {
 export class NluController implements OnModuleInit {
   private readonly startTime = Date.now();
 
+  constructor(private readonly nluService: NluService) {}
+
   async onModuleInit(): Promise<void> {
-    await nluService.load();
+    await this.nluService.load();
   }
 
   @Get('health')
   health(): HealthResponse {
-    const info = nluService.getModelInfo();
+    const info = this.nluService.getModelInfo();
     return {
       status: 'healthy',
       modelLoaded: info.status === 'loaded',
@@ -59,7 +61,7 @@ export class NluController implements OnModuleInit {
       throw new HttpException('text exceeds 2048 character limit', HttpStatus.BAD_REQUEST);
     }
     try {
-      return await nluService.predict(body.text);
+      return await this.nluService.predict(body.text);
     } catch (err) {
       throw new HttpException(
         `Prediction failed: ${err instanceof Error ? err.message : String(err)}`,
@@ -77,7 +79,7 @@ export class NluController implements OnModuleInit {
       throw new HttpException('batch size must not exceed 100', HttpStatus.BAD_REQUEST);
     }
     try {
-      return await nluService.predictBatch(body.texts);
+      return await this.nluService.predictBatch(body.texts);
     } catch (err) {
       throw new HttpException(
         `Batch prediction failed: ${err instanceof Error ? err.message : String(err)}`,
@@ -93,6 +95,6 @@ export class NluController implements OnModuleInit {
 
   @Get('model-info')
   modelInfo() {
-    return nluService.getModelInfo();
+    return this.nluService.getModelInfo();
   }
 }

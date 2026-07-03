@@ -62,7 +62,8 @@ services:
       ENCRYPTION_MASTER_KEY: ${ENCRYPTION_MASTER_KEY:- }
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:- }
       PINECONE_API_KEY: ${PINECONE_API_KEY:- }
-      NLU_SERVICE_URL: ${NLU_SERVICE_URL:-http://nlu:8001}
+      NLU_SERVICE_MODE: ${NLU_SERVICE_MODE:-in-process}
+      NLU_SERVICE_URL: ${NLU_SERVICE_URL:-http://backend:3000/api/nlu}
       # Email Configuration
       SMTP_HOST: ${SMTP_HOST:-smtp.sendgrid.net}
       SMTP_PORT: ${SMTP_PORT:-587}
@@ -106,46 +107,8 @@ services:
       retries: 3
       start_period: 40s
 
-  # ============================================================
-  # Python NLU Microservice (Batch 9)
-  # ============================================================
-  nlu:
-    build:
-      context: ./backend/ml-services/nlu
-      dockerfile: Dockerfile
-    container_name: caredroid-nlu
-    environment:
-      NLU_HOST: 0.0.0.0
-      NLU_PORT: 8001
-      NLU_USE_GPU: "false"
-      NLU_WORKERS: 2
-      NLU_MODEL_NAME: ${NLU_MODEL_NAME:-microsoft/BiomedNLP-PubMedBERT-base-uncased-abstract-fulltext}
-      NLU_BATCH_SIZE: 16
-      NLU_INFERENCE_BATCH_SIZE: 32
-      NLU_LOG_LEVEL: info
-      PYTHONUNBUFFERED: 1
-    ports:
-      - "8001:8001"
-    volumes:
-      - ./backend/ml-services/nlu:/app
-      - nlu_models:/app/models
-      - nlu_cache:/root/.cache/huggingface
-    networks:
-      - caredroid
-    healthcheck:
-      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8001/health')"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
-    # Optional: Use GPU if available
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - driver: nvidia
-    #           count: 1
-    #           capabilities: [gpu]
+  # NLU intent routing runs in-process inside the Nest backend at /api/nlu
+  # (TypeScript Xenova classifier — see backend/ml-services/nlu).
 
   # ============================================================
   # React Frontend Service
@@ -361,10 +324,6 @@ volumes:
   redis_data:
     driver: local
   logs:
-    driver: local
-  nlu_models:
-    driver: local
-  nlu_cache:
     driver: local
   elasticsearch_data:
     driver: local

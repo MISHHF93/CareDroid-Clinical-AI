@@ -3,7 +3,7 @@
  *
  * Three-Phase Classification Pipeline:
  * 1. Keyword Matching (fast, rule-based)
- * 2. NLU Model (fine-tuned BERT - not yet implemented, falls through to Phase 3)
+ * 2. NLU Model (TypeScript Xenova classifier — backend/ml-services/nlu)
  * 3. LLM Fallback (GPT-4 for complex cases)
  *
  * Emergency Detection: 100% recall (no false negatives)
@@ -27,12 +27,14 @@ import {
 } from './patterns/emergency.patterns';
 import { matchToolPatterns, extractToolParameters } from './patterns/tool.patterns';
 import { classifyClinicalQuery } from './patterns/clinical.patterns';
+import { NluService } from '../../../../ml-services/nlu/nlu.service';
 
 @Injectable()
 export class IntentClassifierService {
   private readonly logger = new Logger(IntentClassifierService.name);
 
   private readonly nluServiceUrl: string;
+  private readonly nluUseInProcess: boolean;
   private readonly nluFailureThreshold = 3;
   private readonly nluResetMs = 30_000;
   private readonly llmFailureThreshold = 3;
@@ -53,11 +55,13 @@ export class IntentClassifierService {
     private readonly aiService: AIService,
     private readonly configService: ConfigService,
     private readonly nluMetrics: NluMetricsService,
+    private readonly nluService: NluService,
   ) {
     const nluConfig = this.configService.get<any>('nlu');
-    const baseUrl = nluConfig?.url || 'http://localhost:8001';
+    const baseUrl = nluConfig?.url || 'http://127.0.0.1:3340/api/nlu';
     this.nluServiceUrl = baseUrl.replace(/\/$/, '');
     this.nluEnabled = nluConfig?.enabled !== false;
+    this.nluUseInProcess = nluConfig?.mode !== 'http';
   }
 
   /**
@@ -291,11 +295,11 @@ export class IntentClassifierService {
   }
 
   /**
-   * Phase 2: NLU model-based classification (fine-tuned BERT)
+   * Phase 2: NLU model-based classification (TypeScript Xenova head in-process by default).
    */
   private async nluMatcher(
     message: string,
-    context?: IntentClassificationContext,
+    _context?: IntentClassificationContext,
   ): Promise<Omit<
     IntentClassification,
     'isEmergency' | 'emergencyKeywords' | 'emergencySeverity' | 'method' | 'classifiedAt'
@@ -310,6 +314,58 @@ export class IntentClassifierService {
       return null;
     }
 
+    try {
+      const result = this.nluUseInProcess
+        ? await this.predictWithInProcessNlu(message)
+        : await this.predictWithHttpNlu(message);
+
+      if (!result) {
+        return null;
+      }
+
+      const primaryIntent = this.mapNluIntent(result.intent);
+      if (!primaryIntent) {
+        this.logger.warn(`NLU returned unknown intent: ${String(result.intent)}`);
+        this.recordFailure(this.nluCircuitBreaker, this.nluFailureThreshold, this.nluResetMs);
+        return null;
+      }
+
+      this.recordSuccess(this.nluCircuitBreaker);
+
+      const toolId =
+        result.toolId ?? (primaryIntent === PrimaryIntent.CLINICAL_TOOL ? result.intent : undefined);
+
+      return {
+        primaryIntent,
+        toolId,
+        confidence: result.confidence ?? 0.0,
+        extractedParameters: result.parameters || {},
+        matchedPatterns: ['nlu-model'],
+      };
+    } catch (error) {
+      this.logger.warn(
+        `NLU service unavailable: ${error instanceof Error ? error.message : String(error)}`,
+      );
+      this.recordFailure(this.nluCircuitBreaker, this.nluFailureThreshold, this.nluResetMs);
+      return null;
+    }
+  }
+
+  private async predictWithInProcessNlu(
+    message: string,
+  ): Promise<{ intent: string; confidence: number; toolId?: string; parameters?: Record<string, unknown> } | null> {
+    await this.nluService.load();
+    const result = await this.nluService.predict(message);
+    return {
+      intent: result.intent,
+      confidence: result.confidence,
+      parameters: { keyTerms: result.keyTerms, subcategory: result.subcategory },
+    };
+  }
+
+  private async predictWithHttpNlu(
+    message: string,
+  ): Promise<{ intent: string; confidence: number; toolId?: string; parameters?: Record<string, unknown> } | null> {
     if (!this.nluServiceUrl) {
       this.logger.warn('NLU service URL not configured. Skipping NLU phase.');
       return null;
@@ -322,7 +378,7 @@ export class IntentClassifierService {
       const response = await fetch(`${this.nluServiceUrl}/predict`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: message, context }),
+        body: JSON.stringify({ text: message }),
         signal: controller.signal,
       });
 
@@ -332,51 +388,33 @@ export class IntentClassifierService {
         return null;
       }
 
-      const result = await response.json();
-      const primaryIntent = this.mapNluIntent(result.intent);
-
-      if (!primaryIntent) {
-        this.logger.warn(`NLU returned unknown intent: ${String(result.intent)}`);
-        this.recordFailure(this.nluCircuitBreaker, this.nluFailureThreshold, this.nluResetMs);
-        return null;
-      }
-
-      this.recordSuccess(this.nluCircuitBreaker);
-
-      return {
-        primaryIntent,
-        toolId: result.toolId,
-        confidence: result.confidence ?? 0.0,
-        extractedParameters: result.parameters || {},
-        matchedPatterns: ['nlu-model'],
-      };
-    } catch (error) {
-      this.logger.warn(
-        `NLU service unavailable: ${error instanceof Error ? error.message : String(error)}`,
-      );
-      this.recordFailure(this.nluCircuitBreaker, this.nluFailureThreshold, this.nluResetMs);
-      return null;
+      return await response.json();
     } finally {
       clearTimeout(timeout);
     }
   }
 
   /**
-   * Map NLU intent labels to PrimaryIntent enum
+   * Map NLU intent labels (backend/ml-services/nlu/nlu.config.ts's 10-class
+   * taxonomy) to the coarser 5-value PrimaryIntent enum this pipeline uses.
+   * toolId is set for CLINICAL_TOOL results so downstream tool-routing logic
+   * knows which specific clinical tool the NLU model picked.
    */
   private mapNluIntent(intent: string | undefined): PrimaryIntent | null {
     switch (intent) {
-      case 'emergency':
+      case 'emergency_alert':
         return PrimaryIntent.EMERGENCY;
-      case 'clinical_tool':
+      case 'drug_interaction_check':
+      case 'sofa_score_calculation':
+      case 'medication_order':
+      case 'diagnosis_support':
         return PrimaryIntent.CLINICAL_TOOL;
-      case 'admin_function':
-        return PrimaryIntent.ADMINISTRATIVE;
-      case 'lab_query':
-      case 'protocol_search':
-      case 'patient_data':
+      case 'lab_interpretation':
+      case 'clinical_guideline_lookup':
+      case 'patient_status_update':
+      case 'discharge_planning':
         return PrimaryIntent.MEDICAL_REFERENCE;
-      case 'general_query':
+      case 'general_clinical_query':
         return PrimaryIntent.GENERAL_QUERY;
       default:
         return null;

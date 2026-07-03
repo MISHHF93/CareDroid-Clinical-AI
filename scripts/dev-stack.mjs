@@ -105,7 +105,8 @@ const buildStackEnv = (frontendPort, backendPort) => {
     DATABASE_CLIENT: 'sqlite',
     SQLITE_PATH: 'caredroid.dev.sqlite',
     ENABLE_MONGOOSE_EMERGENCY_OS: 'false',
-    NLU_SERVICE_ENABLED: 'false',
+    NLU_SERVICE_MODE: 'in-process',
+    NLU_SERVICE_ENABLED: 'true',
     ANOMALY_DETECTION_ENABLED: 'false',
     RAG_ENABLED: 'false',
     AI_ENABLED: 'false',
@@ -248,6 +249,75 @@ const findExistingCareDroidFrontendPort = async (startPort, attempts = MAX_PORT_
   return null;
 };
 
+const findExistingCareDroidFrontendPortWithRetry = async (
+  startPort,
+  { attempts = MAX_PORT_ATTEMPTS, retries = 3, retryDelayMs = 400 } = {},
+) => {
+  for (let retry = 0; retry < retries; retry++) {
+    const existing = await findExistingCareDroidFrontendPort(startPort, attempts);
+    if (existing) return existing;
+    if (retry < retries - 1) {
+      await sleep(retryDelayMs);
+    }
+  }
+  return null;
+};
+
+const listListeningPidsOnPort = (port) => {
+  const netstatArgs = process.platform === 'win32' ? ['-ano'] : ['-ano', '-p', 'tcp'];
+  const result = spawnSync('netstat', netstatArgs, { encoding: 'utf8', windowsHide: true });
+  if (result.status !== 0 || !result.stdout) return [];
+
+  const needle = `:${port}`;
+  const pids = new Set();
+  for (const line of result.stdout.split(/\r?\n/)) {
+    if (!line.includes('LISTENING') || !line.includes(needle)) continue;
+    const parts = line.trim().split(/\s+/);
+    const pid = Number.parseInt(parts[parts.length - 1], 10);
+    if (Number.isInteger(pid) && pid > 0) pids.add(pid);
+  }
+  return [...pids];
+};
+
+const killProcessesOnPort = (port, label) => {
+  const pids = listListeningPidsOnPort(port);
+  if (!pids.length) return 0;
+
+  console.log(`[ports] stopping ${label} listener(s) on port ${port}: ${pids.join(', ')}`);
+  let stopped = 0;
+  for (const pid of pids) {
+    const killer =
+      process.platform === 'win32'
+        ? spawnSync('taskkill', ['/pid', String(pid), '/T', '/F'], {
+            stdio: 'ignore',
+            windowsHide: true,
+          })
+        : spawnSync('kill', ['-9', String(pid)], { stdio: 'ignore' });
+    if (killer.status === 0) stopped += 1;
+  }
+  return stopped;
+};
+
+const releaseStackPortsForRestart = async (frontendStartPort, backendStartPort) => {
+  let released = 0;
+  for (let offset = 0; offset < 6; offset++) {
+    released += killProcessesOnPort(Number.parseInt(frontendStartPort, 10) + offset, 'frontend');
+  }
+  released += killProcessesOnPort(Number.parseInt(backendStartPort, 10), 'backend');
+  if (released > 0) {
+    await sleep(750);
+  }
+  return released;
+};
+
+const printStackAlreadyRunning = (appOrigin, apiPort) => {
+  console.log('CareDroid local stack is already running.');
+  console.log(`App:      ${appOrigin}`);
+  console.log(`Backend:  http://localhost:${apiPort}`);
+  console.log(`Health:   ${appOrigin}/health`);
+  console.log('Use --force-restart to stop and relaunch both processes.');
+};
+
 const sleep = (ms) => new Promise((resolveSleep) => setTimeout(resolveSleep, ms));
 
 const waitForBackend = async (port, { timeoutMs = 180000, intervalMs = 750 } = {}) => {
@@ -366,15 +436,14 @@ const spawnManagedProcess = (entry) => {
     }
 
     if (entry.name === 'web' && exitCode !== 0) {
-      const existingPort =
-        (await probeFrontendProxyHealth(frontendPort))
-          ? frontendPort
-          : await findExistingCareDroidFrontendPort(preferredFrontendPort);
+      const existingPort = await findExistingCareDroidFrontendPortWithRetry(preferredFrontendPort, {
+        attempts: 6,
+      });
       if (existingPort) {
         console.warn(
-          `[web] CareDroid frontend already running on port ${existingPort} (skipping duplicate Vite).`,
+          `[web] exited with code ${exitCode}, but CareDroid frontend is healthy on port ${existingPort}.`,
         );
-        console.log(`Open http://localhost:${existingPort}`);
+        printStackAlreadyRunning(`http://localhost:${existingPort}`, backendPort);
         process.exit(0);
         return;
       }
@@ -389,11 +458,28 @@ const spawnManagedProcess = (entry) => {
   return child;
 };
 
-const resolvedFrontend = await resolveStackPort(
-  preferredFrontendPort,
-  'Frontend',
-  probeFrontendProxyHealth,
-);
+if (forceRestart && !frontendOnly && !backendOnly) {
+  const released = await releaseStackPortsForRestart(preferredFrontendPort, preferredBackendPort);
+  if (released > 0) {
+    console.log(`[ports] released ${released} process tree(s) for --force-restart.`);
+  }
+}
+
+let resolvedFrontend;
+if (!forceRestart && !backendOnly) {
+  const existingFrontendPort = await findExistingCareDroidFrontendPort(preferredFrontendPort, 6);
+  if (existingFrontendPort) {
+    resolvedFrontend = { port: existingFrontendPort, reusedExisting: true };
+  }
+}
+if (!resolvedFrontend) {
+  resolvedFrontend = await resolveStackPort(
+    preferredFrontendPort,
+    'Frontend',
+    probeFrontendProxyHealth,
+  );
+}
+
 const resolvedBackend = await resolveStackPort(
   preferredBackendPort,
   'Backend',
@@ -426,11 +512,7 @@ if (!frontendProxyHealthy && backendAlreadyHealthy && !forceRestart) {
 }
 
 if (!backendOnly && backendAlreadyHealthy && frontendProxyHealthy) {
-  console.log('CareDroid local stack is already running.');
-  console.log(`App:      ${frontendOrigin}`);
-  console.log(`Backend:  http://localhost:${backendPort}`);
-  console.log(`Health:   ${frontendOrigin}/health`);
-  console.log('Use --force-restart to stop and relaunch both processes.');
+  printStackAlreadyRunning(frontendOrigin, backendPort);
   process.exit(0);
 }
 
@@ -488,17 +570,22 @@ if (!frontendOnly && !backendAlreadyHealthy) {
 
 if (!backendOnly) {
   if (!(await probeFrontendProxyHealth(frontendPort))) {
-    const existingPort = await findExistingCareDroidFrontendPort(preferredFrontendPort);
+    const existingPort = await findExistingCareDroidFrontendPortWithRetry(preferredFrontendPort, {
+      attempts: 6,
+    });
     if (existingPort) {
-      console.log('CareDroid local stack is already running.');
-      console.log(`App:      http://localhost:${existingPort}`);
-      console.log(`Backend:  http://localhost:${backendPort}`);
-      console.log(`Health:   http://localhost:${existingPort}/health`);
-      console.log('Use --force-restart to stop and relaunch both processes.');
+      printStackAlreadyRunning(`http://localhost:${existingPort}`, backendPort);
       process.exit(0);
     }
   }
 
+  if (resolvedFrontend.reusedExisting && (await probeFrontendProxyHealth(frontendPort))) {
+    console.log(`[web] reusing CareDroid frontend on port ${frontendPort}; not starting duplicate Vite.`);
+    if (backendAlreadyHealthy) {
+      printStackAlreadyRunning(frontendOrigin, backendPort);
+      process.exit(0);
+    }
+  } else {
   spawnManagedProcess({
     name: 'web',
     cwd: rootDir,
@@ -506,4 +593,5 @@ if (!backendOnly) {
     args: ['run', 'dev:web'],
     env: frontendEnv,
   });
+  }
 }

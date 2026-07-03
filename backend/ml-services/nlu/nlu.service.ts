@@ -1,9 +1,22 @@
-// TypeScript replacement for model.py + app.py
-// Uses @xenova/transformers (HuggingFace Transformers.js) to run DistilBERT inference
-// in Node.js — no Python runtime required.
-// Install: npm install @xenova/transformers (backend)
+import { Injectable } from '@nestjs/common';
 
-import { INTENT_CLASSES, MODEL_CONFIG, type IntentClass } from './nlu.config';
+// TypeScript replacement for model.py + app.py
+// Runs inference through the classifier trained by scripts/train.ts: a softmax
+// regression head (training/classifier.ts) on top of @xenova/transformers sentence
+// embeddings (training/embeddings.ts) — no Python runtime required. Falls back to
+// keyword rules if no trained classifier.json has been produced yet.
+
+import { existsSync } from 'fs';
+import { INTENT_CLASSES, INTENT_KEYWORDS, MODEL_CONFIG, type IntentClass } from './nlu.config';
+import { embedText } from './training/embeddings';
+import {
+  loadAnyClassifier,
+  predictFromAny,
+  classifierWeightsPath,
+  type AnyClassifierWeights,
+} from './training/classifier';
+import { MODEL_PATHS } from './training/training.config';
+import { detectSubcategory } from './training/subcategory';
 
 export interface PredictResult {
   intent: IntentClass;
@@ -26,20 +39,6 @@ export interface ModelInfo {
   intentClasses: readonly string[];
   maxLength: number;
 }
-
-// Clinical keywords extracted per intent class for rule-based fallback
-const INTENT_KEYWORDS: Record<IntentClass, string[]> = {
-  drug_interaction_check: ['drug', 'medication', 'interaction', 'contraindication', 'combine', 'take with'],
-  lab_interpretation: ['lab', 'result', 'level', 'value', 'normal', 'abnormal', 'creatinine', 'glucose', 'hemoglobin'],
-  sofa_score_calculation: ['sofa', 'score', 'organ', 'failure', 'sepsis', 'icu'],
-  clinical_guideline_lookup: ['guideline', 'protocol', 'recommendation', 'evidence', 'treatment'],
-  patient_status_update: ['patient', 'status', 'update', 'condition', 'stable', 'critical', 'improving'],
-  emergency_alert: ['emergency', 'urgent', 'critical', 'code', 'alert', 'immediate', 'stat'],
-  discharge_planning: ['discharge', 'home', 'follow-up', 'plan', 'instructions', 'release'],
-  medication_order: ['order', 'prescribe', 'dose', 'mg', 'administer', 'give'],
-  diagnosis_support: ['diagnosis', 'differential', 'symptom', 'present', 'assess', 'history'],
-  general_clinical_query: ['question', 'what', 'how', 'why', 'when', 'clinical'],
-};
 
 function extractKeyTerms(text: string): string[] {
   const lower = text.toLowerCase();
@@ -64,24 +63,26 @@ function ruleBasedPredict(text: string): { intentIdx: number; confidence: number
   };
 }
 
+@Injectable()
 export class NluService {
-  private loaded = false;
-  private pipeline: ((text: string | string[]) => Promise<unknown>) | null = null;
+  private classifier: AnyClassifierWeights | null = null;
+  private attemptedLoad = false;
 
   async load(): Promise<void> {
-    if (this.loaded) return;
+    if (this.attemptedLoad) return;
+    this.attemptedLoad = true;
+
+    const weightsPath = classifierWeightsPath(MODEL_PATHS.bestModelDir);
+    if (!existsSync(weightsPath)) {
+      // No trained classifier yet — run `npm run nlu:train` (backend/ml-services/nlu). Rule-based fallback until then.
+      return;
+    }
 
     try {
-      // Dynamically import @xenova/transformers to avoid hard dependency at module load time
-      const { pipeline } = await import('@xenova/transformers' as string);
-      this.pipeline = await (pipeline as (task: string, model: string) => Promise<typeof this.pipeline>)(
-        'text-classification',
-        MODEL_CONFIG.modelName,
-      );
-      this.loaded = true;
+      this.classifier = loadAnyClassifier(weightsPath);
+      await embedText('warmup'); // pre-load the embedding pipeline so the first real predict() isn't slow
     } catch {
-      // @xenova/transformers not installed or model not available — fall back to rule-based
-      this.loaded = false;
+      this.classifier = null;
     }
   }
 
@@ -91,13 +92,12 @@ export class NluService {
     let intentIdx: number;
     let confidence: number;
 
-    if (this.pipeline) {
+    if (this.classifier) {
       try {
-        const output = (await this.pipeline(text)) as Array<{ label: string; score: number }>;
-        const top = output[0];
-        const labelIdx = Number(top.label.replace('LABEL_', ''));
-        intentIdx = labelIdx < INTENT_CLASSES.length ? labelIdx : 0;
-        confidence = top.score;
+        const embedding = await embedText(text);
+        const result = predictFromAny(this.classifier, embedding);
+        intentIdx = result.labelId;
+        confidence = result.confidence;
       } catch {
         const rb = ruleBasedPredict(text);
         intentIdx = rb.intentIdx;
@@ -115,7 +115,7 @@ export class NluService {
       intent,
       confidence: Math.round(confidence * 1000) / 1000,
       labelId: intentIdx,
-      subcategory: null,
+      subcategory: detectSubcategory(text, intent),
       keyTerms: extractKeyTerms(text),
       latencyMs: Date.now() - start,
     };
@@ -133,17 +133,15 @@ export class NluService {
 
   getModelInfo(): ModelInfo {
     return {
-      status: this.loaded ? 'loaded' : 'unloaded',
-      modelName: MODEL_CONFIG.modelName,
+      status: this.classifier ? 'loaded' : 'unloaded',
+      modelName: this.classifier ? this.classifier.embeddingModelName : MODEL_CONFIG.modelName,
       intentClasses: INTENT_CLASSES,
       maxLength: MODEL_CONFIG.maxLength,
     };
   }
 
   unload(): void {
-    this.pipeline = null;
-    this.loaded = false;
+    this.classifier = null;
+    this.attemptedLoad = false;
   }
 }
-
-export const nluService = new NluService();
