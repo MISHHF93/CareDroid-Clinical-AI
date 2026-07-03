@@ -31,14 +31,12 @@ dist-ssr
 # Local RAG in-memory vector index (dev)
 backend/.rag-local/
 
-# Local databases and Python cache artifacts
+# Local databases
 *.sqlite
 *.sqlite-*
 *.db
 *.db-*
-__pycache__/
-.pytest_cache/
-*.pyc
+
 
 # Local terminal session logs (Cursor / dev harness)
 /terminals/

@@ -1,5 +1,5 @@
-// TypeScript replacement for _deprecated-python/load_test.py and load_test_runner.py
-// Usage: ts-node scripts/loadTest.ts [--url http://localhost:3000/nlu/predict] [--requests 50] [--concurrency 5] [--live]
+// NLU load-test harness for the in-process Nest /api/nlu endpoints.
+// Usage: ts-node scripts/loadTest.ts [--url http://localhost:3340/api/nlu/predict] [--requests 50] [--concurrency 5] [--live]
 
 const SAMPLE_QUERIES = [
   'Patient has severe chest pain and shortness of breath',
@@ -22,7 +22,7 @@ function parseArgs(argv: string[]): LoadTestOptions {
     return idx >= 0 && argv[idx + 1] ? argv[idx + 1] : fallback;
   };
   return {
-    url: get('--url', 'http://localhost:3000/nlu/predict'),
+    url: get('--url', 'http://localhost:3340/api/nlu/predict'),
     requests: Number(get('--requests', '50')),
     concurrency: Number(get('--concurrency', '5')),
     live: argv.includes('--live'),

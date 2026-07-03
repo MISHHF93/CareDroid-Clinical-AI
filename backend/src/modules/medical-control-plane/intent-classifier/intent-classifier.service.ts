@@ -128,7 +128,7 @@ export class IntentClassifierService {
     );
 
     // ========================================
-    // PHASE 2: NLU MODEL (Fine-tuned BERT)
+    // PHASE 2: NLU MODEL (Xenova embeddings + trained MLP head)
     // ========================================
     const nluStartMs = Date.now();
     const nluResult = await this.nluMatcher(message, context);

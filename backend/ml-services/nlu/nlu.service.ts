@@ -1,10 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
-// TypeScript replacement for model.py + app.py
-// Runs inference through the classifier trained by scripts/train.ts: a softmax
-// regression head (training/classifier.ts) on top of @xenova/transformers sentence
-// embeddings (training/embeddings.ts) — no Python runtime required. Falls back to
-// keyword rules if no trained classifier.json has been produced yet.
+// Xenova sentence embeddings + trained MLP/linear head (see training/classifier.ts).
+// Falls back to keyword rules when classifier.json has not been produced yet.
 
 import { existsSync } from 'fs';
 import { INTENT_CLASSES, INTENT_KEYWORDS, MODEL_CONFIG, type IntentClass } from './nlu.config';

@@ -228,7 +228,7 @@ cp .env.example .env
 cp backend/.env.example backend/.env
 ```
 
-Start the full local stack (single origin on :8000 — Vite proxies API to Nest):
+Start the full local stack (frontend on :5180 — Vite proxies `/api` to Nest on :3340):
 
 ```bash
 npm start
@@ -238,16 +238,17 @@ Local defaults use **SQLite** and disable optional ML/RAG services so the app bo
 
 | Service | URL |
 |---------|-----|
-| App (frontend + API) | http://localhost:8000 |
-| API (proxied) | http://localhost:8000/api |
-| Health check | http://localhost:8000/health |
-| API docs (Swagger) | http://localhost:8000/api/docs |
+| App (frontend + API proxy) | http://localhost:5180 |
+| API (proxied) | http://localhost:5180/api |
+| Backend (direct, internal) | http://localhost:3340 |
+| Health check | http://localhost:5180/health |
+| API docs (Swagger) | http://localhost:5180/api/docs |
 
 ### Focused commands
 
 ```bash
-npm run dev:web          # Frontend only (Vite on :8000)
-npm run dev:api          # Backend only (Nest on :3000, internal — use :8000 when full stack is running)
+npm run dev:web          # Frontend only (Vite on :5180)
+npm run dev:api          # Backend only (Nest on :3340)
 npm run backend:build    # Compile NestJS
 npm run backend:start    # Run compiled backend
 npm run typecheck:frontend

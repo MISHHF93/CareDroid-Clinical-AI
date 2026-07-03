@@ -105,6 +105,7 @@
     "verify:ai-stack": "node scripts/verify-ai-stack.mjs",
     "verify:rag": "node scripts/verify-rag.mjs",
     "verify:safety": "node scripts/verify-safety-rules.mjs",
+    "verify:ts-backend": "node scripts/verify-ts-backend.mjs",
     "lint": "eslint src",
     "lint:all": "npm run lint && cd backend && npm run lint",
     "format": "prettier --write \"src/**/*.{js,jsx,json,css}\"",

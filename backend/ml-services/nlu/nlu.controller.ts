@@ -1,5 +1,4 @@
-// TypeScript replacement for app.py (FastAPI → NestJS controller)
-// Registers as a module in the existing NestJS backend — no separate Python process needed.
+// In-process NLU HTTP surface mounted on the NestJS backend at /api/nlu.
 
 import {
   Controller,

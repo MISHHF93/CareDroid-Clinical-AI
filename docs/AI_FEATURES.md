@@ -17,7 +17,7 @@ This document is the authoritative reference for every AI capability in CareDroi
 5. [Copilot tools (function calling)](#5-copilot-tools-function-calling)
 6. [Prompt registry](#6-prompt-registry)
 7. [RAG — medical knowledge retrieval](#7-rag--medical-knowledge-retrieval)
-8. [NLU microservice](#8-nlu-microservice)
+8. [NLU intent classifier (in-process TypeScript)](#8-nlu-intent-classifier-in-process-typescript)
 9. [Anomaly detection service](#9-anomaly-detection-service)
 10. [Prompt caching](#10-prompt-caching)
 11. [Edge AI — ambulance & EMS](#11-edge-ai--ambulance--ems)
@@ -412,7 +412,7 @@ ANOMALY_DETECTION_ENABLED=true
 ANOMALY_DETECTION_URL=http://anomaly-detection:5000
 ```
 
-Runs as a Docker sidecar in the full observability stack (`docker-compose.yml`).
+Optional external HTTP service — not bundled in `docker-compose.yml`. Disable with `ANOMALY_DETECTION_ENABLED=false` for local dev.
 
 ---
 
