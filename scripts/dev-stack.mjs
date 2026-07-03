@@ -238,6 +238,16 @@ const resolveStackPort = async (preferredPort, label, probeHealthy) => {
   process.exit(1);
 };
 
+const findExistingCareDroidFrontendPort = async (startPort, attempts = MAX_PORT_ATTEMPTS) => {
+  let port = Number.parseInt(startPort, 10);
+  for (let attempt = 0; attempt < attempts; attempt++) {
+    const portStr = String(port);
+    if (await probeFrontendProxyHealth(portStr)) return portStr;
+    port += 1;
+  }
+  return null;
+};
+
 const sleep = (ms) => new Promise((resolveSleep) => setTimeout(resolveSleep, ms));
 
 const waitForBackend = async (port, { timeoutMs = 180000, intervalMs = 750 } = {}) => {
@@ -356,12 +366,15 @@ const spawnManagedProcess = (entry) => {
     }
 
     if (entry.name === 'web' && exitCode !== 0) {
-      const proxyHealthy = await probeFrontendProxyHealth(frontendPort);
-      if (proxyHealthy) {
+      const existingPort =
+        (await probeFrontendProxyHealth(frontendPort))
+          ? frontendPort
+          : await findExistingCareDroidFrontendPort(preferredFrontendPort);
+      if (existingPort) {
         console.warn(
-          `[web] port ${frontendPort} is already serving CareDroid (Vite likely already running).`,
+          `[web] CareDroid frontend already running on port ${existingPort} (skipping duplicate Vite).`,
         );
-        console.log(`Open ${frontendOrigin}`);
+        console.log(`Open http://localhost:${existingPort}`);
         process.exit(0);
         return;
       }
@@ -397,8 +410,20 @@ backendPort = resolvedBackend.port;
 
 const backendAlreadyHealthy =
   !forceRestart && (await probeBackendHealth(backendPort));
-const frontendProxyHealthy =
+let frontendProxyHealthy =
   !forceRestart && (await probeFrontendProxyHealth(frontendPort));
+
+if (!frontendProxyHealthy && backendAlreadyHealthy && !forceRestart) {
+  const existingFrontendPort = await findExistingCareDroidFrontendPort(preferredFrontendPort);
+  if (existingFrontendPort) {
+    frontendPort = existingFrontendPort;
+    ({ frontendEnv, backendEnv, frontendOrigin, backendOrigin } = buildStackEnv(
+      frontendPort,
+      backendPort,
+    ));
+    frontendProxyHealthy = true;
+  }
+}
 
 if (!backendOnly && backendAlreadyHealthy && frontendProxyHealthy) {
   console.log('CareDroid local stack is already running.');
