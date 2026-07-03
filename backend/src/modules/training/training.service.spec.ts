@@ -16,7 +16,7 @@ describe('TrainingService', () => {
       'cleaning',
       'labeling',
       'embeddings',
-      'lora_tuning',
+      'intent_routing',
       'evaluation',
       'deployment',
     ]);

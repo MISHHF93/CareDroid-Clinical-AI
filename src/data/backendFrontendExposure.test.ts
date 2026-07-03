@@ -35,15 +35,17 @@ const rootEnvExample = readFileSync(join(repoRoot, '.env.example'), 'utf8');
 const backendEnvExample = readFileSync(join(repoRoot, 'backend/.env.example'), 'utf8');
 const backendMainSource = readFileSync(join(repoRoot, 'backend/src/main.ts'), 'utf8');
 const HEAVY_EXPOSURE_SCAN_TIMEOUT_MS = 120_000;
+const scanIt = (name: string, fn: () => void | Promise<void>) =>
+  it(name, { timeout: HEAVY_EXPOSURE_SCAN_TIMEOUT_MS }, fn);
 
-describe('backendFrontendExposure scan', { timeout: HEAVY_EXPOSURE_SCAN_TIMEOUT_MS }, () => {
-  it('passes with zero unguarded missing routes and no false executor claims', () => {
+describe('backendFrontendExposure scan', () => {
+  scanIt('passes with zero unguarded missing routes and no false executor claims', () => {
     const { ok, errors } = assertExposureScanPasses();
     expect(errors, errors.join('; ')).toEqual([]);
     expect(ok).toBe(true);
   });
 
-  it('inventory covers three POST executors', () => {
+  scanIt('inventory covers three POST executors', () => {
     const scan = runBackendFrontendExposureScan();
     expect(scan.executorNluIds).toEqual([...BACKEND_EXECUTOR_NLU_TOOL_IDS]);
     expect(scan.executorNluIds).toHaveLength(3);
@@ -53,7 +55,7 @@ describe('backendFrontendExposure scan', { timeout: HEAVY_EXPOSURE_SCAN_TIMEOUT_
     }
   });
 
-  it('gates known missing routes behind disabled capabilities', () => {
+  scanIt('gates known missing routes behind disabled capabilities', () => {
     const gatedIds = [
       'tools-share-results',
       'team-users',
@@ -72,31 +74,31 @@ describe('backendFrontendExposure scan', { timeout: HEAVY_EXPOSURE_SCAN_TIMEOUT_
     }
   });
 
-  it('matches backend REGISTERED_EXECUTOR_TOOL_IDS in registry source', () => {
+  scanIt('matches backend REGISTERED_EXECUTOR_TOOL_IDS in registry source', () => {
     const block = registrySource.match(/REGISTERED_EXECUTOR_TOOL_IDS\s*=\s*\[([\s\S]*?)\]\s*as const/);
     const backendIds = [...block[1].matchAll(/'([^']+)'/g)].map((m) => m[1]).sort();
     expect(backendIds).toEqual([...BACKEND_EXECUTOR_NLU_TOOL_IDS].sort());
   });
 
-  it('audit controller uses single /api prefix (not /api/api/audit)', () => {
+  scanIt('audit controller uses single /api prefix (not /api/api/audit)', () => {
     const auditRoutes = BACKEND_HTTP_ROUTES.filter((r) => r.controller === 'AuditController');
     expect(auditRoutes.every((r) => r.path.startsWith('/api/audit'))).toBe(true);
     expect(auditRoutes.some((r) => r.path.includes('/api/api/'))).toBe(false);
   });
 
-  it('every frontend inventory entry resolves exposure status', () => {
+  scanIt('every frontend inventory entry resolves exposure status', () => {
     expect(FRONTEND_API_CALLS.length).toBeGreaterThan(30);
     const scan = runBackendFrontendExposureScan();
     expect(scan.analyzed).toHaveLength(FRONTEND_API_CALLS.length);
     expect(scan.unguarded).toHaveLength(0);
   });
 
-  it('keeps frontend API call ids unique', () => {
+  scanIt('keeps frontend API call ids unique', () => {
     const ids = FRONTEND_API_CALLS.map((call) => call.id);
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it('surfaces chat next-action and vitals endpoints through the canonical frontend inventory', () => {
+  scanIt('surfaces chat next-action and vitals endpoints through the canonical frontend inventory', () => {
     expect(FRONTEND_API_CALLS).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ method: 'POST', path: '/api/chat/suggest-action' }),
@@ -107,7 +109,7 @@ describe('backendFrontendExposure scan', { timeout: HEAVY_EXPOSURE_SCAN_TIMEOUT_
     expect(findBackendRoute('POST', '/api/chat/analyze-vitals')).toBeTruthy();
   });
 
-  it('covers protocol detail and compliance data export bridges', () => {
+  scanIt('covers protocol detail and compliance data export bridges', () => {
     const expectedCalls = [
       ['GET', '/api/protocols/:id'],
       ['POST', '/api/compliance/export'],
@@ -121,7 +123,7 @@ describe('backendFrontendExposure scan', { timeout: HEAVY_EXPOSURE_SCAN_TIMEOUT_
     }
   });
 
-  it('covers profile, workspace, activity, and personalization client calls', () => {
+  scanIt('covers profile, workspace, activity, and personalization client calls', () => {
     const expectedUserIdentityCalls = [
       ['GET', '/api/profile/me'],
       ['PATCH', '/api/profile/me'],
@@ -148,7 +150,7 @@ describe('backendFrontendExposure scan', { timeout: HEAVY_EXPOSURE_SCAN_TIMEOUT_
     }
   });
 
-  it('classifies optional Mongoose CareDroid routes separately from always-mounted Nest routes', () => {
+  scanIt('classifies optional Mongoose CareDroid routes separately from always-mounted Nest routes', () => {
     const optionalRoutes = getOptionalRuntimeBackendRoutes();
 
     expect(optionalRoutes).toEqual(
@@ -166,7 +168,7 @@ describe('backendFrontendExposure scan', { timeout: HEAVY_EXPOSURE_SCAN_TIMEOUT_
     expect(BACKEND_ROUTE_EXPOSURE_POLICY['POST /api/emergency/intake/sessions']).toBeUndefined();
   });
 
-  it('gates optional CareDroid frontend calls when the optional runtime is disabled', () => {
+  scanIt('gates optional CareDroid frontend calls when the optional runtime is disabled', () => {
     const scan = runBackendFrontendExposureScan();
     const optionalSmartIntakeIds = [
       'emergency-smart-intake-session-create',
@@ -201,7 +203,7 @@ describe('backendFrontendExposure scan', { timeout: HEAVY_EXPOSURE_SCAN_TIMEOUT_
     }
   });
 
-  it('covers memory dashboard and memory fabric client calls', () => {
+  scanIt('covers memory dashboard and memory fabric client calls', () => {
     const memoryCalls = [
       ['GET', '/api/memory/dashboard'],
       ['POST', '/api/memory/short'],
@@ -219,7 +221,7 @@ describe('backendFrontendExposure scan', { timeout: HEAVY_EXPOSURE_SCAN_TIMEOUT_
     }
   });
 
-  it('covers demo-backed clinical alerts API routes while keeping stream gated', () => {
+  scanIt('covers demo-backed clinical alerts API routes while keeping stream gated', () => {
     const alertCalls = [
       ['GET', '/api/clinical/alerts'],
       ['POST', '/api/clinical/alerts/:id/acknowledge'],
@@ -237,7 +239,7 @@ describe('backendFrontendExposure scan', { timeout: HEAVY_EXPOSURE_SCAN_TIMEOUT_
     expect(stream?.exposure).toBe('gated-stub');
   });
 
-  it('classifies frontend, backend-only, planned, and executor capabilities', () => {
+  scanIt('classifies frontend, backend-only, planned, and executor capabilities', () => {
     const rows = buildBackendFrontendCapabilityRows();
     const classifications = new Set(rows.map((row) => row.classification));
     expect(classifications).toContain(BACKEND_FRONTEND_CAPABILITY_CLASSIFICATIONS.USER_FACING_WIRED);
