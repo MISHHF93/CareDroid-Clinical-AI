@@ -3,10 +3,7 @@
  * The source of truth lives in `lib/ai/config.ts` and `lib/ai/promptRegistry.ts`.
  */
 
-import {
-  EXTERNAL_DATA_REVIEW_DISCLAIMER,
-  HUMAN_REVIEW_DISCLAIMER,
-} from '../../../lib/ai/safetyPolicy';
+import { buildSafetyRulesSnapshot } from '../../../lib/ai/clinicalSafetyRules';
 import {
   readAIPlatformConfig,
   type AIPlatformServiceConfig,
@@ -93,38 +90,4 @@ export const PromptTemplateRegistry: Readonly<Record<string, AIPromptTemplate>> 
   ),
 );
 
-export const AISafetyRules = Object.freeze({
-  cannotLowerPriorityFor: {
-    dpsScores: [1, 2],
-    conditions: ['stroke', 'sepsis', 'chest_pain'],
-    abnormalVitals: ['hr > 120', 'bp < 90/60', 'o2 < 92', 'rr > 24'],
-  },
-  requiredDisclaimers: [
-    HUMAN_REVIEW_DISCLAIMER,
-    EXTERNAL_DATA_REVIEW_DISCLAIMER,
-    'AI-generated content - verify before acting',
-  ],
-  disallowedAutonomousActions: [
-    'diagnose',
-    'prescribe',
-    'disposition patients',
-    'auto-triage without human review',
-    'auto-import external health data',
-    'auto-link patient identity',
-    'overwrite clinical records',
-    'bypass staff verification',
-  ],
-  auditRequirements: {
-    logAllInteractions: true,
-    redactRawPrompts: true,
-    retentionDays: platformConfig.governance.auditRetentionDays,
-    requireUserConsent: true,
-  },
-  rateLimits: {
-    physician: { requestsPerMinute: 60 },
-    nurse: { requestsPerMinute: 30 },
-    charge_nurse: { requestsPerMinute: 45 },
-    clerk: { requestsPerMinute: 10 },
-    ems: { requestsPerMinute: 20 },
-  },
-});
+export const AISafetyRules = buildSafetyRulesSnapshot();

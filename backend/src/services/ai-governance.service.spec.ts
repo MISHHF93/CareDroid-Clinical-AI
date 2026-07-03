@@ -39,7 +39,8 @@ describe('AIGovernanceService', () => {
 
     expect(result).toEqual({
       safe: false,
-      violation: 'Cannot lower priority for DPS 2 patient (critical acuity)',
+      violation: 'Cannot lower priority: DPS2.',
+      floorReasons: ['DPS2'],
     });
   });
 

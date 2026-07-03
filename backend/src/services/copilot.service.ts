@@ -1,7 +1,9 @@
 import {
-  UnifiedPatient as Patient,
-  type IUnifiedPatient as IPatient,
-} from '../models/unified-patient.model';
+  evaluatePriorityChange,
+  patientSafetyContextFromRecord,
+} from '../../../lib/ai/clinicalSafetyRules';
+import { HUMAN_REVIEW_DISCLAIMER } from '../../../lib/ai/safetyPolicy';
+import { UnifiedPatient as Patient } from '../models/unified-patient.model';
 import { capacityService } from './capacity.service';
 import { reassessmentService } from './reassessment.service';
 import { emsService } from './ems.service';
@@ -20,21 +22,7 @@ interface CopilotResponse {
   timestamp: Date;
 }
 
-const HUMAN_REVIEW_REQUIRED =
-  'Human review required. This is not a replacement for clinical judgment.';
-
 export class CopilotService {
-  private safetyRules = {
-    cannotLowerPriorityFor: [
-      'DPS1',
-      'DPS2',
-      'abnormal_vitals',
-      'stroke_protocol',
-      'sepsis_protocol',
-      'chest_pain_protocol',
-    ],
-  };
-
   async processQuery(query: CopilotQuery): Promise<CopilotResponse> {
     const lowerQuery = query.query.toLowerCase();
 
@@ -153,7 +141,7 @@ export class CopilotService {
 
   private async getChestPainWorkflow(_query: CopilotQuery): Promise<CopilotResponse> {
     return {
-      suggestion: `Chest Pain Workflow: 1) ECG within 10min, 2) Troponin, 3) Aspirin if not contraindicated, 4) Consider Cardiology consult, 5) TIMI score calculation. ${HUMAN_REVIEW_REQUIRED}`,
+      suggestion: `Chest Pain Workflow: 1) ECG within 10min, 2) Troponin, 3) Aspirin if not contraindicated, 4) Consider Cardiology consult, 5) TIMI score calculation. ${HUMAN_REVIEW_DISCLAIMER}`,
       data: { protocol: 'chest_pain', steps: ['ECG', 'Troponin', 'Aspirin', 'Cardiology', 'TIMI'] },
       requires_review: true,
       safety_check_passed: true,
@@ -163,7 +151,7 @@ export class CopilotService {
 
   private async getSepsisWorkflow(_query: CopilotQuery): Promise<CopilotResponse> {
     return {
-      suggestion: `Sepsis Workflow: 1) Lactate, 2) Blood cultures before antibiotics, 3) Broad spectrum antibiotics, 4) IVF 30ml/kg, 5) qSOFA score, 6) Consider vasopressors if hypotensive. ${HUMAN_REVIEW_REQUIRED}`,
+      suggestion: `Sepsis Workflow: 1) Lactate, 2) Blood cultures before antibiotics, 3) Broad spectrum antibiotics, 4) IVF 30ml/kg, 5) qSOFA score, 6) Consider vasopressors if hypotensive. ${HUMAN_REVIEW_DISCLAIMER}`,
       data: {
         protocol: 'sepsis',
         steps: ['Lactate', 'Cultures', 'Antibiotics', 'IVF', 'qSOFA', 'Vasopressors'],
@@ -176,7 +164,7 @@ export class CopilotService {
 
   private async getStrokeWorkflow(_query: CopilotQuery): Promise<CopilotResponse> {
     return {
-      suggestion: `Stroke Workflow: 1) Last known well time, 2) NIHSS, 3) Non-contrast CT, 4) CTA if candidate, 5) tPA if <4.5h, 6) Thrombectomy if large vessel occlusion. ${HUMAN_REVIEW_REQUIRED}`,
+      suggestion: `Stroke Workflow: 1) Last known well time, 2) NIHSS, 3) Non-contrast CT, 4) CTA if candidate, 5) tPA if <4.5h, 6) Thrombectomy if large vessel occlusion. ${HUMAN_REVIEW_DISCLAIMER}`,
       data: {
         protocol: 'stroke',
         steps: ['Last known well', 'NIHSS', 'CT', 'CTA', 'tPA', 'Thrombectomy'],
@@ -227,8 +215,11 @@ export class CopilotService {
       };
     }
 
-    const safety = this.evaluatePrioritySafety(patient, requestedDps);
-    if (!safety.ok) {
+    const safety = evaluatePriorityChange(
+      patientSafetyContextFromRecord(patient as unknown as Record<string, unknown>),
+      requestedDps,
+    );
+    if (!safety.allowed) {
       patient.safety_override = false;
       patient.last_safety_violation = new Date();
       patient.alerts.push(safety.message);
@@ -249,7 +240,7 @@ export class CopilotService {
       data: { patient, requested_dps_score: requestedDps },
       requires_review: true,
       safety_check_passed: true,
-      safety_message: HUMAN_REVIEW_REQUIRED,
+      safety_message: HUMAN_REVIEW_DISCLAIMER,
       timestamp: new Date(),
     };
   }
@@ -261,51 +252,6 @@ export class CopilotService {
     return [1, 2, 3, 4, 5].includes(score) ? (score as 1 | 2 | 3 | 4 | 5) : null;
   }
 
-  private evaluatePrioritySafety(
-    patient: IPatient,
-    requestedDps: 1 | 2 | 3 | 4 | 5,
-  ): { ok: boolean; message: string } {
-    if (requestedDps <= patient.dps_score) {
-      return {
-        ok: true,
-        message: 'Priority escalation or equivalent priority is allowed for human review.',
-      };
-    }
-
-    const safetyReasons = this.safetyFloorReasons(patient);
-    if (safetyReasons.length > 0) {
-      return {
-        ok: false,
-        message: `Cannot lower priority for ${patient.name}: ${safetyReasons.join(', ')}.`,
-      };
-    }
-
-    return { ok: true, message: 'No safety-floor blocker detected.' };
-  }
-
-  private safetyFloorReasons(patient: IPatient): string[] {
-    const reasons: string[] = [];
-    if (patient.dps_score <= 2) reasons.push(`DPS${patient.dps_score}`);
-    if (this.hasAbnormalVitals(patient)) reasons.push('abnormal_vitals');
-    const text = `${patient.chief_complaint} ${patient.alerts.join(' ')}`.toLowerCase();
-    if (text.includes('stroke')) reasons.push('stroke_protocol');
-    if (text.includes('sepsis')) reasons.push('sepsis_protocol');
-    if (text.includes('chest pain')) reasons.push('chest_pain_protocol');
-    return reasons.filter((reason) => this.safetyRules.cannotLowerPriorityFor.includes(reason));
-  }
-
-  private hasAbnormalVitals(patient: IPatient): boolean {
-    const vitals = patient.vitals;
-    if (!vitals) return false;
-    if (vitals.hr && (vitals.hr > 120 || vitals.hr < 50)) return true;
-    if (vitals.o2 && vitals.o2 < 92) return true;
-    if (vitals.rr && vitals.rr > 24) return true;
-    if (vitals.bp) {
-      const [systolic] = vitals.bp.split('/').map(Number);
-      if (Number.isFinite(systolic) && systolic < 90) return true;
-    }
-    return false;
-  }
 }
 
 export const copilotService = new CopilotService();

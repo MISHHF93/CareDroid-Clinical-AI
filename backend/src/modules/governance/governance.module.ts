@@ -1,8 +1,9 @@
-import { Controller, Get, Injectable, Module, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Injectable, Module, Post, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Permissions } from '../auth/decorators/permissions.decorator';
 import { Permission } from '../auth/enums/permission.enum';
 import { AuthorizationGuard } from '../auth/guards/authorization.guard';
+import { patientSafetyContextFromRecord } from '../../../../lib/ai/clinicalSafetyRules';
 import { PlatformGovernanceModule, PlatformGovernanceService } from '../platform-governance';
 import { AIGovernanceService } from '../../services/ai-governance.service';
 
@@ -201,6 +202,24 @@ class AIGovernanceEndpointBase {
   validatePrompts() {
     return this.aiGovernance.validateAllPromptTemplates();
   }
+
+  evaluatePriorityChange(body: { patient?: Record<string, unknown>; requestedDps?: number }) {
+    const requestedDps = Number(body.requestedDps);
+    if (!Number.isFinite(requestedDps) || requestedDps < 1 || requestedDps > 5) {
+      return {
+        allowed: false,
+        requiresHumanReview: true,
+        blockReasons: ['invalid_requested_dps'],
+        floorReasons: [],
+        message: 'requestedDps must be an integer between 1 and 5.',
+      };
+    }
+
+    return this.aiGovernance.evaluatePriorityChange(
+      patientSafetyContextFromRecord(body.patient || {}),
+      requestedDps,
+    );
+  }
 }
 
 @Controller('v1/governance')
@@ -233,6 +252,11 @@ export class AIGovernanceV1Controller extends AIGovernanceEndpointBase {
   validatePrompts() {
     return super.validatePrompts();
   }
+
+  @Post('evaluate-priority-change')
+  evaluatePriorityChange(@Body() body: { patient?: Record<string, unknown>; requestedDps?: number }) {
+    return super.evaluatePriorityChange(body);
+  }
 }
 
 @Controller('emergency/governance')
@@ -264,6 +288,11 @@ export class EmergencyAIGovernanceController extends AIGovernanceEndpointBase {
   @Get('validate-prompts')
   validatePrompts() {
     return super.validatePrompts();
+  }
+
+  @Post('evaluate-priority-change')
+  evaluatePriorityChange(@Body() body: { patient?: Record<string, unknown>; requestedDps?: number }) {
+    return super.evaluatePriorityChange(body);
   }
 }
 

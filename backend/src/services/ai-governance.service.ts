@@ -10,6 +10,12 @@
 
 import { Injectable } from '@nestjs/common';
 import {
+  checkSuggestedActionSafety,
+  evaluatePriorityChange as evaluateClinicalPriorityChange,
+  type PatientSafetyContext,
+  type PriorityChangeEvaluation,
+} from '../../../lib/ai/clinicalSafetyRules';
+import {
   AIConfigRegistry,
   AISafetyRules,
   type AIServiceConfig,
@@ -127,28 +133,18 @@ export class AIGovernanceService {
     serviceName: string,
     _input: unknown,
     suggestedAction: any,
-  ): { safe: boolean; violation?: string } {
+  ): { safe: boolean; violation?: string; floorReasons?: string[] } {
     const config = AIConfigRegistry[serviceName];
     if (!config) return { safe: true };
 
-    if (suggestedAction?.action === 'lower_priority') {
-      const patientDps = suggestedAction.patientDps;
-      if (AISafetyRules.cannotLowerPriorityFor.dpsScores.includes(patientDps)) {
-        return {
-          safe: false,
-          violation: `Cannot lower priority for DPS ${patientDps} patient (critical acuity)`,
-        };
-      }
-    }
+    return checkSuggestedActionSafety(suggestedAction);
+  }
 
-    if (suggestedAction?.clinical && !suggestedAction?.disclaimer) {
-      return {
-        safe: false,
-        violation: 'Clinical recommendations require disclaimer',
-      };
-    }
-
-    return { safe: true };
+  evaluatePriorityChange(
+    patient: PatientSafetyContext,
+    requestedDps: number,
+  ): PriorityChangeEvaluation {
+    return evaluateClinicalPriorityChange(patient, requestedDps);
   }
 
   async generateComplianceReport(startDate: Date, endDate: Date): Promise<AIComplianceReport> {

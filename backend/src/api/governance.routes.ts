@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { patientSafetyContextFromRecord } from '../../../lib/ai/clinicalSafetyRules';
 import { aiGovernanceService } from '../services/ai-governance.service';
 
 const router = Router();
@@ -40,6 +41,25 @@ router.get('/violations', async (req, res) => {
 router.get('/validate-prompts', (_req, res) => {
   const results = aiGovernanceService.validateAllPromptTemplates();
   res.json(results);
+});
+
+router.post('/evaluate-priority-change', (req, res) => {
+  const requestedDps = Number(req.body?.requestedDps);
+  if (!Number.isFinite(requestedDps) || requestedDps < 1 || requestedDps > 5) {
+    return res.status(400).json({
+      allowed: false,
+      requiresHumanReview: true,
+      blockReasons: ['invalid_requested_dps'],
+      floorReasons: [],
+      message: 'requestedDps must be an integer between 1 and 5.',
+    });
+  }
+
+  const evaluation = aiGovernanceService.evaluatePriorityChange(
+    patientSafetyContextFromRecord(req.body?.patient || {}),
+    requestedDps,
+  );
+  return res.json(evaluation);
 });
 
 export default router;
