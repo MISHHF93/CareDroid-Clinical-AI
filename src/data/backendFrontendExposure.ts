@@ -225,7 +225,7 @@ function readVitePortFallback(source, blockName) {
     ? Number(frontendLiteral[1])
     : readPortDefault
       ? Number(readPortDefault[1])
-      : 5174;
+      : 5180;
 }
 
 export function readViteDevConfig() {
@@ -239,7 +239,7 @@ export function readViteDevConfig() {
     previewPort: readVitePortFallback(source, 'preview'),
     proxyTarget: proxyMatch
       ? proxyMatch[0].includes('backendPort')
-        ? `http://localhost:${source.match(/backendPort = readPort\([\s\S]*?'(\d{4})',/)?.[1] || '3333'}`
+        ? `http://localhost:${source.match(/backendPort = readPort\([\s\S]*?'(\d{4})',/)?.[1] || '3340'}`
         : proxyMatch[1]
       : null,
     proxiesApi: source.includes("'/api'"),

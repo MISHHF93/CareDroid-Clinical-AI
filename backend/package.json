@@ -18,7 +18,7 @@
     "start:dev": "npm run build && npm run start:prod",
     "start:watch": "nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main.js",
+    "start:prod": "node dist/backend/src/main.js",
     "lint": "node scripts/run-eslint.mjs",
     "lint:fix": "node scripts/run-eslint.mjs --fix",
     "test": "jest --runInBand",

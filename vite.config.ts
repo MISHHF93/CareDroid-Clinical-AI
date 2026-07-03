@@ -121,7 +121,7 @@ const readPort = (...values: (string | undefined)[]): number => {
     const parsed = Number.parseInt(value || '', 10);
     if (Number.isInteger(parsed) && parsed > 0 && parsed <= 65535) return parsed;
   }
-  return 5174;
+  return 5180;
 };
 
 export default defineConfig(({ mode }) => {
@@ -131,13 +131,13 @@ export default defineConfig(({ mode }) => {
     env.VITE_DEV_PORT,
     process.env.FRONTEND_PORT,
     process.env.VITE_DEV_PORT,
-    '5174',
+    '5180',
   );
   const backendPort = readPort(
     env.BACKEND_PORT,
     process.env.BACKEND_PORT,
     process.env.PORT,
-    '3333',
+    '3340',
   );
   const proxyTarget = env.VITE_API_PROXY_TARGET || `http://localhost:${backendPort}`;
   const buildInfo = buildInfoFor(mode, env);
