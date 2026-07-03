@@ -77,6 +77,10 @@ import {
 } from '../services/emergencyOsApi';
 import { apiFetch } from '../services/apiClient';
 import {
+  RECEPTION_DATASET_TIMEOUT_MS,
+  REFRESH_DATASET_TIMEOUT_MS,
+} from '../config/startupTimeouts';
+import {
   DEFAULT_CENTRAL_CONTROL_SETTINGS,
   DEFAULT_EMERGENCY_ALERT_RULES,
   DEFAULT_EMERGENCY_CTAS_TARGETS,
@@ -861,6 +865,57 @@ export type EmergencyDashboardRefreshResult = {
   referrals?: unknown;
   workflowLogs?: unknown;
   errors: Record<string, string>;
+};
+
+export type EmergencyRefreshScope = 'full' | 'reception';
+
+export type EmergencyRefreshOptions = {
+  scope?: EmergencyRefreshScope;
+  /** When true, do not toggle global loading flags (background top-up). */
+  silent?: boolean;
+};
+
+export type EmergencyBackendInitOptions = EmergencyRefreshOptions;
+
+const RECEPTION_REFRESH_DATASETS = Object.freeze([
+  { key: 'whiteboard', label: 'whiteboard', fetcher: fetchEmergencyWhiteboard },
+  { key: 'capacity', label: 'capacity', fetcher: fetchCapacityStatus },
+  { key: 'ems', label: 'EMS', fetcher: fetchEMSIntake },
+  { key: 'queues', label: 'queues', fetcher: fetchEmergencyQueues },
+] as const);
+
+const FULL_REFRESH_DATASETS = Object.freeze([
+  ...RECEPTION_REFRESH_DATASETS,
+  { key: 'boarding', label: 'boarding', fetcher: fetchBoardingStatus },
+  { key: 'reassessment', label: 'reassessment', fetcher: fetchReassessmentQueue },
+  { key: 'referrals', label: 'referrals', fetcher: fetchReferrals },
+  { key: 'workflowLogs', label: 'workflow logs', fetcher: fetchEmergencyWorkflowLogs },
+] as const);
+
+const loadDatasetWithTimeout = async (
+  label: string,
+  fetcher: () => Promise<unknown>,
+  timeoutMs: number,
+): Promise<{ data?: unknown; error?: string }> => {
+  try {
+    const data = await Promise.race([
+      fetcher(),
+      new Promise<never>((_, reject) => {
+        window.setTimeout(
+          () => reject(new Error(`CareDroid ${label} timed out after ${timeoutMs}ms`)),
+          timeoutMs,
+        );
+      }),
+    ]);
+    return { data };
+  } catch (error: unknown) {
+    return {
+      error:
+        error instanceof Error
+          ? error.message
+          : `Unable to load CareDroid ${label} data.`,
+    };
+  }
 };
 
 export type ActivateSurgePayload = {
@@ -2507,8 +2562,12 @@ interface EmergencyStoreState {
   toggleCopilot: () => void;
   setCopilotOpen: (open: boolean) => void;
   clearError: () => void;
-  initializeFromBackend: () => Promise<EmergencyDashboardRefreshResult>;
-  refreshAllData: () => Promise<EmergencyDashboardRefreshResult>;
+  initializeFromBackend: (
+    options?: EmergencyBackendInitOptions,
+  ) => Promise<EmergencyDashboardRefreshResult>;
+  refreshAllData: (
+    options?: EmergencyRefreshOptions,
+  ) => Promise<EmergencyDashboardRefreshResult>;
   activateSurge: (payload?: ActivateSurgePayload) => Promise<EmergencySurgeStatus>;
   sendCopilotQuery: (
     query: string,
@@ -4274,8 +4333,11 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
 
     clearError: () => set((state) => ({ ui: { ...state.ui, error: null } })),
 
-    initializeFromBackend: async () => {
-      set((state) => ({ loading: true, ui: { ...state.ui, loading: true, error: null } }));
+    initializeFromBackend: async (options: EmergencyBackendInitOptions = {}) => {
+      const { scope = 'full', silent = false } = options;
+      if (!silent) {
+        set((state) => ({ loading: true, ui: { ...state.ui, loading: true, error: null } }));
+      }
 
       await get().initializeFlags();
 
@@ -4296,7 +4358,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       }
 
       try {
-        const result = await get().refreshAllData();
+        const result = await get().refreshAllData({ scope, silent: true });
         const whiteboardData = asRecord(unwrapData(result.whiteboard));
         const whiteboardPayload = asRecord(
           firstValue(whiteboardData, ['whiteboard', 'emergencyWhiteboard']) ?? whiteboardData,
@@ -4390,7 +4452,8 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       }
     },
 
-    refreshAllData: async () => {
+    refreshAllData: async (options: EmergencyRefreshOptions = {}) => {
+      const { scope = 'full', silent = false } = options;
       if (isSimulationModeActive()) {
         set((state) => ({
           loading: false,
@@ -4405,33 +4468,34 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         return { errors: {} };
       }
 
-      set((state) => ({ loading: true, ui: { ...state.ui, loading: true, error: null } }));
-      const loadDataset = async (
-        label: string,
-        fetcher: () => Promise<unknown>,
-      ): Promise<{ data?: unknown; error?: string }> => {
-        try {
-          return { data: await fetcher() };
-        } catch (error: any) {
-          return {
-            error:
-              error instanceof Error
-                ? error.message
-                : `Unable to load CareDroid ${label} data.`,
-          };
-        }
-      };
+      if (!silent) {
+        set((state) => ({ loading: true, ui: { ...state.ui, loading: true, error: null } }));
+      }
 
-      const [whiteboard, capacity, boarding, ems, queues, reassessment, referrals, workflowLogs] = await Promise.all([
-        loadDataset('whiteboard', fetchEmergencyWhiteboard),
-        loadDataset('capacity', fetchCapacityStatus),
-        loadDataset('boarding', fetchBoardingStatus),
-        loadDataset('EMS', fetchEMSIntake),
-        loadDataset('queues', fetchEmergencyQueues),
-        loadDataset('reassessment', fetchReassessmentQueue),
-        loadDataset('referrals', fetchReferrals),
-        loadDataset('workflow logs', fetchEmergencyWorkflowLogs),
-      ]);
+      const datasetDefs =
+        scope === 'reception' ? RECEPTION_REFRESH_DATASETS : FULL_REFRESH_DATASETS;
+      const timeoutMs =
+        scope === 'reception' ? RECEPTION_DATASET_TIMEOUT_MS : REFRESH_DATASET_TIMEOUT_MS;
+
+      const loaded = await Promise.all(
+        datasetDefs.map(async (definition) => [
+          definition.key,
+          await loadDatasetWithTimeout(definition.label, definition.fetcher, timeoutMs),
+        ]),
+      );
+
+      const byKey = Object.fromEntries(loaded) as Record<
+        string,
+        { data?: unknown; error?: string }
+      >;
+      const whiteboard = byKey.whiteboard ?? {};
+      const capacity = byKey.capacity ?? {};
+      const boarding = byKey.boarding ?? {};
+      const ems = byKey.ems ?? {};
+      const queues = byKey.queues ?? {};
+      const reassessment = byKey.reassessment ?? {};
+      const referrals = byKey.referrals ?? {};
+      const workflowLogs = byKey.workflowLogs ?? {};
       const errors = Object.fromEntries(
         Object.entries({ whiteboard, capacity, boarding, ems, queues, reassessment, referrals, workflowLogs })
           .filter(([, result]) => result.error)

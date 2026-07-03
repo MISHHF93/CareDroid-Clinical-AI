@@ -22,7 +22,7 @@ import { bootstrapAiPlatformIntegrations } from '../services/aiPlatformBootstrap
 import { resolveClinicalToolLaunchTarget } from '../services/unifiedClinicalToolsBridge';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { EMERGENCY_OS_BRANDING } from '../config/emergencyOsBranding.config';
-import { RECEPTION_FIRST_UX } from '../config/receptionFirstUx.config';
+import { isReceptionFirstUxEnabled, RECEPTION_FIRST_UX } from '../config/receptionFirstUx.config';
 import {
   PractitionerVisibilityProvider,
   usePractitionerSurfaceVisibility,
@@ -356,6 +356,9 @@ function AppShellFrame({ children }: AppShellProps) {
     let stopRealtime: (() => void) | undefined;
 
     bootstrapAiPlatformIntegrations();
+    if (isReceptionFirstUxEnabled()) {
+      void import('../pages/emergency/ReceptionWorkspace');
+    }
     let stopObservabilityHeartbeat: (() => void) | undefined;
     void import('../services/observabilityService').then(({ default: observabilityService }) => {
       if (cancelled) return;
@@ -371,8 +374,16 @@ function AppShellFrame({ children }: AppShellProps) {
     void (async () => {
       await ensureDevBackendSession();
       const backendReachable = await probeBackendReachability();
+      const receptionStartup =
+        isReceptionFirstUxEnabled() ||
+        location.pathname.startsWith(CANONICAL_ROUTES.emergencyReception);
       if (backendReachable) {
-        await useEmergencyStore.getState().initializeFromBackend();
+        if (receptionStartup) {
+          await useEmergencyStore.getState().initializeFromBackend({ scope: 'reception' });
+          void useEmergencyStore.getState().initializeFromBackend({ scope: 'full', silent: true });
+        } else {
+          await useEmergencyStore.getState().initializeFromBackend();
+        }
       } else {
         // No backend � stay on local/simulation data; no network calls needed
         useEmergencyStore.setState({ backendAvailable: false, persistenceMode: 'local' });
@@ -393,7 +404,7 @@ function AppShellFrame({ children }: AppShellProps) {
         const reachable = await probeBackendReachability();
         if (!reachable || isBackendKnownOffline()) return;
         const store = useEmergencyStore.getState();
-        await store.refreshAllData();
+        await store.refreshAllData({ silent: true });
         try {
           const envelope = await fetchCareDroidCentralNodeSnapshot();
           store.dispatchWebSocketEvent({ type: 'central_node_snapshot', payload: envelope });
@@ -479,6 +490,11 @@ function AppShellFrame({ children }: AppShellProps) {
     screenCapabilities.showAdministrativeAutomationEngine,
     simulationModeActive,
   ]);
+
+  useEffect(() => {
+    if (!location.pathname.startsWith(CANONICAL_ROUTES.emergencyReception)) return;
+    void useEmergencyStore.getState().refreshAllData({ scope: 'reception', silent: true });
+  }, [location.pathname]);
 
   useEffect(() => {
     if (previousSimulationModeRef.current === simulationModeActive) return;
