@@ -15,6 +15,7 @@ import {
 } from '../config/security';
 import logger from '../utils/logger';
 import { ensureDevBackendSession } from '../services/devBackendAuth';
+import { USER_BOOTSTRAP_MAX_MS } from '../config/startupTimeouts';
 
 export { Permission } from '../config/backendPermissionCatalog';
 
@@ -115,8 +116,27 @@ export const UserProvider = ({ children }) => {
         return;
       }
 
+      if (looksLikeJwt(resolveSessionToken())) {
+        persistSession(user, authToken);
+        setIsLoading(false);
+        return;
+      }
+
       setIsLoading(true);
-      const session = await ensureDevBackendSession();
+      const session = await Promise.race([
+        ensureDevBackendSession(),
+        new Promise<Awaited<ReturnType<typeof ensureDevBackendSession>>>((resolve) => {
+          window.setTimeout(
+            () =>
+              resolve({
+                token: resolveSessionToken(),
+                source: 'bootstrap-timeout',
+                error: 'Dev session bootstrap timed out',
+              }),
+            USER_BOOTSTRAP_MAX_MS,
+          );
+        }),
+      ]);
       if (cancelled) return;
 
       const nextToken = resolveSessionToken(session.token);

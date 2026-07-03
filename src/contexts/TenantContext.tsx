@@ -8,6 +8,7 @@ import {
 import { readDevTenantContext } from '../services/devBackendAuth';
 import { useUser } from './UserContext';
 import logger from '../utils/logger';
+import { TENANT_CONTEXT_TIMEOUT_MS } from '../config/startupTimeouts';
 
 export const DEMO_TENANT_CONTEXT = Object.freeze({
   organizationId: 'demo-organization',
@@ -102,7 +103,9 @@ export function TenantContextProvider({ children }) {
 
     setIsLoading(true);
     try {
-      const response = await apiFetch('/api/tenant/context');
+      const response = await apiFetch('/api/tenant/context', {
+        timeoutMs: TENANT_CONTEXT_TIMEOUT_MS,
+      });
       const data = await parseApiResponse(response, { fallback: {} });
 
       if (!response.ok) {

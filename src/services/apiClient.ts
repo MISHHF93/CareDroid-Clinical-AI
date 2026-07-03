@@ -5,11 +5,13 @@ import { AUTH_CONFIG } from '../config/auth.config';
 import { getTenantHeaders } from './tenantContextStore';
 import {
   isBackendKnownOffline,
+  isBackendReachableCached,
   isLikelyNetworkError,
   ensureBackendReachabilityProbed,
   markBackendReachable,
   markBackendUnreachable,
 } from './backendReachability';
+import { BACKEND_PROBE_TIMEOUT_MS } from '../config/startupTimeouts';
 import observabilityService from './observabilityService';
 import { isPublicApiPath as isSecurityPublicApiPath } from './securityAccessService';
 
@@ -325,8 +327,8 @@ export const apiFetch = async (path, options: any = {}) => {
     ...fetchOptions
   } = options;
 
-  if (isDev) {
-    await ensureBackendReachabilityProbed();
+  if (isDev && !isBackendKnownOffline() && !isBackendReachableCached()) {
+    await ensureBackendReachabilityProbed({ timeoutMs: BACKEND_PROBE_TIMEOUT_MS });
   }
 
   await bootstrapDevSessionIfNeeded(path);

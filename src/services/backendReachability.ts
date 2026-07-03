@@ -1,4 +1,6 @@
-const CACHE_MS = 15_000;
+import { BACKEND_OFFLINE_CACHE_MS, BACKEND_PROBE_TIMEOUT_MS } from '../config/startupTimeouts';
+
+const CACHE_MS = BACKEND_OFFLINE_CACHE_MS;
 
 let cache: { at: number; reachable: boolean | null } = {
   at: 0,
@@ -49,7 +51,7 @@ export async function probeBackendReachability(options: any = {}) {
 
   try {
     const controller = new AbortController();
-    const timeoutMs = Number(options.timeoutMs) || 2500;
+    const timeoutMs = Number(options.timeoutMs) || BACKEND_PROBE_TIMEOUT_MS;
     const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs);
     const response = await fetch('/health', { cache: 'no-store', signal: controller.signal });
     window.clearTimeout(timeoutId);

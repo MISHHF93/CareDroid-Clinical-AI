@@ -8,6 +8,7 @@ import { createContext, useContext, useEffect, useState, useCallback } from 'rea
 import { useUser } from './UserContext';
 import configService from '../services/configService';
 import logger from '../utils/logger';
+import { CONFIG_LOAD_TIMEOUT_MS } from '../config/startupTimeouts';
 
 
 const SystemConfigContext = createContext<any>(null);
@@ -67,7 +68,7 @@ export function SystemConfigProvider({ children }) {
       setError(null);
 
       const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Config load timeout')), 5000),
+        setTimeout(() => reject(new Error('Config load timeout')), CONFIG_LOAD_TIMEOUT_MS),
       );
 
       const [configRaw, usageRaw, toolsRaw, subRaw] = (await Promise.race([

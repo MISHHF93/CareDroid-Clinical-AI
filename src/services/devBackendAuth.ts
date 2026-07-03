@@ -1,6 +1,7 @@
 import appConfig from '../config/appConfig';
 import { AUTH_CONFIG } from '../config/auth.config';
 import { API_ROUTES } from '../config/api.config';
+import { BACKEND_PROBE_TIMEOUT_MS, DEV_SESSION_FETCH_TIMEOUT_MS } from '../config/startupTimeouts';
 import { setTenantContext } from './tenantContextStore';
 
 async function readJsonBody(response, fallback: any = {}) {
@@ -73,7 +74,10 @@ export function readDevTenantContext() {
  *
  * Falls back to the local bypass token only when the proxied dev-session route is unreachable.
  */
-export async function ensureDevBackendSession({ force = false }: any = {}) {
+export async function ensureDevBackendSession({
+  force = false,
+  timeoutMs = DEV_SESSION_FETCH_TIMEOUT_MS,
+}: any = {}) {
   if (!isDev) return { token: readStoredToken(), source: 'production' };
 
   const existingToken = readStoredToken();
@@ -87,7 +91,9 @@ export async function ensureDevBackendSession({ force = false }: any = {}) {
   // skip the network request � it will fail with ECONNREFUSED since there's no backend.
   try {
     const { ensureBackendReachabilityProbed } = await import('./backendReachability');
-    const backendReachable = await ensureBackendReachabilityProbed();
+    const backendReachable = await ensureBackendReachabilityProbed({
+      timeoutMs: BACKEND_PROBE_TIMEOUT_MS,
+    });
     if (!backendReachable && !force) {
       return { token: existingToken || BYPASS_TOKEN, source: 'local-demo-bypass' };
     }
@@ -99,10 +105,14 @@ export async function ensureDevBackendSession({ force = false }: any = {}) {
 
   try {
     // Raw fetch avoids a circular import with apiClient (which bootstraps this session).
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs);
     const response = await fetch(API_ROUTES.auth.devSession, {
       method: 'POST',
       headers: { Accept: 'application/json' },
+      signal: controller.signal,
     });
+    window.clearTimeout(timeoutId);
     const payload = await readJsonBody(response, {});
     if (!response.ok || !payload?.accessToken) {
       return { token: existingToken || BYPASS_TOKEN, source: 'fallback-bypass', error: payload?.message };
@@ -111,10 +121,16 @@ export async function ensureDevBackendSession({ force = false }: any = {}) {
     persistDevSession(payload);
     return { token: payload.accessToken, source: 'dev-session', tenantContext: payload.tenantContext || null };
   } catch (error: any) {
+    const message =
+      error?.name === 'AbortError'
+        ? 'Dev session timed out'
+        : error instanceof Error
+          ? error.message
+          : 'Dev session unavailable';
     return {
       token: existingToken || BYPASS_TOKEN,
       source: 'fallback-bypass',
-      error: error instanceof Error ? error.message : 'Dev session unavailable',
+      error: message,
     };
   }
 }

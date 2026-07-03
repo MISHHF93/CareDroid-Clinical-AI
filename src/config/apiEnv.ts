@@ -1,7 +1,13 @@
 import appConfig from './appConfig';
 
 /** Default fetch timeout (ms); override with VITE_API_TIMEOUT_MS */
-export const DEFAULT_API_TIMEOUT_MS = Number(import.meta.env?.VITE_API_TIMEOUT_MS) || 30000;
+const configuredApiTimeout = Number(import.meta.env?.VITE_API_TIMEOUT_MS);
+export const DEFAULT_API_TIMEOUT_MS =
+  Number.isFinite(configuredApiTimeout) && configuredApiTimeout > 0
+    ? configuredApiTimeout
+    : import.meta.env?.DEV
+      ? 8_000
+      : 12_000;
 
 /**
  * Ensures REST paths include the Nest global `/api` prefix.
