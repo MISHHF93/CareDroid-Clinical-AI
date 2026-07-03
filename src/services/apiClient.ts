@@ -192,11 +192,33 @@ function buildDevOfflineJsonBody(path) {
   if (/\/workflow/.test(p)) {
     return { logs: [], workflowLogs: [], status: 'dev-offline' };
   }
+  if (/\/operational-intelligence/.test(p)) {
+    return {
+      module: 'CareDroid Operational Intelligence',
+      source: 'dev-offline',
+      status: 'degraded',
+      data: {
+        layer: 'CareDroidOperationalIntelligence',
+        status: 'degraded',
+        mode: 'rule_based',
+        models: [],
+        insights: [],
+      },
+    };
+  }
+  if (/\/central-node/.test(p)) {
+    return {
+      module: 'CareDroid Central Node',
+      source: 'dev-offline',
+      status: 'degraded',
+      data: { node: 'CareDroidCentralNode', status: 'degraded' },
+    };
+  }
   return { data: null, items: [], patients: [], results: [], logs: [], status: 'dev-offline' };
 }
 
 function getDevGracefulResponse(path) {
-  if (!isDev) return null;
+  if (!isDev || !isBackendKnownOffline()) return null;
   const p = normalizeApiPath(path);
   if (DEV_GRACEFUL_EMPTY_PATHS.some((re) => re.test(p))) {
     return new Response(JSON.stringify(buildDevOfflineJsonBody(path)), {

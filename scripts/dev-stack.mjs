@@ -178,6 +178,9 @@ const waitForBackend = async (port, { timeoutMs = 180000, intervalMs = 750 } = {
 };
 
 const resolveBackendStartArgs = () => {
+  if (!backendOnly && !args.has('--backend-prod')) {
+    return ['run', 'start:watch'];
+  }
   const distMain = resolve(backendDir, 'dist', 'main.js');
   if (existsSync(distMain)) {
     return ['run', 'start:prod'];

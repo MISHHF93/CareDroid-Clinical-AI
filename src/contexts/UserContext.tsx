@@ -14,6 +14,7 @@ import {
   checkPermission as checkSecurityPermission,
 } from '../config/security';
 import logger from '../utils/logger';
+import { ensureDevBackendSession } from '../services/devBackendAuth';
 
 export { Permission } from '../config/backendPermissionCatalog';
 
@@ -54,10 +55,21 @@ const readStoredToken = () => {
   return localStorage.getItem(AUTH_TOKEN_KEY) || localStorage.getItem(LEGACY_AUTH_TOKEN_KEY) || '';
 };
 
+const looksLikeJwt = (token: string) => {
+  if (!token || token === OPEN_ACCESS_TOKEN) return false;
+  const parts = token.split('.');
+  return parts.length === 3 && parts.every((part) => part.length > 0);
+};
+
+const resolveSessionToken = (preferredToken?: string) => {
+  const candidate = preferredToken || readStoredToken();
+  return looksLikeJwt(candidate) ? candidate : candidate || OPEN_ACCESS_TOKEN;
+};
+
 const persistSession = (nextUser, nextToken) => {
   if (!canUseStorage()) return;
   const userToPersist = nextUser || OPEN_ACCESS_USER;
-  const tokenToPersist = nextToken || OPEN_ACCESS_TOKEN;
+  const tokenToPersist = resolveSessionToken(nextToken);
   localStorage.setItem(USER_PROFILE_KEY, JSON.stringify(userToPersist));
   localStorage.setItem(AUTH_TOKEN_KEY, tokenToPersist);
   localStorage.removeItem(LEGACY_AUTH_TOKEN_KEY);
@@ -89,24 +101,53 @@ export const useUser = () => {
 
 export const UserProvider = ({ children }) => {
   const [user, setUserState] = useState(() => readStoredUser() || OPEN_ACCESS_USER);
-  const [authToken, setAuthTokenState] = useState(() => OPEN_ACCESS_TOKEN);
-  const [isLoading] = useState(false);
+  const [authToken, setAuthTokenState] = useState(() => resolveSessionToken());
+  const [isLoading, setIsLoading] = useState(
+    () => import.meta.env.DEV && !looksLikeJwt(resolveSessionToken()),
+  );
 
-  // Open-access build phase: always seed a local demo session for platform providers.
   useEffect(() => {
-    persistSession(user, authToken);
-    logger.info('Open access platform session initialized');
-  }, [authToken, user]);
+    let cancelled = false;
+
+    const bootstrapSession = async () => {
+      if (!import.meta.env.DEV) {
+        persistSession(user, authToken);
+        return;
+      }
+
+      setIsLoading(true);
+      const session = await ensureDevBackendSession();
+      if (cancelled) return;
+
+      const nextToken = resolveSessionToken(session.token);
+      const storedUser = readStoredUser() || user || OPEN_ACCESS_USER;
+      setAuthTokenState(nextToken);
+      setUserState(storedUser);
+      persistSession(storedUser, nextToken);
+      setIsLoading(false);
+
+      logger.info('Dev platform session initialized', {
+        source: session.source,
+        hasJwt: looksLikeJwt(nextToken),
+      });
+    };
+
+    void bootstrapSession();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const setUser = (newUser) => {
     const nextUser = newUser ? hydrateStoredDemoUser(newUser) : OPEN_ACCESS_USER;
     setUserState({ ...nextUser, authMode: 'open-access' });
-    persistSession({ ...nextUser, authMode: 'open-access' }, OPEN_ACCESS_TOKEN);
+    persistSession({ ...nextUser, authMode: 'open-access' }, authToken);
   };
 
-  const setAuthToken = () => {
-    setAuthTokenState(OPEN_ACCESS_TOKEN);
-    persistSession(user, OPEN_ACCESS_TOKEN);
+  const setAuthToken = (nextToken = OPEN_ACCESS_TOKEN) => {
+    const resolvedToken = resolveSessionToken(nextToken);
+    setAuthTokenState(resolvedToken);
+    persistSession(user, resolvedToken);
   };
 
   const signOut = () => {
@@ -137,7 +178,7 @@ export const UserProvider = ({ children }) => {
 
   const isAuthenticated = Boolean(user && authToken);
   const authMode = deriveAuthMode(user, authToken);
-  const isRealSession = false;
+  const isRealSession = looksLikeJwt(authToken);
   const isDevAuthBypass = Boolean(
     user?.isDevAuthBypass ||
       user?.authMode === 'platform-access' ||
