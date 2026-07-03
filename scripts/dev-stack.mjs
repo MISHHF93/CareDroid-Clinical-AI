@@ -487,6 +487,18 @@ if (!frontendOnly && !backendAlreadyHealthy) {
 }
 
 if (!backendOnly) {
+  if (!(await probeFrontendProxyHealth(frontendPort))) {
+    const existingPort = await findExistingCareDroidFrontendPort(preferredFrontendPort);
+    if (existingPort) {
+      console.log('CareDroid local stack is already running.');
+      console.log(`App:      http://localhost:${existingPort}`);
+      console.log(`Backend:  http://localhost:${backendPort}`);
+      console.log(`Health:   http://localhost:${existingPort}/health`);
+      console.log('Use --force-restart to stop and relaunch both processes.');
+      process.exit(0);
+    }
+  }
+
   spawnManagedProcess({
     name: 'web',
     cwd: rootDir,
