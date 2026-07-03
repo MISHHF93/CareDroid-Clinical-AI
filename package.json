@@ -179,6 +179,13 @@
     "vitest": "^4.0.18"
   },
   "overrides": {
-    "glob": "^13.0.6"
+    "glob": "^13.0.6",
+    "vite": {
+      "rollup": "npm:@rollup/wasm-node@4.61.1"
+    },
+    "vitest": {
+      "rollup": "npm:@rollup/wasm-node@4.61.1"
+    },
+    "rollup": "npm:@rollup/wasm-node@4.61.1"
   }
 }
