@@ -35,6 +35,11 @@ import { advancePatientJourneyState, dischargePatientSafely, getDefaultNextPatie
 import usePatientWorkflow from '../hooks/usePatientWorkflow';
 import useProfileNavigate from '../hooks/useProfileNavigate';
 import { notifyPatientStepAdvanced } from '../services/workflowNavigationFeedback';
+import {
+  confirmCareDroidAction,
+  showActionSuccess,
+} from '../services/careDroidInteractionFeedback';
+import { STANDARD_ACTION_FEEDBACK } from '../config/careDroidInteractionModel';
 import PatientExperienceStatusBadge from './patient-experience/PatientExperienceStatusBadge';
 import QueueReasonBadge from './queues/QueueReasonBadge';
 import { isInQueueFlow } from '../services/queueReasonVisibility';
@@ -103,7 +108,7 @@ const emptyVitalsForm = {
 };
 
 type VitalsForm = typeof emptyVitalsForm;
-type ActionMode = null | 'staff' | 'room' | 'escalate' | 'discharge';
+type ActionMode = null | 'staff' | 'room';
 type VitalsHistoryView = 'chart' | 'table';
 type VitalsLineKey = 'hr' | 'spo2' | 'sbp' | 'temp';
 type VitalTrend = {
@@ -771,15 +776,6 @@ export default function PatientDetailPanel() {
   }, [selectedPatient]);
 
   useEffect(() => {
-    const openDischargeConfirmation = () => {
-      if (selectedPatientId && canDischarge) setActionMode('discharge');
-    };
-
-    document.addEventListener('open-patient-discharge', openDischargeConfirmation);
-    return () => document.removeEventListener('open-patient-discharge', openDischargeConfirmation);
-  }, [canDischarge, selectedPatientId]);
-
-  useEffect(() => {
     if (!selectedPatient) {
       setCriticalChecklistOpen(false);
       setActiveCriticalChecklist(null);
@@ -887,13 +883,22 @@ export default function PatientDetailPanel() {
     setNoteText('');
   };
 
-  const escalate = () => {
-    if (!canEscalate) return;
+  const confirmEscalatePatient = useCallback(async () => {
+    if (!canEscalate || !selectedPatient) return;
+    const patientLabel = `${selectedPatient.firstName} ${selectedPatient.lastName}`.trim();
+    const confirmed = await confirmCareDroidAction({
+      title: 'Escalate patient?',
+      message: `${patientLabel} will be escalated and a critical alert will be created.`,
+      confirmLabel: 'Confirm escalation',
+      tone: 'danger',
+    });
+    if (!confirmed) return;
+
     dispatchAlert({
       id: createId('alert'),
       severity: 'Critical',
       title: 'Patient escalated',
-      message: `${selectedPatient.firstName} ${selectedPatient.lastName} was escalated for urgent review.`,
+      message: `${patientLabel} was escalated for urgent review.`,
       patientId: selectedPatient.id,
       source: 'patient-detail-panel',
     });
@@ -901,13 +906,40 @@ export default function PatientDetailPanel() {
       createWaitingRoomCommunicationLogInput({
         kind: 'concern-escalated',
         patientId: selectedPatient.id,
-        summary: `${selectedPatient.firstName} ${selectedPatient.lastName} escalated for urgent review.`,
+        summary: `${patientLabel} escalated for urgent review.`,
         severity: 'Critical',
       }),
     );
     addFlag(selectedPatient.id, PatientFlag.HighRisk);
-    setActionMode(null);
-  };
+    showActionSuccess('Patient escalated', 'Critical alert created for urgent review.');
+  }, [addFlag, canEscalate, recordWorkflowAction, selectedPatient]);
+
+  const confirmDischargePatient = useCallback(async () => {
+    if (!canDischarge || !selectedPatient) return;
+    const patientLabel = `${selectedPatient.firstName} ${selectedPatient.lastName}`.trim();
+    const confirmed = await confirmCareDroidAction({
+      title: 'Discharge patient?',
+      message: `${patientLabel} will be marked discharged.`,
+      confirmLabel: 'Confirm discharge',
+      tone: 'danger',
+    });
+    if (!confirmed) return;
+
+    dischargePatientSafely(selectedPatient.id, {
+      actorId: actorStaffId,
+      note: 'Discharged from detail panel',
+    });
+    showActionSuccess(STANDARD_ACTION_FEEDBACK.patientAdvanced, 'Patient discharged.');
+  }, [actorStaffId, canDischarge, selectedPatient]);
+
+  useEffect(() => {
+    const openDischargeConfirmation = () => {
+      if (selectedPatientId && canDischarge) void confirmDischargePatient();
+    };
+
+    document.addEventListener('open-patient-discharge', openDischargeConfirmation);
+    return () => document.removeEventListener('open-patient-discharge', openDischargeConfirmation);
+  }, [canDischarge, confirmDischargePatient, selectedPatientId]);
 
   const openManualChecklist = () => {
     const matches = findMatchingChecklists(selectedPatient);
@@ -1389,30 +1421,7 @@ export default function PatientDetailPanel() {
               ))}
             </select>
           ) : null}
-          {actionMode === 'escalate' ? (
-            <div>
-              <p className="patient-detail-action-panel__prompt">Escalate this patient and create a critical alert?</p>
-              <FieldButton disabled={!canEscalate} onClick={escalate}>Confirm Escalation</FieldButton>
-            </div>
-          ) : null}
-          {actionMode === 'discharge' ? (
-            <div>
-              <p className="patient-detail-action-panel__prompt">Discharge this patient?</p>
-              <FieldButton
-                onClick={() => {
-                  if (!canDischarge) return;
-                  dischargePatientSafely(selectedPatient.id, {
-                    actorId: actorStaffId,
-                    note: 'Discharged from detail panel',
-                  });
-                  setActionMode(null);
-                }}
-                disabled={!canDischarge}
-              >
-                Confirm Discharge
-              </FieldButton>
-            </div>
-          ) : null}
+
         </section>
       ) : null}
 
@@ -1444,10 +1453,10 @@ export default function PatientDetailPanel() {
           <FieldButton disabled={!canAssignRoom} onClick={() => setActionMode(actionMode === 'room' ? null : 'room')}>Assign Room</FieldButton>
           ) : null}
           {escalatePresentation.visible ? (
-          <FieldButton disabled={!canEscalate} onClick={() => setActionMode(actionMode === 'escalate' ? null : 'escalate')}>Escalate</FieldButton>
+          <FieldButton disabled={!canEscalate} onClick={() => void confirmEscalatePatient()}>Escalate</FieldButton>
           ) : null}
           {dischargePresentation.visible ? (
-          <FieldButton disabled={!canDischarge} onClick={() => setActionMode(actionMode === 'discharge' ? null : 'discharge')}>Discharge</FieldButton>
+          <FieldButton disabled={!canDischarge} onClick={() => void confirmDischargePatient()}>Discharge</FieldButton>
           ) : null}
         </div>
       </div>

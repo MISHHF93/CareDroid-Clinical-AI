@@ -1,4 +1,5 @@
 import { Toaster } from 'sonner';
+import { CARE_DROID_INTERACTION } from '../config/careDroidInteractionModel';
 import './CareDroidToastHost.css';
 
 /** Minimal toasts for user feedback only — operational alerts use the notification center. */
@@ -8,7 +9,7 @@ export default function CareDroidToastHost() {
       className="caredroid-toast-host"
       position="top-center"
       visibleToasts={1}
-      duration={2800}
+      duration={CARE_DROID_INTERACTION.feedbackDurationMs}
       closeButton
       richColors={false}
       expand={false}
