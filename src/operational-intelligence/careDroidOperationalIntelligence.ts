@@ -2,7 +2,6 @@ import type { CareDroidCentralNodeSnapshot } from '../central-node/careDroidCent
 import type { Patient, Referral } from '../types/emergency';
 import { summarizeWhatHappensNextBoard } from '../services/whatHappensNextGuidance';
 import {
-  BLOCKED_AUTONOMOUS_ACTIONS,
   CARE_DROID_OPERATIONAL_INTELLIGENCE_LAYER,
   DEFAULT_OPERATIONAL_INTELLIGENCE_SETTINGS,
   OI_RULE_BASELINE_VERSION,
@@ -10,6 +9,7 @@ import {
   type OperationalIntelligenceSettings,
   type OperationalIntelligenceSnapshot,
 } from './operationalIntelligence.types';
+import { BLOCKED_AUTONOMOUS_OI_ACTIONS } from '../../lib/operational-intelligence/constants';
 
 type BuildOperationalIntelligenceOptions = {
   centralSnapshot: CareDroidCentralNodeSnapshot;
@@ -118,7 +118,7 @@ function buildDegradedOperationalIntelligenceSnapshot({
       visible: oiSettings.dataFreshnessVisible,
     },
     badges: [],
-    blockedAutonomousActions: [...BLOCKED_AUTONOMOUS_ACTIONS],
+    blockedAutonomousActions: [...BLOCKED_AUTONOMOUS_OI_ACTIONS],
     recentAuditEvents: workflowLogs.slice(0, 8).map((log) => ({
       id: log.id,
       type: log.type,

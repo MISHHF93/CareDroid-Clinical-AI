@@ -29,6 +29,10 @@ import {
 } from '../services/securityApiBoundary';
 import { compileCareDroidAccessProfile, normalizeCareDroidProfile } from '../lib/users/canonicalAccess';
 import { getDefaultDemoUser } from '../lib/users/demoUsers';
+import {
+  BLOCKED_AUTONOMOUS_OI_ACTIONS,
+  OPERATIONAL_INTELLIGENCE_DISCLAIMERS,
+} from '../../lib/operational-intelligence/constants';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const backendPermissionEnumPath = join(
@@ -115,6 +119,25 @@ describe('security contract', () => {
     for (const key of backendKeys) {
       expect(frontendKeys, `missing frontend mirror for ${key}`).toContain(key);
     }
+  });
+
+  it('blocks autonomous clinical actions in shared operational intelligence constants', () => {
+    expect(BLOCKED_AUTONOMOUS_OI_ACTIONS).toContain('diagnose');
+    expect(BLOCKED_AUTONOMOUS_OI_ACTIONS).toContain('prescribe');
+    expect(BLOCKED_AUTONOMOUS_OI_ACTIONS).toContain('discharge');
+    expect(BLOCKED_AUTONOMOUS_OI_ACTIONS).toContain('auto_triage');
+    expect(OPERATIONAL_INTELLIGENCE_DISCLAIMERS.clinical).toMatch(/human review required/i);
+    expect(OPERATIONAL_INTELLIGENCE_DISCLAIMERS.operational).toMatch(/advisory/i);
+  });
+
+  it('routes backend operational intelligence disclaimers through shared lib constants', () => {
+    const backendSource = readFileSync(
+      join(__dirname, '../../backend/src/modules/emergency-os/emergency-os.operational-intelligence.service.ts'),
+      'utf8',
+    );
+    expect(backendSource).toContain('OPERATIONAL_INTELLIGENCE_DISCLAIMERS');
+    expect(backendSource).not.toMatch(/const CLINICAL_DISCLAIMER\s*=/);
+    expect(backendSource).not.toMatch(/const OPERATIONAL_DISCLAIMER\s*=/);
   });
 
   it('validates PHI API boundary inputs', () => {

@@ -1,6 +1,5 @@
 import { Injectable, Optional } from '@nestjs/common';
 import { EmergencyRealtimeService } from './emergency-realtime.service';
-import { EXTERNAL_DATA_REVIEW_DISCLAIMER } from '../../../../lib/ai/safetyPolicy';
 import {
   BLOCKED_AUTONOMOUS_OI_ACTIONS,
   buildOperationalIntelligenceSnapshot,
@@ -23,10 +22,6 @@ import type {
   OperationalInputEvent,
   OperationalIntelligenceSnapshot,
 } from './emergency-os.types';
-
-const CLINICAL_DISCLAIMER =
-  'Human review required. This is not a replacement for clinical judgment.';
-const OPERATIONAL_DISCLAIMER = OPERATIONAL_INTELLIGENCE_DISCLAIMERS.operational;
 
 function envelope<T>(module: string, data: T): EmergencyModuleEnvelope<T> {
   return {
@@ -92,11 +87,7 @@ export class OperationalIntelligenceService {
       settings,
       central,
       recentAuditEvents: this.workflowLogService.listLogs().slice(0, 8),
-      disclaimers: {
-        operational: OPERATIONAL_DISCLAIMER,
-        clinical: CLINICAL_DISCLAIMER,
-        externalData: EXTERNAL_DATA_REVIEW_DISCLAIMER,
-      },
+      disclaimers: OPERATIONAL_INTELLIGENCE_DISCLAIMERS,
       driftReport: driftReport ?? null,
       supplementalModels,
     });
@@ -234,7 +225,7 @@ export class OperationalIntelligenceService {
       acceptedEvents: accepted.length,
       rejectedEvents: events.length - accepted.length,
       snapshot,
-      safetyNotice: OPERATIONAL_DISCLAIMER,
+      safetyNotice: OPERATIONAL_INTELLIGENCE_DISCLAIMERS.operational,
       blockedAutonomousActions: [...BLOCKED_AUTONOMOUS_OI_ACTIONS],
       lastEvaluatedAt: this.lastEvaluatedAt,
     });

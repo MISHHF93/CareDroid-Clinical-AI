@@ -3,7 +3,7 @@
 > Auto-generated from implementation. Do not edit manually.
 > Regenerate: `npm run docs:generate`
 
-**Entries:** 81
+**Entries:** 82
 
 ### app-config
 
@@ -335,6 +335,13 @@ Workflow automation domains, triggers, and safety contract. [registry]
 - **Source:** `src/config/unifiedWorkflowAutomationModel.ts`
 - **Status:** active
 
+### operational-intelligence-constants
+
+Shared OI safety constants — disclaimers, blocked autonomous actions, and rule baseline version. [registry]
+
+- **Source:** `lib/operational-intelligence/constants.ts`
+- **Status:** active
+
 ### operational-intelligence-engine
 
 Shared rule-based operational intelligence snapshot builder for backend and frontend fallback. [registry]
@@ -577,7 +584,7 @@ Fetch timeout for apiClient (milliseconds). (parser: apiEnv)
 
 ### Configuration audit
 
-68 registry entries, 55 env vars, 2 conflicts (4 compat shims).
+69 registry entries, 55 env vars, 2 conflicts (4 compat shims).
 
 - **Source:** `canonicalConfigurationAudit.ts`
 - **Status:** active

@@ -494,6 +494,24 @@ export const CANONICAL_CONFIGURATION_REGISTRY: readonly CanonicalConfigurationEn
     consumers: ['unifiedWorkflowAutomationEngine', 'WorkflowAutomationCommandBar'],
   }),
   Object.freeze({
+    id: 'operational-intelligence-constants',
+    domain: 'workflow',
+    path: 'lib/operational-intelligence/constants.ts',
+    purpose: 'Shared OI safety constants — disclaimers, blocked autonomous actions, and rule baseline version.',
+    layer: 'registry',
+    exportKeys: [
+      'BLOCKED_AUTONOMOUS_OI_ACTIONS',
+      'OPERATIONAL_INTELLIGENCE_DISCLAIMERS',
+      'OI_RULE_BASELINE_VERSION',
+    ],
+    consumers: [
+      'lib/operational-intelligence/buildSnapshot.ts',
+      'emergency-os.operational-intelligence.service',
+      'operationalIntelligence.types',
+      'careDroidOperationalIntelligence',
+    ],
+  }),
+  Object.freeze({
     id: 'operational-intelligence-engine',
     domain: 'workflow',
     path: 'lib/operational-intelligence/buildSnapshot.ts',
