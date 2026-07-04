@@ -141,4 +141,78 @@ describe('operationalCommandDashboardModel', () => {
     expect(snapshot.pendingBedAssignments.length).toBeGreaterThan(0);
     expect(snapshot.chargeNurseAlerts[0]).toContain('pending bed assignment');
   });
+
+  it('projects waiting, occupancy, and bottleneck labels from unified operational intelligence', () => {
+    const patients = [
+      patient({ id: 'p1', state: PatientState.Waiting }),
+      patient({ id: 'p2', state: PatientState.Triage }),
+    ];
+
+    const snapshot = buildOperationalCommandDashboardSnapshot({
+      patients,
+      rooms,
+      capacity: {
+        score: 40,
+        band: 'Green',
+        label: 'Green capacity',
+        riskLevel: 'Green',
+        totalPatients: 2,
+        occupiedRooms: 2,
+        boardingCount: 0,
+        reassessmentDue: 0,
+        currentOccupancy: 2,
+        maxCapacity: 6,
+        occupancyPercent: 33,
+        waitingCount: 1,
+        dischargeReadyCount: 0,
+        incomingEMSCriticalCount: 0,
+        deductions: [],
+        updatedAt: '2026-06-24T10:00:00.000Z',
+      },
+      unifiedOperationalSnapshot: {
+        engineId: 'unified-operational-intelligence',
+        generatedAt: '2026-07-04T12:00:00.000Z',
+        source: 'backend',
+        domainStatuses: [],
+        insights: [
+          {
+            id: 'uoi-bottleneck-1',
+            domain: 'patient_flow',
+            type: 'bottleneck',
+            title: 'Backend queue bottleneck',
+            summary: 'Queue breach detected.',
+            severity: 'warning',
+            ownerRole: 'charge_nurse',
+            reasonCodes: ['queue_breach'],
+            confidence: 0.9,
+            humanReviewRequired: true,
+            advisoryOnly: true,
+            source: 'backend',
+            updatedAt: '2026-07-04T12:00:00.000Z',
+          },
+        ],
+        metrics: {
+          activePatients: 7,
+          waitingPatients: 5,
+          capacityScore: 91,
+          capacityBand: 'Red',
+          inboundEms: 0,
+          activeBottlenecks: 1,
+          unresolvedAlerts: 0,
+          degradedServices: 0,
+          workflowPendingReview: 0,
+          aiRecommendationCount: 0,
+          congestionPredictions: 0,
+        },
+        safetyStatement: 'Advisory only.',
+        backendEndpoints: [],
+      },
+      now: new Date('2026-06-24T10:00:00.000Z'),
+    });
+
+    expect(snapshot.metrics.find((metric) => metric.id === 'total-patients')?.value).toBe(7);
+    expect(snapshot.metrics.find((metric) => metric.id === 'waiting-room-count')?.value).toBe(5);
+    expect(snapshot.metrics.find((metric) => metric.id === 'er-occupancy')?.value).toBe('91%');
+    expect(snapshot.bottleneckLabel).toBe('Backend queue bottleneck');
+  });
 });

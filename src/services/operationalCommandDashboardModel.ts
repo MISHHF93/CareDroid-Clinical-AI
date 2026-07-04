@@ -21,6 +21,8 @@ import {
 } from './preArrivalActivationRules';
 import { scanProlongedStayAlerts } from './nativeAiCore';
 import { predictPostEdOrientation } from './nativeAiCore';
+import type { UnifiedOperationalIntelligenceSnapshot } from '../config/unifiedOperationalIntelligenceModel';
+import { isAuthoritativeUnifiedOperationalSnapshot } from './unifiedOperationalIntelligenceService';
 
 export type OperationalDashboardTone = 'green' | 'amber' | 'red';
 
@@ -357,6 +359,7 @@ export function buildOperationalCommandDashboardSnapshot(input: {
   staff?: Staff[];
   admissionAlertThreshold?: number;
   prolongedStayAlertThreshold?: number;
+  unifiedOperationalSnapshot?: UnifiedOperationalIntelligenceSnapshot | null;
   now?: Date;
 } = {}): OperationalCommandDashboardSnapshot {
   const now = input.now || new Date();
@@ -364,9 +367,14 @@ export function buildOperationalCommandDashboardSnapshot(input: {
   const rooms = input.rooms || [];
   const capacity = input.capacity;
   const staff = input.staff || [];
+  const unifiedOperational = input.unifiedOperationalSnapshot;
+  const useBackendOperationalIntelligence = isAuthoritativeUnifiedOperationalSnapshot(unifiedOperational);
+  const unifiedMetrics = useBackendOperationalIntelligence ? unifiedOperational.metrics : null;
+
   const active = activePatients(patients);
-  const totalPatients = capacity?.totalPatients ?? active.length;
-  const waitingCount = waitingRoomCount(patients, capacity);
+  const totalPatients = unifiedMetrics?.activePatients ?? capacity?.totalPatients ?? active.length;
+  const waitingCount =
+    unifiedMetrics?.waitingPatients ?? waitingRoomCount(patients, capacity);
   const boardingCount = boardingPatients(patients, capacity, input.boardingMetrics);
   const avgWait = averageWaitMinutes(patients, now);
   const avgTriage = averageTriageMinutes(patients);
@@ -375,6 +383,7 @@ export function buildOperationalCommandDashboardSnapshot(input: {
   const maxCapacity = capacity?.maxCapacity ?? rooms.length;
   const availableBeds = capacity?.availableRoomCount ?? Math.max(0, maxCapacity - occupiedRooms);
   const erOccupancyPercent =
+    unifiedMetrics?.capacityScore ??
     capacity?.occupancyPercent ??
     (maxCapacity > 0 ? Math.round(((capacity?.currentOccupancy ?? occupiedRooms) / maxCapacity) * 100) : null);
   const doctorsOnDuty = countAvailableStaff(staff, ['MD', 'Attending', 'Resident', 'PA']);
@@ -549,12 +558,19 @@ export function buildOperationalCommandDashboardSnapshot(input: {
     },
   ];
 
-  const bottleneckLabel = buildBottleneckLabel({
-    waitingRoomCount: waitingCount,
-    boardingCount,
-    averageWaitMinutes: avgWait,
-    zoneOccupancy,
-  });
+  const unifiedBottleneckInsight = useBackendOperationalIntelligence
+    ? unifiedOperational.insights.find(
+        (insight) => insight.type === 'bottleneck' || insight.type === 'congestion_prediction',
+      )
+    : null;
+  const bottleneckLabel =
+    unifiedBottleneckInsight?.title ||
+    buildBottleneckLabel({
+      waitingRoomCount: waitingCount,
+      boardingCount,
+      averageWaitMinutes: avgWait,
+      zoneOccupancy,
+    });
 
   return {
     metrics,

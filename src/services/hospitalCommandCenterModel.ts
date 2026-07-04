@@ -21,6 +21,7 @@ import type { ContinuousPatientFlowSnapshot } from '../engine/continuousPatientF
 import type { AdministrativeAutomationTask } from '../types/administrativeAutomation';
 import type { DashboardKnowledgeGraphSummary } from './unifiedApplicationKnowledgeGraphPresentation';
 import type { UnifiedOperationalIntelligenceSnapshot } from '../config/unifiedOperationalIntelligenceModel';
+import { isAuthoritativeUnifiedOperationalSnapshot } from './unifiedOperationalIntelligenceService';
 
 export type HospitalCommandTone = 'stable' | 'watch' | 'warning' | 'critical';
 
@@ -255,9 +256,8 @@ export function buildHospitalCommandCenterSnapshot(input: {
   );
 
   const unifiedOperational = input.unifiedOperationalSnapshot;
-  const useBackendOperationalIntelligence = Boolean(
-    unifiedOperational && unifiedOperational.source !== 'degraded',
-  );
+  const useBackendOperationalIntelligence = isAuthoritativeUnifiedOperationalSnapshot(unifiedOperational);
+  const unifiedMetrics = useBackendOperationalIntelligence ? unifiedOperational.metrics : null;
 
   const bottleneckFindings = useBackendOperationalIntelligence
     ? mapUnifiedOperationalBottlenecks(unifiedOperational!)
@@ -318,17 +318,24 @@ export function buildHospitalCommandCenterSnapshot(input: {
     {
       id: 'department-occupancy',
       label: 'Department occupancy',
-      value: occupancyPercent != null ? `${occupancyPercent}%` : capacity?.band ?? '—',
-      detail: `Capacity band ${capacity?.band ?? journey.metrics.capacityBand}`,
-      tone: toneFromCapacityBand(capacity?.band ?? journey.metrics.capacityBand),
+      value:
+        unifiedMetrics != null
+          ? `${unifiedMetrics.capacityScore}%`
+          : occupancyPercent != null
+            ? `${occupancyPercent}%`
+            : capacity?.band ?? '—',
+      detail: `Capacity band ${unifiedMetrics?.capacityBand ?? capacity?.band ?? journey.metrics.capacityBand}`,
+      tone: toneFromCapacityBand(
+        unifiedMetrics?.capacityBand ?? capacity?.band ?? journey.metrics.capacityBand,
+      ),
       route: CANONICAL_ROUTES.emergencyCapacity,
     },
     {
       id: 'waiting-patients',
       label: 'Waiting patients',
-      value: waitingPatients.length,
+      value: unifiedMetrics?.waitingPatients ?? waitingPatients.length,
       detail: `${triageBreached?.value ?? 0} triage breach · ${throughputMetric(throughput, 'waiting-count')?.value ?? 0} in waiting room`,
-      tone: metricTone(waitingPatients.length, 6, 12),
+      tone: metricTone(unifiedMetrics?.waitingPatients ?? waitingPatients.length, 6, 12),
       route: CANONICAL_ROUTES.emergencyQueues,
     },
     {
@@ -382,9 +389,11 @@ export function buildHospitalCommandCenterSnapshot(input: {
     {
       id: 'ems-arrivals',
       label: 'EMS arrivals',
-      value: emsInbound?.value ?? inboundEms.length,
-      detail: emsInbound?.detail || `${inboundEms.length} inbound ambulances`,
-      tone: (emsInbound?.tone as HospitalCommandTone) || metricTone(inboundEms.length, 2, 4),
+      value: unifiedMetrics?.inboundEms ?? emsInbound?.value ?? inboundEms.length,
+      detail: emsInbound?.detail || `${unifiedMetrics?.inboundEms ?? inboundEms.length} inbound ambulances`,
+      tone:
+        (emsInbound?.tone as HospitalCommandTone) ||
+        metricTone(unifiedMetrics?.inboundEms ?? inboundEms.length, 2, 4),
       route: CANONICAL_ROUTES.emergencyEms,
     },
     {
@@ -401,37 +410,29 @@ export function buildHospitalCommandCenterSnapshot(input: {
     {
       id: 'service-bottlenecks',
       label: 'Service bottlenecks',
-      value: useBackendOperationalIntelligence
-        ? unifiedOperational!.metrics.activeBottlenecks
-        : bottleneckFindings.length,
+      value: unifiedMetrics?.activeBottlenecks ?? bottleneckFindings.length,
       detail:
         bottleneckFindings[0]?.title ||
         'No active bottleneck signals',
-      tone: metricTone(
-        useBackendOperationalIntelligence
-          ? unifiedOperational!.metrics.activeBottlenecks
-          : bottleneckFindings.length,
-        1,
-        3,
-      ),
+      tone: metricTone(unifiedMetrics?.activeBottlenecks ?? bottleneckFindings.length, 1, 3),
       route: CANONICAL_ROUTES.emergencyReports,
     },
     {
       id: 'ai-recommendations',
       label: 'AI recommendations',
-      value: oiRecommendations.length,
+      value: unifiedMetrics?.aiRecommendationCount ?? oiRecommendations.length,
       detail:
         oiRecommendations[0]?.action ||
         'CareDroid Copilot — review case-aware suggestions',
-      tone: oiRecommendations.length > 0 ? 'watch' : 'stable',
+      tone: (unifiedMetrics?.aiRecommendationCount ?? oiRecommendations.length) > 0 ? 'watch' : 'stable',
       route: CANONICAL_ROUTES.emergencyCopilot,
     },
     {
       id: 'unresolved-alerts',
       label: 'Unresolved alerts',
-      value: unresolvedClinical.length,
+      value: unifiedMetrics?.unresolvedAlerts ?? unresolvedClinical.length,
       detail: `${journey.metrics.criticalAlerts} critical · acknowledgement required`,
-      tone: metricTone(unresolvedClinical.length, 1, 3),
+      tone: metricTone(unifiedMetrics?.unresolvedAlerts ?? unresolvedClinical.length, 1, 3),
       route: CANONICAL_ROUTES.emergencyAlerts,
     },
     {

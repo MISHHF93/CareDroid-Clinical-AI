@@ -294,6 +294,12 @@ function sortInsights(insights: UnifiedOperationalIntelligenceInsight[]): Unifie
   return [...insights].sort((left, right) => insightPriority(left) - insightPriority(right));
 }
 
+export function isAuthoritativeUnifiedOperationalSnapshot(
+  snapshot: UnifiedOperationalIntelligenceSnapshot | null | undefined,
+): snapshot is UnifiedOperationalIntelligenceSnapshot {
+  return Boolean(snapshot && snapshot.source !== 'degraded');
+}
+
 export function buildUnifiedOperationalIntelligenceSnapshot(
   input: BuildUnifiedOperationalIntelligenceInput = {},
 ): UnifiedOperationalIntelligenceSnapshot {
@@ -363,4 +369,5 @@ export function buildUnifiedOperationalIntelligenceSnapshot(
 
 export default {
   buildUnifiedOperationalIntelligenceSnapshot,
+  isAuthoritativeUnifiedOperationalSnapshot,
 };

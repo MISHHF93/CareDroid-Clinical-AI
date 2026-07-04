@@ -127,6 +127,59 @@ describe('hospitalCommandCenterModel', () => {
     expect(snapshot.metrics.find((metric) => metric.id === 'service-bottlenecks')?.value).toBe(1);
   });
 
+  it('projects core metrics from authoritative unified operational intelligence', () => {
+    const snapshot = buildHospitalCommandCenterSnapshot({
+      patients: [
+        {
+          id: 'p1',
+          state: PatientState.Waiting,
+          priority: Priority.P3,
+          arrivalTime: new Date().toISOString(),
+          flags: [],
+        } as never,
+      ],
+      alerts: [
+        {
+          id: 'a1',
+          severity: 'Critical',
+          message: 'Local alert',
+          acknowledged: false,
+          dismissed: false,
+        } as never,
+      ],
+      emsArrivals: [{ id: 'ems1', status: 'Inbound', eta: 8 } as never],
+      capacity: { band: 'Green', occupancyPercent: 40 } as never,
+      unifiedOperationalSnapshot: {
+        engineId: 'unified-operational-intelligence',
+        generatedAt: '2026-07-04T12:00:00.000Z',
+        source: 'backend',
+        domainStatuses: [],
+        insights: [],
+        metrics: {
+          activePatients: 9,
+          waitingPatients: 4,
+          capacityScore: 82,
+          capacityBand: 'Orange',
+          inboundEms: 3,
+          activeBottlenecks: 2,
+          unresolvedAlerts: 5,
+          degradedServices: 0,
+          workflowPendingReview: 0,
+          aiRecommendationCount: 2,
+          congestionPredictions: 0,
+        },
+        safetyStatement: 'Advisory only.',
+        backendEndpoints: [],
+      },
+    });
+
+    expect(snapshot.metrics.find((metric) => metric.id === 'waiting-patients')?.value).toBe(4);
+    expect(snapshot.metrics.find((metric) => metric.id === 'department-occupancy')?.value).toBe('82%');
+    expect(snapshot.metrics.find((metric) => metric.id === 'ems-arrivals')?.value).toBe(3);
+    expect(snapshot.metrics.find((metric) => metric.id === 'unresolved-alerts')?.value).toBe(5);
+    expect(snapshot.metrics.find((metric) => metric.id === 'ai-recommendations')?.value).toBe(2);
+  });
+
   it('filters metrics by role priority order', () => {
     const snapshot = buildHospitalCommandCenterSnapshot();
     const triageIds = resolveHospitalCommandMetricsForRole(EMERGENCY_ROLE_IDS.triageNurse);

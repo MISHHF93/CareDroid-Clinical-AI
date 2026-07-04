@@ -5,6 +5,7 @@ import { PatientFlag, PatientState, Priority, type EMSArrival, type FitToWaitCla
 import { hasPatientFlag, useEmergencyStore, type EmergencyOperationalMetricKey } from '../../store/emergencyStore';
 import { useEmergencyWhiteboard, useUpgradeHarnessPatientFlow } from '../../hooks/useEmergencyOs';
 import useOperationalIntelligence from '../../hooks/useOperationalIntelligence';
+import useUnifiedOperationalIntelligence from '../../hooks/useUnifiedOperationalIntelligence';
 import useWhiteboardDisplayMode from '../../hooks/useWhiteboardDisplayMode';
 import useDisplayAutoRefresh, { useStableDisplaySnapshot } from '../../hooks/useDisplayAutoRefresh';
 import { isDisplayAutoRefreshScreenMode } from '../../config/displayAutoRefreshModel';
@@ -429,6 +430,7 @@ export default function EmergencyWhiteboard() {
     [centralControlSettings, emergencyRole],
   );
   const operationalIntelligence = useOperationalIntelligence({ screenMode: routeScreenMode });
+  const unifiedOperationalIntelligence = useUnifiedOperationalIntelligence();
   const centralSnapshot = operationalIntelligence.centralSnapshot;
   const intelligenceSnapshot = operationalIntelligence.snapshot;
   const isRegistrationClerk = emergencyRole.role === EMERGENCY_ROLE_IDS.registrationClerk;
@@ -701,9 +703,20 @@ export default function EmergencyWhiteboard() {
         boardingMetrics,
         emsArrivals,
         staff,
+        unifiedOperationalSnapshot: unifiedOperationalIntelligence.unifiedSnapshot,
         now: new Date(Math.max(clockTick, nativeAiRefreshTick)),
       }),
-    [boardingMetrics, capacity, clockTick, emsArrivals, nativeAiRefreshTick, patients, rooms, staff],
+    [
+      boardingMetrics,
+      capacity,
+      clockTick,
+      emsArrivals,
+      nativeAiRefreshTick,
+      patients,
+      rooms,
+      staff,
+      unifiedOperationalIntelligence.unifiedSnapshot,
+    ],
   );
 
   const stablePublicWaitingSnapshot = useStableDisplaySnapshot(publicWaitingSnapshot);
