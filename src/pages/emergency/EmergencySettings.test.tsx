@@ -163,14 +163,18 @@ vi.mock('../../services/emergencySettingsApi', () => ({
   saveOrganizationEmergencyOsSettings: vi.fn(),
 }));
 
-vi.mock('../../services/emergencyOsApi', () => ({
-  fetchEmergencyAiGovernanceCompliance: vi.fn(),
-  fetchEmergencyAiGovernanceRegistry: vi.fn(),
-  fetchEmergencyWorkflowLogs: vi.fn(),
-  fetchIntegrationHub: vi.fn(),
-  fetchProvincialHealth: vi.fn(),
-  validateEmergencyAiGovernancePrompts: vi.fn(),
-}));
+vi.mock('../../services/emergencyOsApi', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../services/emergencyOsApi')>();
+  return {
+    ...actual,
+    fetchEmergencyAiGovernanceCompliance: vi.fn(),
+    fetchEmergencyAiGovernanceRegistry: vi.fn(),
+    fetchEmergencyWorkflowLogs: vi.fn(),
+    fetchIntegrationHub: vi.fn(),
+    fetchProvincialHealth: vi.fn(),
+    validateEmergencyAiGovernancePrompts: vi.fn(),
+  };
+});
 
 describe('EmergencySettings', () => {
   beforeEach(() => {

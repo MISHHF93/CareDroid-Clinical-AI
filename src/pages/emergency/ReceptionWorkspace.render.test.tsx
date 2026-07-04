@@ -2,6 +2,9 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { render } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import ReceptionWorkspace from './ReceptionWorkspace';
+import { HelpHubProvider } from '../../contexts/HelpHubContext';
+import { PractitionerVisibilityProvider } from '../../contexts/PractitionerVisibilityContext';
+import { RouteChromeProvider } from '../../contexts/RouteChromeContext';
 import { useEmergencyStore } from '../../store/emergencyStore';
 
 vi.mock('../../hooks/useEmergencyOs', () => ({
@@ -80,7 +83,13 @@ describe('ReceptionWorkspace render', () => {
     try {
       render(
         <MemoryRouter initialEntries={['/emergency/reception']}>
-          <ReceptionWorkspace />
+          <RouteChromeProvider>
+            <PractitionerVisibilityProvider>
+              <HelpHubProvider>
+                <ReceptionWorkspace />
+              </HelpHubProvider>
+            </PractitionerVisibilityProvider>
+          </RouteChromeProvider>
         </MemoryRouter>,
       );
     } catch (e: any) {
