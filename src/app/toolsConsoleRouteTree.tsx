@@ -25,7 +25,6 @@ const DrugCheckerPage = lazyRoute(() => import('../pages/tools/DrugChecker'));
 const LabInterpreterPage = lazyRoute(() => import('../pages/tools/LabInterpreter'));
 
 const LaboratoryDashboardPage = lazyRoute(() => import('../pages/clinical/LaboratoryDashboard'));
-const MedicalSimulationSuitePage = lazyRoute(() => import('../pages/training/MedicalSimulationSuite'));
 const ProtocolsLibraryPage = lazyRoute(() => import('../pages/tools/Protocols'));
 
 const TOOLS_AI_PAGE_COMPONENTS = Object.freeze({
@@ -46,7 +45,6 @@ const TOOLS_AI_PAGE_COMPONENTS = Object.freeze({
 
 const TOOLS_SHORTCUT_PAGE_COMPONENTS = Object.freeze({
   laboratoryDashboard: LaboratoryDashboardPage,
-  medicalSimulationSuite: MedicalSimulationSuitePage,
   protocolsLibrary: ProtocolsLibraryPage,
 } as const);
 

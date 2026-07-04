@@ -268,18 +268,16 @@ export function buildEmergencyToolsRedirect(location) {
     pathname === CANONICAL_ROUTES.simulation ||
     pathname === '/medical-simulation' ||
     pathname === CANONICAL_ROUTES.simulationOutcomes ||
-    pathname === CANONICAL_ROUTES.competencies
+    pathname === CANONICAL_ROUTES.competencies ||
+    pathname.startsWith(`${CANONICAL_ROUTES.simulation}/`)
   ) {
-    const simulationSlug =
-      pathname === CANONICAL_ROUTES.simulationOutcomes
-        ? 'simulation-outcomes'
-        : pathname === CANONICAL_ROUTES.competencies
-        ? 'competency-platform'
-        : 'simulation-suite';
-    setDefault('source', 'simulation');
-    setDefault('filter', 'simulations');
-    setDefault('q', simulationSlug);
-    setDefault('open', simulationSlug);
+    const target =
+      pathname === '/medical-simulation' ? CANONICAL_ROUTES.simulation : pathname;
+    return {
+      pathname: target,
+      search: location.search || '',
+      hash: location.hash || '',
+    };
   } else if (
     pathname.startsWith('/fleet/') ||
     pathname.startsWith('/operations/') ||

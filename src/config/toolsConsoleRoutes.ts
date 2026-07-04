@@ -77,11 +77,6 @@ export const TOOLS_FILTERED_CONSOLE_ROUTES = Object.freeze<ToolsFilteredConsoleR
 export const TOOLS_SHORTCUT_PAGE_ROUTES = Object.freeze<ToolsShortcutPageRoute[]>([
   { path: '/lab', label: 'Laboratory', componentKey: 'laboratoryDashboard' },
   {
-    path: '/medical-simulation',
-    label: 'Medical Simulation Suite',
-    componentKey: 'medicalSimulationSuite',
-  },
-  {
     path: TOOL_LAUNCH_PATHS.protocols,
     label: 'Protocol and Clinical Pathway Library',
     componentKey: 'protocolsLibrary',

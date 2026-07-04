@@ -23,6 +23,10 @@ describe('Medical Tools route alias fixtures', () => {
     ['/radiology/chest-xray', '/emergency/tools?source=workflows&filter=ai-workflows&q=guideline-rag&open=guideline-rag'],
     ['/automation', '/workflows'],
     ['/automation-analytics', '/workflows'],
+    ['/simulation', '/simulation'],
+    ['/medical-simulation', '/simulation'],
+    ['/simulation/outcomes', '/simulation/outcomes'],
+    ['/competencies', '/competencies'],
   ])('maps %s to %s', (source, expected) => {
     expect(redirectFor(source)).toBe(expected);
   });

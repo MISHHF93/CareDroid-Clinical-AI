@@ -78,13 +78,13 @@ export const WORKSPACE_ROUTE_SHORTCUTS = Object.freeze({
   simulation: {
     id: 'simulation',
     label: 'Simulation Suite',
-    path: `${CANONICAL_ROUTES.emergencyTools}?source=simulation&filter=simulations&q=simulation-suite&open=simulation-suite`,
+    path: CANONICAL_ROUTES.simulation,
     description: 'Simulation scenarios, debriefing, competency practice, and outcomes.',
   },
   competencies: {
     id: 'competencies',
     label: 'Competencies',
-    path: `${CANONICAL_ROUTES.emergencyTools}?source=simulation&filter=simulations&q=competency-platform&open=competency-platform`,
+    path: CANONICAL_ROUTES.competencies,
     description: 'Competency tracking, training gaps, and practice recommendations.',
   },
   governance: {

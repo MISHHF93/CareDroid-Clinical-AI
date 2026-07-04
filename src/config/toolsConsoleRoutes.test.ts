@@ -25,7 +25,6 @@ describe('toolsConsoleRoutes', () => {
         '/tools/calculator-recommender',
         TOOL_LAUNCH_PATHS.protocols,
         '/lab',
-        '/medical-simulation',
       ]),
     );
   });
@@ -48,7 +47,6 @@ describe('toolsConsoleRoutes', () => {
       expect.arrayContaining([
         expect.objectContaining({ path: '/lab', componentKey: 'laboratoryDashboard' }),
         expect.objectContaining({ path: TOOL_LAUNCH_PATHS.protocols, componentKey: 'protocolsLibrary' }),
-        expect.objectContaining({ path: '/medical-simulation', componentKey: 'medicalSimulationSuite' }),
       ]),
     );
   });
