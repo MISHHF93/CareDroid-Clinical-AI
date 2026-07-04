@@ -1,12 +1,33 @@
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { readdirSync, readFileSync } from 'node:fs';
+import { join, relative } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { CARE_DROID_INTERACTION } from './careDroidInteractionModel';
 
 const srcRoot = join(process.cwd(), 'src');
+const CANONICAL_CONFIRM_MODULE = 'services/careDroidInteractionFeedback.ts';
+const CANONICAL_SONNER_MODULES = new Set([
+  'components/CareDroidToastHost.tsx',
+  CANONICAL_CONFIRM_MODULE,
+]);
 
 function readSrc(relativePath: string): string {
   return readFileSync(join(srcRoot, relativePath), 'utf8');
+}
+
+function listSourceFiles(directory = srcRoot): string[] {
+  const entries = readdirSync(directory, { withFileTypes: true });
+  const files: string[] = [];
+  for (const entry of entries) {
+    const fullPath = join(directory, entry.name);
+    if (entry.isDirectory()) {
+      files.push(...listSourceFiles(fullPath));
+      continue;
+    }
+    if (entry.isFile() && /\.(ts|tsx)$/.test(entry.name) && !entry.name.endsWith('.test.ts') && !entry.name.endsWith('.test.tsx')) {
+      files.push(relative(srcRoot, fullPath).replace(/\\/g, '/'));
+    }
+  }
+  return files;
 }
 
 describe('careDroid interaction contract', () => {
@@ -33,19 +54,19 @@ describe('careDroid interaction contract', () => {
     expect(emergencySettings).not.toContain('savedFlashTimerRef');
   });
 
-  it('routes Sonner imports through the canonical feedback service', () => {
-    const feedbackService = readSrc('services/careDroidInteractionFeedback.ts');
-    expect(feedbackService).toContain("from 'sonner'");
-
-    const directSonnerImports = [
-      'components/PatientDetailPanel.tsx',
-      'components/QuickIntake.tsx',
-      'pages/emergency/ReceptionWorkspace.tsx',
-    ];
-
-    for (const relativePath of directSonnerImports) {
+  it('routes Sonner imports through canonical toast surfaces only', () => {
+    const offenders = listSourceFiles().filter((relativePath) => {
       const source = readSrc(relativePath);
-      expect(source.includes("from 'sonner'")).toBe(false);
-    }
+      return source.includes("from 'sonner'") && !CANONICAL_SONNER_MODULES.has(relativePath);
+    });
+    expect(offenders).toEqual([]);
+  });
+
+  it('routes window.confirm through the canonical confirm fallback only', () => {
+    const offenders = listSourceFiles().filter((relativePath) => {
+      const source = readSrc(relativePath);
+      return source.includes('window.confirm') && relativePath !== CANONICAL_CONFIRM_MODULE;
+    });
+    expect(offenders).toEqual([]);
   });
 });
