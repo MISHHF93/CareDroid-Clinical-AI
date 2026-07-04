@@ -25,6 +25,14 @@ describe('careDroid interaction contract', () => {
     expect(receptionWorkspace).not.toContain('}, [error, status]);');
   });
 
+  it('uses canonical feedback for transient settings saves in EmergencySettings', () => {
+    const emergencySettings = readSrc('pages/emergency/EmergencySettings.tsx');
+    expect(emergencySettings).toContain('showActionSuccess');
+    expect(emergencySettings).toContain('showActionError');
+    expect(emergencySettings).not.toContain('const [status, setStatus]');
+    expect(emergencySettings).not.toContain('savedFlashTimerRef');
+  });
+
   it('routes Sonner imports through the canonical feedback service', () => {
     const feedbackService = readSrc('services/careDroidInteractionFeedback.ts');
     expect(feedbackService).toContain("from 'sonner'");

@@ -49,6 +49,7 @@ import { INTEGRATION_STATUS } from '../../config/integrationStatusModel';
 import OperationalHistoryPanel from '../../components/audit/OperationalHistoryPanel';
 import DeviceContextPanel from '../../components/emergency/DeviceContextPanel';
 import useOperationalIntelligence from '../../hooks/useOperationalIntelligence';
+import { showActionError, showActionSuccess } from '../../services/careDroidInteractionFeedback';
 import {
   BottleneckList,
   ServiceDependencyMap,
@@ -329,10 +330,8 @@ export default function EmergencySettings() {
   const [provincialHealthStatus, setProvincialHealthStatus] = useState('loading');
   const [provincialHealthError, setProvincialHealthError] = useState('');
   const [provincialHealthEnvelope, setProvincialHealthEnvelope] = useState<any>(null);
-  const [status, setStatus] = useState('');
   const [error, setError] = useState('');
   const thresholdTimersRef = useRef({});
-  const savedFlashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -384,7 +383,6 @@ export default function EmergencySettings() {
   useEffect(
     () => () => {
       Object.values(thresholdTimersRef.current).forEach((timer) => clearTimeout(timer as number));
-      if (savedFlashTimerRef.current) clearTimeout(savedFlashTimerRef.current);
     },
     [],
   );
@@ -675,9 +673,7 @@ export default function EmergencySettings() {
   };
 
   const flashSaved = () => {
-    setStatus('Saved');
-    if (savedFlashTimerRef.current) clearTimeout(savedFlashTimerRef.current);
-    savedFlashTimerRef.current = setTimeout(() => setStatus(''), 1200);
+    showActionSuccess('Saved');
   };
 
   const updateThreshold = (key, value, patch: any = {}) => {
@@ -716,19 +712,20 @@ export default function EmergencySettings() {
   const saveGroup = async (group, patch) => {
     const storePatch = normalizePatchForStore(patch);
     setSavingGroup(group);
-    setStatus('');
-    setError('');
 
     const result = await saveOrganizationEmergencyOsSettings(patch);
     if (result.ok) {
       const nextSettings = mergeSettings(draft, payloadFromEnvelope(result));
       setDraft(nextSettings);
       saveEmergencySettings?.(normalizePatchForStore(nextSettings));
-      setStatus(`${SETTING_GROUP_LABELS[group]} saved.`);
+      setError('');
+      showActionSuccess(`${SETTING_GROUP_LABELS[group]} saved.`);
     } else {
       saveEmergencySettings?.(storePatch);
       setDraft((current) => mergeSettings(current, patch));
-      setError(`${SETTING_GROUP_LABELS[group]} saved locally only: ${result.message}`);
+      const localOnlyMessage = `${SETTING_GROUP_LABELS[group]} saved locally only: ${result.message}`;
+      setError(localOnlyMessage);
+      showActionError('Settings saved locally only', result.message);
     }
 
     setSavingGroup('');
@@ -739,14 +736,14 @@ export default function EmergencySettings() {
 
   const loadFirstCustomerDemo = () => {
     setActiveScenario(FIRST_CUSTOMER_DEMO_MODE.id);
-    setStatus('Department walkthrough dataset loaded for the live customer walkthrough.');
     setError('');
+    showActionSuccess('Department walkthrough dataset loaded for the live customer walkthrough.');
   };
 
   const resetDemoScenario = () => {
     setActiveScenario('normal-day');
-    setStatus('Department walkthrough dataset reset to normal operations.');
     setError('');
+    showActionSuccess('Department walkthrough dataset reset to normal operations.');
   };
 
   return (
@@ -770,7 +767,6 @@ export default function EmergencySettings() {
       aria-label="CareDroid settings"
     >
 
-      {status ? <div className="emergency-settings__banner">{status}</div> : null}
       {error ? (
         <div className="emergency-settings__banner emergency-settings__banner--error">{error}</div>
       ) : null}
