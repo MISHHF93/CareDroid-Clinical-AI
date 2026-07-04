@@ -41,7 +41,7 @@ export function buildDispatchPriorityQueue(
       if (vehicle.status === 'maintenance') score += 20;
       score += alertsByVehicle[vehicle.id] || 0;
 
-      const reasons = [];
+      const reasons: string[] = [];
       if ((alertsByVehicle[vehicle.id] || 0) > 0) reasons.push('active alert');
       if (vehicle.energyPercent != null && vehicle.energyPercent < 35) reasons.push('low energy');
       if (vehicle.maintenanceStatus && vehicle.maintenanceStatus !== 'ok') reasons.push('maintenance review');

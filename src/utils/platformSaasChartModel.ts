@@ -27,6 +27,30 @@ import { getUserFacingToolRegistryProjection } from '../data/toolInventory';
 
 export type PlatformChartDatum = Readonly<{ name: string; value: number }>;
 
+function countBy(
+  items: readonly unknown[],
+  selector: (item: unknown) => string,
+): Record<string, number> {
+  const counts: Record<string, number> = {};
+  for (const item of items) {
+    const key = selector(item);
+    counts[key] = (counts[key] ?? 0) + 1;
+  }
+  return counts;
+}
+
+function chartEntries(
+  counts: Record<string, number>,
+  formatName: (name: string) => string = (name) => name,
+  limit?: number,
+): PlatformChartDatum[] {
+  const entries = Object.entries(counts).map(([name, value]) => ({
+    name: formatName(name),
+    value,
+  }));
+  return limit == null ? entries : entries.slice(0, limit);
+}
+
 type PlatformAnalyticsSnapshot = ReturnType<typeof buildPlatformAnalytics>;
 type CapabilityDiscoverySnapshot = ReturnType<typeof buildCapabilityDiscovery>;
 type PluginMarketplaceSnapshot = ReturnType<typeof buildPluginMarketplace>;
@@ -96,10 +120,9 @@ export function buildPlatformEventTypeChart(
 export function buildPlatformDecisionChart(
   analytics: PlatformAnalyticsSnapshot = buildPlatformAnalytics(),
 ): PlatformChartDatum[] {
-  const counts = analytics.decisions.reduce<Record<string, number>>((acc, row) => {
-    acc[row.decision] = (acc[row.decision] || 0) + 1;
-    return acc;
-  }, {});
+  const counts = countBy(analytics.decisions, (row) =>
+    String((row as { decision?: string }).decision ?? ''),
+  );
   return Object.values(PLATFORM_ANALYTICS_DECISIONS).map((decision) => ({
     name: formatDecisionLabel(decision),
     value: counts[decision] || 0,
@@ -160,10 +183,7 @@ export function buildLocalGovernanceRegistryFallback(
     };
   });
 
-  const byRiskLevel = rows.reduce<Record<string, number>>((acc, row) => {
-    acc[row.riskLevel] = (acc[row.riskLevel] || 0) + 1;
-    return acc;
-  }, {});
+  const byRiskLevel = countBy(rows, (row) => String((row as { riskLevel?: string }).riskLevel ?? 'unknown'));
 
   return {
     generatedAt: new Date(0).toISOString(),
@@ -224,14 +244,11 @@ export function buildDependencyIssueChart(
 export function buildDependencyExecutorChart(
   dependencies: DependencyMapSnapshot['dependencies'] = buildDependencyMap().dependencies,
 ): PlatformChartDatum[] {
-  const counts = dependencies.reduce<Record<string, number>>((acc, row) => {
-    const key = !row.executor || row.executor === 'n/a' || row.executor === '\uFFFD' ? 'unassigned' : row.executor;
-    acc[key] = (acc[key] || 0) + 1;
-    return acc;
-  }, {});
-  return Object.entries(counts)
-    .slice(0, 8)
-    .map(([name, value]) => ({ name, value }));
+  const counts = countBy(dependencies, (row) => {
+    const executor = (row as { executor?: string }).executor;
+    return !executor || executor === 'n/a' || executor === '\uFFFD' ? 'unassigned' : executor;
+  });
+  return chartEntries(counts, (name) => name, 8);
 }
 
 export function buildFeatureFlagCategoryChart(
@@ -328,14 +345,10 @@ export function buildAssetGraphIssueChart(
 export function buildAssetGraphProductChart(
   chains: AssetDependencyGraphSnapshot['chains'] = buildLocalAssetDependencyGraph().chains,
 ): PlatformChartDatum[] {
-  const counts = chains.reduce<Record<string, number>>((acc, chain) => {
-    const key = chain.product.name;
-    acc[key] = (acc[key] || 0) + 1;
-    return acc;
-  }, {});
-  return Object.entries(counts)
-    .slice(0, 8)
-    .map(([name, value]) => ({ name, value }));
+  const counts = countBy(chains, (chain) =>
+    String((chain as { product?: { name?: string } }).product?.name ?? 'unknown'),
+  );
+  return chartEntries(counts, (name) => name, 8);
 }
 
 type DataLineageSnapshot = ReturnType<typeof buildDataLineageExplorer>;
@@ -343,11 +356,8 @@ type DataLineageSnapshot = ReturnType<typeof buildDataLineageExplorer>;
 export function buildLineageCategoryChart(
   flows: DataLineageSnapshot['flows'] = buildDataLineageExplorer().flows,
 ): PlatformChartDatum[] {
-  const counts = flows.reduce<Record<string, number>>((acc, flow) => {
-    acc[flow.category] = (acc[flow.category] || 0) + 1;
-    return acc;
-  }, {});
-  return Object.entries(counts).map(([name, value]) => ({ name, value }));
+  const counts = countBy(flows, (flow) => String((flow as { category?: string }).category ?? 'unknown'));
+  return chartEntries(counts);
 }
 
 type SelfDiagnosticsSnapshot = ReturnType<typeof buildPlatformSelfDiagnostics>;
@@ -384,17 +394,11 @@ export function buildDepartmentHealthChart(
 export function buildDepartmentOutcomeSourceChart(
   departments: DepartmentIntelligenceSnapshot['departments'] = buildDepartmentPerformanceIntelligence().departments,
 ): PlatformChartDatum[] {
-  const counts = departments
-    .flatMap((department) => department.metrics)
-    .reduce<Record<string, number>>((acc, metric) => {
-      const key = metric.source || 'unknown';
-      acc[key] = (acc[key] || 0) + 1;
-      return acc;
-    }, {});
-  return Object.entries(counts).map(([name, value]) => ({
-    name: name.replace(/-/g, ' '),
-    value,
-  }));
+  const counts = countBy(
+    departments.flatMap((department) => department.metrics),
+    (metric) => String((metric as { source?: string }).source || 'unknown'),
+  );
+  return chartEntries(counts, (name) => name.replace(/-/g, ' '));
 }
 
 export function diagnosticStatusTone(status: string): 'good' | 'warning' | 'critical' | 'neutral' {
@@ -417,10 +421,7 @@ type WorkflowMiningSnapshot = ReturnType<typeof buildWorkflowMiningReport>;
 export function buildWorkspaceDependencyTypeChart(
   edges: WorkspaceGraphSnapshot['edges'] = buildWorkspaceDependencyGraph().edges,
 ): PlatformChartDatum[] {
-  const counts = edges.reduce<Record<string, number>>((acc, edge) => {
-    acc[edge.type] = (acc[edge.type] || 0) + 1;
-    return acc;
-  }, {});
+  const counts = countBy(edges, (edge) => String((edge as { type?: string }).type ?? 'unknown'));
   return Object.values(WORKSPACE_DEPENDENCY_TYPES).map((type) => ({
     name: type.replace(/-/g, ' '),
     value: counts[type] || 0,
@@ -439,10 +440,12 @@ export function buildWorkspaceDependencyStrengthChart(
 export function buildWorkflowSignalChart(
   signalCounts: WorkflowMiningSnapshot['signalCounts'] = buildWorkflowMiningReport().signalCounts,
 ): PlatformChartDatum[] {
-  return Object.entries(signalCounts).map(([name, value]) => ({
-    name: name.replace(/_/g, ' '),
-    value,
-  }));
+  return chartEntries(
+    Object.fromEntries(
+      Object.entries(signalCounts).map(([name, value]) => [name, Number(value) || 0]),
+    ),
+    (name) => name.replace(/_/g, ' '),
+  );
 }
 
 export function buildWorkflowJourneyChart(
@@ -506,10 +509,12 @@ export function buildReadinessDimensionChart(
 export function buildKnowledgeHubTypeChart(
   typeCounts: KnowledgeHubSnapshot['typeCounts'] = buildHealthcareKnowledgeHub().typeCounts,
 ): PlatformChartDatum[] {
-  return Object.entries(typeCounts).map(([name, value]) => ({
-    name: name.replace(/_/g, ' '),
-    value,
-  }));
+  return chartEntries(
+    Object.fromEntries(
+      Object.entries(typeCounts).map(([name, value]) => [name, Number(value) || 0]),
+    ),
+    (name) => name.replace(/_/g, ' '),
+  );
 }
 
 export function buildWorkflowPriorityChart(): PlatformChartDatum[] {
@@ -576,27 +581,21 @@ export function buildBusinessBrainRecommendationChart(
 export function buildArtifactTypeChart(
   artifacts: ArtifactCatalog = buildArtifactCatalog(),
 ): PlatformChartDatum[] {
-  const counts = artifacts.reduce<Record<string, number>>((acc, artifact) => {
-    acc[artifact.type] = (acc[artifact.type] || 0) + 1;
-    return acc;
-  }, {});
-  return Object.entries(counts)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 8)
-    .map(([name, value]) => ({ name, value }));
+  const counts = countBy(artifacts, (artifact) => String((artifact as { type?: string }).type ?? 'unknown'));
+  return chartEntries(counts)
+    .sort((left, right) => right.value - left.value)
+    .slice(0, 8);
 }
 
 export function buildArtifactCategoryChart(
   artifacts: ArtifactCatalog = buildArtifactCatalog(),
 ): PlatformChartDatum[] {
-  const counts = artifacts.reduce<Record<string, number>>((acc, artifact) => {
-    acc[artifact.category] = (acc[artifact.category] || 0) + 1;
-    return acc;
-  }, {});
-  return Object.entries(counts)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 8)
-    .map(([name, value]) => ({ name, value }));
+  const counts = countBy(artifacts, (artifact) =>
+    String((artifact as { category?: string }).category ?? 'unknown'),
+  );
+  return chartEntries(counts)
+    .sort((left, right) => right.value - left.value)
+    .slice(0, 8);
 }
 
 export function businessBrainScoreTone(score: number): 'good' | 'warning' | 'critical' | 'neutral' {
@@ -616,10 +615,9 @@ export function recommendationPriorityTone(
 export function buildLineageStageChart(
   flows: DataLineageSnapshot['flows'] = buildDataLineageExplorer().flows,
 ): PlatformChartDatum[] {
-  const counts = Object.values(DATA_LINEAGE_STAGES).reduce<Record<string, number>>((acc, stage) => {
-    acc[stage] = 0;
-    return acc;
-  }, {});
+  const counts = Object.fromEntries(
+    Object.values(DATA_LINEAGE_STAGES).map((stage) => [stage, 0]),
+  ) as Record<string, number>;
   for (const flow of flows) {
     for (const stage of flow.stages) {
       counts[stage.stage] = (counts[stage.stage] || 0) + 1;

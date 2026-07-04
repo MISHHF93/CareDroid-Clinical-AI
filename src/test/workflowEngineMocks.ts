@@ -35,6 +35,9 @@ export type WorkflowEngineMockModules = {
     refreshAdministrativeAutomationsFromBackend: Mock;
     runAdministrativeAutomationTick: Mock;
     startAdministrativeAutomationEngine: Mock;
+    applyBackendAdministrativeAutomationQueue: Mock;
+    mergeBackendAdministrativeAutomationTasks: Mock;
+    buildEnrichedAdministrativeAutomationSnapshot: Mock;
   };
 };
 
