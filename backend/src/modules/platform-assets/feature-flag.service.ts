@@ -83,11 +83,11 @@ export class FeatureFlagService {
   }
 
   isLaunchableState(state: FeatureFlagState): boolean {
-    return [
-      FeatureFlagState.ENABLED,
-      FeatureFlagState.BETA,
-      FeatureFlagState.EXPERIMENTAL,
-    ].includes(state);
+    return (
+      state === FeatureFlagState.ENABLED ||
+      state === FeatureFlagState.BETA ||
+      state === FeatureFlagState.EXPERIMENTAL
+    );
   }
 
   buildManagementModel(params: {

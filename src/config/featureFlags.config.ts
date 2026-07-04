@@ -1,4 +1,8 @@
 import appConfig from './appConfig';
+import {
+  FEATURE_FLAG_CATEGORIES as SHARED_FEATURE_FLAG_CATEGORIES,
+  FEATURE_FLAG_STATES as SHARED_FEATURE_FLAG_STATES,
+} from '../../lib/featureFlags/constants';
 
 /**
  * Canonical frontend feature flag projection.
@@ -24,26 +28,8 @@ export const FEATURE_FLAGS = Object.freeze({
   orgScopedPlatformReads: appConfig.features.orgScopedPlatformReads,
 });
 
-export const FEATURE_FLAG_STATES = Object.freeze({
-  ENABLED: 'enabled',
-  DISABLED: 'disabled',
-  BETA: 'beta',
-  EXPERIMENTAL: 'experimental',
-  LOCKED: 'locked',
-  SUBSCRIPTION_REQUIRED: 'subscription-required',
-  ADMIN_ONLY: 'admin-only',
-});
-
-export const FEATURE_FLAG_CATEGORIES = Object.freeze({
-  AI: 'AI',
-  TOOLS: 'Tools',
-  CALCULATORS: 'Calculators',
-  SIMULATION: 'Simulation',
-  MAPS: 'Maps',
-  FLEET: 'Fleet',
-  IOT: 'IoT',
-  GOVERNANCE: 'Governance',
-});
+export const FEATURE_FLAG_STATES = SHARED_FEATURE_FLAG_STATES;
+export const FEATURE_FLAG_CATEGORIES = SHARED_FEATURE_FLAG_CATEGORIES;
 
 export const FEATURE_FLAG_STATE_LABELS = Object.freeze({
   [FEATURE_FLAG_STATES.ENABLED]: 'Enabled',

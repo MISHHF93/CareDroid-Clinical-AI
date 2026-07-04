@@ -1,7 +1,19 @@
 import type { CareDroidCentralNodeSnapshot } from '../central-node/careDroidCentralNode';
+import {
+  BLOCKED_AUTONOMOUS_OI_ACTIONS,
+  CARE_DROID_OPERATIONAL_INTELLIGENCE_LAYER,
+  OI_RULE_BASELINE_VERSION,
+  OPERATIONAL_INTELLIGENCE_DISCLAIMERS,
+} from '../../lib/operational-intelligence/constants';
 
-export const CARE_DROID_OPERATIONAL_INTELLIGENCE_LAYER = 'CareDroidOperationalIntelligence' as const;
-export const OI_RULE_BASELINE_VERSION = '1.0.0-rule-baseline';
+export {
+  CARE_DROID_OPERATIONAL_INTELLIGENCE_LAYER,
+  OI_RULE_BASELINE_VERSION,
+  OPERATIONAL_INTELLIGENCE_DISCLAIMERS,
+};
+
+/** @deprecated Use `BLOCKED_AUTONOMOUS_OI_ACTIONS` from shared lib. */
+export const BLOCKED_AUTONOMOUS_ACTIONS = BLOCKED_AUTONOMOUS_OI_ACTIONS;
 
 export type OperationalIntelligenceMode = 'rule_based' | 'ml_assisted' | 'hybrid';
 
@@ -194,23 +206,4 @@ export const DEFAULT_OPERATIONAL_INTELLIGENCE_SETTINGS: OperationalIntelligenceS
   operationalIntelligencePollingInterval: 30000,
 };
 
-export const OPERATIONAL_INTELLIGENCE_DISCLAIMERS = Object.freeze({
-  operational: 'Operational intelligence is advisory. Human review required.',
-  clinical: 'Human review required. This is not a replacement for clinical judgment.',
-  externalData: 'External health record data requires clinician review before use.',
-});
 
-export const BLOCKED_AUTONOMOUS_ACTIONS = Object.freeze([
-  'change_patient_journey_state',
-  'assign_acuity',
-  'diagnose',
-  'prescribe',
-  'discharge',
-  'admit',
-  'merge_patients',
-  'import_external_data',
-  'send_clinical_orders',
-  'override_staff',
-  'auto_triage',
-  'auto_identify_patient',
-]);

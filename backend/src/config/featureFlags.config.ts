@@ -1,23 +1,15 @@
-export enum FeatureFlagState {
-  ENABLED = 'enabled',
-  DISABLED = 'disabled',
-  BETA = 'beta',
-  EXPERIMENTAL = 'experimental',
-  LOCKED = 'locked',
-  SUBSCRIPTION_REQUIRED = 'subscription-required',
-  ADMIN_ONLY = 'admin-only',
-}
+import {
+  FEATURE_FLAG_CATEGORIES as SHARED_FEATURE_FLAG_CATEGORIES,
+  FEATURE_FLAG_STATES as SHARED_FEATURE_FLAG_STATES,
+  type FeatureFlagCategoryValue,
+  type FeatureFlagStateValue,
+} from '../../../lib/featureFlags/constants';
 
-export enum FeatureFlagCategory {
-  AI = 'AI',
-  TOOLS = 'Tools',
-  CALCULATORS = 'Calculators',
-  SIMULATION = 'Simulation',
-  MAPS = 'Maps',
-  FLEET = 'Fleet',
-  IOT = 'IoT',
-  GOVERNANCE = 'Governance',
-}
+export const FeatureFlagState = SHARED_FEATURE_FLAG_STATES;
+export type FeatureFlagState = FeatureFlagStateValue;
+
+export const FeatureFlagCategory = SHARED_FEATURE_FLAG_CATEGORIES;
+export type FeatureFlagCategory = FeatureFlagCategoryValue;
 
 export interface FeatureFlagDefinition {
   id: string;

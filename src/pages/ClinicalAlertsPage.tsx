@@ -16,6 +16,7 @@ import {
   transitionAlertLifecycle,
 } from '../services/alertLifecycleOrchestrator';
 import { EmergencyRoutePage } from './emergency/emergencyRouteShared';
+import useUnifiedApplicationKnowledgeGraph from '../hooks/useUnifiedApplicationKnowledgeGraph';
 import './ClinicalAlertsPage.css';
 
 type AlertSeverity = 'critical' | 'high' | 'moderate' | 'low';
@@ -64,6 +65,7 @@ const ClinicalAlertsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoadingAlerts, setIsLoadingAlerts] = useState(alertsApiEnabled);
   const [apiNotice, setApiNotice] = useState('');
+  const knowledgeGraph = useUnifiedApplicationKnowledgeGraph();
 
   useEffect(() => {
     updateAlerts();
@@ -294,6 +296,32 @@ const ClinicalAlertsPage = () => {
                         </ul>
                       </div>
                     )}
+
+                    {(() => {
+                      const graphContext = knowledgeGraph.resolveAlertContext(alert.id);
+                      const connectedPatients = graphContext.affectedPatients;
+                      const connectedDepartments = graphContext.escalatedDepartments;
+                      if (connectedPatients.length === 0 && connectedDepartments.length === 0) {
+                        return null;
+                      }
+                      return (
+                        <div className="alert-card__graph-context" role="note" aria-label="Connected operational context">
+                          <p className="alert-card__findings-label">Connected context</p>
+                          <ul className="alert-card__findings-list">
+                            {connectedPatients.slice(0, 3).map((patient) => (
+                              <li key={patient.id} className="alert-card__finding">
+                                Patient: {patient.label}
+                              </li>
+                            ))}
+                            {connectedDepartments.slice(0, 2).map((department) => (
+                              <li key={department.id} className="alert-card__finding">
+                                Department: {department.label}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      );
+                    })()}
 
                     <div className="alert-card__actions">
                       {alert.status === 'unacknowledged' ? (
