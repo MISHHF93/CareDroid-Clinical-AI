@@ -5,10 +5,10 @@
   "macroPrecision": 1,
   "macroRecall": 1,
   "latencyMs": {
-    "p50": 12,
-    "p95": 22,
-    "p99": 1251,
-    "mean": 53.096774193548384
+    "p50": 22,
+    "p95": 138,
+    "p99": 3488,
+    "mean": 142.1290322580645
   },
   "testSetSize": 31,
   "usedTrainedClassifier": true,
