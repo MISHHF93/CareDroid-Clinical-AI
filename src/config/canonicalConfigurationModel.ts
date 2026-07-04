@@ -98,13 +98,25 @@ export const CANONICAL_CONFIGURATION_REGISTRY: readonly CanonicalConfigurationEn
     consumers: ['canonicalConfigurationAudit', 'backendFrontendExposure.test'],
   }),
   Object.freeze({
+    id: 'feature-flag-constants',
+    domain: 'feature-flags',
+    path: 'lib/featureFlags/constants.ts',
+    purpose: 'Shared FEATURE_FLAG_STATES and FEATURE_FLAG_CATEGORIES literals for frontend and backend.',
+    layer: 'registry',
+    exportKeys: ['FEATURE_FLAG_STATES', 'FEATURE_FLAG_CATEGORIES'],
+    consumers: ['featureFlags.config', 'backend/featureFlags.config', 'feature-flag.service'],
+  }),
+  Object.freeze({
     id: 'feature-flags',
     domain: 'feature-flags',
     path: 'src/config/featureFlags.config.ts',
     purpose: 'FEATURE_FLAGS projection and FEATURE_FLAG_REGISTRY catalog.',
     layer: 'registry',
     exportKeys: ['FEATURE_FLAGS', 'FEATURE_FLAG_REGISTRY', 'shouldExposeDemoAuthFlag'],
-    supersedes: ['src/config/appConfig.ts (direct features.* reads)'],
+    supersedes: [
+      'src/config/appConfig.ts (direct features.* reads)',
+      'backend/src/config/featureFlags.config.ts (duplicate state/category enums)',
+    ],
     consumers: ['env.config', 'unified-navigation.config', 'AppShell'],
   }),
   Object.freeze({
@@ -480,6 +492,18 @@ export const CANONICAL_CONFIGURATION_REGISTRY: readonly CanonicalConfigurationEn
     layer: 'registry',
     exportKeys: ['WORKFLOW_AUTOMATION_DOMAINS', 'UNIFIED_WORKFLOW_AUTOMATION_CONTRACT'],
     consumers: ['unifiedWorkflowAutomationEngine', 'WorkflowAutomationCommandBar'],
+  }),
+  Object.freeze({
+    id: 'operational-intelligence-engine',
+    domain: 'workflow',
+    path: 'lib/operational-intelligence/buildSnapshot.ts',
+    purpose: 'Shared rule-based operational intelligence snapshot builder for backend and frontend fallback.',
+    layer: 'registry',
+    exportKeys: ['buildOperationalIntelligenceSnapshot'],
+    consumers: [
+      'emergency-os.operational-intelligence.service',
+      'operationalIntelligence.types',
+    ],
   }),
   Object.freeze({
     id: 'unified-operational-intelligence',
