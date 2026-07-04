@@ -16,6 +16,15 @@ describe('careDroid interaction contract', () => {
     expect(CARE_DROID_INTERACTION.feedbackDurationMs).toBe(2800);
   });
 
+  it('avoids status-to-toast bridge state in reception workspace', () => {
+    const receptionWorkspace = readSrc('pages/emergency/ReceptionWorkspace.tsx');
+    expect(receptionWorkspace).toContain('showActionSuccess');
+    expect(receptionWorkspace).toContain('showActionError');
+    expect(receptionWorkspace).not.toContain('const [status, setStatus]');
+    expect(receptionWorkspace).not.toContain('const [error, setError]');
+    expect(receptionWorkspace).not.toContain('}, [error, status]);');
+  });
+
   it('routes Sonner imports through the canonical feedback service', () => {
     const feedbackService = readSrc('services/careDroidInteractionFeedback.ts');
     expect(feedbackService).toContain("from 'sonner'");

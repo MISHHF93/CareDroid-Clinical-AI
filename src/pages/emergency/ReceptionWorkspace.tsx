@@ -36,6 +36,7 @@ import { completeProvisionalIntake } from '../../services/provisionalIdentityInt
 import { ReceptionFlowGraphic } from '../../components/graphics/CdlGraphicKit';
 import ContextualGuidance from '../../components/ui/ContextualGuidance';
 import { showActionError, showActionSuccess } from '../../services/careDroidInteractionFeedback';
+import { STANDARD_ACTION_FEEDBACK } from '../../config/careDroidInteractionModel';
 import { notifyWorkflowHandoffComplete } from '../../services/workflowNavigationFeedback';
 import { EmergencyRoutePage } from './emergencyRouteShared';
 import './ReceptionWorkspace.css';
@@ -244,23 +245,11 @@ export default function ReceptionWorkspace() {
   const [draft, setDraft] = useState<ReceptionIntakeDraft>(EMPTY_DRAFT);
   const [aiAssist, setAiAssist] = useState<ReceptionAiIntakeAssist | null>(null);
   const [result, setResult] = useState<ReceptionRouteResult | null>(null);
-  const [status, setStatus] = useState('');
-  const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [now, setNow] = useState(() => Date.now());
   const [activeQueueTab, setActiveQueueTab] = useState<QueueTabId>('pretriage');
   const [showChooser, setShowChooser] = useState(false);
   const [smartIntakeSession, setSmartIntakeSession] = useState<SmartIntakeSession | null>(null);
-
-  useEffect(() => {
-    if (error) {
-      showActionError('Reception action failed', error);
-      setError('');
-    } else if (status) {
-      showActionSuccess(status);
-      setStatus('');
-    }
-  }, [error, status]);
 
   const receptionCapabilities = useMemo(
     () =>
@@ -342,14 +331,10 @@ export default function ReceptionWorkspace() {
     setDraft({ ...EMPTY_DRAFT });
     setAiAssist(null);
     setResult(null);
-    setError('');
-    setStatus('');
   }, []);
 
   const updateDraft = useCallback((patch: Partial<ReceptionIntakeDraft>) => {
     setDraft((current) => ({ ...current, ...patch }));
-    setError('');
-    setStatus('');
     setResult(null);
   }, []);
 
@@ -421,18 +406,16 @@ export default function ReceptionWorkspace() {
     const storedDraft = { ...draft, id: draft.id || `draft-${Date.now()}`, savedAt: new Date().toISOString() };
     window.sessionStorage?.setItem('caredroid:reception-draft', JSON.stringify(storedDraft));
     setDraft(storedDraft);
-    setStatus('Draft saved locally.');
+    showActionSuccess(STANDARD_ACTION_FEEDBACK.draftSaved);
   };
 
   const createAndRoute = async (options: { aiUnavailable?: boolean } = {}) => {
     if (!canCreatePatient) {
-      setError('Your profile cannot create patients.');
+      showActionError('Reception action failed', 'Your profile cannot create patients.');
       return;
     }
 
     setSubmitting(true);
-    setError('');
-    setStatus('');
     try {
       const routeResult = await createPatientAndRouteFromReception(draft, {
         actorName: currentUserName,
@@ -453,7 +436,10 @@ export default function ReceptionWorkspace() {
       });
       window.sessionStorage?.removeItem('caredroid:reception-draft');
     } catch (routeError) {
-      setError(routeError instanceof Error ? routeError.message : 'Unable to route patient.');
+      showActionError(
+        'Reception action failed',
+        routeError instanceof Error ? routeError.message : 'Unable to route patient.',
+      );
     } finally {
       setSubmitting(false);
     }
@@ -465,7 +451,9 @@ export default function ReceptionWorkspace() {
       actorName: currentUserName,
     });
     setShowChooser(false);
-    setStatus(`${RECEPTION_COPY.chooser.unknown} — ${RECEPTION_COPY.workspace.sentToTriage}`);
+    showActionSuccess(
+      `${RECEPTION_COPY.chooser.unknown} — ${RECEPTION_COPY.workspace.sentToTriage}`,
+    );
     selectPatient(provisional.patient.id);
     setResult(null);
   };
