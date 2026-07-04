@@ -424,7 +424,7 @@ const isProbablyHtml = (body = '', contentType = '') => {
 
 export const parseApiResponse = async <T = any>(
   response,
-  { fallback }: { fallback?: T } = {},
+  { fallback }: { fallback?: T | null } = {},
 ): Promise<T> => {
   if (!response || typeof response.text !== 'function') {
     throw new ApiResponseError('The API did not return a valid response. Check backend availability or the request mock.', {
@@ -438,7 +438,10 @@ export const parseApiResponse = async <T = any>(
   const contentType = response.headers?.get?.('content-type') || '';
   const body = await response.text();
 
-  if (!body) return (fallback ?? ({} as T));
+  if (!body) {
+    if (fallback !== undefined) return fallback as T;
+    return {} as T;
+  }
 
   if (isProbablyHtml(body, contentType)) {
     throw new ApiResponseError(
