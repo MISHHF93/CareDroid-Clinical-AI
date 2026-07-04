@@ -130,7 +130,8 @@ function buildStaffNodes(graph: MutableGraph, staff: readonly Staff[]): void {
       label: member.name || member.id,
       summary: `${member.role || 'Staff'} — ${member.status || 'active'}.`,
       route: CANONICAL_ROUTES.emergencyWhiteboard,
-      severity: member.status === 'Busy' ? 'warning' : 'neutral',
+      severity:
+        (member.activePatients ?? member.assignedPatientIds?.length ?? 0) > 2 ? 'warning' : 'neutral',
       sourceModule: 'emergencyStore.staff',
       metadata: Object.freeze({
         role: member.role || null,
@@ -217,7 +218,8 @@ function buildPatientNodes(
     if (patient.state === PatientState.Discharge || patient.state === PatientState.Deceased) continue;
 
     const nodeId = knowledgeGraphNodeId('patient', patient.id);
-    const journey = resolvePatientJourneyPosition(patient, referrals);
+    const patientReferral = referrals.find((referral) => referral.patientId === patient.id) ?? null;
+    const journey = resolvePatientJourneyPosition(patient, patientReferral);
     const workflowStep = resolveWorkflowStepForState(patient.state);
 
     addNode(graph, Object.freeze({
@@ -335,7 +337,7 @@ function buildAlertNodes(graph: MutableGraph, alerts: readonly Alert[]): void {
       sourceModule: 'emergencyStore.alerts',
       metadata: Object.freeze({
         acknowledged: alert.acknowledged ?? false,
-        category: alert.category || null,
+        category: alert.type || alert.source || null,
       }),
     }));
 
@@ -416,7 +418,7 @@ function buildAutomationTaskNodes(
   graph: MutableGraph,
   tasks: readonly AdministrativeAutomationTask[],
 ): void {
-  for (const task of tasks.filter((entry) => entry.status === 'pending_review' || entry.status === 'active')) {
+  for (const task of tasks.filter((entry) => entry.status === 'pending_review')) {
     const nodeId = knowledgeGraphNodeId('workflow', `automation-${task.id}`);
     addNode(graph, Object.freeze({
       id: nodeId,
@@ -816,9 +818,7 @@ export function buildUnifiedApplicationKnowledgeGraph(
   );
 
   const activeAlerts = alerts.filter((alert) => !alert.dismissed).length;
-  const openWorkflows = administrativeTasks.filter(
-    (task) => task.status === 'pending_review' || task.status === 'active',
-  ).length;
+  const openWorkflows = administrativeTasks.filter((task) => task.status === 'pending_review').length;
   const aiRecommendations = nodes.filter((node) => node.entityType === 'ai_recommendation').length;
   const connectedServices = nodes.filter((node) => node.entityType === 'service').length;
   const occupiedBeds = nodes.filter((node) => node.entityType === 'bed').length;

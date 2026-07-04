@@ -88,16 +88,17 @@ const W = PAGE_REBUILD_WAVES.reduce(
 );
 
 function edEntry(
-  partial: Omit<PageRebuildEntry, 'uxContract' | 'status'> & {
+  partial: Omit<PageRebuildEntry, 'uxContract' | 'status' | 'pilotNav'> & {
     status?: PageRebuildStatus;
     uxContract?: PageUxContract;
+    pilotNav?: boolean;
   },
 ): PageRebuildEntry {
   return Object.freeze({
     status: PAGE_REBUILD_STATUS.pending,
     uxContract: DEFAULT_ED_PAGE_UX_CONTRACT,
-    pilotNav: true,
     ...partial,
+    pilotNav: partial.pilotNav ?? true,
   });
 }
 

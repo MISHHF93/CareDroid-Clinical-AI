@@ -5077,7 +5077,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
           summary: `Review task ${input.taskId} → ${input.decision}`,
           patientId: result.task?.patientId,
           source: 'emergencyStore',
-          severity: !result.task ? 'Critical' : input.decision === 'reject' ? 'Warning' : 'Info',
+          severity: !result.task ? 'Critical' : input.decision === 'dismiss' ? 'Warning' : 'Info',
           timestamp: new Date().toISOString(),
           metadata: {
             taskId: input.taskId,

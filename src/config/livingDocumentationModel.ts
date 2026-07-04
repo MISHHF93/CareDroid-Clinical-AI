@@ -28,7 +28,7 @@ export type LivingDocumentationEntry = Readonly<{
   endpoints?: readonly string[];
   workflows?: readonly string[];
   components?: readonly string[];
-  status?: 'active' | 'redirect' | 'local-only' | 'partial';
+  status?: 'active' | 'redirect' | 'local-only' | 'partial' | 'wired';
 }>;
 
 export type LivingDocumentationPageContext = Readonly<{

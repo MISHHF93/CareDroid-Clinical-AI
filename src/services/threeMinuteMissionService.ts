@@ -156,7 +156,7 @@ export function shouldStartMissionForPatient(patient: Patient): boolean {
   const inEarlyFlow = [PatientState.Arrival, PatientState.Registration, PatientState.Triage, PatientState.Waiting].includes(
     patient.state,
   );
-  return isCriticalAcuity && inEarlyFlow && (hasRedFlags || patient.triagePending);
+  return isCriticalAcuity && inEarlyFlow && (hasRedFlags || Boolean(patient.triagePending));
 }
 
 export function shouldStartMissionForEmsArrival(arrival: EMSArrival): boolean {

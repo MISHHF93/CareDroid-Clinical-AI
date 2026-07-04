@@ -22,11 +22,13 @@ export type IntakeHandoffStore = Pick<
   | 'recordWorkflowAction'
   | 'movePatientToState'
   | 'patients'
+  | 'referrals'
   | 'emergencySettings'
   | 'updatePatient'
   | 'dispatchWebSocketEvent'
   | 'updateCapacity'
   | 'updateAlerts'
+  | 'refreshAdministrativeAutomationsAsync'
 >;
 
 export type IntakeHandoffSource =

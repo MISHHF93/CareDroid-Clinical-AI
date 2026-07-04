@@ -37,7 +37,9 @@ export async function fetchServerObservabilityDiagnostics(): Promise<{
 }> {
   try {
     const response = await apiFetch(OBSERVABILITY_CONTRACT.diagnosticsEndpoint);
-    const data = await parseApiResponse<ServerObservabilityDiagnostics>(response, { fallback: null });
+    const data = await parseApiResponse<ServerObservabilityDiagnostics | null>(response, {
+      fallback: null,
+    });
     if (!response.ok) {
       return {
         ok: false,
@@ -62,7 +64,7 @@ export async function fetchObservabilityPerformance(): Promise<{
 }> {
   try {
     const response = await apiFetch(OBSERVABILITY_CONTRACT.performanceEndpoint);
-    const data = await parseApiResponse<Record<string, unknown>>(response, { fallback: null });
+    const data = await parseApiResponse<Record<string, unknown> | null>(response, { fallback: null });
     if (!response.ok) {
       return {
         ok: false,
@@ -91,7 +93,7 @@ export async function fetchObservabilityTrace(correlationId: string): Promise<{
   }
   try {
     const response = await apiFetch(`${OBSERVABILITY_CONTRACT.traceEndpoint}/${encodeURIComponent(normalized)}`);
-    const data = await parseApiResponse<Record<string, unknown>>(response, { fallback: null });
+    const data = await parseApiResponse<Record<string, unknown> | null>(response, { fallback: null });
     if (!response.ok) {
       return {
         ok: false,

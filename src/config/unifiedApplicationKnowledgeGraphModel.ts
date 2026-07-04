@@ -120,7 +120,7 @@ export const KNOWLEDGE_GRAPH_RELATIONSHIP_TYPES: readonly KnowledgeGraphRelation
   'resulted_in',
 ]);
 
-export const KNOWLEDGE_GRAPH_ENTITIES: readonly KnowledgeGraphEntityDefinition[] = Object.freeze([
+export const KNOWLEDGE_GRAPH_ENTITIES = Object.freeze([
   Object.freeze({
     entityType: 'patient',
     label: 'Patient',
@@ -205,7 +205,7 @@ export const KNOWLEDGE_GRAPH_ENTITIES: readonly KnowledgeGraphEntityDefinition[]
     sourceModules: ['emergencyStore.workflowLogs', 'websocket'],
     relationshipTypes: ['triggered_by', 'connected_to', 'resulted_in'],
   }),
-]);
+]) as readonly KnowledgeGraphEntityDefinition[];
 
 export const UNIFIED_APPLICATION_KNOWLEDGE_GRAPH_SAFETY = Object.freeze({
   statement: OPERATIONAL_INTELLIGENCE_DISCLAIMERS.operational,

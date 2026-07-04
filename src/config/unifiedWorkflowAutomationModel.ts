@@ -135,7 +135,7 @@ const CATEGORY_TO_DOMAINS: Readonly<
   escalation_workflow: ['notifications', 'triage'],
 });
 
-export const WORKFLOW_AUTOMATION_DOMAINS: readonly WorkflowAutomationDomainDefinition[] = Object.freeze([
+export const WORKFLOW_AUTOMATION_DOMAINS = Object.freeze([
   Object.freeze({
     id: 'reception',
     label: 'Reception',
@@ -235,7 +235,7 @@ export const WORKFLOW_AUTOMATION_DOMAINS: readonly WorkflowAutomationDomainDefin
     automationCategories: ['ai_patient_summary'],
     triggerEvents: ['workflow_orchestration_updated'],
   }),
-]);
+]) as readonly WorkflowAutomationDomainDefinition[];
 
 const DOMAIN_BY_ID = Object.freeze(
   Object.fromEntries(WORKFLOW_AUTOMATION_DOMAINS.map((domain) => [domain.id, domain])),

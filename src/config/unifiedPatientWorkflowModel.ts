@@ -58,7 +58,7 @@ const STEP_ORDER: readonly PatientWorkflowStepId[] = Object.freeze([
   'discharge',
 ]);
 
-export const PATIENT_WORKFLOW_STEPS: readonly PatientWorkflowStep[] = Object.freeze([
+export const PATIENT_WORKFLOW_STEPS = Object.freeze([
   Object.freeze({
     id: 'arrival',
     order: 1,
@@ -199,7 +199,7 @@ export const PATIENT_WORKFLOW_STEPS: readonly PatientWorkflowStep[] = Object.fre
     primaryAction: 'Complete discharge summary & handoff',
     clicksSavedEstimate: 3,
   }),
-]);
+]) as readonly PatientWorkflowStep[];
 
 const STEP_BY_STATE = Object.freeze(
   Object.fromEntries(PATIENT_WORKFLOW_STEPS.map((step) => [step.patientState, step])),

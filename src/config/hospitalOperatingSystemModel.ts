@@ -119,7 +119,7 @@ const STAGE_DEPARTMENTS: Partial<Record<EmergencyJourneyStageId, readonly Hospit
     'analytics-feedback': ['quality', 'administration'],
   });
 
-export const HOSPITAL_OPERATING_DEPARTMENTS: readonly HospitalDepartmentParticipation[] = Object.freeze([
+export const HOSPITAL_OPERATING_DEPARTMENTS = Object.freeze([
   Object.freeze({
     id: 'dispatch',
     label: DEPARTMENTS.EMERGENCY,
@@ -192,7 +192,7 @@ export const HOSPITAL_OPERATING_DEPARTMENTS: readonly HospitalDepartmentParticip
     phaseIds: ['reporting-analytics'],
     stageIds: ['analytics-feedback'],
   }),
-]);
+]) as readonly HospitalDepartmentParticipation[];
 
 export function getJourneyStageDefinition(stageId: EmergencyJourneyStageId) {
   return STAGE_BY_ID[stageId];

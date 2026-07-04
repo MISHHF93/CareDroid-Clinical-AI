@@ -434,6 +434,8 @@ export interface EMSArrival {
   handoffClose?: HandoffCloseRecord;
   /** Real-time electronic patient care records from EMS. */
   epcrFeed?: PatientCareRecordFeed[];
+  /** Transport mode when supplied by EMS integration (ground/air/etc.). */
+  transportMode?: string;
 }
 
 export type EMSCase = EMSArrival;
@@ -597,6 +599,12 @@ export interface Patient {
   highRiskComplaintFlags?: HighRiskComplaintFlagRecord[];
   /** Staff-confirmed fit-to-sit / fit-to-wait seating pathway — never auto-assigned. */
   fitToWaitClassification?: FitToWaitClassificationRecord | null;
+  /** Optional intake fields surfaced by EMS feeds, document artifacts, or backend sync. */
+  symptoms?: string[];
+  waitTimeMinutes?: number;
+  waitMinutes?: number;
+  allergies?: string[];
+  medications?: string[];
   /** Normalized arrival block — preferred source for whiteboard and reception surfaces. */
   arrival?: PatientArrivalRecord;
   /** Live automated whiteboard timers and derived display state. */
@@ -835,9 +843,15 @@ export type WorkflowActionType =
   | 'reassessment_created'
   | 'reassessment_completed'
   | 'ems_arrival_created'
+  | 'ems_arrival'
+  | 'ems_incoming'
+  | 'ems_updated'
   | 'ems_converted_to_patient'
   | 'capacity_score_changed'
+  | 'capacity_updated'
+  | 'capacity_changed'
   | 'boarding_started'
+  | 'boarding_updated'
   | 'staffing_request_created'
   | 'referral_created'
   | 'referral_status_changed'
@@ -846,6 +860,15 @@ export type WorkflowActionType =
   | 'integration_event_received'
   | 'clinical_score_saved'
   | 'alert_lifecycle'
+  | 'alert_created'
+  | 'operational_alert_dispatched'
+  | 'staff_assigned'
+  | 'patient_escalated'
+  | 'patient_flow_updated'
+  | 'workflow_orchestration_updated'
+  | 'workflow_log_created'
+  | 'intake_handoff_complete'
+  | 'three_minute_mission_acknowledged'
   | 'administrative_automation_reviewed';
 
 export interface ClinicalScoreSaveInput {

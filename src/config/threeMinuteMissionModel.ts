@@ -42,7 +42,7 @@ export type ThreeMinuteMissionDefinition = Readonly<{
   tasks: readonly Readonly<{ id: ThreeMinuteMissionTaskId; label: string; ownerRole: string }>[];
 }>;
 
-export const THREE_MINUTE_MISSION_DEFINITIONS: readonly ThreeMinuteMissionDefinition[] = Object.freeze([
+export const THREE_MINUTE_MISSION_DEFINITIONS = Object.freeze([
   Object.freeze({
     trigger: 'critical_alert',
     label: 'Critical alert response',
@@ -99,7 +99,7 @@ export const THREE_MINUTE_MISSION_DEFINITIONS: readonly ThreeMinuteMissionDefini
       { id: 'notify_department', label: 'Escalate if overdue', ownerRole: 'charge_nurse' },
     ]),
   }),
-]);
+]) as readonly ThreeMinuteMissionDefinition[];
 
 export type ThreeMinuteMission = Readonly<{
   missionId: string;

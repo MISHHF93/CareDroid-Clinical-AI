@@ -70,8 +70,7 @@ function commandCenterLabel(id: HospitalCommandMetricId): string {
 }
 
 /** Merged registry — header metrics plus command-center-only signals */
-export const UNIFIED_OPERATIONAL_METRICS: readonly UnifiedOperationalMetricDefinition[] =
-  Object.freeze([
+export const UNIFIED_OPERATIONAL_METRICS = Object.freeze([
     ...OPERATIONAL_METRIC_REGISTRY.map((metric) =>
       Object.freeze({
         id: metric.key,
@@ -81,7 +80,7 @@ export const UNIFIED_OPERATIONAL_METRICS: readonly UnifiedOperationalMetricDefin
         operationalKey: metric.key,
         commandCenterId: OPERATIONAL_TO_COMMAND[metric.key],
         surfaces: Object.freeze([
-          ...metric.surfaces,
+          ...(metric.surfaces as UnifiedOperationalMetricDefinition['surfaces']),
           'command-center',
         ] as const),
       }),
@@ -98,7 +97,7 @@ export const UNIFIED_OPERATIONAL_METRICS: readonly UnifiedOperationalMetricDefin
         surfaces: Object.freeze(['command-center', 'analytics'] as const),
       }),
     ),
-  ]);
+  ]) as readonly UnifiedOperationalMetricDefinition[];
 
 const UNIFIED_BY_ID = Object.freeze(
   Object.fromEntries(UNIFIED_OPERATIONAL_METRICS.map((entry) => [entry.id, entry])),

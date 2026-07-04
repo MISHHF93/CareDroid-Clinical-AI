@@ -230,7 +230,7 @@ function buildFlowDetectionItems(
 
 function mapThreeMinuteMissionToWorkflowItem(mission: ThreeMinuteMission): WorkflowAutomationItem {
   const priority: WorkflowAutomationPriority =
-    mission.phase === 'breach' ? 'critical' : mission.phase === 'escalation' ? 'high' : 'high';
+    mission.phase === 'breach' ? 'critical' : mission.phase === 'escalated_l1' ? 'high' : 'high';
   return Object.freeze({
     id: `uwa-tm-${mission.missionId}`,
     domain: 'triage',
