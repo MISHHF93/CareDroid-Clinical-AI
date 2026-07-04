@@ -4,7 +4,6 @@ import { Link, Navigate, useLocation, useSearchParams } from 'react-router-dom';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { PatientFlag, PatientState } from '../../types/emergency';
 import { EMERGENCY_OS_BRANDING } from '../../config/emergencyOsBranding.config';
-import EdDataSourceBanner from '../../components/emergency/EdDataSourceBanner';
 import useEdRouteDataContext from '../../hooks/useEdRouteDataContext';
 import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
 import { useEmergencyStore } from '../../store/emergencyStore';
@@ -26,7 +25,7 @@ import {
   MetricGrid,
   PatientGrid,
   ApiStateBanner,
-  DataSourceNote,
+  OperationalModuleState,
   isHighRisk,
   isBoarding,
   needsReassessmentAttention,
@@ -144,15 +143,12 @@ export function PatientsRoute() {
         </label>
       }
     >
-      <EdDataSourceBanner
-        envelope={patientsModule.data}
-        loading={patientsModule.loading}
-        error={patientsModule.error}
+      <OperationalModuleState
+        moduleState={patientsModule}
         activeScenarioId={activeScenarioId}
         backendAvailable={backendAvailable}
         compact
       />
-      <ApiStateBanner moduleState={patientsModule} />
       <MetricGrid
         metrics={[
           { label: 'Total patients', value: patients.length, color: MEDICAL_THEME.accent },
@@ -202,7 +198,7 @@ export function PatientsRoute() {
             : 'No active patients are currently on the board.'
         }
       />
-      <DataSourceNote moduleState={patientsModule} />
+      <OperationalModuleState moduleState={patientsModule} placement="footer" />
     </EmergencyRoutePage>
   );
 }
@@ -390,14 +386,11 @@ export function QueueRoute() {
         tone: queueMetrics.breachedQueues > 0 ? 'warning' : isTriageWorkspace && triageCount ? 'info' : 'neutral',
       }}
     >
-      <EdDataSourceBanner
-        envelope={queues.data}
-        loading={queues.loading}
-        error={queues.error}
+      <OperationalModuleState
+        moduleState={queues}
         activeScenarioId={activeScenarioId}
         backendAvailable={backendAvailable}
       />
-      <ApiStateBanner moduleState={queues} />
       <MetricGrid
         metrics={[
           { label: 'Total queued', value: queueMetrics.totalQueued, color: MEDICAL_THEME.accent },
@@ -527,7 +520,7 @@ export function QueueRoute() {
           );
         })}
       </div>
-      <DataSourceNote moduleState={queues} />
+      <OperationalModuleState moduleState={queues} placement="footer" />
     </EmergencyRoutePage>
   );
 }
@@ -593,14 +586,11 @@ export function ReassessmentRoute() {
         tone: overdueCount > 0 ? 'critical' : prioritizedDuePatients.length ? 'warning' : 'neutral',
       }}
     >
-      <EdDataSourceBanner
-        envelope={reassessment.data}
-        loading={reassessment.loading}
-        error={reassessment.error}
+      <OperationalModuleState
+        moduleState={reassessment}
         activeScenarioId={activeScenarioId}
         backendAvailable={backendAvailable}
       />
-      <ApiStateBanner moduleState={reassessment} />
       <MetricGrid
         metrics={[
           {
@@ -613,7 +603,7 @@ export function ReassessmentRoute() {
         ]}
       />
       <PatientGrid patients={prioritizedDuePatients} emptyMessage="No reassessments are due right now." />
-      <DataSourceNote moduleState={reassessment} />
+      <OperationalModuleState moduleState={reassessment} placement="footer" />
     </EmergencyRoutePage>
   );
 }
@@ -702,14 +692,11 @@ export function CapacityRoute() {
       <FlowCapacityViewTabs activeView={activeView} onViewChange={setActiveView} />
       {activeView === 'boarding' ? (
         <>
-          <EdDataSourceBanner
-            envelope={boarding.data}
-            loading={boarding.loading}
-            error={boarding.error}
+          <OperationalModuleState
+            moduleState={boarding}
             activeScenarioId={activeScenarioId}
             backendAvailable={backendAvailable}
           />
-          <ApiStateBanner moduleState={boarding} />
           <MetricGrid
             metrics={[
               { label: 'Boarding patients', value: boardingPatients.length, color: '#F59E0B' },
@@ -722,18 +709,15 @@ export function CapacityRoute() {
             ]}
           />
           <PatientGrid patients={boardingPatients} emptyMessage="No active boarding patients." />
-          <DataSourceNote moduleState={boarding} />
+          <OperationalModuleState moduleState={boarding} placement="footer" />
         </>
       ) : (
         <>
-          <EdDataSourceBanner
-            envelope={capacityStatus.data}
-            loading={capacityStatus.loading}
-            error={capacityStatus.error}
+          <OperationalModuleState
+            moduleState={capacityStatus}
             activeScenarioId={activeScenarioId}
             backendAvailable={backendAvailable}
           />
-          <ApiStateBanner moduleState={capacityStatus} />
           <MetricGrid
             metrics={[
               {
@@ -788,7 +772,7 @@ export function CapacityRoute() {
               ) : null}
             </div>
           ) : null}
-          <DataSourceNote moduleState={capacityStatus} />
+          <OperationalModuleState moduleState={capacityStatus} placement="footer" />
         </>
       )}
     </EmergencyRoutePage>
@@ -1017,15 +1001,13 @@ export function CopilotRoute() {
         tone: highRiskPatients.length ? 'warning' : 'info',
       }}
     >
-      <EdDataSourceBanner
-        envelope={copilot.data}
-        loading={copilot.loading}
-        error={copilot.error}
+      <OperationalModuleState
+        moduleState={copilot}
         activeScenarioId={activeScenarioId}
         backendAvailable={backendAvailable}
         compact
+        showApiState={showRouteMetrics}
       />
-      {showRouteMetrics ? <ApiStateBanner moduleState={copilot} /> : null}
       {showRouteMetrics ? (
         <MetricGrid
           metrics={[
@@ -1096,7 +1078,9 @@ export function CopilotRoute() {
             ))}
         </div>
       ) : null}
-      {showRouteMetrics ? <DataSourceNote moduleState={copilot} /> : null}
+      {showRouteMetrics ? (
+        <OperationalModuleState moduleState={copilot} placement="footer" />
+      ) : null}
     </EmergencyRoutePage>
   );
 }

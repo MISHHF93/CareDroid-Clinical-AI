@@ -2,7 +2,7 @@ import { describe, expect, it, vi, afterEach, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import * as visibilityModule from '../../config/practitionerSurfaceVisibility';
 import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
-import { MetricGrid, WorkflowSituationBrief } from './emergencyRouteShared';
+import { MetricGrid, OperationalModuleState, WorkflowSituationBrief } from './emergencyRouteShared';
 
 vi.mock('../../contexts/PractitionerVisibilityContext', () => ({
   usePractitionerSurfaceVisibility: vi.fn(),
@@ -101,5 +101,45 @@ describe('emergencyRouteShared visibility', () => {
 
     expect(container.querySelector('.emergency-route-situation-brief')).toBeTruthy();
     expect(screen.getByText('3 patients awaiting triage')).toBeInTheDocument();
+  });
+
+  it('composes header and footer module state placements', () => {
+    vi.mocked(usePractitionerSurfaceVisibility).mockReturnValue({
+      ...FULL_SURFACES,
+      chrome: {
+        ...FULL_SURFACES.chrome,
+        showDeveloperApiBanners: true,
+        showEdDataSourceBanner: true,
+      },
+    });
+
+    const { rerender } = render(
+      <OperationalModuleState
+        moduleState={{
+          loading: false,
+          error: 'Queue endpoint unavailable',
+          isEmpty: false,
+          data: null,
+        }}
+        activeScenarioId="scenario-1"
+        backendAvailable
+      />,
+    );
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Queue endpoint unavailable');
+
+    rerender(
+      <OperationalModuleState
+        moduleState={{
+          loading: false,
+          error: null,
+          isEmpty: false,
+          data: { generatedAt: '2026-07-04T12:00:00.000Z', source: 'backend' },
+        }}
+        placement="footer"
+      />,
+    );
+
+    expect(screen.getByText(/Source:/i)).toBeInTheDocument();
   });
 });

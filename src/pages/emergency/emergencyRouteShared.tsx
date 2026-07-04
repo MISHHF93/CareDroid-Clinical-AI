@@ -1,4 +1,5 @@
 import { useMemo, type ReactNode } from 'react';
+import EdDataSourceBanner from '../../components/emergency/EdDataSourceBanner';
 import PatientCard from '../../components/PatientCard';
 import HelpTrigger from '../../components/help/HelpTrigger';
 import LivingContextualHelpBanner from '../../components/help/LivingContextualHelpBanner';
@@ -303,6 +304,61 @@ export function PatientGrid({ patients, emptyMessage }) {
 
 function dataFreshness(generatedAt) {
   return resolveEdDataFreshness(generatedAt);
+}
+
+export type EmergencyRouteModuleState = Readonly<{
+  loading?: boolean;
+  error?: string | null;
+  isEmpty?: boolean;
+  data?: {
+    generatedAt?: string;
+    source?: string;
+  } | null;
+}>;
+
+export type OperationalModuleStatePlacement = 'header' | 'footer';
+
+export type OperationalModuleStateProps = Readonly<{
+  moduleState: EmergencyRouteModuleState;
+  activeScenarioId?: string | null;
+  backendAvailable?: boolean;
+  compact?: boolean;
+  fallbackText?: string;
+  placement?: OperationalModuleStatePlacement;
+  showApiState?: boolean;
+  showDataSourceNote?: boolean;
+}>;
+
+/** Canonical loading/error/freshness stack for emergency route pages. */
+export function OperationalModuleState({
+  moduleState,
+  activeScenarioId,
+  backendAvailable,
+  compact = false,
+  fallbackText,
+  placement = 'header',
+  showApiState = true,
+  showDataSourceNote = true,
+}: OperationalModuleStateProps) {
+  if (placement === 'footer') {
+    return showDataSourceNote ? <DataSourceNote moduleState={moduleState} /> : null;
+  }
+
+  return (
+    <>
+      <EdDataSourceBanner
+        envelope={moduleState.data}
+        loading={moduleState.loading}
+        error={moduleState.error}
+        activeScenarioId={activeScenarioId}
+        backendAvailable={backendAvailable}
+        compact={compact}
+      />
+      {showApiState ? (
+        <ApiStateBanner moduleState={moduleState} fallbackText={fallbackText} />
+      ) : null}
+    </>
+  );
 }
 
 export function ApiStateBanner({
