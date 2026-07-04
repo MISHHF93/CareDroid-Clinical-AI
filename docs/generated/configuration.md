@@ -3,7 +3,7 @@
 > Auto-generated from implementation. Do not edit manually.
 > Regenerate: `npm run docs:generate`
 
-**Entries:** 79
+**Entries:** 81
 
 ### app-config
 
@@ -27,13 +27,20 @@ Documents deployable VITE_* keys and local dev defaults. [audit]
 - **Source:** `.env.example`
 - **Status:** active
 
+### feature-flag-constants
+
+Shared FEATURE_FLAG_STATES and FEATURE_FLAG_CATEGORIES literals for frontend and backend. [registry]
+
+- **Source:** `lib/featureFlags/constants.ts`
+- **Status:** active
+
 ### feature-flags
 
 FEATURE_FLAGS projection and FEATURE_FLAG_REGISTRY catalog. [registry]
 
 - **Source:** `src/config/featureFlags.config.ts`
 - **Status:** active
-- **Roles:** `src/config/appConfig.ts (direct features.* reads)`
+- **Roles:** `src/config/appConfig.ts (direct features.* reads)`, `backend/src/config/featureFlags.config.ts (duplicate state/category enums)`
 
 ### suite-entitlements
 
@@ -328,6 +335,13 @@ Workflow automation domains, triggers, and safety contract. [registry]
 - **Source:** `src/config/unifiedWorkflowAutomationModel.ts`
 - **Status:** active
 
+### operational-intelligence-engine
+
+Shared rule-based operational intelligence snapshot builder for backend and frontend fallback. [registry]
+
+- **Source:** `lib/operational-intelligence/buildSnapshot.ts`
+- **Status:** active
+
 ### unified-operational-intelligence
 
 Event-driven operational intelligence domains and contract. [registry]
@@ -563,7 +577,7 @@ Fetch timeout for apiClient (milliseconds). (parser: apiEnv)
 
 ### Configuration audit
 
-66 registry entries, 55 env vars, 1 conflicts (4 compat shims).
+68 registry entries, 55 env vars, 2 conflicts (4 compat shims).
 
 - **Source:** `canonicalConfigurationAudit.ts`
 - **Status:** active
