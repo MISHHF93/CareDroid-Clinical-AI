@@ -6,7 +6,7 @@ import { renderRoute, ROUTE_LOAD_TIMEOUT } from './canonicalRouteTree.testShared
 
 const originalEmergencyState = useEmergencyStore.getState();
 
-describe('canonical route tree — legacy redirects', () => {
+describe.sequential('canonical route tree — legacy redirects', () => {
   afterEach(() => {
     cleanup();
     useEmergencyStore.setState(originalEmergencyState, true);
@@ -64,7 +64,7 @@ describe('canonical route tree — legacy redirects', () => {
   }, ROUTE_LOAD_TIMEOUT);
 });
 
-describe('canonical route tree — governance workspace mounts', () => {
+describe.sequential('canonical route tree — governance workspace mounts', () => {
   afterEach(() => {
     cleanup();
     useEmergencyStore.setState(originalEmergencyState, true);
