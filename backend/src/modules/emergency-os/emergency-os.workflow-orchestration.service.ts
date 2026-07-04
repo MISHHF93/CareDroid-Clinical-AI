@@ -19,6 +19,7 @@ import {
   WorkflowActionLogService,
 } from './emergency-os.services';
 import { EmergencyRealtimeService } from './emergency-realtime.service';
+import { OperationalIntelligenceService } from './emergency-os.operational-intelligence.service';
 
 function envelope<T>(data: T, remainingGaps: string[] = []): EmergencyModuleEnvelope<T> {
   return {
@@ -43,6 +44,7 @@ export class WorkflowOrchestrationService {
     @Optional() private readonly platformAssetsService?: PlatformAssetsService,
     @Optional() private readonly queueService?: AdministrativeAutomationQueueService,
     @Optional() private readonly realtimeService?: EmergencyRealtimeService,
+    @Optional() private readonly operationalIntelligenceService?: OperationalIntelligenceService,
   ) {}
 
   private operationalContext() {
@@ -174,5 +176,6 @@ export class WorkflowOrchestrationService {
         tenant: scope,
       },
     });
+    this.operationalIntelligenceService?.publishRealtimeSignals('workflow_orchestration_updated');
   }
 }

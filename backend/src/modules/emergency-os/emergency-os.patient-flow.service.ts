@@ -2,6 +2,7 @@ import { Injectable, Optional } from '@nestjs/common';
 import type { Patient, Referral, Staff } from '../../../../src/types/emergency';
 import { EmergencyPatientService, ReferralService } from './emergency-os.services';
 import { EmergencyRealtimeService } from './emergency-realtime.service';
+import { OperationalIntelligenceService } from './emergency-os.operational-intelligence.service';
 import {
   buildBackendPatientFlowSnapshot,
   type BackendPatientFlowSnapshot,
@@ -25,6 +26,7 @@ export class PatientFlowService {
     private readonly patientService: EmergencyPatientService,
     private readonly referralService: ReferralService,
     @Optional() private readonly realtimeService?: EmergencyRealtimeService,
+    @Optional() private readonly operationalIntelligenceService?: OperationalIntelligenceService,
   ) {}
 
   private buildSnapshot(patientId?: string): BackendPatientFlowSnapshot {
@@ -59,6 +61,7 @@ export class PatientFlowService {
       type: 'patient_flow_updated',
       payload: { patientFlowSnapshot: snapshot, patientId: patientId || null },
     });
+    this.operationalIntelligenceService?.publishRealtimeSignals('patient_flow_updated');
     return envelope('Continuous Patient Flow Engine', {
       patientId: patientId || null,
       patientFlowSnapshot: snapshot,
