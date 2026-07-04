@@ -34,6 +34,7 @@ import {
   displayPatientName,
 } from './emergencyRouteShared';
 import QueueReasonBadge from '../../components/queues/QueueReasonBadge';
+import { AiChiefRouteRecommendationsPanel } from '../../components/ai/AiChiefRouteRecommendationsPanel';
 import {
   clearPatientRouteParam,
   PATIENT_ROUTE_PARAM_KEYS,
@@ -779,189 +780,6 @@ export function CapacityRoute() {
   );
 }
 
-// ── AI Chief Inline Recommendations Panel ───────────────────────────────────
-
-type AIRec = {
-  id: string;
-  patientId: string;
-  patientName: string;
-  urgency: 'critical' | 'high' | 'moderate';
-  recommendation: string;
-  rationale: string;
-  action: string;
-};
-
-function buildAIRecommendations(patients: typeof PatientState extends never ? never : any[]): AIRec[] {
-  const recs: AIRec[] = [];
-  for (const patient of patients) {
-    const waitMin = patient.arrivalTime
-      ? Math.round((Date.now() - new Date(patient.arrivalTime).getTime()) / 60000)
-      : 0;
-    const flags: string[] = Array.isArray(patient.flags) ? patient.flags.map((f: any) => String(typeof f === 'object' ? f.type || f : f)) : [];
-    const priority: string = String(patient.priority || '');
-    const state: string = String(patient.state || '');
-    const name: string = [patient.lastName || patient.name || 'Patient', patient.firstName].filter(Boolean).join(', ');
-
-    if (priority === 'P1' && state !== 'Discharge') {
-      recs.push({
-        id: `rec-p1-${patient.id}`,
-        patientId: patient.id,
-        patientName: name,
-        urgency: 'critical',
-        recommendation: 'P1 patient requires immediate physician assessment',
-        rationale: `Priority 1 — ${patient.chiefComplaint || patient.complaintCategory || 'Unknown complaint'}. State: ${state}.`,
-        action: 'Assign Physician',
-      });
-    } else if (flags.some((f) => f.includes('ReassessmentDue') || f.includes('Reassessment'))) {
-      recs.push({
-        id: `rec-reassess-${patient.id}`,
-        patientId: patient.id,
-        patientName: name,
-        urgency: 'high',
-        recommendation: 'Reassessment overdue — check vitals and pain score',
-        rationale: `${patient.chiefComplaint || 'Chief complaint unknown'}. Wait: ${waitMin}m.`,
-        action: 'Reassess Now',
-      });
-    } else if (waitMin > 60 && priority === 'P2') {
-      recs.push({
-        id: `rec-wait-${patient.id}`,
-        patientId: patient.id,
-        patientName: name,
-        urgency: 'high',
-        recommendation: 'Extended wait for P2 — deterioration risk',
-        rationale: `${waitMin} minutes in ${state}. Target: 60 min. Review for P1 upgrade.`,
-        action: 'Review Acuity',
-      });
-    } else if (flags.some((f) => f.includes('Deteriorat') || f.includes('Critical'))) {
-      recs.push({
-        id: `rec-deteriorate-${patient.id}`,
-        patientId: patient.id,
-        patientName: name,
-        urgency: 'critical',
-        recommendation: 'Deterioration flag active — escalate to physician',
-        rationale: `Deterioration indicator set. State: ${state}. Complaint: ${patient.chiefComplaint || '—'}.`,
-        action: 'Escalate',
-      });
-    }
-  }
-  return recs.sort((a, b) => (a.urgency === 'critical' ? -1 : b.urgency === 'critical' ? 1 : 0)).slice(0, 8);
-}
-
-const URGENCY_STYLES: Record<AIRec['urgency'], { color: string; bg: string; label: string }> = {
-  critical: { color: '#DC2626', bg: 'rgba(239,68,68,0.08)', label: 'Critical' },
-  high: { color: '#b45309', bg: 'rgba(245,158,11,0.08)', label: 'High' },
-  moderate: { color: '#1d4ed8', bg: 'rgba(29,78,216,0.06)', label: 'Moderate' },
-};
-
-function AIChiefPanel({ patients, highRiskPatients }: { patients: any[]; highRiskPatients: any[] }) {
-  const selectPatient = useEmergencyStore((state) => state.selectPatient);
-  const escalatePatient = useEmergencyStore((state) => state.escalatePatient);
-  const [dismissed, setDismissed] = useState<Set<string>>(new Set());
-  const [accepted, setAccepted] = useState<Set<string>>(new Set());
-
-  const allRecs = useMemo(
-    () => buildAIRecommendations([...highRiskPatients, ...patients.filter((p) => !highRiskPatients.includes(p))]),
-    [patients, highRiskPatients],
-  );
-  const visibleRecs = allRecs.filter((r) => !dismissed.has(r.id));
-
-  if (allRecs.length === 0) {
-    return (
-      <div className="emergency-route-card" style={{ padding: '12px 16px', fontSize: 13, color: MEDICAL_THEME.inkSubtle }}>
-        ✓ No high-priority AI recommendations at this time. Board appears stable.
-      </div>
-    );
-  }
-
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <strong style={{ fontSize: 13 }}>
-          AI Chief Recommendations
-          <span style={{ marginLeft: 6, fontSize: 11, fontWeight: 700, color: MEDICAL_THEME.inkSubtle }}>
-            ({visibleRecs.length} active · {allRecs.filter((r) => r.urgency === 'critical' && !dismissed.has(r.id)).length} critical)
-          </span>
-        </strong>
-        <span style={{ fontSize: 11, color: MEDICAL_THEME.inkSubtle }}>Decision support only — clinician review required</span>
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-        {visibleRecs.map((rec) => {
-          const style = URGENCY_STYLES[rec.urgency];
-          const isAccepted = accepted.has(rec.id);
-          return (
-            <div
-              key={rec.id}
-              style={{
-                padding: '10px 14px',
-                borderRadius: 8,
-                border: `1px solid ${isAccepted ? '#10B981' : style.color}`,
-                background: isAccepted ? 'rgba(16,185,129,0.07)' : style.bg,
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'flex-start',
-                gap: 12,
-              }}
-            >
-              <div style={{ flex: 1 }}>
-                <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 4 }}>
-                  <span style={{ fontSize: 10, fontWeight: 800, color: style.color, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    {style.label}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => selectPatient(rec.patientId)}
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 700, color: MEDICAL_THEME.ink, padding: 0, textDecoration: 'underline' }}
-                  >
-                    {rec.patientName}
-                  </button>
-                </div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: MEDICAL_THEME.ink }}>{rec.recommendation}</div>
-                <div style={{ fontSize: 11, color: MEDICAL_THEME.inkSubtle, marginTop: 2 }}>{rec.rationale}</div>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 4, alignItems: 'flex-end' }}>
-                {!isAccepted ? (
-                  <>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (rec.action === 'Escalate' || rec.action === 'Assign Physician') {
-                          escalatePatient(rec.patientId, { staffId: 'charge-nurse-current', staffName: 'Charge Nurse' });
-                        }
-                        setAccepted((prev) => new Set([...prev, rec.id]));
-                      }}
-                      style={{ padding: '3px 8px', borderRadius: 5, background: style.color, color: '#fff', border: 'none', fontSize: 11, fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}
-                    >
-                      ✓ {rec.action}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setDismissed((prev) => new Set([...prev, rec.id]))}
-                      style={{ padding: '3px 8px', borderRadius: 5, background: 'transparent', color: MEDICAL_THEME.inkSubtle, border: `1px solid ${MEDICAL_THEME.border}`, fontSize: 11, cursor: 'pointer' }}
-                    >
-                      Dismiss
-                    </button>
-                  </>
-                ) : (
-                  <span style={{ fontSize: 11, fontWeight: 700, color: '#10B981' }}>✓ Accepted</span>
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-      {dismissed.size > 0 && (
-        <button
-          type="button"
-          onClick={() => setDismissed(new Set())}
-          style={{ alignSelf: 'flex-start', background: 'none', border: 'none', fontSize: 11, color: MEDICAL_THEME.inkSubtle, cursor: 'pointer', textDecoration: 'underline' }}
-        >
-          Show {dismissed.size} dismissed
-        </button>
-      )}
-    </div>
-  );
-}
-
 export function CopilotRoute() {
   const surfaces = usePractitionerSurfaceVisibility();
   const patients = useEmergencyStore((state) => state.patients);
@@ -1035,8 +853,7 @@ export function CopilotRoute() {
         </div>
       ) : null}
 
-      {/* Inline AI Chief Recommendations */}
-      <AIChiefPanel patients={activePatients} highRiskPatients={highRiskPatients} />
+      <AiChiefRouteRecommendationsPanel />
 
       <p className="emergency-route-card emergency-route-copilot-hint">
         Open the docked {EMERGENCY_OS_BRANDING.copilotName} panel to ask who needs attention, capacity

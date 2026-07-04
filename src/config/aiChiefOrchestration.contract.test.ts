@@ -17,6 +17,7 @@ const OPERATIONAL_INTELLIGENCE_IMPORT =
 const ALLOWED_OI_CORE_IMPORTERS = new Set([
   'src/hooks/useOperationalIntelligenceCore.ts',
   'src/hooks/useAiChiefOrchestrator.ts',
+  'src/hooks/useUnifiedOperationalIntelligence.ts',
 ]);
 
 function listSourceFiles(dir: string): string[] {
@@ -78,5 +79,15 @@ describe('aiChiefOrchestration contract', () => {
       }
     }
     expect(violations).toEqual([]);
+  });
+
+  it('does not duplicate AI Chief recommendation engines in emergency route pages', () => {
+    const emergencyRoutePages = readFileSync(
+      path.join(ROOT, 'src/pages/emergency/emergencyRoutePages.tsx'),
+      'utf8',
+    );
+    expect(emergencyRoutePages).not.toContain('buildAIRecommendations');
+    expect(emergencyRoutePages).not.toContain('function AIChiefPanel');
+    expect(emergencyRoutePages).toContain('AiChiefRouteRecommendationsPanel');
   });
 });
