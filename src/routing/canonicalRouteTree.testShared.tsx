@@ -42,6 +42,8 @@ function LazyAppRoutes() {
 }
 
 export const ROUTE_LOAD_TIMEOUT = 30000;
+/** App module preload can exceed per-test timeouts under parallel vitest workers. */
+export const ROUTE_PRELOAD_TIMEOUT = 120000;
 
 vi.mock('../services/clinicalChatService', () => ({
   sendClinicalChatMessage: vi.fn().mockResolvedValue({
@@ -551,4 +553,4 @@ export function findRouteHeading(name) {
 
 beforeAll(async () => {
   await preloadAppRoutesForTests();
-}, ROUTE_LOAD_TIMEOUT);
+}, ROUTE_PRELOAD_TIMEOUT);
