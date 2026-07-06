@@ -7,7 +7,8 @@ import {
   type IntakeArtifactId,
 } from '../config/intakeArtifactRegistry';
 import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
-import SmartIntakeApi from './smartIntakeApi';
+import OcrIntakeApi, { type OcrJobStatus } from './ocrIntakeApi';
+import analyticsService from './analyticsService';
 import {
   inferTextHintsFromFilename,
   mergeDemographics,
@@ -45,6 +46,10 @@ export type CapturedIntakeArtifact = {
   source: IntakeArtifactCaptureSource;
   rawText: string;
   auditNote: string;
+  ocrJobId?: string;
+  ocrJobStatus?: OcrJobStatus;
+  ocrWarnings: string[];
+  ocrFailed: boolean;
 };
 
 export type CaptureIntakeArtifactOptions = {
@@ -123,6 +128,84 @@ function parseAiPayload(content: string, artifactId: IntakeArtifactId): {
   }
 }
 
+type BackendOcrOutcome = {
+  jobId: string;
+  status: OcrJobStatus;
+  warnings: string[];
+  demographics: IdArtifactDemographics;
+  clinical: ClinicalArtifactData;
+  fieldCount: number;
+  confidence: number;
+};
+
+async function tryBackendOcrJob(params: {
+  filename: string;
+  mimeType: string;
+  dataUrl: string;
+  rawText: string;
+  artifactId: IntakeArtifactId;
+  sessionId?: string;
+  patientId?: string;
+  staff: string;
+}): Promise<BackendOcrOutcome | null> {
+  if (!isBackendCapabilityEnabled('emergencyOcrIntake')) return null;
+
+  try {
+    const job = await OcrIntakeApi.createJob({
+      filename: params.filename,
+      mimeType: params.mimeType,
+      dataUrl: params.dataUrl,
+      rawText: params.rawText,
+      documentTypeHint: params.artifactId,
+      patientId: params.patientId,
+      intakeSessionId: params.sessionId,
+      actor: params.staff,
+    });
+
+    const artifact = getIntakeArtifact(job.documentType as IntakeArtifactId);
+    const demographics: IdArtifactDemographics = {};
+    const clinical: ClinicalArtifactData = {};
+    for (const field of job.extractedFields) {
+      const value = field.status === 'edited' && field.editedValue ? field.editedValue : field.value;
+      if (artifact.parser === 'identity') {
+        (demographics as Record<string, string>)[field.field] = value;
+      } else {
+        (clinical as Record<string, string>)[field.field] = value;
+      }
+    }
+
+    if (job.status === 'completed' && job.extractedFields.length > 0) {
+      void OcrIntakeApi.applyToIntake(job.id, params.staff).catch(() => undefined);
+    }
+
+    analyticsService.trackEvent({
+      eventName: job.status === 'completed' ? 'document_ocr_processed' : 'document_ocr_failed',
+      parameters: {
+        documentType: job.documentType,
+        fieldCount: job.extractedFields.length,
+        confidenceBand: job.overallConfidence >= 0.7 ? 'high' : job.overallConfidence >= 0.4 ? 'medium' : 'low',
+        warningCount: job.warnings.length,
+      },
+    });
+
+    return {
+      jobId: job.id,
+      status: job.status,
+      warnings: job.warnings,
+      demographics,
+      clinical,
+      fieldCount: job.extractedFields.length,
+      confidence: job.overallConfidence,
+    };
+  } catch {
+    analyticsService.trackEvent({
+      eventName: 'document_ocr_failed',
+      parameters: { reason: 'request_error' },
+    });
+    return null;
+  }
+}
+
 async function tryAiAssistExtraction(
   rawText: string,
   artifactId: IntakeArtifactId,
@@ -181,13 +264,67 @@ export async function captureIntakeArtifact({
   let source: IntakeArtifactCaptureSource = 'text_parser';
   let demographics: IdArtifactDemographics = {};
   let clinical: ClinicalArtifactData = {};
+  let ocrJobId: string | undefined;
+  let ocrJobStatus: OcrJobStatus | undefined;
+  let ocrWarnings: string[] = [];
+  let ocrFailed = false;
+  let backendConfidence: number | undefined;
 
-  if (artifact.parser === 'identity') {
-    demographics = parseIdArtifactText(rawText);
-    if (countPopulatedFields(demographics) <= 1) source = 'filename_heuristic';
-  } else {
-    clinical = parseClinicalArtifactText(artifact.parser, rawText);
-    if (countPopulatedFields(clinical) <= 1) source = 'filename_heuristic';
+  const backendResult = await tryBackendOcrJob({
+    filename: file.name,
+    mimeType,
+    dataUrl,
+    rawText,
+    artifactId: resolvedArtifactId,
+    sessionId,
+    patientId: (boardPatient as { id?: string } | null)?.id,
+    staff,
+  });
+
+  if (backendResult) {
+    ocrJobId = backendResult.jobId;
+    ocrJobStatus = backendResult.status;
+    ocrWarnings = backendResult.warnings;
+    ocrFailed = backendResult.status === 'failed';
+
+    if (backendResult.status === 'completed' && backendResult.fieldCount > 0) {
+      demographics = backendResult.demographics;
+      clinical = backendResult.clinical;
+      backendConfidence = backendResult.confidence;
+      source = 'backend_ocr';
+    }
+  }
+
+  if (source !== 'backend_ocr') {
+    if (artifact.parser === 'identity') {
+      demographics = parseIdArtifactText(rawText);
+      if (countPopulatedFields(demographics) <= 1) source = 'filename_heuristic';
+    } else {
+      clinical = parseClinicalArtifactText(artifact.parser, rawText);
+      if (countPopulatedFields(clinical) <= 1) source = 'filename_heuristic';
+    }
+
+    const populatedCount =
+      artifact.parser === 'identity'
+        ? countPopulatedFields(demographics)
+        : countPopulatedFields(clinical);
+
+    if (populatedCount < 3) {
+      const aiResult = await tryAiAssistExtraction(rawText, resolvedArtifactId);
+      const aiCount =
+        artifact.parser === 'identity'
+          ? countPopulatedFields(aiResult.demographics)
+          : countPopulatedFields(aiResult.clinical);
+
+      if (aiCount > populatedCount) {
+        if (artifact.parser === 'identity') {
+          demographics = mergeDemographics(demographics, aiResult.demographics);
+        } else {
+          clinical = { ...clinical, ...aiResult.clinical };
+        }
+        source = 'ai_assist';
+      }
+    }
   }
 
   if (supplementalText.trim()) {
@@ -202,79 +339,6 @@ export async function captureIntakeArtifact({
     source = 'staff_paste';
   }
 
-  const populatedCount =
-    artifact.parser === 'identity'
-      ? countPopulatedFields(demographics)
-      : countPopulatedFields(clinical);
-
-  if (populatedCount < 3) {
-    const aiResult = await tryAiAssistExtraction(rawText, resolvedArtifactId);
-    const aiCount =
-      artifact.parser === 'identity'
-        ? countPopulatedFields(aiResult.demographics)
-        : countPopulatedFields(aiResult.clinical);
-
-    if (aiCount > populatedCount) {
-      if (artifact.parser === 'identity') {
-        demographics = mergeDemographics(demographics, aiResult.demographics);
-      } else {
-        clinical = { ...clinical, ...aiResult.clinical };
-      }
-      source = 'ai_assist';
-    }
-  }
-
-  if (isBackendCapabilityEnabled('emergencySmartIntakeIdentitySession') && sessionId) {
-    await SmartIntakeApi.uploadDocument(
-      sessionId,
-      {
-        filename: file.name,
-        mimeType,
-        content: dataUrl,
-        type: artifact.backendDocumentType,
-        text: rawText,
-        ocrPayload: { rawText, text: rawText, artifactId: resolvedArtifactId },
-      },
-      staff,
-    );
-
-    const submitPayload =
-      artifact.parser === 'identity'
-        ? {
-            source: artifact.intakeInputSource,
-            demographics,
-            confidence: resolveConfidence(countPopulatedFields(demographics), 'backend_ocr'),
-            notes: `${artifact.label} captured from ${file.name}`,
-          }
-        : {
-            source: artifact.intakeInputSource,
-            demographics: {},
-            medications:
-              artifact.parser === 'medication' && clinical.medication
-                ? [{ name: clinical.medication, dose: clinical.dose, route: clinical.route, frequency: clinical.frequency }]
-                : [],
-            allergies:
-              artifact.parser === 'allergy' && (clinical.allergy || clinical.substance)
-                ? [
-                    {
-                      substance: clinical.substance || clinical.allergy || 'Unknown',
-                      reaction: clinical.reaction,
-                      severity: clinical.severity,
-                    },
-                  ]
-                : [],
-            notes: [clinical.diagnoses, clinical.recommendations, clinical.followUpInstructions]
-              .filter(Boolean)
-              .join(' | '),
-            confidence: resolveConfidence(countPopulatedFields(clinical), 'backend_ocr'),
-          };
-
-    if (populatedCount > 0) {
-      await SmartIntakeApi.submitOcrResult(sessionId, submitPayload, staff);
-    }
-    source = 'backend_ocr';
-  }
-
   const fieldCount =
     artifact.parser === 'identity'
       ? countPopulatedFields(demographics)
@@ -287,10 +351,11 @@ export async function captureIntakeArtifact({
     seedFields,
   });
 
-  const auditNote =
-    fieldCount > 0
-      ? `${artifact.label}: captured ${fieldCount} field${fieldCount === 1 ? '' : 's'} from "${file.name}" � staff review required.`
-      : `${artifact.label}: document "${file.name}" stored � no structured fields detected; continue manual verification.`;
+  const auditNote = ocrFailed
+    ? `${artifact.label}: document processing failed for "${file.name}" — continue with manual verification.`
+    : fieldCount > 0
+      ? `${artifact.label}: captured ${fieldCount} field${fieldCount === 1 ? '' : 's'} from "${file.name}" — staff review required.`
+      : `${artifact.label}: document "${file.name}" stored — no structured fields detected; continue manual verification.`;
 
   return {
     artifactId: resolvedArtifactId,
@@ -303,9 +368,13 @@ export async function captureIntakeArtifact({
     demographics,
     clinical,
     extractedFields,
-    confidence: resolveConfidence(fieldCount, source),
+    confidence: backendConfidence ?? resolveConfidence(fieldCount, source),
     source,
     rawText,
     auditNote,
+    ocrJobId,
+    ocrJobStatus,
+    ocrWarnings,
+    ocrFailed,
   };
 }

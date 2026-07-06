@@ -69,6 +69,35 @@ describe('ROLE_PERMISSIONS', () => {
   });
 });
 
+describe('document/OCR intake permissions', () => {
+  it('registration_clerk can capture and review documents', () => {
+    expect(hasCareDroidPermission('registration_clerk', CAREDROID_PERMISSIONS.DOCUMENT_CAPTURE)).toBe(true);
+    expect(hasCareDroidPermission('registration_clerk', CAREDROID_PERMISSIONS.DOCUMENT_REVIEW)).toBe(true);
+  });
+
+  it('clinical roles can review extracted document fields', () => {
+    expect(hasCareDroidPermission('triage_nurse', CAREDROID_PERMISSIONS.DOCUMENT_REVIEW)).toBe(true);
+    expect(hasCareDroidPermission('registered_nurse', CAREDROID_PERMISSIONS.DOCUMENT_REVIEW)).toBe(true);
+    expect(hasCareDroidPermission('emergency_physician', CAREDROID_PERMISSIONS.DOCUMENT_REVIEW)).toBe(true);
+  });
+
+  it('paramedic can capture EMS paperwork but cannot review clinical extraction', () => {
+    expect(hasCareDroidPermission('paramedic', CAREDROID_PERMISSIONS.DOCUMENT_CAPTURE)).toBe(true);
+    expect(hasCareDroidPermission('paramedic', CAREDROID_PERMISSIONS.DOCUMENT_REVIEW)).toBe(false);
+  });
+
+  it('it_admin can read document processing status but cannot capture or review clinical documents', () => {
+    expect(hasCareDroidPermission('it_admin', CAREDROID_PERMISSIONS.DOCUMENT_READ)).toBe(true);
+    expect(hasCareDroidPermission('it_admin', CAREDROID_PERMISSIONS.DOCUMENT_CAPTURE)).toBe(false);
+    expect(hasCareDroidPermission('it_admin', CAREDROID_PERMISSIONS.DOCUMENT_REVIEW)).toBe(false);
+  });
+
+  it('demo_observer has read-only document access', () => {
+    expect(hasCareDroidPermission('demo_observer', CAREDROID_PERMISSIONS.DOCUMENT_READ)).toBe(true);
+    expect(hasCareDroidPermission('demo_observer', CAREDROID_PERMISSIONS.DOCUMENT_CAPTURE)).toBe(false);
+  });
+});
+
 describe('canRoleReceiveCriticalAlerts', () => {
   it('clinical roles receive critical alerts', () => {
     expect(canRoleReceiveCriticalAlerts('triage_nurse')).toBe(true);

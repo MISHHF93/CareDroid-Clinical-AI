@@ -2,10 +2,19 @@ import React, { useRef } from 'react';
 import { Camera, Upload } from 'lucide-react';
 import './OcrCapturePanel.css';
 
+const JOB_STATUS_LABEL: Record<string, string> = {
+  queued: 'Queued',
+  processing: 'Processingâ€¦',
+  completed: 'Processed',
+  failed: 'Failed',
+};
+
 export default function OcrCapturePanel({
   canVerify = true,
   isUploading = false,
   uploadStatus = '',
+  jobStatus = '',
+  warnings = [] as string[],
   onDocumentUpload,
   previewDataUrl = '',
   supplementalText = '',
@@ -17,6 +26,7 @@ export default function OcrCapturePanel({
   onArtifactChange,
   selectedArtifactLabel = '',
 }) {
+  const isFailedJob = jobStatus === 'failed';
   const fileInputRef = useRef<any>(null);
   const cameraInputRef = useRef<any>(null);
 
@@ -43,7 +53,32 @@ export default function OcrCapturePanel({
           saved to the chart.
           {selectedArtifactLabel ? ` Capturing: ${selectedArtifactLabel}.` : ''}
         </p>
+        {jobStatus ? (
+          <span
+            className={[
+              'ocr-capture-panel__job-status',
+              `ocr-capture-panel__job-status--${jobStatus}`,
+            ].join(' ')}
+            role="status"
+          >
+            {JOB_STATUS_LABEL[jobStatus] || jobStatus}
+          </span>
+        ) : null}
       </header>
+
+      {isFailedJob ? (
+        <div className="ocr-capture-panel__failed-fallback" role="alert">
+          <p>Document processing failed for this upload. Continue with manual entry â€” the paste field below still works.</p>
+        </div>
+      ) : null}
+
+      {warnings.length ? (
+        <ul className="ocr-capture-panel__warnings" aria-label="Document processing warnings">
+          {warnings.map((warning) => (
+            <li key={warning}>{warning}</li>
+          ))}
+        </ul>
+      ) : null}
 
       {artifactOptions.length ? (
         <div className="ocr-capture-panel__artifact-picker" role="group" aria-label="Document type">
@@ -110,7 +145,7 @@ export default function OcrCapturePanel({
       {previewDataUrl ? (
         <figure className="ocr-capture-panel__preview">
           <img src={previewDataUrl} alt="Captured identity document preview" />
-          <figcaption>Captured artifact — verify extracted values before continuing.</figcaption>
+          <figcaption>Captured artifact ï¿½ verify extracted values before continuing.</figcaption>
         </figure>
       ) : null}
 
@@ -132,7 +167,7 @@ export default function OcrCapturePanel({
             {extractedPreview.map((field) => (
               <li key={field.field}>
                 <strong>{field.field}</strong>
-                <span>{field.extracted || '—'}</span>
+                <span>{field.extracted || 'ï¿½'}</span>
               </li>
             ))}
           </ul>

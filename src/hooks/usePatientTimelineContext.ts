@@ -11,6 +11,8 @@ import {
   fetchReferrals,
 } from '../services/emergencyOsApi';
 import { fetchPatientManagementBundle } from '../services/patientManagementApi';
+import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
+import OcrIntakeApi from '../services/ocrIntakeApi';
 import type { PatientTimelineContext } from '../utils/patientTimeline';
 import type { WorkflowActionLog } from '../types/emergency';
 
@@ -84,6 +86,9 @@ export function usePatientTimelineContext(patientId: string | null): TimelineCon
       fetchEDCopilot(),
       fetchPatientManagementBundle(patientId),
       fetchPatientWorkflowLogs(patientId),
+      isBackendCapabilityEnabled('emergencyOcrIntake')
+        ? OcrIntakeApi.listJobs({ patientId })
+        : Promise.resolve({ jobs: [] }),
     ]).then((results) => {
       if (cancelled) return;
 
@@ -97,6 +102,7 @@ export function usePatientTimelineContext(patientId: string | null): TimelineCon
       const copilot = dataOf(fulfilledValue(results, 7));
       const patientManagement = fulfilledValue(results, 8) as { ok?: boolean; data?: { timelineEvents?: unknown[] }; error?: string } | null;
       const patientWorkflowLogs = dataOf(fulfilledValue(results, 9));
+      const ocrJobs = fulfilledValue(results, 10) as { jobs?: unknown[] } | null;
       const failures = rejectedMessages(results);
       if (patientManagement && patientManagement.ok === false && patientManagement.error) {
         failures.push(patientManagement.error);
@@ -116,6 +122,7 @@ export function usePatientTimelineContext(patientId: string | null): TimelineCon
           copilotContext: dataOf(copilot.promptContext),
           backendTimelineEvents: arrayOf(patientManagement?.data?.timelineEvents),
           workflowLogs: workflowLogsOf(patientWorkflowLogs.logs),
+          documents: arrayOf(ocrJobs?.jobs),
         },
       });
     });

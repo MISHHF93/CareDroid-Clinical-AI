@@ -255,6 +255,35 @@ describe('detectBottleneckEvents', () => {
     }
   });
 
+  it('detects degraded OCR intake as a medium saas_backend bottleneck that never impacts the 3-minute target', () => {
+    const events = detectBottleneckEvents({
+      generatedAt: ISO,
+      ocrIntakeStatus: { status: 'degraded', failureRate: 0.3 },
+    });
+    const event = events.find((e) => e.id === 'bn-saas-ocr-intake-degraded');
+    expect(event).toBeTruthy();
+    expect(event?.severity).toBe('medium');
+    expect(event?.impactsThreeMinuteTarget).toBe(false);
+    expect(event?.fallbackAction).toContain('manual intake');
+  });
+
+  it('detects down OCR intake as a high severity bottleneck', () => {
+    const events = detectBottleneckEvents({
+      generatedAt: ISO,
+      ocrIntakeStatus: { status: 'down', failureRate: 0.9 },
+    });
+    const event = events.find((e) => e.id === 'bn-saas-ocr-intake-down');
+    expect(event?.severity).toBe('high');
+  });
+
+  it('does not generate an OCR bottleneck when OCR intake is healthy', () => {
+    const events = detectBottleneckEvents({
+      generatedAt: ISO,
+      ocrIntakeStatus: { status: 'healthy' },
+    });
+    expect(events.find((e) => e.id.startsWith('bn-saas-ocr-intake'))).toBeUndefined();
+  });
+
   it('deduplicates events with the same id', () => {
     const events = detectBottleneckEvents({
       generatedAt: ISO,

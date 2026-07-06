@@ -52,6 +52,7 @@ import {
   startSmartIntakeTelemetry,
 } from '../../utils/smartIntakeTelemetry';
 import { captureIntakeArtifact } from '../../services/intakeArtifactCapture';
+import OcrIntakeApi from '../../services/ocrIntakeApi';
 import useFeature from '../../hooks/useFeature';
 import { buildClientTriageAssist } from '../../services/triageAssist';
 import { routeSmartIntakeThroughOrchestrator } from '../../services/receptionIntakeOrchestrator';
@@ -160,6 +161,9 @@ export default function SmartIntake({
     buildAutoApprovedFieldDecisions(SMART_INTAKE_DEMO.extractedFields as any[]),
   );
   const [documentCaptured, setDocumentCaptured] = useState(false);
+  const [ocrJobId, setOcrJobId] = useState('');
+  const [ocrJobStatus, setOcrJobStatus] = useState('');
+  const [ocrWarnings, setOcrWarnings] = useState<string[]>([]);
   const [capturePreviewDataUrl, setCapturePreviewDataUrl] = useState('');
   const [supplementalCaptureText, setSupplementalCaptureText] = useState('');
   const [identityAuditLog, setIdentityAuditLog] = useState(() => [...SMART_INTAKE_DEMO.auditLog]);
@@ -448,6 +452,13 @@ export default function SmartIntake({
         emergencyRole.roleLabel,
       ).catch(() => undefined);
     }
+
+    if (ocrJobId && isBackendCapabilityEnabled('emergencyOcrIntake')) {
+      const ocrDecision = decision === 'edited' ? 'edited' : decision === 'approved' ? 'accepted' : 'rejected';
+      void OcrIntakeApi.reviewField(ocrJobId, field, ocrDecision, undefined, emergencyRole.roleLabel).catch(
+        () => undefined,
+      );
+    }
   };
 
   const handleDocumentUpload = async (event) => {
@@ -471,10 +482,14 @@ export default function SmartIntake({
       setExtractedFields(nextFields);
       setFieldDecisions(buildAutoApprovedFieldDecisions(nextFields, boardPatient as any));
       setOcrUploadStatus(captured.auditNote);
+      setOcrJobId(captured.ocrJobId || '');
+      setOcrJobStatus(captured.ocrJobStatus || '');
+      setOcrWarnings(captured.ocrWarnings || []);
       setIdentityAuditLog((current) => [
         ...current,
         `${captured.artifactLabel} uploaded: ${captured.filename}`,
         captured.auditNote,
+        ...(captured.ocrWarnings || []),
       ]);
       if (captured.artifactId !== selectedArtifactId) {
         setSelectedArtifactId(captured.artifactId);
@@ -832,6 +847,8 @@ export default function SmartIntake({
           setActiveStepTracked(SMART_INTAKE_STEP_INDEX.verify, 'open-patient');
         }}
         ocrUploadStatus={ocrUploadStatus}
+        ocrJobStatus={ocrJobStatus}
+        ocrWarnings={ocrWarnings}
         isUploadingDocument={isUploadingDocument}
         onDocumentUpload={(event) => void handleDocumentUpload(event)}
         capturePreviewDataUrl={capturePreviewDataUrl}

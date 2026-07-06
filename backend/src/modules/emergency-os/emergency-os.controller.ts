@@ -54,6 +54,8 @@ import type {
   ExtractDocumentArtifactsInput,
   PatientDocumentArtifactReviewInput,
 } from '../../../../src/types/patientDocumentArtifact';
+import { OcrIntakeService } from './ocr-intake.service';
+import type { CreateOcrJobInput, OcrFieldReviewInput } from './ocr-intake.types';
 
 @ApiTags('emergency')
 @ApiBearerAuth()
@@ -93,6 +95,7 @@ export class EmergencyOsController {
     private readonly workflowOrchestrationService: WorkflowOrchestrationService,
     private readonly operatingSurfacesService: EmergencyOperatingSurfacesService,
     private readonly entitlementService: EntitlementService,
+    private readonly ocrIntakeService: OcrIntakeService,
   ) {}
 
   @Get('whiteboard')
@@ -201,6 +204,56 @@ export class EmergencyOsController {
       ...body,
       artifactId,
     });
+  }
+
+  @Post('intake/ocr-jobs')
+  createOcrJob(@Body() body: CreateOcrJobInput) {
+    return this.ocrIntakeService.createJob(body);
+  }
+
+  @Get('intake/ocr-jobs')
+  listOcrJobs(
+    @Query('patientId') patientId?: string,
+    @Query('intakeSessionId') intakeSessionId?: string,
+  ) {
+    return { jobs: this.ocrIntakeService.listJobs({ patientId, intakeSessionId }) };
+  }
+
+  @Get('intake/ocr-health')
+  getOcrIntakeHealth() {
+    return this.ocrIntakeService.getHealth();
+  }
+
+  @Get('intake/ocr-jobs/:jobId')
+  async getOcrJob(
+    @Param('jobId') jobId: string,
+    @TenantContext() tenantContext: TenantContextValue | undefined,
+    @Req() request: Request,
+  ) {
+    const job = this.ocrIntakeService.getJob(jobId);
+    if (job.patientId) {
+      await this.patientAuditService.logPatientAccess({
+        request,
+        tenantContext,
+        patientId: job.patientId,
+        resource: `emergency/intake/ocr-jobs/${jobId}`,
+      });
+    }
+    return job;
+  }
+
+  @Post('intake/ocr-jobs/:jobId/fields/:field/review')
+  reviewOcrJobField(
+    @Param('jobId') jobId: string,
+    @Param('field') field: string,
+    @Body() body: OcrFieldReviewInput,
+  ) {
+    return this.ocrIntakeService.reviewField(jobId, field, body);
+  }
+
+  @Post('intake/ocr-jobs/:jobId/apply')
+  applyOcrJobToIntake(@Param('jobId') jobId: string, @Body() body: { actor?: string }) {
+    return this.ocrIntakeService.applyToIntake(jobId, body?.actor || 'unknown');
   }
 
   @Get('patients/:patientId/orchestration')

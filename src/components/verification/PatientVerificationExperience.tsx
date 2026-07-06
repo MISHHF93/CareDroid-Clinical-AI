@@ -24,6 +24,8 @@ export default function PatientVerificationExperience({
   onSelectCandidate,
   onOpenPatient,
   ocrUploadStatus = '',
+  ocrJobStatus = '',
+  ocrWarnings = [] as any[],
   isUploadingDocument = false,
   onDocumentUpload,
   capturePreviewDataUrl = '',
@@ -81,6 +83,8 @@ export default function PatientVerificationExperience({
           canVerify={canVerifyIntake}
           isUploading={isUploadingDocument}
           uploadStatus={ocrUploadStatus}
+          jobStatus={ocrJobStatus}
+          warnings={ocrWarnings}
           onDocumentUpload={onDocumentUpload}
           previewDataUrl={capturePreviewDataUrl}
           supplementalText={supplementalCaptureText}

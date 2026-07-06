@@ -164,6 +164,11 @@ type BuildBottleneckRegistryInput = {
   referralStatus?: {
     pending?: number;
   };
+  ocrIntakeStatus?: {
+    status?: ServiceHealthStatus;
+    failureRate?: number;
+    message?: string;
+  };
   existingServiceSignals?: ExistingServiceBottleneckSignals;
 };
 
@@ -207,6 +212,19 @@ function canonicalAlertOwnership(input: {
 }
 
 export const CURRENT_SERVICE_MAP: readonly CurrentServiceMapEntry[] = Object.freeze([
+  {
+    serviceName: 'OCR Intake Service',
+    filePath: 'backend/src/modules/emergency-os/ocr-intake.service.ts',
+    purpose: 'Classifies uploaded intake documents, extracts fields via a pluggable OCR provider, tracks confidence/warnings, and applies staff-reviewed fields to the intake draft and patient document timeline.',
+    inputs: ['uploaded document (dataUrl/text)', 'document type hint', 'patientId/intakeSessionId linkage'],
+    outputs: ['OCR job with extracted fields + confidence', 'field review decisions', 'applied-to-intake audit trail'],
+    dependencies: ['OcrProvider (mock by default)', 'PatientDocumentArtifactService', 'src/config/intakeArtifactRegistry', 'src/utils/idArtifactParser', 'src/utils/clinicalArtifactParser'],
+    consumers: ['src/services/intakeArtifactCapture.ts', 'Reception/Smart Intake document capture', 'patient document timeline'],
+    failureModes: ['provider extraction failure (job marked failed, never blocks manual intake)', 'unsupported/oversized file upload', 'low-confidence extraction requiring full manual review'],
+    latencyRisks: ['synchronous provider round trip during upload'],
+    duplicationConflicts: ['must remain the single OCR job authority; do not fork a parallel client-only extraction path'],
+    affectsThreeMinuteLoop: false,
+  },
   {
     serviceName: 'Emergency Operating System Service',
     filePath: 'src/services/emergencyOperatingSystemService.ts',
@@ -1083,6 +1101,36 @@ export function detectBottleneckEvents(input: BuildBottleneckRegistryInput): Bot
           impactsThreeMinuteTarget: criticalPatients.length > 0,
           fallbackAction: 'Use the local intake snapshot and persistent in-app critical banner; do not block emergency read-only workflow.',
           recommendedFix: 'Check backend central-node route, websocket/event sync, API base URL, and authentication token health.',
+        },
+        detectedAt,
+      ),
+    );
+  }
+
+  if (input.ocrIntakeStatus?.status === 'degraded' || input.ocrIntakeStatus?.status === 'down') {
+    const status = input.ocrIntakeStatus.status;
+    events.push(
+      bottleneck(
+        {
+          id: `bn-saas-ocr-intake-${status}`,
+          category: 'saas_backend',
+          serviceName: 'OCR Intake Service',
+          source: 'OcrIntakeService.getHealth',
+          severity: status === 'down' ? 'high' : 'medium',
+          title: status === 'down' ? 'OCR document intake is down' : 'OCR document intake is degraded',
+          description:
+            input.ocrIntakeStatus.message ||
+            `Document OCR processing is ${status}${
+              input.ocrIntakeStatus.failureRate !== undefined
+                ? ` with a ${Math.round(input.ocrIntakeStatus.failureRate * 100)}% recent failure rate`
+                : ''
+            }.`,
+          affectedWorkflow: 'Document intake / OCR extraction',
+          affectedDepartment: 'Emergency Department',
+          ownerRole: 'it_admin',
+          impactsThreeMinuteTarget: false,
+          fallbackAction: 'Continue manual intake entry for all documents; do not block reception or triage on OCR availability.',
+          recommendedFix: 'Check the OCR provider configuration and OCR Intake Service logs; verify uploads are within supported file types/size.',
         },
         detectedAt,
       ),

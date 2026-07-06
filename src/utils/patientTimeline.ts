@@ -13,7 +13,8 @@ export type PatientTimelineCategory =
   | 'boarding'
   | 'discharge'
   | 'ai-copilot'
-  | 'provincial-health';
+  | 'provincial-health'
+  | 'document';
 
 export type PatientTimelineItem = {
   id: string;
@@ -51,6 +52,7 @@ export type PatientTimelineContext = {
   workflowLogs?: WorkflowActionLog[];
   knowledgeGraph?: PatientTimelineKnowledgeGraphContext;
   knowledgeGraphSnapshot?: UnifiedApplicationKnowledgeGraphSnapshot;
+  documents?: Array<Record<string, unknown>>;
 };
 
 export const PATIENT_TIMELINE_CATEGORY_LABELS: Record<PatientTimelineCategory, string> = {
@@ -65,6 +67,7 @@ export const PATIENT_TIMELINE_CATEGORY_LABELS: Record<PatientTimelineCategory, s
   discharge: 'Discharge',
   'ai-copilot': 'AI/Copilot',
   'provincial-health': 'Provincial health data',
+  document: 'Document processing',
 };
 
 const PATIENT_TIMELINE_CATEGORY_ORDER: Record<PatientTimelineCategory, number> = {
@@ -79,6 +82,7 @@ const PATIENT_TIMELINE_CATEGORY_ORDER: Record<PatientTimelineCategory, number> =
   discharge: 8,
   'ai-copilot': 9,
   'provincial-health': 10,
+  document: 11,
 };
 
 function timestampOrFallback(value: unknown, fallback: string): string {
@@ -403,6 +407,35 @@ export function buildPatientTimeline(patient: Patient, context: PatientTimelineC
       source: context.copilotContext ? 'emergency-os' : 'derived',
     });
   }
+
+  context.documents
+    ?.filter((document) => eventMatchesPatient(document, patient))
+    .forEach((document) => {
+      const status = String(document.status || '');
+      const failed = status === 'failed';
+      const applied = Boolean(document.appliedToIntake);
+      const fieldCount = Array.isArray(document.extractedFields) ? document.extractedFields.length : 0;
+      const documentLabel = String(document.documentType || 'document').replace(/_/g, ' ');
+      addItem(items, {
+        id: `document-${String(document.id || `${patient.id}-${documentLabel}`)}`,
+        category: 'document',
+        label: PATIENT_TIMELINE_CATEGORY_LABELS.document,
+        summary: failed
+          ? `${documentLabel} upload could not be processed; manual entry required.`
+          : applied
+            ? `${documentLabel} processed and applied to intake (${fieldCount} field${fieldCount === 1 ? '' : 's'}).`
+            : `${documentLabel} processed with ${fieldCount} field${fieldCount === 1 ? '' : 's'} awaiting staff review.`,
+        timestamp: timestampOrFallback(document.updatedAt || document.createdAt, fallbackTimestamp),
+        actor: String(document.reviewer || document.createdBy || '') || undefined,
+        severity: failed ? 'Warning' : 'Info',
+        source: 'emergency-os',
+        metadata: {
+          status,
+          appliedToIntake: applied,
+          fieldCount,
+        },
+      });
+    });
 
   const provincialRecord = context.provincialRecords?.find((record) => eventMatchesPatient(record, patient));
   addItem(items, {
