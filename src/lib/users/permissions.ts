@@ -53,6 +53,17 @@ export const CAREDROID_PERMISSIONS = Object.freeze({
   IMAGING_READ: 'imaging:read',
   MEDICATION_READ: 'medication:read',
   MEDICATION_REVIEW: 'medication:review',
+
+  // Document intake / OCR
+  DOCUMENT_READ: 'document:read',
+  DOCUMENT_CAPTURE: 'document:capture',
+  DOCUMENT_REVIEW: 'document:review',
+
+  // Collaboration Hub
+  COLLABORATION_READ: 'collaboration:read',
+  COLLABORATION_POST: 'collaboration:post',
+  COLLABORATION_MANAGE_CHANNELS: 'collaboration:manage_channels',
+  COLLABORATION_MODERATE: 'collaboration:moderate',
 } as const);
 
 export type CareDroidPermission = (typeof CAREDROID_PERMISSIONS)[keyof typeof CAREDROID_PERMISSIONS];
@@ -73,6 +84,8 @@ export const ROLE_PERMISSIONS: Readonly<Record<HospitalRole, readonly CareDroidP
       P.SETTINGS_READ, P.USERS_READ, P.USERS_CREATE, P.USERS_UPDATE,
       P.AUDIT_READ, P.ORDERS_READ, P.LABS_READ, P.IMAGING_READ,
       P.MEDICATION_READ,
+      P.DOCUMENT_READ,
+      P.COLLABORATION_READ, P.COLLABORATION_POST, P.COLLABORATION_MANAGE_CHANNELS, P.COLLABORATION_MODERATE,
     ]),
 
     ed_director: Object.freeze([
@@ -84,6 +97,8 @@ export const ROLE_PERMISSIONS: Readonly<Record<HospitalRole, readonly CareDroidP
       P.ANALYTICS_READ, P.REPORTS_READ, P.REPORTS_EXPORT,
       P.SETTINGS_READ, P.USERS_READ,
       P.AUDIT_READ, P.ORDERS_READ,
+      P.DOCUMENT_READ,
+      P.COLLABORATION_READ, P.COLLABORATION_POST, P.COLLABORATION_MANAGE_CHANNELS, P.COLLABORATION_MODERATE,
     ]),
 
     charge_nurse: Object.freeze([
@@ -95,6 +110,8 @@ export const ROLE_PERMISSIONS: Readonly<Record<HospitalRole, readonly CareDroidP
       P.ANALYTICS_READ, P.REPORTS_READ,
       P.SETTINGS_READ,
       P.ORDERS_READ, P.LABS_READ, P.IMAGING_READ, P.MEDICATION_READ,
+      P.DOCUMENT_READ, P.DOCUMENT_CAPTURE, P.DOCUMENT_REVIEW,
+      P.COLLABORATION_READ, P.COLLABORATION_POST, P.COLLABORATION_MANAGE_CHANNELS, P.COLLABORATION_MODERATE,
     ]),
 
     triage_nurse: Object.freeze([
@@ -104,6 +121,8 @@ export const ROLE_PERMISSIONS: Readonly<Record<HospitalRole, readonly CareDroidP
       P.ALERT_READ, P.ALERT_ACKNOWLEDGE, P.ALERT_ESCALATE,
       P.STAFF_READ,
       P.ORDERS_READ, P.LABS_READ, P.IMAGING_READ, P.MEDICATION_READ,
+      P.DOCUMENT_READ, P.DOCUMENT_CAPTURE, P.DOCUMENT_REVIEW,
+      P.COLLABORATION_READ, P.COLLABORATION_POST,
     ]),
 
     registered_nurse: Object.freeze([
@@ -113,6 +132,8 @@ export const ROLE_PERMISSIONS: Readonly<Record<HospitalRole, readonly CareDroidP
       P.ALERT_READ, P.ALERT_ACKNOWLEDGE,
       P.STAFF_READ,
       P.ORDERS_READ, P.LABS_READ, P.IMAGING_READ, P.MEDICATION_READ,
+      P.DOCUMENT_READ, P.DOCUMENT_CAPTURE, P.DOCUMENT_REVIEW,
+      P.COLLABORATION_READ, P.COLLABORATION_POST,
     ]),
 
     emergency_physician: Object.freeze([
@@ -124,6 +145,8 @@ export const ROLE_PERMISSIONS: Readonly<Record<HospitalRole, readonly CareDroidP
       P.ANALYTICS_READ, P.REPORTS_READ,
       P.ORDERS_READ, P.ORDERS_CREATE, P.LABS_READ, P.IMAGING_READ,
       P.MEDICATION_READ, P.MEDICATION_REVIEW,
+      P.DOCUMENT_READ, P.DOCUMENT_REVIEW,
+      P.COLLABORATION_READ, P.COLLABORATION_POST,
     ]),
 
     attending_physician: Object.freeze([
@@ -135,6 +158,8 @@ export const ROLE_PERMISSIONS: Readonly<Record<HospitalRole, readonly CareDroidP
       P.ANALYTICS_READ, P.REPORTS_READ,
       P.ORDERS_READ, P.ORDERS_CREATE, P.LABS_READ, P.IMAGING_READ,
       P.MEDICATION_READ, P.MEDICATION_REVIEW,
+      P.DOCUMENT_READ, P.DOCUMENT_REVIEW,
+      P.COLLABORATION_READ, P.COLLABORATION_POST,
     ]),
 
     resident_physician: Object.freeze([
@@ -145,6 +170,8 @@ export const ROLE_PERMISSIONS: Readonly<Record<HospitalRole, readonly CareDroidP
       P.STAFF_READ,
       P.ORDERS_READ, P.ORDERS_CREATE, P.LABS_READ, P.IMAGING_READ,
       P.MEDICATION_READ,
+      P.DOCUMENT_READ, P.DOCUMENT_REVIEW,
+      P.COLLABORATION_READ, P.COLLABORATION_POST,
     ]),
 
     specialist: Object.freeze([
@@ -155,6 +182,8 @@ export const ROLE_PERMISSIONS: Readonly<Record<HospitalRole, readonly CareDroidP
       P.STAFF_READ,
       P.ORDERS_READ, P.ORDERS_CREATE, P.LABS_READ, P.IMAGING_READ,
       P.MEDICATION_READ, P.MEDICATION_REVIEW,
+      P.DOCUMENT_READ, P.DOCUMENT_REVIEW,
+      P.COLLABORATION_READ, P.COLLABORATION_POST,
     ]),
 
     paramedic: Object.freeze([
@@ -162,6 +191,8 @@ export const ROLE_PERMISSIONS: Readonly<Record<HospitalRole, readonly CareDroidP
       P.TRIAGE_READ,
       P.AI_READ,
       P.ALERT_READ, P.ALERT_ACKNOWLEDGE,
+      P.DOCUMENT_READ, P.DOCUMENT_CAPTURE,
+      P.COLLABORATION_READ, P.COLLABORATION_POST,
     ]),
 
     registration_clerk: Object.freeze([
@@ -170,6 +201,8 @@ export const ROLE_PERMISSIONS: Readonly<Record<HospitalRole, readonly CareDroidP
       P.STAFF_READ,
       P.SETTINGS_READ,
       P.ANALYTICS_READ,
+      P.DOCUMENT_READ, P.DOCUMENT_CAPTURE, P.DOCUMENT_REVIEW,
+      P.COLLABORATION_READ, P.COLLABORATION_POST,
     ]),
 
     patient_flow_coordinator: Object.freeze([
@@ -179,6 +212,7 @@ export const ROLE_PERMISSIONS: Readonly<Record<HospitalRole, readonly CareDroidP
       P.ALERT_READ, P.ALERT_ACKNOWLEDGE, P.ALERT_ESCALATE,
       P.STAFF_READ, P.STAFF_ASSIGN,
       P.ANALYTICS_READ, P.REPORTS_READ,
+      P.COLLABORATION_READ, P.COLLABORATION_POST,
     ]),
 
     lab_technician: Object.freeze([
@@ -186,6 +220,7 @@ export const ROLE_PERMISSIONS: Readonly<Record<HospitalRole, readonly CareDroidP
       P.ALERT_READ, P.ALERT_ACKNOWLEDGE,
       P.LABS_READ,
       P.ORDERS_READ,
+      P.COLLABORATION_READ, P.COLLABORATION_POST,
     ]),
 
     radiology_technician: Object.freeze([
@@ -193,6 +228,7 @@ export const ROLE_PERMISSIONS: Readonly<Record<HospitalRole, readonly CareDroidP
       P.ALERT_READ, P.ALERT_ACKNOWLEDGE,
       P.IMAGING_READ,
       P.ORDERS_READ,
+      P.COLLABORATION_READ, P.COLLABORATION_POST,
     ]),
 
     pharmacist: Object.freeze([
@@ -200,18 +236,21 @@ export const ROLE_PERMISSIONS: Readonly<Record<HospitalRole, readonly CareDroidP
       P.ALERT_READ, P.ALERT_ACKNOWLEDGE, P.ALERT_ESCALATE,
       P.MEDICATION_READ, P.MEDICATION_REVIEW,
       P.ORDERS_READ, P.LABS_READ,
+      P.COLLABORATION_READ, P.COLLABORATION_POST,
     ]),
 
     social_worker: Object.freeze([
       P.PATIENT_READ,
       P.ALERT_READ, P.ALERT_ACKNOWLEDGE,
       P.STAFF_READ,
+      P.COLLABORATION_READ, P.COLLABORATION_POST,
     ]),
 
     security_officer: Object.freeze([
       P.PATIENT_READ,
       P.ALERT_READ, P.ALERT_ACKNOWLEDGE, P.ALERT_ESCALATE,
       P.STAFF_READ,
+      P.COLLABORATION_READ, P.COLLABORATION_POST,
     ]),
 
     it_admin: Object.freeze([
@@ -223,6 +262,8 @@ export const ROLE_PERMISSIONS: Readonly<Record<HospitalRole, readonly CareDroidP
       P.AUDIT_READ,
       P.ANALYTICS_READ,
       P.REPORTS_READ,
+      P.DOCUMENT_READ,
+      P.COLLABORATION_READ, P.COLLABORATION_POST, P.COLLABORATION_MANAGE_CHANNELS,
     ]),
 
     quality_safety_officer: Object.freeze([
@@ -233,6 +274,8 @@ export const ROLE_PERMISSIONS: Readonly<Record<HospitalRole, readonly CareDroidP
       P.ANALYTICS_READ, P.REPORTS_READ, P.REPORTS_EXPORT,
       P.AUDIT_READ,
       P.STAFF_READ,
+      P.DOCUMENT_READ,
+      P.COLLABORATION_READ, P.COLLABORATION_POST, P.COLLABORATION_MODERATE,
     ]),
 
     dispatcher: Object.freeze([
@@ -240,6 +283,8 @@ export const ROLE_PERMISSIONS: Readonly<Record<HospitalRole, readonly CareDroidP
       P.ALERT_READ, P.ALERT_ACKNOWLEDGE, P.ALERT_ESCALATE,
       P.STAFF_READ,
       P.ANALYTICS_READ,
+      P.DOCUMENT_READ, P.DOCUMENT_CAPTURE,
+      P.COLLABORATION_READ, P.COLLABORATION_POST,
     ]),
 
     ems_coordinator: Object.freeze([
@@ -249,6 +294,8 @@ export const ROLE_PERMISSIONS: Readonly<Record<HospitalRole, readonly CareDroidP
       P.ALERT_READ, P.ALERT_ACKNOWLEDGE, P.ALERT_ESCALATE,
       P.STAFF_READ, P.STAFF_ASSIGN,
       P.ANALYTICS_READ,
+      P.DOCUMENT_READ, P.DOCUMENT_CAPTURE,
+      P.COLLABORATION_READ, P.COLLABORATION_POST,
     ]),
 
     demo_observer: Object.freeze([
@@ -258,6 +305,8 @@ export const ROLE_PERMISSIONS: Readonly<Record<HospitalRole, readonly CareDroidP
       P.ALERT_READ,
       P.ANALYTICS_READ,
       P.STAFF_READ,
+      P.DOCUMENT_READ,
+      P.COLLABORATION_READ,
     ]),
   });
 

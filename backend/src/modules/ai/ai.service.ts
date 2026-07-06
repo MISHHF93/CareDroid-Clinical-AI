@@ -10,6 +10,11 @@ import { AuditAction } from '../audit/entities/audit-log.entity';
 import { MetricsService } from '../metrics/metrics.service';
 import { PlatformGovernanceService } from '../platform-governance';
 import { SubscriptionsService } from '../subscriptions/subscriptions.service';
+import { CollaborationHubService } from '../collaboration-hub/collaboration-hub.service';
+import {
+  CollaborationMessageSenderType,
+  CollaborationMessageSourceType,
+} from '../collaboration-hub/entities/collaboration-message.entity';
 import {
   AIError,
   Message,
@@ -69,6 +74,7 @@ export class AIService {
     @Optional()
     @Inject(forwardRef(() => IntentClassifierService))
     private readonly intentClassifier?: IntentClassifierService,
+    @Optional() private readonly collaborationHubService?: CollaborationHubService,
   ) {
     const aiConfig = this.configService.get<any>('ai') || {};
     const aiRateLimits = aiConfig.rateLimits || {};
@@ -1095,11 +1101,13 @@ export class AIService {
   }
 
   private async createHumanReviewItemIfRequired(query: AIQuery) {
-    if (
-      !this.platformGovernanceService ||
-      query.status !== QueryStatus.SUCCESS ||
-      !query.requiresHumanReview
-    ) {
+    if (query.status !== QueryStatus.SUCCESS || !query.requiresHumanReview) {
+      return;
+    }
+
+    await this.postAiChiefRecommendation(query);
+
+    if (!this.platformGovernanceService) {
       return;
     }
 
@@ -1128,6 +1136,37 @@ export class AIService {
         aiCommercialization: query.metadata?.aiCommercialization,
       },
     });
+  }
+
+  /**
+   * Surfaces AI Chief output that requires human review into the Collaboration
+   * Hub (patient thread when the query is patient-scoped, otherwise the
+   * organization's shared AI Chief channel) so other staff see it without
+   * digging through the AI usage/analytics endpoints. Best-effort: never
+   * allowed to fail the AI response path.
+   */
+  private async postAiChiefRecommendation(query: AIQuery): Promise<void> {
+    if (!this.collaborationHubService || !query.organizationId) return;
+
+    const patientId =
+      (query.metadata?.aiFoundation?.patientId as string | undefined) ||
+      (query.metadata?.patientId as string | undefined);
+    const summary = (query.response || '').slice(0, 800) || 'AI Chief produced a recommendation.';
+
+    try {
+      const channel = patientId
+        ? await this.collaborationHubService.getOrCreatePatientThread(query.organizationId, patientId)
+        : await this.collaborationHubService.getOrCreateAiChiefChannel(query.organizationId);
+
+      await this.collaborationHubService.postSystemMessage(channel.id, {
+        body: `AI Chief recommendation (requires human review):\n${summary}`,
+        senderType: CollaborationMessageSenderType.AI_CHIEF,
+        sourceType: CollaborationMessageSourceType.AI_RECOMMENDATION,
+        sourceId: query.id,
+      });
+    } catch (error) {
+      console.error('Failed to post AI Chief recommendation to Collaboration Hub:', error);
+    }
   }
 
   private resolveReviewType(query: AIQuery) {

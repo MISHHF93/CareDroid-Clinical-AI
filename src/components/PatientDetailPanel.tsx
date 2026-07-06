@@ -57,6 +57,7 @@ import ErrorBoundary from './ErrorBoundary';
 import AiTriageAssistPanel from './reception/AiTriageAssistPanel';
 import OperationalHistoryPanel from './audit/OperationalHistoryPanel';
 import WaitingRoomCommunicationPanel from './waiting-room/WaitingRoomCommunicationPanel';
+import PatientDiscussionPanel from './collaboration/PatientDiscussionPanel';
 import WaitingRoomCommunicationBadge from './waiting-room/WaitingRoomCommunicationBadge';
 import {
   createWaitingRoomCommunicationLogInput,
@@ -1232,6 +1233,10 @@ export default function PatientDetailPanel() {
           description="Patient actions, queue moves, reassessments, and referrals from workflow audit data."
           limit={10}
         />
+      </section>
+
+      <section className="patient-detail-panel__section">
+        <PatientDiscussionPanel patientId={selectedPatient.id} />
       </section>
 
       <section className="patient-detail-panel__section">

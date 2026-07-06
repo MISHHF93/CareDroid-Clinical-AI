@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Optional } from '@nestjs/common';
 import {
   IntentClassification,
   EmergencySeverity,
@@ -6,6 +6,7 @@ import {
 import { AuditService } from '../../audit/audit.service';
 import { AuditAction } from '../../audit/entities/audit-log.entity';
 import { MetricsService } from '../../metrics/metrics.service';
+import { CollaborationHubService } from '../../collaboration-hub/collaboration-hub.service';
 
 // Re-export EmergencySeverity for tests
 export { EmergencySeverity } from '../intent-classifier/dto/intent-classification.dto';
@@ -19,7 +20,8 @@ export interface EmergencyEscalationDto {
   keywords: string[];
   context: {
     userId: string;
-    conversationId?: number;
+    organizationId?: string;
+    conversationId?: number | string;
     message: string;
     timestamp: Date;
     location?: string;
@@ -38,6 +40,8 @@ export interface EscalationResult {
   requiresImmediate911: boolean;
   medicalDirectorNotified: boolean;
   simulationMode: boolean;
+  /** Collaboration Hub incident channel opened for this escalation, if the module is available. */
+  collaborationChannelId?: string;
 }
 
 /**
@@ -80,6 +84,7 @@ export class EmergencyEscalationService {
   constructor(
     private readonly auditService: AuditService,
     private readonly metricsService: MetricsService,
+    @Optional() private readonly collaborationHubService?: CollaborationHubService,
   ) {}
 
   /**
@@ -144,6 +149,43 @@ export class EmergencyEscalationService {
       userAgent: 'system',
     });
 
+    // Open (or reuse) an incident channel for this escalation so staff can
+    // coordinate in-context instead of only seeing this in the audit log.
+    // Never allowed to fail the escalation itself — best-effort side effect.
+    let collaborationChannelId: string | undefined;
+    if (this.collaborationHubService) {
+      try {
+        const organizationId = dto.context.organizationId || 'default-organization';
+        const incidentSeverityLabel =
+          dto.severity === EmergencySeverity.CRITICAL
+            ? 'critical'
+            : dto.severity === EmergencySeverity.URGENT
+              ? 'high'
+              : 'moderate';
+        const { channel, created } = await this.collaborationHubService.createIncidentChannel(
+          organizationId,
+          {
+            title: `${dto.severity.toUpperCase()} escalation: ${dto.category}`,
+            description: dto.context.message.substring(0, 500),
+            severity: incidentSeverityLabel,
+            triggerType: 'emergency_escalation',
+            sourceId: dto.context.conversationId ? String(dto.context.conversationId) : undefined,
+            createdByUserId: dto.context.userId,
+          },
+        );
+        collaborationChannelId = channel.id;
+        if (created) {
+          await this.collaborationHubService.postSystemMessage(channel.id, { body: message });
+        }
+      } catch (error) {
+        this.logger.warn(
+          `Collaboration hub incident channel creation failed: ${
+            error instanceof Error ? error.message : String(error)
+          }`,
+        );
+      }
+    }
+
     // Record metrics using existing MetricsService methods
     const severityLabel =
       dto.severity === EmergencySeverity.CRITICAL
@@ -170,6 +212,7 @@ export class EmergencyEscalationService {
       requiresImmediate911: requires911,
       medicalDirectorNotified,
       simulationMode: true,
+      collaborationChannelId,
     };
   }
 

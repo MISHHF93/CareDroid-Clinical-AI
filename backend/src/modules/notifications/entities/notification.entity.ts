@@ -16,6 +16,8 @@ export enum NotificationType {
   SECURITY_ALERT = 'security_alert',
   SYSTEM_UPDATE = 'system_update',
   GENERAL = 'general',
+  COLLABORATION_MENTION = 'collaboration_mention',
+  COLLABORATION_MESSAGE = 'collaboration_message',
 }
 
 export enum NotificationStatus {

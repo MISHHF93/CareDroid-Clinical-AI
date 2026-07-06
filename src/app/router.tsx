@@ -52,6 +52,7 @@ const EmergencyDepartmentPulse = lazyRoute(() => import('../pages/emergency/puls
 const EmergencyShiftSummary  = lazyRoute(() => import('../pages/emergency/shift'));
 const EMSPipeline            = lazyRoute(() => import('../components/EMSPipeline'));
 const DispatchConsole        = lazyRoute(() => import('../pages/emergency/DispatchConsole'));
+const CollaborationHub       = lazyRoute(() => import('../pages/collaboration/CollaborationHub'));
 const FullJourneyOperatingPage = lazyRoute(() => import('../pages/emergency/FullJourneyOperatingPage'));
 const HospitalCommandCenter    = lazyRoute(() => import('../pages/emergency/HospitalCommandCenter'));
 const ReferralPanel          = lazyRoute(() => import('../components/ReferralPanel'));
@@ -608,6 +609,16 @@ export function AppRoutes() {
             <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyDispatch}>
               <LazyRoute label="Loading dispatch console...">
                 <DispatchConsole />
+              </LazyRoute>
+            </CareDroidRouteGuard>
+          }
+        />
+        <Route
+          path={CANONICAL_ROUTES.emergencyCollaboration}
+          element={
+            <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyCollaboration}>
+              <LazyRoute label="Loading collaboration hub...">
+                <CollaborationHub />
               </LazyRoute>
             </CareDroidRouteGuard>
           }

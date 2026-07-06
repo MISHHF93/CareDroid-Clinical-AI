@@ -69,6 +69,7 @@ export const CANONICAL_ROUTES = Object.freeze({
   emergencySettings: '/emergency/settings',
   emergencyHelp: '/emergency/help',
   emergencyAlerts: '/emergency/alerts',
+  emergencyCollaboration: '/emergency/collaboration',
   emergencyTools: '/emergency/tools',
   emergencyDispatch: '/emergency/dispatch',
   emergencyEdReadiness: '/emergency/ed-readiness',
@@ -523,6 +524,7 @@ const P = Object.freeze({
   LABS_READ: 'labs:read',
   IMAGING_READ: 'imaging:read',
   MEDICATION_READ: 'medication:read',
+  COLLABORATION_READ: 'collaboration:read',
 });
 
 export const CANONICAL_NAVIGATION_GROUPS = Object.freeze([
@@ -613,6 +615,7 @@ export const CANONICAL_PILOT_VISIBLE_NAV_IDS = Object.freeze([
   'dispatch',
   'ed-readiness',
   'alerts',
+  'collaboration',
   'diagnostics',
   'handoffs',
   'reports',
@@ -850,6 +853,22 @@ export const CANONICAL_ROUTE_MAP = Object.freeze([
     breadcrumbs: ['Emergency', 'Calls'],
     helpTopicId: 'dispatcher',
     workflowOwner: 'Dispatcher',
+  }),
+  route({
+    id: 'collaboration',
+    path: CANONICAL_ROUTES.emergencyCollaboration,
+    label: 'Collaboration Hub',
+    description:
+      'Department channels, patient threads, incident coordination, and AI Chief recommendations in one place.',
+    pageComponent: 'CollaborationHub',
+    requiredPermissions: [P.COLLABORATION_READ],
+    navigationGroup: 'Command',
+    priority: 25,
+    icon: 'messages',
+    readOnlyAllowed: true,
+    breadcrumbs: ['Command', 'Collaboration Hub'],
+    helpTopicId: 'collaboration',
+    workflowOwner: 'All ED staff',
   }),
   route({
     id: 'ems',

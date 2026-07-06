@@ -10,6 +10,9 @@ type RequestWithUser = {
   user?: {
     id?: string;
   };
+  tenantContext?: {
+    organizationId?: string;
+  };
 };
 
 @ApiTags('clinical-alerts')
@@ -23,7 +26,10 @@ export class ClinicalAlertsController {
   @Get()
   @ApiOperation({ summary: 'List demo-backed clinical alert workflow state' })
   list(@Req() req: RequestWithUser) {
-    return this.clinicalAlertsService.listForUser(this.userId(req));
+    return this.clinicalAlertsService.listForUser(
+      this.userId(req),
+      req.tenantContext?.organizationId,
+    );
   }
 
   @Post(':alertId/acknowledge')

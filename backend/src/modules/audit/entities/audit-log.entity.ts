@@ -24,6 +24,12 @@ export enum AuditAction {
   MEMORY_WRITE = 'memory_write',
   EMERGENCY_ACCESS_SUCCESS = 'emergency_access_success',
   EMERGENCY_ACCESS_FAILED = 'emergency_access_failed',
+  MESSAGE_SENT = 'message_sent',
+  MESSAGE_EDITED = 'message_edited',
+  MESSAGE_DELETED = 'message_deleted',
+  CHANNEL_CREATED = 'channel_created',
+  CHANNEL_ARCHIVED = 'channel_archived',
+  MENTION_CREATED = 'mention_created',
 }
 
 @Entity('audit_logs')

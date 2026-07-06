@@ -59,82 +59,82 @@ export const HOSPITAL_ROLE_NAV_IDS: Readonly<Record<string, readonly string[]>> 
 
   // ── Cluster A: Pre-Hospital Command ────────────────────────────────────────
   dispatcher: Object.freeze([
-    'dispatch', 'ems', 'fleet', 'alerts', 'help',
+    'dispatch', 'ems', 'fleet', 'alerts', 'collaboration', 'help',
   ]),
   ems_coordinator: Object.freeze([
-    'ems', 'dispatch', 'ed-readiness', 'capacity', 'patients', 'alerts', 'fleet', 'analytics', 'help',
+    'ems', 'dispatch', 'ed-readiness', 'capacity', 'patients', 'alerts', 'fleet', 'analytics', 'collaboration', 'help',
   ]),
   paramedic: Object.freeze([
-    'ems', 'patients', 'alerts', 'tools', 'help',
+    'ems', 'patients', 'alerts', 'tools', 'collaboration', 'help',
   ]),
 
   // ── Cluster B: Reception & Intake ──────────────────────────────────────────
   registration_clerk: Object.freeze([
-    'reception', 'patients', 'pulse', 'shift', 'alerts', 'help',
+    'reception', 'patients', 'pulse', 'shift', 'alerts', 'collaboration', 'help',
   ]),
 
   // ── Cluster C: Nursing & Triage ────────────────────────────────────────────
   triage_nurse: Object.freeze([
-    'triage', 'reception', 'patients', 'queues', 'reassessment', 'alerts', 'copilot', 'tools', 'help',
+    'triage', 'reception', 'patients', 'queues', 'reassessment', 'alerts', 'copilot', 'tools', 'collaboration', 'help',
   ]),
   registered_nurse: Object.freeze([
     'patients', 'queues', 'whiteboard', 'triage', 'reassessment', 'diagnostics',
-    'handoffs', 'alerts', 'copilot', 'tools', 'shift', 'help',
+    'handoffs', 'alerts', 'copilot', 'tools', 'shift', 'collaboration', 'help',
   ]),
   charge_nurse: Object.freeze([
     'whiteboard', 'reception', 'patients', 'queues', 'triage', 'reassessment',
     'capacity', 'hospital-map', 'handoffs', 'referrals', 'copilot', 'alerts',
-    'predictive-analytics', 'analytics', 'tools', 'shift', 'settings', 'help',
+    'predictive-analytics', 'analytics', 'tools', 'shift', 'collaboration', 'settings', 'help',
   ]),
 
   // ── Cluster D: Physicians ──────────────────────────────────────────────────
   emergency_physician: Object.freeze([
     'whiteboard', 'patients', 'copilot', 'tools', 'analytics', 'command-center',
-    'alerts', 'diagnostics', 'handoffs', 'reports', 'help',
+    'alerts', 'diagnostics', 'handoffs', 'reports', 'collaboration', 'help',
   ]),
   attending_physician: Object.freeze([
     'whiteboard', 'patients', 'copilot', 'tools', 'analytics', 'command-center',
-    'alerts', 'diagnostics', 'handoffs', 'reports', 'help',
+    'alerts', 'diagnostics', 'handoffs', 'reports', 'collaboration', 'help',
   ]),
   resident_physician: Object.freeze([
     'whiteboard', 'patients', 'queues', 'reassessment', 'diagnostics',
-    'handoffs', 'copilot', 'alerts', 'tools', 'help',
+    'handoffs', 'copilot', 'alerts', 'tools', 'collaboration', 'help',
   ]),
   specialist: Object.freeze([
-    'patients', 'queues', 'diagnostics', 'referrals', 'copilot', 'alerts', 'tools', 'help',
+    'patients', 'queues', 'diagnostics', 'referrals', 'copilot', 'alerts', 'tools', 'collaboration', 'help',
   ]),
 
   // ── Cluster E: Ancillary Clinical ──────────────────────────────────────────
   pharmacist: Object.freeze([
-    'diagnostics', 'patients', 'alerts', 'help',
+    'diagnostics', 'patients', 'alerts', 'collaboration', 'help',
   ]),
   lab_technician: Object.freeze([
-    'diagnostics', 'patients', 'alerts', 'help',
+    'diagnostics', 'patients', 'alerts', 'collaboration', 'help',
   ]),
   radiology_technician: Object.freeze([
-    'diagnostics', 'patients', 'alerts', 'help',
+    'diagnostics', 'patients', 'alerts', 'collaboration', 'help',
   ]),
 
   // ── Cluster F: Operations & Leadership ────────────────────────────────────
   patient_flow_coordinator: Object.freeze([
-    'queues', 'whiteboard', 'patients', 'capacity', 'hospital-map', 'handoffs', 'reports', 'alerts', 'pulse', 'shift', 'help',
+    'queues', 'whiteboard', 'patients', 'capacity', 'hospital-map', 'handoffs', 'reports', 'alerts', 'pulse', 'shift', 'collaboration', 'help',
   ]),
   hospital_admin: CANONICAL_PILOT_VISIBLE_NAV_IDS,
   ed_director: CANONICAL_PILOT_VISIBLE_NAV_IDS,
   quality_safety_officer: Object.freeze([
     'reports', 'analytics', 'predictive-analytics', 'executive', 'whiteboard', 'hospital-map', 'patients', 'diagnostics',
-    'alerts', 'copilot', 'admin', 'audit', 'help',
+    'alerts', 'copilot', 'admin', 'audit', 'collaboration', 'help',
   ]),
 
   // ── Cluster G: IT & Platform ───────────────────────────────────────────────
   it_admin: Object.freeze([
-    'settings', 'admin', 'medical-iot', 'audit', 'reports', 'alerts', 'help',
+    'settings', 'admin', 'medical-iot', 'audit', 'reports', 'alerts', 'collaboration', 'help',
   ]),
   super_admin: CANONICAL_PILOT_VISIBLE_NAV_IDS,
 
   // ── Cluster H: Demo / Observer ─────────────────────────────────────────────
   demo_observer: Object.freeze([
-    'whiteboard', 'analytics', 'help',
+    'whiteboard', 'analytics', 'collaboration', 'help',
   ]),
 });
 

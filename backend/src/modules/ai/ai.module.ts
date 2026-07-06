@@ -12,6 +12,7 @@ import { PlatformGovernanceModule } from '../platform-governance';
 import { PlatformAssetsModule } from '../platform-assets/platform-assets.module';
 import { SubscriptionsModule } from '../subscriptions/subscriptions.module';
 import { IntentClassifierModule } from '../medical-control-plane/intent-classifier/intent-classifier.module';
+import { CollaborationHubModule } from '../collaboration-hub/collaboration-hub.module';
 import {
   AiContextManagerService,
   AiGatewayService,
@@ -28,6 +29,7 @@ import {
     PlatformGovernanceModule,
     PlatformAssetsModule,
     SubscriptionsModule,
+    CollaborationHubModule,
     forwardRef(() => IntentClassifierModule),
   ],
   controllers: [AIController],

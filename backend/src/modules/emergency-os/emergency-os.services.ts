@@ -9,6 +9,8 @@ import {
   HUMAN_REVIEW_DISCLAIMER,
 } from '../../../../lib/ai/safetyPolicy';
 import { EmergencyRealtimeService } from './emergency-realtime.service';
+import { CollaborationHubService } from '../collaboration-hub/collaboration-hub.service';
+import { CollaborationMessageSourceType } from '../collaboration-hub/entities/collaboration-message.entity';
 import {
   emergencyAlertsFixture,
   emergencyPatientsFixture,
@@ -525,11 +527,24 @@ type WorkflowActionInput = Omit<
 
 const WORKFLOW_LOG_BUFFER_LIMIT = 500;
 
+const COLLABORATION_NOTABLE_WORKFLOW_TYPES = new Set<WorkflowActionType>([
+  'journey_state_changed',
+  'clinician_assigned',
+  'reassessment_completed',
+  'boarding_started',
+  'referral_created',
+  'patient_escalated',
+  'patient_note_added',
+]);
+
 @Injectable()
 export class WorkflowActionLogService {
   private readonly logs: WorkflowActionLog[] = [];
 
-  constructor(@Optional() private readonly realtimeService?: EmergencyRealtimeService) {}
+  constructor(
+    @Optional() private readonly realtimeService?: EmergencyRealtimeService,
+    @Optional() private readonly collaborationHubService?: CollaborationHubService,
+  ) {}
 
   record(input: WorkflowActionInput): WorkflowActionLog {
     const timestamp = input.timestamp || new Date().toISOString();
@@ -562,7 +577,66 @@ export class WorkflowActionLogService {
       this.logs.length = WORKFLOW_LOG_BUFFER_LIMIT;
     }
     this.realtimeService?.publish({ type: 'workflow_log_created', payload: clone(log) });
+    void this.syncToCollaborationHub(log).catch(() => {
+      // Best-effort side channel — never let a collaboration sync failure affect workflow logging.
+    });
     return clone(log);
+  }
+
+  /**
+   * Mirrors operationally-notable workflow events into the patient's
+   * auto-created Collaboration Hub thread, and escalations into an incident
+   * channel. There is no formal domain event bus in this codebase
+   * (no EventEmitter2/@OnEvent usage was found) — this direct call from the
+   * single, already-centralized WorkflowActionLogService.record() is the
+   * lowest-risk integration point that still reaches all 12+ call sites.
+   */
+  private async syncToCollaborationHub(log: WorkflowActionLog): Promise<void> {
+    if (!this.collaborationHubService) return;
+    const organizationId = log.tenantId || 'default-tenant';
+
+    if (log.patientId) {
+      const channel = await this.collaborationHubService.getOrCreatePatientThread(
+        organizationId,
+        log.patientId,
+      );
+
+      if (COLLABORATION_NOTABLE_WORKFLOW_TYPES.has(log.type)) {
+        await this.collaborationHubService.postSystemMessage(channel.id, {
+          body: log.summary || log.title,
+          sourceType: CollaborationMessageSourceType.WORKFLOW_EVENT,
+          sourceId: log.id,
+        });
+      }
+
+      const dischargeHeuristicText = [log.summary, log.title, JSON.stringify(log.metadata || {})]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase();
+      if (log.type === 'journey_state_changed' && dischargeHeuristicText.includes('discharge')) {
+        await this.collaborationHubService.archivePatientThread(organizationId, log.patientId, 'discharge');
+      }
+    }
+
+    if (log.type === 'patient_escalated') {
+      const { channel, created } = await this.collaborationHubService.createIncidentChannel(
+        organizationId,
+        {
+          title: log.title,
+          description: log.summary,
+          severity: 'high',
+          triggerType: 'patient_escalated',
+          patientId: log.patientId,
+          sourceId: log.id,
+        },
+      );
+      if (created) {
+        await this.collaborationHubService.postSystemMessage(channel.id, {
+          body: log.summary || log.title,
+          sourceType: CollaborationMessageSourceType.ESCALATION,
+        });
+      }
+    }
   }
 
   getDiagnostics() {

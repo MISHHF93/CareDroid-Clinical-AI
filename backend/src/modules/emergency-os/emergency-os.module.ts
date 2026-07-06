@@ -6,6 +6,7 @@ import { AuditModule } from '../audit/audit.module';
 import { AuthModule } from '../auth/auth.module';
 import { ChatModule } from '../chat/chat.module';
 import { PlatformAssetsModule } from '../platform-assets/platform-assets.module';
+import { CollaborationHubModule } from '../collaboration-hub/collaboration-hub.module';
 import { EmergencyOsController } from './emergency-os.controller';
 import { EmergencyRealtimeController } from './emergency-realtime.controller';
 import { EmergencyRealtimeService } from './emergency-realtime.service';
@@ -53,6 +54,7 @@ import {
   WorkflowActionLogService,
 } from './emergency-os.services';
 import { PatientDocumentArtifactService } from './patient-document-artifact.service';
+import { OcrIntakeService } from './ocr-intake.service';
 import { ClinicalDecisionSupportService } from './clinical-decision-support.service';
 import { EmergencyPatientAuditService } from './emergency-patient-audit.service';
 import { PatientFlowService } from './emergency-os.patient-flow.service';
@@ -69,6 +71,7 @@ import { EmergencyOperatingSurfacesService } from './emergency-os.operating-surf
     AuditModule,
     ChatModule,
     PlatformAssetsModule,
+    CollaborationHubModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
@@ -134,6 +137,7 @@ import { EmergencyOperatingSurfacesService } from './emergency-os.operating-surf
     EdgeAIAmbulanceService,
     OrganizationalDigitalTwin,
     PatientDocumentArtifactService,
+    OcrIntakeService,
     ClinicalDecisionSupportService,
     EmergencyPatientAuditService,
     PatientFlowService,

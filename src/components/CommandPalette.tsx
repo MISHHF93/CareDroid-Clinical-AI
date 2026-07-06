@@ -256,7 +256,7 @@ export function searchOperationalEntitiesForPalette(
       type: hit.entityType,
       id: hit.id,
       label: hit.label,
-      description: `${formatOperationalSearchEntityLabel(hit.entityType)} · ${hit.hint}`,
+      description: `${formatOperationalSearchEntityLabel(hit.entityType)} ï¿½ ${hit.hint}`,
       group: groupLabel[hit.entityType as Exclude<OperationalSearchEntityType, 'patient'>],
       icon: 'entity' as const,
       action: () => {
@@ -300,7 +300,7 @@ export function searchPatientsByName(
   return rankPatientsBySearch(patients, normalizedQuery, MAX_PATIENT_RESULTS).map(({ patient }) => ({
     type: 'patient',
     id: `patient-${patient.id}`,
-    label: `${getPatientDisplayName(patient)} · ${patient.chiefComplaint || patient.complaint || 'Complaint not set'} · ${patient.state} · ${formatPatientWait(patient, now)}`,
+    label: `${getPatientDisplayName(patient)} ï¿½ ${patient.chiefComplaint || patient.complaint || 'Complaint not set'} ï¿½ ${patient.state} ï¿½ ${formatPatientWait(patient, now)}`,
     description: `Select patient ${patient.mrn}`,
     group: 'Patients',
     icon: 'person',
@@ -650,6 +650,15 @@ function createCommands(
         ),
     },
     {
+      id: 'collaboration-hub',
+      label: 'Collaboration Hub',
+      description: 'Department channels, patient threads, incidents, and AI Chief recommendations.',
+      group: 'Department',
+      keywords: ['chat', 'messages', 'channels', 'collaboration', 'discussion', 'incident', 'mentions'],
+      requiredRoute: CANONICAL_ROUTES.emergencyCollaboration,
+      action: () => navigateWithRoleGuard(navigate, CANONICAL_ROUTES.emergencyCollaboration, emergencyRole, saasRole),
+    },
+    {
       id: 'toggle-copilot',
       label: 'Toggle Copilot',
       description: 'Show or hide human-reviewed CareDroid Copilot context.',
@@ -720,7 +729,7 @@ function resultIcon(result: PaletteResult): string {
 
 function patientInitials(label: string): string {
   return label
-    .split('·')[0]
+    .split('ï¿½')[0]
     .trim()
     .split(/\s+/)
     .map((part) => part[0])
@@ -936,7 +945,7 @@ export default function CommandPalette({ open, onClose, onExecute }: CommandPale
         </div>
 
         <footer style={styles.footer}>
-          Quick actions on open · ?? navigate · ? select · esc close
+          Quick actions on open ï¿½ ?? navigate ï¿½ ? select ï¿½ esc close
         </footer>
       </section>
     </div>

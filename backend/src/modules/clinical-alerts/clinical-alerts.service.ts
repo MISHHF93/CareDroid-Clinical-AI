@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger, Optional } from '@nestjs/common';
+import { CollaborationHubService } from '../collaboration-hub/collaboration-hub.service';
 
 type ClinicalAlertSeverity = 'critical' | 'high' | 'moderate' | 'low';
 type ClinicalAlertStatus = 'unacknowledged' | 'acknowledged' | 'dismissed';
@@ -97,10 +98,24 @@ function summarize(alerts: ClinicalAlert[]) {
 
 @Injectable()
 export class ClinicalAlertsService {
+  private readonly logger = new Logger(ClinicalAlertsService.name);
   private readonly overridesByUser = new Map<string, Map<string, AlertActionOverride>>();
 
-  listForUser(userId: string) {
+  constructor(@Optional() private readonly collaborationHubService?: CollaborationHubService) {}
+
+  listForUser(userId: string, organizationId?: string) {
     const alerts = cloneAlerts(this.getUserOverrides(userId));
+
+    // Best-effort, fire-and-forget: mirror critical demo alerts into an incident
+    // channel. Only fires for this hardcoded demo alert set until clinical-alerts
+    // becomes a real persisted stream — see docs/DOCUMENTATION_CENTER.md known debt.
+    if (organizationId) {
+      void this.notifyCriticalAlerts(organizationId, alerts).catch((error) => {
+        this.logger.warn(
+          `Collaboration hub incident sync failed: ${error instanceof Error ? error.message : String(error)}`,
+        );
+      });
+    }
 
     return {
       ok: true,
@@ -111,6 +126,33 @@ export class ClinicalAlertsService {
       alerts,
       summary: summarize(alerts),
     };
+  }
+
+  private async notifyCriticalAlerts(
+    organizationId: string,
+    alerts: ClinicalAlert[],
+  ): Promise<void> {
+    if (!this.collaborationHubService) return;
+    const criticalAlerts = alerts.filter(
+      (alert) => alert.severity === 'critical' && alert.status !== 'dismissed',
+    );
+    for (const alert of criticalAlerts) {
+      const { channel, created } = await this.collaborationHubService.createIncidentChannel(
+        organizationId,
+        {
+          title: alert.title,
+          description: alert.description,
+          severity: alert.severity,
+          triggerType: 'clinical_alert',
+          sourceId: alert.id,
+        },
+      );
+      if (created) {
+        await this.collaborationHubService.postSystemMessage(channel.id, {
+          body: `${alert.title}: ${alert.description}\nFindings: ${alert.findings.join(', ')}`,
+        });
+      }
+    }
   }
 
   acknowledge(userId: string, alertId: string, acknowledgedAt?: string) {

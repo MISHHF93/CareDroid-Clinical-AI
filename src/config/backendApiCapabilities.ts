@@ -49,6 +49,7 @@ export const BACKEND_API_CAPABILITY_STATUS = Object.freeze({
   trainingPipeline: BACKEND_CAPABILITY_STATUS.REAL,
   evaluationFramework: BACKEND_CAPABILITY_STATUS.REAL,
   costOptimization: BACKEND_CAPABILITY_STATUS.REAL,
+  collaborationHub: BACKEND_CAPABILITY_STATUS.REAL,
   /** No Nest route — do not POST */
   toolsShareResults: BACKEND_CAPABILITY_STATUS.DISABLED,
   teamManagement: BACKEND_CAPABILITY_STATUS.DISABLED,
@@ -98,6 +99,7 @@ export const BACKEND_API_CAPABILITY_STATUS = Object.freeze({
   emergencySurge: BACKEND_CAPABILITY_STATUS.DISABLED,
   emergencySmartIntake: BACKEND_CAPABILITY_STATUS.DEMO,
   emergencySmartIntakeIdentitySession: BACKEND_CAPABILITY_STATUS.DISABLED,
+  emergencyOcrIntake: BACKEND_CAPABILITY_STATUS.REAL,
   emergencyCopilotRuntime: BACKEND_CAPABILITY_STATUS.DEMO,
   /** Optional / absent CareDroid routes; keep frontend clients from calling them until mounted. */
   emergencyCapacityDashboard: BACKEND_CAPABILITY_STATUS.DISABLED,

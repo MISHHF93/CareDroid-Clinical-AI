@@ -1,0 +1,166 @@
+.cd-collab-channel-list__group {
+  margin-bottom: var(--cd-space-4, 1rem);
+}
+
+.cd-collab-channel-list__group-label {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0 var(--cd-space-2, 0.5rem);
+  margin-bottom: var(--cd-space-1, 0.25rem);
+}
+
+.cd-collab-channel-list__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.4rem 0.5rem;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: left;
+  color: var(--color-text-primary, inherit);
+}
+
+.cd-collab-channel-list__item:hover {
+  background: var(--color-surface, rgba(0, 0, 0, 0.04));
+}
+
+.cd-collab-channel-list__item--active {
+  background: var(--color-elevated, rgba(0, 0, 0, 0.08));
+  font-weight: 600;
+}
+
+.cd-collab-message-list {
+  padding: var(--cd-space-4, 1rem);
+  overflow-y: auto;
+  flex: 1;
+}
+
+.cd-collab-message {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.cd-collab-message--system {
+  opacity: 0.85;
+  font-style: italic;
+}
+
+.cd-collab-message__body {
+  background: var(--color-surface, rgba(0, 0, 0, 0.03));
+  border-radius: 10px;
+  padding: 0.5rem 0.75rem;
+  max-width: 640px;
+}
+
+.cd-collab-message--mine .cd-collab-message__body {
+  background: var(--status-info, rgba(37, 99, 235, 0.12));
+}
+
+.cd-collab-message__meta {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+  margin-bottom: 0.15rem;
+}
+
+.cd-collab-message__actions {
+  display: flex;
+  gap: 0.35rem;
+  margin-top: 0.35rem;
+}
+
+.cd-collab-message__action {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 0.1rem 0.3rem;
+  border-radius: 4px;
+}
+
+.cd-collab-message__action:hover {
+  background: var(--color-elevated, rgba(0, 0, 0, 0.08));
+}
+
+.cd-collab-message__action-text {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.75rem;
+  color: var(--color-text-secondary, inherit);
+  padding: 0.1rem 0.3rem;
+}
+
+.cd-collab-composer {
+  border-top: 1px solid var(--border-subtle, rgba(0, 0, 0, 0.1));
+  padding: var(--cd-space-3, 0.75rem);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cd-collab-composer__reply-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--color-surface, rgba(0, 0, 0, 0.04));
+  border-radius: 6px;
+  padding: 0.25rem 0.5rem;
+}
+
+.cd-collab-hub {
+  display: flex;
+  height: 100%;
+  min-height: 0;
+}
+
+.cd-collab-hub__sidebar {
+  width: 240px;
+  min-width: 200px;
+  border-right: 1px solid var(--border-subtle, rgba(0, 0, 0, 0.1));
+  padding: var(--cd-space-3, 0.75rem);
+  overflow-y: auto;
+}
+
+.cd-collab-hub__main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.cd-collab-hub__header {
+  padding: var(--cd-space-3, 0.75rem);
+  border-bottom: 1px solid var(--border-subtle, rgba(0, 0, 0, 0.1));
+}
+
+.cd-collab-hub__sidebar-title {
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+.cd-collab-hub__denied {
+  padding: 2rem;
+}
+
+.cd-collab-patient-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 420px;
+}
+
+.cd-collab-patient-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cd-collab-patient-panel__messages {
+  overflow-y: auto;
+  max-height: 260px;
+}
