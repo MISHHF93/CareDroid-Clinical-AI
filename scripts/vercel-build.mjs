@@ -1,4 +1,8 @@
 import { spawnSync } from 'node:child_process';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 
 /**
  * Canonical hosted-demo defaults for Vercel frontend builds.
@@ -24,17 +28,42 @@ if (apiUrl && /\/api\/?$/i.test(apiUrl)) {
   process.env.VITE_API_URL = apiUrl.replace(/\/api\/?$/i, '');
 }
 
-const run = (command, args) => {
-  const result = spawnSync(command, args, {
+const runNodeScript = (relativeScript, label) => {
+  const scriptPath = path.join(ROOT, relativeScript);
+  const result = spawnSync(process.execPath, [scriptPath], {
     stdio: 'inherit',
     env: process.env,
-    shell: process.platform === 'win32',
+    cwd: ROOT,
   });
+
+  if (result.error) {
+    console.error(`${label} failed to start:`, result.error.message);
+    process.exit(1);
+  }
 
   if (result.status !== 0) {
     process.exit(result.status ?? 1);
   }
 };
 
-run('npm', ['run', 'validate:vercel-env']);
-run('npm', ['run', 'build']);
+runNodeScript('scripts/validate-vercel-env.mjs', 'Vercel environment validation');
+runNodeScript('scripts/validate-assets.mjs', 'Asset validation');
+
+const viteResult = spawnSync(
+  process.execPath,
+  [path.join(ROOT, 'node_modules', 'vite', 'bin', 'vite.js'), 'build'],
+  {
+    stdio: 'inherit',
+    env: process.env,
+    cwd: ROOT,
+  },
+);
+
+if (viteResult.error) {
+  console.error('Vite build failed to start:', viteResult.error.message);
+  process.exit(1);
+}
+
+if (viteResult.status !== 0) {
+  process.exit(viteResult.status ?? 1);
+}

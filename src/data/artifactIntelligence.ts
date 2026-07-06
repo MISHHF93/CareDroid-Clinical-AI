@@ -1,6 +1,5 @@
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
-import path from 'node:path';
 import { ROUTE_RECORDS } from '../config/routes.config';
+import { CARE_DROID_UNIFIED_AI_NODE_MODELS_PATH } from '../config/careDroidUnifiedAiNode.config';
 import {
   ASSET_PACKS,
   SAAS_PRODUCTS,
@@ -11,7 +10,34 @@ import { BACKEND_HTTP_ROUTES } from './backendHttpRouteInventory';
 import { FRONTEND_API_CALLS } from './frontendApiCallsInventory';
 import { clinicalIntentTools } from './clinicalIntentToolCatalog';
 import { getAiModelRegistry } from './aiModelRegistry';
-import { getLocalTrainedMlModelRegistry } from './aiModelRegistry.node';
+
+/** Browser-safe stubs for locally trained heads (no disk reads). */
+const LOCAL_TRAINED_ML_MODEL_STUBS = Object.freeze([
+  Object.freeze({
+    modelId: 'nlu-intent-classifier',
+    name: 'NLU Intent Classifier',
+    head: 'nlu',
+    route: '/api/nlu/predict',
+    purpose:
+      'Maps clinical utterances to 10 governed intent classes for chat, copilot, and AI Chief routing.',
+    classifierPath: 'backend/ml-services/models/nlu/classifier.json',
+    metricsPath: 'backend/ml-services/models/nlu/metrics.json',
+    manifestPath: 'backend/ml-services/models/manifest.json',
+    status: 'untrained',
+  }),
+  Object.freeze({
+    modelId: 'artifact-router',
+    name: 'Artifact Router',
+    head: 'artifact-router',
+    route: `${CARE_DROID_UNIFIED_AI_NODE_MODELS_PATH}/route`,
+    purpose:
+      'Maps utterances to artifact types (calculator, tool, route, …) for unified AI node routing.',
+    classifierPath: 'backend/ml-services/models/artifact-router/classifier.json',
+    metricsPath: 'backend/ml-services/models/artifact-router/metrics.json',
+    manifestPath: 'backend/ml-services/models/manifest.json',
+    status: 'untrained',
+  }),
+]);
 
 export const ARTIFACT_SCHEMA_FIELDS = Object.freeze([
   'artifactId',
@@ -165,7 +191,7 @@ function artifactText(row) {
   ].join(' ');
 }
 
-function makeArtifact(row) {
+export function makeArtifact(row) {
   const artifact = {
     artifactId: firstKnown(row.artifactId),
     name: firstKnown(row.name, row.artifactId),
@@ -422,122 +448,6 @@ function artifactFromAiModel(model) {
   });
 }
 
-function readJsonlLines(filePath) {
-  if (!existsSync(filePath)) return [];
-  return readFileSync(filePath, 'utf8')
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .map((line) => {
-      try {
-        return JSON.parse(line);
-      } catch {
-        return null;
-      }
-    })
-    .filter(Boolean);
-}
-
-function loadNluTrainingExamples() {
-  const nluDataDir = path.join(process.cwd(), 'backend', 'ml-services', 'nlu', 'data');
-  if (!existsSync(nluDataDir)) return [];
-
-  const examples: Array<{
-    text: string;
-    intent: string;
-    subcategory: string | undefined;
-    split: string;
-    sourceFile: string;
-    index: number;
-  }> = [];
-  // Only index the master corpus — never re-ingest train/val/test splits (circular leak).
-  for (const fileName of ['corpus.jsonl']) {
-    const split = fileName.replace('.jsonl', '');
-    const sourceFile = path.join('backend', 'ml-services', 'nlu', 'data', fileName).split(path.sep).join('/');
-    for (const [index, row] of readJsonlLines(path.join(nluDataDir, fileName)).entries()) {
-      if (!row.text || !row.intent) continue;
-      examples.push({
-        text: String(row.text),
-        intent: String(row.intent),
-        subcategory: row.subcategory ? String(row.subcategory) : undefined,
-        split,
-        sourceFile,
-        index,
-      });
-    }
-  }
-  return examples;
-}
-
-function loadMedicalKnowledgeDocuments() {
-  const knowledgeDir = path.join(process.cwd(), 'data', 'medical-knowledge');
-  if (!existsSync(knowledgeDir)) return [];
-
-  return readdirSync(knowledgeDir)
-    .filter((fileName) => fileName.endsWith('.md'))
-    .map((fileName) => {
-      const absolute = path.join(knowledgeDir, fileName);
-      const body = readFileSync(absolute, 'utf8');
-      const relative = path.join('data', 'medical-knowledge', fileName).split(path.sep).join('/');
-      const title = path.basename(fileName, '.md').replace(/-/g, ' ');
-      return { fileName, relative, body, title };
-    });
-}
-
-function artifactFromNluExample(example) {
-  return makeArtifact({
-    artifactId: `nlu-${example.split}-${example.index}`,
-    name: `${example.intent} query`,
-    type: 'nlu-example',
-    category: example.intent,
-    route: '/api/nlu/predict',
-    sourceFile: example.sourceFile,
-    frontendStatus: 'nlu-training-corpus',
-    backendStatus: 'ml-services-nlu',
-    demoStatus: 'training-split',
-    assetPack: 'ai-workflow-pack',
-    product: 'product-core-platform',
-    workspace: 'ai-workflow|clinical',
-    roles: 'clinician|nurse|emergency-physician|platform-admin',
-    organizationTypes: 'hospital',
-    riskLevel: example.intent === 'emergency_alert' ? 'critical' : 'medium',
-    description: example.text,
-    dependencies: [
-      example.sourceFile,
-      'backend/ml-services/models/nlu/classifier.json',
-      'backend/ml-services/models/manifest.json',
-    ],
-    tags: ['nlu', example.intent, example.split, ...(example.subcategory ? [example.subcategory] : [])],
-    embeddingText: `${example.text} ${example.intent} ${example.subcategory || ''} nlu intent routing`,
-    status: 'active',
-  });
-}
-
-function artifactFromMedicalKnowledge(doc) {
-  return makeArtifact({
-    artifactId: `medical-knowledge-${slug(doc.fileName)}`,
-    name: doc.title,
-    type: 'medical-knowledge',
-    category: 'clinical-reference',
-    route: '/emergency/tools',
-    sourceFile: doc.relative,
-    frontendStatus: 'rag-corpus',
-    backendStatus: 'rag-ingest-candidate',
-    demoStatus: 'reference',
-    assetPack: 'core-platform',
-    product: 'product-core-platform',
-    workspace: 'clinical|education',
-    roles: 'clinician|nurse|emergency-physician|resident|pharmacist',
-    organizationTypes: 'hospital',
-    riskLevel: /interaction|sepsis|arrest|critical/i.test(doc.body) ? 'high' : 'medium',
-    description: doc.body.split(/\r?\n/).find((line) => line.trim() && !line.startsWith('#'))?.trim() || doc.title,
-    dependencies: doc.relative,
-    tags: ['medical-knowledge', 'rag', 'clinical-reference', slug(doc.fileName)],
-    embeddingText: `${doc.title} ${doc.relative} ${doc.body.slice(0, 1600)}`,
-    status: 'active',
-  });
-}
-
 function dedupeArtifacts(artifacts) {
   const seen = new Set();
   return artifacts.filter((artifact) => {
@@ -547,10 +457,13 @@ function dedupeArtifacts(artifacts) {
   });
 }
 
-export function buildArtifactCatalog({ extraArtifacts = [] as any[] }: any = {}) {
+export function composeArtifactCatalog(
+  supplementalArtifacts: any[] = [],
+  { extraArtifacts = [] as any[] }: any = {},
+) {
   const assets = buildAssetInventoryProjection();
   const ownership = new Map(
-    buildRouteOwnershipProjection({ assets }).map((route) => [route.path, route])
+    buildRouteOwnershipProjection({ assets }).map((route) => [route.path, route]),
   );
   const artifacts = [
     ...assets.map(artifactFromAsset),
@@ -561,12 +474,17 @@ export function buildArtifactCatalog({ extraArtifacts = [] as any[] }: any = {})
     ...ASSET_PACKS.map(artifactFromPack),
     ...SAAS_PRODUCTS.map(artifactFromProduct),
     ...getAiModelRegistry().map(artifactFromAiModel),
-    ...getLocalTrainedMlModelRegistry().map(artifactFromLocalMlModel),
-    ...loadNluTrainingExamples().map(artifactFromNluExample),
-    ...loadMedicalKnowledgeDocuments().map(artifactFromMedicalKnowledge),
+    ...supplementalArtifacts,
     ...extraArtifacts.map(makeArtifact),
   ];
   return dedupeArtifacts(artifacts).sort((a, b) => a.artifactId.localeCompare(b.artifactId));
+}
+
+export function buildArtifactCatalog(options: { extraArtifacts?: any[] } = {}) {
+  return composeArtifactCatalog(
+    LOCAL_TRAINED_ML_MODEL_STUBS.map(artifactFromLocalMlModel),
+    options,
+  );
 }
 
 export function validateArtifactCatalog(artifacts = buildArtifactCatalog()) {
