@@ -1,5 +1,7 @@
 # CareDroid: Administrator Guide
 
+> **Related:** [`docs/manuals/roles/hospital-administrator.md`](../manuals/roles/hospital-administrator.md) covers the hospital administrator role in fuller "mission-framed" detail. Flagged as overlapping documentation in the [Documentation Center](../DOCUMENTATION_CENTER.md#known-documentation-debt).
+
 **Roles:** `hospital_admin`, `ed_director`, `super_admin`  
 **Version:** Pilot 2026
 

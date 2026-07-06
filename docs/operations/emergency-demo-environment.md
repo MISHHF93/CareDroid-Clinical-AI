@@ -1,5 +1,7 @@
 # Emergency Demo Environment
 
+> **Related:** [`emergency-demo-mode.md`](emergency-demo-mode.md) covers the same First Customer Demo Mode feature from the current-implementation/entry-points angle (how to launch it today). This document is the goal/spec framing. Flagged as overlapping in the [Documentation Center — Known Documentation Debt](../DOCUMENTATION_CENTER.md#known-documentation-debt); read both until they're merged.
+
 ## Goal
 
 Use the First Customer Demo Mode to present a realistic emergency department demo environment without EHR, ADT, EMS CAD, telemetry, bed-management, referral, or analytics integrations.

@@ -1,5 +1,7 @@
 # IT Administrator Guide
 
+> **Related:** [`docs/manuals/roles/it-administrator.md`](../manuals/roles/it-administrator.md) covers the same role in fuller "mission-framed" detail. Flagged as overlapping documentation in the [Documentation Center](../DOCUMENTATION_CENTER.md#known-documentation-debt).
+
 ## Purpose
 
 Maintain CareDroid availability, configuration, identity, integrations, and deployment health.

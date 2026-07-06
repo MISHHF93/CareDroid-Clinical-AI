@@ -1,5 +1,7 @@
 # Specialist Guide
 
+> **Related:** [`docs/manuals/roles/specialist.md`](../manuals/roles/specialist.md) covers the same role in fuller "mission-framed" detail. Flagged as overlapping documentation in the [Documentation Center](../DOCUMENTATION_CENTER.md#known-documentation-debt).
+
 ## Purpose
 
 Support referral, consult, and transfer decisions from the physician/referral workflow.

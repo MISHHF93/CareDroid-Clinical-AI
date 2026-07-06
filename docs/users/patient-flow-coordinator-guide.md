@@ -1,5 +1,7 @@
 # Patient Flow Coordinator Guide
 
+> **Related:** [`docs/manuals/roles/patient-flow-coordinator.md`](../manuals/roles/patient-flow-coordinator.md) covers the same role in fuller "mission-framed" detail. Flagged as overlapping documentation in the [Documentation Center](../DOCUMENTATION_CENTER.md#known-documentation-debt).
+
 ## Purpose
 
 Reduce operational delay across queues, rooms, EMS offload, boarding, referrals, and discharge.

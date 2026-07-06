@@ -1,5 +1,7 @@
 # Quality & Safety Guide
 
+> **Related:** [`docs/manuals/roles/quality-safety-officer.md`](../manuals/roles/quality-safety-officer.md) covers the same role in fuller "mission-framed" detail. Flagged as overlapping documentation in the [Documentation Center](../DOCUMENTATION_CENTER.md#known-documentation-debt).
+
 ## Purpose
 
 Monitor CareDroid for safety, throughput, documentation quality, and first-three-minute response performance.

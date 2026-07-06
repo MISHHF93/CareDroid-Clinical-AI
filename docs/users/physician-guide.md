@@ -1,5 +1,7 @@
 # CareDroid: Emergency Physician Guide
 
+> **Related:** [`docs/manuals/roles/emergency-physician.md`](../manuals/roles/emergency-physician.md) covers the emergency physician role in fuller "mission-framed" detail. Flagged as overlapping documentation in the [Documentation Center](../DOCUMENTATION_CENTER.md#known-documentation-debt).
+
 **Roles:** `emergency_physician`, `attending_physician`, `resident_physician`  
 **Version:** Pilot 2026
 

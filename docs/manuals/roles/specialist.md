@@ -1,5 +1,7 @@
 # Specialist Manual
 
+> **Related:** [`docs/users/specialist-guide.md`](../../users/specialist-guide.md) covers the same role in a shorter guide format. Flagged as overlapping documentation in the [Documentation Center](../../DOCUMENTATION_CENTER.md#known-documentation-debt).
+
 **Role ID:** `specialist`  
 **Landing page:** `/emergency/patients`  
 **Mission:** Review the consult request thoroughly, document a clear recommendation, and close the handoff loop.

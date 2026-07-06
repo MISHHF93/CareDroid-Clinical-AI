@@ -1,5 +1,7 @@
 # CareDroid: Charge Nurse Guide
 
+> **Related:** [`docs/manuals/roles/charge-nurse.md`](../manuals/roles/charge-nurse.md) covers the same role in fuller "mission-framed" detail. Flagged as overlapping documentation in the [Documentation Center](../DOCUMENTATION_CENTER.md#known-documentation-debt).
+
 **Role:** Charge Nurse (`charge_nurse`)  
 **Version:** Pilot 2026
 

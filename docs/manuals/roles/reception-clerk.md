@@ -1,5 +1,7 @@
 # Reception Clerk Manual
 
+> **Related:** [`docs/users/reception-guide.md`](../../users/reception-guide.md) covers the same role in a shorter guide format. Flagged as overlapping documentation in the [Documentation Center](../../DOCUMENTATION_CENTER.md#known-documentation-debt).
+
 **Role ID:** `registration_clerk`  
 **Landing page:** `/emergency/reception`  
 **Mission:** Prepare every patient card before clinical teams take over.

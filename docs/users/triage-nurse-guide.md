@@ -1,5 +1,7 @@
 # CareDroid: Triage Nurse Guide
 
+> **Related:** [`docs/manuals/roles/triage-nurse.md`](../manuals/roles/triage-nurse.md) covers the same role in fuller "mission-framed" detail. Flagged as overlapping documentation in the [Documentation Center](../DOCUMENTATION_CENTER.md#known-documentation-debt).
+
 **Role:** Triage Nurse (`triage_nurse`)  
 **Version:** Pilot 2026
 

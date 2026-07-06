@@ -1,5 +1,7 @@
 # Emergency Physician Manual
 
+> **Related:** [`docs/users/physician-guide.md`](../../users/physician-guide.md) covers this and related physician roles (`attending_physician`, `resident_physician`) in a shorter guide format. Flagged as overlapping documentation in the [Documentation Center](../../DOCUMENTATION_CENTER.md#known-documentation-debt).
+
 **Role ID:** `emergency_physician`  
 **Landing page:** `/emergency/whiteboard`  
 **Mission:** Every patient gets a timely, safe clinical decision. AI supports you — you own every order, every diagnosis, every disposition.

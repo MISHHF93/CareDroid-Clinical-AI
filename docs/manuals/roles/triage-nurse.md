@@ -1,5 +1,7 @@
 # Triage Nurse Manual
 
+> **Related:** [`docs/users/triage-nurse-guide.md`](../../users/triage-nurse-guide.md) covers the same role in a shorter guide format. Flagged as overlapping documentation in the [Documentation Center](../../DOCUMENTATION_CENTER.md#known-documentation-debt).
+
 **Role ID:** `triage_nurse`  
 **Landing page:** `/emergency/reception` (pretriage queue)  
 **Mission:** Assign the correct acuity, start the right timers, and get every patient moving to the right care pathway.

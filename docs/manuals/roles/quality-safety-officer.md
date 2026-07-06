@@ -1,5 +1,7 @@
 # Quality & Safety Officer Manual
 
+> **Related:** [`docs/users/quality-safety-guide.md`](../../users/quality-safety-guide.md) covers the same role in a shorter guide format. Flagged as overlapping documentation in the [Documentation Center](../../DOCUMENTATION_CENTER.md#known-documentation-debt).
+
 **Role ID:** `quality_safety_officer`  
 **Landing page:** `/emergency/analytics`  
 **Mission:** Find what went wrong before it happens again. Protect patients through data, patterns, and accountability.

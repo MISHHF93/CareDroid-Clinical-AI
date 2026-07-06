@@ -363,8 +363,17 @@ CareDroid is designed with audit-minded SaaS patterns. **It does not claim HIPAA
 
 ## Documentation
 
+**Start at the [Documentation Center](docs/DOCUMENTATION_CENTER.md)** — the canonical index into every architecture, API, data model, deployment, configuration, glossary, ADR, and role-guide document in this repository, organized by persona.
+
 | Document | Audience |
 |----------|----------|
+| [Platform Architecture Overview](docs/architecture/platform-architecture-overview.md) | Developers, architects |
+| [API Reference](docs/api/api-reference.md) | Backend/API engineers |
+| [Data Model Reference](docs/data-model/data-model-reference.md) | Backend engineers, data engineers |
+| [Developer Guide](docs/developer-guide.md) | New contributors |
+| [Deployment Guide](docs/deployment-guide.md) | IT/DevOps, SRE |
+| [Configuration Reference](docs/configuration-reference.md) | IT/DevOps, backend engineers |
+| [Glossary](docs/glossary.md) | Everyone |
 | [AI Features Reference](docs/AI_FEATURES.md) | Developers, clinical informatics, AI reviewers |
 | [AI Patient Intake](docs/AI_PATIENT_INTAKE.md) | Clinical informatics, registration, EMS coordinators |
 | [Medical KPIs & Biomedical Informatics](docs/MEDICAL_KPIS_AND_BIOMEDICAL_INFORMATICS.md) | Clinical informatics, biomedical engineers, clinical leads |

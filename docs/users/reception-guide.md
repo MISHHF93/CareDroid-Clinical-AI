@@ -1,5 +1,7 @@
 # CareDroid: Reception Guide
 
+> **Related:** [`docs/manuals/roles/reception-clerk.md`](../manuals/roles/reception-clerk.md) covers the same role in fuller "mission-framed" detail. Flagged as overlapping documentation in the [Documentation Center](../DOCUMENTATION_CENTER.md#known-documentation-debt).
+
 **Role:** Registration Clerk (`registration_clerk`)  
 **Version:** Pilot 2026
 

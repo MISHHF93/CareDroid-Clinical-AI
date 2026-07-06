@@ -1,5 +1,7 @@
 # Emergency Demo Mode
 
+> **Related:** [`emergency-demo-environment.md`](emergency-demo-environment.md) covers the same First Customer Demo Mode feature from the goal/spec angle. This document covers current entry points/implementation. Flagged as overlapping in the [Documentation Center — Known Documentation Debt](../DOCUMENTATION_CENTER.md#known-documentation-debt); read both until they're merged.
+
 ## Goal
 
 Use the current First Customer Demo Mode to let prospects experience the Emergency OS without EHR, ADT, telemetry, protocol library, scheduling, or analytics integrations.
