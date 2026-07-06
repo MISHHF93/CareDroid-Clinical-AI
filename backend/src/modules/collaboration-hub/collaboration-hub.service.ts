@@ -133,23 +133,43 @@ export class CollaborationHubService {
   // Channel listing / membership
   // ---------------------------------------------------------------------
 
+  /**
+   * Batched by design: the original version ran ensureMembership() (a
+   * findOne + maybe save) once per department channel on every single call,
+   * i.e. up to 15 sequential round-trips per request — and this endpoint is
+   * hit on every page load plus every realtime poll cycle. This version does
+   * a fixed 3-4 queries regardless of department count, and performs zero
+   * writes once a user is already a member of every department channel
+   * (the steady-state case for almost every call after the first).
+   */
   async listChannelsForUser(userId: string, organizationId: string) {
-    await this.ensureDefaultDepartmentChannels(organizationId);
-
-    const departmentChannels = await this.channelRepo.find({
-      where: {
-        organizationId,
-        type: CollaborationChannelType.DEPARTMENT,
-        status: CollaborationChannelStatus.ACTIVE,
-      },
-    });
-    await Promise.all(
-      departmentChannels.map((channel) => this.ensureMembership(channel.id, userId)),
-    );
+    const departmentChannels = await this.ensureDefaultDepartmentChannels(organizationId);
 
     const memberships = await this.membershipRepo.find({
       where: { userId, status: CollaborationChannelMembershipStatus.ACTIVE },
     });
+    const memberChannelIds = new Set(memberships.map((m) => m.channelId));
+
+    const missingDepartmentChannels = departmentChannels.filter(
+      (channel) =>
+        channel.status === CollaborationChannelStatus.ACTIVE && !memberChannelIds.has(channel.id),
+    );
+    if (missingDepartmentChannels.length > 0) {
+      const newMemberships = await this.membershipRepo.save(
+        missingDepartmentChannels.map((channel) =>
+          this.membershipRepo.create({
+            channelId: channel.id,
+            userId,
+            role: CollaborationChannelMembershipRole.MEMBER,
+            status: CollaborationChannelMembershipStatus.ACTIVE,
+            notificationPreference: CollaborationNotificationPreference.ALL,
+            joinedAt: new Date(),
+          }),
+        ),
+      );
+      memberships.push(...newMemberships);
+    }
+
     const channelIds = memberships.map((membership) => membership.channelId);
     if (channelIds.length === 0) return [];
 
@@ -475,8 +495,19 @@ export class CollaborationHubService {
     });
 
     this.realtimeService.publish({ type: 'message_created', payload: { channelId, message } });
-    await this.notifyChannelMembers(channel, message, userId);
-    await this.mirrorToExternalProviders(channel, message, userId);
+    // Notification fan-out and external mirroring are side effects, not part
+    // of "did the message send" — fire-and-forget so a channel with many
+    // members (or a slow external provider) never adds latency to the
+    // send/reply request itself. Both are already internally resilient
+    // (per-member try/catch, Promise.allSettled).
+    void this.notifyChannelMembers(channel, message, userId).catch((error) => {
+      this.logger.warn(
+        `notifyChannelMembers failed for message ${message.id}: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+    });
+    void this.mirrorToExternalProviders(channel, message, userId).catch(() => {});
 
     return message;
   }
@@ -507,8 +538,14 @@ export class CollaborationHubService {
     );
 
     this.realtimeService.publish({ type: 'message_created', payload: { channelId, message } });
-    await this.notifyChannelMembers(channel, message, null);
-    await this.mirrorToExternalProviders(channel, message, null);
+    void this.notifyChannelMembers(channel, message, null).catch((error) => {
+      this.logger.warn(
+        `notifyChannelMembers failed for message ${message.id}: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+    });
+    void this.mirrorToExternalProviders(channel, message, null).catch(() => {});
 
     return message;
   }

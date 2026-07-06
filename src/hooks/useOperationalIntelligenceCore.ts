@@ -27,7 +27,7 @@ function unwrapEnvelopeData<T>(envelope: unknown): T | null {
 
 /** Low-level operational intelligence hook — prefer useAiChiefOrchestrator for unified monitoring. */
 export function useOperationalIntelligenceCore(options: UseOperationalIntelligenceOptions = {}) {
-  const centralNode = useCareDroidCentralNode(options);
+  const centralNode = useCareDroidCentralNode({ screenMode: options.screenMode });
   const emergencySettings = useEmergencyStore((state) => state.emergencySettings);
   const patients = useEmergencyStore((state) => state.patients);
   const referrals = useEmergencyStore((state) => state.referrals);
@@ -70,15 +70,16 @@ export function useOperationalIntelligenceCore(options: UseOperationalIntelligen
     if (!oiSettings.operationalIntelligenceEnabled) return undefined;
     const intervalMs = Math.max(15000, oiSettings.operationalIntelligencePollingInterval || 30000);
     if (!options.realtime) return undefined;
+    // Central-node hydration is owned by AppShell realtime; interval here only
+    // refreshes operational-intelligence snapshots for AI Chief surfaces.
     const timer = window.setInterval(() => {
-      void refresh();
+      void refreshUnifiedOperationalIntelligenceFromBackend();
     }, intervalMs);
     return () => window.clearInterval(timer);
   }, [
     oiSettings.operationalIntelligenceEnabled,
     oiSettings.operationalIntelligencePollingInterval,
     options.realtime,
-    refresh,
   ]);
 
   const fetchModelHealth = useCallback(async () => {

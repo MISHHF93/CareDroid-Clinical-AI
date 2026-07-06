@@ -107,9 +107,43 @@ function inferTriggerFromTimer(timer: ResponseTimerState): ThreeMinuteMissionTri
   return 'critical_patient';
 }
 
+/**
+ * Cheap content signature for change detection. timerToMission() always
+ * returns freshly frozen objects (and re-maps `tasks` every call), so
+ * reference equality is useless here — this compares the fields that
+ * actually affect rendering.
+ */
+function missionSignature(missions: readonly ThreeMinuteMission[]): string {
+  return missions
+    .map(
+      (mission) =>
+        `${mission.missionId}:${mission.phase}:${mission.acknowledgedAt ?? ''}:${mission.breachAt ?? ''}:${mission.tasks
+          .map((task) => `${task.id}=${task.status}`)
+          .join(',')}`,
+    )
+    .join('|');
+}
+
+/**
+ * setMissions() unconditionally writes a brand-new array reference to the
+ * store (see store/threeMinuteMissionStore.ts's `[...missions]` spread), and
+ * this function is called from inside a useMemo on every render of
+ * ThreeMinuteMissionBar / WorkflowAutomationCommandBar (via
+ * buildThreeMinuteMissionSnapshot). Writing on every call — even when
+ * nothing changed — created a render loop: memo runs -> writes store ->
+ * store notifies the same component's `missions` selector -> re-render ->
+ * memo runs again -> writes store again -> ... (observed in practice as a
+ * React "Maximum update depth exceeded" error that pegged the main thread).
+ * Skipping the write when the computed missions are unchanged breaks the
+ * cycle without changing what any caller receives (they still get a fresh,
+ * correct array back from this function every time).
+ */
 export function syncThreeMinuteMissionsFromEngine(): readonly ThreeMinuteMission[] {
   const missions = getAllActiveTimers().map((timer) => timerToMission(timer, inferTriggerFromTimer(timer)));
-  getThreeMinuteMissionStoreState().setMissions(missions);
+  const store = getThreeMinuteMissionStoreState();
+  if (missionSignature(missions) !== missionSignature(store.missions)) {
+    store.setMissions(missions);
+  }
   return missions;
 }
 
@@ -208,8 +242,9 @@ export function acknowledgeThreeMinuteMission(
   return true;
 }
 
-export function buildThreeMinuteMissionSnapshot(): ThreeMinuteMissionSnapshot {
-  const activeMissions = syncThreeMinuteMissionsFromEngine();
+export function buildThreeMinuteMissionSnapshotFromMissions(
+  activeMissions: readonly ThreeMinuteMission[],
+): ThreeMinuteMissionSnapshot {
   const breachCount = activeMissions.filter((mission) => mission.phase === 'breach').length;
   const unacknowledgedCount = activeMissions.filter((mission) => !mission.acknowledgedAt).length;
   const store = useEmergencyStore.getState();
@@ -236,6 +271,10 @@ export function buildThreeMinuteMissionSnapshot(): ThreeMinuteMissionSnapshot {
     unacknowledgedCount,
     complianceRate,
   });
+}
+
+export function buildThreeMinuteMissionSnapshot(): ThreeMinuteMissionSnapshot {
+  return buildThreeMinuteMissionSnapshotFromMissions(syncThreeMinuteMissionsFromEngine());
 }
 
 export function hydrateThreeMinuteMissionsFromStore(): void {

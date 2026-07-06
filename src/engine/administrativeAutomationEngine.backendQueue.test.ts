@@ -12,6 +12,7 @@ vi.mock('../store/emergencyStore', () => ({
     getState: vi.fn(() => ({
       patients: [],
       emsArrivals: [],
+      administrativeAutomationQueue: [],
       setAdministrativeAutomationQueue: vi.fn(),
       backendAvailable: true,
     })),
@@ -20,6 +21,7 @@ vi.mock('../store/emergencyStore', () => ({
 
 import { mergeBackendAdministrativeAutomationTasks } from './administrativeAutomationEngine';
 import { enrichAdministrativeAutomationSnapshotWithAi } from '../services/enrichAdministrativeAutomationsWithAi';
+import { useEmergencyStore } from '../store/emergencyStore';
 
 function makeTask(
   partial: Partial<AdministrativeAutomationTask> & Pick<AdministrativeAutomationTask, 'category'>,
@@ -73,5 +75,35 @@ describe('mergeBackendAdministrativeAutomationTasks', () => {
 
     await mergeBackendAdministrativeAutomationTasks(backendTasks);
     expect(enrichAdministrativeAutomationSnapshotWithAi).toHaveBeenCalledTimes(1);
+  });
+
+  it('reuses aiDecision from the existing queue instead of re-calling /api/ai/node', async () => {
+    const existingTask = makeTask({
+      id: 'task-1',
+      category: 'patient_routing',
+      patientId: 'p-1',
+      proposedPayload: {
+        aiDecision: { requiresClinicianReview: true, triage: { recommendedTriageLevel: 'P2' } },
+      },
+    });
+    vi.mocked(useEmergencyStore.getState).mockReturnValue({
+      patients: [],
+      emsArrivals: [],
+      administrativeAutomationQueue: [existingTask],
+      setAdministrativeAutomationQueue: vi.fn(),
+      backendAvailable: true,
+    } as ReturnType<typeof useEmergencyStore.getState>);
+
+    const backendTasks = [
+      makeTask({
+        id: 'task-1',
+        category: 'patient_routing',
+        patientId: 'p-1',
+      }),
+    ];
+
+    const merged = await mergeBackendAdministrativeAutomationTasks(backendTasks);
+    expect(enrichAdministrativeAutomationSnapshotWithAi).not.toHaveBeenCalled();
+    expect(merged[0]?.proposedPayload?.aiDecision).toEqual(existingTask.proposedPayload.aiDecision);
   });
 });

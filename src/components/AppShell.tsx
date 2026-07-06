@@ -299,11 +299,20 @@ function AppShellFrame({ children }: AppShellProps) {
   const copilotOpen = useEmergencyStore((state) => state.copilotOpen);
   const toggleCopilot = useEmergencyStore((state) => state.toggleCopilot);
   const setCopilotOpen = useEmergencyStore((state) => state.setCopilotOpen);
-  const reassessmentCount = useEmergencyStore((state) =>
-    state.patients.reduce(
-      (count, patient) => count + (isPatientFlaggedForReassessment(patient) ? 1 : 0),
-      0,
-    ),
+  // Select the raw array (cheap reference-equality check) and memoize the
+  // O(n) reduce on it — the previous version ran this reduce inside the
+  // Zustand selector itself, which executes on every single store mutation
+  // (from any of the ~8 background engines, SSE events, or API responses),
+  // not just when patients actually changed. AppShell mounts on every page,
+  // so this was doing wasted O(n) work app-wide on nearly every store tick.
+  const patientsForReassessmentCount = useEmergencyStore((state) => state.patients);
+  const reassessmentCount = useMemo(
+    () =>
+      patientsForReassessmentCount.reduce(
+        (count, patient) => count + (isPatientFlaggedForReassessment(patient) ? 1 : 0),
+        0,
+      ),
+    [patientsForReassessmentCount],
   );
   const { active: simulationModeActive } = useSimulationMode();
   const { canUseCopilot, showSessionCopilot, hiddenOnReception } = useCopilotChromeAccess();

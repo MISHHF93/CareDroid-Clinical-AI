@@ -11,7 +11,8 @@ import './ai-chief-orchestration-bar.css';
 function AiChiefOrchestrationBar() {
   const { pathname } = useLocation();
   const surfaces = usePractitionerSurfaceVisibility();
-  const aiChief = useAiChiefOrchestrator({ realtime: true });
+  // AppShell + unified OI engine own live refresh; avoid a second OI poll loop here.
+  const aiChief = useAiChiefOrchestrator({ realtime: false });
   const { snapshot, topRecommendation, topRisk, criticalDomainCount, watchDomainCount, knowledgeGraphSummary } = aiChief;
 
   if (!surfaces.emergencyRoutes.showAiChiefBar || !isHospitalOperationalPath(pathname)) {

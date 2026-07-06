@@ -54,7 +54,7 @@ function normalizeRealtimeEvent(event) {
   };
 }
 
-function createPollingLoop({ intervalMs, onPoll, onStatus }) {
+function createPollingLoop({ intervalMs, onPoll, onStatus, shouldPoll }: any) {
   let timerId: any = null;
   let stopped = false;
   let failureCount = 0;
@@ -64,6 +64,12 @@ function createPollingLoop({ intervalMs, onPoll, onStatus }) {
 
   const runPoll = async () => {
     if (stopped) return;
+    if (shouldPoll && !shouldPoll()) {
+      // Live SSE/WebSocket connection is healthy — this tick is a true no-op
+      // (no status spam, no network calls) rather than redundant polling.
+      timerId = window.setTimeout(runPoll, intervalMs);
+      return;
+    }
     onStatus?.({
       status: 'reconnecting',
       mode: 'polling',
@@ -216,15 +222,26 @@ export function startEmergencyRealtime({ onEvent, onStatus, onPoll }: any = {}) 
     disposers.clear();
   };
 
+  // Tracks whether a live SSE/WebSocket connection is currently open. The
+  // 30s polling loop below always runs (see createPollingLoop wiring at the
+  // bottom of this function) but was doing full network work on every tick
+  // even while the live connection was healthy — this flag turns it back
+  // into a true fallback: the timer still ticks, but onPoll is a no-op
+  // whenever a live connection is up, so refreshAllData() + the central-node
+  // snapshot fetch only run when SSE/WS actually isn't delivering updates.
+  let liveConnected = false;
+
   const resetReconnectState = () => {
     reconnectAttempt = 0;
     sseSuspended = false;
+    liveConnected = true;
   };
 
   const reconnectDelayMs = () =>
     Math.min(MIN_RECONNECT_MS * 2 ** reconnectAttempt, MAX_RECONNECT_MS);
 
   const scheduleReconnect = () => {
+    liveConnected = false;
     if (stopped || reconnectTimer) return;
     reconnectAttempt += 1;
     if (reconnectAttempt >= SSE_SUSPEND_AFTER_FAILURES) {
@@ -296,6 +313,7 @@ export function startEmergencyRealtime({ onEvent, onStatus, onPoll }: any = {}) 
       intervalMs: config.pollIntervalMs,
       onPoll,
       onStatus: wrappedOnStatus,
+      shouldPoll: () => !liveConnected,
     }),
   );
 

@@ -121,7 +121,30 @@ async function invokePatientJourneyIntent(
   });
 }
 
-export async function evaluatePatientJourneyAiDecisions(
+function patientJourneyDecisionCacheKey(patient: Patient): string {
+  const vitals = readVitals(patient);
+  return [
+    patient.id,
+    patient.state,
+    patient.priority,
+    patient.chiefComplaint || patient.complaint || '',
+    vitals?.hr ?? vitals?.heartRate ?? '',
+    vitals?.sbp ?? '',
+    vitals?.spo2 ?? vitals?.oxygenSaturation ?? '',
+    patientFlags(patient).join(','),
+  ].join('|');
+}
+
+const patientJourneyDecisionCache = new Map<string, PatientJourneyAiDecisionBundle>();
+const patientJourneyDecisionInflight = new Map<string, Promise<PatientJourneyAiDecisionBundle>>();
+
+/** Test helper — clears session cache for patient-journey AI node calls. */
+export function clearPatientJourneyAiDecisionCache(): void {
+  patientJourneyDecisionCache.clear();
+  patientJourneyDecisionInflight.clear();
+}
+
+async function evaluatePatientJourneyAiDecisionsUncached(
   patient: Patient,
 ): Promise<PatientJourneyAiDecisionBundle> {
   const input = buildPatientJourneyAiInput(patient);
@@ -153,6 +176,29 @@ export async function evaluatePatientJourneyAiDecisions(
     summary,
     generatedAt: new Date().toISOString(),
   };
+}
+
+export async function evaluatePatientJourneyAiDecisions(
+  patient: Patient,
+): Promise<PatientJourneyAiDecisionBundle> {
+  const cacheKey = patientJourneyDecisionCacheKey(patient);
+  const cached = patientJourneyDecisionCache.get(cacheKey);
+  if (cached) return cached;
+
+  const inflight = patientJourneyDecisionInflight.get(cacheKey);
+  if (inflight) return inflight;
+
+  const promise = evaluatePatientJourneyAiDecisionsUncached(patient).then((bundle) => {
+    patientJourneyDecisionCache.set(cacheKey, bundle);
+    return bundle;
+  });
+
+  patientJourneyDecisionInflight.set(cacheKey, promise);
+  try {
+    return await promise;
+  } finally {
+    patientJourneyDecisionInflight.delete(cacheKey);
+  }
 }
 
 export async function evaluateEmsPrearrivalAiDecision(

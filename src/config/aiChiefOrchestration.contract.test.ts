@@ -66,6 +66,24 @@ describe('aiChiefOrchestration contract', () => {
     expect(orchestratorSource).toContain('aiChief.operationalIntelligence');
   });
 
+  it('does not re-enrich workflow tasks that already carry aiDecision in the local queue', () => {
+    const source = readFileSync(
+      path.join(ROOT, 'src/engine/administrativeAutomationEngine.ts'),
+      'utf8',
+    );
+    expect(source).toContain('carryForwardAiDecisionsFromQueue');
+    expect(source).toContain('administrativeAutomationQueue');
+  });
+
+  it('does not start a duplicate emergency realtime session from useCareDroidCentralNode', () => {
+    const source = readFileSync(
+      path.join(ROOT, 'src/hooks/useCareDroidCentralNode.ts'),
+      'utf8',
+    );
+    expect(source).not.toContain('startEmergencyRealtime');
+    expect(source).toContain('AppShell owns the singleton emergency realtime session');
+  });
+
   it('restricts direct useOperationalIntelligenceCore imports to orchestrator internals', () => {
     const violations: string[] = [];
     for (const scanRoot of HOOK_SCAN_ROOTS) {

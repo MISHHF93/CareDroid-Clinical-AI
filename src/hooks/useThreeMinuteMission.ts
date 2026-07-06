@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { buildThreeMinuteMissionSnapshot } from '../services/threeMinuteMissionService';
+import {
+  buildThreeMinuteMissionSnapshotFromMissions,
+  syncThreeMinuteMissionsFromEngine,
+} from '../services/threeMinuteMissionService';
 import { useThreeMinuteMissionStore } from '../store/threeMinuteMissionStore';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { acknowledgeThreeMinuteMission } from '../services/threeMinuteMissionService';
@@ -12,16 +15,17 @@ export function useThreeMinuteMission(options: { realtime?: boolean } = {}) {
   const [tick, setTick] = useState(0);
 
   useEffect(() => {
+    syncThreeMinuteMissionsFromEngine();
     if (options.realtime === false) return undefined;
     const timer = window.setInterval(() => {
       setTick((value) => value + 1);
-      buildThreeMinuteMissionSnapshot();
+      syncThreeMinuteMissionsFromEngine();
     }, 1000);
     return () => window.clearInterval(timer);
   }, [options.realtime, patients, alerts, emsArrivals]);
 
   const snapshot = useMemo(
-    () => buildThreeMinuteMissionSnapshot(),
+    () => buildThreeMinuteMissionSnapshotFromMissions(missions),
     [missions, patients, alerts, emsArrivals, tick],
   );
 
