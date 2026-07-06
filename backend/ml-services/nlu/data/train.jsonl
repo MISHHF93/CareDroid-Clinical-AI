@@ -1,477 +1,386 @@
-{"text": "What causes hypertension?", "intent": "general_clinical_query"}
-{"text": "Low albumin and protein levels - clinical significance?", "intent": "lab_interpretation"}
-{"text": "What is the drug interaction between warfarin and aspirin?", "intent": "drug_interaction_check"}
-{"text": "Multiple trauma from motor vehicle accident", "intent": "emergency_alert", "subcategory": "trauma"}
-{"text": "Interpret cardiac biomarkers and troponin", "intent": "lab_interpretation"}
-{"text": "Use SOFA calculator on this patient data", "intent": "sofa_score_calculation"}
-{"text": "Interpret these lab results for me", "intent": "lab_interpretation"}
-{"text": "Tell me about diabetes management", "intent": "general_clinical_query"}
-{"text": "High BUN and creatinine ratio - what's going on?", "intent": "lab_interpretation"}
-{"text": "Acute onset slurred speech and facial drooping", "intent": "emergency_alert", "subcategory": "neurological"}
-{"text": "Does metformin interact with lisinopril?", "intent": "drug_interaction_check"}
-{"text": "Protocol for managing acute renal failure", "intent": "clinical_guideline_lookup"}
-{"text": "Use the tool to assess organ dysfunction", "intent": "sofa_score_calculation"}
-{"text": "Show the standard operating procedure for patient handoff", "intent": "clinical_guideline_lookup"}
-{"text": "Acute stroke symptoms, time-critical intervention needed", "intent": "emergency_alert", "subcategory": "neurological"}
-{"text": "Export patient labs for last month", "intent": "patient_status_update"}
-{"text": "Run the sepsis screening tool", "intent": "sofa_score_calculation"}
-{"text": "Advanced cardiac life support guidelines", "intent": "clinical_guideline_lookup"}
-{"text": "Severe burn injury, airway compromise", "intent": "emergency_alert", "subcategory": "trauma"}
-{"text": "What are the recent values for this patient's labs?", "intent": "patient_status_update"}
-{"text": "ATLS protocol for trauma assessment", "intent": "clinical_guideline_lookup"}
-{"text": "What are the institutional protocols for acute stroke?", "intent": "clinical_guideline_lookup"}
-{"text": "Altered mental status and confusion", "intent": "emergency_alert", "subcategory": "neurological"}
-{"text": "Tell me about chronic obstructive pulmonary disease", "intent": "general_clinical_query"}
-{"text": "How does insulin work in the body?", "intent": "general_clinical_query"}
-{"text": "What is the clinical meaning of these values?", "intent": "lab_interpretation"}
-{"text": "Interpret these laboratory values", "intent": "lab_interpretation"}
-{"text": "Patient presenting with severe chest pain, diaphoresis, and shortness of breath", "intent": "emergency_alert", "subcategory": "cardiac"}
-{"text": "Fever 40C, tachycardia, hypotension, altered mental status", "intent": "emergency_alert", "subcategory": "sepsis"}
-{"text": "Pull up patient records", "intent": "patient_status_update"}
-{"text": "How do I use this app?", "intent": "general_clinical_query"}
-{"text": "Check drug interaction database", "intent": "drug_interaction_check"}
-{"text": "Interpret ABG values: pH 7.28, pCO2 50, pO2 60", "intent": "lab_interpretation"}
-{"text": "Show recent imaging results for this patient", "intent": "patient_status_update"}
-{"text": "I need to access patient previous hospitalizations", "intent": "patient_status_update"}
-{"text": "Severe dyspnea, oxygen saturation dropping", "intent": "emergency_alert", "subcategory": "respiratory"}
-{"text": "What medical schools teach this condition?", "intent": "general_clinical_query"}
-{"text": "Help me understand the coagulation study results", "intent": "lab_interpretation"}
-{"text": "Explain the pathophysiology of sepsis", "intent": "general_clinical_query"}
-{"text": "What do elevated liver enzymes indicate?", "intent": "lab_interpretation"}
-{"text": "What are the symptoms of acute coronary syndrome?", "intent": "general_clinical_query"}
-{"text": "Can you explain these abnormal lab findings?", "intent": "lab_interpretation"}
-{"text": "Check if these medications are contraindicated", "intent": "drug_interaction_check"}
-{"text": "Calculate SOFA score for this patient", "intent": "sofa_score_calculation"}
-{"text": "Show medication history for this patient", "intent": "patient_status_update"}
-{"text": "What is the significance of low platelet count?", "intent": "lab_interpretation"}
-{"text": "Access patient discharge summary", "intent": "discharge_planning"}
-{"text": "Institutional antibiotic protocol for pneumonia", "intent": "clinical_guideline_lookup"}
-{"text": "Please run a full drug interaction check", "intent": "drug_interaction_check"}
-{"text": "Septic shock with multi-organ failure", "intent": "emergency_alert", "subcategory": "sepsis"}
-{"text": "What is the sepsis protocol?", "intent": "clinical_guideline_lookup"}
-{"text": "What's the clinical significance of this INR value?", "intent": "lab_interpretation"}
-{"text": "Patient having seizure, loss of consciousness", "intent": "emergency_alert", "subcategory": "neurological"}
-{"text": "Explain the renin-angiotensin system", "intent": "general_clinical_query"}
-{"text": "What does elevated creatinine mean?", "intent": "lab_interpretation"}
-{"text": "What protocol should we use for difficult airway management?", "intent": "clinical_guideline_lookup"}
-{"text": "What's the guideline for managing hypertensive crisis?", "intent": "clinical_guideline_lookup"}
-{"text": "Chest pain radiating to left arm, ST elevation on EKG", "intent": "emergency_alert", "subcategory": "cardiac"}
-{"text": "Patient coding, starting chest compressions", "intent": "emergency_alert", "subcategory": "cardiac"}
-{"text": "Show patient allergy information", "intent": "patient_status_update"}
-{"text": "Is there an interaction between simvastatin and clarithromycin?", "intent": "drug_interaction_check"}
-{"text": "Assess organ dysfunction score for ICU admission", "intent": "sofa_score_calculation"}
-{"text": "Run qSOFA screening on this patient", "intent": "sofa_score_calculation"}
-{"text": "Order 500mg amoxicillin three times daily for this patient", "intent": "medication_order"}
-{"text": "Prescribe metformin 1000mg twice daily", "intent": "medication_order"}
-{"text": "Administer 4mg IV morphine for pain control", "intent": "medication_order"}
-{"text": "Start patient on lisinopril 10mg once daily", "intent": "medication_order"}
-{"text": "Increase insulin dose to 20 units at bedtime", "intent": "medication_order"}
-{"text": "Discontinue warfarin and switch to apixaban", "intent": "medication_order"}
-{"text": "Patient presents with fatigue, weight loss, and night sweats - differential diagnosis?", "intent": "diagnosis_support"}
-{"text": "What conditions should be considered for this patient's abdominal pain?", "intent": "diagnosis_support"}
-{"text": "Help me build a differential for unexplained syncope", "intent": "diagnosis_support"}
-{"text": "What's the likely diagnosis given these presenting symptoms?", "intent": "diagnosis_support"}
-{"text": "Assess this patient's history for possible autoimmune disease", "intent": "diagnosis_support"}
-{"text": "Differential diagnosis for chronic cough in a smoker", "intent": "diagnosis_support"}
-{"text": "Prepare discharge instructions for this patient", "intent": "discharge_planning"}
-{"text": "What follow-up care is needed after discharge?", "intent": "discharge_planning"}
-{"text": "Draft the discharge summary and home care plan", "intent": "discharge_planning"}
-{"text": "Is this patient ready to be discharged home?", "intent": "discharge_planning"}
-{"text": "Can I combine ibuprofen with lisinopril safely?", "intent": "drug_interaction_check"}
-{"text": "Screen this medication list for interactions", "intent": "drug_interaction_check"}
-{"text": "Is amiodarone safe to take with simvastatin?", "intent": "drug_interaction_check"}
-{"text": "Does this patient's regimen have any contraindicated combinations?", "intent": "drug_interaction_check"}
-{"text": "Interaction check between clopidogrel and omeprazole", "intent": "drug_interaction_check"}
-{"text": "Will grapefruit juice interact with this patient's calcium channel blocker?", "intent": "drug_interaction_check"}
-{"text": "What does a high anion gap indicate?", "intent": "lab_interpretation"}
-{"text": "Interpret this patient's thyroid panel", "intent": "lab_interpretation"}
-{"text": "Explain elevated D-dimer results", "intent": "lab_interpretation"}
-{"text": "What's the significance of a low sodium level?", "intent": "lab_interpretation"}
-{"text": "Review this CBC for abnormalities", "intent": "lab_interpretation"}
-{"text": "Compute the SOFA score from these vitals and labs", "intent": "sofa_score_calculation"}
-{"text": "What's this patient's organ dysfunction score?", "intent": "sofa_score_calculation"}
-{"text": "Run the qSOFA assessment", "intent": "sofa_score_calculation"}
-{"text": "Calculate multi-organ failure score for ICU triage", "intent": "sofa_score_calculation"}
-{"text": "Assess respiratory and renal SOFA components", "intent": "sofa_score_calculation"}
-{"text": "Score this patient's sepsis severity using SOFA criteria", "intent": "sofa_score_calculation"}
-{"text": "What's the recommended protocol for DKA management?", "intent": "clinical_guideline_lookup"}
-{"text": "Show me the guideline for anticoagulation reversal", "intent": "clinical_guideline_lookup"}
-{"text": "Look up the institutional policy for central line insertion", "intent": "clinical_guideline_lookup"}
-{"text": "What's the evidence-based approach to community-acquired pneumonia?", "intent": "clinical_guideline_lookup"}
-{"text": "What's this patient's current vital sign trend?", "intent": "patient_status_update"}
-{"text": "Update me on the patient in bed 12", "intent": "patient_status_update"}
-{"text": "Is the patient's condition improving or worsening?", "intent": "patient_status_update"}
-{"text": "Pull the latest vitals for this patient", "intent": "patient_status_update"}
-{"text": "Give me a status summary for this admission", "intent": "patient_status_update"}
-{"text": "Check on the patient's current clinical status", "intent": "patient_status_update"}
-{"text": "Anaphylaxis with airway swelling, epinephrine needed now", "intent": "emergency_alert", "subcategory": "respiratory"}
-{"text": "Suicidal ideation with a plan, patient in crisis", "intent": "emergency_alert", "subcategory": "psychiatric"}
-{"text": "Massive GI bleed, hypotensive and tachycardic", "intent": "emergency_alert"}
-{"text": "Acute agitation, danger to self and others", "intent": "emergency_alert", "subcategory": "psychiatric"}
-{"text": "Massive postpartum hemorrhage, patient crashing", "intent": "emergency_alert", "subcategory": "trauma"}
-{"text": "What are the risk factors for venous thromboembolism?", "intent": "general_clinical_query"}
-{"text": "Explain the mechanism of beta blockers", "intent": "general_clinical_query"}
-{"text": "What's the pathophysiology of heart failure?", "intent": "general_clinical_query"}
-{"text": "How is type 2 diabetes diagnosed?", "intent": "general_clinical_query"}
-{"text": "Coordinate home health services for this discharge", "intent": "discharge_planning"}
-{"text": "What discharge criteria has this patient met?", "intent": "discharge_planning"}
-{"text": "Schedule the follow-up appointment before discharge", "intent": "discharge_planning"}
-{"text": "Review discharge medication reconciliation", "intent": "discharge_planning"}
-{"text": "Titrate the heparin drip per protocol", "intent": "medication_order"}
-{"text": "Hold the patient's antihypertensives before surgery", "intent": "medication_order"}
-{"text": "Order a stat dose of naloxone", "intent": "medication_order"}
-{"text": "Adjust vancomycin dosing based on renal function", "intent": "medication_order"}
-{"text": "What's on the differential for acute abdominal pain in an elderly patient?", "intent": "diagnosis_support"}
-{"text": "Consider causes of unexplained weight loss", "intent": "diagnosis_support"}
-{"text": "Build a differential for new-onset ascites", "intent": "diagnosis_support"}
-{"text": "What should be ruled out for this patient's palpitations?", "intent": "diagnosis_support"}
-{"text": "Are these two blood thinners safe to prescribe together?", "intent": "drug_interaction_check"}
-{"text": "Check for interactions before starting this antibiotic", "intent": "drug_interaction_check"}
-{"text": "Is it safe to combine SSRIs with tramadol?", "intent": "drug_interaction_check"}
-{"text": "What happens if this patient takes both ACE inhibitors and potassium supplements?", "intent": "drug_interaction_check"}
-{"text": "Verify this new prescription against the patient's current medication list", "intent": "drug_interaction_check"}
-{"text": "Can I add azithromycin to a patient already on amiodarone?", "intent": "drug_interaction_check"}
-{"text": "Cross-check this drug list for QT-prolongation risk", "intent": "drug_interaction_check"}
-{"text": "Is there a dangerous interaction between MAOIs and this pain medication?", "intent": "drug_interaction_check"}
-{"text": "Double check compatibility of these IV medications", "intent": "drug_interaction_check"}
-{"text": "Are NSAIDs contraindicated with this patient's current regimen?", "intent": "drug_interaction_check"}
-{"text": "What's the risk of serotonin syndrome with this combination?", "intent": "drug_interaction_check"}
-{"text": "Review polypharmacy risk for this elderly patient's medication list", "intent": "drug_interaction_check"}
-{"text": "Does adding spironolactone pose a risk with this patient's ACE inhibitor?", "intent": "drug_interaction_check"}
-{"text": "Check for interactions with herbal supplements this patient is taking", "intent": "drug_interaction_check"}
-{"text": "Is co-administration of digoxin and amiodarone safe here?", "intent": "drug_interaction_check"}
-{"text": "What does an elevated white blood cell count suggest?", "intent": "lab_interpretation"}
-{"text": "Interpret this lipid panel for cardiovascular risk", "intent": "lab_interpretation"}
-{"text": "What's the significance of a positive troponin trend?", "intent": "lab_interpretation"}
-{"text": "Explain these blood gas results in context of respiratory failure", "intent": "lab_interpretation"}
-{"text": "What does a low hemoglobin and hematocrit indicate?", "intent": "lab_interpretation"}
-{"text": "Review this liver function panel for hepatotoxicity", "intent": "lab_interpretation"}
-{"text": "What's the meaning of an elevated lactate level?", "intent": "lab_interpretation"}
-{"text": "Interpret this urinalysis for signs of infection", "intent": "lab_interpretation"}
-{"text": "What does a prolonged PT/INR suggest?", "intent": "lab_interpretation"}
-{"text": "Explain the significance of elevated BNP levels", "intent": "lab_interpretation"}
-{"text": "What does a high CRP indicate in this context?", "intent": "lab_interpretation"}
-{"text": "Interpret these electrolyte panel results", "intent": "lab_interpretation"}
-{"text": "What's the clinical significance of microcytic anemia on this CBC?", "intent": "lab_interpretation"}
-{"text": "Explain this patient's abnormal renal function panel", "intent": "lab_interpretation"}
-{"text": "What does an elevated procalcitonin level suggest?", "intent": "lab_interpretation"}
-{"text": "Calculate the SOFA score using these ICU parameters", "intent": "sofa_score_calculation"}
-{"text": "What's this patient's total organ failure assessment score?", "intent": "sofa_score_calculation"}
-{"text": "Run the SOFA scoring tool for sepsis severity tracking", "intent": "sofa_score_calculation"}
-{"text": "Determine this patient's respiratory SOFA subscore", "intent": "sofa_score_calculation"}
-{"text": "Assess cardiovascular component of the SOFA score", "intent": "sofa_score_calculation"}
-{"text": "Score renal dysfunction using SOFA criteria", "intent": "sofa_score_calculation"}
-{"text": "Calculate the qSOFA score based on these vitals", "intent": "sofa_score_calculation"}
-{"text": "What's the coagulation component score for SOFA?", "intent": "sofa_score_calculation"}
-{"text": "Use the SOFA tool to track disease progression", "intent": "sofa_score_calculation"}
-{"text": "Compute hepatic dysfunction score under SOFA", "intent": "sofa_score_calculation"}
-{"text": "Run organ failure assessment for ICU admission criteria", "intent": "sofa_score_calculation"}
-{"text": "What's this patient's neurological SOFA subscore based on GCS?", "intent": "sofa_score_calculation"}
-{"text": "Calculate total SOFA score from these six organ systems", "intent": "sofa_score_calculation"}
-{"text": "Screen this patient using qSOFA for sepsis risk", "intent": "sofa_score_calculation"}
-{"text": "Assess multi-organ dysfunction severity using SOFA", "intent": "sofa_score_calculation"}
-{"text": "What's the current guideline for stroke thrombolysis timing?", "intent": "clinical_guideline_lookup"}
-{"text": "Show me the protocol for managing diabetic ketoacidosis", "intent": "clinical_guideline_lookup"}
-{"text": "What's the recommended approach for VTE prophylaxis?", "intent": "clinical_guideline_lookup"}
-{"text": "Look up the sepsis bundle compliance checklist", "intent": "clinical_guideline_lookup"}
-{"text": "What's the guideline for post-cardiac arrest management?", "intent": "clinical_guideline_lookup"}
-{"text": "Show the institutional protocol for blood transfusion", "intent": "clinical_guideline_lookup"}
-{"text": "What's the recommended treatment algorithm for STEMI?", "intent": "clinical_guideline_lookup"}
-{"text": "Look up the guideline for managing acute exacerbation of asthma", "intent": "clinical_guideline_lookup"}
-{"text": "What's the evidence-based protocol for delirium management?", "intent": "clinical_guideline_lookup"}
-{"text": "Show the institutional policy for restraint use", "intent": "clinical_guideline_lookup"}
-{"text": "What's the recommended approach to pain management in the ED?", "intent": "clinical_guideline_lookup"}
-{"text": "Look up the guideline for contrast-induced nephropathy prevention", "intent": "clinical_guideline_lookup"}
-{"text": "What's the protocol for managing severe hyperkalemia?", "intent": "clinical_guideline_lookup"}
-{"text": "Show the evidence-based approach to UTI treatment", "intent": "clinical_guideline_lookup"}
-{"text": "What's the institutional guideline for rapid response activation?", "intent": "clinical_guideline_lookup"}
-{"text": "What's the trend in this patient's oxygen saturation?", "intent": "patient_status_update"}
-{"text": "Give me an update on the patient's neuro checks", "intent": "patient_status_update"}
-{"text": "How has this patient's pain score changed over the shift?", "intent": "patient_status_update"}
-{"text": "Check the patient's intake and output for today", "intent": "patient_status_update"}
-{"text": "What's the latest on this patient's wound healing progress?", "intent": "patient_status_update"}
-{"text": "Review this patient's fluid balance over the last 24 hours", "intent": "patient_status_update"}
-{"text": "Is this patient's fever trending down?", "intent": "patient_status_update"}
-{"text": "What's the current status of the patient in room 204?", "intent": "patient_status_update"}
-{"text": "Show me this patient's vital sign history since admission", "intent": "patient_status_update"}
-{"text": "Has the patient's mental status changed since this morning?", "intent": "patient_status_update"}
-{"text": "Update on the patient's post-op recovery status", "intent": "patient_status_update"}
-{"text": "What's this patient's current pain management status?", "intent": "patient_status_update"}
-{"text": "Check if the patient's blood pressure has stabilized", "intent": "patient_status_update"}
-{"text": "Give me a summary of overnight events for this patient", "intent": "patient_status_update"}
-{"text": "What's the current fall risk status for this patient?", "intent": "patient_status_update"}
-{"text": "Patient unresponsive, not breathing, pulse absent", "intent": "emergency_alert", "subcategory": "respiratory"}
-{"text": "Massive stroke symptoms with hemiparesis and aphasia", "intent": "emergency_alert", "subcategory": "neurological"}
-{"text": "Anaphylactic reaction with stridor and hypotension", "intent": "emergency_alert", "subcategory": "respiratory"}
-{"text": "Active suicide attempt, patient found unresponsive", "intent": "emergency_alert", "subcategory": "psychiatric"}
-{"text": "Penetrating chest trauma with hemodynamic instability", "intent": "emergency_alert", "subcategory": "trauma"}
-{"text": "Diabetic ketoacidosis with severe altered mental status", "intent": "emergency_alert"}
-{"text": "Tension pneumothorax with tracheal deviation", "intent": "emergency_alert", "subcategory": "respiratory"}
-{"text": "Status epilepticus, continuous seizure activity", "intent": "emergency_alert", "subcategory": "neurological"}
-{"text": "Severe upper GI hemorrhage with hematemesis", "intent": "emergency_alert"}
-{"text": "Acute limb ischemia with absent pulses", "intent": "emergency_alert"}
-{"text": "Third-degree AV block with hemodynamic compromise", "intent": "emergency_alert", "subcategory": "cardiac"}
-{"text": "Eclampsia with seizures in pregnant patient", "intent": "emergency_alert", "subcategory": "neurological"}
-{"text": "Severe hypoglycemia with unresponsiveness", "intent": "emergency_alert"}
-{"text": "Acute aortic dissection with tearing chest pain", "intent": "emergency_alert", "subcategory": "cardiac"}
-{"text": "Homicidal ideation with immediate danger to others", "intent": "emergency_alert", "subcategory": "psychiatric"}
-{"text": "What's the mechanism of action of ACE inhibitors?", "intent": "general_clinical_query"}
-{"text": "Explain the Frank-Starling mechanism", "intent": "general_clinical_query"}
-{"text": "How does the coagulation cascade work?", "intent": "general_clinical_query"}
-{"text": "What causes metabolic acidosis?", "intent": "general_clinical_query"}
-{"text": "Explain the pathophysiology of asthma", "intent": "general_clinical_query"}
-{"text": "What are the stages of chronic kidney disease?", "intent": "general_clinical_query"}
-{"text": "How does the renin-angiotensin-aldosterone system regulate blood pressure?", "intent": "general_clinical_query"}
-{"text": "What's the difference between type 1 and type 2 diabetes?", "intent": "general_clinical_query"}
-{"text": "Explain how beta-agonists work in bronchodilation", "intent": "general_clinical_query"}
-{"text": "What causes hyponatremia?", "intent": "general_clinical_query"}
-{"text": "How does insulin resistance develop?", "intent": "general_clinical_query"}
-{"text": "Explain the pathophysiology of atrial fibrillation", "intent": "general_clinical_query"}
-{"text": "What are common causes of anemia?", "intent": "general_clinical_query"}
-{"text": "How does the immune system respond to sepsis?", "intent": "general_clinical_query"}
-{"text": "What's the mechanism behind statin-induced myopathy?", "intent": "general_clinical_query"}
-{"text": "What home care services does this patient need post-discharge?", "intent": "discharge_planning"}
-{"text": "Is this patient a candidate for early discharge?", "intent": "discharge_planning"}
-{"text": "Coordinate durable medical equipment for this discharge", "intent": "discharge_planning"}
-{"text": "What discharge education has been completed for this patient?", "intent": "discharge_planning"}
-{"text": "Arrange transportation for this patient's discharge", "intent": "discharge_planning"}
-{"text": "Review discharge readiness criteria for this admission", "intent": "discharge_planning"}
-{"text": "What follow-up labs are needed after discharge?", "intent": "discharge_planning"}
-{"text": "Prepare a discharge summary with medication changes", "intent": "discharge_planning"}
-{"text": "Coordinate skilled nursing facility placement for discharge", "intent": "discharge_planning"}
-{"text": "What's the discharge disposition plan for this patient?", "intent": "discharge_planning"}
-{"text": "Schedule home health nursing visits post-discharge", "intent": "discharge_planning"}
-{"text": "Review barriers to safe discharge for this patient", "intent": "discharge_planning"}
-{"text": "Finalize discharge medication reconciliation", "intent": "discharge_planning"}
-{"text": "What's the anticipated discharge date for this patient?", "intent": "discharge_planning"}
-{"text": "Coordinate discharge planning with social work", "intent": "discharge_planning"}
-{"text": "Order IV fluids at 125 mL per hour", "intent": "medication_order"}
-{"text": "Start empiric antibiotics for suspected sepsis", "intent": "medication_order"}
-{"text": "Order a stat dose of furosemide 40mg IV", "intent": "medication_order"}
-{"text": "Prescribe a PRN order for breakthrough pain", "intent": "medication_order"}
-{"text": "Order weight-based heparin dosing for this patient", "intent": "medication_order"}
-{"text": "Adjust the insulin sliding scale for this patient", "intent": "medication_order"}
-{"text": "Order antiemetics for post-op nausea", "intent": "medication_order"}
-{"text": "Start DVT prophylaxis with enoxaparin", "intent": "medication_order"}
-{"text": "Order a one-time dose of vitamin K for reversal", "intent": "medication_order"}
-{"text": "Prescribe albuterol nebulizer treatments every 4 hours", "intent": "medication_order"}
-{"text": "Order stress-dose steroids for this patient", "intent": "medication_order"}
-{"text": "Discontinue the patient's home blood pressure medications", "intent": "medication_order"}
-{"text": "Order a taper schedule for this patient's steroids", "intent": "medication_order"}
-{"text": "Start broad-spectrum antibiotics pending culture results", "intent": "medication_order"}
-{"text": "Order repeat dosing of pain medication per protocol", "intent": "medication_order"}
-{"text": "What's the differential for acute onset dyspnea?", "intent": "diagnosis_support"}
-{"text": "Consider causes of recurrent syncope in this patient", "intent": "diagnosis_support"}
-{"text": "What conditions cause both hypertension and tachycardia?", "intent": "diagnosis_support"}
-{"text": "Build a differential for new-onset jaundice", "intent": "diagnosis_support"}
-{"text": "What should be considered for unexplained fever in this patient?", "intent": "diagnosis_support"}
-{"text": "Differential diagnosis for bilateral lower extremity edema", "intent": "diagnosis_support"}
-{"text": "What conditions present with this constellation of symptoms?", "intent": "diagnosis_support"}
-{"text": "Consider secondary causes of this patient's hypertension", "intent": "diagnosis_support"}
-{"text": "What's the differential for acute kidney injury in this case?", "intent": "diagnosis_support"}
-{"text": "Help me think through causes of this patient's altered mental status", "intent": "diagnosis_support"}
-{"text": "What are possible causes of this patient's chronic diarrhea", "intent": "diagnosis_support"}
-{"text": "Differential for new-onset atrial fibrillation in a young patient", "intent": "diagnosis_support"}
-{"text": "What conditions should be ruled out for this chest pain presentation?", "intent": "diagnosis_support"}
-{"text": "Consider causes of unexplained hypoglycemia", "intent": "diagnosis_support"}
-{"text": "What's the differential for a patient with hemoptysis?", "intent": "diagnosis_support"}
-{"text": "Would this patient's new antibiotic conflict with their existing medications?", "intent": "drug_interaction_check"}
-{"text": "This patient is on warfarin - is adding aspirin risky?", "intent": "drug_interaction_check"}
-{"text": "Flag any interactions in this discharge medication list", "intent": "drug_interaction_check"}
-{"text": "Two antihypertensives and a diuretic - any concerning combos here?", "intent": "drug_interaction_check"}
-{"text": "This patient just started chemo - check for drug conflicts", "intent": "drug_interaction_check"}
-{"text": "Interaction alert needed before administering this contrast dye", "intent": "drug_interaction_check"}
-{"text": "Combining lithium with an ACE inhibitor - is that a problem?", "intent": "drug_interaction_check"}
-{"text": "This elderly patient takes 12 medications - run a full interaction audit", "intent": "drug_interaction_check"}
-{"text": "Is tramadol safe alongside this patient's antidepressant?", "intent": "drug_interaction_check"}
-{"text": "Before I give this vaccine, check for medication conflicts", "intent": "drug_interaction_check"}
-{"text": "New order for ketorolac - any conflicts with home meds?", "intent": "drug_interaction_check"}
-{"text": "This patient's pharmacy flagged a possible interaction - can you confirm?", "intent": "drug_interaction_check"}
-{"text": "Combining beta blockers with calcium channel blockers here - safe?", "intent": "drug_interaction_check"}
-{"text": "Patient wants to know if their supplement interacts with blood thinners", "intent": "drug_interaction_check"}
-{"text": "Verify safety of starting rifampin with this patient's HIV regimen", "intent": "drug_interaction_check"}
-{"text": "Is there a risk combining opioids with benzodiazepines for this patient?", "intent": "drug_interaction_check"}
-{"text": "Check compatibility before mixing these two IV drips", "intent": "drug_interaction_check"}
-{"text": "This patient's new anticoagulant - any conflict with their aspirin?", "intent": "drug_interaction_check"}
-{"text": "Pharmacist wants an interaction check before dispensing", "intent": "drug_interaction_check"}
-{"text": "Does adding this antifungal risk toxicity with the current statin?", "intent": "drug_interaction_check"}
-{"text": "This patient's potassium came back at 6.2 - what does that mean?", "intent": "lab_interpretation"}
-{"text": "Explain what a shifted left differential indicates", "intent": "lab_interpretation"}
-{"text": "The troponin is trending up - what's the clinical picture?", "intent": "lab_interpretation"}
-{"text": "What's the interpretation of this arterial blood gas?", "intent": "lab_interpretation"}
-{"text": "Sodium of 118 - walk me through the significance", "intent": "lab_interpretation"}
-{"text": "This patient's ferritin is elevated - what should I consider?", "intent": "lab_interpretation"}
-{"text": "Break down this comprehensive metabolic panel for me", "intent": "lab_interpretation"}
-{"text": "What does a rising creatinine over 3 days suggest?", "intent": "lab_interpretation"}
-{"text": "Explain the meaning of this patient's hemoglobin A1c result", "intent": "lab_interpretation"}
-{"text": "This patient's WBC count doubled overnight - interpret that", "intent": "lab_interpretation"}
-{"text": "What's the clinical takeaway from this coagulation panel?", "intent": "lab_interpretation"}
-{"text": "Elevated amylase and lipase - what does that point to?", "intent": "lab_interpretation"}
-{"text": "This patient's calcium is critically low - explain the labs", "intent": "lab_interpretation"}
-{"text": "What does a low albumin with high globulin suggest?", "intent": "lab_interpretation"}
-{"text": "Interpret this newborn's bilirubin level", "intent": "lab_interpretation"}
-{"text": "The patient's magnesium is low - what's the significance?", "intent": "lab_interpretation"}
-{"text": "Explain this abnormal peripheral blood smear finding", "intent": "lab_interpretation"}
-{"text": "What's the clinical meaning behind this elevated ESR?", "intent": "lab_interpretation"}
-{"text": "This patient's blood culture came back positive - what next in interpretation?", "intent": "lab_interpretation"}
-{"text": "Break down what this patient's urine protein-to-creatinine ratio means", "intent": "lab_interpretation"}
-{"text": "This patient needs vasopressors - factor that into the SOFA score", "intent": "sofa_score_calculation"}
-{"text": "Recalculate SOFA now that the patient is intubated", "intent": "sofa_score_calculation"}
-{"text": "What's the platelet component contributing to this SOFA score?", "intent": "sofa_score_calculation"}
-{"text": "Track this patient's SOFA trend over the last 48 hours", "intent": "sofa_score_calculation"}
-{"text": "Determine if this patient meets sepsis-3 criteria via SOFA", "intent": "sofa_score_calculation"}
-{"text": "Update the SOFA score after the latest labs came back", "intent": "sofa_score_calculation"}
-{"text": "Is this patient's SOFA score trending toward multi-organ failure?", "intent": "sofa_score_calculation"}
-{"text": "Calculate SOFA including the new bilirubin result", "intent": "sofa_score_calculation"}
-{"text": "What's the bilirubin contribution to this patient's SOFA score?", "intent": "sofa_score_calculation"}
-{"text": "Reassess SOFA score after starting dialysis", "intent": "sofa_score_calculation"}
-{"text": "Score this patient's mean arterial pressure component for SOFA", "intent": "sofa_score_calculation"}
-{"text": "Does this patient's GCS change their SOFA score?", "intent": "sofa_score_calculation"}
-{"text": "Run the SOFA calculation with today's ventilator settings", "intent": "sofa_score_calculation"}
-{"text": "What's this ICU patient's baseline SOFA on admission?", "intent": "sofa_score_calculation"}
-{"text": "Compare this patient's SOFA score day 1 versus day 3", "intent": "sofa_score_calculation"}
-{"text": "Factor in the new creatinine for an updated SOFA score", "intent": "sofa_score_calculation"}
-{"text": "Is a SOFA score increase of 2 clinically significant here?", "intent": "sofa_score_calculation"}
-{"text": "Calculate the SOFA score for sepsis screening in the ED", "intent": "sofa_score_calculation"}
-{"text": "What's this patient's SOFA-based mortality risk estimate?", "intent": "sofa_score_calculation"}
-{"text": "Assess if this patient qualifies for septic shock via SOFA criteria", "intent": "sofa_score_calculation"}
-{"text": "What does the guideline say about early goal-directed therapy?", "intent": "clinical_guideline_lookup"}
-{"text": "Show the recommended workup for suspected pulmonary embolism", "intent": "clinical_guideline_lookup"}
-{"text": "What's the institutional pathway for chest pain rule-out?", "intent": "clinical_guideline_lookup"}
-{"text": "Look up recommended ventilator settings for ARDS", "intent": "clinical_guideline_lookup"}
-{"text": "What's the guideline-based approach to febrile neutropenia?", "intent": "clinical_guideline_lookup"}
-{"text": "Show the protocol for managing thyroid storm", "intent": "clinical_guideline_lookup"}
-{"text": "What's recommended for reversal of direct oral anticoagulants?", "intent": "clinical_guideline_lookup"}
-{"text": "Look up the pathway for suspected necrotizing fasciitis", "intent": "clinical_guideline_lookup"}
-{"text": "What's the evidence-based approach to alcohol withdrawal management?", "intent": "clinical_guideline_lookup"}
-{"text": "Show the institutional protocol for massive transfusion", "intent": "clinical_guideline_lookup"}
-{"text": "What's the guideline for managing hypertensive emergency in pregnancy?", "intent": "clinical_guideline_lookup"}
-{"text": "Look up recommended antibiotic duration for bacteremia", "intent": "clinical_guideline_lookup"}
-{"text": "What's the pathway for suspected acute compartment syndrome?", "intent": "clinical_guideline_lookup"}
-{"text": "Show the guideline for post-intubation sedation management", "intent": "clinical_guideline_lookup"}
-{"text": "What's recommended for treating serotonin syndrome?", "intent": "clinical_guideline_lookup"}
-{"text": "Look up the institutional sepsis alert escalation protocol", "intent": "clinical_guideline_lookup"}
-{"text": "What's the guideline-based fluid resuscitation strategy for burns?", "intent": "clinical_guideline_lookup"}
-{"text": "Show the recommended approach to refractory status epilepticus", "intent": "clinical_guideline_lookup"}
-{"text": "What's the pathway for evaluating suspected acute mesenteric ischemia?", "intent": "clinical_guideline_lookup"}
-{"text": "Look up the guideline for perioperative anticoagulation management", "intent": "clinical_guideline_lookup"}
-{"text": "Has this patient spiked a fever in the last hour?", "intent": "patient_status_update"}
-{"text": "What's the current Glasgow Coma Scale for this patient?", "intent": "patient_status_update"}
-{"text": "Check this patient's urine output over the last shift", "intent": "patient_status_update"}
-{"text": "Is the patient tolerating the oxygen weaning trial?", "intent": "patient_status_update"}
-{"text": "What's this patient's current sedation level?", "intent": "patient_status_update"}
-{"text": "Any change in this patient's wound drainage since this morning?", "intent": "patient_status_update"}
-{"text": "Check if this patient has passed flatus post-surgery", "intent": "patient_status_update"}
-{"text": "What's the latest ventilator weaning progress for this patient?", "intent": "patient_status_update"}
-{"text": "Has the patient's delirium screening changed today?", "intent": "patient_status_update"}
-{"text": "Give me the nursing update from the last shift change", "intent": "patient_status_update"}
-{"text": "What's this patient's current line and tube status?", "intent": "patient_status_update"}
-{"text": "Check if the patient's chest tube output has decreased", "intent": "patient_status_update"}
-{"text": "Is this patient ambulating independently yet?", "intent": "patient_status_update"}
-{"text": "What's the current status of this patient's pressure injury?", "intent": "patient_status_update"}
-{"text": "Has this patient's anticoagulation reversed per the latest labs?", "intent": "patient_status_update"}
-{"text": "Check the current telemetry rhythm for this patient", "intent": "patient_status_update"}
-{"text": "What's this patient's tolerance to the new diet order?", "intent": "patient_status_update"}
-{"text": "Give me the current isolation precaution status for this patient", "intent": "patient_status_update"}
-{"text": "Has the patient's restraint order been reassessed today?", "intent": "patient_status_update"}
-{"text": "What's the latest update on this patient's code status discussion?", "intent": "patient_status_update"}
-{"text": "Massive hemoptysis, patient unable to protect airway", "intent": "emergency_alert", "subcategory": "respiratory"}
-{"text": "Witnessed cardiac arrest, initiating ACLS protocol", "intent": "emergency_alert", "subcategory": "cardiac"}
-{"text": "Rapidly expanding neck hematoma post-thyroidectomy", "intent": "emergency_alert", "subcategory": "trauma"}
-{"text": "Ruptured ectopic pregnancy with hemodynamic instability", "intent": "emergency_alert"}
-{"text": "Severe angioedema with impending airway obstruction", "intent": "emergency_alert", "subcategory": "respiratory"}
-{"text": "New onset hemiplegia with slurred speech, last known well 30 minutes ago", "intent": "emergency_alert", "subcategory": "neurological"}
-{"text": "Crush injury with suspected compartment syndrome", "intent": "emergency_alert", "subcategory": "trauma"}
-{"text": "Patient found down, unknown downtime, in asystole", "intent": "emergency_alert", "subcategory": "cardiac"}
-{"text": "Severe DKA with Kussmaul breathing and obtundation", "intent": "emergency_alert"}
-{"text": "Acute limb threatening ischemia after arterial line removal", "intent": "emergency_alert"}
-{"text": "Postictal patient with ongoing status epilepticus risk", "intent": "emergency_alert", "subcategory": "neurological"}
-{"text": "Massive PE with hypotension and hypoxia", "intent": "emergency_alert", "subcategory": "respiratory"}
-{"text": "Homicidal patient actively threatening staff", "intent": "emergency_alert", "subcategory": "psychiatric"}
-{"text": "Severe traumatic brain injury with blown pupil", "intent": "emergency_alert", "subcategory": "trauma"}
-{"text": "Anaphylaxis progressing despite initial epinephrine dose", "intent": "emergency_alert", "subcategory": "respiratory"}
-{"text": "Acute mesenteric ischemia with peritoneal signs", "intent": "emergency_alert"}
-{"text": "Newborn with respiratory distress and cyanosis", "intent": "emergency_alert", "subcategory": "respiratory"}
-{"text": "Patient actively hemorrhaging from surgical site", "intent": "emergency_alert", "subcategory": "trauma"}
-{"text": "Ventricular tachycardia with loss of pulse", "intent": "emergency_alert", "subcategory": "cardiac"}
-{"text": "Severe hyperkalemia with peaked T waves on EKG", "intent": "emergency_alert", "subcategory": "cardiac"}
-{"text": "What's the difference between systolic and diastolic heart failure?", "intent": "general_clinical_query"}
-{"text": "How does the Frank-Starling law apply to cardiac output?", "intent": "general_clinical_query"}
-{"text": "What causes a widened pulse pressure?", "intent": "general_clinical_query"}
-{"text": "Explain the pathophysiology of nephrotic syndrome", "intent": "general_clinical_query"}
-{"text": "What's the mechanism behind aspirin's antiplatelet effect?", "intent": "general_clinical_query"}
-{"text": "How does the body compensate for chronic respiratory acidosis?", "intent": "general_clinical_query"}
-{"text": "What's the pathophysiology behind DKA?", "intent": "general_clinical_query"}
-{"text": "Explain how loop diuretics work on the nephron", "intent": "general_clinical_query"}
-{"text": "What causes a shift to the left in oxygen dissociation?", "intent": "general_clinical_query"}
-{"text": "How does the vagus nerve influence heart rate?", "intent": "general_clinical_query"}
-{"text": "What's the mechanism of statin-related liver toxicity?", "intent": "general_clinical_query"}
-{"text": "Explain the pathophysiology of Guillain-Barre syndrome", "intent": "general_clinical_query"}
-{"text": "What causes hepatic encephalopathy?", "intent": "general_clinical_query"}
-{"text": "How does the kidney regulate acid-base balance?", "intent": "general_clinical_query"}
-{"text": "What's the mechanism behind heparin-induced thrombocytopenia?", "intent": "general_clinical_query"}
-{"text": "Explain how sepsis leads to distributive shock", "intent": "general_clinical_query"}
-{"text": "What causes refeeding syndrome?", "intent": "general_clinical_query"}
-{"text": "How does aldosterone affect potassium regulation?", "intent": "general_clinical_query"}
-{"text": "What's the pathophysiology of pre-eclampsia?", "intent": "general_clinical_query"}
-{"text": "Explain the mechanism behind tumor lysis syndrome", "intent": "general_clinical_query"}
-{"text": "What's the plan for wound care after this patient goes home?", "intent": "discharge_planning"}
-{"text": "Does this patient need outpatient physical therapy after discharge?", "intent": "discharge_planning"}
-{"text": "Arrange a discharge follow-up call within 48 hours", "intent": "discharge_planning"}
-{"text": "What are the red-flag symptoms to counsel this patient on before discharge?", "intent": "discharge_planning"}
-{"text": "Is a repeat chest X-ray needed before discharge clearance?", "intent": "discharge_planning"}
-{"text": "Coordinate interpreter services for discharge instructions", "intent": "discharge_planning"}
-{"text": "What's the plan for continuing IV antibiotics after discharge?", "intent": "discharge_planning"}
-{"text": "Review this patient's readiness for outpatient management", "intent": "discharge_planning"}
-{"text": "Schedule a cardiology follow-up before this patient leaves", "intent": "discharge_planning"}
-{"text": "What durable medical equipment should go home with this patient?", "intent": "discharge_planning"}
-{"text": "Confirm this patient has a safe place to go after discharge", "intent": "discharge_planning"}
-{"text": "Arrange caregiver education before sending this patient home", "intent": "discharge_planning"}
-{"text": "What's the anticoagulation bridging plan after discharge?", "intent": "discharge_planning"}
-{"text": "Coordinate with case management on discharge barriers", "intent": "discharge_planning"}
-{"text": "Is this patient stable enough for same-day discharge?", "intent": "discharge_planning"}
-{"text": "What follow-up imaging is needed after this patient leaves?", "intent": "discharge_planning"}
-{"text": "Review the discharge checklist for this admission", "intent": "discharge_planning"}
-{"text": "Arrange a wheelchair van for this patient's discharge", "intent": "discharge_planning"}
-{"text": "What's the plan for weaning steroids after discharge?", "intent": "discharge_planning"}
-{"text": "Confirm pharmacy has the discharge prescriptions ready", "intent": "discharge_planning"}
-{"text": "Start a bicarbonate drip for this patient's acidosis", "intent": "medication_order"}
-{"text": "Order scheduled acetaminophen for fever control", "intent": "medication_order"}
-{"text": "Begin a fentanyl patch for chronic pain management", "intent": "medication_order"}
-{"text": "Order potassium repletion per the sliding scale protocol", "intent": "medication_order"}
-{"text": "Start empiric antifungal coverage for this patient", "intent": "medication_order"}
-{"text": "Order a magnesium sulfate infusion for this patient", "intent": "medication_order"}
-{"text": "Prescribe a bowel regimen for this post-op patient", "intent": "medication_order"}
-{"text": "Start levothyroxine replacement for this patient", "intent": "medication_order"}
-{"text": "Order a one-time dose of ondansetron before the procedure", "intent": "medication_order"}
-{"text": "Begin a norepinephrine drip titrated to MAP goal", "intent": "medication_order"}
-{"text": "Order thromboprophylaxis with sequential compression devices and heparin", "intent": "medication_order"}
-{"text": "Start oral rehydration therapy for this patient", "intent": "medication_order"}
-{"text": "Prescribe a statin for secondary prevention", "intent": "medication_order"}
-{"text": "Order stress ulcer prophylaxis for this ICU patient", "intent": "medication_order"}
-{"text": "Begin weaning the propofol infusion", "intent": "medication_order"}
-{"text": "Order a repeat dose of the antiepileptic for breakthrough seizure", "intent": "medication_order"}
-{"text": "Start topical treatment for this patient's pressure injury", "intent": "medication_order"}
-{"text": "Order IV iron replacement for this patient's anemia", "intent": "medication_order"}
-{"text": "Prescribe an inhaled corticosteroid for maintenance therapy", "intent": "medication_order"}
-{"text": "Begin antiviral therapy for this patient's diagnosis", "intent": "medication_order"}
-{"text": "What's the differential for a young patient presenting with palpitations and diaphoresis?", "intent": "diagnosis_support"}
-{"text": "Consider causes of acute vision loss in this patient", "intent": "diagnosis_support"}
-{"text": "What conditions should be on the differential for hemoptysis?", "intent": "diagnosis_support"}
-{"text": "Build a differential for a patient with fever and joint pain", "intent": "diagnosis_support"}
-{"text": "What could explain this patient's unexplained bruising?", "intent": "diagnosis_support"}
-{"text": "Consider the differential for acute urinary retention", "intent": "diagnosis_support"}
-{"text": "What conditions present with both weight loss and diarrhea?", "intent": "diagnosis_support"}
-{"text": "Help me think through causes of this patient's new-onset confusion", "intent": "diagnosis_support"}
-{"text": "What's the differential for a child with fever and rash?", "intent": "diagnosis_support"}
-{"text": "Consider causes of this patient's recurrent falls", "intent": "diagnosis_support"}
-{"text": "What conditions should be ruled out for this patient's dizziness?", "intent": "diagnosis_support"}
-{"text": "Build a differential for postpartum fever", "intent": "diagnosis_support"}
-{"text": "What's on the differential for a patient with jaw pain and diaphoresis?", "intent": "diagnosis_support"}
-{"text": "Consider causes of this patient's unexplained hypotension", "intent": "diagnosis_support"}
-{"text": "What conditions present with both headache and neck stiffness?", "intent": "diagnosis_support"}
-{"text": "Help me build a differential for acute vision changes with headache", "intent": "diagnosis_support"}
-{"text": "What's the likely cause of this patient's new heart murmur?", "intent": "diagnosis_support"}
-{"text": "Consider secondary causes of this patient's failure to thrive", "intent": "diagnosis_support"}
-{"text": "What conditions should be considered for a swollen, painful joint?", "intent": "diagnosis_support"}
-{"text": "Build a differential for a patient with chronic fatigue and pallor", "intent": "diagnosis_support"}
+{"text":"What medical schools teach this condition?","intent":"general_clinical_query"}
+{"text":"What causes a shift to the left in oxygen dissociation?","intent":"general_clinical_query"}
+{"text":"How does the immune system respond to sepsis?","intent":"general_clinical_query"}
+{"text":"Explain the mechanism of beta blockers","intent":"general_clinical_query"}
+{"text":"What's the mechanism of action of ACE inhibitors?","intent":"general_clinical_query"}
+{"text":"What causes hypertension?","intent":"general_clinical_query"}
+{"text":"How does insulin resistance develop?","intent":"general_clinical_query"}
+{"text":"How does the coagulation cascade work?","intent":"general_clinical_query"}
+{"text":"How is type 2 diabetes diagnosed?","intent":"general_clinical_query"}
+{"text":"What's the mechanism of statin-related liver toxicity?","intent":"general_clinical_query"}
+{"text":"Tell me about diabetes management","intent":"general_clinical_query"}
+{"text":"Explain the pathophysiology of sepsis","intent":"general_clinical_query"}
+{"text":"Explain the Frank-Starling mechanism","intent":"general_clinical_query"}
+{"text":"What's the difference between type 1 and type 2 diabetes?","intent":"general_clinical_query"}
+{"text":"What causes metabolic acidosis?","intent":"general_clinical_query"}
+{"text":"What causes hyponatremia?","intent":"general_clinical_query"}
+{"text":"What's the mechanism behind heparin-induced thrombocytopenia?","intent":"general_clinical_query"}
+{"text":"How does the Frank-Starling law apply to cardiac output?","intent":"general_clinical_query"}
+{"text":"What's the pathophysiology of heart failure?","intent":"general_clinical_query"}
+{"text":"How does the renin-angiotensin-aldosterone system regulate blood pressure?","intent":"general_clinical_query"}
+{"text":"What causes a widened pulse pressure?","intent":"general_clinical_query"}
+{"text":"Explain how beta-agonists work in bronchodilation","intent":"general_clinical_query"}
+{"text":"What are the symptoms of acute coronary syndrome?","intent":"general_clinical_query"}
+{"text":"What's the mechanism behind aspirin's antiplatelet effect?","intent":"general_clinical_query"}
+{"text":"What's the pathophysiology behind DKA?","intent":"general_clinical_query"}
+{"text":"How does insulin work in the body?","intent":"general_clinical_query"}
+{"text":"How does the vagus nerve influence heart rate?","intent":"general_clinical_query"}
+{"text":"What are the stages of chronic kidney disease?","intent":"general_clinical_query"}
+{"text":"Tell me about chronic obstructive pulmonary disease","intent":"general_clinical_query"}
+{"text":"Explain the renin-angiotensin system","intent":"general_clinical_query"}
+{"text":"Explain how sepsis leads to distributive shock","intent":"general_clinical_query"}
+{"text":"Explain the pathophysiology of nephrotic syndrome","intent":"general_clinical_query"}
+{"text":"What's the difference between systolic and diastolic heart failure?","intent":"general_clinical_query"}
+{"text":"What causes hepatic encephalopathy?","intent":"general_clinical_query"}
+{"text":"How does aldosterone affect potassium regulation?","intent":"general_clinical_query"}
+{"text":"Explain how loop diuretics work on the nephron","intent":"general_clinical_query"}
+{"text":"Explain the pathophysiology of asthma","intent":"general_clinical_query"}
+{"text":"Explain the pathophysiology of atrial fibrillation","intent":"general_clinical_query"}
+{"text":"What's the recommended protocol for DKA management?","intent":"clinical_guideline_lookup"}
+{"text":"Show the institutional protocol for blood transfusion","intent":"clinical_guideline_lookup"}
+{"text":"What's the institutional guideline for rapid response activation?","intent":"clinical_guideline_lookup"}
+{"text":"What's the current guideline for stroke thrombolysis timing?","intent":"clinical_guideline_lookup"}
+{"text":"Look up the institutional sepsis alert escalation protocol","intent":"clinical_guideline_lookup"}
+{"text":"Look up the guideline for managing acute exacerbation of asthma","intent":"clinical_guideline_lookup"}
+{"text":"What's recommended for treating serotonin syndrome?","intent":"clinical_guideline_lookup"}
+{"text":"What's the evidence-based approach to community-acquired pneumonia?","intent":"clinical_guideline_lookup"}
+{"text":"Look up recommended ventilator settings for ARDS","intent":"clinical_guideline_lookup"}
+{"text":"Show the evidence-based approach to UTI treatment","intent":"clinical_guideline_lookup"}
+{"text":"Show the guideline for post-intubation sedation management","intent":"clinical_guideline_lookup"}
+{"text":"What's the recommended approach for VTE prophylaxis?","intent":"clinical_guideline_lookup"}
+{"text":"What's the evidence-based approach to alcohol withdrawal management?","intent":"clinical_guideline_lookup"}
+{"text":"Show the institutional policy for restraint use","intent":"clinical_guideline_lookup"}
+{"text":"What's the guideline for post-cardiac arrest management?","intent":"clinical_guideline_lookup"}
+{"text":"What's the institutional pathway for chest pain rule-out?","intent":"clinical_guideline_lookup"}
+{"text":"What's the recommended treatment algorithm for STEMI?","intent":"clinical_guideline_lookup"}
+{"text":"What's recommended for reversal of direct oral anticoagulants?","intent":"clinical_guideline_lookup"}
+{"text":"What's the guideline for managing hypertensive emergency in pregnancy?","intent":"clinical_guideline_lookup"}
+{"text":"Look up the guideline for contrast-induced nephropathy prevention","intent":"clinical_guideline_lookup"}
+{"text":"Show me the protocol for managing diabetic ketoacidosis","intent":"clinical_guideline_lookup"}
+{"text":"What are the institutional protocols for acute stroke?","intent":"clinical_guideline_lookup"}
+{"text":"Advanced cardiac life support guidelines","intent":"clinical_guideline_lookup"}
+{"text":"Show the protocol for managing thyroid storm","intent":"clinical_guideline_lookup"}
+{"text":"Protocol for managing acute renal failure","intent":"clinical_guideline_lookup"}
+{"text":"What's the guideline-based approach to febrile neutropenia?","intent":"clinical_guideline_lookup"}
+{"text":"Look up the institutional policy for central line insertion","intent":"clinical_guideline_lookup"}
+{"text":"What's the pathway for suspected acute compartment syndrome?","intent":"clinical_guideline_lookup"}
+{"text":"What's the protocol for managing severe hyperkalemia?","intent":"clinical_guideline_lookup"}
+{"text":"Look up the pathway for suspected necrotizing fasciitis","intent":"clinical_guideline_lookup"}
+{"text":"Show me the guideline for anticoagulation reversal","intent":"clinical_guideline_lookup"}
+{"text":"Show the standard operating procedure for patient handoff","intent":"clinical_guideline_lookup"}
+{"text":"Show the recommended workup for suspected pulmonary embolism","intent":"clinical_guideline_lookup"}
+{"text":"Look up recommended antibiotic duration for bacteremia","intent":"clinical_guideline_lookup"}
+{"text":"Look up the sepsis bundle compliance checklist","intent":"clinical_guideline_lookup"}
+{"text":"What is the sepsis protocol?","intent":"clinical_guideline_lookup"}
+{"text":"Show the recommended approach to refractory status epilepticus","intent":"clinical_guideline_lookup"}
+{"text":"What's the guideline for managing hypertensive crisis?","intent":"clinical_guideline_lookup"}
+{"text":"Active suicide attempt, patient found unresponsive","intent":"emergency_alert"}
+{"text":"Severe dyspnea, oxygen saturation dropping","intent":"emergency_alert"}
+{"text":"Severe hypoglycemia with unresponsiveness","intent":"emergency_alert"}
+{"text":"Ruptured ectopic pregnancy with hemodynamic instability","intent":"emergency_alert"}
+{"text":"Severe angioedema with impending airway obstruction","intent":"emergency_alert"}
+{"text":"Acute stroke symptoms, time-critical intervention needed","intent":"emergency_alert"}
+{"text":"Patient actively hemorrhaging from surgical site","intent":"emergency_alert"}
+{"text":"Patient coding, starting chest compressions","intent":"emergency_alert"}
+{"text":"Homicidal ideation with immediate danger to others","intent":"emergency_alert"}
+{"text":"Patient presenting with severe chest pain, diaphoresis, and shortness of breath","intent":"emergency_alert"}
+{"text":"Anaphylaxis progressing despite initial epinephrine dose","intent":"emergency_alert"}
+{"text":"Acute limb threatening ischemia after arterial line removal","intent":"emergency_alert"}
+{"text":"Homicidal patient actively threatening staff","intent":"emergency_alert"}
+{"text":"Eclampsia with seizures in pregnant patient","intent":"emergency_alert"}
+{"text":"Tension pneumothorax with tracheal deviation","intent":"emergency_alert"}
+{"text":"Third-degree AV block with hemodynamic compromise","intent":"emergency_alert"}
+{"text":"Acute mesenteric ischemia with peritoneal signs","intent":"emergency_alert"}
+{"text":"Severe hyperkalemia with peaked T waves on EKG","intent":"emergency_alert"}
+{"text":"Ventricular tachycardia with loss of pulse","intent":"emergency_alert"}
+{"text":"Patient having seizure, loss of consciousness","intent":"emergency_alert"}
+{"text":"Penetrating chest trauma with hemodynamic instability","intent":"emergency_alert"}
+{"text":"Severe traumatic brain injury with blown pupil","intent":"emergency_alert"}
+{"text":"Altered mental status and confusion","intent":"emergency_alert"}
+{"text":"Severe DKA with Kussmaul breathing and obtundation","intent":"emergency_alert"}
+{"text":"Diabetic ketoacidosis with severe altered mental status","intent":"emergency_alert"}
+{"text":"Septic shock with multi-organ failure","intent":"emergency_alert"}
+{"text":"Massive postpartum hemorrhage, patient crashing","intent":"emergency_alert"}
+{"text":"Suicidal ideation with a plan, patient in crisis","intent":"emergency_alert"}
+{"text":"Rapidly expanding neck hematoma post-thyroidectomy","intent":"emergency_alert"}
+{"text":"Fever 40C, tachycardia, hypotension, altered mental status","intent":"emergency_alert"}
+{"text":"Witnessed cardiac arrest, initiating ACLS protocol","intent":"emergency_alert"}
+{"text":"Anaphylactic reaction with stridor and hypotension","intent":"emergency_alert"}
+{"text":"Acute onset slurred speech and facial drooping","intent":"emergency_alert"}
+{"text":"Status epilepticus, continuous seizure activity","intent":"emergency_alert"}
+{"text":"Acute aortic dissection with tearing chest pain","intent":"emergency_alert"}
+{"text":"Massive GI bleed, hypotensive and tachycardic","intent":"emergency_alert"}
+{"text":"Acute agitation, danger to self and others","intent":"emergency_alert"}
+{"text":"Severe burn injury, airway compromise","intent":"emergency_alert"}
+{"text":"Patient found down, unknown downtime, in asystole","intent":"emergency_alert"}
+{"text":"Crush injury with suspected compartment syndrome","intent":"emergency_alert"}
+{"text":"Patient unresponsive, not breathing, pulse absent","intent":"emergency_alert"}
+{"text":"Postictal patient with ongoing status epilepticus risk","intent":"emergency_alert"}
+{"text":"What's the meaning of an elevated lactate level?","intent":"lab_interpretation"}
+{"text":"What does an elevated white blood cell count suggest?","intent":"lab_interpretation"}
+{"text":"What's the clinical significance of this INR value?","intent":"lab_interpretation"}
+{"text":"What does a prolonged PT/INR suggest?","intent":"lab_interpretation"}
+{"text":"This patient's WBC count doubled overnight - interpret that","intent":"lab_interpretation"}
+{"text":"Help me understand the coagulation study results","intent":"lab_interpretation"}
+{"text":"Explain elevated D-dimer results","intent":"lab_interpretation"}
+{"text":"Explain the meaning of this patient's hemoglobin A1c result","intent":"lab_interpretation"}
+{"text":"Interpret this newborn's bilirubin level","intent":"lab_interpretation"}
+{"text":"Break down this comprehensive metabolic panel for me","intent":"lab_interpretation"}
+{"text":"What does a low hemoglobin and hematocrit indicate?","intent":"lab_interpretation"}
+{"text":"What does a rising creatinine over 3 days suggest?","intent":"lab_interpretation"}
+{"text":"Break down what this patient's urine protein-to-creatinine ratio means","intent":"lab_interpretation"}
+{"text":"What's the clinical meaning behind this elevated ESR?","intent":"lab_interpretation"}
+{"text":"Interpret these laboratory values","intent":"lab_interpretation"}
+{"text":"High BUN and creatinine ratio - what's going on?","intent":"lab_interpretation"}
+{"text":"What's the clinical significance of microcytic anemia on this CBC?","intent":"lab_interpretation"}
+{"text":"This patient's potassium came back at 6.2 - what does that mean?","intent":"lab_interpretation"}
+{"text":"What does a low albumin with high globulin suggest?","intent":"lab_interpretation"}
+{"text":"This patient's blood culture came back positive - what next in interpretation?","intent":"lab_interpretation"}
+{"text":"This patient's calcium is critically low - explain the labs","intent":"lab_interpretation"}
+{"text":"What does elevated creatinine mean?","intent":"lab_interpretation"}
+{"text":"What's the significance of a low sodium level?","intent":"lab_interpretation"}
+{"text":"What's the clinical takeaway from this coagulation panel?","intent":"lab_interpretation"}
+{"text":"What does a high CRP indicate in this context?","intent":"lab_interpretation"}
+{"text":"Interpret this patient's thyroid panel","intent":"lab_interpretation"}
+{"text":"Explain what a shifted left differential indicates","intent":"lab_interpretation"}
+{"text":"Can you explain these abnormal lab findings?","intent":"lab_interpretation"}
+{"text":"Sodium of 118 - walk me through the significance","intent":"lab_interpretation"}
+{"text":"Interpret ABG values: pH 7.28, pCO2 50, pO2 60","intent":"lab_interpretation"}
+{"text":"Explain this patient's abnormal renal function panel","intent":"lab_interpretation"}
+{"text":"Interpret these lab results for me","intent":"lab_interpretation"}
+{"text":"Review this CBC for abnormalities","intent":"lab_interpretation"}
+{"text":"Interpret cardiac biomarkers and troponin","intent":"lab_interpretation"}
+{"text":"Elevated amylase and lipase - what does that point to?","intent":"lab_interpretation"}
+{"text":"What is the significance of low platelet count?","intent":"lab_interpretation"}
+{"text":"The troponin is trending up - what's the clinical picture?","intent":"lab_interpretation"}
+{"text":"Explain these blood gas results in context of respiratory failure","intent":"lab_interpretation"}
+{"text":"Explain this abnormal peripheral blood smear finding","intent":"lab_interpretation"}
+{"text":"Interpret these electrolyte panel results","intent":"lab_interpretation"}
+{"text":"Review this liver function panel for hepatotoxicity","intent":"lab_interpretation"}
+{"text":"What do elevated liver enzymes indicate?","intent":"lab_interpretation"}
+{"text":"Pull the latest vitals for this patient","intent":"patient_status_update"}
+{"text":"What's this patient's current line and tube status?","intent":"patient_status_update"}
+{"text":"Show patient allergy information","intent":"patient_status_update"}
+{"text":"How has this patient's pain score changed over the shift?","intent":"patient_status_update"}
+{"text":"Give me a summary of overnight events for this patient","intent":"patient_status_update"}
+{"text":"What's this patient's current sedation level?","intent":"patient_status_update"}
+{"text":"Export patient labs for last month","intent":"patient_status_update"}
+{"text":"Has the patient's mental status changed since this morning?","intent":"patient_status_update"}
+{"text":"What's the trend in this patient's oxygen saturation?","intent":"patient_status_update"}
+{"text":"Has the patient's restraint order been reassessed today?","intent":"patient_status_update"}
+{"text":"Is the patient's condition improving or worsening?","intent":"patient_status_update"}
+{"text":"What's the latest update on this patient's code status discussion?","intent":"patient_status_update"}
+{"text":"What's this patient's tolerance to the new diet order?","intent":"patient_status_update"}
+{"text":"Any change in this patient's wound drainage since this morning?","intent":"patient_status_update"}
+{"text":"Update me on the patient in bed 12","intent":"patient_status_update"}
+{"text":"Give me the current isolation precaution status for this patient","intent":"patient_status_update"}
+{"text":"Show recent imaging results for this patient","intent":"patient_status_update"}
+{"text":"Show medication history for this patient","intent":"patient_status_update"}
+{"text":"Give me the nursing update from the last shift change","intent":"patient_status_update"}
+{"text":"Check the patient's intake and output for today","intent":"patient_status_update"}
+{"text":"What's the current fall risk status for this patient?","intent":"patient_status_update"}
+{"text":"What's the current status of this patient's pressure injury?","intent":"patient_status_update"}
+{"text":"Is the patient tolerating the oxygen weaning trial?","intent":"patient_status_update"}
+{"text":"Give me an update on the patient's neuro checks","intent":"patient_status_update"}
+{"text":"What's this patient's current vital sign trend?","intent":"patient_status_update"}
+{"text":"What's the current status of the patient in room 204?","intent":"patient_status_update"}
+{"text":"Is this patient ambulating independently yet?","intent":"patient_status_update"}
+{"text":"Check if the patient's chest tube output has decreased","intent":"patient_status_update"}
+{"text":"Show me this patient's vital sign history since admission","intent":"patient_status_update"}
+{"text":"Check the current telemetry rhythm for this patient","intent":"patient_status_update"}
+{"text":"Check if the patient's blood pressure has stabilized","intent":"patient_status_update"}
+{"text":"Check if this patient has passed flatus post-surgery","intent":"patient_status_update"}
+{"text":"Review this patient's fluid balance over the last 24 hours","intent":"patient_status_update"}
+{"text":"Check on the patient's current clinical status","intent":"patient_status_update"}
+{"text":"Has the patient's delirium screening changed today?","intent":"patient_status_update"}
+{"text":"Update on the patient's post-op recovery status","intent":"patient_status_update"}
+{"text":"Has this patient spiked a fever in the last hour?","intent":"patient_status_update"}
+{"text":"What's this patient's current pain management status?","intent":"patient_status_update"}
+{"text":"Coordinate interpreter services for discharge instructions","intent":"discharge_planning"}
+{"text":"Finalize discharge medication reconciliation","intent":"discharge_planning"}
+{"text":"What follow-up labs are needed after discharge?","intent":"discharge_planning"}
+{"text":"Coordinate durable medical equipment for this discharge","intent":"discharge_planning"}
+{"text":"Schedule home health nursing visits post-discharge","intent":"discharge_planning"}
+{"text":"Does this patient need outpatient physical therapy after discharge?","intent":"discharge_planning"}
+{"text":"Prepare a discharge summary with medication changes","intent":"discharge_planning"}
+{"text":"What's the anticoagulation bridging plan after discharge?","intent":"discharge_planning"}
+{"text":"Arrange a wheelchair van for this patient's discharge","intent":"discharge_planning"}
+{"text":"Access patient discharge summary","intent":"discharge_planning"}
+{"text":"Is this patient stable enough for same-day discharge?","intent":"discharge_planning"}
+{"text":"Confirm pharmacy has the discharge prescriptions ready","intent":"discharge_planning"}
+{"text":"Review discharge medication reconciliation","intent":"discharge_planning"}
+{"text":"Is a repeat chest X-ray needed before discharge clearance?","intent":"discharge_planning"}
+{"text":"Is this patient ready to be discharged home?","intent":"discharge_planning"}
+{"text":"Review the discharge checklist for this admission","intent":"discharge_planning"}
+{"text":"Draft the discharge summary and home care plan","intent":"discharge_planning"}
+{"text":"Coordinate discharge planning with social work","intent":"discharge_planning"}
+{"text":"Set up post-discharge anticoagulation bridge orders for this admission","intent":"discharge_planning"}
+{"text":"What discharge education has been completed for this patient?","intent":"discharge_planning"}
+{"text":"Arrange caregiver education before sending this patient home","intent":"discharge_planning"}
+{"text":"What's the discharge disposition plan for this patient?","intent":"discharge_planning"}
+{"text":"What follow-up imaging is needed after this patient leaves?","intent":"discharge_planning"}
+{"text":"What follow-up care is needed after discharge?","intent":"discharge_planning"}
+{"text":"What discharge criteria has this patient met?","intent":"discharge_planning"}
+{"text":"What are the red-flag symptoms to counsel this patient on before discharge?","intent":"discharge_planning"}
+{"text":"Arrange transportation for this patient's discharge","intent":"discharge_planning"}
+{"text":"Review barriers to safe discharge for this patient","intent":"discharge_planning"}
+{"text":"Arrange a discharge follow-up call within 48 hours","intent":"discharge_planning"}
+{"text":"Schedule the follow-up appointment before discharge","intent":"discharge_planning"}
+{"text":"What home care services does this patient need post-discharge?","intent":"discharge_planning"}
+{"text":"Confirm this patient has a safe place to go after discharge","intent":"discharge_planning"}
+{"text":"What's the anticipated discharge date for this patient?","intent":"discharge_planning"}
+{"text":"Is this patient a candidate for early discharge?","intent":"discharge_planning"}
+{"text":"What bridging anticoagulation does this patient need at discharge?","intent":"discharge_planning"}
+{"text":"Schedule a cardiology follow-up before this patient leaves","intent":"discharge_planning"}
+{"text":"Coordinate home health services for this discharge","intent":"discharge_planning"}
+{"text":"What durable medical equipment should go home with this patient?","intent":"discharge_planning"}
+{"text":"Hold the patient's antihypertensives before surgery","intent":"medication_order"}
+{"text":"Order a magnesium sulfate infusion for this patient","intent":"medication_order"}
+{"text":"Order a one-time dose of vitamin K for reversal","intent":"medication_order"}
+{"text":"Order stress ulcer prophylaxis for this ICU patient","intent":"medication_order"}
+{"text":"Order repeat dosing of pain medication per protocol","intent":"medication_order"}
+{"text":"Order a one-time dose of ondansetron before the procedure","intent":"medication_order"}
+{"text":"Adjust vancomycin dosing based on renal function","intent":"medication_order"}
+{"text":"Order antiemetics for post-op nausea","intent":"medication_order"}
+{"text":"Start empiric antibiotics for suspected sepsis","intent":"medication_order"}
+{"text":"Order scheduled acetaminophen for fever control","intent":"medication_order"}
+{"text":"Start empiric antifungal coverage for this patient","intent":"medication_order"}
+{"text":"Order IV fluids at 125 mL per hour","intent":"medication_order"}
+{"text":"Order weight-based heparin dosing for this patient","intent":"medication_order"}
+{"text":"Order IV iron replacement for this patient's anemia","intent":"medication_order"}
+{"text":"Increase insulin dose to 20 units at bedtime","intent":"medication_order"}
+{"text":"Start topical treatment for this patient's pressure injury","intent":"medication_order"}
+{"text":"Order a repeat dose of the antiepileptic for breakthrough seizure","intent":"medication_order"}
+{"text":"Order thromboprophylaxis with sequential compression devices and heparin","intent":"medication_order"}
+{"text":"Order a stat dose of furosemide 40mg IV","intent":"medication_order"}
+{"text":"Prescribe a bowel regimen for this post-op patient","intent":"medication_order"}
+{"text":"Order stress-dose steroids for this patient","intent":"medication_order"}
+{"text":"Prescribe metformin 1000mg twice daily","intent":"medication_order"}
+{"text":"Prescribe a statin for secondary prevention","intent":"medication_order"}
+{"text":"Start patient on lisinopril 10mg once daily","intent":"medication_order"}
+{"text":"Prescribe an inhaled corticosteroid for maintenance therapy","intent":"medication_order"}
+{"text":"Begin antiviral therapy for this patient's diagnosis","intent":"medication_order"}
+{"text":"Prescribe a PRN order for breakthrough pain","intent":"medication_order"}
+{"text":"Order a taper schedule for this patient's steroids","intent":"medication_order"}
+{"text":"Start DVT prophylaxis with enoxaparin","intent":"medication_order"}
+{"text":"Start broad-spectrum antibiotics pending culture results","intent":"medication_order"}
+{"text":"Order a stat dose of naloxone","intent":"medication_order"}
+{"text":"Administer 4mg IV morphine for pain control","intent":"medication_order"}
+{"text":"Titrate the heparin drip per protocol","intent":"medication_order"}
+{"text":"Prescribe albuterol nebulizer treatments every 4 hours","intent":"medication_order"}
+{"text":"Order 500mg amoxicillin three times daily for this patient","intent":"medication_order"}
+{"text":"Discontinue the patient's home blood pressure medications","intent":"medication_order"}
+{"text":"Can I add azithromycin to a patient already on amiodarone?","intent":"drug_interaction_check"}
+{"text":"Check if these medications are contraindicated","intent":"drug_interaction_check"}
+{"text":"Check for interactions with herbal supplements this patient is taking","intent":"drug_interaction_check"}
+{"text":"Are these two blood thinners safe to prescribe together?","intent":"drug_interaction_check"}
+{"text":"What happens if this patient takes both ACE inhibitors and potassium supplements?","intent":"drug_interaction_check"}
+{"text":"Are NSAIDs contraindicated with this patient's current regimen?","intent":"drug_interaction_check"}
+{"text":"Combining lithium with an ACE inhibitor - is that a problem?","intent":"drug_interaction_check"}
+{"text":"Is co-administration of digoxin and amiodarone safe here?","intent":"drug_interaction_check"}
+{"text":"Can I combine ibuprofen with lisinopril safely?","intent":"drug_interaction_check"}
+{"text":"Is there an interaction between simvastatin and clarithromycin?","intent":"drug_interaction_check"}
+{"text":"Verify safety of starting rifampin with this patient's HIV regimen","intent":"drug_interaction_check"}
+{"text":"Verify this new prescription against the patient's current medication list","intent":"drug_interaction_check"}
+{"text":"Is there a dangerous interaction between MAOIs and this pain medication?","intent":"drug_interaction_check"}
+{"text":"Review discharge meds for dangerous combinations","intent":"drug_interaction_check"}
+{"text":"Does adding spironolactone pose a risk with this patient's ACE inhibitor?","intent":"drug_interaction_check"}
+{"text":"Flag any interactions in this discharge medication list","intent":"drug_interaction_check"}
+{"text":"This patient just started chemo - check for drug conflicts","intent":"drug_interaction_check"}
+{"text":"Is it safe to combine SSRIs with tramadol?","intent":"drug_interaction_check"}
+{"text":"Check drug interaction database","intent":"drug_interaction_check"}
+{"text":"Two antihypertensives and a diuretic - any concerning combos here?","intent":"drug_interaction_check"}
+{"text":"This patient's new anticoagulant - any conflict with their aspirin?","intent":"drug_interaction_check"}
+{"text":"Check for drug interactions in the discharge medication list","intent":"drug_interaction_check"}
+{"text":"Is tramadol safe alongside this patient's antidepressant?","intent":"drug_interaction_check"}
+{"text":"Check for interactions before starting this antibiotic","intent":"drug_interaction_check"}
+{"text":"New order for ketorolac - any conflicts with home meds?","intent":"drug_interaction_check"}
+{"text":"Does adding this antifungal risk toxicity with the current statin?","intent":"drug_interaction_check"}
+{"text":"This elderly patient takes 12 medications - run a full interaction audit","intent":"drug_interaction_check"}
+{"text":"Does this patient's regimen have any contraindicated combinations?","intent":"drug_interaction_check"}
+{"text":"Will grapefruit juice interact with this patient's calcium channel blocker?","intent":"drug_interaction_check"}
+{"text":"Pharmacist wants an interaction check before dispensing","intent":"drug_interaction_check"}
+{"text":"What is the drug interaction between warfarin and aspirin?","intent":"drug_interaction_check"}
+{"text":"Cross-check this drug list for QT-prolongation risk","intent":"drug_interaction_check"}
+{"text":"Interaction check between clopidogrel and omeprazole","intent":"drug_interaction_check"}
+{"text":"This patient is on warfarin - is adding aspirin risky?","intent":"drug_interaction_check"}
+{"text":"What's the risk of serotonin syndrome with this combination?","intent":"drug_interaction_check"}
+{"text":"This patient's pharmacy flagged a possible interaction - can you confirm?","intent":"drug_interaction_check"}
+{"text":"Would this patient's new antibiotic conflict with their existing medications?","intent":"drug_interaction_check"}
+{"text":"Combining beta blockers with calcium channel blockers here - safe?","intent":"drug_interaction_check"}
+{"text":"Review polypharmacy risk for this elderly patient's medication list","intent":"drug_interaction_check"}
+{"text":"Is there a risk combining opioids with benzodiazepines for this patient?","intent":"drug_interaction_check"}
+{"text":"Calculate the SOFA score using these ICU parameters","intent":"sofa_score_calculation"}
+{"text":"Use SOFA calculator on this patient data","intent":"sofa_score_calculation"}
+{"text":"Compare this patient's SOFA score day 1 versus day 3","intent":"sofa_score_calculation"}
+{"text":"Run organ failure assessment for ICU admission criteria","intent":"sofa_score_calculation"}
+{"text":"What's this patient's total organ failure assessment score?","intent":"sofa_score_calculation"}
+{"text":"Recalculate SOFA now that the patient is intubated","intent":"sofa_score_calculation"}
+{"text":"What's the platelet component contributing to this SOFA score?","intent":"sofa_score_calculation"}
+{"text":"Determine this patient's respiratory SOFA subscore","intent":"sofa_score_calculation"}
+{"text":"What's this patient's SOFA-based mortality risk estimate?","intent":"sofa_score_calculation"}
+{"text":"Run the sepsis screening tool","intent":"sofa_score_calculation"}
+{"text":"Use the tool to assess organ dysfunction","intent":"sofa_score_calculation"}
+{"text":"Assess multi-organ dysfunction severity using SOFA","intent":"sofa_score_calculation"}
+{"text":"Calculate SOFA including the new bilirubin result","intent":"sofa_score_calculation"}
+{"text":"Score this patient's sepsis severity using SOFA criteria","intent":"sofa_score_calculation"}
+{"text":"What's this patient's organ dysfunction score?","intent":"sofa_score_calculation"}
+{"text":"Assess cardiovascular component of the SOFA score","intent":"sofa_score_calculation"}
+{"text":"Factor in the new creatinine for an updated SOFA score","intent":"sofa_score_calculation"}
+{"text":"Determine if this patient meets sepsis-3 criteria via SOFA","intent":"sofa_score_calculation"}
+{"text":"Update the SOFA score after the latest labs came back","intent":"sofa_score_calculation"}
+{"text":"What's this patient's neurological SOFA subscore based on GCS?","intent":"sofa_score_calculation"}
+{"text":"What's the coagulation component score for SOFA?","intent":"sofa_score_calculation"}
+{"text":"Assess organ dysfunction score for ICU admission","intent":"sofa_score_calculation"}
+{"text":"Run the qSOFA assessment","intent":"sofa_score_calculation"}
+{"text":"Compute the SOFA score from these vitals and labs","intent":"sofa_score_calculation"}
+{"text":"Compute hepatic dysfunction score under SOFA","intent":"sofa_score_calculation"}
+{"text":"Use the SOFA tool to track disease progression","intent":"sofa_score_calculation"}
+{"text":"Calculate the qSOFA score based on these vitals","intent":"sofa_score_calculation"}
+{"text":"Calculate SOFA score for this patient","intent":"sofa_score_calculation"}
+{"text":"Does this patient's GCS change their SOFA score?","intent":"sofa_score_calculation"}
+{"text":"Track this patient's SOFA trend over the last 48 hours","intent":"sofa_score_calculation"}
+{"text":"Is this patient's SOFA score trending toward multi-organ failure?","intent":"sofa_score_calculation"}
+{"text":"Assess respiratory and renal SOFA components","intent":"sofa_score_calculation"}
+{"text":"This patient needs vasopressors - factor that into the SOFA score","intent":"sofa_score_calculation"}
+{"text":"What's this ICU patient's baseline SOFA on admission?","intent":"sofa_score_calculation"}
+{"text":"Screen this patient using qSOFA for sepsis risk","intent":"sofa_score_calculation"}
+{"text":"Run qSOFA screening on this patient","intent":"sofa_score_calculation"}
+{"text":"Run the SOFA scoring tool for sepsis severity tracking","intent":"sofa_score_calculation"}
+{"text":"Calculate multi-organ failure score for ICU triage","intent":"sofa_score_calculation"}
+{"text":"Consider causes of unexplained weight loss","intent":"diagnosis_support"}
+{"text":"What should be considered for unexplained fever in this patient?","intent":"diagnosis_support"}
+{"text":"Help me think through causes of this patient's new-onset confusion","intent":"diagnosis_support"}
+{"text":"What conditions present with both weight loss and diarrhea?","intent":"diagnosis_support"}
+{"text":"Consider causes of recurrent syncope in this patient","intent":"diagnosis_support"}
+{"text":"What's the differential for a patient with hemoptysis?","intent":"diagnosis_support"}
+{"text":"What's the differential for acute onset dyspnea?","intent":"diagnosis_support"}
+{"text":"What's the likely diagnosis given these presenting symptoms?","intent":"diagnosis_support"}
+{"text":"Help me think through causes of this patient's altered mental status","intent":"diagnosis_support"}
+{"text":"Consider secondary causes of this patient's failure to thrive","intent":"diagnosis_support"}
+{"text":"Build a differential for a patient with fever and joint pain","intent":"diagnosis_support"}
+{"text":"What's the likely cause of this patient's new heart murmur?","intent":"diagnosis_support"}
+{"text":"What's on the differential for a patient with jaw pain and diaphoresis?","intent":"diagnosis_support"}
+{"text":"What conditions present with this constellation of symptoms?","intent":"diagnosis_support"}
+{"text":"What conditions should be ruled out for this patient's dizziness?","intent":"diagnosis_support"}
+{"text":"Differential for new-onset atrial fibrillation in a young patient","intent":"diagnosis_support"}
+{"text":"What should be ruled out for this patient's palpitations?","intent":"diagnosis_support"}
+{"text":"Assess this patient's history for possible autoimmune disease","intent":"diagnosis_support"}
+{"text":"Consider causes of unexplained hypoglycemia","intent":"diagnosis_support"}
+{"text":"What could explain this patient's unexplained bruising?","intent":"diagnosis_support"}
+{"text":"What conditions should be considered for this patient's abdominal pain?","intent":"diagnosis_support"}
+{"text":"Consider causes of acute vision loss in this patient","intent":"diagnosis_support"}
+{"text":"Build a differential for new-onset jaundice","intent":"diagnosis_support"}
+{"text":"Differential diagnosis for chronic cough in a smoker","intent":"diagnosis_support"}
+{"text":"What conditions cause both hypertension and tachycardia?","intent":"diagnosis_support"}
+{"text":"What's the differential for a young patient presenting with palpitations and diaphoresis?","intent":"diagnosis_support"}
+{"text":"Help me build a differential for unexplained syncope","intent":"diagnosis_support"}
+{"text":"Build a differential for postpartum fever","intent":"diagnosis_support"}
+{"text":"Patient presents with fatigue, weight loss, and night sweats - differential diagnosis?","intent":"diagnosis_support"}
+{"text":"Consider the differential for acute urinary retention","intent":"diagnosis_support"}
+{"text":"Build a differential for new-onset ascites","intent":"diagnosis_support"}
+{"text":"Consider causes of this patient's unexplained hypotension","intent":"diagnosis_support"}
+{"text":"What's the differential for acute kidney injury in this case?","intent":"diagnosis_support"}
+{"text":"What are possible causes of this patient's chronic diarrhea","intent":"diagnosis_support"}
+{"text":"What conditions present with both headache and neck stiffness?","intent":"diagnosis_support"}
+{"text":"Differential diagnosis for bilateral lower extremity edema","intent":"diagnosis_support"}

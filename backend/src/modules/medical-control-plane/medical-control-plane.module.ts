@@ -11,11 +11,12 @@
  */
 
 import { Module } from '@nestjs/common';
+import { UnifiedAiNodeModule } from '../../../ml-services/unified-ai-node/unified-ai-node.module';
 import { IntentClassifierModule } from './intent-classifier/intent-classifier.module';
 import { ToolOrchestratorModule } from './tool-orchestrator/tool-orchestrator.module';
 
 @Module({
-  imports: [IntentClassifierModule, ToolOrchestratorModule],
-  exports: [IntentClassifierModule, ToolOrchestratorModule],
+  imports: [UnifiedAiNodeModule, IntentClassifierModule, ToolOrchestratorModule],
+  exports: [UnifiedAiNodeModule, IntentClassifierModule, ToolOrchestratorModule],
 })
 export class MedicalControlPlaneModule {}

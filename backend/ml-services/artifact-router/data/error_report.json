@@ -1,0 +1,191 @@
+[
+  {
+    "inputText": "name: NIHSS Summary View",
+    "expected": "calculator",
+    "predicted": "document",
+    "confidence": 0.7382091207955539,
+    "labelType": "name",
+    "artifactId": "nihss-summary-view",
+    "artifactType": "calculator"
+  },
+  {
+    "inputText": "route: /tools/pulmonology/oxygen-escalation-helper",
+    "expected": "tool",
+    "predicted": "prompt",
+    "confidence": 0.5345265325667337,
+    "labelType": "route",
+    "artifactId": "oxygen-escalation-helper",
+    "artifactType": "tool"
+  },
+  {
+    "inputText": "route: /integrations/hl7",
+    "expected": "tool",
+    "predicted": "route",
+    "confidence": 0.5049785050812862,
+    "labelType": "route",
+    "artifactId": "hl7-bridge",
+    "artifactType": "tool"
+  },
+  {
+    "inputText": "route: /tools/calculator-recommender",
+    "expected": "tool",
+    "predicted": "prompt",
+    "confidence": 0.5837076626816018,
+    "labelType": "route",
+    "artifactId": "calculator-recommender-ai",
+    "artifactType": "tool"
+  },
+  {
+    "inputText": "route: /costs",
+    "expected": "tool",
+    "predicted": "route",
+    "confidence": 0.9605501131219438,
+    "labelType": "route",
+    "artifactId": "ai-cost-optimization",
+    "artifactType": "tool"
+  },
+  {
+    "inputText": "name: Prompt Firewall",
+    "expected": "tool",
+    "predicted": "prompt",
+    "confidence": 0.7770903206454902,
+    "labelType": "name",
+    "artifactId": "prompt-firewall",
+    "artifactType": "tool"
+  },
+  {
+    "inputText": "name: NEXUS C-Spine Rule",
+    "expected": "tool",
+    "predicted": "calculator",
+    "confidence": 0.5919152677254027,
+    "labelType": "name",
+    "artifactId": "nexus-cspine",
+    "artifactType": "tool"
+  },
+  {
+    "inputText": "name: Deployment Observability",
+    "expected": "tool",
+    "predicted": "document",
+    "confidence": 0.9592706280470934,
+    "labelType": "name",
+    "artifactId": "deployment-observability",
+    "artifactType": "tool"
+  },
+  {
+    "inputText": "name: Vertigo HINTS Assistant",
+    "expected": "tool",
+    "predicted": "prompt",
+    "confidence": 0.5252197888358637,
+    "labelType": "name",
+    "artifactId": "vertigo-hints-assistant",
+    "artifactType": "tool"
+  },
+  {
+    "inputText": "name: platform | Route Optimization Engine",
+    "expected": "platform",
+    "predicted": "route",
+    "confidence": 0.8262456374507895,
+    "labelType": "name",
+    "artifactId": "route-optimizer",
+    "artifactType": "platform"
+  },
+  {
+    "inputText": "name: User roles",
+    "expected": "document",
+    "predicted": "tool",
+    "confidence": 0.6521505065023515,
+    "labelType": "name",
+    "artifactId": "doc-docs-generated-roles-md",
+    "artifactType": "document"
+  },
+  {
+    "inputText": "route: /tools/calculators/revised-trauma-score",
+    "expected": "prompt",
+    "predicted": "calculator",
+    "confidence": 0.9433125039050752,
+    "labelType": "route",
+    "artifactId": "prompt-revised-trauma-score",
+    "artifactType": "prompt"
+  },
+  {
+    "inputText": "route: /tools/calculators/rox-index",
+    "expected": "prompt",
+    "predicted": "calculator",
+    "confidence": 0.8972362518743145,
+    "labelType": "route",
+    "artifactId": "prompt-rox-index",
+    "artifactType": "prompt"
+  },
+  {
+    "inputText": "route: /tools/calculators/rass",
+    "expected": "prompt",
+    "predicted": "calculator",
+    "confidence": 0.5781195543650439,
+    "labelType": "route",
+    "artifactId": "prompt-rass",
+    "artifactType": "prompt"
+  },
+  {
+    "inputText": "route: /tools/psychiatry/substance-use-screening-assistant",
+    "expected": "prompt",
+    "predicted": "tool",
+    "confidence": 0.6948664030684402,
+    "labelType": "route",
+    "artifactId": "prompt-substance-use-screening-assistant",
+    "artifactType": "prompt"
+  },
+  {
+    "inputText": "route: /fleet/route-optimizer",
+    "expected": "prompt",
+    "predicted": "route",
+    "confidence": 0.9561485095589964,
+    "labelType": "route",
+    "artifactId": "prompt-route-optimizer",
+    "artifactType": "prompt"
+  },
+  {
+    "inputText": "route: /tools/calculators/rockall-score",
+    "expected": "prompt",
+    "predicted": "calculator",
+    "confidence": 0.9056993810063466,
+    "labelType": "route",
+    "artifactId": "prompt-rockall-score",
+    "artifactType": "prompt"
+  },
+  {
+    "inputText": "route: /tools/calculators/shock-index",
+    "expected": "prompt",
+    "predicted": "calculator",
+    "confidence": 0.870695552578681,
+    "labelType": "route",
+    "artifactId": "prompt-shock-index",
+    "artifactType": "prompt"
+  },
+  {
+    "inputText": "name: predictiveAnalytics route",
+    "expected": "route",
+    "predicted": "tool",
+    "confidence": 0.9235072702695409,
+    "labelType": "name",
+    "artifactId": "route-predictiveAnalytics",
+    "artifactType": "route"
+  },
+  {
+    "inputText": "name: platformAnalytics route",
+    "expected": "route",
+    "predicted": "platform",
+    "confidence": 0.8609115158164043,
+    "labelType": "name",
+    "artifactId": "route-platformAnalytics",
+    "artifactType": "route"
+  },
+  {
+    "inputText": "route: /usage",
+    "expected": "route",
+    "predicted": "tool",
+    "confidence": 0.6556676815483237,
+    "labelType": "route",
+    "artifactId": "route-usage",
+    "artifactType": "route"
+  }
+]

@@ -29,7 +29,7 @@ export class TrainingService implements OnModuleInit {
     {
       id: 'training-run-baseline',
       modelName: 'caredroid-nlu-intent-classifier',
-      datasetName: 'ml-services/nlu/data',
+      datasetName: 'ml-services/models/nlu',
       currentStage: 'deployment',
       status: 'completed',
       metrics: DEFAULT_METRICS,
@@ -38,16 +38,40 @@ export class TrainingService implements OnModuleInit {
       updatedAt: new Date(Date.now() - 3_600_000).toISOString(),
       deploymentTarget: 'intent-classifier',
     },
+    {
+      id: 'training-run-artifact-router',
+      modelName: 'caredroid-artifact-router',
+      datasetName: 'ml-services/models/artifact-router',
+      currentStage: 'deployment',
+      status: 'completed',
+      metrics: { ...DEFAULT_METRICS, accuracy: 0.88, latencyMs: 10 },
+      capabilities: ['prompt_engineering', 'moe_routing'],
+      createdAt: new Date(Date.now() - 86_400_000).toISOString(),
+      updatedAt: new Date(Date.now() - 3_600_000).toISOString(),
+      deploymentTarget: 'unified-ai-node',
+    },
   ];
 
   constructor(private readonly moeRouter: MoERouterService) {}
 
   onModuleInit(): void {
-    this.syncNluMetricsFromDisk();
+    this.syncUnifiedModelMetricsFromDisk();
   }
 
-  private syncNluMetricsFromDisk(): void {
-    const metricsPath = join(process.cwd(), 'ml-services', 'nlu', 'metrics.json');
+  private syncUnifiedModelMetricsFromDisk(): void {
+    this.syncHeadMetrics('nlu', 'training-run-baseline');
+    this.syncHeadMetrics('artifact-router', 'training-run-artifact-router');
+  }
+
+  private syncHeadMetrics(head: 'nlu' | 'artifact-router', runId: string): void {
+    const unifiedMetrics = join(process.cwd(), 'ml-services', 'models', head, 'metrics.json');
+    const legacyMetrics = join(
+      process.cwd(),
+      'ml-services',
+      head === 'nlu' ? 'nlu' : 'artifact-router',
+      'metrics.json',
+    );
+    const metricsPath = existsSync(unifiedMetrics) ? unifiedMetrics : legacyMetrics;
     if (!existsSync(metricsPath)) return;
 
     try {
@@ -57,26 +81,28 @@ export class TrainingService implements OnModuleInit {
         macroF1?: number;
         latencyMs?: { mean?: number; p50?: number };
         testSetSize?: number;
+        architecture?: string;
+        targetMode?: string;
       };
 
-      const baseline = this.runs.find((run) => run.id === 'training-run-baseline');
-      if (!baseline) return;
+      const run = this.runs.find((item) => item.id === runId);
+      if (!run) return;
 
-      baseline.metrics = {
-        accuracy: raw.accuracy ?? baseline.metrics.accuracy,
-        precision: raw.macroPrecision ?? raw.macroF1 ?? baseline.metrics.precision,
+      run.metrics = {
+        accuracy: raw.accuracy ?? run.metrics.accuracy,
+        precision: raw.macroPrecision ?? raw.macroF1 ?? run.metrics.precision,
         hallucinationRate: Math.max(0, 1 - (raw.macroF1 ?? raw.accuracy ?? 0.85)),
-        latencyMs: raw.latencyMs?.p50 ?? raw.latencyMs?.mean ?? baseline.metrics.latencyMs,
+        latencyMs: raw.latencyMs?.p50 ?? raw.latencyMs?.mean ?? run.metrics.latencyMs,
         costUsd: 0,
       };
-      baseline.datasetName = `nlu-test-${raw.testSetSize ?? 'unknown'}`;
-      baseline.updatedAt = new Date().toISOString();
+      run.datasetName = `${head}-test-${raw.testSetSize ?? 'unknown'}${raw.targetMode ? `-${raw.targetMode}` : ''}`;
+      run.updatedAt = new Date().toISOString();
       this.logger.log(
-        `Synced NLU training metrics (accuracy=${baseline.metrics.accuracy}, latencyMs=${baseline.metrics.latencyMs})`,
+        `Synced ${head} metrics (accuracy=${run.metrics.accuracy}, latencyMs=${run.metrics.latencyMs})`,
       );
     } catch (error) {
       this.logger.warn(
-        `Unable to read NLU metrics.json: ${error instanceof Error ? error.message : String(error)}`,
+        `Unable to read ${head} metrics.json: ${error instanceof Error ? error.message : String(error)}`,
       );
     }
   }

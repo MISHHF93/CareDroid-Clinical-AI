@@ -268,11 +268,11 @@ describe('backendFrontendExposure scan', () => {
 });
 
 describe('Vite proxy and ports', () => {
-  it('serves frontend on port 5180 and proxies API/health/socket in dev and preview', () => {
+  it('serves frontend on port 5190 and proxies API/health/socket in dev and preview', () => {
     const vite = readViteDevConfig();
-    expect(vite.devPort).toBe(5180);
-    expect(vite.previewPort).toBe(5180);
-    expect(vite.proxyTarget).toBe('http://localhost:3340');
+    expect(vite.devPort).toBe(5190);
+    expect(vite.previewPort).toBe(5190);
+    expect(vite.proxyTarget).toBe('http://localhost:3350');
     expect(vite.proxiesApi).toBe(true);
     expect(vite.proxiesHealth).toBe(true);
     expect(vite.proxiesSocketIo).toBe(true);
@@ -281,14 +281,14 @@ describe('Vite proxy and ports', () => {
   });
 
   it('keeps local example URLs aligned to Vite dev port and metrics route', () => {
-    expect(rootEnvExample).toContain('VITE_PRIVACY_POLICY_URL=http://localhost:5180/privacy');
-    expect(rootEnvExample).toContain('GOOGLE_CALLBACK_URL=http://localhost:5180/api/auth/google/callback');
-    expect(rootEnvExample).toContain('LINKEDIN_CALLBACK_URL=http://localhost:5180/api/auth/linkedin/callback');
+    expect(rootEnvExample).toContain('VITE_PRIVACY_POLICY_URL=http://localhost:5190/privacy');
+    expect(rootEnvExample).toContain('GOOGLE_CALLBACK_URL=http://localhost:5190/api/auth/google/callback');
+    expect(rootEnvExample).toContain('LINKEDIN_CALLBACK_URL=http://localhost:5190/api/auth/linkedin/callback');
     expect(rootEnvExample).not.toMatch(/localhost:5173/);
     expect(rootEnvExample).not.toMatch(/localhost:4173/);
-    expect(backendEnvExample).toContain('FRONTEND_URL=http://localhost:5180');
-    expect(backendEnvExample).toContain('GOOGLE_CALLBACK_URL=http://localhost:5180/api/auth/google/callback');
-    expect(backendEnvExample).toContain('STRIPE_SUCCESS_URL=http://localhost:5180/subscription/success');
+    expect(backendEnvExample).toContain('FRONTEND_URL=http://localhost:5190');
+    expect(backendEnvExample).toContain('GOOGLE_CALLBACK_URL=http://localhost:5190/api/auth/google/callback');
+    expect(backendEnvExample).toContain('STRIPE_SUCCESS_URL=http://localhost:5190/subscription/success');
     expect(backendEnvExample).not.toMatch(/localhost:5173/);
     expect(backendEnvExample).not.toMatch(/localhost:4173/);
     expect(backendMainSource).toContain('http://localhost:${port}/api/metrics');

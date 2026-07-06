@@ -228,7 +228,7 @@ cp .env.example .env
 cp backend/.env.example backend/.env
 ```
 
-Start the full local stack (frontend on :5180 — Vite proxies `/api` to Nest on :3340):
+Start the full local stack (frontend on :5190 — Vite proxies `/api` to Nest on :3350):
 
 ```bash
 npm start
@@ -238,17 +238,17 @@ Local defaults use **SQLite** and disable optional ML/RAG services so the app bo
 
 | Service | URL |
 |---------|-----|
-| App (frontend + API proxy) | http://localhost:5180 |
-| API (proxied) | http://localhost:5180/api |
-| Backend (direct, internal) | http://localhost:3340 |
-| Health check | http://localhost:5180/health |
-| API docs (Swagger) | http://localhost:5180/api/docs |
+| App (frontend + API proxy) | http://localhost:5190 |
+| API (proxied) | http://localhost:5190/api |
+| Backend (direct, internal) | http://localhost:3350 |
+| Health check | http://localhost:5190/health |
+| API docs (Swagger) | http://localhost:5190/api/docs |
 
 ### Focused commands
 
 ```bash
-npm run dev:web          # Frontend only (Vite on :5180)
-npm run dev:api          # Backend only (Nest on :3340)
+npm run dev:web          # Frontend only (Vite on :5190)
+npm run dev:api          # Backend only (Nest on :3350)
 npm run backend:build    # Compile NestJS
 npm run backend:start    # Run compiled backend
 npm run typecheck:frontend
@@ -275,7 +275,7 @@ Key walkthrough surfaces in order:
 
 | Variable | Purpose |
 |----------|---------|
-| `VITE_API_URL` | Leave empty in local dev (same-origin `/api` via Vite on :8000) |
+| `VITE_API_URL` | Leave empty in local dev (same-origin `/api` via Vite on :5190) |
 | `VITE_ED_SINGLE_APPLICATION` | `true` (default) — activates Emergency OS as single app |
 | `AI_ENABLED` | Enable AI features globally |
 | `ED_COPILOT_AI_ENABLED` | Enable the ED Copilot specifically |
@@ -298,7 +298,7 @@ See `.env.example` for the full variable list.
 | `ANTHROPIC_API_KEY` | Backend AI key |
 | `PINECONE_API_KEY` | Pinecone API key for RAG |
 | `NLU_SERVICE_MODE` | `in-process` (default) or `http` for an external NLU deployment |
-| `NLU_SERVICE_URL` | NLU base URL (default `http://127.0.0.1:3340/api/nlu` when in-process) |
+| `NLU_SERVICE_URL` | NLU base URL (default `http://127.0.0.1:3350/api/nlu` when in-process) |
 | `ANOMALY_DETECTION_URL` | Anomaly detection service URL |
 | `REDIS_URL` | Optional Redis cache |
 

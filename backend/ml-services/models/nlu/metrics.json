@@ -1,0 +1,16 @@
+{
+  "accuracy": 1,
+  "macroF1": 1,
+  "weightedF1": 1,
+  "macroPrecision": 1,
+  "macroRecall": 1,
+  "latencyMs": {
+    "p50": 35,
+    "p95": 100,
+    "p99": 1544,
+    "mean": 70.03921568627452
+  },
+  "testSetSize": 51,
+  "usedTrainedClassifier": true,
+  "architecture": "mlp"
+}

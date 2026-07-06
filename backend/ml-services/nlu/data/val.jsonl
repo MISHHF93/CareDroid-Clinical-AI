@@ -1,25 +1,45 @@
-{"text":"How does insulin work in the body?","intent":"general_clinical_query"}
-{"text":"How does the coagulation cascade work?","intent":"general_clinical_query"}
-{"text":"Tell me about diabetes management","intent":"general_clinical_query"}
-{"text":"Interpret this lipid panel for cardiovascular risk","intent":"lab_interpretation"}
-{"text":"Interpret this patient's thyroid panel","intent":"lab_interpretation"}
-{"text":"What is the significance of low platelet count?","intent":"lab_interpretation"}
-{"text":"Can I combine ibuprofen with lisinopril safely?","intent":"drug_interaction_check"}
-{"text":"Does this patient's regimen have any contraindicated combinations?","intent":"drug_interaction_check"}
-{"text":"Multiple trauma from motor vehicle accident","intent":"emergency_alert","subcategory":"trauma"}
-{"text":"Acute aortic dissection with tearing chest pain","intent":"emergency_alert","subcategory":"cardiac"}
-{"text":"Anaphylaxis with airway swelling, epinephrine needed now","intent":"emergency_alert","subcategory":"respiratory"}
-{"text":"Compute the SOFA score from these vitals and labs","intent":"sofa_score_calculation"}
-{"text":"Calculate the SOFA score using these ICU parameters","intent":"sofa_score_calculation"}
-{"text":"Protocol for managing acute renal failure","intent":"clinical_guideline_lookup"}
-{"text":"Advanced cardiac life support guidelines","intent":"clinical_guideline_lookup"}
-{"text":"Look up the sepsis bundle compliance checklist","intent":"clinical_guideline_lookup"}
-{"text":"Export patient labs for last month","intent":"patient_status_update"}
-{"text":"Has the patient's mental status changed since this morning?","intent":"patient_status_update"}
+{"text":"Explain the mechanism behind tumor lysis syndrome","intent":"general_clinical_query"}
+{"text":"Explain the pathophysiology of Guillain-Barre syndrome","intent":"general_clinical_query"}
+{"text":"How does the body compensate for chronic respiratory acidosis?","intent":"general_clinical_query"}
+{"text":"What's the pathophysiology of pre-eclampsia?","intent":"general_clinical_query"}
+{"text":"What's the pathway for evaluating suspected acute mesenteric ischemia?","intent":"clinical_guideline_lookup"}
+{"text":"What's the evidence-based protocol for delirium management?","intent":"clinical_guideline_lookup"}
+{"text":"What does the guideline say about early goal-directed therapy?","intent":"clinical_guideline_lookup"}
+{"text":"What's the recommended approach to pain management in the ED?","intent":"clinical_guideline_lookup"}
+{"text":"ATLS protocol for trauma assessment","intent":"clinical_guideline_lookup"}
+{"text":"Acute limb ischemia with absent pulses","intent":"emergency_alert"}
+{"text":"Anaphylaxis with airway swelling, epinephrine needed now","intent":"emergency_alert"}
+{"text":"Chest pain radiating to left arm, ST elevation on EKG","intent":"emergency_alert"}
+{"text":"Multiple trauma from motor vehicle accident","intent":"emergency_alert"}
+{"text":"Severe upper GI hemorrhage with hematemesis","intent":"emergency_alert"}
+{"text":"What does an elevated procalcitonin level suggest?","intent":"lab_interpretation"}
+{"text":"What is the clinical meaning of these values?","intent":"lab_interpretation"}
+{"text":"Low albumin and protein levels - clinical significance?","intent":"lab_interpretation"}
+{"text":"This patient's ferritin is elevated - what should I consider?","intent":"lab_interpretation"}
+{"text":"The patient's magnesium is low - what's the significance?","intent":"lab_interpretation"}
 {"text":"What are the recent values for this patient's labs?","intent":"patient_status_update"}
+{"text":"What's the current Glasgow Coma Scale for this patient?","intent":"patient_status_update"}
+{"text":"Check this patient's urine output over the last shift","intent":"patient_status_update"}
+{"text":"Give me a status summary for this admission","intent":"patient_status_update"}
+{"text":"I need to access patient previous hospitalizations","intent":"patient_status_update"}
 {"text":"Prepare discharge instructions for this patient","intent":"discharge_planning"}
-{"text":"Is this patient ready to be discharged home?","intent":"discharge_planning"}
-{"text":"Discontinue the patient's home blood pressure medications","intent":"medication_order"}
-{"text":"Order antiemetics for post-op nausea","intent":"medication_order"}
-{"text":"What's the differential for a patient with hemoptysis?","intent":"diagnosis_support"}
-{"text":"What's the differential for acute onset dyspnea?","intent":"diagnosis_support"}
+{"text":"What's the plan for wound care after this patient goes home?","intent":"discharge_planning"}
+{"text":"Review this patient's readiness for outpatient management","intent":"discharge_planning"}
+{"text":"Coordinate with case management on discharge barriers","intent":"discharge_planning"}
+{"text":"Begin weaning the propofol infusion","intent":"medication_order"}
+{"text":"Start oral rehydration therapy for this patient","intent":"medication_order"}
+{"text":"Begin a norepinephrine drip titrated to MAP goal","intent":"medication_order"}
+{"text":"Begin a fentanyl patch for chronic pain management","intent":"medication_order"}
+{"text":"Check compatibility before mixing these two IV drips","intent":"drug_interaction_check"}
+{"text":"Interaction alert needed before administering this contrast dye","intent":"drug_interaction_check"}
+{"text":"Is amiodarone safe to take with simvastatin?","intent":"drug_interaction_check"}
+{"text":"Double check compatibility of these IV medications","intent":"drug_interaction_check"}
+{"text":"Does metformin interact with lisinopril?","intent":"drug_interaction_check"}
+{"text":"Calculate total SOFA score from these six organ systems","intent":"sofa_score_calculation"}
+{"text":"Is a SOFA score increase of 2 clinically significant here?","intent":"sofa_score_calculation"}
+{"text":"Run the SOFA calculation with today's ventilator settings","intent":"sofa_score_calculation"}
+{"text":"What's the bilirubin contribution to this patient's SOFA score?","intent":"sofa_score_calculation"}
+{"text":"What's the differential for a child with fever and rash?","intent":"diagnosis_support"}
+{"text":"What conditions should be on the differential for hemoptysis?","intent":"diagnosis_support"}
+{"text":"What conditions should be considered for a swollen, painful joint?","intent":"diagnosis_support"}
+{"text":"Help me build a differential for acute vision changes with headache","intent":"diagnosis_support"}

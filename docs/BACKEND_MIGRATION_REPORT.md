@@ -111,9 +111,9 @@ Full inventory: `src/data/frontendApiCallsInventory.ts` + `backend/src/data/back
 | Variable | Before | After |
 |----------|--------|-------|
 | `NLU_SERVICE_MODE` | `http` (sidecar) | `in-process` (default) |
-| `NLU_SERVICE_URL` | `http://nlu:8001` | `http://127.0.0.1:3340/api/nlu` |
+| `NLU_SERVICE_URL` | `http://nlu:8001` | `http://127.0.0.1:3350/api/nlu` |
 | `AI_EMBEDDING_MODEL` | `distilbert-base-uncased` | `Xenova/all-mpnet-base-v2` |
-| Dev ports | Mixed docs (`8000`) | **5180** frontend / **3340** backend |
+| Dev ports | Mixed docs (`8000`) | **5190** frontend / **3350** backend |
 
 Docker: `docker-compose.app.yml` + `docker-compose.ml.yml` set `NLU_SERVICE_MODE=in-process` on the Node backend image only.
 
@@ -121,7 +121,7 @@ Docker: `docker-compose.app.yml` + `docker-compose.ml.yml` set `NLU_SERVICE_MODE
 
 ## Frontend integration
 
-- **Proxy:** `vite.config.ts` → `localhost:3340` for `/api`, `/health`, `/socket.io`
+- **Proxy:** `vite.config.ts` → `localhost:3350` for `/api`, `/health`, `/socket.io`
 - **Dev stack:** `scripts/dev-stack.mjs` spawns Nest + Vite with `NLU_SERVICE_MODE=in-process`
 - **API client:** `src/services/apiClient.ts` — relative `/api` paths only
 - **NLU path in chat:** `POST /api/chat/intent-classify` (Nest intent classifier, not Python)
@@ -186,8 +186,8 @@ npm run build
 
 ## Cleanup performed in this audit
 
-- Aligned README + smoke checklist dev ports (`5180`/`3340`)
-- Fixed NLU load-test default URL → `http://localhost:3340/api/nlu/predict`
+- Aligned README + smoke checklist dev ports (`5190`/`3350`)
+- Fixed NLU load-test default URL → `http://localhost:3350/api/nlu/predict`
 - Updated `docs/AI_FEATURES.md` TOC and anomaly-detection compose wording
 - Removed Python cache entries from `.gitignore`
 - Added `npm run verify:ts-backend` migration guard script

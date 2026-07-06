@@ -31,6 +31,9 @@ const REQUIRED_TS_BACKEND = [
   'backend/src/app.module.ts',
   'backend/ml-services/nlu/nlu.module.ts',
   'backend/ml-services/nlu/nlu.service.ts',
+  'backend/ml-services/unified-ai-node/unified-ai-node.module.ts',
+  'backend/ml-services/shared/paths.ts',
+  'backend/ml-services/models/manifest.json',
   'lib/ai/config.ts',
 ];
 

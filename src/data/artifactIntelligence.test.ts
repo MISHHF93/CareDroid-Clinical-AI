@@ -47,7 +47,7 @@ describe('artifact intelligence pipeline', () => {
     const validation = validateArtifactCatalog(artifacts);
     expect(validation.duplicateIds).toEqual([]);
     expect(validation.ok).toBe(true);
-    expect(artifacts.length).toBeGreaterThan(500);
+    expect(artifacts.length).toBeGreaterThan(1900);
   });
 
   it('maps routes, tools, calculators, asset packs, products, and AI models into artifacts', () => {
@@ -84,6 +84,13 @@ describe('artifact intelligence pipeline', () => {
     expect(labels.length).toBeGreaterThan(artifacts.length);
     expect(labels.every((label) => Number(label.confidence) > 0 && Number(label.confidence) <= 1)).toBe(true);
     expect(labels.some((label) => label.labelType === 'route')).toBe(true);
+    expect(labels.some((label) => label.labelType === 'intent')).toBe(true);
+  });
+
+  it('captures NLU training examples and medical knowledge for intent routing models', () => {
+    expect(artifactIds.has('nlu-train-0')).toBe(true);
+    expect(artifacts.some((artifact) => artifact.type === 'nlu-example')).toBe(true);
+    expect(artifacts.some((artifact) => artifact.type === 'medical-knowledge')).toBe(true);
   });
 
   it('recommends related artifacts and detects orphan, duplicate, and missing metadata findings', () => {

@@ -1,19 +1,22 @@
 // TypeScript replacement for _deprecated-python/prepare_data.py
 // Usage: ts-node scripts/prepareData.ts
 
+import { existsSync } from 'fs';
+import path from 'path';
 import { loadJsonlDataset, writeJsonlDataset, stratifiedSplit, intentDistribution } from '../training/dataset';
 import { MODEL_PATHS, TRAINING_CONFIG } from '../training/training.config';
 
 function prepareDatasets(): void {
-  const trainFile = MODEL_PATHS.trainingData;
-  const data = loadJsonlDataset(trainFile);
+  const corpusFile = path.join(path.dirname(MODEL_PATHS.trainingData), 'corpus.jsonl');
+  const sourceFile = existsSync(corpusFile) ? corpusFile : MODEL_PATHS.trainingData;
+  const data = loadJsonlDataset(sourceFile);
 
   if (data.length === 0) {
-    console.error(`Training file not found or empty: ${trainFile}`);
+    console.error(`Training file not found or empty: ${sourceFile}`);
     return;
   }
 
-  console.log(`Loaded ${data.length} examples from ${trainFile}`);
+  console.log(`Loaded ${data.length} examples from ${sourceFile}`);
 
   const distribution = intentDistribution(data);
   console.log('\nIntent distribution:');
@@ -26,7 +29,7 @@ function prepareDatasets(): void {
   const [train, rest] = stratifiedSplit(data, 0.2, TRAINING_CONFIG.seed);
   const [val, test] = stratifiedSplit(rest, 0.5, TRAINING_CONFIG.seed);
 
-  writeJsonlDataset(trainFile, train);
+  writeJsonlDataset(MODEL_PATHS.trainingData, train);
   writeJsonlDataset(MODEL_PATHS.validationData, val);
   writeJsonlDataset(MODEL_PATHS.testData, test);
 

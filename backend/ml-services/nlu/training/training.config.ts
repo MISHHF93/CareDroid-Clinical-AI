@@ -8,15 +8,13 @@
 
 import { existsSync } from 'fs';
 import path from 'path';
+import { classifierDir, metricsPath } from '../../shared/paths';
 import { INTENT_CLASSES, type IntentClass } from '../nlu.config';
 
 /** Prefer source tree under backend/ml-services/nlu (models are not copied to dist). */
 function resolveNluRoot(): string {
   const fromCwd = path.resolve(process.cwd(), 'ml-services', 'nlu');
-  const hasArtifacts =
-    existsSync(path.join(fromCwd, 'models', 'best_model', 'classifier.json')) ||
-    existsSync(path.join(fromCwd, 'data', 'train.jsonl'));
-  if (hasArtifacts) return fromCwd;
+  if (existsSync(path.join(fromCwd, 'data', 'train.jsonl'))) return fromCwd;
   return path.resolve(__dirname, '..');
 }
 
@@ -68,6 +66,6 @@ export const MODEL_PATHS = {
   trainingData: process.env.NLU_TRAINING_DATA ?? path.join(NLU_ROOT, 'data/train.jsonl'),
   validationData: process.env.NLU_VALIDATION_DATA ?? path.join(NLU_ROOT, 'data/val.jsonl'),
   testData: process.env.NLU_TEST_DATA ?? path.join(NLU_ROOT, 'data/test.jsonl'),
-  bestModelDir: process.env.NLU_BEST_MODEL_DIR ?? path.join(NLU_ROOT, 'models/best_model'),
-  metricsOutput: process.env.NLU_METRICS_OUTPUT ?? path.join(NLU_ROOT, 'metrics.json'),
+  bestModelDir: process.env.NLU_BEST_MODEL_DIR ?? classifierDir('nlu'),
+  metricsOutput: process.env.NLU_METRICS_OUTPUT ?? metricsPath('nlu'),
 } as const;

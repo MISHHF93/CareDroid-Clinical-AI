@@ -2,15 +2,15 @@
  * Intent Classifier Module
  */
 
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { IntentClassifierService } from './intent-classifier.service';
 import { AiModule } from '../../ai/ai.module';
 import { MetricsModule } from '../../metrics/metrics.module';
-import { NluModule } from '../../../../ml-services/nlu/nlu.module';
+import { UnifiedAiNodeModule } from '../../../../ml-services/unified-ai-node/unified-ai-node.module';
 
 @Module({
-  imports: [AiModule, ConfigModule, MetricsModule, NluModule],
+  imports: [forwardRef(() => AiModule), ConfigModule, MetricsModule, UnifiedAiNodeModule],
   providers: [IntentClassifierService],
   exports: [IntentClassifierService],
 })

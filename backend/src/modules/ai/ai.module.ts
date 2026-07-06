@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AIController } from './ai.controller';
 import { AIService } from './ai.service';
@@ -11,6 +11,7 @@ import { OrganizationsModule } from '../organizations/organizations.module';
 import { PlatformGovernanceModule } from '../platform-governance';
 import { PlatformAssetsModule } from '../platform-assets/platform-assets.module';
 import { SubscriptionsModule } from '../subscriptions/subscriptions.module';
+import { IntentClassifierModule } from '../medical-control-plane/intent-classifier/intent-classifier.module';
 import {
   AiContextManagerService,
   AiGatewayService,
@@ -27,6 +28,7 @@ import {
     PlatformGovernanceModule,
     PlatformAssetsModule,
     SubscriptionsModule,
+    forwardRef(() => IntentClassifierModule),
   ],
   controllers: [AIController],
   providers: [

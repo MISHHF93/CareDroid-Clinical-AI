@@ -1,3 +1,5 @@
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import path from 'node:path';
 import { ROUTE_RECORDS } from '../config/routes.config';
 import {
   ASSET_PACKS,
@@ -9,6 +11,7 @@ import { BACKEND_HTTP_ROUTES } from './backendHttpRouteInventory';
 import { FRONTEND_API_CALLS } from './frontendApiCallsInventory';
 import { clinicalIntentTools } from './clinicalIntentToolCatalog';
 import { getAiModelRegistry } from './aiModelRegistry';
+import { getLocalTrainedMlModelRegistry } from './aiModelRegistry.node';
 
 export const ARTIFACT_SCHEMA_FIELDS = Object.freeze([
   'artifactId',
@@ -78,6 +81,12 @@ const TYPE_SCORE = Object.freeze({
   document: 0.58,
   'asset-pack': 0.84,
   product: 0.84,
+  'nlu-example': 0.94,
+  'medical-knowledge': 0.88,
+  'backend-service': 0.8,
+  engine: 0.84,
+  page: 0.74,
+  registry: 0.76,
 });
 
 function asArray(value) {
@@ -364,6 +373,31 @@ function artifactFromProduct(product) {
   });
 }
 
+function artifactFromLocalMlModel(model) {
+  return makeArtifact({
+    artifactId: `model-${model.modelId}`,
+    name: model.name,
+    type: 'ai-model',
+    category: 'local-ml-head',
+    route: model.route,
+    sourceFile: model.classifierPath,
+    frontendStatus: 'unified-ai-node',
+    backendStatus: model.status,
+    demoStatus: model.status === 'active' ? 'live-or-local' : 'training-required',
+    assetPack: 'ai-workflow-pack',
+    product: 'product-core-platform',
+    workspace: 'ai-workflow|clinical',
+    roles: 'clinician|platform-admin',
+    organizationTypes: 'hospital',
+    riskLevel: 'high',
+    description: `${model.purpose}${model.accuracy ? ` (${(model.accuracy * 100).toFixed(1)}% accuracy)` : ''}`,
+    dependencies: [model.classifierPath, model.metricsPath, model.manifestPath || 'backend/ml-services/models/manifest.json'],
+    tags: ['ai-model', 'local-ml', model.head, model.modelId, model.architecture || 'untrained'],
+    embeddingText: `${model.name} ${model.purpose} ${model.head} ${model.route} local trained classifier`,
+    status: model.status,
+  });
+}
+
 function artifactFromAiModel(model) {
   return makeArtifact({
     artifactId: `model-${model.modelId}`,
@@ -385,6 +419,122 @@ function artifactFromAiModel(model) {
     dependencies: model.artifactDependencies,
     tags: ['ai-model', model.modelId, model.owner, model.costProfile],
     status: model.status,
+  });
+}
+
+function readJsonlLines(filePath) {
+  if (!existsSync(filePath)) return [];
+  return readFileSync(filePath, 'utf8')
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      try {
+        return JSON.parse(line);
+      } catch {
+        return null;
+      }
+    })
+    .filter(Boolean);
+}
+
+function loadNluTrainingExamples() {
+  const nluDataDir = path.join(process.cwd(), 'backend', 'ml-services', 'nlu', 'data');
+  if (!existsSync(nluDataDir)) return [];
+
+  const examples: Array<{
+    text: string;
+    intent: string;
+    subcategory: string | undefined;
+    split: string;
+    sourceFile: string;
+    index: number;
+  }> = [];
+  // Only index the master corpus — never re-ingest train/val/test splits (circular leak).
+  for (const fileName of ['corpus.jsonl']) {
+    const split = fileName.replace('.jsonl', '');
+    const sourceFile = path.join('backend', 'ml-services', 'nlu', 'data', fileName).split(path.sep).join('/');
+    for (const [index, row] of readJsonlLines(path.join(nluDataDir, fileName)).entries()) {
+      if (!row.text || !row.intent) continue;
+      examples.push({
+        text: String(row.text),
+        intent: String(row.intent),
+        subcategory: row.subcategory ? String(row.subcategory) : undefined,
+        split,
+        sourceFile,
+        index,
+      });
+    }
+  }
+  return examples;
+}
+
+function loadMedicalKnowledgeDocuments() {
+  const knowledgeDir = path.join(process.cwd(), 'data', 'medical-knowledge');
+  if (!existsSync(knowledgeDir)) return [];
+
+  return readdirSync(knowledgeDir)
+    .filter((fileName) => fileName.endsWith('.md'))
+    .map((fileName) => {
+      const absolute = path.join(knowledgeDir, fileName);
+      const body = readFileSync(absolute, 'utf8');
+      const relative = path.join('data', 'medical-knowledge', fileName).split(path.sep).join('/');
+      const title = path.basename(fileName, '.md').replace(/-/g, ' ');
+      return { fileName, relative, body, title };
+    });
+}
+
+function artifactFromNluExample(example) {
+  return makeArtifact({
+    artifactId: `nlu-${example.split}-${example.index}`,
+    name: `${example.intent} query`,
+    type: 'nlu-example',
+    category: example.intent,
+    route: '/api/nlu/predict',
+    sourceFile: example.sourceFile,
+    frontendStatus: 'nlu-training-corpus',
+    backendStatus: 'ml-services-nlu',
+    demoStatus: 'training-split',
+    assetPack: 'ai-workflow-pack',
+    product: 'product-core-platform',
+    workspace: 'ai-workflow|clinical',
+    roles: 'clinician|nurse|emergency-physician|platform-admin',
+    organizationTypes: 'hospital',
+    riskLevel: example.intent === 'emergency_alert' ? 'critical' : 'medium',
+    description: example.text,
+    dependencies: [
+      example.sourceFile,
+      'backend/ml-services/models/nlu/classifier.json',
+      'backend/ml-services/models/manifest.json',
+    ],
+    tags: ['nlu', example.intent, example.split, ...(example.subcategory ? [example.subcategory] : [])],
+    embeddingText: `${example.text} ${example.intent} ${example.subcategory || ''} nlu intent routing`,
+    status: 'active',
+  });
+}
+
+function artifactFromMedicalKnowledge(doc) {
+  return makeArtifact({
+    artifactId: `medical-knowledge-${slug(doc.fileName)}`,
+    name: doc.title,
+    type: 'medical-knowledge',
+    category: 'clinical-reference',
+    route: '/emergency/tools',
+    sourceFile: doc.relative,
+    frontendStatus: 'rag-corpus',
+    backendStatus: 'rag-ingest-candidate',
+    demoStatus: 'reference',
+    assetPack: 'core-platform',
+    product: 'product-core-platform',
+    workspace: 'clinical|education',
+    roles: 'clinician|nurse|emergency-physician|resident|pharmacist',
+    organizationTypes: 'hospital',
+    riskLevel: /interaction|sepsis|arrest|critical/i.test(doc.body) ? 'high' : 'medium',
+    description: doc.body.split(/\r?\n/).find((line) => line.trim() && !line.startsWith('#'))?.trim() || doc.title,
+    dependencies: doc.relative,
+    tags: ['medical-knowledge', 'rag', 'clinical-reference', slug(doc.fileName)],
+    embeddingText: `${doc.title} ${doc.relative} ${doc.body.slice(0, 1600)}`,
+    status: 'active',
   });
 }
 
@@ -411,6 +561,9 @@ export function buildArtifactCatalog({ extraArtifacts = [] as any[] }: any = {})
     ...ASSET_PACKS.map(artifactFromPack),
     ...SAAS_PRODUCTS.map(artifactFromProduct),
     ...getAiModelRegistry().map(artifactFromAiModel),
+    ...getLocalTrainedMlModelRegistry().map(artifactFromLocalMlModel),
+    ...loadNluTrainingExamples().map(artifactFromNluExample),
+    ...loadMedicalKnowledgeDocuments().map(artifactFromMedicalKnowledge),
     ...extraArtifacts.map(makeArtifact),
   ];
   return dedupeArtifacts(artifacts).sort((a, b) => a.artifactId.localeCompare(b.artifactId));
@@ -462,9 +615,32 @@ export function buildArtifactTrainingDataset(artifacts = buildArtifactCatalog())
         labelType: 'tags',
         confidence: 0.78,
       },
-    ].filter((label) => label.inputText && label.inputText !== UNKNOWN);
+    ];
 
-    return labels.map((label) => ({
+    if (artifact.type === 'nlu-example' && artifact.description && artifact.description !== UNKNOWN) {
+      labels.push({
+        inputText: artifact.description,
+        labelType: 'intent',
+        confidence: 0.95,
+      });
+    }
+
+    if (
+      ['calculator', 'tool', 'executor', 'route', 'page'].includes(artifact.type) &&
+      artifact.description &&
+      artifact.description !== UNKNOWN &&
+      artifact.description.length >= 20
+    ) {
+      labels.push({
+        inputText: artifact.description,
+        labelType: 'intent',
+        confidence: 0.88,
+      });
+    }
+
+    const filtered = labels.filter((label) => label.inputText && label.inputText !== UNKNOWN);
+
+    return filtered.map((label) => ({
       inputText: label.inputText,
       targetArtifactId: artifact.artifactId,
       targetCategory: artifact.category,

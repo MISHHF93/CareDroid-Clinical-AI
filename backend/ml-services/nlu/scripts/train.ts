@@ -2,8 +2,9 @@
 // Usage: ts-node scripts/train.ts
 
 import { writeFileSync } from 'fs';
+import { updateHeadManifest } from '../../shared/manifest';
 import { prepareDataset } from '../training/dataset';
-import { embedBatch } from '../training/embeddings';
+import { embedBatchCached as embedBatch } from '../training/embeddingsCache';
 import {
   trainClassifier,
   predictFromAny,
@@ -20,6 +21,7 @@ const MLP_CONFIG = {
   l2Reg: TRAINING_CONFIG.l2Reg,
   hiddenDim: Number(process.env.NLU_MLP_HIDDEN_DIM ?? 64),
   seed: TRAINING_CONFIG.seed,
+  patience: Number(process.env.NLU_MLP_PATIENCE ?? 300),
 };
 
 async function train(): Promise<void> {
@@ -114,6 +116,16 @@ async function train(): Promise<void> {
       MODEL_PATHS.metricsOutput,
       JSON.stringify({ accuracy, testSetSize: testData.length, architecture: chosenName }, null, 2),
     );
+    updateHeadManifest('nlu', {
+      classifierPath: outputPath,
+      metricsPath: MODEL_PATHS.metricsOutput,
+      architecture: chosenName,
+      accuracy,
+      numClasses,
+      embeddingModel: MODEL_CONFIG.embeddingModelName,
+      testSetSize: testData.length,
+      trainedAt: chosen.trainedAt,
+    });
   }
 
   console.log('Training completed!');

@@ -381,7 +381,7 @@ This is **intent routing only** — not a foundation model. Primary clinical rea
 | Parameter | Default |
 |-----------|---------|
 | Mode | `in-process` (inject `NluService` in Nest) |
-| URL | `http://127.0.0.1:3340/api/nlu` (or `http://backend:3000/api/nlu` in Docker) |
+| URL | `http://127.0.0.1:3350/api/nlu` (or `http://backend:3000/api/nlu` in Docker) |
 | Timeout | 30,000 ms |
 | Retries | 3 |
 | Confidence threshold | 0.70 |
@@ -389,7 +389,7 @@ This is **intent routing only** — not a foundation model. Primary clinical rea
 ```bash
 NLU_SERVICE_MODE=in-process
 NLU_SERVICE_ENABLED=true
-NLU_SERVICE_URL=http://127.0.0.1:3340/api/nlu
+NLU_SERVICE_URL=http://127.0.0.1:3350/api/nlu
 NLU_CONFIDENCE_THRESHOLD=0.70
 ```
 
@@ -679,7 +679,7 @@ AI audit records are queryable from `/audit` (`PlatformGovernanceWorkspace`) and
 |----------|---------|
 | `NLU_SERVICE_MODE` | `in-process` |
 | `NLU_SERVICE_ENABLED` | `true` |
-| `NLU_SERVICE_URL` | `http://127.0.0.1:3340/api/nlu` |
+| `NLU_SERVICE_URL` | `http://127.0.0.1:3350/api/nlu` |
 | `NLU_SERVICE_TIMEOUT` | `30000` |
 | `NLU_SERVICE_RETRIES` | `3` |
 | `NLU_CONFIDENCE_THRESHOLD` | `0.70` |

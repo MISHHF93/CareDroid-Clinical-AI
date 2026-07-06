@@ -1,4 +1,4 @@
-import { Injectable, Optional } from '@nestjs/common';
+import { Inject, Injectable, Optional, forwardRef } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, MoreThanOrEqual } from 'typeorm';
@@ -26,6 +26,8 @@ import {
   type CareDroidAIIntent,
   type CareDroidAIRequest,
 } from '../../../../lib/ai/careDroidAI';
+import { IntentClassifierService } from '../medical-control-plane/intent-classifier/intent-classifier.service';
+import { extractClassifiableText } from '../../../ml-services/shared/routing-maps';
 
 interface RateLimitConfig {
   dailyLimit: number;
@@ -64,6 +66,9 @@ export class AIService {
     private readonly metricsService: MetricsService,
     @Optional() private readonly platformGovernanceService?: PlatformGovernanceService,
     @Optional() private readonly subscriptionsService?: SubscriptionsService,
+    @Optional()
+    @Inject(forwardRef(() => IntentClassifierService))
+    private readonly intentClassifier?: IntentClassifierService,
   ) {
     const aiConfig = this.configService.get<any>('ai') || {};
     const aiRateLimits = aiConfig.rateLimits || {};
@@ -458,11 +463,13 @@ export class AIService {
     context?: any,
   ) {
     const startTime = Date.now();
+    const unifiedClassification = await this.classifyStructuredNodeInput(userId, request);
     const mergedRequest = {
       ...request,
       context: {
         ...(request.context || {}),
         ...(context || {}),
+        ...(unifiedClassification ? { unifiedClassification } : {}),
       },
     };
     const response = await runCareDroidAI(mergedRequest);
@@ -487,6 +494,7 @@ export class AIService {
         sourceScreen: mergedRequest.context?.sourceScreen,
         userRole: mergedRequest.context?.userRole || mergedRequest.context?.tenant?.role,
         confidence: response.confidence,
+        unifiedClassification,
         warningCount: response.warnings.length,
         nextActionCount: response.nextActions.length,
         aiCommercialization: {
@@ -501,6 +509,32 @@ export class AIService {
     });
 
     return response;
+  }
+
+  private async classifyStructuredNodeInput(
+    userId: string,
+    request: CareDroidAIRequest,
+  ): Promise<Record<string, unknown> | null> {
+    if (!this.intentClassifier) return null;
+    const text = extractClassifiableText(request.input as Record<string, unknown>);
+    if (!text) return null;
+    try {
+      const classification = await this.intentClassifier.classify(text, {
+        userId,
+        userRole: String(request.context?.userRole || request.context?.tenant?.role || 'clinician'),
+      });
+      return {
+        primaryIntent: classification.primaryIntent,
+        toolId: classification.toolId,
+        artifactType: classification.artifactType,
+        artifactRouteConfidence: classification.artifactRouteConfidence,
+        confidence: classification.confidence,
+        method: classification.method,
+        isEmergency: classification.isEmergency,
+      };
+    } catch {
+      return null;
+    }
   }
 
   async getUsage(userId: string, days: number = 30) {

@@ -36,7 +36,14 @@
     "nlu:evaluate": "ts-node ml-services/nlu/scripts/evaluate.ts",
     "nlu:load-test": "ts-node ml-services/nlu/scripts/loadTest.ts",
     "nlu:cross-validate": "ts-node ml-services/nlu/scripts/crossValidate.ts",
-    "nlu:pipeline": "npm run nlu:prepare-data && npm run nlu:train && npm run nlu:evaluate"
+    "nlu:augment-artifacts": "ts-node ml-services/nlu/scripts/augmentFromArtifacts.ts",
+    "nlu:pipeline": "npm run nlu:augment-artifacts && npm run nlu:prepare-data && npm run nlu:train && npm run nlu:evaluate",
+    "artifact-router:prepare-data": "ts-node ml-services/artifact-router/scripts/prepareData.ts",
+    "artifact-router:train": "ts-node ml-services/artifact-router/scripts/train.ts",
+    "artifact-router:evaluate": "ts-node ml-services/artifact-router/scripts/evaluate.ts",
+    "artifact-router:pipeline": "npm run artifact-router:prepare-data && npm run artifact-router:train && npm run artifact-router:evaluate",
+    "train:unified-models": "node ../scripts/train-unified-models.mjs",
+    "sync:unified-models": "node ../scripts/sync-unified-models.mjs"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",

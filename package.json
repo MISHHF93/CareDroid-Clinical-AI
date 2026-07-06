@@ -122,6 +122,8 @@
     "plans:scan-battery": "node scripts/run-plan-scan-battery.mjs",
     "plans:write-progress": "node scripts/write-plan-progress-dashboard.mjs",
     "artifact-intelligence:generate": "node scripts/generate-artifact-intelligence.mjs",
+    "train:unified-models": "node scripts/train-unified-models.mjs",
+    "sync:unified-models": "node scripts/sync-unified-models.mjs",
     "docs:generate": "node scripts/generate-living-documentation.mjs",
     "docs:check": "node scripts/check-living-documentation.mjs",
     "test:living-docs": "vitest run src/config/livingDocumentationModel.test.ts src/services/livingDocumentationService.test.ts && npm run docs:check",

@@ -9,10 +9,9 @@ import { embedText } from './training/embeddings';
 import {
   loadAnyClassifier,
   predictFromAny,
-  classifierWeightsPath,
   type AnyClassifierWeights,
 } from './training/classifier';
-import { MODEL_PATHS } from './training/training.config';
+import { resolveClassifierPath } from '../shared/paths';
 import { detectSubcategory } from './training/subcategory';
 
 export interface PredictResult {
@@ -69,7 +68,7 @@ export class NluService {
     if (this.attemptedLoad) return;
     this.attemptedLoad = true;
 
-    const weightsPath = classifierWeightsPath(MODEL_PATHS.bestModelDir);
+    const weightsPath = resolveClassifierPath('nlu');
     if (!existsSync(weightsPath)) {
       // No trained classifier yet — run `npm run nlu:train` (backend/ml-services/nlu). Rule-based fallback until then.
       return;

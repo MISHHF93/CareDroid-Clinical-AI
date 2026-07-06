@@ -2,9 +2,11 @@
 // Usage: ts-node scripts/evaluate.ts
 
 import { existsSync, writeFileSync } from 'fs';
+import { updateHeadManifest } from '../../shared/manifest';
+import { resolveClassifierPath } from '../../shared/paths';
 import { loadJsonlDataset, type NluExample } from '../training/dataset';
-import { embedText } from '../training/embeddings';
-import { loadAnyClassifier, predictFromAny, classifierWeightsPath } from '../training/classifier';
+import { embedTextCached as embedText } from '../training/embeddingsCache';
+import { loadAnyClassifier, predictFromAny } from '../training/classifier';
 import { INTENT_CLASSES, INTENT_LABELS, MODEL_PATHS } from '../training/training.config';
 import { INTENT_KEYWORDS } from '../nlu.config';
 
@@ -68,7 +70,7 @@ async function evaluate(): Promise<void> {
     return;
   }
 
-  const weightsPath = classifierWeightsPath(MODEL_PATHS.bestModelDir);
+  const weightsPath = resolveClassifierPath('nlu');
   const classifier = existsSync(weightsPath) ? loadAnyClassifier(weightsPath) : null;
 
   if (classifier) {
@@ -128,6 +130,15 @@ async function evaluate(): Promise<void> {
   console.log('='.repeat(50) + '\n');
 
   writeFileSync(MODEL_PATHS.metricsOutput, JSON.stringify(results, null, 2));
+  updateHeadManifest('nlu', {
+    classifierPath: weightsPath,
+    metricsPath: MODEL_PATHS.metricsOutput,
+    architecture: results.architecture ?? undefined,
+    accuracy: results.accuracy,
+    numClasses: INTENT_CLASSES.length,
+    testSetSize: testData.length,
+    evaluatedAt: new Date().toISOString(),
+  });
   console.log(`Metrics saved to ${MODEL_PATHS.metricsOutput}`);
 }
 

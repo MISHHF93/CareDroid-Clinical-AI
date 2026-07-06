@@ -46,6 +46,10 @@ import { PlatformGovernanceService } from '../platform-governance';
 import { Message, unifiedAIClient } from '../../../../lib/ai/serverClient';
 import { buildSystemPrompt } from '../../../../lib/ai/contextEngine';
 import { getToolsForRequestType } from '../../../../lib/ai/toolRegistry';
+import {
+  mapRouterArtifactTypeToArtifactEntity,
+  resolveExecutorToolId,
+} from '../../../ml-services/shared/routing-maps';
 
 interface QueryResponse {
   text: string;
@@ -186,7 +190,7 @@ export class ChatService {
       });
 
       this.logger.log(
-        `🧠 Intent: ${classification.primaryIntent} | Tool: ${classification.toolId || 'N/A'} | Confidence: ${classification.confidence.toFixed(2)} | Method: ${classification.method}`,
+        `🧠 Intent: ${classification.primaryIntent} | Tool: ${classification.toolId || 'N/A'} | Artifact: ${classification.artifactType || 'N/A'} | Confidence: ${classification.confidence.toFixed(2)} | Method: ${classification.method}`,
       );
 
       // Record conversation depth metric
@@ -206,6 +210,8 @@ export class ChatService {
             message: message.substring(0, 100),
             intent: classification.primaryIntent,
             toolId: classification.toolId,
+            artifactType: classification.artifactType,
+            artifactRouteConfidence: classification.artifactRouteConfidence,
             confidence: classification.confidence,
             method: classification.method,
             isEmergency: classification.isEmergency,
@@ -688,8 +694,11 @@ export class ChatService {
     featureHint: string | undefined,
     classification: IntentClassification | null,
   ): IntentClassification | null {
-    if (classification?.primaryIntent === PrimaryIntent.CLINICAL_TOOL && classification.toolId) {
-      return classification;
+    if (classification?.primaryIntent === PrimaryIntent.CLINICAL_TOOL) {
+      const resolvedToolId = this.resolveClassificationToolId(classification, message);
+      if (resolvedToolId) {
+        return { ...classification, toolId: resolvedToolId };
+      }
     }
 
     const hintedToolId = toolHint || featureHint;
@@ -709,6 +718,13 @@ export class ChatService {
       matchedPatterns: classification?.matchedPatterns || [`ui-tool-hint:${hintedToolId}`],
       classifiedAt: classification?.classifiedAt || new Date(),
     } as IntentClassification;
+  }
+
+  private resolveClassificationToolId(
+    classification: IntentClassification,
+    message?: string,
+  ): string | undefined {
+    return resolveExecutorToolId(classification.toolId, classification.artifactType, message);
   }
 
   /**
@@ -755,6 +771,8 @@ export class ChatService {
       context: {
         primaryIntent: classification.primaryIntent,
         toolId: classification.toolId,
+        artifactType: classification.artifactType,
+        artifactRouteConfidence: classification.artifactRouteConfidence,
         isEmergency: classification.isEmergency,
         method: classification.method,
       },
@@ -1102,8 +1120,21 @@ export class ChatService {
     }
 
     try {
+      const routerType = response.intentClassification?.artifactType as string | undefined;
+      const artifactEntityType = mapRouterArtifactTypeToArtifactEntity(routerType);
+      const artifactTypeEnum =
+        artifactEntityType === 'calculator'
+          ? ArtifactType.CALCULATOR
+          : artifactEntityType === 'workflow'
+            ? ArtifactType.WORKFLOW
+            : artifactEntityType === 'prompt'
+              ? ArtifactType.PROMPT
+              : artifactEntityType === 'protocol'
+                ? ArtifactType.PROTOCOL
+                : ArtifactType.AI_OUTPUT;
+
       await this.artifactsService.create({
-        type: ArtifactType.AI_OUTPUT,
+        type: artifactTypeEnum,
         title: this.compactArtifactTitle(response.text),
         description: this.compactAssistantText(response.text, 1800),
         tags: [
@@ -1111,6 +1142,10 @@ export class ChatService {
           'ai-output',
           response.toolResult ? 'tool-context' : 'rag-context',
           String(params.routePlan?.selectedExpert || 'clinical-assistant'),
+          ...(routerType ? [`artifact-type:${routerType}`] : []),
+          ...(response.intentClassification?.toolId
+            ? [`tool:${response.intentClassification.toolId}`]
+            : []),
         ],
         version: '1.0.0',
       });

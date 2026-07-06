@@ -102,8 +102,9 @@ export function trainMlpClassifier(
   numClasses: number,
   labelToIntent: Record<number, string>,
   embeddingModelName: string,
-  config: { numEpochs: number; learningRate: number; l2Reg: number; hiddenDim: number; seed: number },
+  config: { numEpochs: number; learningRate: number; l2Reg: number; hiddenDim: number; seed: number; patience?: number },
   validation?: { embeddings: number[][]; labels: number[] },
+  classWeights?: number[],
 ): MlpTrainResult {
   const n = embeddings.length;
   const dim = embeddings[0]?.length ?? 0;
@@ -129,36 +130,86 @@ export function trainMlpClassifier(
   let bestB2 = [...b2];
   let bestEpoch = -1;
   let bestValLoss = hasVal ? Infinity : null;
+  const trainStart = Date.now();
+  const progressEvery = Math.max(1, Math.round(config.numEpochs / 25));
+
+  // Buffers reused across every example and every epoch instead of being reallocated
+  // each time — with n examples * numEpochs iterations, fresh allocations here were the
+  // dominant source of GC pressure. Reusing them changes nothing numerically (same
+  // operations in the same order each epoch, just against existing memory).
+  const w1Grad: number[][] = Array.from({ length: hiddenDim }, () => new Array(dim).fill(0));
+  const b1Grad: number[] = new Array(hiddenDim).fill(0);
+  const w2Grad: number[][] = Array.from({ length: numClasses }, () => new Array(hiddenDim).fill(0));
+  const b2Grad: number[] = new Array(numClasses).fill(0);
+  const hPreBuf: number[] = new Array(hiddenDim).fill(0);
+  const hBuf: number[] = new Array(hiddenDim).fill(0);
+  const logitsBuf: number[] = new Array(numClasses).fill(0);
+  const probsBuf: number[] = new Array(numClasses).fill(0);
+  const dLogitsBuf: number[] = new Array(numClasses).fill(0);
+  const dHBuf: number[] = new Array(hiddenDim).fill(0);
 
   for (let epoch = 0; epoch < config.numEpochs; epoch++) {
-    const w1Grad: number[][] = Array.from({ length: hiddenDim }, () => new Array(dim).fill(0));
-    const b1Grad: number[] = new Array(hiddenDim).fill(0);
-    const w2Grad: number[][] = Array.from({ length: numClasses }, () => new Array(hiddenDim).fill(0));
-    const b2Grad: number[] = new Array(numClasses).fill(0);
+    for (let j = 0; j < hiddenDim; j++) w1Grad[j].fill(0);
+    b1Grad.fill(0);
+    for (let c = 0; c < numClasses; c++) w2Grad[c].fill(0);
+    b2Grad.fill(0);
     let totalLoss = 0;
 
     for (let i = 0; i < n; i++) {
-      const { hPre, h, logits } = forward(w1, b1, w2, b2, embeddings[i]);
-      const probs = softmax(logits);
-      const trueLabel = labels[i];
-      totalLoss += -Math.log(Math.max(probs[trueLabel], 1e-12));
+      const embedding = embeddings[i];
 
-      const dLogits = probs.map((p, c) => p - (c === trueLabel ? 1 : 0));
-      const dH = new Array(hiddenDim).fill(0);
+      // Forward pass (same arithmetic as forward(), written into reused buffers).
+      for (let j = 0; j < hiddenDim; j++) {
+        const row = w1[j];
+        let sum = b1[j];
+        for (let d = 0; d < dim; d++) sum += row[d] * embedding[d];
+        hPreBuf[j] = sum;
+        hBuf[j] = sum > 0 ? sum : 0;
+      }
+      for (let c = 0; c < numClasses; c++) {
+        const row = w2[c];
+        let sum = b2[c];
+        for (let j = 0; j < hiddenDim; j++) sum += row[j] * hBuf[j];
+        logitsBuf[c] = sum;
+      }
+
+      // Softmax (same arithmetic as softmax(), written into probsBuf).
+      let max = -Infinity;
+      for (let c = 0; c < numClasses; c++) if (logitsBuf[c] > max) max = logitsBuf[c];
+      let sumExp = 0;
+      for (let c = 0; c < numClasses; c++) {
+        const e = Math.exp(logitsBuf[c] - max);
+        probsBuf[c] = e;
+        sumExp += e;
+      }
+      for (let c = 0; c < numClasses; c++) probsBuf[c] /= sumExp;
+
+      const trueLabel = labels[i];
+      const sampleWeight = classWeights?.[trueLabel] ?? 1;
+      totalLoss += sampleWeight * -Math.log(Math.max(probsBuf[trueLabel], 1e-12));
 
       for (let c = 0; c < numClasses; c++) {
-        b2Grad[c] += dLogits[c];
+        dLogitsBuf[c] = (probsBuf[c] - (c === trueLabel ? 1 : 0)) * sampleWeight;
+      }
+      dHBuf.fill(0);
+
+      for (let c = 0; c < numClasses; c++) {
+        const dlc = dLogitsBuf[c];
+        b2Grad[c] += dlc;
+        const w2Row = w2[c];
+        const w2GradRow = w2Grad[c];
         for (let j = 0; j < hiddenDim; j++) {
-          w2Grad[c][j] += dLogits[c] * h[j];
-          dH[j] += dLogits[c] * w2[c][j];
+          w2GradRow[j] += dlc * hBuf[j];
+          dHBuf[j] += dlc * w2Row[j];
         }
       }
 
       for (let j = 0; j < hiddenDim; j++) {
-        const dHPre = hPre[j] > 0 ? dH[j] : 0;
+        const dHPre = hPreBuf[j] > 0 ? dHBuf[j] : 0;
         b1Grad[j] += dHPre;
+        const w1GradRow = w1Grad[j];
         for (let d = 0; d < dim; d++) {
-          w1Grad[j][d] += dHPre * embeddings[i][d];
+          w1GradRow[d] += dHPre * embedding[d];
         }
       }
     }
@@ -180,10 +231,11 @@ export function trainMlpClassifier(
 
     epochLosses.push(totalLoss / n);
 
+    let currentValLoss: number | null = null;
     if (hasVal) {
-      const valLoss = meanCrossEntropyLoss(w1, b1, w2, b2, validation!.embeddings, validation!.labels);
-      if (valLoss < (bestValLoss as number)) {
-        bestValLoss = valLoss;
+      currentValLoss = meanCrossEntropyLoss(w1, b1, w2, b2, validation!.embeddings, validation!.labels);
+      if (currentValLoss < (bestValLoss as number)) {
+        bestValLoss = currentValLoss;
         bestEpoch = epoch;
         bestW1 = clone2d(w1);
         bestB1 = [...b1];
@@ -191,6 +243,29 @@ export function trainMlpClassifier(
         bestB2 = [...b2];
       }
     }
+
+    if (epoch % progressEvery === 0 || epoch === config.numEpochs - 1) {
+      const elapsedSec = ((Date.now() - trainStart) / 1000).toFixed(1);
+      const trainLoss = epochLosses[epoch];
+      const valLossMsg = currentValLoss !== null ? `, valLoss=${currentValLoss.toFixed(4)}` : '';
+      console.log(`  epoch ${epoch + 1}/${config.numEpochs} (${elapsedSec}s): trainLoss=${trainLoss.toFixed(4)}${valLossMsg}`);
+    }
+
+    // The returned weights are already the best-val-loss checkpoint (below), so epochs
+    // past the point where validation stops improving are pure wasted compute, not
+    // additional quality — stopping early changes nothing about the result.
+    const patience = config.patience ?? 300;
+    if (hasVal && epoch - bestEpoch > patience) {
+      console.log(
+        `  Early stopping at epoch ${epoch + 1}/${config.numEpochs} (no val improvement in ${patience} epochs): ` +
+          `best epoch=${bestEpoch + 1}, best valLoss=${(bestValLoss as number).toFixed(4)}`,
+      );
+      break;
+    }
+  }
+
+  if (hasVal) {
+    console.log(`  MLP checkpoint: best epoch=${bestEpoch + 1}, best valLoss=${(bestValLoss as number).toFixed(4)}`);
   }
 
   const finalW1 = hasVal ? bestW1 : w1;

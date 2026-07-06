@@ -14,7 +14,7 @@ import { IntentClassifierService } from './intent-classifier.service';
 import { AIService } from '../../ai/ai.service';
 import { ConfigService } from '@nestjs/config';
 import { NluMetricsService } from '../../metrics/nlu-metrics.service';
-import { NluService } from '../../../../ml-services/nlu/nlu.service';
+import { UnifiedAiNodeService } from '../../../../ml-services/unified-ai-node/unified-ai-node.service';
 import { PrimaryIntent, EmergencySeverity } from './dto/intent-classification.dto';
 
 describe('IntentClassifierService', () => {
@@ -30,13 +30,13 @@ describe('IntentClassifierService', () => {
     get: jest.fn().mockReturnValue({
       enabled: true,
       mode: 'in-process',
-      url: 'http://127.0.0.1:3340/api/nlu',
+      url: 'http://127.0.0.1:3350/api/nlu',
     }),
   };
 
-  const mockNluService = {
+  const mockUnifiedAiNode = {
     load: jest.fn().mockResolvedValue(undefined),
-    predict: jest.fn().mockRejectedValue(new Error('NLU unavailable')),
+    route: jest.fn().mockRejectedValue(new Error('Unified AI node unavailable')),
   };
 
   const mockNluMetricsService = {
@@ -65,8 +65,8 @@ describe('IntentClassifierService', () => {
           useValue: mockNluMetricsService,
         },
         {
-          provide: NluService,
-          useValue: mockNluService,
+          provide: UnifiedAiNodeService,
+          useValue: mockUnifiedAiNode,
         },
       ],
     }).compile();
@@ -316,30 +316,53 @@ describe('IntentClassifierService', () => {
   // NLU INTEGRATION TESTS (PHASE 2)
   // ========================================
   describe('NLU Integration (Phase 2)', () => {
-    it('should use NLU result when confidence is high', async () => {
-      mockNluService.predict.mockResolvedValueOnce({
-        intent: 'sofa_score_calculation',
-        confidence: 0.92,
-        labelId: 2,
-        keyTerms: ['sofa'],
-        latencyMs: 5,
+    it('should use unified AI node result when confidence is high', async () => {
+      mockUnifiedAiNode.route.mockResolvedValueOnce({
+        intent: {
+          intent: 'sofa_score_calculation',
+          confidence: 0.92,
+          labelId: 2,
+          keyTerms: ['sofa'],
+          subcategory: null,
+          latencyMs: 5,
+        },
+        artifact: {
+          artifactType: 'calculator',
+          confidence: 0.88,
+          labelId: 0,
+          targetMode: 'artifact-type',
+          latencyMs: 4,
+        },
+        latencyMs: 9,
       });
 
       const result = await service.classify('Help me with this case');
 
       expect(result.method).toBe('nlu');
       expect(result.primaryIntent).toBe(PrimaryIntent.CLINICAL_TOOL);
-      expect(result.toolId).toBe('sofa_score_calculation');
+      expect(result.toolId).toBe('sofa-calculator');
+      expect(result.artifactType).toBe('calculator');
       expect(result.confidence).toBeGreaterThanOrEqual(0.7);
     });
 
     it('should fall back to LLM when NLU confidence is low', async () => {
-      mockNluService.predict.mockResolvedValueOnce({
-        intent: 'general_clinical_query',
-        confidence: 0.4,
-        labelId: 9,
-        keyTerms: [],
-        latencyMs: 5,
+      mockUnifiedAiNode.route.mockResolvedValueOnce({
+        intent: {
+          intent: 'general_clinical_query',
+          confidence: 0.4,
+          labelId: 9,
+          keyTerms: [],
+          subcategory: null,
+          latencyMs: 5,
+        },
+        artifact: {
+          artifactType: 'tool',
+          confidence: 0.3,
+          labelId: 1,
+          targetMode: 'artifact-type',
+          latencyMs: 4,
+        },
+        latencyMs: 9,
       });
 
       mockAIService.generateStructuredJSON.mockResolvedValue({

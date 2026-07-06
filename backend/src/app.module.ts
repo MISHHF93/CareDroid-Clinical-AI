@@ -234,7 +234,7 @@ function resolveDatabaseClient() {
     NativeAiModule,
     NluModule,
 
-    // Medical Control Plane (Intent Classification, Tool Orchestration)
+    // Medical Control Plane (Intent Classification, Tool Orchestration, Unified AI Node)
     MedicalControlPlaneModule,
 
     // Encryption (Batch 4)

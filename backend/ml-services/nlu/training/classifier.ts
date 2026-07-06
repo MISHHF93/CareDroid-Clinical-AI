@@ -82,6 +82,7 @@ export function trainClassifier(
   embeddingModelName: string,
   config: { numEpochs: number; learningRate: number; l2Reg: number } = TRAINING_CONFIG,
   validation?: { embeddings: number[][]; labels: number[] },
+  classWeights?: number[],
 ): TrainResult {
   const n = embeddings.length;
   const dim = embeddings[0]?.length ?? 0;
@@ -108,10 +109,11 @@ export function trainClassifier(
       const probs = softmax(logits);
       const trueLabel = labels[i];
 
-      totalLoss += -Math.log(Math.max(probs[trueLabel], 1e-12));
+      const sampleWeight = classWeights?.[trueLabel] ?? 1;
+      totalLoss += sampleWeight * -Math.log(Math.max(probs[trueLabel], 1e-12));
 
       for (let c = 0; c < numClasses; c++) {
-        const gradSignal = probs[c] - (c === trueLabel ? 1 : 0);
+        const gradSignal = (probs[c] - (c === trueLabel ? 1 : 0)) * sampleWeight;
         biasGrad[c] += gradSignal;
         for (let d = 0; d < dim; d++) {
           weightGrad[c][d] += gradSignal * embeddings[i][d];

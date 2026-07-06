@@ -47,7 +47,7 @@ describe('build and service config consistency', () => {
     expect(packageJson.scripts.dev).toBe('vite --strictPort');
     expect(packageJson.scripts['dev:web']).toBe('vite --strictPort');
     expect(packageJson.scripts['dev:lan']).toBe('vite --strictPort --host');
-    expect(viteConfig).toContain("return 8000");
+    expect(viteConfig).toContain("return 5190");
     expect(viteConfig.match(/strictPort:\s*true/g)).toHaveLength(2);
     expect(viteConfig).toContain('env.VITE_API_PROXY_TARGET || `http://localhost:${backendPort}`');
     expect(devStack).toContain('VITE_API_PROXY_TARGET: backendOrigin');
@@ -162,18 +162,18 @@ describe('build and service config consistency', () => {
   it('keeps Vite on the documented local frontend port', () => {
     const viteConfig = read('vite.config.ts');
 
-    expect(viteConfig).toContain("return 8000");
+    expect(viteConfig).toContain("return 5190");
     expect(viteConfig).toContain('strictPort: true');
   });
 
   it('normalizes NLU defaults to in-process TypeScript on the Nest backend', () => {
     expect(read('backend/.env.example')).toContain('NLU_SERVICE_MODE=in-process');
-    expect(read('backend/.env.example')).toContain('NLU_SERVICE_URL=http://127.0.0.1:3340/api/nlu');
+    expect(read('backend/.env.example')).toContain('NLU_SERVICE_URL=http://127.0.0.1:3350/api/nlu');
     expect(read('backend/src/config/nlu.config.ts')).toContain("NLU_SERVICE_MODE || 'in-process'");
     expect(read('docker-compose.yml')).toContain(
       'NLU_SERVICE_URL: ${NLU_SERVICE_URL:-http://backend:3000/api/nlu}',
     );
-    expect(read('lib/ai/config.ts')).toContain('http://127.0.0.1:3340/api/nlu');
+    expect(read('lib/ai/config.ts')).toContain('http://127.0.0.1:3350/api/nlu');
   });
 
   it('keeps NLU confidence threshold aligned across backend and classifier config', () => {

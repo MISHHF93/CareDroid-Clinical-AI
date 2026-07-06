@@ -38,6 +38,12 @@ export interface IntentClassification {
   // Tool identification (if clinical_tool intent)
   toolId?: string;
 
+  /** Artifact-type head from unified AI node (calculator, tool, route, …). */
+  artifactType?: string;
+
+  /** Confidence from artifact-router classifier head (0-1). */
+  artifactRouteConfidence?: number;
+
   // Confidence score (0-1)
   confidence: number;
 

@@ -15,7 +15,9 @@ export type UnifiedAiNodeDomain =
   | 'copilot_chat';
 
 export const CARE_DROID_UNIFIED_AI_NODE_ID = 'CareDroidUnifiedAINode';
-export const CARE_DROID_UNIFIED_AI_NODE_VERSION = '2026.07.01';
+export const CARE_DROID_UNIFIED_AI_NODE_VERSION = '2026.07.04';
+/** ML classifier heads (intent + artifact-router) — single manifest under backend/ml-services/models/. */
+export const CARE_DROID_UNIFIED_AI_NODE_MODELS_PATH = '/api/ai/node/models';
 export const EXPECTED_PLATFORM_AI_SERVICE_COUNT = 17;
 
 export type UnifiedAiNodeChannel = 'structured' | 'conversational';

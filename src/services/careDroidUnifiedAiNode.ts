@@ -9,9 +9,11 @@ import {
   AI_SYSTEM_TOOL_NODE_MAP,
   buildUnifiedAiNodeContext,
   CARE_DROID_UNIFIED_AI_NODE_ID,
+  CARE_DROID_UNIFIED_AI_NODE_MODELS_PATH,
   PLATFORM_AI_SERVICE_NODE_MAP,
   type UnifiedAiNodeCapability,
 } from '../config/careDroidUnifiedAiNode.config';
+import { apiFetch, parseApiResponse } from './apiClient';
 import {
   requestAiChiefConversational,
   requestAiChiefCopilotQuery,
@@ -33,7 +35,22 @@ export type UnifiedAiConversationalRequest = AIChiefConversationalRequest & {
   platformServiceId?: string;
 };
 
-export { CARE_DROID_UNIFIED_AI_NODE_ID };
+export { CARE_DROID_UNIFIED_AI_NODE_ID, CARE_DROID_UNIFIED_AI_NODE_MODELS_PATH };
+
+export type UnifiedModelHealth = {
+  status: 'ready' | 'degraded';
+  embeddingModel: string;
+  heads: {
+    nlu: { loaded: boolean; classifierExists: boolean };
+    artifactRouter: { loaded: boolean; classifierExists: boolean };
+  };
+};
+
+/** Ops health for unified classifier directory (intent + artifact-router heads). */
+export async function fetchUnifiedModelHealth(): Promise<UnifiedModelHealth> {
+  const response = await apiFetch(`${CARE_DROID_UNIFIED_AI_NODE_MODELS_PATH}/health`);
+  return parseApiResponse<UnifiedModelHealth>(response, { fallback: null });
+}
 
 export function resolveUnifiedAiCapability(
   capabilityId: string,

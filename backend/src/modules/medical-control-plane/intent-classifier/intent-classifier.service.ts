@@ -3,13 +3,13 @@
  *
  * Three-Phase Classification Pipeline:
  * 1. Keyword Matching (fast, rule-based)
- * 2. NLU Model (TypeScript Xenova classifier — backend/ml-services/nlu)
+ * 2. Unified AI Node (NLU intent head + artifact-router head — ml-services/models)
  * 3. LLM Fallback (GPT-4 for complex cases)
  *
  * Emergency Detection: 100% recall (no false negatives)
  */
 
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger, forwardRef } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AIService } from '../../ai/ai.service';
 import { NluMetricsService } from '../../metrics/nlu-metrics.service';
@@ -27,7 +27,8 @@ import {
 } from './patterns/emergency.patterns';
 import { matchToolPatterns, extractToolParameters } from './patterns/tool.patterns';
 import { classifyClinicalQuery } from './patterns/clinical.patterns';
-import { NluService } from '../../../../ml-services/nlu/nlu.service';
+import { resolveExecutorToolId } from '../../../../ml-services/shared/routing-maps';
+import { UnifiedAiNodeService } from '../../../../ml-services/unified-ai-node/unified-ai-node.service';
 
 @Injectable()
 export class IntentClassifierService {
@@ -52,13 +53,14 @@ export class IntentClassifierService {
   };
 
   constructor(
+    @Inject(forwardRef(() => AIService))
     private readonly aiService: AIService,
     private readonly configService: ConfigService,
     private readonly nluMetrics: NluMetricsService,
-    private readonly nluService: NluService,
+    private readonly unifiedAiNode: UnifiedAiNodeService,
   ) {
     const nluConfig = this.configService.get<any>('nlu');
-    const baseUrl = nluConfig?.url || 'http://127.0.0.1:3340/api/nlu';
+    const baseUrl = nluConfig?.url || 'http://127.0.0.1:3350/api/nlu';
     this.nluServiceUrl = baseUrl.replace(/\/$/, '');
     this.nluEnabled = nluConfig?.enabled !== false;
     this.nluUseInProcess = nluConfig?.mode !== 'http';
@@ -128,7 +130,7 @@ export class IntentClassifierService {
     );
 
     // ========================================
-    // PHASE 2: NLU MODEL (Xenova embeddings + trained MLP head)
+    // PHASE 2: UNIFIED AI NODE (intent + artifact-type classifiers)
     // ========================================
     const nluStartMs = Date.now();
     const nluResult = await this.nluMatcher(message, context);
@@ -295,7 +297,7 @@ export class IntentClassifierService {
   }
 
   /**
-   * Phase 2: NLU model-based classification (TypeScript Xenova head in-process by default).
+   * Phase 2: Unified AI node — intent head + artifact-router head (in-process by default).
    */
   private async nluMatcher(
     message: string,
@@ -316,8 +318,8 @@ export class IntentClassifierService {
 
     try {
       const result = this.nluUseInProcess
-        ? await this.predictWithInProcessNlu(message)
-        : await this.predictWithHttpNlu(message);
+        ? await this.predictWithUnifiedNode(message)
+        : await this.predictWithHttpUnifiedNode(message);
 
       if (!result) {
         return null;
@@ -332,15 +334,26 @@ export class IntentClassifierService {
 
       this.recordSuccess(this.nluCircuitBreaker);
 
-      const toolId =
+      const rawToolId =
         result.toolId ?? (primaryIntent === PrimaryIntent.CLINICAL_TOOL ? result.intent : undefined);
+      const toolId = resolveExecutorToolId(rawToolId, result.artifactType, message);
+
+      const extractedParameters = { ...(result.parameters || {}) };
+      if (result.artifactType && result.artifactType !== 'unknown') {
+        extractedParameters.artifactType = result.artifactType;
+        if (result.artifactRouteConfidence !== undefined) {
+          extractedParameters.artifactRouteConfidence = result.artifactRouteConfidence;
+        }
+      }
 
       return {
         primaryIntent,
         toolId,
+        artifactType: result.artifactType,
+        artifactRouteConfidence: result.artifactRouteConfidence,
         confidence: result.confidence ?? 0.0,
-        extractedParameters: result.parameters || {},
-        matchedPatterns: ['nlu-model'],
+        extractedParameters,
+        matchedPatterns: ['unified-ai-node'],
       };
     } catch (error) {
       this.logger.warn(
@@ -351,23 +364,48 @@ export class IntentClassifierService {
     }
   }
 
-  private async predictWithInProcessNlu(
+  private async predictWithUnifiedNode(
     message: string,
-  ): Promise<{ intent: string; confidence: number; toolId?: string; parameters?: Record<string, unknown> } | null> {
-    await this.nluService.load();
-    const result = await this.nluService.predict(message);
+  ): Promise<{
+    intent: string;
+    confidence: number;
+    toolId?: string;
+    artifactType?: string;
+    artifactRouteConfidence?: number;
+    parameters?: Record<string, unknown>;
+  } | null> {
+    await this.unifiedAiNode.load();
+    const routed = await this.unifiedAiNode.route(message);
     return {
-      intent: result.intent,
-      confidence: result.confidence,
-      parameters: { keyTerms: result.keyTerms, subcategory: result.subcategory },
+      intent: routed.intent.intent,
+      confidence: routed.intent.confidence,
+      artifactType: routed.artifact.artifactType,
+      artifactRouteConfidence: routed.artifact.confidence,
+      parameters: {
+        keyTerms: routed.intent.keyTerms,
+        subcategory: routed.intent.subcategory,
+        artifactLabelId: routed.artifact.labelId,
+        artifactTargetMode: routed.artifact.targetMode,
+      },
     };
   }
 
-  private async predictWithHttpNlu(
+  private unifiedNodeHttpBase(): string {
+    return this.nluServiceUrl.replace(/\/api\/nlu\/?$/, '');
+  }
+
+  private async predictWithHttpUnifiedNode(
     message: string,
-  ): Promise<{ intent: string; confidence: number; toolId?: string; parameters?: Record<string, unknown> } | null> {
+  ): Promise<{
+    intent: string;
+    confidence: number;
+    toolId?: string;
+    artifactType?: string;
+    artifactRouteConfidence?: number;
+    parameters?: Record<string, unknown>;
+  } | null> {
     if (!this.nluServiceUrl) {
-      this.logger.warn('NLU service URL not configured. Skipping NLU phase.');
+      this.logger.warn('Unified AI node URL not configured. Skipping model phase.');
       return null;
     }
 
@@ -375,7 +413,7 @@ export class IntentClassifierService {
     const timeout = setTimeout(() => controller.abort(), 5000);
 
     try {
-      const response = await fetch(`${this.nluServiceUrl}/predict`, {
+      const response = await fetch(`${this.unifiedNodeHttpBase()}/api/ai/node/models/route`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: message }),
@@ -383,12 +421,30 @@ export class IntentClassifierService {
       });
 
       if (!response.ok) {
-        this.logger.warn(`NLU service responded with ${response.status}`);
+        this.logger.warn(`Unified AI node responded with ${response.status}`);
         this.recordFailure(this.nluCircuitBreaker, this.nluFailureThreshold, this.nluResetMs);
         return null;
       }
 
-      return await response.json();
+      const payload = (await response.json()) as {
+        intent?: { intent?: string; confidence?: number; keyTerms?: string[]; subcategory?: string | null };
+        artifact?: { artifactType?: string; confidence?: number; labelId?: number; targetMode?: string };
+      };
+
+      if (!payload.intent?.intent) return null;
+
+      return {
+        intent: payload.intent.intent,
+        confidence: payload.intent.confidence ?? 0,
+        artifactType: payload.artifact?.artifactType,
+        artifactRouteConfidence: payload.artifact?.confidence,
+        parameters: {
+          keyTerms: payload.intent.keyTerms,
+          subcategory: payload.intent.subcategory,
+          artifactLabelId: payload.artifact?.labelId,
+          artifactTargetMode: payload.artifact?.targetMode,
+        },
+      };
     } finally {
       clearTimeout(timeout);
     }

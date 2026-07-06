@@ -1,31 +1,51 @@
-{"text":"What's the difference between type 1 and type 2 diabetes?","intent":"general_clinical_query"}
-{"text":"What medical schools teach this condition?","intent":"general_clinical_query"}
-{"text":"What are the symptoms of acute coronary syndrome?","intent":"general_clinical_query"}
-{"text":"What does a low hemoglobin and hematocrit indicate?","intent":"lab_interpretation"}
-{"text":"Interpret ABG values: pH 7.28, pCO2 50, pO2 60","intent":"lab_interpretation"}
-{"text":"Explain the significance of elevated BNP levels","intent":"lab_interpretation"}
-{"text":"Can you explain these abnormal lab findings?","intent":"lab_interpretation"}
-{"text":"Does adding spironolactone pose a risk with this patient's ACE inhibitor?","intent":"drug_interaction_check"}
-{"text":"What happens if this patient takes both ACE inhibitors and potassium supplements?","intent":"drug_interaction_check"}
-{"text":"Double check compatibility of these IV medications","intent":"drug_interaction_check"}
-{"text":"Third-degree AV block with hemodynamic compromise","intent":"emergency_alert","subcategory":"cardiac"}
-{"text":"Severe burn injury, airway compromise","intent":"emergency_alert","subcategory":"trauma"}
-{"text":"Penetrating chest trauma with hemodynamic instability","intent":"emergency_alert","subcategory":"trauma"}
-{"text":"Determine this patient's respiratory SOFA subscore","intent":"sofa_score_calculation"}
-{"text":"Score this patient's sepsis severity using SOFA criteria","intent":"sofa_score_calculation"}
-{"text":"Assess organ dysfunction score for ICU admission","intent":"sofa_score_calculation"}
+{"text":"What are common causes of anemia?","intent":"general_clinical_query"}
+{"text":"What are the risk factors for venous thromboembolism?","intent":"general_clinical_query"}
+{"text":"What's the mechanism behind statin-induced myopathy?","intent":"general_clinical_query"}
+{"text":"How does the kidney regulate acid-base balance?","intent":"general_clinical_query"}
+{"text":"What causes refeeding syndrome?","intent":"general_clinical_query"}
+{"text":"What's the guideline-based fluid resuscitation strategy for burns?","intent":"clinical_guideline_lookup"}
+{"text":"Show the institutional protocol for massive transfusion","intent":"clinical_guideline_lookup"}
 {"text":"Institutional antibiotic protocol for pneumonia","intent":"clinical_guideline_lookup"}
-{"text":"Look up the guideline for managing acute exacerbation of asthma","intent":"clinical_guideline_lookup"}
-{"text":"What's the recommended protocol for DKA management?","intent":"clinical_guideline_lookup"}
-{"text":"Check the patient's intake and output for today","intent":"patient_status_update"}
-{"text":"Check on the patient's current clinical status","intent":"patient_status_update"}
-{"text":"Give me a status summary for this admission","intent":"patient_status_update"}
-{"text":"Arrange transportation for this patient's discharge","intent":"discharge_planning"}
-{"text":"Is this patient a candidate for early discharge?","intent":"discharge_planning"}
-{"text":"Schedule the follow-up appointment before discharge","intent":"discharge_planning"}
-{"text":"Start empiric antibiotics for suspected sepsis","intent":"medication_order"}
-{"text":"Prescribe a PRN order for breakthrough pain","intent":"medication_order"}
-{"text":"Start broad-spectrum antibiotics pending culture results","intent":"medication_order"}
-{"text":"Assess this patient's history for possible autoimmune disease","intent":"diagnosis_support"}
+{"text":"Look up the guideline for perioperative anticoagulation management","intent":"clinical_guideline_lookup"}
+{"text":"What protocol should we use for difficult airway management?","intent":"clinical_guideline_lookup"}
+{"text":"Massive hemoptysis, patient unable to protect airway","intent":"emergency_alert"}
+{"text":"New onset hemiplegia with slurred speech, last known well 30 minutes ago","intent":"emergency_alert"}
+{"text":"Massive stroke symptoms with hemiparesis and aphasia","intent":"emergency_alert"}
+{"text":"Massive PE with hypotension and hypoxia","intent":"emergency_alert"}
+{"text":"Newborn with respiratory distress and cyanosis","intent":"emergency_alert"}
+{"text":"What's the significance of a positive troponin trend?","intent":"lab_interpretation"}
+{"text":"Interpret this urinalysis for signs of infection","intent":"lab_interpretation"}
+{"text":"What does a high anion gap indicate?","intent":"lab_interpretation"}
+{"text":"Explain the significance of elevated BNP levels","intent":"lab_interpretation"}
+{"text":"Interpret this lipid panel for cardiovascular risk","intent":"lab_interpretation"}
+{"text":"What's the interpretation of this arterial blood gas?","intent":"lab_interpretation"}
+{"text":"Is this patient's fever trending down?","intent":"patient_status_update"}
+{"text":"What's the latest on this patient's wound healing progress?","intent":"patient_status_update"}
+{"text":"Pull up patient records","intent":"patient_status_update"}
+{"text":"Has this patient's anticoagulation reversed per the latest labs?","intent":"patient_status_update"}
+{"text":"What's the latest ventilator weaning progress for this patient?","intent":"patient_status_update"}
+{"text":"Plan anticoagulation bridging before this patient leaves the hospital","intent":"discharge_planning"}
+{"text":"What's the plan for continuing IV antibiotics after discharge?","intent":"discharge_planning"}
+{"text":"Coordinate skilled nursing facility placement for discharge","intent":"discharge_planning"}
+{"text":"What's the plan for weaning steroids after discharge?","intent":"discharge_planning"}
+{"text":"Review discharge readiness criteria for this admission","intent":"discharge_planning"}
+{"text":"Discontinue warfarin and switch to apixaban","intent":"medication_order"}
+{"text":"Order potassium repletion per the sliding scale protocol","intent":"medication_order"}
+{"text":"Start a bicarbonate drip for this patient's acidosis","intent":"medication_order"}
+{"text":"Start levothyroxine replacement for this patient","intent":"medication_order"}
+{"text":"Adjust the insulin sliding scale for this patient","intent":"medication_order"}
+{"text":"Before I give this vaccine, check for medication conflicts","intent":"drug_interaction_check"}
+{"text":"Flag interaction risks in medications prescribed at discharge","intent":"drug_interaction_check"}
+{"text":"Screen this medication list for interactions","intent":"drug_interaction_check"}
+{"text":"Please run a full drug interaction check","intent":"drug_interaction_check"}
+{"text":"Patient wants to know if their supplement interacts with blood thinners","intent":"drug_interaction_check"}
+{"text":"Reassess SOFA score after starting dialysis","intent":"sofa_score_calculation"}
+{"text":"Calculate the SOFA score for sepsis screening in the ED","intent":"sofa_score_calculation"}
+{"text":"Score renal dysfunction using SOFA criteria","intent":"sofa_score_calculation"}
+{"text":"Score this patient's mean arterial pressure component for SOFA","intent":"sofa_score_calculation"}
+{"text":"Assess if this patient qualifies for septic shock via SOFA criteria","intent":"sofa_score_calculation"}
+{"text":"Build a differential for a patient with chronic fatigue and pallor","intent":"diagnosis_support"}
+{"text":"Consider secondary causes of this patient's hypertension","intent":"diagnosis_support"}
 {"text":"What conditions should be ruled out for this chest pain presentation?","intent":"diagnosis_support"}
-{"text":"What's the differential for acute kidney injury in this case?","intent":"diagnosis_support"}
+{"text":"What's on the differential for acute abdominal pain in an elderly patient?","intent":"diagnosis_support"}
+{"text":"Consider causes of this patient's recurrent falls","intent":"diagnosis_support"}

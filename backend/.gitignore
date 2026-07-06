@@ -47,3 +47,6 @@ lerna-debug.log*
 # Temp
 temp/
 tmp/
+
+# Generated ML training caches (large, machine-local, safe to regenerate)
+ml-services/embedding-cache.json

@@ -56,8 +56,8 @@ const parsePort = (value, fallback, label) => {
 };
 
 /** CareDroid-local defaults — kept away from 3000/5173/8000 (common other-app ports). */
-const DEFAULT_FRONTEND_PORT = '5180';
-const DEFAULT_BACKEND_PORT = '3340';
+const DEFAULT_FRONTEND_PORT = '5190';
+const DEFAULT_BACKEND_PORT = '3350';
 
 const preferredFrontendPort = parsePort(
   argValue('--frontend-port') || process.env.FRONTEND_PORT || process.env.VITE_DEV_PORT,

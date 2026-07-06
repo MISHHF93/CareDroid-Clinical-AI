@@ -2,7 +2,7 @@
 
 export const MODEL_CONFIG = {
   modelName: process.env.NLU_EMBEDDING_MODEL ?? 'Xenova/all-mpnet-base-v2',
-  modelPath: process.env.NLU_BEST_MODEL_DIR ?? './models/best_model',
+  modelPath: process.env.NLU_BEST_MODEL_DIR ?? '../models/nlu',
   maxLength: Number(process.env.NLU_MAX_LENGTH ?? 512),
   confidenceThreshold: Number(process.env.NLU_CONFIDENCE_THRESHOLD ?? 0.5),
 } as const;

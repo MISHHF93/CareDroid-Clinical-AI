@@ -1,4 +1,5 @@
 import { readAIPlatformConfig } from '../lib/ai/config';
+import { CARE_DROID_UNIFIED_AI_NODE_MODELS_PATH } from '../config/careDroidUnifiedAiNode.config';
 import {
   CARE_DROID_UNIFIED_AI_NODE_ID,
   EXPECTED_PLATFORM_AI_SERVICE_COUNT,
