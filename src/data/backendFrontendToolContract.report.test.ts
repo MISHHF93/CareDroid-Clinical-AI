@@ -25,7 +25,7 @@ import { readToolPatternsSource } from './clinicalToolAliasSync';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, '../..');
-const docsDir = join(repoRoot, 'docs');
+const docsDir = join(repoRoot, 'docs', 'architecture');
 
 describe('backendFrontendToolContract report', () => {
   it('covers every NLU profile and three POST executors', () => {

@@ -10,7 +10,7 @@ import {
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, '../..');
-const docsDir = join(repoRoot, 'docs');
+const docsDir = join(repoRoot, 'docs', 'architecture');
 
 describe('featureCoverageMatrix report', () => {
   it('builds rows from canonical inventory', () => {

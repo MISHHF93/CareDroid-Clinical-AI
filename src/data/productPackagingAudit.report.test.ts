@@ -10,7 +10,7 @@ import {
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, '../..');
-const docsDir = join(repoRoot, 'docs');
+const docsDir = join(repoRoot, 'docs', 'specs');
 
 describe('productPackagingAudit report', () => {
   it('defines nine solution packs wired to seed ids', () => {

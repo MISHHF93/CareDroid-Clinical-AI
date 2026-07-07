@@ -10,7 +10,7 @@ import {
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, '../..');
-const docsDir = join(repoRoot, 'docs');
+const docsDir = join(repoRoot, 'docs', 'operations');
 
 describe('saasComplianceAudit report', () => {
   it('builds compliance rows with violation tracking', () => {

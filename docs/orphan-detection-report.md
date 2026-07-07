@@ -1,34 +1,34 @@
 # Orphan Detection Report
 
-Generated: 2026-07-02 (regenerate with `npm run orphan-detection:write-docs`)
+Generated: 2026-07-07 (regenerate with `npm run orphan-detection:write-docs`)
 
 ## Classification key
 
 | Class | Meaning |
 |-------|---------|
 | **wire** | Reachable in product intent (nav/inventory) but missing route, import, or API contract |
-| **merge** | Duplicate surface or overlapping module � consolidate |
-| **quarantine** | No production consumer � archive or delete after review |
+| **merge** | Duplicate surface or overlapping module — consolidate |
+| **quarantine** | No production consumer — archive or delete after review |
 | **legacy** | Redirect, alias, gated stub, or deprecated path kept for compatibility |
 
 ## Executive summary
 
 | Metric | Count |
 |--------|------:|
-| Total orphan findings | 399 |
-| App.jsx routes | 158 |
-| Orphan / gap routes | 215 |
+| Total orphan findings | 386 |
+| App.jsx routes | 151 |
+| Orphan / gap routes | 222 |
 | Orphan pages | 1 |
 | Orphan components | 0 |
 | Domain module findings (dashboard / simulation / lab / 3D) | 1 |
 | Orphan services | 0 |
 | Executor contract gaps | 0 |
 | API orphans / stubs | 141 |
-| Weakly linked markdown | 41 |
-| **wire** | 212 |
+| Weakly linked markdown | 21 |
+| **wire** | 218 |
 | **merge** | 0 |
-| **quarantine** | 33 |
-| **legacy** | 154 |
+| **quarantine** | 15 |
+| **legacy** | 153 |
 
 ## Merge candidates (explicit)
 
@@ -40,10 +40,10 @@ Generated: 2026-07-02 (regenerate with `npm run orphan-detection:write-docs`)
 
 ## Critical findings
 
-1. **Simulation / lab / 3D workspace styles** � `SimulationLaboratoryViewer.css` is an intentional shared style module for active demo pages; no missing page component is required. Class: **legacy**.
-2. **AI agents / platform APIs** � platform/product clients are represented in `frontendApiCallsInventory`; current scan has no **wire** findings.
-3. **Chart/export components** � legacy barrel-only components have been removed; keep new chart surfaces route-owned. Class: **resolved**.
-4. **Dual registry** � hundreds of tools in inventory without dedicated page components (route-only). Class: **legacy** (inventory-first) unless promoting to assets.
+1. **Simulation / lab / 3D workspace styles** — `SimulationLaboratoryViewer.css` is an intentional shared style module for active demo pages; no missing page component is required. Class: **legacy**.
+2. **AI agents / platform APIs** — platform/product clients are represented in `frontendApiCallsInventory`; current scan has no **wire** findings.
+3. **Chart/export components** — legacy barrel-only components have been removed; keep new chart surfaces route-owned. Class: **resolved**.
+4. **Dual registry** — hundreds of tools in inventory without dedicated page components (route-only). Class: **legacy** (inventory-first) unless promoting to assets.
 
 ## Orphan routes
 
@@ -66,14 +66,12 @@ Generated: 2026-07-02 (regenerate with `npm run orphan-detection:write-docs`)
 | /executive | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /discover | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /recommendations | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /automation-audit | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /automation-analytics | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /assistant | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /ai-command-center | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /workspaces | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /operations-center | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /protocols | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /documentation | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /knowledge-graph | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /predictive-analytics | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /clinical-decision-support | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
@@ -102,6 +100,7 @@ Generated: 2026-07-02 (regenerate with `npm run orphan-detection:write-docs`)
 | /legal/hipaa | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /onboarding/consent | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /legal/consent-history | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
+| /customer-portal | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /knowledge-hub | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /marketplace | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /enterprise-readiness | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
@@ -127,15 +126,22 @@ Generated: 2026-07-02 (regenerate with `npm run orphan-detection:write-docs`)
 | /governance-registry | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /ai-governance | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /security | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
+| /audit | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /regulatory | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /human-review | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /assets | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /artifacts | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
+| /memory | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
+| /training | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
+| /costs | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
+| /fleet/predictive-maintenance | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
+| /fleet/route-optimizer | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /ai-models | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /ai-evaluation | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /platform-learning-engine | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /brain | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /business-brain | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
+| /organization | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /organization-intelligence | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /settings/organization | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /tenant-admin | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
@@ -157,6 +163,8 @@ Generated: 2026-07-02 (regenerate with `npm run orphan-detection:write-docs`)
 | /value-tracking | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /product-intelligence | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /expansion-opportunities | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
+| /customer-success | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
+| /success-center | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /integrations-marketplace | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /integration-readiness | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /solution-builder | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
@@ -164,12 +172,10 @@ Generated: 2026-07-02 (regenerate with `npm run orphan-detection:write-docs`)
 | /welcome | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /onboarding | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /notification-preferences | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /fleet/live-map | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /fleet/tracking | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /maps | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /tracking | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /live-tracking | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
+| /fleet/ | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
+| /organization/ | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /settings/organization/ | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
+| /ai/evaluation | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /governance | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /governance/ai | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /governance/model-usage | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
@@ -182,6 +188,7 @@ Generated: 2026-07-02 (regenerate with `npm run orphan-detection:write-docs`)
 | /governance/ai-security/policy | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /governance/ai-security/model-access | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /governance/ai-security/incidents | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
+| /audit-logs | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /audit/ai | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /audit/phi | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /audit/integrations | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
@@ -239,7 +246,7 @@ Generated: 2026-07-02 (regenerate with `npm run orphan-detection:write-docs`)
 | /ai-evaluation | wire | toolInventory route not registered in App.jsx |
 | /assistant | wire | toolInventory route not registered in App.jsx |
 | /ai-governance | wire | toolInventory route not registered in App.jsx |
-| /ai-memory | wire | toolInventory route not registered in App.jsx |
+| /memory | wire | toolInventory route not registered in App.jsx |
 | /audit/ai | wire | toolInventory route not registered in App.jsx |
 | /assistant | wire | toolInventory route not registered in App.jsx |
 | /training | wire | toolInventory route not registered in App.jsx |
@@ -256,13 +263,13 @@ Generated: 2026-07-02 (regenerate with `npm run orphan-detection:write-docs`)
 | /governance/validation/synthetic-patients | wire | toolInventory route not registered in App.jsx |
 | /governance/validation | wire | toolInventory route not registered in App.jsx |
 | /protocols | wire | toolInventory route not registered in App.jsx |
-| /documentation | wire | toolInventory route not registered in App.jsx |
 | /knowledge-graph | wire | toolInventory route not registered in App.jsx |
 | /assistant | wire | toolInventory route not registered in App.jsx |
 | /predictive-analytics | wire | toolInventory route not registered in App.jsx |
 | /3d-viewer | wire | toolInventory route not registered in App.jsx |
 | /home | legacy | Redirect or alias route in App.jsx |
 | /workspace | legacy | Redirect or alias route in App.jsx |
+| /medical-simulation | legacy | Redirect or alias route in App.jsx |
 | /anatomy-viewer | legacy | Redirect or alias route in App.jsx |
 
 ## Orphan pages
@@ -303,47 +310,44 @@ _None detected._
 
 | API | Class | Evidence |
 | --- | --- | --- |
-| chat-messages-sync | legacy | Gated stub � intentional no-op until backend exists |
-| chat-conversations-sync | legacy | Gated stub � intentional no-op until backend exists |
-| tools-share-results | legacy | Gated stub � intentional no-op until backend exists |
-| notifications-stream | legacy | Gated stub � intentional no-op until backend exists |
-| notifications-send-channel | legacy | Gated stub � intentional no-op until backend exists |
-| team-users | legacy | Gated stub � intentional no-op until backend exists |
-| team-user-update | legacy | Gated stub � intentional no-op until backend exists |
-| team-user-delete | legacy | Gated stub � intentional no-op until backend exists |
-| team-invite | legacy | Gated stub � intentional no-op until backend exists |
-| bulk-sync | legacy | Gated stub � intentional no-op until backend exists |
-| clinical-alerts-stream | legacy | Gated stub � intentional no-op until backend exists |
-| emergency-capacity-history | legacy | Gated stub � intentional no-op until backend exists |
-| emergency-queue-analytics | legacy | Gated stub � intentional no-op until backend exists |
-| emergency-shift-report-export | legacy | Gated stub � intentional no-op until backend exists |
-| emergency-referral-history | legacy | Gated stub � intentional no-op until backend exists |
-| emergency-transfer-status | legacy | Gated stub � intentional no-op until backend exists |
-| emergency-diversion-status | legacy | Gated stub � intentional no-op until backend exists |
-| emergency-smart-intake-session-create | legacy | Gated stub � intentional no-op until backend exists |
-| emergency-smart-intake-manual-entry | legacy | Gated stub � intentional no-op until backend exists |
-| emergency-smart-intake-document | legacy | Gated stub � intentional no-op until backend exists |
-| emergency-smart-intake-ocr | legacy | Gated stub � intentional no-op until backend exists |
-| emergency-smart-intake-match | legacy | Gated stub � intentional no-op until backend exists |
-| emergency-smart-intake-verify-field | legacy | Gated stub � intentional no-op until backend exists |
-| emergency-smart-intake-link-patient | legacy | Gated stub � intentional no-op until backend exists |
-| emergency-smart-intake-create-patient | legacy | Gated stub � intentional no-op until backend exists |
-| emergency-smart-intake-continue-unknown | legacy | Gated stub � intentional no-op until backend exists |
-| emergency-smart-intake-ems-evidence | legacy | Gated stub � intentional no-op until backend exists |
-| emergency-smart-intake-reconcile-unknown | legacy | Gated stub � intentional no-op until backend exists |
-| emergency-smart-intake-biometric-consent | legacy | Gated stub � intentional no-op until backend exists |
-| emergency-smart-intake-biometric-consent-withdraw | legacy | Gated stub � intentional no-op until backend exists |
-| emergency-smart-intake-audit-log | legacy | Gated stub � intentional no-op until backend exists |
-| exports-pdf | legacy | Gated stub � intentional no-op until backend exists |
-| exports-excel | legacy | Gated stub � intentional no-op until backend exists |
-| reports-generate | legacy | Gated stub � intentional no-op until backend exists |
-| reports-schedule-create | legacy | Gated stub � intentional no-op until backend exists |
-| reports-schedule-cancel | legacy | Gated stub � intentional no-op until backend exists |
+| chat-messages-sync | legacy | Gated stub — intentional no-op until backend exists |
+| chat-conversations-sync | legacy | Gated stub — intentional no-op until backend exists |
+| tools-share-results | legacy | Gated stub — intentional no-op until backend exists |
+| notifications-stream | legacy | Gated stub — intentional no-op until backend exists |
+| notifications-send-channel | legacy | Gated stub — intentional no-op until backend exists |
+| team-users | legacy | Gated stub — intentional no-op until backend exists |
+| team-user-update | legacy | Gated stub — intentional no-op until backend exists |
+| team-user-delete | legacy | Gated stub — intentional no-op until backend exists |
+| team-invite | legacy | Gated stub — intentional no-op until backend exists |
+| bulk-sync | legacy | Gated stub — intentional no-op until backend exists |
+| clinical-alerts-stream | legacy | Gated stub — intentional no-op until backend exists |
+| emergency-capacity-history | legacy | Gated stub — intentional no-op until backend exists |
+| emergency-queue-analytics | legacy | Gated stub — intentional no-op until backend exists |
+| emergency-shift-report-export | legacy | Gated stub — intentional no-op until backend exists |
+| emergency-referral-history | legacy | Gated stub — intentional no-op until backend exists |
+| emergency-transfer-status | legacy | Gated stub — intentional no-op until backend exists |
+| emergency-diversion-status | legacy | Gated stub — intentional no-op until backend exists |
+| emergency-smart-intake-session-create | legacy | Gated stub — intentional no-op until backend exists |
+| emergency-smart-intake-manual-entry | legacy | Gated stub — intentional no-op until backend exists |
+| emergency-smart-intake-document | legacy | Gated stub — intentional no-op until backend exists |
+| emergency-smart-intake-ocr | legacy | Gated stub — intentional no-op until backend exists |
+| emergency-smart-intake-match | legacy | Gated stub — intentional no-op until backend exists |
+| emergency-smart-intake-verify-field | legacy | Gated stub — intentional no-op until backend exists |
+| emergency-smart-intake-link-patient | legacy | Gated stub — intentional no-op until backend exists |
+| emergency-smart-intake-create-patient | legacy | Gated stub — intentional no-op until backend exists |
+| emergency-smart-intake-continue-unknown | legacy | Gated stub — intentional no-op until backend exists |
+| emergency-smart-intake-ems-evidence | legacy | Gated stub — intentional no-op until backend exists |
+| emergency-smart-intake-reconcile-unknown | legacy | Gated stub — intentional no-op until backend exists |
+| emergency-smart-intake-biometric-consent | legacy | Gated stub — intentional no-op until backend exists |
+| emergency-smart-intake-biometric-consent-withdraw | legacy | Gated stub — intentional no-op until backend exists |
+| emergency-smart-intake-audit-log | legacy | Gated stub — intentional no-op until backend exists |
+| exports-pdf | legacy | Gated stub — intentional no-op until backend exists |
+| exports-excel | legacy | Gated stub — intentional no-op until backend exists |
+| reports-generate | legacy | Gated stub — intentional no-op until backend exists |
+| reports-schedule-create | legacy | Gated stub — intentional no-op until backend exists |
+| reports-schedule-cancel | legacy | Gated stub — intentional no-op until backend exists |
 | GET /api/emergency/patients/:patientId/workflow-logs | legacy | Backend-only route (no SPA client) |
-| POST /api/emergency/copilot/query | legacy | Backend-only route (no SPA client) |
-| GET /api/emergency/copilot/interactions | legacy | Backend-only route (no SPA client) |
 | POST /api/emergency/copilot/interactions | legacy | Backend-only route (no SPA client) |
-| GET /api/emergency/clinical-calculators/results | legacy | Backend-only route (no SPA client) |
 | POST /api/emergency/clinical-calculators/results | legacy | Backend-only route (no SPA client) |
 | POST /api/emergency/digital-twin/organizational/simulate | legacy | Backend-only route (no SPA client) |
 | POST /api/emergency/digital-twin/organizational/synchronize | legacy | Backend-only route (no SPA client) |
@@ -419,12 +423,15 @@ _None detected._
 | POST /api/tools/execute | legacy | Backend-only route (no SPA client) |
 | POST /api/tool-calling/execute | legacy | Backend-only route (no SPA client) |
 | GET /api/tool-calling/catalog | legacy | Backend-only route (no SPA client) |
+| GET /api/tool-calling/resolve | legacy | Backend-only route (no SPA client) |
+| GET /api/tool-calling/logs | legacy | Backend-only route (no SPA client) |
+| POST /api/cost-optimizer/route | legacy | Backend-only route (no SPA client) |
 | POST /api/platform/users/me/pinned-assets | legacy | Platform/product API is deferred and not frontend-inventory wired |
 | POST /api/platform/users/me/hidden-assets | legacy | Platform/product API is deferred and not frontend-inventory wired |
 | GET /api/platform/assets/:assetId | legacy | Platform/product API is deferred and not frontend-inventory wired |
 | GET /api/platform/packs/:packId | legacy | Platform/product API is deferred and not frontend-inventory wired |
 
-_� and 21 more API rows._
+_… and 21 more API rows._
 
 ## Orphan markdown (weak inbound links)
 
@@ -433,40 +440,20 @@ _� and 21 more API rows._
 | docs/architecture/architecture-map.md | quarantine | No inbound links from README, src, or other docs |
 | docs/architecture/clickable-map-report.md | legacy | No inbound links from README, src, or other docs |
 | docs/architecture/component-mounting-report.md | legacy | No inbound links from README, src, or other docs |
-| docs/architecture/current-system-inventory.md | legacy | No inbound links from README, src, or other docs |
 | docs/architecture/emergency-resource-board.md | quarantine | No inbound links from README, src, or other docs |
-| docs/architecture/endpoint-to-frontend-matrix.md | legacy | No inbound links from README, src, or other docs |
 | docs/architecture/layout-routing-consolidation-report.md | legacy | No inbound links from README, src, or other docs |
-| docs/architecture/project-audit.md | quarantine | No inbound links from README, src, or other docs |
 | docs/architecture/system-evaluation.md | quarantine | No inbound links from README, src, or other docs |
 | docs/architecture/ui-surface-compression.md | quarantine | No inbound links from README, src, or other docs |
-| docs/duplicate-system-audit.md | legacy | No inbound links from README, src, or other docs |
-| docs/manuals/roles/charge-nurse.md | quarantine | No inbound links from README, src, or other docs |
 | docs/manuals/roles/demo-observer.md | quarantine | No inbound links from README, src, or other docs |
-| docs/manuals/roles/emergency-physician.md | quarantine | No inbound links from README, src, or other docs |
-| docs/manuals/roles/hospital-administrator.md | quarantine | No inbound links from README, src, or other docs |
-| docs/manuals/roles/it-administrator.md | quarantine | No inbound links from README, src, or other docs |
 | docs/manuals/roles/lab-technician.md | quarantine | No inbound links from README, src, or other docs |
 | docs/manuals/roles/paramedic.md | quarantine | No inbound links from README, src, or other docs |
-| docs/manuals/roles/patient-flow-coordinator.md | quarantine | No inbound links from README, src, or other docs |
 | docs/manuals/roles/pharmacist.md | quarantine | No inbound links from README, src, or other docs |
-| docs/manuals/roles/quality-safety-officer.md | quarantine | No inbound links from README, src, or other docs |
 | docs/manuals/roles/radiology-technician.md | quarantine | No inbound links from README, src, or other docs |
-| docs/manuals/roles/reception-clerk.md | quarantine | No inbound links from README, src, or other docs |
 | docs/manuals/roles/registered-nurse.md | quarantine | No inbound links from README, src, or other docs |
-| docs/manuals/roles/specialist.md | quarantine | No inbound links from README, src, or other docs |
-| docs/manuals/roles/triage-nurse.md | quarantine | No inbound links from README, src, or other docs |
-| docs/operations/emergency-demo-environment.md | quarantine | No inbound links from README, src, or other docs |
-| docs/operations/emergency-demo-mode.md | quarantine | No inbound links from README, src, or other docs |
-| docs/operations/emergency-pilot-readiness.md | quarantine | No inbound links from README, src, or other docs |
-| docs/specs/ai-chief-spec.md | quarantine | No inbound links from README, src, or other docs |
+| docs/product-packaging-audit.md | legacy | No inbound links from README, src, or other docs |
 | docs/specs/current-codebase-findings.md | quarantine | No inbound links from README, src, or other docs |
-| docs/specs/full-emergency-care-journey.md | quarantine | No inbound links from README, src, or other docs |
-| docs/specs/page-map.md | quarantine | No inbound links from README, src, or other docs |
 | docs/specs/product-discovery-report.md | legacy | No inbound links from README, src, or other docs |
 | docs/specs/product-packaging-audit.md | legacy | No inbound links from README, src, or other docs |
-| docs/specs/role-permission-map.md | quarantine | No inbound links from README, src, or other docs |
-| docs/specs/route-map.md | quarantine | No inbound links from README, src, or other docs |
 | docs/specs/saas-service-journey-map.md | quarantine | No inbound links from README, src, or other docs |
 | docs/specs/service-bottleneck-spec.md | quarantine | No inbound links from README, src, or other docs |
 | docs/specs/three-minute-response-spec.md | quarantine | No inbound links from README, src, or other docs |

@@ -36,12 +36,13 @@ describe('backendFrontendExposure report', () => {
       join(docsDir, 'backend-exposure-report.md'),
       `${formatBackendExposureReportMarkdown(scan)}\n`
     );
+    mkdirSync(join(docsDir, 'architecture'), { recursive: true });
     writeFileSync(
-      join(docsDir, 'endpoint-to-frontend-matrix.md'),
+      join(docsDir, 'architecture', 'endpoint-to-frontend-matrix.md'),
       `${formatEndpointMatrixMarkdown(scan)}\n`
     );
     writeFileSync(
-      join(docsDir, 'backend-frontend-tool-contract.md'),
+      join(docsDir, 'architecture', 'backend-frontend-tool-contract.md'),
       `${formatBackendFrontendContractMarkdown(buildBackendFrontendContractRows(), getContractGaps())}\n`
     );
     writeFileSync(
