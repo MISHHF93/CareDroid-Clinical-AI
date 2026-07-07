@@ -116,7 +116,7 @@ export function interpretFib4(fib4, ageYears) {
     label: 'Elevated FIB-4 (age ≥65)',
     riskBand: '≥ 2.0 (age ≥65)',
     interpretation:
-      'FIB-4 =2.0 in patients =65 years — higher fibrosis concern in age-adjusted thresholds; supports specialist correlation.',
+      'FIB-4 ≥2.0 in patients ≥65 years — higher fibrosis concern in age-adjusted thresholds; supports specialist correlation.',
     disclaimer,
     referenceLine,
   };

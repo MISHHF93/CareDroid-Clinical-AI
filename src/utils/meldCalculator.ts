@@ -220,7 +220,7 @@ export function validateMeldInputs(raw, opts: any = {}) {
 
   if (!biliStr) errors.push('Enter total bilirubin.');
   if (!inrStr) errors.push('Enter INR.');
-  if (!raw.onDialysis && !crStr) errors.push('Enter serum creatinine or mark dialysis (=2×/week).');
+  if (!raw.onDialysis && !crStr) errors.push('Enter serum creatinine or mark dialysis (≥2×/week).');
   if (requireSodium && !naStr) errors.push('Enter serum sodium for MELD-Na.');
 
   const labs = meldLabsFromInputs(raw);

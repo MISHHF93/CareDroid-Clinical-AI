@@ -38,7 +38,7 @@ export const QSOFA_INTERPRETATION_BY_SCORE = Object.freeze([
   { score: 3, severity: 'critical', positiveThreshold: true },
 ]);
 
-/** HAS-BLED interpretHasBled severity — threshold at =3 */
+/** HAS-BLED interpretHasBled severity — threshold at ≥3 */
 export const HAS_BLED_SEVERITY_BY_SCORE = Object.freeze(
   Array.from({ length: 10 }, (_, score) => ({
     score,

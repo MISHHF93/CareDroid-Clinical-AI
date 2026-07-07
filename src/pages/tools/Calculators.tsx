@@ -788,7 +788,7 @@ const QSOFACalculator = ({ onResultChange, patientContext = null as any }) => {
           <CalcDecisionSupportLead />
           <p className="calc-disclaimer-detail">
             <strong>Clinical use:</strong> qSOFA is bedside screening in suspected infection. It does not diagnose
-            sepsis. Score =2 suggests higher risk of poor outcome per Sepsis-3 — always interpret in clinical context.
+            sepsis. Score ≥2 suggests higher risk of poor outcome per Sepsis-3 — always interpret in clinical context.
             Not for use as sole basis for treatment decisions.
           </p>
         </div>

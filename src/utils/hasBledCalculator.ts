@@ -99,7 +99,7 @@ export const HAS_BLED_CRITERIA_META = [
   {
     key: 'renalDysfunction',
     shortLabel: 'A — Abnormal renal function',
-    help: 'Chronic dialysis, renal transplant, or serum creatinine =200 µmol/L (˜2.3 mg/dL) / severe renal impairment as defined locally.',
+    help: 'Chronic dialysis, renal transplant, or serum creatinine ≥200 μmol/L (≈2.3 mg/dL) / severe renal impairment as defined locally.',
   },
   {
     key: 'liverDysfunction',
