@@ -182,7 +182,12 @@ describe('AppShell R12 startup wiring', () => {
       </MemoryRouter>,
     );
 
-    await waitFor(() => expect(initializeFromBackend).toHaveBeenCalledTimes(1));
+    // Reception-first UX is always enabled, so AppShell performs a two-phase
+    // startup: a fast reception-scope load followed by a silent full-scope
+    // background load (see receptionFirstUx.config.ts + AppShell.tsx startup effect).
+    await waitFor(() => expect(initializeFromBackend).toHaveBeenCalledTimes(2));
+    expect(initializeFromBackend).toHaveBeenNthCalledWith(1, { scope: 'reception' });
+    expect(initializeFromBackend).toHaveBeenNthCalledWith(2, { scope: 'full', silent: true });
     expect(mocks.startEmergencyRealtime).toHaveBeenCalledTimes(1);
     expect(startReassessmentEngine).toHaveBeenCalledTimes(1);
     expect(startCapacityEngine).toHaveBeenCalledTimes(1);

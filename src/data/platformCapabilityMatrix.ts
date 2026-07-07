@@ -36,6 +36,24 @@ const TEST_COVERAGE_PATH_ALIASES = Object.freeze({
   'routePagesSmoke.test.jsx': 'src/test/routePagesSmoke.test.tsx',
   'App.permissions.test.tsx': 'src/App.permissions.test.tsx',
   'platformResponsive.test.jsx': 'src/styles/responsiveUx.test.ts',
+  // The following per-page .jsx/.js test files were removed without a
+  // replacement reference here; equivalent route-mount coverage now lives in
+  // the shared smoke test (src/test/routePagesSmoke.test.tsx via
+  // responsiveRegression.routes.ts), verified per-route before aliasing.
+  'src/pages/AiCommandCenterDashboard.test.jsx': 'src/test/routePagesSmoke.test.tsx',
+  'src/pages/AiEvaluationDashboard.test.jsx': 'src/test/routePagesSmoke.test.tsx',
+  'src/pages/MemoryDashboard.test.jsx': 'src/test/routePagesSmoke.test.tsx',
+  'src/data/fullPlatformConsolidation.test.js': 'src/data/fullPlatformConsolidation.test.tsx',
+  'src/pages/Artifacts.test.jsx': 'src/test/routePagesSmoke.test.tsx',
+  'src/pages/CommandDashboard.test.jsx': 'src/test/routePagesSmoke.test.tsx',
+  'src/pages/DeviceFleetManagement.test.jsx': 'src/test/routePagesSmoke.test.tsx',
+  'src/pages/fleet/FleetDashboard.test.jsx': 'src/test/routePagesSmoke.test.tsx',
+  'src/pages/fleet/FleetLiveMap.test.jsx': 'src/test/routePagesSmoke.test.tsx',
+  'src/pages/HospitalMapDashboard.test.jsx': 'src/test/routePagesSmoke.test.tsx',
+  'src/pages/LiveTrackingMaps.test.jsx': 'src/test/routePagesSmoke.test.tsx',
+  'src/pages/MedicalIotDashboard.test.jsx': 'src/test/routePagesSmoke.test.tsx',
+  'src/pages/fleet/PredictiveMaintenance.test.jsx': 'src/test/routePagesSmoke.test.tsx',
+  'src/pages/fleet/RouteOptimizer.test.jsx': 'src/test/routePagesSmoke.test.tsx',
 });
 
 const FOUNDATION_CAPABILITIES = Object.freeze([
@@ -161,7 +179,7 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     aiLaunchAlias: 'show timeline',
     backendService: 'TimelineService / PlatformSystemsService',
     apiEndpoint: 'GET /api/patients/:patientId/timeline',
-    testCoverage: ['backend/src/modules/clinical-intelligence/timeline.service.spec.ts', 'src/pages/PlatformOSPages.test.jsx'],
+    testCoverage: ['backend/src/modules/clinical-intelligence/timeline.service.spec.ts'],
   },
   {
     id: 'workflows',
@@ -171,7 +189,7 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     aiLaunchAlias: 'build workflow',
     backendService: 'ClinicalIntelligenceService',
     apiEndpoint: 'POST /api/clinical-intelligence/workflow-builder/generate',
-    testCoverage: ['src/pages/PlatformOSPages.test.jsx', 'src/data/platformSystemsExpansionPlan.test.ts'],
+    testCoverage: ['src/test/routePagesSmoke.test.tsx', 'src/data/platformSystemsExpansionPlan.test.ts'],
   },
   {
     id: 'search',
@@ -181,7 +199,7 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     aiLaunchAlias: 'search everything',
     backendService: 'SearchService',
     apiEndpoint: 'GET /api/platform-systems/capabilities/:capabilityId',
-    testCoverage: ['backend/src/modules/workspace-intelligence/search.service.spec.ts', 'src/pages/PlatformOSPages.test.jsx'],
+    testCoverage: ['backend/src/modules/workspace-intelligence/search.service.spec.ts'],
   },
   {
     id: 'assets',
@@ -211,7 +229,7 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     aiLaunchAlias: 'show workspaces',
     backendService: 'WorkspacesService',
     apiEndpoint: 'GET /api/workspaces',
-    testCoverage: ['src/pages/WorkspaceHome.test.jsx', 'src/data/workspaceArchitecture.test.ts'],
+    testCoverage: ['src/data/workspaceArchitecture.test.ts'],
   },
   {
     id: 'system-health',

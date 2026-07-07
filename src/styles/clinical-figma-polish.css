@@ -686,8 +686,8 @@
 }
 
 .unified-intake-phase-nav__btn.is-active {
-  background: color-mix(in srgb, var(--reception-command-primary, #2563eb) 12%, #fff) !important;
-  border-color: color-mix(in srgb, var(--reception-command-primary, #2563eb) 55%, #94a3b8) !important;
+  background: color-mix(in srgb, var(--reception-command-primary, #0ea5e9) 12%, #fff) !important;
+  border-color: color-mix(in srgb, var(--reception-command-primary, #0ea5e9) 55%, #94a3b8) !important;
   color: var(--reception-command-primary-strong, #1d4ed8) !important;
   box-shadow: 0 1px 4px rgba(37, 99, 235, 0.14);
   font-weight: 700;
@@ -707,8 +707,8 @@
 
 .reception-quick-complaints__chip.is-active,
 .reception-quick-complaints__chip:hover {
-  background: color-mix(in srgb, var(--reception-command-primary, #2563eb) 10%, #fff) !important;
-  border-color: color-mix(in srgb, var(--reception-command-primary, #2563eb) 50%, #94a3b8) !important;
+  background: color-mix(in srgb, var(--reception-command-primary, #0ea5e9) 10%, #fff) !important;
+  border-color: color-mix(in srgb, var(--reception-command-primary, #0ea5e9) 50%, #94a3b8) !important;
   color: var(--reception-command-primary-strong, #1d4ed8) !important;
 }
 

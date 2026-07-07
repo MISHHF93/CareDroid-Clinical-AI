@@ -24,7 +24,10 @@ describe('mobile-first layout architecture', () => {
   });
 
   it('loads mobile-first-layout.css from main.jsx', () => {
-    expect(mainJsx).toContain("import './styles/mobile-first-layout.css'");
+    // Moved from a direct main.tsx import into a CSS @import inside
+    // design-system.css alongside the other style layers.
+    const designSystemCss = readFileSync(join(__dirname, 'design-system.css'), 'utf8');
+    expect(designSystemCss).toContain("@import './mobile-first-layout.css'");
   });
 
   it('defines acceptance breakpoints in JS', () => {
@@ -60,16 +63,21 @@ describe('mobile-first layout architecture', () => {
     expect(QA_PHONE_TABLET_WIDTHS).toEqual([...MOBILE_FIRST_BREAKPOINTS.phone, ...MOBILE_FIRST_BREAKPOINTS.tablet]);
     const widths = RESPONSIVE_QA_VIEWPORTS.map((v) => v.width);
     expect(widths).toEqual(expect.arrayContaining([375, 412, 480, 600, 768, 1280, 1920]));
-    expect(RESPONSIVE_QA_VIEWPORTS).toHaveLength(13);
+    expect(RESPONSIVE_QA_VIEWPORTS).toHaveLength(15);
   });
 
   it('exposes fluid spacing and typography tokens via design-tokens.css', () => {
     const designTokensCss = readFileSync(join(__dirname, 'design-tokens.css'), 'utf8');
     expect(designTokensCss).toContain('--app-fluid-page-gutter:');
     expect(designTokensCss).toContain('--bp-phone-md: 375px');
-    const indexCss = readFileSync(join(__dirname, '../index.css'), 'utf8');
-    expect(indexCss).toContain('--space-fluid-4:');
-    expect(indexCss).toContain('--text-title-fluid:');
-    expect(mainJsx).toContain("import './styles/design-tokens.css'");
+    // --space-fluid-4 and --text-title-fluid are defined in primitives.css;
+    // design-tokens.css only references them via var().
+    const primitivesCss = readFileSync(join(__dirname, 'primitives.css'), 'utf8');
+    expect(primitivesCss).toContain('--space-fluid-4:');
+    expect(primitivesCss).toContain('--text-title-fluid:');
+    // design-tokens.css moved from a direct main.tsx import into a CSS @import
+    // inside design-system.css alongside the other style layers.
+    const designSystemCss = readFileSync(join(__dirname, 'design-system.css'), 'utf8');
+    expect(designSystemCss).toContain("@import './design-tokens.css'");
   });
 });

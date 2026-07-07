@@ -52,16 +52,18 @@ describe('Fleet Command (fleet-command) wiring', () => {
     expect(nlu?.category).toBe('fleet');
   });
 
-  it('documents the future route while the CareDroid shell redirects fleet paths', () => {
+  it('documents the active route while the CareDroid shell redirects fleet paths', () => {
     const routeRecord = ROUTE_RECORDS.find((record) => record.id === 'fleetCommand');
     expect(routeRecord).toMatchObject({
       path,
       componentKey: 'FleetDashboard',
-      status: 'future',
+      status: 'active',
       navGroup: 'operations',
     });
     expect(fleetDashboardSource).toContain('FleetDashboard');
-    expect(NON_ED_WORKSPACE_REDIRECT_ROUTES.some((route) => route.path === '/fleet/*')).toBe(true);
+    // Fleet graduated from a redirected/future module to an active, mounted
+    // route — it no longer appears in the non-ED workspace redirect table.
+    expect(NON_ED_WORKSPACE_REDIRECT_ROUTES.some((route) => route.path === '/fleet/*')).toBe(false);
   });
 
   it('mirrors backend tool.patterns.ts toolId', () => {

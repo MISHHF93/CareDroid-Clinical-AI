@@ -18,7 +18,6 @@ const copilotPanelCss = readFileSync(
   'utf8',
 );
 const sidebarCss = readFileSync(join(srcRoot, 'components/Sidebar.css'), 'utf8');
-const quickCommandCss = readFileSync(join(srcRoot, 'components/QuickCommandLauncher.css'), 'utf8');
 const drawerCss = readFileSync(join(srcRoot, 'components/ui/Drawer.css'), 'utf8');
 const chatInterfaceCss = readFileSync(join(srcRoot, 'components/ChatInterface.css'), 'utf8');
 const layoutVisibilityCss = readFileSync(join(srcRoot, 'styles/layout-visibility.css'), 'utf8');
@@ -63,7 +62,9 @@ describe('mobile scrolling contracts', () => {
     expect(sidebarCss).toMatch(/aside\[aria-label='Emergency navigation'\][\s\S]*position:\s*fixed/);
     expect(sidebarCss).toMatch(/\.sidebar-nav-item:nth-of-type\(n \+ 6\)\s*\{[\s\S]*display:\s*none/);
     expect(copilotPanelCss).toMatch(/\.ed-copilot-panel\s*\{[\s\S]*overflow:\s*hidden/);
-    expect(quickCommandCss).toMatch(/\.quick-command\s*\{[\s\S]*pointer-events:\s*none/);
+    // CommandPalette.tsx (the current quick-command UI) unmounts entirely when
+    // closed (`if (!open) return null`) rather than staying mounted with a CSS
+    // pointer-events toggle, so there's no equivalent selector to check here.
     expect(drawerCss).toMatch(/\.drawer-overlay\s*\{[\s\S]*pointer-events:\s*none/);
     expect(drawerCss).toMatch(/\.drawer-overlay-open\s*\{[\s\S]*pointer-events:\s*auto/);
   });
@@ -79,7 +80,7 @@ describe('mobile scrolling contracts', () => {
   });
 
   it('allows tools and calculator pages to grow inside the shared AppShell main region', () => {
-    expect(appShellCss).toMatch(/\.ed-os-main\s*\{[\s\S]*overflow:\s*auto/);
+    expect(appShellCss).toMatch(/\.app-shell-main-content\s*\{[\s\S]*overflow:\s*auto/);
     expect(layoutVisibilityCss).toMatch(/\.tools-overview[\s\S]*overflow-x:\s*clip/);
     expect(layoutVisibilityCss).toMatch(/\.calculators-content[\s\S]*overflow-x:\s*clip/);
     expect(toolsOverviewCss).not.toMatch(/\.tools-overview\s*\{[^}]*height:\s*100vh/);

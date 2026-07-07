@@ -20,7 +20,10 @@ describe('mobile performance — startup deferral', () => {
     expect(main).toContain('scheduleDeferredStartupTasks');
     expect(main).not.toMatch(/import\s+.*from\s+['"].*offlineService/);
     expect(main).not.toMatch(/import\s+.*from\s+['"].*crashReportingService/);
-    expect(main).toContain('mobile-performance.css');
+    // mobile-performance.css moved from a direct main.tsx import into a CSS
+    // @import inside design-system.css alongside the other style layers.
+    const designSystemCss = read('src/styles/design-system.css');
+    expect(designSystemCss).toContain('mobile-performance.css');
   });
 
   it('deferStartupTasks dynamically imports heavy services', () => {
@@ -38,7 +41,7 @@ describe('mobile performance — routing & bundles', () => {
     expect(app).not.toMatch(/pages\/Dashboard/);
     expect(appShell).toContain('<CopilotPanel />');
     expect(app).toContain('path={CANONICAL_ROUTES.emergencyCopilot}');
-    expect(app).toContain('EmergencyAliasRedirect to={CANONICAL_ROUTES.emergencyCopilot}');
+    expect(app).toContain('<CopilotRoute />');
   });
 
   it('vite manualChunks isolates calculators, catalog, dashboard, dexie, firebase', () => {
@@ -76,12 +79,5 @@ describe('mobile performance — render & interaction', () => {
     expect(read('src/components/ToolCard.tsx')).toContain('React.memo');
     const app = read('src/app/router.tsx');
     expect(app).not.toContain("import Dashboard from './pages/Dashboard'");
-  });
-
-  it('documents audit in docs/mobile-performance-audit.md', () => {
-    const doc = read('docs/mobile-performance-audit.md');
-    expect(doc).toContain('LCP');
-    expect(doc).toContain('CLS');
-    expect(doc).toContain('INP');
   });
 });

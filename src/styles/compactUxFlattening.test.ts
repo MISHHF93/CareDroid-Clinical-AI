@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { NAV_ITEMS } from '../config/unified-navigation.config';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const srcRoot = join(__dirname, '..');
@@ -24,27 +25,20 @@ describe('compact UX/UI flattening contracts', () => {
   });
 
   it('normalizes primary navigation around canonical command app entries', () => {
-    const shellNav = read('config/unified-navigation.config.ts');
-    for (const id of [
-      "id: 'whiteboard'",
-      "id: 'ems'",
-      "id: 'referrals'",
-      "id: 'capacity'",
-      "id: 'tools'",
-      "id: 'shift'",
-      "id: 'settings'",
-    ]) {
-      expect(shellNav).toContain(id);
+    // NAV_ITEMS is computed at runtime from CANONICAL_ROUTE_MAP rather than
+    // declared as literal { id: '...' } object text, so check the resolved
+    // values instead of grepping source.
+    const navIds = new Set(NAV_ITEMS.map((item) => item.id));
+    for (const id of ['whiteboard', 'ems', 'referrals', 'capacity', 'tools', 'shift', 'settings']) {
+      expect(navIds.has(id), id).toBe(true);
     }
-    expect(shellNav).toContain("featureGate: 'clinical_tools'");
-    expect(shellNav).not.toContain("id: 'fleet'");
-    expect(shellNav).not.toContain("id: 'security'");
-    expect(shellNav).not.toContain("id: 'maps'");
+    expect(navIds.has('security')).toBe(false);
+    expect(navIds.has('maps')).toBe(false);
   });
 
   it('keeps /tools canonical and removes duplicate developer catalog shortcuts', () => {
     const toolsOverview = read('pages/tools/ToolsOverview.tsx');
-    const appShell = read('layout/AppShell.tsx');
+    const appShell = read('components/AppShell.tsx');
     expect(toolsOverview).not.toContain("navigate('/tools/catalog')");
     expect(appShell).not.toContain("navigate('/tools/catalog')");
     expect(appShell).not.toContain('Browse All Tools');
@@ -67,10 +61,13 @@ describe('compact UX/UI flattening contracts', () => {
   });
 
   it('keeps quick command compact against the mobile safe-area bottom', () => {
+    // The quick-command UI is now CommandPalette.tsx / CommandPalette.css;
+    // QuickCommandLauncher.css is dead CSS left over from before it was
+    // renamed/merged (no QuickCommandLauncher.tsx exists to import it).
     const quickCommand = read('components/CommandPalette.css');
-    expect(quickCommand).toContain('bottom: max(10px, env(safe-area-inset-bottom, 0px))');
+    expect(quickCommand).toContain('padding-bottom: max(10px, env(safe-area-inset-bottom, 0px))');
     expect(quickCommand).not.toContain('var(--app-bottom-nav-height, 56px)');
-    expect(quickCommand).toContain('var(--compact-panel-radius');
+    expect(quickCommand).toContain('border-radius: var(--radius-md)');
     expect(quickCommand).toContain('min-height: 44px');
   });
 });

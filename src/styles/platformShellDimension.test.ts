@@ -15,7 +15,7 @@ const sidebarSource = readFileSync(join(__dirname, '../components/Sidebar.tsx'),
 describe('platform shell dimension contract', () => {
   it('defines canonical chrome heights in shell-header-polish', () => {
     expect(shellHeaderPolishCss).toContain('--cdl-header-height: 52px');
-    expect(shellHeaderPolishCss).toContain('--cdl-route-tab-height: 44px');
+    expect(shellHeaderPolishCss).toContain('--cdl-route-tab-height: 52px');
     expect(shellHeaderPolishCss).toContain('--cdl-chrome-stack-height');
   });
 

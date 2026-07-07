@@ -226,6 +226,7 @@
     border-inline: 0;
     border-bottom: 0;
     border-radius: 22px 22px 0 0;
+    padding-bottom: max(10px, env(safe-area-inset-bottom, 0px));
   }
 
   .command-palette::before {

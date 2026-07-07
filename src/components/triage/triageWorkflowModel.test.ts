@@ -13,7 +13,19 @@ describe('triageWorkflowModel', () => {
   ];
 
   it('builds triage operational strip metrics from existing data sources', () => {
-    const metrics = selectTriageOperationalStripMetrics(patients, []);
+    // Pass explicit metricIds to bypass the pilot-mode default filter (which
+    // trims the strip to just triage-pending/triage-breached) — this test
+    // verifies the underlying metric computation, not the pilot policy.
+    const metrics = selectTriageOperationalStripMetrics(patients, [], {
+      metricIds: [
+        'triage-pending',
+        'longest-untriaged-wait',
+        'triage-breach-approaching',
+        'triage-breached',
+        'rapid-review-flags',
+        'ems-handoffs-pending',
+      ],
+    });
     const byId = Object.fromEntries(metrics.map((metric) => [metric.id, metric]));
 
     expect(byId['triage-pending'].value).toBeGreaterThanOrEqual(1);

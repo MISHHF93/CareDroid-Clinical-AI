@@ -9,12 +9,17 @@ const read = (path) => readFileSync(join(srcRoot, path), 'utf8');
 
 describe('visual and mobile entropy guardrails', () => {
   it('keeps legacy public notices shell-safe without 100vw viewport overflow', () => {
+    // These pages moved their layout into the shared PublicPageTemplate
+    // component instead of hand-rolling inline width/overflow styles per page —
+    // check the pages adopt the shared (safe) template and that its CSS never
+    // uses a 100vw width that could overflow the shell.
+    const publicPageCss = read('styles/cdl-public-page.css');
+    expect(publicPageCss).not.toContain('100vw');
+    expect(publicPageCss).toMatch(/\.cdl-public-page__container\s*\{[\s\S]*width:\s*100%/);
+
     ['pages/GDPRNotice.tsx', 'pages/HIPAANotice.tsx', 'pages/HelpCenter.tsx'].forEach((path) => {
       const source = read(path);
-
-      expect(source).not.toContain("width: '100vw'");
-      expect(source).toContain("width: '100%'");
-      expect(source).toContain("overflowX: 'clip'");
+      expect(source).toContain('PublicPageTemplate');
     });
   });
 

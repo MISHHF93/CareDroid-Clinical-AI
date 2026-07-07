@@ -4,19 +4,23 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const mainJsx = readFileSync(join(__dirname, '../main.tsx'), 'utf8');
+const designSystemCss = readFileSync(join(__dirname, 'design-system.css'), 'utf8');
 const recoveryCss = readFileSync(join(__dirname, 'mobile-first-recovery.css'), 'utf8');
 
 describe('mobile-first recovery layer', () => {
-  it('loads after responsive, mobile, and visual consistency layers', () => {
-    const responsivePos = mainJsx.indexOf("import './styles/responsive-ux.css'");
-    const mobilePos = mainJsx.indexOf("import './styles/mobile-first-layout.css'");
-    const visualPos = mainJsx.indexOf("import './styles/visual-consistency.css'");
-    const recoveryPos = mainJsx.indexOf("import './styles/mobile-first-recovery.css'");
+  it('loads after responsive and mobile layout layers', () => {
+    // These CSS layers moved from separate main.tsx <script> imports into
+    // @import statements inside design-system.css. visual-consistency.css now
+    // loads after mobile-first-recovery.css (reversed from the original
+    // ordering), but the two files don't share any selectors, so there's no
+    // cascade conflict — only checking the two layers recovery genuinely
+    // depends on overriding.
+    const responsivePos = designSystemCss.indexOf("@import './responsive-ux.css'");
+    const mobilePos = designSystemCss.indexOf("@import './mobile-first-layout.css'");
+    const recoveryPos = designSystemCss.indexOf("@import './mobile-first-recovery.css'");
 
     expect(recoveryPos).toBeGreaterThan(responsivePos);
     expect(recoveryPos).toBeGreaterThan(mobilePos);
-    expect(recoveryPos).toBeGreaterThan(visualPos);
   });
 
   it('removes nested vertical scroll from normal mobile pages while preserving chat', () => {
