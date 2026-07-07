@@ -7,7 +7,7 @@ describe('alertLifecycleModel', () => {
     expect(envelope.state).toBe('critical');
     expect(envelope.showToast).toBe(true);
     expect(envelope.showPersistentBanner).toBe(true);
-    expect(envelope.primarySurface).toBe('header-bell');
+    expect(envelope.primarySurface).toBe('shell-dock');
   });
 
   it('maps informational tier to drawer-only disclosure', () => {

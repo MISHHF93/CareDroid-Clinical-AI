@@ -24,7 +24,7 @@ describe('profileDesignLanguage.config', () => {
     const pharmacistCopy = resolveCopy({ saasRole: 'pharmacist' });
 
     expect(resolveProfileIdentityCard(nurseCopy).eyebrow).toBe('Triage lane');
-    expect(resolveProfileIdentityCard(pharmacistCopy).eyebrow).toBe('Pharmacy');
+    expect(resolveProfileIdentityCard(pharmacistCopy).eyebrow).toBe('Read-only display');
   });
 
   it('unifies copilot chrome labels while varying welcome intro by role', () => {

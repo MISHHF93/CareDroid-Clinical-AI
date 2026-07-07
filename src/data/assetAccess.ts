@@ -53,6 +53,8 @@ export const ASSET_ACCESS_LABELS = Object.freeze({
 
 const ADMIN_ONLY_TOOLS = new Set(['audit-logs', 'system-config', 'team-management']);
 const ADMIN_SAAS_ROLES = new Set([
+  'admin',
+  'owner',
   'platform-admin',
   'hospital-administrator',
   'compliance-officer',

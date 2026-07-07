@@ -50,6 +50,7 @@ const PARTITIONED_REGISTRY_DOMAINS: ReadonlySet<CanonicalConfigurationDomain> = 
   'documentation',
   'workflow',
   'platform',
+  'feature-flags',
 ]);
 
 function countBy<T extends string>(items: readonly { domain?: T; layer?: T }[], key: 'domain' | 'layer') {

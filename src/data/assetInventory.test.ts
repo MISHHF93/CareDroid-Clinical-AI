@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { ROUTE_RECORDS } from '../config/routes.config';
+import { CANONICAL_APP_ROUTE_TREE, ROUTE_RECORDS } from '../config/routes.config';
+import { LEGACY_DASHBOARD_REDIRECTS } from '../config/edOperatingSurface.config';
 import { QUICK_COMMAND_DESTINATION_ITEMS } from '../config/navigation.config';
 import {
   buildAssetInventoryProjection,
@@ -75,8 +76,19 @@ describe('mounted SaaS asset inventory projection', () => {
   it('keeps quick command destinations scoped to the active CareDroid route surface', () => {
     const mountedNav = buildNavigationMountProjection();
     const commandPaths = new Set(QUICK_COMMAND_DESTINATION_ITEMS.map((item) => item.path));
+    const knownRoutePaths = new Set([
+      ...ROUTE_RECORDS.map((route) => route.path),
+      ...CANONICAL_APP_ROUTE_TREE.map((route) => route.path),
+      ...Object.keys(LEGACY_DASHBOARD_REDIRECTS),
+    ]);
 
-    expect([...commandPaths].every((path) => path.startsWith('/emergency/'))).toBe(true);
+    // Most quick commands stay within the emergency workflow surface, but a few
+    // (audit, AI command center, admin) intentionally point at top-level platform
+    // routes — require every destination to be a real, mounted route, or a
+    // documented legacy redirect, either way.
+    expect(
+      [...commandPaths].every((path) => path.startsWith('/emergency/') || knownRoutePaths.has(path))
+    ).toBe(true);
     expect(commandPaths.size).toBe(QUICK_COMMAND_DESTINATION_ITEMS.length);
     expect(new Set(mountedNav.map((item) => `${item.section}:${item.id}`)).size).toBe(
       mountedNav.length

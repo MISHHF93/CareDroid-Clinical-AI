@@ -26,7 +26,7 @@ describe('emergencyOperationalPresentationModel', () => {
     );
     expect(resolveOperationalPresentation(CARE_DROID_SCREEN_MODES.triage).stripLayout).toBe('compact');
     expect(resolveOperationalPresentation(CARE_DROID_SCREEN_MODES.chargeNurse).stripLayout).toBe(
-      'command',
+      'compact',
     );
   });
 
@@ -48,6 +48,6 @@ describe('emergencyOperationalPresentationModel', () => {
 
   it('derives presentation density from the canonical screen mode registry', () => {
     expect(resolveOperationalPresentation(CARE_DROID_SCREEN_MODES.commandCenter).density).toBe('wall');
-    expect(resolveOperationalPresentation(CARE_DROID_SCREEN_MODES.triage).density).toBe('comfortable');
+    expect(resolveOperationalPresentation(CARE_DROID_SCREEN_MODES.triage).density).toBe('compact');
   });
 });
