@@ -95,8 +95,8 @@ describe('getDashboardWidgets', () => {
     expect(primary).toContain('analytics');
   });
 
-  it('registration_clerk sees registration-queue', () => {
+  it('registration_clerk sees incomplete-registration', () => {
     const { secondary } = getDashboardWidgets('registration_clerk');
-    expect(secondary).toContain('registration-queue');
+    expect(secondary).toContain('incomplete-registration');
   });
 });
