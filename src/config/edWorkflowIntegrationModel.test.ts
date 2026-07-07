@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { CANONICAL_ROUTES } from './routes.config';
+import { CANONICAL_ROUTES, TRIAGE_PRETRIAGE_ROUTE } from './routes.config';
 import { EMERGENCY_ROLE_IDS } from './emergencyRolePermissions';
 import {
   ED_WORKFLOW_AZ_STEPS,
@@ -47,7 +47,7 @@ describe('edWorkflowIntegrationModel', () => {
       },
     });
     expect(context.emergencyRoleId).toBe(EMERGENCY_ROLE_IDS.triageNurse);
-    expect(context.landingRoute).toBe(CANONICAL_ROUTES.triage);
+    expect(context.landingRoute).toBe(TRIAGE_PRETRIAGE_ROUTE);
   });
 
   it('summarizes backend vs frontend sync expectations', () => {

@@ -46,8 +46,12 @@ describe('edOperatingSurface.config', () => {
     expect(LEGACY_DASHBOARD_REDIRECTS[CANONICAL_ROUTES.aiChief]).toBe(
       CANONICAL_ROUTES.emergencyCopilot,
     );
-    expect(LEGACY_DASHBOARD_REDIRECTS[CANONICAL_ROUTES.executive]).toBeUndefined();
-    expect(LEGACY_DASHBOARD_REDIRECTS[CANONICAL_ROUTES.aiCommandCenter]).toBeUndefined();
+    expect(LEGACY_DASHBOARD_REDIRECTS[CANONICAL_ROUTES.executive]).toBe(
+      `${CANONICAL_ROUTES.emergencyCommandCenter}?view=executive`,
+    );
+    expect(LEGACY_DASHBOARD_REDIRECTS[CANONICAL_ROUTES.aiCommandCenter]).toBe(
+      `${CANONICAL_ROUTES.emergencyCommandCenter}?view=ai`,
+    );
   });
 
   it('exposes owner role and primary decision for each surface', () => {

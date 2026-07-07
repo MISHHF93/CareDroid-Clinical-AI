@@ -57,7 +57,7 @@ describe('emergencyDeviceContextModel', () => {
       'display=waiting-room',
     );
     expect(resolveDeviceContextLandingRoute(EMERGENCY_DEVICE_CONTEXT_IDS.managerLaptop)).toBe(
-      CANONICAL_ROUTES.emergencyWhiteboard,
+      CANONICAL_ROUTES.emergencyCommandCenter,
     );
   });
 
@@ -66,7 +66,7 @@ describe('emergencyDeviceContextModel', () => {
       role: EMERGENCY_ROLE_ID.registrationClerk,
       deviceContextId: EMERGENCY_DEVICE_CONTEXT_IDS.managerLaptop,
     });
-    expect(route).toBe(CANONICAL_ROUTES.emergencyWhiteboard);
+    expect(route).toBe(CANONICAL_ROUTES.emergencyCommandCenter);
   });
 
   it('overrides screen mode resolution ahead of role defaults', () => {
