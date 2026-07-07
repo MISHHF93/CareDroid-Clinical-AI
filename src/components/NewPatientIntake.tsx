@@ -18,14 +18,14 @@ import { runSmartIntakeVerticalSlice } from '../services/emergencyOsApi';
 import './NewPatientIntake.css';
 
 const COMPLAINT_CATEGORIES = [
-  { value: 'Chest Pain', label: 'Chest pain', icon: '??' },
-  { value: 'Breathing', label: 'Breathing', icon: '??' },
-  { value: 'Neuro/Stroke', label: 'Neuro/Stroke', icon: '??' },
-  { value: 'Sepsis', label: 'Sepsis', icon: '??' },
-  { value: 'Trauma', label: 'Trauma', icon: '??' },
-  { value: 'OB/Gyn', label: 'OB/Gyn', icon: '??' },
-  { value: 'Pediatric', label: 'Pediatric', icon: '??' },
-  { value: 'Other', label: 'Other', icon: '??' },
+  { value: 'Chest Pain', label: 'Chest pain', icon: '🫀' },
+  { value: 'Breathing', label: 'Breathing', icon: '🫁' },
+  { value: 'Neuro/Stroke', label: 'Neuro/Stroke', icon: '🧠' },
+  { value: 'Sepsis', label: 'Sepsis', icon: '🩸' },
+  { value: 'Trauma', label: 'Trauma', icon: '🤕' },
+  { value: 'OB/Gyn', label: 'OB/Gyn', icon: '🤰' },
+  { value: 'Pediatric', label: 'Pediatric', icon: '🧒' },
+  { value: 'Other', label: 'Other', icon: '📋' },
 ];
 
 const SEX_OPTIONS = [
@@ -35,11 +35,11 @@ const SEX_OPTIONS = [
 ];
 
 const CTAS_LABELS = {
-  [Priority.P1]: 'CTAS 1 � Resuscitation',
-  [Priority.P2]: 'CTAS 2 � Emergent',
-  [Priority.P3]: 'CTAS 3 � Urgent',
-  [Priority.P4]: 'CTAS 4 � Semi-Urgent',
-  [Priority.P5]: 'CTAS 5 � Non-Urgent',
+  [Priority.P1]: 'CTAS 1 · Resuscitation',
+  [Priority.P2]: 'CTAS 2 · Emergent',
+  [Priority.P3]: 'CTAS 3 · Urgent',
+  [Priority.P4]: 'CTAS 4 · Semi-Urgent',
+  [Priority.P5]: 'CTAS 5 · Non-Urgent',
 };
 
 const INITIAL_IDENTITY = {

@@ -12,7 +12,7 @@ import { getUserFacingToolInventory } from './toolInventory';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(__dirname, '../..');
 
-/** Nine sellable solution packs (marketing name ? pack id ? product slug). */
+/** Nine sellable solution packs (marketing name → pack id → product slug). */
 export const PRODUCT_SOLUTION_PACKS = Object.freeze([
   {
     marketingName: 'Emergency Department Pack',
@@ -228,7 +228,7 @@ function rolePacksForAsset(assetId, packIds, packs, assetToRolePacks) {
   for (const packId of packIds) {
     const pack = packs.find((p) => p.id === packId);
     if (pack?.targetRoles?.length) {
-      pack.targetRoles.forEach((r) => roles.add(`pack:${packId}?${r}`));
+      pack.targetRoles.forEach((r) => roles.add(`pack:${packId}→${r}`));
     }
   }
   if (assetId.startsWith('agent-')) {
@@ -412,9 +412,9 @@ export function formatProductPackagingAuditMarkdown(audit = buildProductPackagin
     '',
     '| Concern | Canonical | Consumers |',
     '|---------|-----------|-----------|',
-    '| Solution pack definitions | `backend/.../platform-asset-seed.data.ts` ? `SEED_ASSET_PACKS` | DB seed, entitlements, marketplace |',
+    '| Solution pack definitions | `backend/.../platform-asset-seed.data.ts` → `SEED_ASSET_PACKS` | DB seed, entitlements, marketplace |',
     '| Platform asset rows | `SEED_PLATFORM_ASSETS` (derived from packs) | `platform_assets` table |',
-    '| Sellable products | `backend/.../product-catalog-seed.data.ts` ? `SEED_PRODUCTS` | `/api/products`, commercial UI |',
+    '| Sellable products | `backend/.../product-catalog-seed.data.ts` → `SEED_PRODUCTS` | `/api/products`, commercial UI |',
     '| Specialty packs | `SEED_SPECIALTIES` | `/api/specialties`, specialty pages |',
     '| Role packs | `SEED_ROLE_PROFILES` + pack `targetRoles` | `/api/platform/me/role-profile`, recommendations |',
     '| Org-type defaults | `DEFAULT_PACKS_BY_ORGANIZATION_TYPE` | Org onboarding, default entitlements |',

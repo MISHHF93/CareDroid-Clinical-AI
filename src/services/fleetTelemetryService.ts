@@ -27,7 +27,7 @@ export const FLEET_LIVE_TRACKING_BACKEND_STATUS = Object.freeze({
 const MOCK_VEHICLES = [
   {
     id: 'VH-101',
-    label: 'Van 101 � North route',
+    label: 'Van 101 — North route',
     status: 'occupied',
     maintenanceStatus: 'ok',
     etaMinutes: 18,
@@ -46,7 +46,7 @@ const MOCK_VEHICLES = [
   },
   {
     id: 'VH-204',
-    label: 'Truck 204 � Depot',
+    label: 'Truck 204 — Depot',
     status: 'available',
     maintenanceStatus: 'ok',
     etaMinutes: null,
@@ -65,7 +65,7 @@ const MOCK_VEHICLES = [
   },
   {
     id: 'VH-118',
-    label: 'Van 118 � South loop',
+    label: 'Van 118 — South loop',
     status: 'active',
     maintenanceStatus: 'ok',
     etaMinutes: 34,
@@ -84,7 +84,7 @@ const MOCK_VEHICLES = [
   },
   {
     id: 'VH-077',
-    label: 'Truck 077 � Workshop',
+    label: 'Truck 077 — Workshop',
     status: 'maintenance',
     maintenanceStatus: 'scheduled_service',
     etaMinutes: null,
@@ -103,7 +103,7 @@ const MOCK_VEHICLES = [
   },
   {
     id: 'VH-312',
-    label: 'Van 312 � City center',
+    label: 'Van 312 — City center',
     status: 'occupied',
     maintenanceStatus: 'warning',
     etaMinutes: 9,
@@ -122,7 +122,7 @@ const MOCK_VEHICLES = [
   },
   {
     id: 'VH-189',
-    label: 'Truck 189 � Yard',
+    label: 'Truck 189 — Yard',
     status: 'available',
     maintenanceStatus: 'ok',
     etaMinutes: null,

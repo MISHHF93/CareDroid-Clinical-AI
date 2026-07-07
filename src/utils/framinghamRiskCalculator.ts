@@ -13,7 +13,7 @@
 const MIN_AGE = 30;
 const MAX_AGE = 74;
 
-/** Total points ? 10-year hard CHD risk % (Wilson Table 4, selected bands). */
+/** Total points → 10-year hard CHD risk % (Wilson Table 4, selected bands). */
 const RISK_FROM_POINTS = {
   female: [
     { maxPoints: 8, riskPct: 1 },

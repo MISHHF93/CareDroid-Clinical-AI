@@ -36,7 +36,7 @@ export const HEART_DIMENSIONS_META = [
     options: [
       { value: 0, label: '< 45 years' },
       { value: 1, label: '45–64 years' },
-      { value: 2, label: '= 65 years' },
+      { value: 2, label: '≥ 65 years' },
     ],
   },
   {
@@ -46,7 +46,7 @@ export const HEART_DIMENSIONS_META = [
     options: [
       { value: 0, label: 'No known risk factors' },
       { value: 1, label: '1–2 risk factors' },
-      { value: 2, label: '= 3 risk factors or history of atherosclerotic disease' },
+      { value: 2, label: '≥ 3 risk factors or history of atherosclerotic disease' },
     ],
   },
   {
@@ -54,7 +54,7 @@ export const HEART_DIMENSIONS_META = [
     label: 'Troponin',
     help: 'Initial troponin relative to local assay upper limit of normal (ULN).',
     options: [
-      { value: 0, label: '= normal limit' },
+      { value: 0, label: '≤ normal limit' },
       { value: 1, label: '1–3× ULN' },
       { value: 2, label: '> 3× ULN' },
     ],

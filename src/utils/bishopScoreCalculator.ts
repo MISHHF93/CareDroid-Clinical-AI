@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Bishop score — cervical favourability for labour induction.
  * Reference: Bishop EH. Pelvic scoring for elective induction. Obstet Gynecol. 1964;24:266–268.
  */
@@ -34,9 +34,9 @@ export const BISHOP_DIMENSIONS_META = [
     label: 'Fetal station',
     help: 'Fetal head position relative to ischial spines.',
     options: [
-      { value: 0, label: '-3' },
-      { value: 1, label: '-2' },
-      { value: 2, label: '-1 or 0' },
+      { value: 0, label: '−3' },
+      { value: 1, label: '−2' },
+      { value: 2, label: '−1 or 0' },
       { value: 3, label: '+1 or +2' },
     ],
   },

@@ -260,7 +260,7 @@ export const listClinicalCalculatorResults = ({ patientId, calculatorId }: any =
   return requestEmergencyJson(path);
 };
 
-/** Fire-and-forget copilot audit trail � never blocks clinical UI. */
+/** Fire-and-forget copilot audit trail — never blocks clinical UI. */
 export function persistCopilotInteractionSafely(payload: any = {}) {
   void recordCopilotInteraction({
     requiresHumanReview: true,

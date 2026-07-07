@@ -91,7 +91,7 @@ export default function UsagePage() {
                   <h2>{meter.label}</h2>
                   <strong>{formatNumber(meter.value)}</strong>
                   <p className="commercial-subtitle">
-                    {meter.unit} � {meter.events} events � billing separated
+                    {meter.unit} · {meter.events} events · billing separated
                   </p>
                 </Card>
               ))}

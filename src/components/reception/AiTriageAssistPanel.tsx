@@ -114,9 +114,9 @@ export default function AiTriageAssistPanel({
     >
       <header className="ai-triage-assist__header">
         <div>
-          <p className="ai-triage-assist__eyebrow">Nurse triage sign-off � {sourceLabel}</p>
+          <p className="ai-triage-assist__eyebrow">Nurse triage sign-off · {sourceLabel}</p>
           <h3 className="ai-triage-assist__title">
-            Suggested {priorityLabel(priority)} � {streamingLaneLabel(String(lane))}
+            Suggested {priorityLabel(priority)} · {streamingLaneLabel(String(lane))}
           </h3>
           <p className="ai-triage-assist__esi">{priorityToEsiLabel(priority)}</p>
         </div>

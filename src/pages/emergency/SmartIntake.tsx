@@ -321,7 +321,7 @@ export default function SmartIntake({
     if (!fromReception || !provisionalKind) return;
     setActiveStep(0);
     setStatusMessage(
-      `${PROVISIONAL_IDENTITY_PROFILES[provisionalKind].label} � send to triage without waiting for full verification.`,
+      `${PROVISIONAL_IDENTITY_PROFILES[provisionalKind].label} — send to triage without waiting for full verification.`,
     );
   }, [fromReception, intakeMode]);
 
@@ -624,7 +624,7 @@ export default function SmartIntake({
         setActiveStepTracked(SMART_INTAKE_DEMO.steps.length - 1, 'finalize-local-fallback');
       } else {
         setErrorMessage(formatApiRecoveryMessage(error, 'intake confirmation'));
-        setStatusMessage(`${actionLabel} not confirmed � review the error and retry.`);
+        setStatusMessage(`${actionLabel} not confirmed — review the error and retry.`);
       }
     } finally {
       setPendingAction('');
@@ -727,7 +727,7 @@ export default function SmartIntake({
         systemPrompt: `${getAIPrompt('smart-intake-assistant').prompt}\n${HUMAN_REVIEW_DISCLAIMER}`,
         message: [
           `Smart Intake session ${sessionId}.`,
-          'Provide verification hints only � do not suggest triage priority or clinical disposition.',
+          'Provide verification hints only — do not suggest triage priority or clinical disposition.',
           missingFields ? `Fields needing review: ${missingFields}.` : 'All demo fields appear captured.',
           'List 2-3 concise next verification steps for front-desk staff.',
         ].join(' '),
@@ -785,7 +785,7 @@ export default function SmartIntake({
     <>
       {!embedded && !fromReception ? (
       <div className="smart-intake__status" role="status">
-        <strong>Session:</strong> {sessionId} � {statusMessage}
+        <strong>Session:</strong> {sessionId} · {statusMessage}
       </div>
       ) : statusMessage ? (
         <div className="smart-intake__status" role="status">
@@ -798,7 +798,7 @@ export default function SmartIntake({
             {aiHintLoading
               ? fromReception || embedded
                 ? RECEPTION_COPY.identityCheck.aiHelpLoading
-                : 'AI help�'
+                : 'AI help…'
               : fromReception || embedded
                 ? RECEPTION_COPY.identityCheck.aiHelp
                 : 'AI verification help'}

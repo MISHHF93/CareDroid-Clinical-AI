@@ -255,7 +255,7 @@ export default function ReceptionWorkQueues({
         ) : (
           <OperationalEmptyState
             size="inline"
-            icon="?"
+            icon="○"
             title={emptyCopy[activeTab]}
             guidance={emptyGuidance?.guidance}
             status="Queue is clear for this lane."

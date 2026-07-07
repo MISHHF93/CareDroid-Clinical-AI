@@ -1,7 +1,7 @@
-/**
+﻿/**
  * PERC — Pulmonary Embolism Rule-out Criteria.
  * All eight criteria must be met (favorable findings) for PERC to be satisfied.
- * Valid only when pre-test probability of PE is already low (~=15%).
+ * Valid only when pre-test probability of PE is already low (~≤15%).
  *
  * Reference: Kline JA, Courtney DM, Kabrhel C, et al. Prospective multicenter
  * evaluation of the pulmonary embolism rule-out criteria. J Thromb Haemost.
@@ -32,7 +32,7 @@ export const PERC_CRITERIA_META = [
   },
   {
     key: 'spo2AtLeast95',
-    shortLabel: 'SpO2 = 95% on room air',
+    shortLabel: 'SpO₂ ≥ 95% on room air',
     help: 'Oxygen saturation at least 95% while breathing room air.',
   },
   {

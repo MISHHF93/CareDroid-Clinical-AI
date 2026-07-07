@@ -1,5 +1,5 @@
 /**
- * Frontend ? backend NLU alias synchronization and drift reports.
+ * Frontend ↔ backend NLU alias synchronization and drift reports.
  *
  * Backend keywords (tool.patterns.ts) drive NLU matching.
  * NLU_TO_REGISTRY_ID holds precise catalog / deep-link aliases only — not every keyword.
@@ -184,7 +184,7 @@ export function readToolPatternsSource() {
   return cachedPatternsSource;
 }
 
-/** @returns {Map<string, string>} registryId ? primary NLU toolId */
+/** @returns {Map<string, string>} registryId → primary NLU toolId */
 export function buildRegistryToNluToolIdMap() {
   const map = new Map();
   for (const [nluToolId, registryId] of Object.entries(ORCHESTRATOR_TO_REGISTRY_ID)) {
@@ -433,13 +433,13 @@ export function buildClinicalToolAliasSyncReport(options: any = {}) {
       (lower.includes('emergency') || lower.includes('trauma') || lower.includes('abc ')) &&
       mentalHealthRegistry.has(registryId)
     ) {
-      highRiskMisroutes.push({ alias, registryId, reason: 'emergency/trauma phrase ? mental health tool' });
+      highRiskMisroutes.push({ alias, registryId, reason: 'emergency/trauma phrase → mental health tool' });
     }
     if (lower.includes('pulmonary embolism') && registryId === REGISTRY.phq9) {
-      highRiskMisroutes.push({ alias, registryId, reason: 'PE phrase ? PHQ-9' });
+      highRiskMisroutes.push({ alias, registryId, reason: 'PE phrase → PHQ-9' });
     }
     if (lower.includes('pulmonary embolism') && registryId === REGISTRY.gad7) {
-      highRiskMisroutes.push({ alias, registryId, reason: 'PE phrase ? GAD-7' });
+      highRiskMisroutes.push({ alias, registryId, reason: 'PE phrase → GAD-7' });
     }
     if (
       (lower === 'screen' || lower === 'screening') &&
@@ -448,7 +448,7 @@ export function buildClinicalToolAliasSyncReport(options: any = {}) {
       highRiskMisroutes.push({
         alias,
         registryId,
-        reason: 'vague screen/screening ? mental health or alcohol tool',
+        reason: 'vague screen/screening → mental health or alcohol tool',
       });
     }
   }
@@ -520,7 +520,7 @@ export function formatAliasSyncReport(report) {
   if (report.unsafeCatalogRoutes.length) {
     lines.push('Unsafe catalog routes:');
     for (const row of report.unsafeCatalogRoutes) {
-      lines.push(`  - ${row.alias} ? ${row.registryId} (${row.reason})`);
+      lines.push(`  - ${row.alias} → ${row.registryId} (${row.reason})`);
     }
   }
   if (report.wrongCatalogTargets.length) {
@@ -550,7 +550,7 @@ export function formatAliasSyncReport(report) {
   if (report.highRiskMisroutes.length) {
     lines.push('High-risk misroutes:');
     for (const row of report.highRiskMisroutes) {
-      lines.push(`  - ${row.alias} ? ${row.registryId} (${row.reason})`);
+      lines.push(`  - ${row.alias} → ${row.registryId} (${row.reason})`);
     }
   }
   if (report.metadataMismatches?.length) {

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Deterministic fixtures for PR1 Tier-A calculators (qSOFA, NEWS2, Child-Pugh, HAS-BLED).
  */
 
@@ -82,7 +82,7 @@ export const NEWS2_SCALE_SWITCH_FIXTURE = Object.freeze({
   temperature: 36.8,
 });
 
-/** Scale 2 room-air vs oxygen at high SpO2 (hypercapnic pathway edge) */
+/** Scale 2 room-air vs oxygen at high SpO₂ (hypercapnic pathway edge) */
 export const NEWS2_SCALE2_SPO2_EDGE = Object.freeze({
   spo2: 93,
   respiratoryRate: 16,

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+﻿import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import useProfileNavigate from '../../hooks/useProfileNavigate';
 import { useConversation } from '../../contexts/ConversationContext';
@@ -1081,7 +1081,7 @@ const NEWS2Calculator = ({ onResultChange, patientContext = null as any }) => {
 
         <fieldset className="calc-news2-scale-fieldset">
           <legend className="calc-news2-legend" id="news2-scale-legend">
-            SpO2 scoring scale
+            SpO₂ scoring scale
           </legend>
           <div className="calc-news2-scale-options" role="radiogroup" aria-labelledby="news2-scale-legend">
             <label className="calc-news2-scale-option">
@@ -1117,7 +1117,7 @@ const NEWS2Calculator = ({ onResultChange, patientContext = null as any }) => {
           {spo2Scale === '2' && (
             <div className="calc-news2-scale2-warning" role="alert">
               <strong>Scale 2 warning:</strong> Using Scale 2 inappropriately (e.g. for patients who should be on
-              Scale 1) will mis-score SpO2 and may delay recognition of hypoxaemia or cause inappropriate oxygen
+              Scale 1) will mis-score SpO₂ and may delay recognition of hypoxaemia or cause inappropriate oxygen
               targets. If unsure, use Scale 1 and seek respiratory / senior advice.
             </div>
           )}
@@ -1154,7 +1154,7 @@ const NEWS2Calculator = ({ onResultChange, patientContext = null as any }) => {
           </div>
           <div className="calc-input-group calc-input-group--grow">
             <label className="calc-input-label" htmlFor="news2-spo2">
-              SpO2 (%)
+              SpO₂ (%)
             </label>
             <span className="calc-input-help" id="news2-spo2-help">
               Pulse oximetry on current scale ({spo2Scale === '2' ? 'Scale 2' : 'Scale 1'}).
@@ -1189,7 +1189,7 @@ const NEWS2Calculator = ({ onResultChange, patientContext = null as any }) => {
             </label>
           </div>
           <span className="calc-input-help" id="news2-o2-help">
-            NEWS2 adds 2 points when supplemental oxygen is required (Air vs oxygen row), in addition to the SpO2
+            NEWS2 adds 2 points when supplemental oxygen is required (Air vs oxygen row), in addition to the SpO₂
             score for the scale you selected.
           </span>
         </div>
@@ -1322,7 +1322,7 @@ const NEWS2Calculator = ({ onResultChange, patientContext = null as any }) => {
               </div>
               <div className="calc-breakdown-item">
                 <span className="calc-breakdown-label">
-                  SpO2 (scale {result.breakdown.spo2ScaleUsed})
+                  SpO₂ (scale {result.breakdown.spo2ScaleUsed})
                 </span>
                 <span className="calc-breakdown-score">{result.breakdown.spo2}</span>
               </div>
@@ -1369,7 +1369,7 @@ const NEWS2Calculator = ({ onResultChange, patientContext = null as any }) => {
         ) : (
           <div className="calc-results-empty">
             <CalcResultsEmptyIcon icon={CHROME_ICONS.clipboardList} />
-            <p>Enter observations, choose SpO2 scale, then calculate</p>
+            <p>Enter observations, choose SpO₂ scale, then calculate</p>
           </div>
         )}
       </CalcResultsPanel>

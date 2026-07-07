@@ -28,12 +28,12 @@ export const MULTI_TENANT_SURFACE_REGISTRY = Object.freeze([
     readPaths: [
       'GET /api/emergency/settings (tenant-scoped)',
       'GET /api/organizations/:organizationId/tenant-admin',
-      'OrganizationContext ? emergencyStore hydration',
+      'OrganizationContext → emergencyStore hydration',
     ],
     writePaths: [
       'PATCH /api/emergency/settings (tenant-scoped)',
       'PATCH /api/organizations/:organizationId/tenant-admin',
-      'EmergencySettings.jsx ? saveOrganizationEmergencyOsSettings',
+      'EmergencySettings.jsx → saveOrganizationEmergencyOsSettings',
     ],
     orgScopedRead: true,
     orgScopedWrite: true,
@@ -94,8 +94,8 @@ export const MULTI_TENANT_SURFACE_REGISTRY = Object.freeze([
     ],
     writePaths: [
       'PATCH /api/emergency/settings (tenant-scoped)',
-      'EmergencySettings.jsx ? saveOrganizationEmergencyOsSettings',
-      'saveThresholdSettings ? tenant-admin',
+      'EmergencySettings.jsx → saveOrganizationEmergencyOsSettings',
+      'saveThresholdSettings → tenant-admin',
     ],
     orgScopedRead: true,
     orgScopedWrite: true,
@@ -168,7 +168,7 @@ export const MULTI_TENANT_SURFACE_REGISTRY = Object.freeze([
     domain: MULTI_TENANT_CONFIG_DOMAIN.ROLES,
     label: 'Tenant-admin permission overrides',
     intendedStorage: 'organization.settings.permissionsOverrides',
-    actualStorage: 'organization.settings.permissionsOverrides ? useEmergencyRolePermissions',
+    actualStorage: 'organization.settings.permissionsOverrides → useEmergencyRolePermissions',
     readPaths: [
       'GET /api/organizations/:organizationId/tenant-admin',
       'emergencySettings.permissionsOverrides',
@@ -188,7 +188,7 @@ export const MULTI_TENANT_ISOLATION_GAPS = Object.freeze([
 
 export const MULTI_TENANT_MITIGATIONS = Object.freeze([
   'EmergencySettingsService resolves settings by organizationId with deep-merge over defaults',
-  'EmergencySettings.jsx persists via saveOrganizationEmergencyOsSettings ? tenant-admin',
+  'EmergencySettings.jsx persists via saveOrganizationEmergencyOsSettings → tenant-admin',
   'OrganizationContext hydrates emergencyStore from organization.settings.emergencyOs on login',
   'resolveEmergencyRoleId maps platform roleProfileId via org emergencyOs.roles',
   'hasEmergencyActionPermission merges permissionsOverrides from org settings',
@@ -326,7 +326,7 @@ export function auditMultiTenantExposure() {
     orgSettingsShape: Object.freeze({
       emergencyOs: 'department, thresholds, alertRules, staff, featureFlags, integrations',
       branding: 'displayName, logoUrl, primaryColor, theme, loginTitle',
-      permissionsOverrides: 'role ? permission[] map',
+      permissionsOverrides: 'role → permission[] map',
       integrations: 'marketplace enablement + request status',
     }),
   });

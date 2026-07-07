@@ -1,4 +1,4 @@
-/**
+﻿/**
  * NEWS2 — National Early Warning Score 2 (Royal College of Physicians standard).
  * Aggregate score from RR, SpO2 (Scale 1 or 2), supplemental oxygen, SBP, pulse,
  * consciousness, and temperature; escalation bands follow RCP trigger guidance.
@@ -246,14 +246,14 @@ export function validateNews2Inputs(raw) {
   }
 
   const spo2 = typeof raw.spo2 === 'string' ? raw.spo2.trim() : raw.spo2;
-  if (spo2 === '' || Number.isNaN(parseFloat(spo2))) errors.push('Enter SpO2 (%).');
+  if (spo2 === '' || Number.isNaN(parseFloat(spo2))) errors.push('Enter SpO₂ (%).');
   else {
     const n = parseFloat(spo2);
-    if (n < 70 || n > 100) errors.push('SpO2 should be between 70 and 100%.');
+    if (n < 70 || n > 100) errors.push('SpO₂ should be between 70 and 100%.');
   }
 
   const scaleOk = raw.spo2Scale === '1' || raw.spo2Scale === '2' || raw.spo2Scale === 1 || raw.spo2Scale === 2;
-  if (!scaleOk) errors.push('Select SpO2 Scale 1 or Scale 2.');
+  if (!scaleOk) errors.push('Select SpO₂ Scale 1 or Scale 2.');
 
   const sbp = typeof raw.systolicBp === 'string' ? raw.systolicBp.trim() : raw.systolicBp;
   if (sbp === '' || Number.isNaN(parseFloat(sbp))) errors.push('Enter systolic blood pressure (mmHg).');

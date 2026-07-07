@@ -27,7 +27,7 @@ export const ABCD2_CLINICAL_FEATURE_OPTIONS = Object.freeze([
 export const ABCD2_DURATION_OPTIONS = Object.freeze([
   { value: 'under_10', label: '< 10 minutes', points: 0 },
   { value: 'ten_to_59', label: '10–59 minutes', points: 1 },
-  { value: 'sixty_plus', label: '= 60 minutes', points: 2 },
+  { value: 'sixty_plus', label: '≥ 60 minutes', points: 2 },
 ]);
 
 /**

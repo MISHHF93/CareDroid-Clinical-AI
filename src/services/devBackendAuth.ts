@@ -89,7 +89,7 @@ async function resolveDevBackendSession({
   }
 
   // When local demo auth is allowed and no backend API URL is configured,
-  // skip the network request � it will fail with ECONNREFUSED since there's no backend.
+  // skip the network request — it will fail with ECONNREFUSED since there's no backend.
   try {
     const { ensureBackendReachabilityProbed } = await import('./backendReachability');
     const backendReachable = await ensureBackendReachabilityProbed({

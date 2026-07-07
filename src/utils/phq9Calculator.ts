@@ -5,7 +5,7 @@
  * severity measure. J Gen Intern Med. 2001;16(9):606–613.
  *
  * Screening / decision support only — does not diagnose depression or recommend medications.
- * Question 9 (self-harm ideation) requires elevated safety handling when score = 1.
+ * Question 9 (self-harm ideation) requires elevated safety handling when score ≥ 1.
  */
 
 /** @typedef {'none_minimal' | 'mild' | 'moderate' | 'moderately_severe' | 'severe'} Phq9SeverityCategory */

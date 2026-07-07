@@ -38,7 +38,7 @@ function buildPublicWaitingFallbackSnapshot(updatedAt = null) {
     escalationMessage: PUBLIC_WAITING_ESCALATION_MESSAGE,
     waitDisclaimer: PUBLIC_WAIT_URGENCY_DISCLAIMER,
     emsCrowdingImpact: { active: false },
-    summaryLine: 'Waiting room information is temporarily unavailable � please ask staff if you need help.',
+    summaryLine: 'Waiting room information is temporarily unavailable — please ask staff if you need help.',
     updatedAt,
   };
 }
@@ -77,7 +77,7 @@ export default function PublicWaitingDisplay({
   useEffect(() => {
     if (!kioskMode || typeof document === 'undefined') return undefined;
     const previousTitle = document.title;
-    document.title = `${displayTitle} � ${EMERGENCY_OS_BRANDING.productName}`;
+    document.title = `${displayTitle} · ${EMERGENCY_OS_BRANDING.productName}`;
     document.documentElement.classList.add('public-waiting-kiosk-active');
     return () => {
       document.title = previousTitle;
@@ -205,7 +205,7 @@ export default function PublicWaitingDisplay({
         <section className="public-waiting-display__stages" aria-label="Waiting room status messages">
           <h3>Right now in the waiting room</h3>
           <p className="public-waiting-display__stages-note">
-            General status messages only � counts, no names or clinical details
+            General status messages only — counts, no names or clinical details
           </p>
           <ol className="public-waiting-display__stage-list">
             {resolvedSnapshot.statusMessaging.statusLines.map((line) => (
@@ -222,7 +222,7 @@ export default function PublicWaitingDisplay({
         <section className="public-waiting-display__stages" aria-label="Care process stages">
           <h3>Care process stages</h3>
           <p className="public-waiting-display__stages-note">
-            Where patients are in the emergency visit � counts only, no identifiers
+            Where patients are in the emergency visit — counts only, no identifiers
           </p>
           <ol className="public-waiting-display__stage-list">
             {resolvedSnapshot.careStages.map((stage) => (

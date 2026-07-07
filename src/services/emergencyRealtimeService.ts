@@ -302,7 +302,7 @@ function startEmergencyRealtimeSession({ onEvent, onStatus, onPoll }: any = {}) 
       wrappedOnStatus({
         status: 'reconnecting',
         mode: 'polling',
-        message: 'API offline � using local CareDroid state until backend is available.',
+        message: 'API offline — using local CareDroid state until backend is available.',
         updatedAt: new Date().toISOString(),
       });
       scheduleReconnect();

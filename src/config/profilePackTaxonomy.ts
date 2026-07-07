@@ -6,7 +6,7 @@ import { resolveUserProfileFromSaasRole } from './userProfileCatalog';
 import { SAAS_ENTITLEMENT_PACKS } from './userProfileSegregation';
 import { PILOT_CUSTOMER_MODE, PROFILE_SCOPED_PILOT_NAV_IDS } from './unified-navigation.config';
 
-/** Catalog toolPolicy pack ? substrings that match tool.packId / category / assetPackId */
+/** Catalog toolPolicy pack → substrings that match tool.packId / category / assetPackId */
 export const CATALOG_PACK_MATCHERS: Readonly<Record<string, readonly string[]>> = Object.freeze({
   'core-platform': Object.freeze(['core-platform', 'clinical-core', 'platform']),
   'reception-desk': Object.freeze(['reception-desk', 'reception', 'front-desk']),

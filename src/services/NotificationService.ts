@@ -344,7 +344,7 @@ export const NotificationService = {
    */
   subscribeToNotifications(onNotification, onError) {
     if (!isBackendCapabilityEnabled('notificationStream')) {
-      logger.info('Notification stream API not available � skipping SSE subscription');
+      logger.info('Notification stream API not available — skipping SSE subscription');
       const unavailableResponse = makeNotificationStreamDisabledResponse();
       const error: any = new Error('Real-time notification stream is not available on this server.');
       error.unavailableResponse = unavailableResponse;

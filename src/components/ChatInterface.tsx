@@ -330,7 +330,7 @@ function buildRequestedEdCopilotSystemPrompt({
     ...activeVitalsAlerts,
     ...activeLongWaitAlerts,
     longWaitAttention || null,
-    longestWaitBroadcast ? `? ${longestWaitBroadcast}` : null,
+    longestWaitBroadcast ? `⏱ ${longestWaitBroadcast}` : null,
     ...enabledToolLines,
     '',
     formatWhatHappensNextForCopilot(activePatients, { referrals }),
@@ -542,7 +542,7 @@ function CopilotActionCard({ action, status, onApply, onDismiss }) {
   return (
     <div className="chat-interface__action-card">
       <div>
-        <strong>? Suggested Action</strong>
+        <strong>⚡ Suggested Action</strong>
         <p>
           Flag {target} for reassessment
           {action.flag ? ` (${action.flag})` : ''}.
@@ -1149,7 +1149,7 @@ const ChatInterface = ({
             >
               {message.role === 'assistant' && (
                 <div className="chat-interface__avatar chat-interface__avatar--assistant" aria-hidden>
-                  ??
+                  🤖
                 </div>
               )}
               <div
@@ -1251,7 +1251,7 @@ const ChatInterface = ({
               </div>
               {message.role === 'user' && (
                 <div className="chat-interface__avatar chat-interface__avatar--user" aria-hidden>
-                  ??
+                  👤
                 </div>
               )}
             </div>
@@ -1260,7 +1260,7 @@ const ChatInterface = ({
         {isLoading && (
           <div className="chat-interface__message-row chat-interface__message-row--assistant">
             <div className="chat-interface__avatar chat-interface__avatar--assistant" aria-hidden>
-              ??
+              🤖
             </div>
             <div className="chat-interface__loading-bubble">
               <div className="chat-interface__speaker-label">

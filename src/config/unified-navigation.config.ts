@@ -39,14 +39,14 @@ export const PILOT_CORE_NAV_ITEM_IDS: readonly string[] = Object.freeze(
   ),
 );
 
-/** Secondary utility nav � routable in pilot but deprioritized in the sidebar. */
+/** Secondary utility nav — routable in pilot but deprioritized in the sidebar. */
 export const PILOT_UTILITY_NAV_ITEM_IDS: readonly string[] = Object.freeze([
   'pulse',
   'shift',
   'help',
 ]);
 
-/** Extension/platform nav � hidden in pilot unless entitlements expand visibility. */
+/** Extension/platform nav — hidden in pilot unless entitlements expand visibility. */
 export const PILOT_EXTENSION_NAV_ITEM_IDS: readonly string[] = CANONICAL_PILOT_EXTENSION_NAV_IDS;
 
 export const PILOT_CUSTOMER_VISIBLE_NAV_ITEM_IDS: readonly string[] = CANONICAL_PILOT_VISIBLE_NAV_IDS;

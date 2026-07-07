@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Catalog of clinical tools the NLU layer can recognize (mirrors backend patterns).
  * Keep in sync with:
  * - backend/.../intent-classifier/patterns/tool.patterns.ts (toolId + keywords)
@@ -53,11 +53,11 @@ const clinicalIntentToolsRaw = [
     toolName: 'NEWS2 (National Early Warning Score 2)',
     category: 'calculator',
     description:
-      'RCP NEWS2: RR, SpO2 (Scale 1 or 2), supplemental oxygen, systolic BP, pulse, consciousness, temperature � total score and escalation band.',
+      'RCP NEWS2: RR, SpO₂ (Scale 1 or 2), supplemental oxygen, systolic BP, pulse, consciousness, temperature — total score and escalation band.',
     path: '/tools/calculators/news2',
     sidebarToolId: 'news2',
     chatSeed:
-      'Help me calculate and interpret NEWS2 from respiratory rate, SpO2 (and which SpO2 scale), oxygen use, blood pressure, pulse, consciousness, and temperature.',
+      'Help me calculate and interpret NEWS2 from respiratory rate, SpO₂ (and which SpO₂ scale), oxygen use, blood pressure, pulse, consciousness, and temperature.',
     backendExecutable: false,
   },
   {
@@ -1127,7 +1127,7 @@ Check: BUN >25 mg/dL, impaired mental status, SIRS, age >60, pleural effusion on
 
 STEP 0 — Non-invasive fibrosis screening only. Does not diagnose cirrhosis or replace elastography, biopsy, or hepatology referral — follow local NAFLD/hepatitis staging protocols.
 
-Use conventional units: age (years), AST and ALT (U/L), platelets (�10?/L). Interpretation uses age <65 vs =65 cutoffs (<1.3 / 1.3�2.67 / >2.67 vs <2.0 / =2.0).`,
+Use conventional units: age (years), AST and ALT (U/L), platelets (×10⁹/L). Interpretation uses age <65 vs ≥65 cutoffs (<1.3 / 1.3–2.67 / >2.67 vs <2.0 / ≥2.0).`,
     backendExecutable: false,
   },
   {
@@ -2762,7 +2762,7 @@ export const builtinUiCalculators = [
   {
     id: 'news2',
     name: 'NEWS2',
-    description: 'National Early Warning Score 2 (RCP) � vitals, SpO2 scale, escalation.',
+    description: 'National Early Warning Score 2 (RCP) — vitals, SpO₂ scale, escalation.',
     path: '/tools/calculators/news2',
     calcQuery: '/tools/calculators?calc=news2',
     implementation: 'Client-side in Calculators.jsx (news2Calculator.js)',

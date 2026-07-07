@@ -3,12 +3,12 @@ import { resolveEmptyStateGraphic } from '../../config/cdlGraphicModel';
 import './OperationalEmptyState.css';
 
 /**
- * Structured operational empty state � guidance, actions, status, and next steps.
+ * Structured operational empty state — guidance, actions, status, and next steps.
  */
 import { dispatchOpenHelpHub } from '../../contexts/HelpHubContext';
 
 export default function OperationalEmptyState({
-  icon = '?',
+  icon = '○',
   title,
   guidance,
   status = (undefined as any),

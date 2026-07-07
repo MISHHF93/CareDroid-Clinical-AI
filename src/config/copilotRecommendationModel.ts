@@ -1,6 +1,6 @@
 /**
  * Copilot recommendation audit — actionable, prioritized operational guidance.
- * Priority order: queue ? capacity ? boarding ? reassessment.
+ * Priority order: queue → capacity → boarding → reassessment.
  * Node-safe.
  */
 import { getCopilotRecommendationLimit } from './practitionerCleanup.config';
@@ -224,7 +224,7 @@ export function buildCopilotRecommendations(context: any = {}) {
 
 export function formatCopilotRecommendationLine(recommendation, index = 0) {
   const prefix = `[${recommendation.domain}]`;
-  const routeHint = recommendation.route ? ` ? ${recommendation.route}` : '';
+  const routeHint = recommendation.route ? ` → ${recommendation.route}` : '';
   return `${index + 1}. ${prefix} ${recommendation.action} — ${recommendation.detail}${routeHint}`;
 }
 

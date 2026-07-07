@@ -92,7 +92,7 @@ export function evaluatePecarnHead(raw) {
  */
 export function interpretPecarnHead(input) {
   const { ageCategory, ruleCriteriaMet, triggeredCriteria } = input;
-  const ageLabel = ageCategory === 'under_2' ? '<2 years' : '=2 years';
+  const ageLabel = ageCategory === 'under_2' ? '<2 years' : '≥2 years';
 
   const referenceLine =
     'Kuppermann N, et al. Identification of children at very low risk of clinically important brain injuries after head trauma: a prospective cohort study. Lancet. 2009;374(9696):1160–1170.';

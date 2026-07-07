@@ -145,7 +145,7 @@ export default function OcrCapturePanel({
       {previewDataUrl ? (
         <figure className="ocr-capture-panel__preview">
           <img src={previewDataUrl} alt="Captured identity document preview" />
-          <figcaption>Captured artifact � verify extracted values before continuing.</figcaption>
+          <figcaption>Captured artifact — verify extracted values before continuing.</figcaption>
         </figure>
       ) : null}
 
@@ -167,7 +167,7 @@ export default function OcrCapturePanel({
             {extractedPreview.map((field) => (
               <li key={field.field}>
                 <strong>{field.field}</strong>
-                <span>{field.extracted || '�'}</span>
+                <span>{field.extracted || '—'}</span>
               </li>
             ))}
           </ul>

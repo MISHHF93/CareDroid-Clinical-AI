@@ -1,4 +1,4 @@
-/**
+﻿/**
  * HAS-BLED — bleeding risk factors in patients considered for anticoagulation (e.g. atrial fibrillation).
  * One point each (maximum 9): Hypertension, Abnormal renal, Abnormal liver, Stroke, Bleeding, Labile INR,
  * Elderly (>65), Drugs, Alcohol.
@@ -74,7 +74,7 @@ export function interpretHasBled(total) {
       interpretation:
         'A HAS-BLED score of 3 or more is associated with higher bleeding risk and should prompt closer clinical review and risk–benefit discussion when anticoagulation is being considered. It does not by itself mandate a specific treatment choice.',
       bleedingRiskNote:
-        'Use alongside validated stroke-risk tools (e.g. CHA2DS2-VASc) and patient preferences; follow local anticoagulation safety pathways.',
+        'Use alongside validated stroke-risk tools (e.g. CHA₂DS₂-VASc) and patient preferences; follow local anticoagulation safety pathways.',
       referenceLine,
     };
   }

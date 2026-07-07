@@ -101,7 +101,7 @@ export const aliasOnlyToolReferences = [
     status: 'phantom',
     sourceScanKind: 'alias',
     category: 'medication',
-    notes: 'Overlaps NLU antibiotic-guide ? diagnosis page; separate id unused in UI.',
+    notes: 'Overlaps NLU antibiotic-guide → diagnosis page; separate id unused in UI.',
   },
   {
     id: 'medication-checker',
@@ -129,24 +129,24 @@ export const toolIdAliases = [
   {
     id: 'drug-interaction-checker',
     mapsTo: 'drug-check',
-    source: 'e2e tests, ToolCard; NLU executor id drug-interactions ? registry drug-check',
+    source: 'e2e tests, ToolCard; NLU executor id drug-interactions → registry drug-check',
   },
   { id: 'drug-interactions', mapsTo: 'drug-check', source: 'tool.patterns vs registry drug-check' },
   { id: 'lab-interpreter', mapsTo: 'lab-interp', source: 'Throughout backend + frontend' },
   {
     id: 'medical-simulation',
     mapsTo: 'simulation-suite',
-    source: 'Canonical route alias /medical-simulation ? /simulation',
+    source: 'Canonical route alias /medical-simulation → /simulation',
   },
   {
     id: 'lab',
     mapsTo: 'laboratory-dashboard',
-    source: 'Canonical route alias /lab ? /laboratory',
+    source: 'Canonical route alias /lab → /laboratory',
   },
   {
     id: 'anatomy-viewer',
     mapsTo: 'medical-3d-viewer',
-    source: 'Canonical route alias /anatomy-viewer ? /3d-viewer',
+    source: 'Canonical route alias /anatomy-viewer → /3d-viewer',
   },
   { id: 'sofa-calculator', mapsTo: 'sofa-score', source: 'Orchestrator id vs registry id' },
   { id: 'quick-sofa', mapsTo: 'qsofa', source: 'NLU alias — quick sofa' },

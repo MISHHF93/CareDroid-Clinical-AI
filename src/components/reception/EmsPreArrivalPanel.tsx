@@ -82,7 +82,7 @@ export default function EmsPreArrivalPanel({
       {loading && !inboundArrivals.length ? (
         <OperationalEmptyState
           size="inline"
-          icon="?"
+          icon="↻"
           title={copy.loading}
           guidance="Syncing inbound EMS units from the active feed."
           status="EMS pre-arrival feed loading"
@@ -94,7 +94,7 @@ export default function EmsPreArrivalPanel({
       {!loading && !inboundArrivals.length ? (
         <OperationalEmptyState
           size="inline"
-          icon="?"
+          icon="✓"
           title={copy.empty}
           guidance={EMPTY_STATE_COPY.reception.emsPreArrival.guidance}
           status="No inbound units on the feed."

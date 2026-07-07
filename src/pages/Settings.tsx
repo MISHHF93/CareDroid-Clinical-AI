@@ -105,7 +105,7 @@ const Settings = () => {
         setBillingLoading(false);
         setBillingStatus({
           type: 'idle',
-          message: 'Billing API unavailable in demo mode � subscription data stays local during the build phase.',
+          message: 'Billing API unavailable in demo mode — subscription data stays local during the build phase.',
         });
         return;
       }
@@ -525,8 +525,8 @@ const Settings = () => {
                     <div key={provider.id}>
                       <strong>{provider.name}</strong>
                       <span>
-                        {provider.status} � {provider.protocol}
-                        {provider.entryPath ? ` � ${provider.entryPath}` : ''}
+                        {provider.status} · {provider.protocol}
+                        {provider.entryPath ? ` · ${provider.entryPath}` : ''}
                       </span>
                       <span>{provider.notes}</span>
                     </div>
@@ -579,7 +579,7 @@ const Settings = () => {
                     <div key={domain.id}>
                       <strong>{domain.name}</strong>
                       <span>
-                        {domain.status} � {domain.tenantBoundary}
+                        {domain.status} · {domain.tenantBoundary}
                       </span>
                       <span>{domain.residualRisk}</span>
                     </div>

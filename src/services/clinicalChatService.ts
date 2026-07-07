@@ -19,7 +19,7 @@ export function registryIdToChatToolParam(registryId) {
 }
 
 /**
- * POST /api/chat/message � shared by Dashboard, ChatInterface, and tools.
+ * POST /api/chat/message — shared by Dashboard, ChatInterface, and tools.
  * @param {{ message: string, messages?: Array<{role: string, content: string}>, tool?: string, feature?: string, requestType?: string, conversationId?: number|string, authToken?: string|null, workspaceContext?: object, memoryContext?: object, userId?: string, tenantId?: string, patientId?: string, encounterId?: string, purpose?: string, sourceModule?: string }} params
  * @returns {Promise<{ ok: boolean, status: number, data: object }>}
  */

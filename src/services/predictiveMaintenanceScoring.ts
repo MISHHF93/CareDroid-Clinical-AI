@@ -151,16 +151,16 @@ export function scorePredictiveMaintenanceRules(normalized) {
   if (age != null) {
     if (age >= 20) {
       score += 35;
-      contributingFactors.push('Vehicle age = 20 years (+35)');
+      contributingFactors.push('Vehicle age ≥ 20 years (+35)');
     } else if (age >= 15) {
       score += 25;
-      contributingFactors.push('Vehicle age = 15 years (+25)');
+      contributingFactors.push('Vehicle age ≥ 15 years (+25)');
     } else if (age >= 10) {
       score += 15;
-      contributingFactors.push('Vehicle age = 10 years (+15)');
+      contributingFactors.push('Vehicle age ≥ 10 years (+15)');
     } else if (age >= 7) {
       score += 8;
-      contributingFactors.push('Vehicle age = 7 years (+8)');
+      contributingFactors.push('Vehicle age ≥ 7 years (+8)');
     }
   }
 
@@ -168,13 +168,13 @@ export function scorePredictiveMaintenanceRules(normalized) {
   if (mileage != null) {
     if (mileage >= 200_000) {
       score += 30;
-      contributingFactors.push('Mileage = 200,000 (+30)');
+      contributingFactors.push('Mileage ≥ 200,000 (+30)');
     } else if (mileage >= 150_000) {
       score += 20;
-      contributingFactors.push('Mileage = 150,000 (+20)');
+      contributingFactors.push('Mileage ≥ 150,000 (+20)');
     } else if (mileage >= 100_000) {
       score += 10;
-      contributingFactors.push('Mileage = 100,000 (+10)');
+      contributingFactors.push('Mileage ≥ 100,000 (+10)');
     }
   }
 

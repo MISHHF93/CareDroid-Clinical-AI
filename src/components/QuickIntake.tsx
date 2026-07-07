@@ -619,7 +619,7 @@ export default function QuickIntake({
             </h2>
             <div style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 12, marginTop: 4 }}>
               {variant === 'reception'
-                ? 'Fast registration for front desk � patient enters triage queue after submit.'
+                ? 'Fast registration for front desk — patient enters triage queue after submit.'
                 : `Unified input and escalation for ${centralControl.inputProfile.label}`}
             </div>
           </div>
@@ -775,7 +775,7 @@ export default function QuickIntake({
                 }}
               >
                 <div style={{ color: MEDICAL_TYPE.statusCritical, fontSize: 11, fontWeight: 700, marginBottom: 8 }}>
-                  High-risk complaint flags � staff alert only
+                  High-risk complaint flags — staff alert only
                 </div>
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                   {detectedComplaintFlags.map((flag) => (

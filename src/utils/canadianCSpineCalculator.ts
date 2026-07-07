@@ -30,7 +30,7 @@
  * }} CcrApplicabilityInputs */
 
 export const CCR_HIGH_RISK_META = [
-  { key: 'age65OrOlder', label: 'Age = 65 years' },
+  { key: 'age65OrOlder', label: 'Age ≥ 65 years' },
   { key: 'dangerousMechanism', label: 'Dangerous mechanism' },
   { key: 'paresthesiasInExtremities', label: 'Paresthesias in extremities' },
 ];

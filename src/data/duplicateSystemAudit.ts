@@ -1,5 +1,5 @@
-/**
- * Duplicate system audit � competing sources of truth across routes, nav, inventories, etc.
+﻿/**
+ * Duplicate system audit — competing sources of truth across routes, nav, inventories, etc.
  * Regenerate: npm run duplicate-system-audit:write-docs
  */
 
@@ -51,11 +51,11 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
     id: 'routes',
     title: 'Routes',
     canonical: '`src/config/routes.config.ts` (`CANONICAL_ROUTES`, alias groups)',
-    secondary: '`src/app/router.tsx` (React Router mount table only � must not invent new paths)',
+    secondary: '`src/app/router.tsx` (React Router mount table only — must not invent new paths)',
     duplicates: [
       {
         name: 'Canonical route map vs tool launch paths',
-        instances: ['routes.config.js ? CANONICAL_ROUTES', 'clinicalToolIdContract.js ? TOOL_LAUNCH_PATHS'],
+        instances: ['routes.config.js → CANONICAL_ROUTES', 'clinicalToolIdContract.js → TOOL_LAUNCH_PATHS'],
         overlap: pathOverlap(CANONICAL_ROUTES, TOOL_LAUNCH_PATHS).length,
         risk: 'Drift when adding fleet/simulation paths to one file only',
         action: 'merge',
@@ -74,7 +74,7 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
       {
         name: 'Calculator deep links',
         instances: [
-          'clinicalToolRoutes.js ? CALCULATOR_ROUTE_DEFS',
+          'clinicalToolRoutes.js → CALCULATOR_ROUTE_DEFS',
           'App.jsx LegacyCalculatorRouteRedirect for /tools/calculators',
           'toolInventory per-tool `route`',
         ],
@@ -95,7 +95,7 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
       },
       {
         name: 'Workflow surfaces',
-        instances: ['/automation ? WorkflowAutomationBuilder', '/workflows ? WorkflowBuilderPage (PlatformOS)'],
+        instances: ['/automation → WorkflowAutomationBuilder', '/workflows → WorkflowBuilderPage (PlatformOS)'],
         overlap: 2,
         risk: 'Two workflow UIs under different nav ids',
         action: 'merge',
@@ -104,7 +104,7 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
       },
       {
         name: 'Operations entry points',
-        instances: ['/operations', '/operations-center', 'WORKSPACE_ROUTE_SHORTCUTS.commandCenter ? /dashboard'],
+        instances: ['/operations', '/operations-center', 'WORKSPACE_ROUTE_SHORTCUTS.commandCenter → /dashboard'],
         overlap: 3,
         risk: 'Ops vs command center naming confusion',
         action: 'legacy',
@@ -205,7 +205,7 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
     id: 'inventories',
     title: 'Inventories',
     canonical:
-      'Pipeline: `clinicalToolIdContract.ts` ? `toolRegistry.ts` ? `toolInventory.js` (canonical launch records)',
+      'Pipeline: `clinicalToolIdContract.ts` → `toolRegistry.ts` → `toolInventory.js` (canonical launch records)',
     secondary: null,
     duplicates: [
       {
@@ -271,10 +271,10 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
           'cardiologyCalculators.jsx',
           'pulmonologyCalculators.jsx',
           'nephrologyCalculators.jsx',
-          '�12 pack JSX group files',
+          '…12 pack JSX group files',
         ],
         overlap: 12,
-        risk: 'Parallel registration vs hub � ids must match inventory',
+        risk: 'Parallel registration vs hub — ids must match inventory',
         action: 'legacy',
         recommendation:
           'Keep as composition modules imported by Calculators.jsx; do not register routes separately.',
@@ -292,14 +292,14 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
   {
     id: 'dashboards',
     title: 'Dashboards',
-    canonical: '`/dashboard` ? CommandDashboard.jsx + `commandDashboardModel.ts`',
+    canonical: '`/dashboard` → CommandDashboard.jsx + `commandDashboardModel.ts`',
     secondary: null,
     duplicates: [
       {
         name: 'Home vs assistant',
         instances: ['CommandDashboard (/dashboard)', 'ChatInterface ED Copilot panel'],
         overlap: 1,
-        risk: 'Resolved � former Dashboard.jsx assistant page was removed.',
+        risk: 'Resolved — former Dashboard.jsx assistant page was removed.',
         action: 'legacy',
         recommendation:
           'Keep /dashboard owned by CommandDashboard and /assistant as an ED Copilot alias into the shell.',
@@ -365,7 +365,7 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
         overlap: 3,
         risk: 'Bypass enabled via multiple flags',
         action: 'merge',
-        recommendation: 'Single gate: featureFlags.config ? env.config ? auth.config demo.exposed.',
+        recommendation: 'Single gate: featureFlags.config → env.config → auth.config demo.exposed.',
       },
     ],
   },
@@ -383,7 +383,7 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
           'Backend workspace entities + UserIdentityContext',
         ],
         overlap: CARE_WORKSPACES.length,
-        risk: 'UI filter workspace ? server workspace ? care workspace cards',
+        risk: 'UI filter workspace ≠ server workspace ≠ care workspace cards',
         action: 'merge',
         recommendation:
           'Canonical: API workspace for enforcement; CARE_WORKSPACES for UX labels; migrate WorkspaceContext to read API.',
@@ -447,7 +447,7 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
         name: 'Product catalog vs platform assets',
         instances: ['product-catalog Product entities', 'platform_assets', 'solution packs docs'],
         overlap: null,
-        risk: 'Commercial product id ? asset id',
+        risk: 'Commercial product id ≠ asset id',
         action: 'wire',
         recommendation: 'Canonical commercial: Product maps to packIds; assets remain operational unit.',
       },
@@ -568,7 +568,7 @@ export function buildDuplicateSystemReport() {
 }
 
 function escapeCell(v) {
-  return String(v ?? '�').replace(/\|/g, '\\|');
+  return String(v ?? '—').replace(/\|/g, '\\|');
 }
 
 export function formatDuplicateSystemAuditMarkdown(report = buildDuplicateSystemReport()) {
@@ -587,25 +587,25 @@ export function formatDuplicateSystemAuditMarkdown(report = buildDuplicateSystem
     '|--------|------:|',
     `| Audit sections | ${report.summary.sectionCount} |`,
     `| Duplicate findings documented | ${report.summary.duplicateFindings} |`,
-    `| CANONICAL_ROUTES n TOOL_LAUNCH_PATHS (same path string) | ${report.summary.routeOverlapCount} |`,
+    `| CANONICAL_ROUTES ∩ TOOL_LAUNCH_PATHS (same path string) | ${report.summary.routeOverlapCount} |`,
     `| POST executor ids (frontend) | ${report.executorParity.frontend.join(', ')} |`,
     `| REGISTRY_ID_TO_ORCHESTRATOR_TOOL entries | ${report.executorParity.maps} |`,
     '',
     '### Top consolidation priorities',
     '',
-    '1. **Routes** � Single path map in `routes.config.js`; stop duplicating in `TOOL_LAUNCH_PATHS`.',
-    '2. **Inventories** � `toolInventory.js` is the SPA launch authority; `assetInventory.ts` mounts it into product/pack/workspace/role metadata.',
-    '3. **Workspace** � Merge three workspace models under API `enabledToolIds`; dedupe `LEGACY_TOOL_ID_ALIASES`.',
-    '4. **Dashboards** � Keep `CommandDashboard` as home; ED Copilot owns assistant chat in the shell.',
-    '5. **Executors** � Backend `tool-orchestrator.registry.ts` owns ids; frontend mirrors via contract tests only.',
-    '6. **Pack routes** � One pack marketplace URL under organization settings.',
+    '1. **Routes** — Single path map in `routes.config.js`; stop duplicating in `TOOL_LAUNCH_PATHS`.',
+    '2. **Inventories** — `toolInventory.js` is the SPA launch authority; `assetInventory.ts` mounts it into product/pack/workspace/role metadata.',
+    '3. **Workspace** — Merge three workspace models under API `enabledToolIds`; dedupe `LEGACY_TOOL_ID_ALIASES`.',
+    '4. **Dashboards** — Keep `CommandDashboard` as home; ED Copilot owns assistant chat in the shell.',
+    '5. **Executors** — Backend `tool-orchestrator.registry.ts` owns ids; frontend mirrors via contract tests only.',
+    '6. **Pack routes** — One pack marketplace URL under organization settings.',
     '',
     '## Canonical source matrix',
     '',
     '| Domain | Canonical source | Do not duplicate in |',
     '|--------|------------------|---------------------|',
     '| Routes | `src/config/routes.config.ts` | router.tsx (invent new paths), TOOL_LAUNCH_PATHS |',
-    '| Router mount | `src/app/router.tsx` | � |',
+    '| Router mount | `src/app/router.tsx` | — |',
     '| Layouts | `src/components/AppShell.tsx` | `src/layouts/AppShell.tsx` (shim), page-level shells |',
     '| AppShell rail | `src/components/AppShell.tsx` + `NAVIGATION_ITEMS` | Inline nav arrays |',
     '| Navigation | `src/config/unified-navigation.config.ts` | `navigation.config.js`, `primaryNavigation.js` (shims/projections only) |',
@@ -622,7 +622,7 @@ export function formatDuplicateSystemAuditMarkdown(report = buildDuplicateSystem
     '| Workspace (UX) | `src/data/workspaceArchitecture.ts` via `workspace.config.js` | Duplicate CARE_WORKSPACES |',
     '| Asset entitlements | `backend/.../platform-asset-seed.data.ts` + DB | `buildAssetRegistry()` demo |',
     '| Asset access (client) | `platformAssetsApi` + `UserIdentityContext` + `assetInventory.ts` | Empty pack/product projections |',
-    '| Tool launch (client) | `toolInventory.js` + `registryToolLaunch.js` | � |',
+    '| Tool launch (client) | `toolInventory.js` + `registryToolLaunch.js` | — |',
     '| Executors | `backend/.../tool-orchestrator.registry.ts` | Extra REGISTERED lists in frontend |',
     '',
   ];
@@ -644,7 +644,7 @@ export function formatDuplicateSystemAuditMarkdown(report = buildDuplicateSystem
   }
 
   if (report.routePathOverlap.length) {
-    lines.push('## Route path overlap detail (CANONICAL_ROUTES n TOOL_LAUNCH_PATHS)', '');
+    lines.push('## Route path overlap detail (CANONICAL_ROUTES ∩ TOOL_LAUNCH_PATHS)', '');
     lines.push('| Key | Path |');
     lines.push('|-----|------|');
     for (const row of report.routePathOverlap) {
@@ -658,7 +658,7 @@ export function formatDuplicateSystemAuditMarkdown(report = buildDuplicateSystem
     lines.push(
       report.appPathsNotInCanonical.map((p) => `- \`${p}\``).join('\n'),
       '',
-      '_Many are dynamic tool routes, org/commercial pages, or profile subpaths � extend CANONICAL_ROUTES or document as extensions._',
+      '_Many are dynamic tool routes, org/commercial pages, or profile subpaths — extend CANONICAL_ROUTES or document as extensions._',
       ''
     );
   }

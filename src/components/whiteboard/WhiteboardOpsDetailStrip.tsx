@@ -75,7 +75,7 @@ export default function WhiteboardOpsDetailStrip({
           {summaryParts.join(' · ') || `${signalCount} operational signals`}
         </span>
         <span className="whiteboard-ops-detail-strip__chevron" aria-hidden="true">
-          {expanded ? '?' : '?'}
+          {expanded ? '▾' : '▸'}
         </span>
       </button>
 

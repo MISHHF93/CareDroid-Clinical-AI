@@ -101,7 +101,7 @@ export default function ReceptionEscalationPanel({
           <div className="reception-escalation-panel__confirmation" role="status">
             <strong>{RECEPTION_COPY.escalation.confirmationTitle}</strong>
             <p>
-              {lastConfirmation.reasonLabel} � {lastConfirmation.targetsLabel}
+              {lastConfirmation.reasonLabel} · {lastConfirmation.targetsLabel}
             </p>
             <p>{RECEPTION_COPY.escalation.confirmationBody}</p>
             <button type="button" onClick={() => setLastConfirmation(null)}>

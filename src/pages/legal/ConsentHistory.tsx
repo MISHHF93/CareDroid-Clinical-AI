@@ -122,7 +122,7 @@ export const ConsentHistory = () => {
     return (
       <div className="consent-history-error">
         <EmptyState
-          icon="??"
+          icon="⚠️"
           title="Error Loading Consent History"
           message={error}
           action={{
@@ -138,7 +138,7 @@ export const ConsentHistory = () => {
     return (
       <div className="consent-history-empty">
         <EmptyState
-          icon="??"
+          icon="📄"
           title="No Consent Records"
           message="You haven't provided any consents yet"
           action={{
@@ -180,7 +180,7 @@ export const ConsentHistory = () => {
             <div key={consent.id || index} className="consent-record">
               <div className="consent-record-header">
                 <div className="consent-record-date">
-                  <span className="consent-record-icon">??</span>
+                  <span className="consent-record-icon">📅</span>
                   <span className="consent-record-timestamp">
                     {formatDate(consent.consentDate)}
                   </span>
@@ -197,7 +197,7 @@ export const ConsentHistory = () => {
                     <div key={key} className="consent-detail-item">
                       <span className="consent-detail-label">{getConsentLabel(key)}:</span>
                       <span className={`consent-detail-value consent-detail-value-${value ? 'yes' : 'no'}`}>
-                        {value ? '? Accepted' : '? Declined'}
+                        {value ? '✓ Accepted' : '✗ Declined'}
                       </span>
                     </div>
                   ))}
@@ -206,9 +206,9 @@ export const ConsentHistory = () => {
 
               <div className="consent-record-footer">
                 <div className="consent-record-meta">
-                  <span title="IP Address">?? {consent.ipAddress || 'Unknown'}</span>
-                  <span title="User Agent">?? {consent.userAgent || 'Unknown device'}</span>
-                  <span title="Record ID">?? {consent.id || 'N/A'}</span>
+                  <span title="IP Address">🌐 {consent.ipAddress || 'Unknown'}</span>
+                  <span title="User Agent">💻 {consent.userAgent || 'Unknown device'}</span>
+                  <span title="Record ID">🔑 {consent.id || 'N/A'}</span>
                 </div>
               </div>
             </div>

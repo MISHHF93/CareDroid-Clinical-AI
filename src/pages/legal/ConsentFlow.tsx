@@ -186,7 +186,7 @@ export const ConsentFlow = ({ onComplete }) => {
               </p>
               <div className="consent-warning">
                 <p>
-                  <strong>?? Important:</strong> CareDroid is a decision support tool only. 
+                  <strong>⚠️ Important:</strong> CareDroid is a decision support tool only. 
                   It is NOT a substitute for professional medical judgment.
                 </p>
               </div>

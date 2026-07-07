@@ -19,17 +19,17 @@
 export const TIMI_UA_NSTEMI_CRITERIA_META = [
   {
     key: 'age65OrOlder',
-    shortLabel: 'Age = 65 years',
+    shortLabel: 'Age ≥ 65 years',
     help: 'Patient age 65 years or older at presentation.',
   },
   {
     key: 'threeOrMoreCadRiskFactors',
-    shortLabel: '= 3 CAD risk factors',
-    help: 'Family history of CAD, hypertension, hypercholesterolaemia, diabetes mellitus, or current smoker (=3 present).',
+    shortLabel: '≥ 3 CAD risk factors',
+    help: 'Family history of CAD, hypertension, hypercholesterolaemia, diabetes mellitus, or current smoker (≥3 present).',
   },
   {
     key: 'knownCadStenosis50',
-    shortLabel: 'Known CAD (stenosis = 50%)',
+    shortLabel: 'Known CAD (stenosis ≥ 50%)',
     help: 'Prior coronary artery stenosis of 50% or more on angiography.',
   },
   {
@@ -44,7 +44,7 @@ export const TIMI_UA_NSTEMI_CRITERIA_META = [
   },
   {
     key: 'stDeviation',
-    shortLabel: 'ST-segment deviation = 0.5 mm',
+    shortLabel: 'ST-segment deviation ≥ 0.5 mm',
     help: 'ST-segment deviation of 0.5 mm or more on the admission ECG (not due to LVH or digoxin).',
   },
   {

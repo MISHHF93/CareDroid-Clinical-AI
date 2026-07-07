@@ -782,7 +782,7 @@ export function getPrimaryNavItemForPath(pathname) {
   );
 }
 
-/** Canonical sidebar builder � filters APP_SHELL_NAV_ITEMS by feature gate. */
+/** Canonical sidebar builder — filters APP_SHELL_NAV_ITEMS by feature gate. */
 export function buildSidebarItems(isEnabled) {
   return APP_SHELL_NAV_ITEMS.map((item) => {
     const feature = FEATURE_REGISTRY_BY_ID[item.featureId];

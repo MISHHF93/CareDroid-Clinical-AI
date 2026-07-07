@@ -137,7 +137,7 @@ function StatusBadge({ status }) {
 
 function SortableTh({ label, sortKey, activeKey, sortDir, onSort }) {
   const active = activeKey === sortKey;
-  const indicator = active ? (sortDir === 'asc' ? ' ?' : ' ?') : '';
+  const indicator = active ? (sortDir === 'asc' ? ' ▲' : ' ▼') : '';
   return (
     <th>
       <button
@@ -351,7 +351,7 @@ function DiscoveredRowsTable({ rows, onOpenPath, onLaunch, sortKey, sortDir, onS
               <td className="catalog-source-cell" data-label="Notes / source">
                 {row.mapsTo && (
                   <span>
-                    ? <code>{row.mapsTo}</code>{' '}
+                    → <code>{row.mapsTo}</code>{' '}
                   </span>
                 )}
                 {row.apiPath && <span className="catalog-api-hint">{row.apiPath} </span>}
@@ -988,7 +988,7 @@ const ClinicalToolCatalog = () => {
           <ul className="catalog-alias-list">
             {toolIdAliases.map((a) => (
               <li key={a.id}>
-                <code>{a.id}</code> ? <code>{a.mapsTo}</code> ({a.source})
+                <code>{a.id}</code> → <code>{a.mapsTo}</code> ({a.source})
               </li>
             ))}
           </ul>

@@ -123,7 +123,7 @@ export const PRODUCTION_QUICK_WIN_CATALOG = Object.freeze([
   win('Q023', 'P2', 'pilot', 'First-customer demo mode dataset', 'done'),
   win('Q024', 'P2', 'pilot', 'Clinic onboarding simulation script', 'done'),
   win('Q025', 'P2', 'architecture', 'multi-tenant-readiness audit script', 'done'),
-  win('Q026', 'P2', 'operational', 'Smart intake click reduction 22?8', 'done'),
+  win('Q026', 'P2', 'operational', 'Smart intake click reduction 22→8', 'done'),
   win('Q027', 'P2', 'operational', 'Reception worker swarm 12/12', 'done'),
   win('Q028', 'P2', 'operational', 'Error recovery audit 10/10 surfaces', 'done'),
   win('Q029', 'P2', 'frontend', 'Lazy routes with retry', 'done'),

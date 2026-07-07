@@ -332,7 +332,7 @@ export function sortAlertsByClassification(alerts = [] as any[]) {
   );
 }
 
-/** Unified lifecycle envelope for a single alert � toast, banner, and history routing. */
+/** Unified lifecycle envelope for a single alert — toast, banner, and history routing. */
 export function resolveOperationalAlertEnvelope(alert: any) {
   const tier = getAlertClassificationTier(alert);
   const resolution = String(alert?.resolutionStatus || alert?.metadata?.resolutionStatus || '');

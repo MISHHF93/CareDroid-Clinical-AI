@@ -22,7 +22,7 @@ export const APGAR_COMPONENTS_META = [
     options: [
       { value: 0, label: 'Absent' },
       { value: 1, label: '< 100 bpm' },
-      { value: 2, label: '= 100 bpm' },
+      { value: 2, label: '≥ 100 bpm' },
     ],
   },
   {

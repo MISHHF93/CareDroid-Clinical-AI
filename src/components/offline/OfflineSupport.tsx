@@ -45,7 +45,7 @@ export const OfflineIndicator = () => {
     <div className={`offline-indicator ${isOnline ? 'offline-indicator-online' : 'offline-indicator-offline'}`}>
       <div className="offline-indicator-content">
         <span className="offline-indicator-icon">
-          {isOnline ? '?' : '??'}
+          {isOnline ? '✓' : '⚠️'}
         </span>
         <span className="offline-indicator-text">
           {isOnline ? 'You are back online' : 'You are offline - Some features may be limited'}
@@ -57,7 +57,7 @@ export const OfflineIndicator = () => {
           onClick={() => setShowIndicator(false)}
           aria-label="Close notification"
         >
-          ?
+          ✕
         </button>
       )}
     </div>
@@ -150,7 +150,7 @@ export const SyncStatus = ({ isVisible = false, progress = 0, itemsSynced = 0, t
         <div className="sync-status-left">
           {isComplete ? (
             <>
-              <span className="sync-status-icon">?</span>
+              <span className="sync-status-icon">✓</span>
               <div className="sync-status-text">
                 <h4>Sync Complete</h4>
                 <p>All {itemsSynced} items synchronized</p>
@@ -205,14 +205,14 @@ export const OfflineWarning = ({
   return (
     <div className="offline-warning">
       <div className="offline-warning-header">
-        <span className="offline-warning-icon">??</span>
+        <span className="offline-warning-icon">⚠️</span>
         <h3>Limited Functionality</h3>
         <button
           className="offline-warning-close"
           onClick={onDismiss}
           aria-label="Close warning"
         >
-          ?
+          ✕
         </button>
       </div>
 
@@ -225,7 +225,7 @@ export const OfflineWarning = ({
           <ul className="offline-warning-features">
             {affectedFeatures.map((feature) => (
               <li key={feature}>
-                <span className="warning-feature-icon">?</span>
+                <span className="warning-feature-icon">○</span>
                 <span>{featureNames[feature] || feature}</span>
               </li>
             ))}

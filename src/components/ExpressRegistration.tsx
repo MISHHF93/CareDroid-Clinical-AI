@@ -269,7 +269,7 @@ export default function ExpressRegistration({
               cursor: 'pointer',
             }}
           >
-            �
+            ×
           </button>
         </header>
 

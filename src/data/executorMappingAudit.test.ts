@@ -1,5 +1,5 @@
 /**
- * Cross-repo executor mapping audit (frontend contract ? backend registry).
+ * Cross-repo executor mapping audit (frontend contract ↔ backend registry).
  */
 
 import { readFileSync } from 'node:fs';

@@ -289,7 +289,7 @@ export default function CommandDashboard({
               <li key={alert.patientId}>
                 <strong>{alert.patientLabel}</strong>
                 <span>
-                  Risk {alert.probabilityPercent}% � projected {alert.predictedHours}h
+                  Risk {alert.probabilityPercent}% · projected {alert.predictedHours}h
                 </span>
                 <small>{alert.action}</small>
               </li>
@@ -306,7 +306,7 @@ export default function CommandDashboard({
               <li key={prediction.patientId}>
                 <strong>{prediction.patientLabel}</strong>
                 <span>
-                  {prediction.orientation.toUpperCase()} � {prediction.probabilityPercent}%
+                  {prediction.orientation.toUpperCase()} · {prediction.probabilityPercent}%
                 </span>
               </li>
             ))}

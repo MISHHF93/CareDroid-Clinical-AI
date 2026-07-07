@@ -96,13 +96,13 @@ export function auditRegistryOrchestratorMappings() {
     if (!ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS.includes(nluId)) {
       issues.push({
         code: 'registry-map-not-registered',
-        detail: `${registryId} ? ${nluId} is not in ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS`,
+        detail: `${registryId} → ${nluId} is not in ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS`,
       });
     }
     if (!isOrchestratorPostExecutable(nluId)) {
       issues.push({
         code: 'registry-map-not-post-executable',
-        detail: `${registryId} ? ${nluId} fails isOrchestratorPostExecutable`,
+        detail: `${registryId} → ${nluId} fails isOrchestratorPostExecutable`,
       });
     }
   }

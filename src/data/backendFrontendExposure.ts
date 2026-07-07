@@ -1,5 +1,5 @@
 /**
- * Production exposure scan � matches frontend API inventory to backend routes and capability gates.
+ * Production exposure scan — matches frontend API inventory to backend routes and capability gates.
  */
 
 import { readFileSync } from 'node:fs';
@@ -276,9 +276,9 @@ export function formatBackendExposureReportMarkdown(scan = runBackendFrontendExp
     '',
     '| Setting | Value |',
     '|---------|-------|',
-    `| Frontend dev port | ${vite.devPort ?? '�'} |`,
-    `| Preview port | ${vite.previewPort ?? '�'} |`,
-    `| Proxy target | ${vite.proxyTarget ?? '�'} |`,
+    `| Frontend dev port | ${vite.devPort ?? '—'} |`,
+    `| Preview port | ${vite.previewPort ?? '—'} |`,
+    `| Proxy target | ${vite.proxyTarget ?? '—'} |`,
     `| Proxies \`/api\` | ${vite.proxiesApi ? 'yes' : 'no'} |`,
     `| Proxies \`/health\` | ${vite.proxiesHealth ? 'yes' : 'no'} |`,
     `| Proxies \`/socket.io\` | ${vite.proxiesSocketIo ? 'yes' : 'no'} |`,
@@ -287,7 +287,7 @@ export function formatBackendExposureReportMarkdown(scan = runBackendFrontendExp
     '',
     '## Registered POST executors',
     '',
-    ...scan.executorNluIds.map((id) => `- \`${id}\` ? \`POST /api/tools/${id}/execute\``),
+    ...scan.executorNluIds.map((id) => `- \`${id}\` → \`POST /api/tools/${id}/execute\``),
     '',
     '## Frontend calls without backend routes (gated)',
     '',
@@ -300,7 +300,7 @@ export function formatBackendExposureReportMarkdown(scan = runBackendFrontendExp
   ];
 
   if (scan.unguarded.length > 0) {
-    lines.push('## ?? Unguarded missing routes', '', '| ID | Method | Path | Client |', '|----|--------|------|--------|');
+    lines.push('## ⚠️ Unguarded missing routes', '', '| ID | Method | Path | Client |', '|----|--------|------|--------|');
     for (const c of scan.unguarded) {
       lines.push(`| ${c.id} | ${c.method} | \`${c.path}\` | ${c.client} |`);
     }
@@ -330,15 +330,15 @@ export function formatEndpointMatrixMarkdown(scan = runBackendFrontendExposureSc
     '|--------|------|---------|-----------------|----------|',
     ...scan.analyzed.map((c) => {
       const exposure =
-        c.exposure === 'wired' ? '?' : c.exposure === 'gated-stub' ? '?? gated' : '? unguarded';
-      return `| ${c.method} | \`${c.path}\` | ${c.backendController ?? '�'} | ${c.client} | ${exposure} |`;
+        c.exposure === 'wired' ? '✅' : c.exposure === 'gated-stub' ? '⚠️ gated' : '❌ unguarded';
+      return `| ${c.method} | \`${c.path}\` | ${c.backendController ?? '—'} | ${c.client} | ${exposure} |`;
     }),
     '',
     '## Backend route inventory (reference)',
     '',
     ...listBackendRoutePaths().slice(0, 20).map((r) => `- \`${r}\``),
     '',
-    `_�and ${listBackendRoutePaths().length - 20} more in src/data/backendHttpRouteInventory.js_`,
+    `_…and ${listBackendRoutePaths().length - 20} more in src/data/backendHttpRouteInventory.js_`,
     '',
   ];
   return lines.join('\n');

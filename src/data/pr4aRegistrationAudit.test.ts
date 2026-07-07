@@ -165,13 +165,13 @@ describe('PR4A registration audit — NLU, backend, aliases', () => {
   });
 
   it.each(PR4A_REQUIRED_NLU_ALIAS_PAIRS)(
-    'NLU_TO_REGISTRY_ID maps "%s" ? %s',
+    'NLU_TO_REGISTRY_ID maps "%s" → %s',
     (alias, canonical) => {
       expect(NLU_TO_REGISTRY_ID[alias]).toBe(canonical);
     }
   );
 
-  it.each(PR4A_ALL_ALIAS_PAIRS)('resolveRegistryId("%s") ? %s', (alias, canonical) => {
+  it.each(PR4A_ALL_ALIAS_PAIRS)('resolveRegistryId("%s") → %s', (alias, canonical) => {
     expect(resolveRegistryId(alias)).toBe(canonical);
   });
 
@@ -215,7 +215,7 @@ describe('PR4A registration audit — NLU, backend, aliases', () => {
         const slug = aliasToSlug(phrase);
         const inNluMap = NLU_TO_REGISTRY_ID[phrase] === id || NLU_TO_REGISTRY_ID[slug] === id;
         const inBackend = keywords.includes(slug) || keywords.some((k) => k.includes(slug));
-        expect(inNluMap || inBackend, `missing alias coverage for "${phrase}" ? ${id}`).toBe(true);
+        expect(inNluMap || inBackend, `missing alias coverage for "${phrase}" → ${id}`).toBe(true);
       }
     }
   );
@@ -249,7 +249,7 @@ describe('PR4A registration audit — catalog, discovery, sidebar', () => {
     expect(merged.filter((r) => r.id === id)).toHaveLength(1);
   });
 
-  it.each(PR4A_DISCOVERY_ALIAS_PAIRS)('toolIdAliases documents %s ? %s', (aliasId, canonical) => {
+  it.each(PR4A_DISCOVERY_ALIAS_PAIRS)('toolIdAliases documents %s → %s', (aliasId, canonical) => {
     const row = toolIdAliases.find((a) => a.id === aliasId);
     expect(row?.mapsTo).toBe(canonical);
   });

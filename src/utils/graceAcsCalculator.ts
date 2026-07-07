@@ -130,7 +130,7 @@ export function validateGraceAcsInputs(raw) {
 
   const creatinineMgDl = Number(raw.creatinineMgDl);
   if (!Number.isFinite(creatinineMgDl) || creatinineMgDl <= 0 || creatinineMgDl > 25) {
-    errors.push('Creatinine must be a positive value in mg/dL (typically = 25).');
+    errors.push('Creatinine must be a positive value in mg/dL (typically ≤ 25).');
   }
 
   const killipClass = raw.killipClass;

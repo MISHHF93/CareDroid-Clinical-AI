@@ -395,7 +395,7 @@ function AppShellFrame({ children }: AppShellProps) {
           await useEmergencyStore.getState().initializeFromBackend();
         }
       } else {
-        // No backend � stay on local/simulation data; no network calls needed
+        // No backend — stay on local/simulation data; no network calls needed
         useEmergencyStore.setState({ backendAvailable: false, persistenceMode: 'local' });
       }
       useEmergencyStore.getState().updateAlerts();

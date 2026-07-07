@@ -173,13 +173,13 @@ describe('PR2 registration audit — NLU, backend keywords, aliases', () => {
   });
 
   it.each(PR2_REQUIRED_NLU_ALIAS_PAIRS)(
-    'NLU_TO_REGISTRY_ID maps catalog alias "%s" ? %s',
+    'NLU_TO_REGISTRY_ID maps catalog alias "%s" → %s',
     (alias, canonical) => {
       expect(NLU_TO_REGISTRY_ID[alias]).toBe(canonical);
     }
   );
 
-  it.each(PR2_ALL_ALIAS_PAIRS)('resolveRegistryId("%s") ? %s', (alias, canonical) => {
+  it.each(PR2_ALL_ALIAS_PAIRS)('resolveRegistryId("%s") → %s', (alias, canonical) => {
     expect(resolveRegistryId(alias)).toBe(canonical);
   });
 
@@ -231,7 +231,7 @@ describe('PR2 registration audit — NLU, backend keywords, aliases', () => {
 
 describe('PR2 registration audit — discovery & catalog', () => {
   it.each(PR2_DISCOVERY_ALIAS_PAIRS)(
-    'toolIdAliases discovery row for %s ? %s',
+    'toolIdAliases discovery row for %s → %s',
     (aliasId, canonical) => {
       const row = toolIdAliases.find((a) => a.id === aliasId);
       expect(row, `missing toolIdAliases id ${aliasId}`).toBeTruthy();

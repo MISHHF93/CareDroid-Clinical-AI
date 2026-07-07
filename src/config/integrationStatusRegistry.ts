@@ -191,7 +191,7 @@ export const INTEGRATION_POINT_REGISTRY = Object.freeze([
     status: INTEGRATION_STATUS.PLACEHOLDER,
     capability: 'notificationSendChannel',
     surfaces: ['NotificationPreferences', 'EmergencySettings'],
-    summary: 'Preference fields exist; no ED alert ? email routing.',
+    summary: 'Preference fields exist; no ED alert → email routing.',
   },
   {
     id: 'sms-delivery',
@@ -218,7 +218,7 @@ export const INTEGRATION_POINT_REGISTRY = Object.freeze([
     label: 'Identity verification workflow',
     status: INTEGRATION_STATUS.IMPLEMENTED,
     surfaces: ['SmartIntake', 'PatientVerificationExperience', 'ReceptionWorkspace'],
-    summary: 'Five-step OCR ? duplicate ? field review ? finalize UI.',
+    summary: 'Five-step OCR → duplicate → field review → finalize UI.',
   },
   {
     id: 'client-duplicate-detection',

@@ -11,7 +11,7 @@ const ALL_PATIENT_ROUTE_KEYS = Object.values(PATIENT_ROUTE_PARAM_KEYS);
 
 /**
  * Read patient context from reception / whiteboard URL search params.
- * Priority for focusPatientId: queue row ? one-shot context ? handoff banner.
+ * Priority for focusPatientId: queue row → one-shot context → handoff banner.
  */
 export function readPatientRouteContext(searchParams) {
   const contextPatientId = searchParams.get(PATIENT_ROUTE_PARAM_KEYS.context) || '';

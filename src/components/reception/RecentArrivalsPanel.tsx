@@ -48,7 +48,7 @@ export default function RecentArrivalsPanel({ patients = [] as any[], onSelectPa
       ) : (
         <OperationalEmptyState
           size="inline"
-          icon="?"
+          icon="○"
           title={copy.empty}
           guidance={EMPTY_STATE_COPY.reception.recentArrivals.guidance}
           status="No registrations in the last 30 minutes."

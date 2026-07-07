@@ -758,7 +758,7 @@ export default function EmergencySettings() {
       }
       actions={
         <strong className="emergency-settings__module-count">
-          {loading ? 'Loading�' : `${enabledCount} modules`}
+          {loading ? 'Loading…' : `${enabledCount} modules`}
         </strong>
       }
       className="emergency-settings cd-page-shell"
@@ -781,7 +781,7 @@ export default function EmergencySettings() {
         title="ED-18 Walkthrough Dataset"
         subtitle={
           surfaces.settings.showWalkthroughDetail
-            ? 'Loads 18 representative active patients across every queue state � enough to demo the full ED journey without overwhelming practitioners.'
+            ? 'Loads 18 representative active patients across every queue state — enough to demo the full ED journey without overwhelming practitioners.'
             : undefined
         }
         action={
@@ -854,7 +854,7 @@ export default function EmergencySettings() {
               <small>{integrationHubEnvelope?.source || 'local settings fallback'}</small>
               <p>
                 <Link to={CANONICAL_ROUTES.integrationHub}>Open Integration Hub dashboard</Link>
-                {' � '}
+                {' · '}
                 <Link to={CANONICAL_ROUTES.cosmosViewer}>Cosmos Viewer</Link>
               </p>
             </div>
@@ -1014,7 +1014,7 @@ export default function EmergencySettings() {
             value={draft.publicDisplayPrivacy || 'standard'}
             options={PUBLIC_DISPLAY_PRIVACY_OPTIONS.map((option) => [
               option.id,
-              `${option.label} � ${option.description}`,
+              `${option.label} — ${option.description}`,
             ])}
             onChange={(value) => updateDraft({ publicDisplayPrivacy: value })}
           />
@@ -1023,7 +1023,7 @@ export default function EmergencySettings() {
             value={draft.wallDisplayMonitorPrivacy || 'operational'}
             options={WALL_DISPLAY_MONITOR_PRIVACY_OPTIONS.map((option) => [
               option.id,
-              `${option.label} � ${option.description}`,
+              `${option.label} — ${option.description}`,
             ])}
             onChange={(value) => updateDraft({ wallDisplayMonitorPrivacy: value })}
           />
@@ -1154,7 +1154,7 @@ export default function EmergencySettings() {
                   <strong>{log.title || log.type}</strong>
                   <p>{log.summary}</p>
                   <small>
-                    {log.source} � {patientAuditLabel(log.patientId, patients)}
+                    {log.source} · {patientAuditLabel(log.patientId, patients)}
                   </small>
                 </div>
                 <div>
@@ -1507,7 +1507,7 @@ export default function EmergencySettings() {
             <div>
               <strong>Compliance and audit</strong>
               <p>
-                {aiGovernanceCompliance?.totalInteractions ?? 0} audited interactions �{' '}
+                {aiGovernanceCompliance?.totalInteractions ?? 0} audited interactions ·{' '}
                 {Math.round((aiGovernanceCompliance?.humanReviewRate || 0) * 100)}% human review rate
               </p>
               <small>
@@ -1530,11 +1530,11 @@ export default function EmergencySettings() {
             <div>
               <strong>Copilot runtime config</strong>
               <p>
-                {copilotService.provider || draft.aiSettings.provider} �{' '}
+                {copilotService.provider || draft.aiSettings.provider} ·{' '}
                 {copilotService.model || draft.aiSettings.model}
               </p>
               <small>
-                {copilotService.auditLevel || 'full'} audit � {copilotService.status || 'settings'} status
+                {copilotService.auditLevel || 'full'} audit · {copilotService.status || 'settings'} status
               </small>
             </div>
           </article>
@@ -1542,11 +1542,11 @@ export default function EmergencySettings() {
             <div>
               <strong>ML model governance</strong>
               <p>
-                Deterioration: {deteriorationService.status || 'future'} � Federated EMS:{' '}
+                Deterioration: {deteriorationService.status || 'future'} · Federated EMS:{' '}
                 {federatedEmsService.status || 'future'}
               </p>
               <small>
-                {aiStatusCounts.active || 0} active � {aiStatusCounts.future || 0} future �{' '}
+                {aiStatusCounts.active || 0} active · {aiStatusCounts.future || 0} future ·{' '}
                 {aiStatusCounts['local-deterministic'] || 0} deterministic
               </small>
             </div>

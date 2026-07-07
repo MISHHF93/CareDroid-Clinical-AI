@@ -256,7 +256,7 @@ export function searchOperationalEntitiesForPalette(
       type: hit.entityType,
       id: hit.id,
       label: hit.label,
-      description: `${formatOperationalSearchEntityLabel(hit.entityType)} � ${hit.hint}`,
+      description: `${formatOperationalSearchEntityLabel(hit.entityType)} · ${hit.hint}`,
       group: groupLabel[hit.entityType as Exclude<OperationalSearchEntityType, 'patient'>],
       icon: 'entity' as const,
       action: () => {
@@ -300,7 +300,7 @@ export function searchPatientsByName(
   return rankPatientsBySearch(patients, normalizedQuery, MAX_PATIENT_RESULTS).map(({ patient }) => ({
     type: 'patient',
     id: `patient-${patient.id}`,
-    label: `${getPatientDisplayName(patient)} � ${patient.chiefComplaint || patient.complaint || 'Complaint not set'} � ${patient.state} � ${formatPatientWait(patient, now)}`,
+    label: `${getPatientDisplayName(patient)} · ${patient.chiefComplaint || patient.complaint || 'Complaint not set'} · ${patient.state} · ${formatPatientWait(patient, now)}`,
     description: `Select patient ${patient.mrn}`,
     group: 'Patients',
     icon: 'person',
@@ -729,7 +729,7 @@ function resultIcon(result: PaletteResult): string {
 
 function patientInitials(label: string): string {
   return label
-    .split('�')[0]
+    .split('·')[0]
     .trim()
     .split(/\s+/)
     .map((part) => part[0])
@@ -926,7 +926,7 @@ export default function CommandPalette({ open, onClose, onExecute }: CommandPale
           {!results.length ? (
             <OperationalEmptyState
               size="inline"
-              icon="?"
+              icon="⌘"
               title={
                 normalizeSearch(query)
                   ? EMPTY_STATE_COPY.commandPalette.noResults.title
@@ -945,7 +945,7 @@ export default function CommandPalette({ open, onClose, onExecute }: CommandPale
         </div>
 
         <footer style={styles.footer}>
-          Quick actions on open � ?? navigate � ? select � esc close
+          Quick actions on open · ↑↓ navigate · ↵ select · esc close
         </footer>
       </section>
     </div>

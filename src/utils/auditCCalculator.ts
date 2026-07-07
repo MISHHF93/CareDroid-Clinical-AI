@@ -95,17 +95,17 @@ export function interpretAuditCScore(score) {
 
   const labels = {
     negative: `Negative AUDIT-C screen (score ${score}; below ${AUDIT_C_WOMEN_POSITIVE_THRESHOLD} for women and below ${AUDIT_C_MEN_POSITIVE_THRESHOLD} for men)`,
-    positive_women: `Positive AUDIT-C screen for women (score ${score} = ${AUDIT_C_WOMEN_POSITIVE_THRESHOLD}); below men's threshold of ${AUDIT_C_MEN_POSITIVE_THRESHOLD}`,
-    positive_men: `Positive AUDIT-C screen (score ${score} = ${AUDIT_C_MEN_POSITIVE_THRESHOLD} for men; also = ${AUDIT_C_WOMEN_POSITIVE_THRESHOLD} for women)`,
+    positive_women: `Positive AUDIT-C screen for women (score ${score} ≥ ${AUDIT_C_WOMEN_POSITIVE_THRESHOLD}); below men's threshold of ${AUDIT_C_MEN_POSITIVE_THRESHOLD}`,
+    positive_men: `Positive AUDIT-C screen (score ${score} ≥ ${AUDIT_C_MEN_POSITIVE_THRESHOLD} for men; also ≥ ${AUDIT_C_WOMEN_POSITIVE_THRESHOLD} for women)`,
   };
 
   const discussion = {
     negative:
       'A score below sex-specific cutoffs lowers concern for hazardous drinking on this brief screen, but does not exclude alcohol-related harm. Use clinical judgment and local pathways if concerns remain.',
     positive_women:
-      `A score of ${score} meets the AUDIT-C positive threshold for women (=${AUDIT_C_WOMEN_POSITIVE_THRESHOLD}). Discuss further assessment (e.g. full AUDIT or structured clinical interview) per institutional guidance. This tool does not diagnose alcohol use disorder.`,
+      `A score of ${score} meets the AUDIT-C positive threshold for women (≥${AUDIT_C_WOMEN_POSITIVE_THRESHOLD}). Discuss further assessment (e.g. full AUDIT or structured clinical interview) per institutional guidance. This tool does not diagnose alcohol use disorder.`,
     positive_men:
-      `A score of ${score} meets the AUDIT-C positive threshold for men (=${AUDIT_C_MEN_POSITIVE_THRESHOLD}) and for women (=${AUDIT_C_WOMEN_POSITIVE_THRESHOLD}). Discuss further assessment per institutional guidance. This tool does not diagnose alcohol use disorder.`,
+      `A score of ${score} meets the AUDIT-C positive threshold for men (≥${AUDIT_C_MEN_POSITIVE_THRESHOLD}) and for women (≥${AUDIT_C_WOMEN_POSITIVE_THRESHOLD}). Discuss further assessment per institutional guidance. This tool does not diagnose alcohol use disorder.`,
   };
 
   const severity =
@@ -120,10 +120,10 @@ export function interpretAuditCScore(score) {
     totalScore: score,
     screeningResult,
     label: labels[screeningResult],
-    interpretation: `${labels[screeningResult]}. Per AUDIT-C guidance, scores =${AUDIT_C_WOMEN_POSITIVE_THRESHOLD} (women) or =${AUDIT_C_MEN_POSITIVE_THRESHOLD} (men) suggest further alcohol assessment.`,
+    interpretation: `${labels[screeningResult]}. Per AUDIT-C guidance, scores ≥${AUDIT_C_WOMEN_POSITIVE_THRESHOLD} (women) or ≥${AUDIT_C_MEN_POSITIVE_THRESHOLD} (men) suggest further alcohol assessment.`,
     screeningDiscussion: discussion[screeningResult],
     screeningDisclaimer:
-      'Screening only. AUDIT-C is a brief alcohol consumption screen. Apply the sex-appropriate positive threshold (=3 women, =4 men). It does not diagnose alcohol use disorder and does not provide withdrawal-management advice.',
+      'Screening only. AUDIT-C is a brief alcohol consumption screen. Apply the sex-appropriate positive threshold (≥3 women, ≥4 men). It does not diagnose alcohol use disorder and does not provide withdrawal-management advice.',
     safetyDisclaimer:
       'Screening results reflect the answers entered and may omit important context. Do not use this score alone to rule in or rule out alcohol use disorder or to mandate treatment.',
     pathwayDisclaimer:

@@ -22,16 +22,16 @@ export const computeRiskScore = (tool, results) => {
     if (sofaScore >= 13) {
       riskScore = Math.min(0.95, 0.7 + (sofaScore - 13) * 0.02);
       severity = 'critical';
-      riskFactors.push('SOFA = 13 (High mortality risk)');
+      riskFactors.push('SOFA ≥ 13 (High mortality risk)');
       riskFactors.push('Multi-organ dysfunction detected');
     } else if (sofaScore >= 10) {
       riskScore = 0.6;
       severity = 'high';
-      riskFactors.push('SOFA = 10 (Elevated mortality risk)');
+      riskFactors.push('SOFA ≥ 10 (Elevated mortality risk)');
     } else if (sofaScore >= 6) {
       riskScore = 0.4;
       severity = 'moderate';
-      riskFactors.push('SOFA = 6 (Moderate organ dysfunction)');
+      riskFactors.push('SOFA ≥ 6 (Moderate organ dysfunction)');
     } else {
       riskScore = 0.15;
       severity = 'low';
@@ -109,14 +109,14 @@ export const computeRiskScore = (tool, results) => {
     if (score >= 4) {
       riskScore = Math.max(riskScore, 0.75);
       severity = 'high';
-      riskFactors.push(`CHA2DS2-VASc = 4 (High stroke risk)`);
+      riskFactors.push(`CHA2DS2-VASc ≥ 4 (High stroke risk)`);
       riskFactors.push(
         'Review anticoagulation indications and contraindications per local protocol',
       );
     } else if (score >= 2) {
       riskScore = Math.max(riskScore, 0.5);
       if (severity === 'low') severity = 'moderate';
-      riskFactors.push(`CHA2DS2-VASc = 2 (Moderate stroke risk)`);
+      riskFactors.push(`CHA2DS2-VASc ≥ 2 (Moderate stroke risk)`);
     }
   }
 

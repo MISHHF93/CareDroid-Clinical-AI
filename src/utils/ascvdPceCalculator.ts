@@ -289,7 +289,7 @@ export function interpretAscvdTenYearRisk(tenYearRiskPct, opts: any = {}) {
     low: 'Low 10-year ASCVD risk (<5%)',
     borderline: 'Borderline 10-year ASCVD risk (5% to <7.5%)',
     intermediate: 'Intermediate 10-year ASCVD risk (7.5% to <20%)',
-    high: 'High 10-year ASCVD risk (=20%)',
+    high: 'High 10-year ASCVD risk (≥20%)',
   };
 
   const preventionGuidance = {

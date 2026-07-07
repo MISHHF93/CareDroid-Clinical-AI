@@ -602,7 +602,7 @@ function PatientCard({
       ? reassessmentTimer.overdueLabel || 'Overdue'
       : reassessmentTimer?.stage === 'due'
         ? reassessmentTimer.dueInLabel || 'Due'
-        : reassessmentTimer?.dueInLabel || '�';
+        : reassessmentTimer?.dueInLabel || '—';
 
   if (layout === 'row') {
     return (
@@ -837,7 +837,7 @@ function PatientCard({
                 title={signalBadges
                   .slice(maxPatientCardBadges)
                   .map((signal) => signal.label)
-                  .join(' � ')}
+                  .join(' · ')}
               >
                 +{signalBadges.length - maxPatientCardBadges}
               </span>
@@ -913,7 +913,7 @@ function PatientCard({
           </span>
           <span className={tempAbnormal ? 'patient-card__vital patient-card__vital--warning patient-card__vital-temp' : 'patient-card__vital patient-card__vital-temp'}>
             <small>Temp</small>
-            <strong>{temp ?? '--'}�</strong>
+            <strong>{temp ?? '--'}°</strong>
           </span>
         </div>
       ) : null}
@@ -960,7 +960,7 @@ function PatientCard({
                     title={visibleFlags
                       .slice(maxPatientCardBadges)
                       .map((flag) => flagLabels[flag])
-                      .join(' � ')}
+                      .join(' · ')}
                   >
                     +{overflow}
                   </span>

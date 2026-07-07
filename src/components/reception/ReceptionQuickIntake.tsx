@@ -332,7 +332,7 @@ export default function ReceptionQuickIntake({
             onClick={closeWithConfirm}
             aria-label={copy.closeLabel}
           >
-            �
+            ×
           </button>
         ) : null}
       </header>
@@ -354,7 +354,7 @@ export default function ReceptionQuickIntake({
         {selectedPatient ? (
           <div className="reception-quick-intake__selected">
             <span>
-              Using chart: <strong>{getPatientDisplayName(selectedPatient)}</strong> �{' '}
+              Using chart: <strong>{getPatientDisplayName(selectedPatient)}</strong> ·{' '}
               {selectedPatient.mrn}
             </span>
             <button type="button" onClick={clearSelectedPatient}>
@@ -373,7 +373,7 @@ export default function ReceptionQuickIntake({
                 >
                   {getPatientDisplayName(patient)}
                   <small>
-                    {patient.mrn} � DOB {patient.dob || '�'} � {patient.state}
+                    {patient.mrn} · DOB {patient.dob || '—'} · {patient.state}
                   </small>
                 </button>
               </li>

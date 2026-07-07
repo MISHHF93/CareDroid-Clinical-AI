@@ -1,5 +1,5 @@
 /**
- * Backend ? frontend tool contract matrix (documentation source of truth).
+ * Backend ↔ frontend tool contract matrix (documentation source of truth).
  *
  * Regenerate: npm run contract:write-docs
  * @see docs/backend-frontend-tool-contract.md
@@ -40,7 +40,7 @@ const MATRIX_BASE_TESTS = [
 
 const EXECUTOR_DTO = {
   request: 'ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`)',
-  response: 'ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, �)',
+  response: 'ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, …)',
 };
 
 const EXECUTOR_API = {
@@ -117,13 +117,13 @@ const CHAT_API = {
   endpoint: 'POST /api/chat/message',
   client: 'src/services/apiClient.js (`apiFetch`)',
   dto: 'ChatMessageDto (message, conversationId, tool?, feature?)',
-  response: 'QueryResponse (text, intentClassification, toolResult?, �)',
+  response: 'QueryResponse (text, intentClassification, toolResult?, …)',
 };
 
 const LIST_TOOLS_API = {
   endpoint: 'GET /api/tools',
   client: 'src/services/clinicalToolsApi.js (`fetchBackendClinicalTools`)',
-  dto: '�',
+  dto: '—',
   response: 'ToolListDto',
 };
 
@@ -175,7 +175,7 @@ function resolveComponent(registryId, nluToolId, builtinSlug) {
     return 'src/pages/tools/Calculators.jsx (hub card) + src/components/ChatInterface.jsx (ED Copilot)';
   }
   if (registryId === REGISTRY.calculatorsHub) return REGISTRY_COMPONENT[REGISTRY.calculatorsHub];
-  return '�';
+  return '—';
 }
 
 function FLEET_TIER_A(registryId) {
@@ -200,7 +200,7 @@ function apiBlock(nluToolId, registryId, postExecutor) {
   if (registryId === REGISTRY.dispatchAi || tierForRegistryId(registryId) === 'B') {
     return { ...CHAT_API, note: 'Tier-B: catalog launch seeds dashboard chat; no tool POST' };
   }
-  return { endpoint: '�', client: '�', dto: '�', response: '�' };
+  return { endpoint: '—', client: '—', dto: '—', response: '—' };
 }
 
 /**
@@ -217,11 +217,11 @@ export function deriveContractStatus(row) {
 
   const hasFrontend =
     row.frontendComponent &&
-    row.frontendComponent !== '�' &&
+    row.frontendComponent !== '—' &&
     row.frontendRoute &&
-    row.frontendRoute !== '�';
+    row.frontendRoute !== '—';
   const hasNlu = row.nluProfile && row.backendIntentPattern;
-  const hasRegistry = row.registryEntry !== '�';
+  const hasRegistry = row.registryEntry !== '—';
   const hasCatalog = row.catalogEntry === 'yes';
 
   if (row.backendExecutor === 'yes' && hasFrontend && hasNlu && hasRegistry) {
@@ -234,7 +234,7 @@ export function deriveContractStatus(row) {
     return 'backend-only';
   }
   if (hasRegistry && hasCatalog && hasFrontend) {
-    return row.nluProfile === '�' ? 'frontend-only' : 'fully wired';
+    return row.nluProfile === '—' ? 'frontend-only' : 'fully wired';
   }
   return 'frontend-only';
 }
@@ -253,14 +253,14 @@ function buildRowFromNlu(nlu, patterns) {
       (nlu.toolId === 'sofa-calculator' && c.id === 'sofa')
   );
   const builtinSlug = builtin?.id ?? null;
-  /** POST execute applies only when this NLU id is registered � not sibling profiles on the same page. */
+  /** POST execute applies only when this NLU id is registered — not sibling profiles on the same page. */
   const postExecutor = isOrchestratorPostExecutable(nlu.toolId);
   const orchestratorId = postExecutor
     ? nlu.toolId
     : REGISTRY_ID_TO_ORCHESTRATOR_TOOL[registryId] &&
         isOrchestratorPostExecutable(REGISTRY_ID_TO_ORCHESTRATOR_TOOL[registryId])
       ? `${REGISTRY_ID_TO_ORCHESTRATOR_TOOL[registryId]} (registry sibling)`
-      : '�';
+      : '—';
   const pat = patternFor(nlu.toolId, patterns);
   const api = apiBlock(nlu.toolId, registryId, postExecutor);
   const render = buildFrontendRenderingRow(registryId);
@@ -270,20 +270,20 @@ function buildRowFromNlu(nlu, patterns) {
     canonicalId: nlu.toolId,
     canonicalInventoryId: inventoryRecord?.id || registryId,
     displayName: nlu.toolName,
-    frontendRoute: inventoryRecord?.route || nlu.path || launch.path || reg?.path || '�',
+    frontendRoute: inventoryRecord?.route || nlu.path || launch.path || reg?.path || '—',
     frontendComponent:
       inventoryRecord?.component || resolveComponent(registryId, nlu.toolId, builtinSlug),
-    registryEntry: reg ? registryId : registryId !== nlu.toolId ? registryId : '�',
+    registryEntry: reg ? registryId : registryId !== nlu.toolId ? registryId : '—',
     catalogEntry: catalogRowFor(nlu.toolId, registryId) ? 'yes' : 'no',
     discoveryEntry: discoveryHas(nlu.toolId) || discoveryHas(registryId) ? 'yes' : 'no',
     nluProfile: nlu.toolId,
-    backendIntentPattern: pat ? `tool.patterns.ts ? ${pat.toolId}` : '�',
-    orchestratorToolId: inventoryRecord?.orchestratorToolId || orchestratorId || '�',
+    backendIntentPattern: pat ? `tool.patterns.ts → ${pat.toolId}` : '—',
+    orchestratorToolId: inventoryRecord?.orchestratorToolId || orchestratorId || '—',
     backendExecutor: postExecutor ? 'yes' : 'no',
     apiEndpoint: inventoryRecord?.endpoint || api.endpoint,
-    requestDto: inventoryRecord?.requestDto || api.dto || '�',
-    responseDto: inventoryRecord?.responseDto || api.response || '�',
-    frontendApiClient: inventoryRecord?.apiClient || api.client || '�',
+    requestDto: inventoryRecord?.requestDto || api.dto || '—',
+    responseDto: inventoryRecord?.responseDto || api.response || '—',
+    frontendApiClient: inventoryRecord?.apiClient || api.client || '—',
     testCoverage: testFilesFor(registryId, nlu.toolId).join(', '),
     tier: inventoryRecord?.tier || tierForRegistryId(registryId),
     notes: [
@@ -318,27 +318,27 @@ function buildRowFromRegistryOnly(registryId, patterns) {
     canonicalId: registryId,
     canonicalInventoryId: inventoryRecord?.id || registryId,
     displayName: reg?.name ?? registryId,
-    frontendRoute: inventoryRecord?.route ?? reg?.path ?? launch.path ?? '�',
+    frontendRoute: inventoryRecord?.route ?? reg?.path ?? launch.path ?? '—',
     frontendComponent:
       inventoryRecord?.component ?? resolveComponent(registryId, registryId, builtin?.id),
     registryEntry: registryId,
     catalogEntry: catalogRowFor(registryId, registryId) ? 'yes' : 'no',
     discoveryEntry: discoveryHas(registryId) ? 'yes' : 'no',
-    nluProfile: nlus.length ? nlus.map((t) => t.toolId).join(', ') : '�',
+    nluProfile: nlus.length ? nlus.map((t) => t.toolId).join(', ') : '—',
     backendIntentPattern: nlus.length
       ? nlus.map((t) => (patternFor(t.toolId, patterns) ? t.toolId : 'missing')).join(', ')
-      : '�',
+      : '—',
     orchestratorToolId:
-      inventoryRecord?.orchestratorToolId || REGISTRY_ID_TO_ORCHESTRATOR_TOOL[registryId] || '�',
+      inventoryRecord?.orchestratorToolId || REGISTRY_ID_TO_ORCHESTRATOR_TOOL[registryId] || '—',
     backendExecutor: REGISTRY_ID_TO_ORCHESTRATOR_TOOL[registryId]
       ? isOrchestratorPostExecutable(REGISTRY_ID_TO_ORCHESTRATOR_TOOL[registryId])
         ? 'yes'
         : 'no'
       : 'no',
-    apiEndpoint: inventoryRecord?.endpoint || '�',
-    requestDto: inventoryRecord?.requestDto || '�',
-    responseDto: inventoryRecord?.responseDto || '�',
-    frontendApiClient: inventoryRecord?.apiClient || '�',
+    apiEndpoint: inventoryRecord?.endpoint || '—',
+    requestDto: inventoryRecord?.requestDto || '—',
+    responseDto: inventoryRecord?.responseDto || '—',
+    frontendApiClient: inventoryRecord?.apiClient || '—',
     testCoverage: testFilesFor(registryId, registryId).join(', '),
     tier: inventoryRecord?.tier || tierForRegistryId(registryId),
     notes: nlus.length ? '' : 'No dedicated clinicalIntentTools row',
@@ -353,9 +353,9 @@ function buildRowFromRegistryOnly(registryId, patterns) {
       row.backendExecutor === 'yes'
     );
     row.apiEndpoint = api.endpoint;
-    row.requestDto = api.dto || '�';
-    row.responseDto = api.response || '�';
-    row.frontendApiClient = api.client || '�';
+    row.requestDto = api.dto || '—';
+    row.responseDto = api.response || '—';
+    row.frontendApiClient = api.client || '—';
   }
 
   (row as any).status = deriveContractStatus(row);
@@ -367,19 +367,19 @@ function buildPhantomRows() {
     kind: 'phantom',
     canonicalId: p.id,
     displayName: p.name,
-    frontendRoute: '�',
-    frontendComponent: '�',
-    registryEntry: '�',
+    frontendRoute: '—',
+    frontendComponent: '—',
+    registryEntry: '—',
     catalogEntry: 'no',
     discoveryEntry: 'yes',
-    nluProfile: '�',
-    backendIntentPattern: '�',
-    orchestratorToolId: '�',
+    nluProfile: '—',
+    backendIntentPattern: '—',
+    orchestratorToolId: '—',
     backendExecutor: 'no',
-    apiEndpoint: (p as any).relatedApi || '�',
-    requestDto: '�',
-    responseDto: '�',
-    frontendApiClient: p.source || '�',
+    apiEndpoint: (p as any).relatedApi || '—',
+    requestDto: '—',
+    responseDto: '—',
+    frontendApiClient: p.source || '—',
     testCoverage: 'sourceCodeToolDiscovery.test.ts',
     tier: 'phantom',
     notes: p.notes,
@@ -395,14 +395,14 @@ function buildPlatformRows() {
       kind: 'platform',
       canonicalId: 'tools-list-api',
       displayName: 'List orchestrator tools',
-      frontendRoute: '�',
+      frontendRoute: '—',
       frontendComponent: 'src/pages/tools/ClinicalToolCatalog.tsx',
-      registryEntry: '�',
-      catalogEntry: '�',
+      registryEntry: '—',
+      catalogEntry: '—',
       discoveryEntry: 'yes',
-      nluProfile: '�',
-      backendIntentPattern: '�',
-      orchestratorToolId: '�',
+      nluProfile: '—',
+      backendIntentPattern: '—',
+      orchestratorToolId: '—',
       backendExecutor: 'n/a',
       apiEndpoint: LIST_TOOLS_API.endpoint,
       requestDto: LIST_TOOLS_API.dto,
@@ -418,20 +418,20 @@ function buildPlatformRows() {
       kind: 'platform',
       canonicalId: 'tools-share-results',
       displayName: 'Share tool results (client)',
-      frontendRoute: '�',
+      frontendRoute: '—',
       frontendComponent: 'src/components/tools/ToolResultShare.tsx',
-      registryEntry: '�',
-      catalogEntry: '�',
+      registryEntry: '—',
+      catalogEntry: '—',
       discoveryEntry: 'no',
-      nluProfile: '�',
-      backendIntentPattern: '�',
-      orchestratorToolId: '�',
+      nluProfile: '—',
+      backendIntentPattern: '—',
+      orchestratorToolId: '—',
       backendExecutor: 'no',
       apiEndpoint: 'POST /api/tools/share-results',
-      requestDto: '� (undocumented)',
-      responseDto: '�',
+      requestDto: '— (undocumented)',
+      responseDto: '—',
       frontendApiClient: 'src/components/tools/ToolResultShare.jsx (`apiFetch`)',
-      testCoverage: '�',
+      testCoverage: '—',
       tier: 'platform',
       notes:
         'Email share gated via backendApiCapabilities.toolsShareResults; use Share Link or client export',
@@ -518,7 +518,7 @@ function gapFixFor(row) {
 }
 
 function mdCell(value) {
-  if (value === null || value === undefined || value === '') return '�';
+  if (value === null || value === undefined || value === '') return '—';
   return String(value).replace(/\|/g, '\\|').replace(/\n/g, ' ');
 }
 
@@ -553,11 +553,11 @@ export function formatBackendFrontendContractMarkdown(
   }, {});
 
   const lines = [
-    '# Backend ? frontend tool contract matrix',
+    '# Backend ↔ frontend tool contract matrix',
     '',
     `Generated: ${generatedAt}`,
     '',
-    '> **Source:** `src/data/backendFrontendToolContract.ts` � regenerate with `npm run contract:write-docs`.',
+    '> **Source:** `src/data/backendFrontendToolContract.ts` — regenerate with `npm run contract:write-docs`.',
     '> **Related:** [clinical-tool-executors.md](./clinical-tool-executors.md), [e2e-tool-validation-matrix.md](./e2e-tool-validation-matrix.md).',
     '',
     '## Summary',
@@ -584,17 +584,17 @@ export function formatBackendFrontendContractMarkdown(
     '| **frontend-only** | Client form and/or chat launch; no `registerTool()` POST executor. |',
     '| **backend-only** | Executor or API without a dedicated UI (none today for clinical tools). |',
     '| **broken** | Client calls missing API, or misleading executor flags documented in code. |',
-    '| **planned** | Phantom / roadmap ids (recommendations, cost tracking) � no production surface. |',
+    '| **planned** | Phantom / roadmap ids (recommendations, cost tracking) — no production surface. |',
     '',
     '## POST executor reference',
     '',
     'Only these NLU ids have `registerTool()` in `tool-orchestrator.service.ts`:',
     '',
     ...ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS.map(
-      (id) => `- \`${id}\` ? ${EXECUTOR_API[id]?.endpoint ?? 'POST /api/tools/:id/execute'}`
+      (id) => `- \`${id}\` → ${EXECUTOR_API[id]?.endpoint ?? 'POST /api/tools/:id/execute'}`
     ),
     '',
-    'Chat NLU for other tools: `chat.service.ts` ? `handleClinicalTool` ? `NotFoundException` ? general AI fallback (no structured executor).',
+    'Chat NLU for other tools: `chat.service.ts` → `handleClinicalTool` → `NotFoundException` → general AI fallback (no structured executor).',
     '',
     '## Full contract matrix',
     '',
@@ -608,7 +608,7 @@ export function formatBackendFrontendContractMarkdown(
       let v = row[key];
       if (key === 'testCoverage' && v && v.length > 80) {
         const parts = v.split(', ');
-        v = `${parts.length} files (${parts.slice(0, 2).join(', ')}, �)`;
+        v = `${parts.length} files (${parts.slice(0, 2).join(', ')}, …)`;
       }
       return mdCell(v);
     });
@@ -642,7 +642,7 @@ export function formatBackendFrontendContractMarkdown(
     '### Manual follow-ups (not auto-flagged)',
     '',
     '- **Keyboard shortcuts:** duplicate `Ctrl+Shift+*` bindings in `toolRegistry.ts` (PERC/PHQ-9, GRACE/GAD-7, etc.).',
-    '- **Route duality:** legacy `/tools/calculator/*` vs `/tools/calculators/*` � both valid; keep redirects in `clinicalToolRoutes.js`.',
+    '- **Route duality:** legacy `/tools/calculator/*` vs `/tools/calculators/*` — both valid; keep redirects in `clinicalToolRoutes.js`.',
     '- **Env:** align `backend/.env.example` `FRONTEND_URL` with Vite port **8000** when using default dev proxy.',
     '- **dispatch-ai:** fleet Tier-B chat; `backendRouted: true` marks NLU/chat routing, while `postExecutable: false` keeps it out of POST execute.',
     '',

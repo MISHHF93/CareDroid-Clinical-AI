@@ -114,7 +114,7 @@ export function renderWithRouter(ui, options: any = {}) {
   return render(<MemoryRouter initialEntries={[route]}>{tree}</MemoryRouter>);
 }
 
-/** Page smoke helper � mirrors AppShell visibility resolution for isolated page renders. */
+/** Page smoke helper — mirrors AppShell visibility resolution for isolated page renders. */
 export function renderPageWithRouter(ui, options: any = {}) {
   return renderWithRouter(ui, { ...options, withVisibilityProvider: true });
 }

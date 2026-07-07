@@ -1,5 +1,5 @@
 /**
- * Design token system contracts � semantic spacing, typography, breakpoints, touch.
+ * Design token system contracts — semantic spacing, typography, breakpoints, touch.
  */
 
 import { readFileSync } from 'node:fs';
@@ -29,7 +29,7 @@ const indexCss = readFileSync(join(__dirname, '../index.css'), 'utf8');
 const responsiveUxCss = readFileSync(join(__dirname, 'responsive-ux.css'), 'utf8');
 const calculatorsCss = readFileSync(join(__dirname, '../pages/tools/Calculators.css'), 'utf8');
 
-describe('design-tokens.css � semantic token layer', () => {
+describe('design-tokens.css — semantic token layer', () => {
   it('is loaded from design-system.css after primitives.css and before normalization', () => {
     const designSystemCss = readFileSync(join(__dirname, 'design-system.css'), 'utf8');
     const primitivesPos = designSystemCss.indexOf("@import './primitives.css';");
@@ -116,7 +116,7 @@ describe('design-tokens.css � semantic token layer', () => {
   });
 });
 
-describe('designTokens.js � JS mirror', () => {
+describe('designTokens.js — JS mirror', () => {
   it('maps semantic breakpoint tiers', () => {
     expect(DESIGN_BREAKPOINTS.mobile.max).toBe(767);
     expect(DESIGN_BREAKPOINTS.tablet.min).toBe(768);
@@ -146,7 +146,7 @@ describe('designTokens.js � JS mirror', () => {
   });
 });
 
-describe('tool CSS � token adoption (no scattered 44px in calculators)', () => {
+describe('tool CSS — token adoption (no scattered 44px in calculators)', () => {
   it('Calculators.css uses touch-target token for primary controls', () => {
     expect(calculatorsCss).toContain('min-height: var(--touch-target-min)');
     expect(calculatorsCss).not.toMatch(/[^-]min-height:\s*44px/);

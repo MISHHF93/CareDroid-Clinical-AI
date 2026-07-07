@@ -60,7 +60,7 @@ export function bilirubinUmolLToMgDl(umolL) {
   return umolL / 17.104;
 }
 
-/** g/L ? g/dL */
+/** g/L → g/dL */
 export function albuminGlToGdl(gL) {
   if (!Number.isFinite(gL)) return NaN;
   return gL / 10;
