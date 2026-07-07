@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-07T21:23:11.840Z",
+  "generatedAt": "2026-07-07T21:54:28.137Z",
   "goal": "Verify every emergency page is reachable via sidebar, reception embed, or retained route",
   "exposure": {
     "stages": [
@@ -23,6 +23,7 @@
       "tools",
       "analytics",
       "settings",
+      "collaboration",
       "integrations",
       "cosmos",
       "platform",
@@ -80,6 +81,11 @@
       {
         "route": "/emergency/whiteboard",
         "surfaceId": "whiteboard",
+        "via": "sidebar"
+      },
+      {
+        "route": "/emergency/collaboration",
+        "surfaceId": "collaboration",
         "via": "sidebar"
       },
       {
@@ -198,14 +204,9 @@
         "via": "sidebar"
       }
     ],
-    "orphans": [
-      {
-        "route": "/emergency/collaboration",
-        "reason": "No surface registry entry"
-      }
-    ],
+    "orphans": [],
     "navNotInPalette": [],
-    "passesAudit": false,
+    "passesAudit": true,
     "receptionFirstEnabled": true
   },
   "palette": {
@@ -242,5 +243,5 @@
     "missingFromPalette": []
   },
   "receptionImportIssues": [],
-  "passesAudit": false
+  "passesAudit": true
 }

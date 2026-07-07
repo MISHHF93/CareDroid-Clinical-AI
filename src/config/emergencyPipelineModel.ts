@@ -193,6 +193,16 @@ export const EMERGENCY_SURFACE_REGISTRY = Object.freeze([
     panelKey: null,
   }),
   Object.freeze({
+    id: 'collaboration',
+    label: 'Collaboration Hub',
+    canonicalRoute: CANONICAL_ROUTES.emergencyCollaboration,
+    zone: EMERGENCY_SURFACE_ZONE.UTILITY,
+    embedInReception: false,
+    sidebarNavId: 'collaboration',
+    standaloneAllowed: true,
+    panelKey: null,
+  }),
+  Object.freeze({
     id: 'integrations',
     label: 'Integrations',
     canonicalRoute: CANONICAL_ROUTES.integrationHub,
