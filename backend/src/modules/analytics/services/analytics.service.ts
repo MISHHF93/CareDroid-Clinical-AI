@@ -197,27 +197,24 @@ export class AnalyticsService {
     startDate: Date,
     endDate: Date,
   ): Promise<Array<{ event: string; count: number; dropoff: number }>> {
-    const funnelData = [];
+    // Each step's count is independent of the others — only the dropoff calculation
+    // below depends on step order — so there's no reason to await them one at a time.
+    const counts = await Promise.all(
+      events.map((event) =>
+        this.analyticsEventRepository.count({
+          where: {
+            event,
+            createdAt: Between(startDate, endDate),
+          },
+        }),
+      ),
+    );
 
-    for (let i = 0; i < events.length; i++) {
-      const event = events[i];
-      const count = await this.analyticsEventRepository.count({
-        where: {
-          event,
-          createdAt: Between(startDate, endDate),
-        },
-      });
-
-      const dropoff = i > 0 ? funnelData[i - 1].count - count : 0;
-
-      funnelData.push({
-        event,
-        count,
-        dropoff,
-      });
-    }
-
-    return funnelData;
+    return events.map((event, i) => ({
+      event,
+      count: counts[i],
+      dropoff: i > 0 ? counts[i - 1] - counts[i] : 0,
+    }));
   }
 
   /**

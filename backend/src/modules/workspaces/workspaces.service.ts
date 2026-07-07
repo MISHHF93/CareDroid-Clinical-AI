@@ -324,16 +324,26 @@ export class WorkspacesService {
     const existingTypes = new Set(
       memberships.map((membership) => membership.workspace?.type).filter(Boolean),
     );
-    for (const definition of defaults) {
-      if (definition.type && existingTypes.has(definition.type)) continue;
-      const workspace = this.workspaceRepository.create({
-        ...definition,
-        slug: await this.uniqueSlug(`${definition.type}-${user.id}`),
-        ownerUserId: user.id,
-      });
-      const savedWorkspace = await this.workspaceRepository.save(workspace);
-      await this.createMembership(user, savedWorkspace, definition.membershipRole);
-    }
+    const missingDefinitions = defaults.filter(
+      (definition) => !definition.type || !existingTypes.has(definition.type),
+    );
+    // Only new users hit this (existing users' defaults are already in existingTypes
+    // above), but listForUser is a hot endpoint, so a first-time user's handful of
+    // missing workspaces are created concurrently rather than one sequential
+    // slug-check + save + membership-insert chain at a time. Safe to parallelize:
+    // each definition's slug base includes its own (distinct) workspace type, so
+    // there's no collision risk between iterations of this same batch.
+    await Promise.all(
+      missingDefinitions.map(async (definition) => {
+        const workspace = this.workspaceRepository.create({
+          ...definition,
+          slug: await this.uniqueSlug(`${definition.type}-${user.id}`),
+          ownerUserId: user.id,
+        });
+        const savedWorkspace = await this.workspaceRepository.save(workspace);
+        await this.createMembership(user, savedWorkspace, definition.membershipRole);
+      }),
+    );
   }
 
   private defaultWorkspaceDefinitions(user: User) {

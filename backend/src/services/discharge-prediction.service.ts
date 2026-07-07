@@ -28,7 +28,14 @@ export class DischargePredictionService {
   async calculateDischargeReadiness(patientId: string): Promise<DischargeReadiness> {
     const patient = await Patient.findById(patientId);
     if (!patient) throw new Error('Patient not found');
+    return this.scoreDischargeReadiness(patient);
+  }
 
+  // Split out so identifySameDayDischarges (which already has the patient docs from its
+  // own query) doesn't re-fetch each one by id right after loading them — that was an N+1
+  // on this consultant sweep's candidate loop.
+  private async scoreDischargeReadiness(patient: IPatient): Promise<DischargeReadiness> {
+    const patientId = String(patient._id);
     const criteria = [
       { name: 'Vital signs stable', met: await this.checkStableVitals(patient), confidence: 0.85 },
       { name: 'Pain controlled', met: await this.checkPainControl(patient), confidence: 0.7 },
@@ -107,15 +114,11 @@ export class DischargePredictionService {
       $or: [{ 'vitals.temperature': { $lte: 37.5 } }, { 'vitals.temperature': { $exists: false } }],
     });
 
-    const dischargeable: IPatient[] = [];
-    for (const patient of candidates) {
-      const readiness = await this.calculateDischargeReadiness(String(patient._id));
-      if (readiness.readinessScore >= 70) {
-        dischargeable.push(patient);
-      }
-    }
+    const readinessByPatient = await Promise.all(
+      candidates.map((patient) => this.scoreDischargeReadiness(patient)),
+    );
 
-    return dischargeable;
+    return candidates.filter((_, index) => readinessByPatient[index].readinessScore >= 70);
   }
 
   async predictDischargeTime(patientId: string): Promise<Date> {

@@ -136,23 +136,28 @@ export class ClinicalAlertsService {
     const criticalAlerts = alerts.filter(
       (alert) => alert.severity === 'critical' && alert.status !== 'dismissed',
     );
-    for (const alert of criticalAlerts) {
-      const { channel, created } = await this.collaborationHubService.createIncidentChannel(
-        organizationId,
-        {
-          title: alert.title,
-          description: alert.description,
-          severity: alert.severity,
-          triggerType: 'clinical_alert',
-          sourceId: alert.id,
-        },
-      );
-      if (created) {
-        await this.collaborationHubService.postSystemMessage(channel.id, {
-          body: `${alert.title}: ${alert.description}\nFindings: ${alert.findings.join(', ')}`,
-        });
-      }
-    }
+    // Independent per-alert work (each creates/looks up its own incident channel by
+    // sourceId) — bounded today by the small hardcoded demo alert set, but sequential
+    // awaits here would become a real N+1 once this is a real persisted alert stream.
+    await Promise.all(
+      criticalAlerts.map(async (alert) => {
+        const { channel, created } = await this.collaborationHubService!.createIncidentChannel(
+          organizationId,
+          {
+            title: alert.title,
+            description: alert.description,
+            severity: alert.severity,
+            triggerType: 'clinical_alert',
+            sourceId: alert.id,
+          },
+        );
+        if (created) {
+          await this.collaborationHubService!.postSystemMessage(channel.id, {
+            body: `${alert.title}: ${alert.description}\nFindings: ${alert.findings.join(', ')}`,
+          });
+        }
+      }),
+    );
   }
 
   acknowledge(userId: string, alertId: string, acknowledgedAt?: string) {
