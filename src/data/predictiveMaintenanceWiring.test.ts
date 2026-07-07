@@ -6,7 +6,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
-import { NON_ED_WORKSPACE_REDIRECT_ROUTES } from '../config/routes.config';
+import { CANONICAL_ROUTES } from '../config/routes.config';
 import { toolRegistryById } from './toolRegistry';
 import { clinicalIntentTools } from './clinicalIntentToolCatalog';
 import {
@@ -20,7 +20,7 @@ import { getAllDiscoveredTools, toolIdAliases } from './sourceCodeToolDiscovery'
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const predictiveMaintenanceSource = readFileSync(
-  join(__dirname, '../pages/fleet/PredictiveMaintenance.jsx'),
+  join(__dirname, '../pages/fleet/PredictiveMaintenance.tsx'),
   'utf8',
 );
 const patternsSource = readFileSync(
@@ -51,9 +51,9 @@ describe('Predictive Maintenance (predictive-maintenance) wiring', () => {
     expect(nlu?.category).toBe('fleet');
   });
 
-  it('keeps the fleet page component available while the CareDroid shell redirects fleet paths', () => {
+  it('keeps the fleet page component available at its canonical route', () => {
     expect(predictiveMaintenanceSource).toContain('PredictiveMaintenance');
-    expect(NON_ED_WORKSPACE_REDIRECT_ROUTES.some((route) => route.path === '/fleet/*')).toBe(true);
+    expect(CANONICAL_ROUTES.fleetPredictiveMaintenance).toBe(path);
   });
 
   it('mirrors backend tool.patterns.ts toolId', () => {

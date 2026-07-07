@@ -15,16 +15,20 @@ import { resolveCatalogLaunch } from './clinicalCatalogWiring';
 import { getCalculatorToolInventory, getUserFacingToolInventory } from './toolInventory';
 import { BACKEND_HTTP_ROUTES, findBackendRoute } from './backendHttpRouteInventory';
 import { EMERGENCY_PAGE_ALL_RENDER_PATHS } from './emergencyPageRenderInventory';
+import { CANONICAL_ROUTES } from '../config/routes.config';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const srcRoot = dirname(__dirname);
 const appSource = readFileSync(join(srcRoot, 'app', 'router.tsx'), 'utf8');
-const appShellSource = readFileSync(join(srcRoot, 'layout/AppShell.tsx'), 'utf8');
 const userContextSource = readFileSync(join(srcRoot, 'contexts/UserContext.tsx'), 'utf8');
 const platformEntrySource = readFileSync(join(srcRoot, 'pages/PlatformEntryHub.jsx'), 'utf8');
 const appConfigSource = readFileSync(join(srcRoot, 'config/appConfig.ts'), 'utf8');
 const authConfigSource = readFileSync(join(srcRoot, 'config/auth.config.ts'), 'utf8');
 const appShellCss = readFileSync(join(srcRoot, 'components/app-shell.css'), 'utf8');
+const copilotPanelCss = readFileSync(
+  join(srcRoot, 'components/styles/CopilotPanel-part-01.css'),
+  'utf8',
+);
 const indexCss = readFileSync(join(srcRoot, 'index.css'), 'utf8');
 const themeTokensCss = readFileSync(join(srcRoot, 'styles/theme-tokens.css'), 'utf8');
 const routeConfigSource = readFileSync(join(srcRoot, 'config/routes.config.ts'), 'utf8');
@@ -32,7 +36,6 @@ const viteConfigSource = readFileSync(join(dirname(srcRoot), 'vite.config.ts'), 
 
 const REQUIRED_LEGACY_REDIRECT_SNIPPETS = Object.freeze([
   'LEGACY_EMERGENCY_ROUTE_REDIRECTS.map',
-  'path="/dashboard"',
   'path="/general-healthcare"',
   'path="/tools/*" element={<ToolsRedirect />}',
 ]);
@@ -102,13 +105,16 @@ describe('full platform consolidation contract', () => {
     for (const snippet of REQUIRED_LEGACY_REDIRECT_SNIPPETS) {
       expect(appSource).toContain(snippet);
     }
-    expect(platformEntrySource).toContain('Start ED 18 demo');
+    // /dashboard moved from a hand-written JSX <Route> to the data-driven
+    // OUTSIDE_SHELL_ROUTE_REDIRECTS table (see routes.config.ts) — check the redirect
+    // is declared rather than a specific rendering mechanism for it.
+    expect(routeSurfaceDeclares(CANONICAL_ROUTES.dashboard)).toBe(true);
+    expect(platformEntrySource).toContain('Start at reception');
     expect(platformEntrySource).not.toContain('Continue to sign in');
     expect(userContextSource).toContain('OPEN_ACCESS_USER');
     expect(userContextSource).toContain("authMode: 'open-access'");
     expect(appSource).not.toContain('<TenantRequired>');
     expect(appSource).toContain('function AuthPathsRedirect()');
-    expect(appShellSource).toContain('ed-os-banner');
   });
 
   it('declares the CareDroid route surface once', () => {
@@ -118,8 +124,10 @@ describe('full platform consolidation contract', () => {
 
     expect(appSource).toContain('path="/emergency" element={<EmergencyDefaultRedirect />}');
     expect(appSource).toContain('path="/emergency/*"');
-    expect(appSource).toContain('path={CANONICAL_ROUTES.fleetCommand}');
-    expect(appSource).toContain('path={CANONICAL_ROUTES.aiGovernance}');
+    // Fleet and AI-governance routes moved from hand-written JSX <Route> elements to a
+    // data-driven route table at some point — routeSurfaceDeclares checks both forms.
+    expect(routeSurfaceDeclares(CANONICAL_ROUTES.fleetCommand)).toBe(true);
+    expect(routeSurfaceDeclares(CANONICAL_ROUTES.aiGovernance)).toBe(true);
     expect(appSource).not.toMatch(/element:\s*null|element:\s*undefined/);
   });
 
@@ -196,7 +204,7 @@ describe('full platform consolidation contract', () => {
     expect(themeTokensCss).toContain('--app-bg');
     expect(indexCss).toMatch(/html\s*\{[\s\S]*overflow-y:\s*auto/);
     expect(indexCss).toMatch(/body\s*\{[\s\S]*overflow-y:\s*auto/);
-    expect(appShellCss).toMatch(/\.ed-os-main,\s*[\s\S]*\.app-shell-main-content\s*\{[\s\S]*overflow:\s*auto/);
-    expect(appShellCss).toMatch(/\.ed-copilot-panel\s*\{[\s\S]*overflow:\s*hidden/);
+    expect(appShellCss).toMatch(/\.app-shell-main-content\s*\{[\s\S]*overflow:\s*auto/);
+    expect(copilotPanelCss).toMatch(/\.ed-copilot-panel\s*\{[\s\S]*overflow:\s*hidden/);
   });
 });

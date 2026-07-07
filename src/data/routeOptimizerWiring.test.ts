@@ -6,7 +6,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
-import { NON_ED_WORKSPACE_REDIRECT_ROUTES } from '../config/routes.config';
+import { CANONICAL_ROUTES } from '../config/routes.config';
 import { toolRegistryById } from './toolRegistry';
 import { clinicalIntentTools } from './clinicalIntentToolCatalog';
 import {
@@ -19,7 +19,7 @@ import { getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { getAllDiscoveredTools, toolIdAliases } from './sourceCodeToolDiscovery';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const routeOptimizerSource = readFileSync(join(__dirname, '../pages/fleet/RouteOptimizer.jsx'), 'utf8');
+const routeOptimizerSource = readFileSync(join(__dirname, '../pages/fleet/RouteOptimizer.tsx'), 'utf8');
 const patternsSource = readFileSync(
   join(
     __dirname,
@@ -48,9 +48,9 @@ describe('Route Optimizer (route-optimizer) wiring', () => {
     expect(nlu?.category).toBe('fleet');
   });
 
-  it('keeps the fleet page component available while the CareDroid shell redirects fleet paths', () => {
+  it('keeps the fleet page component available at its canonical route', () => {
     expect(routeOptimizerSource).toContain('RouteOptimizer');
-    expect(NON_ED_WORKSPACE_REDIRECT_ROUTES.some((route) => route.path === '/fleet/*')).toBe(true);
+    expect(CANONICAL_ROUTES.fleetRouteOptimizer).toBe(path);
   });
 
   it('mirrors backend tool.patterns.ts toolId', () => {
