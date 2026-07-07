@@ -1,10 +1,10 @@
 /**
- * NEWS2 � National Early Warning Score 2 (Royal College of Physicians standard).
+ * NEWS2 — National Early Warning Score 2 (Royal College of Physicians standard).
  * Aggregate score from RR, SpO2 (Scale 1 or 2), supplemental oxygen, SBP, pulse,
  * consciousness, and temperature; escalation bands follow RCP trigger guidance.
  *
- * SpO2 Scale 2 must only be used for patients with a prescribed target range (typically 88�92%),
- * e.g. confirmed hypercapnic respiratory failure, under a competent clinician�s direction.
+ * SpO2 Scale 2 must only be used for patients with a prescribed target range (typically 88–92%),
+ * e.g. confirmed hypercapnic respiratory failure, under a competent clinician’s direction.
  *
  * Reference: Royal College of Physicians. National Early Warning Score (NEWS) 2.
  */
@@ -25,7 +25,7 @@ export function scoreRespiratoryRate(rr) {
 }
 
 /**
- * SpO2 Scale 1 (most patients) � oxygen delivery scored separately (+0 air / +2 oxygen).
+ * SpO2 Scale 1 (most patients) — oxygen delivery scored separately (+0 air / +2 oxygen).
  * @param {number} spo2
  */
 export function scoreSpo2Scale1(spo2) {
@@ -37,7 +37,7 @@ export function scoreSpo2Scale1(spo2) {
 }
 
 /**
- * SpO2 Scale 2 (target SpO2 88�92%, e.g. hypercapnic respiratory failure pathway).
+ * SpO2 Scale 2 (target SpO2 88–92%, e.g. hypercapnic respiratory failure pathway).
  * @param {number} spo2
  * @param {boolean} supplementalOxygen
  */
@@ -53,7 +53,7 @@ export function scoreSpo2Scale2(spo2, supplementalOxygen) {
   return 3;
 }
 
-/** Air vs supplemental oxygen (NEWS2 �Air or oxygen?� row). */
+/** Air vs supplemental oxygen (NEWS2 “Air or oxygen?” row). */
 export function scoreSupplementalOxygen(supplementalOxygen) {
   return supplementalOxygen ? 2 : 0;
 }
@@ -83,7 +83,7 @@ export function scorePulse(pulse) {
   return 3;
 }
 
-/** @param {boolean} newConfusion ACVPU � new confusion vs alert */
+/** @param {boolean} newConfusion ACVPU — new confusion vs alert */
 export function scoreConsciousness(newConfusion) {
   return newConfusion ? 3 : 0;
 }
@@ -176,7 +176,7 @@ export function interpretNews2Risk(total, breakdown) {
   );
 
   const referenceLine =
-    'Royal College of Physicians. National Early Warning Score (NEWS) 2 � standard observation chart and escalation thresholds.';
+    'Royal College of Physicians. National Early Warning Score (NEWS) 2 — standard observation chart and escalation thresholds.';
 
   if (total >= 7) {
     return {
@@ -184,7 +184,7 @@ export function interpretNews2Risk(total, breakdown) {
       severity: 'critical',
       label: 'High risk band (aggregate)',
       interpretation:
-        'Aggregate score 7 or more aligns with RCP NEWS2 guidance for a high-level clinical alert � urgent or emergency response by a team that includes staff with critical care skills. Escalation and diagnosis remain clinical decisions.',
+        'Aggregate score 7 or more aligns with RCP NEWS2 guidance for a high-level clinical alert — urgent or emergency response by a team that includes staff with critical care skills. Escalation and diagnosis remain clinical decisions.',
       escalationHint:
         'Escalate per local policy; response team must be able to manage acute deterioration including airway support.',
       hasRed,
@@ -198,7 +198,7 @@ export function interpretNews2Risk(total, breakdown) {
       severity: 'warning',
       label: 'Medium risk band (aggregate)',
       interpretation:
-        'Aggregate score 5�6 matches the RCP threshold for urgent clinical review by staff competent in assessment and treatment of acutely ill patients; it does not by itself define a diagnosis.',
+        'Aggregate score 5–6 matches the RCP threshold for urgent clinical review by staff competent in assessment and treatment of acutely ill patients; it does not by itself define a diagnosis.',
       escalationHint: 'Increase monitoring frequency and arrange urgent ward-based or acute-team review per protocol.',
       hasRed,
       referenceLine,
@@ -213,7 +213,7 @@ export function interpretNews2Risk(total, breakdown) {
       interpretation:
         'A score of 3 in one physiological parameter (red score) should prompt urgent evaluation by a ward-based clinician to determine cause and monitoring frequency, even when the aggregate score is below 5. This pattern is not equivalent to a specific diagnosis.',
       escalationHint:
-        'Does not automatically equal the same response as aggregate =5, but must not be ignored � clinical review is required.',
+        'Does not automatically equal the same response as aggregate ≥5, but must not be ignored — clinical review is required.',
       hasRed: true,
       referenceLine,
     };
@@ -224,7 +224,7 @@ export function interpretNews2Risk(total, breakdown) {
     severity: 'normal',
     label: 'Lower aggregate band',
     interpretation:
-      'Aggregate score 0�4 with no single-parameter red score suggests a lower immediate escalation concern on this chart; continue routine observations per local policy and reassess if the clinical picture changes.',
+      'Aggregate score 0–4 with no single-parameter red score suggests a lower immediate escalation concern on this chart; continue routine observations per local policy and reassess if the clinical picture changes.',
     escalationHint: 'Continue scheduled observations; reassess if the clinical picture changes.',
     hasRed: false,
     referenceLine,
@@ -270,10 +270,10 @@ export function validateNews2Inputs(raw) {
   }
 
   const temp = typeof raw.temperature === 'string' ? raw.temperature.trim() : raw.temperature;
-  if (temp === '' || Number.isNaN(parseFloat(temp))) errors.push('Enter temperature (�C).');
+  if (temp === '' || Number.isNaN(parseFloat(temp))) errors.push('Enter temperature (°C).');
   else {
     const n = parseFloat(temp);
-    if (n < 30 || n > 43) errors.push('Temperature should be between 30 and 43 �C.');
+    if (n < 30 || n > 43) errors.push('Temperature should be between 30 and 43 °C.');
   }
 
   return { ok: errors.length === 0, errors };

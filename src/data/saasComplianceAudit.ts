@@ -505,7 +505,7 @@ export function getSaasComplianceDocument() {
     `| User-facing registry tools | ${userFacingCount} |`,
     `| Seeded \`platform_assets\` | ${seedAssetCount} |`,
     `| Fully charter-compliant (strict) | ${fullyCompliant.length} |`,
-    `| Rows with =1 violation | ${nonCompliant.length} |`,
+    `| Rows with ≥1 violation | ${nonCompliant.length} |`,
     `| Registry tools without platform asset row | ${rows.filter((r) => r.isPlatformAsset === 'No' && r.layer === 'tool-registry').length} |`,
     `| Seeded assets without pack | ${byRule['asset-in-pack'].filter((r) => r.layer === 'ai-agent').length} AI agents + ${byRule['asset-in-pack'].filter((r) => r.isPlatformAsset === 'Yes' && r.layer !== 'ai-agent').length} other |`,
     '',

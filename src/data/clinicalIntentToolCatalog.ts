@@ -31,7 +31,7 @@ const clinicalIntentToolsRaw = [
     toolName: 'SOFA Score Calculator',
     category: 'calculator',
     description:
-      'Sequential Organ Failure Assessment (ICU sepsis / organ dysfunction) � clinical decision support only; does not diagnose sepsis or direct therapy.',
+      'Sequential Organ Failure Assessment (ICU sepsis / organ dysfunction) — clinical decision support only; does not diagnose sepsis or direct therapy.',
     path: '/tools/calculators/sofa',
     sidebarToolId: REGISTRY.sofaScore,
     backendExecutable: true,
@@ -41,7 +41,7 @@ const clinicalIntentToolsRaw = [
     toolName: 'qSOFA (quick SOFA)',
     category: 'calculator',
     description:
-      'Bedside screening: RR =22/min, SBP =100 mmHg, altered mentation or GCS <15. Score =2 suggests higher risk of poor outcome in suspected infection (Sepsis-3).',
+      'Bedside screening: RR ≥22/min, SBP ≤100 mmHg, altered mentation or GCS <15. Score ≥2 suggests higher risk of poor outcome in suspected infection (Sepsis-3).',
     path: '/tools/calculators/qsofa',
     sidebarToolId: 'qsofa',
     chatSeed:
@@ -65,7 +65,7 @@ const clinicalIntentToolsRaw = [
     toolName: 'Child-Pugh score',
     category: 'calculator',
     description:
-      'Cirrhosis severity (Child�Turcotte�Pugh): bilirubin, albumin, INR or PT prolongation, ascites, hepatic encephalopathy � total 5�15 and class A/B/C.',
+      'Cirrhosis severity (Child–Turcotte–Pugh): bilirubin, albumin, INR or PT prolongation, ascites, hepatic encephalopathy — total 5–15 and class A/B/C.',
     path: '/tools/calculators/child-pugh',
     sidebarToolId: 'child-pugh',
     chatSeed:
@@ -77,7 +77,7 @@ const clinicalIntentToolsRaw = [
     toolName: 'HAS-BLED score',
     category: 'calculator',
     description:
-      'Bleeding-risk factors (0�9) when anticoagulation is considered, e.g. in atrial fibrillation; score =3 suggests higher bleeding risk warranting closer review.',
+      'Bleeding-risk factors (0–9) when anticoagulation is considered, e.g. in atrial fibrillation; score ≥3 suggests higher bleeding risk warranting closer review.',
     path: '/tools/calculators/has-bled',
     sidebarToolId: 'has-bled',
     chatSeed:
@@ -89,7 +89,7 @@ const clinicalIntentToolsRaw = [
     toolName: 'MELD score',
     category: 'calculator',
     description:
-      'Model for End-stage Liver Disease: total bilirubin, INR, creatinine (dialysis rule) � 6�40 severity index for chronic liver disease.',
+      'Model for End-stage Liver Disease: total bilirubin, INR, creatinine (dialysis rule) — 6–40 severity index for chronic liver disease.',
     path: '/tools/calculators/meld',
     sidebarToolId: 'meld',
     chatSeed:
@@ -101,7 +101,7 @@ const clinicalIntentToolsRaw = [
     toolName: 'MELD-Na score',
     category: 'calculator',
     description:
-      'MELD with UNOS sodium adjustment (MELD-Na) for hyponatremia in chronic liver disease � laboratory MELD plus serum sodium.',
+      'MELD with UNOS sodium adjustment (MELD-Na) for hyponatremia in chronic liver disease — laboratory MELD plus serum sodium.',
     path: '/tools/calculators/meld-na',
     sidebarToolId: 'meld-na',
     chatSeed:
@@ -113,7 +113,7 @@ const clinicalIntentToolsRaw = [
     toolName: 'TIMI risk score (UA/NSTEMI)',
     category: 'calculator',
     description:
-      'TIMI for unstable angina / NSTEMI: age, CAD risk factors, known CAD, aspirin, severe angina, ST deviation, elevated cardiac markers (0�7).',
+      'TIMI for unstable angina / NSTEMI: age, CAD risk factors, known CAD, aspirin, severe angina, ST deviation, elevated cardiac markers (0–7).',
     path: '/tools/calculators/timi-ua-nstemi',
     sidebarToolId: 'timi-ua-nstemi',
     chatSeed:
@@ -125,7 +125,7 @@ const clinicalIntentToolsRaw = [
     toolName: 'ASCVD 10-year risk (PCE)',
     category: 'calculator',
     description:
-      'Decision support: ACC/AHA pooled cohort equations for primary prevention ASCVD risk (age 40�79). Does not recommend statins or other therapies.',
+      'Decision support: ACC/AHA pooled cohort equations for primary prevention ASCVD risk (age 40–79). Does not recommend statins or other therapies.',
     path: '/tools/calculators/ascvd-risk',
     sidebarToolId: 'ascvd-risk',
     chatSeed:
@@ -197,11 +197,11 @@ const clinicalIntentToolsRaw = [
     toolName: 'CKD staging (KDIGO)',
     category: 'calculator',
     description:
-      'Decision support: KDIGO CKD stage and staging (CKD-EPI 2021 eGFR, ACR, G�A prognostic risk). Does not establish chronicity or recommend dialysis or drug therapy.',
+      'Decision support: KDIGO CKD stage and staging (CKD-EPI 2021 eGFR, ACR, G×A prognostic risk). Does not establish chronicity or recommend dialysis or drug therapy.',
     path: '/tools/calculators/ckd-staging',
     sidebarToolId: 'ckd-staging',
     chatSeed:
-      'Help me stage CKD using age, sex, serum creatinine, and urine albumin-creatinine ratio � eGFR category, albuminuria category, and KDIGO combined risk for discussion.',
+      'Help me stage CKD using age, sex, serum creatinine, and urine albumin-creatinine ratio — eGFR category, albuminuria category, and KDIGO combined risk for discussion.',
     backendExecutable: false,
   },
   {
@@ -401,7 +401,7 @@ const clinicalIntentToolsRaw = [
     toolName: 'STOP-Bang (OSA screening)',
     category: 'calculator',
     description:
-      'STOP-Bang (stop bang) questionnaire for obstructive sleep apnea screening: snoring, tiredness, observed apnea, hypertension, BMI, age, neck size, male sex (0�8).',
+      'STOP-Bang (stop bang) questionnaire for obstructive sleep apnea screening: snoring, tiredness, observed apnea, hypertension, BMI, age, neck size, male sex (0–8).',
     path: '/tools/calculators/stop-bang',
     sidebarToolId: 'stop-bang',
     chatSeed:
@@ -497,7 +497,7 @@ const clinicalIntentToolsRaw = [
     toolName: 'AUDIT-C (alcohol screen)',
     category: 'calculator',
     description:
-      'Screening only: AUDIT-C brief alcohol consumption screen (0�12). Does not diagnose alcohol use disorder or provide withdrawal-management advice.',
+      'Screening only: AUDIT-C brief alcohol consumption screen (0–12). Does not diagnose alcohol use disorder or provide withdrawal-management advice.',
     path: '/tools/calculators/audit-c',
     sidebarToolId: 'audit-c',
     chatSeed:
@@ -509,11 +509,11 @@ const clinicalIntentToolsRaw = [
     toolName: 'PHQ-9 (depression screen)',
     category: 'calculator',
     description:
-      'Screening only: PHQ-9 depression symptom questionnaire (0�27). Does not diagnose depression or recommend medications. Question 9 requires urgent safety review when non-zero.',
+      'Screening only: PHQ-9 depression symptom questionnaire (0–27). Does not diagnose depression or recommend medications. Question 9 requires urgent safety review when non-zero.',
     path: '/tools/calculators/phq9',
     sidebarToolId: 'phq9',
     chatSeed:
-      'STEP 0 � Before routine scoring: if PHQ-9 question 9 (self-harm or suicidal ideation) is non-zero, stop screening, arrange immediate safety assessment, and ensure crisis resources (e.g. 988 Suicide & Crisis Lifeline in the U.S. when applicable). Then help me complete the PHQ-9 mood screen (nine questions, past two weeks) and interpret the total score and severity range as screening only � do not diagnose depression or recommend medications.',
+      'STEP 0 — Before routine scoring: if PHQ-9 question 9 (self-harm or suicidal ideation) is non-zero, stop screening, arrange immediate safety assessment, and ensure crisis resources (e.g. 988 Suicide & Crisis Lifeline in the U.S. when applicable). Then help me complete the PHQ-9 mood screen (nine questions, past two weeks) and interpret the total score and severity range as screening only — do not diagnose depression or recommend medications.',
     backendExecutable: false,
   },
   {
@@ -521,11 +521,11 @@ const clinicalIntentToolsRaw = [
     toolName: 'GAD-7 (anxiety screen)',
     category: 'calculator',
     description:
-      'Screening only: GAD-7 anxiety symptom questionnaire (0�21). Does not diagnose anxiety disorders or recommend medications.',
+      'Screening only: GAD-7 anxiety symptom questionnaire (0–21). Does not diagnose anxiety disorders or recommend medications.',
     path: '/tools/calculators/gad7',
     sidebarToolId: 'gad7',
     chatSeed:
-      'STEP 0 � Before routine scoring: if suicidal thoughts, self-harm, or immediate safety concerns are present, stop screening, arrange immediate safety assessment, and ensure crisis resources (e.g. 988 Suicide & Crisis Lifeline in the U.S. when applicable; emergency services if in immediate danger). Then help me complete the GAD-7 anxiety screen (seven questions, past two weeks) and interpret the total score and severity range as screening only � do not diagnose an anxiety disorder or recommend medications. For moderate or severe scores, acute panic, or overwhelming distress, emphasize timely or urgent clinical evaluation without diagnosing or recommending treatment.',
+      'STEP 0 — Before routine scoring: if suicidal thoughts, self-harm, or immediate safety concerns are present, stop screening, arrange immediate safety assessment, and ensure crisis resources (e.g. 988 Suicide & Crisis Lifeline in the U.S. when applicable; emergency services if in immediate danger). Then help me complete the GAD-7 anxiety screen (seven questions, past two weeks) and interpret the total score and severity range as screening only — do not diagnose an anxiety disorder or recommend medications. For moderate or severe scores, acute panic, or overwhelming distress, emphasize timely or urgent clinical evaluation without diagnosing or recommending treatment.',
     backendExecutable: false,
   },
   {
@@ -724,12 +724,12 @@ const clinicalIntentToolsRaw = [
     toolName: 'HEART score',
     category: 'calculator',
     description:
-      'HEART score for chest pain risk stratification: history, ECG, age, risk factors, troponin (0�10).',
+      'HEART score for chest pain risk stratification: history, ECG, age, risk factors, troponin (0–10).',
     path: '/tools/calculators/heart-score',
     sidebarToolId: 'heart-score',
-    chatSeed: `Help me calculate the HEART score for a patient with chest pain using history, ECG, age, cardiovascular risk factors, and troponin (0�10 total).
+    chatSeed: `Help me calculate the HEART score for a patient with chest pain using history, ECG, age, cardiovascular risk factors, and troponin (0–10 total).
 
-STEP 0 � If the patient is hemodynamically unstable, has ongoing severe chest pain with concern for STEMI, or needs immediate resuscitation, activate emergency chest-pain / ACS pathways first. Do not delay urgent care to finish this chat.
+STEP 0 — If the patient is hemodynamically unstable, has ongoing severe chest pain with concern for STEMI, or needs immediate resuscitation, activate emergency chest-pain / ACS pathways first. Do not delay urgent care to finish this chat.
 
 Ask about each component in turn (0, 1, or 2 points each):
 1) History suspiciousness for ACS
@@ -738,8 +738,8 @@ Ask about each component in turn (0, 1, or 2 points each):
 4) Cardiovascular risk factors
 5) Initial troponin relative to local ULN
 
-After collecting answers, report the total HEART score, risk category (low 0�3, intermediate 4�6, high 7�10), and validation-cohort MACE context. Clearly state:
-- Clinical decision support and risk stratification only � not a diagnosis of ACS or myocardial infarction
+After collecting answers, report the total HEART score, risk category (low 0–3, intermediate 4–6, high 7–10), and validation-cohort MACE context. Clearly state:
+- Clinical decision support and risk stratification only — not a diagnosis of ACS or myocardial infarction
 - Does not rule in or rule out acute coronary syndrome
 - Do not recommend specific treatment, anticoagulation, disposition, observation duration, or invasive strategy`,
     backendExecutable: false,
@@ -749,21 +749,21 @@ After collecting answers, report the total HEART score, risk category (low 0�3
     toolName: 'ABCD² score',
     category: 'calculator',
     description:
-      'ABCD� score for short-term stroke risk after TIA: age, blood pressure, clinical features, duration, diabetes (0�7).',
+      'ABCD² score for short-term stroke risk after TIA: age, blood pressure, clinical features, duration, diabetes (0–7).',
     path: '/tools/calculators/abcd2',
     sidebarToolId: 'abcd2',
-    chatSeed: `Help me calculate the ABCD� score for a patient with a suspected transient ischemic attack (TIA).
+    chatSeed: `Help me calculate the ABCD² score for a patient with a suspected transient ischemic attack (TIA).
 
-STEP 0 � If acute stroke, crescendo neurologic symptoms, or new persistent focal deficit is present, activate emergency stroke pathways immediately. Do not delay urgent evaluation, imaging, or treatment to finish this chat.
+STEP 0 — If acute stroke, crescendo neurologic symptoms, or new persistent focal deficit is present, activate emergency stroke pathways immediately. Do not delay urgent evaluation, imaging, or treatment to finish this chat.
 
 Collect at the time of the TIA:
-1) Age =60 years
-2) Blood pressure at event (systolic and diastolic mmHg) � 1 point if SBP =140 or DBP =90
+1) Age ≥60 years
+2) Blood pressure at event (systolic and diastolic mmHg) — 1 point if SBP ≥140 or DBP ≥90
 3) Clinical features: other (0), speech disturbance without weakness (1), or unilateral weakness (2)
-4) Duration: <10 min (0), 10�59 min (1), or =60 min (2)
+4) Duration: <10 min (0), 10–59 min (1), or ≥60 min (2)
 5) Diabetes (1 point)
 
-Report total score (0�7), risk category (low 0�3, moderate 4�5, high 6�7), and validation-cohort stroke-risk context. Clearly state this is TIA/stroke risk stratification only � does not diagnose TIA or stroke and does not recommend antithrombotic therapy, admission, or imaging timing.`,
+Report total score (0–7), risk category (low 0–3, moderate 4–5, high 6–7), and validation-cohort stroke-risk context. Clearly state this is TIA/stroke risk stratification only — does not diagnose TIA or stroke and does not recommend antithrombotic therapy, admission, or imaging timing.`,
     backendExecutable: false,
   },
   {
@@ -842,7 +842,7 @@ Report total score (0�7), risk category (low 0�3, moderate 4�5, high 6�7
     toolId: 'centor-mcisaac',
     toolName: 'Centor / McIsaac score',
     category: 'calculator',
-    description: 'Modified Centor (McIsaac) score for streptococcal pharyngitis probability (0�5).',
+    description: 'Modified Centor (McIsaac) score for streptococcal pharyngitis probability (0–5).',
     path: '/tools/calculators/centor-mcisaac',
     sidebarToolId: 'centor-mcisaac',
     chatSeed:
@@ -854,14 +854,14 @@ Report total score (0�7), risk category (low 0�3, moderate 4�5, high 6�7
     toolName: 'Bishop score',
     category: 'calculator',
     description:
-      'Bishop score for cervical favourability before labour induction (dilation, effacement, station, consistency, position; 0�13).',
+      'Bishop score for cervical favourability before labour induction (dilation, effacement, station, consistency, position; 0–13).',
     path: '/tools/calculators/bishop-score',
     sidebarToolId: 'bishop-score',
     chatSeed: `Help me calculate the Bishop score from a cervical examination for labour documentation.
 
-STEP 0 � Cervical favourability documentation only. Does not recommend induction method, ripening agents, timing, or mode of delivery � follow obstetric team and institutional protocols.
+STEP 0 — Cervical favourability documentation only. Does not recommend induction method, ripening agents, timing, or mode of delivery — follow obstetric team and institutional protocols.
 
-Collect: dilation (cm), effacement (%), fetal station, consistency, and position. Total 0�13; classic teaching uses =8 favourable, 6�7 intermediate, <6 unfavourable.`,
+Collect: dilation (cm), effacement (%), fetal station, consistency, and position. Total 0–13; classic teaching uses ≥8 favourable, 6–7 intermediate, <6 unfavourable.`,
     backendExecutable: false,
   },
   {
@@ -869,14 +869,14 @@ Collect: dilation (cm), effacement (%), fetal station, consistency, and position
     toolName: 'Apgar score',
     category: 'calculator',
     description:
-      'Apgar score for newborn status at 1 and 5 minutes (appearance, pulse, grimace, activity, respiration; 0�10 each).',
+      'Apgar score for newborn status at 1 and 5 minutes (appearance, pulse, grimace, activity, respiration; 0–10 each).',
     path: '/tools/calculators/apgar-score',
     sidebarToolId: 'apgar-score',
     chatSeed: `Help me score Apgar components at 1 and 5 minutes for a newborn.
 
-STEP 0 � Newborn assessment documentation only. Does not replace neonatal resuscitation algorithms (e.g. NRP) or ongoing monitoring � follow delivery-unit and pediatric protocols.
+STEP 0 — Newborn assessment documentation only. Does not replace neonatal resuscitation algorithms (e.g. NRP) or ongoing monitoring — follow delivery-unit and pediatric protocols.
 
-Score appearance, pulse, grimace, activity, and respiration (0�2 each) at 1 and 5 minutes. Interpretation bands: 0�3 severely depressed, 4�6 moderately depressed, 7�10 reassuring.`,
+Score appearance, pulse, grimace, activity, and respiration (0–2 each) at 1 and 5 minutes. Interpretation bands: 0–3 severely depressed, 4–6 moderately depressed, 7–10 reassuring.`,
     backendExecutable: false,
   },
   {
@@ -1064,14 +1064,14 @@ Score appearance, pulse, grimace, activity, and respiration (0�2 each) at 1 an
     toolName: 'Braden scale',
     category: 'calculator',
     description:
-      'Braden scale for pressure injury risk (six subscales, 6�23; lower scores = higher risk).',
+      'Braden scale for pressure injury risk (six subscales, 6–23; lower scores = higher risk).',
     path: '/tools/calculators/braden-scale',
     sidebarToolId: 'braden-scale',
     chatSeed: `Help me complete the Braden scale for an inpatient and document pressure-injury risk.
 
-STEP 0 � This is a nursing risk screen for prevention documentation. It does not replace skin inspection, repositioning orders, support-surface selection, or wound care plans � follow your unit's pressure-injury prevention bundle.
+STEP 0 — This is a nursing risk screen for prevention documentation. It does not replace skin inspection, repositioning orders, support-surface selection, or wound care plans — follow your unit's pressure-injury prevention bundle.
 
-Score all six subscales (sensory perception, moisture, activity, mobility, nutrition, friction & shear). Total 6�23; lower scores indicate higher risk in validation studies.`,
+Score all six subscales (sensory perception, moisture, activity, mobility, nutrition, friction & shear). Total 6–23; lower scores indicate higher risk in validation studies.`,
     backendExecutable: false,
   },
   {
@@ -1079,14 +1079,14 @@ Score all six subscales (sensory perception, moisture, activity, mobility, nutri
     toolName: 'Morse Fall Scale',
     category: 'calculator',
     description:
-      'Morse Fall Scale for inpatient fall risk (history, diagnoses, ambulation, IV, gait, mental status; 0�125).',
+      'Morse Fall Scale for inpatient fall risk (history, diagnoses, ambulation, IV, gait, mental status; 0–125).',
     path: '/tools/calculators/morse-fall-scale',
     sidebarToolId: 'morse-fall-scale',
     chatSeed: `Help me score the Morse Fall Scale for an inpatient and document fall-risk category.
 
-STEP 0 � This is a nursing fall-risk screen for documentation. It does not replace environmental safety rounds, toileting plans, bed alarms, physiotherapy referral, or provider orders � follow your unit's fall-prevention pathway.
+STEP 0 — This is a nursing fall-risk screen for documentation. It does not replace environmental safety rounds, toileting plans, bed alarms, physiotherapy referral, or provider orders — follow your unit's fall-prevention pathway.
 
-Collect: history of falling (within 3 months), secondary diagnosis, ambulatory aid, IV/heparin lock, gait, and mental status. Total 0�125; bands: low <25, moderate 25�50, high >50.`,
+Collect: history of falling (within 3 months), secondary diagnosis, ambulatory aid, IV/heparin lock, gait, and mental status. Total 0–125; bands: low <25, moderate 25–50, high >50.`,
     backendExecutable: false,
   },
   {
@@ -1094,7 +1094,7 @@ Collect: history of falling (within 3 months), secondary diagnosis, ambulatory a
     toolName: 'Ranson criteria',
     category: 'calculator',
     description:
-      'Ranson criteria for acute pancreatitis severity (5 admission + 6 at 48 hours; 0�11).',
+      'Ranson criteria for acute pancreatitis severity (5 admission + 6 at 48 hours; 0–11).',
     path: '/tools/calculators/ranson-criteria',
     sidebarToolId: 'ranson-criteria',
     chatSeed:
@@ -1106,14 +1106,14 @@ Collect: history of falling (within 3 months), secondary diagnosis, ambulatory a
     toolName: 'BISAP score',
     category: 'calculator',
     description:
-      'BISAP score for early acute pancreatitis mortality risk (BUN, mental status, SIRS, age, pleural effusion; 0�5).',
+      'BISAP score for early acute pancreatitis mortality risk (BUN, mental status, SIRS, age, pleural effusion; 0–5).',
     path: '/tools/calculators/bisap-score',
     sidebarToolId: 'bisap-score',
     chatSeed: `Help me calculate the BISAP score for acute pancreatitis within 24 hours of presentation.
 
-STEP 0 � Early severity estimate for risk documentation only. Does not replace imaging for necrosis, ICU criteria, fluid resuscitation, or serial reassessment � follow institutional acute pancreatitis pathways.
+STEP 0 — Early severity estimate for risk documentation only. Does not replace imaging for necrosis, ICU criteria, fluid resuscitation, or serial reassessment — follow institutional acute pancreatitis pathways.
 
-Check: BUN >25 mg/dL, impaired mental status, SIRS, age >60, pleural effusion on imaging. Score 0�5; higher scores correlate with higher mortality in validation cohorts.`,
+Check: BUN >25 mg/dL, impaired mental status, SIRS, age >60, pleural effusion on imaging. Score 0–5; higher scores correlate with higher mortality in validation cohorts.`,
     backendExecutable: false,
   },
   {
@@ -1125,7 +1125,7 @@ Check: BUN >25 mg/dL, impaired mental status, SIRS, age >60, pleural effusion on
     sidebarToolId: 'fib4',
     chatSeed: `Help me calculate the FIB-4 index from age, AST, ALT, and platelet count.
 
-STEP 0 � Non-invasive fibrosis screening only. Does not diagnose cirrhosis or replace elastography, biopsy, or hepatology referral � follow local NAFLD/hepatitis staging protocols.
+STEP 0 — Non-invasive fibrosis screening only. Does not diagnose cirrhosis or replace elastography, biopsy, or hepatology referral — follow local NAFLD/hepatitis staging protocols.
 
 Use conventional units: age (years), AST and ALT (U/L), platelets (�10?/L). Interpretation uses age <65 vs =65 cutoffs (<1.3 / 1.3�2.67 / >2.67 vs <2.0 / =2.0).`,
     backendExecutable: false,
@@ -1183,7 +1183,7 @@ Use conventional units: age (years), AST and ALT (U/L), platelets (�10?/L). In
     toolName: 'Framingham 10-year CHD risk',
     category: 'calculator',
     description:
-      'Framingham ATP III point-based 10-year hard CHD risk (ages 30�74) � alternative cardiovascular risk context to ASCVD PCE.',
+      'Framingham ATP III point-based 10-year hard CHD risk (ages 30–74) — alternative cardiovascular risk context to ASCVD PCE.',
     path: '/tools/calculators/framingham-risk',
     sidebarToolId: 'framingham-risk',
     chatSeed:
@@ -1286,7 +1286,7 @@ Use conventional units: age (years), AST and ALT (U/L), platelets (�10?/L). In
     toolName: 'CHA2DS2-VASc Score',
     category: 'calculator',
     description:
-      'Stroke risk in non-valvular atrial fibrillation � clinical decision support only; does not recommend starting, stopping, or switching anticoagulation.',
+      'Stroke risk in non-valvular atrial fibrillation — clinical decision support only; does not recommend starting, stopping, or switching anticoagulation.',
     path: '/tools/calculators/chads2vasc',
     sidebarToolId: 'calc-chads2vasc',
     backendExecutable: false,
@@ -2330,7 +2330,7 @@ Then summarize entered findings, calculate the Wells DVT score, explain likely/u
     toolName: 'Drug Interaction Checker',
     category: 'checker',
     description:
-      'Drug�drug interaction and contraindication context � clinical decision support only; does not recommend specific doses or starting, stopping, or switching therapy.',
+      'Drug–drug interaction and contraindication context — clinical decision support only; does not recommend specific doses or starting, stopping, or switching therapy.',
     path: '/tools/drug-checker',
     sidebarToolId: 'drug-check',
     backendExecutable: true,
@@ -2344,7 +2344,7 @@ Then summarize entered findings, calculate the Wells DVT score, explain likely/u
     path: '/tools/calculators',
     sidebarToolId: 'dose-calculator',
     chatSeed:
-      'Help me understand how weight-based and renal-adjusted dosing are typically approached for a medication class � educational reference only. Do not calculate mg/kg doses or recommend a specific dose for this patient; direct prescribing to licensed clinicians and pharmacy resources.',
+      'Help me understand how weight-based and renal-adjusted dosing are typically approached for a medication class — educational reference only. Do not calculate mg/kg doses or recommend a specific dose for this patient; direct prescribing to licensed clinicians and pharmacy resources.',
     backendExecutable: false,
   },
   {
@@ -2352,7 +2352,7 @@ Then summarize entered findings, calculate the Wells DVT score, explain likely/u
     toolName: 'Lab Results Interpreter',
     category: 'interpreter',
     description:
-      'Lab panel interpretation support � clinical decision support only; does not establish a diagnosis. Verify with clinician judgment and local protocols.',
+      'Lab panel interpretation support — clinical decision support only; does not establish a diagnosis. Verify with clinician judgment and local protocols.',
     path: '/tools/lab-interpreter',
     sidebarToolId: 'lab-interp',
     backendExecutable: true,
@@ -2362,7 +2362,7 @@ Then summarize entered findings, calculate the Wells DVT score, explain likely/u
     toolName: 'ABG Interpreter',
     category: 'interpreter',
     description:
-      'ABG and acid�base interpretation support (Lab Interpreter page) � clinical decision support only; does not establish a diagnosis.',
+      'ABG and acid–base interpretation support (Lab Interpreter page) — clinical decision support only; does not establish a diagnosis.',
     path: '/tools/lab-interpreter',
     sidebarToolId: 'abg-interpreter',
     backendExecutable: false,
@@ -2540,11 +2540,11 @@ Then summarize entered findings, calculate the Wells DVT score, explain likely/u
     toolName: 'Procedure Guide',
     category: 'reference',
     description:
-      'Step-by-step procedural guidance and checklists � clinical decision support only; does not replace hands-on training, supervision, or institutional policy.',
+      'Step-by-step procedural guidance and checklists — clinical decision support only; does not replace hands-on training, supervision, or institutional policy.',
     path: '/tools/procedures',
     sidebarToolId: 'procedures',
     chatSeed:
-      'Walk me through a step-by-step clinical procedure with equipment checklist, key steps, common pitfalls, and when to stop or escalate. This is educational support only � confirm technique and indications with institutional policy and supervising clinician.',
+      'Walk me through a step-by-step clinical procedure with equipment checklist, key steps, common pitfalls, and when to stop or escalate. This is educational support only — confirm technique and indications with institutional policy and supervising clinician.',
     backendExecutable: false,
   },
   {
@@ -2583,11 +2583,11 @@ Then summarize entered findings, calculate the Wells DVT score, explain likely/u
     toolName: 'Route Optimization Assistant',
     category: 'fleet',
     description:
-      'Plan and reorder multi-stop routes using priorities, traffic, vehicle limits, and time windows. Provides travel estimates and savings � does not auto-dispatch.',
+      'Plan and reorder multi-stop routes using priorities, traffic, vehicle limits, and time windows. Provides travel estimates and savings — does not auto-dispatch.',
     path: '/fleet/route-optimizer',
     sidebarToolId: 'route-optimizer',
     chatSeed:
-      'Help me optimize a multi-stop fleet route: review destinations, priorities, traffic constraints, vehicle limits, and time windows. Suggest stop order and travel estimates � do not auto-dispatch or modify live routes without human approval.',
+      'Help me optimize a multi-stop fleet route: review destinations, priorities, traffic constraints, vehicle limits, and time windows. Suggest stop order and travel estimates — do not auto-dispatch or modify live routes without human approval.',
     backendExecutable: false,
   },
   {
@@ -2599,7 +2599,7 @@ Then summarize entered findings, calculate the Wells DVT score, explain likely/u
     path: '/fleet/predictive-maintenance',
     sidebarToolId: 'predictive-maintenance',
     chatSeed:
-      'Help me interpret predictive maintenance risk for a fleet vehicle: review age, mileage, service history, diagnostic codes, battery health, and telemetry. Suggest inspection timing and anomalies � do not auto-schedule shop work without human maintenance approval.',
+      'Help me interpret predictive maintenance risk for a fleet vehicle: review age, mileage, service history, diagnostic codes, battery health, and telemetry. Suggest inspection timing and anomalies — do not auto-schedule shop work without human maintenance approval.',
     backendExecutable: false,
   },
   {
@@ -2607,11 +2607,11 @@ Then summarize entered findings, calculate the Wells DVT score, explain likely/u
     toolName: 'Fleet Command Dashboard',
     category: 'fleet',
     description:
-      'Operational fleet snapshot: active and available vehicles, maintenance status, ETAs, energy levels, and utilization metrics. Decision support only � does not dispatch or control vehicles.',
+      'Operational fleet snapshot: active and available vehicles, maintenance status, ETAs, energy levels, and utilization metrics. Decision support only — does not dispatch or control vehicles.',
     path: '/fleet/command',
     sidebarToolId: 'fleet-command',
     chatSeed:
-      'Help me review fleet operations using the Fleet Command dashboard context: summarize active vs available vs on-job vehicles, flag maintenance and low-energy units, and discuss utilization and ETA patterns. Do not auto-dispatch or change assignments � recommend human dispatcher review.',
+      'Help me review fleet operations using the Fleet Command dashboard context: summarize active vs available vs on-job vehicles, flag maintenance and low-energy units, and discuss utilization and ETA patterns. Do not auto-dispatch or change assignments — recommend human dispatcher review.',
     backendExecutable: false,
   },
   {
@@ -2634,7 +2634,7 @@ Then summarize entered findings, calculate the Wells DVT score, explain likely/u
     path: '/tools/diagnosis',
     sidebarToolId: 'diagnosis',
     chatSeed:
-      'Generate a ranked differential diagnosis list for discussion as clinical decision support � not a confirmed diagnosis. Require clinician review before testing or treatment decisions:',
+      'Generate a ranked differential diagnosis list for discussion as clinical decision support — not a confirmed diagnosis. Require clinician review before testing or treatment decisions:',
     backendExecutable: false,
   },
   {
@@ -2657,7 +2657,7 @@ Then summarize entered findings, calculate the Wells DVT score, explain likely/u
     path: '/tools/diagnosis',
     sidebarToolId: 'antibiotic-guide',
     chatSeed:
-      'Discuss empiric antibiotic considerations for this infection scenario as educational decision support � cite guideline principles, resistance patterns, and patient factors. Do not prescribe, dose, or order antibiotics; require clinician review and local antimicrobial stewardship pathways.',
+      'Discuss empiric antibiotic considerations for this infection scenario as educational decision support — cite guideline principles, resistance patterns, and patient factors. Do not prescribe, dose, or order antibiotics; require clinician review and local antimicrobial stewardship pathways.',
     backendExecutable: false,
   },
 ];
@@ -3049,7 +3049,7 @@ export const builtinUiCalculators = [
   {
     id: 'stop-bang',
     name: 'STOP-Bang / stop bang',
-    description: 'STOP-Bang (stop bang) obstructive sleep apnea screening questionnaire (0�8).',
+    description: 'STOP-Bang (stop bang) obstructive sleep apnea screening questionnaire (0–8).',
     path: '/tools/calculators/stop-bang',
     calcQuery: '/tools/calculators?calc=stop-bang',
     implementation: 'Client-side in Calculators.jsx (stopBangCalculator.js)',
@@ -3121,7 +3121,7 @@ export const builtinUiCalculators = [
   {
     id: 'audit-c',
     name: 'AUDIT-C / audit c',
-    description: 'AUDIT-C (audit c) brief alcohol consumption screen (0�12).',
+    description: 'AUDIT-C (audit c) brief alcohol consumption screen (0–12).',
     path: '/tools/calculators/audit-c',
     calcQuery: '/tools/calculators?calc=audit-c',
     implementation: 'Client-side in Calculators.jsx (auditCCalculator.js)',
@@ -3130,7 +3130,7 @@ export const builtinUiCalculators = [
   {
     id: 'phq9',
     name: 'PHQ-9 / phq9',
-    description: 'PHQ-9 (phq9) depression symptom screen (0�27) with question 9 safety escalation.',
+    description: 'PHQ-9 (phq9) depression symptom screen (0–27) with question 9 safety escalation.',
     path: '/tools/calculators/phq9',
     calcQuery: '/tools/calculators?calc=phq9',
     implementation: 'Client-side in Calculators.jsx (phq9Calculator.js)',
@@ -3139,7 +3139,7 @@ export const builtinUiCalculators = [
   {
     id: 'gad7',
     name: 'GAD-7 / gad7',
-    description: 'GAD-7 (gad7) anxiety symptom screen (0�21) with severity range.',
+    description: 'GAD-7 (gad7) anxiety symptom screen (0–21) with severity range.',
     path: '/tools/calculators/gad7',
     calcQuery: '/tools/calculators?calc=gad7',
     implementation: 'Client-side in Calculators.jsx (gad7Calculator.js)',
@@ -3219,7 +3219,7 @@ export const builtinUiCalculators = [
     id: 'heart-score',
     name: 'HEART score',
     description:
-      'Chest pain risk stratification (history, ECG, age, risk factors, troponin; 0�10).',
+      'Chest pain risk stratification (history, ECG, age, risk factors, troponin; 0–10).',
     path: '/tools/calculators/heart-score',
     calcQuery: '/tools/calculators?calc=heart-score',
     implementation: 'Client-side in pr8ClinicalBatchCalculators.jsx (heartScoreCalculator.js)',
@@ -3228,7 +3228,7 @@ export const builtinUiCalculators = [
   {
     id: 'centor-mcisaac',
     name: 'Centor / McIsaac',
-    description: 'Strep pharyngitis probability (modified Centor/McIsaac; 0�5).',
+    description: 'Strep pharyngitis probability (modified Centor/McIsaac; 0–5).',
     path: '/tools/calculators/centor-mcisaac',
     calcQuery: '/tools/calculators?calc=centor-mcisaac',
     implementation: 'Client-side in pr8ClinicalBatchCalculators.jsx (centorMcisaacCalculator.js)',
@@ -3237,7 +3237,7 @@ export const builtinUiCalculators = [
   {
     id: 'bishop-score',
     name: 'Bishop score',
-    description: 'Cervical favourability for labour induction (0�13).',
+    description: 'Cervical favourability for labour induction (0–13).',
     path: '/tools/calculators/bishop-score',
     calcQuery: '/tools/calculators?calc=bishop-score',
     implementation: 'Client-side in pr8ClinicalBatchCalculators.jsx (bishopScoreCalculator.js)',
@@ -3246,7 +3246,7 @@ export const builtinUiCalculators = [
   {
     id: 'apgar-score',
     name: 'Apgar score',
-    description: 'Newborn status at 1 and 5 minutes (0�10 per timepoint).',
+    description: 'Newborn status at 1 and 5 minutes (0–10 per timepoint).',
     path: '/tools/calculators/apgar-score',
     calcQuery: '/tools/calculators?calc=apgar-score',
     implementation: 'Client-side in pr8ClinicalBatchCalculators.jsx (apgarScoreCalculator.js)',
@@ -3310,7 +3310,7 @@ export const builtinUiCalculators = [
   {
     id: 'braden-scale',
     name: 'Braden scale',
-    description: 'Pressure injury risk (6 subscales; 6�23).',
+    description: 'Pressure injury risk (6 subscales; 6–23).',
     path: '/tools/calculators/braden-scale',
     calcQuery: '/tools/calculators?calc=braden-scale',
     implementation: 'Client-side in pr8ClinicalBatchCalculators.jsx (bradenScaleCalculator.js)',
@@ -3319,7 +3319,7 @@ export const builtinUiCalculators = [
   {
     id: 'morse-fall-scale',
     name: 'Morse Fall Scale',
-    description: 'Inpatient fall risk (0�125).',
+    description: 'Inpatient fall risk (0–125).',
     path: '/tools/calculators/morse-fall-scale',
     calcQuery: '/tools/calculators?calc=morse-fall-scale',
     implementation: 'Client-side in pr8ClinicalBatchCalculators.jsx (morseFallScaleCalculator.js)',
@@ -3328,7 +3328,7 @@ export const builtinUiCalculators = [
   {
     id: 'ranson-criteria',
     name: 'Ranson criteria',
-    description: 'Acute pancreatitis severity (admission + 48 h; 0�11).',
+    description: 'Acute pancreatitis severity (admission + 48 h; 0–11).',
     path: '/tools/calculators/ranson-criteria',
     calcQuery: '/tools/calculators?calc=ranson-criteria',
     implementation: 'Client-side in pr8ClinicalBatchCalculators.jsx (ransonCriteriaCalculator.js)',
@@ -3337,7 +3337,7 @@ export const builtinUiCalculators = [
   {
     id: 'bisap-score',
     name: 'BISAP score',
-    description: 'Early pancreatitis mortality risk (0�5).',
+    description: 'Early pancreatitis mortality risk (0–5).',
     path: '/tools/calculators/bisap-score',
     calcQuery: '/tools/calculators?calc=bisap-score',
     implementation: 'Client-side in pr8ClinicalBatchCalculators.jsx (bisapScoreCalculator.js)',
@@ -3392,7 +3392,7 @@ export const builtinUiCalculators = [
   {
     id: 'framingham-risk',
     name: 'Framingham CHD risk',
-    description: '10-year hard CHD risk (Framingham ATP III points; ages 30�74).',
+    description: '10-year hard CHD risk (Framingham ATP III points; ages 30–74).',
     path: '/tools/calculators/framingham-risk',
     calcQuery: '/tools/calculators?calc=framingham-risk',
     implementation: 'Client-side in pr8ClinicalBatchCalculators.jsx (framinghamRiskCalculator.js)',
@@ -3447,9 +3447,9 @@ export const builtinUiCalculators = [
   },
   {
     id: 'abcd2',
-    name: 'ABCD� score',
+    name: 'ABCD² score',
     description:
-      'TIA short-term stroke risk (age, BP, clinical features, duration, diabetes; 0�7).',
+      'TIA short-term stroke risk (age, BP, clinical features, duration, diabetes; 0–7).',
     path: '/tools/calculators/abcd2',
     calcQuery: '/tools/calculators?calc=abcd2',
     implementation: 'Client-side in abcd2Calculator.jsx (abcd2Calculator.js)',
@@ -3624,5 +3624,5 @@ export function getCatalogSummary({ sidebarCount = 0, backendToolCount = 0 }: an
   };
 }
 
-/** NLU tools with no dedicated page � launch via chat from suite or catalog */
+/** NLU tools with no dedicated page — launch via chat from suite or catalog */
 export const chatOnlyClinicalTools = clinicalIntentTools.filter((t) => !t.path);

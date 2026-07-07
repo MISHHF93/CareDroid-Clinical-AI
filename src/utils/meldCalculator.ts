@@ -166,7 +166,7 @@ export function interpretMeldScores(meld, meldNa = null) {
     severity = 'critical';
     mortalityBand = 'High 90-day mortality signal (historical cohort)';
     interpretation =
-      'Scores =30 are associated with substantially increased short-term mortality in published MELD validation data. Escalate per local hepatology / critical-care pathways as clinically indicated.';
+      'Scores ≥30 are associated with substantially increased short-term mortality in published MELD validation data. Escalate per local hepatology / critical-care pathways as clinically indicated.';
   } else if (scoreForBand >= 20) {
     severity = 'warning';
     mortalityBand = 'Moderately increased 90-day mortality signal';

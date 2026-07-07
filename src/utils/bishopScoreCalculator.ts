@@ -10,12 +10,12 @@ export const BISHOP_DIMENSIONS_META = [
   {
     key: 'dilation',
     label: 'Cervical dilation',
-    help: 'Measured in centimetres from closed to =5 cm.',
+    help: 'Measured in centimetres from closed to ≥5 cm.',
     options: [
       { value: 0, label: 'Closed' },
       { value: 1, label: '1–2 cm' },
       { value: 2, label: '3–4 cm' },
-      { value: 3, label: '= 5 cm' },
+      { value: 3, label: '≥ 5 cm' },
     ],
   },
   {
@@ -26,7 +26,7 @@ export const BISHOP_DIMENSIONS_META = [
       { value: 0, label: '0–30%' },
       { value: 1, label: '40–50%' },
       { value: 2, label: '60–70%' },
-      { value: 3, label: '= 80%' },
+      { value: 3, label: '≥ 80%' },
     ],
   },
   {
@@ -124,7 +124,7 @@ export function interpretBishopScore(score) {
       riskCategory,
       riskCategoryLabel: riskCategoryLabels[riskCategory],
       label: 'Favourable Bishop score',
-      riskBand: '= 8 points',
+      riskBand: '≥ 8 points',
       favourability: 'Traditionally considered favourable cervix in classic teaching',
       interpretation:
         'Scores =8 are associated with a favourable cervix and higher induction success in many cohorts — interpret with gestational age, parity, and local obstetric documentation standards.',

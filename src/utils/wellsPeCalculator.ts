@@ -40,9 +40,9 @@ export const WELLS_PE_CRITERIA_META = [
   },
   {
     key: 'immobilizationOrSurgery',
-    shortLabel: 'Immobilization =3 days or surgery (past 4 weeks)',
+    shortLabel: 'Immobilization ≥3 days or surgery (past 4 weeks)',
     points: 1.5,
-    help: 'Bed rest =3 days or major surgery under general anaesthesia within the previous 4 weeks.',
+    help: 'Bed rest ≥3 days or major surgery under general anaesthesia within the previous 4 weeks.',
   },
   {
     key: 'previousDvtOrPe',

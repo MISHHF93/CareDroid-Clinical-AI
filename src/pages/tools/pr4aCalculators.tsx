@@ -594,7 +594,7 @@ export function CkdStagingCalculator({ onResultChange }) {
             Use as decision-support for clinician-patient discussions.
           </p>
           <p className="calc-disclaimer-detail">
-            <strong>KDIGO staging context:</strong> CKD is defined by kidney damage or GFR &lt;60 for =3 months. A
+            <strong>KDIGO staging context:</strong> CKD is defined by kidney damage or GFR &lt;60 for ≥3 months. A
             single eGFR and ACR do not establish chronicity. Does not recommend dialysis or specific drug therapy.
           </p>
         </div>
@@ -1119,7 +1119,7 @@ export function AuditCCalculator({ onResultChange }) {
           <CalcDecisionSupportLead />
           <p className="calc-disclaimer-detail">
             <strong>Screening only.</strong> AUDIT-C is a brief alcohol consumption screen (0–12). Apply sex-specific
-            positive thresholds (={AUDIT_C_WOMEN_POSITIVE_THRESHOLD} women, ={AUDIT_C_MEN_POSITIVE_THRESHOLD} men). It
+            positive thresholds (≥{AUDIT_C_WOMEN_POSITIVE_THRESHOLD} women, ≥{AUDIT_C_MEN_POSITIVE_THRESHOLD} men). It
             does not diagnose alcohol use disorder or provide withdrawal-management advice.
           </p>
         </div>

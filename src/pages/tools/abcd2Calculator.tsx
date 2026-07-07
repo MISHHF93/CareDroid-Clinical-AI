@@ -192,7 +192,7 @@ export function Abcd2Calculator({ onResultChange }) {
                   onChange={(e) => setInputs((p) => ({ ...p, age60OrOlder: e.target.checked }))}
                 />
                 <label htmlFor={`${slug}-age`} className="calc-checkbox-label">
-                  Age = 60 years (1 point)
+                  Age ≥ 60 years (1 point)
                 </label>
               </div>
             </div>
@@ -214,7 +214,7 @@ export function Abcd2Calculator({ onResultChange }) {
                 Blood pressure at event — diastolic (mmHg)
               </label>
               <span className="calc-input-help" id={`${slug}-bp-help`}>
-                1 point if systolic =140 or diastolic =90 mmHg
+                1 point if systolic ≥140 or diastolic ≥90 mmHg
               </span>
               <input
                 id={`${slug}-dbp`}

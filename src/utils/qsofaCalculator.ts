@@ -1,6 +1,6 @@
 /**
  * qSOFA (quick SOFA) — bedside screening for higher risk of poor outcome in suspected infection.
- * One point each: RR = 22/min, SBP = 100 mmHg, altered mentation OR GCS < 15.
+ * One point each: RR ≥ 22/min, SBP ≤ 100 mmHg, altered mentation OR GCS < 15.
  *
  * Reference: Singer M, et al. The Third International Consensus Definitions for Sepsis and Septic Shock (Sepsis-3). JAMA. 2016;315(8):801-810.
  */
@@ -50,7 +50,7 @@ export function interpretQsofaScore(score) {
     return {
       severity: 'critical',
       interpretation:
-        'Score =2 suggests higher risk of poor outcome among patients with suspected infection; it is not diagnostic of sepsis or septic shock. Use alongside clinical judgment and further assessment (e.g., SOFA where appropriate).',
+        'Score ≥2 suggests higher risk of poor outcome among patients with suspected infection; it is not diagnostic of sepsis or septic shock. Use alongside clinical judgment and further assessment (e.g., SOFA where appropriate).',
       referenceLine,
     };
   }
@@ -58,7 +58,7 @@ export function interpretQsofaScore(score) {
     return {
       severity: 'normal',
       interpretation:
-        'One criterion present; not qSOFA-positive by the =2 threshold. Reassess if clinical picture changes.',
+        'One criterion present; not qSOFA-positive by the ≥2 threshold. Reassess if clinical picture changes.',
       referenceLine,
     };
   }

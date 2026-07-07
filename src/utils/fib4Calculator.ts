@@ -100,9 +100,9 @@ export function interpretFib4(fib4, ageYears) {
     return {
       severity: 'normal',
       riskCategory,
-      riskCategoryLabel: 'Lower fibrosis concern (age =65)',
-      label: 'Lower FIB-4 (age =65)',
-      riskBand: '< 2.0 (age =65)',
+      riskCategoryLabel: 'Lower fibrosis concern (age ≥65)',
+      label: 'Lower FIB-4 (age ≥65)',
+      riskBand: '< 2.0 (age ≥65)',
       interpretation:
         'FIB-4 <2.0 in older adults — lower risk stratum per age-adjusted interpretation; correlate with comorbidities and serial trends.',
       disclaimer,
@@ -112,9 +112,9 @@ export function interpretFib4(fib4, ageYears) {
   return {
     severity: 'warning',
     riskCategory,
-    riskCategoryLabel: 'Elevated fibrosis concern (age =65)',
-    label: 'Elevated FIB-4 (age =65)',
-    riskBand: '= 2.0 (age =65)',
+    riskCategoryLabel: 'Elevated fibrosis concern (age ≥65)',
+    label: 'Elevated FIB-4 (age ≥65)',
+    riskBand: '≥ 2.0 (age ≥65)',
     interpretation:
       'FIB-4 =2.0 in patients =65 years — higher fibrosis concern in age-adjusted thresholds; supports specialist correlation.',
     disclaimer,

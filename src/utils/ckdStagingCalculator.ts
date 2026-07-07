@@ -218,7 +218,7 @@ export function validateCkdStagingInputs(raw) {
   }
 
   if (!Number.isFinite(urineAcr) || urineAcr < 0) {
-    errors.push('Enter a valid urine albumin-creatinine ratio (=0).');
+    errors.push('Enter a valid urine albumin-creatinine ratio (≥0).');
   }
 
   const acrMgG = toAcrMgG(urineAcr, acrUnit);

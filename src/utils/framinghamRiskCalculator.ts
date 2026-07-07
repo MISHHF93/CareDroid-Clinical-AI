@@ -191,7 +191,7 @@ export function interpretFraminghamRisk(tenYearRiskPct) {
     return {
       severity: 'critical',
       label: 'High Framingham CHD risk',
-      riskBand: '= 20% 10-year hard CHD risk',
+      riskBand: '≥ 20% 10-year hard CHD risk',
       interpretation:
         '10-year hard CHD risk =20% in ATP III framing — high-risk category for prevention discussion per historical guidelines.',
       disclaimer,

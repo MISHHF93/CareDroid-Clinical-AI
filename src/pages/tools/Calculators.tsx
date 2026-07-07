@@ -807,7 +807,7 @@ const QSOFACalculator = ({ onResultChange, patientContext = null as any }) => {
               Respiratory rate (breaths/min)
             </label>
             <span className="calc-input-help" id="qsofa-rr-help">
-              1 point if = 22
+              1 point if ≥ 22
             </span>
             <input
               id="qsofa-rr"
@@ -827,7 +827,7 @@ const QSOFACalculator = ({ onResultChange, patientContext = null as any }) => {
               Systolic blood pressure (mmHg)
             </label>
             <span className="calc-input-help" id="qsofa-sbp-help">
-              1 point if = 100
+              1 point if ≤ 100
             </span>
             <input
               id="qsofa-sbp"
@@ -928,11 +928,11 @@ const QSOFACalculator = ({ onResultChange, patientContext = null as any }) => {
             <div className="calc-breakdown">
               <div className="calc-breakdown-title">Criteria</div>
               <div className="calc-breakdown-item">
-                <span className="calc-breakdown-label">RR = 22/min</span>
+                <span className="calc-breakdown-label">RR ≥ 22/min</span>
                 <span className="calc-breakdown-score">{result.criteria.respiratoryRateGte22 ? '1' : '0'}</span>
               </div>
               <div className="calc-breakdown-item">
-                <span className="calc-breakdown-label">SBP = 100 mmHg</span>
+                <span className="calc-breakdown-label">SBP ≤ 100 mmHg</span>
                 <span className="calc-breakdown-score">{result.criteria.systolicBpLte100 ? '1' : '0'}</span>
               </div>
               <div className="calc-breakdown-item">
@@ -2499,7 +2499,7 @@ const MeldCalculator = ({ mode = 'meld', onResultChange }) => {
               </div>
               {includeMeldNa && result.meldForNa !== undefined ? (
                 <div className="calc-breakdown-item">
-                  <span className="calc-breakdown-label">MELD for Na step (=11 floor)</span>
+                  <span className="calc-breakdown-label">MELD for Na step (≥11 floor)</span>
                   <span className="calc-breakdown-score">{result.meldForNa}</span>
                 </div>
               ) : null}
@@ -3236,7 +3236,7 @@ const BMICalculator = ({ onResultChange }) => {
                 <li>Underweight: BMI &lt; 18.5</li>
                 <li>Normal weight: BMI 18.5-24.9</li>
                 <li>Overweight: BMI 25.0-29.9</li>
-                <li>Obese: BMI = 30.0</li>
+                <li>Obese: BMI ≥ 30.0</li>
               </ul>
             </div>
             <CalcResultSafetyFooter />
@@ -3308,7 +3308,7 @@ const CHA2DS2VAScCalculator = ({ onResultChange }) => {
       recommendation =
         'Higher stroke-risk stratum for discussion with guidelines — not a directive to start or stop anticoagulation.';
     } else {
-      interpretation = 'High estimated stroke risk stratum (score =3)';
+      interpretation = 'High estimated stroke risk stratum (score ≥3)';
       severity = 'critical';
       recommendation =
         'Higher stroke-risk stratum for discussion with guidelines and bleeding-risk assessment (e.g. HAS-BLED) — not a directive to start or stop therapy.';

@@ -21,8 +21,8 @@ const HEART_FIELDS = [
 
 const QSOFA_FIELDS = [
   { id: 'alteredMentation', label: 'Altered mentation' },
-  { id: 'rr22', label: 'RR =22' },
-  { id: 'sbp100', label: 'SBP =100' },
+  { id: 'rr22', label: 'RR ≥22' },
+  { id: 'sbp100', label: 'SBP ≤100' },
 ];
 
 const NIHSS_FIELDS = [

@@ -3,7 +3,7 @@
  * One point each (maximum 9): Hypertension, Abnormal renal, Abnormal liver, Stroke, Bleeding, Labile INR,
  * Elderly (>65), Drugs, Alcohol.
  *
- * Interpretation: score =3 suggests higher bleeding risk warranting closer review (not alone for treatment decisions).
+ * Interpretation: score ≥3 suggests higher bleeding risk warranting closer review (not alone for treatment decisions).
  *
  * Reference: Pisters R, Lane DA, Nieuwlaat R, de Vos CB, Crijns HJ, Lip GY. Europace. 2010;12(7):923–928;
  * Lip GYH et al. Eur Heart J. 2010;31(8):1004–1019 (HAS-BLED acronym and components).
