@@ -4,7 +4,7 @@ import {
   isDerivedAlertId,
   normalizeAlert,
   type AlertEngineInputs,
-} from './alertEngine';
+} from './alertEngineDerived';
 import { PatientState, Priority, type Patient, type Referral } from '../types/emergency';
 
 const now = new Date('2026-06-11T12:00:00.000Z');
@@ -118,7 +118,11 @@ describe('deriveAlerts referral intelligence rules', () => {
     );
   });
 
-  it('escalates urgent and critical emergent referrals that are not accepted in time', () => {
+  it('escalates an unaccepted urgent/emergent referral to a critical alert', () => {
+    // Both referrals target the same patient, so triageOperationalAlerts()
+    // collapses them to the single highest-priority surviving alert rather
+    // than surfacing one alert per referral (noise reduction across the
+    // shared patient) — see alertClassificationModel.ts.
     const alerts = deriveAlerts(
       {
         ...baseInputs,
@@ -141,24 +145,18 @@ describe('deriveAlerts referral intelligence rules', () => {
       now
     );
 
-    expect(alerts).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          id: 'alert-referral-critical-unacknowledged-ref-urgent',
-          severity: 'Critical',
-          title: 'Referral escalation required',
-        }),
-        expect.objectContaining({
-          id: 'alert-referral-emergent-pager-ref-emergent',
-          severity: 'Critical',
-        }),
-      ])
-    );
+    expect(alerts).toEqual([
+      expect.objectContaining({
+        id: 'alert-referral-critical-unacknowledged-ref-urgent',
+        severity: 'Critical',
+        title: 'Referral escalation required',
+      }),
+    ]);
   });
 });
 
 describe('deriveAlerts reassessment reminder rules', () => {
-  it('creates persistent upcoming and overdue recheck alerts', () => {
+  it('surfaces the most severe reassessment reminder when a patient has multiple due', () => {
     const reminderPatient: Patient = {
       ...patient,
       id: 'pt-reminder',
@@ -192,22 +190,16 @@ describe('deriveAlerts reassessment reminder rules', () => {
       now
     );
 
-    expect(alerts).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          id: 'alert-reassessment-reminder-upcoming-reminder-upcoming',
-          severity: 'Warning',
-          autoDismissAfter: undefined,
-          actionType: 'REASSESSMENT_REMINDER',
-          reminderId: 'reminder-upcoming',
-        }),
-        expect.objectContaining({
-          id: 'alert-reassessment-reminder-overdue-reminder-overdue',
-          severity: 'Critical',
-          reminderId: 'reminder-overdue',
-        }),
-      ])
-    );
+    // Both reminders belong to the same patient, so triageOperationalAlerts()
+    // collapses them down to the single more urgent (overdue) alert.
+    expect(alerts).toEqual([
+      expect.objectContaining({
+        id: 'alert-reassessment-reminder-overdue-reminder-overdue',
+        severity: 'Critical',
+        reminderId: 'reminder-overdue',
+        actionType: 'REASSESSMENT_REMINDER',
+      }),
+    ]);
   });
 });
 

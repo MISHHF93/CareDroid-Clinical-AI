@@ -93,7 +93,7 @@ afterEach(() => {
 });
 
 describe('emergencyStore EMS arrival conversion', () => {
-  it('converts an EMS arrival into an Arrival-state whiteboard patient with EMS flag', () => {
+  it('converts an EMS arrival into a Registration-state whiteboard patient with EMS flag', () => {
     const store = useEmergencyStore.getState();
     const arrival = store.emsArrivals.find((candidate) => candidate.status === 'Inbound');
 
@@ -116,9 +116,11 @@ describe('emergencyStore EMS arrival conversion', () => {
         patientId: expect.any(String),
       })
     );
+    // Converted EMS arrivals now land in Registration first (reception-first
+    // journey model) rather than jumping straight to Arrival.
     expect(patient).toEqual(
       expect.objectContaining({
-        state: PatientState.Arrival,
+        state: PatientState.Registration,
         chiefComplaint: arrival!.chiefComplaint,
         roomId: preparedArrival?.preparedRoomId,
       })
@@ -212,7 +214,7 @@ describe('emergencyStore EMS arrival conversion', () => {
       .patients.find((candidate) => candidate.id === convertedArrival?.patientId);
 
     expect(patient).toMatchObject({
-      state: PatientState.Arrival,
+      state: PatientState.Registration,
       chiefComplaint: 'STEMI',
       criticalChecklist: expect.objectContaining({
         type: 'stemi',

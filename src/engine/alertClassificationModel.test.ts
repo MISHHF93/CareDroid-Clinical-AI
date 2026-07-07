@@ -108,7 +108,11 @@ describe('alertClassificationModel', () => {
 
     expect(triage.visible.length).toBeLessThan(4);
     expect(triage.counts.critical).toBeGreaterThan(0);
-    expect(triage.suppressed.some((alert) => alert.id === 'alert-referral-sent-r1')).toBe(true);
+    // Referral-sent notifications are dropped by shouldRetainDerivedAlert
+    // before triage runs, so they never appear in visible or suppressed —
+    // they're excluded from the alert stream entirely, not merely suppressed.
+    expect(triage.visible.some((alert) => alert.id === 'alert-referral-sent-r1')).toBe(false);
+    expect(triage.all.some((alert) => alert.id === 'alert-referral-sent-r1')).toBe(false);
 
     const audit = auditAlertInventory([
       criticalAlert,

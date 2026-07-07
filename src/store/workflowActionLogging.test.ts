@@ -1,9 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import {
-  selectPatientWorkflowTimeline,
-  selectWorkflowLogs,
-  useEmergencyStore,
-} from './emergencyStore';
+import { useEmergencyStore } from './emergencyStore';
 import { PatientState, Priority } from '../types/emergency';
 
 const originalState = useEmergencyStore.getState();
@@ -103,7 +99,7 @@ describe('CareDroid workflow action logging', () => {
       metadata: { sourceId: 'test' },
     });
 
-    const allLogs = selectWorkflowLogs(useEmergencyStore.getState());
+    const allLogs = useEmergencyStore.getState().workflowLogs;
     expect(allLogs).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ type: 'patient_created', patientId: patient.id }),
@@ -120,7 +116,10 @@ describe('CareDroid workflow action logging', () => {
         expect.objectContaining({ type: 'integration_event_received' }),
       ])
     );
-    expect(selectPatientWorkflowTimeline(useEmergencyStore.getState(), patient.id)).toEqual(
+    const patientTimeline = useEmergencyStore
+      .getState()
+      .workflowLogs.filter((log) => log.patientId === patient.id);
+    expect(patientTimeline).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ type: 'patient_created', patientId: patient.id }),
         expect.objectContaining({ type: 'referral_created', patientId: patient.id }),
