@@ -21,7 +21,14 @@ describe.sequential('canonical route tree — legacy redirects', () => {
   ])('%s redirects to Medical Tools with intent preserved', async (legacyPath, expectedPath) => {
     renderRoute(legacyPath);
 
-    expect(await screen.findByTestId('location')).toHaveTextContent(expectedPath);
+    // The redirect happens after LazyAppRoutes finishes its async module load and
+    // the RootLayout guards (ProfileRouteGuard/PilotExtensionRouteGuard) resolve, so
+    // the location output can still hold its pre-redirect text the instant it mounts.
+    // findByTestId resolves as soon as the (always-present) element exists, not once
+    // it reaches this content, so the actual wait has to happen here instead.
+    await waitFor(() => {
+      expect(screen.getByTestId('location')).toHaveTextContent(expectedPath);
+    }, { timeout: ROUTE_LOAD_TIMEOUT });
     expect(await screen.findByRole('link', { name: 'Medical Tools' })).toHaveAttribute(
       'aria-current',
       'page',

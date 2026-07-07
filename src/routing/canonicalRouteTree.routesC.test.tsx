@@ -1,5 +1,5 @@
 import './canonicalRouteTree.testShared.tsx';
-import { cleanup, screen, waitFor } from '@testing-library/react';
+import { cleanup, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { findRouteHeading, renderRoute, ROUTE_LOAD_TIMEOUT } from './canonicalRouteTree.testShared.tsx';
@@ -26,14 +26,22 @@ describe('canonical route tree — queues params, reassessment, boarding, referr
   it('/emergency/reassessment renders a dedicated reassessment queue surface', async () => {
     renderRoute('/emergency/reassessment');
 
-    expect(await screen.findByRole('heading', { name: 'Reassessment' })).toBeInTheDocument();
+    // The shell chrome route-tab and the page's own (visually-hidden) accessibility
+    // heading both render "Reassessment" — scope to <main> for the page's heading.
+    const main = await screen.findByRole('main');
+    expect(await within(main).findByRole('heading', { name: 'Reassessment' })).toBeInTheDocument();
   });
 
   it('/emergency/boarding renders boarding and discharge capacity detail', async () => {
     renderRoute('/emergency/boarding');
 
-    expect(await screen.findByTestId('location')).toHaveTextContent('/emergency/capacity?view=boarding');
-    expect(await screen.findByRole('heading', { name: 'Flow & Capacity' })).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByTestId('location')).toHaveTextContent('/emergency/capacity?view=boarding');
+    }, { timeout: ROUTE_LOAD_TIMEOUT });
+    // The shell chrome route-tab and the page's own (visually-hidden) accessibility
+    // heading both render "Flow & Capacity" — scope to <main> for the page's heading.
+    const main = await screen.findByRole('main');
+    expect(await within(main).findByRole('heading', { name: 'Flow & Capacity' })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: 'Boarding' })).toHaveAttribute('aria-selected', 'true');
   });
 

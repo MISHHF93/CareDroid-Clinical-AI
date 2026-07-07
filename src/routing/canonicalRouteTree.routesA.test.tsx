@@ -15,7 +15,7 @@ describe('canonical route tree — whiteboard, patients, ems', () => {
   it('/emergency/whiteboard renders the active CareDroid whiteboard', async () => {
     renderRoute('/emergency/whiteboard');
 
-    expect(await screen.findByRole('link', { name: 'Dashboard' })).toHaveAttribute(
+    expect(await screen.findByRole('link', { name: 'Whiteboard' })).toHaveAttribute(
       'aria-current',
       'page',
     );
@@ -27,8 +27,11 @@ describe('canonical route tree — whiteboard, patients, ems', () => {
     renderRoute('/emergency/patients');
 
     expect(await screen.findByRole('heading', { name: 'Department Patients' })).toBeInTheDocument();
-    expect(screen.getByLabelText('Department Patients')).toBeInTheDocument();
-    expect(screen.getByLabelText('Search patients')).toBeInTheDocument();
+    expect(await screen.findByLabelText('Department Patients')).toBeInTheDocument();
+    // The page's search field renders via RouteChromeContext, which registers
+    // asynchronously (a useEffect) after the initial paint — wait for it rather
+    // than asserting synchronously right after the heading resolves.
+    expect(await screen.findByLabelText('Search patients')).toBeInTheDocument();
   });
 
   it('/emergency/patients consumes patientId context without another lookup', async () => {

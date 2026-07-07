@@ -1,5 +1,5 @@
 import './canonicalRouteTree.testShared.tsx';
-import { cleanup, screen } from '@testing-library/react';
+import { cleanup, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 import {
   NAVIGATION_ITEMS,
@@ -33,7 +33,11 @@ describe('canonical route tree — sidebar destinations (batch A)', () => {
       renderRoute(path);
 
       const expectedPath = RESOLVED_ROUTE_PATHS[path] || path;
-      expect(await screen.findByTestId('location')).toHaveTextContent(expectedPath);
+      // The location output mounts before any redirect settles, so findByTestId
+      // resolves immediately with pre-redirect content — wait for the real value.
+      await waitFor(() => {
+        expect(screen.getByTestId('location')).toHaveTextContent(expectedPath);
+      }, { timeout: ROUTE_LOAD_TIMEOUT });
       expect(screen.getByRole('main')).toBeInTheDocument();
       expect(screen.getByLabelText('Operational command context')).toBeInTheDocument();
       expect(screen.queryByText('Access denied')).toBeNull();
@@ -60,7 +64,11 @@ describe('canonical route tree — sidebar destinations (batch B)', () => {
       renderRoute(path);
 
       const expectedPath = RESOLVED_ROUTE_PATHS[path] || path;
-      expect(await screen.findByTestId('location')).toHaveTextContent(expectedPath);
+      // The location output mounts before any redirect settles, so findByTestId
+      // resolves immediately with pre-redirect content — wait for the real value.
+      await waitFor(() => {
+        expect(screen.getByTestId('location')).toHaveTextContent(expectedPath);
+      }, { timeout: ROUTE_LOAD_TIMEOUT });
       expect(screen.getByRole('main')).toBeInTheDocument();
       expect(screen.getByLabelText('Operational command context')).toBeInTheDocument();
       expect(screen.queryByText('Access denied')).toBeNull();

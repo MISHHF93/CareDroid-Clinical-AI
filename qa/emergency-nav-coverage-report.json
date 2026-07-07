@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-02T19:33:01.094Z",
+  "generatedAt": "2026-07-07T20:15:50.236Z",
   "goal": "Verify every emergency page is reachable via sidebar, reception embed, or retained route",
   "exposure": {
     "stages": [
@@ -44,6 +44,7 @@
       "/shared/tools/:shareId",
       "/emergency/command-center",
       "/emergency/whiteboard",
+      "/emergency/collaboration",
       "/emergency/patients",
       "/emergency/dispatch",
       "/emergency/ems",
@@ -197,16 +198,22 @@
         "via": "sidebar"
       }
     ],
-    "orphans": [],
+    "orphans": [
+      {
+        "route": "/emergency/collaboration",
+        "reason": "No surface registry entry"
+      }
+    ],
     "navNotInPalette": [],
-    "passesAudit": true,
+    "passesAudit": false,
     "receptionFirstEnabled": true
   },
   "palette": {
-    "commandCount": 28,
+    "commandCount": 29,
     "navItemIds": [
       "reception",
       "whiteboard",
+      "collaboration",
       "command-center",
       "dispatch",
       "ed-readiness",
@@ -235,5 +242,5 @@
     "missingFromPalette": []
   },
   "receptionImportIssues": [],
-  "passesAudit": true
+  "passesAudit": false
 }

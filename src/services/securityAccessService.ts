@@ -59,16 +59,17 @@ function hasCompiledPermissionBridge(
   permission: string,
 ): boolean {
   const normalized = normalizePermission(permission);
+  const permissions = profile.permissions || [];
 
   if (normalized.caredroid.length > 0) {
     return normalized.caredroid.some((key) => hasCompiledPermission(profile, key));
   }
 
   if (normalized.backend.length > 0) {
-    return normalized.backend.some((key) => profile.permissions.includes(key));
+    return normalized.backend.some((key) => permissions.includes(key));
   }
 
-  return expandPermissionAliases(permission).some((alias) => profile.permissions.includes(alias));
+  return expandPermissionAliases(permission).some((alias) => permissions.includes(alias));
 }
 
 export function checkPermission(ctx: SecurityAccessContext, permission: string): boolean {

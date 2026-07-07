@@ -139,7 +139,7 @@ export default function UnifiedIntakePanel({
         </div>
       ) : null}
 
-      <main className="reception-command-grid unified-intake-grid">
+      <div className="reception-command-grid unified-intake-grid">
         <section className="reception-command-panel reception-command-panel--span" aria-labelledby="arrival-type-title">
           <div className="reception-command-panel__header">
             <h2 id="arrival-type-title">Arrival type</h2>
@@ -506,7 +506,7 @@ export default function UnifiedIntakePanel({
 
         {showQueueRail ? queueRail : null}
         {showQueueRail ? alertsRail : null}
-      </main>
+      </div>
 
       <div className="reception-command-actionbar unified-intake-actionbar" aria-label="Unified intake actions">
         <button type="button" className="reception-command-actionbar__secondary" onClick={onSaveDraft}>

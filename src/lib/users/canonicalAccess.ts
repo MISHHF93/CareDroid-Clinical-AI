@@ -595,7 +595,7 @@ export function canAccessRoute(
     routeRecord?.requiredPermissions ||
     ROUTE_REQUIRED_PERMISSIONS[normalizedPath] ||
     [];
-  return required.every((permission) => profile.permissions.includes(permission));
+  return required.every((permission) => (profile.permissions || []).includes(permission));
 }
 
 export function hasPermission(
@@ -606,7 +606,7 @@ export function hasPermission(
     'navigationAccess' in compiledProfile
       ? compiledProfile
       : compileCareDroidAccessProfile(compiledProfile);
-  return profile.permissions.includes(permission);
+  return (profile.permissions || []).includes(permission);
 }
 
 export function hasAnyPermission(

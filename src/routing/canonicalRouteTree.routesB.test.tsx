@@ -1,5 +1,5 @@
 import './canonicalRouteTree.testShared.tsx';
-import { cleanup, screen, waitFor } from '@testing-library/react';
+import { cleanup, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { renderRoute } from './canonicalRouteTree.testShared.tsx';
@@ -22,7 +22,10 @@ describe('canonical route tree — intake, capacity, queues', () => {
   it('/emergency/capacity renders capacity, rooms, boarding, and discharge pipeline from store', async () => {
     renderRoute('/emergency/capacity');
 
-    expect(await screen.findByRole('heading', { name: 'Flow & Capacity' })).toBeInTheDocument();
+    // The shell chrome route-tab and the page's own (visually-hidden) accessibility
+    // heading both render "Flow & Capacity" — scope to <main> for the page's heading.
+    const main = await screen.findByRole('main');
+    expect(await within(main).findByRole('heading', { name: 'Flow & Capacity' })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: 'Capacity' })).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByRole('tablist', { name: 'Flow and capacity views' })).toBeInTheDocument();
   });

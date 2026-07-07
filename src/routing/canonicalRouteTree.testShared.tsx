@@ -401,9 +401,13 @@ vi.mock('../engine/reassessmentEngine', () => ({
   startReassessmentEngine: () => 0,
 }));
 
-vi.mock('../engine/continuousPatientFlowEngine', () => ({
-  startContinuousPatientFlowEngine: () => 0,
-}));
+vi.mock('../engine/continuousPatientFlowEngine', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../engine/continuousPatientFlowEngine')>();
+  return {
+    ...actual,
+    startContinuousPatientFlowEngine: () => 0,
+  };
+});
 
 
 

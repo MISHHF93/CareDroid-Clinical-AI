@@ -10,6 +10,10 @@ vi.mock('../components/AppShell', async () => {
   const React = await import('react');
   const { Outlet, useLocation, useNavigate } = await import('react-router-dom');
   const { RouteChromeProvider } = await import('../contexts/RouteChromeContext');
+  const { HelpHubProvider } = await import('../contexts/HelpHubContext');
+  const { PractitionerVisibilityProvider } = await import('../contexts/PractitionerVisibilityContext');
+  const { NotificationShellProvider } = await import('../contexts/NotificationShellContext');
+  const { ConfirmDialogProvider } = await import('../components/ui/ConfirmDialogProvider');
   const { CANONICAL_ROUTES } = await import('../config/routes.config');
 
   function DeepLinkAppShell({ children }: { children?: React.ReactNode }) {
@@ -21,13 +25,32 @@ vi.mock('../components/AppShell', async () => {
       navigate(`${CANONICAL_ROUTES.emergencyWhiteboard}${location.search}`, { replace: true });
     }, [location.pathname, location.search, navigate]);
 
+    // Mirrors the real AppShell's provider nesting (ConfirmDialog > PractitionerVisibility >
+    // HelpHub > NotificationShell) so page content that depends on these contexts
+    // (e.g. LivingContextualHelpBanner's useHelpHub) doesn't crash under this stub.
     return React.createElement(
-      RouteChromeProvider,
+      ConfirmDialogProvider,
       null,
       React.createElement(
-        'div',
-        { role: 'main', id: 'main-content' },
-        children ?? React.createElement(Outlet),
+        PractitionerVisibilityProvider,
+        null,
+        React.createElement(
+          HelpHubProvider,
+          null,
+          React.createElement(
+            NotificationShellProvider,
+            null,
+            React.createElement(
+              RouteChromeProvider,
+              null,
+              React.createElement(
+                'div',
+                { role: 'main', id: 'main-content' },
+                children ?? React.createElement(Outlet),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

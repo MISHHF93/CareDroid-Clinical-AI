@@ -139,7 +139,7 @@ export const UserProvider = ({ children }) => {
       ]);
       if (cancelled) return;
 
-      const nextToken = resolveSessionToken(session.token);
+      const nextToken = resolveSessionToken(session?.token);
       const storedUser = readStoredUser() || user || OPEN_ACCESS_USER;
       setAuthTokenState(nextToken);
       setUserState(storedUser);
@@ -147,7 +147,7 @@ export const UserProvider = ({ children }) => {
       setIsLoading(false);
 
       logger.info('Dev platform session initialized', {
-        source: session.source,
+        source: session?.source,
         hasJwt: looksLikeJwt(nextToken),
       });
     };
