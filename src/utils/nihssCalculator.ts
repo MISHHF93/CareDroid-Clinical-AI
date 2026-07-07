@@ -1,10 +1,10 @@
 /**
- * NIH Stroke Scale (NIHSS) — summed neurologic deficit score (0–42).
+ * NIH Stroke Scale (NIHSS) â€” summed neurologic deficit score (0â€“42).
  *
  * Reference: Brott T, et al. Measurements of acute cerebral infarction: a clinical examination scale.
- * Stroke. 1989;20(7):864–870; NINDS NIH Stroke Scale training materials.
+ * Stroke. 1989;20(7):864â€“870; NINDS NIH Stroke Scale training materials.
  *
- * Decision support only — does not replace urgent stroke evaluation or institutional stroke protocols.
+ * Decision support only â€” does not replace urgent stroke evaluation or institutional stroke protocols.
  */
 
 /** @typedef {{
@@ -26,21 +26,21 @@
  * }} NihssItemScores */
 
 export const NIHSS_ITEM_META = [
-  { key: 'loc', label: '1a — Level of consciousness', min: 0, max: 3, untestableCode: null },
-  { key: 'locQuestions', label: '1b — LOC questions', min: 0, max: 2, untestableCode: null },
-  { key: 'locCommands', label: '1c — LOC commands', min: 0, max: 2, untestableCode: null },
-  { key: 'bestGaze', label: '2 — Best gaze', min: 0, max: 2, untestableCode: null },
-  { key: 'visualFields', label: '3 — Visual fields', min: 0, max: 3, untestableCode: null },
-  { key: 'facialPalsy', label: '4 — Facial palsy', min: 0, max: 3, untestableCode: null },
-  { key: 'motorArmLeft', label: '5a — Motor arm (left)', min: 0, max: 4, untestableCode: 9 },
-  { key: 'motorArmRight', label: '5b — Motor arm (right)', min: 0, max: 4, untestableCode: 9 },
-  { key: 'motorLegLeft', label: '6a — Motor leg (left)', min: 0, max: 4, untestableCode: 9 },
-  { key: 'motorLegRight', label: '6b — Motor leg (right)', min: 0, max: 4, untestableCode: 9 },
-  { key: 'limbAtaxia', label: '7 — Limb ataxia', min: 0, max: 2, untestableCode: 9 },
-  { key: 'sensory', label: '8 — Sensory', min: 0, max: 2, untestableCode: null },
-  { key: 'bestLanguage', label: '9 — Best language', min: 0, max: 3, untestableCode: null },
-  { key: 'dysarthria', label: '10 — Dysarthria', min: 0, max: 1, untestableCode: 9 },
-  { key: 'extinctionInattention', label: '11 — Extinction / inattention', min: 0, max: 2, untestableCode: null },
+  { key: 'loc', label: '1a â€” Level of consciousness', min: 0, max: 3, untestableCode: null },
+  { key: 'locQuestions', label: '1b â€” LOC questions', min: 0, max: 2, untestableCode: null },
+  { key: 'locCommands', label: '1c â€” LOC commands', min: 0, max: 2, untestableCode: null },
+  { key: 'bestGaze', label: '2 â€” Best gaze', min: 0, max: 2, untestableCode: null },
+  { key: 'visualFields', label: '3 â€” Visual fields', min: 0, max: 3, untestableCode: null },
+  { key: 'facialPalsy', label: '4 â€” Facial palsy', min: 0, max: 3, untestableCode: null },
+  { key: 'motorArmLeft', label: '5a â€” Motor arm (left)', min: 0, max: 4, untestableCode: 9 },
+  { key: 'motorArmRight', label: '5b â€” Motor arm (right)', min: 0, max: 4, untestableCode: 9 },
+  { key: 'motorLegLeft', label: '6a â€” Motor leg (left)', min: 0, max: 4, untestableCode: 9 },
+  { key: 'motorLegRight', label: '6b â€” Motor leg (right)', min: 0, max: 4, untestableCode: 9 },
+  { key: 'limbAtaxia', label: '7 â€” Limb ataxia', min: 0, max: 2, untestableCode: 9 },
+  { key: 'sensory', label: '8 â€” Sensory', min: 0, max: 2, untestableCode: null },
+  { key: 'bestLanguage', label: '9 â€” Best language', min: 0, max: 3, untestableCode: null },
+  { key: 'dysarthria', label: '10 â€” Dysarthria', min: 0, max: 1, untestableCode: 9 },
+  { key: 'extinctionInattention', label: '11 â€” Extinction / inattention', min: 0, max: 2, untestableCode: null },
 ];
 
 /**
@@ -77,7 +77,7 @@ export function validateNihssInputs(raw) {
 
     if (!Number.isFinite(value) || !allowed) {
       errors.push(
-        `${meta.label}: score must be ${meta.min}–${meta.max}` +
+        `${meta.label}: score must be ${meta.min}â€“${meta.max}` +
           (meta.untestableCode !== null ? ` or ${meta.untestableCode} if untestable` : '') +
           '.'
       );
@@ -137,10 +137,10 @@ export function interpretNihssSeverity(total) {
 
   const labelByBand = {
     none: 'No measurable deficit on NIHSS (score 0)',
-    minor: 'Minor deficit severity band (NIHSS 1–4)',
-    moderate: 'Moderate deficit severity band (NIHSS 5–15)',
-    'moderate-severe': 'Moderate-to-severe deficit severity band (NIHSS 16–20)',
-    severe: 'Severe deficit severity band (NIHSS 21–42)',
+    minor: 'Minor deficit severity band (NIHSS 1â€“4)',
+    moderate: 'Moderate deficit severity band (NIHSS 5â€“15)',
+    'moderate-severe': 'Moderate-to-severe deficit severity band (NIHSS 16â€“20)',
+    severe: 'Severe deficit severity band (NIHSS 21â€“42)',
   };
 
   const severity =
@@ -155,12 +155,12 @@ export function interpretNihssSeverity(total) {
     label: labelByBand[band as any],
     severityBand: band,
     totalScore: total,
-    interpretation: `Total NIHSS ${total} — ${labelByBand[band as any]}. This describes neurologic deficit severity on examination; it does not confirm acute ischemic stroke, hemorrhage, or large-vessel occlusion, and must not be used alone to direct reperfusion therapy.`,
+    interpretation: `Total NIHSS ${total} â€” ${labelByBand[band as any]}. This describes neurologic deficit severity on examination; it does not confirm acute ischemic stroke, hemorrhage, or large-vessel occlusion, and must not be used alone to direct reperfusion therapy.`,
     safetyDisclaimer:
       'NIHSS is for structured neurologic assessment and documentation. It does not replace urgent stroke evaluation, neuroimaging, last-known-well timing, or institutional acute stroke protocols. Do not delay emergency stroke care to complete scoring.',
     pathwayDisclaimer:
       'Follow local stroke pathways and treating team judgment for thrombolysis, thrombectomy, blood pressure management, and disposition. This tool does not recommend specific treatments.',
     referenceLine:
-      'NIH Stroke Scale — NINDS / Brott T, et al. Stroke. 1989;20(7):864–870.',
+      'NIH Stroke Scale â€” NINDS / Brott T, et al. Stroke. 1989;20(7):864â€“870.',
   };
 }

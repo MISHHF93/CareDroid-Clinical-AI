@@ -191,7 +191,7 @@ export const ReassessmentAutomationService = Object.freeze({
       alerts: Object.freeze(items.map((item) => item.alert)),
       thresholds: REASSESSMENT_INTELLIGENCE_THRESHOLDS,
       preventionGoal: 'Prevent forgotten patients by surfacing Needs Reassessment alerts on the Emergency Whiteboard.',
-      sourceState: 'Demo data · No live integration',
+      sourceState: 'Demo data Â· No live integration',
       safetyStatement:
         'Reassessment recommendations are operational prompts only. Clinicians remain responsible for reassessment and acuity decisions.',
     });

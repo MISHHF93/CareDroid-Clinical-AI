@@ -1,10 +1,10 @@
 /**
- * Ottawa Ankle Rule and Ottawa foot rules — radiography decision support after acute injury.
+ * Ottawa Ankle Rule and Ottawa foot rules â€” radiography decision support after acute injury.
  *
- * Reference: Stiell IG, et al. Implementation of the Ottawa ankle rules. JAMA. 1994;271(11):827–832;
- * Stiell IG, et al. Multicentre trial to introduce the Ottawa ankle rules. BMJ. 1995;311(7005):594–597.
+ * Reference: Stiell IG, et al. Implementation of the Ottawa ankle rules. JAMA. 1994;271(11):827â€“832;
+ * Stiell IG, et al. Multicentre trial to introduce the Ottawa ankle rules. BMJ. 1995;311(7005):594â€“597.
  *
- * Decision support only — not fracture clearance; does not replace clinical judgment.
+ * Decision support only â€” not fracture clearance; does not replace clinical judgment.
  */
 
 /** @typedef {{
@@ -32,26 +32,26 @@
 export function ottawaApplicabilityWarnings(applicability: any = {}) {
   const warnings = [] as any[];
   if (applicability.acuteAnkleFootInjury === false) {
-    warnings.push('Not an acute ankle/foot injury context — Ottawa rules may not apply.');
+    warnings.push('Not an acute ankle/foot injury context â€” Ottawa rules may not apply.');
   }
   if (applicability.neurovascularCompromise) {
     warnings.push(
-      'Suspected neurovascular compromise — do not rely on Ottawa rules; pursue urgent evaluation and imaging per protocol.'
+      'Suspected neurovascular compromise â€” do not rely on Ottawa rules; pursue urgent evaluation and imaging per protocol.'
     );
   }
   if (applicability.openFractureOrGrossDeformity) {
     warnings.push(
-      'Open fracture or gross deformity — Ottawa rules must not delay appropriate trauma care and imaging.'
+      'Open fracture or gross deformity â€” Ottawa rules must not delay appropriate trauma care and imaging.'
     );
   }
   if (applicability.severeTraumaOrMultisystem) {
     warnings.push(
-      'Severe or multisystem trauma — full trauma evaluation takes precedence over rule-out radiography pathways.'
+      'Severe or multisystem trauma â€” full trauma evaluation takes precedence over rule-out radiography pathways.'
     );
   }
   if (applicability.pediatricUnder18) {
     warnings.push(
-      'Age under 18 — validated primarily in adults; consider pediatric-specific guidelines.'
+      'Age under 18 â€” validated primarily in adults; consider pediatric-specific guidelines.'
     );
   }
   return warnings;
@@ -145,7 +145,7 @@ export function interpretOttawaAnkleFootRules(result) {
   if (!result.rulesApplicable) {
     return {
       severity: 'critical',
-      label: 'Ottawa rules not applicable — urgent evaluation',
+      label: 'Ottawa rules not applicable â€” urgent evaluation',
       ankleRadiographIndicated: null,
       footRadiographIndicated: null,
       interpretation:
@@ -156,7 +156,7 @@ export function interpretOttawaAnkleFootRules(result) {
       pathwayDisclaimer:
         'Clinician judgment and local protocols override this tool. Address neurovascular status, open injury, and deformity immediately.',
       referenceLine:
-        'Stiell IG, et al. Ottawa ankle rules. JAMA. 1994;271(11):827–832; Stiell IG, et al. BMJ. 1995;311(7005):594–597.',
+        'Stiell IG, et al. Ottawa ankle rules. JAMA. 1994;271(11):827â€“832; Stiell IG, et al. BMJ. 1995;311(7005):594â€“597.',
     };
   }
 
@@ -185,13 +185,13 @@ export function interpretOttawaAnkleFootRules(result) {
     footRadiographIndicated: result.footRadiographIndicated,
     interpretation: `${ankleText}. ${footText}.${
       detailParts.length ? ` ${detailParts.join('. ')}.` : ''
-    } A negative result does not exclude fracture — document shared decision-making per local pathway.`,
+    } A negative result does not exclude fracture â€” document shared decision-making per local pathway.`,
     applicabilityWarnings: result.applicabilityWarnings,
     safetyDisclaimer:
       'For acute ankle/foot injury only. Ottawa rules support radiography decisions; they do not prove absence of injury, do not address Maisonneuve or proximal injuries, and must not override clinician judgment.',
     pathwayDisclaimer:
       'Follow institutional musculoskeletal and emergency medicine protocols for imaging, splinting, and follow-up.',
     referenceLine:
-      'Stiell IG, et al. Ottawa ankle rules. JAMA. 1994;271(11):827–832; Stiell IG, et al. BMJ. 1995;311(7005):594–597.',
+      'Stiell IG, et al. Ottawa ankle rules. JAMA. 1994;271(11):827â€“832; Stiell IG, et al. BMJ. 1995;311(7005):594â€“597.',
   };
 }

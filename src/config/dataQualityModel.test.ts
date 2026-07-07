@@ -32,7 +32,7 @@ describe('dataQualityModel', () => {
       dob: '',
       sex: '',
       mrn: 'TEMP-UNK-123456',
-      chiefComplaint: 'Unknown identity — clinical care priority',
+      chiefComplaint: 'Unknown identity â€” clinical care priority',
       flags: ['IdentityPending'],
     };
 

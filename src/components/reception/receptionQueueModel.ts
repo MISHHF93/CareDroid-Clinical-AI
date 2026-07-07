@@ -221,7 +221,7 @@ export function selectReceptionOperationalStripMetrics(
       label: RECEPTION_COPY.metrics.doorToTriage,
       value: triageBreachSummary.longestElapsedLabel,
       queueTab: 'pretriage',
-      hint: `Target ${triageBreachSummary.targetMinutes}m · ${triageBreachSummary.awaitingTriageCount} awaiting`,
+      hint: `Target ${triageBreachSummary.targetMinutes}m Â· ${triageBreachSummary.awaitingTriageCount} awaiting`,
     },
     {
       id: 'offload-delays',
@@ -275,7 +275,7 @@ export function selectArrivalDashboardMetrics(patients = [] as any[], emsInbound
       {
         id: 'ems-arrivals',
         label: 'EMS arrivals',
-        hint: `${counts.ems} registered · ${emsInbound} inbound`,
+        hint: `${counts.ems} registered Â· ${emsInbound} inbound`,
         value: counts.ems + emsInbound,
         queueTab: 'ems',
       },

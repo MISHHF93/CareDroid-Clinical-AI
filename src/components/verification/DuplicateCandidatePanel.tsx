@@ -57,12 +57,12 @@ export default function DuplicateCandidatePanel({
                 <div>
                   <strong>{candidate.displayName}</strong>
                   <span>
-                    {candidate.matchScore}% · {duplicateActionLabel(candidate.recommendedAction)}
+                    {candidate.matchScore}% Â· {duplicateActionLabel(candidate.recommendedAction)}
                   </span>
                   <small>
                     Matched: {candidate.matchedFields.join(', ') || 'none'}
                     {candidate.conflictingFields.length
-                      ? ` · Conflicts: ${candidate.conflictingFields.join(', ')}`
+                      ? ` Â· Conflicts: ${candidate.conflictingFields.join(', ')}`
                       : ''}
                   </small>
                 </div>
@@ -98,7 +98,7 @@ export default function DuplicateCandidatePanel({
       {onContinueCreate ? (
         <footer className="duplicate-candidate-panel__footer">
           <button type="button" onClick={onContinueCreate}>
-            No match — continue verification
+            No match â€” continue verification
           </button>
         </footer>
       ) : null}

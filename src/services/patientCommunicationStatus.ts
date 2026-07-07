@@ -93,13 +93,13 @@ function latestEventTimestamp(
 export function formatCommunicationStatusTimestamp(
   timestamp: string | null | undefined,
   now: Date,
-  { unknownLabel = '—' }: any = {},
+  { unknownLabel = 'â€”' }: any = {},
 ): string {
   if (!timestamp) return unknownLabel;
   const minutes = minutesSince(timestamp, now);
   const clock = formatTimerClockTime(timestamp);
   if (minutes === null) return clock;
-  return `${clock} · ${formatCommunicationDuration(minutes)}`;
+  return `${clock} Â· ${formatCommunicationDuration(minutes)}`;
 }
 
 function resolveNextCheckpoint(input: {
@@ -160,7 +160,7 @@ function resolveNextCheckpoint(input: {
   return {
     at: null,
     label: 'Routine check-in',
-    detail: 'No checkpoint scheduled — maintain routine waiting-room contact.',
+    detail: 'No checkpoint scheduled â€” maintain routine waiting-room contact.',
   };
 }
 
@@ -258,7 +258,7 @@ export function buildPatientCommunicationStatus(
     communicationOverdueLabel: communicationOverdue
       ? contactMinutes === null
         ? 'No staff contact logged'
-        : `Contact overdue · ${formatCommunicationDuration(contactMinutes)}`
+        : `Contact overdue Â· ${formatCommunicationDuration(contactMinutes)}`
       : null,
     tone,
     timer,
@@ -293,7 +293,7 @@ export function buildPatientCommunicationStatusBoard(
       ? 'No waiting patients to track for communication status.'
       : overdueCount
         ? `${overdueCount} of ${rows.length} waiting patients need staff contact.`
-        : `${rows.length} waiting patients — communication checkpoints current.`;
+        : `${rows.length} waiting patients â€” communication checkpoints current.`;
 
   return Object.freeze({
     rows,

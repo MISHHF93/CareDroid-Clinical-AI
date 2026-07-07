@@ -137,7 +137,7 @@ class OfflineDB {
   // Sync individual item
   async syncItem(item) {
     if (!isBackendCapabilityEnabled('bulkSync')) {
-      logger.info('[OfflineDB] Bulk sync API not available — keeping item in queue');
+      logger.info('[OfflineDB] Bulk sync API not available â€” keeping item in queue');
       const fallback = makeBulkSyncDisabledResponse(1);
       reportApiError({
         title: 'Bulk sync unavailable',

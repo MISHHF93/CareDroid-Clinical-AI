@@ -171,7 +171,7 @@ function minutesSince(timestamp?: string | null, now = new Date()): number {
   return Math.max(0, Math.round((now.getTime() - parsed) / 60000));
 }
 
-export function formatDurationLabel(minutes: number, { unknownLabel = '—' }: any = {}): string {
+export function formatDurationLabel(minutes: number, { unknownLabel = 'â€”' }: any = {}): string {
   if (!Number.isFinite(minutes)) return unknownLabel;
   if (minutes === Number.POSITIVE_INFINITY) return unknownLabel;
   if (minutes < 1) return '<1m';
@@ -182,9 +182,9 @@ export function formatDurationLabel(minutes: number, { unknownLabel = '—' }: any
 }
 
 function formatClockTime(isoTime?: string | null): string {
-  if (!isoTime) return '—';
+  if (!isoTime) return 'â€”';
   const date = new Date(isoTime);
-  if (!Number.isFinite(date.getTime())) return '—';
+  if (!Number.isFinite(date.getTime())) return 'â€”';
   return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 }
 
@@ -209,7 +209,7 @@ function hasFlag(patient: Patient, flag: PatientFlag): boolean {
 
 export function deriveTriageLevelLabel(patient: Patient): string | null {
   if (!patient.triageTime || !patient.priority) return null;
-  return `${patient.priority} · ${PriorityLabel[patient.priority]}`;
+  return `${patient.priority} Â· ${PriorityLabel[patient.priority]}`;
 }
 
 export function deriveHighRiskComplaintFlags(patient: Patient): string[] {
@@ -248,13 +248,13 @@ export function deriveProviderWaitingStatus(
 
   if (!patient.lastAssessedTime) {
     return {
-      label: assigneeName ? `Assigned · ${assigneeName}` : 'Assigned · not seen',
+      label: assigneeName ? `Assigned Â· ${assigneeName}` : 'Assigned Â· not seen',
       tone: 'warning',
     };
   }
 
   return {
-    label: assigneeName ? `Return · ${assigneeName}` : 'Return · awaiting provider',
+    label: assigneeName ? `Return Â· ${assigneeName}` : 'Return Â· awaiting provider',
     tone: 'info',
   };
 }

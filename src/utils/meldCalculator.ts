@@ -1,21 +1,21 @@
 /**
- * MELD and MELD-Na — liver disease severity indices (allocation-era laboratory model).
+ * MELD and MELD-Na â€” liver disease severity indices (allocation-era laboratory model).
  *
- * MELD: Kamath PS et al. Hepatology. 2001;33(2):464–470; UNOS laboratory MELD.
- * MELD-Na: Kim WR et al. Hepatology. 2008;48(3):997–1005; UNOS sodium adjustment (2016 policy).
+ * MELD: Kamath PS et al. Hepatology. 2001;33(2):464â€“470; UNOS laboratory MELD.
+ * MELD-Na: Kim WR et al. Hepatology. 2008;48(3):997â€“1005; UNOS sodium adjustment (2016 policy).
  *
- * Decision support only — not for transplant listing recommendations.
+ * Decision support only â€” not for transplant listing recommendations.
  */
 
 import { bilirubinUmolLToMgDl } from './childPughCalculator';
 
 /** Safe display for lab breakdown rows (avoids throwing on non-finite edge values). */
 export function formatMeldLabValue(value, decimals = 2) {
-  if (!Number.isFinite(value)) return '—';
+  if (!Number.isFinite(value)) return 'â€”';
   return value.toFixed(decimals);
 }
 
-/** µmol/L ? mg/dL (creatinine) */
+/** Âµmol/L ? mg/dL (creatinine) */
 export function creatinineUmolLToMgDl(umolL) {
   if (!Number.isFinite(umolL)) return NaN;
   return umolL / 88.4;
@@ -46,7 +46,7 @@ export function applyMeldLabClamps(labs) {
 
 /**
  * @param {{ bilirubinMgDl: number, inr: number, creatinineMgDl: number, onDialysis?: boolean }} labs
- * @returns {number|null} integer 6–40 typical; null if inputs invalid
+ * @returns {number|null} integer 6â€“40 typical; null if inputs invalid
  */
 export function calculateMeldScore(labs) {
   if (
@@ -81,8 +81,8 @@ export function clampMeldSodiumMmolL(na) {
 
 /**
  * MELD-Na with UNOS sodium adjustment; result is not below the laboratory MELD used for allocation math.
- * @param {number} meldScore — laboratory MELD before sodium step
- * @param {number} sodiumMmolL — serum sodium (mEq/L)
+ * @param {number} meldScore â€” laboratory MELD before sodium step
+ * @param {number} sodiumMmolL â€” serum sodium (mEq/L)
  */
 export function calculateMeldNaScore(meldScore, sodiumMmolL) {
   if (!Number.isFinite(meldScore) || !Number.isFinite(sodiumMmolL)) return null;
@@ -149,7 +149,7 @@ export function interpretMeldScores(meld, meldNa = null) {
   if (!Number.isFinite(meld)) return null;
 
   const referenceLine =
-    'Kamath PS et al. Hepatology. 2001;33(2):464–470; Kim WR et al. Hepatology. 2008;48(3):997–1005; UNOS policy summaries.';
+    'Kamath PS et al. Hepatology. 2001;33(2):464â€“470; Kim WR et al. Hepatology. 2008;48(3):997â€“1005; UNOS policy summaries.';
 
   const scoreForBand = meldNa !== null && Number.isFinite(meldNa) ? meldNa : meld;
 
@@ -161,7 +161,7 @@ export function interpretMeldScores(meld, meldNa = null) {
     severity = 'critical';
     mortalityBand = 'Very high 90-day mortality signal (historical cohort)';
     interpretation =
-      'Scores in this range have been associated with very high short-term mortality in historical transplant-era cohorts. Use for severity context only — not for transplant candidacy or listing decisions on this screen.';
+      'Scores in this range have been associated with very high short-term mortality in historical transplant-era cohorts. Use for severity context only â€” not for transplant candidacy or listing decisions on this screen.';
   } else if (scoreForBand >= 30) {
     severity = 'critical';
     mortalityBand = 'High 90-day mortality signal (historical cohort)';
@@ -171,12 +171,12 @@ export function interpretMeldScores(meld, meldNa = null) {
     severity = 'warning';
     mortalityBand = 'Moderately increased 90-day mortality signal';
     interpretation =
-      'Scores 20–29 fall in a moderate-risk band in historical MELD cohorts. Interpret alongside ascites, encephalopathy, infection, and acute-on-chronic liver failure.';
+      'Scores 20â€“29 fall in a moderate-risk band in historical MELD cohorts. Interpret alongside ascites, encephalopathy, infection, and acute-on-chronic liver failure.';
   } else if (scoreForBand >= 10) {
     severity = 'normal';
-    mortalityBand = 'Lower–intermediate 90-day mortality signal';
+    mortalityBand = 'Lowerâ€“intermediate 90-day mortality signal';
     interpretation =
-      'Scores 10–19 are generally lower than higher MELD bands but do not exclude serious decompensation. Continue clinical monitoring.';
+      'Scores 10â€“19 are generally lower than higher MELD bands but do not exclude serious decompensation. Continue clinical monitoring.';
   } else {
     severity = 'normal';
     mortalityBand = 'Lower 90-day mortality signal (historical cohort)';
@@ -220,7 +220,7 @@ export function validateMeldInputs(raw, opts: any = {}) {
 
   if (!biliStr) errors.push('Enter total bilirubin.');
   if (!inrStr) errors.push('Enter INR.');
-  if (!raw.onDialysis && !crStr) errors.push('Enter serum creatinine or mark dialysis (=2×/week).');
+  if (!raw.onDialysis && !crStr) errors.push('Enter serum creatinine or mark dialysis (=2Ã—/week).');
   if (requireSodium && !naStr) errors.push('Enter serum sodium for MELD-Na.');
 
   const labs = meldLabsFromInputs(raw);
@@ -243,7 +243,7 @@ export function validateMeldInputs(raw, opts: any = {}) {
   if (naStr && !Number.isFinite(labs.sodiumMmolL)) {
     errors.push('Sodium must be a valid number.');
   } else if (naStr && ((labs.sodiumMmolL as any) < 100 || (labs.sodiumMmolL as any) > 180)) {
-    errors.push('Sodium should be between 100 and 180 mEq/L (values are clamped to 125–140 for MELD-Na).');
+    errors.push('Sodium should be between 100 and 180 mEq/L (values are clamped to 125â€“140 for MELD-Na).');
   }
 
   return { ok: errors.length === 0, errors, labs };

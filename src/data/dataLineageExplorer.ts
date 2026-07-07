@@ -82,7 +82,7 @@ function makeFlow({
       transformations: transformations.input,
       timestamp: timestamps.input,
       metadata: {
-        route: inventory?.route || inventory?.navigationPath || '—',
+        route: inventory?.route || inventory?.navigationPath || 'â€”',
         sourceKind: inventory?.sourceKind || 'inventory',
       },
     }),
@@ -105,8 +105,8 @@ function makeFlow({
       timestamp: timestamps.tool,
       metadata: {
         inventoryId,
-        launchType: inventory?.launchType || '—',
-        executorStatus: inventory?.executorStatus || '—',
+        launchType: inventory?.launchType || 'â€”',
+        executorStatus: inventory?.executorStatus || 'â€”',
       },
     }),
     lineageStage({
@@ -115,9 +115,9 @@ function makeFlow({
       transformations: transformations.backend,
       timestamp: timestamps.backend,
       metadata: {
-        apiClient: frontendCall?.client || inventory?.apiClient || '—',
-        controller: backendRoute?.controller || '—',
-        service: backendRoute?.controller?.replace(/Controller$/, 'Service') || '—',
+        apiClient: frontendCall?.client || inventory?.apiClient || 'â€”',
+        controller: backendRoute?.controller || 'â€”',
+        service: backendRoute?.controller?.replace(/Controller$/, 'Service') || 'â€”',
       },
     }),
     lineageStage({

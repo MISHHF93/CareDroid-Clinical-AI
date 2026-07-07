@@ -44,7 +44,7 @@ describe('receptionEscalationWorkflow', () => {
 
   it('builds triage and charge target labels', () => {
     expect(buildReceptionEscalationTargetsLabel(['triage', 'charge'])).toBe(
-      'Triage nurse · Charge nurse',
+      'Triage nurse Â· Charge nurse',
     );
   });
 
@@ -89,7 +89,7 @@ describe('receptionEscalationWorkflow', () => {
       {
         id: 'a1',
         severity: 'Critical',
-        title: 'Reception escalation — Collapse / distress',
+        title: 'Reception escalation â€” Collapse / distress',
         message: 'Waiting room',
         createdAt: '2026-06-20T10:00:00.000Z',
         dismissed: false,
@@ -100,7 +100,7 @@ describe('receptionEscalationWorkflow', () => {
       {
         id: 'a2',
         severity: 'Warning',
-        title: 'Reception escalation — Duplicate registration',
+        title: 'Reception escalation â€” Duplicate registration',
         message: 'Desk',
         createdAt: '2026-06-20T09:50:00.000Z',
         dismissed: false,
@@ -128,7 +128,7 @@ describe('receptionEscalationWorkflow', () => {
       {
         id: 'a1',
         severity: 'Critical',
-        title: 'Reception escalation — Collapse / distress',
+        title: 'Reception escalation â€” Collapse / distress',
         message: 'Waiting room',
         createdAt: '2026-06-20T10:00:00.000Z',
         dismissed: false,
@@ -139,7 +139,7 @@ describe('receptionEscalationWorkflow', () => {
       {
         id: 'a2',
         severity: 'Warning',
-        title: 'Reception escalation — Duplicate registration',
+        title: 'Reception escalation â€” Duplicate registration',
         message: 'Desk',
         createdAt: '2026-06-20T09:50:00.000Z',
         dismissed: false,
@@ -160,7 +160,7 @@ describe('receptionEscalationWorkflow', () => {
       {
         id: 'a1',
         severity: 'Critical',
-        title: 'Reception escalation — Urgent triage',
+        title: 'Reception escalation â€” Urgent triage',
         message: 'Desk',
         createdAt: '2026-06-20T10:00:00.000Z',
         dismissed: false,

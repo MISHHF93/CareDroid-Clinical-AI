@@ -29,7 +29,7 @@ export default function QueueReasonBadge({
             ]
               .filter(Boolean)
               .join(' ')}
-            title={[reason.label, reason.staffDetail].filter(Boolean).join(' · ')}
+            title={[reason.label, reason.staffDetail].filter(Boolean).join(' Â· ')}
           >
             {compact ? reason.shortLabel : reason.label}
           </span>
@@ -53,7 +53,7 @@ export default function QueueReasonBadge({
         reasons.length > 1 ? `Also: ${reasons.slice(1).map((reason) => reason.label).join(', ')}` : null,
       ]
         .filter(Boolean)
-        .join(' · ')}
+        .join(' Â· ')}
     >
       {compact ? primaryReason.shortLabel : primaryReason.label}
     </span>

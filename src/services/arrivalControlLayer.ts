@@ -405,7 +405,7 @@ export function registerNewArrival(
   if (complaintPatch.highRiskComplaintFlags?.length) {
     store.recordWorkflowAction?.({
       type: 'high_risk_complaint_flagged',
-      summary: `High-risk complaint flags: ${collectHighRiskComplaintLabels(workingPatient).join(', ')}. Rapid review queue — staff triage required.`,
+      summary: `High-risk complaint flags: ${collectHighRiskComplaintLabels(workingPatient).join(', ')}. Rapid review queue â€” staff triage required.`,
       patientId,
       source: options.source || 'high-risk-complaint-flags',
       metadata: {

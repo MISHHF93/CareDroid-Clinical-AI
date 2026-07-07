@@ -185,7 +185,7 @@ function detectSteps(
   ) {
     steps.push({
       id: 'triage-needed',
-      staffDetail: `Internal ${patient.state} · ${queueDestination}`,
+      staffDetail: `Internal ${patient.state} Â· ${queueDestination}`,
     });
   }
 
@@ -198,8 +198,8 @@ function detectSteps(
     steps.push({
       id: 'reassessment-due',
       staffDetail: timer.isOverdue
-        ? `Reassessment overdue · last ${timer.lastReassessmentAgeLabel}`
-        : `Reassessment due · ${timer.dueInLabel}`,
+        ? `Reassessment overdue Â· last ${timer.lastReassessmentAgeLabel}`
+        : `Reassessment due Â· ${timer.dueInLabel}`,
     });
   }
 
@@ -209,14 +209,14 @@ function detectSteps(
   ) {
     steps.push({
       id: 'admission-decision-pending',
-      staffDetail: `Internal ${patient.state} · bed placement workflow`,
+      staffDetail: `Internal ${patient.state} Â· bed placement workflow`,
     });
   }
 
   if (patient.state === PatientState.Disposition || patient.state === PatientState.Discharge) {
     steps.push({
       id: 'discharge-workflow-pending',
-      staffDetail: `Internal ${patient.state} · departure planning`,
+      staffDetail: `Internal ${patient.state} Â· departure planning`,
     });
   }
 
@@ -224,14 +224,14 @@ function detectSteps(
   if (referral) {
     steps.push({
       id: 'referral-pending',
-      staffDetail: `Referral ${referral.status}${referral.service || referral.targetDepartment ? ` · ${referral.service || referral.targetDepartment}` : ''}`,
+      staffDetail: `Referral ${referral.status}${referral.service || referral.targetDepartment ? ` Â· ${referral.service || referral.targetDepartment}` : ''}`,
     });
   }
 
   if (patient.state === PatientState.Results) {
     steps.push({
       id: 'result-review-pending',
-      staffDetail: 'Results returned · clinician review outstanding',
+      staffDetail: 'Results returned Â· clinician review outstanding',
     });
   }
 
@@ -268,7 +268,7 @@ function detectSteps(
   ) {
     steps.push({
       id: 'triage-needed',
-      staffDetail: `Registration complete · route to triage (${queueDestination})`,
+      staffDetail: `Registration complete Â· route to triage (${queueDestination})`,
     });
   }
 
@@ -343,7 +343,7 @@ export function buildWhatHappensNextCopilotLines(
     const snapshot = resolveWhatHappensNext(selected, context);
     if (snapshot) {
       lines.push(
-        `Selected patient next step: ${snapshot.label} — ${snapshot.guidance} (${snapshot.staffDetail})`,
+        `Selected patient next step: ${snapshot.label} â€” ${snapshot.guidance} (${snapshot.staffDetail})`,
       );
       if (snapshot.secondarySteps.length) {
         lines.push(
@@ -375,7 +375,7 @@ export function buildWhatHappensNextCopilotLines(
     lines.push('What happens next queue (staff guidance, human review required):');
     queue.forEach(({ patient, snapshot }) => {
       lines.push(
-        `- ${patient.firstName} ${patient.lastName} (${patient.state}): ${snapshot.label} — ${snapshot.guidance}`,
+        `- ${patient.firstName} ${patient.lastName} (${patient.state}): ${snapshot.label} â€” ${snapshot.guidance}`,
       );
     });
   }

@@ -31,9 +31,9 @@ export default function DeteriorationWatchBadge({
       ]
         .filter(Boolean)
         .join(' ')}
-      title={[snap.label, 'Advisory only — staff re-review required', snap.staffDetail]
+      title={[snap.label, 'Advisory only â€” staff re-review required', snap.staffDetail]
         .filter(Boolean)
-        .join(' · ')}
+        .join(' Â· ')}
     >
       {compact ? `Watch ${snap.shortLabel}` : `${snap.label} (advisory)`}
     </span>

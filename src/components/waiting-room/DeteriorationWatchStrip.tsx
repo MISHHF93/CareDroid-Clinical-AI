@@ -48,7 +48,7 @@ export default function DeteriorationWatchStrip({
           <p className="deterioration-watch-strip__eyebrow">Operational advisory</p>
           <h3>Deterioration watch</h3>
           <p className="deterioration-watch-strip__subtitle">
-            Patients who may need staff re-review based on vitals, reassessment delays, high-risk complaint, and EMS/intake observations — advisory only.
+            Patients who may need staff re-review based on vitals, reassessment delays, high-risk complaint, and EMS/intake observations â€” advisory only.
           </p>
         </div>
       </header>

@@ -1,5 +1,5 @@
 /**
- * Patient queue reason layer — for every waiting or queued patient, derive why they
+ * Patient queue reason layer â€” for every waiting or queued patient, derive why they
  * remain in the operational queue (staff-facing only; not shown on public displays).
  */
 import { isEmsRegistrationPatient } from '../components/reception/receptionQueueModel';
@@ -197,32 +197,32 @@ function defaultQueueReason(
     case PatientState.Disposition:
       return {
         id: 'discharge-paperwork-pending',
-        staffDetail: 'Disposition queue · discharge paperwork outstanding',
+        staffDetail: 'Disposition queue Â· discharge paperwork outstanding',
       };
     case PatientState.Admission:
       return {
         id: 'admission-bed-pending',
-        staffDetail: 'Admission queue · inpatient bed placement',
+        staffDetail: 'Admission queue Â· inpatient bed placement',
       };
     case PatientState.Results:
       return {
         id: 'result-pending',
-        staffDetail: 'Results returned · clinician review outstanding',
+        staffDetail: 'Results returned Â· clinician review outstanding',
       };
     case PatientState.Orders:
       return {
         id: 'result-pending',
-        staffDetail: 'Orders placed · awaiting results',
+        staffDetail: 'Orders placed Â· awaiting results',
       };
     case PatientState.Assessment:
       return {
         id: 'room-pending',
-        staffDetail: 'Assessment queue · treatment space required',
+        staffDetail: 'Assessment queue Â· treatment space required',
       };
     case PatientState.Waiting:
       return {
         id: 'provider-pending',
-        staffDetail: 'Waiting room queue · clinician visit pending',
+        staffDetail: 'Waiting room queue Â· clinician visit pending',
       };
     case PatientState.Triage:
       return {
@@ -238,7 +238,7 @@ function defaultQueueReason(
     default:
       return {
         id: 'triage-pending',
-        staffDetail: `Operational queue · ${patient.state}`,
+        staffDetail: `Operational queue Â· ${patient.state}`,
       };
   }
 }
@@ -265,7 +265,7 @@ function detectReasons(
   ) {
     reasons.push({
       id: 'verification-incomplete',
-      staffDetail: `Identity verification lane · ${queueDestination}`,
+      staffDetail: `Identity verification lane Â· ${queueDestination}`,
     });
   }
 
@@ -280,7 +280,7 @@ function detectReasons(
   ) {
     reasons.push({
       id: 'triage-pending',
-      staffDetail: `Awaiting triage · ${queueDestination}`,
+      staffDetail: `Awaiting triage Â· ${queueDestination}`,
     });
   }
 
@@ -290,7 +290,7 @@ function detectReasons(
   ) {
     reasons.push({
       id: 'admission-bed-pending',
-      staffDetail: `Inpatient bed placement · ${patient.state}`,
+      staffDetail: `Inpatient bed placement Â· ${patient.state}`,
     });
   }
 
@@ -298,21 +298,21 @@ function detectReasons(
   if (referral) {
     reasons.push({
       id: 'referral-pending',
-      staffDetail: `Referral ${referral.status}${referral.service || referral.targetDepartment ? ` · ${referral.service || referral.targetDepartment}` : ''}`,
+      staffDetail: `Referral ${referral.status}${referral.service || referral.targetDepartment ? ` Â· ${referral.service || referral.targetDepartment}` : ''}`,
     });
   }
 
   if (patient.state === PatientState.Disposition) {
     reasons.push({
       id: 'discharge-paperwork-pending',
-      staffDetail: 'Disposition queue · discharge paperwork and instructions',
+      staffDetail: 'Disposition queue Â· discharge paperwork and instructions',
     });
   }
 
   if (patient.state === PatientState.Results) {
     reasons.push({
       id: 'result-pending',
-      staffDetail: 'Results returned · review outstanding',
+      staffDetail: 'Results returned Â· review outstanding',
     });
   } else if (patient.state === PatientState.Orders || pendingResultCount(patient) > 0) {
     reasons.push({
@@ -325,7 +325,7 @@ function detectReasons(
     reasons.push({
       id: 'room-pending',
       staffDetail: patient.fitToWaitClassification?.id
-        ? `Fit-to-wait · ${patient.fitToWaitClassification.label || patient.fitToWaitClassification.id}`
+        ? `Fit-to-wait Â· ${patient.fitToWaitClassification.label || patient.fitToWaitClassification.id}`
         : 'Treatment room not assigned',
     });
   }
@@ -342,7 +342,7 @@ function detectReasons(
       reasons.push({
         id: 'provider-pending',
         staffDetail: needsClinicianReview(patient, now)
-          ? `Reassessment due · ${provider.label}`
+          ? `Reassessment due Â· ${provider.label}`
           : provider.label,
       });
     }
@@ -357,7 +357,7 @@ function detectReasons(
   ) {
     reasons.push({
       id: 'triage-pending',
-      staffDetail: `Route to triage · ${queueDestination}`,
+      staffDetail: `Route to triage Â· ${queueDestination}`,
     });
   }
 

@@ -187,7 +187,7 @@ export function buildWaitingRoomAlertMetrics({
     label: 'Reception escalation',
     value: reception.summary.activeCount,
     tone: reception.summary.criticalCount ? 'critical' : reception.summary.activeCount ? 'warning' : 'success',
-    hint: `${reception.summary.triageCount} triage · ${reception.summary.chargeCount} charge`,
+    hint: `${reception.summary.triageCount} triage Â· ${reception.summary.chargeCount} charge`,
     patientId: reception.previewRows[0]?.patientId,
     priority: reception.summary.criticalCount ? 0 : 1,
   });
@@ -209,7 +209,7 @@ export function capWhiteboardAlertMetrics(
     label: 'More signals',
     value: overflow,
     tone: 'neutral',
-    hint: `${overflow} additional waiting-room signals — open safety board below`,
+    hint: `${overflow} additional waiting-room signals â€” open safety board below`,
     priority: 99,
   });
   return visible;

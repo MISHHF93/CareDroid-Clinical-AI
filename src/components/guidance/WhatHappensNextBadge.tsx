@@ -32,7 +32,7 @@ export default function WhatHappensNextBadge({
           : null,
       ]
         .filter(Boolean)
-        .join(' · ')}
+        .join(' Â· ')}
     >
       {compact ? `Next: ${snapshot.shortLabel}` : `Next: ${snapshot.label}`}
     </span>

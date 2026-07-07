@@ -44,7 +44,7 @@ describe('AutoScorePopulator', () => {
     });
     expect(result.fields.history.status).toBe('requires-assessment');
     expect(result.fields.ecg.status).toBe('requires-assessment');
-    expect(result.bannerSummary).toBe('3 fields filled · 2 require assessment');
+    expect(result.bannerSummary).toBe('3 fields filled Â· 2 require assessment');
   });
 
   it('pre-populates qSOFA objective vitals and leaves mentation for assessment', () => {

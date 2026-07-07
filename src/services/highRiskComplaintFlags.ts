@@ -6,7 +6,7 @@ import {
   type QueueDestination,
 } from '../types/emergency';
 
-/** Canonical high-risk complaint fast-flag identifiers — staff alert only, no auto-triage. */
+/** Canonical high-risk complaint fast-flag identifiers â€” staff alert only, no auto-triage. */
 export type HighRiskComplaintFlagId =
   | 'chest-pain'
   | 'shortness-of-breath'
@@ -299,7 +299,7 @@ export function deriveHighRiskComplaintQueueDestination(
   return null;
 }
 
-/** Applies fast flags and operational routing — never changes clinical priority / CTAS. */
+/** Applies fast flags and operational routing â€” never changes clinical priority / CTAS. */
 export function buildHighRiskComplaintPatch(
   patient: Partial<Patient> & {
     chiefComplaint?: string;
@@ -372,9 +372,9 @@ export function buildHighRiskComplaintAlerts(
         type: 'Clinical',
         severity: (needsReview ? 'Critical' : 'Warning') as import('../types/emergency').AlertSeverity,
         title: needsReview
-          ? `Rapid review needed — ${displayName}`
-          : `High-risk complaint — ${displayName}`,
-        message: `${labels.join(', ')}. Staff review required — fast flags do not assign triage level.`,
+          ? `Rapid review needed â€” ${displayName}`
+          : `High-risk complaint â€” ${displayName}`,
+        message: `${labels.join(', ')}. Staff review required â€” fast flags do not assign triage level.`,
         patientId: patient.id,
         createdAt: patient.arrivalTime || now.toISOString(),
         dismissed: false,
@@ -460,7 +460,7 @@ export type HighRiskComplaintFlagStore = {
 
 /**
  * Applies staff-selected and text-detected fast flags.
- * Operational routing only — never changes clinical priority / CTAS.
+ * Operational routing only â€” never changes clinical priority / CTAS.
  */
 export function applyHighRiskComplaintFlags(
   store: HighRiskComplaintFlagStore,
@@ -487,7 +487,7 @@ export function applyHighRiskComplaintFlags(
   const labels = patch.highRiskComplaintFlags.map((record) => record.label);
   store.recordWorkflowAction?.({
     type: 'high_risk_complaint_flagged',
-    summary: `High-risk complaint flags: ${labels.join(', ')}. Staff review required — fast flags do not assign triage level.`,
+    summary: `High-risk complaint flags: ${labels.join(', ')}. Staff review required â€” fast flags do not assign triage level.`,
     patientId,
     source: options.source || 'high-risk-complaint-flags',
     metadata: {

@@ -1,10 +1,10 @@
 /**
- * GAD-7 — Generalized Anxiety Disorder 7-item anxiety symptom screen (0–21).
+ * GAD-7 â€” Generalized Anxiety Disorder 7-item anxiety symptom screen (0â€“21).
  *
- * Reference: Spitzer RL, Kroenke K, Williams JB, Löwe B. A brief measure for assessing
- * generalized anxiety disorder: the GAD-7. Arch Intern Med. 2006;166(10):1092–1097.
+ * Reference: Spitzer RL, Kroenke K, Williams JB, LÃ¶we B. A brief measure for assessing
+ * generalized anxiety disorder: the GAD-7. Arch Intern Med. 2006;166(10):1092â€“1097.
  *
- * Screening / decision support only — does not diagnose anxiety disorders or recommend medications.
+ * Screening / decision support only â€” does not diagnose anxiety disorders or recommend medications.
  */
 
 /** @typedef {'none_minimal' | 'mild' | 'moderate' | 'severe'} Gad7SeverityCategory */
@@ -72,10 +72,10 @@ export function categorizeGad7Severity(score) {
 }
 
 const SEVERITY_LABELS = {
-  none_minimal: 'Minimal (0–4)',
-  mild: 'Mild (5–9)',
-  moderate: 'Moderate (10–14)',
-  severe: 'Severe (15–21)',
+  none_minimal: 'Minimal (0â€“4)',
+  mild: 'Mild (5â€“9)',
+  moderate: 'Moderate (10â€“14)',
+  severe: 'Severe (15â€“21)',
 };
 
 /**
@@ -88,10 +88,10 @@ export function interpretGad7Score(total) {
   if (!severityCategory) return null;
 
   const referenceLine =
-    'Spitzer RL, Kroenke K, Williams JB, Löwe B. A brief measure for assessing generalized anxiety disorder: the GAD-7. Arch Intern Med. 2006;166(10):1092–1097.';
+    'Spitzer RL, Kroenke K, Williams JB, LÃ¶we B. A brief measure for assessing generalized anxiety disorder: the GAD-7. Arch Intern Med. 2006;166(10):1092â€“1097.';
 
   const severityLabel = SEVERITY_LABELS[severityCategory];
-  const label = `GAD-7 total ${total}/21 — ${severityLabel} anxiety symptom severity range`;
+  const label = `GAD-7 total ${total}/21 â€” ${severityLabel} anxiety symptom severity range`;
 
   let uiSeverity = 'normal';
   if (severityCategory === 'moderate') uiSeverity = 'warning';
@@ -100,7 +100,7 @@ export function interpretGad7Score(total) {
   const severeSymptoms = severityCategory === 'severe';
 
   const interpretation = severeSymptoms
-    ? `Total score ${total}/21 falls in the ${severityLabel} range on this symptom screen and usually warrants prompt clinical evaluation per institutional guidance. Higher scores suggest more frequent anxiety symptoms over the past two weeks; use clinical judgment and local pathways for follow-up. If suicidal thoughts are present, follow suicide-risk protocols — this screen does not assess self-harm.`
+    ? `Total score ${total}/21 falls in the ${severityLabel} range on this symptom screen and usually warrants prompt clinical evaluation per institutional guidance. Higher scores suggest more frequent anxiety symptoms over the past two weeks; use clinical judgment and local pathways for follow-up. If suicidal thoughts are present, follow suicide-risk protocols â€” this screen does not assess self-harm.`
     : `Total score ${total}/21 falls in the ${severityLabel} range on this symptom screen. Higher scores suggest more frequent anxiety symptoms over the past two weeks; use clinical judgment and local pathways for follow-up.`;
 
   const moderateSymptoms = severityCategory === 'moderate';
@@ -108,7 +108,7 @@ export function interpretGad7Score(total) {
   const acuteDistressSafetyAlert = severeSymptoms
     ? {
         elevated: true,
-        headline: 'Elevated anxiety symptom burden — consider urgent evaluation',
+        headline: 'Elevated anxiety symptom burden â€” consider urgent evaluation',
         message:
           'Severe-range scores warrant prompt clinical follow-up. For acute panic, overwhelming distress, or inability to function safely, follow local psychiatric emergency pathways. If the patient has thoughts of self-harm or suicide, urgent safety assessment is required (e.g. 988 Suicide & Crisis Lifeline in the U.S. when applicable). This calculator does not provide emergency services or treatment recommendations.',
       }
@@ -123,7 +123,7 @@ export function interpretGad7Score(total) {
       ? {
           warranted: true,
           message:
-            'Moderate-range scores on this screen often warrant clinical follow-up per institutional guidance. This tool does not establish an anxiety disorder diagnosis. A low or moderate score does not rule out suicide risk — use PHQ-9 question 9 and local suicide-risk pathways when self-harm is a concern.',
+            'Moderate-range scores on this screen often warrant clinical follow-up per institutional guidance. This tool does not establish an anxiety disorder diagnosis. A low or moderate score does not rule out suicide risk â€” use PHQ-9 question 9 and local suicide-risk pathways when self-harm is a concern.',
         }
       : { warranted: false, message: null };
 

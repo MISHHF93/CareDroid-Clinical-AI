@@ -67,20 +67,20 @@ export function summarizeDisplayRefreshErrors(
   const messages = Object.entries(result.errors)
     .map(([key, message]) => (message ? `${key}: ${message}` : null))
     .filter((entry): entry is string => Boolean(entry));
-  return messages.length ? messages.join(' · ') : null;
+  return messages.length ? messages.join(' Â· ') : null;
 }
 
 export function formatDisplayUpdatedAt(
   timestamp: string | null | undefined,
   now = new Date(),
 ): string {
-  if (!timestamp) return '—';
+  if (!timestamp) return 'â€”';
   try {
     const parsed = new Date(timestamp);
-    if (!Number.isFinite(parsed.getTime())) return '—';
+    if (!Number.isFinite(parsed.getTime())) return 'â€”';
     return parsed.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
   } catch {
-    return '—';
+    return 'â€”';
   }
 }
 
@@ -151,7 +151,7 @@ export function buildDepartmentStatusFallbackSnapshot(
       },
     ],
     updatedAt,
-    summaryLine: 'Live department metrics are temporarily unavailable — staff are restoring the feed.',
+    summaryLine: 'Live department metrics are temporarily unavailable â€” staff are restoring the feed.',
   };
 }
 

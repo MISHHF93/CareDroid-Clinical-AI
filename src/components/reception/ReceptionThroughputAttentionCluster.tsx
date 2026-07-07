@@ -3,7 +3,7 @@ import ReceptionAlertRail from './ReceptionAlertRail';
 import './ReceptionThroughputAttentionCluster.css';
 
 /**
- * Reception desk throughput awareness — compact alert rail for front-desk staff.
+ * Reception desk throughput awareness â€” compact alert rail for front-desk staff.
  */
 export default function ReceptionThroughputAttentionCluster({
   patients = [] as any[],

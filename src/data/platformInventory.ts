@@ -1,5 +1,5 @@
 /**
- * Reverse-engineered platform inventory — counts and lists derived from shipped source.
+ * Reverse-engineered platform inventory â€” counts and lists derived from shipped source.
  * Used by README audit section and drift tests (`platformInventory.test.ts`).
  */
 
@@ -161,7 +161,7 @@ export function formatPlatformInventoryMarkdown(inv = getPlatformInventory()) {
     .join('\n');
 
   const calcList = inv.builtinCalculators
-    .map((row) => `- **${row.name}** (\`${row.slug}\`) — \`${row.path}\``)
+    .map((row) => `- **${row.name}** (\`${row.slug}\`) â€” \`${row.path}\``)
     .join('\n');
 
   const hubOnly = inv.nluHubOnlyProfiles.map((id) => `\`${id}\``).join(', ');
@@ -172,7 +172,7 @@ export function formatPlatformInventoryMarkdown(inv = getPlatformInventory()) {
     .join('\n');
 
   const spaAreas = inv.spaFeatureAreas
-    .map((a) => `- **${a.area}** — ${a.routes.map((r) => `\`${r}\``).join(', ')}`)
+    .map((a) => `- **${a.area}** â€” ${a.routes.map((r) => `\`${r}\``).join(', ')}`)
     .join('\n');
 
   return `## Platform inventory
@@ -202,13 +202,13 @@ ${tierRows}
 
 **Tier semantics**
 
-- **A** — Dedicated calculator form in \`Calculators.tsx\` (client-side scoring).
-- **B** — Chat-assisted from calculators hub (structured chat seed, no standalone form).
-- **C** — Full page + registered POST \`/api/tools/:id/execute\` (SOFA, drug checker, lab interpreter).
-- **clinical-page** — Protocols, diagnosis assistant, procedure guide (chat via \`POST /api/chat/message\`).
-- **fleet-A** — Fleet operations pages under \`/fleet/*\`.
-- **fleet-B** — Dispatch intelligence (chat-assisted via hub).
-- **hub** — Calculators overview (\`/tools/calculators\`).
+- **A** â€” Dedicated calculator form in \`Calculators.tsx\` (client-side scoring).
+- **B** â€” Chat-assisted from calculators hub (structured chat seed, no standalone form).
+- **C** â€” Full page + registered POST \`/api/tools/:id/execute\` (SOFA, drug checker, lab interpreter).
+- **clinical-page** â€” Protocols, diagnosis assistant, procedure guide (chat via \`POST /api/chat/message\`).
+- **fleet-A** â€” Fleet operations pages under \`/fleet/*\`.
+- **fleet-B** â€” Dispatch intelligence (chat-assisted via hub).
+- **hub** â€” Calculators overview (\`/tools/calculators\`).
 
 ### Built-in calculator forms (${c.builtinCalculatorForms})
 

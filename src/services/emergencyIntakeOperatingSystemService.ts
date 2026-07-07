@@ -993,7 +993,7 @@ function buildPreTriageQueue() {
         Object.freeze({
           patientId: patient.patientId,
           displayName: patient.displayName,
-          demographicSummary: `${patient.age} · ${patient.arrivalMode}`,
+          demographicSummary: `${patient.age} Â· ${patient.arrivalMode}`,
           queuePosition: DEMO_PATIENTS.indexOf(patient) + 1,
           arrivalOrIntakeTimestamp: `${patient.arrivalMinutesAgo} min ago`,
           complaint: patient.complaint,

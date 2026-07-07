@@ -31,7 +31,7 @@ export default function DuplicateReviewAlert({
         {candidates.slice(0, 3).map((candidate) => (
           <li key={candidate.patientId}>
             <span>
-              {candidate.displayName} · {candidate.matchScore}% ·{' '}
+              {candidate.displayName} Â· {candidate.matchScore}% Â·{' '}
               {duplicateActionLabel(candidate.recommendedAction)}
             </span>
             {onOpenPatient ? (

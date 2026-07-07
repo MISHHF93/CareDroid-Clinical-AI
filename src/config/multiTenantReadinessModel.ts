@@ -1,5 +1,5 @@
 /**
- * Multi-tenant readiness audit — verify org-scoped configuration for
+ * Multi-tenant readiness audit â€” verify org-scoped configuration for
  * settings, branding, thresholds, integrations, and roles.
  * Node-safe; mirrors live storage and API paths.
  */

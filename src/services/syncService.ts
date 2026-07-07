@@ -155,7 +155,7 @@ class SyncService {
   async syncMessages(messages, token) {
     if (messages.length === 0) return;
     if (!isBackendCapabilityEnabled('chatPersistence')) {
-      logger.info('Skipping message sync — chat persistence API not available on server');
+      logger.info('Skipping message sync â€” chat persistence API not available on server');
       const fallback = makeDisabledCapabilityResponse('chatPersistence', '/api/chat/messages', {
         synced: 0,
         queued: messages.length,
@@ -231,7 +231,7 @@ class SyncService {
   async syncConversations(conversations, token) {
     if (conversations.length === 0) return;
     if (!isBackendCapabilityEnabled('chatPersistence')) {
-      logger.info('Skipping conversation sync — chat persistence API not available on server');
+      logger.info('Skipping conversation sync â€” chat persistence API not available on server');
       const fallback = makeDisabledCapabilityResponse('chatPersistence', '/api/chat/conversations', {
         synced: 0,
         queued: conversations.length,
@@ -304,7 +304,7 @@ class SyncService {
   async syncToolResults(toolResults, token) {
     if (toolResults.length === 0) return;
     if (!isBackendCapabilityEnabled('toolsResultsSync')) {
-      logger.info('Skipping tool results sync — tools results API not available on server');
+      logger.info('Skipping tool results sync â€” tools results API not available on server');
       await recordAutomationBlocked({
         triggerFired: 'Offline tool result sync requested',
         conditionsEvaluated: [{ label: 'Tool results sync backend capability enabled', result: false }],

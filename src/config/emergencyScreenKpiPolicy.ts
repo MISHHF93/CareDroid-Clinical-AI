@@ -1,5 +1,5 @@
 /**
- * Screen-mode KPI policy — canonical KPI sets per CareDroid screen mode.
+ * Screen-mode KPI policy â€” canonical KPI sets per CareDroid screen mode.
  * Values resolve from existing operational builders (central node, reception strip,
  * department status, public waiting, command center throughput).
  */
@@ -751,7 +751,7 @@ export function buildProviderWaitKpiValues(input: {
           : visibility.approachingThresholdCount
             ? 'warning'
             : 'stable',
-      detail: `CTAS thresholds · default target ${visibility.summary.defaultTargetMinutes}m`,
+      detail: `CTAS thresholds Â· default target ${visibility.summary.defaultTargetMinutes}m`,
     },
     'average-provider-wait': {
       value: visibility.averageProviderWaitLabel,
@@ -762,7 +762,7 @@ export function buildProviderWaitKpiValues(input: {
           : visibility.approachingThresholdCount
             ? 'warning'
             : 'stable',
-      detail: `Mean triage-to-provider wait · warning ${visibility.summary.warningMinutes}m`,
+      detail: `Mean triage-to-provider wait Â· warning ${visibility.summary.warningMinutes}m`,
     },
     'provider-wait-approaching': {
       value: visibility.approachingThresholdCount,
@@ -882,7 +882,7 @@ export function buildCommandCenterKpiValues(input: {
     'longest-untriaged-wait': {
       id: 'longest-untriaged-wait',
       label: 'Longest untriaged wait',
-      value: longestUntriaged?.value ?? '—',
+      value: longestUntriaged?.value ?? 'â€”',
       tone: (longestUntriaged?.tone as EmergencyScreenKpiTone) || 'stable',
       detail: longestUntriaged?.detail,
       source: 'commandCenterThroughputModel.longest-untriaged-wait',
@@ -922,7 +922,7 @@ export function buildCommandCenterKpiValues(input: {
     'longest-provider-wait': {
       id: 'longest-provider-wait',
       label: 'Longest provider wait',
-      value: longestProviderWait?.value ?? '—',
+      value: longestProviderWait?.value ?? 'â€”',
       tone: (longestProviderWait?.tone as EmergencyScreenKpiTone) || 'stable',
       detail: longestProviderWait?.detail,
       source: 'commandCenterThroughputModel.longest-provider-wait',
@@ -930,7 +930,7 @@ export function buildCommandCenterKpiValues(input: {
     'average-provider-wait': {
       id: 'average-provider-wait',
       label: 'Average provider wait',
-      value: avgProvider?.value ?? '—',
+      value: avgProvider?.value ?? 'â€”',
       tone: (avgProvider?.tone as EmergencyScreenKpiTone) || 'stable',
       detail: avgProvider?.detail,
       source: 'commandCenterThroughputModel.avg-wait-provider',
@@ -954,7 +954,7 @@ export function buildCommandCenterKpiValues(input: {
     throughput: {
       id: 'throughput',
       label: 'Throughput',
-      value: `${avgTriage?.value ?? '—'} / ${avgProvider?.value ?? '—'}`,
+      value: `${avgTriage?.value ?? 'â€”'} / ${avgProvider?.value ?? 'â€”'}`,
       tone: (avgProvider?.tone as EmergencyScreenKpiTone) || 'info',
       detail: 'Average triage and provider waits',
       source: 'commandCenterThroughputModel.throughput',
@@ -994,7 +994,7 @@ export function buildCommandCenterKpiValues(input: {
     'trend-metrics': {
       id: 'trend-metrics',
       label: 'LWBS risk',
-      value: lwbsRisk?.value ?? '—',
+      value: lwbsRisk?.value ?? 'â€”',
       tone: (lwbsRisk?.tone as EmergencyScreenKpiTone) || 'stable',
       detail: lwbsRisk?.detail,
       source: 'commandCenterThroughputModel.lwbs-risk',
@@ -1284,7 +1284,7 @@ export function buildScreenModeKpiSnapshot(input: {
   const summaryLine = kpis
     .map((kpi) => `${kpi.label}: ${kpi.value}`)
     .slice(0, 4)
-    .join(' · ');
+    .join(' Â· ');
 
   return {
     screenMode: input.screenMode,

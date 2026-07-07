@@ -114,10 +114,10 @@ export default function ReceptionWorkQueues({
         <p className="reception-work-queues__online-summary" role="status">
           {queueTimingSummary.onlineCount} patient{queueTimingSummary.onlineCount === 1 ? '' : 's'} online
           {queueTimingSummary.dueSoonCount
-            ? ` · ${queueTimingSummary.dueSoonCount} due soon`
+            ? ` Â· ${queueTimingSummary.dueSoonCount} due soon`
             : ''}
           {queueTimingSummary.breachedCount
-            ? ` · ${queueTimingSummary.breachedCount} overdue`
+            ? ` Â· ${queueTimingSummary.breachedCount} overdue`
             : ''}
         </p>
       </header>

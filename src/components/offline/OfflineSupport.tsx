@@ -328,7 +328,7 @@ export const useOfflineStatus = () => {
       // Example: Sync conversations
       if (!isBackendCapabilityEnabled('bulkSync')) {
         const fallback = makeBulkSyncDisabledResponse(syncStats.total || 0);
-        logger.info('Bulk sync API not available — keeping offline changes queued');
+        logger.info('Bulk sync API not available â€” keeping offline changes queued');
         reportApiError({
           title: 'Offline sync queued',
           message: fallback.message,

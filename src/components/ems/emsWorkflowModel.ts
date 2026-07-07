@@ -21,7 +21,7 @@ export function shouldShowEmsOperationalStrip({ screenMode, roleId, displayMode 
 }
 
 /**
- * EMS command strip — inbound units, ETA, receiving area, offload, and pressure.
+ * EMS command strip â€” inbound units, ETA, receiving area, offload, and pressure.
  */
 export function selectEmsOperationalStrip({
   emsArrivals = [] as any[],
@@ -75,7 +75,7 @@ export function selectEmsOperationalStrip({
       id: 'offload-duration',
       label: visibilityById['offload-duration']?.label || 'Offload duration',
       hint: visibilityById['offload-duration']?.hint || 'Mean scene-to-handoff offload time',
-      value: visibilityById['offload-duration']?.value ?? '—',
+      value: visibilityById['offload-duration']?.value ?? 'â€”',
       surface: EMS_SCREEN_WIDGETS.offloadTimers,
       tone: visibilityById['offload-duration']?.tone || 'neutral',
       whiteboardAction: 'open-offload-tracker',

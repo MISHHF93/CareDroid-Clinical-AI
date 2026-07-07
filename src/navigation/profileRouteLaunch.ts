@@ -1,5 +1,5 @@
 /**
- * Profile- and entitlement-aware navigation — use instead of raw navigate() for product surfaces.
+ * Profile- and entitlement-aware navigation â€” use instead of raw navigate() for product surfaces.
  */
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { isRouteAllowedForProfile, resolveUserProfileFromSaasRole } from '../config/userProfileCatalog';
@@ -124,7 +124,7 @@ export function resolveProfileAwareDestination(path, options: any = {}) {
 }
 
 /**
- * Preferred navigation entry point — emergency role matrix + SaaS profile bottleneck.
+ * Preferred navigation entry point â€” emergency role matrix + SaaS profile bottleneck.
  * @param {import('react-router-dom').NavigateFunction} navigate
  * @param {import('react-router-dom').To} to
  */

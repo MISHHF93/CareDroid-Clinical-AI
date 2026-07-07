@@ -80,7 +80,7 @@ export function buildReceptionAlertMetrics({
         label: emsSnapshot.delayedCount ? 'EMS offload delay' : 'EMS awaiting offload',
         value: emsValue,
         tone: emsSnapshot.delayedCount ? 'critical' : 'warning',
-        hint: `Target ${offloadTargetMinutes}m · longest ${emsSnapshot.longestOffloadMinutes ?? 0}m`,
+        hint: `Target ${offloadTargetMinutes}m Â· longest ${emsSnapshot.longestOffloadMinutes ?? 0}m`,
         patientId: emsSnapshot.previewRows[0]?.patientId,
         priority: emsSnapshot.delayedCount ? 0 : 1,
       });

@@ -1,5 +1,5 @@
 /**
- * Production-readiness audit — scores, risks, quick wins, deployment blockers.
+ * Production-readiness audit â€” scores, risks, quick wins, deployment blockers.
  * Node-safe; aggregates signals from domain audit models and QA reports.
  */
 
@@ -153,11 +153,11 @@ export const PRODUCTION_QUICK_WIN_CATALOG = Object.freeze([
 /** @type {ReadonlyArray} */
 export const PRODUCTION_DEPLOYMENT_BLOCKER_CATALOG = Object.freeze([
   blocker('B001', 'critical', 'security', 'Unauthenticated /api/emergency/* in production', 'Deploy with JWT guards enabled'),
-  blocker('B002', 'critical', 'pilot', 'No VITE_API_URL on Vercel — API calls hit SPA', 'Deploy backend + set env'),
+  blocker('B002', 'critical', 'pilot', 'No VITE_API_URL on Vercel â€” API calls hit SPA', 'Deploy backend + set env'),
   blocker('B003', 'critical', 'security', 'Shared ED settings singleton across tenants', 'Org-scoped settings service'),
   blocker('B004', 'critical', 'pilot', 'JWT_SECRET left at CHANGE_ME_IN_PRODUCTION', 'Rotate secrets in prod'),
   blocker('B005', 'high', 'pilot', 'Multi-tenant readiness audit fails (score 50)', 'All domains org-configurable'),
-  blocker('B006', 'high', 'backend', 'ED state not durable — data loss on restart', 'Postgres persistence layer'),
+  blocker('B006', 'high', 'backend', 'ED state not durable â€” data loss on restart', 'Postgres persistence layer'),
   blocker('B007', 'high', 'auditability', 'Workflow logs in-memory only', 'Durable audit storage'),
   blocker('B008', 'high', 'integrations', 'Live clinical write path via FHIR not implemented', 'Scope pilot to standalone ED'),
   blocker('B009', 'high', 'security', 'permissionsOverrides not enforced in ED RBAC', 'Wire resolveEmergencyRole'),
@@ -189,8 +189,8 @@ export const PRODUCTION_DEPLOYMENT_BLOCKER_CATALOG = Object.freeze([
   blocker('B035', 'medium', 'pilot', 'Stripe/billing not required for ED pilot but may block org create', 'Verify billing flow'),
   blocker('B036', 'medium', 'pilot', 'OAuth providers not configured', 'Email/password or dev session only'),
   blocker('B037', 'medium', 'pilot', 'Email SMTP not configured for notifications', 'Disable or configure SMTP'),
-  blocker('B038', 'medium', 'pilot', 'Redis cache optional — perf under load unknown', 'Load test with Redis'),
-  blocker('B039', 'medium', 'pilot', 'ML/RAG stack optional — copilot may degrade', 'Document AI provider keys'),
+  blocker('B038', 'medium', 'pilot', 'Redis cache optional â€” perf under load unknown', 'Load test with Redis'),
+  blocker('B039', 'medium', 'pilot', 'ML/RAG stack optional â€” copilot may degrade', 'Document AI provider keys'),
   blocker('B040', 'medium', 'pilot', 'Native Android app removed from ED pilot scope', 'TypeScript web pilot only'),
   blocker('B041', 'low', 'pilot', 'Fleet/IoT modules in codebase confuse scope', 'Nav/feature flag hide'),
   blocker('B042', 'low', 'pilot', 'Federated learning endpoints on ED controller', 'Disable in prod'),
@@ -198,7 +198,7 @@ export const PRODUCTION_DEPLOYMENT_BLOCKER_CATALOG = Object.freeze([
   blocker('B044', 'low', 'architecture', 'Branding ED copy not org-scoped', 'Pilot uses default copy'),
   blocker('B045', 'low', 'auditability', 'Automation audit separate from ED workflow logs', 'Unified operator view'),
   blocker('B046', 'low', 'operational', 'Copilot LLM fallback when rules miss', 'Monitor generic responses'),
-  blocker('B047', 'low', 'frontend', 'Large bundle — verify budget tests pass', 'Run bundleBudget.test'),
+  blocker('B047', 'low', 'frontend', 'Large bundle â€” verify budget tests pass', 'Run bundleBudget.test'),
   blocker('B048', 'low', 'backend', 'Rate limit may block burst intake', 'Tune throttle for reception'),
   blocker('B049', 'low', 'security', 'Crash report endpoint auth unverified', 'Audit /api/crashes'),
   blocker('B050', 'low', 'pilot', 'QA screenshots not in CI gate', 'Optional visual regression'),

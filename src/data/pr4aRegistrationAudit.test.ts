@@ -1,5 +1,5 @@
 /**
- * PR4A registration audit — cross-system consistency for ASCVD, CKD staging, STOP-Bang, AUDIT-C.
+ * PR4A registration audit â€” cross-system consistency for ASCVD, CKD staging, STOP-Bang, AUDIT-C.
  * Complements per-tool wiring tests, pr4aConsistency.test.js, and pr4aCoverage.test.js.
  */
 
@@ -70,7 +70,7 @@ function _extractAppCalculatorRoutes(source) {
   return routes;
 }
 
-describe('PR4A registration audit — canonical ID alignment', () => {
+describe('PR4A registration audit â€” canonical ID alignment', () => {
   it('keeps PR4A_CALCULATOR_REGISTRY_IDS frozen and matches tier-A slice', () => {
     expect(Object.isFrozen(PR4A_CALCULATOR_REGISTRY_IDS)).toBe(true);
     expect(Object.isFrozen(PR4A_TIER_A_CALCULATOR_REGISTRY_IDS)).toBe(true);
@@ -106,7 +106,7 @@ describe('PR4A registration audit — canonical ID alignment', () => {
   });
 });
 
-describe('PR4A registration audit — routes, deep links, navigation', () => {
+describe('PR4A registration audit â€” routes, deep links, navigation', () => {
   it.each(PR4A_TOOL_IDS)('%s uses plural /tools/calculators/ path everywhere', (id) => {
     const path = PR4A_ROUTE_BY_REGISTRY_ID[id];
     expect(path).toBe(`${PR4A_HUB_PATH}/${id}`);
@@ -157,7 +157,7 @@ describe('PR4A registration audit — routes, deep links, navigation', () => {
   });
 });
 
-describe('PR4A registration audit — NLU, backend, aliases', () => {
+describe('PR4A registration audit â€” NLU, backend, aliases', () => {
   it.each(PR4A_TOOL_IDS)('backend tool.patterns.ts declares toolId %s exactly once', (id) => {
     const patterns = parseClinicalToolPatterns(patternsSource);
     const hits = patterns.filter((p) => p.toolId === id);
@@ -227,7 +227,7 @@ describe('PR4A registration audit — NLU, backend, aliases', () => {
   });
 });
 
-describe('PR4A registration audit — catalog, discovery, sidebar', () => {
+describe('PR4A registration audit â€” catalog, discovery, sidebar', () => {
   it.each(PR4A_TOOL_IDS)('%s appears exactly once in medical catalog with uiCalculatorSlug', (id) => {
     const rows = getMedicalToolsCatalogRows();
     const matches = rows.filter((r) => r.primaryId === id);

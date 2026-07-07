@@ -116,7 +116,7 @@ function minutesSince(timestamp: string | null | undefined, now: Date): number |
   return Math.max(0, Math.round((now.getTime() - parsed) / 60000));
 }
 
-export function formatCommunicationDuration(minutes: number | null, { unknownLabel = '—' }: any = {}): string {
+export function formatCommunicationDuration(minutes: number | null, { unknownLabel = 'â€”' }: any = {}): string {
   if (minutes === null || !Number.isFinite(minutes)) return unknownLabel;
   if (minutes < 1) return '<1m ago';
   if (minutes < 60) return `${minutes}m ago`;
@@ -324,15 +324,15 @@ export function resolveCommunicationRecency(
   const minutesSinceContact = minutesSince(latest?.timestamp, now);
   const tone = resolveRecencyTone(minutesSinceContact);
   const recencyLabel = latest
-    ? `${formatCommunicationDuration(minutesSinceContact)} · ${COMMUNICATION_KIND_SHORT_LABELS[latest.kind]}`
+    ? `${formatCommunicationDuration(minutesSinceContact)} Â· ${COMMUNICATION_KIND_SHORT_LABELS[latest.kind]}`
     : 'No staff contact logged';
   const shortRecencyLabel = latest
     ? formatCommunicationDuration(minutesSinceContact).replace(' ago', '')
-    : '—';
+    : 'â€”';
 
   const actor = latest?.actorName || latest?.actorStaffId || 'Staff';
   const staffDetail = latest
-    ? `Last ${COMMUNICATION_KIND_LABELS[latest.kind].toLowerCase()} by ${actor} · ${formatCommunicationDuration(minutesSinceContact)}`
+    ? `Last ${COMMUNICATION_KIND_LABELS[latest.kind].toLowerCase()} by ${actor} Â· ${formatCommunicationDuration(minutesSinceContact)}`
     : 'No waiting-room communication events recorded for this patient yet.';
 
   return {

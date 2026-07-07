@@ -54,7 +54,7 @@ describe('long wait rescue helpers', () => {
       now,
     );
 
-    expect(line).toBe('ATTENTION: Longest waiting patient — Long One, 80min, P3, Back pain');
+    expect(line).toBe('ATTENTION: Longest waiting patient â€” Long One, 80min, P3, Back pain');
   });
 
   it('summarizes long-wait and LWBS shift metrics against CTAS targets', () => {

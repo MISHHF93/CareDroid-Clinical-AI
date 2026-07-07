@@ -1,5 +1,5 @@
 /**
- * Crowd Level Engine — unified LOW ? CRITICAL classification from queue,
+ * Crowd Level Engine â€” unified LOW ? CRITICAL classification from queue,
  * capacity, EMS, and wait-time signals.
  */
 import {
@@ -96,15 +96,15 @@ const PUBLIC_DETAILS: Record<CrowdLevelId, string> = {
   [CROWD_LEVEL.MODERATE]: 'Typical waiting-room activity.',
   [CROWD_LEVEL.BUSY]: 'More patients than usual are waiting.',
   [CROWD_LEVEL.VERY_BUSY]: 'The department is under high demand right now.',
-  [CROWD_LEVEL.CRITICAL]: 'Extremely high demand — care teams are prioritizing urgent needs.',
+  [CROWD_LEVEL.CRITICAL]: 'Extremely high demand â€” care teams are prioritizing urgent needs.',
 };
 
 const STAFF_DETAILS: Record<CrowdLevelId, string> = {
   [CROWD_LEVEL.LOW]: 'Queue, capacity, and EMS pressure are within normal range.',
-  [CROWD_LEVEL.MODERATE]: 'Moderate queue and wait-time pressure — monitor intake pace.',
+  [CROWD_LEVEL.MODERATE]: 'Moderate queue and wait-time pressure â€” monitor intake pace.',
   [CROWD_LEVEL.BUSY]: 'Elevated waiting room and throughput pressure.',
-  [CROWD_LEVEL.VERY_BUSY]: 'Sustained crowding — expect delays across intake and treatment.',
-  [CROWD_LEVEL.CRITICAL]: 'Critical crowding — activate surge coordination and flow controls.',
+  [CROWD_LEVEL.VERY_BUSY]: 'Sustained crowding â€” expect delays across intake and treatment.',
+  [CROWD_LEVEL.CRITICAL]: 'Critical crowding â€” activate surge coordination and flow controls.',
 };
 
 function minutesSince(timestamp: string | null | undefined, now: Date): number {
@@ -304,7 +304,7 @@ export function buildCrowdLevelSnapshot(input: CrowdLevelInput = {}): CrowdLevel
   });
 }
 
-/** @deprecated Use buildCrowdLevelSnapshot — kept for public waiting display compatibility */
+/** @deprecated Use buildCrowdLevelSnapshot â€” kept for public waiting display compatibility */
 export function derivePublicCrowdLevelFromEngine(
   waitingCount: number,
   capacityBand?: string,

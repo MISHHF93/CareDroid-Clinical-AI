@@ -85,7 +85,7 @@ export function buildProviderWaitVisibilitySnapshot(
     averageProviderWaitLabel:
       averageProviderWaitMinutes != null
         ? formatDuration(averageProviderWaitMinutes)
-        : '—',
+        : 'â€”',
     approachingThresholdCount: summary.approachingThresholdCount,
     breachedCount: summary.breachedCount,
     onTrackCount: summary.onTrackCount,
@@ -140,7 +140,7 @@ function metricValue(
     case 'awaiting-clinician':
       return snapshot.awaitingClinicianCount;
     case 'longest-provider-wait':
-      return snapshot.awaitingClinicianCount ? snapshot.longestProviderWaitLabel : '—';
+      return snapshot.awaitingClinicianCount ? snapshot.longestProviderWaitLabel : 'â€”';
     case 'average-provider-wait':
       return snapshot.averageProviderWaitLabel;
     case 'provider-wait-approaching':
@@ -148,7 +148,7 @@ function metricValue(
     case 'provider-wait-breached':
       return snapshot.breachedCount;
     default:
-      return '—';
+      return 'â€”';
   }
 }
 
@@ -161,9 +161,9 @@ function metricHint(
     case 'awaiting-clinician':
       return 'Patients waiting for first clinician contact';
     case 'longest-provider-wait':
-      return `CTAS thresholds · default target ${summary.defaultTargetMinutes}m`;
+      return `CTAS thresholds Â· default target ${summary.defaultTargetMinutes}m`;
     case 'average-provider-wait':
-      return `Mean triage-to-provider wait · warning ${summary.warningMinutes}m`;
+      return `Mean triage-to-provider wait Â· warning ${summary.warningMinutes}m`;
     case 'provider-wait-approaching':
       return `Within ${summary.warningMinutes}m of patient CTAS target`;
     case 'provider-wait-breached':

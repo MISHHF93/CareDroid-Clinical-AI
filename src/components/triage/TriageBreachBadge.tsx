@@ -33,10 +33,10 @@ export default function TriageBreachBadge({
       ]
         .filter(Boolean)
         .join(' ')}
-      title={[snapshot.label, snapshot.staffDetail].filter(Boolean).join(' · ')}
+      title={[snapshot.label, snapshot.staffDetail].filter(Boolean).join(' Â· ')}
     >
       {compact ? `Triage ${snapshot.shortLabel}` : snapshot.label}
-      {showElapsed ? ` · ${snapshot.elapsedLabel}` : null}
+      {showElapsed ? ` Â· ${snapshot.elapsedLabel}` : null}
     </span>
   );
 }

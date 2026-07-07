@@ -1,5 +1,5 @@
 /**
- * Frontend rendering inventory — PR1–PR6 roadmap tools + fleet operations.
+ * Frontend rendering inventory â€” PR1â€“PR6 roadmap tools + fleet operations.
  * Validates UI render paths (routes, hub cards, forms, disclaimers) atop wiring matrices.
  */
 
@@ -59,7 +59,7 @@ function readFleetComponentSource(componentName: string): string {
   }
 }
 
-/** User-facing roadmap scope (PR1–PR5 calculators + PR5/6 chat + fleet PR6). */
+/** User-facing roadmap scope (PR1â€“PR5 calculators + PR5/6 chat + fleet PR6). */
 export const ROADMAP_FRONTEND_REGISTRY_IDS = Object.freeze([
   ...PR1_CALCULATOR_REGISTRY_IDS,
   ...PR2_TIER_A_CALCULATOR_REGISTRY_IDS,

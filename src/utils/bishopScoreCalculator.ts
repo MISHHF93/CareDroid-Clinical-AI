@@ -1,10 +1,10 @@
 /**
- * Bishop score — cervical favourability for labour induction.
- * Reference: Bishop EH. Pelvic scoring for elective induction. Obstet Gynecol. 1964;24:266–268.
+ * Bishop score â€” cervical favourability for labour induction.
+ * Reference: Bishop EH. Pelvic scoring for elective induction. Obstet Gynecol. 1964;24:266â€“268.
  */
 
 export const BISHOP_OBSTETRIC_DISCLAIMER =
-  'Cervical favourability documentation for labour and delivery planning. Does not recommend induction method, ripening agents, timing, or mode of delivery — follow obstetric team and institutional protocols.';
+  'Cervical favourability documentation for labour and delivery planning. Does not recommend induction method, ripening agents, timing, or mode of delivery â€” follow obstetric team and institutional protocols.';
 
 export const BISHOP_DIMENSIONS_META = [
   {
@@ -13,8 +13,8 @@ export const BISHOP_DIMENSIONS_META = [
     help: 'Measured in centimetres from closed to =5 cm.',
     options: [
       { value: 0, label: 'Closed' },
-      { value: 1, label: '1–2 cm' },
-      { value: 2, label: '3–4 cm' },
+      { value: 1, label: '1â€“2 cm' },
+      { value: 2, label: '3â€“4 cm' },
       { value: 3, label: '= 5 cm' },
     ],
   },
@@ -23,9 +23,9 @@ export const BISHOP_DIMENSIONS_META = [
     label: 'Effacement',
     help: 'Percentage of cervical length effaced.',
     options: [
-      { value: 0, label: '0–30%' },
-      { value: 1, label: '40–50%' },
-      { value: 2, label: '60–70%' },
+      { value: 0, label: '0â€“30%' },
+      { value: 1, label: '40â€“50%' },
+      { value: 2, label: '60â€“70%' },
       { value: 3, label: '= 80%' },
     ],
   },
@@ -99,7 +99,7 @@ export function validateBishopInputs(raw) {
 }
 
 /**
- * @param {number} score 0–13
+ * @param {number} score 0â€“13
  */
 export function interpretBishopScore(score) {
   if (!Number.isFinite(score) || score < 0 || score > 13) return null;
@@ -108,7 +108,7 @@ export function interpretBishopScore(score) {
   if (!riskCategory) return null;
 
   const referenceLine =
-    'Bishop EH. Pelvic scoring for elective induction. Obstet Gynecol. 1964;24:266–268.';
+    'Bishop EH. Pelvic scoring for elective induction. Obstet Gynecol. 1964;24:266â€“268.';
 
   const disclaimer = BISHOP_OBSTETRIC_DISCLAIMER;
 
@@ -127,7 +127,7 @@ export function interpretBishopScore(score) {
       riskBand: '= 8 points',
       favourability: 'Traditionally considered favourable cervix in classic teaching',
       interpretation:
-        'Scores =8 are associated with a favourable cervix and higher induction success in many cohorts — interpret with gestational age, parity, and local obstetric documentation standards.',
+        'Scores =8 are associated with a favourable cervix and higher induction success in many cohorts â€” interpret with gestational age, parity, and local obstetric documentation standards.',
       disclaimer,
       referenceLine,
     };
@@ -139,10 +139,10 @@ export function interpretBishopScore(score) {
       riskCategory,
       riskCategoryLabel: riskCategoryLabels[riskCategory],
       label: 'Intermediate Bishop score',
-      riskBand: '6–7 points',
+      riskBand: '6â€“7 points',
       favourability: 'Intermediate favourability in classic teaching',
       interpretation:
-        'Intermediate scores — supports induction-planning documentation with obstetric correlation per institutional protocol.',
+        'Intermediate scores â€” supports induction-planning documentation with obstetric correlation per institutional protocol.',
       disclaimer,
       referenceLine,
     };
@@ -156,7 +156,7 @@ export function interpretBishopScore(score) {
     riskBand: '< 6 points',
     favourability: 'Unfavourable cervix in classic teaching',
     interpretation:
-      'Scores <6 are traditionally considered unfavourable — supports cervical exam documentation and obstetric team review per protocol.',
+      'Scores <6 are traditionally considered unfavourable â€” supports cervical exam documentation and obstetric team review per protocol.',
     disclaimer,
     referenceLine,
   };

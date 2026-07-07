@@ -198,7 +198,7 @@ export default function CalculatorRecommender({ embedded = false, onCloseEmbedde
               </div>
             ) : (
               <div className="tool-empty-state">
-                Try ìchest pain with elevated troponinî to suggest HEART, TIMI, GRACE, and ASCVD tools.
+                Try ‚Äúchest pain with elevated troponin‚Äù to suggest HEART, TIMI, GRACE, and ASCVD tools.
               </div>
             )}
 

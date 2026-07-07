@@ -44,7 +44,7 @@ function parseBackendUnsupported() {
   return [...block[1].matchAll(/'([^']+)'/g)].map((m) => m[1]).sort();
 }
 
-describe('executorMappingAudit — frontend ? backend', () => {
+describe('executorMappingAudit â€” frontend ? backend', () => {
   it('ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS matches backend REGISTERED_EXECUTOR_TOOL_IDS', () => {
     expect([...ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS].sort()).toEqual(parseBackendRegistered());
   });

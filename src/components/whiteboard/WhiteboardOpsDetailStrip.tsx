@@ -72,7 +72,7 @@ export default function WhiteboardOpsDetailStrip({
       >
         <span className="whiteboard-ops-detail-strip__title">Ops detail</span>
         <span className="whiteboard-ops-detail-strip__summary">
-          {summaryParts.join(' · ') || `${signalCount} operational signals`}
+          {summaryParts.join(' Â· ') || `${signalCount} operational signals`}
         </span>
         <span className="whiteboard-ops-detail-strip__chevron" aria-hidden="true">
           {expanded ? '?' : '?'}

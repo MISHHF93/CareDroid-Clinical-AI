@@ -1,5 +1,5 @@
 /**
- * qSOFA (quick SOFA) — bedside screening for higher risk of poor outcome in suspected infection.
+ * qSOFA (quick SOFA) â€” bedside screening for higher risk of poor outcome in suspected infection.
  * One point each: RR = 22/min, SBP = 100 mmHg, altered mentation OR GCS < 15.
  *
  * Reference: Singer M, et al. The Third International Consensus Definitions for Sepsis and Septic Shock (Sepsis-3). JAMA. 2016;315(8):801-810.
@@ -7,7 +7,7 @@
 
 /**
  * @param {{ respiratoryRateGte22: boolean, systolicBpLte100: boolean, alteredMentationOrGcsLt15: boolean }} criteria
- * @returns {number} 0–3
+ * @returns {number} 0â€“3
  */
 export function calculateQsofaScore(criteria) {
   const { respiratoryRateGte22, systolicBpLte100, alteredMentationOrGcsLt15 } = criteria;
@@ -41,7 +41,7 @@ export function qsofaCriteriaFromInputs(raw) {
 }
 
 /**
- * @param {number} score 0–3
+ * @param {number} score 0â€“3
  * @returns {{ severity: 'normal'|'warning'|'critical', interpretation: string, referenceLine: string }}
  */
 export function interpretQsofaScore(score) {

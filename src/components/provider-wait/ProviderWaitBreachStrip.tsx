@@ -46,9 +46,9 @@ export default function ProviderWaitBreachStrip({
         <p className="provider-wait-breach-strip__eyebrow">Triage to provider</p>
         <h3>Provider wait breach timer</h3>
         <p className="provider-wait-breach-strip__subtitle">
-          Triage-to-provider elapsed time against CTAS thresholds — {snapshot.summary.breachedCount}{' '}
-          breached · {snapshot.summary.approachingThresholdCount} approaching · avg{' '}
-          {visibility.averageProviderWaitLabel} · {snapshot.summary.highRiskExceptionCount} high-risk
+          Triage-to-provider elapsed time against CTAS thresholds â€” {snapshot.summary.breachedCount}{' '}
+          breached Â· {snapshot.summary.approachingThresholdCount} approaching Â· avg{' '}
+          {visibility.averageProviderWaitLabel} Â· {snapshot.summary.highRiskExceptionCount} high-risk
           exceptions
         </p>
       </header>

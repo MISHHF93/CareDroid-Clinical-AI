@@ -1,10 +1,10 @@
 /**
- * Apgar score — newborn status at 1 and 5 minutes.
- * Reference: Apgar V. A proposal for a new method of evaluation of the newborn infant. Curr Res Anesth Analg. 1953;32:260–267.
+ * Apgar score â€” newborn status at 1 and 5 minutes.
+ * Reference: Apgar V. A proposal for a new method of evaluation of the newborn infant. Curr Res Anesth Analg. 1953;32:260â€“267.
  */
 
 export const APGAR_OBSTETRIC_DISCLAIMER =
-  'Newborn assessment and documentation aid at 1 and 5 minutes. Does not replace neonatal resuscitation algorithms (e.g. NRP), cord management, or ongoing monitoring — follow delivery-unit and pediatric protocols.';
+  'Newborn assessment and documentation aid at 1 and 5 minutes. Does not replace neonatal resuscitation algorithms (e.g. NRP), cord management, or ongoing monitoring â€” follow delivery-unit and pediatric protocols.';
 
 export const APGAR_COMPONENTS_META = [
   {
@@ -92,7 +92,7 @@ export function validateApgarMinuteInputs(raw) {
 }
 
 /**
- * @param {number} score 0–10
+ * @param {number} score 0â€“10
  * @param {{ timingLabel?: string }} [options]
  */
 export function interpretApgarScore(score, options: any = {}) {
@@ -104,7 +104,7 @@ export function interpretApgarScore(score, options: any = {}) {
   const timingSuffix = options.timingLabel ? ` at ${options.timingLabel}` : '';
 
   const referenceLine =
-    'Apgar V. A proposal for a new method of evaluation of the newborn infant. Curr Res Anesth Analg. 1953;32:260–267.';
+    'Apgar V. A proposal for a new method of evaluation of the newborn infant. Curr Res Anesth Analg. 1953;32:260â€“267.';
 
   const disclaimer = APGAR_OBSTETRIC_DISCLAIMER;
 
@@ -120,9 +120,9 @@ export function interpretApgarScore(score, options: any = {}) {
       riskCategory,
       riskCategoryLabel: riskCategoryLabels[riskCategory],
       label: 'Critically low Apgar',
-      riskBand: `0–3${timingSuffix}`,
+      riskBand: `0â€“3${timingSuffix}`,
       interpretation:
-        'Scores 0–3 fall in the severely depressed stratum in teaching — supports correlation with neonatal team assessment and institutional newborn resuscitation pathway documentation (e.g. NRP).',
+        'Scores 0â€“3 fall in the severely depressed stratum in teaching â€” supports correlation with neonatal team assessment and institutional newborn resuscitation pathway documentation (e.g. NRP).',
       disclaimer,
       referenceLine,
     };
@@ -134,9 +134,9 @@ export function interpretApgarScore(score, options: any = {}) {
       riskCategory,
       riskCategoryLabel: riskCategoryLabels[riskCategory],
       label: 'Moderately depressed Apgar',
-      riskBand: `4–6${timingSuffix}`,
+      riskBand: `4â€“6${timingSuffix}`,
       interpretation:
-        'Scores 4–6 suggest moderate depression in validation cohorts — supports serial reassessment and newborn observation per delivery-unit protocol.',
+        'Scores 4â€“6 suggest moderate depression in validation cohorts â€” supports serial reassessment and newborn observation per delivery-unit protocol.',
       disclaimer,
       referenceLine,
     };
@@ -147,9 +147,9 @@ export function interpretApgarScore(score, options: any = {}) {
     riskCategory,
     riskCategoryLabel: riskCategoryLabels[riskCategory],
     label: 'Reassuring Apgar',
-    riskBand: `7–10${timingSuffix}`,
+    riskBand: `7â€“10${timingSuffix}`,
     interpretation:
-      'Scores 7–10 are generally reassuring in teaching — supports routine newborn observation and documentation.',
+      'Scores 7â€“10 are generally reassuring in teaching â€” supports routine newborn observation and documentation.',
     disclaimer,
     referenceLine,
   };

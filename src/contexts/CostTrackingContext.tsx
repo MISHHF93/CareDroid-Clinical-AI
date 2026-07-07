@@ -18,7 +18,7 @@ function canonicalToolId(toolId) {
   return TOOL_ID_ALIASES[toolId] || toolId;
 }
 
-// Tool cost configuration (per execution in USD) — keys match `src/data/toolRegistry` ids where applicable
+// Tool cost configuration (per execution in USD) â€” keys match `src/data/toolRegistry` ids where applicable
 const TOOL_COSTS = {
   'drug-check': 0.05,
   'lab-interp': 0.08,

@@ -1,5 +1,5 @@
 /**
- * End-to-end validation matrix — complete shipped tool inventory and wiring facts.
+ * End-to-end validation matrix â€” complete shipped tool inventory and wiring facts.
  * Consumed by Vitest (`e2eToolValidationMatrix.test.ts`) and QA checklists.
  */
 
@@ -388,7 +388,7 @@ export function getE2eValidationMatrixDocument() {
   };
 }
 
-/** Validate a matrix row — returns issue codes (empty = ok). */
+/** Validate a matrix row â€” returns issue codes (empty = ok). */
 export function validateMatrixRow(row) {
   const issues = [] as any[];
 
@@ -471,7 +471,7 @@ const MATRIX_COLUMNS = [
 ];
 
 function yesNo(value) {
-  return value ? 'yes' : '—';
+  return value ? 'yes' : 'â€”';
 }
 
 /**
@@ -523,13 +523,13 @@ export function formatE2eMatrixMarkdown(doc = getE2eValidationMatrixDocument()) 
   ];
 
   for (const row of doc.inventory) {
-    const nlu = row.nluToolIds?.length ? row.nluToolIds.join(', ') : '—';
+    const nlu = row.nluToolIds?.length ? row.nluToolIds.join(', ') : 'â€”';
     const tests =
       row.testCoverage?.length > 4
         ? `${row.testCoverage.length} files`
-        : row.testCoverage?.join(', ') || '—';
+        : row.testCoverage?.join(', ') || 'â€”';
     lines.push(
-      `| ${row.id} | ${row.tier} | ${row.route || '—'} | ${yesNo(row.registryPresence)} | ${yesNo(row.catalogPresence)} | ${yesNo(row.discoveryPresence)} | ${yesNo(row.nluPresence)}${row.nluPresence && nlu !== row.id ? ` (${nlu})` : ''} | ${yesNo(row.backendPostExecutor)} | ${row.launch?.path || '—'} | ${tests} |`
+      `| ${row.id} | ${row.tier} | ${row.route || 'â€”'} | ${yesNo(row.registryPresence)} | ${yesNo(row.catalogPresence)} | ${yesNo(row.discoveryPresence)} | ${yesNo(row.nluPresence)}${row.nluPresence && nlu !== row.id ? ` (${nlu})` : ''} | ${yesNo(row.backendPostExecutor)} | ${row.launch?.path || 'â€”'} | ${tests} |`
     );
   }
 

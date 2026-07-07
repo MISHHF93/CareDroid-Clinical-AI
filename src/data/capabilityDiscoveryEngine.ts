@@ -147,7 +147,7 @@ function buildProtocolItems(profile, limit = 8) {
       description: protocol.summary,
       category: protocol.category,
       path: '/protocols',
-      reason: `${protocol.currentVersion} · ${protocol.linkedCalculators.length} calculators · ${protocol.linkedSimulations.length} simulations`,
+      reason: `${protocol.currentVersion} Â· ${protocol.linkedCalculators.length} calculators Â· ${protocol.linkedSimulations.length} simulations`,
       source: 'protocol-pathway-library',
     }));
 }

@@ -1,5 +1,5 @@
 /**
- * Tier-A calculator forms — input sections and calculate actions render.
+ * Tier-A calculator forms â€” input sections and calculate actions render.
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -73,7 +73,7 @@ async function waitForSofaPreflight(iface, calculatorSlug) {
   });
 }
 
-describe('Calculators — hub shell', () => {
+describe('Calculators â€” hub shell', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockCompactViewport(false);
@@ -96,7 +96,7 @@ describe('Calculators — hub shell', () => {
   }, 20000);
 });
 
-describe('Calculators — Tier-A form sections', () => {
+describe('Calculators â€” Tier-A form sections', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockCompactViewport(false);
@@ -152,7 +152,7 @@ describe('Calculators — Tier-A form sections', () => {
   );
 });
 
-describe('Calculators — compact viewport mock', () => {
+describe('Calculators â€” compact viewport mock', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockCompactViewport(true);

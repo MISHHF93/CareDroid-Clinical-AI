@@ -109,7 +109,7 @@ export const EmergencyKPILayerService = Object.freeze({
       label: 'Emergency KPI Layer',
       metrics,
       metricById: Object.freeze(Object.fromEntries(metrics.map((metric) => [metric.metricId, metric]))),
-      sourceState: 'Demo data · No live integration',
+      sourceState: 'Demo data Â· No live integration',
       safetyStatement:
         'EmergencyKPILayer is the canonical source for ED metrics. Dashboards should render these values instead of recalculating locally.',
     });

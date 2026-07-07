@@ -33,7 +33,7 @@ const RECEPTION_FIRST_NAV_ORDER = Object.freeze([
   'audit',
 ]);
 
-// Derived from cluster config — all 21 hospital roles + legacy emergency role aliases.
+// Derived from cluster config â€” all 21 hospital roles + legacy emergency role aliases.
 // Exported for backward compatibility with existing tests.
 const ROLE_NAV_ORDER_OVERRIDES: Readonly<Record<string, readonly string[]>> = Object.freeze({
   ...HOSPITAL_ROLE_NAV_IDS,
@@ -73,7 +73,7 @@ export function sortNavigationItemsForRole(items: readonly any[], role: string):
   });
 }
 
-// Full list of known sidebar item IDs — used to compute the hidden set from a role's allowlist.
+// Full list of known sidebar item IDs â€” used to compute the hidden set from a role's allowlist.
 const ALL_KNOWN_NAV_ITEM_IDS: readonly string[] = Object.freeze([
   'command-center', 'reception', 'whiteboard', 'dispatch', 'ems', 'ed-readiness',
   'patients', 'queues', 'triage', 'reassessment', 'alerts', 'capacity', 'referrals',

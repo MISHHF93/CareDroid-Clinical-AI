@@ -152,7 +152,7 @@ const ToolResultShare = ({ toolName, toolId, results, onClose }) => {
         endpoint: fallback.endpoint,
       });
       setFeedback({
-        text: `${UNSUPPORTED_CAPABILITY_MESSAGE} Use “Share Link” or “Export” instead.`,
+        text: `${UNSUPPORTED_CAPABILITY_MESSAGE} Use â€œShare Linkâ€ or â€œExportâ€ instead.`,
         variant: 'error',
       });
       return;
@@ -295,7 +295,7 @@ const ToolResultShare = ({ toolName, toolId, results, onClose }) => {
                     <span className="share-inline-icon share-inline-icon--spin" aria-hidden>
                       <NavIcon icon={CHROME_ICONS.loader} size={20} />
                     </span>
-                    Exporting…
+                    Exportingâ€¦
                   </>
                 ) : (
                   <>
@@ -343,7 +343,7 @@ const ToolResultShare = ({ toolName, toolId, results, onClose }) => {
                     <span className="share-inline-icon share-inline-icon--spin" aria-hidden>
                       <NavIcon icon={CHROME_ICONS.loader} size={20} />
                     </span>
-                    Sending…
+                    Sendingâ€¦
                   </>
                 ) : (
                   <>

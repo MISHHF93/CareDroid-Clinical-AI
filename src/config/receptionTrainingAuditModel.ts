@@ -1,5 +1,5 @@
 /**
- * Five-minute training rule — reception workflows a new clerk must grasp on day one.
+ * Five-minute training rule â€” reception workflows a new clerk must grasp on day one.
  */
 
 import { RECEPTION_COPY } from '../components/reception/receptionCopy';

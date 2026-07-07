@@ -1,9 +1,9 @@
 /**
  * TIMI risk score for unstable angina / NSTEMI (UA/NSTEMI).
- * Seven binary criteria, one point each (0–7).
+ * Seven binary criteria, one point each (0â€“7).
  *
  * Reference: Antman EM, Cohen M, Bernink PJ, et al. The TIMI risk score for unstable angina/non-ST
- * elevation MI: A method to provide prognostic information for decision-makers. JAMA. 2000;284(7):835–842.
+ * elevation MI: A method to provide prognostic information for decision-makers. JAMA. 2000;284(7):835â€“842.
  */
 
 /** @typedef {{
@@ -90,8 +90,8 @@ export function calculateTimiUaNstemiScore(raw) {
 }
 
 /**
- * 14-day composite (death, MI, urgent revascularisation) from validation cohort — decision support only.
- * @param {number} score 0–7
+ * 14-day composite (death, MI, urgent revascularisation) from validation cohort â€” decision support only.
+ * @param {number} score 0â€“7
  */
 export function interpretTimiUaNstemi(score) {
   if (!Number.isFinite(score) || score < 0 || score > 7) {
@@ -99,17 +99,17 @@ export function interpretTimiUaNstemi(score) {
   }
 
   const referenceLine =
-    'Antman EM, Cohen M, Bernink PJ, et al. The TIMI risk score for unstable angina/non-ST elevation MI. JAMA. 2000;284(7):835–842.';
+    'Antman EM, Cohen M, Bernink PJ, et al. The TIMI risk score for unstable angina/non-ST elevation MI. JAMA. 2000;284(7):835â€“842.';
 
   const acsDisclaimer =
-    'For patients with suspected acute coronary syndrome (UA/NSTEMI) only — not for STEMI. This score does not confirm ACS, does not establish a diagnosis, and does not recommend antiplatelet, anticoagulant, or invasive strategy — follow institutional ACS pathways and cardiology consultation.';
+    'For patients with suspected acute coronary syndrome (UA/NSTEMI) only â€” not for STEMI. This score does not confirm ACS, does not establish a diagnosis, and does not recommend antiplatelet, anticoagulant, or invasive strategy â€” follow institutional ACS pathways and cardiology consultation.';
 
   if (score >= 5) {
     return {
       severity: 'critical',
       label: 'Higher TIMI risk band',
-      riskBand: '5–7 points',
-      approximateEventRate: 'Approximately 26–41% 14-day death, MI, or urgent revascularisation in the original validation cohort',
+      riskBand: '5â€“7 points',
+      approximateEventRate: 'Approximately 26â€“41% 14-day death, MI, or urgent revascularisation in the original validation cohort',
       interpretation:
         'A TIMI score of 5 or more is associated with a substantially higher rate of adverse events at 14 days in the UA/NSTEMI validation study. Use for risk stratification and documentation; escalate monitoring and specialist review per local ACS protocol.',
       acsDisclaimer,
@@ -121,10 +121,10 @@ export function interpretTimiUaNstemi(score) {
     return {
       severity: 'warning',
       label: 'Intermediate TIMI risk band',
-      riskBand: '3–4 points',
-      approximateEventRate: 'Approximately 13–20% 14-day death, MI, or urgent revascularisation in the original validation cohort',
+      riskBand: '3â€“4 points',
+      approximateEventRate: 'Approximately 13â€“20% 14-day death, MI, or urgent revascularisation in the original validation cohort',
       interpretation:
-        'Scores of 3–4 fall in an intermediate-risk band in the TIMI UA/NSTEMI cohort. Interpret with serial ECGs, biomarkers, and clinical course; follow your unit’s intermediate-risk ACS pathway.',
+        'Scores of 3â€“4 fall in an intermediate-risk band in the TIMI UA/NSTEMI cohort. Interpret with serial ECGs, biomarkers, and clinical course; follow your unitâ€™s intermediate-risk ACS pathway.',
       acsDisclaimer,
       referenceLine,
     };
@@ -133,10 +133,10 @@ export function interpretTimiUaNstemi(score) {
   return {
     severity: 'normal',
     label: 'Lower TIMI risk band',
-    riskBand: '0–2 points',
-    approximateEventRate: 'Approximately 4.7–8.3% 14-day death, MI, or urgent revascularisation in the original validation cohort',
+    riskBand: '0â€“2 points',
+    approximateEventRate: 'Approximately 4.7â€“8.3% 14-day death, MI, or urgent revascularisation in the original validation cohort',
     interpretation:
-      'Scores of 0–2 are associated with comparatively lower 14-day event rates in the validation study, but adverse events still occur. Continue ACS evaluation and serial reassessment per protocol.',
+      'Scores of 0â€“2 are associated with comparatively lower 14-day event rates in the validation study, but adverse events still occur. Continue ACS evaluation and serial reassessment per protocol.',
     acsDisclaimer,
     referenceLine,
   };

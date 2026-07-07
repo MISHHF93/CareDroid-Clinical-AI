@@ -35,7 +35,7 @@ export default function DigitalDoorSign({
       {snapshot.careTeam.length ? (
         <div className="digital-door-sign__team">
           <span>Care team</span>
-          <p>{snapshot.careTeam.join(' · ')}</p>
+          <p>{snapshot.careTeam.join(' Â· ')}</p>
         </div>
       ) : null}
 

@@ -1,5 +1,5 @@
 /**
- * GDPR / consent — wired to POST/GET /api/compliance/consent
+ * GDPR / consent â€” wired to POST/GET /api/compliance/consent
  */
 
 import { apiFetch, getApiErrorMessage, parseApiResponse } from './apiClient';

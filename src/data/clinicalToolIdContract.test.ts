@@ -82,7 +82,7 @@ function parseBackendRegistryIdToExecutor() {
   return map;
 }
 
-describe('clinicalToolIdContract — canonical groups', () => {
+describe('clinicalToolIdContract â€” canonical groups', () => {
   it('exposes a contract version', () => {
     expect(TOOL_ID_CONTRACT_VERSION).toMatch(/^\d+\.\d+\.\d+$/);
   });
@@ -145,7 +145,7 @@ describe('clinicalToolIdContract — canonical groups', () => {
   });
 });
 
-describe('clinicalToolIdContract — registry drift', () => {
+describe('clinicalToolIdContract â€” registry drift', () => {
   it('ALL_REGISTRY_TOOL_IDS matches toolRegistry.js exactly', () => {
     const registryIds = sortedUnique(toolRegistry.map((t) => t.id));
     const contractIds = sortedUnique([...ALL_REGISTRY_TOOL_IDS]);
@@ -170,7 +170,7 @@ describe('clinicalToolIdContract — registry drift', () => {
   });
 });
 
-describe('clinicalToolIdContract — alias maps', () => {
+describe('clinicalToolIdContract â€” alias maps', () => {
   it('every NLU_TO_REGISTRY_ID target is a toolRegistry id', () => {
     for (const target of registryIdsReferencedByAliases()) {
       expect(toolRegistryById[target], `unknown registry target: ${target}`).toBeTruthy();
@@ -220,7 +220,7 @@ describe('clinicalToolIdContract — alias maps', () => {
   });
 });
 
-describe('clinicalToolIdContract — NLU profile drift', () => {
+describe('clinicalToolIdContract â€” NLU profile drift', () => {
   it('clinicalIntentTools toolIds match NLU_PROFILE_TOOL_IDS', () => {
     const catalogIds = sortedUnique(clinicalIntentTools.map((t) => t.toolId));
     const contractIds = sortedUnique([...NLU_PROFILE_TOOL_IDS]);

@@ -34,7 +34,7 @@ function accessSummary(row) {
   if (row.uiCalculatorSlug) parts.push('Form');
   if (row.chatOnRequest) parts.push('Chat');
   if (row.backendExecutor) parts.push('API');
-  return parts.length ? parts.join(' · ') : 'Chat';
+  return parts.length ? parts.join(' Â· ') : 'Chat';
 }
 
 function buildFromNlu(nlu) {

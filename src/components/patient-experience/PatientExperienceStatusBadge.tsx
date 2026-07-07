@@ -37,7 +37,7 @@ export default function PatientExperienceStatusBadge({
         showStaffDetail ? `Internal state: ${snapshot.internalState}` : 'Patient-safe waiting room status',
       ]
         .filter(Boolean)
-        .join(' · ')}
+        .join(' Â· ')}
     >
       {displayLabel}
     </span>

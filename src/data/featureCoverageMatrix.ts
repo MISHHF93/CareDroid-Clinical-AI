@@ -1,5 +1,5 @@
 /**
- * Feature coverage matrix — source-derived audit across tools, platform surfaces,
+ * Feature coverage matrix â€” source-derived audit across tools, platform surfaces,
  * packs, roles, and contracts. Regenerate: npm run feature-coverage-matrix:write-docs
  */
 
@@ -174,7 +174,7 @@ function roleProfileMapping(assetId, roleToAssets) {
   for (const [roleId, assets] of roleToAssets.entries()) {
     if (assets.includes(assetId)) roles.push(roleId);
   }
-  return roles.length ? roles.join(', ') : '—';
+  return roles.length ? roles.join(', ') : 'â€”';
 }
 
 function featureKind(record) {
@@ -195,7 +195,7 @@ const SUPPLEMENTAL_FEATURES = [
   {
     feature: 'Command Dashboard',
     route: '/dashboard',
-    inventoryId: '—',
+    inventoryId: 'â€”',
     assetId: 'dashboard',
     packIds: ['core-platform'],
     org: 'Pack-gated (core-platform)',
@@ -300,8 +300,8 @@ const SUPPLEMENTAL_FEATURES = [
   {
     feature: '3D Medical Viewer',
     route: '/3d-viewer',
-    inventoryId: '—',
-    assetId: '—',
+    inventoryId: 'â€”',
+    assetId: 'â€”',
     packIds: [],
     org: 'Open',
     role: 'education',
@@ -330,12 +330,12 @@ const SUPPLEMENTAL_FEATURES = [
   {
     feature: 'Product Catalog',
     route: '/products',
-    inventoryId: '—',
-    assetId: '—',
+    inventoryId: 'â€”',
+    assetId: 'â€”',
     packIds: ['(products)'],
     org: 'Catalog',
     role: 'admin, buyer',
-    workspace: '—',
+    workspace: 'â€”',
     backend: 'Implemented',
     frontend: 'Routed',
     test: 'product-catalog.service.spec.ts',
@@ -345,12 +345,12 @@ const SUPPLEMENTAL_FEATURES = [
   {
     feature: 'Integration Marketplace',
     route: '/integrations-marketplace',
-    inventoryId: '—',
-    assetId: '—',
+    inventoryId: 'â€”',
+    assetId: 'â€”',
     packIds: ['(integrations)'],
     org: 'Request workflow',
     role: 'admin',
-    workspace: '—',
+    workspace: 'â€”',
     backend: 'Catalog seed',
     frontend: 'Routed',
     test: 'Missing',
@@ -399,14 +399,14 @@ export function buildFeatureCoverageRows() {
         ? 'Base contract tests only'
         : 'Missing';
 
-    const route = record.route || record.navigationPath || '—';
+    const route = record.route || record.navigationPath || 'â€”';
     const backendRoute = record.endpoint ? findBackendRoute('POST', record.endpoint) : null;
 
     rows.push({
       feature: record.label || record.id,
       route,
       inventoryId: record.id,
-      assetId: packIds.length ? assetId : '— (not in pack seed)',
+      assetId: packIds.length ? assetId : 'â€” (not in pack seed)',
       packAssignment: packIds.length ? packIds.join(', ') : 'Missing',
       organizationVisibility: organizationVisibility(packIds),
       roleVisibility: roleVisibility(seg),
@@ -423,7 +423,7 @@ export function buildFeatureCoverageRows() {
         missingPack: !packIds.length && record.sourceKind === 'registry',
         missingTest: testStatus === 'Missing',
         missingDoc: documentationStatus(record.id, packIds) === 'Missing',
-        missingRoleProfile: roleProfileMapping(assetId, roleToAssets) === '—',
+        missingRoleProfile: roleProfileMapping(assetId, roleToAssets) === 'â€”',
         missingAsset: !packIds.length,
       },
     });
@@ -450,7 +450,7 @@ export function buildFeatureCoverageRows() {
         missingPack: false,
         missingTest: true,
         missingDoc: false,
-        missingRoleProfile: roleProfileMapping(agentId, roleToAssets) === '—',
+        missingRoleProfile: roleProfileMapping(agentId, roleToAssets) === 'â€”',
         missingAsset: false,
       },
     });
@@ -473,8 +473,8 @@ export function buildFeatureCoverageRows() {
         missingPack: !sup.packIds?.length,
         missingTest: String(sup.test).toLowerCase().includes('missing'),
         missingDoc: String(sup.doc).toLowerCase().includes('missing'),
-        missingRoleProfile: roleProfileMapping(sup.assetId, roleToAssets) === '—',
-        missingAsset: sup.assetId === '—',
+        missingRoleProfile: roleProfileMapping(sup.assetId, roleToAssets) === 'â€”',
+        missingAsset: sup.assetId === 'â€”',
       },
     });
   }
@@ -483,7 +483,7 @@ export function buildFeatureCoverageRows() {
 }
 
 function escapeCell(value) {
-  return String(value ?? '—').replace(/\|/g, '\\|').replace(/\n/g, ' ');
+  return String(value ?? 'â€”').replace(/\|/g, '\\|').replace(/\n/g, ' ');
 }
 
 function formatTable(rows) {
@@ -574,10 +574,10 @@ export function getFeatureCoverageDocument() {
     gaps.missingTest.length
       ? gaps.missingTest
           .slice(0, 40)
-          .map((r) => `- **${r.feature}** (\`${r.inventoryId}\`) — ${r.route}`)
+          .map((r) => `- **${r.feature}** (\`${r.inventoryId}\`) â€” ${r.route}`)
           .join('\n') +
         (gaps.missingTest.length > 40
-          ? `\n- … and ${gaps.missingTest.length - 40} more (see full tables)`
+          ? `\n- â€¦ and ${gaps.missingTest.length - 40} more (see full tables)`
           : '')
       : '- None flagged',
     '',
@@ -586,10 +586,10 @@ export function getFeatureCoverageDocument() {
     gaps.missingDoc.length
       ? gaps.missingDoc
           .slice(0, 40)
-          .map((r) => `- **${r.feature}** — pack: ${r.packAssignment}`)
+          .map((r) => `- **${r.feature}** â€” pack: ${r.packAssignment}`)
           .join('\n') +
         (gaps.missingDoc.length > 40
-          ? `\n- … and ${gaps.missingDoc.length - 40} more`
+          ? `\n- â€¦ and ${gaps.missingDoc.length - 40} more`
           : '')
       : '- None flagged',
     '',
@@ -598,10 +598,10 @@ export function getFeatureCoverageDocument() {
     gaps.missingPack.length
       ? gaps.missingPack
           .slice(0, 40)
-          .map((r) => `- **${r.feature}** — \`${r.inventoryId}\``)
+          .map((r) => `- **${r.feature}** â€” \`${r.inventoryId}\``)
           .join('\n') +
         (gaps.missingPack.length > 40
-          ? `\n- … and ${gaps.missingPack.length - 40} more`
+          ? `\n- â€¦ and ${gaps.missingPack.length - 40} more`
           : '')
       : '- None flagged',
     '',
@@ -610,10 +610,10 @@ export function getFeatureCoverageDocument() {
     gaps.missingRoleProfile.length
       ? gaps.missingRoleProfile
           .slice(0, 40)
-          .map((r) => `- **${r.feature}** — asset \`${r.assetId}\`; roles: ${r.roleVisibility}`)
+          .map((r) => `- **${r.feature}** â€” asset \`${r.assetId}\`; roles: ${r.roleVisibility}`)
           .join('\n') +
         (gaps.missingRoleProfile.length > 40
-          ? `\n- … and ${gaps.missingRoleProfile.length - 40} more`
+          ? `\n- â€¦ and ${gaps.missingRoleProfile.length - 40} more`
           : '')
       : '- None flagged',
     '',

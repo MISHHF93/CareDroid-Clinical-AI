@@ -58,7 +58,7 @@ export function shouldShowShiftHandoffStrip({ roleId = (undefined as string | un
 }
 
 /**
- * Five-metric shift snapshot for nurse/physician handoff — one glance, one click to filter.
+ * Five-metric shift snapshot for nurse/physician handoff â€” one glance, one click to filter.
  */
 export function selectShiftHandoffMetrics({
   patients = [] as any[],

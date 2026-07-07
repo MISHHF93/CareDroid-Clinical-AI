@@ -1,5 +1,5 @@
 /**
- * Whiteboard density audit — classify surfaces as always-visible vs progressive disclosure.
+ * Whiteboard density audit â€” classify surfaces as always-visible vs progressive disclosure.
  * Pairs with whiteboardOperationalLoadModel for load-aware visibility.
  */
 
@@ -18,7 +18,7 @@ export const WHITEBOARD_SURFACE_REGISTRY = Object.freeze([
     id: 'hero-title',
     label: 'Department title',
     tier: WHITEBOARD_DENSITY_TIER.ALWAYS_VISIBLE,
-    rationale: 'Orientation anchor — who/where am I.',
+    rationale: 'Orientation anchor â€” who/where am I.',
   }),
   Object.freeze({
     id: 'hero-detail',
@@ -48,19 +48,19 @@ export const WHITEBOARD_SURFACE_REGISTRY = Object.freeze([
     id: 'primary-stats',
     label: 'Primary stat row',
     tier: WHITEBOARD_DENSITY_TIER.ALWAYS_VISIBLE,
-    rationale: 'Waiting, capacity, reassess, EMS ETA — actionable at a glance.',
+    rationale: 'Waiting, capacity, reassess, EMS ETA â€” actionable at a glance.',
   }),
   Object.freeze({
     id: 'secondary-stats',
     label: 'Secondary stat cards',
     tier: WHITEBOARD_DENSITY_TIER.PROGRESSIVE,
-    rationale: 'Total, high risk, EMS offload detail — drill-down metrics.',
+    rationale: 'Total, high risk, EMS offload detail â€” drill-down metrics.',
   }),
   Object.freeze({
     id: 'command-layer',
     label: 'Operational command layer',
     tier: WHITEBOARD_DENSITY_TIER.PROGRESSIVE,
-    rationale: 'Central snapshot grid — useful when calm, noisy under load.',
+    rationale: 'Central snapshot grid â€” useful when calm, noisy under load.',
   }),
   Object.freeze({
     id: 'ems-attention',
@@ -78,19 +78,19 @@ export const WHITEBOARD_SURFACE_REGISTRY = Object.freeze([
     id: 'reassess-attention',
     label: 'Reassessment attention strip',
     tier: WHITEBOARD_DENSITY_TIER.CONTEXTUAL,
-    rationale: 'Due reassessments — hidden when handoff or awareness banner covers it.',
+    rationale: 'Due reassessments â€” hidden when handoff or awareness banner covers it.',
   }),
   Object.freeze({
     id: 'referral-attention',
     label: 'Referral attention strip',
     tier: WHITEBOARD_DENSITY_TIER.CONTEXTUAL,
-    rationale: 'Pending referrals — hidden when consolidated elsewhere.',
+    rationale: 'Pending referrals â€” hidden when consolidated elsewhere.',
   }),
   Object.freeze({
     id: 'charge-nurse-strip',
     label: 'Charge nurse operational strip',
     tier: WHITEBOARD_DENSITY_TIER.CONTEXTUAL,
-    rationale: 'Role-specific queue summary — suppressed under pressure.',
+    rationale: 'Role-specific queue summary â€” suppressed under pressure.',
   }),
   Object.freeze({
     id: 'waiting-room-safety',
@@ -102,19 +102,19 @@ export const WHITEBOARD_SURFACE_REGISTRY = Object.freeze([
     id: 'mission-control',
     label: 'Mission control panels',
     tier: WHITEBOARD_DENSITY_TIER.PROGRESSIVE,
-    rationale: 'Deep workflow cards — collapse when triage bandwidth is scarce.',
+    rationale: 'Deep workflow cards â€” collapse when triage bandwidth is scarce.',
   }),
   Object.freeze({
     id: 'queue-intelligence',
     label: 'Queue intelligence panel',
     tier: WHITEBOARD_DENSITY_TIER.PROGRESSIVE,
-    rationale: 'Detailed queue analytics — expand on demand.',
+    rationale: 'Detailed queue analytics â€” expand on demand.',
   }),
   Object.freeze({
     id: 'ops-detail',
     label: 'Ops detail drawer',
     tier: WHITEBOARD_DENSITY_TIER.PROGRESSIVE,
-    rationale: 'Audit history, data quality, queue pressure — one expandable strip.',
+    rationale: 'Audit history, data quality, queue pressure â€” one expandable strip.',
   }),
   Object.freeze({
     id: 'filters',
@@ -126,25 +126,25 @@ export const WHITEBOARD_SURFACE_REGISTRY = Object.freeze([
     id: 'patient-grid',
     label: 'Patient card grid',
     tier: WHITEBOARD_DENSITY_TIER.ALWAYS_VISIBLE,
-    rationale: 'Core work surface — cap count under waiting-wall load.',
+    rationale: 'Core work surface â€” cap count under waiting-wall load.',
   }),
   Object.freeze({
     id: 'department-status-screen',
     label: 'Department status screen',
     tier: WHITEBOARD_DENSITY_TIER.ALWAYS_VISIBLE,
-    rationale: 'Read-only wall display — aggregate metrics without PHI.',
+    rationale: 'Read-only wall display â€” aggregate metrics without PHI.',
   }),
   Object.freeze({
     id: 'public-waiting-screen',
     label: 'Public waiting display',
     tier: WHITEBOARD_DENSITY_TIER.ALWAYS_VISIBLE,
-    rationale: 'Patient waiting-area wall — PHI-safe operational guidance only.',
+    rationale: 'Patient waiting-area wall â€” PHI-safe operational guidance only.',
   }),
   Object.freeze({
     id: 'command-center-throughput',
     label: 'Department throughput',
     tier: WHITEBOARD_DENSITY_TIER.ALWAYS_VISIBLE,
-    rationale: 'Manager/director throughput dashboard — arrivals, waits, boarding, forecast.',
+    rationale: 'Manager/director throughput dashboard â€” arrivals, waits, boarding, forecast.',
   }),
 ]);
 
@@ -441,7 +441,7 @@ function buildRecommendations({
     items.push(`Cap unfiltered grid at ${operationalLoad.maxVisibleCards} cards with filter prompt.`);
   }
   if (hiddenUnderLoad >= 4) {
-    items.push('Progressive disclosure active — expand ops detail or queue intelligence when bandwidth allows.');
+    items.push('Progressive disclosure active â€” expand ops detail or queue intelligence when bandwidth allows.');
   }
 
   return Object.freeze(items);

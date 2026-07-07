@@ -17,28 +17,28 @@ type RiskLevel = 'HIGH' | 'MODERATE' | 'LOW' | 'NONE_REPORTED';
 export const IDEATION = [
   {
     id: 'q1',
-    question: '1. Wish to be dead — Have you wished you were dead or wished you could go to sleep and not wake up?',
+    question: '1. Wish to be dead â€” Have you wished you were dead or wished you could go to sleep and not wake up?',
     stopIfNo: false,
   },
   {
     id: 'q2',
-    question: '2. Suicidal ideation — Have you had any actual thoughts of killing yourself?',
+    question: '2. Suicidal ideation â€” Have you had any actual thoughts of killing yourself?',
     stopIfNo: true,
   },
   {
     id: 'q3',
-    question: '3. Suicidal ideation with method — Have you been thinking about how you might kill yourself?',
+    question: '3. Suicidal ideation with method â€” Have you been thinking about how you might kill yourself?',
     stopIfNo: true,
   },
   {
     id: 'q4',
-    question: '4. Suicidal ideation with intent — Have you had these thoughts and had some intention of acting on them?',
+    question: '4. Suicidal ideation with intent â€” Have you had these thoughts and had some intention of acting on them?',
     stopIfNo: true,
   },
   {
     id: 'q5',
     question:
-      '5. Suicidal ideation with plan — Have you started to work out or worked out the details of how to kill yourself? Do you intend to carry out this plan?',
+      '5. Suicidal ideation with plan â€” Have you started to work out or worked out the details of how to kill yourself? Do you intend to carry out this plan?',
     stopIfNo: false,
   },
 ];
@@ -65,17 +65,17 @@ const RISK_DISPLAY: Record<RiskLevel, { color: string; background: string; label
   HIGH: {
     color: MEDICAL_TYPE.statusCritical,
     background: '#7F1D1D66',
-    label: 'HIGH RISK — Immediate psychiatric consultation required. Do not leave patient alone.',
+    label: 'HIGH RISK â€” Immediate psychiatric consultation required. Do not leave patient alone.',
   },
   MODERATE: {
     color: '#FDBA74',
     background: '#7C2D1266',
-    label: 'MODERATE RISK — Physician review required. Safety planning recommended.',
+    label: 'MODERATE RISK â€” Physician review required. Safety planning recommended.',
   },
   LOW: {
     color: '#FDE68A',
     background: '#78350F66',
-    label: 'LOW RISK — Monitor and reassess. Document safety planning discussion.',
+    label: 'LOW RISK â€” Monitor and reassess. Document safety planning discussion.',
   },
   NONE_REPORTED: {
     color: '#86EFAC',
@@ -91,7 +91,7 @@ function patientName(patient?: { firstName?: string; lastName?: string; mrn?: st
 
 function ideationSummary(answers: AnswerMap): string {
   const answered = IDEATION.filter((item) => answers[item.id]).map(
-    (item) => `${item.question.split(' — ')[0]}: ${answers[item.id]?.toUpperCase()}`,
+    (item) => `${item.question.split(' â€” ')[0]}: ${answers[item.id]?.toUpperCase()}`,
   );
   return answered.length ? answered.join(', ') : 'not completed';
 }
@@ -182,7 +182,7 @@ export default function ColumbiaSSRS({ patientId, onClose }: ColumbiaSSRSProps) 
 
     dispatchAlert({
       severity: 'Critical',
-      title: `Suicide Risk Assessment — ${patientName(patient)}`,
+      title: `Suicide Risk Assessment â€” ${patientName(patient)}`,
       message: `${risk} risk identified. Physician review required.`,
       patientId,
       source: 'columbia-ssrs',
@@ -288,7 +288,7 @@ export default function ColumbiaSSRS({ patientId, onClose }: ColumbiaSSRSProps) 
             </h2>
             {patient ? (
               <div style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 12, marginTop: 4 }}>
-                {patientName(patient)} · {patient.mrn}
+                {patientName(patient)} Â· {patient.mrn}
               </div>
             ) : null}
           </div>

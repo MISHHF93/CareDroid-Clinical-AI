@@ -1,5 +1,5 @@
 /**
- * Route Optimization — deterministic sort engine (Tier A).
+ * Route Optimization â€” deterministic sort engine (Tier A).
  * Future: pass `options.engine === 'graph'` and `options.graphProvider` for backend optimizer.
  */
 
@@ -141,7 +141,7 @@ function buildSequence(
 
   if (enforceLimits && destinations.length > limit) {
     warnings.push(
-      `Vehicle max stops (${vehicleLimitations.maxStops}) exceeded — ${destinations.length - limit} stop(s) deferred.`
+      `Vehicle max stops (${vehicleLimitations.maxStops}) exceeded â€” ${destinations.length - limit} stop(s) deferred.`
     );
   }
 

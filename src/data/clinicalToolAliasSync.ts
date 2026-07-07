@@ -2,7 +2,7 @@
  * Frontend ? backend NLU alias synchronization and drift reports.
  *
  * Backend keywords (tool.patterns.ts) drive NLU matching.
- * NLU_TO_REGISTRY_ID holds precise catalog / deep-link aliases only — not every keyword.
+ * NLU_TO_REGISTRY_ID holds precise catalog / deep-link aliases only â€” not every keyword.
  */
 
 import { readFileSync } from 'node:fs';
@@ -71,7 +71,7 @@ export const PHANTOM_BLOCKED_CATALOG_ALIASES = Object.freeze([
   'medication-checker',
 ]);
 
-/** Over-broad catalog keys — allowed only when explicitly listed (hub navigation). */
+/** Over-broad catalog keys â€” allowed only when explicitly listed (hub navigation). */
 export const BROAD_CATALOG_ALIASES = Object.freeze(['calculator', 'dispatch']);
 
 /**
@@ -111,7 +111,7 @@ export const ALLOWED_BACKEND_KEYWORD_COLLISIONS = Object.freeze([
   },
 ]);
 
-/** Registry ids shipped in PR1–PR6 + fleet audits. */
+/** Registry ids shipped in PR1â€“PR6 + fleet audits. */
 export const AUDITED_CLINICAL_REGISTRY_IDS = Object.freeze([
   ...PR1_CALCULATOR_REGISTRY_IDS,
   ...PR2_CALCULATOR_REGISTRY_IDS,
@@ -156,7 +156,7 @@ export const CHAT_ASSISTED_REQUIRED_BACKEND_ALIASES = Object.freeze([
   ...NEXUS_CSPINE_REQUIRED_NLU_ALIASES.map((a) => ({ alias: a, nluToolId: 'nexus-cspine' })),
 ]);
 
-/** All product-required NLU / discovery alias pairs (PR1–PR7 + fleet). */
+/** All product-required NLU / discovery alias pairs (PR1â€“PR7 + fleet). */
 export const ALL_REQUIRED_CATALOG_ALIAS_PAIRS = Object.freeze([
   ...PR1_ALL_ALIAS_PAIRS,
   ...MELD_ALL_ALIAS_PAIRS,
@@ -357,7 +357,7 @@ export function buildClinicalToolAliasSyncReport(options: any = {}) {
     if (actual !== registryId && slugActual !== registryId) {
       missingCatalogAliases.push({ alias, expected: registryId, actual, slugActual });
     } else if (actual !== registryId && slugActual === registryId) {
-      // phrase missing but slug ok — report as partial
+      // phrase missing but slug ok â€” report as partial
       if (actual === undefined) {
         missingCatalogAliases.push({ alias, expected: registryId, note: 'slug present, phrase missing' });
       }
@@ -572,9 +572,9 @@ export function formatAliasSyncReport(report) {
     }
   }
   if (report.isClean) {
-    lines.push('Status: CLEAN — frontend catalog, backend patterns, and alias map are aligned.');
+    lines.push('Status: CLEAN â€” frontend catalog, backend patterns, and alias map are aligned.');
   } else {
-    lines.push('Status: DRIFT DETECTED — see sections above.');
+    lines.push('Status: DRIFT DETECTED â€” see sections above.');
   }
   return lines.join('\n');
 }

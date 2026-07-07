@@ -32,9 +32,9 @@ const LabInterpreter = ({ embedded = false, onCloseEmbedded }: any = {}) => {
   const [preflightReady, setPreflightReady] = useState(false);
 
   const commonLabs = [
-    { name: 'WBC', unit: 'K/µL' },
+    { name: 'WBC', unit: 'K/ÂµL' },
     { name: 'Hemoglobin', unit: 'g/dL' },
-    { name: 'Platelets', unit: 'K/µL' },
+    { name: 'Platelets', unit: 'K/ÂµL' },
     { name: 'Sodium', unit: 'mEq/L' },
     { name: 'Potassium', unit: 'mEq/L' },
     { name: 'Chloride', unit: 'mEq/L' },
@@ -132,7 +132,7 @@ const LabInterpreter = ({ embedded = false, onCloseEmbedded }: any = {}) => {
 
   const loadExample = () => {
     setLabValues([
-      { name: 'WBC', value: 15.2, unit: 'K/µL' },
+      { name: 'WBC', value: 15.2, unit: 'K/ÂµL' },
       { name: 'Hemoglobin', value: 10.5, unit: 'g/dL' },
       { name: 'Sodium', value: 132, unit: 'mEq/L' },
       { name: 'Potassium', value: 5.8, unit: 'mEq/L' },
@@ -590,7 +590,7 @@ const LabResults = ({ results }) => {
           </span>
           Clinical Disclaimer:
         </strong>{' '}
-        Clinical decision support only — does not establish a diagnosis.{' '}
+        Clinical decision support only â€” does not establish a diagnosis.{' '}
         {disclaimer ||
           'Lab interpretation is context-dependent. Results should be evaluated by qualified healthcare providers in conjunction with clinical presentation and patient history.'}{' '}
         This tool provides educational information only and is not a substitute for professional

@@ -1,10 +1,10 @@
 /**
- * FIB-4 index — non-invasive liver fibrosis risk (NAFLD / chronic hepatitis context).
- * Reference: Vallet-Pichard A, et al. FIB-4: an inexpensive and accurate marker of fibrosis in HCV/HIV co-infection. Hepatology. 2007;46(1):266–272.
+ * FIB-4 index â€” non-invasive liver fibrosis risk (NAFLD / chronic hepatitis context).
+ * Reference: Vallet-Pichard A, et al. FIB-4: an inexpensive and accurate marker of fibrosis in HCV/HIV co-infection. Hepatology. 2007;46(1):266â€“272.
  */
 
 export const FIB4_SAFETY_DISCLAIMER =
-  'Non-invasive fibrosis screening index only. Does not diagnose cirrhosis or replace elastography, liver biopsy, or hepatology referral pathways — follow local NAFLD/hepatitis staging protocols.';
+  'Non-invasive fibrosis screening index only. Does not diagnose cirrhosis or replace elastography, liver biopsy, or hepatology referral pathways â€” follow local NAFLD/hepatitis staging protocols.';
 
 /** @param {number} score */
 export function fib4RiskCategoryFromIndex(score, ageYears) {
@@ -51,7 +51,7 @@ export function interpretFib4(fib4, ageYears) {
   if (!riskCategory) return null;
 
   const referenceLine =
-    'Vallet-Pichard A, et al. FIB-4: an inexpensive and accurate marker of fibrosis in HCV/HIV co-infection. Hepatology. 2007;46(1):266–272.';
+    'Vallet-Pichard A, et al. FIB-4: an inexpensive and accurate marker of fibrosis in HCV/HIV co-infection. Hepatology. 2007;46(1):266â€“272.';
 
   const disclaimer = FIB4_SAFETY_DISCLAIMER;
   const youngCutoff = ageYears < 65;
@@ -65,7 +65,7 @@ export function interpretFib4(fib4, ageYears) {
         label: 'Low FIB-4',
         riskBand: '< 1.3 (age <65)',
         interpretation:
-          'FIB-4 <1.3 in patients <65 years suggests advanced fibrosis is unlikely in validation studies — supports routine monitoring per hepatology protocol.',
+          'FIB-4 <1.3 in patients <65 years suggests advanced fibrosis is unlikely in validation studies â€” supports routine monitoring per hepatology protocol.',
         disclaimer,
         referenceLine,
       };
@@ -76,9 +76,9 @@ export function interpretFib4(fib4, ageYears) {
         riskCategory,
         riskCategoryLabel: 'Indeterminate fibrosis concern (age <65)',
         label: 'Indeterminate FIB-4',
-        riskBand: '1.3–2.67 (age <65)',
+        riskBand: '1.3â€“2.67 (age <65)',
         interpretation:
-          'Indeterminate range — supports additional non-invasive staging (e.g. elastography) or specialist review per local pathway.',
+          'Indeterminate range â€” supports additional non-invasive staging (e.g. elastography) or specialist review per local pathway.',
         disclaimer,
         referenceLine,
       };
@@ -90,7 +90,7 @@ export function interpretFib4(fib4, ageYears) {
       label: 'High FIB-4',
       riskBand: '> 2.67 (age <65)',
       interpretation:
-        'FIB-4 >2.67 in patients <65 years is associated with higher likelihood of advanced fibrosis in validation studies — supports hepatology correlation and further staging.',
+        'FIB-4 >2.67 in patients <65 years is associated with higher likelihood of advanced fibrosis in validation studies â€” supports hepatology correlation and further staging.',
       disclaimer,
       referenceLine,
     };
@@ -104,7 +104,7 @@ export function interpretFib4(fib4, ageYears) {
       label: 'Lower FIB-4 (age =65)',
       riskBand: '< 2.0 (age =65)',
       interpretation:
-        'FIB-4 <2.0 in older adults — lower risk stratum per age-adjusted interpretation; correlate with comorbidities and serial trends.',
+        'FIB-4 <2.0 in older adults â€” lower risk stratum per age-adjusted interpretation; correlate with comorbidities and serial trends.',
       disclaimer,
       referenceLine,
     };
@@ -116,7 +116,7 @@ export function interpretFib4(fib4, ageYears) {
     label: 'Elevated FIB-4 (age =65)',
     riskBand: '= 2.0 (age =65)',
     interpretation:
-      'FIB-4 =2.0 in patients =65 years — higher fibrosis concern in age-adjusted thresholds; supports specialist correlation.',
+      'FIB-4 =2.0 in patients =65 years â€” higher fibrosis concern in age-adjusted thresholds; supports specialist correlation.',
     disclaimer,
     referenceLine,
   };
@@ -155,7 +155,7 @@ export function validateFib4Inputs(raw) {
     plt > FIB4_LIMITS.platelets10e9PerL.max
   ) {
     errors.push(
-      `Enter platelet count between 1 and ${FIB4_LIMITS.platelets10e9PerL.max} (×10?/L).`
+      `Enter platelet count between 1 and ${FIB4_LIMITS.platelets10e9PerL.max} (Ã—10?/L).`
     );
   }
 

@@ -109,7 +109,7 @@ export default function EMSPressureScore({ variant = 'badge', className = '' }) 
           <span>EMS Pressure</span>
           <h2>{pressure.band.label}</h2>
           <p>
-            {pressure.incomingUnits} inbound · {pressure.awaitingHandoff} awaiting handoff · avg
+            {pressure.incomingUnits} inbound Â· {pressure.awaitingHandoff} awaiting handoff Â· avg
             offload {pressure.averageOffloadMinutes}m
           </p>
         </div>

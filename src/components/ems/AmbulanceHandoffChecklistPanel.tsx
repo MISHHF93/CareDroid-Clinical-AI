@@ -10,7 +10,7 @@ import {
 import './AmbulanceHandoffChecklistPanel.css';
 
 function vitalChip(label, value, unit = '') {
-  if (value === undefined || value === null || value === '') return `${label} —`;
+  if (value === undefined || value === null || value === '') return `${label} â€”`;
   return `${label} ${value}${unit}`;
 }
 
@@ -78,7 +78,7 @@ export default function AmbulanceHandoffChecklistPanel({
       <header className="amb-handoff-checklist__header">
         <div>
           <h4>Ambulance handoff checklist</h4>
-          <p>{arrival.unitName || arrival.unitId} · {checklist.complaintSummary}</p>
+          <p>{arrival.unitName || arrival.unitId} Â· {checklist.complaintSummary}</p>
         </div>
         <span className={`amb-handoff-checklist__status${checklist.handoffAccepted ? ' amb-handoff-checklist__status--done' : ''}`}>
           {checklist.handoffAccepted ? 'Accepted' : `${completion}% complete`}

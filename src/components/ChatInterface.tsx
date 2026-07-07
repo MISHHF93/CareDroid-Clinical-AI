@@ -1071,7 +1071,7 @@ const ChatInterface = ({
     } catch {
       onAppendMessage?.(conversationId, {
         role: 'assistant',
-        content: 'Copilot unavailable — check connection',
+        content: 'Copilot unavailable â€” check connection',
         metadata: {
           isCopilotError: true,
           retryMessage: outgoingText,
@@ -1243,7 +1243,7 @@ const ChatInterface = ({
                   {formatMessageTime(message.timestamp)}
                   {message.ragContext && message.ragContext.sourcesFound > 0 && (
                     <span style={{ marginLeft: '12px', opacity: 0.7 }}>
-                      • {message.ragContext.chunksRetrieved} chunks from{' '}
+                      â€¢ {message.ragContext.chunksRetrieved} chunks from{' '}
                       {message.ragContext.sourcesFound} sources
                     </span>
                   )}

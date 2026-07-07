@@ -1,10 +1,10 @@
 /**
- * ACC/AHA 2013 Pooled Cohort Equations (PCE) ó 10-year ASCVD risk.
+ * ACC/AHA 2013 Pooled Cohort Equations (PCE) ‚Äî 10-year ASCVD risk.
  *
  * Reference: Goff DC Jr, et al. 2013 ACC/AHA Guideline on the Assessment of Cardiovascular Risk.
- * Circulation. 2014;129(25 suppl 2):S49ñS73. Table A equation parameters.
+ * Circulation. 2014;129(25 suppl 2):S49‚ÄìS73. Table A equation parameters.
  *
- * Decision support only ó does not recommend statins or other therapies.
+ * Decision support only ‚Äî does not recommend statins or other therapies.
  */
 
 /** @typedef {'female' | 'male'} AscvdSex */
@@ -76,7 +76,7 @@ const PCE_MODELS = {
     mean: 86.61,
     baselineSurvival: 0.9533,
   },
-  // AA men: main effects only (no age◊lipid/BP interactions per ACC reference implementation).
+  // AA men: main effects only (no age√ólipid/BP interactions per ACC reference implementation).
   african_american_male: {
     lnAge: 2.469,
     lnTotalChol: 0.302,
@@ -121,7 +121,7 @@ export function resolvePceModelKey(race, sex) {
 
 /**
  * @param {typeof PCE_MODELS.white_female} model
- * @param {AscvdPceInputs} inputs ó lipids in mg/dL
+ * @param {AscvdPceInputs} inputs ‚Äî lipids in mg/dL
  */
 function computeLinearPredictorSum(model, inputs) {
   const lnAge = Math.log(inputs.ageYears);
@@ -210,7 +210,7 @@ export function validateAscvdPceInputs(raw) {
   if (!Number.isFinite(ageYears)) {
     errors.push('Enter age in years.');
   } else if (ageYears < PCE_MIN_AGE || ageYears > PCE_MAX_AGE) {
-    errors.push(`Age must be ${PCE_MIN_AGE}ñ${PCE_MAX_AGE} years for the pooled cohort equations.`);
+    errors.push(`Age must be ${PCE_MIN_AGE}‚Äì${PCE_MAX_AGE} years for the pooled cohort equations.`);
   }
 
   if (sex !== 'female' && sex !== 'male') {
@@ -282,7 +282,7 @@ export function interpretAscvdTenYearRisk(tenYearRiskPct, opts: any = {}) {
 
   const category = categorizeAscvdTenYearRisk(tenYearRiskPct) as any;
   const usesOtherRaceNote = opts.usesOtherRaceWhiteCoefficients
-    ? ' ìOtherî race uses White coefficient values per ACC/AHA pooled cohort guidance.'
+    ? ' ‚ÄúOther‚Äù race uses White coefficient values per ACC/AHA pooled cohort guidance.'
     : '';
 
   const categoryLabels = {
@@ -294,13 +294,13 @@ export function interpretAscvdTenYearRisk(tenYearRiskPct, opts: any = {}) {
 
   const preventionGuidance = {
     low:
-      'Discuss heart-healthy lifestyle habits and periodic reassessment of risk factors. PCE estimates population-based atherosclerotic cardiovascular disease risk ó it does not diagnose existing disease.',
+      'Discuss heart-healthy lifestyle habits and periodic reassessment of risk factors. PCE estimates population-based atherosclerotic cardiovascular disease risk ‚Äî it does not diagnose existing disease.',
     borderline:
       'Suitable for shared decision-making about risk factors and whether additional risk refinement (e.g. coronary artery calcium, family history) may inform prevention discussions per institutional pathways. This tool does not recommend starting or withholding statin therapy.',
     intermediate:
-      'Elevated estimated risk warrants structured clinicianñpatient discussion of lifestyle modification and whether further risk assessment is appropriate per ACC/AHA prevention guidance and local policy. Avoid using this percentage alone to mandate treatment.',
+      'Elevated estimated risk warrants structured clinician‚Äìpatient discussion of lifestyle modification and whether further risk assessment is appropriate per ACC/AHA prevention guidance and local policy. Avoid using this percentage alone to mandate treatment.',
     high:
-      'High estimated 10-year risk supports intensive discussion of risk-factor modification and guideline-concordant prevention pathways with the treating clinician. This output is decision support for discussion ó not a treatment prescription.',
+      'High estimated 10-year risk supports intensive discussion of risk-factor modification and guideline-concordant prevention pathways with the treating clinician. This output is decision support for discussion ‚Äî not a treatment prescription.',
   };
 
   const severity =
@@ -311,16 +311,16 @@ export function interpretAscvdTenYearRisk(tenYearRiskPct, opts: any = {}) {
     label: categoryLabels[category],
     riskCategory: category,
     tenYearRiskPct,
-    interpretation: `Estimated 10-year ASCVD risk ò ${tenYearRiskPct.toFixed(1)}% (${categoryLabels[category].toLowerCase()}).${usesOtherRaceNote}`,
+    interpretation: `Estimated 10-year ASCVD risk Àú ${tenYearRiskPct.toFixed(1)}% (${categoryLabels[category].toLowerCase()}).${usesOtherRaceNote}`,
     preventionDiscussion: preventionGuidance[category],
     clinicianPatientDisclaimer:
       'Use as decision-support for clinician-patient discussions.',
     safetyDisclaimer:
-      'Pooled Cohort Equations estimate 10-year risk of first hard ASCVD event in primary prevention populations aged 40ñ79. They do not diagnose coronary artery disease, do not replace clinical judgment, and must not be used alone to rule in or rule out cardiovascular disease.',
+      'Pooled Cohort Equations estimate 10-year risk of first hard ASCVD event in primary prevention populations aged 40‚Äì79. They do not diagnose coronary artery disease, do not replace clinical judgment, and must not be used alone to rule in or rule out cardiovascular disease.',
     pathwayDisclaimer:
       'Follow ACC/AHA cholesterol and prevention guidelines and institutional pathways for risk-factor management. This tool does not recommend specific medications, doses, or preventive therapies.',
     referenceLine:
-      'Goff DC Jr, et al. 2013 ACC/AHA Guideline on the Assessment of Cardiovascular Risk. Circulation. 2014;129(25 suppl 2):S49ñS73.',
+      'Goff DC Jr, et al. 2013 ACC/AHA Guideline on the Assessment of Cardiovascular Risk. Circulation. 2014;129(25 suppl 2):S49‚ÄìS73.',
   };
 }
 

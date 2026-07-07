@@ -411,7 +411,7 @@ export function getOptionalRuntimeBackendRoutes() {
 }
 
 /**
- * Frontend inventory calls that are gated (no backend) — implement or keep gated.
+ * Frontend inventory calls that are gated (no backend) â€” implement or keep gated.
  */
 export function getFrontendGatedCalls() {
   return FRONTEND_API_CALLS.filter((c) => !findBackendRoute(c.method, c.path));

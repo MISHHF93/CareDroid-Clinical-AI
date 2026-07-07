@@ -26,7 +26,7 @@ export default function WaitingRoomCommunicationPanel({
   workflowLogs = ([] as any[]),
   staff = ([] as any[]),
   title = 'Waiting-room communication',
-  description = 'Staff contact events — updates, vitals, reassessments, delays, queue moves, and escalations.',
+  description = 'Staff contact events â€” updates, vitals, reassessments, delays, queue moves, and escalations.',
   limit = 8,
   compact = false,
   className = '',

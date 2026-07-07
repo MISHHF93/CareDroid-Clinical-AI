@@ -75,7 +75,7 @@ function parseUpperReference(referenceRange) {
   const text = String(referenceRange || '');
   const lessThan = text.match(/<\s*(\d+(?:\.\d+)?)/);
   if (lessThan) return Number(lessThan[1]);
-  const range = text.match(/(\d+(?:\.\d+)?)\s*[-–]\s*(\d+(?:\.\d+)?)/);
+  const range = text.match(/(\d+(?:\.\d+)?)\s*[-â€“]\s*(\d+(?:\.\d+)?)/);
   if (range) return Number(range[2]);
   const upper = text.match(/upper(?:\s+limit)?\D+(\d+(?:\.\d+)?)/i);
   return upper ? Number(upper[1]) : null;
@@ -188,7 +188,7 @@ function buildResult(calculatorId, label, values, fields, requiresAssessment) {
     assessmentCount,
     confirmationCount,
     bannerTitle: `${label} pre-populated from chart data`,
-    bannerSummary: `${populatedCount} field${populatedCount === 1 ? '' : 's'} filled · ${
+    bannerSummary: `${populatedCount} field${populatedCount === 1 ? '' : 's'} filled Â· ${
       assessmentCount + confirmationCount
     } require assessment`,
   };

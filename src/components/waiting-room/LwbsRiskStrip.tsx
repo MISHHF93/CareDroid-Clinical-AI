@@ -57,7 +57,7 @@ export default function LwbsRiskStrip({
           <p className="lwbs-risk-strip__eyebrow">Operational advisory</p>
           <h3>LWBS risk</h3>
           <p className="lwbs-risk-strip__subtitle">
-            Non-clinical left-without-being-seen risk from wait, reassessment, contact, congestion, time of day, and complaint context — advisory only.
+            Non-clinical left-without-being-seen risk from wait, reassessment, contact, congestion, time of day, and complaint context â€” advisory only.
           </p>
         </div>
       </header>

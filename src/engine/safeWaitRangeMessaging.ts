@@ -1,5 +1,5 @@
 /**
- * Patient-safe wait range messaging — buckets internal minute metrics into
+ * Patient-safe wait range messaging â€” buckets internal minute metrics into
  * non-exact ranges suitable for public waiting-room displays.
  */
 
@@ -15,7 +15,7 @@ export type SafeWaitRangeBucketId =
   (typeof SAFE_WAIT_RANGE_BUCKET)[keyof typeof SAFE_WAIT_RANGE_BUCKET];
 
 export const PUBLIC_WAIT_URGENCY_DISCLAIMER =
-  'Emergency patients are prioritized by urgency — these wait ranges are estimates, not guarantees.';
+  'Emergency patients are prioritized by urgency â€” these wait ranges are estimates, not guarantees.';
 
 const BUCKET_ORDER: SafeWaitRangeBucketId[] = [
   SAFE_WAIT_RANGE_BUCKET.UNDER_30,
@@ -27,9 +27,9 @@ const BUCKET_ORDER: SafeWaitRangeBucketId[] = [
 
 const BUCKET_LABELS: Record<SafeWaitRangeBucketId, string> = {
   [SAFE_WAIT_RANGE_BUCKET.UNDER_30]: 'Less than 30 minutes',
-  [SAFE_WAIT_RANGE_BUCKET.THIRTY_TO_SIXTY]: '30–60 minutes',
-  [SAFE_WAIT_RANGE_BUCKET.ONE_TO_TWO_HOURS]: '1–2 hours',
-  [SAFE_WAIT_RANGE_BUCKET.TWO_TO_FOUR_HOURS]: '2–4 hours',
+  [SAFE_WAIT_RANGE_BUCKET.THIRTY_TO_SIXTY]: '30â€“60 minutes',
+  [SAFE_WAIT_RANGE_BUCKET.ONE_TO_TWO_HOURS]: '1â€“2 hours',
+  [SAFE_WAIT_RANGE_BUCKET.TWO_TO_FOUR_HOURS]: '2â€“4 hours',
   [SAFE_WAIT_RANGE_BUCKET.OVER_FOUR_HOURS]: 'More than 4 hours',
 };
 
@@ -115,8 +115,8 @@ export function buildSafeWaitRangeMessage(
 
   const detail =
     bucketId === 'span'
-      ? 'Typical wait to see a clinician — actual times vary and urgent cases are seen first.'
-      : 'Typical wait to see a clinician — urgent cases are seen first.';
+      ? 'Typical wait to see a clinician â€” actual times vary and urgent cases are seen first.'
+      : 'Typical wait to see a clinician â€” urgent cases are seen first.';
 
   return Object.freeze({
     value,
@@ -128,13 +128,13 @@ export function buildSafeWaitRangeMessage(
   });
 }
 
-/** @deprecated Use buildSafeWaitRangeMessage — kept for import stability. */
+/** @deprecated Use buildSafeWaitRangeMessage â€” kept for import stability. */
 export function formatPublicWaitRange(avgMinutes: number, longestMinutes: number): string {
   return buildSafeWaitRangeMessage({ avgMinutes, longestMinutes }).value;
 }
 
-/** @deprecated Use formatSafeWaitRangeBucket — kept for import stability. */
+/** @deprecated Use formatSafeWaitRangeBucket â€” kept for import stability. */
 export function formatPublicWaitDuration(minutes: number): string {
-  if (!Number.isFinite(minutes) || minutes <= 0) return '—';
+  if (!Number.isFinite(minutes) || minutes <= 0) return 'â€”';
   return formatSafeWaitRangeBucket(minutes);
 }

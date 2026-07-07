@@ -1,5 +1,5 @@
 /**
- * Predictive Maintenance — deterministic rule-based scoring (Tier A).
+ * Predictive Maintenance â€” deterministic rule-based scoring (Tier A).
  * Tier C: pass `options.engine === 'ai'` and `options.aiProvider` when ML is available.
  */
 
@@ -96,7 +96,7 @@ export function normalizePredictiveMaintenanceInput(input: any = {}) {
 function buildInspectionWindows(riskBand, normalized) {
   const templates = {
     critical: [
-      { daysFromNow: 0, priority: 'urgent', reason: 'Critical maintenance risk — schedule immediate inspection' },
+      { daysFromNow: 0, priority: 'urgent', reason: 'Critical maintenance risk â€” schedule immediate inspection' },
       { daysFromNow: 3, priority: 'high', reason: 'Follow-up systems check after urgent service' },
       { daysFromNow: 14, priority: 'medium', reason: 'Verify corrective actions and clear diagnostic codes' },
     ],

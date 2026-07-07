@@ -128,7 +128,7 @@ export default function ReceptionPatientAnswersPanel({
               <p>
                 <strong>{snapshot.focusedPatient.nextCheckpointLabel}</strong>
                 {snapshot.focusedPatient.nextCheckpointAt
-                  ? ` · ${formatReceptionCheckpointTime(snapshot.focusedPatient.nextCheckpointAt)}`
+                  ? ` Â· ${formatReceptionCheckpointTime(snapshot.focusedPatient.nextCheckpointAt)}`
                   : null}
               </p>
               {snapshot.focusedPatient.nextCheckpointDetail ? (

@@ -153,7 +153,7 @@ const Protocols = ({ embedded = false, onCloseEmbedded }: any = {}) => {
 
         <ApiStateBanner
           loading={catalogLoading}
-          loadingMessage="Loading protocol catalog from server…"
+          loadingMessage="Loading protocol catalog from serverâ€¦"
           error={catalogError}
           onRetry={loadCatalog}
         />

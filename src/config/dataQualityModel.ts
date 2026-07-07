@@ -1,5 +1,5 @@
 /**
- * Data quality risk model — missing demographics, duplicates, arrival reason, verification.
+ * Data quality risk model â€” missing demographics, duplicates, arrival reason, verification.
  * Node-safe; duplicate pairing is supplied by dataQualityDiscovery.ts for UI accuracy.
  */
 
@@ -26,9 +26,9 @@ const PLACEHOLDER_NAME_PAIRS = [
 ];
 
 const PLACEHOLDER_COMPLAINTS = new Set([
-  'unknown identity — clinical care priority',
-  'temporary registration — identity to be reconciled',
-  'identity verification deferred — intake allowed',
+  'unknown identity â€” clinical care priority',
+  'temporary registration â€” identity to be reconciled',
+  'identity verification deferred â€” intake allowed',
   'unknown',
   'complaint pending',
   'reason pending',
@@ -154,7 +154,7 @@ export function assessPatientDataQualityRisks(patient, { duplicatePatientIds = n
       id: `${patient.id}:duplicate_patient`,
       category: DATA_QUALITY_RISK.DUPLICATE_PATIENT,
       label: DATA_QUALITY_RISK_LABELS.duplicate_patient,
-      summary: 'May match another active patient — confirm before creating a new chart.',
+      summary: 'May match another active patient â€” confirm before creating a new chart.',
       severity: 'warning',
       recommendedAction: 'review_duplicate',
     });

@@ -103,9 +103,9 @@ export function resolveReassessmentTimerThresholds(
 }
 
 export function formatTimerClockTime(isoTime?: string | null): string {
-  if (!isoTime) return '—';
+  if (!isoTime) return 'â€”';
   const date = new Date(isoTime);
-  if (!Number.isFinite(date.getTime())) return '—';
+  if (!Number.isFinite(date.getTime())) return 'â€”';
   return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 }
 
@@ -203,7 +203,7 @@ function minutesSince(timestamp?: string | null, now = new Date()): number | nul
   return Math.max(0, Math.round((now.getTime() - parsed) / 60000));
 }
 
-export function formatTimerLabel(minutes: number | null, { unknownLabel = '—' }: any = {}): string {
+export function formatTimerLabel(minutes: number | null, { unknownLabel = 'â€”' }: any = {}): string {
   if (minutes === null || !Number.isFinite(minutes)) return unknownLabel;
   if (minutes < 1) return '<1m';
   if (minutes < 60) return `${minutes}m`;
@@ -403,7 +403,7 @@ export function buildReassessmentTimerSnapshot(
         ? 'Due now'
         : minutesUntilDue !== null
           ? `Due in ${formatTimerLabel(Math.max(0, minutesUntilDue))}`
-          : '—';
+          : 'â€”';
 
   return {
     patientId: patient.id,
@@ -469,13 +469,13 @@ export function buildReassessmentTimerAlerts(
       severity: timer.stage === 'overdue' || timer.isOverdue ? 'Critical' : 'Warning',
       title:
         timer.stage === 'overdue' || timer.isOverdue
-          ? `Reassessment overdue — ${timer.displayName}`
-          : `Reassessment due — ${timer.displayName}`,
+          ? `Reassessment overdue â€” ${timer.displayName}`
+          : `Reassessment due â€” ${timer.displayName}`,
       message: [
         `Due ${timer.dueInLabel}.`,
         `Last vitals ${timer.lastVitalsAgeLabel} ago.`,
         `Last nurse contact ${timer.lastNurseContactAgeLabel} ago.`,
-        timer.lastReassessmentAgeLabel !== '—'
+        timer.lastReassessmentAgeLabel !== 'â€”'
           ? `Last reassessment ${timer.lastReassessmentAgeLabel} ago.`
           : null,
       ]

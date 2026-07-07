@@ -140,7 +140,7 @@ export function buildEmsAttentionStripMetrics(summary) {
         value:
           summary.inboundCount > 1
             ? summary.soonestEtaLabel || `${summary.inboundCount} units`
-            : summary.soonestEtaLabel || '—',
+            : summary.soonestEtaLabel || 'â€”',
         surface: 'ems',
         tone:
           summary.soonestEtaMinutes !== null && summary.soonestEtaMinutes <= 10

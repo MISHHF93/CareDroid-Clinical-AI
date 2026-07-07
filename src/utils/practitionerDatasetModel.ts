@@ -1,5 +1,5 @@
 /**
- * Practitioner-facing dataset shaping — representative samples without overload.
+ * Practitioner-facing dataset shaping â€” representative samples without overload.
  */
 import { PRACTITIONER_WALKTHROUGH_ACTIVE_CENSUS } from '../config/practitionerCleanup.constants';
 import { isPractitionerCleanupEnabled } from '../config/practitionerCleanup.config';
@@ -65,7 +65,7 @@ export function capPatientsForPractitionerView(patients, max = PRACTITIONER_WALK
 }
 
 /**
- * Practitioner seed shaping — dedupe MRNs then cap representative census.
+ * Practitioner seed shaping â€” dedupe MRNs then cap representative census.
  * @template T
  * @param {T[]} patients
  * @param {number} [max]

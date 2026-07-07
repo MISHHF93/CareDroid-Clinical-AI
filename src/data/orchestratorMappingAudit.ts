@@ -1,5 +1,5 @@
 /**
- * Orchestrator mapping audits — registry ? NLU ? backend POST executors.
+ * Orchestrator mapping audits â€” registry ? NLU ? backend POST executors.
  * Used by drift tests; does not register or fake backend tools.
  */
 

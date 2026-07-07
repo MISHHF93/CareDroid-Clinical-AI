@@ -1,8 +1,8 @@
 /**
- * PECARN pediatric head injury / CT decision rule — informational stratification only.
+ * PECARN pediatric head injury / CT decision rule â€” informational stratification only.
  *
  * Reference: Kuppermann N, et al. Identification of children at very low risk of clinically
- * important brain injuries after head trauma. Lancet. 2009;374(9696):1160–1170.
+ * important brain injuries after head trauma. Lancet. 2009;374(9696):1160â€“1170.
  *
  * Does not order or defer CT; does not replace clinician judgment or observation protocols.
  */
@@ -95,13 +95,13 @@ export function interpretPecarnHead(input) {
   const ageLabel = ageCategory === 'under_2' ? '<2 years' : '=2 years';
 
   const referenceLine =
-    'Kuppermann N, et al. Identification of children at very low risk of clinically important brain injuries after head trauma: a prospective cohort study. Lancet. 2009;374(9696):1160–1170.';
+    'Kuppermann N, et al. Identification of children at very low risk of clinically important brain injuries after head trauma: a prospective cohort study. Lancet. 2009;374(9696):1160â€“1170.';
 
   if (ruleCriteriaMet) {
     return {
       severity: 'warning',
       riskStratumLabel: 'Higher-risk stratum (PECARN criteria present)',
-      interpretation: `For the ${ageLabel} PECARN age group, one or more rule criteria are present (${triggeredCriteria.join('; ')}). In the derivation cohort, such patients were not in the very-low-risk group for clinically important traumatic brain injury. This is informational stratification only — it does not direct CT, observation, or discharge.`,
+      interpretation: `For the ${ageLabel} PECARN age group, one or more rule criteria are present (${triggeredCriteria.join('; ')}). In the derivation cohort, such patients were not in the very-low-risk group for clinically important traumatic brain injury. This is informational stratification only â€” it does not direct CT, observation, or discharge.`,
       disclaimer: PECARN_HEAD_DISCLAIMER,
       referenceLine,
     };

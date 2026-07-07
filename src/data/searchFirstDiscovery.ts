@@ -118,7 +118,7 @@ const COMMERCIAL_CAPABILITY_GROUPS = Object.freeze([
     id: 'enterprise-platform',
     title: 'Enterprise Operating Platform',
     description:
-      'Prompts 99–116 — benchmarking, franchise readiness, certification, risk, continuity, DR, assets, workforce, training, knowledge, playbooks, decision support, scenarios, strategy, portfolio, governance, ESG, architecture.',
+      'Prompts 99â€“116 â€” benchmarking, franchise readiness, certification, risk, continuity, DR, assets, workforce, training, knowledge, playbooks, decision support, scenarios, strategy, portfolio, governance, ESG, architecture.',
     path: CANONICAL_ROUTES.enterprisePlatform,
     aliases: ['enterprise platform', 'benchmarking', 'franchise readiness', 'risk register', 'ESG', 'portfolio'],
   },
@@ -126,7 +126,7 @@ const COMMERCIAL_CAPABILITY_GROUPS = Object.freeze([
     id: 'platform-intelligence',
     title: 'Platform Intelligence Hub',
     description:
-      'Prompts 117–136 — artifact registry, lineage, metadata, KPI intelligence, observability, technical debt, platform convergence.',
+      'Prompts 117â€“136 â€” artifact registry, lineage, metadata, KPI intelligence, observability, technical debt, platform convergence.',
     path: CANONICAL_ROUTES.platformIntelligence,
     aliases: ['platform intelligence', 'data catalog', 'data lineage', 'technical debt', 'convergence review'],
   },

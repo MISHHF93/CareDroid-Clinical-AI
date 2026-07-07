@@ -1,5 +1,5 @@
 /**
- * Copilot recommendation audit — actionable, prioritized operational guidance.
+ * Copilot recommendation audit â€” actionable, prioritized operational guidance.
  * Priority order: queue ? capacity ? boarding ? reassessment.
  * Node-safe.
  */
@@ -131,7 +131,7 @@ export function buildCopilotRecommendations(context: any = {}) {
           primaryBottleneck.bottleneckReason,
         ]
           .filter(Boolean)
-          .join(' · '),
+          .join(' Â· '),
         route: COPILOT_ROUTES.queues,
         whiteboardFilter: mapQueueToWhiteboardFilter(primaryBottleneck.id),
         severity: primaryBottleneck.bottleneckSeverity === 'critical' ? 'critical' : 'warning',
@@ -148,7 +148,7 @@ export function buildCopilotRecommendations(context: any = {}) {
         id: `queue-breach-${queue.id || queue.label}`,
         domain: COPILOT_RECOMMENDATION_DOMAIN.QUEUE,
         action: `Open ${queue.label} queue`,
-        detail: `${queue.count} waiting · oldest ${queue.oldestWaitMinutes}m vs ${queue.targetMinutes}m target`,
+        detail: `${queue.count} waiting Â· oldest ${queue.oldestWaitMinutes}m vs ${queue.targetMinutes}m target`,
         route: COPILOT_ROUTES.queues,
         whiteboardFilter: mapQueueToWhiteboardFilter(queue.id),
         severity:
@@ -166,7 +166,7 @@ export function buildCopilotRecommendations(context: any = {}) {
         id: 'capacity-pressure',
         domain: COPILOT_RECOMMENDATION_DOMAIN.CAPACITY,
         action: 'Open capacity dashboard',
-        detail: `Score ${capacityStatus.score ?? '—'} · ${capacityBand} band · act before grid saturates`,
+        detail: `Score ${capacityStatus.score ?? 'â€”'} Â· ${capacityBand} band Â· act before grid saturates`,
         route: COPILOT_ROUTES.capacity,
         severity: capacityBand === 'Red' ? 'critical' : 'warning',
         reasonCodes: [`capacity_${capacityBand.toLowerCase()}_band`],
@@ -183,7 +183,7 @@ export function buildCopilotRecommendations(context: any = {}) {
         id: 'boarding-pressure',
         domain: COPILOT_RECOMMENDATION_DOMAIN.BOARDING,
         action: 'Review boarding list',
-        detail: `${boarders} boarder${boarders === 1 ? '' : 's'} · ${boardingRisk} risk`,
+        detail: `${boarders} boarder${boarders === 1 ? '' : 's'} Â· ${boardingRisk} risk`,
         route: COPILOT_ROUTES.boarding,
         whiteboardFilter: 'Boarding',
         severity: boardingRisk === 'critical' || boardingRisk === 'high' ? 'critical' : 'warning',
@@ -201,7 +201,7 @@ export function buildCopilotRecommendations(context: any = {}) {
         id: 'reassessment-queue',
         domain: COPILOT_RECOMMENDATION_DOMAIN.REASSESSMENT,
         action: 'Open reassessment queue',
-        detail: `${reassessDue} due${reassessOverdue ? ` · ${reassessOverdue} overdue` : ''}`,
+        detail: `${reassessDue} due${reassessOverdue ? ` Â· ${reassessOverdue} overdue` : ''}`,
         route: COPILOT_ROUTES.reassessment,
         whiteboardFilter: 'Reassess',
         severity: reassessOverdue >= 2 || reassessDue >= 4 ? 'critical' : 'warning',
@@ -225,7 +225,7 @@ export function buildCopilotRecommendations(context: any = {}) {
 export function formatCopilotRecommendationLine(recommendation, index = 0) {
   const prefix = `[${recommendation.domain}]`;
   const routeHint = recommendation.route ? ` ? ${recommendation.route}` : '';
-  return `${index + 1}. ${prefix} ${recommendation.action} — ${recommendation.detail}${routeHint}`;
+  return `${index + 1}. ${prefix} ${recommendation.action} â€” ${recommendation.detail}${routeHint}`;
 }
 
 export function formatCopilotRecommendationsForPrompt(recommendations = [] as any[]) {
@@ -280,13 +280,13 @@ export function resolveCopilotQuickAction(query = '', context: any = {}) {
       (rec) => rec.domain === COPILOT_RECOMMENDATION_DOMAIN.CAPACITY,
     );
     const band = context.centralSnapshot?.capacityStatus?.band || 'Green';
-    const score = context.centralSnapshot?.capacityStatus?.score ?? '—';
+    const score = context.centralSnapshot?.capacityStatus?.score ?? 'â€”';
     return Object.freeze({
       handled: true,
       source: 'rule',
       response: capacityRec
         ? formatCopilotRecommendationLine(capacityRec, 0)
-        : `[capacity] Stable — score ${score}, ${band} band. No capacity escalation route needed.`,
+        : `[capacity] Stable â€” score ${score}, ${band} band. No capacity escalation route needed.`,
       recommendations: capacityRec ? [capacityRec] : [],
     });
   }
@@ -301,7 +301,7 @@ export function resolveCopilotQuickAction(query = '', context: any = {}) {
       source: 'rule',
       response: boardingRec
         ? formatCopilotRecommendationLine(boardingRec, 0)
-        : `[boarding] No boarding pressure — ${boarders} boarders on the board.`,
+        : `[boarding] No boarding pressure â€” ${boarders} boarders on the board.`,
       recommendations: boardingRec ? [boardingRec] : [],
     });
   }
@@ -316,7 +316,7 @@ export function resolveCopilotQuickAction(query = '', context: any = {}) {
       source: 'rule',
       response: reassessRec
         ? formatCopilotRecommendationLine(reassessRec, 0)
-        : `[reassessment] Queue clear — ${due} patients flagged.`,
+        : `[reassessment] Queue clear â€” ${due} patients flagged.`,
       recommendations: reassessRec ? [reassessRec] : [],
     });
   }

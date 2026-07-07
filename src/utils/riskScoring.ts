@@ -210,7 +210,7 @@ export const generateClinicalAlerts = (tool, results, riskData) => {
         title: 'Reduced Kidney Function Signal',
         description: `GFR ${results.gfr} is in a reduced kidney-function range; confirm chronicity and clinical context before labeling CKD.`,
         findings: [
-          `GFR: ${results.gfr} mL/min/1.73m²`,
+          `GFR: ${results.gfr} mL/min/1.73mÂ²`,
           'CKD Stage: ' + getKidneyStage(results.gfr),
         ],
         recommendations: [

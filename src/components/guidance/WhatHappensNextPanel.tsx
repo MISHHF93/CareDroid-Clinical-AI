@@ -20,7 +20,7 @@ export default function WhatHappensNextPanel({
       <header className="what-next-panel__header">
         <div>
           <h4>What happens next</h4>
-          <p>Operational guidance for staff — human review required.</p>
+          <p>Operational guidance for staff â€” human review required.</p>
         </div>
         <WhatHappensNextBadge patient={patient} referrals={referrals} staff={staff} compact />
       </header>

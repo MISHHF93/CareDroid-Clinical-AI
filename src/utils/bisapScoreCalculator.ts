@@ -1,10 +1,10 @@
 /**
- * BISAP score — early pancreatitis severity / mortality risk.
- * Reference: Wu BU, et al. The early prediction of mortality in acute pancreatitis. Am J Gastroenterol. 2008;103(5):1198–1203.
+ * BISAP score â€” early pancreatitis severity / mortality risk.
+ * Reference: Wu BU, et al. The early prediction of mortality in acute pancreatitis. Am J Gastroenterol. 2008;103(5):1198â€“1203.
  */
 
 export const BISAP_SAFETY_DISCLAIMER =
-  'Early pancreatitis severity estimate for risk documentation. Does not replace imaging for necrosis, ICU criteria, fluid resuscitation, or serial clinical reassessment — follow institutional acute pancreatitis pathways.';
+  'Early pancreatitis severity estimate for risk documentation. Does not replace imaging for necrosis, ICU criteria, fluid resuscitation, or serial clinical reassessment â€” follow institutional acute pancreatitis pathways.';
 
 export const BISAP_CRITERIA_META = [
   {
@@ -72,7 +72,7 @@ export function validateBisapInputs(raw) {
 }
 
 /**
- * @param {number} score 0–5
+ * @param {number} score 0â€“5
  */
 export function interpretBisapScore(score) {
   if (!Number.isFinite(score) || score < 0 || score > 5) return null;
@@ -81,7 +81,7 @@ export function interpretBisapScore(score) {
   if (!riskCategory) return null;
 
   const referenceLine =
-    'Wu BU, et al. The early prediction of mortality in acute pancreatitis. Am J Gastroenterol. 2008;103(5):1198–1203.';
+    'Wu BU, et al. The early prediction of mortality in acute pancreatitis. Am J Gastroenterol. 2008;103(5):1198â€“1203.';
 
   const disclaimer = BISAP_SAFETY_DISCLAIMER;
 
@@ -110,11 +110,11 @@ export function interpretBisapScore(score) {
     riskCategoryLabel: riskCategoryLabels[riskCategory],
     label: score >= 3 ? 'Higher BISAP score' : 'Lower BISAP score',
     riskBand: `${score} of 5 points`,
-    mortalityContext: `Approximate in-hospital mortality ${mortalityByScore[score] ?? '—'} in validation cohort`,
+    mortalityContext: `Approximate in-hospital mortality ${mortalityByScore[score] ?? 'â€”'} in validation cohort`,
     interpretation:
       score >= 3
-        ? 'Higher BISAP scores correlate with increased mortality in validation studies — supports monitored-care documentation and early critical-care consultation per protocol.'
-        : 'Lower BISAP scores — supports standard pancreatitis care documentation with serial reassessment.',
+        ? 'Higher BISAP scores correlate with increased mortality in validation studies â€” supports monitored-care documentation and early critical-care consultation per protocol.'
+        : 'Lower BISAP scores â€” supports standard pancreatitis care documentation with serial reassessment.',
     disclaimer,
     referenceLine,
   };

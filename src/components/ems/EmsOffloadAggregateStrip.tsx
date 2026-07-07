@@ -43,7 +43,7 @@ export default function EmsOffloadAggregateStrip({
           <p className="ems-offload-aggregate-strip__eyebrow">EMS offload</p>
           <h3>Aggregate offload status</h3>
           <p className="ems-offload-aggregate-strip__subtitle">
-            Department-wide ambulance inbound, delays, duration, and handoff queue — no patient
+            Department-wide ambulance inbound, delays, duration, and handoff queue â€” no patient
             identifiers on this summary.
           </p>
         </div>

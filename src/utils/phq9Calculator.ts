@@ -1,10 +1,10 @@
 /**
- * PHQ-9 — Patient Health Questionnaire depression symptom screen (9 items, 0–27).
+ * PHQ-9 â€” Patient Health Questionnaire depression symptom screen (9 items, 0â€“27).
  *
  * Reference: Kroenke K, Spitzer RL, Williams JB. The PHQ-9: validity of a brief depression
- * severity measure. J Gen Intern Med. 2001;16(9):606–613.
+ * severity measure. J Gen Intern Med. 2001;16(9):606â€“613.
  *
- * Screening / decision support only — does not diagnose depression or recommend medications.
+ * Screening / decision support only â€” does not diagnose depression or recommend medications.
  * Question 9 (self-harm ideation) requires elevated safety handling when score = 1.
  */
 
@@ -61,7 +61,7 @@ export const PHQ9_ITEMS = [
     key: 'q6',
     number: 6,
     label:
-      'Feeling bad about yourself — or that you are a failure or have let yourself or your family down',
+      'Feeling bad about yourself â€” or that you are a failure or have let yourself or your family down',
   },
   {
     key: 'q7',
@@ -72,7 +72,7 @@ export const PHQ9_ITEMS = [
     key: 'q8',
     number: 8,
     label:
-      'Moving or speaking so slowly that other people could have noticed — or the opposite, being so fidgety or restless that you have been moving around a lot more than usual',
+      'Moving or speaking so slowly that other people could have noticed â€” or the opposite, being so fidgety or restless that you have been moving around a lot more than usual',
   },
   {
     key: 'q9',
@@ -126,11 +126,11 @@ export function isPhq9Question9Elevated(question9Score) {
 }
 
 const SEVERITY_LABELS = {
-  none_minimal: 'None–minimal (0–4)',
-  mild: 'Mild (5–9)',
-  moderate: 'Moderate (10–14)',
-  moderately_severe: 'Moderately severe (15–19)',
-  severe: 'Severe (20–27)',
+  none_minimal: 'Noneâ€“minimal (0â€“4)',
+  mild: 'Mild (5â€“9)',
+  moderate: 'Moderate (10â€“14)',
+  moderately_severe: 'Moderately severe (15â€“19)',
+  severe: 'Severe (20â€“27)',
 };
 
 /**
@@ -145,12 +145,12 @@ export function interpretPhq9Score(total, question9Score) {
 
   const question9Elevated = isPhq9Question9Elevated(question9Score);
   const referenceLine =
-    'Kroenke K, Spitzer RL, Williams JB. The PHQ-9: validity of a brief depression severity measure. J Gen Intern Med. 2001;16(9):606–613.';
+    'Kroenke K, Spitzer RL, Williams JB. The PHQ-9: validity of a brief depression severity measure. J Gen Intern Med. 2001;16(9):606â€“613.';
 
   const severityLabel = SEVERITY_LABELS[severityCategory];
   const label = question9Elevated
-    ? `Question 9 elevated — urgent safety review (PHQ-9 total ${total}/27; ${severityLabel} symptom severity range)`
-    : `PHQ-9 total ${total}/27 — ${severityLabel} symptom severity range`;
+    ? `Question 9 elevated â€” urgent safety review (PHQ-9 total ${total}/27; ${severityLabel} symptom severity range)`
+    : `PHQ-9 total ${total}/27 â€” ${severityLabel} symptom severity range`;
 
   const highSymptomBurden =
     severityCategory === 'moderately_severe' || severityCategory === 'severe';
@@ -161,7 +161,7 @@ export function interpretPhq9Score(total, question9Score) {
   if (question9Elevated) uiSeverity = 'critical';
 
   const interpretation = question9Elevated
-    ? `Question 9 indicates possible self-harm or suicidal ideation (score ${question9Score}) and requires immediate clinical attention per institutional safety protocols — prioritize safety assessment before routine disposition. Total score ${total}/27 falls in the ${severityLabel} range on this symptom screen.`
+    ? `Question 9 indicates possible self-harm or suicidal ideation (score ${question9Score}) and requires immediate clinical attention per institutional safety protocols â€” prioritize safety assessment before routine disposition. Total score ${total}/27 falls in the ${severityLabel} range on this symptom screen.`
     : `Total score ${total}/27 falls in the ${severityLabel} range on this symptom screen. Higher scores suggest more frequent depressive symptoms over the past two weeks; use clinical judgment and local pathways for follow-up.`;
 
   const highSymptomEscalation =
@@ -175,7 +175,7 @@ export function interpretPhq9Score(total, question9Score) {
 
   const screeningDiscussion = {
     none_minimal:
-      'Scores in the none–minimal range suggest few depressive symptoms on this screen over the past two weeks. A low score does not exclude important mood concerns or safety risk in other contexts.',
+      'Scores in the noneâ€“minimal range suggest few depressive symptoms on this screen over the past two weeks. A low score does not exclude important mood concerns or safety risk in other contexts.',
     mild:
       'Scores in the mild range may warrant watchful waiting or repeat screening depending on context, functional impairment, and patient preference. This tool does not establish a depression diagnosis.',
     moderate:
@@ -189,7 +189,7 @@ export function interpretPhq9Score(total, question9Score) {
   const question9SafetyAlert = question9Elevated
     ? {
         elevated: true,
-        headline: 'Question 9 — possible self-harm or suicidal ideation',
+        headline: 'Question 9 â€” possible self-harm or suicidal ideation',
         message:
           'Any non-zero score on question 9 requires urgent safety assessment. Do not delay evaluation or use this screen alone to clear safety concerns. Follow local psychiatric emergency pathways, ensure immediate access to crisis resources (e.g. 988 Suicide & Crisis Lifeline in the U.S. when applicable), and arrange direct clinical review. This calculator does not provide emergency services or treatment recommendations.',
       }

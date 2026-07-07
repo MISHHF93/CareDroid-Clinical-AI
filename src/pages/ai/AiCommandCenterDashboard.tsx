@@ -177,7 +177,7 @@ function LoadingShell() {
         fontSize: 14,
       }}
     >
-      Loading AI Command Center…
+      Loading AI Command Centerâ€¦
     </div>
   );
 }
@@ -198,7 +198,7 @@ function WarningBanner({ warnings }: { warnings: string[] }) {
       }}
     >
       <strong>Degraded data sources: </strong>
-      {warnings.join(' · ')}
+      {warnings.join(' Â· ')}
     </div>
   );
 }
@@ -260,7 +260,7 @@ export default function AiCommandCenterDashboard() {
             AI Command Center
           </h1>
           <p style={{ margin: '2px 0 0', fontSize: 13, color: MEDICAL_THEME.inkMuted }}>
-            Evaluation · Memory · Cost · Expert routing
+            Evaluation Â· Memory Â· Cost Â· Expert routing
           </p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -298,7 +298,7 @@ export default function AiCommandCenterDashboard() {
               opacity: loading ? 0.6 : 1,
             }}
           >
-            {loading ? 'Refreshing…' : 'Refresh'}
+            {loading ? 'Refreshingâ€¦' : 'Refresh'}
           </button>
         </div>
       </div>
@@ -314,34 +314,34 @@ export default function AiCommandCenterDashboard() {
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 20 }}>
             <MetricTile
               label="Health"
-              value={health?.label ?? '—'}
+              value={health?.label ?? 'â€”'}
               sub={`${health?.failedBenchmarks ?? 0} benchmark failures`}
               accent={statusColor[health?.status ?? ''] || MEDICAL_THEME.ink}
             />
             <MetricTile
               label="Latency"
-              value={health ? `${Math.round(health.latencyMs)} ms` : '—'}
+              value={health ? `${Math.round(health.latencyMs)} ms` : 'â€”'}
               sub="avg response time"
             />
             <MetricTile
               label="Accuracy"
-              value={health ? pct(health.accuracy) : '—'}
+              value={health ? pct(health.accuracy) : 'â€”'}
               sub="evaluation score"
               accent={health && health.accuracy >= 0.85 ? '#22c55e' : '#f59e0b'}
             />
             <MetricTile
               label="Cache Hit"
-              value={rag ? pct(rag.cacheHitRate) : '—'}
+              value={rag ? pct(rag.cacheHitRate) : 'â€”'}
               sub="retrieval cache"
             />
             <MetricTile
               label="Total Cost"
-              value={cost ? usd(cost.totalUsd) : '—'}
+              value={cost ? usd(cost.totalUsd) : 'â€”'}
               sub={cost ? `avg ${usd(cost.averageUsd)} / req` : undefined}
             />
             <MetricTile
               label="Hallucination"
-              value={snapshot?.hallucinationMetrics.label ?? '—'}
+              value={snapshot?.hallucinationMetrics.label ?? 'â€”'}
               sub={`target ${snapshot?.hallucinationMetrics.benchmark ?? '<= 5%'}`}
               accent={
                 snapshot && snapshot.hallucinationMetrics.rate <= 0.05
@@ -501,7 +501,7 @@ export default function AiCommandCenterDashboard() {
                     }}
                   >
                     <strong style={{ color: MEDICAL_THEME.ink }}>{log.action ?? log.type ?? 'Event'}</strong>
-                    {log.resource && ` · ${log.resource}`}
+                    {log.resource && ` Â· ${log.resource}`}
                     {log.timestamp && (
                       <span style={{ float: 'right', color: MEDICAL_THEME.inkSubtle }}>
                         {new Date(log.timestamp).toLocaleTimeString()}
@@ -556,7 +556,7 @@ export default function AiCommandCenterDashboard() {
                 textAlign: 'right',
               }}
             >
-              Last refreshed {lastRefreshed.toLocaleTimeString()} · auto-refreshes every{' '}
+              Last refreshed {lastRefreshed.toLocaleTimeString()} Â· auto-refreshes every{' '}
               {AI_COMMAND_CENTER_REFRESH_MS / 1000}s
             </div>
           )}

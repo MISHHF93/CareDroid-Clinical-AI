@@ -146,7 +146,7 @@ export function shouldShowPhysicianOperationalStrip({
 }
 
 /**
- * Physician command strip — assigned patients, provider wait, results, referrals, boarders.
+ * Physician command strip â€” assigned patients, provider wait, results, referrals, boarders.
  */
 export function selectPhysicianOperationalStrip({
   patients = [] as any[],

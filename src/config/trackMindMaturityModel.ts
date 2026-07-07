@@ -1,5 +1,5 @@
 /**
- * TrackMind Operating System Maturity Framework — nine-domain maturity scoring.
+ * TrackMind Operating System Maturity Framework â€” nine-domain maturity scoring.
  * Node-safe; aggregates platform audit signals and questionnaire inputs.
  */
 
@@ -34,7 +34,7 @@ export const TRACKMIND_MATURITY_LEVELS = Object.freeze([
     level: 1,
     label: 'Initial',
     minScore: 0,
-    summary: 'Reactive and undocumented — outcomes depend on individual effort.',
+    summary: 'Reactive and undocumented â€” outcomes depend on individual effort.',
   }),
   Object.freeze({
     id: TRACKMIND_MATURITY_LEVEL.EMERGING,

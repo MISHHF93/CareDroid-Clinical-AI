@@ -29,7 +29,7 @@ export default function PatientExperienceStatusStrip({
           <p className="patient-experience-strip__eyebrow">Patient experience layer</p>
           <h3>Understandable status map</h3>
           <p className="patient-experience-strip__subtitle">
-            Staff view mapping journey and queue states to patient-safe process labels — no public PHI.
+            Staff view mapping journey and queue states to patient-safe process labels â€” no public PHI.
           </p>
         </div>
       </header>

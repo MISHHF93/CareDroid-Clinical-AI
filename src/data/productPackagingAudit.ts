@@ -1,5 +1,5 @@
 /**
- * Product packaging audit — solution pack, specialty, role, organization type coverage.
+ * Product packaging audit â€” solution pack, specialty, role, organization type coverage.
  * Regenerate: npm run product-packaging-audit:write-docs
  */
 
@@ -284,10 +284,10 @@ export function buildProductPackagingAudit() {
     if (!orgTypes.length) violations.push('missing-organization-type');
     return {
       assetId,
-      solutionPacks: packIds.join(', ') || '—',
-      specialtyPacks: specialtySlugs.join(', ') || '—',
-      rolePacks: roleMappings.join('; ') || '—',
-      organizationTypes: orgTypes.join(', ') || '—',
+      solutionPacks: packIds.join(', ') || 'â€”',
+      specialtyPacks: specialtySlugs.join(', ') || 'â€”',
+      rolePacks: roleMappings.join('; ') || 'â€”',
+      organizationTypes: orgTypes.join(', ') || 'â€”',
       violations,
       compliant: violations.length === 0,
     };
@@ -343,7 +343,7 @@ export function buildProductPackagingAudit() {
 }
 
 function escapeCell(v) {
-  return String(v ?? '—').replace(/\|/g, '\\|');
+  return String(v ?? 'â€”').replace(/\|/g, '\\|');
 }
 
 export function formatProductPackagingAuditMarkdown(audit = buildProductPackagingAudit()) {
@@ -383,7 +383,7 @@ export function formatProductPackagingAuditMarkdown(audit = buildProductPackagin
     '',
     audit.summary.nonCompliantAssets === 0
       ? '**PASS (seed catalog):** All seeded platform assets have solution pack, specialty, role, and organization-type coverage.'
-      : `**PARTIAL:** ${audit.summary.nonCompliantAssets} seeded asset(s) fail one or more packaging dimensions — see violations below.`,
+      : `**PARTIAL:** ${audit.summary.nonCompliantAssets} seeded asset(s) fail one or more packaging dimensions â€” see violations below.`,
     '',
     audit.summary.backendSeedBacklogCount > 0
       ? `**Backend seed backlog:** ${audit.summary.backendSeedBacklogCount} user-facing tools are covered by the frontend mounted asset projection but are not yet direct backend \`platform_assets\` seed rows.`
@@ -425,7 +425,7 @@ export function formatProductPackagingAuditMarkdown(audit = buildProductPackagin
   );
 
   if (!audit.nonCompliant.length) {
-    lines.push('_None — all seeded assets satisfy four dimensions._', '');
+    lines.push('_None â€” all seeded assets satisfy four dimensions._', '');
   } else {
     lines.push('| Asset ID | Solution packs | Specialty | Role | Org types | Violations |', '| --- | --- | --- | --- | --- | --- |');
     for (const row of audit.nonCompliant) {
@@ -439,10 +439,10 @@ export function formatProductPackagingAuditMarkdown(audit = buildProductPackagin
   if (audit.specialtyGaps.length) {
     lines.push('### Missing specialty pack', '');
     audit.specialtyGaps.slice(0, 30).forEach((r) => {
-      lines.push(`- \`${r.assetId}\` — packs: ${r.solutionPacks}`);
+      lines.push(`- \`${r.assetId}\` â€” packs: ${r.solutionPacks}`);
     });
     if (audit.specialtyGaps.length > 30) {
-      lines.push(`- … and ${audit.specialtyGaps.length - 30} more`);
+      lines.push(`- â€¦ and ${audit.specialtyGaps.length - 30} more`);
     }
     lines.push('');
   }
@@ -450,10 +450,10 @@ export function formatProductPackagingAuditMarkdown(audit = buildProductPackagin
   if (audit.roleGaps.length) {
     lines.push('### Missing role pack', '');
     audit.roleGaps.slice(0, 30).forEach((r) => {
-      lines.push(`- \`${r.assetId}\` — packs: ${r.solutionPacks}`);
+      lines.push(`- \`${r.assetId}\` â€” packs: ${r.solutionPacks}`);
     });
     if (audit.roleGaps.length > 30) {
-      lines.push(`- … and ${audit.roleGaps.length - 30} more`);
+      lines.push(`- â€¦ and ${audit.roleGaps.length - 30} more`);
     }
     lines.push('');
   }
@@ -492,17 +492,17 @@ export function formatProductPackagingAuditMarkdown(audit = buildProductPackagin
   );
   if (audit.backendSeedBacklog.length) {
     audit.backendSeedBacklog.forEach((t) => {
-      lines.push(`- **${t.label}** (\`${t.id}\`) — ${t.route || 'no route'}${t.mounted ? ' — mounted projection OK' : ''}`);
+      lines.push(`- **${t.label}** (\`${t.id}\`) â€” ${t.route || 'no route'}${t.mounted ? ' â€” mounted projection OK' : ''}`);
     });
     if (audit.backendSeedBacklogTotal > audit.backendSeedBacklog.length) {
-      lines.push(`- … and ${audit.backendSeedBacklogTotal - audit.backendSeedBacklog.length} more`);
+      lines.push(`- â€¦ and ${audit.backendSeedBacklogTotal - audit.backendSeedBacklog.length} more`);
     }
   }
 
   if (audit.inventoryOnly.length) {
     lines.push('', '### Registry tools missing mounted projection', '');
     audit.inventoryOnly.forEach((t) => {
-      lines.push(`- **${t.label}** (\`${t.id}\`) — ${t.route || 'no route'}`);
+      lines.push(`- **${t.label}** (\`${t.id}\`) â€” ${t.route || 'no route'}`);
     });
   }
 
@@ -510,11 +510,11 @@ export function formatProductPackagingAuditMarkdown(audit = buildProductPackagin
     '',
     '## Remediation playbook',
     '',
-    '1. **Solution pack** — Add asset id to appropriate `SEED_ASSET_PACKS[].assetIds` (or `core-platform` for universal tools).',
-    '2. **Specialty pack** — Add asset id to `SEED_SPECIALTIES[].assetIds` for each relevant specialty slug.',
-    '3. **Role pack** — Add to `SEED_ROLE_PROFILES[].preferredAssetIds` and/or pack `targetRoles` for role targeting.',
-    '4. **Organization type** — Ensure at least one containing pack lists the tenant segment in `organizationTypes`.',
-    '5. **Backend seed backlog** — Promote high-value mounted projection rows into backend `platform_assets` seed rows when they need entitlement enforcement, billing, or marketplace ownership.',
+    '1. **Solution pack** â€” Add asset id to appropriate `SEED_ASSET_PACKS[].assetIds` (or `core-platform` for universal tools).',
+    '2. **Specialty pack** â€” Add asset id to `SEED_SPECIALTIES[].assetIds` for each relevant specialty slug.',
+    '3. **Role pack** â€” Add to `SEED_ROLE_PROFILES[].preferredAssetIds` and/or pack `targetRoles` for role targeting.',
+    '4. **Organization type** â€” Ensure at least one containing pack lists the tenant segment in `organizationTypes`.',
+    '5. **Backend seed backlog** â€” Promote high-value mounted projection rows into backend `platform_assets` seed rows when they need entitlement enforcement, billing, or marketplace ownership.',
     '',
     '## Appendix',
     '',

@@ -1,5 +1,5 @@
 /**
- * Orphan audit — backend-only routes, gated frontend calls, internal services.
+ * Orphan audit â€” backend-only routes, gated frontend calls, internal services.
  */
 
 import {
@@ -126,7 +126,7 @@ export function formatOrphanedBackendFunctionsMarkdown() {
     '|-------|------------|-------------|',
     ...byStrategy['expose-recommended'].map(
       (r) =>
-        `| \`${r.key.replace(/^\w+ /, '')}\` | ${r.controller} | ${r.clientHint ?? '—'} |`
+        `| \`${r.key.replace(/^\w+ /, '')}\` | ${r.controller} | ${r.clientHint ?? 'â€”'} |`
     ),
     '',
     '## C. Deferred / admin / SSO',
@@ -143,7 +143,7 @@ export function formatOrphanedBackendFunctionsMarkdown() {
     '|----|--------|------|------------|--------|',
     ...gated.map(
       (c) =>
-        `| ${c.id} | ${c.method} | \`${c.path}\` | ${c.capability ?? '—'} | ${c.client} |`
+        `| ${c.id} | ${c.method} | \`${c.path}\` | ${c.capability ?? 'â€”'} | ${c.client} |`
     ),
     '',
     '## E. POST executors',
@@ -167,7 +167,7 @@ export function formatOrphanedBackendFunctionsMarkdown() {
     '| Category | Count |',
     '|----------|------:|',
     `| Backend HTTP routes | ${backendOnly.length + gated.length} |`,
-    `| Wired frontend ? backend | ${gated.length ? 'see exposure report' : '—'} |`,
+    `| Wired frontend ? backend | ${gated.length ? 'see exposure report' : 'â€”'} |`,
     `| Backend-only / deferred (policy) | ${backendOnly.length} |`,
     `| Gated frontend (no route) | ${gated.length} |`,
     `| POST executors | ${BACKEND_EXECUTOR_NLU_TOOL_IDS.length} |`,

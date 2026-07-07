@@ -1,5 +1,5 @@
 /**
- * Whiteboard operational load — readability under department pressure.
+ * Whiteboard operational load â€” readability under department pressure.
  * Simulates charge-nurse awareness when waiting, EMS, reassess, and referrals stack up.
  */
 
@@ -69,7 +69,7 @@ export function evaluateWhiteboardOperationalLoad(metrics: any = {}) {
     issues.push({
       id: 'waiting-wall',
       severity: waitingPatients >= WHITEBOARD_LOAD_THRESHOLDS.waitingCritical ? 'critical' : 'warning',
-      summary: `${waitingPatients} patients waiting — full board grid reduces signal.`,
+      summary: `${waitingPatients} patients waiting â€” full board grid reduces signal.`,
     });
   }
   if (attentionSignals >= 2) {

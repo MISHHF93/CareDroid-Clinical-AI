@@ -1,5 +1,5 @@
 /**
- * CareDroid screen mode settings — normalized tenant configuration for displays,
+ * CareDroid screen mode settings â€” normalized tenant configuration for displays,
  * role access, privacy tiers, refresh cadence, and per-screen KPI visibility.
  */
 import {
@@ -54,12 +54,12 @@ export const PUBLIC_DISPLAY_PRIVACY_OPTIONS: ReadonlyArray<{
   {
     id: PUBLIC_DISPLAY_PRIVACY_LEVEL.standard,
     label: 'Standard public aggregate',
-    description: 'Wait ranges, crowd level, and process-stage messaging — no PHI.',
+    description: 'Wait ranges, crowd level, and process-stage messaging â€” no PHI.',
   },
   {
     id: PUBLIC_DISPLAY_PRIVACY_LEVEL.minimal,
     label: 'Minimal public aggregate',
-    description: 'Crowd level and generic guidance only — highest public privacy.',
+    description: 'Crowd level and generic guidance only â€” highest public privacy.',
   },
 ]);
 

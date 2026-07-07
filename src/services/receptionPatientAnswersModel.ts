@@ -1,5 +1,5 @@
 /**
- * Reception desk patient-answers model — consolidates public waiting display status,
+ * Reception desk patient-answers model â€” consolidates public waiting display status,
  * crowd level, wait explanation, process education, and per-patient checkpoints so
  * front desk staff can answer common questions without repeating themselves.
  */
@@ -128,7 +128,7 @@ function buildDepartmentWaitExplanation(input: {
 }): string {
   return [
     `Typical clinician wait right now is ${input.waitRangeValue}.`,
-    `The waiting room is ${input.crowdLevelLabel.toLowerCase()} — ${input.crowdLevelDetail}`,
+    `The waiting room is ${input.crowdLevelLabel.toLowerCase()} â€” ${input.crowdLevelDetail}`,
     input.waitDisclaimer,
   ].join(' ');
 }

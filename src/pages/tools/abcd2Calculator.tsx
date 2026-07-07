@@ -1,5 +1,5 @@
 /**
- * ABCD² calculator form (Tier A) — TIA short-term stroke risk stratification.
+ * ABCDÂ² calculator form (Tier A) â€” TIA short-term stroke risk stratification.
  */
 
 import { useEffect, useRef, useState } from 'react';
@@ -156,7 +156,7 @@ export function Abcd2Calculator({ onResultChange }) {
     <div className={`calculator-interface calculator-interface--${slug}`}>
       <div className="calculator-inputs">
         <CalcPanelTitle icon={icon}>
-          <span id={`${slug}-form-title`}>ABCD² score</span>
+          <span id={`${slug}-form-title`}>ABCDÂ² score</span>
         </CalcPanelTitle>
         <div className="calc-timi-disclaimer calc-has-bled-disclaimer" role="note">
           <CalcDecisionSupportLead />
@@ -181,7 +181,7 @@ export function Abcd2Calculator({ onResultChange }) {
             </div>
           ) : null}
           <fieldset className="calc-timi-fieldset">
-            <legend className="calc-timi-legend">ABCD² criteria</legend>
+            <legend className="calc-timi-legend">ABCDÂ² criteria</legend>
             <div className="calc-form-group calc-timi-row">
               <div className="calc-checkbox-group">
                 <input
@@ -198,7 +198,7 @@ export function Abcd2Calculator({ onResultChange }) {
             </div>
             <div className="calc-form-group calc-timi-row">
               <label htmlFor={`${slug}-sbp`} className="calc-label">
-                Blood pressure at event — systolic (mmHg)
+                Blood pressure at event â€” systolic (mmHg)
               </label>
               <input
                 id={`${slug}-sbp`}
@@ -211,7 +211,7 @@ export function Abcd2Calculator({ onResultChange }) {
             </div>
             <div className="calc-form-group calc-timi-row">
               <label htmlFor={`${slug}-dbp`} className="calc-label">
-                Blood pressure at event — diastolic (mmHg)
+                Blood pressure at event â€” diastolic (mmHg)
               </label>
               <span className="calc-input-help" id={`${slug}-bp-help`}>
                 1 point if systolic =140 or diastolic =90 mmHg
@@ -291,7 +291,7 @@ export function Abcd2Calculator({ onResultChange }) {
         {result ? (
           <>
             <div className={`calc-score-display ${result.severity}`}>
-              <div className="calc-score-label">ABCD² score</div>
+              <div className="calc-score-label">ABCDÂ² score</div>
               <div className="calc-score-value">{result.total}</div>
               <div className="calc-score-interpretation">of 7 points</div>
             </div>

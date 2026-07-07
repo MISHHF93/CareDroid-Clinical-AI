@@ -663,7 +663,7 @@ export default function ReferralPanel() {
                 >
                   <strong>{patientName(patient)}</strong>
                   <span>
-                    {patient.mrn} · {patient.chiefComplaint}
+                    {patient.mrn} Â· {patient.chiefComplaint}
                   </span>
                 </button>
               ))

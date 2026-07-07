@@ -249,7 +249,7 @@ export function startCapacityEngine() {
         id: 'cap-' + Date.now(),
         severity: snapshot.band === 'Red' ? 'Critical':'Warning',
         title: 'Capacity ' + snapshot.band,
-        message: `Score ${snapshot.score} — ${snapshot.band} zone`,
+        message: `Score ${snapshot.score} â€” ${snapshot.band} zone`,
         source: 'capacity-engine',
       });
     }

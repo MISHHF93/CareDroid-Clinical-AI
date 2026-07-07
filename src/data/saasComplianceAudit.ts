@@ -188,7 +188,7 @@ function hasCompleteGovernance(governance) {
 }
 
 function workspaceAssignable(assetId, legacyTargets) {
-  if (!assetId || assetId === '—') return false;
+  if (!assetId || assetId === 'â€”') return false;
   if (legacyTargets.has(assetId)) return true;
   return true;
 }
@@ -301,13 +301,13 @@ function evaluateRow(params) {
 
   return {
     feature,
-    route: route || '—',
-    inventoryId: inventoryId || '—',
-    assetId: assetId || '—',
-    packAssignment: packList.length ? packList.join(', ') : '—',
+    route: route || 'â€”',
+    inventoryId: inventoryId || 'â€”',
+    assetId: assetId || 'â€”',
+    packAssignment: packList.length ? packList.join(', ') : 'â€”',
     layer: layer || 'inventory',
-    lifecycle: lifecycle || '—',
-    lifecycleSource: lifecycleSource || '—',
+    lifecycle: lifecycle || 'â€”',
+    lifecycleSource: lifecycleSource || 'â€”',
     governance: hasCompleteGovernance(governance) ? 'Complete (seed template)' : 'Missing / partial',
     isPlatformAsset: isPlatformAsset ? 'Yes' : 'No',
     violations,
@@ -440,7 +440,7 @@ function summarizeViolations(rows) {
 }
 
 function escapeCell(value) {
-  return String(value ?? '—').replace(/\|/g, '\\|').replace(/\n/g, ' ');
+  return String(value ?? 'â€”').replace(/\|/g, '\\|').replace(/\n/g, ' ');
 }
 
 function formatViolationTable(rows, limit = 50) {
@@ -458,7 +458,7 @@ function formatViolationTable(rows, limit = 50) {
   ];
   const slice = rows.slice(0, limit);
   for (const row of slice) {
-    const violationText = row.violations.map((v) => v.rule).join(', ') || '—';
+    const violationText = row.violations.map((v) => v.rule).join(', ') || 'â€”';
     lines.push(
       `| ${[row.feature, row.route, row.assetId, row.packAssignment, row.isPlatformAsset, violationText]
         .map(escapeCell)
@@ -466,7 +466,7 @@ function formatViolationTable(rows, limit = 50) {
     );
   }
   if (rows.length > limit) {
-    lines.push('', `_… and ${rows.length - limit} more rows (see full matrix)._`);
+    lines.push('', `_â€¦ and ${rows.length - limit} more rows (see full matrix)._`);
   }
   return lines.join('\n');
 }
@@ -494,7 +494,7 @@ export function getSaasComplianceDocument() {
     '### Charter rules verified',
     '',
     ...CHARTER_RULES.map(
-      (r, i) => `${i + 1}. **${r.label}** — ${r.detail}`
+      (r, i) => `${i + 1}. **${r.label}** â€” ${r.detail}`
     ),
     '',
     '## Executive summary',
@@ -511,7 +511,7 @@ export function getSaasComplianceDocument() {
     '',
     '### Compliance posture',
     '',
-    `CareDroid now runs a **mounted registry projection**: ${userFacingCount} user-facing tools in \`toolInventory.js\` are projected through \`assetInventory.js\` with pack, product, workspace, role, lifecycle, execution, and governance metadata while backend \`platform_assets\` remains the commercial entitlement source. **Current state: mounted with evidence** — rows that are not direct DB seeds must retain projection evidence until generated seed sync is automated.`,
+    `CareDroid now runs a **mounted registry projection**: ${userFacingCount} user-facing tools in \`toolInventory.js\` are projected through \`assetInventory.js\` with pack, product, workspace, role, lifecycle, execution, and governance metadata while backend \`platform_assets\` remains the commercial entitlement source. **Current state: mounted with evidence** â€” rows that are not direct DB seeds must retain projection evidence until generated seed sync is automated.`,
     '',
     '## Violations by charter rule',
     '',
@@ -527,9 +527,9 @@ export function getSaasComplianceDocument() {
     sections.push(
       affected
         .slice(0, 35)
-        .map((r) => `- **${r.feature}** (\`${r.assetId}\`, ${r.route}) — ${r.violations.find((v) => v.rule === rule.id)?.message}`)
+        .map((r) => `- **${r.feature}** (\`${r.assetId}\`, ${r.route}) â€” ${r.violations.find((v) => v.rule === rule.id)?.message}`)
         .join('\n'),
-      affected.length > 35 ? `\n- … and ${affected.length - 35} more` : '',
+      affected.length > 35 ? `\n- â€¦ and ${affected.length - 35} more` : '',
       ''
     );
   }
@@ -543,22 +543,22 @@ export function getSaasComplianceDocument() {
     '| STRUCT-002 | **Resolved** | AI agents are pack-mounted through the AI workflow/core platform graph | Keep AI agent pack membership covered by seed and projection tests |',
     '| STRUCT-003 | **Resolved / Monitor** | Commercial surfaces (`/products`, `/integrations-marketplace`) are documented system/product routes and mapped to pack-backed product metadata | Add explicit product-wrapper assets if commercial pages become launchable assets |',
     '| STRUCT-004 | **Resolved** | Inventory lifecycle now maps to platform lifecycle enum (`draft`, `beta`, `active`, `deprecated`, `archived`) | Keep admin-only as access policy instead of lifecycle |',
-    '| STRUCT-005 | **Medium** | Seeded assets use empty `roleProfiles` / `workspaceTags` (implicit “all”) — compliant for assignment API but weak for explicit policy | Populate `roleProfiles` and `workspaceTags` per pack `targetRoles` / `defaultModules` |',
+    '| STRUCT-005 | **Medium** | Seeded assets use empty `roleProfiles` / `workspaceTags` (implicit â€œallâ€) â€” compliant for assignment API but weak for explicit policy | Populate `roleProfiles` and `workspaceTags` per pack `targetRoles` / `defaultModules` |',
     '| STRUCT-006 | **Resolved** | `assetInventory.ts` derives non-empty `packIds`, `productIds`, workspace, role, execution, and governance metadata for mounted tools | Keep asset projection invariant tests passing |',
     '| STRUCT-007 | **Low** | `/assistant?agent=` query now resolves through ED Copilot shell alias | Wire agent asset id to Copilot session context |',
     '',
-    '## Seeded platform assets (DB) — pack membership',
+    '## Seeded platform assets (DB) â€” pack membership',
     '',
     'Assets in `SEED_PLATFORM_ASSETS` without pack assignment:',
     '',
   );
 
   const seedNoPack = rows.filter(
-    (r) => r.isPlatformAsset === 'Yes' && r.packAssignment === '—'
+    (r) => r.isPlatformAsset === 'Yes' && r.packAssignment === 'â€”'
   );
   sections.push(
     seedNoPack.length
-      ? seedNoPack.map((r) => `- \`${r.assetId}\` — ${r.feature}`).join('\n')
+      ? seedNoPack.map((r) => `- \`${r.assetId}\` â€” ${r.feature}`).join('\n')
       : '- None',
     '',
     '## Full compliance matrix',
@@ -578,7 +578,7 @@ export function getSaasComplianceDocument() {
         row.isPlatformAsset,
         row.lifecycle,
         row.governance,
-        row.violationRules.length ? row.violationRules.join('; ') : '—',
+        row.violationRules.length ? row.violationRules.join('; ') : 'â€”',
       ]
         .map(escapeCell)
         .join(' | ')} |`

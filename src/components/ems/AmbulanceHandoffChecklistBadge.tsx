@@ -39,7 +39,7 @@ export default function AmbulanceHandoffChecklistBadge({
         .filter(Boolean)
         .join(' ')}
       data-tone={tone}
-      title={`Handoff ${completion}% · ${formatAmbulanceHandoffDestination(checklist)}`}
+      title={`Handoff ${completion}% Â· ${formatAmbulanceHandoffDestination(checklist)}`}
     >
       {checklist.handoffAccepted ? 'Handoff accepted' : `Handoff ${completion}%`}
       {!compact ? (

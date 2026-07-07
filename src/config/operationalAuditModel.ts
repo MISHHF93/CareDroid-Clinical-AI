@@ -1,5 +1,5 @@
 /**
- * Operational audit model — classify workflow logs for patient, queue, reassessment, referral.
+ * Operational audit model â€” classify workflow logs for patient, queue, reassessment, referral.
  */
 
 export const OPERATIONAL_AUDIT_DOMAIN = Object.freeze({

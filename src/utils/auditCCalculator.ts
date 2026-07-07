@@ -1,11 +1,11 @@
 /**
- * AUDIT-C — Alcohol Use Disorders Identification Test (consumption subset).
+ * AUDIT-C â€” Alcohol Use Disorders Identification Test (consumption subset).
  *
  * Reference: Bush K, et al. The AUDIT alcohol consumption questions (AUDIT-C): an effective brief
- * screening test for problem drinking. Arch Intern Med. 1998;158(16):1789–1795.
+ * screening test for problem drinking. Arch Intern Med. 1998;158(16):1789â€“1795.
  * WHO AUDIT screening guidance.
  *
- * Screening only — does not diagnose alcohol use disorder or provide detox advice.
+ * Screening only â€” does not diagnose alcohol use disorder or provide detox advice.
  */
 
 /** @typedef {'never' | 'monthly_or_less' | 'two_to_four_per_month' | 'two_to_three_per_week' | 'four_plus_per_week'} DrinkingFrequency */
@@ -23,8 +23,8 @@
 export const AUDIT_C_FREQUENCY_OPTIONS = [
   { value: 'never', label: 'Never', points: 0 },
   { value: 'monthly_or_less', label: 'Monthly or less', points: 1 },
-  { value: 'two_to_four_per_month', label: '2–4 times a month', points: 2 },
-  { value: 'two_to_three_per_week', label: '2–3 times a week', points: 3 },
+  { value: 'two_to_four_per_month', label: '2â€“4 times a month', points: 2 },
+  { value: 'two_to_three_per_week', label: '2â€“3 times a week', points: 3 },
   { value: 'four_plus_per_week', label: '4 or more times a week', points: 4 },
 ];
 
@@ -91,7 +91,7 @@ export function interpretAuditCScore(score) {
 
   const screeningResult = categorizeAuditCScreening(score) as any;
   const referenceLine =
-    'Bush K, et al. The AUDIT alcohol consumption questions (AUDIT-C): an effective brief screening test for problem drinking. Arch Intern Med. 1998;158(16):1789–1795.';
+    'Bush K, et al. The AUDIT alcohol consumption questions (AUDIT-C): an effective brief screening test for problem drinking. Arch Intern Med. 1998;158(16):1789â€“1795.';
 
   const labels = {
     negative: `Negative AUDIT-C screen (score ${score}; below ${AUDIT_C_WOMEN_POSITIVE_THRESHOLD} for women and below ${AUDIT_C_MEN_POSITIVE_THRESHOLD} for men)`,

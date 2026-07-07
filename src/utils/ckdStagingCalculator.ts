@@ -1,10 +1,10 @@
 /**
- * KDIGO CKD staging — eGFR (CKD-EPI 2021), albuminuria category, combined prognostic risk.
+ * KDIGO CKD staging â€” eGFR (CKD-EPI 2021), albuminuria category, combined prognostic risk.
  *
  * Reference: Kidney Disease: Improving Global Outcomes (KDIGO) CKD Work Group.
  * KDIGO 2012 Clinical Practice Guideline for the Evaluation and Management of Chronic Kidney Disease.
  *
- * Decision support only — does not recommend medications, dialysis, or transplant.
+ * Decision support only â€” does not recommend medications, dialysis, or transplant.
  */
 
 /** @typedef {'female' | 'male'} CkdSex */
@@ -17,7 +17,7 @@
 const CREATININE_UMOL_TO_MG_DL = 1 / 88.4;
 const ACR_MG_MMOL_TO_MG_G = 8.84;
 
-/** KDIGO prognostic heat map (GFR × albuminuria). */
+/** KDIGO prognostic heat map (GFR Ã— albuminuria). */
 const KDIGO_PROGNOSTIC_RISK = {
   G1: { A1: 'low', A2: 'low', A3: 'moderately_increased' },
   G2: { A1: 'low', A2: 'low', A3: 'moderately_increased' },
@@ -89,41 +89,41 @@ export function classifyGfrCategory(egfrMlMin) {
   if (egfrMlMin >= 90) {
     return {
       category: 'G1',
-      label: 'G1 (=90 mL/min/1.73 m²)',
+      label: 'G1 (=90 mL/min/1.73 mÂ²)',
       description: 'Normal or high GFR (with other kidney damage markers, CKD may still apply).',
     };
   }
   if (egfrMlMin >= 60) {
     return {
       category: 'G2',
-      label: 'G2 (60–89 mL/min/1.73 m²)',
+      label: 'G2 (60â€“89 mL/min/1.73 mÂ²)',
       description: 'Mildly decreased GFR.',
     };
   }
   if (egfrMlMin >= 45) {
     return {
       category: 'G3a',
-      label: 'G3a (45–59 mL/min/1.73 m²)',
+      label: 'G3a (45â€“59 mL/min/1.73 mÂ²)',
       description: 'Mildly to moderately decreased GFR.',
     };
   }
   if (egfrMlMin >= 30) {
     return {
       category: 'G3b',
-      label: 'G3b (30–44 mL/min/1.73 m²)',
+      label: 'G3b (30â€“44 mL/min/1.73 mÂ²)',
       description: 'Moderately to severely decreased GFR.',
     };
   }
   if (egfrMlMin >= 15) {
     return {
       category: 'G4',
-      label: 'G4 (15–29 mL/min/1.73 m²)',
+      label: 'G4 (15â€“29 mL/min/1.73 mÂ²)',
       description: 'Severely decreased GFR.',
     };
   }
   return {
     category: 'G5',
-    label: 'G5 (<15 mL/min/1.73 m²)',
+    label: 'G5 (<15 mL/min/1.73 mÂ²)',
     description: 'Kidney failure (GFR category G5).',
   };
 }
@@ -144,7 +144,7 @@ export function classifyAlbuminuria(acrMgG) {
   if (acrMgG <= 300) {
     return {
       category: 'A2',
-      label: 'A2 (30–300 mg/g)',
+      label: 'A2 (30â€“300 mg/g)',
       description: 'Moderately increased albuminuria.',
     };
   }
@@ -198,7 +198,7 @@ export function validateCkdStagingInputs(raw) {
   const urineAcr = Number(raw.urineAcr);
 
   if (!Number.isFinite(ageYears) || ageYears < 18 || ageYears > 120) {
-    errors.push('Enter age in years (18–120) for CKD-EPI 2021.');
+    errors.push('Enter age in years (18â€“120) for CKD-EPI 2021.');
   }
 
   if (sex !== 'female' && sex !== 'male') {
@@ -214,7 +214,7 @@ export function validateCkdStagingInputs(raw) {
     errors.push('Serum creatinine should be between 0.2 and 25 mg/dL.');
   }
   if (creatinineUnit === 'umol_l' && Number.isFinite(serumCreatinine) && (serumCreatinine < 20 || serumCreatinine > 2200)) {
-    errors.push('Serum creatinine should be between 20 and 2200 µmol/L.');
+    errors.push('Serum creatinine should be between 20 and 2200 Âµmol/L.');
   }
 
   if (!Number.isFinite(urineAcr) || urineAcr < 0) {
@@ -260,7 +260,7 @@ export function interpretCkdStaging(egfr, gfr, albuminuria, prognosticRisk) {
   return {
     severity: prognosticRiskSeverity(prognosticRisk),
     combinedStage,
-    combinedStageLabel: `KDIGO G×A category ${combinedStage} (GFR ${gfr.category} + albuminuria ${albuminuria.category})`,
+    combinedStageLabel: `KDIGO GÃ—A category ${combinedStage} (GFR ${gfr.category} + albuminuria ${albuminuria.category})`,
     gfrCategory: gfr.category,
     gfrCategoryLabel: gfr.label,
     gfrCategoryDescription: gfr.description,
@@ -269,16 +269,16 @@ export function interpretCkdStaging(egfr, gfr, albuminuria, prognosticRisk) {
     albuminuriaCategoryDescription: albuminuria.description,
     prognosticRisk,
     prognosticRiskLabel: riskLabel,
-    interpretation: `Estimated eGFR ${egfr} mL/min/1.73 m² (${gfr.label}). ${albuminuria.label}: ${albuminuria.description} Combined KDIGO prognostic category: ${riskLabel}.`,
+    interpretation: `Estimated eGFR ${egfr} mL/min/1.73 mÂ² (${gfr.label}). ${albuminuria.label}: ${albuminuria.description} Combined KDIGO prognostic category: ${riskLabel}.`,
     stagingDiscussion:
-      'KDIGO defines CKD by abnormalities of kidney structure or function for =3 months. A single eGFR and ACR do not by themselves establish chronicity or etiology — correlate with history, imaging, and prior labs per institutional pathways.',
+      'KDIGO defines CKD by abnormalities of kidney structure or function for =3 months. A single eGFR and ACR do not by themselves establish chronicity or etiology â€” correlate with history, imaging, and prior labs per institutional pathways.',
     clinicianPatientDisclaimer: 'Use as decision-support for clinician-patient discussions.',
     safetyDisclaimer:
       'CKD-EPI 2021 estimates GFR from serum creatinine and demographics. It does not replace measured GFR, does not diagnose acute kidney injury, and must not be used alone to rule in or rule out kidney disease.',
     pathwayDisclaimer:
       'Follow KDIGO CKD evaluation and referral guidance and local nephrology pathways. This tool does not recommend specific therapies, dialysis, or transplant evaluation.',
     referenceLine:
-      'KDIGO 2012 Clinical Practice Guideline for the Evaluation and Management of Chronic Kidney Disease. Kidney Int Suppl. 2013;3:1–150. eGFR: Inker LA, et al. N Engl J Med. 2021 (CKD-EPI 2021 creatinine equation).',
+      'KDIGO 2012 Clinical Practice Guideline for the Evaluation and Management of Chronic Kidney Disease. Kidney Int Suppl. 2013;3:1â€“150. eGFR: Inker LA, et al. N Engl J Med. 2021 (CKD-EPI 2021 creatinine equation).',
   };
 }
 

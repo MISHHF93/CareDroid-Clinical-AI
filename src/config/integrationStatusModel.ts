@@ -1,5 +1,5 @@
 /**
- * Integration status helpers — re-exports registry + backend capability rollup.
+ * Integration status helpers â€” re-exports registry + backend capability rollup.
  */
 export {
   INTEGRATION_STATUS,
