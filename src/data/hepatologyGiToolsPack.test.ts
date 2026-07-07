@@ -96,7 +96,8 @@ describe('Hepatology and Gastroenterology Tools Pack wiring', () => {
       expect(record?.orchestratorToolId, registryId).toBeNull();
       expect(clinicalIntentToolsById[registryId]?.chatSeed, registryId).toMatch(/do not recommend|does not recommend/i);
       expect(navigation.mode, registryId).toBe('tool-page');
-      expect(navigation.pathname, registryId).toBe(`/tools/gastroenterology/${registryId}`);
+      expect(navigation.pathname, registryId).toBe(CANONICAL_ROUTES.emergencyTools);
+      expect(navigation.search, registryId).toContain(registryId);
     }
   });
 });

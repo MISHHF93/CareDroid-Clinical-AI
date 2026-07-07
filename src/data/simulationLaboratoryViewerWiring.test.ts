@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { getRegistryToolNavigation } from '../navigation/registryToolLaunch';
+import { CANONICAL_ROUTES } from '../config/routes.config';
 import { resolveCatalogLaunch, resolveRegistryId } from './clinicalCatalogWiring';
 import { REGISTRY } from './clinicalToolIdContract';
 import { getFrontendVisibleToolInventory } from './toolInventory';
@@ -35,7 +36,8 @@ describe('simulation, laboratory, and 3D viewer wiring', () => {
       expect(launch.registryId).toBe(tool.id);
       expect(launch.chatSeed).toMatch(/clinical decision support|demo|training|diagnostic/i);
       const navigation = getRegistryToolNavigation(tool.alias);
-      expect(navigation.pathname).toBe(tool.route);
+      expect(navigation.pathname, tool.id).toBe(CANONICAL_ROUTES.emergencyTools);
+      expect(navigation.search, tool.id).toContain(tool.id);
       expect(navigation.registryId).toBe(tool.id);
     }
   });
