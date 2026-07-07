@@ -178,7 +178,7 @@ describe('emergencyOperatingSystem complaint router', () => {
   });
 
   it('defines the Emergency Analytics MVP adoption and ROI contract', () => {
-    expect(EMERGENCY_ANALYTICS_MVP.route).toBe('/workspace/emergency/analytics');
+    expect(EMERGENCY_ANALYTICS_MVP.route).toBe('/emergency/analytics');
     expect(EMERGENCY_ANALYTICS_EVENTS).toEqual([
       'assessments_completed',
       'calculators_used',
@@ -200,7 +200,7 @@ describe('emergencyOperatingSystem complaint router', () => {
   });
 
   it('defines a 10-minute hospital onboarding walkthrough for CareDroid', () => {
-    expect(EMERGENCY_ONBOARDING_EXPERIENCE.route).toBe('/workspace/emergency/onboarding');
+    expect(EMERGENCY_ONBOARDING_EXPERIENCE.route).toBe('/emergency/help');
     expect(EMERGENCY_ONBOARDING_EXPERIENCE.goal).toMatch(/10 minutes/i);
     expect(EMERGENCY_ONBOARDING_EXPERIENCE.sections.map((section) => section.label)).toEqual([
       'CareDroid overview',
@@ -218,7 +218,7 @@ describe('emergencyOperatingSystem complaint router', () => {
       '7-9',
       '9-10',
     ]);
-    expect(EMERGENCY_ONBOARDING_EXPERIENCE.walkthrough.at(-1).targetRoute).toBe('/workspace/emergency/analytics');
+    expect(EMERGENCY_ONBOARDING_EXPERIENCE.walkthrough.at(-1).targetRoute).toBe('/emergency/analytics');
   });
 
   it('defines a fully labeled Emergency demo tenant for prospect evaluation without integrations', () => {
@@ -226,7 +226,7 @@ describe('emergencyOperatingSystem complaint router', () => {
       expect.objectContaining({
         tenantId: 'emergency-demo-tenant',
         tenantName: 'CareDroid Demo Hospital',
-        workspaceRoute: '/workspace/emergency/demo',
+        workspaceRoute: '/emergency/whiteboard',
         dataPosture: expect.stringMatching(/No live EHR/i),
       })
     );
@@ -252,7 +252,7 @@ describe('emergencyOperatingSystem complaint router', () => {
   });
 
   it('estimates ED ROI from sales and onboarding discovery inputs', () => {
-    expect(EMERGENCY_ROI_ESTIMATOR.route).toBe('/workspace/emergency/roi');
+    expect(EMERGENCY_ROI_ESTIMATOR.route).toBe('/emergency/analytics');
     expect(EMERGENCY_ROI_ESTIMATOR.inputFields.map((field) => field.id)).toEqual([
       'annualEdVolume',
       'physicianCount',
@@ -280,7 +280,7 @@ describe('emergencyOperatingSystem complaint router', () => {
   });
 
   it('defines the first customer deployment blueprint as phased low-risk rollout', () => {
-    expect(EMERGENCY_FIRST_CUSTOMER_DEPLOYMENT.route).toBe('/workspace/emergency/deployment');
+    expect(EMERGENCY_FIRST_CUSTOMER_DEPLOYMENT.route).toBe('/emergency/settings');
     expect(EMERGENCY_FIRST_CUSTOMER_DEPLOYMENT.phases.map((phase) => phase.title)).toEqual([
       'Standalone CareDroid',
       'Protocol Library',
@@ -299,7 +299,7 @@ describe('emergencyOperatingSystem complaint router', () => {
   });
 
   it('defines the Emergency Flow Intelligence platform across all 10 solution areas', () => {
-    expect(EMERGENCY_FLOW_INTELLIGENCE_PLATFORM.route).toBe('/workspace/emergency/flow');
+    expect(EMERGENCY_FLOW_INTELLIGENCE_PLATFORM.route).toBe('/emergency/capacity');
     expect(EMERGENCY_FLOW_INTELLIGENCE_PLATFORM.patientFlow).toEqual([
       'Arrival',
       'Triage',

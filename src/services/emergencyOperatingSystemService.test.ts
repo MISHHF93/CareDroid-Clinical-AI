@@ -161,7 +161,7 @@ describe('EmergencyOperatingSystemService', () => {
       'Discharge Ready',
     ]);
     expect(operatingSystem.copilot.copilotId).toBe('emergency-ai-copilot');
-    expect(operatingSystem.analytics.route).toBe('/workspace/emergency/analytics');
+    expect(operatingSystem.analytics.route).toBe('/emergency/analytics');
     expect(operatingSystem.automationMarketplace.metrics.totalModules).toBe(10);
     expect(operatingSystem.automationRoi).toEqual(
       expect.objectContaining({

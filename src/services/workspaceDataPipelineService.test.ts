@@ -408,19 +408,19 @@ describe('WorkspaceDataPipelineService', () => {
     ]);
     expect(data.emergency.implementationSummary).toEqual(
       expect.objectContaining({
-        route: '/workspace/emergency/implementation',
+        route: '/emergency/settings',
         title: 'CareDroid MVP Implementation Summary',
         sourceDocument: 'docs/emergency-os-mvp-implementation-summary.md',
         coverage: expect.arrayContaining([
           expect.objectContaining({
             doc: 'door-to-doctor-intelligence.md',
-            route: '/workspace/emergency/throughput',
+            route: '/emergency/analytics',
             service: 'DoorToDoctorIntelligenceService',
             status: 'implemented',
           }),
           expect.objectContaining({
             doc: 'first-customer-path.md',
-            route: '/workspace/emergency/deployment',
+            route: '/emergency/settings',
             status: 'implemented',
           }),
         ]),
@@ -649,7 +649,7 @@ describe('WorkspaceDataPipelineService', () => {
           copilotId: 'emergency-ai-copilot',
         }),
         analytics: expect.objectContaining({
-          route: '/workspace/emergency/analytics',
+          route: '/emergency/analytics',
         }),
         automationMarketplace: expect.objectContaining({
           metrics: expect.objectContaining({ totalModules: 10 }),
@@ -687,7 +687,7 @@ describe('WorkspaceDataPipelineService', () => {
         targetSurface: 'patients',
         primaryAction: expect.objectContaining({
           label: 'Open patient flow',
-          target: '/workspace/emergency/patients',
+          target: '/emergency/patients',
         }),
         secondaryAction: expect.objectContaining({
           actionType: 'assistant',
@@ -698,7 +698,7 @@ describe('WorkspaceDataPipelineService', () => {
       expect.objectContaining({
         targetSurface: 'pre-arrival',
         primaryAction: expect.objectContaining({
-          target: '/workspace/emergency/pre-arrival',
+          target: '/emergency/ems',
         }),
       })
     );
@@ -745,7 +745,7 @@ describe('WorkspaceDataPipelineService', () => {
     );
     expect(data.emergency.firstCustomerDeployment).toEqual(
       expect.objectContaining({
-        route: '/workspace/emergency/deployment',
+        route: '/emergency/settings',
         phases: expect.arrayContaining([
           expect.objectContaining({ title: 'Standalone CareDroid' }),
           expect.objectContaining({ title: 'Protocol Library' }),
@@ -758,7 +758,7 @@ describe('WorkspaceDataPipelineService', () => {
     );
     expect(data.emergency.flowIntelligencePlatform).toEqual(
       expect.objectContaining({
-        route: '/workspace/emergency/flow',
+        route: '/emergency/capacity',
         primaryObjective: 'Reduce ED bottlenecks.',
         marketPains: expect.arrayContaining(['Too many patients', 'Too much coordination']),
         valueDrivers: expect.arrayContaining([
@@ -825,7 +825,7 @@ describe('WorkspaceDataPipelineService', () => {
     expect(data.emergency.flowIntelligencePlatform.analyticsModel.events.length).toBeGreaterThan(10);
     expect(data.emergency.onboarding).toEqual(
       expect.objectContaining({
-        route: '/workspace/emergency/onboarding',
+        route: '/emergency/help',
         sections: expect.arrayContaining([
           expect.objectContaining({ label: 'CareDroid overview' }),
           expect.objectContaining({ label: 'Calculators' }),
@@ -837,14 +837,14 @@ describe('WorkspaceDataPipelineService', () => {
         walkthrough: expect.arrayContaining([
           expect.objectContaining({
             minute: '9-10',
-            targetRoute: '/workspace/emergency/analytics',
+            targetRoute: '/emergency/analytics',
           }),
         ]),
       })
     );
     expect(data.emergency.roiEstimator).toEqual(
       expect.objectContaining({
-        route: '/workspace/emergency/roi',
+        route: '/emergency/analytics',
         inputFields: expect.arrayContaining([
           expect.objectContaining({ id: 'annualEdVolume' }),
           expect.objectContaining({ id: 'physicianCount' }),
@@ -932,7 +932,7 @@ describe('WorkspaceDataPipelineService', () => {
     );
     expect(data.analytics.emergency).toEqual(
       expect.objectContaining({
-        route: '/workspace/emergency/analytics',
+        route: '/emergency/analytics',
         trackedEvents: [
           'assessments_completed',
           'calculators_used',
