@@ -41,6 +41,9 @@ backend/.rag-local/
 # Local terminal session logs (Cursor / dev harness)
 /terminals/
 backend/build-out.txt
+.tmp-vitest-out.txt
+test-*-output.txt
+pages-map.txt
 
 # Playwright / responsive QA artifacts
 /test-results/

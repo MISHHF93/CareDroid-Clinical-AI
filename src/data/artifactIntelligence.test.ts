@@ -88,7 +88,10 @@ describe('artifact intelligence pipeline', () => {
   });
 
   it('captures NLU training examples and medical knowledge for intent routing models', () => {
-    expect(artifactIds.has('nlu-train-0')).toBe(true);
+    // 'corpus' not 'train': loadNluTrainingExamples only indexes corpus.jsonl (the
+    // master corpus) — indexing train/val/test splits too would double-count the same
+    // examples as separate artifacts, per the "circular leak" comment at its call site.
+    expect(artifactIds.has('nlu-corpus-0')).toBe(true);
     expect(artifacts.some((artifact) => artifact.type === 'nlu-example')).toBe(true);
     expect(artifacts.some((artifact) => artifact.type === 'medical-knowledge')).toBe(true);
   });

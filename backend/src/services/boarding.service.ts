@@ -1,8 +1,11 @@
 import { EventEmitter } from 'events';
+import { Logger } from '@nestjs/common';
 import {
   UnifiedPatient as Patient,
   type IUnifiedPatient as IPatient,
 } from '../models/unified-patient.model';
+
+const logger = new Logger('BoardingService');
 
 export interface BoardingMetrics {
   medianBoardTime: number;
@@ -159,10 +162,17 @@ export class BoardingService extends EventEmitter {
     return Math.floor((Date.now() - patient.boardingStartTime.getTime()) / 60000);
   }
 
+  // TODO(backend): no real delivery channel wired up yet — this is a standalone
+  // EventEmitter singleton (not NestJS-DI-managed), so it can't currently take a
+  // constructor-injected NotificationService/CollaborationHubService the way the
+  // modules/* services do. Both this log and the 'decision_to_admit' event below have
+  // zero subscribers today; bed management is not actually notified of new boarders.
   private async notifyBedManagement(patientId: string): Promise<void> {
     const patient = await Patient.findById(patientId);
     if (!patient) return;
-    console.log(`[BED MANAGEMENT] Patient ${patient.name} (${patientId}) requires admission`);
+    logger.warn(
+      `Patient ${patient.name} (${patientId}) requires admission — bed management notification not yet wired up`,
+    );
   }
 }
 

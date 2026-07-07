@@ -1,5 +1,6 @@
 import type { Express } from 'express';
 import type { Server as HttpServer } from 'http';
+import { Logger } from '@nestjs/common';
 import { Server, type Socket } from 'socket.io';
 import {
   edgeAIAmbulanceService,
@@ -7,6 +8,8 @@ import {
 } from '../services/edge-ai-ambulance.service';
 
 type CorsOrigin = string | string[] | boolean;
+
+const logger = new Logger('EMSWebSocket');
 
 export function registerEMSWebSocketSupport(
   app: Express,
@@ -17,7 +20,7 @@ export function registerEMSWebSocketSupport(
   const connections = new Map<string, string>();
 
   io.on('connection', (socket) => {
-    console.log('Client connected:', socket.id);
+    logger.log(`Client connected: ${socket.id}`);
 
     socket.on('join-whiteboard', (userId: string) => {
       connections.set(userId, socket.id);
@@ -25,7 +28,7 @@ export function registerEMSWebSocketSupport(
     });
 
     socket.on('disconnect', () => {
-      console.log('Client disconnected:', socket.id);
+      logger.log(`Client disconnected: ${socket.id}`);
       for (const [userId, socketId] of connections.entries()) {
         if (socketId === socket.id) connections.delete(userId);
       }

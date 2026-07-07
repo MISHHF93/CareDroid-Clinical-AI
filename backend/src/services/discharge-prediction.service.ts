@@ -1,7 +1,10 @@
+import { Logger } from '@nestjs/common';
 import {
   UnifiedPatient as Patient,
   type IUnifiedPatient as IPatient,
 } from '../models/unified-patient.model';
+
+const logger = new Logger('DischargePredictionService');
 
 type PatientVirtualFollowup = IPatient & {
   virtualRecheckScheduled?: boolean;
@@ -94,7 +97,7 @@ export class DischargePredictionService {
     const now = new Date();
     const isMidday = now.getHours() >= 11 && now.getHours() <= 14;
     if (!isMidday) {
-      console.log('Reverse triage sweep only runs 11am-2pm');
+      logger.debug('Reverse triage sweep only runs 11am-2pm');
       return [];
     }
 

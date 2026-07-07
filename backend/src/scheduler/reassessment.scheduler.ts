@@ -1,6 +1,9 @@
 import cron, { type ScheduledTask } from 'node-cron';
+import { Logger } from '@nestjs/common';
 import { reassessmentService } from '../services/reassessment.service';
 import { UnifiedPatient as Patient } from '../models/unified-patient.model';
+
+const logger = new Logger('ReassessmentScheduler');
 
 export class ReassessmentScheduler {
   private job: ScheduledTask | null = null;
@@ -26,12 +29,10 @@ export class ReassessmentScheduler {
         }
 
         if (overduePatients.length > 0) {
-          console.log(
-            `[ReassessmentScheduler] ${overduePatients.length} patients need reassessment`,
-          );
+          logger.log(`${overduePatients.length} patients need reassessment`);
         }
       } catch (error) {
-        console.error('[ReassessmentScheduler] Error:', error);
+        logger.error('Reassessment sweep failed', error instanceof Error ? error.stack : error);
       }
     });
   }

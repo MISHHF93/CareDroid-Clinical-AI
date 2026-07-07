@@ -1,5 +1,3 @@
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
-import path from 'node:path';
 import { ROUTE_RECORDS } from '../config/routes.config';
 import {
   ASSET_PACKS,
@@ -11,7 +9,47 @@ import { BACKEND_HTTP_ROUTES } from './backendHttpRouteInventory';
 import { FRONTEND_API_CALLS } from './frontendApiCallsInventory';
 import { clinicalIntentTools } from './clinicalIntentToolCatalog';
 import { getAiModelRegistry } from './aiModelRegistry';
-import { getLocalTrainedMlModelRegistry } from './aiModelRegistry.node';
+
+// artifactIntelligence.node.ts reads NLU training data, medical knowledge docs, and
+// locally trained ML model manifests from disk (node:fs) — none of that exists for a
+// browser to read, and a static `import` of it here would break the Vite client build
+// the same way importing node:fs directly once did (this file is reachable from a real
+// routed page, pages/governance/Artifacts.tsx). The dynamic import below only ever runs
+// in Node (tests, scripts) per the typeof window guard. Rollup can only statically
+// resolve/bundle a dynamic import() whose argument is a literal string — /* @vite-ignore */
+// alone doesn't stop that for a production build, only Vite's dev-mode transform. Building
+// the specifier from a runtime-computed variable makes it un-traceable, so Rollup leaves
+// this call alone entirely instead of trying to bundle the Node-only chunk for the browser.
+type NodeArtifactEnrichments = {
+  localTrainedMlModels: () => any[];
+  nluTrainingExamples: () => any[];
+  medicalKnowledgeDocuments: () => any[];
+};
+
+let nodeEnrichments: NodeArtifactEnrichments = {
+  localTrainedMlModels: () => [],
+  nluTrainingExamples: () => [],
+  medicalKnowledgeDocuments: () => [],
+};
+
+// `typeof window === 'undefined'` is NOT a reliable Node-vs-browser check here: Vitest's
+// jsdom test environment defines `window` too, even though tests run on real Node — that
+// check would silently make artifactIntelligence.test.ts lose the fs-backed NLU/medical
+// knowledge fixtures it asserts on. `process.versions.node` is only ever populated inside
+// an actual Node.js process (plain scripts and Vitest-under-jsdom both qualify; a real
+// browser has no `process` global at all here since nothing polyfills one).
+const isNodeRuntime = typeof process !== 'undefined' && Boolean(process.versions?.node);
+
+if (isNodeRuntime) {
+  try {
+    const nodeCompanionSpecifier = ['.', 'artifactIntelligence.node'].join('/');
+    const mod = await import(/* @vite-ignore */ nodeCompanionSpecifier);
+    nodeEnrichments = mod.nodeArtifactEnrichments;
+  } catch {
+    // Node-only data unavailable (e.g. running outside the repo checkout) — the
+    // browser-safe empty fallbacks above are used instead.
+  }
+}
 
 export const ARTIFACT_SCHEMA_FIELDS = Object.freeze([
   'artifactId',
@@ -422,68 +460,6 @@ function artifactFromAiModel(model) {
   });
 }
 
-function readJsonlLines(filePath) {
-  if (!existsSync(filePath)) return [];
-  return readFileSync(filePath, 'utf8')
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .map((line) => {
-      try {
-        return JSON.parse(line);
-      } catch {
-        return null;
-      }
-    })
-    .filter(Boolean);
-}
-
-function loadNluTrainingExamples() {
-  const nluDataDir = path.join(process.cwd(), 'backend', 'ml-services', 'nlu', 'data');
-  if (!existsSync(nluDataDir)) return [];
-
-  const examples: Array<{
-    text: string;
-    intent: string;
-    subcategory: string | undefined;
-    split: string;
-    sourceFile: string;
-    index: number;
-  }> = [];
-  // Only index the master corpus — never re-ingest train/val/test splits (circular leak).
-  for (const fileName of ['corpus.jsonl']) {
-    const split = fileName.replace('.jsonl', '');
-    const sourceFile = path.join('backend', 'ml-services', 'nlu', 'data', fileName).split(path.sep).join('/');
-    for (const [index, row] of readJsonlLines(path.join(nluDataDir, fileName)).entries()) {
-      if (!row.text || !row.intent) continue;
-      examples.push({
-        text: String(row.text),
-        intent: String(row.intent),
-        subcategory: row.subcategory ? String(row.subcategory) : undefined,
-        split,
-        sourceFile,
-        index,
-      });
-    }
-  }
-  return examples;
-}
-
-function loadMedicalKnowledgeDocuments() {
-  const knowledgeDir = path.join(process.cwd(), 'data', 'medical-knowledge');
-  if (!existsSync(knowledgeDir)) return [];
-
-  return readdirSync(knowledgeDir)
-    .filter((fileName) => fileName.endsWith('.md'))
-    .map((fileName) => {
-      const absolute = path.join(knowledgeDir, fileName);
-      const body = readFileSync(absolute, 'utf8');
-      const relative = path.join('data', 'medical-knowledge', fileName).split(path.sep).join('/');
-      const title = path.basename(fileName, '.md').replace(/-/g, ' ');
-      return { fileName, relative, body, title };
-    });
-}
-
 function artifactFromNluExample(example) {
   return makeArtifact({
     artifactId: `nlu-${example.split}-${example.index}`,
@@ -561,9 +537,9 @@ export function buildArtifactCatalog({ extraArtifacts = [] as any[] }: any = {})
     ...ASSET_PACKS.map(artifactFromPack),
     ...SAAS_PRODUCTS.map(artifactFromProduct),
     ...getAiModelRegistry().map(artifactFromAiModel),
-    ...getLocalTrainedMlModelRegistry().map(artifactFromLocalMlModel),
-    ...loadNluTrainingExamples().map(artifactFromNluExample),
-    ...loadMedicalKnowledgeDocuments().map(artifactFromMedicalKnowledge),
+    ...nodeEnrichments.localTrainedMlModels().map(artifactFromLocalMlModel),
+    ...nodeEnrichments.nluTrainingExamples().map(artifactFromNluExample),
+    ...nodeEnrichments.medicalKnowledgeDocuments().map(artifactFromMedicalKnowledge),
     ...extraArtifacts.map(makeArtifact),
   ];
   return dedupeArtifacts(artifacts).sort((a, b) => a.artifactId.localeCompare(b.artifactId));

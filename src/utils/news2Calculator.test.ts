@@ -24,7 +24,7 @@ describe('news2Calculator', () => {
     expect(scoreRespiratoryRate(7)).toBe(3);
     expect(scoreRespiratoryRate(10)).toBe(1);
     expect(scoreRespiratoryRate(16)).toBe(0);
-    expect(scoreRespiratoryRate(22)).toBe(1);
+    expect(scoreRespiratoryRate(22)).toBe(2);
     expect(scoreRespiratoryRate(28)).toBe(3);
   });
 
