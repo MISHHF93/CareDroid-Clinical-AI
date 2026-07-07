@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import TrainingDashboard from './TrainingDashboard';
+import TrainingDashboard from './training/TrainingDashboard';
 
-vi.mock('./TrainingDashboard.css', () => ({}));
+vi.mock('./training/TrainingDashboard.css', () => ({}));
 
 const trainingApiMock = vi.hoisted(() => ({
   fetchTrainingDashboard: vi.fn(),
@@ -212,7 +212,7 @@ describe('TrainingDashboard', () => {
   it('renders pipeline stages, capabilities, and evaluation metrics', async () => {
     render(<TrainingDashboard />);
 
-    expect(screen.getByRole('heading', { level: 1, name: /training dashboard/i })).toBeVisible();
+    expect(screen.getByRole('heading', { level: 1, name: /ai operations dashboard/i })).toBeVisible();
     expect(await screen.findByText('LoRA Tuning')).toBeVisible();
     expect(screen.getByText('MoE Routing')).toBeVisible();
     expect(screen.getByText('Hallucination rate')).toBeVisible();

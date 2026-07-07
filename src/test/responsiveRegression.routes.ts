@@ -126,7 +126,7 @@ export const CORE_ROUTE_SMOKE = Object.freeze([
   },
   { id: 'artifacts', path: '/artifacts', match: 'heading', heading: /caredroid artifacts/i },
   { id: 'memory', path: '/memory', match: 'heading', heading: /memory dashboard/i },
-  { id: 'training', path: '/training', match: 'heading', heading: /training dashboard/i },
+  { id: 'training', path: '/training', match: 'heading', heading: /ai operations dashboard/i },
   { id: 'analytics', path: '/analytics', match: 'heading', heading: /platform analytics/i },
   {
     id: 'knowledge-hub',

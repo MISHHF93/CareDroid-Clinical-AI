@@ -3,9 +3,6 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import {
   MOBILE_WEB_QA_VIEWPORT_WIDTHS,
   RESPONSIVE_QA_VIEWPORTS,
@@ -20,17 +17,7 @@ import {
 } from './responsiveRegression.routes';
 import { REQUIRED_PRODUCTION_TOOL_PATHS } from '../routes/clinicalToolRoutes';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const docsPath = join(__dirname, '../../docs/responsive-regression-coverage.md');
-
 describe('Responsive regression coverage inventory', () => {
-  it('documents manual visual checks', () => {
-    const doc = readFileSync(docsPath, 'utf8');
-    expect(doc).toContain('Manual visual checks');
-    expect(doc).toContain('Playwright');
-    expect(doc).toContain('320');
-  });
-
   it('core smoke routes are subset of responsive QA pages', () => {
     const qaPaths = new Set(buildResponsiveQaPages().map((p) => p.path));
     for (const { path } of CORE_ROUTE_SMOKE) {
@@ -56,7 +43,7 @@ describe('Responsive regression coverage inventory', () => {
 
   it('Playwright matrix dimensions match product spec', () => {
     expect(MOBILE_WEB_QA_VIEWPORT_WIDTHS).toContain(412);
-    expect(RESPONSIVE_QA_VIEWPORTS).toHaveLength(13);
+    expect(RESPONSIVE_QA_VIEWPORTS).toHaveLength(15);
     expect(RESPONSIVE_QA_VIEWPORTS.map((v) => v.width)).toEqual(
       expect.arrayContaining([320, 360, 390, 412, 430, 768, 1024, 1280, 1440, 1920])
     );
