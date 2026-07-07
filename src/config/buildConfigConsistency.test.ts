@@ -13,7 +13,10 @@ describe('build and service config consistency', () => {
 
     expect(compose).toContain('- "3000:3000"');
     expect(compose).toContain('- "8000:8000"');
-    expect(packageJson).toContain('"dev": "vite --strictPort"');
+    // "dev" now launches the full local dev-stack orchestrator (frontend +
+    // backend together); the pure-Vite command lives under "dev:web".
+    expect(packageJson).toContain('"dev": "node scripts/dev-stack.mjs"');
+    expect(packageJson).toContain('"dev:web": "vite --strictPort"');
     expect(packageJson).toContain('"dev:lan": "vite --strictPort --host"');
     expect(read('vite.config.ts')).toContain('strictPort: true');
     expect(compose).toContain(
@@ -34,7 +37,9 @@ describe('build and service config consistency', () => {
     expect(appCompose).toContain('DATABASE_CLIENT: sqlite');
     expect(appCompose).toContain('SQLITE_PATH: /data/caredroid.dev.sqlite');
     expect(appCompose).toContain('VITE_API_PROXY_TARGET: http://backend:3000');
-    expect(appCompose).toContain('NLU_SERVICE_ENABLED: ${NLU_SERVICE_ENABLED:-false}');
+    // In-process NLU no longer needs a separate service, so the app-only
+    // compose now defaults it on (matches docker-compose.ml.yml's default).
+    expect(appCompose).toContain('NLU_SERVICE_ENABLED: ${NLU_SERVICE_ENABLED:-true}');
     expect(appCompose).toContain("ANOMALY_DETECTION_ENABLED: 'false'");
     expect(appCompose).toContain("RAG_ENABLED: 'false'");
   });
@@ -44,7 +49,7 @@ describe('build and service config consistency', () => {
     const devStack = read('scripts/dev-stack.mjs');
     const viteConfig = read('vite.config.ts');
 
-    expect(packageJson.scripts.dev).toBe('vite --strictPort');
+    expect(packageJson.scripts.dev).toBe('node scripts/dev-stack.mjs');
     expect(packageJson.scripts['dev:web']).toBe('vite --strictPort');
     expect(packageJson.scripts['dev:lan']).toBe('vite --strictPort --host');
     expect(viteConfig).toContain("return 5190");
@@ -103,8 +108,8 @@ describe('build and service config consistency', () => {
   });
 
   it('keeps backend production entrypoint aligned with package.json', () => {
-    expect(read('backend/package.json')).toContain('"start:prod": "node dist/main.js"');
-    expect(read('backend/Dockerfile')).toContain('CMD ["node", "dist/main.js"]');
+    expect(read('backend/package.json')).toContain('"start:prod": "node dist/backend/src/main.js"');
+    expect(read('backend/Dockerfile')).toContain('CMD ["node", "dist/backend/src/main.js"]');
   });
 
   it('keeps frontend and backend Node runtime baselines aligned', () => {
@@ -140,7 +145,7 @@ describe('build and service config consistency', () => {
     expect(backendPackageJson).toContain('"start": "npm run start:prod"');
     expect(backendPackageJson).toContain('"start:dev": "npm run build && npm run start:prod"');
     expect(backendPackageJson).toContain('"start:watch": "nest start --watch"');
-    expect(backendPackageJson).toContain('"start:prod": "node dist/main.js"');
+    expect(backendPackageJson).toContain('"start:prod": "node dist/backend/src/main.js"');
     expect(read('backend/tsconfig.json')).toContain('"rootDir": ".."');
     expect(read('scripts/clean.mjs')).toContain("'backend/dist'");
     expect(read('scripts/dev-stack.mjs')).toContain("stdio: ['ignore', 'pipe', 'pipe']");

@@ -7,9 +7,13 @@ import {
   splitPatientName,
 } from './receptionQuickIntakeService';
 
-vi.mock('./emergencyOsApi', () => ({
-  createSmartIntakePatient: vi.fn(),
-}));
+vi.mock('./emergencyOsApi', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('./emergencyOsApi')>();
+  return {
+    ...actual,
+    createSmartIntakePatient: vi.fn(),
+  };
+});
 
 import { createSmartIntakePatient } from './emergencyOsApi';
 

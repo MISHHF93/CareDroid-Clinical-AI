@@ -49,9 +49,13 @@ vi.mock('../hooks/useEmergencyOs', () => ({
   useUpgradeHarnessPatientFlow: () => ({ data: { data: { signals: [] } } }),
 }));
 
-vi.mock('../services/emergencyOsApi', () => ({
-  createSmartIntakePatient: vi.fn(async (patient: Patient) => ({ data: { patient } })),
-}));
+vi.mock('../services/emergencyOsApi', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../services/emergencyOsApi')>();
+  return {
+    ...actual,
+    createSmartIntakePatient: vi.fn(async (patient: Patient) => ({ data: { patient } })),
+  };
+});
 
 vi.mock('./calculators/HEARTScore', () => ({
   default: () => null,
