@@ -25,7 +25,7 @@ import {
 import './FleetDashboard.css';
 
 const FLEET_DISPATCH_SAFETY_COPY =
-  'Human dispatchers must approve all vehicle assignments, routing changes, and maintenance downtime before operational execution.';
+  'Decision support only. Human dispatchers must approve all vehicle assignments, routing changes, and maintenance downtime before operational execution.';
 
 const FLEET_AI_CAPABILITIES = PLATFORM_AI_MODEL_REGISTRY.filter((model) =>
   ['edgeAmbulance', 'federatedEmsTriage'].includes(model.platformServiceId),
