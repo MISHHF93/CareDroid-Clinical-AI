@@ -133,23 +133,43 @@ export class CollaborationHubService {
   // Channel listing / membership
   // ---------------------------------------------------------------------
 
+  /**
+   * Batched by design: the original version ran ensureMembership() (a
+   * findOne + maybe save) once per department channel on every single call,
+   * i.e. up to 15 sequential round-trips per request — and this endpoint is
+   * hit on every page load plus every realtime poll cycle. This version does
+   * a fixed 3-4 queries regardless of department count, and performs zero
+   * writes once a user is already a member of every department channel
+   * (the steady-state case for almost every call after the first).
+   */
   async listChannelsForUser(userId: string, organizationId: string) {
-    await this.ensureDefaultDepartmentChannels(organizationId);
-
-    const departmentChannels = await this.channelRepo.find({
-      where: {
-        organizationId,
-        type: CollaborationChannelType.DEPARTMENT,
-        status: CollaborationChannelStatus.ACTIVE,
-      },
-    });
-    await Promise.all(
-      departmentChannels.map((channel) => this.ensureMembership(channel.id, userId)),
-    );
+    const departmentChannels = await this.ensureDefaultDepartmentChannels(organizationId);
 
     const memberships = await this.membershipRepo.find({
       where: { userId, status: CollaborationChannelMembershipStatus.ACTIVE },
     });
+    const memberChannelIds = new Set(memberships.map((m) => m.channelId));
+
+    const missingDepartmentChannels = departmentChannels.filter(
+      (channel) =>
+        channel.status === CollaborationChannelStatus.ACTIVE && !memberChannelIds.has(channel.id),
+    );
+    if (missingDepartmentChannels.length > 0) {
+      const newMemberships = await this.membershipRepo.save(
+        missingDepartmentChannels.map((channel) =>
+          this.membershipRepo.create({
+            channelId: channel.id,
+            userId,
+            role: CollaborationChannelMembershipRole.MEMBER,
+            status: CollaborationChannelMembershipStatus.ACTIVE,
+            notificationPreference: CollaborationNotificationPreference.ALL,
+            joinedAt: new Date(),
+          }),
+        ),
+      );
+      memberships.push(...newMemberships);
+    }
+
     const channelIds = memberships.map((membership) => membership.channelId);
     if (channelIds.length === 0) return [];
 
@@ -171,7 +191,25 @@ export class CollaborationHubService {
     return new Set(memberships.map((m) => m.channelId));
   }
 
-  async getChannel(channelId: string): Promise<CollaborationChannel> {
+  /**
+   * Every user-facing lookup MUST go through this (org-scoped), not a bare
+   * findOne — a channelId/messageId alone is not enough to prove the caller's
+   * organization owns it. Without the organizationId filter here, assertAccess()
+   * still "works" per its own membership logic, but for DEPARTMENT channels it
+   * auto-joins on first reference regardless of org, which previously let any
+   * authenticated user from ANY hospital org join, read, and post into another
+   * hospital's department channel just by knowing/guessing its channel id.
+   * Internal system paths that already own a trusted channelId (e.g.
+   * postSystemMessage, called only with channels the calling service just
+   * created or fetched itself) use findChannelByIdUnscoped instead.
+   */
+  async getChannel(channelId: string, organizationId: string): Promise<CollaborationChannel> {
+    const channel = await this.channelRepo.findOne({ where: { id: channelId, organizationId } });
+    if (!channel) throw new NotFoundException('Channel not found.');
+    return channel;
+  }
+
+  private async findChannelByIdUnscoped(channelId: string): Promise<CollaborationChannel> {
     const channel = await this.channelRepo.findOne({ where: { id: channelId } });
     if (!channel) throw new NotFoundException('Channel not found.');
     return channel;
@@ -367,10 +405,12 @@ export class CollaborationHubService {
   }
 
   async resolveIncidentChannel(
+    organizationId: string,
     channelId: string,
-    resolvedByUserId?: string,
+    resolvedByUserId: string,
   ): Promise<CollaborationChannel> {
-    const channel = await this.getChannel(channelId);
+    const channel = await this.getChannel(channelId, organizationId);
+    await this.assertAccess(channel, resolvedByUserId);
     channel.resolvedAt = new Date();
     channel.status = CollaborationChannelStatus.ARCHIVED;
     channel.archivedAt = new Date();
@@ -421,8 +461,13 @@ export class CollaborationHubService {
     });
   }
 
-  async archiveChannel(channelId: string, actorUserId?: string): Promise<CollaborationChannel> {
-    const channel = await this.getChannel(channelId);
+  async archiveChannel(
+    organizationId: string,
+    channelId: string,
+    actorUserId: string,
+  ): Promise<CollaborationChannel> {
+    const channel = await this.getChannel(channelId, organizationId);
+    await this.assertAccess(channel, actorUserId);
     channel.status = CollaborationChannelStatus.ARCHIVED;
     channel.archivedAt = new Date();
     const saved = await this.channelRepo.save(channel);
@@ -445,11 +490,12 @@ export class CollaborationHubService {
 
   async postMessage(
     userId: string,
+    organizationId: string,
     channelId: string,
     dto: PostMessageDto,
     context: RequestContext,
   ): Promise<CollaborationMessage> {
-    const channel = await this.getChannel(channelId);
+    const channel = await this.getChannel(channelId, organizationId);
     await this.assertAccess(channel, userId);
 
     const message = await this.messageRepo.save(
@@ -475,8 +521,19 @@ export class CollaborationHubService {
     });
 
     this.realtimeService.publish({ type: 'message_created', payload: { channelId, message } });
-    await this.notifyChannelMembers(channel, message, userId);
-    await this.mirrorToExternalProviders(channel, message, userId);
+    // Notification fan-out and external mirroring are side effects, not part
+    // of "did the message send" — fire-and-forget so a channel with many
+    // members (or a slow external provider) never adds latency to the
+    // send/reply request itself. Both are already internally resilient
+    // (per-member try/catch, Promise.allSettled).
+    void this.notifyChannelMembers(channel, message, userId).catch((error) => {
+      this.logger.warn(
+        `notifyChannelMembers failed for message ${message.id}: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+    });
+    void this.mirrorToExternalProviders(channel, message, userId).catch(() => {});
 
     return message;
   }
@@ -492,7 +549,10 @@ export class CollaborationHubService {
       threadRootId?: string;
     },
   ): Promise<CollaborationMessage> {
-    const channel = await this.getChannel(channelId);
+    // Unscoped: only called internally with a channelId the calling service
+    // already created/fetched itself (patient thread, incident, AI Chief
+    // channel) — never derived from arbitrary user/request input.
+    const channel = await this.findChannelByIdUnscoped(channelId);
     const message = await this.messageRepo.save(
       this.messageRepo.create({
         channelId,
@@ -507,8 +567,14 @@ export class CollaborationHubService {
     );
 
     this.realtimeService.publish({ type: 'message_created', payload: { channelId, message } });
-    await this.notifyChannelMembers(channel, message, null);
-    await this.mirrorToExternalProviders(channel, message, null);
+    void this.notifyChannelMembers(channel, message, null).catch((error) => {
+      this.logger.warn(
+        `notifyChannelMembers failed for message ${message.id}: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+    });
+    void this.mirrorToExternalProviders(channel, message, null).catch(() => {});
 
     return message;
   }
@@ -579,10 +645,11 @@ export class CollaborationHubService {
 
   async listMessages(
     userId: string,
+    organizationId: string,
     channelId: string,
     query: { before?: string; limit?: number; threadRootId?: string },
   ): Promise<CollaborationMessage[]> {
-    const channel = await this.getChannel(channelId);
+    const channel = await this.getChannel(channelId, organizationId);
     await this.assertAccess(channel, userId);
 
     const qb = this.messageRepo
@@ -627,14 +694,28 @@ export class CollaborationHubService {
   // Reactions & pins
   // ---------------------------------------------------------------------
 
+  /** Every message-scoped mutation must resolve the owning channel through the
+   * org-scoped getChannel() before touching the message — otherwise a
+   * messageId alone lets any authenticated user (any org) react to, pin, or
+   * attach files to a message that isn't theirs to touch. */
+  private async getMessageWithChannel(
+    messageId: string,
+    organizationId: string,
+  ): Promise<{ message: CollaborationMessage; channel: CollaborationChannel }> {
+    const message = await this.messageRepo.findOne({ where: { id: messageId } });
+    if (!message) throw new NotFoundException('Message not found.');
+    const channel = await this.getChannel(message.channelId, organizationId);
+    return { message, channel };
+  }
+
   async addReaction(
     userId: string,
+    organizationId: string,
     messageId: string,
     emoji: string,
   ): Promise<CollaborationMessageReaction> {
-    const message = await this.messageRepo.findOne({ where: { id: messageId } });
-    if (!message) throw new NotFoundException('Message not found.');
-    await this.assertAccess(await this.getChannel(message.channelId), userId);
+    const { message, channel } = await this.getMessageWithChannel(messageId, organizationId);
+    await this.assertAccess(channel, userId);
 
     const existing = await this.reactionRepo.findOne({ where: { messageId, userId, emoji } });
     if (existing) return existing;
@@ -649,9 +730,14 @@ export class CollaborationHubService {
     return reaction;
   }
 
-  async removeReaction(userId: string, messageId: string, emoji: string): Promise<void> {
-    const message = await this.messageRepo.findOne({ where: { id: messageId } });
-    if (!message) throw new NotFoundException('Message not found.');
+  async removeReaction(
+    userId: string,
+    organizationId: string,
+    messageId: string,
+    emoji: string,
+  ): Promise<void> {
+    const { message, channel } = await this.getMessageWithChannel(messageId, organizationId);
+    await this.assertAccess(channel, userId);
     await this.reactionRepo.delete({ messageId, userId, emoji });
     this.realtimeService.publish({
       type: 'reaction_removed',
@@ -659,9 +745,13 @@ export class CollaborationHubService {
     });
   }
 
-  async pinMessage(userId: string, messageId: string): Promise<CollaborationMessage> {
-    const message = await this.messageRepo.findOne({ where: { id: messageId } });
-    if (!message) throw new NotFoundException('Message not found.');
+  async pinMessage(
+    userId: string,
+    organizationId: string,
+    messageId: string,
+  ): Promise<CollaborationMessage> {
+    const { message, channel } = await this.getMessageWithChannel(messageId, organizationId);
+    await this.assertAccess(channel, userId);
     message.pinnedAt = new Date();
     message.pinnedByUserId = userId;
     const saved = await this.messageRepo.save(message);
@@ -672,9 +762,13 @@ export class CollaborationHubService {
     return saved;
   }
 
-  async unpinMessage(userId: string, messageId: string): Promise<CollaborationMessage> {
-    const message = await this.messageRepo.findOne({ where: { id: messageId } });
-    if (!message) throw new NotFoundException('Message not found.');
+  async unpinMessage(
+    userId: string,
+    organizationId: string,
+    messageId: string,
+  ): Promise<CollaborationMessage> {
+    const { message, channel } = await this.getMessageWithChannel(messageId, organizationId);
+    await this.assertAccess(channel, userId);
     message.pinnedAt = null;
     message.pinnedByUserId = null;
     const saved = await this.messageRepo.save(message);
@@ -685,8 +779,12 @@ export class CollaborationHubService {
     return saved;
   }
 
-  async listPinnedMessages(userId: string, channelId: string): Promise<CollaborationMessage[]> {
-    const channel = await this.getChannel(channelId);
+  async listPinnedMessages(
+    userId: string,
+    organizationId: string,
+    channelId: string,
+  ): Promise<CollaborationMessage[]> {
+    const channel = await this.getChannel(channelId, organizationId);
     await this.assertAccess(channel, userId);
     return this.messageRepo
       .find({
@@ -702,9 +800,11 @@ export class CollaborationHubService {
 
   async markRead(
     userId: string,
+    organizationId: string,
     channelId: string,
     dto: MarkReadDto,
   ): Promise<CollaborationChannelMembership> {
+    await this.getChannel(channelId, organizationId);
     const membership = await this.membershipRepo.findOne({ where: { channelId, userId } });
     if (!membership) throw new NotFoundException('Membership not found.');
     membership.lastReadMessageId = dto.lastReadMessageId;
@@ -714,9 +814,11 @@ export class CollaborationHubService {
 
   async updateMembershipPreference(
     userId: string,
+    organizationId: string,
     channelId: string,
     dto: UpdateMembershipDto,
   ): Promise<CollaborationChannelMembership> {
+    await this.getChannel(channelId, organizationId);
     const membership = await this.membershipRepo.findOne({ where: { channelId, userId } });
     if (!membership) throw new NotFoundException('Membership not found.');
     if (dto.notificationPreference) membership.notificationPreference = dto.notificationPreference;
@@ -733,12 +835,12 @@ export class CollaborationHubService {
 
   async uploadAttachment(
     userId: string,
+    organizationId: string,
     messageId: string,
     dto: UploadAttachmentDto,
   ): Promise<CollaborationAttachment> {
-    const message = await this.messageRepo.findOne({ where: { id: messageId } });
-    if (!message) throw new NotFoundException('Message not found.');
-    await this.assertAccess(await this.getChannel(message.channelId), userId);
+    const { message, channel } = await this.getMessageWithChannel(messageId, organizationId);
+    await this.assertAccess(channel, userId);
 
     const buffer = Buffer.from(dto.dataBase64, 'base64');
     const stored = await this.attachmentStorage.store({
@@ -779,10 +881,15 @@ export class CollaborationHubService {
 
   async linkExternalProvider(
     userId: string,
+    organizationId: string,
     channelId: string,
     dto: LinkExternalProviderDto,
   ): Promise<CollaborationExternalLink> {
-    await this.getChannel(channelId);
+    // Mirroring a channel to an external provider (e.g. Slack) can leak every
+    // future message in it outside CareDroid, so this needs the same
+    // membership check as posting/reading, not just "does the channel exist".
+    const channel = await this.getChannel(channelId, organizationId);
+    await this.assertAccess(channel, userId);
     const existing = await this.externalLinkRepo.findOne({
       where: { channelId, provider: dto.provider },
     });
@@ -804,9 +911,13 @@ export class CollaborationHubService {
   }
 
   async unlinkExternalProvider(
+    userId: string,
+    organizationId: string,
     channelId: string,
     provider: CollaborationExternalProvider,
   ): Promise<void> {
+    const channel = await this.getChannel(channelId, organizationId);
+    await this.assertAccess(channel, userId);
     await this.externalLinkRepo.delete({ channelId, provider });
   }
 

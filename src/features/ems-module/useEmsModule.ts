@@ -1,12 +1,13 @@
+import { useMemo } from 'react';
 import { useEmergencyStore } from '../../store/emergencyStore';
 
 export function useEmsModule() {
   const emsUnits = useEmergencyStore((s) => s.emsUnits);
   const patients = useEmergencyStore((s) => s.patients);
 
-  const inbound = emsUnits.filter((u) => u.status === 'Inbound');
-  const arrived = emsUnits.filter((u) => u.status === 'Arrived');
-  const available = emsUnits.filter((u) => u.status === 'Available');
+  const inbound = useMemo(() => emsUnits.filter((u) => u.status === 'Inbound'), [emsUnits]);
+  const arrived = useMemo(() => emsUnits.filter((u) => u.status === 'Arrived'), [emsUnits]);
+  const available = useMemo(() => emsUnits.filter((u) => u.status === 'Available'), [emsUnits]);
 
   function patientName(patientId?: string): string | undefined {
     if (!patientId) return undefined;

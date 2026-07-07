@@ -7,7 +7,7 @@ vi.mock('../store/emergencyStore', () => ({
 
 import {
   filterFlaggedReassessmentPatients,
-  formatWaitTime,
+  formatCompactWaitTime,
   getFlagTimestampInfo,
   getMostSevereReassessmentFlag,
   sortFlaggedReassessmentPatients,
@@ -122,9 +122,9 @@ describe('ReassessmentDrawer helpers', () => {
   });
 
   it('formats wait times compactly', () => {
-    expect(formatWaitTime(0)).toBe('<1m');
-    expect(formatWaitTime(42)).toBe('42m');
-    expect(formatWaitTime(95)).toBe('1h 35m');
-    expect(formatWaitTime(120)).toBe('2h');
+    expect(formatCompactWaitTime(0)).toBe('<1m');
+    expect(formatCompactWaitTime(42)).toBe('42m');
+    expect(formatCompactWaitTime(95)).toBe('1h 35m');
+    expect(formatCompactWaitTime(120)).toBe('2h');
   });
 });

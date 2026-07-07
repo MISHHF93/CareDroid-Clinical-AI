@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { Priority } from '../../types/emergency';
 import type { Patient } from '../../types/emergency';
@@ -18,16 +19,25 @@ export function useTriageQueue(filter?: string | null) {
   const queues = useEmergencyStore((s) => s.queues);
   const alerts = useEmergencyStore((s) => s.alerts);
 
-  const waiting = patients
-    .filter((p) => WAITING_STATES.has(p.state))
-    .sort(sortByPriorityThenWait);
+  // Store mutations to any slice (or an unrelated parent re-render) previously
+  // reran these filter/sort chains on every render, even when patients/alerts
+  // hadn't actually changed.
+  const waiting = useMemo(
+    () => patients.filter((p) => WAITING_STATES.has(p.state)).sort(sortByPriorityThenWait),
+    [patients],
+  );
 
-  const filtered = filter
-    ? waiting.filter((p) => String(p.priority) === filter || p.state === filter)
-    : waiting;
+  const filtered = useMemo(
+    () =>
+      filter ? waiting.filter((p) => String(p.priority) === filter || p.state === filter) : waiting,
+    [filter, waiting],
+  );
 
-  const criticalCount = waiting.filter((p) => p.priority === Priority.P1 || p.priority === Priority.P2).length;
-  const activeAlerts = alerts.filter((a) => !a.dismissed);
+  const criticalCount = useMemo(
+    () => waiting.filter((p) => p.priority === Priority.P1 || p.priority === Priority.P2).length,
+    [waiting],
+  );
+  const activeAlerts = useMemo(() => alerts.filter((a) => !a.dismissed), [alerts]);
 
   return { patients: filtered, allWaiting: waiting, queues, criticalCount, activeAlerts };
 }

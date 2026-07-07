@@ -113,7 +113,6 @@ export default function SmartIntake({
   const emergencyRole = useEmergencyRolePermissions();
   const { profileNavigate } = useProfileNavigate();
   const [searchParams] = useSearchParams();
-  const store = useEmergencyStore();
   const addPatient = useEmergencyStore((state) => state.addPatient);
   const registerArrivalControl = useEmergencyStore((state) => state.registerArrivalControl);
   const hydrateFromApi = useEmergencyStore((state) => state.hydrateFromApi);
@@ -382,7 +381,7 @@ export default function SmartIntake({
 
   const finishIntakeNavigation = (patientId) => {
     if (!patientId) return;
-    const handoff = completeIntakeHandoff(store, {
+    const handoff = completeIntakeHandoff(useEmergencyStore.getState(), {
       patientId,
       source: 'smart-intake',
       sessionId,
@@ -536,7 +535,7 @@ export default function SmartIntake({
         actorName: emergencyRole.roleLabel || 'Smart Intake',
         actorStaffId: emergencyRole.canonicalProfile?.employeeId || emergencyRole.canonicalProfile?.id,
       });
-      applyIntakeArrivalContext(store, routeResult.patientId as any, arrivalContext);
+      applyIntakeArrivalContext(useEmergencyStore.getState(), routeResult.patientId as any, arrivalContext);
       registerArrivalControl(routeResult.patientId as any, { source: 'smart-intake' });
       selectPatient(routeResult.patientId as any);
       if (documentArtifactsEnabled && supplementalCaptureText.trim()) {
@@ -573,7 +572,7 @@ export default function SmartIntake({
         patientRecord.triagePending = true;
       }
       addPatient(patientRecord as any, { syncToBackend: false });
-      applyIntakeArrivalContext(store, patient.id as any, arrivalContext);
+      applyIntakeArrivalContext(useEmergencyStore.getState(), patient.id as any, arrivalContext);
       registerArrivalControl(patient.id as any, { source: 'smart-intake' });
       selectPatient(patient.id as any);
       finishIntakeNavigation(patient.id);
@@ -594,7 +593,7 @@ export default function SmartIntake({
       capacity: whiteboard.capacity || capacity,
     });
     if (patient?.id) {
-      applyIntakeArrivalContext(store, patient.id, resolveIntakeArrivalReason());
+      applyIntakeArrivalContext(useEmergencyStore.getState(), patient.id, resolveIntakeArrivalReason());
       registerArrivalControl(patient.id, { source: 'smart-intake' });
       selectPatient(patient.id);
       finishIntakeNavigation(patient.id);
@@ -647,7 +646,7 @@ export default function SmartIntake({
   const handleProvisionalIntake = (kind) => {
     if (!canCreatePatient) return;
     setPendingAction(`Provisional-${kind}`);
-    const result = completeProvisionalIntake(store, kind, { sessionId });
+    const result = completeProvisionalIntake(useEmergencyStore.getState(), kind, { sessionId });
     setPendingAction('');
     finishIntakeNavigation(result.patient.id);
   };
@@ -897,7 +896,7 @@ export default function SmartIntake({
                   }),
             () => {
               applyIntakeArrivalContext(
-                store,
+                useEmergencyStore.getState(),
                 selectedCandidate!.patientId,
                 resolveIntakeArrivalReason(),
               );

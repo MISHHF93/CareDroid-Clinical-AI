@@ -25,6 +25,45 @@ function unwrapEnvelopeData<T>(envelope: unknown): T | null {
   return payload.data ?? (envelope as T);
 }
 
+type OperationalIntelligenceRefreshListener = () => unknown;
+
+// useAiChiefOrchestrator({ realtime: true }) — and therefore this hook — is mounted
+// independently in several places at once (AiChiefOrchestrationBar, CopilotPanel,
+// AiChiefRouteRecommendationsPanel, HospitalCommandCenter), and each instance previously
+// started its own setInterval. Since intervalMs is derived from the same global
+// emergencySettings store for every caller, a single shared timer is enough — this
+// collapses N independent, unsynchronized intervals into one, calling every currently
+// mounted instance's refresh() together per tick instead of N times spread arbitrarily.
+let sharedPolling: {
+  intervalMs: number;
+  timerId: any;
+  listeners: Set<OperationalIntelligenceRefreshListener>;
+} | null = null;
+
+function registerSharedOperationalIntelligencePolling(
+  intervalMs: number,
+  listener: OperationalIntelligenceRefreshListener,
+): () => void {
+  if (!sharedPolling) {
+    const listeners = new Set<OperationalIntelligenceRefreshListener>([listener]);
+    const timerId = window.setInterval(() => {
+      listeners.forEach((l) => void l());
+    }, intervalMs);
+    sharedPolling = { intervalMs, timerId, listeners };
+  } else {
+    sharedPolling.listeners.add(listener);
+  }
+
+  return () => {
+    if (!sharedPolling) return;
+    sharedPolling.listeners.delete(listener);
+    if (sharedPolling.listeners.size === 0) {
+      window.clearInterval(sharedPolling.timerId);
+      sharedPolling = null;
+    }
+  };
+}
+
 /** Low-level operational intelligence hook — prefer useAiChiefOrchestrator for unified monitoring. */
 export function useOperationalIntelligenceCore(options: UseOperationalIntelligenceOptions = {}) {
   const centralNode = useCareDroidCentralNode(options);
@@ -68,12 +107,9 @@ export function useOperationalIntelligenceCore(options: UseOperationalIntelligen
 
   useEffect(() => {
     if (!oiSettings.operationalIntelligenceEnabled) return undefined;
-    const intervalMs = Math.max(15000, oiSettings.operationalIntelligencePollingInterval || 30000);
     if (!options.realtime) return undefined;
-    const timer = window.setInterval(() => {
-      void refresh();
-    }, intervalMs);
-    return () => window.clearInterval(timer);
+    const intervalMs = Math.max(15000, oiSettings.operationalIntelligencePollingInterval || 30000);
+    return registerSharedOperationalIntelligencePolling(intervalMs, refresh);
   }, [
     oiSettings.operationalIntelligenceEnabled,
     oiSettings.operationalIntelligencePollingInterval,

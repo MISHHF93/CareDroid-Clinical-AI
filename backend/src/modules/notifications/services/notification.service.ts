@@ -124,33 +124,46 @@ export class NotificationService {
     failureCount: number;
     notifications: Notification[];
   }> {
-    const notifications: Notification[] = [];
-    let successCount = 0;
-    let failureCount = 0;
-
-    for (const userId of dto.userIds) {
-      try {
-        const notification = await this.sendNotification({
+    // Each sendNotification call does several independent DB round trips
+    // (preference check, token fetch, insert, status update) plus push sends.
+    // Running them one user at a time in a for-await loop meant a bulk
+    // notification to N users took N sequential rounds of that work instead
+    // of letting the independent per-user sends run concurrently.
+    // Promise.allSettled preserves the original per-user try/catch semantics
+    // — one user's failure doesn't affect anyone else's send or the count.
+    const results = await Promise.allSettled(
+      dto.userIds.map((userId) =>
+        this.sendNotification({
           userId,
           type: dto.type,
           title: dto.title,
           body: dto.body,
           data: dto.data,
           priority: dto.priority,
-        });
+        }),
+      ),
+    );
 
-        notifications.push(notification);
+    const notifications: Notification[] = [];
+    let successCount = 0;
+    let failureCount = 0;
 
-        if (notification.status === NotificationStatus.SENT) {
+    results.forEach((result, index) => {
+      if (result.status === 'fulfilled') {
+        notifications.push(result.value);
+        if (result.value.status === NotificationStatus.SENT) {
           successCount++;
         } else {
           failureCount++;
         }
-      } catch (error) {
-        this.logger.error(`Failed to send notification to user ${userId}:`, error);
+      } else {
+        this.logger.error(
+          `Failed to send notification to user ${dto.userIds[index]}:`,
+          result.reason,
+        );
         failureCount++;
       }
-    }
+    });
 
     this.logger.log(`Bulk notification sent: ${successCount} successes, ${failureCount} failures`);
 

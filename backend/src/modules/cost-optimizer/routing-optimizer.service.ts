@@ -47,7 +47,7 @@ export class RoutingOptimizerService {
       const cachedResult = this.cacheService.get<RouteOptimizationResult>(cacheKey);
       if (cachedResult) {
         const result = this.withCacheHit(cachedResult, requestId, cacheKey, ttlSeconds);
-        this.recordMetrics(result, request.userId, true);
+        this.recordMetrics(result, true);
         return result;
       }
       this.metricsService?.recordCacheOperation('cost_optimizer_route', 'miss');
@@ -77,7 +77,7 @@ export class RoutingOptimizerService {
       this.cacheService.set(cacheKey, result, ttlSeconds);
     }
 
-    this.recordMetrics(result, request.userId, false);
+    this.recordMetrics(result, false);
     return result;
   }
 
@@ -167,11 +167,7 @@ export class RoutingOptimizerService {
     };
   }
 
-  private recordMetrics(
-    result: RouteOptimizationResult,
-    userId = 'anonymous',
-    cacheHit: boolean,
-  ): void {
+  private recordMetrics(result: RouteOptimizationResult, cacheHit: boolean): void {
     const actualRequestCost = result.costPrediction.totalCostUsd;
     const actualTokenCost = cacheHit ? 0 : result.costPrediction.tokenCostUsd;
 
@@ -187,7 +183,7 @@ export class RoutingOptimizerService {
     this.metricsService?.recordCacheOperation('cost_optimizer_route', cacheHit ? 'hit' : 'success');
 
     if (actualRequestCost > 0) {
-      this.metricsService?.recordOpenaiCost(result.costPrediction.model, userId, actualRequestCost);
+      this.metricsService?.recordOpenaiCost(result.costPrediction.model, actualRequestCost);
     }
   }
 

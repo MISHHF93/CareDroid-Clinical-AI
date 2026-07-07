@@ -45,7 +45,7 @@ export class MetricsService {
   // Cost Metrics (Phase 4)
   public readonly openaiApiCostTotal: Counter;
   public readonly openaiCostPerMinute: Gauge;
-  public readonly costPerUserTotal: Counter;
+  public readonly totalCostCounter: Counter;
 
   constructor() {
     // Enable default Node.js metrics (memory, CPU, event loop, etc.)
@@ -180,10 +180,16 @@ export class MetricsService {
     });
 
     // ========== Cost Metrics (Phase 4) ==========
+    // /metrics has no auth guard (standard Prometheus scrape pattern — scrapers
+    // typically can't send a JWT bearer token, so this endpoint is expected to be
+    // reachable without one and secured at the network layer instead). A user_id
+    // label previously meant anyone who could reach this plaintext endpoint could see
+    // exactly which user IDs incurred how much AI cost. Aggregating by model instead
+    // keeps the metric useful without exposing per-user identifiers on a public route.
     this.openaiApiCostTotal = new Counter({
       name: 'openai_api_cost_total',
       help: 'Total OpenAI API costs in USD',
-      labelNames: ['model', 'user_id'],
+      labelNames: ['model'],
       registers: [register],
     });
 
@@ -193,10 +199,9 @@ export class MetricsService {
       registers: [register],
     });
 
-    this.costPerUserTotal = new Counter({
-      name: 'cost_per_user_total',
-      help: 'Total cost per user in USD',
-      labelNames: ['user_id'],
+    this.totalCostCounter = new Counter({
+      name: 'cost_total',
+      help: 'Total cost across all users in USD',
       registers: [register],
     });
   }
@@ -303,9 +308,9 @@ export class MetricsService {
   /**
    * Record OpenAI API cost
    */
-  recordOpenaiCost(model: string, userId: string, costUsd: number): void {
-    this.openaiApiCostTotal.labels(model, userId).inc(costUsd);
-    this.costPerUserTotal.labels(userId).inc(costUsd);
+  recordOpenaiCost(model: string, costUsd: number): void {
+    this.openaiApiCostTotal.labels(model).inc(costUsd);
+    this.totalCostCounter.inc(costUsd);
   }
 
   /**

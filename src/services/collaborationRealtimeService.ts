@@ -84,6 +84,20 @@ export function startCollaborationRealtime({ onEvent, onStatus, onPoll }: any = 
 
   const emitStatus = (status: RealtimeStatus) => onStatus?.(status);
 
+  // Polling is a true fallback, not a parallel background job: it only runs
+  // while SSE is down, and stops the instant SSE reconnects. Running both at
+  // once was hitting the (comparatively expensive) channel-list endpoint
+  // every 20s even when SSE was healthy and nothing had changed.
+  const stopPolling = () => {
+    pollDispose?.();
+    pollDispose = null;
+  };
+
+  const startPollingIfNeeded = () => {
+    if (pollDispose || stopped) return;
+    pollDispose = createPollingLoop({ intervalMs: DEFAULT_POLL_INTERVAL_MS, onPoll, onStatus: emitStatus });
+  };
+
   const scheduleReconnect = () => {
     if (stopped || reconnectTimer) return;
     reconnectAttempt += 1;
@@ -107,6 +121,7 @@ export function startCollaborationRealtime({ onEvent, onStatus, onPoll }: any = 
         message: reachable ? 'SSE unavailable — polling.' : 'API offline — polling for updates.',
         updatedAt: new Date().toISOString(),
       });
+      startPollingIfNeeded();
       scheduleReconnect();
       return;
     }
@@ -114,6 +129,7 @@ export function startCollaborationRealtime({ onEvent, onStatus, onPoll }: any = 
     const source = new EventSource(buildAuthenticatedSsePath(DEFAULT_SSE_PATH));
     source.onopen = () => {
       reconnectAttempt = 0;
+      stopPolling();
       emitStatus({ status: 'connected', mode: 'sse', message: 'Collaboration Hub connected.', updatedAt: new Date().toISOString() });
     };
     source.onmessage = (message) => {
@@ -124,19 +140,19 @@ export function startCollaborationRealtime({ onEvent, onStatus, onPoll }: any = 
     source.onerror = () => {
       source.close();
       emitStatus({ status: 'reconnecting', mode: 'sse', message: 'Reconnecting…', updatedAt: new Date().toISOString() });
+      startPollingIfNeeded();
       scheduleReconnect();
     };
     disposeCurrent = () => source.close();
   };
 
   void connect();
-  pollDispose = createPollingLoop({ intervalMs: DEFAULT_POLL_INTERVAL_MS, onPoll, onStatus: emitStatus });
 
   return () => {
     stopped = true;
     if (reconnectTimer) window.clearTimeout(reconnectTimer);
     disposeCurrent?.();
-    pollDispose?.();
+    stopPolling();
   };
 }
 

@@ -74,7 +74,11 @@ export class CollaborationHubController {
   @Post('channels/:channelId/archive')
   @ApiOperation({ summary: 'Archive a channel' })
   async archiveChannel(@Req() req: any, @Param('channelId') channelId: string) {
-    return this.collaborationHubService.archiveChannel(channelId, req.user.id);
+    return this.collaborationHubService.archiveChannel(
+      this.organizationId(req),
+      channelId,
+      req.user.id,
+    );
   }
 
   @Get('channels/:channelId/messages')
@@ -86,11 +90,16 @@ export class CollaborationHubController {
     @Query('limit') limit?: string,
     @Query('threadRootId') threadRootId?: string,
   ) {
-    return this.collaborationHubService.listMessages(req.user.id, channelId, {
-      before,
-      limit: limit ? Number(limit) : undefined,
-      threadRootId,
-    });
+    return this.collaborationHubService.listMessages(
+      req.user.id,
+      this.organizationId(req),
+      channelId,
+      {
+        before,
+        limit: limit ? Number(limit) : undefined,
+        threadRootId,
+      },
+    );
   }
 
   @Post('channels/:channelId/messages')
@@ -100,7 +109,13 @@ export class CollaborationHubController {
     @Param('channelId') channelId: string,
     @Body() dto: PostMessageDto,
   ) {
-    return this.collaborationHubService.postMessage(req.user.id, channelId, dto, this.context(req));
+    return this.collaborationHubService.postMessage(
+      req.user.id,
+      this.organizationId(req),
+      channelId,
+      dto,
+      this.context(req),
+    );
   }
 
   @Patch('messages/:messageId')
@@ -127,7 +142,12 @@ export class CollaborationHubController {
     @Param('messageId') messageId: string,
     @Body() dto: AddReactionDto,
   ) {
-    return this.collaborationHubService.addReaction(req.user.id, messageId, dto.emoji);
+    return this.collaborationHubService.addReaction(
+      req.user.id,
+      this.organizationId(req),
+      messageId,
+      dto.emoji,
+    );
   }
 
   @Delete('messages/:messageId/reactions/:emoji')
@@ -137,32 +157,54 @@ export class CollaborationHubController {
     @Param('messageId') messageId: string,
     @Param('emoji') emoji: string,
   ) {
-    await this.collaborationHubService.removeReaction(req.user.id, messageId, emoji);
+    await this.collaborationHubService.removeReaction(
+      req.user.id,
+      this.organizationId(req),
+      messageId,
+      emoji,
+    );
     return { ok: true };
   }
 
   @Post('messages/:messageId/pin')
   @ApiOperation({ summary: 'Pin a message' })
   async pinMessage(@Req() req: any, @Param('messageId') messageId: string) {
-    return this.collaborationHubService.pinMessage(req.user.id, messageId);
+    return this.collaborationHubService.pinMessage(
+      req.user.id,
+      this.organizationId(req),
+      messageId,
+    );
   }
 
   @Delete('messages/:messageId/pin')
   @ApiOperation({ summary: 'Unpin a message' })
   async unpinMessage(@Req() req: any, @Param('messageId') messageId: string) {
-    return this.collaborationHubService.unpinMessage(req.user.id, messageId);
+    return this.collaborationHubService.unpinMessage(
+      req.user.id,
+      this.organizationId(req),
+      messageId,
+    );
   }
 
   @Get('channels/:channelId/pinned')
   @ApiOperation({ summary: 'List pinned messages in a channel' })
   async listPinned(@Req() req: any, @Param('channelId') channelId: string) {
-    return this.collaborationHubService.listPinnedMessages(req.user.id, channelId);
+    return this.collaborationHubService.listPinnedMessages(
+      req.user.id,
+      this.organizationId(req),
+      channelId,
+    );
   }
 
   @Post('channels/:channelId/read')
   @ApiOperation({ summary: 'Advance your read cursor for a channel' })
   async markRead(@Req() req: any, @Param('channelId') channelId: string, @Body() dto: MarkReadDto) {
-    return this.collaborationHubService.markRead(req.user.id, channelId, dto);
+    return this.collaborationHubService.markRead(
+      req.user.id,
+      this.organizationId(req),
+      channelId,
+      dto,
+    );
   }
 
   @Patch('channels/:channelId/membership')
@@ -172,7 +214,12 @@ export class CollaborationHubController {
     @Param('channelId') channelId: string,
     @Body() dto: UpdateMembershipDto,
   ) {
-    return this.collaborationHubService.updateMembershipPreference(req.user.id, channelId, dto);
+    return this.collaborationHubService.updateMembershipPreference(
+      req.user.id,
+      this.organizationId(req),
+      channelId,
+      dto,
+    );
   }
 
   @Post('channels/:channelId/typing')
@@ -193,7 +240,12 @@ export class CollaborationHubController {
     @Param('messageId') messageId: string,
     @Body() dto: UploadAttachmentDto,
   ) {
-    return this.collaborationHubService.uploadAttachment(req.user.id, messageId, dto);
+    return this.collaborationHubService.uploadAttachment(
+      req.user.id,
+      this.organizationId(req),
+      messageId,
+      dto,
+    );
   }
 
   @Post('channels/:channelId/external-links')
@@ -203,16 +255,27 @@ export class CollaborationHubController {
     @Param('channelId') channelId: string,
     @Body() dto: LinkExternalProviderDto,
   ) {
-    return this.collaborationHubService.linkExternalProvider(req.user.id, channelId, dto);
+    return this.collaborationHubService.linkExternalProvider(
+      req.user.id,
+      this.organizationId(req),
+      channelId,
+      dto,
+    );
   }
 
   @Delete('channels/:channelId/external-links/:provider')
   @ApiOperation({ summary: 'Remove an external provider mirror from a channel' })
   async unlinkExternalProvider(
+    @Req() req: any,
     @Param('channelId') channelId: string,
     @Param('provider') provider: CollaborationExternalProvider,
   ) {
-    await this.collaborationHubService.unlinkExternalProvider(channelId, provider);
+    await this.collaborationHubService.unlinkExternalProvider(
+      req.user.id,
+      this.organizationId(req),
+      channelId,
+      provider,
+    );
     return { ok: true };
   }
 
@@ -257,7 +320,11 @@ export class CollaborationHubController {
   @Post('incidents/:channelId/resolve')
   @ApiOperation({ summary: 'Resolve and archive an incident channel' })
   async resolveIncident(@Req() req: any, @Param('channelId') channelId: string) {
-    return this.collaborationHubService.resolveIncidentChannel(channelId, req.user.id);
+    return this.collaborationHubService.resolveIncidentChannel(
+      this.organizationId(req),
+      channelId,
+      req.user.id,
+    );
   }
 
   @Get('analytics/summary')

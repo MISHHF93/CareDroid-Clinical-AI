@@ -107,9 +107,59 @@ function inferTriggerFromTimer(timer: ResponseTimerState): ThreeMinuteMissionTri
   return 'critical_patient';
 }
 
+/**
+ * Cheap content signature for change detection. timerToMission() always
+ * returns freshly frozen objects (and re-maps `tasks` every call), so
+ * reference equality is useless here — this compares the fields that
+ * actually affect rendering.
+ */
+function missionSignature(missions: readonly ThreeMinuteMission[]): string {
+  return missions
+    .map(
+      (mission) =>
+        `${mission.missionId}:${mission.phase}:${mission.acknowledgedAt ?? ''}:${mission.breachAt ?? ''}:${mission.tasks
+          .map((task) => `${task.id}=${task.status}`)
+          .join(',')}`,
+    )
+    .join('|');
+}
+
+/**
+ * setMissions() unconditionally writes a brand-new array reference to the
+ * store (see store/threeMinuteMissionStore.ts's `[...missions]` spread), and
+ * this function is called from inside a useMemo on every render of
+ * ThreeMinuteMissionBar / WorkflowAutomationCommandBar (via
+ * buildThreeMinuteMissionSnapshot). Writing on every call — even when
+ * nothing changed — created a render loop: memo runs -> writes store ->
+ * store notifies the same component's `missions` selector -> re-render ->
+ * memo runs again -> writes store again -> ... (observed in practice as a
+ * React "Maximum update depth exceeded" error that pegged the main thread).
+ * Skipping the write when the computed missions are unchanged breaks the
+ * cycle without changing what any caller receives (they still get a fresh,
+ * correct array back from this function every time).
+ */
 export function syncThreeMinuteMissionsFromEngine(): readonly ThreeMinuteMission[] {
   const missions = getAllActiveTimers().map((timer) => timerToMission(timer, inferTriggerFromTimer(timer)));
-  getThreeMinuteMissionStoreState().setMissions(missions);
+  const store = getThreeMinuteMissionStoreState();
+  if (missionSignature(missions) !== missionSignature(store.missions)) {
+    // Deferred by a microtask so the write always lands after React finishes
+    // the current commit, not mid-render for whichever sibling component
+    // happens to still be processing in the same batch. Two independent
+    // useThreeMinuteMission() instances (ThreeMinuteMissionBar and
+    // WorkflowAutomationCommandBar, via useUnifiedWorkflowAutomation) each
+    // run this from their own mount effect, and on the very first commit
+    // one's synchronous store write could otherwise land while the other was
+    // still rendering (a one-time "Cannot update a component while rendering
+    // a different component" warning, not a loop). Re-checking the signature
+    // against the latest store state avoids clobbering a write that already
+    // happened in between.
+    queueMicrotask(() => {
+      const latest = getThreeMinuteMissionStoreState();
+      if (missionSignature(missions) !== missionSignature(latest.missions)) {
+        latest.setMissions(missions);
+      }
+    });
+  }
   return missions;
 }
 
@@ -208,8 +258,15 @@ export function acknowledgeThreeMinuteMission(
   return true;
 }
 
-export function buildThreeMinuteMissionSnapshot(): ThreeMinuteMissionSnapshot {
-  const activeMissions = syncThreeMinuteMissionsFromEngine();
+// Pure — derives the snapshot from an already-known missions array without touching the
+// timer engine or the Zustand store. Callers that already have fresh `missions` (e.g. a
+// React hook subscribed to the store) should use this instead of
+// buildThreeMinuteMissionSnapshot() during render: that function's engine sync can write
+// to the store, and doing that inside a render-phase useMemo/useState trips React's
+// "Cannot update a component while rendering a different component" warning.
+export function buildThreeMinuteMissionSnapshotFromMissions(
+  activeMissions: readonly ThreeMinuteMission[],
+): ThreeMinuteMissionSnapshot {
   const breachCount = activeMissions.filter((mission) => mission.phase === 'breach').length;
   const unacknowledgedCount = activeMissions.filter((mission) => !mission.acknowledgedAt).length;
   const store = useEmergencyStore.getState();
@@ -236,6 +293,11 @@ export function buildThreeMinuteMissionSnapshot(): ThreeMinuteMissionSnapshot {
     unacknowledgedCount,
     complianceRate,
   });
+}
+
+export function buildThreeMinuteMissionSnapshot(): ThreeMinuteMissionSnapshot {
+  const activeMissions = syncThreeMinuteMissionsFromEngine();
+  return buildThreeMinuteMissionSnapshotFromMissions(activeMissions);
 }
 
 export function hydrateThreeMinuteMissionsFromStore(): void {
@@ -302,6 +364,7 @@ export default {
   startThreeMinuteMission,
   acknowledgeThreeMinuteMission,
   buildThreeMinuteMissionSnapshot,
+  buildThreeMinuteMissionSnapshotFromMissions,
   syncThreeMinuteMissionsFromEngine,
   evaluateThreeMinuteTriggers,
   hydrateThreeMinuteMissionsFromStore,

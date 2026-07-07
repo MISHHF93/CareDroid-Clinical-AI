@@ -1,4 +1,5 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import {
   AICallInterrogationService,
   type EmergencyCall,
@@ -10,6 +11,19 @@ import {
   type EDState,
 } from '../../services/organizational-digital-twin.service';
 import { ERPulseHandoverService } from '../../services/smart-handover-v2.service';
+import { SkipTenantIsolation } from '../tenant-context/tenant-scope.decorator';
+
+/**
+ * These research/demo controllers (federated EMS, LMECS, AI call
+ * interrogation, digital twin, ER Pulse handover) previously had no guards at
+ * all — unlike every other emergency-os controller, they accepted patient
+ * data (chief complaints, ECG samples, wearable data, patient records) from
+ * completely unauthenticated requests. They're @SkipTenantIsolation() rather
+ * than tenant-scoped like EmergencyOsController because they don't carry an
+ * organizationId/workspaceId and operate on request-body payloads directly,
+ * not tenant-scoped DB records — but they still require a valid authenticated
+ * user, matching every other PHI-adjacent endpoint in this module.
+ */
 
 interface HandoverRequest {
   patientId?: string;
@@ -25,6 +39,8 @@ interface CallInterrogationRequest {
   timestamp?: string;
 }
 
+@UseGuards(AuthGuard('jwt'))
+@SkipTenantIsolation()
 @Controller('handover')
 export class ERPulseHandoverController {
   constructor(private readonly handoverService: ERPulseHandoverService) {}
@@ -37,6 +53,8 @@ export class ERPulseHandoverController {
   }
 }
 
+@UseGuards(AuthGuard('jwt'))
+@SkipTenantIsolation()
 @Controller('ems/federated')
 export class FederatedEMSController {
   constructor(private readonly federatedEMSService: FederatedEMSService) {}
@@ -78,6 +96,8 @@ export class FederatedEMSController {
   }
 }
 
+@UseGuards(AuthGuard('jwt'))
+@SkipTenantIsolation()
 @Controller('federated/lmecs')
 export class LMECSController {
   constructor(private readonly lmecsService: LMECSService) {}
@@ -121,6 +141,8 @@ export class LMECSController {
   }
 }
 
+@UseGuards(AuthGuard('jwt'))
+@SkipTenantIsolation()
 @Controller('ems')
 export class AICallInterrogationController {
   constructor(private readonly callInterrogationService: AICallInterrogationService) {}
@@ -152,6 +174,8 @@ export class AICallInterrogationController {
   }
 }
 
+@UseGuards(AuthGuard('jwt'))
+@SkipTenantIsolation()
 @Controller('emergency/digital-twin/organizational')
 export class OrganizationalDigitalTwinController {
   constructor(private readonly organizationalDigitalTwin: OrganizationalDigitalTwin) {}

@@ -40,8 +40,11 @@ export function useUnifiedApplicationKnowledgeGraph(
   const emsArrivals = useEmergencyStore((state) => state.emsArrivals);
   const capacity = useEmergencyStore((state) => state.capacity);
   const patientFlowSnapshot = useEmergencyStore((state) => state.patientFlowSnapshot);
-  const selectedPatientId =
-    options.selectedPatientId ?? useEmergencyStore((state) => state.selectedPatientId);
+  // Must call this hook unconditionally — `options.selectedPatientId ?? useStore(...)`
+  // would skip the hook call whenever a non-nullish value is passed in, violating
+  // Rules of Hooks whenever the caller's selectedPatientId toggles between renders.
+  const storeSelectedPatientId = useEmergencyStore((state) => state.selectedPatientId);
+  const selectedPatientId = options.selectedPatientId ?? storeSelectedPatientId;
   const unifiedSnapshot = useUnifiedOperationalIntelligenceStore((state) => state.unifiedSnapshot);
 
   const snapshot = useMemo((): UnifiedApplicationKnowledgeGraphSnapshot => {

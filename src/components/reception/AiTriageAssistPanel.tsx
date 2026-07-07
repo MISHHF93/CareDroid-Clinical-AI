@@ -32,7 +32,6 @@ export default function AiTriageAssistPanel({
   const triage = useTriageScreen();
   const reception = useReceptionScreen();
   const emergencyRole = useEmergencyRolePermissions();
-  const store = useEmergencyStore();
   const patients = useEmergencyStore((state) => state.patients);
   const canReviewTriage = triage.showAiTriageAssist || reception.showClinicalTriageAssist;
 
@@ -57,8 +56,13 @@ export default function AiTriageAssistPanel({
   const lane = overrideLane || assist.suggestedQueue;
   const priority = overridePriority || assist.suggestedPriority;
 
+  // These handlers only need the store's current values/actions at click time
+  // â€” none of them are read during render â€” so useEmergencyStore.getState()
+  // (a plain snapshot, not a subscription) avoids re-rendering this component
+  // on every store mutation the way `useEmergencyStore()` (whole-store,
+  // no selector) previously did.
   const handleAccept = () => {
-    const result = acceptTriageAssistSuggestion(store, patient, assist, {
+    const result = acceptTriageAssistSuggestion(useEmergencyStore.getState(), patient, assist, {
       actorName: emergencyRole.roleLabel,
       override: {
         priority: (overridePriority || undefined) as any,
@@ -69,16 +73,17 @@ export default function AiTriageAssistPanel({
   };
 
   const handleDismiss = () => {
-    dismissTriageAssistSuggestion(store, patient, assist, emergencyRole.roleLabel);
+    dismissTriageAssistSuggestion(useEmergencyStore.getState(), patient, assist, emergencyRole.roleLabel);
     onDismissed?.(patient.id);
   };
 
   const handleEdit = () => {
-    store.selectPatient(patient.id);
+    useEmergencyStore.getState().selectPatient(patient.id);
     onEdit?.(patient.id);
   };
 
   const handleAskCopilot = () => {
+    const store = useEmergencyStore.getState();
     store.selectPatient(patient.id);
     if (!store.copilotOpen) {
       store.toggleCopilot();
@@ -109,9 +114,9 @@ export default function AiTriageAssistPanel({
     >
       <header className="ai-triage-assist__header">
         <div>
-          <p className="ai-triage-assist__eyebrow">Nurse triage sign-off · {sourceLabel}</p>
+          <p className="ai-triage-assist__eyebrow">Nurse triage sign-off ï¿½ {sourceLabel}</p>
           <h3 className="ai-triage-assist__title">
-            Suggested {priorityLabel(priority)} · {streamingLaneLabel(String(lane))}
+            Suggested {priorityLabel(priority)} ï¿½ {streamingLaneLabel(String(lane))}
           </h3>
           <p className="ai-triage-assist__esi">{priorityToEsiLabel(priority)}</p>
         </div>

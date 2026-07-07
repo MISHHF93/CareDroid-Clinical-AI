@@ -155,7 +155,12 @@ export function getWaitMinutes(patient: Patient, now = Date.now()): number {
   return Math.max(0, Math.floor((now - arrivalTime) / 60000));
 }
 
-export function formatWaitTime(waitMinutes: number): string {
+// Named distinctly from utils/patientWhiteboardModel.ts's formatWaitTime — that one
+// produces patient-facing reassurance prose ("About 45 minutes"); this produces the
+// compact staff-facing shorthand ("45m", "1h 30m") this drawer needs. They're
+// intentionally different formats for different audiences, not a drift bug, but sharing
+// the same name made it easy to import the wrong one for a given context.
+export function formatCompactWaitTime(waitMinutes: number): string {
   if (waitMinutes < 1) return '<1m';
   if (waitMinutes < 60) return `${waitMinutes}m`;
 
@@ -422,7 +427,7 @@ export default function ReassessmentDrawer({ open, count, onClose }: Reassessmen
 
                   <div className="reassessment-drawer__actions">
                     <span className={`reassessment-drawer__wait reassessment-drawer__wait--${flagCopy.tone}`}>
-                      {formatWaitTime(waitMinutes)}
+                      {formatCompactWaitTime(waitMinutes)}
                     </span>
                     <button
                       type="button"

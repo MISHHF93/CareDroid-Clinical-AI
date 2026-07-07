@@ -278,7 +278,7 @@ export class AIService {
         response.usage.outputTokens,
         response.usage.cacheReadInputTokens,
       );
-      this.metricsService.recordOpenaiCost(config.model, userId, costUsd);
+      this.metricsService.recordOpenaiCost(config.model, costUsd);
       const aiUsageMetadata = this.buildAiUsageMetadata(
         context,
         config.model,
@@ -391,7 +391,7 @@ export class AIService {
         response.usage.outputTokens,
         response.usage.cacheReadInputTokens,
       );
-      this.metricsService.recordOpenaiCost(config.model, userId, costUsd);
+      this.metricsService.recordOpenaiCost(config.model, costUsd);
       const aiUsageMetadata = this.buildAiUsageMetadata(
         context,
         config.model,
@@ -855,7 +855,7 @@ export class AIService {
         response.usage.outputTokens,
         response.usage.cacheReadInputTokens,
       );
-      this.metricsService.recordOpenaiCost(config.model, userId, costUsd);
+      this.metricsService.recordOpenaiCost(config.model, costUsd);
       const aiUsageMetadata = this.buildAiUsageMetadata(
         context,
         config.model,

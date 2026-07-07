@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { buildThreeMinuteMissionSnapshot } from '../services/threeMinuteMissionService';
+import {
+  buildThreeMinuteMissionSnapshotFromMissions,
+  syncThreeMinuteMissionsFromEngine,
+} from '../services/threeMinuteMissionService';
 import { useThreeMinuteMissionStore } from '../store/threeMinuteMissionStore';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { acknowledgeThreeMinuteMission } from '../services/threeMinuteMissionService';
@@ -11,18 +14,30 @@ export function useThreeMinuteMission(options: { realtime?: boolean } = {}) {
   const emsArrivals = useEmergencyStore((state) => state.emsArrivals);
   const [tick, setTick] = useState(0);
 
+  // Syncing from the timer engine can write to the missions store (see
+  // syncThreeMinuteMissionsFromEngine). Doing that from a render-phase useMemo trips
+  // React's "Cannot update a component while rendering a different component" warning
+  // whenever this hook's own component is subscribed to that store. Keeping the sync in
+  // effects only means it always runs post-render, in the commit phase.
+  useEffect(() => {
+    syncThreeMinuteMissionsFromEngine();
+  }, [patients, alerts, emsArrivals]);
+
   useEffect(() => {
     if (options.realtime === false) return undefined;
     const timer = window.setInterval(() => {
       setTick((value) => value + 1);
-      buildThreeMinuteMissionSnapshot();
+      syncThreeMinuteMissionsFromEngine();
     }, 1000);
     return () => window.clearInterval(timer);
   }, [options.realtime, patients, alerts, emsArrivals]);
 
   const snapshot = useMemo(
-    () => buildThreeMinuteMissionSnapshot(),
-    [missions, patients, alerts, emsArrivals, tick],
+    () => buildThreeMinuteMissionSnapshotFromMissions(missions),
+    // alerts isn't read directly here, but buildThreeMinuteMissionSnapshotFromMissions
+    // computes complianceRate from the live emergency store's alerts, so it must stay a
+    // dep to avoid a stale complianceRate when alerts change without missions changing.
+    [missions, alerts, tick],
   );
 
   const acknowledgeMission = useCallback((missionId: string, acknowledgedBy: string) => {

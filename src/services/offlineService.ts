@@ -396,11 +396,15 @@ class OfflineService {
    */
   async getUnsyncedItems() {
     try {
-      const messages = await db.messages.where('synced').equals(false as any).toArray();
-      const conversations = await db.conversations.where('synced').equals(false as any).toArray();
-      const toolResults = await db.toolResults.where('synced').equals(false as any).toArray();
-      const auditLogs = await db.auditLogs.where('synced').equals(false as any).toArray();
-      const notifications = await db.notifications.where('synced').equals(false as any).toArray();
+      // IndexedDB key ranges only accept Number/String/Date/Array — a boolean `synced`
+      // value is not a valid key, so `.where('synced').equals(false)` throws a DataError
+      // even though the field is indexed. `.filter()` scans in JS instead of using the
+      // index, which is fine at this table's size and works for any value type.
+      const messages = await db.messages.filter((item: any) => item.synced === false).toArray();
+      const conversations = await db.conversations.filter((item: any) => item.synced === false).toArray();
+      const toolResults = await db.toolResults.filter((item: any) => item.synced === false).toArray();
+      const auditLogs = await db.auditLogs.filter((item: any) => item.synced === false).toArray();
+      const notifications = await db.notifications.filter((item: any) => item.synced === false).toArray();
 
       return {
         messages,

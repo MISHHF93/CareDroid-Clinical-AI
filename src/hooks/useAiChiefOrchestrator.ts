@@ -38,7 +38,13 @@ export function useAiChiefOrchestrator(options: UseAiChiefOrchestratorOptions = 
   const referrals = useEmergencyStore((state) => state.referrals);
   const workflowLogs = useEmergencyStore((state) => state.workflowLogs);
   const emergencySettings = useEmergencyStore((state) => state.emergencySettings);
-  const selectedPatientId = options.selectedPatientId ?? useEmergencyStore((state) => state.selectedPatientId);
+  // `options.selectedPatientId ?? useEmergencyStore(...)` would call this hook
+  // conditionally (skipped whenever the caller passes a non-nullish value),
+  // violating Rules of Hooks — CopilotPanel toggles between a patient id and
+  // null on every select/deselect while this hook is mounted with
+  // realtime: true, which would change the hook count render-to-render.
+  const storeSelectedPatientId = useEmergencyStore((state) => state.selectedPatientId);
+  const selectedPatientId = options.selectedPatientId ?? storeSelectedPatientId;
 
   const operationalIntelligence = useOperationalIntelligenceCore({
     screenMode,
