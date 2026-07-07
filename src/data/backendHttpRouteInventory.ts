@@ -994,6 +994,49 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
 
   { method: 'GET', path: '/api/workspaces/invitations/:token', controller: 'WorkspaceInvitationsController' },
   { method: 'POST', path: '/api/workspaces/invitations/:token/accept', controller: 'WorkspaceInvitationsController' },
+
+  { method: 'GET', path: '/api/collaboration/channels', controller: 'CollaborationHubController' },
+  { method: 'POST', path: '/api/collaboration/channels', controller: 'CollaborationHubController' },
+  { method: 'POST', path: '/api/collaboration/channels/:channelId/archive', controller: 'CollaborationHubController' },
+  { method: 'GET', path: '/api/collaboration/channels/:channelId/messages', controller: 'CollaborationHubController' },
+  { method: 'POST', path: '/api/collaboration/channels/:channelId/messages', controller: 'CollaborationHubController' },
+  { method: 'PATCH', path: '/api/collaboration/messages/:messageId', controller: 'CollaborationHubController' },
+  { method: 'DELETE', path: '/api/collaboration/messages/:messageId', controller: 'CollaborationHubController' },
+  { method: 'POST', path: '/api/collaboration/messages/:messageId/reactions', controller: 'CollaborationHubController' },
+  { method: 'DELETE', path: '/api/collaboration/messages/:messageId/reactions/:emoji', controller: 'CollaborationHubController' },
+  { method: 'POST', path: '/api/collaboration/messages/:messageId/pin', controller: 'CollaborationHubController' },
+  { method: 'DELETE', path: '/api/collaboration/messages/:messageId/pin', controller: 'CollaborationHubController' },
+  { method: 'GET', path: '/api/collaboration/channels/:channelId/pinned', controller: 'CollaborationHubController' },
+  { method: 'POST', path: '/api/collaboration/channels/:channelId/read', controller: 'CollaborationHubController' },
+  { method: 'PATCH', path: '/api/collaboration/channels/:channelId/membership', controller: 'CollaborationHubController' },
+  { method: 'POST', path: '/api/collaboration/channels/:channelId/typing', controller: 'CollaborationHubController' },
+  { method: 'POST', path: '/api/collaboration/messages/:messageId/attachments', controller: 'CollaborationHubController' },
+  { method: 'POST', path: '/api/collaboration/channels/:channelId/external-links', controller: 'CollaborationHubController' },
+  { method: 'DELETE', path: '/api/collaboration/channels/:channelId/external-links/:provider', controller: 'CollaborationHubController' },
+  { method: 'GET', path: '/api/collaboration/search', controller: 'CollaborationHubController' },
+  { method: 'GET', path: '/api/collaboration/patients/:patientId/thread', controller: 'CollaborationHubController' },
+  { method: 'POST', path: '/api/collaboration/incidents', controller: 'CollaborationHubController' },
+  { method: 'POST', path: '/api/collaboration/incidents/:channelId/resolve', controller: 'CollaborationHubController' },
+  { method: 'GET', path: '/api/collaboration/analytics/summary', controller: 'CollaborationHubController' },
+
+  { method: 'GET', path: '/api/emergency/intake/ocr-health', controller: 'EmergencyOsController' },
+  { method: 'GET', path: '/api/emergency/intake/ocr-jobs', controller: 'EmergencyOsController' },
+  { method: 'GET', path: '/api/emergency/intake/ocr-jobs/:jobId', controller: 'EmergencyOsController' },
+  { method: 'POST', path: '/api/emergency/intake/ocr-jobs', controller: 'EmergencyOsController' },
+  { method: 'POST', path: '/api/emergency/intake/ocr-jobs/:jobId/apply', controller: 'EmergencyOsController' },
+  { method: 'POST', path: '/api/emergency/intake/ocr-jobs/:jobId/fields/:field/review', controller: 'EmergencyOsController' },
+
+  { method: 'GET', path: '/api/observability/diagnostics', controller: 'PlatformTelemetryController' },
+  { method: 'GET', path: '/api/observability/health', controller: 'PlatformTelemetryController' },
+  { method: 'GET', path: '/api/observability/performance', controller: 'PlatformTelemetryController' },
+  { method: 'GET', path: '/api/observability/traces/:correlationId', controller: 'PlatformTelemetryController' },
+  { method: 'POST', path: '/api/observability/events', controller: 'PlatformTelemetryController' },
+
+  { method: 'GET', path: '/api/rag/health', controller: 'RAGController' },
+  { method: 'GET', path: '/api/rag/stats', controller: 'RAGController' },
+
+  { method: 'POST', path: '/api/emergency/governance/evaluate-priority-change', controller: 'EmergencyAIGovernanceController' },
+  { method: 'POST', path: '/api/v1/governance/evaluate-priority-change', controller: 'AIGovernanceV1Controller' },
 ]);
 
 /** @typedef {BackendHttpRoute & { runtime: 'mongoose-emergency-os', mountFlag: string }} OptionalRuntimeBackendRoute */

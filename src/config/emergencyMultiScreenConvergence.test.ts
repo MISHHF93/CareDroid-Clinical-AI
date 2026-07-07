@@ -35,7 +35,7 @@ import { resolveEmergencyDisplayPrivacyPolicy } from './emergencyDisplayPrivacyP
 import { resolveOperationalPresentation } from './emergencyOperationalPresentationModel';
 import { isPractitionerCleanupEnabled } from './practitionerCleanup.config';
 import { resolveWhiteboardDisplayProfile } from '../hooks/useWhiteboardDisplayMode';
-import { EMERGENCY_PAGE_ALL_RENDER_PATHS } from '../data/emergencyPageRenderInventory';
+import { EMERGENCY_PAGE_PRIMARY_PATHS } from '../data/emergencyPageRenderInventory';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, '..', '..');
@@ -61,7 +61,7 @@ describe('emergencyMultiScreenConvergence', () => {
     expect(activeAppShellSource).toContain('export function AppShell');
     expect(
       CANONICAL_APP_ROUTE_TREE.filter((route) => route.type === 'page').map((route) => route.path),
-    ).toEqual(EMERGENCY_PAGE_ALL_RENDER_PATHS);
+    ).toEqual(EMERGENCY_PAGE_PRIMARY_PATHS);
   });
 
   it('maps each ED role to a distinct primary screen mode', () => {

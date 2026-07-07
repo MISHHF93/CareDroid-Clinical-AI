@@ -30,6 +30,13 @@ const REQUESTED_ITEMS = [
     featureGate: null,
   },
   {
+    id: 'collaboration',
+    label: 'Collaboration Hub',
+    icon: 'messages',
+    route: '/emergency/collaboration',
+    featureGate: null,
+  },
+  {
     id: 'intake',
     label: 'Intake',
     icon: 'intake',
@@ -343,7 +350,7 @@ describe('unified navigation config', () => {
     expect(adminLabels).not.toContain('Fleet');
 
     const readOnlyLabels = getVisibleNavigation('read_only_viewer').map((item) => item.label);
-    expect(readOnlyLabels).toEqual(['Whiteboard', 'Analytics', 'Help']);
+    expect(readOnlyLabels).toEqual(['Whiteboard', 'Analytics', 'Collaboration Hub', 'Help']);
     expect(readOnlyLabels).toContain('Analytics');
     expect(readOnlyLabels).not.toContain('Settings');
   });
@@ -357,7 +364,7 @@ describe('unified navigation config', () => {
 
   it('hides standalone intake nav for registration clerks', () => {
     const clerkNavIds = getVisibleNavigation('registration_clerk').map((item) => item.id);
-    expect(clerkNavIds).toEqual(['reception', 'patients', 'pulse', 'shift', 'alerts', 'help']);
+    expect(clerkNavIds).toEqual(['reception', 'patients', 'pulse', 'shift', 'alerts', 'collaboration', 'help']);
     expect(clerkNavIds).not.toContain('whiteboard');
     expect(clerkNavIds).not.toContain('intake');
     expect(clerkNavIds).not.toContain('queues');
@@ -403,7 +410,7 @@ describe('unified navigation config', () => {
 
   it('keeps physician navigation whiteboard-first with workflows on patient cards', () => {
     const physicianNavIds = getVisibleNavigation('physician').map((item) => item.id);
-    expect(physicianNavIds).toEqual(['whiteboard', 'patients', 'copilot', 'tools', 'analytics', 'command-center', 'alerts', 'diagnostics', 'handoffs', 'reports', 'help']);
+    expect(physicianNavIds).toEqual(['whiteboard', 'patients', 'copilot', 'tools', 'analytics', 'command-center', 'alerts', 'diagnostics', 'handoffs', 'reports', 'collaboration', 'help']);
     expect(physicianNavIds).not.toContain('reception');
     expect(physicianNavIds).not.toContain('queues');
     expect(physicianNavIds).not.toContain('reassessment');

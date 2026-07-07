@@ -21,7 +21,11 @@ function endpointKey(endpoint) {
 
 describe('emergencyPageRenderInventory', () => {
   it('matches the mounted App page routes', () => {
-    expect(getCanonicalAppPagePaths()).toEqual(EMERGENCY_PAGE_ALL_RENDER_PATHS);
+    // EMERGENCY_PAGE_ALL_RENDER_PATHS includes duplicateRenderPaths aliases (e.g.
+    // /emergency/journey's legacy /emergency/command-center bookmark), which are
+    // redirects in the route tree, not distinct mounted page components — compare
+    // against the primary (alias-free) path list instead.
+    expect(getCanonicalAppPagePaths()).toEqual(EMERGENCY_PAGE_PRIMARY_PATHS);
   });
 
   it('keeps requested AppShell nav paths in the active page inventory', () => {
@@ -51,9 +55,13 @@ describe('emergencyPageRenderInventory', () => {
   });
 
   it('keeps screenshot targets unique and concrete', () => {
-    expect(new Set(EMERGENCY_PAGE_SCREENSHOT_TARGETS.map((target) => target.path)).size).toBe(
-      EMERGENCY_PAGE_SCREENSHOT_TARGETS.length,
+    // Duplicate-render-path aliases (e.g. the /emergency/journey legacy bookmark
+    // that redirects to /emergency/command-center) intentionally share their
+    // primary entry's path — only primary (non-alias) targets need unique paths.
+    const primaryTargets = EMERGENCY_PAGE_SCREENSHOT_TARGETS.filter(
+      (target) => !target.isDuplicateRenderPath,
     );
+    expect(new Set(primaryTargets.map((target) => target.path)).size).toBe(primaryTargets.length);
     expect(
       new Set(EMERGENCY_PAGE_SCREENSHOT_TARGETS.map((target) => target.screenshotSlug)).size,
     ).toBe(EMERGENCY_PAGE_SCREENSHOT_TARGETS.length);

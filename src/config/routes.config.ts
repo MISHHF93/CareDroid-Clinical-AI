@@ -220,6 +220,7 @@ export const CANONICAL_APP_ROUTE_TREE = Object.freeze([
   { path: '/emergency', type: 'redirect', to: '/emergency/reception' },
   { path: '/emergency/command-center', type: 'page', componentKey: 'HospitalCommandCenter' },
   { path: '/emergency/whiteboard', type: 'page', componentKey: 'EmergencyWhiteboard' },
+  { path: '/emergency/collaboration', type: 'page', componentKey: 'CollaborationHub' },
   { path: '/emergency/patients', type: 'page', componentKey: 'EmergencyPatientsRoute' },
   { path: '/emergency/journey', type: 'redirect', to: '/emergency/command-center' },
   { path: '/emergency/dispatch', type: 'page', componentKey: 'DispatchConsole' },

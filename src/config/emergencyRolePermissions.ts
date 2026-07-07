@@ -103,6 +103,7 @@ export const EMERGENCY_ACTIONS = Object.freeze({
 
 const ROUTES = Object.freeze({
   whiteboard: CANONICAL_ROUTES.emergencyWhiteboard,
+  collaboration: CANONICAL_ROUTES.emergencyCollaboration,
   commandCenter: CANONICAL_ROUTES.emergencyCommandCenter,
   pulse: CANONICAL_ROUTES.emergencyPulse,
   patients: CANONICAL_ROUTES.emergencyPatients,
@@ -153,6 +154,7 @@ const ROUTES = Object.freeze({
 
 const ALL_ROUTES = Object.freeze([
   ROUTES.whiteboard,
+  ROUTES.collaboration,
   ROUTES.commandCenter,
   ROUTES.pulse,
   ROUTES.patients,
@@ -201,6 +203,7 @@ const ALL_ACTIONS = Object.freeze(
 );
 const CLINICAL_VIEW_ROUTES = Object.freeze([
   ROUTES.whiteboard,
+  ROUTES.collaboration,
   ROUTES.commandCenter,
   ROUTES.patients,
   ROUTES.journey,
@@ -225,6 +228,7 @@ const CLINICAL_VIEW_ROUTES = Object.freeze([
 ]);
 const OPERATIONS_VIEW_ROUTES = Object.freeze([
   ROUTES.whiteboard,
+  ROUTES.collaboration,
   ROUTES.commandCenter,
   ROUTES.pulse,
   ROUTES.patients,
@@ -327,6 +331,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
       'Front-door clinical role for intake, triage, vitals, reassessment, and patient safety flags.',
     routes: [
       ROUTES.whiteboard,
+      ROUTES.collaboration,
       ROUTES.patients,
       ROUTES.ems,
       ROUTES.reception,
@@ -336,6 +341,8 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
       ROUTES.copilot,
       ROUTES.tools,
       ROUTES.platform,
+      ROUTES.alerts,
+      ROUTES.help,
     ],
     actions: [
       EMERGENCY_ACTIONS.createPatient,
@@ -378,7 +385,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
     label: EMERGENCY_ROLE_LABELS[EMERGENCY_ROLE_IDS.registrationClerk],
     description:
       'Emergency reception role for fast arrival capture, intake drafts, demographics, queue handoff, and critical staff notification without clinical override authority.',
-    routes: [ROUTES.reception, ROUTES.patients, ROUTES.intake, ROUTES.pulse, ROUTES.shift, ROUTES.alerts, ROUTES.help],
+    routes: [ROUTES.reception, ROUTES.patients, ROUTES.intake, ROUTES.pulse, ROUTES.shift, ROUTES.alerts, ROUTES.collaboration, ROUTES.help],
     actions: [
       EMERGENCY_ACTIONS.createPatient,
       EMERGENCY_ACTIONS.editPatientDemographics,
@@ -394,7 +401,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
     label: EMERGENCY_ROLE_LABELS[EMERGENCY_ROLE_IDS.emsUser],
     description:
       'EMS coordination role for inbound units, bay preparation, and handoff completion.',
-    routes: [ROUTES.ems, ROUTES.whiteboard, ROUTES.patients, ROUTES.capacity, ROUTES.tools, ROUTES.platform, ROUTES.alerts, ROUTES.help],
+    routes: [ROUTES.ems, ROUTES.whiteboard, ROUTES.patients, ROUTES.capacity, ROUTES.tools, ROUTES.platform, ROUTES.alerts, ROUTES.collaboration, ROUTES.help],
     actions: [
       EMERGENCY_ACTIONS.prepareEmsBay,
       EMERGENCY_ACTIONS.convertEmsArrival,
@@ -408,7 +415,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
     label: EMERGENCY_ROLE_LABELS[EMERGENCY_ROLE_IDS.dispatcher],
     description:
       'Emergency call taker and CAD dispatch operator. Receives 911 calls, performs telephone triage, assigns EMS units, and notifies the ED of inbound critical patients.',
-    routes: [ROUTES.dispatch, ROUTES.ems, ROUTES.alerts, ROUTES.help],
+    routes: [ROUTES.dispatch, ROUTES.ems, ROUTES.alerts, ROUTES.collaboration, ROUTES.help],
     actions: [
       EMERGENCY_ACTIONS.createPatient,
       EMERGENCY_ACTIONS.prepareEmsBay,
@@ -420,7 +427,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
     label: EMERGENCY_ROLE_LABELS[EMERGENCY_ROLE_IDS.emsCoordinator],
     description:
       'EMS operations coordinator who manages unit deployment, prehospital data relay, pre-arrival notifications, and ED readiness handoffs.',
-    routes: [ROUTES.dispatch, ROUTES.ems, ROUTES.edReadiness, ROUTES.whiteboard, ROUTES.capacity, ROUTES.alerts, ROUTES.analytics, ROUTES.help],
+    routes: [ROUTES.dispatch, ROUTES.ems, ROUTES.edReadiness, ROUTES.whiteboard, ROUTES.capacity, ROUTES.patients, ROUTES.alerts, ROUTES.analytics, ROUTES.collaboration, ROUTES.help],
     actions: [
       EMERGENCY_ACTIONS.createPatient,
       EMERGENCY_ACTIONS.prepareEmsBay,
@@ -434,7 +441,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
     id: EMERGENCY_ROLE_IDS.readOnlyViewer,
     label: EMERGENCY_ROLE_LABELS[EMERGENCY_ROLE_IDS.readOnlyViewer],
     description: 'Read-only hallway and departmental wall displays with no mutating actions.',
-    routes: [ROUTES.whiteboard, ROUTES.analytics, ROUTES.help],
+    routes: [ROUTES.whiteboard, ROUTES.analytics, ROUTES.collaboration, ROUTES.help],
     actions: [EMERGENCY_ACTIONS.viewAnalytics, EMERGENCY_ACTIONS.displayWhiteboardReadonly],
     defaultRoute: getDefaultRouteForProfile(EMERGENCY_ROLE_IDS.readOnlyViewer),
     readOnly: true,
@@ -443,7 +450,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
     id: EMERGENCY_ROLE_IDS.publicDisplay,
     label: EMERGENCY_ROLE_LABELS[EMERGENCY_ROLE_IDS.publicDisplay],
     description: 'Public waiting-room display — aggregate status only, no staff actions.',
-    routes: [ROUTES.whiteboard],
+    routes: [ROUTES.whiteboard, ROUTES.analytics, ROUTES.collaboration, ROUTES.help],
     actions: [EMERGENCY_ACTIONS.displayPublicWaitboard, EMERGENCY_ACTIONS.displayPublicPublish],
     defaultRoute: getDefaultRouteForProfile(EMERGENCY_ROLE_IDS.publicDisplay),
     readOnly: true,

@@ -477,6 +477,7 @@ export const FEATURE_SUITE_ASSIGNMENTS: Readonly<Record<string, FeatureSuiteAssi
 
 export const NAV_SUITE_ASSIGNMENTS: Readonly<Record<string, CareDroidSuiteId>> = Object.freeze({
   reception: 'reception_arrival',
+  collaboration: 'charge_nurse_command',
   'command-center': 'emergency_whiteboard',
   whiteboard: 'emergency_whiteboard',
   intake: 'reception_arrival',
