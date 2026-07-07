@@ -89,7 +89,7 @@ export function classifyGfrCategory(egfrMlMin) {
   if (egfrMlMin >= 90) {
     return {
       category: 'G1',
-      label: 'G1 (=90 mL/min/1.73 m²)',
+      label: 'G1 (≥90 mL/min/1.73 m²)',
       description: 'Normal or high GFR (with other kidney damage markers, CKD may still apply).',
     };
   }
@@ -271,7 +271,7 @@ export function interpretCkdStaging(egfr, gfr, albuminuria, prognosticRisk) {
     prognosticRiskLabel: riskLabel,
     interpretation: `Estimated eGFR ${egfr} mL/min/1.73 m² (${gfr.label}). ${albuminuria.label}: ${albuminuria.description} Combined KDIGO prognostic category: ${riskLabel}.`,
     stagingDiscussion:
-      'KDIGO defines CKD by abnormalities of kidney structure or function for =3 months. A single eGFR and ACR do not by themselves establish chronicity or etiology — correlate with history, imaging, and prior labs per institutional pathways.',
+      'KDIGO defines CKD by abnormalities of kidney structure or function for ≥3 months. A single eGFR and ACR do not by themselves establish chronicity or etiology — correlate with history, imaging, and prior labs per institutional pathways.',
     clinicianPatientDisclaimer: 'Use as decision-support for clinician-patient discussions.',
     safetyDisclaimer:
       'CKD-EPI 2021 estimates GFR from serum creatinine and demographics. It does not replace measured GFR, does not diagnose acute kidney injury, and must not be used alone to rule in or rule out kidney disease.',

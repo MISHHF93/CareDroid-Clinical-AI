@@ -134,6 +134,6 @@ export const HAS_BLED_CRITERIA_META = [
   {
     key: 'alcoholUse',
     shortLabel: 'D — Alcohol use',
-    help: 'Excessive alcohol use (e.g. =8 drinks/week in the original operational definition — confirm with local guidance).',
+    help: 'Excessive alcohol use (e.g. ≥8 drinks/week in the original operational definition — confirm with local guidance).',
   },
 ];
