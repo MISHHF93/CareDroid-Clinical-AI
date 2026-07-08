@@ -40,6 +40,7 @@ const backendPatternsSource = readFileSync(
   'utf8'
 );
 const appSource = readFileSync(join(repoRoot, 'src/app/router.tsx'), 'utf8');
+const providersSource = readFileSync(join(repoRoot, 'src/app/providers.tsx'), 'utf8');
 const themeContextSource = readFileSync(join(repoRoot, 'src/contexts/ThemeContext.tsx'), 'utf8');
 const themeTestSource = readFileSync(join(repoRoot, 'src/contexts/ThemeContext.test.tsx'), 'utf8');
 
@@ -224,7 +225,7 @@ describe('medical expansion cross-pack validation', () => {
     expect(MOBILE_FIRST_VIEWPORT_WIDTHS).toEqual(
       expect.arrayContaining([320, 360, 375, 390, 412, 430, 480, 600, 768, 1024])
     );
-    expect(appSource).toContain('<ThemeProvider>');
+    expect(providersSource).toContain('<ThemeProvider>');
     expect(themeContextSource).toMatch(/standardTheme|STANDARD_THEME/);
     expect(themeTestSource).toMatch(/light/);
   });
