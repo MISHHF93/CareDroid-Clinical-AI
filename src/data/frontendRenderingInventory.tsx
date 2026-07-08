@@ -45,6 +45,12 @@ const toolPageLayoutSource = readFileSync(join(__dirname, '../pages/tools/ToolPa
 const catalogSource = readFileSync(join(__dirname, '../pages/tools/ClinicalToolCatalog.tsx'), 'utf8');
 const toolNotFoundSource = readFileSync(join(__dirname, '../pages/tools/ToolNotFound.tsx'), 'utf8');
 const toolsOverviewSource = readFileSync(join(__dirname, '../pages/tools/ToolsOverview.tsx'), 'utf8');
+// Fleet/hospital-ops routes are mounted through a config-driven route tree
+// rather than literal <Route> JSX in router.tsx.
+const operationsFleetConsoleRouteTreeSource = readFileSync(
+  join(__dirname, '../app/operationsFleetConsoleRouteTree.tsx'),
+  'utf8',
+);
 const mobileCalculatorCss = readFileSync(
   join(__dirname, '../components/calculators/mobileCalculator.css'),
   'utf8',
@@ -169,9 +175,10 @@ function disclaimerLayerOk(registryId, tier) {
     const spec = PR_FLEET_TOOL_SPECS[registryId];
     const fleetSource = spec?.appComponent ? readFleetComponentSource(spec.appComponent) : '';
     return (
-      appSource.includes('FleetDashboard') &&
+      operationsFleetConsoleRouteTreeSource.includes(spec?.appComponent || '\0') &&
       appSource.includes('ToolsRedirect') &&
-      (toolsOverviewSource.includes('fleet') || Boolean(fleetSource))
+      (toolsOverviewSource.includes('fleet') || Boolean(fleetSource)) &&
+      /Decision support only/i.test(fleetSource)
     );
   }
   if (tier === 'fleet-B' || tier === 'B') {
