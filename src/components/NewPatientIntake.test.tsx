@@ -13,6 +13,14 @@ import { PatientState, Priority } from '../types/emergency';
 
 import './NewPatientIntake.css';
 
+vi.mock('../services/emergencyOsApi', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../services/emergencyOsApi')>();
+  return {
+    ...actual,
+    runSmartIntakeVerticalSlice: vi.fn().mockResolvedValue({ data: {} }),
+  };
+});
+
 const originalState = useEmergencyStore.getState();
 
 afterEach(() => {
@@ -164,7 +172,13 @@ describe('NewPatientIntake quick flow', () => {
     expect(screen.getByLabelText(/first name/i)).toHaveFocus();
 
     fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' });
-    expect(confirmSpy).toHaveBeenCalledWith('Discard this quick intake draft?');
-    expect(onClose).toHaveBeenCalled();
+    // confirmCareDroidAction falls back to window.confirm(title + message) when
+    // no ConfirmDialogProvider is mounted, and resolves asynchronously.
+    await waitFor(() => {
+      expect(confirmSpy).toHaveBeenCalledWith('Discard intake draft?\n\nUnsaved intake details will be lost.');
+    });
+    await waitFor(() => {
+      expect(onClose).toHaveBeenCalled();
+    });
   });
 });

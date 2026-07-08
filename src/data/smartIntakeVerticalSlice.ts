@@ -201,7 +201,7 @@ export function buildSmartIntakeVerticalSlicePatient({
       triageTime: timestamp,
       lastAssessedTime: Object.values(vitals).some((value) => String(value ?? '').trim()) ? timestamp : null,
       complaintCategory,
-      vitals: normalizedVitals as any,
+      vitals: [normalizedVitals] as any,
       assignedStaffId: null,
       roomId: null,
       flags,
