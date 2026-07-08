@@ -127,7 +127,11 @@ describe('R12 complaint routing', () => {
   it('debounces QuickIntake complaint text and shows routed score suggestions', () => {
     vi.useFakeTimers();
 
-    render(<QuickIntake onClose={() => {}} onAdded={() => {}} />);
+    render(
+      <MemoryRouter>
+        <QuickIntake onClose={() => {}} onAdded={() => {}} />
+      </MemoryRouter>,
+    );
 
     expect(screen.getByRole('heading', { name: 'Central Node Intake' })).toBeTruthy();
     expect(screen.getByLabelText('Central node input mode')).toHaveTextContent(
@@ -163,7 +167,11 @@ describe('R12 complaint routing', () => {
       true,
     );
 
-    render(<PatientDetailPanel />);
+    render(
+      <MemoryRouter>
+        <PatientDetailPanel />
+      </MemoryRouter>,
+    );
 
     expect(await screen.findByText('heart-score')).toBeTruthy();
   });
@@ -242,7 +250,11 @@ describe('R12 critical vitals and flag reactivity', () => {
       true,
     );
 
-    render(<PatientDetailPanel />);
+    render(
+      <MemoryRouter>
+        <PatientDetailPanel />
+      </MemoryRouter>,
+    );
 
     expect(await screen.findAllByText('Backend-only provincial chart audit.')).not.toHaveLength(0);
     expect(screen.getAllByText('Local clinician assignment preserved.')).not.toHaveLength(0);
@@ -263,7 +275,11 @@ describe('R12 critical vitals and flag reactivity', () => {
       true,
     );
 
-    render(<PatientDetailPanel />);
+    render(
+      <MemoryRouter>
+        <PatientDetailPanel />
+      </MemoryRouter>,
+    );
 
     fireEvent.click(screen.getByRole('button', { name: /add vitals/i }));
     fireEvent.change(screen.getByLabelText('SPO2'), { target: { value: '87' } });
@@ -306,7 +322,7 @@ describe('R12 critical vitals and flag reactivity', () => {
       useEmergencyStore.getState().addFlag(patient.id, PatientFlag.DeteriorationRisk);
     });
 
-    expect(await screen.findByTitle(PatientFlag.DeteriorationRisk)).toBeTruthy();
+    expect(await screen.findByText('Deterioration risk')).toBeTruthy();
     expect(
       document
         .querySelector('[data-patient-card-id="r12-patient-1"]')
@@ -316,7 +332,7 @@ describe('R12 critical vitals and flag reactivity', () => {
 });
 
 describe('R12 capacity header flow', () => {
-  it('updates the Header capacity badge when a patient state change recalculates capacity', async () => {
+  it('updates the Header waiting-count badge when a patient state change recalculates capacity', async () => {
     const patient = makePatient();
     useEmergencyStore.setState(
       {
@@ -342,12 +358,14 @@ describe('R12 capacity header flow', () => {
       </MemoryRouter>,
     );
 
-    expect(screen.getByTitle(/Capacity Score: 10 Green/i)).toBeTruthy();
+    expect(screen.getByTitle(/Waiting/i)).toHaveTextContent('1');
 
     act(() => {
       useEmergencyStore.getState().movePatientToState(patient.id, PatientState.Admission, 's1');
     });
 
-    expect(await screen.findByTitle(/Capacity Score: 71 Red/i)).toBeTruthy();
+    await waitFor(() => {
+      expect(screen.getByTitle(/Waiting/i)).toHaveTextContent('0');
+    });
   });
 });
