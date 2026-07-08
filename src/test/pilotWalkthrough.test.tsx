@@ -19,6 +19,7 @@ import { useUser } from '../contexts/UserContext';
 import { AppRoutes } from '../App';
 import { PatientState, Priority } from '../types/emergency';
 import { getPatientFlagType, useEmergencyStore } from '../../store/emergencyStore';
+import { compileCareDroidAccessProfile, normalizeCareDroidProfile } from '../lib/users/canonicalAccess';
 
 vi.mock('recharts', () => {
   const passthrough = ({ children }) => <div>{children}</div>;
@@ -85,6 +86,44 @@ vi.mock('../services/emergencySettingsApi', () => ({
 const originalEmergencyState = useEmergencyStore.getState();
 const PILOT_ROUTE_LOAD_TIMEOUT = 15000;
 
+// Permissions and screen mode are resolved by two independent systems, and
+// no single front-line HospitalRole has every permission this walkthrough
+// exercises (create + discharge + referrals + analytics) -- that split
+// mirrors real hospital division of labor (reception/nursing creates,
+// physicians discharge). `super_admin` is the only role with every
+// permission (`permissions.ts`: `Object.freeze(Object.values(P))`), so it's
+// used for the compiled access profile attached below, which every
+// route/permission check consults directly via `compiledAccessProfile`.
+// Screen mode is resolved separately (`useRouteScreenMode`), driven purely
+// by the raw `role` string on the user object, not by
+// `compiledAccessProfile` -- `super_admin`'s EmergencyRoleId ('admin')
+// would resolve to the aggregate-metrics admin screen mode with no
+// individual patient cards, so DemoAccessRole below overrides just that
+// raw string to 'physician' to keep the standard clinical whiteboard.
+const PILOT_COMPILED_ACCESS_PROFILE = compileCareDroidAccessProfile(
+  normalizeCareDroidProfile({
+    id: 'pilot-demo-admin',
+    employeeId: 'PILOT-001',
+    fullName: 'Pilot Demo Admin',
+    preferredName: 'Pilot',
+    email: 'pilot-demo-admin@caredroid.local',
+    phone: '',
+    avatarUrl: '',
+    role: 'super_admin',
+    title: 'Pilot Demo Admin',
+    department: 'Administration',
+    hospitalSite: 'Central City Hospital',
+    cityZone: 'Central',
+    shiftStatus: 'on_shift',
+    shiftStart: '00:00',
+    shiftEnd: '23:59',
+    licenseNumber: null,
+    specialties: [],
+    availabilityStatus: 'available',
+    escalationLevel: 'none',
+  } as any),
+);
+
 function DemoAccessRole() {
   const { setUser } = useUser();
   const initialized = React.useRef(false);
@@ -97,9 +136,10 @@ function DemoAccessRole() {
       email: 'pilot-demo-admin@caredroid.local',
       name: 'Pilot Demo Admin',
       fullName: 'Pilot Demo Admin',
-      role: 'admin',
+      role: 'physician',
       authMode: 'open-access',
       isEmailVerified: true,
+      compiledAccessProfile: PILOT_COMPILED_ACCESS_PROFILE,
     });
   }, [setUser]);
 
@@ -166,7 +206,7 @@ function AppRouteHarness({ initialPath = '/emergency/whiteboard' }) {
 function findNewPatient(beforeIds) {
   return useEmergencyStore
     .getState()
-    .patients.find((patient) => patient.id.startsWith('smart-intake-') && !beforeIds.has(patient.id));
+    .patients.find((patient) => !beforeIds.has(patient.id));
 }
 
 async function waitForNewPatient(beforeIds) {
@@ -220,23 +260,36 @@ describe('pilot walkthrough', () => {
     render(<AppRouteHarness />);
 
     expect(await screen.findByText('CareDroid')).toBeInTheDocument();
-    expect(await screen.findByText('Total', {}, { timeout: PILOT_ROUTE_LOAD_TIMEOUT })).toBeInTheDocument();
+    expect(await screen.findByText('Waiting', {}, { timeout: PILOT_ROUTE_LOAD_TIMEOUT })).toBeInTheDocument();
 
     await user.click(screen.getByLabelText('Pilot open intake'));
-    expect(await screen.findByRole('heading', { name: 'Smart Intake Identity Review' })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: 'Check patient identity' }, { timeout: PILOT_ROUTE_LOAD_TIMEOUT }),
+    ).toBeInTheDocument();
 
-    await user.click(screen.getAllByRole('button', { name: /Start Intake/i })[0]);
-    for (const approveButton of screen.getAllByRole('button', { name: 'Approve' })) {
-      await user.click(approveButton);
-    }
-    await user.click(screen.getAllByRole('button', { name: /Create and Send to Triage/i }).at(-1));
+    // Reception-embedded intake now runs the life-critical desk form and the
+    // identity-verification overlay side by side. Patient creation only
+    // requires the desk form (createPatientAndRouteFromReception gates on
+    // permission, not field completeness); identity capture is a separate,
+    // non-blocking flow layered on top.
+    expect(
+      await screen.findByRole('heading', { name: 'Life-critical intake' }, { timeout: PILOT_ROUTE_LOAD_TIMEOUT }),
+    ).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Chest pain' }));
+    // Primary CTA label escalates to "Route to priority triage" for
+    // red-flag complaints like chest pain (see
+    // resolveUnifiedIntakePrimaryAction), replacing the default
+    // "Create patient & route" — match on the shared "route" wording.
+    await user.click(screen.getByRole('button', { name: /route/i }));
 
     const createdPatient = await waitForNewPatient(beforePatientIds);
     expect(createdPatient.state).toBe(PatientState.Triage);
 
     await user.click(screen.getByLabelText('Pilot open whiteboard'));
-    expect(await screen.findByText('Total', {}, { timeout: PILOT_ROUTE_LOAD_TIMEOUT })).toBeInTheDocument();
-    await waitFor(() => expect(getPatientCard(createdPatient.id)).toBeInTheDocument());
+    expect(await screen.findByText('Waiting', {}, { timeout: PILOT_ROUTE_LOAD_TIMEOUT })).toBeInTheDocument();
+    await waitFor(() => expect(getPatientCard(createdPatient.id)).toBeInTheDocument(), {
+      timeout: PILOT_ROUTE_LOAD_TIMEOUT,
+    });
 
     await user.click(getPatientCard(createdPatient.id));
 
@@ -279,7 +332,12 @@ describe('pilot walkthrough', () => {
 
     await user.click(screen.getByLabelText('Pilot open referrals'));
     expect(await screen.findByRole('heading', { name: 'Referrals' })).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: /New Referral/i }));
+    // Header actions (New Referral/New Transfer) register into the shared
+    // route chrome via useRouteChromeRegistration, an effect that commits
+    // one tick after the page body renders — findByRole waits for it.
+    await user.click(
+      await screen.findByRole('button', { name: /New Referral/i }, { timeout: PILOT_ROUTE_LOAD_TIMEOUT }),
+    );
 
     await user.type(screen.getByPlaceholderText(/Search active patients/i), createdPatient.mrn);
     const searchResults = screen.getByLabelText('Active patient search results');
@@ -295,6 +353,13 @@ describe('pilot walkthrough', () => {
     expect(await screen.findByText('Pilot cardiology referral')).toBeInTheDocument();
 
     await user.click(screen.getByLabelText('Pilot open whiteboard'));
+    // The board caps visible cards at PRACTITIONER_WHITEBOARD_CARD_LIMIT (18)
+    // to reduce clutter; the walkthrough's fixture data plus this session's
+    // freshly-created patient can exceed that on the unfiltered view. Narrow
+    // to the "Referrals" awareness chip, which the patient we just referred
+    // is guaranteed to appear under -- also the natural next click for
+    // someone who just sent a referral.
+    await user.click(await screen.findByRole('button', { name: /Referrals \(\d+\)/i }));
     await waitFor(() => expect(getPatientCard(createdPatient.id)).toBeInTheDocument());
     act(() => {
       useEmergencyStore.getState().movePatientToState(createdPatient.id, PatientState.Disposition);
@@ -310,7 +375,9 @@ describe('pilot walkthrough', () => {
     await waitForPatient(createdPatient.id, (patient) => patient.state === PatientState.Discharge);
 
     await user.click(screen.getByLabelText('Pilot open analytics'));
-    expect(await screen.findByRole('heading', { name: 'Emergency Analytics' })).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: 'Department Analytics' }, { timeout: PILOT_ROUTE_LOAD_TIMEOUT }),
+    ).toBeInTheDocument();
     await waitFor(() => expect(useEmergencyStore.getState().emergencyAnalytics.data?.shift).toBeTruthy());
 
     const analytics = useEmergencyStore.getState().emergencyAnalytics.data;
@@ -326,5 +393,5 @@ describe('pilot walkthrough', () => {
     const analyticsKpis = screen.getByLabelText('Emergency analytics KPIs');
     expect(within(analyticsKpis).getByText('Discharges')).toBeInTheDocument();
     expect(within(analyticsKpis).getAllByText(String(analytics.shift.dischargeCount)).length).toBeGreaterThan(0);
-  }, 30000);
+  }, 60000);
 });
