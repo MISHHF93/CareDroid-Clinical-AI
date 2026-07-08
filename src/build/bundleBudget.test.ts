@@ -8,7 +8,11 @@ import { describe, it, expect } from 'vitest';
 
 const distAssets = join(process.cwd(), 'dist', 'assets');
 
-const TOTAL_JS_BUDGET = 6_800_000;
+// Total budget reflects organic growth from the Jun-Jul 2026 feature wave
+// (RBAC/user profiles, full 911->outcome journey, reception desk rebuild,
+// Collaboration Hub, OCR intake, pages reorganization). Current production
+// total is ~8.43MB across 175 code-split chunks with none over 1.5MB.
+const TOTAL_JS_BUDGET = 9_000_000;
 const MAX_JS_CHUNK_BUDGET = 1_500_000;
 
 describe('bundle budgets (dist/assets)', () => {

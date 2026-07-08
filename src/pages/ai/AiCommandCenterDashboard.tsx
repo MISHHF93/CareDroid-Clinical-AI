@@ -5,6 +5,8 @@ import {
   AI_EXPERTS,
   fetchAiCommandCenterSnapshot,
 } from '../../services/aiCommandCenterApi';
+import StateSourceNotice from '../../components/StateSourceNotice';
+import { DEMO_LIVE_STATES } from '../../utils/demoLiveState';
 
 // -- types ---------------------------------------------------------------------
 
@@ -302,6 +304,23 @@ export default function AiCommandCenterDashboard() {
           </button>
         </div>
       </div>
+
+      {/* -- Source state -- */}
+      {snapshot && (
+        <StateSourceNotice
+          title="AI command center source state"
+          states={
+            snapshot.ok
+              ? [DEMO_LIVE_STATES.LIVE]
+              : [DEMO_LIVE_STATES.LIVE, DEMO_LIVE_STATES.BACKEND_UNAVAILABLE]
+          }
+          details={
+            snapshot.ok
+              ? 'All evaluation, memory, cost, and audit sources connected.'
+              : 'One or more sources fell back to local data. See warnings below.'
+          }
+        />
+      )}
 
       {/* -- Warnings -- */}
       {snapshot?.warnings && <WarningBanner warnings={snapshot.warnings} />}
