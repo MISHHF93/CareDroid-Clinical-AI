@@ -4,6 +4,7 @@ import ProfileSettingsShell from '../../components/profile/ProfileSettingsShell'
 import useProfileShellProps from '../../hooks/useProfileShellProps';
 import { resolveProfileShellSection } from '../../config/profileDesignLanguage.config';
 import { useUserIdentity } from '../../contexts/UserIdentityContext';
+import { NotificationService } from '../../services/NotificationService';
 import './ProfileIdentityPages.css';
 
 export default function ProfilePreferences() {
@@ -25,7 +26,8 @@ export default function ProfilePreferences() {
   const [status, setStatus] = useState('');
 
   useEffect(() => {
-    setForm({
+    setForm((current) => ({
+      ...current,
       theme: preferences?.theme || 'system',
       language: preferences?.language || 'en',
       defaultDashboard: preferences?.defaultDashboard || 'command',
@@ -33,11 +35,28 @@ export default function ProfilePreferences() {
       responseStyle: preferences?.aiAssistantPreferences?.responseStyle || 'concise',
       citationLevel: preferences?.aiAssistantPreferences?.citationLevel || 'standard',
       safetyTone: preferences?.aiAssistantPreferences?.safetyTone || 'standard',
-      pushEnabled: preferences?.notificationSettings?.pushEnabled !== false,
-      emailEnabled: preferences?.notificationSettings?.emailEnabled !== false,
-      securityAlerts: preferences?.notificationSettings?.securityAlerts !== false,
-    });
+    }));
   }, [preferences]);
+
+  useEffect(() => {
+    let cancelled = false;
+    NotificationService.getPreferences()
+      .then((result: any) => {
+        if (cancelled || !result?.preferences) return;
+        setForm((current) => ({
+          ...current,
+          pushEnabled: result.preferences.pushEnabled !== false,
+          emailEnabled: result.preferences.emailEnabled !== false,
+          securityAlerts: result.preferences.securityAlerts !== false,
+        }));
+      })
+      .catch(() => {
+        // Delivery preferences stay at their form defaults if the backend is unreachable.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const recommendations = useMemo(
     () => aiPersonalization?.recommendedWorkflows || [],
@@ -62,13 +81,17 @@ export default function ProfilePreferences() {
         citationLevel: form.citationLevel,
         safetyTone: form.safetyTone,
       },
-      notificationSettings: {
-        ...(preferences?.notificationSettings || {}),
+    });
+    try {
+      await NotificationService.updatePreferences({
         pushEnabled: form.pushEnabled,
         emailEnabled: form.emailEnabled,
         securityAlerts: form.securityAlerts,
-      },
-    });
+      });
+    } catch {
+      setStatus('Preferences saved, but delivery settings failed to update.');
+      return;
+    }
     setStatus(result.ok ? 'Preferences saved.' : result.message || 'Unable to save preferences.');
   };
 
