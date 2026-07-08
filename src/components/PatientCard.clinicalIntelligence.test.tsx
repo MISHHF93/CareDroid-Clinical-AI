@@ -7,6 +7,12 @@ import PatientCard from './PatientCard';
 import PatientDetailPanel from './PatientDetailPanel';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { PatientFlag, PatientState, Priority } from '../types/emergency';
+import { PERMISSIVE_EMERGENCY_ROLE_MOCK } from '../test/permissiveEmergencyRoleMock';
+
+vi.mock('../hooks/useEmergencyRolePermissions', () => ({
+  useEmergencyRolePermissions: () => PERMISSIVE_EMERGENCY_ROLE_MOCK,
+  default: () => PERMISSIVE_EMERGENCY_ROLE_MOCK,
+}));
 
 const originalState = useEmergencyStore.getState();
 
@@ -141,7 +147,9 @@ describe('PatientDetailPanel clinical intelligence', () => {
 
     expect(screen.getByRole('heading', { level: 2, name: /Avery Stone/i })).toBeInTheDocument();
     expect(screen.getByText('MRN-AI-1')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /move to next state/i })).toBeInTheDocument();
+    // The primary workflow action button now shows step-specific guidance
+    // (from patientWorkflow.primaryAction) rather than a generic label.
+    expect(screen.getByRole('button', { name: /begin assessment or order diagnostics/i })).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: /add vitals/i }));
     fireEvent.change(screen.getByLabelText(/^HR$/i), { target: { value: '122' } });

@@ -815,74 +815,7 @@ export default function PatientDetailPanel() {
     setAutoOpenedChecklistKey(autoKey);
   }, [autoOpenedChecklistKey, selectedPatient]);
 
-  if (!selectedPatient) return null;
-
-  const currentStateIndex = patientStateOrder.indexOf(selectedPatient.state);
-  const patientVitals: Vitals[] = Array.isArray(selectedPatient.vitals) ? selectedPatient.vitals : [];
-  const vitalsHistory = [...patientVitals].reverse();
-  const latestVitals = vitalsHistory[0];
-  const previousVitals = vitalsHistory[1];
-  const latestVitalEntries: Array<{ label: string; value?: number; trend?: VitalTrend | null }> = [
-    { label: 'HR', value: latestVitals?.hr, trend: trendArrow('HR', latestVitals?.hr, previousVitals?.hr) },
-    { label: 'SBP', value: latestVitals?.sbp, trend: trendArrow('SBP', latestVitals?.sbp, previousVitals?.sbp) },
-    { label: 'DBP', value: latestVitals?.dbp },
-    { label: 'SpO2', value: latestVitals?.spo2, trend: trendArrow('SpO2', latestVitals?.spo2, previousVitals?.spo2) },
-    { label: 'Temp', value: latestVitals?.temp, trend: trendArrow('Temp', latestVitals?.temp, previousVitals?.temp) },
-    { label: 'RR', value: latestVitals?.rr },
-    { label: 'GCS', value: latestVitals?.gcs },
-    { label: 'Pain', value: latestVitals?.pain },
-  ];
-  const actorStaffId = selectedPatient.assignedStaffId || staff[0]?.id || 'system';
-  const checklistStaffId = selectedPatient.assignedStaffId || staff[0]?.id || 'current-staff';
-  const isSepsisChecklistBlocked = hasPatientFlagValue(selectedPatient, PatientFlag.SepsisAlert);
-  const sortedNotes = [...selectedPatient.notes].sort(
-    (a, b) =>
-      new Date(b.timestamp || b.createdAt || 0).getTime() -
-      new Date(a.timestamp || a.createdAt || 0).getTime(),
-  );
-
-  const submitVitals = (event: FormEvent) => {
-    event.preventDefault();
-    if (!canWriteVitals) return;
-    const vitals = parseVitals(vitalsForm, actorStaffId);
-    addVitals(selectedPatient.id, vitals);
-    const { spo2, hr, sbp } = vitals;
-    const hasCriticalVitals =
-      (spo2 !== undefined && spo2 < 88) ||
-      (hr !== undefined && (hr < 40 || hr > 150)) ||
-      (sbp !== undefined && sbp < 80);
-
-    if (hasCriticalVitals) {
-      dispatchAlert({
-        severity: 'Critical',
-        title: `Critical Vitals — ${selectedPatient.firstName}`,
-        message: `SpO2 ${spo2 ?? '--'}%, HR ${hr ?? '--'}, BP ${sbp ?? '--'}`,
-        patientId: selectedPatient.id,
-        source: 'patient-detail-panel',
-      });
-      addFlag(selectedPatient.id, PatientFlag.DeteriorationRisk);
-    }
-
-    setVitalsForm(emptyVitalsForm);
-    setShowVitalsForm(false);
-  };
-
-  const submitNote = (event: FormEvent) => {
-    event.preventDefault();
-    if (!canWriteNote) return;
-    const text = noteText.trim();
-    if (!text) return;
-
-    const note: Note = {
-      id: createId('note'),
-      text,
-      authorId: actorStaffId,
-      timestamp: new Date().toISOString(),
-    };
-
-    addNote(selectedPatient.id, note);
-    setNoteText('');
-  };
+  const actorStaffId = selectedPatient?.assignedStaffId || staff[0]?.id || 'system';
 
   const confirmEscalatePatient = useCallback(async () => {
     if (!canEscalate || !selectedPatient) return;
@@ -941,6 +874,74 @@ export default function PatientDetailPanel() {
     document.addEventListener('open-patient-discharge', openDischargeConfirmation);
     return () => document.removeEventListener('open-patient-discharge', openDischargeConfirmation);
   }, [canDischarge, confirmDischargePatient, selectedPatientId]);
+
+  if (!selectedPatient) return null;
+
+  const currentStateIndex = patientStateOrder.indexOf(selectedPatient.state);
+  const patientVitals: Vitals[] = Array.isArray(selectedPatient.vitals) ? selectedPatient.vitals : [];
+  const vitalsHistory = [...patientVitals].reverse();
+  const latestVitals = vitalsHistory[0];
+  const previousVitals = vitalsHistory[1];
+  const latestVitalEntries: Array<{ label: string; value?: number; trend?: VitalTrend | null }> = [
+    { label: 'HR', value: latestVitals?.hr, trend: trendArrow('HR', latestVitals?.hr, previousVitals?.hr) },
+    { label: 'SBP', value: latestVitals?.sbp, trend: trendArrow('SBP', latestVitals?.sbp, previousVitals?.sbp) },
+    { label: 'DBP', value: latestVitals?.dbp },
+    { label: 'SpO2', value: latestVitals?.spo2, trend: trendArrow('SpO2', latestVitals?.spo2, previousVitals?.spo2) },
+    { label: 'Temp', value: latestVitals?.temp, trend: trendArrow('Temp', latestVitals?.temp, previousVitals?.temp) },
+    { label: 'RR', value: latestVitals?.rr },
+    { label: 'GCS', value: latestVitals?.gcs },
+    { label: 'Pain', value: latestVitals?.pain },
+  ];
+  const checklistStaffId = selectedPatient.assignedStaffId || staff[0]?.id || 'current-staff';
+  const isSepsisChecklistBlocked = hasPatientFlagValue(selectedPatient, PatientFlag.SepsisAlert);
+  const sortedNotes = [...selectedPatient.notes].sort(
+    (a, b) =>
+      new Date(b.timestamp || b.createdAt || 0).getTime() -
+      new Date(a.timestamp || a.createdAt || 0).getTime(),
+  );
+
+  const submitVitals = (event: FormEvent) => {
+    event.preventDefault();
+    if (!canWriteVitals) return;
+    const vitals = parseVitals(vitalsForm, actorStaffId);
+    addVitals(selectedPatient.id, vitals);
+    const { spo2, hr, sbp } = vitals;
+    const hasCriticalVitals =
+      (spo2 !== undefined && spo2 < 88) ||
+      (hr !== undefined && (hr < 40 || hr > 150)) ||
+      (sbp !== undefined && sbp < 80);
+
+    if (hasCriticalVitals) {
+      dispatchAlert({
+        severity: 'Critical',
+        title: `Critical Vitals — ${selectedPatient.firstName}`,
+        message: `SpO2 ${spo2 ?? '--'}%, HR ${hr ?? '--'}, BP ${sbp ?? '--'}`,
+        patientId: selectedPatient.id,
+        source: 'patient-detail-panel',
+      });
+      addFlag(selectedPatient.id, PatientFlag.DeteriorationRisk);
+    }
+
+    setVitalsForm(emptyVitalsForm);
+    setShowVitalsForm(false);
+  };
+
+  const submitNote = (event: FormEvent) => {
+    event.preventDefault();
+    if (!canWriteNote) return;
+    const text = noteText.trim();
+    if (!text) return;
+
+    const note: Note = {
+      id: createId('note'),
+      text,
+      authorId: actorStaffId,
+      timestamp: new Date().toISOString(),
+    };
+
+    addNote(selectedPatient.id, note);
+    setNoteText('');
+  };
 
   const openManualChecklist = () => {
     const matches = findMatchingChecklists(selectedPatient);
