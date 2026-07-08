@@ -105,8 +105,12 @@ describe('apiFetch offline fallback', () => {
     // isDev is false in VITEST (see apiClient.ts); dev-offline graceful responses are a
     // runtime-only dev feature that cannot be exercised from unit tests. This verifies
     // that the underlying TypeError propagates cleanly instead of being swallowed.
+    // An explicit Authorization header is required so shouldShortCircuitProtectedApi()
+    // doesn't short-circuit this protected path to a synthetic 401 before fetch runs.
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Failed to fetch')));
-    await expect(apiFetch('/api/emergency/whiteboard')).rejects.toThrow(TypeError);
+    await expect(
+      apiFetch('/api/emergency/whiteboard', { headers: { Authorization: 'Bearer test-token' } }),
+    ).rejects.toThrow(TypeError);
   });
 });
 
