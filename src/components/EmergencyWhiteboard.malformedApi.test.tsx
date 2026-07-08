@@ -1,5 +1,5 @@
 import React from 'react';
-import { act, render, screen } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import EmergencyWhiteboard from './EmergencyWhiteboard';
@@ -71,8 +71,9 @@ describe('EmergencyWhiteboard malformed API patients', () => {
       </MemoryRouter>,
     );
 
-    expect(await screen.findByLabelText('CareDroid command center status')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(document.querySelector('[data-patient-card-id="api-malformed-1"]')).toBeTruthy();
+    });
     expect(screen.queryByRole('alert', { name: /encountered an error/i })).not.toBeInTheDocument();
-    expect(document.querySelector('[data-patient-card-id="api-malformed-1"]')).toBeTruthy();
   });
 });

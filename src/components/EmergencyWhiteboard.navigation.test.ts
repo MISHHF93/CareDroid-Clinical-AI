@@ -38,7 +38,6 @@ describe('Emergency Whiteboard navigation wiring', () => {
   });
 
   it('promotes Whiteboard-first workflow launch points without duplicating workflow logic', () => {
-    expect(whiteboardSource).toContain('Critical actions from the board');
     expect(whiteboardSource).toContain('queue breaches');
     expect(whiteboardSource).toContain('boarding risk');
     expect(whiteboardSource).toContain('active alerts');

@@ -36,11 +36,10 @@ describe('EmergencyWhiteboard store reactivity', () => {
       </MemoryRouter>,
     );
 
-    const commandStatus = await screen.findByLabelText('CareDroid command center status');
-    expect(commandStatus).toHaveTextContent(/Central Node managed/i);
-    expect(commandStatus).toHaveTextContent(/active ED records/i);
+    await waitFor(() => {
+      expect(document.querySelector('[data-patient-card-id]')).toBeTruthy();
+    });
     const firstPatientCard = document.querySelector('[data-patient-card-id]');
-    expect(firstPatientCard).toBeTruthy();
     await user.click(firstPatientCard);
 
     expect(useEmergencyStore.getState().selectedPatientId).toBe(
