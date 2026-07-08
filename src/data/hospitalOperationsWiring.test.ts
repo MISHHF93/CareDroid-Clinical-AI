@@ -18,6 +18,17 @@ import { getUserFacingToolRegistryProjection } from './toolInventory';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
+// Hospital operations/fleet routes are mounted through a config-driven route
+// tree (operationsFleetConsoleRoutes.ts + operationsFleetConsoleRouteTree.tsx),
+// not as literal <Route> JSX in router.tsx.
+const operationsFleetConsoleRoutesSource = readFileSync(
+  join(__dirname, '../config/operationsFleetConsoleRoutes.ts'),
+  'utf8',
+);
+const operationsFleetConsoleRouteTreeSource = readFileSync(
+  join(__dirname, '../app/operationsFleetConsoleRouteTree.tsx'),
+  'utf8',
+);
 
 describe('Hospital operations wiring', () => {
   it('registers canonical hospital operations ids', () => {
@@ -40,11 +51,13 @@ describe('Hospital operations wiring', () => {
   it('mounts hospital operations routes in App and removes legacy whiteboard redirects', () => {
     expect(TOOL_LAUNCH_PATHS.hospitalMap).toBe('/hospital-map');
     expect(TOOL_LAUNCH_PATHS.deviceFleet).toBe('/devices');
-    expect(appSource).toContain('path={CANONICAL_ROUTES.hospitalMap}');
-    expect(appSource).toContain('path={CANONICAL_ROUTES.devices}');
-    expect(appSource).toContain('HospitalMapDashboard');
-    expect(appSource).toContain('DeviceFleetManagement');
-    expect(appSource).toContain('SurveillanceNexusDashboard');
+    expect(operationsFleetConsoleRoutesSource).toContain('CANONICAL_ROUTES.hospitalMap');
+    expect(operationsFleetConsoleRoutesSource).toContain('CANONICAL_ROUTES.devices');
+    expect(operationsFleetConsoleRouteTreeSource).toContain('HospitalMapDashboard');
+    expect(operationsFleetConsoleRouteTreeSource).toContain('DeviceFleetManagement');
+    // /surveillance/nexus now redirects into the whiteboard (CANONICAL_APP_ROUTE_TREE
+    // status: 'redirect') rather than mounting a dedicated dashboard component.
+    expect(appSource).toContain('renderOperationsFleetConsoleRoutes');
 
     const redirectsByPath = Object.fromEntries(
       LEGACY_EMERGENCY_ROUTE_REDIRECTS.map((redirect) => [redirect.path, redirect.to])
