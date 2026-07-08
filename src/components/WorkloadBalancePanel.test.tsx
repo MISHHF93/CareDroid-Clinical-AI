@@ -4,6 +4,14 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { PatientState, Priority } from '../types/emergency';
 import WorkloadBalancePanel from './WorkloadBalancePanel';
 
+const mocks = vi.hoisted(() => ({
+  showActionSuccess: vi.fn(),
+}));
+
+vi.mock('../services/careDroidInteractionFeedback', () => ({
+  showActionSuccess: mocks.showActionSuccess,
+}));
+
 function patient(id, assignedStaffId) {
   return {
     id,
@@ -78,6 +86,9 @@ describe('WorkloadBalancePanel', () => {
         reason: 'Workload balance panel reassignment',
       })
     );
-    expect(screen.getByText(/reassigned to Dr. Singh/i)).toBeInTheDocument();
+    expect(mocks.showActionSuccess).toHaveBeenCalledWith(
+      'Test pt-overload-1 reassigned',
+      'Now assigned to Dr. Singh.',
+    );
   });
 });

@@ -112,10 +112,10 @@ describe('PediatricDrugCalculator dosing', () => {
       expect.arrayContaining([
         expect.objectContaining({
           text: `Pediatric Drug Calculator: ${PEDIATRIC_DRUGS.length}/${PEDIATRIC_DRUGS.length} — Dosing reference generated`,
-          authorId: 's3',
-        }),
-        expect.objectContaining({
-          text: expect.stringContaining('"weightKg":14'),
+          authorStaffId: 's3',
+          metadata: expect.objectContaining({
+            fieldsJson: expect.stringContaining('"weightKg":14'),
+          }),
         }),
       ])
     );

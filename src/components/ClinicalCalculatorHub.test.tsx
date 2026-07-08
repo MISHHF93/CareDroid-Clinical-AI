@@ -211,11 +211,10 @@ describe('ClinicalCalculatorHub R10 consolidation', () => {
       expect.arrayContaining([
         expect.objectContaining({
           text: 'HEART Score: 1/10 — Low risk',
-          authorId: 's1',
-        }),
-        expect.objectContaining({
-          text: expect.stringContaining('HEART Score fields:'),
-          authorId: 's1',
+          authorStaffId: 's1',
+          metadata: expect.objectContaining({
+            scoreId: 'heart-score',
+          }),
         }),
       ]),
     );
