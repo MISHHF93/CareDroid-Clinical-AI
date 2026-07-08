@@ -35,7 +35,7 @@ function resultFor(total: number) {
   if (total === 0) {
     return {
       band: 'Low risk',
-      color: '#10B981',
+      color: MEDICAL_THEME.success,
       recommendation: 'Monitor and reassess',
       alert: false,
     };
@@ -44,7 +44,7 @@ function resultFor(total: number) {
   if (total === 1) {
     return {
       band: 'Moderate',
-      color: '#F59E0B',
+      color: MEDICAL_THEME.warning,
       recommendation: 'Consider sepsis workup',
       alert: false,
     };
@@ -52,7 +52,7 @@ function resultFor(total: number) {
 
   return {
     band: 'HIGH RISK',
-    color: '#EF4444',
+    color: MEDICAL_THEME.danger,
     recommendation: 'SEPSIS ALERT - High risk for organ dysfunction. Initiate sepsis bundle immediately',
     alert: true,
   };
@@ -163,8 +163,8 @@ export default function QSOFA({ patientId, onClose }: QSOFAProps) {
         alignItems: 'center',
         gap: 12,
         width: '100%',
-        border: criteria[keyName] ? '1px solid #0ea5e9' : '1px solid #e0f2fe',
-        background: criteria[keyName] ? 'rgba(14, 165, 233, 0.12)' : MEDICAL_THEME.surfaceCard,
+        border: criteria[keyName] ? `1px solid ${MEDICAL_THEME.accent}` : '1px solid #e0f2fe',
+        background: criteria[keyName] ? MEDICAL_THEME.accentTint : MEDICAL_THEME.surfaceCard,
         borderRadius: 12,
         padding: 14,
         cursor: 'pointer',
@@ -319,7 +319,7 @@ export default function QSOFA({ patientId, onClose }: QSOFAProps) {
           ) : null}
 
           {savedMessage ? (
-            <div role="status" style={{ color: '#10B981', fontSize: 13 }}>
+            <div role="status" style={{ color: MEDICAL_THEME.success, fontSize: 13 }}>
               {savedMessage}
             </div>
           ) : null}

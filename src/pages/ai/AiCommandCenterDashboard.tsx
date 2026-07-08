@@ -18,16 +18,16 @@ const pct = (v: number) => `${Math.round(v * 100)}%`;
 const usd = (v: number) => `$${v.toFixed(2)}`;
 
 const toneColor: Record<string, string> = {
-  critical: '#ef4444',
-  warning:  '#f59e0b',
-  good:     '#22c55e',
+  critical: MEDICAL_THEME.danger,
+  warning:  MEDICAL_THEME.warning,
+  good:     MEDICAL_THEME.success,
   neutral:  MEDICAL_THEME.inkMuted,
 };
 
 const statusColor: Record<string, string> = {
-  healthy:  '#22c55e',
-  review:   '#f59e0b',
-  degraded: '#ef4444',
+  healthy:  MEDICAL_THEME.success,
+  review:   MEDICAL_THEME.warning,
+  degraded: MEDICAL_THEME.danger,
 };
 
 // -- sub-components ------------------------------------------------------------
@@ -155,7 +155,12 @@ function ExpertRow({
           style={{
             fontSize: 12,
             fontWeight: 700,
-            color: expert.confidence >= 90 ? '#22c55e' : expert.confidence >= 80 ? '#f59e0b' : '#ef4444',
+            color:
+              expert.confidence >= 90
+                ? MEDICAL_THEME.success
+                : expert.confidence >= 80
+                  ? MEDICAL_THEME.warning
+                  : MEDICAL_THEME.danger,
             minWidth: 52,
             textAlign: 'right',
           }}
@@ -190,12 +195,12 @@ function WarningBanner({ warnings }: { warnings: string[] }) {
     <div
       role="alert"
       style={{
-        background: '#fef3c7',
-        border: '1px solid #d97706',
+        background: MEDICAL_THEME.warningTint,
+        border: `1px solid ${MEDICAL_THEME.warningBorder}`,
         borderRadius: 8,
         padding: '10px 14px',
         fontSize: 13,
-        color: '#92400e',
+        color: MEDICAL_THEME.warningBorder,
         marginBottom: 16,
       }}
     >
@@ -290,7 +295,7 @@ export default function AiCommandCenterDashboard() {
             disabled={loading}
             style={{
               background: MEDICAL_THEME.accent,
-              color: '#fff',
+              color: MEDICAL_THEME.onAccent,
               border: 'none',
               borderRadius: 8,
               padding: '7px 14px',
@@ -346,7 +351,7 @@ export default function AiCommandCenterDashboard() {
               label="Accuracy"
               value={health ? pct(health.accuracy) : '—'}
               sub="evaluation score"
-              accent={health && health.accuracy >= 0.85 ? '#22c55e' : '#f59e0b'}
+              accent={health && health.accuracy >= 0.85 ? MEDICAL_THEME.success : MEDICAL_THEME.warning}
             />
             <MetricTile
               label="Cache Hit"
@@ -364,8 +369,8 @@ export default function AiCommandCenterDashboard() {
               sub={`target ${snapshot?.hallucinationMetrics.benchmark ?? '<= 5%'}`}
               accent={
                 snapshot && snapshot.hallucinationMetrics.rate <= 0.05
-                  ? '#22c55e'
-                  : '#ef4444'
+                  ? MEDICAL_THEME.success
+                  : MEDICAL_THEME.danger
               }
             />
           </div>
@@ -469,7 +474,7 @@ export default function AiCommandCenterDashboard() {
                   ))}
                   <div style={{ fontSize: 12, color: MEDICAL_THEME.inkMuted, marginTop: 4 }}>
                     Success rate:{' '}
-                    <strong style={{ color: '#22c55e' }}>{pct(tools.successRate)}</strong>
+                    <strong style={{ color: MEDICAL_THEME.success }}>{pct(tools.successRate)}</strong>
                   </div>
                 </div>
               ) : (
@@ -551,7 +556,7 @@ export default function AiCommandCenterDashboard() {
                     <span
                       style={{
                         fontWeight: 700,
-                        color: status === 'live' ? '#22c55e' : '#f59e0b',
+                        color: status === 'live' ? MEDICAL_THEME.success : MEDICAL_THEME.warning,
                         textTransform: 'uppercase',
                         fontSize: 11,
                         letterSpacing: '0.06em',
