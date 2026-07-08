@@ -186,7 +186,7 @@
 /* ── Nav item ──────────────────────────────────────────────────── */
 .sidebar-nav-item {
   width: 100%;
-  min-height: 40px;
+  min-height: var(--touch-target-min, 44px);
   border-radius: var(--cdl-sidebar-item-radius, 6px);
   display: flex;
   align-items: center;

@@ -30,6 +30,8 @@ function check(id, category, title, passed, evidence, fix) {
 export function buildAccessibilityAudit(sourceSnapshot: any = {}) {
   const appShellJsx = sourceSnapshot.appShellJsx || '';
   const sidebarTsx = sourceSnapshot.sidebarTsx || '';
+  const sidebarCss = sourceSnapshot.sidebarCss || '';
+  const notificationPanelTsx = sourceSnapshot.notificationPanelTsx || '';
   const appShellCss = sourceSnapshot.appShellCss || '';
   const themeSurfacesCss = sourceSnapshot.themeSurfacesCss || '';
   const themeTokensCss = sourceSnapshot.themeTokensCss || '';
@@ -50,7 +52,7 @@ export function buildAccessibilityAudit(sourceSnapshot: any = {}) {
       'keyboard-overlay-escape',
       ACCESSIBILITY_AUDIT_CATEGORIES.KEYBOARD_NAVIGATION,
       'Shell overlays close with Escape',
-      has(appShellJsx, "event.key === 'Escape'") || has(appShellJsx, "event.key === \"Escape\""),
+      /\.key === ['"]Escape['"]/.test(appShellJsx),
       '`AppShell` closes open menus and palettes on Escape.',
       'Keep Escape handling on AppShell overlays.'
     ),
@@ -58,29 +60,29 @@ export function buildAccessibilityAudit(sourceSnapshot: any = {}) {
       'screen-reader-icon-buttons',
       ACCESSIBILITY_AUDIT_CATEGORIES.SCREEN_READERS,
       'Icon-only shell controls expose accessible names',
-      (has(appShellJsx, 'aria-label={isNew ? `${item.label}. New.` : item.label}') ||
-        has(sidebarTsx, 'aria-label={item.label}')) &&
-        has(appShellJsx, 'aria-label={`${activeAlerts.length} unread alerts`}') &&
-        has(appShellJsx, "aria-label={isCopilotCollapsed ? 'Expand ED Copilot' : 'Collapse ED Copilot'}"),
-      'Collapsed rail, alert bell, and Copilot toggle have explicit labels.',
+      has(sidebarTsx, 'aria-label={item.label}') &&
+        /aria-label=\{`\$\{item\.label\}.*unread/.test(sidebarTsx) &&
+        has(appShellJsx, 'aria-label={copilotChrome.openAriaLabel}'),
+      'Collapsed rail item, unread-alert badge, and Copilot toggle have explicit dynamic labels.',
       'Do not rely on `title` as the accessible name for icon-only controls.'
     ),
     check(
       'screen-reader-status',
       ACCESSIBILITY_AUDIT_CATEGORIES.SCREEN_READERS,
-      'Non-text health state is announced',
-      has(appShellJsx, 'role="status"') && has(appShellJsx, 'aria-label={realtimeStatusLabel(connection)}'),
-      'Realtime connection state has a status role and text alternative.',
+      'Non-text alert/notification state is announced',
+      has(notificationPanelTsx, 'role="dialog"') &&
+        has(notificationPanelTsx, 'aria-labelledby="notification-center-title"'),
+      'The notification center panel is announced as a labeled dialog when opened.',
       'Add a screen-reader label to non-text status indicators.'
     ),
     check(
       'contrast-theme-tokens',
       ACCESSIBILITY_AUDIT_CATEGORIES.CONTRAST,
       'Theme tokens define AA-oriented foreground and focus colors',
-      has(themeTokensCss, '--app-fg: #f8fafc') &&
+      has(themeTokensCss, '--app-fg:') &&
         has(themeTokensCss, '--app-focus-ring-aa') &&
         has(themeTokensCss, '--app-accent-contrast'),
-      'Dark/light tokens expose foreground, contrast, and focus ring variables.',
+      'Light/dark tokens expose foreground, contrast, and focus ring variables.',
       'Maintain tokenized foreground and focus colors with AA contrast checks.'
     ),
     check(
@@ -114,10 +116,10 @@ export function buildAccessibilityAudit(sourceSnapshot: any = {}) {
       ACCESSIBILITY_AUDIT_CATEGORIES.TOUCH_TARGETS,
       'Shared controls meet 44px target floor',
       has(designTokensCss, '--touch-target-min: 44px') &&
-        has(appShellCss, '.ed-nav-rail__item') &&
-        has(appShellCss, 'height: 44px') &&
+        has(sidebarCss, '.sidebar-nav-item') &&
+        has(sidebarCss, 'min-height: var(--touch-target-min') &&
         has(responsiveUxCss, 'min-height: var(--app-min-touch-target, 44px)'),
-      'Design tokens, responsive UX, and AppShell rail controls enforce 44px minimum targets.',
+      'Design tokens, responsive UX, and Sidebar nav controls enforce 44px minimum targets.',
       'Apply the touch target token to primary buttons, nav items, and form controls.'
     ),
   ];

@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { act, render } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AppShell } from '../components/AppShell';
 import { EMERGENCY_OS_ROUTE_COMMANDS } from '../config/commandPalette.config';
@@ -25,6 +26,8 @@ const { navigateMock, shellLocation, emergencyStoreState } = vi.hoisted(() => ({
     staff: [],
     rooms: [],
     workflowLogs: [],
+    administrativeAutomationQueue: [],
+    activeShift: { chargeStaffId: null },
     copilotMessages: [],
     integrationEvents: [],
     selectedPatientId: null,
@@ -41,6 +44,7 @@ const { navigateMock, shellLocation, emergencyStoreState } = vi.hoisted(() => ({
     updateAlerts: vi.fn(),
     setWebSocketStatus: vi.fn(),
     dispatchWebSocketEvent: vi.fn(),
+    refreshAdministrativeAutomationsAsync: vi.fn().mockResolvedValue(undefined),
     emergencySettings: {
       defaultScreenMode: 'clinical',
       readOnlyDisplayMode: false,
@@ -84,6 +88,7 @@ vi.mock('../store/emergencyStore', () => {
     const nextState = typeof partial === 'function' ? partial(emergencyStoreState) : partial;
     Object.assign(emergencyStoreState, nextState);
   });
+  useEmergencyStore.subscribe = vi.fn(() => vi.fn());
   return { useEmergencyStore };
 });
 
@@ -136,6 +141,10 @@ vi.mock('../components/EMSCriticalBroadcast', () => ({
 }));
 
 vi.mock('../components/ReassessmentDrawer', () => ({
+  default: () => null,
+}));
+
+vi.mock('../pages/emergency/ReceptionWorkspace', () => ({
   default: () => null,
 }));
 
@@ -229,9 +238,11 @@ describe('AppShell navigation surfaces', () => {
 
   it('navigates Medical Tools browser events with query intent preserved', async () => {
     render(
-      <AppShell>
-        <div>Route content</div>
-      </AppShell>,
+      <MemoryRouter>
+        <AppShell>
+          <div>Route content</div>
+        </AppShell>
+      </MemoryRouter>,
     );
 
     await act(async () => {
