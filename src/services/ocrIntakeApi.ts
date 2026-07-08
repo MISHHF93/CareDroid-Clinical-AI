@@ -74,7 +74,7 @@ async function postJson<T>(path: string, body: unknown): Promise<T> {
     body: JSON.stringify(body),
   });
   const payload = await parseApiResponse(response);
-  if (!response.ok) {
+  if (!response?.ok) {
     throw new Error(payload?.error || payload?.message || getApiErrorMessage(null, response));
   }
   return payload as T;
@@ -86,7 +86,7 @@ async function getJson<T>(path: string): Promise<T> {
   }
   const response = await apiFetch(path);
   const payload = await parseApiResponse(response);
-  if (!response.ok) {
+  if (!response?.ok) {
     throw new Error(payload?.error || payload?.message || getApiErrorMessage(null, response));
   }
   return payload as T;

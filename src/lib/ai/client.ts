@@ -248,6 +248,15 @@ async function callBackendAI(request: AIRequest): Promise<AIResponse> {
     body: JSON.stringify(bodyForBackendRequest(request)),
   });
 
+  if (!response || typeof response.text !== 'function') {
+    throw new AIError({
+      message: 'The API did not return a valid response. Check backend availability or the request mock.',
+      code: 'AI_NETWORK_ERROR',
+      requestType: request.requestType,
+      retryable: true,
+    });
+  }
+
   if (request.stream && response.body) {
     return {
       ok: response.ok,

@@ -442,8 +442,10 @@ export async function requestAiChiefCopilotQuery(
     },
   });
 
-  if (!response.ok) {
-    throw new Error(`AI Chief copilot query failed with status ${response.status}`);
+  if (!response?.ok) {
+    throw new Error(
+      `AI Chief copilot query failed with status ${response?.status ?? 'unknown'}`,
+    );
   }
 
   const responseText =

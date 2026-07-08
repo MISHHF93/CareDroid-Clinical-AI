@@ -156,7 +156,7 @@ async function requestEmergencyJson(path, options: any = {}) {
       },
     });
     const data = await parseApiResponse(response, { fallback: {} });
-    if (!response.ok) {
+    if (!response?.ok) {
       throw new Error(data?.message || getApiErrorMessage(null, response));
     }
     return data;

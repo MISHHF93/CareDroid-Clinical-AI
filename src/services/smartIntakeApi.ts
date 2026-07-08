@@ -1,8 +1,21 @@
-import { apiFetch, getApiErrorMessage, parseApiResponse } from './apiClient';
+import { apiFetch, ApiResponseError, getApiErrorMessage, parseApiResponse } from './apiClient';
 import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
 
 const jsonHeaders = { 'Content-Type': 'application/json' };
 const SMART_INTAKE_UNAVAILABLE_MESSAGE = 'Backend Smart Intake endpoint is not available yet.';
+const SMART_INTAKE_INVALID_RESPONSE_MESSAGE =
+  'The API did not return a valid response. Check backend availability or the request mock.';
+
+function assertValidApiResponse(response) {
+  if (!response || typeof response.text !== 'function') {
+    throw new ApiResponseError(SMART_INTAKE_INVALID_RESPONSE_MESSAGE, {
+      status: response?.status || 0,
+      statusText: response?.statusText || '',
+      url: response?.url || '',
+      contentType: '',
+    });
+  }
+}
 
 async function postJson(path, body) {
   if (!isBackendCapabilityEnabled('emergencySmartIntakeIdentitySession')) {
@@ -14,8 +27,9 @@ async function postJson(path, body) {
     headers: jsonHeaders,
     body: JSON.stringify(body),
   });
+  assertValidApiResponse(response);
   const payload = await parseApiResponse(response);
-  if (!response.ok) {
+  if (!response?.ok) {
     throw new Error(payload?.error || payload?.message || getApiErrorMessage(null, response));
   }
   return payload;
@@ -27,8 +41,9 @@ async function getJson(path) {
   }
 
   const response = await apiFetch(path);
+  assertValidApiResponse(response);
   const payload = await parseApiResponse(response);
-  if (!response.ok) {
+  if (!response?.ok) {
     throw new Error(payload?.error || payload?.message || getApiErrorMessage(null, response));
   }
   return payload;

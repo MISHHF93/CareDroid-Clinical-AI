@@ -14,6 +14,7 @@ import {
 import { BACKEND_PROBE_TIMEOUT_MS } from '../config/startupTimeouts';
 import observabilityService from './observabilityService';
 import { isPublicApiPath as isSecurityPublicApiPath } from './securityAccessService';
+import { toUserFacingApiErrorMessage } from '../config/errorRecoveryModel';
 
 // In development, use empty string to let Vite proxy handle routing.
 // VITE_API_URL is treated as an origin only; request paths own the /api prefix.
@@ -491,7 +492,12 @@ export function getApiErrorMessage(error, response: any = undefined) {
   if (isLikelyNetworkError(error)) {
     return 'Unable to reach the API. Start the backend with `npm run dev:api` or `npm run dev:fullstack`.';
   }
-  if (error?.message) return error.message;
+  if (error?.message) {
+    return toUserFacingApiErrorMessage(
+      error,
+      'Unable to reach the API. Ensure the backend is running or check VITE_API_URL.',
+    );
+  }
   return 'Unable to reach the API. Ensure the backend is running or check VITE_API_URL.';
 }
 

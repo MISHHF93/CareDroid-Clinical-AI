@@ -17,11 +17,37 @@ export function isLikelyNetworkError(error) {
   return /network|fetch|failed to fetch|timeout|aborted|offline/i.test(message);
 }
 
+const INTERNAL_JAVASCRIPT_ERROR_PATTERNS = [
+  /cannot read propert/i,
+  /cannot set propert/i,
+  /undefined is not/i,
+  /null is not/i,
+  /is not a function/i,
+  /is not iterable/i,
+];
+
+export function isInternalJavaScriptErrorMessage(message = '') {
+  const normalized = String(message || '').trim();
+  if (!normalized) return false;
+  return INTERNAL_JAVASCRIPT_ERROR_PATTERNS.some((pattern) => pattern.test(normalized));
+}
+
+export function toUserFacingApiErrorMessage(
+  error,
+  fallback = 'Unable to reach the API. Check backend availability and try again.',
+) {
+  const detail = error instanceof Error ? error.message : String(error || '');
+  if (!detail || isInternalJavaScriptErrorMessage(detail)) {
+    return fallback;
+  }
+  return detail;
+}
+
 export function formatApiRecoveryMessage(error, subject = 'changes') {
   if (typeof navigator !== 'undefined' && !navigator.onLine) {
     return `You appear offline. Your ${subject} stay in this workflow — reconnect and try again.`;
   }
-  const detail = error instanceof Error ? error.message : String(error || 'Request failed');
+  const detail = toUserFacingApiErrorMessage(error, 'Request failed');
   return `Server unavailable. Your ${subject} are preserved here. ${detail}`;
 }
 

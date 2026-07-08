@@ -422,7 +422,7 @@ export default function SmartIntake({
       setActiveStepTracked(resolveSessionStartStep(), 'session-start');
     } catch (error: any) {
       setErrorMessage(
-        `${error?.message || 'Backend Smart Intake contract is not reachable.'} Continue verification in safeguarded review mode.`,
+        `${formatApiRecoveryMessage(error, 'Smart Intake session')} Continue verification in safeguarded review mode.`,
       );
       setStatusMessage('Safeguarded identity review is active for this session.');
       setActiveStepTracked(resolveSessionStartStep(), 'session-start-fallback');

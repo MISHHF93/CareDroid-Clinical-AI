@@ -1,26 +1,34 @@
 import { describe, expect, it } from 'vitest';
 import {
-  auditErrorRecoverySurfaces,
   formatApiRecoveryMessage,
-  isLikelyNetworkError,
+  isInternalJavaScriptErrorMessage,
+  toUserFacingApiErrorMessage,
 } from './errorRecoveryModel';
 
 describe('errorRecoveryModel', () => {
-  it('formats offline-aware API recovery messages', () => {
-    const original = navigator.onLine;
-    Object.defineProperty(navigator, 'onLine', { configurable: true, value: false });
-    expect(formatApiRecoveryMessage(new Error('fail'), 'intake form')).toContain('offline');
-    Object.defineProperty(navigator, 'onLine', { configurable: true, value: original });
+  it('detects internal JavaScript error messages', () => {
+    expect(
+      isInternalJavaScriptErrorMessage("Cannot read properties of undefined (reading 'status')"),
+    ).toBe(true);
+    expect(isInternalJavaScriptErrorMessage('Request failed (404).')).toBe(false);
   });
 
-  it('detects likely network errors', () => {
-    expect(isLikelyNetworkError(new Error('Failed to fetch'))).toBe(true);
-    expect(isLikelyNetworkError(new Error('Validation failed'))).toBe(false);
+  it('replaces internal JavaScript errors with clinician-safe fallback copy', () => {
+    expect(
+      toUserFacingApiErrorMessage(
+        new TypeError("Cannot read properties of undefined (reading 'status')"),
+      ),
+    ).toBe('Unable to reach the API. Check backend availability and try again.');
   });
 
-  it('audits recovery surfaces', () => {
-    const audit = auditErrorRecoverySurfaces();
-    expect(audit.passesAudit).toBe(true);
-    expect(audit.surfaceCount).toBeGreaterThanOrEqual(8);
+  it('formats Smart Intake recovery copy without raw runtime errors', () => {
+    expect(
+      formatApiRecoveryMessage(
+        new TypeError("Cannot read properties of undefined (reading 'status')"),
+        'Smart Intake session',
+      ),
+    ).toBe(
+      'Server unavailable. Your Smart Intake session are preserved here. Request failed',
+    );
   });
 });
