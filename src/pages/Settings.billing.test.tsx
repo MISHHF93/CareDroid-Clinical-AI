@@ -58,6 +58,20 @@ vi.mock('../services/tenantIsolationApi', () => ({
   fetchTenantDataIsolationAudit: vi.fn(),
 }));
 
+vi.mock('../contexts/PractitionerVisibilityContext', () => ({
+  usePractitionerSurfaceVisibility: () => ({
+    settings: {
+      showPlatformStrip: true,
+      showEnterpriseSections: true,
+      showNestedSubtitles: true,
+      showAuditSections: true,
+      showGovernanceSections: true,
+      showScreenModes: true,
+      showWalkthroughDetail: true,
+    },
+  }),
+}));
+
 function renderSettings() {
   return render(
     <MemoryRouter>
@@ -181,7 +195,9 @@ describe('Settings Billing card', () => {
 
     renderSettings();
 
-    expect(await screen.findByText(/sign in to view current plan/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/billing data loads when the backend subscription api is available/i),
+    ).toBeInTheDocument();
     expect(fetchCurrentSubscription).not.toHaveBeenCalled();
     expect(fetchSubscriptionPlans).not.toHaveBeenCalled();
   });

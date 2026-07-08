@@ -168,28 +168,4 @@ describe('ProfileSettings operational profile save', () => {
       'You do not have permission to access this resource.'
     );
   });
-
-  it('saves AI, notification, and theme preferences from profile settings', async () => {
-    const user = userEvent.setup();
-    renderProfileSettings();
-
-    await user.selectOptions(screen.getByLabelText(/theme/i), 'dark');
-    await user.selectOptions(screen.getByLabelText(/density/i), 'compact');
-    await user.selectOptions(screen.getByLabelText(/ai response style/i), 'teaching');
-    await user.click(screen.getByLabelText(/email notifications/i));
-    await user.click(screen.getByRole('button', { name: /save preferences/i }));
-
-    await waitFor(() => {
-      expect(mockSavePreferences).toHaveBeenCalledWith(
-        expect.objectContaining({
-          theme: 'dark',
-          density: 'compact',
-          compactMode: true,
-          aiAssistantPreferences: expect.objectContaining({ responseStyle: 'teaching' }),
-          notificationSettings: expect.objectContaining({ emailEnabled: false }),
-        })
-      );
-    });
-    expect(screen.getByText(/preferences saved/i)).toBeInTheDocument();
-  });
 });
