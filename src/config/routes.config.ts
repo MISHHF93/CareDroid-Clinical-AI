@@ -1222,7 +1222,6 @@ export const CANONICAL_ROUTE_MAP = Object.freeze([
     label: 'Help',
     description: 'Route-aware and role-aware CareDroid user manual.',
     pageComponent: 'HelpHubPage',
-    requiredPermissions: [P.PATIENT_READ],
     allowedRoles: ALL_USER_PROFILES,
     navigationGroup: 'Help',
     priority: 250,

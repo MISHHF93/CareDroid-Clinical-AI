@@ -47,7 +47,7 @@ describe('canonical CareDroid access', () => {
       backendRole: 'nurse',
     });
     expect(getCanonicalRoleMapping('it_admin')).toMatchObject({
-      emergencyRoleId: 'admin',
+      emergencyRoleId: 'it_admin',
       saasRole: 'platform-admin',
       backendRole: 'admin',
     });

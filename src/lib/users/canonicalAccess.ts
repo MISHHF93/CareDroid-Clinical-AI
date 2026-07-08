@@ -238,7 +238,7 @@ export const CANONICAL_ROLE_CATALOG: Readonly<Record<HospitalRole, CanonicalRole
       dataMinimizationLevel: 'metadata_only',
       aliases: ['security-officer'],
     }),
-    it_admin: role('it_admin', 'admin', 'platform-admin', 'admin', {
+    it_admin: role('it_admin', 'it_admin', 'platform-admin', 'admin', {
       admin: true,
       dataMinimizationLevel: 'metadata_only',
       aliases: ['it-admin', 'technical-admin'],

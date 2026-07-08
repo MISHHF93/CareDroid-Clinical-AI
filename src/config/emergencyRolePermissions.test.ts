@@ -62,6 +62,7 @@ describe('CareDroid role-based views', () => {
   it('defines the requested demo roles with stable ids', () => {
     expect(getEmergencyDemoRoles().map((role) => role.label)).toEqual([
       'Admin',
+      'IT Admin',
       'ED Manager',
       'Charge Nurse',
       'Triage Nurse',

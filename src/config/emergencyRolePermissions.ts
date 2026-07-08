@@ -34,6 +34,7 @@ export {
 
 export const EMERGENCY_ROLE_IDS = Object.freeze({
   admin: 'admin',
+  itAdmin: 'it_admin',
   edManager: 'ed_manager',
   chargeNurse: 'charge_nurse',
   triageNurse: 'triage_nurse',
@@ -48,6 +49,7 @@ export const EMERGENCY_ROLE_IDS = Object.freeze({
 
 export const EMERGENCY_ROLE_LABELS = Object.freeze({
   [EMERGENCY_ROLE_IDS.admin]: 'Admin',
+  [EMERGENCY_ROLE_IDS.itAdmin]: 'IT Admin',
   [EMERGENCY_ROLE_IDS.edManager]: 'ED Manager',
   [EMERGENCY_ROLE_IDS.chargeNurse]: 'Charge Nurse',
   [EMERGENCY_ROLE_IDS.triageNurse]: 'Triage Nurse',
@@ -273,6 +275,24 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
     routes: ALL_ROUTES,
     actions: ALL_ACTIONS,
     defaultRoute: getDefaultRouteForProfile(EMERGENCY_ROLE_IDS.admin),
+  }),
+  // Technical/IT administration — deliberately excludes patient whiteboard, EMS, intake,
+  // reception, and all other clinical/PHI-bearing routes (data minimization: metadata only).
+  [EMERGENCY_ROLE_IDS.itAdmin]: Object.freeze({
+    id: EMERGENCY_ROLE_IDS.itAdmin,
+    label: EMERGENCY_ROLE_LABELS[EMERGENCY_ROLE_IDS.itAdmin],
+    description:
+      'Technical administration: settings, integrations, audit, and platform operations — no patient clinical data.',
+    routes: [
+      ROUTES.settings,
+      ROUTES.integrations,
+      ROUTES.integrationHub,
+      ROUTES.audit,
+      ROUTES.adminOperations,
+      ROUTES.help,
+    ],
+    actions: [EMERGENCY_ACTIONS.manageSettings],
+    defaultRoute: CANONICAL_ROUTES.emergencySettings,
   }),
   [EMERGENCY_ROLE_IDS.edManager]: Object.freeze({
     id: EMERGENCY_ROLE_IDS.edManager,

@@ -275,6 +275,7 @@ export const EMERGENCY_ROLE_FUNCTION_IDS: Readonly<
     'governance-audit',
     'analytics-view',
   ],
+  [EMERGENCY_ROLE_IDS.itAdmin]: ['admin-settings', 'governance-audit'],
   [EMERGENCY_ROLE_IDS.readOnlyViewer]: ['read-only-board', 'analytics-view'],
   [EMERGENCY_ROLE_IDS.publicDisplay]: ['public-display'],
 });
@@ -489,6 +490,13 @@ const EMERGENCY_PROFILE_COPY_BASE: Readonly<
     workspaceDescription: 'Settings, governance, and full CareDroid administration.',
     profileShellSubtitle: 'Site admin — settings, roles, and governance.',
     copilotIntro: 'Assist with configuration and policy-aligned changes.',
+  },
+  [EMERGENCY_ROLE_IDS.itAdmin]: {
+    personaTitle: 'IT Admin',
+    workspaceEyebrow: 'Technical administration',
+    workspaceDescription: 'Settings, integrations, and audit — no patient clinical data.',
+    profileShellSubtitle: 'IT admin — technical configuration and platform operations.',
+    copilotIntro: 'Not available for IT admin — no clinical context to assist with.',
   },
   [EMERGENCY_ROLE_IDS.readOnlyViewer]: {
     personaTitle: ED_PERSONA_LABELS.readOnlyWhiteboard,
