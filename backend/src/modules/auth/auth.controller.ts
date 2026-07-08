@@ -15,11 +15,16 @@ import { Response, Request } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { IsEmail, IsString } from 'class-validator';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { IdentityProviderRegistryService } from './identity-provider-registry.service';
+
+// Tighter than the app-wide default (100 req/min) — credential-guessing
+// endpoints get a stricter ceiling than general API traffic.
+const BRUTE_FORCE_GUARD_LIMIT = { default: { limit: 10, ttl: 60000 } };
 
 class VerifyTwoFactorLoginDto {
   @IsString()
@@ -64,6 +69,8 @@ export class AuthController {
   }
 
   @Post('register')
+  @UseGuards(ThrottlerGuard)
+  @Throttle(BRUTE_FORCE_GUARD_LIMIT)
   @ApiOperation({ summary: 'Register new user with email and password' })
   @ApiResponse({ status: 201, description: 'User successfully registered' })
   @ApiResponse({ status: 400, description: 'Email already exists' })
@@ -72,6 +79,8 @@ export class AuthController {
   }
 
   @Post('login')
+  @UseGuards(ThrottlerGuard)
+  @Throttle(BRUTE_FORCE_GUARD_LIMIT)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Login with email and password' })
   @ApiResponse({ status: 200, description: 'Successfully authenticated' })
@@ -103,6 +112,8 @@ export class AuthController {
   }
 
   @Post('verify-2fa')
+  @UseGuards(ThrottlerGuard)
+  @Throttle(BRUTE_FORCE_GUARD_LIMIT)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Verify 2FA token during login' })
   @ApiResponse({ status: 200, description: 'Successfully authenticated with 2FA' })
