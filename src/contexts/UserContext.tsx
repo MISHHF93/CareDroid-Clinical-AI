@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useRef } from 'react';
 import appConfig from '../config/appConfig';
 import { AUTH_CONFIG } from '../config/auth.config';
 import { deriveAuthMode } from '../auth/authSession';
@@ -107,17 +107,31 @@ export const UserProvider = ({ children }) => {
     () => import.meta.env.DEV && !looksLikeJwt(resolveSessionToken()),
   );
 
+  // Bootstrap below is async and only re-runs on mount ([] deps), so it must
+  // not read `user`/`authToken` from its closure — any setUser() call that
+  // lands while ensureDevBackendSession() is still pending (e.g. a demo/pilot
+  // caller setting a custom role right after mount) would otherwise be
+  // silently clobbered by the stale pre-bootstrap value once this resolves.
+  const userRef = useRef(user);
+  const authTokenRef = useRef(authToken);
+  useEffect(() => {
+    userRef.current = user;
+  }, [user]);
+  useEffect(() => {
+    authTokenRef.current = authToken;
+  }, [authToken]);
+
   useEffect(() => {
     let cancelled = false;
 
     const bootstrapSession = async () => {
       if (!import.meta.env.DEV) {
-        persistSession(user, authToken);
+        persistSession(userRef.current, authTokenRef.current);
         return;
       }
 
       if (looksLikeJwt(resolveSessionToken())) {
-        persistSession(user, authToken);
+        persistSession(userRef.current, authTokenRef.current);
         setIsLoading(false);
         return;
       }
@@ -140,7 +154,7 @@ export const UserProvider = ({ children }) => {
       if (cancelled) return;
 
       const nextToken = resolveSessionToken(session?.token);
-      const storedUser = readStoredUser() || user || OPEN_ACCESS_USER;
+      const storedUser = readStoredUser() || userRef.current || OPEN_ACCESS_USER;
       setAuthTokenState(nextToken);
       setUserState(storedUser);
       persistSession(storedUser, nextToken);
