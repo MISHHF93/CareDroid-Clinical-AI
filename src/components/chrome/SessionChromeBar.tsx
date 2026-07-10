@@ -11,7 +11,7 @@ function isLocalDevHost(): boolean {
   return host === 'localhost' || host === '127.0.0.1' || Boolean(import.meta.env.DEV);
 }
 
-/** Compact status strip — copilot, guide, and demo controls live in the sidebar. */
+/** Compact status strip for session state that should stay visible outside the route body. */
 export default function SessionChromeBar() {
   const surfaces = usePractitionerSurfaceVisibility();
   const activeScenarioId = useEmergencyStore((state) => state.activeScenarioId);

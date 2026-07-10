@@ -40,8 +40,6 @@ import {
   type OperationalSearchHit,
 } from '../services/unifiedOperationalSearch';
 import UserAccountMenu from './account/UserAccountMenu';
-import ProfileRoleSwitcher from './account/ProfileRoleSwitcher';
-import useProfileSwitcherVisibility from '../hooks/useProfileSwitcherVisibility';
 import OperationalAlertRail from './emergency/OperationalAlertRail';
 import { isPilotStationKpiPolicyActive } from '../config/stationKpiPolicy';
 import './Header.css';
@@ -132,7 +130,6 @@ export function Header() {
   );
   const canSubmitCentralIntake =
     canCreatePatient || (centralControl.enabled && !emergencyRole.readOnly);
-  const showProfileSwitcher = useProfileSwitcherVisibility();
   const syncMode = websocket.mode || centralSnapshot.sync.mode || 'polling';
   const syncAge = formatSyncAge(websocket.lastEventAt || centralSnapshot.sync.lastSyncedAt);
   const syncStale =
@@ -498,8 +495,6 @@ export function Header() {
               <IconSearch size={18} stroke={2} />
             </button>
           ) : null}
-
-          {showProfileSwitcher ? <ProfileRoleSwitcher variant="compact" /> : null}
 
           <UserAccountMenu />
         </div>

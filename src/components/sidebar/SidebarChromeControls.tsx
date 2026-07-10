@@ -3,19 +3,14 @@ import {
   IconHelpCircle,
   IconRefresh,
   IconSparkles,
-  IconUserCircle,
 } from '@tabler/icons-react';
 import { useEmergencyStore } from '../../store/emergencyStore';
-import { useSimulationMode } from '../../contexts/SimulationModeContext';
 import { useSystemConfig } from '../../contexts/SystemConfigContext';
-import useProfileSwitcherVisibility from '../../hooks/useProfileSwitcherVisibility';
 import { useCopilotChromeAccess } from '../../hooks/useCopilotChromeAccess';
 import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
 import { dispatchOpenHelpHub } from '../../contexts/HelpHubContext';
 import { EMERGENCY_OS_BRANDING } from '../../config/emergencyOsBranding.config';
 import type { CopilotShellTab } from '../copilot/CopilotShell';
-import SimulationModeToggle from '../simulation/SimulationModeToggle';
-import DemoPersonaDrawer from '../account/DemoPersonaDrawer';
 import './SidebarChromeControls.css';
 
 function isLocalDevHost(): boolean {
@@ -30,10 +25,7 @@ export default function SidebarChromeControls() {
   const copilotOpen = useEmergencyStore((state) => state.copilotOpen);
   const toggleCopilot = useEmergencyStore((state) => state.toggleCopilot);
   const setCopilotOpen = useEmergencyStore((state) => state.setCopilotOpen);
-  const { enabled: simulationEnabled } = useSimulationMode();
   const { configDegraded, loading: configLoading, refresh } = useSystemConfig();
-  const showDemoPanel = useProfileSwitcherVisibility();
-  const [demoOpen, setDemoOpen] = useState(false);
   const [activeCopilotTab, setActiveCopilotTab] = useState<CopilotShellTab>('chat');
 
   const suppressDevSegments = !surfaces.chrome.showSessionDevSegments;
@@ -126,25 +118,6 @@ export default function SidebarChromeControls() {
             <span className="sidebar-chrome-control__label">Guide</span>
           </button>
 
-          {showDemoPanel ? (
-            <button
-              type="button"
-              className={[
-                'sidebar-chrome-control',
-                demoOpen ? 'sidebar-chrome-control--active' : '',
-              ]
-                .filter(Boolean)
-                .join(' ')}
-              aria-expanded={demoOpen}
-              onClick={() => setDemoOpen((open) => !open)}
-            >
-              <IconUserCircle size={16} stroke={2} className="sidebar-chrome-control__icon" aria-hidden />
-              <span className="sidebar-chrome-control__label">Demo</span>
-            </button>
-          ) : null}
-
-          {simulationEnabled ? <SimulationModeToggle variant="sidebar" /> : null}
-
           {showApiSegment ? (
             <button
               type="button"
@@ -163,12 +136,6 @@ export default function SidebarChromeControls() {
           ) : null}
         </div>
       </div>
-
-      {showDemoPanel && demoOpen ? (
-        <div className="sidebar-chrome-controls__drawer">
-          <DemoPersonaDrawer onClose={() => setDemoOpen(false)} />
-        </div>
-      ) : null}
     </section>
   );
 }

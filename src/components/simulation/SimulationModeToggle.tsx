@@ -2,7 +2,7 @@ import { useSimulationMode } from '../../contexts/SimulationModeContext';
 import './SimulationModeToggle.css';
 
 type SimulationModeToggleProps = {
-  variant?: 'header' | 'banner' | 'sidebar';
+  variant?: 'header' | 'banner';
 };
 
 export default function SimulationModeToggle({ variant = 'header' }: SimulationModeToggleProps) {

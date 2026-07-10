@@ -13,6 +13,9 @@ import {
   getVisibleNavigationForSaasRole,
   resolveFeatureGate,
 } from './unified-navigation.config';
+import { CAREDROID_USER_PROFILE_IDS } from './routes.config';
+import { EMERGENCY_ROLE_IDS } from './emergencyRolePermissions';
+import { SAAS_USER_ROLES } from './saasProfileConstants';
 
 const REQUESTED_ITEMS = [
   {
@@ -287,6 +290,11 @@ const PILOT_VISIBLE_ITEMS = REQUESTED_ITEMS.filter((item) =>
   (PILOT_CUSTOMER_VISIBLE_NAV_ITEM_IDS as readonly string[]).includes(item.id),
 );
 
+function expectUniqueValues(scope: string, values: readonly string[]) {
+  const duplicates = values.filter((value, index) => values.indexOf(value) !== index);
+  expect(duplicates, `${scope}: ${duplicates.join(', ')}`).toEqual([]);
+}
+
 describe('unified navigation config', () => {
   it('exports the exact requested CareDroid nav items in order', () => {
     expect(DEFAULT_ROUTE).toBe('/emergency/reception');
@@ -313,6 +321,29 @@ describe('unified navigation config', () => {
       expect(item.icon, item.label).toMatch(/^[a-z0-9-]+$/);
       expect(item.roles.length, item.label).toBeGreaterThan(0);
       expect(typeof item.isEmergencyCore, item.label).toBe('boolean');
+    }
+  });
+
+  it('keeps visible navigation non-redundant for every user profile', () => {
+    for (const profileId of CAREDROID_USER_PROFILE_IDS) {
+      const items = getVisibleNavigation(profileId);
+      expectUniqueValues(`${profileId} ids`, items.map((item) => item.id));
+      expectUniqueValues(`${profileId} labels`, items.map((item) => item.label));
+      expectUniqueValues(`${profileId} routes`, items.map((item) => item.route));
+    }
+
+    for (const emergencyRoleId of Object.values(EMERGENCY_ROLE_IDS)) {
+      const items = getVisibleNavigation(emergencyRoleId);
+      expectUniqueValues(`${emergencyRoleId} ids`, items.map((item) => item.id));
+      expectUniqueValues(`${emergencyRoleId} labels`, items.map((item) => item.label));
+      expectUniqueValues(`${emergencyRoleId} routes`, items.map((item) => item.route));
+    }
+
+    for (const saasRole of SAAS_USER_ROLES) {
+      const items = getVisibleNavigationForSaasRole(saasRole);
+      expectUniqueValues(`${saasRole} ids`, items.map((item) => item.id));
+      expectUniqueValues(`${saasRole} labels`, items.map((item) => item.label));
+      expectUniqueValues(`${saasRole} routes`, items.map((item) => item.route));
     }
   });
 

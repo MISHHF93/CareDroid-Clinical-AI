@@ -22,6 +22,7 @@ describe('Header central control', () => {
     expect(screen.queryByText(/Physician input/i)).toBeNull();
     expect(screen.queryByLabelText('CareDroid demo scenario')).toBeNull();
     expect(screen.queryByLabelText('Demo CareDroid role')).toBeNull();
+    expect(screen.queryByLabelText('Switch workflow profile')).toBeNull();
   });
 
   it('renders a slim contextual header with search and create actions', () => {

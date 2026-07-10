@@ -36,8 +36,18 @@ vi.mock('../../hooks/useProfileNavigate', () => ({
   })),
 }));
 
+vi.mock('../../contexts/SimulationModeContext', () => ({
+  useSimulationMode: vi.fn(() => ({
+    enabled: false,
+    active: false,
+    setActive: vi.fn(),
+    toggle: vi.fn(),
+  })),
+}));
+
 import { useUser } from '../../contexts/UserContext';
 import useProfileSwitcherVisibility from '../../hooks/useProfileSwitcherVisibility';
+import { useSimulationMode } from '../../contexts/SimulationModeContext';
 
 describe('UserAccountMenu', () => {
   it('shows profile and entry hub links for demo sessions', async () => {
@@ -89,5 +99,52 @@ describe('UserAccountMenu', () => {
 
     await userEvent.click(screen.getByRole('button', { expanded: false }));
     expect(screen.queryByText('Switch workflow profile')).not.toBeInTheDocument();
+  });
+
+  it('hides the training scenario toggle when simulation mode is not enabled', async () => {
+    vi.mocked(useUser).mockReturnValue({
+      user: { id: 'open-access-user', name: 'Demo User' },
+    });
+    vi.mocked(useSimulationMode).mockReturnValue({
+      enabled: false,
+      active: false,
+      setActive: vi.fn(),
+      toggle: vi.fn(),
+    });
+
+    render(
+      <MemoryRouter>
+        <UserAccountMenu />
+      </MemoryRouter>,
+    );
+
+    await userEvent.click(screen.getByRole('button', { expanded: false }));
+    expect(screen.queryByRole('menuitemcheckbox')).not.toBeInTheDocument();
+  });
+
+  it('shows and toggles the training scenario control when simulation mode is enabled', async () => {
+    vi.mocked(useUser).mockReturnValue({
+      user: { id: 'open-access-user', name: 'Demo User' },
+    });
+    const toggle = vi.fn();
+    vi.mocked(useSimulationMode).mockReturnValue({
+      enabled: true,
+      active: false,
+      setActive: vi.fn(),
+      toggle,
+    });
+
+    render(
+      <MemoryRouter>
+        <UserAccountMenu />
+      </MemoryRouter>,
+    );
+
+    await userEvent.click(screen.getByRole('button', { expanded: false }));
+    const scenarioToggle = screen.getByRole('menuitemcheckbox', { name: 'Training scenario: Off' });
+    expect(scenarioToggle).toHaveAttribute('aria-checked', 'false');
+
+    await userEvent.click(scenarioToggle);
+    expect(toggle).toHaveBeenCalledTimes(1);
   });
 });

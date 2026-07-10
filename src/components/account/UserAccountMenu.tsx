@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { IconChevronDown } from '@tabler/icons-react';
 import { useUser } from '../../contexts/UserContext';
 import { useUserIdentity } from '../../contexts/UserIdentityContext';
+import { useSimulationMode } from '../../contexts/SimulationModeContext';
 import useEffectiveUserProfile from '../../hooks/useEffectiveUserProfile';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { isAdminSaasRole } from '../../config/platformEntryModel';
@@ -42,6 +43,8 @@ export default function UserAccountMenu() {
   const { user } = useUser() as { user: AppUser | null };
   const { account } = useUserIdentity() as { account: AppAccount | null };
   const { accessSummary, profileCopy } = useEffectiveUserProfile();
+  const { enabled: simulationEnabled, active: simulationActive, toggle: toggleSimulation } =
+    useSimulationMode();
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
@@ -116,6 +119,23 @@ export default function UserAccountMenu() {
             <div className="account-menu__section account-menu__section--profiles">
               <div className="account-menu__section-title">Switch workflow profile</div>
               <ProfileRoleSwitcher variant="menu" onSwitch={() => setOpen(false)} />
+            </div>
+          ) : null}
+
+          {simulationEnabled ? (
+            <div className="account-menu__section">
+              <button
+                type="button"
+                className="account-menu__item"
+                role="menuitemcheckbox"
+                aria-checked={simulationActive}
+                onClick={() => {
+                  toggleSimulation();
+                  setOpen(false);
+                }}
+              >
+                Training scenario: {simulationActive ? 'On' : 'Off'}
+              </button>
             </div>
           ) : null}
 
