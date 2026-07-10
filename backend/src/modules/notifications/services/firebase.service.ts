@@ -1,11 +1,20 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as admin from 'firebase-admin';
+import {
+  applicationDefault,
+  cert,
+  getApp,
+  getApps,
+  initializeApp,
+  type App,
+  type AppOptions,
+} from 'firebase-admin/app';
+import { getMessaging, type Message, type MulticastMessage } from 'firebase-admin/messaging';
 
 @Injectable()
 export class FirebaseService implements OnModuleInit {
   private readonly logger = new Logger(FirebaseService.name);
-  private firebaseApp: admin.app.App;
+  private firebaseApp: App;
 
   constructor(private readonly configService: ConfigService) {}
 
@@ -16,8 +25,8 @@ export class FirebaseService implements OnModuleInit {
   private initializeFirebase() {
     try {
       // Check if Firebase is already initialized
-      if (admin.apps.length > 0) {
-        this.firebaseApp = admin.app();
+      if (getApps().length > 0) {
+        this.firebaseApp = getApp();
         this.logger.log('Using existing Firebase app');
         return;
       }
@@ -43,24 +52,24 @@ export class FirebaseService implements OnModuleInit {
       const storageBucket = firebaseConfig?.storageBucket || serviceAccount?.storage_bucket;
       const messagingSenderId = firebaseConfig?.messagingSenderId;
 
-      const config: admin.AppOptions = serviceAccount
+      const config: AppOptions = serviceAccount
         ? {
-            credential: admin.credential.cert(serviceAccount),
+            credential: cert(serviceAccount),
             projectId,
             storageBucket,
           }
         : {
-            credential: admin.credential.applicationDefault(),
+            credential: applicationDefault(),
             projectId,
             storageBucket,
           };
 
       if (messagingSenderId) {
-        (config as admin.AppOptions & { messagingSenderId?: string }).messagingSenderId =
+        (config as AppOptions & { messagingSenderId?: string }).messagingSenderId =
           messagingSenderId;
       }
 
-      this.firebaseApp = admin.initializeApp(config);
+      this.firebaseApp = initializeApp(config);
       this.logger.log('Firebase Admin SDK initialized successfully');
     } catch (error) {
       this.logger.error('Failed to initialize Firebase Admin SDK', error);
@@ -88,7 +97,7 @@ export class FirebaseService implements OnModuleInit {
         throw new Error('Firebase not initialized');
       }
 
-      const message: admin.messaging.Message = {
+      const message: Message = {
         token,
         notification: {
           title,
@@ -124,7 +133,7 @@ export class FirebaseService implements OnModuleInit {
         },
       };
 
-      const response = await admin.messaging().send(message);
+      const response = await getMessaging(this.firebaseApp).send(message);
 
       this.logger.log(`Notification sent successfully: ${response}`);
 
@@ -180,7 +189,7 @@ export class FirebaseService implements OnModuleInit {
         return { successCount: 0, failureCount: 0, failedTokens: [] };
       }
 
-      const message: admin.messaging.MulticastMessage = {
+      const message: MulticastMessage = {
         tokens,
         notification: {
           title,
@@ -205,7 +214,7 @@ export class FirebaseService implements OnModuleInit {
         },
       };
 
-      const response = await admin.messaging().sendEachForMulticast(message);
+      const response = await getMessaging(this.firebaseApp).sendEachForMulticast(message);
 
       const failedTokens: string[] = [];
       response.responses.forEach((resp, idx) => {
@@ -238,7 +247,7 @@ export class FirebaseService implements OnModuleInit {
         throw new Error('Firebase not initialized');
       }
 
-      await admin.messaging().subscribeToTopic(tokens, topic);
+      await getMessaging(this.firebaseApp).subscribeToTopic(tokens, topic);
       this.logger.log(`Subscribed ${tokens.length} tokens to topic: ${topic}`);
     } catch (error) {
       this.logger.error(`Failed to subscribe to topic ${topic}:`, error);
@@ -255,7 +264,7 @@ export class FirebaseService implements OnModuleInit {
         throw new Error('Firebase not initialized');
       }
 
-      await admin.messaging().unsubscribeFromTopic(tokens, topic);
+      await getMessaging(this.firebaseApp).unsubscribeFromTopic(tokens, topic);
       this.logger.log(`Unsubscribed ${tokens.length} tokens from topic: ${topic}`);
     } catch (error) {
       this.logger.error(`Failed to unsubscribe from topic ${topic}:`, error);
@@ -277,7 +286,7 @@ export class FirebaseService implements OnModuleInit {
         throw new Error('Firebase not initialized');
       }
 
-      const message: admin.messaging.Message = {
+      const message: Message = {
         topic,
         notification: {
           title,
@@ -286,7 +295,7 @@ export class FirebaseService implements OnModuleInit {
         data: data || {},
       };
 
-      const response = await admin.messaging().send(message);
+      const response = await getMessaging(this.firebaseApp).send(message);
       this.logger.log(`Notification sent to topic ${topic}: ${response}`);
 
       return response;

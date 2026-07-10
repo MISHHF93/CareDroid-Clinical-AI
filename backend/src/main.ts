@@ -155,10 +155,6 @@ async function bootstrap() {
     next();
   });
 
-  // Sentry error tracking middleware (must be early in the middleware stack)
-  app.use(Sentry.Handlers.requestHandler());
-  app.use(Sentry.Handlers.errorHandler());
-
   const loggingMiddleware = new LoggingMiddleware();
   app.use((req, res, next) => loggingMiddleware.use(req, res, next));
 
@@ -231,6 +227,11 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup(SWAGGER_DOCS_PATH, app, document);
+
+  // Sentry error handler: must be registered after all routes/controllers
+  // are mounted and before app.listen(), so it only catches errors that
+  // escape NestJS's own exception filters (registered above).
+  Sentry.setupExpressErrorHandler(expressApp);
 
   const port = environment.server.port;
   await app.listen(port);

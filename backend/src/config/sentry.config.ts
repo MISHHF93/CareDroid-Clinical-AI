@@ -27,13 +27,13 @@ export const initSentry = (): void => {
     release,
     integrations: [
       // Enable HTTP client/server integration
-      new Sentry.Integrations.Http({ tracing: true }),
-      // Enable Express request/error handlers
-      new Sentry.Integrations.Express(),
+      Sentry.httpIntegration(),
+      // Enable Express request/error handling instrumentation
+      Sentry.expressIntegration(),
       // Capture unhandled exceptions
-      new Sentry.Integrations.OnUncaughtException(),
+      Sentry.onUncaughtExceptionIntegration(),
       // Capture unhandled promise rejections
-      new Sentry.Integrations.OnUnhandledRejection(),
+      Sentry.onUnhandledRejectionIntegration(),
     ],
     // Capture 100% of transactions in development, 10% in production
     tracesSampleRate: environment === 'production' ? 0.1 : 1.0,

@@ -28,7 +28,8 @@
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
     "test:run:stable": "vitest run --pool=threads --maxWorkers=1",
-    "test:integration": "jest tests/integration",
+    "test:integration": "vitest run --config vitest.integration.config.ts",
+    "test:integration:jest": "jest tests/integration",
     "test:run:parallel": "node scripts/run-vitest-parallel.mjs",
     "test:run:frontend": "vitest run src",
     "test:pr6-fleet": "vitest run src/data/pr6FleetComprehensive.test.tsx src/data/prFleetConsistency.test.ts src/data/fleetCommandWiring.test.ts src/data/predictiveMaintenanceWiring.test.ts src/data/routeOptimizerWiring.test.ts src/data/dispatchAiWiring.test.ts src/pages/fleet src/services/fleetTelemetryService.test.ts src/services/predictiveMaintenanceScoring.test.ts src/services/routeOptimizationService.test.ts src/routes/clinicalToolRoutes.test.ts",
@@ -88,6 +89,7 @@
     "test:mobile-performance": "vitest run src/styles/mobilePerformance.test.ts",
     "qa:responsive:chromium": "playwright test e2e/responsive-qa.spec.mjs --config=playwright.config.mjs --project=chromium",
     "test:e2e:responsive": "playwright test e2e/responsive-qa.spec.mjs",
+    "test:e2e:a11y": "playwright test --config=playwright.a11y.config.ts",
     "test:e2e:production": "playwright test e2e/production-smoke.spec.mjs --config=playwright.production.config.mjs",
     "test:coverage": "vitest run --coverage",
     "test:frontend": "vitest",
@@ -140,7 +142,8 @@
     "qa:trackmind-maturity": "node scripts/trackmind-maturity-audit.mjs",
     "qa:customer-success": "node scripts/customer-success-platform-audit.mjs",
     "qa:enterprise-platform": "node scripts/enterprise-operating-platform-audit.mjs",
-    "qa:platform-intelligence": "node scripts/platform-intelligence-audit.mjs"
+    "qa:platform-intelligence": "node scripts/platform-intelligence-audit.mjs",
+    "scorecard:platform": "node scripts/platform-scorecard.mjs"
   },
   "dependencies": {
     "@tabler/icons-react": "^3.44.0",
@@ -156,6 +159,7 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.12.1",
     "@playwright/test": "^1.60.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
@@ -172,6 +176,7 @@
     "eslint-plugin-react": "^7.33.2",
     "globals": "^17.6.0",
     "jest": "^30.4.2",
+    "jest-axe": "^10.0.0",
     "jiti": "^2.7.0",
     "jsdom": "^28.0.0",
     "mongodb-memory-server": "^11.2.0",
@@ -182,7 +187,7 @@
     "ts-jest": "^29.4.11",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.61.0",
-    "vite": "^7.3.1",
+    "vite": "^7.3.6",
     "vitest": "^4.0.18"
   },
   "overrides": {

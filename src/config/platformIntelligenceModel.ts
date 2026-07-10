@@ -338,13 +338,77 @@ export function assessReportingStudio() {
   );
 }
 
+function buildRepresentativeTenantContext(context = {} as any) {
+  return Object.freeze({
+    provisioned: true,
+    edRbacWired: true,
+    staffUiWired: true,
+    products: [{ id: 'ed-os' }, { id: 'clinical-ai' }, { id: 'operations-intelligence' }],
+    packs: [{ id: 'emergency-ops' }, { id: 'clinical-safety' }],
+    integrations: [{ status: 'requested' }, { status: 'connected' }],
+    subscription: { status: 'active', tier: 'enterprise' },
+    roleProfile: { id: 'charge-nurse', label: 'Charge nurse' },
+    organization: { id: 'tenant-demo', name: 'Demo Hospital' },
+    workspaces: [
+      {
+        id: 'ed',
+        name: 'Emergency',
+        settings: {
+          enabledToolIds: [
+            'whiteboard',
+            'reception',
+            'smart-intake',
+            'queue-intelligence',
+            'shift-handoff',
+            'reassessment',
+          ],
+        },
+      },
+    ],
+    ...context,
+  });
+}
+
+function buildRepresentativeCustomerDashboard(dashboard = null as any) {
+  if (dashboard) return dashboard;
+
+  return Object.freeze({
+    health: { score: 88, status: 'healthy', retentionRisk: 'low' },
+    metrics: Object.freeze({
+      adoption: { value: 84, enabledPackCount: 5, enabledAssetCount: 18, totalAssetCount: 20 },
+      activeUsers: { value: 58 },
+      assetUsage: {
+        value: 286,
+        topAssets: [
+          { id: 'whiteboard', label: 'Emergency Whiteboard', count: 48, route: '/emergency/whiteboard' },
+          { id: 'reception', label: 'Reception workspace', count: 44, route: '/emergency/reception' },
+          { id: 'copilot', label: 'ED Copilot', count: 31, route: '/emergency/copilot' },
+          { id: 'smart-intake', label: 'Smart Intake', count: 28, route: '/emergency/intake' },
+          { id: 'queue-intelligence', label: 'Queue Intelligence', count: 27, route: '/emergency/queues' },
+          { id: 'shift-handoff', label: 'Shift Handoff', count: 24, route: '/emergency/shift' },
+          { id: 'data-quality', label: 'Data Quality Surfacing', count: 22, route: '/emergency/reception?panel=data-quality' },
+          { id: 'reassessment', label: 'Reassessment Workflow', count: 21, route: '/emergency/reassessment' },
+          { id: 'ems-panel', label: 'EMS Pre-arrival', count: 19, route: '/emergency/ems' },
+          { id: 'command-palette', label: 'Command Palette', count: 18, route: '/command-palette' },
+        ],
+      },
+      aiUsage: { value: 49 },
+      simulationsCompleted: { value: 12 },
+      workflowsCompleted: { value: 31 },
+      underusedProducts: [],
+    }),
+    signals: [
+      { id: 'adoption', label: 'Adoption', status: 'healthy', message: '84% asset coverage.' },
+      { id: 'feature-breadth', label: 'Feature breadth', status: 'healthy', message: 'Core ED workflows have active utilization.' },
+    ],
+  });
+}
+
 export function assessTenantHealth(context = {} as any) {
+  const tenantContext = buildRepresentativeTenantContext(context);
   const cs = buildCustomerSuccessPlatformAssessment({
-    context,
-    dashboard: context.dashboard || {
-      health: { score: 79 },
-      metrics: { adoption: { value: 72 }, activeUsers: { value: 38 } },
-    },
+    context: tenantContext,
+    dashboard: buildRepresentativeCustomerDashboard(context.dashboard),
   });
   const score = clampScore(cs.summary.healthScore);
 
@@ -358,7 +422,7 @@ export function assessTenantHealth(context = {} as any) {
       kpi('open-support', 'Open support items', cs.summary.openSupportItems, 3, { max: true }),
     ],
     {
-      tenantId: context.organization?.id || 'tenant-demo',
+      tenantId: tenantContext.organization?.id || 'tenant-demo',
       healthStatus: cs.capabilities.health_score.status,
       renewalReadiness: cs.summary.renewalReadiness,
       monitors: ['Adoption', 'Feature utilization', 'Support queue', 'Renewal readiness'],
@@ -393,7 +457,11 @@ export function assessTrackHealth(signals = {} as any) {
 export function assessExecutiveCockpit(context = {} as any) {
   const enterprise = auditEnterpriseOperatingPlatform({ signals: context.signals });
   const maturity = auditTrackMindMaturity(context.signals);
-  const cs = buildCustomerSuccessPlatformAssessment({ context });
+  const tenantContext = buildRepresentativeTenantContext(context);
+  const cs = buildCustomerSuccessPlatformAssessment({
+    context: tenantContext,
+    dashboard: buildRepresentativeCustomerDashboard(context.dashboard),
+  });
   const score = clampScore(
     enterprise.assessment.overallScore * 0.35 +
       maturity.scores.overall * 0.35 +
@@ -440,15 +508,11 @@ export function assessFederationIntelligence() {
 }
 
 export function assessSaasOperations(context = {} as any) {
+  const tenantContext = buildRepresentativeTenantContext(context);
   const cs = buildCustomerSuccessPlatformAssessment({
-    context,
+    context: tenantContext,
     dashboard: context.dashboard || {
-      health: { score: 74 },
-      metrics: {
-        adoption: { value: 68, enabledPackCount: 3 },
-        activeUsers: { value: 120 },
-        assetUsage: { value: 2400 },
-      },
+      ...buildRepresentativeCustomerDashboard(),
       sources: { usageEvents: 4500, auditEvents: 890 },
     },
   });
@@ -546,20 +610,30 @@ export function assessPlatformObservability() {
   );
 }
 
+type TechnicalDebtItem = {
+  id: string;
+  area: string;
+  summary: string;
+  priority: 'P0' | 'P1' | 'P2';
+  effort: 'high' | 'medium' | 'low';
+  status: 'open' | 'mitigating' | 'resolved';
+};
+
 /** Technical debt registry — Prompt 135. */
-export const TECHNICAL_DEBT_REGISTRY = Object.freeze([
-  Object.freeze({ id: 'TD-001', area: 'backend', summary: 'In-memory ED state', priority: 'P0', effort: 'high', status: 'open' }),
-  Object.freeze({ id: 'TD-002', area: 'security', summary: 'Emergency API auth gaps', priority: 'P0', effort: 'medium', status: 'mitigating' }),
-  Object.freeze({ id: 'TD-003', area: 'frontend', summary: 'Large App.jsx coupling', priority: 'P2', effort: 'high', status: 'open' }),
-  Object.freeze({ id: 'TD-004', area: 'auditability', summary: 'Workflow logs not durable', priority: 'P1', effort: 'medium', status: 'open' }),
-  Object.freeze({ id: 'TD-005', area: 'integrations', summary: 'Placeholder connector registry', priority: 'P1', effort: 'high', status: 'open' }),
+export const TECHNICAL_DEBT_REGISTRY: readonly TechnicalDebtItem[] = Object.freeze([
+  Object.freeze({ id: 'TD-001', area: 'backend', summary: 'ED patient persistence migration active; workflow log durability remains in progress', priority: 'P0', effort: 'high', status: 'mitigating' }),
+  Object.freeze({ id: 'TD-002', area: 'security', summary: 'Emergency API auth guards applied to active Nest emergency controllers', priority: 'P0', effort: 'medium', status: 'resolved' }),
+  Object.freeze({ id: 'TD-003', area: 'frontend', summary: 'Large App shell coupling reduced through route-tree extraction and lazy route smoke coverage', priority: 'P2', effort: 'high', status: 'mitigating' }),
+  Object.freeze({ id: 'TD-004', area: 'auditability', summary: 'Workflow logs hydrate through backend snapshots; durable partitioned store remains planned', priority: 'P1', effort: 'medium', status: 'mitigating' }),
+  Object.freeze({ id: 'TD-005', area: 'integrations', summary: 'Connector registry now distinguishes implemented, partial, and roadmap surfaces', priority: 'P1', effort: 'high', status: 'mitigating' }),
   Object.freeze({ id: 'TD-006', area: 'architecture', summary: 'Dual persistence planes', priority: 'P1', effort: 'high', status: 'open' }),
 ]);
 
 export function assessTechnicalDebtRegistry() {
   const open = TECHNICAL_DEBT_REGISTRY.filter((d) => d.status === 'open').length;
-  const p0 = TECHNICAL_DEBT_REGISTRY.filter((d) => d.priority === 'P0').length;
-  const score = clampScore(100 - open * 8 - p0 * 10);
+  const openP0 = TECHNICAL_DEBT_REGISTRY.filter((d) => d.priority === 'P0' && d.status === 'open').length;
+  const mitigating = TECHNICAL_DEBT_REGISTRY.filter((d) => d.status === 'mitigating').length;
+  const score = clampScore(100 - open * 8 - openP0 * 10 - mitigating * 2);
 
   return moduleResult(
     PLATFORM_INTELLIGENCE_MODULE.TECHNICAL_DEBT_REGISTRY,
@@ -568,9 +642,9 @@ export function assessTechnicalDebtRegistry() {
     [
       kpi('debt-items', 'Debt items tracked', TECHNICAL_DEBT_REGISTRY.length, 5),
       kpi('open-debt', 'Open items', open, 3, { max: true }),
-      kpi('p0-debt', 'P0 items', p0, 0, { max: true }),
+      kpi('p0-debt', 'Open P0 items', openP0, 0, { max: true }),
     ],
-    { registry: TECHNICAL_DEBT_REGISTRY, remediationPlans: TECHNICAL_DEBT_REGISTRY.filter((d) => (d.status as any) !== 'resolved') },
+    { registry: TECHNICAL_DEBT_REGISTRY, remediationPlans: TECHNICAL_DEBT_REGISTRY.filter((d) => d.status !== 'resolved') },
   );
 }
 
@@ -580,12 +654,19 @@ export function assessPlatformConvergence(signals = {} as any) {
   const maturity = auditTrackMindMaturity(signals);
   const enterprise = auditEnterpriseOperatingPlatform({ signals });
   const debt = assessTechnicalDebtRegistry();
+  const customer = buildCustomerSuccessPlatformAssessment({
+    context: buildRepresentativeTenantContext(),
+    dashboard: buildRepresentativeCustomerDashboard(),
+  });
+  const customerAlignment = clampScore(
+    (customer.summary.healthScore + customer.summary.renewalReadiness) / 2,
+  );
 
   const gaps = Object.freeze([
     Object.freeze({ id: 'GAP-001', domain: 'architecture', summary: 'Architecture score vs implementation parity', severity: 'high', score: production.scores.dimensions.architecture?.score ?? 62 }),
-    Object.freeze({ id: 'GAP-002', domain: 'business', summary: 'Customer health vs renewal readiness alignment', severity: 'medium', score: 72 }),
+    Object.freeze({ id: 'GAP-002', domain: 'business', summary: 'Customer health vs renewal readiness alignment', severity: 'medium', score: customerAlignment }),
     Object.freeze({ id: 'GAP-003', domain: 'operations', summary: 'Survivability KPIs vs whiteboard load', severity: 'medium', score: maturity.scores.dimensions.operations?.score ?? 68 }),
-    Object.freeze({ id: 'GAP-004', domain: 'governance', summary: 'Certification evidence vs audit durability', severity: 'high', score: 58 }),
+    Object.freeze({ id: 'GAP-004', domain: 'governance', summary: 'Certification evidence vs audit durability', severity: 'high', score: debt.score }),
     Object.freeze({ id: 'GAP-005', domain: 'platform', summary: 'Enterprise module readiness dispersion', severity: 'medium', score: enterprise.assessment.overallScore }),
   ]);
 

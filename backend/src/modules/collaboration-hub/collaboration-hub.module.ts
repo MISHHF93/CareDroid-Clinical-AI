@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import type { StringValue } from 'ms';
 import { CollaborationChannel } from './entities/collaboration-channel.entity';
 import { CollaborationChannelMembership } from './entities/collaboration-channel-membership.entity';
 import { CollaborationMessage } from './entities/collaboration-message.entity';
@@ -48,7 +49,7 @@ import { JwtQueryAuthGuard } from '../emergency-os/guards/jwt-query-auth.guard';
         return {
           secret: config?.secret,
           signOptions: {
-            expiresIn: config?.accessTokenExpiry,
+            expiresIn: config?.accessTokenExpiry as StringValue | undefined,
             issuer: config?.issuer,
             audience: config?.audience,
           },
