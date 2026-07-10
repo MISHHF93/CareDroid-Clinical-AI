@@ -1,3 +1,4 @@
+import './CopilotPanel.css';
 import { MEDICAL_THEME } from '../config/medicalTheme.constants';
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import type { Dispatch, SetStateAction } from 'react';

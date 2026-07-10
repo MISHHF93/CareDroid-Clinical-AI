@@ -57,9 +57,8 @@ import { NotificationShellProvider } from '../contexts/NotificationShellContext'
 import SidebarNotificationPanel from './SidebarNotificationPanel';
 import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
 import { HelpHubProvider, dispatchOpenHelpHub } from '../contexts/HelpHubContext';
+import CopilotPanelLoader from './copilot/CopilotPanelLoader';
 import './app-shell.css';
-import './CopilotPanel.css';
-import { CopilotPanel } from './CopilotPanel';
 import {
   resolveScreenDensityProfile,
   screenDensityShellClassName,
@@ -72,6 +71,9 @@ const CommandPalette = lazy(() => import('./CommandPalette'));
 
 const ReassessmentDrawer = lazy(() => import('./ReassessmentDrawer'));
 const HelpHub = lazy(() => import('./help/HelpHub'));
+const CopilotPanel = lazy(() =>
+  import('./CopilotPanel').then((module) => ({ default: module.CopilotPanel })),
+);
 
 const REASSESSMENT_FLAGS = new Set<string>([
   PatientFlag.DeteriorationRisk,
@@ -933,7 +935,9 @@ function AppShellFrame({ children }: AppShellProps) {
           resetKey={`${copilotOpen}-${location.pathname}`}
           fallbackText="CopilotPanel encountered an error. Refresh to reload."
         >
-          <CopilotPanel />
+          <Suspense fallback={<CopilotPanelLoader />}>
+            <CopilotPanel />
+          </Suspense>
         </ErrorBoundary>
       ) : null}
       {canUseCopilot && !useKioskShell && !hiddenOnReception && !copilotOpen && !showSessionCopilot ? (
