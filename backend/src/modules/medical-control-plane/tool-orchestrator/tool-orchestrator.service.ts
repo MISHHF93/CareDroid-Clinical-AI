@@ -32,6 +32,13 @@ import { Abcd2Service } from './services/abcd2.service';
 import { CanadianCSpineService } from './services/canadian-c-spine.service';
 import { NexusCSpineService } from './services/nexus-cspine.service';
 import { GcsCalculatorService } from './services/gcs-calculator.service';
+import { Chads2Service } from './services/chads2.service';
+import { DukeTreadmillScoreService } from './services/duke-treadmill-score.service';
+import { ReynoldsRiskScoreService } from './services/reynolds-risk-score.service';
+import { HasBledService } from './services/has-bled.service';
+import { TimiUaNstemiService } from './services/timi-ua-nstemi.service';
+import { FraminghamRiskService } from './services/framingham-risk.service';
+import { GraceAcsService } from './services/grace-acs.service';
 import { ExecuteToolDto, ToolExecutionResponseDto, ToolListDto } from './dto/tool-execution.dto';
 import { ToolResult } from './entities/tool-result.entity';
 import {
@@ -78,6 +85,13 @@ export class ToolOrchestratorService {
     private readonly canadianCSpineService: CanadianCSpineService,
     private readonly nexusCSpineService: NexusCSpineService,
     private readonly gcsCalculatorService: GcsCalculatorService,
+    private readonly chads2Service: Chads2Service,
+    private readonly dukeTreadmillScoreService: DukeTreadmillScoreService,
+    private readonly reynoldsRiskScoreService: ReynoldsRiskScoreService,
+    private readonly hasBledService: HasBledService,
+    private readonly timiUaNstemiService: TimiUaNstemiService,
+    private readonly framinghamRiskService: FraminghamRiskService,
+    private readonly graceAcsService: GraceAcsService,
     private readonly auditService: AuditService,
     private readonly toolMetrics: ToolMetricsService,
     @InjectRepository(ToolResult)
@@ -106,6 +120,13 @@ export class ToolOrchestratorService {
     this.registerTool(this.canadianCSpineService);
     this.registerTool(this.nexusCSpineService);
     this.registerTool(this.gcsCalculatorService);
+    this.registerTool(this.chads2Service);
+    this.registerTool(this.dukeTreadmillScoreService);
+    this.registerTool(this.reynoldsRiskScoreService);
+    this.registerTool(this.hasBledService);
+    this.registerTool(this.timiUaNstemiService);
+    this.registerTool(this.framinghamRiskService);
+    this.registerTool(this.graceAcsService);
 
     this.logger.log(
       `Initialized tool registry with ${Object.keys(this.toolRegistry).length} tools`,

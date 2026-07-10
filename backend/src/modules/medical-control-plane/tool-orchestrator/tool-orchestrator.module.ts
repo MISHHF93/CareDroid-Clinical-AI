@@ -17,6 +17,13 @@ import { Abcd2Service } from './services/abcd2.service';
 import { CanadianCSpineService } from './services/canadian-c-spine.service';
 import { NexusCSpineService } from './services/nexus-cspine.service';
 import { GcsCalculatorService } from './services/gcs-calculator.service';
+import { Chads2Service } from './services/chads2.service';
+import { DukeTreadmillScoreService } from './services/duke-treadmill-score.service';
+import { ReynoldsRiskScoreService } from './services/reynolds-risk-score.service';
+import { HasBledService } from './services/has-bled.service';
+import { TimiUaNstemiService } from './services/timi-ua-nstemi.service';
+import { FraminghamRiskService } from './services/framingham-risk.service';
+import { GraceAcsService } from './services/grace-acs.service';
 import { AiModule } from '../../ai/ai.module';
 import { AuditModule } from '../../audit/audit.module';
 import { MetricsModule } from '../../metrics/metrics.module';
@@ -49,6 +56,13 @@ import { PlatformGovernanceModule } from '../../platform-governance';
     CanadianCSpineService,
     NexusCSpineService,
     GcsCalculatorService,
+    Chads2Service,
+    DukeTreadmillScoreService,
+    ReynoldsRiskScoreService,
+    HasBledService,
+    TimiUaNstemiService,
+    FraminghamRiskService,
+    GraceAcsService,
   ],
   exports: [ToolOrchestratorService],
 })

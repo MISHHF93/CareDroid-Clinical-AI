@@ -27,6 +27,13 @@ import { Abcd2Service } from '../src/modules/medical-control-plane/tool-orchestr
 import { CanadianCSpineService } from '../src/modules/medical-control-plane/tool-orchestrator/services/canadian-c-spine.service';
 import { NexusCSpineService } from '../src/modules/medical-control-plane/tool-orchestrator/services/nexus-cspine.service';
 import { GcsCalculatorService } from '../src/modules/medical-control-plane/tool-orchestrator/services/gcs-calculator.service';
+import { Chads2Service } from '../src/modules/medical-control-plane/tool-orchestrator/services/chads2.service';
+import { DukeTreadmillScoreService } from '../src/modules/medical-control-plane/tool-orchestrator/services/duke-treadmill-score.service';
+import { ReynoldsRiskScoreService } from '../src/modules/medical-control-plane/tool-orchestrator/services/reynolds-risk-score.service';
+import { HasBledService } from '../src/modules/medical-control-plane/tool-orchestrator/services/has-bled.service';
+import { TimiUaNstemiService } from '../src/modules/medical-control-plane/tool-orchestrator/services/timi-ua-nstemi.service';
+import { FraminghamRiskService } from '../src/modules/medical-control-plane/tool-orchestrator/services/framingham-risk.service';
+import { GraceAcsService } from '../src/modules/medical-control-plane/tool-orchestrator/services/grace-acs.service';
 import { ToolResult } from '../src/modules/medical-control-plane/tool-orchestrator/entities/tool-result.entity';
 import { ToolMetricsService } from '../src/modules/metrics/tool-metrics.service';
 import { AuditService } from '../src/modules/audit/audit.service';
@@ -78,6 +85,13 @@ describe('Tool Orchestrator API (e2e)', () => {
         CanadianCSpineService,
         NexusCSpineService,
         GcsCalculatorService,
+        Chads2Service,
+        DukeTreadmillScoreService,
+        ReynoldsRiskScoreService,
+        HasBledService,
+        TimiUaNstemiService,
+        FraminghamRiskService,
+        GraceAcsService,
         {
           provide: AuditService,
           useValue: mockAuditService,
@@ -121,7 +135,7 @@ describe('Tool Orchestrator API (e2e)', () => {
         .expect(200)
         .expect((res) => {
           expect(res.body.tools).toBeDefined();
-          expect(res.body.count).toBe(15);
+          expect(res.body.count).toBe(22);
         });
     });
 
@@ -187,7 +201,7 @@ describe('Tool Orchestrator API (e2e)', () => {
         .get('/tools/statistics')
         .expect(200)
         .expect((res) => {
-          expect(res.body.totalTools).toBe(15);
+          expect(res.body.totalTools).toBe(22);
         });
     });
   });

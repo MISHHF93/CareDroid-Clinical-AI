@@ -29,7 +29,7 @@ function patternToolIds(): string[] {
 }
 
 describe('tool-orchestrator.registry', () => {
-  it('exposes exactly fifteen registered executor ids', () => {
+  it('exposes exactly twenty-two registered executor ids', () => {
     expect(REGISTERED_EXECUTOR_TOOL_IDS).toEqual([
       'sofa-calculator',
       'drug-interactions',
@@ -46,6 +46,13 @@ describe('tool-orchestrator.registry', () => {
       'canadian-c-spine',
       'nexus-cspine',
       'gcs-calculator',
+      'chads2',
+      'duke-treadmill-score',
+      'reynolds-risk-score',
+      'has-bled',
+      'timi-ua-nstemi',
+      'framingham-risk',
+      'grace-acs',
     ]);
   });
 
@@ -162,9 +169,9 @@ describe('tool-orchestrator.registry', () => {
     expect(isKnownUnsupportedNluTool('sofa-calculator')).toBe(false);
   });
 
-  it('getExecutorCatalogSnapshot lists fifteen registered executors', () => {
+  it('getExecutorCatalogSnapshot lists twenty-two registered executors', () => {
     const snap = getExecutorCatalogSnapshot();
-    expect(snap.registeredExecutorToolIds).toHaveLength(15);
+    expect(snap.registeredExecutorToolIds).toHaveLength(22);
     expect(snap.unsupportedTools.length).toBeGreaterThan(30);
   });
 
@@ -230,6 +237,54 @@ describe('tool-orchestrator.registry', () => {
     it('validateExecutorContractParameters allows canadian-c-spine and nexus-cspine with all-optional inputs', () => {
       expect(validateExecutorContractParameters('canadian-c-spine', {}).valid).toBe(true);
       expect(validateExecutorContractParameters('nexus-cspine', {}).valid).toBe(true);
+    });
+  });
+
+  describe('cardiology batch executors (chads2, duke-treadmill-score, reynolds-risk-score, has-bled, timi-ua-nstemi, framingham-risk, grace-acs)', () => {
+    const CARDIOLOGY_TOOL_IDS = [
+      'chads2',
+      'duke-treadmill-score',
+      'reynolds-risk-score',
+      'has-bled',
+      'timi-ua-nstemi',
+      'framingham-risk',
+      'grace-acs',
+    ] as const;
+
+    it.each(CARDIOLOGY_TOOL_IDS)(
+      'is no longer listed in NLU_TOOL_IDS_WITHOUT_EXECUTOR: %s',
+      (id) => {
+        expect(NLU_TOOL_IDS_WITHOUT_EXECUTOR).not.toContain(id);
+      },
+    );
+
+    it.each(CARDIOLOGY_TOOL_IDS)('has a parameter-alias entry: %s', (id) => {
+      expect(EXECUTOR_PARAMETER_ALIASES[id]).toBeDefined();
+    });
+
+    it.each(CARDIOLOGY_TOOL_IDS)('has a deterministic request contract: %s', (id) => {
+      expect(EXECUTOR_REQUEST_CONTRACTS[id].deterministic).toBe(true);
+      expect(EXECUTOR_REQUEST_CONTRACTS[id].toolId).toBe(id);
+    });
+
+    it.each(CARDIOLOGY_TOOL_IDS)('classifies as a known tool, not unsupported: %s', (id) => {
+      expect(isKnownUnsupportedNluTool(id)).toBe(false);
+      expect(classifyToolExecutionError(id)).not.toBe(ToolExecutionErrorCode.UNSUPPORTED_TOOL);
+    });
+
+    it('normalizes has-bled snake_case NLU parameters to executor camelCase parameters', () => {
+      expect(
+        normalizeExecutorParameters('has-bled', { renal_dysfunction: true, age_over65: true }),
+      ).toEqual({ renalDysfunction: true, ageOver65: true });
+    });
+
+    it('validateExecutorContractParameters enforces has-bled and timi-ua-nstemi required booleans', () => {
+      expect(validateExecutorContractParameters('has-bled', {}).valid).toBe(false);
+      expect(validateExecutorContractParameters('timi-ua-nstemi', {}).valid).toBe(false);
+    });
+
+    it('validateExecutorContractParameters allows empty optional chads2 inputs', () => {
+      expect(validateExecutorContractParameters('chads2', {}).valid).toBe(true);
     });
   });
 });

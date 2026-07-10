@@ -23,6 +23,13 @@ import { Abcd2Service } from '../src/modules/medical-control-plane/tool-orchestr
 import { CanadianCSpineService } from '../src/modules/medical-control-plane/tool-orchestrator/services/canadian-c-spine.service';
 import { NexusCSpineService } from '../src/modules/medical-control-plane/tool-orchestrator/services/nexus-cspine.service';
 import { GcsCalculatorService } from '../src/modules/medical-control-plane/tool-orchestrator/services/gcs-calculator.service';
+import { Chads2Service } from '../src/modules/medical-control-plane/tool-orchestrator/services/chads2.service';
+import { DukeTreadmillScoreService } from '../src/modules/medical-control-plane/tool-orchestrator/services/duke-treadmill-score.service';
+import { ReynoldsRiskScoreService } from '../src/modules/medical-control-plane/tool-orchestrator/services/reynolds-risk-score.service';
+import { HasBledService } from '../src/modules/medical-control-plane/tool-orchestrator/services/has-bled.service';
+import { TimiUaNstemiService } from '../src/modules/medical-control-plane/tool-orchestrator/services/timi-ua-nstemi.service';
+import { FraminghamRiskService } from '../src/modules/medical-control-plane/tool-orchestrator/services/framingham-risk.service';
+import { GraceAcsService } from '../src/modules/medical-control-plane/tool-orchestrator/services/grace-acs.service';
 import { AuditService } from '../src/modules/audit/audit.service';
 import { AIService } from '../src/modules/ai/ai.service';
 import { ToolMetricsService } from '../src/modules/metrics/tool-metrics.service';
@@ -72,6 +79,13 @@ describe('ToolOrchestratorService', () => {
         CanadianCSpineService,
         NexusCSpineService,
         GcsCalculatorService,
+        Chads2Service,
+        DukeTreadmillScoreService,
+        ReynoldsRiskScoreService,
+        HasBledService,
+        TimiUaNstemiService,
+        FraminghamRiskService,
+        GraceAcsService,
         {
           provide: AuditService,
           useValue: mockAuditService,
@@ -107,10 +121,10 @@ describe('ToolOrchestratorService', () => {
   });
 
   describe('Tool Registry', () => {
-    it('should register all fifteen tools on initialization', () => {
+    it('should register all twenty-two tools on initialization', () => {
       const tools = service.listAvailableTools();
-      expect(tools.count).toBe(15);
-      expect(tools.tools.length).toBe(15);
+      expect(tools.count).toBe(22);
+      expect(tools.tools.length).toBe(22);
     });
 
     it('should have SOFA calculator in registry', () => {
@@ -147,6 +161,13 @@ describe('ToolOrchestratorService', () => {
       'canadian-c-spine',
       'nexus-cspine',
       'gcs-calculator',
+      'chads2',
+      'duke-treadmill-score',
+      'reynolds-risk-score',
+      'has-bled',
+      'timi-ua-nstemi',
+      'framingham-risk',
+      'grace-acs',
     ])('should have %s in registry', (toolId) => {
       const tools = service.listAvailableTools();
       expect(tools.tools.find((t) => t.id === toolId)).toBeDefined();
@@ -535,7 +556,7 @@ describe('ToolOrchestratorService', () => {
     it('should return tool statistics', () => {
       const stats = service.getToolStatistics();
 
-      expect(stats.totalTools).toBe(15);
+      expect(stats.totalTools).toBe(22);
       expect(stats.toolsByCategory).toBeDefined();
       expect(stats.tools).toBeDefined();
     });
