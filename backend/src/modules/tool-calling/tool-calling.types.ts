@@ -58,6 +58,7 @@ export interface ToolCallingValidationResult {
 
 export interface ToolExecutionLogEntry {
   timestamp: string;
+  userId: string;
   phase:
     | 'intent'
     | 'resolution'

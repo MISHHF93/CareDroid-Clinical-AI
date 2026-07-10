@@ -61,9 +61,12 @@ export class ToolCallingController {
 
   @Get('logs')
   @HttpCode(HttpStatus.OK)
-  getLogs(@Query('limit') limit?: string) {
+  getLogs(@Request() req: any, @Query('limit') limit?: string) {
     return {
-      logs: this.toolExecutionService.getExecutionLogs(limit ? Number(limit) : undefined),
+      logs: this.toolExecutionService.getExecutionLogs(
+        req.user?.id || 'anonymous',
+        limit ? Number(limit) : undefined,
+      ),
     };
   }
 }

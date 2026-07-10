@@ -269,4 +269,32 @@ describe('ToolExecutionService', () => {
       expect.objectContaining({ id: 'user-1' }),
     );
   });
+
+  // getExecutionLogs() used to return the whole shared, cross-user in-memory
+  // buffer to any caller with no filtering at all, so any authenticated user
+  // could read every other user's recent tool-execution activity. Locks in
+  // the per-user filter.
+  it('scopes getExecutionLogs to the requesting user only', async () => {
+    const { service } = makeExecutionService();
+
+    await service.executePrompt({
+      prompt: 'Show the fleet vehicle map',
+      toolId: 'fleet-live-map',
+      parameters: {},
+      userId: 'user-a',
+    });
+    await service.executePrompt({
+      prompt: 'Show the fleet vehicle map',
+      toolId: 'fleet-live-map',
+      parameters: {},
+      userId: 'user-b',
+    });
+
+    const userALogs = service.getExecutionLogs('user-a', 100);
+    const userBLogs = service.getExecutionLogs('user-b', 100);
+
+    expect(userALogs.length).toBeGreaterThan(0);
+    expect(userALogs.every((entry) => entry.userId === 'user-a')).toBe(true);
+    expect(userBLogs.every((entry) => entry.userId === 'user-b')).toBe(true);
+  });
 });

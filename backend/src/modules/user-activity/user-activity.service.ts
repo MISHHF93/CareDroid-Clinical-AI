@@ -1,6 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import {
+  WorkspaceMembership,
+  WorkspaceMembershipStatus,
+} from '../workspaces/entities/workspace-membership.entity';
 import { RecordUserActivityDto } from './dto/record-user-activity.dto';
 import { UserActivity, UserActivityCategory } from './entities/user-activity.entity';
 
@@ -26,7 +30,19 @@ export class UserActivityService {
   constructor(
     @InjectRepository(UserActivity)
     private readonly activityRepository: Repository<UserActivity>,
+    @InjectRepository(WorkspaceMembership)
+    private readonly membershipRepository: Repository<WorkspaceMembership>,
   ) {}
+
+  async assertWorkspaceMember(userId: string, workspaceId: string) {
+    const membership = await this.membershipRepository.findOne({
+      where: { userId, workspaceId, status: WorkspaceMembershipStatus.ACTIVE },
+    });
+    if (!membership) {
+      throw new ForbiddenException('Workspace membership is required.');
+    }
+    return membership;
+  }
 
   async record(userId: string, dto: RecordUserActivityDto) {
     const activity = this.activityRepository.create({

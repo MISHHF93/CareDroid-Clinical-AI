@@ -33,7 +33,12 @@ export class UserActivityController {
 
   @Get('workspaces/:workspaceId')
   @ApiOperation({ summary: 'List safe activity for a workspace' })
-  async workspace(@Param('workspaceId') workspaceId: string, @Query('limit') limit?: string) {
+  async workspace(
+    @Req() req: any,
+    @Param('workspaceId') workspaceId: string,
+    @Query('limit') limit?: string,
+  ) {
+    await this.activityService.assertWorkspaceMember(req.user.id, workspaceId);
     return {
       activities: await this.activityService.listForWorkspace(workspaceId, Number(limit) || 30),
     };

@@ -62,6 +62,7 @@ export class ToolExecutionService {
     });
     this.recordLog(
       logs,
+      userId,
       'resolution',
       resolution.definition ? 'success' : 'fallback',
       resolution.reason,
@@ -85,6 +86,7 @@ export class ToolExecutionService {
     });
     this.recordLog(
       logs,
+      userId,
       'parameter_collection',
       parameterState.needsFollowUp ? 'missing_parameters' : 'success',
       parameterState.needsFollowUp
@@ -144,6 +146,7 @@ export class ToolExecutionService {
     });
     this.recordLog(
       logs,
+      userId,
       'validation',
       validation.valid ? 'success' : 'failed',
       'Validated tool parameters.',
@@ -194,9 +197,16 @@ export class ToolExecutionService {
         conversationId,
         { ...(request.context || {}), ...parameterState.parameters },
       );
-      this.recordLog(logs, 'execution', 'success', `Executed ${resolution.definition.name}.`, {
-        executionKind: resolution.definition.executionKind,
-      });
+      this.recordLog(
+        logs,
+        userId,
+        'execution',
+        'success',
+        `Executed ${resolution.definition.name}.`,
+        {
+          executionKind: resolution.definition.executionKind,
+        },
+      );
 
       await this.persistResult(
         resolution.definition,
@@ -205,7 +215,7 @@ export class ToolExecutionService {
         executed.result,
       );
 
-      this.recordLog(logs, 'response', 'success', 'Generated tool response.');
+      this.recordLog(logs, userId, 'response', 'success', 'Generated tool response.');
       return {
         success: true,
         status: 'executed',
@@ -237,7 +247,7 @@ export class ToolExecutionService {
         actionSelected: 'Execute backend tool',
         error: message,
       });
-      this.recordLog(logs, 'execution', 'failed', message, {
+      this.recordLog(logs, userId, 'execution', 'failed', message, {
         toolId: resolution.definition.id,
       });
       return {
@@ -260,8 +270,11 @@ export class ToolExecutionService {
     }
   }
 
-  getExecutionLogs(limit = 50): ToolExecutionLogEntry[] {
-    return this.executionLogs.slice(-limit).reverse();
+  getExecutionLogs(userId: string, limit = 50): ToolExecutionLogEntry[] {
+    return this.executionLogs
+      .filter((entry) => entry.userId === userId)
+      .slice(-limit)
+      .reverse();
   }
 
   private async classifyPrompt(
@@ -271,7 +284,7 @@ export class ToolExecutionService {
   ): Promise<ToolCallingRequest['classification']> {
     try {
       const classification = await this.intentClassifier.classify(prompt, { userId });
-      this.recordLog(logs, 'intent', 'success', 'Classified prompt intent.', {
+      this.recordLog(logs, userId, 'intent', 'success', 'Classified prompt intent.', {
         intent: classification.primaryIntent,
         toolId: classification.toolId,
         confidence: classification.confidence,
@@ -281,6 +294,7 @@ export class ToolExecutionService {
     } catch (error) {
       this.recordLog(
         logs,
+        userId,
         'intent',
         'fallback',
         `Intent classification failed: ${error instanceof Error ? error.message : String(error)}`,
@@ -431,7 +445,7 @@ export class ToolExecutionService {
     startedAt: number,
     classification: ToolCallingRequest['classification'],
   ): Promise<ToolCallingResult> {
-    this.recordLog(logs, 'fallback', 'fallback', resolution.reason, {
+    this.recordLog(logs, request.userId || 'anonymous', 'fallback', 'fallback', resolution.reason, {
       requestedToolId: request.toolId || classification?.toolId,
       launch: resolution.launch,
     });
@@ -598,6 +612,7 @@ export class ToolExecutionService {
 
   private recordLog(
     turnLogs: ToolExecutionLogEntry[],
+    userId: string,
     phase: ToolExecutionLogEntry['phase'],
     status: ToolExecutionLogEntry['status'],
     message: string,
@@ -605,6 +620,7 @@ export class ToolExecutionService {
   ) {
     const entry: ToolExecutionLogEntry = {
       timestamp: new Date().toISOString(),
+      userId,
       phase,
       status,
       message,

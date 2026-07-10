@@ -3,6 +3,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { TenantContextService } from './tenant-context.service';
 import { TenantDataIsolationAuditService } from './tenant-data-isolation-audit.service';
+import { TenantIsolationGuard } from './tenant-isolation.guard';
 import { TenantScoped } from './tenant-scope.decorator';
 
 @ApiTags('tenant')
@@ -22,6 +23,7 @@ export class TenantContextController {
   }
 
   @Get('isolation-audit')
+  @UseGuards(TenantIsolationGuard)
   @TenantScoped({ admin: 'organization' })
   @ApiOperation({ summary: 'Tenant data isolation audit report' })
   async isolationAudit(@Req() req: any) {

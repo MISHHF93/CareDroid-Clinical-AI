@@ -26,6 +26,7 @@ import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
 import { Permission } from '../auth/enums/permission.enum';
 import { OrganizationScoped, TenantScoped } from '../tenant-context/tenant-scope.decorator';
+import { TenantIsolationGuard } from '../tenant-context/tenant-isolation.guard';
 
 @ApiTags('subscriptions')
 @Controller('subscriptions')
@@ -110,7 +111,7 @@ export class SubscriptionsController {
   }
 
   @Post('upgrade')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), TenantIsolationGuard)
   @OrganizationScoped({ admin: 'organization', permissions: [Permission.MANAGE_SUBSCRIPTIONS] })
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Upgrade current subscription through the SaaS lifecycle engine' })
@@ -119,7 +120,7 @@ export class SubscriptionsController {
   }
 
   @Post('downgrade')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), TenantIsolationGuard)
   @OrganizationScoped({ admin: 'organization', permissions: [Permission.MANAGE_SUBSCRIPTIONS] })
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Downgrade current subscription through the SaaS lifecycle engine' })
@@ -128,7 +129,7 @@ export class SubscriptionsController {
   }
 
   @Post('trial/convert')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), TenantIsolationGuard)
   @OrganizationScoped({ admin: 'organization', permissions: [Permission.MANAGE_SUBSCRIPTIONS] })
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Convert a trial subscription to a paid or contracted plan' })
@@ -137,7 +138,7 @@ export class SubscriptionsController {
   }
 
   @Get('billing')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), TenantIsolationGuard)
   @OrganizationScoped({ admin: 'organization', permissions: [Permission.MANAGE_SUBSCRIPTIONS] })
   @ApiBearerAuth()
   @ApiOperation({
@@ -148,7 +149,7 @@ export class SubscriptionsController {
   }
 
   @Get('usage')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), TenantIsolationGuard)
   @OrganizationScoped({ admin: 'organization', permissions: [Permission.VIEW_ANALYTICS] })
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get organization usage summary by workspace, asset, role, and period' })
@@ -157,7 +158,7 @@ export class SubscriptionsController {
   }
 
   @Get('usage/metering')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), TenantIsolationGuard)
   @OrganizationScoped({ admin: 'organization', permissions: [Permission.VIEW_ANALYTICS] })
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get billing-neutral usage metering framework summary' })

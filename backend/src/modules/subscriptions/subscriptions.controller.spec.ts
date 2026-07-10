@@ -1,9 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
+import { GUARDS_METADATA } from '@nestjs/common/constants';
+import { Reflector } from '@nestjs/core';
 import { SubscriptionTier } from './entities/subscription.entity';
 import { UsageEventType } from './subscription-plans.config';
 import { SubscriptionsController } from './subscriptions.controller';
 import { SubscriptionsService } from './subscriptions.service';
+import { TenantContextService } from '../tenant-context/tenant-context.service';
+import { TenantIsolationGuard } from '../tenant-context/tenant-isolation.guard';
+import { TENANT_SCOPE_KEY } from '../tenant-context/tenant-scope.decorator';
+import { Permission } from '../auth/enums/permission.enum';
 
 describe('SubscriptionsController', () => {
   let controller: SubscriptionsController;
@@ -37,6 +43,8 @@ describe('SubscriptionsController', () => {
             get: jest.fn((key: string) => (key === 'stripe.secretKey' ? 'sk_test_123' : '')),
           },
         },
+        Reflector,
+        { provide: TenantContextService, useValue: { resolveForRequest: jest.fn() } },
       ],
     }).compile();
 
@@ -92,5 +100,35 @@ describe('SubscriptionsController', () => {
       eventType: UsageEventType.TOOL_LAUNCH,
       assetId: 'qsofa',
     });
+  });
+
+  describe('organization-admin route wiring', () => {
+    // TenantIsolationGuard is the only guard that reads @OrganizationScoped/@TenantScoped
+    // metadata, and it is registered globally in a way that no-ops before authentication
+    // (see tenant-isolation.guard.ts). Routes carrying that decorator MUST also re-list
+    // TenantIsolationGuard locally, or the admin/permission policy is silently never enforced.
+    const adminScopedRoutes: Array<{
+      method: keyof SubscriptionsController;
+      permissions: Permission[];
+    }> = [
+      { method: 'upgrade', permissions: [Permission.MANAGE_SUBSCRIPTIONS] },
+      { method: 'downgrade', permissions: [Permission.MANAGE_SUBSCRIPTIONS] },
+      { method: 'convertTrial', permissions: [Permission.MANAGE_SUBSCRIPTIONS] },
+      { method: 'getBillingOverview', permissions: [Permission.MANAGE_SUBSCRIPTIONS] },
+      { method: 'getUsageSummary', permissions: [Permission.VIEW_ANALYTICS] },
+      { method: 'getUsageMeteringFramework', permissions: [Permission.VIEW_ANALYTICS] },
+    ];
+
+    it.each(adminScopedRoutes)(
+      '$method re-applies TenantIsolationGuard so its @OrganizationScoped policy is enforced',
+      ({ method, permissions }) => {
+        const handler = SubscriptionsController.prototype[method];
+        const guards = Reflect.getMetadata(GUARDS_METADATA, handler) || [];
+        expect(guards).toContain(TenantIsolationGuard);
+
+        const policy = Reflect.getMetadata(TENANT_SCOPE_KEY, handler);
+        expect(policy).toEqual(expect.objectContaining({ admin: 'organization', permissions }));
+      },
+    );
   });
 });

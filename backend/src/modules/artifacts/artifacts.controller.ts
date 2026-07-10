@@ -1,6 +1,9 @@
 import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { AuthorizationGuard } from '../auth/guards/authorization.guard';
+import { RequirePermission } from '../auth/decorators/permissions.decorator';
+import { Permission } from '../auth/enums/permission.enum';
 import { ArtifactQueryDto } from './dto/artifact-query.dto';
 import { CreateArtifactDto } from './dto/create-artifact.dto';
 import { UpdateArtifactDto } from './dto/update-artifact.dto';
@@ -26,7 +29,9 @@ export class ArtifactsController {
   }
 
   @Post()
-  @ApiOperation({ summary: 'Create an artifact knowledge asset' })
+  @UseGuards(AuthorizationGuard)
+  @RequirePermission(Permission.WRITE_PHI)
+  @ApiOperation({ summary: 'Create an artifact knowledge asset (admin only)' })
   async create(@Body() dto: CreateArtifactDto) {
     return this.artifactsService.create(dto);
   }
@@ -44,7 +49,11 @@ export class ArtifactsController {
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Update an artifact knowledge asset and snapshot the version' })
+  @UseGuards(AuthorizationGuard)
+  @RequirePermission(Permission.WRITE_PHI)
+  @ApiOperation({
+    summary: 'Update an artifact knowledge asset and snapshot the version (admin only)',
+  })
   async update(@Param('id') id: string, @Body() dto: UpdateArtifactDto) {
     return this.artifactsService.update(id, dto);
   }
