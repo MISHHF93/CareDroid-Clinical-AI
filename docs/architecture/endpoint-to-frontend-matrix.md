@@ -1,6 +1,6 @@
 # Endpoint-to-frontend matrix
 
-**Generated:** 2026-07-07T14:12:01.535Z
+**Generated:** 2026-07-09T00:27:17.259Z
 
 | Method | Path | Backend | Frontend client | Exposure |
 |--------|------|---------|-----------------|----------|
@@ -371,5 +371,5 @@
 - `GET /api/emergency/capacity`
 - `GET /api/emergency/boarding`
 
-_…and 510 more in src/data/backendHttpRouteInventory.js_
+_…and 548 more in src/data/backendHttpRouteInventory.js_
 
