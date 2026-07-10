@@ -212,6 +212,14 @@ export async function evaluatePatientJourneyAiDecisions(
 const emsDecisionCache = new Map<string, { signature: string; response: CareDroidAIResponse }>();
 const inFlightEmsDecisions = new Map<string, { signature: string; promise: Promise<CareDroidAIResponse> }>();
 
+/** Test helper — clears session caches for patient-journey and EMS pre-arrival AI node calls. */
+export function clearPatientJourneyAiDecisionCache(): void {
+  decisionCache.clear();
+  inFlightDecisions.clear();
+  emsDecisionCache.clear();
+  inFlightEmsDecisions.clear();
+}
+
 export async function evaluateEmsPrearrivalAiDecision(
   arrival: EMSArrival,
   patient?: Patient,

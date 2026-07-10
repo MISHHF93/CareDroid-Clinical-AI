@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { Priority, PatientState, type Patient } from '../types/emergency';
 import {
   buildPatientJourneyAiInput,
+  clearPatientJourneyAiDecisionCache,
   evaluatePatientJourneyAiDecisions,
   formatAiDecisionSummary,
   hasHighRiskAiSignal,
@@ -33,6 +34,13 @@ const chestPainPatient: Patient = {
 } as Patient;
 
 describe('patientJourneyAiDecisionService', () => {
+  it('caches patient journey AI node bundles for unchanged patient context', async () => {
+    clearPatientJourneyAiDecisionCache();
+    const first = await evaluatePatientJourneyAiDecisions(chestPainPatient);
+    const second = await evaluatePatientJourneyAiDecisions(chestPainPatient);
+    expect(second).toBe(first);
+  });
+
   it('maps registration and triage context into unified AI node input', () => {
     const input = buildPatientJourneyAiInput(chestPainPatient);
     expect(input.chiefComplaint).toContain('Chest pain');

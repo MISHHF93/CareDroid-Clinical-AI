@@ -24,6 +24,7 @@ export function useThreeMinuteMission(options: { realtime?: boolean } = {}) {
   }, [patients, alerts, emsArrivals]);
 
   useEffect(() => {
+    syncThreeMinuteMissionsFromEngine();
     if (options.realtime === false) return undefined;
     const timer = window.setInterval(() => {
       setTick((value) => value + 1);

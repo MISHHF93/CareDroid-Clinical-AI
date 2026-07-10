@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
   buildCareDroidCentralNodeSnapshot,
@@ -8,12 +8,18 @@ import { useEmergencyStore } from '../store/emergencyStore';
 import { useEmergencyRolePermissions } from './useEmergencyRolePermissions';
 import useRouteScreenMode from './useRouteScreenMode';
 import { fetchCareDroidCentralNodeSnapshot } from '../services/emergencyOsApi';
-import startEmergencyRealtime from '../services/emergencyRealtimeService';
 
 type UseCareDroidCentralNodeOptions = {
   screenMode?: CareDroidScreenMode;
-  realtime?: boolean;
 };
+
+function readCentralNodeGeneratedAt(envelope: unknown): string {
+  if (!envelope || typeof envelope !== 'object') {
+    return new Date().toISOString();
+  }
+  const record = envelope as { data?: { generatedAt?: string }; generatedAt?: string };
+  return record.data?.generatedAt || record.generatedAt || new Date().toISOString();
+}
 
 export function useCareDroidCentralNode(options: UseCareDroidCentralNodeOptions = {}) {
   const location = useLocation();
@@ -117,7 +123,7 @@ export function useCareDroidCentralNode(options: UseCareDroidCentralNodeOptions 
       setWebSocketStatus({
         status: 'connected',
         mode: 'polling',
-        lastEventAt: envelope?.data?.generatedAt || envelope?.generatedAt || new Date().toISOString(),
+        lastEventAt: readCentralNodeGeneratedAt(envelope),
         message: 'Central node snapshot refreshed.',
       });
       return envelope;
@@ -135,14 +141,12 @@ export function useCareDroidCentralNode(options: UseCareDroidCentralNodeOptions 
     }
   }, [dispatchWebSocketEvent, setWebSocketStatus]);
 
-  useEffect(() => {
-    if (!options.realtime) return undefined;
-    return startEmergencyRealtime({
-      onEvent: dispatchWebSocketEvent,
-      onStatus: setWebSocketStatus,
-      onPoll: refresh,
-    });
-  }, [dispatchWebSocketEvent, options.realtime, refresh, setWebSocketStatus]);
+  // AppShell owns the singleton emergency realtime session (SSE + polling
+  // fallback). Starting another connection here duplicated
+  // /api/emergency/realtime/stream and doubled poll-driven refresh work on
+  // AI Chief surfaces (copilot, executive) that mount this hook with
+  // realtime enabled upstream. Subscribe via emergencyStore websocket state
+  // and dispatchWebSocketEvent hydration instead.
 
   return {
     snapshot,

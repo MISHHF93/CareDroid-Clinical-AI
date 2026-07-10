@@ -4,7 +4,7 @@ import {
 } from '../config/automationEntitlement.config';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { ADMINISTRATIVE_AUTOMATION_SAFETY_STATEMENT } from '../config/administrativeAutomationCatalog';
-import { taskNeedsAiEnrichment } from '../services/administrativeAutomationAiUtils';
+import { taskHasAiDecision, taskNeedsAiEnrichment } from '../services/administrativeAutomationAiUtils';
 import { enrichAdministrativeAutomationSnapshotWithAi } from '../services/enrichAdministrativeAutomationsWithAi';
 import { buildAdministrativeAutomationSnapshot } from '../services/unifiedClinicalWorkflowOrchestrator';
 import type {
@@ -110,14 +110,41 @@ function buildSnapshotFromTasks(
   });
 }
 
+function carryForwardAiDecisionsFromQueue(
+  backendTasks: readonly AdministrativeAutomationTask[],
+  existingTasks: readonly AdministrativeAutomationTask[],
+): AdministrativeAutomationTask[] {
+  const existingById = new Map(existingTasks.map((task) => [task.id, task]));
+
+  return backendTasks.map((task) => {
+    if (taskHasAiDecision(task)) return task;
+    const existing = existingById.get(task.id);
+    if (!existing || !taskHasAiDecision(existing)) return task;
+    return Object.freeze({
+      ...task,
+      proposedPayload: Object.freeze({
+        ...task.proposedPayload,
+        aiDecision: existing.proposedPayload.aiDecision,
+      }),
+    });
+  });
+}
+
 /** Apply backend tasks without rebuilding the queue from local patient state. */
 export async function mergeBackendAdministrativeAutomationTasks(
   backendTasks: readonly AdministrativeAutomationTask[],
 ): Promise<AdministrativeAutomationTask[]> {
-  if (!backendTasks.some(taskNeedsAiEnrichment)) return [...backendTasks];
-
   const state = useEmergencyStore.getState();
-  const snapshot = buildSnapshotFromTasks(backendTasks);
+  const tasksWithCarriedDecisions = carryForwardAiDecisionsFromQueue(
+    backendTasks,
+    state.administrativeAutomationQueue,
+  );
+
+  if (!tasksWithCarriedDecisions.some(taskNeedsAiEnrichment)) {
+    return [...tasksWithCarriedDecisions];
+  }
+
+  const snapshot = buildSnapshotFromTasks(tasksWithCarriedDecisions);
   const enriched = await enrichAdministrativeAutomationSnapshotWithAi(snapshot, {
     patients: state.patients,
     emsArrivals: state.emsArrivals,

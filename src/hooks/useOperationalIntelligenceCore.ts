@@ -66,7 +66,7 @@ function registerSharedOperationalIntelligencePolling(
 
 /** Low-level operational intelligence hook — prefer useAiChiefOrchestrator for unified monitoring. */
 export function useOperationalIntelligenceCore(options: UseOperationalIntelligenceOptions = {}) {
-  const centralNode = useCareDroidCentralNode(options);
+  const centralNode = useCareDroidCentralNode({ screenMode: options.screenMode });
   const emergencySettings = useEmergencyStore((state) => state.emergencySettings);
   const patients = useEmergencyStore((state) => state.patients);
   const referrals = useEmergencyStore((state) => state.referrals);
@@ -109,12 +109,16 @@ export function useOperationalIntelligenceCore(options: UseOperationalIntelligen
     if (!oiSettings.operationalIntelligenceEnabled) return undefined;
     if (!options.realtime) return undefined;
     const intervalMs = Math.max(15000, oiSettings.operationalIntelligencePollingInterval || 30000);
-    return registerSharedOperationalIntelligencePolling(intervalMs, refresh);
+    // Central-node hydration is owned by AppShell realtime; this shared interval only
+    // refreshes operational-intelligence snapshots for AI Chief surfaces, and must not
+    // also call centralNode.refresh() (that would duplicate AppShell's own hydration).
+    return registerSharedOperationalIntelligencePolling(intervalMs, () =>
+      refreshUnifiedOperationalIntelligenceFromBackend(),
+    );
   }, [
     oiSettings.operationalIntelligenceEnabled,
     oiSettings.operationalIntelligencePollingInterval,
     options.realtime,
-    refresh,
   ]);
 
   const fetchModelHealth = useCallback(async () => {

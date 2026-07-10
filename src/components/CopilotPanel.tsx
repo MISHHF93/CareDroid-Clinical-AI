@@ -433,7 +433,7 @@ export function CopilotPanel() {
   const routeScreenMode = useRouteScreenMode();
   const aiChiefOrchestrator = useAiChiefOrchestrator({
     screenMode: routeScreenMode,
-    realtime: true,
+    realtime: false,
     selectedPatientId,
   });
   const operationalIntelligence = aiChiefOrchestrator.operationalIntelligence;
