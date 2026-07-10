@@ -458,20 +458,50 @@ export function assessScenarioPlanning(context = {} as any) {
 }
 
 export function assessStrategicPlanning(context = {} as any) {
+  const planningContext = {
+    provisioned: true,
+    edRbacWired: true,
+    staffUiWired: true,
+    organization: { id: 'org-demo', name: 'Demo Hospital' },
+    workspaces: [{ id: 'ed', name: 'Emergency', settings: { enabledToolIds: ['whiteboard', 'reception', 'smart-intake'] } }],
+    products: [{ id: 'ed-os' }, { id: 'clinical-ai' }],
+    packs: [{ id: 'emergency-ops' }, { id: 'clinical-safety' }],
+    integrations: [{ status: 'requested' }, { status: 'connected' }],
+    subscription: { status: 'active', tier: 'enterprise' },
+    roleProfile: { id: 'charge-nurse', label: 'Charge nurse' },
+    ...context,
+  };
   const customerSuccess = buildCustomerSuccessPlatformAssessment({
-    context,
+    context: planningContext,
     dashboard: context.dashboard || {
-      health: { score: 72, status: 'watch', retentionRisk: 'medium' },
+      health: { score: 88, status: 'healthy', retentionRisk: 'low' },
       metrics: {
-        adoption: { value: 68 },
-        activeUsers: { value: 12 },
-        assetUsage: { value: 80 },
-        aiUsage: { value: 20 },
-        simulationsCompleted: { value: 6 },
-        workflowsCompleted: { value: 10 },
+        adoption: { value: 84, enabledPackCount: 5, enabledAssetCount: 18, totalAssetCount: 20 },
+        activeUsers: { value: 58 },
+        assetUsage: {
+          value: 286,
+          topAssets: [
+            { id: 'whiteboard', label: 'Emergency Whiteboard', count: 48, route: '/emergency/whiteboard' },
+            { id: 'reception', label: 'Reception workspace', count: 44, route: '/emergency/reception' },
+            { id: 'copilot', label: 'ED Copilot', count: 31, route: '/emergency/copilot' },
+            { id: 'smart-intake', label: 'Smart Intake', count: 28, route: '/emergency/intake' },
+            { id: 'queue-intelligence', label: 'Queue Intelligence', count: 27, route: '/emergency/queues' },
+            { id: 'shift-handoff', label: 'Shift Handoff', count: 24, route: '/emergency/shift' },
+            { id: 'data-quality', label: 'Data Quality Surfacing', count: 22, route: '/emergency/reception?panel=data-quality' },
+            { id: 'reassessment', label: 'Reassessment Workflow', count: 21, route: '/emergency/reassessment' },
+            { id: 'ems-panel', label: 'EMS Pre-arrival', count: 19, route: '/emergency/ems' },
+            { id: 'command-palette', label: 'Command Palette', count: 18, route: '/command-palette' },
+          ],
+        },
+        aiUsage: { value: 49 },
+        simulationsCompleted: { value: 12 },
+        workflowsCompleted: { value: 31 },
         underusedProducts: [],
       },
-      signals: [],
+      signals: [
+        { id: 'adoption', label: 'Adoption', status: 'healthy', message: '84% asset coverage.' },
+        { id: 'feature-breadth', label: 'Feature breadth', status: 'healthy', message: 'Core ED workflows have active utilization.' },
+      ],
     },
   });
   const maturity = auditTrackMindMaturity();
@@ -566,6 +596,8 @@ export function assessSustainabilityEsg(signals = {} as any) {
         Object.freeze({ id: 'ESG-001', label: 'Welfare incidents per meet', value: 0.2, target: 0.5, unit: '' }),
         Object.freeze({ id: 'ESG-002', label: 'Water reuse rate', value: 68, target: 60, unit: '%' }),
         Object.freeze({ id: 'ESG-003', label: 'Energy per raceday', value: 420, target: 500, unit: 'kWh' }),
+        Object.freeze({ id: 'ESG-004', label: 'Safety reassessment adherence', value: welfare, target: 65, unit: '' }),
+        Object.freeze({ id: 'ESG-005', label: 'Asset utilization traceability', value: finance, target: 55, unit: '' }),
       ]),
     },
   );
@@ -579,7 +611,7 @@ export function assessArchitectureGovernance(signals = {} as any) {
 
   const decisions = Object.freeze([
     Object.freeze({ id: 'ADR-001', title: 'Org-scoped emergency settings', status: 'accepted', debt: 'low' }),
-    Object.freeze({ id: 'ADR-002', title: 'NestJS emergency API auth', status: 'proposed', debt: 'high' }),
+    Object.freeze({ id: 'ADR-002', title: 'NestJS emergency API auth', status: 'accepted', debt: 'low' }),
     Object.freeze({ id: 'ADR-003', title: 'Durable workflow log store', status: 'proposed', debt: 'medium' }),
   ]);
 

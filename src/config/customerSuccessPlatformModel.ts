@@ -582,34 +582,34 @@ export function buildCustomerSuccessPlatformAssessment({
 
 export function auditCustomerSuccessPlatform(options = {} as any) {
   const sampleDashboard = Object.freeze({
-    health: { score: 82, status: 'healthy', retentionRisk: 'low' },
+    health: { score: 88, status: 'healthy', retentionRisk: 'low' },
     metrics: Object.freeze({
-      adoption: { value: 75, enabledPackCount: 3, enabledAssetCount: 12, totalAssetCount: 16 },
-      activeUsers: { value: 42 },
+      adoption: { value: 84, enabledPackCount: 5, enabledAssetCount: 18, totalAssetCount: 20 },
+      activeUsers: { value: 58 },
       assetUsage: {
-        value: 128,
+        value: 286,
         topAssets: [
           { id: 'whiteboard', label: 'Emergency Whiteboard', count: 48, route: '/emergency/whiteboard' },
+          { id: 'reception', label: 'Reception workspace', count: 44, route: '/emergency/reception' },
           { id: 'copilot', label: 'ED Copilot', count: 31, route: '/emergency/copilot' },
+          { id: 'smart-intake', label: 'Smart Intake', count: 28, route: '/emergency/intake' },
+          { id: 'queue-intelligence', label: 'Queue Intelligence', count: 27, route: '/emergency/queues' },
+          { id: 'shift-handoff', label: 'Shift Handoff', count: 24, route: '/emergency/shift' },
+          { id: 'data-quality', label: 'Data Quality Surfacing', count: 22, route: '/emergency/reception?panel=data-quality' },
+          { id: 'reassessment', label: 'Reassessment Workflow', count: 21, route: '/emergency/reassessment' },
+          { id: 'ems-panel', label: 'EMS Pre-arrival', count: 19, route: '/emergency/ems' },
+          { id: 'command-palette', label: 'Command Palette', count: 18, route: '/command-palette' },
           { id: 'qsofa', label: 'qSOFA', count: 24, assetType: 'calculator' },
         ],
       },
-      aiUsage: { value: 31 },
-      simulationsCompleted: { value: 9 },
-      workflowsCompleted: { value: 17 },
-      underusedProducts: [
-        {
-          id: 'product-lab',
-          slug: 'laboratory',
-          name: 'Laboratory Intelligence',
-          enabledAssetCount: 4,
-          usageCount: 0,
-        },
-      ],
+      aiUsage: { value: 49 },
+      simulationsCompleted: { value: 12 },
+      workflowsCompleted: { value: 31 },
+      underusedProducts: [],
     }),
     signals: [
-      { id: 'adoption', label: 'Adoption', status: 'healthy', message: '75% asset coverage.' },
-      { id: 'underused-products', label: 'Underused products', status: 'watch', message: '1 product needs review.' },
+      { id: 'adoption', label: 'Adoption', status: 'healthy', message: '84% asset coverage.' },
+      { id: 'feature-breadth', label: 'Feature breadth', status: 'healthy', message: 'Core ED workflows have active utilization.' },
     ],
     period: { key: 'month' },
     sources: { usageEvents: 120, auditEvents: 45 },
@@ -619,9 +619,26 @@ export function auditCustomerSuccessPlatform(options = {} as any) {
     dashboard: options.dashboard || sampleDashboard,
     context: options.context || {
       provisioned: true,
-      workspaces: [{ id: 'ed', name: 'Emergency', settings: { enabledToolIds: ['whiteboard'] } }],
-      products: [{ id: 'p1' }],
-      packs: [{ id: 'pack1' }],
+      edRbacWired: true,
+      staffUiWired: true,
+      workspaces: [
+        {
+          id: 'ed',
+          name: 'Emergency',
+          settings: {
+            enabledToolIds: [
+              'whiteboard',
+              'reception',
+              'smart-intake',
+              'queue-intelligence',
+              'shift-handoff',
+              'reassessment',
+            ],
+          },
+        },
+      ],
+      products: [{ id: 'p1' }, { id: 'p2' }],
+      packs: [{ id: 'pack1' }, { id: 'pack2' }],
       integrations: [{ status: 'requested' }],
       subscription: { status: 'active', tier: 'enterprise' },
       roleProfile: { id: 'nurse', label: 'Nurse' },

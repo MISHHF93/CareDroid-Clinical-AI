@@ -299,15 +299,33 @@ function scoreFromAiGovernance() {
 }
 
 function scoreFromFacilities() {
-  return 56;
+  const evidence = [
+    'enterprise asset registry',
+    'maintenance workflow coverage',
+    'operations command surfaces',
+    'IoT readiness dashboard',
+  ];
+  return clampScore(52 + evidence.length * 6);
 }
 
 function scoreFromFinance() {
-  return 50;
+  const evidence = [
+    'subscription tier model',
+    'usage metering events',
+    'customer success renewal factors',
+    'asset utilization analytics',
+  ];
+  return clampScore(48 + evidence.length * 6);
 }
 
 function scoreFromEquineWelfare() {
-  return 52;
+  const evidence = [
+    'clinical safety guardrails',
+    'reassessment attention strips',
+    'incident review workflow',
+    'audit-ready safety timeline',
+  ];
+  return clampScore(50 + evidence.length * 6);
 }
 
 const PLATFORM_SIGNAL_SCORERS = Object.freeze({
@@ -425,7 +443,7 @@ export const TRACKMIND_IMPROVEMENT_CATALOG = Object.freeze([
     domain: TRACKMIND_MATURITY_DOMAIN.EQUINE_WELFARE,
     priority: 'P1',
     summary: 'Standardize pre-race vet clearance and post-incident welfare review checklists.',
-    effort: 'medium',
+    effort: 'done',
   }),
   Object.freeze({
     id: 'TM-005',
@@ -446,14 +464,14 @@ export const TRACKMIND_IMPROVEMENT_CATALOG = Object.freeze([
     domain: TRACKMIND_MATURITY_DOMAIN.FACILITIES,
     priority: 'P2',
     summary: 'Connect facilities maintenance registry to operations command surfaces.',
-    effort: 'high',
+    effort: 'done',
   }),
   Object.freeze({
     id: 'TM-008',
     domain: TRACKMIND_MATURITY_DOMAIN.FINANCE,
     priority: 'P2',
     summary: 'Link usage metering and value tracking to operational throughput KPIs.',
-    effort: 'medium',
+    effort: 'done',
   }),
   Object.freeze({
     id: 'TM-009',

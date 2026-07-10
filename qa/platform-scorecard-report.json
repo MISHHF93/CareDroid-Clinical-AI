@@ -1,0 +1,547 @@
+{
+  "generatedAt": "2026-07-10T01:51:45.643Z",
+  "goal": "CareDroid platform scorecard across intelligence, enterprise readiness, customer success, maturity, and production readiness",
+  "overallScore": 86,
+  "overallStatus": "excellent",
+  "sections": [
+    {
+      "id": "platform-intelligence",
+      "label": "Platform Intelligence",
+      "score": 88,
+      "status": "ready",
+      "weight": 35,
+      "source": "auditPlatformIntelligence"
+    },
+    {
+      "id": "enterprise-operating-platform",
+      "label": "Enterprise Operating Platform",
+      "score": 87,
+      "status": "ready",
+      "weight": 25,
+      "source": "auditEnterpriseOperatingPlatform"
+    },
+    {
+      "id": "customer-success",
+      "label": "Customer Success",
+      "score": 97,
+      "status": "excellent",
+      "weight": 20,
+      "source": "auditCustomerSuccessPlatform"
+    },
+    {
+      "id": "operating-maturity",
+      "label": "Operating Maturity",
+      "score": 76,
+      "status": "managed",
+      "weight": 10,
+      "source": "auditTrackMindMaturity"
+    },
+    {
+      "id": "production-readiness",
+      "label": "Production Readiness",
+      "score": 69,
+      "status": "staging-only",
+      "weight": 10,
+      "source": "auditProductionReadiness"
+    }
+  ],
+  "summary": {
+    "platformScore": 88,
+    "enterpriseScore": 87,
+    "customerScore": 97,
+    "customerFeatureUtilizationRate": 100,
+    "customerKpisPassed": 7,
+    "customerKpisTotal": 7,
+    "maturityScore": 76,
+    "productionReadinessScore": 69,
+    "productionReadinessGrade": "staging-only"
+  },
+  "lowestModules": {
+    "platform": [
+      {
+        "id": "federation_intelligence",
+        "prompt": 130,
+        "label": "Federation intelligence",
+        "score": 73,
+        "status": "developing",
+        "kpisPassed": 3,
+        "kpisTotal": 3
+      },
+      {
+        "id": "track_health",
+        "prompt": 128,
+        "label": "Track health dashboard",
+        "score": 74,
+        "status": "developing",
+        "kpisPassed": 3,
+        "kpisTotal": 3
+      },
+      {
+        "id": "forecasting_readiness",
+        "prompt": 125,
+        "label": "Forecasting readiness",
+        "score": 75,
+        "status": "developing",
+        "kpisPassed": 2,
+        "kpisTotal": 2
+      },
+      {
+        "id": "data_lineage",
+        "prompt": 121,
+        "label": "Data lineage platform",
+        "score": 76,
+        "status": "developing",
+        "kpisPassed": 1,
+        "kpisTotal": 2
+      },
+      {
+        "id": "cross_domain_analytics",
+        "prompt": 124,
+        "label": "Cross-domain analytics",
+        "score": 78,
+        "status": "developing",
+        "kpisPassed": 2,
+        "kpisTotal": 2
+      }
+    ],
+    "enterprise": [
+      {
+        "id": "sustainability_esg",
+        "prompt": 115,
+        "label": "Sustainability & ESG",
+        "score": 74,
+        "status": "developing",
+        "kpisPassed": 3,
+        "kpisTotal": 3
+      },
+      {
+        "id": "operational_benchmarking",
+        "prompt": 99,
+        "label": "Operational benchmarking",
+        "score": 75,
+        "status": "developing",
+        "kpisPassed": 2,
+        "kpisTotal": 2
+      },
+      {
+        "id": "architecture_governance",
+        "prompt": 116,
+        "label": "Architecture governance",
+        "score": 75,
+        "status": "developing",
+        "kpisPassed": 3,
+        "kpisTotal": 3
+      },
+      {
+        "id": "portfolio_management",
+        "prompt": 113,
+        "label": "Portfolio management",
+        "score": 76,
+        "status": "developing",
+        "kpisPassed": 3,
+        "kpisTotal": 3
+      },
+      {
+        "id": "decision_support",
+        "prompt": 110,
+        "label": "Decision support",
+        "score": 77,
+        "status": "developing",
+        "kpisPassed": 3,
+        "kpisTotal": 3
+      }
+    ]
+  },
+  "opportunities": [
+    {
+      "id": "platform:federation_intelligence",
+      "area": "platform-intelligence",
+      "label": "Federation intelligence",
+      "score": 73,
+      "target": 80,
+      "gap": 7,
+      "impact": 2,
+      "source": "platformIntelligenceModel"
+    },
+    {
+      "id": "platform:track_health",
+      "area": "platform-intelligence",
+      "label": "Track health dashboard",
+      "score": 74,
+      "target": 80,
+      "gap": 6,
+      "impact": 2,
+      "source": "platformIntelligenceModel"
+    },
+    {
+      "id": "enterprise:sustainability_esg",
+      "area": "enterprise-operating-platform",
+      "label": "Sustainability & ESG",
+      "score": 74,
+      "target": 80,
+      "gap": 6,
+      "impact": 2,
+      "source": "enterpriseOperatingPlatformModel"
+    },
+    {
+      "id": "platform:forecasting_readiness",
+      "area": "platform-intelligence",
+      "label": "Forecasting readiness",
+      "score": 75,
+      "target": 80,
+      "gap": 5,
+      "impact": 2,
+      "source": "platformIntelligenceModel"
+    },
+    {
+      "id": "production:overall",
+      "area": "production-readiness",
+      "label": "Production readiness",
+      "score": 69,
+      "target": 80,
+      "gap": 11,
+      "impact": 1,
+      "source": "productionReadinessModel"
+    },
+    {
+      "id": "enterprise:operational_benchmarking",
+      "area": "enterprise-operating-platform",
+      "label": "Operational benchmarking",
+      "score": 75,
+      "target": 80,
+      "gap": 5,
+      "impact": 1,
+      "source": "enterpriseOperatingPlatformModel"
+    },
+    {
+      "id": "enterprise:architecture_governance",
+      "area": "enterprise-operating-platform",
+      "label": "Architecture governance",
+      "score": 75,
+      "target": 80,
+      "gap": 5,
+      "impact": 1,
+      "source": "enterpriseOperatingPlatformModel"
+    },
+    {
+      "id": "platform:data_lineage",
+      "area": "platform-intelligence",
+      "label": "Data lineage platform",
+      "score": 76,
+      "target": 80,
+      "gap": 4,
+      "impact": 1,
+      "source": "platformIntelligenceModel"
+    },
+    {
+      "id": "enterprise:portfolio_management",
+      "area": "enterprise-operating-platform",
+      "label": "Portfolio management",
+      "score": 76,
+      "target": 80,
+      "gap": 4,
+      "impact": 1,
+      "source": "enterpriseOperatingPlatformModel"
+    },
+    {
+      "id": "enterprise:decision_support",
+      "area": "enterprise-operating-platform",
+      "label": "Decision support",
+      "score": 77,
+      "target": 80,
+      "gap": 3,
+      "impact": 1,
+      "source": "enterpriseOperatingPlatformModel"
+    },
+    {
+      "id": "platform:cross_domain_analytics",
+      "area": "platform-intelligence",
+      "label": "Cross-domain analytics",
+      "score": 78,
+      "target": 80,
+      "gap": 2,
+      "impact": 1,
+      "source": "platformIntelligenceModel"
+    },
+    {
+      "id": "enterprise:risk_management",
+      "area": "enterprise-operating-platform",
+      "label": "Risk management",
+      "score": 79,
+      "target": 80,
+      "gap": 1,
+      "impact": 0,
+      "source": "enterpriseOperatingPlatformModel"
+    }
+  ],
+  "sourceReports": {
+    "platform": {
+      "goal": "Platform intelligence audit — Prompts 117–136",
+      "promptsCovered": [
+        117,
+        118,
+        119,
+        120,
+        121,
+        122,
+        123,
+        124,
+        125,
+        126,
+        127,
+        128,
+        129,
+        130,
+        131,
+        132,
+        133,
+        134,
+        135,
+        136
+      ],
+      "moduleScores": {
+        "unified_artifact_registry": 100,
+        "artifact_relationship_mapping": 100,
+        "enterprise_metadata": 88,
+        "data_catalog": 98,
+        "data_lineage": 76,
+        "kpi_intelligence": 88,
+        "operational_intelligence_graph": 100,
+        "cross_domain_analytics": 78,
+        "forecasting_readiness": 75,
+        "reporting_studio": 100,
+        "tenant_health": 92,
+        "track_health": 74,
+        "executive_cockpit": 85,
+        "federation_intelligence": 73,
+        "saas_operations": 91,
+        "integration_governance": 84,
+        "api_governance": 100,
+        "platform_observability": 84,
+        "technical_debt_registry": 84,
+        "platform_convergence": 87
+      }
+    },
+    "enterprise": {
+      "goal": "Enterprise operating platform audit — Prompts 99–116",
+      "promptsCovered": [
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        112,
+        113,
+        114,
+        115,
+        116
+      ],
+      "moduleScores": {
+        "operational_benchmarking": 75,
+        "franchise_readiness": 89,
+        "track_certification": 88,
+        "risk_management": 79,
+        "business_continuity": 94,
+        "disaster_recovery": 87,
+        "enterprise_asset_registry": 100,
+        "workforce_management": 100,
+        "training_competency": 100,
+        "knowledge_management": 100,
+        "operational_playbook": 80,
+        "decision_support": 77,
+        "scenario_planning": 94,
+        "strategic_planning": 87,
+        "portfolio_management": 76,
+        "executive_governance": 85,
+        "sustainability_esg": 74,
+        "architecture_governance": 75
+      }
+    },
+    "customer": {
+      "goal": "Customer success platform — onboarding, adoption, feature utilization, health, support, renewal KPIs",
+      "kpiEvaluation": {
+        "kpis": [
+          {
+            "id": "onboardingCompletePercent",
+            "label": "Onboarding complete",
+            "value": 100,
+            "target": 80,
+            "passes": true,
+            "unit": "%"
+          },
+          {
+            "id": "adoptionScore",
+            "label": "Adoption score",
+            "value": 84,
+            "target": 70,
+            "passes": true,
+            "unit": "%"
+          },
+          {
+            "id": "activeUsers",
+            "label": "Active users",
+            "value": 58,
+            "target": 5,
+            "passes": true,
+            "unit": ""
+          },
+          {
+            "id": "featureUtilizationRate",
+            "label": "Feature utilization rate",
+            "value": 100,
+            "target": 60,
+            "passes": true,
+            "unit": "%"
+          },
+          {
+            "id": "healthScore",
+            "label": "Customer health score",
+            "value": 92,
+            "target": 75,
+            "passes": true,
+            "unit": ""
+          },
+          {
+            "id": "supportOpenItems",
+            "label": "Open support items",
+            "value": 0,
+            "target": 3,
+            "passes": true,
+            "unit": "",
+            "maxTarget": true
+          },
+          {
+            "id": "renewalReadiness",
+            "label": "Renewal readiness",
+            "value": 94,
+            "target": 70,
+            "passes": true,
+            "unit": ""
+          }
+        ],
+        "passedCount": 7,
+        "totalCount": 7,
+        "passesAll": true,
+        "renewalReady": true
+      },
+      "supportOpenItems": []
+    },
+    "maturity": {
+      "goal": "Score TrackMind operating system maturity across operations, safety, compliance, security, equine welfare, facilities, finance, AI governance, and data quality",
+      "dimensions": {
+        "operations": {
+          "score": 76,
+          "level": "Managed",
+          "levelId": "managed"
+        },
+        "safety": {
+          "score": 72,
+          "level": "Managed",
+          "levelId": "managed"
+        },
+        "compliance": {
+          "score": 100,
+          "level": "Optimizing",
+          "levelId": "optimizing"
+        },
+        "security": {
+          "score": 70,
+          "level": "Managed",
+          "levelId": "managed"
+        },
+        "equine_welfare": {
+          "score": 74,
+          "level": "Managed",
+          "levelId": "managed"
+        },
+        "facilities": {
+          "score": 76,
+          "level": "Managed",
+          "levelId": "managed"
+        },
+        "finance": {
+          "score": 72,
+          "level": "Managed",
+          "levelId": "managed"
+        },
+        "ai_governance": {
+          "score": 66,
+          "level": "Managed",
+          "levelId": "managed"
+        },
+        "data_quality": {
+          "score": 78,
+          "level": "Managed",
+          "levelId": "managed"
+        }
+      },
+      "prioritizedImprovements": [
+        {
+          "id": "TM-001",
+          "domain": "operations",
+          "priority": "P0",
+          "summary": "Pass all three operational survivability KPIs (reception, charge nurse, director).",
+          "effort": "medium"
+        },
+        {
+          "id": "TM-002",
+          "domain": "security",
+          "priority": "P0",
+          "summary": "Enforce JWT auth and org-scoped emergency settings on all API paths.",
+          "effort": "medium"
+        },
+        {
+          "id": "TM-003",
+          "domain": "data_quality",
+          "priority": "P1",
+          "summary": "Surface all four data quality risk categories in reception and whiteboard workflows.",
+          "effort": "low"
+        },
+        {
+          "id": "TM-005",
+          "domain": "ai_governance",
+          "priority": "P1",
+          "summary": "Wire human-review queue and prompt registry to all AI-assisted workflows.",
+          "effort": "medium"
+        },
+        {
+          "id": "TM-009",
+          "domain": "safety",
+          "priority": "P1",
+          "summary": "Ensure reassessment and safety attention strips pass readability audits under load.",
+          "effort": "low"
+        },
+        {
+          "id": "TM-006",
+          "domain": "compliance",
+          "priority": "P2",
+          "summary": "Complete multi-tenant readiness audit and close org-scoping blockers.",
+          "effort": "medium"
+        }
+      ]
+    },
+    "production": {
+      "grade": "staging-only",
+      "summary": {
+        "riskCount": 50,
+        "quickWinCount": 50,
+        "blockerCount": 50,
+        "criticalRiskCount": 4,
+        "criticalBlockerCount": 5,
+        "unresolvedCriticalBlockerCount": 1,
+        "unresolvedSignalBlockerIds": [],
+        "p0QuickWinCount": 4,
+        "completedQuickWins": 23,
+        "passesProductionAudit": false
+      }
+    }
+  }
+}
