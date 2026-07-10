@@ -3,21 +3,23 @@ process.env.ENABLE_MONGOOSE_EMERGENCY_OS = 'true';
 process.env.RAG_ENABLED = 'false';
 process.env.RERANK_ENABLED = 'false';
 
-const express = require('express');
-const http = require('http');
-const mongoose = require('mongoose');
-const request = require('supertest');
-const { MongoMemoryServer } = require('mongodb-memory-server');
-const { io: createSocketClient } = require('socket.io-client');
+import express from 'express';
+import http from 'http';
+import mongoose from 'mongoose';
+import request from 'supertest';
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import { io as createSocketClient } from 'socket.io-client';
 
-const { registerAllRoutes } = require('../../backend/src/api/routes-registry');
-const { registerEMSWebSocketSupport } = require('../../backend/src/api/ems.socket');
-const {
-  REQUIRED_SERVICE_NAMES,
-  checkServiceHealth,
-  initializeAllServices,
-} = require('../../backend/src/services');
-const { UnifiedPatient } = require('../../backend/src/models/unified-patient.model');
+// Dynamically imported in beforeAll, after the env vars above are set —
+// these backend modules read them at import time, and static ESM imports
+// are hoisted before any other top-level code (unlike the original CJS
+// require() calls, which ran in textual order).
+let registerAllRoutes: typeof import('../../backend/src/api/routes-registry').registerAllRoutes;
+let registerEMSWebSocketSupport: typeof import('../../backend/src/api/ems.socket').registerEMSWebSocketSupport;
+let REQUIRED_SERVICE_NAMES: typeof import('../../backend/src/services').REQUIRED_SERVICE_NAMES;
+let checkServiceHealth: typeof import('../../backend/src/services').checkServiceHealth;
+let initializeAllServices: typeof import('../../backend/src/services').initializeAllServices;
+let UnifiedPatient: typeof import('../../backend/src/models/unified-patient.model').UnifiedPatient;
 
 const TEST_AUTH_HEADER = 'Bearer integration-test-token';
 
@@ -105,6 +107,13 @@ describe('Emergency OS end-to-end integration', () => {
   let initialization: any;
 
   beforeAll(async () => {
+    ({ registerAllRoutes } = await import('../../backend/src/api/routes-registry'));
+    ({ registerEMSWebSocketSupport } = await import('../../backend/src/api/ems.socket'));
+    ({ REQUIRED_SERVICE_NAMES, checkServiceHealth, initializeAllServices } = await import(
+      '../../backend/src/services'
+    ));
+    ({ UnifiedPatient } = await import('../../backend/src/models/unified-patient.model'));
+
     mongoServer = await MongoMemoryServer.create({
       instance: {
         launchTimeout: 60000,
