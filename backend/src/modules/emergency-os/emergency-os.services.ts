@@ -41,6 +41,7 @@ import type {
 } from './emergency-os.types';
 import { ensurePatientArrivalBlock } from './patient-arrival.sync';
 import { Patient } from './entities/patient.entity';
+import { Alert } from './entities/alert.entity';
 import { EncryptionService } from '../encryption/encryption.service';
 
 function clone<T>(value: T): T {
@@ -693,7 +694,14 @@ export class EmergencyPatientService {
     @InjectRepository(Patient)
     private readonly patientRepository?: Repository<Patient>,
     @Optional() private readonly encryptionService?: EncryptionService,
-  ) {}
+    @Optional()
+    @InjectRepository(Alert)
+    private readonly alertRepository?: Repository<Alert>,
+  ) {
+    for (const alert of this.alerts) {
+      this.persistAlertToDatabase(alert);
+    }
+  }
 
   /**
    * Phase 1 of the DB migration: best-effort, non-blocking write-through to
@@ -744,6 +752,28 @@ export class EmergencyPatientService {
     });
     this.patientRepository.save(entity).catch((error) => {
       this.logger.warn(`Failed to persist patient ${patient.id} to database: ${error}`);
+    });
+  }
+
+  /**
+   * Mirrors `persistPatientToDatabase()`: best-effort, non-blocking
+   * write-through to the real `alerts` table. Called for every dispatched
+   * alert (and once per fixture-seeded alert at construction) so real data
+   * exists for a future read-cutover. Never throws.
+   */
+  private persistAlertToDatabase(alert: EmergencyAlert): void {
+    if (!this.alertRepository) return;
+    const entity = this.alertRepository.create({
+      id: alert.id,
+      severity: alert.severity,
+      title: alert.title,
+      message: alert.message,
+      patientId: alert.patientId,
+      dispatchedAt: alert.createdAt,
+      dismissed: alert.dismissed,
+    });
+    this.alertRepository.save(entity).catch((error) => {
+      this.logger.warn(`Failed to persist alert ${alert.id} to database: ${error}`);
     });
   }
 
@@ -1044,6 +1074,7 @@ export class EmergencyPatientService {
       dismissed: false,
     };
     this.alerts.unshift(alert);
+    this.persistAlertToDatabase(alert);
     this.workflowLogService.record({
       type: 'operational_alert_dispatched',
       title: input.title,

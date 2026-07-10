@@ -63,12 +63,16 @@ import { PatientFlowService } from './emergency-os.patient-flow.service';
 import { AdministrativeAutomationQueueService } from './administrative-automation-queue.service';
 import { AdministrativeAutomationTaskEntity } from './entities/administrative-automation-task.entity';
 import { Patient } from './entities/patient.entity';
+import { Room } from './entities/room.entity';
+import { Staff } from './entities/staff.entity';
+import { Alert } from './entities/alert.entity';
+import { EmergencyReferenceDataSeedService } from './emergency-reference-data.seed.service';
 import { WorkflowOrchestrationService } from './emergency-os.workflow-orchestration.service';
 import { EmergencyOperatingSurfacesService } from './emergency-os.operating-surfaces.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([AdministrativeAutomationTaskEntity, Patient]),
+    TypeOrmModule.forFeature([AdministrativeAutomationTaskEntity, Patient, Room, Staff, Alert]),
     ConfigModule,
     AuthModule,
     AuditModule,
@@ -148,6 +152,7 @@ import { EmergencyOperatingSurfacesService } from './emergency-os.operating-surf
     AdministrativeAutomationQueueService,
     WorkflowOrchestrationService,
     EmergencyOperatingSurfacesService,
+    EmergencyReferenceDataSeedService,
   ],
   exports: [EmergencyPatientService, ReferralService, EMSIntakeService],
 })
