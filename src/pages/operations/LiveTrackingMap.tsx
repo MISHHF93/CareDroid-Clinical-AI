@@ -153,7 +153,7 @@ export default function LiveTrackingMap() {
       {!loading && !error ? (
         <div className="live-map__layout">
           <section className="live-map__map-shell" aria-label="Unified tracking canvas">
-            <div className="live-map-canvas" role="img" aria-label="Fleet and IoT tracking map">
+            <div className="live-map-canvas" role="group" aria-label="Fleet and IoT tracking map — contains selectable markers">
               <svg viewBox="0 0 100 100" className="live-map-canvas__svg" preserveAspectRatio="xMidYMid meet">
                 {visibleMarkers.map((marker) => {
                   const selected = marker.id === selectedMarkerId;

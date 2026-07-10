@@ -169,8 +169,8 @@ export default function FleetLiveMap() {
           <section className="fleet-live-map__map-shell" aria-label="Fleet map canvas">
             <div
               className="fleet-live-map-canvas fleet-map-canvas"
-              role="img"
-              aria-label="Fleet vehicle and route map"
+              role="group"
+              aria-label="Fleet vehicle and route map — contains selectable vehicle markers"
             >
               <svg viewBox="0 0 100 100" className="fleet-live-map-canvas__svg" preserveAspectRatio="xMidYMid meet">
                 {gridLines.map((line, index) => (

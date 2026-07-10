@@ -5,6 +5,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { axe, toHaveNoViolations } from 'jest-axe';
+
+expect.extend(toHaveNoViolations);
 
 import Calculators from '../pages/tools/Calculators';
 import ToolsOverview from '../pages/tools/ToolsOverview';
@@ -879,6 +882,59 @@ describe('Route pages smoke — non-empty render', () => {
       expectNonEmptyPage(container);
     },
     15_000
+  );
+});
+
+/**
+ * First automated accessibility coverage for the app — covers the full CORE_ROUTE_SMOKE set except
+ * 'calculators-library-filter', which renders 250+ tool cards and takes 80s+ in jsdom regardless of
+ * timeout — needs the Playwright/axe-core suite (e2e/a11y.spec.mjs) for real-browser coverage instead.
+ */
+const A11Y_SMOKE_ROUTES = CORE_ROUTE_SMOKE.filter((route) => route.id !== 'calculators-library-filter');
+
+describe('Route pages smoke — accessibility (axe, WCAG 2.1 A/AA)', () => {
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    Element.prototype.scrollTo = vi.fn();
+    mockCompactViewport(false);
+    const { buildFleetDashboardSnapshot } =
+      await import('../data/testHelpers/fleetToolsTestFixtures');
+    mockFetchFleetCommandSnapshot.mockResolvedValue(buildFleetDashboardSnapshot());
+  });
+
+  it.each(A11Y_SMOKE_ROUTES)(
+    '$id at $path has no serious/critical WCAG 2.1 A/AA violations',
+    async (route) => {
+      const { id, path, match, heading } = route;
+      const Page = PAGE_BY_ID[id];
+      const { container } = renderRoute(path, Page);
+
+      if (match === 'composer') {
+        await screen.findByPlaceholderText(/ask anything clinical/i);
+      } else if (match === 'fleet-summary') {
+        await waitFor(() => {
+          expect(screen.getByRole('heading', { name: /fleet summary/i })).toBeInTheDocument();
+        });
+      } else {
+        await screen.findByRole('heading', { level: 1, name: heading });
+      }
+
+      const results = await axe(container, {
+        runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] },
+      });
+
+      const seriousOrCritical = results.violations.filter(
+        (v) => v.impact === 'serious' || v.impact === 'critical'
+      );
+
+      expect(
+        seriousOrCritical,
+        seriousOrCritical
+          .map((v) => `${v.id} (${v.impact}, ${v.nodes.length} node(s)): ${v.help} — ${v.helpUrl}`)
+          .join('\n')
+      ).toEqual([]);
+    },
+    30_000
   );
 });
 

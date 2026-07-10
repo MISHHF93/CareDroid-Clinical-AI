@@ -283,8 +283,8 @@ export default function MedicalIotDashboard() {
         <section className="medical-iot-page__map-shell" aria-label="Medical IoT device map canvas">
           <div
             className="medical-iot-map-canvas"
-            role="img"
-            aria-label="Medical IoT device position map"
+            role="group"
+            aria-label="Medical IoT device position map — contains selectable device markers"
           >
             <svg viewBox="0 0 100 100" className="medical-iot-map-canvas__svg" preserveAspectRatio="xMidYMid meet">
               {gridLines.map((line, index) => (

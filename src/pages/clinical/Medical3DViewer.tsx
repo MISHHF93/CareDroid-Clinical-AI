@@ -81,8 +81,8 @@ export default function Medical3DViewer() {
           <svg
             className="medical-3d-page__canvas"
             viewBox="0 0 100 100"
-            role="img"
-            aria-label="Demo anatomy silhouette with selectable model markers"
+            role="group"
+            aria-label="Demo anatomy silhouette — contains selectable model markers"
           >
             <rect x="0" y="0" width="100" height="100" fill="var(--app-surface-muted, #f1f5f9)" />
             <ellipse cx="50" cy="22" rx="12" ry="14" fill="var(--app-chart-3)" opacity="0.35" />
