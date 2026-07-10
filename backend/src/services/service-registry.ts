@@ -33,6 +33,13 @@ import { surgeCapacityService } from './surge-capacity.service';
 import { wearableRPMService } from './wearable-rpm.service';
 
 const workflowActionLogService = new WorkflowActionLogService();
+// Manually constructed outside Nest DI, so it never receives a Patient
+// repository (the constructor's 3rd param is optional for exactly this
+// reason) and stays in-memory-only. This instance only feeds the generic
+// lifecycle/health-probe registry below (initializeAllServices/
+// checkServiceHealth) via patientJourneyService/queueIntelligenceService/
+// realTimeSimulationService — no real controller reads or writes patient
+// data through this registry, so it doesn't need database persistence.
 const emergencyPatientService = new EmergencyPatientService(workflowActionLogService);
 
 export const patientJourneyService = new PatientJourneyService(emergencyPatientService);

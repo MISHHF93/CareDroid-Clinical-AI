@@ -164,6 +164,19 @@ describe('EncryptionService', () => {
     });
   });
 
+  describe('Buffer helpers (encryptToBuffer / decryptFromBuffer)', () => {
+    it('round-trips a plaintext value through a storage-ready Buffer', () => {
+      const plaintext = 'patient.email@example.com';
+      const buffer = service.encryptToBuffer(plaintext);
+
+      expect(Buffer.isBuffer(buffer)).toBe(true);
+      expect(buffer.toString('utf8')).not.toContain(plaintext);
+
+      const decrypted = service.decryptFromBuffer(buffer);
+      expect(decrypted).toBe(plaintext);
+    });
+  });
+
   describe('Batch Operations', () => {
     it('should encrypt multiple values', () => {
       const plaintexts = ['email@example.com', '+1-555-0123', 'License#ABC123XY'];

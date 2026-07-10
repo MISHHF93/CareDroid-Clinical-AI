@@ -6,9 +6,6 @@ import {
   UpdateDateColumn,
   OneToOne,
   OneToMany,
-  BeforeInsert,
-  BeforeUpdate,
-  AfterLoad,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { UserProfile } from './user-profile.entity';
@@ -16,7 +13,6 @@ import { OAuthAccount } from './oauth-account.entity';
 import { TwoFactor } from '../../two-factor/entities/two-factor.entity';
 import { Subscription } from '../../subscriptions/entities/subscription.entity';
 import { AuditLog } from '../../audit/entities/audit-log.entity';
-import { EncryptionService } from '../../encryption/encryption.service';
 
 export enum UserRole {
   PHYSICIAN = 'physician',
@@ -110,37 +106,4 @@ export class User {
 
   @OneToMany(() => AuditLog, (log) => log.user)
   auditLogs: AuditLog[];
-
-  /**
-   * BeforeInsert hook: Encrypt PHI fields before saving to database
-   * Called whenever a new User is inserted
-   */
-  @BeforeInsert()
-  async encryptPhiBeforeInsert(_encryptionService?: EncryptionService) {
-    // Encryption service will be injected via hooks decorator in UsersService
-    // For now, this is a placeholder that will be implemented at the repository level
-    this.phiFieldsEncrypted = false;
-  }
-
-  /**
-   * BeforeUpdate hook: Re-encrypt PHI fields during updates
-   * Called whenever a User is updated
-   */
-  @BeforeUpdate()
-  async encryptPhiBeforeUpdate(_encryptionService?: EncryptionService) {
-    // Encryption service will be injected via hooks decorator in UsersService
-    // For now, this is a placeholder that will be implemented at the repository level
-    this.phiFieldsEncrypted = false;
-  }
-
-  /**
-   * AfterLoad hook: Decrypt PHI fields after loading from database
-   * Called whenever entities are loaded from the database
-   */
-  @AfterLoad()
-  async decryptPhiAfterLoad() {
-    // Decryption will be handled at the service level
-    // This is a placeholder for automatic decryption logic
-    this.phoneDecrypted = undefined;
-  }
 }

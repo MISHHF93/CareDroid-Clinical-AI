@@ -14,6 +14,7 @@ import { WorkspaceMembership } from '../workspaces/entities/workspace-membership
 import { AuditService } from '../audit/audit.service';
 import { TwoFactorService } from '../two-factor/two-factor.service';
 import { EmailService } from '../email/email.service';
+import { EncryptionService } from '../encryption/encryption.service';
 import * as bcrypt from 'bcrypt';
 
 jest.mock('bcrypt');
@@ -104,6 +105,13 @@ describe('AuthService', () => {
     sendVerificationEmail: jest.fn(),
   };
 
+  const mockEncryptionService = {
+    encryptToBuffer: jest.fn((plaintext: string) => Buffer.from(`encrypted:${plaintext}`)),
+    decryptFromBuffer: jest.fn((buffer: Buffer) =>
+      buffer.toString('utf8').replace('encrypted:', ''),
+    ),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -159,6 +167,10 @@ describe('AuthService', () => {
         {
           provide: TwoFactorService,
           useValue: mockTwoFactorService,
+        },
+        {
+          provide: EncryptionService,
+          useValue: mockEncryptionService,
         },
       ],
     }).compile();
@@ -289,7 +301,16 @@ describe('AuthService', () => {
       };
 
       const hashedPassword = '$2b$10$hashedpassword';
-      const newUser = {
+      const newUser: {
+        id: string;
+        email: string;
+        password: string;
+        emailVerified: boolean;
+        isActive: boolean;
+        role: string;
+        emailEncrypted?: Buffer;
+        phiFieldsEncrypted?: boolean;
+      } = {
         id: '2',
         email: registerDto.email,
         password: hashedPassword,
@@ -318,6 +339,13 @@ describe('AuthService', () => {
         expect.objectContaining({ role: UserRole.STUDENT }),
       );
       expect(mockUserRepository.save).toHaveBeenCalled();
+
+      // Encrypted at-rest copy must be populated before save, without
+      // touching the plaintext email used for login lookups.
+      expect(mockEncryptionService.encryptToBuffer).toHaveBeenCalledWith(registerDto.email);
+      expect(newUser.emailEncrypted).toEqual(Buffer.from(`encrypted:${registerDto.email}`));
+      expect(newUser.phiFieldsEncrypted).toBe(true);
+      expect(newUser.email).toBe(registerDto.email);
     });
 
     it('should throw error when email already exists', async () => {

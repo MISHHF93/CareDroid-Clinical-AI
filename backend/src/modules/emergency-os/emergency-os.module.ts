@@ -1,9 +1,11 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
+import type { StringValue } from 'ms';
 import { AuditModule } from '../audit/audit.module';
 import { AuthModule } from '../auth/auth.module';
+import { EncryptionModule } from '../encryption/encryption.module';
 import { ChatModule } from '../chat/chat.module';
 import { PlatformAssetsModule } from '../platform-assets/platform-assets.module';
 import { CollaborationHubModule } from '../collaboration-hub/collaboration-hub.module';
@@ -60,16 +62,18 @@ import { EmergencyPatientAuditService } from './emergency-patient-audit.service'
 import { PatientFlowService } from './emergency-os.patient-flow.service';
 import { AdministrativeAutomationQueueService } from './administrative-automation-queue.service';
 import { AdministrativeAutomationTaskEntity } from './entities/administrative-automation-task.entity';
+import { Patient } from './entities/patient.entity';
 import { WorkflowOrchestrationService } from './emergency-os.workflow-orchestration.service';
 import { EmergencyOperatingSurfacesService } from './emergency-os.operating-surfaces.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([AdministrativeAutomationTaskEntity]),
+    TypeOrmModule.forFeature([AdministrativeAutomationTaskEntity, Patient]),
     ConfigModule,
     AuthModule,
     AuditModule,
-    ChatModule,
+    EncryptionModule,
+    forwardRef(() => ChatModule),
     PlatformAssetsModule,
     CollaborationHubModule,
     JwtModule.registerAsync({
@@ -84,7 +88,7 @@ import { EmergencyOperatingSurfacesService } from './emergency-os.operating-surf
         return {
           secret: config?.secret,
           signOptions: {
-            expiresIn: config?.accessTokenExpiry,
+            expiresIn: config?.accessTokenExpiry as StringValue | undefined,
             issuer: config?.issuer,
             audience: config?.audience,
           },
@@ -145,5 +149,6 @@ import { EmergencyOperatingSurfacesService } from './emergency-os.operating-surf
     WorkflowOrchestrationService,
     EmergencyOperatingSurfacesService,
   ],
+  exports: [EmergencyPatientService, ReferralService, EMSIntakeService],
 })
 export class EmergencyOsModule {}

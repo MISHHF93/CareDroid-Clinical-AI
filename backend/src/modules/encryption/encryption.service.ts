@@ -163,6 +163,27 @@ export class EncryptionService {
   }
 
   /**
+   * Encrypt a plaintext value into a storage-ready Buffer, for columns
+   * typed as `blob`/`bytea` (e.g. `emailEncrypted`, `phoneEncrypted`).
+   *
+   * @param plaintext - Data to encrypt
+   * @returns Buffer containing the JSON-serialized EncryptedData
+   */
+  encryptToBuffer(plaintext: string): Buffer {
+    return Buffer.from(JSON.stringify(this.encrypt(plaintext)));
+  }
+
+  /**
+   * Decrypt a Buffer produced by encryptToBuffer() back to plaintext.
+   *
+   * @param buffer - Buffer containing JSON-serialized EncryptedData
+   * @returns Decrypted plaintext
+   */
+  decryptFromBuffer(buffer: Buffer): string {
+    return this.decrypt(JSON.parse(buffer.toString('utf8')) as EncryptedData);
+  }
+
+  /**
    * Derive a key from master key and salt using scrypt
    * Scrypt is memory-hard, resisting GPU/ASIC attacks
    *

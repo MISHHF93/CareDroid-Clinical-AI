@@ -35,6 +35,7 @@ import { AuditService } from '../audit/audit.service';
 import { AuditAction } from '../audit/entities/audit-log.entity';
 import { TwoFactorService } from '../two-factor/two-factor.service';
 import { EmailService } from '../email/email.service';
+import { EncryptionService } from '../encryption/encryption.service';
 
 @Injectable()
 export class AuthService {
@@ -59,8 +60,20 @@ export class AuthService {
     private readonly configService: ConfigService,
     private readonly auditService: AuditService,
     private readonly twoFactorService: TwoFactorService,
+    private readonly encryptionService: EncryptionService,
     @Optional() private readonly emailService?: EmailService,
   ) {}
+
+  /**
+   * Populate the encrypted at-rest copy of the user's email. The plaintext
+   * `email` column is untouched and remains the source of truth for login
+   * lookups (`WHERE email = ?`) — this only adds the genuine encrypted copy
+   * that `emailEncrypted` was always meant to hold.
+   */
+  private applyEmailEncryption(user: User): void {
+    user.emailEncrypted = this.encryptionService.encryptToBuffer(user.email);
+    user.phiFieldsEncrypted = true;
+  }
 
   private getFrontendBaseUrl(): string {
     const serverConfig = this.configService.get<any>('server') || {};
@@ -108,6 +121,7 @@ export class AuthService {
       role: UserRole.STUDENT,
     });
 
+    this.applyEmailEncryption(user);
     await this.userRepository.save(user);
 
     // Create profile
@@ -219,6 +233,7 @@ export class AuthService {
         emailVerified: true, // OAuth providers verify emails
       });
 
+      this.applyEmailEncryption(user);
       await this.userRepository.save(user);
 
       // Create profile
@@ -319,6 +334,7 @@ export class AuthService {
         role: UserRole.PHYSICIAN,
         isActive: true,
       });
+      this.applyEmailEncryption(user);
       await this.userRepository.save(user);
 
       const profile = this.profileRepository.create({

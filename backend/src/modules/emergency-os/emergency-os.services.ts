@@ -1,4 +1,6 @@
-import { Injectable, Optional } from '@nestjs/common';
+import { Injectable, Logger, Optional } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import type { Repository } from 'typeorm';
 import {
   calculateEmergencyOsCapacity,
   type EmergencyOsCapacityThresholds,
@@ -38,6 +40,8 @@ import type {
   WorkflowActionType,
 } from './emergency-os.types';
 import { ensurePatientArrivalBlock } from './patient-arrival.sync';
+import { Patient } from './entities/patient.entity';
+import { EncryptionService } from '../encryption/encryption.service';
 
 function clone<T>(value: T): T {
   return JSON.parse(JSON.stringify(value));
@@ -614,7 +618,11 @@ export class WorkflowActionLogService {
         .join(' ')
         .toLowerCase();
       if (log.type === 'journey_state_changed' && dischargeHeuristicText.includes('discharge')) {
-        await this.collaborationHubService.archivePatientThread(organizationId, log.patientId, 'discharge');
+        await this.collaborationHubService.archivePatientThread(
+          organizationId,
+          log.patientId,
+          'discharge',
+        );
       }
     }
 
@@ -671,6 +679,7 @@ export class WorkflowActionLogService {
 
 @Injectable()
 export class EmergencyPatientService {
+  private readonly logger = new Logger(EmergencyPatientService.name);
   private readonly patients: EmergencyPatient[] = clone(emergencyPatientsFixture);
   private readonly rooms: EmergencyRoom[] = clone(emergencyRoomsFixture);
   private readonly staff: EmergencyStaff[] = clone(emergencyStaffFixture);
@@ -680,7 +689,63 @@ export class EmergencyPatientService {
   constructor(
     private readonly workflowLogService: WorkflowActionLogService,
     @Optional() private readonly realtimeService?: EmergencyRealtimeService,
+    @Optional()
+    @InjectRepository(Patient)
+    private readonly patientRepository?: Repository<Patient>,
+    @Optional() private readonly encryptionService?: EncryptionService,
   ) {}
+
+  /**
+   * Phase 1 of the DB migration: best-effort, non-blocking write-through to
+   * the real `patients` table, called from every mutator (create/update,
+   * state transitions, staff assignment, notes, escalation). Reads still
+   * come from the in-memory array — this only keeps the table current so
+   * real data exists to cut reads over to in a later phase. Never throws;
+   * a failed write here must not break the synchronous in-memory response.
+   */
+  private persistPatientToDatabase(patient: EmergencyPatient): void {
+    if (!this.patientRepository) return;
+    const piiFieldsEncrypted = Boolean(this.encryptionService);
+    const entity = this.patientRepository.create({
+      id: patient.id,
+      mrn: patient.mrn,
+      mrnEncrypted: this.encryptionService?.encryptToBuffer(patient.mrn),
+      firstName: patient.firstName,
+      firstNameEncrypted: this.encryptionService?.encryptToBuffer(patient.firstName),
+      lastName: patient.lastName,
+      lastNameEncrypted: this.encryptionService?.encryptToBuffer(patient.lastName),
+      dob: patient.dob,
+      dobEncrypted: this.encryptionService?.encryptToBuffer(patient.dob),
+      piiFieldsEncrypted,
+      age: patient.age,
+      sex: patient.sex,
+      arrivalTime: patient.arrivalTime,
+      triageTime: patient.triageTime,
+      chiefComplaint: patient.chiefComplaint,
+      complaintCategory: patient.complaintCategory,
+      state: patient.state,
+      priority: patient.priority,
+      vitals: patient.vitals,
+      flags: patient.flags,
+      assignedStaffId: patient.assignedStaffId,
+      roomId: patient.roomId,
+      notes: patient.notes,
+      timeline: patient.timeline,
+      triageAssist: patient.triageAssist,
+      triageAssistGeneratedAt: patient.triageAssistGeneratedAt,
+      arrivalMode: patient.arrivalMode,
+      registrationStatus: patient.registrationStatus,
+      triagePending: patient.triagePending,
+      firstContactAt: patient.firstContactAt,
+      queueDestination: patient.queueDestination,
+      arrival: patient.arrival,
+      quickSafetyFlags: patient.quickSafetyFlags,
+      highRiskComplaintFlags: patient.highRiskComplaintFlags,
+    });
+    this.patientRepository.save(entity).catch((error) => {
+      this.logger.warn(`Failed to persist patient ${patient.id} to database: ${error}`);
+    });
+  }
 
   private isEmsPatient(patient: EmergencyPatient): boolean {
     return (
@@ -715,6 +780,24 @@ export class EmergencyPatientService {
 
   listAlerts(): EmergencyAlert[] {
     return clone(this.alerts);
+  }
+
+  getPatient(patientId: string): EmergencyPatient | undefined {
+    return clone(this.patients.find((patient) => patient.id === patientId));
+  }
+
+  updatePatient(patientId: string, patch: Partial<EmergencyPatient>): EmergencyPatient {
+    const index = this.patients.findIndex((patient) => patient.id === patientId);
+    if (index === -1) throw new Error(`Emergency patient ${patientId} not found`);
+    this.patients[index] = {
+      ...this.patients[index],
+      ...patch,
+      id: this.patients[index].id,
+    };
+    const updated = clone(this.patients[index]);
+    this.persistPatientToDatabase(updated);
+    this.publishPatientBoardRealtime('patient_updated', updated, updated);
+    return updated;
   }
 
   createPatient(input: Partial<EmergencyPatient>): EmergencyPatient {
@@ -780,6 +863,7 @@ export class EmergencyPatientService {
       },
     });
     const created = clone(patient);
+    this.persistPatientToDatabase(created);
     this.publishPatientBoardRealtime('patient_created', created, created);
     return created;
   }
@@ -847,6 +931,7 @@ export class EmergencyPatientService {
     }
 
     const updated = clone(this.patients[index]);
+    this.persistPatientToDatabase(updated);
     this.publishPatientBoardRealtime(
       'journey_state_changed',
       {
@@ -868,7 +953,9 @@ export class EmergencyPatientService {
       ...this.patients[index],
       ...patch,
     };
-    return clone(this.patients[index]);
+    const updated = clone(this.patients[index]);
+    this.persistPatientToDatabase(updated);
+    return updated;
   }
 
   assignStaffToPatient(
@@ -893,7 +980,12 @@ export class EmergencyPatientService {
       metadata: { staffId },
     });
     const updated = clone(this.patients[index]);
-    this.publishPatientBoardRealtime('staff_assigned', { patientId, staffId, patient: updated }, updated);
+    this.persistPatientToDatabase(updated);
+    this.publishPatientBoardRealtime(
+      'staff_assigned',
+      { patientId, staffId, patient: updated },
+      updated,
+    );
     return updated;
   }
 
@@ -925,7 +1017,12 @@ export class EmergencyPatientService {
       metadata: { noteId: note.id },
     });
     const updated = clone(this.patients[index]);
-    this.publishPatientBoardRealtime('patient_note_added', { patientId, note, patient: updated }, updated);
+    this.persistPatientToDatabase(updated);
+    this.publishPatientBoardRealtime(
+      'patient_note_added',
+      { patientId, note, patient: updated },
+      updated,
+    );
     return updated;
   }
 
@@ -990,6 +1087,7 @@ export class EmergencyPatientService {
       severity: 'Critical',
     });
     const updated = clone(this.patients[index]);
+    this.persistPatientToDatabase(updated);
     this.publishPatientBoardRealtime('patient_escalated', { patientId, patient: updated }, updated);
     return updated;
   }
@@ -1757,11 +1855,7 @@ export class EDCopilotService {
     });
   }
 
-  processQuery(input: {
-    query?: string;
-    user_role?: string;
-    context?: Record<string, unknown>;
-  }) {
+  processQuery(input: { query?: string; user_role?: string; context?: Record<string, unknown> }) {
     const query = String(input.query || '').trim();
     const lowerQuery = query.toLowerCase();
     const patients = this.patientService.listPatients();
@@ -1771,7 +1865,8 @@ export class EDCopilotService {
     );
     const emsPatients = patients.filter(
       (patient) =>
-        patient.flags.includes('EMSArrival') || /ems|ambulance|pre-arrival/i.test(patient.chiefComplaint),
+        patient.flags.includes('EMSArrival') ||
+        /ems|ambulance|pre-arrival/i.test(patient.chiefComplaint),
     );
     let response =
       'Ask about longest wait, reassessment queue, EMS inbound, current capacity, or major clinical workflows.';
@@ -1810,7 +1905,10 @@ export class EDCopilotService {
       requiresReview = capacity.band !== 'Green';
     } else if (lowerQuery.includes('chest pain')) {
       response = `Chest pain workflow: ECG within 10 minutes, troponin, aspirin if not contraindicated, and clinician-directed risk stratification. ${HUMAN_REVIEW_DISCLAIMER}`;
-      data = { protocol: 'chest_pain', steps: ['ECG', 'Troponin', 'Aspirin', 'Risk stratification'] };
+      data = {
+        protocol: 'chest_pain',
+        steps: ['ECG', 'Troponin', 'Aspirin', 'Risk stratification'],
+      };
       requiresReview = true;
     } else if (lowerQuery.includes('sepsis')) {
       response = `Sepsis workflow: lactate, blood cultures before antibiotics, broad-spectrum antibiotics, fluids as appropriate, and escalation for shock. ${HUMAN_REVIEW_DISCLAIMER}`;
