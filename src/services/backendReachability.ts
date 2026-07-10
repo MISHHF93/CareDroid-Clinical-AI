@@ -37,7 +37,7 @@ export function isBackendKnownOffline() {
   return cache.reachable === false && Date.now() - cache.at < CACHE_MS;
 }
 
-export async function probeBackendReachability(options: any = {}) {
+export async function probeBackendReachability(options: any = {}): Promise<boolean> {
   const force = Boolean(options.force);
   const now = Date.now();
   if (!force && cache.reachable !== null && now - cache.at < CACHE_MS) {
@@ -60,7 +60,7 @@ export async function probeBackendReachability(options: any = {}) {
     cache = { at: now, reachable: false };
   }
 
-  return cache.reachable;
+  return Boolean(cache.reachable);
 }
 
 /** One-shot startup probe so dev API calls can short-circuit before ERR_CONNECTION_REFUSED. */

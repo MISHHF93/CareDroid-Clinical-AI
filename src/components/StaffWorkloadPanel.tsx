@@ -209,12 +209,12 @@ export default function StaffWorkloadPanel({ open, onClose }: StaffWorkloadPanel
     void reassignPatient(patient, fromStaff, toStaff);
   };
 
-  const applySuggestion = (suggestion: StaffBalanceSuggestion) => {
+  const applySuggestion = async (suggestion: StaffBalanceSuggestion) => {
     const patient = patients.find((candidate) => candidate.id === suggestion.patientId);
     const fromStaff = activeStaff.find((candidate) => candidate.id === suggestion.fromStaffId);
     const toStaff = activeStaff.find((candidate) => candidate.id === suggestion.toStaffId);
     if (!patient || !fromStaff || !toStaff) return;
-    if (reassignPatient(patient, fromStaff, toStaff)) {
+    if (await reassignPatient(patient, fromStaff, toStaff)) {
       setAiSuggestions((current) => current.filter((item) => item.id !== suggestion.id));
     }
   };

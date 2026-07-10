@@ -16,7 +16,7 @@ function HospitalJourneyCommandBar() {
   }
 
   const activeIndex = ED_JOURNEY_PHASES.findIndex((phase) => phase.id === hospitalOs.phaseId);
-  const metrics = hospitalOs.metrics ?? { activePatients: 0, inboundEms: 0 };
+  const metrics = hospitalOs.snapshot.metrics ?? { activePatients: 0, inboundEms: 0 };
   const phaseSummaries = new Map(
     (hospitalOs.snapshot?.phases ?? []).map((phase) => [phase.phaseId, phase]),
   );

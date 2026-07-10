@@ -138,8 +138,9 @@ function uniq(values) {
   return [...new Set(source.flatMap(asArray).map((value) => value.trim()).filter(Boolean))];
 }
 
-function firstKnown(...values) {
-  return values.find((value) => value !== undefined && value !== null && value !== '') || UNKNOWN;
+function firstKnown(...values: unknown[]): string {
+  const found = values.find((value) => value !== undefined && value !== null && value !== '');
+  return (found as string | undefined) ?? UNKNOWN;
 }
 
 function slug(value) {

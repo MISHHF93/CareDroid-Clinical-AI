@@ -14,7 +14,7 @@ import { startWorkflowTrace } from '../services/observabilityTrace';
 const REFRESH_DEBOUNCE_MS = 1_500;
 const MAX_PENDING_EVENTS = 24;
 
-let refreshTimerId: ReturnType<typeof setTimeout> | null = null;
+let refreshTimerId: number | null = null;
 let lastBackendEventType: string | undefined;
 const pendingEvents: OperationalInputEvent[] = [];
 
@@ -161,7 +161,7 @@ export async function refreshUnifiedOperationalIntelligenceFromBackend(
       await applyUnifiedSnapshot(snapshot, source, eventType);
       store.setRefreshError('');
       store.setIsRefreshing(false);
-      trace.end('success', { mode: source, insightCount: snapshot.insights?.length ?? 0 });
+      trace.end('success', { mode: source, insightCount: snapshot.recommendations?.length ?? 0 });
       return snapshot;
     }
 

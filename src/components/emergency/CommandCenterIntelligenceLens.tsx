@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type ReactElement } from 'react';
 import { Link } from 'react-router-dom';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import {
@@ -67,7 +67,7 @@ function ExecutiveLensPanel() {
           ? `${analyticsData.shift.avgWaitMinutes} min`
           : '—',
       );
-      setPlatformStatus(healthBundle.saas.data?.summary?.overallStatus || 'unknown');
+      setPlatformStatus(healthBundle.saas.data?.status || 'unknown');
       setSurgeLevel((surgeResult as { ok?: boolean; data?: { level?: string } }).ok
         ? String((surgeResult as { data?: { level?: string } }).data?.level || 'normal')
         : 'unknown');
@@ -105,7 +105,7 @@ function AiLensPanel() {
     setLoading(true);
     try {
       const snapshot = await fetchAiCommandCenterSnapshot();
-      setExpertsActive(String(snapshot.experts?.filter((expert) => expert.status === 'active').length ?? snapshot.health.activeExperts));
+      setExpertsActive(String(snapshot.experts?.filter((expert) => expert.active).length ?? snapshot.health.activeExperts));
       setModelHealth(snapshot.health.label || snapshot.health.status || 'unknown');
       setPendingReviews(String(snapshot.health.failedBenchmarks ?? snapshot.warnings.length));
       setDailyCost(
@@ -156,7 +156,7 @@ function PredictiveLensPanel() {
   );
 }
 
-const PANEL_BY_VIEW: Record<CommandCenterIntelligenceView, () => JSX.Element> = {
+const PANEL_BY_VIEW: Record<CommandCenterIntelligenceView, () => ReactElement> = {
   executive: ExecutiveLensPanel,
   ai: AiLensPanel,
   predictive: PredictiveLensPanel,

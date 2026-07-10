@@ -423,11 +423,11 @@ const isProbablyHtml = (body = '', contentType = '') => {
   return normalizedType.includes('text/html') || trimmed.startsWith('<!doctype') || trimmed.startsWith('<html');
 };
 
-export const parseApiResponse = async <T = any>(
+export const parseApiResponse = async <T = Record<string, any>>(
   response,
-  options: { fallback?: T | null } = {},
+  options: { fallback?: Record<string, any> | null } = {},
 ): Promise<T> => {
-  const fallback = options.fallback !== undefined ? options.fallback : ({} as T);
+  const fallback = (options.fallback !== undefined ? options.fallback : {}) as T;
   if (!response || typeof response.text !== 'function') {
     throw new ApiResponseError('The API did not return a valid response. Check backend availability or the request mock.', {
       status: response?.status || 0,

@@ -68,7 +68,11 @@ const Settings = () => {
   const [identityStatus, setIdentityStatus] = useState('');
   const [tenantIsolationAudit, setTenantIsolationAudit] = useState<any>(null);
   const [tenantIsolationStatus, setTenantIsolationStatus] = useState('');
-  const [auditLogState, setAuditLogState] = useState({
+  const [auditLogState, setAuditLogState] = useState<{
+    status: string;
+    message: string;
+    logs: any[];
+  }>({
     status: 'loading',
     message: '',
     logs: [],

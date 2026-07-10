@@ -38,7 +38,7 @@ function formatClock(minutes: number) {
 }
 
 export default function RouteOptimizer() {
-  const [depotLabel, setDepotLabel] = useState(FLEET_ROUTE_PRIORITY_INPUT.depotLabel);
+  const [depotLabel, setDepotLabel] = useState<string>(FLEET_ROUTE_PRIORITY_INPUT.depotLabel);
   const [routeStart, setRouteStart] = useState('08:00');
   const [trafficLevel, setTrafficLevel] = useState(
     FLEET_ROUTE_PRIORITY_INPUT.trafficConstraints.level,

@@ -57,7 +57,7 @@ export function useOperationsHubLiveFeeds({
         medicalIot: medicalIotResult,
         fleet: fleetResult,
         platformHealth,
-        clinicalAlerts,
+        clinicalAlerts: clinicalAlerts as OperationsLiveFeeds['clinicalAlerts'],
       });
       setLastRefreshed(new Date());
     } finally {

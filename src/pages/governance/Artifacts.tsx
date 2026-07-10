@@ -28,7 +28,7 @@ export default function Artifacts() {
   const resonance = useMemo(() => createArtifactResonanceService(catalog), [catalog]);
 
   const typeOptions = useMemo(() => {
-    const types = new Set(catalog.map((artifact) => artifact.type));
+    const types = new Set((catalog as { type: string }[]).map((artifact) => artifact.type));
     return [...types].sort();
   }, [catalog]);
 

@@ -12,8 +12,8 @@ import './ApiStateBanner.css';
 export default function ApiStateBanner({
   loading = false,
   loadingMessage = 'Loading…',
-  error = null,
-  unsupportedMessage = null,
+  error = null as string | null,
+  unsupportedMessage = null as string | null,
   onRetry = undefined as any,
 }) {
   if (loading) {

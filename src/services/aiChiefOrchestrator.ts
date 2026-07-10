@@ -333,7 +333,7 @@ export async function requestAiChiefStructured(
       source: 'aiChiefOrchestrator',
       patientId: readPatientId(request.input as Record<string, unknown>),
       summary: `AI Chief structured request (${request.intent || 'general'})`,
-      metadata: { intent: request.intent, requestType: request.requestType },
+      metadata: { intent: request.intent },
     },
     async () => {
       const prepared = enrichStructuredRequest(request);

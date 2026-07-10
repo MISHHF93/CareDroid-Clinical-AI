@@ -8,19 +8,19 @@ export async function fetchMyAuditLogs(limit = 5) {
 
     if (!response.ok) {
       return {
-        ok: false,
+        ok: false as const,
         message: data?.message || getApiErrorMessage(null, response),
         raw: data,
       };
     }
 
     return {
-      ok: true,
+      ok: true as const,
       logs: Array.isArray(data?.data) ? data.data : [],
       total: Number(data?.total || 0),
     };
   } catch (error: any) {
-    return { ok: false, message: getApiErrorMessage(error), logs: [], total: 0 };
+    return { ok: false as const, message: getApiErrorMessage(error), logs: [], total: 0 };
   }
 }
 
@@ -35,18 +35,18 @@ export async function fetchPhiAccessLogs({ startDate, endDate }: any = {}) {
 
     if (!response.ok) {
       return {
-        ok: false,
+        ok: false as const,
         message: data?.message || getApiErrorMessage(null, response),
         raw: data,
       };
     }
 
     return {
-      ok: true,
+      ok: true as const,
       logs: Array.isArray(data?.data) ? data.data : [],
       total: Number(data?.total || 0),
     };
   } catch (error: any) {
-    return { ok: false, message: getApiErrorMessage(error), logs: [], total: 0 };
+    return { ok: false as const, message: getApiErrorMessage(error), logs: [], total: 0 };
   }
 }

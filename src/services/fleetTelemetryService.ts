@@ -274,7 +274,7 @@ function computeSummary(vehicles) {
 }
 
 function buildFleetVisualizationData(vehicles) {
-  const statusDistribution = vehicles.reduce((acc, vehicle) => {
+  const statusDistribution: Record<string, number> = vehicles.reduce((acc, vehicle) => {
     acc[vehicle.status] = (acc[vehicle.status] || 0) + 1;
     return acc;
   }, {});
@@ -514,6 +514,7 @@ export async function fetchFleetLiveTrackingSnapshot(options: any = {}) {
       'Demo fleet live tracking - backend vehicle GPS and active-route endpoints are not connected',
     message:
       'Fleet map uses demo coordinates only. Verify vehicle location, dispatch status, and route ETAs in the system of record.',
+    fromApi: false,
   };
 }
 

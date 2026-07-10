@@ -33,7 +33,7 @@ export default function AiEvaluationDashboard() {
       if (!active) return;
       setFromApi(Boolean(result.ok));
       setMessage(result.message || '');
-      setDashboard(result.data || LOCAL_EVALUATION_DASHBOARD);
+      setDashboard((result.data as typeof LOCAL_EVALUATION_DASHBOARD) || LOCAL_EVALUATION_DASHBOARD);
       setLoading(false);
     })();
     return () => {

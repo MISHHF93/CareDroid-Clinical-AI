@@ -22,6 +22,8 @@ export type SelfCheckinHandoffStore = Pick<
   | 'updateCapacity'
   | 'updateAlerts'
   | 'initializeFromBackend'
+  | 'referrals'
+  | 'refreshAdministrativeAutomationsAsync'
 >;
 
 export type SelfCheckinWhiteboardHandoffOptions = {

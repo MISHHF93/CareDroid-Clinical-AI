@@ -45,7 +45,7 @@ export function resolveEdSourceLabel(source?: string | null): string {
 export type EdDataSourceInput = Readonly<{
   envelope?: { source?: string; generatedAt?: string } | null;
   loading?: boolean;
-  error?: string;
+  error?: string | null;
   activeScenarioId?: string | null;
   backendAvailable?: boolean;
   simulationModeActive?: boolean;

@@ -33,6 +33,7 @@ import {
   type Patient,
   type Referral,
   type Staff,
+  type WorkflowActionType,
 } from '../types/emergency';
 
 export type AiChiefOrchestrationSnapshot = Readonly<{
@@ -91,9 +92,24 @@ function buildCentralNodeSource(options: BuildAiChiefOrchestrationOptions): Care
     emsUnits: [],
     referrals: options.referrals ?? [],
     rooms: [],
-    workflowLogs: options.workflowLogs ?? [],
+    workflowLogs: (options.workflowLogs ?? []).map((log) => ({
+      ...log,
+      type: log.type as WorkflowActionType,
+      title: log.summary,
+      severity: 'Info' as const,
+      status: 'recorded' as const,
+      metadata: {},
+    })),
     emergencySettings: (options.emergencySettings as CareDroidCentralNodeSource['emergencySettings']) ?? {},
-    websocket: { connected: false, status: 'disconnected' },
+    websocket: {
+      connected: false,
+      status: 'disconnected',
+      url: null,
+      lastConnectedAt: null,
+      lastDisconnectedAt: null,
+      lastEventAt: null,
+      error: null,
+    },
     copilotMessages: [],
     integrationEvents: [],
     selectedPatientId: options.selectedPatientId ?? null,
@@ -102,13 +118,15 @@ function buildCentralNodeSource(options: BuildAiChiefOrchestrationOptions): Care
     loading: false,
     backendAvailable: false,
     capacity:
-      options.capacity ??
-      ({
+      options.capacity ?? {
         band: 'Green',
         score: 80,
-        occupied: 0,
-        total: 0,
-      } as CapacitySnapshot),
+        totalPatients: 0,
+        occupiedRooms: 0,
+        boardingCount: 0,
+        reassessmentDue: 0,
+        updatedAt: new Date().toISOString(),
+      },
     ...options.centralNodeSource,
   };
 }
@@ -245,7 +263,7 @@ function mapAnomaliesToRisks(
       domain: 'operational_intelligence' as const,
       title: anomaly.title,
       summary: anomaly.message,
-      severity: severityToTone(anomaly.severity),
+      severity: ((tone) => (tone === 'neutral' ? 'info' : tone))(severityToTone(anomaly.severity)),
       reasonCodes: Object.freeze(anomaly.reasonCodes || []),
       humanReviewRequired: true as const,
     }),

@@ -6,7 +6,7 @@ import type { AdministrativeAutomationTask } from '../types/administrativeAutoma
 import { startWorkflowTrace } from '../services/observabilityTrace';
 
 const REFRESH_DEBOUNCE_MS = 1_500;
-let refreshTimerId: ReturnType<typeof setTimeout> | null = null;
+let refreshTimerId: number | null = null;
 let lastBackendEventType: string | undefined;
 
 export function getLastWorkflowAutomationBackendEvent(): string | undefined {

@@ -90,7 +90,7 @@ function normalize(value) {
   return String(value || '').trim().toLowerCase();
 }
 
-function unique(values) {
+function unique<T>(values: T[]): T[] {
   return [...new Set(values.filter(Boolean))];
 }
 

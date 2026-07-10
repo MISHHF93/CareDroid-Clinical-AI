@@ -32,7 +32,7 @@ export const PRACTITIONER_CLEANUP = Object.freeze({
   suppressDeveloperApiBanners: true,
   hidePatientJourneyEngineCard: true,
   /** Keep AI Chief, three-minute mission, and workflow command bars visible during pilot cleanup */
-  showOperationalCommandBars: true,
+  showOperationalCommandBars: true as boolean,
   /** Collapse whiteboard hero into operational-awareness layout by default */
   forceOperationalAwareness: true,
   /** Command palette: hide extension/platform nav duplicates */

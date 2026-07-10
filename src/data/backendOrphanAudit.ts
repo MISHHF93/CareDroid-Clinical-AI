@@ -86,6 +86,7 @@ export function assertNoOrphanedBackendFunctionality() {
 export function formatOrphanedBackendFunctionsMarkdown() {
   const backendOnly = getBackendOnlyRoutes();
   const gated = getFrontendGatedCalls();
+  const scan = runBackendFrontendExposureScan();
   const byStrategy: any = { 'backend-only': [], 'expose-recommended': [], deferred: [] };
 
   for (const route of backendOnly) {
@@ -166,11 +167,13 @@ export function formatOrphanedBackendFunctionsMarkdown() {
     '',
     '| Category | Count |',
     '|----------|------:|',
-    `| Backend HTTP routes | ${backendOnly.length + gated.length} |`,
-    `| Wired frontend ? backend | ${gated.length ? 'see exposure report' : '—'} |`,
+    `| Backend HTTP routes (total inventory) | ${scan.backendRouteCount} |`,
+    `| Wired frontend → backend | ${scan.wired.length} |`,
     `| Backend-only / deferred (policy) | ${backendOnly.length} |`,
     `| Gated frontend (no route) | ${gated.length} |`,
     `| POST executors | ${BACKEND_EXECUTOR_NLU_TOOL_IDS.length} |`,
+    '',
+    `_Cross-check: total inventory (${scan.backendRouteCount}) should equal wired (${scan.wired.length}) + backend-only (${backendOnly.length}) + any remaining unlisted routes. See [backend-exposure-report.md](./backend-exposure-report.md) for the authoritative scan._`,
     '',
   ];
 

@@ -409,7 +409,7 @@ export async function syncClinicalAlertsFromBackend(): Promise<{
   }
 
   const apiAlerts = Array.isArray((result as { data?: { alerts?: unknown[] } }).data?.alerts)
-    ? (result as { data: { alerts: Record<string, unknown>[] } }).data.alerts
+    ? (result as unknown as { data: { alerts: Record<string, unknown>[] } }).data.alerts
     : [];
 
   const store = useEmergencyStore.getState();

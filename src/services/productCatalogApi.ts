@@ -102,7 +102,7 @@ export const ProductCatalogApi = {
     return response.json();
   },
 
-  async getAssetDependencyGraph(organizationId) {
+  async getAssetDependencyGraph(organizationId = undefined) {
     const qs = organizationId ? `?organizationId=${encodeURIComponent(organizationId)}` : '';
     const response = await apiFetch(`/api/dependency-graph${qs}`);
     if (!response.ok) throw new Error(`Asset dependency graph failed (${response.status})`);
@@ -135,7 +135,7 @@ export const ProductCatalogApi = {
     return response.json();
   },
 
-  async submitMaturityAssessment(answers, organizationId) {
+  async submitMaturityAssessment(answers, organizationId = undefined) {
     const response = await apiFetch('/api/maturity-assessments', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

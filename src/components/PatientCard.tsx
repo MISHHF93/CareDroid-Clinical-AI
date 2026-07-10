@@ -330,7 +330,6 @@ function PatientCard({
   onKeyboardFocus,
 }: PatientCardProps) {
   const emergencyRole = useEmergencyRolePermissions();
-  const effectiveProfile = useEffectiveUserProfile();
   const screenDensity = useScreenDensityMode();
   const patientCardSurfaces = usePractitionerSurfaceVisibility().patientCard;
   const maxPatientCardBadges = patientCardSurfaces.badgeLimit;
@@ -383,7 +382,7 @@ function PatientCard({
   usePhiViewAudit(patient.id, {
     enabled: !readOnlyDisplay && privacyPolicy.tier !== 'public' && !privacyPolicy.aggregateMetricsOnly,
     source: 'PatientCard',
-    staffId: effectiveProfile?.id || emergencyRole.canonicalProfile?.id,
+    staffId: emergencyRole.canonicalProfile?.id,
     details: { layout, workflowProfile },
   });
 

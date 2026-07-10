@@ -78,12 +78,13 @@ function parseSeedConstArrays(seed) {
   return arrays;
 }
 
-function resolveAssetIdsFromPackBlock(assetIdsLine, constArrays) {
-  const inline = assetIdsLine.match(/\[([\s\S]*?)\]/);
-  if (inline) {
-    return [...inline[1].matchAll(/'([^']+)'/g)].map((m) => m[1]);
+function resolveAssetIdsFromPackBlock(body, constArrays) {
+  const multiline = body.match(/assetIds:\s*\[([\s\S]*?)\]/);
+  if (multiline) {
+    const ids = [...multiline[1].matchAll(/'([^']+)'/g)].map((m) => m[1]);
+    if (ids.length) return ids;
   }
-  const ref = assetIdsLine.match(/assetIds:\s*([A-Z0-9_]+)/);
+  const ref = body.match(/assetIds:\s*([A-Z0-9_]+)/);
   if (ref && constArrays.has(ref[1])) {
     return constArrays.get(ref[1]);
   }
@@ -94,13 +95,14 @@ function parsePackByAsset() {
   const seed = readRepoFile('backend/src/modules/platform-assets/data/platform-asset-seed.data.ts');
   const constArrays = parseSeedConstArrays(seed);
   const packByAsset = new Map();
-  const packSection = seed.split('export const SEED_ASSET_PACKS')[1]?.split('export const DEFAULT_PACKS')[0] || '';
+  const packSection =
+    seed.split('const RAW_SEED_ASSET_PACKS')[1]?.split('export const SEED_ASSET_PACKS')[0] ||
+    seed.split('export const SEED_ASSET_PACKS')[1]?.split('export const DEFAULT_PACKS')[0] ||
+    '';
   for (const block of packSection.matchAll(/\{\s*id:\s*'([^']+)'([\s\S]*?)\n\s*\},/g)) {
     const packId = block[1];
     const body = block[2];
-    const assetLine = body.match(/assetIds:\s*([^\n]+)/);
-    if (!assetLine) continue;
-    const ids = resolveAssetIdsFromPackBlock(assetLine[0], constArrays);
+    const ids = resolveAssetIdsFromPackBlock(body, constArrays);
     for (const assetId of ids) {
       const arr = packByAsset.get(assetId) || [];
       if (!arr.includes(packId)) arr.push(packId);
@@ -145,7 +147,10 @@ function parsePackOrganizationTypes() {
   const seed = readRepoFile('backend/src/modules/platform-assets/data/platform-asset-seed.data.ts');
   const constArrays = parseSeedConstArrays(seed);
   const packOrgTypes = new Map();
-  const packSection = seed.split('export const SEED_ASSET_PACKS')[1]?.split('export const DEFAULT_PACKS')[0] || '';
+  const packSection =
+    seed.split('const RAW_SEED_ASSET_PACKS')[1]?.split('export const SEED_ASSET_PACKS')[0] ||
+    seed.split('export const SEED_ASSET_PACKS')[1]?.split('export const DEFAULT_PACKS')[0] ||
+    '';
   for (const block of packSection.matchAll(/\{\s*id:\s*'([^']+)'([\s\S]*?)\n\s*\},/g)) {
     const packId = block[1];
     const body = block[2];

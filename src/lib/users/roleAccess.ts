@@ -195,8 +195,8 @@ export const ROLE_DASHBOARD_CONFIG: Readonly<Record<HospitalRole, DashboardWidge
     },
   });
 
-export function getRoleLabel(role: HospitalRole): string {
-  return CAREDROID_ROLE_LABELS[role] ?? role;
+export function getRoleLabel(role: HospitalRole | string): string {
+  return CAREDROID_ROLE_LABELS[role as HospitalRole] ?? role;
 }
 
 export function getRoleDescription(role: HospitalRole): string {

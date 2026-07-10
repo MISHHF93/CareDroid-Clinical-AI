@@ -25,7 +25,7 @@ export default function PublicDisplaySituationBrief({
   className = '',
 }: PublicDisplaySituationBriefProps) {
   const attention =
-    snapshot.statusMessaging?.advisories?.[0] ||
+    snapshot.statusMessaging?.advisories?.[0]?.message ||
     snapshot.guidanceMessages?.[0] ||
     snapshot.escalationMessage ||
     'Tell staff immediately if symptoms worsen';

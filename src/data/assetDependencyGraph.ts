@@ -59,7 +59,7 @@ export function buildLocalAssetDependencyGraph({
     };
 
     for (const assetId of flag.assetIds || []) {
-      const record = inventoryById.get(assetId);
+      const record: any = inventoryById.get(assetId);
       const chainId = `${product.id}:${assetPack.id}:${assetId}`;
       if (chainKeys.has(chainId)) {
         issues.push({

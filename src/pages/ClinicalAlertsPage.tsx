@@ -94,7 +94,10 @@ const ClinicalAlertsPage = () => {
   }, [alertsApiEnabled]);
 
   const displayAlerts = useMemo(
-    () => filterAlertsForProfile(storeAlerts, compiledProfile).map(mapAlertToClinicalDisplay),
+    () =>
+      (compiledProfile ? filterAlertsForProfile(storeAlerts, compiledProfile) : storeAlerts).map(
+        mapAlertToClinicalDisplay,
+      ),
     [compiledProfile, storeAlerts],
   );
 

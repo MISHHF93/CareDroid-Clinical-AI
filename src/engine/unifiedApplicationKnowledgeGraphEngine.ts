@@ -7,7 +7,7 @@ import { useEmergencyStore } from '../store/emergencyStore';
 
 const REFRESH_DEBOUNCE_MS = 800;
 
-let refreshTimerId: ReturnType<typeof setTimeout> | null = null;
+let refreshTimerId: number | null = null;
 let unsubscribeEmergency: (() => void) | null = null;
 let unsubscribeOperationalIntelligence: (() => void) | null = null;
 

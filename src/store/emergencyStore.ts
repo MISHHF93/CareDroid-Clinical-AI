@@ -1980,6 +1980,21 @@ const workflowTitles: Record<WorkflowActionType, string> = {
   clinical_score_saved: 'Clinical score saved',
   alert_lifecycle: 'Alert lifecycle',
   administrative_automation_reviewed: 'Administrative automation reviewed',
+  ems_arrival: 'EMS arrival',
+  ems_incoming: 'EMS incoming',
+  ems_updated: 'EMS updated',
+  capacity_updated: 'Capacity updated',
+  capacity_changed: 'Capacity changed',
+  boarding_updated: 'Boarding updated',
+  alert_created: 'Alert created',
+  operational_alert_dispatched: 'Operational alert dispatched',
+  staff_assigned: 'Staff assigned',
+  patient_escalated: 'Patient escalated',
+  patient_flow_updated: 'Patient flow updated',
+  workflow_orchestration_updated: 'Workflow orchestration updated',
+  workflow_log_created: 'Workflow log created',
+  intake_handoff_complete: 'Intake handoff complete',
+  three_minute_mission_acknowledged: 'Three-minute mission acknowledged',
 };
 
 type WorkflowActionInput = Omit<

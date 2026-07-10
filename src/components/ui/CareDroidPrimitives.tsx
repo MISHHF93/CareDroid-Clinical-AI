@@ -713,7 +713,7 @@ export function CareDroidPage({
   );
 }
 
-interface PublicPageTemplateProps extends HTMLAttributes<HTMLDivElement> {
+interface PublicPageTemplateProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
   title: React.ReactNode;
   eyebrow?: React.ReactNode;
   description?: React.ReactNode;

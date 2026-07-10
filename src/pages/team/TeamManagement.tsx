@@ -73,7 +73,7 @@ export const TeamManagement = () => {
       if (!response.ok) {
         throw new Error(data?.message || 'Failed to fetch users');
       }
-      setUsers(data);
+      setUsers(Array.isArray(data) ? data : []);
       setError(null);
     } catch (err: any) {
       setError(err.message);

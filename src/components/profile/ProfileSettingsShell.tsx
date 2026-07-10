@@ -6,6 +6,8 @@ import {
   resolveProfileShellEyebrow,
 } from '../../config/profileDesignLanguage.config';
 import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
+import type { UserProfileAccessSummary } from '../../config/userProfileCatalog';
+import type { ProfileCopyStack } from '../../config/userProfileCopyModel';
 import './ProfileSettingsShell.css';
 
 export default function ProfileSettingsShell({
@@ -18,8 +20,8 @@ export default function ProfileSettingsShell({
   title?: React.ReactNode;
   subtitle?: React.ReactNode;
   children?: React.ReactNode;
-  accessSummary?: Record<string, any> | null;
-  profileCopy?: Record<string, any> | null;
+  accessSummary?: UserProfileAccessSummary | null;
+  profileCopy?: ProfileCopyStack | null;
 }) {
   const surfaces = usePractitionerSurfaceVisibility();
   const location = useLocation();
