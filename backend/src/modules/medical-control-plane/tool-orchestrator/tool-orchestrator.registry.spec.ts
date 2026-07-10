@@ -29,11 +29,23 @@ function patternToolIds(): string[] {
 }
 
 describe('tool-orchestrator.registry', () => {
-  it('exposes exactly three registered executor ids', () => {
+  it('exposes exactly fifteen registered executor ids', () => {
     expect(REGISTERED_EXECUTOR_TOOL_IDS).toEqual([
       'sofa-calculator',
       'drug-interactions',
       'lab-interpreter',
+      'heart-score',
+      'cha2ds2vasc-calculator',
+      'wells-pe',
+      'shock-index',
+      'apache2-calculator',
+      'anion-gap',
+      'aa-gradient',
+      'news2',
+      'abcd2',
+      'canadian-c-spine',
+      'nexus-cspine',
+      'gcs-calculator',
     ]);
   });
 
@@ -150,9 +162,74 @@ describe('tool-orchestrator.registry', () => {
     expect(isKnownUnsupportedNluTool('sofa-calculator')).toBe(false);
   });
 
-  it('getExecutorCatalogSnapshot lists three registered executors', () => {
+  it('getExecutorCatalogSnapshot lists fifteen registered executors', () => {
     const snap = getExecutorCatalogSnapshot();
-    expect(snap.registeredExecutorToolIds).toHaveLength(3);
+    expect(snap.registeredExecutorToolIds).toHaveLength(15);
     expect(snap.unsupportedTools.length).toBeGreaterThan(30);
+  });
+
+  describe('representative-batch executors (heart-score, cha2ds2vasc-calculator, wells-pe, shock-index, apache2-calculator, anion-gap, aa-gradient, news2, abcd2, canadian-c-spine, nexus-cspine, gcs-calculator)', () => {
+    const NEW_TOOL_IDS = [
+      'heart-score',
+      'cha2ds2vasc-calculator',
+      'wells-pe',
+      'shock-index',
+      'apache2-calculator',
+      'anion-gap',
+      'aa-gradient',
+      'news2',
+      'abcd2',
+      'canadian-c-spine',
+      'nexus-cspine',
+      'gcs-calculator',
+    ] as const;
+
+    it.each(NEW_TOOL_IDS)('is no longer listed in NLU_TOOL_IDS_WITHOUT_EXECUTOR: %s', (id) => {
+      expect(NLU_TOOL_IDS_WITHOUT_EXECUTOR).not.toContain(id);
+    });
+
+    it.each(NEW_TOOL_IDS)('has a parameter-alias entry (possibly empty): %s', (id) => {
+      expect(EXECUTOR_PARAMETER_ALIASES[id]).toBeDefined();
+    });
+
+    it.each(NEW_TOOL_IDS)('has a deterministic request contract: %s', (id) => {
+      expect(EXECUTOR_REQUEST_CONTRACTS[id].deterministic).toBe(true);
+      expect(EXECUTOR_REQUEST_CONTRACTS[id].toolId).toBe(id);
+    });
+
+    it.each(NEW_TOOL_IDS)('classifies as a known tool, not unsupported: %s', (id) => {
+      expect(isKnownUnsupportedNluTool(id)).toBe(false);
+      expect(classifyToolExecutionError(id)).not.toBe(ToolExecutionErrorCode.UNSUPPORTED_TOOL);
+    });
+
+    it('normalizes shock-index snake_case NLU parameters to executor camelCase parameters', () => {
+      expect(
+        normalizeExecutorParameters('shock-index', { heart_rate: 110, systolic_bp: 100 }),
+      ).toEqual({ heartRate: 110, systolicBp: 100 });
+    });
+
+    it('normalizes news2 snake_case NLU parameters to executor camelCase parameters', () => {
+      expect(
+        normalizeExecutorParameters('news2', { respiratory_rate: 18, spo2_scale: '1' }),
+      ).toEqual({ respiratoryRate: 18, spo2Scale: '1' });
+    });
+
+    it('validateExecutorContractParameters enforces heart-score required dimensions', () => {
+      expect(
+        validateExecutorContractParameters('heart-score', {
+          history: 0,
+          ecg: 0,
+          age: 0,
+          riskFactors: 0,
+          troponin: 0,
+        }).valid,
+      ).toBe(true);
+      expect(validateExecutorContractParameters('heart-score', {}).valid).toBe(false);
+    });
+
+    it('validateExecutorContractParameters allows canadian-c-spine and nexus-cspine with all-optional inputs', () => {
+      expect(validateExecutorContractParameters('canadian-c-spine', {}).valid).toBe(true);
+      expect(validateExecutorContractParameters('nexus-cspine', {}).valid).toBe(true);
+    });
   });
 });

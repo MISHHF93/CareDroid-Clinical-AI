@@ -11,6 +11,18 @@ import { ToolOrchestratorService } from '../src/modules/medical-control-plane/to
 import { SofaCalculatorService } from '../src/modules/medical-control-plane/tool-orchestrator/services/sofa-calculator.service';
 import { DrugCheckerService } from '../src/modules/medical-control-plane/tool-orchestrator/services/drug-checker.service';
 import { LabInterpreterService } from '../src/modules/medical-control-plane/tool-orchestrator/services/lab-interpreter.service';
+import { HeartScoreService } from '../src/modules/medical-control-plane/tool-orchestrator/services/heart-score.service';
+import { Cha2ds2VascCalculatorService } from '../src/modules/medical-control-plane/tool-orchestrator/services/cha2ds2vasc-calculator.service';
+import { WellsPeService } from '../src/modules/medical-control-plane/tool-orchestrator/services/wells-pe.service';
+import { ShockIndexService } from '../src/modules/medical-control-plane/tool-orchestrator/services/shock-index.service';
+import { Apache2CalculatorService } from '../src/modules/medical-control-plane/tool-orchestrator/services/apache2-calculator.service';
+import { AnionGapService } from '../src/modules/medical-control-plane/tool-orchestrator/services/anion-gap.service';
+import { AaGradientService } from '../src/modules/medical-control-plane/tool-orchestrator/services/aa-gradient.service';
+import { News2Service } from '../src/modules/medical-control-plane/tool-orchestrator/services/news2.service';
+import { Abcd2Service } from '../src/modules/medical-control-plane/tool-orchestrator/services/abcd2.service';
+import { CanadianCSpineService } from '../src/modules/medical-control-plane/tool-orchestrator/services/canadian-c-spine.service';
+import { NexusCSpineService } from '../src/modules/medical-control-plane/tool-orchestrator/services/nexus-cspine.service';
+import { GcsCalculatorService } from '../src/modules/medical-control-plane/tool-orchestrator/services/gcs-calculator.service';
 import { AuditService } from '../src/modules/audit/audit.service';
 import { AIService } from '../src/modules/ai/ai.service';
 import { ToolMetricsService } from '../src/modules/metrics/tool-metrics.service';
@@ -48,6 +60,18 @@ describe('ToolOrchestratorService', () => {
         SofaCalculatorService,
         DrugCheckerService,
         LabInterpreterService,
+        HeartScoreService,
+        Cha2ds2VascCalculatorService,
+        WellsPeService,
+        ShockIndexService,
+        Apache2CalculatorService,
+        AnionGapService,
+        AaGradientService,
+        News2Service,
+        Abcd2Service,
+        CanadianCSpineService,
+        NexusCSpineService,
+        GcsCalculatorService,
         {
           provide: AuditService,
           useValue: mockAuditService,
@@ -83,10 +107,10 @@ describe('ToolOrchestratorService', () => {
   });
 
   describe('Tool Registry', () => {
-    it('should register all three tools on initialization', () => {
+    it('should register all fifteen tools on initialization', () => {
       const tools = service.listAvailableTools();
-      expect(tools.count).toBe(3);
-      expect(tools.tools.length).toBe(3);
+      expect(tools.count).toBe(15);
+      expect(tools.tools.length).toBe(15);
     });
 
     it('should have SOFA calculator in registry', () => {
@@ -108,6 +132,24 @@ describe('ToolOrchestratorService', () => {
       const lab = tools.tools.find((t) => t.id === 'lab-interpreter');
       expect(lab).toBeDefined();
       expect(lab?.name).toBe('Lab Results Interpreter');
+    });
+
+    it.each([
+      'heart-score',
+      'cha2ds2vasc-calculator',
+      'wells-pe',
+      'shock-index',
+      'apache2-calculator',
+      'anion-gap',
+      'aa-gradient',
+      'news2',
+      'abcd2',
+      'canadian-c-spine',
+      'nexus-cspine',
+      'gcs-calculator',
+    ])('should have %s in registry', (toolId) => {
+      const tools = service.listAvailableTools();
+      expect(tools.tools.find((t) => t.id === toolId)).toBeDefined();
     });
   });
 
@@ -493,7 +535,7 @@ describe('ToolOrchestratorService', () => {
     it('should return tool statistics', () => {
       const stats = service.getToolStatistics();
 
-      expect(stats.totalTools).toBe(3);
+      expect(stats.totalTools).toBe(15);
       expect(stats.toolsByCategory).toBeDefined();
       expect(stats.tools).toBeDefined();
     });

@@ -15,6 +15,18 @@ import { ToolOrchestratorService } from '../src/modules/medical-control-plane/to
 import { SofaCalculatorService } from '../src/modules/medical-control-plane/tool-orchestrator/services/sofa-calculator.service';
 import { DrugCheckerService } from '../src/modules/medical-control-plane/tool-orchestrator/services/drug-checker.service';
 import { LabInterpreterService } from '../src/modules/medical-control-plane/tool-orchestrator/services/lab-interpreter.service';
+import { HeartScoreService } from '../src/modules/medical-control-plane/tool-orchestrator/services/heart-score.service';
+import { Cha2ds2VascCalculatorService } from '../src/modules/medical-control-plane/tool-orchestrator/services/cha2ds2vasc-calculator.service';
+import { WellsPeService } from '../src/modules/medical-control-plane/tool-orchestrator/services/wells-pe.service';
+import { ShockIndexService } from '../src/modules/medical-control-plane/tool-orchestrator/services/shock-index.service';
+import { Apache2CalculatorService } from '../src/modules/medical-control-plane/tool-orchestrator/services/apache2-calculator.service';
+import { AnionGapService } from '../src/modules/medical-control-plane/tool-orchestrator/services/anion-gap.service';
+import { AaGradientService } from '../src/modules/medical-control-plane/tool-orchestrator/services/aa-gradient.service';
+import { News2Service } from '../src/modules/medical-control-plane/tool-orchestrator/services/news2.service';
+import { Abcd2Service } from '../src/modules/medical-control-plane/tool-orchestrator/services/abcd2.service';
+import { CanadianCSpineService } from '../src/modules/medical-control-plane/tool-orchestrator/services/canadian-c-spine.service';
+import { NexusCSpineService } from '../src/modules/medical-control-plane/tool-orchestrator/services/nexus-cspine.service';
+import { GcsCalculatorService } from '../src/modules/medical-control-plane/tool-orchestrator/services/gcs-calculator.service';
 import { ToolResult } from '../src/modules/medical-control-plane/tool-orchestrator/entities/tool-result.entity';
 import { ToolMetricsService } from '../src/modules/metrics/tool-metrics.service';
 import { AuditService } from '../src/modules/audit/audit.service';
@@ -54,6 +66,18 @@ describe('Tool Orchestrator API (e2e)', () => {
         SofaCalculatorService,
         DrugCheckerService,
         LabInterpreterService,
+        HeartScoreService,
+        Cha2ds2VascCalculatorService,
+        WellsPeService,
+        ShockIndexService,
+        Apache2CalculatorService,
+        AnionGapService,
+        AaGradientService,
+        News2Service,
+        Abcd2Service,
+        CanadianCSpineService,
+        NexusCSpineService,
+        GcsCalculatorService,
         {
           provide: AuditService,
           useValue: mockAuditService,
@@ -97,7 +121,7 @@ describe('Tool Orchestrator API (e2e)', () => {
         .expect(200)
         .expect((res) => {
           expect(res.body.tools).toBeDefined();
-          expect(res.body.count).toBe(3);
+          expect(res.body.count).toBe(15);
         });
     });
 
@@ -163,7 +187,7 @@ describe('Tool Orchestrator API (e2e)', () => {
         .get('/tools/statistics')
         .expect(200)
         .expect((res) => {
-          expect(res.body.totalTools).toBe(3);
+          expect(res.body.totalTools).toBe(15);
         });
     });
   });

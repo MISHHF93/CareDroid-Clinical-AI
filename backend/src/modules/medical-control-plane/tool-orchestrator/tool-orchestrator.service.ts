@@ -20,6 +20,18 @@ import {
 import { SofaCalculatorService } from './services/sofa-calculator.service';
 import { DrugCheckerService } from './services/drug-checker.service';
 import { LabInterpreterService } from './services/lab-interpreter.service';
+import { HeartScoreService } from './services/heart-score.service';
+import { Cha2ds2VascCalculatorService } from './services/cha2ds2vasc-calculator.service';
+import { WellsPeService } from './services/wells-pe.service';
+import { ShockIndexService } from './services/shock-index.service';
+import { Apache2CalculatorService } from './services/apache2-calculator.service';
+import { AnionGapService } from './services/anion-gap.service';
+import { AaGradientService } from './services/aa-gradient.service';
+import { News2Service } from './services/news2.service';
+import { Abcd2Service } from './services/abcd2.service';
+import { CanadianCSpineService } from './services/canadian-c-spine.service';
+import { NexusCSpineService } from './services/nexus-cspine.service';
+import { GcsCalculatorService } from './services/gcs-calculator.service';
 import { ExecuteToolDto, ToolExecutionResponseDto, ToolListDto } from './dto/tool-execution.dto';
 import { ToolResult } from './entities/tool-result.entity';
 import {
@@ -54,6 +66,18 @@ export class ToolOrchestratorService {
     private readonly sofaCalculatorService: SofaCalculatorService,
     private readonly drugCheckerService: DrugCheckerService,
     private readonly labInterpreterService: LabInterpreterService,
+    private readonly heartScoreService: HeartScoreService,
+    private readonly cha2ds2VascCalculatorService: Cha2ds2VascCalculatorService,
+    private readonly wellsPeService: WellsPeService,
+    private readonly shockIndexService: ShockIndexService,
+    private readonly apache2CalculatorService: Apache2CalculatorService,
+    private readonly anionGapService: AnionGapService,
+    private readonly aaGradientService: AaGradientService,
+    private readonly news2Service: News2Service,
+    private readonly abcd2Service: Abcd2Service,
+    private readonly canadianCSpineService: CanadianCSpineService,
+    private readonly nexusCSpineService: NexusCSpineService,
+    private readonly gcsCalculatorService: GcsCalculatorService,
     private readonly auditService: AuditService,
     private readonly toolMetrics: ToolMetricsService,
     @InjectRepository(ToolResult)
@@ -70,6 +94,18 @@ export class ToolOrchestratorService {
     this.registerTool(this.sofaCalculatorService);
     this.registerTool(this.drugCheckerService);
     this.registerTool(this.labInterpreterService);
+    this.registerTool(this.heartScoreService);
+    this.registerTool(this.cha2ds2VascCalculatorService);
+    this.registerTool(this.wellsPeService);
+    this.registerTool(this.shockIndexService);
+    this.registerTool(this.apache2CalculatorService);
+    this.registerTool(this.anionGapService);
+    this.registerTool(this.aaGradientService);
+    this.registerTool(this.news2Service);
+    this.registerTool(this.abcd2Service);
+    this.registerTool(this.canadianCSpineService);
+    this.registerTool(this.nexusCSpineService);
+    this.registerTool(this.gcsCalculatorService);
 
     this.logger.log(
       `Initialized tool registry with ${Object.keys(this.toolRegistry).length} tools`,
