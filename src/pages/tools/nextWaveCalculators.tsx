@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { NavIcon } from '../../navigation/NavIcon';
-import { getCalculatorSubIcon, CHROME_ICONS } from '../../navigation/iconRegistry';
+import { getCalculatorSubIcon } from '../../navigation/iconRegistry';
+import {
+  CalcDecisionSupportLead as SharedCalcDecisionSupportLead,
+  CalcResultSafetyFooter as SharedCalcResultSafetyFooter,
+  CalcPanelTitle,
+  ResultsPanelTitle,
+} from './calculatorPrimitives';
 import {
   ANION_GAP_DISCLAIMER,
   RASS_DISCLAIMER,
@@ -13,38 +19,19 @@ import {
   interpretShockIndex,
 } from '../../utils/nextWaveCalculatorUtils';
 
-function CalcPanelTitle({ icon, children }) {
-  return (
-    <div className="calculator-panel-title">
-      <NavIcon icon={icon} size={22} aria-hidden />
-      <span className="calculator-panel-title-text">{children}</span>
-    </div>
-  );
-}
-
-function ResultsPanelTitle() {
-  return (
-    <div className="calculator-panel-title">
-      <NavIcon icon={CHROME_ICONS.barChart} size={22} aria-hidden />
-      <span className="calculator-panel-title-text">Results</span>
-    </div>
-  );
-}
-
 function CalcDecisionSupportLead() {
   return (
-    <p className="calc-ds-lead">
-      <strong>Decision support only.</strong> Does not establish a diagnosis or replace clinician judgment; follow
-      local protocols.
-    </p>
+    <SharedCalcDecisionSupportLead>
+      Does not establish a diagnosis or replace clinician judgment; follow local protocols.
+    </SharedCalcDecisionSupportLead>
   );
 }
 
 function CalcResultSafetyFooter() {
   return (
-    <p className="calc-result-safety-footer" role="note">
+    <SharedCalcResultSafetyFooter>
       Output reflects the values entered and may omit important clinical context.
-    </p>
+    </SharedCalcResultSafetyFooter>
   );
 }
 

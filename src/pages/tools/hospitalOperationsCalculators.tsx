@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { NavIcon } from '../../navigation/NavIcon';
-import { getCalculatorSubIcon, CHROME_ICONS } from '../../navigation/iconRegistry';
+import { getCalculatorSubIcon } from '../../navigation/iconRegistry';
+import { CalcPanelTitle, ResultsPanelTitle } from './calculatorPrimitives';
 import {
   HOSPITAL_OPERATIONS_CALCULATOR_DISCLAIMER,
   calculateBedOccupancy,
@@ -8,24 +9,6 @@ import {
   calculateStaffingRatio,
   calculateTurnaroundTime,
 } from '../../utils/hospitalOperationsCalculators';
-
-function CalcPanelTitle({ icon, children }) {
-  return (
-    <div className="calculator-panel-title">
-      <NavIcon icon={icon} size={22} aria-hidden />
-      <span className="calculator-panel-title-text">{children}</span>
-    </div>
-  );
-}
-
-function ResultsPanelTitle() {
-  return (
-    <div className="calculator-panel-title">
-      <NavIcon icon={CHROME_ICONS.barChart} size={22} aria-hidden />
-      <span className="calculator-panel-title-text">Results</span>
-    </div>
-  );
-}
 
 function CalculatorShell({ slug, title, result, emptyText, children, onResultChange, resultPayload }) {
   const icon = getCalculatorSubIcon(slug);

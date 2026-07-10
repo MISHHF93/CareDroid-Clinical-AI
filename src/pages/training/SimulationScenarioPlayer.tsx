@@ -86,7 +86,7 @@ export default function SimulationScenarioPlayer() {
         <section className="scenario-player-page__panel" aria-label="Patient vitals and labs">
           <h2>Vitals and labs</h2>
           <div className="scenario-player-page__vitals">
-            {Object.entries(scenario.vitals).map(([key, value]) => (
+            {Object.entries(scenario.vitals as Record<string, string>).map(([key, value]) => (
               <span key={key}>
                 {key}: {value}
               </span>

@@ -180,8 +180,10 @@ describe('Calculators.css — responsive typography & touch', () => {
 
   it('declares calculator-panel-title-text in calculator modules', () => {
     expect(calculatorPrimitivesJsx).toContain('calculator-panel-title-text');
-    expect(pr4aJsx).toContain('calculator-panel-title-text');
-    expect(mentalJsx).toContain('calculator-panel-title-text');
+    // pr4a/mentalHealth import CalcPanelTitle from calculatorPrimitives rather than
+    // redeclaring it locally — assert the shared import instead of the class literal.
+    expect(pr4aJsx).toMatch(/CalcPanelTitle[\s\S]*from '\.\/calculatorPrimitives'/);
+    expect(mentalJsx).toMatch(/CalcPanelTitle[\s\S]*from '\.\/calculatorPrimitives'/);
   });
 });
 

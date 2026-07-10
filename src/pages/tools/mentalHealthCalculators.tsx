@@ -15,75 +15,33 @@ import {
   computeGad7Result,
 } from '../../utils/gad7Calculator';
 import { NavIcon } from '../../navigation/NavIcon';
-import { getCalculatorSubIcon, CHROME_ICONS } from '../../navigation/iconRegistry';
-
-function CalcPanelTitle({ icon, children }) {
-  return (
-    <div className="calculator-panel-title">
-      <NavIcon icon={icon} size={22} aria-hidden />
-      <span className="calculator-panel-title-text">{children}</span>
-    </div>
-  );
-}
-
-function ResultsPanelTitle() {
-  return (
-    <div className="calculator-panel-title">
-      <NavIcon icon={CHROME_ICONS.barChart} size={22} aria-hidden />
-      <span className="calculator-panel-title-text">Results</span>
-    </div>
-  );
-}
-
-function CalcResultsEmptyIcon({ icon, size = 56 }) {
-  return (
-    <div className="calc-results-empty-icon" aria-hidden>
-      <NavIcon icon={icon} size={size} />
-    </div>
-  );
-}
+import { CHROME_ICONS, getCalculatorSubIcon } from '../../navigation/iconRegistry';
+import {
+  CalcDecisionSupportLead as SharedCalcDecisionSupportLead,
+  CalcResultSafetyFooter as SharedCalcResultSafetyFooter,
+  CalcInterpretationRegion,
+  CalcPanelTitle,
+  CalcResultsEmptyIcon,
+  ResultsPanelTitle,
+  scrollResultsIntoView,
+} from './calculatorPrimitives';
 
 function CalcDecisionSupportLead() {
   return (
-    <p className="calc-ds-lead">
-      <strong>Decision support only.</strong> Does not establish a diagnosis or replace clinician judgment; follow
-      local protocols.
-    </p>
+    <SharedCalcDecisionSupportLead>
+      Does not establish a diagnosis or replace clinician judgment; follow local protocols.
+    </SharedCalcDecisionSupportLead>
   );
 }
 
 function CalcResultSafetyFooter() {
   return (
-    <p className="calc-result-safety-footer" role="note">
+    <SharedCalcResultSafetyFooter>
       Output reflects the values you entered and may omit important clinical context. Do not treat this screen as
       definitive proof of illness severity, eligibility, or treatment requirement, and do not use it alone to rule
       in or rule out a diagnosis.
-    </p>
+    </SharedCalcResultSafetyFooter>
   );
-}
-
-function CalcInterpretationRegion({ headingId, title, severity, emphasizeRisk, children }) {
-  return (
-    <section
-      className={`calc-interpretation-box ${severity}${emphasizeRisk ? ' calc-interpretation-box--risk-emphasis' : ''}`}
-      role="region"
-      aria-labelledby={headingId}
-    >
-      <h3 id={headingId} className="calc-interpretation-title">
-        {title}
-      </h3>
-      {children}
-    </section>
-  );
-}
-
-function scrollResultsIntoView(resultsEl) {
-  if (!resultsEl) return;
-  const reduceMotion =
-    typeof window !== 'undefined' &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  resultsEl.focus({ preventScroll: true });
-  resultsEl.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'nearest' });
 }
 
 function focusFirstEmptyLikertItem(items, responses, idPrefix) {

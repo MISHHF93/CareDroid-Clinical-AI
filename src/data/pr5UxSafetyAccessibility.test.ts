@@ -15,6 +15,10 @@ const mentalHealthUiSource = readFileSync(
   join(__dirname, '../pages/tools/mentalHealthCalculators.tsx'),
   'utf8'
 );
+const calculatorPrimitivesSource = readFileSync(
+  join(__dirname, '../pages/tools/calculatorPrimitives.tsx'),
+  'utf8'
+);
 
 const MEDICATION_PATTERN = /\b(prescribe|start antidepressant|ssri|snri|benzodiazepine|mg\/day)\b/i;
 const DEPRESSION_DIAGNOSIS_PATTERN = /\b(diagnosed with depression|has major depressive disorder|confirmed depression)\b/i;
@@ -101,7 +105,9 @@ describe('PR5 UX & clinical safety — PHQ-9 interpretation copy', () => {
 
 describe('PR5 accessibility & UX — Phq9Calculator UI contracts', () => {
   it('uses decision support lead, Q9 alerts, interpretation region, and safety footer', () => {
-    expect(mentalHealthUiSource).toContain('<h3 id={headingId}');
+    // CalcInterpretationRegion (incl. the <h3 id={headingId}> heading) is imported from
+    // calculatorPrimitives, not redeclared locally — assert the shared source instead.
+    expect(calculatorPrimitivesSource).toContain('<h3 id={headingId}');
     expect(phq9Ui).toContain('phq9-validation-summary');
     expect(phq9Ui).toContain('calc-breakdown-list');
     expect(phq9Ui).toContain('CalcDecisionSupportLead');
@@ -153,7 +159,9 @@ describe('PR5 UX & clinical safety — GAD-7 interpretation copy', () => {
 
 describe('PR5 accessibility & UX — Gad7Calculator UI contracts', () => {
   it('uses decision support lead, interpretation region, and safety footer', () => {
-    expect(mentalHealthUiSource).toContain('<h3 id={headingId}');
+    // CalcInterpretationRegion (incl. the <h3 id={headingId}> heading) is imported from
+    // calculatorPrimitives, not redeclared locally — assert the shared source instead.
+    expect(calculatorPrimitivesSource).toContain('<h3 id={headingId}');
     expect(gad7Ui).toContain('gad7-validation-summary');
     expect(gad7Ui).toContain('CalcDecisionSupportLead');
     expect(gad7Ui).toContain('CalcInterpretationRegion');

@@ -18,6 +18,10 @@ const mentalHealthUiSource = readFileSync(
   join(__dirname, '../pages/tools/mentalHealthCalculators.tsx'),
   'utf8'
 );
+const calculatorPrimitivesSource = readFileSync(
+  join(__dirname, '../pages/tools/calculatorPrimitives.tsx'),
+  'utf8'
+);
 const calculatorsCssSource = readFileSync(join(__dirname, '../pages/tools/Calculators.css'), 'utf8');
 
 function sliceExportedComponent(source, componentName) {
@@ -61,7 +65,9 @@ describe('PHQ-9 UX & accessibility', () => {
   });
 
   it('exposes interpretation and score semantics for assistive tech', () => {
-    expect(mentalHealthUiSource).toContain('<h3 id={headingId}');
+    // CalcInterpretationRegion (incl. the <h3 id={headingId}> heading) is imported from
+    // calculatorPrimitives, not redeclared locally — assert the shared source instead.
+    expect(calculatorPrimitivesSource).toContain('<h3 id={headingId}');
     expect(phq9Ui).toContain('CalcInterpretationRegion');
     expect(phq9Ui).toContain('headingId={interpretationHeadingId}');
     expect(phq9Ui).toContain('role="group"');
@@ -95,7 +101,9 @@ describe('GAD-7 UX & accessibility', () => {
       /aria-live=\{\s*result\?\.acuteDistressSafetyAlert\?\.elevated \|\| result\?\.moderateSymptomEscalation\?\.warranted/
     );
     expect(calculatorsCssSource).toContain('.calc-gad7-moderate-warning');
-    expect(mentalHealthUiSource).toContain('<h3 id={headingId}');
+    // CalcInterpretationRegion (incl. the <h3 id={headingId}> heading) is imported from
+    // calculatorPrimitives, not redeclared locally — assert the shared source instead.
+    expect(calculatorPrimitivesSource).toContain('<h3 id={headingId}');
     expect(gad7Ui).toContain('CalcInterpretationRegion');
   });
 });

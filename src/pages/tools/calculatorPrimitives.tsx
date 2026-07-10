@@ -37,7 +37,7 @@ export function CalcDecisionSupportLead({ children = undefined }: any) {
   );
 }
 
-export function CalcResultSafetyFooter({ children = undefined }) {
+export function CalcResultSafetyFooter({ children = undefined }: any) {
   return (
     <p className="calc-result-safety-footer" role="note">
       {children ||
@@ -46,7 +46,7 @@ export function CalcResultSafetyFooter({ children = undefined }) {
   );
 }
 
-export function CalcInterpretationRegion({ headingId, title, severity, emphasizeRisk, children, ariaLabel = undefined }) {
+export function CalcInterpretationRegion({ headingId, title, severity, emphasizeRisk = false, children, ariaLabel = undefined }) {
   return (
     <section
       className={`calc-interpretation-box ${severity}${emphasizeRisk ? ' calc-interpretation-box--risk-emphasis' : ''}`}

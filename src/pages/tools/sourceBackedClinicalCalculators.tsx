@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { NavIcon } from '../../navigation/NavIcon';
-import { CHROME_ICONS, getCalculatorSubIcon } from '../../navigation/iconRegistry';
+import { getCalculatorSubIcon } from '../../navigation/iconRegistry';
+import { CalcPanelTitle, ResultsPanelTitle } from './calculatorPrimitives';
 import {
   WELLS_PE_CRITERIA_META,
   calculateWellsPeScore,
@@ -35,24 +36,6 @@ import {
 } from '../../utils/ottawaAnkleCalculator';
 import { NEXUS_CRITERIA_META, evaluateNexusCSpine } from '../../utils/nexusCSpineCalculator';
 import { PECARN_AGE_CATEGORIES, evaluatePecarnHead } from '../../utils/pecarnHeadCalculator';
-
-function CalcPanelTitle({ icon, children }) {
-  return (
-    <div className="calculator-panel-title">
-      <NavIcon icon={icon} size={22} aria-hidden />
-      <span className="calculator-panel-title-text">{children}</span>
-    </div>
-  );
-}
-
-function ResultsPanelTitle() {
-  return (
-    <div className="calculator-panel-title">
-      <NavIcon icon={CHROME_ICONS.barChart} size={22} aria-hidden />
-      <span className="calculator-panel-title-text">Results</span>
-    </div>
-  );
-}
 
 function DecisionSupportNotice({ children }) {
   return (

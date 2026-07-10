@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS, getCalculatorSubIcon } from '../../navigation/iconRegistry';
+import { CalcPanelTitle, ResultsPanelTitle, scrollResultsIntoView } from './calculatorPrimitives';
 import {
   computeBunCreatinineRatio,
   computeCorrectedSodium,
@@ -12,32 +13,6 @@ import {
   computeKfre4Variable,
   computeOsmolalGap,
 } from '../../utils/nephrologyCalculators';
-
-function CalcPanelTitle({ icon, children }) {
-  return (
-    <div className="calculator-panel-title">
-      <NavIcon icon={icon} size={22} aria-hidden />
-      <span className="calculator-panel-title-text">{children}</span>
-    </div>
-  );
-}
-
-function ResultsPanelTitle() {
-  return (
-    <div className="calculator-panel-title">
-      <NavIcon icon={CHROME_ICONS.barChart} size={22} aria-hidden />
-      <span className="calculator-panel-title-text">Results</span>
-    </div>
-  );
-}
-
-function scrollResultsIntoView(el) {
-  if (!el) return;
-  const reduceMotion =
-    typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  el.focus({ preventScroll: true });
-  el.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'nearest' });
-}
 
 function DecisionSupportNotice({ children }) {
   return (

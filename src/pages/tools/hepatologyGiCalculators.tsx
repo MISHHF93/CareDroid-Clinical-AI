@@ -1,6 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
-import { NavIcon } from '../../navigation/NavIcon';
-import { getCalculatorSubIcon, CHROME_ICONS } from '../../navigation/iconRegistry';
+import { getCalculatorSubIcon } from '../../navigation/iconRegistry';
+import {
+  CalcDecisionSupportLead as SharedCalcDecisionSupportLead,
+  CalcResultSafetyFooter as SharedCalcResultSafetyFooter,
+  CalcInterpretationRegion,
+  CalcPanelTitle,
+  CalcResultsEmptyIcon,
+  CalcResultsPanel,
+  ResultsPanelTitle,
+  scrollResultsIntoView,
+} from './calculatorPrimitives';
 import {
   HEPATOLOGY_GI_DISCLAIMER,
   calculateApri,
@@ -16,79 +25,22 @@ import {
   validateMaddreyInputs,
 } from '../../utils/hepatologyGiCalculators';
 
-function CalcPanelTitle({ icon, children }) {
-  return (
-    <div className="calculator-panel-title">
-      <NavIcon icon={icon} size={22} aria-hidden />
-      <span className="calculator-panel-title-text">{children}</span>
-    </div>
-  );
-}
-
-function ResultsPanelTitle() {
-  return (
-    <div className="calculator-panel-title">
-      <NavIcon icon={CHROME_ICONS.barChart} size={22} aria-hidden />
-      <span className="calculator-panel-title-text">Results</span>
-    </div>
-  );
-}
-
 function CalcDecisionSupportLead() {
   return (
-    <p className="calc-ds-lead">
-      <strong>Decision support only.</strong> Does not establish a diagnosis, recommend treatment, or replace clinician
-      judgment and local GI/hepatology protocols.
-    </p>
+    <SharedCalcDecisionSupportLead>
+      Does not establish a diagnosis, recommend treatment, or replace clinician judgment and local GI/hepatology
+      protocols.
+    </SharedCalcDecisionSupportLead>
   );
 }
 
 function CalcResultSafetyFooter() {
   return (
-    <p className="calc-result-safety-footer" role="note">
+    <SharedCalcResultSafetyFooter>
       Output reflects only the values entered here and may omit important context such as active bleeding,
       encephalopathy, infection, hemodynamic instability, anticoagulants, and local pathway requirements.
-    </p>
+    </SharedCalcResultSafetyFooter>
   );
-}
-
-function CalcResultsPanel({ id, resultsRef, children }) {
-  return (
-    <div className="calculator-results" id={id} ref={resultsRef} tabIndex={-1} role="region">
-      {children}
-    </div>
-  );
-}
-
-function CalcResultsEmptyIcon({ icon, size = 56 }) {
-  return (
-    <div className="calc-results-empty-icon" aria-hidden>
-      <NavIcon icon={icon} size={size} />
-    </div>
-  );
-}
-
-function CalcInterpretationRegion({ headingId, title, severity, emphasizeRisk, children }) {
-  return (
-    <section
-      className={`calc-interpretation-box ${severity}${emphasizeRisk ? ' calc-interpretation-box--risk-emphasis' : ''}`}
-      role="region"
-      aria-labelledby={headingId}
-    >
-      <h3 id={headingId} className="calc-interpretation-title">
-        {title}
-      </h3>
-      {children}
-    </section>
-  );
-}
-
-function scrollResultsIntoView(el) {
-  if (!el) return;
-  const reduceMotion =
-    typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  el.focus({ preventScroll: true });
-  el.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'nearest' });
 }
 
 function ErrorSummary({ errors }) {
@@ -276,7 +228,7 @@ export function MaddreyDiscriminantFunctionCalculator({ onResultChange }) {
           </div>
         </form>
       </div>
-      <CalcResultsPanel id="calc-results-maddrey-discriminant-function" resultsRef={resultsRef}>
+      <CalcResultsPanel id="calc-results-maddrey-discriminant-function" resultsRef={resultsRef} role="region">
         <ResultsPanelTitle />
         {result ? (
           <ResultBlock slug={slug} result={result} scoreLabel="Maddrey DF" />
@@ -401,7 +353,7 @@ export function ApriCalculator({ onResultChange }) {
           </div>
         </form>
       </div>
-      <CalcResultsPanel id="calc-results-apri" resultsRef={resultsRef}>
+      <CalcResultsPanel id="calc-results-apri" resultsRef={resultsRef} role="region">
         <ResultsPanelTitle />
         {result ? (
           <ResultBlock slug={slug} result={result} scoreLabel="APRI" />
@@ -611,7 +563,7 @@ export function GlasgowBlatchfordScoreCalculator({ onResultChange }) {
           </div>
         </form>
       </div>
-      <CalcResultsPanel id="calc-results-glasgow-blatchford-score" resultsRef={resultsRef}>
+      <CalcResultsPanel id="calc-results-glasgow-blatchford-score" resultsRef={resultsRef} role="region">
         <ResultsPanelTitle />
         {result ? (
           <ResultBlock slug={slug} result={result} scoreLabel="GBS">
@@ -752,7 +704,7 @@ export function RockallScoreCalculator({ onResultChange }) {
           </div>
         </form>
       </div>
-      <CalcResultsPanel id="calc-results-rockall-score" resultsRef={resultsRef}>
+      <CalcResultsPanel id="calc-results-rockall-score" resultsRef={resultsRef} role="region">
         <ResultsPanelTitle />
         {result ? (
           <ResultBlock slug={slug} result={result} scoreLabel="Rockall score">
