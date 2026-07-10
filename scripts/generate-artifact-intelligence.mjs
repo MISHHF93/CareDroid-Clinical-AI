@@ -418,7 +418,7 @@ async function main() {
       buildArtifactTrainingDataset,
       encodeArtifactFeatures,
       validateArtifactCatalog,
-    } = await vite.ssrLoadModule('/src/data/artifactIntelligence.node.ts');
+    } = await vite.ssrLoadModule('/src/data/artifactIntelligence.ts');
 
     const [
       documentArtifacts,
