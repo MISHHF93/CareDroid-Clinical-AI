@@ -38,6 +38,7 @@ import { PatientFlowService } from './emergency-os.patient-flow.service';
 import { WorkflowOrchestrationService } from './emergency-os.workflow-orchestration.service';
 import { EmergencyOperatingSurfacesService } from './emergency-os.operating-surfaces.service';
 import { EntitlementService } from '../platform-assets/entitlement.service';
+import { OcrIntakeService } from './ocr-intake.service';
 
 describe('EmergencyOsController', () => {
   let controller: EmergencyOsController;
@@ -75,6 +76,7 @@ describe('EmergencyOsController', () => {
         PatientFlowService,
         WorkflowOrchestrationService,
         EmergencyOperatingSurfacesService,
+        OcrIntakeService,
         {
           provide: EntitlementService,
           useValue: {
