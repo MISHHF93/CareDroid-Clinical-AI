@@ -1,6 +1,9 @@
 import { Injectable, Optional } from '@nestjs/common';
 import type { ReviewAdministrativeAutomationInput } from '../../../../src/types/administrativeAutomation';
-import type { AdministrativeAutomationSnapshot, AdministrativeAutomationTask } from '../../../../src/types/administrativeAutomation';
+import type {
+  AdministrativeAutomationSnapshot,
+  AdministrativeAutomationTask,
+} from '../../../../src/types/administrativeAutomation';
 import type { Alert, EMSArrival, Patient, Referral, Staff } from '../../../../src/types/emergency';
 import { PlatformAssetsService } from '../platform-assets/platform-assets.service';
 import type { EmergencyModuleEnvelope } from './emergency-os.types';

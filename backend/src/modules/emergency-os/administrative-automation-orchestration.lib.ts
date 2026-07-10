@@ -137,7 +137,10 @@ function buildRoutingTasks(
           proposedAction: 'Move patient to triage queue and notify triage nurse.',
           proposedPayload: { targetState: PatientState.Triage, queue: 'pretriage' },
           ownerRole: 'triage_nurse',
-          priority: patient.priority === Priority.P1 || patient.priority === Priority.P2 ? 'high' : 'medium',
+          priority:
+            patient.priority === Priority.P1 || patient.priority === Priority.P2
+              ? 'high'
+              : 'medium',
           createdAt: now,
           updatedAt: now,
         }),
@@ -154,7 +157,8 @@ function buildRoutingTasks(
           patientId: patient.id,
           patientName: patientName(patient),
           title: `Advance ${patientName(patient)} to waiting`,
-          summary: 'Triage documentation captured — ready for waiting-room or provider queue routing.',
+          summary:
+            'Triage documentation captured — ready for waiting-room or provider queue routing.',
           proposedAction: 'Move patient to waiting queue after triage sign-off.',
           proposedPayload: { targetState: PatientState.Waiting, queue: 'waiting-room' },
           ownerRole: 'triage_nurse',
@@ -233,7 +237,8 @@ function buildSummaryTasks(
         patientName: patientName(patient),
         title: `AI summary ready — ${patientName(patient)}`,
         summary,
-        proposedAction: 'Attach reviewed summary to patient record and share with assigned clinician.',
+        proposedAction:
+          'Attach reviewed summary to patient record and share with assigned clinician.',
         proposedPayload: { summaryText: summary },
         ownerRole: 'emergency_physician',
         priority: patient.priority === Priority.P1 ? 'critical' : 'high',
@@ -265,7 +270,8 @@ function buildTriagePrepTasks(
         patientName: linkedPatient ? patientName(linkedPatient) : arrival.unitName,
         title: `Prepare triage packet — ${arrival.unitName}`,
         summary: `Inbound EMS ETA ${arrival.eta}m · ${arrival.chiefComplaint || 'complaint pending'}`,
-        proposedAction: 'Open pre-arrival triage packet, assign receiving nurse, and stage resus if critical.',
+        proposedAction:
+          'Open pre-arrival triage packet, assign receiving nurse, and stage resus if critical.',
         proposedPayload: {
           arrivalId: arrival.id,
           etaMinutes: arrival.eta,
@@ -289,10 +295,25 @@ function buildDepartmentNotificationTasks(
 ): AdministrativeAutomationTask[] {
   const tasks: AdministrativeAutomationTask[] = [];
   const stages = [
-    { stageId: 'registration', state: PatientState.Registration, label: 'Registration', ownerRole: 'Registration clerk' },
+    {
+      stageId: 'registration',
+      state: PatientState.Registration,
+      label: 'Registration',
+      ownerRole: 'Registration clerk',
+    },
     { stageId: 'triage', state: PatientState.Triage, label: 'Triage', ownerRole: 'Triage nurse' },
-    { stageId: 'waiting', state: PatientState.Waiting, label: 'Waiting', ownerRole: 'Charge nurse' },
-    { stageId: 'assessment', state: PatientState.Assessment, label: 'Assessment', ownerRole: 'Emergency physician' },
+    {
+      stageId: 'waiting',
+      state: PatientState.Waiting,
+      label: 'Waiting',
+      ownerRole: 'Charge nurse',
+    },
+    {
+      stageId: 'assessment',
+      state: PatientState.Assessment,
+      label: 'Assessment',
+      ownerRole: 'Emergency physician',
+    },
   ];
 
   for (const stage of stages) {
@@ -438,7 +459,8 @@ function buildEscalationTasks(
           patientName: patientName(patient),
           title: `Escalation review — ${patientName(patient)}`,
           summary: `Operational flags: ${flags.join(', ') || 'risk signal detected'}.`,
-          proposedAction: 'Launch reassessment, notify charge nurse, and document escalation rationale.',
+          proposedAction:
+            'Launch reassessment, notify charge nurse, and document escalation rationale.',
           proposedPayload: { flags, escalationType: 'clinical_operational' },
           ownerRole: 'charge_nurse',
           priority: hasFlag(patient, PatientFlag.DeteriorationRisk) ? 'critical' : 'high',
@@ -463,7 +485,8 @@ function buildEscalationTasks(
           status: 'pending_review',
           title: 'Escalate unresolved critical alerts',
           summary: `${unresolvedCritical.length} critical alert(s) need acknowledgement before next workflow step.`,
-          proposedAction: 'Route alerts to charge nurse and attending physician for coordinated response.',
+          proposedAction:
+            'Route alerts to charge nurse and attending physician for coordinated response.',
           proposedPayload: { alertIds: unresolvedCritical.map((alert) => alert.id) },
           ownerRole: recommendRouting('critical_alert').primaryRole,
           priority: 'critical',
@@ -488,7 +511,10 @@ export function buildAdministrativeAutomationSnapshot(
   const emsArrivals = input.emsArrivals || [];
   const existing = new Map(
     (input.existingTasks || [])
-      .filter((task) => task.status !== 'executed' && task.status !== 'dismissed' && task.status !== 'expired')
+      .filter(
+        (task) =>
+          task.status !== 'executed' && task.status !== 'dismissed' && task.status !== 'expired',
+      )
       .map((task) => [task.id, task]),
   );
 
@@ -550,7 +576,10 @@ type PatientJourneyAiDecisionBundle = Readonly<{
   generatedAt: string;
 }>;
 
-function buildPatientJourneyAiInput(patient: Patient, tenant?: TenantContext): Record<string, unknown> {
+function buildPatientJourneyAiInput(
+  patient: Patient,
+  tenant?: TenantContext,
+): Record<string, unknown> {
   const vitals = patient.currentVitals || patient.vitals?.at(-1);
   return {
     patientId: patient.id,
@@ -590,7 +619,10 @@ function aiContext(sourceScreen: string, patientId: string, tenant?: TenantConte
   };
 }
 
-function buildEmsPrearrivalAiInput(arrival: EMSArrival, patient?: Patient): Record<string, unknown> {
+function buildEmsPrearrivalAiInput(
+  arrival: EMSArrival,
+  patient?: Patient,
+): Record<string, unknown> {
   const vitals = patient?.currentVitals || patient?.vitals?.at(-1);
   return {
     unitName: arrival.unitName,
@@ -655,8 +687,12 @@ function formatAiDecisionSummary(bundle: PatientJourneyAiDecisionBundle): string
     : '';
   return [
     `AI triage advisory: ${triageLevel}.`,
-    redFlags.length ? `Red flags: ${redFlags.join('; ')}.` : 'No critical red flags in submitted data.',
-    missing ? `Registration gaps: ${missing}.` : 'Registration fields appear complete for automated review.',
+    redFlags.length
+      ? `Red flags: ${redFlags.join('; ')}.`
+      : 'No critical red flags in submitted data.',
+    missing
+      ? `Registration gaps: ${missing}.`
+      : 'Registration fields appear complete for automated review.',
     'Licensed clinician must confirm before acuity, routing, or orders change.',
   ].join(' ');
 }
@@ -666,7 +702,12 @@ function hasHighRiskAiSignal(bundle: PatientJourneyAiDecisionBundle): boolean {
   if (criticalSeverity === 'critical') return true;
   if ((bundle.critical.redFlags || []).length > 0) return true;
   const triageLevel = String(bundle.triage.data?.recommendedTriageLevel || '').toUpperCase();
-  return triageLevel === 'P1' || triageLevel === 'P2' || triageLevel === 'RESUSCITATION' || triageLevel === 'EMERGENT';
+  return (
+    triageLevel === 'P1' ||
+    triageLevel === 'P2' ||
+    triageLevel === 'RESUSCITATION' ||
+    triageLevel === 'EMERGENT'
+  );
 }
 
 async function enrichAdministrativeAutomationSnapshotWithAi(

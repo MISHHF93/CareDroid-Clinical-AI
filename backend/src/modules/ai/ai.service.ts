@@ -118,7 +118,10 @@ export class AIService {
 
     // Claude Sonnet pricing estimate (USD per 1K tokens).
     this.aiPricing = new Map([
-      [UNIFIED_AI_MODEL, { inputPer1kTokens: 0.003, outputPer1kTokens: 0.015, cacheReadPer1kTokens: 0.0003 }],
+      [
+        UNIFIED_AI_MODEL,
+        { inputPer1kTokens: 0.003, outputPer1kTokens: 0.015, cacheReadPer1kTokens: 0.0003 },
+      ],
     ]);
 
     // Legacy LLM function schema. Canonical executor IDs/aliases live in
@@ -463,11 +466,7 @@ export class AIService {
     }
   }
 
-  async runCareDroidAINode(
-    userId: string,
-    request: CareDroidAIRequest,
-    context?: any,
-  ) {
+  async runCareDroidAINode(userId: string, request: CareDroidAIRequest, context?: any) {
     const startTime = Date.now();
     const unifiedClassification = await this.classifyStructuredNodeInput(userId, request);
     const mergedRequest = {
@@ -1155,7 +1154,10 @@ export class AIService {
 
     try {
       const channel = patientId
-        ? await this.collaborationHubService.getOrCreatePatientThread(query.organizationId, patientId)
+        ? await this.collaborationHubService.getOrCreatePatientThread(
+            query.organizationId,
+            patientId,
+          )
         : await this.collaborationHubService.getOrCreateAiChiefChannel(query.organizationId);
 
       await this.collaborationHubService.postSystemMessage(channel.id, {

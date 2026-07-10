@@ -123,10 +123,7 @@ export class InMemoryVectorStore {
     writeFileSync(this.persistPath, JSON.stringify([...this.records.values()]));
   }
 
-  private matchesFilter(
-    metadata: ChunkMetadata,
-    filter?: Record<string, unknown>,
-  ): boolean {
+  private matchesFilter(metadata: ChunkMetadata, filter?: Record<string, unknown>): boolean {
     if (!filter || Object.keys(filter).length === 0) return true;
 
     for (const [key, value] of Object.entries(filter)) {

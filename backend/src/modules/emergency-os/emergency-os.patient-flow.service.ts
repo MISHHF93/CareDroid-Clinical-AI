@@ -48,7 +48,9 @@ export class PatientFlowService {
     return Object.freeze({
       ...snapshot,
       patients: Object.freeze(patientEntry ? [patientEntry] : []),
-      detections: Object.freeze(snapshot.detections.filter((entry) => entry.patientId === patientId)),
+      detections: Object.freeze(
+        snapshot.detections.filter((entry) => entry.patientId === patientId),
+      ),
       aiRecommendations: Object.freeze(
         snapshot.aiRecommendations.filter((entry) => entry.patientId === patientId),
       ),

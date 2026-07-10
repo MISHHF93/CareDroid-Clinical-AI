@@ -52,7 +52,9 @@ describe('FleetController entitlement guard', () => {
       new ForbiddenException('Feature access denied: pack-required'),
     );
 
-    await expect(controller.getFleetVehicles(req as any)).rejects.toBeInstanceOf(ForbiddenException);
+    await expect(controller.getFleetVehicles(req as any)).rejects.toBeInstanceOf(
+      ForbiddenException,
+    );
     expect(vehicleTrackingService.getLiveVehicles).not.toHaveBeenCalled();
   });
 });

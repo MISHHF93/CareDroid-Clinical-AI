@@ -335,7 +335,8 @@ export class IntentClassifierService {
       this.recordSuccess(this.nluCircuitBreaker);
 
       const rawToolId =
-        result.toolId ?? (primaryIntent === PrimaryIntent.CLINICAL_TOOL ? result.intent : undefined);
+        result.toolId ??
+        (primaryIntent === PrimaryIntent.CLINICAL_TOOL ? result.intent : undefined);
       const toolId = resolveExecutorToolId(rawToolId, result.artifactType, message);
 
       const extractedParameters = { ...(result.parameters || {}) };
@@ -364,9 +365,7 @@ export class IntentClassifierService {
     }
   }
 
-  private async predictWithUnifiedNode(
-    message: string,
-  ): Promise<{
+  private async predictWithUnifiedNode(message: string): Promise<{
     intent: string;
     confidence: number;
     toolId?: string;
@@ -394,9 +393,7 @@ export class IntentClassifierService {
     return this.nluServiceUrl.replace(/\/api\/nlu\/?$/, '');
   }
 
-  private async predictWithHttpUnifiedNode(
-    message: string,
-  ): Promise<{
+  private async predictWithHttpUnifiedNode(message: string): Promise<{
     intent: string;
     confidence: number;
     toolId?: string;
@@ -427,8 +424,18 @@ export class IntentClassifierService {
       }
 
       const payload = (await response.json()) as {
-        intent?: { intent?: string; confidence?: number; keyTerms?: string[]; subcategory?: string | null };
-        artifact?: { artifactType?: string; confidence?: number; labelId?: number; targetMode?: string };
+        intent?: {
+          intent?: string;
+          confidence?: number;
+          keyTerms?: string[];
+          subcategory?: string | null;
+        };
+        artifact?: {
+          artifactType?: string;
+          confidence?: number;
+          labelId?: number;
+          targetMode?: string;
+        };
       };
 
       if (!payload.intent?.intent) return null;

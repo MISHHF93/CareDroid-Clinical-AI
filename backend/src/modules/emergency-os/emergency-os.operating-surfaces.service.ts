@@ -1,9 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import type {
-  EmergencyAlert,
-  EmergencyPatient,
-  WorkflowActionLog,
-} from './emergency-os.types';
+import type { EmergencyAlert, EmergencyPatient, WorkflowActionLog } from './emergency-os.types';
 import {
   EmergencyAnalyticsService,
   EmergencyPatientService,
@@ -45,7 +41,9 @@ function activePatients(patients: EmergencyPatient[]) {
 
 function inboundEms(emsArrivals: EmsArrivalLike[]) {
   return emsArrivals.filter((arrival) =>
-    ['Dispatched', 'Inbound', 'Arrived', 'Handoff', 'Offload'].includes(String(arrival.status || '')),
+    ['Dispatched', 'Inbound', 'Arrived', 'Handoff', 'Offload'].includes(
+      String(arrival.status || ''),
+    ),
   );
 }
 
@@ -65,7 +63,9 @@ export class EmergencyOperatingSurfacesService {
     const patients = this.patientService.listPatients();
     const alerts = this.patientService.listAlerts() as unknown as EmergencyAlert[];
     const capacity = this.patientService.computeCapacity();
-    const emsPayload = this.emsIntakeService.getEMSIntake().data as { emsArrivals?: EmsArrivalLike[] };
+    const emsPayload = this.emsIntakeService.getEMSIntake().data as {
+      emsArrivals?: EmsArrivalLike[];
+    };
     const emsArrivals = emsPayload.emsArrivals || [];
     const queues = this.queueService.getQueues().data as { queues?: unknown[] };
     const analytics = this.analyticsService.getAnalytics().data;
@@ -136,7 +136,8 @@ export class EmergencyOperatingSurfacesService {
               ['LabPending', 'ImagingPending', 'EcgPending'].includes(String(flag)),
             ),
         );
-        const orchestration = await this.workflowOrchestrationService.getWorkflowOrchestration(tenant);
+        const orchestration =
+          await this.workflowOrchestrationService.getWorkflowOrchestration(tenant);
         return envelope('Diagnostics Board Snapshot', surfaceId, {
           pendingOrderPatients: pendingOrders.length,
           highRiskPatients: context.analytics.highRisk,
@@ -146,7 +147,8 @@ export class EmergencyOperatingSurfacesService {
       }
 
       case 'handoffs': {
-        const orchestration = await this.workflowOrchestrationService.getWorkflowOrchestration(tenant);
+        const orchestration =
+          await this.workflowOrchestrationService.getWorkflowOrchestration(tenant);
         return envelope('Handoffs Board Snapshot', surfaceId, {
           emsHandoffsPending: context.inboundEms.filter((a) => a.status !== 'Offload').length,
           referralsOpen: context.referrals.filter((ref) => ref.status !== 'Completed').length,
@@ -180,13 +182,21 @@ export class EmergencyOperatingSurfacesService {
           ),
           staffOnDuty: this.patientService.listStaff().length,
           readinessChecks: [
-            { id: 'ems-surge', label: 'EMS surge watch', status: context.inboundEms.length >= 3 ? 'attention' : 'ready' },
+            {
+              id: 'ems-surge',
+              label: 'EMS surge watch',
+              status: context.inboundEms.length >= 3 ? 'attention' : 'ready',
+            },
             {
               id: 'capacity',
               label: 'Capacity headroom',
               status: context.capacity.band === 'Red' ? 'attention' : 'ready',
             },
-            { id: 'alerts', label: 'Critical alerts', status: context.alerts.some((a) => a.severity === 'Critical') ? 'attention' : 'ready' },
+            {
+              id: 'alerts',
+              label: 'Critical alerts',
+              status: context.alerts.some((a) => a.severity === 'Critical') ? 'attention' : 'ready',
+            },
           ],
         });
 
@@ -207,7 +217,9 @@ export class EmergencyOperatingSurfacesService {
           criticalAlerts: criticalAlerts.length,
           unresolvedAlerts: criticalAlerts.filter((alert) => !alert.dismissed).length,
           threeMinuteBreaches: complianceBreaches.length,
-          doctorsOnDuty: staff.filter((member) => /physician|doctor|attending/i.test(String(member.role || ''))).length,
+          doctorsOnDuty: staff.filter((member) =>
+            /physician|doctor|attending/i.test(String(member.role || '')),
+          ).length,
           nursesOnDuty: staff.filter((member) => /nurse/i.test(String(member.role || ''))).length,
           queueCounts: context.queues,
           workflowLogCount: context.workflowLogs.length,

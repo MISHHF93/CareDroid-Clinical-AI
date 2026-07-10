@@ -424,7 +424,12 @@ const RAW_SEED_PRODUCTS = [
     description:
       'ED and EMS flow intelligence for throughput, handoff, dynamic triage, bed pressure, referrals, discharge acceleration, equipment, surge prediction, Copilot, and command-center operations.',
     productType: ProductType.EMERGENCY_DEPARTMENT,
-    packIds: ['emergency-department-pack', 'emergency-medicine', 'reception-desk', 'emergency-clinical'],
+    packIds: [
+      'emergency-department-pack',
+      'emergency-medicine',
+      'reception-desk',
+      'emergency-clinical',
+    ],
     highlightAssetIds: [
       'heart-score',
       'sofa-score',

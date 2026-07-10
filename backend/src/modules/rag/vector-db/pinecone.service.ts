@@ -60,8 +60,7 @@ export class PineconeService implements IVectorDatabase, OnModuleInit {
 
       if (!apiKey) {
         const persistPath =
-          process.env.RAG_LOCAL_INDEX_PATH ||
-          join(process.cwd(), '.rag-local', 'vectors.json');
+          process.env.RAG_LOCAL_INDEX_PATH || join(process.cwd(), '.rag-local', 'vectors.json');
         this.inMemoryStore = new InMemoryVectorStore(
           this.dimension,
           'in-memory-local',

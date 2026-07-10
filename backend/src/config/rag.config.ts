@@ -22,7 +22,10 @@ export default registerAs('rag', () => ({
   pinecone: {
     apiKey: process.env.PINECONE_API_KEY,
     indexName: process.env.PINECONE_INDEX_NAME || 'caredroid-medical-knowledge',
-    dimension: parseInt(process.env.PINECONE_DIMENSION || process.env.EMBEDDING_DIMENSION || '768', 10),
+    dimension: parseInt(
+      process.env.PINECONE_DIMENSION || process.env.EMBEDDING_DIMENSION || '768',
+      10,
+    ),
     environment: process.env.PINECONE_ENVIRONMENT || 'us-east-1-aws',
     namespace: process.env.PINECONE_NAMESPACE || 'medical-docs',
   },

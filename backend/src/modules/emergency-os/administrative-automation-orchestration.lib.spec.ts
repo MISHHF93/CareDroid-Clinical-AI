@@ -40,7 +40,9 @@ describe('administrative-automation-orchestration.lib', () => {
     expect(categories.has('patient_routing')).toBe(true);
 
     const routingTask = snapshot.tasks.find((task) => task.category === 'patient_routing');
-    const aiDecision = routingTask?.proposedPayload.aiDecision as { requiresClinicianReview?: boolean } | undefined;
+    const aiDecision = routingTask?.proposedPayload.aiDecision as
+      | { requiresClinicianReview?: boolean }
+      | undefined;
     expect(aiDecision).toBeTruthy();
     expect(aiDecision?.requiresClinicianReview).toBe(true);
   });

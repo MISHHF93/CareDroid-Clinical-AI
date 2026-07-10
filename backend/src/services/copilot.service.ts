@@ -251,7 +251,6 @@ export class CopilotService {
     const score = Number(match[1]);
     return [1, 2, 3, 4, 5].includes(score) ? (score as 1 | 2 | 3 | 4 | 5) : null;
   }
-
 }
 
 export const copilotService = new CopilotService();

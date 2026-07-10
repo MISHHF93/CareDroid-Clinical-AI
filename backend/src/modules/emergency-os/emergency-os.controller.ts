@@ -457,7 +457,8 @@ export class EmergencyOsController {
 
   @Post('workflow-orchestration/review')
   reviewWorkflowAutomation(
-    @Body() body: import('../../../../src/types/administrativeAutomation').ReviewAdministrativeAutomationInput,
+    @Body()
+    body: import('../../../../src/types/administrativeAutomation').ReviewAdministrativeAutomationInput,
     @TenantContext() tenantContext?: TenantContextValue,
   ) {
     return this.workflowOrchestrationService.reviewTask(body, tenantContext);

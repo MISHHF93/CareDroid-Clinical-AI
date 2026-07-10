@@ -94,38 +94,56 @@ function minutesSince(iso: string | undefined, now: Date): number {
 
 function resolveWorkflowState(patient: Patient): string {
   if (hasFlag(patient, PatientFlag.ReassessmentDue)) return 'reassessment';
-  if (patient.state === PatientState.Disposition && hasFlag(patient, PatientFlag.PendingAdmission)) {
+  if (
+    patient.state === PatientState.Disposition &&
+    hasFlag(patient, PatientFlag.PendingAdmission)
+  ) {
     return 'admission';
   }
   if (patient.state === PatientState.Discharge) {
-    return patient.timeline?.some((event) => event.type === 'FollowUpScheduled') ? 'follow-up' : 'discharge';
+    return patient.timeline?.some((event) => event.type === 'FollowUpScheduled')
+      ? 'follow-up'
+      : 'discharge';
   }
   return PATIENT_STATE_TO_WORKFLOW[patient.state] || 'waiting';
 }
 
-function bottleneckStatus(stageWaitMinutes: number, targetMinutes: number, priority: Priority): string {
+function bottleneckStatus(
+  stageWaitMinutes: number,
+  targetMinutes: number,
+  priority: Priority,
+): string {
   const isHighAcuity = priority === Priority.P1 || priority === Priority.P2;
-  if (stageWaitMinutes >= targetMinutes * 2 || (isHighAcuity && stageWaitMinutes >= targetMinutes * 1.25)) {
+  if (
+    stageWaitMinutes >= targetMinutes * 2 ||
+    (isHighAcuity && stageWaitMinutes >= targetMinutes * 1.25)
+  ) {
     return 'overload';
   }
-  if (stageWaitMinutes >= targetMinutes * 1.5 || (isHighAcuity && stageWaitMinutes >= targetMinutes)) {
+  if (
+    stageWaitMinutes >= targetMinutes * 1.5 ||
+    (isHighAcuity && stageWaitMinutes >= targetMinutes)
+  ) {
     return 'congestion';
   }
   if (stageWaitMinutes >= targetMinutes) return 'watch';
   return 'clear';
 }
 
-export function buildBackendPatientFlowSnapshot(input: {
-  patients?: Patient[];
-  staff?: Staff[];
-  referrals?: Referral[];
-  capacity?: CapacitySnapshot | null;
-  now?: Date;
-} = {}): BackendPatientFlowSnapshot {
+export function buildBackendPatientFlowSnapshot(
+  input: {
+    patients?: Patient[];
+    staff?: Staff[];
+    referrals?: Referral[];
+    capacity?: CapacitySnapshot | null;
+    now?: Date;
+  } = {},
+): BackendPatientFlowSnapshot {
   const now = input.now || new Date();
   const staff = input.staff || [];
   const activePatients = (input.patients || []).filter(
-    (patient) => patient.state !== PatientState.Discharge && patient.state !== PatientState.Deceased,
+    (patient) =>
+      patient.state !== PatientState.Discharge && patient.state !== PatientState.Deceased,
   );
 
   const patients = activePatients.map((patient) => {
@@ -151,7 +169,9 @@ export function buildBackendPatientFlowSnapshot(input: {
       targetMinutes,
       bottleneckStatus: status,
       bottleneckReason:
-        status === 'clear' ? null : `${workflowStateId} running ${Math.max(0, stageWaitMinutes - targetMinutes)}m over target.`,
+        status === 'clear'
+          ? null
+          : `${workflowStateId} running ${Math.max(0, stageWaitMinutes - targetMinutes)}m over target.`,
       predictedNextStep: null,
       predictedNextStepId: null,
       aiRecommendation: null,
@@ -253,7 +273,10 @@ function buildRoutingTasks(patients: Patient[], now: string): AdministrativeAuto
           proposedAction: 'Move patient to triage queue and notify triage nurse.',
           proposedPayload: { targetState: PatientState.Triage, queue: 'pretriage' },
           ownerRole: 'triage_nurse',
-          priority: patient.priority === Priority.P1 || patient.priority === Priority.P2 ? 'high' : 'medium',
+          priority:
+            patient.priority === Priority.P1 || patient.priority === Priority.P2
+              ? 'high'
+              : 'medium',
           createdAt: now,
           updatedAt: now,
         }),
@@ -286,11 +309,13 @@ function buildEscalationTasks(patients: Patient[], now: string): AdministrativeA
 }
 
 /** @deprecated Use `buildBackendEnrichedAdministrativeAutomationSnapshot` for full parity. */
-export function buildBackendAdministrativeAutomationSnapshot(input: {
-  patients?: Patient[];
-  existingTasks?: readonly AdministrativeAutomationTask[];
-  now?: Date;
-} = {}): AdministrativeAutomationSnapshot {
+export function buildBackendAdministrativeAutomationSnapshot(
+  input: {
+    patients?: Patient[];
+    existingTasks?: readonly AdministrativeAutomationTask[];
+    now?: Date;
+  } = {},
+): AdministrativeAutomationSnapshot {
   const now = (input.now || new Date()).toISOString();
   const patients = input.patients || [];
   const existing = new Map(
@@ -306,7 +331,18 @@ export function buildBackendAdministrativeAutomationSnapshot(input: {
 
   const tasks = Object.freeze([...existing.values(), ...generated]);
   const byCategory = Object.freeze(
-    (['patient_routing', 'documentation_handoff', 'ai_patient_summary', 'triage_preparation', 'department_notification', 'staff_assignment', 'queue_prioritization', 'escalation_workflow'] as AdministrativeAutomationCategory[]).reduce(
+    (
+      [
+        'patient_routing',
+        'documentation_handoff',
+        'ai_patient_summary',
+        'triage_preparation',
+        'department_notification',
+        'staff_assignment',
+        'queue_prioritization',
+        'escalation_workflow',
+      ] as AdministrativeAutomationCategory[]
+    ).reduce(
       (acc, category) => {
         acc[category] = tasks.filter((task) => task.category === category).length;
         return acc;

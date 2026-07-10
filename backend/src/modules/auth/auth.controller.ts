@@ -100,10 +100,7 @@ export class AuthController {
     const productionDemoAuthEnabled =
       String(process.env.ALLOW_DEMO_AUTH_IN_PRODUCTION || '').toLowerCase() === 'true';
     if (nodeEnv === 'production' && !productionDemoAuthEnabled) {
-      throw new HttpException(
-        'Dev session is not available in production',
-        HttpStatus.FORBIDDEN,
-      );
+      throw new HttpException('Dev session is not available in production', HttpStatus.FORBIDDEN);
     }
 
     const ipAddress = req.ip || '0.0.0.0';

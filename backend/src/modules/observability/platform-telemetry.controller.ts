@@ -3,10 +3,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { AuthorizationGuard } from '../auth/guards/authorization.guard';
 import { Permissions } from '../auth/decorators/permissions.decorator';
 import { Permission } from '../auth/enums/permission.enum';
-import {
-  PlatformTelemetryEvent,
-  PlatformTelemetryService,
-} from './platform-telemetry.service';
+import { PlatformTelemetryEvent, PlatformTelemetryService } from './platform-telemetry.service';
 
 type TelemetryIngestDto = {
   sessionId?: string;

@@ -42,7 +42,9 @@ describe('buildOperationalIntelligenceSnapshot', () => {
     expect(snapshot.layer).toBe('CareDroidOperationalIntelligence');
     expect(snapshot.featureVector.breachedQueues).toBe(1);
     expect(snapshot.recommendations.some((rec) => rec.id === 'rec-review-queues')).toBe(true);
-    expect(snapshot.anomalies.some((anomaly) => anomaly.category === 'queue_bottleneck')).toBe(true);
+    expect(snapshot.anomalies.some((anomaly) => anomaly.category === 'queue_bottleneck')).toBe(
+      true,
+    );
     expect(snapshot.alerts.every((alert) => alert.humanReviewRequired)).toBe(true);
   });
 });

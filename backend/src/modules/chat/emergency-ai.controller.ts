@@ -50,25 +50,25 @@ class UnifiedNodeConversationalDto {
   memoryContext?: Record<string, any>;
 }
 
-const UNIFIED_NODE_CONVERSATIONAL_ROUTES: Record<
-  string,
-  { feature: string; requestType: string }
-> = {
-  COPILOT_CHAT: { feature: 'ed-copilot', requestType: 'COPILOT_CHAT' },
-  INTAKE_SUGGEST: { feature: 'smart-intake-ai', requestType: 'INTAKE_SUGGESTION' },
-  INTAKE_SUGGESTION: { feature: 'smart-intake-ai', requestType: 'INTAKE_SUGGESTION' },
-  CLINICAL_SUMMARY: { feature: 'referral-ai', requestType: 'CLINICAL_SUMMARY' },
-  SHIFT_SUMMARY: { feature: 'analytics-ai', requestType: 'SHIFT_SUMMARY' },
-  HANDOFF_BRIEF: { feature: 'handoff-brief', requestType: 'HANDOFF_BRIEF' },
-  SCORE_ASSIST: { feature: 'clinical-chat', requestType: 'SCORE_ASSIST' },
-  PROTOCOL_SUGGEST: { feature: 'clinical-chat', requestType: 'PROTOCOL_SUGGEST' },
-  TRIAGE_ASSIST: { feature: 'clinical-chat', requestType: 'TRIAGE_ASSIST' },
-  STAFF_BALANCE: { feature: 'ed-copilot', requestType: 'COPILOT_CHAT' },
-  CAPACITY_CRISIS: { feature: 'ed-copilot', requestType: 'COPILOT_CHAT' },
-};
+const UNIFIED_NODE_CONVERSATIONAL_ROUTES: Record<string, { feature: string; requestType: string }> =
+  {
+    COPILOT_CHAT: { feature: 'ed-copilot', requestType: 'COPILOT_CHAT' },
+    INTAKE_SUGGEST: { feature: 'smart-intake-ai', requestType: 'INTAKE_SUGGESTION' },
+    INTAKE_SUGGESTION: { feature: 'smart-intake-ai', requestType: 'INTAKE_SUGGESTION' },
+    CLINICAL_SUMMARY: { feature: 'referral-ai', requestType: 'CLINICAL_SUMMARY' },
+    SHIFT_SUMMARY: { feature: 'analytics-ai', requestType: 'SHIFT_SUMMARY' },
+    HANDOFF_BRIEF: { feature: 'handoff-brief', requestType: 'HANDOFF_BRIEF' },
+    SCORE_ASSIST: { feature: 'clinical-chat', requestType: 'SCORE_ASSIST' },
+    PROTOCOL_SUGGEST: { feature: 'clinical-chat', requestType: 'PROTOCOL_SUGGEST' },
+    TRIAGE_ASSIST: { feature: 'clinical-chat', requestType: 'TRIAGE_ASSIST' },
+    STAFF_BALANCE: { feature: 'ed-copilot', requestType: 'COPILOT_CHAT' },
+    CAPACITY_CRISIS: { feature: 'ed-copilot', requestType: 'COPILOT_CHAT' },
+  };
 
 function resolveUnifiedNodeConversationalRoute(requestType: string) {
-  const route = UNIFIED_NODE_CONVERSATIONAL_ROUTES[requestType] || UNIFIED_NODE_CONVERSATIONAL_ROUTES.COPILOT_CHAT;
+  const route =
+    UNIFIED_NODE_CONVERSATIONAL_ROUTES[requestType] ||
+    UNIFIED_NODE_CONVERSATIONAL_ROUTES.COPILOT_CHAT;
   return { feature: route.feature, resolvedRequestType: route.requestType };
 }
 

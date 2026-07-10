@@ -48,7 +48,11 @@ describe('entitlement-launch.util', () => {
     };
 
     await expect(
-      assertEntitlementLaunchFromRequest(entitlementService as any, { user: { id: 'user-1' } }, 'fleet-dashboard'),
+      assertEntitlementLaunchFromRequest(
+        entitlementService as any,
+        { user: { id: 'user-1' } },
+        'fleet-dashboard',
+      ),
     ).rejects.toBeInstanceOf(ForbiddenException);
   });
 });

@@ -254,7 +254,9 @@ export class AIGovernanceV1Controller extends AIGovernanceEndpointBase {
   }
 
   @Post('evaluate-priority-change')
-  evaluatePriorityChange(@Body() body: { patient?: Record<string, unknown>; requestedDps?: number }) {
+  evaluatePriorityChange(
+    @Body() body: { patient?: Record<string, unknown>; requestedDps?: number },
+  ) {
     return super.evaluatePriorityChange(body);
   }
 }
@@ -291,7 +293,9 @@ export class EmergencyAIGovernanceController extends AIGovernanceEndpointBase {
   }
 
   @Post('evaluate-priority-change')
-  evaluatePriorityChange(@Body() body: { patient?: Record<string, unknown>; requestedDps?: number }) {
+  evaluatePriorityChange(
+    @Body() body: { patient?: Record<string, unknown>; requestedDps?: number },
+  ) {
     return super.evaluatePriorityChange(body);
   }
 }

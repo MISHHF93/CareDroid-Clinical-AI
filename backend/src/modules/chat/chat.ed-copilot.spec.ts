@@ -20,7 +20,9 @@ describe('ChatService ED Copilot wiring', () => {
 
   it('preserves sanitized client Copilot context needed for deterministic commands', () => {
     expect(source).toContain('sanitizeEdCopilotDetectedIntent');
-    expect(source).toContain('detectedIntent: this.sanitizeEdCopilotDetectedIntent(context.detectedIntent)');
+    expect(source).toContain(
+      'detectedIntent: this.sanitizeEdCopilotDetectedIntent(context.detectedIntent)',
+    );
     expect(source).toContain('emsPressure: context.emsPressure || null');
     expect(source).toContain('normalizeEdCopilotIntentName');
     expect(source).toContain("if (normalized === 'FILTER_COMPLAINT') return 'FILTER_BY_COMPLAINT'");

@@ -281,7 +281,9 @@ export class PlatformTelemetryService {
     slowEndpoints.sort((a, b) => b.p95Ms - a.p95Ms);
 
     const recentSlow = this.events
-      .filter((event) => event.category === 'api' && (event.durationMs || 0) >= SLOW_API_THRESHOLD_MS)
+      .filter(
+        (event) => event.category === 'api' && (event.durationMs || 0) >= SLOW_API_THRESHOLD_MS,
+      )
       .slice(0, 20);
 
     return {
@@ -326,7 +328,9 @@ export class PlatformTelemetryService {
       .filter((event) => event.severity === 'error' || event.severity === 'critical')
       .slice(0, 20);
     const slowApiCalls = this.events
-      .filter((event) => event.category === 'api' && (event.durationMs || 0) >= SLOW_API_THRESHOLD_MS)
+      .filter(
+        (event) => event.category === 'api' && (event.durationMs || 0) >= SLOW_API_THRESHOLD_MS,
+      )
       .slice(0, 20);
 
     return {

@@ -1,4 +1,11 @@
-import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus, Logger } from '@nestjs/common';
+import {
+  ArgumentsHost,
+  Catch,
+  ExceptionFilter,
+  HttpException,
+  HttpStatus,
+  Logger,
+} from '@nestjs/common';
 import * as Sentry from '@sentry/node';
 import type { Request, Response } from 'express';
 import { recordBackendErrorTelemetry } from '../observability/platform-telemetry-sink';
