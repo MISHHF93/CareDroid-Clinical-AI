@@ -6,9 +6,10 @@ import {
   TOOLS_FILTERED_CONSOLE_ROUTES,
   TOOLS_SHORTCUT_PAGE_ROUTES,
 } from '../config/toolsConsoleRoutes';
-import ToolsFilteredConsole from '../pages/tools/ToolsFilteredConsole';
 
 const lazyRoute = lazyWithRetry;
+
+const ToolsFilteredConsole = lazyRoute(() => import('../pages/tools/ToolsFilteredConsole'));
 
 const AmbientScribePage = lazyRoute(() => import('../pages/tools/AmbientScribe'));
 const CalculatorRecommenderPage = lazyRoute(() => import('../pages/tools/CalculatorRecommender'));

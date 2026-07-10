@@ -1,8 +1,6 @@
 import { Suspense } from 'react';
 import { MEDICAL_THEME } from '../config/medicalTheme.constants';
 import { lazyWithRetry } from '../utils/lazyWithRetry';
-import { isReceptionFirstUxEnabled } from '../config/receptionFirstUx.config';
-import ReceptionWorkspacePage from '../pages/emergency/ReceptionWorkspace';
 import {
   Navigate,
   Outlet,
@@ -39,9 +37,7 @@ const WhiteboardDisplayRoute = lazyRoute(() => import('../features/whiteboard/Wh
 // ── ED core pages ────────────────────────────────────────────────────────────
 const EmergencyWhiteboard    = lazyRoute(() => import('../pages/emergency'));
 const SmartIntake            = lazyRoute(() => import('../pages/emergency/SmartIntake'));
-const ReceptionWorkspace = isReceptionFirstUxEnabled()
-  ? ReceptionWorkspacePage
-  : lazyRoute(() => import('../pages/emergency/ReceptionWorkspace'));
+const ReceptionWorkspace = lazyRoute(() => import('../pages/emergency/ReceptionWorkspace'));
 const SelfArrivalCheckIn     = lazyRoute(() => import('../pages/emergency/SelfArrivalCheckIn'));
 const PatientRoomDisplay     = lazyRoute(() => import('../pages/emergency/PatientRoomDisplay'));
 const EmergencyAnalytics     = lazyRoute(() => import('../pages/emergency/EmergencyAnalytics'));
@@ -58,6 +54,14 @@ const HospitalCommandCenter    = lazyRoute(() => import('../pages/emergency/Hosp
 const ReferralPanel          = lazyRoute(() => import('../components/ReferralPanel'));
 const IntegrationHubPage     = lazyRoute(() => import('../pages/integrations/IntegrationHubPage'));
 const SharedToolSession      = lazyRoute(() => import('../pages/tools/SharedToolSession'));
+
+// ── Emergency route pages (patients/queue/reassessment/boarding/capacity/copilot) ──
+const PatientsRoute = lazyNamed(() => import('../pages/emergency/emergencyRoutePages'), 'PatientsRoute');
+const QueueRoute = lazyNamed(() => import('../pages/emergency/emergencyRoutePages'), 'QueueRoute');
+const ReassessmentRoute = lazyNamed(() => import('../pages/emergency/emergencyRoutePages'), 'ReassessmentRoute');
+const BoardingRoute = lazyNamed(() => import('../pages/emergency/emergencyRoutePages'), 'BoardingRoute');
+const CapacityRoute = lazyNamed(() => import('../pages/emergency/emergencyRoutePages'), 'CapacityRoute');
+const CopilotRoute = lazyNamed(() => import('../pages/emergency/emergencyRoutePages'), 'CopilotRoute');
 
 // ── Clinical tools ───────────────────────────────────────────────────────────
 const ToolsOverview       = lazyRoute(() => import('../pages/tools/ToolsOverview'));
@@ -114,15 +118,6 @@ import { renderProfileConsoleRoutes } from './profileConsoleRouteTree';
 import { renderAdminConsoleRoutes } from './adminConsoleRouteTree';
 import { renderPublicConsoleRoutes } from './publicConsoleRouteTree';
 import { shouldSuppressPlatformSystemStub } from '../config/platformStubPolicy';
-
-import {
-  PatientsRoute,
-  QueueRoute,
-  ReassessmentRoute,
-  BoardingRoute,
-  CapacityRoute,
-  CopilotRoute,
-} from '../pages/emergency/emergencyRoutePages';
 
 import EmergencySurfaceRedirect from '../pages/emergency/EmergencySurfaceRedirect';
 import { shouldRedirectEmergencySurface } from '../services/navigateToEmergencySurface';
@@ -588,7 +583,9 @@ export function AppRoutes() {
           element={
             <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyPatients}>
               <EmergencySurfaceRedirect surfaceId="patients">
-                <PatientsRoute />
+                <LazyRoute label="Loading patients...">
+                  <PatientsRoute />
+                </LazyRoute>
               </EmergencySurfaceRedirect>
             </CareDroidRouteGuard>
           }
@@ -684,13 +681,9 @@ export function AppRoutes() {
           path={CANONICAL_ROUTES.emergencyReception}
           element={
             <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyReception}>
-              {isReceptionFirstUxEnabled() ? (
+              <LazyRoute label="Loading reception...">
                 <ReceptionWorkspace />
-              ) : (
-                <LazyRoute label="Loading reception...">
-                  <ReceptionWorkspace />
-                </LazyRoute>
-              )}
+              </LazyRoute>
             </CareDroidRouteGuard>
           }
         />
@@ -723,7 +716,9 @@ export function AppRoutes() {
           element={
             <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyQueues}>
               <EmergencySurfaceRedirect surfaceId="queues">
-                <QueueRoute />
+                <LazyRoute label="Loading queues...">
+                  <QueueRoute />
+                </LazyRoute>
               </EmergencySurfaceRedirect>
             </CareDroidRouteGuard>
           }
@@ -732,7 +727,9 @@ export function AppRoutes() {
           path={CANONICAL_ROUTES.emergencyReassessment}
           element={
             <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyReassessment}>
-              <ReassessmentRoute />
+              <LazyRoute label="Loading reassessment...">
+                <ReassessmentRoute />
+              </LazyRoute>
             </CareDroidRouteGuard>
           }
         />
@@ -740,7 +737,9 @@ export function AppRoutes() {
           path={CANONICAL_ROUTES.emergencyCapacity}
           element={
             <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyCapacity}>
-              <CapacityRoute />
+              <LazyRoute label="Loading capacity...">
+                <CapacityRoute />
+              </LazyRoute>
             </CareDroidRouteGuard>
           }
         />
@@ -748,7 +747,9 @@ export function AppRoutes() {
           path={CANONICAL_ROUTES.emergencyBoarding}
           element={
             <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyBoarding}>
-              <BoardingRoute />
+              <LazyRoute label="Loading boarding...">
+                <BoardingRoute />
+              </LazyRoute>
             </CareDroidRouteGuard>
           }
         />
@@ -766,7 +767,9 @@ export function AppRoutes() {
           path={CANONICAL_ROUTES.emergencyCopilot}
           element={
             <CareDroidRouteGuard path={CANONICAL_ROUTES.emergencyCopilot}>
-              <CopilotRoute />
+              <LazyRoute label="Loading copilot...">
+                <CopilotRoute />
+              </LazyRoute>
             </CareDroidRouteGuard>
           }
         />
