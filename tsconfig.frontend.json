@@ -12,11 +12,10 @@
     "checkJs": false,
     "isolatedModules": true,
     "resolveJsonModule": true,
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"],
-      "@lib/*": ["lib/*"],
-      "@store/*": ["src/store/*"]
+      "@/*": ["./src/*"],
+      "@lib/*": ["./lib/*"],
+      "@store/*": ["./src/store/*"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.d.ts"],

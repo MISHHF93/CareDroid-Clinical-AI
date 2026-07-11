@@ -33,7 +33,7 @@ const backendHealthPlugin = (proxyTarget: string): Plugin => ({
   name: 'care-backend-health',
   configureServer(server) {
     server.httpServer?.once('listening', () => {
-      void fetch(`${proxyTarget}/health`)
+      void fetch(`${proxyTarget}/health/live`)
         .then((response) => {
           if (!response.ok) throw new Error(`HTTP ${response.status}`);
         })
@@ -41,7 +41,8 @@ const backendHealthPlugin = (proxyTarget: string): Plugin => ({
           server.config.logger.warn(
             `\nCareDroid API is not reachable at ${proxyTarget}.\n` +
               '  Full stack: npm run dev:fullstack\n' +
-              '  API only:   npm run dev:api\n',
+              '  API only:   npm run dev:api\n' +
+              '  Open app at http://localhost:5190 (not :5173/:8000/:3000)\n',
           );
         });
     });
@@ -139,7 +140,10 @@ export default defineConfig(({ mode }) => {
     process.env.PORT,
     '3350',
   );
-  const proxyTarget = env.VITE_API_PROXY_TARGET || `http://localhost:${backendPort}`;
+  // Prefer 127.0.0.1 over localhost on Windows to avoid IPv6 ECONNREFUSED (-102)
+  // when Nest is bound on IPv4 and `localhost` resolves to ::1 first.
+  const rawProxyTarget = env.VITE_API_PROXY_TARGET || `http://127.0.0.1:${backendPort}`;
+  const proxyTarget = rawProxyTarget.replace('://localhost', '://127.0.0.1');
   const buildInfo = buildInfoFor(mode, env);
 
   return {
