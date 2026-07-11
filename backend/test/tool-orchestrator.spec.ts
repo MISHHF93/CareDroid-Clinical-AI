@@ -30,6 +30,16 @@ import { HasBledService } from '../src/modules/medical-control-plane/tool-orches
 import { TimiUaNstemiService } from '../src/modules/medical-control-plane/tool-orchestrator/services/timi-ua-nstemi.service';
 import { FraminghamRiskService } from '../src/modules/medical-control-plane/tool-orchestrator/services/framingham-risk.service';
 import { GraceAcsService } from '../src/modules/medical-control-plane/tool-orchestrator/services/grace-acs.service';
+import { CorrectedCalciumService } from '../src/modules/medical-control-plane/tool-orchestrator/services/corrected-calcium.service';
+import { CorrectedSodiumService } from '../src/modules/medical-control-plane/tool-orchestrator/services/corrected-sodium.service';
+import { FenaService } from '../src/modules/medical-control-plane/tool-orchestrator/services/fena.service';
+import { FeureaService } from '../src/modules/medical-control-plane/tool-orchestrator/services/feurea.service';
+import { OsmolalGapService } from '../src/modules/medical-control-plane/tool-orchestrator/services/osmolal-gap.service';
+import { SerumOsmolalityService } from '../src/modules/medical-control-plane/tool-orchestrator/services/serum-osmolality.service';
+import { Pao2Fio2RatioService } from '../src/modules/medical-control-plane/tool-orchestrator/services/pao2-fio2-ratio.service';
+import { RoxIndexService } from '../src/modules/medical-control-plane/tool-orchestrator/services/rox-index.service';
+import { MewsService } from '../src/modules/medical-control-plane/tool-orchestrator/services/mews.service';
+import { RevisedTraumaScoreService } from '../src/modules/medical-control-plane/tool-orchestrator/services/revised-trauma-score.service';
 import { AuditService } from '../src/modules/audit/audit.service';
 import { AIService } from '../src/modules/ai/ai.service';
 import { ToolMetricsService } from '../src/modules/metrics/tool-metrics.service';
@@ -86,6 +96,16 @@ describe('ToolOrchestratorService', () => {
         TimiUaNstemiService,
         FraminghamRiskService,
         GraceAcsService,
+        CorrectedCalciumService,
+        CorrectedSodiumService,
+        FenaService,
+        FeureaService,
+        OsmolalGapService,
+        SerumOsmolalityService,
+        Pao2Fio2RatioService,
+        RoxIndexService,
+        MewsService,
+        RevisedTraumaScoreService,
         {
           provide: AuditService,
           useValue: mockAuditService,
@@ -121,10 +141,10 @@ describe('ToolOrchestratorService', () => {
   });
 
   describe('Tool Registry', () => {
-    it('should register all twenty-two tools on initialization', () => {
+    it('should register all thirty-two tools on initialization', () => {
       const tools = service.listAvailableTools();
-      expect(tools.count).toBe(22);
-      expect(tools.tools.length).toBe(22);
+      expect(tools.count).toBe(32);
+      expect(tools.tools.length).toBe(32);
     });
 
     it('should have SOFA calculator in registry', () => {
@@ -556,7 +576,7 @@ describe('ToolOrchestratorService', () => {
     it('should return tool statistics', () => {
       const stats = service.getToolStatistics();
 
-      expect(stats.totalTools).toBe(22);
+      expect(stats.totalTools).toBe(32);
       expect(stats.toolsByCategory).toBeDefined();
       expect(stats.tools).toBeDefined();
     });

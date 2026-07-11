@@ -30,7 +30,7 @@ function patternToolIds(): string[] {
 }
 
 describe('tool-orchestrator.registry', () => {
-  it('exposes exactly twenty-two registered executor ids', () => {
+  it('exposes exactly thirty-two registered executor ids', () => {
     expect(REGISTERED_EXECUTOR_TOOL_IDS).toEqual([
       'sofa-calculator',
       'drug-interactions',
@@ -54,6 +54,16 @@ describe('tool-orchestrator.registry', () => {
       'timi-ua-nstemi',
       'framingham-risk',
       'grace-acs',
+      'corrected-calcium',
+      'corrected-sodium',
+      'fena',
+      'feurea',
+      'osmolal-gap',
+      'serum-osmolality',
+      'pao2-fio2-ratio',
+      'rox-index',
+      'mews',
+      'revised-trauma-score',
     ]);
   });
 
@@ -190,9 +200,9 @@ describe('tool-orchestrator.registry', () => {
     expect(isKnownUnsupportedNluTool('sofa-calculator')).toBe(false);
   });
 
-  it('getExecutorCatalogSnapshot lists twenty-two registered executors', () => {
+  it('getExecutorCatalogSnapshot lists thirty-two registered executors', () => {
     const snap = getExecutorCatalogSnapshot();
-    expect(snap.registeredExecutorToolIds).toHaveLength(22);
+    expect(snap.registeredExecutorToolIds).toHaveLength(32);
     expect(snap.unsupportedTools.length).toBeGreaterThan(30);
   });
 
@@ -306,6 +316,63 @@ describe('tool-orchestrator.registry', () => {
 
     it('validateExecutorContractParameters allows empty optional chads2 inputs', () => {
       expect(validateExecutorContractParameters('chads2', {}).valid).toBe(true);
+    });
+  });
+
+  describe('critical-care batch executors (corrected-calcium, corrected-sodium, fena, feurea, osmolal-gap, serum-osmolality, pao2-fio2-ratio, rox-index, mews, revised-trauma-score)', () => {
+    const CRITICAL_CARE_TOOL_IDS = [
+      'corrected-calcium',
+      'corrected-sodium',
+      'fena',
+      'feurea',
+      'osmolal-gap',
+      'serum-osmolality',
+      'pao2-fio2-ratio',
+      'rox-index',
+      'mews',
+      'revised-trauma-score',
+    ] as const;
+
+    it.each(CRITICAL_CARE_TOOL_IDS)(
+      'is no longer listed in NLU_TOOL_IDS_WITHOUT_EXECUTOR: %s',
+      (id) => {
+        expect(NLU_TOOL_IDS_WITHOUT_EXECUTOR).not.toContain(id);
+      },
+    );
+
+    it.each(CRITICAL_CARE_TOOL_IDS)('has a parameter-alias entry: %s', (id) => {
+      expect(EXECUTOR_PARAMETER_ALIASES[id]).toBeDefined();
+    });
+
+    it.each(CRITICAL_CARE_TOOL_IDS)('has a deterministic request contract: %s', (id) => {
+      expect(EXECUTOR_REQUEST_CONTRACTS[id].deterministic).toBe(true);
+      expect(EXECUTOR_REQUEST_CONTRACTS[id].toolId).toBe(id);
+    });
+
+    it.each(CRITICAL_CARE_TOOL_IDS)('classifies as a known tool, not unsupported: %s', (id) => {
+      expect(isKnownUnsupportedNluTool(id)).toBe(false);
+      expect(classifyToolExecutionError(id)).not.toBe(ToolExecutionErrorCode.UNSUPPORTED_TOOL);
+    });
+
+    it('normalizes fena snake_case NLU parameters to executor camelCase parameters', () => {
+      expect(
+        normalizeExecutorParameters('fena', {
+          serum_sodium: 140,
+          urine_sodium: 20,
+          serum_creatinine_mg_dl: 2.0,
+          urine_creatinine_mg_dl: 60,
+        }),
+      ).toEqual({
+        serumSodium: 140,
+        urineSodium: 20,
+        serumCreatinineMgDl: 2.0,
+        urineCreatinineMgDl: 60,
+      });
+    });
+
+    it('validateExecutorContractParameters enforces mews and revised-trauma-score required fields', () => {
+      expect(validateExecutorContractParameters('mews', {}).valid).toBe(false);
+      expect(validateExecutorContractParameters('revised-trauma-score', {}).valid).toBe(false);
     });
   });
 });

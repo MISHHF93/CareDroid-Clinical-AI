@@ -39,6 +39,16 @@ import { HasBledService } from './services/has-bled.service';
 import { TimiUaNstemiService } from './services/timi-ua-nstemi.service';
 import { FraminghamRiskService } from './services/framingham-risk.service';
 import { GraceAcsService } from './services/grace-acs.service';
+import { CorrectedCalciumService } from './services/corrected-calcium.service';
+import { CorrectedSodiumService } from './services/corrected-sodium.service';
+import { FenaService } from './services/fena.service';
+import { FeureaService } from './services/feurea.service';
+import { OsmolalGapService } from './services/osmolal-gap.service';
+import { SerumOsmolalityService } from './services/serum-osmolality.service';
+import { Pao2Fio2RatioService } from './services/pao2-fio2-ratio.service';
+import { RoxIndexService } from './services/rox-index.service';
+import { MewsService } from './services/mews.service';
+import { RevisedTraumaScoreService } from './services/revised-trauma-score.service';
 import { ExecuteToolDto, ToolExecutionResponseDto, ToolListDto } from './dto/tool-execution.dto';
 import { ToolResult } from './entities/tool-result.entity';
 import {
@@ -94,6 +104,16 @@ export class ToolOrchestratorService {
     private readonly timiUaNstemiService: TimiUaNstemiService,
     private readonly framinghamRiskService: FraminghamRiskService,
     private readonly graceAcsService: GraceAcsService,
+    private readonly correctedCalciumService: CorrectedCalciumService,
+    private readonly correctedSodiumService: CorrectedSodiumService,
+    private readonly fenaService: FenaService,
+    private readonly feureaService: FeureaService,
+    private readonly osmolalGapService: OsmolalGapService,
+    private readonly serumOsmolalityService: SerumOsmolalityService,
+    private readonly pao2Fio2RatioService: Pao2Fio2RatioService,
+    private readonly roxIndexService: RoxIndexService,
+    private readonly mewsService: MewsService,
+    private readonly revisedTraumaScoreService: RevisedTraumaScoreService,
     private readonly auditService: AuditService,
     private readonly toolMetrics: ToolMetricsService,
     @InjectRepository(ToolResult)
@@ -129,6 +149,16 @@ export class ToolOrchestratorService {
     this.registerTool(this.timiUaNstemiService);
     this.registerTool(this.framinghamRiskService);
     this.registerTool(this.graceAcsService);
+    this.registerTool(this.correctedCalciumService);
+    this.registerTool(this.correctedSodiumService);
+    this.registerTool(this.fenaService);
+    this.registerTool(this.feureaService);
+    this.registerTool(this.osmolalGapService);
+    this.registerTool(this.serumOsmolalityService);
+    this.registerTool(this.pao2Fio2RatioService);
+    this.registerTool(this.roxIndexService);
+    this.registerTool(this.mewsService);
+    this.registerTool(this.revisedTraumaScoreService);
 
     this.logger.log(
       `Initialized tool registry with ${Object.keys(this.toolRegistry).length} tools`,

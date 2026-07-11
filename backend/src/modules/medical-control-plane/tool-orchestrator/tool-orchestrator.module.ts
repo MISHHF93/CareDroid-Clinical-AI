@@ -24,6 +24,16 @@ import { HasBledService } from './services/has-bled.service';
 import { TimiUaNstemiService } from './services/timi-ua-nstemi.service';
 import { FraminghamRiskService } from './services/framingham-risk.service';
 import { GraceAcsService } from './services/grace-acs.service';
+import { CorrectedCalciumService } from './services/corrected-calcium.service';
+import { CorrectedSodiumService } from './services/corrected-sodium.service';
+import { FenaService } from './services/fena.service';
+import { FeureaService } from './services/feurea.service';
+import { OsmolalGapService } from './services/osmolal-gap.service';
+import { SerumOsmolalityService } from './services/serum-osmolality.service';
+import { Pao2Fio2RatioService } from './services/pao2-fio2-ratio.service';
+import { RoxIndexService } from './services/rox-index.service';
+import { MewsService } from './services/mews.service';
+import { RevisedTraumaScoreService } from './services/revised-trauma-score.service';
 import { AiModule } from '../../ai/ai.module';
 import { AuditModule } from '../../audit/audit.module';
 import { MetricsModule } from '../../metrics/metrics.module';
@@ -63,6 +73,16 @@ import { PlatformGovernanceModule } from '../../platform-governance';
     TimiUaNstemiService,
     FraminghamRiskService,
     GraceAcsService,
+    CorrectedCalciumService,
+    CorrectedSodiumService,
+    FenaService,
+    FeureaService,
+    OsmolalGapService,
+    SerumOsmolalityService,
+    Pao2Fio2RatioService,
+    RoxIndexService,
+    MewsService,
+    RevisedTraumaScoreService,
   ],
   exports: [ToolOrchestratorService],
 })
