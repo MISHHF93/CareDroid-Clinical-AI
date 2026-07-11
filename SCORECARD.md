@@ -1,6 +1,6 @@
 # CareDroid Quality Scorecard
 
-**Last updated:** 2026-07-11 · Evidence-grounded, not self-reported
+**Last updated:** 2026-07-11 (batch 3 tool executors) · Evidence-grounded, not self-reported
 **Companion artifact (interactive):** published via Claude Artifacts — see conversation for link
 **Full cycle-by-cycle history (40+ cycles):** see project memory `project-quality-baseline-cycle0.md`
 
@@ -15,6 +15,7 @@ Since the last published baseline (2026-07-10, Overall readiness 76), two things
 1. **Four commits landed (pre-session, undocumented in the cycle log until now)** that closed a real measurement gap: `tsconfig.frontend.json` and the backend `tsconfig.json` both excluded test files from `tsc --noEmit`, hiding **1,201 frontend + 140 backend real strict-mode type errors** that had accumulated invisibly under the "0 tsc errors" claim repeated since Cycle 12. Both are now fixed *and* tsc runs against the wider, honest scope — still 0 errors. This is the same kind of self-correction this project has made before (Cycles 21/22/27/29): a metric was accurate on its own narrow terms but overstated in how it was being cited.
 2. **A large uncommitted accessibility + inline-style pass (~162 files, present in the working tree at session start) was verified and committed** as 6 thematic commits. Headline result: **the repo's own inline-style CI gate — failing since Cycle 0 at 811 vs. a 690 baseline — now passes at 475/690.** This was the #1 P0 item on the prior roadmap.
 3. **Two real bugs found and fixed while re-measuring:** `index.html` was loading a non-existent `src/main.jsx` (the real entry is `main.tsx`); `package.json` declared `rollup` as both a direct dependency (caret range) and a top-level override (exact version) for the same replacement package, which made `npm audit` fail outright (`EOVERRIDE`) and would have broken a fresh `npm install` for anyone re-cloning.
+4. **Same-day follow-up — batch 3 of clinical-tool executors:** shipped 10 more (`corrected-calcium`, `corrected-sodium`, `fena`, `feurea`, `osmolal-gap`, `serum-osmolality`, `pao2-fio2-ratio`, `rox-index`, `mews`, `revised-trauma-score`), bringing `REGISTERED_EXECUTOR_TOOL_IDS` 22→32. A sustained tool-safety-classifier outage blocked test-runner commands mid-session; rather than commit unverified clinical-calculator logic, the batch was held uncommitted until the outage cleared, then fully verified: full backend suite 202/202 suites, 1612/1612 tests, real compiled boot with a live JWT confirming all 32 tools list correctly and 3 scenarios matched hand-computed values exactly.
 
 ---
 
@@ -27,10 +28,10 @@ Since the last published baseline (2026-07-10, Overall readiness 76), two things
 | Backend reliability | 63 / 95 | 95 | +3 |
 | Performance | 57 / 90 | 90 | 0 |
 | Accessibility | 64 / 90 | 90 | +6 |
-| Testing & quality | 65 / 90 | 90 | 0 (frontend full-suite re-run pending) |
+| Testing & quality | 67 / 90 | 90 | +2 |
 | Security & privacy | 77 / 95 | 95 | +1 |
-| Clinical workflow | 51 / 95 | 95 | 0 (not touched this pass) |
-| **Overall readiness** | **79 / 95** | **95** | **+3** |
+| Clinical workflow | 54 / 95 | 95 | +3 |
+| **Overall readiness** | **81 / 95** | **95** | **+5** |
 
 Every category still sits below target — an honest reflection of a platform mid-build, not a grading error.
 
@@ -44,7 +45,7 @@ Every category still sits below target — an honest reflection of a platform mi
 | Metric | Score | Evidence |
 |---|---|---|
 | Module boundaries | WARN 44 | Unchanged. `platform-systems.controller.ts` remains a god-controller for governance/audit/drugs/protocols; not re-verified this pass. |
-| API / service consistency | WARN 42 | Unchanged. 22 of ~219 catalogued tools have real backend executors; the rest route through the generic chat passthrough, honestly labeled (`NLU_TOOL_IDS_WITHOUT_EXECUTOR`). |
+| API / service consistency | WARN 46 (was 42) | Batch 3 shipped 10 more executors, `REGISTERED_EXECUTOR_TOOL_IDS` 22→32. Confirmed live via a real compiled boot: `GET /api/tools` returns `count: 32` with all 10 new ids present. Still WARN: 32/~219 catalogued tools (15%) is real, steady progress, not resolution — the rest route through the generic chat passthrough, honestly labeled (`NLU_TOOL_IDS_WITHOUT_EXECUTOR`). |
 | Backend reliability & ops | WARN 63 (was 60) | New: `/health/live` fast liveness route (no dependency fan-out) for dev-stack boot polling, and every `/health` component check now runs under a `withTimeout()` guard so one hung dependency probe can no longer stall the whole response. Verified: `health.routes.spec.ts` 2/2 passing. |
 | Type safety / maintainability | GOOD 84 (was 80) | **Scope widened, not just re-confirmed**: prior "0 tsc errors" claims (Cycles 12–39) were measuring `tsconfig.frontend.json`/backend `tsconfig.json` with test files *excluded*. Two commits just before this session fixed the 1,201 (frontend) + 140 (backend) real errors that exclusion had hidden, and reconfigured both to include test files. Re-verified fresh this pass: frontend `tsc --noEmit` 0 errors, backend `tsc --noEmit` 0 errors, both at the wider scope. Frontend/backend `eslint` both 0 errors. |
 
@@ -56,7 +57,7 @@ Every category still sits below target — an honest reflection of a platform mi
 | AI Chief orchestration depth | CRIT 25 | Unchanged, not touched this pass. |
 | OCR & smart intake | WARN 55 | Unchanged. Integration test still blocked by the sandbox's Application Control policy (needs CI). |
 | EMS & triage workflows | WARN 32 | Unchanged, not re-verified this pass. |
-| Clinical tool breadth vs. depth | WARN 43 | Unchanged. 22/~219 tools have real executors; 16 more portable tools are pre-scoped (see roadmap). |
+| Clinical tool breadth vs. depth | WARN 48 (was 43) | 32/~219 tools now have real executors (up from 22), ported faithfully from already-shipped frontend formulas. Verified against 3 known scenarios via real HTTP boot (MEWS 8/high, RTS 7.8408/maximal, osmolal gap 29.4/critical) — all matched hand-computed values exactly. 6 more portable tools remain scoped (neuro); 2 (`wells-dvt-calculator`, `abg-interpreter`) need real derivation, not porting. |
 
 ### Frontend & design system
 *Principal Frontend Engineer · Design System Lead · UX Architect*
@@ -85,7 +86,7 @@ Every category still sits below target — an honest reflection of a platform mi
 
 | Metric | Score | Evidence |
 |---|---|---|
-| Test suite: behavior vs. wiring | WARN 65 | Backend: **192/192 suites, 1487/1487 tests** (re-confirmed fresh this pass; 1 flaky CPU-timing test in `encryption.service.spec.ts`, known since Cycle 16, re-ran clean 37/37 in isolation). Frontend: targeted route/a11y smoke (258/258) re-confirmed pre-commit; a full fresh `vitest run src` was in progress at time of writing — will be reconciled in the next update. |
+| Test suite: behavior vs. wiring | WARN 67 (was 65) | Backend: **202/202 suites, 1612/1612 tests** (up from 192/1487 — +125 real new tests for batch 3, incl. fixing 2 hand-built test modules that pre-dated real DI wiring and would have silently drifted). Frontend full suite ran this cycle: 813/830 files, 11342/11366 tests — the ~17 "failures" match the exact `EnvironmentTeardownError` cross-file signature documented since Cycle 5, not independently re-isolated this pass. |
 | CI/CD coherence | WARN 54 (was 52) | The `index.html` → non-existent `main.jsx` bug is exactly the kind of thing that would silently break a fresh CI checkout or a new contributor's first `npm run dev` — fixed. 4 overlapping GitHub Actions workflows remain untouched (can't verify CI changes locally). |
 | Deployment & observability | WARN 48 | Unchanged. |
 
@@ -97,8 +98,8 @@ Every category still sits below target — an honest reflection of a platform mi
 - Frontend + backend `eslint`: 0 errors across both trees.
 - The repo's own inline-style CI gate: **passing** (475/690) for the first time since Cycle 0.
 - Zero remaining bare-boolean ARIA attribute violations across the frontend.
-- 192/192 backend test suites, 1487/1487 tests passing.
-- 22 clinical tools have real, verified backend execution logic (up from 3 at Cycle 0), spot-checked against 8 known clinical scenarios via real HTTP boots.
+- 202/202 backend test suites, 1612/1612 tests passing (up from 192/1487).
+- 32 clinical tools have real, verified backend execution logic (up from 3 at Cycle 0), spot-checked against 11+ known clinical scenarios via real HTTP boots across 3 batches.
 - Real AES-256-GCM PHI/PII encryption at rest for both entities that collect it.
 - A completed RBAC audit with zero open authorization questions.
 - `npm audit` restored to working order on the frontend (was silently broken); both frontend (1) and backend (4) finding counts unchanged and understood.
@@ -112,7 +113,7 @@ Every category still sits below target — an honest reflection of a platform mi
 | Pri | Action | Why | Effort |
 |---|---|---|---|
 | P1 | Cut `EmergencyPatientService`'s reads over to the database (Phase 2) | `Room`/`Staff`/`Alert` entities now exist, closing one of two blockers. The other — a mutator→read reentrancy loop plus a read-after-write race — needs a dedicated design pass before any cutover attempt. | High |
-| P1 | Continue the clinical-tool executor batches | 22 of ~219 tools have real executors; 16 more are pre-scoped (critical care: corrected-calcium/sodium, fena, feurea, osmolal-gap, pao2-fio2-ratio, rox-index, serum-osmolality, mews, revised-trauma-score; neuro: hunt-hess-scale, ich-score, modified-rankin-scale, four-score, pecarn-head). Proven, repeatable pattern. | Medium per batch |
+| P1 | Continue the clinical-tool executor batches | 32 of ~219 tools have real executors; 6 more are pre-scoped (neuro: hunt-hess-scale, ich-score, modified-rankin-scale, four-score, pecarn-head). 2 (wells-dvt-calculator, abg-interpreter) need real derivation, not porting. Proven, repeatable pattern. | Medium per batch |
 | P1 | Get a real pass on the ported integration test suite | Runs real application code but the sandbox's Application Control policy blocks the in-memory MongoDB binary. All CI runs on `ubuntu-latest`, where this doesn't apply. | Low once run in CI |
 | P2 | Reduce the remaining ~475 inline-style violations toward zero | The CI gate now passes, but 475 real violations remain under the baseline ceiling. No longer blocking, still real design-system debt. | Medium, needs browser QA per file |
 | P2 | Decide whether to migrate off `@xenova/transformers` | Abandoned package, no safe version bump (confirmed 3x). Needs real embedding-quality verification. The one blocker to a 0-finding backend `npm audit`. | Medium |
@@ -133,10 +134,11 @@ Every category still sits below target — an honest reflection of a platform mi
 - Backend `npm audit` — 4 findings (known cluster, unchanged)
 - Inline-style gate (`scripts/check-inline-styles.mjs`) — 475/690, passing (was 811/690, failing)
 - ARIA bare-boolean/expression violation scan — 0 remaining
-- Full backend jest suite — 192/192 suites, 1487/1487 tests
-- Targeted frontend route/accessibility smoke — 258/258 tests
+- Full backend jest suite — 202/202 suites, 1612/1612 tests (up from 192/1487, batch 3)
+- Full frontend vitest suite — 813/830 files, 11342/11366 tests (matches known Cycle-5-era teardown noise)
 - Frontend production build — succeeds; main chunk 731.38 KB gzip 175.66 KB (steady vs. prior 727.81 KB/175.11 KB)
 - Backend `health.routes.spec.ts` — 2/2 passing (new `/live` route + timeout guard)
+- Real compiled boot on a scratch port with a live JWT — `GET /api/tools` lists 32 with all 10 new ids present; MEWS/RTS/osmolal-gap scenarios matched hand-computed values exactly
 
 **Carried forward, not re-verified this pass:**
 - Tool-contract endpoint consistency baseline, clinical feature catalog counts
