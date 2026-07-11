@@ -1,0 +1,72 @@
+{
+  "folders": [
+    {
+      "name": "CareDroid Clinical AI",
+      "path": "."
+    }
+  ],
+  "settings": {
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "typescript.enablePromptUseWorkspaceTsdk": true,
+    "typescript.tsserver.experimental.enableProjectDiagnostics": false,
+
+    "vscode-edge-devtools.webhint.enable": false,
+    "vscode-edge-devtools.webhint": false,
+    "webhint.enable": false,
+    "hint.enable": false,
+    "hint.configFile": ".hintrc",
+
+    "css.validate": false,
+    "less.validate": false,
+    "scss.validate": false,
+    "html.validate": false,
+    "html.validate.scripts": false,
+    "html.validate.styles": false,
+
+    "files.exclude": {
+      "**/.claude": true,
+      "**/agent-tools": true,
+      "**/tool-results": true,
+      "**/scratchpad": true,
+      "**/dist": true,
+      "**/backend/dist": true,
+      "**/coverage": true,
+      "**/artifact-*.html": true,
+      "**/caredroid-scorecard*.html": true
+    },
+    "files.associations": {
+      "**/artifact-*.html": "plaintext",
+      "**/caredroid-scorecard*.html": "plaintext",
+      "**/tool-results/**/*.html": "plaintext"
+    },
+    "search.exclude": {
+      "**/node_modules": true,
+      "**/dist": true,
+      "**/.claude": true,
+      "**/agent-tools": true,
+      "**/tool-results": true,
+      "**/scratchpad": true
+    },
+    "eslint.enable": true,
+    "eslint.workingDirectories": [
+      { "directory": ".", "changeProcessCwd": true },
+      { "directory": "backend", "changeProcessCwd": true }
+    ],
+    "eslint.validate": [
+      "javascript",
+      "javascriptreact",
+      "typescript",
+      "typescriptreact"
+    ]
+  },
+  "extensions": {
+    "recommendations": [
+      "dbaeumer.vscode-eslint"
+    ],
+    "unwantedRecommendations": [
+      "ms-edgedevtools.vscode-edge-devtools",
+      "webhint.vscode-webhint",
+      "deque-systems.vscode-axe-linter"
+    ]
+  }
+}

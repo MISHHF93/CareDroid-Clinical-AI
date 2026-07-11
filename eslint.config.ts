@@ -13,7 +13,23 @@ const vitestAndLegacyJestGlobals = Object.fromEntries(
 );
 
 const config: Linter.Config[] = [
-  { ignores: ['dist/**', 'backend/**', 'node_modules/**', 'android/**', 'coverage/**', '.venv/**'] },
+  {
+    ignores: [
+      'dist/**',
+      'backend/**',
+      'node_modules/**',
+      'android/**',
+      'coverage/**',
+      '.venv/**',
+      'agent-tools/**',
+      '**/tool-results/**',
+      '**/scratchpad/**',
+      'artifact-*.html',
+      'caredroid-scorecard*.html',
+      'qa/**',
+      '.claude/**',
+    ],
+  },
   js.configs.recommended,
   {
     files: ['**/*.{js,jsx,mjs,cjs,ts,tsx}'],

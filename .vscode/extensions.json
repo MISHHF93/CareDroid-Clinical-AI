@@ -1,5 +1,12 @@
 {
-    "recommendations": [
-        "google.geminicodeassist"
-    ]
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode"
+  ],
+  "unwantedRecommendations": [
+    "ms-edgedevtools.vscode-edge-devtools",
+    "webhint.vscode-webhint",
+    "deque-systems.vscode-axe-linter",
+    "streetsidesoftware.code-spell-checker"
+  ]
 }

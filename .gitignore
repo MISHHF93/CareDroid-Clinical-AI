@@ -1,5 +1,9 @@
 # Claude Code session artifacts
 agent-tools/
+**/tool-results/
+**/scratchpad/
+artifact-*.html
+caredroid-scorecard*.html
 
 # Logs
 logs
@@ -18,6 +22,8 @@ dist-ssr
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/*.code-workspace
 .idea
 .DS_Store
 *.suo
@@ -55,3 +61,12 @@ pages-map.txt
 /qa/screenshot-backend.sqlite*
 /e2e/.auth/qa-user.json
 .vercel
+
+# Local agent worktrees / settings
+.claude/
+
+
+# Local health scan outputs
+bug-inventory-report.json
+source-dirt-report.json
+

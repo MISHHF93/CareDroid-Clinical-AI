@@ -1,0 +1,134 @@
+{
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "typescript.tsserver.maxTsServerMemory": 4096,
+  "typescript.tsserver.experimental.enableProjectDiagnostics": false,
+  "typescript.validate.enable": true,
+  "javascript.validate.enable": true,
+
+  "vscode-edge-devtools.webhint.enable": false,
+  "vscode-edge-devtools.webhint": false,
+  "vscode-edge-devtools.mirrorEdits": false,
+  "vscode-edge-devtools.headless": true,
+  "vscode-edge-devtools.browserArgs": [],
+  "vscode-edge-devtools.defaultUrl": "",
+  "vscode-edge-devtools.sourceMaps": false,
+  "webhint.enable": false,
+  "hint.enable": false,
+  "hint.configFile": ".hintrc",
+
+  "css.validate": false,
+  "less.validate": false,
+  "scss.validate": false,
+  "css.lint.unknownAtRules": "ignore",
+  "css.lint.compatibleVendorPrefixes": "ignore",
+  "css.lint.vendorPrefix": "ignore",
+  "css.lint.duplicateProperties": "ignore",
+  "css.lint.emptyRules": "ignore",
+  "css.lint.importStatement": "ignore",
+  "css.lint.boxModel": "ignore",
+  "css.lint.universalSelector": "ignore",
+  "css.lint.zeroUnits": "ignore",
+  "css.lint.fontFaceProperties": "ignore",
+  "css.lint.hexColorLength": "ignore",
+  "css.lint.argumentsInColorFunction": "ignore",
+  "css.lint.unknownProperties": "ignore",
+  "css.lint.ieHack": "ignore",
+  "css.lint.unknownVendorSpecificProperties": "ignore",
+  "css.lint.propertyIgnoredDueToDisplay": "ignore",
+  "css.lint.important": "ignore",
+  "css.lint.float": "ignore",
+  "css.lint.idSelector": "ignore",
+
+  "html.validate.scripts": false,
+  "html.validate.styles": false,
+  "html.validate": false,
+  "html.autoClosingTags": true,
+
+  "json.validate.enable": true,
+
+  "files.associations": {
+    "**/artifact-*.html": "plaintext",
+    "**/caredroid-scorecard*.html": "plaintext",
+    "**/tool-results/**/*.html": "plaintext",
+    "**/scratchpad/**": "plaintext",
+    "**/agent-tools/**": "plaintext",
+    "**/.claude/**": "plaintext"
+  },
+
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/dist/**": true,
+    "**/backend/dist/**": true,
+    "**/backend/node_modules/**": true,
+    "**/mcp/node_modules/**": true,
+    "**/.claude/**": true,
+    "**/qa/**": true,
+    "**/coverage/**": true,
+    "**/agent-tools/**": true,
+    "**/tool-results/**": true,
+    "**/scratchpad/**": true,
+    "**/artifact-*.html": true,
+    "**/caredroid-scorecard*.html": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/backend/dist": true,
+    "**/.claude": true,
+    "**/qa": true,
+    "**/coverage": true,
+    "**/agent-tools": true,
+    "**/tool-results": true,
+    "**/scratchpad": true,
+    "**/artifact-*.html": true,
+    "**/caredroid-scorecard*.html": true
+  },
+  "files.exclude": {
+    "**/.claude": true,
+    "**/agent-tools": true,
+    "**/tool-results": true,
+    "**/scratchpad": true,
+    "**/dist": true,
+    "**/backend/dist": true,
+    "**/coverage": true,
+    "**/artifact-*.html": true,
+    "**/caredroid-scorecard*.html": true
+  },
+  "files.readonlyInclude": {
+    "**/dist/**": true,
+    "**/backend/dist/**": true,
+    "**/node_modules/**": true
+  },
+
+  "eslint.enable": true,
+  "eslint.workingDirectories": [
+    { "directory": ".", "changeProcessCwd": true },
+    { "directory": "backend", "changeProcessCwd": true }
+  ],
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+  "eslint.options": {
+    "ignorePatterns": [
+      "dist/**",
+      "backend/dist/**",
+      "node_modules/**",
+      "coverage/**",
+      "agent-tools/**",
+      "**/tool-results/**",
+      "**/scratchpad/**",
+      ".claude/**",
+      "artifact-*.html",
+      "caredroid-scorecard*.html"
+    ]
+  },
+
+  "problems.showCurrentInStatus": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "never"
+  }
+}

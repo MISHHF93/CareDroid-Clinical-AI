@@ -81,17 +81,20 @@ const withDefaults = (defaults) => {
 };
 
 const buildStackEnv = (frontendPort, backendPort) => {
+  // Browser origin stays on localhost (CORS + cookies). Proxy target uses
+  // 127.0.0.1 so Windows does not ECONNREFUSED via IPv6-only localhost resolution.
   const frontendOrigin = `http://localhost:${frontendPort}`;
   const backendOrigin = `http://localhost:${backendPort}`;
+  const backendProxyTarget = `http://127.0.0.1:${backendPort}`;
 
   const frontendEnv = withDefaults({
     VITE_API_URL: '',
-    VITE_API_PROXY_TARGET: backendOrigin,
+    VITE_API_PROXY_TARGET: backendProxyTarget,
     VITE_DEV_PORT: frontendPort,
     FRONTEND_PORT: frontendPort,
     BACKEND_PORT: backendPort,
   });
-  frontendEnv.VITE_API_PROXY_TARGET = backendOrigin;
+  frontendEnv.VITE_API_PROXY_TARGET = backendProxyTarget;
   frontendEnv.VITE_DEV_PORT = frontendPort;
   frontendEnv.FRONTEND_PORT = frontendPort;
   frontendEnv.BACKEND_PORT = backendPort;
@@ -154,7 +157,7 @@ const probeHttpHealth = (port, path = '/health') =>
         host: '127.0.0.1',
         port,
         path,
-        timeout: 1500,
+        timeout: 2500,
       },
       (response) => {
         let body = '';
@@ -163,12 +166,17 @@ const probeHttpHealth = (port, path = '/health') =>
           body += chunk;
         });
         response.on('end', () => {
+          // Treat 2xx/503 as "API process is up" when payload is CareDroid-shaped.
+          // Full /health may be degraded/unhealthy while the app is still usable.
+          const statusOk =
+            (response.statusCode >= 200 && response.statusCode < 300) ||
+            response.statusCode === 503;
+          const caredroidPayload = isCareDroidHealthPayload(body);
           resolveProbe({
             ok: response.statusCode === 200,
             body,
-            caredroid: response.statusCode === 200 && isCareDroidHealthPayload(body),
-            foreign:
-              response.statusCode === 200 && !isCareDroidHealthPayload(body),
+            caredroid: statusOk && caredroidPayload,
+            foreign: statusOk && !caredroidPayload,
           });
         });
       },
@@ -183,8 +191,13 @@ const probeHttpHealth = (port, path = '/health') =>
     );
   });
 
-const probeBackendHealth = (port) =>
-  probeHttpHealth(port, '/health').then((result) => result.caredroid);
+/** Prefer fast /health/live so stack boot is not blocked by deep dependency checks. */
+const probeBackendHealth = async (port) => {
+  const live = await probeHttpHealth(port, '/health/live');
+  if (live.caredroid) return true;
+  const full = await probeHttpHealth(port, '/health');
+  return full.caredroid;
+};
 
 const probeFrontendProxyHealth = (port) =>
   probeHttpHealth(port, '/health').then((result) => result.caredroid);
@@ -320,10 +333,18 @@ const printStackAlreadyRunning = (appOrigin, apiPort) => {
 
 const sleep = (ms) => new Promise((resolveSleep) => setTimeout(resolveSleep, ms));
 
-const waitForBackend = async (port, { timeoutMs = 180000, intervalMs = 750 } = {}) => {
+const waitForBackend = async (port, { timeoutMs = 300000, intervalMs = 1000 } = {}) => {
   const started = Date.now();
+  let lastLog = 0;
   while (Date.now() - started < timeoutMs) {
     if (await probeBackendHealth(port)) return true;
+    const elapsed = Date.now() - started;
+    if (elapsed - lastLog >= 15000) {
+      lastLog = elapsed;
+      console.log(
+        `[web] still waiting for API health on :${port} (${Math.round(elapsed / 1000)}s / ${Math.round(timeoutMs / 1000)}s)...`,
+      );
+    }
     await sleep(intervalMs);
   }
   return false;
@@ -559,7 +580,10 @@ if (!frontendOnly && !backendAlreadyHealthy) {
     const ready = await waitForBackend(backendPort);
     if (!ready) {
       console.error(
-        `[web] backend did not respond on http://localhost:${backendPort}/health within 3 minutes.`,
+        `[web] backend did not respond on http://localhost:${backendPort}/health/live (or /health) within 5 minutes.`,
+      );
+      console.error(
+        '[web] Tip: check [api] logs above for seed/RAG hang, port conflicts, or SQLite lock.',
       );
       shutdown(1);
       process.exit(1);
