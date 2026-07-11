@@ -2,7 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import * as request from 'supertest';
+import { ThrottlerModule } from '@nestjs/throttler';
+import request from 'supertest';
 import * as speakeasy from 'speakeasy';
 import { AuthModule } from '../src/modules/auth/auth.module';
 import { AuthService } from '../src/modules/auth/auth.service';
@@ -63,6 +64,7 @@ describe('Two-Factor Authentication (e2e)', () => {
           synchronize: true,
           logging: false,
         }),
+        ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
         AuthModule,
       ],
     }).compile();

@@ -2,7 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import * as request from 'supertest';
+import { ThrottlerModule } from '@nestjs/throttler';
+import request from 'supertest';
 import { AuthModule } from '../src/modules/auth/auth.module';
 import { jwtConfig, oauthConfig, sessionConfig } from '../src/config/auth.config';
 import { User } from '../src/modules/users/entities/user.entity';
@@ -39,6 +40,7 @@ describe('Authentication E2E Tests', () => {
           synchronize: true,
           logging: false,
         }),
+        ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
         AuthModule,
       ],
     }).compile();

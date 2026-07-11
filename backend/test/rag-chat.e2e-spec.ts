@@ -1,10 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import * as request from 'supertest';
+import request from 'supertest';
 import { ChatController } from '../src/modules/chat/chat.controller';
 import { ChatService } from '../src/modules/chat/chat.service';
 import { AuthorizationGuard } from '../src/modules/auth/guards/authorization.guard';
+import { EntitlementService } from '../src/modules/platform-assets/entitlement.service';
 
 /**
  * Batch 7: RAG-Augmented Chat E2E Tests
@@ -94,6 +95,12 @@ describe('RAG-Augmented Chat (e2e)', () => {
         {
           provide: ChatService,
           useValue: chatService,
+        },
+        {
+          provide: EntitlementService,
+          useValue: {
+            assertLaunchAllowed: jest.fn().mockResolvedValue(undefined),
+          },
         },
       ],
     })

@@ -6,7 +6,7 @@ import { Permission } from '../auth/enums/permission.enum';
 import { AuthorizationGuard } from '../auth/guards/authorization.guard';
 import { SURVEILLANCE_SOURCE } from './surveillance.data';
 import { SurveillanceService } from './surveillance.service';
-import type { SurveillanceNexusSnapshot, SurveillanceRequestLike } from './surveillance.types';
+import type { SurveillanceRequestLike } from './surveillance.types';
 
 const SURVEILLANCE_VIEW_PERMISSIONS = [
   Permission.VIEW_SURVEILLANCE,

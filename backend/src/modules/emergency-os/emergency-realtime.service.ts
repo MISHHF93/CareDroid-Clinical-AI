@@ -78,7 +78,9 @@ export class EmergencyRealtimeService implements OnModuleInit, OnModuleDestroy {
     ];
 
     try {
+      // Deferred require avoids circular Nest module graph at bootstrap.
       const { EmergencyWhiteboardService, CareDroidCentralNodeService } =
+        // eslint-disable-next-line @typescript-eslint/no-require-imports -- circular Nest graph
         require('./emergency-os.services') as typeof import('./emergency-os.services');
       const whiteboard = this.moduleRef.get(EmergencyWhiteboardService, { strict: false });
       const centralNode = this.moduleRef.get(CareDroidCentralNodeService, { strict: false });
@@ -106,6 +108,7 @@ export class EmergencyRealtimeService implements OnModuleInit, OnModuleDestroy {
   publishBoardMutations(): void {
     try {
       const { EmergencyWhiteboardService, CareDroidCentralNodeService } =
+        // eslint-disable-next-line @typescript-eslint/no-require-imports -- circular Nest graph
         require('./emergency-os.services') as typeof import('./emergency-os.services');
       const whiteboard = this.moduleRef.get(EmergencyWhiteboardService, { strict: false });
       const centralNode = this.moduleRef.get(CareDroidCentralNodeService, { strict: false });
@@ -116,6 +119,7 @@ export class EmergencyRealtimeService implements OnModuleInit, OnModuleDestroy {
         this.publish({ type: 'central_node_snapshot', payload: centralNode.getSnapshot() });
       }
       const { OperationalIntelligenceService } =
+        // eslint-disable-next-line @typescript-eslint/no-require-imports -- circular Nest graph
         require('./emergency-os.operational-intelligence.service') as typeof import('./emergency-os.operational-intelligence.service');
       const operationalIntelligence = this.moduleRef.get(OperationalIntelligenceService, {
         strict: false,
@@ -129,6 +133,7 @@ export class EmergencyRealtimeService implements OnModuleInit, OnModuleDestroy {
   publishEmsUpdate(): void {
     try {
       const { EMSIntakeService } =
+        // eslint-disable-next-line @typescript-eslint/no-require-imports -- circular Nest graph
         require('./emergency-os.services') as typeof import('./emergency-os.services');
       const ems = this.moduleRef.get(EMSIntakeService, { strict: false });
       if (ems) {

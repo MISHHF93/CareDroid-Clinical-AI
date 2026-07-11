@@ -506,7 +506,6 @@ export function buildAdministrativeAutomationSnapshot(
   const now = (input.now || new Date()).toISOString();
   const patients = input.patients || [];
   const staff = input.staff || [];
-  const referrals = input.referrals || [];
   const alerts = input.alerts || [];
   const emsArrivals = input.emsArrivals || [];
   const existing = new Map(

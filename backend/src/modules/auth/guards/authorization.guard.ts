@@ -6,7 +6,7 @@ import {
   ANY_PERMISSIONS_KEY,
   IS_PUBLIC_KEY,
 } from '../decorators/permissions.decorator';
-import { hasPermissionWithHierarchy, hasAnyPermission } from '../config/role-permissions.config';
+import { hasPermissionWithHierarchy } from '../config/role-permissions.config';
 import { hasSaasProfilePermission } from '../../user-profile/saas-profile-rbac.config';
 import { UserRole } from '../../users/entities/user.entity';
 import { AuditService } from '../../audit/audit.service';

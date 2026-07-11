@@ -8,11 +8,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import * as request from 'supertest';
+import request from 'supertest';
 import { ChatController } from '../src/modules/chat/chat.controller';
 import { ChatService } from '../src/modules/chat/chat.service';
 import { AuthorizationGuard } from '../src/modules/auth/guards/authorization.guard';
 import { IntentClassifierService } from '../src/modules/medical-control-plane/intent-classifier/intent-classifier.service';
+import { EntitlementService } from '../src/modules/platform-assets/entitlement.service';
 
 describe('Intent Classification Integration (e2e)', () => {
   let app: INestApplication;
@@ -40,6 +41,18 @@ describe('Intent Classification Integration (e2e)', () => {
         recordModelPhaseDuration: jest.fn(),
         recordLlmPhaseDuration: jest.fn(),
         setCircuitBreakerState: jest.fn(),
+      } as any,
+      {
+        load: jest.fn().mockResolvedValue(undefined),
+        route: jest.fn().mockResolvedValue({
+          intent: { intent: 'general_query', confidence: 0, keyTerms: [], subcategory: undefined },
+          artifact: {
+            artifactType: undefined,
+            confidence: 0,
+            labelId: undefined,
+            targetMode: undefined,
+          },
+        }),
       } as any,
     );
 
@@ -76,6 +89,12 @@ describe('Intent Classification Integration (e2e)', () => {
                   : undefined,
               };
             },
+          },
+        },
+        {
+          provide: EntitlementService,
+          useValue: {
+            assertLaunchAllowed: jest.fn().mockResolvedValue(undefined),
           },
         },
       ],
