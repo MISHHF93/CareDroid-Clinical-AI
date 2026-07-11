@@ -52,14 +52,31 @@ function configuredValue(...keys: string[]): string | null {
   return null;
 }
 
+async function withTimeout<T>(work: Promise<T>, timeoutMs: number, label: string): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      work,
+      new Promise<T>((_resolve, reject) => {
+        timer = setTimeout(() => {
+          reject(new Error(`${label} timed out after ${timeoutMs}ms`));
+        }, timeoutMs);
+      }),
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
+
 async function timedComponent(
   critical: boolean,
   check: () => Promise<Omit<TimedComponentInput, 'critical'>>,
+  label = 'health check',
 ): Promise<ComponentHealth> {
   const startedAt = Date.now();
 
   try {
-    const result = await check();
+    const result = await withTimeout(check(), CHECK_TIMEOUT_MS, label);
     return {
       ...result,
       critical,
@@ -454,6 +471,15 @@ function determineOverallStatus(components: HealthComponents): OverallStatus {
 
   return 'healthy';
 }
+
+/** Fast liveness for local stack boot (no external/service dependency checks). */
+router.get('/live', (_req, res) => {
+  return res.status(200).json({
+    status: 'ok',
+    service: 'CareDroid API',
+    timestamp: new Date().toISOString(),
+  });
+});
 
 router.get('/', async (req, res) => {
   const startedAt = Date.now();
