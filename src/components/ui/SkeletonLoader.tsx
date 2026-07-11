@@ -15,7 +15,7 @@ export default function SkeletonLoader({ variant = 'panel', rows = 3 }: Skeleton
   const cardCount = variant === 'whiteboard' ? 6 : rows;
 
   return (
-    <div role="status" aria-busy="true" aria-label="Loading" style={{ padding: 16 }}>
+    <div role="status" aria-busy="true" aria-label="Loading" className="u-pad-16">
       <style>
         {`
           @keyframes caredroid-skeleton-shimmer {

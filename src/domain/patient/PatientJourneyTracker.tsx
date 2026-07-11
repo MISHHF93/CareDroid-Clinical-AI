@@ -66,7 +66,7 @@ export function PatientJourneyTracker({
             <li
               key={stage.id}
               className={`cd-journey__step cd-journey__step--${status}`}
-              aria-current={status === 'current' ? 'step' : undefined}
+              {...(status === 'current' ? { 'aria-current': 'step' as const } : {})}
             >
               <span className="cd-journey__dot" aria-hidden="true" />
               <span className="cd-journey__label">{stage.label}</span>

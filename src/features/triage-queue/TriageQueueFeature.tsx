@@ -94,7 +94,7 @@ export function TriageQueueFeature({ onSelectPatient }: TriageQueueFeatureProps)
               className="cd-triage-queue__filter"
               data-active={selected ? 'true' : 'false'}
               onClick={() => setFilter(f.value)}
-              aria-pressed={selected}
+              {...((selected) ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
             >
               <span>{f.label}</span>
               <strong>{count}</strong>

@@ -99,7 +99,7 @@ export default function ClinicalKnowledgeGraph() {
                 type="button"
                 className={`knowledge-graph-page__node${node.id === selectedNodeId ? ' is-selected' : ''}`}
                 onClick={() => setSelectedNodeId(node.id)}
-                aria-pressed={node.id === selectedNodeId}
+                {...((node.id === selectedNodeId) ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
               >
                 <strong>{node.label}</strong>
                 <span>{node.type}</span>

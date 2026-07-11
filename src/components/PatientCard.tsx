@@ -603,30 +603,41 @@ function PatientCard({
         ? reassessmentTimer.dueInLabel || 'Due'
         : reassessmentTimer?.dueInLabel || '—';
 
+  // Prefer static ARIA role strings (not JSX expressions) for a11y tooling.
+  const rowClassName = [
+    'patient-card',
+    'patient-card--row',
+    `patient-card--priority-${displayPriority}`,
+    hasReassessmentDue ? 'patient-card--reassessment-due' : '',
+    hasDeteriorationRisk ? 'patient-card--deterioration-risk' : '',
+    hasEmsArrival ? 'patient-card--ems-arrival' : '',
+    hasLongWait ? 'patient-card--long-wait' : '',
+    hasLwbsRisk ? 'patient-card--lwbs-risk' : '',
+    keyboardSelected ? 'patient-card--keyboard-selected' : '',
+    highlighted ? 'patient-card--highlighted' : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
+
+  const cardClassName = [
+    'patient-card',
+    `patient-card--density-${densityVariant}`,
+    `patient-card--priority-${displayPriority}`,
+    hasReassessmentDue ? 'patient-card--reassessment-due' : '',
+    hasDeteriorationRisk ? 'patient-card--deterioration-risk' : '',
+    hasEmsArrival ? 'patient-card--ems-arrival' : '',
+    hasLongWait ? 'patient-card--long-wait' : '',
+    hasLwbsRisk ? 'patient-card--lwbs-risk' : '',
+    showWorkflowActions ? 'patient-card--mission-control' : '',
+    keyboardSelected ? 'patient-card--keyboard-selected' : '',
+    highlighted ? 'patient-card--highlighted' : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
+
   if (layout === 'row') {
-    return (
-      <div
-        className={[
-          'patient-card',
-          'patient-card--row',
-          `patient-card--priority-${displayPriority}`,
-          hasReassessmentDue ? 'patient-card--reassessment-due' : '',
-          hasDeteriorationRisk ? 'patient-card--deterioration-risk' : '',
-          hasEmsArrival ? 'patient-card--ems-arrival' : '',
-          hasLongWait ? 'patient-card--long-wait' : '',
-          hasLwbsRisk ? 'patient-card--lwbs-risk' : '',
-          keyboardSelected ? 'patient-card--keyboard-selected' : '',
-          highlighted ? 'patient-card--highlighted' : '',
-        ].filter(Boolean).join(' ')}
-        data-patient-card-id={patient.id}
-        onClick={readOnlyDisplay ? undefined : handleSelect}
-        onFocus={onKeyboardFocus}
-        role={readOnlyDisplay ? 'row' : 'button'}
-        tabIndex={readOnlyDisplay ? -1 : 0}
-        onKeyDown={readOnlyDisplay ? undefined : handleKeyDown}
-        style={cardStyle}
-        aria-label={patientCardAriaLabel}
-      >
+    const rowBody = (
+      <>
         <div className="patient-card__row-cell patient-card__row-cell--triage patient-card__row-cell--graphic" aria-label={`Triage ${displayPriority}`}>
           <PatientAcuityRing priority={displayPriority} className="patient-card__row-acuity-ring" />
           <span className="patient-card__row-triage-label">{priorityLabel}</span>
@@ -694,34 +705,45 @@ function PatientCard({
             <PatientJourneyStateBadge patient={patient} compact linkToRoute={false} />
           ) : null}
         </div>
+      </>
+    );
+
+    if (readOnlyDisplay) {
+      return (
+        <div
+          className={rowClassName}
+          data-patient-card-id={patient.id}
+          onFocus={onKeyboardFocus}
+          role="row"
+          tabIndex={-1}
+          style={cardStyle}
+          aria-label={patientCardAriaLabel}
+        >
+          {rowBody}
+        </div>
+      );
+    }
+
+    return (
+      <div
+        className={rowClassName}
+        data-patient-card-id={patient.id}
+        onClick={handleSelect}
+        onFocus={onKeyboardFocus}
+        role="button"
+        tabIndex={0}
+        onKeyDown={handleKeyDown}
+        style={cardStyle}
+        aria-label={patientCardAriaLabel}
+      >
+        {rowBody}
       </div>
     );
   }
 
-  return (
-    <div
-      className={[
-        'patient-card',
-        `patient-card--density-${densityVariant}`,
-        `patient-card--priority-${displayPriority}`,
-        hasReassessmentDue ? 'patient-card--reassessment-due' : '',
-        hasDeteriorationRisk ? 'patient-card--deterioration-risk' : '',
-        hasEmsArrival ? 'patient-card--ems-arrival' : '',
-        hasLongWait ? 'patient-card--long-wait' : '',
-        hasLwbsRisk ? 'patient-card--lwbs-risk' : '',
-        showWorkflowActions ? 'patient-card--mission-control' : '',
-        keyboardSelected ? 'patient-card--keyboard-selected' : '',
-        highlighted ? 'patient-card--highlighted' : '',
-      ].filter(Boolean).join(' ')}
-      data-patient-card-id={patient.id}
-      onClick={readOnlyDisplay ? undefined : handleSelect}
-      onFocus={onKeyboardFocus}
-      role={readOnlyDisplay ? 'article' : 'button'}
-      tabIndex={readOnlyDisplay ? -1 : 0}
-      onKeyDown={readOnlyDisplay ? undefined : handleKeyDown}
-      style={cardStyle}
-      aria-label={patientCardAriaLabel}
-    >
+  // Card layout: static ARIA role strings on each branch (article vs button).
+  const cardBody = (
+      <>
       <div className="patient-card__priority-strip patient-card__priority-strip--graphic" aria-label={`${displayPriority} ${priorityLabel}`}>
         <PatientAcuityRing priority={displayPriority} className="patient-card__acuity-ring" />
         <span className="patient-card__priority-label">{priorityLabel}</span>
@@ -1101,6 +1123,38 @@ function PatientCard({
           ) : null}
         </div>
       ) : null}
+      </>
+  );
+
+  if (readOnlyDisplay) {
+    return (
+      <div
+        className={cardClassName}
+        data-patient-card-id={patient.id}
+        onFocus={onKeyboardFocus}
+        role="article"
+        tabIndex={-1}
+        style={cardStyle}
+        aria-label={patientCardAriaLabel}
+      >
+        {cardBody}
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={cardClassName}
+      data-patient-card-id={patient.id}
+      onClick={handleSelect}
+      onFocus={onKeyboardFocus}
+      role="button"
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
+      style={cardStyle}
+      aria-label={patientCardAriaLabel}
+    >
+      {cardBody}
     </div>
   );
 }

@@ -223,7 +223,7 @@ export const TeamManagement = () => {
           <h1>Team Management</h1>
           <p>Manage team members, roles, and permissions</p>
         </div>
-        <button
+        <button type="button"
           className="btn-invite"
           onClick={() => {
             if (requireTeamApi()) setShowInviteModal(true);
@@ -238,7 +238,7 @@ export const TeamManagement = () => {
       {error && (
         <div className="team-error">
           <span>{error}</span>
-          <button onClick={() => setError(null)}>✕</button>
+          <button type="button" onClick={() => setError(null)}>✕</button>
         </div>
       )}
 
@@ -271,7 +271,7 @@ export const TeamManagement = () => {
         <div className="team-empty">
           <p>No team members found</p>
           {searchQuery && (
-            <button onClick={() => setSearchQuery('')}>Clear search</button>
+            <button type="button" onClick={() => setSearchQuery('')}>Clear search</button>
           )}
         </div>
       )}
@@ -326,7 +326,7 @@ const UserTable = ({ users, sortConfig, onSort, onEdit, onDelete, actionsDisable
 
   const TableHeaderCell = ({ label, sortKey }) => (
     <th>
-      <button
+      <button type="button"
         className={`table-sort-btn ${sortConfig.key === sortKey ? 'table-sort-active' : ''}`}
         onClick={() => onSort(sortKey)}
         aria-label={`Sort by ${label}`}
@@ -382,7 +382,7 @@ const UserTable = ({ users, sortConfig, onSort, onEdit, onDelete, actionsDisable
                 </span>
               </td>
               <td className="table-actions">
-                <button
+                <button type="button"
                   className="action-btn action-edit"
                   onClick={() => onEdit(user)}
                   title="Edit user"
@@ -391,7 +391,7 @@ const UserTable = ({ users, sortConfig, onSort, onEdit, onDelete, actionsDisable
                 >
                   ✎
                 </button>
-                <button
+                <button type="button"
                   className="action-btn action-delete"
                   onClick={() => onDelete(user.id)}
                   title="Remove user"
@@ -440,7 +440,7 @@ const EditUserModal = ({ user, onSave, onCancel, disabled = false }) => {
       <div className="edit-user-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>Edit User</h2>
-          <button className="modal-close" onClick={onCancel}>✕</button>
+          <button type="button" className="modal-close" onClick={onCancel}>✕</button>
         </div>
 
         <div className="modal-body">
@@ -474,14 +474,14 @@ const EditUserModal = ({ user, onSave, onCancel, disabled = false }) => {
         </div>
 
         <div className="modal-footer">
-          <button
+          <button type="button"
             className="btn-cancel"
             onClick={onCancel}
             disabled={saving}
           >
             Cancel
           </button>
-          <button
+          <button type="button"
             className="btn-save"
             onClick={handleSave}
             disabled={saving || disabled}
@@ -547,7 +547,7 @@ const InviteUserModal = ({ email, onEmailChange, onInvite, onCancel, disabled = 
       <div className="invite-user-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>Invite Team Member</h2>
-          <button className="modal-close" onClick={onCancel}>✕</button>
+          <button type="button" className="modal-close" onClick={onCancel}>✕</button>
         </div>
 
         <div className="modal-body">
@@ -572,14 +572,14 @@ const InviteUserModal = ({ email, onEmailChange, onInvite, onCancel, disabled = 
         </div>
 
         <div className="modal-footer">
-          <button
+          <button type="button"
             className="btn-cancel"
             onClick={onCancel}
             disabled={loading}
           >
             Cancel
           </button>
-          <button
+          <button type="button"
             className="btn-invite"
             onClick={handleInvite}
             disabled={!isValidEmail || loading || disabled}

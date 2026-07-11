@@ -292,7 +292,7 @@ function EMSArrivalRow({
           <button
             type="button"
             className="ems-pipeline__details-toggle"
-            aria-expanded={showDetails}
+            {...((showDetails) ? { 'aria-expanded': 'true' as const } : { 'aria-expanded': 'false' as const })}
             onClick={() => setDetailsOpen((open) => !open)}
           >
             {showDetails ? 'Hide details' : 'Show details'}

@@ -75,15 +75,32 @@ export function CalcResultsPanel({
   ariaAtomic = true,
   role = undefined,
 }: any) {
+  // Static role when results are a named region (Edge Tools rejects dynamic ARIA roles).
+  const useRegion = role === 'region' || (!!ariaLabel && role !== 'status' && role !== 'alert');
+  if (useRegion) {
+    return (
+      <div
+        ref={resultsRef}
+        id={id}
+        className="calculator-results"
+        role="region"
+        aria-label={ariaLabel}
+        aria-live={ariaLive}
+        aria-atomic={ariaAtomic ? 'true' : 'false'}
+        tabIndex={-1}
+      >
+        {children}
+      </div>
+    );
+  }
   return (
     <div
       ref={resultsRef}
       id={id}
       className="calculator-results"
-      role={role || (ariaLabel ? 'region' : undefined)}
       aria-label={ariaLabel}
       aria-live={ariaLive}
-      aria-atomic={ariaAtomic}
+      aria-atomic={ariaAtomic ? 'true' : 'false'}
       tabIndex={-1}
     >
       {children}

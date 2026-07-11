@@ -52,7 +52,7 @@ export const OfflineIndicator = () => {
         </span>
       </div>
       {isOnline && (
-        <button
+        <button type="button"
           className="offline-indicator-close"
           onClick={() => setShowIndicator(false)}
           aria-label="Close notification"
@@ -86,19 +86,15 @@ export const OfflineModeBanner = ({
         ? 'Syncing offline cache'
         : 'Offline cache ready';
 
-  return (
-    <section
-      className={[
-        'offline-mode-banner',
-        !isOnline ? 'offline-mode-banner--offline' : '',
-        syncError ? 'offline-mode-banner--error' : '',
-      ]
-        .filter(Boolean)
-        .join(' ')}
-      role={!isOnline || syncError ? 'alert' : 'status'}
-      aria-live="polite"
-      aria-label="Offline mode status"
-    >
+  const bannerClassName = [
+    'offline-mode-banner',
+    !isOnline ? 'offline-mode-banner--offline' : '',
+    syncError ? 'offline-mode-banner--error' : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
+  const bannerBody = (
+    <>
       <div className="offline-mode-banner__body">
         <div className="offline-mode-banner__heading">
           <strong>{statusLabel}</strong>
@@ -130,6 +126,20 @@ export const OfflineModeBanner = ({
           Dismiss
         </button>
       )}
+    </>
+  );
+
+  // Static role strings only (Edge Tools rejects dynamic role expressions).
+  if (!isOnline || syncError) {
+    return (
+      <section className={bannerClassName} role="alert" aria-live="polite" aria-label="Offline mode status">
+        {bannerBody}
+      </section>
+    );
+  }
+  return (
+    <section className={bannerClassName} role="status" aria-live="polite" aria-label="Offline mode status">
+      {bannerBody}
     </section>
   );
 };
@@ -207,7 +217,7 @@ export const OfflineWarning = ({
       <div className="offline-warning-header">
         <span className="offline-warning-icon">⚠️</span>
         <h3>Limited Functionality</h3>
-        <button
+        <button type="button"
           className="offline-warning-close"
           onClick={onDismiss}
           aria-label="Close warning"

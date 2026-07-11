@@ -181,7 +181,7 @@ export default function QueueIntelligencePanel({ collapsed, onCollapsedChange })
               type="button"
               className={`queue-intel__row${isActive ? ' queue-intel__row--active' : ''}`}
               onClick={() => setQueueFilter(queue.type)}
-              aria-pressed={isActive}
+              {...((isActive) ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
               title={queue.name}
             >
               <span className="queue-intel__icon">

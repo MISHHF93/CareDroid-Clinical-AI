@@ -129,7 +129,7 @@ export default function ReceptionWorkQueues({
             type="button"
             role="tab"
             id={`reception-queue-tab-${tab.id}`}
-            aria-selected={activeTab === tab.id}
+            {...((activeTab === tab.id) ? { 'aria-selected': 'true' as const } : { 'aria-selected': 'false' as const })}
             aria-controls={`reception-queue-panel-${tab.id}`}
             className={[
               'reception-work-queues__tab',

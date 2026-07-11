@@ -342,17 +342,25 @@ export default function ReassessmentDrawer({ open, count, onClose }: Reassessmen
           </div>
 
           <div className="reassessment-drawer__sort" aria-label="Sort reassessment patients">
-            <button
+            {sortMode === 'severity' ? (<button
               type="button"
-              aria-pressed={sortMode === 'severity'}
+              aria-pressed="true"
               onClick={() => setSortMode('severity')}
             >
               By severity
-            </button>
+            </button>) : (<button
+              type="button"
+              aria-pressed="false"
+              onClick={() => setSortMode('severity')}
+            >
+              By severity
+            </button>)}
             <span aria-hidden>|</span>
-            <button type="button" aria-pressed={sortMode === 'wait'} onClick={() => setSortMode('wait')}>
+            {sortMode === 'wait' ? (<button type="button" aria-pressed="true" onClick={() => setSortMode('wait')}>
               By wait time
-            </button>
+            </button>) : (<button type="button" aria-pressed="false" onClick={() => setSortMode('wait')}>
+              By wait time
+            </button>)}
           </div>
 
           <button type="button" className="reassessment-drawer__close" onClick={onClose} aria-label="Close reassessment drawer">

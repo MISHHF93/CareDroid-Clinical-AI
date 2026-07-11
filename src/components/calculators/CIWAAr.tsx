@@ -278,16 +278,7 @@ export default function CIWAAr({ patientId, onClose }: CIWAArProps) {
       role="dialog"
       aria-modal="true"
       aria-labelledby="ciwa-title"
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 300,
-        background: 'rgba(0,0,0,0.62)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 20,
-      }}
+      className="u-modal-scrim"
     >
       <div
         style={{
@@ -303,17 +294,10 @@ export default function CIWAAr({ patientId, onClose }: CIWAArProps) {
         }}
       >
         <header
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 12,
-            padding: 16,
-            borderBottom: '1px solid #e0f2fe',
-          }}
+          className="u-panel-header-row"
         >
           <div>
-            <h2 id="ciwa-title" style={{ margin: 0, fontSize: 18, fontWeight: 650 }}>
+            <h2 id="ciwa-title" className="u-title-18">
               CIWA-Ar Alcohol Withdrawal
             </h2>
             {patient ? (
@@ -326,21 +310,13 @@ export default function CIWAAr({ patientId, onClose }: CIWAArProps) {
             type="button"
             onClick={onClose}
             aria-label="Close CIWA-Ar"
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: 8,
-              border: '1px solid #e0f2fe',
-              background: 'transparent',
-              color: 'var(--medical-ink, #111827)',
-              cursor: 'pointer',
-            }}
+            className="u-icon-btn-32"
           >
             X
           </button>
         </header>
 
-        <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <div className="u-stack-14">
           <section
             aria-live="polite"
             style={{
@@ -351,7 +327,7 @@ export default function CIWAAr({ patientId, onClose }: CIWAArProps) {
             }}
           >
             <div style={{ color: protocol.color, fontSize: 13, fontWeight: 800 }}>{protocol.band}</div>
-            <div style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', fontSize: 32, marginTop: 4 }}>
+            <div className="u-mono-32">
               {total}/67
             </div>
             <p style={{ margin: '8px 0 0', color: 'var(--medical-ink, #111827)', fontSize: 13 }}>{protocol.recommendation}</p>
@@ -360,8 +336,8 @@ export default function CIWAAr({ patientId, onClose }: CIWAArProps) {
           {CIWA_ITEMS.map((item) => {
             const value = scores[item.id] || 0;
             return (
-              <section key={item.id} style={{ border: '1px solid #e0f2fe', borderRadius: 12, padding: 14 }}>
-                <label style={{ display: 'grid', gap: 10 }}>
+              <section key={item.id} className="u-card-border">
+                <label className="u-grid-gap-10">
                   <span style={{ color: 'var(--medical-ink, #111827)', fontSize: 14, fontWeight: 700 }}>{item.label}</span>
                   <input
                     type="range"
@@ -403,7 +379,7 @@ export default function CIWAAr({ patientId, onClose }: CIWAArProps) {
           ) : null}
 
           {savedMessage ? (
-            <div role="status" style={{ color: '#10B981', fontSize: 13 }}>
+            <div role="status" className="u-ok-13">
               {savedMessage}
             </div>
           ) : null}

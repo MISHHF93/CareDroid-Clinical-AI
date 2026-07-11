@@ -69,7 +69,7 @@ export default function SidebarChromeControls() {
               ]
                 .filter(Boolean)
                 .join(' ')}
-              aria-pressed={copilotOpen}
+              {...((copilotOpen) ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
               title={`${copilotOpen ? 'Close' : 'Open'} ${EMERGENCY_OS_BRANDING.copilotName} (C)`}
               onClick={toggleCopilot}
             >
@@ -94,7 +94,7 @@ export default function SidebarChromeControls() {
                   ]
                     .filter(Boolean)
                     .join(' ')}
-                  aria-pressed={copilotOpen && activeCopilotTab === tab.id}
+                  {...((copilotOpen && activeCopilotTab === tab.id) ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
                   onClick={() => openCopilotTab(tab.id)}
                 >
                   {tab.label}

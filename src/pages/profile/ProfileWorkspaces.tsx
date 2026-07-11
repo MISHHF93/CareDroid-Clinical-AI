@@ -45,7 +45,7 @@ export default function ProfileWorkspaces() {
     >
       <div className="profile-identity-page__inner">
         <Card>
-          <h2 style={{ marginTop: 0 }}>Change Workspace</h2>
+          <h2 className="u-mt-0">Change Workspace</h2>
           <div className="profile-identity-row">
             <div>
               <strong>{activeWorkspace?.branding?.displayName || activeWorkspace?.name || 'No active workspace'}</strong>
@@ -99,7 +99,7 @@ export default function ProfileWorkspaces() {
         </div>
 
         <Card>
-          <h2 style={{ marginTop: 0 }}>Effective Permissions</h2>
+          <h2 className="u-mt-0">Effective Permissions</h2>
           <p className="profile-identity-muted">
             These permissions combine account role, active workspace membership, and explicit workspace grants.
           </p>

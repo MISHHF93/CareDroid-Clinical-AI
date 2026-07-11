@@ -21,22 +21,19 @@ function iconForSeverity(severity: Alert['severity']) {
 }
 
 export function AlertCard({ alert, onAction, onDismiss, className }: AlertCardProps) {
-  const role = alert.severity === 'Info' ? 'status' : 'alert';
   const reviewState = alert.acknowledged || alert.read ? 'Reviewed' : 'Needs review';
+  const classNames = [
+    'cd-alert-card',
+    `cd-alert-card--${alert.severity}`,
+    alert.read ? 'cd-alert-card--read' : '',
+    className ?? '',
+  ]
+    .filter(Boolean)
+    .join(' ');
+  const ariaLabel = `${alert.severity} alert: ${alert.title}. ${reviewState}.`;
 
-  return (
-    <article
-      role={role}
-      className={[
-        'cd-alert-card',
-        `cd-alert-card--${alert.severity}`,
-        alert.read ? 'cd-alert-card--read' : '',
-        className ?? '',
-      ]
-        .filter(Boolean)
-        .join(' ')}
-      aria-label={`${alert.severity} alert: ${alert.title}. ${reviewState}.`}
-    >
+  const body = (
+    <>
       <span className={`cd-alert-card__icon cd-alert-card__icon--${alert.severity}`} aria-hidden="true">
         {iconForSeverity(alert.severity)}
       </span>
@@ -81,6 +78,20 @@ export function AlertCard({ alert, onAction, onDismiss, className }: AlertCardPr
           ) : null}
         </div>
       </div>
+    </>
+  );
+
+  // Static role strings only — Edge Tools rejects dynamic ARIA roles.
+  if (alert.severity === 'Info') {
+    return (
+      <article className={classNames} role="status" aria-label={ariaLabel}>
+        {body}
+      </article>
+    );
+  }
+  return (
+    <article className={classNames} role="alert" aria-label={ariaLabel}>
+      {body}
     </article>
   );
 }

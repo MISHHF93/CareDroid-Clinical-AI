@@ -44,12 +44,11 @@ export function lazyWithRetry(importFn) {
         if (typeof window === 'undefined' || typeof sessionStorage === 'undefined') {
           throw err;
         }
+        // One automatic reload after a failed chunk (stale deploy / missing module).
+        // Do NOT return a never-resolving promise — that freezes Suspense as a white screen.
         if (!sessionStorage.getItem(CHUNK_RETRY_KEY)) {
           sessionStorage.setItem(CHUNK_RETRY_KEY, '1');
-          window.setTimeout(() => {
-            window.location.reload();
-          }, 0);
-          return new Promise(() => {});
+          window.location.reload();
         }
         sessionStorage.removeItem(CHUNK_RETRY_KEY);
         throw err;

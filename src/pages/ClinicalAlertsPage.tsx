@@ -220,7 +220,7 @@ const ClinicalAlertsPage = () => {
                 .filter(Boolean)
                 .join(' ')}
               onClick={() => setSelectedSeverity(f.value as AlertSeverity | 'all')}
-              aria-pressed={selectedSeverity === f.value}
+              {...((selectedSeverity === f.value) ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
             >
               {f.label}
             </button>

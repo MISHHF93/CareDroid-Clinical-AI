@@ -1,0 +1,376 @@
+/**
+ * Utility classes that replace common static style={{ ... }} patterns.
+ * Used to clear Microsoft Edge Tools no-inline-styles noise and centralize spacing.
+ */
+
+.u-m-0 {
+  margin: 0;
+}
+
+.u-mb-4 {
+  margin-bottom: 4px;
+}
+
+.u-mb-6 {
+  margin-bottom: 6px;
+}
+
+.u-mb-8 {
+  margin-bottom: 8px;
+}
+
+.u-mb-12 {
+  margin-bottom: 12px;
+}
+
+.u-mb-16 {
+  margin-bottom: 16px;
+}
+
+.u-mb-20 {
+  margin-bottom: 20px;
+}
+
+.u-mt-4 {
+  margin-top: 4px;
+}
+
+.u-mt-8 {
+  margin-top: 8px;
+}
+
+.u-mt-12 {
+  margin-top: 12px;
+}
+
+.u-mt-16 {
+  margin-top: 16px;
+}
+
+.u-mt-20 {
+  margin-top: 20px;
+}
+
+.u-my-8 {
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.u-ml-0 {
+  margin-left: 0;
+}
+
+.u-mr-8 {
+  margin-right: 8px;
+}
+
+.u-p-0 {
+  padding: 0;
+}
+
+.u-pl-16 {
+  padding-left: 16px;
+}
+
+.u-pl-20 {
+  padding-left: 20px;
+}
+
+.u-ta-center {
+  text-align: center;
+}
+
+.u-ta-left {
+  text-align: left;
+}
+
+.u-ta-right {
+  text-align: right;
+}
+
+.u-fs-11 {
+  font-size: 11px;
+}
+
+.u-fs-12 {
+  font-size: 12px;
+}
+
+.u-fs-13 {
+  font-size: 13px;
+}
+
+.u-fw-600 {
+  font-weight: 600;
+}
+
+.u-fw-700 {
+  font-weight: 700;
+}
+
+.u-list-reset {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.u-list-tight {
+  margin: 8px 0 0;
+  padding-left: 20px;
+  font-size: 12px;
+}
+
+.u-flex {
+  display: flex;
+}
+
+.u-flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.u-flex-wrap {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.u-flex-center {
+  display: flex;
+  align-items: center;
+}
+
+.u-flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.u-gap-4 {
+  gap: 4px;
+}
+
+.u-gap-6 {
+  gap: 6px;
+}
+
+.u-gap-8 {
+  gap: 8px;
+}
+
+.u-gap-10 {
+  gap: 10px;
+}
+
+.u-gap-12 {
+  gap: 12px;
+}
+
+.u-grid {
+  display: grid;
+}
+
+.u-w-full {
+  width: 100%;
+}
+
+.u-block {
+  display: block;
+}
+
+.u-inline-flex {
+  display: inline-flex;
+  align-items: center;
+}
+
+.u-mt-10 {
+  margin-top: 10px;
+}
+
+.u-mt-0 {
+  margin-top: 0;
+}
+
+.u-flex-1 {
+  flex: 1;
+}
+
+.u-gap-5 {
+  gap: 5px;
+}
+
+.u-grid-gap-8 {
+  display: grid;
+  gap: 8px;
+}
+
+.u-grid-gap-10 {
+  display: grid;
+  gap: 10px;
+}
+
+.u-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.u-grid-2-gap-10 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.u-flex-wrap-gap-10 {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.u-flex-wrap-gap-10-mt-10 {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.u-modal-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: rgba(0, 0, 0, 0.62);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.u-modal-scrim-260 {
+  position: fixed;
+  inset: 0;
+  z-index: 260;
+  background: rgba(0, 0, 0, 0.66);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.u-icon-btn-32 {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid #e0f2fe;
+  background: transparent;
+  color: var(--medical-ink, #111827);
+  cursor: pointer;
+}
+
+.u-panel-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px;
+  border-bottom: 1px solid #e0f2fe;
+}
+
+.u-title-18 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 650;
+}
+
+.u-title-18-750 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 750;
+}
+
+.u-stack-14 {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.u-pad-10-border-b {
+  padding: 10px;
+  border-bottom: 1px solid #e0f2fe;
+}
+
+.u-pad-16-border-b {
+  padding: 16px;
+  border-bottom: 1px solid #e0f2fe;
+}
+
+.u-mono-32 {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 32px;
+  margin-top: 4px;
+}
+
+.u-ok-13 {
+  color: #10b981;
+  font-size: 13px;
+}
+
+.u-flex-col-gap-5 {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.u-flex-col-gap-6 {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.u-flex-col-gap-12 {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.u-card-border {
+  border: 1px solid #e0f2fe;
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.u-label-caps {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.u-click-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.u-muted-13 {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.u-input-surface {
+  border: 1px solid #e0f2fe;
+  border-radius: 8px;
+  background: #f0f9ff;
+  color: var(--medical-ink, #111827);
+  padding: 10px;
+}
+
+.u-pad-16 {
+  padding: 16px;
+}
+
+.u-mb-16-str {
+  margin-bottom: 16px;
+}

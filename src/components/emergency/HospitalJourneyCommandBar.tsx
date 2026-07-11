@@ -49,7 +49,11 @@ function HospitalJourneyCommandBar() {
               <Link
                 to={phase.route}
                 className="hospital-journey-command-bar__link"
-                aria-current={isCurrentRoute ? 'page' : state === 'active' ? 'step' : undefined}
+                {...(isCurrentRoute
+                  ? { 'aria-current': 'page' as const }
+                  : state === 'active'
+                    ? { 'aria-current': 'step' as const }
+                    : {})}
                 title={`${phase.order}. ${phase.label}`}
                 aria-label={
                   summary && (summary.activeCount > 0 || summary.stagesAttention > 0)

@@ -268,7 +268,7 @@ export default function StaffWorkloadPanel({ open, onClose }: StaffWorkloadPanel
       className={`staff-workload-panel${open ? ' staff-workload-panel--open' : ''}`}
       role="dialog"
       aria-label="Staff workload"
-      aria-hidden={!open}
+      {...(!open ? { 'aria-hidden': 'true' as const } : { 'aria-hidden': 'false' as const })}
     >
       <header className="staff-workload-panel__header">
         <div>
@@ -326,11 +326,11 @@ export default function StaffWorkloadPanel({ open, onClose }: StaffWorkloadPanel
             const rowId = `staff-workload-${workload.member.id}`;
             return (
               <article key={workload.member.id} className="staff-workload-row">
-                <button
+                {expanded ? (<button
                   type="button"
                   className="staff-workload-row__summary"
                   onClick={() => toggleExpandedStaff(setExpandedStaffIds, workload.member.id)}
-                  aria-expanded={expanded}
+                  aria-expanded="true"
                   aria-controls={rowId}
                 >
                   {workload.member.avatarUrl ? (
@@ -351,7 +351,32 @@ export default function StaffWorkloadPanel({ open, onClose }: StaffWorkloadPanel
                   >
                     <span style={{ width: `${workload.fillPercent}%` }} />
                   </span>
-                </button>
+                </button>) : (<button
+                  type="button"
+                  className="staff-workload-row__summary"
+                  onClick={() => toggleExpandedStaff(setExpandedStaffIds, workload.member.id)}
+                  aria-expanded="false"
+                  aria-controls={rowId}
+                >
+                  {workload.member.avatarUrl ? (
+                    <img src={workload.member.avatarUrl} alt="" loading="lazy" />
+                  ) : (
+                    <span className="staff-workload-row__avatar">{initialsForStaff(workload.member)}</span>
+                  )}
+                  <span className="staff-workload-row__identity">
+                    <strong>{getStaffName(workload.member)}</strong>
+                    <small>{workload.member.roleLabel || workload.member.role}</small>
+                  </span>
+                  <strong className="staff-workload-row__count" aria-label={`${workload.count} patients`}>
+                    {workload.count}
+                  </strong>
+                  <span
+                    className={`staff-workload-row__bar staff-workload-row__bar--${workload.band}`}
+                    aria-label={`${workload.count} assigned active patients`}
+                  >
+                    <span style={{ width: `${workload.fillPercent}%` }} />
+                  </span>
+                </button>)}
 
                 {expanded ? (
                   <div id={rowId} className="staff-workload-row__patients">

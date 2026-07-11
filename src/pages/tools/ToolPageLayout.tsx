@@ -146,12 +146,12 @@ const ToolPageLayout = ({
     <ActionRow align="end" className="tool-header-actions">
       {actions}
       {results && (
-        <button
-          className="btn-share-tool btn-share-tool--with-icon"
-          onClick={() => setShowShareModal(true)}
-          title="Export or share your results"
-          type="button"
-        >
+        <button type="button"
+ className="btn-share-tool btn-share-tool--with-icon"
+ onClick={() => setShowShareModal(true)}
+ title="Export or share your results"
+ 
+ >
           <NavIcon icon={CHROME_ICONS.upload} size={16} aria-hidden />
           <span>Share Results</span>
         </button>

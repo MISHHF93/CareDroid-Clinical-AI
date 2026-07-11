@@ -59,7 +59,7 @@ export default function ProfileActivity() {
         </div>
 
         <Card>
-          <h2 style={{ marginTop: 0 }}>Audit Visibility</h2>
+          <h2 className="u-mt-0">Audit Visibility</h2>
           <p className="profile-identity-muted">
             Compliance-grade audit events remain protected. This page shows only safe current-user summaries.
           </p>

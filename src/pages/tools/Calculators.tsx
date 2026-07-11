@@ -1,4 +1,4 @@
-﻿import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import useProfileNavigate from '../../hooks/useProfileNavigate';
 import { useConversation } from '../../contexts/ConversationContext';
@@ -186,6 +186,7 @@ import {
   scrollResultsIntoView as scrollCalcResultsIntoView,
 } from './calculatorPrimitives';
 
+import { AriaInvalidInput } from '../../components/a11y/AriaInvalidFields';
 // Hub cards still derive from builtinUiCalculators.map inside buildBuiltinHubCalculatorCards().
 export const CALCULATORS = buildBuiltinHubCalculatorCards();
 const CHAT_ASSISTED_TOOLS = getHubChatAssistedTools();
@@ -228,7 +229,7 @@ function CalculatorSelectCard({ calc, isActive, onSelect }) {
     <div
       role="button"
       tabIndex={0}
-      aria-pressed={isActive}
+      {...(isActive ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
       aria-label={`${calc.name}. ${calc.description}${calc.route ? `. Route ${calc.route}` : ''}`}
       className={`calculator-card ${isActive ? 'active' : ''}`}
       onClick={onSelect}
@@ -809,13 +810,13 @@ const QSOFACalculator = ({ onResultChange, patientContext = null as any }) => {
             <span className="calc-input-help" id="qsofa-rr-help">
               1 point if ≥ 22
             </span>
-            <input
+            <AriaInvalidInput
               id="qsofa-rr"
               type="number"
               inputMode="decimal"
               className={calcFieldClass('calc-input-field', rrInvalid)}
               aria-describedby={calcDescribedBy('qsofa-rr-help', validationErrors.length ? errorSummaryId : '')}
-              aria-invalid={rrInvalid || undefined}
+               invalid={rrInvalid || undefined}
               min={0}
               max={120}
               value={respiratoryRate}
@@ -829,13 +830,13 @@ const QSOFACalculator = ({ onResultChange, patientContext = null as any }) => {
             <span className="calc-input-help" id="qsofa-sbp-help">
               1 point if ≤ 100
             </span>
-            <input
+            <AriaInvalidInput
               id="qsofa-sbp"
               type="number"
               inputMode="decimal"
               className={calcFieldClass('calc-input-field', sbpInvalid)}
               aria-describedby={calcDescribedBy('qsofa-sbp-help', validationErrors.length ? errorSummaryId : '')}
-              aria-invalid={sbpInvalid || undefined}
+               invalid={sbpInvalid || undefined}
               min={40}
               max={300}
               value={systolicBloodPressure}
@@ -846,7 +847,7 @@ const QSOFACalculator = ({ onResultChange, patientContext = null as any }) => {
 
         <div className="calc-input-group">
           <div className="calc-checkbox-group">
-            <input
+            <AriaInvalidInput
               type="checkbox"
               id="qsofa-alt"
               className="calc-checkbox"
@@ -856,7 +857,7 @@ const QSOFACalculator = ({ onResultChange, patientContext = null as any }) => {
                 'qsofa-ment-help',
                 validationErrors.length ? errorSummaryId : ''
               )}
-              aria-invalid={mentationInvalid || undefined}
+               invalid={mentationInvalid || undefined}
             />
             <label htmlFor="qsofa-alt" className="calc-checkbox-label">
               Altered mentation (e.g. disorientation, lethargy)
@@ -875,12 +876,12 @@ const QSOFACalculator = ({ onResultChange, patientContext = null as any }) => {
             3–15. If provided and &lt; 15, counts toward mentation criterion. May leave blank if you used
             "altered mentation" only.
           </span>
-          <input
+          <AriaInvalidInput
             id="qsofa-gcs"
             type="number"
             className={calcFieldClass('calc-input-field', gcsInvalid)}
             aria-describedby={calcDescribedBy('qsofa-gcs-help', validationErrors.length ? errorSummaryId : '')}
-            aria-invalid={gcsInvalid || undefined}
+             invalid={gcsInvalid || undefined}
             min={3}
             max={15}
             value={gcs}
@@ -1139,13 +1140,13 @@ const NEWS2Calculator = ({ onResultChange, patientContext = null as any }) => {
             <span className="calc-input-help" id="news2-rr-help">
               Values outside 0–60 cannot be calculated; use the chart for extreme physiology.
             </span>
-            <input
+            <AriaInvalidInput
               id="news2-rr"
               type="number"
               inputMode="numeric"
               className={calcFieldClass('calc-input-field', rrInvalid)}
               aria-describedby={calcDescribedBy('news2-rr-help', validationErrors.length ? errorSummaryId : '')}
-              aria-invalid={rrInvalid || undefined}
+               invalid={rrInvalid || undefined}
               min={0}
               max={60}
               value={respiratoryRate}
@@ -1159,13 +1160,13 @@ const NEWS2Calculator = ({ onResultChange, patientContext = null as any }) => {
             <span className="calc-input-help" id="news2-spo2-help">
               Pulse oximetry on current scale ({spo2Scale === '2' ? 'Scale 2' : 'Scale 1'}).
             </span>
-            <input
+            <AriaInvalidInput
               id="news2-spo2"
               type="number"
               inputMode="decimal"
               className={calcFieldClass('calc-input-field', spo2Invalid)}
               aria-describedby={calcDescribedBy('news2-spo2-help', validationErrors.length ? errorSummaryId : '')}
-              aria-invalid={spo2Invalid || undefined}
+               invalid={spo2Invalid || undefined}
               min={70}
               max={100}
               value={spo2}
@@ -1202,13 +1203,13 @@ const NEWS2Calculator = ({ onResultChange, patientContext = null as any }) => {
             <span className="calc-input-help" id="news2-sbp-help">
               Values outside 50–280 mmHg are blocked from calculation.
             </span>
-            <input
+            <AriaInvalidInput
               id="news2-sbp"
               type="number"
               inputMode="decimal"
               className={calcFieldClass('calc-input-field', sbpInvalid)}
               aria-describedby={calcDescribedBy('news2-sbp-help', validationErrors.length ? errorSummaryId : '')}
-              aria-invalid={sbpInvalid || undefined}
+               invalid={sbpInvalid || undefined}
               min={50}
               max={280}
               value={systolicBp}
@@ -1222,13 +1223,13 @@ const NEWS2Calculator = ({ onResultChange, patientContext = null as any }) => {
             <span className="calc-input-help" id="news2-pulse-help">
               Values outside 20–220 bpm are blocked from calculation.
             </span>
-            <input
+            <AriaInvalidInput
               id="news2-pulse"
               type="number"
               inputMode="numeric"
               className={calcFieldClass('calc-input-field', pulseInvalid)}
               aria-describedby={calcDescribedBy('news2-pulse-help', validationErrors.length ? errorSummaryId : '')}
-              aria-invalid={pulseInvalid || undefined}
+               invalid={pulseInvalid || undefined}
               min={20}
               max={220}
               value={pulse}
@@ -1244,13 +1245,13 @@ const NEWS2Calculator = ({ onResultChange, patientContext = null as any }) => {
           <span className="calc-input-help" id="news2-temp-help">
             Core or equivalent temperature. Values outside 30–43 °C are blocked from calculation.
           </span>
-            <input
+            <AriaInvalidInput
               id="news2-temp"
               type="number"
               inputMode="decimal"
               className={calcFieldClass('calc-input-field', tempInvalid)}
               aria-describedby={calcDescribedBy('news2-temp-help', validationErrors.length ? errorSummaryId : '')}
-              aria-invalid={tempInvalid || undefined}
+               invalid={tempInvalid || undefined}
               step="0.1"
               min={30}
               max={43}
@@ -1498,13 +1499,13 @@ const ChildPughCalculator = ({ onResultChange }) => {
               Required. Valid ranges depend on unit; out-of-range values are blocked.
             </span>
             <div className="calc-input-inline-units">
-              <input
+              <AriaInvalidInput
                 id="cp-bili"
                 type="number"
                 inputMode="decimal"
                 className={calcFieldClass('calc-input-field', biliInvalid)}
                 aria-describedby={calcDescribedBy('cp-bili-help', validationErrors.length ? errorSummaryId : '')}
-                aria-invalid={biliInvalid || undefined}
+                 invalid={biliInvalid || undefined}
                 step="0.1"
                 min={0}
                 value={bilirubin}
@@ -1538,13 +1539,13 @@ const ChildPughCalculator = ({ onResultChange }) => {
               Required. Valid ranges depend on unit; out-of-range values are blocked.
             </span>
             <div className="calc-input-inline-units">
-              <input
+              <AriaInvalidInput
                 id="cp-alb"
                 type="number"
                 inputMode="decimal"
                 className={calcFieldClass('calc-input-field', albInvalid)}
                 aria-describedby={calcDescribedBy('cp-alb-help', validationErrors.length ? errorSummaryId : '')}
-                aria-invalid={albInvalid || undefined}
+                 invalid={albInvalid || undefined}
                 step="0.1"
                 min={0}
                 value={albumin}
@@ -1604,13 +1605,13 @@ const ChildPughCalculator = ({ onResultChange }) => {
             <span className="calc-input-help" id="cp-inr-help">
               0.5–15. Values outside this range are blocked from calculation.
             </span>
-            <input
+            <AriaInvalidInput
               id="cp-inr"
               type="number"
               inputMode="decimal"
               className={calcFieldClass('calc-input-field', inrInvalid)}
               aria-describedby={calcDescribedBy('cp-inr-help', validationErrors.length ? errorSummaryId : '')}
-              aria-invalid={inrInvalid || undefined}
+               invalid={inrInvalid || undefined}
               step="0.1"
               min={0.5}
               max={15}
@@ -1626,13 +1627,13 @@ const ChildPughCalculator = ({ onResultChange }) => {
             <span className="calc-input-help" id="cp-pt-help">
               0–80 seconds above control. Values outside this range are blocked.
             </span>
-            <input
+            <AriaInvalidInput
               id="cp-pt"
               type="number"
               inputMode="decimal"
               className={calcFieldClass('calc-input-field', ptInvalid)}
               aria-describedby={calcDescribedBy('cp-pt-help', validationErrors.length ? errorSummaryId : '')}
-              aria-invalid={ptInvalid || undefined}
+               invalid={ptInvalid || undefined}
               step="0.1"
               min={0}
               max={80}
@@ -2293,7 +2294,7 @@ const MeldCalculator = ({ mode = 'meld', onResultChange }) => {
               Total bilirubin
             </label>
             <div className="calc-input-row calc-input-row--with-unit">
-              <input
+              <AriaInvalidInput
                 id="meld-bili"
                 type="number"
                 min="0"
@@ -2305,7 +2306,7 @@ const MeldCalculator = ({ mode = 'meld', onResultChange }) => {
                   setBilirubin(e.target.value);
                 }}
                 aria-required="true"
-                aria-invalid={biliInvalid}
+                 invalid={biliInvalid}
                 aria-describedby={calcDescribedBy(hasValidationErrors ? errorSummaryId : null, 'meld-labs-legend')}
                 inputMode="decimal"
               />
@@ -2326,7 +2327,7 @@ const MeldCalculator = ({ mode = 'meld', onResultChange }) => {
             <label className="calc-input-label" htmlFor="meld-inr">
               INR
             </label>
-            <input
+            <AriaInvalidInput
               id="meld-inr"
               type="number"
               min="0"
@@ -2338,7 +2339,7 @@ const MeldCalculator = ({ mode = 'meld', onResultChange }) => {
                 setInr(e.target.value);
               }}
               aria-required="true"
-              aria-invalid={inrInvalid}
+               invalid={inrInvalid}
               aria-describedby={calcDescribedBy(hasValidationErrors ? errorSummaryId : null)}
               inputMode="decimal"
             />
@@ -2350,7 +2351,7 @@ const MeldCalculator = ({ mode = 'meld', onResultChange }) => {
               Serum creatinine
             </label>
             <div className="calc-input-row calc-input-row--with-unit">
-              <input
+              <AriaInvalidInput
                 id="meld-cr"
                 type="number"
                 min="0"
@@ -2362,8 +2363,8 @@ const MeldCalculator = ({ mode = 'meld', onResultChange }) => {
                   setCreatinine(e.target.value);
                 }}
                 disabled={onDialysis}
-                aria-required={!onDialysis}
-                aria-invalid={crInvalid}
+                aria-required={!onDialysis ? 'true' : 'false'}
+                 invalid={crInvalid}
                 aria-describedby={calcDescribedBy(
                   hasValidationErrors ? errorSummaryId : null,
                   'meld-dialysis-help'
@@ -2407,7 +2408,7 @@ const MeldCalculator = ({ mode = 'meld', onResultChange }) => {
               <label className="calc-input-label" htmlFor="meld-sodium">
                 Serum sodium
               </label>
-              <input
+              <AriaInvalidInput
                 id="meld-sodium"
                 type="number"
                 min="100"
@@ -2424,7 +2425,7 @@ const MeldCalculator = ({ mode = 'meld', onResultChange }) => {
                   'meld-sodium-help',
                   hasValidationErrors ? errorSummaryId : null
                 )}
-                aria-invalid={sodiumInvalid}
+                 invalid={sodiumInvalid}
                 inputMode="decimal"
               />
               <span id="meld-sodium-help" className="calc-input-help">
@@ -2836,7 +2837,7 @@ const SOFACalculator = ({ onResultChange }) => {
         />
 
         <div className="calc-actions">
-          <button
+          <button type="button"
             className="calc-calculate-btn"
             onClick={handleCalculate}
             disabled={loading || !preflightReady}
@@ -2853,7 +2854,7 @@ const SOFACalculator = ({ onResultChange }) => {
               </>
             )}
           </button>
-          <button className="calc-reset-btn" onClick={handleReset}>
+          <button type="button" className="calc-reset-btn" onClick={handleReset}>
             Reset
           </button>
         </div>
@@ -3032,7 +3033,7 @@ const GFRCalculator = ({ onResultChange }) => {
             <NavIcon icon={CHROME_ICONS.calculator} size={20} />
             Calculate eGFR
           </button>
-          <button
+          <button type="button"
             className="calc-reset-btn"
             onClick={() => { setInputs({ age: '', sex: '', creatinine: '' }); setResult(null); }}
           >
@@ -3202,7 +3203,7 @@ const BMICalculator = ({ onResultChange }) => {
             <NavIcon icon={CHROME_ICONS.calculator} size={20} />
             Calculate BMI
           </button>
-          <button
+          <button type="button"
             className="calc-reset-btn"
             onClick={() => { setInputs({ ...inputs, weight: '', height: '' }); setResult(null); }}
           >
@@ -3427,7 +3428,7 @@ const CHA2DS2VAScCalculator = ({ onResultChange }) => {
             <NavIcon icon={CHROME_ICONS.calculator} size={20} />
             Calculate Score
           </button>
-          <button
+          <button type="button"
             className="calc-reset-btn"
             onClick={() => {
               setInputs({

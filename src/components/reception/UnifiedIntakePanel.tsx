@@ -111,7 +111,7 @@ export default function UnifiedIntakePanel({
         <button
           type="button"
           className={`unified-intake-phase-nav__btn${phase === UNIFIED_INTAKE_PHASE.critical ? ' is-active' : ''}`}
-          aria-current={phase === UNIFIED_INTAKE_PHASE.critical ? 'step' : undefined}
+          {...(phase === UNIFIED_INTAKE_PHASE.critical ? { 'aria-current': 'step' as const } : {})}
           onClick={() => setPhase(UNIFIED_INTAKE_PHASE.critical)}
         >
           1. Life-critical
@@ -122,7 +122,7 @@ export default function UnifiedIntakePanel({
         <button
           type="button"
           className={`unified-intake-phase-nav__btn${phase === UNIFIED_INTAKE_PHASE.admin ? ' is-active' : ''}`}
-          aria-current={phase === UNIFIED_INTAKE_PHASE.admin ? 'step' : undefined}
+          {...(phase === UNIFIED_INTAKE_PHASE.admin ? { 'aria-current': 'step' as const } : {})}
           onClick={() => {
             setPhase(UNIFIED_INTAKE_PHASE.admin);
             setAdminExpanded(true);
@@ -150,7 +150,7 @@ export default function UnifiedIntakePanel({
                 key={type.id}
                 type="button"
                 role="radio"
-                aria-checked={draft.arrivalType === type.id}
+                {...((draft.arrivalType === type.id) ? { 'aria-checked': 'true' as const } : { 'aria-checked': 'false' as const })}
                 className={draft.arrivalType === type.id ? 'is-active' : ''}
                 onClick={() => onDraftChange({ arrivalType: type.id })}
               >

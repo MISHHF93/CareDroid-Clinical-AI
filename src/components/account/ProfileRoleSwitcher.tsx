@@ -12,6 +12,13 @@ type ProfileRoleSwitcherProps = {
   onSwitch?: (roleId: string) => void;
 };
 
+/**
+ * Workflow profile switcher.
+ *
+ * ARIA notes (Microsoft Edge Tools / axe static analysis):
+ * - Avoid JSX expressions in aria-* values — static scanners treat `{expr}` as invalid.
+ * - Prefer native radios for exclusive choice; chips use literal aria-pressed strings.
+ */
 export default function ProfileRoleSwitcher({
   variant = 'chips',
   className = '',
@@ -20,6 +27,7 @@ export default function ProfileRoleSwitcher({
   const { role, switchDemoRole } = useEmergencyRolePermissions();
   const { profileNavigate } = useProfileNavigate();
   const roleViews = listCuratedDemoRoleViews();
+  const groupName = 'caredroid-workflow-profile';
 
   const handleSwitch = (emergencyRoleId: string) => {
     switchDemoRole(emergencyRoleId);
@@ -47,33 +55,39 @@ export default function ProfileRoleSwitcher({
   }
 
   if (variant === 'menu') {
+    // Native radiogroup: no aria-checked expressions; valid exclusive selection.
     return (
-      <div
+      <fieldset
         className={`profile-role-switcher profile-role-switcher--menu ${className}`.trim()}
-        role="group"
-        aria-label="Switch workflow profile"
       >
+        <legend className="profile-role-switcher__legend">Switch workflow profile</legend>
         {roleViews.map((view) => {
           const active = view.emergencyRoleId === role;
           return (
-            <button
+            <label
               key={view.emergencyRoleId}
-              type="button"
-              role="menuitemradio"
-              aria-checked={active}
               className={`profile-role-switcher__menu-item${active ? ' is-active' : ''}`}
               title={view.description}
-              onClick={() => handleSwitch(view.emergencyRoleId)}
             >
-              <span>{view.label}</span>
-              <small>{view.sceneLabel}</small>
-            </button>
+              <input
+                type="radio"
+                name={groupName}
+                value={view.emergencyRoleId}
+                checked={active}
+                onChange={() => handleSwitch(view.emergencyRoleId)}
+              />
+              <span className="profile-role-switcher__menu-copy">
+                <span>{view.label}</span>
+                <small>{view.sceneLabel}</small>
+              </span>
+            </label>
           );
         })}
-      </div>
+      </fieldset>
     );
   }
 
+  // Chips: toggle buttons with *literal* aria-pressed (no JSX expression value).
   return (
     <div
       className={`profile-role-switcher profile-role-switcher--chips ${className}`.trim()}
@@ -82,12 +96,26 @@ export default function ProfileRoleSwitcher({
     >
       {roleViews.map((view) => {
         const active = view.emergencyRoleId === role;
+        if (active) {
+          return (
+            <button
+              key={view.emergencyRoleId}
+              type="button"
+              className="profile-role-switcher__chip is-active"
+              aria-pressed="true"
+              title={view.description}
+              onClick={() => handleSwitch(view.emergencyRoleId)}
+            >
+              {view.label}
+            </button>
+          );
+        }
         return (
           <button
             key={view.emergencyRoleId}
             type="button"
-            className={`profile-role-switcher__chip${active ? ' is-active' : ''}`}
-            aria-pressed={active}
+            className="profile-role-switcher__chip"
+            aria-pressed="false"
             title={view.description}
             onClick={() => handleSwitch(view.emergencyRoleId)}
           >

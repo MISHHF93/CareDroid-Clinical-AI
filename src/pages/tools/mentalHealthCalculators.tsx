@@ -1,3 +1,4 @@
+import { AriaInvalidSelect } from '../../components/a11y/AriaInvalidFields';
 /**
  * PHQ-9 and GAD-7 calculator forms (Tier A). Screening-only UX with accessibility affordances.
  */
@@ -129,13 +130,13 @@ export function Phq9Calculator({ onResultChange }) {
             </span>
           ) : null}
         </label>
-        <select
+        <AriaInvalidSelect
           id={id}
           className={likertSelectClassName(hasValidationErrors, responses[item.key])}
           value={responses[item.key]}
           onChange={(e) => setItem(item.key, e.target.value)}
           aria-required="true"
-          aria-invalid={hasValidationErrors && responses[item.key] === ''}
+           invalid={hasValidationErrors && responses[item.key] === ''}
           aria-describedby={
             [isQ9 ? 'phq9-q9-field-help' : null, hasValidationErrors ? validationSummaryId : null]
               .filter(Boolean)
@@ -148,7 +149,7 @@ export function Phq9Calculator({ onResultChange }) {
               {opt.label} ({opt.points})
             </option>
           ))}
-        </select>
+        </AriaInvalidSelect>
         {isQ9 ? (
           <span className="calc-input-help" id="phq9-q9-field-help">
             Any non-zero response requires urgent safety review per institutional protocols.
@@ -407,13 +408,13 @@ export function Gad7Calculator({ onResultChange }) {
             {item.number}. {item.label}
           </span>
         </label>
-        <select
+        <AriaInvalidSelect
           id={id}
           className={likertSelectClassName(hasValidationErrors, responses[item.key])}
           value={responses[item.key]}
           onChange={(e) => setItem(item.key, e.target.value)}
           aria-required="true"
-          aria-invalid={hasValidationErrors && responses[item.key] === ''}
+           invalid={hasValidationErrors && responses[item.key] === ''}
           aria-describedby={
             [
               isDistressItem ? 'gad7-q7-field-help' : null,
@@ -429,7 +430,7 @@ export function Gad7Calculator({ onResultChange }) {
               {opt.label} ({opt.points})
             </option>
           ))}
-        </select>
+        </AriaInvalidSelect>
         {isDistressItem ? (
           <span className="calc-input-help" id="gad7-q7-field-help">
             High scores may reflect acute fear or panic; follow distress and suicide-risk pathways when clinically

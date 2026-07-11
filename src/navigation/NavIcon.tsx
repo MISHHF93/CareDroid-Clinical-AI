@@ -1,5 +1,3 @@
-import React from 'react';
-
 /**
  * Renders a Lucide icon with theme-aware sizing (default: CSS var --nav-icon-size).
  */
@@ -18,14 +16,25 @@ export function NavIcon({
       ? { width: size, height: size }
       : { width: 'var(--nav-icon-size, 20px)', height: 'var(--nav-icon-size, 20px)' };
 
+  // Static role only when non-decorative (Edge Tools rejects dynamic ARIA roles).
+  if (decorative) {
+    return (
+      <Icon
+        className={`nav-icon-svg ${className}`.trim()}
+        style={style}
+        strokeWidth={strokeWidth}
+        aria-hidden="true"
+        {...rest}
+      />
+    );
+  }
   return (
     <Icon
       className={`nav-icon-svg ${className}`.trim()}
       style={style}
       strokeWidth={strokeWidth}
-      aria-hidden={decorative ? true : undefined}
-      aria-label={decorative ? undefined : label}
-      role={decorative ? undefined : 'img'}
+      aria-label={label}
+      role="img"
       {...rest}
     />
   );

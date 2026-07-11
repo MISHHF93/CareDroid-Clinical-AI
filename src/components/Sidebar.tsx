@@ -301,7 +301,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
             .join(' ')}
           onClick={openDockedCopilot}
           aria-label={item.label}
-          aria-pressed={copilotOpen}
+          {...((copilotOpen) ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
           title={item.label}
           data-nav-id={item.id}
           data-icon-key={item.icon}
@@ -333,7 +333,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
           onClick={notificationShell.togglePanel}
           aria-label={`${item.label}${globalUnreadCount ? `: ${globalUnreadCount} unread` : ''}`}
           aria-haspopup="dialog"
-          aria-expanded={notificationShell.panelOpen}
+          {...((notificationShell.panelOpen) ? { 'aria-expanded': 'true' as const } : { 'aria-expanded': 'false' as const })}
           title={item.label}
           data-nav-id={item.id}
           data-icon-key={item.icon}
@@ -363,7 +363,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
           .filter(Boolean)
           .join(' ')}
         aria-label={item.label}
-        aria-current={active ? 'page' : undefined}
+        {...(active ? { 'aria-current': 'page' as const } : {})}
         title={item.label}
         data-nav-id={item.id}
         data-icon-key={item.icon}
@@ -405,7 +405,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
             openDockedCopilot();
           }}
           aria-label={label}
-          aria-pressed={copilotOpen}
+          {...((copilotOpen) ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
           title={label}
           data-nav-id={item.id}
           data-icon-key={item.icon}
@@ -433,7 +433,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
             notificationShell.togglePanel();
           }}
           aria-label={`${label}${globalUnreadCount ? `: ${globalUnreadCount} unread` : ''}`}
-          aria-expanded={notificationShell.panelOpen}
+          {...((notificationShell.panelOpen) ? { 'aria-expanded': 'true' as const } : { 'aria-expanded': 'false' as const })}
           data-nav-id={item.id}
           data-icon-key={item.icon}
         >
@@ -454,7 +454,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
         to={destination}
         className={['sidebar-item', active ? 'sidebar-item--active' : ''].filter(Boolean).join(' ')}
         aria-label={label}
-        aria-current={active ? 'page' : undefined}
+        {...(active ? { 'aria-current': 'page' as const } : {})}
         title={label}
         data-nav-id={item.id}
         data-icon-key={item.icon}
@@ -512,7 +512,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
             .join(' ')}
           onClick={toggleCopilot}
           disabled={!canUseCopilot}
-          aria-pressed={copilotOpen}
+          {...((copilotOpen) ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
           aria-label={canUseCopilot ? copilotChrome.openAriaLabel : copilotChrome.unavailableAriaLabel}
           title={canUseCopilot ? copilotChrome.openTitle : copilotChrome.unavailableTitle}
         >
@@ -527,7 +527,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
             .filter(Boolean)
             .join(' ')}
           onClick={() => setMoreOpen((open) => !open)}
-          aria-expanded={moreOpen}
+          {...((moreOpen) ? { 'aria-expanded': 'true' as const } : { 'aria-expanded': 'false' as const })}
           aria-controls="sidebar-more-sheet"
           aria-label="More"
         >
@@ -570,7 +570,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
                     className={['sidebar-more-item', active ? 'sidebar-more-item--active' : '']
                       .filter(Boolean)
                       .join(' ')}
-                    aria-current={active ? 'page' : undefined}
+                    {...(active ? { 'aria-current': 'page' as const } : {})}
                     aria-label={item.label}
                     title={item.label}
                     data-nav-id={item.id}

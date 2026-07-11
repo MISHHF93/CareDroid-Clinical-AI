@@ -61,7 +61,7 @@ export default function HelpHub({ variant = 'drawer' }: HelpHubProps) {
     <div
       className={['help-hub', variant === 'page' ? 'help-hub--page' : ''].filter(Boolean).join(' ')}
       role="dialog"
-      aria-modal={variant === 'drawer'}
+      aria-modal={variant === 'drawer' ? 'true' : 'false'}
       aria-labelledby="help-hub-title"
     >
       <header className="help-hub__header">
@@ -89,7 +89,7 @@ export default function HelpHub({ variant = 'drawer' }: HelpHubProps) {
             role="tab"
             className="help-hub__tab"
             data-active={state.tab === tab.id ? 'true' : 'false'}
-            aria-selected={state.tab === tab.id}
+            {...((state.tab === tab.id) ? { 'aria-selected': 'true' as const } : { 'aria-selected': 'false' as const })}
             onClick={() => setTab(tab.id)}
           >
             {tab.label}

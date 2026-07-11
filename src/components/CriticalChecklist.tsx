@@ -138,7 +138,7 @@ function ChecklistRow({
         {categoryIcon[item.category]}
       </span>
       <span>
-        <span style={{ alignItems: 'center', display: 'flex', gap: 7 }}>
+        <span className="u-flex-center u-gap-6">
           {item.critical ? (
             <span
               aria-label="Critical item"
@@ -274,15 +274,7 @@ export default function CriticalChecklist({
             type="button"
             onClick={onClose}
             aria-label="Close checklist"
-            style={{
-              background: 'transparent',
-              border: '1px solid #e0f2fe',
-              borderRadius: 8,
-              color: 'var(--medical-ink, #111827)',
-              cursor: 'pointer',
-              height: 32,
-              width: 32,
-            }}
+            className="u-icon-btn-32"
           >
             X
           </button>
@@ -316,7 +308,7 @@ export default function CriticalChecklist({
         ) : null}
       </header>
 
-      <div style={{ padding: 16 }}>
+      <div className="u-pad-16">
         {activeChecklist ? (
           <>
             {!checklist ? (
@@ -337,7 +329,7 @@ export default function CriticalChecklist({
                 </button>
               </div>
             ) : null}
-            <div style={{ display: 'grid', gap: 10 }}>
+            <div className="u-grid-gap-10">
               {sortedItems.map((item) => (
                 <ChecklistRow
                   key={item.id}

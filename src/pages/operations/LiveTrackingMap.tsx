@@ -125,7 +125,7 @@ export default function LiveTrackingMap() {
           <button
             key={value}
             type="button"
-            aria-pressed={layer === value}
+            {...((layer === value) ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
             onClick={() => setLayer(value)}
           >
             {value === 'all' ? 'All layers' : value === 'fleet' ? 'Fleet' : 'Medical IoT'}
@@ -135,7 +135,7 @@ export default function LiveTrackingMap() {
           <button
             key={value}
             type="button"
-            aria-pressed={statusFilter === value}
+            {...((statusFilter === value) ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
             onClick={() => setStatusFilter(value)}
           >
             {value === 'all' ? 'All statuses' : value}

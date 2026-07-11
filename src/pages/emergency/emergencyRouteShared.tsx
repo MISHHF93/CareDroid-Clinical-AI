@@ -127,7 +127,7 @@ export function FlowCapacityViewTabs({ activeView, onViewChange }) {
           key={view.id}
           type="button"
           role="tab"
-          aria-selected={activeView === view.id}
+          {...((activeView === view.id) ? { 'aria-selected': 'true' as const } : { 'aria-selected': 'false' as const })}
           className={`emergency-route-view-tabs__btn${
             activeView === view.id ? ' emergency-route-view-tabs__btn--active' : ''
           }`}

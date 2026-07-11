@@ -246,11 +246,11 @@ export default function WorkloadBalancePanel({
             const expanded = expandedStaffIds.has(member.id);
             return (
               <article key={member.id} className="workload-staff-row">
-                <button
+                {expanded ? (<button
                   type="button"
                   className="workload-staff-row__summary"
                   onClick={() => toggleExpanded(member.id)}
-                  aria-expanded={expanded}
+                  aria-expanded="true"
                 >
                   {member.avatarUrl ? (
                     <img src={member.avatarUrl} alt="" loading="lazy" />
@@ -268,7 +268,29 @@ export default function WorkloadBalancePanel({
                   >
                     <span style={{ width: `${member.assignedCount === 0 ? 0 : Math.max(16, member.workloadPercent)}%` }} />
                   </span>
-                </button>
+                </button>) : (<button
+                  type="button"
+                  className="workload-staff-row__summary"
+                  onClick={() => toggleExpanded(member.id)}
+                  aria-expanded="false"
+                >
+                  {member.avatarUrl ? (
+                    <img src={member.avatarUrl} alt="" loading="lazy" />
+                  ) : (
+                    <span className="workload-staff-row__avatar">{member.initials}</span>
+                  )}
+                  <span className="workload-staff-row__identity">
+                    <strong>{member.displayName}</strong>
+                    <small>{member.roleLabel}</small>
+                  </span>
+                  <strong className="workload-staff-row__count">{member.assignedCount}</strong>
+                  <span
+                    className={`workload-staff-row__bar workload-staff-row__bar--${member.workloadTone}`}
+                    aria-label={`${member.assignedCount} assigned patients`}
+                  >
+                    <span style={{ width: `${member.assignedCount === 0 ? 0 : Math.max(16, member.workloadPercent)}%` }} />
+                  </span>
+                </button>)}
 
                 {expanded ? (
                   <div className="workload-staff-row__patients">

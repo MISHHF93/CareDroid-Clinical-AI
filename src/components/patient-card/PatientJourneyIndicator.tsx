@@ -82,7 +82,7 @@ export function PatientJourneyIndicator({
             key={stage.state}
             className={`patient-journey__stage ${stageClass}`}
             role="listitem"
-            aria-current={isActive ? 'step' : undefined}
+            {...(isActive ? { 'aria-current': 'step' as const } : {})}
           >
             <span className="patient-journey__stage-btn" title={stage.label}>
               {variant !== 'mini' && (

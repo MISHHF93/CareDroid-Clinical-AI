@@ -796,5 +796,5 @@ export function buildSidebarItems(isEnabled) {
       activePaths: item.activePaths,
       tier: feature?.tier || 'core',
     };
-  }).filter(Boolean);
+  }).filter((item): item is NonNullable<typeof item> => item !== null);
 }

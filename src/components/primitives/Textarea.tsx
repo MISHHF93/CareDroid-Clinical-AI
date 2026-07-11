@@ -1,4 +1,5 @@
 import React, { useId } from 'react';
+import { AriaInvalidTextarea } from '../a11y/AriaInvalidFields';
 import './Textarea.css';
 
 type TextareaProps = {
@@ -22,12 +23,12 @@ export function Textarea({ label, hint, error, required, className, id: external
           {label}
         </label>
       )}
-      <textarea
+      <AriaInvalidTextarea
         id={id}
         rows={rows}
-        aria-invalid={error ? true : undefined}
+         invalid={error ? true : undefined}
         aria-describedby={[hintId, errorId].filter(Boolean).join(' ') || undefined}
-        aria-required={required}
+        aria-required={required ? 'true' : 'false'}
         className={['cd-textarea', error ? 'cd-textarea--error' : ''].filter(Boolean).join(' ')}
         {...props}
       />

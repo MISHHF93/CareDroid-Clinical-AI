@@ -127,7 +127,7 @@ export function buildClinicalDecisionSupportPlan({
   patientContext = {} as any,
   profile = {} as any,
   activeWorkspaceId = 'all',
-  calculatorInventory = [] as any[],
+  calculatorInventory = [] as readonly any[],
 } = {}) {
   const signals = detectSignals(symptoms);
   const riskLevel = chooseRisk(signals);

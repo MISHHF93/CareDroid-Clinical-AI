@@ -359,14 +359,16 @@ const ToolResultShare = ({ toolName, toolId, results, onClose }) => {
           )}
 
           {/* Message Display */}
-          {feedback.text && (
-            <div
-              className={`share-message share-message--${feedback.variant}`}
-              role={feedback.variant === 'error' ? 'alert' : 'status'}
-            >
-              {feedback.text}
-            </div>
-          )}
+          {feedback.text &&
+            (feedback.variant === 'error' ? (
+              <div className={`share-message share-message--${feedback.variant}`} role="alert">
+                {feedback.text}
+              </div>
+            ) : (
+              <div className={`share-message share-message--${feedback.variant}`} role="status">
+                {feedback.text}
+              </div>
+            ))}
         </div>
 
         <div className="share-modal-footer">

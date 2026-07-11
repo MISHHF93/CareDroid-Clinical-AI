@@ -81,7 +81,7 @@ export default function OperationalHistoryPanel({
                 key={domain}
                 type="button"
                 role="tab"
-                aria-selected={activeDomain === domain}
+                {...((activeDomain === domain) ? { 'aria-selected': 'true' as const } : { 'aria-selected': 'false' as const })}
                 className={[
                   'operational-history-panel__tab',
                   activeDomain === domain ? 'operational-history-panel__tab--active' : '',

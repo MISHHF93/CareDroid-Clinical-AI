@@ -53,28 +53,54 @@ export default function CopilotShell({
       {header}
 
       {chatOnly ? null : (
-      <div className="ed-copilot-shell__tabs" role="tablist" aria-label="Copilot panel sections">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            type="button"
-            role="tab"
-            id={`ed-copilot-tab-${tab.id}`}
-            aria-selected={activeTab === tab.id}
-            aria-controls={`ed-copilot-panel-${tab.id}`}
-            className="ed-copilot-shell__tab"
-            data-active={activeTab === tab.id ? 'true' : 'false'}
-            onClick={() => onTabChange(tab.id)}
-          >
-            <span>{tab.label}</span>
-            {typeof tab.badge === 'number' && tab.badge > 0 ? (
-              <span className="ed-copilot-shell__tab-badge" aria-label={`${tab.badge} items`}>
-                {tab.badge}
-              </span>
-            ) : null}
-          </button>
-        ))}
-      </div>
+        <div className="ed-copilot-shell__tabs" role="tablist" aria-label="Copilot panel sections">
+          {tabs.map((tab) => {
+            const selected = activeTab === tab.id;
+            // Edge Tools rejects JSX expressions in ARIA values — use literals only.
+            if (selected) {
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  role="tab"
+                  id={`ed-copilot-tab-${tab.id}`}
+                  aria-selected="true"
+                  aria-controls={`ed-copilot-panel-${tab.id}`}
+                  className="ed-copilot-shell__tab"
+                  data-active="true"
+                  onClick={() => onTabChange(tab.id)}
+                >
+                  <span>{tab.label}</span>
+                  {typeof tab.badge === 'number' && tab.badge > 0 ? (
+                    <span className="ed-copilot-shell__tab-badge" aria-label={`${tab.badge} items`}>
+                      {tab.badge}
+                    </span>
+                  ) : null}
+                </button>
+              );
+            }
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                role="tab"
+                id={`ed-copilot-tab-${tab.id}`}
+                aria-selected="false"
+                aria-controls={`ed-copilot-panel-${tab.id}`}
+                className="ed-copilot-shell__tab"
+                data-active="false"
+                onClick={() => onTabChange(tab.id)}
+              >
+                <span>{tab.label}</span>
+                {typeof tab.badge === 'number' && tab.badge > 0 ? (
+                  <span className="ed-copilot-shell__tab-badge" aria-label={`${tab.badge} items`}>
+                    {tab.badge}
+                  </span>
+                ) : null}
+              </button>
+            );
+          })}
+        </div>
       )}
 
       <div className="ed-copilot-shell__body">

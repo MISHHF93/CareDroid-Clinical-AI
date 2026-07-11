@@ -1,3 +1,4 @@
+import { AriaInvalidInput } from '../a11y/AriaInvalidFields';
 import './Checkbox.css';
 
 /**
@@ -29,7 +30,7 @@ export const Checkbox = ({
   return (
     <div className={`checkbox-container checkbox-${size}`}>
       <div className="checkbox-wrapper">
-        <input
+        <AriaInvalidInput
           type="checkbox"
           id={id}
           className="checkbox-input"
@@ -37,7 +38,7 @@ export const Checkbox = ({
           onChange={(e) => onChange(e.target.checked)}
           disabled={disabled}
           required={required}
-          aria-invalid={!!error}
+           invalid={error}
           aria-describedby={description ? `${id}-desc` : undefined}
         />
         <label htmlFor={id} className="checkbox-label">
@@ -141,7 +142,7 @@ export const Toggle = ({
         onChange={(e) => onChange(e.target.checked)}
         disabled={disabled}
         role="switch"
-        aria-checked={checked}
+        {...(checked ? { 'aria-checked': 'true' as const } : { 'aria-checked': 'false' as const })}
       />
       <label htmlFor={id} className="toggle-label">
         <span className="toggle-text">

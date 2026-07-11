@@ -92,6 +92,6 @@ export const useNotificationActions = () => {
  *     }
  *   };
  *
- *   return <button onClick={handleSave}>Save</button>;
+ *   return <button type="button" onClick={handleSave}>Save</button>;
  * }
  */

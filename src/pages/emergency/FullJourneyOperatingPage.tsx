@@ -26,6 +26,7 @@ import {
   buildCommandCenterWorkflowActions,
   type OperationalWorkflowAction,
 } from '../../config/operationalWorkflow.config';
+import './FullJourneyOperatingPage.css';
 
 type ViewId = 'journey' | 'ed-readiness' | 'diagnostics' | 'handoffs' | 'reports';
 
@@ -100,57 +101,27 @@ function SectionCard({ title, lead, badge, children }: {
 }
 
 function StatusChip({ label, status }: { label: string; status: string }) {
-  const color = STATUS_COLORS[status] ?? MEDICAL_THEME.inkSubtle;
   return (
-    <span
-      className="emergency-route-action-chip"
-      style={{ color, borderColor: color, whiteSpace: 'nowrap' }}
-    >
+    <span className="emergency-route-action-chip fj-status-chip" data-status={status}>
       {label} · {status}
     </span>
   );
 }
 
 function MetricChip({ label, value, warn }: { label: string; value: string | number; warn?: boolean }) {
+  const warnOn = Boolean(warn && Number(value) > 0);
   return (
-    <div
-      style={{
-        padding: '10px 14px',
-        borderRadius: 10,
-        background: MEDICAL_THEME.surfaceCard,
-        border: `1px solid ${warn && Number(value) > 0 ? MEDICAL_TYPE.statusCritical : MEDICAL_THEME.border}`,
-        minWidth: 80,
-        flex: '0 0 auto',
-      }}
-    >
-      <div
-        style={{
-          fontSize: 22,
-          fontWeight: 800,
-          color: warn && Number(value) > 0 ? MEDICAL_TYPE.statusCritical : MEDICAL_THEME.ink,
-        }}
-      >
-        {value}
-      </div>
-      <div style={{ fontSize: 11, color: MEDICAL_THEME.inkSubtle, fontWeight: 600 }}>{label}</div>
+    <div className={`fj-metric-chip${warnOn ? ' fj-metric-chip--warn' : ''}`}>
+      <div className="fj-metric-chip__value">{value}</div>
+      <div className="fj-metric-chip__label">{label}</div>
     </div>
   );
 }
 
 function ActionToneDot({ tone }: { tone: OperationalWorkflowAction['tone'] }) {
-  const color =
-    tone === 'critical'
-      ? MEDICAL_TYPE.statusCritical
-      : tone === 'warning'
-        ? '#F59E0B'
-        : tone === 'success'
-          ? '#10B981'
-          : MEDICAL_THEME.accent;
-
   return (
     <span
       className={`emergency-command-action__tone emergency-command-action__tone--${tone}`}
-      style={{ backgroundColor: color }}
       aria-hidden="true"
     />
   );
@@ -235,7 +206,7 @@ function JourneyView({ snapshot }: { snapshot: ReturnType<typeof buildFullEmerge
         lead="Door-to-action compliance tracked through journey traces and the response timer engine."
         badge={snapshot.metrics.threeMinuteBreaches ? `${snapshot.metrics.threeMinuteBreaches} breach` : 'on track'}
       >
-        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 10 }}>
+        <div className="u-flex-wrap-gap-10-mt-10">
           <MetricChip label="Active journeys" value={snapshot.metrics.activeJourneyTraces} />
           <MetricChip label="3-min breaches" value={snapshot.metrics.threeMinuteBreaches} warn />
           <MetricChip label="Unacked critical" value={snapshot.metrics.unacknowledgedCriticalAlerts} warn />
@@ -249,26 +220,22 @@ function JourneyView({ snapshot }: { snapshot: ReturnType<typeof buildFullEmerge
         badge={snapshot.activeTraces?.length ?? 0}
       >
         {snapshot.activeTraces?.length ? (
-          <div className="emergency-route-stack" style={{ marginTop: 10 }}>
+          <div className="emergency-route-stack u-mt-10" >
             {snapshot.activeTraces.map((trace) => (
               <article key={trace.traceId} className="emergency-route-queue-row">
-                <div style={{ flex: 1 }}>
-                  <strong style={{ fontSize: 13 }}>{trace.currentStage.replace(/_/g, ' ')}</strong>
-                  <div className="emergency-route-queue-row__patients" style={{ fontSize: 12, marginTop: 2 }}>
+                <div className="u-flex-1">
+                  <strong className="u-fs-13">{trace.currentStage.replace(/_/g, ' ')}</strong>
+                  <div className="emergency-route-queue-row__patients fj-caption">
                     {trace.callId ? `Call ${trace.callId}` : 'Walk-in'}
                     {trace.patientId ? ` · Patient ${trace.patientId}` : ''}
                     {trace.emsArrivalId ? ` · EMS ${trace.emsArrivalId}` : ''}
                   </div>
-                  <small className="emergency-route-queue-row__movement" style={{ fontSize: 11 }}>
+                  <small className="emergency-route-queue-row__movement u-fs-11" >
                     {trace.signalCount} signals · started {new Date(trace.startedAt).toLocaleTimeString()}
                   </small>
                 </div>
                 <span
-                  className="emergency-route-queue-row__oldest"
-                  style={{
-                    color: trace.threeMinuteBreachOccurred ? MEDICAL_TYPE.statusCritical : MEDICAL_THEME.inkSubtle,
-                    flexShrink: 0,
-                  }}
+                  className={`emergency-route-queue-row__oldest ${trace.threeMinuteBreachOccurred ? 'fj-text-critical-flex' : 'fj-text-subtle-flex'}`}
                 >
                   {trace.threeMinuteBreachOccurred ? '3-min breach' : 'compliant'}
                 </span>
@@ -276,7 +243,7 @@ function JourneyView({ snapshot }: { snapshot: ReturnType<typeof buildFullEmerge
             ))}
           </div>
         ) : (
-          <p className="emergency-route-section-card__lead" style={{ marginTop: 10 }}>
+          <p className="emergency-route-section-card__lead u-mt-10" >
             No active traces yet. Log a call in the Dispatch Console, dispatch a unit, and route through reception to
             populate the full emergency care journey.
           </p>
@@ -289,7 +256,7 @@ function JourneyView({ snapshot }: { snapshot: ReturnType<typeof buildFullEmerge
         lead="CAD dispatch status, active EMS assessments, and pre-arrival pipeline."
         badge={cadSummary.activeAssignments}
       >
-        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 10 }}>
+        <div className="u-flex-wrap-gap-10-mt-10">
           <MetricChip label="CAD units total" value={cadSummary.totalUnits} />
           <MetricChip label="Available" value={cadSummary.availableUnits} />
           <MetricChip label="En route" value={cadSummary.enRouteUnits} warn />
@@ -298,7 +265,7 @@ function JourneyView({ snapshot }: { snapshot: ReturnType<typeof buildFullEmerge
           <MetricChip label="Active assessments" value={prehospitalSummary.activeAssessments} warn />
           <MetricChip label="Packets transmitted" value={prehospitalSummary.transmittedPackets} />
         </div>
-        <div className="emergency-route-chip-row" style={{ marginTop: 10 }}>
+        <div className="emergency-route-chip-row u-mt-10" >
           <Link to={CANONICAL_ROUTES.emergencyDispatch} className="emergency-route-action-chip">Dispatch Console</Link>
           <Link to={CANONICAL_ROUTES.emergencyEms} className="emergency-route-action-chip">EMS Pipeline</Link>
           <Link to={CANONICAL_ROUTES.emergencyEdReadiness} className="emergency-route-action-chip">ED Readiness</Link>
@@ -311,7 +278,7 @@ function JourneyView({ snapshot }: { snapshot: ReturnType<typeof buildFullEmerge
         lead="Active patients, queues, staff routing, and diagnostics."
         badge={snapshot.metrics.activePatients}
       >
-        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 10 }}>
+        <div className="u-flex-wrap-gap-10-mt-10">
           <MetricChip label="Active patients" value={snapshot.metrics.activePatients} />
           <MetricChip label="P1/P2" value={snapshot.metrics.p1p2Patients} warn />
           <MetricChip label="Inbound EMS" value={snapshot.metrics.inboundEms} warn />
@@ -319,7 +286,7 @@ function JourneyView({ snapshot }: { snapshot: ReturnType<typeof buildFullEmerge
           <MetricChip label="STAT orders" value={dxSummary.statOrders} warn />
           <MetricChip label="Capacity" value={snapshot.metrics.capacityBand} />
         </div>
-        <div className="emergency-route-chip-row" style={{ marginTop: 10 }}>
+        <div className="emergency-route-chip-row u-mt-10" >
           <Link to={CANONICAL_ROUTES.emergencyWhiteboard} className="emergency-route-action-chip">Whiteboard</Link>
           <Link to={CANONICAL_ROUTES.emergencyQueues} className="emergency-route-action-chip">Patient Queues</Link>
           <Link to={CANONICAL_ROUTES.emergencyDiagnostics} className="emergency-route-action-chip">Diagnostics</Link>
@@ -333,26 +300,26 @@ function JourneyView({ snapshot }: { snapshot: ReturnType<typeof buildFullEmerge
         lead="Live status for each stage. Click Open to navigate to that stage's surface."
         badge={snapshot.stages.length}
       >
-        <div className="emergency-route-stack" style={{ marginTop: 10 }}>
+        <div className="emergency-route-stack u-mt-10" >
           {snapshot.stages.map((stage) => (
             <article key={stage.id} className="emergency-route-queue-row">
-              <div style={{ flex: 1 }}>
-                <strong style={{ fontSize: 13 }}>
+              <div className="u-flex-1">
+                <strong className="u-fs-13">
                   {stage.order}. {stage.label}
                 </strong>
-                <div className="emergency-route-queue-row__patients" style={{ fontSize: 12, marginTop: 2 }}>
+                <div className="emergency-route-queue-row__patients fj-caption">
                   {stage.outcome}
                 </div>
-                <small className="emergency-route-queue-row__movement" style={{ fontSize: 11 }}>
+                <small className="emergency-route-queue-row__movement u-fs-11" >
                   {stage.ownerRoles.join(' · ')}
                 </small>
               </div>
-              <Link to={stage.route} className="emergency-route-filter-banner__btn" style={{ flexShrink: 0 }}>
+              <Link to={stage.route} className="emergency-route-filter-banner__btn fj-flex-shrink-0">
                 Open
               </Link>
               <span
-                className="emergency-route-queue-row__oldest"
-                style={{ color: STATUS_COLORS[stage.status] ?? MEDICAL_THEME.inkSubtle, flexShrink: 0 }}
+                className="emergency-route-queue-row__oldest fj-text-subtle-flex"
+                data-status={stage.status}
               >
                 {stage.status}
               </span>
@@ -412,21 +379,21 @@ function CreateReadinessPlanForm({ onCreated }: { onCreated: () => void }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 12 }}>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+    <form onSubmit={handleSubmit} className="fj-stack-col-10">
+      <div className="u-grid-2-gap-10">
         <div>
-          <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: MEDICAL_THEME.inkSubtle, marginBottom: 3 }}>Bay / Room</label>
+          <label className="fj-label-block">Bay / Room</label>
           <input
-            style={{ width: '100%', padding: '7px 10px', borderRadius: 7, border: `1px solid ${MEDICAL_THEME.border}`, background: MEDICAL_THEME.surfacePage, color: MEDICAL_THEME.ink, fontSize: 13, boxSizing: 'border-box' }}
+            className="fj-field-input"
             value={bay}
             onChange={(e) => setBay(e.target.value)}
             placeholder="e.g. Resus 1, Trauma Bay..."
           />
         </div>
         <div>
-          <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: MEDICAL_THEME.inkSubtle, marginBottom: 3 }}>ETA (minutes)</label>
+          <label className="fj-label-block">ETA (minutes)</label>
           <input
-            style={{ width: '100%', padding: '7px 10px', borderRadius: 7, border: `1px solid ${MEDICAL_THEME.border}`, background: MEDICAL_THEME.surfacePage, color: MEDICAL_THEME.ink, fontSize: 13, boxSizing: 'border-box' }}
+            className="fj-field-input"
             type="number"
             value={etaMinutes}
             onChange={(e) => setEtaMinutes(e.target.value)}
@@ -436,23 +403,14 @@ function CreateReadinessPlanForm({ onCreated }: { onCreated: () => void }) {
         </div>
       </div>
       <div>
-        <div style={{ fontSize: 11, fontWeight: 700, color: MEDICAL_THEME.inkSubtle, marginBottom: 4 }}>Activate resources:</div>
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+        <div className="fj-label-mb4">Activate resources:</div>
+        <div className="u-flex-wrap u-gap-6">
           {resourceOptions.map((r) => (
             <button
               key={r}
               type="button"
               onClick={() => toggle(r)}
-              style={{
-                padding: '3px 8px',
-                borderRadius: 20,
-                border: `1px solid ${resources.includes(r) ? MEDICAL_THEME.accent : MEDICAL_THEME.border}`,
-                background: resources.includes(r) ? `color-mix(in srgb, ${MEDICAL_THEME.accent} 15%, transparent)` : 'transparent',
-                color: resources.includes(r) ? MEDICAL_THEME.ink : MEDICAL_THEME.inkSubtle,
-                fontSize: 11,
-                fontWeight: 600,
-                cursor: 'pointer',
-              }}
+              className={`fj-resource-chip${resources.includes(r) ? ' fj-resource-chip--on' : ''}`}
             >
               {r}
             </button>
@@ -462,17 +420,7 @@ function CreateReadinessPlanForm({ onCreated }: { onCreated: () => void }) {
       <button
         type="submit"
         disabled={submitting}
-        style={{
-          padding: '8px 14px',
-          borderRadius: 8,
-          background: MEDICAL_THEME.accent,
-          color: MEDICAL_THEME.onAccent,
-          fontWeight: 700,
-          fontSize: 13,
-          border: 'none',
-          cursor: submitting ? 'not-allowed' : 'pointer',
-          alignSelf: 'flex-start',
-        }}
+        className="fj-btn-primary"
       >
         Create Readiness Plan
       </button>
@@ -503,36 +451,21 @@ function ReadinessPlanCard({ plan, onUpdated }: { plan: EDReadinessPlan; onUpdat
 
   return (
     <article
-      style={{
-        padding: 14,
-        borderRadius: 10,
-        border: `1px solid ${overdue ? MEDICAL_TYPE.statusCritical : plan.status === 'ready' ? '#10B981' : MEDICAL_THEME.border}`,
-        background: plan.status === 'ready' ? 'rgba(16,185,129,0.05)' : MEDICAL_THEME.surfaceCard,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 8,
-      }}
+      className={`fj-plan-card${overdue ? ' fj-plan-card--overdue' : plan.status === 'ready' ? ' fj-plan-card--ready' : ''}`}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <div className="fj-row-between">
         <div>
-          <strong style={{ fontSize: 13 }}>{plan.assignedRoom ?? plan.assignedBay ?? 'Bay TBD'}</strong>
-          <div style={{ fontSize: 12, color: MEDICAL_THEME.inkSubtle, marginTop: 2 }}>
+          <strong className="u-fs-13">{plan.assignedRoom ?? plan.assignedBay ?? 'Bay TBD'}</strong>
+          <div className="fj-caption-12-mt">
             ETA: {new Date(plan.expectedArrivalAt).toLocaleTimeString()}
             {plan.specialtyTeamCalled && ` · Specialty: ${plan.specialtyTeams.join(', ')}`}
           </div>
-          <div style={{ fontSize: 11, color: MEDICAL_THEME.inkSubtle }}>
+          <div className="fj-caption-11">
             Equipment: {checkedItems}/{totalItems} · Staff notified: {plan.notifiedStaff.length}
           </div>
         </div>
         <span
-          style={{
-            fontSize: 11,
-            fontWeight: 700,
-            padding: '2px 8px',
-            borderRadius: 4,
-            background: overdue ? 'rgba(239,68,68,0.12)' : plan.status === 'ready' ? 'rgba(16,185,129,0.12)' : 'rgba(245,158,11,0.12)',
-            color: overdue ? MEDICAL_TYPE.statusCritical : plan.status === 'ready' ? '#059669' : '#b45309',
-          }}
+          className={`fj-plan-status ${overdue ? 'fj-plan-status--overdue' : plan.status === 'ready' ? 'fj-plan-status--ready' : 'fj-plan-status--active'}`}
         >
           {overdue ? 'OVERDUE' : plan.status.toUpperCase()}
         </span>
@@ -540,26 +473,18 @@ function ReadinessPlanCard({ plan, onUpdated }: { plan: EDReadinessPlan; onUpdat
 
       {/* Equipment checklist */}
       {plan.equipmentChecklist.length > 0 && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+        <div className="u-flex-col u-gap-4">
           {plan.equipmentChecklist.map((item) => (
             <label
               key={item.item}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                fontSize: 12,
-                cursor: item.ready ? 'default' : 'pointer',
-                color: item.ready ? '#10B981' : MEDICAL_THEME.ink,
-                textDecoration: item.ready ? 'line-through' : 'none',
-              }}
+              className={`fj-check-row ${item.ready ? 'fj-check-row--ready' : 'fj-check-row--todo'}`}
             >
               <input
                 type="checkbox"
                 checked={item.ready}
                 disabled={item.ready}
                 onChange={() => !item.ready && handleCheckItem(item.item)}
-                style={{ accentColor: '#10B981' }}
+                className="fj-check-row"
               />
               {item.item}
             </label>
@@ -569,12 +494,12 @@ function ReadinessPlanCard({ plan, onUpdated }: { plan: EDReadinessPlan; onUpdat
 
       {/* Actions */}
       {plan.status === 'pending' && (
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 4 }}>
+        <div className="fj-row-wrap-8-mt">
           {plan.notifiedStaff.length === 0 && (
             <button
               type="button"
               onClick={handleNotifyStaff}
-              style={{ padding: '5px 10px', borderRadius: 6, background: 'transparent', color: MEDICAL_THEME.accent, border: `1px solid ${MEDICAL_THEME.accent}`, fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
+              className="fj-btn-outline-accent"
             >
               Notify Charge Nurse
             </button>
@@ -583,17 +508,7 @@ function ReadinessPlanCard({ plan, onUpdated }: { plan: EDReadinessPlan; onUpdat
             type="button"
             onClick={handleMarkReady}
             disabled={!allChecked && totalItems > 0}
-            style={{
-              padding: '5px 10px',
-              borderRadius: 6,
-              background: allChecked ? '#10B981' : 'transparent',
-              color: allChecked ? '#fff' : MEDICAL_THEME.inkSubtle,
-              border: `1px solid ${allChecked ? '#10B981' : MEDICAL_THEME.border}`,
-              fontSize: 12,
-              fontWeight: 700,
-              cursor: allChecked ? 'pointer' : 'not-allowed',
-              opacity: allChecked ? 1 : 0.6,
-            }}
+            className={`fj-btn-mark-ready${allChecked ? ' fj-btn-mark-ready--enabled' : ''}`}
             title={allChecked ? 'Mark bay as ready' : `Check all ${totalItems - checkedItems} remaining items first`}
           >
             ✓ Mark Bay Ready
@@ -602,7 +517,7 @@ function ReadinessPlanCard({ plan, onUpdated }: { plan: EDReadinessPlan; onUpdat
       )}
 
       {plan.status === 'ready' && (
-        <div style={{ fontSize: 12, color: '#10B981', fontWeight: 700 }}>✓ Bay ready for patient arrival</div>
+        <div className="fj-text-ok-12">✓ Bay ready for patient arrival</div>
       )}
     </article>
   );
@@ -631,7 +546,7 @@ function EdReadinessView() {
   return (
     <>
       {/* Summary metrics */}
-      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+      <div className="u-flex-wrap-gap-10">
         <MetricChip label="Active plans" value={summary.activePlans} />
         <MetricChip label="Ready" value={summary.readyCount} />
         <MetricChip label="Pending" value={summary.pendingCount} warn />
@@ -642,8 +557,8 @@ function EdReadinessView() {
 
       {/* Overdue alert */}
       {summary.overdueCount > 0 && (
-        <div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(239,68,68,0.1)', border: `2px solid ${MEDICAL_TYPE.statusCritical}` }}>
-          <strong style={{ color: MEDICAL_TYPE.statusCritical, fontSize: 13 }}>
+        <div className="fj-critical-panel">
+          <strong className="fj-text-critical-13">
             ⚡ {summary.overdueCount} readiness plan{summary.overdueCount > 1 ? 's' : ''} overdue — patient arrival expected. Check equipment now.
           </strong>
         </div>
@@ -656,7 +571,7 @@ function EdReadinessView() {
           lead="Critical flags from active EMS assessments en route. Review and activate ED protocols."
           badge={activeAssessments.filter((a) => a.traumaActivation || a.strokeAlert || a.stemiAlert || a.sepsisConcern).length}
         >
-          <div className="emergency-route-stack" style={{ marginTop: 10 }}>
+          <div className="emergency-route-stack u-mt-10" >
             {activeAssessments.map((assessment) => {
               const flags: string[] = [];
               if (assessment.traumaActivation) flags.push('TRAUMA ACTIVATION');
@@ -666,28 +581,28 @@ function EdReadinessView() {
 
               return (
                 <article key={assessment.id} className="emergency-route-queue-row">
-                  <div style={{ flex: 1 }}>
-                    <strong style={{ fontSize: 13 }}>{assessment.chiefComplaint}</strong>
-                    <div style={{ fontSize: 12, color: MEDICAL_THEME.inkSubtle, marginTop: 2 }}>
+                  <div className="u-flex-1">
+                    <strong className="u-fs-13">{assessment.chiefComplaint}</strong>
+                    <div className="fj-caption-12-mt">
                       Crew: {assessment.crewLeadName} · Mechanism: {assessment.mechanism}
                     </div>
                     {flags.length > 0 && (
-                      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 4 }}>
+                      <div className="fj-row-wrap-6-mt">
                         {flags.map((flag) => (
-                          <span key={flag} style={{ fontSize: 11, fontWeight: 800, color: MEDICAL_TYPE.statusCritical }}>
+                          <span key={flag} className="fj-text-critical-11">
                             ⚠ {flag}
                           </span>
                         ))}
                       </div>
                     )}
                     {assessment.currentVitals && (
-                      <div style={{ fontSize: 11, color: MEDICAL_THEME.inkSubtle, marginTop: 2 }}>
+                      <div className="fj-caption-11-mt">
                         Vitals: HR {assessment.currentVitals.hr ?? '?'} · SpO2 {assessment.currentVitals.spo2 ?? '?'}%
                         · BP {assessment.currentVitals.sbp ?? '?'}/{assessment.currentVitals.dbp ?? '?'}
                       </div>
                     )}
                     {flags.length > 0 && (
-                      <div style={{ marginTop: 6 }}>
+                      <div className="fj-mt-6">
                         <button
                           type="button"
                           onClick={() => {
@@ -701,7 +616,7 @@ function EdReadinessView() {
                             createReadinessPlan({ callId: assessment.id, preparedBy: 'charge-nurse-current', expectedArrivalAt: eta, activatedResources: resources });
                             refresh();
                           }}
-                          style={{ padding: '4px 10px', borderRadius: 6, background: MEDICAL_TYPE.statusCritical, color: '#fff', border: 'none', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}
+                          className="fj-btn-critical"
                         >
                           ⚡ Activate ED Protocols
                         </button>
@@ -709,8 +624,7 @@ function EdReadinessView() {
                     )}
                   </div>
                   <span
-                    className="emergency-route-queue-row__oldest"
-                    style={{ color: flags.length > 0 ? MEDICAL_TYPE.statusCritical : MEDICAL_THEME.inkSubtle }}
+                    className={`emergency-route-queue-row__oldest ${flags.length > 0 ? 'fj-text-critical' : 'fj-text-subtle'}`}
                   >
                     {assessment.status}
                   </span>
@@ -727,24 +641,15 @@ function EdReadinessView() {
         lead="Active bay/room preparation plans. Check equipment, notify staff, and mark bay ready before patient arrival."
         badge={plans.length}
       >
-        <div style={{ display: 'flex', gap: 8, marginTop: 10, marginBottom: plans.length > 0 ? 12 : 0 }}>
+        <div className="fj-actions-row" style={plans.length > 0 ? { marginBottom: 12 } : undefined}>
           <button
             type="button"
             onClick={() => setShowCreateForm((v) => !v)}
-            style={{
-              padding: '6px 12px',
-              borderRadius: 7,
-              background: showCreateForm ? MEDICAL_THEME.border : MEDICAL_THEME.accent,
-              color: showCreateForm ? MEDICAL_THEME.ink : MEDICAL_THEME.onAccent,
-              border: 'none',
-              fontSize: 12,
-              fontWeight: 700,
-              cursor: 'pointer',
-            }}
+            className={`fj-btn-toggle ${showCreateForm ? 'fj-btn-toggle--on' : 'fj-btn-toggle--off'}`}
           >
             {showCreateForm ? 'Cancel' : '+ Create Readiness Plan'}
           </button>
-          <Link to={CANONICAL_ROUTES.emergencyDispatch} className="emergency-route-action-chip" style={{ fontSize: 12 }}>
+          <Link to={CANONICAL_ROUTES.emergencyDispatch} className="emergency-route-action-chip u-fs-12" >
             Dispatch Console
           </Link>
         </div>
@@ -754,11 +659,11 @@ function EdReadinessView() {
         )}
 
         {plans.length === 0 && !showCreateForm ? (
-          <p style={{ fontSize: 13, color: MEDICAL_THEME.inkSubtle, marginTop: 10 }}>
+          <p className="fj-caption-13-mt">
             No active readiness plans. Create a plan manually above, or send a pre-alert from the Dispatch Console.
           </p>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 10 }}>
+          <div className="fj-stack-col-10-mt">
             {plans.map((plan) => (
               <ReadinessPlanCard key={plan.id} plan={plan} onUpdated={refresh} />
             ))}
@@ -772,19 +677,19 @@ function EdReadinessView() {
         lead="Real-time EMS unit status from the dispatch system."
         badge={cadSummary.totalUnits}
       >
-        <div className="emergency-route-chip-row" style={{ marginTop: 10 }}>
+        <div className="emergency-route-chip-row u-mt-10" >
           <StatusChip label={`${cadSummary.availableUnits} Available`} status="ready" />
           <StatusChip label={`${cadSummary.enRouteUnits} En Route`} status="active" />
           <StatusChip label={`${cadSummary.transportingUnits} Transporting`} status="active" />
           <StatusChip label={`${cadSummary.onSceneUnits} On Scene`} status="ready" />
         </div>
-        <div className="emergency-route-chip-row" style={{ marginTop: 8 }}>
+        <div className="emergency-route-chip-row u-mt-8" >
           <Link to={CANONICAL_ROUTES.emergencyDispatch} className="emergency-route-action-chip">Dispatch Console</Link>
           <Link to={CANONICAL_ROUTES.emergencyEms} className="emergency-route-action-chip">EMS Pipeline</Link>
         </div>
       </SectionCard>
 
-      <div role="note" style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.2)', fontSize: 12, color: MEDICAL_THEME.inkSubtle }}>
+      <div role="note" className="fj-alert-box">
         ED Readiness planning is decision support only. Bed assignment, specialty team activation, and equipment preparation require charge nurse or physician authorization.
       </div>
     </>
@@ -816,7 +721,7 @@ function DiagnosticsView() {
 
   return (
     <>
-      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+      <div className="u-flex-wrap-gap-10">
         <MetricChip label="Total orders" value={summary.totalOrders} />
         <MetricChip label="STAT" value={summary.statOrders} warn />
         <MetricChip label="Urgent" value={summary.urgentOrders} />
@@ -834,35 +739,35 @@ function DiagnosticsView() {
         badge={board.length}
       >
         {board.length === 0 ? (
-          <p style={{ fontSize: 13, color: MEDICAL_THEME.inkSubtle, marginTop: 10 }}>
+          <p className="fj-caption-13-mt">
             No active diagnostic orders. Orders appear here when created via the patient care workflow.
           </p>
         ) : (
-          <div className="emergency-route-stack" style={{ marginTop: 10 }}>
+          <div className="emergency-route-stack u-mt-10" >
             {board.map((row) => (
               <article key={row.orderId} className="emergency-route-queue-row">
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                    <strong style={{ fontSize: 13 }}>
+                <div className="u-flex-1">
+                  <div className="u-flex-center u-gap-8">
+                    <strong className="u-fs-13">
                       {DIAGNOSTIC_TYPE_LABELS[row.type]}
                     </strong>
-                    <span style={{ fontSize: 11, fontWeight: 800, color: priorityColor(row.priority) }}>
+                    <span className="fj-priority-badge" data-priority={row.priority}>
                       {DIAGNOSTIC_PRIORITY_LABELS[row.priority]}
                     </span>
                   </div>
-                  <div style={{ fontSize: 12, color: MEDICAL_THEME.inkSubtle, marginTop: 2 }}>
+                  <div className="fj-caption-12-mt">
                     Patient {row.patientId.slice(-6)} · {row.targetDepartment}
                     · Ordered {new Date(row.orderedAt).toLocaleTimeString()}
                   </div>
                   {row.resultSummary && (
-                    <div style={{ fontSize: 12, color: '#10B981', marginTop: 2 }}>
+                    <div className="fj-text-ok-12-mt">
                       Result: {row.resultSummary}
                     </div>
                   )}
                 </div>
                 <span
-                  className="emergency-route-queue-row__oldest"
-                  style={{ color: row.status === 'resulted' ? '#10B981' : row.status === 'in_progress' ? '#F59E0B' : MEDICAL_THEME.inkSubtle }}
+                  className="emergency-route-queue-row__oldest fj-dx-status"
+                  data-status={row.status}
                 >
                   {row.status}
                 </span>
@@ -876,7 +781,7 @@ function DiagnosticsView() {
         title="Diagnostic Workflows"
         lead="Navigate to laboratory, imaging, pharmacy, and consult surfaces."
       >
-        <div className="emergency-route-chip-row" style={{ marginTop: 10 }}>
+        <div className="emergency-route-chip-row u-mt-10" >
           <Link to="/emergency/tools?filter=laboratory&q=lab-interp" className="emergency-route-action-chip">Lab Interpreter</Link>
           <Link to="/emergency/tools?filter=clinical-tools&q=drug-check" className="emergency-route-action-chip">Drug Checker</Link>
           <Link to="/emergency/referrals" className="emergency-route-action-chip">Consults</Link>
@@ -884,7 +789,7 @@ function DiagnosticsView() {
         </div>
       </SectionCard>
 
-      <div role="note" style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.2)', fontSize: 12, color: MEDICAL_THEME.inkSubtle }}>
+      <div role="note" className="fj-alert-box">
         Diagnostic coordination is decision support only. All orders require physician authorization. Lab, imaging, and pharmacy results require licensed clinician interpretation before clinical action.
       </div>
     </>
@@ -908,7 +813,7 @@ function HandoffsView() {
 
   return (
     <>
-      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+      <div className="u-flex-wrap-gap-10">
         <MetricChip label="Disposition patients" value={dispositionPatients.length} />
         <MetricChip label="Pending handoffs" value={pendingHandoffs.length} warn />
         <MetricChip label="EMS handoffs active" value={arrivedEms.length} warn />
@@ -921,24 +826,24 @@ function HandoffsView() {
           lead="Ambulance crews at the ED awaiting patient handoff confirmation."
           badge={arrivedEms.length}
         >
-          <div className="emergency-route-stack" style={{ marginTop: 10 }}>
+          <div className="emergency-route-stack u-mt-10" >
             {arrivedEms.map((arrival) => (
               <article key={arrival.id} className="emergency-route-queue-row">
-                <div style={{ flex: 1 }}>
-                  <strong style={{ fontSize: 13 }}>{arrival.chiefComplaint}</strong>
-                  <div style={{ fontSize: 12, color: MEDICAL_THEME.inkSubtle, marginTop: 2 }}>
+                <div className="u-flex-1">
+                  <strong className="u-fs-13">{arrival.chiefComplaint}</strong>
+                  <div className="fj-caption-12-mt">
                     Unit: {arrival.unitName} · Age {arrival.patientAge} {arrival.patientSex}
                     · Severity: {arrival.severity}
                   </div>
                   {arrival.handoffSummary && (
-                    <div style={{ fontSize: 12, color: MEDICAL_THEME.inkSubtle, marginTop: 2 }}>
+                    <div className="fj-caption-12-mt">
                       {arrival.handoffSummary}
                     </div>
                   )}
                 </div>
                 <span
-                  className="emergency-route-queue-row__oldest"
-                  style={{ color: arrival.status === 'Handoff' ? '#F59E0B' : STATUS_COLORS.active }}
+                  className="emergency-route-queue-row__oldest fj-arrival-status"
+                  data-status={arrival.status}
                 >
                   {arrival.status}
                 </span>
@@ -954,29 +859,28 @@ function HandoffsView() {
         badge={dispositionPatients.length}
       >
         {dispositionPatients.length === 0 ? (
-          <p style={{ fontSize: 13, color: MEDICAL_THEME.inkSubtle, marginTop: 10 }}>
+          <p className="fj-caption-13-mt">
             No patients currently in disposition or admission state.
           </p>
         ) : (
-          <div className="emergency-route-stack" style={{ marginTop: 10 }}>
+          <div className="emergency-route-stack u-mt-10" >
             {dispositionPatients.map((patient) => (
               <article key={patient.id} className="emergency-route-queue-row">
-                <div style={{ flex: 1 }}>
-                  <strong style={{ fontSize: 13 }}>
+                <div className="u-flex-1">
+                  <strong className="u-fs-13">
                     {patient.firstName} {patient.lastName}
                   </strong>
-                  <div style={{ fontSize: 12, color: MEDICAL_THEME.inkSubtle, marginTop: 2 }}>
+                  <div className="fj-caption-12-mt">
                     MRN: {patient.mrn} · {patient.chiefComplaint} · State: {patient.state}
                   </div>
                   {patient.referral && (
-                    <div style={{ fontSize: 12, color: MEDICAL_THEME.inkSubtle }}>
+                    <div className="fj-caption">
                       Referral: {patient.referral.targetDepartment} — {patient.referral.status}
                     </div>
                   )}
                 </div>
                 <span
-                  className="emergency-route-queue-row__oldest"
-                  style={{ color: STATUS_COLORS.active }}
+                  className="emergency-route-queue-row__oldest fj-text-ok"
                 >
                   {patient.state}
                 </span>
@@ -990,7 +894,7 @@ function HandoffsView() {
         title="Handoff Tools"
         lead="Generate structured handoff summaries and access shift documentation."
       >
-        <div className="emergency-route-chip-row" style={{ marginTop: 10 }}>
+        <div className="emergency-route-chip-row u-mt-10" >
           <Link to={CANONICAL_ROUTES.emergencyShift} className="emergency-route-action-chip">Shift Summary</Link>
           <Link to={CANONICAL_ROUTES.emergencyReferrals} className="emergency-route-action-chip">Referrals</Link>
           <Link to={CANONICAL_ROUTES.emergencyEms} className="emergency-route-action-chip">EMS Pipeline</Link>
@@ -998,7 +902,7 @@ function HandoffsView() {
         </div>
       </SectionCard>
 
-      <div role="note" style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.2)', fontSize: 12, color: MEDICAL_THEME.inkSubtle }}>
+      <div role="note" className="fj-alert-box">
         Handoff summaries are structured decision support. All handoffs require verbal confirmation and clinician sign-off. AI-generated handoff content must be reviewed and accepted by the receiving clinician.
       </div>
     </>
@@ -1015,7 +919,7 @@ function ReportsView({ snapshot }: { snapshot: ReturnType<typeof buildFullEmerge
 
   return (
     <>
-      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+      <div className="u-flex-wrap-gap-10">
         <MetricChip label="Active journeys" value={journeyMetrics.activeJourneys} />
         <MetricChip label="3-min breaches" value={snapshot.metrics.threeMinuteBreaches} warn />
         <MetricChip label="Bottlenecks" value={bottlenecks?.analytics?.activeCount ?? 0} warn />
@@ -1028,26 +932,25 @@ function ReportsView({ snapshot }: { snapshot: ReturnType<typeof buildFullEmerge
         title="3-Minute Response Compliance"
         lead="Tracks critical response timer adherence from first emergency signal to clinical action."
       >
-        <div className="emergency-route-stack" style={{ marginTop: 10 }}>
+        <div className="emergency-route-stack u-mt-10" >
           <article className="emergency-route-queue-row">
-            <div style={{ flex: 1 }}>
-              <strong style={{ fontSize: 13 }}>Active Journey Traces</strong>
-              <div style={{ fontSize: 12, color: MEDICAL_THEME.inkSubtle }}>
+            <div className="u-flex-1">
+              <strong className="u-fs-13">Active Journey Traces</strong>
+              <div className="fj-caption">
                 Patients with an active 3-minute response timer in progress.
               </div>
             </div>
             <span className="emergency-route-journey-card__count">{journeyMetrics.activeJourneys}</span>
           </article>
           <article className="emergency-route-queue-row">
-            <div style={{ flex: 1 }}>
-              <strong style={{ fontSize: 13 }}>Response Breaches</strong>
-              <div style={{ fontSize: 12, color: MEDICAL_THEME.inkSubtle }}>
+            <div className="u-flex-1">
+              <strong className="u-fs-13">Response Breaches</strong>
+              <div className="fj-caption">
                 Critical response timers that exceeded the 3-minute target this session.
               </div>
             </div>
             <span
-              className="emergency-route-journey-card__count"
-              style={{ color: snapshot.metrics.threeMinuteBreaches > 0 ? MEDICAL_TYPE.statusCritical : '#10B981' }}
+              className={`emergency-route-journey-card__count ${snapshot.metrics.threeMinuteBreaches > 0 ? 'fj-metric-count-bad' : 'fj-metric-count-ok'}`}
             >
               {snapshot.metrics.threeMinuteBreaches}
             </span>
@@ -1061,20 +964,19 @@ function ReportsView({ snapshot }: { snapshot: ReturnType<typeof buildFullEmerge
           lead="Detected workflow, operational, or system bottlenecks requiring attention."
           badge={bottlenecks.analytics?.activeCount ?? 0}
         >
-          <div className="emergency-route-stack" style={{ marginTop: 10 }}>
+          <div className="emergency-route-stack u-mt-10" >
             {bottlenecks.activeBottlenecks.slice(0, 8).map((finding) => (
               <article key={finding.id} className="emergency-route-queue-row">
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 13 }}>{finding.title}</div>
+                <div className="u-flex-1">
+                  <div className="u-fs-13">{finding.title}</div>
                   {finding.ownerRole && (
-                    <div style={{ fontSize: 11, color: MEDICAL_THEME.inkSubtle }}>
+                    <div className="fj-caption-11">
                       Owner: {finding.ownerRole}
                     </div>
                   )}
                 </div>
                 <span
-                  className="emergency-route-queue-row__oldest"
-                  style={{ color: finding.severity === 'critical' ? MEDICAL_TYPE.statusCritical : '#F59E0B' }}
+                  className={`emergency-route-queue-row__oldest ${finding.severity === 'critical' ? 'fj-severity-critical' : 'fj-severity-warn'}`}
                 >
                   {finding.severity}
                 </span>
@@ -1088,7 +990,7 @@ function ReportsView({ snapshot }: { snapshot: ReturnType<typeof buildFullEmerge
         title="Analytics & Reporting Surfaces"
         lead="Navigate to full analytics, shift summaries, and AI governance reports."
       >
-        <div className="emergency-route-chip-row" style={{ marginTop: 10 }}>
+        <div className="emergency-route-chip-row u-mt-10" >
           <Link to={CANONICAL_ROUTES.emergencyAnalytics} className="emergency-route-action-chip">Analytics Dashboard</Link>
           <Link to={CANONICAL_ROUTES.emergencyShift} className="emergency-route-action-chip">Shift Summary</Link>
           <Link to={CANONICAL_ROUTES.emergencyAlerts} className="emergency-route-action-chip">Critical Alerts</Link>
@@ -1122,36 +1024,13 @@ function StickyActionBanner({ snapshot }: { snapshot: ReturnType<typeof buildFul
   if (!topIssue) return null;
 
   return (
-    <div
-      style={{
-        padding: '10px 16px',
-        borderRadius: 8,
-        background: 'rgba(239,68,68,0.1)',
-        border: `2px solid ${MEDICAL_TYPE.statusCritical}`,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: 12,
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span style={{ fontSize: 16 }}>⚡</span>
-        <strong style={{ color: MEDICAL_TYPE.statusCritical, fontSize: 13 }}>{topIssue.label}</strong>
-        <span style={{ fontSize: 11, color: MEDICAL_THEME.inkSubtle }}>— 3-minute response target</span>
+    <div className="fj-critical-banner">
+      <div className="u-flex-center u-gap-8">
+        <span className="fj-critical-banner__icon">⚡</span>
+        <strong className="fj-text-critical-13">{topIssue.label}</strong>
+        <span className="fj-caption-11">— 3-minute response target</span>
       </div>
-      <Link
-        to={topIssue.route}
-        style={{
-          padding: '6px 12px',
-          borderRadius: 6,
-          background: MEDICAL_TYPE.statusCritical,
-          color: '#fff',
-          fontWeight: 700,
-          fontSize: 12,
-          textDecoration: 'none',
-          whiteSpace: 'nowrap',
-        }}
-      >
+      <Link to={topIssue.route} className="fj-critical-banner__cta">
         {topIssue.action}
       </Link>
     </div>

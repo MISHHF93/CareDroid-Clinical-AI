@@ -36,7 +36,7 @@ const ClinicalAlertBanner = ({ alert, onAcknowledge, onDismiss }) => {
           )}
         </div>
         {onDismiss && (
-          <button className="alert-close" onClick={onDismiss} title="Dismiss">✕</button>
+          <button type="button" className="alert-close" onClick={onDismiss} title="Dismiss">✕</button>
         )}
       </div>
 
@@ -62,7 +62,7 @@ const ClinicalAlertBanner = ({ alert, onAcknowledge, onDismiss }) => {
         )}
         <div className="alert-actions">
           {onAcknowledge && !isAcknowledged && (
-            <button 
+            <button type="button" 
               className="alert-action-btn acknowledge"
               onClick={() => onAcknowledge(alert.id)}
               title="Mark as acknowledged"

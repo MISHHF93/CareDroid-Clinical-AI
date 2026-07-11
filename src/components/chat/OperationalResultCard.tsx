@@ -118,12 +118,12 @@ function actionLabel(action) {
 
 export default function OperationalResultCard({
   toolResult,
-  parameters,
-  timestamp,
+  parameters = undefined,
+  timestamp = undefined,
   source = undefined,
-  followUpSuggestions,
-  onRetry,
-  onEdit,
+  followUpSuggestions = undefined,
+  onRetry = undefined,
+  onEdit = undefined,
 }) {
   if (!toolResult) return null;
 

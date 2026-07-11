@@ -151,20 +151,11 @@ export default function HEARTScore({ patientId, onClose }: HEARTScoreProps) {
 
   return (
     <div
-      className="clinical-calculator-modal"
+      className="clinical-calculator-modal u-modal-scrim"
       role="dialog"
       aria-modal="true"
       aria-labelledby="heart-score-title"
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 300,
-        background: 'rgba(0,0,0,0.62)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 20,
-      }}
+      
     >
       <div
         className="clinical-calculator-modal__panel"
@@ -181,17 +172,10 @@ export default function HEARTScore({ patientId, onClose }: HEARTScoreProps) {
         }}
       >
         <header
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 12,
-            padding: 16,
-            borderBottom: '1px solid #e0f2fe',
-          }}
+          className="u-panel-header-row"
         >
           <div>
-            <h2 id="heart-score-title" style={{ margin: 0, fontSize: 18, fontWeight: 650 }}>
+            <h2 id="heart-score-title" className="u-title-18">
               HEART Score
             </h2>
             {patient ? (
@@ -204,25 +188,17 @@ export default function HEARTScore({ patientId, onClose }: HEARTScoreProps) {
             type="button"
             onClick={onClose}
             aria-label="Close HEART score"
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: 8,
-              border: '1px solid #e0f2fe',
-              background: 'transparent',
-              color: 'var(--medical-ink, #111827)',
-              cursor: 'pointer',
-            }}
+            className="u-icon-btn-32"
           >
             X
           </button>
         </header>
 
-        <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <div className="u-stack-14">
           {FIELD_OPTIONS.map((field) => (
             <section key={field.key} style={{ border: '1px solid #e0f2fe', borderRadius: 10, padding: 12 }}>
               <h3 style={{ margin: '0 0 10px', color: MEDICAL_THEME.inkSubtle, fontSize: 12 }}>{field.title}</h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div className="u-flex-col u-gap-8">
                 {field.options.map((option) => (
                   <label
                     className="clinical-calculator-modal__choice"
@@ -263,7 +239,7 @@ export default function HEARTScore({ patientId, onClose }: HEARTScoreProps) {
             }}
           >
             <div style={{ color: result.color, fontSize: 13, fontWeight: 700 }}>{result.band}</div>
-            <div style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', fontSize: 32, marginTop: 4 }}>
+            <div className="u-mono-32">
               {total}/10
             </div>
             <div style={{ color: 'var(--medical-ink, #111827)', fontSize: 13, marginTop: 4 }}>{result.recommendation}</div>
@@ -289,7 +265,7 @@ export default function HEARTScore({ patientId, onClose }: HEARTScoreProps) {
           ) : null}
 
           {savedMessage ? (
-            <div role="status" style={{ color: '#10B981', fontSize: 13 }}>
+            <div role="status" className="u-ok-13">
               {savedMessage}
             </div>
           ) : null}

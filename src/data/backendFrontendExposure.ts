@@ -104,7 +104,7 @@ function frontendCallCapabilityRow(call) {
 
   return {
     id: `frontend:${call.id}`,
-    source: 'frontend-api',
+    source: 'frontend-api' as const,
     classification,
     method: call.method,
     path: call.path,
@@ -120,7 +120,7 @@ function backendRouteCapabilityRow(route) {
   const policy = BACKEND_ROUTE_EXPOSURE_POLICY[routePolicyKey(route.method, route.path)];
   return {
     id: `backend:${route.method}:${route.path}`,
-    source: 'backend-route',
+    source: 'backend-route' as const,
     classification: classifyBackendOnlyRoute(route),
     method: route.method,
     path: route.path,
@@ -145,7 +145,7 @@ function userFacingExecutorCapabilityRows() {
         BACKEND_EXECUTOR_NLU_TOOL_IDS.includes(record.orchestratorToolId);
       return {
         id: `tool-executor:${record.id}`,
-        source: 'user-facing-tool',
+        source: 'user-facing-tool' as const,
         classification: wired
           ? BACKEND_FRONTEND_CAPABILITY_CLASSIFICATIONS.USER_FACING_WIRED
           : BACKEND_FRONTEND_CAPABILITY_CLASSIFICATIONS.FRONTEND_VISIBLE_BACKEND_MISSING,

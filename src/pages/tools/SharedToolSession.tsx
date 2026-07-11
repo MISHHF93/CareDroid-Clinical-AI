@@ -19,7 +19,7 @@ const SharedToolSession = () => {
         <div className="shared-session-card">
           <h1>Session Not Found</h1>
           <p>This shared session link is invalid or has expired.</p>
-          <button onClick={() => profileNavigate('/tools')}>Browse Tools</button>
+          <button type="button" onClick={() => profileNavigate('/tools')}>Browse Tools</button>
         </div>
       </div>
     );
@@ -51,9 +51,9 @@ const SharedToolSession = () => {
           </pre>
         )}
         <div className="shared-actions">
-          <button onClick={() => profileNavigate('/dashboard')}>Open Dashboard</button>
+          <button type="button" onClick={() => profileNavigate('/dashboard')}>Open Dashboard</button>
           {tool && (
-            <button onClick={() => profileNavigate(tool.path)}>Open Tool</button>
+            <button type="button" onClick={() => profileNavigate(tool.path)}>Open Tool</button>
           )}
         </div>
       </div>

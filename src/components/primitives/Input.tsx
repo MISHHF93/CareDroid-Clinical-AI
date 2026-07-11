@@ -1,4 +1,5 @@
 import React, { useId } from 'react';
+import { AriaInvalidInput } from '../a11y/AriaInvalidFields';
 import './Input.css';
 
 type InputSize = 'sm' | 'md' | 'lg';
@@ -48,11 +49,11 @@ export function Input({
             {leadingIcon}
           </span>
         )}
-        <input
+        <AriaInvalidInput
           id={id}
-          aria-invalid={error ? true : undefined}
+           invalid={error ? true : undefined}
           aria-describedby={describedBy}
-          aria-required={required}
+          aria-required={required ? 'true' : 'false'}
           className={[
             'cd-input',
             `cd-input--${size}`,

@@ -37,7 +37,7 @@ export default function ReceptionPipelineShell({
               ]
                 .filter(Boolean)
                 .join(' ')}
-              aria-current={active ? 'step' : undefined}
+              {...(active ? { 'aria-current': 'step' as const } : {})}
               onClick={() => onStageChange?.(stage.id)}
             >
               {label}

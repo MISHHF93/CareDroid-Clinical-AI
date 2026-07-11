@@ -43,16 +43,24 @@ const Card = ({
     }
   };
 
+  // Static role only when interactive (Edge Tools rejects dynamic ARIA roles).
+  if (onClick) {
+    return (
+      <div
+        className={getClassName()}
+        style={{ padding, ...style }}
+        onClick={onClick}
+        onKeyDown={handleKeyDown}
+        role="button"
+        tabIndex={0}
+        {...props}
+      >
+        {children}
+      </div>
+    );
+  }
   return (
-    <div
-      className={getClassName()}
-      style={{ padding, ...style }}
-      onClick={onClick}
-      onKeyDown={handleKeyDown}
-      role={onClick ? 'button' : undefined}
-      tabIndex={onClick ? 0 : undefined}
-      {...props}
-    >
+    <div className={getClassName()} style={{ padding, ...style }} {...props}>
       {children}
     </div>
   );

@@ -240,7 +240,7 @@ export function getJourneyBottlenecks(options: any = {}) {
         overTargetMinutes,
       }),
     });
-  }).filter(Boolean);
+  }).filter((bottleneck): bottleneck is NonNullable<typeof bottleneck> => bottleneck !== null);
 }
 
 export function getJourneyMetrics(options: any = {}) {

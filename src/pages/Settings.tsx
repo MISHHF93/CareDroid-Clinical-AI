@@ -616,7 +616,7 @@ const Settings = () => {
               </div>
             ) : (
               <>
-                <div className="settings-billing-summary" aria-busy={billingLoading}>
+                <div className="settings-billing-summary" aria-busy={billingLoading ? 'true' : 'false'}>
                   <div>
                     <span className="settings-billing-label">Current plan</span>
                     <strong>{billingLoading ? 'Loading department data...' : subscription?.tier || 'Not returned'}</strong>

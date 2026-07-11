@@ -622,9 +622,15 @@ export default function ReferralPanel() {
       ) : null}
 
       {backendStatus || backendPending ? (
-        <p className="referral-panel__backend-status" role={backendStatus?.includes('failed') ? 'alert' : 'status'}>
-          {backendPending ? 'Syncing referral workflow with backend...' : backendStatus}
-        </p>
+        backendStatus?.includes('failed') ? (
+          <p className="referral-panel__backend-status" role="alert">
+            {backendPending ? 'Syncing referral workflow with backend...' : backendStatus}
+          </p>
+        ) : (
+          <p className="referral-panel__backend-status" role="status">
+            {backendPending ? 'Syncing referral workflow with backend...' : backendStatus}
+          </p>
+        )
       ) : null}
 
       {formOpen ? (

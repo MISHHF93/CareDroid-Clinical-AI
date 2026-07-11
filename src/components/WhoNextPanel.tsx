@@ -315,9 +315,9 @@ export default function WhoNextPanel({ mode = 'detail' }: WhoNextPanelProps) {
         <div style={{ alignItems: 'center', display: 'flex', justifyContent: 'space-between', gap: 8 }}>
           <strong style={{ color: '#38bdf8', fontSize: 11, letterSpacing: '0.12em' }}>SEE NEXT</strong>
           <div style={{ display: 'flex', gap: 6 }}>
-            <button
+            {pinned ? (<button
               type="button"
-              aria-pressed={pinned}
+              aria-pressed="true"
               onClick={() => setPinned((current) => !current)}
               style={{
                 ...buttonStyle,
@@ -327,7 +327,19 @@ export default function WhoNextPanel({ mode = 'detail' }: WhoNextPanelProps) {
               }}
             >
               {pinned ? 'Pinned' : 'Pin'}
-            </button>
+            </button>) : (<button
+              type="button"
+              aria-pressed="false"
+              onClick={() => setPinned((current) => !current)}
+              style={{
+                ...buttonStyle,
+                background: pinned ? '#0284c7' : '#f0f9ff',
+                color: pinned ? MEDICAL_THEME.onAccent : MEDICAL_THEME.accent,
+                padding: '5px 8px',
+              }}
+            >
+              {pinned ? 'Pinned' : 'Pin'}
+            </button>)}
             <button
               type="button"
               aria-label="Close see next panel"

@@ -26,6 +26,15 @@
   border-color: color-mix(in srgb, var(--app-accent) 40%, transparent);
 }
 
+.account-menu__chevron {
+  flex-shrink: 0;
+  transition: transform 0.15s ease;
+}
+
+.account-menu__trigger--open .account-menu__chevron {
+  transform: rotate(180deg);
+}
+
 .account-menu__avatar {
   width: 28px;
   height: 28px;
@@ -111,6 +120,14 @@
   font-size: 0.85rem;
   cursor: pointer;
   text-decoration: none;
+}
+
+.account-menu__item--static {
+  cursor: default;
+}
+
+.account-menu__item--static:hover {
+  background: transparent;
 }
 
 .account-menu__item:hover {

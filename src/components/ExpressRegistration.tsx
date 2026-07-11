@@ -208,20 +208,11 @@ export default function ExpressRegistration({
 
   return (
     <div
-      className="express-registration-overlay"
+      className="express-registration-overlay u-modal-scrim-260"
       role="dialog"
       aria-modal="true"
       aria-labelledby="express-registration-title"
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 260,
-        background: 'rgba(0,0,0,0.66)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 16,
-      }}
+      
     >
       <form
         className="express-registration-modal"
@@ -248,7 +239,7 @@ export default function ExpressRegistration({
           }}
         >
           <div>
-            <h2 id="express-registration-title" style={{ margin: 0, fontSize: 18, fontWeight: 750 }}>
+            <h2 id="express-registration-title" className="u-title-18-750">
               {RECEPTION_COPY.express.title}
             </h2>
             <p style={{ margin: '4px 0 0', color: MEDICAL_THEME.inkSubtle, fontSize: 12 }}>
@@ -259,15 +250,7 @@ export default function ExpressRegistration({
             type="button"
             onClick={closeWithConfirm}
             aria-label="Close express registration"
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: 8,
-              border: '1px solid #e0f2fe',
-              background: 'transparent',
-              color: 'var(--medical-ink, #111827)',
-              cursor: 'pointer',
-            }}
+            className="u-icon-btn-32"
           >
             ×
           </button>
@@ -288,8 +271,8 @@ export default function ExpressRegistration({
             />
           ) : null}
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-            <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <div className="u-grid-2">
+            <label className="u-flex-col u-gap-4">
               <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 11, fontWeight: 700 }}>First name</span>
               <input
                 ref={firstNameRef}
@@ -300,7 +283,7 @@ export default function ExpressRegistration({
                 style={inputStyle}
               />
             </label>
-            <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            <label className="u-flex-col u-gap-4">
               <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 11, fontWeight: 700 }}>Last name</span>
               <input
                 value={lastName}
@@ -312,7 +295,7 @@ export default function ExpressRegistration({
             </label>
           </div>
 
-          <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <label className="u-flex-col u-gap-4">
             <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 11, fontWeight: 700 }}>
               Date of birth {dob ? `(age ${age})` : ''}
             </span>
@@ -325,7 +308,7 @@ export default function ExpressRegistration({
             />
           </label>
 
-          <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <label className="u-flex-col u-gap-4">
             <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 11, fontWeight: 700 }}>Health card</span>
             <input
               value={healthCard}
@@ -338,7 +321,7 @@ export default function ExpressRegistration({
             />
           </label>
 
-          <label style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <label className="u-flex-col u-gap-4">
             <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 11, fontWeight: 700 }}>Phone</span>
             <input
               type="tel"

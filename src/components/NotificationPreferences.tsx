@@ -414,7 +414,7 @@ function NotificationPreferences() {
       </div>
 
       <div className="preferences-footer">
-        <button className="save-btn" onClick={handleSave} disabled={saving || loading}>
+        <button type="button" className="save-btn" onClick={handleSave} disabled={saving || loading}>
           {saving ? 'Saving...' : 'Save Preferences'}
         </button>
       </div>

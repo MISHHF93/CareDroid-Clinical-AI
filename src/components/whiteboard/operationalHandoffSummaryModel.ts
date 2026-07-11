@@ -256,11 +256,11 @@ export function buildOperationalHandoffDomains({
   ]);
 }
 
-export function flattenOperationalHandoffMetrics(domains = [] as any[]) {
+export function flattenOperationalHandoffMetrics(domains: readonly any[] = []) {
   return Object.freeze(domains.flatMap((domain) => domain.metrics ?? []));
 }
 
-export function evaluateOperationalHandoffHunting(domains = [] as any[]) {
+export function evaluateOperationalHandoffHunting(domains: readonly any[] = []) {
   const visibleDomains = domains.filter((domain) => domain.hasAttention).length;
   const flatMetrics = flattenOperationalHandoffMetrics(domains);
 

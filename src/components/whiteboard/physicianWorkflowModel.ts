@@ -115,7 +115,7 @@ function countResultsPendingPatients(patients = [] as any[]) {
   ).length;
 }
 
-function countAssignedPatients(patients = [] as any[], physicianStaffId = null) {
+function countAssignedPatients(patients = [] as any[], physicianStaffId: string | null = null) {
   if (!physicianStaffId) {
     return patients.filter(
       (patient) =>
@@ -151,7 +151,7 @@ export function shouldShowPhysicianOperationalStrip({
 export function selectPhysicianOperationalStrip({
   patients = [] as any[],
   referrals = [] as any[],
-  physicianStaffId = null,
+  physicianStaffId = null as string | null,
   settings = {} as any,
   visibleSurfaces = null as any,
   stripMetricIds = null as any,

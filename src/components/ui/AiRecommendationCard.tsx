@@ -140,7 +140,7 @@ export function AiRecommendationCard({
               .filter(Boolean)
               .join(' ')}
             onClick={handleOverride}
-            aria-pressed={overridden}
+            {...((overridden) ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
             aria-label={overridden ? 'Undo clinician override' : 'Override AI recommendation'}
           >
             {overridden ? (

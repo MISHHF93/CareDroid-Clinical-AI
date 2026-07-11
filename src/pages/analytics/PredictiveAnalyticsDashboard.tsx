@@ -139,7 +139,7 @@ function ModelCard({
     >
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 8 }}>
-        <div style={{ flex: 1 }}>
+        <div className="u-flex-1">
           <div style={{ fontWeight: 700, fontSize: 15, color: MEDICAL_THEME.ink }}>
             {model.title}
           </div>
@@ -271,7 +271,7 @@ function ModelCard({
 
           {/* Open linked page */}
           {model.linkedPath && (
-            <button
+            <button type="button"
               onClick={() => onNavigate(model.linkedPath)}
               style={{
                 alignSelf: 'flex-start',
@@ -319,7 +319,7 @@ export default function PredictiveAnalyticsDashboard() {
       }}
     >
       {/* Header */}
-      <div style={{ marginBottom: 20 }}>
+      <div className="u-mb-20">
         <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: MEDICAL_THEME.ink }}>
           Predictive Analytics Dashboard
         </h1>
@@ -343,7 +343,7 @@ export default function PredictiveAnalyticsDashboard() {
           gap: 8,
         }}
       >
-        <span style={{ fontWeight: 700 }}>Demo models</span> — predictions shown are not live
+        <span className="u-fw-700">Demo models</span> — predictions shown are not live
         patient, device, or fleet data. Connect live data pipelines to activate real predictions.
       </div>
 

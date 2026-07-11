@@ -1,3 +1,4 @@
+import { AriaInvalidInput, AriaInvalidSelect } from '../../components/a11y/AriaInvalidFields';
 /**
  * PR4A calculators — ASCVD PCE, CKD staging, STOP-Bang, AUDIT-C.
  * Decision-support / screening UX with accessibility affordances.
@@ -214,7 +215,7 @@ export function AscvdRiskCalculator({ onResultChange }) {
               <label className="calc-input-label" htmlFor="ascvd-age">
                 Age (years)
               </label>
-              <input
+              <AriaInvalidInput
                 id="ascvd-age"
                 type="number"
                 min="40"
@@ -224,7 +225,7 @@ export function AscvdRiskCalculator({ onResultChange }) {
                 value={ageYears}
                 onChange={(e) => setAgeYears(e.target.value)}
                 aria-required="true"
-                aria-invalid={fieldInvalid(!ageYears.trim())}
+                 invalid={fieldInvalid(!ageYears.trim())}
                 aria-describedby={ascvdAgeHelpId}
                 inputMode="numeric"
               />
@@ -237,37 +238,37 @@ export function AscvdRiskCalculator({ onResultChange }) {
               <label className="calc-input-label" htmlFor="ascvd-sex">
                 Sex
               </label>
-              <select
+              <AriaInvalidSelect
                 id="ascvd-sex"
                 className={fieldClass('calc-select-field', fieldInvalid(!sex))}
                 value={sex}
                 onChange={(e) => setSex(e.target.value)}
                 aria-required="true"
-                aria-invalid={fieldInvalid(!sex)}
+                 invalid={fieldInvalid(!sex)}
               >
                 <option value="">Select…</option>
                 <option value="female">Female</option>
                 <option value="male">Male</option>
-              </select>
+              </AriaInvalidSelect>
             </div>
 
             <div className="calc-input-group">
               <label className="calc-input-label" htmlFor="ascvd-race">
                 Race / ethnicity (PCE cohort)
               </label>
-              <select
+              <AriaInvalidSelect
                 id="ascvd-race"
                 className={fieldClass('calc-select-field', fieldInvalid(!race))}
                 value={race}
                 onChange={(e) => setRace(e.target.value)}
                 aria-required="true"
-                aria-invalid={fieldInvalid(!race)}
+                 invalid={fieldInvalid(!race)}
               >
                 <option value="">Select…</option>
                 <option value="white">White</option>
                 <option value="african_american">African American</option>
                 <option value="other">Other (uses White coefficients)</option>
-              </select>
+              </AriaInvalidSelect>
             </div>
 
             <div className="calc-input-group">
@@ -275,7 +276,7 @@ export function AscvdRiskCalculator({ onResultChange }) {
                 Total cholesterol
               </label>
               <div className="calc-input-row calc-input-row--with-unit">
-                <input
+                <AriaInvalidInput
                   id="ascvd-total-chol"
                   type="number"
                   min="0"
@@ -284,7 +285,7 @@ export function AscvdRiskCalculator({ onResultChange }) {
                   value={totalCholesterol}
                   onChange={(e) => setTotalCholesterol(e.target.value)}
                   aria-required="true"
-                  aria-invalid={fieldInvalid(!totalCholesterol.trim())}
+                   invalid={fieldInvalid(!totalCholesterol.trim())}
                   inputMode="decimal"
                 />
                 <select
@@ -304,7 +305,7 @@ export function AscvdRiskCalculator({ onResultChange }) {
                 HDL cholesterol
               </label>
               <div className="calc-input-row calc-input-row--with-unit">
-                <input
+                <AriaInvalidInput
                   id="ascvd-hdl"
                   type="number"
                   min="0"
@@ -313,7 +314,7 @@ export function AscvdRiskCalculator({ onResultChange }) {
                   value={hdlCholesterol}
                   onChange={(e) => setHdlCholesterol(e.target.value)}
                   aria-required="true"
-                  aria-invalid={fieldInvalid(!hdlCholesterol.trim())}
+                   invalid={fieldInvalid(!hdlCholesterol.trim())}
                   inputMode="decimal"
                 />
                 <select
@@ -332,7 +333,7 @@ export function AscvdRiskCalculator({ onResultChange }) {
               <label className="calc-input-label" htmlFor="ascvd-sbp">
                 Systolic blood pressure (mmHg)
               </label>
-              <input
+              <AriaInvalidInput
                 id="ascvd-sbp"
                 type="number"
                 min="70"
@@ -342,7 +343,7 @@ export function AscvdRiskCalculator({ onResultChange }) {
                 value={systolicBpMmHg}
                 onChange={(e) => setSystolicBpMmHg(e.target.value)}
                 aria-required="true"
-                aria-invalid={fieldInvalid(!systolicBpMmHg.trim())}
+                 invalid={fieldInvalid(!systolicBpMmHg.trim())}
                 inputMode="numeric"
               />
             </div>
@@ -592,7 +593,7 @@ export function CkdStagingCalculator({ onResultChange }) {
               <label className="calc-input-label" htmlFor="ckd-age">
                 Age (years)
               </label>
-              <input
+              <AriaInvalidInput
                 id="ckd-age"
                 type="number"
                 min="18"
@@ -602,7 +603,7 @@ export function CkdStagingCalculator({ onResultChange }) {
                 value={ageYears}
                 onChange={(e) => setAgeYears(e.target.value)}
                 aria-required="true"
-                aria-invalid={fieldInvalid(!ageYears.trim())}
+                 invalid={fieldInvalid(!ageYears.trim())}
                 inputMode="numeric"
               />
             </div>
@@ -611,18 +612,18 @@ export function CkdStagingCalculator({ onResultChange }) {
               <label className="calc-input-label" htmlFor="ckd-sex">
                 Sex
               </label>
-              <select
+              <AriaInvalidSelect
                 id="ckd-sex"
                 className={fieldClass('calc-select-field', fieldInvalid(!sex))}
                 value={sex}
                 onChange={(e) => setSex(e.target.value)}
                 aria-required="true"
-                aria-invalid={fieldInvalid(!sex)}
+                 invalid={fieldInvalid(!sex)}
               >
                 <option value="">Select…</option>
                 <option value="female">Female</option>
                 <option value="male">Male</option>
-              </select>
+              </AriaInvalidSelect>
             </div>
 
             <div className="calc-input-group">
@@ -630,7 +631,7 @@ export function CkdStagingCalculator({ onResultChange }) {
                 Serum creatinine
               </label>
               <div className="calc-input-row calc-input-row--with-unit">
-                <input
+                <AriaInvalidInput
                   id="ckd-creatinine"
                   type="number"
                   min="0"
@@ -639,7 +640,7 @@ export function CkdStagingCalculator({ onResultChange }) {
                   value={serumCreatinine}
                   onChange={(e) => setSerumCreatinine(e.target.value)}
                   aria-required="true"
-                  aria-invalid={fieldInvalid(!serumCreatinine.trim())}
+                   invalid={fieldInvalid(!serumCreatinine.trim())}
                   inputMode="decimal"
                 />
                 <select
@@ -659,7 +660,7 @@ export function CkdStagingCalculator({ onResultChange }) {
                 Urine albumin-creatinine ratio (ACR)
               </label>
               <div className="calc-input-row calc-input-row--with-unit">
-                <input
+                <AriaInvalidInput
                   id="ckd-acr"
                   type="number"
                   min="0"
@@ -668,7 +669,7 @@ export function CkdStagingCalculator({ onResultChange }) {
                   value={urineAcr}
                   onChange={(e) => setUrineAcr(e.target.value)}
                   aria-required="true"
-                  aria-invalid={fieldInvalid(!urineAcr.trim())}
+                   invalid={fieldInvalid(!urineAcr.trim())}
                   inputMode="decimal"
                 />
                 <select
@@ -1122,13 +1123,13 @@ export function AuditCCalculator({ onResultChange }) {
                   <label className="calc-input-label" htmlFor={id}>
                     {item.label}
                   </label>
-                  <select
+                  <AriaInvalidSelect
                     id={id}
                     className={fieldClass('calc-select-field', fieldInvalid(responses[item.key] === ''))}
                     value={responses[item.key]}
                     onChange={(e) => setItem(item.key, e.target.value)}
                     aria-required="true"
-                    aria-invalid={fieldInvalid(responses[item.key] === '')}
+                     invalid={fieldInvalid(responses[item.key] === '')}
                     aria-describedby={hasValidationErrors ? validationSummaryId : undefined}
                   >
                     <option value="">Select…</option>
@@ -1137,7 +1138,7 @@ export function AuditCCalculator({ onResultChange }) {
                         {opt.label} ({opt.points})
                       </option>
                     ))}
-                  </select>
+                  </AriaInvalidSelect>
                 </div>
               );
             })}

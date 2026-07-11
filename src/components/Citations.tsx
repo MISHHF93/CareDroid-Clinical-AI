@@ -9,7 +9,7 @@ import { EMPTY_STATE_COPY } from '../config/emptyStateCopy';
  */
 const CitationBadge = ({ citation, index, onClick }) => {
   return (
-    <button
+    <button type="button"
       onClick={() => onClick(citation)}
       style={{
         display: 'inline-flex',
@@ -139,7 +139,7 @@ export const CitationModal = ({ citation, onClose }) => {
           justifyContent: 'space-between',
           gap: '16px',
         }}>
-          <div style={{ flex: 1 }}>
+          <div className="u-flex-1">
             <h3 style={{
               margin: '0 0 8px 0',
               fontSize: '18px',
@@ -158,7 +158,7 @@ export const CitationModal = ({ citation, onClose }) => {
               </div>
             )}
           </div>
-          <button
+          <button type="button"
             onClick={onClose}
             style={{
               background: 'none',
@@ -191,7 +191,7 @@ export const CitationModal = ({ citation, onClose }) => {
         {/* Content */}
         <div style={{ padding: '24px' }}>
           {/* Type Badge */}
-          <div style={{ marginBottom: '16px' }}>
+          <div className="u-mb-16-str">
             <span style={{
               display: 'inline-block',
               padding: '4px 12px',
@@ -256,20 +256,10 @@ export const CitationModal = ({ citation, onClose }) => {
           }}>
             {citation.authors && citation.authors.length > 0 && (
               <div>
-                <div style={{
-                  fontSize: '11px',
-                  fontWeight: 600,
-                  color: 'rgba(255, 255, 255, 0.5)',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px',
-                  marginBottom: '6px',
-                }}>
+                <div className="u-label-caps">
                   Authors
                 </div>
-                <div style={{
-                  fontSize: '13px',
-                  color: 'rgba(255, 255, 255, 0.8)',
-                }}>
+                <div className="u-muted-13">
                   {citation.authors.join(', ')}
                 </div>
               </div>
@@ -277,20 +267,10 @@ export const CitationModal = ({ citation, onClose }) => {
 
             {citation.date && (
               <div>
-                <div style={{
-                  fontSize: '11px',
-                  fontWeight: 600,
-                  color: 'rgba(255, 255, 255, 0.5)',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px',
-                  marginBottom: '6px',
-                }}>
+                <div className="u-label-caps">
                   Date
                 </div>
-                <div style={{
-                  fontSize: '13px',
-                  color: 'rgba(255, 255, 255, 0.8)',
-                }}>
+                <div className="u-muted-13">
                   {citation.date}
                 </div>
               </div>
@@ -298,20 +278,10 @@ export const CitationModal = ({ citation, onClose }) => {
 
             {citation.specialty && (
               <div>
-                <div style={{
-                  fontSize: '11px',
-                  fontWeight: 600,
-                  color: 'rgba(255, 255, 255, 0.5)',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px',
-                  marginBottom: '6px',
-                }}>
+                <div className="u-label-caps">
                   Specialty
                 </div>
-                <div style={{
-                  fontSize: '13px',
-                  color: 'rgba(255, 255, 255, 0.8)',
-                }}>
+                <div className="u-muted-13">
                   {citation.specialty}
                 </div>
               </div>
@@ -319,14 +289,7 @@ export const CitationModal = ({ citation, onClose }) => {
 
             {citation.doi && (
               <div>
-                <div style={{
-                  fontSize: '11px',
-                  fontWeight: 600,
-                  color: 'rgba(255, 255, 255, 0.5)',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px',
-                  marginBottom: '6px',
-                }}>
+                <div className="u-label-caps">
                   DOI
                 </div>
                 <div style={{
@@ -342,7 +305,7 @@ export const CitationModal = ({ citation, onClose }) => {
 
           {/* Tags */}
           {citation.tags && citation.tags.length > 0 && (
-            <div style={{ marginBottom: '16px' }}>
+            <div className="u-mb-16-str">
               <div style={{
                 fontSize: '11px',
                 fontWeight: 600,

@@ -112,7 +112,7 @@ export default function Medical3DViewer() {
                     role="button"
                     tabIndex={0}
                     aria-label={`${model.label}, ${modelStatusLabel(model.status)}`}
-                    aria-pressed={selected}
+                    {...((selected) ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
                   />
                 </g>
               );
@@ -138,7 +138,7 @@ export default function Medical3DViewer() {
                 type="button"
                 className={`medical-3d-page__roster-item${model.id === selectedModelId ? ' is-selected' : ''}`}
                 onClick={() => setSelectedModelId(model.id)}
-                aria-pressed={model.id === selectedModelId}
+                {...((model.id === selectedModelId) ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
               >
                 <strong>{model.label}</strong>
                 <span>{model.category}</span>

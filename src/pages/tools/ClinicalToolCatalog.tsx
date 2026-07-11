@@ -794,7 +794,7 @@ const ClinicalToolCatalog = () => {
             className={`catalog-category-chip${
               categoryFilter === chip.value ? ' catalog-category-chip--active' : ''
             }`}
-            aria-pressed={categoryFilter === chip.value}
+            {...((categoryFilter === chip.value) ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
             onClick={() => setCategoryFilter(chip.value)}
           >
             {chip.label}

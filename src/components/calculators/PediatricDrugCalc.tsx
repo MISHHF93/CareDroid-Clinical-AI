@@ -98,20 +98,11 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
 
   return (
     <div
-      className="clinical-calculator-modal"
+      className="clinical-calculator-modal u-modal-scrim"
       role="dialog"
       aria-modal="true"
       aria-labelledby="pediatric-drug-title"
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 300,
-        background: 'rgba(0,0,0,0.62)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 20,
-      }}
+      
     >
       <style>
         {`
@@ -169,17 +160,10 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
       >
         <header
           data-print-hide="true"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 12,
-            padding: 16,
-            borderBottom: '1px solid #e0f2fe',
-          }}
+          className="u-panel-header-row"
         >
           <div>
-            <h2 id="pediatric-drug-title" style={{ margin: 0, fontSize: 18, fontWeight: 650 }}>
+            <h2 id="pediatric-drug-title" className="u-title-18">
               Pediatric Drug Calculator
             </h2>
             {patient ? (
@@ -192,15 +176,7 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
             type="button"
             onClick={onClose}
             aria-label="Close pediatric drug calculator"
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: 8,
-              border: '1px solid #e0f2fe',
-              background: 'transparent',
-              color: 'var(--medical-ink, #111827)',
-              cursor: 'pointer',
-            }}
+            className="u-icon-btn-32"
           >
             X
           </button>
@@ -217,7 +193,7 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
               alignItems: 'end',
             }}
           >
-            <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <label className="u-flex-col-gap-6">
               <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 12, fontWeight: 700 }}>Weight (kg)</span>
               <input
                 autoFocus
@@ -302,7 +278,7 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
           ) : null}
 
           <section className="pediatric-drug-print-area">
-            <div data-print-hide="true" style={{ marginBottom: 12 }}>
+            <div data-print-hide="true" className="u-mb-12">
               <h3 style={{ margin: '0 0 4px', fontSize: 18 }}>Pediatric Drug Doses</h3>
               <div style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 13 }}>
                 Weight: {weight === null ? 'not entered' : `${weight.toFixed(1)} kg`}
@@ -312,11 +288,11 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
               <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 680 }}>
                 <thead>
                   <tr style={{ background: MEDICAL_THEME.surfaceCard, color: MEDICAL_THEME.inkSubtle, textAlign: 'left', fontSize: 12 }}>
-                    <th style={{ padding: 10, borderBottom: '1px solid #e0f2fe' }}>Drug</th>
-                    <th style={{ padding: 10, borderBottom: '1px solid #e0f2fe' }}>Dose/kg</th>
-                    <th style={{ padding: 10, borderBottom: '1px solid #e0f2fe' }}>CALCULATED DOSE</th>
-                    <th style={{ padding: 10, borderBottom: '1px solid #e0f2fe' }}>Max</th>
-                    <th style={{ padding: 10, borderBottom: '1px solid #e0f2fe' }}>Unit</th>
+                    <th className="u-pad-10-border-b">Drug</th>
+                    <th className="u-pad-10-border-b">Dose/kg</th>
+                    <th className="u-pad-10-border-b">CALCULATED DOSE</th>
+                    <th className="u-pad-10-border-b">Max</th>
+                    <th className="u-pad-10-border-b">Unit</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -328,7 +304,7 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
                         background: drug.critical ? '#7F1D1D20' : 'transparent',
                       }}
                     >
-                      <td style={{ padding: 10, borderBottom: '1px solid #e0f2fe' }}>
+                      <td className="u-pad-10-border-b">
                         <strong>{drug.name}</strong>
                         <div style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 12 }}>{drug.category}</div>
                       </td>

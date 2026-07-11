@@ -1,4 +1,4 @@
-import React, { useId, useState } from 'react';
+import { useId, useState } from 'react';
 import './input.css';
 
 const Input = ({ 
@@ -57,21 +57,39 @@ const Input = ({
       )}
       <div className="input-container">
         {leftIcon && <span className="input-icon input-icon-left">{leftIcon}</span>}
-        <input
-          id={inputId}
-          type={type}
-          className={getInputClassName()}
-          placeholder={placeholder}
-          value={value}
-          onChange={onChange}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          disabled={disabled}
-          style={style}
-          aria-invalid={error ? 'true' : undefined}
-          aria-describedby={messageId}
-          {...props}
-        />
+        {error ? (
+          <input
+            id={inputId}
+            type={type}
+            className={getInputClassName()}
+            placeholder={placeholder}
+            value={value}
+            onChange={onChange}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            disabled={disabled}
+            style={style}
+            aria-invalid="true"
+            aria-describedby={messageId}
+            {...props}
+          />
+        ) : (
+          <input
+            id={inputId}
+            type={type}
+            className={getInputClassName()}
+            placeholder={placeholder}
+            value={value}
+            onChange={onChange}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            disabled={disabled}
+            style={style}
+            aria-invalid="false"
+            aria-describedby={messageId}
+            {...props}
+          />
+        )}
         {rightIcon && <span className="input-icon input-icon-right">{rightIcon}</span>}
       </div>
       {error && (

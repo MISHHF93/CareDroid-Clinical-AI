@@ -1143,7 +1143,7 @@ const ToolsOverview = () => {
               <button
                 key={option.value}
                 type="button"
-                aria-pressed={toolFilter === option.value}
+                {...((toolFilter === option.value) ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
                 aria-label={option.value === 'all' ? 'All' : option.label}
                 className={`tools-filter-tab${toolFilter === option.value ? ' tools-filter-tab--active' : ''}`}
                 onClick={() => setToolFilter(option.value)}
@@ -1265,12 +1265,12 @@ const ToolsOverview = () => {
           </div>
           <div className="tools-recent-list">
             {recentToolItems.slice(0, 3).map((tool) => (
-              <button
-                key={tool.id}
-                className="tools-recent-card"
-                onClick={() => handleToolClick(tool)}
-                type="button"
-              >
+              <button type="button"
+ key={tool.id}
+ className="tools-recent-card"
+ onClick={() => handleToolClick(tool)}
+
+ >
                 <span className="tools-recent-icon" aria-hidden>
                   <NavIcon icon={getToolIcon(tool.id)} size={22} />
                 </span>
@@ -1322,7 +1322,7 @@ const ToolsOverview = () => {
                 key={tool.id}
                 data-tool-id={tool.id}
                 className="tool-card-large"
-                aria-disabled={tool.isLaunchable === false}
+                {...((tool.isLaunchable === false) ? { 'aria-disabled': 'true' as const } : { 'aria-disabled': 'false' as const })}
               >
               <div className="tool-card-header">
                 <div className="tool-icon">
@@ -1363,18 +1363,18 @@ const ToolsOverview = () => {
                   ) : null}
                 </div>
                 <div className="tool-card-actions">
-                  <button
-                    className={`tool-card-action ${favoriteToolIdSet.has(tool.id) ? 'active' : ''}`}
-                    title={
-                      favoriteToolIdSet.has(tool.id) ? 'Remove from favorites' : 'Add to favorites'
-                    }
-                    aria-label={`${favoriteToolIdSet.has(tool.id) ? 'Remove' : 'Add'} ${tool.name} ${favoriteToolIdSet.has(tool.id) ? 'from' : 'to'} favorites`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleFavorite(tool.id);
-                    }}
-                    type="button"
-                  >
+                  <button type="button"
+ className={`tool-card-action ${favoriteToolIdSet.has(tool.id) ? 'active' : ''}`}
+ title={
+ favoriteToolIdSet.has(tool.id) ? 'Remove from favorites' : 'Add to favorites'
+ }
+ aria-label={`${favoriteToolIdSet.has(tool.id) ? 'Remove' : 'Add'} ${tool.name} ${favoriteToolIdSet.has(tool.id) ? 'from' : 'to'} favorites`}
+ onClick={(e) => {
+ e.stopPropagation();
+ toggleFavorite(tool.id);
+ }}
+
+ >
                     <NavIcon
                       icon={CHROME_ICONS.star}
                       size={16}
@@ -1382,32 +1382,32 @@ const ToolsOverview = () => {
                       aria-hidden
                     />
                   </button>
-                  <button
-                    className={`tool-card-action ${pinnedToolIdSet.has(tool.id) ? 'active' : ''}`}
-                    title={pinnedToolIdSet.has(tool.id) ? 'Unpin tool' : 'Pin tool'}
-                    aria-label={`${pinnedToolIdSet.has(tool.id) ? 'Unpin' : 'Pin'} ${tool.name}`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      togglePinned(tool.id);
-                    }}
-                    type="button"
-                  >
+                  <button type="button"
+ className={`tool-card-action ${pinnedToolIdSet.has(tool.id) ? 'active' : ''}`}
+ title={pinnedToolIdSet.has(tool.id) ? 'Unpin tool' : 'Pin tool'}
+ aria-label={`${pinnedToolIdSet.has(tool.id) ? 'Unpin' : 'Pin'} ${tool.name}`}
+ onClick={(e) => {
+ e.stopPropagation();
+ togglePinned(tool.id);
+ }}
+
+ >
                     <NavIcon icon={CHROME_ICONS.pin} size={16} aria-hidden />
                   </button>
-                  <button
-                    className={`tool-card-action ${hiddenToolIdSet.has(tool.id) ? 'active' : ''}`}
-                    title={
-                      hiddenToolIdSet.has(tool.id)
-                        ? 'Show tool by default'
-                        : 'Hide from default views'
-                    }
-                    aria-label={`${hiddenToolIdSet.has(tool.id) ? 'Show' : 'Hide'} ${tool.name} by default`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleHidden(tool.id);
-                    }}
-                    type="button"
-                  >
+                  <button type="button"
+ className={`tool-card-action ${hiddenToolIdSet.has(tool.id) ? 'active' : ''}`}
+ title={
+ hiddenToolIdSet.has(tool.id)
+ ? 'Show tool by default'
+ : 'Hide from default views'
+ }
+ aria-label={`${hiddenToolIdSet.has(tool.id) ? 'Show' : 'Hide'} ${tool.name} by default`}
+ onClick={(e) => {
+ e.stopPropagation();
+ toggleHidden(tool.id);
+ }}
+
+ >
                     <NavIcon icon={CHROME_ICONS.close} size={16} aria-hidden />
                   </button>
                   <div className="tool-shortcut">
@@ -1449,7 +1449,7 @@ const ToolsOverview = () => {
               </div>
 
               <div className="tool-actions">
-                <button
+                <button type="button"
                   className="btn-open-tool"
                   disabled={Boolean(tool.restrictionReason) || tool.isLaunchable === false}
                   aria-label={`${primaryActionLabel(tool)} ${tool.name}`}
@@ -1463,7 +1463,7 @@ const ToolsOverview = () => {
                 {hasMeaningfulAssistantAction(tool) &&
                 !tool.restrictionReason &&
                 tool.isLaunchable !== false ? (
-                  <button
+                  <button type="button"
                     className="btn-chat-tool"
                     aria-label={`Ask Assistant about ${tool.name}`}
                     onClick={(e) => {

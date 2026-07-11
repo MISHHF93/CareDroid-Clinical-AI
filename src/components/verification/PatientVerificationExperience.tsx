@@ -164,7 +164,7 @@ export default function PatientVerificationExperience({
             <button
               type="button"
               onClick={() => onStepChange?.(index)}
-              aria-current={isActive ? 'step' : undefined}
+              {...(isActive ? { 'aria-current': 'step' as const } : {})}
             >
               <span>{index + 1}</span>
               {step}

@@ -228,7 +228,7 @@ export function formatCopilotRecommendationLine(recommendation, index = 0) {
   return `${index + 1}. ${prefix} ${recommendation.action} — ${recommendation.detail}${routeHint}`;
 }
 
-export function formatCopilotRecommendationsForPrompt(recommendations = [] as any[]) {
+export function formatCopilotRecommendationsForPrompt(recommendations: readonly any[] = []) {
   if (!recommendations.length) {
     return 'No prioritized queue, capacity, boarding, or reassessment actions detected.';
   }
@@ -324,7 +324,7 @@ export function resolveCopilotQuickAction(query = '', context: any = {}) {
   return Object.freeze({ handled: false });
 }
 
-export function auditCopilotRecommendations(recommendations = [] as any[]) {
+export function auditCopilotRecommendations(recommendations: readonly any[] = []) {
   const actionable = recommendations.filter((rec) => rec.actionable);
   const generic = recommendations.filter((rec) => rec.generic);
   const byDomain = Object.fromEntries(

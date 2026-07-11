@@ -57,7 +57,7 @@ export default function EdJourneyProgressRail({
               <Link
                 to={buildPhaseRouteWithPatientContext(phase.route, { patientId: patientId ?? undefined, encounterId })}
                 className="ed-journey-rail__link"
-                aria-current={state === 'active' ? 'step' : undefined}
+                {...(state === 'active' ? { 'aria-current': 'step' as const } : {})}
                 title={`${phase.order}. ${phase.label}`}
               >
                 <span className="ed-journey-rail__marker" aria-hidden="true">

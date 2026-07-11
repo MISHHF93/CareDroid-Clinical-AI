@@ -21,7 +21,7 @@ const AnomalyBanner = ({ score, types, recommendations, onDismiss }) => {
           <p className="anomaly-score">Anomaly Score: {Math.round(score * 100)}%</p>
         </div>
         {onDismiss && (
-          <button className="anomaly-close" onClick={onDismiss}>✕</button>
+          <button type="button" className="anomaly-close" onClick={onDismiss}>✕</button>
         )}
       </div>
 

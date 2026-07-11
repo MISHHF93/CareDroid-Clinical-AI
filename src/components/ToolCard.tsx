@@ -10,7 +10,7 @@ import { getToolIcon } from '../navigation/iconRegistry';
 function Notice({ variant, title = undefined as any, children }) {
   return (
     <div className={`tool-card-notice tool-card-notice--${variant}`} role="status">
-      {title && <div className="tool-card-strong" style={{ marginBottom: 8 }}>{title}</div>}
+      {title && <div className="tool-card-strong u-mb-8" >{title}</div>}
       {children}
     </div>
   );
@@ -50,7 +50,7 @@ export function ToolResultBody({ toolResult }) {
 
       {warnings && warnings.length > 0 && (
         <Notice variant="warning" title="Warnings">
-          <ul style={{ margin: 0, paddingLeft: 20 }}>
+          <ul className="u-list-reset">
             {warnings.map((warning, idx) => (
               <li key={idx}>{warning}</li>
             ))}
@@ -59,12 +59,12 @@ export function ToolResultBody({ toolResult }) {
       )}
 
       {citations && citations.length > 0 && (
-        <div style={{ marginTop: 16 }}>
+        <div className="u-mt-16">
           <hr className="tool-card-divider" />
-          <div className="tool-card-muted" style={{ marginBottom: 8 }}>
+          <div className="tool-card-muted u-mb-8" >
             <strong>References:</strong>
           </div>
-          <ul style={{ margin: '8px 0 0 0', paddingLeft: 20, fontSize: 12 }}>
+          <ul className="u-list-tight">
             {citations.map((citation, idx) => (
               <li key={idx}>
                 {citation.title} - {citation.reference}
@@ -125,7 +125,7 @@ function renderSofaCalculator(data) {
 
   return (
     <div>
-      <div style={{ textAlign: 'center', marginBottom: 20 }}>
+      <div className="u-ta-center u-mb-20">
         <h2 className="tool-card-title-lg">{data.totalScore}</h2>
         <div className="tool-card-muted">Total SOFA Score (0-24)</div>
       </div>
@@ -135,7 +135,7 @@ function renderSofaCalculator(data) {
           <thead>
             <tr>
               <th>Organ System</th>
-              <th style={{ textAlign: 'center' }}>Score</th>
+              <th className="u-ta-center">Score</th>
             </tr>
           </thead>
           <tbody>
@@ -146,7 +146,7 @@ function renderSofaCalculator(data) {
               return (
                 <tr key={row.key}>
                   <td>{row.label}</td>
-                  <td style={{ textAlign: 'center' }}>
+                  <td className="u-ta-center">
                     <span className="tool-card-score-pill" style={{ backgroundColor: bg }}>
                       {score}
                     </span>
@@ -172,7 +172,7 @@ function renderDrugChecker(data) {
     return (
       <Notice variant="success">
         <span className="tool-card-strong">No Interactions Detected</span>
-        <div style={{ marginTop: 8 }}>No significant drug interactions were found.</div>
+        <div className="u-mt-8">No significant drug interactions were found.</div>
       </Notice>
     );
   }
@@ -190,9 +190,9 @@ function renderDrugChecker(data) {
       <hr className="tool-card-divider" />
 
       {groupedInteractions.contraindicated.length > 0 && (
-        <div style={{ marginBottom: 16 }}>
+        <div className="u-mb-16">
           <span className="tool-card-pill tool-card-pill--error">Contraindicated</span>
-          <ul style={{ marginTop: 8 }}>
+          <ul className="u-mt-8">
             {groupedInteractions.contraindicated.map((interaction, idx) => (
               <li key={idx}>
                 <span className="tool-card-strong">
@@ -212,9 +212,9 @@ function renderDrugChecker(data) {
       )}
 
       {groupedInteractions.major.length > 0 && (
-        <div style={{ marginBottom: 16 }}>
+        <div className="u-mb-16">
           <span className="tool-card-pill tool-card-pill--warn">Major</span>
-          <ul style={{ marginTop: 8 }}>
+          <ul className="u-mt-8">
             {groupedInteractions.major.map((interaction, idx) => (
               <li key={idx}>
                 <span className="tool-card-strong">
@@ -234,9 +234,9 @@ function renderDrugChecker(data) {
       )}
 
       {groupedInteractions.moderate.length > 0 && (
-        <div style={{ marginBottom: 16 }}>
+        <div className="u-mb-16">
           <span className="tool-card-pill tool-card-pill--info">Moderate</span>
-          <ul style={{ marginTop: 8 }}>
+          <ul className="u-mt-8">
             {groupedInteractions.moderate.slice(0, 3).map((interaction, idx) => (
               <li key={idx}>
                 {interaction.drug1} + {interaction.drug2}: {interaction.description}
@@ -284,7 +284,7 @@ function renderLabInterpreter(data) {
   return (
     <div>
       {data.summary && (
-        <div style={{ marginBottom: 16, textAlign: 'center' }}>
+        <div className="u-mb-16 u-ta-center">
           <span>
             {data.summary.abnormal} of {data.summary.total} values abnormal
           </span>
@@ -301,7 +301,7 @@ function renderLabInterpreter(data) {
 
       {data.criticalValues && data.criticalValues.length > 0 && (
         <Notice variant="error" title="Critical Values">
-          <ul style={{ margin: 0, paddingLeft: 20 }}>
+          <ul className="u-list-reset">
             {data.criticalValues.map((lab, idx) => (
               <li key={idx}>
                 <span className="tool-card-strong">{lab.name}</span>: {lab.value} {lab.unit} (
@@ -315,15 +315,15 @@ function renderLabInterpreter(data) {
       {data.interpretations && data.interpretations.length > 0 && (
         <div>
           {data.interpretations.map((interp, idx) => (
-            <div key={idx} style={{ marginBottom: 16 }}>
+            <div key={idx} className="u-mb-16">
               <h3 className="tool-card-title-sm">{interp.category}</h3>
-              <p style={{ margin: '0 0 8px 0' }}>{interp.clinicalSignificance}</p>
+              <p className="u-mb-8">{interp.clinicalSignificance}</p>
               {interp.suggestedActions && interp.suggestedActions.length > 0 && (
                 <>
-                  <div className="tool-card-muted" style={{ fontSize: 12 }}>
+                  <div className="tool-card-muted u-fs-12" >
                     Suggested Actions:
                   </div>
-                  <ul style={{ marginTop: 4, paddingLeft: 20, fontSize: 12 }}>
+                  <ul className="u-mt-4 u-pl-20 u-fs-12">
                     {interp.suggestedActions.map((action, actionIdx) => (
                       <li key={actionIdx}>{action}</li>
                     ))}
@@ -337,9 +337,9 @@ function renderLabInterpreter(data) {
       )}
 
       {data.labValues && data.labValues.length > 0 && (
-        <div style={{ marginTop: 16 }}>
+        <div className="u-mt-16">
           <hr className="tool-card-divider" />
-          <div className="tool-card-strong" style={{ marginBottom: 8 }}>
+          <div className="tool-card-strong u-mb-8" >
             All Lab Values
           </div>
           <div className="tool-card-table-wrap">

@@ -238,7 +238,7 @@ export const ConsentHistory = () => {
             <Link to="/consent" className="btn-consent-secondary">
               Manage Consents
             </Link>
-            <button
+            <button type="button"
               className="btn-consent-export"
               onClick={() => {
                 // Export consent history as JSON

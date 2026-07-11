@@ -23,14 +23,9 @@ export default function OperationalEmptyState({
 }) {
   const sizeClass =
     size === 'inline' ? 'operational-empty-state--inline' : size === 'panel' ? 'operational-empty-state--panel' : '';
-
-  return (
-    <section
-      className={['operational-empty-state', sizeClass, className].filter(Boolean).join(' ')}
-      role={role}
-      aria-label={title || guidance || 'Empty state'}
-      {...props}
-    >
+  const classNames = ['operational-empty-state', sizeClass, className].filter(Boolean).join(' ');
+  const body = (
+    <>
       <span className="operational-empty-state__icon" aria-hidden>
         {icon == null || (typeof icon === 'string' && icon.length <= 2) ? (
           <CdlEmptyIllustration variant={resolveEmptyStateGraphic(title || guidance || '')} />
@@ -72,6 +67,20 @@ export default function OperationalEmptyState({
           ) : null}
         </div>
       ) : null}
+    </>
+  );
+
+  // Static role strings only (Edge Tools rejects dynamic ARIA roles).
+  if (role === 'alert') {
+    return (
+      <section className={classNames} role="alert" aria-label={title || guidance || 'Empty state'} {...props}>
+        {body}
+      </section>
+    );
+  }
+  return (
+    <section className={classNames} role="status" aria-label={title || guidance || 'Empty state'} {...props}>
+      {body}
     </section>
   );
 }

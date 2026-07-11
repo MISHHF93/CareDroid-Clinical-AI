@@ -126,7 +126,7 @@ export function AiChiefRouteRecommendationsPanel({
         </strong>
       </header>
 
-      <div className="cd-ai-panel__list" style={{ display: 'grid', gap: 8 }}>
+      <div className="cd-ai-panel__list u-grid-gap-8" >
         {visibleRecommendations.map((recommendation) => {
           const isAccepted = accepted.has(recommendation.id);
           const patientLabel = recommendation.patientId
@@ -157,7 +157,7 @@ export function AiChiefRouteRecommendationsPanel({
               <p className="cd-ai-card__primary">{recommendation.rationale}</p>
 
               {patientLabel ? (
-                <p className="emergency-route-muted" style={{ margin: 0, padding: 0 }}>
+                <p className="emergency-route-muted u-m-0 u-p-0" >
                   Patient:{' '}
                   <button
                     type="button"
@@ -171,7 +171,7 @@ export function AiChiefRouteRecommendationsPanel({
               ) : null}
 
               {recommendation.route ? (
-                <p className="emergency-route-muted" style={{ margin: 0, padding: 0 }}>
+                <p className="emergency-route-muted u-m-0 u-p-0" >
                   <Link to={recommendation.route}>Open related workflow</Link>
                 </p>
               ) : null}

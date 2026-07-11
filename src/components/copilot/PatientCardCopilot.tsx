@@ -175,14 +175,21 @@ export default function PatientCardCopilot({
           </h3>
           <span className="patient-card-copilot__safety-badge">{SAFETY_BOUNDED_ASSISTANT_LABEL}</span>
         </div>
-        <button
+        {expanded ? (<button
           type="button"
           className="patient-card-copilot__toggle"
           onClick={() => setExpanded((open) => !open)}
-          aria-expanded={expanded}
+          aria-expanded="true"
         >
           {expanded ? 'Collapse' : 'Expand'}
-        </button>
+        </button>) : (<button
+          type="button"
+          className="patient-card-copilot__toggle"
+          onClick={() => setExpanded((open) => !open)}
+          aria-expanded="false"
+        >
+          {expanded ? 'Collapse' : 'Expand'}
+        </button>)}
       </header>
 
       {expanded ? (

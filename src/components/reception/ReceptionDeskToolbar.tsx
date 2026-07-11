@@ -73,7 +73,7 @@ export default function ReceptionDeskToolbar({
             key={tab.id}
             type="button"
             role="tab"
-            aria-selected={activeQueueTab === tab.id}
+            {...((activeQueueTab === tab.id) ? { 'aria-selected': 'true' as const } : { 'aria-selected': 'false' as const })}
             className={[
               'reception-desk-toolbar__queue-tab',
               activeQueueTab === tab.id ? 'reception-desk-toolbar__action--active' : '',

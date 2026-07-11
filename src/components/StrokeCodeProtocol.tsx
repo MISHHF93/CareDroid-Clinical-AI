@@ -309,14 +309,14 @@ export default function StrokeCodeProtocol({
 
   if (!active && !strokeRouteMatch) {
     return (
-      <section style={{ padding: 16, borderBottom: '1px solid #e0f2fe' }} aria-labelledby="stroke-manual-heading">
+      <section className="u-pad-16-border-b" aria-labelledby="stroke-manual-heading">
         <h3 id="stroke-manual-heading" style={{ margin: '0 0 8px', fontSize: 13, color: MEDICAL_THEME.inkSubtle }}>
           Stroke Protocol
         </h3>
         <p style={{ margin: '0 0 10px', color: MEDICAL_THEME.inkMuted, fontSize: 12 }}>
           Manual physician activation is available for concerning neurologic presentations not matched by the complaint router.
         </p>
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <div className="u-flex-wrap u-gap-8">
           <button type="button" style={buttonStyle('primary')} disabled={!canManageFlags || !canWriteNote} onClick={activateStrokeCode}>
             Activate Stroke Code
           </button>
@@ -329,7 +329,7 @@ export default function StrokeCodeProtocol({
   }
 
   return (
-    <section style={{ padding: 16, borderBottom: '1px solid #e0f2fe' }} aria-labelledby="stroke-code-heading">
+    <section className="u-pad-16-border-b" aria-labelledby="stroke-code-heading">
       {!active ? (
         <div
           style={{
@@ -427,7 +427,7 @@ export default function StrokeCodeProtocol({
                       >
                         {stepState ? '✓' : ''}
                       </span>
-                      <strong style={{ fontSize: 11 }}>{step}</strong>
+                      <strong className="u-fs-11">{step}</strong>
                       <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 10 }}>{formatClock(stepState?.completedAt)}</span>
                       {duration !== null ? <span style={{ color: MEDICAL_THEME.inkMuted, fontSize: 10 }}>+{duration}min</span> : null}
                     </button>
@@ -475,7 +475,7 @@ export default function StrokeCodeProtocol({
       ) : null}
 
       {active ? (
-        <div style={{ marginTop: 16 }}>
+        <div className="u-mt-16">
           <h4 style={{ margin: '0 0 10px', color: 'var(--medical-ink, #111827)', fontSize: 13 }}>tPA Eligibility Checklist</h4>
           <div style={{ display: 'grid', gap: 14 }}>
             <CheckboxGroup

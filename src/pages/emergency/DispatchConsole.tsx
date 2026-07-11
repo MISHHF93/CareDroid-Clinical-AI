@@ -54,18 +54,7 @@ function autoPriority(conscious: boolean, breathing: boolean, complaint: string)
 
 function PriorityBadge({ priority }: { priority: CallPriority }) {
   return (
-    <span
-      style={{
-        display: 'inline-block',
-        padding: '2px 8px',
-        borderRadius: 4,
-        fontSize: 11,
-        fontWeight: 700,
-        letterSpacing: '0.06em',
-        color: '#fff',
-        background: CALL_PRIORITY_COLORS[priority],
-      }}
-    >
+    <span className="dc-priority-badge" data-priority={priority}>
       {priority}
     </span>
   );
@@ -75,16 +64,9 @@ function SummaryCard({ label, value, highlight }: { label: string; value: number
   return (
     <div
       className={`dispatch-console__summary-card${highlight && value > 0 ? ' dispatch-console__summary-card--highlight' : ''}`}
-      style={{
-        padding: '12px 16px',
-        minWidth: 90,
-        border: highlight && value > 0 ? `1px solid ${MEDICAL_TYPE.statusCritical}` : undefined,
-      }}
     >
-      <div style={{ fontSize: 22, fontWeight: 800, color: highlight && value > 0 ? MEDICAL_TYPE.statusCritical : MEDICAL_THEME.ink }}>
-        {value}
-      </div>
-      <div style={{ fontSize: 11, color: MEDICAL_THEME.inkSubtle, fontWeight: 600 }}>{label}</div>
+      <div className="dispatch-console__summary-card__value">{value}</div>
+      <div className="dispatch-console__summary-card__label">{label}</div>
     </div>
   );
 }
@@ -128,31 +110,12 @@ function NewCallForm({ onCreated }: { onCreated: (call: EmergencyCall) => void }
     setSubmitting(false);
   }
 
-  const inputStyle: React.CSSProperties = {
-    width: '100%',
-    padding: '8px 10px',
-    borderRadius: 8,
-    border: `1px solid ${MEDICAL_THEME.border}`,
-    background: MEDICAL_THEME.surfacePage,
-    color: MEDICAL_THEME.ink,
-    fontSize: 14,
-    boxSizing: 'border-box',
-  };
-
-  const labelStyle: React.CSSProperties = {
-    display: 'block',
-    fontSize: 12,
-    fontWeight: 700,
-    color: MEDICAL_THEME.inkSubtle,
-    marginBottom: 4,
-  };
-
   return (
-    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+    <form onSubmit={handleSubmit} className="u-flex-col-gap-12">
       <div>
-        <label style={labelStyle}>Chief Complaint *</label>
+        <label className="dc-field-label">Chief Complaint *</label>
         <input
-          style={inputStyle}
+          className="dc-field-input"
           value={complaint}
           onChange={(e) => setComplaint(e.target.value)}
           placeholder="e.g. Chest pain, unresponsive, MVA..."
@@ -163,54 +126,45 @@ function NewCallForm({ onCreated }: { onCreated: (call: EmergencyCall) => void }
       {/* Auto-priority indicator */}
       {complaint.trim() && (
         <div
-          style={{
-            padding: '8px 12px',
-            borderRadius: 8,
-            background: isPriorityCritical ? 'rgba(239,68,68,0.08)' : 'rgba(245,158,11,0.08)',
-            border: `1px solid ${isPriorityCritical ? 'rgba(239,68,68,0.3)' : 'rgba(245,158,11,0.3)'}`,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            fontSize: 12,
-          }}
+          className={isPriorityCritical ? "dc-alert-soft" : "dc-success-panel"}
         >
-          <span style={{ fontWeight: 700, color: MEDICAL_THEME.inkSubtle }}>Auto-detected priority:</span>
+          <span className="dc-muted-strong">Auto-detected priority:</span>
           <PriorityBadge priority={detectedPriority} />
-          <span style={{ color: MEDICAL_THEME.inkSubtle }}>— adjust after intake if needed</span>
+          <span className="dc-muted">— adjust after intake if needed</span>
         </div>
       )}
 
       <div>
-        <label style={labelStyle}>Incident Address *</label>
+        <label className="dc-field-label">Incident Address *</label>
         <input
-          style={inputStyle}
+          className="dc-field-input"
           value={address}
           onChange={(e) => setAddress(e.target.value)}
           placeholder="Street address or landmark"
           required
         />
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+      <div className="u-grid-2-gap-10">
         <div>
-          <label style={labelStyle}>Caller Name</label>
-          <input style={inputStyle} value={callerName} onChange={(e) => setCallerName(e.target.value)} placeholder="Optional" />
+          <label className="dc-field-label">Caller Name</label>
+          <input className="dc-field-input" value={callerName} onChange={(e) => setCallerName(e.target.value)} placeholder="Optional" />
         </div>
         <div>
-          <label style={labelStyle}>Patient Age</label>
-          <input style={inputStyle} type="number" value={age} onChange={(e) => setAge(e.target.value)} placeholder="If known" min={0} max={120} />
+          <label className="dc-field-label">Patient Age</label>
+          <input className="dc-field-input" type="number" value={age} onChange={(e) => setAge(e.target.value)} placeholder="If known" min={0} max={120} />
         </div>
       </div>
-      <div style={{ display: 'flex', gap: 16 }}>
-        <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, cursor: 'pointer' }}>
+      <div className="dc-row-gap-16">
+        <label className="u-click-row">
           <input type="checkbox" checked={conscious} onChange={(e) => setConscious(e.target.checked)} />
           Conscious
         </label>
-        <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, cursor: 'pointer' }}>
+        <label className="u-click-row">
           <input type="checkbox" checked={breathing} onChange={(e) => setBreathing(e.target.checked)} />
           Breathing
         </label>
         {(!conscious || !breathing) && (
-          <span style={{ fontSize: 12, fontWeight: 800, color: MEDICAL_TYPE.statusCritical }}>
+          <span className="dc-critical-12-badge">
             {!conscious && !breathing ? '⚠ UNCONSCIOUS + NOT BREATHING — Echo priority' : `⚠ ${!conscious ? 'UNCONSCIOUS' : 'NOT BREATHING'} — Delta priority`}
           </span>
         )}
@@ -218,17 +172,7 @@ function NewCallForm({ onCreated }: { onCreated: (call: EmergencyCall) => void }
       <button
         type="submit"
         disabled={submitting || !complaint.trim() || !address.trim()}
-        style={{
-          padding: '10px 16px',
-          borderRadius: 8,
-          background: isPriorityCritical && complaint.trim() ? MEDICAL_TYPE.statusCritical : MEDICAL_THEME.accent,
-          color: MEDICAL_THEME.onAccent,
-          fontWeight: 700,
-          fontSize: 14,
-          border: 'none',
-          cursor: submitting ? 'not-allowed' : 'pointer',
-          opacity: submitting ? 0.6 : 1,
-        }}
+        className={`dc-btn-primary${isPriorityCritical && complaint.trim() ? ' dc-btn-primary--critical' : ''}${submitting ? ' dc-btn-primary--disabled' : ''}`}
       >
         {isPriorityCritical && complaint.trim() ? '⚡ Log Critical Call' : 'Log New Call'}
       </button>
@@ -287,63 +231,45 @@ function CADDispatchPanel({
 
   return (
     <div
-      style={{
-        padding: 16,
-        borderRadius: 10,
-        border: `2px solid ${isCritical ? MEDICAL_TYPE.statusCritical : MEDICAL_THEME.border}`,
-        background: isCritical ? 'rgba(239,68,68,0.05)' : MEDICAL_THEME.surfaceCard,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 12,
-      }}
+      className={`dc-panel ${isCritical ? "dc-call-card--critical" : ""}`}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <strong style={{ fontSize: 14, color: isCritical ? MEDICAL_TYPE.statusCritical : MEDICAL_THEME.ink }}>
+      <div className="u-flex-center u-gap-8">
+        <strong className={isCritical ? 'dc-title-14-critical' : 'dc-title-14'}>
           {isCritical ? '⚡ Dispatch Unit Now' : 'Dispatch Unit'}
         </strong>
         <PriorityBadge priority={call.callPriority} />
         {isCritical && (
-          <span style={{ fontSize: 11, color: MEDICAL_TYPE.statusCritical, fontWeight: 700 }}>
+          <span className="dc-critical-11">
             3-minute response target
           </span>
         )}
       </div>
 
-      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-        <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, cursor: 'pointer' }}>
+      <div className="dc-row-gap-12-wrap">
+        <label className="u-click-row">
           <input type="checkbox" checked={requiresALS} onChange={(e) => setRequiresALS(e.target.checked)} />
           ALS required
         </label>
-        <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, cursor: 'pointer' }}>
+        <label className="u-click-row">
           <input type="checkbox" checked={requiresAir} onChange={(e) => setRequiresAir(e.target.checked)} />
           Air transport
         </label>
       </div>
 
       {availableUnits.length === 0 ? (
-        <div style={{ padding: '8px 12px', borderRadius: 8, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.3)', fontSize: 13, color: MEDICAL_TYPE.statusCritical, fontWeight: 700 }}>
+        <div className="dc-alert-soft">
           ⚠ No available {requiresAir ? 'Air' : requiresALS ? 'ALS' : 'BLS'} units — all assigned. Manually assign or request mutual aid.
         </div>
       ) : (
         <div>
-          <div style={{ fontSize: 12, fontWeight: 700, color: MEDICAL_THEME.inkSubtle, marginBottom: 6 }}>
+          <div className="dc-field-label-mb6">
             Available units ({availableUnits.length}):
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <div className="u-flex-col u-gap-4">
             {availableUnits.map((unit) => (
               <label
                 key={unit.id}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  padding: '6px 10px',
-                  borderRadius: 6,
-                  border: `1px solid ${selectedUnitId === unit.id ? MEDICAL_THEME.accent : MEDICAL_THEME.border}`,
-                  background: selectedUnitId === unit.id ? `color-mix(in srgb, ${MEDICAL_THEME.accent} 10%, transparent)` : 'transparent',
-                  cursor: 'pointer',
-                  fontSize: 13,
-                }}
+                className={`dc-unit-option dc-resource-chip ${selectedUnitId === unit.id ? "dc-resource-chip--on" : ""}`}
               >
                 <input
                   type="radio"
@@ -353,7 +279,7 @@ function CADDispatchPanel({
                   onChange={() => setSelectedUnitId(unit.id)}
                 />
                 <strong>{unit.callSign}</strong>
-                <span style={{ color: MEDICAL_THEME.inkSubtle }}>
+                <span className="dc-muted">
                   {unit.type} · {unit.crewSize} crew · {unit.baseLocation}
                 </span>
               </label>
@@ -363,25 +289,15 @@ function CADDispatchPanel({
       )}
 
       {error && (
-        <div style={{ padding: '8px 12px', borderRadius: 8, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.3)', fontSize: 13, color: MEDICAL_TYPE.statusCritical }}>
+        <div className="dc-alert-soft">
           {error}
         </div>
       )}
 
-      <button
+      <button type="button"
         onClick={handleDispatch}
         disabled={dispatching || availableUnits.length === 0}
-        style={{
-          padding: '10px 16px',
-          borderRadius: 8,
-          background: isCritical ? MEDICAL_TYPE.statusCritical : MEDICAL_THEME.accent,
-          color: '#fff',
-          fontWeight: 700,
-          fontSize: 14,
-          border: 'none',
-          cursor: dispatching || availableUnits.length === 0 ? 'not-allowed' : 'pointer',
-          opacity: dispatching || availableUnits.length === 0 ? 0.6 : 1,
-        }}
+        className={`dc-btn-primary${isCritical ? ' dc-btn-primary--critical' : ''}`}
       >
         {dispatching ? 'Dispatching...' : `Dispatch to ${call.location.address}`}
       </button>
@@ -436,17 +352,17 @@ function EDPreAlertPanel({
 
   if (sent) {
     return (
-      <div style={{ padding: '12px 16px', borderRadius: 10, background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.3)' }}>
-        <div style={{ fontWeight: 700, color: '#10B981', fontSize: 14 }}>✓ ED Pre-Alert Sent</div>
-        <div style={{ fontSize: 12, color: MEDICAL_THEME.inkSubtle, marginTop: 4 }}>
+      <div className="dc-success-panel">
+        <div className="dc-success-title">✓ ED Pre-Alert Sent</div>
+        <div className="dc-muted-12-mt4">
           ED Readiness plan created. ETA: {assignment.estimatedResponseMinutes} min.
           Unit: {assignment.unit.callSign}.
         </div>
-        <div style={{ display: 'flex', gap: 8, marginTop: 10, flexWrap: 'wrap' }}>
-          <Link to={CANONICAL_ROUTES.emergencyEdReadiness} className="emergency-route-action-chip" style={{ textDecoration: 'none', fontSize: 13 }}>
+        <div className="dc-row-gap-8-wrap-mt">
+          <Link to={CANONICAL_ROUTES.emergencyEdReadiness} className="emergency-route-action-chip dc-link-plain">
             Open ED Readiness →
           </Link>
-          <Link to={CANONICAL_ROUTES.emergencyEms} className="emergency-route-action-chip" style={{ textDecoration: 'none', fontSize: 13 }}>
+          <Link to={CANONICAL_ROUTES.emergencyEms} className="emergency-route-action-chip dc-link-plain">
             EMS Pipeline →
           </Link>
         </div>
@@ -455,32 +371,23 @@ function EDPreAlertPanel({
   }
 
   return (
-    <div style={{ padding: 16, borderRadius: 10, border: `1px solid ${MEDICAL_THEME.border}`, background: MEDICAL_THEME.surfaceCard, display: 'flex', flexDirection: 'column', gap: 12 }}>
+    <div className="dc-panel">
       <div>
-        <strong style={{ fontSize: 14 }}>Send Hospital Pre-Alert</strong>
-        <div style={{ fontSize: 12, color: MEDICAL_THEME.inkSubtle, marginTop: 2 }}>
+        <strong className="dc-title-14">Send Hospital Pre-Alert</strong>
+        <div className="dc-muted-12-mt">
           Unit {assignment.unit.callSign} dispatched · ETA {assignment.estimatedResponseMinutes} min · Notify ED and activate protocols.
         </div>
       </div>
 
       <div>
-        <div style={{ fontSize: 12, fontWeight: 700, color: MEDICAL_THEME.inkSubtle, marginBottom: 6 }}>Activate resources:</div>
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+        <div className="dc-field-label-mb6">Activate resources:</div>
+        <div className="u-flex-wrap u-gap-6">
           {resourceOptions.map((r) => (
             <button
               key={r}
               type="button"
               onClick={() => toggleResource(r)}
-              style={{
-                padding: '4px 10px',
-                borderRadius: 20,
-                border: `1px solid ${resources.includes(r) ? MEDICAL_THEME.accent : MEDICAL_THEME.border}`,
-                background: resources.includes(r) ? `color-mix(in srgb, ${MEDICAL_THEME.accent} 15%, transparent)` : 'transparent',
-                color: resources.includes(r) ? MEDICAL_THEME.ink : MEDICAL_THEME.inkSubtle,
-                fontSize: 12,
-                fontWeight: 600,
-                cursor: 'pointer',
-              }}
+              className={`dc-resource-chip ${resources.includes(r) ? "dc-resource-chip--on" : ""}`}
             >
               {r}
             </button>
@@ -489,23 +396,14 @@ function EDPreAlertPanel({
       </div>
 
       <div>
-        <div style={{ fontSize: 12, fontWeight: 700, color: MEDICAL_THEME.inkSubtle, marginBottom: 6 }}>Specialty teams:</div>
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+        <div className="dc-field-label-mb6">Specialty teams:</div>
+        <div className="u-flex-wrap u-gap-6">
           {specialtyOptions.map((s) => (
             <button
               key={s}
               type="button"
               onClick={() => toggleSpecialty(s)}
-              style={{
-                padding: '4px 10px',
-                borderRadius: 20,
-                border: `1px solid ${specialtyTeams.includes(s) ? '#8B5CF6' : MEDICAL_THEME.border}`,
-                background: specialtyTeams.includes(s) ? 'rgba(139,92,246,0.12)' : 'transparent',
-                color: specialtyTeams.includes(s) ? '#7C3AED' : MEDICAL_THEME.inkSubtle,
-                fontSize: 12,
-                fontWeight: 600,
-                cursor: 'pointer',
-              }}
+              className={`dc-resource-chip ${specialtyTeams.includes(s) ? "dc-resource-chip--on" : ""}`}
             >
               {s}
             </button>
@@ -514,31 +412,21 @@ function EDPreAlertPanel({
       </div>
 
       <div>
-        <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: MEDICAL_THEME.inkSubtle, marginBottom: 4 }}>
+        <label className="dc-field-label">
           Assign bay / room (optional)
         </label>
         <input
-          style={{ width: '100%', padding: '8px 10px', borderRadius: 8, border: `1px solid ${MEDICAL_THEME.border}`, background: MEDICAL_THEME.surfacePage, color: MEDICAL_THEME.ink, fontSize: 14, boxSizing: 'border-box' }}
+          className="dc-field-input"
           value={bay}
           onChange={(e) => setBay(e.target.value)}
           placeholder="e.g. Trauma Bay 1, Resus Room 2..."
         />
       </div>
 
-      <button
+      <button type="button"
         onClick={handleSendAlert}
         disabled={sending}
-        style={{
-          padding: '10px 16px',
-          borderRadius: 8,
-          background: '#10B981',
-          color: '#fff',
-          fontWeight: 700,
-          fontSize: 14,
-          border: 'none',
-          cursor: sending ? 'not-allowed' : 'pointer',
-          opacity: sending ? 0.6 : 1,
-        }}
+        className="dc-btn-primary dc-btn-success"
       >
         {sending ? 'Sending...' : '→ Send Pre-Alert to ED'}
       </button>
@@ -574,71 +462,52 @@ function CallCard({
   const isDispatched = call.status === 'dispatched' || call.status === 'ems_en_route' || call.status === 'hospital_notified';
 
   return (
-    <div
-      className={`dispatch-console__call-card${isOverTarget ? ' dispatch-console__call-card--breach' : ''}`}
-      style={{
-        padding: 14,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 8,
-      }}
-    >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+    <div className={`dc-call-card dispatch-console__call-card${isOverTarget ? ' dispatch-console__call-card--breach' : ''}`}>
+      <div className="dc-row-between">
         <div>
-          <div style={{ fontSize: 11, fontWeight: 700, color: MEDICAL_THEME.inkSubtle, letterSpacing: '0.06em' }}>
+          <div className="dc-meta-caps">
             {call.callNumber}
           </div>
-          <div style={{ fontSize: 15, fontWeight: 700, color: MEDICAL_THEME.ink, marginTop: 2 }}>
+          <div className="dc-title-15">
             {call.chiefComplaint}
           </div>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
+        <div className="dc-col-end">
           <PriorityBadge priority={call.callPriority} />
           <span
-            style={{
-              fontSize: 11,
-              fontWeight: 700,
-              color: isOverTarget ? MEDICAL_TYPE.statusCritical : MEDICAL_THEME.inkSubtle,
-            }}
+            className={isOverTarget ? "dc-critical-11" : "dc-meta-caps"}
           >
             {isOverTarget ? `⚠ ${ageMinutes}m — BREACH` : `${ageMinutes}m ago`}
           </span>
         </div>
       </div>
 
-      <div style={{ fontSize: 12, color: MEDICAL_THEME.inkSubtle }}>{call.location.address}</div>
+      <div className="dc-muted-12">{call.location.address}</div>
 
       {(call.patientConscious === false || call.patientBreathing === false) && (
-        <div style={{ fontSize: 12, color: MEDICAL_TYPE.statusCritical, fontWeight: 700 }}>
+        <div className="dc-critical-12">
           {call.patientConscious === false && 'UNCONSCIOUS '}
           {call.patientBreathing === false && '— NOT BREATHING'}
         </div>
       )}
 
       {/* Status pipeline */}
-      <div style={{ display: 'flex', gap: 4, fontSize: 11, flexWrap: 'wrap', marginTop: 2 }}>
+      <div className="dc-row-gap-4-wrap">
         {(['received', 'dispatched', 'ems_en_route', 'ems_on_scene', 'ems_transporting', 'hospital_notified'] as const).map((s) => (
           <span
             key={s}
-            style={{
-              padding: '2px 6px',
-              borderRadius: 4,
-              background: call.status === s ? MEDICAL_THEME.accent : 'transparent',
-              color: call.status === s ? MEDICAL_THEME.onAccent : MEDICAL_THEME.inkSubtle,
-              fontWeight: call.status === s ? 700 : 400,
-              border: `1px solid ${call.status === s ? MEDICAL_THEME.accent : MEDICAL_THEME.border}`,
-            }}
+            className={`dc-chip ${call.status === s ? "dc-resource-chip--on" : ""}`}
           >
             {s.replace(/_/g, ' ')}
           </span>
         ))}
       </div>
 
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 4 }}>
+      <div className="dc-row-gap-8-wrap u-mt-4">
         <select
           value={call.callPriority}
           onChange={(e) => onPriorityChange(call.id, e.target.value as CallPriority)}
-          style={{ fontSize: 12, padding: '4px 8px', borderRadius: 6, border: `1px solid ${MEDICAL_THEME.border}`, background: MEDICAL_THEME.surfacePage, color: MEDICAL_THEME.ink }}
+          className="dc-field-input dc-select-sm"
         >
           {(Object.keys(CALL_PRIORITY_LABELS) as CallPriority[]).map((p) => (
             <option key={p} value={p}>{CALL_PRIORITY_LABELS[p]}</option>
@@ -648,7 +517,7 @@ function CallCard({
         <select
           value={call.status}
           onChange={(e) => onStatusChange(call.id, e.target.value as EmergencyCall['status'])}
-          style={{ fontSize: 12, padding: '4px 8px', borderRadius: 6, border: `1px solid ${MEDICAL_THEME.border}`, background: MEDICAL_THEME.surfacePage, color: MEDICAL_THEME.ink }}
+          className="dc-field-input dc-select-sm"
         >
           <option value="received">Received</option>
           <option value="triaged">Triaged</option>
@@ -664,18 +533,7 @@ function CallCard({
           <button
             type="button"
             onClick={() => setShowDispatch(true)}
-            style={{
-              padding: '4px 10px',
-              borderRadius: 6,
-              background: call.callPriority === 'Echo' || call.callPriority === 'Delta'
-                ? MEDICAL_TYPE.statusCritical
-                : MEDICAL_THEME.accent,
-              color: '#fff',
-              fontWeight: 700,
-              fontSize: 12,
-              border: 'none',
-              cursor: 'pointer',
-            }}
+            className={`dc-btn-primary dc-btn-sm ${call.callPriority === 'Echo' || call.callPriority === 'Delta' ? 'dc-btn-primary--critical' : ''}`}
           >
             Dispatch Unit →
           </button>
@@ -685,7 +543,7 @@ function CallCard({
           <button
             type="button"
             onClick={() => setShowPreAlert(true)}
-            style={{ padding: '4px 10px', borderRadius: 6, background: '#10B981', color: '#fff', fontWeight: 700, fontSize: 12, border: 'none', cursor: 'pointer' }}
+            className="dc-btn-primary dc-btn-sm dc-btn-success"
           >
             Pre-Alert ED →
           </button>
@@ -726,12 +584,12 @@ function CADUnitBoard() {
   }, []);
 
   return (
-    <div className="dispatch-console__unit-board" style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <strong style={{ fontSize: 13 }}>CAD Unit Board</strong>
-        <span style={{ fontSize: 11, color: MEDICAL_THEME.inkSubtle }}>Auto-refreshes every 5s</span>
+    <div className="dispatch-console__unit-board dc-panel u-flex-col-gap-10">
+      <div className="u-flex-between">
+        <strong className="u-fs-13">CAD Unit Board</strong>
+        <span className="fj-caption-11">Auto-refreshes every 5s</span>
       </div>
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+      <div className="u-flex-wrap u-gap-8">
         <SummaryCard label="Available" value={cadSummary.availableUnits} />
         <SummaryCard label="Dispatched" value={cadSummary.dispatchedUnits} />
         <SummaryCard label="En Route" value={cadSummary.enRouteUnits} />
@@ -739,14 +597,14 @@ function CADUnitBoard() {
         <SummaryCard label="Transporting" value={cadSummary.transportingUnits} highlight />
         <SummaryCard label="Total" value={cadSummary.totalUnits} />
       </div>
-      <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
-        <Link to={CANONICAL_ROUTES.emergencyEdReadiness} style={{ fontSize: 13, color: MEDICAL_THEME.accent, textDecoration: 'none', fontWeight: 600 }}>
+      <div className="u-flex u-gap-8 u-mt-4">
+        <Link to={CANONICAL_ROUTES.emergencyEdReadiness} className="dc-link-accent">
           ED Readiness →
         </Link>
-        <Link to={CANONICAL_ROUTES.emergencyEms} style={{ fontSize: 13, color: MEDICAL_THEME.accent, textDecoration: 'none', fontWeight: 600 }}>
+        <Link to={CANONICAL_ROUTES.emergencyEms} className="dc-link-accent">
           EMS Pipeline →
         </Link>
-        <Link to={CANONICAL_ROUTES.emergencyCommandCenter} style={{ fontSize: 13, color: MEDICAL_THEME.accent, textDecoration: 'none', fontWeight: 600 }}>
+        <Link to={CANONICAL_ROUTES.emergencyCommandCenter} className="dc-link-accent">
           Command Center →
         </Link>
       </div>
@@ -837,24 +695,16 @@ export default function DispatchConsole() {
       operationalSummaryExtra={
         criticalPending > 0 ? (
           <div
-            className="dispatch-console__banner"
-            style={{
-              padding: '10px 16px',
-              background: 'rgba(239,68,68,0.08)',
-              borderColor: `color-mix(in srgb, ${MEDICAL_TYPE.statusCritical} 35%, var(--cdl-clinical-border, #e2e8f0))`,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}
+            className="dispatch-console__banner dc-alert-soft"
             role="status"
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 18 }}>⚡</span>
-              <strong style={{ color: MEDICAL_TYPE.statusCritical, fontSize: 14 }}>
+            <div className="u-flex-center u-gap-8">
+              <span className="fj-critical-banner__icon">⚡</span>
+              <strong className="dc-title-14-critical">
                 {criticalPending} Echo/Delta call{criticalPending > 1 ? 's' : ''} awaiting dispatch
               </strong>
             </div>
-            <span style={{ fontSize: 12, color: MEDICAL_THEME.inkSubtle }}>Dispatch unit on call card below</span>
+            <span className="dc-muted-12">Dispatch unit on call card below</span>
           </div>
         ) : null
       }
@@ -880,8 +730,8 @@ export default function DispatchConsole() {
         compact
       />
       {showForm && (
-        <div className="dispatch-console__form" style={{ padding: 20 }}>
-          <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 14 }}>New Emergency Call</div>
+        <div className="dispatch-console__form u-pad-16">
+          <div className="dc-title-14 u-mb-16">New Emergency Call</div>
           <NewCallForm onCreated={handleCreated} />
         </div>
       )}
@@ -891,7 +741,7 @@ export default function DispatchConsole() {
 
       {/* Call list */}
       {calls.length === 0 ? (
-        <div className="dispatch-console__empty" style={{ padding: 40, textAlign: 'center', color: MEDICAL_THEME.inkSubtle, fontSize: 14 }}>
+        <div className="dispatch-console__empty dc-muted u-ta-center dc-empty-pad">
           No active calls. Log a call using the button above.
         </div>
       ) : (
@@ -909,8 +759,7 @@ export default function DispatchConsole() {
 
       <div
         role="note"
-        className="dispatch-console__notice"
-        style={{ padding: '10px 14px', fontSize: 12, color: MEDICAL_THEME.inkSubtle }}
+        className="dispatch-console__notice dc-muted-12 dc-pad-note"
       >
         CareDroid AI is decision support only. All dispatch decisions must be made by licensed dispatchers following
         local medical protocols. Unit assignment, pre-alert, and ED readiness activation require dispatcher authorization.

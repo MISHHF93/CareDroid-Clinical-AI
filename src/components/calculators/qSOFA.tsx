@@ -176,7 +176,7 @@ export default function QSOFA({ patientId, onClose }: QSOFAProps) {
         onChange={() => toggleCriteria(keyName)}
         style={{ width: 22, height: 22, accentColor: MEDICAL_THEME.accent }}
       />
-      <span style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+      <span className="u-flex-col-gap-5">
         <strong style={{ color: 'var(--medical-ink, #111827)', fontSize: 14 }}>{label}</strong>
         {current ? <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 12 }}>{current}</span> : null}
         {autoFilledFromVitals ? (
@@ -188,20 +188,11 @@ export default function QSOFA({ patientId, onClose }: QSOFAProps) {
 
   return (
     <div
-      className="clinical-calculator-modal"
+      className="clinical-calculator-modal u-modal-scrim"
       role="dialog"
       aria-modal="true"
       aria-labelledby="qsofa-title"
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 300,
-        background: 'rgba(0,0,0,0.62)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 20,
-      }}
+      
     >
       <div
         className="clinical-calculator-modal__panel"
@@ -218,17 +209,10 @@ export default function QSOFA({ patientId, onClose }: QSOFAProps) {
         }}
       >
         <header
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 12,
-            padding: 16,
-            borderBottom: '1px solid #e0f2fe',
-          }}
+          className="u-panel-header-row"
         >
           <div>
-            <h2 id="qsofa-title" style={{ margin: 0, fontSize: 18, fontWeight: 650 }}>
+            <h2 id="qsofa-title" className="u-title-18">
               qSOFA
             </h2>
             {patient ? (
@@ -241,21 +225,13 @@ export default function QSOFA({ patientId, onClose }: QSOFAProps) {
             type="button"
             onClick={onClose}
             aria-label="Close qSOFA"
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: 8,
-              border: '1px solid #e0f2fe',
-              background: 'transparent',
-              color: 'var(--medical-ink, #111827)',
-              cursor: 'pointer',
-            }}
+            className="u-icon-btn-32"
           >
             X
           </button>
         </header>
 
-        <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <div className="u-stack-14">
           {renderToggle({
             keyName: 'alteredMentation',
             label: 'Altered mentation / GCS < 15',
@@ -285,7 +261,7 @@ export default function QSOFA({ patientId, onClose }: QSOFAProps) {
             }}
           >
             <div style={{ color: result.color, fontSize: 13, fontWeight: 700 }}>{result.band}</div>
-            <div style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', fontSize: 32, marginTop: 4 }}>
+            <div className="u-mono-32">
               {total}/3
             </div>
             {result.alert ? (

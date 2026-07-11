@@ -109,7 +109,7 @@ function DeviceRow({
       type="button"
       className={`medical-iot-page__device-row${selected ? ' is-selected' : ''}`}
       onClick={() => onSelect(device.id)}
-      aria-pressed={selected}
+      {...((selected) ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
     >
       <GraphicIconBadge iconKey={categoryIconKey(device.category)} accent="information" size="sm" />
       <div>
@@ -414,7 +414,7 @@ export default function MedicalIotDashboard() {
             key={id}
             type="button"
             className={filter === id ? 'is-active' : undefined}
-            aria-pressed={filter === id}
+            {...((filter === id) ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
             onClick={() => setFilter(id)}
           >
             {label}

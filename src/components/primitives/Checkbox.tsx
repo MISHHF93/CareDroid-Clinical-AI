@@ -1,4 +1,5 @@
 import React, { useId, useEffect, useRef } from 'react';
+import { AriaInvalidInput } from '../a11y/AriaInvalidFields';
 import './Checkbox.css';
 
 type CheckboxProps = {
@@ -21,12 +22,12 @@ export function Checkbox({ label, description, error, indeterminate, className, 
   return (
     <div className={['cd-checkbox-root', className].filter(Boolean).join(' ')}>
       <label className="cd-checkbox-row" htmlFor={id}>
-        <input
+        <AriaInvalidInput
           ref={ref}
           type="checkbox"
           id={id}
           className="cd-checkbox-control"
-          aria-invalid={error ? true : undefined}
+           invalid={error ? true : undefined}
           {...props}
         />
         {(label || description) && (

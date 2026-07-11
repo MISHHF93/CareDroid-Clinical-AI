@@ -53,7 +53,7 @@ export default function ProfileSecurity() {
         </Card>
 
         <Card>
-          <h2 style={{ marginTop: 0 }}>Profile routes</h2>
+          <h2 className="u-mt-0">Profile routes</h2>
           <p className="profile-identity-muted">
             Use profile settings to adjust demo identity, tools, and workspace preferences.
           </p>

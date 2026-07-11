@@ -45,7 +45,7 @@ export const EmptyConversations = ({ onNewConversation }) => {
       description="Start a new conversation to ask CareDroid clinical questions"
       action={
         onNewConversation && (
-          <button className="btn-primary" onClick={onNewConversation}>
+          <button type="button" className="btn-primary" onClick={onNewConversation}>
             Start Conversation
           </button>
         )
@@ -119,7 +119,7 @@ export const ErrorState = ({
         )}
         {onRetry && (
           <div className="empty-state-action">
-            <button className="btn-secondary" onClick={onRetry}>
+            <button type="button" className="btn-secondary" onClick={onRetry}>
               Try Again
             </button>
           </div>

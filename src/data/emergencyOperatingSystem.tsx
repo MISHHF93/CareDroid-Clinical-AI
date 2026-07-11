@@ -2262,7 +2262,7 @@ function uniqueCalculators(calculators = [] as any[]) {
   return Object.freeze(
     calculators
       .map(normalizeSelectedCalculator)
-      .filter(Boolean)
+      .filter((calculator): calculator is NonNullable<typeof calculator> => Boolean(calculator))
       .filter((calculator) => {
         const key = calculator!.id || calculator!.label;
         if (seen.has(key)) return false;

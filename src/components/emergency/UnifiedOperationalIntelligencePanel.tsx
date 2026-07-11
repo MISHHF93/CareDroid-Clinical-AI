@@ -63,7 +63,7 @@ export function UnifiedOperationalIntelligencePanel({
           className="cd-btn cd-btn--secondary cd-btn--sm unified-operational-intelligence-panel__refresh"
           onClick={() => void refresh()}
           disabled={isRefreshing}
-          aria-busy={isRefreshing}
+          aria-busy={isRefreshing ? 'true' : 'false'}
         >
           <RefreshCw size={14} aria-hidden="true" />
           {isRefreshing ? 'Refreshing…' : 'Refresh'}

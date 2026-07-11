@@ -365,17 +365,27 @@ export default function ReceptionQuickIntake({
           <ul className="reception-quick-intake__search-results" aria-label="Patient search results">
             {searchResults.map(({ patient }, index) => (
               <li key={patient.id}>
-                <button
+                {index === searchHighlight ? (<button
                   type="button"
                   className="reception-quick-intake__search-result"
-                  aria-selected={index === searchHighlight}
+                  aria-selected="true"
                   onClick={() => applySelectedPatient(patient)}
                 >
                   {getPatientDisplayName(patient)}
                   <small>
                     {patient.mrn} · DOB {patient.dob || '—'} · {patient.state}
                   </small>
-                </button>
+                </button>) : (<button
+                  type="button"
+                  className="reception-quick-intake__search-result"
+                  aria-selected="false"
+                  onClick={() => applySelectedPatient(patient)}
+                >
+                  {getPatientDisplayName(patient)}
+                  <small>
+                    {patient.mrn} · DOB {patient.dob || '—'} · {patient.state}
+                  </small>
+                </button>)}
               </li>
             ))}
           </ul>

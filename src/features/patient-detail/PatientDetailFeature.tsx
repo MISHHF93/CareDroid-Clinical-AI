@@ -94,7 +94,7 @@ export function PatientDetailFeature({ patientId, onBack }: PatientDetailFeature
             key={t}
             type="button"
             role="tab"
-            aria-selected={tab === t}
+            {...((tab === t) ? { 'aria-selected': 'true' as const } : { 'aria-selected': 'false' as const })}
             className="cd-patient-detail__tab"
             data-active={tab === t ? 'true' : 'false'}
             onClick={() => setTab(t)}

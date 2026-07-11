@@ -76,17 +76,27 @@ export default function HelpCenter() {
                 .filter(Boolean)
                 .join(' ')}
             >
-              <button
+              {isOpen ? (<button
                 type="button"
                 className="cdl-public-faq__trigger"
-                aria-expanded={isOpen}
+                aria-expanded="true"
                 onClick={() => setExpandedSection(isOpen ? null : sectionIndex)}
               >
                 <span>{section.title}</span>
                 <span className="cdl-public-faq__chevron" aria-hidden>
                   ▾
                 </span>
-              </button>
+              </button>) : (<button
+                type="button"
+                className="cdl-public-faq__trigger"
+                aria-expanded="false"
+                onClick={() => setExpandedSection(isOpen ? null : sectionIndex)}
+              >
+                <span>{section.title}</span>
+                <span className="cdl-public-faq__chevron" aria-hidden>
+                  ▾
+                </span>
+              </button>)}
               {isOpen ? (
                 <div className="cdl-public-faq__panel">
                   {section.items.map((item) => (

@@ -290,7 +290,7 @@ export default function AiCommandCenterDashboard() {
               {health.label}
             </span>
           )}
-          <button
+          <button type="button"
             onClick={load}
             disabled={loading}
             style={{
@@ -393,7 +393,7 @@ export default function AiCommandCenterDashboard() {
             {/* Memory */}
             <SectionCard title="AI Memory">
               {mem ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <div className="u-flex-col u-gap-10">
                   {[
                     { label: 'Short-term context', value: mem.shortTerm },
                     { label: 'Long-term preferences & history', value: mem.longTerm },
@@ -434,7 +434,7 @@ export default function AiCommandCenterDashboard() {
             {/* Tool Calls */}
             <SectionCard title="Tool Routing">
               {tools ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <div className="u-flex-col u-gap-8">
                   <div
                     style={{
                       display: 'flex',
@@ -444,7 +444,7 @@ export default function AiCommandCenterDashboard() {
                     }}
                   >
                     <span style={{ color: MEDICAL_THEME.inkMuted }}>Total requests</span>
-                    <span style={{ fontWeight: 700 }}>{tools.totalRequests}</span>
+                    <span className="u-fw-700">{tools.totalRequests}</span>
                   </div>
                   {Object.entries(tools.routeCounts).map(([route, count]) => (
                     <div
@@ -485,7 +485,7 @@ export default function AiCommandCenterDashboard() {
             {/* RAG Quality */}
             <SectionCard title="RAG & Retrieval">
               {rag ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <div className="u-flex-col u-gap-10">
                   {[
                     { label: 'Retrieval precision', value: rag.retrievalLabel },
                     { label: 'Cache hit rate', value: pct(rag.cacheHitRate) },

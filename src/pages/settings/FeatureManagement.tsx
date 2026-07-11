@@ -248,7 +248,7 @@ function FeatureToggle({ checked, disabled, pending, onClick, title }) {
         .filter(Boolean)
         .join(' ')}
       role="switch"
-      aria-checked={checked}
+      {...((checked) ? { 'aria-checked': 'true' as const } : { 'aria-checked': 'false' as const })}
       disabled={disabled || pending}
       title={title}
       onClick={onClick}
@@ -623,7 +623,7 @@ export default function FeatureManagement() {
                 type="button"
                 className="feature-toggle-panel__section-toggle"
                 onClick={() => toggleSection(section)}
-                aria-expanded={expanded}
+                {...((expanded) ? { 'aria-expanded': 'true' as const } : { 'aria-expanded': 'false' as const })}
               >
                 {expanded ? <ChevronDown size={17} aria-hidden /> : <ChevronRight size={17} aria-hidden />}
                 <Icon size={18} aria-hidden />

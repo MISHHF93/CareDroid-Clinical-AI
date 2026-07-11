@@ -185,7 +185,7 @@ export default function HospitalMapInsights({
                   key={floor.id}
                   type="button"
                   role="tab"
-                  aria-selected={floor.id === activeFloorId}
+                  {...((floor.id === activeFloorId) ? { 'aria-selected': 'true' as const } : { 'aria-selected': 'false' as const })}
                   className={floor.id === activeFloorId ? 'is-active' : undefined}
                   onClick={() => setSelectedFloorId(floor.id)}
                 >

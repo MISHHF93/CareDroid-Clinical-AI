@@ -32,14 +32,21 @@ export default function SimulationModeBanner() {
         </span>
       </div>
       <div className="simulation-mode-banner__actions">
-        <button
+        {showTransparency ? (<button
           type="button"
           className="simulation-mode-banner__link"
           onClick={() => setShowTransparency((open) => !open)}
-          aria-expanded={showTransparency}
+          aria-expanded="true"
         >
           {showTransparency ? 'Hide feature status' : 'Live vs demo vs planned'}
-        </button>
+        </button>) : (<button
+          type="button"
+          className="simulation-mode-banner__link"
+          onClick={() => setShowTransparency((open) => !open)}
+          aria-expanded="false"
+        >
+          {showTransparency ? 'Hide feature status' : 'Live vs demo vs planned'}
+        </button>)}
         <SimulationModeToggle variant="banner" />
       </div>
       {showTransparency ? (

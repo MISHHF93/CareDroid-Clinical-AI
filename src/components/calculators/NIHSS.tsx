@@ -262,16 +262,7 @@ export default function NIHSS({ patientId, onClose }: NIHSSProps) {
       role="dialog"
       aria-modal="true"
       aria-labelledby="nihss-title"
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 300,
-        background: 'rgba(0,0,0,0.62)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 20,
-      }}
+      className="u-modal-scrim"
     >
       <div
         style={{
@@ -287,17 +278,10 @@ export default function NIHSS({ patientId, onClose }: NIHSSProps) {
         }}
       >
         <header
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 12,
-            padding: 16,
-            borderBottom: '1px solid #e0f2fe',
-          }}
+          className="u-panel-header-row"
         >
           <div>
-            <h2 id="nihss-title" style={{ margin: 0, fontSize: 18, fontWeight: 650 }}>
+            <h2 id="nihss-title" className="u-title-18">
               NIHSS
             </h2>
             {patient ? (
@@ -310,21 +294,13 @@ export default function NIHSS({ patientId, onClose }: NIHSSProps) {
             type="button"
             onClick={onClose}
             aria-label="Close NIHSS"
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: 8,
-              border: '1px solid #e0f2fe',
-              background: 'transparent',
-              color: 'var(--medical-ink, #111827)',
-              cursor: 'pointer',
-            }}
+            className="u-icon-btn-32"
           >
             X
           </button>
         </header>
 
-        <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <div className="u-stack-14">
           <section
             style={{
               border: `1px solid ${lkwElapsed.outsideTpaWindow ? '#EF4444' : '#F59E0B'}`,
@@ -378,7 +354,7 @@ export default function NIHSS({ patientId, onClose }: NIHSSProps) {
             }}
           >
             <div style={{ color: severity.color, fontSize: 13, fontWeight: 700 }}>{severity.label}</div>
-            <div style={{ fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', fontSize: 32, marginTop: 4 }}>
+            <div className="u-mono-32">
               {total}/42
             </div>
           </section>
@@ -447,7 +423,7 @@ export default function NIHSS({ patientId, onClose }: NIHSSProps) {
           ) : null}
 
           {savedMessage ? (
-            <div role="status" style={{ color: '#10B981', fontSize: 13 }}>
+            <div role="status" className="u-ok-13">
               {savedMessage}
             </div>
           ) : null}

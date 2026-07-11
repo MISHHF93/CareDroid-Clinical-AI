@@ -514,20 +514,11 @@ export default function QuickIntake({
 
   return (
     <div
-      className="quick-intake-overlay"
+      className="quick-intake-overlay u-modal-scrim-260"
       role="dialog"
       aria-modal="true"
       aria-labelledby="quick-intake-title"
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 260,
-        background: 'rgba(0,0,0,0.66)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 16,
-      }}
+      
     >
       <style>
         {`
@@ -604,17 +595,10 @@ export default function QuickIntake({
         }}
       >
         <header
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 12,
-            padding: 16,
-            borderBottom: '1px solid #e0f2fe',
-          }}
+          className="u-panel-header-row"
         >
           <div>
-            <h2 id="quick-intake-title" style={{ margin: 0, fontSize: 18, fontWeight: 750 }}>
+            <h2 id="quick-intake-title" className="u-title-18-750">
               {copy.title}
             </h2>
             <div style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 12, marginTop: 4 }}>
@@ -627,15 +611,7 @@ export default function QuickIntake({
             type="button"
             onClick={closeWithConfirm}
             aria-label={copy.closeLabel}
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: 8,
-              border: '1px solid #e0f2fe',
-              background: 'transparent',
-              color: 'var(--medical-ink, #111827)',
-              cursor: 'pointer',
-            }}
+            className="u-icon-btn-32"
           >
             X
           </button>
@@ -645,7 +621,7 @@ export default function QuickIntake({
           className="quick-intake-grid"
           style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: 14, padding: 16 }}
         >
-          <section style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <section className="u-flex-col-gap-12">
             {variant === 'reception' && duplicateCandidates.length ? (
               <DuplicateReviewAlert
                 candidates={duplicateCandidates}
@@ -678,8 +654,8 @@ export default function QuickIntake({
             </div>
             ) : null}
             <div
-              className="quick-intake-category-grid"
-              style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}
+              className="quick-intake-category-grid u-grid-2"
+              
             >
               {CATEGORY_BUTTONS.map((category) => {
                 const active = complaintCategory === category.label;
@@ -711,7 +687,7 @@ export default function QuickIntake({
               })}
             </div>
 
-            <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <label className="u-flex-col-gap-6">
               <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 12, fontWeight: 700 }}>Complaint</span>
               <textarea
                 ref={complaintInputRef}
@@ -745,7 +721,7 @@ export default function QuickIntake({
                 <div style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 11, fontWeight: 700, marginBottom: 8 }}>
                   Suggested protocols
                 </div>
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                <div className="u-flex-wrap u-gap-8">
                   {protocols.map((protocol) => (
                     <span
                       key={protocol}
@@ -777,7 +753,7 @@ export default function QuickIntake({
                 <div style={{ color: MEDICAL_TYPE.statusCritical, fontSize: 11, fontWeight: 700, marginBottom: 8 }}>
                   High-risk complaint flags — staff alert only
                 </div>
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                <div className="u-flex-wrap u-gap-8">
                   {detectedComplaintFlags.map((flag) => (
                     <span
                       key={flag.id}
@@ -802,9 +778,9 @@ export default function QuickIntake({
             ) : null}
           </section>
 
-          <section style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-              <label style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+          <section className="u-flex-col u-gap-10">
+            <div className="u-grid-2">
+              <label className="u-flex-col-gap-5">
                 <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 11, fontWeight: 700 }}>First</span>
                 <input
                   value={firstName}
@@ -813,7 +789,7 @@ export default function QuickIntake({
                   style={inputStyle}
                 />
               </label>
-              <label style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+              <label className="u-flex-col-gap-5">
                 <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 11, fontWeight: 700 }}>Last</span>
                 <input
                   value={lastName}
@@ -824,7 +800,7 @@ export default function QuickIntake({
               </label>
             </div>
 
-            <label style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+            <label className="u-flex-col-gap-5">
               <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 11, fontWeight: 700 }}>
                 DOB {dob ? `(Age ${age})` : ''}
               </span>
@@ -863,7 +839,7 @@ export default function QuickIntake({
               </div>
             </div>
 
-            <label style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+            <label className="u-flex-col-gap-5">
               <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 11, fontWeight: 700 }}>MRN</span>
               <input
                 value={mrn}

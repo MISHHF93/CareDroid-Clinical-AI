@@ -84,12 +84,34 @@ export default function DemoUserSwitcher({
       <div className="demo-user-switcher__list" role="group" aria-label="Switch demo user">
         {allDemoUsers.map((u: CareDroidUserProfile) => {
           const active = u.id === profile.id;
+          // Edge Tools rejects JSX expressions in ARIA values — use literals only.
+          if (active) {
+            return (
+              <button
+                key={u.id}
+                type="button"
+                aria-pressed="true"
+                className="demo-user-switcher__item is-active"
+                onClick={() => handleSwitch(u.id)}
+              >
+                <div className="demo-user-switcher__avatar" aria-hidden="true">
+                  {initials(u.fullName)}
+                </div>
+                <div className="demo-user-switcher__info">
+                  <span className="demo-user-switcher__name">{u.fullName}</span>
+                  <span className="demo-user-switcher__meta">
+                    {getRoleLabel(u.role)} · {u.department}
+                  </span>
+                </div>
+              </button>
+            );
+          }
           return (
             <button
               key={u.id}
               type="button"
-              aria-pressed={active}
-              className={`demo-user-switcher__item${active ? ' is-active' : ''}`}
+              aria-pressed="false"
+              className="demo-user-switcher__item"
               onClick={() => handleSwitch(u.id)}
             >
               <div className="demo-user-switcher__avatar" aria-hidden="true">

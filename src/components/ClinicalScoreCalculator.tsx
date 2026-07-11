@@ -337,7 +337,7 @@ export default function ClinicalScoreCalculator({
         <button
           type="button"
           className={`clinical-score-modal__toggle${isActive ? ' clinical-score-modal__toggle--active' : ''}`}
-          aria-pressed={isActive}
+          {...((isActive) ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
           aria-label={`${field.label}: ${values[field.id] === '' ? 'Requires assessment' : isActive ? 'Yes' : 'No'}`}
           onClick={() => {
             setValues((current) => ({ ...current, [field.id]: current[field.id] ? 0 : 1 }));

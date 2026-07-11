@@ -32,24 +32,39 @@ export function Avatar({ src, name = '', size = 'md', className, ...props }: Ava
   const initials = getInitials(name);
   const bg = getColor(name || 'default');
 
+  const classNames = ['cd-avatar', `cd-avatar--${size}`, className ?? ''].filter(Boolean).join(' ');
+  const content = showImage ? (
+    <img
+      className="cd-avatar__img"
+      src={src}
+      alt={name || ''}
+      onError={() => setImgFailed(true)}
+    />
+  ) : (
+    <span className="cd-avatar__initials" aria-hidden="true">{initials || '?'}</span>
+  );
+
+  // Static role only when named (Edge Tools rejects dynamic ARIA roles).
+  if (name) {
+    return (
+      <span
+        className={classNames}
+        style={!showImage ? { background: bg } : undefined}
+        aria-label={name}
+        role="img"
+        {...props}
+      >
+        {content}
+      </span>
+    );
+  }
   return (
     <span
-      className={['cd-avatar', `cd-avatar--${size}`, className ?? ''].filter(Boolean).join(' ')}
+      className={classNames}
       style={!showImage ? { background: bg } : undefined}
-      aria-label={name || undefined}
-      role={name ? 'img' : undefined}
       {...props}
     >
-      {showImage ? (
-        <img
-          className="cd-avatar__img"
-          src={src}
-          alt={name || ''}
-          onError={() => setImgFailed(true)}
-        />
-      ) : (
-        <span className="cd-avatar__initials" aria-hidden="true">{initials || '?'}</span>
-      )}
+      {content}
     </span>
   );
 }

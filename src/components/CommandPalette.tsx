@@ -884,8 +884,12 @@ export default function CommandPalette({ open, onClose, onExecute }: CommandPale
                     key={result.id}
                     type="button"
                     role="option"
-                    aria-selected={active}
-                    aria-disabled={result.type === 'command' && result.disabled ? true : undefined}
+                    {...(active
+                      ? { 'aria-selected': 'true' as const }
+                      : { 'aria-selected': 'false' as const })}
+                    {...(result.type === 'command' && result.disabled
+                      ? { 'aria-disabled': 'true' as const }
+                      : { 'aria-disabled': 'false' as const })}
                     disabled={result.type === 'command' && result.disabled}
                     onMouseEnter={() => setSelectedIndex(index)}
                     onClick={() => executeResult(result)}

@@ -180,7 +180,7 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded }: any = {}) => {
                   onChange={(e) => handleMedicationChange(index, e.target.value)}
                 />
                 {medications.length > 1 && (
-                  <button
+                  <button type="button"
                     className="btn-remove-med"
                     onClick={() => handleRemoveMedication(index)}
                     title="Remove medication"
@@ -205,10 +205,10 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded }: any = {}) => {
           />
 
           <div className="input-actions">
-            <button className="btn-add-med" onClick={handleAddMedication}>
+            <button type="button" className="btn-add-med" onClick={handleAddMedication}>
               + Add Another Medication
             </button>
-            <button 
+            <button type="button" 
               className="btn-check-interactions" 
               onClick={handleCheck}
               disabled={isChecking || !preflightReady}

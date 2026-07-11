@@ -117,7 +117,7 @@ export default function SimulationScenarioPlayer() {
                   type="button"
                   className={`scenario-player-page__check${selected ? ' is-selected' : ''}`}
                   onClick={() => toggleAction(action)}
-                  aria-pressed={selected}
+                  {...((selected) ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
                 >
                   {action}
                 </button>

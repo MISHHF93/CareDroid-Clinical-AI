@@ -43,11 +43,11 @@ const Button = ({
   };
 
   return (
-    <button
+    <button type="button"
       className={getClassName()}
       style={style}
       disabled={disabled || loading}
-      aria-busy={loading || undefined}
+      aria-busy={(loading || undefined) ? 'true' : 'false'}
       {...props}
     >
       {loading && (

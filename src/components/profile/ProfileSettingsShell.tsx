@@ -77,7 +77,7 @@ export default function ProfileSettingsShell({
               key={item.id}
               to={item.path}
               className={active ? 'is-active' : ''}
-              aria-current={active ? 'page' : undefined}
+              {...(active ? { 'aria-current': 'page' as const } : {})}
             >
               {item.label}
             </Link>

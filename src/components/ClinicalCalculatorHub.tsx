@@ -522,7 +522,7 @@ export default function ClinicalCalculatorHub({
           <button
             key={category}
             type="button"
-            aria-pressed={activeCategory === category}
+            {...((activeCategory === category) ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
             className={activeCategory === category ? 'is-active' : ''}
             onClick={() => setActiveCategory(category)}
           >

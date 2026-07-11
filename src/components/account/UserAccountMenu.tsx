@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { IconChevronDown } from '@tabler/icons-react';
 import { useUser } from '../../contexts/UserContext';
 import { useUserIdentity } from '../../contexts/UserIdentityContext';
@@ -48,6 +48,7 @@ export default function UserAccountMenu() {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const displayName = useMemo(
     () =>
@@ -87,29 +88,62 @@ export default function UserAccountMenu() {
     setOpen(false);
   }, [location.pathname]);
 
+  const go = (path: string) => {
+    setOpen(false);
+    navigate(path);
+  };
+
+  const triggerInner = (
+    <>
+      <span className="account-menu__avatar" aria-hidden="true">
+        {avatarUrl ? <img src={avatarUrl} alt="" /> : getInitials(displayName)}
+      </span>
+      <span className="account-menu__label">
+        <span className="account-menu__name">{displayName}</span>
+        <span className="account-menu__meta">{accountMeta}</span>
+      </span>
+      <IconChevronDown size={14} className="account-menu__chevron" aria-hidden="true" />
+    </>
+  );
+
   return (
     <div className="account-menu" ref={rootRef}>
-      <button
-        type="button"
-        className="account-menu__trigger"
-        aria-haspopup="menu"
-        aria-expanded={open}
-        onClick={() => setOpen((value) => !value)}
-      >
-        <span className="account-menu__avatar" aria-hidden>
-          {avatarUrl ? <img src={avatarUrl} alt="" /> : getInitials(displayName)}
-        </span>
-        <span className="account-menu__label">
-          <span className="account-menu__name">{displayName}</span>
-          <span className="account-menu__meta">{accountMeta}</span>
-        </span>
-        <IconChevronDown size={14} aria-hidden />
-      </button>
+      {/* Dual trigger branches use static aria-expanded true/false tokens. */}
+      {open ? (
+        <button
+          type="button"
+          className="account-menu__trigger account-menu__trigger--open"
+          aria-haspopup="true"
+          aria-expanded="true"
+          aria-controls="account-menu-panel"
+          id="account-menu-trigger"
+          onClick={() => setOpen(false)}
+        >
+          {triggerInner}
+        </button>
+      ) : (
+        <button
+          type="button"
+          className="account-menu__trigger"
+          aria-haspopup="true"
+          aria-expanded="false"
+          aria-controls="account-menu-panel"
+          id="account-menu-trigger"
+          onClick={() => setOpen(true)}
+        >
+          {triggerInner}
+        </button>
+      )}
 
       {open ? (
-        <div className="account-menu__panel" role="menu">
+        <div
+          className="account-menu__panel"
+          id="account-menu-panel"
+          role="region"
+          aria-labelledby="account-menu-trigger"
+        >
           <div className="account-menu__section">
-            <div className="account-menu__item" style={{ cursor: 'default' }}>
+            <div className="account-menu__item account-menu__item--static">
               <strong>{displayName}</strong>
               <span className="account-menu__role-chip">{roleLabel}</span>
             </div>
@@ -117,45 +151,66 @@ export default function UserAccountMenu() {
 
           {showProfileSwitcher ? (
             <div className="account-menu__section account-menu__section--profiles">
-              <div className="account-menu__section-title">Switch workflow profile</div>
               <ProfileRoleSwitcher variant="menu" onSwitch={() => setOpen(false)} />
             </div>
           ) : null}
 
           {simulationEnabled ? (
             <div className="account-menu__section">
-              <button
-                type="button"
-                className="account-menu__item"
-                role="menuitemcheckbox"
-                aria-checked={simulationActive}
-                onClick={() => {
-                  toggleSimulation();
-                  setOpen(false);
-                }}
-              >
-                Training scenario: {simulationActive ? 'On' : 'Off'}
-              </button>
+              {simulationActive ? (
+                <button
+                  type="button"
+                  className="account-menu__item"
+                  aria-pressed="true"
+                  onClick={() => {
+                    toggleSimulation();
+                    setOpen(false);
+                  }}
+                >
+                  Training scenario: On
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="account-menu__item"
+                  aria-pressed="false"
+                  onClick={() => {
+                    toggleSimulation();
+                    setOpen(false);
+                  }}
+                >
+                  Training scenario: Off
+                </button>
+              )}
             </div>
           ) : null}
 
-          <div className="account-menu__section">
-            <Link className="account-menu__item" to={CANONICAL_ROUTES.profile} role="menuitem">
+          {/* Account actions as labeled navigation (plain buttons). */}
+          <nav className="account-menu__section" aria-label="Account links">
+            <button
+              type="button"
+              className="account-menu__item"
+              onClick={() => go(CANONICAL_ROUTES.profile)}
+            >
               Profile overview
-            </Link>
-            <Link className="account-menu__item" to={CANONICAL_ROUTES.platformStart} role="menuitem">
+            </button>
+            <button
+              type="button"
+              className="account-menu__item"
+              onClick={() => go(CANONICAL_ROUTES.platformStart)}
+            >
               Entry hub
-            </Link>
+            </button>
             {showAdminLink ? (
-              <Link
+              <button
+                type="button"
                 className="account-menu__item"
-                to={CANONICAL_ROUTES.adminOperations}
-                role="menuitem"
+                onClick={() => go(CANONICAL_ROUTES.adminOperations)}
               >
                 Admin console
-              </Link>
+              </button>
             ) : null}
-          </div>
+          </nav>
         </div>
       ) : null}
     </div>

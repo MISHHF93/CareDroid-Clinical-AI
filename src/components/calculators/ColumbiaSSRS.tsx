@@ -131,7 +131,7 @@ function AnswerButtons({
         <button
           key={answer}
           type="button"
-          aria-pressed={value === answer}
+          {...((value === answer) ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
           aria-label={`${label} ${answer.toUpperCase()}`}
           onClick={() => onAnswer(answer)}
           style={{
@@ -248,16 +248,7 @@ export default function ColumbiaSSRS({ patientId, onClose }: ColumbiaSSRSProps) 
       role="dialog"
       aria-modal="true"
       aria-labelledby="cssrs-title"
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 300,
-        background: 'rgba(0,0,0,0.62)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: 20,
-      }}
+      className="u-modal-scrim"
     >
       <div
         style={{
@@ -273,17 +264,10 @@ export default function ColumbiaSSRS({ patientId, onClose }: ColumbiaSSRSProps) 
         }}
       >
         <header
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 12,
-            padding: 16,
-            borderBottom: '1px solid #e0f2fe',
-          }}
+          className="u-panel-header-row"
         >
           <div>
-            <h2 id="cssrs-title" style={{ margin: 0, fontSize: 18, fontWeight: 650 }}>
+            <h2 id="cssrs-title" className="u-title-18">
               Columbia Suicide Severity Rating Scale
             </h2>
             {patient ? (
@@ -296,21 +280,13 @@ export default function ColumbiaSSRS({ patientId, onClose }: ColumbiaSSRSProps) 
             type="button"
             onClick={onClose}
             aria-label="Close Columbia SSR Scale"
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: 8,
-              border: '1px solid #e0f2fe',
-              background: 'transparent',
-              color: 'var(--medical-ink, #111827)',
-              cursor: 'pointer',
-            }}
+            className="u-icon-btn-32"
           >
             X
           </button>
         </header>
 
-        <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 14 }}>
+        <div className="u-stack-14">
           <section
             style={{
               background: '#f0f9ff',
@@ -328,7 +304,7 @@ export default function ColumbiaSSRS({ patientId, onClose }: ColumbiaSSRSProps) 
             <h3 style={{ margin: '0 0 10px', fontSize: 15 }}>Ideation Section</h3>
             <div style={{ display: 'grid', gap: 12 }}>
               {visibleItems.map((item) => (
-                <section key={item.id} style={{ border: '1px solid #e0f2fe', borderRadius: 12, padding: 14 }}>
+                <section key={item.id} className="u-card-border">
                   <strong style={{ display: 'block', color: 'var(--medical-ink, #111827)', lineHeight: 1.45 }}>{item.question}</strong>
                   <AnswerButtons
                     label={item.id}
@@ -345,7 +321,7 @@ export default function ColumbiaSSRS({ patientId, onClose }: ColumbiaSSRSProps) 
             </div>
           </section>
 
-          <section style={{ border: '1px solid #e0f2fe', borderRadius: 12, padding: 14 }}>
+          <section className="u-card-border">
             <h3 style={{ margin: '0 0 10px', fontSize: 15 }}>Behavior Section</h3>
             <strong style={{ display: 'block', color: 'var(--medical-ink, #111827)', lineHeight: 1.45 }}>{BEHAVIOR.question}</strong>
             <p style={{ margin: '8px 0 0', color: MEDICAL_THEME.inkSubtle, fontSize: 13 }}>{BEHAVIOR.examples}</p>
@@ -369,7 +345,7 @@ export default function ColumbiaSSRS({ patientId, onClose }: ColumbiaSSRSProps) 
           </section>
 
           {patient ? (
-            <div style={{ display: 'grid', gap: 10 }}>
+            <div className="u-grid-gap-10">
               {confirmingSave ? (
                 <section
                   role="alertdialog"
@@ -379,7 +355,7 @@ export default function ColumbiaSSRS({ patientId, onClose }: ColumbiaSSRSProps) 
                   <p style={{ margin: '0 0 12px', color: 'var(--medical-ink, #111827)', fontWeight: 700 }}>
                     Saving this score will alert the clinical team. Continue?
                   </p>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                  <div className="u-grid-2-gap-10">
                     <button
                       type="button"
                       onClick={saveAndAlert}
@@ -433,7 +409,7 @@ export default function ColumbiaSSRS({ patientId, onClose }: ColumbiaSSRSProps) 
           ) : null}
 
           {savedMessage ? (
-            <div role="status" style={{ color: '#10B981', fontSize: 13 }}>
+            <div role="status" className="u-ok-13">
               {savedMessage}
             </div>
           ) : null}
