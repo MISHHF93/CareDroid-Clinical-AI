@@ -48,7 +48,6 @@ describe('Sidebar unified navigation rendering', () => {
       ['Reassess', '/emergency/reassessment'],
       ['Flow & Capacity', '/emergency/capacity'],
       ['Referrals', '/emergency/referrals'],
-      ['Copilot', null],
       ['Medical Tools', '/emergency/tools'],
       ['Analytics', '/emergency/analytics'],
       ['Settings', '/emergency/settings'],
@@ -66,9 +65,21 @@ describe('Sidebar unified navigation rendering', () => {
       }
     }
 
+    // Exactly one conversational AI control → docked CareDroid Copilot.
+    const copilotButtons = desktopNav.getAllByRole('button', { name: 'Copilot' });
+    expect(copilotButtons).toHaveLength(1);
+    expect(copilotButtons[0].getAttribute('data-nav-id')).toBe('copilot');
+    expect(copilotButtons[0].getAttribute('data-ai-node')).toBe('caredroid-copilot');
+    expect(copilotButtons[0].getAttribute('aria-pressed')).toBe('false');
+    expect(screen.queryByRole('button', { name: /CareDroid Copilot/i })).toBeNull();
+    expect(screen.queryByText('CareDroid Copilot')).toBeNull();
+
     for (const hiddenLabel of ['Cosmos', 'Fleet', 'AI Governance']) {
       expect(desktopNav.queryByRole('link', { name: hiddenLabel })).toBeNull();
     }
+
+    // Account is the header UserAccountMenu, not a sidebar utility link.
+    expect(desktopNav.queryByRole('link', { name: 'Account' })).toBeNull();
   });
 
   it('renders only read-only visible pages and marks the active route', () => {
@@ -115,7 +126,6 @@ describe('Sidebar unified navigation rendering', () => {
       ['Reassess', 'reassessment'],
       ['Flow & Capacity', 'capacity'],
       ['Referrals', 'referrals'],
-      ['Copilot', 'ed-copilot'],
       ['Medical Tools', 'clinical-tools'],
       ['Analytics', 'emergency-analytics'],
       ['Settings', 'settings'],
@@ -123,13 +133,14 @@ describe('Sidebar unified navigation rendering', () => {
     const iconKeys: string[] = [];
 
     for (const [label, iconKey] of expectedIconKeyByLabel) {
-      const item =
-        label === 'Copilot'
-          ? desktopNav.getByRole('button', { name: label })
-          : desktopNav.getByRole('link', { name: label });
+      const item = desktopNav.getByRole('link', { name: label });
       expect(item.getAttribute('data-icon-key')).toBe(iconKey);
       iconKeys.push(item.getAttribute('data-icon-key') || '');
     }
+
+    const copilot = desktopNav.getByRole('button', { name: 'Copilot' });
+    expect(copilot.getAttribute('data-icon-key')).toBe('ed-copilot');
+    iconKeys.push(copilot.getAttribute('data-icon-key') || '');
 
     expect(new Set(iconKeys).size).toBe(iconKeys.length);
   });

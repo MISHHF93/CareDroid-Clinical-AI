@@ -493,10 +493,10 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────
-   12. OPERATIONAL ALARM DOCK (alert strip between header and content)
+   12. OPERATIONAL ALARM WINDOW (floating corner notification)
    ───────────────────────────────────────────────────────────────── */
 
-.operational-alarm-dock {
+.operational-alarm-dock--floating {
   font-size: 13.5px;
 }
 

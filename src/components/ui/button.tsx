@@ -1,4 +1,4 @@
-import React, { ButtonHTMLAttributes } from 'react';
+import React, { ButtonHTMLAttributes, useId } from 'react';
 import './button.css';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -9,6 +9,11 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
   children?: React.ReactNode;
+  /**
+   * When the button is disabled for product reasons (missing API, permissions, etc.),
+   * provide a human-readable explanation. Applied to title + aria-describedby.
+   */
+  disabledReason?: string;
 }
 
 const Button = ({
@@ -22,8 +27,17 @@ const Button = ({
   leftIcon,
   rightIcon,
   className = '',
+  disabledReason,
+  title,
+  'aria-describedby': ariaDescribedBy,
+  type = 'button',
   ...props
 }: ButtonProps) => {
+  const reasonId = useId();
+  const isDisabled = Boolean(disabled || loading);
+  const showReason = isDisabled && Boolean(disabledReason);
+  const describedBy = [ariaDescribedBy, showReason ? reasonId : null].filter(Boolean).join(' ') || undefined;
+
   const getClassName = () => {
     const variants: Record<string, string> = {
       primary: 'btn-primary',
@@ -43,24 +57,35 @@ const Button = ({
   };
 
   return (
-    <button type="button"
-      className={getClassName()}
-      style={style}
-      disabled={disabled || loading}
-      aria-busy={(loading || undefined) ? 'true' : 'false'}
-      {...props}
-    >
-      {loading && (
-        <span className="btn-spinner">
-          <svg className="spinner-icon" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="10" fill="none" strokeWidth="3" />
-          </svg>
+    <>
+      <button
+        type={type}
+        className={getClassName()}
+        style={style}
+        disabled={isDisabled}
+        aria-busy={loading ? true : undefined}
+        title={title || disabledReason || undefined}
+        aria-describedby={describedBy}
+        data-disabled-reason={showReason ? disabledReason : undefined}
+        {...props}
+      >
+        {loading && (
+          <span className="btn-spinner" aria-hidden="true">
+            <svg className="spinner-icon" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10" fill="none" strokeWidth="3" />
+            </svg>
+          </span>
+        )}
+        {!loading && leftIcon && <span className="btn-icon-left">{leftIcon}</span>}
+        <span className="btn-content">{children}</span>
+        {!loading && rightIcon && <span className="btn-icon-right">{rightIcon}</span>}
+      </button>
+      {showReason ? (
+        <span id={reasonId} className="sr-only">
+          {disabledReason}
         </span>
-      )}
-      {!loading && leftIcon && <span className="btn-icon-left">{leftIcon}</span>}
-      <span className="btn-content">{children}</span>
-      {!loading && rightIcon && <span className="btn-icon-right">{rightIcon}</span>}
-    </button>
+      ) : null}
+    </>
   );
 };
 

@@ -15,6 +15,7 @@ import {
   type CareDroidAIResponse,
   type CareDroidAIValidationIssue,
 } from './careDroidAITypes';
+import { buildAiResponseProvenance } from './provenanceContract';
 
 export {
   CARE_DROID_AI_INTENTS,
@@ -25,6 +26,13 @@ export {
   type CareDroidAIResponse,
   type CareDroidAIStatus,
 } from './careDroidAITypes';
+export {
+  buildAiResponseProvenance,
+  isAiResponseProvenance,
+  PROVENANCE_CONTRACT_VERSION,
+  type AiResponseProvenance,
+  type ProvenanceEvidenceItem,
+} from './provenanceContract';
 export {
   CARE_DROID_AI_SCHEMAS,
   getRequiredInputFields,
@@ -833,23 +841,58 @@ function buildSuccessResponse(
     ...(result.warnings || []),
     schema.clinical ? CLINICAL_DECISION_SUPPORT_DISCLAIMER : OPERATIONAL_REVIEW_WARNING,
   ]);
+  const confidence = clampConfidence(result.confidence);
+  const redFlags = uniqueStrings([...(result.redFlags || []), ...readArray(result.data.redFlags)]);
+  const assignedRole =
+    result.assignedRole || readString(result.data.owner) || 'Responsible clinician';
+  const missingFromData =
+    result.data.missingFields ||
+    result.data.missingLifeCriticalData ||
+    result.data.missingInformation ||
+    result.data.missing;
+
+  const provenance = buildAiResponseProvenance({
+    confidence,
+    responseClass: schema.clinical ? 'clinical' : 'operational',
+    modelOrEngine: 'careDroidAI-heuristic-node',
+    recommendedReviewerRole: result.suggestedOwnerRole || assignedRole,
+    missingFromData,
+    redFlags,
+    warnings,
+    limitations: [
+      schema.clinical
+        ? 'Structured CareDroid AI intents are rule/heuristic decision support, not foundation-model inference.'
+        : 'Operational insight only; does not replace charge-nurse or physician judgment.',
+    ],
+    evidence: [
+      {
+        id: `rule-${intent}`,
+        kind: 'structured_rule',
+        title: `CareDroid intent handler: ${intent}`,
+        sourceId: intent,
+      },
+    ],
+    applicablePopulation:
+      'ED / acute-care operational context for the requesting role; jurisdiction-specific protocols are not assumed universal.',
+  });
 
   return {
     intent,
     status: 'success',
     priority: result.priority || priorityFromResult(result),
     data: result.data,
-    confidence: clampConfidence(result.confidence),
+    confidence,
     reasoning: result.reasoning.filter(Boolean),
     warnings,
-    redFlags: uniqueStrings([...(result.redFlags || []), ...readArray(result.data.redFlags)]),
+    redFlags,
     nextActions: result.nextActions.filter(Boolean),
-    assignedRole: result.assignedRole || readString(result.data.owner) || 'Responsible clinician',
+    assignedRole,
     recommendedDepartment: result.recommendedDepartment || readString(result.data.recommendedDepartment) || 'Emergency Department',
     requiresClinicianReview: true,
     clinicianOverrideAvailable: true,
-    generatedAt: new Date().toISOString(),
+    generatedAt: provenance.generatedAt,
     safetyDisclaimer: CLINICAL_DECISION_SUPPORT_DISCLAIMER,
+    provenance,
     ...(result.visibleToRoles ? { visibleToRoles: result.visibleToRoles } : {}),
     ...(result.escalationRole ? { escalationRole: result.escalationRole } : {}),
     ...(result.suggestedOwnerRole ? { suggestedOwnerRole: result.suggestedOwnerRole } : {}),
@@ -860,6 +903,17 @@ function buildErrorResponse(
   intent: CareDroidAIIntent | 'unknown',
   issues: CareDroidAIValidationIssue[],
 ): CareDroidAIResponse {
+  const provenance = buildAiResponseProvenance({
+    confidence: 0,
+    responseClass: 'error',
+    modelOrEngine: 'careDroidAI-heuristic-node',
+    recommendedReviewerRole: 'Responsible clinician',
+    missingInformation: issues.map((i) => `${i.field}: ${i.message}`),
+    uncertainty: 'No recommendation generated; request failed validation.',
+    limitations: ['Request rejected before recommendation generation.'],
+    evidence: [],
+  });
+
   return {
     intent,
     status: 'error',
@@ -881,8 +935,9 @@ function buildErrorResponse(
     recommendedDepartment: 'Emergency Department',
     requiresClinicianReview: true,
     clinicianOverrideAvailable: true,
-    generatedAt: new Date().toISOString(),
+    generatedAt: provenance.generatedAt,
     safetyDisclaimer: CLINICAL_DECISION_SUPPORT_DISCLAIMER,
+    provenance,
   };
 }
 

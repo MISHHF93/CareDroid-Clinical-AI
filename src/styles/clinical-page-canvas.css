@@ -7,19 +7,21 @@
 :root {
   --cdl-clinical-canvas-top-glow: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 8%, transparent);
   --cdl-clinical-canvas-base: var(--medical-surface-page, #f8fafc);
-  --cdl-clinical-border: color-mix(in srgb, var(--medical-border, #e2e8f0) 60%, transparent);
-  --cdl-clinical-border-strong: color-mix(in srgb, var(--medical-border, #e2e8f0) 80%, transparent);
-  --cdl-clinical-border-focus: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 42%, transparent);
+  /* Soft edges: depth first, hard boxes second */
+  --cdl-clinical-border: color-mix(in srgb, var(--medical-border, #e2e8f0) 36%, transparent);
+  --cdl-clinical-border-strong: color-mix(in srgb, var(--medical-border, #e2e8f0) 55%, transparent);
+  --cdl-clinical-border-focus: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 38%, transparent);
+  --cdl-clinical-hairline: color-mix(in srgb, var(--medical-border, #e2e8f0) 42%, transparent);
   --cdl-clinical-radius: 12px;
   --cdl-clinical-radius-sm: 10px;
   --cdl-clinical-radius-lg: 14px;
   --cdl-clinical-shadow-rest:
-    0 1px 3px rgba(15, 23, 42, 0.06),
-    0 4px 16px rgba(15, 23, 42, 0.08);
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 4px 14px rgba(15, 23, 42, 0.06);
   --cdl-clinical-shadow-hover:
-    0 4px 8px rgba(15, 23, 42, 0.09),
-    0 12px 28px rgba(15, 23, 42, 0.11);
-  --cdl-clinical-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.88);
+    0 4px 8px rgba(15, 23, 42, 0.07),
+    0 12px 24px rgba(15, 23, 42, 0.09);
+  --cdl-clinical-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.9);
   --cdl-clinical-panel-padding: clamp(14px, 1.6vw, 20px);
   --cdl-clinical-card-padding: clamp(12px, 1.4vw, 16px);
   --cdl-clinical-section-gap: clamp(16px, 2vw, 24px);
@@ -314,6 +316,137 @@
     ):hover {
     transform: none;
   }
+}
+
+/* —— Platform border declutter ——
+ * One hairline per chrome stack; soft cards; no stacked separators. */
+.emergency-app-shell .app-chrome,
+.emergency-app-shell .session-chrome-bar,
+.emergency-app-shell .emergency-app-shell__command-bars > *,
+.emergency-app-shell [class*='command-bar'],
+.emergency-app-shell [class*='-command-bar'],
+.emergency-app-shell .operational-strip,
+.emergency-app-shell .hospital-journey-command-bar,
+.emergency-app-shell .three-minute-mission-bar,
+.emergency-app-shell .unified-operational-intelligence-command-bar,
+.emergency-app-shell .workflow-automation-command-bar,
+.emergency-app-shell .ai-chief-orchestration-bar {
+  border-bottom-color: transparent;
+}
+
+.emergency-app-shell .app-chrome {
+  box-shadow: 0 1px 0 var(--cdl-clinical-hairline);
+}
+
+.emergency-app-shell .session-chrome-bar {
+  border-bottom: 0;
+  box-shadow: 0 1px 0 var(--cdl-clinical-hairline);
+  background: color-mix(in srgb, var(--ed-surface-raised, #ffffff) 96%, var(--ed-surface-base, #f8fafc));
+}
+
+/* Command / mission bars: single soft edge, no double lines under chrome */
+.emergency-app-shell .emergency-app-shell__command-bars > *,
+.emergency-app-shell [class*='command-bar'],
+.emergency-app-shell [class*='-command-bar'],
+.emergency-app-shell .hospital-journey-command-bar,
+.emergency-app-shell .three-minute-mission-bar,
+.emergency-app-shell .unified-operational-intelligence-command-bar,
+.emergency-app-shell .workflow-automation-command-bar,
+.emergency-app-shell .ai-chief-orchestration-bar {
+  border-bottom: 0;
+  box-shadow: 0 1px 0 var(--cdl-clinical-hairline);
+}
+
+/* Cards & panels: prefer soft edge + shadow over hard boxes */
+:is(.app-shell, .emergency-app-shell) :is(
+    .card,
+    .cdl-surface,
+    .cd-dashboard-section,
+    .cd-hero-panel,
+    .cd-surface,
+    .cd-dashboard-card,
+    .cd-tool-card,
+    .cd-insight-card,
+    .cd-metric-card,
+    .cd-status-widget,
+    .cd-filter-panel,
+    .cd-info-notice,
+    .cd-state,
+    .cd-surface-card,
+    .emergency-route-card,
+    .emergency-route-metric-card,
+    .emergency-route-situation-brief,
+    .emergency-route-filter-banner,
+    .hospital-command-center__metric-card,
+    .hospital-command-center__status,
+    .hospital-command-center__panel,
+    .patient-card,
+    .staff-card,
+    .summary-card,
+    .cost-card,
+    .analytics-panel,
+    .cost-panel,
+    .tool-card-large,
+    .platform-result-card,
+    .platform-panel,
+    .operating-card,
+    .operating-drilldown,
+    .device-summary-card,
+    .medical-iot-card,
+    [class$='-card']:not([class*='metric-chip']):not([class*='badge']):not([class*='chip']):not([class*='avatar']),
+    [class$='-panel'],
+    [class$='-widget'],
+    [class$='-notice']
+  ) {
+  border-color: var(--cdl-clinical-border);
+  box-shadow: var(--cdl-clinical-shadow-rest);
+}
+
+/* Inner card/panel headers: soft divider, not a second frame */
+:is(.app-shell, .emergency-app-shell) :is(
+    .cd-card__header,
+    .cd-drawer__header,
+    .cd-modal__header,
+    [class$='-card__header'],
+    [class*='-card-header'],
+    [class$='-panel__header'],
+    [class*='-panel-header'],
+    [class$='__header']:not(.app-chrome):not(.caredroid-header)
+  ) {
+  border-bottom-color: var(--cdl-clinical-hairline) !important;
+}
+
+/* Nested surfaces inside cards: no extra box border */
+:is(.app-shell, .emergency-app-shell) :is(
+    .cd-surface--nested,
+    .cd-surface--subtle,
+    .cd-surface-card--muted,
+    .cd-dashboard-section__content > .cd-surface
+  ) {
+  border-color: transparent;
+  box-shadow: none;
+  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 38%, var(--app-surface-1, #ffffff));
+}
+
+/* Session chrome chips: tint-first, border only on interaction */
+.emergency-app-shell .session-chrome-bar__segment,
+.emergency-app-shell .session-chrome-bar__pill {
+  border-color: transparent;
+  background: color-mix(in srgb, var(--ed-surface-overlay, #f8fafc) 70%, transparent);
+}
+
+.emergency-app-shell .session-chrome-bar__segment:hover,
+.emergency-app-shell .session-chrome-bar__segment:focus-visible,
+.emergency-app-shell .session-chrome-bar__pill:hover,
+.emergency-app-shell .session-chrome-bar__pill:focus-visible {
+  border-color: var(--cdl-clinical-border-strong);
+}
+
+/* Sidebar: single soft rail, not a hard wall */
+.emergency-app-shell > .sidebar,
+.emergency-app-shell .sidebar {
+  border-right-color: transparent !important;
+  box-shadow: var(--cdl-sidebar-shadow, 1px 0 0 var(--cdl-clinical-hairline));
 }
 
 @media (max-width: 768px) {

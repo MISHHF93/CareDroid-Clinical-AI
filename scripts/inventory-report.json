@@ -1,0 +1,93 @@
+{
+  "filesScanned": 1459,
+  "ariaExprFiles": 0,
+  "ariaExprTotal": 0,
+  "ariaExpr": [],
+  "requireFiles": 0,
+  "requireTop": [],
+  "styleFiles": 84,
+  "styleTotal": 812,
+  "styleTop": [
+    {
+      "f": "src\\pages\\emergency\\FullJourneyOperatingPage.tsx",
+      "n": 117
+    },
+    {
+      "f": "src\\pages\\emergency\\DispatchConsole.tsx",
+      "n": 79
+    },
+    {
+      "f": "src\\pages\\ai\\AiCommandCenterDashboard.tsx",
+      "n": 51
+    },
+    {
+      "f": "src\\components\\QuickIntake.tsx",
+      "n": 48
+    },
+    {
+      "f": "src\\components\\StrokeCodeProtocol.tsx",
+      "n": 38
+    },
+    {
+      "f": "src\\pages\\analytics\\PredictiveAnalyticsDashboard.tsx",
+      "n": 34
+    },
+    {
+      "f": "src\\components\\calculators\\PediatricDrugCalc.tsx",
+      "n": 33
+    },
+    {
+      "f": "src\\components\\Citations.tsx",
+      "n": 32
+    },
+    {
+      "f": "src\\components\\calculators\\ColumbiaSSRS.tsx",
+      "n": 29
+    },
+    {
+      "f": "src\\components\\CriticalChecklist.tsx",
+      "n": 26
+    },
+    {
+      "f": "src\\components\\ToolCard.tsx",
+      "n": 25
+    },
+    {
+      "f": "src\\components\\ExpressRegistration.tsx",
+      "n": 24
+    },
+    {
+      "f": "src\\components\\calculators\\qSOFA.tsx",
+      "n": 22
+    },
+    {
+      "f": "src\\components\\calculators\\NEWS2.tsx",
+      "n": 21
+    },
+    {
+      "f": "src\\components\\calculators\\NIHSS.tsx",
+      "n": 21
+    },
+    {
+      "f": "src\\components\\calculators\\CIWAAr.tsx",
+      "n": 19
+    },
+    {
+      "f": "src\\components\\calculators\\HEARTScore.tsx",
+      "n": 17
+    },
+    {
+      "f": "src\\components\\WhoNextPanel.tsx",
+      "n": 14
+    },
+    {
+      "f": "src\\components\\ErrorBoundary.tsx",
+      "n": 13
+    },
+    {
+      "f": "src\\components\\ToolPanel.tsx",
+      "n": 12
+    }
+  ],
+  "menuitemradio": []
+}

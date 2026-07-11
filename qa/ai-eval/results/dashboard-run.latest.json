@@ -1,0 +1,24 @@
+{
+  "id": "10c050025830",
+  "modelName": "offline-fixture-harness",
+  "promptName": "n/a-fixture",
+  "agentName": "ai-eval-run-v1",
+  "ragStrategy": "knowledge-registry-keyword-proxy",
+  "datasetName": "caredroid-ai-eval-v1",
+  "status": "completed",
+  "sampleCount": 41,
+  "metrics": {
+    "modelQuality": 1,
+    "hallucinationRate": 0,
+    "accuracy": 1,
+    "latencyMs": 11,
+    "retrievalPrecision": 1,
+    "toolExecutionSuccess": 1,
+    "workflowSuccess": 1,
+    "userSatisfaction": null,
+    "costUsd": 0
+  },
+  "evaluatedAt": "2026-07-11T21:43:41.995Z",
+  "notes": "Measured offline fixtures — not seeded DEFAULT_METRICS",
+  "source": "qa/ai-eval/results/latest.json"
+}

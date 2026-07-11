@@ -1,0 +1,44 @@
+{
+  "id": "kn-fhir-r4-citation-v1",
+  "title": "HL7 FHIR R4 — citation-only reference",
+  "publisher": "HL7 International (citation); CareDroid Clinical Informatics (registry entry)",
+  "author": "CareDroid Clinical Informatics",
+  "published_at": "2019-10-30",
+  "retrieved_at": "2026-07-11",
+  "jurisdiction": "global",
+  "version": "1",
+  "url_or_canonical_id": "https://hl7.org/fhir/R4/",
+  "license": "HL7-FHIR-license-as-published",
+  "permitted_use": "citation_only",
+  "content_hash": "4244a409889c7b7f9ce4f16711fe6e3c1f4d62e3dc7be62f1a9f368248cb43bd",
+  "content_path": "data/medical-knowledge/citation-fhir-r4.md",
+  "topic": "fhir_r4_interoperability",
+  "specialty": "health_informatics",
+  "evidence_grade": "N/A",
+  "review_status": "accepted_with_limitations",
+  "expires_at": "2028-07-11",
+  "source_type": "standards_spec",
+  "rag_ingest_allowed": false,
+  "limitations": [
+    "Citation metadata only — full FHIR R4 specification text is not redistributed in this repo.",
+    "Not a clinical treatment guideline.",
+    "Do not invent FHIR element semantics beyond institutional integration documentation.",
+    "Patient FHIR resources are PHI; patient-context gate applies before LLM egress."
+  ],
+  "reject_reason": null,
+  "related_artifact_ids": ["kn-nemsis-citation-v1"],
+  "provenance_chain": [
+    {
+      "step": "citation_metadata_authored",
+      "actor": "CareDroid Clinical Informatics",
+      "at": "2026-07-11",
+      "note": "Citation-only standards entry pointing at official HL7 FHIR R4 site."
+    },
+    {
+      "step": "registry_acceptance",
+      "actor": "AI post-v1 finish slice",
+      "at": "2026-07-11",
+      "note": "Accepted with limitations; rag_ingest_allowed=false."
+    }
+  ]
+}

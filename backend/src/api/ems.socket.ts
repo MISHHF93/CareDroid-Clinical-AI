@@ -92,6 +92,65 @@ export function registerEdgeAIAmbulanceWebSocketSupport(
   return io;
 }
 
+/**
+ * High-frequency AVL position stream for CareDroid Sentinel.
+ * Board-level episode/alarm/ETA events remain on emergency SSE; GPS ticks use this path.
+ */
+export function registerSentinelAvlWebSocketSupport(
+  app: Express,
+  server: HttpServer,
+  corsOrigins: CorsOrigin = false,
+): Server {
+  const io = new Server(server, {
+    path: '/ws/sentinel/avl',
+    cors: { origin: corsOrigins, credentials: true },
+  });
+
+  io.on('connection', (socket) => {
+    socket.emit('sentinel/avl:ready', {
+      path: '/ws/sentinel/avl',
+      mode: 'sentinel-avl',
+      supportedEvents: ['subscribe', 'position', 'unsubscribe'],
+    });
+
+    socket.on('subscribe', (payload: { room?: string } | undefined) => {
+      const room = payload?.room || 'sentinel-avl';
+      socket.join(room);
+      socket.emit('sentinel/avl:subscribed', { room });
+    });
+
+    socket.on('unsubscribe', (payload: { room?: string } | undefined) => {
+      const room = payload?.room || 'sentinel-avl';
+      socket.leave(room);
+      socket.emit('sentinel/avl:unsubscribed', { room });
+    });
+  });
+
+  app.set('sentinelAvlIo', io);
+  return io;
+}
+
+/** Publish a throttled unit position to Sentinel AVL subscribers. */
+export function publishSentinelAvlPosition(
+  app: Express,
+  position: {
+    unitId: string;
+    externalId?: string;
+    latitude: number;
+    longitude: number;
+    heading?: number | null;
+    speedKmh?: number | null;
+    occurredAt?: string;
+  },
+): void {
+  const io = app.get('sentinelAvlIo') as Server | undefined;
+  if (!io) return;
+  io.to('sentinel-avl').emit('sentinel/avl:position', {
+    ...position,
+    occurredAt: position.occurredAt || new Date().toISOString(),
+  });
+}
+
 function emitSocketResult(
   socket: Socket,
   callback: ((response: any) => void) | undefined,

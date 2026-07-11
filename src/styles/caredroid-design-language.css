@@ -50,13 +50,15 @@
   flex-shrink: 0;
   width: var(--cdl-sidebar-width, 232px);
   background: var(--cdl-sidebar-bg, var(--medical-white));
-  border-right: 1px solid var(--cdl-sidebar-border, var(--medical-border));
+  border-right: 0;
+  box-shadow: var(--cdl-sidebar-shadow, 1px 0 0 color-mix(in srgb, var(--medical-border) 45%, transparent));
 }
 
 .cdl-shell__header {
   min-height: var(--cdl-header-height, 56px);
   background: var(--cdl-header-bg, var(--medical-white));
-  border-bottom: 1px solid var(--cdl-header-border, var(--medical-border));
+  border-bottom: 0;
+  box-shadow: 0 1px 0 var(--cdl-header-border, color-mix(in srgb, var(--medical-border) 50%, transparent));
 }
 
 .cdl-shell__canvas {

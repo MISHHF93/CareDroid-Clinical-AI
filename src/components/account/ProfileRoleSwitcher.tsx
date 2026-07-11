@@ -55,10 +55,11 @@ export default function ProfileRoleSwitcher({
   }
 
   if (variant === 'menu') {
-    // Native radiogroup: no aria-checked expressions; valid exclusive selection.
+    // Native radiogroup: LTR layout is [radio] [label] — see ProfileRoleSwitcher.css.
     return (
       <fieldset
         className={`profile-role-switcher profile-role-switcher--menu ${className}`.trim()}
+        dir="ltr"
       >
         <legend className="profile-role-switcher__legend">Switch workflow profile</legend>
         {roleViews.map((view) => {
@@ -68,6 +69,7 @@ export default function ProfileRoleSwitcher({
               key={view.emergencyRoleId}
               className={`profile-role-switcher__menu-item${active ? ' is-active' : ''}`}
               title={view.description}
+              dir="ltr"
             >
               <input
                 type="radio"

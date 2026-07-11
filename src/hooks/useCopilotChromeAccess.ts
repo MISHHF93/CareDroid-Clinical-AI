@@ -4,6 +4,13 @@ import { usePractitionerSurfaceVisibility } from '../contexts/PractitionerVisibi
 import useEmergencyRolePermissions from './useEmergencyRolePermissions';
 import useScreenModeCapabilities from './useScreenModeCapabilities';
 
+/**
+ * Access flags for CareDroid Copilot (single Unified AI node).
+ *
+ * Session chrome no longer hosts a second open control — the sidebar nav item
+ * `copilot` is the sole entry. `showSessionCopilot` remains false for API
+ * compatibility with older callers.
+ */
 export function useCopilotChromeAccess() {
   const emergencyRole = useEmergencyRolePermissions();
   const screenCapabilities = useScreenModeCapabilities();
@@ -13,12 +20,11 @@ export function useCopilotChromeAccess() {
   const canUseCopilot = copilotPresentation.visible && copilotPresentation.enabled;
   const hiddenOnReception =
     RECEPTION_FIRST_UX.hideCopilotOnReception && screenCapabilities.isRegistrationScreen;
-  const showSessionCopilot =
-    surfaces.chrome.showSessionCopilot && canUseCopilot && !hiddenOnReception;
 
   return {
     canUseCopilot,
-    showSessionCopilot,
+    /** @deprecated Always false — use sidebar nav `copilot` / toggleCopilot only. */
+    showSessionCopilot: false as const,
     hiddenOnReception,
     copilotPresentation,
     copilotSurfaces: surfaces.copilot,

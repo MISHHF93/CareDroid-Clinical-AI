@@ -126,6 +126,42 @@ const ClinicalAlertsPage = () => {
     });
   };
 
+  /**
+   * Export a single alert as a local JSON download (no PHI-heavy payload).
+   * Backend export endpoint is not required; this is an intentional client-side report.
+   */
+  const handleExportAlert = (alert: ClinicalAlert) => {
+    if (!canExport || isReadOnly) {
+      setApiNotice('Export is not available for this role.');
+      return;
+    }
+    const payload = {
+      exportedAt: new Date().toISOString(),
+      sourceScreen: 'clinical-alerts-page',
+      alert: {
+        id: alert.id,
+        title: alert.title,
+        description: alert.description,
+        severity: alert.severity,
+        status: alert.status,
+        source: alert.source,
+        timestamp: alert.timestamp,
+        findings: alert.findings,
+      },
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = `clinical-alert-${alert.id}.json`;
+    anchor.rel = 'noopener';
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+    setApiNotice(`Exported alert “${alert.title}” as JSON.`);
+  };
+
   const unacknowledgedCount = displayAlerts.filter((a) => a.status === 'unacknowledged').length;
   const criticalCount = displayAlerts.filter((a) => a.severity === 'critical').length;
 
@@ -361,6 +397,16 @@ const ClinicalAlertsPage = () => {
                           type="button"
                           className="alert-card__btn-export"
                           aria-label={`Export details for alert: ${alert.title}`}
+                          title={
+                            isReadOnly
+                              ? 'Read-only mode cannot export alerts'
+                              : 'Download this alert as a JSON report'
+                          }
+                          data-disabled-reason={
+                            isReadOnly ? 'Read-only mode cannot export alerts' : undefined
+                          }
+                          disabled={isReadOnly}
+                          onClick={() => handleExportAlert(alert)}
                         >
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>

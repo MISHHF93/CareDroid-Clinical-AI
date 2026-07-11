@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "1.0.0",
+  "registryVersion": "1.1.0",
+  "updatedAt": "2026-07-11",
+  "description": "CareDroid governed knowledge registry index. Only artifacts with rag_ingest_allowed and accepted review status may enter the RAG vector index. Citation-only standards entries are registered but not ingested.",
+  "policyPath": "data/knowledge-registry/policy.json",
+  "schemaPath": "data/knowledge-registry/schema/knowledge-artifact.schema.json",
+  "artifactsDir": "data/knowledge-registry/artifacts",
+  "rejectedLogPath": "docs/ai/knowledge-registry/REJECTED.md",
+  "artifactIds": [
+    "kn-acls-cardiac-arrest-v1",
+    "kn-sepsis-hour-1-v1",
+    "kn-sofa-overview-v1",
+    "kn-warfarin-aspirin-v1",
+    "kn-stroke-fast-v1",
+    "kn-pediatric-fever-caution-v1",
+    "kn-pregnancy-ed-caution-v1",
+    "kn-fhir-r4-citation-v1",
+    "kn-nemsis-citation-v1"
+  ],
+  "counts": {
+    "accepted_with_limitations": 9,
+    "accepted": 0,
+    "rejected": 0,
+    "pending_review": 0,
+    "citation_only": 2,
+    "rag_ingest_eligible": 7
+  },
+  "seedCorpusContentPaths": [
+    "data/medical-knowledge/acls-cardiac-arrest.md",
+    "data/medical-knowledge/sepsis-hour-1-bundle.md",
+    "data/medical-knowledge/sofa-score-overview.md",
+    "data/medical-knowledge/warfarin-aspirin-interaction.md",
+    "data/medical-knowledge/stroke-fast-recognition.md",
+    "data/medical-knowledge/pediatric-fever-caution.md",
+    "data/medical-knowledge/pregnancy-ed-caution.md",
+    "data/medical-knowledge/citation-fhir-r4.md",
+    "data/medical-knowledge/citation-nemsis.md"
+  ]
+}

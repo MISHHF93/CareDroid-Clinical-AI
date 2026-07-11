@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "1.0.0",
+  "registryVersion": "1.0.0",
+  "updatedAt": "2026-07-11",
+  "description": "CareDroid model registry — approved purpose, prohibited uses, deployment flags, rollback, expiration.",
+  "schemaPath": "data/model-registry/schema/model-entry.schema.json",
+  "entriesDir": "data/model-registry/entries",
+  "entryIds": [
+    "mdl-claude-sonnet-4-6-v1",
+    "mdl-unified-ai-node-v1",
+    "mdl-caredroid-heuristic-node-v1",
+    "mdl-local-deterministic-v1",
+    "mdl-offline-eval-harness-v1"
+  ],
+  "deploymentFlagsDoc": "docs/ai/runbooks/SHADOW_CANARY_DEPLOYMENT.md",
+  "rollbackDoc": "docs/ai/runbooks/ROLLBACK_AND_KILL_SWITCH.md"
+}

@@ -1,0 +1,48 @@
+{
+  "packId": "phi_leak",
+  "version": "1",
+  "description": "Egress minimize must strip synthetic PHI patterns before external LLM payloads.",
+  "cases": [
+    {
+      "id": "phi-ssn-001",
+      "input": {
+        "text": "Patient SSN 123-45-6789 arrived by EMS."
+      },
+      "expect": {
+        "mustNotContainAfterMinimize": ["123-45-6789"],
+        "mustContainAfterMinimize": ["[redacted-ssn]"]
+      },
+      "blocking": true
+    },
+    {
+      "id": "phi-phone-email-001",
+      "input": {
+        "text": "Call family at 555-222-3333 or contact jane.doe@example.org"
+      },
+      "expect": {
+        "mustNotContainAfterMinimize": ["555-222-3333", "jane.doe@example.org"]
+      },
+      "blocking": true
+    },
+    {
+      "id": "phi-mrn-001",
+      "input": {
+        "text": "MRN: AB-99887766 for bed 12"
+      },
+      "expect": {
+        "mustNotContainAfterMinimize": ["AB-99887766"]
+      },
+      "blocking": true
+    },
+    {
+      "id": "phi-secret-001",
+      "input": {
+        "text": "Debug with key_sk_live_supersecrettokenvalue"
+      },
+      "expect": {
+        "mustNotContainAfterMinimize": ["key_sk_live_supersecrettokenvalue"]
+      },
+      "blocking": true
+    }
+  ]
+}

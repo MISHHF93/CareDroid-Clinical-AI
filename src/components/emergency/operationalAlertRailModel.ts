@@ -135,11 +135,12 @@ export function buildOperationalAlertMetrics({
     if (pilotMetrics.length) return pilotMetrics;
   }
 
+  // Readable label + value pairs (never cram everything into value with empty labels).
   const metrics: OperationalAlertMetric[] = [
     {
       id: 'capacity',
-      label: '',
-      value: `CAP ${centralSnapshot.capacityStatus.score} ${centralSnapshot.capacityStatus.band}`,
+      label: 'Capacity',
+      value: `${centralSnapshot.capacityStatus.score} ${centralSnapshot.capacityStatus.band}`,
       tone:
         centralSnapshot.operationalSummary?.metrics?.find((metric) => metric.key === 'capacityScore')
           ?.tone || capacityTone(centralSnapshot.capacityStatus.band),
@@ -147,28 +148,28 @@ export function buildOperationalAlertMetrics({
     },
     {
       id: 'ems-inbound',
-      label: '',
-      value: `EMS ${centralSnapshot.emsPressure.inbound}`,
+      label: 'EMS',
+      value: String(centralSnapshot.emsPressure.inbound),
       tone: emsTone(centralSnapshot),
       priority: 1,
     },
     {
       id: 'reassessment-due',
-      label: '',
-      value: `REA ${centralSnapshot.reassessmentStatus.due}`,
+      label: 'Reassess',
+      value: String(centralSnapshot.reassessmentStatus.due),
       tone: centralSnapshot.reassessmentStatus.due ? 'critical' : 'success',
       priority: 2,
     },
     {
       id: 'active-alerts',
-      label: '',
-      value: `ALR ${centralSnapshot.currentDepartmentStatus.activeAlerts}`,
+      label: 'Alerts',
+      value: String(centralSnapshot.currentDepartmentStatus.activeAlerts),
       tone: centralSnapshot.currentDepartmentStatus.activeAlerts ? 'critical' : 'success',
       priority: 3,
     },
     {
       id: 'sync-status',
-      label: '',
+      label: 'Sync',
       value: syncLabel,
       tone: syncStale ? 'warning' : 'success',
       hint: syncTitle,
@@ -179,15 +180,15 @@ export function buildOperationalAlertMetrics({
   if (intelligenceSnapshot?.enabled) {
     metrics.push({
       id: 'operational-intelligence',
-      label: '',
-      value: `OI ${[
-        intelligenceSnapshot.mode.replace('_', ' '),
+      label: 'Intel',
+      value: [
+        intelligenceSnapshot.mode.replace(/_/g, ' '),
         intelligenceSnapshot.dataFreshness.visible
           ? intelligenceSnapshot.dataFreshness.status
           : null,
       ]
         .filter(Boolean)
-        .join(' · ')}`,
+        .join(' · '),
       tone: intelligenceTone(intelligenceSnapshot),
       hint: intelligenceSnapshot.disclaimers.operational,
       priority: 5,
@@ -197,12 +198,21 @@ export function buildOperationalAlertMetrics({
   return metrics;
 }
 
+/** Hard cap for metrics inside the slim header top bar (readability over density). */
+export const MAX_HEADER_STRIP_METRICS = 3;
+
 export function buildHeaderOperationalAlertMetrics(
   input: BuildOperationalAlertMetricsInput,
 ): OperationalAlertMetric[] {
   if (isPilotStationKpiPolicyActive() && input.screenMode) {
-    return buildPilotHeaderOperationalAlertMetrics(input, input.screenMode);
+    return buildPilotHeaderOperationalAlertMetrics(input, input.screenMode).slice(
+      0,
+      MAX_HEADER_STRIP_METRICS,
+    );
   }
 
-  return buildOperationalAlertMetrics(input).slice(0, MAX_OPERATIONAL_ALERT_METRICS);
+  // Prefer the most actionable signals; drop sync unless stale so the strip stays readable.
+  const all = buildOperationalAlertMetrics(input);
+  const primary = all.filter((metric) => metric.id !== 'sync-status' || input.syncStale);
+  return primary.slice(0, MAX_HEADER_STRIP_METRICS);
 }

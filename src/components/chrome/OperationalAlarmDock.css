@@ -1,44 +1,211 @@
-.operational-alarm-dock {
+/**
+ * Header-anchored operational alarm notification.
+ * Chip sits in Header actions; panel drops below the top bar.
+ */
+
+.operational-alarm-dock--header {
+  position: relative;
+  /* Row, not column — column + panel was stretching the chip off the 36px bar.
+   * Reset padding: global [class$="-header"] once applied page-header 24px padding. */
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 0 0 auto;
+  height: var(--app-chrome-control-h, 36px);
+  min-height: var(--app-chrome-control-h, 36px);
+  max-height: var(--app-chrome-control-h, 36px);
+  max-width: none;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  box-sizing: border-box;
+  z-index: 50;
+}
+
+.emergency-app-shell {
+  --cdl-alarm-dock-estimate: 0px;
+}
+
+/* ── Header chip ── */
+.operational-alarm-dock__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: var(--app-chrome-control-h, 36px);
+  min-height: var(--app-chrome-control-h, 36px);
+  max-height: var(--app-chrome-control-h, 36px);
+  max-width: 100%;
+  padding: 0 10px 0 8px;
+  border: 1px solid color-mix(in srgb, var(--medical-border, #e2e8f0) 65%, transparent);
+  border-radius: var(--app-chrome-control-radius, 9px);
+  background: color-mix(in srgb, var(--medical-slate-50, #f8fafc) 40%, #ffffff);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  color: var(--medical-ink, #111827);
+  text-align: left;
+  box-sizing: border-box;
+  line-height: 1;
+}
+
+.operational-alarm-dock__chip:hover {
+  border-color: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 40%, var(--medical-border));
+  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 4%, #ffffff);
+}
+
+.operational-alarm-dock__chip:focus-visible {
+  outline: 2px solid var(--app-accent-interactive, #0ea5e9);
+  outline-offset: 2px;
+}
+
+.operational-alarm-dock--tier-critical .operational-alarm-dock__chip {
+  border-color: color-mix(in srgb, var(--status-critical, #ef4444) 45%, var(--medical-border));
+  background: color-mix(in srgb, var(--status-critical, #ef4444) 8%, var(--medical-white));
+}
+
+.operational-alarm-dock--tier-high .operational-alarm-dock__chip {
+  border-color: color-mix(in srgb, var(--status-warning, #f59e0b) 45%, var(--medical-border));
+  background: color-mix(in srgb, var(--status-warning, #f59e0b) 9%, var(--medical-white));
+}
+
+.operational-alarm-dock__chip-icon {
   flex-shrink: 0;
-  border-bottom: 1px solid var(--medical-border);
-  background: var(--medical-white);
+  color: var(--status-critical, #ef4444);
 }
 
-.emergency-app-shell:has(.operational-alarm-dock) {
-  --cdl-alarm-dock-estimate: 40px;
+.operational-alarm-dock--tier-high .operational-alarm-dock__chip-icon {
+  color: var(--status-warning, #f59e0b);
 }
 
-.operational-alarm-dock__strip {
+.operational-alarm-dock__chip-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--status-critical, #ef4444);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.operational-alarm-dock--tier-high .operational-alarm-dock__chip-count {
+  background: var(--status-warning, #f59e0b);
+  color: #1c1917;
+}
+
+.operational-alarm-dock__chip-text {
+  display: grid;
+  gap: 0;
+  min-width: 0;
+  flex: 1;
+}
+
+.operational-alarm-dock__chip-text strong {
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.operational-alarm-dock__chip-text span {
+  font-size: 10px;
+  color: var(--medical-ink-muted, #64748b);
+  line-height: 1.15;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 140px;
+}
+
+/* ── Dropdown window under header ── */
+.operational-alarm-dock__window {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  width: min(360px, calc(100vw - 24px));
+  max-height: min(42vh, 420px);
+  overflow: hidden;
+  border: 1px solid var(--medical-border, #e2e8f0);
+  border-radius: 12px;
+  background: var(--medical-white, #fff);
+  box-shadow:
+    0 12px 40px rgba(15, 23, 42, 0.16),
+    0 2px 8px rgba(15, 23, 42, 0.08);
+  z-index: 200;
+}
+
+.operational-alarm-dock__window-header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  min-height: 40px;
-  padding: 8px var(--cdl-header-padding-inline, 18px);
+  justify-content: space-between;
+  gap: 8px;
+  flex-shrink: 0;
+  padding: 8px 10px;
+  border-bottom: 1px solid color-mix(in srgb, var(--medical-border, #e2e8f0) 50%, transparent);
+  background: var(--medical-slate-50, #f8fafc);
 }
 
-.operational-alarm-dock__strip--critical {
+.operational-alarm-dock__window-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 750;
+  color: var(--medical-ink);
+}
+
+.operational-alarm-dock__window-header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.operational-alarm-dock__window-body {
+  overflow: auto;
+  overscroll-behavior: contain;
+  max-height: min(36vh, 360px);
+}
+
+.operational-alarm-dock__card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px 10px;
+  padding: 10px 12px;
+  border-left: 3px solid transparent;
+}
+
+.operational-alarm-dock__card--critical {
   background: color-mix(in srgb, var(--status-critical, #ef4444) 7%, var(--medical-white));
-  border-left: 3px solid var(--status-critical, #ef4444);
-  box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--status-critical, #ef4444) 14%, transparent);
+  border-left-color: var(--status-critical, #ef4444);
 }
 
-.operational-alarm-dock__strip--high {
+.operational-alarm-dock__card--high {
   background: color-mix(in srgb, var(--status-warning, #f59e0b) 8%, var(--medical-white));
-  border-left: 3px solid var(--status-warning, #f59e0b);
-  box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--status-warning, #f59e0b) 14%, transparent);
+  border-left-color: var(--status-warning, #f59e0b);
 }
 
-.operational-alarm-dock__strip--complete {
+.operational-alarm-dock__card--complete {
   background: color-mix(in srgb, var(--status-success, #22c55e) 8%, var(--medical-white));
   border-left-color: var(--status-success, #22c55e);
 }
 
 .operational-alarm-dock__icon {
   flex-shrink: 0;
+  grid-row: 1 / span 2;
   color: var(--status-critical, #ef4444);
+  margin-top: 2px;
 }
 
-.operational-alarm-dock__strip--high .operational-alarm-dock__icon {
+.operational-alarm-dock__card--high .operational-alarm-dock__icon {
   color: var(--status-warning, #f59e0b);
 }
 
@@ -46,13 +213,13 @@
   display: grid;
   gap: 2px;
   min-width: 0;
-  flex: 1;
+  grid-column: 2;
 }
 
 .operational-alarm-dock__copy strong {
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.25;
   color: var(--medical-ink);
 }
 
@@ -60,20 +227,23 @@
   font-size: 11px;
   line-height: 1.35;
   color: var(--medical-ink-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .operational-alarm-dock__actions {
   display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
+  flex-wrap: wrap;
   gap: 6px;
+  grid-column: 2;
 }
 
-.operational-alarm-dock__actions button {
-  min-height: 30px;
+.operational-alarm-dock__actions button,
+.operational-alarm-dock__checklist-actions button,
+.operational-alarm-dock__window-header-actions button {
+  min-height: 28px;
   padding: 0 10px;
   border: 1px solid var(--cdl-clinical-border, var(--medical-border));
   border-radius: 8px;
@@ -83,13 +253,12 @@
   font: inherit;
   font-size: 11px;
   font-weight: 700;
-  transition: background-color 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
 }
 
-.operational-alarm-dock__actions button:hover:not(:disabled) {
+.operational-alarm-dock__actions button:hover:not(:disabled),
+.operational-alarm-dock__checklist-actions button:hover:not(:disabled) {
   border-color: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 42%, var(--medical-border));
   background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 6%, var(--medical-white));
-  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.06);
 }
 
 .operational-alarm-dock__actions button:disabled {
@@ -98,16 +267,25 @@
 }
 
 .operational-alarm-dock__ghost {
-  background: transparent;
-  color: var(--medical-ink-muted);
+  background: transparent !important;
+  color: var(--medical-ink-muted) !important;
+  border-color: transparent !important;
+}
+
+.operational-alarm-dock__icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  min-height: 28px;
+  padding: 0 !important;
+  border-radius: 8px;
 }
 
 .operational-alarm-dock__checklist {
   display: grid;
   gap: 10px;
-  max-height: min(240px, 34dvh);
-  overflow: auto;
-  padding: 12px var(--cdl-header-padding-inline, 18px) 14px;
+  padding: 10px 12px 12px;
   border-top: 1px solid var(--medical-border);
   background: var(--medical-slate-50);
 }
@@ -116,13 +294,13 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
 }
 
 .operational-alarm-dock__checklist-eyebrow {
   display: block;
   margin-bottom: 4px;
-  color: var(--medical-accent-hover);
+  color: var(--medical-accent-hover, #0369a1);
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -131,13 +309,13 @@
 
 .operational-alarm-dock__checklist h2 {
   margin: 0;
-  font-size: 14px;
-  line-height: 1.2;
+  font-size: 13px;
+  line-height: 1.25;
 }
 
 .operational-alarm-dock__checklist p {
   margin: 4px 0 0;
-  font-size: 12px;
+  font-size: 11px;
   color: var(--medical-ink-muted);
 }
 
@@ -145,11 +323,11 @@
   display: grid;
   gap: 4px;
   justify-items: end;
-  min-width: 72px;
+  min-width: 64px;
 }
 
 .operational-alarm-dock__progress {
-  width: 72px;
+  width: 64px;
   height: 6px;
   overflow: hidden;
   border-radius: 999px;
@@ -160,7 +338,7 @@
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: var(--medical-accent);
+  background: var(--medical-accent, #0ea5e9);
 }
 
 .operational-alarm-dock__checklist-items {
@@ -173,24 +351,18 @@
   grid-template-columns: auto 1fr;
   gap: 8px;
   align-items: start;
-  padding: 8px 10px;
+  padding: 7px 9px;
   border: 1px solid var(--cdl-clinical-border, var(--medical-border));
   border-radius: 8px;
   background: var(--medical-white);
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 500;
   cursor: pointer;
-  transition: border-color 120ms ease, background-color 120ms ease;
-}
-
-.operational-alarm-dock__checklist-items label:hover {
-  border-color: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 32%, var(--medical-border));
-  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 4%, var(--medical-white));
 }
 
 .operational-alarm-dock__item--done {
-  border-color: color-mix(in srgb, var(--status-success) 40%, var(--medical-border));
-  background: color-mix(in srgb, var(--status-success) 6%, var(--medical-white));
+  border-color: color-mix(in srgb, var(--status-success, #22c55e) 40%, var(--medical-border));
+  background: color-mix(in srgb, var(--status-success, #22c55e) 6%, var(--medical-white));
 }
 
 .operational-alarm-dock__checklist-actions {
@@ -198,22 +370,29 @@
   gap: 8px;
 }
 
-.operational-alarm-dock__secondary {
-  border-top: 1px solid var(--medical-border);
+@media (max-width: 720px) {
+  .operational-alarm-dock--header {
+    max-width: none;
+  }
+
+  .operational-alarm-dock__chip-text {
+    display: none;
+  }
+
+  .operational-alarm-dock__chip {
+    padding: 0 8px;
+    gap: 5px;
+  }
+
+  .operational-alarm-dock__window {
+    right: -8px;
+    width: min(340px, calc(100vw - 16px));
+  }
 }
 
-@media (max-width: 768px) {
-  .operational-alarm-dock__strip {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .operational-alarm-dock__copy span {
-    white-space: normal;
-  }
-
-  .operational-alarm-dock__actions {
-    flex-wrap: wrap;
-    width: 100%;
+@media (prefers-reduced-motion: reduce) {
+  .operational-alarm-dock__chip,
+  .operational-alarm-dock__window {
+    transition: none;
   }
 }

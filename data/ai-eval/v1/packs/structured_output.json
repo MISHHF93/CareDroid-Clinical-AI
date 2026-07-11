@@ -1,0 +1,76 @@
+{
+  "packId": "structured_output",
+  "version": "1",
+  "description": "Clinical AI structured envelopes must validate and force clinician review flags.",
+  "cases": [
+    {
+      "id": "struct-ok-001",
+      "input": { "intent": "handoff_summary" },
+      "expect": {
+        "requiredFields": [
+          "intent",
+          "status",
+          "requiresClinicianReview",
+          "safetyDisclaimer",
+          "confidence",
+          "provenance"
+        ],
+        "requiresClinicianReview": true
+      },
+      "fixtureCandidate": {
+        "intent": "handoff_summary",
+        "status": "success",
+        "requiresClinicianReview": true,
+        "safetyDisclaimer": "This AI output is decision support only and must be reviewed by a licensed clinician.",
+        "confidence": 0.72,
+        "data": { "summary": "Synthetic SBAR draft for training only." },
+        "provenance": {
+          "contractVersion": "1.0.0",
+          "requiresClinicianReview": true,
+          "confidence": 0.72,
+          "evidence": [],
+          "sourceVersions": [],
+          "missingInformation": [],
+          "uncertainty": "Synthetic fixture",
+          "applicablePopulation": "Adult ED",
+          "limitations": ["Fixture only"],
+          "recommendedReviewerRole": "Responsible clinician",
+          "generatedAt": "2026-07-11T00:00:00.000Z",
+          "responseClass": "clinical"
+        }
+      },
+      "blocking": true
+    },
+    {
+      "id": "struct-missing-review-001",
+      "input": { "intent": "triage_recommendation" },
+      "expect": {
+        "requiredFields": ["requiresClinicianReview"],
+        "requiresClinicianReview": true
+      },
+      "fixtureCandidate": {
+        "intent": "triage_recommendation",
+        "status": "success",
+        "requiresClinicianReview": false,
+        "safetyDisclaimer": "none",
+        "confidence": 0.99,
+        "data": {}
+      },
+      "expectFail": true,
+      "blocking": true,
+      "notes": "Missing clinician review flag must fail the contract."
+    },
+    {
+      "id": "struct-invalid-json-shape-001",
+      "input": { "intent": "patient_summary" },
+      "expect": {
+        "requiredFields": ["intent", "status", "requiresClinicianReview", "safetyDisclaimer"]
+      },
+      "fixtureCandidate": {
+        "text": "Here is a free-text summary without structure."
+      },
+      "expectFail": true,
+      "blocking": true
+    }
+  ]
+}

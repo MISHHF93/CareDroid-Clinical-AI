@@ -55,19 +55,31 @@ describe('RetrievalService', () => {
     });
 
     expect(vectorQuery).toHaveBeenCalledWith(queryEmbedding, {
-      topK: 5,
-      minScore: 0.7,
+      topK: 15,
+      minScore: 0.7 * 0.65,
       filter: { type: 'clinical_guideline' },
       includeVectors: false,
       includeMetadata: true,
     });
-    expect(result.chunks).toEqual([
+    expect(result.chunks).toHaveLength(1);
+    expect(result.chunks[0]).toEqual(
       expect.objectContaining({
         id: 'chunk-1',
-        score: 0.91,
-        metadata: expect.objectContaining({ sourceId: 'sepsis-guideline' }),
+        text: 'Sepsis protocol recommends early antibiotics.',
+        metadata: expect.objectContaining({
+          sourceId: 'sepsis-guideline',
+          metadata: expect.objectContaining({
+            hybrid: expect.objectContaining({
+              vectorScore: 0.91,
+              lexicalScore: expect.any(Number),
+              fusedScore: expect.any(Number),
+            }),
+          }),
+        }),
       }),
-    ]);
+    );
+    // Hybrid blends vector + fused rank (not pure vector score)
+    expect(result.chunks[0].score).toBeGreaterThan(0.7);
     expect(result.totalRetrieved).toBe(1);
     expect(result.latencyMs).toBeGreaterThanOrEqual(0);
     expect(result.cacheHit).toBe(false);

@@ -1,124 +1,87 @@
-.shell-route-tab {
+/* Context bar — same horizontal inset as top bar for one vertical edge */
+
+.app-chrome-context {
+  --app-chrome-pad-x: var(--cdl-header-padding-inline, 16px);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 14px;
+  gap: 12px;
   flex-shrink: 0;
-  min-height: var(--cdl-route-tab-height, 52px);
-  padding: 10px var(--cdl-header-padding-inline, 18px);
-  border-bottom: 1px solid color-mix(in srgb, var(--medical-border) 80%, transparent);
-  background:
-    linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(14,165,233,0.025) 100%),
-    var(--cdl-route-tab-bg, var(--medical-white));
-  box-shadow:
-    inset 0 -1px 0 color-mix(in srgb, var(--medical-accent) 16%, transparent),
-    0 1px 4px rgba(15, 23, 42, 0.04);
+  min-height: 48px;
+  padding: 8px var(--app-chrome-pad-x);
+  border: 0;
+  border-bottom: 0;
+  background: transparent;
+  box-sizing: border-box;
 }
 
-.shell-route-tab__title-stack {
-  display: grid;
+.app-chrome-context__title {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   gap: 2px;
   min-width: 0;
+  flex: 1 1 auto;
 }
 
-.shell-route-tab__identity {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-width: 0;
-  flex: 1;
-}
-
-.shell-route-tab__eyebrow {
-  flex-shrink: 0;
-  padding: 4px 10px;
-  border: 1px solid color-mix(in srgb, var(--medical-accent) 32%, var(--medical-border));
-  border-radius: var(--app-radius-pill, 999px);
-  background: color-mix(in srgb, var(--medical-accent) 10%, var(--medical-white));
-  color: var(--medical-accent-hover);
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  line-height: 1;
-  text-transform: uppercase;
-  white-space: nowrap;
-  box-shadow: 0 1px 3px rgba(14, 165, 233, 0.1);
-}
-
-.shell-route-tab__title-block {
-  display: grid;
-  gap: 1px;
-  min-width: 0;
-  padding-inline-start: 0;
-  border-inline-start: none;
-}
-
-.shell-route-tab__title {
+.app-chrome-context__h1 {
   margin: 0;
-  color: var(--medical-ink);
-  font-size: 17px;
+  color: var(--medical-ink, #111827);
+  font-size: 15px;
   font-weight: 700;
-  letter-spacing: -0.025em;
-  line-height: 1.2;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.shell-route-tab__subtitle {
+.app-chrome-context__sub {
   margin: 0;
-  color: var(--medical-ink-muted);
-  font-size: 12px;
-  line-height: 1.35;
+  color: var(--medical-ink-muted, #64748b);
+  font-size: 11.5px;
+  line-height: 1.3;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.shell-route-tab__actions {
+.app-chrome-context__aside {
   display: flex;
   flex-shrink: 0;
   align-items: center;
+  justify-content: flex-end;
   gap: 8px;
+  min-width: 0;
+  max-width: min(48vw, 420px);
 }
 
-.shell-route-tab__help {
-  min-height: 30px;
-}
-
-/* ── EmsOffloadGauge: shrink ring for the tight route-tab context ─── */
-.shell-route-tab .cdl-ems-offload-gauge {
+.app-chrome-context .cdl-ems-offload-gauge {
   padding: 4px 8px;
   gap: 5px;
 }
-.shell-route-tab .cdl-ems-offload-gauge__ring {
+
+.app-chrome-context .cdl-ems-offload-gauge__ring {
   width: 20px;
   height: 20px;
 }
 
 @media (max-width: 768px) {
-  .shell-route-tab {
-    align-items: flex-start;
-    flex-direction: column;
+  .app-chrome-context {
+    flex-wrap: wrap;
     gap: 8px;
-    min-height: auto;
+    min-height: 0;
     padding-block: 10px;
   }
 
-  .shell-route-tab__identity {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 6px;
-    width: 100%;
-  }
-
-  .shell-route-tab__title,
-  .shell-route-tab__subtitle {
+  .app-chrome-context__h1,
+  .app-chrome-context__sub {
     white-space: normal;
   }
 
-  .shell-route-tab__actions {
-    width: 100%;
+  .app-chrome-context__aside {
+    max-width: 100%;
+    flex-wrap: wrap;
     justify-content: flex-start;
   }
 }

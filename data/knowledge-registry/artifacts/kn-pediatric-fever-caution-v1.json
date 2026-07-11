@@ -1,0 +1,40 @@
+{
+  "id": "kn-pediatric-fever-caution-v1",
+  "title": "Pediatric fever caution — CareDroid operational summary",
+  "publisher": "CareDroid Clinical Informatics",
+  "author": "CareDroid Clinical Informatics",
+  "published_at": "2026-07-11",
+  "retrieved_at": "2026-07-11",
+  "jurisdiction": "US-oriented_educational",
+  "version": "1",
+  "url_or_canonical_id": "data/medical-knowledge/pediatric-fever-caution.md",
+  "license": "CareDroid-internal-educational-summary",
+  "permitted_use": "internal_rag_demo_and_ops_only",
+  "content_hash": "96ca0455affcc7e7c2c8927abd65b2a58315adc2a5d8339133395fc5e34d5888",
+  "content_path": "data/medical-knowledge/pediatric-fever-caution.md",
+  "topic": "pediatric_fever_caution",
+  "specialty": "pediatrics",
+  "evidence_grade": "summary",
+  "review_status": "accepted_with_limitations",
+  "expires_at": "2027-07-11",
+  "source_type": "clinical_reference",
+  "rag_ingest_allowed": true,
+  "limitations": [
+    "Not a full AAP pathway; age-band specifics require local pediatric protocols.",
+    "No AI-invented weight-based dosing."
+  ],
+  "reject_reason": null,
+  "related_artifact_ids": [],
+  "provenance_chain": [
+    {
+      "step": "authored_internal_summary",
+      "actor": "CareDroid Clinical Informatics",
+      "at": "2026-07-11"
+    },
+    {
+      "step": "registry_acceptance",
+      "actor": "AI Assurance post-v1",
+      "at": "2026-07-11"
+    }
+  ]
+}

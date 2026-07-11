@@ -1,0 +1,50 @@
+{
+  "packId": "tool_selection",
+  "version": "1",
+  "description": "ED copilot tool routing — correct tool name for the user intent.",
+  "cases": [
+    {
+      "id": "tool-capacity-001",
+      "input": { "query": "What is current ED bed capacity and boarding load?" },
+      "expect": { "tool": "get_capacity_status" },
+      "fixtureCandidate": { "toolCalls": [{ "name": "get_capacity_status" }] },
+      "blocking": true
+    },
+    {
+      "id": "tool-queue-001",
+      "input": { "query": "How many patients are waiting in triage queue?" },
+      "expect": { "tool": "get_queue_status" },
+      "fixtureCandidate": { "toolCalls": [{ "name": "get_queue_status" }] },
+      "blocking": true
+    },
+    {
+      "id": "tool-search-001",
+      "input": { "query": "Find patient named Alex Rivera in the board search" },
+      "expect": { "tool": "search_patients" },
+      "fixtureCandidate": { "toolCalls": [{ "name": "search_patients" }] },
+      "blocking": true
+    },
+    {
+      "id": "tool-patient-001",
+      "input": { "query": "Open details for patientId p-100" },
+      "expect": { "tool": "get_patient_details" },
+      "fixtureCandidate": { "toolCalls": [{ "name": "get_patient_details" }] },
+      "blocking": true
+    },
+    {
+      "id": "tool-calc-001",
+      "input": { "query": "Launch HEART score calculator for this chest pain patient" },
+      "expect": { "tool": "launch_calculator" },
+      "fixtureCandidate": { "toolCalls": [{ "name": "launch_calculator" }] },
+      "blocking": true
+    },
+    {
+      "id": "tool-wrong-001",
+      "input": { "query": "What is current ED bed capacity?" },
+      "expect": { "tool": "get_capacity_status" },
+      "fixtureCandidate": { "toolCalls": [{ "name": "dispatch_alert" }] },
+      "expectFail": true,
+      "blocking": true
+    }
+  ]
+}

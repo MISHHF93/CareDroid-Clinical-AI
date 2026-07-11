@@ -179,27 +179,18 @@ export function Sidebar({ navigationItems }: SidebarProps) {
     [desktopPrimaryNav],
   );
   const desktopUtilityNav = useMemo(() => {
-    const utility = visibleNav.filter((item) => item.isEmergencyCore === false);
-    const withAccount = utility.some((item) => item.id === 'account')
-      ? utility
-      : [
-          ...utility,
-          {
-            id: 'account',
-            label: 'Account',
-            icon: 'account',
-            path: CANONICAL_ROUTES.profile,
-            route: CANONICAL_ROUTES.profile,
-            isEmergencyCore: false,
-          },
-        ];
+    // Account lives in the header UserAccountMenu (Profile overview), not the
+    // sidebar — drop any nav-config "account" item so it is not duplicated.
+    const utility = visibleNav.filter(
+      (item) => item.isEmergencyCore === false && item.id !== 'account',
+    );
     if (
       isAdminSaasRole(saasRole) &&
       isRouteAllowedForProfile(resolveUserProfileFromSaasRole(saasRole), CANONICAL_ROUTES.adminOperations) &&
-      !withAccount.some((item) => item.id === 'admin-console')
+      !utility.some((item) => item.id === 'admin-console')
     ) {
       return [
-        ...withAccount,
+        ...utility,
         {
           id: 'admin-console',
           label: 'Admin',
@@ -210,7 +201,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
         },
       ];
     }
-    return withAccount;
+    return utility;
   }, [saasRole, visibleNav]);
   const mobilePrimaryIds = useMemo(() => {
     if (isReceptionFirstUxEnabled()) {
@@ -230,7 +221,10 @@ export function Sidebar({ navigationItems }: SidebarProps) {
       .filter((item): item is SidebarNavItem => Boolean(item));
   }, [mobilePrimaryIds, visibleNav]);
   const moreNav = useMemo(() => {
-    return visibleNav.filter((item) => !mobilePrimaryIds.includes(item.id));
+    // Account chrome lives in the header UserAccountMenu, not mobile "More".
+    return visibleNav.filter(
+      (item) => !mobilePrimaryIds.includes(item.id) && item.id !== 'account',
+    );
   }, [mobilePrimaryIds, visibleNav]);
   const moreHasActiveItem = useMemo(
     () => moreNav.some((item) => isActiveRoute(location.pathname, item, location.search)),
@@ -286,6 +280,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
     const destination =
       item.id === 'reception' ? CANONICAL_ROUTES.emergencyReception : item.route || item.path;
 
+    // Sole conversational AI entry — opens docked CareDroid Copilot (not a second chrome strip).
     if (item.id === 'copilot') {
       if (!canUseCopilot && !navigationItems) return null;
       return (
@@ -300,19 +295,16 @@ export function Sidebar({ navigationItems }: SidebarProps) {
             .filter(Boolean)
             .join(' ')}
           onClick={openDockedCopilot}
-          aria-label={item.label}
+          aria-label={copilotChrome.shortName}
           {...((copilotOpen) ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
-          title={item.label}
+          title={canUseCopilot ? copilotChrome.openTitle : copilotChrome.unavailableTitle}
           data-nav-id={item.id}
           data-icon-key={item.icon}
+          data-ai-node="caredroid-copilot"
         >
-          {item.id === 'copilot' ? (
-            <GraphicIconBadge iconKey="ed-copilot" accent="brand" size="sm" className="sidebar-nav-item__graphic-badge" />
-          ) : (
-            <IconComponent size={16} stroke={2} className="sidebar-nav-item__icon" />
-          )}
-          <span className="sidebar-nav-item__label">{item.id === 'copilot' ? copilotChrome.shortName : item.label}</span>
-          <span className="sidebar-nav-item__tooltip">{item.id === 'copilot' ? copilotChrome.productName : item.label}</span>
+          <GraphicIconBadge iconKey="ed-copilot" accent="brand" size="sm" className="sidebar-nav-item__graphic-badge" />
+          <span className="sidebar-nav-item__label">{copilotChrome.shortName}</span>
+          <span className="sidebar-nav-item__tooltip">{copilotChrome.shortName}</span>
         </button>
       );
     }
@@ -404,14 +396,15 @@ export function Sidebar({ navigationItems }: SidebarProps) {
             setMoreOpen(false);
             openDockedCopilot();
           }}
-          aria-label={label}
+          aria-label={copilotChrome.shortName}
           {...((copilotOpen) ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
-          title={label}
+          title={canUseCopilot ? copilotChrome.openTitle : copilotChrome.unavailableTitle}
           data-nav-id={item.id}
           data-icon-key={item.icon}
+          data-ai-node="caredroid-copilot"
         >
-          <IconComponent size={20} stroke={2} className="sidebar-nav-item__icon" />
-          <label>{label}</label>
+          <GraphicIconBadge iconKey="ed-copilot" accent="brand" size="sm" className="sidebar-item__graphic-badge" />
+          <label>{copilotChrome.shortName}</label>
         </button>
       );
     }
@@ -504,7 +497,11 @@ export function Sidebar({ navigationItems }: SidebarProps) {
       </nav>
       <nav className="sidebar-mobile-nav" aria-label="Emergency mobile navigation">
         {mobilePrimaryNav.map(mobileNavLink)}
-        {canUseCopilot && !screenCapabilities.isRegistrationScreen && !mobilePrimaryIds.includes('copilot') ? (
+        {/* Only inject a mobile copilot control when nav list has no copilot item (avoid double entry). */}
+        {canUseCopilot &&
+        !screenCapabilities.isRegistrationScreen &&
+        !mobilePrimaryIds.includes('copilot') &&
+        !visibleNav.some((item) => item.id === 'copilot') ? (
         <button
           type="button"
           className={['sidebar-item', copilotOpen ? 'sidebar-item--active' : '']
@@ -513,8 +510,10 @@ export function Sidebar({ navigationItems }: SidebarProps) {
           onClick={toggleCopilot}
           disabled={!canUseCopilot}
           {...((copilotOpen) ? { 'aria-pressed': 'true' as const } : { 'aria-pressed': 'false' as const })}
-          aria-label={canUseCopilot ? copilotChrome.openAriaLabel : copilotChrome.unavailableAriaLabel}
+          aria-label={copilotChrome.shortName}
           title={canUseCopilot ? copilotChrome.openTitle : copilotChrome.unavailableTitle}
+          data-nav-id="copilot"
+          data-ai-node="caredroid-copilot"
         >
           <GraphicIconBadge iconKey="ed-copilot" accent="brand" size="sm" className="sidebar-item__graphic-badge" />
           <label>{copilotChrome.shortName}</label>

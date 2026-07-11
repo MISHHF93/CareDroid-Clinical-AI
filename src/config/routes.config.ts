@@ -1090,7 +1090,8 @@ export const CANONICAL_ROUTE_MAP = Object.freeze([
     id: 'copilot',
     path: CANONICAL_ROUTES.emergencyCopilot,
     label: 'Copilot',
-    description: 'Docked AI Chief navigation item.',
+    description:
+      'Sole conversational AI entry — opens the docked CareDroid Copilot (Unified AI node). Chat/Context/Safety live inside the panel.',
     pageComponent: 'CopilotRoute',
     requiredPermissions: [P.AI_READ],
     allowedRoles: [...CLINICAL_PROFILES, ...OPS_PROFILES, 'quality_safety_officer', 'demo_observer'],
@@ -1099,7 +1100,7 @@ export const CANONICAL_ROUTE_MAP = Object.freeze([
     icon: 'ed-copilot',
     aliases: [CANONICAL_ROUTES.aiChief, '/copilot', '/assistant', '/chat', '/ai'],
     readOnlyAllowed: true,
-    breadcrumbs: ['Intelligence', 'AI Chief'],
+    breadcrumbs: ['Intelligence', 'CareDroid Copilot'],
     helpTopicId: 'copilot',
     workflowOwner: 'Clinical leadership',
   }),

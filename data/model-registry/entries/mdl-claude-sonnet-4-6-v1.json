@@ -1,0 +1,51 @@
+{
+  "id": "mdl-claude-sonnet-4-6-v1",
+  "displayName": "Anthropic Claude Sonnet 4.6 (CareDroid default generation)",
+  "kind": "foundation_llm",
+  "status": "approved",
+  "purpose": "Conversational ED copilot / chat: summarize, explain, retrieve-grounded draft, classify intents with tools under human confirmation.",
+  "prohibitedUses": [
+    "Autonomous diagnosis or prescription",
+    "Suppressing critical alarms",
+    "Redirecting ambulances",
+    "Merging patient identities",
+    "Computing validated medical scores instead of deterministic calculators",
+    "Training or fine-tuning on production PHI without BAA and legal approval"
+  ],
+  "owner": "Clinical Informatics",
+  "reviewers": ["Clinical Informatics", "Security", "Emergency Operations"],
+  "trainingDataLineage": "Provider-managed foundation model (Anthropic). CareDroid does not fine-tune this model on production data. Prompt/tool configuration is CareDroid-owned.",
+  "benchmarkResults": {
+    "source": "qa/ai-eval/results/latest.json",
+    "suite": "caredroid-ai-eval-v1",
+    "note": "Offline safety suite is fixture-based; live LLM candidate scoring not yet required for CI.",
+    "offlineGate": "pass"
+  },
+  "regulatoryClass": "informational_cds",
+  "jurisdictions": ["deployment-tenant-default", "US-oriented_educational"],
+  "limitations": [
+    "Default AI_PROVIDER=anthropic; multi-provider adapters exist but tool/stream parity varies.",
+    "PHI minimize is pattern-based, not full de-identification.",
+    "Requires human review on all clinical outputs (provenance contract)."
+  ],
+  "deployment": {
+    "environments": ["dev", "sim", "canary", "prod"],
+    "featureFlag": "AI_PROVIDER=anthropic",
+    "canaryPercentDefault": 100,
+    "rollback": "Set AI_KILL_SWITCH=1 or AI_PROVIDER=local; see docs/ai/runbooks/ROLLBACK_AND_KILL_SWITCH.md",
+    "history": [
+      {
+        "at": "2026-07-11",
+        "event": "registry_seed",
+        "actor": "AI Assurance PR-10",
+        "note": "Documented as production-intended generation path."
+      }
+    ]
+  },
+  "expiresAt": "2027-07-11",
+  "retirementPlan": "Rotate to next approved model via registry entry + canary; never silent swap. Keep local adapter as deterministic degraded mode.",
+  "provider": "anthropic",
+  "modelIdentifier": "claude-sonnet-4-6",
+  "relatedServiceIds": ["copilot", "smartIntakeVerification", "referralSummarization"],
+  "relatedPaths": ["lib/ai/providers/anthropicAdapter.ts", "lib/ai/serverClient.ts", "lib/ai/providers/egress.ts"]
+}

@@ -84,6 +84,7 @@ import { EmergencyOsModule } from './modules/emergency-os/emergency-os.module';
 import { CollaborationHubModule } from './modules/collaboration-hub/collaboration-hub.module';
 import { NativeAiModule } from './modules/native-ai/native-ai.module';
 import { NluModule } from '../ml-services/nlu/nlu.module';
+import { SentinelModule } from './modules/sentinel/sentinel.module';
 
 // Monitoring & Observability
 import { LoggerModule } from './modules/common/logger.module';
@@ -232,6 +233,7 @@ function resolveDatabaseClient() {
     TenantContextModule,
     AutomationAuditModule,
     EmergencyOsModule,
+    SentinelModule,
     CollaborationHubModule,
     NativeAiModule,
     NluModule,

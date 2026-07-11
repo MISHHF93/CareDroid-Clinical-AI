@@ -13,6 +13,11 @@ import { RetrievalService } from './retrieval.service';
 import { RerankingService } from './reranking.service';
 import { ClinicalContextService } from './clinical-context.service';
 import { CitationService } from './citation.service';
+import {
+  enrichSourceWithRegistry,
+  findRegistryArtifactForSource,
+  loadKnowledgeRegistryArtifacts,
+} from './utils/knowledge-registry-enrichment';
 
 /**
  * RAG Service
@@ -110,6 +115,16 @@ export class RAGService implements OnModuleInit {
         includeEmbeddings,
         filter,
         corpusVersion: this.corpusVersion,
+        hybrid: options.hybrid !== false,
+        metadataFilter: {
+          specialty: options.specialty,
+          jurisdiction: options.jurisdiction,
+          evidenceGrade: options.evidenceGrade,
+          excludeExpired: options.excludeExpired !== false,
+          documentType: options.documentType,
+          documentTypes: options.documentTypes,
+          ragIngestAllowed: true,
+        },
       });
 
       const chunks = await this.rerankingService.rerank(
@@ -163,10 +178,18 @@ export class RAGService implements OnModuleInit {
       throw new Error('RAG is disabled. Ingestion is not available.');
     }
     try {
-      this.logger.log(`Ingesting document: ${dto.source.title}`);
+      // Enrich with knowledge-registry metadata (evidence grade, jurisdiction, expiry)
+      const registry = loadKnowledgeRegistryArtifacts();
+      const artifact = findRegistryArtifactForSource(dto.source, registry);
+      const enrichedSource = enrichSourceWithRegistry(dto.source, artifact);
+      const enrichedDto: IngestDocumentDto = { ...dto, source: enrichedSource };
+
+      this.logger.log(
+        `Ingesting document: ${enrichedSource.title}${artifact ? ` [registry ${artifact.id}]` : ''}`,
+      );
 
       // 1. Chunk the document
-      const chunks = this.documentChunker.chunkDocument(dto);
+      const chunks = this.documentChunker.chunkDocument(enrichedDto);
       this.logger.debug(`Split document into ${chunks.length} chunks`);
 
       if (chunks.length === 0) {
@@ -180,7 +203,7 @@ export class RAGService implements OnModuleInit {
 
       // 3. Create vector records
       const vectorRecords: VectorRecord[] = chunks.map((chunk, index) => ({
-        id: `${dto.source.id}_chunk_${chunk.chunkIndex}`,
+        id: `${enrichedSource.id}_chunk_${chunk.chunkIndex}`,
         vector: embeddings[index],
         text: chunk.text,
         metadata: chunk.metadata,
@@ -189,12 +212,14 @@ export class RAGService implements OnModuleInit {
       // 4. Upsert to vector database
       await this.vectorDb.upsertBatch(vectorRecords);
       this.invalidateRetrievalCache();
-      this.logger.log(`Successfully ingested ${chunks.length} chunks for: ${dto.source.title}`);
+      this.logger.log(
+        `Successfully ingested ${chunks.length} chunks for: ${enrichedSource.title}`,
+      );
 
       return {
         success: true,
         chunksIngested: chunks.length,
-        sourceId: dto.source.id,
+        sourceId: enrichedSource.id,
       };
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error));
@@ -262,7 +287,19 @@ export class RAGService implements OnModuleInit {
     if (options.specialty) {
       filter.specialty = options.specialty;
     }
+    if (options.jurisdiction) {
+      filter.jurisdiction = options.jurisdiction;
+    }
     return filter;
+  }
+
+  /**
+   * Ground a model answer against the last retrieved chunks (citation entailment).
+   */
+  groundAnswer(answerText: string, chunks: RAGContext['chunks'], stripUnsupported = true) {
+    return this.citationService.groundAnswer(answerText, chunks, {
+      stripUnsupported,
+    });
   }
 
   private invalidateRetrievalCache(): void {

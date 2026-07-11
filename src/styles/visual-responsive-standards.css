@@ -198,13 +198,17 @@
   gap: var(--app-visual-section-gap);
 }
 
+/* Page / section heroes only — do NOT match chrome controls like
+ * .operational-alarm-dock--header or .app-chrome (false positives on *-header). */
 :is(.app-shell, .emergency-app-shell) :is(
     .cd-page-header,
     .emergency-route-page__hero,
     [class$='-hero'],
     [class*='-hero '],
-    [class$='-header'],
-    [class*='-header ']
+    [class$='-page-header'],
+    [class*='-page-header '],
+    [class$='-command-header'],
+    [class*='-command-header ']
   ) {
   align-items: flex-start;
   gap: var(--app-visual-panel-gap);

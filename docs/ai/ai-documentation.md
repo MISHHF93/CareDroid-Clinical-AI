@@ -3,6 +3,8 @@
 **Generated:** 2026-06-28  
 **Source:** `backend/src/modules/ai*`, `backend/src/modules/medical-control-plane/`, `src/lib/ai/`, `src/data/clinicalIntentToolCatalog.ts`
 
+**Baseline (read first):** [AI Baseline Report v1](./AI_BASELINE_REPORT_v1.md) · [Capability Maturity Matrix v1](./AI_CAPABILITY_MATURITY_MATRIX_v1.md) · [Knowledge registry](./knowledge-registry/README.md) · [Eval harness](./AI_EVAL_HARNESS_v1.md) · [Provenance](./RESPONSE_PROVENANCE_CONTRACT_v1.md) · [Model registry](./MODEL_REGISTRY_v1.md) · **[Assurance report](./AI_ASSURANCE_ENGINEERING_REPORT_v1.md)**.
+
 ---
 
 ## Core Principle

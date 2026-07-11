@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'crypto';
+import { existsSync, readFileSync } from 'fs';
+import { join } from 'path';
 import {
   CreateEvaluationRunDto,
   EvaluationBenchmark,
@@ -99,6 +101,10 @@ const METRIC_DEFINITIONS: EvaluationMetricDefinition[] = [
   },
 ];
 
+/**
+ * Demo-only defaults. NEVER treat as measured production quality.
+ * Measured series come from `npm run ai:eval` → qa/ai-eval/results/.
+ */
 const DEFAULT_METRICS: EvaluationMetrics = {
   modelQuality: 0.912,
   hallucinationRate: 0.038,
@@ -115,7 +121,7 @@ const METRIC_IDS: EvaluationMetricId[] = METRIC_DEFINITIONS.map((metric) => metr
 
 @Injectable()
 export class EvaluationService {
-  private readonly runs: EvaluationRun[] = this.createSeedRuns();
+  private readonly runs: EvaluationRun[] = this.bootstrapRuns();
 
   getMetricDefinitions(): EvaluationMetricDefinition[] {
     return METRIC_DEFINITIONS.map((metric) => ({ ...metric }));
@@ -129,7 +135,12 @@ export class EvaluationService {
 
   getDashboard(): EvaluationDashboard {
     const runs = this.getRuns();
-    const aggregateMetrics = this.aggregateMetrics(runs);
+    const measuredRuns = runs.filter((run) => !run.seedOnly && run.status === 'completed');
+    const seedRuns = runs.filter((run) => run.seedOnly);
+    // Prefer measured offline/live runs for aggregates when present
+    const aggregateSource = measuredRuns.length ? measuredRuns : runs;
+    const aggregateMetrics = this.aggregateMetrics(aggregateSource);
+    const measuredSource = measuredRuns.find((run) => run.measuredSource)?.measuredSource;
 
     return {
       generatedAt: new Date().toISOString(),
@@ -139,6 +150,16 @@ export class EvaluationService {
       benchmarks: this.buildBenchmarks(aggregateMetrics),
       runs,
       comparisons: this.buildComparisons(runs),
+      honesty: {
+        aggregateIsSeedOnly: measuredRuns.length === 0,
+        measuredRunCount: measuredRuns.length,
+        seedRunCount: seedRuns.length,
+        measuredSource,
+        guidance:
+          measuredRuns.length > 0
+            ? 'Aggregates prefer measured runs (ai-eval harness). Seed runs remain listed for UI demos only.'
+            : 'Aggregates are SEED-ONLY demo values. Run `npm run ai:eval` and reload to attach measured offline results. Do not use for model promotion.',
+      },
     };
   }
 
@@ -413,6 +434,62 @@ export class EvaluationService {
     );
   }
 
+  private bootstrapRuns(): EvaluationRun[] {
+    const seeds = this.createSeedRuns();
+    const measured = this.loadMeasuredOfflineRun();
+    return measured ? [measured, ...seeds] : seeds;
+  }
+
+  /**
+   * Load latest offline harness dashboard run if present (repo root relative).
+   * Path: qa/ai-eval/results/dashboard-run.latest.json
+   */
+  private loadMeasuredOfflineRun(): EvaluationRun | null {
+    const candidates = [
+      join(process.cwd(), 'qa', 'ai-eval', 'results', 'dashboard-run.latest.json'),
+      join(process.cwd(), '..', 'qa', 'ai-eval', 'results', 'dashboard-run.latest.json'),
+      join(__dirname, '..', '..', '..', '..', 'qa', 'ai-eval', 'results', 'dashboard-run.latest.json'),
+    ];
+    for (const filePath of candidates) {
+      try {
+        if (!existsSync(filePath)) continue;
+        const raw = JSON.parse(readFileSync(filePath, 'utf8')) as Partial<EvaluationRun> & {
+          metrics?: Partial<EvaluationMetrics> & { userSatisfaction?: number | null };
+        };
+        if (!raw?.metrics || !raw.evaluatedAt) continue;
+        const metrics = this.normalizeMetrics({
+          ...raw.metrics,
+          // harness may emit null satisfaction
+          userSatisfaction:
+            raw.metrics.userSatisfaction === null || raw.metrics.userSatisfaction === undefined
+              ? 0
+              : raw.metrics.userSatisfaction,
+        });
+        return {
+          id: String(raw.id || randomUUID()),
+          modelName: String(raw.modelName || 'offline-fixture-harness'),
+          promptName: String(raw.promptName || 'n/a-fixture'),
+          agentName: String(raw.agentName || 'ai-eval-run-v1'),
+          ragStrategy: String(raw.ragStrategy || 'knowledge-registry-keyword-proxy'),
+          datasetName: String(raw.datasetName || 'caredroid-ai-eval-v1'),
+          status: raw.status === 'failed' ? 'failed' : 'completed',
+          sampleCount: Math.max(0, Math.round(Number(raw.sampleCount) || 0)),
+          metrics,
+          evaluatedAt: String(raw.evaluatedAt),
+          notes: String(
+            raw.notes ||
+              'Measured offline fixtures from npm run ai:eval — not seeded DEFAULT_METRICS',
+          ),
+          seedOnly: false,
+          measuredSource: 'qa/ai-eval/results/dashboard-run.latest.json',
+        };
+      } catch {
+        // try next path
+      }
+    }
+    return null;
+  }
+
   private createSeedRuns(): EvaluationRun[] {
     const now = Date.now();
     const day = 24 * 60 * 60 * 1000;
@@ -520,9 +597,11 @@ export class EvaluationService {
       id: `evaluation-run-${seeds.length - index}`,
       ...seed,
       metrics: this.normalizeMetrics(seed.metrics),
-      status: 'completed',
+      status: 'completed' as const,
       evaluatedAt: new Date(now - index * 7 * day).toISOString(),
-      notes: 'Seeded benchmark run for dashboard trend baselines.',
+      notes:
+        'SEED ONLY — demo trend data. Not measured. Use npm run ai:eval for authoritative offline safety metrics.',
+      seedOnly: true,
     }));
   }
 }

@@ -59,10 +59,10 @@ describe('ProfileRoleSwitcher', () => {
       </MemoryRouter>,
     );
 
-    const activeItem = screen.getByRole('menuitemradio', { name: /Provider rounds/i });
-    expect(activeItem).toHaveAttribute('aria-checked', 'true');
+    const activeItem = screen.getByRole('radio', { name: /Provider rounds/i });
+    expect(activeItem).toBeChecked();
 
-    await userEvent.click(screen.getByRole('menuitemradio', { name: /Reception desk/i }));
+    await userEvent.click(screen.getByRole('radio', { name: /Reception desk/i }));
     expect(switchDemoRole).toHaveBeenCalledWith('registration_clerk');
   });
 

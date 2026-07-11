@@ -1,0 +1,56 @@
+{
+  "id": "mdl-unified-ai-node-v1",
+  "displayName": "CareDroid Unified AI Node (NLU + artifact router)",
+  "kind": "local_classifier",
+  "status": "approved",
+  "purpose": "Local embedding (Xenova all-mpnet-base-v2) + MLP heads for clinical intent routing and artifact-type routing (ADR-0003).",
+  "prohibitedUses": [
+    "Clinical diagnosis",
+    "Sole source of triage disposition",
+    "Treating NLU accuracy metrics on tiny test sets as external validity"
+  ],
+  "owner": "Clinical Informatics / ML Platform",
+  "reviewers": ["Clinical Informatics", "Platform Engineering"],
+  "trainingDataLineage": "Local JSONL corpora under backend/ml-services/{nlu,artifact-router}/data; leak-free hard-example mining scripts. Frozen sentence embeddings; small classifier heads only.",
+  "benchmarkResults": {
+    "nlu": { "reportedAccuracy": 1.0, "testSetSize": 51, "caveat": "Small set; remeasure with larger held-out" },
+    "artifactRouter": { "reportedAccuracy": 0.947, "testSetSize": 282 },
+    "manifest": "backend/ml-services/models/manifest.json"
+  },
+  "regulatoryClass": "operational_support",
+  "jurisdictions": ["deployment-tenant-default"],
+  "limitations": [
+    "Not a foundation LLM.",
+    "NLU metrics.json may be missing on some worktrees until pipeline re-run.",
+    "Routing only — downstream tools/calculators remain authoritative for scores."
+  ],
+  "deployment": {
+    "environments": ["dev", "sim", "prod"],
+    "featureFlag": "NLU_SERVICE_ENABLED",
+    "canaryPercentDefault": 100,
+    "rollback": "Disable NLU_SERVICE_ENABLED or fall back to pattern/keyword routing; restore previous classifier.json from models/.",
+    "history": [
+      {
+        "at": "2026-07-05",
+        "event": "unified_node_accepted",
+        "actor": "ADR-0003",
+        "note": "NLU + artifact-router combined behind one manifest."
+      },
+      {
+        "at": "2026-07-11",
+        "event": "registry_seed",
+        "actor": "AI Assurance PR-10"
+      }
+    ]
+  },
+  "expiresAt": "2027-01-11",
+  "retirementPlan": "Retrain heads with larger held-out eval; promote via registry + offline gate; keep prior classifier artifacts for rollback.",
+  "provider": "local",
+  "modelIdentifier": "caredroid-unified-ai-node",
+  "relatedServiceIds": [],
+  "relatedPaths": [
+    "backend/ml-services/unified-ai-node/",
+    "backend/ml-services/models/manifest.json",
+    "docs/adr/0003-unified-ai-node.md"
+  ]
+}

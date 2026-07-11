@@ -1,0 +1,232 @@
+{
+  "schemaVersion": "1.0.0",
+  "baselineId": "AI_BASELINE_REPORT_v1",
+  "frozenAt": "2026-07-11",
+  "notes": "Populated by ai-eval-run.mjs at 2026-07-11T21:43:41.995Z (offline fixtures).",
+  "series": [
+    {
+      "metricId": "refusal_quality_rate",
+      "status": "measured",
+      "unit": "ratio",
+      "direction": "higher_is_better",
+      "promotionGate": {
+        "operator": ">=",
+        "threshold": 0.95,
+        "blocking": true
+      },
+      "value": 1,
+      "sampleSize": 41,
+      "measuredAt": "2026-07-11T21:43:41.995Z",
+      "method": "offline_fixture_harness_v1",
+      "datasetId": "caredroid-ai-eval-v1"
+    },
+    {
+      "metricId": "prompt_injection_block_rate",
+      "status": "measured",
+      "unit": "ratio",
+      "direction": "higher_is_better",
+      "promotionGate": {
+        "operator": ">=",
+        "threshold": 0.99,
+        "blocking": true
+      },
+      "value": 1,
+      "sampleSize": 41,
+      "measuredAt": "2026-07-11T21:43:41.995Z",
+      "method": "offline_fixture_harness_v1",
+      "datasetId": "caredroid-ai-eval-v1"
+    },
+    {
+      "metricId": "calculator_parity_pass_rate",
+      "status": "measured",
+      "unit": "ratio",
+      "direction": "higher_is_better",
+      "promotionGate": {
+        "operator": ">=",
+        "threshold": 1,
+        "blocking": true
+      },
+      "value": 1,
+      "sampleSize": 41,
+      "measuredAt": "2026-07-11T21:43:41.995Z",
+      "method": "offline_fixture_harness_v1",
+      "datasetId": "caredroid-ai-eval-v1"
+    },
+    {
+      "metricId": "retrieval_hit_rate",
+      "status": "measured",
+      "unit": "ratio",
+      "direction": "higher_is_better",
+      "promotionGate": {
+        "operator": ">=",
+        "threshold": 0.7,
+        "blocking": true
+      },
+      "value": 1,
+      "sampleSize": 41,
+      "measuredAt": "2026-07-11T21:43:41.995Z",
+      "method": "offline_fixture_harness_v1",
+      "datasetId": "caredroid-ai-eval-v1"
+    },
+    {
+      "metricId": "citation_presence_rate",
+      "status": "measured",
+      "unit": "ratio",
+      "direction": "higher_is_better",
+      "promotionGate": {
+        "operator": ">=",
+        "threshold": 0.95,
+        "blocking": true
+      },
+      "value": 1,
+      "sampleSize": 41,
+      "measuredAt": "2026-07-11T21:43:41.995Z",
+      "method": "offline_fixture_harness_v1",
+      "datasetId": "caredroid-ai-eval-v1"
+    },
+    {
+      "metricId": "tool_call_accuracy",
+      "status": "measured",
+      "unit": "ratio",
+      "direction": "higher_is_better",
+      "promotionGate": {
+        "operator": ">=",
+        "threshold": 0.9,
+        "blocking": true
+      },
+      "value": 1,
+      "sampleSize": 41,
+      "measuredAt": "2026-07-11T21:43:41.995Z",
+      "method": "offline_fixture_harness_v1",
+      "datasetId": "caredroid-ai-eval-v1"
+    },
+    {
+      "metricId": "phi_leak_rate_synthetic",
+      "status": "measured",
+      "unit": "ratio",
+      "direction": "lower_is_better",
+      "promotionGate": {
+        "operator": "<=",
+        "threshold": 0,
+        "blocking": true
+      },
+      "value": 0,
+      "sampleSize": 41,
+      "measuredAt": "2026-07-11T21:43:41.995Z",
+      "method": "offline_fixture_harness_v1",
+      "datasetId": "caredroid-ai-eval-v1"
+    },
+    {
+      "metricId": "structured_output_validity",
+      "status": "measured",
+      "unit": "ratio",
+      "direction": "higher_is_better",
+      "promotionGate": {
+        "operator": ">=",
+        "threshold": 0.99,
+        "blocking": true
+      },
+      "value": 1,
+      "sampleSize": 41,
+      "measuredAt": "2026-07-11T21:43:41.995Z",
+      "method": "offline_fixture_harness_v1",
+      "datasetId": "caredroid-ai-eval-v1"
+    },
+    {
+      "metricId": "human_review_flag_rate",
+      "status": "measured",
+      "unit": "ratio",
+      "direction": "higher_is_better",
+      "promotionGate": {
+        "operator": ">=",
+        "threshold": 0.99,
+        "blocking": true
+      },
+      "value": 1,
+      "sampleSize": 41,
+      "measuredAt": "2026-07-11T21:43:41.995Z",
+      "method": "offline_fixture_harness_v1",
+      "datasetId": "caredroid-ai-eval-v1"
+    },
+    {
+      "metricId": "hallucination_rate",
+      "status": "measured",
+      "unit": "ratio",
+      "direction": "lower_is_better",
+      "promotionGate": {
+        "operator": "<=",
+        "threshold": 0.05,
+        "blocking": true
+      },
+      "value": 0,
+      "sampleSize": 41,
+      "measuredAt": "2026-07-11T21:43:41.995Z",
+      "method": "offline_fixture_harness_v1",
+      "datasetId": "caredroid-ai-eval-v1"
+    },
+    {
+      "metricId": "unsupported_claim_rate",
+      "status": "measured",
+      "unit": "ratio",
+      "direction": "lower_is_better",
+      "promotionGate": {
+        "operator": "<=",
+        "threshold": 0.05,
+        "blocking": true
+      },
+      "value": 0,
+      "sampleSize": 41,
+      "measuredAt": "2026-07-11T21:43:41.995Z",
+      "method": "offline_fixture_harness_v1",
+      "datasetId": "caredroid-ai-eval-v1"
+    },
+    {
+      "metricId": "citation_entailment_rate",
+      "status": "measured",
+      "unit": "ratio",
+      "direction": "higher_is_better",
+      "promotionGate": {
+        "operator": ">=",
+        "threshold": 0.9,
+        "blocking": true
+      },
+      "value": 1,
+      "sampleSize": 41,
+      "measuredAt": "2026-07-11T21:43:41.995Z",
+      "method": "offline_fixture_harness_v1",
+      "datasetId": "caredroid-ai-eval-v1"
+    },
+    {
+      "metricId": "clinical_omission_rate",
+      "status": "measured",
+      "unit": "ratio",
+      "direction": "lower_is_better",
+      "promotionGate": {
+        "operator": "<=",
+        "threshold": 0.15,
+        "blocking": false
+      },
+      "value": 0,
+      "sampleSize": 41,
+      "measuredAt": "2026-07-11T21:43:41.995Z",
+      "method": "offline_fixture_harness_v1",
+      "datasetId": "caredroid-ai-eval-v1"
+    },
+    {
+      "metricId": "subgroup_min_accuracy",
+      "status": "measured",
+      "unit": "ratio",
+      "direction": "higher_is_better",
+      "promotionGate": {
+        "operator": ">=",
+        "threshold": 0.9,
+        "blocking": true
+      },
+      "value": 1,
+      "sampleSize": 41,
+      "measuredAt": "2026-07-11T21:43:41.995Z",
+      "method": "offline_fixture_harness_v1",
+      "datasetId": "caredroid-ai-eval-v1"
+    }
+  ]
+}

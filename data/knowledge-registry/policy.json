@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "1.0.0",
+  "updatedAt": "2026-07-11",
+  "description": "Ingest and acceptance policy for CareDroid knowledge registry. Enforced by scripts/validate-knowledge-registry.mjs.",
+  "allowedLicenses": [
+    "CareDroid-internal-educational-summary",
+    "CC0-1.0",
+    "CC-BY-4.0",
+    "CC-BY-SA-4.0",
+    "ODbL-1.0",
+    "public-domain",
+    "HL7-FHIR-license-as-published",
+    "NEMSIS-public-spec",
+    "US-government-work",
+    "citation-metadata-only"
+  ],
+  "ragIngestRequires": {
+    "review_status": ["accepted", "accepted_with_limitations"],
+    "rag_ingest_allowed": true,
+    "content_hash_match": true,
+    "license_in_allowlist": true,
+    "not_expired": true
+  },
+  "maxAgeYearsForGradeAPrimary": 10,
+  "urlDomainDenylist": [
+    "facebook.com",
+    "twitter.com",
+    "x.com",
+    "reddit.com",
+    "quora.com",
+    "medium.com",
+    "tiktok.com",
+    "pinterest.com",
+    "yahoo.com/answers"
+  ],
+  "promotionalDomainHints": [
+    "buy",
+    "shop",
+    "coupon",
+    "affiliate",
+    "sponsored"
+  ],
+  "rejectCriteria": [
+    "missing_license",
+    "license_not_allowed",
+    "content_hash_mismatch",
+    "duplicate_content_hash",
+    "expired_without_revalidation",
+    "community_forum_as_clinical_evidence",
+    "promotional_or_unverifiable",
+    "copyrighted_full_text_without_permission",
+    "contradicts_accepted_higher_grade_source",
+    "jurisdiction_unlabeled_for_protocol"
+  ],
+  "seedNote": "v1 seeds are CareDroid-authored educational digests for ops/RAG demo — not substitutes for full AHA/SSC/ILCOR primary texts. Do not present as universal institutional protocol."
+}

@@ -1,0 +1,15 @@
+{
+  "generatedAt": "2026-07-11T20:25:43.259Z",
+  "filesScanned": 563,
+  "total": 1192,
+  "byClass": {
+    "LIVE": 1189,
+    "DISABLED_REASONED": 1,
+    "NEEDS_REVIEW": 2
+  },
+  "brokenCount": 0,
+  "edBrokenCount": 0,
+  "edBroken": [],
+  "brokenSample": [],
+  "note": "Static classification is conservative. LIVE means a handler binding was found, not that runtime succeeds. Playwright interaction-execution suite validates observable outcomes."
+}

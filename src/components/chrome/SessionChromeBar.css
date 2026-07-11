@@ -6,8 +6,9 @@
   gap: var(--ed-space-2, 8px);
   min-height: var(--ed-chrome-height, 36px);
   padding: var(--ed-space-1, 4px) var(--ed-space-3, 12px);
-  border-bottom: 1px solid var(--ed-border-subtle);
-  background: color-mix(in srgb, var(--ed-surface-raised) 92%, var(--ed-surface-base));
+  border-bottom: 0;
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--ed-border-subtle, #e2e8f0) 55%, transparent);
+  background: color-mix(in srgb, var(--ed-surface-raised) 96%, var(--ed-surface-base));
   color: var(--ed-text-secondary);
   font-size: var(--ed-type-body, 12px);
 }
@@ -51,9 +52,9 @@
   align-items: center;
   gap: 6px;
   max-width: 100%;
-  border: 1px solid var(--ed-border-subtle);
+  border: 1px solid transparent;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--ed-surface-overlay) 55%, transparent);
+  background: color-mix(in srgb, var(--ed-surface-overlay) 70%, transparent);
   line-height: 1.2;
   padding: 4px 8px;
   white-space: nowrap;
@@ -87,7 +88,7 @@ button.session-chrome-bar__segment:focus-visible {
 }
 
 .session-chrome-bar--with-copilot {
-  border-bottom-color: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 18%, var(--ed-border-subtle));
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 16%, transparent);
 }
 
 .session-chrome-bar__segment strong {
@@ -123,7 +124,7 @@ button.session-chrome-bar__segment:focus-visible {
 }
 
 .session-chrome-bar__pill {
-  border: 1px solid var(--ed-border-subtle);
+  border: 1px solid transparent;
   border-radius: 999px;
   background: color-mix(in srgb, var(--app-accent-interactive, var(--status-info, #0ea5e9)) 12%, var(--ed-surface-overlay));
   color: var(--ed-text-primary);

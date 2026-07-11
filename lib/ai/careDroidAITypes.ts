@@ -1,3 +1,5 @@
+import type { AiResponseProvenance } from './provenanceContract';
+
 export const CARE_DROID_AI_INTENTS = [
   'critical_alert_assessment',
   'three_minute_response_plan',
@@ -74,6 +76,11 @@ export interface CareDroidAIResponse<
   escalationRole?: string;
   /** Suggested owner role for this recommendation. */
   suggestedOwnerRole?: string;
+  /**
+   * PR-6 provenance contract — evidence, confidence, missing info, uncertainty,
+   * population limits, and mandated clinician review.
+   */
+  provenance: AiResponseProvenance;
 }
 
 export interface CareDroidAIValidationIssue {

@@ -6,13 +6,14 @@
 :root {
   --cdl-header-height: 52px;
   --cdl-header-padding-block: 8px;
-  --cdl-header-padding-inline: var(--app-layout-page-gutter-inline, 18px);
-  --cdl-route-tab-height: 52px;
+  /* Match page gutter so header, route tab, and content share one vertical edge */
+  --cdl-header-padding-inline: var(--app-layout-page-gutter-inline, 16px);
+  --cdl-route-tab-height: 48px;
   --cdl-route-tab-bg: var(--medical-white);
   --cdl-chrome-stack-height: calc(
     var(--cdl-header-height) + var(--cdl-route-tab-height) + var(--cdl-alarm-dock-estimate, 0px)
   );
-  --cdl-header-shadow: 0 1px 0 rgba(15, 23, 42, 0.05);
+  --cdl-header-shadow: 0 1px 0 color-mix(in srgb, var(--medical-border, #e2e8f0) 48%, transparent);
 }
 
 /* —— Utility chrome (clock · status · create · search · account) —— */
@@ -21,7 +22,7 @@
   min-height: var(--cdl-header-height);
   grid-template-rows: minmax(var(--cdl-header-height), auto);
   background: var(--medical-white);
-  border-bottom: 1px solid color-mix(in srgb, var(--medical-border) 92%, transparent);
+  border-bottom: 0;
   box-shadow: var(--cdl-header-shadow);
 }
 

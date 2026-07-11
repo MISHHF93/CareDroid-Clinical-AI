@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://caredroid.local/schemas/ai-baseline-metrics-v1.json",
+  "title": "CareDroid AI Baseline Metrics v1",
+  "description": "Locked metric definitions for measured (not seeded) AI evaluation series. Seeded EvaluationService DEFAULT_METRICS must not be copied here as measured values.",
+  "type": "object",
+  "required": ["schemaVersion", "baselineId", "frozenAt", "series"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "baselineId": { "const": "AI_BASELINE_REPORT_v1" },
+    "frozenAt": { "type": "string", "format": "date" },
+    "notes": { "type": "string" },
+    "series": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/metricSeries" }
+    }
+  },
+  "$defs": {
+    "metricSeries": {
+      "type": "object",
+      "required": ["metricId", "status", "unit", "direction", "promotionGate"],
+      "additionalProperties": false,
+      "properties": {
+        "metricId": {
+          "type": "string",
+          "enum": [
+            "latency_p50_ms",
+            "latency_p95_ms",
+            "token_cost_usd_per_1k_requests",
+            "retrieval_hit_rate",
+            "retrieval_precision_at_k",
+            "citation_presence_rate",
+            "citation_entailment_rate",
+            "hallucination_rate",
+            "unsupported_claim_rate",
+            "clinical_omission_rate",
+            "tool_call_accuracy",
+            "structured_output_validity",
+            "calculator_parity_pass_rate",
+            "refusal_quality_rate",
+            "prompt_injection_block_rate",
+            "phi_leak_rate_synthetic",
+            "human_review_flag_rate",
+            "nlu_intent_accuracy_held_out",
+            "artifact_router_accuracy_held_out",
+            "subgroup_min_accuracy"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": ["not_measured", "measured", "seed_only_do_not_use"]
+        },
+        "unit": { "type": "string" },
+        "direction": {
+          "type": "string",
+          "enum": ["lower_is_better", "higher_is_better"]
+        },
+        "promotionGate": {
+          "type": "object",
+          "required": ["operator", "threshold", "blocking"],
+          "properties": {
+            "operator": { "enum": [">=", "<=", ">", "<"] },
+            "threshold": { "type": "number" },
+            "blocking": { "type": "boolean" }
+          }
+        },
+        "value": { "type": ["number", "null"] },
+        "sampleSize": { "type": ["integer", "null"], "minimum": 0 },
+        "measuredAt": { "type": ["string", "null"], "format": "date-time" },
+        "method": { "type": "string" },
+        "datasetId": { "type": ["string", "null"] },
+        "notes": { "type": "string" }
+      }
+    }
+  }
+}

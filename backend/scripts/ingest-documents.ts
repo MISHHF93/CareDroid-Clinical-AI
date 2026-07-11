@@ -2,18 +2,26 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from '../src/app.module';
 import { RAGService } from '../src/modules/rag/rag.service';
 import { IngestDocumentDto, MedicalSource } from '../src/modules/rag/dto/medical-source.dto';
+import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
 
 /**
  * Ingestion Script
- * 
+ *
  * Script to ingest medical documents into the RAG system.
- * 
+ *
+ * Knowledge registry gate (PR-2):
+ *   By default, each file must match an accepted artifact in
+ *   data/knowledge-registry/ (hash + rag_ingest_allowed).
+ *   Skip only for local experiments: KNOWLEDGE_REGISTRY_GATE=0
+ *   Preflight: npm run verify:knowledge-registry
+ *              npm run gate:knowledge-registry -- --directory data/medical-knowledge
+ *
  * Usage:
  *   npm run ingest -- --file path/to/document.txt --type protocol
  *   npm run ingest -- --directory path/to/documents/
- * 
+ *
  * Supported document types:
  * - protocol: Clinical protocols (ACLS, ATLS, etc.)
  * - guideline: Clinical practice guidelines
@@ -69,16 +77,25 @@ async function bootstrap() {
       try {
         console.log(`\n📄 Processing: ${path.basename(filePath)}`);
 
-        // Read file content
-        const content = fs.readFileSync(filePath, 'utf-8');
+        // Read file bytes (hash must match registry content_hash over raw bytes)
+        const fileBytes = fs.readFileSync(filePath);
+        const content = fileBytes.toString('utf-8');
+
+        const gate = assertKnowledgeRegistryAllowsIngest(filePath, fileBytes);
+        if (!gate.ok) {
+          throw new Error(gate.reason);
+        }
+        if (gate.artifactId) {
+          console.log(`   🔐 Registry gate: ${gate.artifactId} (${gate.reviewStatus})`);
+        }
 
         // Create medical source metadata
         const source: MedicalSource = {
-          id: generateSourceId(filePath),
+          id: gate.artifactId || generateSourceId(filePath),
           title: extractTitle(filePath, content),
           type: options.type || detectDocumentType(filePath, content),
-          organization: options.organization,
-          specialty: options.specialty,
+          organization: options.organization || gate.publisher,
+          specialty: options.specialty || gate.specialty,
           date: new Date().toISOString().split('T')[0],
         };
 
@@ -128,6 +145,114 @@ async function bootstrap() {
   } finally {
     await app.close();
   }
+}
+
+type KnowledgeRegistryGateResult =
+  | {
+      ok: true;
+      artifactId?: string;
+      reviewStatus?: string;
+      publisher?: string;
+      specialty?: string;
+    }
+  | { ok: false; reason: string };
+
+/**
+ * Enforce data/knowledge-registry acceptance before RAG ingest.
+ * Set KNOWLEDGE_REGISTRY_GATE=0 to bypass (local experiments only).
+ */
+function assertKnowledgeRegistryAllowsIngest(
+  filePath: string,
+  fileBytes: Buffer,
+): KnowledgeRegistryGateResult {
+  if (process.env.KNOWLEDGE_REGISTRY_GATE === '0') {
+    console.warn('   ⚠️  KNOWLEDGE_REGISTRY_GATE=0 — registry gate bypassed');
+    return { ok: true };
+  }
+
+  const repoRoot = path.resolve(__dirname, '../..');
+  const artifactsDir = path.join(repoRoot, 'data', 'knowledge-registry', 'artifacts');
+  if (!fs.existsSync(artifactsDir)) {
+    return {
+      ok: false,
+      reason:
+        'Knowledge registry missing (data/knowledge-registry/artifacts). Register the source or set KNOWLEDGE_REGISTRY_GATE=0 for local experiments only.',
+    };
+  }
+
+  const hash = crypto.createHash('sha256').update(fileBytes).digest('hex');
+  const rel = path
+    .relative(repoRoot, path.resolve(filePath))
+    .split(path.sep)
+    .join('/');
+
+  const files = fs.readdirSync(artifactsDir).filter((n) => n.endsWith('.json'));
+  type ArtifactRow = {
+    id?: string;
+    content_hash?: string;
+    content_path?: string;
+    rag_ingest_allowed?: boolean;
+    review_status?: string;
+    publisher?: string;
+    specialty?: string;
+    expires_at?: string | null;
+  };
+
+  let match: ArtifactRow | undefined;
+  for (const name of files) {
+    const row = JSON.parse(
+      fs.readFileSync(path.join(artifactsDir, name), 'utf8'),
+    ) as ArtifactRow;
+    if (row.content_hash === hash || row.content_path === rel) {
+      match = row;
+      break;
+    }
+  }
+
+  if (!match) {
+    return {
+      ok: false,
+      reason: `No knowledge-registry artifact for ${rel} (hash ${hash.slice(0, 12)}…). Run npm run verify:knowledge-registry and register the file first.`,
+    };
+  }
+  if (match.content_hash && match.content_hash !== hash) {
+    return {
+      ok: false,
+      reason: `Registry hash mismatch for ${match.id}: re-hash content or update artifact.`,
+    };
+  }
+  if (match.rag_ingest_allowed !== true) {
+    return {
+      ok: false,
+      reason: `Artifact ${match.id} has rag_ingest_allowed=false`,
+    };
+  }
+  if (
+    match.review_status !== 'accepted' &&
+    match.review_status !== 'accepted_with_limitations'
+  ) {
+    return {
+      ok: false,
+      reason: `Artifact ${match.id} review_status=${match.review_status} (need accepted*)`,
+    };
+  }
+  if (match.expires_at) {
+    const exp = new Date(match.expires_at);
+    if (!Number.isNaN(exp.getTime()) && exp.getTime() < Date.now()) {
+      return {
+        ok: false,
+        reason: `Artifact ${match.id} expired at ${match.expires_at}`,
+      };
+    }
+  }
+
+  return {
+    ok: true,
+    artifactId: match.id,
+    reviewStatus: match.review_status,
+    publisher: match.publisher,
+    specialty: match.specialty,
+  };
 }
 
 /**

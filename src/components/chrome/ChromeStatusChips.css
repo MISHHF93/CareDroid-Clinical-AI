@@ -1,0 +1,5 @@
+/* Layout-only; visual alarm styles live in styles/alarm-system.css */
+
+.chrome-status-chips.alarm-kpi-rail {
+  /* inherits flex rail */
+}

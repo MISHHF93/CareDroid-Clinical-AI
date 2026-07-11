@@ -43,6 +43,7 @@ import { ExecuteToolDto, ToolExecutionResponseDto, ToolListDto } from './dto/too
 import { ToolResult } from './entities/tool-result.entity';
 import {
   classifyToolExecutionError,
+  describeToolCapability,
   getExecutorCatalogSnapshot,
   normalizeExecutorParameters,
   resolveExecutorToolId,
@@ -51,6 +52,7 @@ import {
   validateExecutorRequestPayload,
 } from './tool-orchestrator.registry';
 import { PlatformGovernanceService } from '../../platform-governance';
+import { recordAiMonitorEvent } from '../../../../../lib/ai/productionMonitoring';
 
 interface ToolRegistry {
   [toolId: string]: ClinicalToolService;
@@ -312,6 +314,11 @@ export class ToolOrchestratorService {
     const resolved = resolveExecutorToolId(requestedToolId);
     if (!resolved) {
       const errorCode = classifyToolExecutionError(requestedToolId);
+      recordAiMonitorEvent('unsupported_tool', {
+        toolId: requestedToolId,
+        errorCode,
+        source: 'tool-orchestrator',
+      });
       await this.auditService.log({
         userId: dto.userId,
         action: AuditAction.SECURITY_EVENT,
@@ -326,18 +333,16 @@ export class ToolOrchestratorService {
         },
       });
 
+      const capability = describeToolCapability(requestedToolId);
       return this.buildExecutionErrorResponse({
         requestedToolId,
         toolName: requestedToolId,
-        errors: [
-          errorCode === ToolExecutionErrorCode.UNSUPPORTED_TOOL
-            ? `Tool is not available for server execution: ${requestedToolId}`
-            : `Tool not found: ${requestedToolId}`,
-        ],
+        errors: [capability.message],
         errorCode,
         startTime,
         auditStatus: 'skipped',
         userId: dto.userId,
+        honesty: capability,
       });
     }
 
@@ -518,7 +523,9 @@ export class ToolOrchestratorService {
     startTime: number;
     auditStatus: string;
     userId?: string;
+    honesty?: ReturnType<typeof describeToolCapability>;
   }): ToolExecutionResponseDto {
+    const honesty = args.honesty || describeToolCapability(args.requestedToolId);
     return {
       toolId: args.resolvedToolId ?? args.requestedToolId,
       requestedToolId: args.requestedToolId,
@@ -528,8 +535,15 @@ export class ToolOrchestratorService {
       errorCode: args.errorCode,
       result: {
         success: false,
-        data: {},
+        data: {
+          honesty,
+          executable: false,
+          doNotTreatAsSuccess: true,
+          requiresClinicianReview: true,
+        },
         errors: args.errors,
+        disclaimer:
+          'This tool did not execute on the server. Do not treat chat routing or NLU suggestions as completed clinical calculations.',
         timestamp: new Date(),
       },
       executionTimeMs: Date.now() - args.startTime,
@@ -573,7 +587,14 @@ export class ToolOrchestratorService {
   private formatToolResultForChat(response: ToolExecutionResponseDto): string {
     if (!response.success) {
       const errors = response.result.errors?.join(', ') || 'Unknown error';
-      return `❌ **${response.toolName} Error**\n\n${errors}`;
+      const honesty = (response.result.data as any)?.honesty;
+      const surface = honesty?.suggestedSurface
+        ? `\n\n_Suggested surface: **${honesty.suggestedSurface}** (not server execute)._`
+        : '';
+      const disclaimer = response.result.disclaimer
+        ? `\n\n_${response.result.disclaimer}_`
+        : '';
+      return `❌ **${response.toolName} — not executed**\n\n${errors}${surface}${disclaimer}`;
     }
 
     let output = `✅ **${response.toolName}**\n\n`;

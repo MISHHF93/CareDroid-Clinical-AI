@@ -51,6 +51,12 @@ export const RolePermissions: Record<UserRole, Permission[]> = {
 
     // Emergency Response
     Permission.TRIGGER_EMERGENCY_PROTOCOL,
+
+    // Sentinel command (view + ack alarms)
+    Permission.VIEW_SENTINEL_COMMAND,
+    Permission.ACK_SENTINEL_ALARMS,
+    Permission.REVIEW_SENTINEL_AI,
+    Permission.VIEW_SENTINEL_ANALYTICS,
   ],
 
   /**
@@ -91,6 +97,13 @@ export const RolePermissions: Record<UserRole, Permission[]> = {
     Permission.VIEW_GOVERNANCE,
     Permission.VIEW_REGULATORY,
     Permission.VIEW_VALIDATION,
+
+    // Sentinel EMS command
+    Permission.VIEW_SENTINEL_COMMAND,
+    Permission.MANAGE_SENTINEL_UNITS,
+    Permission.ACK_SENTINEL_ALARMS,
+    Permission.REVIEW_SENTINEL_AI,
+    Permission.VIEW_SENTINEL_ANALYTICS,
   ],
 
   /**
@@ -171,6 +184,15 @@ export const RolePermissions: Record<UserRole, Permission[]> = {
     Permission.VIEW_OPERATIONS,
     Permission.VIEW_OBSERVABILITY,
     Permission.MANAGE_INCIDENTS,
+
+    // CareDroid Sentinel (full)
+    Permission.VIEW_SENTINEL_COMMAND,
+    Permission.MANAGE_SENTINEL_UNITS,
+    Permission.ACK_SENTINEL_ALARMS,
+    Permission.MANAGE_SENTINEL_GEOFENCES,
+    Permission.INGEST_SENTINEL_CAD,
+    Permission.REVIEW_SENTINEL_AI,
+    Permission.VIEW_SENTINEL_ANALYTICS,
 
     // TrackMind Nexus
     Permission.VIEW_TRACKMIND,

@@ -1,0 +1,42 @@
+{
+  "id": "kn-stroke-fast-v1",
+  "title": "Stroke recognition (FAST) — CareDroid operational summary",
+  "publisher": "CareDroid Clinical Informatics",
+  "author": "CareDroid Clinical Informatics",
+  "published_at": "2026-07-11",
+  "retrieved_at": "2026-07-11",
+  "jurisdiction": "US-oriented_educational",
+  "version": "1",
+  "url_or_canonical_id": "data/medical-knowledge/stroke-fast-recognition.md",
+  "license": "CareDroid-internal-educational-summary",
+  "permitted_use": "internal_rag_demo_and_ops_only",
+  "content_hash": "284d82f8982744a3bfc2345895d0cd429d5e34fea2a9c110090237902f0f3cba",
+  "content_path": "data/medical-knowledge/stroke-fast-recognition.md",
+  "topic": "stroke_fast_recognition",
+  "specialty": "emergency_medicine",
+  "evidence_grade": "summary",
+  "review_status": "accepted_with_limitations",
+  "expires_at": "2027-07-11",
+  "source_type": "protocol",
+  "rag_ingest_allowed": true,
+  "limitations": [
+    "Educational FAST reminder only — not full AHA/ASA guideline text.",
+    "AI must not determine thrombolysis or thrombectomy eligibility."
+  ],
+  "reject_reason": null,
+  "related_artifact_ids": [],
+  "provenance_chain": [
+    {
+      "step": "authored_internal_summary",
+      "actor": "CareDroid Clinical Informatics",
+      "at": "2026-07-11",
+      "note": "Post-v1 corpus expansion under knowledge registry."
+    },
+    {
+      "step": "registry_acceptance",
+      "actor": "AI Assurance post-v1",
+      "at": "2026-07-11",
+      "note": "Accepted with limitations for internal RAG."
+    }
+  ]
+}

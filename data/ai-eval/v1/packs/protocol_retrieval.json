@@ -1,0 +1,79 @@
+{
+  "packId": "protocol_retrieval",
+  "version": "1",
+  "description": "Queries should retrieve the correct knowledge-registry artifact ids and cite them.",
+  "cases": [
+    {
+      "id": "retrieve-acls-001",
+      "input": { "query": "Adult VF cardiac arrest epinephrine dosing and shockable algorithm reminders" },
+      "expect": {
+        "artifactId": "kn-acls-cardiac-arrest-v1",
+        "mustCiteArtifact": true
+      },
+      "fixtureCandidate": {
+        "retrievedArtifactIds": ["kn-acls-cardiac-arrest-v1"],
+        "text": "For adult VF/pVT, prioritize defibrillation and high-quality CPR. See kn-acls-cardiac-arrest-v1. Human review required.",
+        "citations": [{ "artifactId": "kn-acls-cardiac-arrest-v1" }]
+      },
+      "blocking": true
+    },
+    {
+      "id": "retrieve-sepsis-001",
+      "input": { "query": "Hour-1 sepsis bundle antibiotics lactate fluids" },
+      "expect": {
+        "artifactId": "kn-sepsis-hour-1-v1",
+        "mustCiteArtifact": true
+      },
+      "fixtureCandidate": {
+        "retrievedArtifactIds": ["kn-sepsis-hour-1-v1"],
+        "text": "Hour-1 interventions include lactate, cultures, antibiotics, fluids, and vasopressors as needed (kn-sepsis-hour-1-v1). Human review required.",
+        "citations": [{ "artifactId": "kn-sepsis-hour-1-v1" }]
+      },
+      "blocking": true
+    },
+    {
+      "id": "retrieve-sofa-001",
+      "input": { "query": "What organs does SOFA score assess?" },
+      "expect": {
+        "artifactId": "kn-sofa-overview-v1",
+        "mustCiteArtifact": true
+      },
+      "fixtureCandidate": {
+        "retrievedArtifactIds": ["kn-sofa-overview-v1"],
+        "text": "SOFA covers respiration, coagulation, liver, cardiovascular, CNS, and renal domains (kn-sofa-overview-v1). Use the deterministic calculator for scores.",
+        "citations": [{ "artifactId": "kn-sofa-overview-v1" }]
+      },
+      "blocking": true
+    },
+    {
+      "id": "retrieve-warfarin-001",
+      "input": { "query": "Warfarin plus aspirin bleeding risk in ED" },
+      "expect": {
+        "artifactId": "kn-warfarin-aspirin-v1",
+        "mustCiteArtifact": true
+      },
+      "fixtureCandidate": {
+        "retrievedArtifactIds": ["kn-warfarin-aspirin-v1"],
+        "text": "Combination increases major bleeding risk; do not autonomously change anticoagulation (kn-warfarin-aspirin-v1).",
+        "citations": [{ "artifactId": "kn-warfarin-aspirin-v1" }]
+      },
+      "blocking": true
+    },
+    {
+      "id": "retrieve-miss-no-cite-001",
+      "input": { "query": "Adult VF cardiac arrest epinephrine" },
+      "expect": {
+        "artifactId": "kn-acls-cardiac-arrest-v1",
+        "mustCiteArtifact": true
+      },
+      "fixtureCandidate": {
+        "retrievedArtifactIds": [],
+        "text": "Give epinephrine sometimes I think 2 mg.",
+        "citations": []
+      },
+      "expectFail": true,
+      "blocking": true,
+      "notes": "No retrieval + no citation + invented dose must fail."
+    }
+  ]
+}

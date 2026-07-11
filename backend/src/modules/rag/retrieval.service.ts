@@ -1,5 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import {
+  hybridFuse,
+  passesMetadataFilter,
+  type MetadataFilter,
+} from '../../../../lib/rag/hybridRetrieval';
+import { recordAiMonitorEvent } from '../../../../lib/ai/productionMonitoring';
 import { CacheService } from '../cache/cache.service';
 import { RetrievedChunk } from './dto/rag-context.dto';
 import { PineconeService } from './vector-db/pinecone.service';
@@ -12,6 +18,10 @@ export interface RetrievalRequest {
   includeEmbeddings: boolean;
   filter: Record<string, any>;
   corpusVersion: number;
+  /** Hybrid lexical + dense fusion (default true) */
+  hybrid?: boolean;
+  /** Extra metadata constraints (jurisdiction, evidence grade, expiry) */
+  metadataFilter?: MetadataFilter;
 }
 
 export interface RetrievalResult {
@@ -60,26 +70,106 @@ export class RetrievalService {
 
   private async retrieveUncached(request: RetrievalRequest): Promise<RetrievalResult> {
     const startedAt = Date.now();
+    const hybrid = request.hybrid !== false;
+    // Over-fetch for hybrid fusion, then cut to topK
+    const fetchK = hybrid ? Math.min(Math.max(request.topK * 3, request.topK + 8), 40) : request.topK;
+    const fetchMinScore = hybrid ? Math.max(0, request.minScore * 0.65) : request.minScore;
+
     const queryResult = await this.vectorDb.query(request.queryEmbedding, {
-      topK: request.topK,
-      minScore: request.minScore,
+      topK: fetchK,
+      minScore: fetchMinScore,
       filter: request.filter,
       includeVectors: request.includeEmbeddings,
       includeMetadata: true,
     });
 
-    const chunks: RetrievedChunk[] = queryResult.matches.map((match) => ({
-      id: match.id,
-      text: match.text,
-      score: match.score,
-      metadata: match.metadata,
-      embedding: match.vector,
-    }));
+    let matches = queryResult.matches;
+
+    if (request.metadataFilter) {
+      matches = matches.filter((match) =>
+        passesMetadataFilter(
+          {
+            ...(match.metadata as unknown as Record<string, unknown>),
+            ...((match.metadata as any)?.metadata || {}),
+          },
+          request.metadataFilter,
+        ),
+      );
+    }
+
+    let chunks: RetrievedChunk[];
+
+    if (hybrid && matches.length > 0) {
+      const fused = hybridFuse(
+        request.query,
+        matches.map((match) => ({
+          id: match.id,
+          text: match.text,
+          vectorScore: match.score,
+          metadata: match.metadata as unknown as Record<string, unknown>,
+        })),
+        { topK: request.topK },
+      );
+
+      const byId = new Map(matches.map((m) => [m.id, m]));
+      chunks = fused
+        .map((row) => {
+          const match = byId.get(row.id);
+          if (!match) return null;
+          // Blend vector similarity with fused rank score for downstream confidence
+          const blended = Math.min(1, 0.55 * match.score + 0.45 * row.fusedScore);
+          if (blended < request.minScore * 0.85 && match.score < request.minScore) {
+            return null;
+          }
+          return {
+            id: match.id,
+            text: match.text,
+            score: blended,
+            metadata: {
+              ...match.metadata,
+              metadata: {
+                ...(match.metadata as any)?.metadata,
+                hybrid: {
+                  vectorScore: match.score,
+                  lexicalScore: row.lexicalScore,
+                  fusedScore: row.fusedScore,
+                  vectorRank: row.vectorRank,
+                  lexicalRank: row.lexicalRank,
+                },
+              },
+            },
+            embedding: match.vector,
+          } as RetrievedChunk;
+        })
+        .filter((c): c is RetrievedChunk => Boolean(c));
+    } else {
+      chunks = matches
+        .filter((match) => match.score >= request.minScore)
+        .slice(0, request.topK)
+        .map((match) => ({
+          id: match.id,
+          text: match.text,
+          score: match.score,
+          metadata: match.metadata,
+          embedding: match.vector,
+        }));
+    }
 
     const latencyMs = Date.now() - startedAt;
     this.logger.debug(
-      `Retrieved ${chunks.length}/${request.topK} chunks in ${latencyMs}ms for "${request.query.substring(0, 80)}"`,
+      `Retrieved ${chunks.length}/${request.topK} chunks in ${latencyMs}ms hybrid=${hybrid} for "${request.query.substring(0, 80)}"`,
     );
+
+    if (chunks.length === 0) {
+      recordAiMonitorEvent('retrieval_miss', {
+        queryPreview: String(request.query || '').slice(0, 80),
+        topK: request.topK,
+        minScore: request.minScore,
+        hybrid,
+        totalRetrieved: queryResult.total ?? queryResult.matches.length,
+        latencyMs,
+      });
+    }
 
     return {
       chunks,

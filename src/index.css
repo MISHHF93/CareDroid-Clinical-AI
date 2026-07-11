@@ -39,13 +39,13 @@ body {
   width: 100%;
   max-width: 100%;
   min-width: 0;
-  height: auto;
-  min-height: 100dvh;
+  /* Fill viewport so AppShell flex children can compute min-height:0 scroll chains */
+  height: var(--app-viewport-height, 100dvh);
   min-height: var(--app-viewport-height, 100dvh);
+  max-height: var(--app-viewport-height, 100dvh);
   position: relative;
   box-sizing: border-box;
-  overflow-x: clip;
-  overflow-y: visible;
+  overflow: hidden;
   overscroll-behavior-x: none;
   display: flex;
   flex-direction: column;

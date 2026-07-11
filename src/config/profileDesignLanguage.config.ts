@@ -225,12 +225,13 @@ export function resolveCopilotChromeLabels(
 
   return Object.freeze({
     productName: COPILOT_PRODUCT_NAME,
+    /** Dense sidebar / mobile label — always "Copilot" so chrome is not triple-branded. */
     shortName: COPILOT_SHORT_NAME,
-    openAriaLabel: `Open ${COPILOT_PRODUCT_NAME}`,
-    openTitle: `Open ${COPILOT_PRODUCT_NAME} (C)`,
-    navLabel: COPILOT_PRODUCT_NAME,
-    unavailableAriaLabel: `${COPILOT_PRODUCT_NAME} unavailable`,
-    unavailableTitle: `${COPILOT_PRODUCT_NAME} unavailable`,
+    openAriaLabel: `Open ${COPILOT_SHORT_NAME}`,
+    openTitle: `Open ${COPILOT_SHORT_NAME} (C)`,
+    navLabel: COPILOT_SHORT_NAME,
+    unavailableAriaLabel: `${COPILOT_SHORT_NAME} unavailable`,
+    unavailableTitle: `${COPILOT_SHORT_NAME} unavailable`,
     placeholder: `Ask ${COPILOT_PRODUCT_NAME}...`,
     messageAriaLabel: `Message ${COPILOT_PRODUCT_NAME}`,
     sendAriaLabel: `Send ${COPILOT_PRODUCT_NAME} message`,

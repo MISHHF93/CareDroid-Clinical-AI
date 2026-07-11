@@ -1,0 +1,44 @@
+{
+  "id": "kn-acls-cardiac-arrest-v1",
+  "title": "ACLS Cardiac Arrest (Adult) — CareDroid operational summary",
+  "publisher": "CareDroid Clinical Informatics",
+  "author": "CareDroid Clinical Informatics",
+  "published_at": "2026-06-01",
+  "retrieved_at": "2026-07-11",
+  "jurisdiction": "US-oriented_educational",
+  "version": "1",
+  "url_or_canonical_id": "data/medical-knowledge/acls-cardiac-arrest.md",
+  "license": "CareDroid-internal-educational-summary",
+  "permitted_use": "internal_rag_demo_and_ops_only",
+  "content_hash": "f74a5c1c4317f78958bb4407d274921dcfc2e077ed6f99e7e21414c3d5c883c5",
+  "content_path": "data/medical-knowledge/acls-cardiac-arrest.md",
+  "topic": "cardiac_arrest_acls",
+  "specialty": "emergency_medicine",
+  "evidence_grade": "summary",
+  "review_status": "accepted_with_limitations",
+  "expires_at": "2027-07-11",
+  "source_type": "protocol",
+  "rag_ingest_allowed": true,
+  "limitations": [
+    "Internal educational digest — not the full AHA ACLS provider manual.",
+    "Must not be presented as the sole source of resuscitation orders.",
+    "Clinicians must follow current local and AHA/ILCOR guidance.",
+    "Drug doses and algorithms require human verification against current official algorithms."
+  ],
+  "reject_reason": null,
+  "related_artifact_ids": [],
+  "provenance_chain": [
+    {
+      "step": "authored_internal_summary",
+      "actor": "CareDroid Clinical Informatics",
+      "at": "2026-06-01",
+      "note": "Condensed adult cardiac-arrest operational reminders for ED/EMS RAG seed."
+    },
+    {
+      "step": "registry_seed_acceptance",
+      "actor": "AI Baseline PR-2",
+      "at": "2026-07-11",
+      "note": "Accepted with limitations for internal RAG only; primary AHA materials remain external citation targets."
+    }
+  ]
+}

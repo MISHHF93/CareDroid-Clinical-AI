@@ -6,6 +6,8 @@ import {
 } from '../../config/emergencyOperationalPresentationModel';
 import { shouldForceCompactOperationalStrip } from '../../config/practitionerCleanup.config';
 import { compactOperationalStripMetrics } from '../../config/stationKpiPolicy';
+import { alarmKpiClassNames, resolveAlarmSeverity } from '../../config/alarmVisualModel';
+import '../../styles/alarm-system.css';
 import './OperationalStrip.css';
 
 export default function OperationalStrip({
@@ -75,19 +77,33 @@ export default function OperationalStrip({
       {displayMetrics.map((metric) => {
         const interactive = metric.interactive ?? Boolean(metric.queueTab && onMetricSelect);
         const tone = metric.tone || 'neutral';
+        const severity = resolveAlarmSeverity(tone);
         return (
           <button
             key={metric.id}
             type="button"
-            className="operational-strip__metric"
+            className={['operational-strip__metric', alarmKpiClassNames(tone, { size: 'sm' })]
+              .filter(Boolean)
+              .join(' ')}
             data-metric-id={metric.id}
             data-tone={tone}
+            data-alarm={severity}
             onClick={() => interactive && (onMetricSelect as any)?.(metric)}
             disabled={readOnly || !interactive}
             title={[metric.label, metric.hint].filter(Boolean).join(' · ')}
+            aria-label={[metric.label, String(metric.value), severity === 'critical' ? 'critical' : severity === 'warning' ? 'warning' : '']
+              .filter(Boolean)
+              .join(', ')}
           >
-            <strong>{metric.value}</strong>
-            <span>{metric.label}</span>
+            <strong className="alarm-kpi__value">{metric.value}</strong>
+            <span className="alarm-kpi__label">
+              {metric.label}
+              {severity === 'critical' ? (
+                <span className="alarm-kpi__badge">CRIT</span>
+              ) : severity === 'warning' ? (
+                <span className="alarm-kpi__badge">WARN</span>
+              ) : null}
+            </span>
           </button>
         );
       })}

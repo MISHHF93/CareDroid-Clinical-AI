@@ -1,5 +1,6 @@
 import './theme-init';
 import './styles/design-system.css';
+import './styles/alarm-system.css';
 import './styles/inline-style-utilities.css';
 import './index.css';
 

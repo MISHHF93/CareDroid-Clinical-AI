@@ -63,6 +63,19 @@ describe('CitationService', () => {
     });
   });
 
+  it('grounds answers and strips unsupported clinical claims', () => {
+    const grounded = service.groundAnswer(
+      'Antibiotics should be given within 1 hour for sepsis or septic shock. All patients need steroids in ten minutes.',
+      chunks,
+      { stripUnsupported: true, minScore: 0.25 },
+    );
+
+    expect(grounded.claims.length).toBeGreaterThan(0);
+    expect(grounded.unsupportedRate).toBeGreaterThan(0);
+    expect(grounded.groundedText.toLowerCase()).toMatch(/antibiotic|sepsis|lactate/);
+    expect(grounded.groundedText.toLowerCase()).not.toContain('steroids in ten minutes');
+  });
+
   it('builds source-panel references with relevance, timestamps, and metadata', () => {
     const sources = service.extractSources(chunks);
     const references = service.buildReferences(chunks, sources);

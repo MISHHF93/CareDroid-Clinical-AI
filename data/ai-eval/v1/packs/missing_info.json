@@ -1,0 +1,68 @@
+{
+  "packId": "missing_info",
+  "version": "1",
+  "description": "Intake / pre-arrival missing field detection (synthetic).",
+  "cases": [
+    {
+      "id": "missing-ems-001",
+      "input": {
+        "fields": {
+          "chiefComplaint": "Chest pain",
+          "age": 64,
+          "sex": "M",
+          "sbp": null,
+          "hr": null,
+          "etaMinutes": 8
+        }
+      },
+      "expect": {
+        "missing": ["sbp", "hr"]
+      },
+      "fixtureCandidate": {
+        "missing": ["sbp", "hr"],
+        "text": "Missing pre-arrival vitals: SBP and HR. ETA 8 minutes. Human review required."
+      },
+      "blocking": false
+    },
+    {
+      "id": "missing-intake-001",
+      "input": {
+        "fields": {
+          "name": "Test Patient",
+          "dob": null,
+          "allergies": null,
+          "chiefComplaint": "Fall"
+        }
+      },
+      "expect": {
+        "missing": ["dob", "allergies"]
+      },
+      "fixtureCandidate": {
+        "missing": ["dob", "allergies"],
+        "text": "Incomplete intake: DOB and allergies not documented."
+      },
+      "blocking": false
+    },
+    {
+      "id": "missing-omit-001",
+      "input": {
+        "fields": {
+          "name": "Test Patient",
+          "dob": null,
+          "allergies": null,
+          "chiefComplaint": "Fall"
+        }
+      },
+      "expect": {
+        "missing": ["dob", "allergies"]
+      },
+      "fixtureCandidate": {
+        "missing": [],
+        "text": "Intake looks complete."
+      },
+      "expectFail": true,
+      "blocking": false,
+      "notes": "Omitting required missing fields is a clinical omission failure."
+    }
+  ]
+}

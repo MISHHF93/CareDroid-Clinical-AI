@@ -1,0 +1,45 @@
+{
+  "id": "mdl-caredroid-heuristic-node-v1",
+  "displayName": "CareDroid structured AI node (heuristic intents)",
+  "kind": "heuristic_rules",
+  "status": "approved",
+  "purpose": "18 structured intents (intake, triage assist, handoff, EMS pre-arrival risk, bottlenecks, etc.) implemented as pure rule/heuristic handlers with mandatory clinician review.",
+  "prohibitedUses": [
+    "Presenting outputs as foundation-model inference",
+    "Autonomous clinical actions",
+    "Skipping provenance / human-review contract"
+  ],
+  "owner": "Clinical Informatics",
+  "reviewers": ["Clinical Informatics", "Emergency Nursing"],
+  "trainingDataLineage": "No ML training. Logic in lib/ai/careDroidAI.ts handlers; prompts in careDroidAIPrompts.ts for documentation/persona only.",
+  "benchmarkResults": {
+    "provenanceContract": "required",
+    "offlineStructuredPack": "data/ai-eval/v1/packs/structured_output.json"
+  },
+  "regulatoryClass": "informational_cds",
+  "jurisdictions": ["deployment-tenant-default"],
+  "limitations": [
+    "Confidence scores are heuristic, not calibrated model uncertainty.",
+    "UI must show AiMaturityBadge kind=heuristic."
+  ],
+  "deployment": {
+    "environments": ["dev", "sim", "prod"],
+    "featureFlag": "structured_ai_node",
+    "canaryPercentDefault": 100,
+    "rollback": "Disable structured AI node routes / feature flags at API gateway; retain deterministic calculators and ops dashboards.",
+    "history": [
+      {
+        "at": "2026-07-11",
+        "event": "registry_seed_with_provenance",
+        "actor": "AI Assurance PR-6/PR-10",
+        "note": "Provenance contract attached to all success/error responses."
+      }
+    ]
+  },
+  "expiresAt": "2027-07-11",
+  "retirementPlan": "Replace individual intents with measured tools+RAG only when eval residual gap is proven; retire intents one-by-one with registry entries.",
+  "provider": "local",
+  "modelIdentifier": "careDroidAI-heuristic-node",
+  "relatedServiceIds": [],
+  "relatedPaths": ["lib/ai/careDroidAI.ts", "lib/ai/provenanceContract.ts"]
+}

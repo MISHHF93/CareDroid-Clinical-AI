@@ -3,7 +3,7 @@
   min-width: 0;
   max-width: 100%;
   background: var(--app-surface);
-  border: 1px solid var(--app-border);
+  border: 1px solid color-mix(in srgb, var(--app-border) 55%, transparent);
   border-radius: var(--compact-panel-radius, var(--app-radius-lg, var(--radius-lg)));
   box-shadow: var(--compact-shadow, var(--app-elevation-card, var(--app-shadow-1)));
   color: var(--app-text-primary);
@@ -155,7 +155,7 @@
   min-width: 0;
   margin-bottom: var(--app-panel-gap, var(--space-4));
   padding-bottom: var(--app-panel-gap, var(--space-4));
-  border-bottom: 1px solid var(--app-border);
+  border-bottom: 1px solid color-mix(in srgb, var(--app-border) 45%, transparent);
 }
 
 /* Card Footer */
@@ -168,7 +168,7 @@
   min-width: 0;
   margin-top: var(--app-panel-gap, var(--space-4));
   padding-top: var(--app-panel-gap, var(--space-4));
-  border-top: 1px solid var(--app-border);
+  border-top: 1px solid color-mix(in srgb, var(--app-border) 45%, transparent);
 }
 
 .card-compact {

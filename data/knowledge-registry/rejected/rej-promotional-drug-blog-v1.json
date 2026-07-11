@@ -1,0 +1,33 @@
+{
+  "id": "kn-promotional-anticoagulant-blog-v1",
+  "title": "Sponsored blog: best blood thinner deals (example rejection)",
+  "publisher": "unknown commercial affiliate",
+  "author": "unknown",
+  "published_at": null,
+  "retrieved_at": "2026-07-11",
+  "jurisdiction": "unknown",
+  "version": "1",
+  "url_or_canonical_id": "https://example-affiliate.shop/best-blood-thinner-coupon",
+  "license": "unknown",
+  "permitted_use": "rejected",
+  "content_hash": "1111111111111111111111111111111111111111111111111111111111111111",
+  "content_path": "",
+  "topic": "anticoagulation",
+  "specialty": "pharmacy",
+  "evidence_grade": "D",
+  "review_status": "rejected",
+  "expires_at": null,
+  "source_type": "other",
+  "rag_ingest_allowed": false,
+  "limitations": [],
+  "reject_reason": "promotional_or_unverifiable; promotional domain hints (shop, coupon); missing license; not peer-reviewed",
+  "related_artifact_ids": [],
+  "provenance_chain": [
+    {
+      "step": "rejected_at_review",
+      "actor": "AI Baseline PR-2 policy",
+      "at": "2026-07-11",
+      "note": "Illustrative rejection of promotional / affiliate medical content."
+    }
+  ]
+}

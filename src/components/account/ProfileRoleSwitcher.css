@@ -21,58 +21,94 @@
   max-width: 180px;
 }
 
+/* ── Menu variant (account dropdown Session section) ── */
 .profile-role-switcher--menu {
   display: grid;
-  gap: 6px;
+  gap: 4px;
   margin: 0;
   padding: 0;
   border: 0;
   min-width: 0;
+  direction: ltr;
+  text-align: left;
 }
 
 .profile-role-switcher__legend {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
+  padding: 4px 6px 6px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--medical-ink-subtle, #9ca3af);
+  text-align: left;
 }
 
+/* LTR row: [radio/tick] [label + meta] — never reverse or stack */
 .profile-role-switcher__menu-item {
   display: flex;
+  flex-direction: row;
   align-items: flex-start;
+  justify-content: flex-start;
   gap: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
   padding: 8px 10px;
-  border-radius: 10px;
-  cursor: pointer;
   border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--medical-ink, #111827);
+  cursor: pointer;
+  direction: ltr;
+  text-align: left;
 }
 
-.profile-role-switcher__menu-item input {
-  margin-top: 3px;
-  flex-shrink: 0;
-}
-
-.profile-role-switcher__menu-item.is-active {
-  border-color: color-mix(in srgb, var(--medical-accent, #0ea5e9) 40%, transparent);
-  background: color-mix(in srgb, var(--medical-accent, #0ea5e9) 10%, transparent);
+.profile-role-switcher__menu-item input[type='radio'] {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  margin: 3px 0 0;
+  padding: 0;
+  accent-color: var(--app-accent-interactive, #0ea5e9);
+  cursor: pointer;
+  order: 0;
 }
 
 .profile-role-switcher__menu-copy {
   display: grid;
   gap: 2px;
+  flex: 1 1 auto;
   min-width: 0;
+  order: 1;
+  text-align: left;
+}
+
+.profile-role-switcher__menu-copy > span {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--medical-ink, #111827);
+  line-height: 1.25;
 }
 
 .profile-role-switcher__menu-copy small {
-  color: var(--app-fg-muted, #64748b);
-  font-size: 0.72rem;
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 400;
+  color: var(--medical-ink-muted, #6b7280);
+  line-height: 1.3;
 }
 
+.profile-role-switcher__menu-item:hover,
+.profile-role-switcher__menu-item.is-active {
+  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 10%, var(--medical-accent-tint, #e0f2fe));
+}
+
+.profile-role-switcher__menu-item.is-active {
+  border-color: color-mix(in srgb, var(--medical-accent, #0ea5e9) 40%, transparent);
+}
+
+/* ── Chips variant ── */
 .profile-role-switcher--chips {
   display: flex;
   flex-wrap: wrap;
@@ -99,38 +135,4 @@
 .profile-role-switcher__chip.is-active {
   border-color: color-mix(in srgb, var(--app-accent-interactive) 55%, transparent);
   background: color-mix(in srgb, var(--app-accent-interactive) 14%, transparent);
-}
-
-.profile-role-switcher--menu {
-  display: grid;
-  gap: 4px;
-}
-
-.profile-role-switcher__menu-item {
-  display: grid;
-  gap: 2px;
-  width: 100%;
-  text-align: left;
-  border: none;
-  border-radius: 8px;
-  background: transparent;
-  color: inherit;
-  padding: 8px 10px;
-  cursor: pointer;
-}
-
-.profile-role-switcher__menu-item span {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--medical-ink, #111827);
-}
-
-.profile-role-switcher__menu-item small {
-  font-size: 0.68rem;
-  color: var(--medical-ink-muted, #6b7280);
-}
-
-.profile-role-switcher__menu-item:hover,
-.profile-role-switcher__menu-item.is-active {
-  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 10%, var(--medical-accent-tint, #e0f2fe));
 }

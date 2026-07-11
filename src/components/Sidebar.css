@@ -8,8 +8,8 @@
   flex-direction: column;
   overflow: hidden;
   background: var(--cdl-sidebar-bg, var(--medical-white));
-  border-right: 1px solid var(--cdl-sidebar-border, var(--medical-border));
-  box-shadow: var(--cdl-sidebar-shadow, var(--sidebar-shadow));
+  border-right: 0;
+  box-shadow: var(--cdl-sidebar-shadow, 1px 0 0 color-mix(in srgb, var(--medical-border) 45%, transparent));
   color: var(--sidebar-fg, var(--medical-ink));
 }
 
@@ -25,7 +25,8 @@
   gap: 8px;
   min-height: var(--cdl-sidebar-brand-height, 44px);
   padding: 8px 10px;
-  border-bottom: 1px solid var(--cdl-sidebar-footer-border, var(--medical-border));
+  border-bottom: 0;
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--cdl-sidebar-footer-border, var(--medical-border)) 55%, transparent);
 }
 
 .sidebar__brand-mark {
@@ -109,7 +110,8 @@
   flex-direction: column;
   gap: 6px;
   padding: 6px 6px 8px;
-  border-top: 1px solid var(--cdl-sidebar-footer-border, var(--medical-border));
+  border-top: 0;
+  box-shadow: 0 -1px 0 color-mix(in srgb, var(--cdl-sidebar-footer-border, var(--medical-border)) 55%, transparent);
   background: var(--medical-slate-50);
 }
 
@@ -143,7 +145,7 @@
   width: 100%;
   min-height: 40px;
   box-sizing: border-box;
-  border: 1px solid var(--medical-border);
+  border: 1px solid color-mix(in srgb, var(--medical-border) 60%, transparent);
   border-left: 3px solid transparent;
   border-radius: var(--cdl-sidebar-item-radius, 6px);
   background: var(--medical-white);
@@ -301,7 +303,7 @@
   transform: translateY(-50%);
   background: var(--medical-white);
   color: var(--medical-ink);
-  border: 1px solid var(--medical-border);
+  border: 1px solid color-mix(in srgb, var(--medical-border) 55%, transparent);
   border-radius: 8px;
   padding: 6px 8px;
   font-size: 12px;
@@ -409,12 +411,12 @@
     width: 100% !important;
     height: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
     padding: 0 !important;
-    border-top: 1px solid var(--medical-border) !important;
+    border-top: 0 !important;
     border-right: none !important;
     background: var(--medical-white);
     overflow: visible !important;
     position: fixed !important;
-    box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.06);
+    box-shadow: 0 -1px 0 color-mix(in srgb, var(--medical-border) 50%, transparent), 0 -4px 20px rgba(15, 23, 42, 0.06);
   }
 
   aside[aria-label='Emergency navigation'] {
@@ -555,11 +557,11 @@
     gap: 10px;
     max-height: min(62vh, 420px);
     overflow-y: auto;
-    border-top: 1px solid var(--medical-border);
+    border-top: 0;
     border-radius: 18px 18px 0 0;
     background: var(--medical-white);
     padding: 14px 14px calc(14px + env(safe-area-inset-bottom, 0px));
-    box-shadow: var(--medical-shadow-lift);
+    box-shadow: 0 -1px 0 color-mix(in srgb, var(--medical-border) 45%, transparent), var(--medical-shadow-lift);
     animation: sidebar-more-sheet-up var(--motion-transition-normal) both;
   }
 
@@ -577,7 +579,7 @@
 
   .sidebar-more-sheet header button {
     min-height: 44px;
-    border: 1px solid var(--medical-border);
+    border: 1px solid color-mix(in srgb, var(--medical-border) 55%, transparent);
     border-radius: 10px;
     background: var(--medical-slate-100);
     color: var(--medical-ink-muted);
@@ -596,7 +598,7 @@
     align-items: center;
     gap: 10px;
     min-height: 48px;
-    border: 1px solid var(--medical-border);
+    border: 1px solid color-mix(in srgb, var(--medical-border) 45%, transparent);
     border-radius: 12px;
     background: var(--medical-slate-50);
     color: var(--medical-ink);

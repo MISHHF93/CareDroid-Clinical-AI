@@ -1,0 +1,436 @@
+/**
+ * Platform visual alarm system.
+ * Use .alarm-kpi for chips/KPIs and .alarm-row for list rows.
+ * Severity via data-alarm="critical|warning|info|ok|neutral".
+ */
+
+:root {
+  --alarm-critical: #dc2626;
+  --alarm-critical-bg: color-mix(in srgb, #dc2626 12%, #ffffff);
+  --alarm-critical-border: color-mix(in srgb, #dc2626 55%, #e2e8f0);
+  --alarm-critical-text: #991b1b;
+
+  --alarm-warning: #d97706;
+  --alarm-warning-bg: color-mix(in srgb, #f59e0b 14%, #ffffff);
+  --alarm-warning-border: color-mix(in srgb, #f59e0b 50%, #e2e8f0);
+  --alarm-warning-text: #92400e;
+
+  --alarm-info: #0284c7;
+  --alarm-info-bg: color-mix(in srgb, #0ea5e9 10%, #ffffff);
+  --alarm-info-border: color-mix(in srgb, #0ea5e9 40%, #e2e8f0);
+  --alarm-info-text: #075985;
+
+  --alarm-ok: #059669;
+  --alarm-ok-bg: color-mix(in srgb, #10b981 8%, #ffffff);
+  --alarm-ok-border: color-mix(in srgb, #10b981 35%, #e2e8f0);
+  --alarm-ok-text: #047857;
+
+  --alarm-neutral-bg: #ffffff;
+  --alarm-neutral-border: var(--medical-border, #e2e8f0);
+  --alarm-neutral-text: var(--medical-ink, #111827);
+  --alarm-neutral-label: var(--medical-ink-muted, #64748b);
+}
+
+/* ── KPI chip (chrome + strips) ── */
+.alarm-kpi {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2px;
+  flex: 0 0 auto;
+  min-width: 68px;
+  max-width: 120px;
+  min-height: 38px;
+  padding: 5px 10px 5px 12px;
+  border: 1px solid var(--alarm-neutral-border);
+  border-radius: 9px;
+  background: var(--alarm-neutral-bg);
+  box-sizing: border-box;
+  list-style: none;
+  overflow: hidden;
+}
+
+/* Left severity rail */
+.alarm-kpi::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: transparent;
+  border-radius: 9px 0 0 9px;
+}
+
+.alarm-kpi__value {
+  color: var(--alarm-neutral-text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.15;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.alarm-kpi__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--alarm-neutral-label);
+  font-size: 10.5px;
+  font-weight: 650;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.alarm-kpi__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 14px;
+  height: 14px;
+  padding: 0 4px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.alarm-kpi__badge--inline {
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+/* Critical */
+.alarm-kpi--critical,
+.alarm-kpi[data-alarm='critical'] {
+  border-color: var(--alarm-critical-border);
+  background: var(--alarm-critical-bg);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--alarm-critical) 18%, transparent),
+    0 2px 8px color-mix(in srgb, var(--alarm-critical) 12%, transparent);
+}
+
+.alarm-kpi--critical::before,
+.alarm-kpi[data-alarm='critical']::before {
+  background: var(--alarm-critical);
+  width: 4px;
+}
+
+.alarm-kpi--critical .alarm-kpi__value,
+.alarm-kpi[data-alarm='critical'] .alarm-kpi__value {
+  color: var(--alarm-critical-text);
+}
+
+.alarm-kpi--critical .alarm-kpi__label,
+.alarm-kpi[data-alarm='critical'] .alarm-kpi__label {
+  color: var(--alarm-critical-text);
+  font-weight: 750;
+}
+
+.alarm-kpi--critical .alarm-kpi__badge,
+.alarm-kpi[data-alarm='critical'] .alarm-kpi__badge {
+  background: var(--alarm-critical);
+  color: #ffffff;
+}
+
+/* Warning */
+.alarm-kpi--warning,
+.alarm-kpi[data-alarm='warning'] {
+  border-color: var(--alarm-warning-border);
+  background: var(--alarm-warning-bg);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--alarm-warning) 14%, transparent);
+}
+
+.alarm-kpi--warning::before,
+.alarm-kpi[data-alarm='warning']::before {
+  background: var(--alarm-warning);
+  width: 4px;
+}
+
+.alarm-kpi--warning .alarm-kpi__value,
+.alarm-kpi[data-alarm='warning'] .alarm-kpi__value {
+  color: var(--alarm-warning-text);
+}
+
+.alarm-kpi--warning .alarm-kpi__label,
+.alarm-kpi[data-alarm='warning'] .alarm-kpi__label {
+  color: var(--alarm-warning-text);
+  font-weight: 700;
+}
+
+.alarm-kpi--warning .alarm-kpi__badge,
+.alarm-kpi[data-alarm='warning'] .alarm-kpi__badge {
+  background: var(--alarm-warning);
+  color: #ffffff;
+}
+
+/* Info */
+.alarm-kpi--info,
+.alarm-kpi[data-alarm='info'] {
+  border-color: var(--alarm-info-border);
+  background: var(--alarm-info-bg);
+}
+
+.alarm-kpi--info::before,
+.alarm-kpi[data-alarm='info']::before {
+  background: var(--alarm-info);
+}
+
+.alarm-kpi--info .alarm-kpi__value,
+.alarm-kpi[data-alarm='info'] .alarm-kpi__value {
+  color: var(--alarm-info-text);
+}
+
+/* OK / stable */
+.alarm-kpi--ok,
+.alarm-kpi[data-alarm='ok'] {
+  border-color: var(--alarm-ok-border);
+  background: var(--alarm-ok-bg);
+}
+
+.alarm-kpi--ok::before,
+.alarm-kpi[data-alarm='ok']::before {
+  background: var(--alarm-ok);
+}
+
+.alarm-kpi--ok .alarm-kpi__value,
+.alarm-kpi[data-alarm='ok'] .alarm-kpi__value {
+  color: var(--alarm-ok-text);
+}
+
+/* Pulse for active critical alarms */
+.alarm-kpi--pulse.alarm-kpi--critical,
+.alarm-kpi--pulse[data-alarm='critical'] {
+  animation: alarm-kpi-critical-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes alarm-kpi-critical-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--alarm-critical) 22%, transparent),
+      0 2px 8px color-mix(in srgb, var(--alarm-critical) 14%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 0 0 3px color-mix(in srgb, var(--alarm-critical) 28%, transparent),
+      0 4px 14px color-mix(in srgb, var(--alarm-critical) 22%, transparent);
+  }
+}
+
+/* Compact size for dense strips */
+.alarm-kpi--sm {
+  min-width: 58px;
+  min-height: 32px;
+  padding: 3px 8px 3px 10px;
+}
+
+.alarm-kpi--sm .alarm-kpi__value {
+  font-size: 12px;
+}
+
+.alarm-kpi--sm .alarm-kpi__label {
+  font-size: 10px;
+}
+
+/* Horizontal row of chips */
+.alarm-kpi-rail {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+/* ── List / table row alarming ── */
+.alarm-row {
+  position: relative;
+}
+
+.alarm-row--critical,
+.alarm-row[data-alarm='critical'] {
+  background: color-mix(in srgb, var(--alarm-critical) 7%, transparent);
+  box-shadow: inset 3px 0 0 var(--alarm-critical);
+}
+
+.alarm-row--warning,
+.alarm-row[data-alarm='warning'] {
+  background: color-mix(in srgb, var(--alarm-warning) 8%, transparent);
+  box-shadow: inset 3px 0 0 var(--alarm-warning);
+}
+
+.alarm-row--info,
+.alarm-row[data-alarm='info'] {
+  box-shadow: inset 3px 0 0 var(--alarm-info);
+}
+
+/* Dot marker for list cells */
+.alarm-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--alarm-neutral-border);
+}
+
+.alarm-dot--critical {
+  background: var(--alarm-critical);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--alarm-critical) 25%, transparent);
+  animation: alarm-dot-pulse 1.4s ease-in-out infinite;
+}
+
+.alarm-dot--warning {
+  background: var(--alarm-warning);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--alarm-warning) 22%, transparent);
+}
+
+.alarm-dot--info {
+  background: var(--alarm-info);
+}
+
+.alarm-dot--ok {
+  background: var(--alarm-ok);
+}
+
+@keyframes alarm-dot-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--alarm-critical) 20%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--alarm-critical) 12%, transparent);
+  }
+}
+
+/* ── Cards / widgets (MetricCard, StatusWidget, StatCard) ── */
+.alarm-surface {
+  position: relative;
+  transition: border-color 120ms ease, background-color 120ms ease, box-shadow 120ms ease;
+}
+
+.alarm-surface--critical,
+.alarm-surface[data-alarm='critical'] {
+  border-color: var(--alarm-critical-border) !important;
+  background: var(--alarm-critical-bg) !important;
+  box-shadow:
+    inset 4px 0 0 var(--alarm-critical),
+    0 0 0 1px color-mix(in srgb, var(--alarm-critical) 16%, transparent);
+}
+
+.alarm-surface--critical .cd-metric-card__value,
+.alarm-surface--critical .cd-status-widget strong,
+.alarm-surface--critical .cd-stat-card__value,
+.alarm-surface[data-alarm='critical'] .cd-metric-card__value,
+.alarm-surface[data-alarm='critical'] .cd-status-widget strong,
+.alarm-surface[data-alarm='critical'] .cd-stat-card__value {
+  color: var(--alarm-critical-text) !important;
+}
+
+.alarm-surface--warning,
+.alarm-surface[data-alarm='warning'] {
+  border-color: var(--alarm-warning-border) !important;
+  background: var(--alarm-warning-bg) !important;
+  box-shadow: inset 4px 0 0 var(--alarm-warning);
+}
+
+.alarm-surface--warning .cd-metric-card__value,
+.alarm-surface--warning .cd-status-widget strong,
+.alarm-surface--warning .cd-stat-card__value,
+.alarm-surface[data-alarm='warning'] .cd-metric-card__value,
+.alarm-surface[data-alarm='warning'] .cd-status-widget strong,
+.alarm-surface[data-alarm='warning'] .cd-stat-card__value {
+  color: var(--alarm-warning-text) !important;
+}
+
+.alarm-surface--info,
+.alarm-surface[data-alarm='info'] {
+  border-color: var(--alarm-info-border) !important;
+  background: var(--alarm-info-bg) !important;
+  box-shadow: inset 3px 0 0 var(--alarm-info);
+}
+
+.alarm-surface--ok,
+.alarm-surface[data-alarm='ok'] {
+  border-color: var(--alarm-ok-border) !important;
+  background: var(--alarm-ok-bg) !important;
+  box-shadow: inset 3px 0 0 var(--alarm-ok);
+}
+
+.alarm-surface--pulse.alarm-surface--critical,
+.alarm-surface--pulse[data-alarm='critical'] {
+  animation: alarm-surface-critical-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes alarm-surface-critical-pulse {
+  0%,
+  100% {
+    box-shadow:
+      inset 4px 0 0 var(--alarm-critical),
+      0 0 0 1px color-mix(in srgb, var(--alarm-critical) 18%, transparent);
+  }
+  50% {
+    box-shadow:
+      inset 4px 0 0 var(--alarm-critical),
+      0 0 0 3px color-mix(in srgb, var(--alarm-critical) 22%, transparent),
+      0 4px 12px color-mix(in srgb, var(--alarm-critical) 14%, transparent);
+  }
+}
+
+/* Badge alarming (danger/warning) */
+.alarm-badge--critical {
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--alarm-critical) 35%, transparent);
+}
+
+.alarm-badge--warning {
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--alarm-warning) 30%, transparent);
+}
+
+/* MetricChip pill form with alarm */
+.cd-metric-chip.alarm-kpi {
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  min-height: 0;
+  max-width: none;
+  padding: 5px 10px 5px 12px;
+  border-radius: 999px;
+}
+
+.cd-metric-chip.alarm-kpi .alarm-kpi__value,
+.cd-metric-chip.alarm-kpi .cd-metric-chip__value {
+  font-size: 12px;
+}
+
+.cd-metric-chip.alarm-kpi .alarm-kpi__label,
+.cd-metric-chip.alarm-kpi .cd-metric-chip__label {
+  font-size: 10px;
+}
+
+/* Prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .alarm-kpi--pulse.alarm-kpi--critical,
+  .alarm-kpi--pulse[data-alarm='critical'],
+  .alarm-dot--critical,
+  .alarm-surface--pulse.alarm-surface--critical,
+  .alarm-surface--pulse[data-alarm='critical'] {
+    animation: none;
+  }
+}

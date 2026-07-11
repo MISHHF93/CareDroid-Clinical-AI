@@ -1,0 +1,43 @@
+{
+  "id": "kn-sofa-overview-v1",
+  "title": "SOFA Score Overview — CareDroid clinical reference summary",
+  "publisher": "CareDroid Clinical Informatics",
+  "author": "CareDroid Clinical Informatics",
+  "published_at": "2026-06-01",
+  "retrieved_at": "2026-07-11",
+  "jurisdiction": "global_educational",
+  "version": "1",
+  "url_or_canonical_id": "data/medical-knowledge/sofa-score-overview.md",
+  "license": "CareDroid-internal-educational-summary",
+  "permitted_use": "internal_rag_demo_and_ops_only",
+  "content_hash": "409100cc5dbd3c8920aacbe35cb3217068f916f79cb84db3976708b8a3de935b",
+  "content_path": "data/medical-knowledge/sofa-score-overview.md",
+  "topic": "sofa_score",
+  "specialty": "critical_care",
+  "evidence_grade": "summary",
+  "review_status": "accepted_with_limitations",
+  "expires_at": "2027-07-11",
+  "source_type": "calculator_reference",
+  "rag_ingest_allowed": true,
+  "limitations": [
+    "Explains SOFA components; actual score calculation must use deterministic calculator services.",
+    "Does not replace validated scoring implementations or primary literature cutoffs.",
+    "LLM must not invent component values or compute SOFA numerically from free text alone."
+  ],
+  "reject_reason": null,
+  "related_artifact_ids": ["kn-sepsis-hour-1-v1"],
+  "provenance_chain": [
+    {
+      "step": "authored_internal_summary",
+      "actor": "CareDroid Clinical Informatics",
+      "at": "2026-06-01",
+      "note": "Reference overview paired with deterministic SOFA calculator tools."
+    },
+    {
+      "step": "registry_seed_acceptance",
+      "actor": "AI Baseline PR-2",
+      "at": "2026-07-11",
+      "note": "Accepted with limitations for RAG explanation only."
+    }
+  ]
+}

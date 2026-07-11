@@ -1,0 +1,39 @@
+{
+  "id": "mdl-local-deterministic-v1",
+  "displayName": "Local deterministic LLM adapter (degraded mode)",
+  "kind": "other",
+  "status": "approved",
+  "purpose": "Offline/test/degraded generation path with no external network; returns explicit degraded messaging.",
+  "prohibitedUses": [
+    "Primary clinical decision support in production when external LLM is healthy",
+    "Implying measured clinical quality"
+  ],
+  "owner": "Platform Engineering",
+  "reviewers": ["Platform Engineering", "Security"],
+  "trainingDataLineage": "None — template responses only.",
+  "benchmarkResults": {
+    "unitTests": "lib/ai/providers/egress.test.ts"
+  },
+  "regulatoryClass": "operational_support",
+  "jurisdictions": ["all"],
+  "limitations": ["Not clinically useful content; safety fallback only."],
+  "deployment": {
+    "environments": ["dev", "sim", "shadow", "prod"],
+    "featureFlag": "AI_PROVIDER=local | AI_LOCAL_FALLBACK=1",
+    "canaryPercentDefault": 0,
+    "rollback": "Switch AI_PROVIDER back to anthropic when healthy; kill switch still available.",
+    "history": [
+      {
+        "at": "2026-07-11",
+        "event": "registry_seed",
+        "actor": "AI Assurance PR-3/PR-10"
+      }
+    ]
+  },
+  "expiresAt": "2028-07-11",
+  "retirementPlan": "Keep indefinitely as kill-switch companion / offline mode.",
+  "provider": "local",
+  "modelIdentifier": "local-deterministic-v1",
+  "relatedServiceIds": [],
+  "relatedPaths": ["lib/ai/providers/localAdapter.ts", "lib/ai/providers/egress.ts"]
+}

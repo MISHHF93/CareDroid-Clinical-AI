@@ -1,8 +1,6 @@
 import { useMemo, type ReactNode } from 'react';
 import EdDataSourceBanner from '../../components/emergency/EdDataSourceBanner';
 import PatientCard from '../../components/PatientCard';
-import HelpTrigger from '../../components/help/HelpTrigger';
-import LivingContextualHelpBanner from '../../components/help/LivingContextualHelpBanner';
 import EdJourneyProgressRail from '../../components/emergency/EdJourneyProgressRail';
 import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import { OperationalPageTemplate, PageShell } from '../../components/ui/CareDroidPrimitives';
@@ -174,37 +172,17 @@ export function EmergencyRoutePage({
       nextAction: base?.nextAction ?? patientWorkflow.primaryAction,
     };
   }, [situationBrief, operatingSurface.situationBrief, patientWorkflow]);
-  const resolvedEyebrow =
-    eyebrow ??
-    (operatingSurface.phaseLabel
-      ? `ED OS · ${operatingSurface.phaseLabel}`
-      : undefined);
-  const headerActions = useMemo(
-    () => (
-      <>
-        {actions}
-        <HelpTrigger variant="button" className="emergency-route-help-trigger" label="Guide" />
-        <MaturityChip maturity={maturity} />
-      </>
-    ),
-    [actions, maturity],
-  );
+  // No static eyebrow/maturity/Guide in chrome — staff use title + sidebar Guide only.
+  const headerActions = useMemo(() => (actions ? <>{actions}</> : null), [actions]);
 
   const routeChrome = useMemo(
     () => ({
-      eyebrow: surfaces.chrome.showPageEyebrow ? resolvedEyebrow : undefined,
+      eyebrow: undefined,
       title,
       subtitle: showDescription ? description : undefined,
       actions: headerActions,
     }),
-    [
-      description,
-      headerActions,
-      resolvedEyebrow,
-      showDescription,
-      surfaces.chrome.showPageEyebrow,
-      title,
-    ],
+    [description, headerActions, showDescription, title],
   );
 
   useRouteChromeRegistration(routeChrome);
@@ -230,7 +208,10 @@ export function EmergencyRoutePage({
         zones={{
           operationalSummary: (
             <>
-              {showJourneyRail && operatingSurface.phaseId ? (
+              {showJourneyRail &&
+              surfaces.emergencyRoutes.showJourneyRail &&
+              operatingSurface.phaseId &&
+              selectedPatientId ? (
                 <EdJourneyProgressRail
                   activePhaseId={operatingSurface.phaseId}
                   ownerRole={patientWorkflow.ownerRole ?? operatingSurface.ownerRole}
@@ -241,7 +222,6 @@ export function EmergencyRoutePage({
                   }
                 />
               ) : null}
-              <LivingContextualHelpBanner />
               {resolvedSituationBrief ? <WorkflowSituationBrief {...resolvedSituationBrief} /> : null}
               {operationalSummaryExtra}
             </>

@@ -43,6 +43,7 @@ export default function AmbientScribe({ embedded = false, onCloseEmbedded }: any
   const [loading, setLoading] = useState(false);
   const [listening, setListening] = useState(false);
   const [error, setError] = useState<any>(null);
+  const [copyStatus, setCopyStatus] = useState('');
   const recognitionRef = useRef<any>(null);
 
   const speechSupported = useMemo(() => Boolean(getSpeechRecognition()), []);
@@ -115,9 +116,48 @@ export default function AmbientScribe({ embedded = false, onCloseEmbedded }: any
     setLoading(false);
   };
 
+  const buildDraftClipboardText = () => {
+    if (!draft) return '';
+    const sections = sectionEntries(draft)
+      .map(([key, value]) => `${String(key).toUpperCase()}\n${String(value || '').trim()}`)
+      .join('\n\n');
+    const header = [
+      `Ambient Clinical Scribe — ${NOTE_TYPES.find((n) => n.value === noteType)?.label || noteType}`,
+      patientContext.patientLabel ? `Patient: ${patientContext.patientLabel}` : null,
+      'STATUS: Clinician-reviewed draft — not signed, not chart-committed',
+      '',
+    ]
+      .filter(Boolean)
+      .join('\n');
+    return `${header}${sections || String(draft.narrative || draft.text || transcriptText || '').trim()}`.trim();
+  };
+
+  const handleCopyForward = async () => {
+    if (!reviewed || !draft) {
+      setCopyStatus('Review the draft and confirm the checkbox before copy-forward.');
+      return;
+    }
+    const text = buildDraftClipboardText();
+    if (!text) {
+      setCopyStatus('No draft text available to copy.');
+      return;
+    }
+    try {
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+        setCopyStatus('Draft copied to clipboard for clinician documentation.');
+        return;
+      }
+      setCopyStatus('Clipboard API unavailable — select and copy the draft text manually.');
+    } catch {
+      setCopyStatus('Clipboard blocked by the browser — select and copy the draft text manually.');
+    }
+  };
+
   const clearWorkflow = () => {
     setTranscriptText('');
     setPatientContext({ patientLabel: '', encounterType: '', clinicianInstructions: '' });
+    setCopyStatus('');
     setDraftResponse(null);
     setReviewed(false);
     setError(null);
@@ -263,9 +303,28 @@ export default function AmbientScribe({ embedded = false, onCloseEmbedded }: any
                     type="button"
                     className="diagnosis-primary-btn tool-review-actions"
                     disabled={!reviewed}
+                    title={
+                      reviewed
+                        ? 'Copy the reviewed draft to your clipboard for clinician documentation'
+                        : 'Review the draft and confirm the checkbox before copy-forward'
+                    }
+                    data-disabled-reason={
+                      reviewed
+                        ? undefined
+                        : 'Review the draft and confirm the checkbox before copy-forward'
+                    }
+                    aria-label="Copy reviewed draft for clinician documentation"
+                    onClick={() => {
+                      void handleCopyForward();
+                    }}
                   >
                     Ready for clinician copy-forward
                   </button>
+                  {copyStatus ? (
+                    <p className="tool-inline-status" role="status" aria-live="polite">
+                      {copyStatus}
+                    </p>
+                  ) : null}
                 </div>
               </div>
             ) : (

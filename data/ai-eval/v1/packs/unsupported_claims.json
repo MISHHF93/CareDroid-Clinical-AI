@@ -1,0 +1,78 @@
+{
+  "packId": "unsupported_claims",
+  "version": "1",
+  "description": "Claims must be supported by retrieved evidence spans; fabricated citations fail.",
+  "cases": [
+    {
+      "id": "claim-supported-001",
+      "input": {
+        "evidence": [
+          {
+            "artifactId": "kn-sepsis-hour-1-v1",
+            "span": "Administer broad-spectrum antibiotics within 1 hour for sepsis or septic shock."
+          }
+        ]
+      },
+      "expect": {
+        "supported": true
+      },
+      "fixtureCandidate": {
+        "claims": [
+          {
+            "text": "Antibiotics should be given within 1 hour for sepsis or septic shock.",
+            "citationArtifactId": "kn-sepsis-hour-1-v1"
+          }
+        ],
+        "text": "Antibiotics should be given within 1 hour for sepsis or septic shock. (kn-sepsis-hour-1-v1)"
+      },
+      "blocking": true
+    },
+    {
+      "id": "claim-unsupported-001",
+      "input": {
+        "evidence": [
+          {
+            "artifactId": "kn-sepsis-hour-1-v1",
+            "span": "Administer broad-spectrum antibiotics within 1 hour for sepsis or septic shock."
+          }
+        ]
+      },
+      "expect": {
+        "supported": false
+      },
+      "fixtureCandidate": {
+        "claims": [
+          {
+            "text": "All sepsis patients must receive steroids within 10 minutes of arrival.",
+            "citationArtifactId": "kn-sepsis-hour-1-v1"
+          }
+        ],
+        "text": "All sepsis patients must receive steroids within 10 minutes (kn-sepsis-hour-1-v1)."
+      },
+      "expectFail": true,
+      "blocking": true,
+      "notes": "Citation present but claim not entailed by evidence — count as unsupported/hallucination."
+    },
+    {
+      "id": "claim-fabricated-pmid-001",
+      "input": {
+        "evidence": []
+      },
+      "expect": {
+        "supported": false,
+        "forbidFabricatedPmid": true
+      },
+      "fixtureCandidate": {
+        "claims": [
+          {
+            "text": "According to PMID 99999999 this is mandatory.",
+            "citationArtifactId": null
+          }
+        ],
+        "text": "According to PMID 99999999 steroids are mandatory for all ED patients."
+      },
+      "expectFail": true,
+      "blocking": true
+    }
+  ]
+}

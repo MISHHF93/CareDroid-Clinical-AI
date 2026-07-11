@@ -83,45 +83,6 @@
   font-weight: 600;
 }
 
-.sidebar-chrome-control-tabs {
-  display: grid;
-  width: 100%;
-  overflow: hidden;
-  border: 1px solid var(--medical-border);
-  border-radius: var(--cdl-sidebar-item-radius, 6px);
-  background: var(--medical-white);
-}
-
-.sidebar-chrome-control-tab {
-  min-height: 34px;
-  border: 0;
-  border-right: 1px solid var(--medical-border);
-  background: transparent;
-  color: var(--medical-ink-muted);
-  cursor: pointer;
-  font: inherit;
-  font-size: 11px;
-  font-weight: 600;
-  line-height: 1;
-  padding: 0 4px;
-  text-align: center;
-}
-
-.sidebar-chrome-control-tab:last-child {
-  border-right: 0;
-}
-
-.sidebar-chrome-control-tab:hover {
-  background: var(--medical-slate-100);
-  color: var(--medical-ink);
-}
-
-.sidebar-chrome-control-tab--active {
-  background: var(--medical-accent-tint);
-  color: var(--medical-accent-hover);
-  font-weight: 700;
-}
-
 /* Simulation toggle in sidebar rail */
 .sidebar-chrome-controls .simulation-mode-toggle--sidebar {
   width: 100%;

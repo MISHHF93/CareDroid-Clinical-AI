@@ -138,6 +138,14 @@ export const BACKEND_API_CAPABILITY_STATUS = Object.freeze({
   surveillanceZones: BACKEND_CAPABILITY_STATUS.DEMO,
   surveillanceHealth: BACKEND_CAPABILITY_STATUS.DEMO,
   surveillanceAlerts: BACKEND_CAPABILITY_STATUS.DEMO,
+  /** CareDroid Sentinel — EMS command, AVL, durable alarms, AI review, analytics */
+  sentinelHealth: BACKEND_CAPABILITY_STATUS.REAL,
+  sentinelCommand: BACKEND_CAPABILITY_STATUS.REAL,
+  sentinelAlarms: BACKEND_CAPABILITY_STATUS.REAL,
+  sentinelInbound: BACKEND_CAPABILITY_STATUS.REAL,
+  sentinelIngest: BACKEND_CAPABILITY_STATUS.REAL,
+  sentinelAi: BACKEND_CAPABILITY_STATUS.REAL,
+  sentinelAnalytics: BACKEND_CAPABILITY_STATUS.REAL,
 });
 
 export const BACKEND_API_CAPABILITIES = Object.freeze(

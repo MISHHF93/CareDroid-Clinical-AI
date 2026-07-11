@@ -16,6 +16,7 @@ import {
   normalizeExecutorParameters,
   isKnownUnsupportedNluTool,
   getExecutorCatalogSnapshot,
+  describeToolCapability,
   ToolExecutionErrorCode,
 } from './tool-orchestrator.registry';
 
@@ -56,18 +57,38 @@ describe('tool-orchestrator.registry', () => {
     ]);
   });
 
-  it('maps registry ids to executor ids (frontend REGISTRY_ID_TO_ORCHESTRATOR_TOOL parity)', () => {
-    expect(REGISTRY_ID_TO_EXECUTOR_TOOL_ID).toEqual({
-      'drug-check': 'drug-interactions',
-      'lab-interp': 'lab-interpreter',
-      'sofa-score': 'sofa-calculator',
-    });
+  it('maps registry ids to executor ids (includes PR-7 executable catalog expansions)', () => {
+    expect(REGISTRY_ID_TO_EXECUTOR_TOOL_ID['drug-check']).toBe('drug-interactions');
+    expect(REGISTRY_ID_TO_EXECUTOR_TOOL_ID['lab-interp']).toBe('lab-interpreter');
+    expect(REGISTRY_ID_TO_EXECUTOR_TOOL_ID['sofa-score']).toBe('sofa-calculator');
+    expect(REGISTRY_ID_TO_EXECUTOR_TOOL_ID['heart-score']).toBe('heart-score');
+    expect(REGISTRY_ID_TO_EXECUTOR_TOOL_ID.news2).toBe('news2');
+    // Every mapped target must be a registered executor
+    for (const target of Object.values(REGISTRY_ID_TO_EXECUTOR_TOOL_ID)) {
+      expect(REGISTERED_EXECUTOR_TOOL_IDS).toContain(target);
+    }
   });
 
   it('resolves drug-interaction-checker alias', () => {
     const resolved = resolveExecutorToolId('drug-interaction-checker');
     expect(resolved?.resolvedId).toBe('drug-interactions');
     expect(resolved?.aliased).toBe(true);
+  });
+
+  it('resolves common aliases added in PR-7', () => {
+    expect(resolveExecutorToolId('heart')?.resolvedId).toBe('heart-score');
+    expect(resolveExecutorToolId('gcs')?.resolvedId).toBe('gcs-calculator');
+    expect(resolveExecutorToolId('news-2')?.resolvedId).toBe('news2');
+    expect(resolveExecutorToolId('wells')?.resolvedId).toBe('wells-pe');
+  });
+
+  it('describes unsupported tools honestly without implying success', () => {
+    const cap = describeToolCapability('dispatch-ai');
+    expect(cap.executable).toBe(false);
+    expect(cap.status).toBe('unsupported');
+    expect(cap.doNotTreatAsSuccess).toBe(true);
+    expect(cap.requiresClinicianReview).toBe(true);
+    expect(cap.message.toLowerCase()).toMatch(/not available|not.*server/);
   });
 
   it('resolves sidebar registry ids', () => {

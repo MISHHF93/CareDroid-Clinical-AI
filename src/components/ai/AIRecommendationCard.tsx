@@ -4,6 +4,7 @@ import {
   type CareDroidAIResponse,
 } from '../../lib/ai/careDroidAI';
 import { AIConfidenceBadge } from './AIConfidenceBadge';
+import { AiMaturityBadge, inferAiMaturity } from './AiMaturityBadge';
 import { AIReasoningList } from './AIReasoningList';
 import { ClinicalSafetyNotice } from './ClinicalSafetyNotice';
 import { MissingDataAlert } from './MissingDataAlert';
@@ -38,6 +39,16 @@ export function AIChiefRecommendationCard({
     (warning) => warning !== CLINICAL_DECISION_SUPPORT_DISCLAIMER,
   );
   const heading = title || formatIntent(response.intent);
+  const provenance = response.provenance;
+  const maturity = inferAiMaturity({
+    modelOrEngine: provenance?.modelOrEngine,
+    responseClass: provenance?.responseClass,
+    evidenceKinds: provenance?.evidence?.map((e) => e.kind),
+  });
+  const provenanceMissing =
+    provenance?.missingInformation?.length
+      ? provenance.missingInformation
+      : missingData;
 
   return (
     <article
@@ -52,7 +63,10 @@ export function AIChiefRecommendationCard({
             <h3>{heading}</h3>
           </div>
         </div>
-        <AIConfidenceBadge confidence={response.confidence} />
+        <div className="cd-ai-card__meta-row">
+          <AiMaturityBadge kind={maturity} />
+          <AIConfidenceBadge confidence={response.confidence} />
+        </div>
       </header>
 
       <p className="cd-ai-card__primary">{primary}</p>
@@ -79,7 +93,36 @@ export function AIChiefRecommendationCard({
         </div>
       ) : null}
 
-      <MissingDataAlert items={missingData} />
+      <MissingDataAlert items={provenanceMissing} />
+
+      {provenance ? (
+        <div className="cd-ai-card__provenance" data-provenance-version={provenance.contractVersion}>
+          <strong>Provenance</strong>
+          {provenance.uncertainty ? <p style={{ margin: 0 }}>{provenance.uncertainty}</p> : null}
+          {provenance.recommendedReviewerRole ? (
+            <p style={{ margin: 0 }}>
+              Reviewer: <span>{provenance.recommendedReviewerRole}</span>
+            </p>
+          ) : null}
+          {provenance.limitations?.length ? (
+            <ul>
+              {provenance.limitations.slice(0, compact ? 2 : 4).map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          ) : null}
+          {provenance.evidence?.length ? (
+            <p style={{ margin: 0 }}>
+              Evidence items: {provenance.evidence.length}
+              {provenance.sourceVersions?.length
+                ? ` · sources: ${provenance.sourceVersions.length}`
+                : ''}
+            </p>
+          ) : (
+            <p style={{ margin: 0 }}>No retrieved evidence attached — treat as ungrounded draft.</p>
+          )}
+        </div>
+      ) : null}
 
       {visibleWarnings.length ? (
         <div className="cd-ai-card__warnings" role="status">

@@ -1,0 +1,141 @@
+{
+  "apply": true,
+  "filesScanned": 701,
+  "filesWithIssues": 16,
+  "totalExpressionAriaAttrs": 19,
+  "totalDualBranchApplied": 0,
+  "filesTouched": [],
+  "topFiles": [
+    {
+      "file": "src\\components\\Sidebar.tsx",
+      "hits": 3,
+      "sample": [
+        "aria-current={active ? 'page' : undefined}",
+        "aria-current={active ? 'page' : undefined}",
+        "aria-current={active ? 'page' : undefined}"
+      ],
+      "applied": 0
+    },
+    {
+      "file": "src\\components\\reception\\UnifiedIntakePanel.tsx",
+      "hits": 2,
+      "sample": [
+        "aria-current={phase === UNIFIED_INTAKE_PHASE.critical ? 'step' : undefined}",
+        "aria-current={phase === UNIFIED_INTAKE_PHASE.admin ? 'step' : undefined}"
+      ],
+      "applied": 0
+    },
+    {
+      "file": "src\\components\\account\\UserAccountMenu.tsx",
+      "hits": 1,
+      "sample": [
+        "aria-expanded={open ? 'true' : 'false'}"
+      ],
+      "applied": 0
+    },
+    {
+      "file": "src\\components\\emergency\\EdJourneyProgressRail.tsx",
+      "hits": 1,
+      "sample": [
+        "aria-current={state === 'active' ? 'step' : undefined}"
+      ],
+      "applied": 0
+    },
+    {
+      "file": "src\\components\\emergency\\HospitalJourneyCommandBar.tsx",
+      "hits": 1,
+      "sample": [
+        "aria-current={isCurrentRoute ? 'page' : state === 'active' ? 'step' : undefined}"
+      ],
+      "applied": 0
+    },
+    {
+      "file": "src\\components\\forms\\Checkbox.tsx",
+      "hits": 1,
+      "sample": [
+        "aria-checked={checked ? 'true' : 'false'}"
+      ],
+      "applied": 0
+    },
+    {
+      "file": "src\\components\\patient-card\\PatientJourneyIndicator.tsx",
+      "hits": 1,
+      "sample": [
+        "aria-current={isActive ? 'step' : undefined}"
+      ],
+      "applied": 0
+    },
+    {
+      "file": "src\\components\\profile\\ProfileSettingsShell.tsx",
+      "hits": 1,
+      "sample": [
+        "aria-current={active ? 'page' : undefined}"
+      ],
+      "applied": 0
+    },
+    {
+      "file": "src\\components\\StaffWorkloadPanel.tsx",
+      "hits": 1,
+      "sample": [
+        "aria-hidden={!open ? 'true' : 'false'}"
+      ],
+      "applied": 0
+    },
+    {
+      "file": "src\\components\\verification\\PatientVerificationExperience.tsx",
+      "hits": 1,
+      "sample": [
+        "aria-current={isActive ? 'step' : undefined}"
+      ],
+      "applied": 0
+    },
+    {
+      "file": "src\\domain\\patient\\PatientJourneyTracker.tsx",
+      "hits": 1,
+      "sample": [
+        "aria-current={status === 'current' ? 'step' : undefined}"
+      ],
+      "applied": 0
+    },
+    {
+      "file": "src\\navigation\\NavIcon.tsx",
+      "hits": 1,
+      "sample": [
+        "aria-hidden={(decorative ? true : undefined) ? 'true' : 'false'}"
+      ],
+      "applied": 0
+    },
+    {
+      "file": "src\\pages\\clinical\\Medical3DViewer.tsx",
+      "hits": 1,
+      "sample": [
+        "aria-pressed={selected ? 'true' : 'false'}"
+      ],
+      "applied": 0
+    },
+    {
+      "file": "src\\pages\\emergency\\ReceptionPipelineShell.tsx",
+      "hits": 1,
+      "sample": [
+        "aria-current={active ? 'step' : undefined}"
+      ],
+      "applied": 0
+    },
+    {
+      "file": "src\\pages\\tools\\Calculators.tsx",
+      "hits": 1,
+      "sample": [
+        "aria-pressed={isActive ? 'true' : 'false'}"
+      ],
+      "applied": 0
+    },
+    {
+      "file": "src\\pages\\tools\\ToolsOverview.tsx",
+      "hits": 1,
+      "sample": [
+        "aria-disabled={tool.isLaunchable === false ? 'true' : 'false'}"
+      ],
+      "applied": 0
+    }
+  ]
+}

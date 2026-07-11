@@ -65,6 +65,13 @@ export interface EvaluationRun {
   metrics: EvaluationMetrics;
   evaluatedAt: string;
   notes?: string;
+  /**
+   * When true, metrics are demo seeds — not measured offline/live eval.
+   * Prefer seedOnly=false runs (e.g. ai-eval-run harness) for promotion decisions.
+   */
+  seedOnly?: boolean;
+  /** Path or id of measured source (e.g. qa/ai-eval/results/latest.json) */
+  measuredSource?: string;
 }
 
 export interface EvaluationRawScores {
@@ -116,4 +123,14 @@ export interface EvaluationDashboard {
   benchmarks: EvaluationBenchmark[];
   runs: EvaluationRun[];
   comparisons: Record<EvaluationComparisonDimension, EvaluationComparisonSummary[]>;
+  /**
+   * Honesty flags for consumers — never treat seed-only aggregates as measured production quality.
+   */
+  honesty?: {
+    aggregateIsSeedOnly: boolean;
+    measuredRunCount: number;
+    seedRunCount: number;
+    measuredSource?: string;
+    guidance: string;
+  };
 }

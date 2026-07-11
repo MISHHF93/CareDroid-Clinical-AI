@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   CommandActionGraphicCard,
@@ -24,6 +24,13 @@ import {
   buildHospitalCommandCenterSnapshot,
   filterHospitalCommandMetrics,
 } from '../../services/hospitalCommandCenterModel';
+import {
+  buildSentinelCommandMetrics,
+  buildSentinelLiveRegionText,
+  formatEtaRange,
+  loadSentinelCommandSnapshotWithFallback,
+} from '../../services/sentinel';
+import type { SentinelCommandSnapshot, SentinelUnitView } from '../../types/sentinel';
 
 import EdDataSourceBanner from '../../components/emergency/EdDataSourceBanner';
 import useEdRouteDataContext from '../../hooks/useEdRouteDataContext';
@@ -62,6 +69,35 @@ export default function HospitalCommandCenter() {
   const unifiedOperationalIntelligence = useUnifiedOperationalIntelligence({ realtime: true });
   const operationalIntelligence = aiChief.operationalIntelligence;
   const emergencyAnalytics = useEmergencyAnalytics();
+  const [sentinelSnapshot, setSentinelSnapshot] = useState<SentinelCommandSnapshot | null>(null);
+  const [sentinelSource, setSentinelSource] = useState<'live' | 'cache' | 'unavailable'>('unavailable');
+  const [sentinelMessage, setSentinelMessage] = useState('Sentinel not loaded');
+
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const result = await loadSentinelCommandSnapshotWithFallback();
+        if (cancelled) return;
+        setSentinelSnapshot(result.snapshot);
+        setSentinelSource(result.source);
+        setSentinelMessage(result.message);
+      } catch {
+        if (cancelled) return;
+        setSentinelSnapshot(null);
+        setSentinelSource('unavailable');
+        setSentinelMessage('Sentinel capability unavailable');
+      }
+    };
+    void load();
+    const timer = window.setInterval(() => {
+      void load();
+    }, 30_000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(timer);
+    };
+  }, []);
 
   const snapshot = useMemo(
     () =>
@@ -107,9 +143,27 @@ export default function HospitalCommandCenter() {
     [emergencyRole.role],
   );
 
-  const visibleMetrics = useMemo(
-    () => filterHospitalCommandMetrics(snapshot, visibleMetricIds),
-    [snapshot, visibleMetricIds],
+  const sentinelMetrics = useMemo(
+    () => buildSentinelCommandMetrics(sentinelSnapshot),
+    [sentinelSnapshot],
+  );
+
+  const visibleMetrics = useMemo(() => {
+    const base = filterHospitalCommandMetrics(snapshot, visibleMetricIds);
+    // Prefer live Sentinel values for EMS/ETA/alarm/AI metrics when available.
+    if (!sentinelSnapshot) return base;
+    const byId = new Map(base.map((m) => [m.id, m]));
+    for (const metric of sentinelMetrics) {
+      if (visibleMetricIds.includes(metric.id)) {
+        byId.set(metric.id, metric);
+      }
+    }
+    return visibleMetricIds.map((id) => byId.get(id)).filter(Boolean) as typeof base;
+  }, [snapshot, visibleMetricIds, sentinelSnapshot, sentinelMetrics]);
+
+  const sentinelLiveText = useMemo(
+    () => buildSentinelLiveRegionText(sentinelSnapshot),
+    [sentinelSnapshot],
   );
 
   const workflowActions = useMemo(
@@ -166,7 +220,11 @@ export default function HospitalCommandCenter() {
               <span>
                 3-min: {snapshot.threeMinuteCompliance.compliant ? 'compliant' : 'breach'}
               </span>
+              <span>Sentinel: {sentinelSource}</span>
             </div>
+          </div>
+          <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+            {sentinelLiveText}
           </div>
         </>
       }
@@ -200,6 +258,50 @@ export default function HospitalCommandCenter() {
       }
       activeWork={
         <>
+          <section
+            className="emergency-route-card cd-surface-card"
+            aria-labelledby="sentinel-ems-command-heading"
+          >
+            <div className="emergency-route-section-card__header">
+              <div>
+                <strong id="sentinel-ems-command-heading">Sentinel EMS command</strong>
+                <p className="emergency-route-section-card__lead">
+                  Live units, ETA confidence ranges, inbound pre-arrival, durable alarms, and
+                  human-review AI. Source: {sentinelSource}. {sentinelMessage}
+                </p>
+              </div>
+              <Link
+                to={CANONICAL_ROUTES.emergencyEms}
+                className="emergency-route-filter-banner__btn cd-btn cd-btn--secondary cd-btn--sm"
+              >
+                Open EMS pipeline
+              </Link>
+            </div>
+            {sentinelSnapshot && sentinelSnapshot.units.length > 0 ? (
+              <ul className="hospital-command-center__sentinel-units">
+                {sentinelSnapshot.units.slice(0, 8).map((unit: SentinelUnitView) => (
+                  <li key={unit.id}>
+                    <strong>{unit.label}</strong>
+                    <span>
+                      {unit.status} · {unit.freshness}
+                    </span>
+                    <span>{formatEtaRange(unit)}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="emergency-route-section-card__lead">
+                No Sentinel units yet. Enable SENTINEL_ENABLED and poll mock/webhook adapters, or
+                use EMS pipeline demo paths.
+              </p>
+            )}
+            {sentinelSnapshot && sentinelSnapshot.aiRecommendations.length > 0 ? (
+              <p className="emergency-route-section-card__lead" role="note">
+                {sentinelSnapshot.aiRecommendations.length} AI recommendation(s) require clinician
+                review before any pathway activation.
+              </p>
+            ) : null}
+          </section>
           <section className="emergency-route-card cd-surface-card">
             <div className="emergency-route-section-card__header">
               <div>

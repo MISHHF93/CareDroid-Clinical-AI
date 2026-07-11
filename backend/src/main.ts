@@ -12,6 +12,7 @@ import { AppModule } from './app.module';
 import {
   registerEdgeAIAmbulanceWebSocketSupport,
   registerEMSWebSocketSupport,
+  registerSentinelAvlWebSocketSupport,
 } from './api/ems.socket';
 import healthRoutes from './api/health.routes';
 import { registerAllRoutes } from './api/routes-registry';
@@ -207,6 +208,11 @@ async function bootstrap() {
     expressApp,
     app.getHttpServer(),
     undefined,
+    environment.server.corsOrigins,
+  );
+  registerSentinelAvlWebSocketSupport(
+    expressApp,
+    app.getHttpServer(),
     environment.server.corsOrigins,
   );
 

@@ -101,6 +101,15 @@ export enum Permission {
   TRIGGER_EMERGENCY_PROTOCOL = 'TRIGGER_EMERGENCY_PROTOCOL', // Initiate emergency response
   OVERRIDE_SAFETY_CHECKS = 'OVERRIDE_SAFETY_CHECKS', // Override warnings (senior physicians only)
 
+  // CareDroid Sentinel (EMS command, AVL, durable alarms, AI review)
+  VIEW_SENTINEL_COMMAND = 'VIEW_SENTINEL_COMMAND',
+  MANAGE_SENTINEL_UNITS = 'MANAGE_SENTINEL_UNITS',
+  ACK_SENTINEL_ALARMS = 'ACK_SENTINEL_ALARMS',
+  MANAGE_SENTINEL_GEOFENCES = 'MANAGE_SENTINEL_GEOFENCES',
+  INGEST_SENTINEL_CAD = 'INGEST_SENTINEL_CAD',
+  REVIEW_SENTINEL_AI = 'REVIEW_SENTINEL_AI',
+  VIEW_SENTINEL_ANALYTICS = 'VIEW_SENTINEL_ANALYTICS',
+
   // Two-Factor Authentication
   ENFORCE_MFA = 'ENFORCE_MFA', // Require 2FA for specific users
   MANAGE_MFA = 'MANAGE_MFA', // Configure MFA settings
@@ -497,6 +506,43 @@ export const PermissionMetadata: Record<
     description: 'Override system safety warnings',
     category: 'Emergency & Safety',
     riskLevel: 'critical',
+  },
+
+  // CareDroid Sentinel
+  [Permission.VIEW_SENTINEL_COMMAND]: {
+    description: 'View Sentinel EMS command center, units, and inbound patients',
+    category: 'Sentinel',
+    riskLevel: 'high',
+  },
+  [Permission.MANAGE_SENTINEL_UNITS]: {
+    description: 'Manage Sentinel EMS units and tracking configuration',
+    category: 'Sentinel',
+    riskLevel: 'high',
+  },
+  [Permission.ACK_SENTINEL_ALARMS]: {
+    description: 'Acknowledge, escalate, and resolve Sentinel alarms',
+    category: 'Sentinel',
+    riskLevel: 'high',
+  },
+  [Permission.MANAGE_SENTINEL_GEOFENCES]: {
+    description: 'Create and manage Sentinel geofences',
+    category: 'Sentinel',
+    riskLevel: 'medium',
+  },
+  [Permission.INGEST_SENTINEL_CAD]: {
+    description: 'Ingest CAD/AVL and EMS webhook events into Sentinel',
+    category: 'Sentinel',
+    riskLevel: 'critical',
+  },
+  [Permission.REVIEW_SENTINEL_AI]: {
+    description: 'Review and accept/reject Sentinel AI recommendations',
+    category: 'Sentinel',
+    riskLevel: 'high',
+  },
+  [Permission.VIEW_SENTINEL_ANALYTICS]: {
+    description: 'View Sentinel EMS and alarm analytics KPIs',
+    category: 'Sentinel',
+    riskLevel: 'medium',
   },
 
   // Two-Factor Authentication

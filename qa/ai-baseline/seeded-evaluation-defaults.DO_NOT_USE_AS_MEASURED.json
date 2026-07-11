@@ -1,0 +1,16 @@
+{
+  "warning": "These values are copied from EvaluationService DEFAULT_METRICS for documentation only. They are SEED / DEMO defaults and must NEVER be treated as measured production quality or copied into measured-series.empty.json as measured values.",
+  "source": "backend/src/modules/evaluation/evaluation.service.ts",
+  "frozenAt": "2026-07-11",
+  "DEFAULT_METRICS": {
+    "modelQuality": 0.912,
+    "hallucinationRate": 0.038,
+    "accuracy": 0.924,
+    "latencyMs": 860,
+    "retrievalPrecision": 0.887,
+    "toolExecutionSuccess": 0.991,
+    "workflowSuccess": 0.943,
+    "userSatisfaction": 4.55,
+    "costUsd": 12.8
+  }
+}

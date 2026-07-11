@@ -1,0 +1,43 @@
+{
+  "id": "mdl-offline-eval-harness-v1",
+  "displayName": "CareDroid offline AI eval harness",
+  "kind": "eval_harness",
+  "status": "approved",
+  "purpose": "Locked synthetic safety/contract evaluation (refusal, calculator parity, retrieval citations, PHI minimize, structured provenance).",
+  "prohibitedUses": [
+    "Substituting fixture pass rates for live foundation-model clinical quality claims without additional measured runs"
+  ],
+  "owner": "Platform Engineering / Clinical Informatics",
+  "reviewers": ["Clinical Informatics", "Security"],
+  "trainingDataLineage": "Synthetic de-identified packs only — data/ai-eval/v1 (no production PHI).",
+  "benchmarkResults": {
+    "command": "npm run ai:eval:gate",
+    "latest": "qa/ai-eval/results/latest.json",
+    "cases": 35
+  },
+  "regulatoryClass": "eval_only",
+  "jurisdictions": ["all"],
+  "limitations": [
+    "Fixture-based; token-overlap entailment proxy; not live LLM judge.",
+    "Subgroup packs deferred to v1.1."
+  ],
+  "deployment": {
+    "environments": ["dev", "sim", "prod"],
+    "featureFlag": "ci_ai_eval_gate",
+    "canaryPercentDefault": 100,
+    "rollback": "N/A for harness; candidates blocked on gate fail.",
+    "history": [
+      {
+        "at": "2026-07-11",
+        "event": "pr4_harness_landed",
+        "actor": "AI Assurance PR-4/PR-10"
+      }
+    ]
+  },
+  "expiresAt": "2027-07-11",
+  "retirementPlan": "Version suite to v2 with live LLM optional packs; keep v1 frozen for regression.",
+  "provider": "local",
+  "modelIdentifier": "offline-fixture-harness",
+  "relatedServiceIds": [],
+  "relatedPaths": ["scripts/ai-eval-run.mjs", "scripts/ai-eval-gate.mjs", "data/ai-eval/v1/"]
+}

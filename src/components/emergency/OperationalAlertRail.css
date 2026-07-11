@@ -1,99 +1,40 @@
+/* Non-chrome OperationalAlertRail host (whiteboard / other strips).
+ * Chrome KPIs use ChromeStatusChips — not this file. */
+
 .operational-alert-rail {
   display: flex;
   min-width: 0;
   overflow: hidden;
 }
 
-.operational-alert-rail--dense .operational-alert-rail__strip.operational-strip--compact {
-  gap: 4px;
-}
-
-.operational-alert-rail--dense .operational-alert-rail__strip .operational-strip__metric {
-  display: inline-flex;
-  flex-direction: row;
-  align-items: baseline;
-  gap: 5px;
-  min-height: 26px;
-  padding: 3px 8px;
-  border-radius: 999px;
-  font-family: inherit;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0;
-  text-transform: none;
-}
-
-.operational-alert-rail--dense .operational-alert-rail__strip .operational-strip__metric strong {
-  order: 1;
-  font-size: 12px;
-  font-weight: 850;
-}
-
-.operational-alert-rail--dense .operational-alert-rail__strip .operational-strip__metric span {
-  order: 0;
-  color: var(--medical-text-subtle, #9ca3af);
-  font-size: 10px;
-  font-weight: 650;
-}
-
 .operational-alert-rail__strip.operational-strip--compact {
   display: flex;
   flex-wrap: nowrap;
-  gap: 5px;
+  gap: 8px;
   border: none;
   border-radius: 0;
   background: transparent;
   grid-template-columns: none;
-}
-
-.operational-alert-rail__strip .operational-strip__metric {
-  display: inline-flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 0;
-  min-height: auto;
-  min-width: 0;
-  padding: 5px 7px;
-  border: 1px solid rgba(31, 41, 55, 0.9);
-  border-radius: 999px;
-  background: var(--medical-surface-card, #ffffff);
-  color: var(--medical-text-muted, #6b7280);
-  flex-shrink: 0;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 10px;
-  font-weight: 850;
-  letter-spacing: 0.04em;
-  line-height: 1.2;
-  text-transform: uppercase;
-  cursor: default;
-}
-
-.operational-alert-rail__strip .operational-strip__metric strong {
-  font-size: inherit;
-  font-weight: inherit;
-  color: inherit;
+  box-shadow: none;
+  padding: 0;
 }
 
 .operational-alert-rail__strip .operational-strip__metric span:empty {
   display: none;
 }
 
-.operational-alert-rail__strip .operational-strip__metric[data-tone='success'] {
-  border-color: rgba(16, 185, 129, 0.34);
-  color: var(--medical-status-success-text, #15803d);
-}
-
-.operational-alert-rail__strip .operational-strip__metric[data-tone='warning'] {
-  border-color: rgba(245, 158, 11, 0.38);
-  color: var(--medical-status-warning-text, #b45309);
-}
-
-.operational-alert-rail__strip .operational-strip__metric[data-tone='critical'] {
-  border-color: rgba(239, 68, 68, 0.42);
-  color: var(--medical-status-critical-text, #b91c1c);
-}
-
-.operational-alert-rail--sync-pulse
-  .operational-strip__metric[data-metric-id='sync-status'] {
+.operational-alert-rail--sync-pulse .operational-strip__metric[data-metric-id='sync-status'] {
   animation: emergency-os-sync-pulse 1.2s ease-out;
+}
+
+@keyframes emergency-os-sync-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.45);
+  }
+  70% {
+    box-shadow: 0 0 0 8px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
 }

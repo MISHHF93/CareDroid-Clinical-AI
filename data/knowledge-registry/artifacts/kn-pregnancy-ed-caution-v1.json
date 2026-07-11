@@ -1,0 +1,40 @@
+{
+  "id": "kn-pregnancy-ed-caution-v1",
+  "title": "Pregnancy considerations in ED — CareDroid operational summary",
+  "publisher": "CareDroid Clinical Informatics",
+  "author": "CareDroid Clinical Informatics",
+  "published_at": "2026-07-11",
+  "retrieved_at": "2026-07-11",
+  "jurisdiction": "US-oriented_educational",
+  "version": "1",
+  "url_or_canonical_id": "data/medical-knowledge/pregnancy-ed-caution.md",
+  "license": "CareDroid-internal-educational-summary",
+  "permitted_use": "internal_rag_demo_and_ops_only",
+  "content_hash": "0dffdc0987c41dd6624c15016200ae1b0bccf6f29fe1e1b62650890673aa42b2",
+  "content_path": "data/medical-knowledge/pregnancy-ed-caution.md",
+  "topic": "pregnancy_ed_caution",
+  "specialty": "obstetrics",
+  "evidence_grade": "summary",
+  "review_status": "accepted_with_limitations",
+  "expires_at": "2027-07-11",
+  "source_type": "clinical_reference",
+  "rag_ingest_allowed": true,
+  "limitations": [
+    "Not ACOG full guidance; local OB protocols supersede.",
+    "AI must not start/stop medications or declare trimester-specific safety."
+  ],
+  "reject_reason": null,
+  "related_artifact_ids": [],
+  "provenance_chain": [
+    {
+      "step": "authored_internal_summary",
+      "actor": "CareDroid Clinical Informatics",
+      "at": "2026-07-11"
+    },
+    {
+      "step": "registry_acceptance",
+      "actor": "AI Assurance post-v1",
+      "at": "2026-07-11"
+    }
+  ]
+}

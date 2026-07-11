@@ -1,0 +1,33 @@
+{
+  "id": "kn-reddit-sepsis-thread-v1",
+  "title": "Anonymous forum sepsis advice thread (example rejection)",
+  "publisher": "unknown",
+  "author": "anonymous",
+  "published_at": null,
+  "retrieved_at": "2026-07-11",
+  "jurisdiction": "unknown",
+  "version": "1",
+  "url_or_canonical_id": "https://reddit.com/r/medicine/example-rejected",
+  "license": "unknown",
+  "permitted_use": "rejected",
+  "content_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "content_path": "",
+  "topic": "sepsis",
+  "specialty": "emergency_medicine",
+  "evidence_grade": "D",
+  "review_status": "rejected",
+  "expires_at": null,
+  "source_type": "other",
+  "rag_ingest_allowed": false,
+  "limitations": [],
+  "reject_reason": "community_forum_as_clinical_evidence; domain denylist (reddit.com); missing license; unverifiable authorship",
+  "related_artifact_ids": [],
+  "provenance_chain": [
+    {
+      "step": "rejected_at_review",
+      "actor": "AI Baseline PR-2 policy",
+      "at": "2026-07-11",
+      "note": "Illustrative rejection — community discussion may inform workflow discovery labels only, never clinical evidence grade A–C."
+    }
+  ]
+}

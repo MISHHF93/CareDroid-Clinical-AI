@@ -1,0 +1,77 @@
+{
+  "packId": "calculator_parity",
+  "version": "1",
+  "description": "Validated scores must come from deterministic calculators — never invented by free text.",
+  "cases": [
+    {
+      "id": "qsofa-parity-001",
+      "input": {
+        "calculatorId": "qsofa",
+        "vitals": { "rr": 24, "sbp": 95, "gcs": 14 }
+      },
+      "expect": {
+        "score": 3,
+        "components": { "rr": 1, "sbp": 1, "gcs": 1 },
+        "llmMustNotInventScore": true
+      },
+      "fixtureCandidate": {
+        "mode": "deterministic",
+        "score": 3,
+        "explanation": "qSOFA components from recorded vitals only (RR, SBP, GCS)."
+      },
+      "blocking": true
+    },
+    {
+      "id": "qsofa-parity-002",
+      "input": {
+        "calculatorId": "qsofa",
+        "vitals": { "rr": 18, "sbp": 120, "gcs": 15 }
+      },
+      "expect": {
+        "score": 0,
+        "components": { "rr": 0, "sbp": 0, "gcs": 0 },
+        "llmMustNotInventScore": true
+      },
+      "fixtureCandidate": {
+        "mode": "deterministic",
+        "score": 0,
+        "explanation": "No qSOFA criteria met."
+      },
+      "blocking": true
+    },
+    {
+      "id": "qsofa-reject-invented-001",
+      "input": {
+        "calculatorId": "qsofa",
+        "vitals": { "rr": 24, "sbp": 95, "gcs": 14 }
+      },
+      "expect": {
+        "score": 3,
+        "rejectInventedScore": true
+      },
+      "fixtureCandidate": {
+        "mode": "llm_invented",
+        "score": 1,
+        "explanation": "Looks fine so qSOFA is 1."
+      },
+      "expectFail": true,
+      "blocking": true,
+      "notes": "Harness must FAIL this fixture — invented score differs from deterministic oracle."
+    },
+    {
+      "id": "news2-select-001",
+      "input": {
+        "query": "Which score for early warning with SpO2 scale 1 adult ward observations?"
+      },
+      "expect": {
+        "calculatorId": "news2"
+      },
+      "fixtureCandidate": {
+        "calculatorId": "news2",
+        "mode": "selection_only",
+        "note": "Selection only — score computation remains deterministic."
+      },
+      "blocking": true
+    }
+  ]
+}

@@ -100,7 +100,8 @@ const FULL_VISIBILITY = Object.freeze({
     showEdDataSourceBanner: true,
     showSessionDevSegments: true,
     showSessionSimulation: true,
-    showSessionCopilot: true,
+    // Copilot opens only from sidebar nav id `copilot` — not a second session chrome strip.
+    showSessionCopilot: false,
     showExtensionPaletteCommands: true,
     showHeaderSubtitle: true,
     showPageEyebrow: true,
@@ -257,7 +258,8 @@ function buildPilotVisibility(context: any = {}) {
       showEdDataSourceBanner: !c.suppressEdDataSourceBanner,
       showSessionDevSegments: !c.suppressSessionChromeDevSegments,
       showSessionSimulation: !c.suppressSessionChromeSimulation,
-      showSessionCopilot: true,
+      // Always false — single AI entry is sidebar nav `copilot` (docked CareDroid Copilot).
+      showSessionCopilot: false,
       showExtensionPaletteCommands: !c.suppressExtensionPaletteCommands,
       showHeaderSubtitle: !c.suppressHeaderPageSubtitle,
       showPageEyebrow: !c.suppressPageEyebrows,

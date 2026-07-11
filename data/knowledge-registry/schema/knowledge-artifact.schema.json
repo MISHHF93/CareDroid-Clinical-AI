@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://caredroid.local/schemas/knowledge-artifact-v1.json",
+  "title": "CareDroid Knowledge Artifact v1",
+  "description": "Governed knowledge artifact metadata for RAG and clinical AI evidence. Accepted artifacts only may be ingested into the medical knowledge index.",
+  "type": "object",
+  "required": [
+    "id",
+    "title",
+    "publisher",
+    "retrieved_at",
+    "jurisdiction",
+    "version",
+    "license",
+    "permitted_use",
+    "content_hash",
+    "content_path",
+    "topic",
+    "specialty",
+    "evidence_grade",
+    "review_status",
+    "provenance_chain"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^kn-[a-z0-9-]+-v[0-9]+$",
+      "description": "Stable artifact id, e.g. kn-acls-cardiac-arrest-v1"
+    },
+    "title": { "type": "string", "minLength": 3 },
+    "publisher": { "type": "string", "minLength": 2 },
+    "author": {
+      "type": ["string", "array"],
+      "items": { "type": "string" }
+    },
+    "published_at": {
+      "type": ["string", "null"],
+      "description": "Original publication date when known (ISO date)"
+    },
+    "retrieved_at": { "type": "string" },
+    "jurisdiction": {
+      "type": "string",
+      "description": "e.g. US, CA, multi, global, institutional"
+    },
+    "version": { "type": "string" },
+    "url_or_canonical_id": {
+      "type": ["string", "null"],
+      "description": "Canonical URL, DOI, PMID, or internal path"
+    },
+    "license": {
+      "type": "string",
+      "description": "SPDX-like or explicit license label"
+    },
+    "permitted_use": {
+      "type": "string",
+      "enum": [
+        "internal_rag_and_ops",
+        "internal_rag_demo_and_ops_only",
+        "citation_only",
+        "public_domain_full_text",
+        "open_license_full_text",
+        "rejected"
+      ]
+    },
+    "content_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "SHA-256 hex of content file bytes"
+    },
+    "content_path": {
+      "type": "string",
+      "description": "Repo-relative path to allowed text body"
+    },
+    "topic": { "type": "string" },
+    "specialty": { "type": "string" },
+    "evidence_grade": {
+      "type": "string",
+      "enum": ["A", "B", "C", "D", "N/A", "summary"],
+      "description": "A–D for primary evidence; summary for internal educational digests; N/A for non-clinical"
+    },
+    "review_status": {
+      "type": "string",
+      "enum": ["draft", "accepted", "accepted_with_limitations", "rejected", "expired", "pending_review"]
+    },
+    "expires_at": {
+      "type": ["string", "null"],
+      "description": "Revalidation / expiry date (ISO date)"
+    },
+    "provenance_chain": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["step", "actor", "at"],
+        "properties": {
+          "step": { "type": "string" },
+          "actor": { "type": "string" },
+          "at": { "type": "string" },
+          "note": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "source_type": {
+      "type": "string",
+      "enum": [
+        "protocol",
+        "guideline",
+        "clinical_reference",
+        "drug_info",
+        "calculator_reference",
+        "standards_spec",
+        "other"
+      ]
+    },
+    "rag_ingest_allowed": { "type": "boolean" },
+    "limitations": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "reject_reason": {
+      "type": ["string", "null"]
+    },
+    "related_artifact_ids": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}

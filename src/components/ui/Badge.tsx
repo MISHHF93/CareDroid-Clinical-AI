@@ -46,12 +46,30 @@ function Badge({
   ...props
 }: BadgeProps) {
   const resolvedVariant = variant || TONE_TO_VARIANT[tone || 'neutral'] || 'neutral';
+  // Map danger → critical alarm rail for platform consistency
+  const alarmTone =
+    resolvedVariant === 'danger'
+      ? 'critical'
+      : resolvedVariant === 'warning'
+        ? 'warning'
+        : resolvedVariant === 'success'
+          ? 'ok'
+          : resolvedVariant === 'info'
+            ? 'info'
+            : 'neutral';
   return (
     <PrimitiveBadge
       tone={VARIANT_TO_TONE[resolvedVariant]}
       size={size}
       compact={compact || size === 'sm'}
-      className={[dot ? 'cd-badge--with-dot' : '', className ?? ''].filter(Boolean).join(' ')}
+      className={[
+        dot ? 'cd-badge--with-dot' : '',
+        alarmTone !== 'neutral' ? `alarm-badge alarm-badge--${alarmTone}` : '',
+        className ?? '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+      data-alarm={alarmTone}
       {...props}
     >
       {dot && <span className="cd-badge__dot" aria-hidden="true" />}

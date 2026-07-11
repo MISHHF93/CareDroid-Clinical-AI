@@ -22,6 +22,7 @@ import {
   ToolExecutionLogEntry,
   ToolResolution,
 } from './tool-calling.types';
+import { recordAiMonitorEvent } from '../../../../lib/ai/productionMonitoring';
 
 @Injectable()
 export class ToolExecutionService {
@@ -452,6 +453,11 @@ export class ToolExecutionService {
 
     const toolId =
       request.toolId || classification?.toolId || resolution.requestedToolId || 'unknown-tool';
+    recordAiMonitorEvent('unsupported_tool', {
+      toolId,
+      source: 'tool-calling',
+      reason: resolution.reason,
+    });
     await this.recordBlockedAutomation(request, {
       toolId,
       triggerFired: 'Tool execution requested',

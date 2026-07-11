@@ -77,7 +77,10 @@ describe('operationalAlertRailModel', () => {
       'sync-status',
     ]);
     expect(metrics.find((metric) => metric.id === 'active-alerts')?.tone).toBe('critical');
-    expect(metrics.find((metric) => metric.id === 'reassessment-due')?.value).toBe('REA 4');
+    expect(metrics.find((metric) => metric.id === 'reassessment-due')?.value).toBe('4');
+    expect(metrics.find((metric) => metric.id === 'reassessment-due')?.label).toBe('Reassess');
+    expect(metrics.find((metric) => metric.id === 'capacity')?.label).toBe('Capacity');
+    expect(metrics.find((metric) => metric.id === 'capacity')?.value).toMatch(/72/);
   });
 
   it('appends operational intelligence metric when enabled', () => {
@@ -96,6 +99,23 @@ describe('operationalAlertRailModel', () => {
 
     expect(metrics.at(-1)?.id).toBe('operational-intelligence');
     expect(metrics.at(-1)?.tone).toBe('success');
+  });
+
+  it('keeps the header strip to three readable primary metrics when sync is fresh', () => {
+    const metrics = buildHeaderOperationalAlertMetrics({
+      centralSnapshot: buildSnapshot(),
+      syncLabel: 'POLLING now',
+      syncStale: false,
+      screenMode: null,
+    });
+
+    expect(metrics).toHaveLength(3);
+    expect(metrics.map((metric) => metric.id)).toEqual([
+      'capacity',
+      'ems-inbound',
+      'reassessment-due',
+    ]);
+    expect(metrics.every((metric) => metric.label.trim().length > 0)).toBe(true);
   });
 
   it('caps pilot header metrics to two station signals per screen mode', () => {

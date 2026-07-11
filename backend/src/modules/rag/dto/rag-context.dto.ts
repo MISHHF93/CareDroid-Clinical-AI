@@ -248,6 +248,26 @@ export interface RAGRetrievalOptions {
   specialty?: string;
 
   /**
+   * Jurisdiction label for registry-backed corpora (e.g. US-oriented_educational)
+   */
+  jurisdiction?: string;
+
+  /**
+   * Evidence grade allow-list (A|B|C|D|summary|N/A)
+   */
+  evidenceGrade?: string | string[];
+
+  /**
+   * Drop expired knowledge-registry artifacts
+   */
+  excludeExpired?: boolean;
+
+  /**
+   * Hybrid lexical + dense fusion (default true when unset)
+   */
+  hybrid?: boolean;
+
+  /**
    * Include embedding vectors in response
    */
   includeEmbeddings?: boolean;

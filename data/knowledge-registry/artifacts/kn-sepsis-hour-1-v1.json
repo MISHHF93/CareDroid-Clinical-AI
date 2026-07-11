@@ -1,0 +1,43 @@
+{
+  "id": "kn-sepsis-hour-1-v1",
+  "title": "Sepsis Hour-1 Bundle — CareDroid operational summary",
+  "publisher": "CareDroid Clinical Informatics",
+  "author": "CareDroid Clinical Informatics",
+  "published_at": "2026-06-01",
+  "retrieved_at": "2026-07-11",
+  "jurisdiction": "US-oriented_educational",
+  "version": "1",
+  "url_or_canonical_id": "data/medical-knowledge/sepsis-hour-1-bundle.md",
+  "license": "CareDroid-internal-educational-summary",
+  "permitted_use": "internal_rag_demo_and_ops_only",
+  "content_hash": "a03f9db4eb1376643bc0e2319ea54a3979ee6a5b5913dfe07c3dab3dedd1644a",
+  "content_path": "data/medical-knowledge/sepsis-hour-1-bundle.md",
+  "topic": "sepsis_hour_1_bundle",
+  "specialty": "emergency_medicine",
+  "evidence_grade": "summary",
+  "review_status": "accepted_with_limitations",
+  "expires_at": "2027-07-11",
+  "source_type": "guideline",
+  "rag_ingest_allowed": true,
+  "limitations": [
+    "Educational digest inspired by Surviving Sepsis Campaign Hour-1 concepts — not the full SSC guideline text.",
+    "Local antimicrobial and fluid protocols supersede this summary.",
+    "AI must not auto-order antibiotics, fluids, or vasopressors from this artifact."
+  ],
+  "reject_reason": null,
+  "related_artifact_ids": ["kn-sofa-overview-v1"],
+  "provenance_chain": [
+    {
+      "step": "authored_internal_summary",
+      "actor": "CareDroid Clinical Informatics",
+      "at": "2026-06-01",
+      "note": "ED documentation reminders for hour-1 sepsis interventions."
+    },
+    {
+      "step": "registry_seed_acceptance",
+      "actor": "AI Baseline PR-2",
+      "at": "2026-07-11",
+      "note": "Accepted with limitations; cite SSC primary publications for formal evidence claims."
+    }
+  ]
+}

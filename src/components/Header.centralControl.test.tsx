@@ -1,8 +1,18 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { UserProvider } from '../contexts/UserContext';
 import { Header } from './Header';
+
+vi.mock('../contexts/NotificationShellContext', () => ({
+  useNotificationShell: () => ({
+    visibleNotificationAlerts: [],
+    openPanel: vi.fn(),
+    recordAlertAcknowledged: vi.fn(),
+    openAlertRoute: vi.fn(() => null),
+  }),
+  NotificationShellProvider: ({ children }: { children: unknown }) => children,
+}));
 
 function renderHeader() {
   return render(
@@ -14,28 +24,45 @@ function renderHeader() {
   );
 }
 
-describe('Header central control', () => {
-  it('hides advanced central controls from the pilot top bar', () => {
+describe('Header flat chrome (app-chrome-top)', () => {
+  it('renders identity, search, create, and account only', () => {
     renderHeader();
 
-    expect(screen.queryByText(/Central Node: Input only/i)).toBeNull();
-    expect(screen.queryByText(/Physician input/i)).toBeNull();
-    expect(screen.queryByLabelText('CareDroid demo scenario')).toBeNull();
-    expect(screen.queryByLabelText('Demo CareDroid role')).toBeNull();
+    const header = screen.getByRole('banner');
+    expect(header).toHaveClass('app-chrome-top');
+    expect(header).toHaveAttribute('data-header-layout', 'minimal');
+    expect(within(header).queryByText('CD')).toBeNull();
+    expect(
+      within(header).getByRole('searchbox', { name: /operational search|patient search/i }),
+    ).toBeInTheDocument();
+    expect(within(header).getByRole('button', { name: /create patient/i })).toBeInTheDocument();
+    expect(within(header).getByRole('button', { name: /Account menu for/i })).toBeInTheDocument();
   });
 
-  it('shows the compact workflow profile switcher directly in the header', () => {
+  it('has no Guide control in the header (Guide is sidebar-only)', () => {
     renderHeader();
 
-    expect(screen.getByLabelText('Switch workflow profile')).toBeInTheDocument();
+    const header = screen.getByRole('banner');
+    expect(within(header).queryByLabelText('Department status')).toBeNull();
+    // Guide must not appear as a button, link, or labeled control in the top bar
+    expect(within(header).queryByRole('button', { name: /^Guide$/i })).toBeNull();
+    expect(within(header).queryByRole('link', { name: /^Guide$/i })).toBeNull();
+    expect(within(header).queryByRole('button', { name: /open caredroid guide|process guide/i })).toBeNull();
+    expect(within(header).queryByTitle(/process guide/i)).toBeNull();
+    expect(within(header).queryByText(/Central Node/i)).toBeNull();
+    // Sidebar owns the single Guide entry — header actions are alarms/create/account only
+    expect(header.querySelector('.help-trigger')).toBeNull();
+    expect(header.querySelector('.help-trigger--icon')).toBeNull();
   });
 
-  it('renders a slim contextual header with search and create actions', () => {
+  it('places search before create in the header DOM', () => {
     renderHeader();
 
-    expect(screen.getByRole('button', { name: /create patient/i })).toBeInTheDocument();
-    expect(screen.getByRole('searchbox', { name: /operational search/i })).toBeInTheDocument();
-    expect(screen.queryByLabelText('Operational command context')).toBeNull();
-    expect(screen.queryByRole('button', { name: /notification center/i })).toBeNull();
+    const header = screen.getByRole('banner');
+    const search = within(header).getByRole('searchbox');
+    const create = within(header).getByRole('button', { name: /create patient/i });
+    expect(
+      Boolean(search.compareDocumentPosition(create) & Node.DOCUMENT_POSITION_FOLLOWING),
+    ).toBe(true);
   });
 });

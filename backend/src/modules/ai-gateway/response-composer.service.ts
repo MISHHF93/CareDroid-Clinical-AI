@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { buildAiResponseProvenance } from '../../../../lib/ai/provenanceContract';
 import {
   AiContextPacket,
   AiGatewayMetadata,
@@ -14,7 +15,7 @@ export class ResponseComposerService {
     routePlan: ExpertRoutePlan,
     contextPacket: AiContextPacket,
     extraMetadata: Record<string, any> = {},
-  ): T & { metadata: Record<string, any> } {
+  ): T & { provenance: ReturnType<typeof buildAiResponseProvenance>; metadata: Record<string, any> } {
     const aiFoundation: AiGatewayMetadata = {
       runId: envelope.runId,
       capabilityId: envelope.capabilityId,
@@ -30,19 +31,52 @@ export class ResponseComposerService {
       estimatedCost: routePlan.costPlan.estimatedCost,
       costReductionApplied: routePlan.costPlan.costReductionApplied,
       phiAccessed: envelope.policy.phiAccessed,
-      requiresHumanReview: routePlan.safetyPlan.requiresHumanReview,
+      requiresHumanReview: true, // PR-6: clinician review always required on composed AI output
       startedAt: envelope.trace.startedAt,
     };
     const pipeline = [
       ...contextPacket.pipeline,
       { stage: 'response_composer', status: 'complete' as const },
+      { stage: 'provenance_contract', status: 'complete' as const },
     ];
+
+    const ragContext = (response as any).ragContext;
+    const citations = (response as any).citations || ragContext?.sources || [];
+    const chunks = ragContext?.chunks || [];
+    const confidence =
+      typeof (response as any).confidence === 'number'
+        ? (response as any).confidence
+        : routePlan.confidence;
+
+    const provenance =
+      (response as any).provenance && (response as any).provenance.contractVersion === '1.0.0'
+        ? (response as any).provenance
+        : buildAiResponseProvenance({
+            confidence,
+            ragSources: citations,
+            ragChunks: chunks,
+            modelOrEngine: routePlan.modelPlan?.primaryModel || routePlan.selectedExpert,
+            responseClass: routePlan.safetyPlan?.emergencyEscalation ? 'clinical' : 'operational',
+            recommendedReviewerRole: 'Responsible clinician',
+            missingInformation: Array.isArray((response as any).missingInformation)
+              ? (response as any).missingInformation
+              : [],
+            limitations: [
+              'Chat/copilot output is decision support only.',
+              routePlan.retrievalPolicy
+                ? `Retrieval policy: ${String(routePlan.retrievalPolicy)}`
+                : 'Retrieval policy not specified for this route.',
+            ],
+          });
 
     return {
       ...response,
+      provenance,
+      requiresClinicianReview: true,
       metadata: {
         ...response.metadata,
         aiFoundation,
+        provenance,
         aiGateway: {
           runId: envelope.runId,
           capabilityId: envelope.capabilityId,
@@ -58,7 +92,10 @@ export class ResponseComposerService {
           modelPlan: routePlan.modelPlan,
           toolPlan: routePlan.toolPlan,
           costPlan: routePlan.costPlan,
-          safetyPlan: routePlan.safetyPlan,
+          safetyPlan: {
+            ...routePlan.safetyPlan,
+            requiresHumanReview: true,
+          },
         },
         context: {
           sourceSurface: contextPacket.sourceSurface,
@@ -72,7 +109,7 @@ export class ResponseComposerService {
           blockedActions: routePlan.safetyPlan.blockedActions,
           emergencyEscalation: routePlan.safetyPlan.emergencyEscalation,
           crisisEscalation: routePlan.safetyPlan.crisisEscalation,
-          requiresHumanReview: routePlan.safetyPlan.requiresHumanReview,
+          requiresHumanReview: true,
         },
         cost: {
           estimated: routePlan.costPlan.estimatedCost,

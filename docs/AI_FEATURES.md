@@ -3,6 +3,16 @@
 > **Platform build:** `emergency-os-2026.06`
 > **Primary model:** `claude-sonnet-4-6` (Anthropic Claude)
 > **Governance posture:** Human-reviewed clinical decision support — never autonomous clinician
+>
+> **Baseline freeze (2026-07-11):** [AI Baseline Report v1](./ai/AI_BASELINE_REPORT_v1.md) · [Maturity matrix](./ai/AI_CAPABILITY_MATURITY_MATRIX_v1.md) · `qa/ai-baseline/`.  
+> **Eval (PR-4):** [AI Eval Harness v1](./ai/AI_EVAL_HARNESS_v1.md) — `npm run ai:eval:gate` (authoritative offline safety suite).  
+> **RAG (PR-5):** [Hybrid retrieval + citation entailment](./ai/RAG_HYBRID_RETRIEVAL_v1.md).  
+> **Provenance (PR-6):** [Response provenance contract](./ai/RESPONSE_PROVENANCE_CONTRACT_v1.md) — evidence, confidence, missing info, uncertainty, clinician review.  
+> **Tools / honesty (PR-7/8):** [Tool capability + maturity labels](./ai/TOOL_CAPABILITY_HONESTY_v1.md).  
+> **Registry / deploy (PR-10):** [Model registry](./ai/MODEL_REGISTRY_v1.md) · [Shadow/canary](./ai/runbooks/SHADOW_CANARY_DEPLOYMENT.md) · [Rollback](./ai/runbooks/ROLLBACK_AND_KILL_SWITCH.md).  
+> **Assurance report (PR-11):** [AI Assurance Engineering Report v1](./ai/AI_ASSURANCE_ENGINEERING_REPORT_v1.md).  
+> **Post-v1:** subgroup eval gate · 7 knowledge artifacts · eval dashboard seed banner · [production monitoring](./ai/PRODUCTION_MONITORING_v1.md).  
+> Feature docs describe intended design; the baseline documents what is **actually wired**, what is **heuristic/future**, and which evaluation numbers are **seeded only**.
 
 This document is the authoritative reference for every AI capability in CareDroid. It covers the AI platform architecture, all 17 registered AI services, the 9 live copilot tools, the RAG pipeline, NLU service, edge AI layer, governance framework, and per-tenant configuration.
 
@@ -44,20 +54,20 @@ CareDroid's AI layer is built around three non-negotiable principles:
 
 ## 2. Provider support
 
-The AI platform is provider-agnostic. The active provider is set via `AI_PROVIDER` (env) and defaults to Anthropic.
+Generation goes through a **single egress** (`lib/ai/providers/egress.ts` → `callAI` / `unifiedAIClient`). See [LLM Egress v1](./ai/LLM_EGRESS_v1.md).
 
 | Provider | `AI_PROVIDER` value | Notes |
 |----------|--------------------|----|
-| **Anthropic Claude** | `anthropic` | Default. Prompt caching enabled. |
-| OpenAI | `openai` | Full tool-use support |
-| Azure OpenAI | `azure-openai` | Used by Ambient Documentation service |
-| Google Gemini | `gemini` | Available as alternative |
-| Local / deterministic | `local` | Used by rule-based and edge services; no API cost |
+| **Anthropic Claude** | `anthropic` | **Default.** Prompt caching + tools + streaming. |
+| OpenAI | `openai` | Chat Completions adapter (non-streaming in v1 egress). |
+| Azure OpenAI | `azure-openai` | Requires endpoint + deployment + API key. |
+| Google Gemini | `gemini` | generateContent adapter (non-streaming text). |
+| Local / deterministic | `local` | No network; degraded-mode / tests / offline. |
 
-**Default model:** `claude-sonnet-4-6`
-**Fallback model:** `claude-sonnet-4-6`
-**Default temperature:** `0.2`
-**Default max tokens:** `2,000`
+**Default model:** `claude-sonnet-4-6`  
+**Fallback:** set `AI_FALLBACK_PROVIDER` (e.g. `local`) and/or `AI_LOCAL_FALLBACK=1`  
+**Kill switch:** `AI_KILL_SWITCH=1` or `AI_EXTERNAL_LLM_DISABLED=1`  
+**PHI minimize:** applied on every egress call (pattern redaction)
 
 Override per-call via `AI_MODEL`, `AI_TEMPERATURE`, `AI_MAX_TOKENS`, or `AI_STREAMING_ENABLED`.
 

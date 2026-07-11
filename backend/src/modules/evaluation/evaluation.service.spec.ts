@@ -34,6 +34,11 @@ describe('EvaluationService', () => {
     expect(dashboard.aggregateMetrics.accuracy).toBeGreaterThanOrEqual(0);
     expect(dashboard.aggregateMetrics.retrievalPrecision).toBeGreaterThanOrEqual(0);
     expect(dashboard.benchmarks.every((benchmark) => benchmark.observedLabel)).toBe(true);
+    expect(dashboard.honesty).toBeDefined();
+    expect(typeof dashboard.honesty?.aggregateIsSeedOnly).toBe('boolean');
+    expect(dashboard.honesty?.guidance).toMatch(/seed|measured/i);
+    // Seed runs are always labeled for honesty
+    expect(dashboard.runs.some((run) => run.seedOnly === true)).toBe(true);
   });
 
   it('creates evaluation runs from raw scoring counters', () => {

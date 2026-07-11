@@ -5,6 +5,7 @@
   --app-shell-sidebar-offset: var(--cdl-sidebar-width, 232px);
   display: flex;
   height: var(--app-viewport-height, 100dvh);
+  max-height: var(--app-viewport-height, 100dvh);
   overflow: hidden;
   background: var(--cdl-canvas-bg, var(--ed-surface-base, var(--medical-surface-page)));
   color: var(--ed-text-primary, var(--medical-ink));
@@ -47,12 +48,84 @@
   outline-offset: 2px;
 }
 
+/*
+ * Scroll chain (platform-wide):
+ * shell (fixed 100dvh, overflow hidden)
+ *   → main-column (flex:1 1 0; min-height:0; column)
+ *     → chrome siblings (flex-shrink:0)
+ *     → main.app-shell-main-content (flex:1; min-height:0; overflow-y:auto)  ← only scrollport
+ */
 .emergency-app-shell__main-column {
   display: flex;
-  flex: 1;
+  flex: 1 1 0;
   flex-direction: column;
   min-width: 0;
+  min-height: 0;
+  max-height: 100%;
   overflow: hidden;
+}
+
+/* Flex host under RouteChromeProvider — owns chrome + scrollable page */
+.emergency-app-shell__chrome-and-page {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  max-height: 100%;
+  overflow: hidden;
+}
+
+.emergency-app-shell__command-bars {
+  flex: 0 0 auto;
+  flex-shrink: 0;
+}
+
+/* Unified chrome stack: top bar + context bar as one surface.
+ * Single hairline under the whole stack — no internal separators. */
+.app-chrome {
+  --app-chrome-pad-x: var(--cdl-header-padding-inline, 0px);
+  --app-chrome-control-h: 36px;
+  --app-chrome-control-radius: 9px;
+  flex: 0 0 auto;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background: var(--app-surface-1, #ffffff);
+  border-bottom: 0;
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--medical-border, #e2e8f0) 55%, transparent);
+  overflow: visible;
+  position: relative;
+  z-index: 30;
+}
+
+.app-chrome .app-chrome-top {
+  border: 0;
+  border-bottom: 0;
+  box-shadow: none;
+  background: transparent;
+}
+
+.app-chrome .app-chrome-context {
+  border: 0;
+  border-bottom: 0;
+  box-shadow: none;
+  background: color-mix(in srgb, var(--medical-slate-50, #f8fafc) 55%, #ffffff);
+}
+
+/* Keep chrome from eating the scrollport (alarms float outside this chain) */
+.emergency-app-shell__chrome-and-page > .app-chrome,
+.emergency-app-shell__chrome-and-page .session-chrome-bar,
+.emergency-app-shell__chrome-and-page > .emergency-app-shell__command-bars,
+.emergency-app-shell__chrome-and-page > .emergency-wall-kiosk-header {
+  flex: 0 0 auto;
+  flex-shrink: 0;
+}
+
+/* Legacy in-flow dock no longer used; floating window reserves no chrome height */
+.emergency-app-shell {
+  --cdl-alarm-dock-estimate: 0px;
 }
 
 .emergency-app-shell > .sidebar {
@@ -70,8 +143,9 @@
 }
 
 .emergency-app-shell--copilot-open .emergency-app-shell__main-column {
-  flex: 1 1 auto;
+  flex: 1 1 0;
   min-width: 0;
+  min-height: 0;
 }
 
 .emergency-app-shell--copilot-open .ed-copilot-panel {
@@ -90,14 +164,28 @@
   font-size: var(--ed-type-section, 13px);
 }
 
+/*
+ * Sole page scrollport: take remaining height after chrome siblings.
+ * flex-basis 0 forces correct remaining-space calculation in the column chain.
+ */
 .app-shell-main-content {
-  flex: 1;
+  flex: 1 1 0;
   min-width: 0;
   min-height: 0;
-  overflow: auto;
+  max-height: 100%;
+  overflow-x: clip;
+  overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-gutter: stable;
   -webkit-overflow-scrolling: touch;
+  /* Do not use 100vh here — that breaks nested flex scroll with sticky chrome */
+  height: auto;
+}
+
+/* Nested page roots should grow with content, not trap a second viewport */
+.app-shell-main-content > * {
+  min-width: 0;
+  max-width: 100%;
 }
 
 .app-shell-main-content--mobile-nav {

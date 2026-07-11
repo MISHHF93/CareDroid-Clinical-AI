@@ -1,6 +1,22 @@
 import { Injectable } from '@nestjs/common';
+import {
+  annotateAnswerClaims,
+  filterSupportedClaims,
+  scoreClaimAgainstEvidence,
+  type ClaimEntailmentResult,
+  type ClaimInput,
+  type EvidenceSpan,
+} from '../../../../lib/rag/citationEntailment';
 import { MedicalSource } from './dto/medical-source.dto';
 import { RAGReference, RetrievedChunk } from './dto/rag-context.dto';
+
+export interface GroundedAnswerResult {
+  originalText: string;
+  groundedText: string;
+  claims: ClaimEntailmentResult[];
+  strippedClaims: ClaimEntailmentResult[];
+  unsupportedRate: number;
+}
 
 @Injectable()
 export class CitationService {
@@ -91,6 +107,71 @@ export class CitationService {
       chunkIds: sortedChunks.map((chunk) => chunk.id),
       excerpts: sortedChunks.slice(0, 2).map((chunk) => this.trimExcerpt(chunk.text)),
     };
+  }
+
+  /**
+   * Score free-text claims against retrieved chunk evidence (token-overlap entailment).
+   */
+  scoreClaims(
+    claims: ClaimInput[],
+    chunks: RetrievedChunk[],
+    options?: { minScore?: number; requireCitationMatch?: boolean },
+  ): { kept: ClaimEntailmentResult[]; stripped: ClaimEntailmentResult[] } {
+    const evidence = this.toEvidenceSpans(chunks);
+    return filterSupportedClaims(claims, evidence, options);
+  }
+
+  scoreSingleClaim(
+    claim: ClaimInput,
+    chunks: RetrievedChunk[],
+    options?: { minScore?: number; requireCitationMatch?: boolean },
+  ): ClaimEntailmentResult {
+    return scoreClaimAgainstEvidence(claim, this.toEvidenceSpans(chunks), options);
+  }
+
+  /**
+   * Annotate an answer and optionally strip unsupported clinical-looking sentences.
+   * Safe default: strip when unsupportedRate material and stripUnsupported=true.
+   */
+  groundAnswer(
+    answerText: string,
+    chunks: RetrievedChunk[],
+    options: { minScore?: number; stripUnsupported?: boolean } = {},
+  ): GroundedAnswerResult {
+    const evidenceTexts = chunks.map((c) => c.text);
+    const annotated = annotateAnswerClaims(answerText, evidenceTexts, {
+      minScore: options.minScore,
+    });
+    const stripped = annotated.sentences.filter((s) => !s.supported);
+    const kept = annotated.sentences.filter((s) => s.supported);
+
+    let groundedText = answerText;
+    if (options.stripUnsupported) {
+      groundedText = kept.map((s) => s.claim).join(' ').trim();
+      if (!groundedText) {
+        groundedText =
+          'I could not support a clinical claim from the retrieved sources. Please consult the cited guidelines or a clinician.';
+      }
+    }
+
+    return {
+      originalText: answerText,
+      groundedText,
+      claims: annotated.sentences,
+      strippedClaims: stripped,
+      unsupportedRate: annotated.unsupportedRate,
+    };
+  }
+
+  private toEvidenceSpans(chunks: RetrievedChunk[]): EvidenceSpan[] {
+    return chunks.map((chunk) => ({
+      text: chunk.text,
+      sourceId: chunk.metadata?.sourceId,
+      artifactId:
+        (chunk.metadata as any)?.artifactId ||
+        (chunk.metadata as any)?.metadata?.artifactId ||
+        chunk.metadata?.sourceId,
+    }));
   }
 
   private trimExcerpt(text: string): string {

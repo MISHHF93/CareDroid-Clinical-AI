@@ -1,38 +1,51 @@
 /**
- * Chrome ↔ page alignment — one padded track on the main column so utility bar,
- * route tab, alarm dock, session bar, and page canvas share the same left edge.
+ * Chrome ↔ page alignment
+ *
+ * Strategy:
+ * - main-column owns the horizontal gutter
+ * - app-chrome + main content span the same content width (no second inset)
+ * - top bar + context bar use pad-x: 0 so their content shares one left/right edge
  */
 
 .emergency-app-shell__main-column {
+  --app-layout-page-gutter-inline: var(--app-layout-page-gutter-inline, 16px);
   padding-inline: var(--app-layout-page-gutter-inline);
+  box-sizing: border-box;
+  --cdl-alarm-dock-estimate: 0px;
+  --cdl-header-padding-inline: 0px;
+}
+
+/* One track: chrome stack + page share max-width and centering */
+.emergency-app-shell__main-column > .app-chrome,
+.emergency-app-shell__main-column > .emergency-app-shell__command-bars,
+.emergency-app-shell__main-column > .session-chrome-bar,
+.emergency-app-shell__main-column > .app-shell-main-content,
+.emergency-app-shell__chrome-and-page > .app-chrome,
+.emergency-app-shell__chrome-and-page > .emergency-app-shell__command-bars,
+.emergency-app-shell__chrome-and-page > .session-chrome-bar,
+.emergency-app-shell__chrome-and-page > .app-shell-main-content {
+  width: 100%;
+  max-width: var(--app-layout-content-max, 100%);
+  margin-inline: 0;
   box-sizing: border-box;
 }
 
-.emergency-app-shell__main-column > :is(
-    .caredroid-header--slim,
-    .shell-route-tab,
-    .operational-alarm-dock,
-    .session-chrome-bar,
-    .app-shell-main-content
-  ) {
-  width: 100%;
-  max-width: var(--app-layout-content-max);
-  margin-inline: auto;
+.emergency-app-shell__main-column .app-chrome {
+  --app-chrome-pad-x: 0px;
+  --cdl-header-padding-inline: 0px;
 }
 
-.emergency-app-shell__main-column .caredroid-header--slim .caredroid-header__topbar {
+.emergency-app-shell__main-column .app-chrome-top,
+.emergency-app-shell__main-column .app-chrome-context {
+  padding-inline: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.emergency-app-shell__main-column .app-chrome-top {
   height: var(--cdl-header-height, 52px);
   min-height: var(--cdl-header-height, 52px);
-  padding-inline: 0;
-}
-
-.emergency-app-shell__main-column .shell-route-tab {
-  padding-inline: 0;
-}
-
-.emergency-app-shell__main-column .operational-alarm-dock__strip,
-.emergency-app-shell__main-column .operational-alarm-dock__checklist {
-  padding-inline: 0;
+  max-height: var(--cdl-header-height, 52px);
 }
 
 .emergency-app-shell__main-column .session-chrome-bar {
@@ -41,33 +54,25 @@
 
 .emergency-app-shell .app-shell-main-content {
   padding-inline: 0;
-  padding-block-start: var(--app-layout-page-gutter-block);
+  padding-block-start: var(--app-layout-page-gutter-block, 12px);
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .emergency-app-shell .app-shell-main-content > * {
   width: 100%;
   max-width: 100%;
   margin-inline: 0;
+  min-width: 0;
 }
 
 .emergency-app-shell .app-shell-main-content > :first-child {
   margin-block-start: 0;
 }
 
-.emergency-app-shell .app-shell-main-content .tools-overview {
-  margin-inline: 0;
-  max-width: 100%;
-  padding-inline: 0;
-}
-
 @media (max-width: 768px) {
-  .emergency-app-shell__main-column > :is(
-      .caredroid-header--slim,
-      .shell-route-tab,
-      .operational-alarm-dock,
-      .session-chrome-bar,
-      .app-shell-main-content
-    ) {
-    max-width: 100%;
+  .emergency-app-shell__main-column {
+    padding-inline: 12px;
   }
 }

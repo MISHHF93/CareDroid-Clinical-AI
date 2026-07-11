@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, Bell, ChevronDown, ChevronUp, X } from 'lucide-react';
 import { CRITICAL_CHECKLISTS } from '../../config/criticalChecklists';
 import {
   EMERGENCY_ACTIONS,
@@ -114,12 +114,27 @@ function topDockAlert(alerts: Alert[]): Alert | null {
   );
 }
 
+function countActiveAlerts(alerts: Alert[]): number {
+  return alerts.filter(
+    (alert) =>
+      !alert.dismissed &&
+      !alert.acknowledged &&
+      ['critical', 'high', 'medium'].includes(getAlertClassificationTier(alert)),
+  ).length;
+}
+
+/**
+ * Header-anchored alarm notification control.
+ * Chip lives in the top bar; expanded panel drops below the header (not full-width).
+ */
 export default function OperationalAlarmDock({ showEmsInbound = true }: OperationalAlarmDockProps) {
   const navigate = useNavigate();
   const { user } = useUser();
   const emergencyRole = useEmergencyRolePermissions();
   const { saasRole } = useEffectiveUserProfile();
   const now = useNow();
+  const panelId = useId();
+  const chipRef = useRef<HTMLButtonElement>(null);
 
   const emsArrivals = useEmergencyStore((state) => state.emsArrivals);
   const rooms = useEmergencyStore((state) => state.rooms);
@@ -140,25 +155,74 @@ export default function OperationalAlarmDock({ showEmsInbound = true }: Operatio
     () => topDockAlert(visibleNotificationAlerts),
     [visibleNotificationAlerts],
   );
+  const alertCount = useMemo(
+    () => countActiveAlerts(visibleNotificationAlerts) + (arrival ? 1 : 0),
+    [visibleNotificationAlerts, arrival],
+  );
 
+  const [windowOpen, setWindowOpen] = useState(false);
   const [checklistOpen, setChecklistOpen] = useState(true);
+  const [seenEmsId, setSeenEmsId] = useState<string | null>(null);
+
   const currentStaff = useMemo(
     () => resolveCurrentStaff({ user, staff, activeShift }),
     [activeShift, staff, user],
   );
 
+  // Soft-open once for a newly seen critical EMS inbound (user can collapse after).
+  useEffect(() => {
+    if (arrival?.id && arrival.id !== seenEmsId) {
+      setSeenEmsId(arrival.id);
+      setWindowOpen(true);
+      setChecklistOpen(true);
+    }
+  }, [arrival?.id, seenEmsId]);
+
+  useEffect(() => {
+    if (!windowOpen) return undefined;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setWindowOpen(false);
+        chipRef.current?.focus();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [windowOpen]);
+
   if (!arrival && !storeAlert) {
     return null;
   }
 
+  const tier = arrival
+    ? 'critical'
+    : storeAlert
+      ? getAlertClassificationTier(storeAlert)
+      : 'high';
+
+  const chipLabel = arrival
+    ? `EMS ETA ${countdownLabel(arrival, now)}`
+    : storeAlert
+      ? storeAlert.title
+      : 'Alerts';
+
+  const chipSummary =
+    alertCount > 1
+      ? `${alertCount} active`
+      : arrival
+        ? 'Critical EMS'
+        : tier === 'critical'
+          ? 'Critical alert'
+          : 'Priority alert';
+
   const renderStoreAlert = (alert: Alert) => {
-    const tier = getAlertClassificationTier(alert);
+    const alertTier = getAlertClassificationTier(alert);
     const primaryAction = openAlertRoute(alert);
     return (
       <section
-        className={`operational-alarm-dock__strip operational-alarm-dock__strip--${tier}`}
-        role="alert"
-        aria-live="polite"
+        className={`operational-alarm-dock__card operational-alarm-dock__card--${alertTier}`}
+        aria-label={alert.title}
       >
         <AlertTriangle size={16} aria-hidden className="operational-alarm-dock__icon" />
         <div className="operational-alarm-dock__copy">
@@ -174,173 +238,235 @@ export default function OperationalAlarmDock({ showEmsInbound = true }: Operatio
           <button type="button" onClick={() => recordAlertAcknowledged(alert.id)}>
             Acknowledge
           </button>
-          <button type="button" className="operational-alarm-dock__ghost" onClick={openPanel}>
-            All alerts
-          </button>
         </div>
       </section>
     );
   };
 
-  if (!arrival) {
-    return <div className="operational-alarm-dock">{renderStoreAlert(storeAlert!)}</div>;
+  let emsBody: ReactNode = null;
+  if (arrival) {
+    const checklist = CRITICAL_CHECKLISTS.find((entry) => entry.type === arrival.criticalChecklist?.type);
+    const items = checklist?.items || [];
+    const completedCount = arrival.criticalChecklist?.completions.length || 0;
+    const progress = items.length ? Math.round((completedCount / items.length) * 100) : 0;
+    const assignedBay = roomName(rooms, arrival.preparedRoomId || arrival.criticalChecklist?.assignedRoomId);
+    const doctors = physicianList(staff, activeShift);
+    const isPrepComplete = Boolean(arrival.criticalChecklist?.completedAt);
+    const canMarkPrepComplete = items.length > 0 && completedCount >= items.length;
+    const prepareBayPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.prepareEmsBay);
+    const convertPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.convertEmsArrival);
+    const canPrepareBay = prepareBayPresentation.visible && prepareBayPresentation.enabled;
+    const canConvert = convertPresentation.visible && convertPresentation.enabled;
+
+    const toggleItem = (item: { id: string; label: string }, checked: boolean) => {
+      if (!canPrepareBay) return;
+      checkCriticalEMSChecklistItem(arrival.id, {
+        itemId: item.id,
+        label: item.label,
+        checked,
+        staffId: currentStaff.staffId,
+        staffName: currentStaff.staffName,
+        timestamp: new Date().toISOString(),
+      });
+    };
+
+    const markPrepComplete = () => {
+      if (!canMarkPrepComplete || !canPrepareBay) return;
+      completeCriticalEMSChecklist(arrival.id, {
+        staffId: currentStaff.staffId,
+        staffName: currentStaff.staffName,
+        timestamp: new Date().toISOString(),
+      });
+      setChecklistOpen(false);
+    };
+
+    const addToWhiteboard = () => {
+      if (!canConvert) return;
+      const result = convertEmsArrivalForReception(arrival.id, {
+        actorName: emergencyRole.roleLabel,
+      });
+      if (!result.ok) return;
+      if (prefersReceptionForPatientCreate(emergencyRole.role)) {
+        navigateProfileAware(
+          navigate,
+          result.receptionVerifyPath ||
+            getReceptionEmbeddedIntakePath({
+              step: 'verify',
+              patientId: result.patientId,
+              emsArrivalId: arrival.id,
+            }),
+          { emergencyRole, saasRole },
+        );
+      }
+    };
+
+    emsBody = (
+      <>
+        <section
+          className={[
+            'operational-alarm-dock__card',
+            'operational-alarm-dock__card--critical',
+            isPrepComplete ? 'operational-alarm-dock__card--complete' : '',
+          ]
+            .filter(Boolean)
+            .join(' ')}
+          aria-label="Critical EMS inbound"
+        >
+          <AlertTriangle size={16} aria-hidden className="operational-alarm-dock__icon" />
+          <div className="operational-alarm-dock__copy">
+            <strong>
+              Critical EMS — {arrival.chiefComplaint || arrival.prearrivalComplaint}
+            </strong>
+            <span>
+              ETA {countdownLabel(arrival, now)} · {assignedBay}
+              {isPrepComplete
+                ? ` · Prep complete by ${arrival.criticalChecklist?.completedByStaffName || 'team'}`
+                : ` · ${completedCount}/${items.length} prep steps`}
+            </span>
+          </div>
+          <div className="operational-alarm-dock__actions">
+            {!isPrepComplete ? (
+              <button type="button" onClick={() => setChecklistOpen((open) => !open)}>
+                {checklistOpen ? 'Hide prep' : 'Show prep'}
+              </button>
+            ) : null}
+            <button type="button" onClick={addToWhiteboard} disabled={!canConvert}>
+              Add to whiteboard
+            </button>
+          </div>
+        </section>
+
+        {checklistOpen && !isPrepComplete ? (
+          <div className="operational-alarm-dock__checklist" aria-label={arrival.criticalChecklist?.title}>
+            <div className="operational-alarm-dock__checklist-head">
+              <div>
+                <span className="operational-alarm-dock__checklist-eyebrow">Critical EMS prep</span>
+                <h2>{arrival.criticalChecklist?.title}</h2>
+                <p>
+                  {arrival.unitName} · {assignedBay} · Notify {doctors}
+                </p>
+              </div>
+              <div className="operational-alarm-dock__checklist-meta">
+                <div
+                  className="operational-alarm-dock__progress"
+                  aria-label={`${progress}% checklist complete`}
+                >
+                  <span style={{ width: `${progress}%` }} />
+                </div>
+                <strong>
+                  {completedCount}/{items.length}
+                </strong>
+              </div>
+            </div>
+            <div className="operational-alarm-dock__checklist-items">
+              {items.map((item) => {
+                const completion = arrival.criticalChecklist?.completions.find(
+                  (entry) => entry.itemId === item.id,
+                );
+                const label =
+                  item.id === 'physician-notified' ? `${item.label}: ${doctors}` : item.label;
+                return (
+                  <label
+                    key={item.id}
+                    className={completion ? 'operational-alarm-dock__item--done' : ''}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={Boolean(completion)}
+                      onChange={(event) => toggleItem(item, event.target.checked)}
+                      disabled={!canPrepareBay}
+                    />
+                    <span>{label}</span>
+                  </label>
+                );
+              })}
+            </div>
+            <div className="operational-alarm-dock__checklist-actions">
+              <button
+                type="button"
+                onClick={markPrepComplete}
+                disabled={!canMarkPrepComplete || !canPrepareBay}
+              >
+                Mark prep complete
+              </button>
+            </div>
+          </div>
+        ) : null}
+      </>
+    );
   }
 
-  const checklist = CRITICAL_CHECKLISTS.find((entry) => entry.type === arrival.criticalChecklist?.type);
-  const items = checklist?.items || [];
-  const completedCount = arrival.criticalChecklist?.completions.length || 0;
-  const progress = items.length ? Math.round((completedCount / items.length) * 100) : 0;
-  const assignedBay = roomName(rooms, arrival.preparedRoomId || arrival.criticalChecklist?.assignedRoomId);
-  const doctors = physicianList(staff, activeShift);
-  const isPrepComplete = Boolean(arrival.criticalChecklist?.completedAt);
-  const canMarkPrepComplete = items.length > 0 && completedCount >= items.length;
-  const prepareBayPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.prepareEmsBay);
-  const convertPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.convertEmsArrival);
-  const canPrepareBay = prepareBayPresentation.visible && prepareBayPresentation.enabled;
-  const canConvert = convertPresentation.visible && convertPresentation.enabled;
-
-  const toggleItem = (item: { id: string; label: string }, checked: boolean) => {
-    if (!canPrepareBay) return;
-    checkCriticalEMSChecklistItem(arrival.id, {
-      itemId: item.id,
-      label: item.label,
-      checked,
-      staffId: currentStaff.staffId,
-      staffName: currentStaff.staffName,
-      timestamp: new Date().toISOString(),
-    });
-  };
-
-  const markPrepComplete = () => {
-    if (!canMarkPrepComplete || !canPrepareBay) return;
-    completeCriticalEMSChecklist(arrival.id, {
-      staffId: currentStaff.staffId,
-      staffName: currentStaff.staffName,
-      timestamp: new Date().toISOString(),
-    });
-    setChecklistOpen(false);
-  };
-
-  const addToWhiteboard = () => {
-    if (!canConvert) return;
-    const result = convertEmsArrivalForReception(arrival.id, {
-      actorName: emergencyRole.roleLabel,
-    });
-    if (!result.ok) return;
-    if (prefersReceptionForPatientCreate(emergencyRole.role)) {
-      navigateProfileAware(
-        navigate,
-        result.receptionVerifyPath ||
-          getReceptionEmbeddedIntakePath({
-            step: 'verify',
-            patientId: result.patientId,
-            emsArrivalId: arrival.id,
-          }),
-        { emergencyRole, saasRole },
-      );
-    }
-  };
-
   return (
-    <div className="operational-alarm-dock">
-      <section
-        className={[
-          'operational-alarm-dock__strip',
-          'operational-alarm-dock__strip--critical',
-          'operational-alarm-dock__strip--ems',
-          isPrepComplete ? 'operational-alarm-dock__strip--complete' : '',
-        ]
-          .filter(Boolean)
-          .join(' ')}
-        role="alert"
-        aria-live="polite"
+    <div
+      className={[
+        'operational-alarm-dock',
+        'operational-alarm-dock--header',
+        windowOpen ? 'operational-alarm-dock--open' : 'operational-alarm-dock--collapsed',
+        `operational-alarm-dock--tier-${tier}`,
+      ].join(' ')}
+      data-alarm-surface="header-notification"
+    >
+      <button
+        ref={chipRef}
+        type="button"
+        className="operational-alarm-dock__chip"
+        aria-expanded={windowOpen}
+        aria-controls={panelId}
+        aria-haspopup="dialog"
+        aria-label={`${chipSummary}: ${chipLabel}. ${windowOpen ? 'Collapse' : 'Expand'} alarms`}
+        onClick={() => setWindowOpen((open) => !open)}
       >
-        <AlertTriangle size={16} aria-hidden className="operational-alarm-dock__icon" />
-        <div className="operational-alarm-dock__copy">
-          <strong>
-            Critical EMS inbound — {arrival.chiefComplaint || arrival.prearrivalComplaint}
-          </strong>
-          <span>
-            ETA {countdownLabel(arrival, now)} · {assignedBay}
-            {isPrepComplete
-              ? ` · Prep complete by ${arrival.criticalChecklist?.completedByStaffName || 'team'}`
-              : ` · ${completedCount}/${items.length} prep steps`}
-          </span>
-        </div>
-        <div className="operational-alarm-dock__actions">
-          {!isPrepComplete ? (
-            <button type="button" onClick={() => setChecklistOpen((open) => !open)}>
-              {checklistOpen ? 'Hide prep' : 'Show prep'}
-            </button>
-          ) : null}
-          <button type="button" onClick={addToWhiteboard} disabled={!canConvert}>
-            Add to whiteboard
-          </button>
-          <button type="button" className="operational-alarm-dock__ghost" onClick={openPanel}>
-            All alerts
-          </button>
-        </div>
-      </section>
+        <Bell size={15} aria-hidden className="operational-alarm-dock__chip-icon" />
+        <span className="operational-alarm-dock__chip-count" aria-hidden>
+          {Math.max(1, alertCount)}
+        </span>
+        <span className="operational-alarm-dock__chip-text">
+          <strong>{chipSummary}</strong>
+          <span>{chipLabel}</span>
+        </span>
+        {windowOpen ? <ChevronUp size={14} aria-hidden /> : <ChevronDown size={14} aria-hidden />}
+      </button>
 
-      {checklistOpen && !isPrepComplete ? (
-        <div className="operational-alarm-dock__checklist" aria-label={arrival.criticalChecklist?.title}>
-          <div className="operational-alarm-dock__checklist-head">
-            <div>
-              <span className="operational-alarm-dock__checklist-eyebrow">Critical EMS prep</span>
-              <h2>{arrival.criticalChecklist?.title}</h2>
-              <p>
-                {arrival.unitName} · {assignedBay} · Notify {doctors}
-              </p>
+      {windowOpen ? (
+        <div
+          id={panelId}
+          className="operational-alarm-dock__window"
+          role="region"
+          aria-label="Operational alarms"
+        >
+          <header className="operational-alarm-dock__window-header">
+            <div className="operational-alarm-dock__window-title">
+              <AlertTriangle size={14} aria-hidden />
+              <strong>Alarms</strong>
+              <span className="sr-only" aria-live="polite">
+                {chipSummary}. {chipLabel}
+              </span>
             </div>
-            <div className="operational-alarm-dock__checklist-meta">
-              <div
-                className="operational-alarm-dock__progress"
-                aria-label={`${progress}% checklist complete`}
+            <div className="operational-alarm-dock__window-header-actions">
+              <button type="button" className="operational-alarm-dock__ghost" onClick={openPanel}>
+                All alerts
+              </button>
+              <button
+                type="button"
+                className="operational-alarm-dock__icon-btn"
+                aria-label="Collapse alarms"
+                onClick={() => {
+                  setWindowOpen(false);
+                  chipRef.current?.focus();
+                }}
               >
-                <span style={{ width: `${progress}%` }} />
-              </div>
-              <strong>
-                {completedCount}/{items.length}
-              </strong>
+                <X size={14} aria-hidden />
+              </button>
             </div>
-          </div>
-          <div className="operational-alarm-dock__checklist-items">
-            {items.map((item) => {
-              const completion = arrival.criticalChecklist?.completions.find(
-                (entry) => entry.itemId === item.id,
-              );
-              const label =
-                item.id === 'physician-notified' ? `${item.label}: ${doctors}` : item.label;
-              return (
-                <label
-                  key={item.id}
-                  className={completion ? 'operational-alarm-dock__item--done' : ''}
-                >
-                  <input
-                    type="checkbox"
-                    checked={Boolean(completion)}
-                    onChange={(event) => toggleItem(item, event.target.checked)}
-                    disabled={!canPrepareBay}
-                  />
-                  <span>{label}</span>
-                </label>
-              );
-            })}
-          </div>
-          <div className="operational-alarm-dock__checklist-actions">
-            <button
-              type="button"
-              onClick={markPrepComplete}
-              disabled={!canMarkPrepComplete || !canPrepareBay}
-            >
-              Mark prep complete
-            </button>
+          </header>
+
+          <div className="operational-alarm-dock__window-body">
+            {emsBody}
+            {storeAlert && (!arrival || storeAlert.id !== arrival.id)
+              ? renderStoreAlert(storeAlert)
+              : null}
           </div>
         </div>
-      ) : null}
-
-      {storeAlert && storeAlert.id !== arrival.id ? (
-        <div className="operational-alarm-dock__secondary">{renderStoreAlert(storeAlert)}</div>
       ) : null}
     </div>
   );

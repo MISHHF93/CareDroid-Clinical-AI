@@ -1,0 +1,43 @@
+{
+  "id": "kn-warfarin-aspirin-v1",
+  "title": "Warfarin and Aspirin Interaction — CareDroid drug-info summary",
+  "publisher": "CareDroid Clinical Informatics",
+  "author": "CareDroid Clinical Informatics",
+  "published_at": "2026-06-01",
+  "retrieved_at": "2026-07-11",
+  "jurisdiction": "US-oriented_educational",
+  "version": "1",
+  "url_or_canonical_id": "data/medical-knowledge/warfarin-aspirin-interaction.md",
+  "license": "CareDroid-internal-educational-summary",
+  "permitted_use": "internal_rag_demo_and_ops_only",
+  "content_hash": "91611a4d01b032fd8f4a6f2beb873fe60781d9db924f84413efe732b08de8c53",
+  "content_path": "data/medical-knowledge/warfarin-aspirin-interaction.md",
+  "topic": "warfarin_aspirin_interaction",
+  "specialty": "emergency_medicine",
+  "evidence_grade": "summary",
+  "review_status": "accepted_with_limitations",
+  "expires_at": "2027-07-11",
+  "source_type": "drug_info",
+  "rag_ingest_allowed": true,
+  "limitations": [
+    "Educational interaction note — not a complete drug database monographs.",
+    "Do not autonomously start/stop anticoagulation from AI output.",
+    "Pharmacy or hematology consult required for complex cases."
+  ],
+  "reject_reason": null,
+  "related_artifact_ids": [],
+  "provenance_chain": [
+    {
+      "step": "authored_internal_summary",
+      "actor": "CareDroid Clinical Informatics",
+      "at": "2026-06-01",
+      "note": "ED-oriented bleeding-risk interaction reminder."
+    },
+    {
+      "step": "registry_seed_acceptance",
+      "actor": "AI Baseline PR-2",
+      "at": "2026-07-11",
+      "note": "Accepted with limitations for internal RAG."
+    }
+  ]
+}

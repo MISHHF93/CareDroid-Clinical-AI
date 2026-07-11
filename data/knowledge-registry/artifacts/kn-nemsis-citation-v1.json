@@ -1,0 +1,44 @@
+{
+  "id": "kn-nemsis-citation-v1",
+  "title": "NEMSIS — citation-only EMS data standard reference",
+  "publisher": "NEMSIS TAC / NHTSA (citation); CareDroid Clinical Informatics (registry entry)",
+  "author": "CareDroid Clinical Informatics",
+  "published_at": null,
+  "retrieved_at": "2026-07-11",
+  "jurisdiction": "US",
+  "version": "1",
+  "url_or_canonical_id": "https://nemsis.org/",
+  "license": "NEMSIS-public-spec",
+  "permitted_use": "citation_only",
+  "content_hash": "3a13616fc97c7fa5d0242004d61af18d707aef980022cbe0f3fee46883650985",
+  "content_path": "data/medical-knowledge/citation-nemsis.md",
+  "topic": "nemsis_ems_data_standard",
+  "specialty": "emergency_medical_services",
+  "evidence_grade": "N/A",
+  "review_status": "accepted_with_limitations",
+  "expires_at": "2028-07-11",
+  "source_type": "standards_spec",
+  "rag_ingest_allowed": false,
+  "limitations": [
+    "Citation metadata only — full NEMSIS dictionary/XSD packages are not redistributed here.",
+    "State and local EMS schemas may diverge; check local authority.",
+    "Not a clinical treatment or triage protocol.",
+    "EMS patient identifiers are PHI; patient-context gate applies before LLM egress."
+  ],
+  "reject_reason": null,
+  "related_artifact_ids": ["kn-fhir-r4-citation-v1"],
+  "provenance_chain": [
+    {
+      "step": "citation_metadata_authored",
+      "actor": "CareDroid Clinical Informatics",
+      "at": "2026-07-11",
+      "note": "Citation-only standards entry pointing at official NEMSIS site."
+    },
+    {
+      "step": "registry_acceptance",
+      "actor": "AI post-v1 finish slice",
+      "at": "2026-07-11",
+      "note": "Accepted with limitations; rag_ingest_allowed=false."
+    }
+  ]
+}

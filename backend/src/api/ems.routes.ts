@@ -20,6 +20,28 @@ function normalizeEMSStatus(status: unknown): EMSLifecycleStatus | null {
   return EMS_STATUS_ALIASES[status] || EMS_STATUS_ALIASES[status.toLowerCase()] || null;
 }
 
+async function dualWriteSentinelInbound(req: {
+  app: { get: (key: string) => unknown };
+  body: Record<string, unknown>;
+}) {
+  // Best-effort dual-write signal when Sentinel is enabled.
+  // Never fails the legacy EMS path — EDOS compatibility first.
+  try {
+    const { getSentinelRuntimeConfig } = await import('../modules/sentinel/sentinel.config');
+    if (!getSentinelRuntimeConfig().enabled) return;
+    const io = req.app.get('io') as
+      | { to?: (room: string) => { emit?: (event: string, payload: unknown) => void } }
+      | undefined;
+    io?.to?.('whiteboard')?.emit?.('sentinel_ems_dual_write', {
+      unitId: req.body.ems_unit_id || req.body.unitId,
+      at: new Date().toISOString(),
+      source: 'legacy-ems-alert',
+    });
+  } catch {
+    // swallow — dual-write is optional
+  }
+}
+
 router.post('/alert', async (req, res) => {
   try {
     if (!req.body?.ems_unit_id && !req.body?.unitId) {
@@ -34,6 +56,7 @@ router.post('/alert', async (req, res) => {
     const patient = await emsService.createPrehospitalAlert(req.body);
     const io = req.app.get('io');
     io?.to?.('whiteboard')?.emit?.('ems_alert_received', patient);
+    await dualWriteSentinelInbound(req);
     res.status(201).json({ message: 'EMS alert received', patient });
   } catch (error: any) {
     res.status(500).json({ error: error.message });

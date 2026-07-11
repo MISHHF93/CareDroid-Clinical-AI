@@ -27,12 +27,15 @@ export default function EdDataSourceBanner({
     simulationModeActive,
   });
 
+  // Clinical UX: only surface data-source lines when something is wrong (stale/error).
+  // Healthy “demo/local” labels are noise for medical staff.
   if (input.loading && !input.envelope) {
-    return (
-      <p className={`ed-data-source ed-data-source--loading ${className}`.trim()} role="status">
-        Loading department data…
-      </p>
-    );
+    return null;
+  }
+
+  const hasError = Boolean(input.error);
+  if (!warnStale && !hasError) {
+    return null;
   }
 
   return (
@@ -43,28 +46,25 @@ export default function EdDataSourceBanner({
         warnStale ? 'Data may be stale. Validate against current department state.' : undefined
       }
     >
-      <span className="ed-data-source__label">Data source:</span> {sourceLabel}
-      <span className="ed-data-source__sep" aria-hidden>
-        {' '}
-        ·{' '}
-      </span>
-      {freshness.label}
-      {input.error ? (
+      {hasError ? (
+        <span className="ed-data-source__warn">Department data unavailable — check connection</span>
+      ) : (
         <>
+          <span className="ed-data-source__warn">Data may be stale</span>
           <span className="ed-data-source__sep" aria-hidden>
             {' '}
             ·{' '}
           </span>
-          <span className="ed-data-source__warn">API unavailable — using local store</span>
+          <span>{freshness.label}</span>
         </>
-      ) : null}
-      {warnStale ? (
+      )}
+      {sourceLabel && warnStale ? (
         <>
           <span className="ed-data-source__sep" aria-hidden>
             {' '}
             ·{' '}
           </span>
-          <span className="ed-data-source__warn">validate before operational decisions</span>
+          <span className="ed-data-source__label">{sourceLabel}</span>
         </>
       ) : null}
     </p>

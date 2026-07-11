@@ -35,6 +35,45 @@ export type RegisteredExecutorToolId = (typeof REGISTERED_EXECUTOR_TOOL_IDS)[num
 /** Legacy / NLU aliases accepted at POST /tools/:id/execute (resolved to canonical ids). */
 export const EXECUTOR_ID_ALIASES: Readonly<Record<string, RegisteredExecutorToolId>> = {
   'drug-interaction-checker': 'drug-interactions',
+  'drug-checker': 'drug-interactions',
+  'drug-check': 'drug-interactions',
+  'lab-interp': 'lab-interpreter',
+  'lab-interpretation': 'lab-interpreter',
+  sofa: 'sofa-calculator',
+  'sofa-score': 'sofa-calculator',
+  heart: 'heart-score',
+  'heart-score-calculator': 'heart-score',
+  wells: 'wells-pe',
+  'wells-pe-score': 'wells-pe',
+  'wells-score': 'wells-pe',
+  gcs: 'gcs-calculator',
+  'glasgow-coma-scale': 'gcs-calculator',
+  'gcs-score': 'gcs-calculator',
+  'news-2': 'news2',
+  'news2-score': 'news2',
+  'news2-calculator': 'news2',
+  'cha2ds2-vasc': 'cha2ds2vasc-calculator',
+  'chads2-vasc': 'cha2ds2vasc-calculator',
+  'cha2ds2vasc': 'cha2ds2vasc-calculator',
+  'shock-index-calculator': 'shock-index',
+  'anion-gap-calculator': 'anion-gap',
+  'a-a-gradient': 'aa-gradient',
+  'aa-gradient-calculator': 'aa-gradient',
+  'apache-ii': 'apache2-calculator',
+  'apache2': 'apache2-calculator',
+  'abcd2-score': 'abcd2',
+  'canadian-cspine': 'canadian-c-spine',
+  'nexus-c-spine': 'nexus-cspine',
+  'hasbled': 'has-bled',
+  'has-bled-score': 'has-bled',
+  'timi': 'timi-ua-nstemi',
+  'timi-score': 'timi-ua-nstemi',
+  'framingham': 'framingham-risk',
+  'grace': 'grace-acs',
+  'grace-score': 'grace-acs',
+  'duke-treadmill': 'duke-treadmill-score',
+  'reynolds': 'reynolds-risk-score',
+  'chads2-score': 'chads2',
 };
 
 /** Legacy LLM function names retained only for old tool_use payload normalization. */
@@ -52,6 +91,27 @@ export const REGISTRY_ID_TO_EXECUTOR_TOOL_ID: Readonly<Record<string, Registered
   'drug-check': 'drug-interactions',
   'lab-interp': 'lab-interpreter',
   'sofa-score': 'sofa-calculator',
+  // Registry / catalog ids that map to live POST executors (honesty: only these execute server-side)
+  'heart-score': 'heart-score',
+  'wells-pe': 'wells-pe',
+  'gcs-calculator': 'gcs-calculator',
+  news2: 'news2',
+  'cha2ds2vasc-calculator': 'cha2ds2vasc-calculator',
+  'calc-chads2vasc': 'cha2ds2vasc-calculator',
+  'shock-index': 'shock-index',
+  'anion-gap': 'anion-gap',
+  'aa-gradient': 'aa-gradient',
+  'apache2-calculator': 'apache2-calculator',
+  abcd2: 'abcd2',
+  'canadian-c-spine': 'canadian-c-spine',
+  'nexus-cspine': 'nexus-cspine',
+  chads2: 'chads2',
+  'has-bled': 'has-bled',
+  'timi-ua-nstemi': 'timi-ua-nstemi',
+  'framingham-risk': 'framingham-risk',
+  'grace-acs': 'grace-acs',
+  'duke-treadmill-score': 'duke-treadmill-score',
+  'reynolds-risk-score': 'reynolds-risk-score',
 };
 
 export enum ToolExecutionErrorCode {
@@ -861,6 +921,71 @@ export function isKnownUnsupportedNluTool(toolId: string): boolean {
   return UNSUPPORTED_SET.has(String(toolId || '').trim());
 }
 
+export type ToolCapabilityStatus = 'executable' | 'unsupported' | 'unknown';
+
+export interface ToolCapabilityDescription {
+  requestedId: string;
+  status: ToolCapabilityStatus;
+  executable: boolean;
+  resolvedId?: RegisteredExecutorToolId;
+  aliased?: boolean;
+  errorCode?: ToolExecutionErrorCode;
+  /** Human-readable honesty message — never imply fake success */
+  message: string;
+  /** Where the user should go instead of POST /tools/:id/execute */
+  suggestedSurface?: UnsupportedOrchestratorToolDoc['frontendSurface'] | 'orchestrator-api';
+  reason?: string;
+  doNotTreatAsSuccess: true;
+  requiresClinicianReview: true;
+}
+
+/**
+ * Honest capability probe for any tool id (execute vs client-only vs unknown).
+ */
+export function describeToolCapability(toolId: string): ToolCapabilityDescription {
+  const requestedId = String(toolId || '').trim();
+  const resolved = resolveExecutorToolId(requestedId);
+  if (resolved) {
+    return {
+      requestedId,
+      status: 'executable',
+      executable: true,
+      resolvedId: resolved.resolvedId,
+      aliased: resolved.aliased,
+      message: `Tool "${requestedId}" resolves to executable orchestrator id "${resolved.resolvedId}".`,
+      suggestedSurface: 'orchestrator-api',
+      doNotTreatAsSuccess: true,
+      requiresClinicianReview: true,
+    };
+  }
+
+  if (isKnownUnsupportedNluTool(requestedId)) {
+    const doc = UNSUPPORTED_ORCHESTRATOR_TOOL_DOCS.find((d) => d.nluToolId === requestedId);
+    return {
+      requestedId,
+      status: 'unsupported',
+      executable: false,
+      errorCode: ToolExecutionErrorCode.UNSUPPORTED_TOOL,
+      message: `Tool "${requestedId}" is not available for server execution. Use the ${doc?.frontendSurface || 'client'} surface instead — do not treat chat routing as a completed clinical calculation.`,
+      suggestedSurface: doc?.frontendSurface || 'calculator-form',
+      reason: doc?.reason,
+      doNotTreatAsSuccess: true,
+      requiresClinicianReview: true,
+    };
+  }
+
+  return {
+    requestedId,
+    status: 'unknown',
+    executable: false,
+    errorCode: ToolExecutionErrorCode.TOOL_NOT_FOUND,
+    message: `Tool "${requestedId}" is not registered for server execution.`,
+    suggestedSurface: 'calculator-form',
+    doNotTreatAsSuccess: true,
+    requiresClinicianReview: true,
+  };
+}
+
 export function getExecutorCatalogSnapshot() {
   return {
     audit: EXECUTOR_MAPPING_AUDIT,
@@ -870,5 +995,7 @@ export function getExecutorCatalogSnapshot() {
     registryIdToExecutor: { ...REGISTRY_ID_TO_EXECUTOR_TOOL_ID },
     executorAliases: { ...EXECUTOR_ID_ALIASES },
     unsupportedTools: [...UNSUPPORTED_ORCHESTRATOR_TOOL_DOCS],
+    executableCount: REGISTERED_EXECUTOR_TOOL_IDS.length,
+    unsupportedCount: NLU_TOOL_IDS_WITHOUT_EXECUTOR.length,
   };
 }

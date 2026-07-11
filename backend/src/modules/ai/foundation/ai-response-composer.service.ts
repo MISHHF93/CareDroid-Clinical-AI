@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { buildAiResponseProvenance } from '../../../../../lib/ai/provenanceContract';
 import {
   AiContextPacket,
   AiFoundationMetadata,
@@ -14,7 +15,7 @@ export class AiResponseComposerService {
     routePlan: ExpertRoutePlan,
     contextPacket: AiContextPacket,
     extraMetadata: Record<string, any> = {},
-  ): T & { metadata: Record<string, any> } {
+  ): T & { provenance: ReturnType<typeof buildAiResponseProvenance>; metadata: Record<string, any> } {
     const aiFoundation: AiFoundationMetadata = {
       runId: envelope.runId,
       capabilityId: envelope.capabilityId,
@@ -28,22 +29,38 @@ export class AiResponseComposerService {
       estimatedCost: routePlan.costPlan.estimatedCost,
       costReductionApplied: routePlan.costPlan.costReductionApplied,
       phiAccessed: envelope.policy.phiAccessed,
-      requiresHumanReview: routePlan.safetyPlan.requiresHumanReview,
+      requiresHumanReview: true,
       startedAt: envelope.trace.startedAt,
     };
 
+    const provenance =
+      (response as any).provenance?.contractVersion === '1.0.0'
+        ? (response as any).provenance
+        : buildAiResponseProvenance({
+            confidence: routePlan.confidence,
+            modelOrEngine: routePlan.selectedExpert,
+            responseClass: 'clinical',
+            recommendedReviewerRole: 'Responsible clinician',
+          });
+
     return {
       ...response,
+      provenance,
+      requiresClinicianReview: true,
       metadata: {
         ...response.metadata,
         aiFoundation,
+        provenance,
         routePlan: {
           selectedExperts: routePlan.selectedExperts,
           routingEvidence: routePlan.routingEvidence,
           modelPlan: routePlan.modelPlan,
           toolPlan: routePlan.toolPlan,
           costPlan: routePlan.costPlan,
-          safetyPlan: routePlan.safetyPlan,
+          safetyPlan: {
+            ...routePlan.safetyPlan,
+            requiresHumanReview: true,
+          },
         },
         context: {
           sourceSurface: contextPacket.sourceSurface,
@@ -56,7 +73,7 @@ export class AiResponseComposerService {
           blockedActions: routePlan.safetyPlan.blockedActions,
           emergencyEscalation: routePlan.safetyPlan.emergencyEscalation,
           crisisEscalation: routePlan.safetyPlan.crisisEscalation,
-          requiresHumanReview: routePlan.safetyPlan.requiresHumanReview,
+          requiresHumanReview: true,
         },
         cost: {
           estimated: routePlan.costPlan.estimatedCost,

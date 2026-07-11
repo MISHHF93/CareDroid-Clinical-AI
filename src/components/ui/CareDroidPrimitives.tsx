@@ -1,10 +1,18 @@
 import React, { HTMLAttributes, LabelHTMLAttributes, TableHTMLAttributes } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { CDL_PAGE_ZONES, type CdlPageZoneId } from '../../config/caredroidDesignLanguage';
+import {
+  alarmKpiClassNames,
+  alarmSeverityAriaLabel,
+  alarmSeverityBadge,
+  alarmSurfaceClassNames,
+  resolveAlarmSeverity,
+} from '../../config/alarmVisualModel';
 import Badge from './Badge';
 import Card from './card';
 import PageHeader from './PageHeader';
 import { Spinner } from './Spinner';
+import '../../styles/alarm-system.css';
 import './CareDroidPrimitives.css';
 
 interface AsProps {
@@ -280,20 +288,52 @@ export function OverflowCanvas({ children, minWidth, className = '', as: Element
 interface MetricChipProps extends HTMLAttributes<HTMLSpanElement> {
   label?: React.ReactNode;
   value?: React.ReactNode;
+  /** Platform alarm tone — drives visual alarming (critical/warning/…). */
+  tone?: string;
   className?: string;
 }
 
-export function MetricChip({ label, value, title = undefined, className = '', ...props }: MetricChipProps) {
+export function MetricChip({
+  label,
+  value,
+  tone = 'neutral',
+  title = undefined,
+  className = '',
+  ...props
+}: MetricChipProps) {
+  const severity = resolveAlarmSeverity(tone);
+  const badge = alarmSeverityBadge(severity);
   return (
     <span
-      className={['cd-metric-chip', className].filter(Boolean).join(' ')}
-      title={title || (label && value !== undefined ? `${value} ${label}` : undefined)}
+      className={['cd-metric-chip', alarmKpiClassNames(tone, { size: 'sm' }), className]
+        .filter(Boolean)
+        .join(' ')}
+      data-alarm={severity}
+      data-tone={tone}
+      title={
+        title ||
+        (label && value !== undefined
+          ? `${value} ${label}${badge ? ` (${badge})` : ''}`
+          : undefined)
+      }
+      aria-label={
+        label && value !== undefined
+          ? [String(label), String(value), alarmSeverityAriaLabel(severity)]
+              .filter(Boolean)
+              .join(', ')
+          : undefined
+      }
       {...props}
     >
       {value !== undefined && value !== null ? (
-        <span className="cd-metric-chip__value">{value}</span>
+        <span className="cd-metric-chip__value alarm-kpi__value">{value}</span>
       ) : null}
-      {label ? <span className="cd-metric-chip__label">{label}</span> : null}
+      {label ? (
+        <span className="cd-metric-chip__label alarm-kpi__label">
+          {label}
+          {badge ? <span className="alarm-kpi__badge">{badge}</span> : null}
+        </span>
+      ) : null}
     </span>
   );
 }
@@ -322,9 +362,27 @@ interface MetricCardProps {
 }
 
 export function MetricCard({ label, value, helper, suffix = '', tone = 'neutral', className = '', ...props }: MetricCardProps) {
+  const severity = resolveAlarmSeverity(tone);
+  const badge = alarmSeverityBadge(severity);
   return (
-    <Card compact className={['cd-metric-card', `cd-metric-card--${tone}`, className].filter(Boolean).join(' ')} {...(props as HTMLAttributes<HTMLDivElement>)}>
-      <span className="cd-metric-card__label">{label}</span>
+    <Card
+      compact
+      className={[
+        'cd-metric-card',
+        `cd-metric-card--${tone}`,
+        alarmSurfaceClassNames(tone),
+        className,
+      ]
+        .filter(Boolean)
+        .join(' ')}
+      data-alarm={severity}
+      data-tone={tone}
+      {...(props as HTMLAttributes<HTMLDivElement>)}
+    >
+      <span className="cd-metric-card__label">
+        {label}
+        {badge ? <span className="alarm-kpi__badge alarm-kpi__badge--inline">{badge}</span> : null}
+      </span>
       <strong className="cd-metric-card__value">
         {value}
         {suffix}
@@ -436,8 +494,22 @@ interface StatusWidgetProps {
 }
 
 export function StatusWidget({ label, value, status = 'neutral', helper, className = '', ...props }: StatusWidgetProps) {
+  const severity = resolveAlarmSeverity(status);
   return (
-    <Card compact className={['cd-status-widget', `cd-status-widget--${status}`, className].filter(Boolean).join(' ')} {...(props as HTMLAttributes<HTMLDivElement>)}>
+    <Card
+      compact
+      className={[
+        'cd-status-widget',
+        `cd-status-widget--${status}`,
+        alarmSurfaceClassNames(status),
+        className,
+      ]
+        .filter(Boolean)
+        .join(' ')}
+      data-alarm={severity}
+      data-tone={status}
+      {...(props as HTMLAttributes<HTMLDivElement>)}
+    >
       <div className="cd-status-widget__header">
         <span>{label}</span>
         <StatusBadge status={status} />

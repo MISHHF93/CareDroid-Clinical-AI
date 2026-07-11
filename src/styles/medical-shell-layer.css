@@ -9,8 +9,8 @@
   /* Sidebar */
   --cdl-sidebar-width: 232px;
   --cdl-sidebar-bg: var(--medical-white);
-  --cdl-sidebar-border: var(--medical-border);
-  --cdl-sidebar-shadow: 1px 0 0 var(--medical-border), 4px 0 28px rgba(15, 23, 42, 0.07);
+  --cdl-sidebar-border: color-mix(in srgb, var(--medical-border) 55%, transparent);
+  --cdl-sidebar-shadow: 1px 0 0 color-mix(in srgb, var(--medical-border) 45%, transparent), 4px 0 24px rgba(15, 23, 42, 0.05);
   --cdl-sidebar-brand-height: 44px;
   --cdl-sidebar-nav-gap: 1px;
   --cdl-sidebar-group-gap: 4px;
@@ -23,26 +23,26 @@
   --cdl-sidebar-item-bg-active: var(--medical-accent-tint);
   --cdl-sidebar-item-rail-active: var(--medical-accent);
   --cdl-sidebar-group-label-fg: var(--medical-ink-subtle);
-  --cdl-sidebar-footer-border: var(--medical-border);
+  --cdl-sidebar-footer-border: color-mix(in srgb, var(--medical-border) 50%, transparent);
 
   /* Header */
   --cdl-header-height: 52px;
   --cdl-route-tab-height: 52px;
   --cdl-chrome-stack-height: calc(var(--cdl-header-height) + var(--cdl-route-tab-height));
   --cdl-header-bg: var(--medical-white);
-  --cdl-header-border: var(--medical-border);
+  --cdl-header-border: color-mix(in srgb, var(--medical-border) 50%, transparent);
   --cdl-header-title-fg: var(--medical-ink);
   --cdl-header-meta-fg: var(--medical-ink-muted);
 
-  /* Main canvas */
+  /* Main canvas — soft edges + depth over hard boxes */
   --cdl-canvas-bg: var(--medical-surface-page);
   --cdl-clinical-canvas-base: var(--medical-surface-page);
-  --cdl-clinical-border: color-mix(in srgb, var(--medical-border) 48%, transparent);
-  --cdl-clinical-shadow-rest: 0 1px 2px rgba(15, 23, 42, 0.03), 0 4px 14px rgba(15, 23, 42, 0.04);
+  --cdl-clinical-border: color-mix(in srgb, var(--medical-border) 32%, transparent);
+  --cdl-clinical-shadow-rest: 0 1px 2px rgba(15, 23, 42, 0.04), 0 4px 14px rgba(15, 23, 42, 0.05);
 
   /* Notification panel */
   --cdl-notification-bg: var(--medical-slate-50);
-  --cdl-notification-border: var(--medical-border);
+  --cdl-notification-border: color-mix(in srgb, var(--medical-border) 55%, transparent);
   --cdl-notification-item-bg: var(--medical-white);
   --cdl-notification-unread-rail: var(--medical-accent);
 }

@@ -482,6 +482,18 @@ export function validateCareDroidAIRequest(request: unknown): CareDroidAIValidat
 export function validateCareDroidAIResponse(value: unknown): value is CareDroidAIResponse {
   if (!isPlainObject(value)) return false;
   const status = value.status;
+  const provenance = value.provenance;
+  const provenanceOk =
+    isPlainObject(provenance) &&
+    provenance.contractVersion === '1.0.0' &&
+    provenance.requiresClinicianReview === true &&
+    Array.isArray(provenance.evidence) &&
+    Array.isArray(provenance.missingInformation) &&
+    Array.isArray(provenance.limitations) &&
+    typeof provenance.confidence === 'number' &&
+    typeof provenance.uncertainty === 'string' &&
+    typeof provenance.recommendedReviewerRole === 'string';
+
   return (
     (isCareDroidAIIntent(value.intent) || value.intent === 'unknown') &&
     (status === 'success' || status === 'error') &&
@@ -497,9 +509,11 @@ export function validateCareDroidAIResponse(value: unknown): value is CareDroidA
     typeof value.assignedRole === 'string' &&
     typeof value.recommendedDepartment === 'string' &&
     typeof value.requiresClinicianReview === 'boolean' &&
+    value.requiresClinicianReview === true &&
     typeof value.clinicianOverrideAvailable === 'boolean' &&
     typeof value.generatedAt === 'string' &&
-    typeof value.safetyDisclaimer === 'string'
+    typeof value.safetyDisclaimer === 'string' &&
+    provenanceOk
   );
 }
 
