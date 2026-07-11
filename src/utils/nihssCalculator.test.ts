@@ -40,6 +40,7 @@ describe('nihssCalculator', () => {
     const { total } = computeNihssTotal(zeroExam);
     expect(total).toBe(0);
     const interp = interpretNihssSeverity(total);
+    if (!interp) throw new Error('expected interpretNihssSeverity to return a result');
     expect(interp.severityBand).toBe('none');
   });
 
@@ -56,11 +57,14 @@ describe('nihssCalculator', () => {
     };
     const { total } = computeNihssTotal(severe);
     expect(total).toBeGreaterThanOrEqual(21);
-    expect(interpretNihssSeverity(total).severityBand).toBe('severe');
+    const severeInterp = interpretNihssSeverity(total);
+    if (!severeInterp) throw new Error('expected interpretNihssSeverity to return a result');
+    expect(severeInterp.severityBand).toBe('severe');
   });
 
   it('interpretation stresses urgent stroke pathways and no treatment directives', () => {
     const interp = interpretNihssSeverity(8);
+    if (!interp) throw new Error('expected interpretNihssSeverity to return a result');
     expect(interp.safetyDisclaimer).toMatch(/does not replace urgent stroke evaluation/i);
     expect(interp.pathwayDisclaimer).toMatch(/local stroke pathways/i);
     expect(interp.interpretation).not.toMatch(/give tpa|thrombectomy now/i);

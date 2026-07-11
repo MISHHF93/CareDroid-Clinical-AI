@@ -184,6 +184,7 @@ describe('PR1 registration audit — discovery & catalog', () => {
     (aliasId, canonical) => {
       const row = toolIdAliases.find((a) => a.id === aliasId);
       expect(row, `missing toolIdAliases id ${aliasId}`).toBeTruthy();
+      if (!row) throw new Error(`expected toolIdAliases row for ${aliasId} to exist`);
       expect(row.mapsTo).toBe(canonical);
     }
   );
@@ -213,7 +214,7 @@ describe('PR1 registration audit — discovery & catalog', () => {
 
 describe('PR1 registration audit — sidebar & chat launch', () => {
   it('lists each PR1 tool exactly once in toolRegistry (sidebar visibility)', () => {
-    const pr1InRegistry = toolRegistry.filter((t) => PR1_TOOL_IDS.includes(t.id));
+    const pr1InRegistry = toolRegistry.filter((t) => (PR1_TOOL_IDS as readonly string[]).includes(t.id));
     expect(pr1InRegistry).toHaveLength(PR1_TOOL_IDS.length);
     for (const id of PR1_TOOL_IDS) {
       expect(toolRegistryById[id].panelTool).toBe('calculators');

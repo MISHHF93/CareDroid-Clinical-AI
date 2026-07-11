@@ -87,10 +87,10 @@ describe('whiteboard snapshot resilience', () => {
           boardingMetrics: state.boardingMetrics,
           emergencySettings: state.emergencySettings,
           centralSnapshot: {
-            operationalSummary: { metrics: [] },
+            operationalSummary: { metrics: [] } as any,
             queueHealth: [],
-          },
-          intelligenceSnapshot: { recommendations: [] },
+          } as any,
+          intelligenceSnapshot: { recommendations: [] } as any,
         }),
       ).not.toThrow();
     });

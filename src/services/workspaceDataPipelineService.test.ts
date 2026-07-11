@@ -10,6 +10,22 @@ import WorkspaceDataPipelineService, {
 describe('WorkspaceDataPipelineService', () => {
   it('normalizes workspace data through the canonical pipeline stages', () => {
     const data = normalizeWorkspaceData('emergency');
+    expect(data.emergency).not.toBeNull();
+    if (!data.emergency) throw new Error('expected emergency workspace data to be present');
+    expect(data.analytics.solutionPackage).not.toBeNull();
+    if (!data.analytics.solutionPackage) throw new Error('expected analytics solutionPackage to be present');
+    expect(data.emergency.intakeOperatingSystem).not.toBeNull();
+    if (!data.emergency.intakeOperatingSystem) {
+      throw new Error('expected emergency intakeOperatingSystem to be present');
+    }
+    expect(data.emergency.simulationScenarios).not.toBeNull();
+    if (!data.emergency.simulationScenarios) throw new Error('expected emergency simulationScenarios to be present');
+    expect(data.emergency.demoEnvironment).not.toBeNull();
+    if (!data.emergency.demoEnvironment) throw new Error('expected emergency demoEnvironment to be present');
+    // `emergency` is attached to the analytics slice dynamically in production code
+    // (see workspaceDataPipelineService.ts `buildAnalytics`), so it is not part of the
+    // static analytics type. Mirror that dynamic cast here for the equality assertions below.
+    const analyticsEmergency = (data.analytics as { emergency?: unknown }).emergency;
 
     expect(data.pipelineStages).toEqual([
       'Source',
@@ -930,7 +946,7 @@ describe('WorkspaceDataPipelineService', () => {
         }),
       })
     );
-    expect(data.analytics.emergency).toEqual(
+    expect(analyticsEmergency).toEqual(
       expect.objectContaining({
         route: '/emergency/analytics',
         trackedEvents: [
@@ -955,7 +971,7 @@ describe('WorkspaceDataPipelineService', () => {
         }),
       })
     );
-    expect(data.emergency.analyticsMvp).toBe(data.analytics.emergency);
+    expect(data.emergency.analyticsMvp).toBe(analyticsEmergency);
     expect(data.emergency.productTiers.map((tier) => tier.title)).toEqual([
       'Emergency Flow Starter',
       'Emergency Flow Professional',
@@ -1050,10 +1066,16 @@ describe('WorkspaceDataPipelineService', () => {
       expect(context.tools.length).toBeGreaterThan(0);
       expect(context.automations).toEqual(expect.any(Array));
     }
-    expect(getWorkspaceAIContext('emergency').emergency.chiefComplaintRoutes.map((route) => route.complaint)).toEqual(
+    const emergencyAiContextForRoutes = getWorkspaceAIContext('emergency').emergency;
+    expect(emergencyAiContextForRoutes).not.toBeNull();
+    if (!emergencyAiContextForRoutes) throw new Error('expected emergency AI context to be present');
+    expect(emergencyAiContextForRoutes.chiefComplaintRoutes.map((route) => route.complaint)).toEqual(
       expect.arrayContaining(['Chest Pain', 'Sepsis Concern', 'Shortness of Breath', 'Abdominal Pain', 'Psychiatric Crisis'])
     );
-    expect(getWorkspaceAIContext('emergency').emergency.aiCopilot).toEqual(
+    const emergencyAiContextForCopilot = getWorkspaceAIContext('emergency').emergency;
+    expect(emergencyAiContextForCopilot).not.toBeNull();
+    if (!emergencyAiContextForCopilot) throw new Error('expected emergency AI context to be present');
+    expect(emergencyAiContextForCopilot.aiCopilot).toEqual(
       expect.objectContaining({
         copilotId: 'emergency-ai-copilot',
         safetyBoundary: expect.stringMatching(/No autonomous/i),

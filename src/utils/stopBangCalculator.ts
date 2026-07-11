@@ -192,15 +192,15 @@ export function validateStopBangInputs(raw) {
  */
 export function computeStopBangResult(raw) {
   const v = validateStopBangInputs(raw);
-  if (!v.valid) return { ok: false, errors: v.errors };
+  if (!v.valid) return { ok: false as const, errors: v.errors };
 
   const breakdown = computeStopBangBreakdown(v.inputs);
   const total = sumStopBangScore(breakdown);
   const interp = interpretStopBangScore(total);
-  if (!interp) return { ok: false, errors: ['Unable to calculate STOP-Bang score.'] };
+  if (!interp) return { ok: false as const, errors: ['Unable to calculate STOP-Bang score.'] };
 
   return {
-    ok: true,
+    ok: true as const,
     inputs: v.inputs,
     breakdown,
     ...interp,

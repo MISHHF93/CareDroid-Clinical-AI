@@ -219,7 +219,7 @@ describe('medical expansion cross-pack validation', () => {
   it('covers all pack routes in mobile widths and standard light theme wiring', () => {
     const responsiveRegistryIds = new Set(RESPONSIVE_QA_PAGES.map((page) => page.registryId).filter(Boolean));
     for (const id of allPackIds) {
-      expect(responsiveRegistryIds.has(id), `missing responsive QA route for ${id}`).toBe(true);
+      expect(responsiveRegistryIds.has(id as any), `missing responsive QA route for ${id}`).toBe(true);
     }
 
     expect(MOBILE_FIRST_VIEWPORT_WIDTHS).toEqual(

@@ -71,6 +71,9 @@ describe('nephrologyCalculators', () => {
       acrMgG: 500,
     });
     expect(result.ok).toBe(true);
+    if (result.twoYearRiskPct === undefined) {
+      throw new Error('expected twoYearRiskPct to be defined');
+    }
     expect(result.twoYearRiskPct).toBeGreaterThan(0);
     expect(result.fiveYearRiskPct).toBeGreaterThan(result.twoYearRiskPct);
     expect(result.disclaimer).toMatch(/does not diagnose CKD/i);
@@ -127,6 +130,9 @@ describe('nephrologyCalculators', () => {
       measuredOsmolality: 120,
     });
     expect(result.ok).toBe(false);
+    if (!result.errors) {
+      throw new Error('expected errors to be defined');
+    }
     expect(result.errors.length).toBeGreaterThan(0);
   });
 });

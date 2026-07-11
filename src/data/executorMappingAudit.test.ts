@@ -27,11 +27,13 @@ const registrySource = readFileSync(
 
 function parseBackendRegistered() {
   const block = registrySource.match(/REGISTERED_EXECUTOR_TOOL_IDS\s*=\s*\[([\s\S]*?)\]\s*as const/);
+  if (!block) throw new Error('expected REGISTERED_EXECUTOR_TOOL_IDS block to match');
   return [...block[1].matchAll(/'([^']+)'/g)].map((m) => m[1]).sort();
 }
 
 function parseBackendRegistryMap() {
   const block = registrySource.match(/REGISTRY_ID_TO_EXECUTOR_TOOL_ID[\s\S]*?=\s*\{([\s\S]*?)\};/);
+  if (!block) throw new Error('expected REGISTRY_ID_TO_EXECUTOR_TOOL_ID block to match');
   const map: any = {};
   for (const m of block[1].matchAll(/'([^']+)':\s*'([^']+)'/g)) {
     map[m[1]] = m[2];
@@ -41,6 +43,7 @@ function parseBackendRegistryMap() {
 
 function parseBackendUnsupported() {
   const block = registrySource.match(/NLU_TOOL_IDS_WITHOUT_EXECUTOR\s*=\s*\[([\s\S]*?)\]\s*as const/);
+  if (!block) throw new Error('expected NLU_TOOL_IDS_WITHOUT_EXECUTOR block to match');
   return [...block[1].matchAll(/'([^']+)'/g)].map((m) => m[1]).sort();
 }
 

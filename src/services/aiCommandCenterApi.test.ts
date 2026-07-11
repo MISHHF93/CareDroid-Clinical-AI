@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const apiFetchJson = vi.hoisted(() => vi.fn());
-const capabilityStatus = vi.hoisted(() => vi.fn(() => 'real'));
+const capabilityStatus = vi.hoisted(() => vi.fn((_capability: string) => 'real'));
 const fetchEvaluationDashboard = vi.hoisted(() => vi.fn());
 const fetchMemoryDashboard = vi.hoisted(() => vi.fn());
 const fetchMyAuditLogs = vi.hoisted(() => vi.fn());

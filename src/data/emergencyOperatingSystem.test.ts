@@ -218,7 +218,7 @@ describe('emergencyOperatingSystem complaint router', () => {
       '7-9',
       '9-10',
     ]);
-    expect(EMERGENCY_ONBOARDING_EXPERIENCE.walkthrough.at(-1).targetRoute).toBe('/emergency/analytics');
+    expect(EMERGENCY_ONBOARDING_EXPERIENCE.walkthrough.at(-1)!.targetRoute).toBe('/emergency/analytics');
   });
 
   it('defines a fully labeled Emergency demo tenant for prospect evaluation without integrations', () => {
@@ -294,7 +294,7 @@ describe('emergencyOperatingSystem complaint router', () => {
         integrationRequirement: 'No integrations required',
       })
     );
-    expect(EMERGENCY_FIRST_CUSTOMER_DEPLOYMENT.phases.at(-1).acceptance).toMatch(/No live writeback/i);
+    expect(EMERGENCY_FIRST_CUSTOMER_DEPLOYMENT.phases.at(-1)!.acceptance).toMatch(/No live writeback/i);
     expect(EMERGENCY_FIRST_CUSTOMER_DEPLOYMENT.acceptance).toMatch(/without requiring a full hospital-wide deployment/i);
   });
 
@@ -346,7 +346,7 @@ describe('emergencyOperatingSystem complaint router', () => {
     expect(EMERGENCY_FLOW_INTELLIGENCE_PLATFORM.saasPackagingModel.firstCustomerReadiness.sellableNow).toMatch(
       /Emergency Flow Starter/i
     );
-    expect(EMERGENCY_FLOW_INTELLIGENCE_PLATFORM.saasPackagingModel.packages.at(-1).solutionIds).toHaveLength(10);
+    expect(EMERGENCY_FLOW_INTELLIGENCE_PLATFORM.saasPackagingModel.packages.at(-1)!.solutionIds).toHaveLength(10);
     expect(
       EMERGENCY_FLOW_INTELLIGENCE_PLATFORM.automationRegistry.every((automation) =>
         automation.flowStages.every((stage) => EMERGENCY_FLOW_INTELLIGENCE_PLATFORM.patientFlow.includes(stage))

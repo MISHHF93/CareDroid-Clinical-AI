@@ -17,7 +17,7 @@ import { SystemConfigProvider } from '../contexts/SystemConfigContext';
 import { TenantContextProvider } from '../contexts/TenantContext';
 import { useUser } from '../contexts/UserContext';
 import { AppRoutes } from '../App';
-import { PatientState, Priority } from '../types/emergency';
+import { PatientFlag, PatientState, Priority } from '../types/emergency';
 import { getPatientFlagType, useEmergencyStore } from '../../store/emergencyStore';
 import { compileCareDroidAccessProfile, normalizeCareDroidProfile } from '../lib/users/canonicalAccess';
 
@@ -231,6 +231,7 @@ async function waitForPatient(patientId, predicate) {
 function getPatientCard(patientId) {
   const card = document.querySelector(`[data-patient-card-id="${patientId}"]`);
   expect(card).toBeTruthy();
+  if (!card) throw new Error(`expected patient card for ${patientId}`);
   return card;
 }
 
@@ -246,7 +247,7 @@ describe('pilot walkthrough', () => {
   beforeEach(() => {
     useEmergencyStore.setState(originalEmergencyState, true);
     vi.clearAllMocks();
-    global.fetch?.mockRejectedValue?.(new Error('Pilot test uses local CareDroid fixtures.'));
+    (global.fetch as any)?.mockRejectedValue?.(new Error('Pilot test uses local CareDroid fixtures.'));
   });
 
   afterEach(() => {
@@ -321,7 +322,7 @@ describe('pilot walkthrough', () => {
           completedBy: 'pilot-demo-admin',
         });
       }
-      useEmergencyStore.getState().removeFlag(createdPatient.id, 'ReassessmentDue');
+      useEmergencyStore.getState().removeFlag(createdPatient.id, PatientFlag.ReassessmentDue);
     });
     await waitForPatient(createdPatient.id, (patient) => !flagTypes(patient).includes('ReassessmentDue'));
 
@@ -345,6 +346,7 @@ describe('pilot walkthrough', () => {
       .getAllByRole('button')
       .find((button) => button.textContent.includes(createdPatient.mrn));
     expect(patientResult).toBeTruthy();
+    if (!patientResult) throw new Error(`expected a search result for ${createdPatient.mrn}`);
     await user.click(patientResult);
 
     await user.type(screen.getByPlaceholderText('Clinical reason for referral'), 'Pilot cardiology referral');
@@ -381,6 +383,7 @@ describe('pilot walkthrough', () => {
     await waitFor(() => expect(useEmergencyStore.getState().emergencyAnalytics.data?.shift).toBeTruthy());
 
     const analytics = useEmergencyStore.getState().emergencyAnalytics.data;
+    if (!analytics) throw new Error('expected emergencyAnalytics data to be populated');
     expect(analytics.shift.dischargeCount).toBeGreaterThan(0);
     expect(analytics.operationalCommand.topComplaints).toEqual(
       expect.arrayContaining([

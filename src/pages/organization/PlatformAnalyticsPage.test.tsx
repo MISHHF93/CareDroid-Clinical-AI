@@ -110,7 +110,7 @@ const analytics = {
 describe('PlatformAnalyticsPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    PlatformAssetsApi.getOrganizationAnalytics.mockResolvedValue(analytics);
+    vi.mocked(PlatformAssetsApi.getOrganizationAnalytics).mockResolvedValue(analytics);
   });
 
   it('renders adoption, engagement, underused asset, and top asset dashboards', async () => {

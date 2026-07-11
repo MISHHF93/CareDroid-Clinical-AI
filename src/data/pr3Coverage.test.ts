@@ -72,7 +72,7 @@ describe('PR3 coverage — registry inclusion', () => {
   });
 
   it('includes each PR3 tool exactly once in toolRegistry with calculator panel', () => {
-    const pr3Rows = toolRegistry.filter((t) => PR3_TOOL_IDS.includes(t.id));
+    const pr3Rows = toolRegistry.filter((t) => (PR3_TOOL_IDS as readonly string[]).includes(t.id));
     expect(pr3Rows).toHaveLength(PR3_TOOL_IDS.length);
     for (const id of PR3_TOOL_IDS) {
       const reg = toolRegistryById[id];
@@ -143,6 +143,7 @@ describe('PR3 coverage — discovery inclusion', () => {
     for (const [aliasId, canonical] of PR3_DISCOVERY_ALIAS_PAIRS) {
       const row = toolIdAliases.find((a) => a.id === aliasId);
       expect(row, `discovery alias row missing: ${aliasId}`).toBeTruthy();
+      if (!row) throw new Error(`discovery alias row missing: ${aliasId}`);
       expect(row.mapsTo).toBe(canonical);
     }
   });
@@ -153,6 +154,7 @@ describe('PR3 coverage — NLU profiles and chatSeed presence', () => {
     for (const id of PR3_TOOL_IDS) {
       const nlu = clinicalIntentTools.find((t) => t.toolId === id);
       expect(nlu, `clinicalIntentTools missing ${id}`).toBeTruthy();
+      if (!nlu) throw new Error(`clinicalIntentTools missing ${id}`);
       expect(clinicalIntentToolsById[id]).toBe(nlu);
       expect(nlu.path).toBe(PR3_HUB_PATH);
       expect(nlu.sidebarToolId).toBe(id);
@@ -325,7 +327,7 @@ describe('PR3 coverage — duplicate alias detection', () => {
   });
 
   it('does not register conflicting mapsTo for PR3-targeting discovery aliases', () => {
-    const pr3AliasRows = toolIdAliases.filter((a) => PR3_TOOL_IDS.includes(a.mapsTo));
+    const pr3AliasRows = toolIdAliases.filter((a) => (PR3_TOOL_IDS as readonly string[]).includes(a.mapsTo));
     const byId = new Map();
     for (const row of pr3AliasRows) {
       const prior = byId.get(row.id);
@@ -354,7 +356,7 @@ describe('PR3 coverage — no orphaned PR3 tool IDs', () => {
   });
 
   it('does not leave PR3-targeting discovery aliases pointing at missing registry ids', () => {
-    const pr3AliasRows = toolIdAliases.filter((a) => PR3_TOOL_IDS.includes(a.mapsTo));
+    const pr3AliasRows = toolIdAliases.filter((a) => (PR3_TOOL_IDS as readonly string[]).includes(a.mapsTo));
     for (const { id, mapsTo } of pr3AliasRows) {
       expect(toolRegistryById[mapsTo], `orphan mapsTo for alias ${id}`).toBeTruthy();
       expect(NLU_TO_REGISTRY_ID[id] ?? NLU_TO_REGISTRY_ID[id.replace(/-/g, ' ')]).toBe(mapsTo);

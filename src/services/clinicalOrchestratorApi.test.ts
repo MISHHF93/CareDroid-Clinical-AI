@@ -29,7 +29,7 @@ describe('clinicalOrchestratorApi', () => {
   });
 
   it('calls POST execute for registered drug-interactions', async () => {
-    apiFetch.mockResolvedValueOnce({
+    vi.mocked(apiFetch).mockResolvedValueOnce({
       ok: true,
       status: 200,
       _json: {
@@ -37,7 +37,7 @@ describe('clinicalOrchestratorApi', () => {
         toolId: 'drug-interactions',
         result: { success: true, data: { interactions: [] } },
       },
-    });
+    } as any);
 
     const result = await executeClinicalTool('drug-interactions', {
       medications: ['aspirin', 'warfarin'],
@@ -52,7 +52,7 @@ describe('clinicalOrchestratorApi', () => {
   });
 
   it('returns network error without faking success', async () => {
-    apiFetch.mockRejectedValueOnce(new Error('Failed to fetch'));
+    vi.mocked(apiFetch).mockRejectedValueOnce(new Error('Failed to fetch'));
 
     const result = await executeClinicalTool('lab-interpreter', { labValues: [] });
 
@@ -62,7 +62,7 @@ describe('clinicalOrchestratorApi', () => {
   });
 
   it('resolves registry id drug-check to drug-interactions execute path', async () => {
-    apiFetch.mockResolvedValueOnce({
+    vi.mocked(apiFetch).mockResolvedValueOnce({
       ok: true,
       status: 200,
       _json: {
@@ -70,7 +70,7 @@ describe('clinicalOrchestratorApi', () => {
         toolId: 'drug-interactions',
         result: { success: true, data: {} },
       },
-    });
+    } as any);
 
     await executeClinicalTool('drug-check', { medications: ['a', 'b'] });
     expect(apiFetch).toHaveBeenCalledWith(

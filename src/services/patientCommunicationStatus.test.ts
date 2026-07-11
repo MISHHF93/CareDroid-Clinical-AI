@@ -43,7 +43,7 @@ function buildPatient(overrides: Partial<Patient> = {}): Patient {
       },
     ],
     ...overrides,
-  };
+  } as unknown as Patient;
 }
 
 describe('patientCommunicationStatus', () => {
@@ -59,7 +59,7 @@ describe('patientCommunicationStatus', () => {
         summary: 'Checked in with patient',
         timestamp: '2026-06-20T11:50:00.000Z',
       }),
-    ];
+    ] as any;
 
     const status = buildPatientCommunicationStatus(buildPatient(), {
       now: NOW,
@@ -108,7 +108,7 @@ describe('patientCommunicationStatus', () => {
             summary: 'Checked in',
             timestamp: '2026-06-20T11:55:00.000Z',
           }),
-        ],
+        ] as any,
       },
     );
 

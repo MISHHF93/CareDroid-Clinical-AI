@@ -7,7 +7,7 @@ const trackEvent = vi.fn();
 const invokeUnifiedAiConversational = vi.fn().mockResolvedValue({ content: '{}' });
 
 vi.mock('../config/backendApiCapabilities', () => ({
-  isBackendCapabilityEnabled: (capability) => capabilityEnabled(capability),
+  isBackendCapabilityEnabled: (capability) => capabilityEnabled(),
 }));
 
 vi.mock('./ocrIntakeApi', () => ({

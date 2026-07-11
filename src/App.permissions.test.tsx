@@ -83,7 +83,7 @@ describe('App CareDroid route contract', () => {
           appSource.includes(`path={CANONICAL_ROUTES.${path === '/hospital-map' ? 'hospitalMap' : path === '/medical-iot' ? 'medicalIot' : path === '/live-map' ? 'liveMap' : path === '/operations' ? 'operations' : 'devices'}}`));
       expect(
         redirectsByPath[path] ||
-          (nonEdRedirectPaths.has(path) ? CANONICAL_ROUTES.emergencyWhiteboard : null) ||
+          (nonEdRedirectPaths.has(path as any) ? CANONICAL_ROUTES.emergencyWhiteboard : null) ||
           (appSource.includes(`path="${path}"`) ? CANONICAL_ROUTES.emergencyWhiteboard : null) ||
           mountedRoute,
         path,

@@ -133,7 +133,7 @@ describe('PR4A ten-area — 5. registry mappings', () => {
   });
 
   it.each(PR4A_TOOL_IDS)('%s is not in nluCalculatorHubOnly', (id) => {
-    expect(nluCalculatorHubOnly.some((h) => h.toolId === id)).toBe(false);
+    expect(nluCalculatorHubOnly.some((h) => h.toolId === (id as string))).toBe(false);
   });
 });
 
@@ -275,7 +275,7 @@ describe('PR4A ten-area — 10. edge cases & duplicate detection', () => {
   });
 
   it('PR4A-targeting discovery aliases have unique ids and consistent mapsTo', () => {
-    const pr4aRows = toolIdAliases.filter((a) => PR4A_TOOL_IDS.includes(a.mapsTo));
+    const pr4aRows = toolIdAliases.filter((a) => (PR4A_TOOL_IDS as readonly string[]).includes(a.mapsTo));
     const ids = pr4aRows.map((a) => a.id);
     expect(new Set(ids).size).toBe(ids.length);
     for (const [aliasId, canonical] of PR4A_DISCOVERY_ALIAS_PAIRS) {
@@ -295,7 +295,7 @@ describe('PR4A ten-area — no orphaned tool IDs', () => {
   });
 
   it('PR4A-targeting discovery aliases do not point at missing registry ids', () => {
-    const pr4aAliasRows = toolIdAliases.filter((a) => PR4A_TOOL_IDS.includes(a.mapsTo));
+    const pr4aAliasRows = toolIdAliases.filter((a) => (PR4A_TOOL_IDS as readonly string[]).includes(a.mapsTo));
     for (const { id, mapsTo } of pr4aAliasRows) {
       expect(toolRegistryById[mapsTo], `orphan mapsTo for alias ${id}`).toBeTruthy();
     }
@@ -307,7 +307,7 @@ describe('PR4A ten-area — no orphaned tool IDs', () => {
 
   it('dedicated-path registry rows for PR4A match frozen audit list exactly', () => {
     const pr4aDedicated = toolRegistry
-      .filter((t) => PR4A_TOOL_IDS.includes(t.id))
+      .filter((t) => (PR4A_TOOL_IDS as readonly string[]).includes(t.id))
       .map((t) => t.id)
       .sort();
     expect(pr4aDedicated).toEqual([...PR4A_TOOL_IDS].sort());

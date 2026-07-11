@@ -18,14 +18,14 @@ describe('memoryApi fabric methods', () => {
   });
 
   it('fetches normalized memory fabric context', async () => {
-    apiFetch.mockResolvedValue({
+    vi.mocked(apiFetch).mockResolvedValue({
       ok: true,
       json: async () => ({
         workspaceMemory: { recentAssets: ['qsofa'], visibleAssetIds: ['qsofa'] },
         userMemory: { pinnedAssets: ['qsofa'], recentAssets: ['qsofa'] },
         rules: { rawPromptIncluded: false, rawSearchIncluded: false },
       }),
-    });
+    } as any);
 
     const result = await fetchMemoryFabricContext();
 
@@ -39,10 +39,10 @@ describe('memoryApi fabric methods', () => {
   });
 
   it('records sanitized fabric memory signals', async () => {
-    apiFetch.mockResolvedValue({
+    vi.mocked(apiFetch).mockResolvedValue({
       ok: true,
       json: async () => ({ status: 'recorded' }),
-    });
+    } as any);
 
     const result = await recordMemorySignal({
       scope: 'workspace',

@@ -34,7 +34,7 @@ function renderPage() {
 describe('TimelineAi', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    generateTimelineAi.mockResolvedValue({
+    vi.mocked(generateTimelineAi).mockResolvedValue({
       ok: true,
       data: {
         runId: 'timeline-run-1',

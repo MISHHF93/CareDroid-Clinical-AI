@@ -49,6 +49,9 @@ describe('UX Debt Elimination Engine', () => {
   });
 
   it('classifies duplicate, conflicting, hidden, obsolete, and accessibility debt', () => {
+    // buildUxDebtAudit's options type is inferred from its production default values
+    // (CANONICAL_ROUTES, RESPONSIVE_QA_PAGES, etc.), so this deliberately minimal,
+    // test-only fixture shape doesn't structurally match those literal defaults.
     const audit = buildUxDebtAudit({
       routes: {
         dashboard: '/dashboard',
@@ -81,7 +84,7 @@ describe('UX Debt Elimination Engine', () => {
         quickCommandCss: 'bottom: var(--app-bottom-nav-height, 56px);',
         drawerJsx: '<div className="drawer" />',
       },
-    });
+    } as any);
 
     const classifications = [...new Set(audit.findings.map((finding) => finding.classification))];
     expect(classifications).toEqual(

@@ -107,6 +107,7 @@ describe('PR2 comprehensive — MELD formula & MELD-Na', () => {
       { includeMeldNa: true }
     );
     expect(out.ok).toBe(true);
+    if (!('meld' in out)) throw new Error('expected computeMeldResult to succeed');
     expect(out.meld).toBe(MELD_NA_REGRESSION.expectedMeld);
     expect(out.meldNa).toBe(MELD_NA_REGRESSION.expectedMeldNa);
     expect(out.meldNa).toBeGreaterThanOrEqual(out.meld);
@@ -117,6 +118,8 @@ describe('PR2 comprehensive — MELD formula & MELD-Na', () => {
     const floored = computeMeldResult({ ...MELD_BASE_LABS, creatinine: '1' });
     expect(low.ok).toBe(true);
     expect(floored.ok).toBe(true);
+    if (!('meld' in low)) throw new Error('expected computeMeldResult to succeed');
+    if (!('meld' in floored)) throw new Error('expected computeMeldResult to succeed');
     expect(low.meld).toBe(floored.meld);
     expect(low.clamped.creatinineMgDl).toBe(1);
     expect(applyMeldLabClamps({ bilirubinMgDl: 1, inr: 1, creatinineMgDl: 0.3, onDialysis: false }).creatinineMgDl).toBe(
@@ -129,6 +132,8 @@ describe('PR2 comprehensive — MELD formula & MELD-Na', () => {
     const crFour = computeMeldResult({ ...MELD_BASE_LABS, creatinine: '4', onDialysis: false });
     expect(dialysis.ok).toBe(true);
     expect(crFour.ok).toBe(true);
+    if (!('meld' in dialysis)) throw new Error('expected computeMeldResult to succeed');
+    if (!('meld' in crFour)) throw new Error('expected computeMeldResult to succeed');
     expect(dialysis.meld).toBe(crFour.meld);
     expect(dialysis.clamped.onDialysis).toBe(true);
     expect(dialysis.clamped.creatinineMgDl).toBe(4);
@@ -147,7 +152,8 @@ describe('PR2 comprehensive — MELD formula & MELD-Na', () => {
   });
 
   it('interpretMeldScores avoids transplant listing language', () => {
-    const i = interpretMeldScores(35, 36);
+    const i = interpretMeldScores(35, 36 as any);
+    if (!i) throw new Error('expected interpretMeldScores to return a result');
     expect(i.transplantDisclaimer).toMatch(/does not recommend transplant/i);
     expect(i.interpretation).not.toMatch(/list for transplant/i);
   });
@@ -162,8 +168,9 @@ describe('PR2 comprehensive — MELD formula & MELD-Na', () => {
       onDialysis: false,
     });
     expect(out.ok).toBe(false);
+    if ('meld' in out) throw new Error('expected computeMeldResult to fail');
     expect(out.errors.length).toBeGreaterThan(0);
-    expect(out.meld).toBeUndefined();
+    expect((out as any).meld).toBeUndefined();
   });
 
   it('invalid input: MELD-Na requires sodium', () => {
@@ -206,12 +213,13 @@ describe('PR2 comprehensive — TIMI scoring & interpretation', () => {
   it('breakdown sums match total for partial selection', () => {
     const partial = { ...TIMI_NONE, severeAngina: true, stDeviation: true, elevatedCardiacMarkers: true };
     const b = computeTimiBreakdown(partial);
-    expect(Object.values(b).reduce((a, n) => a + n, 0)).toBe(3);
+    expect((Object.values(b) as number[]).reduce((a, n) => a + n, 0)).toBe(3);
     expect(calculateTimiUaNstemiScore(partial)).toBe(3);
   });
 
   it('ACS disclaimer excludes STEMI and treatment directives', () => {
     const i = interpretTimiUaNstemi(4);
+    if (!i) throw new Error('expected interpretTimiUaNstemi to return a result');
     expect(i.acsDisclaimer).toMatch(/not for STEMI/i);
     expect(i.acsDisclaimer).toMatch(/does not confirm ACS/i);
     expect(i.interpretation).not.toMatch(/start heparin|give aspirin|pci now/i);
@@ -260,6 +268,7 @@ describe('PR2 comprehensive — PERC evaluation', () => {
     expect(evalResult.satisfied).toBe(false);
     expect(evalResult.unmetKeys).toHaveLength(8);
     const i = interpretPerc(evalResult, { lowPretestProbabilityAcknowledged: true });
+    if (!i) throw new Error('expected interpretPerc to return a result');
     expect(i.percStatus).toBe('PERC not satisfied');
     expect(i.interpretation).toMatch(/cannot be used|not satisfied/i);
   });
@@ -269,6 +278,7 @@ describe('PR2 comprehensive — PERC evaluation', () => {
     expect(evalResult.satisfied).toBe(true);
     expect(evalResult.unmetKeys).toHaveLength(0);
     const i = interpretPerc(evalResult, { lowPretestProbabilityAcknowledged: true });
+    if (!i) throw new Error('expected interpretPerc to return a result');
     expect(i.percStatus).toBe('PERC satisfied');
     expect(i.safetyDisclaimer).toMatch(/does not rule out PE/i);
     expect(i.interpretation).toMatch(/not definitive exclusion/i);
@@ -277,6 +287,7 @@ describe('PR2 comprehensive — PERC evaluation', () => {
 
   it('requires low pre-test probability when not acknowledged', () => {
     const i = interpretPerc(evaluatePerc(PERC_ALL_MET));
+    if (!i) throw new Error('expected interpretPerc to return a result');
     expect(i.label).toMatch(/low pre-test probability/i);
   });
 });
@@ -340,7 +351,7 @@ describe('PR2 comprehensive — registry, catalog, discovery', () => {
     const expectedPath =
       PR2_ROUTE_BY_REGISTRY_ID[id] ?? PR2_HUB_ROUTE_BY_REGISTRY_ID[id] ?? HUB;
     expect(reg.path).toBe(expectedPath);
-    if (PR2_TIER_A_CALCULATOR_REGISTRY_IDS.includes(id)) {
+    if ((PR2_TIER_A_CALCULATOR_REGISTRY_IDS as readonly string[]).includes(id)) {
       expect(reg.initialCalc).toBe(id);
     }
   });

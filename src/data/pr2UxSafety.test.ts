@@ -23,13 +23,17 @@ const CERTAINTY_PATTERN =
 
 describe('PR2 UX & clinical safety — interpretation copy', () => {
   it('MELD interpretation avoids transplant listing language', () => {
-    const i = interpretMeldScores(35, 36);
+    // interpretMeldScores' second param is inferred as `null | undefined` from its
+    // `= null` default; cast the deliberately non-null test value to match.
+    const i = interpretMeldScores(35, 36 as any);
+    if (!i) throw new Error('expected interpretMeldScores to return a result');
     expect(i.interpretation).not.toMatch(/list for transplant|recommend transplant/i);
     expect(i.transplantDisclaimer).toMatch(/does not recommend transplant/i);
   });
 
   it('TIMI interpretation does not confirm ACS or prescribe therapy', () => {
     const i = interpretTimiUaNstemi(5);
+    if (!i) throw new Error('expected interpretTimiUaNstemi to return a result');
     expect(i.acsDisclaimer).toMatch(/does not confirm ACS/i);
     expect(i.acsDisclaimer).toMatch(/not for STEMI/i);
     expect(i.interpretation).not.toMatch(/start heparin|give aspirin|pci now/i);
@@ -37,6 +41,7 @@ describe('PR2 UX & clinical safety — interpretation copy', () => {
 
   it('Wells PE interpretation avoids ruling in or out PE', () => {
     const i = interpretWellsPe(7);
+    if (!i) throw new Error('expected interpretWellsPe to return a result');
     expect(i.diagnosticDisclaimer).toMatch(/does not rule in or rule out/i);
     expect(i.interpretation).not.toMatch(CERTAINTY_PATTERN);
   });
@@ -53,6 +58,7 @@ describe('PR2 UX & clinical safety — interpretation copy', () => {
       noEstrogenUse: true,
     });
     const i = interpretPerc(evalResult, { lowPretestProbabilityAcknowledged: true });
+    if (!i) throw new Error('expected interpretPerc to return a result');
     expect(i.safetyDisclaimer).toMatch(/does not rule out PE/i);
     expect(i.interpretation).toMatch(/not definitive exclusion/i);
     expect(i.interpretation).not.toMatch(/\bpe is ruled out\b|\bdefinitively ruled out\b/i);
@@ -126,6 +132,7 @@ describe('PR3 UX & clinical safety — Ottawa Ankle interpretation', () => {
       { applicabilityWarnings: warnings, rulesApplicable: false }
     );
     const i = interpretOttawaAnkleFootRules(result);
+    if (!i) throw new Error('expected interpretOttawaAnkleFootRules to return a result');
     expect(i.label).toMatch(/not applicable/i);
     expect(i.interpretation).toMatch(/defer appropriate care/i);
     expect(i.safetyDisclaimer).toMatch(/acute ankle\/foot injury/i);
@@ -152,6 +159,7 @@ describe('PR3 UX & clinical safety — Canadian C-Spine interpretation', () => {
       activeRotationRight45: true,
     });
     const i = interpretCanadianCSpine(result);
+    if (!i) throw new Error('expected interpretCanadianCSpine to return a result');
     expect(i.safetyDisclaimer).toMatch(/does not clear the cervical spine/i);
     expect(i.pathwayDisclaimer).toMatch(/Do not delay primary trauma survey/i);
     expect(i.interpretation).not.toMatch(/cleared|no injury guaranteed/i);
@@ -161,6 +169,7 @@ describe('PR3 UX & clinical safety — Canadian C-Spine interpretation', () => {
 describe('PR3 UX & clinical safety — NIHSS interpretation', () => {
   it('avoid treatment recommendations and stresses emergency stroke care', () => {
     const i = interpretNihssSeverity(12);
+    if (!i) throw new Error('expected interpretNihssSeverity to return a result');
     expect(i.label).toMatch(/deficit severity band/i);
     expect(i.label).not.toMatch(/\bstroke\b/i);
     expect(i.safetyDisclaimer).toMatch(/does not replace urgent stroke evaluation/i);
@@ -183,6 +192,7 @@ describe('PR3 UX & clinical safety — GRACE ACS interpretation', () => {
       elevatedCardiacEnzymes: true,
     });
     const i = interpretGraceAcsRisk(result);
+    if (!i) throw new Error('expected interpretGraceAcsRisk to return a result');
     expect(i.safetyDisclaimer).toMatch(/does not confirm or exclude/i);
     expect(i.pathwayDisclaimer).toMatch(/local acute coronary syndrome protocols/i);
     expect(i.pathwayDisclaimer).toMatch(/without delay/i);

@@ -102,6 +102,10 @@ describe('automationRegistry', () => {
     const emergency = getAutomationSolutionPackages().find(
       (solution) => solution.solutionId === 'emergency-department-solution'
     );
+    if (!emergency) throw new Error('expected emergency-department-solution to exist');
+    if (!emergency.products) throw new Error('expected emergency-department-solution to have products');
+    if (!emergency.coreMvpPackage) throw new Error('expected emergency-department-solution to have coreMvpPackage');
+    if (!emergency.optionalAddOns) throw new Error('expected emergency-department-solution to have optionalAddOns');
 
     expect(emergency.patientJourney).toEqual([
       'arrival',

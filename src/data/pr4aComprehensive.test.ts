@@ -165,6 +165,7 @@ describe('PR4A comprehensive — 1. ASCVD calculations', () => {
       race: 'white',
     });
     expect(out.ok).toBe(true);
+    if (!out.ok) throw new Error('expected computeAscvdPceResult to succeed');
     expect(out.riskCategory).toBe(categorizeAscvdTenYearRisk(out.tenYearRiskPct));
     expect(out.clinicianPatientDisclaimer).toMatch(/decision-support/i);
     expect(out.pathwayDisclaimer).toMatch(/does not recommend specific medications/i);
@@ -173,6 +174,7 @@ describe('PR4A comprehensive — 1. ASCVD calculations', () => {
   it('rejects age outside PCE range', () => {
     const out = computeAscvdPceResult({ ...ASCVD_TABLE_A_DEMO, sex: 'male', race: 'white', ageYears: 25 });
     expect(out.ok).toBe(false);
+    if (out.ok) throw new Error('expected computeAscvdPceResult to fail');
     expect(out.errors.join(' ')).toMatch(/40.*79/i);
   });
 });
@@ -186,10 +188,10 @@ describe('PR4A comprehensive — 2. CKD staging calculations', () => {
   );
 
   it('classifies GFR and albuminuria at KDIGO boundaries', () => {
-    expect(classifyGfrCategory(90).category).toBe('G1');
-    expect(classifyGfrCategory(59).category).toBe('G3a');
-    expect(classifyAlbuminuria(30).category).toBe('A2');
-    expect(classifyAlbuminuria(301).category).toBe('A3');
+    expect(classifyGfrCategory(90)!.category).toBe('G1');
+    expect(classifyGfrCategory(59)!.category).toBe('G3a');
+    expect(classifyAlbuminuria(30)!.category).toBe('A2');
+    expect(classifyAlbuminuria(301)!.category).toBe('A3');
   });
 
   it('combines prognostic risk on heat-map cells', () => {
@@ -200,6 +202,7 @@ describe('PR4A comprehensive — 2. CKD staging calculations', () => {
   it('computeCkdStagingResult returns staging without therapy directives', () => {
     const out = computeCkdStagingResult(CKD_REFERENCE_INPUT);
     expect(out.ok).toBe(true);
+    if (!out.ok) throw new Error('expected computeCkdStagingResult to succeed');
     expect(out.combinedStageLabel).toMatch(/G×A category/i);
     expect(out.stagingDiscussion).toMatch(/≥3 months/i);
     expect(out.pathwayDisclaimer).toMatch(/does not recommend specific therapies/i);
@@ -208,6 +211,8 @@ describe('PR4A comprehensive — 2. CKD staging calculations', () => {
   it('interpretCkdStaging uses combined G×A stage label', () => {
     const gfr = classifyGfrCategory(outEgfrFromFixture());
     const alb = classifyAlbuminuria(45);
+    if (!gfr) throw new Error('expected classifyGfrCategory to return a category');
+    if (!alb) throw new Error('expected classifyAlbuminuria to return a category');
     const risk = combineCkdPrognosticRisk(gfr.category, alb.category);
     const i = interpretCkdStaging(outEgfrFromFixture(), gfr, alb, risk);
     expect(i.combinedStage).toMatch(/^G\d/);
@@ -216,7 +221,9 @@ describe('PR4A comprehensive — 2. CKD staging calculations', () => {
 });
 
 function outEgfrFromFixture() {
-  return computeCkdStagingResult(CKD_REFERENCE_INPUT).egfrMlMin;
+  const out = computeCkdStagingResult(CKD_REFERENCE_INPUT);
+  if (!out.ok) throw new Error('expected computeCkdStagingResult to succeed');
+  return out.egfrMlMin;
 }
 
 describe('PR4A comprehensive — 3. STOP-Bang scoring', () => {
@@ -238,6 +245,7 @@ describe('PR4A comprehensive — 3. STOP-Bang scoring', () => {
   it('computeStopBangResult includes screening-only disclaimer', () => {
     const out = computeStopBangResult(STOP_BANG_ALL_TRUE);
     expect(out.ok).toBe(true);
+    if (!out.ok) throw new Error('expected computeStopBangResult to succeed');
     expect(out.screeningDisclaimer).toBe('Screening tool only.');
     expect(out.pathwayDisclaimer).toMatch(/does not recommend CPAP/i);
     expect(out.osaRiskDiscussion).not.toMatch(/\bstart cpap\b/i);
@@ -248,6 +256,7 @@ describe('PR4A comprehensive — 4. AUDIT-C scoring', () => {
   it('negative screen at low consumption pattern', () => {
     const out = computeAuditCResult(AUDIT_C_NEGATIVE_INPUT);
     expect(out.ok).toBe(true);
+    if (!out.ok) throw new Error('expected computeAuditCResult to succeed');
     expect(out.totalScore).toBe(0);
     expect(out.screeningResult).toBe('negative');
     expect(categorizeAuditCScreening(out.totalScore)).toBe('negative');
@@ -256,6 +265,7 @@ describe('PR4A comprehensive — 4. AUDIT-C scoring', () => {
   it('positive men screen at high consumption pattern', () => {
     const out = computeAuditCResult(AUDIT_C_POSITIVE_MEN_INPUT);
     expect(out.ok).toBe(true);
+    if (!out.ok) throw new Error('expected computeAuditCResult to succeed');
     expect(out.totalScore).toBe(11);
     expect(out.screeningResult).toBe('positive_men');
     expect(out.screeningDisclaimer).toMatch(/^Screening only\./i);
@@ -270,6 +280,7 @@ describe('PR4A comprehensive — 4. AUDIT-C scoring', () => {
   it('requires all three AUDIT-C questions', () => {
     const out = computeAuditCResult({ drinkingFrequency: 'never' });
     expect(out.ok).toBe(false);
+    if (out.ok) throw new Error('expected computeAuditCResult to fail');
     expect(out.errors.length).toBeGreaterThanOrEqual(2);
   });
 });
@@ -292,7 +303,7 @@ describe('PR4A comprehensive — 5. registry mappings', () => {
   });
 
   it.each(PR4A_TOOL_IDS)('%s is not listed in nluCalculatorHubOnly', (id) => {
-    expect(nluCalculatorHubOnly.some((h) => h.toolId === id)).toBe(false);
+    expect(nluCalculatorHubOnly.some((h) => (h.toolId as string) === id)).toBe(false);
   });
 });
 

@@ -92,7 +92,7 @@ describe('mergeBackendAdministrativeAutomationTasks', () => {
       administrativeAutomationQueue: [existingTask],
       setAdministrativeAutomationQueue: vi.fn(),
       backendAvailable: true,
-    } as ReturnType<typeof useEmergencyStore.getState>);
+    } as unknown as ReturnType<typeof useEmergencyStore.getState>);
 
     const backendTasks = [
       makeTask({

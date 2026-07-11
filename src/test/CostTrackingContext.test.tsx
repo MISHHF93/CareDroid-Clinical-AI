@@ -330,6 +330,7 @@ describe('CostTrackingContext', () => {
       });
 
       const saved = localStorage.getItem('careDroid.costs.default');
+      if (!saved) throw new Error('expected saved cost data to be defined');
       const parsed = JSON.parse(saved);
       expect(parsed.executions).toHaveLength(1);
       expect(parsed.totalCost).toBeGreaterThan(0);

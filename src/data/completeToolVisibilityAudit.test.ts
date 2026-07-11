@@ -66,6 +66,7 @@ describe('complete calculator and medical-tool visibility audit', () => {
     for (const record of dedicated) {
       const card = cards.find((candidate) => candidate.registryId === record.id);
       expect(card, record.id).toBeTruthy();
+      if (!card) throw new Error(`expected hub card for ${record.id}`);
       expect(card.route, record.id).toBe(record.route);
     }
 

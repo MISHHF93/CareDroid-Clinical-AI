@@ -111,11 +111,11 @@ function routeConfigOwnsPath(path) {
   return (
     Object.values(CANONICAL_ROUTES).includes(path) ||
     CANONICAL_APP_ROUTE_TREE.some((route) => route.path === path) ||
-    ROUTE_RECORDS.some(
+    (ROUTE_RECORDS as any[]).some(
       (route) =>
         route.path === path ||
         route.aliases?.includes(path) ||
-        route.matchPrefixes?.some((prefix) => path.startsWith(prefix)),
+        route.matchPrefixes?.some((prefix: string) => path.startsWith(prefix)),
     ) ||
     LEGACY_EMERGENCY_ROUTE_REDIRECTS.some((route) => redirectRouteMatches(route, path)) ||
     NON_ED_WORKSPACE_REDIRECT_ROUTES.some((route) => redirectRouteMatches(route, path)) ||
@@ -171,7 +171,7 @@ describe('canonical segment inventory', () => {
     expect(backendOnly.length).toBeGreaterThan(0);
 
     for (const record of frontendOnly) {
-      expect(validFrontendTypes.has(record.frontendOnlyType), record.id).toBe(true);
+      expect(validFrontendTypes.has(record.frontendOnlyType!), record.id).toBe(true);
       expect(record.backendOnlyType, record.id).toBeNull();
       expect(record.bridges.gaps.length, record.id).toBeGreaterThan(0);
     }
@@ -186,6 +186,7 @@ describe('canonical segment inventory', () => {
 
   it('anchors active navigation-backed segments to the visible IA and keeps legacy buckets documented', () => {
     for (const record of records.filter((segment) => segment.navEntry)) {
+      if (!record.navEntry) continue;
       const navEntry = PRIMARY_NAV_BY_ID[record.navEntry];
       if (!navEntry) continue;
       expect(navEntry, record.id).toBeTruthy();
@@ -231,7 +232,7 @@ describe('canonical segment inventory', () => {
   });
 
   it('documents bridge gaps for every incomplete or fragmented segment', () => {
-    const completeStatuses = new Set([SEGMENT_STATUSES.COMPLETE, SEGMENT_STATUSES.HIDDEN]);
+    const completeStatuses = new Set<string>([SEGMENT_STATUSES.COMPLETE, SEGMENT_STATUSES.HIDDEN]);
     for (const record of records) {
       if (completeStatuses.has(record.status)) continue;
       expect(record.bridges.gaps.length, `${record.id} should document bridge gaps`).toBeGreaterThan(0);

@@ -58,7 +58,7 @@ describe('platformLearningEngine', () => {
   });
 
   it('builds privacy-safe analytics events from learning signals', () => {
-    const events = buildLearningEventsFromSignals(learningSignals);
+    const events = buildLearningEventsFromSignals(learningSignals as any);
 
     expect(events).toEqual(
       expect.arrayContaining([

@@ -179,9 +179,9 @@ vi.mock('../../services/emergencyOsApi', async (importOriginal) => {
 describe('EmergencySettings', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    fetchOrganizationEmergencyOsSettings.mockResolvedValue({ ok: false, data: null });
-    fetchEmergencyOsSettings.mockResolvedValue({ ok: true, data: { data: mockSettings } });
-    saveOrganizationEmergencyOsSettings.mockImplementation((patch) =>
+    vi.mocked(fetchOrganizationEmergencyOsSettings).mockResolvedValue({ ok: false, data: null, message: '' });
+    vi.mocked(fetchEmergencyOsSettings).mockResolvedValue({ ok: true, data: { data: mockSettings }, message: '' });
+    vi.mocked(saveOrganizationEmergencyOsSettings).mockImplementation((patch: any) =>
       Promise.resolve({
         ok: true,
         data: {
@@ -198,9 +198,10 @@ describe('EmergencySettings', () => {
             },
           },
         },
+        message: '',
       }),
     );
-    fetchEmergencyWorkflowLogs.mockResolvedValue({
+    vi.mocked(fetchEmergencyWorkflowLogs).mockResolvedValue({
       data: {
         logs: [
           {
@@ -218,7 +219,7 @@ describe('EmergencySettings', () => {
         ],
       },
     });
-    fetchIntegrationHub.mockResolvedValue({
+    vi.mocked(fetchIntegrationHub).mockResolvedValue({
       module: 'Integration Hub',
       source: 'fixture',
       data: {
@@ -227,7 +228,7 @@ describe('EmergencySettings', () => {
       },
       remainingGaps: ['Live credentials are not connected.'],
     });
-    fetchProvincialHealth.mockResolvedValue({
+    vi.mocked(fetchProvincialHealth).mockResolvedValue({
       module: 'Provincial Health',
       source: 'fixture',
       data: {
@@ -238,7 +239,7 @@ describe('EmergencySettings', () => {
       },
       remainingGaps: [],
     });
-    fetchEmergencyAiGovernanceRegistry.mockResolvedValue({
+    vi.mocked(fetchEmergencyAiGovernanceRegistry).mockResolvedValue({
       services: {
         copilot: {
           name: 'ED Copilot',
@@ -272,15 +273,15 @@ describe('EmergencySettings', () => {
       storageMode: 'in-memory-audit-fixture',
       governanceFrameworks: ['NIST AI RMF', 'WHO AI healthcare guidance'],
     });
-    fetchEmergencyAiGovernanceCompliance.mockResolvedValue({
+    vi.mocked(fetchEmergencyAiGovernanceCompliance).mockResolvedValue({
       totalInteractions: 2,
       humanReviewRate: 1,
       storageMode: 'in-memory-audit-fixture',
     });
-    validateEmergencyAiGovernancePrompts.mockResolvedValue({
+    vi.mocked(validateEmergencyAiGovernancePrompts).mockResolvedValue({
       copilot: { valid: true, issues: [] },
     });
-    saveEmergencyOsSettings.mockImplementation((payload) =>
+    vi.mocked(saveEmergencyOsSettings).mockImplementation((payload: any) =>
       Promise.resolve({
         ok: true,
         data: {
@@ -300,6 +301,7 @@ describe('EmergencySettings', () => {
             },
           },
         },
+        message: '',
       }),
     );
   });

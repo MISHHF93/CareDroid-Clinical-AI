@@ -219,7 +219,7 @@ describe('New clinical tools — catalog and launch', () => {
 
 describe('New clinical tools — sidebar and no orphaned routes', () => {
   it('lists each audited tool exactly once in toolRegistry', () => {
-    const rows = toolRegistry.filter((t) => NEW_CLINICAL_TOOLS_ALL_IDS.includes(t.id));
+    const rows = toolRegistry.filter((t) => NEW_CLINICAL_TOOLS_ALL_IDS.includes(t.id as any));
     expect(rows).toHaveLength(NEW_CLINICAL_TOOLS_ALL_IDS.length);
   });
 

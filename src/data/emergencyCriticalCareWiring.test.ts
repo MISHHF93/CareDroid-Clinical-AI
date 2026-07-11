@@ -41,7 +41,9 @@ describe('Emergency & Critical Care calculator wiring', () => {
     const hubOnlyIds = new Set(nluCalculatorHubOnly.map((tool) => tool.toolId));
     for (const [registryId, slug] of EMERGENCY_TIER_A) {
       const builtin = builtinUiCalculators.find((calculator) => calculator.id === slug);
+    if (!builtin) throw new Error('expected builtin calculator entry to exist');
       const nlu = clinicalIntentTools.find((tool) => tool.sidebarToolId === registryId);
+    if (!nlu) throw new Error('expected nlu tool entry to exist');
       const route = `/tools/calculators/${slug}`;
 
       expect(builtin?.path).toBe(route);
@@ -50,7 +52,7 @@ describe('Emergency & Critical Care calculator wiring', () => {
       expect(resolveCatalogLaunch(registryId).path).toBe(route);
       expect(matchCalculatorRoute(route)?.calculatorSlug).toBe(slug);
       expect(CALCULATOR_ROUTE_DEFS.some((def) => def.calculatorSlug === slug)).toBe(true);
-      expect(hubOnlyIds.has(nlu.toolId)).toBe(false);
+      expect(hubOnlyIds.has(nlu.toolId as any)).toBe(false);
     }
   });
 

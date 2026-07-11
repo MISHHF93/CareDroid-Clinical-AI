@@ -99,12 +99,12 @@ describe('PR2 coverage — registry mappings', () => {
   });
 
   it('exposes each PR2 registry id exactly once in toolRegistry export', () => {
-    const pr2Rows = toolRegistry.filter((t) => PR2_CALCULATOR_REGISTRY_IDS.includes(t.id));
+    const pr2Rows = toolRegistry.filter((t) => PR2_CALCULATOR_REGISTRY_IDS.includes(t.id as any));
     expect(pr2Rows).toHaveLength(PR2_CALCULATOR_REGISTRY_IDS.length);
   });
 
   it('aligns discovery alias mapsTo with NLU_TO_REGISTRY_ID for PR2 aliases', () => {
-    const pr2Aliases = toolIdAliases.filter((a) => PR2_CALCULATOR_REGISTRY_IDS.includes(a.mapsTo));
+    const pr2Aliases = toolIdAliases.filter((a) => PR2_CALCULATOR_REGISTRY_IDS.includes(a.mapsTo as any));
     expect(pr2Aliases.length).toBeGreaterThan(0);
     for (const { id, mapsTo } of pr2Aliases) {
       expect(NLU_TO_REGISTRY_ID[id]).toBe(mapsTo);

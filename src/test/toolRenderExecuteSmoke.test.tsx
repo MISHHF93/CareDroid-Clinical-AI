@@ -61,7 +61,7 @@ vi.mock('../contexts/ConversationContext', () => ({
 vi.mock('../contexts/UserContext', async (importOriginal) => {
   const actual = await importOriginal();
   return {
-    ...actual,
+    ...(actual as Record<string, unknown>),
     useUser: () => mockUserValue,
   };
 });
@@ -258,7 +258,8 @@ describe('toolRenderExecuteSmoke — Tier A local (no orchestrator on qSOFA)', (
     );
     const iface = container.querySelector('.calculator-interface--qsofa');
     expect(iface).toBeTruthy();
-    const btn = within(iface).getByRole('button', { name: /calculate qsofa/i });
+    if (!iface) throw new Error('expected qsofa calculator interface to render');
+    const btn = within(iface as HTMLElement).getByRole('button', { name: /calculate qsofa/i });
     fireEvent.click(btn);
     expect(mockExecuteClinicalTool).not.toHaveBeenCalled();
   });
@@ -268,7 +269,7 @@ describe('toolRenderExecuteSmoke — matrix modes', () => {
   it('every registry row has smoke path and valid execution mode', () => {
     const modes = new Set(Object.values(EXECUTION_MODES));
     for (const row of buildRenderExecuteMatrix()) {
-      expect(modes.has(row.executionMode) || row.executionMode === 'other').toBe(true);
+      expect(modes.has(row.executionMode as any) || row.executionMode === 'other').toBe(true);
       expect(row.checks.nonEmpty).toBe(true);
       if (row.executionMode === EXECUTION_MODES.LOCAL_CALCULATOR) {
         expect(row.checks.usesLocalOnly).toBe(true);

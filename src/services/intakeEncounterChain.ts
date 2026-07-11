@@ -86,7 +86,7 @@ export function applyIntakeArrivalContext(
 export function readIntakeEncounterChain(
   patient?: Patient | null,
   encounterId?: string | null,
-  queue = WHITEBOARD_QUEUE_FILTER.triage,
+  queue: string = WHITEBOARD_QUEUE_FILTER.triage,
 ): IntakeEncounterChain {
   const resolvedEncounterId =
     encounterId ||

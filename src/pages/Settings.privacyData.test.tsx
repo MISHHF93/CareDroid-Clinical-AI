@@ -20,7 +20,7 @@ vi.mock('../contexts/ThemeContext', () => ({
 vi.mock('../contexts/UserContext', async (importOriginal) => {
   const actual = await importOriginal();
   return {
-    ...actual,
+    ...(actual as Record<string, unknown>),
     useUser: () =>
       createMockUserValue({
         user: { email: 'clinician@example.com' },

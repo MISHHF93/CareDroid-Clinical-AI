@@ -37,9 +37,9 @@ const backendPreferences = {
 };
 
 function arrangeSuccessfulLoad() {
-  NotificationService.getPreferences.mockResolvedValue(backendPreferences);
-  NotificationService.getUnreadCount.mockResolvedValue(2);
-  NotificationService.fetchNotificationHistory.mockResolvedValue({
+  vi.mocked(NotificationService.getPreferences).mockResolvedValue(backendPreferences);
+  vi.mocked(NotificationService.getUnreadCount).mockResolvedValue(2);
+  vi.mocked(NotificationService.fetchNotificationHistory).mockResolvedValue({
     notifications: [
       {
         id: 'n1',
@@ -50,7 +50,7 @@ function arrangeSuccessfulLoad() {
       },
     ],
   });
-  NotificationService.fetchDevices.mockResolvedValue([
+  vi.mocked(NotificationService.fetchDevices).mockResolvedValue([
     {
       id: 'device-1',
       platform: 'web',
@@ -60,9 +60,9 @@ function arrangeSuccessfulLoad() {
       lastUsedAt: '2026-05-21T20:00:00.000Z',
     },
   ]);
-  NotificationService.updatePreferences.mockResolvedValue(backendPreferences);
-  NotificationService.markAllAsRead.mockResolvedValue({ success: true });
-  NotificationService.removeDevice.mockResolvedValue(true);
+  vi.mocked(NotificationService.updatePreferences).mockResolvedValue(backendPreferences);
+  vi.mocked(NotificationService.markAllAsRead).mockResolvedValue({ success: true });
+  vi.mocked(NotificationService.removeDevice).mockResolvedValue(true);
 }
 
 describe('NotificationPreferences', () => {
@@ -98,7 +98,8 @@ describe('NotificationPreferences', () => {
     fireEvent.click(removeButton);
     expect(screen.getByRole('dialog', { name: /remove notification device/i })).toBeInTheDocument();
 
-    fireEvent.click(screen.getAllByRole('button', { name: /remove device/i }).at(-1));
+    const removeConfirmButtons = screen.getAllByRole('button', { name: /remove device/i });
+    fireEvent.click(removeConfirmButtons[removeConfirmButtons.length - 1]);
 
     await waitFor(() => expect(NotificationService.removeDevice).toHaveBeenCalledWith('device-1'));
     expect(screen.queryByText(/Chrome on Windows/i)).not.toBeInTheDocument();

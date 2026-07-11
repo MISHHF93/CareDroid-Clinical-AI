@@ -3,6 +3,7 @@ import {
   deriveAlerts,
   isDerivedAlertId,
   normalizeAlert,
+  type AlertDispatchInput,
   type AlertEngineInputs,
 } from './alertEngineDerived';
 import { PatientState, Priority, type Patient, type Referral } from '../types/emergency';
@@ -24,17 +25,19 @@ const patient: Patient = {
   complaintCategory: 'Chest Pain',
   state: PatientState.Disposition,
   priority: Priority.P2,
-  vitals: {
-    hr: 92,
-    bpSystolic: 136,
-    bpDiastolic: 82,
-    spo2: 97,
-    temp: 36.8,
-    rr: 18,
-    gcs: 15,
-    pain: 4,
-    recordedAt: '2026-06-11T10:30:00.000Z',
-  },
+  vitals: [
+    {
+      hr: 92,
+      bpSystolic: 136,
+      bpDiastolic: 82,
+      spo2: 97,
+      temp: 36.8,
+      rr: 18,
+      gcs: 15,
+      pain: 4,
+      recordedAt: '2026-06-11T10:30:00.000Z',
+    },
+  ],
   assignedStaffId: null,
   roomId: null,
   flags: [],
@@ -47,6 +50,11 @@ const baseInputs: AlertEngineInputs = {
   capacity: {
     id: 'capacity-test',
     generatedAt: now.toISOString(),
+    updatedAt: now.toISOString(),
+    band: 'Green',
+    totalPatients: 1,
+    occupiedRooms: 0,
+    reassessmentDue: 0,
     totalActivePatients: 1,
     currentOccupancy: 0,
     maxCapacity: 1,
@@ -211,7 +219,7 @@ describe('AlertEngine dispatch normalization', () => {
         severity: 'Warning',
         title: 'Connection warning',
         message: 'Unable to reach chat service.',
-      },
+      } as unknown as AlertDispatchInput,
       now
     );
 

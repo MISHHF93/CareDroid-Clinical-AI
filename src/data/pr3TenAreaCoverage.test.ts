@@ -255,7 +255,9 @@ describe('PR3 ten-area — 7. backend alias consistency', () => {
     for (const id of PR3_TOOL_IDS) {
       expect(patternsSource.split(`toolId: '${id}'`).length - 1).toBe(1);
     }
-    expect(clinicalIntentTools.filter((t) => PR3_TOOL_IDS.includes(t.toolId))).toHaveLength(4);
+    expect(
+      clinicalIntentTools.filter((t) => (PR3_TOOL_IDS as readonly string[]).includes(t.toolId))
+    ).toHaveLength(4);
   });
 });
 
@@ -287,7 +289,9 @@ describe('PR3 ten-area — 9. duplicate alias detection', () => {
   });
 
   it('PR3-targeting discovery aliases have unique ids and consistent mapsTo', () => {
-    const pr3Rows = toolIdAliases.filter((a) => PR3_TOOL_IDS.includes(a.mapsTo));
+    const pr3Rows = toolIdAliases.filter((a) =>
+      (PR3_TOOL_IDS as readonly string[]).includes(a.mapsTo)
+    );
     const ids = pr3Rows.map((a) => a.id);
     expect(new Set(ids).size).toBe(ids.length);
     for (const [aliasId, canonical] of PR3_DISCOVERY_ALIAS_PAIRS) {
@@ -302,7 +306,9 @@ describe('PR3 ten-area — 10. no orphaned tool IDs', () => {
   });
 
   it('PR3-targeting discovery aliases do not point at missing registry ids', () => {
-    const pr3AliasRows = toolIdAliases.filter((a) => PR3_TOOL_IDS.includes(a.mapsTo));
+    const pr3AliasRows = toolIdAliases.filter((a) =>
+      (PR3_TOOL_IDS as readonly string[]).includes(a.mapsTo)
+    );
     for (const { id, mapsTo } of pr3AliasRows) {
       expect(toolRegistryById[mapsTo], `orphan mapsTo for alias ${id}`).toBeTruthy();
     }
@@ -314,7 +320,9 @@ describe('PR3 ten-area — 10. no orphaned tool IDs', () => {
 
   it('hub registry rows for PR3 match frozen audit list exactly', () => {
     const hubPr3 = toolRegistry
-      .filter((t) => t.path === '/tools/calculators' && PR3_TOOL_IDS.includes(t.id))
+      .filter(
+        (t) => t.path === '/tools/calculators' && (PR3_TOOL_IDS as readonly string[]).includes(t.id)
+      )
       .map((t) => t.id)
       .sort();
     expect(hubPr3).toEqual([...PR3_TOOL_IDS].sort());

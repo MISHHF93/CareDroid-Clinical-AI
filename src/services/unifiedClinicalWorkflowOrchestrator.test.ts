@@ -17,6 +17,7 @@ function makePatient(overrides: Partial<Patient> = {}): Patient {
     sex: 'M',
     arrivalTime: new Date(Date.now() - 60 * 60000).toISOString(),
     chiefComplaint: 'Chest pain',
+    complaintCategory: 'Cardiac',
     state: PatientState.Registration,
     priority: Priority.P2,
     vitals: [],
@@ -47,7 +48,7 @@ describe('unifiedClinicalWorkflowOrchestrator', () => {
           flags: [PatientFlag.ReassessmentDue],
         }),
       ],
-      staff: [{ id: 's1', name: 'Dr. Lee', role: 'MD', status: 'Available', active: true }],
+      staff: [{ id: 's1', name: 'Dr. Lee', role: 'MD', status: 'OnShift', active: true }],
       alerts: [
         {
           id: 'a-critical',
@@ -93,7 +94,7 @@ describe('unifiedClinicalWorkflowOrchestrator', () => {
       setQueueFilter: vi.fn(),
       selectPatient: vi.fn(),
       recordWorkflowAction,
-      emergencySettings: {},
+      emergencySettings: {} as any,
       assignStaff,
       addNote,
     });

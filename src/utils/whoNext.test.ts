@@ -79,7 +79,7 @@ describe('whoNext scoring', () => {
     });
 
     expect(recommendation.patient.id).toBe('winner');
-    expect(recommendation.room).toBe('Bed 7');
+    expect((recommendation as { room?: string }).room).toBe('Bed 7');
     expect(formatWhoNextForCopilot(recommendation)).toBe(
       'Suggested next: Sarah Miller (Bed 7) — P2 priority + reassessment due'
     );

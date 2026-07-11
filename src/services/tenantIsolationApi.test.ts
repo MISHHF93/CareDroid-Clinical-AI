@@ -13,8 +13,8 @@ describe('tenantIsolationApi', () => {
   });
 
   it('fetches the tenant data isolation audit report', async () => {
-    apiFetchJson.mockResolvedValue({
-      response: { ok: true },
+    vi.mocked(apiFetchJson).mockResolvedValue({
+      response: { ok: true } as unknown as Response,
       data: { status: 'tenant_isolated', summary: { auditedDomains: 6 } },
     });
 

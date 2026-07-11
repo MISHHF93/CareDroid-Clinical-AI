@@ -18,6 +18,7 @@ describe('percCalculator', () => {
   it('interpretPerc when satisfied includes strong safety language', () => {
     const r = evaluatePerc(allMet);
     const i = interpretPerc(r, { lowPretestProbabilityAcknowledged: true });
+    if (!i) throw new Error('expected interpretPerc to return a result');
     expect(i.percStatus).toBe('PERC satisfied');
     expect(i.safetyDisclaimer).toMatch(/only when pre-test probability/i);
     expect(i.interpretation).toMatch(/not definitive exclusion/i);
@@ -28,12 +29,14 @@ describe('percCalculator', () => {
     const i = interpretPerc(evaluatePerc({ ...allMet, noHemoptysis: false }), {
       lowPretestProbabilityAcknowledged: true,
     });
+    if (!i) throw new Error('expected interpretPerc to return a result');
     expect(i.percStatus).toBe('PERC not satisfied');
     expect(i.interpretation).toMatch(/cannot be used/i);
   });
 
   it('requires low pre-test probability acknowledgment in guidance', () => {
     const warn = interpretPerc(evaluatePerc(allMet));
+    if (!warn) throw new Error('expected interpretPerc to return a result');
     expect(warn.label).toMatch(/low pre-test probability/i);
   });
 
@@ -42,6 +45,7 @@ describe('percCalculator', () => {
     expect(evalResult.satisfied).toBe(false);
     expect(evalResult.unmetKeys).toHaveLength(PERC_CRITERIA_META.length);
     const i = interpretPerc(evalResult, { lowPretestProbabilityAcknowledged: true });
+    if (!i) throw new Error('expected interpretPerc to return a result');
     expect(i.percStatus).toBe('PERC not satisfied');
     expect(i.severity).toBe('warning');
     expect(i.interpretation).toMatch(/cannot be used/i);

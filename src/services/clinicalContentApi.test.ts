@@ -15,7 +15,7 @@ describe('clinicalContentApi', () => {
 
   it('fetchProtocols returns items on success', async () => {
     vi.mocked(apiFetchJson).mockResolvedValue({
-      response: { ok: true, status: 200 },
+      response: { ok: true, status: 200 } as any,
       data: { items: [{ name: 'Sepsis' }], total: 1 },
     });
     const res = await fetchProtocols({ limit: 10 });
@@ -26,7 +26,7 @@ describe('clinicalContentApi', () => {
 
   it('fetchProtocols returns error on failure', async () => {
     vi.mocked(apiFetchJson).mockResolvedValue({
-      response: { ok: false, status: 503 },
+      response: { ok: false, status: 503 } as any,
       data: {},
     });
     const res = await fetchProtocols();
@@ -37,7 +37,7 @@ describe('clinicalContentApi', () => {
 
   it('fetchProtocolById calls protocol detail endpoint', async () => {
     vi.mocked(apiFetchJson).mockResolvedValue({
-      response: { ok: true, status: 200 },
+      response: { ok: true, status: 200 } as any,
       data: { id: 'sepsis', name: 'Sepsis Management' },
     });
 
@@ -58,7 +58,7 @@ describe('clinicalContentApi', () => {
 
   it('fetchDrugs calls /api/drugs', async () => {
     vi.mocked(apiFetchJson).mockResolvedValue({
-      response: { ok: true, status: 200 },
+      response: { ok: true, status: 200 } as any,
       data: { items: [{ name: 'Warfarin' }] },
     });
     const res = await fetchDrugs({ search: 'war' });

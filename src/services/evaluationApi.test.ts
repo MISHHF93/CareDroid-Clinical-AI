@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const apiFetchJson = vi.hoisted(() => vi.fn());
-const capabilityStatus = vi.hoisted(() => vi.fn(() => 'real'));
+const capabilityStatus = vi.hoisted(() => vi.fn((_capability?: string) => 'real'));
 
 vi.mock('../config/backendApiCapabilities', () => ({
   BACKEND_CAPABILITY_STATUS: {

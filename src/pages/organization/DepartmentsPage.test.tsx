@@ -94,7 +94,7 @@ const departmentGraph = {
 describe('DepartmentsPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    PlatformAssetsApi.listDepartments.mockResolvedValue(departmentGraph);
+    vi.mocked(PlatformAssetsApi.listDepartments).mockResolvedValue(departmentGraph);
   });
 
   it('renders department-to-asset mappings with packs, assets, roles, permissions, and users', async () => {

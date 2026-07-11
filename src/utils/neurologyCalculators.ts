@@ -31,7 +31,7 @@ function requireSelections(raw, optionsByKey) {
 
 function result(score, label, interpretation, severity, referenceLine, extra: any = {}) {
   return {
-    ok: true,
+    ok: true as const,
     score,
     label,
     interpretation,
@@ -52,7 +52,7 @@ export const HUNT_HESS_GRADE_OPTIONS = Object.freeze([
 
 export function computeHuntHessScale(raw) {
   const grade = selectedPoints(raw.grade, HUNT_HESS_GRADE_OPTIONS);
-  if (!Number.isFinite(grade)) return { ok: false, errors: ['Select the Hunt-Hess clinical grade.'] };
+  if (!Number.isFinite(grade)) return { ok: false as const, errors: ['Select the Hunt-Hess clinical grade.'] };
   const severity = grade >= 4 ? 'critical' : grade === 3 ? 'warning' : 'normal';
   return result(
     grade,
@@ -73,7 +73,7 @@ export function computeIchScore(raw) {
   if (!Number.isFinite(volumeMl) || volumeMl < 0 || volumeMl > 300) errors.push('Enter hematoma volume from 0 to 300 mL.');
   if (!['yes', 'no'].includes(raw.intraventricularHemorrhage)) errors.push('Select intraventricular hemorrhage status.');
   if (!['yes', 'no'].includes(raw.infratentorialOrigin)) errors.push('Select infratentorial origin status.');
-  if (errors.length) return { ok: false, errors };
+  if (errors.length) return { ok: false as const, errors };
 
   const gcsPoints = gcs <= 4 ? 2 : gcs <= 12 ? 1 : 0;
   const volumePoints = volumeMl >= 30 ? 1 : 0;
@@ -133,7 +133,7 @@ export const FOUR_SCORE_OPTIONS = Object.freeze({
 
 export function computeFourScore(raw) {
   const errors = requireSelections(raw, FOUR_SCORE_OPTIONS);
-  if (errors.length) return { ok: false, errors };
+  if (errors.length) return { ok: false as const, errors };
   const eye = selectedPoints(raw.eye, FOUR_SCORE_OPTIONS.eye);
   const motor = selectedPoints(raw.motor, FOUR_SCORE_OPTIONS.motor);
   const brainstem = selectedPoints(raw.brainstem, FOUR_SCORE_OPTIONS.brainstem);
@@ -162,7 +162,7 @@ export const MODIFIED_RANKIN_OPTIONS = Object.freeze([
 
 export function computeModifiedRankinScale(raw) {
   const score = selectedPoints(raw.score, MODIFIED_RANKIN_OPTIONS);
-  if (!Number.isFinite(score)) return { ok: false, errors: ['Select the modified Rankin Scale level.'] };
+  if (!Number.isFinite(score)) return { ok: false as const, errors: ['Select the modified Rankin Scale level.'] };
   const severity = score >= 4 ? 'critical' : score >= 2 ? 'warning' : 'normal';
   return result(
     score,
@@ -265,7 +265,7 @@ export const NIHSS_SUMMARY_OPTIONS = Object.freeze({
 
 export function computeNihssSummaryView(raw) {
   const errors = requireSelections(raw, NIHSS_SUMMARY_OPTIONS);
-  if (errors.length) return { ok: false, errors };
+  if (errors.length) return { ok: false as const, errors };
   const components = Object.fromEntries(
     Object.entries(NIHSS_SUMMARY_OPTIONS).map(([key, options]) => [key, selectedPoints(raw[key], options)])
   );
@@ -307,7 +307,7 @@ export const PEDIATRIC_GCS_OPTIONS = Object.freeze({
 
 export function computePediatricGcs(raw) {
   const errors = requireSelections(raw, PEDIATRIC_GCS_OPTIONS);
-  if (errors.length) return { ok: false, errors };
+  if (errors.length) return { ok: false as const, errors };
   const eye = selectedPoints(raw.eye, PEDIATRIC_GCS_OPTIONS.eye);
   const verbal = selectedPoints(raw.verbal, PEDIATRIC_GCS_OPTIONS.verbal);
   const motor = selectedPoints(raw.motor, PEDIATRIC_GCS_OPTIONS.motor);

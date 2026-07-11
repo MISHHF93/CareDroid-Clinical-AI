@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import type { Patient } from '../types/emergency';
 import { PatientFlag, PatientState } from '../types/emergency';
 import {
   buildTriageBreachVisibilitySnapshot,
@@ -20,7 +21,7 @@ describe('triageBreachVisibilityModel', () => {
       arrivalTime: new Date(Date.now() - 9 * 60000).toISOString(),
       flags: [],
     },
-  ];
+  ] as unknown as Patient[];
 
   it('builds visibility snapshot with breach counts and rapid-review flags', () => {
     const snapshot = buildTriageBreachVisibilitySnapshot(patients, {

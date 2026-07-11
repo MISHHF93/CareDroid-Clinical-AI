@@ -6,7 +6,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import RealTimeCostService from '../services/realtime/RealTimeCostService';
 
 // Mock WebSocket
-global.WebSocket = vi.fn();
+global.WebSocket = vi.fn() as any;
 
 describe('RealTimeCostService', () => {
   let service;
@@ -25,7 +25,7 @@ describe('RealTimeCostService', () => {
       addEventListener: vi.fn(),
     };
 
-    global.WebSocket = vi.fn(() => mockWs);
+    global.WebSocket = vi.fn(() => mockWs) as any;
   });
 
   afterEach(() => {

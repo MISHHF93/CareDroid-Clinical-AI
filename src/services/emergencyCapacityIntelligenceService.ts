@@ -13,7 +13,17 @@ export const CAPACITY_ENGINE_INPUTS = Object.freeze([
   'EMS arrivals',
 ]);
 
-export const DEFAULT_EMERGENCY_CAPACITY_STATE = Object.freeze({
+export interface EmergencyCapacityStateInput {
+  currentCensus: number;
+  occupiedSpaces: number;
+  availableSpaces: number;
+  pendingAdmissions: number;
+  boardingPatients: number;
+  emsArrivals: number;
+  dischargeCandidates: number;
+}
+
+export const DEFAULT_EMERGENCY_CAPACITY_STATE: EmergencyCapacityStateInput = Object.freeze({
   currentCensus: 67,
   occupiedSpaces: 58,
   availableSpaces: 7,

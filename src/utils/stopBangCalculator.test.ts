@@ -74,6 +74,7 @@ describe('stopBangCalculator — interpretation', () => {
   it('includes required screening disclaimer and avoids treatment directives', () => {
     const out = computeStopBangResult(ALL_TRUE);
     expect(out.ok).toBe(true);
+    if (!out.ok) throw new Error('expected computeStopBangResult to succeed');
     expect(out.screeningDisclaimer).toBe('Screening tool only.');
     expect(out.pathwayDisclaimer.toLowerCase()).not.toMatch(/\bprescribe cpap\b/);
     expect(out.osaRiskDiscussion.toLowerCase()).not.toMatch(/\bstart cpap\b/);
@@ -91,6 +92,7 @@ describe('stopBangCalculator — edge cases', () => {
   it('validateStopBangInputs accepts any boolean combination', () => {
     const v = validateStopBangInputs(ALL_FALSE);
     expect(v.valid).toBe(true);
+    if (!v.inputs) throw new Error('expected validateStopBangInputs to return inputs');
     expect(v.inputs.snoring).toBe(false);
   });
 

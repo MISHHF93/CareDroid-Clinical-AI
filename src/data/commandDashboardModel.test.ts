@@ -83,7 +83,7 @@ describe('command dashboard model', () => {
   it('stitches major capabilities into dashboard, operations/tools, command, search, and AI alias reachability', () => {
     const graph = getMountedCapabilityGraph();
     const audit = buildCapabilityReachabilityAudit(graph);
-    const byId = new Map(audit.map((row) => [row.capabilityId, row]));
+    const byId = new Map(audit.map((row): [string, typeof row] => [row.capabilityId, row]));
 
     [
       REGISTRY.qsofa,
@@ -96,8 +96,9 @@ describe('command dashboard model', () => {
       REGISTRY.laboratoryDashboard,
       REGISTRY.medical3dViewer,
     ].forEach((id) => {
-      const row = byId.get(id);
+      const row = byId.get(id) as any;
       expect(row, id).toBeTruthy();
+      if (!row) throw new Error(`expected capability reachability row for ${id}`);
       expect(row.dashboard, id).toBe(true);
       expect(row.command, id).toBe(true);
       expect(row.search, id).toBe(true);

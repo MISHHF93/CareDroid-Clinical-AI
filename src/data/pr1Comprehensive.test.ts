@@ -156,7 +156,7 @@ describe('PR1 comprehensive — NEWS2 scale switching & bands', () => {
     expect(roomAir.spo2).toBe(scoreSpo2Scale2(base.spo2, false));
     expect(onO2.spo2).toBe(scoreSpo2Scale2(base.spo2, true));
     expect(roomAir.spo2).not.toBe(onO2.spo2);
-    expect(sumNews2Score(onO2)).toBeGreaterThan(sumNews2Score(roomAir));
+    expect(sumNews2Score(onO2)).toBeGreaterThan(sumNews2Score(roomAir) as number);
   });
 
   it('interpretNews2Risk uses critical severity at aggregate ≥7', () => {

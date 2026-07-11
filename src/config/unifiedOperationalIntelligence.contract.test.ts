@@ -121,7 +121,6 @@ describe('unifiedOperationalIntelligence contract', () => {
           confidenceDistributionShift: false,
           summary: 'Disabled',
           generatedAt: '2026-07-03T12:00:00.000Z',
-          alerts: [],
         },
         dataFreshness: {
           status: 'fresh',

@@ -235,6 +235,7 @@ describe('PR2 registration audit — discovery & catalog', () => {
     (aliasId, canonical) => {
       const row = toolIdAliases.find((a) => a.id === aliasId);
       expect(row, `missing toolIdAliases id ${aliasId}`).toBeTruthy();
+      if (!row) throw new Error(`missing toolIdAliases id ${aliasId}`);
       expect(row.mapsTo).toBe(canonical);
       expect(NLU_TO_REGISTRY_ID[aliasId]).toBe(canonical);
     }
@@ -279,7 +280,7 @@ describe('PR2 registration audit — discovery & catalog', () => {
 
 describe('PR2 registration audit — sidebar, hub launch, deep links', () => {
   it('lists each PR2 tool exactly once in toolRegistry (sidebar visibility)', () => {
-    const pr2InRegistry = toolRegistry.filter((t) => PR2_TOOL_IDS.includes(t.id));
+    const pr2InRegistry = toolRegistry.filter((t) => (PR2_TOOL_IDS as readonly string[]).includes(t.id));
     expect(pr2InRegistry).toHaveLength(PR2_TOOL_IDS.length);
     for (const id of PR2_TOOL_IDS) {
       expect(getToolIcon(id)).toBeTruthy();
@@ -329,7 +330,7 @@ describe('PR2 registration audit — sidebar, hub launch, deep links', () => {
     for (const [id, config] of [
       ['wells-pe', wellsPeChatConfig],
       ['perc', percChatConfig],
-    ]) {
+    ] as const) {
       const nlu = clinicalIntentTools.find((t) => t.toolId === id);
       expect(nlu?.chatSeed).toBe(config.chatSeed);
       expect(resolveCatalogLaunch(id).chatSeed).toBe(config.chatSeed);
@@ -338,6 +339,7 @@ describe('PR2 registration audit — sidebar, hub launch, deep links', () => {
 
   it.each(PR2_TIER_A_TOOL_IDS)('builtin slug deep link (?calc=) for %s', (id) => {
     const builtin = builtinUiCalculators.find((c) => c.id === id);
+    if (!builtin) throw new Error(`builtinUiCalculators missing ${id}`);
     const fromBuiltin = resolveCatalogLaunch(id);
     expect(fromBuiltin.path).toBe(builtin.path);
     expect(builtin.calcQuery).toContain(`calc=${id}`);

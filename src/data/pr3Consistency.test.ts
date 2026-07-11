@@ -53,7 +53,7 @@ const patternsSource = readFileSync(
 const ALL_PR3_ALIAS_PAIRS = [...PR3_NLU_ALIAS_PAIRS, ...PR3_DISCOVERY_ALIAS_PAIRS];
 
 const PR3_DISCOVERY_ALIAS_IDS = toolIdAliases
-  .filter((a) => PR3_CALCULATOR_REGISTRY_IDS.includes(a.mapsTo))
+  .filter((a) => (PR3_CALCULATOR_REGISTRY_IDS as readonly string[]).includes(a.mapsTo))
   .map((a) => a.id);
 
 describe('PR3 consistency — centralized audit lists', () => {
@@ -86,6 +86,7 @@ describe('PR3 consistency — registry, NLU, and chat config alignment', () => {
 
       const nlu = clinicalIntentTools.find((t) => t.toolId === id);
       expect(nlu, `clinicalIntentTools missing ${id}`).toBeTruthy();
+      if (!nlu) throw new Error(`clinicalIntentTools missing ${id}`);
       expect(nlu.backendExecutable).toBe(false);
       expect(nlu.sidebarToolId).toBe(id);
       expect(nlu.path).toBe(PR3_HUB_PATH);
@@ -259,7 +260,7 @@ describe('PR3 consistency — resolveCatalogLaunch, routes, sidebar, deep links'
   });
 
   it('exposes each PR3 registry id exactly once in toolRegistry (sidebar visibility)', () => {
-    const pr3Rows = toolRegistry.filter((t) => PR3_CALCULATOR_REGISTRY_IDS.includes(t.id));
+    const pr3Rows = toolRegistry.filter((t) => (PR3_CALCULATOR_REGISTRY_IDS as readonly string[]).includes(t.id));
     expect(pr3Rows).toHaveLength(PR3_CALCULATOR_REGISTRY_IDS.length);
     for (const id of PR3_CALCULATOR_REGISTRY_IDS) {
       const icon = getToolIcon(id);

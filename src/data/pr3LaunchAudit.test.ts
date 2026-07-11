@@ -123,13 +123,13 @@ describe('PR3 launch audit — ten-dimension matrix', () => {
 
   it('has no PR3 registry ids outside the frozen audit list', () => {
     const hubPr3 = toolRegistry
-      .filter((t) => t.path === PR3_HUB_PATH && PR3_CALCULATOR_REGISTRY_IDS.includes(t.id))
+      .filter((t) => t.path === PR3_HUB_PATH && (PR3_CALCULATOR_REGISTRY_IDS as readonly string[]).includes(t.id))
       .map((t) => t.id);
     expect(hubPr3.sort()).toEqual([...PR3_CALCULATOR_REGISTRY_IDS].sort());
   });
 
   it('has no NLU calculator profiles for PR3 ids that cannot resolveRegistryId', () => {
-    const pr3Nlu = clinicalIntentTools.filter((t) => PR3_CALCULATOR_REGISTRY_IDS.includes(t.toolId));
+    const pr3Nlu = clinicalIntentTools.filter((t) => (PR3_CALCULATOR_REGISTRY_IDS as readonly string[]).includes(t.toolId));
     expect(pr3Nlu).toHaveLength(PR3_CALCULATOR_REGISTRY_IDS.length);
     for (const row of pr3Nlu) {
       expect(resolveRegistryId(row.toolId)).toBe(row.toolId);

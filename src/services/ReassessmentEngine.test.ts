@@ -29,6 +29,7 @@ describe('ReassessmentEngine', () => {
         state: PatientState.Waiting,
       })
     );
+    if (!result) throw new Error('expected evaluatePatientForReassessment to return a result');
     expect(result.reasons).toContain('Waiting 52 minutes');
   });
 
@@ -42,6 +43,7 @@ describe('ReassessmentEngine', () => {
       { now }
     );
 
+    if (!result) throw new Error('expected evaluatePatientForReassessment to return a result');
     expect(result.reasons).toContain('Vitals stale 47 minutes');
   });
 
@@ -56,6 +58,7 @@ describe('ReassessmentEngine', () => {
       { now }
     );
 
+    if (!result) throw new Error('expected evaluatePatientForReassessment to return a result');
     expect(result.reasons).toContain('High-priority triage before assessment');
   });
 

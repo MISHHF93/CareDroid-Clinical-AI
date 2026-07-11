@@ -39,13 +39,13 @@ describe('ExportService', () => {
         appendChild: vi.fn(),
         removeChild: vi.fn(),
       },
-    };
+    } as unknown as Document;
 
     // Mock URL for blob operations
     global.URL = {
       createObjectURL: vi.fn(() => 'blob:mock-url'),
       revokeObjectURL: vi.fn(),
-    };
+    } as unknown as typeof URL;
   });
 
   afterEach(() => {
@@ -257,14 +257,14 @@ describe('ExportService', () => {
     });
 
     it('should schedule report', async () => {
-      global.fetch.mockResolvedValue({
+      vi.mocked(global.fetch).mockResolvedValue({
         ok: true,
         json: async () => ({
           id: 'scheduled-123',
           templateId: 'cost_summary',
           status: 'active',
         }),
-      });
+      } as unknown as Response);
 
       const scheduled = await service.scheduleReport(
         'cost_summary',
@@ -310,13 +310,13 @@ describe('ExportService', () => {
     });
 
     it('should retrieve scheduled reports', async () => {
-      global.fetch.mockResolvedValue({
+      vi.mocked(global.fetch).mockResolvedValue({
         ok: true,
         json: async () => ({
           id: 'scheduled-123',
           templateId: 'cost_summary',
         }),
-      });
+      } as unknown as Response);
 
       await service.scheduleReport(
         'cost_summary',
@@ -330,12 +330,12 @@ describe('ExportService', () => {
     });
 
     it('should filter scheduled reports by template', async () => {
-      global.fetch.mockResolvedValue({
+      vi.mocked(global.fetch).mockResolvedValue({
         ok: true,
         json: async () => ({
           id: 'scheduled-123',
         }),
-      });
+      } as unknown as Response);
 
       await service.scheduleReport(
         'cost_summary',
@@ -349,10 +349,10 @@ describe('ExportService', () => {
     });
 
     it('should cancel scheduled report', async () => {
-      global.fetch.mockResolvedValueOnce({
+      vi.mocked(global.fetch).mockResolvedValueOnce({
         ok: true,
         json: async () => ({ id: 'scheduled-123' }),
-      });
+      } as unknown as Response);
 
       await service.scheduleReport(
         'cost_summary',
@@ -360,9 +360,9 @@ describe('ExportService', () => {
         ['user@example.com']
       );
 
-      global.fetch.mockResolvedValueOnce({
+      vi.mocked(global.fetch).mockResolvedValueOnce({
         ok: true,
-      });
+      } as unknown as Response);
 
       const success = await service.cancelScheduledReport('scheduled-123');
 

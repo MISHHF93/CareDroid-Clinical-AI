@@ -70,7 +70,7 @@ describe('PR4A coverage — registry inclusion', () => {
   });
 
   it('includes each PR4A tool exactly once in toolRegistry with calculator panel', () => {
-    const pr4aRows = toolRegistry.filter((t) => PR4A_TOOL_IDS.includes(t.id));
+    const pr4aRows = toolRegistry.filter((t) => (PR4A_TOOL_IDS as readonly string[]).includes(t.id));
     expect(pr4aRows).toHaveLength(PR4A_TOOL_IDS.length);
     for (const id of PR4A_TOOL_IDS) {
       const reg = toolRegistryById[id];
@@ -93,7 +93,7 @@ describe('PR4A coverage — registry inclusion', () => {
 
   it('does not list PR4A tools in chat-only hub (Tier-A dedicated forms)', () => {
     for (const id of PR4A_TOOL_IDS) {
-      expect(nluCalculatorHubOnly.some((h) => h.toolId === id)).toBe(false);
+      expect(nluCalculatorHubOnly.some((h) => (h.toolId as string) === id)).toBe(false);
     }
   });
 });
@@ -149,6 +149,7 @@ describe('PR4A coverage — discovery inclusion', () => {
     for (const [aliasId, canonical] of PR4A_DISCOVERY_ALIAS_PAIRS) {
       const row = toolIdAliases.find((a) => a.id === aliasId);
       expect(row, `discovery alias row missing: ${aliasId}`).toBeTruthy();
+      if (!row) throw new Error(`expected discovery alias row for ${aliasId} to exist`);
       expect(row.mapsTo).toBe(canonical);
     }
   });
@@ -166,6 +167,7 @@ describe('PR4A coverage — NLU profiles', () => {
     for (const id of PR4A_TOOL_IDS) {
       const nlu = clinicalIntentTools.find((t) => t.toolId === id);
       expect(nlu, `clinicalIntentTools missing ${id}`).toBeTruthy();
+      if (!nlu) throw new Error(`expected clinicalIntentTools entry for ${id} to exist`);
       expect(clinicalIntentToolsById[id]).toBe(nlu);
       expect(nlu.path).toBe(`${PR4A_HUB_PATH}/${id}`);
       expect(nlu.sidebarToolId).toBe(id);

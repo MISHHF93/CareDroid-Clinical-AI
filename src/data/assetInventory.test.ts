@@ -24,6 +24,7 @@ describe('mounted SaaS asset inventory projection', () => {
     for (const id of userFacingIds) {
       const asset = byId.get(id);
       expect(asset, id).toBeTruthy();
+      if (!asset) throw new Error(`expected asset ${id} to be mounted`);
       expect(asset.productIds.length, `${id} productIds`).toBeGreaterThan(0);
       expect(asset.packIds.length, `${id} packIds`).toBeGreaterThan(0);
       expect(asset.workspaceIds.length, `${id} workspaceIds`).toBeGreaterThan(0);

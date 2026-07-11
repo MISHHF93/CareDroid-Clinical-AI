@@ -101,7 +101,7 @@ describe('PR4A registration audit — canonical ID alignment', () => {
   });
 
   it('has no PR4A registry rows outside the audit list (no orphans)', () => {
-    const pr4aRows = toolRegistry.filter((t) => PR4A_TOOL_IDS.includes(t.id));
+    const pr4aRows = toolRegistry.filter((t) => PR4A_TOOL_IDS.includes(t.id as any));
     expect(pr4aRows.map((t) => t.id).sort()).toEqual([...PR4A_TOOL_IDS].sort());
   });
 });
@@ -222,7 +222,7 @@ describe('PR4A registration audit — NLU, backend, aliases', () => {
 
   it('excludes PR4A tools from chat-only hub list', () => {
     for (const id of PR4A_TOOL_IDS) {
-      expect(nluCalculatorHubOnly.some((h) => h.toolId === id)).toBe(false);
+      expect(nluCalculatorHubOnly.some((h) => h.toolId === (id as any))).toBe(false);
     }
   });
 });

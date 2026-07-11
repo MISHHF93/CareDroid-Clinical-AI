@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { PatientState, Priority } from '../types/emergency';
+import { PatientState, Priority, type Patient } from '../types/emergency';
 import {
   buildProviderWaitVisibilitySnapshot,
   hasProviderWaitVisibilityActivity,
@@ -20,7 +20,7 @@ describe('providerWaitVisibilityModel', () => {
       priority: Priority.P2,
       triageTime: new Date(Date.now() - 35 * 60000).toISOString(),
     },
-  ];
+  ] as unknown as Patient[];
 
   it('builds visibility snapshot with wait counts and average', () => {
     const snapshot = buildProviderWaitVisibilitySnapshot(patients, {

@@ -115,12 +115,12 @@ describe('clinicalToolIdContract — canonical groups', () => {
   it('NLU_HUB_ONLY_PROFILE_TOOL_IDS matches nluCalculatorHubOnly NLU-only rows', () => {
     const hubOnlyIds = nluCalculatorHubOnly
       .map((row) => row.toolId)
-      .filter((id) => NLU_HUB_ONLY_PROFILE_TOOL_IDS.includes(id));
+      .filter((id) => (NLU_HUB_ONLY_PROFILE_TOOL_IDS as readonly string[]).includes(id));
     expect(sortedUnique(hubOnlyIds)).toEqual(sortedUnique([...NLU_HUB_ONLY_PROFILE_TOOL_IDS]));
   });
 
   it('builtinUiCalculators ids are canonical BUILTIN_CALC slugs', () => {
-    const allowed = new Set(Object.values(BUILTIN_CALC));
+    const allowed = new Set(Object.values(BUILTIN_CALC)) as Set<string>;
     for (const calc of builtinUiCalculators) {
       expect(allowed.has(calc.id), `unexpected builtin slug: ${calc.id}`).toBe(true);
     }
@@ -240,7 +240,7 @@ describe('clinicalToolIdContract — NLU profile drift', () => {
     const coveredIds = new Set([...catalogIds, ...hubOnlyIds, ...groupedChatIds]);
 
     for (const toolId of patternToolIds()) {
-      expect(coveredIds.has(toolId), `${toolId} must be launchable through catalog or chat hub`).toBe(true);
+      expect(coveredIds.has(toolId as string), `${toolId} must be launchable through catalog or chat hub`).toBe(true);
     }
   });
 

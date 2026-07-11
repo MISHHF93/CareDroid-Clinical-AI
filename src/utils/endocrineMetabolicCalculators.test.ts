@@ -115,6 +115,7 @@ describe('endocrineMetabolicCalculators', () => {
       ethanol: 0,
     });
     expect(result.ok).toBe(false);
+    if (!result.errors) throw new Error('expected result.errors to be defined');
     expect(result.errors.length).toBeGreaterThan(0);
   });
 });

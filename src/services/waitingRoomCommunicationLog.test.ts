@@ -33,7 +33,7 @@ function buildPatient(overrides: Partial<Patient> = {}): Patient {
     notes: [],
     timeline: [],
     ...overrides,
-  };
+  } as unknown as Patient;
 }
 
 describe('waitingRoomCommunicationLog', () => {

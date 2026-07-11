@@ -57,10 +57,11 @@ describe('platformAnalytics', () => {
       '2026-05-29',
       '2026-05-30',
     ]);
-    expect(
-      analytics.featureEngagement.find((event) => event.eventType === PLATFORM_ANALYTICS_EVENT_TYPES.SEARCH_ACTIVITY)
-        .count
-    ).toBe(5);
+    const searchActivityEvent = analytics.featureEngagement.find(
+      (event) => event.eventType === PLATFORM_ANALYTICS_EVENT_TYPES.SEARCH_ACTIVITY
+    );
+    if (!searchActivityEvent) throw new Error('expected a search_activity featureEngagement event');
+    expect(searchActivityEvent.count).toBe(5);
   });
 
   it('flags tools for promote, improve, merge, hide, or monitor decisions', () => {

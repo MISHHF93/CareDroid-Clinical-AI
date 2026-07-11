@@ -7,7 +7,7 @@ import { UserProvider } from '../contexts/UserContext';
 import { NotificationShellProvider } from '../contexts/NotificationShellContext';
 import EMSCriticalBroadcast from './EMSCriticalBroadcast';
 import { useEmergencyStore } from '../store/emergencyStore';
-import { Priority } from '../types/emergency';
+import { Priority, type EMSArrival } from '../types/emergency';
 
 const emergencyRoleMock = vi.hoisted(() => ({
   role: 'charge_nurse',
@@ -86,7 +86,7 @@ function seedCriticalArrival() {
       },
       true,
     );
-    useEmergencyStore.getState().addEMSArrival(respiratoryFailureArrival());
+    useEmergencyStore.getState().addEMSArrival(respiratoryFailureArrival() as unknown as EMSArrival);
   });
 }
 

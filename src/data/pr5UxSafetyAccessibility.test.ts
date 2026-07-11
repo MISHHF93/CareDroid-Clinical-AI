@@ -41,6 +41,7 @@ describe('PR5 NLU — chat seed safety', () => {
   it('phq9 chat seed avoids diagnostic certainty and treatment directives', () => {
     const nlu = clinicalIntentTools.find((t) => t.toolId === 'phq9');
     expect(nlu?.chatSeed).toBeTruthy();
+    if (!nlu) throw new Error('expected phq9 clinical intent tool to exist');
     expect(nlu.chatSeed).not.toMatch(DEPRESSION_DIAGNOSIS_PATTERN);
     expect(nlu.chatSeed).not.toMatch(MEDICATION_PATTERN);
     expect(`${nlu.description} ${nlu.chatSeed}`).toMatch(/screen|does not diagnose/i);
@@ -52,6 +53,7 @@ describe('PR5 NLU — chat seed safety', () => {
   it('gad7 chat seed avoids diagnostic certainty and treatment directives', () => {
     const nlu = clinicalIntentTools.find((t) => t.toolId === 'gad7');
     expect(nlu?.chatSeed).toBeTruthy();
+    if (!nlu) throw new Error('expected gad7 clinical intent tool to exist');
     expect(nlu.chatSeed).not.toMatch(ANXIETY_DIAGNOSIS_PATTERN);
     expect(nlu.chatSeed).not.toMatch(MEDICATION_PATTERN);
     expect(`${nlu.description} ${nlu.chatSeed}`).toMatch(/screen|does not diagnose/i);
@@ -64,6 +66,7 @@ describe('PR5 NLU — chat seed safety', () => {
 describe('PR5 UX & clinical safety — PHQ-9 interpretation copy', () => {
   it('interpretation avoids depression diagnosis and medication advice', () => {
     const interp = interpretPhq9Score(14, 0);
+    if (!interp) throw new Error('expected interpretPhq9Score to return a result');
     const combined = `${interp.interpretation} ${interp.screeningDisclaimer} ${interp.pathwayDisclaimer}`;
     expect(combined).not.toMatch(DEPRESSION_DIAGNOSIS_PATTERN);
     expect(combined).not.toMatch(MEDICATION_PATTERN);
@@ -73,6 +76,7 @@ describe('PR5 UX & clinical safety — PHQ-9 interpretation copy', () => {
 
   it('elevates question 9 with urgent safety messaging', () => {
     const interp = interpretPhq9Score(3, 2);
+    if (!interp) throw new Error('expected interpretPhq9Score to return a result');
     expect(interp.question9Elevated).toBe(true);
     expect(interp.severity).toBe('critical');
     expect(interp.question9SafetyAlert.message).toMatch(/urgent safety assessment/i);
@@ -82,6 +86,7 @@ describe('PR5 UX & clinical safety — PHQ-9 interpretation copy', () => {
 
   it('warns on high total when question 9 is zero', () => {
     const interp = interpretPhq9Score(18, 0);
+    if (!interp) throw new Error('expected interpretPhq9Score to return a result');
     expect(interp.highSymptomEscalation.warranted).toBe(true);
     expect(interp.highSymptomEscalation.message).toMatch(/does not rule out suicide risk/i);
   });
@@ -99,6 +104,7 @@ describe('PR5 UX & clinical safety — PHQ-9 interpretation copy', () => {
       q9: 1,
     });
     expect(out.ok).toBe(true);
+    if (!out.ok) throw new Error('expected computePhq9Result to succeed');
     expect(out.question9Elevated).toBe(true);
   });
 });
@@ -127,6 +133,7 @@ describe('PR5 accessibility & UX — Phq9Calculator UI contracts', () => {
 describe('PR5 UX & clinical safety — GAD-7 interpretation copy', () => {
   it('interpretation avoids anxiety disorder diagnosis and medication advice', () => {
     const interp = interpretGad7Score(12);
+    if (!interp) throw new Error('expected interpretGad7Score to return a result');
     const combined = `${interp.interpretation} ${interp.screeningDisclaimer} ${interp.safetyDisclaimer}`;
     expect(combined).not.toMatch(ANXIETY_DIAGNOSIS_PATTERN);
     expect(combined).not.toMatch(MEDICATION_PATTERN);
@@ -136,6 +143,7 @@ describe('PR5 UX & clinical safety — GAD-7 interpretation copy', () => {
 
   it('severe GAD-7 scores include acute distress safety alert', () => {
     const interp = interpretGad7Score(16);
+    if (!interp) throw new Error('expected interpretGad7Score to return a result');
     expect(interp.acuteDistressSafetyAlert.elevated).toBe(true);
     expect(interp.acuteDistressSafetyAlert.message).toMatch(/988/i);
     expect(interp.interpretation).toMatch(/suicidal thoughts/i);
@@ -152,6 +160,7 @@ describe('PR5 UX & clinical safety — GAD-7 interpretation copy', () => {
       q7: 0,
     });
     expect(out.ok).toBe(true);
+    if (!out.ok) throw new Error('expected computeGad7Result to succeed');
     expect(out.totalScore).toBe(6);
     expect(out.severityCategory).toBe('mild');
   });

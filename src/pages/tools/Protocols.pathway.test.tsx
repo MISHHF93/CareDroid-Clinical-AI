@@ -27,8 +27,9 @@ function renderProtocols() {
 describe('Protocols pathway library', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    sendClinicalChatMessage.mockResolvedValue({
+    vi.mocked(sendClinicalChatMessage).mockResolvedValue({
       ok: true,
+      status: 200,
       data: { response: 'AI explanation for selected protocol pathway.' },
     });
   });

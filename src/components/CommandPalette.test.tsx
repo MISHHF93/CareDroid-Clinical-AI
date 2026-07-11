@@ -177,6 +177,7 @@ describe('CommandPalette helpers', () => {
     expect(
       isCommandVisibleForEmergencyRole(
         {
+          id: 'create-patient',
           requiredAction: EMERGENCY_ACTIONS.createPatient,
           requiredRoute: CANONICAL_ROUTES.emergencyWhiteboard,
         },
@@ -186,6 +187,7 @@ describe('CommandPalette helpers', () => {
     expect(
       isCommandVisibleForEmergencyRole(
         {
+          id: 'open-patients',
           requiredRoute: CANONICAL_ROUTES.emergencyPatients,
         },
         readOnlyRole,
@@ -194,6 +196,7 @@ describe('CommandPalette helpers', () => {
     expect(
       isCommandVisibleForEmergencyRole(
         {
+          id: 'open-settings',
           requiredRoute: CANONICAL_ROUTES.emergencySettings,
         },
         readOnlyRole,

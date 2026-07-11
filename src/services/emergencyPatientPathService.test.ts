@@ -68,6 +68,9 @@ describe('EmergencyPatientPathService', () => {
         nextAction: expect.any(String),
       })
     );
+    if (!chestPain) throw new Error('expected a Chest pain patient in the demo dashboard');
+    if (!stroke) throw new Error('expected a Stroke symptoms patient in the demo dashboard');
+    if (!boarding) throw new Error('expected an inpatient-admission patient in the demo dashboard');
     expect(chestPain.calculators.map((calculator) => calculator.label)).toEqual(expect.arrayContaining(['HEART']));
     expect(stroke.calculators.map((calculator) => calculator.label)).toEqual(expect.arrayContaining(['NIHSS']));
     expect(boarding.destination.label).toBe('Inpatient admission');

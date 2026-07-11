@@ -45,6 +45,7 @@ describe('Predictive Maintenance (predictive-maintenance) wiring', () => {
     expect(reg?.category).toBe('Fleet');
 
     const nlu = clinicalIntentTools.find((t) => t.toolId === id);
+    if (!nlu) throw new Error('expected nlu tool entry to exist');
     expect(nlu?.path).toBe(path);
     expect(nlu?.sidebarToolId).toBe(id);
     expect(nlu?.backendExecutable).toBe(false);

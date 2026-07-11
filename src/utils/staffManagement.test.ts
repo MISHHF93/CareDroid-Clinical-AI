@@ -53,7 +53,7 @@ describe('staff workload management', () => {
     const workloads = buildStaffWorkloads(staff, patients, {
       status: 'Active',
       staffIds: ['staff-okonkwo', 'staff-singh'],
-    });
+    } as any);
     const overloaded = workloads.find((member) => member.id === 'staff-okonkwo');
     const suggestion = getStaffRebalanceSuggestion(workloads);
 

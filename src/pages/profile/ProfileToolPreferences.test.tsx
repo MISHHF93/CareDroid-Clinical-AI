@@ -18,7 +18,7 @@ vi.mock('../../contexts/ToolPreferencesContext', () => ({
 }));
 
 vi.mock('../../contexts/UserContext', async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual = await importOriginal<typeof import('../../contexts/UserContext')>();
   return {
     ...actual,
     useUser: () => mockUserValue,
@@ -57,6 +57,7 @@ describe('ProfileToolPreferences', () => {
 
   it('allows hidden tools to be restored from profile settings', () => {
     const hiddenTool = getUserFacingToolRegistryProjection().find((tool) => tool.category === 'Calculator');
+    if (!hiddenTool) throw new Error('expected a Calculator tool in the registry projection');
     mockToolPreferencesValue.hiddenTools = [hiddenTool.id];
 
     render(<MemoryRouter><ProfileToolPreferences /></MemoryRouter>);

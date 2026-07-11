@@ -59,6 +59,7 @@ describe('PR2 consistency — registry, NLU, and builtin alignment', () => {
       expect(toolRegistryById[id], `toolRegistry missing ${id}`).toBeTruthy();
       const nlu = clinicalIntentTools.find((t) => t.toolId === id);
       expect(nlu, `clinicalIntentTools missing ${id}`).toBeTruthy();
+      if (!nlu) throw new Error(`expected clinicalIntentTools to include ${id}`);
       expect(nlu.backendExecutable).toBe(false);
       expect(nlu.sidebarToolId).toBe(id);
     }
@@ -86,7 +87,9 @@ describe('PR2 consistency — registry, NLU, and builtin alignment', () => {
 
 describe('PR2 consistency — aliases and discovery', () => {
   it('aligns PR2 discovery aliases with NLU_TO_REGISTRY_ID', () => {
-    const pr2Aliases = toolIdAliases.filter((a) => PR2_CALCULATOR_REGISTRY_IDS.includes(a.mapsTo));
+    const pr2Aliases = toolIdAliases.filter((a) =>
+      (PR2_CALCULATOR_REGISTRY_IDS as readonly string[]).includes(a.mapsTo)
+    );
     expect(pr2Aliases.length).toBeGreaterThan(0);
     for (const { id, mapsTo } of pr2Aliases) {
       expect(NLU_TO_REGISTRY_ID[id]).toBe(mapsTo);
@@ -131,7 +134,9 @@ describe('PR2 consistency — catalog, discovery, and searchability', () => {
 
 describe('PR2 consistency — sidebar visibility', () => {
   it('exposes each PR2 registry id exactly once in toolRegistry', () => {
-    const pr2Rows = toolRegistry.filter((t) => PR2_CALCULATOR_REGISTRY_IDS.includes(t.id));
+    const pr2Rows = toolRegistry.filter((t) =>
+      (PR2_CALCULATOR_REGISTRY_IDS as readonly string[]).includes(t.id)
+    );
     expect(pr2Rows).toHaveLength(PR2_CALCULATOR_REGISTRY_IDS.length);
   });
 });

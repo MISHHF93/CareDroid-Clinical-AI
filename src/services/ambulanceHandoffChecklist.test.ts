@@ -33,7 +33,7 @@ const baseArrival = {
   priority: Priority.P1,
   patientId: 'patient-ems-1',
   arrivedAt: '2026-06-20T11:45:00.000Z',
-  vitals: { hr: 98, sbp: 142, dbp: 88, spo2: 94 },
+  vitals: { hr: 98, sbp: 142, dbp: 88, spo2: 94, recordedAt: '2026-06-20T11:40:00.000Z' },
   criticalChecklist: {
     type: 'stemi' as const,
     title: 'STEMI Preparation Checklist',

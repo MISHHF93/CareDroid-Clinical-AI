@@ -42,7 +42,7 @@ export function validateBodeIndexInputs(raw) {
 
 export function computeBodeIndex(raw) {
   const validation = validateBodeIndexInputs(raw);
-  if (!validation.ok) return { ok: false, errors: validation.errors };
+  if (!validation.ok) return { ok: false as const, errors: validation.errors };
   const { bmi, fev1PctPredicted, sixMinuteWalkMeters, mmrcDyspnea } = validation.values;
   const fev1Points = fev1PctPredicted >= 65 ? 0 : fev1PctPredicted >= 50 ? 1 : fev1PctPredicted >= 36 ? 2 : 3;
   const walkPoints =
@@ -52,7 +52,7 @@ export function computeBodeIndex(raw) {
   const totalScore = fev1Points + walkPoints + dyspneaPoints + bmiPoints;
   const riskBand = totalScore >= 7 ? 'very_high' : totalScore >= 5 ? 'high' : totalScore >= 3 ? 'intermediate' : 'low';
   return {
-    ok: true,
+    ok: true as const,
     totalScore,
     riskBand,
     severity: severityForBand(riskBand),
@@ -88,7 +88,7 @@ export function computeCopdGoldAssessment(raw) {
   if (!inRange(moderateExacerbations, 0, 20)) errors.push('Enter moderate exacerbations from 0 to 20.');
   if (!inRange(severeExacerbations, 0, 20)) errors.push('Enter severe exacerbations or hospitalizations from 0 to 20.');
   if (Number.isFinite(fev1PctPredicted) && !inRange(fev1PctPredicted, 1, 150)) errors.push('Optional FEV1 percent predicted must be 1 to 150.');
-  if (errors.length) return { ok: false, errors };
+  if (errors.length) return { ok: false as const, errors };
 
   const moreSymptoms =
     (Number.isFinite(catScore) && catScore >= 10) || (Number.isFinite(mmrcGrade) && mmrcGrade >= 2);
@@ -105,7 +105,7 @@ export function computeCopdGoldAssessment(raw) {
           : 'GOLD 4';
 
   return {
-    ok: true,
+    ok: true as const,
     group,
     symptomBurden: moreSymptoms ? 'more' : 'fewer',
     exacerbationRisk: highExacerbationRisk ? 'high' : 'low',
@@ -135,14 +135,14 @@ export function computeAaGradient(raw) {
   if (!inRange(paco2MmHg, 10, 120)) errors.push('Enter PaCO2 from 10 to 120 mmHg.');
   if (!inRange(atmosphericPressureMmHg, 400, 800)) errors.push('Atmospheric pressure must be 400 to 800 mmHg.');
   if (!inRange(respiratoryQuotient, 0.6, 1.2)) errors.push('Respiratory quotient must be 0.6 to 1.2.');
-  if (errors.length) return { ok: false, errors };
+  if (errors.length) return { ok: false as const, errors };
 
   const alveolarOxygen = (fio2Pct / 100) * (atmosphericPressureMmHg - 47) - paco2MmHg / respiratoryQuotient;
   const gradient = alveolarOxygen - pao2MmHg;
   const expectedUpperLimit = ageYears / 4 + 4;
   const elevated = gradient > expectedUpperLimit;
   return {
-    ok: true,
+    ok: true as const,
     alveolarOxygen: Number(alveolarOxygen.toFixed(1)),
     gradient: Number(gradient.toFixed(1)),
     expectedUpperLimit: Number(expectedUpperLimit.toFixed(1)),
@@ -163,11 +163,11 @@ export function computePao2Fio2Ratio(raw) {
   const errors = [] as any[];
   if (!inRange(pao2MmHg, 20, 700)) errors.push('Enter PaO2 from 20 to 700 mmHg.');
   if (!inRange(fio2Pct, 21, 100)) errors.push('Enter FiO2 from 21% to 100%.');
-  if (errors.length) return { ok: false, errors };
+  if (errors.length) return { ok: false as const, errors };
   const ratio = pao2MmHg / (fio2Pct / 100);
   const band = ratio <= 100 ? 'severe' : ratio <= 200 ? 'moderate' : ratio <= 300 ? 'mild' : 'above_ards_threshold';
   return {
-    ok: true,
+    ok: true as const,
     ratio: Number(ratio.toFixed(0)),
     riskBand: band,
     severity: severityForBand(band),
@@ -194,11 +194,11 @@ export function computeRoxIndex(raw) {
   if (!inRange(spo2Pct, 50, 100)) errors.push('Enter SpO2 from 50% to 100%.');
   if (!inRange(fio2Pct, 21, 100)) errors.push('Enter FiO2 from 21% to 100%.');
   if (!inRange(respiratoryRate, 4, 80)) errors.push('Enter respiratory rate from 4 to 80 breaths/min.');
-  if (errors.length) return { ok: false, errors };
+  if (errors.length) return { ok: false as const, errors };
   const rox = (spo2Pct / (fio2Pct / 100)) / respiratoryRate;
   const band = rox >= 4.88 ? 'reassuring' : rox >= 3.85 ? 'indeterminate' : 'concerning';
   return {
-    ok: true,
+    ok: true as const,
     roxIndex: Number(rox.toFixed(2)),
     riskBand: band,
     severity: band === 'concerning' ? 'critical' : band === 'indeterminate' ? 'warning' : 'normal',
@@ -221,7 +221,7 @@ export function computePneumoniaSeverityIndex(raw) {
   const errors = [] as any[];
   if (!inRange(ageYears, 0, 120)) errors.push('Enter age from 0 to 120 years.');
   if (!['female', 'male'].includes(sex)) errors.push('Select sex.');
-  if (errors.length) return { ok: false, errors };
+  if (errors.length) return { ok: false as const, errors };
   let points = sex === 'female' ? ageYears - 10 : ageYears;
   const add = (condition, value) => {
     if (condition) points += value;
@@ -269,7 +269,7 @@ export function computePneumoniaSeverityIndex(raw) {
             ? 'IV'
             : 'V';
   return {
-    ok: true,
+    ok: true as const,
     points,
     riskClass,
     severity: riskClass === 'IV' || riskClass === 'V' ? 'warning' : 'normal',
@@ -289,13 +289,13 @@ export function computeAsthmaSeverityScore(raw) {
   if (!inRange(pefPctPersonalBest, 0, 150)) errors.push('Enter PEF percent personal best/predicted from 0 to 150.');
   if (!inRange(spo2Pct, 50, 100)) errors.push('Enter SpO2 from 50% to 100%.');
   if (!inRange(respiratoryRate, 4, 80)) errors.push('Enter respiratory rate from 4 to 80 breaths/min.');
-  if (errors.length) return { ok: false, errors };
+  if (errors.length) return { ok: false as const, errors };
   const lifeThreatening = Boolean(raw.silentChest || raw.alteredMentalStatus || raw.exhaustion || spo2Pct < 90);
   const severe = lifeThreatening || pefPctPersonalBest < 50 || spo2Pct < 92 || raw.speaksWordsOnly || raw.accessoryMuscleUse;
   const moderate = !severe && (pefPctPersonalBest < 80 || spo2Pct < 95 || raw.speaksPhrasesOnly || respiratoryRate >= 25);
   const band = lifeThreatening ? 'life_threatening' : severe ? 'severe' : moderate ? 'moderate' : 'mild';
   return {
-    ok: true,
+    ok: true as const,
     riskBand: band,
     severity: band === 'life_threatening' || band === 'severe' ? 'critical' : band === 'moderate' ? 'warning' : 'normal',
     label:

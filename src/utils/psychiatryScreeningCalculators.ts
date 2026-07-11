@@ -35,7 +35,7 @@ function requireIntegerRange(raw, key, label, min, max, errors) {
 
 function result(label, interpretation, severity, referenceLine, extra: any = {}) {
   return {
-    ok: true,
+    ok: true as const,
     label,
     interpretation,
     severity,
@@ -55,7 +55,7 @@ export function computeCageResult(raw) {
   ];
   const answers: any = {};
   for (const [key, label] of keys) answers[key] = requireYesNo(raw, key, label, errors);
-  if (errors.length) return { ok: false, errors };
+  if (errors.length) return { ok: false as const, errors };
 
   const score = Object.values(answers).filter((value: any) => value === 'yes').length;
   const positive = score >= 2;
@@ -87,7 +87,7 @@ export function computeMmseResult(raw) {
     language: requireIntegerRange(raw, 'language', 'language', 0, 8, errors),
     visuospatial: requireIntegerRange(raw, 'visuospatial', 'visuospatial copying', 0, 1, errors),
   };
-  if (errors.length) return { ok: false, errors };
+  if (errors.length) return { ok: false as const, errors };
 
   const score = Object.values(domains).reduce<number>((sum, value) => sum + (value as number), 0);
   const severity = score < 18 ? 'critical' : score < 24 ? 'warning' : 'normal';
@@ -118,7 +118,7 @@ export function computeMocaPlaceholderWorkflow(raw) {
   const trainedAdministrator = requireYesNo(raw, 'trainedAdministrator', 'whether a trained administrator will perform the MoCA', errors);
   const accommodationsReviewed = requireYesNo(raw, 'accommodationsReviewed', 'whether language, vision, hearing, motor, and education context was reviewed', errors);
   const humanReviewPlan = requireYesNo(raw, 'humanReviewPlan', 'whether clinician review is planned', errors);
-  if (errors.length) return { ok: false, errors };
+  if (errors.length) return { ok: false as const, errors };
 
   const blocked = officialFormAvailable === 'no' || trainedAdministrator === 'no' || humanReviewPlan === 'no';
   return result(
@@ -143,7 +143,7 @@ export function computePcl5Result(raw) {
   for (let i = 1; i <= 20; i += 1) {
     items[`q${i}`] = requireIntegerRange(raw, `q${i}`, `PCL-5 item ${i}`, 0, 4, errors);
   }
-  if (errors.length) return { ok: false, errors };
+  if (errors.length) return { ok: false as const, errors };
 
   const score = Object.values(items).reduce<number>((sum, value) => sum + (value as number), 0);
   const elevated = score >= 31;
@@ -179,7 +179,7 @@ export function computeMdqResult(raw) {
     errors.push('Select level of functional impairment.');
   }
   const urgentSafetyConcern = requireYesNo(raw, 'urgentSafetyConcern', 'whether psychosis, unsafe behavior, suicidal ideation, or danger is present', errors);
-  if (errors.length) return { ok: false, errors };
+  if (errors.length) return { ok: false as const, errors };
 
   const positive = symptomCount >= 7 && samePeriod === 'yes' && ['moderate', 'serious'].includes(impairment);
   const crisisSensitive = urgentSafetyConcern === 'yes';
@@ -209,7 +209,7 @@ export function computeEpworthSleepinessResult(raw) {
     items[`q${i}`] = requireIntegerRange(raw, `q${i}`, `Epworth situation ${i}`, 0, 3, errors);
   }
   const safetySensitiveActivity = requireYesNo(raw, 'safetySensitiveActivity', 'whether safety-sensitive sleepiness is present', errors);
-  if (errors.length) return { ok: false, errors };
+  if (errors.length) return { ok: false as const, errors };
 
   const score = Object.values(items).reduce<number>((sum, value) => sum + (value as number), 0);
   const severity = safetySensitiveActivity === 'yes' ? 'critical' : score >= 16 ? 'warning' : score >= 11 ? 'warning' : 'normal';
@@ -244,7 +244,7 @@ export function computeColumbiaSuicideSeverityWorkflow(raw) {
   const behavior = requireYesNo(raw, 'behavior', 'whether recent suicidal behavior or preparatory behavior is disclosed', errors);
   const currentUnsafe = requireYesNo(raw, 'currentUnsafe', 'whether the person cannot be kept safe right now', errors);
   const directHumanReview = requireYesNo(raw, 'directHumanReview', 'whether direct human review is arranged', errors);
-  if (errors.length) return { ok: false, errors };
+  if (errors.length) return { ok: false as const, errors };
 
   const crisisSensitive = [ideation, intentOrPlan, behavior, currentUnsafe].includes('yes');
   const reviewGap = directHumanReview === 'no';

@@ -6,7 +6,7 @@ import {
   useEmergencyStore,
 } from './emergencyStore';
 import { movePatientToState as movePatientWithJourneyRules } from '../engine/journeyEngine';
-import { PatientState, Priority } from '../types/emergency';
+import { PatientFlag, PatientState, Priority } from '../types/emergency';
 
 function seedPt005WalkthroughFixtures() {
   useEmergencyStore.setState((state) => {
@@ -82,7 +82,7 @@ function seedPt005WalkthroughFixtures() {
           vitalsAlerts: [],
         },
       ],
-    };
+    } as any;
   });
 }
 
@@ -156,7 +156,7 @@ describe('emergencyStore EMS arrival conversion', () => {
       status: 'Inbound' as const,
       prearrivalComplaint: 'STEMI male 58, BP 88/60',
       priority: Priority.P1,
-    };
+    } as any;
 
     useEmergencyStore.getState().addEMSArrival(arrival);
 
@@ -270,7 +270,7 @@ describe('first customer walkthrough', () => {
         },
       ],
       notes: [],
-    };
+    } as any;
 
     useEmergencyStore.getState().addPatient(patient);
     let activePatient = useEmergencyStore
@@ -289,13 +289,13 @@ describe('first customer walkthrough', () => {
     useEmergencyStore.getState().addFlag(patient.id, 'ReassessmentDue', {
       reason: 'First customer walkthrough reassessment',
       detectedAt: '2026-06-12T05:40:00.000Z',
-    });
+    } as any);
 
     expect(selectReassessmentQueue(useEmergencyStore.getState())[0]).toMatchObject({
       patientId: patient.id,
     });
 
-    useEmergencyStore.getState().removeFlag(patient.id, 'ReassessmentDue');
+    useEmergencyStore.getState().removeFlag(patient.id, PatientFlag.ReassessmentDue);
     useEmergencyStore.getState().addNote(patient.id, {
       id: 'walkthrough-reassessment-note',
       patientId: patient.id,
@@ -434,7 +434,7 @@ describe('emergencyStore crisis staffing requests', () => {
       reason: 'Capacity crisis Orange at 68/100',
       capacityScore: 68,
       capacityRiskLevel: 'Orange',
-    });
+    } as any);
 
     expect(useEmergencyStore.getState().staffingRequests[0]).toMatchObject({
       requestedByStaffId: 'staff-priya-nair',
@@ -591,7 +591,7 @@ describe('emergencyStore long wait rescue', () => {
 
     expect(patient && hasPatientFlag(patient, 'LongWait')).toBe(true);
     expect(patient && hasPatientFlag(patient, 'ReassessmentDue')).toBe(true);
-    expect(patient?.flags.find((flag) => flag.type === 'ReassessmentDue')).toMatchObject({
+    expect((patient?.flags as any[])?.find((flag) => flag.type === 'ReassessmentDue')).toMatchObject({
       reason: 'Critical wait time breach',
       severity: 'Critical',
     });

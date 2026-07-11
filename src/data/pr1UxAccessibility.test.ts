@@ -91,6 +91,7 @@ describe('PR1 calculators — clinical safety copy', () => {
   it('Child-Pugh interpretation is prognostic, not prescriptive', () => {
     const i = interpretChildPughClass(10);
     expect(i).toBeTruthy();
+    if (!i) throw new Error('expected interpretChildPughClass to return a result');
     expect(i.interpretation).not.toMatch(TREATMENT_PATTERN);
     expect(i.interpretation).not.toMatch(CERTAINTY_PATTERN);
   });
@@ -98,6 +99,7 @@ describe('PR1 calculators — clinical safety copy', () => {
   it('HAS-BLED interpretation does not mandate anticoagulation changes', () => {
     const i = interpretHasBled(4);
     expect(i).toBeTruthy();
+    if (!i) throw new Error('expected interpretHasBled to return a result');
     expect(`${i.interpretation} ${i.bleedingRiskNote ?? ''}`).not.toMatch(TREATMENT_PATTERN);
     expect(`${i.interpretation} ${i.bleedingRiskNote ?? ''}`).not.toMatch(CERTAINTY_PATTERN);
   });

@@ -103,7 +103,7 @@ describe('PR1 coverage — registry & routes', () => {
   });
 
   it('exposes each PR1 registry id exactly once in toolRegistry export', () => {
-    const pr1Rows = toolRegistry.filter((t) => PR1_CALCULATOR_REGISTRY_IDS.includes(t.id));
+    const pr1Rows = toolRegistry.filter((t) => PR1_CALCULATOR_REGISTRY_IDS.includes(t.id as any));
     expect(pr1Rows).toHaveLength(PR1_CALCULATOR_REGISTRY_IDS.length);
     for (const id of PR1_CALCULATOR_REGISTRY_IDS) {
       expect(toolRegistryById[id].id).toBe(id);

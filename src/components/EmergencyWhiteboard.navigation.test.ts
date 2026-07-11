@@ -12,8 +12,10 @@ describe('Emergency Whiteboard navigation wiring', () => {
   it('opens and closes patient detail through the primary emergency store', () => {
     expect(patientCardSource).toContain('const handleSelect = useCallback(');
     expect(patientCardSource).toContain('selectPatient(patient.id);');
-    expect(patientCardSource).toContain('onClick={readOnlyDisplay ? undefined : handleSelect}');
-    expect(patientCardSource).toContain("role={readOnlyDisplay ? 'article' : 'button'}");
+    expect(patientCardSource).toContain('onClick={handleSelect}');
+    // Static ARIA roles (Edge Tools rejects dynamic role={expression} patterns)
+    expect(patientCardSource).toContain('role="button"');
+    expect(patientCardSource).toContain('role="article"');
     expect(patientCardSource).toContain("event.key === 'Enter' || event.key === ' '");
     expect(patientDetailPanelSource).toContain('onClick={() => selectPatient(null)}');
     expect(patientDetailPanelSource).toContain('aria-label="Close patient detail"');

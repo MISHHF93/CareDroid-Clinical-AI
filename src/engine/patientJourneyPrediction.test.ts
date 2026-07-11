@@ -10,7 +10,7 @@ describe('patientJourneyPrediction', () => {
         priority: Priority.P2,
         flags: [PatientFlag.EMSArrival],
         chiefComplaint: 'Chest pain',
-        vitals: [{ hr: 112, spo2: 90 }],
+        vitals: [{ hr: 112, spo2: 90, recordedAt: new Date().toISOString() }],
         age: 74,
         complaintCategory: 'Cardiac',
         arrivalTime: new Date().toISOString(),

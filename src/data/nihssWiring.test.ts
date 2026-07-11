@@ -51,6 +51,7 @@ describe('NIHSS (Tier B chat-assisted) wiring', () => {
 
   it('uses hub-only routing without dedicated calculator form', () => {
     const nlu = clinicalIntentTools.find((t) => t.toolId === id);
+    if (!nlu) throw new Error('expected nlu tool entry to exist');
     expect(nlu?.path).toBe('/tools/calculators');
     expect(nlu?.sidebarToolId).toBe(id);
     expect(nlu?.backendExecutable).toBe(false);

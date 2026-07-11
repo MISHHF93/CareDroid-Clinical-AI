@@ -18,7 +18,7 @@ describe('whiteLabelApi', () => {
     vi.clearAllMocks();
     localStorage.clear();
     window.history.replaceState({}, '', '/');
-    apiFetch.mockResolvedValue(
+    vi.mocked(apiFetch).mockResolvedValue(
       new Response(JSON.stringify({ tenantId: 'demo-care', branding: { displayName: 'Demo Care' } }), {
         status: 200,
       }),

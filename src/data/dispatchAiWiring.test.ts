@@ -72,6 +72,7 @@ describe('Dispatch Intelligence (dispatch-ai) wiring', () => {
     expect(reg?.panelTool).toBe('calculators');
 
     const nlu = clinicalIntentTools.find((t) => t.toolId === id);
+    if (!nlu) throw new Error('expected nlu tool entry to exist');
     expect(nlu?.path).toBe(HUB_PATH);
     expect(nlu?.sidebarToolId).toBe(id);
     expect(nlu?.backendRouted).toBe(true);

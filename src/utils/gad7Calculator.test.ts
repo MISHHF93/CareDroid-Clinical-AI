@@ -54,12 +54,14 @@ describe('gad7Calculator — interpretation guardrails', () => {
   it('requires all seven responses', () => {
     const out = computeGad7Result({ q1: 0 });
     expect(out.ok).toBe(false);
+    if (out.ok) throw new Error('expected computeGad7Result to fail');
     expect(out.errors.length).toBeGreaterThan(0);
   });
 
   it('avoids anxiety disorder diagnosis and medication language', () => {
     const out = computeGad7Result(allThrees());
     expect(out.ok).toBe(true);
+    if (!out.ok) throw new Error('expected computeGad7Result to succeed');
     expect(out.totalScore).toBe(21);
     expect(out.severityCategory).toBe('severe');
     const combined = `${out.screeningDiscussion} ${out.screeningDisclaimer} ${out.safetyDisclaimer} ${out.clinicianReviewDisclaimer}`.toLowerCase();
@@ -73,12 +75,14 @@ describe('gad7Calculator — interpretation guardrails', () => {
 describe('gad7Calculator — severe-range safety', () => {
   it('returns acute distress alert for severe scores', () => {
     const interp = interpretGad7Score(15);
+    if (!interp) throw new Error('expected interpretGad7Score to return a result');
     expect(interp.acuteDistressSafetyAlert.elevated).toBe(true);
     expect(interp.acuteDistressSafetyAlert.message).toMatch(/988/i);
   });
 
   it('does not flag acute distress alert below severe range', () => {
     const interp = interpretGad7Score(14);
+    if (!interp) throw new Error('expected interpretGad7Score to return a result');
     expect(interp.acuteDistressSafetyAlert.elevated).toBe(false);
     expect(interp.moderateSymptomEscalation.warranted).toBe(true);
     expect(interp.moderateSymptomEscalation.message).toMatch(/PHQ-9 question 9/i);

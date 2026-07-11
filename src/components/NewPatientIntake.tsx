@@ -1,10 +1,11 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { AriaInvalidInput } from './a11y/AriaInvalidFields';
 /**
  * @deprecated Legacy whiteboard central intake modal. Production paths use
  * `QuickIntake` (reception/whiteboard) and embedded Smart Intake. Retained for
  * tests and optional whiteboard emergency create; always hands off via
  * `completeIntakeHandoff` with source `whiteboard-central-intake`.
  */
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { CheckCircle2, X } from 'lucide-react';
 import { Priority } from '../types/emergency';
@@ -333,7 +334,7 @@ export default function NewPatientIntake({ open, onClose, onPatientAdded }) {
                       ? 'new-patient-intake__complaint--active'
                       : ''
                   }
-                  aria-pressed={complaintCategory === category.value}
+                  aria-pressed={complaintCategory === category.value ? 'true' : 'false'}
                   onClick={() => handleCategoryClick(category.value)}
                 >
                   <span aria-hidden>{category.icon}</span>
@@ -343,13 +344,13 @@ export default function NewPatientIntake({ open, onClose, onPatientAdded }) {
             </div>
             <label className="new-patient-intake__complaint-field">
               Free-text complaint <small>Required</small>
-              <input
+              <AriaInvalidInput
                 ref={complaintRef}
                 value={complaintText}
                 placeholder="e.g. chest pressure, cough, ankle injury..."
                 autoComplete="off"
                 onChange={(event) => setComplaintText(event.target.value)}
-                aria-invalid={submitAttempted && !complaintEntered}
+                 invalid={submitAttempted && !complaintEntered}
               />
             </label>
           </section>
@@ -365,24 +366,24 @@ export default function NewPatientIntake({ open, onClose, onPatientAdded }) {
             <div className="new-patient-intake__name-row">
               <label>
                 First name <small>Required name</small>
-                <input
+                <AriaInvalidInput
                   value={identity.firstName}
                   autoComplete="given-name"
                   onChange={(event) =>
                     setIdentity((current) => ({ ...current, firstName: event.target.value }))
                   }
-                  aria-invalid={submitAttempted && !nameEntered}
+                   invalid={submitAttempted && !nameEntered}
                 />
               </label>
               <label>
                 Last name
-                <input
+                <AriaInvalidInput
                   value={identity.lastName}
                   autoComplete="family-name"
                   onChange={(event) =>
                     setIdentity((current) => ({ ...current, lastName: event.target.value }))
                   }
-                  aria-invalid={submitAttempted && !nameEntered}
+                   invalid={submitAttempted && !nameEntered}
                 />
               </label>
             </div>
@@ -408,7 +409,7 @@ export default function NewPatientIntake({ open, onClose, onPatientAdded }) {
                       type="button"
                       data-sex-option={option.value}
                       tabIndex={tabbable ? 0 : -1}
-                      aria-pressed={selected}
+                      aria-pressed={selected ? 'true' : 'false'}
                       className={selected ? 'new-patient-intake__sex--active' : ''}
                       onClick={() => setIdentity((current) => ({ ...current, sex: option.value }))}
                       onKeyDown={(event) => handleSexKeyDown(event, index)}
@@ -458,7 +459,7 @@ export default function NewPatientIntake({ open, onClose, onPatientAdded }) {
             <button
               type="button"
               className={`new-patient-intake__ctas new-patient-intake__ctas--${selectedPriority.toLowerCase()}`}
-              aria-expanded={priorityPickerOpen}
+              aria-expanded={priorityPickerOpen ? 'true' : 'false'}
               onClick={() => setPriorityPickerOpen((current) => !current)}
             >
               <span>

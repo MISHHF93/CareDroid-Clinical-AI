@@ -89,7 +89,7 @@ describe('PR5 consistency — registry, NLU, catalog, and backend alignment', ()
 
   it('excludes PR5 tools from chat-only hub list (Tier-A dedicated forms)', () => {
     for (const id of PR5_CALCULATOR_REGISTRY_IDS) {
-      expect(nluCalculatorHubOnly.some((h) => h.toolId === id)).toBe(false);
+      expect(nluCalculatorHubOnly.some((h) => (h.toolId as string) === id)).toBe(false);
     }
   });
 
@@ -191,7 +191,7 @@ describe('PR5 consistency — resolveCatalogLaunch, routes, sidebar', () => {
   });
 
   it('lists each PR5 tool exactly once in toolRegistry (sidebar visibility)', () => {
-    const pr5Rows = toolRegistry.filter((t) => PR5_CALCULATOR_REGISTRY_IDS.includes(t.id));
+    const pr5Rows = toolRegistry.filter((t) => (PR5_CALCULATOR_REGISTRY_IDS as readonly string[]).includes(t.id));
     expect(pr5Rows).toHaveLength(PR5_CALCULATOR_REGISTRY_IDS.length);
     for (const id of PR5_CALCULATOR_REGISTRY_IDS) {
       expect(getToolIcon(id)).toBeTruthy();

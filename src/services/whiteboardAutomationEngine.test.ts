@@ -29,7 +29,7 @@ function patient(overrides: Partial<Patient> = {}): Patient {
         reason: 'Columbia positive',
         detectedAt: '2026-06-24T08:10:00.000Z',
         severity: 'Warning',
-      },
+      } as unknown as PatientFlag,
     ],
     notes: [],
     timeline: [],

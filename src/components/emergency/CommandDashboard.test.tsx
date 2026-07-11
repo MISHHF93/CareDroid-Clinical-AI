@@ -1,7 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import CommandDashboard from './CommandDashboard';
-import { PatientState, Priority, type ActiveShift, type Patient, type Room, type Staff } from '../../types/emergency';
+import {
+  PatientState,
+  Priority,
+  type ActiveShift,
+  type CapacitySnapshot,
+  type Patient,
+  type Room,
+  type Staff,
+} from '../../types/emergency';
 
 const rooms: Room[] = [
   { id: 'r1', name: 'Resus 1', type: 'Resus', status: 'Occupied', patientId: 'p1' },
@@ -45,7 +53,7 @@ const activeShift: ActiveShift = {
   staffIds: ['s-charge', 's-md'],
 };
 
-const capacity = {
+const capacity: CapacitySnapshot = {
   score: 55,
   band: 'Yellow',
   label: 'Yellow capacity',

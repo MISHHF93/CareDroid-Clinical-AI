@@ -221,7 +221,7 @@ function getQueueBottleneck(queue) {
 }
 
 export const QueueIntelligenceService = Object.freeze({
-  getQueues(queueState) {
+  getQueues(queueState = DEFAULT_EMERGENCY_QUEUE_STATE) {
     return Object.freeze(normalizeQueueState(queueState).map((queue) => Object.freeze({ ...queue, score: scoreQueue(queue) })));
   },
 

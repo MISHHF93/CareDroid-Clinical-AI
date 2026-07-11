@@ -335,7 +335,7 @@ describe('PR3 comprehensive — 9. duplicate alias detection', () => {
   });
 
   it('does not map PR3 discovery aliases to conflicting mapsTo', () => {
-    const pr3Rows = toolIdAliases.filter((a) => PR3_TOOL_IDS.includes(a.mapsTo));
+    const pr3Rows = toolIdAliases.filter((a) => (PR3_TOOL_IDS as readonly string[]).includes(a.mapsTo));
     const ids = pr3Rows.map((a) => a.id);
     expect(new Set(ids).size).toBe(ids.length);
     for (const [aliasId, canonical] of PR3_DISCOVERY_ALIAS_PAIRS) {
@@ -356,7 +356,7 @@ describe('PR3 comprehensive — 10. no orphaned tool IDs', () => {
   });
 
   it('does not leave PR3-targeting discovery aliases pointing at missing registry ids', () => {
-    const pr3AliasRows = toolIdAliases.filter((a) => PR3_TOOL_IDS.includes(a.mapsTo));
+    const pr3AliasRows = toolIdAliases.filter((a) => (PR3_TOOL_IDS as readonly string[]).includes(a.mapsTo));
     for (const { id, mapsTo } of pr3AliasRows) {
       expect(toolRegistryById[mapsTo], `orphan mapsTo for alias ${id}`).toBeTruthy();
       expect(NLU_TO_REGISTRY_ID[id] ?? NLU_TO_REGISTRY_ID[id.replace(/-/g, ' ')]).toBe(mapsTo);

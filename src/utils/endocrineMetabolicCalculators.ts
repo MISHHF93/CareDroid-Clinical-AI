@@ -80,12 +80,12 @@ export function computeHomaIr(raw) {
   const errors = [] as any[];
   if (!inRange(fastingGlucoseMgDl, 40, 600)) errors.push('Enter fasting glucose in a plausible range.');
   if (!inRange(fastingInsulinUiuMl, 0.2, 300)) errors.push('Enter fasting insulin from 0.2 to 300 uIU/mL.');
-  if (errors.length) return { ok: false, errors };
+  if (errors.length) return { ok: false as const, errors };
 
   const homaIr = round((fastingGlucoseMgDl * fastingInsulinUiuMl) / 405, 2);
   const riskBand = homaIr < 2 ? 'lower' : homaIr < 2.9 ? 'borderline' : 'higher';
   return {
-    ok: true,
+    ok: true as const,
     homaIr,
     glucoseMgDl: round(fastingGlucoseMgDl, 1),
     severity: riskBand === 'higher' ? 'warning' : 'normal',
@@ -105,12 +105,12 @@ export function computeCorrectedCalcium(raw) {
   const errors = [] as any[];
   if (!inRange(calciumMgDl, 4, 18)) errors.push('Enter total calcium in a plausible range.');
   if (!inRange(albuminGdl, 1, 6)) errors.push('Enter albumin from 1 to 6 g/dL or equivalent.');
-  if (errors.length) return { ok: false, errors };
+  if (errors.length) return { ok: false as const, errors };
 
   const correctedCalciumMgDl = round(calciumMgDl + 0.8 * (4 - albuminGdl), 2);
   const correctedCalciumMmolL = round(correctedCalciumMgDl * 0.2495, 2);
   return {
-    ok: true,
+    ok: true as const,
     correctedCalciumMgDl,
     correctedCalciumMmolL,
     severity: correctedCalciumMgDl < 7 || correctedCalciumMgDl > 12 ? 'critical' : correctedCalciumMgDl < 8.5 || correctedCalciumMgDl > 10.5 ? 'warning' : 'normal',
@@ -129,11 +129,11 @@ export function computeCorrectedSodium(raw) {
   const errors = [] as any[];
   if (!inRange(sodium, 90, 190)) errors.push('Enter measured sodium from 90 to 190 mEq/L.');
   if (!inRange(glucoseMgDl, 20, 2000)) errors.push('Enter glucose in a plausible range.');
-  if (errors.length) return { ok: false, errors };
+  if (errors.length) return { ok: false as const, errors };
 
   const correctedSodium = round(sodium + correctionFactor * ((glucoseMgDl - 100) / 100), 1);
   return {
-    ok: true,
+    ok: true as const,
     correctedSodium,
     glucoseMgDl: round(glucoseMgDl, 1),
     severity: correctedSodium < 125 || correctedSodium > 155 ? 'critical' : correctedSodium < 135 || correctedSodium > 145 ? 'warning' : 'normal',
@@ -155,11 +155,11 @@ export function computeSerumOsmolality(raw) {
   if (!inRange(glucoseMgDl, 20, 2000)) errors.push('Enter glucose in a plausible range.');
   if (!inRange(bunMgDl, 1, 300)) errors.push('Enter BUN in a plausible range.');
   if (!inRange(ethanolMgDl, 0, 600)) errors.push('Enter ethanol from 0 to 600 mg/dL or leave 0.');
-  if (errors.length) return { ok: false, errors };
+  if (errors.length) return { ok: false as const, errors };
 
   const calculatedOsmolality = round(2 * sodium + glucoseMgDl / 18 + bunMgDl / 2.8 + ethanolMgDl / 3.7, 1);
   return {
-    ok: true,
+    ok: true as const,
     calculatedOsmolality,
     severity: calculatedOsmolality < 275 || calculatedOsmolality > 320 ? 'warning' : 'normal',
     label: `Calculated osmolality ${calculatedOsmolality} mOsm/kg`,
@@ -176,11 +176,11 @@ export function computeOsmolalGap(raw) {
   const errors = [] as any[];
   if (!osmolality.ok) errors.push(...(osmolality.errors as any[]));
   if (!inRange(measuredOsmolality, 200, 450)) errors.push('Enter measured osmolality from 200 to 450 mOsm/kg.');
-  if (errors.length) return { ok: false, errors };
+  if (errors.length) return { ok: false as const, errors };
 
   const osmolalGap = round(measuredOsmolality - (osmolality as any).calculatedOsmolality, 1);
   return {
-    ok: true,
+    ok: true as const,
     calculatedOsmolality: (osmolality as any).calculatedOsmolality,
     osmolalGap,
     severity: osmolalGap > 20 ? 'critical' : osmolalGap > 10 ? 'warning' : 'normal',
@@ -198,11 +198,11 @@ export function computeBmi(raw) {
   const errors = [] as any[];
   if (!inRange(weightKg, 1, 350)) errors.push('Enter weight from 1 to 350 kg or equivalent.');
   if (!inRange(heightCm, 30, 250)) errors.push('Enter height from 30 to 250 cm or equivalent.');
-  if (errors.length) return { ok: false, errors };
+  if (errors.length) return { ok: false as const, errors };
 
   const bmi = round(weightKg / Math.pow(heightCm / 100, 2), 1);
   return {
-    ok: true,
+    ok: true as const,
     bmi,
     category: categoryForBmi(bmi),
     severity: severityForBmi(bmi),
@@ -220,11 +220,11 @@ export function computeBsaMosteller(raw) {
   const errors = [] as any[];
   if (!inRange(weightKg, 1, 350)) errors.push('Enter weight from 1 to 350 kg or equivalent.');
   if (!inRange(heightCm, 30, 250)) errors.push('Enter height from 30 to 250 cm or equivalent.');
-  if (errors.length) return { ok: false, errors };
+  if (errors.length) return { ok: false as const, errors };
 
   const bsaM2 = round(Math.sqrt((heightCm * weightKg) / 3600), 2);
   return {
-    ok: true,
+    ok: true as const,
     bsaM2,
     severity: 'normal',
     label: `BSA ${bsaM2} m2`,
@@ -241,14 +241,14 @@ export function computeIdealBodyWeight(raw) {
   const errors = [] as any[];
   if (!['female', 'male'].includes(sex)) errors.push('Select sex for the Devine equation.');
   if (!inRange(heightCm, 120, 230)) errors.push('Enter adult height from 120 to 230 cm or equivalent.');
-  if (errors.length) return { ok: false, errors };
+  if (errors.length) return { ok: false as const, errors };
 
   const heightIn = heightCm / IN_TO_CM;
   const base = sex === 'female' ? 45.5 : 50;
   const idealBodyWeightKg = round(base + 2.3 * (heightIn - 60), 1);
   const idealBodyWeightLb = round(idealBodyWeightKg * KG_TO_LB, 1);
   return {
-    ok: true,
+    ok: true as const,
     idealBodyWeightKg,
     idealBodyWeightLb,
     severity: 'normal',
@@ -267,14 +267,14 @@ export function computeAdjustedBodyWeight(raw) {
   const errors = [] as any[];
   if (!inRange(actualWeightKg, 1, 350)) errors.push('Enter actual weight from 1 to 350 kg or equivalent.');
   if (!ibw.ok) errors.push(...(ibw.errors as any[]));
-  if (errors.length) return { ok: false, errors };
+  if (errors.length) return { ok: false as const, errors };
 
   const adjustedBodyWeightKg =
     actualWeightKg > (ibw as any).idealBodyWeightKg
       ? round((ibw as any).idealBodyWeightKg + correctionFactor * (actualWeightKg - (ibw as any).idealBodyWeightKg), 1)
       : round(actualWeightKg, 1);
   return {
-    ok: true,
+    ok: true as const,
     adjustedBodyWeightKg,
     idealBodyWeightKg: (ibw as any).idealBodyWeightKg,
     actualWeightKg: round(actualWeightKg, 1),
@@ -295,7 +295,7 @@ export function computeWaistHipRatio(raw) {
   if (!['female', 'male'].includes(sex)) errors.push('Select sex for waist-to-hip risk bands.');
   if (!inRange(waist, 20, 250)) errors.push('Enter waist circumference from 20 to 250 units.');
   if (!inRange(hip, 20, 250)) errors.push('Enter hip circumference from 20 to 250 units.');
-  if (errors.length) return { ok: false, errors };
+  if (errors.length) return { ok: false as const, errors };
 
   const ratio = round(waist / hip, 2);
   const riskBand =
@@ -303,7 +303,7 @@ export function computeWaistHipRatio(raw) {
       ? ratio > 1 ? 'high' : ratio >= 0.96 ? 'moderate' : 'lower'
       : ratio > 0.85 ? 'high' : ratio >= 0.81 ? 'moderate' : 'lower';
   return {
-    ok: true,
+    ok: true as const,
     waistHipRatio: ratio,
     riskBand,
     severity: riskBand === 'high' ? 'warning' : 'normal',

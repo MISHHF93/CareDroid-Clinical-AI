@@ -17,7 +17,7 @@ import { executeClinicalTool } from './clinicalOrchestratorApi';
 describe('clinicalOrchestratorApi — registered executors', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    apiFetch.mockResolvedValue({
+    vi.mocked(apiFetch).mockResolvedValue({
       ok: true,
       status: 200,
       _json: {
@@ -25,7 +25,7 @@ describe('clinicalOrchestratorApi — registered executors', () => {
         toolId: 'stub',
         result: { success: true, data: {} },
       },
-    });
+    } as any);
   });
 
   it.each(ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS)(

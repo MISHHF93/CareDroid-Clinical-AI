@@ -21,7 +21,7 @@ function patient(overrides: Partial<Patient> = {}): Patient {
     complaintCategory: 'Cardiac',
     state: PatientState.Assessment,
     priority: Priority.P2,
-    vitals: [{ hr: 110, sbp: 88, dbp: 55, spo2: 90 }],
+    vitals: [{ hr: 110, sbp: 88, dbp: 55, spo2: 90 }] as unknown as Patient['vitals'],
     flags: [PatientFlag.HighRisk],
     notes: [],
     timeline: [],

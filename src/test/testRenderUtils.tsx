@@ -10,11 +10,11 @@ import { RouteChromeProvider } from '../contexts/RouteChromeContext';
 
 export const mockToolPreferencesValue = {
   recordToolAccess: vi.fn(),
-  favorites: [],
-  pinned: [],
-  recentTools: [],
-  hiddenTools: [],
-  profileSettings: {},
+  favorites: [] as string[],
+  pinned: [] as string[],
+  recentTools: [] as string[],
+  hiddenTools: [] as string[],
+  profileSettings: {} as Record<string, unknown>,
   toggleFavorite: vi.fn(),
   togglePinned: vi.fn(),
   toggleHidden: vi.fn(),

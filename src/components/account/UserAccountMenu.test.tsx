@@ -61,11 +61,11 @@ describe('UserAccountMenu', () => {
       </MemoryRouter>,
     );
 
-    await userEvent.click(screen.getByRole('button'));
-    expect(screen.getByRole('menuitem', { name: 'Profile overview' })).toBeInTheDocument();
-    expect(screen.getByRole('menuitem', { name: 'Entry hub' })).toBeInTheDocument();
-    expect(screen.queryByRole('menuitem', { name: 'Sign in' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('menuitem', { name: 'Sign out' })).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { expanded: false }));
+    expect(screen.getByRole('button', { name: 'Profile overview' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Entry hub' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Sign in' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Sign out' })).not.toBeInTheDocument();
   });
 
   it('shows workflow profile switcher when visibility hook allows it', async () => {

@@ -6,7 +6,7 @@ import {
   registerArrivalControl,
 } from './arrivalControlLayer';
 import { buildReceptionQuickIntakePatient } from './receptionQuickIntakeService';
-import { completeReceptionHandoff } from './receptionHandoff';
+import { completeReceptionHandoff, type IntakeHandoffStore } from './receptionHandoff';
 import { buildPublicWaitingDisplaySnapshot } from '../components/whiteboard/publicWaitingDisplayModel';
 import { WHITEBOARD_QUEUE_FILTER } from './queueAssignment';
 
@@ -16,6 +16,7 @@ function buildHandoffStore(initialPatients: Patient[] = []) {
 
   const store = {
     patients,
+    referrals: [],
     emergencySettings: {
       intakeSettings: { autoAssignTriageQueue: true, autoCreateEncounter: true },
     },
@@ -33,6 +34,9 @@ function buildHandoffStore(initialPatients: Patient[] = []) {
       websocketEvents.push(event);
     },
     recordWorkflowAction: () => ({ id: 'wf-arrival-control' }),
+    updateCapacity: () => {},
+    updateAlerts: () => {},
+    refreshAdministrativeAutomationsAsync: async () => ({} as any),
   };
 
   return { store, patients, websocketEvents };
@@ -82,7 +86,7 @@ describe('arrival-to-triage control layer', () => {
     });
     expect(registered?.queueDestination).toBe('verification');
 
-    const handoff = completeReceptionHandoff(store, {
+    const handoff = completeReceptionHandoff(store as unknown as IntakeHandoffStore, {
       patientId: patient.id,
       source: 'reception-quick-intake',
     });
@@ -119,6 +123,10 @@ describe('arrival-to-triage control layer', () => {
         totalBeds: 20,
         waitingCount: 1,
         boardingCount: 0,
+        totalPatients: 10,
+        occupiedRooms: 10,
+        reassessmentDue: 0,
+        updatedAt: '2026-06-20T14:00:00.000Z',
       } as import('../types/emergency').CapacitySnapshot,
     });
 

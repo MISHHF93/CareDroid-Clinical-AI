@@ -59,7 +59,7 @@ describe('careDroidUnifiedAiNode', () => {
       platformServiceCount: 17,
       aiSystemToolCount: 12,
     });
-    expect(context.sourceScreen).toBe('test');
+    expect((context as any).sourceScreen).toBe('test');
   });
 
   it('aligns 17 platform AI models to the unified node registry', () => {

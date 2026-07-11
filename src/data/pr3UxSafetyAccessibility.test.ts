@@ -58,6 +58,7 @@ describe('PR3 hub groups — catalog clarity', () => {
     const cardiac = CHAT_ASSISTED_HUB_GROUPS.find((g) => g.groupId === 'cardiac');
     const neuro = CHAT_ASSISTED_HUB_GROUPS.find((g) => g.groupId === 'neurology');
     const trauma = CHAT_ASSISTED_HUB_GROUPS.find((g) => g.groupId === 'trauma');
+    if (!cardiac || !neuro || !trauma) throw new Error('expected cardiac, neuro, and trauma hub groups to exist');
     expect(cardiac.lead).toMatch(/decision support only/i);
     expect(cardiac.lead).toMatch(/do not diagnose|does not diagnose|rule out ACS/i);
     expect(cardiac.lead).toMatch(/do not delay/i);
@@ -218,6 +219,7 @@ describe('PR3 launch flow — hub path without dashboard fallback for PR3', () =
 describe('PR3 clinical safety — hub group leads', () => {
   it('cardiac group lead avoids diagnostic certainty and treatment directives', () => {
     const cardiac = CHAT_ASSISTED_HUB_GROUPS.find((g) => g.groupId === 'cardiac');
+    if (!cardiac) throw new Error('expected cardiac hub group to exist');
     expect(cardiac.lead).toMatch(/clinical decision support only/i);
     expect(cardiac.lead).toMatch(/does not confirm or exclude/i);
     expect(cardiac.lead).not.toMatch(TREATMENT_PATTERN);
@@ -225,12 +227,14 @@ describe('PR3 clinical safety — hub group leads', () => {
 
   it('neurology group lead prioritizes stroke pathways over chat', () => {
     const neuro = CHAT_ASSISTED_HUB_GROUPS.find((g) => g.groupId === 'neurology');
+    if (!neuro) throw new Error('expected neurology hub group to exist');
     expect(neuro.lead).toMatch(/does not diagnose stroke/i);
     expect(neuro.lead).toMatch(/do not defer urgent care/i);
   });
 
   it('trauma group lead covers hard stops and does not claim clearance', () => {
     const trauma = CHAT_ASSISTED_HUB_GROUPS.find((g) => g.groupId === 'trauma');
+    if (!trauma) throw new Error('expected trauma hub group to exist');
     expect(trauma.lead).toMatch(/neurovascular compromise/i);
     expect(trauma.lead).toMatch(/open fracture/i);
     expect(trauma.lead).toMatch(/do not defer urgent care/i);

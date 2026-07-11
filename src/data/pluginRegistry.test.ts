@@ -40,7 +40,7 @@ describe('pluginRegistry', () => {
 
     const validation = validatePluginRegistration(invalid, [
       { id: 'Bad Plugin Id' },
-    ]);
+    ] as any);
 
     expect(validation.valid).toBe(false);
     expect(validation.errors.join(' ')).toMatch(/kebab-case/i);

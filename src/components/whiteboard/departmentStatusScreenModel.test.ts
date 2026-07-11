@@ -23,7 +23,7 @@ function buildPatient(overrides: Partial<Patient> = {}): Patient {
     notes: [],
     timeline: [],
     ...overrides,
-  };
+  } as unknown as Patient;
 }
 
 describe('departmentStatusScreenModel', () => {
@@ -52,7 +52,7 @@ describe('departmentStatusScreenModel', () => {
         updatedAt: now.toISOString(),
         boardingCount: 3,
         longestWaitMinutes: 180,
-      },
+      } as any,
       referrals: [{ id: 'r1', patientId: 'w1', status: 'Pending', reason: 'Cardiology' }],
       emsArrivals: [
         {
@@ -64,7 +64,7 @@ describe('departmentStatusScreenModel', () => {
           dispatchTime: '2026-06-20T09:50:00.000Z',
           estimatedArrivalTime: '2026-06-20T10:08:00.000Z',
         },
-      ],
+      ] as any,
     });
 
     expect(snapshot.metrics.map((metric) => metric.id)).toEqual(
@@ -106,7 +106,7 @@ describe('departmentStatusScreenModel', () => {
         band: 'Yellow',
         updatedAt: now.toISOString(),
         boardingCount: 1,
-      },
+      } as any,
     });
 
     const filtered = filterDepartmentStatusSnapshot(snapshot, READ_ONLY_WHITEBOARD_METRIC_IDS);
@@ -131,7 +131,7 @@ describe('departmentStatusScreenModel', () => {
         band: 'Orange',
         updatedAt: now.toISOString(),
         boardingCount: 4,
-      },
+      } as any,
       referrals: [
         { id: 'r1', patientId: 'w1', status: 'Pending', reason: 'Cardiology' },
         { id: 'r2', patientId: 'w2', status: 'Pending', reason: 'Neurology' },
@@ -146,7 +146,7 @@ describe('departmentStatusScreenModel', () => {
           dispatchTime: '2026-06-20T09:50:00.000Z',
           estimatedArrivalTime: '2026-06-20T10:08:00.000Z',
         },
-      ],
+      ] as any,
     });
 
     const filtered = filterDepartmentStatusSnapshot(snapshot, READ_ONLY_WHITEBOARD_METRIC_IDS);

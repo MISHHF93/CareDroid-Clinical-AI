@@ -2,11 +2,35 @@
  * ChatInterface — NLU/chat integration (Vitest + clinicalChatService mocks).
  */
 
+import type { ComponentProps } from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ChatInterface from './ChatInterface';
 import { useEmergencyStore } from '../../store/emergencyStore';
+
+/**
+ * ChatInterface's props are inferred (no explicit prop type/interface on the
+ * component), so every destructured prop is required from TypeScript's point of
+ * view even though the component treats most of them as optional at runtime.
+ * This helper supplies safe defaults for all of them so each test can override
+ * only the props it cares about.
+ */
+function renderChatInterface(props: Partial<ComponentProps<typeof ChatInterface>> = {}) {
+  return render(
+    <ChatInterface
+      currentTool={null}
+      currentFeature={null}
+      prefillText={undefined}
+      conversationId={undefined}
+      messages={[]}
+      onAppendMessage={vi.fn()}
+      onTrackEvent={vi.fn()}
+      authToken={undefined}
+      {...props}
+    />,
+  );
+}
 
 vi.mock('./ChatInterface.css', () => ({}));
 vi.mock('./ToolPanel', () => ({ default: () => <div data-testid="tool-panel" /> }));
@@ -84,15 +108,13 @@ describe('ChatInterface NLU integration', () => {
   it('renders composer and sends message via clinicalChatService', async () => {
     const user = userEvent.setup();
 
-    render(
-      <ChatInterface
-        currentTool={null}
-        conversationId="conv-1"
-        messages={[]}
-        onAppendMessage={onAppendMessage}
-        authToken="test-token"
-      />,
-    );
+    renderChatInterface({
+      currentTool: null,
+      conversationId: 'conv-1',
+      messages: [],
+      onAppendMessage,
+      authToken: 'test-token',
+    });
 
     const input = screen.getByRole('textbox');
     await user.type(input, 'Calculate SOFA score');
@@ -126,15 +148,13 @@ describe('ChatInterface NLU integration', () => {
       },
     });
 
-    render(
-      <ChatInterface
-        currentTool={null}
-        conversationId="conv-ed"
-        messages={[]}
-        onAppendMessage={onAppendMessage}
-        authToken="test-token"
-      />,
-    );
+    renderChatInterface({
+      currentTool: null,
+      conversationId: 'conv-ed',
+      messages: [],
+      onAppendMessage,
+      authToken: 'test-token',
+    });
 
     await user.type(screen.getByRole('textbox'), 'Show me all chest pain patients');
     await user.keyboard('{Enter}');
@@ -173,19 +193,17 @@ describe('ChatInterface NLU integration', () => {
     const patient = useEmergencyStore.getState().patients[0];
     const patientName = `${patient.firstName} ${patient.lastName}`;
 
-    render(
-      <ChatInterface
-        messages={[
-          {
-            id: 'assistant-action-1',
-            role: 'assistant',
-            content:
-              `I suggest flagging ${patientName} for reassessment.\n\n\`\`\`json\n{"action":"FLAG_PATIENT","patientId":"${patient.id}","flag":"ReassessmentDue"}\n\`\`\``,
-          },
-        ]}
-        onAppendMessage={onAppendMessage}
-      />,
-    );
+    renderChatInterface({
+      messages: [
+        {
+          id: 'assistant-action-1',
+          role: 'assistant',
+          content:
+            `I suggest flagging ${patientName} for reassessment.\n\n\`\`\`json\n{"action":"FLAG_PATIENT","patientId":"${patient.id}","flag":"ReassessmentDue"}\n\`\`\``,
+        },
+      ],
+      onAppendMessage,
+    });
 
     expect(screen.getByText(/suggested action/i)).toBeInTheDocument();
     expect(addFlagSpy).not.toHaveBeenCalled();
@@ -208,19 +226,17 @@ describe('ChatInterface NLU integration', () => {
       }));
     });
 
-    render(
-      <ChatInterface
-        messages={[
-          {
-            id: 'assistant-action-disabled',
-            role: 'assistant',
-            content:
-              `Action suggestion.\n\n\`\`\`json\n{"action":"FLAG_PATIENT","patientId":"${patient.id}","flag":"ReassessmentDue"}\n\`\`\``,
-          },
-        ]}
-        onAppendMessage={onAppendMessage}
-      />,
-    );
+    renderChatInterface({
+      messages: [
+        {
+          id: 'assistant-action-disabled',
+          role: 'assistant',
+          content:
+            `Action suggestion.\n\n\`\`\`json\n{"action":"FLAG_PATIENT","patientId":"${patient.id}","flag":"ReassessmentDue"}\n\`\`\``,
+        },
+      ],
+      onAppendMessage,
+    });
 
     expect(screen.queryByText(/suggested action/i)).not.toBeInTheDocument();
   });
@@ -228,19 +244,17 @@ describe('ChatInterface NLU integration', () => {
   it('parses suggested action JSON with params and dismisses the card', async () => {
     const user = userEvent.setup();
 
-    render(
-      <ChatInterface
-        messages={[
-          {
-            id: 'assistant-action-params',
-            role: 'assistant',
-            content:
-              'Suggested for review.\n\n```json\n{"action":"FLAG_PATIENT","params":{"patientId":"tor-uc-001","patientName":"Maya Chen","flag":"ReassessmentDue","reason":"Long wait"}}\n```',
-          },
-        ]}
-        onAppendMessage={onAppendMessage}
-      />,
-    );
+    renderChatInterface({
+      messages: [
+        {
+          id: 'assistant-action-params',
+          role: 'assistant',
+          content:
+            'Suggested for review.\n\n```json\n{"action":"FLAG_PATIENT","params":{"patientId":"tor-uc-001","patientName":"Maya Chen","flag":"ReassessmentDue","reason":"Long wait"}}\n```',
+        },
+      ],
+      onAppendMessage,
+    });
 
     expect(screen.getByText(/suggested action/i)).toBeInTheDocument();
     expect(screen.getByText(/flag maya chen for reassessment/i)).toBeInTheDocument();
@@ -268,15 +282,13 @@ describe('ChatInterface NLU integration', () => {
       },
     });
 
-    render(
-      <ChatInterface
-        currentTool={null}
-        conversationId="conv-ed"
-        messages={[]}
-        onAppendMessage={onAppendMessage}
-        authToken="test-token"
-      />,
-    );
+    renderChatInterface({
+      currentTool: null,
+      conversationId: 'conv-ed',
+      messages: [],
+      onAppendMessage,
+      authToken: 'test-token',
+    });
 
     await user.type(screen.getByRole('textbox'), 'Flag Maya Chen for reassessment');
     await user.keyboard('{Enter}');
@@ -299,15 +311,13 @@ describe('ChatInterface NLU integration', () => {
     activeWorkspaceId = 'emergency';
     const user = userEvent.setup();
 
-    render(
-      <ChatInterface
-        currentTool={null}
-        conversationId="conv-ed"
-        messages={[]}
-        onAppendMessage={onAppendMessage}
-        authToken="test-token"
-      />,
-    );
+    renderChatInterface({
+      currentTool: null,
+      conversationId: 'conv-ed',
+      messages: [],
+      onAppendMessage,
+      authToken: 'test-token',
+    });
 
     await user.click(screen.getByRole('button', { name: /ems update/i }));
 
@@ -327,15 +337,13 @@ describe('ChatInterface NLU integration', () => {
     const user = userEvent.setup();
     const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
 
-    render(
-      <ChatInterface
-        currentTool={null}
-        conversationId="conv-ed"
-        messages={[]}
-        onAppendMessage={onAppendMessage}
-        authToken="test-token"
-      />,
-    );
+    renderChatInterface({
+      currentTool: null,
+      conversationId: 'conv-ed',
+      messages: [],
+      onAppendMessage,
+      authToken: 'test-token',
+    });
 
     expect(screen.getByRole('toolbar', { name: /open copilot tools/i })).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: /open calculators/i }));
@@ -362,15 +370,13 @@ describe('ChatInterface NLU integration', () => {
     });
     const user = userEvent.setup();
 
-    render(
-      <ChatInterface
-        currentTool={null}
-        conversationId="conv-ed"
-        messages={[]}
-        onAppendMessage={onAppendMessage}
-        authToken="test-token"
-      />,
-    );
+    renderChatInterface({
+      currentTool: null,
+      conversationId: 'conv-ed',
+      messages: [],
+      onAppendMessage,
+      authToken: 'test-token',
+    });
 
     expect(screen.queryByRole('button', { name: /ems update/i })).not.toBeInTheDocument();
     await user.type(screen.getByRole('textbox'), "What's the EMS situation");
@@ -394,15 +400,13 @@ describe('ChatInterface NLU integration', () => {
     const patient = useEmergencyStore.getState().patients[0];
     const patientName = `${patient.firstName} ${patient.lastName}`;
 
-    render(
-      <ChatInterface
-        currentTool={null}
-        conversationId="conv-ed"
-        messages={[]}
-        onAppendMessage={onAppendMessage}
-        authToken="test-token"
-      />,
-    );
+    renderChatInterface({
+      currentTool: null,
+      conversationId: 'conv-ed',
+      messages: [],
+      onAppendMessage,
+      authToken: 'test-token',
+    });
 
     await user.type(screen.getByRole('textbox'), `Run HEART score for ${patientName}`);
     await user.keyboard('{Enter}');
@@ -432,15 +436,13 @@ describe('ChatInterface NLU integration', () => {
     const user = userEvent.setup();
     sendClinicalChatMessage.mockResolvedValueOnce({ ok: false, status: 503, data: {} });
 
-    render(
-      <ChatInterface
-        currentTool={null}
-        conversationId="conv-1"
-        messages={[]}
-        onAppendMessage={onAppendMessage}
-        authToken="test-token"
-      />,
-    );
+    renderChatInterface({
+      currentTool: null,
+      conversationId: 'conv-1',
+      messages: [],
+      onAppendMessage,
+      authToken: 'test-token',
+    });
 
     await user.type(screen.getByRole('textbox'), 'Capacity status');
     await user.keyboard('{Enter}');
@@ -459,25 +461,23 @@ describe('ChatInterface NLU integration', () => {
   it('renders retry button on Copilot error messages', async () => {
     const user = userEvent.setup();
 
-    render(
-      <ChatInterface
-        currentTool={null}
-        conversationId="conv-1"
-        messages={[
-          {
-            id: 'error-1',
-            role: 'assistant',
-            content: 'Copilot unavailable — check connection',
-            metadata: {
-              isCopilotError: true,
-              retryMessage: 'Capacity status',
-            },
+    renderChatInterface({
+      currentTool: null,
+      conversationId: 'conv-1',
+      messages: [
+        {
+          id: 'error-1',
+          role: 'assistant',
+          content: 'Copilot unavailable — check connection',
+          metadata: {
+            isCopilotError: true,
+            retryMessage: 'Capacity status',
           },
-        ]}
-        onAppendMessage={onAppendMessage}
-        authToken="test-token"
-      />,
-    );
+        },
+      ],
+      onAppendMessage,
+      authToken: 'test-token',
+    });
 
     await user.click(screen.getByRole('button', { name: /retry/i }));
 
@@ -490,15 +490,13 @@ describe('ChatInterface NLU integration', () => {
   it('focuses the ED Copilot composer when / is pressed in emergency workspace', () => {
     activeWorkspaceId = 'emergency';
 
-    render(
-      <ChatInterface
-        currentTool={null}
-        conversationId="conv-ed"
-        messages={[]}
-        onAppendMessage={onAppendMessage}
-        authToken="test-token"
-      />,
-    );
+    renderChatInterface({
+      currentTool: null,
+      conversationId: 'conv-ed',
+      messages: [],
+      onAppendMessage,
+      authToken: 'test-token',
+    });
 
     const input = screen.getByRole('textbox');
     expect(input).not.toHaveFocus();
@@ -509,49 +507,45 @@ describe('ChatInterface NLU integration', () => {
   });
 
   it('shows existing messages without blank root', () => {
-    render(
-      <ChatInterface
-        messages={[
-          { id: '1', role: 'user', content: 'Hello clinician' },
-          { id: '2', role: 'assistant', content: 'How can I help?' },
-        ]}
-        onAppendMessage={onAppendMessage}
-      />,
-    );
+    renderChatInterface({
+      messages: [
+        { id: '1', role: 'user', content: 'Hello clinician' },
+        { id: '2', role: 'assistant', content: 'How can I help?' },
+      ],
+      onAppendMessage,
+    });
 
     expect(screen.getByText('Hello clinician')).toBeInTheDocument();
     expect(screen.getByText('How can I help?')).toBeInTheDocument();
   });
 
   it('marks unconnected voice input as unavailable', () => {
-    render(<ChatInterface messages={[]} onAppendMessage={onAppendMessage} />);
+    renderChatInterface({ messages: [], onAppendMessage });
 
     expect(screen.getByRole('button', { name: /voice input unavailable/i })).toBeDisabled();
   });
 
   it('renders AI foundation metadata on assistant messages', () => {
-    render(
-      <ChatInterface
-        messages={[
-          {
-            id: '2',
-            role: 'assistant',
-            content: 'Routing-aware reply',
-            aiFoundation: {
-              route: 'administrative',
-              selectedExpert: 'operations',
-              selectedExperts: [{ expertId: 'operations', role: 'primary', confidence: 0.76, score: 9.4 }],
-              retrievalPolicy: 'operational',
-              confidence: 0.76,
-              routeScore: 9.4,
-              estimatedCost: 0.08,
-              requiresHumanReview: false,
-            },
+    renderChatInterface({
+      messages: [
+        {
+          id: '2',
+          role: 'assistant',
+          content: 'Routing-aware reply',
+          aiFoundation: {
+            route: 'administrative',
+            selectedExpert: 'operations',
+            selectedExperts: [{ expertId: 'operations', role: 'primary', confidence: 0.76, score: 9.4 }],
+            retrievalPolicy: 'operational',
+            confidence: 0.76,
+            routeScore: 9.4,
+            estimatedCost: 0.08,
+            requiresHumanReview: false,
           },
-        ]}
-        onAppendMessage={onAppendMessage}
-      />,
-    );
+        },
+      ],
+      onAppendMessage,
+    });
 
     const routePanel = screen.getByLabelText(/ai routing metadata/i);
     expect(routePanel).toHaveTextContent(/expert: operations/i);
@@ -560,41 +554,39 @@ describe('ChatInterface NLU integration', () => {
   });
 
   it('renders the AI source panel for RAG references', () => {
-    render(
-      <ChatInterface
-        messages={[
-          {
-            id: '2',
-            role: 'assistant',
-            content: 'Use early antibiotics for sepsis.',
-            sourcePanel: {
-              confidence: 0.88,
-              generatedAt: '2026-01-01T12:00:00.000Z',
-              retrieval: {
-                chunksRetrieved: 2,
-                sourcesFound: 1,
-                latencyMs: 42,
-              },
-              references: [
-                {
-                  id: 'ref-sepsis',
-                  sourceId: 'sepsis-guideline',
-                  citationLabel: '[1]',
-                  title: 'Surviving Sepsis Guideline',
-                  type: 'clinical_guideline',
-                  organization: 'SCCM',
-                  relevance: 0.91,
-                  timestamp: '2026-01-01T11:00:00.000Z',
-                  chunkCount: 2,
-                  excerpts: ['Use early broad-spectrum antibiotics in sepsis.'],
-                },
-              ],
+    renderChatInterface({
+      messages: [
+        {
+          id: '2',
+          role: 'assistant',
+          content: 'Use early antibiotics for sepsis.',
+          sourcePanel: {
+            confidence: 0.88,
+            generatedAt: '2026-01-01T12:00:00.000Z',
+            retrieval: {
+              chunksRetrieved: 2,
+              sourcesFound: 1,
+              latencyMs: 42,
             },
+            references: [
+              {
+                id: 'ref-sepsis',
+                sourceId: 'sepsis-guideline',
+                citationLabel: '[1]',
+                title: 'Surviving Sepsis Guideline',
+                type: 'clinical_guideline',
+                organization: 'SCCM',
+                relevance: 0.91,
+                timestamp: '2026-01-01T11:00:00.000Z',
+                chunkCount: 2,
+                excerpts: ['Use early broad-spectrum antibiotics in sepsis.'],
+              },
+            ],
           },
-        ]}
-        onAppendMessage={onAppendMessage}
-      />,
-    );
+        },
+      ],
+      onAppendMessage,
+    });
 
     const sourcePanel = screen.getByLabelText(/ai source panel/i);
     expect(sourcePanel).toHaveTextContent(/clinical rag sources/i);

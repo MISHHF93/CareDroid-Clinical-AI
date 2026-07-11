@@ -27,29 +27,29 @@ describe('ckdStagingCalculator — CKD-EPI 2021', () => {
 
 describe('ckdStagingCalculator — KDIGO categories', () => {
   it('classifies GFR category boundaries', () => {
-    expect(classifyGfrCategory(90).category).toBe('G1');
-    expect(classifyGfrCategory(89).category).toBe('G2');
-    expect(classifyGfrCategory(60).category).toBe('G2');
-    expect(classifyGfrCategory(59).category).toBe('G3a');
-    expect(classifyGfrCategory(45).category).toBe('G3a');
-    expect(classifyGfrCategory(44).category).toBe('G3b');
-    expect(classifyGfrCategory(30).category).toBe('G3b');
-    expect(classifyGfrCategory(29).category).toBe('G4');
-    expect(classifyGfrCategory(15).category).toBe('G4');
-    expect(classifyGfrCategory(14).category).toBe('G5');
+    expect(classifyGfrCategory(90)!.category).toBe('G1');
+    expect(classifyGfrCategory(89)!.category).toBe('G2');
+    expect(classifyGfrCategory(60)!.category).toBe('G2');
+    expect(classifyGfrCategory(59)!.category).toBe('G3a');
+    expect(classifyGfrCategory(45)!.category).toBe('G3a');
+    expect(classifyGfrCategory(44)!.category).toBe('G3b');
+    expect(classifyGfrCategory(30)!.category).toBe('G3b');
+    expect(classifyGfrCategory(29)!.category).toBe('G4');
+    expect(classifyGfrCategory(15)!.category).toBe('G4');
+    expect(classifyGfrCategory(14)!.category).toBe('G5');
   });
 
   it('classifies albuminuria boundaries in mg/g', () => {
-    expect(classifyAlbuminuria(29).category).toBe('A1');
-    expect(classifyAlbuminuria(30).category).toBe('A2');
-    expect(classifyAlbuminuria(300).category).toBe('A2');
-    expect(classifyAlbuminuria(301).category).toBe('A3');
+    expect(classifyAlbuminuria(29)!.category).toBe('A1');
+    expect(classifyAlbuminuria(30)!.category).toBe('A2');
+    expect(classifyAlbuminuria(300)!.category).toBe('A2');
+    expect(classifyAlbuminuria(301)!.category).toBe('A3');
   });
 
   it('converts mg/mmol ACR to mg/g thresholds', () => {
     expect(toAcrMgG(3, 'mg_mmol')).toBeCloseTo(26.52, 0);
-    expect(classifyAlbuminuria(toAcrMgG(3.4, 'mg_mmol')).category).toBe('A2');
-    expect(classifyAlbuminuria(toAcrMgG(34, 'mg_mmol')).category).toBe('A3');
+    expect(classifyAlbuminuria(toAcrMgG(3.4, 'mg_mmol'))!.category).toBe('A2');
+    expect(classifyAlbuminuria(toAcrMgG(34, 'mg_mmol'))!.category).toBe('A3');
   });
 
   it('maps KDIGO heat-map combined prognostic risk', () => {
@@ -95,6 +95,7 @@ describe('ckdStagingCalculator — full result', () => {
       acrUnit: 'mg_g',
     });
     expect(out.ok).toBe(true);
+    if (!out.ok) throw new Error('expected computeCkdStagingResult to succeed');
     expect(out.egfrMlMin).toBeGreaterThan(0);
     expect(out.gfrCategory).toBeTruthy();
     expect(out.albuminuriaCategory).toBe('A2');
@@ -118,11 +119,12 @@ describe('ckdStagingCalculator — edge cases', () => {
   });
 
   it('handles eGFR at G1/G2 boundary and zero ACR', () => {
-    expect(classifyGfrCategory(90).category).toBe('G1');
-    expect(classifyGfrCategory(89).category).toBe('G2');
-    expect(classifyAlbuminuria(0).category).toBe('A1');
+    expect(classifyGfrCategory(90)!.category).toBe('G1');
+    expect(classifyGfrCategory(89)!.category).toBe('G2');
+    expect(classifyAlbuminuria(0)!.category).toBe('A1');
     const gfr = classifyGfrCategory(90);
     const alb = classifyAlbuminuria(0);
+    if (!gfr || !alb) throw new Error('expected classifyGfrCategory/classifyAlbuminuria to return a category');
     const risk = combineCkdPrognosticRisk(gfr.category, alb.category);
     const interp = interpretCkdStaging(90, gfr, alb, risk);
     expect(interp.prognosticRisk).toBe('low');

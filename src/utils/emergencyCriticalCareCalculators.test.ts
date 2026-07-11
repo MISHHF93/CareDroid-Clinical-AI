@@ -22,9 +22,13 @@ describe('emergency critical care calculators', () => {
   it('scores and interprets GCS', () => {
     const score = calculateGcsScore({ eye: 4, verbal: 5, motor: 6 });
     expect(score).toBe(15);
-    expect(interpretGcsScore(8).riskCategory).toBe('severe');
-    expect(interpretGcsScore(12).riskCategory).toBe('moderate');
-    expect(interpretGcsScore(15).riskCategory).toBe('mild');
+    const gcs8 = interpretGcsScore(8);
+    const gcs12 = interpretGcsScore(12);
+    const gcs15 = interpretGcsScore(15);
+    if (!gcs8 || !gcs12 || !gcs15) throw new Error('expected interpretGcsScore to return a result');
+    expect(gcs8.riskCategory).toBe('severe');
+    expect(gcs12.riskCategory).toBe('moderate');
+    expect(gcs15.riskCategory).toBe('mild');
   });
 
   it('scores CURB-65 criteria and interpretation ranges', () => {
@@ -62,10 +66,13 @@ describe('emergency critical care calculators', () => {
     };
     expect(validateApacheIIInputs(inputs).ok).toBe(true);
     const score = calculateApacheIIScore(inputs);
+    if (!score) throw new Error('expected calculateApacheIIScore to return a result');
     expect(score.total).toBe(14);
     expect(score.gcsContribution).toBe(5);
     expect(score.renalAdjustment).toBe(2);
-    expect(interpretApacheIIScore(31).riskCategory).toBe('very_high');
+    const apacheInterp = interpretApacheIIScore(31);
+    if (!apacheInterp) throw new Error('expected interpretApacheIIScore to return a result');
+    expect(apacheInterp.riskCategory).toBe('very_high');
   });
 
   it('validates MEWS required fields and computes score ranges', () => {
@@ -86,11 +93,14 @@ describe('emergency critical care calculators', () => {
   it('validates and computes Revised Trauma Score', () => {
     expect(validateRtsInputs({ gcs: 16, systolicBp: 120, respiratoryRate: 18 }).ok).toBe(false);
     const rts = computeRevisedTraumaScore({ gcs: 15, systolicBp: 120, respiratoryRate: 18 });
+    if (!rts) throw new Error('expected computeRevisedTraumaScore to return a result');
     expect(rts.gcsCode).toBe(4);
     expect(rts.sbpCode).toBe(4);
     expect(rts.rrCode).toBe(4);
     expect(rts.weighted).toBe(7.8408);
-    expect(interpretRevisedTraumaScore(7.8408).riskCategory).toBe('maximal');
+    const rtsInterp = interpretRevisedTraumaScore(7.8408);
+    if (!rtsInterp) throw new Error('expected interpretRevisedTraumaScore to return a result');
+    expect(rtsInterp.riskCategory).toBe('maximal');
   });
 
   it('scores PEWS and exposes pediatric interpretation', () => {
@@ -103,8 +113,12 @@ describe('emergency critical care calculators', () => {
         vomiting: 0,
       })
     ).toBe(4);
-    expect(interpretPewsScore(2).riskCategory).toBe('low');
-    expect(interpretPewsScore(3).riskCategory).toBe('medium');
-    expect(interpretPewsScore(4).warnings.join(' ')).toMatch(/Pediatric caution/i);
+    const pews2 = interpretPewsScore(2);
+    const pews3 = interpretPewsScore(3);
+    const pews4 = interpretPewsScore(4);
+    if (!pews2 || !pews3 || !pews4) throw new Error('expected interpretPewsScore to return a result');
+    expect(pews2.riskCategory).toBe('low');
+    expect(pews3.riskCategory).toBe('medium');
+    expect(pews4.warnings.join(' ')).toMatch(/Pediatric caution/i);
   });
 });

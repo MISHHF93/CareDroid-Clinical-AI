@@ -52,12 +52,14 @@ describe('MELD calculator wiring (meld, meld-na)', () => {
       expect(reg.initialCalc).toBe(id);
 
       const nlu = clinicalIntentTools.find((t) => t.toolId === id);
+    if (!nlu) throw new Error('expected nlu tool entry to exist');
       expect(nlu, `clinicalIntentTools missing ${id}`).toBeTruthy();
       expect(nlu.path).toBe(`/tools/calculators/${id}`);
       expect(nlu.sidebarToolId).toBe(id);
       expect(nlu.backendExecutable).toBe(false);
 
       const builtin = builtinUiCalculators.find((c) => c.id === id);
+    if (!builtin) throw new Error('expected builtin calculator entry to exist');
       expect(builtin, `builtinUiCalculators missing ${id}`).toBeTruthy();
       expect(builtin.path).toBe(`/tools/calculators/${id}`);
       expect(BUILTIN_CALC_ID_TO_REGISTRY_ID[id]).toBe(id);

@@ -10,7 +10,7 @@ describe('practitionerSurfaceVisibility', () => {
   });
 
   it('returns full visibility when pilot cleanup is off', () => {
-    vi.spyOn(cleanupConfig, 'isPractitionerCleanupEnabled').mockReturnValue(false);
+    vi.spyOn(cleanupConfig, 'isPractitionerCleanupEnabled').mockReturnValue(false as unknown as true);
     const surfaces = getPractitionerSurfaceVisibility();
     expect(surfaces.active).toBe(false);
     expect(surfaces.whiteboard.showRoleStrips).toBe(true);

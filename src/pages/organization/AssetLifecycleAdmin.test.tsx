@@ -61,8 +61,8 @@ const assets = [
 describe('AssetLifecycleAdmin', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    PlatformAssetsApi.listAssets.mockResolvedValue(assets);
-    PlatformAssetsApi.updateAssetLifecycle.mockResolvedValue({});
+    vi.mocked(PlatformAssetsApi.listAssets).mockResolvedValue(assets);
+    vi.mocked(PlatformAssetsApi.updateAssetLifecycle).mockResolvedValue({});
   });
 
   it('renders canonical lifecycle states and updates assets through the backend', async () => {

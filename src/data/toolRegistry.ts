@@ -4110,7 +4110,7 @@ const toolRegistry = [
 export const toolRegistryById = toolRegistry.reduce((acc, tool) => {
   acc[tool.id] = tool;
   return acc;
-}, {});
+}, {} as Record<string, (typeof toolRegistry)[number]>);
 
 export const getToolById = (toolId) => toolRegistryById[toolId] || null;
 

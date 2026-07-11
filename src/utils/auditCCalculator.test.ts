@@ -62,6 +62,7 @@ describe('auditCCalculator — interpretation', () => {
   it('requires all dropdown answers', () => {
     const out = computeAuditCResult({ drinkingFrequency: 'never' });
     expect(out.ok).toBe(false);
+    if (!out.errors) throw new Error('expected computeAuditCResult to report errors');
     expect(out.errors.length).toBeGreaterThan(0);
   });
 
@@ -72,6 +73,10 @@ describe('auditCCalculator — interpretation', () => {
       bingeFrequency: 'weekly',
     });
     expect(out.ok).toBe(true);
+    // NOTE: computeAuditCResult's inferred return type spreads `interp` into the success
+    // branch, which widens `ok` to `boolean` on both branches — `out.ok` alone can't
+    // narrow. Discriminate on a success-only field instead.
+    if (!('totalScore' in out)) throw new Error('expected computeAuditCResult to succeed');
     expect(out.totalScore).toBe(11);
     expect(out.screeningResult).toBe('positive_men');
     const combined = `${out.screeningDiscussion} ${out.pathwayDisclaimer} ${out.screeningDisclaimer}`.toLowerCase();
@@ -89,6 +94,7 @@ describe('auditCCalculator — interpretation', () => {
       bingeFrequency: 'never',
     });
     expect(out.ok).toBe(true);
+    if (!('totalScore' in out)) throw new Error('expected computeAuditCResult to succeed');
     expect(out.totalScore).toBe(1);
     expect(out.screeningResult).toBe('negative');
     expect(out.label).toMatch(/negative/i);

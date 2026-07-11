@@ -213,6 +213,7 @@ describe('capabilityExposureMatrix', () => {
         guard.allowedFrontendIds.includes(call.id)
       )) {
         expect(allowed.capability, `${allowed.id} must be capability-gated`).toBeTruthy();
+        if (!allowed.capability) throw new Error(`expected capability to be defined for ${allowed.id}`);
         expect(BACKEND_API_CAPABILITIES[allowed.capability], `${allowed.id} gate must stay disabled`).toBe(false);
         expect(allowed.notes || '').toMatch(/No route|gated off/i);
       }

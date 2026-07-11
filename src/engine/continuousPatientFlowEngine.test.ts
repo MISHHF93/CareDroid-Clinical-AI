@@ -25,7 +25,7 @@ function makePatient(overrides: Partial<Patient> = {}): Patient {
     notes: [],
     timeline: [],
     ...overrides,
-  };
+  } as unknown as Patient;
 }
 
 describe('continuousPatientFlowEngine', () => {
@@ -58,13 +58,14 @@ describe('continuousPatientFlowEngine', () => {
           type: 'StateChange',
           timestamp: new Date(Date.now() - 50 * 60000).toISOString(),
           summary: 'Moved to waiting',
+          to: PatientState.Waiting,
           metadata: { toState: PatientState.Waiting },
         },
       ],
     });
 
     const snapshot = buildPatientFlowPatientSnapshot(patient, {
-      staff: [{ id: 's1', name: 'Dr. Patel', role: 'MD', status: 'Available', active: true }],
+      staff: [{ id: 's1', name: 'Dr. Patel', role: 'MD', status: 'Available' as any, active: true }],
       now: new Date(),
     });
 
@@ -92,7 +93,8 @@ describe('continuousPatientFlowEngine', () => {
             type: 'StateChange',
             timestamp: new Date(Date.now() - 70 * 60000).toISOString(),
             summary: 'Waiting',
-            metadata: { toState: PatientState.Waiting },
+            to: PatientState.Waiting,
+          metadata: { toState: PatientState.Waiting },
           },
         ],
       }),
@@ -108,6 +110,7 @@ describe('continuousPatientFlowEngine', () => {
             type: 'StateChange',
             timestamp: new Date(Date.now() - 25 * 60000).toISOString(),
             summary: 'Triage',
+            to: PatientState.Triage,
             metadata: { toState: PatientState.Triage },
           },
         ],

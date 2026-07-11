@@ -122,7 +122,7 @@ describe('emergencyOsApi advanced CareDroid capabilities', () => {
   });
 
   it('calls the active CareDroid module endpoints through the canonical facade', async () => {
-    const activeFetchers = [
+    const activeFetchers: Array<[() => Promise<unknown>, string]> = [
       [fetchCareDroidCentralNodeSnapshot, '/api/emergency/central-node/snapshot'],
       [fetchEmergencyWhiteboard, '/api/emergency/whiteboard'],
       [fetchEmergencyPatients, '/api/emergency/patients'],

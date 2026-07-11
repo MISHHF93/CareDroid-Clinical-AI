@@ -265,15 +265,15 @@ export function validatePhq9Inputs(raw) {
  */
 export function computePhq9Result(raw) {
   const v = validatePhq9Inputs(raw);
-  if (!v.valid) return { ok: false, errors: v.errors };
+  if (!v.valid) return { ok: false as const, errors: v.errors };
 
   const breakdown = computePhq9Breakdown(v.inputs);
   const total = sumPhq9Score(breakdown);
   const interp = interpretPhq9Score(total, breakdown.q9);
-  if (!interp) return { ok: false, errors: ['Unable to calculate PHQ-9 score.'] };
+  if (!interp) return { ok: false as const, errors: ['Unable to calculate PHQ-9 score.'] };
 
   return {
-    ok: true,
+    ok: true as const,
     inputs: v.inputs,
     breakdown,
     ...interp,

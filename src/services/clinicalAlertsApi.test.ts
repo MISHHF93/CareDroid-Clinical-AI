@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const capabilityEnabled = vi.fn(() => true);
+const capabilityEnabled = vi.fn((_capability?: string) => true);
 const apiFetch = vi.fn();
 
 vi.mock('../config/backendApiCapabilities', () => ({
@@ -34,6 +34,7 @@ describe('clinicalAlertsApi', () => {
     const result = await fetchClinicalAlerts();
 
     expect(result.ok).toBe(true);
+    if (!result.ok) throw new Error('expected fetchClinicalAlerts to succeed');
     expect(apiFetch).toHaveBeenCalledWith('/api/clinical/alerts', expect.any(Object));
     expect(result.data.alerts).toHaveLength(1);
   });
@@ -58,6 +59,7 @@ describe('clinicalAlertsApi', () => {
     const result = await fetchClinicalAlerts();
 
     expect(result.ok).toBe(false);
+    if (!('disabled' in result)) throw new Error('expected fetchClinicalAlerts to return a disabled result');
     expect(result.disabled).toBe(true);
     expect(apiFetch).not.toHaveBeenCalled();
   });

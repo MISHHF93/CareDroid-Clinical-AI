@@ -35,6 +35,7 @@ describe('platformIntelligenceModel', () => {
     const assessment = buildPlatformIntelligenceAssessment();
     expect(assessment.summary.convergenceActions?.length).toBeGreaterThan(0);
     const convergence = assessment.modules.find((m) => m.id === 'platform_convergence');
+    if (!convergence) throw new Error('expected platform_convergence module');
     expect(convergence.assessment.artifacts.correctiveActions.length).toBeGreaterThan(0);
   });
 

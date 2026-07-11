@@ -60,6 +60,7 @@ describe('timiUaNstemiCalculator', () => {
 
   it('includes ACS disclaimer without treatment directives', () => {
     const i = interpretTimiUaNstemi(4);
+    if (!i) throw new Error('expected interpretTimiUaNstemi to return a result');
     expect(i.acsDisclaimer).toMatch(/does not recommend/i);
     expect(i.interpretation).not.toMatch(/start heparin|give aspirin|pci/i);
   });
@@ -82,7 +83,7 @@ describe('timiUaNstemiCalculator', () => {
   it('breakdown sums to total for partial selection', () => {
     const partial = { ...none, severeAngina: true, stDeviation: true };
     const breakdown = computeTimiBreakdown(partial);
-    expect(Object.values(breakdown).reduce((a, b) => a + b, 0)).toBe(2);
+    expect((Object.values(breakdown) as number[]).reduce((a, b) => a + b, 0)).toBe(2);
     expect(calculateTimiUaNstemiScore(partial)).toBe(2);
   });
 });

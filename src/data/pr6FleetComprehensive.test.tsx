@@ -94,7 +94,7 @@ const BACKEND_KEYWORDS_BY_TOOL = Object.freeze(
 const mockFetchFleetCommandSnapshot = vi.fn();
 
 vi.mock('../services/fleetTelemetryService', async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual = (await importOriginal()) as object;
   return {
     ...actual,
     fetchFleetCommandSnapshot: (...args) => mockFetchFleetCommandSnapshot(...args),
@@ -445,7 +445,7 @@ describe('5. Registry mappings', () => {
   );
 
   it('lists each fleet tool exactly once in toolRegistry', () => {
-    const fleetRows = toolRegistry.filter((t) => PR_FLEET_TOOL_IDS.includes(t.id));
+    const fleetRows = toolRegistry.filter((t) => (PR_FLEET_TOOL_IDS as readonly string[]).includes(t.id));
     expect(fleetRows).toHaveLength(PR_FLEET_TOOL_IDS.length);
   });
 
@@ -541,7 +541,7 @@ describe('8. Archived route validation', () => {
     expect(appSource).toContain('CANONICAL_ROUTES.emergencyWhiteboard');
     expect(appSource).not.toContain(`path: '/tools/calculators/${id}'`);
     expect(calculatorsSource).not.toContain(`case '${id}':`);
-    expect(nluCalculatorHubOnly.some((h) => h.toolId === id)).toBe(false);
+    expect(nluCalculatorHubOnly.some((h) => (h.toolId as string) === id)).toBe(false);
   });
 
   it.each(PR_FLEET_TIER_B_IDS)('%s resolves hub path only without dedicated fleet route', (id) => {

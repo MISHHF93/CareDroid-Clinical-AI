@@ -26,7 +26,7 @@ vi.mock('../../contexts/WorkspaceContext', () => ({
 }));
 
 vi.mock('../../contexts/UserContext', async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual = await importOriginal<typeof import('../../contexts/UserContext')>();
   return {
     ...actual,
     useUser: () => mockUserValue,
@@ -54,10 +54,10 @@ describe('ToolsOverview unified inventory', () => {
     vi.clearAllMocks();
     mockWorkspaceValue.workspaces = [{ id: 'all', name: 'All Tools', toolIds: [] }];
     mockWorkspaceValue.activeWorkspaceId = 'all';
-    mockToolPreferencesValue.favorites = [] as any[];
-    mockToolPreferencesValue.pinned = [] as any[];
-    mockToolPreferencesValue.recentTools = [] as any[];
-    mockToolPreferencesValue.hiddenTools = [] as any[];
+    (mockToolPreferencesValue as any).favorites = [] as any[];
+    (mockToolPreferencesValue as any).pinned = [] as any[];
+    (mockToolPreferencesValue as any).recentTools = [] as any[];
+    (mockToolPreferencesValue as any).hiddenTools = [] as any[];
     (mockToolPreferencesValue as any).profileSettings = {};
   });
 
@@ -170,7 +170,7 @@ describe('ToolsOverview unified inventory', () => {
   }, 10000);
 
   it('shows a non-blank empty state for empty custom workspaces', () => {
-    mockWorkspaceValue.workspaces = [{ id: 'empty', name: 'Empty Workspace', toolIds: ['unknown-tool'] }];
+    (mockWorkspaceValue as any).workspaces = [{ id: 'empty', name: 'Empty Workspace', toolIds: ['unknown-tool'] }];
     mockWorkspaceValue.activeWorkspaceId = 'empty';
 
     renderOverview();
@@ -193,7 +193,7 @@ describe('ToolsOverview unified inventory', () => {
   });
 
   it('explains hidden tools in empty filtered views', () => {
-    mockToolPreferencesValue.hiddenTools = ['qsofa'];
+    (mockToolPreferencesValue as any).hiddenTools = ['qsofa'];
 
     renderOverview();
     fireEvent.change(screen.getByRole('searchbox', { name: /search all tools/i }), {

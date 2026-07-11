@@ -155,7 +155,7 @@ export type OperationalIntelligenceSnapshot = {
   featureVector: OperationalFeatureVector;
   scores: OperationalScore[];
   signals: OperationalSignal[];
-  predictions: [];
+  predictions: unknown[];
   anomalies: OperationalAnomaly[];
   recommendations: OperationalRecommendation[];
   alerts: OperationalAlert[];

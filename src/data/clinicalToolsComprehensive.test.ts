@@ -106,6 +106,10 @@ describe('1. PHQ-9 scoring', () => {
     });
     const out = computePhq9Result(responses);
     expect(out.ok).toBe(true);
+    // NOTE: computePhq9Result's inferred return type spreads `interp` into the success
+    // branch, which widens `ok` to `boolean` on both branches — `out.ok` alone can't
+    // narrow. Discriminate on a success-only field instead.
+    if (!('totalScore' in out)) throw new Error('expected computePhq9Result to succeed');
     expect(out.totalScore).toBe(7);
     expect(out.severityCategory).toBe('mild');
     expect(sumPhq9Score(out.breakdown)).toBe(7);
@@ -129,6 +133,7 @@ describe('1. PHQ-9 scoring', () => {
 
   it('maps moderately severe band to warning UI severity when q9 is zero', () => {
     const interp = interpretPhq9Score(17, 0);
+    if (!interp) throw new Error('expected interpretPhq9Score to return a result');
     expect(interp.severityCategory).toBe('moderately_severe');
     expect(interp.severity).toBe('warning');
     expect(interp.severityLabel).toMatch(/Moderately severe/i);
@@ -155,6 +160,9 @@ describe('2. GAD-7 scoring', () => {
     });
     const out = computeGad7Result(responses);
     expect(out.ok).toBe(true);
+    // NOTE: see comment above — `ok` widens to `boolean` on both branches, so narrow on
+    // a success-only field instead.
+    if (!('totalScore' in out)) throw new Error('expected computeGad7Result to succeed');
     expect(out.totalScore).toBe(7);
     expect(out.severityCategory).toBe('mild');
     expect(sumGad7Score(out.breakdown)).toBe(7);
@@ -180,6 +188,9 @@ describe('2. GAD-7 scoring', () => {
     const moderate = interpretGad7Score(12);
     const mild = interpretGad7Score(9);
     const severe = interpretGad7Score(15);
+    if (!moderate) throw new Error('expected interpretGad7Score(12) to return a result');
+    if (!mild) throw new Error('expected interpretGad7Score(9) to return a result');
+    if (!severe) throw new Error('expected interpretGad7Score(15) to return a result');
     expect(moderate.moderateSymptomEscalation.warranted).toBe(true);
     expect(moderate.acuteDistressSafetyAlert.elevated).toBe(false);
     expect(mild.moderateSymptomEscalation.warranted).toBe(false);
@@ -190,6 +201,7 @@ describe('2. GAD-7 scoring', () => {
   it('computeGad7Result returns moderate escalation fields for total 12', () => {
     const out = computeGad7Result(buildGad7Responses({ q1: 2, q2: 2, q3: 2, q4: 2, q5: 2, q6: 1, q7: 1 }));
     expect(out.ok).toBe(true);
+    if (!('totalScore' in out)) throw new Error('expected computeGad7Result to succeed');
     expect(out.totalScore).toBe(12);
     expect(out.severityCategory).toBe('moderate');
     expect(out.moderateSymptomEscalation.warranted).toBe(true);
@@ -209,6 +221,7 @@ describe('3. PHQ-9 Question 9 handling', () => {
   it('elevates critical severity and safety alert when q9 is non-zero', () => {
     const out = computePhq9Result(buildPhq9Responses({ q9: 2 }));
     expect(out.ok).toBe(true);
+    if (!('totalScore' in out)) throw new Error('expected computePhq9Result to succeed');
     expect(out.question9Elevated).toBe(true);
     expect(out.severity).toBe('critical');
     expect(out.question9SafetyAlert.elevated).toBe(true);
@@ -217,6 +230,7 @@ describe('3. PHQ-9 Question 9 handling', () => {
 
   it('prioritizes Q9 over severity band when total is low', () => {
     const interp = interpretPhq9Score(3, 1);
+    if (!interp) throw new Error('expected interpretPhq9Score(3, 1) to return a result');
     expect(interp.severity).toBe('critical');
     expect(interp.severityCategory).toBe('none_minimal');
     expect(interp.interpretation).toMatch(/prioritize safety assessment/i);
@@ -224,6 +238,7 @@ describe('3. PHQ-9 Question 9 handling', () => {
 
   it('warns on high symptom burden when q9 is zero', () => {
     const interp = interpretPhq9Score(18, 0);
+    if (!interp) throw new Error('expected interpretPhq9Score(18, 0) to return a result');
     expect(interp.question9Elevated).toBe(false);
     expect(interp.highSymptomEscalation.warranted).toBe(true);
     expect(interp.highSymptomEscalation.message).toMatch(/does not rule out suicide risk/i);
@@ -231,6 +246,7 @@ describe('3. PHQ-9 Question 9 handling', () => {
 
   it('does not warrant high-symptom escalation for moderate totals with q9 zero', () => {
     const interp = interpretPhq9Score(12, 0);
+    if (!interp) throw new Error('expected interpretPhq9Score(12, 0) to return a result');
     expect(interp.highSymptomEscalation.warranted).toBe(false);
   });
 });
@@ -339,8 +355,9 @@ describe('6. Registry mappings', () => {
   it.each(WIRING_AUDIT_TIER_A_IDS)('%s is registered in builtinUiCalculators with matching path', (id) => {
     const spec = WIRING_AUDIT_TOOL_SPECS[id];
     const builtin = builtinUiCalculators.find((c) => c.id === id);
-    expect(builtin?.id).toBe(id);
-    expect(builtin?.path).toBe(spec.routePath);
+    if (!builtin) throw new Error(`expected builtinUiCalculators to contain ${id}`);
+    expect(builtin.id).toBe(id);
+    expect(builtin.path).toBe(spec.routePath);
     expect(BUILTIN_CALC_ID_TO_REGISTRY_ID[builtin.id]).toBe(id);
   });
 

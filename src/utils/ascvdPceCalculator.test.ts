@@ -91,6 +91,7 @@ describe('ascvdPceCalculator — validation', () => {
       smoker: false,
     });
     expect(v.valid).toBe(true);
+    if (!v.inputs) throw new Error('expected validateAscvdPceInputs to return inputs');
     expect(v.inputs.totalCholesterol).toBeCloseTo(cholesterolMmolLToMgDl(5.5), 0);
   });
 });
@@ -99,17 +100,20 @@ describe('ascvdPceCalculator — interpretation', () => {
   it('includes clinician disclaimer and avoids treatment directives', () => {
     const out = computeAscvdPceResult({ ...TABLE_A_DEMO, sex: 'male', race: 'white' });
     expect(out.ok).toBe(true);
+    if (!out.ok) throw new Error('expected computeAscvdPceResult to succeed');
     expect(out.clinicianPatientDisclaimer).toBe(
       'Use as decision-support for clinician-patient discussions.'
     );
     expect(out.preventionDiscussion).toBeTruthy();
     expect(out.preventionDiscussion.toLowerCase()).not.toMatch(/\b(start|prescribe|statin dose)\b/);
+    if (!out.pathwayDisclaimer) throw new Error('expected out.pathwayDisclaimer to be defined');
     expect(out.pathwayDisclaimer.toLowerCase()).not.toMatch(/\bprescribe\b/);
   });
 
   it('returns prevention discussion for each risk category', () => {
     for (const pct of [3, 6, 12, 25]) {
       const i = interpretAscvdTenYearRisk(pct);
+      if (!i) throw new Error('expected interpretAscvdTenYearRisk to return a result');
       expect(i.preventionDiscussion).toBeTruthy();
       expect(i.preventionDiscussion.toLowerCase()).not.toMatch(/\bprescribe\b/);
       expect(i.riskCategory).toBe(categorizeAscvdTenYearRisk(pct));
@@ -163,6 +167,7 @@ describe('ascvdPceCalculator — clinical edge cases', () => {
   it('computeAscvdPceResult returns structured errors when validation fails', () => {
     const out = computeAscvdPceResult({ ...maleWhite, ageYears: 25 });
     expect(out.ok).toBe(false);
+    if (out.ok) throw new Error('expected computeAscvdPceResult to fail');
     expect(Array.isArray(out.errors)).toBe(true);
     expect(out.errors.length).toBeGreaterThan(0);
   });

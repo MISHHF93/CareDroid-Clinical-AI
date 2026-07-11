@@ -13,7 +13,7 @@ describe('AdvancedRecommendationService', () => {
   describe('getRecommendations', () => {
     it('should return recommendations from NLU intent classifier', async () => {
       // Mock successful API response
-      global.fetch.mockResolvedValueOnce({
+      vi.mocked(global.fetch).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           intent: 'drug_interaction',
@@ -21,7 +21,7 @@ describe('AdvancedRecommendationService', () => {
           entities: [],
           emergencyScore: 0
         })
-      });
+      } as Response);
 
       const recommendations = await advancedRecommendationService.getRecommendations(
         'Check if warfarin interacts with aspirin'
@@ -35,7 +35,7 @@ describe('AdvancedRecommendationService', () => {
     });
 
     it('should return drug-checker for medication queries', async () => {
-      global.fetch.mockResolvedValueOnce({
+      vi.mocked(global.fetch).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           intent: 'drug_interaction',
@@ -46,7 +46,7 @@ describe('AdvancedRecommendationService', () => {
           ],
           emergencyScore: 0
         })
-      });
+      } as Response);
 
       const recommendations = await advancedRecommendationService.getRecommendations(
         'warfarin and aspirin interaction'
@@ -57,7 +57,7 @@ describe('AdvancedRecommendationService', () => {
     });
 
     it('should return lab-interpreter for lab queries', async () => {
-      global.fetch.mockResolvedValueOnce({
+      vi.mocked(global.fetch).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           intent: 'lab_interpretation',
@@ -65,7 +65,7 @@ describe('AdvancedRecommendationService', () => {
           entities: [{ type: 'lab_test', value: 'troponin' }],
           emergencyScore: 0.3
         })
-      });
+      } as Response);
 
       const recommendations = await advancedRecommendationService.getRecommendations(
         'interpret elevated troponin levels'
@@ -108,7 +108,7 @@ describe('AdvancedRecommendationService', () => {
     });
 
     it('should cache results for same query', async () => {
-      global.fetch.mockResolvedValue({
+      vi.mocked(global.fetch).mockResolvedValue({
         ok: true,
         json: async () => ({
           intent: 'drug_interaction',
@@ -116,7 +116,7 @@ describe('AdvancedRecommendationService', () => {
           entities: [],
           emergencyScore: 0
         })
-      });
+      } as Response);
 
       const query = 'warfarin interaction';
       
@@ -130,7 +130,7 @@ describe('AdvancedRecommendationService', () => {
 
   describe('classifyIntent', () => {
     it('should call backend intent classification API', async () => {
-      global.fetch.mockResolvedValueOnce({
+      vi.mocked(global.fetch).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           intent: 'diagnosis',
@@ -138,7 +138,7 @@ describe('AdvancedRecommendationService', () => {
           entities: [],
           emergencyScore: 0.1
         })
-      });
+      } as Response);
 
       const result = await advancedRecommendationService.classifyIntent(
         'differential diagnosis for chest pain'
@@ -158,7 +158,7 @@ describe('AdvancedRecommendationService', () => {
 
     it('should handle API errors gracefully', async () => {
       const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      global.fetch.mockRejectedValueOnce(new Error('Network error'));
+      vi.mocked(global.fetch).mockRejectedValueOnce(new Error('Network error'));
 
       const result = await advancedRecommendationService.classifyIntent('test query');
 
@@ -174,7 +174,7 @@ describe('AdvancedRecommendationService', () => {
 
   describe('entity-based recommendations', () => {
     it('should detect medication entities and recommend drug-checker', async () => {
-      global.fetch.mockResolvedValueOnce({
+      vi.mocked(global.fetch).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           intent: 'medication_dosing',
@@ -184,7 +184,7 @@ describe('AdvancedRecommendationService', () => {
           ],
           emergencyScore: 0
         })
-      });
+      } as Response);
 
       const recommendations = await advancedRecommendationService.getRecommendations(
         'metformin dosing for type 2 diabetes'
@@ -196,7 +196,7 @@ describe('AdvancedRecommendationService', () => {
     });
 
     it('should detect lab test entities and recommend lab-interpreter', async () => {
-      global.fetch.mockResolvedValueOnce({
+      vi.mocked(global.fetch).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           intent: 'lab_interpretation',
@@ -206,7 +206,7 @@ describe('AdvancedRecommendationService', () => {
           ],
           emergencyScore: 0
         })
-      });
+      } as Response);
 
       const recommendations = await advancedRecommendationService.getRecommendations(
         'creatinine 2.5 mg/dL'
@@ -219,7 +219,7 @@ describe('AdvancedRecommendationService', () => {
 
   describe('personalization', () => {
     it('should boost favorited tools in recommendations', async () => {
-      global.fetch.mockResolvedValueOnce({
+      vi.mocked(global.fetch).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           intent: 'drug_interaction',
@@ -227,7 +227,7 @@ describe('AdvancedRecommendationService', () => {
           entities: [],
           emergencyScore: 0
         })
-      });
+      } as Response);
 
       const context = {
         userPreferences: {
@@ -248,7 +248,7 @@ describe('AdvancedRecommendationService', () => {
     });
 
     it('should slightly boost recently used tools', async () => {
-      global.fetch.mockResolvedValueOnce({
+      vi.mocked(global.fetch).mockResolvedValueOnce({
         ok: true,
         json: async () => ({
           intent: 'lab_interpretation',
@@ -256,7 +256,7 @@ describe('AdvancedRecommendationService', () => {
           entities: [],
           emergencyScore: 0
         })
-      });
+      } as Response);
 
       const context = {
         userPreferences: {},
@@ -280,6 +280,7 @@ describe('AdvancedRecommendationService', () => {
       advancedRecommendationService.recordFeedback('drug-checker', false);
 
       const feedback = advancedRecommendationService.getUserFeedback('drug-checker');
+      if (!feedback) throw new Error('expected getUserFeedback to return feedback');
 
       expect(feedback.totalFeedback).toBe(3);
       expect(feedback.accepted).toBe(2);
@@ -305,7 +306,7 @@ describe('AdvancedRecommendationService', () => {
 
   describe('cache management', () => {
     it('should cache recommendation results', async () => {
-      global.fetch.mockResolvedValue({
+      vi.mocked(global.fetch).mockResolvedValue({
         ok: true,
         json: async () => ({
           intent: 'drug_interaction',
@@ -313,7 +314,7 @@ describe('AdvancedRecommendationService', () => {
           entities: [],
           emergencyScore: 0
         })
-      });
+      } as Response);
 
       const query = 'test query';
       
@@ -326,7 +327,7 @@ describe('AdvancedRecommendationService', () => {
     });
 
     it('should clear cache on demand', async () => {
-      global.fetch.mockResolvedValue({
+      vi.mocked(global.fetch).mockResolvedValue({
         ok: true,
         json: async () => ({
           intent: 'drug_interaction',
@@ -334,7 +335,7 @@ describe('AdvancedRecommendationService', () => {
           entities: [],
           emergencyScore: 0
         })
-      });
+      } as Response);
 
       await advancedRecommendationService.getRecommendations('test');
       

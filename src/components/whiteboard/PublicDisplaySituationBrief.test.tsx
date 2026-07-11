@@ -20,7 +20,11 @@ const snapshot: PublicWaitingDisplaySnapshot = {
   },
   careStages: [{ id: 'registration', label: 'Registration', count: 3 }],
   processEducation: null as any,
-  statusMessaging: { statusLines: [], advisories: ['Crowding may extend waits'], escalationMessage: 'Ask staff if worse' },
+  statusMessaging: {
+    statusLines: [],
+    advisories: ['Crowding may extend waits'],
+    escalationMessage: 'Ask staff if worse',
+  } as any,
   guidanceMessages: [],
   escalationMessage: 'Ask staff if symptoms worsen',
   waitDisclaimer: 'Not personal status',

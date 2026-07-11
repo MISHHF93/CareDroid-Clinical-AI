@@ -33,13 +33,13 @@ const backendRegistrySource = readFileSync(
   ),
   'utf8'
 );
-let cachedContractRows = null;
+let cachedContractRows: ReturnType<typeof buildBackendFrontendContractRows> | null = null;
 
 function getContractRows() {
   if (!cachedContractRows) {
     cachedContractRows = buildBackendFrontendContractRows();
   }
-  return cachedContractRows;
+  return cachedContractRows!;
 }
 
 function parseBackendRegisteredExecutorIds() {

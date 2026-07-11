@@ -180,15 +180,15 @@ export function validateAuditCInputs(raw) {
  */
 export function computeAuditCResult(raw) {
   const v = validateAuditCInputs(raw);
-  if (!v.valid) return { ok: false, errors: v.errors };
+  if (!v.valid) return { ok: false as const, errors: v.errors };
 
   const breakdown = computeAuditCBreakdown(v.inputs);
   const total = sumAuditCScore(breakdown);
   const interp = interpretAuditCScore(total);
-  if (!interp) return { ok: false, errors: ['Unable to calculate AUDIT-C score.'] };
+  if (!interp) return { ok: false as const, errors: ['Unable to calculate AUDIT-C score.'] };
 
   return {
-    ok: true,
+    ok: true as const,
     inputs: v.inputs,
     breakdown,
     ...interp,

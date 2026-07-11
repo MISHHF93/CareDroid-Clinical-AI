@@ -25,7 +25,9 @@ describe('automationAuditLogger', () => {
   });
 
   it('falls back to local audit entries for blocked automation decisions', async () => {
-    createAutomationAuditEvent.mockResolvedValue({ ok: false, message: 'API unavailable' });
+    vi.mocked(createAutomationAuditEvent).mockResolvedValue(
+      { ok: false, message: 'API unavailable' } as any,
+    );
 
     await recordAutomationBlocked({
       triggerFired: 'Notification stream subscription requested',
@@ -47,7 +49,7 @@ describe('automationAuditLogger', () => {
   });
 
   it('falls back to local audit entries for failed automation decisions', async () => {
-    createAutomationAuditEvent.mockRejectedValue(new Error('network down'));
+    vi.mocked(createAutomationAuditEvent).mockRejectedValue(new Error('network down'));
 
     await recordAutomationFailure({
       triggerFired: 'Offline sync failed',

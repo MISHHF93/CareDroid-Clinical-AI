@@ -194,6 +194,7 @@ describe('PR3 registration audit — discovery and catalog', () => {
     (aliasId, canonical) => {
       const row = toolIdAliases.find((a) => a.id === aliasId);
       expect(row, `missing toolIdAliases id ${aliasId}`).toBeTruthy();
+      if (!row) throw new Error(`missing toolIdAliases id ${aliasId}`);
       expect(row.mapsTo).toBe(canonical);
       expect(NLU_TO_REGISTRY_ID[aliasId]).toBe(canonical);
     }
@@ -238,7 +239,7 @@ describe('PR3 registration audit — discovery and catalog', () => {
 
 describe('PR3 registration audit — sidebar, hub launch, chat seeds', () => {
   it('lists each PR3 tool exactly once in toolRegistry (sidebar visibility)', () => {
-    const pr3InRegistry = toolRegistry.filter((t) => PR3_TOOL_IDS.includes(t.id));
+    const pr3InRegistry = toolRegistry.filter((t) => (PR3_TOOL_IDS as readonly string[]).includes(t.id));
     expect(pr3InRegistry).toHaveLength(PR3_TOOL_IDS.length);
     for (const id of PR3_TOOL_IDS) {
       expect(getToolIcon(id)).toBeTruthy();
@@ -312,7 +313,7 @@ describe('PR3 registration audit — no orphaned registry entries', () => {
   });
 
   it('has no duplicate toolIdAliases.id entries among PR3-targeting rows', () => {
-    const pr3AliasRows = toolIdAliases.filter((a) => PR3_TOOL_IDS.includes(a.mapsTo));
+    const pr3AliasRows = toolIdAliases.filter((a) => (PR3_TOOL_IDS as readonly string[]).includes(a.mapsTo));
     const ids = pr3AliasRows.map((a) => a.id);
     expect(new Set(ids).size).toBe(ids.length);
   });

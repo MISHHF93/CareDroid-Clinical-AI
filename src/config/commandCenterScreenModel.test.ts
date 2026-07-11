@@ -13,8 +13,8 @@ import { isPractitionerCleanupEnabled } from './practitionerCleanup.config';
 
 describe('commandCenterScreenModel', () => {
   const commandCan = (action: string) =>
-    action === EMERGENCY_ACTIONS.analyticsView ||
-    action === EMERGENCY_ACTIONS.copilotUse ||
+    action === EMERGENCY_ACTIONS.viewAnalytics ||
+    action === EMERGENCY_ACTIONS.useCopilot ||
     action === EMERGENCY_ACTIONS.manageCapacity ||
     action === EMERGENCY_ACTIONS.queueMove ||
     action === 'analytics.view' ||

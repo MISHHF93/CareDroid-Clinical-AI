@@ -56,7 +56,7 @@ const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculato
 const ALL_PR4A_ALIAS_PAIRS = [...PR4A_REQUIRED_NLU_ALIAS_PAIRS, ...PR4A_DISCOVERY_ALIAS_PAIRS];
 
 const PR4A_DISCOVERY_ALIAS_IDS = toolIdAliases
-  .filter((a) => PR4A_CALCULATOR_REGISTRY_IDS.includes(a.mapsTo))
+  .filter((a) => (PR4A_CALCULATOR_REGISTRY_IDS as readonly string[]).includes(a.mapsTo))
   .map((a) => a.id);
 
 describe('PR4A consistency — centralized audit lists', () => {
@@ -94,6 +94,7 @@ describe('PR4A consistency — registry, NLU, catalog, and backend alignment', (
 
       const nlu = clinicalIntentTools.find((t) => t.toolId === id);
       expect(nlu, `clinicalIntentTools missing ${id}`).toBeTruthy();
+      if (!nlu) throw new Error(`clinicalIntentTools missing ${id}`);
       expect(nlu.toolId).toBe(id);
       expect(nlu.path).toBe(route);
       expect(nlu.sidebarToolId).toBe(id);
@@ -101,6 +102,7 @@ describe('PR4A consistency — registry, NLU, catalog, and backend alignment', (
 
       const builtin = builtinUiCalculators.find((c) => c.id === id);
       expect(builtin, `builtinUiCalculators missing ${id}`).toBeTruthy();
+      if (!builtin) throw new Error(`builtinUiCalculators missing ${id}`);
       expect(builtin.id).toBe(id);
       expect(builtin.path).toBe(route);
       expect(builtin.calcQuery).toBe(`${PR4A_HUB_PATH}?calc=${id}`);
@@ -116,7 +118,7 @@ describe('PR4A consistency — registry, NLU, catalog, and backend alignment', (
 
   it('excludes PR4A tools from chat-only hub list (Tier-A dedicated forms)', () => {
     for (const id of PR4A_CALCULATOR_REGISTRY_IDS) {
-      expect(nluCalculatorHubOnly.some((h) => h.toolId === id)).toBe(false);
+      expect(nluCalculatorHubOnly.some((h) => (h.toolId as string) === (id as string))).toBe(false);
     }
   });
 
@@ -259,6 +261,7 @@ describe('PR4A consistency — resolveCatalogLaunch, routes, sidebar, deep links
     for (const id of PR4A_CALCULATOR_REGISTRY_IDS) {
       const fromBuiltin = resolveCatalogLaunch(id);
       const builtin = builtinUiCalculators.find((c) => c.id === id);
+      if (!builtin) throw new Error(`builtinUiCalculators missing ${id}`);
       expect(fromBuiltin.path).toBe(builtin.path);
       expect(builtin.calcQuery).toContain(`calc=${id}`);
     }
@@ -281,7 +284,7 @@ describe('PR4A consistency — resolveCatalogLaunch, routes, sidebar, deep links
   });
 
   it('exposes each PR4A registry id exactly once in toolRegistry (sidebar visibility)', () => {
-    const pr4aRows = toolRegistry.filter((t) => PR4A_CALCULATOR_REGISTRY_IDS.includes(t.id));
+    const pr4aRows = toolRegistry.filter((t) => (PR4A_CALCULATOR_REGISTRY_IDS as readonly string[]).includes(t.id));
     expect(pr4aRows).toHaveLength(PR4A_CALCULATOR_REGISTRY_IDS.length);
     for (const id of PR4A_CALCULATOR_REGISTRY_IDS) {
       const icon = getToolIcon(id);

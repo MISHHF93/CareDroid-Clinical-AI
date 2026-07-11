@@ -14,8 +14,8 @@ describe('configService', () => {
   });
 
   it('returns defaults metadata when system config request fails', async () => {
-    apiFetchJson.mockResolvedValueOnce({
-      response: { ok: false, status: 503, statusText: 'Service Unavailable' },
+    vi.mocked(apiFetchJson).mockResolvedValueOnce({
+      response: { ok: false, status: 503, statusText: 'Service Unavailable' } as unknown as Response,
       data: {},
     });
 
@@ -31,8 +31,8 @@ describe('configService', () => {
   });
 
   it('returns live data when system config succeeds', async () => {
-    apiFetchJson.mockResolvedValueOnce({
-      response: { ok: true, status: 200 },
+    vi.mocked(apiFetchJson).mockResolvedValueOnce({
+      response: { ok: true, status: 200 } as unknown as Response,
       data: { rag: { enabled: true, topK: 3, minScore: 0.5 }, session: { idleTimeoutMs: 1, absoluteTimeoutMs: 2 } },
     });
 

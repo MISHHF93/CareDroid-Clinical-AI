@@ -40,6 +40,7 @@ describe('medical simulation catalog', () => {
 
   it('builds a debrief with missed actions and next recommended scenarios', () => {
     const scenario = getSimulationScenarioById('sepsis-deterioration');
+    if (!scenario) throw new Error('expected sepsis-deterioration scenario to be defined');
     const debrief = buildScenarioDebrief(scenario, [scenario.criticalActions[0]]);
     expect(debrief.summary).toMatch(/sepsis deterioration completed/i);
     expect(debrief.missedCriticalActions.length).toBeGreaterThan(0);

@@ -17,6 +17,7 @@ function seedPatient(overrides: Partial<Patient> = {}): Patient {
     arrivalTime: new Date().toISOString(),
     chiefComplaint: 'Chest pain',
     complaint: 'Chest pain',
+    complaintCategory: 'Cardiac',
     state: PatientState.Triage,
     priority: Priority.P3,
     vitals: [],

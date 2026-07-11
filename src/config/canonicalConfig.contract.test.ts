@@ -80,7 +80,9 @@ describe('canonical configuration contract', () => {
     expect(ROUTE_RECORDS_BY_ID.tools.path).toBe('/emergency/tools');
     expect(ROUTE_RECORDS_BY_ID.calculators.path).toBe('/emergency/tools');
     expect(ROUTE_RECORDS_BY_ID.assetPacks.path).toBe('/asset-packs');
-    expect(ROUTE_RECORDS_BY_ID.assetPacks.componentKey).toBe('PackMarketplace');
+    expect((ROUTE_RECORDS_BY_ID.assetPacks as { componentKey?: string }).componentKey).toBe(
+      'PackMarketplace'
+    );
     expect(ROUTE_RECORDS_BY_ID.organizationPacks.path).toBe('/settings/organization/packs');
     expect(ROUTE_RECORDS_BY_ID.organizationPacks.aliases).toBe(ORGANIZATION_PACKS_ROUTE_ALIASES);
     expect(PROTECTED_ROUTE_ALIAS_REDIRECTS).toEqual(

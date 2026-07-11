@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { PatientState, Priority } from '../types/emergency';
+import { PatientState, Priority, type EMSArrival } from '../types/emergency';
 import {
   buildEmsOffloadAlerts,
   buildEmsOffloadTrackerRow,
@@ -86,7 +86,7 @@ describe('emsOffloadTracker', () => {
           },
         ],
         staff: [{ id: 'rn-1', name: 'N. Nurse', role: 'RN', active: true }],
-        rooms: [{ id: 'resus-1', name: 'Resus 1', type: 'Resus', status: 'Occupied' }],
+        rooms: [{ id: 'resus-1', name: 'Resus 1', type: 'Resus', status: 'Occupied' } as any],
         offloadTargetMinutes: 15,
       },
     );
@@ -132,7 +132,7 @@ describe('emsOffloadTracker', () => {
   });
 
   it('normalizes offload timestamps when status advances', () => {
-    const arrival = {
+    const arrival: EMSArrival = {
       id: 'ems-4',
       unitId: 'Medic 4',
       unitName: 'Medic 4',
@@ -174,7 +174,7 @@ describe('emsOffloadTracker', () => {
             chiefComplaint: 'Fall',
             prearrivalComplaint: 'Fall',
             eta: 6,
-            severity: 'Medium',
+            severity: 'Moderate',
             dispatchTime: '2026-06-20T11:50:00.000Z',
             estimatedArrivalTime: '2026-06-20T12:06:00.000Z',
             notes: '',

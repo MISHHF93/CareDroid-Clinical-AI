@@ -6,7 +6,7 @@ import {
   getPilotCustomerNavigationItems,
 } from '../config/unified-navigation.config';
 import { useEmergencyStore } from '../store/emergencyStore';
-import { renderRoute, ROUTE_LOAD_TIMEOUT } from './canonicalRouteTree.testShared.tsx';
+import { renderRoute, ROUTE_LOAD_TIMEOUT } from './canonicalRouteTree.testShared';
 
 const originalEmergencyState = useEmergencyStore.getState();
 const PILOT_VISIBLE_NAVIGATION_ITEMS = getPilotCustomerNavigationItems(NAVIGATION_ITEMS);

@@ -1,8 +1,14 @@
-import './canonicalRouteTree.testShared.tsx';
+import './canonicalRouteTree.testShared';
 import { cleanup, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 import { useEmergencyStore } from '../store/emergencyStore';
-import { renderRoute, ROUTE_LOAD_TIMEOUT } from './canonicalRouteTree.testShared.tsx';
+import { renderRoute, ROUTE_LOAD_TIMEOUT } from './canonicalRouteTree.testShared';
+
+interface InShellRouteExpectation {
+  path: string;
+  marker?: RegExp | string;
+  markerRole?: string;
+}
 
 const originalEmergencyState = useEmergencyStore.getState();
 
@@ -42,7 +48,7 @@ describe.sequential('canonical route tree — legacy redirects', () => {
     ['/workflows', { path: '/workflows', marker: /^workflows$/i, markerRole: 'heading' }],
     ['/fleet/command', { path: '/fleet/command' }],
     ['/fleet/map', { path: '/fleet/map' }],
-  ])('%s mounts the in-shell canonical route', async (legacyPath, expected) => {
+  ] as [string, InShellRouteExpectation][])('%s mounts the in-shell canonical route', async (legacyPath, expected) => {
     renderRoute(legacyPath);
 
     expect(await screen.findByTestId('location')).toHaveTextContent(expected.path);
@@ -50,9 +56,10 @@ describe.sequential('canonical route tree — legacy redirects', () => {
     expect(screen.queryByText('Access denied')).toBeNull();
 
     if (typeof expected.marker === 'string') {
+      const markerSelector = expected.marker;
       await waitFor(
         () => {
-          expect(document.querySelector(expected.marker)).toBeTruthy();
+          expect(document.querySelector(markerSelector)).toBeTruthy();
         },
         { timeout: ROUTE_LOAD_TIMEOUT },
       );

@@ -21,7 +21,7 @@ vi.mock('./UserContext', () => ({
 vi.mock('../services/apiClient', () => ({
   apiFetch: (...args) => mocks.apiFetch(...args),
   getApiErrorMessage: (_error, response) => `Request failed (${response?.status || 0})`,
-  parseApiResponse: async (response, { fallback: any = {} } = {}) => {
+  parseApiResponse: async (response, { fallback = {} }: { fallback?: any } = {}) => {
     const body = await response.text();
     return body ? JSON.parse(body) : fallback;
   },
@@ -118,7 +118,7 @@ describe('TenantContextProvider', () => {
   it('uses explicit demo tenant context for demo auth when backend is unavailable', async () => {
     mocks.userState = {
       ...mocks.userState,
-      user: { id: 'dev-demo-user', role: 'physician', isDevAuthBypass: true },
+      user: { id: 'dev-demo-user', role: 'physician', isDevAuthBypass: true } as any,
       isDevAuthBypass: true,
     };
     mocks.apiFetch.mockRejectedValue(new Error('backend unavailable'));

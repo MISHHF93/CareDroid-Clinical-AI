@@ -33,7 +33,7 @@ function renderPage() {
 describe('AmbientScribe', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    generateAmbientScribeDraft.mockResolvedValue({
+    vi.mocked(generateAmbientScribeDraft).mockResolvedValue({
       ok: true,
       data: {
         runId: 'run-1',

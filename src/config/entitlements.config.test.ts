@@ -30,7 +30,7 @@ describe('entitlements.config', () => {
       requiredPlan: SUBSCRIPTION_TIERS.PROFESSIONAL,
       requiredPackIds: ['research-education'],
     });
-    expect(subscriptionMeetsRequirement('institutional', 'professional')).toBe(true);
-    expect(subscriptionMeetsRequirement('free', 'professional')).toBe(false);
+    expect(subscriptionMeetsRequirement('institutional', 'professional' as any)).toBe(true);
+    expect(subscriptionMeetsRequirement('free', 'professional' as any)).toBe(false);
   });
 });

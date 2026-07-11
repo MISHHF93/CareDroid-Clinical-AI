@@ -61,9 +61,9 @@ const marketplacePack = {
 describe('PackMarketplace', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    PlatformAssetsApi.listMarketplacePacks.mockResolvedValue([marketplacePack]);
-    PlatformAssetsApi.installPack.mockResolvedValue({});
-    PlatformAssetsApi.removePack.mockResolvedValue({});
+    vi.mocked(PlatformAssetsApi.listMarketplacePacks).mockResolvedValue([marketplacePack]);
+    vi.mocked(PlatformAssetsApi.installPack).mockResolvedValue({});
+    vi.mocked(PlatformAssetsApi.removePack).mockResolvedValue({});
   });
 
   it('renders marketplace pack details from the backend projection', async () => {

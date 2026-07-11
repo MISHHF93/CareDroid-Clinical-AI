@@ -50,6 +50,8 @@ describe('trackMindMaturityModel', () => {
     const improved = scoreTrackMindDomain(TRACKMIND_MATURITY_DOMAIN.OPERATIONS, {
       answers: { [TRACKMIND_MATURITY_DOMAIN.OPERATIONS]: 5 },
     });
+    if (!improved) throw new Error('expected scoreTrackMindDomain(improved) to return a result');
+    if (!baseline) throw new Error('expected scoreTrackMindDomain(baseline) to return a result');
     expect(improved.score).toBeGreaterThanOrEqual(baseline.score);
   });
 

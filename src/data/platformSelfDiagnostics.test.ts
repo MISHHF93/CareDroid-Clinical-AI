@@ -52,7 +52,7 @@ describe('platformSelfDiagnostics', () => {
           },
         ],
       },
-    });
+    } as unknown as Parameters<typeof buildPlatformSelfDiagnostics>[0]);
 
     expect(diagnostics.healthLabel).toBe('Critical');
     expect(diagnostics.byStatus.critical.map((item) => item.id)).toEqual(

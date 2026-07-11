@@ -85,6 +85,7 @@ describe('canadianCSpineCalculator', () => {
       activeRotationRight45: true,
     });
     const interp = interpretCanadianCSpine(result);
+    if (!interp) throw new Error('expected interpretCanadianCSpine to return a result');
     expect(interp.safetyDisclaimer).toMatch(/does not clear the cervical spine/i);
     expect(interp.pathwayDisclaimer).toMatch(/Do not delay primary trauma survey/i);
     expect(interp.interpretation).not.toMatch(/c-spine cleared|definitely no fracture/i);

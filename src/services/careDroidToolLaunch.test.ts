@@ -3,6 +3,7 @@ import {
   launchCareDroidTool,
   launchOrchestrationRecommendation,
 } from './careDroidToolLaunch';
+import type { ToolRecommendation } from '../../lib/patient-orchestration';
 
 describe('careDroidToolLaunch', () => {
   beforeEach(() => {
@@ -18,10 +19,10 @@ describe('careDroidToolLaunch', () => {
         label: 'HEART Score',
         reason: 'Chest pain pathway',
         launchKind: 'calculator',
-        category: 'calculator',
+        category: 'calculator' as any,
         priority: 1,
         missing: true,
-      },
+      } as unknown as ToolRecommendation,
     });
 
     expect(dispatchEvent).toHaveBeenCalledWith(
@@ -40,10 +41,10 @@ describe('careDroidToolLaunch', () => {
         label: 'Copilot review',
         reason: 'Gap fill',
         launchKind: 'copilot',
-        category: 'copilot',
+        category: 'copilot' as any,
         priority: 1,
         missing: false,
-      },
+      } as unknown as ToolRecommendation,
     });
 
     expect(dispatchEvent).toHaveBeenCalledWith(
@@ -62,10 +63,10 @@ describe('careDroidToolLaunch', () => {
         label: 'Protocols',
         reason: 'Care pathway',
         launchKind: 'workflow',
-        category: 'clinical-tools',
+        category: 'clinical-tools' as any,
         priority: 1,
         missing: false,
-      },
+      } as unknown as ToolRecommendation,
     });
 
     expect(dispatchEvent).toHaveBeenCalledWith(

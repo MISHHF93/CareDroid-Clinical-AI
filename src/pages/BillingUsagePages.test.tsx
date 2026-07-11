@@ -33,7 +33,7 @@ vi.mock('../services/subscriptionApi', () => ({
 describe('Billing and usage pages', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    fetchBillingOverview.mockResolvedValue({
+    vi.mocked(fetchBillingOverview).mockResolvedValue({
       ok: true,
       data: {
         status: 'active',
@@ -61,8 +61,8 @@ describe('Billing and usage pages', () => {
           },
         ],
       },
-    });
-    fetchUsageSummary.mockResolvedValue({
+    } as any);
+    vi.mocked(fetchUsageSummary).mockResolvedValue({
       ok: true,
       data: {
         totals: [
@@ -83,8 +83,8 @@ describe('Billing and usage pages', () => {
           byEventType: [{ key: 'ai_call', quantity: 12, events: 6 }],
         },
       },
-    });
-    fetchUsageMeteringFramework.mockResolvedValue({
+    } as any);
+    vi.mocked(fetchUsageMeteringFramework).mockResolvedValue({
       ok: true,
       data: {
         storage: { billingSeparated: true },
@@ -110,7 +110,7 @@ describe('Billing and usage pages', () => {
           byIntegration: [{ key: 'fhir', quantity: 3, events: 3 }],
         },
       },
-    });
+    } as any);
   });
 
   it('renders billing overview with current plan and plan limits', async () => {

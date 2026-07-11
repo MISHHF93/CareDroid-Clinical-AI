@@ -92,7 +92,7 @@ const serviceLineGraph = {
 describe('ServiceLinesPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    PlatformAssetsApi.listServiceLines.mockResolvedValue(serviceLineGraph);
+    vi.mocked(PlatformAssetsApi.listServiceLines).mockResolvedValue(serviceLineGraph);
   });
 
   it('renders service-line mappings with departments, packs, and assets', async () => {

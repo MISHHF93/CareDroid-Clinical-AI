@@ -35,7 +35,7 @@ describe('administrativeAutomationEngine entitlement filtering', () => {
       flags: [],
       notes: [],
       timeline: [],
-    } as Patient;
+    } as unknown as Patient;
 
     useEmergencyStore.setState({
       patients: [patient],
@@ -72,7 +72,7 @@ describe('administrativeAutomationEngine entitlement filtering', () => {
       flags: [],
       notes: [],
       timeline: [],
-    } as Patient;
+    } as unknown as Patient;
 
     useEmergencyStore.setState({
       patients: [patient],

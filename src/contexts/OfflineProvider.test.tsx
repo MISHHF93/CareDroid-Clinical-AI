@@ -76,7 +76,7 @@ vi.mock('../services/syncService', () => ({
 }));
 
 vi.mock('../components/offline/OfflineSupport', async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual = await importOriginal<typeof import('../components/offline/OfflineSupport')>();
   return {
     ...actual,
     registerServiceWorker: vi.fn().mockResolvedValue(undefined),

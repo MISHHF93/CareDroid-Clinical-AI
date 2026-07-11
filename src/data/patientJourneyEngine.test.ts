@@ -80,8 +80,13 @@ describe('PatientJourneyEngine', () => {
         automationCount: 1,
       })
     );
-    expect(journey.find((state) => state.id === 'results').status).toBe('current');
-    expect(journey.find((state) => state.id === 'follow-up').automationCount).toBe(1);
+    const resultsState = journey.find((state) => state.id === 'results');
+    if (!resultsState) throw new Error('expected results state in journey');
+    expect(resultsState.status).toBe('current');
+
+    const followUpState = journey.find((state) => state.id === 'follow-up');
+    if (!followUpState) throw new Error('expected follow-up state in journey');
+    expect(followUpState.automationCount).toBe(1);
   });
 
   it('summarizes bottlenecks, metrics, and recommendations', () => {

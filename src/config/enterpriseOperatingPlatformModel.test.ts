@@ -27,6 +27,7 @@ describe('enterpriseOperatingPlatformModel', () => {
   it('includes anonymized benchmarking without track identifiers', () => {
     const assessment = buildEnterpriseOperatingPlatformAssessment();
     const benchmarking = assessment.modules.find((m) => m.id === 'operational_benchmarking');
+    if (!benchmarking) throw new Error('expected operational_benchmarking module');
     expect(benchmarking.assessment.artifacts.anonymized).toBe(true);
     expect(benchmarking.assessment.artifacts.cohorts.length).toBeGreaterThan(0);
   });

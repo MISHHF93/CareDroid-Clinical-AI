@@ -5,8 +5,8 @@ import { MemoryRouter } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import PatientCard from './PatientCard';
 import PatientDetailPanel from './PatientDetailPanel';
-import { useEmergencyStore } from '../store/emergencyStore';
-import { PatientFlag, PatientState, Priority } from '../types/emergency';
+import { useEmergencyStore, type EmergencyStoreState } from '../store/emergencyStore';
+import { PatientFlag, PatientState, Priority, type Patient } from '../types/emergency';
 import { PERMISSIVE_EMERGENCY_ROLE_MOCK } from '../test/permissiveEmergencyRoleMock';
 
 vi.mock('../hooks/useEmergencyRolePermissions', () => ({
@@ -24,7 +24,7 @@ function selectedPatient() {
     lastName: 'Stone',
     dob: '1970-01-01',
     age: 56,
-    sex: 'Female',
+    sex: 'Female' as const,
     arrivalTime: '2026-06-12T08:40:00-04:00',
     triageTime: null,
     lastAssessedTime: null,
@@ -82,13 +82,13 @@ function seedPatientDetail() {
           },
         },
         loadPatientBackendDetails: vi.fn(() => Promise.resolve(null)),
-      },
+      } as unknown as EmergencyStoreState,
       true
     );
   });
 }
 
-function timelinePatient() {
+function timelinePatient(): Patient {
   return {
     ...selectedPatient(),
     id: 'patient-timeline-test',
@@ -124,7 +124,7 @@ function timelinePatient() {
         note: 'Discharged home.',
       },
     ],
-  };
+  } as unknown as Patient;
 }
 
 afterEach(() => {

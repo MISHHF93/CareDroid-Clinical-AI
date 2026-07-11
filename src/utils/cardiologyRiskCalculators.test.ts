@@ -28,6 +28,7 @@ describe('cardiologyRiskCalculators', () => {
       stDeviationMm: 2,
       anginaIndex: 2,
     });
+    if (!result) throw new Error('expected computeDukeTreadmillScore to return a result');
     expect(result.score).toBe(-12);
     expect(interpretDukeTreadmillScore(result.score)?.severity).toBe('critical');
   });
@@ -45,6 +46,7 @@ describe('cardiologyRiskCalculators', () => {
       diabetes: true,
       hba1cPct: 7.2,
     });
+    if (!result) throw new Error('expected computeReynoldsRiskHelper to return a result');
     expect(result.riskCategory).toBe('high');
   });
 
@@ -58,6 +60,7 @@ describe('cardiologyRiskCalculators', () => {
       nsvt: true,
       unexplainedSyncope: false,
     });
+    if (!result) throw new Error('expected computeHcmSuddenDeathRisk to return a result');
     expect(result.fiveYearRiskPct).toBeGreaterThan(0);
     expect(interpretHcmSuddenDeathRisk(result.fiveYearRiskPct)).toBeTruthy();
   });

@@ -41,7 +41,7 @@ describe('operationalMetricsModel', () => {
 
   it('maps alert types to metric routes without duplicating route tables', () => {
     const routes = buildOperationalAlertTypeRoutes();
-    expect(routes.reassessment).toBe(CANONICAL_ROUTES.emergencyReassessment);
+    expect((routes as any).reassessment).toBe(CANONICAL_ROUTES.emergencyReassessment);
     expect(resolveOperationalAlertRoute({ type: 'EMS', title: 'Inbound EMS' })).toBe(
       CANONICAL_ROUTES.emergencyEms,
     );

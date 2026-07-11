@@ -17,7 +17,7 @@ vi.mock('../contexts/UserContext', () => ({
 vi.mock('../services/apiClient', () => ({
   apiFetch: (...args) => mocks.apiFetch(...args),
   getApiErrorMessage: () => 'Request failed',
-  parseApiResponse: async (response, { fallback: any = {} } = {}) => {
+  parseApiResponse: async (response, { fallback = {} }: any = {}) => {
     const body = await response.text();
     return body ? JSON.parse(body) : fallback;
   },

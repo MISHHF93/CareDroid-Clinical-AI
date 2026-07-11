@@ -257,11 +257,11 @@ export function validateMeldInputs(raw, opts: any = {}) {
 export function computeMeldResult(raw, opts: any = {}) {
   const { includeMeldNa = false } = opts;
   const v = validateMeldInputs(raw, { requireSodium: includeMeldNa });
-  if (!v.ok) return { ok: false, errors: v.errors };
+  if (!v.ok) return { ok: false as const, errors: v.errors };
 
   const clamped = applyMeldLabClamps(v.labs);
   const meld = calculateMeldScore(v.labs);
-  if (meld === null) return { ok: false, errors: ['Unable to calculate MELD from the values provided.'] };
+  if (meld === null) return { ok: false as const, errors: ['Unable to calculate MELD from the values provided.'] };
 
   let meldNa: any = null;
   let sodiumUsed = null;
@@ -272,7 +272,7 @@ export function computeMeldResult(raw, opts: any = {}) {
 
   const interp = interpretMeldScores(meld, meldNa);
   return {
-    ok: true,
+    ok: true as const,
     meld,
     meldNa,
     clamped,

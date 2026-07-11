@@ -4,6 +4,7 @@ import {
   PatientState,
   Priority,
   type Patient,
+  type TriageAcuity,
 } from '../types/emergency';
 import {
   buildPatientArrivalRecord,
@@ -99,9 +100,9 @@ describe('patientArrivalModel', () => {
         arrival: {
           arrivalMode: 'walk-in',
           arrivalTimestamp: '2026-06-20T09:00:00.000Z',
-          triageAcuity: { code: Priority.P3, status: 'unassigned' },
+          triageAcuity: { code: Priority.P3, status: 'unassigned' } as unknown as TriageAcuity,
           waitingRoomStatus: 'waiting-for-clinician',
-        },
+        } as unknown as Patient['arrival'],
       }),
     );
 

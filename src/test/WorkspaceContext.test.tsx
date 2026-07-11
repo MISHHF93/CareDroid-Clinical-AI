@@ -103,6 +103,7 @@ describe('WorkspaceContext', () => {
 
       const saved = localStorage.getItem('careDroid.workspaces.v1');
       expect(saved).toBeTruthy();
+      if (!saved) throw new Error('expected workspace state to be persisted');
 
       const parsed = JSON.parse(saved);
       expect(parsed.workspaces).toContainEqual(newWorkspace);
@@ -182,8 +183,9 @@ describe('WorkspaceContext', () => {
       });
 
       const saved = localStorage.getItem('careDroid.workspaces.v1');
+      if (!saved) throw new Error('expected workspace state to be persisted');
       const parsed = JSON.parse(saved);
-      
+
       const updated = parsed.workspaces.find(w => w.id === 'test');
       expect(updated.name).toBe('Updated Test');
     });
@@ -256,8 +258,9 @@ describe('WorkspaceContext', () => {
       });
 
       const saved = localStorage.getItem('careDroid.workspaces.v1');
+      if (!saved) throw new Error('expected workspace state to be persisted');
       const parsed = JSON.parse(saved);
-      
+
       const removed = parsed.workspaces.find(w => w.id === 'remove-me');
       expect(removed).toBeUndefined();
     });
@@ -282,6 +285,7 @@ describe('WorkspaceContext', () => {
       });
 
       const saved = localStorage.getItem('careDroid.workspaces.v1');
+      if (!saved) throw new Error('expected workspace state to be persisted');
       const parsed = JSON.parse(saved);
 
       expect(parsed.activeWorkspaceId).toBe('laboratory');

@@ -24,11 +24,12 @@ describe('OperationalResultCard', () => {
     );
 
     const actions = screen.getByText(/next best actions/i).closest('.operational-result-card__section');
-    expect(within(actions).getByRole('link', { name: /review detailed output/i })).toHaveAttribute(
+    if (!actions) throw new Error('expected next best actions section to render');
+    expect(within(actions as HTMLElement).getByRole('link', { name: /review detailed output/i })).toHaveAttribute(
       'href',
       '/timeline'
     );
-    expect(within(actions).getByRole('link', { name: /open recommended next actions/i })).toHaveAttribute(
+    expect(within(actions as HTMLElement).getByRole('link', { name: /open recommended next actions/i })).toHaveAttribute(
       'href',
       '/recommendations'
     );

@@ -18,7 +18,7 @@ let mockProfessional;
 let mockPreferences;
 
 vi.mock('../contexts/UserContext', async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual = (await importOriginal()) as object;
   return {
     ...actual,
     useUser: () =>
@@ -52,7 +52,7 @@ vi.mock('../contexts/UserIdentityContext', () => ({
 function renderProfileSettings() {
   return render(
     <MemoryRouter>
-      <ProfileSettings />
+      <ProfileSettings authToken={mockAuthToken} />
     </MemoryRouter>
   );
 }

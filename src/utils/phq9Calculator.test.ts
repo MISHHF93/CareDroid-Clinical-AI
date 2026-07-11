@@ -67,6 +67,7 @@ describe('phq9Calculator — question 9 safety', () => {
 
   it('returns critical severity and safety alert when question 9 is non-zero', () => {
     const interp = interpretPhq9Score(2, 1);
+    if (!interp) throw new Error('expected interpretPhq9Score to return a result');
     expect(interp.question9Elevated).toBe(true);
     expect(interp.severity).toBe('critical');
     expect(interp.question9SafetyAlert.elevated).toBe(true);
@@ -77,6 +78,7 @@ describe('phq9Calculator — question 9 safety', () => {
 
   it('does not flag question 9 safety when score is zero', () => {
     const interp = interpretPhq9Score(18, 0);
+    if (!interp) throw new Error('expected interpretPhq9Score to return a result');
     expect(interp.question9Elevated).toBe(false);
     expect(interp.question9SafetyAlert.elevated).toBe(false);
   });
@@ -86,12 +88,14 @@ describe('phq9Calculator — interpretation guardrails', () => {
   it('requires all nine responses', () => {
     const out = computePhq9Result({ q1: 0 });
     expect(out.ok).toBe(false);
+    if (out.ok) throw new Error('expected computePhq9Result to fail');
     expect(out.errors.length).toBeGreaterThan(0);
   });
 
   it('avoids depression diagnosis and medication language', () => {
     const out = computePhq9Result(allThrees());
     expect(out.ok).toBe(true);
+    if (!out.ok) throw new Error('expected computePhq9Result to succeed');
     expect(out.totalScore).toBe(27);
     expect(out.severityCategory).toBe('severe');
     const combined = `${out.screeningDiscussion} ${out.screeningDisclaimer} ${out.pathwayDisclaimer} ${out.clinicianReviewDisclaimer}`.toLowerCase();

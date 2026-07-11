@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import type { CareDroidAIResponse } from '../../lib/ai/careDroidAI';
 import { AIRecommendationCard } from './AIRecommendationCard';
 
-const response: CareDroidAIResponse = {
+const response = {
   intent: 'triage_recommendation',
   status: 'success',
   data: {
@@ -17,7 +17,7 @@ const response: CareDroidAIResponse = {
   nextActions: ['Confirm vitals.', 'Document clinician override if changed.'],
   requiresClinicianReview: true,
   generatedAt: '2026-06-27T12:00:00.000Z',
-};
+} as unknown as CareDroidAIResponse;
 
 describe('AIRecommendationCard', () => {
   it('renders explainable recommendation details and review controls', () => {

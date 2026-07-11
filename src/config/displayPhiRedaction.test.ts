@@ -15,7 +15,7 @@ import {
   resolveReadOnlyWhiteboardPrivacyLabel,
 } from './wallDisplayMonitorPrivacyModel';
 
-const patient: Patient = {
+const patient = {
   id: 'patient-1',
   mrn: 'MRN-SECRET',
   firstName: 'Avery',
@@ -28,7 +28,7 @@ const patient: Patient = {
   flags: [],
   notes: [{ id: 'n1', text: 'Patient anxious in waiting room', timestamp: '2026-06-20T10:05:00.000Z' }],
   timeline: [],
-};
+} as unknown as Patient;
 
 describe('displayPhiRedaction', () => {
   it('collects patient PHI tokens for display validation', () => {

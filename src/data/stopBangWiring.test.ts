@@ -39,12 +39,14 @@ describe('STOP-Bang calculator wiring (stop-bang)', () => {
     expect(reg.initialCalc).toBe(id);
 
     const nlu = clinicalIntentTools.find((t) => t.toolId === id);
+    if (!nlu) throw new Error('expected nlu tool entry to exist');
     expect(nlu).toBeTruthy();
     expect(nlu.path).toBe('/tools/calculators/stop-bang');
     expect(nlu.sidebarToolId).toBe(id);
     expect(nlu.backendExecutable).toBe(false);
 
     const builtin = builtinUiCalculators.find((c) => c.id === id);
+    if (!builtin) throw new Error('expected builtin calculator entry to exist');
     expect(builtin).toBeTruthy();
     expect(builtin.path).toBe('/tools/calculators/stop-bang');
     expect(BUILTIN_CALC_ID_TO_REGISTRY_ID[id]).toBe(id);

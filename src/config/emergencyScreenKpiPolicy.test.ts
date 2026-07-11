@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import type { CapacitySnapshot, Patient } from '../types/emergency';
 import { PatientFlag, PatientState } from '../types/emergency';
 import { CARE_DROID_SCREEN_MODES } from './careDroidScreenModes';
 import {
@@ -108,7 +109,7 @@ describe('emergencyScreenKpiPolicy', () => {
         arrivalTime: new Date(Date.now() - 45 * 60000).toISOString(),
         flags: [PatientFlag.HighRisk],
       },
-    ];
+    ] as unknown as Patient[];
     const values = buildTriageKpiValues({ patients, emsArrivals: [] });
     expect(values['triage-pending'].value).toBeGreaterThanOrEqual(1);
     expect(values['longest-untriaged-wait'].value).not.toBe('—');
@@ -128,7 +129,7 @@ describe('emergencyScreenKpiPolicy', () => {
         state: PatientState.Triage,
         arrivalTime: new Date().toISOString(),
       },
-    ];
+    ] as unknown as Patient[];
     const snapshot = buildScreenModeKpiSnapshot({
       screenMode: CARE_DROID_SCREEN_MODES.reception,
       patients,
@@ -150,8 +151,8 @@ describe('emergencyScreenKpiPolicy', () => {
         arrivalTime: '2026-06-20T08:00:00.000Z',
         triageTime: '2026-06-20T08:30:00.000Z',
       },
-    ];
-    const capacity = {
+    ] as unknown as Patient[];
+    const capacity: CapacitySnapshot = {
       score: 70,
       band: 'Yellow',
       updatedAt: '2026-06-20T10:00:00.000Z',

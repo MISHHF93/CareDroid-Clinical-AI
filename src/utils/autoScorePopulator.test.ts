@@ -36,6 +36,7 @@ describe('AutoScorePopulator', () => {
       ],
     });
 
+    if (!result) throw new Error('expected getAutoScorePrefill to return a HEART prefill');
     expect(result.calculatorId).toBe('heart');
     expect(result.values).toMatchObject({
       age: 1,
@@ -55,6 +56,7 @@ describe('AutoScorePopulator', () => {
       })
     );
 
+    if (!result) throw new Error('expected getAutoScorePrefill to return a qSOFA prefill');
     expect(result.calculatorId).toBe('qsofa');
     expect(result.values).toMatchObject({
       rr22: 1,
@@ -72,6 +74,7 @@ describe('AutoScorePopulator', () => {
       })
     );
 
+    if (!result) throw new Error('expected getAutoScorePrefill to return a NIHSS prefill');
     expect(result.calculatorId).toBe('nihss');
     expect(result.values).toMatchObject({
       motorLeft: 1,

@@ -80,7 +80,7 @@ describe('alertLifecycleOrchestrator', () => {
       title: 'Stroke alert',
       message: 'Facial droop and slurred speech',
       source: 'alert-engine',
-    });
+    } as any);
 
     expect(alert.lifecycleStatus).toBe('open');
     expect(alert.ownerRole).toBeTruthy();
@@ -94,7 +94,7 @@ describe('alertLifecycleOrchestrator', () => {
       title: 'Queue breach',
       message: 'Triage queue threshold breached',
       source: 'queue-intelligence',
-    });
+    } as any);
 
     expect(ingestPreparedAlert).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -131,7 +131,7 @@ describe('alertLifecycleOrchestrator', () => {
         title: 'Open',
         message: 'Open alert',
         source: 'test',
-      }),
+      } as any),
       prepareUnifiedAlert({
         id: 'a2',
         severity: 'Info',
@@ -139,7 +139,7 @@ describe('alertLifecycleOrchestrator', () => {
         message: 'Dismissed alert',
         source: 'test',
         dismissed: true,
-      }),
+      } as any),
     ];
 
     expect(getActiveAlerts(alerts)).toHaveLength(1);
@@ -157,10 +157,10 @@ describe('alertLifecycleOrchestrator', () => {
             title: 'Lab critical',
             message: 'Review critical lab',
             source: 'clinical-alerts-api',
-          }),
+          } as any),
         ],
         ingestPreparedAlert,
-      }) as ReturnType<typeof useEmergencyStore.getState>;
+      }) as unknown as ReturnType<typeof useEmergencyStore.getState>;
 
     await transitionAlertLifecycle('alert-ack', 'acknowledge', {
       actorId: 'nurse-1',

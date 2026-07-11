@@ -19,7 +19,9 @@ describe('EmsPreArrivalPipelineService', () => {
       'ED Notification',
       'Arrival',
     ]);
-    expect(EmsPreArrivalPipelineService.getWorkflow().at(-1).id).toBe('arrival');
+    const lastWorkflowStep = EmsPreArrivalPipelineService.getWorkflow().at(-1);
+    if (!lastWorkflowStep) throw new Error('expected last workflow step to be defined');
+    expect(lastWorkflowStep.id).toBe('arrival');
   });
 
   it('sorts incoming patients by risk and ETA with structured handoff context', () => {

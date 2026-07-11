@@ -55,21 +55,27 @@ describe('EdAutomationMarketplace', () => {
         ]),
       })
     );
-    expect(categories.find((category) => category.category === 'EMS').modules).toEqual(
+    const emsCategory = categories.find((category) => category.category === 'EMS');
+    if (!emsCategory) throw new Error('expected EMS category to exist');
+    expect(emsCategory.modules).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           title: 'Virtual ED',
         }),
       ])
     );
-    expect(categories.find((category) => category.category === 'Simulation').modules).toEqual(
+    const simulationCategory = categories.find((category) => category.category === 'Simulation');
+    if (!simulationCategory) throw new Error('expected Simulation category to exist');
+    expect(simulationCategory.modules).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           title: 'Simulation Academy',
         }),
       ])
     );
-    expect(categories.find((category) => category.category === 'Analytics').moduleCount).toBeGreaterThan(0);
+    const analyticsCategory = categories.find((category) => category.category === 'Analytics');
+    if (!analyticsCategory) throw new Error('expected Analytics category to exist');
+    expect(analyticsCategory.moduleCount).toBeGreaterThan(0);
   });
 
   it('returns a marketplace dashboard summary', () => {

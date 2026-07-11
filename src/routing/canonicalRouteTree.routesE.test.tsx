@@ -2,7 +2,7 @@ import './canonicalRouteTree.testShared.tsx';
 import { cleanup, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 import { useEmergencyStore } from '../store/emergencyStore';
-import { findRouteHeading, renderRoute, ROUTE_LOAD_TIMEOUT } from './canonicalRouteTree.testShared.tsx';
+import { findRouteHeading, renderRoute, ROUTE_LOAD_TIMEOUT } from './canonicalRouteTree.testShared';
 
 const originalEmergencyState = useEmergencyStore.getState();
 

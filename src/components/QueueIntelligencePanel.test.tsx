@@ -3,23 +3,31 @@ import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import QueueIntelligencePanel from './QueueIntelligencePanel';
 import { selectQueueBottleneckAlert, useEmergencyStore } from '../../store/emergencyStore';
+import type { QueueSummary, QueueType } from '../../types/emergency';
 
 import './QueueIntelligencePanel.css';
 
 const originalState = useEmergencyStore.getState();
 
-function queue(type, count, averageWaitMinutes, longestWaitMinutes) {
+function queue(
+  type: QueueType,
+  count: number,
+  averageWaitMinutes: number,
+  longestWaitMinutes: number,
+): QueueSummary {
   return {
     id: `queue-${type.toLowerCase()}`,
     type,
     name: type,
+    label: type,
+    count,
     patientIds: Array.from({ length: count }, (_, index) => `${type}-${index}`),
     targetWaitMinutes: 30,
     averageWaitMinutes,
     longestWaitMinutes,
     criticalCount: 0,
     updatedAt: '2026-06-11T06:00:00.000Z',
-  };
+  } as unknown as QueueSummary;
 }
 
 afterEach(() => {
@@ -34,7 +42,6 @@ describe('QueueIntelligencePanel', () => {
     act(() => {
       useEmergencyStore.setState({
         activeQueueFilter: null,
-        bottleneckAlert: null,
         queues: [
           queue('Waiting', 3, 45, 55),
           queue('Triage', 0, 0, 0),

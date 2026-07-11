@@ -4,7 +4,7 @@
  */
 export function parseToolExecutionResponse(json) {
   if (!json || typeof json !== 'object') {
-    return { ok: false, data: null, errors: ['Empty response'] };
+    return { ok: false as const, data: null, errors: ['Empty response'] };
   }
 
   if (json.result && typeof json.result === 'object') {
@@ -41,5 +41,5 @@ export function parseToolExecutionResponse(json) {
     };
   }
 
-  return { ok: false, data: null, errors: ['Unexpected tool response shape'] };
+  return { ok: false as const, data: null, errors: ['Unexpected tool response shape'] };
 }

@@ -329,7 +329,7 @@ export function interpretAscvdTenYearRisk(tenYearRiskPct, opts: any = {}) {
  */
 export function computeAscvdPceResult(raw) {
   const v = validateAscvdPceInputs(raw);
-  if (!v.valid) return { ok: false, errors: v.errors };
+  if (!v.valid) return { ok: false as const, errors: v.errors };
 
   const pce = computeAscvdPceTenYearRisk(v.inputs);
   const interp = interpretAscvdTenYearRisk(pce.tenYearRiskPct, {
@@ -337,7 +337,7 @@ export function computeAscvdPceResult(raw) {
   });
 
   return {
-    ok: true,
+    ok: true as const,
     inputs: v.inputs,
     tenYearRiskPct: pce.tenYearRiskPct,
     modelKey: pce.modelKey,

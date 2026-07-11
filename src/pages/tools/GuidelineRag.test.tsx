@@ -33,7 +33,7 @@ function renderPage() {
 describe('GuidelineRag', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    queryGuidelineEvidence.mockResolvedValue({
+    vi.mocked(queryGuidelineEvidence).mockResolvedValue({
       ok: true,
       data: {
         runId: 'rag-run-1',

@@ -168,6 +168,7 @@ describe('news2Calculator', () => {
     const base = NEWS2_SCALE2_SPO2_EDGE;
     const roomAir = computeNews2Breakdown({ ...base, spo2Scale: '2', supplementalOxygen: false });
     const onO2 = computeNews2Breakdown({ ...base, spo2Scale: '2', supplementalOxygen: true });
+    if (roomAir.spo2 == null) throw new Error('expected roomAir.spo2 to be defined');
     expect(onO2.spo2).toBeGreaterThan(roomAir.spo2);
   });
 

@@ -13,7 +13,7 @@ describe('preArrivalActivationRules', () => {
       framework: 'mist' as const,
       mist: {
         mechanism: 'Car accident',
-        injury: 'Multiple trauma',
+        injuries: 'Multiple trauma',
         signs: 'Tachycardic, low BP',
         treatments: 'IV fluids',
       },
@@ -29,7 +29,7 @@ describe('preArrivalActivationRules', () => {
       framework: 'mist' as const,
       mist: {
         mechanism: 'Walk-in referral',
-        injury: 'Ankle sprain',
+        injuries: 'Ankle sprain',
         signs: 'Stable vitals',
         treatments: 'Ice pack',
       },
@@ -50,15 +50,17 @@ describe('preArrivalActivationRules', () => {
       severity: 'Critical',
       dispatchTime: '2026-06-24T10:00:00.000Z',
       estimatedArrivalTime: '2026-06-24T10:08:00.000Z',
+      notes: '',
       status: 'Inbound',
+      prearrivalComplaint: 'Major trauma',
       priority: Priority.P1,
       mechanismOfInjury: 'Motor vehicle collision',
       preArrivalNotification: {
         framework: 'mist',
-        source: 'ems',
+        source: 'ems-crew',
         mist: {
           mechanism: 'Motor vehicle collision',
-          injury: 'Chest trauma',
+          injuries: 'Chest trauma',
           signs: 'Tachycardic, hypotensive',
           treatments: 'C-collar, fluids',
         },

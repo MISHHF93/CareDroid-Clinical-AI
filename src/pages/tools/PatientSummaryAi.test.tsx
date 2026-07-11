@@ -33,7 +33,7 @@ function renderPage() {
 describe('PatientSummaryAi', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    generatePatientSummaryAi.mockResolvedValue({
+    vi.mocked(generatePatientSummaryAi).mockResolvedValue({
       ok: true,
       data: {
         runId: 'summary-run-1',

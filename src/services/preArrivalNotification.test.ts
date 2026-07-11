@@ -14,7 +14,7 @@ const arrival = {
   patientSex: 'Male' as const,
   chiefComplaint: 'Chest pain',
   mechanismOfInjury: 'Rest pain',
-  vitals: { hr: 110, sbp: 140, dbp: 90, spo2: 96 },
+  vitals: { hr: 110, sbp: 140, dbp: 90, spo2: 96, recordedAt: new Date().toISOString() },
   eta: 6,
   severity: 'High' as const,
   dispatchTime: new Date().toISOString(),

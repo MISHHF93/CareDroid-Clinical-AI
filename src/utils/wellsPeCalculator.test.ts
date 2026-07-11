@@ -31,6 +31,7 @@ describe('wellsPeCalculator', () => {
 
   it('includes diagnostic safety disclaimer without rule-out language', () => {
     const low = interpretWellsPe(2);
+    if (!low) throw new Error('expected interpretWellsPe to return a result');
     expect(low.diagnosticDisclaimer).toMatch(/does not rule in or rule out/i);
     expect(low.interpretation).not.toMatch(/pe is excluded|rule out pe|definitely no pe/i);
   });

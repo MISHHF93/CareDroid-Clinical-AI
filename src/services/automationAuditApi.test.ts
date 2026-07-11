@@ -39,11 +39,11 @@ const backendEvent = {
 describe('automationAuditApi', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    apiFetch.mockResolvedValue({ ok: true, headers: new Headers() });
+    vi.mocked(apiFetch).mockResolvedValue({ ok: true, headers: new Headers() } as any);
   });
 
   it('fetches and maps backend automation audit entries', async () => {
-    parseApiResponse.mockResolvedValue({ data: [backendEvent] });
+    vi.mocked(parseApiResponse).mockResolvedValue({ data: [backendEvent] } as any);
 
     const result = await fetchAutomationAuditEntries({ tenantId: 'tenant-demo-hospital' });
 
@@ -59,7 +59,7 @@ describe('automationAuditApi', () => {
   });
 
   it('posts automation audit events using the backend payload contract', async () => {
-    parseApiResponse.mockResolvedValue({ data: backendEvent });
+    vi.mocked(parseApiResponse).mockResolvedValue({ data: backendEvent } as any);
 
     const result = await createAutomationAuditEvent({
       triggerFired: backendEvent.triggerFired,
@@ -84,6 +84,7 @@ describe('automationAuditApi', () => {
       })
     );
     expect(result.ok).toBe(true);
+    if (!result.data) throw new Error('expected createAutomationAuditEvent to return data');
     expect(result.data.id).toBe('audit-backend-1');
   });
 });

@@ -32,8 +32,10 @@ describe('next-wave Tier A calculators', () => {
   it('exposes catalog, route, and form smoke hooks without claiming backend executors', () => {
     for (const id of PR11_TOOL_IDS) {
       const builtin = builtinUiCalculators.find((calc) => calc.id === id);
+    if (!builtin) throw new Error('expected builtin calculator entry to exist');
       const registry = toolRegistry.find((tool) => tool.id === id);
       const nlu = clinicalIntentTools.find((tool) => tool.toolId === id);
+    if (!nlu) throw new Error('expected nlu tool entry to exist');
       const launch = resolveCatalogLaunch(id);
 
       expect(builtin?.path).toBe(`/tools/calculators/${id}`);

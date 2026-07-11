@@ -68,6 +68,7 @@ describe('graceAcsCalculator', () => {
   it('interpretation avoids treatment directives and diagnostic certainty', () => {
     const result = computeGraceAcsRisk(baseline);
     const interp = interpretGraceAcsRisk(result);
+    if (!interp) throw new Error('expected interpretGraceAcsRisk to return an interpretation');
     expect(interp.label).toMatch(/risk/i);
     expect(interp.safetyDisclaimer).toMatch(/does not confirm or exclude/i);
     expect(interp.pathwayDisclaimer).toMatch(/local acute coronary syndrome protocols/i);

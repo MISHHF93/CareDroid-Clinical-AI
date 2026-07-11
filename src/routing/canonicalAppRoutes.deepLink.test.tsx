@@ -3,7 +3,7 @@ import './canonicalRouteTree.testShared.tsx';
 import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 import { useEmergencyStore } from '../store/emergencyStore';
-import { AppRouteHarness, ROUTE_LOAD_TIMEOUT } from './canonicalRouteTree.testShared.tsx';
+import { AppRouteHarness, ROUTE_LOAD_TIMEOUT } from './canonicalRouteTree.testShared';
 
 const originalEmergencyState = useEmergencyStore.getState();
 

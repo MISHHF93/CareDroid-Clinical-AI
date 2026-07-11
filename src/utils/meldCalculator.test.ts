@@ -36,6 +36,7 @@ describe('meldCalculator', () => {
   it('increases MELD with worsening labs', () => {
     const low = calculateMeldScore({ bilirubinMgDl: 1, inr: 1, creatinineMgDl: 1, onDialysis: false });
     const high = calculateMeldScore({ bilirubinMgDl: 3, inr: 2, creatinineMgDl: 3, onDialysis: false });
+    if (low === null || high === null) throw new Error('expected calculateMeldScore to return a number');
     expect(high).toBeGreaterThan(low);
     expect(high).toBeLessThanOrEqual(40);
   });
@@ -83,6 +84,7 @@ describe('meldCalculator', () => {
       { includeMeldNa: true }
     );
     expect(r.ok).toBe(true);
+    if (!r.ok) throw new Error('expected computeMeldResult to succeed');
     expect(r.meld).toBeTypeOf('number');
     expect(r.meldNa).toBeTypeOf('number');
     expect(r.meldNa).toBeGreaterThanOrEqual(r.meld);
@@ -105,7 +107,10 @@ describe('meldCalculator', () => {
   });
 
   it('interpretMeldScores includes transplant disclaimer and no listing language', () => {
-    const i = interpretMeldScores(32, 34);
+    // Second param is inferred as `null | undefined` from its `= null` default in the
+    // implementation; cast the deliberately non-null test value to match.
+    const i = interpretMeldScores(32, 34 as any);
+    if (!i) throw new Error('expected interpretMeldScores to return a result');
     expect(i.transplantDisclaimer).toMatch(/does not recommend transplant/i);
     expect(i.interpretation).not.toMatch(/list for transplant/i);
   });
@@ -206,6 +211,7 @@ describe('meldCalculator', () => {
     expect(lowCrNoDialysis.ok).toBe(true);
     expect(lowCrDialysis.ok).toBe(true);
     expect(crFour.ok).toBe(true);
+    if (!lowCrDialysis.ok || !crFour.ok) throw new Error('expected computeMeldResult calls to succeed');
     expect(lowCrDialysis.meld).toBe(crFour.meld);
     expect(lowCrDialysis.clamped?.creatinineMgDl).toBe(4);
   });
@@ -224,6 +230,7 @@ describe('meldCalculator', () => {
       { includeMeldNa: true }
     );
     expect(out.ok).toBe(true);
+    if (!out.ok) throw new Error('expected computeMeldResult to succeed');
     expect(out.meldNa).toBeGreaterThan(out.meld);
     expect(out.sodiumUsed).toBe(125);
   });
@@ -239,7 +246,8 @@ describe('meldCalculator', () => {
     });
     expect(out.ok).toBe(false);
     expect(Array.isArray(out.errors)).toBe(true);
-    expect(out.meld).toBeUndefined();
+    // Deliberately checking that the failure branch carries no `meld` field.
+    expect((out as { meld?: number }).meld).toBeUndefined();
   });
 
   it('clamps MELD score to the 6–40 range for extreme laboratory values', () => {

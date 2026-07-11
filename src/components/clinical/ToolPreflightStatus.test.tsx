@@ -35,7 +35,7 @@ vi.mock('../../services/clinicalToolsApi', () => ({
 describe('ToolPreflightStatus', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    fetchClinicalToolMetadata.mockResolvedValue({
+    vi.mocked(fetchClinicalToolMetadata).mockResolvedValue({
       ok: true,
       data: {
         id: 'drug-interactions',
@@ -43,16 +43,17 @@ describe('ToolPreflightStatus', () => {
         parameters: [{ name: 'medications', required: true, description: 'Medication list' }],
       },
     });
-    fetchToolStatistics.mockResolvedValue({
+    vi.mocked(fetchToolStatistics).mockResolvedValue({
       ok: true,
       data: {
         totalTools: 3,
         tools: [{ id: 'drug-interactions', name: 'Drug Interactions', category: 'diagnostic' }],
       },
     });
-    validateClinicalTool.mockResolvedValue({
+    vi.mocked(validateClinicalTool).mockResolvedValue({
       ok: true,
       data: { valid: true, errors: [], warnings: [], resolvedToolId: 'drug-interactions' },
+      error: null,
     });
   });
 
@@ -100,6 +101,7 @@ describe('ToolPreflightStatus', () => {
         toolId="unsupported-tool"
         parameters={{}}
         requiredInputs={[{ label: 'Some input', present: false }]}
+        onReadyChange={vi.fn()}
       />
     );
 

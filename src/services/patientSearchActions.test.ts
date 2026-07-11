@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { PatientState } from '../types/emergency';
+import { PatientState, type Patient } from '../types/emergency';
 import {
   buildFindPatientPath,
   buildReceptionSearchFilterPath,
@@ -51,7 +51,7 @@ describe('patientSearchActions', () => {
   });
 
   it('runs full intake handoff when creating encounter from search', () => {
-    expect(getPatientEncounterId(patient)).toBe('encounter-patient-1');
+    expect(getPatientEncounterId(patient as unknown as Patient)).toBe('encounter-patient-1');
 
     const store = {
       patients: [patient],

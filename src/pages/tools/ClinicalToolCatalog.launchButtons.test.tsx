@@ -82,8 +82,9 @@ describe('ClinicalToolCatalog — launch buttons', () => {
     });
     const medicalSection = medicalHeading.closest('.catalog-section--medical');
     expect(medicalSection).toBeTruthy();
+    if (!medicalSection) throw new Error('expected medical section to be found');
 
-    const scoped = within(medicalSection);
+    const scoped = within(medicalSection as HTMLElement);
     expect(scoped.getAllByRole('button', { name: /^open$/i }).length).toBeGreaterThan(0);
     expect(
       scoped.getAllByRole('button', { name: /^(launch|start guided chat)$/i }).length
@@ -100,8 +101,9 @@ describe('ClinicalToolCatalog — launch buttons', () => {
       name: /medical tools & calculators/i,
     });
     const medicalSection = medicalHeading.closest('.catalog-section--medical');
+    if (!medicalSection) throw new Error('expected medical section to be found');
     expect(
-      within(medicalSection).getAllByRole('button', { name: /start guided chat/i }).length
+      within(medicalSection as HTMLElement).getAllByRole('button', { name: /start guided chat/i }).length
     ).toBeGreaterThan(0);
   }, 20000);
 });

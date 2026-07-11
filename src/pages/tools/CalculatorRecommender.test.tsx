@@ -33,8 +33,9 @@ function renderPage() {
 describe('CalculatorRecommender', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    sendClinicalChatMessage.mockResolvedValue({
+    vi.mocked(sendClinicalChatMessage).mockResolvedValue({
       ok: true,
+      status: 200,
       data: {
         response: 'Recommended calculators',
         toolResult: {

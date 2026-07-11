@@ -11,8 +11,8 @@ vi.mock('./apiClient', () => ({
 describe('enterpriseIdentityApi', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    apiFetch.mockResolvedValue({ ok: true });
-    parseApiResponse.mockResolvedValue({ providers: [] });
+    vi.mocked(apiFetch).mockResolvedValue({ ok: true } as any);
+    vi.mocked(parseApiResponse).mockResolvedValue({ providers: [] });
   });
 
   it('fetches the identity provider registry', async () => {

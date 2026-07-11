@@ -29,10 +29,10 @@ describe('clinicalToolsApi', () => {
   });
 
   it('returns tools on success', async () => {
-    apiFetch.mockResolvedValueOnce({
+    vi.mocked(apiFetch).mockResolvedValueOnce({
       ok: true,
       _json: { tools: [{ id: 'sofa-calculator' }], count: 1, tier: 'pro' },
-    });
+    } as any);
 
     const result = await fetchBackendClinicalTools();
     expect(result.ok).toBe(true);
@@ -46,7 +46,7 @@ describe('clinicalToolsApi', () => {
     const pendingResponse = new Promise((resolve) => {
       resolveFetch = resolve;
     });
-    apiFetch.mockReturnValueOnce(pendingResponse);
+    vi.mocked(apiFetch).mockReturnValueOnce(pendingResponse as any);
 
     const first = fetchBackendClinicalTools();
     const second = fetchBackendClinicalTools();
@@ -67,11 +67,11 @@ describe('clinicalToolsApi', () => {
   });
 
   it('returns empty tools and error message on HTTP failure', async () => {
-    apiFetch.mockResolvedValueOnce({
+    vi.mocked(apiFetch).mockResolvedValueOnce({
       ok: false,
       status: 503,
       _json: { message: 'Service unavailable' },
-    });
+    } as any);
 
     const result = await fetchBackendClinicalTools();
     expect(result.ok).toBe(false);
@@ -80,7 +80,7 @@ describe('clinicalToolsApi', () => {
   });
 
   it('returns network error without throwing (catalog can render static rows)', async () => {
-    apiFetch.mockRejectedValueOnce(new Error('Failed to fetch'));
+    vi.mocked(apiFetch).mockRejectedValueOnce(new Error('Failed to fetch'));
 
     const result = await fetchBackendClinicalTools();
     expect(result.ok).toBe(false);
@@ -98,10 +98,10 @@ describe('clinicalToolsApi', () => {
   });
 
   it('fetches tool metadata with an encoded id', async () => {
-    apiFetch.mockResolvedValueOnce({
+    vi.mocked(apiFetch).mockResolvedValueOnce({
       ok: true,
       _json: { id: 'sofa-calculator', parameters: [] },
-    });
+    } as any);
 
     const result = await fetchClinicalToolMetadata('sofa-calculator');
     expect(result.ok).toBe(true);
@@ -110,10 +110,10 @@ describe('clinicalToolsApi', () => {
   });
 
   it('validates tool parameters without executing', async () => {
-    apiFetch.mockResolvedValueOnce({
+    vi.mocked(apiFetch).mockResolvedValueOnce({
       ok: true,
       _json: { valid: true, errors: [], warnings: [] },
-    });
+    } as any);
 
     const result = await validateClinicalTool('lab-interpreter', { labValues: [] });
     expect(result.ok).toBe(true);
@@ -125,9 +125,9 @@ describe('clinicalToolsApi', () => {
   });
 
   it('fetches executor catalog and tool statistics through guarded clients', async () => {
-    apiFetch
-      .mockResolvedValueOnce({ ok: true, _json: { registeredExecutorToolIds: ['sofa-calculator'] } })
-      .mockResolvedValueOnce({ ok: true, _json: { totalTools: 3 } });
+    vi.mocked(apiFetch)
+      .mockResolvedValueOnce({ ok: true, _json: { registeredExecutorToolIds: ['sofa-calculator'] } } as any)
+      .mockResolvedValueOnce({ ok: true, _json: { totalTools: 3 } } as any);
 
     await expect(fetchToolExecutorCatalog()).resolves.toMatchObject({
       ok: true,

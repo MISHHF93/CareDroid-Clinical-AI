@@ -1,8 +1,8 @@
-import './canonicalRouteTree.testShared.tsx';
+import './canonicalRouteTree.testShared';
 import { cleanup, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 import { useEmergencyStore } from '../store/emergencyStore';
-import { renderRoute } from './canonicalRouteTree.testShared.tsx';
+import { renderRoute } from './canonicalRouteTree.testShared';
 
 const originalEmergencyState = useEmergencyStore.getState();
 

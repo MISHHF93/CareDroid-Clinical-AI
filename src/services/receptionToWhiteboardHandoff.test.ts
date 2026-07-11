@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { PatientState, Priority, type Patient } from '../types/emergency';
 import { registerNewArrival } from './arrivalControlLayer';
 import { readIntakeEncounterChain } from './intakeEncounterChain';
-import { completeReceptionHandoff } from './receptionHandoff';
+import { completeReceptionHandoff, type IntakeHandoffStore } from './receptionHandoff';
 import { buildReceptionQuickIntakePatient } from './receptionQuickIntakeService';
 import { buildSelfCheckinPatient, createEmptySelfCheckinForm } from './selfCheckinService';
 import { completeSelfCheckinWhiteboardHandoff } from './selfCheckinWhiteboardHandoff';
@@ -67,7 +67,7 @@ describe('reception to whiteboard handoff chain', () => {
 
     registerNewArrival(store, patient.id, { source: 'reception-quick-intake' });
 
-    const handoff = completeReceptionHandoff(store, {
+    const handoff = completeReceptionHandoff(store as unknown as IntakeHandoffStore, {
       patientId: patient.id,
       source: 'reception-quick-intake',
       actorName: 'Registration Clerk',

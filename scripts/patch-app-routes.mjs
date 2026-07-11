@@ -32,7 +32,7 @@ const unusedImports = [
   "import PatientCard from './components/PatientCard';\n",
   "import { PatientFlag, PatientState } from './types/emergency';\n",
   "import { EMERGENCY_OS_BRANDING } from './config/emergencyOsBranding.config';\n",
-  /import \{\n  useBoardingStatus,\n  useCapacityStatus,\n  useEDCopilot,\n  useEmergencyPatients,\n  useEmergencyQueues,\n  useUpgradeHarnessAuditSummary,\n  useUpgradeHarnessCapacity,\n  useUpgradeHarnessClinicalIntelligence,\n  usePatientJourney,\n  useReassessmentQueue,\n\} from '\.\/hooks\/useEmergencyOs';\n/,
+  /import \{\n {2}useBoardingStatus,\n {2}useCapacityStatus,\n {2}useEDCopilot,\n {2}useEmergencyPatients,\n {2}useEmergencyQueues,\n {2}useUpgradeHarnessAuditSummary,\n {2}useUpgradeHarnessCapacity,\n {2}useUpgradeHarnessClinicalIntelligence,\n {2}usePatientJourney,\n {2}useReassessmentQueue,\n\} from '\.\/hooks\/useEmergencyOs';\n/,
   "import { useEmergencyStore } from './store/emergencyStore';\n",
 ];
 

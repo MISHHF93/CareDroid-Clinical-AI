@@ -100,7 +100,7 @@ describe('PediatricDrugCalculator dosing', () => {
 
   it('saves pediatric drug reference notes to the linked patient', async () => {
     const user = userEvent.setup();
-    useEmergencyStore.setState({ ...originalState, patients: [pediatricPatient] }, true);
+    useEmergencyStore.setState({ ...originalState, patients: [pediatricPatient] as any }, true);
 
     render(<PediatricDrugCalculator open patient={pediatricPatient} onClose={() => {}} />);
 

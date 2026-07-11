@@ -56,7 +56,7 @@ describe('buildCopilotPatientArtifactContext', () => {
       timeline: [],
     };
 
-    const context = buildCopilotPatientArtifactContext(patient, null);
+    const context = buildCopilotPatientArtifactContext(patient, null) as any;
     expect(context?.nativeAi?.routing?.specialists).toContain('cardiac_vascular');
     expect(context?.nativeAi?.specialistInferences?.length).toBeGreaterThan(0);
     expect(context?.nativeAi?.admissionMl).toBeTruthy();

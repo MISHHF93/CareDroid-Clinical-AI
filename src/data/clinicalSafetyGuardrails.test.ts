@@ -85,7 +85,7 @@ describe('clinicalSafetyGuardrails — anticoagulation', () => {
   it('HAS-BLED chat seed avoids therapy start/stop directives', () => {
     const seed = clinicalIntentTools.find((t) => t.toolId === 'has-bled')?.chatSeed || '';
     expect(seed).not.toMatch(SAFETY_AUDIT_PATTERNS.ANTICOAG_THERAPY_FORBIDDEN_RE);
-    expect(seed).toMatch(SAFETY_AUDIT_PATTERNS.ANTICOAG_GUARDRAIL_RE);
+    expect(seed).toMatch((SAFETY_AUDIT_PATTERNS as Record<string, RegExp>).ANTICOAG_GUARDRAIL_RE);
   });
 
   it('Calculators.jsx CHA2DS2-VASc avoids anticoagulation mandate language', () => {

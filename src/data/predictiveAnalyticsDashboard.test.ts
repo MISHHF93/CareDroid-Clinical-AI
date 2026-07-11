@@ -19,7 +19,7 @@ describe('predictiveAnalyticsDashboard', () => {
       'fleet-maintenance-risk',
     ]);
     expect(DEMO_PREDICTIVE_ANALYTICS_MODELS.map((model) => model.id)).toEqual(
-      expect.arrayContaining(PREDICTIVE_ANALYTICS_MODEL_TYPES)
+      expect.arrayContaining([...PREDICTIVE_ANALYTICS_MODEL_TYPES])
     );
   });
 

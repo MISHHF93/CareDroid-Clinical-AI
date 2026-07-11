@@ -19,7 +19,7 @@ describe('AutomationEngine', () => {
     });
 
     expect(result.ok).toBe(true);
-    expect(result.outputs).toEqual(expect.arrayContaining(['risk profile', 'calculator recommendations']));
+    expect((result as any).outputs).toEqual(expect.arrayContaining(['risk profile', 'calculator recommendations']));
     expect(result.patientJourneyStates).toEqual(
       expect.arrayContaining(['arrival', 'registration', 'triage', 'waiting', 'assessment'])
     );

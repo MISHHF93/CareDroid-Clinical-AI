@@ -45,7 +45,7 @@ describe('NewPatientIntake quick flow', () => {
   it('shows a live P2 reason for chest pain with HR over 120 before submit', async () => {
     const user = userEvent.setup();
 
-    render(<NewPatientIntake open onClose={() => {}} />);
+    render(<NewPatientIntake open onClose={() => {}} onPatientAdded={() => {}} />);
 
     await user.click(screen.getByRole('button', { name: /chest pain/i }));
     await user.type(screen.getByLabelText(/free-text complaint/i), 'Chest pressure');
@@ -123,7 +123,7 @@ describe('NewPatientIntake quick flow', () => {
     const user = userEvent.setup();
     const beforeCount = useEmergencyStore.getState().patients.length;
 
-    render(<NewPatientIntake open onClose={() => {}} />);
+    render(<NewPatientIntake open onClose={() => {}} onPatientAdded={() => {}} />);
 
     await user.click(screen.getByRole('button', { name: /chest pain/i }));
     await user.type(screen.getByLabelText(/free-text complaint/i), 'Chest pressure');
@@ -161,7 +161,7 @@ describe('NewPatientIntake quick flow', () => {
     const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
     const onClose = vi.fn();
 
-    render(<NewPatientIntake open onClose={onClose} />);
+    render(<NewPatientIntake open onClose={onClose} onPatientAdded={() => {}} />);
 
     await waitFor(() => {
       expect(screen.getByLabelText(/free-text complaint/i)).toHaveFocus();

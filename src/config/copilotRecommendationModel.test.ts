@@ -80,6 +80,7 @@ describe('copilotRecommendationModel', () => {
     });
 
     expect(resolved.handled).toBe(true);
+    if (!resolved.handled) throw new Error('expected quick action to be handled');
     expect(resolved.response).toContain('[queue]');
     expect(isGenericCopilotText(resolved.response)).toBe(false);
   });

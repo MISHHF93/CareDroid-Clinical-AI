@@ -111,14 +111,14 @@ const customerSuccess = {
 describe('OrganizationIntelligenceProfile', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    PlatformAssetsApi.getOrganizationAnalytics.mockResolvedValue(analytics);
-    PlatformAssetsApi.getCustomerSuccessDashboard.mockResolvedValue(customerSuccess);
-    PlatformAssetsApi.getTenantAdministration.mockResolvedValue({
+    vi.mocked(PlatformAssetsApi.getOrganizationAnalytics).mockResolvedValue(analytics);
+    vi.mocked(PlatformAssetsApi.getCustomerSuccessDashboard).mockResolvedValue(customerSuccess);
+    vi.mocked(PlatformAssetsApi.getTenantAdministration).mockResolvedValue({
       profile: { id: 'org-1', name: 'Demo Hospital', organizationType: 'hospital' },
       departments: ['emergency', 'icu'],
       workspaces: [{ id: 'education', name: 'Education', enabledToolIds: [] }],
     });
-    PlatformAssetsApi.listMarketplacePacks.mockResolvedValue([
+    vi.mocked(PlatformAssetsApi.listMarketplacePacks).mockResolvedValue([
       { id: 'core-platform', name: 'Core Platform', assetIds: ['qsofa'] },
       {
         id: 'simulation-training-pack',

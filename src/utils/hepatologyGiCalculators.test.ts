@@ -56,6 +56,7 @@ describe('hepatology/GI calculator utilities', () => {
     });
 
     expect(result?.total).toBe(23);
+    if (!result) throw new Error('expected calculateGlasgowBlatchfordScore to return a result');
     expect(interpretGlasgowBlatchford(result.total)?.severity).toBe('critical');
     expect(interpretGlasgowBlatchford(0)?.label).toBe('GBS 0');
   });
@@ -69,6 +70,7 @@ describe('hepatology/GI calculator utilities', () => {
       stigmataPoints: 2,
     });
     expect(result?.total).toBe(11);
+    if (!result) throw new Error('expected calculateRockallScore to return a result');
     expect(interpretRockall(result.total)?.severity).toBe('critical');
     expect(interpretRockall(1)?.severity).toBe('normal');
   });

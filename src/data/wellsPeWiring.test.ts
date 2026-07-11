@@ -49,6 +49,7 @@ describe('Wells PE (Tier B chat-assisted) wiring', () => {
 
   it('registers NLU profile as hub-only (no dedicated form route)', () => {
     const nlu = clinicalIntentTools.find((t) => t.toolId === id);
+    if (!nlu) throw new Error('expected nlu tool entry to exist');
     expect(nlu?.path).toBe('/tools/calculators');
     expect(nlu?.sidebarToolId).toBe(id);
     expect(nlu?.backendExecutable).toBe(false);

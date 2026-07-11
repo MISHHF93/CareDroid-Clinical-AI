@@ -31,7 +31,7 @@ const chestPainPatient: Patient = {
   flags: [],
   notes: [],
   timeline: [],
-} as Patient;
+} as unknown as Patient;
 
 describe('patientJourneyAiDecisionService', () => {
   it('caches patient journey AI node bundles for unchanged patient context', async () => {

@@ -36,7 +36,9 @@ describe('platformInventory', () => {
 
   it('lists every registry id in a tier bucket', () => {
     const inv = getPlatformInventory();
-    const listed = Object.values(inv.registryByTier).flatMap((rows) => rows.map((r) => r.id));
+    const listed = (
+      Object.values(inv.registryByTier) as Array<Array<{ id: string; name: string; route: string | null }>>
+    ).flatMap((rows) => rows.map((r) => r.id));
     expect(listed.sort()).toEqual([...ALL_REGISTRY_TOOL_IDS].sort());
   });
 });

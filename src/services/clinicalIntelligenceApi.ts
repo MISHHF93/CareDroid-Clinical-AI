@@ -49,17 +49,17 @@ export async function queryGuidelineEvidence(payload, options: any = {}) {
 
     if (!response.ok) {
       return {
-        ok: false,
+        ok: false as const,
         errorCode: data?.errorCode || `HTTP_${response.status}`,
         message: data?.message || getApiErrorMessage(null, response),
         raw: data,
       };
     }
 
-    return { ok: true, data };
+    return { ok: true as const, data };
   } catch (error: any) {
     return {
-      ok: false,
+      ok: false as const,
       errorCode: 'NETWORK_ERROR',
       message: getApiErrorMessage(error),
     };
@@ -77,17 +77,17 @@ export async function generateDifferentialAi(payload, options: any = {}) {
 
     if (!response.ok) {
       return {
-        ok: false,
+        ok: false as const,
         errorCode: data?.errorCode || `HTTP_${response.status}`,
         message: data?.message || getApiErrorMessage(null, response),
         raw: data,
       };
     }
 
-    return { ok: true, data };
+    return { ok: true as const, data };
   } catch (error: any) {
     return {
-      ok: false,
+      ok: false as const,
       errorCode: 'NETWORK_ERROR',
       message: getApiErrorMessage(error),
     };

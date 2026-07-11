@@ -134,7 +134,6 @@ describe('emergencyMultiRoleWorkflowValidation', () => {
 
     const triageQueued = buildPatient({
       state: PatientState.Triage,
-      encounterId: 'enc-001',
     });
     const triageQueues = selectReceptionQueues([triageQueued]);
     expect(triageQueues.counts.awaitingTriage).toBe(1);
@@ -154,7 +153,7 @@ describe('emergencyMultiRoleWorkflowValidation', () => {
       state: PatientState.Waiting,
       priority: Priority.P3,
       triageTime: '2026-06-20T09:50:00.000Z',
-      assignedProviderId: 'physician-1',
+      assignedStaffId: 'physician-1',
     });
     expect(matchesWhiteboardQueueFilter(waiting, WHITEBOARD_QUEUE_FILTER.waiting)).toBe(true);
     expect(resolvePatientExperienceStatus(waiting).id).toBe('waiting-for-clinician');

@@ -58,7 +58,7 @@ describe('intakeEncounter', () => {
       },
     };
 
-    const result = ensureEncounterAfterIntake(store, {
+    const result = ensureEncounterAfterIntake(store as any, {
       patientId: patient.id,
       source: 'quick-intake',
     });
@@ -95,7 +95,7 @@ describe('intakeEncounter', () => {
       recordWorkflowAction: () => ({ id: 'wf-2' }),
     };
 
-    const result = ensureEncounterAfterIntake(store, {
+    const result = ensureEncounterAfterIntake(store as any, {
       patientId: patient.id,
       source: 'smart-intake',
     });

@@ -33,7 +33,7 @@ function renderPage() {
 describe('ClinicalAudit', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    fetchClinicalAuditExecutionLogs.mockResolvedValue({
+    vi.mocked(fetchClinicalAuditExecutionLogs).mockResolvedValue({
       ok: true,
       data: {
         runId: 'audit-1',

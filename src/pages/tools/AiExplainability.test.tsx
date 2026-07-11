@@ -33,7 +33,7 @@ function renderPage() {
 describe('AiExplainability', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    fetchAiExplainabilityTrace.mockResolvedValue({
+    vi.mocked(fetchAiExplainabilityTrace).mockResolvedValue({
       ok: true,
       data: {
         runId: 'explain-1',

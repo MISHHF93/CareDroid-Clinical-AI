@@ -121,7 +121,8 @@ describe('PR8 calculator utilities', () => {
       onHypertensionTreatment: false,
       smoker: false,
     });
-    expect(framingham?.tenYearRiskPct).toBeGreaterThan(0);
+    if (!framingham) throw new Error('expected framingham to be defined');
+    expect(framingham.tenYearRiskPct).toBeGreaterThan(0);
     expect(interpretFraminghamRisk(framingham.tenYearRiskPct)?.referenceLine).toMatch(/coronary heart disease/i);
   });
 });

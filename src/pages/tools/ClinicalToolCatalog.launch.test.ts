@@ -11,6 +11,7 @@ describe('ClinicalToolCatalog chat launch wiring', () => {
     const handler = catalogSource.match(
       /const handleTryInChat = \(sidebarToolId, chatSeed[^)]*\) => \{([\s\S]*?)\n {2}\};/
     )?.[1];
+    if (!handler) throw new Error('expected handleTryInChat handler to be found in source');
 
     expect(handler).toContain('launchCatalogItem(sidebarToolId)');
     const sidebarBranch = handler.match(/if \(sidebarToolId\) \{([\s\S]*?)\n {4}\}/)?.[1];

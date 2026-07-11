@@ -31,6 +31,7 @@ describe('clinical tool routes — unified inventory', () => {
     for (const record of getCalculatorToolInventory().filter((tool) => tool.hasDedicatedForm)) {
       const def = calculatorDefsBySlug.get(record.calculatorSlug);
       expect(def, record.id).toBeTruthy();
+      if (!def) throw new Error(`expected calculator route def for ${record.id}`);
       expect(def.path, record.id).toBe(record.route);
       expect(matchCalculatorRoute(record.route)?.calculatorSlug, record.id).toBe(record.calculatorSlug);
     }

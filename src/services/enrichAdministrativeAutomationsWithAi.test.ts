@@ -19,7 +19,7 @@ describe('enrichAdministrativeAutomationsWithAi', () => {
       flags: [],
       notes: [],
       timeline: [],
-    } as Patient;
+    } as unknown as Patient;
 
     const base = buildAdministrativeAutomationSnapshot({
       patients: [patient],
@@ -39,7 +39,10 @@ describe('enrichAdministrativeAutomationsWithAi', () => {
     expect(routingTask).toBeTruthy();
     expect(routingTask?.summary).toContain('AI triage advisory');
     expect(routingTask?.proposedPayload.aiDecision).toBeTruthy();
-    expect(routingTask?.proposedPayload.aiDecision?.requiresClinicianReview).toBe(true);
+    expect(
+      (routingTask?.proposedPayload.aiDecision as { requiresClinicianReview?: boolean } | undefined)
+        ?.requiresClinicianReview,
+    ).toBe(true);
   });
 
   it('skips re-enrichment when backend already stamped aiDecision on tasks', async () => {
@@ -57,7 +60,7 @@ describe('enrichAdministrativeAutomationsWithAi', () => {
       flags: [],
       notes: [],
       timeline: [],
-    } as Patient;
+    } as unknown as Patient;
 
     const base = buildAdministrativeAutomationSnapshot({
       patients: [patient],

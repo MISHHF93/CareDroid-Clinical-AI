@@ -46,6 +46,7 @@ describe('PR4A NLU — chat seeds avoid diagnostic certainty and treatment direc
   it.each(PR4A_REGISTRY_IDS)('%s chat seed is decision-support scoped', (toolId) => {
     const nlu = clinicalIntentTools.find((t) => t.toolId === toolId);
     expect(nlu?.chatSeed).toBeTruthy();
+    if (!nlu) throw new Error(`expected clinicalIntentTools to contain ${toolId}`);
     expect(nlu.chatSeed).not.toMatch(CERTAINTY_PATTERN);
     expect(nlu.chatSeed).not.toMatch(TREATMENT_PATTERN);
     expect(`${nlu.description} ${nlu.chatSeed}`).toMatch(
@@ -57,6 +58,7 @@ describe('PR4A NLU — chat seeds avoid diagnostic certainty and treatment direc
 describe('PR4A UX & clinical safety — interpretation copy', () => {
   it('ASCVD interpretation avoids therapy mandates and diagnostic certainty', () => {
     const i = interpretAscvdTenYearRisk(12.5);
+    if (!i) throw new Error('expected interpretAscvdTenYearRisk to return an interpretation');
     expect(i.safetyDisclaimer).toMatch(/do not diagnose/i);
     expect(i.pathwayDisclaimer).toMatch(/does not recommend specific medications/i);
     expect(i.preventionDiscussion).not.toMatch(TREATMENT_PATTERN);
@@ -66,6 +68,8 @@ describe('PR4A UX & clinical safety — interpretation copy', () => {
   it('CKD staging interpretation avoids establishing chronicity or therapy', () => {
     const gfr = classifyGfrCategory(45);
     const alb = classifyAlbuminuria(120);
+    if (!gfr) throw new Error('expected classifyGfrCategory to classify 45');
+    if (!alb) throw new Error('expected classifyAlbuminuria to classify 120');
     const risk = combineCkdPrognosticRisk(gfr.category, alb.category);
     const i = interpretCkdStaging(45, gfr, alb, risk);
     expect(i.stagingDiscussion).toMatch(/≥3 months/i);
@@ -78,6 +82,7 @@ describe('PR4A UX & clinical safety — interpretation copy', () => {
 
   it('STOP-Bang interpretation avoids OSA diagnosis and treatment orders', () => {
     const i = interpretStopBangScore(6);
+    if (!i) throw new Error('expected interpretStopBangScore to return an interpretation');
     expect(i.screeningDisclaimer).toMatch(/Screening tool only/i);
     expect(i.safetyDisclaimer).toMatch(/does not diagnose OSA/i);
     expect(i.pathwayDisclaimer).toMatch(/does not recommend CPAP/i);
@@ -87,6 +92,7 @@ describe('PR4A UX & clinical safety — interpretation copy', () => {
 
   it('AUDIT-C interpretation avoids AUD diagnosis and withdrawal management', () => {
     const i = interpretAuditCScore(5);
+    if (!i) throw new Error('expected interpretAuditCScore to return an interpretation');
     expect(i.screeningDisclaimer).toMatch(/^Screening only\./i);
     expect(i.screeningDisclaimer).toMatch(/does not diagnose alcohol use disorder/i);
     expect(i.pathwayDisclaimer).toMatch(/does not recommend specific medications/i);
@@ -107,6 +113,7 @@ describe('PR4A UX & clinical safety — input validation', () => {
       systolicBpMmHg: 120,
     });
     expect(out.ok).toBe(false);
+    if (out.ok) throw new Error('expected computeAscvdPceResult to fail validation');
     expect(out.errors.join(' ')).toMatch(/40.*79/i);
   });
 
@@ -120,6 +127,7 @@ describe('PR4A UX & clinical safety — input validation', () => {
       acrUnit: 'mg_g',
     });
     expect(out.ok).toBe(false);
+    if (out.ok) throw new Error('expected computeCkdStagingResult to fail validation');
     expect(out.errors.length).toBeGreaterThan(0);
   });
 
@@ -130,6 +138,7 @@ describe('PR4A UX & clinical safety — input validation', () => {
       bingeFrequency: '',
     });
     expect(out.ok).toBe(false);
+    if (out.ok) throw new Error('expected computeAuditCResult to fail validation');
     expect(out.errors.length).toBeGreaterThanOrEqual(2);
   });
 
@@ -145,6 +154,7 @@ describe('PR4A UX & clinical safety — input validation', () => {
       maleSex: false,
     });
     expect(out.ok).toBe(true);
+    if (!out.ok) throw new Error('expected computeStopBangResult to succeed');
     expect(out.totalScore).toBe(0);
   });
 });

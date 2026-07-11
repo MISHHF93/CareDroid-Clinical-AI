@@ -51,7 +51,7 @@ describe('receptionQueryParams', () => {
 
   it('builds whiteboard href with optional encounter', () => {
     expect(buildWhiteboardPatientHref('p-9')).toBe('/emergency/whiteboard?patient=p-9');
-    expect(buildWhiteboardPatientHref('p-9', 'enc-1')).toBe(
+    expect(buildWhiteboardPatientHref('p-9', 'enc-1' as any)).toBe(
       '/emergency/whiteboard?patient=p-9&encounter=enc-1',
     );
   });

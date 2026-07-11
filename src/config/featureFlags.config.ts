@@ -265,11 +265,11 @@ export function summarizeFeatureFlags(stateMap = buildFeatureFlagStateMap()) {
     ...flag,
     state: normalizeFeatureFlagState(stateMap[flag.id] || flag.defaultState),
   }));
-  const stateCounts = Object.values(FEATURE_FLAG_STATES).reduce((acc, state) => {
+  const stateCounts = Object.values(FEATURE_FLAG_STATES).reduce<Record<string, number>>((acc, state) => {
     acc[state] = flags.filter((flag) => flag.state === state).length;
     return acc;
   }, {});
-  const categoryCounts = Object.values(FEATURE_FLAG_CATEGORIES).reduce((acc, category) => {
+  const categoryCounts = Object.values(FEATURE_FLAG_CATEGORIES).reduce<Record<string, number>>((acc, category) => {
     acc[category] = flags.filter((flag) => flag.category === category).length;
     return acc;
   }, {});

@@ -116,7 +116,7 @@ describe('queueReasonVisibility', () => {
         lastAssessedTime: '2026-06-20T10:10:00.000Z',
         roomId: null,
       }),
-      { staff: [{ id: 'staff-1', displayName: 'Dr. Lee' }] },
+      { staff: [{ id: 'staff-1', displayName: 'Dr. Lee' }] as any },
     );
 
     expect(snapshot?.reasons.map((reason) => reason.id)).not.toContain('room-pending');

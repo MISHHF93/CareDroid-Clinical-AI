@@ -72,7 +72,7 @@ describe('administrativeAutomationAiUtils', () => {
       flags: [],
       notes: [],
       timeline: [],
-    } as Patient;
+    } as unknown as Patient;
     const discharged = { ...patient, id: 'p-2', state: PatientState.Discharge } as Patient;
 
     const tasks = [

@@ -46,7 +46,7 @@ describe('queueAssignment', () => {
       },
     };
 
-    const result = enterTriageQueue(store, {
+    const result = enterTriageQueue(store as any, {
       patientId: triagePatient.id,
       source: 'quick-intake',
     });
@@ -84,7 +84,7 @@ describe('queueAssignment', () => {
       recordWorkflowAction: vi.fn(() => ({ id: 'wf-3' })),
     };
 
-    const result = enterEmsRegistrationQueue(store, {
+    const result = enterEmsRegistrationQueue(store as any, {
       patientId: triagePatient.id,
       emsArrivalId: 'ems-1',
     });
@@ -124,7 +124,7 @@ describe('queueAssignment', () => {
       recordWorkflowAction: vi.fn(),
     };
 
-    const result = enterTriageQueue(store, { patientId: triagePatient.id });
+    const result = enterTriageQueue(store as any, { patientId: triagePatient.id });
     expect(result).toEqual({ ok: false, reason: 'invalid_state' });
   });
 

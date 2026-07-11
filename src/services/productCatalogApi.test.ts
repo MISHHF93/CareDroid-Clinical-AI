@@ -9,7 +9,7 @@ vi.mock('./apiClient', () => ({
 describe('ProductCatalogApi builder helpers', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    apiFetch.mockResolvedValue(new Response('[]', { status: 200 }));
+    vi.mocked(apiFetch).mockResolvedValue(new Response('[]', { status: 200 }));
   });
 
   it('lists product builder graphs with organization scope', async () => {
@@ -18,7 +18,7 @@ describe('ProductCatalogApi builder helpers', () => {
   });
 
   it('gets product builder detail by slug', async () => {
-    apiFetch.mockResolvedValue(new Response('{}', { status: 200 }));
+    vi.mocked(apiFetch).mockResolvedValue(new Response('{}', { status: 200 }));
     await ProductCatalogApi.getProductBuilder('icu-suite', 'org-1');
     expect(apiFetch).toHaveBeenCalledWith('/api/products/icu-suite/builder?organizationId=org-1');
   });
@@ -44,12 +44,14 @@ describe('ProductCatalogApi builder helpers', () => {
   });
 
   it('loads asset dependency graph with organization scope', async () => {
-    await ProductCatalogApi.getAssetDependencyGraph('org-1');
+    // getAssetDependencyGraph's untyped default param infers as `undefined`-only;
+    // cast is required to exercise the organization-scoped call path.
+    await ProductCatalogApi.getAssetDependencyGraph('org-1' as unknown as undefined);
     expect(apiFetch).toHaveBeenCalledWith('/api/dependency-graph?organizationId=org-1');
   });
 
   it('posts hospital solution recommendation input', async () => {
-    apiFetch.mockResolvedValue(new Response('{}', { status: 200 }));
+    vi.mocked(apiFetch).mockResolvedValue(new Response('{}', { status: 200 }));
     const payload = { organizationId: 'org-1', hospitalType: 'hospital' };
 
     await ProductCatalogApi.getHospitalSolutionRecommendation(payload);
@@ -62,7 +64,7 @@ describe('ProductCatalogApi builder helpers', () => {
   });
 
   it('posts hospital solution apply payload', async () => {
-    apiFetch.mockResolvedValue(new Response('{}', { status: 200 }));
+    vi.mocked(apiFetch).mockResolvedValue(new Response('{}', { status: 200 }));
     const payload = { organizationId: 'org-1', commercialPlanId: 'enterprise' };
 
     await ProductCatalogApi.applyHospitalSolution(payload);
@@ -75,13 +77,13 @@ describe('ProductCatalogApi builder helpers', () => {
   });
 
   it('gets care pathway detail by slug', async () => {
-    apiFetch.mockResolvedValue(new Response('{}', { status: 200 }));
+    vi.mocked(apiFetch).mockResolvedValue(new Response('{}', { status: 200 }));
     await ProductCatalogApi.getCarePathway('sepsis');
     expect(apiFetch).toHaveBeenCalledWith('/api/care-pathways/sepsis');
   });
 
   it('loads organization value tracking by period', async () => {
-    apiFetch.mockResolvedValue(new Response('{}', { status: 200 }));
+    vi.mocked(apiFetch).mockResolvedValue(new Response('{}', { status: 200 }));
 
     await ProductCatalogApi.getOrganizationValueTracking('org-1', 'week');
 
@@ -94,7 +96,7 @@ describe('ProductCatalogApi builder helpers', () => {
   });
 
   it('posts onboarding payload to configure tenant profile', async () => {
-    apiFetch.mockResolvedValue(new Response('{}', { status: 200 }));
+    vi.mocked(apiFetch).mockResolvedValue(new Response('{}', { status: 200 }));
     const payload = {
       name: 'North EMS',
       slug: 'north-ems',

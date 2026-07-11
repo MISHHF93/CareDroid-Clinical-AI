@@ -62,7 +62,7 @@ vi.mock('../../contexts/WorkspaceContext', () => ({
 }));
 
 vi.mock('../../contexts/UserContext', async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual = (await importOriginal()) as any;
   return {
     ...actual,
     useUser: () => mockUserValue,
@@ -96,7 +96,7 @@ const mockUserIdentityValue = {
   memoryFabricContext: null,
   refreshMemoryFabricContext: vi.fn(),
   organization: null,
-  roleProfile: { id: 'admin' },
+  roleProfile: { id: 'admin' } as { id: string } | null,
   entitledAssetIds: [],
   entitledPackIds: ['core-platform', 'platform-admin'],
   allowedWorkspaces: [],
@@ -107,7 +107,7 @@ const mockUserIdentityValue = {
 };
 
 vi.mock('../../contexts/UserIdentityContext', async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual = (await importOriginal()) as any;
   return {
     ...actual,
     useUserIdentity: () => mockUserIdentityValue,
@@ -131,7 +131,7 @@ vi.mock('../../config/practitionerCleanup.config', async () => {
 });
 
 vi.mock('../../config/unified-navigation.config', async () => {
-  const actual = await vi.importActual('../../config/unified-navigation.config');
+  const actual = (await vi.importActual('../../config/unified-navigation.config')) as any;
   return {
     ...actual,
     PILOT_CUSTOMER_MODE: Object.freeze({
@@ -245,11 +245,11 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
     mockWorkspaceValue.workspaces = [{ id: 'all', name: 'All Tools', toolIds: [] }];
     mockWorkspaceValue.activeWorkspaceId = 'all';
     mockWorkspaceValue.activeWorkspace = { id: 'all', name: 'All Tools', toolIds: [] };
-    mockWorkspaceValue.visibleAssetIds = [] as any[];
-    mockToolPreferencesValue.favorites = [] as any[];
-    mockToolPreferencesValue.pinned = [] as any[];
-    mockToolPreferencesValue.recentTools = [] as any[];
-    mockToolPreferencesValue.hiddenTools = [] as any[];
+    mockWorkspaceValue.visibleAssetIds = [];
+    mockToolPreferencesValue.favorites = [];
+    mockToolPreferencesValue.pinned = [];
+    mockToolPreferencesValue.recentTools = [];
+    mockToolPreferencesValue.hiddenTools = [];
     mockToolPreferencesValue.profileSettings = { permissionLevel: 'admin' };
   });
 
@@ -301,7 +301,7 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
   it('labels the library as the active workspace operating console', () => {
     mockWorkspaceValue.workspaces = [{ id: 'medical-iot', name: 'Medical IoT', toolIds: [] }];
     mockWorkspaceValue.activeWorkspaceId = 'medical-iot';
-    mockWorkspaceValue.activeWorkspace = { id: 'medical-iot', name: 'Medical IoT' };
+    mockWorkspaceValue.activeWorkspace = { id: 'medical-iot', name: 'Medical IoT', toolIds: [] };
     mockUserIdentityValue.roleProfile = null;
 
     renderOverview();
@@ -312,17 +312,17 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
   });
 
   it('keeps recommended cards scoped to the active workspace inventory', () => {
-    mockWorkspaceValue.workspaces = [{ id: 'emergency', name: 'Emergency', toolIds: ['qsofa'] }];
+    mockWorkspaceValue.workspaces = [{ id: 'emergency', name: 'Emergency', toolIds: ['qsofa'] }] as any;
     mockWorkspaceValue.activeWorkspaceId = 'emergency';
-    mockWorkspaceValue.activeWorkspace = { id: 'emergency', name: 'Emergency', toolIds: ['qsofa'] };
-    mockWorkspaceValue.visibleAssetIds = ['qsofa'];
+    mockWorkspaceValue.activeWorkspace = { id: 'emergency', name: 'Emergency', toolIds: ['qsofa'] } as any;
+    mockWorkspaceValue.visibleAssetIds = ['qsofa'] as any;
 
     const { container } = renderOverview();
     const renderedIds = [...container.querySelectorAll('[data-tool-id]')].map((node) =>
       node.getAttribute('data-tool-id')
     );
 
-    expect(renderedIds.every((id) => mockWorkspaceValue.visibleAssetIds.includes(id))).toBe(true);
+    expect(renderedIds.every((id) => (mockWorkspaceValue.visibleAssetIds as any[]).includes(id))).toBe(true);
   });
 
   it('stitches tools into workflow and recommendation next actions', () => {
@@ -378,6 +378,7 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
 
     expect(renderedIds.length).toBeGreaterThan(0);
     for (const id of renderedIds) {
+      if (id === null) throw new Error('expected data-tool-id attribute to be present');
       const record = toolById[id];
       expect(record, id).toBeTruthy();
       expect(matchesToolFilter(record, filter), id).toBe(true);
@@ -412,7 +413,7 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
 
   it('shows a resettable empty state for unmatched search', () => {
     renderOverview();
-    const input = screen.getByRole('searchbox', { name: /search all tools/i });
+    const input = screen.getByRole('searchbox', { name: /search all tools/i }) as HTMLInputElement;
 
     fireEvent.change(input, { target: { value: 'zzz-no-visible-tool' } });
     expect(screen.getByRole('status')).toHaveTextContent(/no matching tools/i);

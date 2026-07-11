@@ -16,8 +16,8 @@ function disabledResult(action) {
   });
 
   return {
-    ok: false,
-    disabled: true,
+    ok: false as const,
+    disabled: true as const,
     message: `${UNSUPPORTED_CAPABILITY_MESSAGE} ${action} is available locally only.`,
   };
 }
@@ -33,11 +33,11 @@ async function requestJson(path, options: any = {}) {
     });
     const data = await parseApiResponse(response, { fallback: {} });
     if (!response.ok) {
-      return { ok: false, data: null, message: data?.message || getApiErrorMessage(null, response) };
+      return { ok: false as const, data: null, message: data?.message || getApiErrorMessage(null, response) };
     }
-    return { ok: true, data, message: '' };
+    return { ok: true as const, data, message: '' };
   } catch (error: any) {
-    return { ok: false, data: null, message: getApiErrorMessage(error) };
+    return { ok: false as const, data: null, message: getApiErrorMessage(error) };
   }
 }
 

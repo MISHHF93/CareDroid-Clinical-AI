@@ -6,7 +6,7 @@ import {
   getPilotCustomerNavigationItems,
 } from '../config/unified-navigation.config';
 import { useEmergencyStore } from '../store/emergencyStore';
-import { renderRoute, ROUTE_LOAD_TIMEOUT } from './canonicalRouteTree.testShared.tsx';
+import { renderRoute, ROUTE_LOAD_TIMEOUT } from './canonicalRouteTree.testShared';
 
 const originalEmergencyState = useEmergencyStore.getState();
 const PILOT_VISIBLE_NAVIGATION_ITEMS = getPilotCustomerNavigationItems(NAVIGATION_ITEMS);
@@ -40,6 +40,7 @@ describe('canonical route tree — shell and workspace', () => {
     for (const label of ['Medical Tools', 'Patients', 'Queues']) {
       const item = PILOT_VISIBLE_NAVIGATION_ITEMS.find((navItem) => navItem.label === label);
       expect(item, label).toBeTruthy();
+      if (!item) throw new Error(`expected navigation item for ${label} to exist`);
       expect(within(desktopNavigation).getByRole('link', { name: label })).toHaveAttribute(
         'href',
         item.path,

@@ -72,7 +72,7 @@ describe('ED scenario fixtures', () => {
     const analytics = buildEmergencyScenarioModuleEnvelope('analytics', FIRST_CUSTOMER_DEMO_MODE.id);
     const rootState = buildRootEmergencyScenarioState(FIRST_CUSTOMER_DEMO_MODE.id);
 
-    expect(fixture.patientVolumePerDay).toBe(100);
+    expect((fixture as unknown as { patientVolumePerDay: number }).patientVolumePerDay).toBe(100);
     expect(fixture.patients).toHaveLength(18);
     expect(fixture.patients.filter((patient) => patient.state === 'Waiting').length).toBeGreaterThanOrEqual(4);
     expect(
@@ -98,7 +98,7 @@ describe('ED scenario fixtures', () => {
     );
     expect(analytics.data.operationalCommand.dailyVolume.at(-1).count).toBe(100);
     expect(rootState.patients).toHaveLength(100);
-    expect(rootState.emergencySettings.demoMode).toEqual(
+    expect(rootState.emergencySettings!.demoMode).toEqual(
       expect.objectContaining({
         active: true,
         id: FIRST_CUSTOMER_DEMO_MODE.id,

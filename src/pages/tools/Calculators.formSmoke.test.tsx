@@ -106,9 +106,10 @@ describe('Calculators — Tier-A form sections', () => {
     '$slug renders calculator interface, inputs, and calculate action',
     async ({ slug, interfaceClass }) => {
       const { container } = renderCalculator(slug);
-      const iface = container.querySelector(`.${interfaceClass.split(' ')[0]}`);
+      const iface = container.querySelector(`.${interfaceClass.split(' ')[0]}`) as HTMLElement | null;
 
       expect(iface).toBeTruthy();
+      if (!iface) throw new Error(`expected calculator interface for ${slug}`);
       expect(
         iface.querySelector(
           '.calc-input-group, .calc-has-bled-fieldset, .calc-timi-criteria, .calc-input-grid, select, input'
@@ -133,6 +134,7 @@ describe('Calculators — Tier-A form sections', () => {
     async ({ path, calculatorSlug }) => {
       const smokeRow = BUILTIN_CALCULATOR_FORM_SMOKE_ROWS.find((row) => row.slug === calculatorSlug);
       expect(smokeRow, calculatorSlug).toBeTruthy();
+      if (!smokeRow) throw new Error(`expected form smoke row for ${calculatorSlug}`);
 
       const { container } = render(
         <MemoryRouter initialEntries={[path]}>
@@ -141,9 +143,10 @@ describe('Calculators — Tier-A form sections', () => {
           </Routes>
         </MemoryRouter>
       );
-      const iface = container.querySelector(`.${smokeRow.interfaceClass.split(' ')[0]}`);
+      const iface = container.querySelector(`.${smokeRow.interfaceClass.split(' ')[0]}`) as HTMLElement | null;
 
       expect(iface).toBeTruthy();
+      if (!iface) throw new Error(`expected calculator interface for ${calculatorSlug}`);
       expect(iface.querySelector('input, select, textarea, .calc-checkbox-group')).toBeTruthy();
       expect(within(iface).getByRole('button', { name: /calculate/i })).toBeInTheDocument();
       expect(iface.querySelector('.calculator-results')).toBeTruthy();
@@ -160,8 +163,9 @@ describe('Calculators — compact viewport mock', () => {
 
   it('renders qSOFA form without crashing at compact viewport', async () => {
     const { container } = renderCalculator('qsofa');
-    const iface = container.querySelector('.calculator-interface--qsofa');
+    const iface = container.querySelector('.calculator-interface--qsofa') as HTMLElement | null;
     expect(iface).toBeTruthy();
+    if (!iface) throw new Error('expected qSOFA calculator interface');
     expect(within(iface).getByRole('button', { name: /calculate qsofa/i })).toBeInTheDocument();
   });
 
@@ -170,7 +174,7 @@ describe('Calculators — compact viewport mock', () => {
     async (slug) => {
       const { container } = renderCalculator(slug);
       const root =
-        container.querySelector(`[class*="calculator-interface"]`) ?? container;
+        (container.querySelector(`[class*="calculator-interface"]`) as HTMLElement | null) ?? container;
       expect(within(root).getByRole('button', { name: /reset/i })).toBeInTheDocument();
     }
   );

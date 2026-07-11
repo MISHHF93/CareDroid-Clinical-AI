@@ -24,7 +24,7 @@ vi.mock('../contexts/ThemeContext', () => ({
 }));
 
 vi.mock('../contexts/UserContext', async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual = await importOriginal() as any;
   return {
     ...actual,
     useUser: () => mockUserState,
@@ -89,7 +89,7 @@ describe('Settings Billing card', () => {
       isAuthenticated: true,
       isLoading: false,
     });
-    fetchCurrentSubscription.mockResolvedValue({
+    vi.mocked(fetchCurrentSubscription).mockResolvedValue({
       ok: true,
       data: {
         tier: 'professional',
@@ -97,8 +97,9 @@ describe('Settings Billing card', () => {
         currentPeriodEnd: '2026-06-01T00:00:00.000Z',
         cancelAtPeriodEnd: false,
       },
+      message: '',
     });
-    fetchSubscriptionPlans.mockResolvedValue({
+    vi.mocked(fetchSubscriptionPlans).mockResolvedValue({
       ok: true,
       data: [
         {
@@ -108,10 +109,11 @@ describe('Settings Billing card', () => {
           features: ['Backend feature A'],
         },
       ],
+      message: '',
     });
-    createCheckoutSession.mockResolvedValue({ ok: true, data: {} });
-    createCustomerPortalSession.mockResolvedValue({ ok: true, data: {} });
-    fetchIdentityProviderRegistry.mockResolvedValue({
+    vi.mocked(createCheckoutSession).mockResolvedValue({ ok: true, data: {}, message: '' });
+    vi.mocked(createCustomerPortalSession).mockResolvedValue({ ok: true, data: {}, message: '' });
+    vi.mocked(fetchIdentityProviderRegistry).mockResolvedValue({
       ok: true,
       data: {
         summary: { supported: 1, planned: 5, unavailable: 0 },
@@ -126,8 +128,9 @@ describe('Settings Billing card', () => {
           },
         ],
       },
+      message: '',
     });
-    fetchTenantDataIsolationAudit.mockResolvedValue({
+    vi.mocked(fetchTenantDataIsolationAudit).mockResolvedValue({
       ok: true,
       data: {
         status: 'tenant_isolated',
@@ -145,6 +148,7 @@ describe('Settings Billing card', () => {
           },
         ],
       },
+      message: '',
     });
   });
 

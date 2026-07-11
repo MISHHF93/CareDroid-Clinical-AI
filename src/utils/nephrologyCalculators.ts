@@ -75,7 +75,7 @@ export function computeEgfrCkdEpi2021(raw) {
   if (!inRange(ageYears, 18, 120)) errors.push('Enter age from 18 to 120 years.');
   if (!['female', 'male'].includes(sex)) errors.push('Select sex.');
   if (!inRange(serumCreatinineMgDl, 0.2, 25)) errors.push('Enter serum creatinine in a plausible adult range.');
-  if (errors.length) return { ok: false, errors };
+  if (errors.length) return { ok: false as const, errors };
 
   const isFemale = sex === 'female';
   const kappa = isFemale ? 0.7 : 0.9;
@@ -90,7 +90,7 @@ export function computeEgfrCkdEpi2021(raw) {
   const egfrMlMin173 = Math.round(egfr);
   const gfr = classifyGfrCategory(egfrMlMin173);
   return {
-    ok: true,
+    ok: true as const,
     egfrMlMin173,
     serumCreatinineMgDl: round(serumCreatinineMgDl, 2),
     gfrCategory: (gfr as any).category,
@@ -113,12 +113,12 @@ export function computeCreatinineClearanceCockcroftGault(raw) {
   if (!['female', 'male'].includes(sex)) errors.push('Select sex.');
   if (!inRange(weightKg, 20, 350)) errors.push('Enter weight from 20 to 350 kg.');
   if (!inRange(serumCreatinineMgDl, 0.2, 25)) errors.push('Enter serum creatinine in a plausible adult range.');
-  if (errors.length) return { ok: false, errors };
+  if (errors.length) return { ok: false as const, errors };
 
   const sexFactor = sex === 'female' ? 0.85 : 1;
   const creatinineClearanceMlMin = round(((140 - ageYears) * weightKg * sexFactor) / (72 * serumCreatinineMgDl), 1);
   return {
-    ok: true,
+    ok: true as const,
     creatinineClearanceMlMin,
     severity: creatinineClearanceMlMin < 15 ? 'critical' : creatinineClearanceMlMin < 45 ? 'warning' : 'normal',
     label: 'Cockcroft-Gault creatinine clearance estimate',
@@ -139,12 +139,12 @@ export function computeFeNa(raw) {
   if (!inRange(urineSodium, 0, 300)) errors.push('Enter urine sodium from 0 to 300 mEq/L.');
   if (!inRange(serumCreatinineMgDl, 0.2, 25)) errors.push('Enter serum creatinine in a plausible range.');
   if (!inRange(urineCreatinineMgDl, 1, 5000)) errors.push('Enter urine creatinine in a plausible range.');
-  if (errors.length) return { ok: false, errors };
+  if (errors.length) return { ok: false as const, errors };
 
   const fractionalExcretionPct = round((urineSodium * serumCreatinineMgDl * 100) / (serumSodium * urineCreatinineMgDl), 2);
   const riskBand = fractionalExcretionPct < 1 ? 'low' : fractionalExcretionPct > 2 ? 'high' : 'intermediate';
   return {
-    ok: true,
+    ok: true as const,
     fractionalExcretionPct,
     riskBand,
     severity: riskBand === 'intermediate' ? 'warning' : 'normal',
@@ -166,12 +166,12 @@ export function computeFeUrea(raw) {
   if (!inRange(urineUreaNitrogenMgDl, 1, 5000)) errors.push('Enter urine urea nitrogen in a plausible range.');
   if (!inRange(serumCreatinineMgDl, 0.2, 25)) errors.push('Enter serum creatinine in a plausible range.');
   if (!inRange(urineCreatinineMgDl, 1, 5000)) errors.push('Enter urine creatinine in a plausible range.');
-  if (errors.length) return { ok: false, errors };
+  if (errors.length) return { ok: false as const, errors };
 
   const fractionalExcretionPct = round((urineUreaNitrogenMgDl * serumCreatinineMgDl * 100) / (bunMgDl * urineCreatinineMgDl), 1);
   const riskBand = fractionalExcretionPct < 35 ? 'low' : 'not_low';
   return {
-    ok: true,
+    ok: true as const,
     fractionalExcretionPct,
     riskBand,
     severity: 'normal',
@@ -193,7 +193,7 @@ export function computeKfre4Variable(raw) {
   if (!['female', 'male'].includes(sex)) errors.push('Select sex.');
   if (!inRange(egfrMlMin173, 1, 120)) errors.push('Enter eGFR from 1 to 120 mL/min/1.73 m2.');
   if (!inRange(acrMgG, 0.1, 10000)) errors.push('Enter urine ACR from 0.1 to 10000 mg/g.');
-  if (errors.length) return { ok: false, errors };
+  if (errors.length) return { ok: false as const, errors };
 
   const male = sex === 'male' ? 1 : 0;
   const linearPredictor =
@@ -206,7 +206,7 @@ export function computeKfre4Variable(raw) {
   const fiveYearRiskPct = round((1 - Math.pow(0.9365, exponent)) * 100, 1);
   const severity = fiveYearRiskPct >= 20 ? 'critical' : fiveYearRiskPct >= 5 ? 'warning' : 'normal';
   return {
-    ok: true,
+    ok: true as const,
     twoYearRiskPct,
     fiveYearRiskPct,
     severity,
@@ -224,12 +224,12 @@ export function computeBunCreatinineRatio(raw) {
   const errors = [] as any[];
   if (!inRange(bunMgDl, 1, 300)) errors.push('Enter BUN in a plausible range.');
   if (!inRange(serumCreatinineMgDl, 0.2, 25)) errors.push('Enter serum creatinine in a plausible range.');
-  if (errors.length) return { ok: false, errors };
+  if (errors.length) return { ok: false as const, errors };
 
   const ratio = round(bunMgDl / serumCreatinineMgDl, 1);
   const riskBand = ratio > 20 ? 'high' : ratio < 10 ? 'low' : 'common_range';
   return {
-    ok: true,
+    ok: true as const,
     ratio,
     riskBand,
     severity: riskBand === 'common_range' ? 'normal' : 'warning',
@@ -248,11 +248,11 @@ export function computeCorrectedSodium(raw) {
   const errors = [] as any[];
   if (!inRange(sodium, 90, 190)) errors.push('Enter measured sodium from 90 to 190 mEq/L.');
   if (!inRange(glucoseMgDl, 20, 2000)) errors.push('Enter glucose in a plausible range.');
-  if (errors.length) return { ok: false, errors };
+  if (errors.length) return { ok: false as const, errors };
 
   const correctedSodium = round(sodium + correctionFactor * ((glucoseMgDl - 100) / 100), 1);
   return {
-    ok: true,
+    ok: true as const,
     correctedSodium,
     glucoseMgDl: round(glucoseMgDl, 1),
     severity: correctedSodium < 125 || correctedSodium > 155 ? 'critical' : correctedSodium < 135 || correctedSodium > 145 ? 'warning' : 'normal',
@@ -274,11 +274,11 @@ export function computeFreeWaterDeficit(raw) {
   if (!inRange(weightKg, 1, 350)) errors.push('Enter weight from 1 to 350 kg.');
   if (!inRange(tbwFactor, 0.35, 0.7)) errors.push('Select total body water factor from 0.35 to 0.70.');
   if (!inRange(targetSodium, 130, 145)) errors.push('Enter target sodium from 130 to 145 mEq/L.');
-  if (errors.length) return { ok: false, errors };
+  if (errors.length) return { ok: false as const, errors };
 
   const deficitLiters = Math.max(0, round(tbwFactor * weightKg * (sodium / targetSodium - 1), 1));
   return {
-    ok: true,
+    ok: true as const,
     deficitLiters,
     severity: sodium >= 160 ? 'critical' : sodium > 145 ? 'warning' : 'normal',
     label: `Estimated free water deficit ${deficitLiters} L`,
@@ -301,12 +301,12 @@ export function computeOsmolalGap(raw) {
   if (!inRange(bunMgDl, 1, 300)) errors.push('Enter BUN in a plausible range.');
   if (!inRange(ethanolMgDl, 0, 600)) errors.push('Enter ethanol from 0 to 600 mg/dL or leave 0.');
   if (!inRange(measuredOsmolality, 200, 450)) errors.push('Enter measured osmolality from 200 to 450 mOsm/kg.');
-  if (errors.length) return { ok: false, errors };
+  if (errors.length) return { ok: false as const, errors };
 
   const calculatedOsmolality = round(2 * sodium + glucoseMgDl / 18 + bunMgDl / 2.8 + ethanolMgDl / 3.7, 1);
   const osmolalGap = round(measuredOsmolality - calculatedOsmolality, 1);
   return {
-    ok: true,
+    ok: true as const,
     calculatedOsmolality,
     osmolalGap,
     severity: osmolalGap > 20 ? 'critical' : osmolalGap > 10 ? 'warning' : 'normal',

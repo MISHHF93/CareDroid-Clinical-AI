@@ -59,10 +59,10 @@ describe('careDroidUnifiedAiNode service', () => {
     requestAiChiefConversational.mockResolvedValue(response);
 
     const result = await invokeUnifiedAiConversational({
-      requestType: 'COPILOT_QUERY',
+      requestType: 'COPILOT_QUERY' as any,
       message: 'queue status',
       capabilityId: 'copilot',
-    });
+    } as unknown as Parameters<typeof invokeUnifiedAiConversational>[0]);
 
     expect(result).toBe(response);
     expect(requestAiChiefConversational).toHaveBeenCalledWith(
@@ -151,7 +151,7 @@ describe('careDroidUnifiedAiNode service', () => {
       requestType: 'STAFF_BALANCE',
       message: 'balance staff',
       platformServiceId: 'copilot',
-    });
+    } as unknown as Parameters<typeof invokeUnifiedAiRequest>[0]);
 
     expect(requestAiChiefConversational).toHaveBeenCalledWith(
       expect.objectContaining({

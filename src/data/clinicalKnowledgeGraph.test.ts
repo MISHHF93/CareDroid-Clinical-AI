@@ -25,9 +25,12 @@ describe('clinicalKnowledgeGraph', () => {
     expect(sepsisNodes.map((node) => node.id)).toContain('protocol-sepsis');
     expect(deviceNodes.every((node) => node.type === 'device')).toBe(true);
     expect(snapshot.selectedNode.id).toBe('protocol-sepsis');
-    expect(snapshot.neighbors.map(({ node }) => node.id)).toEqual(
-      expect.arrayContaining(['qsofa', 'lab-lactate', 'simulation-sepsis'])
-    );
+    expect(
+      snapshot.neighbors.map(({ node }) => {
+        if (!node) throw new Error('expected neighbor node to be defined');
+        return node.id;
+      })
+    ).toEqual(expect.arrayContaining(['qsofa', 'lab-lactate', 'simulation-sepsis']));
   });
 
   it('builds AI prompts from selected graph relationships', () => {

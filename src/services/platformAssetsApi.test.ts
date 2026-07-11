@@ -9,7 +9,7 @@ vi.mock('./apiClient', () => ({
 describe('PlatformAssetsApi marketplace helpers', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    apiFetch.mockResolvedValue(new Response('[]', { status: 200 }));
+    vi.mocked(apiFetch).mockResolvedValue(new Response('[]', { status: 200 }));
   });
 
   it('lists marketplace packs with organization scope', async () => {
@@ -24,7 +24,7 @@ describe('PlatformAssetsApi marketplace helpers', () => {
   });
 
   it('loads marketplace pack details', async () => {
-    apiFetch.mockResolvedValue(new Response('{}', { status: 200 }));
+    vi.mocked(apiFetch).mockResolvedValue(new Response('{}', { status: 200 }));
 
     await PlatformAssetsApi.getMarketplacePack('icu-pack', { organizationId: 'org-1' });
 
@@ -40,7 +40,7 @@ describe('PlatformAssetsApi marketplace helpers', () => {
   });
 
   it('loads department details with organization scope', async () => {
-    apiFetch.mockResolvedValue(new Response('{}', { status: 200 }));
+    vi.mocked(apiFetch).mockResolvedValue(new Response('{}', { status: 200 }));
 
     await PlatformAssetsApi.getDepartment('emergency', { organizationId: 'org-1' });
 
@@ -54,7 +54,7 @@ describe('PlatformAssetsApi marketplace helpers', () => {
   });
 
   it('loads service line details with organization scope', async () => {
-    apiFetch.mockResolvedValue(new Response('{}', { status: 200 }));
+    vi.mocked(apiFetch).mockResolvedValue(new Response('{}', { status: 200 }));
 
     await PlatformAssetsApi.getServiceLine('emergency-medicine', { organizationId: 'org-1' });
 
@@ -64,7 +64,7 @@ describe('PlatformAssetsApi marketplace helpers', () => {
   });
 
   it('loads tenant administration by organization scope', async () => {
-    apiFetch.mockResolvedValue(new Response('{}', { status: 200 }));
+    vi.mocked(apiFetch).mockResolvedValue(new Response('{}', { status: 200 }));
 
     await PlatformAssetsApi.getTenantAdministration('org-1');
 
@@ -72,7 +72,7 @@ describe('PlatformAssetsApi marketplace helpers', () => {
   });
 
   it('loads customer success dashboard with a period', async () => {
-    apiFetch.mockResolvedValue(new Response('{}', { status: 200 }));
+    vi.mocked(apiFetch).mockResolvedValue(new Response('{}', { status: 200 }));
 
     await PlatformAssetsApi.getCustomerSuccessDashboard('org-1', 'week');
 
@@ -88,7 +88,7 @@ describe('PlatformAssetsApi marketplace helpers', () => {
   });
 
   it('updates asset lifecycle state', async () => {
-    apiFetch.mockResolvedValue(new Response('{}', { status: 200 }));
+    vi.mocked(apiFetch).mockResolvedValue(new Response('{}', { status: 200 }));
 
     await PlatformAssetsApi.updateAssetLifecycle('agent-clinical', 'archived');
 
@@ -100,7 +100,7 @@ describe('PlatformAssetsApi marketplace helpers', () => {
   });
 
   it('loads governance registry with filters', async () => {
-    apiFetch.mockResolvedValue(new Response('{}', { status: 200 }));
+    vi.mocked(apiFetch).mockResolvedValue(new Response('{}', { status: 200 }));
 
     await PlatformAssetsApi.getGovernanceRegistry({
       query: 'qsofa',
@@ -114,7 +114,7 @@ describe('PlatformAssetsApi marketplace helpers', () => {
   });
 
   it('updates tenant administration by organization scope', async () => {
-    apiFetch.mockResolvedValue(new Response('{}', { status: 200 }));
+    vi.mocked(apiFetch).mockResolvedValue(new Response('{}', { status: 200 }));
     const payload = { departments: ['emergency'] };
 
     await PlatformAssetsApi.updateTenantAdministration('org-1', payload);

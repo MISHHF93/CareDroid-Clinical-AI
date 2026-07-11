@@ -40,10 +40,11 @@ describe('EmergencyWhiteboard store reactivity', () => {
       expect(document.querySelector('[data-patient-card-id]')).toBeTruthy();
     });
     const firstPatientCard = document.querySelector('[data-patient-card-id]');
+    if (!firstPatientCard) throw new Error('expected a patient card to render');
     await user.click(firstPatientCard);
 
     expect(useEmergencyStore.getState().selectedPatientId).toBe(
-      firstPatientCard.dataset.patientCardId,
+      (firstPatientCard as HTMLElement).dataset.patientCardId,
     );
   });
 

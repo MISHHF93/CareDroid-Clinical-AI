@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { PatientFlag, PatientState, Priority } from '../types/emergency';
+import {
+  PatientFlag,
+  PatientState,
+  Priority,
+  type EMSArrival,
+  type Patient,
+  type QueueSummary,
+  type Referral,
+} from '../types/emergency';
 import {
   auditOperationalSearchCoverage,
   groupOperationalSearchHits,
@@ -28,11 +36,12 @@ const patient = {
       patientId: 'patient-1',
       type: 'EncounterCreated',
       timestamp: new Date().toISOString(),
+      to: PatientState.Waiting,
       summary: 'Encounter created',
       metadata: { encounterId: 'encounter-patient-1' },
     },
   ],
-};
+} as unknown as Patient;
 
 describe('unifiedOperationalSearch', () => {
   const dataset = {
@@ -47,7 +56,7 @@ describe('unifiedOperationalSearch', () => {
         reason: 'Chest pain consult',
         requestedAt: new Date().toISOString(),
       },
-    ],
+    ] as unknown as Referral[],
     emsArrivals: [
       {
         id: 'ems-1',
@@ -66,7 +75,7 @@ describe('unifiedOperationalSearch', () => {
         prearrivalComplaint: 'Chest pain',
         priority: Priority.P1,
       },
-    ],
+    ] as unknown as EMSArrival[],
     queues: [
       {
         id: 'queue-waiting',
@@ -75,7 +84,7 @@ describe('unifiedOperationalSearch', () => {
         count: 3,
         longestWaitMinutes: 42,
       },
-    ],
+    ] as unknown as QueueSummary[],
   };
 
   it('finds all five entity types from one query surface', () => {

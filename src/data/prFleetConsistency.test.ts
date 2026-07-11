@@ -157,7 +157,7 @@ describe('PR-FLEET consistency — NLU and orchestrator maps', () => {
 
 describe('PR-FLEET consistency — Tier-A pages vs Tier-B hub', () => {
   it.each(PR_FLEET_TIER_A_IDS)('%s is not hub-only and has no Calculators.jsx switch', (id) => {
-    expect(nluCalculatorHubOnly.some((h) => h.toolId === id)).toBe(false);
+    expect(nluCalculatorHubOnly.some((h) => (h.toolId as string) === id)).toBe(false);
     expect(calculatorsSource).not.toContain(`case '${id}':`);
   });
 
@@ -210,7 +210,7 @@ describe('PR-FLEET consistency — aliases (no orphans or conflicts)', () => {
   });
 
   it('has no duplicate toolIdAliases.id entries among fleet tools', () => {
-    const fleetCanonicals = new Set(PR_FLEET_TOOL_IDS);
+    const fleetCanonicals: Set<string> = new Set(PR_FLEET_TOOL_IDS);
     const fleetAliasIds = toolIdAliases
       .filter((a) => fleetCanonicals.has(a.mapsTo))
       .map((a) => a.id);
@@ -218,7 +218,7 @@ describe('PR-FLEET consistency — aliases (no orphans or conflicts)', () => {
   });
 
   it('does not leave fleet discovery aliases pointing outside fleet ids', () => {
-    const fleetSet = new Set(PR_FLEET_TOOL_IDS);
+    const fleetSet: Set<string> = new Set(PR_FLEET_TOOL_IDS);
     for (const row of toolIdAliases) {
       if (
         PR_FLEET_DISCOVERY_ALIAS_PAIRS.some(([aliasId]) => aliasId === row.id) &&
@@ -321,7 +321,7 @@ describe('PR-FLEET consistency — catalog rows and discovery', () => {
 
 describe('PR-FLEET consistency — sidebar visibility', () => {
   it('lists each fleet tool exactly once in toolRegistry', () => {
-    const rows = toolRegistry.filter((t) => PR_FLEET_TOOL_IDS.includes(t.id));
+    const rows = toolRegistry.filter((t) => (PR_FLEET_TOOL_IDS as readonly string[]).includes(t.id));
     expect(rows).toHaveLength(PR_FLEET_TOOL_IDS.length);
     for (const id of PR_FLEET_TOOL_IDS) {
       expect(toolRegistryById[id]?.id).toBe(id);
@@ -356,6 +356,7 @@ describe('PR-FLEET consistency — unsupported orchestrator documentation', () =
     const docs = buildUnsupportedOrchestratorToolDocs();
     const row = docs.find((d) => d.nluToolId === id);
     expect(row, `missing unsupported doc for ${id}`).toBeTruthy();
+    if (!row) throw new Error(`missing unsupported doc for ${id}`);
     expect(row.registryId).toBe(id);
   });
 

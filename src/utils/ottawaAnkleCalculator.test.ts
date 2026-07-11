@@ -62,6 +62,7 @@ describe('ottawaAnkleCalculator', () => {
   it('interpretation avoids fracture clearance language', () => {
     const result = applyOttawaAnkleFootRules(negativeExam);
     const interp = interpretOttawaAnkleFootRules(result);
+    if (!interp) throw new Error('expected interpretOttawaAnkleFootRules to return a result');
     expect(interp.ankleRadiographIndicated).toBe(false);
     expect(interp.safetyDisclaimer).toMatch(/acute ankle\/foot injury only/i);
     expect(interp.interpretation).not.toMatch(/no fracture|fracture ruled out/i);

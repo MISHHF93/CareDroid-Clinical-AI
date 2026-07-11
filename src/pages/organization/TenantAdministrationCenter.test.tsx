@@ -112,8 +112,8 @@ const tenantAdmin = {
 describe('TenantAdministrationCenter', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    PlatformAssetsApi.getTenantAdministration.mockResolvedValue(tenantAdmin);
-    PlatformAssetsApi.updateTenantAdministration.mockResolvedValue(tenantAdmin);
+    vi.mocked(PlatformAssetsApi.getTenantAdministration).mockResolvedValue(tenantAdmin);
+    vi.mocked(PlatformAssetsApi.updateTenantAdministration).mockResolvedValue(tenantAdmin);
   });
 
   it('renders tenant-scoped administration sections', async () => {
@@ -145,7 +145,8 @@ describe('TenantAdministrationCenter', () => {
     );
 
     const fleetRow = (await screen.findByText('Fleet')).closest('.org-integration-row');
-    await user.click(within(fleetRow).getByRole('button', { name: /enable/i }));
+    if (!fleetRow) throw new Error('expected fleet integration row to render');
+    await user.click(within(fleetRow as HTMLElement).getByRole('button', { name: /enable/i }));
     await user.click(screen.getByRole('button', { name: /save tenant administration/i }));
 
     await waitFor(() => {

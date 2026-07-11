@@ -46,6 +46,7 @@ describe('Fleet Command (fleet-command) wiring', () => {
     expect(reg?.category).toBe('Fleet');
 
     const nlu = clinicalIntentTools.find((t) => t.toolId === id);
+    if (!nlu) throw new Error('expected nlu tool entry to exist');
     expect(nlu?.path).toBe(path);
     expect(nlu?.sidebarToolId).toBe(id);
     expect(nlu?.backendExecutable).toBe(false);
@@ -63,7 +64,7 @@ describe('Fleet Command (fleet-command) wiring', () => {
     expect(fleetDashboardSource).toContain('FleetDashboard');
     // Fleet graduated from a redirected/future module to an active, mounted
     // route — it no longer appears in the non-ED workspace redirect table.
-    expect(NON_ED_WORKSPACE_REDIRECT_ROUTES.some((route) => route.path === '/fleet/*')).toBe(false);
+    expect(NON_ED_WORKSPACE_REDIRECT_ROUTES.some((route) => (route.path as string) === '/fleet/*')).toBe(false);
   });
 
   it('mirrors backend tool.patterns.ts toolId', () => {

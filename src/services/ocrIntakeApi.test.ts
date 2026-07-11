@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const capabilityEnabled = vi.fn(() => true);
+const capabilityEnabled = vi.fn((_capability?: string) => true);
 const apiFetch = vi.fn();
 
 vi.mock('../config/backendApiCapabilities', () => ({

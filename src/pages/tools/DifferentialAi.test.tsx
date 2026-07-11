@@ -33,7 +33,7 @@ function renderPage() {
 describe('DifferentialAi', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    generateDifferentialAi.mockResolvedValue({
+    vi.mocked(generateDifferentialAi).mockResolvedValue({
       ok: true,
       data: {
         runId: 'diff-run-1',

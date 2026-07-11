@@ -6,7 +6,7 @@ import {
   resolvePipelineStageFromSearchParams,
 } from './emergencyPipelineModel';
 import { sortNavigationItemsForRole } from './emergencyNavPolicy';
-import { NAVIGATION_ITEMS } from './unified-navigation.config.ts';
+import { NAVIGATION_ITEMS } from './unified-navigation.config';
 
 describe('emergencyPipelineModel', () => {
   it('defines four reception pipeline stages', () => {

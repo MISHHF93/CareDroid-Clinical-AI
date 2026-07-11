@@ -29,7 +29,7 @@ function buildStore(patient: { id: string; state: PatientState; timeline?: unkno
     updateCapacity: () => calls.push('capacity:update'),
     updateAlerts: () => calls.push('alerts:update'),
   };
-  return { store, calls };
+  return { store: store as any, calls };
 }
 
 describe('receptionHandoff', () => {

@@ -7,7 +7,7 @@ import {
 
 describe('CrossModuleIntelligenceService', () => {
   it('builds a connected module graph with no isolated modules', () => {
-    const snapshot = buildCrossModuleHubSnapshot();
+    const snapshot = buildCrossModuleHubSnapshot(undefined);
 
     expect(snapshot.coverage.allModulesLinked).toBe(true);
     expect(snapshot.coverage.moduleCount).toBeGreaterThanOrEqual(9);

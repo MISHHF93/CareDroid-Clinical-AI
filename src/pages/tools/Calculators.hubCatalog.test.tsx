@@ -113,6 +113,7 @@ describe('Calculators hub catalog', () => {
     for (const record of dedicated) {
       const card = cards.find((candidate) => candidate.id === record.calculatorSlug);
       expect(card, record.id).toBeTruthy();
+      if (!card) throw new Error(`expected a hub card for ${record.id}`);
       expect(card.registryId, record.id).toBe(record.id);
       expect(card.route, record.id).toBe(record.route);
     }
@@ -143,7 +144,7 @@ describe('Calculators hub catalog', () => {
       expect(registryIds, record.id).toContain(record.id);
     }
     for (const toolId of NLU_HUB_ONLY_PROFILE_TOOL_IDS) {
-      if (toolId === 'dispatch-ai') continue;
+      if ((toolId as string) === 'dispatch-ai') continue;
       expect(HUB_CHAT_ASSISTED_TOOL_IDS).toContain(toolId);
     }
   });
@@ -190,8 +191,9 @@ describe('Calculators — every built-in slug form shell', () => {
 
       const iface = container.querySelector(`.${interfaceClass.split(' ')[0]}`);
       expect(iface).toBeTruthy();
+      if (!iface) throw new Error(`expected calculator interface element for ${interfaceClass}`);
 
-      const scope = within(iface);
+      const scope = within(iface as HTMLElement);
       expect(
         iface.querySelector(
           '.calc-input-group, .calc-has-bled-fieldset, .calc-timi-criteria, .calc-input-grid, select, input'

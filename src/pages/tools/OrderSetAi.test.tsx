@@ -33,7 +33,7 @@ function renderPage() {
 describe('OrderSetAi', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    generateOrderSetAi.mockResolvedValue({
+    vi.mocked(generateOrderSetAi).mockResolvedValue({
       ok: true,
       data: {
         runId: 'order-set-run-1',

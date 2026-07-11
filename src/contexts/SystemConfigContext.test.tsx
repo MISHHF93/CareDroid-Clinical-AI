@@ -62,19 +62,19 @@ describe('SystemConfigProvider API polling', () => {
   it('does not keep polling usage after a degraded authenticated load', async () => {
     const setIntervalSpy = vi.spyOn(window, 'setInterval');
     mockUserState.isAuthenticated = true;
-    configService.getSystemConfig.mockResolvedValue({
+    vi.mocked(configService.getSystemConfig).mockResolvedValue({
       rag: { enabled: false },
       _meta: { ok: false, fromDefaults: true, error: 'API unavailable' },
     });
-    configService.getAIRemainingQueries.mockResolvedValue({
+    vi.mocked(configService.getAIRemainingQueries).mockResolvedValue({
       remaining: 10,
       _meta: { ok: false, fromDefaults: true, error: 'API unavailable' },
     });
-    configService.getAvailableTools.mockResolvedValue({
+    vi.mocked(configService.getAvailableTools).mockResolvedValue({
       tools: [],
       _meta: { ok: false, fromDefaults: true, error: 'API unavailable' },
     });
-    configService.getCurrentSubscription.mockResolvedValue({
+    vi.mocked(configService.getCurrentSubscription).mockResolvedValue({
       tier: 'free',
       status: 'active',
       _meta: { ok: false, fromDefaults: true, error: 'API unavailable' },

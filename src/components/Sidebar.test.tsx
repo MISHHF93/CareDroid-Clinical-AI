@@ -54,12 +54,12 @@ describe('Sidebar unified navigation rendering', () => {
       ['Settings', '/emergency/settings'],
     ]) {
       if (path) {
-        const link = desktopNav.getByRole('link', { name: label });
+        const link = desktopNav.getByRole('link', { name: label as string });
         expect(link).toBeTruthy();
         expect(link.getAttribute('href')).toBe(path);
         expect(link.getAttribute('title')).toBe(label);
       } else {
-        const button = desktopNav.getByRole('button', { name: label });
+        const button = desktopNav.getByRole('button', { name: label as string });
         expect(button).toBeTruthy();
         expect(button.getAttribute('title')).toBe(label);
         expect(button.getAttribute('aria-pressed')).toBe('false');

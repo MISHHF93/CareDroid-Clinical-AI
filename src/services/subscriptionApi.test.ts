@@ -16,8 +16,8 @@ vi.mock('./apiClient', () => ({
 describe('subscriptionApi metering helpers', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    apiFetch.mockResolvedValue({ ok: true });
-    parseApiResponse.mockResolvedValue({});
+    vi.mocked(apiFetch).mockResolvedValue({ ok: true } as any);
+    vi.mocked(parseApiResponse).mockResolvedValue({});
   });
 
   it('fetches billing overview', async () => {

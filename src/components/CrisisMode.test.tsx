@@ -77,10 +77,10 @@ describe('CrisisMode', () => {
           eta: 8,
           chiefComplaint: 'Respiratory distress',
         },
-      ],
+      ] as any,
     }));
 
-    render(<CrisisMode />);
+    render(<CrisisMode onVisibilityChange={vi.fn()} />);
 
     expect(screen.getByText(/CAPACITY STRAINED - 68\/100 - Orange/i)).toBeInTheDocument();
     await waitFor(() => {

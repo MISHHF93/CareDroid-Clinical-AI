@@ -67,7 +67,7 @@ const dashboard = {
 describe('CustomerSuccessDashboard', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    PlatformAssetsApi.getCustomerSuccessDashboard.mockResolvedValue(dashboard);
+    vi.mocked(PlatformAssetsApi.getCustomerSuccessDashboard).mockResolvedValue(dashboard);
   });
 
   it('renders customer health, usage metrics, and underused products', async () => {

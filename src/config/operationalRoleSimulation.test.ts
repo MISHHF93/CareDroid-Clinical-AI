@@ -38,7 +38,7 @@ function buildSimProfile(roleId: string) {
     specialties: [],
     availabilityStatus: 'available',
     escalationLevel: 'none',
-    permissions: getPermissionsForRole(roleId),
+    permissions: getPermissionsForRole(roleId as HospitalRole),
     assignedPatients: [],
     currentLoad: 0,
     lastActiveAt: new Date().toISOString(),

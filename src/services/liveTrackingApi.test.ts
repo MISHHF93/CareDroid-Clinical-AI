@@ -41,8 +41,8 @@ describe('liveTrackingApi', () => {
   });
 
   it('normalizes successful demo contract responses', async () => {
-    apiFetchJson.mockResolvedValueOnce({
-      response: { ok: true, status: 200 },
+    vi.mocked(apiFetchJson).mockResolvedValueOnce({
+      response: { ok: true, status: 200 } as any,
       data: {
         success: true,
         demo: true,
@@ -66,7 +66,7 @@ describe('liveTrackingApi', () => {
   });
 
   it('returns a safe failure result for unavailable backend routes', async () => {
-    apiFetchJson.mockRejectedValueOnce(new Error('backend unavailable'));
+    vi.mocked(apiFetchJson).mockRejectedValueOnce(new Error('backend unavailable'));
 
     const result = await fetchLiveTrackingCapability('hospitalMap', '/api/hospital-map/floors');
 

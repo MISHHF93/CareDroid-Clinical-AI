@@ -20,12 +20,13 @@ describe('protocolPathwayLibrary', () => {
       'pediatric fever',
     ]);
     expect(PROTOCOL_PATHWAYS.map((protocol) => protocol.category)).toEqual(
-      expect.arrayContaining(PROTOCOL_CATEGORIES)
+      expect.arrayContaining([...PROTOCOL_CATEGORIES])
     );
   });
 
   it('models viewer content, version history, calculators, and simulations', () => {
     const sepsis = getProtocolPathwayById('sepsis');
+    if (!sepsis) throw new Error('expected sepsis protocol pathway to exist');
 
     expect(sepsis.title).toBe('Sepsis Management');
     expect(sepsis.steps.length).toBeGreaterThan(0);

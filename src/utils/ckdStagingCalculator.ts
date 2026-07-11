@@ -287,7 +287,7 @@ export function interpretCkdStaging(egfr, gfr, albuminuria, prognosticRisk) {
  */
 export function computeCkdStagingResult(raw) {
   const v = validateCkdStagingInputs(raw);
-  if (!v.valid) return { ok: false, errors: v.errors };
+  if (!v.valid) return { ok: false as const, errors: v.errors };
 
   const { ageYears, sex, serumCreatinineMgDl, urineAcrMgG, creatinineUnit, acrUnit } = v.inputs as any;
   const egfrMlMin = computeCkdEpi2021Egfr(ageYears, sex, serumCreatinineMgDl);
@@ -297,7 +297,7 @@ export function computeCkdStagingResult(raw) {
   const interp = interpretCkdStaging(egfrMlMin, gfr, albuminuria, prognosticRisk);
 
   return {
-    ok: true,
+    ok: true as const,
     inputs: v.inputs,
     egfrMlMin,
     serumCreatinineMgDl,

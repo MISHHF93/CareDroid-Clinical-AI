@@ -10,7 +10,7 @@ describe('OperationalEmptyState', () => {
         guidance="Register walk-ins from reception."
         status="Board is clear"
         nextSteps={['Open reception', 'Check EMS feed']}
-        actions={<OperationalEmptyAction>Register walk-in</OperationalEmptyAction>}
+        actions={<OperationalEmptyAction onClick={() => {}}>Register walk-in</OperationalEmptyAction>}
       />,
     );
 

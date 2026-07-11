@@ -15,7 +15,7 @@ function patientWithArrival() {
     lastName: 'Lee',
     dob: '1988-04-02',
     age: 38,
-    sex: 'Male',
+    sex: 'Male' as const,
     arrivalTime: '2026-06-20T08:00:00.000Z',
     chiefComplaint: 'Chest pain',
     complaintCategory: 'Chest pain',

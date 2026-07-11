@@ -16,7 +16,7 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock('../contexts/UserContext', async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual = (await importOriginal()) as object;
   return {
     ...actual,
     useUser: () =>
@@ -70,7 +70,7 @@ describe('Profile activity audit visibility', () => {
       role: 'student',
     };
     mocks.hasPermission.mockReturnValue(false);
-    fetchMyAuditLogs.mockResolvedValue({
+    vi.mocked(fetchMyAuditLogs).mockResolvedValue({
       ok: true,
       total: 1,
       logs: [
@@ -83,7 +83,7 @@ describe('Profile activity audit visibility', () => {
         },
       ],
     });
-    fetchPhiAccessLogs.mockResolvedValue({ ok: true, total: 0, logs: [] });
+    vi.mocked(fetchPhiAccessLogs).mockResolvedValue({ ok: true, total: 0, logs: [] });
   });
 
   it('shows personal activity and restricted PHI empty state for normal users', async () => {
@@ -118,7 +118,7 @@ describe('Profile activity audit visibility', () => {
       role: 'physician',
     };
     mocks.hasPermission.mockReturnValue(true);
-    fetchPhiAccessLogs.mockResolvedValue({
+    vi.mocked(fetchPhiAccessLogs).mockResolvedValue({
       ok: true,
       total: 2,
       logs: [

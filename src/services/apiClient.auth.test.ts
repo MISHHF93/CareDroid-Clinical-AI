@@ -204,7 +204,7 @@ describe('apiFetchJson', () => {
 
 describe('apiAxios', () => {
   it('registers request interceptors for path and auth', () => {
-    expect(apiAxios.interceptors.request.handlers.length).toBeGreaterThan(0);
+    expect((apiAxios.interceptors.request as any).handlers.length).toBeGreaterThan(0);
   });
 
   it('injects tenant headers in axios requests', () => {
@@ -216,8 +216,8 @@ describe('apiAxios', () => {
       subscriptionPlan: 'professional',
     });
 
-    const interceptor = apiAxios.interceptors.request.handlers[0].fulfilled;
-    const config = interceptor({ url: '/config/system', headers: {} });
+    const interceptor = (apiAxios.interceptors.request as any).handlers[0].fulfilled;
+    const config: any = interceptor({ url: '/config/system', headers: {} as any });
 
     expect(config.headers).toMatchObject({
       'X-CareDroid-Organization-Id': 'org-1',

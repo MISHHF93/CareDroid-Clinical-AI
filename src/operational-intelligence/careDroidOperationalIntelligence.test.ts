@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { buildCareDroidCentralNodeSnapshot } from '../central-node/careDroidCentralNode';
+import {
+  buildCareDroidCentralNodeSnapshot,
+  type CareDroidCentralNodeSource,
+} from '../central-node/careDroidCentralNode';
 import { buildCareDroidOperationalIntelligenceSnapshot } from './careDroidOperationalIntelligence';
 import {
   CARE_DROID_OPERATIONAL_INTELLIGENCE_LAYER,
@@ -22,6 +25,8 @@ const baseSource = {
   emsIncomingPatients: [],
   emsUnits: [],
   referrals: [],
+  staff: [],
+  rooms: [],
   workflowLogs: [],
   emergencySettings: {
     tenantName: 'Test ED',
@@ -50,14 +55,14 @@ const baseSource = {
 describe('CareDroidOperationalIntelligence', () => {
   it('builds an advisory snapshot linked to central node', () => {
     const centralSnapshot = buildCareDroidCentralNodeSnapshot(
-      baseSource,
+      baseSource as unknown as CareDroidCentralNodeSource,
       {
         role: 'charge_nurse',
         roleLabel: 'Charge Nurse',
         readOnly: false,
         allowedRoutes: ['/emergency/whiteboard'],
       },
-      { screenMode: 'COMMAND_CENTER_DISPLAY', source: 'store' },
+      { screenMode: 'COMMAND_CENTER_DISPLAY' as any, source: 'store' },
     );
 
     const backendSnapshot = buildCareDroidOperationalIntelligenceSnapshot({
@@ -125,7 +130,6 @@ describe('CareDroidOperationalIntelligence', () => {
           confidenceDistributionShift: false,
           summary: 'Drift monitoring disabled.',
           generatedAt: new Date().toISOString(),
-          alerts: [],
         },
         dataFreshness: {
           status: 'fresh',
@@ -162,14 +166,14 @@ describe('CareDroidOperationalIntelligence', () => {
 
   it('returns a degraded snapshot without frontend rule duplication when backend data is absent', () => {
     const centralSnapshot = buildCareDroidCentralNodeSnapshot(
-      baseSource,
+      baseSource as unknown as CareDroidCentralNodeSource,
       {
         role: 'charge_nurse',
         roleLabel: 'Charge Nurse',
         readOnly: false,
         allowedRoutes: ['/emergency/whiteboard'],
       },
-      { screenMode: 'COMMAND_CENTER_DISPLAY', source: 'store' },
+      { screenMode: 'COMMAND_CENTER_DISPLAY' as any, source: 'store' },
     );
 
     const snapshot = buildCareDroidOperationalIntelligenceSnapshot({

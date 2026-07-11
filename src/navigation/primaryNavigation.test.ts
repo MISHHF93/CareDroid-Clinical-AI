@@ -120,7 +120,7 @@ describe('primaryNavigation', () => {
       VISIBLE_SIDEBAR_ITEMS.flatMap((item) => [
         item.path,
         ...(item.matchPaths || []),
-        ...(item.legacyPaths || []),
+        ...((item as any).legacyPaths || []),
       ]).filter(Boolean),
     );
 
@@ -150,9 +150,9 @@ describe('primaryNavigation', () => {
   });
 
   it('keeps legacy calculator routes outside primary nav without a duplicate sidebar destination', () => {
-    expect(ADVANCED_SIDEBAR_NAV_ITEMS.some((item) => item.path === '/tools/calculators')).toBe(
-      false,
-    );
+    expect(
+      ADVANCED_SIDEBAR_NAV_ITEMS.some((item) => (item.path as string) === '/tools/calculators'),
+    ).toBe(false);
     expect(PRIMARY_SIDEBAR_NAV_ITEMS.some((item) => item.path === '/tools')).toBe(false);
     expect(PRIMARY_SIDEBAR_NAV_ITEMS.some((item) => item.path === '/emergency/tools')).toBe(true);
   });
@@ -229,7 +229,7 @@ describe('primaryNavigation', () => {
         ...SOLUTIONS_SIDEBAR_NAV_ITEMS,
         ...OPERATIONS_SIDEBAR_NAV_ITEMS,
         ...ADVANCED_SIDEBAR_NAV_ITEMS,
-      ].map((item) => [item.id, item]),
+      ].map((item: any) => [item.id, item]),
     );
 
     expect(byId.home).toBeUndefined();

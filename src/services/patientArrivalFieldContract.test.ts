@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { PatientState, Priority } from '../types/emergency';
+import { PatientState, Priority, type Patient } from '../types/emergency';
 import { buildSmartIntakeVerticalSlicePatient } from '../data/smartIntakeVerticalSlice';
 import { buildReceptionQuickIntakePatient } from './receptionQuickIntakeService';
 import { buildProvisionalPatient } from './provisionalIdentityIntake';
@@ -124,7 +124,7 @@ describe('patientArrivalFieldContract', () => {
 
   it.each(intakeBuilders)('sets required arrival fields for $label', ({ build }) => {
     const patient = build();
-    expect(() => assertPatientArrivalContract(patient)).not.toThrow();
+    expect(() => assertPatientArrivalContract(patient as Patient)).not.toThrow();
     expect(patient.arrival).toBeTruthy();
     expect(patient.arrival?.chiefComplaint.length).toBeGreaterThan(0);
     expect(patient.arrival?.triageAcuity.level).toBeGreaterThanOrEqual(1);

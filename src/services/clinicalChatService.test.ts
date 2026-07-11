@@ -33,6 +33,7 @@ describe('clinicalChatService', () => {
       toolName: 'SOFA',
       result: { totalScore: 5 },
     });
+    if (!out) throw new Error('expected normalizeToolResultForUi to return a value');
     expect(out.result.data).toEqual({ totalScore: 5 });
   });
 
@@ -46,6 +47,7 @@ describe('clinicalChatService', () => {
       },
     });
     expect(msg.content).toBe('Hello');
+    if (!msg.toolResult) throw new Error('expected mapChatResponseToAssistantMessage to normalize toolResult');
     expect(msg.toolResult.toolId).toBe('drug-interactions');
   });
 
@@ -155,13 +157,13 @@ describe('clinicalChatService', () => {
   });
 
   it('sendClinicalChatMessage routes COPILOT_CHAT through the unified AI node', async () => {
-    invokeUnifiedAiConversational.mockResolvedValue({
+    vi.mocked(invokeUnifiedAiConversational).mockResolvedValue({
       ok: true,
       status: 200,
       content: 'Chief response',
       data: { response: 'Chief response', toolResult: { toolId: 'ed-copilot' } },
       toolCalls: [],
-      usage: { inputTokens: 1, outputTokens: 1, totalTokens: 2 },
+      usage: { inputTokens: 1, outputTokens: 1, totalTokens: 2 } as any,
       requestType: 'COPILOT_CHAT',
     });
 
@@ -169,7 +171,7 @@ describe('clinicalChatService', () => {
       message: 'capacity status',
       requestType: 'COPILOT_CHAT',
       workspaceContext: { workspaceKey: 'emergency' },
-    });
+    } as any);
 
     expect(res.ok).toBe(true);
     expect(invokeUnifiedAiConversational).toHaveBeenCalledWith(
@@ -186,16 +188,16 @@ describe('clinicalChatService', () => {
   });
 
   it('sendClinicalChatMessage posts JSON', async () => {
-    apiFetch.mockResolvedValue({
+    vi.mocked(apiFetch).mockResolvedValue({
       ok: true,
       json: async () => ({ response: 'ok' }),
-    });
+    } as Response);
     const res = await sendClinicalChatMessage({
       message: 'hi',
       tool: 'drug-interactions',
       conversationId: '12',
       authToken: 'tok',
-    });
+    } as any);
     expect(res.ok).toBe(true);
     expect(apiFetch).toHaveBeenCalledWith(
       '/api/chat/message',
@@ -204,7 +206,7 @@ describe('clinicalChatService', () => {
         headers: expect.objectContaining({ Authorization: 'Bearer tok' }),
       }),
     );
-    const body = JSON.parse(apiFetch.mock.calls[0][1].body);
+    const body = JSON.parse(vi.mocked(apiFetch).mock.calls[0][1].body);
     expect(body.message).toBe('hi');
     expect(body.tool).toBe('drug-interactions');
     expect(body.conversationId).toBe(12);
@@ -215,16 +217,16 @@ describe('clinicalChatService', () => {
   });
 
   it('sendClinicalChatMessage includes matching knowledge base articles before assistant routing', async () => {
-    apiFetch.mockResolvedValue({
+    vi.mocked(apiFetch).mockResolvedValue({
       ok: true,
       json: async () => ({ response: 'ok' }),
-    });
+    } as Response);
 
     await sendClinicalChatMessage({
       message: 'How do I fix tenant context access?',
-    });
+    } as any);
 
-    const body = JSON.parse(apiFetch.mock.calls[0][1].body);
+    const body = JSON.parse(vi.mocked(apiFetch).mock.calls[0][1].body);
     expect(body.knowledgeBaseContext.matches[0]).toMatchObject({
       id: 'troubleshooting-tenant-context',
       category: 'troubleshooting',
@@ -232,10 +234,10 @@ describe('clinicalChatService', () => {
   });
 
   it('sendClinicalChatMessage includes sanitized memory fabric context when provided', async () => {
-    apiFetch.mockResolvedValue({
+    vi.mocked(apiFetch).mockResolvedValue({
       ok: true,
       json: async () => ({ response: 'ok' }),
-    });
+    } as Response);
 
     await sendClinicalChatMessage({
       message: 'Use my workspace context',
@@ -244,9 +246,9 @@ describe('clinicalChatService', () => {
         userMemory: { pinnedAssets: ['drug-check'] },
         rules: { rawPromptIncluded: false, rawSearchIncluded: false },
       },
-    });
+    } as any);
 
-    const body = JSON.parse(apiFetch.mock.calls[0][1].body);
+    const body = JSON.parse(vi.mocked(apiFetch).mock.calls[0][1].body);
     expect(body.memoryContext).toMatchObject({
       workspaceMemory: { recentAssets: ['qsofa'] },
       userMemory: { pinnedAssets: ['drug-check'] },
@@ -255,10 +257,10 @@ describe('clinicalChatService', () => {
   });
 
   it('sendClinicalChatMessage includes SaaS workspace context when provided', async () => {
-    apiFetch.mockResolvedValue({
+    vi.mocked(apiFetch).mockResolvedValue({
       ok: true,
       json: async () => ({ response: 'ok' }),
-    });
+    } as Response);
 
     await sendClinicalChatMessage({
       message: 'what should I use for chest pain?',
@@ -271,9 +273,9 @@ describe('clinicalChatService', () => {
         recentAssets: ['qsofa'],
         permissions: ['VIEW_EMERGENCY'],
       },
-    });
+    } as any);
 
-    const body = JSON.parse(apiFetch.mock.calls[0][1].body);
+    const body = JSON.parse(vi.mocked(apiFetch).mock.calls[0][1].body);
     expect(body.workspaceContext).toMatchObject({
       workspaceKey: 'emergency',
       role: 'emergency-physician',
@@ -286,10 +288,10 @@ describe('clinicalChatService', () => {
   });
 
   it('suggestClinicalAction posts patient context', async () => {
-    apiFetch.mockResolvedValue({
+    vi.mocked(apiFetch).mockResolvedValue({
       ok: true,
       json: async () => ({ suggestion: 'review vitals' }),
-    });
+    } as Response);
 
     const res = await suggestClinicalAction({
       patientId: 'patient-1',
@@ -305,17 +307,17 @@ describe('clinicalChatService', () => {
         headers: expect.objectContaining({ Authorization: 'Bearer tok' }),
       }),
     );
-    expect(JSON.parse(apiFetch.mock.calls[0][1].body)).toEqual({
+    expect(JSON.parse(vi.mocked(apiFetch).mock.calls[0][1].body)).toEqual({
       patientId: 'patient-1',
       context: { setting: 'icu' },
     });
   });
 
   it('analyzeClinicalVitals posts vitals payload', async () => {
-    apiFetch.mockResolvedValue({
+    vi.mocked(apiFetch).mockResolvedValue({
       ok: true,
       json: async () => ({ risk: 'low' }),
-    });
+    } as Response);
 
     const res = await analyzeClinicalVitals({
       vitals: { hr: 88 },
@@ -330,7 +332,7 @@ describe('clinicalChatService', () => {
         headers: expect.objectContaining({ Authorization: 'Bearer tok' }),
       }),
     );
-    expect(JSON.parse(apiFetch.mock.calls[0][1].body)).toEqual({
+    expect(JSON.parse(vi.mocked(apiFetch).mock.calls[0][1].body)).toEqual({
       vitals: { hr: 88 },
     });
   });

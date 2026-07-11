@@ -95,7 +95,7 @@ import {
 const mockFetchFleetCommandSnapshot = vi.fn();
 
 vi.mock('../contexts/UserContext', async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual = await importOriginal<typeof import('../contexts/UserContext')>();
   return {
     ...actual,
     useUser: () => mockUserValue,
@@ -343,7 +343,7 @@ vi.mock('../services/productCatalogApi', () => ({
 }));
 
 vi.mock('../services/platformAssetsApi', async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual = await importOriginal<typeof import('../services/platformAssetsApi')>();
   return {
     ...actual,
     PlatformAssetsApi: {
@@ -431,7 +431,7 @@ vi.mock('../services/platformAssetsApi', async (importOriginal) => {
 });
 
 vi.mock('../services/platformGovernanceApi', async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual = await importOriginal<typeof import('../services/platformGovernanceApi')>();
   return {
     ...actual,
     fetchPlatformGovernanceSurface: vi.fn().mockResolvedValue({
@@ -444,7 +444,7 @@ vi.mock('../services/platformGovernanceApi', async (importOriginal) => {
 });
 
 vi.mock('../services/systemHealthService', async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual = await importOriginal<typeof import('../services/systemHealthService')>();
   return {
     ...actual,
     fetchDeploymentTruth: vi.fn().mockResolvedValue({
@@ -568,7 +568,7 @@ vi.mock('../services/analyticsService', () => ({
 }));
 
 vi.mock('../services/artifactsApi', async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual = await importOriginal<typeof import('../services/artifactsApi')>();
   return {
     ...actual,
     fetchArtifacts: vi.fn().mockResolvedValue({ ok: true, artifacts: [] }),
@@ -578,7 +578,7 @@ vi.mock('../services/artifactsApi', async (importOriginal) => {
 });
 
 vi.mock('../services/memoryApi', async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual = await importOriginal<typeof import('../services/memoryApi')>();
   return {
     ...actual,
     fetchMemoryDashboard: vi
@@ -589,7 +589,7 @@ vi.mock('../services/memoryApi', async (importOriginal) => {
 });
 
 vi.mock('../services/trainingApi', async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual = await importOriginal<typeof import('../services/trainingApi')>();
   return {
     ...actual,
     fetchTrainingDashboard: vi
@@ -597,12 +597,12 @@ vi.mock('../services/trainingApi', async (importOriginal) => {
       .mockResolvedValue({ ok: true, data: actual.LOCAL_TRAINING_DASHBOARD }),
     fetchMoeTrainingPlan: vi
       .fn()
-      .mockResolvedValue({ ok: true, data: actual.LOCAL_MOE_TRAINING_PLAN }),
+      .mockResolvedValue({ ok: true, data: (actual as any).LOCAL_MOE_TRAINING_PLAN }),
   };
 });
 
 vi.mock('../services/evaluationApi', async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual = await importOriginal<typeof import('../services/evaluationApi')>();
   return {
     ...actual,
     fetchEvaluationDashboard: vi
@@ -612,7 +612,7 @@ vi.mock('../services/evaluationApi', async (importOriginal) => {
 });
 
 vi.mock('../services/aiCommandCenterApi', async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual = await importOriginal<typeof import('../services/aiCommandCenterApi')>();
   return {
     ...actual,
     fetchAiCommandCenterSnapshot: vi.fn().mockResolvedValue({
@@ -693,7 +693,7 @@ vi.mock('../contexts/SystemConfigContext', () => ({
 }));
 
 vi.mock('../services/fleetTelemetryService', async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual = await importOriginal<typeof import('../services/fleetTelemetryService')>();
   return {
     ...actual,
     fetchFleetCommandSnapshot: (...args) => mockFetchFleetCommandSnapshot(...args),

@@ -18,11 +18,13 @@ describe('frontend operating system model', () => {
   });
 
   it('classifies routes into operating-system stages', () => {
-    expect(getFrontendOperatingSystemStage('/workspace/emergency')).toBe('workspace');
+    // getFrontendOperatingSystemStage's untyped default (`= CANONICAL_ROUTES.dashboard`)
+    // infers a "/dashboard"-only param type; casts exercise the other route classifications.
+    expect(getFrontendOperatingSystemStage('/workspace/emergency' as '/dashboard')).toBe('workspace');
     expect(getFrontendOperatingSystemStage('/dashboard')).toBe('dashboard');
-    expect(getFrontendOperatingSystemStage('/search?q=sepsis')).toBe('asset-launch');
-    expect(getFrontendOperatingSystemStage('/workflows')).toBe('workflow');
-    expect(getFrontendOperatingSystemStage('/timeline')).toBe('result');
+    expect(getFrontendOperatingSystemStage('/search?q=sepsis' as '/dashboard')).toBe('asset-launch');
+    expect(getFrontendOperatingSystemStage('/workflows' as '/dashboard')).toBe('workflow');
+    expect(getFrontendOperatingSystemStage('/timeline' as '/dashboard')).toBe('result');
   });
 
   it('builds workspace-aware shell state for UI surfaces', () => {

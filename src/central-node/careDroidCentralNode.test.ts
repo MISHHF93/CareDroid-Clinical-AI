@@ -33,6 +33,8 @@ function patient(overrides: Partial<Patient> = {}): Patient {
 function source(overrides: Partial<CareDroidCentralNodeSource> = {}): CareDroidCentralNodeSource {
   return {
     patients: [patient()],
+    staff: [],
+    rooms: [],
     capacity: {
       score: 72,
       band: 'Yellow',

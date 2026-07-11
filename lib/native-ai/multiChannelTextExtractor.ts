@@ -24,7 +24,7 @@ const MODEL_VERSION = '1.0.0-roberta-mha-cnn-heuristic';
 function tokenize(text: string): string[] {
   return text
     .toLowerCase()
-    .replace(/[^a-z0-9\s%/\-]/g, ' ')
+    .replace(/[^a-z0-9\s%/-]/g, ' ')
     .split(/\s+/)
     .filter(Boolean);
 }

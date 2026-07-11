@@ -20,7 +20,7 @@ describe('NotificationService', () => {
         ok: true,
         json: async () => ({ messageId: 'test' }),
       })
-    );
+    ) as unknown as typeof fetch;
   });
 
   afterEach(() => {
@@ -152,7 +152,7 @@ describe('NotificationService', () => {
           ok: true,
           json: async () => ({}),
         })
-      );
+      ) as unknown as typeof fetch;
 
       const success = await service.updatePreferences({
         emailEnabled: false,

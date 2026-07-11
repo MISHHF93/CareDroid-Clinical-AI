@@ -42,11 +42,13 @@ describe('PR1 calculator wiring (qSOFA, NEWS2, Child-Pugh, HAS-BLED)', () => {
       expect(reg.panelTool).toBe('calculators');
 
       const nlu = clinicalIntentTools.find((t) => t.toolId === id);
+    if (!nlu) throw new Error('expected nlu tool entry to exist');
       expect(nlu, `clinicalIntentTools missing ${id}`).toBeTruthy();
       expect(nlu.path).toBe(`/tools/calculators/${id}`);
       expect(nlu.sidebarToolId).toBe(id);
 
       const builtin = builtinUiCalculators.find((c) => c.id === id);
+    if (!builtin) throw new Error('expected builtin calculator entry to exist');
       expect(builtin, `builtinUiCalculators missing ${id}`).toBeTruthy();
       expect(builtin.path).toBe(`/tools/calculators/${id}`);
       expect(builtin.calcQuery).toBe(`/tools/calculators?calc=${id}`);

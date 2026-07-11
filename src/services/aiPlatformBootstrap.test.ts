@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { buildDepartmentContext, setDepartmentContextStoreReader } from '../../lib/ai/contextEngine';
 import { executeEmergencyTool, setToolRegistryStoreReader } from '../../lib/ai/toolRegistry';
-import { PatientState, Priority } from '../types/emergency';
+import { PatientState, Priority, type Patient } from '../types/emergency';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { bootstrapAiPlatformIntegrations, teardownAiPlatformIntegrations } from './aiPlatformBootstrap';
 
@@ -25,7 +25,7 @@ describe('aiPlatformBootstrap', () => {
           notes: [],
           timeline: [],
         },
-      ],
+      ] as unknown as Patient[],
     }));
   });
 

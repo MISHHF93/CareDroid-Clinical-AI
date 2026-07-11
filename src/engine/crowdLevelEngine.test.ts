@@ -21,6 +21,11 @@ function buildPatient(overrides: Partial<Patient> = {}): Patient {
     notes: [],
     timeline: [],
     ...overrides,
+    dob: overrides.dob ?? '1990-01-01',
+    age: overrides.age ?? 40,
+    sex: overrides.sex ?? 'Unknown',
+    complaintCategory: overrides.complaintCategory ?? 'Other',
+    vitals: overrides.vitals ?? [],
   };
 }
 

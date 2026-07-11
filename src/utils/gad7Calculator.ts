@@ -202,15 +202,15 @@ export function validateGad7Inputs(raw) {
  */
 export function computeGad7Result(raw) {
   const v = validateGad7Inputs(raw);
-  if (!v.valid) return { ok: false, errors: v.errors };
+  if (!v.valid) return { ok: false as const, errors: v.errors };
 
   const breakdown = computeGad7Breakdown(v.inputs);
   const total = sumGad7Score(breakdown);
   const interp = interpretGad7Score(total);
-  if (!interp) return { ok: false, errors: ['Unable to calculate GAD-7 score.'] };
+  if (!interp) return { ok: false as const, errors: ['Unable to calculate GAD-7 score.'] };
 
   return {
-    ok: true,
+    ok: true as const,
     inputs: v.inputs,
     breakdown,
     ...interp,

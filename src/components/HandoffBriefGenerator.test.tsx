@@ -241,7 +241,13 @@ describe('HandoffBriefGenerator', () => {
       content: 'SHIFT HANDOFF - generated brief',
       data: {},
       toolCalls: [],
-      usage: { inputTokens: 0, outputTokens: 0, totalTokens: 0 },
+      usage: {
+        inputTokens: 0,
+        outputTokens: 0,
+        totalTokens: 0,
+        cacheReadInputTokens: 0,
+        cacheCreationInputTokens: 0,
+      },
       requestType: 'HANDOFF_BRIEF',
     });
     setMockEmergencyStore({

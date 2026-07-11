@@ -79,7 +79,7 @@ describe('workspaceArchitecture', () => {
       );
     }
     expect(getActiveWorkspaceRegistry().map((workspace) => workspace.id)).not.toEqual(
-      expect.arrayContaining(FUTURE_WORKSPACE_IDS)
+      expect.arrayContaining(FUTURE_WORKSPACE_IDS as string[])
     );
   });
 

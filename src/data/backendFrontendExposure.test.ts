@@ -76,6 +76,7 @@ describe('backendFrontendExposure scan', () => {
 
   scanIt('matches backend REGISTERED_EXECUTOR_TOOL_IDS in registry source', () => {
     const block = registrySource.match(/REGISTERED_EXECUTOR_TOOL_IDS\s*=\s*\[([\s\S]*?)\]\s*as const/);
+    if (!block) throw new Error('expected REGISTERED_EXECUTOR_TOOL_IDS block in registry source');
     const backendIds = [...block[1].matchAll(/'([^']+)'/g)].map((m) => m[1]).sort();
     expect(backendIds).toEqual([...BACKEND_EXECUTOR_NLU_TOOL_IDS].sort());
   });
