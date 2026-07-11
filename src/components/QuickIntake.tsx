@@ -68,14 +68,14 @@ type ComplaintCategory =
 type Sex = Patient['sex'];
 
 const CATEGORY_BUTTONS: Array<{ label: ComplaintCategory; icon: string }> = [
-  { label: 'Chest pain', icon: '??' },
-  { label: 'Breathing', icon: '??' },
-  { label: 'Neuro/Stroke', icon: '??' },
-  { label: 'Sepsis', icon: '??' },
-  { label: 'Trauma', icon: '??' },
-  { label: 'OB/Gyn', icon: '??' },
-  { label: 'Pediatric', icon: '??' },
-  { label: 'Other', icon: '??' },
+  { label: 'Chest pain', icon: '🫀' },
+  { label: 'Breathing', icon: '🫁' },
+  { label: 'Neuro/Stroke', icon: '🧠' },
+  { label: 'Sepsis', icon: '🩸' },
+  { label: 'Trauma', icon: '🤕' },
+  { label: 'OB/Gyn', icon: '🤰' },
+  { label: 'Pediatric', icon: '🧒' },
+  { label: 'Other', icon: '📋' },
 ];
 
 const PRIORITY_COLORS: Record<Priority, string> = {

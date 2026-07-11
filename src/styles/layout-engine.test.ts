@@ -32,6 +32,12 @@ describe('layout-engine.css', () => {
     expect(layoutEngineCss).toContain('.emergency-route-metric-grid');
     expect(layoutEngineCss).toMatch(/grid-template-columns:\s*repeat\(auto-fit, minmax/);
   });
+
+  it('caps the header topbar to the same content-max as the page below it', () => {
+    expect(layoutEngineCss).toMatch(
+      /\.caredroid-header--compact \.caredroid-header__topbar\s*\{[\s\S]*max-width:\s*var\(--app-layout-content-max\)[\s\S]*margin-inline:\s*auto/
+    );
+  });
 });
 
 describe('app-shell.css — route scrollport', () => {

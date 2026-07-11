@@ -184,7 +184,14 @@
 }
 
 /* —— Header chrome aligns to shell grid —— */
+/* Matches .app-shell-main-content's content-max cap so the header's brand/actions
+   line up with page content instead of stretching full-bleed while the page
+   beneath it stays capped and centered (visible on 34"+ ultrawide monitors). */
 .caredroid-header--compact .caredroid-header__topbar {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: var(--app-layout-content-max);
+  margin-inline: auto;
   padding-inline: var(--app-layout-page-gutter-inline);
   gap: var(--app-layout-panel-gap);
 }
