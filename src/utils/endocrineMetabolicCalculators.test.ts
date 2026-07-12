@@ -4,10 +4,8 @@ import {
   computeBmi,
   computeBsaMosteller,
   computeCorrectedCalcium,
-  computeCorrectedSodium,
   computeHomaIr,
   computeIdealBodyWeight,
-  computeOsmolalGap,
   computeSerumOsmolality,
   computeWaistHipRatio,
 } from './endocrineMetabolicCalculators';
@@ -24,7 +22,7 @@ describe('endocrineMetabolicCalculators', () => {
     expect(result.disclaimer).toMatch(/does not recommend insulin or medication dosing/i);
   });
 
-  it('computes corrected calcium, corrected sodium, osmolality, and osmolal gap', () => {
+  it('computes corrected calcium and calculated osmolality', () => {
     expect(
       computeCorrectedCalcium({
         calcium: 8,
@@ -33,15 +31,6 @@ describe('endocrineMetabolicCalculators', () => {
         albuminUnit: 'g_dl',
       }).correctedCalciumMgDl
     ).toBe(9.6);
-
-    expect(
-      computeCorrectedSodium({
-        sodium: 128,
-        glucose: 500,
-        glucoseUnit: 'mg_dl',
-        correctionFactor: '1.6',
-      }).correctedSodium
-    ).toBe(134.4);
 
     expect(
       computeSerumOsmolality({
@@ -54,19 +43,6 @@ describe('endocrineMetabolicCalculators', () => {
         ethanolUnit: 'mg_dl',
       }).calculatedOsmolality
     ).toBe(290);
-
-    const gap = computeOsmolalGap({
-      sodium: 140,
-      glucose: 90,
-      glucoseUnit: 'mg_dl',
-      bun: 14,
-      bunUnit: 'mg_dl',
-      ethanol: 0,
-      ethanolUnit: 'mg_dl',
-      measuredOsmolality: 320,
-    });
-    expect(gap.osmolalGap).toBe(30);
-    expect(gap.disclaimer).toMatch(/does not diagnose toxic alcohol ingestion/i);
   });
 
   it('computes anthropometrics locally without dosing automation', () => {

@@ -4,6 +4,9 @@
  * Deterministic calculation and documentation support only. These helpers do
  * not diagnose endocrine disease and do not recommend insulin, antidiabetic,
  * thyroid, weight-based, electrolyte, or other medication dosing.
+ *
+ * `computeCorrectedSodium`/`computeOsmolalGap` live in `nephrologyCalculators.ts`
+ * (the only page that renders them); this file previously had exact duplicates.
  */
 
 export const ENDOCRINE_METABOLIC_SAFETY_DISCLAIMER =
@@ -122,29 +125,6 @@ export function computeCorrectedCalcium(raw) {
   };
 }
 
-export function computeCorrectedSodium(raw) {
-  const sodium = toNumber(raw.sodium);
-  const glucoseMgDl = toGlucoseMgDl(raw.glucose, raw.glucoseUnit);
-  const correctionFactor = raw.correctionFactor === '2.4' ? 2.4 : 1.6;
-  const errors = [] as any[];
-  if (!inRange(sodium, 90, 190)) errors.push('Enter measured sodium from 90 to 190 mEq/L.');
-  if (!inRange(glucoseMgDl, 20, 2000)) errors.push('Enter glucose in a plausible range.');
-  if (errors.length) return { ok: false as const, errors };
-
-  const correctedSodium = round(sodium + correctionFactor * ((glucoseMgDl - 100) / 100), 1);
-  return {
-    ok: true as const,
-    correctedSodium,
-    glucoseMgDl: round(glucoseMgDl, 1),
-    severity: correctedSodium < 125 || correctedSodium > 155 ? 'critical' : correctedSodium < 135 || correctedSodium > 145 ? 'warning' : 'normal',
-    label: `Corrected sodium ${correctedSodium} mEq/L`,
-    interpretation:
-      'Corrected sodium estimates sodium after accounting for hyperglycemia-related water shift. Use measured osmolality, tonicity, symptoms, and rate of change for clinical decisions.',
-    referenceLine: 'Common correction factors add 1.6 or 2.4 mEq/L sodium per 100 mg/dL glucose above 100 mg/dL.',
-    disclaimer: `${ENDOCRINE_METABOLIC_SAFETY_DISCLAIMER} Does not recommend hypertonic saline, insulin, free water, or correction rates.`,
-  };
-}
-
 export function computeSerumOsmolality(raw) {
   const sodium = toNumber(raw.sodium);
   const glucoseMgDl = toGlucoseMgDl(raw.glucose, raw.glucoseUnit);
@@ -167,28 +147,6 @@ export function computeSerumOsmolality(raw) {
       'Calculated serum osmolality estimates osmoles from sodium, glucose, BUN, and optional ethanol. Compare with measured osmolality when available and interpret with tonicity and clinical context.',
     referenceLine: 'Calculated osmolality = 2 x Na + glucose/18 + BUN/2.8 + ethanol/3.7.',
     disclaimer: `${ENDOCRINE_METABOLIC_SAFETY_DISCLAIMER} Does not diagnose hyperosmolar states, DKA, toxic ingestion, or recommend insulin, fluids, dialysis, or disposition.`,
-  };
-}
-
-export function computeOsmolalGap(raw) {
-  const osmolality = computeSerumOsmolality(raw);
-  const measuredOsmolality = toNumber(raw.measuredOsmolality);
-  const errors = [] as any[];
-  if (!osmolality.ok) errors.push(...(osmolality.errors as any[]));
-  if (!inRange(measuredOsmolality, 200, 450)) errors.push('Enter measured osmolality from 200 to 450 mOsm/kg.');
-  if (errors.length) return { ok: false as const, errors };
-
-  const osmolalGap = round(measuredOsmolality - (osmolality as any).calculatedOsmolality, 1);
-  return {
-    ok: true as const,
-    calculatedOsmolality: (osmolality as any).calculatedOsmolality,
-    osmolalGap,
-    severity: osmolalGap > 20 ? 'critical' : osmolalGap > 10 ? 'warning' : 'normal',
-    label: `Osmolal gap ${osmolalGap} mOsm/kg`,
-    interpretation:
-      'Osmolal gap compares measured and calculated serum osmolality. Interpret with timing, ethanol, ketones, renal failure, shock, laboratory method, and toxicology pathway context.',
-    referenceLine: osmolality.referenceLine,
-    disclaimer: `${ENDOCRINE_METABOLIC_SAFETY_DISCLAIMER} Does not diagnose toxic alcohol ingestion or recommend antidotes, dialysis, insulin, fluids, or disposition.`,
   };
 }
 
