@@ -40,6 +40,11 @@ import { Pao2Fio2RatioService } from '../src/modules/medical-control-plane/tool-
 import { RoxIndexService } from '../src/modules/medical-control-plane/tool-orchestrator/services/rox-index.service';
 import { MewsService } from '../src/modules/medical-control-plane/tool-orchestrator/services/mews.service';
 import { RevisedTraumaScoreService } from '../src/modules/medical-control-plane/tool-orchestrator/services/revised-trauma-score.service';
+import { HuntHessScaleService } from '../src/modules/medical-control-plane/tool-orchestrator/services/hunt-hess-scale.service';
+import { IchScoreService } from '../src/modules/medical-control-plane/tool-orchestrator/services/ich-score.service';
+import { FourScoreService } from '../src/modules/medical-control-plane/tool-orchestrator/services/four-score.service';
+import { ModifiedRankinScaleService } from '../src/modules/medical-control-plane/tool-orchestrator/services/modified-rankin-scale.service';
+import { PecarnHeadService } from '../src/modules/medical-control-plane/tool-orchestrator/services/pecarn-head.service';
 import { AuditService } from '../src/modules/audit/audit.service';
 import { AIService } from '../src/modules/ai/ai.service';
 import { ToolMetricsService } from '../src/modules/metrics/tool-metrics.service';
@@ -106,6 +111,11 @@ describe('ToolOrchestratorService', () => {
         RoxIndexService,
         MewsService,
         RevisedTraumaScoreService,
+        HuntHessScaleService,
+        IchScoreService,
+        FourScoreService,
+        ModifiedRankinScaleService,
+        PecarnHeadService,
         {
           provide: AuditService,
           useValue: mockAuditService,
@@ -141,10 +151,10 @@ describe('ToolOrchestratorService', () => {
   });
 
   describe('Tool Registry', () => {
-    it('should register all thirty-two tools on initialization', () => {
+    it('should register all thirty-seven tools on initialization', () => {
       const tools = service.listAvailableTools();
-      expect(tools.count).toBe(32);
-      expect(tools.tools.length).toBe(32);
+      expect(tools.count).toBe(37);
+      expect(tools.tools.length).toBe(37);
     });
 
     it('should have SOFA calculator in registry', () => {
@@ -576,7 +586,7 @@ describe('ToolOrchestratorService', () => {
     it('should return tool statistics', () => {
       const stats = service.getToolStatistics();
 
-      expect(stats.totalTools).toBe(32);
+      expect(stats.totalTools).toBe(37);
       expect(stats.toolsByCategory).toBeDefined();
       expect(stats.tools).toBeDefined();
     });

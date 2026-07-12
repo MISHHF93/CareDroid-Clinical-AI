@@ -30,7 +30,7 @@ function patternToolIds(): string[] {
 }
 
 describe('tool-orchestrator.registry', () => {
-  it('exposes exactly thirty-two registered executor ids', () => {
+  it('exposes exactly thirty-seven registered executor ids', () => {
     expect(REGISTERED_EXECUTOR_TOOL_IDS).toEqual([
       'sofa-calculator',
       'drug-interactions',
@@ -64,6 +64,11 @@ describe('tool-orchestrator.registry', () => {
       'rox-index',
       'mews',
       'revised-trauma-score',
+      'hunt-hess-scale',
+      'ich-score',
+      'four-score',
+      'modified-rankin-scale',
+      'pecarn-head',
     ]);
   });
 
@@ -200,9 +205,9 @@ describe('tool-orchestrator.registry', () => {
     expect(isKnownUnsupportedNluTool('sofa-calculator')).toBe(false);
   });
 
-  it('getExecutorCatalogSnapshot lists thirty-two registered executors', () => {
+  it('getExecutorCatalogSnapshot lists thirty-seven registered executors', () => {
     const snap = getExecutorCatalogSnapshot();
-    expect(snap.registeredExecutorToolIds).toHaveLength(32);
+    expect(snap.registeredExecutorToolIds).toHaveLength(37);
     expect(snap.unsupportedTools.length).toBeGreaterThan(30);
   });
 
@@ -373,6 +378,49 @@ describe('tool-orchestrator.registry', () => {
     it('validateExecutorContractParameters enforces mews and revised-trauma-score required fields', () => {
       expect(validateExecutorContractParameters('mews', {}).valid).toBe(false);
       expect(validateExecutorContractParameters('revised-trauma-score', {}).valid).toBe(false);
+    });
+  });
+
+  describe('neuro batch executors (hunt-hess-scale, ich-score, four-score, modified-rankin-scale, pecarn-head)', () => {
+    const NEURO_TOOL_IDS = [
+      'hunt-hess-scale',
+      'ich-score',
+      'four-score',
+      'modified-rankin-scale',
+      'pecarn-head',
+    ] as const;
+
+    it.each(NEURO_TOOL_IDS)('is no longer listed in NLU_TOOL_IDS_WITHOUT_EXECUTOR: %s', (id) => {
+      expect(NLU_TOOL_IDS_WITHOUT_EXECUTOR).not.toContain(id);
+    });
+
+    it.each(NEURO_TOOL_IDS)('has a parameter-alias entry (possibly empty): %s', (id) => {
+      expect(EXECUTOR_PARAMETER_ALIASES[id]).toBeDefined();
+    });
+
+    it.each(NEURO_TOOL_IDS)('has a deterministic request contract: %s', (id) => {
+      expect(EXECUTOR_REQUEST_CONTRACTS[id].deterministic).toBe(true);
+      expect(EXECUTOR_REQUEST_CONTRACTS[id].toolId).toBe(id);
+    });
+
+    it.each(NEURO_TOOL_IDS)('classifies as a known tool, not unsupported: %s', (id) => {
+      expect(isKnownUnsupportedNluTool(id)).toBe(false);
+      expect(classifyToolExecutionError(id)).not.toBe(ToolExecutionErrorCode.UNSUPPORTED_TOOL);
+    });
+
+    it('normalizes ich-score snake_case NLU parameters to executor camelCase parameters', () => {
+      expect(
+        normalizeExecutorParameters('ich-score', {
+          volume_ml: 20,
+          intraventricular_hemorrhage: 'no',
+          infratentorial_origin: 'no',
+        }),
+      ).toEqual({ volumeMl: 20, intraventricularHemorrhage: 'no', infratentorialOrigin: 'no' });
+    });
+
+    it('validateExecutorContractParameters enforces four-score and pecarn-head required fields', () => {
+      expect(validateExecutorContractParameters('four-score', {}).valid).toBe(false);
+      expect(validateExecutorContractParameters('pecarn-head', {}).valid).toBe(false);
     });
   });
 });

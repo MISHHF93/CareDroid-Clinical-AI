@@ -49,6 +49,11 @@ import { Pao2Fio2RatioService } from './services/pao2-fio2-ratio.service';
 import { RoxIndexService } from './services/rox-index.service';
 import { MewsService } from './services/mews.service';
 import { RevisedTraumaScoreService } from './services/revised-trauma-score.service';
+import { HuntHessScaleService } from './services/hunt-hess-scale.service';
+import { IchScoreService } from './services/ich-score.service';
+import { FourScoreService } from './services/four-score.service';
+import { ModifiedRankinScaleService } from './services/modified-rankin-scale.service';
+import { PecarnHeadService } from './services/pecarn-head.service';
 import { ExecuteToolDto, ToolExecutionResponseDto, ToolListDto } from './dto/tool-execution.dto';
 import { ToolResult } from './entities/tool-result.entity';
 import {
@@ -114,6 +119,11 @@ export class ToolOrchestratorService {
     private readonly roxIndexService: RoxIndexService,
     private readonly mewsService: MewsService,
     private readonly revisedTraumaScoreService: RevisedTraumaScoreService,
+    private readonly huntHessScaleService: HuntHessScaleService,
+    private readonly ichScoreService: IchScoreService,
+    private readonly fourScoreService: FourScoreService,
+    private readonly modifiedRankinScaleService: ModifiedRankinScaleService,
+    private readonly pecarnHeadService: PecarnHeadService,
     private readonly auditService: AuditService,
     private readonly toolMetrics: ToolMetricsService,
     @InjectRepository(ToolResult)
@@ -159,6 +169,11 @@ export class ToolOrchestratorService {
     this.registerTool(this.roxIndexService);
     this.registerTool(this.mewsService);
     this.registerTool(this.revisedTraumaScoreService);
+    this.registerTool(this.huntHessScaleService);
+    this.registerTool(this.ichScoreService);
+    this.registerTool(this.fourScoreService);
+    this.registerTool(this.modifiedRankinScaleService);
+    this.registerTool(this.pecarnHeadService);
 
     this.logger.log(
       `Initialized tool registry with ${Object.keys(this.toolRegistry).length} tools`,

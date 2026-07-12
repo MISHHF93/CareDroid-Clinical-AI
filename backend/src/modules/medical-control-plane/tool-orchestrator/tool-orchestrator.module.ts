@@ -34,6 +34,11 @@ import { Pao2Fio2RatioService } from './services/pao2-fio2-ratio.service';
 import { RoxIndexService } from './services/rox-index.service';
 import { MewsService } from './services/mews.service';
 import { RevisedTraumaScoreService } from './services/revised-trauma-score.service';
+import { HuntHessScaleService } from './services/hunt-hess-scale.service';
+import { IchScoreService } from './services/ich-score.service';
+import { FourScoreService } from './services/four-score.service';
+import { ModifiedRankinScaleService } from './services/modified-rankin-scale.service';
+import { PecarnHeadService } from './services/pecarn-head.service';
 import { AiModule } from '../../ai/ai.module';
 import { AuditModule } from '../../audit/audit.module';
 import { MetricsModule } from '../../metrics/metrics.module';
@@ -83,6 +88,11 @@ import { PlatformGovernanceModule } from '../../platform-governance';
     RoxIndexService,
     MewsService,
     RevisedTraumaScoreService,
+    HuntHessScaleService,
+    IchScoreService,
+    FourScoreService,
+    ModifiedRankinScaleService,
+    PecarnHeadService,
   ],
   exports: [ToolOrchestratorService],
 })

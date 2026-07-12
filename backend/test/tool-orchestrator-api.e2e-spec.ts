@@ -44,6 +44,11 @@ import { Pao2Fio2RatioService } from '../src/modules/medical-control-plane/tool-
 import { RoxIndexService } from '../src/modules/medical-control-plane/tool-orchestrator/services/rox-index.service';
 import { MewsService } from '../src/modules/medical-control-plane/tool-orchestrator/services/mews.service';
 import { RevisedTraumaScoreService } from '../src/modules/medical-control-plane/tool-orchestrator/services/revised-trauma-score.service';
+import { HuntHessScaleService } from '../src/modules/medical-control-plane/tool-orchestrator/services/hunt-hess-scale.service';
+import { IchScoreService } from '../src/modules/medical-control-plane/tool-orchestrator/services/ich-score.service';
+import { FourScoreService } from '../src/modules/medical-control-plane/tool-orchestrator/services/four-score.service';
+import { ModifiedRankinScaleService } from '../src/modules/medical-control-plane/tool-orchestrator/services/modified-rankin-scale.service';
+import { PecarnHeadService } from '../src/modules/medical-control-plane/tool-orchestrator/services/pecarn-head.service';
 import { ToolResult } from '../src/modules/medical-control-plane/tool-orchestrator/entities/tool-result.entity';
 import { ToolMetricsService } from '../src/modules/metrics/tool-metrics.service';
 import { AuditService } from '../src/modules/audit/audit.service';
@@ -112,6 +117,11 @@ describe('Tool Orchestrator API (e2e)', () => {
         RoxIndexService,
         MewsService,
         RevisedTraumaScoreService,
+        HuntHessScaleService,
+        IchScoreService,
+        FourScoreService,
+        ModifiedRankinScaleService,
+        PecarnHeadService,
         {
           provide: AuditService,
           useValue: mockAuditService,
@@ -155,7 +165,7 @@ describe('Tool Orchestrator API (e2e)', () => {
         .expect(200)
         .expect((res) => {
           expect(res.body.tools).toBeDefined();
-          expect(res.body.count).toBe(32);
+          expect(res.body.count).toBe(37);
         });
     });
 
@@ -221,7 +231,7 @@ describe('Tool Orchestrator API (e2e)', () => {
         .get('/tools/statistics')
         .expect(200)
         .expect((res) => {
-          expect(res.body.totalTools).toBe(32);
+          expect(res.body.totalTools).toBe(37);
         });
     });
   });
