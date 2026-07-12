@@ -1,0 +1,101 @@
+.operational-intelligence-bar {
+  display: grid;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--ed-border-subtle, #e2e8f0);
+  border-radius: 10px;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--ed-accent, #0ea5e9) 4%, var(--ed-surface-raised, #f8fafc)),
+    var(--ed-surface-raised, #f8fafc)
+  );
+  font-size: 11px;
+  color: var(--ed-text-meta, #64748b);
+}
+
+.operational-intelligence-bar--warning {
+  border-color: color-mix(in srgb, var(--status-warning, #d97706) 40%, transparent);
+}
+
+.operational-intelligence-bar--critical {
+  border-color: color-mix(in srgb, var(--status-critical, #dc2626) 40%, transparent);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--status-critical, #dc2626) 6%, var(--ed-surface-raised, #f8fafc)),
+    var(--ed-surface-raised, #f8fafc)
+  );
+}
+
+.operational-intelligence-bar__identity {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  color: var(--ed-text-primary, #0f172a);
+}
+
+.operational-intelligence-bar__domains {
+  font-weight: 600;
+}
+
+.operational-intelligence-bar__source {
+  margin-inline-start: auto;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ed-accent, #0ea5e9) 12%, transparent);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.operational-intelligence-bar__signals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+}
+
+.operational-intelligence-bar__alert {
+  color: var(--status-critical, #dc2626);
+  font-weight: 700;
+}
+
+.operational-intelligence-bar__insight p {
+  margin: 0;
+}
+
+.operational-intelligence-bar__risk,
+.operational-intelligence-bar__recommendation {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.operational-intelligence-bar__risk strong,
+.operational-intelligence-bar__recommendation strong {
+  color: var(--ed-text-primary, #0f172a);
+}
+
+.operational-intelligence-bar__recommendation--idle {
+  font-style: italic;
+}
+
+.operational-intelligence-bar__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.operational-intelligence-bar__action {
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--ed-border-subtle, #e2e8f0);
+  background: #fff;
+  color: var(--ed-text-primary, #0f172a);
+  text-decoration: none;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.operational-intelligence-bar__action:hover {
+  border-color: color-mix(in srgb, var(--ed-accent, #0ea5e9) 35%, transparent);
+}

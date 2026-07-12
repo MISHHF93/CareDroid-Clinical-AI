@@ -11,9 +11,24 @@
   align-items: center;
   min-height: 20px;
   padding: 0 6px;
+  border: none;
   border-radius: 999px;
   background: color-mix(in srgb, var(--app-accent-interactive, var(--status-info)) 12%, var(--color-elevated, var(--medical-border, #e0f2fe)));
   color: var(--color-text-secondary, #9ca3af);
+  font: inherit;
   font-size: 11px;
   font-weight: 700;
+  cursor: pointer;
+}
+
+.reception-queue-badge-stack__more:focus-visible {
+  outline: 2px solid var(--app-focus-ring, #0284c7);
+  outline-offset: 2px;
+}
+
+.reception-queue-badge-stack__overflow:not([hidden]) {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
 }

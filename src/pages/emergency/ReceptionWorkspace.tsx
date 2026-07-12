@@ -2,9 +2,11 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FolderOpen, ShieldCheck } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 
-import ArrivalControlSummaryStrip from '../../components/reception/ArrivalControlSummaryStrip';
 import ReceptionDeskToolbar from '../../components/reception/ReceptionDeskToolbar';
 import ReceptionEscalationAttentionStrip from '../../components/reception/ReceptionEscalationAttentionStrip';
+import ReceptionEscalationPanel from '../../components/reception/ReceptionEscalationPanel';
+import ReceptionEscalationQuickActions from '../../components/reception/ReceptionEscalationQuickActions';
+import { type ReceptionJourneyStage } from '../../components/reception/ReceptionJourneyTimeline';
 import ReceptionOperationalRail from '../../components/reception/ReceptionOperationalRail';
 import ReceptionSmartIntakeOverlay from '../../components/reception/ReceptionSmartIntakeOverlay';
 import PreparePatientChooser from '../../components/reception/PreparePatientChooser';
@@ -19,6 +21,7 @@ import useProfileNavigate from '../../hooks/useProfileNavigate';
 import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermissions';
 import useRouteScreenMode from '../../hooks/useRouteScreenMode';
 import useReceptionDeskUi from '../../hooks/useReceptionDeskUi';
+import useReceptionPinnedActions from '../../hooks/useReceptionPinnedActions';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { PatientFlag, PatientState, Priority, type Alert, type Patient } from '../../types/emergency';
 import {
@@ -33,6 +36,11 @@ import {
   type ReceptionRouteResult,
 } from '../../services/receptionIntakeOrchestrator';
 import { completeProvisionalIntake } from '../../services/provisionalIdentityIntake';
+import type {
+  ReceptionEscalationInput,
+  ReceptionEscalationReasonId,
+} from '../../services/receptionEscalationWorkflow';
+import { buildArrivalControlSummary } from '../../services/arrivalControlLayer';
 import { ReceptionFlowGraphic } from '../../components/graphics/CdlGraphicKit';
 import ContextualGuidance from '../../components/ui/ContextualGuidance';
 import { showActionError, showActionSuccess } from '../../services/careDroidInteractionFeedback';
@@ -102,6 +110,12 @@ function waitMinutes(patient: Patient): number {
   const time = new Date(patient.arrival?.arrivalTimestamp || patient.arrivalTime || '').getTime();
   if (!Number.isFinite(time)) return 0;
   return Math.max(0, Math.round((Date.now() - time) / 60000));
+}
+
+function averageWaitMinutes(patients: Patient[]): number | null {
+  if (!patients.length) return null;
+  const total = patients.reduce((sum, patient) => sum + waitMinutes(patient), 0);
+  return Math.round(total / patients.length);
 }
 
 function queueStatus(patient: Patient): string {
@@ -236,6 +250,7 @@ export default function ReceptionWorkspace() {
   const emergencyRole = useEmergencyRolePermissions();
   const screenMode = useRouteScreenMode();
   const receptionDesk = useReceptionDeskUi();
+  const { pinnedQueueTab } = useReceptionPinnedActions();
   const patients = useEmergencyStore((state) => state.patients);
   const alerts = useEmergencyStore((state) => state.alerts);
   const capacity = useEmergencyStore((state) => state.capacity);
@@ -247,9 +262,13 @@ export default function ReceptionWorkspace() {
   const [result, setResult] = useState<ReceptionRouteResult | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [now, setNow] = useState(() => Date.now());
-  const [activeQueueTab, setActiveQueueTab] = useState<QueueTabId>('pretriage');
+  const [activeQueueTab, setActiveQueueTab] = useState<QueueTabId>(() =>
+    mapQueueParamToTab(pinnedQueueTab || 'pretriage'),
+  );
   const [showChooser, setShowChooser] = useState(false);
   const [smartIntakeSession, setSmartIntakeSession] = useState<SmartIntakeSession | null>(null);
+  const [escalationDialogOpen, setEscalationDialogOpen] = useState(false);
+  const [escalationReasonId, setEscalationReasonId] = useState<ReceptionEscalationReasonId | null>(null);
 
   const receptionCapabilities = useMemo(
     () =>
@@ -312,6 +331,48 @@ export default function ReceptionWorkspace() {
   );
 
   const criticalAlerts = useMemo(() => alerts.filter(isReceptionCriticalAlert), [alerts]);
+
+  const journeyStages: ReceptionJourneyStage[] = useMemo(() => {
+    const summary = buildArrivalControlSummary(receptionQueueAll);
+    const registrationWait = averageWaitMinutes(filterQueueByTab(receptionQueueAll, 'verification'));
+    const triageWait = averageWaitMinutes(filterQueueByTab(receptionQueueAll, 'pretriage'));
+
+    return [
+      {
+        id: 'arrived',
+        label: 'Arrived (30m)',
+        count: summary.recentArrivals,
+        avgWaitMinutes: null,
+        queueTab: null,
+        tone: 'neutral',
+      },
+      {
+        id: 'registration',
+        label: 'Registration / ID check',
+        count: summary.awaitingRegistration,
+        avgWaitMinutes: registrationWait,
+        queueTab: 'verification',
+        tone: summary.awaitingRegistration ? 'attention' : 'neutral',
+      },
+      {
+        id: 'waiting-for-triage',
+        label: 'Waiting for triage nurse',
+        count: summary.triagePending,
+        avgWaitMinutes: triageWait,
+        queueTab: 'pretriage',
+        tone: summary.rapidReview ? 'critical' : summary.triagePending ? 'attention' : 'neutral',
+        badge: summary.rapidReview ? `${summary.rapidReview} rapid review` : null,
+      },
+      {
+        id: 'waiting-room',
+        label: 'In waiting room',
+        count: summary.inWaitingRoom,
+        avgWaitMinutes: null,
+        queueTab: null,
+        tone: 'neutral',
+      },
+    ];
+  }, [receptionQueueAll]);
   const selectedPatient = useMemo(
     () => (selectedPatientId ? patients.find((patient) => patient.id === selectedPatientId) || null : null),
     [patients, selectedPatientId],
@@ -485,6 +546,16 @@ export default function ReceptionWorkspace() {
     setSearchParams(next, { replace: true });
   };
 
+  const openEscalationDialog = useCallback((reasonId: ReceptionEscalationReasonId | null = null) => {
+    setEscalationReasonId(reasonId);
+    setEscalationDialogOpen(true);
+  }, []);
+
+  const submitEscalation = useCallback(
+    (input: ReceptionEscalationInput) => useEmergencyStore.getState().submitReceptionEscalation(input),
+    [],
+  );
+
   const situationTone =
     criticalAlerts.length || criticalNeeded
       ? 'critical'
@@ -548,11 +619,20 @@ export default function ReceptionWorkspace() {
             onSelectPatient={selectPatient}
             className="reception-front-door__escalation-strip"
           />
+          {receptionCapabilities.canEscalateToNurse ? (
+            <ReceptionEscalationQuickActions
+              defaultPatientId={selectedPatientId}
+              actorStaffId={emergencyRole.canonicalProfile?.employeeId || emergencyRole.canonicalProfile?.id}
+              actorName={currentUserName}
+              onSubmit={submitEscalation}
+              onOpenDetail={(reasonId: ReceptionEscalationReasonId | null) => openEscalationDialog(reasonId)}
+              className="reception-front-door__escalation-quick-actions"
+            />
+          ) : null}
         </>
       }
       primaryActions={
         receptionDesk.enabled ? (
-        <>
           <ReceptionDeskToolbar
             canCreatePatient={receptionCapabilities.canCreatePatient}
             canVerifyIntake={receptionCapabilities.canVerifyIdentity}
@@ -560,24 +640,20 @@ export default function ReceptionWorkspace() {
             canOpenPrepareChooser={receptionCapabilities.canCaptureArrivalReason}
             canOpenSmartIntake={receptionCapabilities.canOpenSmartIntake}
             activeQueueTab={activeQueueTab}
+            journeyStages={journeyStages}
             onRegisterWalkIn={resetForNextPatient}
             onCheckIdentity={() => openSmartIntake({ step: 'capture', autostart: true })}
             onOtherArrivals={() => setShowChooser(true)}
-            onEscalate={() => profileNavigate(`${CANONICAL_ROUTES.emergencyQueues}?queue=pretriage`)}
+            onEscalate={() => openEscalationDialog(null)}
             onFocusEms={() => focusQueueTab('ems')}
             onFocusVerification={() => focusQueueTab('verification')}
             onFocusPretriage={() => focusQueueTab('pretriage')}
-          />
-          <ArrivalControlSummaryStrip
-            patients={receptionQueueAll}
-            onMetricSelect={({ queueTab }) => {
+            onSelectStage={(queueTab) => {
               if (queueTab === 'verification' || queueTab === 'pretriage') {
                 focusQueueTab(queueTab);
               }
             }}
-            className="reception-front-door__arrival-summary"
           />
-        </>
         ) : null
       }
       supportingContext={
@@ -683,6 +759,20 @@ export default function ReceptionWorkspace() {
           clearIntakeQueryParams();
         }}
         onHandoffComplete={handleSmartIntakeHandoff}
+      />
+
+      <ReceptionEscalationPanel
+        open={escalationDialogOpen}
+        patients={receptionQueueAll}
+        defaultPatientId={selectedPatientId}
+        initialReasonId={escalationReasonId}
+        actorStaffId={emergencyRole.canonicalProfile?.employeeId || emergencyRole.canonicalProfile?.id}
+        actorName={currentUserName}
+        onClose={() => {
+          setEscalationDialogOpen(false);
+          setEscalationReasonId(null);
+        }}
+        onSubmit={submitEscalation}
       />
     </EmergencyRoutePage>
   );

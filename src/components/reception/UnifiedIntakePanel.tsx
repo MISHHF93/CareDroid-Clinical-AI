@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
-import { AlertTriangle, ChevronDown, ChevronUp, Save, Sparkles, Timer, UserPlus } from 'lucide-react';
+import { AlertTriangle, ChevronDown, ChevronUp, ClipboardCheck, Save, Sparkles, Timer, UserPlus } from 'lucide-react';
 import {
   detectReceptionRedFlags,
   resolveUnifiedIntakePrimaryAction,
@@ -12,6 +12,7 @@ import {
   type ReceptionRouteResult,
   type UnifiedIntakePhase,
 } from '../../services/receptionIntakeOrchestrator';
+import { RECEPTION_COPY } from './receptionCopy';
 
 const ARRIVAL_TYPES: Array<{ id: ReceptionArrivalType; label: string }> = [
   { id: 'walk-in', label: 'Walk-in' },
@@ -84,6 +85,20 @@ export default function UnifiedIntakePanel({
     () => resolveUnifiedIntakePrimaryAction(draft, aiAssist),
     [draft, aiAssist],
   );
+
+  const outstandingActions = useMemo(() => {
+    const items: string[] = [];
+    if (!String(draft.chiefComplaint || '').trim()) {
+      items.push('Capture chief complaint');
+    }
+    if (missingCriticalFields.length) {
+      items.push(`Complete required field${missingCriticalFields.length === 1 ? '' : 's'}: ${missingCriticalFields.join(', ')}`);
+    }
+    if (liveRedFlags.length) {
+      items.push(`Confirm red flag${liveRedFlags.length === 1 ? '' : 's'}: ${liveRedFlags.join(', ')}`);
+    }
+    return items;
+  }, [draft.chiefComplaint, missingCriticalFields, liveRedFlags]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -455,9 +470,26 @@ export default function UnifiedIntakePanel({
 
         <aside className="reception-command-panel reception-command-panel--assist" aria-labelledby="ai-assist-title">
           <div className="reception-command-panel__header">
-            <h2 id="ai-assist-title">AI Intake Assist</h2>
-            <span className="reception-command-chip">Auto-updated</span>
+            <h2 id="ai-assist-title">{RECEPTION_COPY.copilot.title}</h2>
+            <span className="reception-command-chip">{RECEPTION_COPY.copilot.autoUpdated}</span>
           </div>
+
+          <div className="reception-command-copilot-outstanding" role="status">
+            <div className="reception-command-copilot-outstanding__header">
+              <ClipboardCheck size={16} aria-hidden="true" />
+              <span>{RECEPTION_COPY.copilot.outstandingTitle}</span>
+            </div>
+            {outstandingActions.length ? (
+              <ul>
+                {outstandingActions.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            ) : (
+              <p>{RECEPTION_COPY.copilot.outstandingNone}</p>
+            )}
+          </div>
+
           {aiAssist ? (
             <div className="reception-command-ai">
               <div className={`reception-command-ai__urgency reception-command-ai__urgency--${aiAssist.urgencySuggestion}`}>
@@ -498,7 +530,7 @@ export default function UnifiedIntakePanel({
             <div className="reception-command-ai-empty">
               <div className="reception-command-empty">
                 <Sparkles size={20} aria-hidden="true" />
-                <span>Assist updates as you capture chief complaint and critical fields.</span>
+                <span>{RECEPTION_COPY.copilot.idle}</span>
               </div>
             </div>
           )}

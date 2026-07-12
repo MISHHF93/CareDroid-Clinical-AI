@@ -28,7 +28,7 @@ function unwrapEnvelopeData<T>(envelope: unknown): T | null {
 type OperationalIntelligenceRefreshListener = () => unknown;
 
 // useAiChiefOrchestrator({ realtime: true }) — and therefore this hook — is mounted
-// independently in several places at once (AiChiefOrchestrationBar, CopilotPanel,
+// independently in several places at once (OperationalIntelligenceBar, CopilotPanel,
 // AiChiefRouteRecommendationsPanel, HospitalCommandCenter), and each instance previously
 // started its own setInterval. Since intervalMs is derived from the same global
 // emergencySettings store for every caller, a single shared timer is enough — this

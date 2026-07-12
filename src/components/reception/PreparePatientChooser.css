@@ -91,7 +91,7 @@
 
 .reception-prepare__option--primary {
   border-color: var(--app-accent-interactive);
-  background: rgb(37 99 235 / 12%);
+  background: var(--medical-sky-50, #f0f9ff);
 }
 
 .reception-prepare__option:hover,

@@ -612,37 +612,37 @@
 }
 
 /* ── 15C. Reception toolbar action buttons ───────────────────────
-   The pale --reception-surface-inset + #e0f2fe border = nearly
-   invisible on a white card. Promote to a concrete slate surface. */
+   Pure white surfaces — color comes from border and icon only. */
 
 .reception-desk-toolbar__action {
-  background: var(--medical-slate-50, #f8fafc) !important;
-  border-color: #94a3b8 !important;
-  border-width: 1.5px !important;
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  border-width: 1px !important;
   color: var(--medical-ink, #111827) !important;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  box-shadow: none !important;
 }
 
 .reception-desk-toolbar__action:hover:not(:disabled) {
-  background: var(--medical-slate-100, #f1f5f9) !important;
-  border-color: #64748b !important;
-  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.08);
+  background: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: none !important;
 }
 
-/* Primary "Register" button — keep its blue accent stronger */
+/* Primary "Register" button — white background, blue border accent */
 .reception-desk-toolbar__action--primary {
-  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 12%, #fff) !important;
-  border-color: rgba(14, 165, 233, 0.55) !important;
-  color: var(--app-accent-interactive, #0369a1) !important;
+  background: #ffffff !important;
+  border-color: rgba(14, 165, 233, 0.5) !important;
+  color: #0369a1 !important;
 }
 
 .reception-desk-toolbar__action--primary:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 20%, #fff) !important;
+  background: #f8fafc !important;
+  border-color: #0ea5e9 !important;
 }
 
-/* Escalate button — keep red accent */
+/* Escalate button — white background, red border accent */
 .reception-desk-toolbar__action--escalate {
-  background: color-mix(in srgb, #ef4444 10%, #fff) !important;
+  background: #ffffff !important;
   border-color: rgba(239, 68, 68, 0.45) !important;
   color: #b91c1c !important;
 }
@@ -652,11 +652,11 @@
    Inactive queue tabs need visible body; active tab keeps blue.  */
 
 .reception-desk-toolbar__queue-tab {
-  background: var(--medical-slate-50, #f8fafc) !important;
-  border-color: #94a3b8 !important;
-  border-width: 1.5px !important;
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  border-width: 1px !important;
   color: #374151 !important;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  box-shadow: none !important;
 }
 
 .reception-desk-toolbar__queue-tab:hover:not(.reception-desk-toolbar__action--active) {
@@ -666,58 +666,55 @@
 
 .reception-desk-toolbar__action--active.reception-desk-toolbar__queue-tab,
 .reception-desk-toolbar__queue-tab.reception-desk-toolbar__action--active {
-  background: var(--app-accent-interactive, #0ea5e9) !important;
+  background: #ffffff !important;
   border-color: var(--app-accent-interactive, #0ea5e9) !important;
-  color: #ffffff !important;
-  box-shadow: 0 1px 4px rgba(14, 165, 233, 0.28);
+  color: var(--cd-brand-text, #0369a1) !important;
+  box-shadow: inset 0 0 0 1px var(--app-accent-interactive, #0ea5e9);
 }
 
 /* ── 15E. Unified intake phase nav (Registration tabs) ───────────
-   Pure-white inactive buttons with faint border = ghost text label.
-   Give them a concrete pill surface and clear inactive/active split. */
+   White surfaces with clear active/inactive split. */
 
 .unified-intake-phase-nav__btn {
-  background: var(--medical-slate-50, #f8fafc) !important;
-  border-color: #94a3b8 !important;
-  border-width: 1.5px !important;
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  border-width: 1px !important;
   color: #374151 !important;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  box-shadow: none !important;
   font-weight: 600;
 }
 
 .unified-intake-phase-nav__btn.is-active {
-  background: color-mix(in srgb, var(--reception-command-primary, #0ea5e9) 12%, #fff) !important;
-  border-color: color-mix(in srgb, var(--reception-command-primary, #0ea5e9) 55%, #94a3b8) !important;
-  color: var(--reception-command-primary-strong, #1d4ed8) !important;
-  box-shadow: 0 1px 4px rgba(37, 99, 235, 0.14);
+  background: #ffffff !important;
+  border-color: rgba(14, 165, 233, 0.5) !important;
+  color: #0369a1 !important;
+  box-shadow: none !important;
   font-weight: 700;
 }
 
 /* ── 15F. Quick complaint chips ──────────────────────────────────
-   --reception-command-inset may resolve to a near-transparent
-   value. Anchor with a solid off-white slate base.               */
+   White surfaces with clear selected state. */
 
 .reception-quick-complaints__chip {
-  background: var(--medical-slate-50, #f8fafc) !important;
-  border-color: #94a3b8 !important;
-  border-width: 1.5px !important;
+  background: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  border-width: 1px !important;
   color: #374151 !important;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
 }
 
 .reception-quick-complaints__chip.is-active,
 .reception-quick-complaints__chip:hover {
-  background: color-mix(in srgb, var(--reception-command-primary, #0ea5e9) 10%, #fff) !important;
-  border-color: color-mix(in srgb, var(--reception-command-primary, #0ea5e9) 50%, #94a3b8) !important;
-  color: var(--reception-command-primary-strong, #1d4ed8) !important;
+  background: #f8fafc !important;
+  border-color: rgba(14, 165, 233, 0.5) !important;
+  color: #0369a1 !important;
 }
 
 /* ── 15G. Reception work-queue tabs (inactive state) ─────────────
-   Section 8 sets white background — still low-contrast on white
-   card. Promote inactive tabs to slate-50 so they read as pills. */
+   White surfaces for all queue tabs. */
 
 .reception-work-queues__tab:not(.reception-work-queues__tab--active) {
-  background: var(--medical-slate-50, #f8fafc);
+  background: #ffffff;
   border-color: #94a3b8;
   border-width: 1.5px;
   color: #374151;

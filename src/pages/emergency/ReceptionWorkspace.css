@@ -1,18 +1,22 @@
 .reception-command {
-  --reception-command-bg: var(--medical-surface-page, #f8fafc);
-  --reception-command-panel: var(--medical-white, #ffffff);
+  --reception-command-bg: #ffffff;
+  --reception-command-panel: #ffffff;
   --reception-command-inset: var(--medical-slate-100, #f1f5f9);
   --reception-command-border: var(--medical-border, #e2e8f0);
   --reception-command-ink: var(--medical-ink, #111827);
   --reception-command-muted: var(--medical-ink-muted, #64748b);
   --reception-command-primary: var(--medical-accent-hover, #0284c7);
-  --reception-command-primary-strong: var(--medical-accent-tint, rgba(14, 165, 233, 0.1));
+  --reception-command-primary-strong: var(--medical-sky-700, #0369a1);
   --reception-command-critical: var(--semantic-critical, #b91c1c);
   --reception-command-warning: var(--semantic-attention, #b45309);
   display: grid;
   gap: var(--cdl-panel-gap, var(--app-layout-panel-gap, 12px));
   padding: 4px 0 72px;
   color: var(--reception-command-ink);
+}
+
+.reception-workspace {
+  background: #ffffff;
 }
 
 .reception-command button,
@@ -26,8 +30,12 @@
 .reception-command input:focus-visible,
 .reception-command select:focus-visible,
 .reception-command textarea:focus-visible {
-  outline: 3px solid rgba(15, 118, 110, 0.24);
+  outline: 3px solid color-mix(in srgb, var(--medical-sky-500, #0ea5e9) 24%, transparent);
   outline-offset: 2px;
+}
+
+.reception-front-door__escalation-quick-actions {
+  margin-top: var(--cdl-panel-gap, var(--app-layout-panel-gap, 12px));
 }
 
 .reception-command-header {
@@ -148,8 +156,8 @@
 }
 
 .reception-command-stepper__item--complete {
-  border-color: rgba(15, 118, 110, 0.35);
-  background: #ecfdf5;
+  border-color: var(--medical-sky-300, #7dd3fc);
+  background: #ffffff;
   color: var(--reception-command-primary-strong);
 }
 
@@ -189,6 +197,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
   gap: 14px;
+  max-width: 1400px;
 }
 
 .reception-command-panel {
@@ -227,6 +236,7 @@
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 8px;
+  max-width: 900px;
 }
 
 .reception-command-segmented button,
@@ -248,15 +258,16 @@
 }
 
 .reception-command-segmented button.is-active {
-  border-color: rgba(15, 118, 110, 0.45);
-  background: #ccfbf1;
-  color: #134e4a;
+  border-color: var(--medical-sky-400, #38bdf8);
+  background: #ffffff;
+  color: var(--medical-sky-700, #0369a1);
 }
 
 .reception-command-form-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
+  max-width: 900px;
 }
 
 .reception-command-form-grid--admin {
@@ -400,6 +411,41 @@
   font-weight: 700;
 }
 
+.reception-command-copilot-outstanding {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 10px;
+  border: 1px solid var(--reception-command-border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: var(--reception-command-inset);
+}
+
+.reception-command-copilot-outstanding__header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--reception-command-muted);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.reception-command-copilot-outstanding ul {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+}
+
+.reception-command-copilot-outstanding p {
+  margin: 0;
+  color: var(--reception-command-muted);
+  font-size: 13px;
+}
+
 .reception-command-empty {
   display: flex;
   align-items: center;
@@ -421,6 +467,7 @@
   gap: 8px;
   align-items: center;
   min-height: 58px;
+  max-width: 900px;
   border: 1px solid var(--reception-command-border);
   border-radius: 8px;
   background: #ffffff;
@@ -599,6 +646,12 @@
   .reception-command-form-grid,
   .reception-command-segmented {
     grid-template-columns: 1fr 1fr;
+    max-width: none;
+  }
+
+  .reception-front-door__body {
+    grid-template-columns: 1fr;
+    max-width: none;
   }
 
   .reception-command-panel--intake {
@@ -624,6 +677,12 @@
   .reception-command-red-flags > div,
   .reception-command-stepper {
     grid-template-columns: 1fr;
+    max-width: none;
+  }
+
+  .reception-command-queue-row {
+    grid-template-columns: 1fr;
+    max-width: none;
   }
 
   .reception-command-actionbar {
@@ -634,10 +693,6 @@
   .reception-command-actionbar button {
     width: 100%;
     min-width: 0;
-  }
-
-  .reception-command-queue-row {
-    grid-template-columns: 1fr;
   }
 
   .reception-command-alert {
@@ -742,6 +797,7 @@
   display: grid;
   gap: var(--cdl-panel-gap, 12px);
   grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
+  max-width: 1400px;
 }
 
 .reception-front-door__main {
@@ -809,5 +865,127 @@
 
   .reception-operational-rail {
     position: static;
+  }
+}
+
+/* Reception profile layout -------------------------------------------------
+   Use the available desk canvas, but let cards—not decorative color—create
+   hierarchy. The operational rail becomes a real companion column on wide
+   screens and folds back into the document flow at smaller sizes. */
+.reception-front-door {
+  width: 100%;
+  max-width: none;
+}
+
+.reception-front-door > .emergency-route-page__content > .cdl-operational-page {
+  width: 100%;
+  min-width: 0;
+}
+
+.reception-front-door
+  > .emergency-route-page__content
+  > .cdl-operational-page
+  > [data-cdl-zone='primary-actions'] {
+  grid-auto-flow: row;
+  justify-content: stretch;
+  width: 100%;
+}
+
+.reception-command-stepper-shell__graphic {
+  display: none;
+}
+
+/* ── Standard desktop (1280–2559px): 2-column ── */
+@media (min-width: 1280px) and (max-width: 2559px) {
+  .reception-front-door > .emergency-route-page__content > .cdl-operational-page {
+    grid-template-columns: minmax(0, 1fr) minmax(310px, 360px);
+    align-items: start;
+  }
+
+  .reception-front-door
+    > .emergency-route-page__content
+    > .cdl-operational-page
+    > [data-cdl-zone='operational-summary'],
+  .reception-front-door
+    > .emergency-route-page__content
+    > .cdl-operational-page
+    > [data-cdl-zone='primary-actions'] {
+    grid-column: 1 / -1;
+  }
+
+  .reception-front-door
+    > .emergency-route-page__content
+    > .cdl-operational-page
+    > [data-cdl-zone='active-work'] {
+    grid-column: 1;
+    grid-row: 3;
+  }
+
+  .reception-front-door
+    > .emergency-route-page__content
+    > .cdl-operational-page
+    > [data-cdl-zone='supporting-context'] {
+    grid-column: 2;
+    grid-row: 3;
+    position: sticky;
+    top: 12px;
+    align-self: start;
+  }
+}
+
+/* ── Ultrawide (2560px+): 3-column handled by clinical-ultrawide-layer.css ──
+   The ultrawide layer sets grid-template-columns with capped rail width.
+   We only need to ensure the rail doesn't get too wide internally. */
+@media (min-width: 2560px) {
+  .reception-front-door
+    > .emergency-route-page__content
+    > .cdl-operational-page
+    > [data-cdl-zone='primary-actions'] {
+    grid-column: 1 / -1;
+  }
+
+  .reception-operational-rail {
+    max-width: var(--cd-uw-rail-max, 380px);
+  }
+}
+
+/* ── Tablet (760–1279px): stacked with 2-col rail ── */
+@media (min-width: 760px) and (max-width: 1279px) {
+  .reception-operational-rail {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+    position: static;
+  }
+}
+
+/* ── Small tablet / large phone (≤760px): single column ── */
+@media (max-width: 760px) {
+  .reception-command-stepper {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .reception-command-stepper__item--critical {
+    grid-column: 1 / -1;
+  }
+
+  .unified-intake-actionbar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 8px max(10px, env(safe-area-inset-right))
+      calc(8px + env(safe-area-inset-bottom))
+      max(10px, env(safe-area-inset-left));
+  }
+
+  .unified-intake-actionbar
+    :is(.reception-command-actionbar__primary, .reception-command-actionbar__critical) {
+    grid-column: 1 / -1;
+    order: -1;
+  }
+}
+
+/* ── Narrow phone (≤430px) ── */
+@media (max-width: 430px) {
+  .reception-command-stepper,
+  .unified-intake-actionbar {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

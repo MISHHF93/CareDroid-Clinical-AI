@@ -40,9 +40,9 @@
   gap: 8px;
   min-height: 36px;
   padding: 0 12px;
-  border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
+  border: 1px solid var(--color-border-subtle, var(--medical-border, #e2e8f0));
   border-radius: 999px;
-  background: var(--color-elevated, var(--medical-surface-page, #f0f9ff));
+  background: #ffffff;
   color: var(--color-text-secondary, #9ca3af);
   font: inherit;
   font-size: 13px;
@@ -91,12 +91,17 @@
   width: 100%;
   min-height: 48px;
   padding: 0 14px;
-  border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
+  border: 1px solid var(--color-border-subtle, var(--medical-border, #e2e8f0));
   border-radius: 10px;
-  background: var(--color-elevated, var(--medical-surface-page, #f0f9ff));
+  background: #ffffff;
   color: var(--color-text-primary, var(--medical-ink, #111827));
   font: inherit;
   cursor: pointer;
+}
+
+.reception-work-queues__item:focus-visible {
+  outline: 3px solid var(--app-focus-ring, rgba(15, 118, 110, 0.24));
+  outline-offset: 2px;
 }
 
 .reception-work-queues__item span:last-child {

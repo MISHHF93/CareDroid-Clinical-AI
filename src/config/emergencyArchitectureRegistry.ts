@@ -104,11 +104,11 @@ export const EMERGENCY_ARCHITECTURE_REGISTRY: readonly EmergencyArchitectureArti
     note: 'Arrival-to-triage control — timestamps, modes, safety flags, queue routing, operational sync',
   },
   {
-    id: 'arrival-control-summary-strip',
-    path: 'src/components/reception/ArrivalControlSummaryStrip.tsx',
+    id: 'reception-journey-timeline',
+    path: 'src/components/reception/ReceptionJourneyTimeline.tsx',
     classification: EMERGENCY_ARCHITECTURE_CLASSIFICATION.ACTIVE_SCREEN_LOGIC,
     canonical: 'src/services/arrivalControlLayer.ts',
-    note: 'Reception arrival control snapshot — recent arrivals, registration, triage pending, waiting room',
+    note: 'Reception front-door journey timeline — arrival, registration, triage-pending, waiting-room stages with live counts and average wait, drill-through to each queue tab',
   },
   {
     id: 'operational-presentation-model',

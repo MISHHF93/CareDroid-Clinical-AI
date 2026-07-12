@@ -1,12 +1,24 @@
 /**
  * Ultrawide / large desktop — 34" QHD (2560), UWQHD (3440), and 4K canvases.
- * Sorts page zones, caps grid columns, and centers the operational canvas.
+ * Centers content, caps max-width for readability, and enables 3-column layouts
+ * where the primary workspace stays dominant and side panels are capped.
  */
+
+/* —— Shared CCDL ultrawide layout tokens —— */
+:root {
+  /* Max content width: caps line length for readability */
+  --cd-uw-max-content: 1800px;
+  --cd-uw-max-wide: 2000px;
+  --cd-uw-max-4k: 2200px;
+  /* Side panel cap: prevents rails from overpowering primary workspace */
+  --cd-uw-rail-max: 380px;
+  --cd-uw-rail-min: 320px;
+}
 
 @media (min-width: 2560px) {
   :root {
-    --app-layout-content-max: min(100%, 2100px);
-    --app-visual-page-max: min(100%, 2100px);
+    --app-layout-content-max: min(100%, var(--cd-uw-max-content));
+    --app-visual-page-max: min(100%, var(--cd-uw-max-content));
     --app-layout-page-gutter-inline: clamp(32px, 2.4vw, 48px);
     --app-grid-card-min: 17rem;
     --app-visual-grid-min: minmax(min(100%, 300px), 1fr);
@@ -70,16 +82,61 @@
     gap: var(--app-layout-section-gap);
     grid-template-columns: minmax(0, 1fr);
   }
+
+  /* ── Reception: 3-column layout on ultrawide ──
+     Primary intake dominates, operational rail is capped and sticky. */
+  .reception-front-door
+    > .emergency-route-page__content
+    > .cdl-operational-page {
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(var(--cd-uw-rail-min), var(--cd-uw-rail-max));
+    gap: var(--cdl-zone-gap);
+  }
+
+  .reception-front-door
+    > .emergency-route-page__content
+    > .cdl-operational-page
+    > [data-cdl-zone='operational-summary'],
+  .reception-front-door
+    > .emergency-route-page__content
+    > .cdl-operational-page
+    > [data-cdl-zone='primary-actions'] {
+    grid-column: 1 / -1;
+  }
+
+  .reception-front-door
+    > .emergency-route-page__content
+    > .cdl-operational-page
+    > [data-cdl-zone='active-work'] {
+    grid-column: 1;
+  }
+
+  .reception-front-door
+    > .emergency-route-page__content
+    > .cdl-operational-page
+    > [data-cdl-zone='supporting-context'] {
+    grid-column: 2;
+    position: sticky;
+    top: 12px;
+    align-self: start;
+  }
+
+  /* Cap the operational rail internal layout */
+  .reception-operational-rail {
+    gap: var(--space-3, 12px);
+  }
 }
 
 @media (min-width: 3440px) {
   :root {
-    --app-layout-content-max: min(100%, 2400px);
-    --app-visual-page-max: min(100%, 2400px);
+    --app-layout-content-max: min(100%, var(--cd-uw-max-wide));
+    --app-visual-page-max: min(100%, var(--cd-uw-max-wide));
     --app-grid-card-min: 18rem;
     --ed-whiteboard-card-min-ultrawide: 340px;
     --app-ultrawide-metric-columns: 5;
     --app-ultrawide-action-min: 300px;
+    --cd-uw-rail-max: 400px;
   }
 
   .emergency-app-shell .app-shell-main-content .emergency-route-situation-brief__list--graphic {
@@ -101,13 +158,13 @@
   .emergency-whiteboard-page__mission {
     grid-template-columns: minmax(320px, 1fr) minmax(360px, 1.1fr) minmax(320px, 0.9fr) !important;
   }
-
 }
 
 @media (min-width: 3840px) {
   :root {
-    --app-layout-content-max: min(100%, 2600px);
-    --app-visual-page-max: min(100%, 2600px);
+    --app-layout-content-max: min(100%, var(--cd-uw-max-4k));
+    --app-visual-page-max: min(100%, var(--cd-uw-max-4k));
     --app-ultrawide-metric-columns: 6;
+    --cd-uw-rail-max: 420px;
   }
 }

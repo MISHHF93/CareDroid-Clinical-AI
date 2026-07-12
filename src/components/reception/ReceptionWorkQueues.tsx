@@ -171,17 +171,28 @@ export default function ReceptionWorkQueues({
                 ? getPatientDataQualityRisks(patient, dataQualitySnapshot)
                 : [];
 
+              const openRow = () => {
+                if (activeTab === 'pretriage') {
+                  onExpandPatient?.(patient.id);
+                  onOpenPatient?.(patient.id);
+                } else {
+                  onOpenVerification?.(patient.id, activeTab === 'ems' ? patient.emsUnitId : '');
+                }
+              };
+
               return (
               <li key={patient.id}>
-                <button
-                  type="button"
+                {/* div (not button) — contains the badge-stack's own "+N more" toggle button;
+                    a button cannot validly nest another button. */}
+                <div
+                  role="button"
+                  tabIndex={0}
                   className="reception-work-queues__item"
-                  onClick={() => {
-                    if (activeTab === 'pretriage') {
-                      onExpandPatient?.(patient.id);
-                      onOpenPatient?.(patient.id);
-                    } else {
-                      onOpenVerification?.(patient.id, activeTab === 'ems' ? patient.emsUnitId : '');
+                  onClick={openRow}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      openRow();
                     }
                   }}
                 >
@@ -238,7 +249,7 @@ export default function ReceptionWorkQueues({
                       showOnlineDot
                     />
                   </span>
-                </button>
+                </div>
                 {activeTab === 'pretriage' &&
                 canReviewTriage &&
                 expandedPatientId === patient.id ? (

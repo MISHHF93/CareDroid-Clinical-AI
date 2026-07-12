@@ -160,7 +160,7 @@ export const ALERT_SOURCE_REGISTRY = Object.freeze([
     domain: 'Queue',
     source: 'reception-escalation-workflow',
     defaultTier: 'critical',
-    surfaces: ['Header', 'ReceptionWorkspace', 'ChargeNurseOperationalStrip', 'ReceptionEscalationStrip'],
+    surfaces: ['Header', 'ReceptionWorkspace', 'ChargeNurseOperationalStrip', 'ReceptionEscalationAttentionStrip', 'ReceptionEscalationQuickActions'],
   }),
   Object.freeze({
     id: 'operational-intelligence',

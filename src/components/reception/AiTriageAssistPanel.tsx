@@ -13,6 +13,7 @@ import { CARE_STREAMING_LANES } from '../../config/edOperationalStandards';
 import { priorityToEsiLabel } from '../../config/edOperationalStandards';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { Priority } from '../../types/emergency';
+import { RECEPTION_COPY } from './receptionCopy';
 import './AiTriageAssistPanel.css';
 
 const PRIORITY_OPTIONS = [Priority.P1, Priority.P2, Priority.P3, Priority.P4, Priority.P5];
@@ -114,7 +115,9 @@ export default function AiTriageAssistPanel({
     >
       <header className="ai-triage-assist__header">
         <div>
-          <p className="ai-triage-assist__eyebrow">Nurse triage sign-off · {sourceLabel}</p>
+          <p className="ai-triage-assist__eyebrow">
+            {RECEPTION_COPY.copilot.triageSignOffEyebrow} · {sourceLabel}
+          </p>
           <h3 className="ai-triage-assist__title">
             Suggested {priorityLabel(priority)} · {streamingLaneLabel(String(lane))}
           </h3>

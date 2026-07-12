@@ -4,7 +4,6 @@ import './card.css';
 interface CardProps extends HTMLAttributes<HTMLDivElement> {
   subtle?: boolean;
   hover?: boolean;
-  glassmorphism?: boolean;
   compact?: boolean;
   padding?: string;
   children?: React.ReactNode;
@@ -15,7 +14,6 @@ const Card = ({
   style,
   subtle = false,
   hover = false,
-  glassmorphism = false,
   compact = false,
   padding = compact
     ? 'var(--compact-card-padding, var(--app-card-padding-compact, 14px))'
@@ -28,7 +26,6 @@ const Card = ({
     const classes = ['card'];
     if (subtle) classes.push('card-subtle');
     if (hover) classes.push('card-hover');
-    if (glassmorphism) classes.push('card-glass');
     if (compact) classes.push('card-compact');
     if (onClick) classes.push('card-clickable');
     if (className) classes.push(className);

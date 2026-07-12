@@ -15,6 +15,7 @@
 /* 3. App palette (--app-*) */
 @import './theme-tokens.css';
 @import './emergency-tokens.css';
+@import './role-accent-theme.css';
 
 /* 4. Medical theme layers */
 @import './medical-color-layer.css';

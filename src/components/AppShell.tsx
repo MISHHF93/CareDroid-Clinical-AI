@@ -36,8 +36,10 @@ import {
 } from '../config/emergencyRolePermissions';
 import { getVisibleNavigation } from '../config/unified-navigation.config';
 import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
+import { resolveCopilotChromeLabels } from '../config/profileDesignLanguage.config';
 import { getEmergencySurface } from '../config/emergencyPipelineModel';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+import useRoleAccentTheme from '../hooks/useRoleAccentTheme';
 import useScreenModeCapabilities from '../hooks/useScreenModeCapabilities';
 import { navigateProfileAware } from '../navigation/profileRouteLaunch';
 import { useSimulationMode } from '../contexts/SimulationModeContext';
@@ -45,14 +47,10 @@ import { useUserIdentity } from '../contexts/UserIdentityContext';
 import { isSimulationModeActive } from '../services/simulationModeService';
 import SessionChromeBar from './chrome/SessionChromeBar';
 import HospitalJourneyCommandBar from './emergency/HospitalJourneyCommandBar';
-import AiChiefOrchestrationBar from './ai/AiChiefOrchestrationBar';
-import ThreeMinuteMissionBar from './emergency/ThreeMinuteMissionBar';
-import WorkflowAutomationCommandBar from './emergency/WorkflowAutomationCommandBar';
-import UnifiedOperationalIntelligenceCommandBar from './emergency/UnifiedOperationalIntelligenceCommandBar';
 import ShellRouteTab from './chrome/ShellRouteTab';
+import OperationalAlarmDock from './chrome/OperationalAlarmDock';
 import { RouteChromeProvider, useRouteChrome } from '../contexts/RouteChromeContext';
 import { NotificationShellProvider } from '../contexts/NotificationShellContext';
-import { resolveAppShellChromePolicy } from '../config/appShellChromePolicy';
 import SidebarNotificationPanel from './SidebarNotificationPanel';
 import { useCopilotChromeAccess } from '../hooks/useCopilotChromeAccess';
 import { HelpHubProvider, dispatchOpenHelpHub } from '../contexts/HelpHubContext';
@@ -265,6 +263,7 @@ function AppShellFrame({ children }: AppShellProps) {
   const location = useLocation();
   const { effectiveProfile: backendEffectiveProfile } = useUserIdentity();
   const emergencyRole = useEmergencyRolePermissions();
+  useRoleAccentTheme(emergencyRole.role);
   const screenCapabilities = useScreenModeCapabilities();
   const surfaces = usePractitionerSurfaceVisibility();
   const screenDensityProfile = useMemo(
@@ -276,22 +275,16 @@ function AppShellFrame({ children }: AppShellProps) {
     location.pathname === '/emergency';
   const isPublicWaitingKiosk =
     screenCapabilities.isPublicDisplay && isEmergencyBoardRoute;
-  /** Public-audience board only — interactive staff always keep full app chrome. */
-  const chromePolicy = useMemo(
-    () =>
-      resolveAppShellChromePolicy({
-        pathname: location.pathname,
-        isPublicDisplay: screenCapabilities.isPublicDisplay,
-        isWallKiosk: screenCapabilities.isWallKiosk,
-      }),
-    [
-      location.pathname,
-      screenCapabilities.isPublicDisplay,
-      screenCapabilities.isWallKiosk,
-    ],
-  );
-  const showInteractiveAppChrome = chromePolicy.showInteractiveAppChrome;
-  const useKioskShell = !showInteractiveAppChrome;
+  const isReadOnlyWhiteboardKiosk =
+    screenCapabilities.isWallKiosk &&
+    !screenCapabilities.isPublicDisplay &&
+    isEmergencyBoardRoute;
+  const useWallKioskChrome =
+    screenCapabilities.useMinimalAppChrome &&
+    isEmergencyBoardRoute &&
+    !isPublicWaitingKiosk &&
+    !isReadOnlyWhiteboardKiosk;
+  const useKioskShell = useWallKioskChrome || isPublicWaitingKiosk || isReadOnlyWhiteboardKiosk;
   const startupStartedRef = useRef(false);
   const receptionRouteInitialMountRef = useRef(true);
   const previousSimulationModeRef = useRef<boolean | null>(null);
@@ -322,8 +315,9 @@ function AppShellFrame({ children }: AppShellProps) {
     [patientsForReassessmentCount],
   );
   const { active: simulationModeActive } = useSimulationMode();
-  const { canUseCopilot, hiddenOnReception } = useCopilotChromeAccess();
+  const { canUseCopilot, showSessionCopilot, hiddenOnReception } = useCopilotChromeAccess();
   const { saasRole, profileCopy } = useEffectiveUserProfile();
+  const copilotChrome = useMemo(() => resolveCopilotChromeLabels(profileCopy), [profileCopy]);
   const profileNavigate = useCallback(
     (to: To, options?: { replace?: boolean; state?: unknown }) =>
       navigateProfileAware(navigate, to, { saasRole, emergencyRole, ...options }),
@@ -859,12 +853,8 @@ function AppShellFrame({ children }: AppShellProps) {
         'cdl-shell',
         screenDensityShellClassName(screenCapabilities.screenMode),
         isPublicWaitingKiosk ? 'emergency-app-shell--public-waiting-kiosk' : '',
-        screenCapabilities.isWallKiosk && !screenCapabilities.isPublicDisplay
-          ? 'emergency-app-shell--wall-density'
-          : '',
-        copilotOpen && canUseCopilot && showInteractiveAppChrome
-          ? 'emergency-app-shell--copilot-open'
-          : '',
+        isReadOnlyWhiteboardKiosk ? 'emergency-app-shell--read-only-whiteboard-kiosk' : '',
+        copilotOpen && canUseCopilot && !useKioskShell ? 'emergency-app-shell--copilot-open' : '',
       ]
         .filter(Boolean)
         .join(' ')}
@@ -872,80 +862,54 @@ function AppShellFrame({ children }: AppShellProps) {
       <a className="ed-skip-link" href="#main-content">
         Skip to main content
       </a>
-      {chromePolicy.showSidebar ? <Sidebar navigationItems={visibleNavigationItems} /> : null}
-      {chromePolicy.showNotificationPanel ? <SidebarNotificationPanel /> : null}
+      {useKioskShell ? null : <Sidebar navigationItems={visibleNavigationItems} />}
+      {!useKioskShell ? <SidebarNotificationPanel /> : null}
       <div className="emergency-app-shell__main-column">
         <RouteChromeProvider>
-          {/*
-            Explicit flex column host so chrome + main participate in the
-            min-height:0 scroll chain (Provider alone does not create a box).
-          */}
-          <div
-            className="emergency-app-shell__chrome-and-page"
-            data-chrome-policy={chromePolicy.reason}
+          <RouteChromeReset />
+          {useWallKioskChrome ? (
+            <header className="emergency-wall-kiosk-header">
+              <strong>{screenCapabilities.label}</strong>
+              <span className="emergency-wall-kiosk-header__safety">{EMERGENCY_OS_BRANDING.safetyLine}</span>
+            </header>
+          ) : isPublicWaitingKiosk || isReadOnlyWhiteboardKiosk ? null : (
+            <>
+              <Header />
+              <ShellRouteTab title={currentPage.label} subtitle={currentPage.subtitle} />
+              <OperationalAlarmDock showEmsInbound={screenCapabilities.showEmsCriticalOverlay} />
+              {!useKioskShell ? <HospitalJourneyCommandBar /> : null}
+              {!useKioskShell ? <SessionChromeBar /> : null}
+            </>
+          )}
+          <main
+            id="main-content"
+            className={[
+              'app-shell-main-content',
+              isMobileViewport ? 'app-shell-main-content--mobile-nav' : '',
+            ]
+              .filter(Boolean)
+              .join(' ')}
+            role="main"
+            tabIndex={-1}
+            data-screen-density-mode={screenDensityProfile.id}
+            data-practitioner-compact={surfaces.compactLayout ? 'true' : undefined}
           >
-            <RouteChromeReset />
-            {showInteractiveAppChrome ? (
-              <>
-                <div className="app-chrome" data-testid="app-chrome">
-                  {/* Alarms mount inside Header actions; Guide stays sidebar-only */}
-                  <Header />
-                  <ShellRouteTab title={currentPage.label} subtitle={currentPage.subtitle} />
-                </div>
-                {chromePolicy.showCommandBars ? (
-                  <section
-                    className="emergency-app-shell__command-bars"
-                    aria-label="Operational command bars"
-                  >
-                    <HospitalJourneyCommandBar />
-                    <AiChiefOrchestrationBar />
-                    <UnifiedOperationalIntelligenceCommandBar />
-                    <ThreeMinuteMissionBar />
-                    <WorkflowAutomationCommandBar />
-                  </section>
-                ) : null}
-                {chromePolicy.showSessionBar ? <SessionChromeBar /> : null}
-              </>
-            ) : chromePolicy.showWallBrandHeaderOnly ? (
-              <header className="emergency-wall-kiosk-header">
-                <strong>{screenCapabilities.label}</strong>
-                <span className="emergency-wall-kiosk-header__safety">
-                  {EMERGENCY_OS_BRANDING.safetyLine}
-                </span>
-              </header>
-            ) : null}
-            <main
-              id="main-content"
-              className={[
-                'app-shell-main-content',
-                'app-scroll-container',
-                isMobileViewport ? 'app-shell-main-content--mobile-nav' : '',
-              ]
-                .filter(Boolean)
-                .join(' ')}
-              role="main"
-              tabIndex={-1}
-              data-screen-density-mode={screenDensityProfile.id}
-              data-practitioner-compact={surfaces.compactLayout ? 'true' : undefined}
-              data-scrollport="app-shell-main"
+            <ErrorBoundary
+              key={location.pathname}
+              resetKey={location.pathname}
+              fallbackText={`${screenCapabilities.productLabel} page encountered an error. Refresh to reload.`}
             >
-              <ErrorBoundary
-                key={location.pathname}
-                resetKey={location.pathname}
-                fallbackText={`${screenCapabilities.productLabel} page encountered an error. Refresh to reload.`}
+              <Suspense
+                fallback={
+                  <div role="status" className="app-shell-route-loading">
+                    Loading {screenCapabilities.productLabel} page...
+                  </div>
+                }
               >
-                <Suspense
-                  fallback={
-                    <div role="status" className="app-shell-route-loading">
-                      Loading {screenCapabilities.productLabel} page...
-                    </div>
-                  }
-                >
-                  {children}
-                </Suspense>
-              </ErrorBoundary>
-            </main>
-          </div>
+                {children}
+              </Suspense>
+            </ErrorBoundary>
+          </main>
         </RouteChromeProvider>
       </div>
       {!screenCapabilities.isRegistrationScreen && !useKioskShell ? (
@@ -955,7 +919,6 @@ function AppShellFrame({ children }: AppShellProps) {
         </Suspense>
       </ErrorBoundary>
       ) : null}
-      {/* Sole open control is sidebar nav id `copilot` (and keyboard C). No floating launch FAB. */}
       {canUseCopilot && !useKioskShell && !hiddenOnReception && copilotOpen ? (
         <ErrorBoundary
           key={`copilot-${copilotOpen ? 'open' : 'closed'}-${location.pathname}`}
@@ -966,6 +929,17 @@ function AppShellFrame({ children }: AppShellProps) {
             <CopilotPanel />
           </Suspense>
         </ErrorBoundary>
+      ) : null}
+      {canUseCopilot && !useKioskShell && !hiddenOnReception && !copilotOpen && !showSessionCopilot ? (
+        <button
+          type="button"
+          className="ed-copilot-launch"
+          onClick={toggleCopilot}
+          aria-label={copilotChrome.openAriaLabel}
+          title={copilotChrome.openTitle}
+        >
+          {copilotChrome.productName}
+        </button>
       ) : null}
       <ErrorBoundary fallbackText="Critical broadcast overlay encountered an error.">
         <Suspense fallback={null}>

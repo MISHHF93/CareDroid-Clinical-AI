@@ -3,9 +3,22 @@ import { showActionError, showActionSuccess } from '../../services/careDroidInte
 import {
   RECEPTION_ESCALATION_REASONS,
   resolveReceptionEscalationReason,
+  type ReceptionEscalationInput,
+  type ReceptionEscalationReasonId,
+  type ReceptionEscalationRecord,
 } from '../../services/receptionEscalationWorkflow';
 import { RECEPTION_COPY } from './receptionCopy';
 import './ReceptionEscalationQuickActions.css';
+
+type ReceptionEscalationQuickActionsProps = {
+  defaultPatientId?: string | null;
+  actorStaffId?: string | null;
+  actorName?: string;
+  disabled?: boolean;
+  onSubmit?: (input: ReceptionEscalationInput) => ReceptionEscalationRecord | null | undefined;
+  onOpenDetail?: (reasonId: ReceptionEscalationReasonId | null) => void;
+  className?: string;
+};
 
 export default function ReceptionEscalationQuickActions({
   defaultPatientId = null,
@@ -15,7 +28,7 @@ export default function ReceptionEscalationQuickActions({
   onSubmit,
   onOpenDetail,
   className = '',
-}) {
+}: ReceptionEscalationQuickActionsProps) {
   const [pendingReasonId, setPendingReasonId] = useState<any>(null);
 
   const handleQuickFlag = async (reasonId) => {
@@ -35,7 +48,7 @@ export default function ReceptionEscalationQuickActions({
         reasonId,
         patientId: defaultPatientId,
         detail: reason.description,
-        actorStaffId,
+        actorStaffId: actorStaffId ?? undefined,
         actorName,
       });
 

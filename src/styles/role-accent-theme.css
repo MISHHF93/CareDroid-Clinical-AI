@@ -1,0 +1,123 @@
+/**
+ * CareDroid role accent theme — CSS layer for src/config/roleAccentTheme.ts.
+ * Stamped by src/hooks/useRoleAccentTheme.ts as `data-role-theme` on <html>.
+ *
+ * IMPORTANT — two different blast radii, kept deliberately separate:
+ *
+ * 1. `--medical-accent*` / `--medical-text-link*` (global, every role block
+ *    below): these specifically drive the Sidebar's active-nav highlight
+ *    (`--nav-item-active-bg`, `--nav-fg-active`, `--cdl-sidebar-item-bg-active`
+ *    all resolve through `--medical-accent-tint`/`--medical-accent-hover`).
+ *    Safe to override globally — the sidebar should look role-branded on
+ *    every page, and nothing else critical reads this chain.
+ *
+ * 2. `--app-accent*` (Reception-scoped only, see the `.reception-workspace`
+ *    block below): `src/styles/color-normalization.css` has a sweep rule —
+ *    `[class*='--primary']` (any BEM "--primary" modifier, used all over the
+ *    app: mission-bar buttons, alert acknowledge buttons, etc.) gets
+ *    `background: var(--app-accent-interactive, ...)`. That rule is a
+ *    deliberate "one primary-action color everywhere" invariant — it's what
+ *    every role's "Acknowledge" on a shared critical alert should look like
+ *    the same regardless of who's viewing it. Overriding `--app-accent*`
+ *    globally broke that invariant (confirmed: it made the same alert's
+ *    Acknowledge button shift color per role — reported as "huge color
+ *    mismatching"). So `--app-accent*` is only overridden inside
+ *    `.reception-workspace`, which is Reception's own page content, not the
+ *    shared cross-role command bars. If Triage/Nurse/etc. get their own
+ *    workspace wrapper class later, add the same scoped block for them.
+ *
+ * Semantic tones (--app-danger, --app-warning, --app-success,
+ * --semantic-ai-assistance, etc.) are never touched here — critical/warning/
+ * success/AI must read identically regardless of which role is viewing.
+ *
+ * The two-attribute selector ([data-theme][data-role-theme="x"]) outranks the
+ * base `html, html[data-theme='light']` block in theme-tokens.css on
+ * specificity alone, so this file's import order doesn't matter and
+ * theme-tokens.css itself never needs to change.
+ */
+
+html[data-theme][data-role-theme='reception'] {
+  /* Reception uses the canonical medical-blue palette instead of a separate
+     teal skin. Role context comes from navigation and workflow language. */
+  --medical-accent: var(--medical-sky-500, #0ea5e9);
+  --medical-accent-hover: var(--medical-sky-600, #0284c7);
+  --medical-accent-soft: var(--medical-sky-400, #38bdf8);
+  --medical-accent-tint: color-mix(in srgb, var(--medical-sky-500, #0ea5e9) 10%, transparent);
+  --medical-accent-border: color-mix(in srgb, var(--medical-sky-500, #0ea5e9) 32%, transparent);
+  --medical-text-link: var(--medical-sky-700, #0369a1);
+  --medical-text-link-hover: var(--medical-sky-600, #0284c7);
+
+  /* Front-desk work is card-dense, so use the available profile canvas. */
+  --app-layout-content-max: 100%;
+  --app-visual-page-max: 100%;
+}
+
+html[data-theme][data-role-theme='triage'] {
+  --medical-accent: #a35a12;
+  --medical-accent-hover: color-mix(in srgb, #a35a12 82%, black);
+  --medical-accent-soft: color-mix(in srgb, #a35a12 60%, white);
+  --medical-accent-tint: color-mix(in srgb, #a35a12 10%, transparent);
+  --medical-accent-border: color-mix(in srgb, #a35a12 32%, transparent);
+  --medical-text-link: color-mix(in srgb, #a35a12 82%, black);
+  --medical-text-link-hover: color-mix(in srgb, #a35a12 68%, black);
+}
+
+html[data-theme][data-role-theme='nurse'] {
+  --medical-accent: #a8456a;
+  --medical-accent-hover: color-mix(in srgb, #a8456a 82%, black);
+  --medical-accent-soft: color-mix(in srgb, #a8456a 60%, white);
+  --medical-accent-tint: color-mix(in srgb, #a8456a 10%, transparent);
+  --medical-accent-border: color-mix(in srgb, #a8456a 32%, transparent);
+  --medical-text-link: color-mix(in srgb, #a8456a 82%, black);
+  --medical-text-link-hover: color-mix(in srgb, #a8456a 68%, black);
+}
+
+html[data-theme][data-role-theme='physician'] {
+  --medical-accent: #1e3a5f;
+  --medical-accent-hover: color-mix(in srgb, #1e3a5f 82%, black);
+  --medical-accent-soft: color-mix(in srgb, #1e3a5f 60%, white);
+  --medical-accent-tint: color-mix(in srgb, #1e3a5f 10%, transparent);
+  --medical-accent-border: color-mix(in srgb, #1e3a5f 32%, transparent);
+  --medical-text-link: color-mix(in srgb, #1e3a5f 82%, black);
+  --medical-text-link-hover: color-mix(in srgb, #1e3a5f 68%, black);
+}
+
+html[data-theme][data-role-theme='ems'] {
+  --medical-accent: #0e7490;
+  --medical-accent-hover: color-mix(in srgb, #0e7490 82%, black);
+  --medical-accent-soft: color-mix(in srgb, #0e7490 60%, white);
+  --medical-accent-tint: color-mix(in srgb, #0e7490 10%, transparent);
+  --medical-accent-border: color-mix(in srgb, #0e7490 32%, transparent);
+  --medical-text-link: color-mix(in srgb, #0e7490 82%, black);
+  --medical-text-link-hover: color-mix(in srgb, #0e7490 68%, black);
+}
+
+html[data-theme][data-role-theme='admin'] {
+  --medical-accent: #475569;
+  --medical-accent-hover: color-mix(in srgb, #475569 82%, black);
+  --medical-accent-soft: color-mix(in srgb, #475569 60%, white);
+  --medical-accent-tint: color-mix(in srgb, #475569 10%, transparent);
+  --medical-accent-border: color-mix(in srgb, #475569 32%, transparent);
+  --medical-text-link: color-mix(in srgb, #475569 82%, black);
+  --medical-text-link-hover: color-mix(in srgb, #475569 68%, black);
+}
+
+/* data-role-theme="default" intentionally has no block — it inherits the
+   platform-standard accent already defined in theme-tokens.css and
+   medical-color-layer.css. */
+
+/* —— Reception's own workspace content only (not the shared command bars) —— */
+html[data-theme][data-role-theme='reception'] .reception-workspace {
+  --app-accent: var(--medical-sky-500, #0ea5e9);
+  --app-accent-2: var(--medical-sky-600, #0284c7);
+  --app-accent-interactive: var(--medical-sky-500, #0ea5e9);
+  --app-accent-hover: var(--medical-sky-700, #0369a1);
+  --app-link-fg: var(--medical-sky-700, #0369a1);
+  --app-link-hover: var(--medical-sky-600, #0284c7);
+  --app-focus: color-mix(in srgb, var(--medical-sky-500, #0ea5e9) 18%, transparent);
+  --app-focus-ring-aa: var(--medical-sky-600, #0284c7);
+  --app-hover: color-mix(in srgb, var(--medical-sky-500, #0ea5e9) 8%, transparent);
+  --app-table-row-hover: color-mix(in srgb, var(--medical-sky-500, #0ea5e9) 6%, transparent);
+  --app-scrollbar-thumb: color-mix(in srgb, var(--medical-sky-500, #0ea5e9) 24%, #e2e8f0);
+  --app-scrollbar-thumb-hover: color-mix(in srgb, var(--medical-sky-500, #0ea5e9) 40%, #cbd5e1);
+}

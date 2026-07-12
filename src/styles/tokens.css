@@ -78,6 +78,7 @@
   /* — Foreground — */
   --cd-text-primary:   hsl(var(--cd-palette-slate-900));
   --cd-text-secondary: hsl(var(--cd-palette-slate-500));
+  --cd-text-muted:     hsl(var(--cd-palette-slate-400));
   --cd-text-disabled:  hsl(var(--cd-palette-slate-400));
   --cd-text-inverse:   hsl(var(--cd-palette-white));
   --cd-text-brand:     hsl(var(--cd-palette-sky-600));
@@ -98,6 +99,11 @@
   --cd-brand-bg-subtle:   hsl(var(--cd-palette-sky-50));
   --cd-brand-fg:          hsl(var(--cd-palette-white));
   --cd-brand-fg-subtle:   hsl(var(--cd-palette-sky-600));
+  --cd-brand-text:        hsl(var(--cd-palette-sky-700));
+
+  /* — Accent surfaces — */
+  --cd-bg-accent-subtle:  hsl(var(--cd-palette-sky-50));
+  --cd-border-accent:     hsl(var(--cd-palette-sky-200));
 
   /* — Status: Info — */
   --cd-info-bg:     hsl(var(--cd-palette-sky-500));
@@ -121,6 +127,7 @@
   --cd-danger-bg:        hsl(var(--cd-palette-red-500));
   --cd-danger-bg-subtle: hsl(0 72% 96%);
   --cd-danger-border:    hsl(0 84% 82%);
+  --cd-danger-border-strong: hsl(0 74% 72%);
   --cd-danger-text:      hsl(var(--cd-palette-red-600));
 
   /* — Interactive states — */
@@ -148,6 +155,7 @@
 
   --cd-text-primary:   hsl(var(--cd-palette-slate-50));
   --cd-text-secondary: hsl(var(--cd-palette-slate-400));
+  --cd-text-muted:     hsl(var(--cd-palette-slate-500));
   --cd-text-disabled:  hsl(var(--cd-palette-slate-600));
   --cd-text-inverse:   hsl(var(--cd-palette-slate-900));
   --cd-text-brand:     hsl(var(--cd-palette-sky-300));
@@ -166,6 +174,10 @@
   --cd-brand-bg-subtle:   hsl(var(--cd-palette-sky-900));
   --cd-brand-fg:          hsl(var(--cd-palette-white));
   --cd-brand-fg-subtle:   hsl(var(--cd-palette-sky-300));
+  --cd-brand-text:        hsl(var(--cd-palette-sky-300));
+
+  --cd-bg-accent-subtle:  hsl(var(--cd-palette-sky-900));
+  --cd-border-accent:     hsl(var(--cd-palette-sky-700));
 
   --cd-info-bg:           hsl(var(--cd-palette-sky-500));
   --cd-info-bg-subtle:    hsl(var(--cd-palette-sky-900));
@@ -185,6 +197,7 @@
   --cd-danger-bg:        hsl(var(--cd-palette-red-500));
   --cd-danger-bg-subtle: hsl(0 72% 8%);
   --cd-danger-border:    hsl(0 74% 22%);
+  --cd-danger-border-strong: hsl(0 74% 32%);
   --cd-danger-text:      hsl(var(--cd-palette-red-400));
 
   --cd-interactive-bg-hover:    hsl(var(--cd-palette-slate-700));
@@ -335,6 +348,7 @@
   --cd-radius-2xl:  16px;
   --cd-radius-3xl:  24px;
   --cd-radius-full: 9999px;
+  --cd-radius-pill: 999px;
 }
 
 /* ─────────────────────────────────────────────────────────────

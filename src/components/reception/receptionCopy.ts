@@ -197,6 +197,15 @@ export const RECEPTION_COPY = Object.freeze({
     newPatient: 'Register new patient',
     noMatch: 'no match for',
   },
+  copilot: Object.freeze({
+    eyebrow: 'Reception Copilot',
+    title: 'Reception Copilot',
+    autoUpdated: 'Auto-updated',
+    idle: 'Copilot updates as you capture chief complaint and critical fields.',
+    outstandingTitle: 'Still needed before routing',
+    outstandingNone: 'Nothing outstanding — ready to route.',
+    triageSignOffEyebrow: 'Reception Copilot · nurse triage sign-off',
+  }),
   escalation: Object.freeze({
     eyebrow: 'Front desk escalation',
     title: 'Flag for triage / charge nurse',

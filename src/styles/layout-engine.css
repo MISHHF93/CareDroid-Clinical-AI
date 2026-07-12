@@ -5,6 +5,7 @@
  */
 
 :root {
+  --app-viewport-height: 100dvh;
   --app-layout-content-max: var(--app-visual-page-max, min(100%, 1680px));
   --app-layout-readable-max: var(--app-visual-readable-max, 1120px);
   --app-layout-page-gutter-inline: var(--app-shell-page-gutter-inline, var(--app-visual-page-gutter, 24px));

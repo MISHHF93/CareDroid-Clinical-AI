@@ -5,20 +5,35 @@ import {
   RECEPTION_ESCALATION_REASONS,
   resolveReceptionEscalationReason,
   selectReceptionEscalationPatientOptions,
+  type ReceptionEscalationInput,
+  type ReceptionEscalationReasonId,
+  type ReceptionEscalationRecord,
 } from '../../services/receptionEscalationWorkflow';
+import type { Patient } from '../../types/emergency';
 import { RECEPTION_COPY } from './receptionCopy';
 import './ReceptionEscalationPanel.css';
 
+type ReceptionEscalationPanelProps = {
+  open?: boolean;
+  patients?: Patient[];
+  defaultPatientId?: string | null;
+  initialReasonId?: ReceptionEscalationReasonId | null;
+  actorStaffId?: string | null;
+  actorName?: string;
+  onClose?: () => void;
+  onSubmit?: (input: ReceptionEscalationInput) => ReceptionEscalationRecord | null | undefined;
+};
+
 export default function ReceptionEscalationPanel({
   open = false,
-  patients = [] as any[],
+  patients = [],
   defaultPatientId = null,
   initialReasonId = null,
   actorStaffId = null,
   actorName = 'Reception',
   onClose,
   onSubmit,
-}) {
+}: ReceptionEscalationPanelProps) {
   const [reasonId, setReasonId] = useState<any>(null);
   const [patientId, setPatientId] = useState(defaultPatientId || '');
   const [detail, setDetail] = useState('');
@@ -51,7 +66,7 @@ export default function ReceptionEscalationPanel({
         reasonId,
         patientId: patientId || null,
         detail: detail.trim(),
-        actorStaffId,
+        actorStaffId: actorStaffId ?? undefined,
         actorName,
       });
 

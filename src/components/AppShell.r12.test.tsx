@@ -143,10 +143,6 @@ vi.mock('./ReassessmentDrawer', () => ({
 }));
 
 vi.mock('./emergency/HospitalJourneyCommandBar', () => ({ default: () => null }));
-vi.mock('./ai/AiChiefOrchestrationBar', () => ({ default: () => null }));
-vi.mock('./emergency/ThreeMinuteMissionBar', () => ({ default: () => null }));
-vi.mock('./emergency/WorkflowAutomationCommandBar', () => ({ default: () => null }));
-vi.mock('./emergency/UnifiedOperationalIntelligenceCommandBar', () => ({ default: () => null }));
 
 vi.mock('sonner', () => ({
   Toaster: () => null,

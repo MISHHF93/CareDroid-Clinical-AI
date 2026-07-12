@@ -193,10 +193,10 @@ export const LIVING_REUSABLE_COMPONENTS = Object.freeze([
     purpose: 'Operational command bars for journey and workflow surfaces.',
   }),
   Object.freeze({
-    id: 'AiChiefOrchestrationBar',
-    label: 'AI Chief orchestration bar',
-    path: 'src/components/ai/AiChiefOrchestrationBar.tsx',
-    purpose: 'Continuous monitoring recommendations with explainable rationale.',
+    id: 'OperationalIntelligenceBar',
+    label: 'Operational intelligence bar',
+    path: 'src/components/emergency/OperationalIntelligenceBar.tsx',
+    purpose: 'Continuous monitoring recommendations with explainable rationale, surfaced from the header Operations Center.',
   }),
   Object.freeze({
     id: 'LivingContextualHelpBanner',

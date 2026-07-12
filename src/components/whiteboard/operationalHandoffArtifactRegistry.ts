@@ -63,7 +63,7 @@ export const PATIENT_HANDOFF_ARTIFACTS = Object.freeze([
   Object.freeze({
     id: 'reception-escalation-workflow',
     label: 'Reception escalation workflow',
-    surfaces: ['ReceptionEscalationPanel', 'ReceptionEscalationStrip', 'ReceptionWorkspace', 'Header', 'receptionEscalationWorkflow.ts'],
+    surfaces: ['ReceptionEscalationPanel', 'ReceptionEscalationQuickActions', 'ReceptionEscalationAttentionStrip', 'ReceptionWorkspace', 'Header', 'receptionEscalationWorkflow.ts'],
     mechanism: 'submitReceptionEscalation from reception desk — notifies triage and charge nurse via alert center without leaving reception',
   }),
   Object.freeze({

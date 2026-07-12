@@ -65,7 +65,7 @@ html {
     [class*='--primary'],
     .btn-primary,
     [class*='cta']
-  ) {
+  ):not(.reception-desk-toolbar__action) {
   background: var(--app-accent-interactive, var(--medical-accent));
   border-color: color-mix(in srgb, var(--medical-accent) 55%, var(--medical-border));
   color: var(--app-on-solid, #ffffff);

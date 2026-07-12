@@ -1,10 +1,10 @@
 /**
  * Numeric design primitives — spacing, radii, type scale, motion.
+ * Canonical values align with --cd-* tokens in tokens.css.
  * Semantic aliases (--space-xs, --app-radius-*) live in design-tokens.css.
- * Do not duplicate palette colors here.
  */
 :root {
-  /* Spacing (4px grid) */
+  /* Spacing (4px grid) — canonical scale matching --cd-space-* */
   --space-0-5: 2px;
   --space-1: 4px;
   --space-1-5: 6px;
@@ -13,10 +13,12 @@
   --space-4: 16px;
   --space-5: 20px;
   --space-6: 24px;
-  --space-7: 32px;
-  --space-8: 48px;
+  --space-7: 28px;
+  --space-8: 32px;
   --space-10: 40px;
   --space-12: 48px;
+  --space-14: 56px;
+  --space-16: 64px;
 
   /* Mobile-first fluid spacing */
   --space-fluid-1: clamp(4px, 1vw, 6px);
@@ -26,15 +28,16 @@
   --space-fluid-5: clamp(20px, 3vw, 24px);
   --space-fluid-6: clamp(24px, 3.5vw, 32px);
 
-  /* Radius — aligned with compact clinical surfaces (12px cards, 16px panels) */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
-  --radius-2xl: 24px;
+  /* Radius — aligned with --cd-radius-* tokens */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-3xl: 24px;
   --radius-pill: 999px;
 
-  /* Type scale (px) */
+  /* Type scale (px) — aligned with --cd-text-* tokens */
   --font-10: 10px;
   --font-11: 11px;
   --font-12: 12px;
@@ -44,7 +47,6 @@
   --font-16: 16px;
   --font-18: 18px;
   --font-20: 20px;
-  --font-22: 22px;
   --font-24: 24px;
   --font-28: 28px;
   --font-36: 36px;
@@ -56,12 +58,12 @@
   --text-body-fluid: clamp(0.875rem, 1vw + 0.5rem, 0.95rem);
   --text-caption-fluid: clamp(0.75rem, 1vw + 0.45rem, 0.8125rem);
 
-  /* Semantic text aliases (static fallbacks; fluid aliases in design-tokens.css) */
-  --text-xs: 12px;
-  --text-sm: 14px;
-  --text-md: 16px;
-  --text-lg: 18px;
-  --text-xl: 22px;
+  /* Semantic text aliases — aligned with --cd-text-* */
+  --text-xs: 11px;
+  --text-sm: 13px;
+  --text-md: 15px;
+  --text-lg: 17px;
+  --text-xl: 20px;
 
   /* Motion */
   --motion-fast: 120ms;
@@ -87,11 +89,11 @@
   --component-button-height: 40px;
   --component-button-radius: var(--radius-md);
 
-  /* Elevation */
+  /* Elevation — neutral shadows (not blue-tinted) */
   --elevation-none: none;
-  --elevation-card: 0 8px 20px rgba(14, 165, 233, 0.06);
-  --elevation-floating: 0 16px 36px rgba(14, 165, 233, 0.08);
-  --elevation-modal: 0 24px 60px rgba(14, 165, 233, 0.12);
+  --elevation-card: 0 1px 3px rgba(15, 23, 42, 0.06), 0 4px 16px rgba(15, 23, 42, 0.04);
+  --elevation-floating: 0 4px 12px rgba(15, 23, 42, 0.08), 0 8px 24px rgba(15, 23, 42, 0.05);
+  --elevation-modal: 0 10px 25px rgba(15, 23, 42, 0.10), 0 20px 48px rgba(15, 23, 42, 0.06);
 
   /* Root font size — responsive baseline */
   font-size: clamp(15px, 0.22vw + 14px, 17px);

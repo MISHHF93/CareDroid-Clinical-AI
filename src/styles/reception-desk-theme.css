@@ -5,10 +5,10 @@
 
 .reception-workspace {
   --reception-accent: var(--app-accent-interactive, var(--status-info, #0ea5e9));
-  --reception-accent-strong: color-mix(in srgb, var(--reception-accent) 14%, var(--ed-surface-raised, var(--medical-surface-card, #ffffff)));
-  --reception-accent-border: color-mix(in srgb, var(--reception-accent) 38%, var(--ed-border-subtle, var(--medical-border, #e0f2fe)));
-  --reception-surface-card: var(--color-card, var(--ed-surface-overlay, var(--medical-surface-card, #ffffff)));
-  --reception-surface-inset: var(--color-elevated, var(--ed-surface-raised, var(--medical-surface-muted)));
+  --reception-accent-strong: #ffffff;
+  --reception-accent-border: color-mix(in srgb, var(--reception-accent) 38%, var(--ed-border-subtle, var(--medical-border, #e2e8f0)));
+  --reception-surface-card: #ffffff;
+  --reception-surface-inset: #ffffff;
   --reception-text-primary: var(--ed-text-primary, var(--color-text-primary, var(--medical-ink, #111827)));
   --reception-text-secondary: var(--ed-text-secondary, var(--color-text-secondary, var(--medical-ink-muted, #6b7280)));
   --reception-border: var(--ed-border-subtle, var(--color-border-subtle, var(--medical-border)));

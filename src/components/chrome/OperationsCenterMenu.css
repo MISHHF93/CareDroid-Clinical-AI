@@ -1,0 +1,152 @@
+.operations-center-menu {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.operations-center-menu__trigger {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  border: 1px solid var(--app-panel-border, rgba(255, 255, 255, 0.12));
+  background: var(--app-overlay-on-surface, rgba(255, 255, 255, 0.04));
+  color: var(--text-color);
+  cursor: pointer;
+}
+
+.operations-center-menu__trigger:hover {
+  border-color: color-mix(in srgb, var(--app-accent) 40%, transparent);
+}
+
+.operations-center-menu__trigger--open {
+  border-color: var(--app-accent);
+}
+
+.operations-center-menu__trigger--warning {
+  color: var(--status-warning, #d97706);
+  border-color: color-mix(in srgb, var(--status-warning, #d97706) 45%, transparent);
+}
+
+.operations-center-menu__trigger--critical {
+  color: var(--status-critical, #dc2626);
+  border-color: color-mix(in srgb, var(--status-critical, #dc2626) 55%, transparent);
+}
+
+.operations-center-menu__badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--status-critical, #dc2626);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.operations-center-menu__trigger--warning .operations-center-menu__badge {
+  background: var(--status-warning, #d97706);
+}
+
+/*
+ * Named "__dropdown", not "__panel" — src/styles/responsive-ux.css has an app-wide
+ * "fit contract" sweep rule matching [class*='panel'] that forces max-width: 100%.
+ * For an absolutely-positioned flyout anchored to a small trigger button, "100%"
+ * resolves against that tiny trigger's width, silently collapsing the dropdown.
+ *
+ * position: fixed (not absolute) is deliberate: the header (.caredroid-header--compact,
+ * .caredroid-header__topbar) sets overflow: hidden for its own fixed-height layout, which
+ * clips any position: absolute descendant that visually extends below it. Fixed positioning
+ * escapes that clipping (no transform/filter/will-change sits between here and the
+ * viewport), anchored from the header's own height token instead of the trigger's box.
+ */
+.operations-center-menu__dropdown {
+  position: fixed;
+  top: calc(var(--cdl-header-height, 52px) + 8px);
+  right: 16px;
+  z-index: var(--z-popover, 940);
+  display: flex;
+  flex-direction: column;
+  width: min(420px, 92vw);
+  max-height: min(640px, 80vh);
+  border-radius: 12px;
+  border: 1px solid var(--medical-border, #e2e8f0);
+  background: var(--app-surface-1, #ffffff);
+  box-shadow: 0 4px 6px rgba(15, 23, 42, 0.04), 0 12px 32px rgba(15, 23, 42, 0.12);
+  overflow: hidden;
+}
+
+.operations-center-menu__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--medical-border, #e2e8f0);
+  color: var(--medical-ink, #0f172a);
+}
+
+.operations-center-menu__header h2 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.operations-center-menu__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--medical-border, #e2e8f0);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--medical-ink-muted, #64748b);
+  cursor: pointer;
+}
+
+.operations-center-menu__body {
+  display: grid;
+  gap: 8px;
+  padding: 10px 12px;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.operations-center-menu__footer {
+  padding: 10px 12px;
+  border-top: 1px solid var(--medical-border, #e2e8f0);
+}
+
+.operations-center-menu__footer-link {
+  display: block;
+  text-align: center;
+  padding: 8px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--app-accent) 12%, transparent);
+  color: var(--medical-ink, #0f172a);
+  font-size: 12px;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.operations-center-menu__footer-link:hover {
+  background: color-mix(in srgb, var(--app-accent) 20%, transparent);
+}
+
+@media (max-width: 720px) {
+  .operations-center-menu__dropdown {
+    inset: calc(var(--cdl-header-height, 52px) + 8px) 8px auto 8px;
+    right: auto;
+    width: auto;
+    max-height: min(560px, 70vh);
+  }
+}
