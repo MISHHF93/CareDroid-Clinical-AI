@@ -129,3 +129,94 @@ export function ValidationErrors({ errors, title = 'Check required fields:' }) {
     </div>
   );
 }
+
+export function CalcFieldValidationErrors({ errors }) {
+  if (!errors.length) return null;
+  return (
+    <div className="calc-validation-errors" role="alert" aria-live="assertive">
+      <p className="calc-validation-errors-title">Correct the following before calculating:</p>
+      <ul>
+        {errors.map((error) => (
+          <li key={error}>{error}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export function CalcNumberField({ slug, field, value, onChange }) {
+  return (
+    <div className="calc-input-group">
+      <label className="calc-input-label" htmlFor={`${slug}-${field.name}`}>
+        {field.label}
+      </label>
+      <input
+        id={`${slug}-${field.name}`}
+        className="calc-input-field"
+        type="number"
+        min={field.min}
+        max={field.max}
+        step={field.step || 'any'}
+        value={value}
+        onChange={(event) => onChange(field.name, event.target.value)}
+        inputMode="decimal"
+      />
+      {field.help ? <span className="calc-input-help">{field.help}</span> : null}
+    </div>
+  );
+}
+
+export function CalcSelectField({ slug, field, value, onChange }) {
+  return (
+    <div className="calc-input-group">
+      <label className="calc-input-label" htmlFor={`${slug}-${field.name}`}>
+        {field.label}
+      </label>
+      <select
+        id={`${slug}-${field.name}`}
+        className="calc-select-field"
+        value={value}
+        onChange={(event) => onChange(field.name, event.target.value)}
+      >
+        <option value="">Select...</option>
+        {field.options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+      {field.help ? <span className="calc-input-help">{field.help}</span> : null}
+    </div>
+  );
+}
+
+export function CalcCheckboxGroup({ fields, form, onChange, legend = 'Clinical features' }) {
+  if (!fields.length) return null;
+  return (
+    <fieldset className="calc-meld-fieldset calc-has-bled-fieldset">
+      <legend className="calc-timi-legend calc-has-bled-legend">{legend}</legend>
+      {fields.map((field) => (
+        <div className="calc-checkbox-group" key={field.name}>
+          <input
+            id={field.name}
+            type="checkbox"
+            className="calc-checkbox"
+            checked={Boolean(form[field.name])}
+            onChange={(event) => onChange(field.name, event.target.checked)}
+          />
+          <label htmlFor={field.name} className="calc-checkbox-label">
+            {field.label}
+          </label>
+        </div>
+      ))}
+    </fieldset>
+  );
+}
+
+export function ConfigDrivenCalculatorField({ slug, field, value, onChange }) {
+  return field.type === 'select' ? (
+    <CalcSelectField slug={slug} field={field} value={value} onChange={onChange} />
+  ) : (
+    <CalcNumberField slug={slug} field={field} value={value} onChange={onChange} />
+  );
+}

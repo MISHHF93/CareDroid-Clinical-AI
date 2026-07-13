@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { NavIcon } from '../../navigation/NavIcon';
 import { getCalculatorSubIcon } from '../../navigation/iconRegistry';
-import { CalcPanelTitle, ResultsPanelTitle } from './calculatorPrimitives';
+import { CalcFieldValidationErrors, CalcPanelTitle, ResultsPanelTitle } from './calculatorPrimitives';
 import {
   WELLS_PE_CRITERIA_META,
   calculateWellsPeScore,
@@ -45,20 +45,6 @@ function DecisionSupportNotice({ children }) {
         recommend treatment, or replace clinician judgment.
       </p>
       <p className="calc-disclaimer-detail">{children}</p>
-    </div>
-  );
-}
-
-function ValidationErrors({ errors }) {
-  if (!errors.length) return null;
-  return (
-    <div className="calc-validation-errors" role="alert" aria-live="assertive">
-      <p className="calc-validation-errors-title">Correct the following before calculating:</p>
-      <ul>
-        {errors.map((error) => (
-          <li key={error}>{error}</li>
-        ))}
-      </ul>
     </div>
   );
 }
@@ -336,7 +322,7 @@ export function GraceAcsCalculator({ onResultChange }) {
       onResultChange={onResultChange}
     >
       <form className="calc-pr1-form" onSubmit={calculate}>
-        <ValidationErrors errors={errors} />
+        <CalcFieldValidationErrors errors={errors} />
         <div className="calc-input-grid">
           <NumberField slug="grace-acs" name="ageYears" label="Age (years)" value={values.ageYears} onChange={update} min="18" max="120" />
           <NumberField slug="grace-acs" name="heartRateBpm" label="Heart rate (bpm)" value={values.heartRateBpm} onChange={update} min="20" max="300" />
@@ -411,7 +397,7 @@ export function NihssCalculator({ onResultChange }) {
       onResultChange={onResultChange}
     >
       <form className="calc-pr1-form" onSubmit={calculate}>
-        <ValidationErrors errors={errors} />
+        <CalcFieldValidationErrors errors={errors} />
         <div className="calc-input-grid">
           {NIHSS_ITEM_META.map((item) => {
             const options = Array.from({ length: item.max - item.min + 1 }, (_, index) => item.min + index);

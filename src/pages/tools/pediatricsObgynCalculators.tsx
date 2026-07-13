@@ -1,7 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS, getCalculatorSubIcon } from '../../navigation/iconRegistry';
-import { CalcPanelTitle, ResultsPanelTitle, scrollResultsIntoView } from './calculatorPrimitives';
+import {
+  CalcFieldValidationErrors,
+  CalcPanelTitle,
+  ResultsPanelTitle,
+  scrollResultsIntoView,
+} from './calculatorPrimitives';
 import {
   PEDIATRIC_DOSING_PLACEHOLDER_DISCLAIMER,
   PEDIATRICS_OBGYN_SAFETY_DISCLAIMER,
@@ -22,20 +27,6 @@ function DecisionSupportNotice({ children, dosingPlaceholder = false }) {
       <p className="calc-disclaimer-detail">
         {dosingPlaceholder ? PEDIATRIC_DOSING_PLACEHOLDER_DISCLAIMER : PEDIATRICS_OBGYN_SAFETY_DISCLAIMER}
       </p>
-    </div>
-  );
-}
-
-function ValidationErrors({ errors }) {
-  if (!errors.length) return null;
-  return (
-    <div className="calc-validation-errors" role="alert" aria-live="assertive">
-      <p className="calc-validation-errors-title">Correct the following before calculating:</p>
-      <ul>
-        {errors.map((error) => (
-          <li key={error}>{error}</li>
-        ))}
-      </ul>
     </div>
   );
 }
@@ -174,7 +165,7 @@ function PediatricsObgynCalculator({ config, onResultChange }) {
             calculate();
           }}
         >
-          <ValidationErrors errors={errors} />
+          <CalcFieldValidationErrors errors={errors} />
           <div className="calc-input-grid--responsive">
             {config.fields.map((field) => (
               <Field
@@ -392,7 +383,7 @@ function PediatricEmergencyDrugCalculator({ onResultChange, patientContext = nul
             calculate();
           }}
         >
-          <ValidationErrors errors={errors} />
+          <CalcFieldValidationErrors errors={errors} />
           <div className="calc-input-grid--responsive">
             <div className="calc-input-group">
               <label className="calc-input-label" htmlFor="peds-drug-weight">

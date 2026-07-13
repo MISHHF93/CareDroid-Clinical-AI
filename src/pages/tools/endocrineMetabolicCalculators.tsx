@@ -1,7 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS, getCalculatorSubIcon } from '../../navigation/iconRegistry';
-import { CalcPanelTitle, ResultsPanelTitle, scrollResultsIntoView } from './calculatorPrimitives';
+import {
+  CalcFieldValidationErrors,
+  CalcPanelTitle,
+  ConfigDrivenCalculatorField,
+  ResultsPanelTitle,
+  scrollResultsIntoView,
+} from './calculatorPrimitives';
 import {
   computeAdjustedBodyWeight,
   computeBsaMosteller,
@@ -20,66 +26,6 @@ function DecisionSupportNotice({ children }) {
         and metabolic protocols.
       </p>
       <p className="calc-disclaimer-detail">{children}</p>
-    </div>
-  );
-}
-
-function ValidationErrors({ errors }) {
-  if (!errors.length) return null;
-  return (
-    <div className="calc-validation-errors" role="alert" aria-live="assertive">
-      <p className="calc-validation-errors-title">Correct the following before calculating:</p>
-      <ul>
-        {errors.map((error) => (
-          <li key={error}>{error}</li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-function TextField({ slug, field, value, onChange }) {
-  return (
-    <div className="calc-input-group">
-      <label className="calc-input-label" htmlFor={`${slug}-${field.name}`}>
-        {field.label}
-      </label>
-      <input
-        id={`${slug}-${field.name}`}
-        className="calc-input-field"
-        type="number"
-        min={field.min}
-        max={field.max}
-        step={field.step || 'any'}
-        value={value}
-        onChange={(event) => onChange(field.name, event.target.value)}
-        inputMode="decimal"
-      />
-      {field.help ? <span className="calc-input-help">{field.help}</span> : null}
-    </div>
-  );
-}
-
-function SelectField({ slug, field, value, onChange }) {
-  return (
-    <div className="calc-input-group">
-      <label className="calc-input-label" htmlFor={`${slug}-${field.name}`}>
-        {field.label}
-      </label>
-      <select
-        id={`${slug}-${field.name}`}
-        className="calc-select-field"
-        value={value}
-        onChange={(event) => onChange(field.name, event.target.value)}
-      >
-        <option value="">Select...</option>
-        {field.options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-      {field.help ? <span className="calc-input-help">{field.help}</span> : null}
     </div>
   );
 }
@@ -168,27 +114,17 @@ function EndocrineMetabolicCalculator({ config, onResultChange }) {
             calculate();
           }}
         >
-          <ValidationErrors errors={errors} />
+          <CalcFieldValidationErrors errors={errors} />
           <div className="calc-input-grid--responsive">
-            {config.fields.map((field) =>
-              field.type === 'select' ? (
-                <SelectField
-                  key={field.name}
-                  slug={config.slug}
-                  field={field}
-                  value={form[field.name]}
-                  onChange={update}
-                />
-              ) : (
-                <TextField
-                  key={field.name}
-                  slug={config.slug}
-                  field={field}
-                  value={form[field.name]}
-                  onChange={update}
-                />
-              )
-            )}
+            {config.fields.map((field) => (
+              <ConfigDrivenCalculatorField
+                key={field.name}
+                slug={config.slug}
+                field={field}
+                value={form[field.name]}
+                onChange={update}
+              />
+            ))}
           </div>
           <div className="calc-actions">
             <button type="submit" className="calc-calculate-btn">

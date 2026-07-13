@@ -1,7 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS, getCalculatorSubIcon } from '../../navigation/iconRegistry';
-import { CalcPanelTitle, ResultsPanelTitle, scrollResultsIntoView } from './calculatorPrimitives';
+import {
+  CalcCheckboxGroup,
+  CalcFieldValidationErrors,
+  CalcPanelTitle,
+  ConfigDrivenCalculatorField,
+  ResultsPanelTitle,
+  scrollResultsIntoView,
+} from './calculatorPrimitives';
 import {
   computeAaGradient,
   computeAsthmaSeverityScore,
@@ -19,20 +26,6 @@ function DecisionSupportNotice({ children }) {
         <strong>Decision support only.</strong> Does not diagnose or replace clinician judgment; follow local protocols.
       </p>
       <p className="calc-disclaimer-detail">{children}</p>
-    </div>
-  );
-}
-
-function ValidationErrors({ errors }) {
-  if (!errors.length) return null;
-  return (
-    <div className="calc-validation-errors" role="alert" aria-live="assertive">
-      <p className="calc-validation-errors-title">Correct the following before calculating:</p>
-      <ul>
-        {errors.map((error) => (
-          <li key={error}>{error}</li>
-        ))}
-      </ul>
     </div>
   );
 }
@@ -69,74 +62,6 @@ function ResultPanel({ slug, result, emptyText, primaryLabel, primaryValue }) {
       </div>
       <p>{emptyText}</p>
     </div>
-  );
-}
-
-function TextField({ slug, field, value, onChange }) {
-  return (
-    <div className="calc-input-group">
-      <label className="calc-input-label" htmlFor={`${slug}-${field.name}`}>
-        {field.label}
-      </label>
-      <input
-        id={`${slug}-${field.name}`}
-        className="calc-input-field"
-        type="number"
-        min={field.min}
-        max={field.max}
-        step={field.step || 'any'}
-        value={value}
-        onChange={(event) => onChange(field.name, event.target.value)}
-        inputMode="decimal"
-      />
-      {field.help ? <span className="calc-input-help">{field.help}</span> : null}
-    </div>
-  );
-}
-
-function SelectField({ slug, field, value, onChange }) {
-  return (
-    <div className="calc-input-group">
-      <label className="calc-input-label" htmlFor={`${slug}-${field.name}`}>
-        {field.label}
-      </label>
-      <select
-        id={`${slug}-${field.name}`}
-        className="calc-select-field"
-        value={value}
-        onChange={(event) => onChange(field.name, event.target.value)}
-      >
-        <option value="">Select...</option>
-        {field.options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
-}
-
-function CheckboxGroup({ fields, form, onChange }) {
-  if (!fields.length) return null;
-  return (
-    <fieldset className="calc-meld-fieldset calc-has-bled-fieldset">
-      <legend className="calc-timi-legend calc-has-bled-legend">Clinical features</legend>
-      {fields.map((field) => (
-        <div className="calc-checkbox-group" key={field.name}>
-          <input
-            id={field.name}
-            type="checkbox"
-            className="calc-checkbox"
-            checked={Boolean(form[field.name])}
-            onChange={(event) => onChange(field.name, event.target.checked)}
-          />
-          <label htmlFor={field.name} className="calc-checkbox-label">
-            {field.label}
-          </label>
-        </div>
-      ))}
-    </fieldset>
   );
 }
 
@@ -188,17 +113,19 @@ function PulmonologyCalculator({ config, onResultChange }) {
             calculate();
           }}
         >
-          <ValidationErrors errors={errors} />
+          <CalcFieldValidationErrors errors={errors} />
           <div className="calc-input-grid--responsive">
-            {config.fields.map((field) =>
-              field.type === 'select' ? (
-                <SelectField key={field.name} slug={config.slug} field={field} value={form[field.name]} onChange={update} />
-              ) : (
-                <TextField key={field.name} slug={config.slug} field={field} value={form[field.name]} onChange={update} />
-              )
-            )}
+            {config.fields.map((field) => (
+              <ConfigDrivenCalculatorField
+                key={field.name}
+                slug={config.slug}
+                field={field}
+                value={form[field.name]}
+                onChange={update}
+              />
+            ))}
           </div>
-          <CheckboxGroup fields={config.checkboxes || []} form={form} onChange={update} />
+          <CalcCheckboxGroup fields={config.checkboxes || []} form={form} onChange={update} />
           <div className="calc-actions">
             <button type="submit" className="calc-calculate-btn">
               <NavIcon icon={CHROME_ICONS.calculator} size={20} aria-hidden />

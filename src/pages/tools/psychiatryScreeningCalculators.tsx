@@ -1,7 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS, getCalculatorSubIcon } from '../../navigation/iconRegistry';
-import { CalcPanelTitle, ResultsPanelTitle, scrollResultsIntoView } from './calculatorPrimitives';
+import {
+  CalcFieldValidationErrors,
+  CalcPanelTitle,
+  ResultsPanelTitle,
+  scrollResultsIntoView,
+} from './calculatorPrimitives';
 import {
   CRISIS_SENSITIVE_SAFETY_MESSAGE,
   PSYCHIATRY_SCREENING_SAFETY_DISCLAIMER,
@@ -78,20 +83,6 @@ function Field({ config, field, value, onChange }) {
         />
       )}
       {field.help ? <span className="calc-input-help">{field.help}</span> : null}
-    </div>
-  );
-}
-
-function ValidationErrors({ errors }) {
-  if (!errors.length) return null;
-  return (
-    <div className="calc-validation-errors" role="alert" aria-live="assertive">
-      <p className="calc-validation-errors-title">Correct the following before calculating:</p>
-      <ul>
-        {errors.map((error) => (
-          <li key={error}>{error}</li>
-        ))}
-      </ul>
     </div>
   );
 }
@@ -207,7 +198,7 @@ function PsychiatryScreeningCalculator({ config, onResultChange }) {
             calculate();
           }}
         >
-          <ValidationErrors errors={errors} />
+          <CalcFieldValidationErrors errors={errors} />
           <div className="calc-input-grid--responsive">
             {config.fields.map((field) => (
               <Field
