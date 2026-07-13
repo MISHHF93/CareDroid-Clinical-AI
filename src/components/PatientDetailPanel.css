@@ -609,9 +609,9 @@
 }
 
 .patient-detail-calculators__chip {
-  border: 1px solid #374151);
+  border: 1px solid #374151;
   border-radius: 999px;
-  background: color-mix(in srgb, #374151) 12%, transparent);
+  background: color-mix(in srgb, #374151 12%, transparent);
   color: var(--status-info, #bfdbfe);
   font-size: var(--ed-type-body);
   font-weight: 700;

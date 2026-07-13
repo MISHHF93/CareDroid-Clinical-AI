@@ -405,17 +405,21 @@
 
 /* ─────────────────────────────────────────────────────────────
    9. Z-INDEX SCALE
+   Aliased onto the canonical --z-* scale (design-tokens.css) so the
+   two families share one ordered stacking space. Previously these
+   used a separate low scale (modal:400), which let a --cd-z-modal
+   surface render *below* a --z-popover (940) overlay.
 ───────────────────────────────────────────────────────────── */
 :root {
-  --cd-z-base:      0;
+  --cd-z-base:      var(--z-base, 0);
   --cd-z-raised:    10;
-  --cd-z-dropdown:  100;
-  --cd-z-sticky:    200;
-  --cd-z-overlay:   300;
-  --cd-z-modal:     400;
-  --cd-z-popover:   500;
-  --cd-z-toast:     600;
-  --cd-z-tooltip:   700;
+  --cd-z-dropdown:  var(--z-dropdown, 700);
+  --cd-z-sticky:    var(--z-sticky, 800);
+  --cd-z-overlay:   var(--z-overlay, 900);
+  --cd-z-modal:     var(--z-modal, 1100);
+  --cd-z-popover:   var(--z-popover, 940);
+  --cd-z-toast:     var(--z-toast, 1200);
+  --cd-z-tooltip:   calc(var(--z-toast, 1200) + 100);
 }
 
 /* ─────────────────────────────────────────────────────────────

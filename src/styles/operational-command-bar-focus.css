@@ -2,6 +2,6 @@
 .three-minute-mission-bar__btn:focus-visible,
 .ai-chief-orchestration-bar__action:focus-visible,
 .hospital-journey-command-bar__link:focus-visible {
-  outline: 2px solid #374151);
+  outline: 2px solid var(--app-accent-action, #374151);
   outline-offset: 2px;
 }

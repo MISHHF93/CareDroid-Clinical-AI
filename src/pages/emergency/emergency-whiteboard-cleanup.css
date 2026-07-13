@@ -751,7 +751,7 @@
 
 .emergency-whiteboard-page__display-banner {
   align-items: center;
-  background: color-mix(in srgb, #374151) 14%, var(--color-surface, var(--app-surface-1, #ffffff)));
+  background: color-mix(in srgb, #374151 14%, var(--color-surface, var(--app-surface-1, #ffffff)));
   border-bottom: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   display: flex;
   flex-wrap: wrap;

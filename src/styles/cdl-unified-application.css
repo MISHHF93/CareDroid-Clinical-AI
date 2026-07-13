@@ -15,7 +15,7 @@
 }
 
 .cdl-shell--entry .entry-shell__header {
-  min-height: var(--cdl-header-height, 56px);
+  min-height: var(--cdl-header-height, 52px);
 }
 
 .cdl-shell--display .display-shell {
@@ -202,7 +202,7 @@
 .emergency-app-shell .caredroid-header__topbar {
   background: var(--cdl-header-bg, var(--app-surface));
   border-bottom: 1px solid var(--cdl-header-border, var(--app-border));
-  min-height: var(--cdl-header-height, 56px);
+  min-height: var(--cdl-header-height, 52px);
 }
 
 .emergency-app-shell .sidebar-nav-item--active {

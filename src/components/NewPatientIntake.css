@@ -1,7 +1,7 @@
 .new-patient-intake {
   position: fixed;
   inset: 0;
-  z-index: calc(var(--z-modal, 1000) + 100);
+  z-index: calc(var(--z-modal, 1100) + 100);
   display: grid;
   place-items: stretch;
   background: rgba(10, 14, 26, 0.86);

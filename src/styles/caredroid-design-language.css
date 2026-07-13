@@ -55,7 +55,7 @@
 }
 
 .cdl-shell__header {
-  min-height: var(--cdl-header-height, 56px);
+  min-height: var(--cdl-header-height, 52px);
   background: var(--cdl-header-bg, var(--medical-white));
   border-bottom: 0;
   box-shadow: 0 1px 0 var(--cdl-header-border, color-mix(in srgb, var(--medical-border) 50%, transparent));

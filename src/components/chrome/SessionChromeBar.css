@@ -126,7 +126,7 @@ button.session-chrome-bar__segment:focus-visible {
 .session-chrome-bar__pill {
   border: 1px solid transparent;
   border-radius: 999px;
-  background: color-mix(in srgb, #374151) 12%, var(--ed-surface-overlay));
+  background: color-mix(in srgb, #374151 12%, var(--ed-surface-overlay));
   color: var(--ed-text-primary);
   cursor: pointer;
   font: inherit;
@@ -144,7 +144,7 @@ button.session-chrome-bar__segment:focus-visible {
 
 .session-chrome-bar__pill[aria-expanded='true'] {
   border-color: var(--ed-border-strong);
-  background: color-mix(in srgb, #374151) 18%, var(--ed-surface-overlay));
+  background: color-mix(in srgb, #374151 18%, var(--ed-surface-overlay));
 }
 
 .session-chrome-bar__pill--copilot-tab {
