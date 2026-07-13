@@ -96,8 +96,8 @@
 }
 
 .clinical-calculator-hub__tabs button.is-active {
-  border-color: var(--app-accent-interactive, var(--accent-1));
-  background: color-mix(in srgb, var(--app-accent-interactive, var(--accent-1)) 14%, var(--app-surface-1));
+  border-color: #374151);
+  background: color-mix(in srgb, #374151) 14%, var(--app-surface-1));
 }
 
 .clinical-calculator-hub__patient-bar {
@@ -132,7 +132,7 @@
   gap: 5px;
   border: 1px solid var(--app-panel-border);
   border-radius: 999px;
-  background: color-mix(in srgb, var(--app-accent-interactive, var(--color-primary)) 10%, var(--app-surface));
+  background: color-mix(in srgb, #374151) 10%, var(--app-surface));
   color: var(--app-text-secondary);
   padding: 6px 9px;
   font-size: 0.78rem;
@@ -177,8 +177,8 @@
 }
 
 .clinical-calculator-card.is-active {
-  border-color: var(--app-accent-interactive, var(--accent-1));
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--app-accent-interactive, var(--accent-1)) 18%, transparent);
+  border-color: #374151);
+  box-shadow: 0 0 0 2px color-mix(in srgb, #374151) 18%, transparent);
 }
 
 .clinical-calculator-card--disabled {
@@ -229,7 +229,7 @@
   border: 1px solid var(--app-panel-border);
   border-radius: 999px;
   padding: 8px 14px;
-  color: var(--app-accent-interactive, var(--accent-1));
+  color: #374151);
   font-weight: 800;
   text-decoration: none;
 }
@@ -257,8 +257,8 @@
 }
 
 .clinical-calculator-shell__save:not(:disabled) {
-  border-color: var(--app-accent-interactive, var(--accent-1));
-  background: var(--app-accent-interactive, var(--accent-1));
+  border-color: #374151);
+  background: #374151);
   color: var(--app-accent-on-action, #fff);
 }
 

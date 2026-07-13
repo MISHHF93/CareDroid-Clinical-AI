@@ -50,12 +50,12 @@
 }
 
 .operational-alarm-dock__chip:hover {
-  border-color: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 40%, var(--medical-border));
-  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 4%, #ffffff);
+  border-color: color-mix(in srgb, #374151 40%, var(--medical-border));
+  background: color-mix(in srgb, #374151 4%, #ffffff);
 }
 
 .operational-alarm-dock__chip:focus-visible {
-  outline: 2px solid var(--app-accent-interactive, #0ea5e9);
+  outline: 2px solid #374151;
   outline-offset: 2px;
 }
 
@@ -257,8 +257,8 @@
 
 .operational-alarm-dock__actions button:hover:not(:disabled),
 .operational-alarm-dock__checklist-actions button:hover:not(:disabled) {
-  border-color: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 42%, var(--medical-border));
-  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 6%, var(--medical-white));
+  border-color: color-mix(in srgb, #374151 42%, var(--medical-border));
+  background: color-mix(in srgb, #374151 6%, var(--medical-white));
 }
 
 .operational-alarm-dock__actions button:disabled {
@@ -300,7 +300,7 @@
 .operational-alarm-dock__checklist-eyebrow {
   display: block;
   margin-bottom: 4px;
-  color: var(--medical-accent-hover, #0369a1);
+  color: var(--medical-accent-hover, #475569);
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -338,7 +338,7 @@
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: var(--medical-accent, #0ea5e9);
+  background: var(--medical-accent, #64748b);
 }
 
 .operational-alarm-dock__checklist-items {

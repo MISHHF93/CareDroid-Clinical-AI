@@ -18,7 +18,7 @@
   gap: 6px;
   border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   border-radius: 999px;
-  background: var(--color-elevated, var(--medical-surface-page, #f0f9ff));
+  background: var(--color-elevated, var(--medical-surface-page, #f1f5f9));
   color: var(--color-text-secondary, #9ca3af);
   padding: 6px 10px;
   font-size: 11px;
@@ -26,7 +26,7 @@
 }
 
 .patient-verification__step--active button {
-  border-color: var(--app-accent-interactive, var(--status-info));
+  border-color: #374151);
   color: var(--color-text-primary, var(--medical-ink, #111827));
 }
 
@@ -106,7 +106,7 @@
   gap: 6px;
   border: 1px solid var(--color-border-subtle, #e0f2fe);
   border-radius: 10px;
-  background: var(--color-elevated, var(--medical-surface-page, #f0f9ff));
+  background: var(--color-elevated, var(--medical-surface-page, #f1f5f9));
   color: var(--color-text-primary, var(--medical-ink, #111827));
   padding: 8px 12px;
   font-size: 12px;
@@ -135,10 +135,10 @@
 }
 
 .patient-verification__continue button {
-  border: 1px solid color-mix(in srgb, var(--status-info, #38bdf8) 45%, transparent);
+  border: 1px solid color-mix(in srgb, var(--status-info, #94a3b8) 45%, transparent);
   border-radius: 10px;
-  background: color-mix(in srgb, var(--status-info, #38bdf8) 14%, transparent);
-  color: var(--medical-text-link, #0ea5e9);
+  background: color-mix(in srgb, var(--status-info, #94a3b8) 14%, transparent);
+  color: #374151;
   font-size: 13px;
   font-weight: 800;
   padding: 8px 14px;

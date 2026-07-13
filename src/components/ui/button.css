@@ -86,15 +86,15 @@
 
 /* Button Variants */
 .btn-primary {
-  background: var(--app-accent-action, var(--app-accent-interactive));
+  background: var(--app-accent-action, #374151);
   color: var(--app-on-solid);
-  border-color: color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 88%, transparent);
+  border-color: color-mix(in srgb, var(--app-accent-action, #374151) 88%, transparent);
   box-shadow: var(--app-elevation-subtle, var(--app-shadow-1));
 }
 
 .btn-primary:hover {
-  background: var(--app-accent-hover);
-  border-color: var(--app-accent-hover);
+  background: #111827;
+  border-color: #111827;
   box-shadow: var(--app-elevation-card, var(--app-shadow-1));
   transform: none;
 }
@@ -116,13 +116,13 @@
 
 .btn-ghost {
   background: transparent;
-  color: var(--app-accent-action, var(--app-accent-interactive));
+  color: var(--app-accent-action, #374151);
   border-color: transparent;
 }
 
 .btn-ghost:hover {
   background: var(--app-hover);
-  border-color: color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 28%, transparent);
+  border-color: color-mix(in srgb, var(--app-accent-action, #374151) 28%, transparent);
 }
 
 .btn-danger {
@@ -218,7 +218,7 @@
 }
 
 .btn:focus-visible {
-  border-color: var(--app-accent-action, var(--app-accent-interactive));
+  border-color: var(--app-accent-action, #374151);
   box-shadow: 0 0 0 3px var(--app-focus);
 }
 

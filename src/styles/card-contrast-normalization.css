@@ -51,7 +51,7 @@
 .cd-surface--subtle,
 [class*='-card--muted'],
 [class*='-card--inset'] {
-  --card-contract-bg: var(--medical-card-muted-bg, #f0f9ff);
+  --card-contract-bg: var(--medical-card-muted-bg, #f1f5f9);
   --card-contract-fg: var(--medical-card-muted-fg, #111827);
   --card-contract-fg-muted: var(--medical-card-muted-fg-muted, #6b7280);
 }

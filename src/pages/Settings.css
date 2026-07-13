@@ -370,7 +370,7 @@
 }
 
 .settings-confirm-field input:focus {
-  border-color: color-mix(in srgb, var(--app-accent-interactive) 55%, transparent);
+  border-color: color-mix(in srgb, #374151 55%, transparent);
   box-shadow: 0 0 0 2px var(--app-focus);
 }
 

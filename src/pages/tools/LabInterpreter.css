@@ -243,7 +243,7 @@
 }
 
 .lab-values-list::-webkit-scrollbar-thumb {
-  background: color-mix(in srgb, var(--app-accent-interactive) 30%, transparent);
+  background: color-mix(in srgb, #374151 30%, transparent);
   border-radius: 3px;
 }
 
@@ -407,7 +407,7 @@
 }
 
 .lab-results-panel::-webkit-scrollbar-thumb {
-  background: color-mix(in srgb, var(--app-accent-interactive) 30%, transparent);
+  background: color-mix(in srgb, #374151 30%, transparent);
   border-radius: 4px;
 }
 

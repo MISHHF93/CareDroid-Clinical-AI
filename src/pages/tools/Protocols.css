@@ -127,7 +127,7 @@
 }
 
 .protocol-library__card.is-selected {
-  border-color: color-mix(in srgb, var(--app-accent-interactive) 70%, transparent);
+  border-color: color-mix(in srgb, #374151 70%, transparent);
   box-shadow: 0 0 0 1px var(--medical-accent-ring);
 }
 

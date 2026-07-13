@@ -133,7 +133,7 @@
 }
 
 :is(.app-shell, .emergency-app-shell) :is(:focus-visible) {
-  outline: var(--app-focus-ring-width, 2px) solid var(--app-focus-ring-aa, var(--app-accent-interactive));
+  outline: var(--app-focus-ring-width, 2px) solid var(--app-focus-ring-aa, #374151);
   outline-offset: var(--app-focus-ring-offset, 2px);
 }
 

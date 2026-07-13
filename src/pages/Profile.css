@@ -29,7 +29,7 @@
 }
 
 .profile-onboarding-banner a {
-  color: var(--medical-text-link, var(--app-link-fg));
+  color: #374151);
 }
 
 .profile-card__title {
@@ -74,7 +74,7 @@
 }
 
 .profile-nav-links a {
-  color: var(--medical-text-link, var(--app-link-fg));
+  color: #374151);
   text-decoration: none;
   font-weight: 700;
 }
@@ -86,7 +86,7 @@
 }
 
 .profile-back-link {
-  color: var(--medical-text-link, var(--app-link-fg));
+  color: #374151);
   text-decoration: none;
   font-weight: 700;
 }
@@ -96,13 +96,13 @@
   gap: 16px;
   margin-top: 24px;
   padding: 16px;
-  border: 1px solid var(--medical-accent-border, rgba(14, 165, 233, 0.32));
+  border: 1px solid var(--medical-accent-border, rgba(100, 116, 139, 0.32));
   border-radius: 14px;
   background:
     linear-gradient(
       135deg,
-      color-mix(in srgb, var(--app-accent-interactive) 6%, transparent),
-      color-mix(in srgb, var(--app-accent-interactive) 3%, transparent)
+      color-mix(in srgb, #374151 6%, transparent),
+      color-mix(in srgb, #374151 3%, transparent)
     ),
     var(--medical-card-bg, var(--surface-1));
 }
@@ -138,7 +138,7 @@
   border: 1px solid var(--medical-card-border, var(--panel-border));
   border-radius: 10px;
   background: var(--medical-card-muted-bg, var(--panel-background));
-  color: var(--medical-text-link, var(--app-link-fg));
+  color: #374151);
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
@@ -183,7 +183,7 @@
 }
 
 .profile-section-header__cta {
-  color: var(--medical-text-link, var(--app-link-fg));
+  color: #374151);
   font-size: 13px;
   font-weight: 800;
   text-decoration: none;
@@ -197,7 +197,7 @@
 
 .profile-overview-card__header a,
 .profile-overview-row a {
-  color: var(--medical-text-link, var(--app-link-fg));
+  color: #374151);
   font-size: 13px;
   font-weight: 800;
   text-decoration: none;
@@ -270,7 +270,7 @@
   width: var(--competency-progress, 0%);
   height: 100%;
   border-radius: inherit;
-  background: var(--app-accent-interactive);
+  background: #374151;
 }
 
 .profile-preference-list {
@@ -344,10 +344,10 @@
 }
 
 .profile-activity-card__badge {
-  border: 1px solid color-mix(in srgb, var(--app-accent-interactive) 35%, var(--medical-card-border));
+  border: 1px solid color-mix(in srgb, #374151 35%, var(--medical-card-border));
   padding: 4px 10px;
-  background: color-mix(in srgb, var(--app-accent-interactive) 10%, var(--medical-card-bg));
-  color: var(--medical-text-link, var(--app-link-fg));
+  background: color-mix(in srgb, #374151 10%, var(--medical-card-bg));
+  color: #374151);
 }
 
 .profile-activity-state,
@@ -465,10 +465,10 @@
   align-items: center;
   min-height: 40px;
   padding: 0 14px;
-  border: 1px solid color-mix(in srgb, var(--app-accent-interactive) 35%, var(--medical-card-border));
+  border: 1px solid color-mix(in srgb, #374151 35%, var(--medical-card-border));
   border-radius: 999px;
-  background: color-mix(in srgb, var(--app-accent-interactive) 10%, var(--medical-card-bg));
-  color: var(--medical-text-link, var(--app-link-fg));
+  background: color-mix(in srgb, #374151 10%, var(--medical-card-bg));
+  color: #374151);
   font-size: 13px;
   font-weight: 800;
   text-decoration: none;

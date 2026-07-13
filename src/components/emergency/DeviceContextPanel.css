@@ -39,7 +39,7 @@
   padding: 6px 10px;
   border-radius: 999px;
   background: rgba(59, 130, 246, 0.16);
-  color: var(--medical-text-link, #0ea5e9);
+  color: #374151;
   font-size: 12px;
   white-space: nowrap;
 }
@@ -77,7 +77,7 @@
   padding: 0;
   border: 0;
   background: transparent;
-  color: var(--medical-text-link, #0ea5e9);
+  color: #374151;
   font-size: 13px;
   cursor: pointer;
 }

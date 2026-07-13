@@ -216,7 +216,7 @@
 }
 
 .fleet-dashboard__ai-link strong {
-  color: var(--medical-text-link, var(--app-link-fg));
+  color: #374151);
 }
 
 .fleet-dashboard__ai-link span {

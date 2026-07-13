@@ -115,7 +115,7 @@
 .btn-add-med:hover {
   border-color: var(--primary-color);
   color: var(--primary-color);
-  background: color-mix(in srgb, var(--app-accent-interactive) 10%, transparent);
+  background: color-mix(in srgb, #374151 10%, transparent);
 }
 
 .btn-check-interactions {
@@ -124,7 +124,7 @@
   min-height: var(--touch-target-min);
   padding: 14px 28px;
   border: none;
-  background: var(--app-accent-interactive, #0ea5e9);
+  background: #374151;
   color: var(--app-on-solid);
   border-radius: 8px;
   font-weight: 600;
@@ -261,7 +261,7 @@
 }
 
 .quick-reference {
-  background: linear-gradient(135deg, var(--primary-color) 0%, #38bdf8 100%);
+  background: linear-gradient(135deg, var(--primary-color) 0%, #94a3b8 100%);
   color: var(--app-on-solid);
   padding: 32px;
   border-radius: 12px;

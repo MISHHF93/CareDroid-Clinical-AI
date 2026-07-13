@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: center;
   padding: 24px;
-  background: radial-gradient(circle at top, color-mix(in srgb, var(--semantic-ai-assistance) 15%, transparent), transparent 60%), var(--navy-bg, var(--medical-surface-page, #f0f9ff));
+  background: radial-gradient(circle at top, color-mix(in srgb, var(--semantic-ai-assistance) 15%, transparent), transparent 60%), var(--navy-bg, var(--medical-surface-page, #f1f5f9));
 }
 
 .shared-session-card {
@@ -47,7 +47,7 @@
 .shared-tag {
   align-self: flex-start;
   padding: 4px 10px;
-  background: rgba(14, 165, 233, 0.2);
+  background: rgba(100, 116, 139, 0.2);
   border-radius: 999px;
   font-size: 11px;
   text-transform: uppercase;
@@ -79,6 +79,6 @@
 }
 
 .shared-actions button:hover {
-  background: rgba(14, 165, 233, 0.25);
-  border-color: rgba(14, 165, 233, 0.5);
+  background: rgba(100, 116, 139, 0.25);
+  border-color: rgba(100, 116, 139, 0.5);
 }

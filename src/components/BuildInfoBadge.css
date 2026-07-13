@@ -17,7 +17,7 @@
 
 .build-info-badge:hover,
 .build-info-badge:focus-visible {
-  border-color: color-mix(in srgb, var(--app-accent-interactive) 42%, var(--app-panel-border));
+  border-color: color-mix(in srgb, #374151 42%, var(--app-panel-border));
   color: var(--app-fg);
 }
 

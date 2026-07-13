@@ -8,7 +8,7 @@
   background:
     linear-gradient(
       180deg,
-      color-mix(in srgb, var(--app-accent-interactive) 4%, transparent),
+      color-mix(in srgb, #374151 4%, transparent),
       transparent 42%
     ),
     var(--medical-card-bg, var(--surface-1));
@@ -111,7 +111,7 @@
 }
 
 .profile-ai-capability-card:hover {
-  border-color: color-mix(in srgb, var(--app-accent-interactive) 34%, var(--medical-card-border));
+  border-color: color-mix(in srgb, #374151 34%, var(--medical-card-border));
   box-shadow: var(--app-shadow-1);
   transform: translateY(-1px);
 }

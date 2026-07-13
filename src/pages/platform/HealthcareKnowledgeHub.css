@@ -141,7 +141,7 @@
 
 .knowledge-hub-page__card a {
   font-size: 13px;
-  color: var(--app-link, #0ea5e9);
+  color: var(--app-link, #64748b);
 }
 
 .knowledge-hub-page__empty {

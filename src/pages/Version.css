@@ -15,7 +15,7 @@
 
 .version-page__eyebrow {
   margin: 0 0 8px;
-  color: var(--app-accent-interactive);
+  color: #374151;
   font-size: 0.78rem;
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -81,7 +81,7 @@
   min-height: 44px;
   padding: 10px 16px;
   border-radius: 999px;
-  background: var(--app-accent-interactive);
+  background: #374151;
   color: var(--app-on-solid);
   font-weight: 800;
   text-decoration: none;

@@ -105,8 +105,8 @@
 .dashboard-visual-panel__badge {
   border-radius: 999px;
   padding: 5px 10px;
-  background: color-mix(in srgb, var(--app-accent-interactive) 12%, transparent);
-  color: var(--app-accent-interactive);
+  background: color-mix(in srgb, #374151 12%, transparent);
+  color: #374151;
   font-size: 0.75rem;
   font-weight: 800;
 }

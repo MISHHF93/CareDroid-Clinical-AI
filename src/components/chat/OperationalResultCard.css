@@ -23,7 +23,7 @@
 
 .operational-result-card__icon {
   display: inline-flex;
-  color: var(--app-accent-interactive);
+  color: #374151;
 }
 
 .operational-result-card__eyebrow,
@@ -161,7 +161,7 @@
 }
 
 .operational-result-card__controls button:hover {
-  border-color: var(--app-accent-interactive);
+  border-color: #374151;
 }
 
 .operational-result-card__details {

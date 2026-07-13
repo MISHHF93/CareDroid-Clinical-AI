@@ -103,7 +103,7 @@
 }
 
 .three-minute-mission-bar__btn--primary {
-  background: var(--ed-accent, #0ea5e9);
+  background: var(--ed-accent, #64748b);
   border-color: transparent;
   color: #fff;
 }

@@ -5,7 +5,7 @@
   margin-top: 0.5rem;
   padding: 0.55rem 0.65rem;
   border-radius: 0.5rem;
-  background: color-mix(in srgb, var(--medical-card-muted-bg, #f0f9ff) 88%, var(--medical-accent, #0ea5e9) 12%);
+  background: color-mix(in srgb, var(--medical-card-muted-bg, #f1f5f9) 88%, var(--medical-accent, #64748b) 12%);
   border: 1px solid color-mix(in srgb, var(--color-border, var(--medical-text-muted, #6b7280)) 80%, transparent);
   font-size: 0.78rem;
   line-height: 1.35;

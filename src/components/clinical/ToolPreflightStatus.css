@@ -6,7 +6,7 @@
   border: 1px solid var(--medical-accent-border);
   border-radius: 14px;
   background:
-    linear-gradient(135deg, var(--medical-accent-tint-subtle), color-mix(in srgb, var(--app-accent-interactive) 6%, transparent)),
+    linear-gradient(135deg, var(--medical-accent-tint-subtle), color-mix(in srgb, #374151 6%, transparent)),
     var(--surface-1);
 }
 
@@ -44,7 +44,7 @@
 
 .tool-preflight__safe-state--ready {
   border-color: var(--medical-accent-ring-strong);
-  background: color-mix(in srgb, var(--app-accent-interactive) 11%, transparent);
+  background: color-mix(in srgb, #374151 11%, transparent);
   color: var(--accent-green);
 }
 

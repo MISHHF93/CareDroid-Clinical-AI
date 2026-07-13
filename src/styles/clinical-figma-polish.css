@@ -84,7 +84,7 @@
 }
 
 .cdl-situation-graphic-card--information::before {
-  background: var(--status-info, #0ea5e9);
+  background: var(--status-info, #64748b);
 }
 
 .cdl-situation-graphic-card--warning::before {
@@ -96,12 +96,12 @@
 }
 
 .cdl-situation-graphic-card--action::before {
-  background: color-mix(in srgb, var(--medical-accent, #0ea5e9) 70%, #6366f1);
+  background: color-mix(in srgb, var(--medical-accent, #64748b) 70%, #6366f1);
 }
 
 /* Tinted backgrounds — use !important to win over any cascade-order issues */
 .cdl-situation-graphic-card--information {
-  background: color-mix(in srgb, var(--status-info, #0ea5e9) 5%, #fff) !important;
+  background: color-mix(in srgb, var(--status-info, #64748b) 5%, #fff) !important;
 }
 
 .cdl-situation-graphic-card--warning {
@@ -121,7 +121,7 @@
 }
 
 .cdl-graphic-icon-badge--information {
-  box-shadow: 0 1px 4px rgba(14, 165, 233, 0.22);
+  box-shadow: 0 1px 4px rgba(100, 116, 139, 0.22);
 }
 
 .cdl-graphic-icon-badge--warning {
@@ -133,7 +133,7 @@
 }
 
 .cdl-graphic-icon-badge--brand {
-  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.26);
+  box-shadow: 0 2px 8px rgba(100, 116, 139, 0.26);
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -342,7 +342,7 @@
   );
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.55),
-    0 1px 3px rgba(14, 165, 233, 0.08);
+    0 1px 3px rgba(100, 116, 139, 0.08);
 }
 
 /* Section group labels — refined micro-caps */
@@ -399,17 +399,17 @@
 }
 
 .reception-work-queues__tab:hover:not(.reception-work-queues__tab--active) {
-  border-color: var(--app-accent-interactive, #0ea5e9);
+  border-color: #374151;
   color: var(--medical-ink, #111827);
-  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 5%, var(--medical-white, #fff));
+  background: color-mix(in srgb, #374151 5%, var(--medical-white, #fff));
 }
 
 /* Active tab — solid filled */
 .reception-work-queues__tab--active {
-  background: var(--app-accent-interactive, #0ea5e9);
-  border-color: var(--app-accent-interactive, #0ea5e9);
+  background: #374151;
+  border-color: #374151;
   color: #ffffff;
-  box-shadow: 0 1px 4px rgba(14, 165, 233, 0.28);
+  box-shadow: 0 1px 4px rgba(100, 116, 139, 0.28);
 }
 
 /* Count badge */
@@ -462,7 +462,7 @@
 /* EMS offload gauge badge — refined */
 .cdl-ems-offload-gauge {
   border-radius: 10px;
-  box-shadow: 0 1px 4px rgba(14, 165, 233, 0.14);
+  box-shadow: 0 1px 4px rgba(100, 116, 139, 0.14);
   gap: 6px;
 }
 
@@ -631,13 +631,13 @@
 /* Primary "Register" button — white background, blue border accent */
 .reception-desk-toolbar__action--primary {
   background: #ffffff !important;
-  border-color: rgba(14, 165, 233, 0.5) !important;
-  color: #0369a1 !important;
+  border-color: rgba(100, 116, 139, 0.5) !important;
+  color: #475569 !important;
 }
 
 .reception-desk-toolbar__action--primary:hover:not(:disabled) {
   background: #f8fafc !important;
-  border-color: #0ea5e9 !important;
+  border-color: #64748b !important;
 }
 
 /* Escalate button — white background, red border accent */
@@ -667,9 +667,9 @@
 .reception-desk-toolbar__action--active.reception-desk-toolbar__queue-tab,
 .reception-desk-toolbar__queue-tab.reception-desk-toolbar__action--active {
   background: #ffffff !important;
-  border-color: var(--app-accent-interactive, #0ea5e9) !important;
-  color: var(--cd-brand-text, #0369a1) !important;
-  box-shadow: inset 0 0 0 1px var(--app-accent-interactive, #0ea5e9);
+  border-color: #374151 !important;
+  color: var(--cd-brand-text, #475569) !important;
+  box-shadow: inset 0 0 0 1px #374151;
 }
 
 /* ── 15E. Unified intake phase nav (Registration tabs) ───────────
@@ -686,8 +686,8 @@
 
 .unified-intake-phase-nav__btn.is-active {
   background: #ffffff !important;
-  border-color: rgba(14, 165, 233, 0.5) !important;
-  color: #0369a1 !important;
+  border-color: rgba(100, 116, 139, 0.5) !important;
+  color: #475569 !important;
   box-shadow: none !important;
   font-weight: 700;
 }
@@ -706,8 +706,8 @@
 .reception-quick-complaints__chip.is-active,
 .reception-quick-complaints__chip:hover {
   background: #f8fafc !important;
-  border-color: rgba(14, 165, 233, 0.5) !important;
-  color: #0369a1 !important;
+  border-color: rgba(100, 116, 139, 0.5) !important;
+  color: #475569 !important;
 }
 
 /* ── 15G. Reception work-queue tabs (inactive state) ─────────────

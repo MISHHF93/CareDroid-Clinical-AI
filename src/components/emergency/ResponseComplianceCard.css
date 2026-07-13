@@ -4,7 +4,7 @@
   padding: 14px 16px;
   border-radius: 8px;
   border: 1.5px solid transparent;
-  background: var(--medical-surface-page, #f0f9ff);
+  background: var(--medical-surface-page, #f1f5f9);
 }
 
 .response-compliance-card--green {

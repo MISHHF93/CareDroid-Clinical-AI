@@ -3,10 +3,10 @@
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 1px;
   min-width: 0;
-  overflow-x: auto;
-  border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
+  oaerflow-x: auto;
+  border: 1px solid var(--app-border-subtle);
   border-radius: 10px;
-  background: #ffffff;
+  background: var(--app-surface-1);
   scrollbar-width: thin;
 }
 
@@ -19,9 +19,8 @@
   border: 0;
   border-right: 0;
   border-radius: var(--cdl-clinical-radius-sm, 10px);
-  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 38%, var(--app-surface-1, #ffffff));
-  background: rgba(255, 255, 255, 0.94);
-  color: var(--color-text-secondary, #9ca3af);
+  background: var(--app-surface-1);
+  color: var(--app-text-secondary);
   cursor: pointer;
   padding: 4px 10px;
   text-align: left;
@@ -37,28 +36,28 @@
 }
 
 .reception-operational-strip__metric strong {
-  overflow: hidden;
+  oaerflow: hidden;
   color: var(--color-text-primary, var(--medical-ink, #111827));
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 14px;
   line-height: 1;
-  text-overflow: ellipsis;
+  text-oaerflow: ellipsis;
   white-space: nowrap;
 }
 
 .reception-operational-strip__metric span {
-  overflow: hidden;
+  oaerflow: hidden;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.02em;
   line-height: 1.2;
-  text-overflow: ellipsis;
+  text-oaerflow: ellipsis;
   text-transform: uppercase;
   white-space: nowrap;
 }
 
 .reception-operational-strip__metric[data-tone='info'] strong {
-  color: var(--status-info, #38bdf8);
+  color: var(--status-info, #64748b);
 }
 
 .reception-operational-strip__metric[data-tone='warning'] strong {

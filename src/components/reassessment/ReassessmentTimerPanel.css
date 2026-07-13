@@ -4,7 +4,7 @@
   padding: 14px;
   border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   border-radius: 12px;
-  background: var(--color-elevated, var(--medical-surface-page, #f0f9ff));
+  background: var(--color-elevated, var(--medical-surface-page, #f1f5f9));
 }
 
 .reassessment-timer-panel__header {
@@ -16,7 +16,7 @@
 
 .reassessment-timer-panel__eyebrow {
   margin: 0;
-  color: var(--status-info, #38bdf8);
+  color: var(--status-info, #94a3b8);
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.08em;

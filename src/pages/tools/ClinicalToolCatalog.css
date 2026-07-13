@@ -277,18 +277,18 @@
 }
 
 .catalog-badge--backend {
-  background: rgba(14, 165, 233, 0.15);
-  color: var(--app-accent-interactive);
+  background: rgba(100, 116, 139, 0.15);
+  color: #374151;
 }
 
 .catalog-badge--ai {
   background: rgba(59, 130, 246, 0.15);
-  color: var(--app-accent-interactive);
+  color: #374151;
 }
 
 .catalog-badge--data {
-  background: rgba(14, 165, 233, 0.15);
-  color: #0ea5e9;
+  background: rgba(100, 116, 139, 0.15);
+  color: #64748b;
 }
 
 .catalog-badge--emergency {
@@ -577,7 +577,7 @@
     right: 0;
     z-index: 1;
     background: var(--panel-background);
-    box-shadow: -8px 0 12px -8px rgba(14, 165, 233, 0.08);
+    box-shadow: -8px 0 12px -8px rgba(100, 116, 139, 0.08);
   }
 
   .catalog-table-wrap:not(.catalog-table-wrap--stacked) .catalog-table thead th:last-child {

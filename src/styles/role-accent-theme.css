@@ -15,7 +15,7 @@
  *    block below): `src/styles/color-normalization.css` has a sweep rule —
  *    `[class*='--primary']` (any BEM "--primary" modifier, used all over the
  *    app: mission-bar buttons, alert acknowledge buttons, etc.) gets
- *    `background: var(--app-accent-interactive, ...)`. That rule is a
+ *    `background: #374151`. That rule is a
  *    deliberate "one primary-action color everywhere" invariant — it's what
  *    every role's "Acknowledge" on a shared critical alert should look like
  *    the same regardless of who's viewing it. Overriding `--app-accent*`
@@ -39,13 +39,13 @@
 html[data-theme][data-role-theme='reception'] {
   /* Reception uses the canonical medical-blue palette instead of a separate
      teal skin. Role context comes from navigation and workflow language. */
-  --medical-accent: var(--medical-sky-500, #0ea5e9);
-  --medical-accent-hover: var(--medical-sky-600, #0284c7);
-  --medical-accent-soft: var(--medical-sky-400, #38bdf8);
-  --medical-accent-tint: color-mix(in srgb, var(--medical-sky-500, #0ea5e9) 10%, transparent);
-  --medical-accent-border: color-mix(in srgb, var(--medical-sky-500, #0ea5e9) 32%, transparent);
-  --medical-text-link: var(--medical-sky-700, #0369a1);
-  --medical-text-link-hover: var(--medical-sky-600, #0284c7);
+  --medical-accent: var(--medical-sky-500, #64748b);
+  --medical-accent-hover: var(--medical-sky-600, #475569);
+  --medical-accent-soft: var(--medical-sky-400, #94a3b8);
+  --medical-accent-tint: color-mix(in srgb, var(--medical-sky-500, #64748b) 10%, transparent);
+  --medical-accent-border: color-mix(in srgb, var(--medical-sky-500, #64748b) 32%, transparent);
+  --medical-text-link: var(--medical-sky-700, #475569);
+  --medical-text-link-hover: var(--medical-sky-600, #475569);
 
   /* Front-desk work is card-dense, so use the available profile canvas. */
   --app-layout-content-max: 100%;
@@ -108,16 +108,16 @@ html[data-theme][data-role-theme='admin'] {
 
 /* —— Reception's own workspace content only (not the shared command bars) —— */
 html[data-theme][data-role-theme='reception'] .reception-workspace {
-  --app-accent: var(--medical-sky-500, #0ea5e9);
-  --app-accent-2: var(--medical-sky-600, #0284c7);
-  --app-accent-interactive: var(--medical-sky-500, #0ea5e9);
-  --app-accent-hover: var(--medical-sky-700, #0369a1);
-  --app-link-fg: var(--medical-sky-700, #0369a1);
-  --app-link-hover: var(--medical-sky-600, #0284c7);
-  --app-focus: color-mix(in srgb, var(--medical-sky-500, #0ea5e9) 18%, transparent);
-  --app-focus-ring-aa: var(--medical-sky-600, #0284c7);
-  --app-hover: color-mix(in srgb, var(--medical-sky-500, #0ea5e9) 8%, transparent);
-  --app-table-row-hover: color-mix(in srgb, var(--medical-sky-500, #0ea5e9) 6%, transparent);
-  --app-scrollbar-thumb: color-mix(in srgb, var(--medical-sky-500, #0ea5e9) 24%, #e2e8f0);
-  --app-scrollbar-thumb-hover: color-mix(in srgb, var(--medical-sky-500, #0ea5e9) 40%, #cbd5e1);
+  --app-accent: var(--medical-sky-500, #64748b);
+  --app-accent-2: var(--medical-sky-600, #475569);
+  --app-accent-interactive: var(--medical-sky-500, #64748b);
+  --app-accent-hover: var(--medical-sky-700, #475569);
+  --app-link-fg: var(--medical-sky-700, #475569);
+  --app-link-hover: var(--medical-sky-600, #475569);
+  --app-focus: color-mix(in srgb, var(--medical-sky-500, #64748b) 18%, transparent);
+  --app-focus-ring-aa: var(--medical-sky-600, #475569);
+  --app-hover: color-mix(in srgb, var(--medical-sky-500, #64748b) 8%, transparent);
+  --app-table-row-hover: color-mix(in srgb, var(--medical-sky-500, #64748b) 6%, transparent);
+  --app-scrollbar-thumb: color-mix(in srgb, var(--medical-sky-500, #64748b) 24%, #e2e8f0);
+  --app-scrollbar-thumb-hover: color-mix(in srgb, var(--medical-sky-500, #64748b) 40%, #cbd5e1);
 }

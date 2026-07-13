@@ -113,7 +113,7 @@
 .ems-offload-tracker__action {
   border: 0;
   background: transparent;
-  color: var(--medical-text-link, #0ea5e9);
+  color: #374151;
   cursor: pointer;
   font-weight: 700;
   padding: 0;

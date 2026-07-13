@@ -10,19 +10,19 @@
   --medical-card-fg-subtle: var(--medical-text-subtle, #9ca3af);
   --medical-card-border: var(--medical-border, #e2e8f0);
 
-  /* Muted / inset card (sky tint) */
-  --medical-card-muted-bg: var(--medical-surface-page, #f0f9ff);
+  /* Muted / inset card (neutral gray, not blue) */
+  --medical-card-muted-bg: var(--app-surface-muted, #f1f5f9);
   --medical-card-muted-fg: var(--medical-text-body, #111827);
   --medical-card-muted-fg-muted: var(--medical-text-muted, #6b7280);
 
   /* Accent-tint card */
-  --medical-card-accent-bg: var(--medical-accent-tint, rgba(14, 165, 233, 0.12));
+  --medical-card-accent-bg: var(--medical-accent-tint, rgba(100, 116, 139, 0.12));
   --medical-card-accent-fg: var(--medical-text-body, #111827);
   --medical-card-accent-fg-muted: var(--medical-text-muted, #6b7280);
-  --medical-card-accent-border: var(--medical-accent-border, rgba(14, 165, 233, 0.35));
+  --medical-card-accent-border: var(--medical-accent-border, rgba(100, 116, 139, 0.35));
 
   /* Solid accent card (CTA / primary chip) */
-  --medical-card-solid-bg: var(--medical-accent, #0ea5e9);
+  --medical-card-solid-bg: var(--medical-accent, #64748b);
   --medical-card-solid-fg: var(--medical-text-on-accent, #ffffff);
 
   /* Semantic tint cards — ink on tinted surface, never white-on-tint */

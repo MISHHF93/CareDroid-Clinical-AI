@@ -29,7 +29,7 @@
 
 .system-health-eyebrow {
   margin: 0 0 8px;
-  color: var(--app-accent-interactive);
+  color: #374151;
   font-size: 0.78rem;
   font-weight: 850;
   letter-spacing: 0.12em;
@@ -68,7 +68,7 @@
   min-height: var(--app-min-touch-target, 44px);
   padding: 10px 16px;
   border-radius: 999px;
-  background: var(--app-accent-interactive);
+  background: #374151;
   color: var(--app-on-solid);
   font-weight: 850;
   text-decoration: none;
@@ -97,8 +97,8 @@
   margin-bottom: 10px;
   padding: 4px 8px;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--app-accent-interactive) 16%, transparent);
-  color: var(--app-accent-interactive);
+  background: color-mix(in srgb, #374151 16%, transparent);
+  color: #374151;
   font-size: 0.72rem;
   font-weight: 850;
   letter-spacing: 0.08em;
@@ -164,7 +164,7 @@
   overflow: auto;
   padding: 12px;
   border-radius: 14px;
-  background: var(--app-code-bg, var(--medical-surface-page, #f0f9ff));
+  background: var(--app-code-bg, var(--medical-surface-page, #f1f5f9));
   color: var(--app-fg);
   font-size: 0.82rem;
 }

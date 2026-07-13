@@ -24,13 +24,13 @@
 }
 
 .reception-pipeline-shell__stage:hover {
-  border-color: var(--reception-accent-border, color-mix(in srgb, var(--app-accent-interactive, var(--status-info)) 38%, var(--ed-border-subtle)));
+  border-color: var(--reception-accent-border, color-mix(in srgb, #374151) 38%, var(--ed-border-subtle)));
   color: var(--reception-text-primary, var(--ed-text-primary, #111827));
 }
 
 .reception-pipeline-shell__stage--active {
-  border-color: var(--reception-accent-border, color-mix(in srgb, var(--app-accent-interactive, var(--status-info)) 42%, var(--ed-border-subtle)));
-  background: var(--reception-accent-strong, color-mix(in srgb, var(--app-accent-interactive, var(--status-info)) 14%, var(--ed-surface-raised)));
+  border-color: var(--reception-accent-border, color-mix(in srgb, #374151) 42%, var(--ed-border-subtle)));
+  background: var(--reception-accent-strong, color-mix(in srgb, #374151) 14%, var(--ed-surface-raised)));
   color: var(--reception-text-primary, var(--ed-text-primary, #eff6ff));
 }
 

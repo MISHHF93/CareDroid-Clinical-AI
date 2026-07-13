@@ -59,8 +59,8 @@
 
 .admin-ops-shell__nav a.is-active {
   color: var(--text-color);
-  background: color-mix(in srgb, var(--app-accent-interactive) 12%, transparent);
-  border-color: color-mix(in srgb, var(--app-accent-interactive) 30%, transparent);
+  background: color-mix(in srgb, #374151 12%, transparent);
+  border-color: color-mix(in srgb, #374151 30%, transparent);
 }
 
 .admin-ops-shell__content {
@@ -107,7 +107,7 @@
 .admin-ops-status-list strong {
   font-size: 11px;
   text-transform: uppercase;
-  color: var(--app-accent-interactive);
+  color: #374151;
 }
 
 .admin-ops-inline-link {

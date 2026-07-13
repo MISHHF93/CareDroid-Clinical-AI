@@ -26,7 +26,7 @@
 }
 
 .feature-gate-placeholder a {
-  color: var(--app-accent-interactive, var(--medical-accent-soft));
+  color: #374151);
   font-size: 0.85rem;
   font-weight: 800;
   text-decoration: none;

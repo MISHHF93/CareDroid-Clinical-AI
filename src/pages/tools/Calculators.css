@@ -52,7 +52,7 @@
 
 .calculator-card.active {
   border-color: var(--accent-1);
-  background: color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 8%, var(--app-surface));
+  background: color-mix(in srgb, var(--app-accent-action, #374151) 8%, var(--app-surface));
 }
 
 .calculator-card:focus-visible {
@@ -527,7 +527,7 @@
 .calc-spinner {
   width: 40px;
   height: 40px;
-  border: 4px solid color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 22%, transparent);
+  border: 4px solid color-mix(in srgb, var(--app-accent-action, #374151) 22%, transparent);
   border-top-color: var(--accent-1);
   border-radius: 50%;
   animation: spin 1s linear infinite;
@@ -1568,5 +1568,5 @@ ul.calc-breakdown-list .calc-breakdown-item {
 }
 
 .pediatric-drug-reference-table__row--moderate {
-  border-left-color: var(--info, var(--status-info, #38bdf8));
+  border-left-color: var(--info, var(--status-info, #94a3b8));
 }

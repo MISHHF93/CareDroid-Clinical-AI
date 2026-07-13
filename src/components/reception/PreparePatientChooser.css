@@ -10,9 +10,9 @@
 
 .reception-prepare__panel {
   width: min(560px, 100%);
-  border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
+  border: 1px solid var(--app-border-subtle);
   border-radius: 16px;
-  background: var(--color-card, var(--app-surface-2, #ffffff));
+  background: var(--app-surface-1);
   box-shadow: 0 24px 48px rgb(0 0 0 / 35%);
 }
 
@@ -25,7 +25,7 @@
 
 .reception-prepare__eyebrow {
   margin: 0 0 4px;
-  color: var(--status-info, #38bdf8);
+  color: var(--app-text-secondary);
   font-size: 11px;
   font-weight: 900;
   letter-spacing: 0.08em;
@@ -49,10 +49,10 @@
   flex-shrink: 0;
   width: 36px;
   height: 36px;
-  border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
+  border: 1px solid var(--app-border-subtle);
   border-radius: 10px;
   background: transparent;
-  color: var(--color-text-secondary, #9ca3af);
+  color: var(--app-text-secondary);
   cursor: pointer;
 }
 
@@ -68,10 +68,10 @@
   gap: 12px;
   min-height: 72px;
   padding: 14px 16px;
-  border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
+  border: 1px solid var(--app-border-subtle);
   border-radius: 12px;
-  background: var(--color-elevated, var(--medical-surface-page, #f0f9ff));
-  color: var(--color-text-primary, var(--medical-ink, #111827));
+  background: var(--app-surface-muted);
+  color: var(--app-text-primary);
   text-align: left;
   cursor: pointer;
 }
@@ -90,11 +90,11 @@
 }
 
 .reception-prepare__option--primary {
-  border-color: var(--app-accent-interactive);
-  background: var(--medical-sky-50, #f0f9ff);
+  border-color: var(--app-border-strong);
+  background: var(--app-surface-muted);
 }
 
 .reception-prepare__option:hover,
 .reception-prepare__option:focus-visible {
-  border-color: var(--app-accent-hover);
+  border-color: var(--app-text-primary);
 }

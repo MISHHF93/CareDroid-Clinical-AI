@@ -19,7 +19,7 @@
   --medical-status-critical-text: #b91c1c;
   --medical-status-high-text: #c2410c;
   --medical-status-warning-text: #b45309;
-  --medical-status-info-text: #0284c7;
+  --medical-status-info-text: #475569;
   --medical-status-success-text: #15803d;
   --medical-status-neutral-text: var(--medical-ink-muted);
 
@@ -28,6 +28,6 @@
   --app-text-body: var(--medical-text-body);
   --app-text-muted: var(--medical-text-muted);
   --app-text-subtle: var(--medical-text-subtle);
-  --app-text-link: var(--medical-text-link);
-  --app-text-link-hover: var(--medical-text-link-hover);
+  --app-text-link: #374151;
+  --app-text-link-hover: #374151;
 }

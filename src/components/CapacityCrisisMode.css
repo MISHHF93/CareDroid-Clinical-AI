@@ -88,7 +88,7 @@
   grid-template-rows: auto minmax(0, 1fr);
   width: min(480px, 100vw);
   border-left: 1px solid rgba(148, 163, 184, 0.22);
-  background: var(--medical-surface-page, #f0f9ff);
+  background: var(--medical-surface-page, #f1f5f9);
   color: var(--medical-ink, #111827);
   box-shadow: -24px 0 60px rgba(0, 0, 0, 0.48);
   animation: capacity-crisis-drawer-enter var(--motion-transition-normal) both;

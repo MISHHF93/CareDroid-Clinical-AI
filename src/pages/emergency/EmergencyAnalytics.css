@@ -129,7 +129,7 @@
   height: 14px;
   min-width: 14px;
   border: 2px solid var(--color-border-subtle, #e0f2fe);
-  border-top-color: var(--app-accent-interactive, #0ea5e9);
+  border-top-color: #374151;
   border-radius: 50%;
   animation: app-shell-loading-spin 0.7s linear infinite;
 }
@@ -310,7 +310,7 @@
   transform: translateY(-1px);
 }
 
-.emergency-analytics__legend-swatch--0 { background: #38bdf8; }
+.emergency-analytics__legend-swatch--0 { background: #94a3b8; }
 .emergency-analytics__legend-swatch--1 { background: #22c55e; }
 .emergency-analytics__legend-swatch--2 { background: #f59e0b; }
 .emergency-analytics__legend-swatch--3 { background: #f97316; }

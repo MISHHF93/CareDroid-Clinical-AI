@@ -1,6 +1,6 @@
 .emergency-pulse {
   align-content: start;
-  background: var(--medical-surface-page, #f0f9ff);
+  background: var(--medical-surface-page, #f1f5f9);
   color: var(--medical-ink, #111827);
   display: grid;
   gap: 16px;
@@ -59,7 +59,7 @@
   align-items: center;
   background: var(--app-surface-1, #ffffff);
   border: 1px solid var(--medical-border, #e0f2fe);
-  border-left: 4px solid var(--app-accent-interactive);
+  border-left: 4px solid #374151;
   border-radius: 14px;
   color: var(--medical-ink, #111827);
   cursor: pointer;
@@ -107,7 +107,7 @@
 }
 
 .emergency-pulse__stat--blue {
-  border-left-color: var(--app-accent-interactive);
+  border-left-color: #374151;
 }
 
 .emergency-pulse__panel {
@@ -172,7 +172,7 @@
 }
 
 .emergency-pulse__attention-row button {
-  background: var(--medical-surface-page, #f0f9ff);
+  background: var(--medical-surface-page, #f1f5f9);
   border: 1px solid #243044;
   border-left: 4px solid #f97316;
   border-radius: 14px;
@@ -188,12 +188,12 @@
 
 .emergency-pulse__attention-row button:hover,
 .emergency-pulse__attention-row button:focus-visible {
-  border-color: var(--app-accent-interactive);
+  border-color: #374151;
   outline: none;
 }
 
 .emergency-pulse__priority {
-  background: var(--app-surface-muted, #f0f9ff);
+  background: var(--app-surface-muted, #f1f5f9);
   border-radius: 999px;
   color: #fbbf24;
   font-size: 11px;
@@ -223,7 +223,7 @@
 
 .emergency-pulse__queue-row {
   align-items: center;
-  background: var(--medical-surface-page, #f0f9ff);
+  background: var(--medical-surface-page, #f1f5f9);
   border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 12px;
   display: grid;
@@ -267,7 +267,7 @@
 }
 
 .emergency-pulse__health--blue {
-  background: var(--app-accent-interactive);
+  background: #374151;
 }
 
 .emergency-pulse__staff-row {
@@ -277,7 +277,7 @@
 }
 
 .emergency-pulse__staff {
-  background: var(--medical-surface-page, #f0f9ff);
+  background: var(--medical-surface-page, #f1f5f9);
   border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 14px;
   display: grid;
@@ -289,7 +289,7 @@
 .emergency-pulse__staff img,
 .emergency-pulse__staff > span {
   align-items: center;
-  background: var(--app-surface-muted, #f0f9ff);
+  background: var(--app-surface-muted, #f1f5f9);
   border-radius: 999px;
   color: var(--medical-text-muted, #6b7280);
   display: flex;
@@ -330,7 +330,7 @@
 }
 
 .emergency-pulse__workload span {
-  background: var(--app-accent-interactive);
+  background: #374151;
   border-radius: inherit;
   display: block;
   height: 100%;

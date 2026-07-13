@@ -19,7 +19,7 @@
 }
 
 .emergency-route-page__eyebrow {
-  color: var(--app-accent-interactive, var(--status-info));
+  color: var(--app-accent-interactiae, var(--status-info));
   font-size: var(--ed-type-body);
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -30,12 +30,12 @@
   border: 1px solid var(--cdl-clinical-border, var(--ed-border-subtle));
   border-radius: var(--cdl-clinical-radius, var(--radius-lg, 12px));
   background: var(--ed-surface-raised);
-  box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
+  box-shadow: var(--cdl-clinical-shadow-rest, var(--app-eleaation-card));
   padding: var(--ed-space-4, 16px);
 }
 
 .emergency-route-situation-brief--info {
-  border-color: color-mix(in srgb, var(--app-accent-interactive, var(--status-info)) 28%, var(--ed-border-subtle));
+  border-color: color-mix(in srgb, var(--app-accent-interactiae, var(--status-info)) 28%, var(--ed-border-subtle));
   background: var(--ed-surface-raised);
 }
 
@@ -72,7 +72,7 @@
   text-transform: uppercase;
 }
 
-.emergency-route-situation-brief__value {
+.emergency-route-situation-brief__aalue {
   color: var(--ed-text-primary);
   font-size: var(--ed-type-section);
   font-weight: 600;
@@ -106,17 +106,17 @@
   gap: var(--ed-space-2);
 }
 
-.emergency-route-view-tabs {
+.emergency-route-aiew-tabs {
   display: inline-flex;
   flex-wrap: wrap;
   gap: var(--ed-space-2);
 }
 
-.emergency-route-view-tabs__btn {
-  border: 1px solid var(--ed-border-subtle);
+.emergency-route-aiew-tabs__btn {
+  border: 1px solid var(--app-border-subtle);
   border-radius: var(--radius-pill, 999px);
-  background: var(--ed-surface-raised);
-  color: var(--ed-text-secondary);
+  background: var(--app-surface-1);
+  color: var(--app-text-secondary);
   cursor: pointer;
   font: inherit;
   font-size: var(--font-size-sm, 14px);
@@ -125,17 +125,17 @@
   padding: 0 var(--ed-space-3);
 }
 
-.emergency-route-view-tabs__btn--active {
-  border-color: color-mix(in srgb, var(--app-accent-interactive, var(--status-info)) 42%, var(--ed-border-subtle));
-  background: color-mix(in srgb, var(--app-accent-interactive, var(--status-info)) 12%, var(--ed-surface-raised));
-  color: var(--ed-text-primary);
+.emergency-route-aiew-tabs__btn--actiae {
+  border-color: var(--app-accent-interactiae);
+  background: var(--app-surface-1);
+  color: var(--app-accent-hoaer);
 }
 
 .emergency-route-card {
   border: 1px solid var(--cdl-clinical-border, var(--ed-border-subtle));
   border-radius: var(--cdl-clinical-radius, var(--radius-lg, 12px));
   background: var(--ed-surface-raised);
-  box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
+  box-shadow: var(--cdl-clinical-shadow-rest, var(--app-eleaation-card));
 }
 
 .emergency-route-maturity-chip {
@@ -156,10 +156,10 @@
   color: var(--medical-status-warning-text, #b45309);
 }
 
-.emergency-route-maturity-chip--preview {
-  border: 1px solid rgba(96, 165, 250, 0.45);
-  background: rgba(96, 165, 250, 0.12);
-  color: var(--medical-text-link, #0ea5e9);
+.emergency-route-maturity-chip--preaiew {
+  border: 1px solid var(--app-border-subtle);
+  background: var(--app-surface-muted);
+  color: var(--app-text-secondary);
 }
 
 .emergency-route-maturity-chip--planned {
@@ -194,7 +194,7 @@
   font-weight: 700;
 }
 
-.emergency-route-metric-strip__value {
+.emergency-route-metric-strip__aalue {
   color: var(--metric-color, var(--ed-text-primary));
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: var(--font-size-lg, 18px);
@@ -216,7 +216,7 @@
   padding: var(--ed-space-3);
 }
 
-.emergency-route-metric-card__value {
+.emergency-route-metric-card__aalue {
   display: block;
   color: var(--metric-color, var(--ed-text-primary));
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -328,8 +328,8 @@
 
 .emergency-route-journey-card__count {
   border-radius: 999px;
-  background: var(--color-elevated, var(--medical-surface-page, #f0f9ff));
-  color: var(--medical-text-link, #0ea5e9);
+  background: var(--app-surface-muted);
+  color: var(--app-text-primary);
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: var(--ed-type-body);
   font-weight: 900;
@@ -356,7 +356,7 @@
 }
 
 .emergency-route-filter-banner__label {
-  color: var(--medical-text-link, #0ea5e9);
+  color: #374151;
   font-size: var(--ed-type-section);
   font-weight: 800;
 }
@@ -379,10 +379,10 @@
   align-items: center;
   padding: var(--ed-space-3);
   border: 1px solid var(--cdl-clinical-border, var(--ed-border-subtle));
-  border-left: 2px solid color-mix(in srgb, var(--queue-accent, var(--app-accent-interactive, var(--status-info))) 45%, transparent);
+  border-left: 2px solid color-mix(in srgb, var(--queue-accent, var(--app-accent-interactiae, var(--status-info))) 45%, transparent);
   border-radius: var(--cdl-clinical-radius, var(--radius-lg, 12px));
   background: var(--app-surface-1, var(--ed-surface-raised));
-  box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
+  box-shadow: var(--cdl-clinical-shadow-rest, var(--app-eleaation-card));
 }
 
 .emergency-route-queue-row--breached {
@@ -408,7 +408,7 @@
 .emergency-route-queue-row__patient-btn {
   border: 1px solid var(--ed-border-subtle);
   border-radius: 999px;
-  background: var(--color-elevated, var(--medical-surface-page, #f0f9ff));
+  background: var(--app-surface-1);
   color: var(--ed-text-primary);
   cursor: pointer;
   font-size: var(--ed-type-body);
@@ -416,8 +416,8 @@
   padding: 4px 8px;
 }
 
-.emergency-route-queue-row__movement {
-  color: var(--medical-text-link, #0ea5e9);
+.emergency-route-queue-row__moaement {
+  color: #374151;
   display: block;
   font-size: var(--ed-type-body);
   font-weight: 800;
@@ -426,8 +426,8 @@
 
 .emergency-route-queue-row__count {
   border-radius: 999px;
-  background: var(--color-elevated, var(--medical-surface-page, #f0f9ff));
-  color: var(--ed-text-primary);
+  background: var(--app-surface-muted);
+  color: var(--app-text-primary);
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   padding: 5px 10px;
 }
@@ -446,9 +446,9 @@
 }
 
 .emergency-route-recommendation {
-  border-color: color-mix(in srgb, var(--app-accent-interactive, var(--status-info)) 36%, var(--color-border-default, var(--medical-border, #e0f2fe)));
-  background: color-mix(in srgb, var(--app-accent-interactive, var(--status-info)) 8%, var(--ed-surface-raised));
-  color: var(--medical-text-link, #0ea5e9);
+  border-color: var(--app-border-subtle);
+  background: var(--app-surface-muted);
+  color: var(--app-text-secondary);
   padding: var(--ed-space-3);
 }
 
@@ -473,7 +473,7 @@
 }
 
 .emergency-route-signal-row__main strong {
-  color: var(--medical-text-link, #0ea5e9);
+  color: #374151;
   font-size: var(--ed-type-section);
 }
 
@@ -495,28 +495,28 @@
 }
 
 .emergency-route-muted a {
-  color: var(--app-accent-interactive, var(--status-info));
+  color: var(--app-accent-interactiae, var(--status-info));
   font-weight: 700;
   text-decoration: none;
 }
 
-.emergency-route-muted a:hover {
+.emergency-route-muted a:hoaer {
   text-decoration: underline;
 }
 
 .emergency-route-copilot-hint {
-  border-color: color-mix(in srgb, var(--status-warning, #f59e0b) 40%, var(--color-border-default, var(--medical-border, #e0f2fe)));
-  background: color-mix(in srgb, var(--status-warning, #f59e0b) 8%, var(--ed-surface-raised));
+  border-color: color-mix(in srgb, var(--status-warning, #f59e0b) 40%, var(--app-border-subtle));
+  background: color-mix(in srgb, var(--status-warning, #f59e0b) 8%, var(--app-surface-1));
   color: var(--ed-text-secondary);
   margin: 0;
   padding: var(--ed-space-3);
 }
 
 .emergency-route-action-chip {
-  border: 1px solid color-mix(in srgb, var(--app-accent-interactive, var(--status-info)) 34%, var(--color-border-default, var(--medical-border, #e0f2fe)));
+  border: 1px solid var(--app-border-subtle);
   border-radius: 999px;
-  background: color-mix(in srgb, var(--app-accent-interactive, var(--status-info)) 10%, var(--ed-surface-raised));
-  color: var(--medical-text-link, #0ea5e9);
+  background: var(--app-surface-1);
+  color: var(--app-accent-interactiae);
   padding: 6px 10px;
   font-size: var(--ed-type-body);
   font-weight: 800;
@@ -535,10 +535,10 @@
   min-width: 0;
   padding: var(--ed-space-3);
   border: 1px solid var(--cdl-clinical-border, var(--ed-border-subtle));
-  border-left: 2px solid color-mix(in srgb, var(--command-action-accent, var(--app-accent-interactive, var(--status-info))) 45%, transparent);
+  border-left: 2px solid color-mix(in srgb, var(--command-action-accent, var(--app-accent-interactiae, var(--status-info))) 45%, transparent);
   border-radius: var(--cdl-clinical-radius, var(--radius-lg, 12px));
   background: var(--app-surface-1, var(--ed-surface-raised));
-  box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
+  box-shadow: var(--cdl-clinical-shadow-rest, var(--app-eleaation-card));
 }
 
 .emergency-command-action--critical {
@@ -550,14 +550,14 @@
 }
 
 .emergency-command-action--info {
-  --command-action-accent: var(--app-accent-interactive, var(--status-info));
+  --command-action-accent: var(--app-accent-interactiae, var(--status-info));
 }
 
 .emergency-command-action--success {
   --command-action-accent: var(--status-success, #10b981);
 }
 
-.emergency-command-action--active {
+.emergency-command-action--actiae {
   background: color-mix(in srgb, var(--command-action-accent) 7%, var(--ed-surface-raised));
 }
 
@@ -583,7 +583,7 @@
 
 .emergency-command-action__count {
   border-radius: 999px;
-  background: var(--color-elevated, var(--medical-surface-page, #f0f9ff));
+  background: var(--app-surface-muted);
   color: var(--ed-text-primary);
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: var(--ed-type-body);
@@ -607,7 +607,7 @@
   margin: 0;
 }
 
-.emergency-command-action__meta div {
+.emergency-command-action__meta dia {
   min-width: 0;
 }
 

@@ -34,9 +34,9 @@
 }
 
 .ocr-capture-panel__artifact-chip--active {
-  border-color: var(--medical-text-link, #0ea5e9);
+  border-color: #374151;
   color: var(--color-text-primary, var(--medical-ink, #111827));
-  background: rgba(56, 189, 248, 0.12);
+  background: rgba(148, 163, 184, 0.12);
 }
 
 .ocr-capture-panel__artifact-chip:disabled {
@@ -58,7 +58,7 @@
   padding: 0 14px;
   border: 1px solid var(--color-border-subtle, #e0f2fe);
   border-radius: 10px;
-  background: var(--color-elevated, var(--medical-surface-page, #f0f9ff));
+  background: var(--color-elevated, var(--medical-surface-page, #f1f5f9));
   color: var(--color-text-primary, var(--medical-ink, #111827));
   font-size: 13px;
   font-weight: 700;
@@ -103,7 +103,7 @@
   padding: 10px 12px;
   border-radius: 10px;
   border: 1px solid var(--color-border-subtle, #e0f2fe);
-  background: var(--color-elevated, var(--medical-surface-page, #f0f9ff));
+  background: var(--color-elevated, var(--medical-surface-page, #f1f5f9));
   color: var(--color-text-primary, var(--medical-ink, #111827));
   font: inherit;
 }
@@ -155,7 +155,7 @@
   border-radius: 999px;
   font-size: 11px;
   font-weight: 700;
-  background: var(--color-elevated, #f0f9ff);
+  background: var(--color-elevated, #f1f5f9);
   color: var(--color-text-secondary, #9ca3af);
 }
 
@@ -166,8 +166,8 @@
 
 .ocr-capture-panel__job-status--processing,
 .ocr-capture-panel__job-status--queued {
-  background: rgba(56, 189, 248, 0.14);
-  color: #0ea5e9;
+  background: rgba(148, 163, 184, 0.14);
+  color: #64748b;
 }
 
 .ocr-capture-panel__job-status--failed {

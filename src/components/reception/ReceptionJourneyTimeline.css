@@ -23,11 +23,11 @@
   min-width: 0;
   min-height: 76px;
   padding: var(--space-3, 12px);
-  border: 1px solid var(--cd-border-default, #e2e8f0);
+  border: 1px solid var(--app-border-subtle);
   border-radius: var(--cd-radius-md, 12px);
-  background: var(--cd-bg-surface, #ffffff);
-  color: var(--cd-text-primary, #0f172a);
-  box-shadow: var(--elevation-card, 0 8px 20px rgba(14, 165, 233, 0.06));
+  background: var(--app-surface-1);
+  color: var(--app-text-primary);
+  box-shadow: var(--app-elevation-card);
   font: inherit;
   text-align: left;
   cursor: default;
@@ -38,19 +38,19 @@ button.reception-journey-timeline__stage {
 }
 
 button.reception-journey-timeline__stage:hover {
-  border-color: var(--cd-border-strong, #cbd5e1);
-  background: var(--cd-bg-sunken, #f1f5f9);
+  border-color: var(--app-border-subtle);
+  background: var(--app-surface-muted);
 }
 
 button.reception-journey-timeline__stage:focus-visible {
   outline: none;
-  box-shadow: var(--cd-shadow-focus, 0 0 0 3px rgba(14, 165, 233, 0.24));
+  box-shadow: var(--cd-shadow-focus, 0 0 0 3px rgba(15, 23, 42, 0.15));
 }
 
 .reception-journey-timeline__stage--active {
-  border-color: var(--cd-brand-bg, #0ea5e9);
-  background: var(--cd-bg-accent-subtle, rgba(14, 165, 233, 0.06));
-  box-shadow: inset 0 0 0 1px var(--cd-brand-bg, #0ea5e9);
+  border-color: #374151;
+  background: color-mix(in srgb, #374151 6%, var(--app-surface-1));
+  box-shadow: inset 0 0 0 1px #374151;
 }
 
 .reception-journey-timeline__stage--attention:not(.reception-journey-timeline__stage--active) {

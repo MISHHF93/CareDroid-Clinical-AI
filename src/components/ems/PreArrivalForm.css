@@ -42,7 +42,7 @@
 .pre-arrival-intake__completion {
   font-size: 0.78rem;
   font-weight: 700;
-  color: var(--color-accent, var(--app-accent-interactive));
+  color: var(--color-accent, #374151);
   white-space: nowrap;
 }
 
@@ -98,8 +98,8 @@
 }
 
 .pre-arrival-intake__eta-presets button.is-active {
-  background: var(--color-accent, var(--app-accent-interactive));
-  border-color: var(--color-accent, var(--app-accent-interactive));
+  background: var(--color-accent, #374151);
+  border-color: var(--color-accent, #374151);
   color: var(--medical-text-on-solid, #ffffff);
 }
 
@@ -168,7 +168,7 @@
   font-size: 0.82rem;
   font-weight: 700;
   cursor: pointer;
-  background: var(--color-accent, var(--app-accent-interactive));
+  background: var(--color-accent, #374151);
   color: var(--medical-text-on-solid, #ffffff);
 }
 

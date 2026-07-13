@@ -63,11 +63,11 @@
 
 /* Current active stage */
 .patient-journey__stage--active .patient-journey__stage-btn {
-  --journey-border: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 55%, transparent);
-  --journey-bg: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 12%, var(--color-card, #ffffff));
-  --journey-fg: var(--medical-status-info-text, #0369a1);
+  --journey-border: color-mix(in srgb, #374151 55%, transparent);
+  --journey-bg: color-mix(in srgb, #374151 12%, var(--color-card, #ffffff));
+  --journey-fg: var(--medical-status-info-text, #475569);
   font-weight: 750;
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 18%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, #374151 18%, transparent);
 }
 
 /* Critical active stage (e.g., triage for P1 patient) */

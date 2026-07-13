@@ -11,7 +11,7 @@
 
 .reception-escalation-quick-actions__eyebrow {
   margin: 0;
-  color: var(--medical-sky-700, #0369a1);
+  color: var(--app-text-secondary, #64748b);
   font-size: 10px;
   font-weight: 750;
   letter-spacing: 0.08em;
@@ -51,7 +51,7 @@
 }
 
 .reception-escalation-quick-actions__button:hover:not(:disabled) {
-  border-color: var(--medical-sky-300, #7dd3fc);
+  border-color: var(--app-border-subtle, #cbd5e1);
   background: #f8fafc;
 }
 
@@ -85,7 +85,7 @@
   padding: 0;
   border: 0;
   background: transparent;
-  color: var(--medical-sky-700, #0369a1);
+  color: var(--app-text-secondary, #64748b);
   cursor: pointer;
   font-size: 12px;
   font-weight: 700;

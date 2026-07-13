@@ -3,7 +3,7 @@
   gap: 16px;
   padding: 20px 24px 28px;
   border-bottom: 1px solid var(--medical-border, #e0f2fe);
-  background: linear-gradient(135deg, var(--medical-surface-page, #f0f9ff), var(--medical-card-bg, #ffffff)) 100%);
+  background: linear-gradient(135deg, var(--medical-surface-page, #f1f5f9), var(--medical-card-bg, #ffffff)) 100%);
 }
 
 .department-status-screen__header {
@@ -19,7 +19,7 @@
   font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--app-accent-interactive);
+  color: #374151;
 }
 
 .department-status-screen__header h2 {
@@ -202,7 +202,7 @@
   font-size: 12px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--app-accent-interactive);
+  color: #374151;
   font-weight: 800;
 }
 

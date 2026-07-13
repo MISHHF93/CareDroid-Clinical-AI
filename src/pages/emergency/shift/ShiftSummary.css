@@ -1,6 +1,6 @@
 .shift-summary {
   min-height: 100%;
-  background: var(--medical-surface-page, #f0f9ff);
+  background: var(--medical-surface-page, #f1f5f9);
   color: var(--medical-ink, #111827);
   display: grid;
   gap: 18px;
@@ -26,7 +26,7 @@
 }
 
 .shift-summary__eyebrow {
-  color: var(--app-accent-interactive);
+  color: #374151;
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -63,7 +63,7 @@
 .shift-summary__handoff {
   border: 1px solid rgba(96, 165, 250, 0.45);
   border-radius: 12px;
-  background: var(--app-accent-interactive);
+  background: #374151;
   color: var(--medical-ink, #111827);
   cursor: pointer;
   font-weight: 800;
@@ -100,7 +100,7 @@
 }
 
 .shift-summary__status {
-  color: var(--medical-text-link, #0ea5e9);
+  color: #374151;
   font-size: 13px;
 }
 
@@ -143,7 +143,7 @@
 }
 
 .shift-summary__stat--blue strong {
-  color: var(--app-accent-interactive);
+  color: #374151;
 }
 
 .shift-summary__stat--green strong {
@@ -199,14 +199,14 @@
 
 .shift-summary__timeline article {
   align-items: center;
-  border-left: 3px solid var(--app-accent-interactive);
+  border-left: 3px solid #374151;
   display: grid;
   gap: 3px;
   padding: 6px 0 6px 12px;
 }
 
 .shift-summary__timeline time {
-  color: var(--medical-text-link, #0ea5e9);
+  color: #374151;
   font-size: 12px;
   font-weight: 800;
 }
@@ -224,7 +224,7 @@
 }
 
 .shift-summary__capacity-track {
-  background: var(--medical-surface-page, #f0f9ff);
+  background: var(--medical-surface-page, #f1f5f9);
   border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 999px;
   height: 12px;

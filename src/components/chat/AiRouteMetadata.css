@@ -3,7 +3,7 @@
   padding: 10px;
   border: 1px solid var(--panel-border);
   border-radius: var(--radius-md, 12px);
-  background: color-mix(in srgb, var(--app-accent-interactive, #37c6ff) 7%, transparent);
+  background: color-mix(in srgb, #374151 7%, transparent);
   display: grid;
   gap: 8px;
 }

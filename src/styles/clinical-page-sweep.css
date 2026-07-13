@@ -95,7 +95,7 @@
     .emergency-route-copilot-hint
   ) {
   border: 1px solid var(--cdl-clinical-border);
-  border-left: 2px solid color-mix(in srgb, var(--queue-accent, var(--command-action-accent, var(--app-accent-interactive, #0ea5e9))) 45%, transparent);
+  border-left: 2px solid color-mix(in srgb, var(--queue-accent, var(--command-action-accent, #374151)) 45%, transparent);
   border-radius: var(--cdl-clinical-radius);
   background: var(--app-surface-1, #ffffff);
   box-shadow: var(--cdl-clinical-shadow-rest);
@@ -224,7 +224,7 @@
     .timeline-ai__event
   ) {
   border-left-width: 2px;
-  border-left-color: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 40%, var(--cdl-clinical-border));
+  border-left-color: color-mix(in srgb, #374151 40%, var(--cdl-clinical-border));
   box-shadow: none;
 }
 
@@ -267,8 +267,8 @@
 
 .dispatch-console__chip--active,
 .dispatch-console__status-pill--active {
-  border-color: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 28%, transparent);
-  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 10%, var(--app-surface-1, #ffffff));
+  border-color: color-mix(in srgb, #374151 28%, transparent);
+  background: color-mix(in srgb, #374151 10%, var(--app-surface-1, #ffffff));
 }
 
 /* ══════════════════════════════════════════════════════════════════

@@ -1,8 +1,8 @@
 .ai-triage-assist {
-  border: 1px solid color-mix(in srgb, var(--status-info, #38bdf8) 36%, var(--color-border-default, var(--medical-border, #e0f2fe)));
+  border: 1px solid var(--app-border-subtle);
   border-radius: 14px;
-  background: color-mix(in srgb, var(--status-info, #38bdf8) 10%, var(--color-card, var(--app-surface-2, #ffffff)));
-  box-shadow: inset 3px 0 0 var(--status-info, #38bdf8);
+  background: var(--app-surface-1);
+  box-shadow: inset 3px 0 0 var(--app-border-strong);
   display: grid;
   gap: 10px;
   padding: 12px;
@@ -56,16 +56,16 @@
 .ai-triage-assist__overrides select {
   min-height: 36px;
   border-radius: 8px;
-  border: 1px solid var(--color-border-default, var(--medical-border, #e0f2fe));
-  background: var(--color-elevated, var(--medical-surface-page, #f0f9ff));
-  color: var(--medical-card-fg, #111827);
+  border: 1px solid var(--app-border-subtle);
+  background: var(--app-surface-muted);
+  color: var(--app-text-primary);
   padding: 0 8px;
 }
 
 .ai-triage-assist__confidence {
   border-radius: 999px;
-  background: color-mix(in srgb, var(--status-info, #38bdf8) 18%, transparent);
-  color: #e0f2fe;
+  background: var(--app-surface-muted);
+  color: var(--app-text-secondary);
   font-size: 11px;
   font-weight: 700;
   padding: 4px 8px;
@@ -96,7 +96,7 @@
 }
 
 .ai-triage-assist__action {
-  border: 1px solid var(--medical-border, #e0f2fe);
+  border: 1px solid var(--medical-border, #e2e8f0);
   border-radius: 999px;
   background: var(--color-surface, var(--app-surface-1, #ffffff));
   color: var(--medical-card-fg, #111827);
@@ -107,7 +107,7 @@
 }
 
 .ai-triage-assist__action--primary {
-  background: var(--component-button-primary-bg, var(--app-accent-interactive));
+  background: var(--component-button-primary-bg, #374151);
   border-color: transparent;
 }
 

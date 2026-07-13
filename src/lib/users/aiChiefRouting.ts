@@ -5,7 +5,12 @@ import {
 } from './canonicalAccess';
 import type { CareDroidUserProfile } from './userTypes';
 
-export type AlertSeverity = 'critical' | 'high' | 'medium' | 'low';
+/**
+ * AI-specific severity for recommendation routing.
+ * This is distinct from the clinical AlertSeverity in types/emergency.ts
+ * which uses 'Info' | 'Warning' | 'Critical'.
+ */
+export type AiRoutingSeverity = 'critical' | 'high' | 'medium' | 'low';
 
 export type AiRecommendationRoute = {
   visibleToRoles: readonly HospitalRole[];

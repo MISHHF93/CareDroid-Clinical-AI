@@ -23,7 +23,7 @@
 
 .department-staff-bar__eyebrow {
   margin: 0;
-  color: var(--medical-text-link, #0ea5e9);
+  color: #374151;
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.1em;
@@ -120,7 +120,7 @@
   border-radius: 999px;
   padding: 2px 8px;
   font-size: 11px;
-  color: var(--medical-text-link, #0ea5e9);
+  color: #374151;
   background: rgba(59, 130, 246, 0.14);
   border: 1px solid rgba(96, 165, 250, 0.28);
 }

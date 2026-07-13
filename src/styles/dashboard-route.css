@@ -54,7 +54,7 @@
 }
 
 .dashboard-panel {
-  background: var(--color-background, var(--medical-surface-page, #f0f9ff));
+  background: var(--color-background, var(--medical-surface-page, #f1f5f9));
   border: 1px solid var(--ed-border-subtle);
   border-radius: var(--radius-lg, 14px);
   margin-bottom: var(--ed-space-6);
@@ -129,7 +129,7 @@
 }
 
 .dashboard-status--info {
-  color: var(--status-info, #38bdf8);
+  color: var(--status-info, #94a3b8);
 }
 
 .dashboard-status--warn {
@@ -186,7 +186,7 @@
 }
 
 .dashboard-route-row__method {
-  color: var(--app-accent-interactive, var(--status-info));
+  color: #374151);
   min-width: 48px;
 }
 

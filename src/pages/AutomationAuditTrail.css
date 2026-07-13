@@ -28,7 +28,7 @@
 
 .automation-audit-eyebrow {
   margin: 0 0 8px;
-  color: var(--app-accent-interactive);
+  color: #374151;
   font-size: var(--font-12, 12px);
   font-weight: 850;
   letter-spacing: 0.08em;
@@ -83,7 +83,7 @@
   padding: 16px;
   display: grid;
   gap: 4px;
-  background: color-mix(in srgb, var(--app-accent-interactive) 8%, var(--app-surface-1));
+  background: color-mix(in srgb, #374151 8%, var(--app-surface-1));
 }
 
 .automation-audit-policy strong {

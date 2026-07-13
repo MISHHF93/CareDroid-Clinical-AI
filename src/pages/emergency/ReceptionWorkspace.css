@@ -1,14 +1,14 @@
 .reception-command {
-  --reception-command-bg: #ffffff;
-  --reception-command-panel: #ffffff;
-  --reception-command-inset: var(--medical-slate-100, #f1f5f9);
-  --reception-command-border: var(--medical-border, #e2e8f0);
-  --reception-command-ink: var(--medical-ink, #111827);
-  --reception-command-muted: var(--medical-ink-muted, #64748b);
-  --reception-command-primary: var(--medical-accent-hover, #0284c7);
-  --reception-command-primary-strong: var(--medical-sky-700, #0369a1);
-  --reception-command-critical: var(--semantic-critical, #b91c1c);
-  --reception-command-warning: var(--semantic-attention, #b45309);
+  --reception-command-bg: var(--app-surface-0);
+  --reception-command-panel: var(--app-surface-1);
+  --reception-command-inset: var(--app-surface-muted);
+  --reception-command-border: var(--app-border-subtle);
+  --reception-command-ink: var(--app-text-primary);
+  --reception-command-muted: var(--app-text-secondary);
+  --reception-command-primary: #111827;
+  --reception-command-primary-strong: #374151;
+  --reception-command-critical: var(--app-danger);
+  --reception-command-warning: var(--app-warning);
   display: grid;
   gap: var(--cdl-panel-gap, var(--app-layout-panel-gap, 12px));
   padding: 4px 0 72px;
@@ -16,7 +16,7 @@
 }
 
 .reception-workspace {
-  background: #ffffff;
+  background: var(--app-bg);
 }
 
 .reception-command button,
@@ -30,7 +30,7 @@
 .reception-command input:focus-visible,
 .reception-command select:focus-visible,
 .reception-command textarea:focus-visible {
-  outline: 3px solid color-mix(in srgb, var(--medical-sky-500, #0ea5e9) 24%, transparent);
+  outline: 3px solid rgba(15, 23, 42, 0.24);
   outline-offset: 2px;
 }
 
@@ -47,6 +47,7 @@
   border: 1px solid var(--reception-command-border);
   border-radius: 8px;
   background: var(--reception-command-panel);
+  box-shadow: var(--app-elevation-card);
 }
 
 .reception-command-header h1 {
@@ -94,8 +95,8 @@
 }
 
 .reception-command-chip--critical {
-  border-color: rgba(185, 28, 28, 0.35);
-  background: #fff1f2;
+  border-color: color-mix(in srgb, var(--reception-command-critical) 35%, transparent);
+  background: color-mix(in srgb, var(--reception-command-critical) 8%, var(--reception-command-panel));
   color: var(--reception-command-critical);
 }
 
@@ -156,15 +157,15 @@
 }
 
 .reception-command-stepper__item--complete {
-  border-color: var(--medical-sky-300, #7dd3fc);
-  background: #ffffff;
+  border-color: color-mix(in srgb, var(--reception-command-primary) 50%, var(--reception-command-border));
+  background: var(--reception-command-panel);
   color: var(--reception-command-primary-strong);
 }
 
 .reception-command-stepper__item--critical {
   grid-column: 1 / -1;
-  border-color: rgba(185, 28, 28, 0.35);
-  background: #fff1f2;
+  border-color: color-mix(in srgb, var(--reception-command-critical) 35%, transparent);
+  background: color-mix(in srgb, var(--reception-command-critical) 8%, var(--reception-command-panel));
   color: var(--reception-command-critical);
 }
 
@@ -188,8 +189,8 @@
 }
 
 .reception-command-missing {
-  border-color: rgba(180, 83, 9, 0.34);
-  background: #fffbeb;
+  border-color: color-mix(in srgb, var(--reception-command-warning) 34%, transparent);
+  background: color-mix(in srgb, var(--reception-command-warning) 8%, var(--reception-command-panel));
   color: var(--reception-command-warning);
 }
 
@@ -258,9 +259,9 @@
 }
 
 .reception-command-segmented button.is-active {
-  border-color: var(--medical-sky-400, #38bdf8);
-  background: #ffffff;
-  color: var(--medical-sky-700, #0369a1);
+  border-color: color-mix(in srgb, var(--reception-command-primary) 50%, var(--reception-command-border));
+  background: var(--reception-command-panel);
+  color: var(--reception-command-primary-strong);
 }
 
 .reception-command-form-grid {
@@ -299,7 +300,7 @@
   min-height: 42px;
   border: 1px solid var(--reception-command-border);
   border-radius: 8px;
-  background: #ffffff;
+  background: var(--app-input-bg);
   color: var(--reception-command-ink);
   padding: 9px 10px;
 }
@@ -354,17 +355,17 @@
   min-height: 50px;
   border-radius: 8px;
   padding: 10px 12px;
-  background: #ecfdf5;
+  background: color-mix(in srgb, var(--app-success) 10%, var(--reception-command-panel));
   color: var(--reception-command-primary-strong);
 }
 
 .reception-command-ai__urgency--critical {
-  background: #fff1f2;
+  background: color-mix(in srgb, var(--reception-command-critical) 10%, var(--reception-command-panel));
   color: var(--reception-command-critical);
 }
 
 .reception-command-ai__urgency--high {
-  background: #fffbeb;
+  background: color-mix(in srgb, var(--reception-command-warning) 10%, var(--reception-command-panel));
   color: var(--reception-command-warning);
 }
 
@@ -470,7 +471,7 @@
   max-width: 900px;
   border: 1px solid var(--reception-command-border);
   border-radius: 8px;
-  background: #ffffff;
+  background: var(--reception-command-panel);
   color: var(--reception-command-ink);
   padding: 9px 10px;
   cursor: pointer;
@@ -478,8 +479,8 @@
 }
 
 .reception-command-queue-row--risk {
-  border-color: rgba(185, 28, 28, 0.32);
-  background: #fff7f7;
+  border-color: color-mix(in srgb, var(--reception-command-critical) 32%, transparent);
+  background: color-mix(in srgb, var(--reception-command-critical) 5%, var(--reception-command-panel));
 }
 
 .reception-command-queue-row strong,
@@ -530,9 +531,9 @@
   gap: 12px;
   align-items: center;
   min-height: 78px;
-  border: 1px solid rgba(185, 28, 28, 0.32);
+  border: 1px solid color-mix(in srgb, var(--reception-command-critical) 32%, transparent);
   border-radius: 8px;
-  background: #fff7f7;
+  background: color-mix(in srgb, var(--reception-command-critical) 5%, var(--reception-command-panel));
   padding: 10px;
 }
 
@@ -558,7 +559,7 @@
   min-width: 72px;
   min-height: 58px;
   border-radius: 8px;
-  background: #fee2e2;
+  background: color-mix(in srgb, var(--reception-command-critical) 15%, var(--reception-command-panel));
   color: var(--reception-command-critical);
   font-weight: 900;
 }
@@ -587,15 +588,15 @@
   bottom: 92px;
   z-index: 20;
   max-width: min(420px, calc(100vw - 36px));
-  border-color: rgba(15, 118, 110, 0.35);
-  background: #ecfdf5;
+  border-color: color-mix(in srgb, var(--app-success) 35%, transparent);
+  background: color-mix(in srgb, var(--app-success) 10%, var(--reception-command-panel));
   color: var(--reception-command-primary-strong);
-  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.14);
+  box-shadow: var(--app-shadow-2);
 }
 
 .reception-command-toast--error {
-  border-color: rgba(185, 28, 28, 0.35);
-  background: #fff1f2;
+  border-color: color-mix(in srgb, var(--reception-command-critical) 35%, transparent);
+  background: color-mix(in srgb, var(--reception-command-critical) 10%, var(--reception-command-panel));
   color: var(--reception-command-critical);
 }
 
@@ -610,9 +611,9 @@
   gap: 10px;
   min-height: 72px;
   border-top: 1px solid var(--reception-command-border);
-  background: rgba(255, 255, 255, 0.96);
+  background: var(--app-surface-glass);
   padding: 12px 18px;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(var(--app-blur-glass));
 }
 
 .reception-command-actionbar button {
@@ -623,17 +624,17 @@
 .reception-command-actionbar__primary {
   border-color: var(--reception-command-primary-strong) !important;
   background: var(--reception-command-primary) !important;
-  color: #ffffff !important;
+  color: var(--app-on-solid) !important;
 }
 
 .reception-command-actionbar__critical {
   border-color: var(--reception-command-critical) !important;
   background: var(--reception-command-critical) !important;
-  color: #ffffff !important;
+  color: var(--app-on-solid) !important;
 }
 
 .reception-command-actionbar__secondary {
-  background: #ffffff !important;
+  background: var(--reception-command-panel) !important;
 }
 
 .reception-command-actionbar button:disabled {
@@ -1000,9 +1001,9 @@
   z-index: 30;
   display: grid;
   grid-template-rows: auto 1fr auto;
-  background: #ffffff;
+  background: var(--reception-command-panel);
   border-left: 1px solid var(--reception-command-border);
-  box-shadow: -8px 0 24px rgba(15, 23, 42, 0.1);
+  box-shadow: var(--app-shadow-2);
   animation: reception-flyout-slide-in 0.18s ease-out;
 }
 

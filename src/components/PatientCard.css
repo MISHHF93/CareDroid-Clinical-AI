@@ -255,7 +255,7 @@
   align-items: center;
   gap: 6px;
   font-weight: 700;
-  color: var(--medical-text-link, var(--app-link-fg));
+  color: #374151);
 }
 
 /* Visual QA clarity pass: make triage/state/risk readable without relying on tiny color marks. */

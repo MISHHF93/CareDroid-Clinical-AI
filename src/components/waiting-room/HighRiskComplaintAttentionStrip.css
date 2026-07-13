@@ -47,7 +47,7 @@
   min-width: 72px;
   padding: 8px 10px;
   border-radius: 10px;
-  border: 1px solid #e0f2fe;
+  border: 1px solid #f1f5f9;
   background: var(--app-surface-1, #ffffff);
   text-align: center;
 }
@@ -81,9 +81,9 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  border: 1px solid #e0f2fe;
+  border: 1px solid #f1f5f9;
   border-radius: 999px;
-  background: var(--medical-surface-page, #f0f9ff);
+  background: var(--medical-surface-page, #f1f5f9);
   color: var(--medical-ink, #111827);
   cursor: pointer;
   font-size: 12px;

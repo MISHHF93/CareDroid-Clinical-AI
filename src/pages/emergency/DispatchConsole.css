@@ -49,7 +49,7 @@
   padding: 10px 16px;
   border: none;
   border-radius: var(--cdl-clinical-radius-sm, 10px);
-  background: var(--app-accent-interactive, #0ea5e9);
+  background: #374151;
   color: var(--app-on-solid, #ffffff);
   font-weight: 700;
   font-size: 0.8125rem;
@@ -186,7 +186,7 @@
 
 .dc-link-accent {
   font-size: 13px;
-  color: var(--medical-accent, #0ea5e9);
+  color: var(--medical-accent, #64748b);
   text-decoration: none;
   font-weight: 600;
 }
@@ -318,7 +318,7 @@
   font-weight: 700;
   font-size: 13px;
   cursor: pointer;
-  background: var(--medical-accent, #0ea5e9);
+  background: var(--medical-accent, #64748b);
   color: #fff;
 }
 
@@ -343,8 +343,8 @@
 }
 
 .dc-resource-chip--on {
-  border-color: var(--medical-accent, #0ea5e9);
-  background: color-mix(in srgb, var(--medical-accent, #0ea5e9) 14%, transparent);
+  border-color: var(--medical-accent, #64748b);
+  background: color-mix(in srgb, var(--medical-accent, #64748b) 14%, transparent);
   color: var(--medical-ink, #111827);
 }
 

@@ -3,7 +3,7 @@
   gap: 20px;
   padding: 20px 24px 32px;
   border-bottom: 1px solid var(--medical-border, #e0f2fe);
-  background: linear-gradient(180deg, var(--medical-surface-page, #f0f9ff) 0%, var(--medical-card-bg, #ffffff) 100%);
+  background: linear-gradient(180deg, var(--medical-surface-page, #f1f5f9) 0%, var(--medical-card-bg, #ffffff) 100%);
 }
 
 .command-center-throughput__header {
@@ -19,7 +19,7 @@
   font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--medical-text-link, #0ea5e9);
+  color: #374151;
 }
 
 .command-center-throughput__header h2 {
@@ -94,7 +94,7 @@
   padding: 12px;
   border-radius: 14px;
   border: 1px solid var(--medical-border, #e0f2fe);
-  background: var(--medical-surface-page, #f0f9ff);
+  background: var(--medical-surface-page, #f1f5f9);
 }
 
 .command-center-throughput__hourly-bar {
@@ -109,7 +109,7 @@
   width: 100%;
   min-height: 8px;
   border-radius: 4px 4px 0 0;
-  background: linear-gradient(180deg, #38bdf8 0%, var(--app-accent-interactive) 100%);
+  background: linear-gradient(180deg, #94a3b8 0%, #374151 100%);
 }
 
 .command-center-throughput__hourly-count {
@@ -193,14 +193,14 @@
   padding: 14px 16px;
   border-radius: 12px;
   border: 1px solid var(--medical-border, #e0f2fe);
-  background: var(--medical-surface-page, #f0f9ff);
+  background: var(--medical-surface-page, #f1f5f9);
 }
 
 .command-center-throughput__trend-direction {
   font-size: 24px;
   font-weight: 900;
   line-height: 1;
-  color: var(--medical-text-link, #0ea5e9);
+  color: #374151;
 }
 
 .command-center-throughput__trend-card[data-tone='warning'] .command-center-throughput__trend-direction,
@@ -259,7 +259,7 @@
 }
 
 .command-center-throughput__tile[data-tone='watch'] {
-  border-color: var(--app-accent-interactive);
+  border-color: #374151;
 }
 
 .command-center-throughput__value {

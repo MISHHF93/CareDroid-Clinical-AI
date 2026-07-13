@@ -5,8 +5,8 @@
   gap: 0.25rem 0.4rem;
   padding: 0.2rem 0.45rem;
   border-radius: 0.4rem;
-  border: 1px solid color-mix(in srgb, var(--color-accent, var(--app-accent-interactive)) 35%, transparent);
-  background: color-mix(in srgb, var(--color-accent, var(--app-accent-interactive)) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-accent, #374151) 35%, transparent);
+  background: color-mix(in srgb, var(--color-accent, #374151) 8%, transparent);
   font-size: 0.72rem;
 }
 
@@ -18,7 +18,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  color: var(--color-accent, var(--app-accent-interactive));
+  color: var(--color-accent, #374151);
 }
 
 .native-ai-routing-badge__value {

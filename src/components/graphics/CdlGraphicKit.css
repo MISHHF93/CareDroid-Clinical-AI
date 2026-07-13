@@ -1,7 +1,7 @@
 /* CDL graphic kit — iconographic treatments for operational UI */
 
 :root {
-  --cdl-graphic-accent-start: #0ea5e9;
+  --cdl-graphic-accent-start: #64748b;
   --cdl-graphic-accent-end: #6366f1;
   --cdl-graphic-soft-start: #e0f2fe;
   --cdl-graphic-soft-end: #ede9fe;
@@ -35,8 +35,8 @@
 }
 
 .cdl-graphic-icon-badge--information {
-  background: color-mix(in srgb, var(--status-info, #0ea5e9) 12%, var(--medical-white));
-  color: var(--medical-accent-hover, #0369a1);
+  background: color-mix(in srgb, var(--status-info, #64748b) 12%, var(--medical-white));
+  color: var(--medical-accent-hover, #475569);
 }
 
 .cdl-graphic-icon-badge--warning {
@@ -51,7 +51,7 @@
 
 .cdl-graphic-icon-badge--action {
   background: color-mix(in srgb, var(--medical-accent) 14%, var(--medical-white));
-  color: var(--medical-accent-hover, #0369a1);
+  color: var(--medical-accent-hover, #475569);
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--medical-accent) 18%, transparent);
 }
 
@@ -97,7 +97,7 @@
 }
 
 .cdl-situation-graphic-card--information .cdl-situation-graphic-card__motif {
-  color: var(--status-info, #0ea5e9);
+  color: var(--status-info, #64748b);
 }
 
 .cdl-situation-graphic-card--warning .cdl-situation-graphic-card__motif {
@@ -287,7 +287,7 @@
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, var(--status-info, #0ea5e9), var(--medical-accent));
+  background: linear-gradient(90deg, var(--status-info, #64748b), var(--medical-accent));
   transition: width 240ms ease;
 }
 

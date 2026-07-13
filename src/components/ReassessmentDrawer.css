@@ -56,7 +56,7 @@
   max-height: min(50vh, calc(var(--app-viewport-height, 100dvh) - var(--app-visual-viewport-offset-top, 0px)));
   overflow-y: auto;
   border-bottom: 1px solid rgba(248, 113, 113, 0.35);
-  background: var(--medical-surface-page, #f0f9ff);
+  background: var(--medical-surface-page, #f1f5f9);
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.48);
   color: var(--medical-ink, #111827);
   pointer-events: auto;
@@ -137,7 +137,7 @@
 .reassessment-drawer__sort button[aria-pressed='true'] {
   border-color: rgba(59, 130, 246, 0.72);
   background: rgba(37, 99, 235, 0.2);
-  color: var(--medical-text-link, #0ea5e9);
+  color: #374151;
 }
 
 .reassessment-drawer__close {
@@ -384,7 +384,7 @@
   padding: 0 12px;
   border: 1px solid rgba(59, 130, 246, 0.76);
   border-radius: 8px;
-  background: var(--app-accent-interactive);
+  background: #374151;
   color: var(--medical-text-on-solid, #ffffff);
   font-size: 12px;
   font-weight: 900;
@@ -398,7 +398,7 @@
 
 .reassessment-drawer__assess:hover,
 .reassessment-drawer__assess:focus-visible {
-  background: var(--app-accent-interactive);
+  background: #374151;
   outline: none;
   transform: translateY(-1px);
 }

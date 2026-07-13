@@ -51,9 +51,9 @@
 }
 
 .emergency-whiteboard-page__filter-chip--active {
-  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 12%, var(--app-surface-1, #ffffff));
-  border-color: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 30%, transparent);
-  color: var(--app-accent-hover, #0284c7);
+  background: color-mix(in srgb, #374151 12%, var(--app-surface-1, #ffffff));
+  border-color: color-mix(in srgb, #374151 30%, transparent);
+  color: #111827;
   box-shadow: none;
 }
 
@@ -121,13 +121,13 @@
 }
 
 .tools-overview .tools-filter-tab--active {
-  border-color: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 28%, transparent);
-  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 10%, var(--app-surface-1, #ffffff));
-  color: var(--app-accent-hover, #0284c7);
+  border-color: color-mix(in srgb, #374151 28%, transparent);
+  background: color-mix(in srgb, #374151 10%, var(--app-surface-1, #ffffff));
+  color: #111827;
 }
 
 .tools-overview .tools-workspace-os {
-  border-color: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 22%, var(--cdl-clinical-border));
+  border-color: color-mix(in srgb, #374151 22%, var(--cdl-clinical-border));
   border-radius: var(--cdl-clinical-radius);
   box-shadow: var(--cdl-clinical-shadow-rest);
 }
@@ -151,9 +151,9 @@
 }
 
 .clinical-tool-catalog .catalog-category-chip--active {
-  border-color: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 28%, transparent);
-  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 10%, var(--app-surface-1, #ffffff));
-  color: var(--app-accent-hover, #0284c7);
+  border-color: color-mix(in srgb, #374151 28%, transparent);
+  background: color-mix(in srgb, #374151 10%, var(--app-surface-1, #ffffff));
+  color: #111827;
 }
 
 .clinical-tool-catalog .catalog-table th {
@@ -171,7 +171,7 @@
 
 .tool-page .tool-header {
   border: 1px solid var(--cdl-clinical-border);
-  border-left: 3px solid color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 55%, transparent);
+  border-left: 3px solid color-mix(in srgb, #374151 55%, transparent);
   border-radius: var(--cdl-clinical-radius-lg);
   box-shadow: var(--cdl-clinical-shadow-rest);
 }
@@ -192,7 +192,7 @@
   background:
     linear-gradient(
       180deg,
-      color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 4%, var(--app-surface-1, #ffffff)) 0%,
+      color-mix(in srgb, #374151 4%, var(--app-surface-1, #ffffff)) 0%,
       var(--app-surface-1, #ffffff) 100%
     );
   border-bottom-color: var(--cdl-clinical-border);

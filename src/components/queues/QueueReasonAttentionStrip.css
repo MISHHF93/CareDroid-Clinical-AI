@@ -16,7 +16,7 @@
 
 .queue-reason-attention-strip__eyebrow {
   margin: 0;
-  color: var(--medical-text-link, #0ea5e9);
+  color: #374151;
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -88,7 +88,7 @@
   gap: 8px;
   border: 1px solid #e0f2fe;
   border-radius: 999px;
-  background: var(--medical-surface-page, #f0f9ff);
+  background: var(--medical-surface-page, #f1f5f9);
   color: var(--medical-ink, #111827);
   cursor: pointer;
   font-size: 12px;

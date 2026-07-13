@@ -19,7 +19,7 @@
 
 .ems-offload-attention-strip__eyebrow {
   margin: 0;
-  color: #7dd3fc;
+  color: #cbd5e1;
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -74,10 +74,10 @@
 }
 
 .ems-offload-attention-strip__open {
-  border: 1px solid var(--app-accent-interactive);
+  border: 1px solid #374151;
   border-radius: 999px;
   background: #1d4ed822;
-  color: var(--medical-text-link, #0ea5e9);
+  color: #374151;
   cursor: pointer;
   font-size: 12px;
   font-weight: 700;

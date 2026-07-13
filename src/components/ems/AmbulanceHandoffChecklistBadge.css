@@ -36,9 +36,9 @@
 }
 
 .amb-handoff-badge[data-tone='progress'] {
-  border-color: var(--medical-text-link, #0ea5e9);
+  border-color: #374151;
   color: #bae6fd;
-  background: rgba(56, 189, 248, 0.12);
+  background: rgba(148, 163, 184, 0.12);
 }
 
 .amb-handoff-badge[data-tone='pending'] {

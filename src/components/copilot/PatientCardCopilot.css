@@ -4,7 +4,7 @@
   margin-top: 12px;
   border: 1px solid rgba(96, 165, 250, 0.28);
   border-radius: 14px;
-  background: linear-gradient(180deg, var(--medical-surface-card, #ffffff), var(--medical-surface-page, #f0f9ff));
+  background: linear-gradient(180deg, var(--medical-surface-card, #ffffff), var(--medical-surface-page, #f1f5f9));
   overflow: hidden;
 }
 
@@ -72,7 +72,7 @@
 
 .patient-card-copilot__sidebar h4 {
   margin: 0;
-  color: var(--medical-text-link, #0ea5e9);
+  color: #374151;
   font-size: 11px;
   font-weight: 900;
   letter-spacing: 0.08em;
@@ -139,12 +139,12 @@
 }
 
 .patient-card-copilot__message[data-role='staff'] .patient-card-copilot__bubble {
-  background: var(--medical-accent-tint, rgba(14, 165, 233, 0.12));
-  color: var(--medical-text-link, #0ea5e9);
+  background: var(--medical-accent-tint, rgba(100, 116, 139, 0.12));
+  color: #374151;
 }
 
 .patient-card-copilot__message[data-role='copilot'] .patient-card-copilot__bubble {
-  background: var(--medical-card-muted-bg, #f0f9ff);
+  background: var(--medical-card-muted-bg, #f1f5f9);
   color: var(--medical-text-muted, #6b7280);
   border: 1px solid var(--medical-border, #e0f2fe);
 }
@@ -169,7 +169,7 @@
 .patient-card-copilot__composer button {
   border: 0;
   border-radius: 10px;
-  background: var(--app-accent-interactive);
+  background: #374151;
   color: var(--medical-text-on-solid, #ffffff);
   font-weight: 700;
   padding: 8px 12px;

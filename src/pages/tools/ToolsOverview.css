@@ -137,8 +137,8 @@
 }
 
 .tools-execution-badge--local {
-  border-color: color-mix(in srgb, var(--app-accent-interactive, var(--status-info)) 44%, var(--panel-border));
-  color: var(--app-accent-interactive, var(--status-info));
+  border-color: color-mix(in srgb, #374151) 44%, var(--panel-border));
+  color: #374151);
 }
 
 .tools-execution-badge--platform {
@@ -433,9 +433,9 @@
   width: min(100%, 680px);
   margin: 0 0 12px;
   padding: 10px 12px;
-  border: 1px solid color-mix(in srgb, var(--app-accent-interactive) 34%, var(--app-panel-border));
+  border: 1px solid color-mix(in srgb, #374151 34%, var(--app-panel-border));
   border-radius: var(--compact-card-radius, 12px);
-  background: color-mix(in srgb, var(--app-accent-interactive) 9%, var(--app-surface-1));
+  background: color-mix(in srgb, #374151 9%, var(--app-surface-1));
 }
 
 .tools-workspace-os strong {
@@ -615,13 +615,13 @@
 }
 
 .tool-card-large:hover {
-  border-color: var(--cdl-clinical-border-focus, color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 34%, var(--app-border)));
+  border-color: var(--cdl-clinical-border-focus, color-mix(in srgb, var(--app-accent-action, #374151) 34%, var(--app-border)));
   transform: translateY(-1px);
   box-shadow: var(--cdl-clinical-shadow-hover, var(--compact-shadow, var(--app-elevation-card)));
 }
 
 .tool-card-large:focus-visible {
-  outline: 2px solid var(--app-accent-action, var(--app-accent-interactive));
+  outline: 2px solid var(--app-accent-action, #374151);
   outline-offset: 3px;
 }
 
@@ -680,9 +680,9 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  background: color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 10%, var(--app-surface-muted));
-  border: 1px solid color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 22%, var(--app-border));
-  color: var(--app-accent-action, var(--app-accent-interactive));
+  background: color-mix(in srgb, var(--app-accent-action, #374151) 10%, var(--app-surface-muted));
+  border: 1px solid color-mix(in srgb, var(--app-accent-action, #374151) 22%, var(--app-border));
+  color: var(--app-accent-action, #374151);
 }
 
 .tool-meta {
@@ -706,10 +706,10 @@
 .tool-category {
   display: inline-block;
   padding: 4px 10px;
-  border: 1px solid color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 28%, var(--app-border));
+  border: 1px solid color-mix(in srgb, var(--app-accent-action, #374151) 28%, var(--app-border));
   border-radius: 999px;
-  background: color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 9%, var(--app-surface));
-  color: var(--app-accent-action, var(--app-accent-interactive));
+  background: color-mix(in srgb, var(--app-accent-action, #374151) 9%, var(--app-surface));
+  color: var(--app-accent-action, #374151);
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
@@ -741,9 +741,9 @@
 }
 
 .tool-category--lifecycle-beta {
-  border-color: color-mix(in srgb, var(--app-accent-interactive) 34%, var(--app-border));
-  background: color-mix(in srgb, var(--app-accent-interactive) 10%, var(--app-surface));
-  color: var(--app-accent-interactive);
+  border-color: color-mix(in srgb, #374151 34%, var(--app-border));
+  background: color-mix(in srgb, #374151 10%, var(--app-surface));
+  color: #374151;
 }
 
 .tool-category--lifecycle-experimental,
@@ -878,9 +878,9 @@
   min-width: min(100%, 10rem);
   min-height: var(--compact-control-height, 38px);
   padding: 8px 12px;
-  border: 1px solid var(--app-accent-action, var(--app-accent-interactive));
+  border: 1px solid var(--app-accent-action, #374151);
   border-radius: var(--app-radius-md, 12px);
-  background: var(--app-accent-action, var(--app-accent-interactive));
+  background: var(--app-accent-action, #374151);
   font-weight: 600;
   font-size: 14px;
   color: var(--app-on-solid);
@@ -889,8 +889,8 @@
 }
 
 .btn-open-tool:hover {
-  background: var(--app-accent-hover);
-  border-color: var(--app-accent-hover);
+  background: #111827;
+  border-color: #111827;
   transform: none;
 }
 
@@ -956,7 +956,7 @@
 }
 
 .tip-card:hover {
-  background: color-mix(in srgb, var(--app-accent-interactive) 8%, var(--app-surface-2));
+  background: color-mix(in srgb, #374151 8%, var(--app-surface-2));
   transform: none;
 }
 

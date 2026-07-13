@@ -5,12 +5,12 @@
  */
 
 :root {
-  --cdl-clinical-canvas-top-glow: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 8%, transparent);
+  --cdl-clinical-canvas-top-glow: color-mix(in srgb, #374151 8%, transparent);
   --cdl-clinical-canvas-base: var(--medical-surface-page, #f8fafc);
   /* Soft edges: depth first, hard boxes second */
   --cdl-clinical-border: color-mix(in srgb, var(--medical-border, #e2e8f0) 36%, transparent);
   --cdl-clinical-border-strong: color-mix(in srgb, var(--medical-border, #e2e8f0) 55%, transparent);
-  --cdl-clinical-border-focus: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 38%, transparent);
+  --cdl-clinical-border-focus: color-mix(in srgb, #374151 38%, transparent);
   --cdl-clinical-hairline: color-mix(in srgb, var(--medical-border, #e2e8f0) 42%, transparent);
   --cdl-clinical-radius: 12px;
   --cdl-clinical-radius-sm: 10px;
@@ -197,9 +197,9 @@
     .emergency-route-view-tabs__btn--active,
     .reception-command-chip--active
   ) {
-  border-color: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 28%, transparent);
-  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 10%, var(--app-surface-1, #ffffff));
-  color: var(--app-accent-hover, #0284c7);
+  border-color: color-mix(in srgb, #374151 28%, transparent);
+  background: color-mix(in srgb, #374151 10%, var(--app-surface-1, #ffffff));
+  color: #111827;
   box-shadow: none;
 }
 
@@ -220,7 +220,7 @@
     .emergency-route-help-trigger:focus-visible
   ) {
   border-color: var(--cdl-clinical-border-focus);
-  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 8%, var(--app-surface-1, #ffffff));
+  background: color-mix(in srgb, #374151 8%, var(--app-surface-1, #ffffff));
   box-shadow: var(--cdl-clinical-shadow-rest);
 }
 
@@ -234,7 +234,7 @@
   border-bottom-color: color-mix(in srgb, var(--cdl-clinical-border) 55%, transparent);
 }
 
-/* —— Reception desk: soften command panels —— */
+/* —— Reception desk: borderless action areas —— */
 .emergency-app-shell .reception-command :is(
     .reception-command-header,
     .reception-command-panel,
@@ -245,22 +245,16 @@
   ) {
   border-color: var(--cdl-clinical-border);
   border-radius: var(--cdl-clinical-radius);
-  box-shadow: var(--cdl-clinical-shadow-rest);
+  box-shadow: none;
 }
 
 .emergency-app-shell .reception-command {
   gap: var(--cdl-clinical-section-gap);
 }
 
-/* —— Hero panels: gentle accent wash —— */
+/* —— Hero panels: clean white surface —— */
 :is(.app-shell, .emergency-app-shell) .cd-hero-panel {
-  background:
-    linear-gradient(
-      145deg,
-      color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 7%, transparent) 0%,
-      transparent 52%
-    ),
-    var(--app-surface-1, #ffffff);
+  background: var(--app-surface-1, #ffffff);
 }
 
 /* —— Semantic surfaces keep meaning, lose harsh edges —— */
@@ -299,7 +293,7 @@
   border-color: var(--cdl-clinical-border-focus);
   box-shadow:
     inset 0 1px 2px rgba(15, 23, 42, 0.03),
-    0 0 0 3px color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 14%, transparent);
+    0 0 0 3px color-mix(in srgb, #374151 14%, transparent);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -339,7 +333,7 @@
 .emergency-app-shell .session-chrome-bar {
   border-bottom: 0;
   box-shadow: 0 1px 0 var(--cdl-clinical-hairline);
-  background: color-mix(in srgb, var(--ed-surface-raised, #ffffff) 96%, var(--ed-surface-base, #f8fafc));
+  background: #ffffff;
 }
 
 /* Command / mission bars: single soft edge, no double lines under chrome */

@@ -15,7 +15,7 @@
   --ed-radius-md: var(--radius-md, 10px);
   --ed-radius-lg: var(--radius-lg, 14px);
 
-  --ed-surface-base: var(--color-background, var(--app-bg, var(--medical-surface-page, #f8fafc)));
+  --ed-surface-base: var(--color-background, var(--app-bg, var(--medical-white, #ffffff)));
   --ed-surface-raised: var(--color-surface, var(--app-surface-1, var(--medical-surface-card, #ffffff)));
   --ed-surface-overlay: var(--color-floating-surface, var(--app-surface-elevated, #ffffff));
 
@@ -26,7 +26,7 @@
   --ed-border-subtle: var(--app-border-subtle, var(--medical-border, #e2e8f0));
   --ed-border-strong: color-mix(
     in srgb,
-    var(--app-accent-interactive, var(--medical-accent, #0ea5e9)) 34%,
+    #374151) 34%,
     var(--color-border-default, var(--medical-border, #e0f2fe))
   );
 

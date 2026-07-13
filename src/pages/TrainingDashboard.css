@@ -36,13 +36,13 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--app-accent-interactive);
-  background: color-mix(in srgb, var(--app-accent-interactive) 14%, transparent);
+  color: #374151;
+  background: color-mix(in srgb, #374151 14%, transparent);
 }
 
 .training-eyebrow {
   margin: 0 0 6px;
-  color: var(--app-accent-interactive);
+  color: #374151;
   font-size: var(--font-12, 0.75rem);
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -72,7 +72,7 @@
   border-radius: var(--compact-card-radius, 12px);
   padding: 0 16px;
   color: var(--button-primary-fg, white);
-  background: var(--app-accent-interactive);
+  background: #374151;
   font-weight: 800;
   cursor: pointer;
 }
@@ -138,7 +138,7 @@
 .training-progress-track > div {
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, var(--app-accent-interactive), #22c55e);
+  background: linear-gradient(90deg, #374151, #22c55e);
 }
 
 .training-layout {
@@ -170,8 +170,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--app-accent-interactive);
-  background: color-mix(in srgb, var(--app-accent-interactive) 12%, transparent);
+  color: #374151;
+  background: color-mix(in srgb, #374151 12%, transparent);
   font-weight: 900;
 }
 

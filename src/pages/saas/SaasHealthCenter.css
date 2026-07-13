@@ -63,7 +63,7 @@
   border-radius: 999px;
   border: 1px solid var(--app-panel-border);
   background: var(--app-surface-2);
-  color: var(--app-accent-interactive);
+  color: #374151;
   font-weight: 700;
   text-decoration: none;
 }

@@ -93,16 +93,16 @@
 }
 
 .app-chrome-top__search:focus-within {
-  border-color: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 42%, transparent);
+  border-color: color-mix(in srgb, #374151 42%, transparent);
   background: #ffffff;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 14%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #374151 14%, transparent);
 }
 
 /* Reception emphasis — name must NOT include "--primary" (global CTA
  * [class*="--primary"] paints solid accent and looks like a second button). */
 .app-chrome-top__search--emphasis {
-  border-color: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 28%, transparent) !important;
-  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 6%, #ffffff) !important;
+  border-color: color-mix(in srgb, #374151 28%, transparent) !important;
+  background: color-mix(in srgb, #374151 6%, #ffffff) !important;
   color: var(--medical-ink-muted, #64748b);
 }
 
@@ -188,7 +188,7 @@
 }
 
 .app-chrome-top__results button:hover {
-  background: var(--app-surface-muted, #f0f9ff);
+  background: var(--app-surface-muted, #f1f5f9);
 }
 
 .app-chrome-top__results span {
@@ -229,9 +229,9 @@
   height: var(--app-chrome-control-h) !important;
   min-height: var(--app-chrome-control-h) !important;
   max-height: var(--app-chrome-control-h) !important;
-  border: 1px solid color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 70%, transparent);
+  border: 1px solid color-mix(in srgb, #374151 70%, transparent);
   border-radius: var(--app-chrome-control-radius);
-  background: var(--app-accent-interactive, #0ea5e9);
+  background: #374151;
   color: var(--app-on-solid, #f9fafb);
   cursor: pointer;
   font-size: 12.5px !important;
@@ -245,9 +245,9 @@
 
 .app-chrome-top__create:not(:disabled):hover,
 .app-chrome-top__create:not(:disabled):focus-visible {
-  background: var(--app-accent-hover, #0284c7);
+  background: #111827;
   outline: none;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 20%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #374151 20%, transparent);
 }
 
 .app-chrome-top__create:disabled {

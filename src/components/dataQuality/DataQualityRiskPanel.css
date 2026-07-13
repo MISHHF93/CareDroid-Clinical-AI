@@ -66,7 +66,7 @@
   padding: 10px 12px;
   border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   border-radius: 10px;
-  background: var(--color-card, var(--medical-surface-page, #f0f9ff));
+  background: var(--color-card, var(--medical-surface-page, #f1f5f9));
 }
 
 .data-quality-risk-panel__item strong {
@@ -136,6 +136,6 @@
 
 .data-quality-risk-badge__tag--info {
   color: #bae6fd;
-  border-color: color-mix(in srgb, var(--status-info, #38bdf8) 40%, transparent);
-  background: color-mix(in srgb, var(--status-info, #38bdf8) 12%, transparent);
+  border-color: color-mix(in srgb, var(--status-info, #94a3b8) 40%, transparent);
+  background: color-mix(in srgb, var(--status-info, #94a3b8) 12%, transparent);
 }

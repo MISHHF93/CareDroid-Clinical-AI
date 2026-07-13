@@ -100,7 +100,7 @@
   padding: 10px 14px;
   border: 0;
   border-radius: 10px;
-  background: var(--app-accent-interactive);
+  background: #374151;
   color: #07120d;
   font-weight: 700;
   cursor: pointer;
@@ -108,7 +108,7 @@
 
 .profile-identity-button--secondary {
   background: transparent;
-  color: var(--app-accent-interactive);
+  color: #374151;
   border: 1px solid var(--panel-border);
 }
 

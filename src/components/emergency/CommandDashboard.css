@@ -3,7 +3,7 @@
   gap: var(--cd-space-4, 16px);
   padding: clamp(16px, 2vw, 24px);
   border-bottom: 1px solid var(--medical-border, #e0f2fe);
-  background: var(--medical-surface-page, #f0f9ff);
+  background: var(--medical-surface-page, #f1f5f9);
   color: var(--medical-text, #111827);
 }
 
@@ -17,7 +17,7 @@
 
 .command-dashboard__eyebrow {
   margin: 0;
-  color: var(--medical-text-link, #0ea5e9);
+  color: #374151;
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -84,7 +84,7 @@
 .command-dashboard__ai {
   display: grid;
   gap: 12px;
-  border-color: color-mix(in srgb, var(--app-accent-action, #0ea5e9) 32%, var(--medical-border, #e0f2fe));
+  border-color: color-mix(in srgb, var(--app-accent-action, #64748b) 32%, var(--medical-border, #e0f2fe));
 }
 
 .command-dashboard__ai-heading {
@@ -111,9 +111,9 @@
 }
 
 .command-dashboard__ai-heading > span {
-  border: 1px solid color-mix(in srgb, var(--app-accent-action, #0ea5e9) 28%, transparent);
+  border: 1px solid color-mix(in srgb, var(--app-accent-action, #64748b) 28%, transparent);
   border-radius: var(--cd-radius-full, 999px);
-  color: var(--medical-text-link, #0369a1);
+  color: #374151;
   flex: 0 0 auto;
   font-size: 11px;
   font-weight: 800;
@@ -171,7 +171,7 @@
 .command-dashboard__metric {
   border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: var(--cd-radius-lg, 8px);
-  background: var(--medical-surface-page, #f0f9ff);
+  background: var(--medical-surface-page, #f1f5f9);
   display: grid;
   gap: 6px;
   min-height: 136px;
@@ -290,7 +290,7 @@
 .command-dashboard__zone {
   border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: var(--cd-radius-lg, 8px);
-  background: var(--medical-surface-page, #f0f9ff);
+  background: var(--medical-surface-page, #f1f5f9);
   display: grid;
   gap: 6px;
   padding: 12px;

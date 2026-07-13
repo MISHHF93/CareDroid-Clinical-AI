@@ -25,7 +25,7 @@
 .waiting-room-communication-badge--watch {
   background: rgba(59, 130, 246, 0.12);
   border-color: rgba(59, 130, 246, 0.35);
-  color: var(--medical-text-link, #0ea5e9);
+  color: #374151;
 }
 
 .waiting-room-communication-badge--warning {

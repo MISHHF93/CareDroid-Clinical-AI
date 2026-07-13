@@ -3,7 +3,7 @@
   gap: 20px;
   padding: 20px 24px 32px;
   border-bottom: 1px solid var(--medical-border, #e0f2fe);
-  background: linear-gradient(135deg, var(--medical-surface-page, #f0f9ff), var(--medical-card-bg, #ffffff)) 100%);
+  background: linear-gradient(135deg, var(--medical-surface-page, #f1f5f9), var(--medical-card-bg, #ffffff)) 100%);
 }
 
 .public-waiting-display--kiosk {
@@ -219,7 +219,7 @@ html.public-waiting-kiosk-active .emergency-app-shell--public-waiting-kiosk .app
 }
 
 .public-waiting-display__tile[data-tone='watch'] {
-  border-color: var(--app-accent-interactive);
+  border-color: #374151;
 }
 
 .public-waiting-display__tile[data-tone='stable'] {

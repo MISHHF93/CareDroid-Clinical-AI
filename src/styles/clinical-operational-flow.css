@@ -38,7 +38,7 @@
     .operational-strip__metric,
     .operational-strip__action
   ):hover:not(:disabled) {
-  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 8%, var(--app-surface-1, #ffffff));
+  background: color-mix(in srgb, #374151 8%, var(--app-surface-1, #ffffff));
 }
 
 .emergency-app-shell :is(
@@ -89,7 +89,7 @@
 }
 
 .ems-pipeline__row {
-  border-left: 2px solid color-mix(in srgb, var(--status-info, #0ea5e9) 42%, transparent);
+  border-left: 2px solid color-mix(in srgb, var(--status-info, #64748b) 42%, transparent);
 }
 
 .ems-pipeline__row--warning {
@@ -166,9 +166,9 @@
 }
 
 .emergency-app-shell .ems-offload-attention-strip__open {
-  border-color: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 28%, transparent);
-  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 8%, var(--app-surface-1, #ffffff));
-  color: var(--app-accent-hover, #0284c7);
+  border-color: color-mix(in srgb, #374151 28%, transparent);
+  background: color-mix(in srgb, #374151 8%, var(--app-surface-1, #ffffff));
+  color: #111827;
 }
 
 .emergency-app-shell .ems-pressure--gauge {

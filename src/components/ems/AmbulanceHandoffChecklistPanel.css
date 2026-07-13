@@ -54,7 +54,7 @@
 .amb-handoff-checklist__progress span {
   display: block;
   height: 100%;
-  background: linear-gradient(90deg, #38bdf8, #22c55e);
+  background: linear-gradient(90deg, #94a3b8, #22c55e);
   transition: width 0.2s ease;
 }
 
@@ -153,7 +153,7 @@
   border: 0;
   border-radius: 6px;
   padding: 0.35rem 0.55rem;
-  background: var(--accent, var(--app-accent-interactive));
+  background: var(--accent, #374151);
   color: var(--medical-text-on-solid, #ffffff);
   cursor: pointer;
 }

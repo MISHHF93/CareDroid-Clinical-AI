@@ -9,7 +9,7 @@
   --nai-border: var(--medical-border, #e0f2fe);
   --nai-text: var(--medical-text-body, #111827);
   --nai-muted: var(--medical-text-muted, #6b7280);
-  --nai-accent: var(--medical-accent, #0ea5e9);
+  --nai-accent: var(--medical-accent, #64748b);
   --surface-elevated: var(--medical-surface-card, #ffffff);
   --app-surface-card: var(--medical-surface-card, #ffffff);
 }

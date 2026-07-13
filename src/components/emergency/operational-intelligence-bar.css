@@ -6,7 +6,7 @@
   border-radius: 10px;
   background: linear-gradient(
     90deg,
-    color-mix(in srgb, var(--ed-accent, #0ea5e9) 4%, var(--ed-surface-raised, #f8fafc)),
+    color-mix(in srgb, var(--ed-accent, #64748b) 4%, var(--ed-surface-raised, #f8fafc)),
     var(--ed-surface-raised, #f8fafc)
   );
   font-size: 11px;
@@ -42,7 +42,7 @@
   margin-inline-start: auto;
   padding: 1px 6px;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--ed-accent, #0ea5e9) 12%, transparent);
+  background: color-mix(in srgb, var(--ed-accent, #64748b) 12%, transparent);
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.03em;
@@ -97,5 +97,5 @@
 }
 
 .operational-intelligence-bar__action:hover {
-  border-color: color-mix(in srgb, var(--ed-accent, #0ea5e9) 35%, transparent);
+  border-color: color-mix(in srgb, var(--ed-accent, #64748b) 35%, transparent);
 }

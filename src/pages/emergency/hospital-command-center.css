@@ -41,7 +41,7 @@
 }
 
 .hospital-command-center__metric-card:hover {
-  border-color: var(--app-accent-interactive, #0ea5e9);
+  border-color: #374151;
   box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
 }
 

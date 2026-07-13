@@ -140,7 +140,7 @@
 }
 
 .whiteboard-view__patient-list {
-  background: var(--medical-surface-page, #f0f9ff);
+  background: var(--medical-surface-page, #f1f5f9);
   border-radius: 10px;
   min-width: 0;
 }
@@ -152,7 +152,7 @@
 }
 
 .whiteboard-view__patient-list .patient-card--row {
-  background: var(--medical-surface-page, #f0f9ff);
+  background: var(--medical-surface-page, #f1f5f9);
   border-color: color-mix(in srgb, #86efac 16%, var(--medical-border, #e0f2fe));
 }
 

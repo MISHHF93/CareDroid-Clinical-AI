@@ -16,7 +16,7 @@
 
 .waiting-room-safety-board__eyebrow {
   margin: 0;
-  color: var(--status-info, #38bdf8);
+  color: var(--status-info, #94a3b8);
   font-size: 11px;
   font-weight: 900;
   letter-spacing: 0.08em;
@@ -48,7 +48,7 @@
   padding: 8px 10px;
   border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   border-radius: 10px;
-  background: var(--color-elevated, var(--medical-surface-page, #f0f9ff));
+  background: var(--color-elevated, var(--medical-surface-page, #f1f5f9));
   text-align: center;
 }
 
@@ -165,7 +165,7 @@
 
 .waiting-room-safety-board__badge[data-tone='info'] {
   background: rgba(37, 99, 235, 0.16);
-  color: var(--medical-text-link, #0ea5e9);
+  color: #374151;
 }
 
 .waiting-room-safety-board__flags {

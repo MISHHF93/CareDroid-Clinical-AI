@@ -37,7 +37,7 @@
 }
 
 .waiting-room-communication-panel__item {
-  background: var(--medical-surface-page, #f0f9ff);
+  background: var(--medical-surface-page, #f1f5f9);
   border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 10px;
   padding: 10px 12px;

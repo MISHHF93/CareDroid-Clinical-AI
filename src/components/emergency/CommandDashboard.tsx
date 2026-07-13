@@ -11,6 +11,7 @@ import {
 } from '../../services/operationalCommandDashboardModel';
 import {
   CLINICAL_DECISION_SUPPORT_DISCLAIMER,
+  buildAiResponseProvenance,
   type CareDroidAIResponse,
 } from '../../lib/ai/careDroidAI';
 import { BottleneckCommandPanel } from '../bottlenecks/BottleneckPanels';
@@ -131,6 +132,7 @@ function AiDecisionSupportQueue({ snapshot }: { snapshot: OperationalCommandDash
         clinicianOverrideAvailable: true,
         generatedAt: snapshot.updatedAt,
         safetyDisclaimer: CLINICAL_DECISION_SUPPORT_DISCLAIMER,
+        provenance: buildAiResponseProvenance({ responseClass: 'operational' }),
       }),
     );
 

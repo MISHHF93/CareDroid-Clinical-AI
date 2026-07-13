@@ -36,7 +36,7 @@
 }
 
 .patient-whiteboard__card--highlight {
-  border-color: var(--medical-text-link, #0ea5e9);
+  border-color: #374151;
   background: #eff6ff;
 }
 

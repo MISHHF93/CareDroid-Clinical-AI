@@ -14,26 +14,26 @@ html[data-theme='light'] {
   --cd-text-secondary: var(--app-fg-muted, #6b7280);
   --cd-text-disabled: var(--medical-ink-subtle, #9ca3af);
   --cd-text-inverse: var(--app-on-solid, #ffffff);
-  --cd-text-brand: var(--app-accent-hover, #0284c7);
+  --cd-text-brand: #111827;
   --cd-text-danger: var(--semantic-critical, #b91c1c);
 
   --cd-border-subtle: var(--app-border-subtle, #e0f2fe);
   --cd-border-default: var(--app-border, #e0f2fe);
   --cd-border-strong: var(--app-border-strong, #d1d5db);
-  --cd-border-brand: var(--medical-accent-border, rgba(14, 165, 233, 0.35));
+  --cd-border-brand: var(--medical-accent-border, rgba(100, 116, 139, 0.35));
   --cd-border-danger: var(--semantic-critical, #b91c1c);
-  --cd-border-focus: var(--app-accent-interactive, #0ea5e9);
+  --cd-border-focus: #374151;
 
-  --cd-brand-bg: var(--app-accent-interactive, #0ea5e9);
-  --cd-brand-bg-hover: var(--app-accent-hover, #0284c7);
-  --cd-brand-bg-subtle: var(--medical-accent-tint, rgba(14, 165, 233, 0.12));
+  --cd-brand-bg: #374151;
+  --cd-brand-bg-hover: #111827;
+  --cd-brand-bg-subtle: var(--medical-accent-tint, rgba(100, 116, 139, 0.12));
   --cd-brand-fg: var(--app-on-solid, #ffffff);
-  --cd-brand-fg-subtle: var(--semantic-information, #0284c7);
+  --cd-brand-fg-subtle: var(--semantic-information, #475569);
 
-  --cd-info-bg: var(--app-info, #0ea5e9);
-  --cd-info-bg-subtle: var(--semantic-information-bg, rgba(14, 165, 233, 0.12));
+  --cd-info-bg: var(--app-info, #64748b);
+  --cd-info-bg-subtle: var(--semantic-information-bg, rgba(100, 116, 139, 0.12));
   --cd-info-border: var(--medical-border, #e0f2fe);
-  --cd-info-text: var(--semantic-information, #0284c7);
+  --cd-info-text: var(--semantic-information, #475569);
 
   --cd-success-bg: var(--app-success, #22c55e);
   --cd-success-bg-subtle: var(--semantic-healthy-bg, #ecfdf5);
@@ -50,8 +50,8 @@ html[data-theme='light'] {
   --cd-danger-border: var(--semantic-critical, #b91c1c);
   --cd-danger-text: var(--semantic-critical, #b91c1c);
 
-  --cd-interactive-bg-hover: var(--app-hover, rgba(14, 165, 233, 0.08));
-  --cd-interactive-bg-selected: var(--medical-accent-tint, rgba(14, 165, 233, 0.12));
+  --cd-interactive-bg-hover: var(--app-hover, rgba(100, 116, 139, 0.08));
+  --cd-interactive-bg-selected: var(--medical-accent-tint, rgba(100, 116, 139, 0.12));
 
   /* —— app → cd spacing & radii (single scale) —— */
   --app-space-xs: var(--cd-space-1, var(--space-1));

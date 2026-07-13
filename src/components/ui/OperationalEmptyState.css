@@ -89,9 +89,9 @@
 }
 
 .operational-empty-state__action {
-  border: 1px solid color-mix(in srgb, var(--status-info, #38bdf8) 40%, transparent);
+  border: 1px solid color-mix(in srgb, var(--status-info, #94a3b8) 40%, transparent);
   border-radius: 8px;
-  background: color-mix(in srgb, var(--status-info, #38bdf8) 12%, transparent);
+  background: color-mix(in srgb, var(--status-info, #94a3b8) 12%, transparent);
   color: #bae6fd;
   font-size: 12px;
   font-weight: 700;
@@ -100,7 +100,7 @@
 }
 
 .operational-empty-state__action:hover {
-  background: color-mix(in srgb, var(--status-info, #38bdf8) 20%, transparent);
+  background: color-mix(in srgb, var(--status-info, #94a3b8) 20%, transparent);
 }
 
 .operational-empty-state__action--secondary {

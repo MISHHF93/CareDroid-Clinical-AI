@@ -59,7 +59,7 @@ export default function AiEvaluationDashboard() {
   const seedCount =
     honesty?.seedRunCount ??
     (Array.isArray(dashboard.runs)
-      ? dashboard.runs.filter((run: { seedOnly?: boolean }) => run.seedOnly !== false).length
+      ? dashboard.runs.filter((run: Record<string, unknown>) => run.seedOnly !== false).length
       : 0);
 
   return (

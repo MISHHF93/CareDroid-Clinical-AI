@@ -16,7 +16,7 @@
 }
 
 .input-label-focused {
-  color: var(--app-accent-action, var(--app-accent-interactive));
+  color: var(--app-accent-action, #374151);
 }
 
 .input-container {
@@ -51,13 +51,13 @@
 }
 
 .input-field:hover {
-  border-color: color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 26%, var(--app-input-border));
+  border-color: color-mix(in srgb, var(--app-accent-action, #374151) 26%, var(--app-input-border));
   background: var(--app-input-bg-hover);
 }
 
 .input-field:focus,
 .input-focused {
-  border-color: var(--app-accent-action, var(--app-accent-interactive));
+  border-color: var(--app-accent-action, #374151);
   background: var(--app-input-bg-hover);
   box-shadow: 0 0 0 2px var(--app-focus);
 }
@@ -90,7 +90,7 @@
 
 .input-focused + .input-icon,
 .input-field:focus ~ .input-icon {
-  color: var(--app-accent-action, var(--app-accent-interactive));
+  color: var(--app-accent-action, #374151);
 }
 
 /* Input States */

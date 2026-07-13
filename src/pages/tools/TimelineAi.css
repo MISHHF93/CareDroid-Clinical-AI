@@ -51,7 +51,7 @@
   height: 12px;
   flex: 0 0 auto;
   border-radius: 999px;
-  background: var(--app-accent-interactive);
+  background: #374151;
   box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.14);
 }
 

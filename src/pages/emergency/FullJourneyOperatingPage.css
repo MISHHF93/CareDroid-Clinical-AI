@@ -189,7 +189,7 @@
 .fj-btn-primary {
   padding: 8px 14px;
   border-radius: 8px;
-  background: var(--medical-accent, #0ea5e9);
+  background: var(--medical-accent, #64748b);
   color: var(--medical-on-accent, #ffffff);
   font-weight: 700;
   font-size: 13px;
@@ -223,7 +223,7 @@
 }
 
 .fj-btn-toggle--off {
-  background: var(--medical-accent, #0ea5e9);
+  background: var(--medical-accent, #64748b);
   color: var(--medical-on-accent, #ffffff);
 }
 
@@ -314,8 +314,8 @@
 }
 
 .fj-plan-status--active {
-  background: rgba(14, 165, 233, 0.12);
-  color: var(--medical-accent, #0ea5e9);
+  background: rgba(100, 116, 139, 0.12);
+  color: var(--medical-accent, #64748b);
 }
 
 .fj-actions-row {
@@ -351,8 +351,8 @@
 }
 
 .fj-resource-chip--on {
-  border-color: var(--medical-accent, #0ea5e9);
-  background: color-mix(in srgb, var(--medical-accent, #0ea5e9) 15%, transparent);
+  border-color: var(--medical-accent, #64748b);
+  background: color-mix(in srgb, var(--medical-accent, #64748b) 15%, transparent);
   color: var(--medical-ink, #111827);
 }
 
@@ -379,8 +379,8 @@
   padding: 5px 10px;
   border-radius: 6px;
   background: transparent;
-  color: var(--medical-accent, #0ea5e9);
-  border: 1px solid var(--medical-accent, #0ea5e9);
+  color: var(--medical-accent, #64748b);
+  border: 1px solid var(--medical-accent, #64748b);
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
@@ -469,5 +469,5 @@
 
 .emergency-command-action__tone--info,
 .emergency-command-action__tone--neutral {
-  background-color: var(--medical-accent, #0ea5e9);
+  background-color: var(--medical-accent, #64748b);
 }

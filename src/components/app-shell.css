@@ -30,7 +30,7 @@
   inset-inline-start: var(--space-2, 8px);
   z-index: var(--z-toast, 1200);
   padding: var(--space-2, 8px) var(--space-3, 12px);
-  border: 1px solid var(--app-accent-interactive, var(--status-info, #0ea5e9));
+  border: 1px solid #374151);
   border-radius: var(--radius-md, 8px);
   background: var(--color-elevated, var(--app-surface-1, #ffffff));
   color: var(--color-text-primary, var(--medical-ink, #111827));
@@ -44,7 +44,7 @@
 .ed-skip-link:focus,
 .ed-skip-link:focus-visible {
   transform: translateY(0);
-  outline: 2px solid var(--app-accent-interactive, var(--status-info, #0ea5e9));
+  outline: 2px solid #374151);
   outline-offset: 2px;
 }
 
@@ -212,7 +212,7 @@
   height: 16px;
   min-width: 16px;
   border: 2px solid var(--color-border-subtle, #e0f2fe);
-  border-top-color: var(--app-accent-interactive, #0ea5e9);
+  border-top-color: #374151;
   border-radius: 50%;
   animation: app-shell-loading-spin 0.7s linear infinite;
   flex-shrink: 0;

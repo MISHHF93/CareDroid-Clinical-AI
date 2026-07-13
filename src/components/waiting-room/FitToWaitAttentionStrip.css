@@ -87,7 +87,7 @@
   gap: 8px;
   border: 1px solid #e0f2fe;
   border-radius: 999px;
-  background: var(--medical-surface-page, #f0f9ff);
+  background: var(--medical-surface-page, #f1f5f9);
   color: var(--medical-ink, #111827);
   cursor: pointer;
   font-size: 12px;

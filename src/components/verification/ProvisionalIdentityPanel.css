@@ -31,7 +31,7 @@
   padding: 10px;
   border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   border-radius: 10px;
-  background: var(--color-elevated, var(--medical-surface-page, #f0f9ff));
+  background: var(--color-elevated, var(--medical-surface-page, #f1f5f9));
   color: inherit;
   font: inherit;
   text-align: left;

@@ -16,7 +16,7 @@
 
 .cross-module-panel__eyebrow {
   margin: 0 0 6px;
-  color: var(--app-accent-interactive);
+  color: #374151;
   font-size: var(--font-12, 0.75rem);
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -62,7 +62,7 @@
 
 .cross-module-card:hover,
 .cross-module-card:focus-visible {
-  border-color: var(--app-accent-interactive);
+  border-color: #374151;
 }
 
 .cross-module-card div,

@@ -347,7 +347,7 @@
 
 /* Preserve explicit hierarchy on the primary shell/dashboard surfaces. */
 :is(.app-shell, .emergency-app-shell) .app-shell-route-identity {
-  border-left: 3px solid var(--app-accent-interactive);
+  border-left: 3px solid #374151;
   background: color-mix(in srgb, var(--app-surface-glass) 82%, transparent);
   box-shadow: var(--shadow-1);
 }
@@ -374,7 +374,7 @@
   background:
     linear-gradient(
       135deg,
-      color-mix(in srgb, var(--workspace-os-accent, var(--app-accent-interactive)) 22%, var(--app-surface-2)),
+      color-mix(in srgb, var(--workspace-os-accent, #374151) 22%, var(--app-surface-2)),
       var(--app-surface-2)
     );
   box-shadow: var(--app-elevation-card, var(--shadow-1));

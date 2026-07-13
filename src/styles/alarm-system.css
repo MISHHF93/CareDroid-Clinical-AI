@@ -15,9 +15,9 @@
   --alarm-warning-border: color-mix(in srgb, #f59e0b 50%, #e2e8f0);
   --alarm-warning-text: #92400e;
 
-  --alarm-info: #0284c7;
-  --alarm-info-bg: color-mix(in srgb, #0ea5e9 10%, #ffffff);
-  --alarm-info-border: color-mix(in srgb, #0ea5e9 40%, #e2e8f0);
+  --alarm-info: #475569;
+  --alarm-info-bg: color-mix(in srgb, #64748b 10%, #ffffff);
+  --alarm-info-border: color-mix(in srgb, #64748b 40%, #e2e8f0);
   --alarm-info-text: #075985;
 
   --alarm-ok: #059669;

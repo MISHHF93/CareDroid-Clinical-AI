@@ -57,7 +57,7 @@
 .page-continuations__links a:focus-visible,
 .page-continuations__workspace-link:hover,
 .page-continuations__workspace-link:focus-visible {
-  border-color: color-mix(in srgb, var(--app-accent-interactive) 42%, var(--app-border, var(--panel-border)));
+  border-color: color-mix(in srgb, #374151 42%, var(--app-border, var(--panel-border)));
   outline: none;
 }
 
@@ -82,7 +82,7 @@
 }
 
 .page-continuations__panel--workspace {
-  border-color: color-mix(in srgb, var(--app-accent-interactive) 34%, var(--app-border, var(--panel-border)));
+  border-color: color-mix(in srgb, #374151 34%, var(--app-border, var(--panel-border)));
 }
 
 @media (max-width: 640px) {

@@ -16,12 +16,12 @@ html {
   --color-text-muted: var(--medical-ink-subtle);
   --color-primary: var(--medical-accent);
   --color-secondary: var(--medical-accent-soft);
-  --color-accent: var(--medical-accent-hover, #0369a1);
-  --link-color: var(--app-link-fg, var(--medical-text-link));
+  --color-accent: var(--medical-accent-hover, #475569);
+  --link-color: var(--app-link-fg, #374151);
   --status-info: var(--medical-accent);
-  --primary-color: var(--app-accent-interactive);
-  --accent-color: var(--app-accent-interactive);
-  --accent-green: var(--app-accent-interactive);
+  --primary-color: #374151;
+  --accent-color: #374151;
+  --accent-green: #374151;
   --bg-base: var(--medical-surface-page);
   --bg-surface: var(--medical-surface-card);
   --bg-elevated: var(--medical-surface-card);
@@ -66,7 +66,7 @@ html {
     .btn-primary,
     [class*='cta']
   ):not(.reception-desk-toolbar__action) {
-  background: var(--app-accent-interactive, var(--medical-accent));
+  background: #374151);
   border-color: color-mix(in srgb, var(--medical-accent) 55%, var(--medical-border));
   color: var(--app-on-solid, #ffffff);
 }

@@ -1,0 +1,331 @@
+/* ============================================================================
+   RECEPTION WORKSPACE - ORGANIZED HEADER LAYOUT
+   A clean, hierarchical header structure for the reception desk
+   ============================================================================ */
+
+/* Main Header Container */
+.reception-header {
+  display: grid;
+  gap: 16px;
+  padding: 20px 24px;
+  background: #ffffff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* Top Bar - Branding & User Info */
+.reception-header__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.reception-header__branding {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.reception-header__eyebrow {
+  color: #6b7280;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.reception-header__title {
+  margin: 0;
+  color: #111827;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.reception-header__user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: #fafafa;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.reception-header__user-name {
+  font-weight: 600;
+  color: #111827;
+}
+
+.reception-header__user-role {
+  padding: 4px 10px;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #374151;
+}
+
+.reception-header__user-status {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+/* Middle Bar - Metrics & Status */
+.reception-header__metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  padding: 16px;
+  background: #fafafa;
+  border-radius: 10px;
+}
+
+.reception-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  border-radius: 8px;
+}
+
+.reception-metric__value {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+  color: #111827;
+  font-variant-numeric: tabular-nums;
+}
+
+.reception-metric__label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.reception-metric--critical .reception-metric__value {
+  color: #ef4444;
+}
+
+.reception-metric--warning .reception-metric__value {
+  color: #f59e0b;
+}
+
+.reception-metric--success .reception-metric__value {
+  color: #22c55e;
+}
+
+/* Bottom Bar - Actions & Navigation */
+.reception-header__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.reception-header__primary-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.reception-header__action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 16px;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  color: #111827;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.reception-header__action-btn:hover {
+  background: #fafafa;
+  border-color: rgba(0, 0, 0, 0.12);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.reception-header__action-btn--primary {
+  background: #111827;
+  border-color: #111827;
+  color: #ffffff;
+}
+
+.reception-header__action-btn--primary:hover {
+  background: #374151;
+  border-color: #374151;
+}
+
+.reception-header__queue-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 4px;
+  background: #fafafa;
+  border-radius: 8px;
+}
+
+.reception-header__queue-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 12px;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.reception-header__queue-tab:hover {
+  background: rgba(0, 0, 0, 0.02);
+  color: #111827;
+}
+
+.reception-header__queue-tab--active {
+  background: #ffffff;
+  color: #111827;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.reception-header__queue-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  background: #ef4444;
+  border-radius: 999px;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* Situation Brief */
+.reception-header__situation {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  padding: 12px;
+  background: #fafafa;
+  border-radius: 8px;
+  border-left: 3px solid #111827;
+}
+
+.reception-header__situation--warning {
+  border-left-color: #f59e0b;
+  background: rgba(245, 158, 11, 0.04);
+}
+
+.reception-header__situation--critical {
+  border-left-color: #ef4444;
+  background: rgba(239, 68, 68, 0.04);
+}
+
+.reception-situation-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.reception-situation-item__label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.reception-situation-item__value {
+  font-size: 13px;
+  font-weight: 600;
+  color: #111827;
+  line-height: 1.4;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .reception-header {
+    padding: 16px 20px;
+  }
+
+  .reception-header__metrics {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .reception-header__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .reception-header__primary-actions {
+    order: -1;
+  }
+
+  .reception-header__queue-tabs {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .reception-header__queue-tab {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .reception-header {
+    padding: 12px 16px;
+    gap: 12px;
+  }
+
+  .reception-header__top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .reception-header__user-info {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .reception-header__metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .reception-header__title {
+    font-size: 20px;
+  }
+
+  .reception-metric__value {
+    font-size: 24px;
+  }
+
+  .reception-header__primary-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .reception-header__action-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

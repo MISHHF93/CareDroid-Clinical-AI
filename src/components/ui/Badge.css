@@ -35,9 +35,9 @@
 }
 
 .cd-badge--accent {
-  background: color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 10%, var(--app-surface));
-  border-color: color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 28%, var(--app-border));
-  color: var(--app-accent-action, var(--app-accent-interactive));
+  background: color-mix(in srgb, var(--app-accent-action, #374151) 10%, var(--app-surface));
+  border-color: color-mix(in srgb, var(--app-accent-action, #374151) 28%, var(--app-border));
+  color: var(--app-accent-action, #374151);
 }
 
 .cd-badge--success {

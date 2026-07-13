@@ -20,9 +20,9 @@
   overflow: auto;
   margin: 12px;
   padding: 18px;
-  border: 1px solid var(--medical-border, #e0f2fe);
+  border: 1px solid var(--app-border-subtle);
   border-radius: 16px;
-  background: var(--medical-surface-card, #ffffff);
+  background: var(--app-surface-1);
   box-shadow: 0 24px 48px rgba(0, 0, 0, 0.35);
 }
 
@@ -63,9 +63,9 @@
 }
 
 .reception-escalation-panel__close {
-  border: 1px solid var(--medical-border, #e0f2fe);
-  background: var(--app-surface-1, #ffffff);
-  color: var(--medical-text-muted, #6b7280);
+  border: 1px solid var(--app-border-subtle);
+  background: var(--app-surface-1);
+  color: var(--app-text-muted);
   padding: 8px 12px;
 }
 
@@ -135,10 +135,10 @@
 .reception-escalation-panel__field select,
 .reception-escalation-panel__field textarea {
   width: 100%;
-  border: 1px solid var(--medical-border, #e0f2fe);
+  border: 1px solid var(--app-border-subtle);
   border-radius: 10px;
-  background: var(--medical-surface-card, #ffffff);
-  color: var(--medical-text-heading, #111827);
+  background: var(--app-surface-1);
+  color: var(--app-text-primary);
   padding: 10px 12px;
   font: inherit;
 }
@@ -150,9 +150,9 @@
 }
 
 .reception-escalation-panel__secondary {
-  border: 1px solid var(--medical-border, #e0f2fe);
+  border: 1px solid var(--app-border-subtle);
   background: transparent;
-  color: var(--medical-text-muted, #6b7280);
+  color: var(--app-text-muted);
   padding: 10px 14px;
 }
 

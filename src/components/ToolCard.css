@@ -36,7 +36,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--app-accent-interactive);
+  color: #374151;
 }
 
 .tool-result-card-body {
@@ -59,8 +59,8 @@
 }
 
 .tool-card-notice--info {
-  background: color-mix(in srgb, var(--app-accent-interactive) 12%, var(--app-tool-card-body-bg));
-  border-color: color-mix(in srgb, var(--app-accent-interactive) 35%, var(--app-panel-border));
+  background: color-mix(in srgb, #374151 12%, var(--app-tool-card-body-bg));
+  border-color: color-mix(in srgb, #374151 35%, var(--app-panel-border));
 }
 
 .tool-card-notice--warning {
@@ -103,7 +103,7 @@
   margin: 0;
   font-size: var(--font-28);
   font-weight: 700;
-  color: var(--app-accent-interactive);
+  color: #374151;
   text-align: center;
 }
 
@@ -169,7 +169,7 @@
 }
 
 .tool-card-pill--info {
-  background: color-mix(in srgb, var(--app-accent-interactive) 80%, var(--app-accent-contrast));
+  background: color-mix(in srgb, #374151 80%, var(--app-accent-contrast));
   color: var(--app-on-solid);
 }
 

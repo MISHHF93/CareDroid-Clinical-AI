@@ -45,7 +45,7 @@
 }
 
 .clinical-acuity-leaderboard__row:not(.clinical-acuity-leaderboard__row--head):hover {
-  background: color-mix(in srgb, var(--color-primary, var(--app-accent-interactive)) 6%, transparent);
+  background: color-mix(in srgb, var(--color-primary, #374151) 6%, transparent);
 }
 
 .clinical-acuity-leaderboard__row button {

@@ -1,70 +1,52 @@
 /**
- * Reception / registration desk — shared surface tokens and accents.
- * Import once on the reception route (ReceptionWorkspace).
+ * Reception / registration desk — clean theme using standard tokens.
+ * Supports both light and dark modes automatically.
  */
 
 .reception-workspace {
-  --reception-accent: var(--app-accent-interactive, var(--status-info, #0ea5e9));
-  --reception-accent-strong: #ffffff;
-  --reception-accent-border: color-mix(in srgb, var(--reception-accent) 38%, var(--ed-border-subtle, var(--medical-border, #e2e8f0)));
+  --reception-accent: #ffffff;
   --reception-surface-card: #ffffff;
-  --reception-surface-inset: #ffffff;
-  --reception-text-primary: var(--ed-text-primary, var(--color-text-primary, var(--medical-ink, #111827)));
-  --reception-text-secondary: var(--ed-text-secondary, var(--color-text-secondary, var(--medical-ink-muted, #6b7280)));
-  --reception-border: var(--ed-border-subtle, var(--color-border-subtle, var(--medical-border)));
+  --reception-surface-inset: #fafafa;
+  --reception-text-primary: var(--app-text-primary);
+  --reception-text-secondary: var(--app-text-secondary);
+  --reception-border: rgba(0, 0, 0, 0.03);
   --reception-radius-lg: var(--ed-radius-lg, 14px);
   --reception-radius-md: var(--ed-radius-md, 10px);
-  --reception-success: var(--status-success, #34d399);
-  --reception-warning: var(--status-warning, #fbbf24);
-  --reception-danger: var(--status-danger, #f87171);
+  --reception-success: var(--app-success);
+  --reception-warning: var(--app-warning);
+  --reception-danger: var(--app-danger);
+  --reception-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+  --reception-shadow-button: 0 1px 2px rgba(0, 0, 0, 0.03);
+  --reception-hover-bg: rgba(0, 0, 0, 0.02);
+  --reception-active-bg: rgba(0, 0, 0, 0.03);
 }
 
-.reception-workspace .emergency-route-page__hero,
-.reception-workspace .arrival-dashboard,
-.reception-workspace .reception-work-queues,
-.reception-workspace .recent-arrivals,
-.reception-workspace .reception-quick-intake-inline .reception-quick-intake {
-  border-color: var(--reception-border);
-  background: var(--reception-surface-card);
-  color: var(--reception-text-primary);
+/* Floating card styles - ultra-minimal light theme */
+.reception-workspace .card,
+.reception-workspace [class*="card"],
+.reception-workspace [class*="panel"] {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.03);
+  box-shadow: var(--reception-shadow-card);
+  border-radius: var(--reception-radius-md);
 }
 
-.reception-workspace .reception-pipeline-shell__stage {
-  border-color: var(--reception-border);
-  background: var(--reception-surface-inset);
-  color: var(--reception-text-secondary);
+.reception-workspace button:not([class*="ghost"]):not([class*="link"]) {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  box-shadow: var(--reception-shadow-button);
+  border-radius: var(--reception-radius-md);
+  transition: all 0.15s ease;
 }
 
-.reception-workspace .reception-pipeline-shell__stage--active {
-  border-color: var(--reception-accent-border);
-  background: var(--reception-accent-strong);
-  color: var(--reception-text-primary);
+.reception-workspace button:not([class*="ghost"]):not([class*="link"]):hover {
+  background: #fafafa;
+  border-color: rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.03);
+  transform: translateY(-1px);
 }
 
-.reception-workspace .arrival-control-summary__metric {
-  border-color: var(--reception-border);
-  background: var(--reception-surface-inset);
-  color: var(--reception-text-primary);
-}
-
-.reception-workspace .arrival-control-summary__metric:not(:disabled):hover {
-  border-color: var(--reception-accent-border);
-  background: var(--reception-accent-strong);
-}
-
-.reception-workspace .reception-work-queues__tab--active,
-.reception-workspace .reception-desk-toolbar__action--active {
-  border-color: var(--reception-accent-border);
-  background: var(--reception-accent-strong);
-  color: var(--reception-text-primary);
-}
-
-.reception-workspace .reception-workspace__action--primary {
-  border-color: var(--reception-accent-border);
-  background: var(--reception-accent-strong);
-}
-
-.reception-workspace .reception-workspace__banner {
-  border-color: color-mix(in srgb, var(--reception-success) 42%, transparent);
-  background: color-mix(in srgb, var(--reception-success) 14%, var(--reception-surface-inset));
+.reception-workspace button:not([class*="ghost"]):not([class*="link"]):active {
+  background: #f5f5f5;
+  transform: translateY(0);
 }

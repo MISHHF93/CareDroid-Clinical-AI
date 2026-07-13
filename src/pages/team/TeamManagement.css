@@ -147,7 +147,7 @@
 .team-empty button {
   padding: var(--space-2) var(--space-4);
   background: var(--medical-accent-tint);
-  border: 1px solid color-mix(in srgb, var(--app-accent-interactive) 30%, transparent);
+  border: 1px solid color-mix(in srgb, #374151 30%, transparent);
   color: var(--accent-1);
   border-radius: var(--radius-sm);
   cursor: pointer;
