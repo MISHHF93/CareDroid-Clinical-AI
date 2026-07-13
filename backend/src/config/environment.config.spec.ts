@@ -71,6 +71,43 @@ describe('environment config', () => {
     expect(() => validateEnvironmentConfig(config)).toThrow('JWT_SECRET is required in production');
   });
 
+  it('rejects wildcard CORS origins in production', () => {
+    const config = getEnvironmentConfig({
+      NODE_ENV: 'production',
+      JWT_SECRET: 'production-jwt-secret-with-at-least-32-characters',
+      CORS_ORIGIN: '*',
+    });
+
+    expect(() => validateEnvironmentConfig(config)).toThrow(
+      'CORS_ORIGIN must not contain a wildcard in production',
+    );
+  });
+
+  it('rejects invalid production CORS origins', () => {
+    const config = getEnvironmentConfig({
+      NODE_ENV: 'production',
+      JWT_SECRET: 'production-jwt-secret-with-at-least-32-characters',
+      CORS_ORIGIN: 'file:///tmp/caredroid',
+    });
+
+    expect(() => validateEnvironmentConfig(config)).toThrow(
+      'CORS_ORIGIN must contain valid HTTP(S) origins',
+    );
+  });
+
+  it('rejects the non-tenant-isolated Mongoose emergency runtime in production', () => {
+    const config = getEnvironmentConfig({
+      NODE_ENV: 'production',
+      JWT_SECRET: 'production-jwt-secret-with-at-least-32-characters',
+      ENABLE_MONGOOSE_EMERGENCY_OS: 'true',
+      MONGODB_URI: 'mongodb://localhost:27017/caredroid',
+    });
+
+    expect(() => validateEnvironmentConfig(config)).toThrow(
+      'ENABLE_MONGOOSE_EMERGENCY_OS is not supported in production',
+    );
+  });
+
   it('requires feature credentials only when dependent integrations are configured', () => {
     const config = getEnvironmentConfig({
       NODE_ENV: 'development',

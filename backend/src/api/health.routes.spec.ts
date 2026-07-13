@@ -99,4 +99,27 @@ describe('health routes', () => {
     expect(response.body.components.services.status).toBe('unhealthy');
     expect(response.body.components.services.error).toContain('registered service');
   });
+
+  it('omits component details from the public production health response', async () => {
+    process.env.NODE_ENV = 'production';
+    mockedCheckServiceHealth.mockResolvedValue({
+      generatedAt: '2026-06-13T00:00:00.000Z',
+      totals: {
+        registered: 1,
+        ready: 1,
+        failed: 0,
+      },
+      services: {
+        capacityService: {
+          status: 'ready',
+          checkedAt: '2026-06-13T00:00:00.000Z',
+        },
+      },
+    } as Awaited<ReturnType<typeof checkServiceHealth>>);
+
+    const response = await request(buildApp()).get('/health').expect(200);
+
+    expect(response.body.status).toBe('healthy');
+    expect(response.body.components).toBeUndefined();
+  });
 });

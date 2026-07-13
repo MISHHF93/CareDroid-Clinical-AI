@@ -1,6 +1,16 @@
 import { AppController } from './app.controller';
+import { GUARDS_METADATA } from '@nestjs/common/constants';
 
 describe('AppController environment config', () => {
+  it('requires authentication for system configuration', () => {
+    const guards = Reflect.getMetadata(
+      GUARDS_METADATA,
+      AppController.prototype.getSystemConfig,
+    ) as unknown[];
+
+    expect(guards).toHaveLength(1);
+  });
+
   it('returns environment validation and deployment metadata in system config', () => {
     const originalEmergencyFlag = process.env.ENABLE_MONGOOSE_EMERGENCY_OS;
     const originalMongoUri = process.env.MONGODB_URI;

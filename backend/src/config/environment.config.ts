@@ -155,6 +155,8 @@ export const envValidationSchema = Joi.object({
   PORT: Joi.number().port().default(DEFAULT_PORT),
   CORS_ORIGIN: Joi.string().allow('').optional(),
   FRONTEND_URL: Joi.string().allow('').optional(),
+  SWAGGER_ENABLED: booleanSchema.optional(),
+  HEALTH_DETAILS_ENABLED: booleanSchema.optional(),
 
   MONGODB_URI: Joi.string()
     .uri({ scheme: [/mongodb/] })
@@ -459,6 +461,30 @@ export function validateEnvironmentConfig(
 
   if (isProduction && (!config.auth.jwtSecret || config.auth.jwtSecret === DEFAULT_JWT_SECRET)) {
     errors.push('JWT_SECRET is required in production and must not use the local default');
+  }
+
+  if (isProduction && config.server.corsOrigins.includes('*')) {
+    errors.push('CORS_ORIGIN must not contain a wildcard in production');
+  }
+
+  if (
+    isProduction &&
+    config.server.corsOrigins.some((origin) => {
+      try {
+        const parsed = new URL(origin);
+        return !['http:', 'https:'].includes(parsed.protocol) || parsed.origin !== origin;
+      } catch {
+        return true;
+      }
+    })
+  ) {
+    errors.push('CORS_ORIGIN must contain valid HTTP(S) origins without paths in production');
+  }
+
+  if (isProduction && config.database.enableMongooseEmergencyOs) {
+    errors.push(
+      'ENABLE_MONGOOSE_EMERGENCY_OS is not supported in production until legacy routes are tenant-isolated',
+    );
   }
 
   if (config.database.enableMongooseEmergencyOs && !config.database.mongodbUri) {

@@ -1,7 +1,13 @@
-import { Controller, Get, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpStatus, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { Permissions } from '../auth/decorators/permissions.decorator';
+import { Permission } from '../auth/enums/permission.enum';
+import { AuthorizationGuard } from '../auth/guards/authorization.guard';
 import { RAGService } from './rag.service';
 
 @Controller('rag')
+@UseGuards(AuthGuard('jwt'), AuthorizationGuard)
+@Permissions(Permission.VIEW_ANALYTICS)
 export class RAGController {
   constructor(private readonly ragService: RAGService) {}
 

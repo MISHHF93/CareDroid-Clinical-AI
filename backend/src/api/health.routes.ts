@@ -513,6 +513,18 @@ router.get('/', async (req, res) => {
     wearableApi,
   };
   const status = determineOverallStatus(components);
+  const isProduction =
+    String(process.env.NODE_ENV || '').toLowerCase() === 'production' ||
+    String(process.env.CARE_ENV || process.env.APP_ENV || '').toLowerCase() === 'production';
+  const exposeDetails = !isProduction || process.env.HEALTH_DETAILS_ENABLED === 'true';
+
+  if (!exposeDetails) {
+    return res.status(status === 'unhealthy' ? 503 : 200).json({
+      status,
+      timestamp: new Date().toISOString(),
+      responseTimeMs: Date.now() - startedAt,
+    });
+  }
 
   return res.status(status === 'unhealthy' ? 503 : 200).json({
     status,

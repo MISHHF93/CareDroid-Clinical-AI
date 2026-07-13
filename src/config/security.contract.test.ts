@@ -76,7 +76,8 @@ describe('security contract', () => {
 
   it('protects emergency API paths while keeping auth routes public', () => {
     expect(isPublicApiPath('/api/auth/dev-session')).toBe(true);
-    expect(isPublicApiPath('/api/config/system')).toBe(true);
+    expect(isPublicApiPath('/api/config/system')).toBe(false);
+    expect(isProtectedApiPath('/api/config/system')).toBe(true);
     expect(isPublicApiPath('/api/emergency/whiteboard')).toBe(false);
     expect(isProtectedApiPath('/api/emergency/whiteboard')).toBe(true);
     expect(isProtectedApiPath('/api/audit/phi-access')).toBe(true);

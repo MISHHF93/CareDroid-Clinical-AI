@@ -86,7 +86,7 @@ async function connectWhiteboardClient(baseUrl: string) {
     const timeout = setTimeout(() => reject(new Error('Timed out connecting websocket')), 5000);
     socket.once('connect_error', reject);
     socket.once('connect', () => {
-      socket.emit('join-whiteboard', 'integration-test-user');
+      socket.emit('join-whiteboard');
       setTimeout(() => {
         clearTimeout(timeout);
         resolve();
@@ -130,7 +130,10 @@ describe('Emergency OS end-to-end integration', () => {
     app = integrationApp.app;
     mountedRoutes = integrationApp.mountedRoutes;
     httpServer = http.createServer(app);
-    ioServer = registerEMSWebSocketSupport(app, httpServer);
+    ioServer = registerEMSWebSocketSupport(app, httpServer, false, (socket, next) => {
+      socket.data.user = { id: 'integration-test-user' };
+      next();
+    });
     baseUrl = await listen(httpServer);
   });
 

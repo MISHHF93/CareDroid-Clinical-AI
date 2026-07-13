@@ -17,6 +17,8 @@ cp backend/.env.rag.example backend/.env.rag   # only if enabling Pinecone RAG
 | `NODE_ENV` | `development` \| `production` \| `test` |
 | `PORT` / `BACKEND_PORT` | Backend listen port (default 3350 per `.env.example`) |
 | `FRONTEND_URL`, `CORS_ORIGIN` | Frontend origin the backend trusts |
+| `SWAGGER_ENABLED` | Opts production into `/api/docs`; disabled by default |
+| `HEALTH_DETAILS_ENABLED` | Opts production into detailed `/health` component output; disabled by default |
 | `ENABLE_DEV_AUTH_BYPASS`, `ALLOW_DEMO_AUTH_IN_PRODUCTION`, `DEV_LOGIN_EMAIL` | Dev-only auth shortcuts — never enable in a real deployment |
 | `CAREDROID_STRICT_SAAS_ENTITLEMENTS` | Enforce SaaS feature-gating strictly |
 | `CAREDROID_TENANT_ISOLATION_DISABLED` | **Must be unset/false in production** — disables the global `TenantIsolationGuard` |
@@ -31,7 +33,7 @@ cp backend/.env.rag.example backend/.env.rag   # only if enabling Pinecone RAG
 | `DATABASE_HOST/PORT/USER/PASSWORD/NAME/SSL/LOGGING/POOL_SIZE` | Postgres connection detail |
 | `SQLITE_PATH` | Path to the dev SQLite file (`caredroid.dev.sqlite`) |
 | `MONGODB_URI` / `DATABASE_MONGO_URI`, `DB_NAME` | Mongo connection for the clinical patient domain |
-| `ENABLE_MONGOOSE_EMERGENCY_OS` | Gates whether the `UnifiedPatient` Mongoose runtime, reassessment scheduler, and related legacy routes are live — see [Data Model Reference](data-model/data-model-reference.md) |
+| `ENABLE_MONGOOSE_EMERGENCY_OS` | Gates the legacy `UnifiedPatient` Mongoose runtime in non-production environments; production startup rejects it until those routes are tenant-isolated |
 | `REDIS_HOST/PORT/PASSWORD/DB`, `REDIS_URL` | Cache (not used as a job queue) |
 
 ## Auth

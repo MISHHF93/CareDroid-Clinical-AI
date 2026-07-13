@@ -8,21 +8,29 @@ import {
 } from '../services/edge-ai-ambulance.service';
 
 type CorsOrigin = string | string[] | boolean;
+export type SocketAuthMiddleware = Parameters<Server['use']>[0];
 
 const logger = new Logger('EMSWebSocket');
+const denyUnauthenticatedSocket: SocketAuthMiddleware = (_socket, next) => {
+  next(new Error('Authentication required.'));
+};
 
 export function registerEMSWebSocketSupport(
   app: Express,
   server: HttpServer,
   corsOrigins: CorsOrigin = false,
+  authMiddleware: SocketAuthMiddleware = denyUnauthenticatedSocket,
 ): Server {
   const io = new Server(server, { cors: { origin: corsOrigins, credentials: true } });
+  io.use(authMiddleware);
   const connections = new Map<string, string>();
 
   io.on('connection', (socket) => {
     logger.log(`Client connected: ${socket.id}`);
 
-    socket.on('join-whiteboard', (userId: string) => {
+    socket.on('join-whiteboard', () => {
+      const userId = typeof socket.data.user?.id === 'string' ? socket.data.user.id : null;
+      if (!userId) return;
       connections.set(userId, socket.id);
       socket.join('whiteboard');
     });
@@ -44,11 +52,13 @@ export function registerEdgeAIAmbulanceWebSocketSupport(
   server: HttpServer,
   service = edgeAIAmbulanceService,
   corsOrigins: CorsOrigin = false,
+  authMiddleware: SocketAuthMiddleware = denyUnauthenticatedSocket,
 ): Server {
   const io = new Server(server, {
     path: '/ws/edge-ai/ambulance',
     cors: { origin: corsOrigins, credentials: true },
   });
+  io.use(authMiddleware);
 
   io.on('connection', (socket) => {
     socket.emit('edge-ai/ambulance:ready', {
@@ -100,11 +110,13 @@ export function registerSentinelAvlWebSocketSupport(
   app: Express,
   server: HttpServer,
   corsOrigins: CorsOrigin = false,
+  authMiddleware: SocketAuthMiddleware = denyUnauthenticatedSocket,
 ): Server {
   const io = new Server(server, {
     path: '/ws/sentinel/avl',
     cors: { origin: corsOrigins, credentials: true },
   });
+  io.use(authMiddleware);
 
   io.on('connection', (socket) => {
     socket.emit('sentinel/avl:ready', {

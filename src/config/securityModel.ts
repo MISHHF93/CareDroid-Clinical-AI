@@ -102,7 +102,6 @@ export const SECURITY_CONTRACT = Object.freeze({
   protectedApiPrefixes: Object.freeze(['/api/emergency', '/api/audit', '/api/profile']),
   publicApiPrefixes: Object.freeze([
     '/api/auth',
-    '/api/config/system',
     '/api/native-ai',
     '/api/governance',
   ]),

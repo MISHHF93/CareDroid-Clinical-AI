@@ -1,4 +1,5 @@
-import { getRouteList, ROUTES } from './routes-registry';
+import type { Application, RequestHandler } from 'express';
+import { getRouteList, registerAllRoutes, ROUTES } from './routes-registry';
 
 const REQUESTED_ROUTE_PATHS = [
   '/capacity',
@@ -49,5 +50,22 @@ describe('API routes registry', () => {
     );
 
     expect(capacityRoute?.fullPath).toBe('/api/emergency/capacity');
+  });
+
+  it('mounts middleware before every legacy router and can disable discovery', () => {
+    const middleware: RequestHandler = (_req, _res, next) => next();
+    const app = {
+      get: jest.fn(),
+      use: jest.fn(),
+    } as unknown as Application;
+
+    registerAllRoutes(app, {
+      mountDiscovery: false,
+      middleware: [middleware],
+    });
+
+    expect(app.get).not.toHaveBeenCalled();
+    expect(app.use).toHaveBeenCalledTimes(ROUTES.length);
+    expect(app.use).toHaveBeenCalledWith('/api/capacity', middleware, ROUTES[1].router);
   });
 });

@@ -2,7 +2,7 @@
 
 > Consolidates both of CareDroid's API surfaces into one reference. For the frontend-page-consumption view (which page calls which endpoint), see [`docs/generated/apis.md`](../generated/apis.md) — that file is generated from `pageApiBinding.registry.ts` and `emergencyOsApi.ts` and should be treated as authoritative for those 50 bindings. This document is the authoritative *complete* endpoint inventory (500+ endpoints across two route systems) and explains how the two systems relate.
 >
-> **Live, always-current source of truth:** `GET /api/routes` (lists every legacy Express route at runtime) and the Swagger UI at `http://localhost:5190/api/docs` (all NestJS controllers, request/response schemas). Regenerate this document's NestJS section by re-reading `backend/src/modules/**/*.controller.ts` if it drifts.
+> **Live development source of truth:** `GET /api/routes` (lists every legacy Express route at runtime) and the Swagger UI at `http://localhost:5190/api/docs` (all NestJS controllers, request/response schemas). Both are disabled by default in production. Regenerate this document's NestJS section by re-reading `backend/src/modules/**/*.controller.ts` if it drifts.
 
 ## Two route systems, one Express app
 
@@ -14,7 +14,7 @@ All requests hit a single Express app. `app.setGlobalPrefix('api')` in `backend/
 
 ## 1. Legacy Express routers (`backend/src/api/`)
 
-Mounted at `/api/*` (plus `/api/emergency/*` legacy aliases when `ENABLE_MONGOOSE_EMERGENCY_OS=true`). Runtime discovery: `GET /api/routes`.
+Mounted at `/api/*` (plus `/api/emergency/*` legacy aliases when `ENABLE_MONGOOSE_EMERGENCY_OS=true` outside production). Runtime discovery at `GET /api/routes` is disabled in production.
 
 | Base path | File | Endpoints | Notes |
 |---|---|---|---|

@@ -1,5 +1,6 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { AuthGuard } from '@nestjs/passport';
 import { getRouteList } from './api/routes-registry';
 
 @Controller()
@@ -17,6 +18,7 @@ export class AppController {
   }
 
   @Get('config/system')
+  @UseGuards(AuthGuard('jwt'))
   getSystemConfig() {
     const sessionConfig = this.configService.get<any>('session') || {};
     const ragConfig = this.configService.get<any>('rag') || {};

@@ -1,6 +1,8 @@
 import './observability/datadog';
 import { NestFactory } from '@nestjs/core';
 import { Logger, ValidationPipe, type INestApplication } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import helmet from 'helmet';
 import * as express from 'express';
@@ -28,6 +30,13 @@ import {
 } from './static-asset-excludes';
 import { ApiExceptionFilter } from './common/filters/api-exception.filter';
 import { LoggingMiddleware } from './middleware/logging.middleware';
+import {
+  createLegacyApiAuthMiddleware,
+  createRuntimeJwtAuthenticator,
+  createSocketJwtAuthMiddleware,
+} from './api/runtime-auth';
+import { User } from './modules/users/entities/user.entity';
+import { Permission } from './modules/auth/enums/permission.enum';
 
 function shouldServeFrontendAssets(config: EnvironmentConfig) {
   return config.server.nodeEnv === 'production' && !config.runtime.jestWorkerId;
@@ -50,9 +59,24 @@ async function registerEmergencyMongooseRuntime(
 
   await mongoose.connect(mongoUri);
   const expressApp = app.getHttpAdapter().getInstance();
-  const mountedRoutes = registerAllRoutes(expressApp, { mountDiscovery: false });
-  registerAllRoutes(expressApp, { apiPrefix: '/api/emergency', mountDiscovery: false });
-  registerEMSWebSocketSupport(expressApp, app.getHttpServer(), config.server.corsOrigins);
+  const authenticate = createRuntimeJwtAuthenticator(
+    app.get(JwtService),
+    app.get(ConfigService),
+    app.get(DataSource).getRepository(User),
+  );
+  const middleware = [createLegacyApiAuthMiddleware(authenticate)];
+  const mountedRoutes = registerAllRoutes(expressApp, { mountDiscovery: false, middleware });
+  registerAllRoutes(expressApp, {
+    apiPrefix: '/api/emergency',
+    mountDiscovery: false,
+    middleware,
+  });
+  registerEMSWebSocketSupport(
+    expressApp,
+    app.getHttpServer(),
+    config.server.corsOrigins,
+    createSocketJwtAuthMiddleware(authenticate, Permission.READ_PHI),
+  );
   reassessmentScheduler.start();
   const initialization = await initializeAllServices();
   if (initialization.totals.failed > 0) {
@@ -199,40 +223,53 @@ async function bootstrap() {
   app.setGlobalPrefix('api', { exclude: ['health', ''] });
   const expressApp = app.getHttpAdapter().getInstance();
   expressApp.set('typeormDataSource', app.get(DataSource));
-  registerAllRoutes(expressApp, { mountRoutes: false });
+  registerAllRoutes(expressApp, {
+    mountRoutes: false,
+    mountDiscovery: !environment.environment.isProduction,
+  });
   expressApp.use('/api/health', healthRoutes);
   expressApp.use('/health', healthRoutes);
 
   await registerEmergencyMongooseRuntime(app, logger, environment);
+  const authenticateSocket = createRuntimeJwtAuthenticator(
+    app.get(JwtService),
+    app.get(ConfigService),
+    app.get(DataSource).getRepository(User),
+  );
   registerEdgeAIAmbulanceWebSocketSupport(
     expressApp,
     app.getHttpServer(),
     undefined,
     environment.server.corsOrigins,
+    createSocketJwtAuthMiddleware(authenticateSocket, Permission.WRITE_PHI),
   );
   registerSentinelAvlWebSocketSupport(
     expressApp,
     app.getHttpServer(),
     environment.server.corsOrigins,
+    createSocketJwtAuthMiddleware(authenticateSocket, Permission.VIEW_SENTINEL_COMMAND),
   );
 
-  // Swagger documentation
-  const config = new DocumentBuilder()
-    .setTitle('CareDroid API')
-    .setDescription('HIPAA-compliant clinical platform backend')
-    .setVersion('1.0')
-    .addBearerAuth()
-    .addTag('auth', 'Authentication & Authorization')
-    .addTag('users', 'User Management')
-    .addTag('subscriptions', 'Stripe Subscription Management')
-    .addTag('clinical', 'Clinical Data (Drugs, Protocols, Lab Values)')
-    .addTag('ai', 'OpenAI GPT-4 Integration')
-    .addTag('audit', 'HIPAA Audit Logs')
-    .addTag('compliance', 'GDPR & Compliance')
-    .build();
+  const swaggerEnabled =
+    !environment.environment.isProduction || process.env.SWAGGER_ENABLED === 'true';
+  if (swaggerEnabled) {
+    const config = new DocumentBuilder()
+      .setTitle('CareDroid API')
+      .setDescription('HIPAA-compliant clinical platform backend')
+      .setVersion('1.0')
+      .addBearerAuth()
+      .addTag('auth', 'Authentication & Authorization')
+      .addTag('users', 'User Management')
+      .addTag('subscriptions', 'Stripe Subscription Management')
+      .addTag('clinical', 'Clinical Data (Drugs, Protocols, Lab Values)')
+      .addTag('ai', 'OpenAI GPT-4 Integration')
+      .addTag('audit', 'HIPAA Audit Logs')
+      .addTag('compliance', 'GDPR & Compliance')
+      .build();
 
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup(SWAGGER_DOCS_PATH, app, document);
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup(SWAGGER_DOCS_PATH, app, document);
+  }
 
   // Sentry error handler: must be registered after all routes/controllers
   // are mounted and before app.listen(), so it only catches errors that
@@ -243,7 +280,9 @@ async function bootstrap() {
   await app.listen(port);
 
   logger.log(`CareDroid Backend running on: http://localhost:${port}`);
-  logger.log(`Swagger docs available at: http://localhost:${port}/${SWAGGER_DOCS_PATH}`);
+  if (swaggerEnabled) {
+    logger.log(`Swagger docs available at: http://localhost:${port}/${SWAGGER_DOCS_PATH}`);
+  }
   logger.log(`Prometheus metrics at: http://localhost:${port}/api/metrics`);
   logger.log(`Environment: ${environment.server.nodeEnv}`);
   logger.log('TLS 1.3: ENFORCED (only TLS 1.3+ allowed)');

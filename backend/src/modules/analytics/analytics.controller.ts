@@ -1,37 +1,12 @@
 import { Body, Controller, Get, Logger, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { AuthorizationGuard } from '../auth/guards/authorization.guard';
 import { RequirePermission } from '../auth/decorators/permissions.decorator';
 import { Permission } from '../auth/enums/permission.enum';
+import type { TenantContextRequest } from '../tenant-context/tenant-context.types';
+import { AnalyticsPayloadDto, CrashReportDto } from './dto/analytics-ingestion.dto';
 import { AnalyticsService } from './services/analytics.service';
-
-interface AnalyticsEventDto {
-  eventName?: string;
-  event?: string;
-  parameters?: Record<string, any>;
-  properties?: Record<string, any>;
-  timestamp?: number | string;
-  sessionId?: string;
-  userId?: string;
-}
-
-interface AnalyticsPayloadDto {
-  events: AnalyticsEventDto[];
-  sessionId?: string;
-}
-
-interface CrashReportDto {
-  id: string;
-  error: {
-    name: string;
-    message: string;
-    stack: string[];
-  };
-  breadcrumbs: string[];
-  timestamp: string;
-  sessionId: string;
-  environment: 'development' | 'staging' | 'production';
-}
 
 @Controller()
 export class AnalyticsController {
@@ -40,9 +15,11 @@ export class AnalyticsController {
   constructor(private readonly analyticsService: AnalyticsService) {}
 
   @Post('analytics/events')
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { limit: 60, ttl: 60000 } })
   async submitAnalyticsEvents(
     @Body() payload: AnalyticsPayloadDto,
-    @Req() req: any,
+    @Req() req: TenantContextRequest,
   ): Promise<{ status: string; recorded: number }> {
     const events = payload.events || [];
 
@@ -59,8 +36,8 @@ export class AnalyticsController {
         sessionId: event.sessionId || payload.sessionId || 'unknown',
         properties: {
           ...parameters,
-          organizationId: parameters.organizationId || req.tenantContext?.organizationId,
-          workspaceId: parameters.workspaceId || req.tenantContext?.workspaceId,
+          organizationId: req.tenantContext?.organizationId,
+          workspaceId: req.tenantContext?.workspaceId,
         },
         timestamp,
       };
@@ -94,18 +71,23 @@ export class AnalyticsController {
   }
 
   @Post('crashes')
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { limit: 20, ttl: 60000 } })
   async submitCrashReport(@Body() report: CrashReportDto): Promise<{ id: string; status: string }> {
-    const error = report.error || { name: 'Error', message: 'Unknown error', stack: [] };
-    this.logger.error(`Client crash ${report.id}: ${error.message}`, error.stack?.join('\n'));
+    const error = report.error;
+    const logId = this.sanitizeLogValue(report.id);
+    const logMessage = this.sanitizeLogValue(error.message);
+    const logStack = error.stack.map((line) => this.sanitizeLogValue(line)).join('\n');
+    this.logger.error(`Client crash ${logId}: ${logMessage}`, logStack);
 
     await this.analyticsService.trackEvent('client_crash', undefined, report.sessionId, {
       crashId: report.id,
       errorName: error.name,
       errorMessage: error.message,
       environment: report.environment,
-      breadcrumbCount: report.breadcrumbs?.length || 0,
-      componentStack: (report as { componentStack?: string }).componentStack,
-      correlationId: (report as { correlationId?: string }).correlationId,
+      breadcrumbCount: report.breadcrumbs.length,
+      componentStack: report.componentStack,
+      correlationId: report.correlationId,
     });
 
     return {
@@ -120,5 +102,9 @@ export class AnalyticsController {
       status: 'healthy',
       timestamp: Date.now(),
     };
+  }
+
+  private sanitizeLogValue(value: string): string {
+    return value.replace(/[\r\n\t]/g, ' ');
   }
 }
