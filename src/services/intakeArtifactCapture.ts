@@ -9,6 +9,7 @@ import {
 import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
 import OcrIntakeApi, { type OcrJobStatus } from './ocrIntakeApi';
 import analyticsService from './analyticsService';
+import logger from '../utils/logger';
 import {
   inferTextHintsFromFilename,
   mergeDemographics,
@@ -175,7 +176,12 @@ async function tryBackendOcrJob(params: {
     }
 
     if (job.status === 'completed' && job.extractedFields.length > 0) {
-      void OcrIntakeApi.applyToIntake(job.id, params.staff).catch(() => undefined);
+      void OcrIntakeApi.applyToIntake(job.id, params.staff).catch((error) => {
+        logger.warn('Failed to apply OCR intake job to intake session', {
+          jobId: job.id,
+          error: error instanceof Error ? error.message : String(error),
+        });
+      });
     }
 
     analyticsService.trackEvent({

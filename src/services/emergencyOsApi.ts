@@ -1,5 +1,6 @@
 import { apiFetch, getApiErrorMessage, parseApiResponse } from './apiClient';
 import { serializePatientForBackendApi } from './patientArrivalBackendSync';
+import logger from '../utils/logger';
 
 /**
  * Canonical CareDroid frontend facade.
@@ -266,7 +267,11 @@ export function persistCopilotInteractionSafely(payload: any = {}) {
     requiresHumanReview: true,
     safetyCheckPassed: true,
     ...payload,
-  }).catch(() => undefined);
+  }).catch((error) => {
+    logger.warn('Failed to persist copilot interaction audit trail', {
+      error: error instanceof Error ? error.message : String(error),
+    });
+  });
 }
 export const fetchEmergencyWorkflowLogs = () =>
   requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.workflowLogs);

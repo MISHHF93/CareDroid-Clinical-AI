@@ -533,7 +533,13 @@ export class CollaborationHubService {
         }`,
       );
     });
-    void this.mirrorToExternalProviders(channel, message, userId).catch(() => {});
+    void this.mirrorToExternalProviders(channel, message, userId).catch((error) => {
+      this.logger.warn(
+        `mirrorToExternalProviders failed for message ${message.id}: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+    });
 
     return message;
   }
@@ -574,7 +580,13 @@ export class CollaborationHubService {
         }`,
       );
     });
-    void this.mirrorToExternalProviders(channel, message, null).catch(() => {});
+    void this.mirrorToExternalProviders(channel, message, null).catch((error) => {
+      this.logger.warn(
+        `mirrorToExternalProviders failed for message ${message.id}: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+    });
 
     return message;
   }

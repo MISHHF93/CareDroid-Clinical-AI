@@ -77,6 +77,7 @@ import {
   createSmartIntakePatient,
 } from '../services/emergencyOsApi';
 import { apiFetch } from '../services/apiClient';
+import logger from '../utils/logger';
 import {
   RECEPTION_DATASET_TIMEOUT_MS,
   REFRESH_DATASET_TIMEOUT_MS,
@@ -3071,7 +3072,12 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       });
 
       if (options?.syncToBackend) {
-        void createSmartIntakePatient(patientWithTimeline).catch(() => undefined);
+        void createSmartIntakePatient(patientWithTimeline).catch((error) => {
+          logger.warn('Failed to sync smart intake patient to backend', {
+            patientId: patientWithTimeline?.id,
+            error: error instanceof Error ? error.message : String(error),
+          });
+        });
       }
     },
 

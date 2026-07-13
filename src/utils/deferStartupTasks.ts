@@ -61,7 +61,9 @@ export function scheduleDeferredStartupTasks() {
       NotificationService.requestPermission()
         .then((granted) => {
           if (granted) {
-            NotificationService.registerPushToken().catch(() => {});
+            NotificationService.registerPushToken().catch((error) =>
+              logger.warn('Failed to register push token', { error }),
+            );
           }
         })
         .catch((error) => logger.error('Failed to request notification permission', { error }));

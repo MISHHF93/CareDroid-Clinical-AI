@@ -1,5 +1,6 @@
 import { recordClinicalCalculatorResult } from './emergencyOsApi';
 import { CLINICAL_CALCULATOR_REGISTRY, type ClinicalCalculatorId } from '../clinical-calculators';
+import logger from '../utils/logger';
 
 const SCORE_ID_ALIASES: Record<string, ClinicalCalculatorId> = {
   qsofa: 'qsofa',
@@ -40,5 +41,11 @@ export function persistClinicalCalculatorResultSafely(input: PersistCalculatorRe
     interpretation: input.interpretation || input.riskCategory,
     disclaimer: meta.disclaimer,
     referenceLine: meta.sourceLabel,
-  }).catch(() => undefined);
+  }).catch((error) => {
+    logger.warn('Failed to persist clinical calculator result', {
+      calculatorId,
+      patientId: input.patientId,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  });
 }
