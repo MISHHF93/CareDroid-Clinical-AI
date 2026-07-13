@@ -2,7 +2,11 @@
  * Vendor-agnostic CAD/AVL adapter port and v1 implementations.
  */
 
-import type { AdapterHealth, CadAvlEvent, SentinelUnitStatus } from '../../../../../lib/sentinel/types';
+import type {
+  AdapterHealth,
+  CadAvlEvent,
+  SentinelUnitStatus,
+} from '../../../../../lib/sentinel/types';
 import { createId } from '../sentinel.config';
 
 export type AdapterContext = Readonly<{

@@ -14,6 +14,7 @@ import {
   NLU_TO_REGISTRY_ID,
   PR1_CALCULATOR_REGISTRY_IDS,
   BUILTIN_CALC_ID_TO_REGISTRY_ID,
+  REGISTRY_ID_TO_ORCHESTRATOR_TOOL,
   resolveRegistryId,
 } from './clinicalCatalogWiring';
 import { getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
@@ -228,7 +229,10 @@ describe('PR1 registration audit — sidebar & chat launch', () => {
     expect(launch.registryId).toBe(id);
     expect(launch.path).not.toBe('/tools/calculators');
     expect(launch.chatSeed?.length).toBeGreaterThan(20);
-    expect(launch.orchestratorTool).toBeNull();
+    // news2 and has-bled are real registerTool() backend executors, so orchestratorTool
+    // resolves to their tool id instead of null; qsofa/child-pugh have no backend executor.
+    const expectedOrchestratorTool = REGISTRY_ID_TO_ORCHESTRATOR_TOOL[id] ?? null;
+    expect(launch.orchestratorTool).toBe(expectedOrchestratorTool);
     expect(['Open calculator', 'Open']).toContain(launch.openLabel);
   });
 

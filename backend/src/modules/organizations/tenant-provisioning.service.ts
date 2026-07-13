@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { DEFAULT_PACKS_BY_ORGANIZATION_TYPE } from '../platform-assets/data/platform-asset-seed.data';
@@ -35,6 +35,7 @@ type TenantProvisioningOptions = {
 
 @Injectable()
 export class TenantProvisioningService {
+  private readonly logger = new Logger(TenantProvisioningService.name);
   constructor(
     @InjectRepository(Organization)
     private readonly organizationRepository: Repository<Organization>,
@@ -95,8 +96,10 @@ export class TenantProvisioningService {
     for (const packId of packIds) {
       try {
         await this.platformAssetsService.installPackForOrganization(organization.id, packId);
-      } catch {
-        // Provisioning is retried after seed data is available in sparse test/dev databases.
+      } catch (error) {
+        this.logger.warn(
+          `[TenantProvisioning] Failed to install pack ${packId}: ${error instanceof Error ? error.message : String(error)}`,
+        );
       }
     }
     settings.enabledPackIds = [...new Set([...(settings.enabledPackIds || []), ...packIds])];
@@ -277,8 +280,10 @@ export class TenantProvisioningService {
             { organizationId: organization.id },
           ),
         );
-      } catch {
-        // Sparse dev/test databases may not have every entitlement seeded yet.
+      } catch (error) {
+        this.logger.warn(
+          `[TenantProvisioning] Failed to create workspace ${workspace.name}: ${error instanceof Error ? error.message : String(error)}`,
+        );
       }
     }
     return created;
@@ -313,8 +318,10 @@ export class TenantProvisioningService {
       try {
         const profile = await this.platformAssetsService.getRoleProfile(roleProfileId);
         if (profile.defaultAiAgentId) ids.add(profile.defaultAiAgentId);
-      } catch {
-        // Role profiles may not be seeded in isolated tests.
+      } catch (error) {
+        this.logger.warn(
+          `[TenantProvisioning] Failed to fetch role profile ${roleProfileId}: ${error instanceof Error ? error.message : String(error)}`,
+        );
       }
     }
     ids.add('agent-clinical');

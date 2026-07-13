@@ -168,9 +168,18 @@ function resolveComponent(registryId, nluToolId, builtinSlug) {
   }
   if (
     registryId === REGISTRY.dispatchAi ||
-    ['wells-pe', 'perc', 'grace-acs', 'nihss', 'canadian-c-spine', 'ottawa-ankle', 'copd-gold', 'rome-iv-ibs'].includes(
-      registryId
-    )
+    [
+      'wells-pe',
+      'perc',
+      'grace-acs',
+      'nihss',
+      'canadian-c-spine',
+      'nexus-cspine',
+      'pecarn-head',
+      'ottawa-ankle',
+      'copd-gold',
+      'rome-iv-ibs',
+    ].includes(registryId)
   ) {
     return 'src/pages/tools/Calculators.jsx (hub card) + src/components/ChatInterface.jsx (ED Copilot)';
   }

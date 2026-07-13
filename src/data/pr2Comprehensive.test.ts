@@ -38,6 +38,7 @@ import {
   PR2_TIER_A_CALCULATOR_REGISTRY_IDS,
   PR2_TIER_B_CHAT_CALCULATOR_IDS,
   BUILTIN_CALC_ID_TO_REGISTRY_ID,
+  REGISTRY_ID_TO_ORCHESTRATOR_TOOL,
   resolveRegistryId,
 } from './clinicalCatalogWiring';
 import { getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
@@ -297,11 +298,14 @@ describe('PR2 comprehensive — Wells PE & PERC conversational launch', () => {
     const launch = resolveCatalogLaunch('wells-pe');
     expect(launch.path).toBe(wellsPeChatConfig.hubPath);
     expect(launch.registryId).toBe('wells-pe');
-    expect(launch.openLabel).toBe('Start guided chat');
+    // wells-pe is now a real registerTool() backend executor (Tier C / backend-backed), so the
+    // inventory-derived launch resolves to 'Open' (not the old Tier-B 'Start guided chat') and
+    // carries the real orchestrator tool id instead of null.
+    expect(launch.openLabel).toBe('Open');
     expect(launch.chatSeed).toBe(wellsPeChatConfig.chatSeed);
     expect(launch.chatSeed).toMatch(/STEP 0/i);
     expect(launch.chatSeed).toMatch(/does not rule in or rule out/i);
-    expect(launch.orchestratorTool).toBeNull();
+    expect(launch.orchestratorTool).toBe('wells-pe');
   });
 
   it.each(WELLS_PE_LAUNCH_ALIASES)('Wells alias "%s" resolves to same hub launch', (alias) => {
@@ -411,7 +415,10 @@ describe('PR2 comprehensive — NLU aliases, routes, resolveCatalogLaunch', () =
     expect(launch.registryId).toBe(id);
     expect(launch.path).not.toBe(HUB);
     expect(launch.chatSeed?.length).toBeGreaterThan(20);
-    expect(launch.orchestratorTool).toBeNull();
+    // timi-ua-nstemi is a real registerTool() backend executor, so orchestratorTool resolves
+    // to its tool id instead of null; meld/meld-na have no backend executor.
+    const expectedOrchestratorTool = REGISTRY_ID_TO_ORCHESTRATOR_TOOL[id] ?? null;
+    expect(launch.orchestratorTool).toBe(expectedOrchestratorTool);
     expect(launch.openLabel).toBe('Open');
   });
 

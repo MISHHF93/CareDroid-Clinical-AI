@@ -70,7 +70,7 @@ const REQUESTED_ITEMS = [
   {
     id: 'triage',
     label: 'Triage',
-    icon: 'stethoscope',
+    icon: 'triage-priority',
     route: '/triage',
     featureGate: null,
   },
@@ -154,7 +154,7 @@ const REQUESTED_ITEMS = [
   {
     id: 'predictive-analytics',
     label: 'Predictive AI',
-    icon: 'activity',
+    icon: 'predictive-trend',
     route: '/predictive-analytics',
     featureGate: null,
   },

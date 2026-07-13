@@ -30,7 +30,6 @@
     "test:run": "vitest run",
     "test:run:stable": "vitest run --pool=threads --maxWorkers=1",
     "test:integration": "vitest run --config vitest.integration.config.ts",
-    "test:integration:jest": "jest tests/integration",
     "test:run:parallel": "node scripts/run-vitest-parallel.mjs",
     "test:run:frontend": "vitest run src",
     "test:pr6-fleet": "vitest run src/data/pr6FleetComprehensive.test.tsx src/data/prFleetConsistency.test.ts src/data/fleetCommandWiring.test.ts src/data/predictiveMaintenanceWiring.test.ts src/data/routeOptimizerWiring.test.ts src/data/dispatchAiWiring.test.ts src/pages/fleet src/services/fleetTelemetryService.test.ts src/services/predictiveMaintenanceScoring.test.ts src/services/routeOptimizationService.test.ts src/routes/clinicalToolRoutes.test.ts",

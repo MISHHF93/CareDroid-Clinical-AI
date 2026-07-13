@@ -1,4 +1,4 @@
-import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { EventEmitter } from 'events';
 
@@ -21,6 +21,7 @@ function normalizeEventType(type: string): string {
 
 @Injectable()
 export class EmergencyRealtimeService implements OnModuleInit, OnModuleDestroy {
+  private readonly logger = new Logger(EmergencyRealtimeService.name);
   private readonly bus = new EventEmitter();
   private subscriberCount = 0;
   private devTicker: ReturnType<typeof setInterval> | null = null;
@@ -98,8 +99,10 @@ export class EmergencyRealtimeService implements OnModuleInit, OnModuleDestroy {
           receivedAt: new Date().toISOString(),
         });
       }
-    } catch {
-      // Snapshot services may not be ready during isolated tests.
+    } catch (error) {
+      this.logger.warn(
+        `[EmergencyRealtime] Snapshot collection failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
 
     return events;
@@ -125,8 +128,10 @@ export class EmergencyRealtimeService implements OnModuleInit, OnModuleDestroy {
         strict: false,
       });
       operationalIntelligence?.publishRealtimeSignals('central_node_snapshot');
-    } catch {
-      // Ignore when services are unavailable in test harnesses.
+    } catch (error) {
+      this.logger.warn(
+        `[EmergencyRealtime] publishBoardMutations failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
   }
 
@@ -139,8 +144,10 @@ export class EmergencyRealtimeService implements OnModuleInit, OnModuleDestroy {
       if (ems) {
         this.publish({ type: 'ems_updated', payload: ems.getEMSIntake() });
       }
-    } catch {
-      // Optional in partial test modules.
+    } catch (error) {
+      this.logger.warn(
+        `[EmergencyRealtime] publishEmsUpdate failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
   }
 }

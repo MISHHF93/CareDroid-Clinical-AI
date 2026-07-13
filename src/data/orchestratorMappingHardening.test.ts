@@ -44,25 +44,34 @@ describe('orchestratorMappingHardening — registry ↔ executor', () => {
 });
 
 describe('orchestratorMappingHardening — Tier A calculators', () => {
-  it('only sofa-score maps to a POST executor among Tier-A registry ids', () => {
+  // As of 2026-07-13 the backend registers POST executors for a curated set of
+  // Tier-A calculators (not just sofa-score) — see REGISTRY_ID_TO_EXECUTOR_TOOL_ID
+  // in tool-orchestrator.registry.ts. This asserts wiring *consistency* (catalog
+  // launch resolution agrees with the declared registry↔orchestrator map) rather
+  // than a fixed allowlist, so it stays a real regression guard as more tools are
+  // registered instead of going stale every time the backend adds one.
+  it('Tier-A registry ids resolve a POST executor if and only if REGISTRY_ID_TO_ORCHESTRATOR_TOOL declares one', () => {
     for (const registryId of CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS) {
-      const mapped = REGISTRY_ID_TO_ORCHESTRATOR_TOOL[registryId];
-      if (registryId === REGISTRY.sofaScore) {
-        expect(mapped).toBe(NLU.sofaCalculator);
-      } else {
-        expect(mapped).toBeUndefined();
-        expect(resolveCatalogLaunch(registryId).orchestratorTool).toBeNull();
-      }
+      const mapped = REGISTRY_ID_TO_ORCHESTRATOR_TOOL[registryId] ?? null;
+      expect(resolveCatalogLaunch(registryId).orchestratorTool).toBe(mapped);
     }
+  });
+
+  it('sofa-score still maps to its registered executor', () => {
+    expect(REGISTRY_ID_TO_ORCHESTRATOR_TOOL[REGISTRY.sofaScore]).toBe(NLU.sofaCalculator);
   });
 });
 
 describe('orchestratorMappingHardening — Tier B chat-assisted', () => {
-  it('does not expose POST orchestrator for Wells PE, PERC, or dispatch-ai launches', () => {
-    for (const id of [REGISTRY.wellsPe, REGISTRY.perc, REGISTRY.dispatchAi]) {
+  it('does not expose POST orchestrator for PERC or dispatch-ai launches', () => {
+    for (const id of [REGISTRY.perc, REGISTRY.dispatchAi]) {
       expect(resolveCatalogLaunch(id).orchestratorTool).toBeNull();
       expect(resolveOrchestratorToolForLaunch(id, id, true)).toBeNull();
     }
+  });
+
+  it('Wells PE is now a registered POST executor, matching backend REGISTRY_ID_TO_EXECUTOR_TOOL_ID', () => {
+    expect(resolveCatalogLaunch(REGISTRY.wellsPe).orchestratorTool).toBe(NLU.wellsPe);
   });
 
   it('dispatch-ai remains backend-routed in catalog but not POST-executable', () => {

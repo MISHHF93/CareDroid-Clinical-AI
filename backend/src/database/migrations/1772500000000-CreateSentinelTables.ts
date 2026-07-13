@@ -88,7 +88,10 @@ export class CreateSentinelTables1772500000000 implements MigrationInterface {
 
     await queryRunner.createIndex(
       'sentinel_outbox',
-      new TableIndex({ name: 'IDX_sentinel_outbox_status_available', columnNames: ['status', 'availableAt'] }),
+      new TableIndex({
+        name: 'IDX_sentinel_outbox_status_available',
+        columnNames: ['status', 'availableAt'],
+      }),
     );
     await queryRunner.createIndex(
       'sentinel_alarms',

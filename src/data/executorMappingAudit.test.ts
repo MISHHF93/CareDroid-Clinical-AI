@@ -35,8 +35,10 @@ function parseBackendRegistryMap() {
   const block = registrySource.match(/REGISTRY_ID_TO_EXECUTOR_TOOL_ID[\s\S]*?=\s*\{([\s\S]*?)\};/);
   if (!block) throw new Error('expected REGISTRY_ID_TO_EXECUTOR_TOOL_ID block to match');
   const map: any = {};
-  for (const m of block[1].matchAll(/'([^']+)':\s*'([^']+)'/g)) {
-    map[m[1]] = m[2];
+  // Object keys may be quoted ('has-bled') or bare identifiers (news2) —
+  // both are valid JS; match either so bareword keys aren't silently dropped.
+  for (const m of block[1].matchAll(/(?:'([^']+)'|([A-Za-z_$][\w$]*)):\s*'([^']+)'/g)) {
+    map[m[1] ?? m[2]] = m[3];
   }
   return map;
 }

@@ -82,7 +82,7 @@ async function bootstrap() {
         const content = fileBytes.toString('utf-8');
 
         const gate = assertKnowledgeRegistryAllowsIngest(filePath, fileBytes);
-        if (!gate.ok) {
+        if (gate.ok === false) {
           throw new Error(gate.reason);
         }
         if (gate.artifactId) {

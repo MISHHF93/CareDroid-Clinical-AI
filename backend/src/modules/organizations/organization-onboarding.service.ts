@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, Optional } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, Optional } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
@@ -18,6 +18,7 @@ import { TenantProvisioningService } from './tenant-provisioning.service';
 
 @Injectable()
 export class OrganizationOnboardingService {
+  private readonly logger = new Logger(OrganizationOnboardingService.name);
   constructor(
     @InjectRepository(Organization)
     private readonly organizationRepository: Repository<Organization>,
@@ -85,8 +86,10 @@ export class OrganizationOnboardingService {
     for (const packId of packIds) {
       try {
         await this.platformAssetsService.installPackForOrganization(org.id, packId);
-      } catch {
-        // pack may not exist in test DB
+      } catch (error) {
+        this.logger.warn(
+          `[OrganizationOnboarding] Failed to install pack ${packId}: ${error instanceof Error ? error.message : String(error)}`,
+        );
       }
     }
 
@@ -116,8 +119,10 @@ export class OrganizationOnboardingService {
           { organizationId: org.id },
         );
         workspaces.push(workspace);
-      } catch {
-        // optional
+      } catch (error) {
+        this.logger.warn(
+          `[OrganizationOnboarding] Failed to create workspace ${ws.name}: ${error instanceof Error ? error.message : String(error)}`,
+        );
       }
     }
 

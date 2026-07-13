@@ -28,6 +28,7 @@ import {
   PR7_TIER_B_CHAT_CALCULATOR_IDS,
   FLEET_TIER_A_REGISTRY_IDS,
   REGISTRY,
+  REGISTRY_ID_TO_ORCHESTRATOR_TOOL,
   TIER_B_CHAT_CALCULATOR_REGISTRY_IDS,
 } from './clinicalToolIdContract';
 import { resolveCatalogLaunch } from './clinicalCatalogWiring';
@@ -104,18 +105,32 @@ describe('frontend rendering — per-tool layers', () => {
 
   it.each(ROADMAP_TIER_A_IDS)('Tier A %s keeps calculator switch but no active App route', (registryId) => {
     const row = buildFrontendRenderingRow(registryId);
-    expect(row.tier).toBe('A');
+    // Tools with a real backend executor (see REGISTRY_ID_TO_ORCHESTRATOR_TOOL) are
+    // reclassified from Tier A to Tier C by tierForRegistryId — tierAFormSwitch is then
+    // null (it's only computed for tier === 'A'), though the builtin calculator form
+    // switch case itself remains registered.
+    const isBackendExecutor = Boolean(REGISTRY_ID_TO_ORCHESTRATOR_TOOL[registryId]);
+    expect(row.tier).toBe(isBackendExecutor ? 'C' : 'A');
     expect(row.layers.appRoute).toBe(false);
-    expect(row.layers.tierAFormSwitch).toBe(true);
+    expect(row.layers.tierAFormSwitch).toBe(isBackendExecutor ? null : true);
     expect(row.builtinSlug).toBeTruthy();
     expect(calculatorsSource).toContain(`case '${row.builtinSlug}':`);
   });
 
   it.each(ROADMAP_TIER_B_IDS)('Tier B %s has hub card and chat seed', (registryId) => {
     const row = buildFrontendRenderingRow(registryId);
-    expect(['B', 'fleet-B']).toContain(row.tier);
-    expect(row.layers.tierBHubCard).toBe(true);
-    expect(row.layers.tierBChatSeed).toBe(true);
+    // Tools with a real backend executor are reclassified from Tier B to Tier C by
+    // tierForRegistryId — tierBHubCard/tierBChatSeed are then null/false (only computed
+    // for tier 'B'/'fleet-B'), so only assert the hub-card/chat-seed layers for the
+    // still-genuinely-Tier-B tools.
+    const isBackendExecutor = Boolean(REGISTRY_ID_TO_ORCHESTRATOR_TOOL[registryId]);
+    if (isBackendExecutor) {
+      expect(row.tier).toBe('C');
+    } else {
+      expect(['B', 'fleet-B']).toContain(row.tier);
+      expect(row.layers.tierBHubCard).toBe(true);
+      expect(row.layers.tierBChatSeed).toBe(true);
+    }
     const launch = resolveCatalogLaunch(registryId);
     expect(launch.path).toBe('/tools/calculators');
   });

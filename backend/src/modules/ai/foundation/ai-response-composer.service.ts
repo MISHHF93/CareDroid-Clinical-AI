@@ -15,7 +15,10 @@ export class AiResponseComposerService {
     routePlan: ExpertRoutePlan,
     contextPacket: AiContextPacket,
     extraMetadata: Record<string, any> = {},
-  ): T & { provenance: ReturnType<typeof buildAiResponseProvenance>; metadata: Record<string, any> } {
+  ): T & {
+    provenance: ReturnType<typeof buildAiResponseProvenance>;
+    metadata: Record<string, any>;
+  } {
     const aiFoundation: AiFoundationMetadata = {
       runId: envelope.runId,
       capabilityId: envelope.capabilityId,

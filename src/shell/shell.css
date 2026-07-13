@@ -1,0 +1,279 @@
+/**
+ * CareDroid Shell — Canonical Layout System
+ *
+ * Replaces the fragmented layout rules across:
+ * - app-shell.css (238 lines)
+ * - clinical-chrome-alignment.css (78 lines)
+ * - shell-header-polish.css (66 lines)
+ * - medical-shell-layer.css (48 lines)
+ *
+ * All layout decisions live here. Individual component CSS files
+ * should only handle their own internal styling, NOT shell positioning.
+ */
+
+@import '../styles/shell-tokens.css';
+
+/* ════════════════════════════════════════════════════════════════════════
+   ROOT LAYOUT
+   ════════════════════════════════════════════════════════════════════════ */
+
+#root {
+  height: 100dvh;
+  overflow: hidden;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: clip;
+  overflow-y: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   APPLICATION SHELL
+   The outermost container. Flex row: [Sidebar] [MainColumn].
+   ════════════════════════════════════════════════════════════════════════ */
+
+.shell {
+  display: flex;
+  height: 100dvh;
+  overflow: hidden;
+  background-color: var(--shell-canvas-bg);
+  color: var(--shell-header-fg);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   SIDEBAR
+   Fixed width on desktop, collapsed on tablet, bottom nav on mobile.
+   ════════════════════════════════════════════════════════════════════════ */
+
+.shell__sidebar {
+  flex: 0 0 var(--shell-sidebar-width);
+  width: var(--shell-sidebar-width);
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--shell-sidebar-bg);
+  color: var(--shell-sidebar-fg);
+  border-right: 1px solid var(--shell-sidebar-border);
+  overflow: hidden;
+  z-index: var(--z-sidebar);
+}
+
+/* Tablet: collapsed icon rail */
+@media (min-width: var(--shell-bp-tablet)) and (max-width: 1024px) {
+  .shell__sidebar {
+    flex: 0 0 var(--shell-sidebar-width-collapsed);
+    width: var(--shell-sidebar-width-collapsed);
+  }
+}
+
+/* Mobile: hidden sidebar, becomes bottom nav */
+@media (max-width: var(--shell-bp-mobile)) {
+  .shell__sidebar {
+    display: none;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   MAIN COLUMN
+   Flex column: [Header] [Workspace] [Content].
+   ════════════════════════════════════════════════════════════════════════ */
+
+.shell__main {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   APPLICATION HEADER
+   Global platform controls: brand, facility, search, health, notifications, user.
+   ════════════════════════════════════════════════════════════════════════ */
+
+.shell__header {
+  flex: 0 0 var(--shell-header-height);
+  height: var(--shell-header-height);
+  display: flex;
+  align-items: center;
+  gap: var(--shell-panel-gap);
+  padding: 0 var(--shell-page-gutter);
+  background-color: var(--shell-header-bg);
+  border-bottom: 1px solid var(--shell-header-border);
+  z-index: var(--z-header);
+  position: relative;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   WORKSPACE HEADER
+   Role-specific: profile, role nav, operational context, quick actions.
+   ════════════════════════════════════════════════════════════════════════ */
+
+.shell__workspace {
+  flex: 0 0 var(--shell-workspace-height);
+  height: var(--shell-workspace-height);
+  display: flex;
+  align-items: center;
+  gap: var(--shell-panel-gap);
+  padding: 0 var(--shell-page-gutter);
+  background-color: var(--shell-workspace-bg);
+  border-bottom: 1px solid var(--shell-workspace-border);
+  z-index: var(--z-header);
+  position: relative;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   PAGE COMMAND BAR (optional)
+   Current page: title, breadcrumbs, local filters, primary action.
+   ════════════════════════════════════════════════════════════════════════ */
+
+.shell__command-bar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: var(--shell-panel-gap);
+  padding: var(--shell-panel-gap) var(--shell-page-gutter);
+  background-color: var(--shell-content-bg);
+  border-bottom: 1px solid var(--shell-workspace-border);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   PAGE CONTENT
+   The sole scrollport for page content.
+   ════════════════════════════════════════════════════════════════════════ */
+
+.shell__content {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: clip;
+  scroll-padding-top: calc(var(--shell-header-height) + var(--shell-workspace-height));
+}
+
+.shell__content-inner {
+  max-width: var(--shell-content-max);
+  margin: 0 auto;
+  padding: var(--shell-page-gutter);
+}
+
+/* Wide layouts (command center) */
+.shell__content-inner--wide {
+  max-width: var(--shell-content-max-wide);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   MOBILE BOTTOM NAVIGATION
+   ════════════════════════════════════════════════════════════════════════ */
+
+.shell__mobile-nav {
+  display: none;
+}
+
+@media (max-width: var(--shell-bp-mobile)) {
+  .shell__mobile-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: var(--shell-mobile-nav-height);
+    background-color: var(--shell-sidebar-bg);
+    color: var(--shell-sidebar-fg);
+    border-top: 1px solid var(--shell-sidebar-border);
+    z-index: var(--z-sidebar);
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+
+  .shell__content {
+    padding-bottom: var(--shell-mobile-nav-height);
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   OVERLAYS (modals, drawers, popovers)
+   All render inside this stacking context.
+   ════════════════════════════════════════════════════════════════════════ */
+
+.shell__overlay-anchor {
+  position: relative;
+  z-index: var(--z-base);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   SKIP LINK (accessibility)
+   ════════════════════════════════════════════════════════════════════════ */
+
+.shell__skip-link {
+  position: absolute;
+  top: -100%;
+  left: var(--shell-page-gutter);
+  z-index: var(--z-toast);
+  padding: var(--shell-control-height) var(--shell-control-padding-x);
+  background-color: var(--shell-header-bg);
+  border: 2px solid var(--shell-header-fg);
+  border-radius: var(--shell-control-radius);
+  color: var(--shell-header-fg);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.shell__skip-link:focus {
+  top: var(--shell-page-gutter);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   COMPACT DENSITY (command center, wall displays)
+   ════════════════════════════════════════════════════════════════════════ */
+
+.shell--compact .shell__header {
+  flex: 0 0 var(--shell-header-height-compact);
+  height: var(--shell-header-height-compact);
+}
+
+.shell--compact .shell__workspace {
+  display: none;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   RESPONSIVE ULTRAWIDE
+   Keep content centered, don't stretch controls.
+   ════════════════════════════════════════════════════════════════════════ */
+
+@media (min-width: 2560px) {
+  .shell__content-inner {
+    max-width: var(--shell-content-max-wide);
+    padding: var(--shell-page-gutter) clamp(24px, 4vw, 48px);
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   REDUCED MOTION
+   ════════════════════════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   HIGH CONTRAST / FORCED COLORS
+   ════════════════════════════════════════════════════════════════════════ */
+
+@media (forced-colors: active) {
+  .shell__header,
+  .shell__workspace {
+    border-bottom: 2px solid ButtonText;
+  }
+
+  .shell__sidebar {
+    border-right: 2px solid ButtonText;
+  }
+}

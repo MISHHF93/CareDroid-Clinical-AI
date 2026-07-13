@@ -64,7 +64,9 @@ export function createEmergencyCall(params: {
     updatedAt: now(),
   };
   activeCalls.set(call.id, call);
-  void import('./emergencyCareJourneyOrchestrator').then(({ onEmergencyCallLogged }) => onEmergencyCallLogged(call));
+  void import('./emergencyCareJourneyOrchestrator').then(({ onEmergencyCallLogged }) => onEmergencyCallLogged(call)).catch((error) => {
+    console.error('[DispatchIntakeService] onEmergencyCallLogged failed:', error);
+  });
   return call;
 }
 
@@ -74,7 +76,9 @@ export function updateCallStatus(callId: EntityId, status: EmergencyCallStatus):
   const updated: EmergencyCall = { ...call, status, updatedAt: now() };
   activeCalls.set(callId, updated);
   if (status === 'triaged') {
-    void import('./emergencyCareJourneyOrchestrator').then(({ onDispatcherTriage }) => onDispatcherTriage(callId));
+    void import('./emergencyCareJourneyOrchestrator').then(({ onDispatcherTriage }) => onDispatcherTriage(callId)).catch((error) => {
+      console.error('[DispatchIntakeService] onDispatcherTriage (status update) failed:', error);
+    });
   }
   return updated;
 }
@@ -85,7 +89,9 @@ export function updateCallPriority(callId: EntityId, priority: CallPriority): Em
   const updated: EmergencyCall = { ...call, callPriority: priority, updatedAt: now() };
   activeCalls.set(callId, updated);
   if (call.status === 'received') {
-    void import('./emergencyCareJourneyOrchestrator').then(({ onDispatcherTriage }) => onDispatcherTriage(callId));
+    void import('./emergencyCareJourneyOrchestrator').then(({ onDispatcherTriage }) => onDispatcherTriage(callId)).catch((error) => {
+      console.error('[DispatchIntakeService] onDispatcherTriage (priority update) failed:', error);
+    });
   }
   return updated;
 }

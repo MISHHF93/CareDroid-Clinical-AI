@@ -36,7 +36,7 @@ describe('HEART score (heart-score) wiring', () => {
     if (!nlu) throw new Error('expected nlu tool entry to exist');
     expect(nlu?.path).toBe(`/tools/calculators/${id}`);
     expect(nlu?.sidebarToolId).toBe(id);
-    expect(nlu?.backendExecutable).toBe(false);
+    expect(nlu?.backendExecutable).toBe(true);
 
     const builtin = builtinUiCalculators.find((c) => c.id === id);
     if (!builtin) throw new Error('expected builtin calculator entry to exist');

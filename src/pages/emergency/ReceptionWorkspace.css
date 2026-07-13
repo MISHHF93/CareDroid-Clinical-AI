@@ -5,13 +5,13 @@
   --reception-command-border: var(--app-border-subtle);
   --reception-command-ink: var(--app-text-primary);
   --reception-command-muted: var(--app-text-secondary);
-  --reception-command-primary: #111827;
-  --reception-command-primary-strong: #374151;
+  --reception-command-primary: var(--app-text-primary, #111827);
+  --reception-command-primary-strong: var(--app-text-secondary, #374151);
   --reception-command-critical: var(--app-danger);
   --reception-command-warning: var(--app-warning);
   display: grid;
   gap: var(--cdl-panel-gap, var(--app-layout-panel-gap, 12px));
-  padding: 4px 0 72px;
+  padding: 0;
   color: var(--reception-command-ink);
 }
 
@@ -196,9 +196,9 @@
 
 .reception-command-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+  grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.8fr);
   gap: 14px;
-  max-width: 1400px;
+  width: 100%;
 }
 
 .reception-command-panel {
@@ -601,19 +601,19 @@
 }
 
 .reception-command-actionbar {
-  position: fixed;
-  left: var(--app-shell-sidebar-offset, 0);
-  right: 0;
+  position: sticky;
   bottom: 0;
-  z-index: 15;
+  left: 0;
+  right: 0;
+  z-index: 2;
   display: flex;
   justify-content: flex-end;
   gap: 10px;
-  min-height: 72px;
+  min-height: 60px;
   border-top: 1px solid var(--reception-command-border);
-  background: var(--app-surface-glass);
-  padding: 12px 18px;
-  backdrop-filter: blur(var(--app-blur-glass));
+  background: var(--app-surface-glass, rgba(255, 255, 255, 0.95));
+  padding: 10px 16px;
+  backdrop-filter: blur(var(--app-blur-glass, 8px));
 }
 
 .reception-command-actionbar button {
@@ -775,15 +775,11 @@
 
 .reception-command-selected--floating {
   align-items: center;
-  bottom: 84px;
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   justify-content: space-between;
-  left: calc(var(--app-shell-sidebar-offset, 0) + 18px);
-  position: fixed;
-  right: 18px;
-  z-index: 16;
+  z-index: 2;
 }
 
 .reception-front-door__description {
@@ -798,7 +794,7 @@
   display: grid;
   gap: var(--cdl-panel-gap, 12px);
   grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
-  max-width: 1400px;
+  width: 100%;
 }
 
 .reception-front-door__main {

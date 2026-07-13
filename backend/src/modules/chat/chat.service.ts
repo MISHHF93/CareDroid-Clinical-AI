@@ -677,7 +677,10 @@ export class ChatService {
     }
     try {
       this.toolOrchestrator.getToolMetadata(targetId);
-    } catch {
+    } catch (error) {
+      this.logger.warn(
+        `[ChatService] Tool metadata lookup failed for ${targetId}: ${error instanceof Error ? error.message : String(error)}`,
+      );
       return classification;
     }
     return {

@@ -608,11 +608,48 @@ describe('ToolOrchestratorService', () => {
   });
 
   describe('Frontend registry contract parity', () => {
+    // `src/data/clinicalToolIdContract.ts`'s `REGISTRY_ID_TO_ORCHESTRATOR_TOOL` mirrors this
+    // map entry-for-entry (verified against each tool's real registerTool() wiring above).
     it('REGISTRY_ID_TO_EXECUTOR_TOOL_ID matches frontend REGISTRY_ID_TO_ORCHESTRATOR_TOOL', () => {
       expect(REGISTRY_ID_TO_EXECUTOR_TOOL_ID).toEqual({
         'drug-check': 'drug-interactions',
         'lab-interp': 'lab-interpreter',
         'sofa-score': 'sofa-calculator',
+        'heart-score': 'heart-score',
+        'wells-pe': 'wells-pe',
+        'gcs-calculator': 'gcs-calculator',
+        news2: 'news2',
+        'cha2ds2vasc-calculator': 'cha2ds2vasc-calculator',
+        'calc-chads2vasc': 'cha2ds2vasc-calculator',
+        'shock-index': 'shock-index',
+        'anion-gap': 'anion-gap',
+        'aa-gradient': 'aa-gradient',
+        'apache2-calculator': 'apache2-calculator',
+        abcd2: 'abcd2',
+        'canadian-c-spine': 'canadian-c-spine',
+        'nexus-cspine': 'nexus-cspine',
+        chads2: 'chads2',
+        'has-bled': 'has-bled',
+        'timi-ua-nstemi': 'timi-ua-nstemi',
+        'framingham-risk': 'framingham-risk',
+        'grace-acs': 'grace-acs',
+        'duke-treadmill-score': 'duke-treadmill-score',
+        'reynolds-risk-score': 'reynolds-risk-score',
+        'corrected-calcium': 'corrected-calcium',
+        'corrected-sodium': 'corrected-sodium',
+        fena: 'fena',
+        feurea: 'feurea',
+        'osmolal-gap': 'osmolal-gap',
+        'serum-osmolality': 'serum-osmolality',
+        'pao2-fio2-ratio': 'pao2-fio2-ratio',
+        'rox-index': 'rox-index',
+        mews: 'mews',
+        'revised-trauma-score': 'revised-trauma-score',
+        'hunt-hess-scale': 'hunt-hess-scale',
+        'ich-score': 'ich-score',
+        'four-score': 'four-score',
+        'modified-rankin-scale': 'modified-rankin-scale',
+        'pecarn-head': 'pecarn-head',
       });
     });
   });
@@ -644,7 +681,7 @@ describe('ToolOrchestratorService', () => {
     it('should provide user-friendly error messages', async () => {
       const result = await service.executeInChat('invalid-tool', {}, 'test-user', 'test-conv');
 
-      expect(result.formattedForChat).toContain('Error');
+      expect(result.formattedForChat).toContain('not executed');
     });
   });
 

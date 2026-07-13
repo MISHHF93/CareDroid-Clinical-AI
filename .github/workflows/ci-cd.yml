@@ -10,85 +10,15 @@ env:
   NODE_VERSION: '20'
 
 jobs:
-  # Run tests
-  test:
-    runs-on: ubuntu-latest
-
-    services:
-      postgres:
-        image: postgres:14-alpine
-        env:
-          POSTGRES_USER: test
-          POSTGRES_PASSWORD: test
-          POSTGRES_DB: caredroid_test
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-
-      redis:
-        image: redis:7-alpine
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 6379:6379
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: backend/package-lock.json
-
-      - name: Install backend dependencies
-        working-directory: ./backend
-        run: npm ci
-
-      - name: Run backend tests
-        working-directory: ./backend
-        run: npm run test
-        env:
-          DATABASE_HOST: localhost
-          DATABASE_PORT: 5432
-          DATABASE_USER: test
-          DATABASE_PASSWORD: test
-          DATABASE_NAME: caredroid_test
-          REDIS_HOST: localhost
-          REDIS_PORT: 6379
-          JWT_SECRET: test-secret
-          JWT_REFRESH_SECRET: test-refresh-secret
-
-      - name: Run E2E tests
-        working-directory: ./backend
-        run: npm run test:e2e
-        env:
-          DATABASE_HOST: localhost
-          DATABASE_PORT: 5432
-          DATABASE_USER: test
-          DATABASE_PASSWORD: test
-          DATABASE_NAME: caredroid_test
-          REDIS_HOST: localhost
-          REDIS_PORT: 6379
-
-      - name: Install frontend dependencies
-        run: npm ci
-
-      - name: Build frontend
-        run: npm run build
+  # Full validation suite (lint, typecheck, format, unit+E2E tests, builds,
+  # bundle budget, responsive QA, security scan) — see validate.yml. Deploy
+  # must not proceed unless this passes in full, not just backend tests.
+  validate:
+    uses: ./.github/workflows/validate.yml
 
   # Build and push Docker images
   build:
-    needs: test
+    needs: validate
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
 

@@ -1825,18 +1825,94 @@ export const ORCHESTRATOR_TO_REGISTRY_ID = Object.freeze({
 /**
  * NLU ids registered in tool-orchestrator.service (POST /api/tools/:id/execute).
  * Do not add ids here unless backend registerTool() exists.
+ * Mirrors backend REGISTERED_EXECUTOR_TOOL_IDS (tool-orchestrator.registry.ts) —
+ * verified 2026-07-13: each id below has a real `this.registerTool(...)` call in
+ * ToolOrchestratorService's constructor, not just a catalog/NLU-routing entry.
  */
 export const ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS = Object.freeze([
   NLU.sofaCalculator,
   NLU.drugInteractions,
   NLU.labInterpreter,
+  NLU.heartScore,
+  NLU.cha2ds2vascCalculator,
+  NLU.wellsPe,
+  NLU.shockIndex,
+  NLU.apache2Calculator,
+  NLU.anionGap,
+  NLU.aaGradient,
+  NLU.news2,
+  NLU.abcd2,
+  NLU.canadianCSpine,
+  NLU.nexusCspine,
+  NLU.gcsCalculator,
+  NLU.chads2,
+  NLU.dukeTreadmillScore,
+  NLU.reynoldsRiskScore,
+  NLU.hasBled,
+  NLU.timiUaNstemi,
+  NLU.framinghamRisk,
+  NLU.graceAcs,
+  NLU.correctedCalcium,
+  NLU.correctedSodium,
+  NLU.fena,
+  NLU.feurea,
+  NLU.osmolalGap,
+  NLU.serumOsmolality,
+  NLU.pao2Fio2Ratio,
+  NLU.roxIndex,
+  NLU.mews,
+  NLU.revisedTraumaScore,
+  NLU.huntHessScale,
+  NLU.ichScore,
+  NLU.fourScore,
+  NLU.modifiedRankinScale,
+  NLU.pecarnHead,
 ]);
 
-/** Registry id → backend POST /api/chat/message `tool` param (registered executors only). */
+/**
+ * Registry id → backend POST /api/chat/message `tool` param (registered executors only).
+ * Mirrors backend REGISTRY_ID_TO_EXECUTOR_TOOL_ID (tool-orchestrator.registry.ts).
+ */
 export const REGISTRY_ID_TO_ORCHESTRATOR_TOOL = Object.freeze({
   [REGISTRY.drugCheck]: NLU.drugInteractions,
   [REGISTRY.labInterp]: NLU.labInterpreter,
   [REGISTRY.sofaScore]: NLU.sofaCalculator,
+  [REGISTRY.heartScore]: NLU.heartScore,
+  [REGISTRY.wellsPe]: NLU.wellsPe,
+  [REGISTRY.gcsCalculator]: NLU.gcsCalculator,
+  [REGISTRY.news2]: NLU.news2,
+  'cha2ds2vasc-calculator': NLU.cha2ds2vascCalculator,
+  [REGISTRY.calcChads2vasc]: NLU.cha2ds2vascCalculator,
+  [REGISTRY.shockIndex]: NLU.shockIndex,
+  [REGISTRY.anionGap]: NLU.anionGap,
+  [REGISTRY.aaGradient]: NLU.aaGradient,
+  [REGISTRY.apache2Calculator]: NLU.apache2Calculator,
+  [REGISTRY.abcd2]: NLU.abcd2,
+  [REGISTRY.canadianCSpine]: NLU.canadianCSpine,
+  [REGISTRY.nexusCspine]: NLU.nexusCspine,
+  [REGISTRY.chads2]: NLU.chads2,
+  [REGISTRY.hasBled]: NLU.hasBled,
+  [REGISTRY.timiUaNstemi]: NLU.timiUaNstemi,
+  [REGISTRY.framinghamRisk]: NLU.framinghamRisk,
+  [REGISTRY.graceAcs]: NLU.graceAcs,
+  [REGISTRY.dukeTreadmillScore]: NLU.dukeTreadmillScore,
+  [REGISTRY.reynoldsRiskScore]: NLU.reynoldsRiskScore,
+  // Batch 3/4 calculators — registered executors with no distinct registry-id alias (identity map).
+  [REGISTRY.correctedCalcium]: NLU.correctedCalcium,
+  [REGISTRY.correctedSodium]: NLU.correctedSodium,
+  [REGISTRY.fena]: NLU.fena,
+  [REGISTRY.feurea]: NLU.feurea,
+  [REGISTRY.osmolalGap]: NLU.osmolalGap,
+  [REGISTRY.serumOsmolality]: NLU.serumOsmolality,
+  [REGISTRY.pao2Fio2Ratio]: NLU.pao2Fio2Ratio,
+  [REGISTRY.roxIndex]: NLU.roxIndex,
+  [REGISTRY.mews]: NLU.mews,
+  [REGISTRY.revisedTraumaScore]: NLU.revisedTraumaScore,
+  [REGISTRY.huntHessScale]: NLU.huntHessScale,
+  [REGISTRY.ichScore]: NLU.ichScore,
+  [REGISTRY.fourScore]: NLU.fourScore,
+  [REGISTRY.modifiedRankinScale]: NLU.modifiedRankinScale,
+  [REGISTRY.pecarnHead]: NLU.pecarnHead,
 });
 
 /**

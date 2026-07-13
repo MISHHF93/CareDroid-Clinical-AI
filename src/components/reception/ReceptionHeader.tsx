@@ -10,12 +10,6 @@ export type ReceptionHeaderMetric = {
 };
 
 export type ReceptionHeaderProps = {
-  eyebrow?: string;
-  title: string;
-  userName: string;
-  userRole: string;
-  userStatus?: string;
-  hospitalSite?: string;
   metrics: ReceptionHeaderMetric[];
   situation?: {
     status?: string;
@@ -35,12 +29,6 @@ export type ReceptionHeaderProps = {
 };
 
 export default function ReceptionHeader({
-  eyebrow = 'Emergency Department',
-  title,
-  userName,
-  userRole,
-  userStatus,
-  hospitalSite,
   metrics,
   situation,
   primaryActions,
@@ -48,23 +36,6 @@ export default function ReceptionHeader({
 }: ReceptionHeaderProps) {
   return (
     <header className="reception-header">
-      {/* Top Bar - Branding & User Info */}
-      <div className="reception-header__top">
-        <div className="reception-header__branding">
-          <div>
-            {eyebrow && <div className="reception-header__eyebrow">{eyebrow}</div>}
-            <h1 className="reception-header__title">{title}</h1>
-          </div>
-        </div>
-
-        <div className="reception-header__user-info">
-          <span className="reception-header__user-name">{userName}</span>
-          <span className="reception-header__user-role">{userRole}</span>
-          {userStatus && <span className="reception-header__user-status">{userStatus}</span>}
-          {hospitalSite && <span className="reception-header__user-status">{hospitalSite}</span>}
-        </div>
-      </div>
-
       {/* Metrics Bar */}
       <div className="reception-header__metrics">
         {metrics.map((metric, index) => (

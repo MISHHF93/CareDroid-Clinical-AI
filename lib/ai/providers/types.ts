@@ -1,5 +1,6 @@
 import type { AIRequest, AIResponse } from '../llmTransport';
 import type { AIRequestType } from '../types';
+import type { AiDeployMode } from '../deploymentFlags';
 
 export type LlmProviderId = 'anthropic' | 'openai' | 'azure-openai' | 'gemini' | 'local';
 
@@ -27,6 +28,8 @@ export interface LlmAdapterRuntime {
     toolCallCount: number;
     provider?: LlmProviderId;
     phiMinimized?: boolean;
+    redactionCount?: number;
+    deployMode?: AiDeployMode;
   }) => void;
 }
 

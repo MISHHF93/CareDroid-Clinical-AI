@@ -1075,7 +1075,9 @@ function appendAuditLog(
   const entry = createAuditLogEntry(input);
   void import('../services/securityAuditService').then(({ ingestEmergencyAuditEntries }) =>
     ingestEmergencyAuditEntries([entry]),
-  );
+  ).catch((error) => {
+    console.error('[EmergencyStore] ingestEmergencyAuditEntries failed:', error);
+  });
   return [entry, ...existing].slice(0, AUDIT_LOG_LIMIT);
 }
 
@@ -3522,7 +3524,9 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
             actorId: staffId,
             actorName: staffId,
           }),
-        );
+        ).catch((error) => {
+          console.error('[EmergencyStore] afterPatientWorkflowTransition failed:', error);
+        });
       }
     },
 
@@ -3573,7 +3577,9 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
           actorRole: 'emergency_physician',
           note: options.note,
         }),
-      );
+      ).catch((error) => {
+        console.error('[EmergencyStore] dischargePatient afterPatientWorkflowTransition failed:', error);
+      });
     },
 
     assignStaff: (patientId, staffId, options: any = {}) =>
@@ -4679,17 +4685,23 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
 
       void import('../engine/unifiedWorkflowAutomationEngine').then(({ handleWorkflowAutomationBackendEvent }) =>
         handleWorkflowAutomationBackendEvent(type),
-      );
+      ).catch((error) => {
+        console.error('[EmergencyStore] handleWorkflowAutomationBackendEvent failed:', error);
+      });
 
       void import('../engine/unifiedOperationalIntelligenceEngine').then(
         ({ handleUnifiedOperationalIntelligenceBackendEvent }) =>
           handleUnifiedOperationalIntelligenceBackendEvent(type, payload),
-      );
+      ).catch((error) => {
+        console.error('[EmergencyStore] handleUnifiedOperationalIntelligenceBackendEvent failed:', error);
+      });
 
       void import('../engine/unifiedApplicationKnowledgeGraphEngine').then(
         ({ handleUnifiedApplicationKnowledgeGraphBackendEvent }) =>
           handleUnifiedApplicationKnowledgeGraphBackendEvent(type),
-      );
+      ).catch((error) => {
+        console.error('[EmergencyStore] handleUnifiedApplicationKnowledgeGraphBackendEvent failed:', error);
+      });
 
       if (
         [
@@ -4713,6 +4725,8 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
             return;
           }
           get().ingestPreparedAlert(normalizeRealtimeAlert(payload));
+        }).catch((error) => {
+          console.error('[EmergencyStore] ingestRealtimeAlertPayload failed:', error);
         });
         return;
       }
@@ -5006,13 +5020,17 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
     acknowledgeAlert: (alertId) => {
       void import('../services/alertLifecycleOrchestrator').then(({ transitionAlertLifecycle }) =>
         transitionAlertLifecycle(alertId, 'acknowledge', { sourceScreen: 'emergency-store' }),
-      );
+      ).catch((error) => {
+        console.error('[EmergencyStore] acknowledgeAlert transitionAlertLifecycle failed:', error);
+      });
     },
 
     dismissAlert: (alertId) => {
       void import('../services/alertLifecycleOrchestrator').then(({ transitionAlertLifecycle }) =>
         transitionAlertLifecycle(alertId, 'dismiss', { sourceScreen: 'emergency-store' }),
-      );
+      ).catch((error) => {
+        console.error('[EmergencyStore] dismissAlert transitionAlertLifecycle failed:', error);
+      });
     },
 
     setPatientFlowSnapshot: (snapshot) =>
@@ -5100,6 +5118,8 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
             applied: Boolean(result.task),
           },
         });
+      }).catch((error) => {
+        console.error('[EmergencyStore] recordWorkflowTelemetry (admin-review) failed:', error);
       });
       if (!result.task) return null;
       set({ administrativeAutomationQueue: result.tasks });
@@ -5247,7 +5267,9 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       if (updatedArrival?.status && updatedArrival.status !== arrival.status) {
         void import('../services/emergencyCareJourneyOrchestrator').then(({ onEmsArrivalStatusChange }) =>
           onEmsArrivalStatusChange(updatedArrival, arrival.status),
-        );
+        ).catch((error) => {
+          console.error('[EmergencyStore] onEmsArrivalStatusChange failed:', error);
+        });
       }
     },
 
@@ -5637,6 +5659,8 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
           timestamp: log.timestamp,
           metadata: log.metadata,
         });
+      }).catch((error) => {
+        console.error('[EmergencyStore] recordWorkflowTelemetry failed:', error);
       });
       return log;
     },

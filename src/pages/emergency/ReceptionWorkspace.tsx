@@ -46,7 +46,6 @@ import ContextualGuidance from '../../components/ui/ContextualGuidance';
 import { showActionError, showActionSuccess } from '../../services/careDroidInteractionFeedback';
 import { STANDARD_ACTION_FEEDBACK } from '../../config/careDroidInteractionModel';
 import { notifyWorkflowHandoffComplete } from '../../services/workflowNavigationFeedback';
-import { EmergencyRoutePage } from './emergencyRouteShared';
 import ReceptionHeader, { ReceptionHeaderActionButton } from '../../components/reception/ReceptionHeader';
 import ReceptionPageLayout, {
   ReceptionContentSection,
@@ -601,12 +600,6 @@ export default function ReceptionWorkspace() {
     <ReceptionPageLayout
       header={
         <ReceptionHeader
-          eyebrow={RECEPTION_COPY.workspace.eyebrow}
-          title={RECEPTION_COPY.workspace.title}
-          userName={currentUserName}
-          userRole={emergencyRole.roleLabel || 'Registration Clerk'}
-          userStatus={shiftStatus}
-          hospitalSite={hospitalSite}
           metrics={[
             {
               label: RECEPTION_COPY.metrics.queueSize,

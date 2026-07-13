@@ -52,7 +52,7 @@ describe('Wells PE (Tier B chat-assisted) wiring', () => {
     if (!nlu) throw new Error('expected nlu tool entry to exist');
     expect(nlu?.path).toBe('/tools/calculators');
     expect(nlu?.sidebarToolId).toBe(id);
-    expect(nlu?.backendExecutable).toBe(false);
+    expect(nlu?.backendExecutable).toBe(true);
     expect(appSource).not.toContain("path: '/tools/calculators/wells-pe'");
     expect(appSource).not.toContain('initialCalculatorId="wells-pe"');
 
@@ -74,8 +74,8 @@ describe('Wells PE (Tier B chat-assisted) wiring', () => {
     expect(launch.chatSeed).toBe(wellsPeChatConfig.chatSeed);
     expect(launch.chatSeed).toMatch(/Wells score for suspected pulmonary embolism/i);
     expect(launch.chatSeed).toMatch(/low \/ intermediate \/ high probability/i);
-    expect(launch.openLabel).toBe('Start guided chat');
-    expect(launch.orchestratorTool).toBeNull();
+    expect(launch.openLabel).toBe('Open');
+    expect(launch.orchestratorTool).toBe(id);
   });
 
   it.each(WELLS_PE_REQUIRED_NLU_ALIAS_PAIRS)(

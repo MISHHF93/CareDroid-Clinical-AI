@@ -105,7 +105,14 @@ describe('medical expansion cross-pack validation', () => {
         const launch = resolveCatalogLaunch(id);
         const slug = record?.calculatorSlug;
 
-        expect(record?.launchType, id).toBe(TOOL_LAUNCH_TYPES.LOCAL_ONLY);
+        // Tools with a real backend executor (see REGISTRY_ID_TO_ORCHESTRATOR_TOOL) resolve
+        // launchType 'backend-backed' instead of the old 'local-only' — they're still
+        // launched through the same builtin calculator UI/route, just backend-executed.
+        expect(record?.launchType, id).toBe(
+          REGISTRY_ID_TO_ORCHESTRATOR_TOOL[id]
+            ? TOOL_LAUNCH_TYPES.BACKEND_BACKED
+            : TOOL_LAUNCH_TYPES.LOCAL_ONLY
+        );
         expect(launch.path, id).toMatch(/^\/tools\/calculators\//);
         expect(TIER_A_CALCULATOR_PATH_BY_REGISTRY_ID[id], id).toBe(launch.path);
         expect(builtinSlugs.has(slug), id).toBe(true);

@@ -94,18 +94,16 @@ describe('CareDroid design language fit contract', () => {
     expect(sidebarCss).toMatch(/\.sidebar\s*\{[\s\S]*width:\s*232px/);
     expect(sidebarCss).toMatch(/\.sidebar-nav-item\s*\{[\s\S]*min-height:\s*var\(--touch-target-min/);
     expect(sidebarCss).toMatch(/@media \(max-width: 768px\)[\s\S]*height:\s*calc\(72px/);
-    // Flat clinical chrome: balanced grid with minmax tracks (no legacy caredroid-header topbar)
-    expect(headerCss).toMatch(/\.app-chrome-top\s*\{[\s\S]*grid-template-columns:\s*minmax\(0,\s*1fr\)/);
-    expect(headerCss).toMatch(/\.app-chrome-top__search\s*\{[\s\S]*min-width:\s*0/);
-    expect(headerCss).toMatch(/\.app-chrome-top__actions\s*\{[\s\S]*min-width:\s*0/);
+    // Clinical chrome: topbar and actions cluster never force the header to overflow
+    expect(headerCss).toMatch(/\.caredroid-header__topbar\s*\{[\s\S]*min-width:\s*0/);
+    expect(headerCss).toMatch(/\.caredroid-header__actions\s*\{[\s\S]*min-width:\s*0/);
   });
 
   it('fits workspace dropdown and compact shell controls inside mobile viewports', () => {
     expect(sidebarCss).toContain('min-width: 44px');
-    // Header controls share a fixed 36px face; search/actions stay fluid on narrow viewports
-    expect(headerCss).toContain('--app-chrome-control-h: 36px');
-    expect(headerCss).toMatch(/@media \(max-width: 720px\)[\s\S]*\.app-chrome-top__search/);
-    expect(headerCss).toMatch(/\.app-chrome-top__create\s*\{[\s\S]*height:\s*var\(--app-chrome-control-h\)/);
+    // Header search/lookup narrows on narrow viewports instead of overflowing
+    expect(headerCss).toMatch(/@media \(max-width: 768px\)[\s\S]*\.caredroid-header__lookup/);
+    expect(headerCss).toMatch(/\.caredroid-header__action\s*\{[\s\S]*min-height:\s*30px/);
   });
 
   it('uses one navigation system without a conflicting bottom nav', () => {

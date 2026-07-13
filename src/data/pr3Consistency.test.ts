@@ -24,6 +24,8 @@ import {
   PR3_CALCULATOR_REGISTRY_IDS,
   PR3_TIER_B_CHAT_CALCULATOR_IDS,
   TIER_B_CHAT_CALCULATOR_REGISTRY_IDS,
+  REGISTRY_ID_TO_ORCHESTRATOR_TOOL,
+  ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS,
 } from './clinicalCatalogWiring';
 import { getMedicalCatalogSummary, getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { getAllDiscoveredTools, toolIdAliases } from './sourceCodeToolDiscovery';
@@ -87,7 +89,11 @@ describe('PR3 consistency — registry, NLU, and chat config alignment', () => {
       const nlu = clinicalIntentTools.find((t) => t.toolId === id);
       expect(nlu, `clinicalIntentTools missing ${id}`).toBeTruthy();
       if (!nlu) throw new Error(`clinicalIntentTools missing ${id}`);
-      expect(nlu.backendExecutable).toBe(false);
+      // grace-acs and canadian-c-spine are real registerTool() backend executors, so
+      // backendExecutable is true for them; nihss/ottawa-ankle have no backend executor.
+      expect(nlu.backendExecutable).toBe(
+        (ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS as readonly string[]).includes(id)
+      );
       expect(nlu.sidebarToolId).toBe(id);
       expect(nlu.path).toBe(PR3_HUB_PATH);
     }
@@ -195,7 +201,11 @@ describe('PR3 consistency — catalog, discovery, and searchability', () => {
       expect(row.chatOnlyForm).toBe(true);
       expect(row.uiCalculatorSlug).toBeNull();
       expect(row.pagePath).toBe(PR3_HUB_PATH);
-      expect(row.backendExecutor).toBe(false);
+      // grace-acs and canadian-c-spine are real registerTool() backend executors, so
+      // backendExecutor is true for them; nihss/ottawa-ankle have no backend executor.
+      expect(row.backendExecutor).toBe(
+        (ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS as readonly string[]).includes(id)
+      );
     }
   });
 
@@ -236,8 +246,12 @@ describe('PR3 consistency — resolveCatalogLaunch, routes, sidebar, deep links'
       const fromNlu = resolveCatalogLaunch(id);
       expect(fromId.path).toBe(PR3_HUB_PATH);
       expect(fromId.registryId).toBe(id);
-      expect(fromId.openLabel).toBe('Start guided chat');
-      expect(fromId.orchestratorTool).toBeNull();
+      // grace-acs and canadian-c-spine are now real registerTool() backend executors
+      // (Tier C / backend-backed): openLabel is 'Open' with a real orchestratorTool id;
+      // nihss/ottawa-ankle remain chat-only (no backend executor).
+      const expectedOrchestratorTool = REGISTRY_ID_TO_ORCHESTRATOR_TOOL[id] ?? null;
+      expect(fromId.openLabel).toBe(expectedOrchestratorTool ? 'Open' : 'Start guided chat');
+      expect(fromId.orchestratorTool).toBe(expectedOrchestratorTool);
       expect(fromNlu.chatSeed.length).toBeGreaterThan(80);
     }
   });

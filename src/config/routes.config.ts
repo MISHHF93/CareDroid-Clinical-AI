@@ -636,6 +636,16 @@ export const CANONICAL_PILOT_VISIBLE_NAV_IDS = Object.freeze([
   'audit',
   'ai-center',
   'admin',
+  // Curated for triage_nurse/registered_nurse/charge_nurse/quality_safety_officer/
+  // hospital_admin/ed_director/super_admin in HOSPITAL_ROLE_NAV_IDS but previously
+  // absent from both this ceiling and CANONICAL_PILOT_EXTENSION_NAV_IDS — an
+  // oversight that silently stripped a role's own curated nav item, not an
+  // intentional entitlement gate (unlike 'fleet', which IS a deliberate extension
+  // surface — see CANONICAL_PILOT_EXTENSION_NAV_IDS — and is deliberately left out here).
+  'triage',
+  'hospital-map',
+  'predictive-analytics',
+  'executive',
 ]);
 
 export const CANONICAL_PILOT_EXTENSION_NAV_IDS = Object.freeze([
@@ -982,7 +992,7 @@ export const CANONICAL_ROUTE_MAP = Object.freeze([
     emergencyRoles: ['admin', 'ed_manager', 'charge_nurse', 'triage_nurse'],
     navigationGroup: 'Clinical',
     priority: 55,
-    icon: 'stethoscope',
+    icon: 'triage-priority',
     activePaths: [CANONICAL_ROUTES.triage, `${CANONICAL_ROUTES.triage}?queue=pretriage`],
     breadcrumbs: ['Clinical', 'Triage'],
     helpTopicId: 'triage',
@@ -1296,7 +1306,7 @@ export const CANONICAL_ROUTE_MAP = Object.freeze([
     allowedRoles: ['super_admin', 'hospital_admin', 'ed_director', 'charge_nurse', 'emergency_physician', 'attending_physician', 'quality_safety_officer', 'patient_flow_coordinator'],
     navigationGroup: 'Intelligence',
     priority: 148,
-    icon: 'activity',
+    icon: 'predictive-trend',
     emergencySafe: false,
     readOnlyAllowed: true,
     breadcrumbs: ['Intelligence', 'Predictive AI'],
@@ -1360,15 +1370,14 @@ export const CANONICAL_ROUTE_MAP = Object.freeze([
     id: 'laboratory',
     path: CANONICAL_ROUTES.laboratory,
     label: 'Laboratory',
-    description: 'Laboratory route represented through Diagnostics in the current ED workflow.',
-    pageComponent: 'FullJourneyOperatingPage',
+    description: 'Laboratory results dashboard — specimen tracking, pending orders, and critical values.',
+    pageComponent: 'LaboratoryDashboard',
     requiredPermissions: [P.LABS_READ],
     allowedRoles: ['super_admin', 'ed_director', 'charge_nurse', 'emergency_physician', 'attending_physician', 'resident_physician', 'lab_technician', 'pharmacist'],
     navigationGroup: 'Clinical',
     priority: 290,
     icon: 'stethoscope',
     readOnlyAllowed: true,
-    redirectTo: CANONICAL_ROUTES.emergencyDiagnostics,
     breadcrumbs: ['Clinical', 'Laboratory'],
     helpTopicId: 'diagnostics',
     workflowOwner: 'Laboratory',

@@ -58,7 +58,7 @@ const clinicalIntentToolsRaw = [
     sidebarToolId: 'news2',
     chatSeed:
       'Help me calculate and interpret NEWS2 from respiratory rate, SpO₂ (and which SpO₂ scale), oxygen use, blood pressure, pulse, consciousness, and temperature.',
-    backendExecutable: false,
+    backendExecutable: true,
   },
   {
     toolId: 'child-pugh',
@@ -82,7 +82,7 @@ const clinicalIntentToolsRaw = [
     sidebarToolId: 'has-bled',
     chatSeed:
       'Help me score HAS-BLED for bleeding risk: hypertension, renal/liver dysfunction, stroke, bleeding history, labile INR, age over 65, predisposing drugs, and alcohol.',
-    backendExecutable: false,
+    backendExecutable: true,
   },
   {
     toolId: 'meld',
@@ -118,7 +118,7 @@ const clinicalIntentToolsRaw = [
     sidebarToolId: 'timi-ua-nstemi',
     chatSeed:
       'Help me calculate the TIMI risk score for UA/NSTEMI using age, risk factors, known CAD, aspirin use, angina severity, ST deviation, and cardiac markers.',
-    backendExecutable: false,
+    backendExecutable: true,
   },
   {
     toolId: 'ascvd-risk',
@@ -142,7 +142,7 @@ const clinicalIntentToolsRaw = [
     sidebarToolId: REGISTRY.dukeTreadmillScore,
     chatSeed:
       'Help me calculate the Duke Treadmill Score from exercise duration, ST-segment deviation, and exercise angina index. Decision support only; do not use for unstable ACS, uninterpretable ECG, or treatment/disposition decisions.',
-    backendExecutable: false,
+    backendExecutable: true,
   },
   {
     toolId: NLU.reynoldsRiskScore,
@@ -154,7 +154,7 @@ const clinicalIntentToolsRaw = [
     sidebarToolId: REGISTRY.reynoldsRiskScore,
     chatSeed:
       'Help me review Reynolds Risk Score inputs (age, sex, blood pressure, cholesterol, hs-CRP, smoking, parental MI, diabetes/HbA1c where applicable). Clinical decision support only; do not recommend statins, aspirin, or blood pressure therapy.',
-    backendExecutable: false,
+    backendExecutable: true,
   },
   {
     toolId: NLU.hcmSuddenDeathRisk,
@@ -178,7 +178,7 @@ const clinicalIntentToolsRaw = [
     sidebarToolId: REGISTRY.chads2,
     chatSeed:
       'Help me calculate CHADS2 for atrial fibrillation stroke-risk context using CHF, hypertension, age 75 or older, diabetes, and prior stroke/TIA. Clinical decision support only; do not recommend anticoagulation or medication changes.',
-    backendExecutable: false,
+    backendExecutable: true,
   },
   {
     toolId: NLU.heartFailureStaging,
@@ -238,7 +238,7 @@ const clinicalIntentToolsRaw = [
     sidebarToolId: REGISTRY.fena,
     chatSeed:
       'Help me calculate FeNa from serum sodium, urine sodium, serum creatinine, and urine creatinine. Clinical decision support only; discuss limitations with diuretics, CKD, sepsis, contrast, and non-oliguric states, and do not recommend fluids, diuretics, or dialysis.',
-    backendExecutable: false,
+    backendExecutable: true,
   },
   {
     toolId: NLU.feurea,
@@ -250,7 +250,7 @@ const clinicalIntentToolsRaw = [
     sidebarToolId: REGISTRY.feurea,
     chatSeed:
       'Help me calculate FeUrea from BUN, urine urea nitrogen, serum creatinine, and urine creatinine. Clinical decision support only; discuss limitations and do not diagnose AKI etiology or recommend fluids, diuretics, or dialysis.',
-    backendExecutable: false,
+    backendExecutable: true,
   },
   {
     toolId: NLU.kfre,
@@ -286,7 +286,7 @@ const clinicalIntentToolsRaw = [
     sidebarToolId: REGISTRY.correctedSodium,
     chatSeed:
       'Help me calculate corrected sodium from measured sodium and glucose. Clinical decision support only; do not recommend hypertonic saline, insulin, free water, sodium correction rate, or monitoring frequency.',
-    backendExecutable: false,
+    backendExecutable: true,
   },
   {
     toolId: NLU.freeWaterDeficit,
@@ -310,7 +310,7 @@ const clinicalIntentToolsRaw = [
     sidebarToolId: REGISTRY.osmolalGap,
     chatSeed:
       'Help me calculate the osmolal gap from measured osmolality, sodium, glucose, BUN, and ethanol if available. Clinical decision support only; do not diagnose toxic alcohol ingestion or recommend antidotes, dialysis, or disposition.',
-    backendExecutable: false,
+    backendExecutable: true,
   },
   {
     toolId: NLU.homaIr,
@@ -334,7 +334,7 @@ const clinicalIntentToolsRaw = [
     sidebarToolId: REGISTRY.correctedCalcium,
     chatSeed:
       'Help me calculate corrected calcium from measured total calcium and albumin. Clinical decision support only; discuss ionized calcium limitations and do not diagnose hypocalcemia or hypercalcemia, and do not recommend calcium, vitamin D, bisphosphonate, calcitonin, dialysis, or medication changes.',
-    backendExecutable: false,
+    backendExecutable: true,
   },
   {
     toolId: NLU.serumOsmolality,
@@ -346,7 +346,7 @@ const clinicalIntentToolsRaw = [
     sidebarToolId: REGISTRY.serumOsmolality,
     chatSeed:
       'Help me calculate serum osmolality from sodium, glucose, BUN, and ethanol if available. Clinical decision support only; do not diagnose DKA, HHS, toxic ingestion, or hyperosmolar state, and do not recommend insulin, fluids, dialysis, or disposition.',
-    backendExecutable: false,
+    backendExecutable: true,
   },
   {
     toolId: NLU.bsa,
@@ -442,7 +442,7 @@ const clinicalIntentToolsRaw = [
     sidebarToolId: REGISTRY.aaGradient,
     chatSeed:
       'Help me calculate the A-a gradient from age, FiO2, PaO2, PaCO2, atmospheric pressure, and respiratory quotient. Clinical decision support only; verify ABG quality and do not diagnose PE, shunt, V/Q mismatch, or respiratory failure.',
-    backendExecutable: false,
+    backendExecutable: true,
   },
   {
     toolId: NLU.pao2Fio2Ratio,
@@ -454,7 +454,7 @@ const clinicalIntentToolsRaw = [
     sidebarToolId: REGISTRY.pao2Fio2Ratio,
     chatSeed:
       'Help me calculate the PaO2/FiO2 ratio from PaO2 and FiO2. Clinical decision support only; do not diagnose ARDS and do not recommend oxygen device, ventilator settings, intubation, ICU admission, or disposition.',
-    backendExecutable: false,
+    backendExecutable: true,
   },
   {
     toolId: NLU.roxIndex,
@@ -466,7 +466,7 @@ const clinicalIntentToolsRaw = [
     sidebarToolId: REGISTRY.roxIndex,
     chatSeed:
       'Help me calculate the ROX Index from SpO2, FiO2, and respiratory rate for monitoring context. Clinical decision support only; use serial reassessment and local escalation policy, and do not recommend intubation, NIV, ICU admission, or oxygen device changes.',
-    backendExecutable: false,
+    backendExecutable: true,
   },
   {
     toolId: NLU.pneumoniaSeverityIndex,
@@ -742,7 +742,7 @@ After collecting answers, report the total HEART score, risk category (low 0–3
 - Clinical decision support and risk stratification only — not a diagnosis of ACS or myocardial infarction
 - Does not rule in or rule out acute coronary syndrome
 - Do not recommend specific treatment, anticoagulation, disposition, observation duration, or invasive strategy`,
-    backendExecutable: false,
+    backendExecutable: true,
   },
   {
     toolId: 'abcd2',
@@ -764,7 +764,7 @@ Collect at the time of the TIA:
 5) Diabetes (1 point)
 
 Report total score (0–7), risk category (low 0–3, moderate 4–5, high 6–7), and validation-cohort stroke-risk context. Clearly state this is TIA/stroke risk stratification only — does not diagnose TIA or stroke and does not recommend antithrombotic therapy, admission, or imaging timing.`,
-    backendExecutable: false,
+    backendExecutable: true,
   },
   {
     toolId: NLU.huntHessScale,
@@ -776,7 +776,7 @@ Report total score (0–7), risk category (low 0–3, moderate 4–5, high 6–7
     sidebarToolId: REGISTRY.huntHessScale,
     chatSeed:
       'Help me document Hunt-Hess clinical grade for suspected aneurysmal subarachnoid hemorrhage. Clinical decision support only; do not diagnose SAH, do not recommend aneurysm treatment, and do not delay emergency neuroimaging, airway/hemodynamic support, or neurosurgical consultation.',
-    backendExecutable: false,
+    backendExecutable: true,
   },
   {
     toolId: NLU.ichScore,
@@ -788,7 +788,7 @@ Report total score (0–7), risk category (low 0–3, moderate 4–5, high 6–7
     sidebarToolId: REGISTRY.ichScore,
     chatSeed:
       'Help me calculate ICH Score from GCS, hematoma volume, intraventricular hemorrhage, infratentorial origin, and age. Clinical decision support only; do not diagnose hemorrhage type, do not recommend BP targets, reversal, surgery, transfer, or disposition, and do not delay emergency imaging or stroke/neurosurgery pathways.',
-    backendExecutable: false,
+    backendExecutable: true,
   },
   {
     toolId: NLU.fourScore,
@@ -800,7 +800,7 @@ Report total score (0–7), risk category (low 0–3, moderate 4–5, high 6–7
     sidebarToolId: REGISTRY.fourScore,
     chatSeed:
       'Help me document FOUR Score components: eye response, motor response, brainstem reflexes, and respiration. Clinical decision support only; do not diagnose coma cause, brain death, or prognosis, and do not delay airway, ventilation, seizure, trauma, stroke, or neurocritical-care evaluation.',
-    backendExecutable: false,
+    backendExecutable: true,
   },
   {
     toolId: NLU.modifiedRankinScale,
@@ -812,7 +812,7 @@ Report total score (0–7), risk category (low 0–3, moderate 4–5, high 6–7
     sidebarToolId: REGISTRY.modifiedRankinScale,
     chatSeed:
       'Help me document modified Rankin Scale level from functional status and dependence. Clinical decision support only; outcome documentation only, not a diagnosis and not an acute treatment, discharge, rehab, or placement recommendation. Do not delay urgent evaluation for new or worsening neurologic deficits to complete this outcome score.',
-    backendExecutable: false,
+    backendExecutable: true,
   },
   {
     toolId: NLU.nihssSummaryView,
@@ -1188,7 +1188,7 @@ Use conventional units: age (years), AST and ALT (U/L), platelets (×10⁹/L). I
     sidebarToolId: 'framingham-risk',
     chatSeed:
       'Help me estimate 10-year hard CHD risk using Framingham point tables (age, sex, lipids, blood pressure, smoking).',
-    backendExecutable: false,
+    backendExecutable: true,
   },
   {
     toolId: 'shock-index',
@@ -1198,7 +1198,7 @@ Use conventional units: age (years), AST and ALT (U/L), platelets (×10⁹/L). I
     path: '/tools/calculators/shock-index',
     sidebarToolId: 'shock-index',
     chatSeed: 'Help me calculate shock index from heart rate and systolic blood pressure.',
-    backendExecutable: false,
+    backendExecutable: true,
   },
   {
     toolId: 'anion-gap',
@@ -1209,7 +1209,7 @@ Use conventional units: age (years), AST and ALT (U/L), platelets (×10⁹/L). I
     sidebarToolId: 'anion-gap',
     chatSeed:
       'Help me calculate an anion gap from sodium, chloride, bicarbonate, and optional albumin.',
-    backendExecutable: false,
+    backendExecutable: true,
   },
   {
     toolId: 'rass',
@@ -1279,7 +1279,7 @@ Use conventional units: age (years), AST and ALT (U/L), platelets (×10⁹/L). I
     sidebarToolId: 'apache2-calculator',
     chatSeed:
       'Open APACHE II and help me score acute physiology, GCS, age, and chronic health using validated APACHE II point bands. Clinical decision support only. Do not estimate mortality without diagnosis-specific validated context.',
-    backendExecutable: false,
+    backendExecutable: true,
   },
   {
     toolId: 'cha2ds2vasc-calculator',
@@ -1289,7 +1289,7 @@ Use conventional units: age (years), AST and ALT (U/L), platelets (×10⁹/L). I
       'Stroke risk in non-valvular atrial fibrillation — clinical decision support only; does not recommend starting, stopping, or switching anticoagulation.',
     path: '/tools/calculators/chads2vasc',
     sidebarToolId: 'calc-chads2vasc',
-    backendExecutable: false,
+    backendExecutable: true,
   },
   {
     toolId: 'curb65-calculator',
@@ -1313,7 +1313,7 @@ Use conventional units: age (years), AST and ALT (U/L), platelets (×10⁹/L). I
     sidebarToolId: 'gcs-calculator',
     chatSeed:
       'Open the Glasgow Coma Scale calculator and help me score eye, verbal, and motor responses. Clinical decision support only; not a diagnosis.',
-    backendExecutable: false,
+    backendExecutable: true,
   },
   {
     toolId: NLU.mews,
@@ -1325,7 +1325,7 @@ Use conventional units: age (years), AST and ALT (U/L), platelets (×10⁹/L). I
     sidebarToolId: REGISTRY.mews,
     chatSeed:
       'Open MEWS and help me calculate an adult early-warning score from respiratory rate, heart rate, systolic blood pressure, temperature, and AVPU. Clinical decision support only; not a diagnosis.',
-    backendExecutable: false,
+    backendExecutable: true,
   },
   {
     toolId: NLU.revisedTraumaScore,
@@ -1337,7 +1337,7 @@ Use conventional units: age (years), AST and ALT (U/L), platelets (×10⁹/L). I
     sidebarToolId: REGISTRY.revisedTraumaScore,
     chatSeed:
       'Open Revised Trauma Score and help me calculate weighted RTS from GCS, systolic blood pressure, and respiratory rate. Clinical decision support only; trauma pathways take priority.',
-    backendExecutable: false,
+    backendExecutable: true,
   },
   {
     toolId: NLU.pews,
@@ -1383,7 +1383,7 @@ Then summarize entered findings, calculate the Wells DVT score, explain likely/u
     path: wellsPeChatConfig.hubPath,
     sidebarToolId: wellsPeChatConfig.registryId,
     chatSeed: wellsPeChatConfig.chatSeed,
-    backendExecutable: false,
+    backendExecutable: true,
   },
   {
     toolId: percChatConfig.toolId,
@@ -1403,7 +1403,7 @@ Then summarize entered findings, calculate the Wells DVT score, explain likely/u
     path: graceAcsChatConfig.hubPath,
     sidebarToolId: graceAcsChatConfig.registryId,
     chatSeed: graceAcsChatConfig.chatSeed,
-    backendExecutable: false,
+    backendExecutable: true,
   },
   {
     toolId: nihssChatConfig.toolId,
@@ -1423,7 +1423,7 @@ Then summarize entered findings, calculate the Wells DVT score, explain likely/u
     path: canadianCSpineChatConfig.hubPath,
     sidebarToolId: canadianCSpineChatConfig.registryId,
     chatSeed: canadianCSpineChatConfig.chatSeed,
-    backendExecutable: false,
+    backendExecutable: true,
   },
   {
     toolId: ottawaAnkleChatConfig.toolId,
@@ -1443,7 +1443,7 @@ Then summarize entered findings, calculate the Wells DVT score, explain likely/u
     path: pecarnHeadChatConfig.hubPath,
     sidebarToolId: pecarnHeadChatConfig.registryId,
     chatSeed: pecarnHeadChatConfig.chatSeed,
-    backendExecutable: false,
+    backendExecutable: true,
   },
   {
     toolId: nexusCSpineChatConfig.toolId,
@@ -1453,7 +1453,7 @@ Then summarize entered findings, calculate the Wells DVT score, explain likely/u
     path: nexusCSpineChatConfig.hubPath,
     sidebarToolId: nexusCSpineChatConfig.registryId,
     chatSeed: nexusCSpineChatConfig.chatSeed,
-    backendExecutable: false,
+    backendExecutable: true,
   },
   {
     toolId: copdGoldChatConfig.toolId,

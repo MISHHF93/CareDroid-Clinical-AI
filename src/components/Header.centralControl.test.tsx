@@ -24,14 +24,12 @@ function renderHeader() {
   );
 }
 
-describe('Header flat chrome (app-chrome-top)', () => {
-  it('renders identity, search, create, and account only', () => {
+describe('Header chrome (caredroid-header)', () => {
+  it('renders identity, search, create, and account', () => {
     renderHeader();
 
     const header = screen.getByRole('banner');
-    expect(header).toHaveClass('app-chrome-top');
-    expect(header).toHaveAttribute('data-header-layout', 'minimal');
-    expect(within(header).queryByText('CD')).toBeNull();
+    expect(header).toHaveClass('caredroid-header');
     expect(
       within(header).getByRole('searchbox', { name: /operational search|patient search/i }),
     ).toBeInTheDocument();
@@ -55,14 +53,14 @@ describe('Header flat chrome (app-chrome-top)', () => {
     expect(header.querySelector('.help-trigger--icon')).toBeNull();
   });
 
-  it('places search before create in the header DOM', () => {
+  it('places create before search in the header DOM', () => {
     renderHeader();
 
     const header = screen.getByRole('banner');
     const search = within(header).getByRole('searchbox');
     const create = within(header).getByRole('button', { name: /create patient/i });
     expect(
-      Boolean(search.compareDocumentPosition(create) & Node.DOCUMENT_POSITION_FOLLOWING),
+      Boolean(create.compareDocumentPosition(search) & Node.DOCUMENT_POSITION_FOLLOWING),
     ).toBe(true);
   });
 });

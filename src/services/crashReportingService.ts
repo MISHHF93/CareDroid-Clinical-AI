@@ -112,6 +112,7 @@ class CrashReportingService {
       window.localStorage.setItem(SESSION_KEY, generated);
       return generated;
     } catch {
+      // Expected when localStorage is unavailable (SSR, privacy mode) — return fallback ID.
       return `session-${Date.now()}`;
     }
   }
@@ -123,8 +124,10 @@ class CrashReportingService {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-    } catch {
-      logger.debug('Crash payload retained locally; backend ingest unavailable');
+    } catch (error) {
+      logger.debug('Crash payload retained locally; backend ingest unavailable', {
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
   }
 }

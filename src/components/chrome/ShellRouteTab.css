@@ -26,7 +26,7 @@
 
 .app-chrome-context__h1 {
   margin: 0;
-  color: var(--medical-ink, #111827);
+  color: var(--app-text-primary, #111827);
   font-size: 15px;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -38,7 +38,7 @@
 
 .app-chrome-context__sub {
   margin: 0;
-  color: var(--medical-ink-muted, #64748b);
+  color: var(--app-text-muted, #64748b);
   font-size: 11.5px;
   line-height: 1.3;
   overflow: hidden;

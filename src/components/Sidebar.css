@@ -312,7 +312,7 @@
   box-shadow: var(--medical-shadow-soft);
   opacity: 0;
   pointer-events: none;
-  z-index: 200;
+  z-index: var(--z-tooltip, 1000);
   transition: opacity var(--motion-transition-fast), transform var(--motion-transition-fast);
 }
 
@@ -406,7 +406,7 @@
     bottom: 0;
     left: 0;
     right: 0;
-    z-index: 50;
+    z-index: var(--z-sidebar, 100);
     flex-direction: row !important;
     width: 100% !important;
     height: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
@@ -428,7 +428,7 @@
     position: fixed;
     top: auto;
     width: 100% !important;
-    z-index: 50;
+    z-index: var(--z-sidebar, 100);
   }
 
   .sidebar__body {
@@ -543,9 +543,9 @@
   .sidebar-more-backdrop {
     position: fixed;
     inset: 0 0 72px;
-    z-index: 49;
+    z-index: var(--z-overlay, 500);
     display: block;
-    background: rgba(17, 24, 39, 0.38);
+    background: var(--app-overlay, rgba(17, 24, 39, 0.38));
     animation: sidebar-backdrop-fade var(--motion-transition-normal) both;
   }
 

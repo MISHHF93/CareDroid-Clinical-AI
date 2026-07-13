@@ -117,6 +117,7 @@ function parseAiPayload(content: string, artifactId: IntakeArtifactId): {
     }
     return { demographics: {}, clinical: parsed };
   } catch {
+    // Expected when AI response JSON is malformed — fall back to text parser.
     const artifact = getIntakeArtifact(artifactId);
     if (artifact.parser === 'identity') {
       return { demographics: parseIdArtifactText(content), clinical: {} };
@@ -197,7 +198,7 @@ async function tryBackendOcrJob(params: {
       fieldCount: job.extractedFields.length,
       confidence: job.overallConfidence,
     };
-  } catch {
+  } catch (error) {
     analyticsService.trackEvent({
       eventName: 'document_ocr_failed',
       parameters: { reason: 'request_error' },
@@ -242,6 +243,7 @@ async function tryAiAssistExtraction(
       '';
     return parseAiPayload(content, artifactId);
   } catch {
+    // Expected when AI extraction fails or backend is unavailable — return empty result.
     return { demographics: {}, clinical: {} };
   }
 }

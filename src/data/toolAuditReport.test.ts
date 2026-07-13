@@ -12,7 +12,7 @@ describe('tool audit report', () => {
 
     expect(data.summary.totalRows).toBeGreaterThanOrEqual(data.summary.registryTools);
     expect(data.tools.length).toBe(data.summary.totalRows);
-    expect(data.summary.postExecutors).toBe(3);
+    expect(data.summary.postExecutors).toBe(37);
 
     for (const row of data.tools) {
       expect(row.toolId).toBeTruthy();

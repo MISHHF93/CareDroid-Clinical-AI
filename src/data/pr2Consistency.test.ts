@@ -15,6 +15,7 @@ import {
   PR2_TIER_B_CHAT_CALCULATOR_IDS,
   PR2_MELD_CALCULATOR_REGISTRY_IDS,
   PR2_TIMI_CALCULATOR_REGISTRY_IDS,
+  ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS,
 } from './clinicalCatalogWiring';
 import { getMedicalCatalogSummary, getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { getAllDiscoveredTools, toolIdAliases } from './sourceCodeToolDiscovery';
@@ -54,13 +55,18 @@ describe('PR2 consistency — centralized audit lists', () => {
 });
 
 describe('PR2 consistency — registry, NLU, and builtin alignment', () => {
-  it('keeps registry, NLU profile, and backendExecutable false for each PR2 tool', () => {
+  it('keeps registry, NLU profile alignment for each PR2 tool, backendExecutable matching real executor registration', () => {
     for (const id of PR2_CALCULATOR_REGISTRY_IDS) {
       expect(toolRegistryById[id], `toolRegistry missing ${id}`).toBeTruthy();
       const nlu = clinicalIntentTools.find((t) => t.toolId === id);
       expect(nlu, `clinicalIntentTools missing ${id}`).toBeTruthy();
       if (!nlu) throw new Error(`expected clinicalIntentTools to include ${id}`);
-      expect(nlu.backendExecutable).toBe(false);
+      // timi-ua-nstemi and wells-pe are real registerTool() backend executors, so
+      // backendExecutable is true for them; meld/meld-na/perc have no backend executor.
+      const expectedBackendExecutable = (ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS as readonly string[]).includes(
+        id
+      );
+      expect(nlu.backendExecutable).toBe(expectedBackendExecutable);
       expect(nlu.sidebarToolId).toBe(id);
     }
   });

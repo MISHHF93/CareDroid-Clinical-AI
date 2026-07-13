@@ -6,6 +6,7 @@ import {
   ENDOCRINE_METABOLIC_TIER_A_CALCULATOR_REGISTRY_IDS,
   ENDOCRINE_METABOLIC_TIER_B_CHAT_REGISTRY_IDS,
   REGISTRY,
+  REGISTRY_ID_TO_ORCHESTRATOR_TOOL,
 } from './clinicalToolIdContract';
 import { resolveCatalogLaunch } from './clinicalCatalogWiring';
 import { getCanonicalToolInventory, getToolInventoryById } from './toolInventory';
@@ -43,7 +44,12 @@ describe('Endocrine and Metabolic Tools Pack', () => {
       const launch = resolveCatalogLaunch(id);
       const calculatorSlug = inventoryById[id]?.calculatorSlug;
       expect(launch.path).toMatch(/^\/tools\/calculators\//);
-      expect(launch.orchestratorTool).toBeNull();
+      const expectedOrchestratorTool = REGISTRY_ID_TO_ORCHESTRATOR_TOOL[id] || null;
+      if (expectedOrchestratorTool) {
+        expect(launch.orchestratorTool).toBe(expectedOrchestratorTool);
+      } else {
+        expect(launch.orchestratorTool).toBeNull();
+      }
       expect(calculatorSlug).toBeTruthy();
       expect(builtinSlugs.has(calculatorSlug)).toBe(true);
       expect(smokeSlugs.has(calculatorSlug)).toBe(true);

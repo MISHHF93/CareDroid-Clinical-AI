@@ -118,7 +118,13 @@ describe('canonical tool inventory', () => {
       expect(record.launchType).toBe(TOOL_LAUNCH_TYPES.BACKEND_BACKED);
       expect(record.executorStatus).toBe(TOOL_EXECUTOR_STATUS.REGISTERED);
       expect(record.route, record.id).toBeTruthy();
-      expect(record.component, record.id).toBeTruthy();
+      // Backend-executed tools that only have a chat-assisted invocation (no
+      // dedicated calculator form/slug) render through the hub/chat surface
+      // and have no dedicated per-tool component; tools with a calculatorSlug
+      // always resolve a concrete component (see componentFor in toolInventory.tsx).
+      if (record.calculatorSlug) {
+        expect(record.component, record.id).toBeTruthy();
+      }
       expect(record.endpoint, record.id).toBe(`/api/tools/${record.orchestratorToolId}/execute`);
       expect(record.requestDto, record.id).toContain('ExecuteToolDto');
       expect(record.responseDto, record.id).toContain('ToolExecutionResponseDto');
@@ -138,7 +144,12 @@ describe('canonical tool inventory', () => {
   it('resolves aliases, NLU ids, and registry ids to canonical records', () => {
     for (const [registryId, nluId] of Object.entries(REGISTRY_ID_TO_ORCHESTRATOR_TOOL)) {
       expect(resolveToolInventoryRecord(registryId, records)?.orchestratorToolId).toBe(nluId);
-      expect(resolveToolInventoryRecord(nluId, records)?.id).toBe(registryId);
+      // Some registry ids are legacy alias keys that map to the same orchestrator
+      // tool id as the true canonical registry id (e.g. the literal
+      // 'cha2ds2vasc-calculator' key alongside REGISTRY.calcChads2vasc). Resolving
+      // by nluId always yields the canonical registry id, not the alias.
+      const canonicalRegistryId = ORCHESTRATOR_TO_REGISTRY_ID[nluId] || registryId;
+      expect(resolveToolInventoryRecord(nluId, records)?.id).toBe(canonicalRegistryId);
     }
 
     for (const [nluId, registryId] of Object.entries(ORCHESTRATOR_TO_REGISTRY_ID)) {
@@ -259,12 +270,12 @@ describe('canonical tool inventory', () => {
 
     expect(resolveToolInventoryRecord('nexus-cspine', records)).toMatchObject({
       id: 'nexus-cspine',
-      launchType: TOOL_LAUNCH_TYPES.CHAT_ASSISTED,
+      launchType: TOOL_LAUNCH_TYPES.BACKEND_BACKED,
     });
     expect(resolveToolInventoryRecord('nexus-cspine', records)?.chatSeed).toMatch(/decision support/i);
     expect(getUserFacingToolInventory(records).find((record) => record.id === 'nexus-cspine')).toMatchObject({
       id: 'nexus-cspine',
-      surface: TOOL_SURFACES.CHAT_ASSISTED,
+      surface: TOOL_SURFACES.CALCULATOR_FORM,
     });
 
     expect(resolveToolInventoryRecord('ambient-scribe', records)).toMatchObject({

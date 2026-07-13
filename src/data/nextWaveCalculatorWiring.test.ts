@@ -15,6 +15,9 @@ import { CALCULATOR_INTERFACE_CLASS_BY_SLUG } from './calculatorHubManifest';
 import { CALCULATOR_ROUTE_DEFS, expectedLaunchPath, matchCalculatorRoute } from '../routes/clinicalToolRoutes';
 
 const PR11_TOOL_IDS = [REGISTRY.shockIndex, REGISTRY.anionGap, REGISTRY.rass];
+// Shock Index and Anion Gap were reconciled onto the real 37-tool backend executor
+// list; RASS has no backend executor and remains local-only.
+const PR11_BACKEND_EXECUTOR_IDS = new Set([REGISTRY.shockIndex, REGISTRY.anionGap]);
 
 describe('next-wave Tier A calculators', () => {
   it('registers Shock Index, Anion Gap, and RASS as local Tier A forms', () => {
@@ -25,11 +28,15 @@ describe('next-wave Tier A calculators', () => {
       expect(toolRegistryById[id]?.initialCalc).toBe(id);
       expect(toolRegistryById[id]?.path).toBe(`/tools/calculators/${id}`);
       expect(BUILTIN_CALC_ID_TO_REGISTRY_ID[id]).toBe(id);
-      expect(ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS).not.toContain(id);
+      if (PR11_BACKEND_EXECUTOR_IDS.has(id)) {
+        expect(ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS).toContain(id);
+      } else {
+        expect(ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS).not.toContain(id);
+      }
     }
   });
 
-  it('exposes catalog, route, and form smoke hooks without claiming backend executors', () => {
+  it('exposes catalog, route, and form smoke hooks reflecting current backend-executor status', () => {
     for (const id of PR11_TOOL_IDS) {
       const builtin = builtinUiCalculators.find((calc) => calc.id === id);
     if (!builtin) throw new Error('expected builtin calculator entry to exist');
@@ -41,7 +48,7 @@ describe('next-wave Tier A calculators', () => {
       expect(builtin?.path).toBe(`/tools/calculators/${id}`);
       expect(builtin?.orchestratorId).toBeNull();
       expect(registry?.panelTool).toBe('calculators');
-      expect(nlu?.backendExecutable).toBe(false);
+      expect(nlu?.backendExecutable).toBe(PR11_BACKEND_EXECUTOR_IDS.has(id));
       expect(NLU_PROFILE_TOOL_IDS).toContain(id);
       expect(launch.path).toBe(`/tools/calculators/${id}`);
       expect(CALCULATOR_INTERFACE_CLASS_BY_SLUG[id]).toBe(`calculator-interface--${id}`);

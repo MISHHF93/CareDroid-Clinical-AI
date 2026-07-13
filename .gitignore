@@ -64,6 +64,7 @@ pages-map.txt
 
 # Local agent worktrees / settings
 .claude/
+.bob/
 
 
 # Local health scan outputs

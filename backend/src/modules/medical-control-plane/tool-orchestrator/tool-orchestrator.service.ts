@@ -248,7 +248,10 @@ export class ToolOrchestratorService {
             ...tool.getMetadata(),
             parameters: tool.getSchema(),
           };
-        } catch {
+        } catch (error) {
+          this.logger.warn(
+            `[ToolOrchestrator] Failed to load tool ${toolId}: ${error instanceof Error ? error.message : String(error)}`,
+          );
           return null;
         }
       })
@@ -636,9 +639,7 @@ export class ToolOrchestratorService {
       const surface = honesty?.suggestedSurface
         ? `\n\n_Suggested surface: **${honesty.suggestedSurface}** (not server execute)._`
         : '';
-      const disclaimer = response.result.disclaimer
-        ? `\n\n_${response.result.disclaimer}_`
-        : '';
+      const disclaimer = response.result.disclaimer ? `\n\n_${response.result.disclaimer}_` : '';
       return `❌ **${response.toolName} — not executed**\n\n${errors}${surface}${disclaimer}`;
     }
 

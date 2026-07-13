@@ -23,6 +23,8 @@ import {
   BUILTIN_CALC_ID_TO_REGISTRY_ID,
   PR3_CALCULATOR_REGISTRY_IDS,
   PR3_TIER_B_CHAT_CALCULATOR_IDS,
+  REGISTRY_ID_TO_ORCHESTRATOR_TOOL,
+  ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS,
 } from './clinicalCatalogWiring';
 import { getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { getAllDiscoveredTools, toolIdAliases } from './sourceCodeToolDiscovery';
@@ -84,6 +86,55 @@ const WIRING_CTX = {
   getAllDiscoveredTools,
 };
 
+/**
+ * grace-acs and canadian-c-spine are now real registerTool() backend executors
+ * (Tier C / backend-backed), so their resolveCatalogLaunch/catalog-row behavior diverges from
+ * the "always chat-only, no executor" assumption baked into the shared PR3 matrix helpers
+ * (testHelpers/pr3CoverageMatrix.ts, which stays generic across all four PR3 tools and is not
+ * part of this fix). nihss and ottawa-ankle have no backend executor, so they still go through
+ * the original shared helper unchanged.
+ */
+function assertPr3CatalogRowAware(id, ctx) {
+  const expectedOrchestratorTool = REGISTRY_ID_TO_ORCHESTRATOR_TOOL[id] ?? null;
+  if (!expectedOrchestratorTool) {
+    assertPr3CatalogRow(id, ctx);
+    return;
+  }
+  const rows = ctx.getMedicalToolsCatalogRows().filter((r) => r.primaryId === id);
+  expect(rows, `catalog row count for ${id}`).toHaveLength(1);
+  const row = rows[0];
+  expect(row.source).toMatch(/NLU|toolRegistry/);
+  expect(row.pagePath).toBe('/tools/calculators');
+  expect(row.chatOnlyForm).toBe(true);
+  expect(row.uiCalculatorSlug).toBeNull();
+  expect(row.chatOnRequest).toBe(true);
+  expect(row.backendExecutor).toBe(true);
+  expect(row.chatSeed?.length).toBeGreaterThan(20);
+  expect(row.chatSeed).toBe(ctx.clinicalIntentToolsById[id]?.chatSeed);
+}
+
+function assertPr3AliasResolvesAware(alias, canonical, ctx) {
+  const expectedOrchestratorTool = REGISTRY_ID_TO_ORCHESTRATOR_TOOL[canonical] ?? null;
+  if (!expectedOrchestratorTool) {
+    assertPr3AliasResolves(alias, canonical, ctx);
+    return;
+  }
+  expect(ctx.NLU_TO_REGISTRY_ID[alias], `NLU_TO_REGISTRY_ID[${alias}]`).toBe(canonical);
+  expect(ctx.resolveRegistryId(alias)).toBe(canonical);
+
+  const fromAlias = ctx.resolveCatalogLaunch(alias);
+  const fromCanonical = ctx.resolveCatalogLaunch(canonical);
+  expect(fromAlias.path).toBe('/tools/calculators');
+  expect(fromAlias.registryId).toBe(canonical);
+  expect(fromAlias.path).toBe(fromCanonical.path);
+  expect(fromAlias.registryId).toBe(fromCanonical.registryId);
+  expect(fromAlias.chatSeed).toBe(fromCanonical.chatSeed);
+  expect(fromAlias.chatSeed).toBe(ctx.chatConfigById[canonical].chatSeed);
+  expect(fromAlias.chatSeed?.length).toBeGreaterThan(80);
+  expect(fromAlias.openLabel).toBe('Open');
+  expect(fromAlias.orchestratorTool).toBe(expectedOrchestratorTool);
+}
+
 /** Mirrors pr3Comprehensive PR3_COVERAGE_AREA_LABELS for cross-file consistency. */
 export const PR3_TEN_AREA_LABELS = [
   'registry inclusion',
@@ -138,7 +189,7 @@ describe('PR3 ten-area — 1. registry inclusion', () => {
 
 describe('PR3 ten-area — 2. catalog inclusion', () => {
   it.each(PR3_TOOL_IDS)('medical catalog includes %s as chat-only hub row', (id) => {
-    assertPr3CatalogRow(id, { getMedicalToolsCatalogRows, clinicalIntentToolsById });
+    assertPr3CatalogRowAware(id, { getMedicalToolsCatalogRows, clinicalIntentToolsById });
   });
 
   it.each(PR3_CATALOG_SEARCH_QUERIES)('search "%s" finds %s', (registryId, query) => {
@@ -163,11 +214,11 @@ describe('PR3 ten-area — 3. discovery inclusion', () => {
 
 describe('PR3 ten-area — 4. NLU alias matching', () => {
   it.each(PR3_REQUIRED_NLU_ALIAS_PAIRS)('required alias "%s" → %s', (alias, canonical) => {
-    assertPr3AliasResolves(alias, canonical, ALIAS_CTX);
+    assertPr3AliasResolvesAware(alias, canonical, ALIAS_CTX);
   });
 
   it.each(PR3_NLU_ALIAS_PAIRS)('extended NLU alias "%s" → %s', (alias, canonical) => {
-    assertPr3AliasResolves(alias, canonical, ALIAS_CTX);
+    assertPr3AliasResolvesAware(alias, canonical, ALIAS_CTX);
   });
 
   it('separates stroke scale (NIHSS) from cervical spine aliases', () => {
@@ -178,11 +229,11 @@ describe('PR3 ten-area — 4. NLU alias matching', () => {
 
 describe('PR3 ten-area — 5. resolveCatalogLaunch behavior', () => {
   it.each(PR3_TOOL_IDS)('canonical %s → hub guided chat launch', (id) => {
-    assertPr3AliasResolves(id, id, ALIAS_CTX);
+    assertPr3AliasResolvesAware(id, id, ALIAS_CTX);
   });
 
   it.each(PR3_ALL_ALIAS_PAIRS)('alias "%s" matches canonical %s launch', (alias, canonical) => {
-    assertPr3AliasResolves(alias, canonical, ALIAS_CTX);
+    assertPr3AliasResolvesAware(alias, canonical, ALIAS_CTX);
   });
 
   it.each(PR3_TOOL_IDS)('navigation after launch opens chat for visible chat', (id) => {
@@ -205,7 +256,11 @@ describe('PR3 ten-area — 6. chatSeed presence', () => {
     expect(nlu?.chatSeed).toBe(cfg.chatSeed);
     expect(nlu?.chatSeed).toMatch(/STEP 0/i);
     expect(nlu?.chatSeed?.length).toBeGreaterThan(100);
-    expect(nlu?.backendExecutable).toBe(false);
+    // grace-acs and canadian-c-spine are real registerTool() backend executors, so
+    // backendExecutable is true for them; nihss/ottawa-ankle have no backend executor.
+    expect(nlu?.backendExecutable).toBe(
+      (ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS as readonly string[]).includes(id)
+    );
   });
 
   it.each(PR3_TOOL_IDS)('%s is in nluCalculatorHubOnly', (id) => {

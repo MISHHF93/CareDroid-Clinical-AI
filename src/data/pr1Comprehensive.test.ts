@@ -38,6 +38,7 @@ import {
   NLU_TO_REGISTRY_ID,
   PR1_CALCULATOR_REGISTRY_IDS,
   BUILTIN_CALC_ID_TO_REGISTRY_ID,
+  REGISTRY_ID_TO_ORCHESTRATOR_TOOL,
   resolveRegistryId,
 } from './clinicalCatalogWiring';
 import { getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
@@ -320,7 +321,11 @@ describe('PR1 comprehensive — NLU aliases, routes, resolveCatalogLaunch', () =
     expect(launch.registryId).toBe(id);
     expect(launch.path).not.toBe('/tools/calculators');
     expect(launch.chatSeed?.length).toBeGreaterThan(20);
-    expect(launch.orchestratorTool).toBeNull();
+    // news2 and has-bled are real registerTool() backend executors (see
+    // REGISTRY_ID_TO_ORCHESTRATOR_TOOL), so their launch carries the orchestrator tool id
+    // instead of null; qsofa and child-pugh remain chat-only (no backend executor).
+    const expectedOrchestratorTool = REGISTRY_ID_TO_ORCHESTRATOR_TOOL[id] ?? null;
+    expect(launch.orchestratorTool).toBe(expectedOrchestratorTool);
   });
 
   it.each(PR1_ALL_ALIAS_PAIRS)(

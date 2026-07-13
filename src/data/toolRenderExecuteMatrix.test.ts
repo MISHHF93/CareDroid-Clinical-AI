@@ -32,11 +32,15 @@ describe('toolRenderExecuteMatrix', () => {
       expect(executionModeForRegistry(id)).toBe(EXECUTION_MODES.POST_EXECUTOR);
     }
     expect(executionModeForRegistry('qsofa')).toBe(EXECUTION_MODES.LOCAL_CALCULATOR);
-    expect(executionModeForRegistry('wells-pe')).toBe(EXECUTION_MODES.CHAT_HUB);
+    // wells-pe is now a registered backend executor (Tier C), so it renders
+    // through POST /api/tools/:id/execute rather than the chat hub.
+    expect(executionModeForRegistry('wells-pe')).toBe(EXECUTION_MODES.POST_EXECUTOR);
   });
 
   it('Tier B tools have chat seeds on launch', () => {
-    for (const id of ['wells-pe', 'perc', 'grace-acs', 'dispatch-ai']) {
+    // wells-pe and grace-acs are now registered backend executors (Tier C),
+    // so they're no longer chat-only Tier B samples with a null orchestratorTool.
+    for (const id of ['perc', 'dispatch-ai']) {
       const launch = resolveCatalogLaunch(id);
       expect(launch.chatSeed?.length).toBeGreaterThan(20);
       expect(launch.orchestratorTool).toBeNull();

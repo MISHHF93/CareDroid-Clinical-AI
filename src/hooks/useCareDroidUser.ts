@@ -15,6 +15,7 @@ function readStoredDemoUserId(): string | null {
   try {
     return localStorage.getItem(STORAGE_KEY);
   } catch {
+    // Expected when localStorage is unavailable (SSR, privacy mode).
     return null;
   }
 }
@@ -23,7 +24,7 @@ function writeStoredDemoUserId(id: string): void {
   try {
     localStorage.setItem(STORAGE_KEY, id);
   } catch {
-    // storage unavailable
+    // Expected when localStorage is full or unavailable — demo ID won't persist.
   }
 }
 
@@ -104,7 +105,7 @@ export function useCareDroidUser(): UseCareDroidUserResult {
       try {
         window.dispatchEvent(new CustomEvent('caredroid:demo-user-switched', { detail: compiled }));
       } catch {
-        // no window/event target in tests
+        // Expected when window is unavailable (SSR, test environment).
       }
     },
     [setUser],

@@ -24,7 +24,7 @@ describe('platformInventory', () => {
     expect(c.nluClinicalProfiles).toBe(NLU_PROFILE_TOOL_IDS.length);
     expect(c.builtinCalculatorForms).toBe(builtinUiCalculators.length);
     expect(c.backendPostExecutors).toBe(ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS.length);
-    expect(c.backendPostExecutors).toBe(3);
+    expect(c.backendPostExecutors).toBe(37);
     expect(c.tierACalculators).toBe(CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS.length);
     expect(c.tierBChatAssisted).toBe(CLINICAL_TIER_B_CHAT_REGISTRY_IDS.length);
     expect(c.e2eMatrixRows).toBe(getE2eValidationMatrixDocument().summary.totalRows);

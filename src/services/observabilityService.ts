@@ -27,6 +27,7 @@ function readStorage(key: string): string | null {
   try {
     return sessionStorage.getItem(key);
   } catch {
+    // Expected when sessionStorage is unavailable (SSR, privacy mode, quota).
     return null;
   }
 }
@@ -36,7 +37,7 @@ function writeStorage(key: string, value: string): void {
   try {
     sessionStorage.setItem(key, value);
   } catch {
-    // ignore quota errors
+    // Expected when sessionStorage is full or unavailable — safe to ignore.
   }
 }
 

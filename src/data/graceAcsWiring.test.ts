@@ -52,7 +52,7 @@ describe('GRACE ACS (Tier B chat-assisted) wiring', () => {
     if (!nlu) throw new Error('expected nlu tool entry to exist');
     expect(nlu?.path).toBe('/tools/calculators');
     expect(nlu?.sidebarToolId).toBe(id);
-    expect(nlu?.backendExecutable).toBe(false);
+    expect(nlu?.backendExecutable).toBe(true);
     expect(nluCalculatorHubOnly.some((h) => h.toolId === id)).toBe(true);
     expect(appSource).not.toContain("path: '/tools/calculators/grace-acs'");
   });
@@ -64,8 +64,8 @@ describe('GRACE ACS (Tier B chat-assisted) wiring', () => {
       const launch = resolveCatalogLaunch(alias);
       expect(launch.path).toBe('/tools/calculators');
       expect(launch.registryId).toBe(id);
-      expect(launch.openLabel).toBe('Start guided chat');
-      expect(launch.orchestratorTool).toBeNull();
+      expect(launch.openLabel).toBe('Open');
+      expect(launch.orchestratorTool).toBe(id);
       expect(launch.chatSeed).toMatch(/GRACE ACS/i);
     }
   );

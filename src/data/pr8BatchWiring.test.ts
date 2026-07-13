@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
 import { toolRegistryById } from './toolRegistry';
 import { clinicalIntentTools, builtinUiCalculators } from './clinicalIntentToolCatalog';
+import { ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS } from './clinicalToolIdContract';
 import {
   resolveCatalogLaunch,
   PR8_TIER_A_CALCULATOR_REGISTRY_IDS,
@@ -54,7 +55,10 @@ describe('PR8 Tier-A calculator batch wiring', () => {
     if (!nlu) throw new Error('expected nlu tool entry to exist');
     expect(nlu?.path).toBe(`/tools/calculators/${id}`);
     expect(nlu?.sidebarToolId).toBe(id);
-    expect(nlu?.backendExecutable).toBe(false);
+    // heart-score and framingham-risk are now registered backend executors
+    // (see ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS); the rest of the PR8 batch
+    // remain local-only calculators with no real backend executor.
+    expect(nlu?.backendExecutable).toBe(ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS.includes(id));
 
     const builtin = builtinUiCalculators.find((c) => c.id === id);
     if (!builtin) throw new Error('expected builtin calculator entry to exist');

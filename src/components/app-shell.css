@@ -7,7 +7,7 @@
   height: var(--app-viewport-height, 100dvh);
   max-height: var(--app-viewport-height, 100dvh);
   overflow: hidden;
-  background: #ffffff;
+  background: var(--app-surface-0, #ffffff);
   color: var(--ed-text-primary, var(--medical-ink));
   font-family: var(--app-font-family-body, Inter, system-ui, sans-serif);
 }
@@ -28,9 +28,9 @@
   position: fixed;
   inset-block-start: var(--space-2, 8px);
   inset-inline-start: var(--space-2, 8px);
-  z-index: var(--z-toast, 1200);
+  z-index: var(--z-toast, 900);
   padding: var(--space-2, 8px) var(--space-3, 12px);
-  border: 1px solid #374151);
+  border: 1px solid var(--app-text-secondary, #374151);
   border-radius: var(--radius-md, 8px);
   background: var(--color-elevated, var(--app-surface-1, #ffffff));
   color: var(--color-text-primary, var(--medical-ink, #111827));
@@ -44,7 +44,7 @@
 .ed-skip-link:focus,
 .ed-skip-link:focus-visible {
   transform: translateY(0);
-  outline: 2px solid #374151);
+  outline: 2px solid var(--app-text-secondary, #374151);
   outline-offset: 2px;
 }
 
@@ -97,7 +97,7 @@
   box-shadow: 0 1px 0 color-mix(in srgb, var(--medical-border, #e2e8f0) 55%, transparent);
   overflow: visible;
   position: relative;
-  z-index: 30;
+  z-index: var(--z-header, 200);
 }
 
 .app-chrome .app-chrome-top {
@@ -111,7 +111,7 @@
   border: 0;
   border-bottom: 0;
   box-shadow: none;
-  background: #ffffff;
+  background: var(--app-surface-1, #ffffff);
 }
 
 /* Keep chrome from eating the scrollport (alarms float outside this chain) */
@@ -139,7 +139,7 @@
 }
 
 .emergency-app-shell .app-shell-main-content {
-  background: #ffffff;
+  background: var(--app-surface-0, #ffffff);
 }
 
 .emergency-app-shell--copilot-open .emergency-app-shell__main-column {

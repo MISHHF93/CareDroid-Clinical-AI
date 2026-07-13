@@ -226,12 +226,12 @@ export const animation = {
 
 export const layout = {
   sidebar: {
-    width: '260px',
-    collapsedWidth: '64px',
+    width: '232px',
+    collapsedWidth: '56px',
   },
   header: {
-    height: '56px',
-    workspaceHeight: '48px',
+    height: '52px',
+    workspaceHeight: '44px',
     commandBarHeight: '40px',
   },
   content: {

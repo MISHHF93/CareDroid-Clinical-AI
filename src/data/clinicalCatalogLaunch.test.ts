@@ -258,12 +258,20 @@ describe('resolveCatalogLaunch — Tier B chat-assisted (calculators hub)', () =
       const nlu = clinicalIntentTools.find(
         (t) => t.toolId === registryId || t.sidebarToolId === registryId
       );
+      // Tools with a real backend executor (see REGISTRY_ID_TO_ORCHESTRATOR_TOOL) resolve
+      // openLabel 'Open' and a non-null orchestratorTool instead of the old chat-only values.
+      const isBackendExecutor = Boolean(REGISTRY_ID_TO_ORCHESTRATOR_TOOL[registryId]);
       expect(launch.path).toBe(HUB);
       expect(launch.registryId).toBe(registryId);
       expect(launch.chatSeed).toBe(nlu?.chatSeed);
       expect(launch.chatSeed?.length).toBeGreaterThan(40);
-      expect(launch.openLabel).toMatch(/guided chat|Try in chat/i);
-      expect(launch.orchestratorTool).toBeNull();
+      if (isBackendExecutor) {
+        expect(launch.openLabel).toBe('Open');
+        expect(launch.orchestratorTool).toBe(REGISTRY_ID_TO_ORCHESTRATOR_TOOL[registryId]);
+      } else {
+        expect(launch.openLabel).toMatch(/guided chat|Try in chat/i);
+        expect(launch.orchestratorTool).toBeNull();
+      }
     }
   );
 
@@ -302,7 +310,9 @@ describe('resolveCatalogLaunch — NLU hub-only scores', () => {
     const nlu = clinicalIntentToolsById[toolId];
     expect(launch.path).toBe(HUB);
     expect(launch.chatSeed).toBe(nlu?.chatSeed);
-    expect(launch.orchestratorTool).toBeNull();
+    // Tools with a real backend executor now resolve their own tool id instead of null.
+    const expectedOrchestratorTool = REGISTRY_ID_TO_ORCHESTRATOR_TOOL[toolId] || null;
+    expect(launch.orchestratorTool).toBe(expectedOrchestratorTool);
   });
 
   it('resolves apache2 alias via the dedicated calculator route', () => {
@@ -315,16 +325,24 @@ describe('resolveCatalogLaunch — NLU hub-only scores', () => {
 
 describe('resolveCatalogLaunch — invalid orchestrator requests', () => {
   it('never assigns orchestratorTool for invalid POST ids', () => {
+    // wells-pe now has a real backend executor (REGISTRY_ID_TO_ORCHESTRATOR_TOOL) — use
+    // perc instead, a Tier B chat-assisted calculator with no registered executor, to keep
+    // testing that non-executor ids never get an orchestratorTool assigned.
     expect(resolveCatalogLaunch('qsofa').orchestratorTool).toBeNull();
-    expect(resolveCatalogLaunch('wells-pe').orchestratorTool).toBeNull();
+    expect(resolveCatalogLaunch('perc').orchestratorTool).toBeNull();
     expect(resolveOrchestratorToolForLaunch('qsofa', 'qsofa', true)).toBeNull();
   });
 });
 
 describe('resolveCatalogLaunch — Tier C orchestrator (registered executors only)', () => {
   it('maps only registered NLU ids through REGISTRY_ID_TO_ORCHESTRATOR_TOOL', () => {
-    expect(Object.values(REGISTRY_ID_TO_ORCHESTRATOR_TOOL).sort()).toEqual(
-      [...ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS].sort()
+    // Some registry ids alias to the same registered executor (e.g. the legacy
+    // 'calc-chads2vasc' id and the canonical 'cha2ds2vasc-calculator' id both map to
+    // NLU.cha2ds2vascCalculator), so REGISTRY_ID_TO_ORCHESTRATOR_TOOL's values can contain
+    // duplicates. Compare the deduplicated value set against the registered id list instead
+    // of requiring a strict 1:1 mapping.
+    expect(new Set(Object.values(REGISTRY_ID_TO_ORCHESTRATOR_TOOL))).toEqual(
+      new Set(ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS)
     );
   });
 
@@ -352,7 +370,10 @@ describe('resolveCatalogLaunch — Tier C orchestrator (registered executors onl
       ...PR6_CALCULATOR_REGISTRY_IDS,
       ...PR7_CALCULATOR_REGISTRY_IDS,
     ]) {
-      expect(resolveCatalogLaunch(id).orchestratorTool).toBeNull();
+      // Some of these (e.g. grace-acs, canadian-c-spine) now have a real backend executor —
+      // they resolve their own tool id instead of null.
+      const expectedOrchestratorTool = REGISTRY_ID_TO_ORCHESTRATOR_TOOL[id] || null;
+      expect(resolveCatalogLaunch(id).orchestratorTool).toBe(expectedOrchestratorTool);
     }
   });
 });

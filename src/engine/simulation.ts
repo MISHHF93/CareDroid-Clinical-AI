@@ -385,7 +385,7 @@ const advanceRandomPatient = (): void => {
       note: 'Advanced by emergency simulation flow tick.',
     });
   } catch {
-    // Simulation ticks should not interrupt the live whiteboard if a patient changes mid-tick.
+    // Expected when a patient state changes between tick planning and execution — simulation must not crash the live whiteboard.
   }
 };
 

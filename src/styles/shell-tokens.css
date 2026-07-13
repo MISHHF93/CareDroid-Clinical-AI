@@ -1,0 +1,170 @@
+/**
+ * CareDroid Shell — Canonical Layout Tokens
+ *
+ * Single source of truth for ALL shell dimensions, z-index layers, and layout constants.
+ * Every other CSS file MUST reference these tokens instead of defining their own values.
+ *
+ * Conflicts resolved:
+ * - Header height: was 52px (4 defs) / 56px (2 defs) / 64px (1 def) → canonical: 52px
+ * - Sidebar width: was 232px (3 defs) / 240px (2 defs) / 248px (1 def) → canonical: 232px
+ * - Collapsed sidebar: was 56px (2 defs) / 58px (1 def) → canonical: 56px
+ * - Chrome stack: was 104px / 100px / 96px → canonical: 104px (52+52)
+ * - Z-index: was 3 different scales → canonical: single 0-1200 scale
+ */
+
+:root {
+  /* ════════════════════════════════════════════════════════════════════════
+     HEADER HEIGHTS
+     ════════════════════════════════════════════════════════════════════════ */
+
+  /** Primary application header (top bar with brand, search, notifications, user) */
+  --shell-header-height: 52px;
+
+  /** Workspace context bar (role nav, breadcrumbs, page actions) */
+  --shell-workspace-height: 44px;
+
+  /** Combined chrome stack height (header + workspace) */
+  --shell-chrome-stack-height: calc(var(--shell-header-height) + var(--shell-workspace-height));
+
+  /** Compact variant for dense screens (command center, wall displays) */
+  --shell-header-height-compact: 44px;
+
+  /** Legacy aliases — DO NOT USE in new code */
+  --cdl-header-height: var(--shell-header-height);
+  --cdl-route-tab-height: var(--shell-workspace-height);
+  --cdl-chrome-stack-height: var(--shell-chrome-stack-height);
+  --app-shell-header-height: var(--shell-header-height);
+  --app-chrome-bar-h: var(--shell-header-height);
+
+  /* ════════════════════════════════════════════════════════════════════════
+     SIDEBAR DIMENSIONS
+     ════════════════════════════════════════════════════════════════════════ */
+
+  /** Expanded sidebar width (desktop) */
+  --shell-sidebar-width: 232px;
+
+  /** Collapsed sidebar (tablet icon rail) */
+  --shell-sidebar-width-collapsed: 56px;
+
+  /** Mobile drawer max width */
+  --shell-sidebar-drawer-max: min(280px, 88vw);
+
+  /** Mobile bottom nav height (includes safe area) */
+  --shell-mobile-nav-height: 72px;
+
+  /** Legacy aliases */
+  --cdl-sidebar-width: var(--shell-sidebar-width);
+  --sidebar-width-expanded: var(--shell-sidebar-width);
+  --sidebar-width-collapsed: var(--shell-sidebar-width-collapsed);
+  --app-sidebar-width-expanded: 15rem;
+  --app-sidebar-width-collapsed: 3.5rem;
+
+  /* ════════════════════════════════════════════════════════════════════════
+     CONTENT DIMENSIONS
+     ════════════════════════════════════════════════════════════════════════ */
+
+  /** Maximum content width for clinical pages */
+  --shell-content-max: 1680px;
+
+  /** Maximum content width for wide layouts (command center) */
+  --shell-content-max-wide: 2400px;
+
+  /** Page gutter (inline padding) */
+  --shell-page-gutter: clamp(16px, 2vw, 24px);
+
+  /** Section gap between major page sections */
+  --shell-section-gap: 16px;
+
+  /** Panel gap between cards/panels */
+  --shell-panel-gap: 12px;
+
+  /* ════════════════════════════════════════════════════════════════════════
+     CONTROL DIMENSIONS
+     ════════════════════════════════════════════════════════════════════════ */
+
+  /** Standard control height */
+  --shell-control-height: 36px;
+
+  /** Large control height (primary actions) */
+  --shell-control-height-lg: 40px;
+
+  /** Control border radius */
+  --shell-control-radius: 8px;
+
+  /** Control horizontal padding */
+  --shell-control-padding-x: 12px;
+
+  /** Minimum touch target (WCAG 2.2 AA) */
+  --shell-touch-target: 44px;
+
+  /* ════════════════════════════════════════════════════════════════════════
+     Z-INDEX LAYERS (canonical order, never skip layers)
+     ════════════════════════════════════════════════════════════════════════ */
+
+  --z-base: 0;
+  --z-raised: 10;
+  --z-sidebar: 100;
+  --z-header: 200;
+  --z-sticky: 300;
+  --z-dropdown: 400;
+  --z-overlay: 500;
+  --z-popover: 600;
+  --z-drawer: 700;
+  --z-modal: 800;
+  --z-toast: 900;
+  --z-tooltip: 1000;
+
+  /* ════════════════════════════════════════════════════════════════════════
+     BREAKPOINTS (use in @media, these are for reference/calc)
+     ════════════════════════════════════════════════════════════════════════ */
+
+  --shell-bp-mobile: 768px;
+  --shell-bp-tablet: 769px;
+  --shell-bp-desktop: 1280px;
+  --shell-bp-wide: 1920px;
+  --shell-bp-ultrawide: 2560px;
+
+  /* ════════════════════════════════════════════════════════════════════════
+     ANIMATION
+     ════════════════════════════════════════════════════════════════════════ */
+
+  --shell-transition-fast: 120ms ease;
+  --shell-transition-normal: 180ms ease;
+  --shell-transition-slow: 240ms ease;
+
+  /* ════════════════════════════════════════════════════════════════════════
+     SHELL COLORS (semantic, uses theme tokens)
+     ════════════════════════════════════════════════════════════════════════ */
+
+  --shell-header-bg: var(--app-surface-0, #ffffff);
+  --shell-header-border: var(--app-border, #e5e7eb);
+  --shell-header-fg: var(--app-text-primary, #1f2937);
+
+  --shell-sidebar-bg: var(--sidebar-bg, #0f172a);
+  --shell-sidebar-fg: var(--sidebar-fg, #e2e8f0);
+  --shell-sidebar-border: var(--sidebar-border, #1e293b);
+
+  --shell-workspace-bg: var(--app-surface-1, #f8fafc);
+  --shell-workspace-border: var(--app-border, #e5e7eb);
+  --shell-workspace-fg: var(--app-text-secondary, #475569);
+
+  --shell-canvas-bg: var(--app-bg, #f1f5f9);
+  --shell-content-bg: var(--app-surface-0, #ffffff);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   DARK MODE OVERRIDES
+   ════════════════════════════════════════════════════════════════════════ */
+
+html[data-theme="dark"] {
+  --shell-header-bg: var(--app-surface-0, #1e293b);
+  --shell-header-border: var(--app-border, #334155);
+  --shell-header-fg: var(--app-text-primary, #f1f5f9);
+
+  --shell-workspace-bg: var(--app-surface-1, #1e293b);
+  --shell-workspace-border: var(--app-border, #334155);
+  --shell-workspace-fg: var(--app-text-secondary, #94a3b8);
+
+  --shell-canvas-bg: var(--app-bg, #0f172a);
+  --shell-content-bg: var(--app-surface-0, #1e293b);
+}

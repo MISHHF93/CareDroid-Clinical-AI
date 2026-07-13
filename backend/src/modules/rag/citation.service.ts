@@ -147,7 +147,10 @@ export class CitationService {
 
     let groundedText = answerText;
     if (options.stripUnsupported) {
-      groundedText = kept.map((s) => s.claim).join(' ').trim();
+      groundedText = kept
+        .map((s) => s.claim)
+        .join(' ')
+        .trim();
       if (!groundedText) {
         groundedText =
           'I could not support a clinical claim from the retrieved sources. Please consult the cited guidelines or a clinician.';

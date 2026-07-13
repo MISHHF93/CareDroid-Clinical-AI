@@ -147,6 +147,7 @@ describe('ContextBuilderService and ResponseComposerService', () => {
       'context_builder',
       'tool_orchestrator',
       'response_composer',
+      'provenance_contract',
     ]);
   });
 });

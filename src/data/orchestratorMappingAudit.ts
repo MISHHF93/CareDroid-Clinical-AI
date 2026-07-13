@@ -5,12 +5,9 @@
 
 import { clinicalIntentTools } from './clinicalIntentToolCatalog';
 import {
-  CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS,
-  REGISTRY,
   REGISTRY_ID_TO_ORCHESTRATOR_TOOL,
   ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS,
   ORCHESTRATOR_TO_REGISTRY_ID,
-  TIER_B_CHAT_CALCULATOR_REGISTRY_IDS,
   NLU,
 } from './clinicalToolIdContract';
 import {
@@ -108,7 +105,7 @@ export function auditRegistryOrchestratorMappings() {
   }
   for (const nluId of ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS) {
     const hasRegistry =
-      Object.values(REGISTRY_ID_TO_ORCHESTRATOR_TOOL).includes(nluId) ||
+      (Object.values(REGISTRY_ID_TO_ORCHESTRATOR_TOOL) as string[]).includes(nluId) ||
       ORCHESTRATOR_TO_REGISTRY_ID[nluId];
     if (!hasRegistry) {
       issues.push({
@@ -121,59 +118,24 @@ export function auditRegistryOrchestratorMappings() {
 }
 
 /**
- * Tier-A calculators must not map to POST executors except SOFA (dual UI + executor).
+ * dispatch-ai must stay NLU/chat-routed only — it has no deterministic
+ * calculator form, so unlike the Tier-A/B calculators (see below) there is no
+ * scenario where registering it as a POST executor would be correct.
  */
-export function auditTierACalculatorExecutorLeaks() {
+export function auditDispatchAiChatOnly() {
   const issues = [] as any[];
-  const allowedTierAExecutor = new Set([REGISTRY.sofaScore]);
-  for (const registryId of CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS) {
-    if ((REGISTRY_ID_TO_ORCHESTRATOR_TOOL as any)[registryId] && !allowedTierAExecutor.has(registryId as any)) {
-      issues.push({
-        code: 'tier-a-false-executor-map',
-        detail: `Tier-A calculator ${registryId} must not appear in REGISTRY_ID_TO_ORCHESTRATOR_TOOL`,
-      });
-    }
+  const row = clinicalIntentTools.find((t) => t.toolId === NLU.dispatchAi);
+  if (row && !row.backendRouted) {
+    issues.push({
+      code: 'dispatch-missing-chat-flag',
+      detail: 'dispatch-ai should remain backend-routed for NLU/chat only',
+    });
   }
-  return { ok: issues.length === 0, issues };
-}
-
-/** Tier-B chat tools must not claim POST executability unless registered. */
-export function auditTierBBackendExecutableClaims() {
-  const issues = [] as any[];
-  const tierBIds = new Set([
-    ...TIER_B_CHAT_CALCULATOR_REGISTRY_IDS,
-    REGISTRY.dispatchAi,
-  ]);
-  for (const row of clinicalIntentTools) {
-    const registryId = row.sidebarToolId || row.toolId;
-    if (!tierBIds.has(registryId as any) && row.toolId !== NLU.dispatchAi) continue;
-    if (row.toolId === NLU.dispatchAi) {
-      if (!row.backendRouted) {
-        issues.push({
-          code: 'dispatch-missing-chat-flag',
-          detail: 'dispatch-ai should remain backend-routed for NLU/chat only',
-        });
-      }
-      if (isOrchestratorPostExecutable(row.toolId)) {
-        issues.push({
-          code: 'dispatch-false-post-executor',
-          detail: 'dispatch-ai must not be POST-orchestrator registered',
-        });
-      }
-      continue;
-    }
-    if (row.postExecutable) {
-      issues.push({
-        code: 'tier-b-false-backend-executable',
-        detail: `Tier-B tool ${row.toolId} must not set postExecutable: true without POST executor`,
-      });
-    }
-    if (isOrchestratorPostExecutable(row.toolId)) {
-      issues.push({
-        code: 'tier-b-false-post-executor',
-        detail: `Tier-B tool ${row.toolId} must not be POST-orchestrator registered`,
-      });
-    }
+  if (isOrchestratorPostExecutable(NLU.dispatchAi)) {
+    issues.push({
+      code: 'dispatch-false-post-executor',
+      detail: 'dispatch-ai must not be POST-orchestrator registered',
+    });
   }
   return { ok: issues.length === 0, issues };
 }
@@ -201,8 +163,7 @@ export function auditBackendExecutableCatalogFlags() {
 export function runOrchestratorMappingAudit() {
   const audits = [
     auditRegistryOrchestratorMappings(),
-    auditTierACalculatorExecutorLeaks(),
-    auditTierBBackendExecutableClaims(),
+    auditDispatchAiChatOnly(),
     auditBackendExecutableCatalogFlags(),
   ];
   const issues = audits.flatMap((a) => a.issues);

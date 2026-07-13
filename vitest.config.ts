@@ -53,6 +53,7 @@ export default defineConfig({
     alias: {
       '@': path.resolve(process.cwd(), './src'),
       '@lib': path.resolve(process.cwd(), './lib'),
+      '@store': path.resolve(process.cwd(), './src/store'),
     },
   },
 });

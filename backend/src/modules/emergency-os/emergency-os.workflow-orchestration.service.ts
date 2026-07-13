@@ -1,4 +1,4 @@
-import { Injectable, Optional } from '@nestjs/common';
+import { Injectable, Logger, Optional } from '@nestjs/common';
 import type { ReviewAdministrativeAutomationInput } from '../../../../src/types/administrativeAutomation';
 import type {
   AdministrativeAutomationSnapshot,
@@ -37,6 +37,7 @@ function envelope<T>(data: T, remainingGaps: string[] = []): EmergencyModuleEnve
 
 @Injectable()
 export class WorkflowOrchestrationService {
+  private readonly logger = new Logger(WorkflowOrchestrationService.name);
   private readonly fallbackQueues = new Map<string, AdministrativeAutomationTask[]>();
 
   constructor(
@@ -100,8 +101,10 @@ export class WorkflowOrchestrationService {
     try {
       const persisted = await this.queueService.listActiveTasks(organizationId, workspaceId);
       if (persisted.length) return persisted;
-    } catch {
-      // Fall back to in-memory queue when persistence is unavailable.
+    } catch (error) {
+      this.logger.warn(
+        `[WorkflowOrchestration] Failed to load persisted tasks: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
     return [...(this.fallbackQueues.get(key) || [])];
   }
@@ -116,8 +119,10 @@ export class WorkflowOrchestrationService {
     if (!this.queueService) return;
     try {
       await this.queueService.replaceSnapshot(organizationId, workspaceId, tasks);
-    } catch {
-      // In-memory fallback remains authoritative for this request.
+    } catch (error) {
+      this.logger.warn(
+        `[WorkflowOrchestration] Failed to persist tasks: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
   }
 

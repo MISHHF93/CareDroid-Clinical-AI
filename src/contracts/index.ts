@@ -12,6 +12,7 @@
 
 // Re-export all canonical types
 export * from './domains';
+export * from './results';
 
 // Re-export commonly used legacy types for backward compatibility
 export type {

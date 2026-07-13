@@ -72,7 +72,9 @@ export class RetrievalService {
     const startedAt = Date.now();
     const hybrid = request.hybrid !== false;
     // Over-fetch for hybrid fusion, then cut to topK
-    const fetchK = hybrid ? Math.min(Math.max(request.topK * 3, request.topK + 8), 40) : request.topK;
+    const fetchK = hybrid
+      ? Math.min(Math.max(request.topK * 3, request.topK + 8), 40)
+      : request.topK;
     const fetchMinScore = hybrid ? Math.max(0, request.minScore * 0.65) : request.minScore;
 
     const queryResult = await this.vectorDb.query(request.queryEmbedding, {

@@ -55,7 +55,7 @@ describe('TIMI UA/NSTEMI calculator wiring', () => {
     const nlu = clinicalIntentTools.find((t) => t.toolId === id);
     if (!nlu) throw new Error('expected nlu tool entry to exist');
     expect(nlu?.path).toBe('/tools/calculators/timi-ua-nstemi');
-    expect(nlu?.backendExecutable).toBe(false);
+    expect(nlu?.backendExecutable).toBe(true);
 
     const builtin = builtinUiCalculators.find((c) => c.id === id);
     if (!builtin) throw new Error('expected builtin calculator entry to exist');

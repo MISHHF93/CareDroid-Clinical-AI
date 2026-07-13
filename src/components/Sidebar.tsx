@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import appConfig from '../config/appConfig';
 import {
   IconActivity,
+  IconAlertTriangle,
   IconAmbulance,
   IconApps,
   IconArrowsExchange,
@@ -16,6 +17,7 @@ import {
   IconHelpCircle,
   IconLayoutDashboard,
   IconListDetails,
+  IconMap,
   IconMessages,
   IconNotes,
   IconPlugConnected,
@@ -26,6 +28,7 @@ import {
   IconSettings,
   IconShieldCheck,
   IconStethoscope,
+  IconTrendingUp,
   IconUserCircle,
   IconUsers,
   type Icon,
@@ -118,6 +121,9 @@ const ICONS: Record<string, Icon> = {
   knowledge: IconChartBar,
   'ai-center': IconRobot,
   admin: IconSettings,
+  map: IconMap,
+  'triage-priority': IconAlertTriangle,
+  'predictive-trend': IconTrendingUp,
 };
 
 function matchesNavigationPath(pathname: string, path: string): boolean {

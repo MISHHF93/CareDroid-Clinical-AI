@@ -1,407 +1,516 @@
 /**
- * Clinical top bar — single 52px row, one vertical rhythm:
- * [Clock] ………… [ Search ] ………… [ Alarms · Create · Account ]
+ * Clinical top bar — brand clock | central status | search · palette ·
+ * operations center · profile switcher · account menu.
  *
- * Global layout rules target [class*="actions"] with flex-wrap:wrap and
- * buttons with min-height:44px — this file beats those so the right cluster
- * never drops the account control onto the context row.
+ * Base layout lives here; `--cdl-header-*` sizing tokens come from
+ * shell-tokens.css / medical-shell-layer.css, and shell-header-polish.css
+ * layers the "slim" density variant on top of these base rules.
  */
 
-.app-chrome {
-  --app-chrome-control-h: 36px;
-  --app-chrome-control-radius: 9px;
-  --app-chrome-gap: 12px;
-  --app-chrome-bar-h: 52px;
-  --app-chrome-pad-x: var(--cdl-header-padding-inline, 16px);
-}
-
-.app-chrome-top {
-  display: grid;
-  /* Equal flanks keep search optically centered */
-  grid-template-columns: minmax(0, 1fr) minmax(220px, 480px) minmax(0, 1fr);
-  align-items: center;
-  column-gap: var(--app-chrome-gap);
-  width: 100%;
-  height: var(--app-chrome-bar-h);
-  min-height: var(--app-chrome-bar-h);
-  max-height: var(--app-chrome-bar-h);
-  flex-shrink: 0;
-  box-sizing: border-box;
-  padding: 0 var(--app-chrome-pad-x);
-  margin: 0;
-  border: 0;
-  background: var(--cdl-header-bg, var(--app-surface-1, #ffffff));
-  position: relative;
-  overflow: visible;
-  z-index: 40;
-}
-
-/* Kill global touch/readability overrides inside the top bar only */
-.app-chrome-top button,
-.app-chrome-top [role='button'],
-.app-chrome-top input {
-  min-height: 0 !important;
-  font-size: inherit;
-}
-
-.app-chrome-top button {
+.caredroid-header button,
+.caredroid-header select {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* —— Left flank —— */
-.app-chrome-top__identity {
-  grid-column: 1;
-  justify-self: start;
+.caredroid-header--compact {
+  width: 100%;
+  height: var(--cdl-header-height, 52px);
+  flex-shrink: 0;
+  position: relative;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-rows: var(--cdl-header-height, 52px);
+  overflow: hidden;
+  border-bottom: 1px solid var(--medical-border);
+  background: var(--app-surface-1, #ffffff);
+}
+
+.caredroid-header--slim {
+  height: var(--cdl-header-height, 52px);
+  grid-template-rows: var(--cdl-header-height, 52px);
+  background: var(--cdl-header-bg, var(--medical-white));
+  border-bottom: 1px solid var(--cdl-header-border, var(--medical-border));
+  box-shadow: 0 1px 0 rgba(15, 23, 42, 0.04);
+}
+
+.caredroid-header--slim .caredroid-header__topbar {
+  height: var(--cdl-header-height, 52px);
+}
+
+.caredroid-header__brand--slim {
+  min-width: 88px;
+  gap: 8px;
+}
+
+.caredroid-header--slim .caredroid-header__center {
+  justify-content: flex-start;
+}
+
+.caredroid-header--slim .caredroid-header__page-title {
+  justify-items: start;
+  text-align: left;
+}
+
+.caredroid-header--slim .caredroid-header__page-title strong {
+  color: var(--cdl-header-title-fg, var(--medical-ink));
+  font-size: 15px;
+  font-weight: 700;
+  max-width: min(36vw, 420px);
+}
+
+.caredroid-header--slim .caredroid-header__page-title span {
+  color: var(--cdl-header-meta-fg, var(--medical-ink-muted));
+  max-width: min(42vw, 520px);
+}
+
+.caredroid-header__topbar {
   display: flex;
   align-items: center;
-  height: var(--app-chrome-control-h);
+  gap: 16px;
+  height: 48px;
   min-width: 0;
+  overflow: hidden;
+  padding: 0 16px;
 }
 
-.app-chrome-top__clock {
-  display: inline-flex;
+.caredroid-header__brand {
+  display: flex;
+  flex-shrink: 0;
   align-items: center;
-  height: var(--app-chrome-control-h);
-  padding: 0 2px;
-  color: var(--medical-ink-muted, #64748b);
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 12px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.02em;
-  white-space: nowrap;
-  line-height: 1;
+  gap: 12px;
 }
 
-/* —— Center: search fills the middle track —— */
-.app-chrome-top__search {
-  grid-column: 2;
+.caredroid-header__wordmark {
+  color: var(--medical-ink, #111827);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.caredroid-header__center {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  height: 48px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.caredroid-header--pilot-metrics .caredroid-header__center {
+  justify-content: center;
+  gap: 8px;
+}
+
+.caredroid-header--pilot-metrics .caredroid-header__central-status {
+  flex: 0 1 auto;
+  max-width: min(36vw, 320px);
+}
+
+.caredroid-header__page-title {
+  display: grid;
+  min-width: 0;
+  justify-items: center;
+  gap: 2px;
+}
+
+.caredroid-header__page-title strong {
+  font-size: var(--app-type-page-title, 1rem);
+  font-weight: 600;
+  line-height: var(--type-heading-line-height, 1.3);
+}
+
+.caredroid-header__page-title span {
+  font-size: var(--app-type-caption, 0.75rem);
+  color: var(--medical-ink-muted, #6b7280);
+  line-height: var(--type-caption-line-height, 1.45);
+}
+
+.caredroid-header__actions {
+  display: flex;
+  flex: 0 1 auto;
+  flex-shrink: 1;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.caredroid-header__palette-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--medical-border, #e0f2fe);
+  border-radius: 8px;
+  background: var(--app-surface-1, #ffffff);
+  color: var(--medical-text-subtle, #9ca3af);
+  cursor: pointer;
+  transition: border-color 120ms ease, color 120ms ease, background-color 120ms ease;
+}
+
+.caredroid-header__palette-trigger:not(:disabled):hover,
+.caredroid-header__palette-trigger:not(:disabled):focus-visible {
+  border-color: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 42%, transparent);
+  color: var(--medical-ink, #111827);
+  outline: none;
+  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 6%, var(--app-surface-1, #ffffff));
+}
+
+.caredroid-header__central-node {
+  border: 1px solid var(--medical-accent-border, rgba(14, 165, 233, 0.35));
+  border-radius: 999px;
+  background: var(--medical-accent-tint, rgba(14, 165, 233, 0.12));
+  color: var(--medical-text-link, #0ea5e9);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  padding: 6px 10px;
+  white-space: nowrap;
+}
+
+.caredroid-header__central-status {
+  align-items: center;
+  height: 32px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.caredroid-header__central-status .operational-alert-rail__strip.operational-strip--compact {
+  align-items: center;
+  display: flex;
+  flex-wrap: nowrap;
+  height: 32px;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.caredroid-header__central-status .operational-strip__metric {
+  align-items: baseline;
+  display: inline-flex;
+  flex: 0 1 auto;
+  gap: 4px;
+  max-width: 128px;
+  min-height: 24px;
+  min-width: 0;
+  padding: 2px 7px;
+}
+
+.caredroid-header__central-status .operational-strip__metric strong,
+.caredroid-header__central-status .operational-strip__metric span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.caredroid-header:not(.caredroid-header--slim) .caredroid-header__page-title strong {
+  max-width: min(24vw, 260px);
+  overflow: hidden;
+  color: var(--medical-ink, #111827);
+  font-size: 13px;
+  font-weight: 850;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.caredroid-header:not(.caredroid-header--slim) .caredroid-header__page-title span {
+  max-width: min(28vw, 360px);
+  overflow: hidden;
+  color: var(--medical-text-subtle, #9ca3af);
+  font-size: 11px;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.caredroid-header__primary-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.caredroid-header__action {
+  min-height: 30px;
+  border: 1px solid var(--medical-border, #e0f2fe);
+  border-radius: 9px;
+  background: var(--app-surface-1, #ffffff);
+  color: var(--medical-text-muted, #6b7280);
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 850;
+  padding: 0 9px;
+  white-space: nowrap;
+  transition: border-color 120ms ease, color 120ms ease, background-color 120ms ease, box-shadow 120ms ease;
+}
+
+.caredroid-header__action:not(:disabled):hover,
+.caredroid-header__action:not(:disabled):focus-visible {
+  border-color: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 52%, transparent);
+  color: var(--medical-ink, #111827);
+  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 6%, var(--app-surface-1, #ffffff));
+  outline: none;
+}
+
+.caredroid-header__action--primary {
+  border-color: color-mix(in srgb, var(--app-accent-interactive) 74%, transparent);
+  background: var(--app-accent-interactive);
+  color: var(--app-on-solid, #f9fafb);
+}
+
+.caredroid-header__action--primary:not(:disabled):hover,
+.caredroid-header__action--primary:not(:disabled):focus-visible {
+  background: var(--app-accent-hover, #0284c7);
+  border-color: var(--app-accent-hover, #0284c7);
+  color: var(--app-on-solid, #f9fafb);
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 22%, transparent);
+}
+
+.caredroid-header__action:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.caredroid-header__lookup {
   position: relative;
   display: flex;
   align-items: center;
-  width: 100%;
-  height: var(--app-chrome-control-h) !important;
-  min-height: var(--app-chrome-control-h) !important;
-  max-height: var(--app-chrome-control-h) !important;
-  border: 1px solid color-mix(in srgb, var(--medical-border, #e2e8f0) 72%, transparent);
-  border-radius: var(--app-chrome-control-radius);
-  background: color-mix(in srgb, var(--medical-slate-50, #f8fafc) 55%, #ffffff);
-  color: var(--medical-ink-muted, #64748b);
-  min-width: 0;
-  box-sizing: border-box;
-  transition: border-color 120ms ease, box-shadow 120ms ease, background-color 120ms ease;
+  width: min(17vw, 220px);
+  min-width: 160px;
+  height: 32px;
+  border: 1px solid var(--medical-border, #e0f2fe);
+  border-radius: 9px;
+  background: var(--app-surface-1, #ffffff);
+  color: var(--medical-text-muted, #6b7280);
 }
 
-.app-chrome-top__search:focus-within {
-  border-color: color-mix(in srgb, #374151 42%, transparent);
-  background: #ffffff;
-  box-shadow: 0 0 0 3px color-mix(in srgb, #374151 14%, transparent);
+.caredroid-header__lookup--emphasis {
+  width: min(36vw, 420px);
+  min-width: 260px;
+  height: 38px;
+  border-color: var(--medical-accent-border);
+  background: var(--medical-accent-tint);
 }
 
-/* Reception emphasis — name must NOT include "--primary" (global CTA
- * [class*="--primary"] paints solid accent and looks like a second button). */
-.app-chrome-top__search--emphasis {
-  border-color: color-mix(in srgb, #374151 28%, transparent) !important;
-  background: color-mix(in srgb, #374151 6%, #ffffff) !important;
-  color: var(--medical-ink-muted, #64748b);
-}
-
-.app-chrome-top__search > svg {
+.caredroid-header__lookup > svg {
   margin-left: 10px;
   flex-shrink: 0;
-  opacity: 0.72;
-  pointer-events: none;
 }
 
-/* Flatten the input face — global form rules otherwise paint a second
- * bordered field inside the shell (looks like nested search boxes). */
-.app-chrome-top__search input,
-.app-chrome-top__search input:hover,
-.app-chrome-top__search input:focus,
-.app-chrome-top__search input:focus-visible {
+.caredroid-header__lookup input {
   width: 100%;
   min-width: 0;
-  height: 100% !important;
-  min-height: 0 !important;
-  max-height: 100% !important;
-  margin: 0 !important;
-  border: 0 !important;
-  border-radius: 0 !important;
-  outline: none !important;
-  background: transparent !important;
-  box-shadow: none !important;
+  height: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
   color: var(--medical-ink, #111827);
   font: inherit;
-  font-size: 13px !important;
-  line-height: 1;
-  padding: 0 12px 0 8px !important;
-  -webkit-appearance: none !important;
-  appearance: none !important;
+  font-size: 12px;
+  padding: 0 9px 0 7px;
 }
 
-.app-chrome-top__search input::placeholder {
-  color: var(--medical-ink-subtle, #94a3b8);
-}
-
-/* Native search chrome (clear button track) can read as a second control */
-.app-chrome-top__search input[type='search']::-webkit-search-decoration,
-.app-chrome-top__search input[type='search']::-webkit-search-cancel-button,
-.app-chrome-top__search input[type='search']::-webkit-search-results-button,
-.app-chrome-top__search input[type='search']::-webkit-search-results-decoration {
-  -webkit-appearance: none;
-  appearance: none;
-  display: none;
-}
-
-.app-chrome-top__results {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  right: 0;
-  z-index: 140;
+/* position:fixed + portaled to document.body — the header clips its own
+   fixed-height box with overflow:hidden, which would otherwise silently
+   clip any position:absolute dropdown nested inside it (see
+   OperationsCenterMenu for the same class of bug). top/left come from the
+   trigger's measured rect via inline style. */
+.caredroid-header__lookup-results {
+  position: fixed;
+  z-index: var(--z-popover, 600);
+  display: grid;
+  max-width: min(420px, calc(100vw - 24px));
   overflow: hidden;
-  border: 1px solid var(--medical-border, #e2e8f0);
+  border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 12px;
-  background: #ffffff;
-  box-shadow: 0 12px 40px rgba(15, 23, 42, 0.14);
+  background: var(--app-surface-1, #ffffff);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.42);
 }
 
-.app-chrome-top__results button {
+.caredroid-header__lookup-results button {
   display: grid;
   gap: 3px;
   width: 100%;
-  min-height: 48px !important;
-  height: auto !important;
-  max-height: none !important;
+  min-height: 48px;
   border: 0;
-  border-bottom: 1px solid var(--medical-border, #e2e8f0);
+  border-bottom: 1px solid var(--medical-border, #e0f2fe);
   background: transparent;
   color: var(--medical-ink, #111827);
   cursor: pointer;
-  padding: 10px 12px;
+  padding: 9px 11px;
   text-align: left;
-  font-size: 13px !important;
 }
 
-.app-chrome-top__results button:last-child {
+.caredroid-header__lookup-results button:last-child {
   border-bottom: 0;
 }
 
-.app-chrome-top__results button:hover {
-  background: var(--app-surface-muted, #f1f5f9);
+.caredroid-header__lookup-results button:hover {
+  background: var(--app-surface-muted, #f0f9ff);
 }
 
-.app-chrome-top__results span {
+.caredroid-header__lookup-results span {
   overflow: hidden;
-  color: var(--medical-ink-muted, #64748b);
+  color: var(--medical-text-subtle, #9ca3af);
   font-size: 11px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-/* —— Right flank: one single-line cluster —— */
-.app-chrome-top__actions {
-  grid-column: 3;
-  justify-self: end;
-  display: flex !important;
-  flex-direction: row !important;
-  flex-wrap: nowrap !important;
-  align-items: center !important;
-  justify-content: flex-end !important;
-  gap: 8px !important;
-  width: max-content !important;
-  max-width: 100% !important;
-  height: var(--app-chrome-control-h) !important;
-  min-height: var(--app-chrome-control-h) !important;
-  max-height: var(--app-chrome-control-h) !important;
-  min-width: 0;
-  position: relative;
-  overflow: visible;
-  z-index: 45;
-}
+/* ── Light-mode overrides for header identity controls ──────────────────────── */
 
-/* Shared control face — beats global 44px touch targets */
-.app-chrome-top__create {
-  display: inline-flex !important;
-  align-items: center;
-  justify-content: center;
-  flex: 0 0 auto !important;
-  height: var(--app-chrome-control-h) !important;
-  min-height: var(--app-chrome-control-h) !important;
-  max-height: var(--app-chrome-control-h) !important;
-  border: 1px solid color-mix(in srgb, #374151 70%, transparent);
-  border-radius: var(--app-chrome-control-radius);
-  background: #374151;
-  color: var(--app-on-solid, #f9fafb);
-  cursor: pointer;
-  font-size: 12.5px !important;
-  font-weight: 700;
-  line-height: 1 !important;
-  padding: 0 14px !important;
-  white-space: nowrap;
-  box-sizing: border-box;
-  transition: background-color 120ms ease, box-shadow 120ms ease;
+/* ProfileRoleSwitcher: hide redundant "Profile" label, size select cleanly */
+.caredroid-header .profile-role-switcher--compact .profile-role-switcher__label {
+  display: none;
 }
-
-.app-chrome-top__create:not(:disabled):hover,
-.app-chrome-top__create:not(:disabled):focus-visible {
-  background: #111827;
-  outline: none;
-  box-shadow: 0 0 0 3px color-mix(in srgb, #374151 20%, transparent);
-}
-
-.app-chrome-top__create:disabled {
-  cursor: not-allowed;
-  opacity: 0.5;
-}
-
-/* Account — same 36px face, never wraps out of the bar */
-.app-chrome-top .account-menu {
-  display: inline-flex !important;
-  flex: 0 0 auto !important;
-  align-items: center;
-  height: var(--app-chrome-control-h) !important;
-  min-height: var(--app-chrome-control-h) !important;
-  max-height: var(--app-chrome-control-h) !important;
-  max-width: min(168px, 28vw);
-}
-
-.app-chrome-top .account-menu__trigger {
-  display: inline-flex !important;
-  align-items: center;
-  height: var(--app-chrome-control-h) !important;
-  min-height: var(--app-chrome-control-h) !important;
-  max-height: var(--app-chrome-control-h) !important;
-  width: 100%;
-  border-radius: var(--app-chrome-control-radius) !important;
-  border: 1px solid color-mix(in srgb, var(--medical-border, #e2e8f0) 65%, transparent) !important;
-  background: color-mix(in srgb, var(--medical-slate-50, #f8fafc) 40%, #ffffff) !important;
+.caredroid-header .profile-role-switcher--compact select {
+  border: 1px solid var(--medical-border, #e2e8f0);
+  border-radius: 8px;
+  background: var(--app-surface-1, #ffffff);
   color: var(--medical-ink, #111827);
-  padding: 0 8px 0 3px !important;
-  box-sizing: border-box;
-  gap: 6px;
-  font-size: 12px !important;
-  line-height: 1.15 !important;
+  font-size: 11px;
+  font-weight: 500;
+  max-width: 148px;
+  padding: 4px 6px;
 }
 
-.app-chrome-top .account-menu__avatar {
-  width: 28px;
-  height: 28px;
-  flex-shrink: 0;
+/* UserAccountMenu trigger: visible light-mode surface */
+.caredroid-header .account-menu__trigger {
+  border-color: var(--medical-border, #e2e8f0);
+  background: var(--app-surface-1, #ffffff);
+  color: var(--medical-ink, #111827);
+  transition: border-color 120ms ease, background-color 120ms ease;
+}
+.caredroid-header .account-menu__trigger:hover {
+  border-color: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 40%, transparent);
+  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 5%, var(--app-surface-1, #ffffff));
+}
+.caredroid-header .account-menu__name {
+  color: var(--medical-ink, #111827);
+  font-size: 11px;
+  font-weight: 600;
+}
+.caredroid-header .account-menu__meta {
+  color: var(--medical-ink-muted, #6b7280);
+  font-size: 10px;
+}
+.caredroid-header .account-menu__avatar {
+  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 14%, var(--medical-accent-tint, #e0f2fe));
+  color: var(--medical-accent-hover, #0284c7);
+  font-size: 10px;
+  font-weight: 700;
 }
 
-.app-chrome-top .account-menu__name {
-  font-size: 12px !important;
-  font-weight: 650;
-  line-height: 1.15;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.app-chrome-top .account-menu__meta {
-  font-size: 10px !important;
-  line-height: 1.15;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* Alarm chip — icon + count only so Register + Account stay on the same row.
- * Global [class$="-header"] used to dump 24px page-header padding here. */
-.app-chrome-top .operational-alarm-dock--header {
-  display: inline-flex !important;
-  flex-direction: row !important;
-  flex: 0 0 auto !important;
-  align-items: center !important;
-  align-self: center !important;
-  gap: 0 !important;
-  height: var(--app-chrome-control-h) !important;
-  min-height: var(--app-chrome-control-h) !important;
-  max-height: var(--app-chrome-control-h) !important;
-  width: auto !important;
-  max-width: none !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  border: 0 !important;
-  box-sizing: border-box !important;
-  overflow: visible !important;
-}
-
-.app-chrome-top .operational-alarm-dock__chip {
-  display: inline-flex !important;
-  align-items: center;
-  height: var(--app-chrome-control-h) !important;
-  min-height: var(--app-chrome-control-h) !important;
-  max-height: var(--app-chrome-control-h) !important;
-  border-radius: var(--app-chrome-control-radius) !important;
-  padding: 0 8px !important;
-  box-sizing: border-box;
-  font-size: 12px !important;
-  gap: 5px !important;
-}
-
-/* Label lives in aria-label — never expand the right flank */
-.app-chrome-top .operational-alarm-dock__chip-text {
-  display: none !important;
-}
-
-@media (min-width: 1280px) {
-  .app-chrome-top {
-    grid-template-columns: minmax(0, 1fr) minmax(280px, 520px) minmax(0, 1fr);
+@media (max-width: 1024px) {
+  .caredroid-header__topbar {
+    gap: 10px !important;
+    padding-inline: 10px !important;
   }
 
-  .app-chrome-top .account-menu {
-    max-width: min(190px, 22vw);
-  }
-}
-
-@media (max-width: 900px) {
-  .app-chrome-top {
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    column-gap: 8px;
+  .caredroid-header__wordmark {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
   }
 
-  .app-chrome-top__search {
-    max-width: none;
-  }
-
-  .app-chrome-top .account-menu__label {
+  .caredroid-header__page-title span {
     display: none;
   }
 
-  .app-chrome-top .account-menu {
-    max-width: none;
+  .caredroid-header__central-status {
+    max-width: 42vw;
   }
 
-  .app-chrome-top .account-menu__trigger {
-    padding: 0 6px 0 3px !important;
+  .caredroid-header__primary-actions {
+    gap: 4px;
+  }
+
+  .caredroid-header__action {
+    padding-inline: 7px;
+  }
+
+  .caredroid-header__lookup {
+    width: 150px;
+    min-width: 132px;
   }
 }
 
-@media (max-width: 720px) {
-  .app-chrome-top {
-    padding: 0 12px;
-    column-gap: 6px;
-    grid-template-columns: minmax(0, 1fr) auto;
+@media (max-width: 768px) {
+  .caredroid-header button {
+    min-width: 44px;
   }
 
-  .app-chrome-top__clock,
-  .app-chrome-top__identity {
+  .caredroid-header__topbar {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) minmax(0, auto);
+    gap: 8px;
+    overflow: hidden;
+  }
+
+  .caredroid-header__center {
     display: none;
   }
 
-  .app-chrome-top__search {
-    grid-column: 1;
+  .caredroid-header__palette-trigger,
+  .account-menu__trigger {
+    min-height: 44px !important;
+    min-width: 44px !important;
   }
 
-  .app-chrome-top__actions {
-    grid-column: 2;
-    gap: 6px !important;
+  .caredroid-header__palette-trigger:active,
+  .account-menu__trigger:active {
+    border-color: var(--app-accent-interactive) !important;
+    color: var(--medical-ink, #111827) !important;
   }
 
-  .app-chrome-top__create {
-    padding: 0 10px !important;
-    font-size: 12px !important;
+  .caredroid-header__central-node {
+    display: none;
+  }
+
+  .caredroid-header__primary-actions {
+    display: none;
+  }
+
+  .caredroid-header__actions {
+    flex: 0 1 auto;
+    justify-content: flex-end;
+    gap: 6px;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .caredroid-header__actions .profile-role-switcher--compact {
+    display: none;
+  }
+
+  .caredroid-header__palette-trigger {
+    display: none;
+  }
+
+  .caredroid-header__lookup {
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
+    max-width: min(42vw, 168px);
+  }
+}
+
+@media (max-width: 390px) {
+  .caredroid-header__page-title strong {
+    max-width: 40vw;
+  }
+
+  .caredroid-header__lookup {
+    max-width: min(36vw, 132px);
+  }
+
+  .caredroid-header__lookup input {
+    font-size: 16px;
   }
 }

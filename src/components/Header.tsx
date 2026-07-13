@@ -1,5 +1,6 @@
 import { MEDICAL_THEME } from '../config/medicalTheme.constants';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { IconSearch } from '@tabler/icons-react';
 import { useEmergencyStore } from '../store/emergencyStore';
@@ -116,6 +117,12 @@ export function Header() {
   );
   const [patientLookupQuery, setPatientLookupQuery] = useState('');
   const [patientLookupOpen, setPatientLookupOpen] = useState(false);
+  const lookupWrapperRef = useRef<HTMLDivElement>(null);
+  const [lookupPanelPosition, setLookupPanelPosition] = useState<{
+    top: number;
+    left: number;
+    width: number;
+  } | null>(null);
   const [backendVerifiedPatientIds, setBackendVerifiedPatientIds] = useState<Set<string>>(
     () => new Set(),
   );
@@ -365,6 +372,29 @@ export function Header() {
     return () => document.removeEventListener('focus-reception-search', focusLookup);
   }, [isReceptionRoute]);
 
+  const lookupResultsOpen = patientLookupOpen && patientLookupQuery.trim().length > 0;
+
+  const updateLookupPanelPosition = useCallback(() => {
+    const wrapper = lookupWrapperRef.current;
+    if (!wrapper) return;
+    const rect = wrapper.getBoundingClientRect();
+    setLookupPanelPosition({ top: rect.bottom + 6, left: rect.left, width: rect.width });
+  }, []);
+
+  useLayoutEffect(() => {
+    if (!lookupResultsOpen) {
+      setLookupPanelPosition(null);
+      return undefined;
+    }
+    updateLookupPanelPosition();
+    window.addEventListener('resize', updateLookupPanelPosition);
+    window.addEventListener('scroll', updateLookupPanelPosition, true);
+    return () => {
+      window.removeEventListener('resize', updateLookupPanelPosition);
+      window.removeEventListener('scroll', updateLookupPanelPosition, true);
+    };
+  }, [lookupResultsOpen, updateLookupPanelPosition]);
+
   const pilotHeaderMetrics = isPilotStationKpiPolicyActive() && screenCapabilities.showOperationalStrip;
 
   return (
@@ -428,7 +458,8 @@ export function Header() {
           )}
 
           <div
-            className={`caredroid-header__lookup${isReceptionRoute ? ' caredroid-header__lookup--primary' : ''}`}
+            ref={lookupWrapperRef}
+            className={`caredroid-header__lookup${isReceptionRoute ? ' caredroid-header__lookup--emphasis' : ''}`}
           >
             <IconSearch size={15} stroke={2} aria-hidden />
             <input
@@ -457,27 +488,37 @@ export function Header() {
                 }
               }}
             />
-            {patientLookupOpen && patientLookupQuery.trim() ? (
-              <div className="caredroid-header__lookup-results">
-                <PatientSearchResults
-                  query={patientLookupQuery}
-                  results={patientLookupResults}
-                  operationalGroups={operationalSearchGroups}
-                  backendVerifiedPatientIds={backendVerifiedPatientIds}
-                  canCreatePatient={canCreatePatient}
-                  isReceptionRoute={isReceptionRoute}
-                  onFindPatient={selectLookupPatient}
-                  onStartIntake={(patientId) =>
-                    openSmartIntakeFromSearch({ patientId, step: 'verify' })
-                  }
-                  onViewEncounter={handleSearchViewEncounter}
-                  onCreateEncounter={handleSearchCreateEncounter}
-                  onOpenOperationalHit={handleOpenOperationalHit}
-                  onFilterQueues={handleSearchFilterQueues}
-                  onStartNewIntake={() => openSmartIntakeFromSearch()}
-                />
-              </div>
-            ) : null}
+            {lookupResultsOpen && lookupPanelPosition && typeof document !== 'undefined'
+              ? createPortal(
+                  <div
+                    className="caredroid-header__lookup-results"
+                    style={{
+                      top: lookupPanelPosition.top,
+                      left: lookupPanelPosition.left,
+                      width: Math.max(lookupPanelPosition.width, 320),
+                    }}
+                  >
+                    <PatientSearchResults
+                      query={patientLookupQuery}
+                      results={patientLookupResults}
+                      operationalGroups={operationalSearchGroups}
+                      backendVerifiedPatientIds={backendVerifiedPatientIds}
+                      canCreatePatient={canCreatePatient}
+                      isReceptionRoute={isReceptionRoute}
+                      onFindPatient={selectLookupPatient}
+                      onStartIntake={(patientId) =>
+                        openSmartIntakeFromSearch({ patientId, step: 'verify' })
+                      }
+                      onViewEncounter={handleSearchViewEncounter}
+                      onCreateEncounter={handleSearchCreateEncounter}
+                      onOpenOperationalHit={handleOpenOperationalHit}
+                      onFilterQueues={handleSearchFilterQueues}
+                      onStartNewIntake={() => openSmartIntakeFromSearch()}
+                    />
+                  </div>,
+                  document.body,
+                )
+              : null}
           </div>
 
           {!PILOT_CUSTOMER_MODE.enabled && !screenCapabilities.isRegistrationScreen ? (

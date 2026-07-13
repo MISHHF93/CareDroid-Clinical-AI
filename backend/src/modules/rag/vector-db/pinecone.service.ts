@@ -399,7 +399,10 @@ export class PineconeService implements IVectorDatabase, OnModuleInit {
   private safeJsonParse(value: string): Record<string, any> | undefined {
     try {
       return JSON.parse(value);
-    } catch {
+    } catch (error) {
+      this.logger.debug(
+        `[PineconeService] JSON parse failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
       return undefined;
     }
   }

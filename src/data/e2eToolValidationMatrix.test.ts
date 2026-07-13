@@ -200,11 +200,19 @@ describe('e2e matrix — backend executor mappings', () => {
     expect([...ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS].sort()).toEqual(backend);
   });
 
-  it('only three registry ids map to POST executors', () => {
+  it('every registry row flagged as a POST executor is a declared REGISTRY_ID_TO_ORCHESTRATOR_TOOL key', () => {
+    // Containment, not exact-set equality: REGISTRY_ID_TO_ORCHESTRATOR_TOOL can
+    // legitimately hold backend-only aliases (e.g. 'cha2ds2vasc-calculator',
+    // mirrored from backend REGISTRY_ID_TO_EXECUTOR_TOOL_ID alongside its sibling
+    // alias 'calc-chads2vasc') that have no distinct row in this matrix, since
+    // buildE2eToolInventory() only builds one row per real frontend REGISTRY id.
+    const declaredKeys = new Set(Object.keys(REGISTRY_ID_TO_ORCHESTRATOR_TOOL));
     const postRegistry = buildE2eToolInventory()
       .filter((r) => r.backendPostExecutor)
       .map((r) => r.id);
-    expect(postRegistry.sort()).toEqual(Object.keys(REGISTRY_ID_TO_ORCHESTRATOR_TOOL).sort());
+    for (const id of postRegistry) {
+      expect(declaredKeys.has(id), `${id} flagged backendPostExecutor but missing from REGISTRY_ID_TO_ORCHESTRATOR_TOOL`).toBe(true);
+    }
   });
 
   it('dispatch-ai is NLU/chat-routed only with no POST executor', () => {

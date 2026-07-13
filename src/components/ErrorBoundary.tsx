@@ -69,8 +69,23 @@ class ErrorBoundary extends Component<any, any> {
     window.location.reload();
   };
 
+  resetErrorBoundary = () => {
+    this.setState({
+      hasError: false,
+      error: null,
+      errorInfo: null,
+    });
+  };
+
   render() {
     if (this.state.hasError) {
+      if (this.props.fallbackRender) {
+        return this.props.fallbackRender({
+          error: this.state.error,
+          resetErrorBoundary: this.resetErrorBoundary,
+        });
+      }
+
       const showErrorDetails = Boolean(import.meta?.env?.DEV);
       if (this.props.fallbackText || this.props.fallback) {
         return (

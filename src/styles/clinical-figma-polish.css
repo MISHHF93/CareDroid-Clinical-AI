@@ -556,9 +556,9 @@
   flex-wrap: nowrap;
 }
 
-/* Reception --primary search: bring width in line so all items fit in one row
+/* Reception emphasis search: bring width in line so all items fit in one row
    (Register 78px + this 340px + role-switcher 197px + account 300px + 3×12px gap = 951px < 1007px) */
-.emergency-app-shell__main-column .caredroid-header__lookup--primary {
+.emergency-app-shell__main-column .caredroid-header__lookup--emphasis {
   width: min(26vw, 340px);
   min-width: 200px;
   height: 34px;

@@ -29,6 +29,8 @@ import {
   PR3_CALCULATOR_REGISTRY_IDS,
   PR3_TIER_B_CHAT_CALCULATOR_IDS,
   TIER_B_CHAT_CALCULATOR_REGISTRY_IDS,
+  REGISTRY_ID_TO_ORCHESTRATOR_TOOL,
+  ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS,
 } from './clinicalCatalogWiring';
 import { getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { getAllDiscoveredTools, toolIdAliases } from './sourceCodeToolDiscovery';
@@ -152,7 +154,11 @@ describe('PR3 comprehensive — 2. catalog inclusion', () => {
     expect(row.chatOnlyForm).toBe(true);
     expect(row.uiCalculatorSlug).toBeNull();
     expect(row.chatOnRequest).toBe(true);
-    expect(row.backendExecutor).toBe(false);
+    // grace-acs and canadian-c-spine are real registerTool() backend executors, so
+    // backendExecutor is true; nihss/ottawa-ankle have no backend executor.
+    expect(row.backendExecutor).toBe(
+      (ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS as readonly string[]).includes(id)
+    );
     expect(row.chatSeed?.length).toBeGreaterThan(20);
     expect(row.chatSeed).toBe(clinicalIntentToolsById[id]?.chatSeed);
   });
@@ -212,8 +218,12 @@ describe('PR3 comprehensive — 5. resolveCatalogLaunch behavior', () => {
     const launch = resolveCatalogLaunch(id);
     expect(launch.path).toBe(PR3_HUB_PATH);
     expect(launch.registryId).toBe(id);
-    expect(launch.openLabel).toBe('Start guided chat');
-    expect(launch.orchestratorTool).toBeNull();
+    // grace-acs and canadian-c-spine are now real registerTool() backend executors
+    // (Tier C / backend-backed), so their launch resolves to 'Open' with a real
+    // orchestratorTool id; nihss/ottawa-ankle remain chat-only (no backend executor).
+    const expectedOrchestratorTool = REGISTRY_ID_TO_ORCHESTRATOR_TOOL[id] ?? null;
+    expect(launch.openLabel).toBe(expectedOrchestratorTool ? 'Open' : 'Start guided chat');
+    expect(launch.orchestratorTool).toBe(expectedOrchestratorTool);
     expect(launch.chatSeed).toBe(PR3_CHAT_CONFIG_BY_ID[id].chatSeed);
     expect(launch.chatSeed?.length).toBeGreaterThan(80);
   });
@@ -250,7 +260,11 @@ describe('PR3 comprehensive — 6. chatSeed presence', () => {
     const nlu = clinicalIntentTools.find((t) => t.toolId === id);
     expect(nlu?.path).toBe(PR3_HUB_PATH);
     expect(nlu?.sidebarToolId).toBe(id);
-    expect(nlu?.backendExecutable).toBe(false);
+    // grace-acs and canadian-c-spine are real registerTool() backend executors, so
+    // backendExecutable is true; nihss/ottawa-ankle have no backend executor.
+    expect(nlu?.backendExecutable).toBe(
+      (ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS as readonly string[]).includes(id)
+    );
     expect(nlu?.chatSeed?.length).toBeGreaterThan(100);
     expect(nlu?.chatSeed).toBe(PR3_CHAT_CONFIG_BY_ID[id].chatSeed);
   });

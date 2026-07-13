@@ -654,11 +654,15 @@ export async function createPatientAndRouteFromReception(
       criticalAlertId,
       actorName,
     }),
-  );
+  ).catch((error) => {
+    console.error('[ReceptionIntakeOrchestrator] onRapidIntakeCompleted failed:', error);
+  });
 
   void import('../engine/unifiedWorkflowAutomationEngine').then(({ scheduleWorkflowAutomationRefresh }) =>
     scheduleWorkflowAutomationRefresh('patient_created'),
-  );
+  ).catch((error) => {
+    console.error('[ReceptionIntakeOrchestrator] scheduleWorkflowAutomationRefresh failed:', error);
+  });
 
   return {
     patient: {

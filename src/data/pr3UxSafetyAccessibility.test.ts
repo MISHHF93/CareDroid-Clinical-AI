@@ -16,6 +16,7 @@ import {
 import {
   PR3_CALCULATOR_REGISTRY_IDS,
   PR3_TIER_B_CHAT_CALCULATOR_IDS,
+  REGISTRY_ID_TO_ORCHESTRATOR_TOOL,
   resolveCatalogLaunch,
 } from './clinicalCatalogWiring';
 import {
@@ -197,7 +198,11 @@ describe('PR3 launch flow — hub path without dashboard fallback for PR3', () =
   it.each(PR3_CALCULATOR_REGISTRY_IDS)('resolveCatalogLaunch(%s) stays on calculators hub', (id) => {
     const launch = resolveCatalogLaunch(id);
     expect(launch.path).toBe('/tools/calculators');
-    expect(launch.openLabel).toBe('Start guided chat');
+    // grace-acs and canadian-c-spine are now real registerTool() backend executors
+    // (Tier C / backend-backed), so openLabel is 'Open'; nihss/ottawa-ankle remain chat-only
+    // (no backend executor) and keep 'Start guided chat'.
+    const expectedOrchestratorTool = REGISTRY_ID_TO_ORCHESTRATOR_TOOL[id] ?? null;
+    expect(launch.openLabel).toBe(expectedOrchestratorTool ? 'Open' : 'Start guided chat');
     expect(launch.chatSeed?.length).toBeGreaterThan(80);
   });
 

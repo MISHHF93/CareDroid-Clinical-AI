@@ -19,6 +19,7 @@ import {
   NLU_TO_REGISTRY_ID,
   PR3_CALCULATOR_REGISTRY_IDS,
 } from './clinicalCatalogWiring';
+import { ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS } from './clinicalToolIdContract';
 import { getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { getAllDiscoveredTools, toolIdAliases } from './sourceCodeToolDiscovery';
 import { getToolIcon } from '../navigation/iconRegistry';
@@ -67,7 +68,11 @@ describe('PR3 launch audit — ten-dimension matrix', () => {
     expect(nlu?.toolId).toBe(registryId);
     expect(nlu?.sidebarToolId).toBe(registryId);
     expect(nlu?.path).toBe(PR3_HUB_PATH);
-    expect(nlu?.backendExecutable).toBe(false);
+    // grace-acs and canadian-c-spine are now registered backend executors
+    // (see ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS); the rest of the PR3 hub
+    // calculators remain chat-only with no real backend executor.
+    const isBackendExecutor = ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS.includes(registryId);
+    expect(nlu?.backendExecutable).toBe(isBackendExecutor);
 
     // 4. Discovery: canonical row + alias rows
     const discovered = getAllDiscoveredTools().filter((r) => r.id === registryId);
@@ -95,8 +100,16 @@ describe('PR3 launch audit — ten-dimension matrix', () => {
     const launch = resolveCatalogLaunch(registryId);
     expect(launch.path).toBe(PR3_HUB_PATH);
     expect(launch.registryId).toBe(registryId);
-    expect(launch.openLabel).toBe('Start guided chat');
-    expect(launch.orchestratorTool).toBeNull();
+    // grace-acs and canadian-c-spine are now registered backend executors, so
+    // they launch via the real POST executor ('Open') with a populated
+    // orchestratorTool id, instead of the chat-only ('Start guided chat', null) path.
+    if (isBackendExecutor) {
+      expect(launch.openLabel).toBe('Open');
+      expect(launch.orchestratorTool).toBe(registryId);
+    } else {
+      expect(launch.openLabel).toBe('Start guided chat');
+      expect(launch.orchestratorTool).toBeNull();
+    }
     expect(launch.chatSeed).toBe(nlu.chatSeed);
     expect(launch.chatSeed).toBe(PR3_CHAT_CONFIG_BY_ID[registryId].chatSeed);
     expect(launch.chatSeed.length).toBeGreaterThan(80);

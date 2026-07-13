@@ -380,6 +380,8 @@ function AppShellFrame({ children }: AppShellProps) {
         source: 'AppShell',
         metadata: { route: location.pathname },
       });
+    }).catch((error) => {
+      console.error('[AppShell] observabilityService initialization failed:', error);
     });
     void (async () => {
       await ensureDevBackendSession();
@@ -463,7 +465,9 @@ function AppShellFrame({ children }: AppShellProps) {
       useEmergencyStore.getState().updateAlerts();
       void import('../services/alertLifecycleOrchestrator').then(({ checkUnacknowledgedAlertEscalations }) =>
         checkUnacknowledgedAlertEscalations(),
-      );
+      ).catch((error) => {
+        console.error('[AppShell] checkUnacknowledgedAlertEscalations failed:', error);
+      });
     }, 30_000);
 
     if (simulationModeActive) {
@@ -471,6 +475,8 @@ function AppShellFrame({ children }: AppShellProps) {
         if (cancelled) return;
         simulation.startSimulation();
         stopSimulation = simulation.stopSimulation;
+      }).catch((error) => {
+        console.error('[AppShell] simulation start failed:', error);
       });
     }
 

@@ -21,6 +21,8 @@ import {
   NLU_TO_REGISTRY_ID,
   PR2_CALCULATOR_REGISTRY_IDS,
   BUILTIN_CALC_ID_TO_REGISTRY_ID,
+  REGISTRY_ID_TO_ORCHESTRATOR_TOOL,
+  ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS,
   resolveRegistryId,
 } from './clinicalCatalogWiring';
 import { getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
@@ -92,7 +94,11 @@ describe('PR2 registration audit — canonical ID alignment', () => {
     const nlu = clinicalIntentTools.find((t) => t.toolId === id);
     expect(nlu?.toolId).toBe(id);
     expect(nlu?.sidebarToolId).toBe(id);
-    expect(nlu?.backendExecutable).toBe(false);
+    // timi-ua-nstemi is a real registerTool() backend executor, so backendExecutable is true;
+    // meld/meld-na have no backend executor.
+    expect(nlu?.backendExecutable).toBe(
+      (ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS as readonly string[]).includes(id)
+    );
 
     const builtin = builtinUiCalculators.find((c) => c.id === id);
     expect(builtin?.id).toBe(id);
@@ -111,7 +117,11 @@ describe('PR2 registration audit — canonical ID alignment', () => {
     expect(nlu?.toolId).toBe(id);
     expect(nlu?.sidebarToolId).toBe(id);
     expect(nlu?.path).toBe(PR2_HUB_PATH);
-    expect(nlu?.backendExecutable).toBe(false);
+    // wells-pe is a real registerTool() backend executor, so backendExecutable is true;
+    // perc has no backend executor.
+    expect(nlu?.backendExecutable).toBe(
+      (ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS as readonly string[]).includes(id)
+    );
 
     expect(builtinUiCalculators.some((c) => c.id === id)).toBe(false);
     expect(nluCalculatorHubOnly.some((h) => h.toolId === id)).toBe(true);
@@ -294,7 +304,10 @@ describe('PR2 registration audit — sidebar, hub launch, deep links', () => {
     expect(launch.registryId).toBe(id);
     expect(launch.path).not.toBe(PR2_HUB_PATH);
     expect(launch.chatSeed?.length).toBeGreaterThan(20);
-    expect(launch.orchestratorTool).toBeNull();
+    // timi-ua-nstemi is a real registerTool() backend executor, so orchestratorTool resolves
+    // to its tool id instead of null; meld/meld-na have no backend executor.
+    const expectedOrchestratorTool = REGISTRY_ID_TO_ORCHESTRATOR_TOOL[id] ?? null;
+    expect(launch.orchestratorTool).toBe(expectedOrchestratorTool);
     expect(launch.openLabel).toBe('Open');
   });
 
@@ -303,8 +316,11 @@ describe('PR2 registration audit — sidebar, hub launch, deep links', () => {
     expect(launch.path).toBe(PR2_HUB_PATH);
     expect(launch.registryId).toBe(id);
     expect(launch.chatSeed?.length).toBeGreaterThan(80);
-    expect(launch.openLabel).toBe('Start guided chat');
-    expect(launch.orchestratorTool).toBeNull();
+    // wells-pe is now a real registerTool() backend executor (Tier C / backend-backed), so its
+    // launch resolves to 'Open' with a real orchestratorTool id; perc remains chat-only.
+    const expectedOrchestratorTool = REGISTRY_ID_TO_ORCHESTRATOR_TOOL[id] ?? null;
+    expect(launch.openLabel).toBe(expectedOrchestratorTool ? 'Open' : 'Start guided chat');
+    expect(launch.orchestratorTool).toBe(expectedOrchestratorTool);
   });
 
   it.each(PR2_ALL_ALIAS_PAIRS)(

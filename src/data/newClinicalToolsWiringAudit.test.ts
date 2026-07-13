@@ -49,6 +49,7 @@ import {
   NEW_CLINICAL_TOOLS_CHAT_CONFIGS,
   catalogRowsMatchingQuery,
 } from './newClinicalToolsAuditConstants';
+import { REGISTRY_ID_TO_ORCHESTRATOR_TOOL } from './clinicalToolIdContract';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
@@ -117,7 +118,9 @@ describe('New clinical tools — NLU, catalog, and backend', () => {
     expect(nlu?.toolId).toBe(id);
     expect(nlu?.path).toBe(spec.routePath);
     expect(nlu?.sidebarToolId).toBe(id);
-    expect(nlu?.backendExecutable).toBe(false);
+    // heart-score, abcd2, pecarn-head, and nexus-cspine now have a real backend executor
+    // (REGISTRY_ID_TO_ORCHESTRATOR_TOOL) and are marked backendExecutable: true accordingly.
+    expect(nlu?.backendExecutable).toBe(Boolean(REGISTRY_ID_TO_ORCHESTRATOR_TOOL[id]));
     expect(nlu?.chatSeed).toMatch(spec.chatSeedPattern);
     expect(patternsSource).toContain(`toolId: '${id}'`);
     expect(orchestratorSource).toContain(`'${id}'`);
@@ -212,7 +215,10 @@ describe('New clinical tools — catalog and launch', () => {
     expect(launch.registryId).toBe(id);
     expect(launch.path).toBe(spec.routePath);
     expect(launch.path).not.toBe('/dashboard');
-    expect(launch.openLabel).toBe(spec.openLabel);
+    // pecarn-head and nexus-cspine now have a real backend executor — openLabel is 'Open'
+    // instead of the pre-executor spec's 'Start guided chat'.
+    const expectedOpenLabel = REGISTRY_ID_TO_ORCHESTRATOR_TOOL[id] ? 'Open' : spec.openLabel;
+    expect(launch.openLabel).toBe(expectedOpenLabel);
     expect(resolveNavigationPathForLaunch(launch)).toBe(spec.navigationPath);
   });
 });

@@ -17,6 +17,9 @@
 @import './emergency-tokens.css';
 @import './role-accent-theme.css';
 
+/* 3.5 Shell layout tokens (canonical source for all shell dimensions) */
+@import './shell-tokens.css';
+
 /* 4. Medical theme layers */
 @import './medical-color-layer.css';
 @import './medical-shell-layer.css';

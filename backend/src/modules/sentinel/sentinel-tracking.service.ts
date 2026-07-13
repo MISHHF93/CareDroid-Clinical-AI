@@ -84,7 +84,12 @@ export class SentinelTrackingService implements OnModuleInit {
   async health(): Promise<{
     enabled: boolean;
     postgis: boolean;
-    adapters: Array<{ vendorId: string; healthy: boolean; detail: string; lastEventAt: string | null }>;
+    adapters: Array<{
+      vendorId: string;
+      healthy: boolean;
+      detail: string;
+      lastEventAt: string | null;
+    }>;
     unitCount: number;
   }> {
     const config = getSentinelRuntimeConfig();
@@ -136,7 +141,9 @@ export class SentinelTrackingService implements OnModuleInit {
     return this.episodeRepo.find({ order: { updatedAt: 'DESC' }, take: 100 });
   }
 
-  async ingestCadEvents(events: readonly CadAvlEvent[]): Promise<{ accepted: number; rejected: number }> {
+  async ingestCadEvents(
+    events: readonly CadAvlEvent[],
+  ): Promise<{ accepted: number; rejected: number }> {
     let accepted = 0;
     let rejected = 0;
     for (const event of events) {

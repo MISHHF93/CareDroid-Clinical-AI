@@ -281,7 +281,7 @@ export function dischargePatientSafely(
       moveWithJourneyRules(patientId, PatientState.Discharge, { staffId, note });
       return { ok: true as const };
     } catch {
-      // Fall through to clinical override discharge below.
+      // Expected when journey rules block discharge — fall through to clinical override below.
     }
   }
 
@@ -350,7 +350,8 @@ export function advancePatientJourneyState(
       note: options.note,
     });
     return { ok: true as const };
-  } catch {
+  } catch (error) {
+    // Expected when journey rules block the requested state transition.
     return { ok: false as const, reason: 'transition_blocked' as const };
   }
 }
@@ -474,7 +475,8 @@ export function enterWaitingQueue(
       staffId,
       note,
     });
-  } catch {
+  } catch (error) {
+    // Expected when journey rules block the triage → waiting transition.
     return { ok: false as const, reason: 'transition_blocked' as const };
   }
 

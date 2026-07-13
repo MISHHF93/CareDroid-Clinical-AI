@@ -101,7 +101,9 @@ export function startResponseTimer(
 
   void import('../services/threeMinuteMissionService').then(({ syncThreeMinuteMissionsFromEngine }) =>
     syncThreeMinuteMissionsFromEngine(),
-  );
+  ).catch((error) => {
+    console.error('[ThreeMinuteTimerEngine] syncThreeMinuteMissionsFromEngine (startTimer) failed:', error);
+  });
 
   return timerId;
 }
@@ -120,7 +122,9 @@ export function acknowledgeResponseTimer(timerId: string, acknowledgedBy: string
 
   void import('../services/threeMinuteMissionService').then(({ syncThreeMinuteMissionsFromEngine }) =>
     syncThreeMinuteMissionsFromEngine(),
-  );
+  ).catch((error) => {
+    console.error('[ThreeMinuteTimerEngine] syncThreeMinuteMissionsFromEngine (acknowledge) failed:', error);
+  });
 
   return true;
 }
@@ -204,7 +208,9 @@ function checkEscalations(): void {
         current.breachAt = current.breachAt ?? new Date().toISOString();
         void import('../services/emergencyCareJourneyOrchestrator').then(({ onThreeMinuteBreachForPatient }) =>
           onThreeMinuteBreachForPatient(timer.patientId),
-        );
+        ).catch((error) => {
+          console.error('[ThreeMinuteTimerEngine] onThreeMinuteBreachForPatient failed:', error);
+        });
       } else if (threshold.key === 'escalation_l1') {
         current.phase = 'escalated_l1';
       }
@@ -223,7 +229,9 @@ function checkEscalations(): void {
 
   void import('../services/threeMinuteMissionService').then(({ syncThreeMinuteMissionsFromEngine }) =>
     syncThreeMinuteMissionsFromEngine(),
-  );
+  ).catch((error) => {
+    console.error('[ThreeMinuteTimerEngine] syncThreeMinuteMissionsFromEngine (checkEscalations) failed:', error);
+  });
 }
 
 function subscribeToMissionTriggers(): () => void {
@@ -256,7 +264,9 @@ function subscribeToMissionTriggers(): () => void {
     if (changed) {
       void import('../services/threeMinuteMissionService').then(({ evaluateThreeMinuteTriggers }) =>
         evaluateThreeMinuteTriggers(),
-      );
+      ).catch((error) => {
+        console.error('[ThreeMinuteTimerEngine] evaluateThreeMinuteTriggers failed:', error);
+      });
     }
   });
 }
@@ -269,6 +279,8 @@ export function startTimerEngine(): () => void {
   void import('../services/threeMinuteMissionService').then(({ hydrateThreeMinuteMissionsFromStore, evaluateThreeMinuteTriggers }) => {
     hydrateThreeMinuteMissionsFromStore();
     evaluateThreeMinuteTriggers();
+  }).catch((error) => {
+    console.error('[ThreeMinuteTimerEngine] hydrateThreeMinuteMissionsFromStore failed:', error);
   });
 
   unsubscribeStore = subscribeToMissionTriggers();

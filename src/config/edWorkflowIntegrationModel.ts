@@ -197,9 +197,9 @@ type UserLike = {
 } | null;
 
 type OperationalProfileLike = {
-  effectiveProfile?: { saasRole?: string; emergencyRoleId?: string };
-  accessSummary?: UserProfileAccessSummary;
-  saasProfile?: { role?: string; saasRole?: string };
+  effectiveProfile?: { saasRole?: string; emergencyRoleId?: string } | null;
+  accessSummary?: UserProfileAccessSummary | null;
+  saasProfile?: { role?: string; saasRole?: string } | null;
 } | null;
 
 export function listEdWorkflowAzSteps(): readonly EdWorkflowAzStep[] {

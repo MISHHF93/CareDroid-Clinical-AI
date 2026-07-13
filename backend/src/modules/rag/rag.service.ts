@@ -212,9 +212,7 @@ export class RAGService implements OnModuleInit {
       // 4. Upsert to vector database
       await this.vectorDb.upsertBatch(vectorRecords);
       this.invalidateRetrievalCache();
-      this.logger.log(
-        `Successfully ingested ${chunks.length} chunks for: ${enrichedSource.title}`,
-      );
+      this.logger.log(`Successfully ingested ${chunks.length} chunks for: ${enrichedSource.title}`);
 
       return {
         success: true,

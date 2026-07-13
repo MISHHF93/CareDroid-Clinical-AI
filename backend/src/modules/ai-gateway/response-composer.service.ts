@@ -15,7 +15,10 @@ export class ResponseComposerService {
     routePlan: ExpertRoutePlan,
     contextPacket: AiContextPacket,
     extraMetadata: Record<string, any> = {},
-  ): T & { provenance: ReturnType<typeof buildAiResponseProvenance>; metadata: Record<string, any> } {
+  ): T & {
+    provenance: ReturnType<typeof buildAiResponseProvenance>;
+    metadata: Record<string, any>;
+  } {
     const aiFoundation: AiGatewayMetadata = {
       runId: envelope.runId,
       capabilityId: envelope.capabilityId,
@@ -55,7 +58,7 @@ export class ResponseComposerService {
             confidence,
             ragSources: citations,
             ragChunks: chunks,
-            modelOrEngine: routePlan.modelPlan?.primaryModel || routePlan.selectedExpert,
+            modelOrEngine: routePlan.modelPlan?.expertModel || routePlan.selectedExpert,
             responseClass: routePlan.safetyPlan?.emergencyEscalation ? 'clinical' : 'operational',
             recommendedReviewerRole: 'Responsible clinician',
             missingInformation: Array.isArray((response as any).missingInformation)

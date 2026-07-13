@@ -1,4 +1,4 @@
-import { Inject, Injectable, Optional, forwardRef } from '@nestjs/common';
+import { Inject, Injectable, Logger, Optional, forwardRef } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, MoreThanOrEqual } from 'typeorm';
@@ -49,6 +49,7 @@ interface AiModelPricing {
 
 @Injectable()
 export class AIService {
+  private readonly logger = new Logger(AIService.name);
   private readonly rateLimits: Map<SubscriptionTier, RateLimitConfig>;
   private readonly aiPricing: Map<string, AiModelPricing>;
   private readonly toolDefinitions: ToolDefinition[];
@@ -537,7 +538,10 @@ export class AIService {
         method: classification.method,
         isEmergency: classification.isEmergency,
       };
-    } catch {
+    } catch (error) {
+      this.logger.warn(
+        `[AIService] Intent classification failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
       return null;
     }
   }

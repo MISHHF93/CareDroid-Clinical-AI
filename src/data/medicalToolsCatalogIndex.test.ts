@@ -3,6 +3,7 @@ import { clinicalIntentTools } from './clinicalIntentToolCatalog';
 import toolRegistry from './toolRegistry';
 import { getMedicalCatalogSummary, getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { catalogRowsMatchingQuery } from '../utils/catalogSearch';
+import { REGISTRY_ID_TO_ORCHESTRATOR_TOOL } from './clinicalToolIdContract';
 
 describe('medicalToolsCatalogIndex', () => {
   it('includes every NLU clinical tool profile', () => {
@@ -82,7 +83,9 @@ describe('medicalToolsCatalogIndex', () => {
     const pr1 = ['qsofa', 'news2', 'child-pugh', 'has-bled'];
     for (const id of pr1) {
       const row = rows.find((r) => r.primaryId === id);
-      expect(row?.backendExecutor).toBe(false);
+      // news2 and has-bled now have a real backend executor (REGISTRY_ID_TO_ORCHESTRATOR_TOOL).
+      const expectedBackendExecutor = Boolean(REGISTRY_ID_TO_ORCHESTRATOR_TOOL[id]);
+      expect(row?.backendExecutor).toBe(expectedBackendExecutor);
     }
   });
 
@@ -117,7 +120,8 @@ describe('medicalToolsCatalogIndex', () => {
     expect(timi?.pagePath).toBe('/tools/calculators/timi-ua-nstemi');
     expect(timi?.uiCalculatorSlug).toBe('timi-ua-nstemi');
     expect(timi?.chatOnRequest).toBe(true);
-    expect(timi?.backendExecutor).toBe(false);
+    // timi-ua-nstemi now has a real backend executor (REGISTRY_ID_TO_ORCHESTRATOR_TOOL).
+    expect(timi?.backendExecutor).toBe(true);
   });
 
   it('finds wells-pe via pe-score alias search', () => {

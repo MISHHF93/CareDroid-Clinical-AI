@@ -45,10 +45,9 @@ describe('backendFrontendExposure scan', () => {
     expect(ok).toBe(true);
   });
 
-  scanIt('inventory covers three POST executors', () => {
+  scanIt('inventory covers every registered POST executor', () => {
     const scan = runBackendFrontendExposureScan();
     expect(scan.executorNluIds).toEqual([...BACKEND_EXECUTOR_NLU_TOOL_IDS]);
-    expect(scan.executorNluIds).toHaveLength(3);
 
     for (const id of BACKEND_EXECUTOR_NLU_TOOL_IDS) {
       expect(findBackendRoute('POST', `/api/tools/${id}/execute`)).toBeTruthy();

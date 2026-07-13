@@ -6,6 +6,7 @@ import {
   NEPHROLOGY_TIER_A_CALCULATOR_REGISTRY_IDS,
   NEPHROLOGY_TIER_B_CHAT_REGISTRY_IDS,
   REGISTRY,
+  REGISTRY_ID_TO_ORCHESTRATOR_TOOL,
 } from './clinicalToolIdContract';
 import { resolveCatalogLaunch } from './clinicalCatalogWiring';
 import { getCanonicalToolInventory } from './toolInventory';
@@ -41,7 +42,12 @@ describe('Nephrology Clinical Tools Pack', () => {
     for (const id of NEPHROLOGY_TIER_A_CALCULATOR_REGISTRY_IDS) {
       const launch = resolveCatalogLaunch(id);
       expect(launch.path).toMatch(/^\/tools\/calculators\//);
-      expect(launch.orchestratorTool).toBeNull();
+      const expectedOrchestratorTool = REGISTRY_ID_TO_ORCHESTRATOR_TOOL[id] || null;
+      if (expectedOrchestratorTool) {
+        expect(launch.orchestratorTool).toBe(expectedOrchestratorTool);
+      } else {
+        expect(launch.orchestratorTool).toBeNull();
+      }
       expect(builtinSlugs.has(id)).toBe(true);
       expect(smokeSlugs.has(id)).toBe(true);
       expect(CALCULATOR_ROUTE_DEFS.some((route) => route.calculatorSlug === id)).toBe(true);

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { FleetService } from '../fleet/fleet.service';
 import { PlatformAssetsService } from './platform-assets.service';
 
@@ -12,6 +12,7 @@ const DIGITAL_TWIN_CAPABILITY_PACKS = {
 
 @Injectable()
 export class DigitalTwinService {
+  private readonly logger = new Logger(DigitalTwinService.name);
   constructor(
     private readonly fleetService: FleetService,
     private readonly platformAssetsService: PlatformAssetsService,
@@ -38,7 +39,10 @@ export class DigitalTwinService {
         eta: v.eta || '—',
         alert: v.alert || 'None',
       }));
-    } catch {
+    } catch (error) {
+      this.logger.warn(
+        `[DigitalTwin] Fleet snapshot failed, using fallback: ${error instanceof Error ? error.message : String(error)}`,
+      );
       fleetVehicles = [
         {
           id: 'amb-a12',
@@ -116,7 +120,10 @@ export class DigitalTwinService {
       const entitlements =
         await this.platformAssetsService.getOrganizationEntitlements(organizationId);
       return entitlements.map((row) => row.packId);
-    } catch {
+    } catch (error) {
+      this.logger.warn(
+        `[DigitalTwin] Failed to resolve entitlements for ${organizationId}: ${error instanceof Error ? error.message : String(error)}`,
+      );
       return [];
     }
   }

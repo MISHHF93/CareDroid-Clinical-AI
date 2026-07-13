@@ -22,7 +22,10 @@ export class SentinelOutboxService {
     @InjectRepository(SentinelOutboxEntity)
     private readonly outboxRepo: Repository<SentinelOutboxEntity>,
     private readonly moduleRef: ModuleRef,
-    @Optional() private readonly realtimePublisher?: { publish(event: { type: string; payload?: unknown }): void },
+    @Optional()
+    private readonly realtimePublisher?: {
+      publish(event: { type: string; payload?: unknown }): void;
+    },
   ) {}
 
   async enqueue(input: OutboxWriteInput): Promise<SentinelOutboxEntity> {

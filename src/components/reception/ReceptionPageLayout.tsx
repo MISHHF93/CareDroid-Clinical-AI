@@ -6,6 +6,7 @@ export type ReceptionPageLayoutProps = {
   mainContent: ReactNode;
   sidebar?: ReactNode;
   footer?: ReactNode;
+  children?: ReactNode;
 };
 
 export default function ReceptionPageLayout({
@@ -13,23 +14,29 @@ export default function ReceptionPageLayout({
   mainContent,
   sidebar,
   footer,
+  children,
 }: ReceptionPageLayoutProps) {
   return (
-    <div className="reception-page-layout">
-      {/* Fixed Header */}
-      <div className="reception-page-layout__header">{header}</div>
+    <>
+      <div className="reception-page-layout">
+        {/* Workspace Header */}
+        <div className="reception-page-layout__header">{header}</div>
 
-      {/* Main Content Area */}
-      <div className="reception-page-layout__body">
-        <main className="reception-page-layout__main">{mainContent}</main>
+        {/* Main Content Area */}
+        <div className="reception-page-layout__body">
+          <main className="reception-page-layout__main">{mainContent}</main>
 
-        {/* Optional Sidebar */}
-        {sidebar && <aside className="reception-page-layout__sidebar">{sidebar}</aside>}
+          {/* Optional Sidebar */}
+          {sidebar && <aside className="reception-page-layout__sidebar">{sidebar}</aside>}
+        </div>
+
+        {/* Optional Footer */}
+        {footer && <div className="reception-page-layout__footer">{footer}</div>}
       </div>
 
-      {/* Optional Footer */}
-      {footer && <div className="reception-page-layout__footer">{footer}</div>}
-    </div>
+      {/* Overlays, dialogs, and floating panels rendered outside the layout grid */}
+      {children}
+    </>
   );
 }
 

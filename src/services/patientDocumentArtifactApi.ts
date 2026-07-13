@@ -53,7 +53,7 @@ export async function fetchPatientDocumentArtifacts(
     const parsed = await (parseApiResponse as (r: Response) => Promise<PatientDocumentArtifactEnvelope>)(response);
     if (parsed?.data?.artifacts) return parsed;
   } catch {
-    // Fall through to empty local envelope.
+    // Expected when backend is unavailable — fall through to empty local envelope.
   }
   return localEnvelope(patientId, [], []);
 }
@@ -72,7 +72,7 @@ export async function extractPatientDocumentArtifacts(
     const parsed = await (parseApiResponse as (r: Response) => Promise<PatientDocumentArtifactEnvelope>)(response);
     if (parsed?.data?.artifacts?.length) return parsed;
   } catch {
-    // Fall through to local extraction.
+    // Expected when backend is unavailable — fall through to local extraction.
   }
 
   return localEnvelope(input.patientId, local.artifacts, [local.source]);
@@ -95,7 +95,7 @@ export async function reviewPatientDocumentArtifact(
     const parsed = await (parseApiResponse as (r: Response) => Promise<PatientDocumentArtifactEnvelope>)(response);
     if (parsed?.data?.artifacts) return parsed;
   } catch {
-    // Fall through to local review.
+    // Expected when backend is unavailable — fall through to local review.
   }
 
   const updated = currentArtifacts.map((artifact) =>

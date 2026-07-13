@@ -6,6 +6,12 @@ on:
   pull_request:
     branches: [main, develop]
   workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+  security-events: write
+  checks: write
 
 env:
   NODE_VERSION: '20'
@@ -54,6 +60,14 @@ jobs:
         working-directory: backend
         run: npm ci
 
+      # Non-blocking: 28 files currently fail this check (pre-existing drift,
+      # confirmed 2026-07-13, not something to silently gate merges/deploys on
+      # as a side effect of CI consolidation). Still runs and reports so it's
+      # visible; see SCORECARD.md roadmap for the real fix.
+      - name: Format check
+        run: npm run format:check
+        continue-on-error: true
+
       - name: Validate (lint, tests, builds)
         run: npm run validate:ci
         env:
@@ -92,3 +106,37 @@ jobs:
         env:
           CI: true
           QA_BASE_URL: http://localhost:8000
+
+  security-scan:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          scan-ref: .
+          format: sarif
+          output: trivy-results.sarif
+
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: trivy-results.sarif
+        continue-on-error: true
+
+      - name: Run npm audit
+        run: npm audit --audit-level=high
+        continue-on-error: true
+
+      - name: Run backend npm audit
+        working-directory: backend
+        run: npm audit --audit-level=high
+        continue-on-error: true
+
+      - name: Check outdated dependencies
+        run: npm outdated
+        continue-on-error: true

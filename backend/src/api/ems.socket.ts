@@ -23,14 +23,22 @@ export function registerEMSWebSocketSupport(
     logger.log(`Client connected: ${socket.id}`);
 
     socket.on('join-whiteboard', (userId: string) => {
-      connections.set(userId, socket.id);
-      socket.join('whiteboard');
+      try {
+        connections.set(userId, socket.id);
+        socket.join('whiteboard');
+      } catch (error) {
+        console.error('[EMS-WS] join-whiteboard error:', error);
+      }
     });
 
     socket.on('disconnect', () => {
-      logger.log(`Client disconnected: ${socket.id}`);
-      for (const [userId, socketId] of connections.entries()) {
-        if (socketId === socket.id) connections.delete(userId);
+      try {
+        logger.log(`Client disconnected: ${socket.id}`);
+        for (const [userId, socketId] of connections.entries()) {
+          if (socketId === socket.id) connections.delete(userId);
+        }
+      } catch (error) {
+        console.error('[EMS-WS] disconnect cleanup error:', error);
       }
     });
   });

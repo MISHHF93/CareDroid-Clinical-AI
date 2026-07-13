@@ -33,18 +33,29 @@ describe('toolVisibilityMatrix', () => {
     }
   });
 
-  it('documents three backend executors on Tier C tools only', () => {
+  it('documents 37 backend executors on Tier C tools only', () => {
     const rows = buildToolVisibilityMatrix();
     const executors = rows.filter((r) => r.backendExecutorExists);
     expect(executors.map((r) => r.canonicalId).sort()).toEqual(
-      ['drug-check', 'lab-interp', 'sofa-score'].sort()
+      [
+        'drug-check', 'lab-interp', 'sofa-score', 'heart-score', 'calc-chads2vasc', 'wells-pe',
+        'shock-index', 'apache2-calculator', 'anion-gap', 'aa-gradient', 'news2', 'abcd2',
+        'canadian-c-spine', 'nexus-cspine', 'gcs-calculator', 'chads2', 'duke-treadmill-score',
+        'reynolds-risk-score', 'has-bled', 'timi-ua-nstemi', 'framingham-risk', 'grace-acs',
+        'corrected-calcium', 'corrected-sodium', 'fena', 'feurea', 'osmolal-gap', 'serum-osmolality',
+        'pao2-fio2-ratio', 'rox-index', 'mews', 'revised-trauma-score', 'hunt-hess-scale', 'ich-score',
+        'four-score', 'modified-rankin-scale', 'pecarn-head',
+      ].sort()
     );
+    for (const row of executors) {
+      expect(row.tier, row.canonicalId).toBe('C');
+    }
   });
 
-  it('marks Tier B registry tools as archived after active tools routes were retired', () => {
+  it('marks Tier C registry tools (backend-executed) as archived after active tools routes were retired', () => {
     const rows = buildToolVisibilityMatrix();
     const wells = rows.find((r) => r.canonicalId === 'wells-pe');
-    expect(wells?.tier).toBe('B');
+    expect(wells?.tier).toBe('C');
     expect(wells?.currentStatus).toBe('archived route');
     expect(wells?.launchPathWorks).toBe(true);
   });

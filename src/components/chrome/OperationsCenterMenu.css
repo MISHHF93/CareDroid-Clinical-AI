@@ -73,7 +73,7 @@
   position: fixed;
   top: calc(var(--cdl-header-height, 52px) + 8px);
   right: 16px;
-  z-index: var(--z-popover, 940);
+  z-index: var(--z-popover, 600);
   display: flex;
   flex-direction: column;
   width: min(420px, 92vw);

@@ -25,6 +25,7 @@ const getApiBaseUrl = () => {
   try {
     return new URL(configured).origin;
   } catch {
+    // Expected when configured is a relative path or malformed — fall back to raw value.
     return configured.replace(/\/api\/?$/i, '').replace(/\/$/, '');
   }
 };
@@ -59,6 +60,7 @@ const shouldAttachTenantHeaders = (path = '') => {
   try {
     return new URL(path).origin === window.location.origin;
   } catch {
+    // Expected when path is relative or malformed — treat as same-origin.
     return false;
   }
 };

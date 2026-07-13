@@ -448,7 +448,17 @@ export class EvaluationService {
     const candidates = [
       join(process.cwd(), 'qa', 'ai-eval', 'results', 'dashboard-run.latest.json'),
       join(process.cwd(), '..', 'qa', 'ai-eval', 'results', 'dashboard-run.latest.json'),
-      join(__dirname, '..', '..', '..', '..', 'qa', 'ai-eval', 'results', 'dashboard-run.latest.json'),
+      join(
+        __dirname,
+        '..',
+        '..',
+        '..',
+        '..',
+        'qa',
+        'ai-eval',
+        'results',
+        'dashboard-run.latest.json',
+      ),
     ];
     for (const filePath of candidates) {
       try {

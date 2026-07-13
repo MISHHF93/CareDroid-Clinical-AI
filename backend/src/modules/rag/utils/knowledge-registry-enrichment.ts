@@ -2,6 +2,25 @@ import { existsSync, readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
 import { MedicalSource } from '../dto/medical-source.dto';
 
+const VALID_EVIDENCE_LEVELS = new Set<NonNullable<MedicalSource['evidenceLevel']>>([
+  'A',
+  'B',
+  'C',
+  'expert_opinion',
+]);
+
+/**
+ * Registry JSON is untrusted disk input — `evidence_grade` is a free-form
+ * string on disk but `MedicalSource.evidenceLevel` is a closed literal union.
+ * Unrecognized values fall back to undefined (not_assessed) rather than
+ * coercing arbitrary registry content into the type.
+ */
+function normalizeEvidenceLevel(value: string | undefined): MedicalSource['evidenceLevel'] {
+  return value && (VALID_EVIDENCE_LEVELS as Set<string>).has(value)
+    ? (value as MedicalSource['evidenceLevel'])
+    : undefined;
+}
+
 export interface RegistryArtifactLite {
   id: string;
   title?: string;
@@ -69,7 +88,7 @@ export function enrichSourceWithRegistry(
     title: source.title || artifact.title || source.id,
     organization: source.organization || artifact.publisher,
     specialty: source.specialty || artifact.specialty,
-    evidenceLevel: source.evidenceLevel || artifact.evidence_grade,
+    evidenceLevel: source.evidenceLevel || normalizeEvidenceLevel(artifact.evidence_grade),
     authoritative:
       source.authoritative ??
       (artifact.review_status === 'accepted' ||

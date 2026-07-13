@@ -36,7 +36,7 @@
   --ed-type-meta: var(--font-10, 10px);
 
   --ed-chrome-height: 36px;
-  --ed-header-height-target: 64px;
+  --ed-header-height-target: var(--shell-header-height, 52px);
 
   /* Aliases for existing product tokens */
   --copilot-bg: var(--ed-surface-base);
