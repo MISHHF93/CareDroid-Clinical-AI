@@ -5,6 +5,8 @@ import type { TenantContext as TenantContextValue } from '../tenant-context/tena
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthorizationGuard } from '../auth/guards/authorization.guard';
+import { RequirePermission } from '../auth/decorators/permissions.decorator';
+import { Permission } from '../auth/enums/permission.enum';
 import {
   FederatedLearningService,
   HybridDigitalTwinService,
@@ -301,11 +303,13 @@ export class EmergencyOsController {
     return this.emsIntakeService.getEMSIntake();
   }
 
+  @RequirePermission(Permission.READ_PHI)
   @Get('reception/snapshot')
   getReceptionSnapshot() {
     return this.receptionWorkspaceService.getSnapshot();
   }
 
+  @RequirePermission(Permission.WRITE_PHI)
   @Post('reception/handoff')
   async postReceptionHandoff(
     @Body()

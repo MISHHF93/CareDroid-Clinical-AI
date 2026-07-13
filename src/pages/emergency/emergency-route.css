@@ -36,17 +36,17 @@
 
 .emergency-route-situation-brief--info {
   border-color: color-mix(in srgb, var(--app-accent-interactive, var(--status-info)) 28%, var(--ed-border-subtle));
-  background: color-mix(in srgb, var(--app-accent-interactive, var(--status-info)) 6%, var(--ed-surface-raised));
+  background: var(--ed-surface-raised);
 }
 
 .emergency-route-situation-brief--warning {
   border-color: color-mix(in srgb, var(--status-warning, #f59e0b) 34%, var(--ed-border-subtle));
-  background: color-mix(in srgb, var(--status-warning, #f59e0b) 8%, var(--ed-surface-raised));
+  background: var(--ed-surface-raised);
 }
 
 .emergency-route-situation-brief--critical {
   border-color: color-mix(in srgb, var(--status-critical, #ef4444) 38%, var(--ed-border-subtle));
-  background: color-mix(in srgb, var(--status-critical, #ef4444) 8%, var(--ed-surface-raised));
+  background: var(--ed-surface-raised);
 }
 
 .emergency-route-situation-brief__list {

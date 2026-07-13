@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { FolderOpen, ShieldCheck } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { FolderOpen, ShieldCheck, X } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 
 import ReceptionDeskToolbar from '../../components/reception/ReceptionDeskToolbar';
@@ -269,6 +269,8 @@ export default function ReceptionWorkspace() {
   const [smartIntakeSession, setSmartIntakeSession] = useState<SmartIntakeSession | null>(null);
   const [escalationDialogOpen, setEscalationDialogOpen] = useState(false);
   const [escalationReasonId, setEscalationReasonId] = useState<ReceptionEscalationReasonId | null>(null);
+  const [patientDetailOpen, setPatientDetailOpen] = useState(false);
+  const workspaceRef = useRef<HTMLDivElement>(null);
 
   const receptionCapabilities = useMemo(
     () =>
@@ -412,6 +414,33 @@ export default function ReceptionWorkspace() {
     const timer = window.setInterval(() => setNow(Date.now()), 1000);
     return () => window.clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const isInput = e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLSelectElement;
+      if (isInput) return;
+
+      if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+        e.preventDefault();
+        if (canCreatePatient) resetForNextPatient();
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        saveDraft();
+      }
+      if (e.key === 'Escape') {
+        if (smartIntakeSession) { setSmartIntakeSession(null); clearIntakeQueryParams(); return; }
+        if (showChooser) { setShowChooser(false); return; }
+        if (escalationDialogOpen) { setEscalationDialogOpen(false); setEscalationReasonId(null); return; }
+        if (patientDetailOpen) { setPatientDetailOpen(false); return; }
+      }
+      if (e.key === '1' && !e.ctrlKey && !e.metaKey) { focusQueueTab('ems'); }
+      if (e.key === '2' && !e.ctrlKey && !e.metaKey) { focusQueueTab('verification'); }
+      if (e.key === '3' && !e.ctrlKey && !e.metaKey) { focusQueueTab('pretriage'); }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [canCreatePatient, smartIntakeSession, showChooser, escalationDialogOpen, patientDetailOpen, resetForNextPatient, clearIntakeQueryParams, focusQueueTab]);
 
   useEffect(() => {
     try {
@@ -662,10 +691,11 @@ export default function ReceptionWorkspace() {
           criticalAlerts={criticalAlerts}
           selectedPatient={selectedPatient}
           now={now}
-          onSelectPatient={selectPatient}
-          onOpenProfile={(patientId) =>
-            profileNavigate(`${CANONICAL_ROUTES.emergencyPatients}?patientId=${encodeURIComponent(patientId)}`)
-          }
+          onSelectPatient={(patientId) => { selectPatient(patientId); setPatientDetailOpen(true); }}
+          onOpenProfile={(patientId) => {
+            selectPatient(patientId);
+            setPatientDetailOpen(true);
+          }}
           patientDisplayName={patientDisplayName}
           queueStatus={queueStatus}
           nextStep={nextStep}
@@ -774,6 +804,62 @@ export default function ReceptionWorkspace() {
         }}
         onSubmit={submitEscalation}
       />
+
+      {patientDetailOpen && selectedPatient ? (
+        <div
+          className="reception-patient-detail-flyout"
+          role="dialog"
+          aria-label={`Patient detail: ${patientDisplayName(selectedPatient)}`}
+          aria-modal="false"
+        >
+          <div className="reception-patient-detail-flyout__header">
+            <strong>{patientDisplayName(selectedPatient)}</strong>
+            <span className="reception-patient-detail-flyout__mrn">{selectedPatient.mrn}</span>
+            <button
+              type="button"
+              className="reception-patient-detail-flyout__close"
+              onClick={() => setPatientDetailOpen(false)}
+              aria-label="Close patient detail"
+            >
+              <X size={16} />
+            </button>
+          </div>
+          <div className="reception-patient-detail-flyout__body">
+            <dl>
+              <dt>State</dt>
+              <dd>{selectedPatient.state}</dd>
+              <dt>Priority</dt>
+              <dd>{selectedPatient.priority}</dd>
+              <dt>Chief Complaint</dt>
+              <dd>{selectedPatient.chiefComplaint || '—'}</dd>
+              <dt>Arrival</dt>
+              <dd>{selectedPatient.arrival?.arrivalMode || selectedPatient.source || '—'}</dd>
+              <dt>Wait</dt>
+              <dd>{waitMinutes(selectedPatient)}m</dd>
+              <dt>Queue</dt>
+              <dd>{queueStatus(selectedPatient)}</dd>
+              <dt>Next Step</dt>
+              <dd>{nextStep(selectedPatient)}</dd>
+              <dt>Owner</dt>
+              <dd>{ownerRole(selectedPatient)}</dd>
+              {selectedPatient.flags.length > 0 ? (
+                <>
+                  <dt>Flags</dt>
+                  <dd>{selectedPatient.flags.join(', ')}</dd>
+                </>
+              ) : null}
+            </dl>
+          </div>
+          <div className="reception-patient-detail-flyout__footer">
+            <button
+              type="button"
+              onClick={() => profileNavigate(`${CANONICAL_ROUTES.emergencyPatients}?patientId=${encodeURIComponent(selectedPatient.id)}`)}
+            >
+              <FolderOpen size={14} aria-hidden="true" /> Open Full Record
+            </button>
+          </div>
+        </div>
+      ) : null}
     </EmergencyRoutePage>
   );
 }

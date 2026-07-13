@@ -408,32 +408,24 @@ export function Header() {
         </div>
 
         <div className="caredroid-header__actions">
-          <div className="caredroid-header__primary-actions" aria-label="CareDroid primary actions">
-            <button
-              type="button"
-              className="caredroid-header__action caredroid-header__action--primary"
-              onClick={openCentralIntake}
-              disabled={!canSubmitCentralIntake}
-              aria-label={
-                isReceptionRoute
-                  ? isRegistrationClerkRole(emergencyRole.role)
-                    ? RECEPTION_COPY.header.registerTitle
-                    : RECEPTION_COPY.identityCheck.title
-                  : 'Create patient'
-              }
-              title={
-                canSubmitCentralIntake
-                  ? isReceptionRoute
-                    ? isRegistrationClerkRole(emergencyRole.role)
-                      ? RECEPTION_COPY.header.registerTitle
-                      : RECEPTION_COPY.identityCheck.description
-                    : 'Create a patient intake'
-                  : `${emergencyRole.roleLabel} cannot create patients`
-              }
-            >
-              {isReceptionRoute ? RECEPTION_COPY.header.register : 'Create'}
-            </button>
-          </div>
+          {!isReceptionRoute && (
+            <div className="caredroid-header__primary-actions" aria-label="CareDroid primary actions">
+              <button
+                type="button"
+                className="caredroid-header__action caredroid-header__action--primary"
+                onClick={openCentralIntake}
+                disabled={!canSubmitCentralIntake}
+                aria-label="Create patient"
+                title={
+                  canSubmitCentralIntake
+                    ? 'Create a patient intake'
+                    : `${emergencyRole.roleLabel} cannot create patients`
+                }
+              >
+                Create
+              </button>
+            </div>
+          )}
 
           <div
             className={`caredroid-header__lookup${isReceptionRoute ? ' caredroid-header__lookup--primary' : ''}`}

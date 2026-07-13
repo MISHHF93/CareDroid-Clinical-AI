@@ -989,3 +989,112 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* ── Patient Detail Flyout ── */
+.reception-patient-detail-flyout {
+  position: fixed;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: min(380px, 90vw);
+  z-index: 30;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  background: #ffffff;
+  border-left: 1px solid var(--reception-command-border);
+  box-shadow: -8px 0 24px rgba(15, 23, 42, 0.1);
+  animation: reception-flyout-slide-in 0.18s ease-out;
+}
+
+@keyframes reception-flyout-slide-in {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.reception-patient-detail-flyout__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 52px;
+  border-bottom: 1px solid var(--reception-command-border);
+  padding: 10px 14px;
+}
+
+.reception-patient-detail-flyout__header strong {
+  font-size: 15px;
+}
+
+.reception-patient-detail-flyout__mrn {
+  color: var(--reception-command-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.reception-patient-detail-flyout__close {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--reception-command-border);
+  border-radius: 6px;
+  background: var(--reception-command-inset);
+  color: var(--reception-command-muted);
+  cursor: pointer;
+}
+
+.reception-patient-detail-flyout__close:hover {
+  background: var(--reception-command-border);
+  color: var(--reception-command-ink);
+}
+
+.reception-patient-detail-flyout__body {
+  overflow-y: auto;
+  padding: 14px;
+}
+
+.reception-patient-detail-flyout__body dl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 12px;
+  margin: 0;
+}
+
+.reception-patient-detail-flyout__body dt {
+  color: var(--reception-command-muted);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.reception-patient-detail-flyout__body dd {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.reception-patient-detail-flyout__footer {
+  border-top: 1px solid var(--reception-command-border);
+  padding: 10px 14px;
+}
+
+.reception-patient-detail-flyout__footer button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  border: 1px solid var(--reception-command-border);
+  border-radius: 8px;
+  background: var(--reception-command-inset);
+  color: var(--reception-command-ink);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 0 12px;
+}
+
+.reception-patient-detail-flyout__footer button:hover {
+  background: var(--reception-command-border);
+}

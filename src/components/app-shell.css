@@ -7,7 +7,7 @@
   height: var(--app-viewport-height, 100dvh);
   max-height: var(--app-viewport-height, 100dvh);
   overflow: hidden;
-  background: var(--cdl-canvas-bg, var(--ed-surface-base, var(--medical-surface-page)));
+  background: #ffffff;
   color: var(--ed-text-primary, var(--medical-ink));
   font-family: var(--app-font-family-body, Inter, system-ui, sans-serif);
 }
@@ -111,7 +111,7 @@
   border: 0;
   border-bottom: 0;
   box-shadow: none;
-  background: color-mix(in srgb, var(--medical-slate-50, #f8fafc) 55%, #ffffff);
+  background: #ffffff;
 }
 
 /* Keep chrome from eating the scrollport (alarms float outside this chain) */
@@ -139,7 +139,7 @@
 }
 
 .emergency-app-shell .app-shell-main-content {
-  background: var(--cdl-canvas-bg, var(--medical-surface-page));
+  background: #ffffff;
 }
 
 .emergency-app-shell--copilot-open .emergency-app-shell__main-column {
