@@ -42,6 +42,7 @@ import {
 import UserAccountMenu from './account/UserAccountMenu';
 import OperationalAlertRail from './emergency/OperationalAlertRail';
 import OperationsCenterMenu from './chrome/OperationsCenterMenu';
+import ThemeToggle from './chrome/ThemeToggle';
 import { isPilotStationKpiPolicyActive } from '../config/stationKpiPolicy';
 import './Header.css';
 
@@ -518,6 +519,8 @@ export function Header() {
               <IconSearch size={18} stroke={2} />
             </button>
           ) : null}
+
+          <ThemeToggle />
 
           <OperationsCenterMenu />
 

@@ -37,7 +37,7 @@ export const ApplicationHeader: React.FC<ApplicationHeaderProps> = ({
   const tenantCtx = useTenantContext();
   const tenant = tenantCtx?.tenant;
   const { notifications } = useNotifications();
-  const { theme } = useTheme();
+  const { resolvedTheme } = useTheme();
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
@@ -52,7 +52,7 @@ export const ApplicationHeader: React.FC<ApplicationHeaderProps> = ({
         alignItems: 'center',
         padding: `0 ${spacing[4]}`,
         borderBottom: `1px solid ${colors.neutral[200]}`,
-        backgroundColor: theme === 'dark' ? colors.neutral[800] : colors.white,
+        backgroundColor: resolvedTheme === 'dark' ? colors.neutral[800] : colors.white,
       }}
     >
       {/* Brand */}

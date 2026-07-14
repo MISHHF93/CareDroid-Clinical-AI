@@ -1,0 +1,43 @@
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--app-border-subtle, var(--medical-border, #e2e8f0));
+  border-radius: var(--shell-control-radius, 8px);
+  background: var(--app-surface-0, var(--medical-white, #ffffff));
+  color: var(--app-fg-muted, var(--medical-ink-muted, #64748b));
+  cursor: pointer;
+  transition:
+    color var(--shell-transition-fast, 120ms ease),
+    background var(--shell-transition-fast, 120ms ease),
+    border-color var(--shell-transition-fast, 120ms ease);
+}
+
+.theme-toggle:hover {
+  background: var(--app-surface-muted, var(--medical-surface-muted, #f1f5f9));
+  color: var(--app-fg, var(--medical-ink, #111827));
+  border-color: var(--app-panel-border, var(--medical-border, #e2e8f0));
+}
+
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--app-accent, var(--medical-accent, #0ea5e9));
+  outline-offset: 1px;
+}
+
+.theme-toggle:active {
+  transform: scale(0.95);
+}
+
+html[data-theme='dark'] .theme-toggle {
+  background: var(--app-surface-0, #1e293b);
+  border-color: var(--app-border-subtle, #334155);
+  color: var(--app-fg-muted, #94a3b8);
+}
+
+html[data-theme='dark'] .theme-toggle:hover {
+  background: var(--app-surface-muted, #334155);
+  color: var(--app-fg, #f1f5f9);
+}

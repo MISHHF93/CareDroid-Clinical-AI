@@ -17,7 +17,7 @@ export {
 
 export const THEME_CONFIG = Object.freeze({
   standardTheme: 'light',
-  themePreferenceEnabled: false,
+  themePreferenceEnabled: true,
   cssEntry: 'src/styles/design-system.css',
   cssTokenSources: Object.freeze([
     'src/styles/primitives.css',

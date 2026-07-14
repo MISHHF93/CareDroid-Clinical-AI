@@ -93,3 +93,100 @@
   --semantic-infrastructure-health-bg: #f1f5f9;
   --semantic-infrastructure-health-border: #64748b;
 }
+
+/* ════════════════════════════════════════════════════════════════════════
+   DARK MODE — Clinical palette for dark backgrounds.
+   Clinical accent colors (sky) brighten to maintain legibility on dark
+   surfaces. Semantic status colors shift to lighter tints for contrast.
+   ════════════════════════════════════════════════════════════════════════ */
+html[data-theme="dark"] {
+  /* Clinical neutrals — inverted for dark surfaces */
+  --medical-slate-50: #0f172a;
+  --medical-slate-100: #1e293b;
+  --medical-slate-200: #334155;
+  --medical-slate-300: #475569;
+  --medical-slate-400: #94a3b8;
+  --medical-slate-500: #cbd5e1;
+  --medical-slate-600: #e2e8f0;
+  --medical-slate-700: #f1f5f9;
+
+  /* Clinical accent — brightened for dark mode */
+  --medical-sky-50: #0c1a2e;
+  --medical-sky-100: #0e2640;
+  --medical-sky-200: #1a3a5c;
+  --medical-sky-300: #7dd3fc;
+  --medical-sky-400: #38bdf8;
+  --medical-sky-500: #38bdf8;
+  --medical-sky-600: #0ea5e9;
+  --medical-sky-700: #0284c7;
+
+  --medical-white: #0f172a;
+  --medical-ink: #f1f5f9;
+  --medical-ink-muted: #94a3b8;
+  --medical-ink-subtle: #64748b;
+  --medical-border: #334155;
+  --medical-border-strong: #475569;
+  --medical-accent: #38bdf8;
+  --medical-accent-hover: #7dd3fc;
+  --medical-accent-soft: #0ea5e9;
+  --medical-surface-page: #0f172a;
+  --medical-surface-muted: #1e293b;
+  --medical-surface-card: #1e293b;
+  --medical-surface-inset: #1e293b;
+  --medical-shadow-soft: 0 4px 14px rgba(0, 0, 0, 0.28);
+  --medical-shadow-lift: 0 12px 32px rgba(0, 0, 0, 0.36);
+  --medical-accent-tint: rgba(56, 189, 248, 0.12);
+  --medical-accent-tint-faint: color-mix(in srgb, var(--medical-accent) 6%, transparent);
+  --medical-accent-tint-subtle: color-mix(in srgb, var(--medical-accent) 10%, transparent);
+  --medical-accent-tint-mid: color-mix(in srgb, var(--medical-accent) 14%, transparent);
+  --medical-accent-tint-strong: color-mix(in srgb, var(--medical-accent) 18%, transparent);
+  --medical-accent-ring: color-mix(in srgb, var(--medical-accent) 24%, transparent);
+  --medical-accent-ring-strong: color-mix(in srgb, var(--medical-accent) 38%, transparent);
+  --medical-accent-ring-bold: color-mix(in srgb, var(--medical-accent) 46%, transparent);
+  --medical-accent-border: rgba(56, 189, 248, 0.36);
+  --medical-danger-fg: #f87171;
+  --medical-danger-bg: rgba(248, 113, 113, 0.12);
+  --medical-danger-border: #f87171;
+
+  /* Navigation rail — dark */
+  --nav-surface: #1e293b;
+  --nav-surface-muted: #0f172a;
+  --nav-border: var(--medical-border);
+  --nav-fg: var(--medical-ink-muted);
+  --nav-fg-active: var(--medical-accent-hover);
+  --nav-item-hover-bg: #334155;
+  --nav-item-active-bg: color-mix(in srgb, var(--medical-accent) 14%, transparent);
+  --nav-item-active-border: var(--medical-accent);
+
+  /* Semantic operational colors — light tints for dark mode */
+  --semantic-critical: #f87171;
+  --semantic-critical-bg: rgba(248, 113, 113, 0.12);
+  --semantic-urgent: #fb923c;
+  --semantic-urgent-bg: rgba(251, 146, 60, 0.12);
+  --semantic-attention: #fbbf24;
+  --semantic-attention-bg: rgba(251, 191, 36, 0.12);
+  --semantic-healthy: #4ade80;
+  --semantic-healthy-bg: rgba(74, 222, 128, 0.12);
+  --semantic-information: #94a3b8;
+  --semantic-information-bg: rgba(148, 163, 184, 0.12);
+  --semantic-inactive: #64748b;
+  --semantic-inactive-bg: #1e293b;
+  --semantic-inactive-border: var(--medical-border);
+  --semantic-critical-border: #f87171;
+  --semantic-urgent-border: #fb923c;
+  --semantic-attention-border: #fbbf24;
+  --semantic-healthy-border: #4ade80;
+  --semantic-information-border: rgba(148, 163, 184, 0.36);
+  --semantic-warning: var(--semantic-attention);
+  --semantic-warning-bg: var(--semantic-attention-bg);
+  --semantic-warning-border: var(--semantic-attention-border);
+  --semantic-ai-assistance: #818cf8;
+  --semantic-ai-assistance-bg: rgba(129, 140, 248, 0.12);
+  --semantic-ai-assistance-border: #818cf8;
+  --semantic-operational-status: #22d3ee;
+  --semantic-operational-status-bg: rgba(34, 211, 238, 0.12);
+  --semantic-operational-status-border: #22d3ee;
+  --semantic-infrastructure-health: #94a3b8;
+  --semantic-infrastructure-health-bg: #1e293b;
+  --semantic-infrastructure-health-border: #64748b;
+}
