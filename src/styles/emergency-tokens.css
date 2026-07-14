@@ -26,7 +26,7 @@
   --ed-border-subtle: var(--app-border-subtle, var(--medical-border, #e2e8f0));
   --ed-border-strong: color-mix(
     in srgb,
-    #374151) 34%,
+    #374151 34%,
     var(--color-border-default, var(--medical-border, #e0f2fe))
   );
 

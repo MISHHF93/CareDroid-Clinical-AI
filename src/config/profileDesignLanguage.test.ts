@@ -35,7 +35,9 @@ describe('profileDesignLanguage.config', () => {
     const clerkLabels = resolveCopilotChromeLabels(clerkCopy);
 
     expect(physicianLabels.productName).toBe('CareDroid Copilot');
-    expect(clerkLabels.openAriaLabel).toBe('Open CareDroid Copilot');
+    // Dense/aria chrome labels intentionally use the short "Copilot" badge,
+    // not the full product name, so chrome is not triple-branded.
+    expect(clerkLabels.openAriaLabel).toBe('Open Copilot');
     expect(clerkLabels.placeholder).toBe('Ask CareDroid Copilot...');
     expect(physicianLabels.welcomeFull).toContain('Capture differential');
     expect(clerkLabels.welcomeFull).toContain('arrival details');

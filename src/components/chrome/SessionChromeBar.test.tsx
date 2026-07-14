@@ -2,19 +2,14 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import SessionChromeBar from './SessionChromeBar';
 
-vi.mock('../../store/emergencyStore', () => ({
-  useEmergencyStore: (selector: (state: Record<string, unknown>) => unknown) =>
-    selector({
-      activeScenarioId: null,
-    }),
-}));
-
-vi.mock('../../contexts/SimulationModeContext', () => ({
-  useSimulationMode: () => ({ enabled: false, active: false }),
-}));
+const systemConfigState = {
+  configDegraded: false,
+  loading: false,
+  refresh: vi.fn(),
+};
 
 vi.mock('../../contexts/SystemConfigContext', () => ({
-  useSystemConfig: () => ({ configDegraded: false, loading: false, refresh: vi.fn() }),
+  useSystemConfig: () => systemConfigState,
 }));
 
 vi.mock('../../contexts/PractitionerVisibilityContext', () => ({
@@ -29,11 +24,34 @@ vi.mock('../../contexts/PractitionerVisibilityContext', () => ({
 describe('SessionChromeBar', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    systemConfigState.configDegraded = false;
+    systemConfigState.loading = false;
   });
 
-  it('renders dev status segment on local dev hosts', () => {
+  it('renders nothing when system config is healthy', () => {
+    const { container } = render(<SessionChromeBar />);
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it('renders nothing while config is still loading, even if degraded', () => {
+    systemConfigState.configDegraded = true;
+    systemConfigState.loading = true;
+    const { container } = render(<SessionChromeBar />);
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it('shows an actionable connection warning when config is degraded', () => {
+    systemConfigState.configDegraded = true;
     render(<SessionChromeBar />);
-    expect(screen.getByText('Dev')).toBeInTheDocument();
-    expect(screen.getByText('Local session')).toBeInTheDocument();
+    expect(screen.getByText('Connection')).toBeInTheDocument();
+    expect(screen.getByText('Settings unavailable')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Retry' })).toBeInTheDocument();
+  });
+
+  it('retries the config fetch when the retry button is clicked', async () => {
+    systemConfigState.configDegraded = true;
+    render(<SessionChromeBar />);
+    screen.getByRole('button', { name: 'Retry' }).click();
+    expect(systemConfigState.refresh).toHaveBeenCalledTimes(1);
   });
 });

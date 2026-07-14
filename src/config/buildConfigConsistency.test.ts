@@ -54,8 +54,13 @@ describe('build and service config consistency', () => {
     expect(packageJson.scripts['dev:lan']).toBe('vite --strictPort --host');
     expect(viteConfig).toContain("return 5190");
     expect(viteConfig.match(/strictPort:\s*true/g)).toHaveLength(2);
-    expect(viteConfig).toContain('env.VITE_API_PROXY_TARGET || `http://localhost:${backendPort}`');
-    expect(devStack).toContain('VITE_API_PROXY_TARGET: backendOrigin');
+    // Prefers 127.0.0.1 over localhost to avoid a Windows IPv6 ECONNREFUSED
+    // when Nest binds IPv4-only (see vite.config.ts's own comment on this).
+    expect(viteConfig).toContain('env.VITE_API_PROXY_TARGET || `http://127.0.0.1:${backendPort}`');
+    // Proxy target deliberately uses a separate 127.0.0.1-based variable from
+    // the localhost-based backendOrigin (browser-facing) — same Windows IPv6
+    // ECONNREFUSED fix as vite.config.ts above.
+    expect(devStack).toContain('VITE_API_PROXY_TARGET: backendProxyTarget');
     expect(devStack).toContain('PORT: backendPort');
     expect(devStack).toContain('FRONTEND_URL: frontendOrigin');
     expect(devStack).toContain('App:      ${frontendOrigin}');
@@ -77,10 +82,12 @@ describe('build and service config consistency', () => {
   });
 
   it('does not allow Vercel same-origin /api unless a proxy is verified', () => {
-    const vercel = read('vercel.json');
     const validator = read('scripts/validate-vercel-env.mjs');
 
-    expect(vercel).toContain('VITE_ALLOW_SAME_ORIGIN_API:-false');
+    // The safe-by-default behavior now lives entirely in the validator script
+    // (isTruthy(undefined) === false) rather than a hardcoded default in
+    // vercel.json's env block, which no longer declares this var at all.
+    expect(validator).toContain("isTruthy(process.env.VITE_ALLOW_SAME_ORIGIN_API)");
     expect(validator).toContain('VITE_SAME_ORIGIN_API_PROXY_VERIFIED');
     expect(validator).toContain('VITE_API_URL is required for Vercel frontend deploys');
     expect(validator).toContain('!isDemoMode');
@@ -135,7 +142,9 @@ describe('build and service config consistency', () => {
     expect(packageLockRoot.devDependencies['@capacitor/cli']).toBeUndefined();
     expect(packageJson.scripts['android-debug']).toBeUndefined();
     expect(packageJson.scripts['android-release']).toBeUndefined();
-    expect(read('.github/workflows/ci.yml')).not.toContain('Capacitor');
+    // ci.yml was consolidated into validate.yml (5 workflows down to 4) — see
+    // project memory on the CI/CD workflow consolidation.
+    expect(read('.github/workflows/validate.yml')).not.toContain('Capacitor');
     expect(read('.github/workflows/release.yml')).not.toContain('android');
   });
 

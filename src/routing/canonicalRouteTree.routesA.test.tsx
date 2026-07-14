@@ -2,7 +2,7 @@ import './canonicalRouteTree.testShared';
 import { cleanup, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 import { useEmergencyStore } from '../store/emergencyStore';
-import { renderRoute } from './canonicalRouteTree.testShared';
+import { findRouteHeading, renderRoute } from './canonicalRouteTree.testShared';
 
 const originalEmergencyState = useEmergencyStore.getState();
 
@@ -26,7 +26,7 @@ describe('canonical route tree — whiteboard, patients, ems', () => {
   it('/emergency/patients renders the active patient whiteboard surface', async () => {
     renderRoute('/emergency/patients');
 
-    expect(await screen.findByRole('heading', { name: 'Department Patients' })).toBeInTheDocument();
+    expect(await findRouteHeading('Department Patients')).toBeInTheDocument();
     expect(await screen.findByLabelText('Department Patients')).toBeInTheDocument();
     // The page's search field renders via RouteChromeContext, which registers
     // asynchronously (a useEffect) after the initial paint — wait for it rather
@@ -39,7 +39,7 @@ describe('canonical route tree — whiteboard, patients, ems', () => {
 
     renderRoute(`/emergency/patients?patientId=${encodeURIComponent(patient.id)}`);
 
-    expect(await screen.findByRole('heading', { name: 'Department Patients' })).toBeInTheDocument();
+    expect(await findRouteHeading('Department Patients')).toBeInTheDocument();
     await waitFor(() => {
       expect(useEmergencyStore.getState().selectedPatientId).toBe(patient.id);
     });

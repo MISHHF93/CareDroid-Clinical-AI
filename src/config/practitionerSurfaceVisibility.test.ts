@@ -29,7 +29,9 @@ describe('practitionerSurfaceVisibility', () => {
     expect(surfaces.reception.showAlertRail).toBe(false);
     expect(surfaces.patientCard.badgeLimit).toBe(1);
     expect(surfaces.chrome.copilotAutoOpen).toBe(false);
-    expect(surfaces.chrome.showSessionCopilot).toBe(true);
+    // Deprecated surface, always false now — the sidebar nav `copilot` item
+    // is the sole entry point (see useCopilotChromeAccess.ts).
+    expect(surfaces.chrome.showSessionCopilot).toBe(false);
     expect(surfaces.profile.showAccessSummary).toBe(false);
     expect(surfaces.tools.showClinicalIntelligencePanel).toBe(false);
     expect(surfaces.settings.showPlatformStrip).toBe(false);

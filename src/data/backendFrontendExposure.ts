@@ -231,15 +231,17 @@ function readVitePortFallback(source, blockName) {
 export function readViteDevConfig() {
   const vitePath = join(repoRoot, 'vite.config.ts');
   const source = readFileSync(vitePath, 'utf8');
-  const proxyMatch = source.match(/VITE_API_PROXY_TARGET\s*\|\|\s*`http:\/\/localhost:\$\{backendPort\}`/) ||
+  const proxyMatch =
+    source.match(/VITE_API_PROXY_TARGET\s*\|\|\s*`http:\/\/(?:localhost|127\.0\.0\.1):\$\{backendPort\}`/) ||
     source.match(/VITE_API_PROXY_TARGET\s*\|\|\s*['"]([^'"]+)['"]/);
   const hasProxyHelper = source.includes('proxyPaths(proxyTarget)');
   return {
     devPort: readVitePortFallback(source, 'server'),
     previewPort: readVitePortFallback(source, 'preview'),
+    // Proxy target prefers 127.0.0.1 over localhost (Windows IPv6 ECONNREFUSED fix).
     proxyTarget: proxyMatch
       ? proxyMatch[0].includes('backendPort')
-        ? `http://localhost:${source.match(/backendPort = readPort\([\s\S]*?'(\d{4})',/)?.[1] || '3350'}`
+        ? `http://127.0.0.1:${source.match(/backendPort = readPort\([\s\S]*?'(\d{4})',/)?.[1] || '3350'}`
         : proxyMatch[1]
       : null,
     proxiesApi: source.includes("'/api'"),

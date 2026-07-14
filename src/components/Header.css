@@ -12,6 +12,12 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+.caredroid-header__clock {
+  color: var(--medical-ink-subtle, #94a3b8);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+}
+
 .caredroid-header--compact {
   width: 100%;
   height: var(--cdl-header-height, 52px);

@@ -152,6 +152,10 @@ const ROUTES = Object.freeze({
   audit: CANONICAL_ROUTES.audit,
   aiCommandCenter: CANONICAL_ROUTES.aiCommandCenter,
   adminOperations: CANONICAL_ROUTES.adminOperations,
+  triage: CANONICAL_ROUTES.triage,
+  hospitalMap: CANONICAL_ROUTES.hospitalMap,
+  predictiveAnalytics: CANONICAL_ROUTES.predictiveAnalytics,
+  executive: CANONICAL_ROUTES.executive,
 });
 
 const ALL_ROUTES = Object.freeze([
@@ -194,6 +198,10 @@ const ALL_ROUTES = Object.freeze([
   ROUTES.audit,
   ROUTES.aiCommandCenter,
   ROUTES.adminOperations,
+  ROUTES.triage,
+  ROUTES.hospitalMap,
+  ROUTES.predictiveAnalytics,
+  ROUTES.executive,
 ]);
 const FUTURE_MODULE_ACTIONS = Object.freeze([
   EMERGENCY_ACTIONS.manageFederatedLearning,
@@ -264,6 +272,10 @@ const OPERATIONS_VIEW_ROUTES = Object.freeze([
   ROUTES.audit,
   ROUTES.aiCommandCenter,
   ROUTES.adminOperations,
+  ROUTES.triage,
+  ROUTES.hospitalMap,
+  ROUTES.predictiveAnalytics,
+  ROUTES.executive,
 ]);
 
 export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
@@ -363,6 +375,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
       ROUTES.platform,
       ROUTES.alerts,
       ROUTES.help,
+      ROUTES.triage,
     ],
     actions: [
       EMERGENCY_ACTIONS.createPatient,

@@ -15,7 +15,11 @@ const sidebarSource = readFileSync(join(__dirname, '../components/Sidebar.tsx'),
 describe('platform shell dimension contract', () => {
   it('defines canonical chrome heights in shell-header-polish', () => {
     expect(shellHeaderPolishCss).toContain('--cdl-header-height: 52px');
-    expect(shellHeaderPolishCss).toContain('--cdl-route-tab-height: 52px');
+    // shell-header-polish.css imports last in design-system.css, so its
+    // --cdl-route-tab-height wins the cascade over medical-shell-layer.css's
+    // (52px) and shell-tokens.css's earlier definitions — a deliberate later
+    // tightening pass (44px -> 52px -> 48px per git history), not a drift.
+    expect(shellHeaderPolishCss).toContain('--cdl-route-tab-height: 48px');
     expect(shellHeaderPolishCss).toContain('--cdl-chrome-stack-height');
   });
 

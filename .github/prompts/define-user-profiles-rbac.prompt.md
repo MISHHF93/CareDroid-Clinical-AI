@@ -26,7 +26,7 @@ CareDroid models realistic hospital roles for a virtual city hospital network (C
 6. Admin roles (`super_admin`, `hospital_admin`, `it_admin`) must not automatically gain clinical permissions. Clinical permissions require explicit assignment.
 7. AI Chief routing for a new alert scenario belongs in `aiChiefRouting.ts` as a new `AlertScenario` entry.
 8. Demo users are in `demoUsers.ts` only. Do not create user objects in components or hooks.
-9. The `DemoUserSwitcher` component must only render in demo or dev mode. Use an environment check or a feature gate before rendering it.
+9. The demo role switcher (`src/components/account/ProfileRoleSwitcher.tsx`) must only render in demo or dev mode. Use `useProfileSwitcherVisibility()` to gate it before rendering.
 10. RoleBadge in `src/domain/staff/RoleBadge.tsx` must support any new role via `CAREDROID_ROLE_LABELS`.
 
 ## Hospital network

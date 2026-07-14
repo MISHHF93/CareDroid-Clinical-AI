@@ -4,9 +4,9 @@ import {
   isFeatureModuleId,
 } from '../features/featureModuleContract';
 
-export const PAGE_INVENTORY_EXPECTED_TOTAL = 240;
-export const PAGE_SOURCE_EXPECTED_TOTAL = 150;
-export const PAGE_STYLE_EXPECTED_TOTAL = 90;
+export const PAGE_INVENTORY_EXPECTED_TOTAL = 243;
+export const PAGE_SOURCE_EXPECTED_TOTAL = 151;
+export const PAGE_STYLE_EXPECTED_TOTAL = 92;
 export const PAGE_TOOLS_INVENTORY_EXPECTED_TOTAL = 57;
 export const PAGE_TOOLS_SOURCE_EXPECTED_TOTAL = 47;
 

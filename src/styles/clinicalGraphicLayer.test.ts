@@ -34,9 +34,16 @@ describe('clinical graphic layer', () => {
     expect(routeSharedSource).toContain('CdlEmptyIllustration');
   });
 
-  it('adds route graphic badge to shell tab identity', () => {
-    expect(shellRouteTabSource).toContain('RouteGraphicBadge');
-    expect(shellRouteTabSource).toContain('getEmergencySurface');
+  it('keeps the shell tab decluttered (no graphic badge nesting)', () => {
+    // The shell-declutter pass (commit eed08173) deliberately removed
+    // RouteGraphicBadge from the flat context bar — ShellRouteTab's own doc
+    // comment says so explicitly: "Title + optional subtitle + <=3 status
+    // chips. No badge/eyebrow/Guide nesting." RouteGraphicBadge itself is
+    // still a real, exported component (src/components/graphics/CdlGraphicKit.tsx),
+    // just no longer rendered here — confirmed via a repo-wide grep it has
+    // zero render sites anywhere, not only removed from this one file.
+    expect(shellRouteTabSource).not.toContain('RouteGraphicBadge');
+    expect(shellRouteTabSource).toContain('No badge/eyebrow/Guide nesting');
   });
 
   it('renders illustrated empty states by default', () => {

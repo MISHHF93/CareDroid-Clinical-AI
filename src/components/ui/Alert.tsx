@@ -26,6 +26,13 @@ export default function Alert({
       {action ? <div className="cd-alert__action">{action}</div> : null}
     </>
   );
+  if (role === 'note') {
+    return (
+      <div className={classNames} role="note" {...props}>
+        {body}
+      </div>
+    );
+  }
   if (useAlertRole) {
     return (
       <div className={classNames} role="alert" {...props}>

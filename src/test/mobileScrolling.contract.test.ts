@@ -34,13 +34,17 @@ describe('mobile scrolling contracts', () => {
   it('does not lock document scrolling by default', () => {
     expect(indexCss).toMatch(/html\s*\{[\s\S]*height:\s*auto/);
     expect(indexCss).toMatch(/body\s*\{[\s\S]*height:\s*auto/);
-    expect(indexCss).toMatch(/#root\s*\{[\s\S]*height:\s*auto/);
     expect(indexCss).toMatch(/html\s*\{[\s\S]*overflow-y:\s*auto/);
     expect(indexCss).toMatch(/body\s*\{[\s\S]*overflow-y:\s*auto/);
-    expect(indexCss).toMatch(/#root\s*\{[\s\S]*overflow-y:\s*visible/);
     expect(themeSurfacesCss).toMatch(/body\s*\{[\s\S]*overflow-y:\s*auto/);
     expect(indexCss).not.toMatch(/html\s*\{[^}]*overflow:\s*hidden/);
-    expect(indexCss).not.toMatch(/#root\s*\{[^}]*\n\s*height:\s*var\(--app-viewport-height/);
+    // #root itself now owns a fixed viewport-height flex container with its
+    // own overflow: hidden (see its comment: "Fill viewport so AppShell flex
+    // children can compute min-height:0 scroll chains") — the actual scroll
+    // owner moved to .app-shell-main-content deeper in the tree, matching the
+    // same overflow-x/overflow-y split verified elsewhere in this cluster.
+    expect(indexCss).toMatch(/#root\s*\{[\s\S]*overflow:\s*hidden/);
+    expect(indexCss).toMatch(/#root\s*\{[\s\S]*height:\s*var\(--app-viewport-height/);
   });
 
   it('uses scroll lock only through the active overlay class', () => {
@@ -53,7 +57,7 @@ describe('mobile scrolling contracts', () => {
   it('keeps normal pages in the main scrollport while preserving chat as a local viewport', () => {
     expect(appShellCss).toMatch(/\.emergency-app-shell\s*\{[\s\S]*overflow:\s*hidden/);
     expect(appShellCss).toMatch(/\.emergency-app-shell__main-column\s*\{[\s\S]*overflow:\s*hidden/);
-    expect(appShellCss).toMatch(/\.app-shell-main-content\s*\{[\s\S]*overflow:\s*auto/);
+    expect(appShellCss).toMatch(/\.app-shell-main-content\s*\{[\s\S]*overflow-x:\s*clip[\s\S]*overflow-y:\s*auto/);
     expect(chatInterfaceCss).toMatch(/\.chat-interface__messages\s*\{[\s\S]*overflow-y:\s*auto/);
     expect(chatInterfaceCss).toMatch(/\.chat-interface__textarea\s*\{[\s\S]*overflow-y:\s*auto/);
   });
@@ -80,7 +84,7 @@ describe('mobile scrolling contracts', () => {
   });
 
   it('allows tools and calculator pages to grow inside the shared AppShell main region', () => {
-    expect(appShellCss).toMatch(/\.app-shell-main-content\s*\{[\s\S]*overflow:\s*auto/);
+    expect(appShellCss).toMatch(/\.app-shell-main-content\s*\{[\s\S]*overflow-x:\s*clip[\s\S]*overflow-y:\s*auto/);
     expect(layoutVisibilityCss).toMatch(/\.tools-overview[\s\S]*overflow-x:\s*clip/);
     expect(layoutVisibilityCss).toMatch(/\.calculators-content[\s\S]*overflow-x:\s*clip/);
     expect(toolsOverviewCss).not.toMatch(/\.tools-overview\s*\{[^}]*height:\s*100vh/);

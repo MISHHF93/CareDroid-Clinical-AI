@@ -7,13 +7,19 @@ import {
   getUnauthorizedFallback,
 } from './navigation';
 
+// Routes intentionally open to every role with no fine-grained permission gate
+// (e.g. the role-aware user manual) — role membership alone controls access.
+const ROUTES_WITHOUT_REQUIRED_PERMISSIONS = new Set(['/emergency/help']);
+
 describe('ROUTE_ACCESS_CONFIG', () => {
   it('every entry has required fields', () => {
     for (const entry of ROUTE_ACCESS_CONFIG) {
       expect(entry.path).toBeTruthy();
       expect(entry.label).toBeTruthy();
       expect(entry.allowedRoles.length).toBeGreaterThan(0);
-      expect(entry.requiredPermissions.length).toBeGreaterThan(0);
+      if (!ROUTES_WITHOUT_REQUIRED_PERMISSIONS.has(entry.path)) {
+        expect(entry.requiredPermissions.length).toBeGreaterThan(0);
+      }
       expect(typeof entry.navVisible).toBe('boolean');
       expect(typeof entry.priority).toBe('number');
     }

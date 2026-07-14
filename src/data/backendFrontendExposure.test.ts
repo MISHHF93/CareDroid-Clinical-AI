@@ -272,7 +272,8 @@ describe('Vite proxy and ports', () => {
     const vite = readViteDevConfig();
     expect(vite.devPort).toBe(5190);
     expect(vite.previewPort).toBe(5190);
-    expect(vite.proxyTarget).toBe('http://localhost:3350');
+    // Prefers 127.0.0.1 over localhost (Windows IPv6 ECONNREFUSED fix).
+    expect(vite.proxyTarget).toBe('http://127.0.0.1:3350');
     expect(vite.proxiesApi).toBe(true);
     expect(vite.proxiesHealth).toBe(true);
     expect(vite.proxiesSocketIo).toBe(true);

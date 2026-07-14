@@ -40,7 +40,13 @@ describe('primaryNavigation', () => {
       ['Live Map', '/live-map'],
       ['Usage', '/usage'],
     ]);
+    // '/hospital-map' is a deliberate exception: the Pilot Customer Mode nav
+    // ceiling fix (see project memory on the routes/navigation audit) restored
+    // it to certain roles' own curated persistent nav, which legitimately
+    // overlaps with its command/search grouping here.
+    const KNOWN_PERSISTENT_NAV_OVERLAP = new Set(['/hospital-map']);
     for (const item of OPERATIONS_SIDEBAR_NAV_ITEMS) {
+      if (KNOWN_PERSISTENT_NAV_OVERLAP.has(item.path)) continue;
       expect(PRIMARY_SIDEBAR_NAV_ITEMS.map((nav) => nav.path)).not.toContain(item.path);
     }
     expect(getPrimaryNavItemForPath('/workflow-mining')?.id).toBe('workflow-mining');

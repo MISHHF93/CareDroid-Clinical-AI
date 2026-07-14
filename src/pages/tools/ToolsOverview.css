@@ -137,8 +137,8 @@
 }
 
 .tools-execution-badge--local {
-  border-color: color-mix(in srgb, #374151) 44%, var(--panel-border));
-  color: #374151);
+  border-color: color-mix(in srgb, #374151 44%, var(--panel-border));
+  color: #374151;
 }
 
 .tools-execution-badge--platform {

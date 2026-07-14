@@ -53,8 +53,8 @@
     .profile-activity-cta,
     .profile-identity-row a
   ) {
-  color: #374151);
-  text-decoration-color: color-mix(in srgb, #374151 35%, transparent);
+  color: var(--medical-text-link, var(--app-link-fg));
+  text-decoration-color: color-mix(in srgb, var(--medical-text-link, #0369a1) 35%, transparent);
 }
 
 :is(.app-shell, .emergency-app-shell) :is(
@@ -67,7 +67,7 @@
     .profile-activity-cta:hover,
     .profile-identity-row a:hover
   ) {
-  color: #374151);
+  color: var(--medical-text-link-hover, var(--app-link-hover));
 }
 
 :is(.app-shell, .emergency-app-shell) :is(
@@ -86,33 +86,33 @@
 }
 
 .profile-activity-card {
-  border-color: var(--medical-accent-border, rgba(100, 116, 139, 0.32));
+  border-color: var(--medical-accent-border, rgba(14, 165, 233, 0.32));
   background:
     linear-gradient(
       135deg,
-      color-mix(in srgb, #374151 6%, transparent),
-      color-mix(in srgb, #374151 3%, transparent)
+      color-mix(in srgb, var(--app-accent-interactive) 6%, transparent),
+      color-mix(in srgb, var(--app-accent-interactive) 3%, transparent)
     ),
     var(--medical-card-bg, var(--app-surface-1));
 }
 
 .profile-activity-card__badge,
 .profile-activity-cta {
-  border-color: color-mix(in srgb, #374151 35%, var(--medical-card-border));
-  background: color-mix(in srgb, #374151 10%, var(--medical-card-bg));
-  color: #374151);
+  border-color: color-mix(in srgb, var(--app-accent-interactive) 35%, var(--medical-card-border));
+  background: color-mix(in srgb, var(--app-accent-interactive) 10%, var(--medical-card-bg));
+  color: var(--medical-text-link, var(--app-link-fg));
 }
 
 .profile-copilot-card__cta {
-  color: #374151);
+  color: var(--medical-text-link, var(--app-link-fg));
   border-color: var(--medical-card-border, var(--app-border));
   background: var(--medical-card-muted-bg, var(--app-surface-muted));
 }
 
 .profile-copilot-card__cta:hover {
-  color: #374151);
-  border-color: color-mix(in srgb, #374151 28%, var(--medical-card-border));
-  background: color-mix(in srgb, #374151 8%, var(--medical-card-muted-bg));
+  color: var(--medical-text-link-hover, var(--app-link-hover));
+  border-color: color-mix(in srgb, var(--app-accent-interactive) 28%, var(--medical-card-border));
+  background: color-mix(in srgb, var(--app-accent-interactive) 8%, var(--medical-card-muted-bg));
 }
 
 :is(.app-shell, .emergency-app-shell) .profile-insights-panel,
@@ -121,27 +121,27 @@
 }
 
 .profile-summary-card__avatar {
-  color: #374151);
+  color: var(--medical-text-link, var(--app-link-fg));
   background: var(--medical-card-muted-bg, var(--app-surface-muted));
 }
 
 .profile-competency-progress span {
-  background: #374151;
+  background: var(--app-accent-interactive);
 }
 
 .profile-settings-shell__nav a.is-active {
   color: var(--medical-text-heading, var(--app-text-primary));
-  border-color: color-mix(in srgb, #374151 42%, var(--medical-card-border));
-  background: color-mix(in srgb, #374151 12%, var(--medical-card-bg));
+  border-color: color-mix(in srgb, var(--app-accent-interactive) 42%, var(--medical-card-border));
+  background: color-mix(in srgb, var(--app-accent-interactive) 12%, var(--medical-card-bg));
 }
 
 .profile-identity-button {
-  background: #374151;
+  background: var(--app-accent-interactive);
   color: var(--app-on-solid, #ffffff);
 }
 
 .profile-identity-button--secondary {
   background: transparent;
-  color: #374151);
+  color: var(--medical-text-link, var(--app-link-fg));
   border-color: var(--medical-card-border, var(--app-border));
 }

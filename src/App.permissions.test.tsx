@@ -5,10 +5,12 @@ import { describe, expect, it } from 'vitest';
 import {
   CANONICAL_APP_ROUTE_TREE,
   CANONICAL_ROUTES,
+  IN_SHELL_ROUTE_REDIRECTS,
   LEGACY_EMERGENCY_ROUTE_REDIRECTS,
   NON_ED_WORKSPACE_REDIRECT_ROUTES,
 } from './config/routes.config';
-import { EMERGENCY_PAGE_ALL_RENDER_PATHS } from './data/emergencyPageRenderInventory';
+import { OPERATIONS_FLEET_CONSOLE_ROUTE_PATHS } from './config/operationsFleetConsoleRoutes';
+import { EMERGENCY_PAGE_PRIMARY_PATHS } from './data/emergencyPageRenderInventory';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appSource = readFileSync(join(__dirname, 'app/router.tsx'), 'utf8');
@@ -38,7 +40,10 @@ describe('App CareDroid route contract', () => {
     expect(appSource).toContain('<AppShell>');
     expect(appSource).toContain('<Outlet />');
 
-    expect(ACTIVE_EMERGENCY_PAGE_PATHS).toEqual(EMERGENCY_PAGE_ALL_RENDER_PATHS);
+    // Compare against the primary (non-alias) paths — EMERGENCY_PAGE_ALL_RENDER_PATHS
+    // also includes legacy redirect aliases like /emergency/journey, which are
+    // intentionally not 'page'-typed route-tree entries.
+    expect(ACTIVE_EMERGENCY_PAGE_PATHS).toEqual(EMERGENCY_PAGE_PRIMARY_PATHS);
   });
 
   it.each(RETIRED_PLATFORM_PATHS)('%s is not mounted as an App page route', (path) => {
@@ -53,14 +58,13 @@ describe('App CareDroid route contract', () => {
     const nonEdRedirectPaths = new Set(
       NON_ED_WORKSPACE_REDIRECT_ROUTES.map((redirect) => redirect.path),
     );
-
-    const mountedPlatformPaths: Record<string, string> = {
-      '/hospital-map': CANONICAL_ROUTES.hospitalMap,
-      '/medical-iot': CANONICAL_ROUTES.medicalIot,
-      '/devices': CANONICAL_ROUTES.devices,
-      '/live-map': CANONICAL_ROUTES.liveMap,
-      '/operations': CANONICAL_ROUTES.operations,
-    };
+    const inShellRedirectsByPath = Object.fromEntries(
+      IN_SHELL_ROUTE_REDIRECTS.map((redirect) => [redirect.path, redirect.to]),
+    );
+    // Hospital IoT/fleet/operations surfaces are real pages mounted via the
+    // operations-fleet console route tree (a config-driven sub-tree, not
+    // literal <Route> JSX in router.tsx) rather than a redirect table.
+    const operationsFleetMountedPaths = new Set(OPERATIONS_FLEET_CONSOLE_ROUTE_PATHS);
 
     for (const path of [
       '/dashboard',
@@ -77,15 +81,12 @@ describe('App CareDroid route contract', () => {
       '/live-map',
       '/operations',
     ]) {
-      const mountedRoute =
-        mountedPlatformPaths[path] &&
-        (appSource.includes(`path="${mountedPlatformPaths[path]}"`) ||
-          appSource.includes(`path={CANONICAL_ROUTES.${path === '/hospital-map' ? 'hospitalMap' : path === '/medical-iot' ? 'medicalIot' : path === '/live-map' ? 'liveMap' : path === '/operations' ? 'operations' : 'devices'}}`));
       expect(
         redirectsByPath[path] ||
+          inShellRedirectsByPath[path] ||
           (nonEdRedirectPaths.has(path as any) ? CANONICAL_ROUTES.emergencyWhiteboard : null) ||
           (appSource.includes(`path="${path}"`) ? CANONICAL_ROUTES.emergencyWhiteboard : null) ||
-          mountedRoute,
+          (operationsFleetMountedPaths.has(path) ? path : null),
         path,
       ).toBeTruthy();
     }

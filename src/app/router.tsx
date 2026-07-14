@@ -991,6 +991,7 @@ export function AppRoutes() {
       ))}
 
       {/* ── Generic fallbacks ── */}
+      <Route path="/dashboard"          element={<EmergencyDefaultRedirect />} />
       <Route path="/home"               element={<EmergencyDefaultRedirect />} />
       <Route path="/app"                element={<EmergencyDefaultRedirect />} />
       <Route path="/mobile"             element={<EmergencyDefaultRedirect />} />

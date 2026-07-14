@@ -21,7 +21,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const srcRoot = dirname(__dirname);
 const appSource = readFileSync(join(srcRoot, 'app', 'router.tsx'), 'utf8');
 const userContextSource = readFileSync(join(srcRoot, 'contexts/UserContext.tsx'), 'utf8');
-const platformEntrySource = readFileSync(join(srcRoot, 'pages/PlatformEntryHub.jsx'), 'utf8');
+const platformEntrySource = readFileSync(join(srcRoot, 'pages/PlatformEntryHub.tsx'), 'utf8');
 const appConfigSource = readFileSync(join(srcRoot, 'config/appConfig.ts'), 'utf8');
 const authConfigSource = readFileSync(join(srcRoot, 'config/auth.config.ts'), 'utf8');
 const appShellCss = readFileSync(join(srcRoot, 'components/app-shell.css'), 'utf8');
@@ -204,7 +204,7 @@ describe('full platform consolidation contract', () => {
     expect(themeTokensCss).toContain('--app-bg');
     expect(indexCss).toMatch(/html\s*\{[\s\S]*overflow-y:\s*auto/);
     expect(indexCss).toMatch(/body\s*\{[\s\S]*overflow-y:\s*auto/);
-    expect(appShellCss).toMatch(/\.app-shell-main-content\s*\{[\s\S]*overflow:\s*auto/);
+    expect(appShellCss).toMatch(/\.app-shell-main-content\s*\{[\s\S]*overflow-x:\s*clip[\s\S]*overflow-y:\s*auto/);
     expect(copilotPanelCss).toMatch(/\.ed-copilot-panel\s*\{[\s\S]*overflow:\s*hidden/);
   });
 });

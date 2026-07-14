@@ -148,7 +148,7 @@
 
 .operational-strip__metric[data-tone='info'] strong,
 .operational-strip__action[data-tone='info'] strong {
-  color: #374151);
+  color: #374151;
 }
 
 .operational-strip__metric[data-tone='warning'] strong,
@@ -214,17 +214,17 @@
   position: sticky;
   top: 0;
   z-index: 6;
-  border-bottom-color: color-mix(in srgb, #374151) 28%, var(--cdl-clinical-border, var(--color-border-subtle, var(--medical-border, #e0f2fe))));
+  border-bottom-color: color-mix(in srgb, #374151 28%, var(--cdl-clinical-border, var(--color-border-subtle, var(--medical-border, #e0f2fe))));
   box-shadow: var(--cdl-clinical-shadow-hover, var(--cdl-clinical-shadow-rest, var(--app-elevation-card)));
 }
 
 .operational-strip--accent-shift-handoff .operational-strip__eyebrow {
   color: #374151;
-  background: color-mix(in srgb, #374151) 14%, var(--medical-surface-card, #ffffff));
+  background: color-mix(in srgb, #374151 14%, var(--medical-surface-card, #ffffff));
 }
 
 .operational-strip--accent-shift-handoff .operational-strip__metric {
-  background: color-mix(in srgb, #374151) 6%, var(--medical-surface-card, #ffffff));
+  background: color-mix(in srgb, #374151 6%, var(--medical-surface-card, #ffffff));
 }
 
 .operational-strip[data-emphasis='speed'] .operational-strip__eyebrow {

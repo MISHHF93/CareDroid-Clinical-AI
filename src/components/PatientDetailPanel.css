@@ -133,7 +133,7 @@
 }
 
 .patient-detail-panel__field-btn--primary {
-  background: #374151);
+  background: #374151;
   border: none;
   color: var(--app-on-solid, #f9fafb);
 }
@@ -378,7 +378,7 @@
 }
 
 .patient-detail-vitals-trend__toggle-btn--active {
-  background: #374151);
+  background: #374151;
 }
 
 .patient-detail-vitals-trend__chart {
@@ -609,9 +609,9 @@
 }
 
 .patient-detail-calculators__chip {
-  border: 1px solid #374151);
+  border: 1px solid #374151;
   border-radius: 999px;
-  background: color-mix(in srgb, #374151) 12%, transparent);
+  background: color-mix(in srgb, #374151 12%, transparent);
   color: var(--status-info, #bfdbfe);
   font-size: var(--ed-type-body);
   font-weight: 700;

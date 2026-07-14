@@ -55,7 +55,11 @@ describe('PR1 calculators — shared accessibility affordances', () => {
   it.each(['qsofa', 'news2', 'child-pugh'])('%s marks invalid numeric fields', (id) => {
     const ui = sliceCalculatorComponent(calculatorsSource, PR1_COMPONENTS[id]);
     expect(ui).toContain('calcFieldClass');
-    expect(ui).toContain('aria-invalid');
+    // aria-invalid itself is set inside AriaInvalidInput (src/components/a11y/AriaInvalidFields.tsx),
+    // which renders literal "true"/"false" strings rather than a bare boolean — check for its usage
+    // here rather than the literal attribute name, which no longer appears in this source file.
+    expect(ui).toContain('AriaInvalidInput');
+    expect(ui).toMatch(/invalid=\{\w+Invalid/);
   });
 
   it('maps each PR1 calculator to a distinct results panel id', () => {

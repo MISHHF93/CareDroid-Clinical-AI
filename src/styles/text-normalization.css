@@ -45,8 +45,8 @@ html[data-theme='light'],
 }
 
 :is(.app-shell, .emergency-app-shell) a:not([class*='btn']):not([class*='button']):not([role='button']) {
-  color: #374151;
-  text-decoration-color: color-mix(in srgb, #374151 35%, transparent);
+  color: var(--medical-text-link);
+  text-decoration-color: color-mix(in srgb, var(--medical-text-link) 35%, transparent);
 }
 
 /* Accent fill is for chrome; readable action text on white uses link tokens. */
@@ -56,12 +56,12 @@ html[data-theme='light'],
     [class*='-link']:not([class*='btn']):not([class*='button']),
     [class*='__cta']:not([class*='--solid']):not([class*='--primary'])
   ):not([class*='btn']):not([class*='button']):not([role='button']) {
-  color: #374151;
+  color: var(--medical-text-link);
 }
 
 :is(.app-shell, .emergency-app-shell)
   a:not([class*='btn']):not([class*='button']):not([role='button']):hover {
-  color: #374151;
+  color: var(--medical-text-link-hover);
 }
 
 :is(.app-shell, .emergency-app-shell) :is(input, select, textarea)::placeholder {
@@ -116,5 +116,5 @@ html[data-theme='light'],
 }
 
 :is(.diagnostic-safety-dashboard, .patient-card-copilot) [class*='__eyebrow'] {
-  color: #374151;
+  color: var(--medical-text-link);
 }

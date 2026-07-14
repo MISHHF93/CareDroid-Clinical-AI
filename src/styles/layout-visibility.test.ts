@@ -65,7 +65,9 @@ describe('layout-visibility.css', () => {
 describe('AppShell.css — scroll vs conversation', () => {
   it('CareDroid main shell owns the route scrollport without clipping route content', () => {
     expect(appShellCss).toMatch(/\.emergency-app-shell__main-column\s*\{[\s\S]*overflow:\s*hidden/);
-    expect(appShellCss).toMatch(/\.app-shell-main-content\s*\{[\s\S]*overflow:\s*auto/);
+    // Split into overflow-x: clip / overflow-y: auto (a real improvement over
+    // the shorthand — blocks horizontal bleed while still scrolling vertically).
+    expect(appShellCss).toMatch(/\.app-shell-main-content\s*\{[\s\S]*overflow-x:\s*clip[\s\S]*overflow-y:\s*auto/);
   });
 });
 

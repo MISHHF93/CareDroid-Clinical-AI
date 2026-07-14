@@ -126,12 +126,12 @@ Canonical access helpers in `canonicalAccess.ts` are the preferred surface: `has
 - Permissions cascade from role definitions — never copy-paste permission arrays into components.
 - Use `compileCareDroidAccessProfile()` to map a `HospitalRole` to emergency role, SaaS role, backend compatibility role, routes, permissions, dashboard widgets, AI capabilities, and alert ownership.
 
-### Demo user switcher
+### Demo role switcher
 
-`src/components/auth/DemoUserSwitcher.tsx` allows switching the active demo user during demo or dev mode.
-- Only render it in demo/dev contexts. Never expose it in production.
-- Switching a demo user updates both `useCareDroidUser` state and the existing `UserContext` role for nav routing.
-- Switching must also carry `caredroidProfile`, `compiledAccessProfile`, permissions, emergency role, SaaS role, backend compatibility role, route/navigation access, dashboard personalization, AI routing, alert ownership, and staff assignment identity together.
+`src/components/account/ProfileRoleSwitcher.tsx` allows switching the active demo role during demo or dev mode (rendered inside `UserAccountMenu` — do not add a second standalone instance elsewhere; see the doc comment in `src/components/account/index.ts`).
+- Gate it with `useProfileSwitcherVisibility()`. Never expose it in production.
+- Switching calls `switchDemoRole()` from `useEmergencyRolePermissions()`, which carries `caredroidProfile`, `compiledAccessProfile`, permissions, emergency role, SaaS role, backend compatibility role, and hospital role together in one profile update.
+- `src/components/auth/DemoUserSwitcher.tsx`/`UserSwitcher.tsx` (an older, separate demo-user-switching implementation built on `useCareDroidUser`) has been removed — it had zero real importers anywhere in the app.
 
 ### AI Chief routing
 
@@ -180,7 +180,6 @@ localStorage utilities for the current demo user session live in `src/lib/auth/c
 
 Component aliases at `src/components/auth/`:
 - `RoleBadge.tsx` — re-exports `RoleBadge` from `src/domain/staff/RoleBadge`.
-- `UserSwitcher.tsx` — re-exports `DemoUserSwitcher` as `UserSwitcher`.
 
 ### RoleGate
 

@@ -20,11 +20,13 @@ vi.mock('../contexts/PractitionerVisibilityContext', () => ({
 }));
 
 describe('useCopilotChromeAccess', () => {
-  it('enables session copilot chrome when role and surfaces allow it', () => {
+  it('enables copilot access when role and surfaces allow it', () => {
     const { result } = renderHook(() => useCopilotChromeAccess());
 
     expect(result.current.canUseCopilot).toBe(true);
-    expect(result.current.showSessionCopilot).toBe(true);
+    // Deprecated, always false — the sidebar nav `copilot` item is the sole
+    // entry point now (session chrome no longer hosts a second open control).
+    expect(result.current.showSessionCopilot).toBe(false);
     expect(result.current.hiddenOnReception).toBe(false);
   });
 });

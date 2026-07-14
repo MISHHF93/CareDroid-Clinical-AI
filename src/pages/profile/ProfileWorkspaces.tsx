@@ -22,14 +22,17 @@ export default function ProfileWorkspaces() {
     isLoading,
     error,
   } = useUserIdentity();
-  const { switchWorkspace: switchWorkspaceContext } = useWorkspace();
+  const { switchWorkspace: switchWorkspaceContext, error: workspaceContextError } = useWorkspace();
   const visibleWorkspaces = workspaces.filter(
     (workspace) => !isFutureWorkspace(workspace.workspaceKey || workspace.type || workspace.id)
   );
 
+  // Two independent backend resources track "active workspace" — the tenant
+  // workspace-membership system (WorkspaceContext, /api/workspaces/active) and
+  // the user's own profile preference (UserIdentityContext, /api/profile/me/workspaces/active).
+  // Both results are checked so a partial failure surfaces instead of failing silently.
   const handleSwitch = async (workspaceId) => {
-    await switchWorkspaceContext(workspaceId);
-    await switchWorkspace(workspaceId);
+    await Promise.all([switchWorkspaceContext(workspaceId), switchWorkspace(workspaceId)]);
   };
 
   const handleSetDefault = async (workspace) => {
@@ -66,6 +69,7 @@ export default function ProfileWorkspaces() {
             </select>
           </div>
           {error ? <p className="profile-identity-muted">{error}</p> : null}
+          {workspaceContextError ? <p className="profile-identity-muted">{workspaceContextError}</p> : null}
         </Card>
 
         <div className="profile-identity-grid">

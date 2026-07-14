@@ -92,7 +92,10 @@ describe('responsive-ux.css — global normalization', () => {
   it('uses the main shell scrollport plus local scroll helpers', () => {
     expect(appShellCss).toMatch(/\.emergency-app-shell\s*\{[\s\S]*overflow:\s*hidden/);
     expect(appShellCss).toMatch(/\.emergency-app-shell__main-column\s*\{[\s\S]*overflow:\s*hidden/);
-    expect(appShellCss).toMatch(/\.app-shell-main-content\s*\{[\s\S]*overflow:\s*auto/);
+    // Split into overflow-x: clip / overflow-y: auto (blocks horizontal
+    // bleed while still scrolling vertically) — a real improvement over the
+    // shorthand this assertion originally checked for.
+    expect(appShellCss).toMatch(/\.app-shell-main-content\s*\{[\s\S]*overflow-x:\s*clip[\s\S]*overflow-y:\s*auto/);
     expect(copilotPanelCss).toMatch(/\.ed-copilot-panel\s*\{[\s\S]*overflow:\s*hidden/);
     expect(indexCss).toMatch(/\.app-local-scroll-y\s*\{[\s\S]*overflow-y:\s*auto/);
     expect(indexCss).toMatch(/\.app-local-scroll-x\s*\{[\s\S]*overflow-x:\s*auto/);

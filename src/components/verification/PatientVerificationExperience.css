@@ -26,7 +26,7 @@
 }
 
 .patient-verification__step--active button {
-  border-color: #374151);
+  border-color: #374151;
   color: var(--color-text-primary, var(--medical-ink, #111827));
 }
 

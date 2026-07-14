@@ -1,4 +1,3 @@
-import { MEDICAL_THEME } from '../config/medicalTheme.constants';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
@@ -41,8 +40,6 @@ import {
   type OperationalSearchHit,
 } from '../services/unifiedOperationalSearch';
 import UserAccountMenu from './account/UserAccountMenu';
-import ProfileRoleSwitcher from './account/ProfileRoleSwitcher';
-import useProfileSwitcherVisibility from '../hooks/useProfileSwitcherVisibility';
 import OperationalAlertRail from './emergency/OperationalAlertRail';
 import OperationsCenterMenu from './chrome/OperationsCenterMenu';
 import { isPilotStationKpiPolicyActive } from '../config/stationKpiPolicy';
@@ -58,17 +55,7 @@ function Clock() {
     return () => window.clearInterval(interval);
   }, []);
 
-  return (
-    <span
-      style={{
-        color: MEDICAL_THEME.inkSubtle,
-        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
-        fontSize: 12,
-      }}
-    >
-      {now.toLocaleTimeString()}
-    </span>
-  );
+  return <span className="caredroid-header__clock">{now.toLocaleTimeString()}</span>;
 }
 
 function formatSyncAge(timestamp?: string | null): string {
@@ -140,7 +127,6 @@ export function Header() {
   );
   const canSubmitCentralIntake =
     canCreatePatient || (centralControl.enabled && !emergencyRole.readOnly);
-  const showProfileSwitcher = useProfileSwitcherVisibility();
   const syncMode = websocket.mode || centralSnapshot.sync.mode || 'polling';
   const syncAge = formatSyncAge(websocket.lastEventAt || centralSnapshot.sync.lastSyncedAt);
   const syncStale =
@@ -534,8 +520,6 @@ export function Header() {
           ) : null}
 
           <OperationsCenterMenu />
-
-          {showProfileSwitcher ? <ProfileRoleSwitcher variant="compact" /> : null}
 
           <UserAccountMenu />
         </div>

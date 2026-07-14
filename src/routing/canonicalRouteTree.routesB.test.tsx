@@ -2,7 +2,7 @@ import './canonicalRouteTree.testShared';
 import { cleanup, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 import { useEmergencyStore } from '../store/emergencyStore';
-import { renderRoute } from './canonicalRouteTree.testShared';
+import { renderRoute, ROUTE_LOAD_TIMEOUT } from './canonicalRouteTree.testShared';
 
 const originalEmergencyState = useEmergencyStore.getState();
 
@@ -24,8 +24,12 @@ describe('canonical route tree — intake, capacity, queues', () => {
 
     // The shell chrome route-tab and the page's own (visually-hidden) accessibility
     // heading both render "Flow & Capacity" — scope to <main> for the page's heading.
-    const main = await screen.findByRole('main');
-    expect(await within(main).findByRole('heading', { name: 'Flow & Capacity' })).toBeInTheDocument();
+    // The lazy-loaded route module + hook chain here can take longer than the
+    // default findByRole timeout to resolve, so use the shared ROUTE_LOAD_TIMEOUT.
+    const main = await screen.findByRole('main', {}, { timeout: ROUTE_LOAD_TIMEOUT });
+    expect(
+      await within(main).findByRole('heading', { name: 'Flow & Capacity' }, { timeout: ROUTE_LOAD_TIMEOUT }),
+    ).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: 'Capacity' })).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByRole('tablist', { name: 'Flow and capacity views' })).toBeInTheDocument();
   });
@@ -33,7 +37,14 @@ describe('canonical route tree — intake, capacity, queues', () => {
   it('/emergency/queues renders queue intelligence from store state', async () => {
     renderRoute('/emergency/queues');
 
-    expect(await screen.findByRole('heading', { name: 'Department Queues' })).toBeInTheDocument();
+    // Same dual-heading + slow-lazy-load situation as the capacity test above:
+    // the shell chrome route-tab catches up to the page's own registered title
+    // ("Department Queues") once its effect fires, so scope to <main> and use
+    // the shared ROUTE_LOAD_TIMEOUT rather than the default findByRole timeout.
+    const main = await screen.findByRole('main', {}, { timeout: ROUTE_LOAD_TIMEOUT });
+    expect(
+      await within(main).findByRole('heading', { name: 'Department Queues' }, { timeout: ROUTE_LOAD_TIMEOUT }),
+    ).toBeInTheDocument();
     expect(screen.getAllByText('Waiting').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Triage').length).toBeGreaterThan(0);
     expect(screen.getByText('Movement stage: Waiting')).toBeInTheDocument();

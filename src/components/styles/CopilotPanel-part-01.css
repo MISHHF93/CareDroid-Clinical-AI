@@ -23,9 +23,9 @@
   --copilot-surface: color-mix(in srgb, var(--color-floating-surface, var(--app-surface-elevated, #ffffff)) 76%, #f1f5f9);
   --copilot-surface-soft: color-mix(in srgb, var(--color-card, var(--app-surface-2, #ffffff)) 68%, #f1f5f9);
   --copilot-border: color-mix(in srgb, var(--color-border-default, var(--medical-border, #e0f2fe)) 76%, transparent);
-  --copilot-border-strong: color-mix(in srgb, #374151) 34%, var(--color-border-default, var(--medical-border, #e0f2fe)));
-  --copilot-ai: #374151);
-  --copilot-action: #374151);
+  --copilot-border-strong: color-mix(in srgb, #374151 34%, var(--color-border-default, var(--medical-border, #e0f2fe)));
+  --copilot-ai: #374151;
+  --copilot-action: #374151;
   --copilot-text: var(--color-text-primary, var(--medical-ink, #111827));
   --copilot-muted: var(--color-text-secondary, #9ca3af);
   --copilot-warning: var(--status-warning, #f59e0b);
