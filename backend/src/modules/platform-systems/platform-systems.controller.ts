@@ -3,10 +3,7 @@ import {
   Body,
   Controller,
   Get,
-  HttpCode,
-  HttpStatus,
   NotFoundException,
-  Optional,
   Param,
   Patch,
   Post,
@@ -17,8 +14,6 @@ import { AuthGuard } from '@nestjs/passport';
 import { Permissions } from '../auth/decorators/permissions.decorator';
 import { Permission } from '../auth/enums/permission.enum';
 import { AuthorizationGuard } from '../auth/guards/authorization.guard';
-import { PlatformSystemsService } from './platform-systems.service';
-import { PlatformGovernanceService } from '../platform-governance';
 import {
   EmergencyPatientService,
   ReferralService,
@@ -31,11 +26,9 @@ import {
 @UseGuards(AuthGuard('jwt'), AuthorizationGuard)
 export class PlatformSystemsController {
   constructor(
-    private readonly platformSystemsService: PlatformSystemsService,
     private readonly emergencyPatientService: EmergencyPatientService,
     private readonly referralService: ReferralService,
     private readonly emsIntakeService: EMSIntakeService,
-    @Optional() private readonly platformGovernanceService?: PlatformGovernanceService,
   ) {}
 
   @Get('patients')
@@ -135,175 +128,5 @@ export class PlatformSystemsController {
       throw new NotFoundException(`Emergency patient ${body.patientId} was not found`);
     }
     return this.referralService.createReferral(body).data.referral;
-  }
-
-  @Get('platform-systems/capabilities/:capabilityId')
-  @Permissions(Permission.USE_AI_CHAT)
-  @ApiOperation({ summary: 'Get a platform capability contract and demo safety state' })
-  getCapability(@Param('capabilityId') capabilityId: string) {
-    return this.platformSystemsService.getCapability(capabilityId);
-  }
-
-  @Get('platform-systems/packs/:pack')
-  @Permissions(Permission.USE_AI_CHAT)
-  @ApiOperation({ summary: 'Get platform pack capability contracts' })
-  getPack(@Param('pack') pack: string) {
-    return this.platformSystemsService.getPack(pack);
-  }
-
-  @Get('integrations/fhir/connections')
-  @Permissions(Permission.VIEW_INTEGRATIONS)
-  getFhirConnections() {
-    return this.platformSystemsService.getFhirConnections();
-  }
-
-  @Post('integrations/fhir/connections')
-  @HttpCode(HttpStatus.OK)
-  @Permissions(Permission.MANAGE_INTEGRATIONS)
-  createFhirConnection(@Body() body: Record<string, unknown>) {
-    return this.platformSystemsService.demo('fhir-connector', 'demo-patient', body);
-  }
-
-  @Post('integrations/fhir/:connectionId/test')
-  @HttpCode(HttpStatus.OK)
-  @Permissions(Permission.MANAGE_INTEGRATIONS)
-  testFhirConnection(
-    @Param('connectionId') connectionId: string,
-    @Body() body: Record<string, unknown>,
-  ) {
-    return this.platformSystemsService.demo('fhir-connector', connectionId, body);
-  }
-
-  @Post('integrations/fhir/:connectionId/sync')
-  @HttpCode(HttpStatus.OK)
-  @Permissions(Permission.MANAGE_INTEGRATIONS)
-  syncFhirConnection(
-    @Param('connectionId') connectionId: string,
-    @Body() body: Record<string, unknown>,
-  ) {
-    return this.platformSystemsService.demo('fhir-connector', connectionId, body);
-  }
-
-  @Get('integrations/hl7/interfaces')
-  @Permissions(Permission.VIEW_INTEGRATIONS)
-  getHl7Interfaces() {
-    return this.platformSystemsService.getHl7Interfaces();
-  }
-
-  @Post('integrations/hl7/interfaces/:interfaceId/test-message')
-  @HttpCode(HttpStatus.OK)
-  @Permissions(Permission.MANAGE_INTEGRATIONS)
-  testHl7Message(@Param('interfaceId') interfaceId: string, @Body() body: Record<string, unknown>) {
-    return this.platformSystemsService.demo('hl7-bridge', interfaceId, body);
-  }
-
-  @Get('integrations/hl7/messages/quarantine')
-  @Permissions(Permission.VIEW_INTEGRATIONS)
-  getHl7MessageQuarantine() {
-    return this.platformSystemsService.demo('hl7-bridge', 'quarantine');
-  }
-
-  @Post('integrations/hl7/messages/:messageId/replay-preview')
-  @HttpCode(HttpStatus.OK)
-  @Permissions(Permission.MANAGE_INTEGRATIONS)
-  previewHl7MessageReplay(
-    @Param('messageId') messageId: string,
-    @Body() body: Record<string, unknown>,
-  ) {
-    return this.platformSystemsService.demo('hl7-bridge', messageId, {
-      ...body,
-      replayMode: 'preview_only',
-      writebackAllowed: false,
-    });
-  }
-
-  @Get('source-provenance/:sourceId')
-  @Permissions(Permission.VIEW_INTEGRATIONS)
-  async getSourceProvenance(@Param('sourceId') sourceId: string) {
-    if (this.platformGovernanceService) {
-      return this.platformGovernanceService.getSourceProvenance(sourceId);
-    }
-    return this.platformSystemsService.getSourceProvenance(sourceId);
-  }
-
-  @Post('patients/import/ehr')
-  @HttpCode(HttpStatus.OK)
-  @Permissions(Permission.IMPORT_PATIENT_DATA)
-  importEhrPatient(@Body() body: Record<string, unknown>) {
-    return this.platformSystemsService.demo('ehr-patient-import', 'demo-patient', body);
-  }
-
-  @Post('patients/:patientId/import/labs')
-  @HttpCode(HttpStatus.OK)
-  @Permissions(Permission.READ_PHI, Permission.WRITE_PHI)
-  importLabs(@Param('patientId') patientId: string, @Body() body: Record<string, unknown>) {
-    return this.platformSystemsService.demo('lab-result-import', patientId, body);
-  }
-
-  @Post('patients/:patientId/import/medications')
-  @HttpCode(HttpStatus.OK)
-  @Permissions(Permission.READ_PHI, Permission.WRITE_PHI)
-  importMedications(@Param('patientId') patientId: string, @Body() body: Record<string, unknown>) {
-    return this.platformSystemsService.demo('medication-list-import', patientId, body);
-  }
-
-  @Post('patients/:patientId/import/observations')
-  @HttpCode(HttpStatus.OK)
-  @Permissions(Permission.READ_PHI, Permission.WRITE_PHI)
-  importObservations(@Param('patientId') patientId: string, @Body() body: Record<string, unknown>) {
-    return this.platformSystemsService.demo('observation-vitals-import', patientId, body);
-  }
-
-  @Get('patients/:patientId/workspace')
-  @Permissions(Permission.READ_PHI)
-  getPatientWorkspace(@Param('patientId') patientId: string) {
-    return this.platformSystemsService.getPatientWorkspace(patientId);
-  }
-
-  @Get('patients/:patientId/source-data')
-  @Permissions(Permission.READ_PHI)
-  async getPatientSourceData(@Param('patientId') patientId: string) {
-    if (this.platformGovernanceService) {
-      return this.platformGovernanceService.getPatientSourceData(patientId);
-    }
-    return this.platformSystemsService.getSourceProvenance(patientId);
-  }
-
-  @Get('patients/:patientId/summary')
-  @Permissions(Permission.READ_PHI)
-  getPatientSummaryShell(@Param('patientId') patientId: string) {
-    return this.platformSystemsService.demo('patient-summary-ai', patientId);
-  }
-
-  @Get('patients/:patientId/timeline')
-  @Permissions(Permission.READ_PHI)
-  getTimeline(@Param('patientId') patientId: string) {
-    return this.platformSystemsService.getTimeline(patientId);
-  }
-
-  @Post('patients/:patientId/events')
-  @HttpCode(HttpStatus.OK)
-  @Permissions(Permission.READ_PHI, Permission.WRITE_PHI)
-  createPatientEvent(@Param('patientId') patientId: string, @Body() body: Record<string, unknown>) {
-    return this.platformSystemsService.demo('clinical-event-ai', patientId, body);
-  }
-
-  @Get('patients/:patientId/risk-scores')
-  @Permissions(Permission.READ_PHI)
-  getRiskScores(@Param('patientId') patientId: string) {
-    return this.platformSystemsService.getRiskScores(patientId);
-  }
-
-  @Post('patients/:patientId/risk-scores')
-  @HttpCode(HttpStatus.OK)
-  @Permissions(Permission.READ_PHI, Permission.WRITE_PHI)
-  addRiskScore(@Param('patientId') patientId: string, @Body() body: Record<string, unknown>) {
-    return this.platformSystemsService.demo('risk-score-history', patientId, body);
-  }
-
-  @Get('patients/:patientId/care-plan')
-  @Permissions(Permission.READ_PHI)
-  getCarePlan(@Param('patientId') patientId: string) {
-    return this.platformSystemsService.getCarePlan(patientId);
   }
 }

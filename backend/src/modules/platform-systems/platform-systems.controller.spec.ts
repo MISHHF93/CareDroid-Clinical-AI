@@ -1,20 +1,7 @@
 import { PlatformSystemsController } from './platform-systems.controller';
 
 describe('PlatformSystemsController', () => {
-  const buildController = (governanceOverrides: Record<string, any> = {}) => {
-    const platformSystemsService = {
-      demo: jest.fn((capabilityId: string, id?: string, payload?: Record<string, unknown>) => ({
-        capabilityId,
-        id,
-        payload,
-        status: 'demo_review_required',
-      })),
-      getSourceProvenance: jest.fn((sourceId: string) => ({ sourceId, fallback: true })),
-    };
-    const platformGovernanceService = {
-      getPatientSourceData: jest.fn((patientId: string) => ({ patientId, sources: [] })),
-      ...governanceOverrides,
-    };
+  const buildController = () => {
     const emergencyPatientService = {
       listPatients: jest.fn(() => [{ id: 'pt-001', firstName: 'Maya', lastName: 'Singh' }]),
       getPatient: jest.fn((patientId: string) =>
@@ -40,30 +27,15 @@ describe('PlatformSystemsController', () => {
 
     return {
       controller: new PlatformSystemsController(
-        platformSystemsService as any,
         emergencyPatientService as any,
         referralService as any,
         emsIntakeService as any,
-        platformGovernanceService as any,
       ),
-      platformSystemsService,
-      platformGovernanceService,
       emergencyPatientService,
       referralService,
       emsIntakeService,
     };
   };
-
-  it('routes patient source data through the durable governance service', async () => {
-    const { controller, platformGovernanceService } = buildController();
-
-    await expect(controller.getPatientSourceData('patient-1')).resolves.toEqual({
-      patientId: 'patient-1',
-      sources: [],
-    });
-
-    expect(platformGovernanceService.getPatientSourceData).toHaveBeenCalledWith('patient-1');
-  });
 
   describe('emergency patient/staff/rooms/ems/referrals — delegate to the shared EmergencyPatientService', () => {
     it('lists and fetches patients through the shared service, not a local array', () => {
