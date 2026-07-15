@@ -132,6 +132,7 @@ export class ChatService {
     clientWorkspaceContext?: Record<string, any>,
     clientMemoryContext?: Record<string, any>,
     requestMessages?: Array<{ role: string; content: string }>,
+    organizationId?: string,
   ): Promise<QueryResponse> {
     this.logger.log(`💬 Processing chat message: "${message}"`);
     const startedAt = Date.now();
@@ -432,6 +433,7 @@ export class ChatService {
         classification,
         userId,
         modelFoundationContext,
+        organizationId,
       );
       const composed = this.aiResponseComposer.compose(
         response,
@@ -467,6 +469,7 @@ export class ChatService {
           ragContext = await this.ragService.retrieve(message, {
             topK: 3,
             minScore: 0.7,
+            organizationId,
           });
         } else {
           ragContext = this.emptyRagContext(message, 'rag_disabled');
@@ -1960,6 +1963,7 @@ export class ChatService {
     classification: any,
     userId?: string,
     aiFoundation?: Record<string, any>,
+    organizationId?: string,
   ): Promise<QueryResponse> {
     this.logger.log(`📚 Handling medical reference query with RAG`);
 
@@ -1984,6 +1988,7 @@ export class ChatService {
         topK: 5,
         minScore: 0.6,
         documentType: 'guideline', // Prefer guidelines for medical references
+        organizationId,
       });
 
       this.logger.log(

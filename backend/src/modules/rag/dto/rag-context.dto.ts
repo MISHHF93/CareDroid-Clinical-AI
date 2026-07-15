@@ -108,6 +108,13 @@ export interface ChunkMetadata {
   organization?: string;
 
   /**
+   * Tenant/organization identifier for retrieval isolation. Absent (or the
+   * shared/global sentinel) means the document is part of the shared
+   * reference corpus queryable by every tenant.
+   */
+  organizationId?: string;
+
+  /**
    * Publication or last update date
    */
   date?: string;
@@ -251,6 +258,14 @@ export interface RAGRetrievalOptions {
    * Jurisdiction label for registry-backed corpora (e.g. US-oriented_educational)
    */
   jurisdiction?: string;
+
+  /**
+   * Tenant/organization identifier to scope retrieval to. When set, results
+   * are restricted to this tenant's own ingested documents plus the shared
+   * global reference corpus. When unset, retrieval is unscoped (legacy
+   * behavior for callers without tenant context).
+   */
+  organizationId?: string;
 
   /**
    * Evidence grade allow-list (A|B|C|D|summary|N/A)

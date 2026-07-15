@@ -26,6 +26,15 @@ import {
  * Orchestrates document ingestion, embedding generation, vector storage, and retrieval.
  */
 
+/**
+ * Sentinel tenant value for documents meant to be queryable by every
+ * organization (e.g. the shared public clinical-guideline starter corpus).
+ * Any document ingested without an explicit `organizationId` is tagged with
+ * this value rather than left unscoped, so retrieval filtering has a single,
+ * always-present key to reason about.
+ */
+export const RAG_GLOBAL_ORG_SCOPE = '__global__';
+
 @Injectable()
 export class RAGService implements OnModuleInit {
   private readonly logger = new Logger(RAGService.name);
@@ -201,12 +210,15 @@ export class RAGService implements OnModuleInit {
       const embeddings = await this.embeddingService.embedDocuments(texts);
       this.logger.debug(`Generated ${embeddings.length} embeddings`);
 
-      // 3. Create vector records
+      // 3. Create vector records, tagging every chunk with its owning tenant
+      // (or the global sentinel for shared/public corpora) so retrieval can
+      // enforce tenant isolation at query time.
+      const organizationId = enrichedSource.organizationId || RAG_GLOBAL_ORG_SCOPE;
       const vectorRecords: VectorRecord[] = chunks.map((chunk, index) => ({
         id: `${enrichedSource.id}_chunk_${chunk.chunkIndex}`,
         vector: embeddings[index],
         text: chunk.text,
-        metadata: chunk.metadata,
+        metadata: { ...chunk.metadata, organizationId },
       }));
 
       // 4. Upsert to vector database
@@ -287,6 +299,12 @@ export class RAGService implements OnModuleInit {
     }
     if (options.jurisdiction) {
       filter.jurisdiction = options.jurisdiction;
+    }
+    if (options.organizationId) {
+      // Scope to the caller's own tenant plus the shared global corpus.
+      // Callers without tenant context (legacy/internal) get no
+      // organizationId filter at all, preserving unscoped retrieval.
+      filter.organizationId = [options.organizationId, RAG_GLOBAL_ORG_SCOPE];
     }
     return filter;
   }

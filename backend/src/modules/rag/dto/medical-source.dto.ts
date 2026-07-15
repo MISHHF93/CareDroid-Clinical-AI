@@ -43,6 +43,13 @@ export interface MedicalSource {
   organization?: string;
 
   /**
+   * Tenant/organization identifier that owns this document for retrieval
+   * isolation. Leave unset to add it to the shared global reference corpus
+   * queryable by every tenant.
+   */
+  organizationId?: string;
+
+  /**
    * Authors (for journal articles, textbooks)
    */
   authors?: string[];

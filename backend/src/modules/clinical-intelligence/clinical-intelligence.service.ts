@@ -136,6 +136,7 @@ export class ClinicalIntelligenceService {
     userId: string,
     dto: GuidelineRagQueryDto,
     requestMeta: { ipAddress?: string; userAgent?: string } = {},
+    organizationId?: string,
   ): Promise<GuidelineRagResponseDto> {
     const runId = randomUUID();
     const ragContext = await this.ragService.retrieve(dto.query, {
@@ -143,6 +144,7 @@ export class ClinicalIntelligenceService {
       minScore: dto.minScore ?? 0.6,
       documentType: 'guideline',
       specialty: dto.specialty,
+      organizationId,
     });
 
     const citations = buildCitations(ragContext.chunks);

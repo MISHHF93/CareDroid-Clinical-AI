@@ -163,6 +163,7 @@ export class ChatController {
     await assertEntitlementLaunchFromRequest(this.entitlementService, req, 'agent-clinical');
     const userId = req?.user?.id || 'anonymous';
     const userRole = req?.user?.role || null;
+    const organizationId = req?.user?.profile?.organizationId || undefined;
 
     const response = await this.chatService.processMessage(
       dto.message,
@@ -175,6 +176,7 @@ export class ChatController {
       dto.workspaceContext,
       dto.memoryContext,
       dto.messages,
+      organizationId,
     );
 
     return {
