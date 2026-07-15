@@ -6,9 +6,6 @@ import {
   JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
-  BeforeInsert,
-  BeforeUpdate,
-  AfterLoad,
 } from 'typeorm';
 
 @Entity('user_profiles')
@@ -61,7 +58,14 @@ export class UserProfile {
   @Column({ type: 'text', nullable: true })
   avatarUrl: string;
 
-  // PHI columns - encrypted at rest
+  // PHI columns - encrypted at rest.
+  // NOTE: no service currently writes to these columns — UsersService.updateProfile()'s
+  // field allow-list does not include them, so DOB/medical-history/allergies/medications
+  // collection is not yet a built feature and these are always null today. If this
+  // capability is built, encrypt via EncryptionService.encryptToBuffer() explicitly at
+  // the service layer before saving (the same pattern AuthService.applyEmailEncryption()
+  // already uses for User.emailEncrypted) — do not assume an entity lifecycle hook here
+  // handles it; none exists.
   @Column({ type: 'blob', nullable: true })
   dateOfBirthEncrypted: Buffer; // Encrypted DOB
 
@@ -106,48 +110,8 @@ export class UserProfile {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  // Transient properties for in-memory decrypted data
-  dateOfBirthDecrypted?: string;
-  medicalHistoryDecrypted?: string;
-  allergiesDecrypted?: string;
-  medicationsDecrypted?: string;
-
   // Relations
   @OneToOne('User', (user: any) => user.profile, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user: any;
-
-  /**
-   * BeforeInsert hook: Encrypt PHI fields before saving to database
-   * Called whenever a new UserProfile is inserted
-   */
-  @BeforeInsert()
-  async encryptPhiBeforeInsert() {
-    // Encryption service will be injected via service-level handler
-    // This is a placeholder for automatic encryption logic
-  }
-
-  /**
-   * BeforeUpdate hook: Re-encrypt PHI fields during updates
-   * Called whenever a UserProfile is updated
-   */
-  @BeforeUpdate()
-  async encryptPhiBeforeUpdate() {
-    // Encryption service will be injected via service-level handler
-    // This is a placeholder for automatic encryption logic
-  }
-
-  /**
-   * AfterLoad hook: Decrypt PHI fields after loading from database
-   * Called whenever entities are loaded from the database
-   */
-  @AfterLoad()
-  async decryptPhiAfterLoad() {
-    // Decryption will be handled at the service level
-    // This is a placeholder for automatic decryption logic
-    this.dateOfBirthDecrypted = undefined;
-    this.medicalHistoryDecrypted = undefined;
-    this.allergiesDecrypted = undefined;
-    this.medicationsDecrypted = undefined;
-  }
 }
