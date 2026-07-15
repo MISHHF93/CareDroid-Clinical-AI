@@ -30,8 +30,16 @@
   --medical-white: #ffffff;
   --medical-ink: #102a43;
   --medical-ink-secondary: #334e68;
-  --medical-ink-muted: #627d98;
-  --medical-ink-subtle: #94a3b8;
+  /* --medical-ink-muted/-subtle: darkened from #627d98/#94a3b8 (real axe-core
+     WCAG AA scan, Cycle 59) — the originals rendered 4.28:1 and 2.56:1 against
+     white, both below the 4.5:1 minimum for normal text. Both now reuse
+     existing --medical-slate-500/-600 steps rather than inventing new colors;
+     "subtle" ends up darker than "muted" as a result, since WCAG leaves no
+     room for a lighter-than-muted token that's still real (non-decorative)
+     text on a white surface — visual hierarchy between the two now comes from
+     type treatment (size/weight/tracking) at each call site, not raw color. */
+  --medical-ink-muted: #64748b;
+  --medical-ink-subtle: #475569;
   --medical-neutral: #667085;
   --medical-focus: #facc15;
   --medical-border: #cbd5e1;

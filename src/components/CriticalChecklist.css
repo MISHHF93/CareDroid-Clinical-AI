@@ -16,7 +16,7 @@
 
 .checklist-chooser__option-meta {
   display: block;
-  color: #94a3b8;
+  color: var(--medical-ink-subtle);
   font-size: 12px;
   margin-top: 3px;
 }
@@ -63,7 +63,7 @@
 }
 
 .checklist-row__completion-note {
-  color: #94a3b8;
+  color: var(--medical-ink-subtle);
   display: block;
   font-size: 11px;
   margin-top: 5px;
@@ -113,7 +113,7 @@
 }
 
 .critical-checklist-panel__subtitle {
-  color: #94a3b8;
+  color: var(--medical-ink-subtle);
   font-size: 12px;
   line-height: 1.35;
   margin: 6px 0 0;

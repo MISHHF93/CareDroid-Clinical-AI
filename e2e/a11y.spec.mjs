@@ -23,7 +23,13 @@ test.beforeEach(async ({ page }) => {
 });
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const RESULTS_PATH = join(__dirname, '..', 'qa', 'a11y-results.json');
+// Per-page files, not one shared array + a single afterAll: fullyParallel +
+// retries can run this file's tests across multiple worker processes, each
+// with its own module instance, so a shared array + one afterAll write only
+// ever captures whichever worker happened to finish last (silently dropping
+// every other page's results). Writing immediately per-test, keyed by page,
+// is race-free regardless of worker/retry topology.
+const RESULTS_DIR = join(__dirname, '..', 'qa', 'a11y-results');
 
 /** One representative page per major UI archetype — dashboard, chat, catalog, form, list, map, table. */
 const A11Y_PAGES = [
@@ -39,13 +45,6 @@ const A11Y_PAGES = [
 
 /** WCAG 2.1 A/AA is the baseline every page must clear; best-practice rules are reported, not enforced yet. */
 const AXE_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'];
-
-const allResults = [];
-
-test.afterAll(async () => {
-  mkdirSync(dirname(RESULTS_PATH), { recursive: true });
-  writeFileSync(RESULTS_PATH, JSON.stringify(allResults, null, 2));
-});
 
 for (const pageDef of A11Y_PAGES) {
   test(`a11y: ${pageDef.id}`, async ({ page }, testInfo) => {
@@ -65,12 +64,20 @@ for (const pageDef of A11Y_PAGES) {
       sample: v.nodes[0]?.target,
     }));
 
-    allResults.push({
-      pageId: pageDef.id,
-      path: pageDef.path,
-      violationCount: axeResults.violations.length,
-      violations: violationSummary,
-    });
+    mkdirSync(RESULTS_DIR, { recursive: true });
+    writeFileSync(
+      join(RESULTS_DIR, `${pageDef.id}.json`),
+      JSON.stringify(
+        {
+          pageId: pageDef.id,
+          path: pageDef.path,
+          violationCount: axeResults.violations.length,
+          violations: violationSummary,
+        },
+        null,
+        2,
+      ),
+    );
 
     testInfo.attach('axe-violations', {
       body: JSON.stringify(violationSummary, null, 2),

@@ -59,6 +59,9 @@ pages-map.txt
 /qa/page-screenshots/
 /qa/dashboard-resize-audit/*.png
 /qa/screenshot-backend.sqlite*
+/qa/a11y-results.json
+/qa/a11y-results/
+/qa/playwright-a11y-report.json
 /e2e/.auth/qa-user.json
 .vercel
 

@@ -23,6 +23,12 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     actionTimeout: 20_000,
     navigationTimeout: 60_000,
+    // Escape hatch for sandboxes where the downloaded Playwright browser is
+    // blocked (e.g. by an Application Control policy) but a system browser
+    // install is already trusted. No effect unless explicitly set.
+    launchOptions: process.env.QA_CHROMIUM_EXECUTABLE
+      ? { executablePath: process.env.QA_CHROMIUM_EXECUTABLE }
+      : {},
   },
   webServer: {
     command: 'npm run dev',
