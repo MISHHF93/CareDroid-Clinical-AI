@@ -1521,6 +1521,28 @@ function escapeRegExp(value) {
   return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+// CANONICAL_ROUTE_MAP is a fixed, frozen array built once at module load, so
+// the set of distinct patterns routePatternMatches ever sees is bounded and
+// never changes at runtime -- caching the compiled RegExp per pattern is
+// always safe. Without this, every dynamic (":param") route comparison
+// rebuilt and recompiled a RegExp from scratch on every single call; profiled
+// as one of the hottest application functions during route/permission checks
+// (getRouteByPath/getRouteAccess run on every nav-item render).
+const compiledPatternCache = new Map();
+
+function compilePattern(normalizedPattern) {
+  let regex = compiledPatternCache.get(normalizedPattern);
+  if (!regex) {
+    const expression = `^${normalizedPattern
+      .split('/')
+      .map((segment) => (segment.startsWith(':') ? '[^/]+' : escapeRegExp(segment)))
+      .join('/')}(?:/.*)?$`;
+    regex = new RegExp(expression);
+    compiledPatternCache.set(normalizedPattern, regex);
+  }
+  return regex;
+}
+
 function routePatternMatches(pattern, pathname, allowPrefix = true) {
   const normalizedPattern = normalizePathPattern(pattern);
   const normalizedPath = normalizeRoutePath(pathname);
@@ -1533,11 +1555,7 @@ function routePatternMatches(pattern, pathname, allowPrefix = true) {
     return true;
   }
   if (!allowPrefix && !normalizedPattern.includes(':')) return false;
-  const expression = `^${normalizedPattern
-    .split('/')
-    .map((segment) => (segment.startsWith(':') ? '[^/]+' : escapeRegExp(segment)))
-    .join('/')}(?:/.*)?$`;
-  return new RegExp(expression).test(normalizedPath);
+  return compilePattern(normalizedPattern).test(normalizedPath);
 }
 
 export function getRouteByPath(path) {

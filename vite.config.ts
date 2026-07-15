@@ -228,7 +228,12 @@ export default defineConfig(({ mode }) => {
             if (normalizedId.includes('/src/pages/tools/psychiatryScreeningCalculators')) return 'calculators-psychiatry-screening';
             if (normalizedId.includes('/src/pages/tools/hospitalOperationsCalculators')) return 'calculators-hospital-operations';
             if (normalizedId.includes('/src/pages/tools/hepatologyGiCalculators')) return 'calculators-hepatology-gi';
-            if (normalizedId.includes('pages/tools/Calculators')) return 'calculators';
+            // Deliberately NO manual chunk for pages/tools/Calculators.tsx: forcing
+            // it into a named chunk made Rollup fuse ~200 shared startup modules
+            // (apiClient, UserContext, env config, ...) into that chunk, which made
+            // the entry statically import it -- executing the entire calculator
+            // catalog (plus every specialty chunk above) on every page load. With
+            // no manual assignment it stays in the lazily-loaded tools graph.
             if (normalizedId.includes('ClinicalToolCatalog')) return 'clinical-catalog';
             if (normalizedId.includes('pages/Dashboard')) return 'dashboard';
             if (
