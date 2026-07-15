@@ -128,6 +128,7 @@ export default function ReceptionEscalationPanel({
             <fieldset className="reception-escalation-panel__reasons">
               <legend>{RECEPTION_COPY.escalation.reasonLegend}</legend>
               {RECEPTION_ESCALATION_REASONS.map((reason) => (
+                // eslint-disable-next-line jsx-a11y/label-has-associated-control -- the radio input is nested inside this label; the rule can't statically verify reason.label renders real text
                 <label
                   key={reason.id}
                   className={[

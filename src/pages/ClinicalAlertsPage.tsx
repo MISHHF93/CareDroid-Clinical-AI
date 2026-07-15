@@ -274,7 +274,7 @@ const ClinicalAlertsPage = () => {
             <p className="alerts-list-label">
               {filteredAlerts.length} alert{filteredAlerts.length !== 1 ? 's' : ''}
             </p>
-            <ul className="alerts-list" role="list">
+            <ul className="alerts-list">
               {filteredAlerts.map((alert) => (
                 <li key={alert.id}>
                   <article

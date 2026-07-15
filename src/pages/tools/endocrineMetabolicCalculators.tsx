@@ -95,7 +95,6 @@ function ResultPanel({ config, result }) {
       </div>
       <section
         className={`calc-interpretation-box ${result.severity || 'normal'}`}
-        role="region"
         aria-labelledby={`${config.slug}-interpretation-heading`}
       >
         <h3 id={`${config.slug}-interpretation-heading`} className="calc-interpretation-title">

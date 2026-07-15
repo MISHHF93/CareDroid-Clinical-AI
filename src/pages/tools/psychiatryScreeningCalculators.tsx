@@ -124,7 +124,6 @@ function ResultPanel({ config, result }) {
       </div>
       <section
         className={`calc-interpretation-box ${result.severity || 'normal'}`}
-        role="region"
         aria-labelledby={`${config.slug}-interpretation-heading`}
       >
         <h3 id={`${config.slug}-interpretation-heading`} className="calc-interpretation-title">
@@ -135,7 +134,7 @@ function ResultPanel({ config, result }) {
         <p className="calc-reference-line">{result.referenceLine}</p>
       </section>
       {result.components ? (
-        <section className="calc-interpretation-box normal" role="region" aria-label="Component summary">
+        <section className="calc-interpretation-box normal" aria-label="Component summary">
           <h3 className="calc-interpretation-title">Component Summary</h3>
           <ul className="calc-breakdown-list">
             {Object.entries(result.components).map(([key, value]) => (

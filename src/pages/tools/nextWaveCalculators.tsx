@@ -76,7 +76,6 @@ function CalculatorShell({ slug, title, disclaimer, children, result, emptyText,
             </div>
             <section
               className={`calc-interpretation-box ${result.severity}${result.severity !== 'normal' ? ' calc-interpretation-box--risk-emphasis' : ''}`}
-              role="region"
               aria-label={`${title} interpretation`}
             >
               <h3 className="calc-interpretation-title">{result.label}</h3>

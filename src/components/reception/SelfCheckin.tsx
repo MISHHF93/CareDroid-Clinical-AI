@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
 import { suggestSelfArrivalTriage } from '../../engine/selfArrivalTriageEngine';
 import { CARE_STREAMING_LANES } from '../../config/edOperationalStandards';
@@ -64,6 +64,10 @@ export default function SelfCheckin({
 
   const currentStepIndex = stepIndex(step);
   const progressPercent = ((currentStepIndex + 1) / SELF_CHECKIN_STEPS.length) * 100;
+  // Stable ref identity so React only focuses the field when this step's input actually
+  // mounts, not on every re-render (an inline `ref={(el) => el?.focus()}` would steal
+  // focus back on each re-render since its identity changes every time).
+  const focusOnMount = useCallback((el: HTMLElement | null) => el?.focus(), []);
 
   const triagePreview = useMemo(
     () =>
@@ -230,10 +234,10 @@ export default function SelfCheckin({
               <label className="self-checkin__field">
                 First name
                 <input
+                  ref={focusOnMount}
                   value={form.firstName}
                   onChange={(event) => patchForm({ firstName: event.target.value })}
                   autoComplete="given-name"
-                  autoFocus
                 />
               </label>
               <label className="self-checkin__field">

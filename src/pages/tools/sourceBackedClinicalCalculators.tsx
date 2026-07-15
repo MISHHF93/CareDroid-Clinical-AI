@@ -153,7 +153,7 @@ function CalculatorShell({
               <div className="calc-score-value">{scoreDisplay}</div>
               <div className="calc-score-interpretation">{titleText}</div>
             </div>
-            <section className={`calc-interpretation-box ${severity}`} role="region">
+            <section className={`calc-interpretation-box ${severity}`}>
               <h3 className="calc-interpretation-title">{titleText}</h3>
               <p>{result.interpretation}</p>
               {result.safetyDisclaimer ? <p className="calc-disclaimer-detail">{result.safetyDisclaimer}</p> : null}
@@ -258,6 +258,7 @@ export function PercCalculator({ onResultChange }) {
       <form className="calc-pr1-form" onSubmit={calculate}>
         <fieldset className="calc-timi-criteria">
           <legend>Applicability</legend>
+          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control -- input is nested inside this label (and also linked via htmlFor/id) with literal, static accessible text */}
           <label className="calc-checkbox-row" htmlFor="perc-low-pretest">
             <input
               id="perc-low-pretest"

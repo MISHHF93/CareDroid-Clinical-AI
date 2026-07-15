@@ -53,7 +53,6 @@ function ResultPanel({ title, icon, result, emptyText, renderDetails }) {
           {renderDetails?.()}
           <section
             className={`calc-interpretation-box ${result.severity}${result.severity !== 'normal' ? ' calc-interpretation-box--risk-emphasis' : ''}`}
-            role="region"
             aria-label={`${title} interpretation`}
           >
             <h3 className="calc-interpretation-title">Interpretation</h3>
@@ -62,7 +61,7 @@ function ResultPanel({ title, icon, result, emptyText, renderDetails }) {
               <strong>Risk category:</strong> {result.riskCategory}
             </p>
           </section>
-          <section className="calc-interpretation-box warning" role="region" aria-label={`${title} warnings`}>
+          <section className="calc-interpretation-box warning" aria-label={`${title} warnings`}>
             <h3 className="calc-interpretation-title">Warnings</h3>
             <ul className="calc-breakdown-list">
               {(result.warnings || ['Clinical decision support only. Not a diagnosis.']).map((warning) => (
@@ -71,7 +70,7 @@ function ResultPanel({ title, icon, result, emptyText, renderDetails }) {
               <li>{EMERGENCY_DECISION_SUPPORT_DISCLAIMER}</li>
             </ul>
           </section>
-          <section className="calc-interpretation-box normal" role="region" aria-label={`${title} references`}>
+          <section className="calc-interpretation-box normal" aria-label={`${title} references`}>
             <h3 className="calc-interpretation-title">References</h3>
             <p className="calc-interpretation-text">{result.referenceLine}</p>
           </section>

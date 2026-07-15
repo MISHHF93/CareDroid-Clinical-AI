@@ -436,7 +436,9 @@ const EditUserModal = ({ user, onSave, onCancel, disabled = false }) => {
   };
 
   return (
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- click-outside-to-dismiss backdrop; the real Close button below is the keyboard-accessible dismiss control
     <div className="modal-overlay" onClick={onCancel}>
+      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- onClick only stops propagation to the backdrop's close handler, it is not an interactive control itself */}
       <div className="edit-user-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>Edit User</h2>
@@ -543,7 +545,9 @@ const InviteUserModal = ({ email, onEmailChange, onInvite, onCancel, disabled = 
   const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   return (
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- click-outside-to-dismiss backdrop; the real Close button below is the keyboard-accessible dismiss control
     <div className="modal-overlay" onClick={onCancel}>
+      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- onClick only stops propagation to the backdrop's close handler, it is not an interactive control itself */}
       <div className="invite-user-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>Invite Team Member</h2>

@@ -853,6 +853,7 @@ export default function CommandPalette({ open, onClose, onExecute }: CommandPale
 
   return (
     <div style={styles.backdrop} role="presentation" onMouseDown={onClose}>
+      {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- onMouseDown only stops propagation to the backdrop's close handler, it is not an interactive control itself */}
       <section
         role="dialog"
         aria-modal="true"
@@ -883,6 +884,7 @@ export default function CommandPalette({ open, onClose, onExecute }: CommandPale
                   <button
                     key={result.id}
                     type="button"
+                    // eslint-disable-next-line jsx-a11y/role-has-required-aria-props -- aria-selected is always set via the conditional spread below, the linter can't trace it statically
                     role="option"
                     {...(active
                       ? { 'aria-selected': 'true' as const }

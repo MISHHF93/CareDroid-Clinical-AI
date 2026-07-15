@@ -41,6 +41,7 @@ export function AlertRail({ alerts, onAction, onDismiss, className }: AlertRailP
           </p>
         </div>
       </header>
+      {/* eslint-disable-next-line jsx-a11y/no-redundant-roles -- list-style:none strips implicit list semantics in Safari/VoiceOver; role="list" restores it */}
       <ul className="cd-alert-rail__list" role="list">
         {active.map((a) => (
           <li key={a.id}>

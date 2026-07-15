@@ -65,6 +65,7 @@ export default function ProfileRoleSwitcher({
         {roleViews.map((view) => {
           const active = view.emergencyRoleId === role;
           return (
+            // eslint-disable-next-line jsx-a11y/label-has-associated-control -- the radio input is nested inside this label; the rule can't statically verify view.label renders real text
             <label
               key={view.emergencyRoleId}
               className={`profile-role-switcher__menu-item${active ? ' is-active' : ''}`}

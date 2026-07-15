@@ -64,6 +64,7 @@ function SortableHeaderCell({
   return (
     <button
       type="button"
+      role="columnheader"
       className={`whiteboard-patient-row-header__sort${column.className ? ` ${column.className}` : ''}${
         active ? ' whiteboard-patient-row-header__sort--active' : ''
       }`}

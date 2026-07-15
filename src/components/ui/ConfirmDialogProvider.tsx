@@ -41,6 +41,7 @@ export function ConfirmDialogProvider({ children }: { children: React.ReactNode 
       {children}
       {pending ? (
         <div className="cd-confirm-dialog-overlay" role="presentation" onClick={() => close(false)}>
+          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions -- onClick only stops propagation to the backdrop's close handler, it is not an interactive control itself */}
           <div
             className={`cd-confirm-dialog cd-confirm-dialog--${pending.tone || 'default'}`}
             role="alertdialog"
@@ -56,6 +57,7 @@ export function ConfirmDialogProvider({ children }: { children: React.ReactNode 
               {pending.message}
             </p>
             <div className="cd-confirm-dialog__actions">
+              {/* eslint-disable-next-line jsx-a11y/no-autofocus -- deliberate WAI-ARIA alertdialog pattern: move focus to the safe/cancel action when the dialog opens */}
               <Button type="button" variant="secondary" autoFocus onClick={() => close(false)}>
                 {pending.cancelLabel || 'Cancel'}
               </Button>

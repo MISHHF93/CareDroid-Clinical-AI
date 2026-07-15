@@ -26,7 +26,7 @@ export function PatientCard({ patient, onClick, showVitals = false, tabIndex = 0
   };
 
   return (
-    <article
+    <div
       role="button"
       tabIndex={tabIndex}
       className={['cd-patient-card', `cd-patient-card--${p.toLowerCase()}`, className ?? ''].filter(Boolean).join(' ')}
@@ -61,6 +61,6 @@ export function PatientCard({ patient, onClick, showVitals = false, tabIndex = 0
           {patient.state.toLowerCase()}
         </span>
       </div>
-    </article>
+    </div>
   );
 }

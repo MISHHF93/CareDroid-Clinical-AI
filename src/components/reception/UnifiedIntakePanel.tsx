@@ -164,6 +164,7 @@ export default function UnifiedIntakePanel({
               <button
                 key={type.id}
                 type="button"
+                // eslint-disable-next-line jsx-a11y/role-has-required-aria-props -- aria-checked is always set via the conditional spread below, the linter can't trace it statically
                 role="radio"
                 {...((draft.arrivalType === type.id) ? { 'aria-checked': 'true' as const } : { 'aria-checked': 'false' as const })}
                 className={draft.arrivalType === type.id ? 'is-active' : ''}

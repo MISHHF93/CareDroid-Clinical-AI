@@ -59,6 +59,7 @@ function OperationalEntitySection({
               type="button"
               className="patient-search-results__primary patient-search-results__primary--entity"
               role="option"
+              aria-selected="false"
               onMouseDown={(event) => event.preventDefault()}
               onClick={() => onOpenOperationalHit?.(hit)}
             >
@@ -112,6 +113,7 @@ export default function PatientSearchResults({
                   type="button"
                   className="patient-search-results__primary"
                   role="option"
+                  aria-selected="false"
                   onMouseDown={(event) => event.preventDefault()}
                   onClick={() => onFindPatient(patient.id)}
                 >

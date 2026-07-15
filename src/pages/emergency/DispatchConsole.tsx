@@ -113,8 +113,9 @@ function NewCallForm({ onCreated }: { onCreated: (call: EmergencyCall) => void }
   return (
     <form onSubmit={handleSubmit} className="u-flex-col-gap-12">
       <div>
-        <label className="dc-field-label">Chief Complaint *</label>
+        <label className="dc-field-label" htmlFor="dispatch-complaint">Chief Complaint *</label>
         <input
+          id="dispatch-complaint"
           className="dc-field-input"
           value={complaint}
           onChange={(e) => setComplaint(e.target.value)}
@@ -135,8 +136,9 @@ function NewCallForm({ onCreated }: { onCreated: (call: EmergencyCall) => void }
       )}
 
       <div>
-        <label className="dc-field-label">Incident Address *</label>
+        <label className="dc-field-label" htmlFor="dispatch-address">Incident Address *</label>
         <input
+          id="dispatch-address"
           className="dc-field-input"
           value={address}
           onChange={(e) => setAddress(e.target.value)}
@@ -146,12 +148,12 @@ function NewCallForm({ onCreated }: { onCreated: (call: EmergencyCall) => void }
       </div>
       <div className="u-grid-2-gap-10">
         <div>
-          <label className="dc-field-label">Caller Name</label>
-          <input className="dc-field-input" value={callerName} onChange={(e) => setCallerName(e.target.value)} placeholder="Optional" />
+          <label className="dc-field-label" htmlFor="dispatch-caller-name">Caller Name</label>
+          <input id="dispatch-caller-name" className="dc-field-input" value={callerName} onChange={(e) => setCallerName(e.target.value)} placeholder="Optional" />
         </div>
         <div>
-          <label className="dc-field-label">Patient Age</label>
-          <input className="dc-field-input" type="number" value={age} onChange={(e) => setAge(e.target.value)} placeholder="If known" min={0} max={120} />
+          <label className="dc-field-label" htmlFor="dispatch-patient-age">Patient Age</label>
+          <input id="dispatch-patient-age" className="dc-field-input" type="number" value={age} onChange={(e) => setAge(e.target.value)} placeholder="If known" min={0} max={120} />
         </div>
       </div>
       <div className="dc-row-gap-16">
@@ -412,10 +414,11 @@ function EDPreAlertPanel({
       </div>
 
       <div>
-        <label className="dc-field-label">
+        <label className="dc-field-label" htmlFor="dispatch-bay">
           Assign bay / room (optional)
         </label>
         <input
+          id="dispatch-bay"
           className="dc-field-input"
           value={bay}
           onChange={(e) => setBay(e.target.value)}

@@ -27,6 +27,7 @@ export function Card({ title, actions, footer, elevation = 'default', bordered, 
         interactive ? 'cd-card--interactive' : '',
         className ?? '',
       ].filter(Boolean).join(' ')}
+      role={interactive ? 'button' : undefined}
       tabIndex={interactive ? 0 : undefined}
       {...props}
     >

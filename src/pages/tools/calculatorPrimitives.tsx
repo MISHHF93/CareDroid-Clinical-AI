@@ -50,7 +50,6 @@ export function CalcInterpretationRegion({ headingId, title, severity, emphasize
   return (
     <section
       className={`calc-interpretation-box ${severity}${emphasizeRisk ? ' calc-interpretation-box--risk-emphasis' : ''}`}
-      role="region"
       aria-labelledby={headingId}
       aria-label={ariaLabel}
     >

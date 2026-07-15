@@ -578,6 +578,7 @@ export default function QuickIntake({
           }
         `}
       </style>
+      {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- a <form> is a real interactive element; onKeyDown handles Escape-to-cancel/Enter-to-submit shortcuts */}
       <form
         className="quick-intake-modal"
         onSubmit={submit}

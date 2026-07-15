@@ -410,7 +410,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
           data-ai-node="caredroid-copilot"
         >
           <GraphicIconBadge iconKey="ed-copilot" accent="brand" size="sm" className="sidebar-item__graphic-badge" />
-          <label>{copilotChrome.shortName}</label>
+          <span className="sidebar-nav-item__label">{copilotChrome.shortName}</span>
         </button>
       );
     }
@@ -442,7 +442,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
             'alert',
             `${globalUnreadCount} unread alert${globalUnreadCount === 1 ? '' : 's'}`,
           )}
-          <label>Alerts</label>
+          <span className="sidebar-nav-item__label">Alerts</span>
         </button>
       );
     }
@@ -465,7 +465,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
           item.id === 'reassessment' ? 'due' : 'alert',
           `${alertCount} active alert${alertCount === 1 ? '' : 's'}`,
         )}
-        <label>{label}</label>
+        <span className="sidebar-nav-item__label">{label}</span>
       </Link>
     );
 
@@ -522,7 +522,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
           data-ai-node="caredroid-copilot"
         >
           <GraphicIconBadge iconKey="ed-copilot" accent="brand" size="sm" className="sidebar-item__graphic-badge" />
-          <label>{copilotChrome.shortName}</label>
+          <span className="sidebar-nav-item__label">{copilotChrome.shortName}</span>
         </button>
         ) : null}
         {moreNav.length ? (
@@ -537,7 +537,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
           aria-label="More"
         >
           <IconDots size={20} stroke={2} className="sidebar-nav-item__icon" />
-          <label>More</label>
+          <span className="sidebar-nav-item__label">More</span>
         </button>
         ) : null}
       </nav>
@@ -547,6 +547,7 @@ export function Sidebar({ navigationItems }: SidebarProps) {
           role="presentation"
           onClick={() => setMoreOpen(false)}
         >
+          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions -- onClick only stops propagation to the backdrop's close handler, it is not an interactive control itself */}
           <section
             id="sidebar-more-sheet"
             className="sidebar-more-sheet"

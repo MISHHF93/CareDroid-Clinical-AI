@@ -2656,11 +2656,12 @@ const SOFACalculator = ({ onResultChange }) => {
 
         {/* Respiration */}
         <div className="calc-input-group">
-          <label className="calc-input-label">
+          <label className="calc-input-label" htmlFor="sofa-pao2">
             PaO2 (mmHg)
             <span className="calc-input-help">Arterial oxygen pressure</span>
           </label>
           <input
+            id="sofa-pao2"
             type="number"
             className="calc-input-field"
             placeholder="80-100"
@@ -2670,11 +2671,12 @@ const SOFACalculator = ({ onResultChange }) => {
         </div>
 
         <div className="calc-input-group">
-          <label className="calc-input-label">
+          <label className="calc-input-label" htmlFor="sofa-fio2">
             FiO2 (0.21-1.0)
             <span className="calc-input-help">Fraction of inspired oxygen</span>
           </label>
           <input
+            id="sofa-fio2"
             type="number"
             step="0.01"
             className="calc-input-field"
@@ -2701,11 +2703,12 @@ const SOFACalculator = ({ onResultChange }) => {
 
         {/* Coagulation */}
         <div className="calc-input-group">
-          <label className="calc-input-label">
+          <label className="calc-input-label" htmlFor="sofa-platelets">
             Platelets (×10³/µL)
             <span className="calc-input-help">Normal: 150-400</span>
           </label>
           <input
+            id="sofa-platelets"
             type="number"
             className="calc-input-field"
             placeholder="150"
@@ -2716,11 +2719,12 @@ const SOFACalculator = ({ onResultChange }) => {
 
         {/* Liver */}
         <div className="calc-input-group">
-          <label className="calc-input-label">
+          <label className="calc-input-label" htmlFor="sofa-bilirubin">
             Bilirubin (mg/dL)
             <span className="calc-input-help">Normal: 0.1-1.2</span>
           </label>
           <input
+            id="sofa-bilirubin"
             type="number"
             step="0.1"
             className="calc-input-field"
@@ -2732,11 +2736,12 @@ const SOFACalculator = ({ onResultChange }) => {
 
         {/* Cardiovascular */}
         <div className="calc-input-group">
-          <label className="calc-input-label">
+          <label className="calc-input-label" htmlFor="sofa-map">
             MAP (mmHg)
             <span className="calc-input-help">Mean arterial pressure</span>
           </label>
           <input
+            id="sofa-map"
             type="number"
             className="calc-input-field"
             placeholder="70"
@@ -2746,15 +2751,17 @@ const SOFACalculator = ({ onResultChange }) => {
         </div>
 
         <div className="calc-input-group">
-          <label className="calc-input-label">
+          <span className="calc-input-label" id="sofa-vasopressor-label">
             Vasopressor Doses (µg/kg/min)
             <span className="calc-input-help">If applicable</span>
-          </label>
+          </span>
           <input
             type="number"
             step="0.01"
             className="calc-input-field calc-input-field--spaced"
             placeholder="Dopamine"
+            aria-label="Dopamine dose (µg/kg/min)"
+            aria-describedby="sofa-vasopressor-label"
             value={inputs.dopamine}
             onChange={(e) => setInputs({ ...inputs, dopamine: e.target.value })}
           />
@@ -2763,6 +2770,8 @@ const SOFACalculator = ({ onResultChange }) => {
             step="0.01"
             className="calc-input-field calc-input-field--spaced"
             placeholder="Norepinephrine"
+            aria-label="Norepinephrine dose (µg/kg/min)"
+            aria-describedby="sofa-vasopressor-label"
             value={inputs.norepinephrine}
             onChange={(e) => setInputs({ ...inputs, norepinephrine: e.target.value })}
           />
@@ -2771,6 +2780,8 @@ const SOFACalculator = ({ onResultChange }) => {
             step="0.01"
             className="calc-input-field"
             placeholder="Epinephrine"
+            aria-label="Epinephrine dose (µg/kg/min)"
+            aria-describedby="sofa-vasopressor-label"
             value={inputs.epinephrine}
             onChange={(e) => setInputs({ ...inputs, epinephrine: e.target.value })}
           />
@@ -2778,11 +2789,12 @@ const SOFACalculator = ({ onResultChange }) => {
 
         {/* CNS */}
         <div className="calc-input-group">
-          <label className="calc-input-label">
+          <label className="calc-input-label" htmlFor="sofa-gcs">
             Glasgow Coma Scale (3-15)
             <span className="calc-input-help">Consciousness level</span>
           </label>
           <input
+            id="sofa-gcs"
             type="number"
             className="calc-input-field"
             placeholder="15"
@@ -2795,11 +2807,12 @@ const SOFACalculator = ({ onResultChange }) => {
 
         {/* Renal */}
         <div className="calc-input-group">
-          <label className="calc-input-label">
+          <label className="calc-input-label" htmlFor="sofa-creatinine">
             Creatinine (mg/dL)
             <span className="calc-input-help">Normal: 0.6-1.3</span>
           </label>
           <input
+            id="sofa-creatinine"
             type="number"
             step="0.1"
             className="calc-input-field"
@@ -2810,11 +2823,12 @@ const SOFACalculator = ({ onResultChange }) => {
         </div>
 
         <div className="calc-input-group">
-          <label className="calc-input-label">
+          <label className="calc-input-label" htmlFor="sofa-urine-output">
             Urine Output (mL/day)
             <span className="calc-input-help">24-hour total</span>
           </label>
           <input
+            id="sofa-urine-output"
             type="number"
             className="calc-input-field"
             placeholder="1500"
@@ -2988,8 +3002,9 @@ const GFRCalculator = ({ onResultChange }) => {
         <CalcPanelTitle icon={CHROME_ICONS.activity}>Patient Information</CalcPanelTitle>
 
         <div className="calc-input-group">
-          <label className="calc-input-label">Age (years)</label>
+          <label className="calc-input-label" htmlFor="gfr-age">Age (years)</label>
           <input
+            id="gfr-age"
             type="number"
             className="calc-input-field"
             value={inputs.age}
@@ -2998,8 +3013,9 @@ const GFRCalculator = ({ onResultChange }) => {
         </div>
 
         <div className="calc-input-group">
-          <label className="calc-input-label">Sex</label>
+          <label className="calc-input-label" htmlFor="gfr-sex">Sex</label>
           <select
+            id="gfr-sex"
             className="calc-select-field"
             value={inputs.sex}
             onChange={(e) => setInputs({ ...inputs, sex: e.target.value })}
@@ -3011,11 +3027,12 @@ const GFRCalculator = ({ onResultChange }) => {
         </div>
 
         <div className="calc-input-group">
-          <label className="calc-input-label">
+          <label className="calc-input-label" htmlFor="gfr-creatinine">
             Serum Creatinine (mg/dL)
             <span className="calc-input-help">Normal: 0.6-1.3</span>
           </label>
           <input
+            id="gfr-creatinine"
             type="number"
             step="0.1"
             className="calc-input-field"
@@ -3161,8 +3178,9 @@ const BMICalculator = ({ onResultChange }) => {
         <CalcPanelTitle icon={CHROME_ICONS.scale}>Body Measurements</CalcPanelTitle>
 
         <div className="calc-input-group">
-          <label className="calc-input-label">Unit System</label>
+          <label className="calc-input-label" htmlFor="bmi-unit">Unit System</label>
           <select
+            id="bmi-unit"
             className="calc-select-field"
             value={inputs.unit}
             onChange={(e) => setInputs({ ...inputs, unit: e.target.value })}
@@ -3355,8 +3373,9 @@ const CHA2DS2VAScCalculator = ({ onResultChange }) => {
         </div>
 
         <div className="calc-input-group">
-          <label className="calc-input-label">Age (years)</label>
+          <label className="calc-input-label" htmlFor="cha2ds2vasc-age">Age (years)</label>
           <input
+            id="cha2ds2vasc-age"
             type="number"
             className="calc-input-field"
             placeholder="65+ = 1 pt, 75+ = 2 pts"
@@ -3411,8 +3430,9 @@ const CHA2DS2VAScCalculator = ({ onResultChange }) => {
         </div>
 
         <div className="calc-input-group">
-          <label className="calc-input-label">Sex</label>
+          <label className="calc-input-label" htmlFor="cha2ds2vasc-sex">Sex</label>
           <select
+            id="cha2ds2vasc-sex"
             className="calc-select-field"
             value={inputs.sex}
             onChange={(e) => setInputs({ ...inputs, sex: e.target.value })}

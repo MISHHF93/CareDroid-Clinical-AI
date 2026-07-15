@@ -127,6 +127,9 @@ function ModelCard({
 
   return (
     <div
+      role="button"
+      tabIndex={0}
+      aria-expanded={expanded}
       style={{
         background: MEDICAL_THEME.surfaceCard,
         border: `1.5px solid ${color}44`,
@@ -136,6 +139,12 @@ function ModelCard({
         cursor: 'pointer',
       }}
       onClick={() => setExpanded((e) => !e)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          setExpanded((prev) => !prev);
+        }
+      }}
     >
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 8 }}>
@@ -177,6 +186,7 @@ function ModelCard({
 
       {/* Expanded detail */}
       {expanded && (
+        // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- onClick only stops propagation to the card's own toggle handler, it is not an interactive control itself
         <div
           style={{
             borderTop: `1px solid ${MEDICAL_THEME.border}`,

@@ -108,7 +108,7 @@ export default function SidebarNotificationPanel() {
             Using local alert state. {refreshError}
           </div>
         ) : visibleNotificationAlerts.length > 0 ? (
-          <ul className="nc-panel__list" role="list">
+          <ul className="nc-panel__list">
             {visibleNotificationAlerts.map((alert) => {
               const primaryAction = openAlertRoute(alert, closePanel);
               const patientLabel = alertPatientLabel(alert, patientById);
@@ -120,7 +120,6 @@ export default function SidebarNotificationPanel() {
                   className="nc-item"
                   data-severity={severity}
                   data-read={alert.read ? 'true' : 'false'}
-                  role="listitem"
                 >
                   <div className="nc-item__main">
                     <div className="nc-item__meta">

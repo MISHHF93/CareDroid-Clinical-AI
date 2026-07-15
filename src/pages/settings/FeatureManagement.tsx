@@ -247,6 +247,7 @@ function FeatureToggle({ checked, disabled, pending, onClick, title }) {
       ]
         .filter(Boolean)
         .join(' ')}
+      // eslint-disable-next-line jsx-a11y/role-has-required-aria-props -- aria-checked is always set via the conditional spread below, the linter can't trace it statically
       role="switch"
       {...((checked) ? { 'aria-checked': 'true' as const } : { 'aria-checked': 'false' as const })}
       disabled={disabled || pending}

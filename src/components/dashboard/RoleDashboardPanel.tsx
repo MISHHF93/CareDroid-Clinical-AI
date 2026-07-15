@@ -22,7 +22,6 @@ function WidgetCard({ widgetId }: { widgetId: string }) {
     <article
       className="cd-role-widget-card"
       aria-label={`${label} widget`}
-      tabIndex={0}
     >
       <h3 className="cd-role-widget-card__title">{label}</h3>
       <p className="cd-role-widget-card__body" aria-live="polite">

@@ -38,6 +38,7 @@ export function CopilotFeature() {
         {messages.length === 0 && (
           <EmptyState title="Ask CareDroid Copilot" description="Clinical decision support powered by AI. Always verify with clinical judgment." />
         )}
+        {/* eslint-disable jsx-a11y/aria-role -- CopilotMessage's `role` is a typed custom prop ('ai' | 'user'), not the DOM aria role attribute */}
         {messages.map((msg) => (
           <React.Fragment key={msg.id}>
             <CopilotMessage role="user" content={msg.query} timestamp={msg.createdAt} />
@@ -47,6 +48,7 @@ export function CopilotFeature() {
         {sending && (
           <CopilotMessage role="ai" content="…" />
         )}
+        {/* eslint-enable jsx-a11y/aria-role */}
         <div ref={bottomRef} />
       </div>
 

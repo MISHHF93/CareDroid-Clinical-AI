@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { X } from 'lucide-react';
 import { invokeUnifiedAiRequest } from '../services/careDroidUnifiedAiNode';
 import { showActionSuccess } from '../services/careDroidInteractionFeedback';
@@ -100,6 +100,10 @@ export default function WorkloadBalancePanel({
 }) {
   const [expandedStaffIds, setExpandedStaffIds] = useState(() => new Set());
   const [activeReassignPatientId, setActiveReassignPatientId] = useState<any>(null);
+  // Stable ref identity so React only focuses the select once on mount, not on every
+  // re-render (an inline `ref={(el) => el?.focus()}` would steal focus back on each
+  // parent re-render since its identity changes every time).
+  const focusOnMount = useCallback((el: HTMLElement | null) => el?.focus(), []);
 
   const [aiStatus, setAiStatus] = useState('idle');
   const [aiSuggestions, setAiSuggestions] = useState<any[]>([]);
@@ -305,7 +309,7 @@ export default function WorkloadBalancePanel({
                             <label>
                               Reassign to:
                               <select
-                                autoFocus
+                                ref={focusOnMount}
                                 defaultValue=""
                                 onChange={(event) => reassignPatient(patient, member, event.target.value)}
                               >

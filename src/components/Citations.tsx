@@ -101,6 +101,7 @@ export const CitationModal = ({ citation, onClose }) => {
   if (!citation) return null;
 
   return (
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- click-outside-to-dismiss backdrop; the real Close button below is the keyboard-accessible dismiss control
     <div
       style={{
         position: 'fixed',
@@ -117,6 +118,7 @@ export const CitationModal = ({ citation, onClose }) => {
       }}
       onClick={onClose}
     >
+      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- onClick only stops propagation to the backdrop's close handler, it is not an interactive control itself */}
       <div
         style={{
           background: 'var(--surface-2)',

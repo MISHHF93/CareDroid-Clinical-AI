@@ -140,6 +140,7 @@ function CheckboxScoreCalculator({
           <fieldset className="calc-has-bled-fieldset">
             <legend className="calc-timi-legend">Criteria</legend>
             {criteria.map((criterion) => (
+              // eslint-disable-next-line jsx-a11y/label-has-associated-control -- the checkbox input is nested inside this label; the rule can't statically verify criterion.shortLabel renders real text
               <label key={criterion.key} className="calc-checkbox-group">
                 <input
                   type="checkbox"

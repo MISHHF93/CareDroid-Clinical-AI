@@ -51,7 +51,6 @@ function ResultPanel({ slug, result, emptyText, primaryLabel, primaryValue }) {
       </div>
       <section
         className={`calc-interpretation-box ${result.severity || 'normal'}`}
-        role="region"
         aria-labelledby={`${slug}-interpretation-heading`}
       >
         <h3 id={`${slug}-interpretation-heading`} className="calc-interpretation-title">

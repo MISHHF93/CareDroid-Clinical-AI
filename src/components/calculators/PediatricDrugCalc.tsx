@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { MEDICAL_THEME } from '../../config/medicalTheme.constants';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { saveCalculatorResult } from './calculatorSave';
@@ -58,6 +58,11 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
   const weight = useMemo(() => parseWeight(weightInput), [weightInput]);
   const canEstimateWeight = Boolean(patient && patient.age < 18);
   const estimatedWeight = patient ? patient.age * 2 + 8 : null;
+  const weightInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    weightInputRef.current?.focus();
+  }, []);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -196,7 +201,7 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
             <label className="u-flex-col-gap-6">
               <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 12, fontWeight: 700 }}>Weight (kg)</span>
               <input
-                autoFocus
+                ref={weightInputRef}
                 type="number"
                 inputMode="decimal"
                 min="0"

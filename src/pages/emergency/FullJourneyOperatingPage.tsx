@@ -382,8 +382,9 @@ function CreateReadinessPlanForm({ onCreated }: { onCreated: () => void }) {
     <form onSubmit={handleSubmit} className="fj-stack-col-10">
       <div className="u-grid-2-gap-10">
         <div>
-          <label className="fj-label-block">Bay / Room</label>
+          <label className="fj-label-block" htmlFor="fj-bay">Bay / Room</label>
           <input
+            id="fj-bay"
             className="fj-field-input"
             value={bay}
             onChange={(e) => setBay(e.target.value)}
@@ -391,8 +392,9 @@ function CreateReadinessPlanForm({ onCreated }: { onCreated: () => void }) {
           />
         </div>
         <div>
-          <label className="fj-label-block">ETA (minutes)</label>
+          <label className="fj-label-block" htmlFor="fj-eta-minutes">ETA (minutes)</label>
           <input
+            id="fj-eta-minutes"
             className="fj-field-input"
             type="number"
             value={etaMinutes}
