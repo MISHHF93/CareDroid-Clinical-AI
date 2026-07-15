@@ -62,6 +62,7 @@ pages-map.txt
 /qa/a11y-results.json
 /qa/a11y-results/
 /qa/playwright-a11y-report.json
+/qa/performance-results/
 /e2e/.auth/qa-user.json
 .vercel
 
