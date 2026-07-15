@@ -53,53 +53,72 @@ html[data-theme][data-role-theme='reception'] {
 }
 
 html[data-theme][data-role-theme='triage'] {
-  --medical-accent: #a35a12;
-  --medical-accent-hover: color-mix(in srgb, #a35a12 82%, black);
-  --medical-accent-soft: color-mix(in srgb, #a35a12 60%, white);
-  --medical-accent-tint: color-mix(in srgb, #a35a12 10%, transparent);
-  --medical-accent-border: color-mix(in srgb, #a35a12 32%, transparent);
-  --medical-text-link: color-mix(in srgb, #a35a12 82%, black);
-  --medical-text-link-hover: color-mix(in srgb, #a35a12 68%, black);
+  /* A deep amber distinct from --semantic-attention (#b54708) by design — a
+     triage-branded control must never look bit-identical to a real "attention"
+     status badge that might appear right next to it. */
+  --medical-accent: #92400e;
+  --medical-accent-hover: color-mix(in srgb, #92400e 82%, black);
+  --medical-accent-soft: color-mix(in srgb, #92400e 60%, white);
+  --medical-accent-tint: color-mix(in srgb, #92400e 10%, transparent);
+  --medical-accent-border: color-mix(in srgb, #92400e 32%, transparent);
+  --medical-text-link: color-mix(in srgb, #92400e 82%, black);
+  --medical-text-link-hover: color-mix(in srgb, #92400e 68%, black);
 }
 
 html[data-theme][data-role-theme='nurse'] {
-  --medical-accent: #a8456a;
-  --medical-accent-hover: color-mix(in srgb, #a8456a 82%, black);
-  --medical-accent-soft: color-mix(in srgb, #a8456a 60%, white);
-  --medical-accent-tint: color-mix(in srgb, #a8456a 10%, transparent);
-  --medical-accent-border: color-mix(in srgb, #a8456a 32%, transparent);
-  --medical-text-link: color-mix(in srgb, #a8456a 82%, black);
-  --medical-text-link-hover: color-mix(in srgb, #a8456a 68%, black);
+  /* CCDS Operational Teal */
+  --medical-accent: #0f766e;
+  --medical-accent-hover: color-mix(in srgb, #0f766e 82%, black);
+  --medical-accent-soft: color-mix(in srgb, #0f766e 60%, white);
+  --medical-accent-tint: color-mix(in srgb, #0f766e 10%, transparent);
+  --medical-accent-border: color-mix(in srgb, #0f766e 32%, transparent);
+  --medical-text-link: color-mix(in srgb, #0f766e 82%, black);
+  --medical-text-link-hover: color-mix(in srgb, #0f766e 68%, black);
 }
 
 html[data-theme][data-role-theme='physician'] {
-  --medical-accent: #1e3a5f;
-  --medical-accent-hover: color-mix(in srgb, #1e3a5f 82%, black);
-  --medical-accent-soft: color-mix(in srgb, #1e3a5f 60%, white);
-  --medical-accent-tint: color-mix(in srgb, #1e3a5f 10%, transparent);
-  --medical-accent-border: color-mix(in srgb, #1e3a5f 32%, transparent);
-  --medical-text-link: color-mix(in srgb, #1e3a5f 82%, black);
-  --medical-text-link-hover: color-mix(in srgb, #1e3a5f 68%, black);
+  /* CCDS Information Blue — distinct from Reception's Primary Clinical Blue */
+  --medical-accent: #175cd3;
+  --medical-accent-hover: color-mix(in srgb, #175cd3 82%, black);
+  --medical-accent-soft: color-mix(in srgb, #175cd3 60%, white);
+  --medical-accent-tint: color-mix(in srgb, #175cd3 10%, transparent);
+  --medical-accent-border: color-mix(in srgb, #175cd3 32%, transparent);
+  --medical-text-link: color-mix(in srgb, #175cd3 82%, black);
+  --medical-text-link-hover: color-mix(in srgb, #175cd3 68%, black);
 }
 
 html[data-theme][data-role-theme='ems'] {
-  --medical-accent: #0e7490;
-  --medical-accent-hover: color-mix(in srgb, #0e7490 82%, black);
-  --medical-accent-soft: color-mix(in srgb, #0e7490 60%, white);
-  --medical-accent-tint: color-mix(in srgb, #0e7490 10%, transparent);
-  --medical-accent-border: color-mix(in srgb, #0e7490 32%, transparent);
-  --medical-text-link: color-mix(in srgb, #0e7490 82%, black);
-  --medical-text-link-hover: color-mix(in srgb, #0e7490 68%, black);
+  /* Green — deliberately not the exact Success semantic hex, so an EMS-
+     branded control is never visually identical to a "healthy" status. */
+  --medical-accent: #16a34a;
+  --medical-accent-hover: color-mix(in srgb, #16a34a 82%, black);
+  --medical-accent-soft: color-mix(in srgb, #16a34a 60%, white);
+  --medical-accent-tint: color-mix(in srgb, #16a34a 10%, transparent);
+  --medical-accent-border: color-mix(in srgb, #16a34a 32%, transparent);
+  --medical-text-link: color-mix(in srgb, #16a34a 82%, black);
+  --medical-text-link-hover: color-mix(in srgb, #16a34a 68%, black);
+}
+
+html[data-theme][data-role-theme='operations'] {
+  /* CCDS AI Purple, shared with --semantic-ai-assistance */
+  --medical-accent: #5925dc;
+  --medical-accent-hover: color-mix(in srgb, #5925dc 82%, black);
+  --medical-accent-soft: color-mix(in srgb, #5925dc 60%, white);
+  --medical-accent-tint: color-mix(in srgb, #5925dc 10%, transparent);
+  --medical-accent-border: color-mix(in srgb, #5925dc 32%, transparent);
+  --medical-text-link: color-mix(in srgb, #5925dc 82%, black);
+  --medical-text-link-hover: color-mix(in srgb, #5925dc 68%, black);
 }
 
 html[data-theme][data-role-theme='admin'] {
-  --medical-accent: #475569;
-  --medical-accent-hover: color-mix(in srgb, #475569 82%, black);
-  --medical-accent-soft: color-mix(in srgb, #475569 60%, white);
-  --medical-accent-tint: color-mix(in srgb, #475569 10%, transparent);
-  --medical-accent-border: color-mix(in srgb, #475569 32%, transparent);
-  --medical-text-link: color-mix(in srgb, #475569 82%, black);
-  --medical-text-link-hover: color-mix(in srgb, #475569 68%, black);
+  /* CCDS Neutral Gray */
+  --medical-accent: #667085;
+  --medical-accent-hover: color-mix(in srgb, #667085 82%, black);
+  --medical-accent-soft: color-mix(in srgb, #667085 60%, white);
+  --medical-accent-tint: color-mix(in srgb, #667085 10%, transparent);
+  --medical-accent-border: color-mix(in srgb, #667085 32%, transparent);
+  --medical-text-link: color-mix(in srgb, #667085 82%, black);
+  --medical-text-link-hover: color-mix(in srgb, #667085 68%, black);
 }
 
 /* data-role-theme="default" intentionally has no block — it inherits the

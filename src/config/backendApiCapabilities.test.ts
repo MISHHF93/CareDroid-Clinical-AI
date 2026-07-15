@@ -49,6 +49,8 @@ describe('backendApiCapabilities', () => {
       'four-score',
       'modified-rankin-scale',
       'pecarn-head',
+      'wells-dvt-calculator',
+      'abg-interpreter',
     ]);
     expect(isBackendExecutorToolId('qsofa')).toBe(false);
     expect(isBackendExecutorToolId('drug-interactions')).toBe(true);

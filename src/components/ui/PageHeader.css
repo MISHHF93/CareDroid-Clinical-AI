@@ -15,7 +15,7 @@
 
 .cd-page-header__eyebrow {
   margin: 0 0 6px;
-  color: var(--app-accent-action, #374151);
+  color: var(--app-accent-action, var(--app-accent-interactive));
   font-size: var(--font-12);
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -39,7 +39,7 @@
 
 .cd-page-header__icon {
   align-items: center;
-  color: var(--app-accent-action, #374151);
+  color: var(--app-accent-action, var(--app-accent-interactive));
   display: inline-flex;
   flex: 0 0 auto;
   justify-content: center;

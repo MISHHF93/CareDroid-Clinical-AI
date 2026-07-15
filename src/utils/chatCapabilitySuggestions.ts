@@ -316,7 +316,11 @@ function makeExecutorSuggestion(registryId, index) {
     executorId,
     icon: getToolIcon(canonicalId),
     source: 'POST /api/tools/:id/execute',
-    defaultRank: 20 + index,
+    // Base rank sits behind the always-on utility suggestions (audit/export/
+    // notifications/billing, ranks 60-90) so the ~37 registered executors
+    // don't crowd them out of the shared top-10 by default -- a specific
+    // keyword match still boosts a tool via scoreSuggestion's -100 shift.
+    defaultRank: 100 + index,
     keywords: [
       record?.label,
       record?.description,

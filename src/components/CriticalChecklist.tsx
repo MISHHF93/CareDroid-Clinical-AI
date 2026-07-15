@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { MEDICAL_THEME, MEDICAL_TYPE } from '../config/medicalTheme.constants';
+import './CriticalChecklist.css';
 import {
   CHECKLISTS,
   buildChecklistCompletionNote,
@@ -60,24 +60,16 @@ function ChecklistChooser({
   onSelect: (checklistId: string) => void;
 }) {
   return (
-    <div style={{ display: 'grid', gap: 8, marginTop: 14 }}>
+    <div className="checklist-chooser">
       {CHECKLISTS.map((option) => (
         <button
           key={option.id}
           type="button"
           onClick={() => onSelect(option.id)}
-          style={{
-            background: MEDICAL_THEME.surfaceCard,
-            border: '1px solid #e0f2fe',
-            borderRadius: 10,
-            color: 'var(--medical-ink, #111827)',
-            cursor: 'pointer',
-            padding: '10px 12px',
-            textAlign: 'left',
-          }}
+          className="checklist-chooser__option"
         >
           <strong>{option.name}</strong>
-          <span style={{ display: 'block', color: MEDICAL_THEME.inkSubtle, fontSize: 12, marginTop: 3 }}>
+          <span className="checklist-chooser__option-meta">
             {option.items.length} preparation items
           </span>
         </button>
@@ -99,15 +91,10 @@ function ChecklistRow({
 
   return (
     <label
+      className="checklist-row"
       style={{
-        display: 'grid',
-        gridTemplateColumns: '18px 24px 1fr',
-        gap: 10,
-        alignItems: 'start',
-        background: checked ? '#102316' : MEDICAL_THEME.surfaceCard,
+        background: checked ? '#102316' : '#ffffff',
         border: `1px solid ${checked ? '#166534' : item.critical ? '#7F1D1D' : '#e0f2fe'}`,
-        borderRadius: 12,
-        padding: 10,
       }}
     >
       <input
@@ -116,39 +103,24 @@ function ChecklistRow({
         onChange={(event) => {
           if (event.target.checked) onCheck(item);
         }}
-        style={{ marginTop: 3 }}
+        className="checklist-row__checkbox"
       />
       <span
         title={item.category}
         aria-label={item.category}
-        style={{
-          alignItems: 'center',
-          background: '#f0f9ff',
-          borderRadius: 7,
-          color: MEDICAL_THEME.accent,
-          display: 'inline-flex',
-          fontSize: 10,
-          fontWeight: 800,
-          height: 22,
-          justifyContent: 'center',
-          lineHeight: 1,
-          width: 24,
-        }}
+        className="checklist-row__category-icon"
       >
         {categoryIcon[item.category]}
       </span>
       <span>
         <span className="u-flex-center u-gap-6">
           {item.critical ? (
-            <span
-              aria-label="Critical item"
-              style={{ background: '#EF4444', borderRadius: 999, height: 8, width: 8, flex: '0 0 auto' }}
-            />
+            <span aria-label="Critical item" className="checklist-row__critical-dot" />
           ) : null}
-          <span style={{ color: 'var(--medical-ink, #111827)', fontSize: 13, lineHeight: 1.35 }}>{item.text}</span>
+          <span className="checklist-row__text">{item.text}</span>
         </span>
         {completion ? (
-          <small style={{ color: MEDICAL_THEME.inkSubtle, display: 'block', fontSize: 11, marginTop: 5 }}>
+          <small className="checklist-row__completion-note">
             Completed by {completion.checkedBy} at {formatTime(completion.checkedAt)}
           </small>
         ) : null}
@@ -234,39 +206,18 @@ export default function CriticalChecklist({
       role="dialog"
       aria-modal="true"
       aria-label={activeChecklist?.name || 'Critical checklist'}
-      style={{
-        background: MEDICAL_THEME.surfaceCard,
-        borderLeft: '1px solid #e0f2fe',
-        boxShadow: '-24px 0 60px rgba(0,0,0,0.36)',
-        color: 'var(--medical-ink, #111827)',
-        height: '100vh',
-        overflowY: 'auto',
-        position: 'fixed',
-        right: 0,
-        top: 0,
-        width: 360,
-        zIndex: 180,
-      }}
+      className="critical-checklist-panel"
     >
-      <header
-        style={{
-          background: MEDICAL_THEME.surfaceCard,
-          borderBottom: '1px solid #e0f2fe',
-          padding: 16,
-          position: 'sticky',
-          top: 0,
-          zIndex: 1,
-        }}
-      >
-        <div style={{ alignItems: 'start', display: 'flex', justifyContent: 'space-between', gap: 12 }}>
+      <header className="critical-checklist-panel__header">
+        <div className="critical-checklist-panel__header-row">
           <div>
-            <span style={{ color: MEDICAL_TYPE.statusCritical, fontSize: 11, fontWeight: 800, letterSpacing: '0.08em' }}>
+            <span className="critical-checklist-panel__eyebrow">
               CRITICAL CHECKLIST
             </span>
-            <h2 style={{ fontSize: 18, fontWeight: 600, margin: '5px 0 0' }}>
+            <h2 className="critical-checklist-panel__title">
               {activeChecklist?.name || titleHint || 'Choose a checklist'}
             </h2>
-            <p style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 12, lineHeight: 1.35, margin: '6px 0 0' }}>
+            <p className="critical-checklist-panel__subtitle">
               {patient.firstName} {patient.lastName} · {patient.chiefComplaint}
             </p>
           </div>
@@ -281,16 +232,10 @@ export default function CriticalChecklist({
         </div>
 
         {activeChecklist ? (
-          <div style={{ marginTop: 14 }}>
+          <div className="critical-checklist-panel__progress-wrap">
             <div
               aria-label={`${completedCount}/${totalCount} items checked`}
-              style={{
-                background: MEDICAL_THEME.surfaceCard,
-                border: '1px solid #e0f2fe',
-                borderRadius: 999,
-                height: 9,
-                overflow: 'hidden',
-              }}
+              className="critical-checklist-progress-track"
             >
               <span
                 style={{
@@ -301,7 +246,7 @@ export default function CriticalChecklist({
                 }}
               />
             </div>
-            <strong style={{ color: '#E5E7EB', display: 'block', fontSize: 12, marginTop: 7 }}>
+            <strong className="critical-checklist-panel__progress-label">
               {completedCount}/{totalCount} items checked
             </strong>
           </div>
@@ -312,18 +257,11 @@ export default function CriticalChecklist({
         {activeChecklist ? (
           <>
             {!checklist ? (
-              <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, marginBottom: 12 }}>
+              <div className="critical-checklist-panel__change-row">
                 <button
                   type="button"
                   onClick={() => setSelectedChecklistId('')}
-                  style={{
-                    background: 'transparent',
-                    border: '1px solid #e0f2fe',
-                    borderRadius: 10,
-                    color: 'var(--medical-ink, #111827)',
-                    cursor: 'pointer',
-                    padding: '8px 10px',
-                  }}
+                  className="critical-checklist-panel__change-btn"
                 >
                   Change Checklist
                 </button>
@@ -342,7 +280,7 @@ export default function CriticalChecklist({
           </>
         ) : (
           <>
-            <p style={{ color: MEDICAL_THEME.inkDisabled, fontSize: 13, lineHeight: 1.45, margin: 0 }}>
+            <p className="critical-checklist-panel__empty-state">
               Select one of the configured preparation checklists. StrokeCode has no configured C10 checklist yet.
             </p>
             <ChecklistChooser onSelect={setSelectedChecklistId} />

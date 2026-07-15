@@ -67,7 +67,7 @@ type SidebarNavItem = {
   isEmergencyCore?: boolean;
 };
 
-type SidebarProps = {
+export type SidebarProps = {
   navigationItems?: readonly NavigationItem[];
 };
 

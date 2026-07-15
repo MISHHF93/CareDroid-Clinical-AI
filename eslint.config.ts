@@ -14,6 +14,9 @@ const vitestAndLegacyJestGlobals = Object.fromEntries(
 
 const config: Linter.Config[] = [
   {
+    linterOptions: { reportUnusedDisableDirectives: 'error' },
+  },
+  {
     ignores: [
       'dist/**',
       'backend/**',
@@ -54,6 +57,16 @@ const config: Linter.Config[] = [
     rules: {
       'no-undef': 'off',
       'no-unused-vars': 'off',
+      '@typescript-eslint/ban-ts-comment': [
+        'error',
+        {
+          'ts-ignore': true,
+          'ts-nocheck': true,
+          'ts-check': false,
+          'ts-expect-error': 'allow-with-description',
+          minimumDescriptionLength: 10,
+        },
+      ],
     },
   },
   {

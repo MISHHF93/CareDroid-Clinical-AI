@@ -89,6 +89,9 @@ export interface OcrProviderResult {
 export interface OcrProvider {
   readonly name: string;
   extract(input: OcrProviderExtractInput): Promise<OcrProviderResult>;
+  /** Releases any held resources (e.g. a live OCR worker). Optional — providers
+   * with nothing to release (like a pure text-parsing mock) need not implement it. */
+  terminate?(): Promise<void>;
 }
 
 export type OcrServiceHealthStatus = 'healthy' | 'degraded' | 'down';

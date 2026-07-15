@@ -30,7 +30,7 @@ function patternToolIds(): string[] {
 }
 
 describe('tool-orchestrator.registry', () => {
-  it('exposes exactly thirty-seven registered executor ids', () => {
+  it('exposes exactly thirty-nine registered executor ids', () => {
     expect(REGISTERED_EXECUTOR_TOOL_IDS).toEqual([
       'sofa-calculator',
       'drug-interactions',
@@ -69,6 +69,8 @@ describe('tool-orchestrator.registry', () => {
       'four-score',
       'modified-rankin-scale',
       'pecarn-head',
+      'wells-dvt-calculator',
+      'abg-interpreter',
     ]);
   });
 
@@ -205,9 +207,9 @@ describe('tool-orchestrator.registry', () => {
     expect(isKnownUnsupportedNluTool('sofa-calculator')).toBe(false);
   });
 
-  it('getExecutorCatalogSnapshot lists thirty-seven registered executors', () => {
+  it('getExecutorCatalogSnapshot lists thirty-nine registered executors', () => {
     const snap = getExecutorCatalogSnapshot();
-    expect(snap.registeredExecutorToolIds).toHaveLength(37);
+    expect(snap.registeredExecutorToolIds).toHaveLength(39);
     expect(snap.unsupportedTools.length).toBeGreaterThan(30);
   });
 

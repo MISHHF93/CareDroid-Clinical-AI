@@ -15,7 +15,6 @@ import { IntentClassifierModule } from '../medical-control-plane/intent-classifi
 import { CollaborationHubModule } from '../collaboration-hub/collaboration-hub.module';
 import {
   AiContextManagerService,
-  AiGatewayService,
   AiResponseComposerService,
   AiRoutingEngineService,
 } from './foundation';
@@ -35,17 +34,10 @@ import {
   controllers: [AIController],
   providers: [
     AIService,
-    AiGatewayService,
     AiRoutingEngineService,
     AiContextManagerService,
     AiResponseComposerService,
   ],
-  exports: [
-    AIService,
-    AiGatewayService,
-    AiRoutingEngineService,
-    AiContextManagerService,
-    AiResponseComposerService,
-  ],
+  exports: [AIService, AiRoutingEngineService, AiContextManagerService, AiResponseComposerService],
 })
 export class AiModule {}

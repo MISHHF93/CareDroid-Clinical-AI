@@ -25,6 +25,7 @@ import type {
 } from '../../lib/ai/careDroidAI';
 import {
   callAI,
+  UNIFIED_AI_MODEL,
   type AIRequest,
   type AIRequestType,
   type AIResponse,
@@ -262,6 +263,7 @@ function auditStructuredInteraction(
     requestType: request.intent,
     inputPreview: previewAIText(request.input),
     outputPreview: previewAIText(response.data),
+    model: response.provenance?.modelOrEngine,
     safety: {
       requiresHumanReview: response.requiresClinicianReview,
       blocked: response.status === 'error',
@@ -308,6 +310,7 @@ function auditConversationalInteraction(
     outputPreview: previewAIText(
       typeof response.content === 'string' ? response.content : response.data,
     ),
+    model: UNIFIED_AI_MODEL,
     safety: {
       requiresHumanReview: true,
       blocked: false,

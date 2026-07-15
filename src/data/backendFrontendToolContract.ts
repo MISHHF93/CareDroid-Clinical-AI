@@ -170,6 +170,7 @@ function resolveComponent(registryId, nluToolId, builtinSlug) {
     registryId === REGISTRY.dispatchAi ||
     [
       'wells-pe',
+      'wells-dvt-calculator',
       'perc',
       'grace-acs',
       'nihss',

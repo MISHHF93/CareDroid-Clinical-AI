@@ -615,13 +615,13 @@
 }
 
 .tool-card-large:hover {
-  border-color: var(--cdl-clinical-border-focus, color-mix(in srgb, var(--app-accent-action, #374151) 34%, var(--app-border)));
+  border-color: var(--cdl-clinical-border-focus, color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 34%, var(--app-border)));
   transform: translateY(-1px);
   box-shadow: var(--cdl-clinical-shadow-hover, var(--compact-shadow, var(--app-elevation-card)));
 }
 
 .tool-card-large:focus-visible {
-  outline: 2px solid var(--app-accent-action, #374151);
+  outline: 2px solid var(--app-accent-action, var(--app-accent-interactive));
   outline-offset: 3px;
 }
 
@@ -680,9 +680,9 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  background: color-mix(in srgb, var(--app-accent-action, #374151) 10%, var(--app-surface-muted));
-  border: 1px solid color-mix(in srgb, var(--app-accent-action, #374151) 22%, var(--app-border));
-  color: var(--app-accent-action, #374151);
+  background: color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 10%, var(--app-surface-muted));
+  border: 1px solid color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 22%, var(--app-border));
+  color: var(--app-accent-action, var(--app-accent-interactive));
 }
 
 .tool-meta {
@@ -706,10 +706,10 @@
 .tool-category {
   display: inline-block;
   padding: 4px 10px;
-  border: 1px solid color-mix(in srgb, var(--app-accent-action, #374151) 28%, var(--app-border));
+  border: 1px solid color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 28%, var(--app-border));
   border-radius: 999px;
-  background: color-mix(in srgb, var(--app-accent-action, #374151) 9%, var(--app-surface));
-  color: var(--app-accent-action, #374151);
+  background: color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 9%, var(--app-surface));
+  color: var(--app-accent-action, var(--app-accent-interactive));
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
@@ -878,9 +878,9 @@
   min-width: min(100%, 10rem);
   min-height: var(--compact-control-height, 38px);
   padding: 8px 12px;
-  border: 1px solid var(--app-accent-action, #374151);
+  border: 1px solid var(--app-accent-action, var(--app-accent-interactive));
   border-radius: var(--app-radius-md, 12px);
-  background: var(--app-accent-action, #374151);
+  background: var(--app-accent-action, var(--app-accent-interactive));
   font-weight: 600;
   font-size: 14px;
   color: var(--app-on-solid);

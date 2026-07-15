@@ -313,7 +313,6 @@ export default function AmbientScribe({ embedded = false, onCloseEmbedded }: any
                         ? undefined
                         : 'Review the draft and confirm the checkbox before copy-forward'
                     }
-                    aria-label="Copy reviewed draft for clinician documentation"
                     onClick={() => {
                       void handleCopyForward();
                     }}

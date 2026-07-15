@@ -1,22 +1,101 @@
+import type { Worker } from 'tesseract.js';
 import { getIntakeArtifact } from '../../../../src/config/intakeArtifactRegistry';
 import { parseIdArtifactText } from '../../../../src/utils/idArtifactParser';
 import { parseClinicalArtifactText } from '../../../../src/utils/clinicalArtifactParser';
 import type { OcrProvider, OcrProviderExtractInput, OcrProviderResult } from './ocr-intake.types';
 
 const LOW_CONFIDENCE_THRESHOLD = 0.6;
+const IMAGE_DATA_URL_PATTERN = /^data:image\/(png|jpe?g|webp|gif|heic);base64,(.+)$/i;
 
+/**
+ * Base per-field confidence when no real OCR confidence signal is available
+ * (manual/typed-text intake, no image). Blended with real OCR confidence in
+ * `fieldConfidence` whenever an image was actually processed.
+ */
 function fieldConfidence(
   field: string,
   artifact: { extractableFields: readonly string[] },
+  ocrConfidence?: number,
 ): number {
-  return artifact.extractableFields.includes(field) ? 0.82 : 0.55;
+  const base = artifact.extractableFields.includes(field) ? 0.82 : 0.55;
+  if (ocrConfidence === undefined) return base;
+  return Number(((base + ocrConfidence) / 2).toFixed(2));
+}
+
+function decodeImageDataUrl(dataUrl: string): Buffer | null {
+  const match = IMAGE_DATA_URL_PATTERN.exec(dataUrl);
+  if (!match) return null;
+  return Buffer.from(match[2], 'base64');
+}
+
+/**
+ * Shared structured-field extraction: parses raw text (however it was obtained —
+ * typed, pasted, or OCR'd from an image) into the artifact's known fields, using
+ * the same heuristic parsers the frontend capture flow uses. `ocrConfidence`
+ * (0-1), when supplied, blends a real per-document OCR confidence signal into
+ * each field's confidence instead of relying solely on the field-type heuristic.
+ */
+function extractFieldsFromText(
+  text: string,
+  artifact: ReturnType<typeof getIntakeArtifact>,
+  ocrConfidence?: number,
+): { fields: Array<{ field: string; value: string; confidence: number }>; warnings: string[] } {
+  const warnings: string[] = [];
+  const fields: Array<{ field: string; value: string; confidence: number }> = [];
+
+  if (artifact.parser === 'identity') {
+    const demographics = parseIdArtifactText(text);
+    for (const [field, value] of Object.entries(demographics)) {
+      if (value === undefined || value === null || String(value).trim() === '') continue;
+      fields.push({
+        field,
+        value: String(value),
+        confidence: fieldConfidence(field, artifact, ocrConfidence),
+      });
+    }
+  } else {
+    const clinical = parseClinicalArtifactText(artifact.parser, text);
+    for (const [field, value] of Object.entries(clinical)) {
+      if (value === undefined || value === null || String(value).trim() === '') continue;
+      fields.push({
+        field,
+        value: String(value),
+        confidence: fieldConfidence(field, artifact, ocrConfidence),
+      });
+    }
+  }
+
+  for (const required of artifact.requiredForRegistration || []) {
+    if (!fields.some((extracted) => extracted.field === required)) {
+      warnings.push(`Missing required field: ${required}`);
+    }
+  }
+
+  return { fields, warnings };
+}
+
+function buildResult(
+  text: string,
+  fields: Array<{ field: string; value: string; confidence: number }>,
+  warnings: string[],
+): OcrProviderResult {
+  const overallConfidence = fields.length
+    ? Number((fields.reduce((sum, field) => sum + field.confidence, 0) / fields.length).toFixed(2))
+    : 0;
+
+  if (overallConfidence > 0 && overallConfidence < LOW_CONFIDENCE_THRESHOLD) {
+    warnings.push('Overall extraction confidence is low; all fields require staff verification.');
+  }
+
+  return { text, fields, overallConfidence, warnings };
 }
 
 /**
  * Deterministic, dependency-free OCR provider for local/dev use. Reuses the same
  * text-heuristic parsers the frontend capture flow uses, so field extraction stays
- * consistent whether the OCR runs client-side or server-side. Swap `createOcrProvider`
- * to a real vision/OCR provider in production without changing any caller contract.
+ * consistent whether the OCR runs client-side or server-side. Does not read image
+ * pixels at all — only `input.rawText` (manually typed/pasted text). See
+ * `TesseractOcrProvider` for the real image-OCR provider.
  */
 export class MockOcrProvider implements OcrProvider {
   readonly name = 'mock';
@@ -24,54 +103,108 @@ export class MockOcrProvider implements OcrProvider {
   async extract(input: OcrProviderExtractInput): Promise<OcrProviderResult> {
     const artifact = getIntakeArtifact(input.documentType);
     const text = input.rawText.trim();
-    const warnings: string[] = [];
 
     if (!text) {
-      warnings.push('No extractable text found in document; manual entry required.');
-      return { text: '', fields: [], overallConfidence: 0, warnings };
+      return {
+        text: '',
+        fields: [],
+        overallConfidence: 0,
+        warnings: ['No extractable text found in document; manual entry required.'],
+      };
     }
 
-    const fields: Array<{ field: string; value: string; confidence: number }> = [];
+    const { fields, warnings } = extractFieldsFromText(text, artifact);
+    return buildResult(text, fields, warnings);
+  }
+}
 
-    if (artifact.parser === 'identity') {
-      const demographics = parseIdArtifactText(text);
-      for (const [field, value] of Object.entries(demographics)) {
-        if (value === undefined || value === null || String(value).trim() === '') continue;
-        fields.push({ field, value: String(value), confidence: fieldConfidence(field, artifact) });
+/**
+ * Real, self-hosted OCR provider backed by Tesseract.js — genuine image-to-text
+ * recognition (WASM, runs entirely in this process, no external API calls or
+ * cloud credentials). Decodes `input.dataUrl` (the actual uploaded photo/scan),
+ * runs OCR to get real extracted text, then feeds that text into the same
+ * structured-field parsers `MockOcrProvider` uses, so downstream consumers see
+ * an identical result shape regardless of which provider produced it.
+ *
+ * The worker is created lazily on first use and reused across requests (creating
+ * a Tesseract worker loads WASM + language data, too expensive to redo per call).
+ * PDFs are not rasterized in this pass — Tesseract needs raster image input, so a
+ * PDF upload falls back to any manually-supplied `rawText` with an explicit
+ * warning rather than silently producing nothing or crashing.
+ */
+export class TesseractOcrProvider implements OcrProvider {
+  readonly name = 'tesseract';
+
+  private workerPromise: Promise<Worker> | null = null;
+
+  private async getWorker(): Promise<Worker> {
+    if (!this.workerPromise) {
+      const { createWorker } = await import('tesseract.js');
+      this.workerPromise = createWorker('eng');
+    }
+    return this.workerPromise;
+  }
+
+  /** Releases the underlying Tesseract worker (a live WASM instance / worker
+   * thread that otherwise keeps the process alive). Call on app shutdown and
+   * in tests; safe to call even if a worker was never created. */
+  async terminate(): Promise<void> {
+    if (!this.workerPromise) return;
+    const worker = await this.workerPromise;
+    this.workerPromise = null;
+    await worker.terminate();
+  }
+
+  async extract(input: OcrProviderExtractInput): Promise<OcrProviderResult> {
+    const artifact = getIntakeArtifact(input.documentType);
+    const warnings: string[] = [];
+    let text = input.rawText.trim();
+    let ocrConfidence: number | undefined;
+
+    if (input.dataUrl) {
+      const imageBuffer = decodeImageDataUrl(input.dataUrl);
+      if (!imageBuffer) {
+        warnings.push(
+          'Uploaded document is not a rasterized image (e.g. a PDF); OCR text extraction was skipped for this file. Continue with manual entry or upload a photo/scan instead.',
+        );
+      } else {
+        const worker = await this.getWorker();
+        const { data } = await worker.recognize(imageBuffer);
+        const ocrText = (data.text || '').trim();
+        ocrConfidence = Number((data.confidence / 100).toFixed(2));
+        if (ocrText) {
+          text = text ? `${ocrText}\n${text}` : ocrText;
+        } else {
+          warnings.push('OCR could not read any text from the uploaded image.');
+        }
       }
-    } else {
-      const clinical = parseClinicalArtifactText(artifact.parser, text);
-      for (const [field, value] of Object.entries(clinical)) {
-        if (value === undefined || value === null || String(value).trim() === '') continue;
-        fields.push({ field, value: String(value), confidence: fieldConfidence(field, artifact) });
-      }
     }
 
-    for (const required of artifact.requiredForRegistration || []) {
-      if (!fields.some((extracted) => extracted.field === required)) {
-        warnings.push(`Missing required field: ${required}`);
-      }
+    if (!text) {
+      return {
+        text: '',
+        fields: [],
+        overallConfidence: 0,
+        warnings: [...warnings, 'No extractable text found in document; manual entry required.'],
+      };
     }
 
-    const overallConfidence = fields.length
-      ? Number(
-          (fields.reduce((sum, field) => sum + field.confidence, 0) / fields.length).toFixed(2),
-        )
-      : 0;
-
-    if (overallConfidence > 0 && overallConfidence < LOW_CONFIDENCE_THRESHOLD) {
-      warnings.push('Overall extraction confidence is low; all fields require staff verification.');
-    }
-
-    return { text, fields, overallConfidence, warnings };
+    const { fields, warnings: fieldWarnings } = extractFieldsFromText(
+      text,
+      artifact,
+      ocrConfidence,
+    );
+    return buildResult(text, fields, [...warnings, ...fieldWarnings]);
   }
 }
 
 export function createOcrProvider(providerName?: string): OcrProvider {
-  const name = providerName || process.env.OCR_PROVIDER || 'mock';
+  const name = providerName || process.env.OCR_PROVIDER || 'tesseract';
   switch (name) {
     case 'mock':
-    default:
       return new MockOcrProvider();
+    case 'tesseract':
+    default:
+      return new TesseractOcrProvider();
   }
 }

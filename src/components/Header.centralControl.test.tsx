@@ -2,6 +2,7 @@ import { render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
 import { UserProvider } from '../contexts/UserContext';
+import { ThemeProvider } from '../contexts/ThemeContext';
 import { Header } from './Header';
 
 vi.mock('../contexts/NotificationShellContext', () => ({
@@ -17,9 +18,11 @@ vi.mock('../contexts/NotificationShellContext', () => ({
 function renderHeader() {
   return render(
     <MemoryRouter>
-      <UserProvider>
-        <Header />
-      </UserProvider>
+      <ThemeProvider>
+        <UserProvider>
+          <Header />
+        </UserProvider>
+      </ThemeProvider>
     </MemoryRouter>,
   );
 }

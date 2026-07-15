@@ -20,16 +20,18 @@ describe('chat capability suggestions', () => {
   it('shows only registered POST tool executors as executable suggestions', () => {
     const suggestions = getChatCapabilitySuggestions({ hasPermission: allowAll });
     const executorSuggestions = suggestions.filter((suggestion) => suggestion.kind === 'executor');
-    const inventoryExecutors = getBackendBackedToolInventory();
+    const inventoryExecutorIds = new Set(getBackendBackedToolInventory().map((record) => record.id));
 
-    expect(executorSuggestions.map((suggestion) => suggestion.executorId).sort()).toEqual([
-      'drug-interactions',
-      'lab-interpreter',
-      'sofa-calculator',
-    ]);
-    expect(executorSuggestions.map((suggestion) => suggestion.toolId).sort()).toEqual(
-      inventoryExecutors.map((record) => record.id).sort()
-    );
+    // The registry now has ~37 real registered executors -- far more than the
+    // shared top-10 suggestion budget -- so only a ranked subset surfaces by
+    // default. Verify every surfaced executor is a genuine, registered tool
+    // (not which specific ones win the ranking, which is an arbitrary
+    // consequence of tie-breaking order).
+    expect(executorSuggestions.length).toBeGreaterThan(0);
+    expect(executorSuggestions.length).toBeLessThanOrEqual(10);
+    for (const suggestion of executorSuggestions) {
+      expect(inventoryExecutorIds.has(suggestion.toolId)).toBe(true);
+    }
     expect(executorSuggestions.every((suggestion) => suggestion.source.includes('/api/tools'))).toBe(true);
   });
 

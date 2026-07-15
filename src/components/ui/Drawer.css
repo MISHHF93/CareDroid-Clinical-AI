@@ -168,7 +168,7 @@
 }
 
 .drawer-close:focus {
-  outline: 2px solid var(--app-accent-action, #374151);
+  outline: 2px solid var(--app-accent-action, var(--app-accent-interactive));
   outline-offset: 2px;
 }
 

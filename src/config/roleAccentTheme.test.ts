@@ -20,7 +20,7 @@ describe('roleAccentTheme', () => {
     expect(resolveRoleAccentKey(EMERGENCY_ROLE_IDS.emsCoordinator)).toBe('ems');
     expect(resolveRoleAccentKey(EMERGENCY_ROLE_IDS.admin)).toBe('admin');
     expect(resolveRoleAccentKey(EMERGENCY_ROLE_IDS.itAdmin)).toBe('admin');
-    expect(resolveRoleAccentKey(EMERGENCY_ROLE_IDS.edManager)).toBe('admin');
+    expect(resolveRoleAccentKey(EMERGENCY_ROLE_IDS.edManager)).toBe('operations');
   });
 
   it('falls back to "default" for unassigned or unknown roles', () => {
@@ -31,10 +31,19 @@ describe('roleAccentTheme', () => {
     expect(resolveRoleAccentKey(undefined)).toBe('default');
   });
 
-  it('gives every named group a distinct accent hex, none colliding with semantic warning or AI tones', () => {
+  it('gives every named group a distinct accent hex, except two deliberate overlaps', () => {
     const hexes = Object.values(ROLE_ACCENT_GROUP_META).map((meta) => meta.accent);
-    expect(new Set(hexes).size).toBe(hexes.length);
-    expect(hexes).not.toContain('#b45309'); // --semantic-warning
-    expect(hexes).not.toContain('#6366f1'); // --semantic-ai-assistance
+    // Deliberate overlaps: 'default' === 'reception' (Reception uses the
+    // platform-standard accent, not a separate skin — see role-accent-theme.css's
+    // own header comment); 'operations' === AI Purple (the CCDS brief names both
+    // "Operations" and "AI" as the same Purple, with no second hex given).
+    const distinctGroupHexes = Object.values(ROLE_ACCENT_GROUP_META)
+      .filter((meta) => meta.id !== 'operations' && meta.id !== 'default')
+      .map((meta) => meta.accent);
+    expect(new Set(distinctGroupHexes).size).toBe(distinctGroupHexes.length);
+    expect(hexes).not.toContain('#b54708'); // --semantic-attention/--semantic-warning
+    expect(hexes).not.toContain('#027a48'); // --semantic-healthy
+    expect(ROLE_ACCENT_GROUP_META.default.accent).toBe(ROLE_ACCENT_GROUP_META.reception.accent);
+    expect(ROLE_ACCENT_GROUP_META.operations.accent).toBe('#5925dc');
   });
 });

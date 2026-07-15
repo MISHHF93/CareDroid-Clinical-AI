@@ -10,6 +10,7 @@ vi.mock('./careDroidAiApi', () => ({
 
 vi.mock('../lib/ai/client', () => ({
   callAI,
+  UNIFIED_AI_MODEL: 'claude-sonnet-4-6',
 }));
 
 import {

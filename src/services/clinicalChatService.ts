@@ -1,6 +1,7 @@
 import { apiFetch, buildApiUrl, parseApiResponse } from './apiClient';
 import { buildAIAuditEvent, logAIAuditEvent, previewAIText } from '../lib/ai/audit/logger';
 import { invokeUnifiedAiConversational } from './careDroidUnifiedAiNode';
+import { UNIFIED_AI_MODEL } from '../lib/ai/client';
 
 import {
   REGISTRY_ID_TO_ORCHESTRATOR_TOOL,
@@ -104,6 +105,7 @@ export async function sendClinicalChatMessage({
       result: 'allowed',
       requestType: requestType || 'UNKNOWN',
       inputPreview: previewAIText(message),
+      model: UNIFIED_AI_MODEL,
       safety: { requiresHumanReview: true, blocked: false, reasons: [] },
     }),
   );

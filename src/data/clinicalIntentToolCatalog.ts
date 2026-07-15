@@ -1373,7 +1373,7 @@ Ask for missing inputs one at a time:
 10. Alternative diagnosis at least as likely as DVT
 
 Then summarize entered findings, calculate the Wells DVT score, explain likely/unlikely or probability-band interpretation, show limitations, cite the original Wells validation work, and warn: "Clinical decision support only. Not a diagnosis." Do not invent missing clinical values.`,
-    backendExecutable: false,
+    backendExecutable: true,
   },
   {
     toolId: wellsPeChatConfig.toolId,
@@ -2365,7 +2365,7 @@ Then summarize entered findings, calculate the Wells DVT score, explain likely/u
       'ABG and acid–base interpretation support (Lab Interpreter page) — clinical decision support only; does not establish a diagnosis.',
     path: '/tools/lab-interpreter',
     sidebarToolId: 'abg-interpreter',
-    backendExecutable: false,
+    backendExecutable: true,
   },
   {
     toolId: NLU.laboratoryDashboard,

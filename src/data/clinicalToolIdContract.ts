@@ -1776,7 +1776,6 @@ export const ORCHESTRATOR_TO_REGISTRY_ID = Object.freeze({
   [NLU.deviceRecommendationAssistant]: REGISTRY.deviceRecommendationAssistant,
   dispatch: REGISTRY.dispatchAi,
   [NLU.doseCalculator]: REGISTRY.calculatorsHub,
-  [NLU.abgInterpreter]: REGISTRY.labInterp,
   [NLU.protocolLookup]: REGISTRY.protocols,
   [NLU.aclsProtocol]: REGISTRY.protocols,
   [NLU.atlsProtocol]: REGISTRY.protocols,
@@ -1867,6 +1866,8 @@ export const ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS = Object.freeze([
   NLU.fourScore,
   NLU.modifiedRankinScale,
   NLU.pecarnHead,
+  NLU.wellsDvtCalculator,
+  NLU.abgInterpreter,
 ]);
 
 /**
@@ -1913,6 +1914,8 @@ export const REGISTRY_ID_TO_ORCHESTRATOR_TOOL = Object.freeze({
   [REGISTRY.fourScore]: NLU.fourScore,
   [REGISTRY.modifiedRankinScale]: NLU.modifiedRankinScale,
   [REGISTRY.pecarnHead]: NLU.pecarnHead,
+  [REGISTRY.wellsDvtCalculator]: NLU.wellsDvtCalculator,
+  [REGISTRY.abgInterpreter]: NLU.abgInterpreter,
 });
 
 /**

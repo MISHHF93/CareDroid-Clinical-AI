@@ -19,7 +19,7 @@
   background: linear-gradient(
     90deg,
     transparent 0%,
-    color-mix(in srgb, var(--app-accent-action, #374151) 12%, transparent) 50%,
+    color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 12%, transparent) 50%,
     transparent 100%
   );
   animation: shimmer var(--motion-skeleton-duration, 1.15s) var(--motion-ease-standard, ease-in-out) infinite;

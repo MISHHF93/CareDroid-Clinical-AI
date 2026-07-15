@@ -402,7 +402,7 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
 
     expect(toolCard(container, 'lab-interp')).toHaveTextContent(/uses server validation/i);
     expect(toolCard(container, 'qsofa')).toHaveTextContent(/runs in this browser/i);
-    expect(toolCard(container, 'wells-dvt-calculator')).toHaveTextContent(/copilot-guided, human-reviewed/i);
+    expect(toolCard(container, 'perc')).toHaveTextContent(/copilot-guided, human-reviewed/i);
     const platformTool = getUserFacingToolRegistryProjection().find(
       (tool) => tool.executorStatus === 'platform' && toolCard(container, tool.id)
     );
@@ -444,18 +444,18 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
   }, 10000);
 
   it('launches a chat-assisted active surface from a Medical Tools URL entry', () => {
-    renderOverview('/emergency/tools?source=tools&filter=ai-workflows&open=wells-dvt-calculator');
+    renderOverview('/emergency/tools?source=tools&filter=ai-workflows&open=perc');
 
     const activeSurface = screen.getByRole('region', { name: /active medical tools surface/i });
-    expect(within(activeSurface).getByRole('heading', { name: /wells dvt/i })).toBeInTheDocument();
+    expect(within(activeSurface).getByRole('heading', { name: /perc/i })).toBeInTheDocument();
     expect(within(activeSurface).getByText(/^copilot-guided, human-reviewed$/i)).toBeInTheDocument();
 
     fireEvent.click(within(activeSurface).getByRole('button', { name: /ask assistant/i }));
 
-    expect(mockToolPreferencesValue.recordToolAccess).toHaveBeenCalledWith('wells-dvt-calculator');
-    expect(mockConversationValue.selectTool).toHaveBeenCalledWith('wells-dvt-calculator');
-    expect(mockConversationValue.setActiveTool).toHaveBeenCalledWith('wells-dvt-calculator');
-    expect(mockConversationValue.addMessage).toHaveBeenCalledWith(expect.stringMatching(/wells/i), 'user');
+    expect(mockToolPreferencesValue.recordToolAccess).toHaveBeenCalledWith('perc');
+    expect(mockConversationValue.selectTool).toHaveBeenCalledWith('perc');
+    expect(mockConversationValue.setActiveTool).toHaveBeenCalledWith('perc');
+    expect(mockConversationValue.addMessage).toHaveBeenCalledWith(expect.stringMatching(/perc/i), 'user');
     expect(navigateMock).toHaveBeenLastCalledWith('/emergency/copilot', expect.any(Object));
   }, 10000);
 
@@ -495,10 +495,10 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
       expect.objectContaining({ replace: true })
     );
 
-    openTool(container, 'wells-dvt-calculator');
-    expect(mockConversationValue.addMessage).toHaveBeenCalledWith(expect.stringMatching(/wells/i), 'user');
-    expect(mockConversationValue.selectTool).toHaveBeenCalledWith('wells-dvt-calculator');
-    expect(mockToolPreferencesValue.recordToolAccess).toHaveBeenCalledWith('wells-dvt-calculator');
+    openTool(container, 'perc');
+    expect(mockConversationValue.addMessage).toHaveBeenCalledWith(expect.stringMatching(/perc/i), 'user');
+    expect(mockConversationValue.selectTool).toHaveBeenCalledWith('perc');
+    expect(mockToolPreferencesValue.recordToolAccess).toHaveBeenCalledWith('perc');
     expect(navigateMock).toHaveBeenLastCalledWith(
       { pathname: '/emergency/copilot', search: '' },
       expect.objectContaining({ replace: true })

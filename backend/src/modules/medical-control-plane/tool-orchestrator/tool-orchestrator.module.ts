@@ -39,6 +39,8 @@ import { IchScoreService } from './services/ich-score.service';
 import { FourScoreService } from './services/four-score.service';
 import { ModifiedRankinScaleService } from './services/modified-rankin-scale.service';
 import { PecarnHeadService } from './services/pecarn-head.service';
+import { WellsDvtService } from './services/wells-dvt.service';
+import { AbgInterpreterService } from './services/abg-interpreter.service';
 import { AiModule } from '../../ai/ai.module';
 import { AuditModule } from '../../audit/audit.module';
 import { MetricsModule } from '../../metrics/metrics.module';
@@ -93,6 +95,8 @@ import { PlatformGovernanceModule } from '../../platform-governance';
     FourScoreService,
     ModifiedRankinScaleService,
     PecarnHeadService,
+    WellsDvtService,
+    AbgInterpreterService,
   ],
   exports: [ToolOrchestratorService],
 })

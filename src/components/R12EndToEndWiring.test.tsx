@@ -5,6 +5,7 @@ import QuickIntake from './QuickIntake';
 import PatientDetailPanel from './PatientDetailPanel';
 import PatientCard from './PatientCard';
 import { Header } from './Header';
+import { ThemeProvider } from '../contexts/ThemeContext';
 import { useEmergencyStore } from '../store/emergencyStore';
 import {
   PatientFlag,
@@ -354,7 +355,9 @@ describe('R12 capacity header flow', () => {
 
     render(
       <MemoryRouter>
-        <Header />
+        <ThemeProvider>
+          <Header />
+        </ThemeProvider>
       </MemoryRouter>,
     );
 

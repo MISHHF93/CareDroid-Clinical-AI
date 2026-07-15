@@ -146,7 +146,7 @@ const EMERGENCY_OS_PAGE_SUBTITLES: Record<string, string> = {
   [CANONICAL_ROUTES.emergencySettings]: 'Tenant, module, AI, integration, and threshold controls.',
 };
 
-type AppShellProps = {
+export type AppShellProps = {
   children: ReactNode;
 };
 

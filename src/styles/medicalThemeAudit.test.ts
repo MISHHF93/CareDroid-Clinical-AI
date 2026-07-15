@@ -65,15 +65,26 @@ describe('medical theme full-scale audit', () => {
     expect(cardNorm).toContain('--card-contract-fg');
   });
 
-  it('locks theme preference off and standard theme to light', () => {
+  it('defaults standard theme to light with theme preference enabled', () => {
     const themeConfig = tokenFiles[9];
     expect(themeConfig).toContain("standardTheme: 'light'");
-    expect(themeConfig).toContain('themePreferenceEnabled: false');
+    expect(themeConfig).toContain('themePreferenceEnabled: true');
   });
 
-  it('does not ship a dark theme token block', () => {
+  it('ships a complete dark theme token block covering every --app-* surface', () => {
     const themeTokens = tokenFiles[2]; // theme-tokens.css
-    expect(themeTokens).not.toMatch(/html\[data-theme='dark'\]/);
+    expect(themeTokens).toMatch(/html\[data-theme='dark'\]\s*\{/);
+    const darkBlock = themeTokens.slice(themeTokens.indexOf("html[data-theme='dark']"));
+    for (const token of [
+      '--app-bg:',
+      '--app-fg:',
+      '--app-accent:',
+      '--app-accent-interactive:',
+      '--app-panel-bg:',
+      '--app-surface-1:',
+    ]) {
+      expect(darkBlock).toContain(token);
+    }
   });
 
   it('maps emergency and native-ai text to medical ink, not white fallbacks', () => {

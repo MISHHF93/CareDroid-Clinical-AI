@@ -261,7 +261,12 @@ describe('pilot walkthrough', () => {
     render(<AppRouteHarness />);
 
     expect(await screen.findByText('CareDroid')).toBeInTheDocument();
-    expect(await screen.findByText('Waiting', {}, { timeout: PILOT_ROUTE_LOAD_TIMEOUT })).toBeInTheDocument();
+    // Multiple surfaces legitimately show "Waiting" (alarm KPI chip, stat
+    // card, filter chip, per-patient state pills) -- this just confirms the
+    // whiteboard has finished loading real data, not which one rendered it.
+    expect(
+      (await screen.findAllByText('Waiting', {}, { timeout: PILOT_ROUTE_LOAD_TIMEOUT })).length,
+    ).toBeGreaterThan(0);
 
     await user.click(screen.getByLabelText('Pilot open intake'));
     expect(
@@ -287,7 +292,12 @@ describe('pilot walkthrough', () => {
     expect(createdPatient.state).toBe(PatientState.Triage);
 
     await user.click(screen.getByLabelText('Pilot open whiteboard'));
-    expect(await screen.findByText('Waiting', {}, { timeout: PILOT_ROUTE_LOAD_TIMEOUT })).toBeInTheDocument();
+    // Multiple surfaces legitimately show "Waiting" (alarm KPI chip, stat
+    // card, filter chip, per-patient state pills) -- this just confirms the
+    // whiteboard has finished loading real data, not which one rendered it.
+    expect(
+      (await screen.findAllByText('Waiting', {}, { timeout: PILOT_ROUTE_LOAD_TIMEOUT })).length,
+    ).toBeGreaterThan(0);
     await waitFor(() => expect(getPatientCard(createdPatient.id)).toBeInTheDocument(), {
       timeout: PILOT_ROUTE_LOAD_TIMEOUT,
     });

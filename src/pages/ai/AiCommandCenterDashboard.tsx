@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import './AiCommandCenterDashboard.css';
 import { MEDICAL_THEME, MEDICAL_TYPE } from '../../config/medicalTheme.constants';
 import {
   AI_COMMAND_CENTER_REFRESH_MS,
@@ -44,40 +45,15 @@ function MetricTile({
   accent?: string;
 }) {
   return (
-    <div
-      style={{
-        background: MEDICAL_THEME.surfaceCard,
-        border: `1px solid ${MEDICAL_THEME.border}`,
-        borderRadius: 12,
-        padding: '16px 20px',
-        minWidth: 0,
-        flex: '1 1 140px',
-      }}
-    >
-      <div
-        style={{
-          fontSize: 11,
-          fontWeight: 700,
-          letterSpacing: '0.08em',
-          textTransform: 'uppercase',
-          color: MEDICAL_THEME.inkSubtle,
-          marginBottom: 6,
-        }}
-      >
+    <div className="ai-cc-metric-tile">
+      <div className="ai-cc-metric-tile__label">
         {label}
       </div>
-      <div
-        style={{
-          fontSize: 26,
-          fontWeight: 800,
-          color: accent || MEDICAL_THEME.ink,
-          lineHeight: 1.1,
-        }}
-      >
+      <div className="ai-cc-metric-tile__value" style={{ color: accent || MEDICAL_THEME.ink }}>
         {value}
       </div>
       {sub && (
-        <div style={{ fontSize: 12, color: MEDICAL_THEME.inkMuted, marginTop: 3 }}>{sub}</div>
+        <div className="ai-cc-metric-tile__sub">{sub}</div>
       )}
     </div>
   );
@@ -91,24 +67,8 @@ function SectionCard({
   children: React.ReactNode;
 }) {
   return (
-    <div
-      style={{
-        background: MEDICAL_THEME.surfaceCard,
-        border: `1px solid ${MEDICAL_THEME.border}`,
-        borderRadius: 12,
-        padding: '18px 20px',
-      }}
-    >
-      <h2
-        style={{
-          margin: '0 0 14px',
-          fontSize: 13,
-          fontWeight: 700,
-          letterSpacing: '0.06em',
-          textTransform: 'uppercase',
-          color: MEDICAL_THEME.inkMuted,
-        }}
-      >
+    <div className="ai-cc-section-card">
+      <h2 className="ai-cc-section-card__title">
         {title}
       </h2>
       {children}
@@ -123,46 +83,30 @@ function ExpertRow({
 }) {
   const dot = toneColor[expert.tone] || MEDICAL_THEME.inkMuted;
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 10,
-        padding: '6px 0',
-        borderBottom: `1px solid ${MEDICAL_THEME.border}`,
-      }}
-    >
+    <div className="ai-cc-expert-row">
       <span
-        style={{
-          width: 8,
-          height: 8,
-          borderRadius: '50%',
-          background: expert.active ? dot : MEDICAL_THEME.inkDisabled,
-          flexShrink: 0,
-        }}
+        className="ai-cc-expert-row__dot"
+        style={{ background: expert.active ? dot : MEDICAL_THEME.inkDisabled }}
       />
-      <span style={{ flex: '0 0 100px', fontWeight: 600, fontSize: 13, color: MEDICAL_THEME.ink }}>
+      <span className="ai-cc-expert-row__label">
         {expert.label}
       </span>
-      <span style={{ flex: 1, fontSize: 12, color: MEDICAL_THEME.inkMuted }}>{expert.specialty}</span>
+      <span className="ai-cc-expert-row__specialty">{expert.specialty}</span>
       {expert.load != null && (
-        <span style={{ fontSize: 12, color: MEDICAL_THEME.inkSubtle, minWidth: 60, textAlign: 'right' }}>
+        <span className="ai-cc-expert-row__load">
           load {expert.load}%
         </span>
       )}
       {expert.confidence != null && (
         <span
+          className="ai-cc-expert-row__confidence"
           style={{
-            fontSize: 12,
-            fontWeight: 700,
             color:
               expert.confidence >= 90
                 ? MEDICAL_THEME.success
                 : expert.confidence >= 80
                   ? MEDICAL_THEME.warning
                   : MEDICAL_THEME.danger,
-            minWidth: 52,
-            textAlign: 'right',
           }}
         >
           {expert.confidence}% conf
@@ -174,16 +118,7 @@ function ExpertRow({
 
 function LoadingShell() {
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: 260,
-        color: MEDICAL_THEME.inkSubtle,
-        fontSize: 14,
-      }}
-    >
+    <div className="ai-cc-loading-shell">
       Loading AI Command Center…
     </div>
   );
@@ -192,18 +127,7 @@ function LoadingShell() {
 function WarningBanner({ warnings }: { warnings: string[] }) {
   if (!warnings.length) return null;
   return (
-    <div
-      role="alert"
-      style={{
-        background: MEDICAL_THEME.warningTint,
-        border: `1px solid ${MEDICAL_THEME.warningBorder}`,
-        borderRadius: 8,
-        padding: '10px 14px',
-        fontSize: 13,
-        color: MEDICAL_THEME.warningBorder,
-        marginBottom: 16,
-      }}
-    >
+    <div role="alert" className="ai-cc-warning-banner">
       <strong>Degraded data sources: </strong>
       {warnings.join(' · ')}
     </div>
@@ -243,48 +167,27 @@ export default function AiCommandCenterDashboard() {
   const tools  = snapshot?.toolUsage;
 
   return (
-    <main
-      style={{
-        background: MEDICAL_THEME.surfacePage,
-        minHeight: '100vh',
-        padding: '24px 28px',
-        fontFamily: 'Inter, system-ui, sans-serif',
-      }}
-    >
+    <main className="ai-cc-page">
       {/* -- Header -- */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          marginBottom: 20,
-          flexWrap: 'wrap',
-          gap: 10,
-        }}
-      >
+      <div className="ai-cc-header">
         <div>
-          <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: MEDICAL_THEME.ink }}>
+          <h1 className="ai-cc-header__title">
             AI Command Center
           </h1>
-          <p style={{ margin: '2px 0 0', fontSize: 13, color: MEDICAL_THEME.inkMuted }}>
+          <p className="ai-cc-header__subtitle">
             Evaluation · Memory · Cost · Expert routing
           </p>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div className="ai-cc-header__actions">
           {health && (
             <span
+              className="ai-cc-header__status"
               style={{
-                fontSize: 12,
-                fontWeight: 700,
-                letterSpacing: '0.06em',
-                textTransform: 'uppercase',
                 color: statusColor[health.status] || MEDICAL_THEME.inkMuted,
                 background: statusColor[health.status]
                   ? `${statusColor[health.status]}18`
                   : MEDICAL_THEME.border,
                 border: `1px solid ${statusColor[health.status] || MEDICAL_THEME.border}`,
-                borderRadius: 20,
-                padding: '4px 12px',
               }}
             >
               {health.label}
@@ -293,14 +196,8 @@ export default function AiCommandCenterDashboard() {
           <button type="button"
             onClick={load}
             disabled={loading}
+            className="ai-cc-header__refresh-btn"
             style={{
-              background: MEDICAL_THEME.accent,
-              color: MEDICAL_THEME.onAccent,
-              border: 'none',
-              borderRadius: 8,
-              padding: '7px 14px',
-              fontSize: 13,
-              fontWeight: 600,
               cursor: loading ? 'not-allowed' : 'pointer',
               opacity: loading ? 0.6 : 1,
             }}
@@ -335,7 +232,7 @@ export default function AiCommandCenterDashboard() {
       ) : (
         <>
           {/* -- Top metrics strip -- */}
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 20 }}>
+          <div className="ai-cc-metrics-strip">
             <MetricTile
               label="Health"
               value={health?.label ?? '—'}
@@ -376,13 +273,7 @@ export default function AiCommandCenterDashboard() {
           </div>
 
           {/* -- Main grid -- */}
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-              gap: 16,
-            }}
-          >
+          <div className="ai-cc-main-grid">
             {/* AI Experts */}
             <SectionCard title={`AI Experts (${AI_EXPERTS.length})`}>
               {(snapshot?.experts ?? AI_EXPERTS).map((expert) => (
@@ -401,33 +292,17 @@ export default function AiCommandCenterDashboard() {
                     { label: 'Recent activity', value: mem.recentActivity },
                     { label: 'Saved workflows', value: mem.savedWorkflows },
                   ].map(({ label, value }) => (
-                    <div
-                      key={label}
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        fontSize: 13,
-                        borderBottom: `1px solid ${MEDICAL_THEME.border}`,
-                        paddingBottom: 8,
-                      }}
-                    >
-                      <span style={{ color: MEDICAL_THEME.inkMuted }}>{label}</span>
-                      <span style={{ fontWeight: 700, color: MEDICAL_THEME.ink }}>{value}</span>
+                    <div key={label} className="ai-cc-kv-row">
+                      <span className="ai-cc-kv-row__label">{label}</span>
+                      <span className="ai-cc-kv-row__value">{value}</span>
                     </div>
                   ))}
-                  <div
-                    style={{
-                      fontSize: 12,
-                      fontWeight: 700,
-                      color: MEDICAL_THEME.accent,
-                      marginTop: 4,
-                    }}
-                  >
+                  <div className="ai-cc-memory-total">
                     {mem.total} total memory entries
                   </div>
                 </div>
               ) : (
-                <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 13 }}>No data</span>
+                <span className="ai-cc-empty-state">No data</span>
               )}
             </SectionCard>
 
@@ -435,50 +310,27 @@ export default function AiCommandCenterDashboard() {
             <SectionCard title="Tool Routing">
               {tools ? (
                 <div className="u-flex-col u-gap-8">
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      fontSize: 13,
-                      marginBottom: 8,
-                    }}
-                  >
-                    <span style={{ color: MEDICAL_THEME.inkMuted }}>Total requests</span>
+                  <div className="ai-cc-tool-summary-row">
+                    <span className="ai-cc-kv-row__label">Total requests</span>
                     <span className="u-fw-700">{tools.totalRequests}</span>
                   </div>
                   {Object.entries(tools.routeCounts).map(([route, count]) => (
-                    <div
-                      key={route}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 8,
-                        fontSize: 13,
-                        borderBottom: `1px solid ${MEDICAL_THEME.border}`,
-                        paddingBottom: 6,
-                      }}
-                    >
-                      <span
-                        style={{
-                          flex: 1,
-                          color: MEDICAL_THEME.inkMuted,
-                          textTransform: 'capitalize',
-                        }}
-                      >
+                    <div key={route} className="ai-cc-tool-route-row">
+                      <span className="ai-cc-tool-route-row__label">
                         {String(route).replace(/_/g, ' ')}
                       </span>
-                      <span style={{ fontWeight: 700, color: MEDICAL_THEME.ink }}>
+                      <span className="ai-cc-kv-row__value">
                         {String(count)}
                       </span>
                     </div>
                   ))}
-                  <div style={{ fontSize: 12, color: MEDICAL_THEME.inkMuted, marginTop: 4 }}>
+                  <div className="ai-cc-tool-success-rate">
                     Success rate:{' '}
-                    <strong style={{ color: MEDICAL_THEME.success }}>{pct(tools.successRate)}</strong>
+                    <strong className="ai-cc-tool-success-value">{pct(tools.successRate)}</strong>
                   </div>
                 </div>
               ) : (
-                <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 13 }}>No data</span>
+                <span className="ai-cc-empty-state">No data</span>
               )}
             </SectionCard>
 
@@ -491,23 +343,14 @@ export default function AiCommandCenterDashboard() {
                     { label: 'Cache hit rate', value: pct(rag.cacheHitRate) },
                     { label: 'Grounded answers', value: String(rag.groundedAnswers) },
                   ].map(({ label, value }) => (
-                    <div
-                      key={label}
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        fontSize: 13,
-                        borderBottom: `1px solid ${MEDICAL_THEME.border}`,
-                        paddingBottom: 8,
-                      }}
-                    >
-                      <span style={{ color: MEDICAL_THEME.inkMuted }}>{label}</span>
-                      <span style={{ fontWeight: 700, color: MEDICAL_THEME.ink }}>{value}</span>
+                    <div key={label} className="ai-cc-kv-row">
+                      <span className="ai-cc-kv-row__label">{label}</span>
+                      <span className="ai-cc-kv-row__value">{value}</span>
                     </div>
                   ))}
                 </div>
               ) : (
-                <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 13 }}>No data</span>
+                <span className="ai-cc-empty-state">No data</span>
               )}
             </SectionCard>
 
@@ -515,19 +358,11 @@ export default function AiCommandCenterDashboard() {
             {snapshot?.auditLogs?.length ? (
               <SectionCard title="Recent Audit">
                 {snapshot.auditLogs.slice(0, 6).map((log: any, i: number) => (
-                  <div
-                    key={i}
-                    style={{
-                      fontSize: 12,
-                      padding: '5px 0',
-                      borderBottom: `1px solid ${MEDICAL_THEME.border}`,
-                      color: MEDICAL_THEME.inkMuted,
-                    }}
-                  >
-                    <strong style={{ color: MEDICAL_THEME.ink }}>{log.action ?? log.type ?? 'Event'}</strong>
+                  <div key={i} className="ai-cc-audit-row">
+                    <strong className="ai-cc-audit-row__action">{log.action ?? log.type ?? 'Event'}</strong>
                     {log.resource && ` · ${log.resource}`}
                     {log.timestamp && (
-                      <span style={{ float: 'right', color: MEDICAL_THEME.inkSubtle }}>
+                      <span className="ai-cc-audit-row__timestamp">
                         {new Date(log.timestamp).toLocaleTimeString()}
                       </span>
                     )}
@@ -540,27 +375,13 @@ export default function AiCommandCenterDashboard() {
             {snapshot?.sourceStatus && (
               <SectionCard title="Data Sources">
                 {Object.entries(snapshot.sourceStatus).map(([source, status]) => (
-                  <div
-                    key={source}
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      fontSize: 13,
-                      padding: '5px 0',
-                      borderBottom: `1px solid ${MEDICAL_THEME.border}`,
-                    }}
-                  >
-                    <span style={{ color: MEDICAL_THEME.inkMuted, textTransform: 'capitalize' }}>
+                  <div key={source} className="ai-cc-source-row">
+                    <span className="ai-cc-source-row__label">
                       {source}
                     </span>
                     <span
-                      style={{
-                        fontWeight: 700,
-                        color: status === 'live' ? MEDICAL_THEME.success : MEDICAL_THEME.warning,
-                        textTransform: 'uppercase',
-                        fontSize: 11,
-                        letterSpacing: '0.06em',
-                      }}
+                      className="ai-cc-source-row__value"
+                      style={{ color: status === 'live' ? MEDICAL_THEME.success : MEDICAL_THEME.warning }}
                     >
                       {String(status)}
                     </span>
@@ -572,14 +393,7 @@ export default function AiCommandCenterDashboard() {
 
           {/* -- Footer -- */}
           {lastRefreshed && (
-            <div
-              style={{
-                marginTop: 20,
-                fontSize: 11,
-                color: MEDICAL_THEME.inkSubtle,
-                textAlign: 'right',
-              }}
-            >
+            <div className="ai-cc-footer">
               Last refreshed {lastRefreshed.toLocaleTimeString()} · auto-refreshes every{' '}
               {AI_COMMAND_CENTER_REFRESH_MS / 1000}s
             </div>

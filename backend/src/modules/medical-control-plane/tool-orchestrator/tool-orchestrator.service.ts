@@ -54,6 +54,8 @@ import { IchScoreService } from './services/ich-score.service';
 import { FourScoreService } from './services/four-score.service';
 import { ModifiedRankinScaleService } from './services/modified-rankin-scale.service';
 import { PecarnHeadService } from './services/pecarn-head.service';
+import { WellsDvtService } from './services/wells-dvt.service';
+import { AbgInterpreterService } from './services/abg-interpreter.service';
 import { ExecuteToolDto, ToolExecutionResponseDto, ToolListDto } from './dto/tool-execution.dto';
 import { ToolResult } from './entities/tool-result.entity';
 import {
@@ -124,6 +126,8 @@ export class ToolOrchestratorService {
     private readonly fourScoreService: FourScoreService,
     private readonly modifiedRankinScaleService: ModifiedRankinScaleService,
     private readonly pecarnHeadService: PecarnHeadService,
+    private readonly wellsDvtService: WellsDvtService,
+    private readonly abgInterpreterService: AbgInterpreterService,
     private readonly auditService: AuditService,
     private readonly toolMetrics: ToolMetricsService,
     @InjectRepository(ToolResult)
@@ -174,6 +178,8 @@ export class ToolOrchestratorService {
     this.registerTool(this.fourScoreService);
     this.registerTool(this.modifiedRankinScaleService);
     this.registerTool(this.pecarnHeadService);
+    this.registerTool(this.wellsDvtService);
+    this.registerTool(this.abgInterpreterService);
 
     this.logger.log(
       `Initialized tool registry with ${Object.keys(this.toolRegistry).length} tools`,

@@ -33,7 +33,7 @@ describe('toolVisibilityMatrix', () => {
     }
   });
 
-  it('documents 37 backend executors on Tier C tools only', () => {
+  it('documents 39 backend executors on Tier C tools only', () => {
     const rows = buildToolVisibilityMatrix();
     const executors = rows.filter((r) => r.backendExecutorExists);
     expect(executors.map((r) => r.canonicalId).sort()).toEqual(
@@ -44,7 +44,7 @@ describe('toolVisibilityMatrix', () => {
         'reynolds-risk-score', 'has-bled', 'timi-ua-nstemi', 'framingham-risk', 'grace-acs',
         'corrected-calcium', 'corrected-sodium', 'fena', 'feurea', 'osmolal-gap', 'serum-osmolality',
         'pao2-fio2-ratio', 'rox-index', 'mews', 'revised-trauma-score', 'hunt-hess-scale', 'ich-score',
-        'four-score', 'modified-rankin-scale', 'pecarn-head',
+        'four-score', 'modified-rankin-scale', 'pecarn-head', 'wells-dvt-calculator', 'abg-interpreter',
       ].sort()
     );
     for (const row of executors) {

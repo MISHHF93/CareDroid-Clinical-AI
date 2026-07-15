@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { TOOL_LAUNCH_PATHS } from '../data/clinicalToolIdContract';
 import { EMERGENCY_PLATFORM_CONTRACT } from './emergencyPlatform.config';
@@ -50,12 +50,8 @@ describe('platform cohesion contract', () => {
     expect(gate).not.toMatch(/hasPermission\(/);
   });
 
-  it('keeps useRolePermissions as a deprecated shim over useSecurityAccess', () => {
-    const hook = readSource('src/hooks/useRolePermissions.ts');
-    expect(hook).toContain('@deprecated');
-    expect(hook).toContain('useSecurityAccess');
-    expect(hook).not.toContain('useCareDroidUser');
-    expect(hook).not.toContain('checkPermission(');
+  it('has fully removed the useRolePermissions compat shim now that every consumer uses useSecurityAccess directly', () => {
+    expect(existsSync(join(repoRoot, 'src/hooks/useRolePermissions.ts'))).toBe(false);
   });
 
   it('keeps UserContext free of inline role-permission maps', () => {

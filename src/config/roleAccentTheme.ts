@@ -11,7 +11,15 @@
  */
 import { EMERGENCY_ROLE_IDS } from './emergencyRolePermissions';
 
-export type RoleAccentGroupId = 'reception' | 'triage' | 'nurse' | 'physician' | 'ems' | 'admin' | 'default';
+export type RoleAccentGroupId =
+  | 'reception'
+  | 'triage'
+  | 'nurse'
+  | 'physician'
+  | 'ems'
+  | 'operations'
+  | 'admin'
+  | 'default';
 
 export type RoleAccentGroupMeta = {
   id: RoleAccentGroupId;
@@ -35,53 +43,71 @@ export const ROLE_ACCENT_GROUPS: Record<EmergencyRoleId, RoleAccentGroupId> = {
   [EMERGENCY_ROLE_IDS.emsCoordinator]: 'ems',
   [EMERGENCY_ROLE_IDS.admin]: 'admin',
   [EMERGENCY_ROLE_IDS.itAdmin]: 'admin',
-  [EMERGENCY_ROLE_IDS.edManager]: 'admin',
+  [EMERGENCY_ROLE_IDS.edManager]: 'operations',
   [EMERGENCY_ROLE_IDS.readOnlyViewer]: 'default',
   [EMERGENCY_ROLE_IDS.publicDisplay]: 'default',
 };
 
+/**
+ * Hex values are the CareDroid Clinical Design System (CCDS) palette swatches:
+ * Reception = Primary Clinical Blue, Physician = Information Blue (a distinct,
+ * brighter blue so the two roles remain visually distinguishable), Triage =
+ * Attention Amber, Nursing = Operational Teal, EMS = a clear green (kept off
+ * the exact Success Green hex so a role accent is never visually identical to
+ * a semantic "healthy" status), Administration = Neutral Gray, Operations =
+ * AI Purple (reused — the CCDS brief names both as "Purple" with no second
+ * hex given). "AI" itself is intentionally not a role-accent group: it isn't
+ * a login role, and AI-specific surfaces already carry this exact purple via
+ * --semantic-ai-assistance (see medical-color-layer.css).
+ */
 export const ROLE_ACCENT_GROUP_META: Record<RoleAccentGroupId, RoleAccentGroupMeta> = {
   reception: {
     id: 'reception',
     label: 'Reception',
-    description: 'Patient flow and registration — canonical medical blue.',
-    accent: '#0284c7',
+    description: 'Patient flow and registration — CCDS Primary Clinical Blue.',
+    accent: '#075985',
   },
   triage: {
     id: 'triage',
     label: 'Triage',
-    description: 'Urgency and acuity — amber, distinct from the warning semantic tone.',
-    accent: '#a35a12',
+    description: 'Urgency and acuity — a deep amber, distinct from the Attention semantic tone.',
+    accent: '#92400e',
   },
   nurse: {
     id: 'nurse',
     label: 'Nursing',
-    description: 'Active patient care — dusty rose.',
-    accent: '#a8456a',
+    description: 'Active patient care — CCDS Operational Teal.',
+    accent: '#0f766e',
   },
   physician: {
     id: 'physician',
     label: 'Physician',
-    description: 'Clinical decision support — desaturated navy.',
-    accent: '#1e3a5f',
+    description: 'Clinical decision support — CCDS Information Blue.',
+    accent: '#175cd3',
   },
   ems: {
     id: 'ems',
     label: 'EMS Command',
-    description: 'Live operational status — cyan.',
-    accent: '#0e7490',
+    description: 'Live operational status — green, kept distinct from the Success semantic tone.',
+    accent: '#16a34a',
+  },
+  operations: {
+    id: 'operations',
+    label: 'Operations',
+    description: 'Hospital operations oversight — CCDS AI Purple (shared with AI surfaces).',
+    accent: '#5925dc',
   },
   admin: {
     id: 'admin',
     label: 'Administration',
-    description: 'Analytics and oversight — slate.',
-    accent: '#475569',
+    description: 'Analytics and oversight — CCDS Neutral Gray.',
+    accent: '#667085',
   },
   default: {
     id: 'default',
     label: 'CareDroid standard',
     description: 'Unassigned roles keep the platform default accent.',
-    accent: '#0ea5e9',
+    accent: '#075985',
   },
 };
 

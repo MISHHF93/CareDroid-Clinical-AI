@@ -43,6 +43,8 @@ export const REGISTERED_EXECUTOR_TOOL_IDS = [
   'four-score',
   'modified-rankin-scale',
   'pecarn-head',
+  'wells-dvt-calculator',
+  'abg-interpreter',
 ] as const;
 
 export type RegisteredExecutorToolId = (typeof REGISTERED_EXECUTOR_TOOL_IDS)[number];
@@ -89,6 +91,12 @@ export const EXECUTOR_ID_ALIASES: Readonly<Record<string, RegisteredExecutorTool
   'duke-treadmill': 'duke-treadmill-score',
   reynolds: 'reynolds-risk-score',
   'chads2-score': 'chads2',
+  'wells-dvt': 'wells-dvt-calculator',
+  'wells-dvt-score': 'wells-dvt-calculator',
+  'dvt-wells': 'wells-dvt-calculator',
+  abg: 'abg-interpreter',
+  'blood-gas-interpreter': 'abg-interpreter',
+  'arterial-blood-gas': 'abg-interpreter',
 };
 
 /** Legacy LLM function names retained only for old tool_use payload normalization. */
@@ -143,6 +151,8 @@ export const REGISTRY_ID_TO_EXECUTOR_TOOL_ID: Readonly<Record<string, Registered
   'four-score': 'four-score',
   'modified-rankin-scale': 'modified-rankin-scale',
   'pecarn-head': 'pecarn-head',
+  'wells-dvt-calculator': 'wells-dvt-calculator',
+  'abg-interpreter': 'abg-interpreter',
 };
 
 export enum ToolExecutionErrorCode {
@@ -158,7 +168,6 @@ export enum ToolExecutionErrorCode {
  * Used for structured UNSUPPORTED_TOOL responses (not fake executors).
  */
 export const NLU_TOOL_IDS_WITHOUT_EXECUTOR = [
-  'abg-interpreter',
   'acls-protocol',
   'acs-workflow-assistant',
   'adjusted-body-weight',
@@ -339,7 +348,6 @@ export const NLU_TOOL_IDS_WITHOUT_EXECUTOR = [
   'ventilator-support-assistant',
   'vertigo-hints-assistant',
   'waist-hip-ratio',
-  'wells-dvt-calculator',
 ] as const;
 
 export interface ExecutorRequestContract {
@@ -538,6 +546,19 @@ export const EXECUTOR_PARAMETER_ALIASES: Readonly<
     severe_mechanism: 'severeMechanism',
     skull_fracture_signs: 'skullFractureSigns',
   },
+  'wells-dvt-calculator': {
+    active_cancer: 'activeCancer',
+    paralysis_paresis_immobilization: 'paralysisParesisImmobilization',
+    recently_bedridden_or_surgery: 'recentlyBedriddenOrSurgery',
+    localized_tenderness: 'localizedTenderness',
+    entire_leg_swollen: 'entireLegSwollen',
+    calf_swelling_over_3cm: 'calfSwellingOver3cm',
+    pitting_edema: 'pittingEdema',
+    collateral_superficial_veins: 'collateralSuperficialVeins',
+    previous_dvt: 'previousDvt',
+    alternative_diagnosis_as_likely: 'alternativeDiagnosisAsLikely',
+  },
+  'abg-interpreter': {},
 };
 
 /** Request/response contracts for registered executors (documentation + validation hints). */
@@ -953,6 +974,37 @@ export const EXECUTOR_REQUEST_CONTRACTS: Readonly<
       'skullFractureSigns',
     ],
     responseDataKeys: ['ruleCriteriaMet', 'riskStratum', 'triggeredCriteria', 'severity'],
+    deterministic: true,
+  },
+  'wells-dvt-calculator': {
+    toolId: 'wells-dvt-calculator',
+    requiredParameters: [
+      'activeCancer',
+      'paralysisParesisImmobilization',
+      'recentlyBedriddenOrSurgery',
+      'localizedTenderness',
+      'entireLegSwollen',
+      'calfSwellingOver3cm',
+      'pittingEdema',
+      'collateralSuperficialVeins',
+      'previousDvt',
+      'alternativeDiagnosisAsLikely',
+    ],
+    optionalParameters: [],
+    responseDataKeys: ['score', 'breakdown', 'probabilityBand'],
+    deterministic: true,
+  },
+  'abg-interpreter': {
+    toolId: 'abg-interpreter',
+    requiredParameters: ['pH', 'paco2', 'hco3'],
+    optionalParameters: ['sodium', 'chloride', 'pao2', 'fio2'],
+    responseDataKeys: [
+      'primaryDisorder',
+      'primaryDisorderLabel',
+      'compensation',
+      'anionGap',
+      'oxygenation',
+    ],
     deterministic: true,
   },
 };

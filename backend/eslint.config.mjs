@@ -29,6 +29,9 @@ export default [
     ignores: ['dist/**', 'node_modules/**', '.eslintrc.js'],
   },
   {
+    linterOptions: { reportUnusedDisableDirectives: 'error' },
+  },
+  {
     files: ['src/**/*.ts', 'test/**/*.ts'],
     languageOptions: {
       parser: tsParser,
@@ -52,6 +55,16 @@ export default [
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-require-imports': 'warn',
+      '@typescript-eslint/ban-ts-comment': [
+        'error',
+        {
+          'ts-ignore': true,
+          'ts-nocheck': true,
+          'ts-check': false,
+          'ts-expect-error': 'allow-with-description',
+          minimumDescriptionLength: 10,
+        },
+      ],
       '@typescript-eslint/no-unused-vars': [
         'warn',
         {

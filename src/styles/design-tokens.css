@@ -230,7 +230,7 @@
   --component-inner-shadow: var(--app-elevation-none);
   --component-button-radius: var(--app-radius-md);
   --component-button-height: var(--app-button-height);
-  --component-button-primary-bg: var(--app-accent-action, #374151);
+  --component-button-primary-bg: var(--app-accent-action, var(--app-accent-interactive));
   --component-button-primary-fg: var(--app-on-solid);
   --component-button-secondary-bg: var(--app-surface-raised);
   --component-button-secondary-fg: var(--app-text-primary);

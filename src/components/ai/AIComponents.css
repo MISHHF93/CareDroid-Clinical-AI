@@ -30,9 +30,9 @@
 }
 
 .cd-ai-maturity--deterministic {
-  background: color-mix(in srgb, #64748b 10%, #fff);
-  border-color: color-mix(in srgb, #64748b 30%, transparent);
-  color: #475569;
+  background: color-mix(in srgb, #0ea5e9 10%, #fff);
+  border-color: color-mix(in srgb, #0ea5e9 30%, transparent);
+  color: #0369a1;
 }
 
 .cd-ai-maturity--measured {
@@ -114,7 +114,7 @@
 
 .cd-ai-panel__header p,
 .cd-ai-card__title p {
-  color: #374151;
+  color: var(--medical-text-link, #0369a1);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -137,10 +137,10 @@
 
 .cd-ai-panel__header strong {
   align-items: center;
-  background: color-mix(in srgb, var(--app-accent-action, #64748b) 12%, #ffffff);
-  border: 1px solid color-mix(in srgb, var(--app-accent-action, #64748b) 30%, #ffffff);
+  background: color-mix(in srgb, var(--app-accent-action, #0ea5e9) 12%, #ffffff);
+  border: 1px solid color-mix(in srgb, var(--app-accent-action, #0ea5e9) 30%, #ffffff);
   border-radius: 999px;
-  color: #374151;
+  color: var(--medical-text-link, #0369a1);
   display: inline-flex;
   font-size: 12px;
   justify-content: center;
@@ -317,8 +317,8 @@
 }
 
 .cd-ai-card__next {
-  background: color-mix(in srgb, var(--app-accent-action, #64748b) 8%, #ffffff);
-  color: #374151;
+  background: color-mix(in srgb, var(--app-accent-action, #0ea5e9) 8%, #ffffff);
+  color: var(--medical-text-link, #0369a1);
   padding: 10px;
 }
 

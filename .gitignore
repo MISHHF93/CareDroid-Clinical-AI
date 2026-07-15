@@ -71,3 +71,6 @@ pages-map.txt
 bug-inventory-report.json
 source-dirt-report.json
 
+# Tesseract.js OCR language data (auto-downloaded at runtime, machine-local, safe to regenerate)
+backend/*.traineddata
+

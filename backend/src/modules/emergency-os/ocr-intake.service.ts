@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, OnModuleDestroy } from '@nestjs/common';
 import { resolveArtifactId } from '../../../../src/config/intakeArtifactRegistry';
 import { createOcrProvider } from './ocr-providers';
 import { PatientDocumentArtifactService } from './patient-document-artifact.service';
@@ -57,12 +57,19 @@ function referralSourceType(
 }
 
 @Injectable()
-export class OcrIntakeService {
+export class OcrIntakeService implements OnModuleDestroy {
   private readonly jobs = new Map<string, OcrJob>();
   private readonly provider: OcrProvider = createOcrProvider();
   private recentOutcomes: boolean[] = [];
 
   constructor(private readonly documentArtifactService: PatientDocumentArtifactService) {}
+
+  /** Releases the OCR provider's resources (e.g. a live Tesseract worker) on
+   * app shutdown, so the process can exit cleanly instead of hanging on an
+   * open worker thread. */
+  async onModuleDestroy(): Promise<void> {
+    await this.provider.terminate?.();
+  }
 
   async createJob(input: CreateOcrJobInput): Promise<OcrJob> {
     const documentType = resolveArtifactId(input.documentTypeHint, input.filename, input.mimeType);

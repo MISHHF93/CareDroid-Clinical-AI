@@ -1,6 +1,8 @@
 /**
- * Layer 0 — CareDroid Clinical Design Language (CDL) palette.
- * Neutral slate structure + sky-blue clinical accent. Every layer references these primitives.
+ * Layer 0 — CareDroid Clinical Design System (CCDS) palette.
+ * Calm Medical Light Theme: neutral canvas/surface structure + a clinical-blue accent.
+ * Every layer references these primitives — see docs/design/ccds-palette.md for the
+ * source specification this file implements.
  */
 :root {
   /* —— Clinical neutrals (structure, not decoration) —— */
@@ -13,32 +15,37 @@
   --medical-slate-600: #475569;
   --medical-slate-700: #334155;
 
-  /* —— Clinical accent (sky — trust, clarity, action) —— */
-  --medical-sky-50: #f0f9ff;
-  --medical-sky-100: #e0f2fe;
-  --medical-sky-200: #bae6fd;
-  --medical-sky-300: #cbd5e1;
-  --medical-sky-400: #94a3b8;
-  --medical-sky-500: #64748b;
-  --medical-sky-600: #475569;
-  --medical-sky-700: #475569;
+  /* —— Clinical accent (Primary Clinical Blue — trust, clarity, action) —— */
+  --medical-sky-50: #eff7fb;
+  --medical-sky-100: #dceef5;
+  --medical-sky-200: #b9ddeb;
+  --medical-sky-300: #7fc0da;
+  --medical-sky-400: #3d96ba;
+  --medical-sky-500: #0f7ca3;
+  --medical-sky-600: #075985;
+  --medical-sky-700: #054364;
 
+  /* —— CCDS surfaces: Canvas (page) vs Primary/Secondary Surface (cards/panels) —— */
+  --medical-canvas: #f6f9fc;
   --medical-white: #ffffff;
-  --medical-ink: #111827;
-  --medical-ink-muted: #64748b;
+  --medical-ink: #102a43;
+  --medical-ink-secondary: #334e68;
+  --medical-ink-muted: #627d98;
   --medical-ink-subtle: #94a3b8;
-  --medical-border: var(--medical-slate-200);
-  --medical-border-strong: var(--medical-slate-300);
-  --medical-accent: var(--medical-sky-500);
-  --medical-accent-hover: var(--medical-sky-600);
+  --medical-neutral: #667085;
+  --medical-focus: #facc15;
+  --medical-border: #cbd5e1;
+  --medical-border-strong: #94a3b8;
+  --medical-accent: var(--medical-sky-600);
+  --medical-accent-hover: var(--medical-sky-700);
   --medical-accent-soft: var(--medical-sky-400);
-  --medical-surface-page: var(--medical-white);
-  --medical-surface-muted: var(--medical-slate-100);
+  --medical-surface-page: var(--medical-canvas);
+  --medical-surface-muted: #eef4f7;
   --medical-surface-card: var(--medical-white);
-  --medical-surface-inset: var(--medical-slate-100);
+  --medical-surface-inset: #eef4f7;
   --medical-shadow-soft: 0 4px 14px rgba(15, 23, 42, 0.06);
   --medical-shadow-lift: 0 12px 32px rgba(15, 23, 42, 0.08);
-  --medical-accent-tint: rgba(100, 116, 139, 0.1);
+  --medical-accent-tint: rgba(7, 89, 133, 0.1);
   --medical-accent-tint-faint: color-mix(in srgb, var(--medical-accent) 5%, transparent);
   --medical-accent-tint-subtle: color-mix(in srgb, var(--medical-accent) 8%, transparent);
   --medical-accent-tint-mid: color-mix(in srgb, var(--medical-accent) 12%, transparent);
@@ -46,7 +53,7 @@
   --medical-accent-ring: color-mix(in srgb, var(--medical-accent) 20%, transparent);
   --medical-accent-ring-strong: color-mix(in srgb, var(--medical-accent) 35%, transparent);
   --medical-accent-ring-bold: color-mix(in srgb, var(--medical-accent) 42%, transparent);
-  --medical-accent-border: rgba(100, 116, 139, 0.32);
+  --medical-accent-border: rgba(7, 89, 133, 0.32);
   --medical-danger-fg: var(--semantic-critical);
   --medical-danger-bg: var(--semantic-critical-bg);
   --medical-danger-border: var(--semantic-critical-border);
@@ -62,34 +69,34 @@
   --nav-item-active-border: var(--medical-accent);
 
   /* —— Semantic operational colors — clinical meaning only —— */
-  --semantic-critical: #b91c1c;
+  --semantic-critical: #b42318;
   --semantic-critical-bg: #fef2f2;
   --semantic-urgent: #c2410c;
   --semantic-urgent-bg: #fff7ed;
-  --semantic-attention: #b45309;
+  --semantic-attention: #b54708;
   --semantic-attention-bg: #fffbeb;
-  --semantic-healthy: #15803d;
+  --semantic-healthy: #027a48;
   --semantic-healthy-bg: #ecfdf5;
-  --semantic-information: #475569;
-  --semantic-information-bg: rgba(100, 116, 139, 0.1);
-  --semantic-inactive: #64748b;
+  --semantic-information: #175cd3;
+  --semantic-information-bg: rgba(23, 92, 211, 0.1);
+  --semantic-inactive: #667085;
   --semantic-inactive-bg: var(--medical-slate-100);
   --semantic-inactive-border: var(--medical-border);
-  --semantic-critical-border: #991b1b;
+  --semantic-critical-border: #912018;
   --semantic-urgent-border: #c2410c;
-  --semantic-attention-border: #b45309;
-  --semantic-healthy-border: #166534;
-  --semantic-information-border: rgba(100, 116, 139, 0.4);
+  --semantic-attention-border: #b54708;
+  --semantic-healthy-border: #05603a;
+  --semantic-information-border: rgba(23, 92, 211, 0.4);
   --semantic-warning: var(--semantic-attention);
   --semantic-warning-bg: var(--semantic-attention-bg);
   --semantic-warning-border: var(--semantic-attention-border);
-  --semantic-ai-assistance: #6366f1;
-  --semantic-ai-assistance-bg: #eef2ff;
-  --semantic-ai-assistance-border: #4f46e5;
-  --semantic-operational-status: #0891b2;
-  --semantic-operational-status-bg: #ecfeff;
-  --semantic-operational-status-border: #0e7490;
-  --semantic-infrastructure-health: #475569;
+  --semantic-ai-assistance: #5925dc;
+  --semantic-ai-assistance-bg: #f2ecfd;
+  --semantic-ai-assistance-border: #4a1fb8;
+  --semantic-operational-status: #0f766e;
+  --semantic-operational-status-bg: #ecfdf9;
+  --semantic-operational-status-border: #0f766e;
+  --semantic-infrastructure-health: #667085;
   --semantic-infrastructure-health-bg: #f1f5f9;
   --semantic-infrastructure-health-border: #64748b;
 }

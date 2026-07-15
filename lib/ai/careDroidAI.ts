@@ -975,6 +975,7 @@ function logCareDroidAIEvent(request: unknown, response: CareDroidAIResponse): v
             nextActionCount: response.nextActions.length,
           }),
         ),
+        model: response.provenance?.modelOrEngine,
         safety: {
           requiresHumanReview: response.requiresClinicianReview,
           blocked: response.status === 'error',

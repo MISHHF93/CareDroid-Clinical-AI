@@ -45,6 +45,8 @@ import { IchScoreService } from '../src/modules/medical-control-plane/tool-orche
 import { FourScoreService } from '../src/modules/medical-control-plane/tool-orchestrator/services/four-score.service';
 import { ModifiedRankinScaleService } from '../src/modules/medical-control-plane/tool-orchestrator/services/modified-rankin-scale.service';
 import { PecarnHeadService } from '../src/modules/medical-control-plane/tool-orchestrator/services/pecarn-head.service';
+import { WellsDvtService } from '../src/modules/medical-control-plane/tool-orchestrator/services/wells-dvt.service';
+import { AbgInterpreterService } from '../src/modules/medical-control-plane/tool-orchestrator/services/abg-interpreter.service';
 import { AuditService } from '../src/modules/audit/audit.service';
 import { AIService } from '../src/modules/ai/ai.service';
 import { ToolMetricsService } from '../src/modules/metrics/tool-metrics.service';
@@ -116,6 +118,8 @@ describe('ToolOrchestratorService', () => {
         FourScoreService,
         ModifiedRankinScaleService,
         PecarnHeadService,
+        WellsDvtService,
+        AbgInterpreterService,
         {
           provide: AuditService,
           useValue: mockAuditService,
@@ -151,10 +155,10 @@ describe('ToolOrchestratorService', () => {
   });
 
   describe('Tool Registry', () => {
-    it('should register all thirty-seven tools on initialization', () => {
+    it('should register all thirty-nine tools on initialization', () => {
       const tools = service.listAvailableTools();
-      expect(tools.count).toBe(37);
-      expect(tools.tools.length).toBe(37);
+      expect(tools.count).toBe(39);
+      expect(tools.tools.length).toBe(39);
     });
 
     it('should have SOFA calculator in registry', () => {
@@ -367,6 +371,47 @@ describe('ToolOrchestratorService', () => {
 
       expect(result.success).toBe(true);
       expect(result.toolId).toBe('lab-interpreter');
+    });
+
+    it('should execute Wells DVT calculator with a hand-computed score', async () => {
+      const result = await service.executeTool({
+        toolId: 'wells-dvt-calculator',
+        parameters: {
+          activeCancer: false,
+          paralysisParesisImmobilization: false,
+          recentlyBedriddenOrSurgery: false,
+          localizedTenderness: true,
+          entireLegSwollen: true,
+          calfSwellingOver3cm: false,
+          pittingEdema: false,
+          collateralSuperficialVeins: false,
+          previousDvt: true,
+          alternativeDiagnosisAsLikely: false,
+        },
+        userId: 'test-user',
+        conversationId: 'test-conv',
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.toolId).toBe('wells-dvt-calculator');
+      expect(result.result.data.score).toBe(3);
+      expect(result.result.data.probabilityBand).toBe('DVT likely');
+    });
+
+    it('should execute ABG interpreter with a hand-computed compensated metabolic acidosis', async () => {
+      const result = await service.executeTool({
+        toolId: 'abg-interpreter',
+        parameters: { pH: 7.28, paco2: 30, hco3: 14, sodium: 138, chloride: 100 },
+        userId: 'test-user',
+        conversationId: 'test-conv',
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.toolId).toBe('abg-interpreter');
+      expect(result.result.data.primaryDisorder).toBe('metabolic_acidosis');
+      expect(result.result.data.compensation.assessment).toContain('appropriate');
+      expect(result.result.data.anionGap.anionGap).toBe(24);
+      expect(result.result.data.anionGap.category).toBe('high_anion_gap');
     });
 
     it('should include execution time', async () => {
@@ -586,7 +631,7 @@ describe('ToolOrchestratorService', () => {
     it('should return tool statistics', () => {
       const stats = service.getToolStatistics();
 
-      expect(stats.totalTools).toBe(37);
+      expect(stats.totalTools).toBe(39);
       expect(stats.toolsByCategory).toBeDefined();
       expect(stats.tools).toBeDefined();
     });
@@ -650,6 +695,8 @@ describe('ToolOrchestratorService', () => {
         'four-score': 'four-score',
         'modified-rankin-scale': 'modified-rankin-scale',
         'pecarn-head': 'pecarn-head',
+        'wells-dvt-calculator': 'wells-dvt-calculator',
+        'abg-interpreter': 'abg-interpreter',
       });
     });
   });
