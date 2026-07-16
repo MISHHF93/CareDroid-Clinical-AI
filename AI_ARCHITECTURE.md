@@ -192,6 +192,10 @@ Audit / human-review / realtime status
 | Workspace UI | `src/components/interactive-ai/InteractiveAIWorkspace.tsx` |
 | EMS panel | `src/components/interactive-ai/EmsInteractiveAssistPanel.tsx` |
 | Reception mount | `src/pages/emergency/ReceptionWorkspace.tsx` (sidebar) |
+| EMS mount | `src/components/EMSPipeline.tsx` |
+| Triage mount | `src/features/triage-queue/TriageQueueFeature.tsx` |
+| Interaction inbox | `src/components/interactive-ai/InteractionInbox.tsx` |
+| Proposal API | `POST/GET /api/ai/proposals`, approve/reject/execute/rollback |
 
 Realtime: SSE preferred via existing `emergencyRealtimeService` multiplexer; interactive client adds sequence/dedupe/stale rejection; polling fallback when SSE fails. WebSockets reserved for bidirectional coordination.
 

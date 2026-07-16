@@ -18,6 +18,7 @@ import {
   AiResponseComposerService,
   AiRoutingEngineService,
 } from './foundation';
+import { AiActionProposalService } from './ai-action-proposal.service';
 
 @Module({
   imports: [
@@ -34,10 +35,17 @@ import {
   controllers: [AIController],
   providers: [
     AIService,
+    AiActionProposalService,
     AiRoutingEngineService,
     AiContextManagerService,
     AiResponseComposerService,
   ],
-  exports: [AIService, AiRoutingEngineService, AiContextManagerService, AiResponseComposerService],
+  exports: [
+    AIService,
+    AiActionProposalService,
+    AiRoutingEngineService,
+    AiContextManagerService,
+    AiResponseComposerService,
+  ],
 })
 export class AiModule {}

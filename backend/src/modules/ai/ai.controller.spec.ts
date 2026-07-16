@@ -35,15 +35,26 @@ describe('AIController organization usage', () => {
     const entitlementService = {
       assertLaunchAllowed: jest.fn().mockResolvedValue({ isLaunchable: true }),
     };
+    const actionProposals = {
+      create: jest.fn().mockReturnValue({ proposalId: 'p1', state: 'proposed' }),
+      list: jest.fn().mockReturnValue([]),
+      get: jest.fn().mockReturnValue({ proposalId: 'p1' }),
+      approve: jest.fn().mockReturnValue({ proposalId: 'p1', state: 'approved' }),
+      reject: jest.fn().mockReturnValue({ proposalId: 'p1', state: 'rejected' }),
+      execute: jest.fn().mockReturnValue({ proposalId: 'p1', state: 'completed' }),
+      transition: jest.fn().mockReturnValue({ proposalId: 'p1', state: 'rolled_back' }),
+    };
     return {
       controller: new AIController(
         aiService as any,
         organizationsService as any,
         entitlementService as any,
+        actionProposals as any,
       ),
       aiService,
       organizationsService,
       entitlementService,
+      actionProposals,
     };
   };
 
@@ -108,6 +119,24 @@ describe('AIController organization usage', () => {
         workspaceId: 'workspace-1',
         role: 'physician',
       }),
+    );
+  });
+
+  it('creates and lists AI action proposals', async () => {
+    const { controller, actionProposals, entitlementService } = buildController();
+    await controller.createProposal(tenantReq, {
+      originatingRequestId: 'req-1',
+      correlationId: 'corr-1',
+      toolName: 'prepare_ems_handoff_draft',
+      expectedEffect: 'Draft only',
+      previewSummary: 'No chart write',
+      riskLevel: 'moderate',
+    });
+    expect(entitlementService.assertLaunchAllowed).toHaveBeenCalled();
+    expect(actionProposals.create).toHaveBeenCalled();
+    await controller.listProposals(tenantReq, undefined, '1');
+    expect(actionProposals.list).toHaveBeenCalledWith(
+      expect.objectContaining({ organizationId: 'org-1', ownerUserId: 'user-1' }),
     );
   });
 

@@ -33,6 +33,8 @@ import { getSuggestedPrompts } from '../../services/interactiveAi/suggestedPromp
 import { resolveUnifiedChannelFromRole } from '../../services/unifiedAiEnvelope';
 import { AccountableRecommendationCard } from '../ai/AccountableRecommendationCard';
 import type { AccountableRecommendation } from '../../contracts/accountableAi';
+import { InteractionInbox } from './InteractionInbox';
+import { getActionProposal } from '../../services/interactiveAi/actionProposalService';
 import './interactiveAi.css';
 
 export type InteractiveAIWorkspaceProps = {
@@ -71,6 +73,8 @@ export function InteractiveAIWorkspace({
   const [suggestions, setSuggestions] = useState<SuggestedPrompt[]>([]);
   const [realtime, setRealtime] = useState<RealtimeConnectionStatus | null>(null);
   const [statusMessage, setStatusMessage] = useState('');
+  const [showInbox, setShowInbox] = useState(true);
+  const [inboxTick, setInboxTick] = useState(0);
   const abortRef = useRef<AbortController | null>(null);
   const liveRegionRef = useRef<HTMLDivElement | null>(null);
 
@@ -180,6 +184,7 @@ export function InteractiveAIWorkspace({
         if (result.progress.length) {
           setProgress(result.progress[result.progress.length - 1]);
         }
+        setInboxTick((n) => n + 1);
         announce(isTerminalStreamState(result.finalState) ? streamStateLabel(result.finalState) : 'Updated');
       } finally {
         setLoading(false);
@@ -204,6 +209,7 @@ export function InteractiveAIWorkspace({
         note: 'Draft stored for review — no chart write performed.',
       }));
       setProposal(executed);
+      setInboxTick((n) => n + 1);
       announce(`Proposal ${executed.state}`);
     } catch (error) {
       announce(error instanceof Error ? error.message : 'Proposal failed');
@@ -215,6 +221,7 @@ export function InteractiveAIWorkspace({
     try {
       const next = rejectProposal(proposal.proposalId, 'User rejected after preview');
       setProposal(next);
+      setInboxTick((n) => n + 1);
       announce('Proposal rejected');
     } catch (error) {
       announce(error instanceof Error ? error.message : 'Reject failed');
@@ -226,6 +233,7 @@ export function InteractiveAIWorkspace({
     try {
       const next = rollbackProposal(proposal.proposalId);
       setProposal(next);
+      setInboxTick((n) => n + 1);
       announce('Proposal rolled back');
     } catch (error) {
       announce(error instanceof Error ? error.message : 'Rollback failed');
@@ -259,16 +267,43 @@ export function InteractiveAIWorkspace({
           <span className="cd-iaw__ai-mark" aria-hidden="true" />
           {heading}
         </h2>
-        <div
-          className="cd-iaw__realtime"
-          data-live={realtime && !realtime.isStale && realtime.status === 'connected' ? 'true' : 'false'}
-          data-testid="interactive-realtime-status"
-        >
-          {realtime
-            ? `${realtime.status} · ${realtime.mode}${realtime.isStale ? ' · stale' : ''}`
-            : 'realtime idle'}
+        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+          <button
+            type="button"
+            className="cd-iaw__suggestion"
+            aria-pressed={showInbox}
+            onClick={() => setShowInbox((v) => !v)}
+          >
+            Inbox
+          </button>
+          <div
+            className="cd-iaw__realtime"
+            data-live={realtime && !realtime.isStale && realtime.status === 'connected' ? 'true' : 'false'}
+            data-testid="interactive-realtime-status"
+          >
+            {realtime
+              ? `${realtime.status} · ${realtime.mode}${realtime.isStale ? ' · stale' : ''}`
+              : 'realtime idle'}
+          </div>
         </div>
       </header>
+
+      {showInbox ? (
+        <InteractionInbox
+          key={inboxTick}
+          ownerUserId={userId}
+          ownerRole={role}
+          channel={channel}
+          onOpenItem={(item) => {
+            if (item.kind === 'proposal' || item.kind === 'failed_action' || item.kind === 'draft') {
+              const p = getActionProposal(item.sourceId);
+              if (p) setProposal(p);
+            }
+            if (item.summary) setInput(item.summary);
+            announce(`Opened inbox item: ${item.title}`);
+          }}
+        />
+      ) : null}
 
       <div className="cd-iaw__context-bar" data-testid="interactive-context-bar" aria-label="Attached context">
         {contextChips.map((chip) => (

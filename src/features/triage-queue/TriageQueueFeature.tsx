@@ -8,6 +8,7 @@ import { AIInsightPanel } from '../../components/ai';
 import { useCareDroidAI } from '../../hooks/useCareDroidAI';
 import type { Patient } from '../../types/emergency';
 import type { CareDroidAIRequest } from '../../../lib/ai/careDroidAI';
+import { TriageInteractiveAssistPanel } from '../../components/interactive-ai/TriageInteractiveAssistPanel';
 import './TriageQueueFeature.css';
 
 const FILTERS = [
@@ -27,6 +28,7 @@ export function TriageQueueFeature({ onSelectPatient }: TriageQueueFeatureProps)
   const [filter, setFilter] = useState<string | null>(null);
   const { patients, allWaiting, criticalCount, activeAlerts } = useTriageQueue(filter);
   const setSelected = useEmergencyStore((s) => s.selectPatient);
+  const selectedPatientId = useEmergencyStore((s) => s.selectedPatientId);
 
   const filterCounts = useMemo(() => {
     const counts = new Map<string, number>();
@@ -121,6 +123,13 @@ export function TriageQueueFeature({ onSelectPatient }: TriageQueueFeatureProps)
         error={queueAiError}
         emptyMessage="Queue insight will appear when live queue data is available."
       />
+
+      <div className="cd-triage-queue__interactive-ai" style={{ margin: '0.75rem 0' }}>
+        <TriageInteractiveAssistPanel
+          patientId={selectedPatientId || undefined}
+          hasUnresolvedAlert={activeAlerts.length > 0}
+        />
+      </div>
 
       <div className="cd-triage-queue__list">
         <QueueList patients={patients} onSelect={handleSelect} />

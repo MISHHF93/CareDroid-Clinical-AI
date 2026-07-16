@@ -18,6 +18,10 @@ import {
   StructuredJSONDto,
   UnifiedAiQueryDto,
 } from './dto/ai.dto';
+import {
+  AiActionProposalService,
+  type AiActionProposalState,
+} from './ai-action-proposal.service';
 import { OrganizationsService } from '../organizations/organizations.service';
 import { Permission } from '../auth/enums/permission.enum';
 import { TenantIsolationGuard } from '../tenant-context/tenant-isolation.guard';
@@ -52,6 +56,7 @@ export class AIController {
     private readonly aiService: AIService,
     private readonly organizationsService: OrganizationsService,
     private readonly entitlementService: EntitlementService,
+    private readonly actionProposals: AiActionProposalService,
   ) {}
 
   @Post('query')
@@ -120,6 +125,111 @@ export class AIController {
       role: req.tenantContext?.role || dto.role,
       subscriptionPlan: req.tenantContext?.subscriptionPlan,
     });
+  }
+
+  @Post('proposals')
+  @WorkspaceScoped({ permissions: [Permission.USE_AI_CHAT] })
+  @ApiOperation({ summary: 'Create an AI action proposal (preview before execute)' })
+  async createProposal(@Req() req: any, @Body() body: Record<string, unknown>) {
+    await this.assertAiFeatureAllowed(req, { assetId: 'agent-clinical' });
+    return this.actionProposals.create({
+      organizationId: req.tenantContext?.organizationId || (body.organizationId as string),
+      originatingRequestId: String(body.originatingRequestId || body.requestId || 'unknown'),
+      correlationId: String(body.correlationId || body.originatingRequestId || 'unknown'),
+      sessionId: body.sessionId ? String(body.sessionId) : undefined,
+      patientId: body.patientId ? String(body.patientId) : undefined,
+      toolName: String(body.toolName || 'unknown_tool'),
+      validatedArguments:
+        body.validatedArguments && typeof body.validatedArguments === 'object'
+          ? (body.validatedArguments as Record<string, unknown>)
+          : {},
+      expectedEffect: String(body.expectedEffect || 'No effect described'),
+      riskLevel: (body.riskLevel as any) || 'moderate',
+      requiredPermission: body.requiredPermission
+        ? String(body.requiredPermission)
+        : 'use_ai_chat',
+      requiresApproval:
+        typeof body.requiresApproval === 'boolean' ? body.requiresApproval : undefined,
+      previewSummary: String(body.previewSummary || body.expectedEffect || 'Preview required'),
+      dataWillChange: Array.isArray(body.dataWillChange)
+        ? body.dataWillChange.map(String)
+        : [],
+      model: body.model ? String(body.model) : undefined,
+      promptVersion: body.promptVersion ? String(body.promptVersion) : undefined,
+      rollbackCapable: Boolean(body.rollbackCapable),
+      reversibleWindowMs:
+        typeof body.reversibleWindowMs === 'number' ? body.reversibleWindowMs : 15 * 60 * 1000,
+      ownerUserId: req.user?.id,
+      ownerRole: req.tenantContext?.role || (body.ownerRole as string),
+    });
+  }
+
+  @Get('proposals')
+  @WorkspaceScoped({ permissions: [Permission.USE_AI_CHAT] })
+  @ApiOperation({ summary: 'List AI action proposals for the active tenant/user' })
+  async listProposals(
+    @Req() req: any,
+    @Query('state') state?: string,
+    @Query('mine') mine?: string,
+  ) {
+    return {
+      items: this.actionProposals.list({
+        organizationId: req.tenantContext?.organizationId,
+        ownerUserId: mine === '1' || mine === 'true' ? req.user?.id : undefined,
+        state: state as AiActionProposalState | undefined,
+      }),
+    };
+  }
+
+  @Get('proposals/:proposalId')
+  @WorkspaceScoped({ permissions: [Permission.USE_AI_CHAT] })
+  @ApiOperation({ summary: 'Get one AI action proposal' })
+  async getProposal(@Param('proposalId') proposalId: string) {
+    return this.actionProposals.get(proposalId);
+  }
+
+  @Post('proposals/:proposalId/approve')
+  @WorkspaceScoped({ permissions: [Permission.USE_AI_CHAT] })
+  @ApiOperation({ summary: 'Approve an AI action proposal' })
+  async approveProposal(@Req() req: any, @Param('proposalId') proposalId: string) {
+    return this.actionProposals.approve(proposalId, req.user?.id);
+  }
+
+  @Post('proposals/:proposalId/reject')
+  @WorkspaceScoped({ permissions: [Permission.USE_AI_CHAT] })
+  @ApiOperation({ summary: 'Reject an AI action proposal' })
+  async rejectProposal(
+    @Param('proposalId') proposalId: string,
+    @Body() body: Record<string, unknown>,
+  ) {
+    return this.actionProposals.reject(
+      proposalId,
+      String(body.reason || body.rejectionReason || 'Rejected by user'),
+    );
+  }
+
+  @Post('proposals/:proposalId/execute')
+  @WorkspaceScoped({ permissions: [Permission.USE_AI_CHAT] })
+  @ApiOperation({
+    summary: 'Execute an approved AI action proposal (records draft outcome; no silent chart writes)',
+  })
+  async executeProposal(
+    @Param('proposalId') proposalId: string,
+    @Body() body: Record<string, unknown>,
+  ) {
+    return this.actionProposals.execute(
+      proposalId,
+      body.result && typeof body.result === 'object'
+        ? (body.result as Record<string, unknown>)
+        : undefined,
+    );
+  }
+
+  @Post('proposals/:proposalId/rollback')
+  @WorkspaceScoped({ permissions: [Permission.USE_AI_CHAT] })
+  @ApiOperation({ summary: 'Rollback a completed reversible proposal within the window' })
+  async rollbackProposal(@Param('proposalId') proposalId: string) {
+    return this.actionProposals.transition(proposalId, 'rolled_back');
   }
 
   @Get('usage')

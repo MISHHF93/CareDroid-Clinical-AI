@@ -302,6 +302,90 @@
   color: var(--semantic-danger, #dc2626);
 }
 
+.cd-iaw-inbox {
+  border: 1px solid var(--medical-border, #e2e8f0);
+  border-radius: 10px;
+  background: #fff;
+  padding: 0.65rem 0.75rem;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.cd-iaw-inbox__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.cd-iaw-inbox__title {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 650;
+}
+
+.cd-iaw-inbox__count {
+  font-size: 0.7rem;
+  color: var(--medical-ink-subtle, #64748b);
+}
+
+.cd-iaw-inbox__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.cd-iaw-inbox__empty {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--medical-ink-subtle, #64748b);
+}
+
+.cd-iaw-inbox__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.cd-iaw-inbox__item {
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--medical-border, #e2e8f0);
+  border-radius: 8px;
+  background: var(--medical-surface, #f8fafc);
+  padding: 0.45rem 0.55rem;
+  display: grid;
+  gap: 0.15rem;
+  cursor: pointer;
+  font: inherit;
+}
+
+.cd-iaw-inbox__item--urgent,
+.cd-iaw-inbox__item--critical {
+  border-color: color-mix(in srgb, #dc2626 40%, #e2e8f0);
+}
+
+.cd-iaw-inbox__item--attention {
+  border-color: color-mix(in srgb, #f59e0b 40%, #e2e8f0);
+}
+
+.cd-iaw-inbox__item-title {
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.cd-iaw-inbox__item-summary {
+  font-size: 0.74rem;
+  color: var(--medical-ink, #0f172a);
+}
+
+.cd-iaw-inbox__item-meta {
+  font-size: 0.68rem;
+  color: var(--medical-ink-subtle, #64748b);
+}
+
 @media (min-width: 1600px) {
   .cd-iaw {
     padding: 1rem 1.15rem;

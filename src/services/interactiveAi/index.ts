@@ -5,3 +5,4 @@ export * from './workflowAiCards';
 export * from './interactiveRealtimeClient';
 export * from './streamProgress';
 export * from './interactiveAiOrchestrator';
+export * from './interactionInbox';

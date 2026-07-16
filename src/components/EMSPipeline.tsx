@@ -29,6 +29,7 @@ import { usePractitionerSurfaceVisibility } from '../contexts/PractitionerVisibi
 import useEdRouteDataContext from '../hooks/useEdRouteDataContext';
 import { buildPatientsPatientHref } from '../utils/receptionQueryParams';
 import { EmsOffloadGauge, EmsUnitTrackGraphic } from './graphics/CdlGraphicKit';
+import { EmsInteractiveAssistPanel } from './interactive-ai/EmsInteractiveAssistPanel';
 import './EMSPipeline.css';
 
 function minutesRemaining(arrival, now) {
@@ -628,6 +629,24 @@ export default function EMSPipeline() {
           onMetricSelect={handleEmsStripMetricSelect}
         />
       ) : null}
+
+      <div className="ems-pipeline__interactive-ai" style={{ margin: '0.75rem 0 1rem' }}>
+        <EmsInteractiveAssistPanel
+          role={emergencyRole.role || 'paramedic'}
+          userId={emergencyRole.canonicalProfile?.id}
+          organizationId={emergencyRole.canonicalProfile?.organizationId}
+          patientId={
+            emsArrivals.find((a) => a.status === 'Inbound' || a.status === 'Arrived' || a.status === 'Handoff')
+              ?.patientId
+          }
+          emsUnitId={
+            emsArrivals.find((a) => a.status === 'Inbound' || a.status === 'Arrived' || a.status === 'Handoff')
+              ?.unitId ||
+            emsArrivals.find((a) => a.status === 'Inbound' || a.status === 'Arrived' || a.status === 'Handoff')
+              ?.unitName
+          }
+        />
+      </div>
 
       {emsModule.loading && !emsArrivals.length ? (
         <p className="ems-pipeline__empty" role="status">Loading CareDroid EMS intake...</p>
