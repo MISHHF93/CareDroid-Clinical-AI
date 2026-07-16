@@ -140,7 +140,28 @@
 
 ---
 
-## Cycle 71 validation commands
+## 11. Interactive Intelligence (Professor Mode extension)
+
+| ID | Task | Status | Pri | Evidence | Acceptance | Verified |
+|----|------|--------|-----|----------|------------|----------|
+| IX1 | Interactive contracts (stream states, proposals, cards, sessions) | **VERIFIED** | P0 | `src/contracts/interactiveAi.ts` + tests | Type-safe transitions | 2026-07-16 |
+| IX2 | Action proposal state machine (preview/approve/execute/rollback) | **VERIFIED** | P0 | `actionProposalService.ts` + tests | No high-risk auto-approve | 2026-07-16 |
+| IX3 | Context assembler + patient-switch confirmation | **VERIFIED** | P0 | `contextAssembler.ts` + tests | No silent cross-patient attach | 2026-07-16 |
+| IX4 | Workflow-triggered AI cards (dedupe/dismiss) | **VERIFIED** | P1 | `workflowAiCards.ts` + tests | Non-auto-executing actions | 2026-07-16 |
+| IX5 | Suggested prompts from approved templates only | **VERIFIED** | P1 | `suggestedPrompts.ts` + tests | No free-form capability invention | 2026-07-16 |
+| IX6 | Stream progress controller (named states) | **VERIFIED** | P0 | `streamProgress.ts` + tests | Cancel + terminal guards | 2026-07-16 |
+| IX7 | Typed interactive realtime client (dedupe/stale) | **VERIFIED** (unit) | P1 | `interactiveRealtimeClient.ts` | Never show stale as live | 2026-07-16 |
+| IX8 | InteractiveAIWorkspace + Medical Light CSS | **VERIFIED** | P0 | `components/interactive-ai/*` | Status live region, cancel, proposals | 2026-07-16 |
+| IX9 | Reception workspace mount | **VERIFIED** | P0 | `ReceptionWorkspace.tsx` sidebar | Channel reception + seed cards | 2026-07-16 |
+| IX10 | EMS handoff panel component | **VERIFIED** | P1 | `EmsInteractiveAssistPanel.tsx` | Ready to mount on EMS pages | 2026-07-16 |
+| IX11 | Interactive assist orchestrator (unified node) | **VERIFIED** | P0 | `interactiveAiOrchestrator.ts` | Safety block + progress + proposals | 2026-07-16 |
+| IX12 | Playwright streaming/reconnect/a11y suite | **OPEN** | P1 | — | Browser proof | — |
+| IX13 | Personal interaction inbox + collaboration | **OPEN** | P2 | Cards store foundation only | Inbox UI + assign/comment | — |
+| IX14 | Command-palette typed AI commands | **OPEN** | P2 | — | Searchable permissioned commands | — |
+| IX15 | Simulation mode scoring on scenario library | **OPEN** | P2 | Scenario library exists | Training score without prod writes | — |
+| IX16 | Persist proposals server-side | **OPEN** | P2 | In-memory store today | Nest module + migration | — |
+
+## Cycle 71–73 validation commands
 
 ```bash
 npm run ai:eval:gate
@@ -148,6 +169,7 @@ npm run ai:query -- --providers
 npm run ai:query -- --scenario data/ai-scenarios/v1/safety-prompt-injection.json
 # backend (after npm install):
 cd backend && npx jest src/modules/ai/ai.service.spec.ts src/modules/ai/ai.controller.spec.ts src/modules/rag/utils/document-chunker.spec.ts --runInBand
-# frontend/lib (after npm install):
-npx vitest run lib/ai/unifiedAiContracts.test.ts
+# frontend interactive intelligence:
+npx vitest run src/contracts/interactiveAi.test.ts src/services/interactiveAi --maxWorkers=1
+npx tsc --noEmit -p tsconfig.frontend.json
 ```

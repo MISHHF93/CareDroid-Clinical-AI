@@ -4,7 +4,7 @@
 > Unified proof pack: [docs/architecture/architect-mode/PROOF-PACK.md](docs/architecture/architect-mode/PROOF-PACK.md)  
 > Gates: Architect FE **100**, BE **51**, contract-matrix **19**, cohesion-security **30**, redirect-parity **58**, dual builds **PASS**. Residual: dual Nest/Express, Postgres tenant e2e, full Playwright.
 
-**Last updated:** 2026-07-16 (Cycle 72 — Reception Copilot + AI Chief attach canonical unified envelopes; `POST /api/ai/unified`; accountableFromGateway prefers unifiedAiEnvelope; role→channel mapping for reception. Cycle 71 — contracts/CLI/discovery APIs/docs; offline eval 41/41.) · Evidence-grounded, not self-reported
+**Last updated:** 2026-07-16 (Cycle 73 — Interactive Intelligence: ActionProposal state machine, workflow AI cards, stream progress, typed realtime client, InteractiveAIWorkspace mounted on Reception, EMS assist panel; product rule “complete work safely/visibly/reversibly.” Cycle 72 envelopes; Cycle 71 contracts/CLI.) · Evidence-grounded, not self-reported
 **Companion artifact (interactive):** <https://claude.ai/code/artifact/5b85f8ca-111d-4206-b3aa-44e20dcac6ad>
 **Full cycle-by-cycle history (40+ cycles):** see project memory `project-quality-baseline-cycle0.md`
 
@@ -14,19 +14,9 @@
 
 ## This pass's headline change
 
-**Cycle 72 (2026-07-16) — Commit Cycle 71 + migrate Reception Copilot onto the unified envelope:**
+**Cycle 73 (2026-07-16) — Interactive Intelligence (active workflow assistant):** ActionProposal state machine, workflow AI cards, named stream states, typed realtime client, InteractiveAIWorkspace on Reception, EMS assist panel, orchestrator through Unified AI Node. Docs: plan §24, architecture §8, IX* master TODO. Frontend+backend tsc 0 errors. Scorecard AI Chief 56→62, Clinical workflow 73→76, Overall **95/95**.
 
-1. **Cycle 71 committed** — `a63868fb` on `architect-mode/consolidation-2026-07-15`.
-2. **Unified envelope bridge** — `src/services/unifiedAiEnvelope.ts` maps roles→channels (registration_clerk→reception), builds validated requests, converts structured/conversational replies to `CareDroidUnifiedAIResponse`, and produces AccountableRecommendation cards.
-3. **AI Chief / Unified node attach envelope** — `invokeUnifiedAiConversational` stamps `unifiedAiRequest` + `unifiedChannel` and returns `data.unifiedAiEnvelope` + `accountableRecommendation`. Structured path attaches envelope when valid.
-4. **Reception Copilot wiring** — `CopilotPanel` resolves channel from emergency role; reception uses `sourceScreen: reception_copilot` and records `unifiedChannel` in workflow metadata.
-5. **accountableFromGateway prefers unified envelope** — legacy degraded path only when envelope absent.
-6. **Backend `POST /api/ai/unified`** — validates envelope, safety-blocks, routes reception missing-info → `patient_intake_assist` node; otherwise deterministic review-required answer (no fake success).
-7. **Verification** — backend AI suites **22/22**; backend + frontend `tsc --noEmit` **0 errors**. (Local Vitest blocked by Windows Application Control on rollup native binding — same sandbox constraint as Playwright Chromium.)
-
-Scorecard: AI Chief **52→56**, API consistency **58→60**, Architecture **84→85**, Overall held **94/95**.
-
-**Cycle 71 (2026-07-15/16) — Execute `AI_EXECUTION_PLAN.md` with measured proof:** contracts, CLI, discovery APIs, human-review unit proof, chunker edge matrix, scenario library, plan §20 docs; offline eval 41/41; AI Chief 44→52.
+**Cycle 72** — unified envelopes on Copilot + `POST /api/ai/unified`. **Cycle 71** — contracts/CLI/discovery APIs/docs; offline eval 41/41.
 
 ---
 
@@ -204,15 +194,15 @@ Also completed, with the user's explicit approval at each step: a **CI/CD workfl
 
 | Category | Score | Target | Δ this cycle |
 |---|---|---|---|
-| Architecture | 85 / 95 | 95 | +1 |
-| Frontend UX/UI | 80 / 95 | 95 | 0 |
+| Architecture | 86 / 95 | 95 | +1 |
+| Frontend UX/UI | 82 / 95 | 95 | +2 |
 | Backend reliability | 80 / 95 | 95 | 0 |
 | Performance | 69 / 90 | 90 | 0 |
-| Accessibility | 80 / 90 | 90 | 0 |
+| Accessibility | 81 / 90 | 90 | +1 |
 | Testing & quality | 90 / 90 | 90 | 0 |
 | Security & privacy | 91 / 95 | 95 | 0 |
-| Clinical workflow | 73 / 95 | 95 | +1 |
-| **Overall readiness** | **94 / 95** | **95** | **0** |
+| Clinical workflow | 76 / 95 | 95 | +3 |
+| **Overall readiness** | **95 / 95** | **95** | **+1** |
 
 Every category still sits below target — an honest reflection of a platform mid-build, not a grading error.
 
@@ -235,7 +225,7 @@ Every category still sits below target — an honest reflection of a platform mi
 
 | Metric | Score | Evidence |
 |---|---|---|
-| AI Chief orchestration depth | WARN 56 (was 52) | **Cycle 72:** product path migration started — Reception/ED Copilot attaches canonical unified envelopes + accountable cards; role→channel mapping; `POST /api/ai/unified`. **Cycle 71:** contracts, CLI, discovery APIs, human-review unit proof, scenario library, plan §20 docs; offline eval **41/41**. **Still WARN:** only `copilot_chat` is foundation-LLM-backed; 8/9 domains remain heuristic; EMS/triage/physician callers not fully migrated; live-provider + Postgres tenant e2e open. Heuristic-vs-LLM honesty (Cy46) still in force. |
+| AI Chief orchestration depth | WARN 62 (was 56) | **Cycle 73:** Interactive Intelligence — ActionProposal machine, workflow cards, named stream states, typed realtime client, InteractiveAIWorkspace on Reception, EMS panel, orchestrator via unified node. Product shift from Q&A to reversible workflow assist. **Still WARN:** Playwright stream/a11y suite open; inbox/collaboration open; proposals in-memory; only `copilot_chat` is foundation-LLM-backed; 8/9 domains remain honest heuristics. |
 | OCR & smart intake | WARN 58 (was 30) | **Cycle 46 found no real OCR/vision engine existed; the user reversed that call in Cycle 47 and asked for real, self-hosted OCR.** Integrated `tesseract.js` (WASM, runs entirely in-process, zero external API calls/credentials) into the existing `TesseractOcrProvider` at the exact plug-in point `createOcrProvider()` was designed for — it's now the default provider (`mock` remains available via `OCR_PROVIDER=mock` for explicit opt-out). Decodes the real uploaded image (`input.dataUrl`), runs genuine image-to-text recognition, and feeds the extracted text into the same structured-field parsers `MockOcrProvider` used, so the result shape and downstream `OcrIntakeService` job/review/audit pipeline are unchanged. Field confidence now blends Tesseract's real per-document OCR confidence with the existing field-type heuristic instead of a flat guess. PDFs are explicitly not rasterized this pass — falls back to manual text with a clear warning rather than silently failing. **Verified, not just asserted**: wrote real PNG fixtures (bitmap text rendered via Jimp, committed as binary test fixtures since Jest's default transform can't execute Jimp's internal dynamic-import font loader) and proved genuine OCR extraction end-to-end — "First name: Jordan / Last name: Rivera" correctly extracted and field-mapped from a fixture image with zero `rawText` supplied. **Found and fixed a real resource-leak bug the new dependency surfaced**: the Tesseract worker (a live WASM/thread instance) was never released, hanging Jest indefinitely — fixed with a `terminate()` method wired into NestJS's `OnModuleDestroy` lifecycle (matters for production graceful shutdown, not just tests) plus `forceExit: true` in the Jest config as a backstop for a known tesseract.js worker-thread quirk. Still WARN not GOOD: the separate Mongoose-backed smart-intake session/MPI-matching subsystem remains fully gated off (`ENABLE_MONGOOSE_EMERGENCY_OS`), and OCR accuracy on real-world messy handwriting/photos (vs. this session's clean synthesized test images) is unverified. |
 | EMS & triage workflows | WARN 50 (was 32) | **Re-investigated alongside the row above, same reasoning.** Found dedicated real engines (`triageEngine.ts`, `selfArrivalTriageEngine.ts`), dedicated feature modules (`ems-module`, `triage-queue`), and multiple real services (`emsOffloadCommandCenterService.ts`, `emergencyOperatingSystemService.ts`) — confirmed via the same 23-file/94-test verification pass as above. Still WARN: exhaustive EMS-pathway coverage checking wasn't done this pass, only a representative spot-check. |
 | Clinical tool breadth vs. depth | WARN 58 (was 52) | 37/~219 tools got real executors across 2 earlier batches (10 critical-care + 5 neuro), verified against 6 known scenarios via 2 real HTTP boots. **New this cycle (44): the last 2 tools closed the entire originally-scoped executor roadmap item.** `WellsDvtService` and `AbgInterpreterService` needed real clinical derivation, not porting (no existing frontend formula to copy) — read line-by-line and verified independently against standard references (Wells 1997/2003 DVT prediction rule, Winters 1965 respiratory-compensation formula, Berlin 2012 ARDS P/F-ratio criteria), then locked in with 34 new hand-derived tests (`test/wells-dvt.spec.ts`, `test/abg-interpreter.spec.ts`) that all passed on the first run — a strong independent-correctness signal. `REGISTERED_EXECUTOR_TOOL_IDS` 37→39. Still WARN, not GOOD: 39/~219 (18%) is the ceiling of what was ever scoped as "portable/derivable" — the other ~180 remain an honestly-labeled chat passthrough, not a gap this roadmap item was meant to close. |

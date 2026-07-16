@@ -157,7 +157,45 @@ High-risk outputs set `requiresHumanReview` / `requiresClinicianReview` and crea
 
 ---
 
-## 8. Related documents
+## 8. Interactive Intelligence layer (2026-07-16)
+
+Product rule: **help users complete work safely, visibly, and reversibly** — not a passive chatbot.
+
+```text
+Role page / workflow event
+    ↓
+InteractiveAIWorkspace (channel-adapted)
+    ↓
+Context assembler (permissioned, provenance-labeled)
+    ↓
+Stream progress states (validating → evidence → safety → response)
+    ↓
+Unified AI Node (POST /api/ai/unified | invokeUnifiedAiConversational)
+    ↓
+AccountableRecommendation + optional AIActionProposal
+    ↓
+Preview → Approve/Reject → Execute (idempotent) → Rollback window
+    ↓
+Audit / human-review / realtime status
+```
+
+| Building block | Path |
+|----------------|------|
+| Contracts | `src/contracts/interactiveAi.ts` |
+| Action proposals | `src/services/interactiveAi/actionProposalService.ts` |
+| Context assembler | `src/services/interactiveAi/contextAssembler.ts` |
+| Workflow cards | `src/services/interactiveAi/workflowAiCards.ts` |
+| Suggested prompts | `src/services/interactiveAi/suggestedPrompts.ts` |
+| Stream progress | `src/services/interactiveAi/streamProgress.ts` |
+| Typed realtime client | `src/services/interactiveAi/interactiveRealtimeClient.ts` |
+| Orchestrator | `src/services/interactiveAi/interactiveAiOrchestrator.ts` |
+| Workspace UI | `src/components/interactive-ai/InteractiveAIWorkspace.tsx` |
+| EMS panel | `src/components/interactive-ai/EmsInteractiveAssistPanel.tsx` |
+| Reception mount | `src/pages/emergency/ReceptionWorkspace.tsx` (sidebar) |
+
+Realtime: SSE preferred via existing `emergencyRealtimeService` multiplexer; interactive client adds sequence/dedupe/stale rejection; polling fallback when SSE fails. WebSockets reserved for bidirectional coordination.
+
+## 9. Related documents
 
 - `AI_CONFIGURATION_MAP.md` — trained vs heuristic vs foundation LLM honesty map
 - `AI_PROVIDER_MATRIX.md` — providers/models/flags

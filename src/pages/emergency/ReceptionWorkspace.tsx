@@ -51,6 +51,7 @@ import ReceptionPageLayout, {
   ReceptionContentSection,
   ReceptionCard,
 } from '../../components/reception/ReceptionPageLayout';
+import { InteractiveAIWorkspace } from '../../components/interactive-ai/InteractiveAIWorkspace';
 import './ReceptionWorkspace.css';
 import './emergency-route.css';
 import '../../styles/reception-desk-theme.css';
@@ -759,27 +760,53 @@ export default function ReceptionWorkspace() {
         </>
       }
       sidebar={
-        <ReceptionOperationalRail
-          queue={receptionQueue}
-          criticalAlerts={criticalAlerts}
-          selectedPatient={selectedPatient}
-          now={now}
-          onSelectPatient={(patientId) => { selectPatient(patientId); setPatientDetailOpen(true); }}
-          onOpenProfile={(patientId) => {
-            selectPatient(patientId);
-            setPatientDetailOpen(true);
-          }}
-          patientDisplayName={patientDisplayName}
-          queueStatus={queueStatus}
-          nextStep={nextStep}
-          ownerRole={ownerRole}
-          waitMinutes={waitMinutes}
-          isHighRiskPatient={isHighRiskPatient}
-          formatTimer={formatTimer}
-          isTimerBreached={isTimerBreached}
-          activeQueueTab={RECEPTION_COPY.queues.tabs[activeQueueTab]}
-          emptyQueueMessage={emptyQueueMessage}
-        />
+        <>
+          <ReceptionOperationalRail
+            queue={receptionQueue}
+            criticalAlerts={criticalAlerts}
+            selectedPatient={selectedPatient}
+            now={now}
+            onSelectPatient={(patientId) => { selectPatient(patientId); setPatientDetailOpen(true); }}
+            onOpenProfile={(patientId) => {
+              selectPatient(patientId);
+              setPatientDetailOpen(true);
+            }}
+            patientDisplayName={patientDisplayName}
+            queueStatus={queueStatus}
+            nextStep={nextStep}
+            ownerRole={ownerRole}
+            waitMinutes={waitMinutes}
+            isHighRiskPatient={isHighRiskPatient}
+            formatTimer={formatTimer}
+            isTimerBreached={isTimerBreached}
+            activeQueueTab={RECEPTION_COPY.queues.tabs[activeQueueTab]}
+            emptyQueueMessage={emptyQueueMessage}
+          />
+          <div className="reception-interactive-ai" style={{ marginTop: '0.75rem' }}>
+            <InteractiveAIWorkspace
+              role={emergencyRole.role || 'registration_clerk'}
+              userId={emergencyRole.canonicalProfile?.id}
+              organizationId={emergencyRole.canonicalProfile?.organizationId}
+              patientId={selectedPatient?.id}
+              pageId="reception_workspace"
+              channel="reception"
+              purpose="reception_interactive_assist"
+              title="Reception Copilot"
+              seedTriggers={[
+                {
+                  kind: 'incomplete_registration',
+                  summary: 'Check missing registration fields before triage handoff.',
+                  urgency: 'attention',
+                },
+                {
+                  kind: 'new_ocr_document',
+                  summary: 'Review OCR confidence before committing document fields.',
+                  urgency: 'info',
+                },
+              ]}
+            />
+          </div>
+        </>
       }
       footer={
         result ? (

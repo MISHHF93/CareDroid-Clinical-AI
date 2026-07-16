@@ -1,0 +1,312 @@
+/* CareDroid Interactive Intelligence — Medical Light, compact clinical density */
+
+.cd-iaw {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 0;
+  height: 100%;
+  background: var(--medical-surface, #f8fafc);
+  color: var(--medical-ink, #0f172a);
+  border: 1px solid var(--medical-border, #e2e8f0);
+  border-radius: 12px;
+  padding: 0.75rem 0.9rem 0.9rem;
+}
+
+.cd-iaw__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.cd-iaw__title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.95rem;
+  font-weight: 650;
+  margin: 0;
+}
+
+.cd-iaw__ai-mark {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 999px;
+  background: var(--semantic-ai-assistance, #7c3aed);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #7c3aed 18%, transparent);
+}
+
+.cd-iaw__context-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.cd-iaw__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  max-width: 100%;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--medical-border, #e2e8f0);
+  background: #fff;
+  font-size: 0.72rem;
+  color: var(--medical-ink-subtle, #475569);
+}
+
+.cd-iaw__chip--ocr {
+  border-color: color-mix(in srgb, #f59e0b 40%, #e2e8f0);
+}
+
+.cd-iaw__chip button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-size: 0.85rem;
+  line-height: 1;
+  padding: 0 0.1rem;
+}
+
+.cd-iaw__progress {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid var(--medical-border, #e2e8f0);
+}
+
+.cd-iaw__progress-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.cd-iaw__progress-bar {
+  height: 0.35rem;
+  border-radius: 999px;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+
+.cd-iaw__progress-bar > span {
+  display: block;
+  height: 100%;
+  background: var(--semantic-ai-assistance, #7c3aed);
+  transition: width 160ms ease;
+}
+
+.cd-iaw__progress--terminal .cd-iaw__progress-bar > span {
+  background: var(--medical-ink-subtle, #64748b);
+}
+
+.cd-iaw__progress--blocked .cd-iaw__progress-bar > span,
+.cd-iaw__progress--failed .cd-iaw__progress-bar > span {
+  background: var(--semantic-danger, #dc2626);
+}
+
+.cd-iaw__progress--completed .cd-iaw__progress-bar > span {
+  background: var(--semantic-success, #059669);
+}
+
+.cd-iaw__body {
+  display: grid;
+  gap: 0.65rem;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.cd-iaw__response {
+  padding: 0.7rem 0.75rem;
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid var(--medical-border, #e2e8f0);
+  font-size: 0.88rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+.cd-iaw__suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.cd-iaw__suggestion {
+  border: 1px solid var(--medical-border, #e2e8f0);
+  background: #fff;
+  border-radius: 999px;
+  padding: 0.28rem 0.65rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  color: var(--medical-ink, #0f172a);
+}
+
+.cd-iaw__suggestion:hover,
+.cd-iaw__suggestion:focus-visible {
+  border-color: var(--semantic-ai-assistance, #7c3aed);
+  outline: 2px solid color-mix(in srgb, #7c3aed 35%, transparent);
+  outline-offset: 1px;
+}
+
+.cd-iaw__composer {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 0.4rem;
+  align-items: end;
+}
+
+.cd-iaw__composer textarea {
+  width: 100%;
+  min-height: 2.6rem;
+  max-height: 7rem;
+  resize: vertical;
+  border-radius: 10px;
+  border: 1px solid var(--medical-border, #e2e8f0);
+  padding: 0.5rem 0.65rem;
+  font: inherit;
+  font-size: 0.88rem;
+  background: #fff;
+}
+
+.cd-iaw__composer button {
+  border-radius: 10px;
+  border: 1px solid var(--medical-border, #e2e8f0);
+  background: #fff;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cd-iaw__composer button.cd-iaw__send {
+  background: var(--app-accent-interactive, #0ea5e9);
+  border-color: transparent;
+  color: #fff;
+}
+
+.cd-iaw__composer button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.cd-iaw__realtime {
+  font-size: 0.7rem;
+  color: var(--medical-ink-subtle, #64748b);
+}
+
+.cd-iaw__realtime[data-live='false'] {
+  color: #b45309;
+}
+
+.cd-iaw-card {
+  border: 1px solid var(--medical-border, #e2e8f0);
+  border-radius: 10px;
+  background: #fff;
+  padding: 0.65rem 0.75rem;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.cd-iaw-card--urgent {
+  border-color: color-mix(in srgb, #dc2626 45%, #e2e8f0);
+}
+
+.cd-iaw-card--attention {
+  border-color: color-mix(in srgb, #f59e0b 45%, #e2e8f0);
+}
+
+.cd-iaw-card__title {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 650;
+}
+
+.cd-iaw-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  font-size: 0.7rem;
+  color: var(--medical-ink-subtle, #64748b);
+}
+
+.cd-iaw-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.cd-iaw-card__actions button {
+  border-radius: 8px;
+  border: 1px solid var(--medical-border, #e2e8f0);
+  background: #fff;
+  font-size: 0.72rem;
+  padding: 0.28rem 0.55rem;
+  cursor: pointer;
+}
+
+.cd-iaw-proposal {
+  border: 1px solid color-mix(in srgb, #7c3aed 30%, #e2e8f0);
+  border-left: 3px solid var(--semantic-ai-assistance, #7c3aed);
+  border-radius: 10px;
+  background: #fff;
+  padding: 0.7rem 0.75rem;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.cd-iaw-proposal__title {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 650;
+}
+
+.cd-iaw-proposal__preview {
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.cd-iaw-proposal__changes {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.75rem;
+  color: var(--medical-ink-subtle, #475569);
+}
+
+.cd-iaw-proposal__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.cd-iaw-proposal__actions button {
+  border-radius: 8px;
+  border: 1px solid var(--medical-border, #e2e8f0);
+  background: #fff;
+  font-size: 0.75rem;
+  padding: 0.3rem 0.6rem;
+  cursor: pointer;
+}
+
+.cd-iaw-proposal__actions button.cd-iaw-approve {
+  background: var(--semantic-success, #059669);
+  border-color: transparent;
+  color: #fff;
+}
+
+.cd-iaw-proposal__actions button.cd-iaw-reject {
+  color: var(--semantic-danger, #dc2626);
+}
+
+@media (min-width: 1600px) {
+  .cd-iaw {
+    padding: 1rem 1.15rem;
+  }
+  .cd-iaw__composer {
+    grid-template-columns: 1fr auto auto auto;
+  }
+}

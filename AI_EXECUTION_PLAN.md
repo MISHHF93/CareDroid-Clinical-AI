@@ -620,3 +620,76 @@ Do not stop after creating documents.
 Use the documents to guide implementation and continuously update the plan and TODO register.
 
 Do not claim completion without executable proof.
+---
+
+# 24. Interactive Intelligence Layer (Professor Mode extension — 2026-07-16)
+
+## Product principle
+
+CareDroid must not merely answer questions — it must help users **complete work safely, visibly, and reversibly**. Human control is preserved; recommendation acceptance is never proof of correctness (NIST AI RMF: govern, map, measure, manage).
+
+## Interaction surface classification (audit snapshot)
+
+| Surface | Classification | Notes |
+|---------|----------------|-------|
+| CopilotPanel free-text | Partially connected | Unified envelope attached (Cy72); now progress via InteractiveAIWorkspace path for Reception |
+| AccountableRecommendationCard | Fully executable | Evidence + safety + human review display |
+| AIRecommendationCard (structured node) | Fully executable | Accept/modify/dismiss/escalate hooks |
+| Reception Copilot chrome | Partially connected | InteractiveAIWorkspace mounted in ReceptionWorkspace sidebar |
+| EMS handoff AI | Partially connected | EmsInteractiveAssistPanel component ready |
+| Human-review queue | Partially connected | Backend create + decide; inbox UI still thin |
+| Emergency SSE realtime | Partially connected | Shared multiplexer + polling fallback; interactive client adds dedupe/stale |
+| WebSocketManager | Implemented but generic | Prefer typed interactive client; WS for bidirectional only |
+| OCR intake review | Partially connected | Real Tesseract; Interactive prompts for review |
+| Workflow AI cards | Fully executable (new) | Deduped, dismissible, non-auto-executing |
+| AIActionProposal | Fully executable (new) | State machine + preview/approve/execute/rollback |
+| Command palette AI actions | Partial / missing typed AI commands | Future: searchable typed commands only |
+| Proactive inbox | Missing UI shell | Cards store is foundation |
+| Simulation training mode | Partial | Scenario library exists; interactive sim loop open |
+| Token-by-token a11y announcements | Fixed pattern | Live region announces status transitions only |
+
+## Canonical architecture
+
+`InteractiveAIWorkspace` (role-adaptive shell)
+- ContextBar (explicit patient/channel/role context)
+- Stream progress (named states, no indefinite spinner alone)
+- Workflow AI cards (event-triggered CDS-style)
+- Streaming / final response + AccountableRecommendationCard
+- ActionProposalCard (preview → approve/reject → execute → rollback)
+- Suggested prompts (approved templates only)
+- RealtimeStatus (never show stale as live)
+- Composer with cancel
+
+Services:
+- `src/contracts/interactiveAi.ts`
+- `src/services/interactiveAi/*` (proposals, context, cards, prompts, stream, realtime, orchestrator)
+- Reception mount: `ReceptionWorkspace` sidebar
+- EMS mount: `EmsInteractiveAssistPanel`
+
+## Non-negotiables (interaction)
+
+- No fake interactivity or simulated success in production paths
+- No automatic high-risk clinical actions
+- No unrestricted commands from free text
+- No silent cross-patient context
+- No direct provider calls from React
+- No token-by-token screen-reader spam
+- SSE for one-way streams; WebSocket only for true bidirectional coordination
+- All executable suggestions are AIActionProposals with explicit states
+
+## Validation evidence (this cycle)
+
+- Frontend `tsc --noEmit -p tsconfig.frontend.json`: 0 errors
+- Backend `tsc --noEmit`: 0 errors
+- Unit tests added under `src/contracts/interactiveAi.test.ts` and `src/services/interactiveAi/*.test.ts`
+- Offline AI eval gate still authoritative for safety packs (41/41 prior)
+
+## Remaining open (explicit)
+
+- Full Playwright streaming/reconnect/a11y suite for InteractiveAIWorkspace
+- Personal interaction inbox UI + collaborative assignment
+- Command-palette typed AI command registry
+- Simulation mode scoring loop on scenario library
+- Ultrawide visual regression for workspace
+- Backend persistence for proposals (currently in-memory store for deterministic tests)
+

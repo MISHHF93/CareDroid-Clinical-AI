@@ -55,3 +55,25 @@ Current offline fixture run matches baseline gate pass rate (41/41). No offline 
 - Chunker edge-case matrix (`document-chunker.spec.ts`)
 - Human-review creation assertion from high-risk structured node (`ai.service.spec.ts`)
 - Scenario library seed for workflow regression (`data/ai-scenarios/v1/`)
+
+## Cycle 73 — Interactive Intelligence evaluation notes
+
+| Interaction metric (design) | Current status |
+|-----------------------------|----------------|
+| Task completion via proposals | Unit-proven state machine (propose→approve→execute→rollback) |
+| Inappropriate automation rate | High-risk auto-approve throws; moderate requires approval |
+| Evidence comprehension | AccountableRecommendationCard + Why-this-suggestion fields on proposals |
+| Stream progress clarity | Named states (validating…completed/blocked/failed); cancel supported |
+| Alert burden | Workflow cards dedupe (5m cooldown) + dismissible non-critical |
+| Keyboard / screen-reader | Live region for status transitions only (not per-token) |
+| Offline safety packs | Still 41/41 gate (unchanged this cycle) |
+
+**Not yet measured in browser:** Playwright streaming reconnect, ultrawide reflow, full keyboard task completion for InteractiveAIWorkspace.
+
+## Interaction evaluation commands
+
+```bash
+npx tsc --noEmit -p tsconfig.frontend.json
+npx vitest run src/contracts/interactiveAi.test.ts src/services/interactiveAi --maxWorkers=1
+npm run ai:eval:gate
+```
