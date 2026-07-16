@@ -63,12 +63,14 @@ import { convertEmsArrivalForReception } from './receptionIntakeBridge';
 describe('receptionIntakeBridge', () => {
   it('converts EMS arrivals into reception verify paths', () => {
     const result = convertEmsArrivalForReception('ems-1', { actorName: 'Reception' });
+    // Canonical Result envelope: success payload lives under .data.
     expect(result.ok).toBe(true);
-    expect(result.patientId).toBe('patient-ems-1');
-    expect(result.receptionVerifyPath).toContain('/emergency/reception?');
-    expect(result.receptionVerifyPath).toContain('step=verify');
-    expect(result.receptionVerifyPath).toContain('patientId=patient-ems-1');
-    expect(result.receptionVerifyPath).toContain('emsArrivalId=ems-1');
+    if (!result.ok) throw new Error('expected success result');
+    expect(result.data.patientId).toBe('patient-ems-1');
+    expect(result.data.receptionVerifyPath).toContain('/emergency/reception?');
+    expect(result.data.receptionVerifyPath).toContain('step=verify');
+    expect(result.data.receptionVerifyPath).toContain('patientId=patient-ems-1');
+    expect(result.data.receptionVerifyPath).toContain('emsArrivalId=ems-1');
     expect(registerArrivalControl).toHaveBeenCalledWith('patient-ems-1', {
       source: 'ems-convert',
       destination: 'ems-registration',

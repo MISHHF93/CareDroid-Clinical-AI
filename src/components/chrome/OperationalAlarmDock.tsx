@@ -289,10 +289,10 @@ export default function OperationalAlarmDock({ showEmsInbound = true }: Operatio
       if (prefersReceptionForPatientCreate(emergencyRole.role)) {
         navigateProfileAware(
           navigate,
-          result.receptionVerifyPath ||
+          result.data.receptionVerifyPath ||
             getReceptionEmbeddedIntakePath({
               step: 'verify',
-              patientId: result.patientId,
+              patientId: result.data.patientId,
               emsArrivalId: arrival.id,
             }),
           { emergencyRole, saasRole },

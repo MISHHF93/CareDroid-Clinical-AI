@@ -9,7 +9,7 @@
 import { lazy, type ComponentType, type LazyExoticComponent } from 'react';
 
 // Specialty calculators use varied prop shapes; keep the lazy registry loosely typed.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 type AnyCalc = ComponentType<any>;
 type LazyCalc = LazyExoticComponent<AnyCalc>;
 

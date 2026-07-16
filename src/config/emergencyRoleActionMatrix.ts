@@ -203,6 +203,21 @@ export const EMERGENCY_ROLE_ACTION_MATRIX: Record<
     [H.settingsEdit]: A,
     [H.publicDisplayPublish]: A,
   }),
+  [EMERGENCY_ROLE_ID.itAdmin]: Object.freeze({
+    // IT Administrator: system administration only (settings home surface per
+    // emergencyRoleNavigationModel) — every clinical action stays hidden.
+    [H.patientCreate]: X,
+    [H.demographicsEdit]: X,
+    [H.encounterCreate]: X,
+    [H.assignAcuity]: X,
+    [H.moveQueue]: X,
+    [H.completeReassessment]: X,
+    [H.completeEmsHandoff]: X,
+    [H.createReferral]: X,
+    [H.disposition]: X,
+    [H.settingsEdit]: A,
+    [H.publicDisplayPublish]: X,
+  }),
   [EMERGENCY_ROLE_ID.readOnlyViewer]: Object.freeze({
     [H.patientCreate]: X,
     [H.demographicsEdit]: X,

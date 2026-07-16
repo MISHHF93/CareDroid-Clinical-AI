@@ -480,11 +480,11 @@ export default function EMSPipeline() {
     if (!result.ok) return;
     if (prefersReceptionForPatientCreate(emergencyRole.role)) {
       profileNavigate(
-        result.receptionVerifyPath ||
+        result.data.receptionVerifyPath ||
           getReceptionEmbeddedIntakePath({
             step: 'verify',
-            patientId: result.patientId,
-            emsArrivalId: result.emsArrivalId,
+            patientId: result.data.patientId,
+            emsArrivalId: result.data.emsArrivalId,
           }),
       );
     }

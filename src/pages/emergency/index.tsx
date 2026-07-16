@@ -1347,10 +1347,10 @@ export default function EmergencyWhiteboard() {
     if (!result.ok) return;
     if (prefersReceptionForPatientCreate(emergencyRole.role)) {
       profileNavigate(
-        result.receptionVerifyPath ||
+        result.data.receptionVerifyPath ||
           getReceptionEmbeddedIntakePath({
             step: 'verify',
-            patientId: result.patientId,
+            patientId: result.data.patientId,
             emsArrivalId: arrival.id,
           }),
       );
