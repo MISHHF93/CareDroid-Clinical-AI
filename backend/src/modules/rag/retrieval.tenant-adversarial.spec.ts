@@ -2,10 +2,7 @@
  * Cycle 66 / D4 — adversarial tenant filter behavior at the retrieval boundary.
  * Architect Mode: also covers defense-in-depth post-filter.
  */
-import {
-  applyTenantOrganizationDefenseFilter,
-  RetrievalService,
-} from './retrieval.service';
+import { applyTenantOrganizationDefenseFilter, RetrievalService } from './retrieval.service';
 import { RAG_GLOBAL_ORG_SCOPE } from './utils/tenant-scope';
 
 describe('RetrievalService — adversarial tenant isolation', () => {

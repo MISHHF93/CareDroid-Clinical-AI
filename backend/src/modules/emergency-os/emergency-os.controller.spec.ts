@@ -651,9 +651,7 @@ describe('EmergencyOsController', () => {
     });
 
     const logs = controller.getWorkflowLogs();
-    const handoffLogs = logs.data.logs.filter(
-      (log) => log.metadata?.handoff === 'ems.handoff',
-    );
+    const handoffLogs = logs.data.logs.filter((log) => log.metadata?.handoff === 'ems.handoff');
     expect(handoffLogs.length).toBeGreaterThanOrEqual(1);
     expect(handoffLogs[0]).toMatchObject({
       patientId,

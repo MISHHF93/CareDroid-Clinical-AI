@@ -108,9 +108,7 @@ export class PgVectorStore implements IVectorDatabase {
     }
 
     this.initialized = true;
-    this.logger.log(
-      `PgVectorStore ready (table=${this.tableName}, dimension=${this.dimension})`,
-    );
+    this.logger.log(`PgVectorStore ready (table=${this.tableName}, dimension=${this.dimension})`);
   }
 
   async query(queryVector: number[], options: VectorQueryOptions): Promise<QueryResult> {

@@ -117,6 +117,5 @@ export class LocalLexicalRankerService {
   }
 }
 
-/** @deprecated Prefer LocalLexicalRankerService — local lexical overlap, not Cohere. */
+/** @deprecated Prefer LocalLexicalRankerService ï¿½ local lexical overlap, not Cohere. */
 export { LocalLexicalRankerService as CohereRankerService };
-

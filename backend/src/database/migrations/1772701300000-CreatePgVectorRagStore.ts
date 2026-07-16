@@ -18,7 +18,9 @@ export class CreatePgVectorRagStore1772701300000 implements MigrationInterface {
 
     await queryRunner.query(`CREATE EXTENSION IF NOT EXISTS vector`);
 
-    const dimension = Number(process.env.EMBEDDING_DIMENSION || process.env.PINECONE_DIMENSION || 768);
+    const dimension = Number(
+      process.env.EMBEDDING_DIMENSION || process.env.PINECONE_DIMENSION || 768,
+    );
     const safeDim = Number.isFinite(dimension) && dimension > 0 ? Math.floor(dimension) : 768;
 
     await queryRunner.query(`

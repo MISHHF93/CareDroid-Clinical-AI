@@ -28,10 +28,7 @@ export type RuntimeJwtAuthenticator = (
 
 function userHasPermission(user: RuntimeAuthenticatedUser, permission: Permission): boolean {
   if (user.permissions && user.permissions.length > 0) {
-    return claimsIncludePermission(
-      { role: user.role, permissions: user.permissions },
-      permission,
-    );
+    return claimsIncludePermission({ role: user.role, permissions: user.permissions }, permission);
   }
   return hasPermission(user.role, permission);
 }

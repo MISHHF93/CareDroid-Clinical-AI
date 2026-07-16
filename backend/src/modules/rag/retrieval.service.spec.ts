@@ -116,4 +116,75 @@ describe('RetrievalService', () => {
     expect(result.chunks[0].id).toBe('cached-chunk');
     expect(result.cacheHit).toBe(true);
   });
+
+  describe('cache-key correctness (filters must not share entries)', () => {
+    const baseRequest = {
+      query: 'sepsis protocol',
+      queryEmbedding,
+      topK: 5,
+      minScore: 0.7,
+      includeEmbeddings: false,
+      corpusVersion: 1,
+    };
+
+    function capturedKeys(cacheGet: jest.Mock): string[] {
+      return cacheGet.mock.calls.map(([key]) => key as string);
+    }
+
+    it('keys tenant-scoped queries separately (org A warm cache never serves org B)', async () => {
+      const { service, cacheGet } = createService();
+
+      await service.retrieve({
+        ...baseRequest,
+        filter: { organizationId: ['org-a', '__global__'] },
+      });
+      await service.retrieve({
+        ...baseRequest,
+        filter: { organizationId: ['org-b', '__global__'] },
+      });
+
+      const [keyA, keyB] = capturedKeys(cacheGet);
+      expect(keyA).toContain('org-a');
+      expect(keyB).toContain('org-b');
+      expect(keyA).not.toEqual(keyB);
+    });
+
+    it('keys identical queries with different metadata filters separately', async () => {
+      const { service, cacheGet } = createService();
+
+      await service.retrieve({
+        ...baseRequest,
+        filter: {},
+        metadataFilter: { specialty: 'cardiology' },
+      });
+      await service.retrieve({
+        ...baseRequest,
+        filter: {},
+        metadataFilter: { specialty: 'neurology' },
+      });
+
+      const [cardioKey, neuroKey] = capturedKeys(cacheGet);
+      expect(cardioKey).not.toEqual(neuroKey);
+    });
+
+    it('keys hybrid and pure-vector retrieval separately', async () => {
+      const { service, cacheGet } = createService();
+
+      await service.retrieve({ ...baseRequest, filter: {}, hybrid: true });
+      await service.retrieve({ ...baseRequest, filter: {}, hybrid: false });
+
+      const [hybridKey, vectorKey] = capturedKeys(cacheGet);
+      expect(hybridKey).not.toEqual(vectorKey);
+    });
+
+    it('treats an absent metadata filter and an empty one as the same key (no needless misses)', async () => {
+      const { service, cacheGet } = createService();
+
+      await service.retrieve({ ...baseRequest, filter: {} });
+      await service.retrieve({ ...baseRequest, filter: {}, metadataFilter: {} });
+
+      const [absentKey, emptyKey] = capturedKeys(cacheGet);
+      expect(absentKey).toEqual(emptyKey);
+    });
+  });
 });

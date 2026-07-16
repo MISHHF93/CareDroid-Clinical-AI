@@ -221,6 +221,5 @@ export class LocalEmbeddingsService {
   }
 }
 
-/** @deprecated Prefer LocalEmbeddingsService — never called OpenAI. */
+/** @deprecated Prefer LocalEmbeddingsService ï¿½ never called OpenAI. */
 export { LocalEmbeddingsService as OpenAIEmbeddingsService };
-

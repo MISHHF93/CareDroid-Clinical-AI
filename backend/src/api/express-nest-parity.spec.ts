@@ -6,27 +6,29 @@
 import { getRouteList, ROUTES } from './routes-registry';
 
 /** Nest-preferred ownership (documentation contract — not HTTP probes). */
-const NEST_PREFERRED: Record<string, { nestOwner: string; retirePriority: 'P0' | 'P1' | 'P2' | 'keep' }> =
-  {
-    '/health': { nestOwner: 'app/health', retirePriority: 'keep' },
-    '/capacity': { nestOwner: 'emergency-os', retirePriority: 'P1' },
-    '/ems': { nestOwner: 'emergency-os / sentinel', retirePriority: 'P1' },
-    '/surge': { nestOwner: 'emergency-os', retirePriority: 'P2' },
-    '/boarding': { nestOwner: 'emergency-os', retirePriority: 'P1' },
-    '/protocol': { nestOwner: 'clinical / tool-calling', retirePriority: 'P2' },
-    '/deterioration': { nestOwner: 'clinical-intelligence', retirePriority: 'P2' },
-    '/copilot': { nestOwner: 'ai-gateway / chat', retirePriority: 'P0' },
-    '/intake': { nestOwner: 'emergency-os / smart-intake', retirePriority: 'P1' },
-    '/moh': { nestOwner: 'interoperability', retirePriority: 'P2' },
-    '/wearable': { nestOwner: 'telemetry', retirePriority: 'P2' },
-    '/iot': { nestOwner: 'telemetry / iot', retirePriority: 'P2' },
-    '/simulation': { nestOwner: 'simulation', retirePriority: 'P2' },
-    '/governance': { nestOwner: 'platform-governance', retirePriority: 'P0' },
-    '/handover': { nestOwner: 'emergency-os', retirePriority: 'P1' },
-    '/federated': { nestOwner: 'future — disable', retirePriority: 'P2' },
-    '/digital-twin': { nestOwner: 'digital-twin Nest', retirePriority: 'P2' },
-    '/reassessment': { nestOwner: 'emergency-os', retirePriority: 'P1' },
-  };
+const NEST_PREFERRED: Record<
+  string,
+  { nestOwner: string; retirePriority: 'P0' | 'P1' | 'P2' | 'keep' }
+> = {
+  '/health': { nestOwner: 'app/health', retirePriority: 'keep' },
+  '/capacity': { nestOwner: 'emergency-os', retirePriority: 'P1' },
+  '/ems': { nestOwner: 'emergency-os / sentinel', retirePriority: 'P1' },
+  '/surge': { nestOwner: 'emergency-os', retirePriority: 'P2' },
+  '/boarding': { nestOwner: 'emergency-os', retirePriority: 'P1' },
+  '/protocol': { nestOwner: 'clinical / tool-calling', retirePriority: 'P2' },
+  '/deterioration': { nestOwner: 'clinical-intelligence', retirePriority: 'P2' },
+  '/copilot': { nestOwner: 'ai-gateway / chat', retirePriority: 'P0' },
+  '/intake': { nestOwner: 'emergency-os / smart-intake', retirePriority: 'P1' },
+  '/moh': { nestOwner: 'interoperability', retirePriority: 'P2' },
+  '/wearable': { nestOwner: 'telemetry', retirePriority: 'P2' },
+  '/iot': { nestOwner: 'telemetry / iot', retirePriority: 'P2' },
+  '/simulation': { nestOwner: 'simulation', retirePriority: 'P2' },
+  '/governance': { nestOwner: 'platform-governance', retirePriority: 'P0' },
+  '/handover': { nestOwner: 'emergency-os', retirePriority: 'P1' },
+  '/federated': { nestOwner: 'future — disable', retirePriority: 'P2' },
+  '/digital-twin': { nestOwner: 'digital-twin Nest', retirePriority: 'P2' },
+  '/reassessment': { nestOwner: 'emergency-os', retirePriority: 'P1' },
+};
 
 describe('Express→Nest parity inventory', () => {
   it('lists only known Express route groups', () => {

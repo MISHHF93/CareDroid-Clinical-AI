@@ -1,4 +1,8 @@
-import { filterRecordsByTenant, isAllowedTenantDocument, RAG_GLOBAL_ORG_SCOPE } from './tenant-scope';
+import {
+  filterRecordsByTenant,
+  isAllowedTenantDocument,
+  RAG_GLOBAL_ORG_SCOPE,
+} from './tenant-scope';
 
 describe('RAG tenant scope', () => {
   it('allows global corpus for any query org', () => {

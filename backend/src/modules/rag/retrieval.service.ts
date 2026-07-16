@@ -212,7 +212,13 @@ export class RetrievalService {
       topK: request.topK,
       minScore: request.minScore,
       includeEmbeddings: request.includeEmbeddings,
+      // hybrid and metadataFilter both change retrieveUncached's output, so they
+      // must be part of the key — otherwise an identical query with a different
+      // specialty/jurisdiction/documentType filter (or hybrid toggle) is served
+      // the first caller's cached results for the full TTL.
+      hybrid: request.hybrid !== false,
       filter: this.stableObject(request.filter),
+      metadataFilter: this.stableObject((request.metadataFilter || {}) as Record<string, any>),
     })}`;
   }
 
@@ -246,9 +252,7 @@ export function applyTenantOrganizationDefenseFilter<
 
   const raw = filter.organizationId;
   const allowed = new Set(
-    (Array.isArray(raw) ? raw : [raw])
-      .map((value) => String(value || '').trim())
-      .filter(Boolean),
+    (Array.isArray(raw) ? raw : [raw]).map((value) => String(value || '').trim()).filter(Boolean),
   );
   if (allowed.size === 0) return matches;
 

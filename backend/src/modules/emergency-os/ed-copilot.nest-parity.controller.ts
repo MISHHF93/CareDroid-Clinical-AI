@@ -49,9 +49,7 @@ export class EdCopilotNestParityController {
     const suggestion =
       String(response.suggestion || data.response || data.answer || data.message || '') ||
       'No suggestion generated.';
-    const requiresReview = Boolean(
-      response.requires_review ?? data.requires_review ?? true,
-    );
+    const requiresReview = Boolean(response.requires_review ?? data.requires_review ?? true);
     const confidenceRaw = response.confidence ?? data.confidence;
     const confidence = typeof confidenceRaw === 'number' ? confidenceRaw : 0.55;
 

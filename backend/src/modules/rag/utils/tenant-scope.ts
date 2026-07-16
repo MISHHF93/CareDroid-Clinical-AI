@@ -23,15 +23,11 @@ export function isAllowedTenantDocument(
   return docOrg === queryOrg;
 }
 
-export function filterRecordsByTenant<T extends { organizationId?: string | null; metadata?: { organizationId?: string } }>(
-  records: readonly T[],
-  queryOrgId: string | null | undefined,
-): T[] {
+export function filterRecordsByTenant<
+  T extends { organizationId?: string | null; metadata?: { organizationId?: string } },
+>(records: readonly T[], queryOrgId: string | null | undefined): T[] {
   return records.filter((record) => {
-    const org =
-      record.organizationId ??
-      record.metadata?.organizationId ??
-      null;
+    const org = record.organizationId ?? record.metadata?.organizationId ?? null;
     return isAllowedTenantDocument(org, queryOrgId);
   });
 }

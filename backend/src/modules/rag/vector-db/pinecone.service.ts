@@ -44,10 +44,7 @@ export class PineconeService implements IVectorDatabase, OnModuleInit {
     const pineconeConfig = ragConfig?.pinecone || {};
 
     this.indexName = pineconeConfig.indexName || 'caredroid-medical';
-    this.dimension =
-      ragConfig?.embeddings?.dimension ||
-      pineconeConfig.dimension ||
-      768;
+    this.dimension = ragConfig?.embeddings?.dimension || pineconeConfig.dimension || 768;
     this.namespace = (pineconeConfig.namespace || '').trim();
   }
 
@@ -67,9 +64,7 @@ export class PineconeService implements IVectorDatabase, OnModuleInit {
       const ragConfig = this.configService.get<any>('rag');
       const pineconeConfig = ragConfig?.pinecone || {};
       const apiKey = pineconeConfig.apiKey;
-      const backend = String(
-        ragConfig?.vectorBackend || process.env.RAG_VECTOR_BACKEND || '',
-      )
+      const backend = String(ragConfig?.vectorBackend || process.env.RAG_VECTOR_BACKEND || '')
         .toLowerCase()
         .trim();
 
@@ -149,9 +144,7 @@ export class PineconeService implements IVectorDatabase, OnModuleInit {
       this.usePgVector = true;
       this.initialized = true;
       const stats = await store.getStats();
-      this.logger.log(
-        `RAG using pgvector (${stats.totalVectors} vectors, dim=${this.dimension})`,
-      );
+      this.logger.log(`RAG using pgvector (${stats.totalVectors} vectors, dim=${this.dimension})`);
       return true;
     } catch (error) {
       this.logger.warn(
@@ -166,11 +159,7 @@ export class PineconeService implements IVectorDatabase, OnModuleInit {
   private async initializeInMemory(): Promise<void> {
     const persistPath =
       process.env.RAG_LOCAL_INDEX_PATH || join(process.cwd(), '.rag-local', 'vectors.json');
-    this.inMemoryStore = new InMemoryVectorStore(
-      this.dimension,
-      'in-memory-local',
-      persistPath,
-    );
+    this.inMemoryStore = new InMemoryVectorStore(this.dimension, 'in-memory-local', persistPath);
     await this.inMemoryStore.loadFromDisk();
     this.useInMemory = true;
     this.initialized = true;

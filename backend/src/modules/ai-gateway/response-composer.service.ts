@@ -84,7 +84,9 @@ export class ResponseComposerService {
 
     const safetyEscalate = Boolean(routePlan.safetyPlan?.emergencyEscalation);
     const accountableRecommendation = buildAccountableRecommendationDto({
-      content: String((response as any).content || (response as any).answer || (response as any).message || ''),
+      content: String(
+        (response as any).content || (response as any).answer || (response as any).message || '',
+      ),
       evidence,
       confidence: typeof confidence === 'number' ? confidence : null,
       model: {

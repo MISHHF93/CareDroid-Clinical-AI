@@ -13,7 +13,11 @@ describe('PgVectorStore', () => {
       calls.push({ sql, params });
       const normalized = sql.replace(/\s+/g, ' ').trim().toLowerCase();
 
-      if (normalized.startsWith('create extension') || normalized.startsWith('create table') || normalized.startsWith('create index')) {
+      if (
+        normalized.startsWith('create extension') ||
+        normalized.startsWith('create table') ||
+        normalized.startsWith('create index')
+      ) {
         return [];
       }
       if (normalized.startsWith('select 1')) return [{ '?column?': 1 }];
@@ -154,19 +158,13 @@ describe('PgVectorStore', () => {
 
 describe('buildMetadataFilter', () => {
   it('scopes organizationId arrays to organization_id column', () => {
-    const { clause, params } = buildMetadataFilter(
-      { organizationId: ['org-A', '__global__'] },
-      2,
-    );
+    const { clause, params } = buildMetadataFilter({ organizationId: ['org-A', '__global__'] }, 2);
     expect(clause).toContain('organization_id = ANY($2::text[])');
     expect(params).toEqual([['org-A', '__global__']]);
   });
 
   it('maps sourceId and generic metadata keys', () => {
-    const { clause, params } = buildMetadataFilter(
-      { sourceId: 'doc-1', specialty: 'cardio' },
-      1,
-    );
+    const { clause, params } = buildMetadataFilter({ sourceId: 'doc-1', specialty: 'cardio' }, 1);
     expect(clause).toContain('source_id = $1');
     expect(clause).toContain('metadata->>');
     expect(params[0]).toBe('doc-1');
