@@ -46,9 +46,10 @@
   min-height: var(--compact-control-height, 40px);
   padding: 8px 14px;
   border-radius: var(--compact-panel-radius, 12px);
-  border: 1px solid var(--medical-card-border, var(--app-panel-border));
-  background: var(--medical-accent, var(--app-accent));
-  color: #fff;
+  /* Force AA solid clinical blue — role/accent soft teals (#6baaa7) fail white-on-fill 4.5:1 */
+  border: 1px solid var(--medical-sky-700, #054364);
+  background: var(--medical-sky-700, #054364);
+  color: #ffffff;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -243,16 +244,18 @@
   text-align: right;
 }
 
+/* Status KPI ink must clear WCAG AA large-text 3:1 on white (score is 24px/800).
+   Neon greens/ambers (#22c55e / #f59e0b) fail at ~2.2:1 — use clinical dark steps. */
 .is-critical {
-  color: #ef4444;
+  color: #b91c1c;
 }
 
 .is-warning {
-  color: #f59e0b;
+  color: #b45309;
 }
 
 .is-good {
-  color: #22c55e;
+  color: #15803d;
 }
 
 .hospital-map-canvas {

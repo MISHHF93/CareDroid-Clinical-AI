@@ -76,6 +76,7 @@ describe('emergencyOsApi advanced CareDroid capabilities', () => {
       'patients',
       'journey',
       'ems',
+      'emsHandoff',
       'receptionSnapshot',
       'receptionHandoff',
       'triageAssist',

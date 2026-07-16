@@ -1,5 +1,11 @@
 import { AIError, type AIRequest, type AIResponse, type AIUsage } from '../llmTransport';
 import type { LlmAdapter, LlmAdapterHealth, LlmAdapterRuntime } from './types';
+import {
+  fetchWithTimeout,
+  isAbortError,
+  readAiRequestTimeoutMs,
+  toTimeoutAIError,
+} from './transportSafety';
 
 const DEFAULT_MODEL = 'gemini-2.0-flash';
 
@@ -57,19 +63,25 @@ export class GeminiAdapter implements LlmAdapter {
       });
     }
 
+    const timeoutMs = readAiRequestTimeoutMs(runtime?.timeoutMs);
+
     try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          systemInstruction: { parts: [{ text: request.systemPrompt }] },
-          contents,
-          generationConfig: {
-            maxOutputTokens: maxTokens,
-            temperature: 0.2,
-          },
-        }),
-      });
+      const response = await fetchWithTimeout(
+        url,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            systemInstruction: { parts: [{ text: request.systemPrompt }] },
+            contents,
+            generationConfig: {
+              maxOutputTokens: maxTokens,
+              temperature: 0.2,
+            },
+          }),
+        },
+        { timeoutMs, signal: runtime?.signal },
+      );
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
@@ -112,6 +124,7 @@ export class GeminiAdapter implements LlmAdapter {
       };
     } catch (error) {
       if (error instanceof AIError) throw error;
+      if (isAbortError(error)) throw toTimeoutAIError(error, request.requestType, timeoutMs);
       throw new AIError({
         message: error instanceof Error ? error.message : String(error),
         code: 'AI_NETWORK_ERROR',

@@ -6,6 +6,8 @@ export const DEMO_LIVE_STATES = Object.freeze({
   BACKEND_UNAVAILABLE: 'backend-unavailable',
   UNSUPPORTED: 'unsupported',
   LOCAL_ONLY: 'local-only',
+  /** Architect Mode: AppShell engines (reassessment/capacity/alerts) that are session-local */
+  SESSION_ENGINE: 'session-engine',
 });
 
 export const DEMO_LIVE_STATE_LABELS = Object.freeze({
@@ -16,6 +18,7 @@ export const DEMO_LIVE_STATE_LABELS = Object.freeze({
   [DEMO_LIVE_STATES.BACKEND_UNAVAILABLE]: 'Backend unavailable',
   [DEMO_LIVE_STATES.UNSUPPORTED]: 'Unsupported',
   [DEMO_LIVE_STATES.LOCAL_ONLY]: 'Local-only',
+  [DEMO_LIVE_STATES.SESSION_ENGINE]: 'Session engine',
 });
 
 export const DEMO_LIVE_STATE_DESCRIPTIONS = Object.freeze({
@@ -26,6 +29,8 @@ export const DEMO_LIVE_STATE_DESCRIPTIONS = Object.freeze({
   [DEMO_LIVE_STATES.BACKEND_UNAVAILABLE]: 'Falls back because the backend capability is unavailable.',
   [DEMO_LIVE_STATES.UNSUPPORTED]: 'No live backend route or write action is currently supported.',
   [DEMO_LIVE_STATES.LOCAL_ONLY]: 'Runs only in browser state and does not persist to a backend.',
+  [DEMO_LIVE_STATES.SESSION_ENGINE]:
+    'Driven by in-browser timers/engines; not multi-user durable state unless an API snapshot overwrites it.',
 });
 
 export function getDemoLiveStateLabel(state) {

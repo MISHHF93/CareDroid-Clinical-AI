@@ -136,7 +136,7 @@ export class CollaborationHubService {
   /**
    * Batched by design: the original version ran ensureMembership() (a
    * findOne + maybe save) once per department channel on every single call,
-   * i.e. up to 15 sequential round-trips per request — and this endpoint is
+   * i.e. up to 15 sequential round-trips per request ΓÇö and this endpoint is
    * hit on every page load plus every realtime poll cycle. This version does
    * a fixed 3-4 queries regardless of department count, and performs zero
    * writes once a user is already a member of every department channel
@@ -193,7 +193,7 @@ export class CollaborationHubService {
 
   /**
    * Every user-facing lookup MUST go through this (org-scoped), not a bare
-   * findOne — a channelId/messageId alone is not enough to prove the caller's
+   * findOne ΓÇö a channelId/messageId alone is not enough to prove the caller's
    * organization owns it. Without the organizationId filter here, assertAccess()
    * still "works" per its own membership logic, but for DEPARTMENT channels it
    * auto-joins on first reference regardless of org, which previously let any
@@ -522,7 +522,7 @@ export class CollaborationHubService {
 
     this.realtimeService.publish({ type: 'message_created', payload: { channelId, message } });
     // Notification fan-out and external mirroring are side effects, not part
-    // of "did the message send" — fire-and-forget so a channel with many
+    // of "did the message send" ΓÇö fire-and-forget so a channel with many
     // members (or a slow external provider) never adds latency to the
     // send/reply request itself. Both are already internally resilient
     // (per-member try/catch, Promise.allSettled).
@@ -533,7 +533,13 @@ export class CollaborationHubService {
         }`,
       );
     });
-    void this.mirrorToExternalProviders(channel, message, userId).catch(() => {});
+    void this.mirrorToExternalProviders(channel, message, userId).catch((error) => {
+      this.logger.warn(
+        `mirrorToExternalProviders failed for message ${message.id}: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+    });
 
     return message;
   }
@@ -551,7 +557,7 @@ export class CollaborationHubService {
   ): Promise<CollaborationMessage> {
     // Unscoped: only called internally with a channelId the calling service
     // already created/fetched itself (patient thread, incident, AI Chief
-    // channel) — never derived from arbitrary user/request input.
+    // channel) ΓÇö never derived from arbitrary user/request input.
     const channel = await this.findChannelByIdUnscoped(channelId);
     const message = await this.messageRepo.save(
       this.messageRepo.create({
@@ -574,7 +580,13 @@ export class CollaborationHubService {
         }`,
       );
     });
-    void this.mirrorToExternalProviders(channel, message, null).catch(() => {});
+    void this.mirrorToExternalProviders(channel, message, null).catch((error) => {
+      this.logger.warn(
+        `mirrorToExternalProviders failed for message ${message.id}: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+    });
 
     return message;
   }
@@ -695,7 +707,7 @@ export class CollaborationHubService {
   // ---------------------------------------------------------------------
 
   /** Every message-scoped mutation must resolve the owning channel through the
-   * org-scoped getChannel() before touching the message — otherwise a
+   * org-scoped getChannel() before touching the message ΓÇö otherwise a
    * messageId alone lets any authenticated user (any org) react to, pin, or
    * attach files to a message that isn't theirs to touch. */
   private async getMessageWithChannel(
@@ -946,7 +958,7 @@ export class CollaborationHubService {
   }
 
   // ---------------------------------------------------------------------
-  // Notifications (reuses NotificationService — no parallel delivery path)
+  // Notifications (reuses NotificationService ΓÇö no parallel delivery path)
   // ---------------------------------------------------------------------
 
   private async notifyChannelMembers(

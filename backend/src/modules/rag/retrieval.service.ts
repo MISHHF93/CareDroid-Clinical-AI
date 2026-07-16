@@ -9,6 +9,7 @@ import { recordAiMonitorEvent } from '../../../../lib/ai/productionMonitoring';
 import { CacheService } from '../cache/cache.service';
 import { RetrievedChunk } from './dto/rag-context.dto';
 import { PineconeService } from './vector-db/pinecone.service';
+import { isAllowedTenantDocument, RAG_GLOBAL_ORG_SCOPE } from './utils/tenant-scope';
 
 export interface RetrievalRequest {
   query: string;
@@ -86,6 +87,9 @@ export class RetrievalService {
     });
 
     let matches = queryResult.matches;
+
+    // Defense-in-depth: even if a vector backend mis-applies filters, drop foreign tenants.
+    matches = applyTenantOrganizationDefenseFilter(matches, request.filter);
 
     if (request.metadataFilter) {
       matches = matches.filter((match) =>
@@ -227,4 +231,48 @@ export class RetrievalService {
       })),
     };
   }
+}
+
+/**
+ * Post-filter vector matches by organizationId when the request filter scopes tenants.
+ * Allowed values may be a single org or an array including RAG_GLOBAL_ORG_SCOPE.
+ */
+export function applyTenantOrganizationDefenseFilter<
+  T extends { metadata?: { organizationId?: string | null } | null },
+>(matches: T[], filter: Record<string, unknown> | undefined): T[] {
+  if (!filter || filter.organizationId === undefined || filter.organizationId === null) {
+    return matches;
+  }
+
+  const raw = filter.organizationId;
+  const allowed = new Set(
+    (Array.isArray(raw) ? raw : [raw])
+      .map((value) => String(value || '').trim())
+      .filter(Boolean),
+  );
+  if (allowed.size === 0) return matches;
+
+  // Query org is the first non-global entry when present; global-only means public corpus.
+  const queryOrgs = [...allowed].filter((id) => id !== RAG_GLOBAL_ORG_SCOPE);
+  const allowGlobal = allowed.has(RAG_GLOBAL_ORG_SCOPE);
+
+  return matches.filter((match) => {
+    const docOrg = String(
+      match.metadata?.organizationId ??
+        (match.metadata as { metadata?: { organizationId?: string } } | null | undefined)?.metadata
+          ?.organizationId ??
+        '',
+    ).trim();
+
+    if (!docOrg || docOrg === RAG_GLOBAL_ORG_SCOPE) {
+      return allowGlobal || isAllowedTenantDocument(RAG_GLOBAL_ORG_SCOPE, queryOrgs[0] || null);
+    }
+
+    if (queryOrgs.length === 0) {
+      // Filter only asked for global corpus
+      return false;
+    }
+
+    return queryOrgs.some((org) => isAllowedTenantDocument(docOrg, org));
+  });
 }

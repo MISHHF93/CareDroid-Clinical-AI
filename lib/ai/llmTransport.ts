@@ -59,7 +59,9 @@ export type AIErrorCode =
   | 'AI_PROVIDER_ERROR'
   | 'AI_NETWORK_ERROR'
   | 'AI_CONFIG_ERROR'
-  | 'AI_KILL_SWITCH';
+  | 'AI_KILL_SWITCH'
+  | 'AI_TIMEOUT'
+  | 'AI_CIRCUIT_OPEN';
 
 export class AIError extends Error {
   readonly code: AIErrorCode;

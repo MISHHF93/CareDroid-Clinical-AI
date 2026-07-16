@@ -250,7 +250,7 @@
 
 .command-dashboard__metric-threshold,
 .command-dashboard__zone small {
-  color: #64748b;
+  color: var(--medical-ink-muted, #475569);
   font-size: 11px;
 }
 

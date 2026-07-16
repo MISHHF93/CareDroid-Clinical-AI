@@ -164,6 +164,15 @@ export const ROLE_PERMISSION_GRANTS: Record<EmergencyRoleId, readonly string[]> 
     K.screenPhysician,
     K.screenEms,
   ]),
+  /**
+   * IT Admin — platform settings only. No patient create/write/PHI clinical actions.
+   * Aligns with EMERGENCY_ROLE_DEFINITIONS.itAdmin (metadata-only routes).
+   */
+  [EMERGENCY_ROLE_ID.itAdmin]: Object.freeze([
+    K.settingsManage,
+    K.screenAdmin,
+    K.analyticsView,
+  ]),
   [EMERGENCY_ROLE_ID.edManager]: Object.freeze([
     K.queueMove,
     K.reassessmentComplete,

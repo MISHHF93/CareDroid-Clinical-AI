@@ -6,15 +6,15 @@ import { buildHourlyArrivalsChart } from '../../utils/commandCenterChartModel';
 import OperationalPresentationFrame from '../emergency/OperationalPresentationFrame';
 import DisplayRefreshStatusBar from '../emergency/DisplayRefreshStatusBar';
 import { GraphicIconBadge } from '../graphics/CdlGraphicKit';
-import { CategoryBarChart } from '../dashboard/DashboardVisualizations';
+import { CategoryBarChart } from '../dashboard/DashboardCharts';
 import { sortCommandCenterMetrics } from './commandCenterThroughputModel';
 import CommandCenterSurgePanel from './CommandCenterSurgePanel';
 import './CommandCenterThroughputScreen.css';
 
 function trendGlyph(direction) {
-  if (direction === 'up') return '↑';
-  if (direction === 'down') return '↓';
-  return '→';
+  if (direction === 'up') return 'â†‘';
+  if (direction === 'down') return 'â†“';
+  return 'â†’';
 }
 
 export default function CommandCenterThroughputScreen({
@@ -242,7 +242,7 @@ export default function CommandCenterThroughputScreen({
             <h3>Data freshness / system health</h3>
             <strong>{resolvedSnapshot.systemHealth.label}</strong>
             <p>
-              {resolvedSnapshot.systemHealth.freshness} · {resolvedSnapshot.systemHealth.detail}
+              {resolvedSnapshot.systemHealth.freshness} Â· {resolvedSnapshot.systemHealth.detail}
             </p>
           </section>
         ) : null}

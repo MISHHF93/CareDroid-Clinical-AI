@@ -1,12 +1,7 @@
 import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  CategoryBarChart,
-  DistributionDonutChart,
-  MetricCard,
-  MiniSparkline,
-  VisualizationPanel,
-} from '../dashboard/DashboardVisualizations';
+import { MetricCard, MiniSparkline, VisualizationPanel } from '../dashboard/DashboardVisualizations';
+import { CategoryBarChart, DistributionDonutChart } from '../dashboard/DashboardCharts';
 import { GraphicIconBadge } from '../graphics/CdlGraphicKit';
 import { resolveProfileAiCapabilities } from '../../config/profileAiCapabilities.config';
 import type { ProfileCopyStack } from '../../config/userProfileCopyModel';

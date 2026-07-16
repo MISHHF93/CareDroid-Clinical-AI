@@ -9,8 +9,8 @@ import { RetrievedChunk } from '../dto/rag-context.dto';
  */
 
 @Injectable()
-export class CohereRankerService {
-  private readonly logger = new Logger(CohereRankerService.name);
+export class LocalLexicalRankerService {
+  private readonly logger = new Logger(LocalLexicalRankerService.name);
   private readonly model: string;
   private readonly enabled: boolean;
 
@@ -116,3 +116,7 @@ export class CohereRankerService {
     );
   }
 }
+
+/** @deprecated Prefer LocalLexicalRankerService — local lexical overlap, not Cohere. */
+export { LocalLexicalRankerService as CohereRankerService };
+

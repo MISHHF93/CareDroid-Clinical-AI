@@ -1,5 +1,6 @@
 import { buildSurveillanceNexusSnapshot } from './surveillance.data';
 import { SURVEILLANCE_ADAPTER_CONTRACTS } from './surveillance-nexus.contracts';
+import { SurveillanceService } from './surveillance.service';
 
 describe('surveillance nexus module', () => {
   it('builds a complete nexus snapshot', () => {
@@ -17,5 +18,16 @@ describe('surveillance nexus module', () => {
     );
     expect(welfare?.welfareSafeRequired).toBe(true);
     expect(welfare?.requiredHumanApproval).toBe(true);
+  });
+
+  it('serves the canonical nexus snapshot for request-scoped callers', async () => {
+    const service = new SurveillanceService();
+
+    const snapshot = await service.getNexusSnapshot({
+      user: { id: 'user-1', role: 'security-operator' },
+      ip: '127.0.0.1',
+    });
+
+    expect(snapshot).toEqual(buildSurveillanceNexusSnapshot());
   });
 });

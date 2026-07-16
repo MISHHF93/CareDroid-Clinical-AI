@@ -1,6 +1,7 @@
 import { anthropicAdapter } from './anthropicAdapter';
 import { azureOpenAIAdapter } from './azureOpenAIAdapter';
 import { geminiAdapter } from './geminiAdapter';
+import { groqAdapter } from './groqAdapter';
 import { localAdapter } from './localAdapter';
 import { openAIAdapter } from './openaiAdapter';
 import type { LlmAdapter, LlmAdapterHealth, LlmProviderId } from './types';
@@ -10,6 +11,7 @@ const ADAPTERS: Record<LlmProviderId, LlmAdapter> = {
   openai: openAIAdapter,
   'azure-openai': azureOpenAIAdapter,
   gemini: geminiAdapter,
+  groq: groqAdapter,
   local: localAdapter,
 };
 
@@ -18,6 +20,7 @@ export function normalizeProviderId(value: string | undefined | null): LlmProvid
   if (raw === 'azure_openai' || raw === 'azure-openai' || raw === 'azure') return 'azure-openai';
   if (raw === 'openai') return 'openai';
   if (raw === 'gemini' || raw === 'google') return 'gemini';
+  if (raw === 'groq') return 'groq';
   if (raw === 'local' || raw === 'mock' || raw === 'deterministic') return 'local';
   return 'anthropic';
 }

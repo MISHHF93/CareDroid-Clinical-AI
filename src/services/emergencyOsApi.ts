@@ -1,5 +1,6 @@
 import { apiFetch, getApiErrorMessage, parseApiResponse } from './apiClient';
 import { serializePatientForBackendApi } from './patientArrivalBackendSync';
+import logger from '../utils/logger';
 
 /**
  * Canonical CareDroid frontend facade.
@@ -20,6 +21,7 @@ export const EMERGENCY_OS_API_ENDPOINTS = Object.freeze({
   patientDocumentArtifacts: '/api/emergency/patients',
   journey: '/api/emergency/journey',
   ems: '/api/emergency/ems',
+  emsHandoff: '/api/emergency/ems/handoff',
   receptionSnapshot: '/api/emergency/reception/snapshot',
   receptionHandoff: '/api/emergency/reception/handoff',
   triageAssist: '/api/emergency/triage/assist',
@@ -92,6 +94,7 @@ export const ACTIVE_EMERGENCY_OS_API_ENDPOINT_KEYS = Object.freeze([
   'patients',
   'journey',
   'ems',
+  'emsHandoff',
   'receptionSnapshot',
   'receptionHandoff',
   'triageAssist',
@@ -184,6 +187,11 @@ export const fetchEmergencyPatients = () =>
   requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.patients);
 export const fetchPatientJourney = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.journey);
 export const fetchEMSIntake = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.ems);
+export const postEmsHandoff = (payload) =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.emsHandoff, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
 export const fetchReceptionSnapshot = () =>
   requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.receptionSnapshot);
 export const postReceptionHandoff = (payload) =>
@@ -266,7 +274,11 @@ export function persistCopilotInteractionSafely(payload: any = {}) {
     requiresHumanReview: true,
     safetyCheckPassed: true,
     ...payload,
-  }).catch(() => undefined);
+  }).catch((error) => {
+    logger.warn('Failed to persist copilot interaction audit trail', {
+      error: error instanceof Error ? error.message : String(error),
+    });
+  });
 }
 export const fetchEmergencyWorkflowLogs = () =>
   requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.workflowLogs);

@@ -1,6 +1,8 @@
 import './observability/datadog';
 import { NestFactory } from '@nestjs/core';
 import { Logger, ValidationPipe, type INestApplication } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import helmet from 'helmet';
 import * as express from 'express';
@@ -28,6 +30,13 @@ import {
 } from './static-asset-excludes';
 import { ApiExceptionFilter } from './common/filters/api-exception.filter';
 import { LoggingMiddleware } from './middleware/logging.middleware';
+import {
+  createLegacyApiAuthMiddleware,
+  createRuntimeJwtAuthenticator,
+  createSocketJwtAuthMiddleware,
+} from './api/runtime-auth';
+import { User } from './modules/users/entities/user.entity';
+import { Permission } from './modules/auth/enums/permission.enum';
 
 function shouldServeFrontendAssets(config: EnvironmentConfig) {
   return config.server.nodeEnv === 'production' && !config.runtime.jestWorkerId;
@@ -50,9 +59,25 @@ async function registerEmergencyMongooseRuntime(
 
   await mongoose.connect(mongoUri);
   const expressApp = app.getHttpAdapter().getInstance();
-  const mountedRoutes = registerAllRoutes(expressApp, { mountDiscovery: false });
-  registerAllRoutes(expressApp, { apiPrefix: '/api/emergency', mountDiscovery: false });
-  registerEMSWebSocketSupport(expressApp, app.getHttpServer(), config.server.corsOrigins);
+  // Legacy mongoose CareDroid routes require JWT + PHI permissions (security audit D-path).
+  const authenticate = createRuntimeJwtAuthenticator(
+    app.get(JwtService),
+    app.get(ConfigService),
+    app.get(DataSource).getRepository(User),
+  );
+  const middleware = [createLegacyApiAuthMiddleware(authenticate)];
+  const mountedRoutes = registerAllRoutes(expressApp, { mountDiscovery: false, middleware });
+  registerAllRoutes(expressApp, {
+    apiPrefix: '/api/emergency',
+    mountDiscovery: false,
+    middleware,
+  });
+  registerEMSWebSocketSupport(
+    expressApp,
+    app.getHttpServer(),
+    config.server.corsOrigins,
+    createSocketJwtAuthMiddleware(authenticate, Permission.READ_PHI),
+  );
   reassessmentScheduler.start();
   const initialization = await initializeAllServices();
   if (initialization.totals.failed > 0) {
@@ -204,16 +229,23 @@ async function bootstrap() {
   expressApp.use('/health', healthRoutes);
 
   await registerEmergencyMongooseRuntime(app, logger, environment);
+  const authenticateSocket = createRuntimeJwtAuthenticator(
+    app.get(JwtService),
+    app.get(ConfigService),
+    app.get(DataSource).getRepository(User),
+  );
   registerEdgeAIAmbulanceWebSocketSupport(
     expressApp,
     app.getHttpServer(),
     undefined,
     environment.server.corsOrigins,
+    createSocketJwtAuthMiddleware(authenticateSocket, Permission.WRITE_PHI),
   );
   registerSentinelAvlWebSocketSupport(
     expressApp,
     app.getHttpServer(),
     environment.server.corsOrigins,
+    createSocketJwtAuthMiddleware(authenticateSocket, Permission.VIEW_SENTINEL_COMMAND),
   );
 
   // Swagger documentation

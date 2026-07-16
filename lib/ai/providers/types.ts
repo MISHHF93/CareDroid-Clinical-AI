@@ -2,7 +2,13 @@ import type { AIRequest, AIResponse } from '../llmTransport';
 import type { AIRequestType } from '../types';
 import type { AiDeployMode } from '../deploymentFlags';
 
-export type LlmProviderId = 'anthropic' | 'openai' | 'azure-openai' | 'gemini' | 'local';
+export type LlmProviderId =
+  | 'anthropic'
+  | 'openai'
+  | 'azure-openai'
+  | 'gemini'
+  | 'groq'
+  | 'local';
 
 export interface LlmAdapterHealth {
   provider: LlmProviderId;
@@ -19,6 +25,10 @@ export interface LlmAdapterRuntime {
   azureDeployment?: string;
   /** Optional override model/deployment name */
   model?: string;
+  /** Per-request timeout override (ms). Defaults to AI_REQUEST_TIMEOUT_MS or 30000. */
+  timeoutMs?: number;
+  /** Optional abort signal composed with the transport timeout. */
+  signal?: AbortSignal;
   metadataLogger?: (metadata: {
     requestType: AIRequestType;
     model: string;

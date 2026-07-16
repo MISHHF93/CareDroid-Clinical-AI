@@ -1,6 +1,7 @@
 import React from 'react';
 import ToolVisualization from '../ToolVisualization';
 import OperationalResultCard from './OperationalResultCard';
+import { AccountableRecommendationCard } from '../ai/AccountableRecommendationCard';
 
 function getDisplayVisualizations(message) {
   if (!Array.isArray(message?.visualizations)) return [];
@@ -34,6 +35,12 @@ export default function AssistantResultRenderer({
 
   return (
     <>
+      {message.accountableRecommendation ? (
+        <AccountableRecommendationCard
+          recommendation={message.accountableRecommendation}
+          compact
+        />
+      ) : null}
       {message.toolResult && (
         <OperationalResultCard
           toolResult={message.toolResult}

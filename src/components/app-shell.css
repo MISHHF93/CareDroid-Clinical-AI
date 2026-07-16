@@ -7,9 +7,31 @@
   height: var(--app-viewport-height, 100dvh);
   max-height: var(--app-viewport-height, 100dvh);
   overflow: hidden;
-  background: var(--app-surface-0, #ffffff);
-  color: var(--ed-text-primary, var(--medical-ink));
+  /* Medical Light: neutral clinical canvas */
+  background: var(--ml-surface-page, var(--app-surface-0, #f6f9fc));
+  color: var(--ml-text-primary, var(--ed-text-primary, var(--medical-ink)));
   font-family: var(--app-font-family-body, Inter, system-ui, sans-serif);
+}
+
+/* Reception desk density — less chrome stacking, more workspace */
+.emergency-app-shell--reception-density .emergency-app-shell__command-bars {
+  max-height: none;
+}
+
+.emergency-app-shell--reception-density .app-shell-main-content {
+  padding-block-start: var(--ml-space-2, 8px);
+}
+
+/* Ultrawide: keep clinical forms readable, use horizontal space for rails */
+@media (min-width: 1920px) {
+  .emergency-app-shell.ml-app-shell .app-shell-main-content {
+    padding-inline: var(--ml-content-inline-pad, var(--ml-space-6, 24px));
+  }
+
+  .emergency-app-shell.ml-app-shell .app-shell-main-content > * {
+    max-width: min(100%, 100rem);
+    margin-inline: auto;
+  }
 }
 
 @media (max-width: 1024px) and (min-width: 769px) {

@@ -222,38 +222,95 @@ class AIGovernanceEndpointBase {
   }
 }
 
+/**
+ * Nest parity for Express `/api/governance/*` (Architect Mode P0).
+ * Auth required — Express mount also requires JWT via runtime-auth when Mongoose path is on.
+ */
+@Controller('governance')
+@UseGuards(AuthGuard('jwt'), AuthorizationGuard)
+export class NestAiGovernanceController extends AIGovernanceEndpointBase {
+  constructor(aiGovernance: AIGovernanceService) {
+    super(aiGovernance);
+  }
+
+  @Get('registry')
+  @Permissions(Permission.VIEW_GOVERNANCE)
+  getRegistry() {
+    return super.getRegistry();
+  }
+
+  @Get('safety-rules')
+  @Permissions(Permission.VIEW_GOVERNANCE)
+  getSafetyRules() {
+    return super.getSafetyRules();
+  }
+
+  @Get('compliance')
+  @Permissions(Permission.VIEW_GOVERNANCE)
+  getComplianceReport(@Query('days') days?: string) {
+    return super.getComplianceReport(days);
+  }
+
+  @Get('violations')
+  @Permissions(Permission.VIEW_GOVERNANCE)
+  getViolations(@Query('limit') limit?: string) {
+    return super.getViolations(limit);
+  }
+
+  @Get('validate-prompts')
+  @Permissions(Permission.VIEW_GOVERNANCE)
+  validatePrompts() {
+    return super.validatePrompts();
+  }
+
+  @Post('evaluate-priority-change')
+  @Permissions(Permission.VIEW_GOVERNANCE)
+  evaluatePriorityChange(
+    @Body() body: { patient?: Record<string, unknown>; requestedDps?: number },
+  ) {
+    return super.evaluatePriorityChange(body);
+  }
+}
+
 @Controller('v1/governance')
+@UseGuards(AuthGuard('jwt'), AuthorizationGuard)
 export class AIGovernanceV1Controller extends AIGovernanceEndpointBase {
   constructor(aiGovernance: AIGovernanceService) {
     super(aiGovernance);
   }
 
   @Get('registry')
+  @Permissions(Permission.VIEW_GOVERNANCE)
   getRegistry() {
     return super.getRegistry();
   }
 
   @Get('safety-rules')
+  @Permissions(Permission.VIEW_GOVERNANCE)
   getSafetyRules() {
     return super.getSafetyRules();
   }
 
   @Get('compliance')
+  @Permissions(Permission.VIEW_GOVERNANCE)
   getComplianceReport(@Query('days') days?: string) {
     return super.getComplianceReport(days);
   }
 
   @Get('violations')
+  @Permissions(Permission.VIEW_GOVERNANCE)
   getViolations(@Query('limit') limit?: string) {
     return super.getViolations(limit);
   }
 
   @Get('validate-prompts')
+  @Permissions(Permission.VIEW_GOVERNANCE)
   validatePrompts() {
     return super.validatePrompts();
   }
 
   @Post('evaluate-priority-change')
+  @Permissions(Permission.VIEW_GOVERNANCE)
   evaluatePriorityChange(
     @Body() body: { patient?: Record<string, unknown>; requestedDps?: number },
   ) {
@@ -262,37 +319,44 @@ export class AIGovernanceV1Controller extends AIGovernanceEndpointBase {
 }
 
 @Controller('emergency/governance')
+@UseGuards(AuthGuard('jwt'), AuthorizationGuard)
 export class EmergencyAIGovernanceController extends AIGovernanceEndpointBase {
   constructor(aiGovernance: AIGovernanceService) {
     super(aiGovernance);
   }
 
   @Get('registry')
+  @Permissions(Permission.VIEW_GOVERNANCE)
   getRegistry() {
     return super.getRegistry();
   }
 
   @Get('safety-rules')
+  @Permissions(Permission.VIEW_GOVERNANCE)
   getSafetyRules() {
     return super.getSafetyRules();
   }
 
   @Get('compliance')
+  @Permissions(Permission.VIEW_GOVERNANCE)
   getComplianceReport(@Query('days') days?: string) {
     return super.getComplianceReport(days);
   }
 
   @Get('violations')
+  @Permissions(Permission.VIEW_GOVERNANCE)
   getViolations(@Query('limit') limit?: string) {
     return super.getViolations(limit);
   }
 
   @Get('validate-prompts')
+  @Permissions(Permission.VIEW_GOVERNANCE)
   validatePrompts() {
     return super.validatePrompts();
   }
 
   @Post('evaluate-priority-change')
+  @Permissions(Permission.VIEW_GOVERNANCE)
   evaluatePriorityChange(
     @Body() body: { patient?: Record<string, unknown>; requestedDps?: number },
   ) {
@@ -302,7 +366,12 @@ export class EmergencyAIGovernanceController extends AIGovernanceEndpointBase {
 
 @Module({
   imports: [PlatformGovernanceModule],
-  controllers: [GovernanceController, AIGovernanceV1Controller, EmergencyAIGovernanceController],
+  controllers: [
+    GovernanceController,
+    NestAiGovernanceController,
+    AIGovernanceV1Controller,
+    EmergencyAIGovernanceController,
+  ],
   providers: [
     AIGovernanceService,
     ModelRegistryService,

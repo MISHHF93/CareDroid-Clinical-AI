@@ -1,11 +1,7 @@
 import { useMemo } from 'react';
 import { GraphicIconBadge } from '../graphics/CdlGraphicKit';
-import {
-  CategoryBarChart,
-  DistributionDonutChart,
-  TrendChart,
-  VisualizationPanel,
-} from '../dashboard/DashboardVisualizations';
+import { VisualizationPanel } from '../dashboard/DashboardVisualizations';
+import { CategoryBarChart, DistributionDonutChart, TrendChart } from '../dashboard/DashboardCharts';
 import {
   buildComplaintsChart,
   buildDailyVolumeChart,

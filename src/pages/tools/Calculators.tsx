@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import useProfileNavigate from '../../hooks/useProfileNavigate';
 import { useConversation } from '../../contexts/ConversationContext';
@@ -62,116 +62,96 @@ import {
 import { NavIcon } from '../../navigation/NavIcon';
 import { getCalculatorSubIcon, CHROME_ICONS } from '../../navigation/iconRegistry';
 import { useNotificationActions } from '../../hooks/useNotificationActions';
-import { Phq9Calculator, Gad7Calculator } from './mentalHealthCalculators';
-import {
-  AscvdRiskCalculator,
-  AuditCCalculator,
-  CkdStagingCalculator,
-  StopBangCalculator,
-} from './pr4aCalculators';
-import {
-  HeartScoreCalculator,
-  CentorMcisaacCalculator,
-  BishopScoreCalculator,
-  ApgarScoreCalculator,
-  BradenScaleCalculator,
-  MorseFallScaleCalculator,
-  RansonCriteriaCalculator,
-  BisapScoreCalculator,
-  Fib4Calculator,
-  FraminghamRiskCalculator,
-} from './pr8ClinicalBatchCalculators';
-import {
-  ApriCalculator,
-  GlasgowBlatchfordScoreCalculator,
-  MaddreyDiscriminantFunctionCalculator,
-  RockallScoreCalculator,
-} from './hepatologyGiCalculators';
-import { Abcd2Calculator } from './abcd2Calculator';
-import { AnionGapCalculator, RassCalculator, ShockIndexCalculator } from './nextWaveCalculators';
-import {
-  CanadianCSpineCalculator,
-  GraceAcsCalculator,
-  NihssCalculator,
-  OttawaAnkleCalculator,
-  PercCalculator,
-  WellsPeCalculator,
-} from './sourceBackedClinicalCalculators';
-import {
-  ApacheIICalculator,
-  Curb65Calculator,
-  GcsCalculator,
-  MewsCalculator,
-  PewsCalculator,
-  RevisedTraumaScoreCalculator,
-} from './emergencyCriticalCareCalculators';
-import {
-  Chads2Calculator,
-  DukeTreadmillScoreCalculator,
-  HcmSuddenDeathRiskCalculator,
-  HeartFailureStagingCalculator,
-  ReynoldsRiskScoreCalculator,
-} from './cardiologyCalculators';
+// Specialty families: lazy-loaded so the calculators route does not execute every specialty chunk up front.
 import {
   AaGradientCalculator,
+  Abcd2Calculator,
+  AdjustedBodyWeightCalculator,
+  AnionGapCalculator,
+  ApacheIICalculator,
+  ApgarScoreCalculator,
+  ApriCalculator,
+  AscvdRiskCalculator,
   AsthmaSeverityScoreCalculator,
+  AuditCCalculator,
+  BedOccupancyCalculator,
+  BishopScoreCalculator,
+  BisapScoreCalculator,
   BodeIndexCalculator,
-  CopdGoldAssessmentCalculator,
-  Pao2Fio2RatioCalculator,
-  PneumoniaSeverityIndexCalculator,
-  RoxIndexCalculator,
-} from './pulmonologyCalculators';
-import {
+  BradenScaleCalculator,
+  BsaCalculator,
   BunCreatinineRatioCalculator,
+  CageCalculator,
+  CanadianCSpineCalculator,
+  CentorMcisaacCalculator,
+  Chads2Calculator,
+  CkdStagingCalculator,
+  ColumbiaSuicideSeverityWorkflow,
+  CopdGoldAssessmentCalculator,
+  CorrectedCalciumCalculator,
   CorrectedSodiumCalculator,
   CreatinineClearanceCgCalculator,
+  Curb65Calculator,
+  DukeTreadmillScoreCalculator,
   EgfrCkdEpiCalculator,
+  EpworthSleepinessScaleCalculator,
   FeNaCalculator,
   FeUreaCalculator,
-  FreeWaterDeficitCalculator,
-  KfreCalculator,
-  OsmolalGapCalculator,
-} from './nephrologyCalculators';
-import {
-  AdjustedBodyWeightCalculator,
-  BsaCalculator,
-  CorrectedCalciumCalculator,
-  HomaIrCalculator,
-  IdealBodyWeightCalculator,
-  SerumOsmolalityCalculator,
-  WaistHipRatioCalculator,
-} from './endocrineMetabolicCalculators';
-import {
+  FentonGrowthChartHelper,
+  Fib4Calculator,
   FourScoreCalculator,
+  FraminghamRiskCalculator,
+  FreeWaterDeficitCalculator,
+  Gad7Calculator,
+  GcsCalculator,
+  GestationalAgeCalculator,
+  GlasgowBlatchfordScoreCalculator,
+  GraceAcsCalculator,
+  HcmSuddenDeathRiskCalculator,
+  HeartFailureStagingCalculator,
+  HeartScoreCalculator,
+  HomaIrCalculator,
   HuntHessScaleCalculator,
   IchScoreCalculator,
-  ModifiedRankinScaleCalculator,
-  NihssSummaryViewCalculator,
-  PediatricGcsCalculator,
-} from './neurologyCalculators';
-import {
-  FentonGrowthChartHelper,
-  GestationalAgeCalculator,
-  NeonatalBilirubinRiskHelper,
-  PediatricBpPercentileCalculator,
-  PediatricDoseSafetyChecker,
-  PregnancyDueDateCalculator,
-} from './pediatricsObgynCalculators';
-import {
-  CageCalculator,
-  ColumbiaSuicideSeverityWorkflow,
-  EpworthSleepinessScaleCalculator,
+  IdealBodyWeightCalculator,
+  KfreCalculator,
+  MaddreyDiscriminantFunctionCalculator,
   MdqCalculator,
+  MewsCalculator,
   MmseCalculator,
   MocaPlaceholderWorkflow,
+  ModifiedRankinScaleCalculator,
+  MorseFallScaleCalculator,
+  NeonatalBilirubinRiskHelper,
+  NihssCalculator,
+  NihssSummaryViewCalculator,
+  OsmolalGapCalculator,
+  OttawaAnkleCalculator,
+  Pao2Fio2RatioCalculator,
   Pcl5Calculator,
-} from './psychiatryScreeningCalculators';
-import {
-  BedOccupancyCalculator,
+  PediatricBpPercentileCalculator,
+  PediatricDoseSafetyChecker,
+  PediatricGcsCalculator,
+  PercCalculator,
+  PewsCalculator,
+  Phq9Calculator,
+  PneumoniaSeverityIndexCalculator,
+  PregnancyDueDateCalculator,
+  RansonCriteriaCalculator,
+  RassCalculator,
   ResourceUtilizationIndexCalculator,
+  RevisedTraumaScoreCalculator,
+  ReynoldsRiskScoreCalculator,
+  RockallScoreCalculator,
+  RoxIndexCalculator,
+  SerumOsmolalityCalculator,
+  ShockIndexCalculator,
   StaffingRatioCalculator,
+  StopBangCalculator,
   TurnaroundTimeCalculator,
-} from './hospitalOperationsCalculators';
+  WaistHipRatioCalculator,
+  WellsPeCalculator,
+} from './lazySpecialtyCalculators';
 import ToolNotFound from './ToolNotFound';
 import { ClinicalExecutorFeedback } from '../../components/clinical/ClinicalExecutorFeedback';
 import ToolPreflightStatus from '../../components/clinical/ToolPreflightStatus';
@@ -493,7 +473,20 @@ const Calculators = ({ embedded = false, onCloseEmbedded, initialCalculatorId = 
 /**
  * Calculator Interface Component
  */
+function CalculatorFamilyFallback() {
+  return (
+    <div className="calculators-select-placeholder" role="status" aria-live="polite">
+      <p>Loading calculator…</p>
+    </div>
+  );
+}
+
+/**
+ * Calculator Interface Component
+ * Specialty family modules load on demand (Suspense); core hub calculators stay eager.
+ */
 export const CalculatorInterface = ({ calculator, onResultChange, patientContext = null }) => {
+  const body = (() => {
   switch (calculator.id) {
     case 'sofa':
       return <SOFACalculator onResultChange={onResultChange} />;
@@ -700,6 +693,9 @@ export const CalculatorInterface = ({ calculator, onResultChange, patientContext
         />
       );
   }
+  })();
+
+  return <Suspense fallback={<CalculatorFamilyFallback />}>{body}</Suspense>;
 };
 
 /**

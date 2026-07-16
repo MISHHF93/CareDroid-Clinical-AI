@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Logger, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import type { Request } from 'express';
 import { TenantContext } from '../tenant-context/tenant-context.decorator';
 import type { TenantContext as TenantContextValue } from '../tenant-context/tenant-context.types';
@@ -64,6 +64,8 @@ import type { CreateOcrJobInput, OcrFieldReviewInput } from './ocr-intake.types'
 @UseGuards(AuthGuard('jwt'), AuthorizationGuard)
 @Controller('emergency')
 export class EmergencyOsController {
+  private readonly logger = new Logger(EmergencyOsController.name);
+
   constructor(
     private readonly whiteboardService: EmergencyWhiteboardService,
     private readonly patientService: EmergencyPatientService,
@@ -303,6 +305,27 @@ export class EmergencyOsController {
     return this.emsIntakeService.getEMSIntake();
   }
 
+  @RequirePermission(Permission.WRITE_PHI)
+  @Post('ems/handoff')
+  postEmsHandoff(
+    @Body()
+    body: {
+      arrivalId?: string;
+      patientId?: string;
+      actorName?: string;
+      unitId?: string;
+      unitName?: string;
+      chiefComplaint?: string;
+      handoffAcceptedAt?: string;
+      handoffStartedAt?: string;
+      arrivedAt?: string;
+      checklist?: Record<string, unknown>;
+      notes?: string;
+    },
+  ) {
+    return this.emsIntakeService.completeHandoff(body);
+  }
+
   @RequirePermission(Permission.READ_PHI)
   @Get('reception/snapshot')
   getReceptionSnapshot() {
@@ -331,7 +354,13 @@ export class EmergencyOsController {
     if (!triageAssist && body.patientId) {
       try {
         triageAssist = await this.orchestrationService.buildTriageAssist(body.patientId, body);
-      } catch {
+      } catch (error) {
+        // D9: keep deliberate fallback, but surface the degradation for ops.
+        this.logger.warn(
+          `buildTriageAssist failed during reception handoff for patient ${body.patientId}: ${
+            error instanceof Error ? error.message : String(error)
+          }`,
+        );
         triageAssist = null;
       }
     }

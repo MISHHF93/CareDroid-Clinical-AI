@@ -93,6 +93,7 @@
     "qa:responsive:chromium": "playwright test e2e/responsive-qa.spec.mjs --config=playwright.config.mjs --project=chromium",
     "test:e2e:responsive": "playwright test e2e/responsive-qa.spec.mjs",
     "test:e2e:a11y": "playwright test --config=playwright.a11y.config.ts",
+    "test:e2e:ems-copilot": "playwright test --config=playwright.ems-copilot.config.ts",
     "test:e2e:production": "playwright test e2e/production-smoke.spec.mjs --config=playwright.production.config.mjs",
     "test:coverage": "vitest run --coverage",
     "test:frontend": "vitest",

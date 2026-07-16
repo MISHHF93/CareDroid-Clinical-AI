@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Calculators from './Calculators';
 import {
@@ -189,8 +189,16 @@ describe('Calculators — every built-in slug form shell', () => {
       const path = route || `/tools/calculators/${slug}`;
       const { container } = renderCalculatorAtPath(path, slug);
 
-      const iface = container.querySelector(`.${interfaceClass.split(' ')[0]}`);
-      expect(iface).toBeTruthy();
+      // Specialty calculators load via React.lazy + Suspense — wait for the form shell.
+      const selector = `.${interfaceClass.split(' ')[0]}`;
+      await waitFor(
+        () => {
+          const el = container.querySelector(selector);
+          expect(el).toBeTruthy();
+        },
+        { timeout: 8_000 },
+      );
+      const iface = container.querySelector(selector);
       if (!iface) throw new Error(`expected calculator interface element for ${interfaceClass}`);
 
       const scope = within(iface as HTMLElement);

@@ -21,6 +21,8 @@ import { coerceScreenModeForRole } from './emergencyScreenModeAccessModel';
 /** Stable ED role ids — kept local to avoid circular imports with emergencyRolePermissions.js */
 export const EMERGENCY_ROLE_ID = Object.freeze({
   admin: 'admin',
+  /** Technical admin — no PHI/clinical grants (Stage D alignment). */
+  itAdmin: 'it_admin',
   edManager: 'ed_manager',
   chargeNurse: 'charge_nurse',
   triageNurse: 'triage_nurse',

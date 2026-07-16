@@ -133,4 +133,87 @@ describe('RAGService — tenant scoping', () => {
       records.every((record: any) => record.metadata.organizationId === RAG_GLOBAL_ORG_SCOPE),
     ).toBe(true);
   });
+
+  // --- Adversarial tenant isolation (Cycle 64 / D4 partial) ---
+
+  it('adversarial: org-A retrieval filter never includes org-B', async () => {
+    const { service, retrievalService } = buildService();
+
+    await service.retrieve('warfarin interaction', { organizationId: 'org-A' });
+
+    const filter = (retrievalService.retrieve.mock.calls as any[])[0][0].filter;
+    expect(filter.organizationId).toEqual(['org-A', RAG_GLOBAL_ORG_SCOPE]);
+    expect(filter.organizationId).not.toContain('org-B');
+    expect(filter.organizationId).not.toContain('org-A; DROP TABLE');
+  });
+
+  it('adversarial: empty-string organizationId does not invent a tenant scope', async () => {
+    const { service, retrievalService } = buildService();
+
+    await service.retrieve('stroke protocol', { organizationId: '' as any });
+
+    const call = (retrievalService.retrieve.mock.calls as any[])[0][0];
+    // Falsy organizationId must not produce organizationId: ['', '__global__']
+    expect(call.filter.organizationId).toBeUndefined();
+  });
+
+  it('adversarial: whitespace-only organizationId is treated as unscoped after trim', async () => {
+    const { service, retrievalService } = buildService();
+
+    await service.retrieve('stroke protocol', { organizationId: '   ' });
+
+    const call = (retrievalService.retrieve.mock.calls as any[])[0][0];
+    expect(call.filter.organizationId).toBeUndefined();
+  });
+
+  it('adversarial: org-B cannot be smuggled via documentTypes / specialty fields', async () => {
+    const { service, retrievalService } = buildService();
+
+    await service.retrieve('sepsis', {
+      organizationId: 'org-A',
+      documentTypes: ['protocol', 'org-B'] as any,
+      specialty: 'org-B',
+    });
+
+    const filter = (retrievalService.retrieve.mock.calls as any[])[0][0].filter;
+    expect(filter.organizationId).toEqual(['org-A', RAG_GLOBAL_ORG_SCOPE]);
+    // specialty may pass through as a separate filter key — must not replace tenant scope
+    expect(filter.organizationId).not.toEqual(expect.arrayContaining(['org-B']));
+  });
+
+  it('adversarial: ingested org-A chunks never tag as org-B metadata', async () => {
+    const { service, vectorDb } = buildService();
+
+    await service.ingest({
+      content:
+        'Tenant-private EMS diversion protocol for hospital A. Keep this scoped to org-A only.',
+      source: {
+        id: 'org-a-private-1',
+        title: 'Org A Private Protocol',
+        type: 'protocol',
+        organizationId: 'org-A',
+      },
+    });
+
+    const [records] = (vectorDb.upsertBatch.mock.calls as any[])[0];
+    expect(records.length).toBeGreaterThan(0);
+    for (const record of records) {
+      expect(record.metadata.organizationId).toBe('org-A');
+      expect(record.metadata.organizationId).not.toBe('org-B');
+      expect(record.metadata.organizationId).not.toBe(RAG_GLOBAL_ORG_SCOPE);
+    }
+  });
+
+  it('adversarial: sequential retrieve for org-A then org-B does not leak prior filter', async () => {
+    const { service, retrievalService } = buildService();
+
+    await service.retrieve('query one', { organizationId: 'org-A' });
+    await service.retrieve('query two', { organizationId: 'org-B' });
+
+    const first = (retrievalService.retrieve.mock.calls as any[])[0][0].filter;
+    const second = (retrievalService.retrieve.mock.calls as any[])[1][0].filter;
+    expect(first.organizationId).toEqual(['org-A', RAG_GLOBAL_ORG_SCOPE]);
+    expect(second.organizationId).toEqual(['org-B', RAG_GLOBAL_ORG_SCOPE]);
+    expect(second.organizationId).not.toContain('org-A');
+  });
 });

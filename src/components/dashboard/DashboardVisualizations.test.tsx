@@ -1,15 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import {
-  CategoryBarChart,
   ChartErrorState,
   ChartLoadingState,
-  DistributionDonutChart,
   EmptyChartState,
   MetricCard,
   MiniSparkline,
-  TrendChart,
 } from './DashboardVisualizations';
+import {
+  CategoryBarChart,
+  DistributionDonutChart,
+  TrendChart,
+} from './DashboardCharts';
 
 describe('dashboard visualization components', () => {
   it('renders metric cards with accessible values', () => {

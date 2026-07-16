@@ -1,5 +1,11 @@
 import { AIError, type AIRequest, type AIResponse, type AIUsage } from '../llmTransport';
 import type { LlmAdapter, LlmAdapterHealth, LlmAdapterRuntime } from './types';
+import {
+  fetchWithTimeout,
+  isAbortError,
+  readAiRequestTimeoutMs,
+  toTimeoutAIError,
+} from './transportSafety';
 
 /**
  * Azure OpenAI Chat Completions adapter (non-streaming).
@@ -50,19 +56,25 @@ export class AzureOpenAIAdapter implements LlmAdapter {
       ...(request.messages || []).map((m) => ({ role: m.role, content: m.content })),
     ];
 
+    const timeoutMs = readAiRequestTimeoutMs(runtime?.timeoutMs);
+
     try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'api-key': cfg.apiKey,
+      const response = await fetchWithTimeout(
+        url,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'api-key': cfg.apiKey,
+          },
+          body: JSON.stringify({
+            messages,
+            max_tokens: maxTokens,
+            temperature: 0.2,
+          }),
         },
-        body: JSON.stringify({
-          messages,
-          max_tokens: maxTokens,
-          temperature: 0.2,
-        }),
-      });
+        { timeoutMs, signal: runtime?.signal },
+      );
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
@@ -104,6 +116,7 @@ export class AzureOpenAIAdapter implements LlmAdapter {
       };
     } catch (error) {
       if (error instanceof AIError) throw error;
+      if (isAbortError(error)) throw toTimeoutAIError(error, request.requestType, timeoutMs);
       throw new AIError({
         message: error instanceof Error ? error.message : String(error),
         code: 'AI_NETWORK_ERROR',

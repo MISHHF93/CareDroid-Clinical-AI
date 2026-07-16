@@ -58,8 +58,13 @@ if (import.meta.env.DEV) {
   void ensureBackendReachabilityProbed();
 }
 
+// Cycle 68: only warm the reception workspace when already on a reception-ish path.
+// Unconditional preload forced reception (and its graph) into every session with the flag on.
 if (isReceptionFirstUxEnabled()) {
-  void import('./pages/emergency/ReceptionWorkspace');
+  const path = typeof window !== 'undefined' ? window.location.pathname : '';
+  if (/\/(reception|intake)(\/|$)/i.test(path) || path === '/' || path === '') {
+    void import('./pages/emergency/ReceptionWorkspace');
+  }
 }
 
 const clearDevelopmentServiceWorkers = () => {

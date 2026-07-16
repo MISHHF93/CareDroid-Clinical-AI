@@ -25,6 +25,8 @@
 @import './medical-shell-layer.css';
 @import './medical-type-layer.css';
 @import './medical-card-layer.css';
+/* 4.5 Architect Medical Light contract (AI purple, focus, density, ultrawide) */
+@import './medical-light-theme.css';
 
 /* 5. Cross-namespace bridge (--cd-* ↔ --app-* ↔ --semantic-*) */
 @import './design-system-bridge.css';

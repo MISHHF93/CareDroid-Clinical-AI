@@ -133,7 +133,7 @@ function RouteLoadingFallback({ label = 'Loading CareDroid...' }) {
       style={{
         padding: 24,
         minHeight: '40vh',
-        color: MEDICAL_THEME.inkSubtle || '#334155',
+        color: MEDICAL_THEME.inkMuted || '#475569',
         background: MEDICAL_THEME.surfacePage || '#f8fafc',
         fontFamily: 'system-ui, sans-serif',
         fontSize: 16,

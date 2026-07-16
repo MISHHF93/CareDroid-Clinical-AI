@@ -5,6 +5,7 @@ import {
   resetAiMonitor,
 } from '../productionMonitoring';
 import { completeViaEgress, getEgressHealth } from './egress';
+import { getProviderCircuit, resetAllProviderCircuits } from './transportSafety';
 
 describe('completeViaEgress', () => {
   const prevKill = process.env.AI_KILL_SWITCH;
@@ -19,6 +20,9 @@ describe('completeViaEgress', () => {
     if (prevPatient === undefined) delete process.env.AI_PATIENT_CONTEXT_ENABLED;
     else process.env.AI_PATIENT_CONTEXT_ENABLED = prevPatient;
     resetAiMonitor();
+    resetAllProviderCircuits();
+    delete process.env.AI_CIRCUIT_FAILURE_THRESHOLD;
+    delete process.env.AI_CIRCUIT_COOLDOWN_MS;
   });
 
   it('blocks when AI_KILL_SWITCH is engaged', async () => {
@@ -134,5 +138,41 @@ describe('completeViaEgress', () => {
     delete process.env.AI_PATIENT_CONTEXT_ENABLED;
     const health = getEgressHealth();
     expect(health.patientContextEnabled).toBe(false);
+  });
+
+  it('reports request timeout and circuit snapshots on health', () => {
+    const health = getEgressHealth();
+    expect(typeof health.requestTimeoutMs).toBe('number');
+    expect(health.requestTimeoutMs).toBeGreaterThan(0);
+    expect(Array.isArray(health.circuits)).toBe(true);
+  });
+
+  it('fails fast with AI_CIRCUIT_OPEN when the provider circuit is open', async () => {
+    delete process.env.AI_KILL_SWITCH;
+    process.env.AI_PROVIDER = 'local';
+    process.env.AI_CIRCUIT_FAILURE_THRESHOLD = '1';
+    process.env.AI_CIRCUIT_COOLDOWN_MS = '60000';
+    const circuit = getProviderCircuit('local');
+    circuit.recordFailure();
+
+    await expect(
+      completeViaEgress({
+        systemPrompt: 'x',
+        requestType: 'COPILOT_CHAT' as any,
+        messages: [{ role: 'user', content: 'y' }],
+      }),
+    ).rejects.toMatchObject({ code: 'AI_CIRCUIT_OPEN' });
+  });
+
+  it('records success and keeps the circuit closed on healthy local completion', async () => {
+    delete process.env.AI_KILL_SWITCH;
+    process.env.AI_PROVIDER = 'local';
+    resetAllProviderCircuits();
+    await completeViaEgress({
+      systemPrompt: 'You are a test assistant.',
+      requestType: 'COPILOT_CHAT' as any,
+      messages: [{ role: 'user', content: 'ping' }],
+    });
+    expect(getProviderCircuit('local').state()).toBe('closed');
   });
 });

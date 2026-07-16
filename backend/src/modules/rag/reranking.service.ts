@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { RetrievedChunk } from './dto/rag-context.dto';
-import { CohereRankerService } from './reranking/cohere-ranker.service';
+import { LocalLexicalRankerService } from './reranking/cohere-ranker.service';
 
 @Injectable()
 export class RerankingService {
-  constructor(private readonly cohereRanker: CohereRankerService) {}
+  constructor(private readonly localRanker: LocalLexicalRankerService) {}
 
   async rerank(
     query: string,
@@ -16,14 +16,14 @@ export class RerankingService {
       return chunks.slice(0, topK);
     }
 
-    return this.cohereRanker.rerank(query, chunks, topK);
+    return this.localRanker.rerank(query, chunks, topK);
   }
 
   isEnabled(): boolean {
-    return this.cohereRanker.isEnabled();
+    return this.localRanker.isEnabled();
   }
 
   healthCheck(): Promise<boolean> {
-    return this.cohereRanker.healthCheck();
+    return this.localRanker.healthCheck();
   }
 }

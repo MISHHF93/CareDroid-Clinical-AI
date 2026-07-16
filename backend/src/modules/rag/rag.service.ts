@@ -18,6 +18,10 @@ import {
   findRegistryArtifactForSource,
   loadKnowledgeRegistryArtifacts,
 } from './utils/knowledge-registry-enrichment';
+import { RAG_GLOBAL_ORG_SCOPE } from './utils/tenant-scope';
+
+// Re-export canonical global tenant sentinel (single definition in tenant-scope).
+export { RAG_GLOBAL_ORG_SCOPE } from './utils/tenant-scope';
 
 /**
  * RAG Service
@@ -25,15 +29,6 @@ import {
  * Main service for Retrieval-Augmented Generation.
  * Orchestrates document ingestion, embedding generation, vector storage, and retrieval.
  */
-
-/**
- * Sentinel tenant value for documents meant to be queryable by every
- * organization (e.g. the shared public clinical-guideline starter corpus).
- * Any document ingested without an explicit `organizationId` is tagged with
- * this value rather than left unscoped, so retrieval filtering has a single,
- * always-present key to reason about.
- */
-export const RAG_GLOBAL_ORG_SCOPE = '__global__';
 
 @Injectable()
 export class RAGService implements OnModuleInit {
@@ -300,11 +295,16 @@ export class RAGService implements OnModuleInit {
     if (options.jurisdiction) {
       filter.jurisdiction = options.jurisdiction;
     }
-    if (options.organizationId) {
+    // Normalize tenant id: empty/whitespace must not become a fake scope key.
+    const organizationId =
+      typeof options.organizationId === 'string'
+        ? options.organizationId.trim()
+        : options.organizationId;
+    if (organizationId) {
       // Scope to the caller's own tenant plus the shared global corpus.
       // Callers without tenant context (legacy/internal) get no
       // organizationId filter at all, preserving unscoped retrieval.
-      filter.organizationId = [options.organizationId, RAG_GLOBAL_ORG_SCOPE];
+      filter.organizationId = [organizationId, RAG_GLOBAL_ORG_SCOPE];
     }
     return filter;
   }

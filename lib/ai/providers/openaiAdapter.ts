@@ -1,5 +1,11 @@
 import { AIError, type AIRequest, type AIResponse, type AIUsage } from '../llmTransport';
 import type { LlmAdapter, LlmAdapterHealth, LlmAdapterRuntime } from './types';
+import {
+  fetchWithTimeout,
+  isAbortError,
+  readAiRequestTimeoutMs,
+  toTimeoutAIError,
+} from './transportSafety';
 
 const OPENAI_CHAT_URL = 'https://api.openai.com/v1/chat/completions';
 const DEFAULT_MODEL = 'gpt-4o-mini';
@@ -46,20 +52,26 @@ export class OpenAIAdapter implements LlmAdapter {
       ...(request.messages || []).map((m) => ({ role: m.role, content: m.content })),
     ];
 
+    const timeoutMs = readAiRequestTimeoutMs(runtime?.timeoutMs);
+
     try {
-      const response = await fetch(OPENAI_CHAT_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${apiKey}`,
+      const response = await fetchWithTimeout(
+        OPENAI_CHAT_URL,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${apiKey}`,
+          },
+          body: JSON.stringify({
+            model,
+            messages,
+            max_tokens: maxTokens,
+            temperature: 0.2,
+          }),
         },
-        body: JSON.stringify({
-          model,
-          messages,
-          max_tokens: maxTokens,
-          temperature: 0.2,
-        }),
-      });
+        { timeoutMs, signal: runtime?.signal },
+      );
 
       if (!response.ok) {
         throw await toAIError(response, request.requestType);
@@ -93,6 +105,7 @@ export class OpenAIAdapter implements LlmAdapter {
       };
     } catch (error) {
       if (error instanceof AIError) throw error;
+      if (isAbortError(error)) throw toTimeoutAIError(error, request.requestType, timeoutMs);
       throw new AIError({
         message: error instanceof Error ? error.message : String(error),
         code: 'AI_NETWORK_ERROR',

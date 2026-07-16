@@ -1,10 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  CategoryBarChart,
-  MetricCard,
-  VisualizationPanel,
-} from '../dashboard/DashboardVisualizations';
+import { MetricCard, VisualizationPanel } from '../dashboard/DashboardVisualizations';
+import { CategoryBarChart } from '../dashboard/DashboardCharts';
 import { GraphicIconBadge } from '../graphics/CdlGraphicKit';
 import StateSourceNotice from '../StateSourceNotice';
 import { CANONICAL_ROUTES } from '../../config/routes.config';

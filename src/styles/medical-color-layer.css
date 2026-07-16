@@ -30,16 +30,14 @@
   --medical-white: #ffffff;
   --medical-ink: #102a43;
   --medical-ink-secondary: #334e68;
-  /* --medical-ink-muted/-subtle: darkened from #627d98/#94a3b8 (real axe-core
-     WCAG AA scan, Cycle 59) — the originals rendered 4.28:1 and 2.56:1 against
-     white, both below the 4.5:1 minimum for normal text. Both now reuse
-     existing --medical-slate-500/-600 steps rather than inventing new colors;
-     "subtle" ends up darker than "muted" as a result, since WCAG leaves no
-     room for a lighter-than-muted token that's still real (non-decorative)
-     text on a white surface — visual hierarchy between the two now comes from
-     type treatment (size/weight/tracking) at each call site, not raw color. */
-  --medical-ink-muted: #64748b;
-  --medical-ink-subtle: #475569;
+  /* --medical-ink-muted/-subtle: WCAG AA for normal text on Medical Light
+     surfaces. Cycle 59 used slate-500 (#64748b) which passes ~4.76:1 on pure
+     white but fails on #f2f6f9 table headers / sunken rows (4.38:1). Architect
+     Mode a11y suite (2026-07-15): darken muted to slate-600 so all common
+     Medical Light backgrounds clear 4.5:1. Hierarchy vs "subtle" is type
+     treatment (size/weight/tracking), not a lighter-than-AA ink. */
+  --medical-ink-muted: #475569;
+  --medical-ink-subtle: #334155;
   --medical-neutral: #667085;
   --medical-focus: #facc15;
   --medical-border: #cbd5e1;

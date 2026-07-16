@@ -10,6 +10,7 @@ import { ChatModule } from '../chat/chat.module';
 import { PlatformAssetsModule } from '../platform-assets/platform-assets.module';
 import { CollaborationHubModule } from '../collaboration-hub/collaboration-hub.module';
 import { EmergencyOsController } from './emergency-os.controller';
+import { EdCopilotNestParityController } from './ed-copilot.nest-parity.controller';
 import { EmergencyRealtimeController } from './emergency-realtime.controller';
 import { EmergencyRealtimeService } from './emergency-realtime.service';
 import { JwtQueryAuthGuard } from './guards/jwt-query-auth.guard';
@@ -103,6 +104,7 @@ import { EmergencyOperatingSurfacesService } from './emergency-os.operating-surf
   ],
   controllers: [
     EmergencyOsController,
+    EdCopilotNestParityController,
     EmergencyRealtimeController,
     ERPulseHandoverController,
     FederatedEMSController,

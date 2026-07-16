@@ -10,6 +10,7 @@ import useEmsScreen from '../hooks/useEmsScreen';
 import { useEMSIntake } from '../hooks/useEmergencyOs';
 import { convertEmsArrivalForReception } from '../services/receptionIntakeBridge';
 import { fetchEmsFleetSnapshot, fetchEmergencyDiversionStatus } from '../services/emergencyTransportApi';
+import { postEmsHandoff } from '../services/emergencyOsApi';
 import EmsOffloadTrackerPanel from './ems/EmsOffloadTrackerPanel';
 import EmsOffloadAttentionStrip from './ems/EmsOffloadAttentionStrip';
 import EmsOperationalStrip from './ems/EmsOperationalStrip';
@@ -264,6 +265,8 @@ function EMSArrivalRow({
           <button
             type="button"
             className="ems-pipeline__handoff"
+            data-testid="ems-handoff-complete"
+            data-arrival-id={arrival.id}
             onClick={() => onCompleteHandoff(arrival.id)}
             disabled={!canCompleteHandoff}
             title={
@@ -514,6 +517,8 @@ export default function EMSPipeline() {
   const completeHandoff = (arrivalId) => {
     const timestamp = new Date().toISOString();
     const arrival = emsArrivals.find((entry) => entry.id === arrivalId);
+    const handoffStartedAt = arrival?.handoffStartedAt || arrival?.arrivedAt || timestamp;
+    // Optimistic local update keeps offline/demo path working; server persist is best-effort.
     updateAmbulanceHandoffChecklist(
       arrivalId,
       { handoffAccepted: true, handoffAcceptedAt: timestamp },
@@ -522,7 +527,21 @@ export default function EMSPipeline() {
     updateEMSArrival(arrivalId, {
       status: 'Complete',
       handoffCompletedAt: timestamp,
-      handoffStartedAt: arrival?.handoffStartedAt || arrival?.arrivedAt || timestamp,
+      handoffStartedAt,
+    });
+    void postEmsHandoff({
+      arrivalId,
+      patientId: arrival?.patientId,
+      actorName: emergencyRole.roleLabel,
+      unitId: arrival?.unitId,
+      unitName: arrival?.unitName,
+      chiefComplaint: arrival?.chiefComplaint,
+      handoffAcceptedAt: timestamp,
+      handoffStartedAt,
+      arrivedAt: arrival?.arrivedAt,
+      checklist: { handoffAccepted: true, handoffAcceptedAt: timestamp },
+    }).catch((error) => {
+      console.error('[EMSPipeline] EMS handoff persistence failed (local state kept):', error);
     });
   };
   const handleHandoffChecklistUpdate = (arrivalId, patch, actor) => {
@@ -587,7 +606,7 @@ export default function EMSPipeline() {
       description={`Inbound units, bay prep, handoff timing, and diversion awareness. Source: ${emsSource}; ${emsFreshness}.`}
       actions={headerActions}
     >
-      <div className="ems-pipeline">
+      <div className="ems-pipeline" data-testid="ems-pipeline">
       <EdDataSourceBanner
         envelope={emsModule.data}
         loading={emsModule.loading}

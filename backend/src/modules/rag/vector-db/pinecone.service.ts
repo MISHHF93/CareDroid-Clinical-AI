@@ -1,6 +1,7 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit, Optional } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Pinecone, Index, RecordMetadata } from '@pinecone-database/pinecone';
+import { DataSource } from 'typeorm';
 import { join } from 'path';
 import {
   IVectorDatabase,
@@ -12,6 +13,7 @@ import {
 } from './vector-db.interface';
 import { ChunkMetadata } from '../dto/rag-context.dto';
 import { InMemoryVectorStore } from './in-memory-vector.store';
+import { PgVectorStore } from './pgvector.store';
 
 /**
  * Pinecone Vector Database Service
@@ -31,13 +33,21 @@ export class PineconeService implements IVectorDatabase, OnModuleInit {
   private initialized = false;
   private useInMemory = false;
   private inMemoryStore: InMemoryVectorStore | null = null;
+  private pgVectorStore: PgVectorStore | null = null;
+  private usePgVector = false;
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+    @Optional() private readonly dataSource?: DataSource,
+  ) {
     const ragConfig = this.configService.get<any>('rag');
     const pineconeConfig = ragConfig?.pinecone || {};
 
     this.indexName = pineconeConfig.indexName || 'caredroid-medical';
-    this.dimension = pineconeConfig.dimension || 1536;
+    this.dimension =
+      ragConfig?.embeddings?.dimension ||
+      pineconeConfig.dimension ||
+      768;
     this.namespace = (pineconeConfig.namespace || '').trim();
   }
 
@@ -57,22 +67,38 @@ export class PineconeService implements IVectorDatabase, OnModuleInit {
       const ragConfig = this.configService.get<any>('rag');
       const pineconeConfig = ragConfig?.pinecone || {};
       const apiKey = pineconeConfig.apiKey;
+      const backend = String(
+        ragConfig?.vectorBackend || process.env.RAG_VECTOR_BACKEND || '',
+      )
+        .toLowerCase()
+        .trim();
+
+      // Prefer explicit backend selection: pgvector | pinecone | memory
+      if (backend === 'pgvector' || backend === 'pg' || backend === 'postgres') {
+        const ok = await this.tryInitializePgVector();
+        if (ok) return;
+        this.logger.warn('pgvector init failed — falling back to in-memory store');
+        await this.initializeInMemory();
+        return;
+      }
+
+      if (backend === 'memory' || backend === 'in-memory' || backend === 'local') {
+        await this.initializeInMemory();
+        return;
+      }
+
+      if (!apiKey && backend !== 'pinecone') {
+        // Auto: try pgvector when DataSource is Postgres, else memory
+        if (this.dataSource?.options?.type === 'postgres') {
+          const ok = await this.tryInitializePgVector();
+          if (ok) return;
+        }
+        await this.initializeInMemory();
+        return;
+      }
 
       if (!apiKey) {
-        const persistPath =
-          process.env.RAG_LOCAL_INDEX_PATH || join(process.cwd(), '.rag-local', 'vectors.json');
-        this.inMemoryStore = new InMemoryVectorStore(
-          this.dimension,
-          'in-memory-local',
-          persistPath,
-        );
-        await this.inMemoryStore.loadFromDisk();
-        this.useInMemory = true;
-        this.initialized = true;
-        const stats = await this.inMemoryStore.getStats();
-        this.logger.log(
-          `RAG using in-memory vector store (${stats.totalVectors} vectors) — set PINECONE_API_KEY for Pinecone.`,
-        );
+        await this.initializeInMemory();
         return;
       }
 
@@ -95,10 +121,63 @@ export class PineconeService implements IVectorDatabase, OnModuleInit {
       );
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error));
-      this.logger.error(`Failed to initialize Pinecone: ${err.message}`, err.stack);
-      this.logger.warn('Vector database functionality will be disabled.');
-      // Don't throw - allow server to continue without vector DB
+      this.logger.error(`Failed to initialize vector backend: ${err.message}`, err.stack);
+      this.logger.warn('Falling back to in-memory vector store.');
+      try {
+        await this.initializeInMemory();
+      } catch {
+        this.logger.warn('Vector database functionality will be disabled.');
+      }
     }
+  }
+
+  private async tryInitializePgVector(): Promise<boolean> {
+    if (!this.dataSource) {
+      this.logger.warn('PgVectorStore requested but TypeORM DataSource is not available');
+      return false;
+    }
+    try {
+      const store = new PgVectorStore({
+        dimension: this.dimension,
+        indexName: 'pgvector',
+        tableName: process.env.RAG_PGVECTOR_TABLE || 'caredroid_rag_vectors',
+        query: (sql, params) => this.dataSource!.query(sql, params as any[]),
+        logger: this.logger,
+      });
+      await store.initialize();
+      this.pgVectorStore = store;
+      this.usePgVector = true;
+      this.initialized = true;
+      const stats = await store.getStats();
+      this.logger.log(
+        `RAG using pgvector (${stats.totalVectors} vectors, dim=${this.dimension})`,
+      );
+      return true;
+    } catch (error) {
+      this.logger.warn(
+        `PgVectorStore unavailable: ${error instanceof Error ? error.message : String(error)}`,
+      );
+      this.pgVectorStore = null;
+      this.usePgVector = false;
+      return false;
+    }
+  }
+
+  private async initializeInMemory(): Promise<void> {
+    const persistPath =
+      process.env.RAG_LOCAL_INDEX_PATH || join(process.cwd(), '.rag-local', 'vectors.json');
+    this.inMemoryStore = new InMemoryVectorStore(
+      this.dimension,
+      'in-memory-local',
+      persistPath,
+    );
+    await this.inMemoryStore.loadFromDisk();
+    this.useInMemory = true;
+    this.initialized = true;
+    const stats = await this.inMemoryStore.getStats();
+    this.logger.log(
+      `RAG using in-memory vector store (${stats.totalVectors} vectors) — set RAG_VECTOR_BACKEND=pgvector or PINECONE_API_KEY for durable stores.`,
+    );
   }
 
   /**
@@ -108,9 +187,23 @@ export class PineconeService implements IVectorDatabase, OnModuleInit {
     return this.useInMemory;
   }
 
+  isPgVectorMode(): boolean {
+    return this.usePgVector;
+  }
+
+  getActiveBackend(): 'pgvector' | 'pinecone' | 'in-memory' | 'disabled' {
+    if (this.usePgVector) return 'pgvector';
+    if (this.useInMemory) return 'in-memory';
+    if (this.initialized && this.index) return 'pinecone';
+    return 'disabled';
+  }
+
   async query(queryVector: number[], options: VectorQueryOptions): Promise<QueryResult> {
     if (!this.initialized) {
       await this.initialize();
+    }
+    if (this.usePgVector && this.pgVectorStore) {
+      return this.pgVectorStore.query(queryVector, options);
     }
     if (this.useInMemory && this.inMemoryStore) {
       return this.inMemoryStore.query(queryVector, options);
@@ -180,6 +273,10 @@ export class PineconeService implements IVectorDatabase, OnModuleInit {
       return;
     }
 
+    if (this.usePgVector && this.pgVectorStore) {
+      await this.pgVectorStore.upsertBatch(records);
+      return;
+    }
     if (this.useInMemory && this.inMemoryStore) {
       await this.inMemoryStore.upsertBatch(records);
       return;
@@ -224,6 +321,10 @@ export class PineconeService implements IVectorDatabase, OnModuleInit {
       return;
     }
 
+    if (this.usePgVector && this.pgVectorStore) {
+      await this.pgVectorStore.delete(ids);
+      return;
+    }
     if (this.useInMemory && this.inMemoryStore) {
       await this.inMemoryStore.delete(ids);
       return;
@@ -247,6 +348,10 @@ export class PineconeService implements IVectorDatabase, OnModuleInit {
       await this.initialize();
     }
 
+    if (this.usePgVector && this.pgVectorStore) {
+      await this.pgVectorStore.deleteByFilter(filter);
+      return;
+    }
     if (this.useInMemory && this.inMemoryStore) {
       await this.inMemoryStore.deleteByFilter(filter);
       return;
@@ -267,6 +372,9 @@ export class PineconeService implements IVectorDatabase, OnModuleInit {
    * Get statistics about the index
    */
   async getStats(): Promise<IndexStats> {
+    if (this.usePgVector && this.pgVectorStore) {
+      return this.pgVectorStore.getStats();
+    }
     if (this.useInMemory && this.inMemoryStore) {
       return this.inMemoryStore.getStats();
     }
@@ -297,6 +405,9 @@ export class PineconeService implements IVectorDatabase, OnModuleInit {
    * Check if the vector database is healthy and responsive
    */
   async healthCheck(): Promise<boolean> {
+    if (this.usePgVector && this.pgVectorStore) {
+      return this.pgVectorStore.healthCheck();
+    }
     if (this.useInMemory && this.inMemoryStore) {
       return this.inMemoryStore.healthCheck();
     }

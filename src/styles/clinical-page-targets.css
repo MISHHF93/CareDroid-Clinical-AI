@@ -43,7 +43,7 @@
 .emergency-whiteboard-page__filter-chip {
   border-color: color-mix(in srgb, var(--cdl-clinical-border) 80%, transparent);
   background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 50%, var(--app-surface-1, #ffffff));
-  color: var(--app-text-muted, #64748b);
+  color: var(--app-text-muted, #475569);
   transition:
     background-color var(--cdl-clinical-motion),
     border-color var(--cdl-clinical-motion),

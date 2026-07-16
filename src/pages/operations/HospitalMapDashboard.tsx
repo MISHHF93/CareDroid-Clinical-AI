@@ -132,8 +132,9 @@ export default function HospitalMapDashboard() {
   const diversion = capacity?.diversion ?? surge?.diversion ?? false;
   const occupancy = occupancyPct(occupiedBeds, totalBeds);
 
+  // WCAG AA large-text ≥3:1 on white (matches .is-critical / .is-warning / .is-good)
   const scoreColor =
-    capacityScore < 60 ? '#ef4444' : capacityScore < 78 ? '#f59e0b' : '#22c55e';
+    capacityScore < 60 ? '#b91c1c' : capacityScore < 78 ? '#b45309' : '#15803d';
 
   return (
     <main className="hospital-map-page">

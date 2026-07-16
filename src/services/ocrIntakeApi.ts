@@ -1,5 +1,6 @@
 import { apiFetch, getApiErrorMessage, parseApiResponse } from './apiClient';
 import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
+import { assertOcrJobSafeForIntakeApply } from './ocrFieldValidation';
 
 const jsonHeaders = { 'Content-Type': 'application/json' };
 const OCR_INTAKE_UNAVAILABLE_MESSAGE = 'OCR intake service is not available.';
@@ -119,7 +120,16 @@ export const OcrIntakeApi = Object.freeze({
       actor,
     });
   },
-  applyToIntake(jobId: string, actor: string): Promise<OcrJob> {
+  /**
+   * Apply OCR to intake only after client-side validation gate.
+   * Pass preloadedJob when available to avoid a race; otherwise fetches job first.
+   */
+  async applyToIntake(jobId: string, actor: string, preloadedJob?: OcrJob): Promise<OcrJob> {
+    const job = preloadedJob ?? (await OcrIntakeApi.getJob(jobId));
+    const gate = assertOcrJobSafeForIntakeApply(job);
+    if (!gate.ok) {
+      throw new Error(gate.error.message);
+    }
     return postJson(`/api/emergency/intake/ocr-jobs/${jobId}/apply`, { actor });
   },
   fetchHealth(): Promise<OcrHealthSnapshot> {

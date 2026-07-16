@@ -1,11 +1,8 @@
 import { useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { GraphicIconBadge } from '../graphics/CdlGraphicKit';
-import {
-  CategoryBarChart,
-  MetricCard,
-  VisualizationPanel,
-} from '../dashboard/DashboardVisualizations';
+import { MetricCard, VisualizationPanel } from '../dashboard/DashboardVisualizations';
+import { CategoryBarChart } from '../dashboard/DashboardCharts';
 import { fleetChatAssistedLaunchAriaLabel } from '../../data/chatAssistedHubGroups';
 import { resolveCatalogLaunch } from '../../data/clinicalCatalogWiring';
 import { useConversation } from '../../contexts/ConversationContext';

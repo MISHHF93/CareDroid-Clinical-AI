@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { CacheService } from '../cache/cache.service';
-import { OpenAIEmbeddingsService } from './embeddings/openai-embeddings.service';
+import { LocalEmbeddingsService } from './embeddings/openai-embeddings.service';
 
 @Injectable()
 export class EmbeddingService {
   private readonly cacheTtlSeconds: number;
 
   constructor(
-    private readonly openAiEmbeddings: OpenAIEmbeddingsService,
+    private readonly localEmbeddings: LocalEmbeddingsService,
     private readonly cacheService: CacheService,
     private readonly configService: ConfigService,
   ) {
@@ -20,7 +20,7 @@ export class EmbeddingService {
     const text = this.normalizeText(query);
     const embedding = await this.cacheService.getOrSet(
       this.cacheKey(text),
-      () => this.openAiEmbeddings.embed(text),
+      () => this.localEmbeddings.embed(text),
       this.cacheTtlSeconds,
     );
     return [...embedding];
@@ -46,7 +46,7 @@ export class EmbeddingService {
 
     if (missing.size > 0) {
       const missingEntries = [...missing.entries()];
-      const embeddings = await this.openAiEmbeddings.embedBatch(
+      const embeddings = await this.localEmbeddings.embedBatch(
         missingEntries.map(([, entry]) => entry.text),
       );
 
@@ -65,15 +65,15 @@ export class EmbeddingService {
   }
 
   getModel(): string {
-    return this.openAiEmbeddings.getModel();
+    return this.localEmbeddings.getModel();
   }
 
   getDimension(): number {
-    return this.openAiEmbeddings.getDimension();
+    return this.localEmbeddings.getDimension();
   }
 
   healthCheck(): Promise<boolean> {
-    return this.openAiEmbeddings.healthCheck();
+    return this.localEmbeddings.healthCheck();
   }
 
   private normalizeText(text: string): string {

@@ -60,6 +60,11 @@ import {
   resolveScreenDensityProfile,
   screenDensityShellClassName,
 } from '../config/screenDensityModeModel';
+import {
+  isExperimentalShellEngineRuntimeEnabled,
+  listExperimentalShellEngines,
+  shouldStartShellEngine,
+} from '../config/shellEngineCatalog';
 import { PatientFlag, type Patient } from '../types/emergency';
 import { patientFlags } from '../utils/patientVitals';
 
@@ -439,28 +444,72 @@ function AppShellFrame({ children }: AppShellProps) {
       },
     });
 
-    const reassessmentInterval = screenCapabilities.showReassessmentEngine
+    // Stage F: engines are session-local. Experimental engines default OFF in production
+    // (VITE_ENABLE_EXPERIMENTAL_SHELL_ENGINES=true to re-enable).
+    const experimentalEnginesEnabled = isExperimentalShellEngineRuntimeEnabled();
+    const engineCaps = {
+      showReassessmentEngine: screenCapabilities.showReassessmentEngine,
+      showCapacityEngine: screenCapabilities.showCapacityEngine,
+      showPatientFlowEngine: screenCapabilities.showPatientFlowEngine,
+      showAdministrativeAutomationEngine: screenCapabilities.showAdministrativeAutomationEngine,
+      showOperationalIntelligenceEngine: screenCapabilities.showOperationalIntelligenceEngine,
+    };
+    if (import.meta.env.DEV) {
+      console.info(
+        '[AppShell] experimental engines',
+        experimentalEnginesEnabled ? 'ON' : 'OFF',
+        listExperimentalShellEngines().map((e) => e.id).join(','),
+      );
+    }
+
+    const reassessmentInterval = shouldStartShellEngine('reassessment', engineCaps, {
+      experimentalEnabled: experimentalEnginesEnabled,
+    })
       ? startReassessmentEngine()
       : undefined;
-    const capacityInterval = screenCapabilities.showCapacityEngine
+    const capacityInterval = shouldStartShellEngine('capacity', engineCaps, {
+      experimentalEnabled: experimentalEnginesEnabled,
+    })
       ? startCapacityEngine()
       : undefined;
-    const patientFlowInterval = screenCapabilities.showPatientFlowEngine
+    const patientFlowInterval = shouldStartShellEngine('continuousPatientFlow', engineCaps, {
+      experimentalEnabled: experimentalEnginesEnabled,
+    })
       ? startContinuousPatientFlowEngine()
       : undefined;
-    const administrativeAutomationInterval = screenCapabilities.showAdministrativeAutomationEngine
+    const administrativeAutomationInterval = shouldStartShellEngine(
+      'administrativeAutomation',
+      engineCaps,
+      { experimentalEnabled: experimentalEnginesEnabled },
+    )
       ? startAdministrativeAutomationEngine()
       : undefined;
-    const stopUnifiedWorkflowAutomation = screenCapabilities.showAdministrativeAutomationEngine
+    const stopUnifiedWorkflowAutomation = shouldStartShellEngine(
+      'unifiedWorkflowAutomation',
+      engineCaps,
+      { experimentalEnabled: experimentalEnginesEnabled },
+    )
       ? startUnifiedWorkflowAutomationEngine()
       : undefined;
-    const stopUnifiedOperationalIntelligence = screenCapabilities.showOperationalIntelligenceEngine
+    const stopUnifiedOperationalIntelligence = shouldStartShellEngine(
+      'unifiedOperationalIntelligence',
+      engineCaps,
+      { experimentalEnabled: experimentalEnginesEnabled },
+    )
       ? startUnifiedOperationalIntelligenceEngine()
       : undefined;
-    const stopUnifiedApplicationKnowledgeGraph = screenCapabilities.showOperationalIntelligenceEngine
+    const stopUnifiedApplicationKnowledgeGraph = shouldStartShellEngine(
+      'unifiedApplicationKnowledgeGraph',
+      engineCaps,
+      { experimentalEnabled: experimentalEnginesEnabled },
+    )
       ? startUnifiedApplicationKnowledgeGraphEngine()
       : undefined;
-    const stopLivingDocumentation = startLivingDocumentationEngine();
+    const stopLivingDocumentation = shouldStartShellEngine('livingDocumentation', engineCaps, {
+      experimentalEnabled: experimentalEnginesEnabled,
+    })
+      ? startLivingDocumentationEngine()
+      : undefined;
     const alertsInterval = window.setInterval(() => {
       useEmergencyStore.getState().updateAlerts();
       void import('../services/alertLifecycleOrchestrator').then(({ checkUnacknowledgedAlertEscalations }) =>
@@ -852,18 +901,25 @@ function AppShellFrame({ children }: AppShellProps) {
     setShowPalette(false);
   };
 
+  const isReceptionSimpleDensity = screenDensityProfile.id === 'simple-fast';
+
   return (
     <div
       className={[
         'emergency-app-shell',
         'cdl-shell',
+        'ml-app-shell',
         screenDensityShellClassName(screenCapabilities.screenMode),
         isPublicWaitingKiosk ? 'emergency-app-shell--public-waiting-kiosk' : '',
         isReadOnlyWhiteboardKiosk ? 'emergency-app-shell--read-only-whiteboard-kiosk' : '',
         copilotOpen && canUseCopilot && !useKioskShell ? 'emergency-app-shell--copilot-open' : '',
+        isReceptionSimpleDensity ? 'emergency-app-shell--reception-density' : '',
       ]
         .filter(Boolean)
         .join(' ')}
+      data-medical-theme="light"
+      data-screen-density={screenDensityProfile.id}
+      data-ai-chrome={copilotOpen && canUseCopilot ? 'open' : 'closed'}
     >
       <a className="ed-skip-link" href="#main-content">
         Skip to main content
@@ -881,10 +937,11 @@ function AppShellFrame({ children }: AppShellProps) {
           ) : isPublicWaitingKiosk || isReadOnlyWhiteboardKiosk ? null : (
             <>
               <Header />
+              {/* Reception simple-fast density: one route tab only — avoid stacking journey + session bars */}
               <ShellRouteTab title={currentPage.label} subtitle={currentPage.subtitle} />
               <OperationalAlarmDock showEmsInbound={screenCapabilities.showEmsCriticalOverlay} />
-              {!useKioskShell ? <HospitalJourneyCommandBar /> : null}
-              {!useKioskShell ? <SessionChromeBar /> : null}
+              {!useKioskShell && !isReceptionSimpleDensity ? <HospitalJourneyCommandBar /> : null}
+              {!useKioskShell && !isReceptionSimpleDensity ? <SessionChromeBar /> : null}
             </>
           )}
           <main

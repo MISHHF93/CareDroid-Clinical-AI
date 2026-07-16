@@ -49,6 +49,7 @@ export default function CopilotShell({
       className={['ed-copilot-shell', chatOnly ? 'ed-copilot-shell--chat-only' : '']
         .filter(Boolean)
         .join(' ')}
+      data-testid="ed-copilot-shell"
     >
       {header}
 

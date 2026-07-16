@@ -77,6 +77,7 @@ import {
   createSmartIntakePatient,
 } from '../services/emergencyOsApi';
 import { apiFetch } from '../services/apiClient';
+import logger from '../utils/logger';
 import {
   RECEPTION_DATASET_TIMEOUT_MS,
   REFRESH_DATASET_TIMEOUT_MS,
@@ -1701,6 +1702,49 @@ const emptyCapacityMetrics = (): EmergencyCapacityMetrics => ({
   raw: null,
 });
 
+/**
+ * Architect Mode Stage F: keep capacityMetrics.score aligned with capacity.score
+ * when metrics are derived from the local snapshot (no remote payload).
+ * Prevents contradictory KPI counters in shell/reception rails.
+ */
+const capacityMetricsFromSnapshot = (capacity: CapacitySnapshot): EmergencyCapacityMetrics => ({
+  score: capacity.score,
+  color: normalizeCapacityColor(capacity.band ?? capacity.label, capacity.score),
+  triggers: [],
+  recommendations: [],
+  updatedAt: capacity.updatedAt || nowIso(),
+  raw: { source: 'capacity-snapshot-sync', band: capacity.band },
+});
+
+/** Merge local capacity score into metrics without wiping remote triggers when present. */
+const syncCapacityMetricsScore = (
+  metrics: EmergencyCapacityMetrics,
+  capacity: CapacitySnapshot,
+): EmergencyCapacityMetrics => {
+  if (metrics.score === capacity.score && metrics.updatedAt) {
+    return metrics;
+  }
+  // If metrics still look empty/default, fully seed from snapshot.
+  if (!metrics.raw && metrics.score === 0 && (!metrics.triggers || metrics.triggers.length === 0)) {
+    return capacityMetricsFromSnapshot(capacity);
+  }
+  return {
+    ...metrics,
+    score: capacity.score,
+    color: normalizeCapacityColor(capacity.band ?? metrics.color, capacity.score),
+    updatedAt: capacity.updatedAt || metrics.updatedAt || nowIso(),
+  };
+};
+
+/** Spread into set() patches whenever capacity snapshot is recomputed from patients/rooms. */
+const applyCapacityPatch = (
+  state: { capacityMetrics: EmergencyCapacityMetrics },
+  capacity: CapacitySnapshot,
+): { capacity: CapacitySnapshot; capacityMetrics: EmergencyCapacityMetrics } => ({
+  capacity,
+  capacityMetrics: syncCapacityMetricsScore(state.capacityMetrics, capacity),
+});
+
 const emptyBoardingMetrics = (): EmergencyBoardingMetrics => ({
   medianBoardTimeMinutes: 0,
   patientsBoarding: [],
@@ -2937,7 +2981,8 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
     emsUnits: initialScenarioState.emsUnits || SEED_EMS_UNITS,
     emsArrivals: initialScenarioState.emsArrivals || [],
     referrals: initialScenarioState.referrals || SEED_REFERRALS,
-    capacityMetrics: emptyCapacityMetrics(),
+    // Stage F: seed metrics from the same snapshot as capacity (no 0-vs-live contradiction)
+    capacityMetrics: capacityMetricsFromSnapshot(initialCapacity),
     boardingMetrics: emptyBoardingMetrics(),
     surgeStatus: emptySurgeStatus(),
     copilotMessages: [],
@@ -3073,7 +3118,12 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       });
 
       if (options?.syncToBackend) {
-        void createSmartIntakePatient(patientWithTimeline).catch(() => undefined);
+        void createSmartIntakePatient(patientWithTimeline).catch((error) => {
+          logger.warn('Failed to sync smart intake patient to backend', {
+            patientId: patientWithTimeline?.id,
+            error: error instanceof Error ? error.message : String(error),
+          });
+        });
       }
     },
 
@@ -3129,7 +3179,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
     setPatients: (patients) =>
       set((state) => ({
         patients,
-        capacity: buildCapacitySnapshot(patients, state.rooms),
+        ...applyCapacityPatch(state, buildCapacitySnapshot(patients, state.rooms)),
         auditLog: appendAuditLog(state.auditLog, {
           action: 'setPatients',
           staffId: 'system',
@@ -3148,7 +3198,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         return {
           patients,
           rooms,
-          capacity: buildCapacitySnapshot(patients, rooms),
+          ...applyCapacityPatch(state, buildCapacitySnapshot(patients, rooms)),
           auditLog: appendAuditLog(state.auditLog, {
             action: 'removePatient',
             patientId,
@@ -3360,7 +3410,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
 
         return {
           patients,
-          capacity: buildCapacitySnapshot(patients, state.rooms),
+          ...applyCapacityPatch(state, buildCapacitySnapshot(patients, state.rooms)),
           workflowLogs: appendWorkflowLogs(state.workflowLogs, [
             {
               type: 'fit_to_wait_classified' as import('../types/emergency').WorkflowActionType,
@@ -3552,7 +3602,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         );
         return {
           patients,
-          capacity: buildCapacitySnapshot(patients, state.rooms),
+          ...applyCapacityPatch(state, buildCapacitySnapshot(patients, state.rooms)),
           auditLog: appendAuditLog(state.auditLog, {
             action: 'dischargePatient',
             patientId,
@@ -3705,7 +3755,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         return {
           rooms,
           patients,
-          capacity: buildCapacitySnapshot(patients, rooms),
+          ...applyCapacityPatch(state, buildCapacitySnapshot(patients, rooms)),
           auditLog: appendAuditLog(state.auditLog, {
             action: 'assignRoom',
             patientId,
@@ -3787,7 +3837,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
 
         return {
           patients,
-          capacity: buildCapacitySnapshot(patients, state.rooms),
+          ...applyCapacityPatch(state, buildCapacitySnapshot(patients, state.rooms)),
           alerts: flagAlert ? mergeEmergencyAlerts([flagAlert], state.alerts) : state.alerts,
           auditLog: appendAuditLog(state.auditLog, {
             action: 'addFlag',
@@ -3872,7 +3922,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
 
         return {
           patients,
-          capacity: buildCapacitySnapshot(patients, state.rooms),
+          ...applyCapacityPatch(state, buildCapacitySnapshot(patients, state.rooms)),
           auditLog: appendAuditLog(state.auditLog, {
             action: 'removeFlag',
             patientId,
@@ -3891,7 +3941,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
           const patients = pipelinePatch.patients;
           return {
             ...pipelinePatch,
-            capacity: buildCapacitySnapshot(patients, state.rooms),
+            ...applyCapacityPatch(state, buildCapacitySnapshot(patients, state.rooms)),
             auditLog: appendAuditLog(state.auditLog, {
               action: 'addVitals',
               patientId,
@@ -3961,7 +4011,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         });
         return {
           patients,
-          capacity: buildCapacitySnapshot(patients, state.rooms),
+          ...applyCapacityPatch(state, buildCapacitySnapshot(patients, state.rooms)),
           alerts: news2Alert ? mergeEmergencyAlerts([news2Alert], state.alerts) : state.alerts,
           auditLog: appendAuditLog(state.auditLog, {
             action: 'addVitals',
@@ -4295,9 +4345,13 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       set((state) => buildAcknowledgeVitalsAlertPatch(state, patientId, alertId, acknowledgedBy)),
 
     updateCapacity: () =>
-      set((state) => ({
-        capacity: calculateCapacity(),
-      })),
+      set((state) => {
+        const capacity = calculateCapacity();
+        return {
+          capacity,
+          capacityMetrics: syncCapacityMetricsScore(state.capacityMetrics, capacity),
+        };
+      }),
 
     updateAlerts: () =>
       set((state) => {
@@ -4560,32 +4614,45 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         errors,
       });
 
-      set((state) => ({
-        capacityMetrics: capacity.data
-          ? normalizeCapacityMetrics(capacity.data)
-          : state.capacityMetrics,
-        boardingMetrics: boarding.data
-          ? normalizeBoardingMetrics(boarding.data)
-          : state.boardingMetrics,
-        emsIncomingPatients: ems.data
-          ? extractEmsIncomingPatients(ems.data)
-          : state.emsIncomingPatients,
-        emsArrivals: (() => {
-          if (!ems.data) return state.emsArrivals;
-          const nextArrivals = extractEmsIncomingPatients(ems.data) as unknown as EMSArrival[];
-          return nextArrivals.length ? nextArrivals : state.emsArrivals;
-        })(),
-        queues: queues.data ? extractQueueSummaries(queues.data) : state.queues,
-        alerts: operationalAlerts.length
-          ? mergeEmergencyAlerts(operationalAlerts, state.alerts)
-          : state.alerts,
-        loading: false,
-        ui: {
-          ...state.ui,
+      set((state) => {
+        const capacityPayload = capacity.data;
+        const capacityRecord = capacityPayload ? asRecord(capacityPayload) : null;
+        const hasCapacitySnapshot =
+          Boolean(capacityRecord) &&
+          capacityRecord!.score !== undefined &&
+          capacityRecord!.band !== undefined;
+        // Prefer full snapshot sync so capacity.score and capacityMetrics.score never diverge.
+        const capacityPatch = hasCapacitySnapshot
+          ? applyCapacityPatch(state, capacityPayload as CapacitySnapshot)
+          : capacityPayload
+            ? { capacityMetrics: normalizeCapacityMetrics(capacityPayload) }
+            : {};
+
+        return {
+          ...capacityPatch,
+          boardingMetrics: boarding.data
+            ? normalizeBoardingMetrics(boarding.data)
+            : state.boardingMetrics,
+          emsIncomingPatients: ems.data
+            ? extractEmsIncomingPatients(ems.data)
+            : state.emsIncomingPatients,
+          emsArrivals: (() => {
+            if (!ems.data) return state.emsArrivals;
+            const nextArrivals = extractEmsIncomingPatients(ems.data) as unknown as EMSArrival[];
+            return nextArrivals.length ? nextArrivals : state.emsArrivals;
+          })(),
+          queues: queues.data ? extractQueueSummaries(queues.data) : state.queues,
+          alerts: operationalAlerts.length
+            ? mergeEmergencyAlerts(operationalAlerts, state.alerts)
+            : state.alerts,
           loading: false,
-          error: Object.values(errors)[0] ?? null,
-        },
-      }));
+          ui: {
+            ...state.ui,
+            loading: false,
+            error: Object.values(errors)[0] ?? null,
+          },
+        };
+      });
 
       return {
         whiteboard: whiteboard.data,
@@ -4834,21 +4901,40 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
           capacityRecord.score !== undefined &&
           capacityRecord.band !== undefined &&
           capacityRecord.updatedAt !== undefined;
-        set((state) => ({
-          capacityMetrics: normalizeCapacityMetrics(payload),
-          alerts: capacityAlert ? mergeEmergencyAlerts([capacityAlert], state.alerts) : state.alerts,
-          ...(hasCapacitySnapshot
-            ? {
-                capacity: capacity as CapacitySnapshot,
-                capacityHistory: appendCapacityBandChange(
-                  state.capacityHistory,
-                  state.capacity,
-                  capacity as CapacitySnapshot,
-                  type,
-                ),
-              }
-            : {}),
-        }));
+        set((state) => {
+          const metricsFromPayload = normalizeCapacityMetrics(payload);
+          if (!hasCapacitySnapshot) {
+            return {
+              capacityMetrics: metricsFromPayload,
+              alerts: capacityAlert
+                ? mergeEmergencyAlerts([capacityAlert], state.alerts)
+                : state.alerts,
+            };
+          }
+          // Stage F: keep capacity.score and capacityMetrics.score aligned on WS updates
+          const nextCapacity = capacity as CapacitySnapshot;
+          return {
+            capacity: nextCapacity,
+            capacityMetrics: {
+              ...metricsFromPayload,
+              score: nextCapacity.score,
+              color: normalizeCapacityColor(
+                nextCapacity.band ?? metricsFromPayload.color,
+                nextCapacity.score,
+              ),
+              updatedAt: nextCapacity.updatedAt || metricsFromPayload.updatedAt || nowIso(),
+            },
+            capacityHistory: appendCapacityBandChange(
+              state.capacityHistory,
+              state.capacity,
+              nextCapacity,
+              type,
+            ),
+            alerts: capacityAlert
+              ? mergeEmergencyAlerts([capacityAlert], state.alerts)
+              : state.alerts,
+          };
+        });
         return;
       }
       if (['boarding_updated', 'boarding_changed', 'boarding_started'].includes(type)) {
@@ -5129,6 +5215,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
     setCapacity: (capacity) =>
       set((state) => ({
         capacity,
+        capacityMetrics: syncCapacityMetricsScore(state.capacityMetrics, capacity),
         capacityHistory: appendCapacityBandChange(
           state.capacityHistory,
           state.capacity,
@@ -5440,7 +5527,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         return {
           patients,
           rooms,
-          capacity: buildCapacitySnapshot(patients, rooms),
+          ...applyCapacityPatch(state, buildCapacitySnapshot(patients, rooms)),
           emsArrivals: state.emsArrivals.map((candidate) =>
             candidate.id === arrivalId ? convertedArrival : candidate,
           ),

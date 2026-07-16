@@ -54,11 +54,55 @@ describe('ocrIntakeApi', () => {
     );
   });
 
-  it('applies a job to intake', async () => {
+  it('applies a job to intake only after identity validation', async () => {
+    const validatedJob = {
+      id: 'ocr-job-1',
+      status: 'completed',
+      documentType: 'id',
+      provider: 'tesseract',
+      extractedText: 'Ada',
+      extractedFields: [
+        {
+          field: 'firstName',
+          value: 'Ada',
+          confidence: 0.95,
+          status: 'accepted',
+        },
+      ],
+      overallConfidence: 0.9,
+      warnings: [],
+      appliedToIntake: false,
+      createdBy: 'nurse-1',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      auditLog: [],
+    };
+    apiFetch
+      .mockResolvedValueOnce({ ok: true, mockData: validatedJob })
+      .mockResolvedValueOnce({ ok: true, mockData: { ...validatedJob, appliedToIntake: true } });
+
     await OcrIntakeApi.applyToIntake('ocr-job-1', 'nurse-1');
+    expect(apiFetch).toHaveBeenCalledWith('/api/emergency/intake/ocr-jobs/ocr-job-1');
     expect(apiFetch).toHaveBeenCalledWith(
       '/api/emergency/intake/ocr-jobs/ocr-job-1/apply',
       expect.objectContaining({ method: 'POST' }),
+    );
+  });
+
+  it('refuses apply when OCR identity fields are unvalidated', async () => {
+    apiFetch.mockResolvedValue({
+      ok: true,
+      mockData: {
+        id: 'ocr-job-1',
+        status: 'completed',
+        extractedFields: [{ field: 'firstName', value: 'Ada', confidence: 0.9, status: 'pending' }],
+        overallConfidence: 0.9,
+      },
+    });
+    await expect(OcrIntakeApi.applyToIntake('ocr-job-1', 'nurse-1')).rejects.toThrow(/validation/i);
+    expect(apiFetch).not.toHaveBeenCalledWith(
+      '/api/emergency/intake/ocr-jobs/ocr-job-1/apply',
+      expect.anything(),
     );
   });
 

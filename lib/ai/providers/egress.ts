@@ -34,6 +34,11 @@ import {
   resolvePrimaryProvider,
 } from './registry';
 import type { LlmAdapterRuntime, LlmProviderId } from './types';
+import {
+  getProviderCircuit,
+  listProviderCircuitSnapshots,
+  readAiRequestTimeoutMs,
+} from './transportSafety';
 
 export type MetadataLogger = (metadata: {
   requestType: AIRequestType;
@@ -58,6 +63,8 @@ export interface EgressRuntime extends LlmAdapterRuntime {
   stableId?: string;
   /** Skip canary/shadow candidate routing */
   disableDeployRouting?: boolean;
+  /** Skip circuit-breaker check for this call (tests / admin recovery) */
+  disableCircuitBreaker?: boolean;
 }
 
 export interface EgressResult extends AIResponse {
@@ -172,6 +179,8 @@ export async function completeViaEgress(
     azureApiVersion: runtime?.azureApiVersion,
     azureDeployment: runtime?.azureDeployment,
     model: effectiveModel,
+    timeoutMs: runtime?.timeoutMs ?? readAiRequestTimeoutMs(),
+    signal: runtime?.signal,
     metadataLogger: (meta) => {
       runtime?.metadataLogger?.({
         ...meta,
@@ -192,11 +201,17 @@ export async function completeViaEgress(
     },
   };
 
+  const primaryCircuit = runtime?.disableCircuitBreaker
+    ? null
+    : getProviderCircuit(effectiveProvider);
+  primaryCircuit?.assertAllowed(request.requestType);
+
   try {
     const response = await getAdapter(effectiveProvider).complete(
       minimizedRequest,
       adapterRuntime,
     );
+    primaryCircuit?.recordSuccess();
 
     // Shadow mode: best-effort candidate call for comparison logs only
     if (
@@ -226,19 +241,34 @@ export async function completeViaEgress(
       canaryServed,
     );
   } catch (error) {
+    // Kill-switch / config errors should not trip the provider circuit.
+    const code = error instanceof AIError ? error.code : 'unknown';
+    if (
+      primaryCircuit &&
+      code !== 'AI_KILL_SWITCH' &&
+      code !== 'AI_CONFIG_ERROR' &&
+      code !== 'AI_CIRCUIT_OPEN'
+    ) {
+      primaryCircuit.recordFailure();
+    }
     recordAiMonitorEvent('egress_failure', {
       requestType: request.requestType,
-      code: error instanceof AIError ? error.code : 'unknown',
+      code,
     });
     const retryable = error instanceof AIError ? error.retryable : true;
     if (fallback && retryable && fallback !== effectiveProvider) {
+      const fallbackCircuit = runtime?.disableCircuitBreaker
+        ? null
+        : getProviderCircuit(fallback);
       try {
+        fallbackCircuit?.assertAllowed(request.requestType);
         const response = await getAdapter(fallback).complete(minimizedRequest, {
           ...adapterRuntime,
           model:
             runtime?.model ||
             (typeof process !== 'undefined' ? process.env.AI_FALLBACK_MODEL : undefined),
         });
+        fallbackCircuit?.recordSuccess();
         return annotate(
           response,
           fallback,
@@ -249,6 +279,12 @@ export async function completeViaEgress(
           canaryServed,
         );
       } catch (fallbackError) {
+        if (
+          fallbackCircuit &&
+          !(fallbackError instanceof AIError && fallbackError.code === 'AI_CIRCUIT_OPEN')
+        ) {
+          fallbackCircuit.recordFailure();
+        }
         throw fallbackError instanceof AIError
           ? fallbackError
           : new AIError({
@@ -330,6 +366,7 @@ function normalizeProvider(value: string): LlmProviderId {
   if (raw === 'openai') return 'openai';
   if (raw === 'azure' || raw === 'azure-openai' || raw === 'azure_openai') return 'azure-openai';
   if (raw === 'gemini' || raw === 'google') return 'gemini';
+  if (raw === 'groq') return 'groq';
   if (raw === 'local' || raw === 'mock') return 'local';
   return 'anthropic';
 }
@@ -342,6 +379,8 @@ export function getEgressHealth() {
     fallback: resolveFallbackProvider(),
     adapters: listAdapterHealth(),
     patientContextEnabled: isPatientContextEnabled(),
+    requestTimeoutMs: readAiRequestTimeoutMs(),
+    circuits: listProviderCircuitSnapshots(),
     deployment: {
       mode: deploy.mode,
       canaryPercent: deploy.canaryPercent,

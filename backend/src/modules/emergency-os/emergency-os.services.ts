@@ -1245,7 +1245,10 @@ export class PatientJourneyService {
 
 @Injectable()
 export class EMSIntakeService {
-  constructor(private readonly patientService: EmergencyPatientService) {}
+  constructor(
+    private readonly patientService: EmergencyPatientService,
+    private readonly workflowLogService: WorkflowActionLogService,
+  ) {}
 
   getEMSIntake() {
     const patients = this.patientService
@@ -1271,6 +1274,90 @@ export class EMSIntakeService {
       availableResusRooms: this.patientService
         .listRooms()
         .filter((room) => room.type === 'Resus' && room.status === 'Available').length,
+    });
+  }
+
+  /**
+   * Persist EMS ambulance handoff completion (defect D2).
+   * Mirrors reception→triage handoff: server-side workflow audit + optional patient note.
+   * Local whiteboard status remains the frontend source of truth for unit tracking;
+   * this endpoint makes completion survive refresh / multi-workstation use.
+   */
+  completeHandoff(input: {
+    arrivalId?: string;
+    patientId?: string;
+    actorName?: string;
+    unitId?: string;
+    unitName?: string;
+    chiefComplaint?: string;
+    handoffAcceptedAt?: string;
+    handoffStartedAt?: string;
+    arrivedAt?: string;
+    checklist?: Record<string, unknown>;
+    notes?: string;
+  }) {
+    const arrivalId = String(input.arrivalId || '').trim();
+    if (!arrivalId) {
+      return envelope('EMS Handoff', { ok: false, error: 'arrivalId is required' });
+    }
+
+    const timestamp = input.handoffAcceptedAt || new Date().toISOString();
+    const patientId = input.patientId ? String(input.patientId).trim() : '';
+    const patient = patientId
+      ? this.patientService.listPatients().find((entry) => entry.id === patientId)
+      : undefined;
+
+    if (patientId && patient) {
+      this.workflowLogService.record({
+        type: 'patient_note_added',
+        title: 'EMS handoff note',
+        summary: `EMS handoff completed for arrival ${arrivalId}${
+          input.unitName ? ` (${input.unitName})` : ''
+        }.`,
+        patientId,
+        actorName: input.actorName,
+        source: 'ems-pipeline',
+        metadata: {
+          handoff: 'ems.handoff',
+          arrivalId,
+          unitId: input.unitId,
+          unitName: input.unitName,
+        },
+      });
+    }
+
+    const log = this.workflowLogService.record({
+      type: patientId && patient ? 'ems_converted_to_patient' : 'journey_state_changed',
+      title: 'EMS handoff completed',
+      summary: `EMS arrival ${arrivalId} handoff completed${
+        input.unitName ? ` by unit ${input.unitName}` : ''
+      }${patientId ? ` → patient ${patientId}` : ''}.`,
+      patientId: patientId || undefined,
+      actorName: input.actorName,
+      source: 'ems-pipeline',
+      metadata: {
+        handoff: 'ems.handoff',
+        arrivalId,
+        unitId: input.unitId || null,
+        unitName: input.unitName || null,
+        chiefComplaint: input.chiefComplaint || null,
+        handoffAcceptedAt: timestamp,
+        handoffStartedAt: input.handoffStartedAt || input.arrivedAt || timestamp,
+        arrivedAt: input.arrivedAt || null,
+        checklistJson: input.checklist ? JSON.stringify(input.checklist) : null,
+        notes: input.notes || null,
+        status: 'Complete',
+      },
+    });
+
+    return envelope('EMS Handoff', {
+      ok: true,
+      arrivalId,
+      patientId: patientId || null,
+      status: 'Complete',
+      handoffCompletedAt: timestamp,
+      workflowLogId: log.id,
+      patient: patient || null,
     });
   }
 }

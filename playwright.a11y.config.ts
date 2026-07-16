@@ -1,6 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const baseURL = process.env.QA_BASE_URL || 'http://localhost:8000';
+// Hermetic Vite on 5190 (same pattern as EMS-copilot; avoid contaminated :8000 / full dev-stack).
+const port = process.env.VITE_DEV_PORT || process.env.FRONTEND_PORT || '5190';
+const baseURL = (process.env.QA_BASE_URL || `http://localhost:${port}`).replace(/\/+$/, '');
 
 export default defineConfig({
   testDir: './e2e',
@@ -23,18 +25,15 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     actionTimeout: 20_000,
     navigationTimeout: 60_000,
-    // Escape hatch for sandboxes where the downloaded Playwright browser is
-    // blocked (e.g. by an Application Control policy) but a system browser
-    // install is already trusted. No effect unless explicitly set.
     launchOptions: process.env.QA_CHROMIUM_EXECUTABLE
       ? { executablePath: process.env.QA_CHROMIUM_EXECUTABLE }
       : {},
   },
   webServer: {
-    command: 'npm run dev',
+    command: `npx vite --strictPort --port ${port}`,
     url: baseURL,
-    reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
+    reuseExistingServer: process.env.QA_REUSE_SERVER === 'true',
+    timeout: 180_000,
   },
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  projects: [{ name: 'chromium-a11y', use: { ...devices['Desktop Chrome'] } }],
 });

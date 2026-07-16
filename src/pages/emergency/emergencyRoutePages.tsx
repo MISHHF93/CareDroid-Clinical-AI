@@ -35,6 +35,9 @@ import {
 } from './emergencyRouteShared';
 import QueueReasonBadge from '../../components/queues/QueueReasonBadge';
 import { AiChiefRouteRecommendationsPanel } from '../../components/ai/AiChiefRouteRecommendationsPanel';
+import StateSourceNotice from '../../components/StateSourceNotice';
+import { buildSessionEngineSourceDetails } from '../../config/shellEngineCatalog';
+import { DEMO_LIVE_STATES } from '../../utils/demoLiveState';
 import {
   clearPatientRouteParam,
   PATIENT_ROUTE_PARAM_KEYS,
@@ -691,6 +694,14 @@ export function CapacityRoute() {
       situationBrief={capacitySituationBrief}
     >
       <FlowCapacityViewTabs activeView={activeView} onViewChange={setActiveView} />
+      <StateSourceNotice
+        title="Capacity data source"
+        states={[
+          backendAvailable ? DEMO_LIVE_STATES.LIVE : DEMO_LIVE_STATES.BACKEND_UNAVAILABLE,
+          DEMO_LIVE_STATES.SESSION_ENGINE,
+        ]}
+        details={buildSessionEngineSourceDetails(['capacity', 'alertsPoll'])}
+      />
       {activeView === 'boarding' ? (
         <>
           <OperationalModuleState

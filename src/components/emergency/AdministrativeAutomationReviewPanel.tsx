@@ -5,11 +5,8 @@ import type { WorkflowAutomationItem } from '../../config/unifiedWorkflowAutomat
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { useUser } from '../../contexts/UserContext';
 import { GraphicIconBadge } from '../graphics/CdlGraphicKit';
-import {
-  CategoryBarChart,
-  DistributionDonutChart,
-  VisualizationPanel,
-} from '../dashboard/DashboardVisualizations';
+import { VisualizationPanel } from '../dashboard/DashboardVisualizations';
+import { CategoryBarChart, DistributionDonutChart } from '../dashboard/DashboardCharts';
 import { buildAutomationStatusChart } from '../../utils/administrativeAutomationChartModel';
 import './administrative-automation-review.css';
 

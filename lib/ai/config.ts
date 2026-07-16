@@ -3,7 +3,7 @@ import {
   HUMAN_REVIEW_DISCLAIMER,
 } from './safetyPolicy';
 
-export type AIProvider = 'anthropic' | 'openai' | 'azure-openai' | 'gemini' | 'local';
+export type AIProvider = 'anthropic' | 'openai' | 'azure-openai' | 'gemini' | 'groq' | 'local';
 export type GovernanceAIProvider = AIProvider | 'azure_openai';
 
 type EnvSource = Record<string, string | undefined>;

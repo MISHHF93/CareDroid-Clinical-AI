@@ -22,7 +22,15 @@ router.get('/compliance', async (req, res) => {
     const report = await aiGovernanceService.generateComplianceReport(startDate, endDate);
     res.json(report);
   } catch (error: any) {
-    res.status(500).json({ error: error.message || 'Failed to generate AI compliance report' });
+    // Architect Mode Stage C: structured error envelope (no bare string-only failures)
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL',
+        message: error?.message || 'Failed to generate AI compliance report',
+        statusCode: 500,
+      },
+    });
   }
 });
 
@@ -34,7 +42,14 @@ router.get('/violations', async (req, res) => {
     );
     res.json({ violations });
   } catch (error: any) {
-    res.status(500).json({ error: error.message || 'Failed to load AI safety violations' });
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'INTERNAL',
+        message: error?.message || 'Failed to load AI safety violations',
+        statusCode: 500,
+      },
+    });
   }
 });
 

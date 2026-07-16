@@ -56,6 +56,10 @@ import {
 import useRouteScreenMode from '../hooks/useRouteScreenMode';
 import { MetricChip } from './ui/CareDroidPrimitives';
 import { persistCopilotInteractionSafely } from '../services/emergencyOsApi';
+import { AccountableRecommendationCard } from './ai/AccountableRecommendationCard';
+import { accountableFromGatewayPayload } from '../utils/accountableFromGateway';
+import { abstainFromAiFailure } from '../services/aiFailureAbstention';
+import type { AccountableRecommendation } from '../contracts/accountableAi';
 
 type CopilotMessage = {
   id: string;
@@ -63,6 +67,8 @@ type CopilotMessage = {
   content: string;
   timestamp: Date;
   attachments?: CopilotAttachment[];
+  /** Stage G: structured evidence / safety envelope when available */
+  accountable?: AccountableRecommendation;
 };
 
 type StoreCopilotMessage = ReturnType<typeof useEmergencyStore.getState>['copilotMessages'][number];
@@ -919,39 +925,65 @@ export function CopilotPanel() {
 
       const responseText =
         typeof response.content === 'string' ? response.content : extractResponseText(response.data);
-      await streamIntoMessage(responseText, assistantId, setMessages);
+      const accountable = accountableFromGatewayPayload(
+        response.data ?? response,
+        responseText,
+      );
+      await streamIntoMessage(accountable.content || responseText, assistantId, setMessages);
+      setMessages((current) =>
+        current.map((message) =>
+          message.id === assistantId ? { ...message, accountable } : message,
+        ),
+      );
       appendCopilotMessage({
         id: assistantId,
         query: promptText,
-        response: responseText,
-        safetyStatus: 'unknown',
+        response: accountable.content || responseText,
+        safetyStatus:
+          accountable.safety.status === 'ok'
+            ? 'safe'
+            : accountable.safety.status === 'degraded'
+              ? 'caution'
+              : accountable.safety.status === 'escalate' || accountable.safety.status === 'abstain'
+                ? 'blocked'
+                : 'unknown',
         createdAt: assistantMessage.timestamp.toISOString(),
-        raw: response.data,
+        raw: { ...(response.data as object), accountableRecommendation: accountable },
       });
       persistCopilotInteractionSafely({
         question: promptText,
         patientId: selectedPatient?.id,
         patientContextSummary: patientOrchestrationPrompt,
-        draftGuidance: responseText,
+        draftGuidance: accountable.content || responseText,
         userRole: emergencyRole.role,
-        requiresHumanReview: true,
+        requiresHumanReview: accountable.humanReviewRequired,
       });
-    } catch {
-      const fallbackResponse = COPILOT_PLATFORM.prompts.fallbackUnavailable.replace(
-        'CareDroid Copilot',
-        EMERGENCY_OS_BRANDING.copilotName,
-      );
-      await streamIntoMessage(
-        fallbackResponse,
-        assistantId,
-        setMessages,
+    } catch (error) {
+      const abstain = abstainFromAiFailure(error, {
+        provider: 'caredroid-copilot',
+        promptVersion: 'copilot-panel@1',
+      });
+      const fallbackResponse =
+        abstain.content ||
+        COPILOT_PLATFORM.prompts.fallbackUnavailable.replace(
+          'CareDroid Copilot',
+          EMERGENCY_OS_BRANDING.copilotName,
+        );
+      await streamIntoMessage(fallbackResponse, assistantId, setMessages);
+      setMessages((current) =>
+        current.map((message) =>
+          message.id === assistantId
+            ? { ...message, content: fallbackResponse, accountable: abstain }
+            : message,
+        ),
       );
       appendCopilotMessage({
         id: assistantId,
         query: promptText,
         response: fallbackResponse,
-        safetyStatus: 'unknown',
+        safetyStatus: 'blocked',
         createdAt: assistantMessage.timestamp.toISOString(),
+        raw: { accountableRecommendation: abstain },
       });
     } finally {
       setLoading(false);
@@ -976,7 +1008,11 @@ export function CopilotPanel() {
 
   const copilotHeader = (
     <header className="ed-copilot-panel__header">
-      <span aria-label="Copilot panel active" className="ed-copilot-panel__live-dot" />
+      <span
+        role="status"
+        aria-label="Copilot panel active"
+        className="ed-copilot-panel__live-dot"
+      />
       <div className="ed-copilot-panel__identity">
         <span>{copilotChrome.productName}</span>
         {copilotSurfaces.showSafetyBadge ? (
@@ -1019,7 +1055,11 @@ export function CopilotPanel() {
       {messages.map((message) => (
         <div key={message.id} className="ed-copilot-panel__message" data-role={message.role}>
           <div className="ed-copilot-panel__bubble">
-            {message.content || (message.role === 'copilot' && loading ? <TypingIndicator /> : null)}
+            {message.role === 'copilot' && message.accountable ? (
+              <AccountableRecommendationCard recommendation={message.accountable} compact />
+            ) : (
+              message.content || (message.role === 'copilot' && loading ? <TypingIndicator /> : null)
+            )}
             {message.attachments?.length ? (
               <div className="ed-copilot-panel__message-attachments">
                 {message.attachments.map((attachment) => (

@@ -1,12 +1,8 @@
 import { useMemo } from 'react';
 import useUnifiedApplicationKnowledgeGraph from '../../hooks/useUnifiedApplicationKnowledgeGraph';
 import { GraphicIconBadge } from '../graphics/CdlGraphicKit';
-import {
-  CategoryBarChart,
-  DistributionDonutChart,
-  MetricCard,
-  VisualizationPanel,
-} from '../dashboard/DashboardVisualizations';
+import { MetricCard, VisualizationPanel } from '../dashboard/DashboardVisualizations';
+import { CategoryBarChart, DistributionDonutChart } from '../dashboard/DashboardCharts';
 import type { HospitalCommandCenterSnapshot } from '../../services/hospitalCommandCenterModel';
 import type { HospitalCommandMetric } from '../../services/hospitalCommandCenterModel';
 import {

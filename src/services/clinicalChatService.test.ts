@@ -49,6 +49,9 @@ describe('clinicalChatService', () => {
     expect(msg.content).toBe('Hello');
     if (!msg.toolResult) throw new Error('expected mapChatResponseToAssistantMessage to normalize toolResult');
     expect(msg.toolResult.toolId).toBe('drug-interactions');
+    // Stage G: unstructured responses still get accountable envelope (degraded)
+    expect(msg.accountableRecommendation).toBeTruthy();
+    expect(msg.accountableRecommendation.humanReviewRequired).toBe(true);
   });
 
   it('normalizes RAG source panel references from chat responses', () => {

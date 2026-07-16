@@ -3,11 +3,8 @@ import { Link } from 'react-router-dom';
 import ClinicalDecisionSupportDisclaimer from '../../components/clinical/ClinicalDecisionSupportDisclaimer';
 import DispatchIntelligencePanel from '../../components/fleet/DispatchIntelligencePanel';
 import { GraphicIconBadge } from '../../components/graphics/CdlGraphicKit';
-import {
-  CategoryBarChart,
-  MetricCard,
-  VisualizationPanel,
-} from '../../components/dashboard/DashboardVisualizations';
+import { MetricCard, VisualizationPanel } from '../../components/dashboard/DashboardVisualizations';
+import { CategoryBarChart } from '../../components/dashboard/DashboardCharts';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
 import { PLATFORM_AI_MODEL_REGISTRY } from '../../data/aiModelRegistry';

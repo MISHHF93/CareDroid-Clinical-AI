@@ -1,9 +1,9 @@
 {
   "config": {
-    "configFile": "C:\\Users\\borah\\CareDroid-Clinical-AI\\playwright.canonical-routes.config.mjs",
+    "configFile": "C:\\Users\\borah\\CareDroid-Clinical-AI\\playwright.canonical-routes.config.ts",
     "rootDir": "C:/Users/borah/CareDroid-Clinical-AI/e2e",
     "forbidOnly": false,
-    "fullyParallel": true,
+    "fullyParallel": false,
     "globalSetup": "C:\\Users\\borah\\CareDroid-Clinical-AI\\e2e\\global-setup.mjs",
     "globalTeardown": null,
     "globalTimeout": 0,
@@ -22,56 +22,8 @@
         "metadata": {
           "actualWorkers": 1
         },
-        "id": "chromium",
-        "name": "chromium",
-        "testDir": "C:/Users/borah/CareDroid-Clinical-AI/e2e",
-        "testIgnore": [],
-        "testMatch": [
-          "canonical-route-verification.spec.mjs"
-        ],
-        "timeout": 120000
-      },
-      {
-        "outputDir": "C:/Users/borah/CareDroid-Clinical-AI/test-results",
-        "repeatEach": 1,
-        "retries": 0,
-        "metadata": {
-          "actualWorkers": 1
-        },
-        "id": "firefox",
-        "name": "firefox",
-        "testDir": "C:/Users/borah/CareDroid-Clinical-AI/e2e",
-        "testIgnore": [],
-        "testMatch": [
-          "canonical-route-verification.spec.mjs"
-        ],
-        "timeout": 120000
-      },
-      {
-        "outputDir": "C:/Users/borah/CareDroid-Clinical-AI/test-results",
-        "repeatEach": 1,
-        "retries": 0,
-        "metadata": {
-          "actualWorkers": 1
-        },
-        "id": "webkit",
-        "name": "webkit",
-        "testDir": "C:/Users/borah/CareDroid-Clinical-AI/e2e",
-        "testIgnore": [],
-        "testMatch": [
-          "canonical-route-verification.spec.mjs"
-        ],
-        "timeout": 120000
-      },
-      {
-        "outputDir": "C:/Users/borah/CareDroid-Clinical-AI/test-results",
-        "repeatEach": 1,
-        "retries": 0,
-        "metadata": {
-          "actualWorkers": 1
-        },
-        "id": "msedge",
-        "name": "msedge",
+        "id": "chromium-canonical-routes",
+        "name": "chromium-canonical-routes",
         "testDir": "C:/Users/borah/CareDroid-Clinical-AI/e2e",
         "testIgnore": [],
         "testMatch": [
@@ -104,10 +56,10 @@
     "version": "1.60.0",
     "workers": 1,
     "webServer": {
-      "command": "npm run dev",
-      "url": "http://localhost:8000",
-      "reuseExistingServer": true,
-      "timeout": 120000
+      "command": "npx vite --strictPort --port 5190",
+      "url": "http://localhost:5190",
+      "reuseExistingServer": false,
+      "timeout": 180000
     }
   },
   "suites": [
@@ -126,19 +78,19 @@
               "timeout": 120000,
               "annotations": [],
               "expectedStatus": "passed",
-              "projectId": "chromium",
-              "projectName": "chromium",
+              "projectId": "chromium-canonical-routes",
+              "projectName": "chromium-canonical-routes",
               "results": [
                 {
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1871,
+                  "duration": 9122,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-11T22:28:14.123Z",
+                  "startTime": "2026-07-16T00:28:16.168Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -146,9 +98,9 @@
               "status": "expected"
             }
           ],
-          "id": "e546e7288561c9ba85ad-18b538992c17826830ff",
+          "id": "e546e7288561c9ba85ad-12a40271769eb0b18b15",
           "file": "canonical-route-verification.spec.mjs",
-          "line": 220,
+          "line": 303,
           "column": 3
         },
         {
@@ -160,19 +112,19 @@
               "timeout": 120000,
               "annotations": [],
               "expectedStatus": "passed",
-              "projectId": "chromium",
-              "projectName": "chromium",
+              "projectId": "chromium-canonical-routes",
+              "projectName": "chromium-canonical-routes",
               "results": [
                 {
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1827,
+                  "duration": 4023,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-11T22:28:16.103Z",
+                  "startTime": "2026-07-16T00:28:25.657Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -180,9 +132,9 @@
               "status": "expected"
             }
           ],
-          "id": "e546e7288561c9ba85ad-6ee637c3459ca3ceccf6",
+          "id": "e546e7288561c9ba85ad-dfea96cca1dcef0fe79b",
           "file": "canonical-route-verification.spec.mjs",
-          "line": 220,
+          "line": 303,
           "column": 3
         },
         {
@@ -194,19 +146,19 @@
               "timeout": 120000,
               "annotations": [],
               "expectedStatus": "passed",
-              "projectId": "chromium",
-              "projectName": "chromium",
+              "projectId": "chromium-canonical-routes",
+              "projectName": "chromium-canonical-routes",
               "results": [
                 {
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1499,
+                  "duration": 4055,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-11T22:28:17.942Z",
+                  "startTime": "2026-07-16T00:28:29.696Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -214,9 +166,9 @@
               "status": "expected"
             }
           ],
-          "id": "e546e7288561c9ba85ad-3b70a515fe076832c3f0",
+          "id": "e546e7288561c9ba85ad-b45478f6b14418254e8a",
           "file": "canonical-route-verification.spec.mjs",
-          "line": 220,
+          "line": 303,
           "column": 3
         },
         {
@@ -228,19 +180,19 @@
               "timeout": 120000,
               "annotations": [],
               "expectedStatus": "passed",
-              "projectId": "chromium",
-              "projectName": "chromium",
+              "projectId": "chromium-canonical-routes",
+              "projectName": "chromium-canonical-routes",
               "results": [
                 {
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1517,
+                  "duration": 3974,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-11T22:28:19.455Z",
+                  "startTime": "2026-07-16T00:28:33.771Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -248,9 +200,9 @@
               "status": "expected"
             }
           ],
-          "id": "e546e7288561c9ba85ad-0b8555883ca86e2cfaa3",
+          "id": "e546e7288561c9ba85ad-a4b36bb68f63a2a99fa6",
           "file": "canonical-route-verification.spec.mjs",
-          "line": 220,
+          "line": 303,
           "column": 3
         },
         {
@@ -262,19 +214,19 @@
               "timeout": 120000,
               "annotations": [],
               "expectedStatus": "passed",
-              "projectId": "chromium",
-              "projectName": "chromium",
+              "projectId": "chromium-canonical-routes",
+              "projectName": "chromium-canonical-routes",
               "results": [
                 {
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1472,
+                  "duration": 3057,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-11T22:28:20.986Z",
+                  "startTime": "2026-07-16T00:28:37.766Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -282,9 +234,9 @@
               "status": "expected"
             }
           ],
-          "id": "e546e7288561c9ba85ad-a0391b77c53ddf36dd55",
+          "id": "e546e7288561c9ba85ad-d7be3d4f9c88a6c47c18",
           "file": "canonical-route-verification.spec.mjs",
-          "line": 220,
+          "line": 303,
           "column": 3
         },
         {
@@ -296,19 +248,19 @@
               "timeout": 120000,
               "annotations": [],
               "expectedStatus": "passed",
-              "projectId": "chromium",
-              "projectName": "chromium",
+              "projectId": "chromium-canonical-routes",
+              "projectName": "chromium-canonical-routes",
               "results": [
                 {
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1776,
+                  "duration": 3312,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-11T22:28:22.470Z",
+                  "startTime": "2026-07-16T00:28:40.835Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -316,9 +268,9 @@
               "status": "expected"
             }
           ],
-          "id": "e546e7288561c9ba85ad-9b1e2ccdc6c63c4e1777",
+          "id": "e546e7288561c9ba85ad-16ac8d30954909ce29b4",
           "file": "canonical-route-verification.spec.mjs",
-          "line": 220,
+          "line": 303,
           "column": 3
         },
         {
@@ -330,19 +282,19 @@
               "timeout": 120000,
               "annotations": [],
               "expectedStatus": "passed",
-              "projectId": "chromium",
-              "projectName": "chromium",
+              "projectId": "chromium-canonical-routes",
+              "projectName": "chromium-canonical-routes",
               "results": [
                 {
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1602,
+                  "duration": 3086,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-11T22:28:24.257Z",
+                  "startTime": "2026-07-16T00:28:44.160Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -350,9 +302,9 @@
               "status": "expected"
             }
           ],
-          "id": "e546e7288561c9ba85ad-095ca03bbc8110c34843",
+          "id": "e546e7288561c9ba85ad-0f25b15e3ca11a51551e",
           "file": "canonical-route-verification.spec.mjs",
-          "line": 220,
+          "line": 303,
           "column": 3
         },
         {
@@ -364,19 +316,19 @@
               "timeout": 120000,
               "annotations": [],
               "expectedStatus": "passed",
-              "projectId": "chromium",
-              "projectName": "chromium",
+              "projectId": "chromium-canonical-routes",
+              "projectName": "chromium-canonical-routes",
               "results": [
                 {
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1453,
+                  "duration": 3246,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-11T22:28:25.872Z",
+                  "startTime": "2026-07-16T00:28:47.257Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -384,9 +336,9 @@
               "status": "expected"
             }
           ],
-          "id": "e546e7288561c9ba85ad-e5a283881f835a77467c",
+          "id": "e546e7288561c9ba85ad-5784e8e7e6552e64db8b",
           "file": "canonical-route-verification.spec.mjs",
-          "line": 220,
+          "line": 303,
           "column": 3
         },
         {
@@ -398,19 +350,19 @@
               "timeout": 120000,
               "annotations": [],
               "expectedStatus": "passed",
-              "projectId": "chromium",
-              "projectName": "chromium",
+              "projectId": "chromium-canonical-routes",
+              "projectName": "chromium-canonical-routes",
               "results": [
                 {
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1571,
+                  "duration": 2925,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-11T22:28:27.337Z",
+                  "startTime": "2026-07-16T00:28:50.515Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -418,9 +370,9 @@
               "status": "expected"
             }
           ],
-          "id": "e546e7288561c9ba85ad-16c5c2f404a7d37669e6",
+          "id": "e546e7288561c9ba85ad-c9ac9d9e7b4ed9aba980",
           "file": "canonical-route-verification.spec.mjs",
-          "line": 220,
+          "line": 303,
           "column": 3
         },
         {
@@ -432,19 +384,19 @@
               "timeout": 120000,
               "annotations": [],
               "expectedStatus": "passed",
-              "projectId": "chromium",
-              "projectName": "chromium",
+              "projectId": "chromium-canonical-routes",
+              "projectName": "chromium-canonical-routes",
               "results": [
                 {
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 4969,
+                  "duration": 12456,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-06-11T22:28:28.920Z",
+                  "startTime": "2026-07-16T00:28:53.449Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -452,9 +404,9 @@
               "status": "expected"
             }
           ],
-          "id": "e546e7288561c9ba85ad-dc156e1e386fd7414754",
+          "id": "e546e7288561c9ba85ad-5bccc265747706c3ee21",
           "file": "canonical-route-verification.spec.mjs",
-          "line": 229,
+          "line": 317,
           "column": 1
         }
       ]
@@ -462,8 +414,8 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-06-11T22:28:13.295Z",
-    "duration": 20807.527,
+    "startTime": "2026-07-16T00:28:13.519Z",
+    "duration": 53347.704000000005,
     "expected": 10,
     "skipped": 0,
     "unexpected": 0,

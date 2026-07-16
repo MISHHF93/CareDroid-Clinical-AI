@@ -8,6 +8,7 @@ import {
   registryIdToOrchestratorTool,
 } from '../data/clinicalCatalogWiring';
 import { buildKnowledgeBaseAssistantContext } from '../data/customerKnowledgeBase';
+import { accountableFromGatewayPayload } from '../utils/accountableFromGateway';
 
 export { REGISTRY_ID_TO_ORCHESTRATOR_TOOL };
 
@@ -329,11 +330,20 @@ export function mapChatResponseToAssistantMessage(data) {
     }
   }
 
+  // Architect Mode Stage G: always attach accountable envelope for UI rendering.
+  const accountableRecommendation =
+    data.accountableRecommendation ||
+    accountableFromGatewayPayload(data, data.response || data.content || '');
+
   return {
     role: 'assistant',
-    content: data.response || 'I could not generate a response.',
+    content: data.response || accountableRecommendation?.content || 'I could not generate a response.',
     citations: data.citations || [],
-    confidence: data.confidence,
+    confidence:
+      data.confidence ??
+      (accountableRecommendation?.confidence !== undefined
+        ? accountableRecommendation.confidence
+        : undefined),
     suggestions: Array.isArray(data.suggestions) ? data.suggestions : [],
     ragContext: data.ragContext,
     sourcePanel,
@@ -342,6 +352,7 @@ export function mapChatResponseToAssistantMessage(data) {
     metadata: data.metadata,
     aiFoundation,
     aiGateway: data.metadata?.aiGateway,
+    accountableRecommendation,
     timestamp: new Date(),
   };
 }

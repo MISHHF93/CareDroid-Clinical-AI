@@ -4,13 +4,14 @@ import { createHash } from 'crypto';
 import { embedTextWithXenova, resolveXenovaModel } from './xenova-embeddings.util';
 
 /**
- * Embedding provider for RAG retrieval.
- * Supports Xenova semantic embeddings (default), legacy hash vectors, and OpenAI when configured.
+ * Local embedding provider for RAG retrieval (D8 rename).
+ * Default: Xenova transformers offline; deterministic hash fallback.
+ * Historical Nest DI name was OpenAIEmbeddingsService â€” that never called OpenAI.
  */
 
 @Injectable()
-export class OpenAIEmbeddingsService {
-  private readonly logger = new Logger(OpenAIEmbeddingsService.name);
+export class LocalEmbeddingsService {
+  private readonly logger = new Logger(LocalEmbeddingsService.name);
   private readonly model: string;
   private readonly dimension: number;
   private readonly maxBatchSize: number;
@@ -219,3 +220,7 @@ export class OpenAIEmbeddingsService {
       .toLowerCase()}`;
   }
 }
+
+/** @deprecated Prefer LocalEmbeddingsService — never called OpenAI. */
+export { LocalEmbeddingsService as OpenAIEmbeddingsService };
+

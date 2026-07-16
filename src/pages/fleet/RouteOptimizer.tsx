@@ -2,7 +2,8 @@ import { FormEvent, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import ClinicalDecisionSupportDisclaimer from '../../components/clinical/ClinicalDecisionSupportDisclaimer';
 import { GraphicIconBadge } from '../../components/graphics/CdlGraphicKit';
-import { CategoryBarChart, MetricCard, VisualizationPanel } from '../../components/dashboard/DashboardVisualizations';
+import { MetricCard, VisualizationPanel } from '../../components/dashboard/DashboardVisualizations';
+import { CategoryBarChart } from '../../components/dashboard/DashboardCharts';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { FLEET_ROUTE_PRIORITY_INPUT } from '../../data/testHelpers/fleetToolsTestFixtures';
 import {
@@ -228,7 +229,7 @@ export default function RouteOptimizer() {
                       {leg.stopNumber}. {leg.destination.label}
                     </strong>
                     <span>
-                      Arrival {formatClock(leg.arrivalClockMinutes)} · {leg.travelMinutes}m travel ·{' '}
+                      Arrival {formatClock(leg.arrivalClockMinutes)} Â· {leg.travelMinutes}m travel Â·{' '}
                       {leg.windowStatus}
                     </span>
                   </article>

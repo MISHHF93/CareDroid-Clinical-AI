@@ -222,8 +222,16 @@ function buildDevOfflineJsonBody(path) {
   return { data: null, items: [], patients: [], results: [], logs: [], status: 'dev-offline' };
 }
 
-function getDevGracefulResponse(path) {
+function isReadOnlyHttpMethod(method: string | undefined): boolean {
+  const m = String(method || 'GET').toUpperCase();
+  return m === 'GET' || m === 'HEAD' || m === 'OPTIONS';
+}
+
+function getDevGracefulResponse(path, method: string | undefined = 'GET') {
   if (!isDev || !isBackendKnownOffline()) return null;
+  // Architect Mode / e2e: never short-circuit mutations (POST handoff, intake, etc.)
+  // — they must reach the network (or Playwright route) so persistence is observable.
+  if (!isReadOnlyHttpMethod(method)) return null;
   const p = normalizeApiPath(path);
   if (DEV_GRACEFUL_EMPTY_PATHS.some((re) => re.test(p))) {
     return new Response(JSON.stringify(buildDevOfflineJsonBody(path)), {
@@ -234,8 +242,10 @@ function getDevGracefulResponse(path) {
   return null;
 }
 
-function getDevOfflineResponse(path) {
+function getDevOfflineResponse(path, method: string | undefined = 'GET') {
   if (!isDev) return null;
+  // Mutations must not be silently "successful" while offline without a real attempt.
+  if (!isReadOnlyHttpMethod(method)) return null;
   const p = normalizeApiPath(path);
   if (p === '/health') {
     return new Response(JSON.stringify({ status: 'offline', mode: 'local-dev' }), {
@@ -329,6 +339,7 @@ export const apiFetch = async (path, options: any = {}) => {
     headers: optionHeaders,
     ...fetchOptions
   } = options;
+  const requestMethod = String(fetchOptions.method || 'GET').toUpperCase();
 
   if (isDev && !isBackendKnownOffline() && !isBackendReachableCached()) {
     await ensureBackendReachabilityProbed({ timeoutMs: BACKEND_PROBE_TIMEOUT_MS });
@@ -342,13 +353,13 @@ export const apiFetch = async (path, options: any = {}) => {
   }
 
   // Dev noise reduction: return mocked success for known noisy/degraded endpoints
-  const devGraceful = getDevGracefulResponse(path);
+  const devGraceful = getDevGracefulResponse(path, requestMethod);
   if (devGraceful) {
     return devGraceful;
   }
 
   if (isDev && isBackendKnownOffline()) {
-    const offline = getDevOfflineResponse(path);
+    const offline = getDevOfflineResponse(path, requestMethod);
     if (offline) return offline;
   }
 
@@ -360,7 +371,6 @@ export const apiFetch = async (path, options: any = {}) => {
   const { signal, cleanup } = mergeAbortSignals(timeoutMs, userSignal);
   const requestStartedAt = performance.now();
   const apiPath = normalizeApiPath(path);
-  const requestMethod = String(fetchOptions.method || 'GET').toUpperCase();
 
   try {
     const response = await fetch(buildApiUrl(path), {
@@ -391,7 +401,7 @@ export const apiFetch = async (path, options: any = {}) => {
       error?.message?.includes('timed out');
     if (!isTimeoutOrAbort && isLikelyNetworkError(error)) {
       markBackendUnreachable();
-      const offline = getDevOfflineResponse(path);
+      const offline = getDevOfflineResponse(path, requestMethod);
       if (offline) return offline;
     }
     throw error;

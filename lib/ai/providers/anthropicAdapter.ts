@@ -6,6 +6,12 @@ import {
   type ToolCall,
 } from '../llmTransport';
 import type { LlmAdapter, LlmAdapterHealth, LlmAdapterRuntime } from './types';
+import {
+  fetchWithTimeout,
+  isAbortError,
+  readAiRequestTimeoutMs,
+  toTimeoutAIError,
+} from './transportSafety';
 
 const ANTHROPIC_MESSAGES_URL = 'https://api.anthropic.com/v1/messages';
 const ANTHROPIC_VERSION = '2024-10-22';
@@ -48,18 +54,24 @@ export class AnthropicAdapter implements LlmAdapter {
       stream: request.stream === true,
     };
 
+    const timeoutMs = readAiRequestTimeoutMs(runtime?.timeoutMs);
+
     try {
-      const response = await fetch(ANTHROPIC_MESSAGES_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': ANTHROPIC_VERSION,
-          'anthropic-beta': 'prompt-caching-2024-07-31',
-          'x-request-id': requestId,
+      const response = await fetchWithTimeout(
+        ANTHROPIC_MESSAGES_URL,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey,
+            'anthropic-version': ANTHROPIC_VERSION,
+            'anthropic-beta': 'prompt-caching-2024-07-31',
+            'x-request-id': requestId,
+          },
+          body: JSON.stringify(body),
         },
-        body: JSON.stringify(body),
-      });
+        { timeoutMs, signal: runtime?.signal },
+      );
 
       if (!response.ok) {
         throw await toAIError(response, request.requestType);
@@ -107,7 +119,7 @@ export class AnthropicAdapter implements LlmAdapter {
         requestType: request.requestType,
       };
     } catch (error) {
-      throw handleError(error, request.requestType);
+      throw handleError(error, request.requestType, timeoutMs);
     }
   }
 }
@@ -249,8 +261,13 @@ async function toAIError(response: Response, requestType: AIRequest['requestType
   });
 }
 
-function handleError(error: unknown, requestType: AIRequest['requestType']): AIError {
+function handleError(
+  error: unknown,
+  requestType: AIRequest['requestType'],
+  timeoutMs = DEFAULT_TIMEOUT_FALLBACK,
+): AIError {
   if (error instanceof AIError) return error;
+  if (isAbortError(error)) return toTimeoutAIError(error, requestType, timeoutMs);
   return new AIError({
     message: error instanceof Error ? error.message : String(error),
     code: 'AI_NETWORK_ERROR',
@@ -259,6 +276,8 @@ function handleError(error: unknown, requestType: AIRequest['requestType']): AIE
     cause: error,
   });
 }
+
+const DEFAULT_TIMEOUT_FALLBACK = 30_000;
 
 function applyUsage(target: AIUsage, source: any) {
   if (!source) return;

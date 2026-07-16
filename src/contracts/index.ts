@@ -13,6 +13,7 @@
 // Re-export all canonical types
 export * from './domains';
 export * from './results';
+export * from './accountableAi';
 
 // Re-export commonly used legacy types for backward compatibility
 export type {

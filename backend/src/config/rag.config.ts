@@ -17,7 +17,15 @@ export default registerAs('rag', () => ({
   enabled: process.env.RAG_ENABLED !== 'false',
   autoBootstrapCorpus: process.env.RAG_AUTO_BOOTSTRAP_CORPUS !== 'false',
   /**
-   * Pinecone Configuration (falls back to in-memory local store when API key is absent)
+   * Vector backend: pgvector | pinecone | memory
+   * - empty: auto (pgvector on Postgres DataSource, else memory; Pinecone if API key set)
+   */
+  vectorBackend: (process.env.RAG_VECTOR_BACKEND || '').toLowerCase().trim(),
+  pgvector: {
+    tableName: process.env.RAG_PGVECTOR_TABLE || 'caredroid_rag_vectors',
+  },
+  /**
+   * Pinecone Configuration (optional external store)
    */
   pinecone: {
     apiKey: process.env.PINECONE_API_KEY,

@@ -1,0 +1,140 @@
+/**
+ * Architect Mode Stage E — Medical Light theme contract.
+ *
+ * Calm ED operating environment:
+ * - Neutral surfaces (canvas / card / elevated)
+ * - Clinical blue + teal accents
+ * - Semantic amber (warning) and red (critical)
+ * - Clearly labelled AI purple
+ * - Consistent focus rings, spacing density, type scale
+ *
+ * Consumes existing medical-* and --cd-* tokens; does not invent a parallel system.
+ * Import via design-system.css only.
+ */
+
+:root,
+[data-theme='light'],
+[data-medical-theme='light'] {
+  /* —— Surfaces (Medical Light) —— */
+  --ml-surface-page: var(--medical-canvas, #f6f9fc);
+  --ml-surface-card: var(--medical-surface-card, #ffffff);
+  --ml-surface-elevated: var(--medical-white, #ffffff);
+  --ml-surface-sunken: var(--medical-surface-inset, #eef4f7);
+  --ml-surface-muted: var(--medical-surface-muted, #eef4f7);
+
+  /* —— Ink —— */
+  --ml-text-primary: var(--medical-ink, #102a43);
+  --ml-text-secondary: var(--medical-ink-secondary, #334e68);
+  --ml-text-muted: var(--medical-ink-muted, #475569);
+  /* Bridge muted into cd tokens so components reading --cd-text-muted inherit AA ink */
+  --cd-text-muted: var(--ml-text-muted);
+  --cd-text-tertiary: var(--ml-text-muted);
+  --ml-border: var(--medical-border, #cbd5e1);
+  --ml-border-strong: var(--medical-border-strong, #94a3b8);
+
+  /* —— Clinical blue / teal accents —— */
+  --ml-accent-blue: var(--medical-sky-600, #075985);
+  --ml-accent-blue-hover: var(--medical-sky-700, #054364);
+  --ml-accent-teal: #0d9488;
+  --ml-accent-teal-soft: color-mix(in srgb, var(--ml-accent-teal) 12%, transparent);
+
+  /* —— Semantic clinical states —— */
+  --ml-status-info: var(--medical-sky-500, #0f7ca3);
+  --ml-status-success: #15803d;
+  --ml-status-warning: #d97706; /* amber — attention, not decorative */
+  --ml-status-critical: #b91c1c; /* red — immediate */
+  --ml-status-warning-bg: color-mix(in srgb, var(--ml-status-warning) 12%, white);
+  --ml-status-critical-bg: color-mix(in srgb, var(--ml-status-critical) 12%, white);
+
+  /* —— AI purple (labelled assistant chrome only) —— */
+  --ml-ai-purple: #7c3aed;
+  --ml-ai-purple-soft: color-mix(in srgb, var(--ml-ai-purple) 14%, white);
+  --ml-ai-purple-border: color-mix(in srgb, var(--ml-ai-purple) 35%, var(--ml-border));
+  --ml-ai-label: 'AI';
+
+  /* —— Focus (never remove; only restyle) —— */
+  --ml-focus-ring: 0 0 0 2px var(--ml-surface-card), 0 0 0 4px var(--medical-focus, #facc15);
+  --ml-focus-ring-ai: 0 0 0 2px var(--ml-surface-card), 0 0 0 4px var(--ml-ai-purple);
+
+  /* —— Density (tablet → ultrawide) —— */
+  --ml-space-1: 4px;
+  --ml-space-2: 8px;
+  --ml-space-3: 12px;
+  --ml-space-4: 16px;
+  --ml-space-5: 20px;
+  --ml-space-6: 24px;
+  --ml-space-8: 32px;
+  --ml-radius-sm: 6px;
+  --ml-radius-md: 10px;
+  --ml-radius-lg: 14px;
+
+  /* Bridge into canonical --cd-* semantic tokens when present */
+  --cd-bg-base: var(--ml-surface-page);
+  --cd-bg-surface: var(--ml-surface-card);
+  --cd-bg-elevated: var(--ml-surface-elevated);
+  --cd-bg-sunken: var(--ml-surface-sunken);
+  --cd-text-primary: var(--ml-text-primary);
+  --cd-text-secondary: var(--ml-text-secondary);
+  --cd-status-warning: var(--ml-status-warning);
+  --cd-status-danger: var(--ml-status-critical);
+  --cd-ai-accent: var(--ml-ai-purple);
+}
+
+/* AI-labelled surfaces — purple only when data-ai or .cd-ai-* is present */
+[data-ai='true'],
+.cd-ai-surface {
+  --ai-chrome-bg: var(--ml-ai-purple-soft);
+  --ai-chrome-border: var(--ml-ai-purple-border);
+  --ai-chrome-fg: var(--ml-ai-purple);
+}
+
+.cd-ai-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ml-space-1);
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ml-ai-purple);
+  background: var(--ml-ai-purple-soft);
+  border: 1px solid var(--ml-ai-purple-border);
+}
+
+.cd-ai-badge::before {
+  content: 'AI';
+}
+
+/* Global focus visibility for interactive chrome */
+:where(button, a, input, select, textarea, [tabindex]:not([tabindex='-1'])):focus-visible {
+  outline: none;
+  box-shadow: var(--ml-focus-ring);
+}
+
+:where([data-ai='true'], .cd-ai-surface):focus-visible {
+  box-shadow: var(--ml-focus-ring-ai);
+}
+
+/* Ultrawide density — prevent form stretch beyond readable measure */
+@media (min-width: 1920px) {
+  .ml-readable-measure,
+  .cd-clinical-form-column {
+    max-width: min(72rem, 100%);
+  }
+
+  .ml-ultrawide-split {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(20rem, 28rem);
+    gap: var(--ml-space-6);
+    align-items: start;
+  }
+}
+
+/* Dual display / large desktop: denser shell padding without overlapping chrome */
+@media (min-width: 1440px) {
+  :root {
+    --ml-content-inline-pad: var(--ml-space-6);
+  }
+}

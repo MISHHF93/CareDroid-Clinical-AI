@@ -62,14 +62,42 @@ export class ApiExceptionFilter implements ExceptionFilter {
       }
     }
 
+    // Architect Mode Stage C: align error envelope with FE ErrorCode taxonomy.
+    const errorCode =
+      typeof details.errorCode === 'string'
+        ? details.errorCode
+        : status === HttpStatus.BAD_REQUEST
+          ? 'VALIDATION'
+          : status === HttpStatus.UNAUTHORIZED
+            ? 'UNAUTHORIZED'
+            : status === HttpStatus.FORBIDDEN
+              ? 'FORBIDDEN'
+              : status === HttpStatus.NOT_FOUND
+                ? 'NOT_FOUND'
+                : status === HttpStatus.CONFLICT
+                  ? 'CONFLICT'
+                  : status === HttpStatus.TOO_MANY_REQUESTS
+                    ? 'RATE_LIMIT'
+                    : status === HttpStatus.GATEWAY_TIMEOUT
+                      ? 'TIMEOUT'
+                      : status === HttpStatus.SERVICE_UNAVAILABLE
+                        ? 'DEPENDENCY_UNAVAILABLE'
+                        : status === HttpStatus.UNPROCESSABLE_ENTITY
+                          ? 'AI_SAFETY_REJECTION'
+                          : status >= 500
+                            ? 'INTERNAL'
+                            : details.error || HttpStatus[status] || 'UNKNOWN';
+
     response.status(status).json({
       success: false,
       error: {
-        code: details.error || HttpStatus[status] || 'Error',
+        code: errorCode,
         message,
         details: Array.isArray(details.message) ? details.message : details.details,
         statusCode: status,
         path: request.originalUrl,
+        correlationId: correlationId || undefined,
+        retryable: status === 429 || status === 503 || status === 504,
       },
     });
   }

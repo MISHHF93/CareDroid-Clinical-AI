@@ -617,6 +617,58 @@ describe('EmergencyOsController', () => {
     }
   });
 
+  it('persists EMS handoff completion as a workflow audit record', () => {
+    const created = controller.createIntakePatient({
+      mrn: 'ED-EMS-HANDOFF-1',
+      firstName: 'EMS',
+      lastName: 'Handoff',
+      chiefComplaint: 'EMS pre-arrival: chest pain',
+      complaintCategory: 'Cardiac',
+      flags: ['EMSArrival'],
+    });
+    const patientId = created.data.patient.id;
+    const result = controller.postEmsHandoff({
+      arrivalId: 'ems-arrival-test-1',
+      patientId,
+      actorName: 'Charge Nurse',
+      unitId: 'Unit-7',
+      unitName: 'Medic 7',
+      chiefComplaint: 'Chest pain',
+      handoffAcceptedAt: '2026-07-15T12:00:00.000Z',
+      checklist: { handoffAccepted: true },
+    });
+
+    expect(result).toMatchObject({
+      module: 'EMS Handoff',
+      data: {
+        ok: true,
+        arrivalId: 'ems-arrival-test-1',
+        patientId,
+        status: 'Complete',
+        handoffCompletedAt: '2026-07-15T12:00:00.000Z',
+        workflowLogId: expect.any(String),
+      },
+    });
+
+    const logs = controller.getWorkflowLogs();
+    const handoffLogs = logs.data.logs.filter(
+      (log) => log.metadata?.handoff === 'ems.handoff',
+    );
+    expect(handoffLogs.length).toBeGreaterThanOrEqual(1);
+    expect(handoffLogs[0]).toMatchObject({
+      patientId,
+      source: 'ems-pipeline',
+    });
+  });
+
+  it('rejects EMS handoff without arrivalId', () => {
+    const result = controller.postEmsHandoff({ patientId: 'p-1' });
+    expect(result).toMatchObject({
+      module: 'EMS Handoff',
+      data: { ok: false, error: 'arrivalId is required' },
+    });
+  });
+
   it('filters patient-flow and clinical intelligence harness endpoints by patient id', () => {
     const created = controller.createIntakePatient({
       id: 'upgrade-harness-patient-1',

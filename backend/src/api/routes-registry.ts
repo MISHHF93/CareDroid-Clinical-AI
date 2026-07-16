@@ -1,4 +1,4 @@
-import type { Application, Router } from 'express';
+import type { Application, RequestHandler, Router } from 'express';
 import boardingRoutes from './boarding.routes';
 import capacityRoutes from './capacity.routes';
 import copilotRoutes from './copilot.routes';
@@ -40,6 +40,8 @@ export interface RegisterAllRoutesOptions {
   apiPrefix?: string;
   mountDiscovery?: boolean;
   mountRoutes?: boolean;
+  /** Optional Express middleware chain applied to every mounted legacy route group. */
+  middleware?: RequestHandler[];
 }
 
 const DEFAULT_API_PREFIX = '/api';
@@ -215,7 +217,7 @@ export function registerAllRoutes(app: Application, options: RegisterAllRoutesOp
   for (const route of ROUTES) {
     if (!route.enabled) continue;
 
-    app.use(joinRoutePath(apiPrefix, route.path), route.router);
+    app.use(joinRoutePath(apiPrefix, route.path), ...(options.middleware || []), route.router);
     mountedRoutes.push({
       path: route.path,
       fullPath: joinRoutePath(apiPrefix, route.path),
