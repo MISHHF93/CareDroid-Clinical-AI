@@ -12,7 +12,12 @@ import {
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { AIService } from './ai.service';
-import { AIQueryDto, CareDroidAINodeDto, StructuredJSONDto } from './dto/ai.dto';
+import {
+  AIQueryDto,
+  CareDroidAINodeDto,
+  StructuredJSONDto,
+  UnifiedAiQueryDto,
+} from './dto/ai.dto';
 import { OrganizationsService } from '../organizations/organizations.service';
 import { Permission } from '../auth/enums/permission.enum';
 import { TenantIsolationGuard } from '../tenant-context/tenant-isolation.guard';
@@ -95,6 +100,26 @@ export class AIController {
       },
       context,
     );
+  }
+
+  @Post('unified')
+  @WorkspaceScoped({ permissions: [Permission.USE_AI_CHAT] })
+  @ApiOperation({
+    summary: 'Canonical CareDroid Unified AI Node query (validated envelope)',
+  })
+  @ApiResponse({ status: 200, description: 'Unified AI response envelope' })
+  async runUnifiedQuery(@Req() req: any, @Body() dto: UnifiedAiQueryDto) {
+    await this.assertAiFeatureAllowed(req, {
+      assetId: 'agent-clinical',
+      channel: dto.channel,
+      task: dto.task,
+    });
+    return this.aiService.runUnifiedAiQuery(req.user.id, dto as unknown as Record<string, unknown>, {
+      organizationId: req.tenantContext?.organizationId,
+      workspaceId: req.tenantContext?.workspaceId,
+      role: req.tenantContext?.role || dto.role,
+      subscriptionPlan: req.tenantContext?.subscriptionPlan,
+    });
   }
 
   @Get('usage')

@@ -116,6 +116,7 @@ Timeouts and circuit breakers: `lib/ai/providers/transportSafety.ts`.
 |-----------|--------|
 | `POST /api/ai/query` | Implemented |
 | `POST /api/ai/node` | Implemented (structured heuristic node) |
+| `POST /api/ai/unified` | Implemented (Cycle 72 — canonical envelope) |
 | `POST /api/ai/structured` | Implemented |
 | `GET /api/ai/providers/health` | Implemented (Cycle 71) |
 | `GET /api/ai/models` | Implemented (Cycle 71) |

@@ -11,6 +11,7 @@ import useAiChiefOrchestrator from '../hooks/useAiChiefOrchestrator';
 import useUnifiedApplicationKnowledgeGraph from '../hooks/useUnifiedApplicationKnowledgeGraph';
 import type { CareDroidCentralNodeSnapshot } from '../central-node/careDroidCentralNode';
 import { invokeUnifiedAiConversational } from '../services/careDroidUnifiedAiNode';
+import { resolveUnifiedChannelFromRole } from '../services/unifiedAiEnvelope';
 import { getAIPrompt } from '../lib/ai/promptRegistry';
 import { HUMAN_REVIEW_DISCLAIMER } from '../lib/ai/safety/policy';
 import {
@@ -799,10 +800,11 @@ export function CopilotPanel() {
     recordWorkflowAction({
       type: COPILOT_PLATFORM.outputs.workflowActionType,
       title: 'Copilot used',
-      summary: `ED Copilot prompt submitted: ${promptText.slice(0, 80)}${promptText.length > 80 ? '...' : ''}`,
+      summary: `${resolveUnifiedChannelFromRole(String(emergencyRole.role || saasRole || ''), 'api') === 'reception' ? 'Reception Copilot' : 'ED Copilot'} prompt submitted: ${promptText.slice(0, 80)}${promptText.length > 80 ? '...' : ''}`,
       actorStaffId: 'current-user',
       source: COPILOT_PLATFORM.outputs.workflowSource,
       metadata: {
+        unifiedChannel: resolveUnifiedChannelFromRole(String(emergencyRole.role || saasRole || ''), 'api'),
         promptLength: promptText.length,
         multimodalAttachmentCount: submittedAttachments.length,
         multimodalAttachmentTypes: submittedAttachments.map((attachment) => attachment.type).join(', '),
@@ -858,6 +860,9 @@ export function CopilotPanel() {
         patientOrchestration,
       );
 
+      const callerRole = String(emergencyRole.role || saasRole || 'unknown');
+      const unifiedChannel = resolveUnifiedChannelFromRole(callerRole, 'api');
+      const isReceptionCopilot = unifiedChannel === 'reception';
       const response = await invokeUnifiedAiConversational({
         capabilityId: 'copilot',
         platformServiceId: 'copilot',
@@ -866,8 +871,10 @@ export function CopilotPanel() {
         message: promptText,
         messages: requestMessages,
         patientId: selectedPatient?.id,
-        sourceScreen: 'copilot_panel',
+        sourceScreen: isReceptionCopilot ? 'reception_copilot' : 'copilot_panel',
         context: {
+          userRole: callerRole,
+          unifiedChannel,
           aiRequest: {
             requestType: COPILOT_PLATFORM.identity.requestType,
             patientId: selectedPatient?.id,
@@ -876,6 +883,8 @@ export function CopilotPanel() {
             patientVitals: patientArtifactContext?.vitals,
           },
           edCopilot: {
+            channel: unifiedChannel,
+            receptionCopilot: isReceptionCopilot,
             patientCount: activePatients.length,
             highRiskCount,
             selectedPatientId: selectedPatient?.id || null,

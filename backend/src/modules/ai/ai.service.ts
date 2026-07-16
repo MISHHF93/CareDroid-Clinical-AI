@@ -41,8 +41,17 @@ import {
 } from '../../../../lib/ai/careDroidAI';
 import { listAdapterHealth } from '../../../../lib/ai/providers/registry';
 import { loadModelRegistryEntries } from '../../../../lib/ai/modelRegistry';
+import {
+  buildBlockedUnifiedResponse,
+  mapHeuristicNodeToUnifiedResponse,
+  validateUnifiedAiRequest,
+  type CareDroidUnifiedAIRequest,
+  type CareDroidUnifiedAIResponse,
+} from '../../../../lib/ai/unifiedAiContracts';
+import { reviewAIRequestForSafety } from '../../../../lib/ai/safetyPolicy';
 import { IntentClassifierService } from '../medical-control-plane/intent-classifier/intent-classifier.service';
 import { extractClassifiableText } from '../../../ml-services/shared/routing-maps';
+import { randomUUID } from 'crypto';
 
 interface RateLimitConfig {
   dailyLimit: number;
@@ -707,6 +716,204 @@ export class AIService {
     };
   }
 
+  /**
+   * Canonical unified AI query path (AI_EXECUTION_PLAN §4–5).
+   * Validates envelope, applies safety, routes structured tasks to the heuristic
+   * CareDroid AI node when an intent can be resolved; otherwise returns a
+   * deterministic review-required response (no silent fake success).
+   */
+  async runUnifiedAiQuery(
+    userId: string,
+    body: Record<string, unknown>,
+    tenantContext?: {
+      organizationId?: string;
+      workspaceId?: string;
+      role?: string;
+      subscriptionPlan?: string;
+    },
+  ): Promise<CareDroidUnifiedAIResponse> {
+    const started = Date.now();
+    const requestId = String(body.requestId || randomUUID());
+    const correlationId = String(body.correlationId || randomUUID());
+
+    const candidate = {
+      requestId,
+      correlationId,
+      organizationId: String(
+        body.organizationId || tenantContext?.organizationId || 'unknown-org',
+      ),
+      workspaceId: body.workspaceId
+        ? String(body.workspaceId)
+        : tenantContext?.workspaceId
+          ? String(tenantContext.workspaceId)
+          : undefined,
+      facilityId: body.facilityId ? String(body.facilityId) : undefined,
+      userId: String(body.userId || userId),
+      role: String(body.role || tenantContext?.role || 'unknown'),
+      permissions: Array.isArray(body.permissions)
+        ? body.permissions.map(String)
+        : ['use_ai_chat'],
+      channel: body.channel,
+      task: body.task,
+      patientContext: isPlainRecord(body.patientContext) ? body.patientContext : undefined,
+      encounterContext: isPlainRecord(body.encounterContext) ? body.encounterContext : undefined,
+      emsContext: isPlainRecord(body.emsContext) ? body.emsContext : undefined,
+      workflowContext: isPlainRecord(body.workflowContext) ? body.workflowContext : undefined,
+      documentContext: isPlainRecord(body.documentContext) ? body.documentContext : undefined,
+      query: String(body.query || ''),
+      requestedTools: Array.isArray(body.requestedTools)
+        ? body.requestedTools.map(String)
+        : undefined,
+      responseFormat: body.responseFormat || 'structured',
+      locale: body.locale ? String(body.locale) : undefined,
+    };
+
+    const validation = validateUnifiedAiRequest(candidate);
+    if (!validation.valid || !validation.request) {
+      return {
+        requestId,
+        correlationId,
+        status: 'failed',
+        responseType: 'error',
+        content: 'Request failed validation before model or tool execution.',
+        evidence: [],
+        citations: [],
+        uncertainty: [],
+        missingInformation: validation.errors.map((e) => `${e.field}: ${e.message}`),
+        limitations: ['Malformed requests are rejected without invoking a model.'],
+        toolExecutions: [],
+        model: { provider: 'none', model: 'none', fallbackApplied: false },
+        safety: {
+          allowed: false,
+          requiresHumanReview: true,
+          reasons: validation.errors.map((e) => e.message),
+          disclaimer:
+            'Human review required. This is not a replacement for clinical judgment.',
+        },
+        createdAt: new Date().toISOString(),
+      };
+    }
+
+    const request = validation.request as CareDroidUnifiedAIRequest;
+    const safety = reviewAIRequestForSafety({
+      prompt: request.query,
+      patientSpecific: Boolean(request.patientContext),
+    });
+    if (!safety.allowed) {
+      return buildBlockedUnifiedResponse({
+        requestId: request.requestId,
+        correlationId: request.correlationId,
+        reasons: safety.reasons,
+        disclaimer: safety.disclaimer,
+      });
+    }
+
+    const intent = resolveUnifiedTaskToIntent(request.task, request.channel);
+    if (intent) {
+      const nodeResponse = await this.runCareDroidAINode(
+        userId,
+        {
+          intent,
+          input: {
+            ...(request.patientContext || {}),
+            ...(request.emsContext || {}),
+            ...(request.workflowContext || {}),
+            query: request.query,
+            channel: request.channel,
+            task: request.task,
+          },
+          context: {
+            requestId: request.requestId,
+            sourceScreen: `unified:${request.channel}`,
+            userRole: request.role,
+            organizationId: request.organizationId,
+            workspaceId: request.workspaceId,
+            tenant: {
+              organizationId: request.organizationId,
+              workspaceId: request.workspaceId,
+              userId,
+              role: request.role,
+              subscriptionPlan: tenantContext?.subscriptionPlan,
+              source: 'unified_ai_query',
+            },
+          },
+        },
+        {
+          tenant: {
+            organizationId: request.organizationId,
+            workspaceId: request.workspaceId,
+            userId,
+            role: request.role,
+          },
+        },
+      );
+
+      const content = [
+        ...(nodeResponse.reasoning || []),
+        ...(nodeResponse.nextActions?.length
+          ? [`Next actions: ${nodeResponse.nextActions.join('; ')}`]
+          : []),
+      ]
+        .join(' ')
+        .trim();
+
+      return mapHeuristicNodeToUnifiedResponse({
+        requestId: request.requestId,
+        correlationId: request.correlationId,
+        intent: String(nodeResponse.intent),
+        status: nodeResponse.status === 'success' ? 'success' : 'error',
+        content: content || nodeResponse.status,
+        confidence: nodeResponse.confidence,
+        requiresClinicianReview: nodeResponse.requiresClinicianReview !== false,
+        model: 'careDroidAI-node-v1',
+        latencyMs: Date.now() - started,
+        uncertainty: nodeResponse.warnings || [],
+        limitations: [nodeResponse.safetyDisclaimer],
+        humanReview: nodeResponse.requiresClinicianReview
+          ? { status: 'pending', reviewType: 'clinical_ai', severity: 'high' }
+          : undefined,
+      });
+    }
+
+    // Free-text / no structured intent: deterministic review-required answer (no LLM math).
+    return {
+      requestId: request.requestId,
+      correlationId: request.correlationId,
+      status: 'needs_human_review',
+      responseType: 'answer',
+      content: [
+        'CareDroid Unified AI Node received your request.',
+        `Channel: ${request.channel}; task: ${request.task}.`,
+        'No foundation model was invoked for this path (safe default).',
+        'A licensed clinician must review before any clinical action.',
+        `Query: ${request.query.slice(0, 400)}`,
+      ].join(' '),
+      evidence: [],
+      citations: [],
+      confidence: 0.35,
+      uncertainty: ['Deterministic unified path does not perform clinical reasoning.'],
+      missingInformation: [],
+      limitations: [
+        'Use structured node intents or an enabled foundation-model path for richer answers.',
+      ],
+      toolExecutions: [],
+      model: {
+        provider: 'local',
+        model: 'unified-ai-deterministic-v1',
+        latencyMs: Date.now() - started,
+        fallbackApplied: false,
+      },
+      safety: {
+        allowed: true,
+        requiresHumanReview: true,
+        reasons: ['unified_deterministic_path', 'clinician_review_required'],
+        disclaimer: safety.disclaimer,
+      },
+      humanReview: { status: 'pending', reviewType: 'clinical_ai', severity: 'high' },
+      createdAt: new Date().toISOString(),
+    };
+  }
+
   async getRequestById(
     userId: string,
     requestId: string,
@@ -1314,4 +1521,24 @@ export class AIService {
     const hours = this.resolveReviewSeverity(query) === 'critical' ? 4 : 24;
     return new Date(Date.now() + hours * 60 * 60 * 1000);
   }
+}
+
+function isPlainRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value && typeof value === 'object' && !Array.isArray(value));
+}
+
+function resolveUnifiedTaskToIntent(
+  task: string,
+  channel: string,
+): CareDroidAIIntent | null {
+  if (task === 'prepare_handoff') {
+    return channel === 'ems' ? 'ems_prearrival_risk_summary' : 'handoff_summary';
+  }
+  if (task === 'suggest_next_action' && channel === 'triage') return 'triage_recommendation';
+  if (task === 'detect_missing_information' || (task === 'answer_question' && channel === 'reception')) {
+    return 'patient_intake_assist';
+  }
+  if (task === 'explain_alert') return 'critical_alert_assessment';
+  if (task === 'forecast_operations') return 'hospital_command_insight';
+  return null;
 }

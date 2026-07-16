@@ -1,16 +1,43 @@
 /**
  * Normalize gateway / copilot API payloads into AccountableRecommendation.
+ * Prefers canonical CareDroidUnifiedAIResponse when present (Cycle 72).
  */
 import {
   createAccountableRecommendation,
   createAiUnavailableAbstention,
   type AccountableRecommendation,
 } from '../contracts/accountableAi';
+import {
+  accountableFromUnifiedResponse,
+  extractUnifiedEnvelope,
+} from '../services/unifiedAiEnvelope';
 
 export function accountableFromGatewayPayload(
   payload: unknown,
   fallbackContent = '',
 ): AccountableRecommendation {
+  const unified = extractUnifiedEnvelope(payload);
+  if (unified) {
+    const fromUnified = accountableFromUnifiedResponse(unified);
+    if (!fromUnified.content.trim() && fallbackContent.trim()) {
+      return createAccountableRecommendation({
+        content: fallbackContent,
+        evidence: fromUnified.evidence,
+        confidence: fromUnified.confidence,
+        uncertainty: fromUnified.uncertainty,
+        model: fromUnified.model,
+        promptVersion: fromUnified.promptVersion,
+        safetyStatus: fromUnified.safety.status,
+        safetyReasons: [...fromUnified.safety.reasons],
+        humanReviewRequired: fromUnified.humanReviewRequired,
+        requestId: fromUnified.provenance.requestId,
+        tenantId: fromUnified.provenance.tenantId,
+        corpusVersion: fromUnified.provenance.corpusVersion,
+      });
+    }
+    return fromUnified;
+  }
+
   const root = (payload && typeof payload === 'object' ? payload : {}) as Record<string, unknown>;
   const nested =
     root.accountableRecommendation && typeof root.accountableRecommendation === 'object'

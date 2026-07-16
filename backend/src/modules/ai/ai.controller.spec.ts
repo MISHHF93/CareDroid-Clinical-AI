@@ -26,6 +26,8 @@ describe('AIController organization usage', () => {
       getRegisteredModels: jest.fn().mockReturnValue({ models: [] }),
       getAiToolCatalog: jest.fn().mockReturnValue({ tools: [] }),
       getRequestById: jest.fn().mockResolvedValue({ id: 'query-1' }),
+      runUnifiedAiQuery: jest.fn().mockResolvedValue({ status: 'needs_human_review' }),
+      runCareDroidAINode: jest.fn(),
     };
     const organizationsService = {
       assertMemberForUser: jest.fn().mockResolvedValue({ organizationId: 'org-1' }),
@@ -81,6 +83,31 @@ describe('AIController organization usage', () => {
       'user-1',
       'query-1',
       tenantReq.tenantContext,
+    );
+  });
+
+  it('routes POST /ai/unified through the unified query service with tenant context', async () => {
+    const { controller, aiService, entitlementService } = buildController();
+    const dto = {
+      role: 'reception',
+      permissions: ['use_ai_chat'],
+      channel: 'reception',
+      task: 'detect_missing_information',
+      query: 'What is missing?',
+      responseFormat: 'structured' as const,
+    };
+
+    await controller.runUnifiedQuery(tenantReq, dto as any);
+
+    expect(entitlementService.assertLaunchAllowed).toHaveBeenCalled();
+    expect(aiService.runUnifiedAiQuery).toHaveBeenCalledWith(
+      'user-1',
+      dto,
+      expect.objectContaining({
+        organizationId: 'org-1',
+        workspaceId: 'workspace-1',
+        role: 'physician',
+      }),
     );
   });
 

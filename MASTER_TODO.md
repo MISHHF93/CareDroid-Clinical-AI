@@ -53,7 +53,7 @@
 |---|---|---|---|---|---|---|
 | RC1 | Reception Command Desk + intake orchestration | **VERIFIED** | P1 | Built 2026-06-29; audited + escalation wiring fixed Cy-era | reception test files green | 2026-07-11 |
 | RC2 | Reception→triage handoff backend | **VERIFIED** | P1 | `@Post('reception/handoff')` `WRITE_PHI`-guarded + `emergencyOsApi` client | backend suite green | 2026-07-15 Cy62 |
-| RC3 | Reception Copilot end-to-end | **PARTIAL** | P1 | Unit + Playwright shell coverage (`e2e/ems-copilot-handoff.spec.mjs` 3/3); free-text path needs provider key; evidence/confidence/version display audit not done | Display-audit checklist + live demo record | — |
+| RC3 | Reception Copilot end-to-end | **PARTIAL** | P1 | Cy72: unified envelope + sourceScreen `reception_copilot` + accountable card path; Playwright shell (`e2e/ems-copilot-handoff.spec.mjs`); free-text still needs provider key for live LLM | Display-audit checklist + live demo record | 2026-07-16 Cy72 |
 | RC4 | OCR into Reception intake | **VERIFIED** (clean images) | P1 | Real Tesseract.js, end-to-end fixture-verified; PDF rasterization + messy-handwriting accuracy open (→ O2) | backend OCR specs green | 2026-07-14 Cy47 |
 
 ## 6. AI / providers
@@ -68,6 +68,7 @@
 | AI6 | Manual Groq demo record (model/latency/tokens/cost/failure mode) | **OPEN** | P2 | Requires `GROQ_API_KEY` in demo env — operational, not code | Recorded result separate from CI evidence | — |
 | AI7 | Human-review record creation asserted end-to-end | **PARTIAL** | P2 | **Cy71 unit:** `ai.service.spec.ts` asserts `createReviewItem` from high-risk structured node via `createHumanReviewItemIfRequired`. Full HTTP/Postgres integration still open. | Integration test against real review queue | 2026-07-15 Cy71 (unit) |
 | AI8 | Canonical unified AI contracts + CLI + discovery APIs | **VERIFIED** | P1 | `lib/ai/unifiedAiContracts.ts`, `scripts/ai-query.mjs`, `GET /api/ai/providers/health\|models\|tools\|requests/:id`, plan §20 docs | `npm run ai:eval:gate`; CLI safety scenario; backend 25/25 targeted | 2026-07-15 Cy71 |
+| AI9 | Migrate Reception Copilot + AI Chief onto unified envelope | **PARTIAL** | P1 | Cy72: `unifiedAiEnvelope.ts`, CopilotPanel channel stamp, `POST /api/ai/unified`, accountableFromGateway prefers envelope | EMS/triage/physician callers + live demo record | 2026-07-16 Cy72 (reception path) |
 
 ## 7. RAG
 

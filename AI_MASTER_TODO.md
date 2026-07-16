@@ -32,7 +32,7 @@
 |----|------|--------|-----|----------|------------|----------|
 | U1 | Repository AI dependency map | **PARTIAL** | P0 | `AI_CONFIGURATION_MAP.md`, `AI_ARCHITECTURE.md` | Full map + classification of every AI artifact | Cy71 |
 | U2 | Canonical `CareDroidUnifiedAIRequest/Response` | **VERIFIED** (types) | P0 | `lib/ai/unifiedAiContracts.ts` + tests | Runtime validation rejects bad requests | Cy71 |
-| U3 | Migrate all callers onto unified envelope | **OPEN** | P1 | Chat/node/CLI still use mixed shapes | All product paths emit/consume unified response | — |
+| U3 | Migrate all callers onto unified envelope | **PARTIAL** | P1 | Cy72: CopilotPanel + invokeUnifiedAiConversational attach envelope; `POST /api/ai/unified` | EMS/triage/physician + remaining panels | Cy72 (reception/copilot) |
 
 ---
 
@@ -44,7 +44,7 @@
 | G2 | Provider timeout + circuit breaker | **VERIFIED** | P0 | `transportSafety.ts` | test:lib | Cy69 |
 | G3 | Multi-provider adapters | **VERIFIED** (unit) | P1 | anthropic/openai/azure/gemini/groq/local | health() no secrets | Cy69 |
 | G4 | Direct API: providers/health, models, tools, requests/:id | **VERIFIED** | P1 | `ai.controller.ts` Cy71 | controller+service specs | Cy71 |
-| G5 | Direct API: stream query, tool execute, retry, review | **PARTIAL** | P2 | stream via chat; review via human-review | full plan §12 surface | — |
+| G5 | Direct API: stream query, tool execute, retry, review | **PARTIAL** | P2 | Cy72: `POST /api/ai/unified`; stream via chat; review via human-review | full plan §12 surface | Cy72 (unified) |
 | G6 | Dev CLI `npm run ai:query` | **VERIFIED** | P1 | `scripts/ai-query.mjs` | local + safety scenario exit codes; no secrets | Cy71 |
 | G7 | No React direct provider calls | **VERIFIED** | P0 | frontend uses server/proxy clients | grep audit | prior |
 
@@ -96,7 +96,7 @@
 
 | ID | Task | Status | Pri | Evidence | Acceptance | Verified |
 |----|------|--------|-----|----------|------------|----------|
-| W1 | Reception Copilot identity + shell | **PARTIAL** | P1 | MASTER RC3 | display audit + live demo | — |
+| W1 | Reception Copilot identity + shell | **PARTIAL** | P1 | Cy72 sourceScreen reception_copilot + unifiedChannel; MASTER RC3 | display audit + live demo | Cy72 |
 | W2 | EMS handoff Playwright | **VERIFIED** (shell) | P1 | e2e ems-copilot 3/3 | free-text needs key | prior |
 | W3 | Connect remaining role workflows to unified node | **OPEN** | P2 | plan §12 UI | all roles | — |
 

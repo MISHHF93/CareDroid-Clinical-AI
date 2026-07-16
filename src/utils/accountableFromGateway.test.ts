@@ -33,4 +33,39 @@ describe('accountableFromGatewayPayload', () => {
     const rec = accountableFromGatewayPayload({});
     expect(rec.safety.status).toBe('abstain');
   });
+
+  it('prefers canonical unifiedAiEnvelope when present (Reception Copilot path)', () => {
+    const rec = accountableFromGatewayPayload({
+      content: 'legacy',
+      unifiedAiEnvelope: {
+        requestId: 'req-reception-1',
+        correlationId: 'corr-1',
+        status: 'needs_human_review',
+        responseType: 'answer',
+        content: 'Collect insurance card and next of kin before triage handoff.',
+        evidence: [{ id: 'policy-1', title: 'Reception checklist' }],
+        citations: [],
+        confidence: 0.62,
+        uncertainty: ['Heuristic intake assist only'],
+        missingInformation: ['insurance', 'next of kin'],
+        limitations: ['Decision support only'],
+        toolExecutions: [],
+        model: { provider: 'local', model: 'careDroidAI-node-v1', promptVersion: '1.0.0' },
+        safety: {
+          allowed: true,
+          requiresHumanReview: true,
+          reasons: ['clinician_review_required'],
+          disclaimer: 'Human review required.',
+        },
+        humanReview: { status: 'pending', reviewType: 'clinical_ai', severity: 'high' },
+        createdAt: new Date().toISOString(),
+      },
+    });
+    expect(rec.content).toMatch(/insurance/i);
+    expect(rec.humanReviewRequired).toBe(true);
+    expect(rec.provenance.requestId).toBe('req-reception-1');
+    expect(rec.model.name).toBe('careDroidAI-node-v1');
+    expect(rec.evidence[0]?.citation).toMatch(/Reception checklist/i);
+  });
 });
+

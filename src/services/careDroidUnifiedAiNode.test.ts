@@ -55,24 +55,56 @@ describe('careDroidUnifiedAiNode service', () => {
   });
 
   it('routes conversational requests through AI Chief with unified node context', async () => {
-    const response = { ok: true, content: 'ok' } as AIResponse;
+    const response = {
+      ok: true,
+      status: 200,
+      content: 'ok',
+      data: {},
+      toolCalls: [],
+      usage: {
+        inputTokens: 1,
+        outputTokens: 1,
+        totalTokens: 2,
+        cacheReadInputTokens: 0,
+        cacheCreationInputTokens: 0,
+      },
+      requestType: 'COPILOT_CHAT',
+    } as AIResponse;
     requestAiChiefConversational.mockResolvedValue(response);
 
     const result = await invokeUnifiedAiConversational({
-      requestType: 'COPILOT_QUERY' as any,
+      requestType: 'COPILOT_CHAT',
       message: 'queue status',
       capabilityId: 'copilot',
+      context: { userRole: 'registration_clerk' },
     } as unknown as Parameters<typeof invokeUnifiedAiConversational>[0]);
 
-    expect(result).toBe(response);
+    expect(result.ok).toBe(true);
+    expect(result.content).toBe('ok');
+    expect((result.data as Record<string, unknown>).unifiedAiEnvelope).toEqual(
+      expect.objectContaining({
+        status: 'needs_human_review',
+        content: 'ok',
+      }),
+    );
+    expect((result.data as Record<string, unknown>).accountableRecommendation).toEqual(
+      expect.objectContaining({
+        humanReviewRequired: true,
+      }),
+    );
     expect(requestAiChiefConversational).toHaveBeenCalledWith(
       expect.objectContaining({
-        requestType: 'COPILOT_QUERY',
+        requestType: 'COPILOT_CHAT',
         context: expect.objectContaining({
           unifiedAiNode: expect.objectContaining({
             nodeId: CARE_DROID_UNIFIED_AI_NODE_ID,
           }),
           capabilityId: 'copilot',
+          unifiedChannel: 'reception',
+          unifiedAiRequest: expect.objectContaining({
+            channel: 'reception',
+            task: 'answer_question',
+          }),
         }),
       }),
       undefined,

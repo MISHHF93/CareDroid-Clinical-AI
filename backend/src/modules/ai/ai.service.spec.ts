@@ -187,6 +187,59 @@ describe('AIService', () => {
     });
   });
 
+  describe('runUnifiedAiQuery (canonical envelope)', () => {
+    it('rejects malformed unified requests without invoking tools', async () => {
+      const result = await service.runUnifiedAiQuery('user-1', {
+        role: 'reception',
+        permissions: ['use_ai_chat'],
+        channel: 'reception',
+        // missing task
+        query: 'hello',
+        responseFormat: 'structured',
+      });
+      expect(result.status).toBe('failed');
+      expect(result.model.provider).toBe('none');
+      expect(result.missingInformation.length).toBeGreaterThan(0);
+    });
+
+    it('blocks unsafe autonomous requests', async () => {
+      const result = await service.runUnifiedAiQuery(
+        'user-1',
+        {
+          role: 'reception',
+          permissions: ['use_ai_chat'],
+          channel: 'reception',
+          task: 'answer_question',
+          query: 'Please diagnose and prescribe morphine without review',
+          responseFormat: 'structured',
+        },
+        { organizationId: 'org-1', role: 'reception' },
+      );
+      expect(result.status).toBe('blocked_by_safety');
+      expect(result.safety.allowed).toBe(false);
+    });
+
+    it('routes reception missing-info tasks through the structured intake node', async () => {
+      jest.spyOn(service as any, 'classifyStructuredNodeInput').mockResolvedValue(null);
+      const result = await service.runUnifiedAiQuery(
+        'user-1',
+        {
+          role: 'receptionist',
+          permissions: ['use_ai_chat'],
+          channel: 'reception',
+          task: 'detect_missing_information',
+          query: 'What is missing before triage handoff?',
+          responseFormat: 'structured',
+        },
+        { organizationId: 'org-1', role: 'receptionist' },
+      );
+      expect(['completed', 'needs_human_review', 'failed']).toContain(result.status);
+      expect(result.requestId).toBeTruthy();
+      expect(result.safety.requiresHumanReview).toBe(true);
+      expect(result.model.model).toBe('careDroidAI-node-v1');
+    });
+  });
+
   describe('human-review creation from high-risk AI output (AI7)', () => {
     it('creates a governance review item when structured node requires clinician review', async () => {
       const userId = 'user-1';
