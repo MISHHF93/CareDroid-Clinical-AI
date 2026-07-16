@@ -68,7 +68,8 @@
 | AI6 | Manual Groq demo record (model/latency/tokens/cost/failure mode) | **OPEN** | P2 | Requires `GROQ_API_KEY` in demo env — operational, not code | Recorded result separate from CI evidence | — |
 | AI7 | Human-review record creation asserted end-to-end | **PARTIAL** | P2 | **Cy71 unit:** `ai.service.spec.ts` asserts `createReviewItem` from high-risk structured node via `createHumanReviewItemIfRequired`. Full HTTP/Postgres integration still open. | Integration test against real review queue | 2026-07-15 Cy71 (unit) |
 | AI8 | Canonical unified AI contracts + CLI + discovery APIs | **VERIFIED** | P1 | `lib/ai/unifiedAiContracts.ts`, `scripts/ai-query.mjs`, `GET /api/ai/providers/health\|models\|tools\|requests/:id`, plan §20 docs | `npm run ai:eval:gate`; CLI safety scenario; backend 25/25 targeted | 2026-07-15 Cy71 |
-| AI9 | Migrate Reception Copilot + AI Chief onto unified envelope | **PARTIAL** | P1 | Cy72: `unifiedAiEnvelope.ts`, CopilotPanel channel stamp, `POST /api/ai/unified`, accountableFromGateway prefers envelope | EMS/triage/physician callers + live demo record | 2026-07-16 Cy72 (reception path) |
+| AI9 | Migrate Reception Copilot + AI Chief onto unified envelope | **PARTIAL** | P1 | Cy72 envelopes; Cy73 InteractiveAIWorkspace on Reception + EMS panel | EMS/triage/physician full callers + live demo | 2026-07-16 Cy73 |
+| AI10 | Interactive Intelligence layer (proposals, cards, stream states, realtime) | **PARTIAL** | P0 | Cy73 contracts + services + workspace; Playwright/inbox/persist open | See AI_MASTER_TODO IX* | 2026-07-16 Cy73 |
 
 ## 7. RAG
 
