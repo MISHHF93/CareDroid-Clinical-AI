@@ -132,6 +132,38 @@ export class AIController {
     return this.aiService.getRemainingQueries(req.user.id);
   }
 
+  @Get('providers/health')
+  @TenantScoped()
+  @ApiOperation({ summary: 'List AI provider adapter health (configured/ok, no secrets)' })
+  @ApiResponse({ status: 200, description: 'Provider health snapshot' })
+  async getProvidersHealth() {
+    return this.aiService.getProvidersHealth();
+  }
+
+  @Get('models')
+  @TenantScoped()
+  @ApiOperation({ summary: 'List registered AI models from the model registry' })
+  @ApiResponse({ status: 200, description: 'Model registry entries' })
+  async getModels() {
+    return this.aiService.getRegisteredModels();
+  }
+
+  @Get('tools')
+  @WorkspaceScoped({ permissions: [Permission.USE_AI_CHAT] })
+  @ApiOperation({ summary: 'List AI tool definitions available to the unified AI node' })
+  @ApiResponse({ status: 200, description: 'Tool catalog' })
+  async getTools() {
+    return this.aiService.getAiToolCatalog();
+  }
+
+  @Get('requests/:requestId')
+  @WorkspaceScoped({ permissions: [Permission.USE_AI_CHAT] })
+  @ApiOperation({ summary: 'Fetch a prior AI request record by id (tenant-scoped, redacted)' })
+  @ApiResponse({ status: 200, description: 'AI request record' })
+  async getRequest(@Req() req: any, @Param('requestId') requestId: string) {
+    return this.aiService.getRequestById(req.user.id, requestId, req.tenantContext);
+  }
+
   private async assertAiFeatureAllowed(req: any, context: any) {
     const assetId =
       context?.assetId || context?.agentId || context?.toolId || context?.tool || 'agent-clinical';

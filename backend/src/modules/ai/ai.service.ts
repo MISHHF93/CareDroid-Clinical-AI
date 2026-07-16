@@ -1,4 +1,12 @@
-import { Inject, Injectable, Logger, Optional, forwardRef } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  Logger,
+  Optional,
+  forwardRef,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, MoreThanOrEqual } from 'typeorm';
@@ -31,6 +39,8 @@ import {
   type CareDroidAIIntent,
   type CareDroidAIRequest,
 } from '../../../../lib/ai/careDroidAI';
+import { listAdapterHealth } from '../../../../lib/ai/providers/registry';
+import { loadModelRegistryEntries } from '../../../../lib/ai/modelRegistry';
 import { IntentClassifierService } from '../medical-control-plane/intent-classifier/intent-classifier.service';
 import { extractClassifiableText } from '../../../ml-services/shared/routing-maps';
 
@@ -634,6 +644,115 @@ export class AIService {
       usedToday,
       remaining,
       resetAt: this.getNextResetTime(),
+    };
+  }
+
+  /**
+   * Provider health for direct API discovery — never includes API keys or secrets.
+   */
+  getProvidersHealth() {
+    const providers = listAdapterHealth().map((entry) => ({
+      provider: entry.provider,
+      ok: entry.ok,
+      configured: entry.configured,
+      detail: entry.detail,
+    }));
+    return {
+      generatedAt: new Date().toISOString(),
+      providers,
+      primaryProvider:
+        this.configService.get<string>('AI_PROVIDER') ||
+        this.configService.get<string>('ai.provider') ||
+        'anthropic',
+      fallbackProvider:
+        this.configService.get<string>('AI_FALLBACK_PROVIDER') ||
+        this.configService.get<string>('ai.fallbackProvider') ||
+        null,
+    };
+  }
+
+  getRegisteredModels() {
+    const entries = loadModelRegistryEntries();
+    return {
+      generatedAt: new Date().toISOString(),
+      count: entries.length,
+      models: entries.map((entry) => ({
+        id: entry.id,
+        displayName: entry.displayName,
+        kind: entry.kind,
+        status: entry.status,
+        provider: entry.provider,
+        modelIdentifier: entry.modelIdentifier,
+        purpose: entry.purpose,
+        regulatoryClass: entry.regulatoryClass,
+        featureFlag: entry.deployment?.featureFlag,
+        expiresAt: entry.expiresAt,
+      })),
+    };
+  }
+
+  getAiToolCatalog() {
+    const tools = this.getToolDefinitions().map((tool) => ({
+      name: tool.name,
+      description: tool.description,
+      riskLevel: 'moderate' as const,
+      requiresHumanApproval: true,
+      inputSchema: tool.input_schema,
+    }));
+    return {
+      generatedAt: new Date().toISOString(),
+      count: tools.length,
+      tools,
+      note: 'Legacy LLM function schemas. Canonical clinical executors live in tool-orchestrator.registry.ts.',
+    };
+  }
+
+  async getRequestById(
+    userId: string,
+    requestId: string,
+    tenantContext?: { organizationId?: string; workspaceId?: string },
+  ) {
+    const record = await this.aiQueryRepository.findOne({ where: { id: requestId } });
+    if (!record) {
+      throw new NotFoundException(`AI request ${requestId} was not found`);
+    }
+    if (record.userId !== userId) {
+      throw new ForbiddenException('AI request does not belong to the authenticated user');
+    }
+    if (
+      tenantContext?.organizationId &&
+      record.organizationId &&
+      record.organizationId !== tenantContext.organizationId
+    ) {
+      throw new ForbiddenException('AI request is outside the active organization scope');
+    }
+
+    return {
+      id: record.id,
+      status: record.status,
+      feature: record.feature,
+      model: record.model,
+      modelVersion: record.modelVersion,
+      modelClass: record.modelClass,
+      intentClassified: record.intentClassified,
+      toolUsed: record.toolUsed,
+      requiresHumanReview: record.requiresHumanReview,
+      latencyMs: record.latencyMs,
+      totalTokens: record.totalTokens,
+      estimatedCost: record.estimatedCost,
+      cost: record.cost,
+      organizationId: record.organizationId,
+      workspaceId: record.workspaceId,
+      createdAt: record.createdAt,
+      // Prompt/response bodies are stored redacted — never re-expand PHI here.
+      prompt: record.prompt,
+      response: record.response,
+      metadata: {
+        routingExpert: record.routingExpert,
+        retrievalPolicy: record.retrievalPolicy,
+        assetId: record.assetId,
+        agentId: record.agentId,
+      },
     };
   }
 

@@ -22,6 +22,10 @@ describe('AIController organization usage', () => {
       getUsage: jest.fn(),
       getRemainingQueries: jest.fn(),
       getOrganizationUsageSummary: jest.fn().mockResolvedValue({ organizationId: 'org-1' }),
+      getProvidersHealth: jest.fn().mockReturnValue({ providers: [] }),
+      getRegisteredModels: jest.fn().mockReturnValue({ models: [] }),
+      getAiToolCatalog: jest.fn().mockReturnValue({ tools: [] }),
+      getRequestById: jest.fn().mockResolvedValue({ id: 'query-1' }),
     };
     const organizationsService = {
       assertMemberForUser: jest.fn().mockResolvedValue({ organizationId: 'org-1' }),
@@ -60,6 +64,24 @@ describe('AIController organization usage', () => {
       ForbiddenException,
     );
     expect(aiService.getOrganizationUsageSummary).not.toHaveBeenCalled();
+  });
+
+  it('exposes provider health, models, tools, and request lookup endpoints', async () => {
+    const { controller, aiService } = buildController();
+
+    await controller.getProvidersHealth();
+    await controller.getModels();
+    await controller.getTools();
+    await controller.getRequest(tenantReq, 'query-1');
+
+    expect(aiService.getProvidersHealth).toHaveBeenCalled();
+    expect(aiService.getRegisteredModels).toHaveBeenCalled();
+    expect(aiService.getAiToolCatalog).toHaveBeenCalled();
+    expect(aiService.getRequestById).toHaveBeenCalledWith(
+      'user-1',
+      'query-1',
+      tenantReq.tenantContext,
+    );
   });
 
   it('passes tenant context into AI query metadata', async () => {

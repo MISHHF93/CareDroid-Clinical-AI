@@ -39,6 +39,7 @@ describe('AIService', () => {
 
   const mockAiQueryRepository = {
     find: jest.fn().mockResolvedValue([]),
+    findOne: jest.fn().mockResolvedValue(null),
     count: jest.fn().mockResolvedValue(0),
     createQueryBuilder: jest.fn(() => ({
       select: jest.fn().mockReturnThis(),
@@ -51,7 +52,16 @@ describe('AIService', () => {
       getRawMany: jest.fn().mockResolvedValue([]),
     })),
     create: jest.fn((query) => query),
-    save: jest.fn((query) => Promise.resolve({ id: 'query-1', ...query })),
+    save: jest.fn((query) =>
+      Promise.resolve({
+        id: 'query-1',
+        ...query,
+        requiresHumanReview:
+          query.requiresHumanReview ??
+          query.metadata?.aiCommercialization?.requiresHumanReview ??
+          false,
+      }),
+    ),
   };
 
   const mockUserRepository = {
@@ -119,6 +129,119 @@ describe('AIService', () => {
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+  });
+
+  describe('getProvidersHealth / tools / models / requests', () => {
+    it('returns provider health without secrets', () => {
+      const result = service.getProvidersHealth();
+      expect(result.providers.length).toBeGreaterThan(0);
+      expect(result.providers.every((p) => typeof p.provider === 'string')).toBe(true);
+      expect(JSON.stringify(result)).not.toMatch(/sk-/i);
+    });
+
+    it('returns the legacy LLM tool catalog', () => {
+      const catalog = service.getAiToolCatalog();
+      expect(catalog.count).toBeGreaterThan(0);
+      expect(catalog.tools[0]).toEqual(
+        expect.objectContaining({
+          name: expect.any(String),
+          requiresHumanApproval: true,
+        }),
+      );
+    });
+
+    it('returns registered models from the model registry when present', () => {
+      const models = service.getRegisteredModels();
+      expect(typeof models.count).toBe('number');
+      expect(models.count).toBeGreaterThan(0);
+      expect(Array.isArray(models.models)).toBe(true);
+      expect(models.models[0]).toEqual(
+        expect.objectContaining({
+          id: expect.any(String),
+          status: expect.any(String),
+        }),
+      );
+    });
+
+    it('returns a tenant-safe AI request record by id', async () => {
+      mockAiQueryRepository.findOne.mockResolvedValue({
+        id: 'query-1',
+        userId: 'user-1',
+        organizationId: 'org-1',
+        workspaceId: 'ws-1',
+        status: 'success',
+        feature: 'careDroidAI_node',
+        model: 'careDroidAI-node-v1',
+        requiresHumanReview: true,
+        prompt: '[redacted:prompt:careDroidAI_node]',
+        response: '[redacted:response:careDroidAI_node]',
+        createdAt: new Date('2026-07-15T00:00:00.000Z'),
+      });
+
+      const result = await service.getRequestById('user-1', 'query-1', {
+        organizationId: 'org-1',
+      });
+      expect(result.id).toBe('query-1');
+      expect(result.requiresHumanReview).toBe(true);
+      expect(result.prompt).toContain('redacted');
+    });
+  });
+
+  describe('human-review creation from high-risk AI output (AI7)', () => {
+    it('creates a governance review item when structured node requires clinician review', async () => {
+      const userId = 'user-1';
+      jest.spyOn(service as any, 'classifyStructuredNodeInput').mockResolvedValue(null);
+
+      // Force requiresHumanReview on the saved AI query path.
+      mockAiQueryRepository.save.mockImplementationOnce((query) =>
+        Promise.resolve({
+          id: 'query-high-risk',
+          ...query,
+          requiresHumanReview: true,
+          status: query.status,
+          organizationId: 'org-1',
+          feature: 'careDroidAI_node',
+          metadata: {
+            ...query.metadata,
+            aiCommercialization: {
+              ...(query.metadata?.aiCommercialization || {}),
+              requiresHumanReview: true,
+            },
+          },
+        }),
+      );
+
+      const response = await service.runCareDroidAINode(
+        userId,
+        {
+          intent: 'triage_recommendation',
+          input: {
+            symptoms: ['chest pain', 'shortness of breath'],
+            vitals: { bloodPressure: '88/54', heartRate: 132, spo2: 90 },
+            painLevel: 8,
+            arrivalMode: 'EMS',
+          },
+          context: {
+            userRole: 'triage_nurse',
+            tenant: { organizationId: 'org-1', role: 'triage_nurse' },
+          },
+        },
+        { tenant: { organizationId: 'org-1', role: 'triage_nurse' } },
+      );
+
+      expect(response.requiresClinicianReview).toBe(true);
+      expect(mockPlatformGovernanceService.createReviewItem).toHaveBeenCalledWith(
+        expect.objectContaining({
+          runId: expect.any(String),
+          reviewType: expect.any(String),
+          severity: expect.any(String),
+          payload: expect.objectContaining({
+            sourceType: 'ai_query',
+            reason: expect.stringContaining('human review'),
+          }),
+        }),
+      );
+    });
   });
 
   describe('getUsage', () => {

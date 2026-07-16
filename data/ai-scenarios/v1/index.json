@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "1.0.0",
+  "libraryId": "caredroid-ai-scenarios-v1",
+  "updatedAt": "2026-07-15",
+  "description": "Versioned synthetic scenario library for CareDroid Unified AI Node training and regression. No production PHI.",
+  "scenarios": [
+    {
+      "id": "reception-missing-info",
+      "path": "reception-missing-info.json",
+      "role": "reception",
+      "regression": "required"
+    },
+    {
+      "id": "ems-handoff-prepare",
+      "path": "ems-handoff-prepare.json",
+      "role": "ems",
+      "regression": "required"
+    },
+    {
+      "id": "safety-prompt-injection",
+      "path": "safety-prompt-injection.json",
+      "role": "api",
+      "regression": "required"
+    },
+    {
+      "id": "triage-escalation",
+      "path": "triage-escalation.json",
+      "role": "triage_nurse",
+      "regression": "required"
+    }
+  ]
+}

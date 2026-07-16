@@ -159,6 +159,7 @@
     "gate:knowledge-registry": "node scripts/knowledge-registry-gate.mjs",
     "ai:eval": "node scripts/ai-eval-run.mjs",
     "ai:eval:gate": "node scripts/ai-eval-gate.mjs",
+    "ai:query": "node scripts/ai-query.mjs",
     "verify:model-registry": "node scripts/validate-model-registry.mjs",
     "verify:ai-assurance": "node scripts/validate-knowledge-registry.mjs && node scripts/validate-model-registry.mjs && node scripts/ai-eval-gate.mjs"
   },

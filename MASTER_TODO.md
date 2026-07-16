@@ -66,7 +66,8 @@
 | AI4 | Model/prompt provenance in audit trail | **VERIFIED** | P1 | Wired at all call sites | backend specs green | 2026-07-14 Cy46 |
 | AI5 | Quota atomicity under concurrency (simultaneous requests at boundary) | **OPEN** | P2 | No test exercises concurrent quota updates (readiness §3) | Redis-backed concurrency test in CI integration group | — |
 | AI6 | Manual Groq demo record (model/latency/tokens/cost/failure mode) | **OPEN** | P2 | Requires `GROQ_API_KEY` in demo env — operational, not code | Recorded result separate from CI evidence | — |
-| AI7 | Human-review record creation asserted end-to-end | **OPEN** | P2 | Column + write path exist; no test asserts record from a high-risk output | New backend integration test | — |
+| AI7 | Human-review record creation asserted end-to-end | **PARTIAL** | P2 | **Cy71 unit:** `ai.service.spec.ts` asserts `createReviewItem` from high-risk structured node via `createHumanReviewItemIfRequired`. Full HTTP/Postgres integration still open. | Integration test against real review queue | 2026-07-15 Cy71 (unit) |
+| AI8 | Canonical unified AI contracts + CLI + discovery APIs | **VERIFIED** | P1 | `lib/ai/unifiedAiContracts.ts`, `scripts/ai-query.mjs`, `GET /api/ai/providers/health\|models\|tools\|requests/:id`, plan §20 docs | `npm run ai:eval:gate`; CLI safety scenario; backend 25/25 targeted | 2026-07-15 Cy71 |
 
 ## 7. RAG
 
@@ -79,7 +80,7 @@
 | RG5 | PgVectorStore (D5) | **VERIFIED** (unit) | P1 | `pgvector.store.ts` implements `IVectorDatabase`, org IN-filter, dimension validation + migration `1772701300000` + `RAG_VECTOR_BACKEND` | live-Postgres run remains CI/deploy-only here | 2026-07-15 Cy69 |
 | RG6 | Versioned clinical eval dataset + baseline (D6) | **VERIFIED** (offline) | P1 | `data/ai-eval/v1/` (manifest, DATA_CARD, packs) + `BASELINE_RECORDED.json` (41/41, offline_fixture) | `npm run ai:eval`; **live-retrieval baseline still open** (→ RG7) | 2026-07-15 Cy69 |
 | RG7 | Live-retrieval eval baseline (Recall@K against real vector store, not fixtures) | **OPEN** | P2 | Offline-fixture mode only today | Recorded metrics vs. thresholds in BASELINE.md, no dataset tuning | — |
-| RG8 | Chunker edge-case matrix (empty/whitespace/multilingual/malformed/no-valid-chunks) | **OPEN** | P2 | Chunker tested, but not this specific matrix | Named tests per edge case | — |
+| RG8 | Chunker edge-case matrix (empty/whitespace/multilingual/malformed/no-valid-chunks) | **VERIFIED** | P2 | `document-chunker.spec.ts` (Cy71); also fixed tiktoken decode non-string force-split crash | Named tests per edge case green | 2026-07-15 Cy71 |
 | RG9 | "Dictionary chunking" | **N/A** | — | Concept does not exist in this repo (verified twice: Cy pre-48 audit + Cy62); chunker is sentence-boundary + tiktoken | — | 2026-07-15 Cy62 |
 
 ## 8. OCR

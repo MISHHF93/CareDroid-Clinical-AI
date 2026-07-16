@@ -23,7 +23,26 @@ export class DocumentChunker {
    * Count tokens in a text string
    */
   countTokens(text: string): number {
-    return this.encoder.encode(text).length;
+    // Coerce to string — callers (and tiktoken decode round-trips) can hand back
+    // Uint8Array/Buffer under some WASM builds; encode() requires a JS string.
+    return this.encoder.encode(this.asText(text)).length;
+  }
+
+  /**
+   * Normalize tiktoken encode/decode I/O to a JS string.
+   */
+  private asText(value: unknown): string {
+    if (typeof value === 'string') return value;
+    if (value == null) return '';
+    if (value instanceof Uint8Array) {
+      return new TextDecoder('utf-8', { fatal: false }).decode(value);
+    }
+    if (ArrayBuffer.isView(value)) {
+      return new TextDecoder('utf-8', { fatal: false }).decode(
+        new Uint8Array(value.buffer, value.byteOffset, value.byteLength),
+      );
+    }
+    return String(value);
   }
 
   /**
@@ -181,13 +200,16 @@ export class DocumentChunker {
    * Split a large sentence that exceeds chunk size
    */
   private splitLargeSentence(sentence: string, chunkSize: number): string[] {
-    const tokens = this.encoder.encode(sentence);
+    const tokens = this.encoder.encode(this.asText(sentence));
     const chunks: string[] = [];
 
     for (let i = 0; i < tokens.length; i += chunkSize) {
       const chunkTokens = tokens.slice(i, i + chunkSize);
-      const chunkText = this.encoder.decode(chunkTokens);
-      chunks.push(chunkText);
+      // tiktoken WASM decode may return string or Uint8Array depending on build.
+      const chunkText = this.asText(this.encoder.decode(chunkTokens));
+      if (chunkText.length > 0) {
+        chunks.push(chunkText);
+      }
     }
 
     return chunks;
