@@ -296,15 +296,23 @@ export class RAGService implements OnModuleInit {
       filter.jurisdiction = options.jurisdiction;
     }
     // Normalize tenant id: empty/whitespace must not become a fake scope key.
-    const organizationId =
-      typeof options.organizationId === 'string'
-        ? options.organizationId.trim()
-        : options.organizationId;
-    if (organizationId) {
-      // Scope to the caller's own tenant plus the shared global corpus.
-      // Callers without tenant context (legacy/internal) get no
-      // organizationId filter at all, preserving unscoped retrieval.
-      filter.organizationId = [organizationId, RAG_GLOBAL_ORG_SCOPE];
+    // (Reinstated Cy76 — this fail-closed branch was lost in the Cy74-75
+    // consolidation rewrite; see rag.service.spec.ts adversarial cases.)
+    const rawOrganizationId = options.organizationId as unknown;
+    if (typeof rawOrganizationId === 'string') {
+      const organizationId = rawOrganizationId.trim();
+      if (organizationId) {
+        // Scope to the caller's own tenant plus the shared global corpus.
+        // Callers without tenant context (legacy/internal) get no
+        // organizationId filter at all, preserving unscoped retrieval.
+        filter.organizationId = [organizationId, RAG_GLOBAL_ORG_SCOPE];
+      }
+    } else if (rawOrganizationId !== undefined && rawOrganizationId !== null) {
+      // Malformed tenant context (array/object/number smuggled into a string
+      // field) fails CLOSED to the shared corpus only — never unscoped, and
+      // never forwarded where a vector backend could read it as a filter
+      // operator (e.g. { $ne: null }).
+      filter.organizationId = [RAG_GLOBAL_ORG_SCOPE];
     }
     return filter;
   }

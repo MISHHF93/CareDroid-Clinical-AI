@@ -759,7 +759,7 @@ export function projectFromNeutralDto(dto: NeutralBoardDto): CigGraphSnapshot {
       state: defaultState({
         status: 'advisory',
         aiConfidence: rec.confidence ?? null,
-        confidence: rec.confidence ?? null,
+        confidence: rec.confidence ?? undefined,
         humanReviewRequired: rec.humanReviewRequired ?? true,
       }),
       metadata: {

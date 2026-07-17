@@ -166,6 +166,27 @@ describe('RAGService — tenant scoping', () => {
     expect(call.filter.organizationId).toBeUndefined();
   });
 
+  it('adversarial: an array smuggled as organizationId cannot widen the scope to a victim org', async () => {
+    const { service, retrievalService } = buildService();
+
+    await service.retrieve('sepsis', { organizationId: ['org-victim'] as any });
+
+    const call = (retrievalService.retrieve.mock.calls as any[])[0][0];
+    const scope = call.filter.organizationId;
+    expect(scope === undefined || !scope.includes('org-victim')).toBe(true);
+  });
+
+  it('adversarial: an object smuggled as organizationId cannot become a filter operator', async () => {
+    const { service, retrievalService } = buildService();
+
+    await service.retrieve('sepsis', { organizationId: { $ne: null } as any });
+
+    const call = (retrievalService.retrieve.mock.calls as any[])[0][0];
+    const flattened = JSON.stringify(call.filter.organizationId ?? null);
+    // No operator injection may survive into the vector-store filter.
+    expect(flattened).not.toContain('$ne');
+  });
+
   it('adversarial: org-B cannot be smuggled via documentTypes / specialty fields', async () => {
     const { service, retrievalService } = buildService();
 

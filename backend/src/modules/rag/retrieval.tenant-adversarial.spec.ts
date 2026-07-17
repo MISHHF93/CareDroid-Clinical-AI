@@ -152,3 +152,125 @@ describe('applyTenantOrganizationDefenseFilter', () => {
     ]);
   });
 });
+
+/**
+ * Cache-hit isolation (reinstated Cy76 — lost in the Cy74-75 consolidation
+ * rewrite). The cases above use a no-op cache stub, so they prove query
+ * independence but not that a REAL cache can never serve one tenant's stored
+ * result to another. This harness backs the cache with an actual store and
+ * proves both directions: same-tenant repeat IS a cache hit, cross-tenant
+ * repeat is NOT.
+ */
+describe('RetrievalService — cross-tenant cache-hit isolation', () => {
+  const buildWithRealCache = () => {
+    const store = new Map<string, unknown>();
+    const vectorDb = {
+      query: jest.fn(async (_embedding: number[], opts: { filter?: Record<string, unknown> }) => {
+        const orgFilter = opts.filter?.organizationId;
+        const org = Array.isArray(orgFilter) ? String(orgFilter[0]) : 'unscoped';
+        return {
+          matches: [
+            {
+              id: `chunk-${org}`,
+              score: 0.95,
+              text: `${org} confidential protocol`,
+              metadata: { organizationId: org, sourceId: `${org}-1`, title: org, type: 'protocol' },
+            },
+          ],
+          latencyMs: 1,
+          total: 1,
+        };
+      }),
+    };
+    const cacheService = {
+      get: jest.fn(async (key: string) => (store.has(key) ? store.get(key) : null)),
+      set: jest.fn(async (key: string, value: unknown) => {
+        store.set(key, value);
+      }),
+    };
+    const configService = {
+      get: jest.fn(() => ({ retrieval: { defaultTopK: 5, minScore: 0.5, cacheTtlSeconds: 60 } })),
+    };
+    const service = new RetrievalService(
+      vectorDb as any,
+      cacheService as any,
+      configService as any,
+    );
+    return { service, vectorDb, cacheService, store };
+  };
+
+  const cacheBaseRequest = {
+    query: 'sepsis hour-1',
+    queryEmbedding: [0.1, 0.2, 0.3, 0.4],
+    topK: 3,
+    minScore: 0.5,
+    includeEmbeddings: false,
+    corpusVersion: 1,
+    hybrid: false,
+  };
+
+  it('serves a same-tenant repeat from cache without re-querying the vector store', async () => {
+    const { service, vectorDb } = buildWithRealCache();
+    const filter = { organizationId: ['org-A', RAG_GLOBAL_ORG_SCOPE] };
+
+    const first = await service.retrieve({ ...cacheBaseRequest, filter });
+    const second = await service.retrieve({ ...cacheBaseRequest, filter });
+
+    expect(vectorDb.query).toHaveBeenCalledTimes(1);
+    expect(first.cacheHit).toBe(false);
+    expect(second.cacheHit).toBe(true);
+    expect(second.chunks.map((c) => c.id)).toEqual(['chunk-org-A']);
+  });
+
+  it('never serves org-A’s cached result to org-B for the identical query', async () => {
+    const { service, vectorDb } = buildWithRealCache();
+
+    const orgA = await service.retrieve({
+      ...cacheBaseRequest,
+      filter: { organizationId: ['org-A', RAG_GLOBAL_ORG_SCOPE] },
+    });
+    const orgB = await service.retrieve({
+      ...cacheBaseRequest,
+      filter: { organizationId: ['org-B', RAG_GLOBAL_ORG_SCOPE] },
+    });
+
+    expect(vectorDb.query).toHaveBeenCalledTimes(2);
+    expect(orgB.cacheHit).toBe(false);
+    expect(orgA.chunks.map((c) => c.id)).toEqual(['chunk-org-A']);
+    expect(orgB.chunks.map((c) => c.id)).toEqual(['chunk-org-B']);
+    expect(JSON.stringify(orgB)).not.toContain('org-A confidential');
+  });
+
+  it('scoped and unscoped (legacy) requests never share a cache entry', async () => {
+    const { service, vectorDb } = buildWithRealCache();
+
+    await service.retrieve({
+      ...cacheBaseRequest,
+      filter: { organizationId: ['org-A', RAG_GLOBAL_ORG_SCOPE] },
+    });
+    const unscoped = await service.retrieve({ ...cacheBaseRequest, filter: {} });
+
+    expect(vectorDb.query).toHaveBeenCalledTimes(2);
+    expect(unscoped.cacheHit).toBe(false);
+    expect(unscoped.chunks.map((c) => c.id)).toEqual(['chunk-unscoped']);
+  });
+
+  it('concurrent org-A and org-B retrievals never share an in-flight promise', async () => {
+    const { service, vectorDb } = buildWithRealCache();
+
+    const [orgA, orgB] = await Promise.all([
+      service.retrieve({
+        ...cacheBaseRequest,
+        filter: { organizationId: ['org-A', RAG_GLOBAL_ORG_SCOPE] },
+      }),
+      service.retrieve({
+        ...cacheBaseRequest,
+        filter: { organizationId: ['org-B', RAG_GLOBAL_ORG_SCOPE] },
+      }),
+    ]);
+
+    expect(vectorDb.query).toHaveBeenCalledTimes(2);
+    expect(orgA.chunks.map((c) => c.id)).toEqual(['chunk-org-A']);
+    expect(orgB.chunks.map((c) => c.id)).toEqual(['chunk-org-B']);
+  });
+});

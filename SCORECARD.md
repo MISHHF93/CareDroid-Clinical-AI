@@ -4,8 +4,8 @@
 > Unified proof pack: [docs/architecture/architect-mode/PROOF-PACK.md](docs/architecture/architect-mode/PROOF-PACK.md)  
 > Gates: Architect FE **100**, BE **51**, contract-matrix **19**, cohesion-security **30**, redirect-parity **58**, dual builds **PASS**. Residual: dual Nest/Express, Postgres tenant e2e, full Playwright.
 
-**Last updated:** 2026-07-16 (Cycle 75 � StreamingResponse + ActionProposalCard UI components (IX10/IX11 PARTIAL on prior numbering; IX18/IX19 on remote Interactive Intelligence register); CIG PRs 1�5b on branch. Cycle 74 � EMS + Triage interactive mounts, Interaction Inbox, Nest `/api/ai/proposals/*`; Cycle 73 InteractiveAIWorkspace foundation.) � Evidence-grounded, not self-reported
-**Companion artifact (interactive):** <https://claude.ai/code/artifact/5b85f8ca-111d-4206-b3aa-44e20dcac6ad>
+**Last updated:** 2026-07-17 (Cycle 76 — independent verification of the Interactive-Intelligence consolidation after a history rewrite merged two parallel cycle sequences: confirmed the workspace layer genuinely real (contracts/orchestrator/role mounts/inbox all green), found + fixed 1 frontend `tsc` error in CIG, repaired 4 raw-cp1252 bytes in this header (D11 recurrence), and **reinstated three verified closures the rewrite had dropped** — the RAG malformed-tenant fail-closed fix (filter-operator injection), the cross-tenant cache-hit denial proofs, and the AI7 human-review end-to-end spec (23/23). Security 91→92 re-earned. Fresh full backend suite **241/241 suites, 1,889/1,889 tests**; migrations 29/29 from empty. Cycle 75 — StreamingResponse + ActionProposalCard UI components; CIG PRs 1–5b. Cycle 74 — EMS + Triage interactive mounts, Interaction Inbox, Nest `/api/ai/proposals/*`; Cycle 73 InteractiveAIWorkspace foundation.) · Evidence-grounded, not self-reported
+**Companion artifact (interactive):** <https://claude.ai/code/artifact/f613bb99-0c0b-43a3-ae9e-55cfbece7438> (kept current per cycle; supersedes `5b85f8ca…`)
 **Full cycle-by-cycle history (40+ cycles):** see project memory `project-quality-baseline-cycle0.md`
 
 > A self-reported internal "maturity model" script (`scripts/platform-scorecard.mjs`) also exists in this repo and outputs ~86/100 — that reflects the app's own sample/demo self-assessment data, not measured reality, and is **not** used here. Every score below is tied to a specific command, file, or test run.
@@ -13,6 +13,8 @@
 ---
 
 ## This pass's headline change
+
+**Cycle 76 (2026-07-17) — Consolidation verified; three dropped closures reinstated:** Cycles 71–75 were **two parallel sequences sharing the same numbers** (this session: interaction contracts → authoritative TypeORM proposal persistence → HTTP e2e + dynamic permission → components; remote session: InteractiveAIWorkspace → role mounts → inbox → CIG graph). The merged history kept the remote line and absorbed this session's components/contracts, but **dropped three verified closures**, all reinstated this cycle with fresh proof: (1) the RAG `buildRetrievalFilter` fail-closed guard — a non-string `organizationId` (e.g. `{"$ne": null}`) again flowed into the vector-store filter as a potential operator injection; re-fixed + 2 adversarial tests; (2) the 4 cross-tenant **cache-hit denial** proofs against a real cache store; (3) the AI7 **human-review end-to-end** spec (high-risk query → persisted `needs_review` row through the real governance service). Also fixed 1 frontend `tsc` error the CIG series left (`projectFromNeutralDto.ts` null-vs-undefined) and repaired 4 raw-cp1252 bytes in this file's header. Deliberately **not** re-added: the TypeORM proposal persistence layer (entity/migration/hash-chain audit/tenant-scoped 404s/dynamic `requiredPermission`) — the remote line's in-process store owns that surface now and tracks the migration as IX16; recovering the dropped implementation is documented there rather than colliding with an active redesign. Security & privacy 91→**92** (re-earned). Evidence: reinstated suites 23/23; full backend **241/241 / 1,889/1,889**; both trees `tsc`/eslint 0/0; migrations 29/29 from empty.
 
 **Cycle 74 (2026-07-16) — Role coverage + inbox + proposal API:** EMSPipeline mounts EMS assist; TriageQueueFeature mounts Triage assist; InteractionInbox aggregates proposals/cards; Nest `POST/GET /api/ai/proposals` + approve/reject/execute/rollback (in-memory, high-risk always requires approval). Backend proposal suite green. AI Chief 62→65, Clinical workflow 76→78, Overall held **95/95**.
 
@@ -202,7 +204,7 @@ Also completed, with the user's explicit approval at each step: a **CI/CD workfl
 | Performance | 69 / 90 | 90 | 0 |
 | Accessibility | 81 / 90 | 90 | +1 |
 | Testing & quality | 90 / 90 | 90 | 0 |
-| Security & privacy | 91 / 95 | 95 | 0 |
+| Security & privacy | 92 / 95 | 95 | +1 |
 | Clinical workflow | 78 / 95 | 95 | +2 |
 | **Overall readiness** | **95 / 95** | **95** | **0** |
 
