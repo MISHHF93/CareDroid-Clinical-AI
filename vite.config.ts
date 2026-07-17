@@ -203,6 +203,16 @@ export default defineConfig(({ mode }) => {
               return 'vendor';
             }
 
+            // Audited Cycle 84: unlike the Calculators/Analytics fusion bugs,
+            // this grouping is NOT forcing eagerness onto otherwise-lazy code.
+            // Disabling it experimentally made the anonymous entry chunk grow
+            // by ~1MB (the exact size of this chunk) instead of splitting
+            // that weight into its own lazy chunk -- Rollup's own static
+            // reachability analysis confirms unified-navigation.config (used
+            // directly by AppShell.tsx on every page) and everything grouped
+            // here are genuinely only reachable from the eager entry graph.
+            // Naming them keeps that necessary weight in its own cacheable,
+            // clearly-labeled chunk instead of bloating the anonymous entry.
             if (
               normalizedId.includes('/src/config/unified-navigation') ||
               normalizedId.includes('/src/config/navigation') ||

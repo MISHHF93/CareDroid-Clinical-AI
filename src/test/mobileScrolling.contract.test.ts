@@ -19,7 +19,6 @@ const copilotPanelCss = readFileSync(
 );
 const sidebarCss = readFileSync(join(srcRoot, 'components/Sidebar.css'), 'utf8');
 const drawerCss = readFileSync(join(srcRoot, 'components/ui/Drawer.css'), 'utf8');
-const chatInterfaceCss = readFileSync(join(srcRoot, 'components/ChatInterface.css'), 'utf8');
 const layoutVisibilityCss = readFileSync(join(srcRoot, 'styles/layout-visibility.css'), 'utf8');
 const toolsOverviewCss = readFileSync(join(srcRoot, 'pages/tools/ToolsOverview.css'), 'utf8');
 const calculatorsCss = readFileSync(join(srcRoot, 'pages/tools/Calculators.css'), 'utf8');
@@ -54,12 +53,11 @@ describe('mobile scrolling contracts', () => {
     expect(copilotPanelCss).toMatch(/\.ed-copilot-panel\s*\{[\s\S]*overflow:\s*hidden/);
   });
 
-  it('keeps normal pages in the main scrollport while preserving chat as a local viewport', () => {
+  it('keeps normal pages in the main scrollport while preserving Copilot chat as a local viewport', () => {
     expect(appShellCss).toMatch(/\.emergency-app-shell\s*\{[\s\S]*overflow:\s*hidden/);
     expect(appShellCss).toMatch(/\.emergency-app-shell__main-column\s*\{[\s\S]*overflow:\s*hidden/);
     expect(appShellCss).toMatch(/\.app-shell-main-content\s*\{[\s\S]*overflow-x:\s*clip[\s\S]*overflow-y:\s*auto/);
-    expect(chatInterfaceCss).toMatch(/\.chat-interface__messages\s*\{[\s\S]*overflow-y:\s*auto/);
-    expect(chatInterfaceCss).toMatch(/\.chat-interface__textarea\s*\{[\s\S]*overflow-y:\s*auto/);
+    expect(copilotPanelCss).toMatch(/\.ed-copilot-panel\s*\{[\s\S]*overflow:\s*hidden/);
   });
 
   it('keeps the canonical Sidebar and overlays from creating extra page scroll owners', () => {

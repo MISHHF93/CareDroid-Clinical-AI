@@ -67,10 +67,9 @@ describe('feature flag UI coverage', () => {
     expect(calculatorHubSource).toContain('component:');
   });
 
-  it('guards audit log, simulation autostart, and Copilot tool actions', () => {
+  it('guards audit log, simulation autostart, and Copilot mount', () => {
     const settingsSource = readSource('pages/Settings.tsx');
     const appShellSource = readSource('components/AppShell.tsx');
-    const chatSource = readSource('components/ChatInterface.tsx');
 
     expect(settingsSource).toContain('<FeatureGate feature="audit_log">');
     expect(appShellSource).toContain('startReassessmentEngine()');
@@ -79,9 +78,6 @@ describe('feature flag UI coverage', () => {
     expect(appShellSource).toContain('startAdministrativeAutomationEngine()');
     expect(appShellSource).toContain('copilotOpen ?');
     expect(appShellSource).toContain('<CopilotPanel />');
-    expect(chatSource).toContain('copilotToolActionsEnabled && actionSuggestion');
-    expect(chatSource).toContain('enabledFeatures: enabledCopilotFeatures');
-    expect(chatSource).toContain('emsPipelineEnabled ? buildEMSPressureCopilotContext(emsPressure) : null');
   });
 
   it('keeps requested feature ids registered for gated surfaces', () => {
