@@ -81,6 +81,7 @@ import { ProductCatalogModule } from './modules/product-catalog/product-catalog.
 import { TenantContextModule } from './modules/tenant-context/tenant-context.module';
 import { AutomationAuditModule } from './modules/automation-audit/automation-audit.module';
 import { EmergencyOsModule } from './modules/emergency-os/emergency-os.module';
+import { CigModule } from './modules/cig/cig.module';
 import { CollaborationHubModule } from './modules/collaboration-hub/collaboration-hub.module';
 import { NativeAiModule } from './modules/native-ai/native-ai.module';
 import { NluModule } from '../ml-services/nlu/nlu.module';
@@ -233,6 +234,7 @@ function resolveDatabaseClient() {
     TenantContextModule,
     AutomationAuditModule,
     EmergencyOsModule,
+    CigModule,
     SentinelModule,
     CollaborationHubModule,
     NativeAiModule,
