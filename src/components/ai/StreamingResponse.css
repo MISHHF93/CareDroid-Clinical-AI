@@ -1,0 +1,114 @@
+.cd-stream {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ml-space-2, 8px);
+  padding: var(--ml-space-3, 12px);
+  border-radius: var(--ml-radius-md, 10px);
+  border: 1px solid var(--ml-border, #cbd5e1);
+  background: var(--ml-surface, #fff);
+  color: var(--ml-text-primary, #102a43);
+}
+
+.cd-stream--compact {
+  padding: var(--ml-space-2, 8px);
+  gap: var(--ml-space-1, 4px);
+}
+
+.cd-stream--critical {
+  border-color: var(--ml-status-critical, #b91c1c);
+}
+
+.cd-stream--warn {
+  border-color: var(--ml-status-warning, #d97706);
+}
+
+.cd-stream__statusline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ml-space-2, 8px);
+}
+
+.cd-stream__phase {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--ml-ai-purple-soft, color-mix(in srgb, #7c3aed 10%, #fff));
+  color: var(--ml-ai-purple, #5925dc);
+}
+
+.cd-stream__phase--good {
+  background: var(--ml-status-success-bg, color-mix(in srgb, #027a48 12%, white));
+  color: var(--ml-status-success, #027a48);
+}
+
+.cd-stream__phase--warn {
+  background: var(--ml-status-warning-bg, color-mix(in srgb, #d97706 12%, white));
+  color: var(--ml-status-warning, #b54708);
+}
+
+.cd-stream__phase--critical {
+  background: var(--ml-status-critical-bg, color-mix(in srgb, #b91c1c 12%, white));
+  color: var(--ml-status-critical, #b42318);
+}
+
+.cd-stream__pulse {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cd-stream__pulse {
+    animation: cd-stream-pulse 1.2s ease-in-out infinite;
+  }
+}
+
+@keyframes cd-stream-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.cd-stream__cancel {
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: var(--ml-radius-sm, 6px);
+  border: 1px solid var(--ml-border, #cbd5e1);
+  background: var(--ml-surface, #fff);
+  color: var(--ml-text-primary, #102a43);
+  cursor: pointer;
+}
+
+.cd-stream__cancel:hover {
+  background: var(--ml-surface-hover, #f1f5f9);
+}
+
+.cd-stream__text {
+  font-size: 14px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.cd-stream__detail {
+  margin: 0;
+  font-size: 13px;
+}
+
+.cd-stream__detail--critical {
+  color: var(--ml-status-critical, #b42318);
+}
+
+.cd-stream__detail--warn {
+  color: var(--ml-status-warning, #b54708);
+}

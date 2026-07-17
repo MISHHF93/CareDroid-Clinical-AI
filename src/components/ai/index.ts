@@ -4,6 +4,8 @@ export { AIInsightPanel } from './AIInsightPanel';
 export { AIReasoningList } from './AIReasoningList';
 export { AIChiefRecommendationCard, AIRecommendationCard } from './AIRecommendationCard';
 export { AiChiefRouteRecommendationsPanel } from './AiChiefRouteRecommendationsPanel';
+export { ActionProposalCard, type ActionProposalCardProps } from './ActionProposalCard';
 export { ClinicalSafetyNotice } from './ClinicalSafetyNotice';
+export { StreamingResponse, type StreamingResponseProps } from './StreamingResponse';
 export { MissingDataAlert } from './MissingDataAlert';
 export { OverrideActionButtons } from './OverrideActionButtons';
