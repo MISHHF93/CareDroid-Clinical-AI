@@ -107,6 +107,36 @@ export {
   type FeDepartmentLike,
 } from './adapters/feEmergencyStoreAdapter';
 
+export {
+  adaptNestEmergencyOsToNeutralDto,
+  deriveQueuesFromNestPatients,
+  type NestEmergencyBoardSource,
+  type NestPatientLike,
+  type NestRoomLike,
+  type NestStaffLike,
+  type NestAlertLike,
+  type NestQueueLike,
+} from './adapters/nestEmergencyOsAdapter';
+
+export {
+  CIG_EDGE_TYPE_WEIGHTS,
+  edgeTypeWeight,
+  nodeStatusBonus,
+  scorePath,
+  rankPaths,
+  preferredEdgeTypesForGoal,
+  type CigTraverseGoal,
+  type ScoredPath,
+} from './pathScore';
+
+export {
+  traverseCigGraph,
+  allowedEdgeTypesFromTraverse,
+  allowedNodeIdsFromTraverse,
+  type TraverseOptions,
+  type TraverseResult,
+} from './traverse';
+
 /** Frozen entity type list for runtime validation. */
 export const CIG_ENTITY_TYPES = Object.freeze([
   'patient',
