@@ -8,6 +8,7 @@ import {
   buildScenarioDebrief,
   getSimulationScenarioById,
 } from '../../data/medicalSimulationCatalog';
+import { recordSimulationRun } from '../../services/simulationScoringService';
 import { DEMO_LIVE_STATES } from '../../utils/demoLiveState';
 import './SimulationScenarioPlayer.css';
 
@@ -18,6 +19,7 @@ export default function SimulationScenarioPlayer() {
     [scenarioId],
   );
   const [selectedActions, setSelectedActions] = useState<string[]>([]);
+  const [recordedRunId, setRecordedRunId] = useState<string | null>(null);
   const debrief = useMemo(
     () =>
       scenario && selectedActions.length
@@ -25,6 +27,17 @@ export default function SimulationScenarioPlayer() {
         : null,
     [scenario, selectedActions],
   );
+
+  function recordRun() {
+    if (!scenario || !debrief) return;
+    const run = recordSimulationRun(scenario, selectedActions, debrief);
+    setRecordedRunId(run.runId);
+  }
+
+  function practiceAgain() {
+    setSelectedActions([]);
+    setRecordedRunId(null);
+  }
 
   if (!scenario) {
     return (
@@ -37,6 +50,7 @@ export default function SimulationScenarioPlayer() {
   }
 
   function toggleAction(action: string) {
+    setRecordedRunId(null);
     setSelectedActions((current) =>
       current.includes(action) ? current.filter((item) => item !== action) : [...current, action],
     );
@@ -168,6 +182,23 @@ export default function SimulationScenarioPlayer() {
               ))}
             </ul>
           ) : null}
+          <div className="scenario-player-page__debrief-actions">
+            {recordedRunId ? (
+              <>
+                <span className="scenario-player-page__recorded" data-testid="scenario-run-recorded">
+                  Saved to your local practice history — stored only in this browser, never written to any
+                  patient record or backend.
+                </span>
+                <button type="button" onClick={practiceAgain}>
+                  Practice again
+                </button>
+              </>
+            ) : (
+              <button type="button" onClick={recordRun} data-testid="scenario-record-run">
+                Save score to practice history
+              </button>
+            )}
+          </div>
         </section>
       ) : null}
     </main>
