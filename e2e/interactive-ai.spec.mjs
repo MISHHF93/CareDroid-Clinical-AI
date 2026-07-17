@@ -169,6 +169,53 @@ test('reception: realtime status never claims live without a connection, and the
   await expect(status).not.toHaveText('');
 });
 
+test('reception: a typed AI command from the command palette runs in the workspace — id-only handoff, no text execution (IX14)', async ({
+  page,
+}) => {
+  const workspace = await openWorkspace(page, RECEPTION_PATH);
+
+  // Reception autofocuses its search input; global shortcuts deliberately
+  // ignore keys typed into editable fields, so release focus first.
+  await page.evaluate(() => {
+    const active = document.activeElement;
+    if (active instanceof HTMLElement) active.blur();
+  });
+  await page.keyboard.press('Control+k');
+  const palette = page.getByRole('dialog', { name: 'Command palette' });
+  await expect(palette).toBeVisible({ timeout: 10_000 });
+
+  // Searching surfaces the typed AI command through the normal ranking pipeline.
+  await palette.getByRole('textbox').fill('draft triage handoff');
+  const aiCommand = palette.getByRole('option', { name: /AI: Draft triage handoff/ });
+  await expect(aiCommand).toBeVisible({ timeout: 10_000 });
+  await aiCommand.click();
+  await expect(palette).not.toBeVisible();
+
+  // The workspace runs the registry's FIXED template — the palette only sent
+  // the command id, so the composer must NOT contain the typed search text.
+  const composer = workspace.getByPlaceholder('Ask for help completing this workflow…');
+  await expect(composer).not.toHaveValue(/draft triage handoff/);
+
+  const progress = workspace.getByTestId('interactive-stream-progress');
+  await expect(progress).toBeVisible({ timeout: 10_000 });
+  expect((await progress.innerText()).trim().length).toBeGreaterThan(0);
+
+  await expect
+    .poll(
+      async () => {
+        if (await workspace.getByTestId('interactive-response').count()) return 'response';
+        if (await workspace.getByTestId('action-proposal-card').count()) return 'proposal';
+        const text = ((await progress.innerText().catch(() => '')) || '').toLowerCase();
+        if (/completed|failed|blocked|insufficient|cancelled|timed/.test(text)) {
+          return 'terminal';
+        }
+        return 'pending';
+      },
+      { timeout: 30_000 },
+    )
+    .not.toBe('pending');
+});
+
 test('ems: the same workspace architecture mounts on the EMS pipeline', async ({ page }) => {
   const workspace = await openWorkspace(page, EMS_PATH);
   await expect(workspace.getByTestId('interactive-realtime-status')).toBeVisible();

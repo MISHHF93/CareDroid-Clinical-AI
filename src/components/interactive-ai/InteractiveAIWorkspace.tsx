@@ -29,6 +29,12 @@ import {
   type WorkflowTriggerEvent,
 } from '../../services/interactiveAi/workflowAiCards';
 import { startInteractiveRealtimeClient } from '../../services/interactiveAi/interactiveRealtimeClient';
+import {
+  AI_COMMAND_EVENT,
+  commandMatchesChannel,
+  consumePendingAiCommand,
+  getAiPaletteCommand,
+} from '../../services/interactiveAi/aiCommandRegistry';
 import { getSuggestedPrompts } from '../../services/interactiveAi/suggestedPrompts';
 import { resolveUnifiedChannelFromRole } from '../../services/unifiedAiEnvelope';
 import { AccountableRecommendationCard } from '../ai/AccountableRecommendationCard';
@@ -191,6 +197,42 @@ export function InteractiveAIWorkspace({
     },
     [announce, channel, loading, organizationId, pageId, patientId, permissions, purpose, role, userId],
   );
+
+  // Typed palette commands (IX14): only registry ids arrive here — the id is
+  // re-validated against the closed registry, the channel and the user's
+  // permissions before the FIXED template query runs. Unknown ids are refused.
+  const runPaletteCommand = useCallback(
+    (commandId: string) => {
+      const command = getAiPaletteCommand(commandId);
+      if (!command) {
+        announce('Ignored unknown AI command');
+        return;
+      }
+      if (!commandMatchesChannel(command, channel)) return;
+      if (!permissions.includes(command.requiredPermission)) {
+        announce(`Not permitted: ${command.label}`);
+        return;
+      }
+      announce(`Running ${command.label}`);
+      void runQuery(command.query);
+    },
+    [announce, channel, permissions, runQuery],
+  );
+
+  const consumedPendingRef = useRef(false);
+  useEffect(() => {
+    if (!consumedPendingRef.current) {
+      consumedPendingRef.current = true;
+      const pending = consumePendingAiCommand();
+      if (pending) runPaletteCommand(pending);
+    }
+    const onCommand = (event: Event) => {
+      const commandId = (event as CustomEvent<{ commandId?: string }>).detail?.commandId;
+      if (typeof commandId === 'string') runPaletteCommand(commandId);
+    };
+    document.addEventListener(AI_COMMAND_EVENT, onCommand);
+    return () => document.removeEventListener(AI_COMMAND_EVENT, onCommand);
+  }, [runPaletteCommand]);
 
   const onCancel = () => {
     abortRef.current?.abort();

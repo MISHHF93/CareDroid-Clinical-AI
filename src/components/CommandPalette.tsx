@@ -49,6 +49,11 @@ import {
   type OperationalSearchEntityType,
   type OperationalSearchHit,
 } from '../services/unifiedOperationalSearch';
+import {
+  AI_PALETTE_COMMANDS,
+  dispatchAiPaletteCommand,
+  type AiPaletteChannel,
+} from '../services/interactiveAi/aiCommandRegistry';
 import { PILOT_CUSTOMER_MODE } from '../config/unified-navigation.config';
 import {
   isPilotExtensionNavItem,
@@ -63,6 +68,7 @@ export type CommandGroup =
   | 'Patient'
   | 'Clinical'
   | 'Department'
+  | 'AI Assist'
   | 'Settings'
   | 'Help';
 
@@ -576,6 +582,66 @@ function createHighValueCommands(
   ];
 }
 
+/**
+ * Typed AI commands (IX14): each entry is a closed-registry command — the
+ * palette dispatches only the command id; the fixed query template lives in
+ * the registry and the mounted workspace re-validates id + permission before
+ * running. Freeform palette text is never executed as an AI command.
+ */
+export function createAiAssistCommands(
+  navigate: ReturnType<typeof useNavigate>,
+  emergencyRole: EmergencyCommandPermissions,
+  saasRole?: string,
+): CommandWithVisibility[] {
+  const surfaceRouteForChannel = (channel: AiPaletteChannel): string | null => {
+    if (channel === 'reception') return CANONICAL_ROUTES.emergencyReception;
+    if (channel === 'ems') return CANONICAL_ROUTES.emergencyEms;
+    // 'any' commands run on whichever interactive workspace surface the role can open.
+    if (emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyReception)) {
+      return CANONICAL_ROUTES.emergencyReception;
+    }
+    if (emergencyRole.canAccessRoute(CANONICAL_ROUTES.emergencyEms)) {
+      return CANONICAL_ROUTES.emergencyEms;
+    }
+    return null;
+  };
+
+  const isOnSurface = (route: string): boolean =>
+    typeof window !== 'undefined' &&
+    window.location.pathname.startsWith(routePermissionPath(route));
+
+  return AI_PALETTE_COMMANDS.flatMap((aiCommand) => {
+    const fixedRoute =
+      aiCommand.channel === 'any' ? null : surfaceRouteForChannel(aiCommand.channel);
+    // Standing on the target surface means no navigation is needed, so the
+    // nav-matrix route gate does not apply — the copilot action gate still does.
+    const route =
+      aiCommand.channel === 'any'
+        ? [CANONICAL_ROUTES.emergencyReception, CANONICAL_ROUTES.emergencyEms].find(isOnSurface) ||
+          surfaceRouteForChannel('any')
+        : fixedRoute;
+    if (!route) return [];
+    const onSurface = isOnSurface(route);
+    return [
+      {
+        id: aiCommand.id,
+        label: aiCommand.label,
+        description: aiCommand.description,
+        group: 'AI Assist' as const,
+        keywords: [...aiCommand.keywords],
+        requiredAction: EMERGENCY_ACTIONS.useCopilot,
+        ...(onSurface ? {} : { requiredRoute: route }),
+        action: () => {
+          dispatchAiPaletteCommand(aiCommand.id);
+          if (!isOnSurface(route)) {
+            navigateWithRoleGuard(navigate, route, emergencyRole, saasRole);
+          }
+        },
+      },
+    ];
+  });
+}
+
 function createCommands(
   navigate: ReturnType<typeof useNavigate>,
   toggleCopilot: () => void,
@@ -587,6 +653,7 @@ function createCommands(
   const compiled = saasRole ? compileUserProfile({ saasRole }) : null;
   const commands: CommandWithVisibility[] = [
     ...createHighValueCommands(navigate, emergencyRole, saasRole),
+    ...createAiAssistCommands(navigate, emergencyRole, saasRole),
     ...createEmergencyRouteCommands(
       navigate,
       emergencyRole,

@@ -1,6 +1,7 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   buildCommandResults,
+  createAiAssistCommands,
   isCommandVisibleForEmergencyRole,
   matchAndRankCommands,
   readRecentCommandIds,
@@ -8,6 +9,11 @@ import {
   searchPatientsByName,
   type Command,
 } from './CommandPalette';
+import {
+  AI_COMMAND_EVENT,
+  AI_PALETTE_COMMANDS,
+  resetAiPaletteCommandStateForTests,
+} from '../services/interactiveAi/aiCommandRegistry';
 import { COMMAND_PALETTE_HIGH_VALUE_ACTION_IDS, COMMAND_PALETTE_SUPPRESSED_ROUTE_IDS } from '../config/commandPaletteHighValueModel';
 import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
 import { presentEmergencyRoleAction } from '../config/emergencyRoleActionMatrix';
@@ -202,5 +208,94 @@ describe('CommandPalette helpers', () => {
         readOnlyRole,
       ),
     ).toBe(false);
+  });
+});
+
+describe('AI Assist palette commands (IX14)', () => {
+  afterEach(() => {
+    resetAiPaletteCommandStateForTests();
+  });
+
+  const allowAllRole = {
+    role: EMERGENCY_ROLE_ID.chargeNurse,
+    can: () => true,
+    presentAction: () => ({
+      state: 'allowed' as const,
+      visible: true,
+      enabled: true,
+      readOnly: false,
+      permission: null,
+    }),
+    canAccessRoute: () => true,
+    nearestRoute: () => CANONICAL_ROUTES.emergencyWhiteboard,
+  };
+
+  function buildAiCommands(navigate: () => void = vi.fn()) {
+    return createAiAssistCommands(
+      navigate as unknown as Parameters<typeof createAiAssistCommands>[0],
+      allowAllRole,
+    );
+  }
+
+  it('builds one permissioned palette entry per registry command', () => {
+    const commands = buildAiCommands();
+    expect(commands.map((c) => c.id)).toEqual(AI_PALETTE_COMMANDS.map((c) => c.id));
+    for (const command of commands) {
+      expect(command.group).toBe('AI Assist');
+      expect(command.requiredAction).toBe(EMERGENCY_ACTIONS.useCopilot);
+      expect(command.requiredRoute).toBeTruthy();
+    }
+  });
+
+  it('is hidden for roles whose action matrix denies copilot or the target route', () => {
+    const noCopilotRole = {
+      ...allowAllRole,
+      presentAction: () => ({
+        state: 'hidden' as const,
+        visible: false,
+        enabled: false,
+        readOnly: true,
+        permission: null,
+      }),
+    };
+    for (const command of buildAiCommands()) {
+      expect(isCommandVisibleForEmergencyRole(command, noCopilotRole)).toBe(false);
+    }
+
+    const noRouteRole = { ...allowAllRole, canAccessRoute: () => false };
+    const routeDenied = createAiAssistCommands(
+      vi.fn() as unknown as Parameters<typeof createAiAssistCommands>[0],
+      noRouteRole,
+    );
+    // 'any'-channel commands have no reachable surface, so they never build;
+    // the channel-fixed ones survive building but fail route visibility.
+    expect(routeDenied.map((c) => c.id)).toEqual(
+      AI_PALETTE_COMMANDS.filter((c) => c.channel !== 'any').map((c) => c.id),
+    );
+    for (const command of routeDenied) {
+      expect(isCommandVisibleForEmergencyRole(command, noRouteRole)).toBe(false);
+    }
+  });
+
+  it('is searchable through the normal ranking pipeline', () => {
+    const ranked = matchAndRankCommands(buildAiCommands(), 'handoff');
+    expect(ranked.length).toBeGreaterThan(0);
+    expect(ranked[0].id).toMatch(/handoff|prepare/);
+    expect(matchAndRankCommands(buildAiCommands(), 'ai')[0].group).toBe('AI Assist');
+  });
+
+  it('executing an entry dispatches ONLY the typed command id — never palette text', () => {
+    const navigate = vi.fn();
+    const commands = buildAiCommands(navigate);
+    const target = commands.find((c) => c.id === 'ai-reception-handoff-draft');
+    const seen: unknown[] = [];
+    const listener = (event: Event) => seen.push((event as CustomEvent).detail);
+    document.addEventListener(AI_COMMAND_EVENT, listener);
+    try {
+      target?.action();
+    } finally {
+      document.removeEventListener(AI_COMMAND_EVENT, listener);
+    }
+    expect(seen).toEqual([{ commandId: 'ai-reception-handoff-draft' }]);
   });
 });
