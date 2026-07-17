@@ -5,6 +5,7 @@ import { JwtModule } from '@nestjs/jwt';
 import type { StringValue } from 'ms';
 import { AuditModule } from '../audit/audit.module';
 import { AuthModule } from '../auth/auth.module';
+import { CigModule } from '../cig/cig.module';
 import { EncryptionModule } from '../encryption/encryption.module';
 import { ChatModule } from '../chat/chat.module';
 import { PlatformAssetsModule } from '../platform-assets/platform-assets.module';
@@ -78,6 +79,7 @@ import { EmergencyOperatingSurfacesService } from './emergency-os.operating-surf
     AuthModule,
     AuditModule,
     EncryptionModule,
+    CigModule,
     forwardRef(() => ChatModule),
     PlatformAssetsModule,
     CollaborationHubModule,

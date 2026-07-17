@@ -10,6 +10,7 @@ import {
   EXTERNAL_DATA_REVIEW_DISCLAIMER,
   HUMAN_REVIEW_DISCLAIMER,
 } from '../../../../lib/ai/safetyPolicy';
+import { CigProjectionFacade } from '../cig/cig-projection.facade';
 import { EmergencyRealtimeService } from './emergency-realtime.service';
 import { CollaborationHubService } from '../collaboration-hub/collaboration-hub.service';
 import { CollaborationMessageSourceType } from '../collaboration-hub/entities/collaboration-message.entity';
@@ -697,10 +698,61 @@ export class EmergencyPatientService {
     @Optional()
     @InjectRepository(Alert)
     private readonly alertRepository?: Repository<Alert>,
+    /** PR-5b: Mode B CIG shadow projection after board mutations */
+    @Optional() private readonly cigProjection?: CigProjectionFacade,
   ) {
     for (const alert of this.alerts) {
       this.persistAlertToDatabase(alert);
     }
+  }
+
+  /**
+   * Best-effort Mode B CIG project of the full in-memory board.
+   * Never throws; never blocks the synchronous mutator response.
+   * Multi-user durable twin is NOT claimed (session durability only).
+   */
+  private projectCigBoard(sourceEventName: string, eventId?: string): void {
+    if (!this.cigProjection) return;
+    const tenantId =
+      process.env.CIG_DEFAULT_TENANT_ID?.trim() || 'emergency-os-default';
+    const staffLoad = new Map<string, number>();
+    for (const patient of this.patients) {
+      if (!patient.assignedStaffId) continue;
+      if (patient.state === 'Discharge') continue;
+      staffLoad.set(
+        patient.assignedStaffId,
+        (staffLoad.get(patient.assignedStaffId) || 0) + 1,
+      );
+    }
+    void this.cigProjection
+      .afterBoardMutation({
+        tenantId,
+        mode: 'B',
+        sourceEventName,
+        eventId,
+        producer: 'EmergencyPatientService',
+        board: {
+          patients: this.patients,
+          rooms: this.rooms,
+          staff: this.staff.map((member) => ({
+            ...member,
+            activePatients: staffLoad.get(member.id) ?? 0,
+          })),
+          alerts: this.alerts,
+        },
+      })
+      .then((result) => {
+        if (!result.ok) {
+          this.logger.warn(
+            `CIG Mode B projection failed after ${sourceEventName}: ${result.error}`,
+          );
+        }
+      })
+      .catch((error) => {
+        this.logger.warn(
+          `CIG Mode B projection threw after ${sourceEventName}: ${error}`,
+        );
+      });
   }
 
   /**
@@ -827,6 +879,7 @@ export class EmergencyPatientService {
     const updated = clone(this.patients[index]);
     this.persistPatientToDatabase(updated);
     this.publishPatientBoardRealtime('patient_updated', updated, updated);
+    this.projectCigBoard('patient.updated', `patient-updated-${updated.id}`);
     return updated;
   }
 
@@ -895,6 +948,7 @@ export class EmergencyPatientService {
     const created = clone(patient);
     this.persistPatientToDatabase(created);
     this.publishPatientBoardRealtime('patient_created', created, created);
+    this.projectCigBoard('patient.created', `patient-created-${created.id}`);
     return created;
   }
 
@@ -970,6 +1024,7 @@ export class EmergencyPatientService {
       },
       updated,
     );
+    this.projectCigBoard('patient.state.changed', `patient-state-${updated.id}-${to}`);
     return updated;
   }
 
@@ -1016,6 +1071,7 @@ export class EmergencyPatientService {
       { patientId, staffId, patient: updated },
       updated,
     );
+    this.projectCigBoard('patient.assigned', `patient-assigned-${updated.id}-${staffId}`);
     return updated;
   }
 
