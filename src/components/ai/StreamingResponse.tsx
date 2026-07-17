@@ -1,20 +1,21 @@
 /**
- * Interactive Intelligence IX10 — explicit stream-phase rendering.
+ * Interactive Intelligence — explicit stream-phase rendering.
  *
  * Never an indefinite spinner: while a request is active the current
- * `AIStreamPhase` is named on screen and announced once per transition via a
+ * `AiStreamState` is named on screen and announced once per transition via a
  * polite live region. Streamed text itself is NOT a live region — screen
  * readers hear phase changes, never token-by-token output.
  */
 import {
-  STREAM_PHASE_LABELS,
-  isTerminalStreamPhase,
-  type AIStreamPhase,
-} from '../../contracts/aiInteraction';
+  AI_STREAM_STATES,
+  isTerminalStreamState,
+  streamStateLabel,
+  type AiStreamState,
+} from '../../contracts/interactiveAi';
 import './StreamingResponse.css';
 
 export type StreamingResponseProps = {
-  phase: AIStreamPhase;
+  phase: AiStreamState;
   /** Streamed text accumulated so far (rendered, not announced). */
   text?: string;
   /** Shown while the request is active; omit to hide the cancel control. */
@@ -24,7 +25,7 @@ export type StreamingResponseProps = {
   compact?: boolean;
 };
 
-const TERMINAL_TONE: Record<string, 'good' | 'warn' | 'critical'> = {
+const TERMINAL_TONE: Partial<Record<AiStreamState, 'good' | 'warn' | 'critical'>> = {
   completed: 'good',
   cancelled: 'warn',
   timed_out: 'warn',
@@ -40,9 +41,9 @@ export function StreamingResponse({
   errorMessage,
   compact = false,
 }: StreamingResponseProps) {
-  const terminal = isTerminalStreamPhase(phase);
-  const tone = terminal ? TERMINAL_TONE[phase] : 'active';
-  const label = STREAM_PHASE_LABELS[phase];
+  const terminal = isTerminalStreamState(phase);
+  const tone = terminal ? TERMINAL_TONE[phase] || 'warn' : 'active';
+  const label = streamStateLabel(phase);
 
   return (
     <div
@@ -94,5 +95,8 @@ export function StreamingResponse({
     </div>
   );
 }
+
+/** Exported for tests — every contract phase has a human label. */
+export const ALL_STREAM_PHASES_FOR_TEST = AI_STREAM_STATES;
 
 export default StreamingResponse;

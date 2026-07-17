@@ -1,15 +1,15 @@
 /**
- * Interactive Intelligence IX11 — render an AIActionProposal for human
- * decision. The user previews the exact operation (tool + validated
- * arguments), sees risk, reversibility, expiry, and provenance, and can
- * approve or reject. Terminal and expired proposals disable actions instead
- * of hiding what happened; the audit trail is always inspectable.
+ * Interactive Intelligence — render an AIActionProposal for human decision.
+ *
+ * The user previews the exact operation (tool + validated arguments), sees
+ * risk, reversibility, expiry, and provenance, and can approve or reject.
+ * Terminal and expired proposals disable actions instead of hiding what
+ * happened.
  */
 import {
-  isProposalActionable,
-  isProposalExpired,
+  isTerminalProposalState,
   type AIActionProposal,
-} from '../../contracts/aiInteraction';
+} from '../../contracts/interactiveAi';
 import './ActionProposalCard.css';
 
 export type ActionProposalCardProps = {
@@ -42,6 +42,24 @@ function stateLabel(state: AIActionProposal['state']): string {
   return state.replace(/_/g, ' ');
 }
 
+export function isProposalExpired(
+  proposal: AIActionProposal,
+  now: () => Date = () => new Date(),
+): boolean {
+  const expires = Date.parse(proposal.expiresAt);
+  if (!Number.isFinite(expires)) return false;
+  return expires < now().getTime() || proposal.state === 'expired';
+}
+
+export function isProposalActionable(
+  proposal: AIActionProposal,
+  now: () => Date = () => new Date(),
+): boolean {
+  if (isTerminalProposalState(proposal.state)) return false;
+  if (isProposalExpired(proposal, now)) return false;
+  return proposal.state === 'proposed' || proposal.state === 'reviewing';
+}
+
 export function ActionProposalCard({
   proposal,
   patientName,
@@ -53,7 +71,8 @@ export function ActionProposalCard({
 }: ActionProposalCardProps) {
   const expired = isProposalExpired(proposal, now);
   const actionable = isProposalActionable(proposal, now) && !busy;
-  const tone = expired && STATE_TONE[proposal.state] === 'active' ? 'warn' : STATE_TONE[proposal.state];
+  const tone =
+    expired && STATE_TONE[proposal.state] === 'active' ? 'warn' : STATE_TONE[proposal.state];
 
   return (
     <article
@@ -78,7 +97,10 @@ export function ActionProposalCard({
           {expired && proposal.state !== 'expired' ? 'expired' : stateLabel(proposal.state)}
         </span>
         {sessionOnly ? (
-          <span className="cd-proposal__pill cd-proposal__pill--session" data-testid="proposal-session-only">
+          <span
+            className="cd-proposal__pill cd-proposal__pill--session"
+            data-testid="proposal-session-only"
+          >
             session only — not persisted
           </span>
         ) : null}
@@ -89,38 +111,48 @@ export function ActionProposalCard({
         {patientName ? <span className="cd-proposal__patient"> · {patientName}</span> : null}
       </p>
 
+      {proposal.previewSummary ? (
+        <p className="cd-proposal__preview" data-testid="proposal-preview">
+          {proposal.previewSummary}
+        </p>
+      ) : null}
+
       <details className="cd-proposal__details">
         <summary>Exact operation</summary>
         <pre className="cd-proposal__args" data-testid="proposal-arguments">
-          {JSON.stringify({ tool: proposal.toolName, arguments: proposal.validatedArguments }, null, 2)}
+          {JSON.stringify(
+            { tool: proposal.toolName, arguments: proposal.validatedArguments },
+            null,
+            2,
+          )}
         </pre>
       </details>
 
       <p className="cd-proposal__rollback" data-testid="proposal-rollback">
-        {proposal.rollback.supported
-          ? `Reversible: ${proposal.rollback.note || 'can be rolled back after execution.'}`
-          : `Not automatically reversible${proposal.rollback.note ? ` — ${proposal.rollback.note}` : '.'}`}
+        {proposal.rollbackCapable
+          ? `Reversible${proposal.reversibleUntil ? ` until ${new Date(proposal.reversibleUntil).toLocaleTimeString()}` : ': can be rolled back after execution.'}`
+          : 'Not automatically reversible.'}
       </p>
 
-      {proposal.transitions.length > 0 ? (
+      {proposal.dataWillChange?.length ? (
         <details className="cd-proposal__details">
-          <summary>History ({proposal.transitions.length})</summary>
-          <ol className="cd-proposal__history" data-testid="proposal-history">
-            {proposal.transitions.map((transition, index) => (
-              <li key={`${transition.at}-${index}`}>
-                <span className="cd-proposal__history-move">
-                  {stateLabel(transition.from)} → {stateLabel(transition.to)}
-                </span>{' '}
-                by {transition.actor}
-                {transition.note ? ` — ${transition.note}` : ''}
-              </li>
+          <summary>Data that will change ({proposal.dataWillChange.length})</summary>
+          <ul className="cd-proposal__history" data-testid="proposal-data-change">
+            {proposal.dataWillChange.map((item) => (
+              <li key={item}>{item}</li>
             ))}
-          </ol>
+          </ul>
         </details>
       ) : null}
 
+      {(proposal.rejectionReason || proposal.errorCode) && (
+        <p className="cd-proposal__detail" data-testid="proposal-error">
+          {proposal.rejectionReason || proposal.errorCode}
+        </p>
+      )}
+
       <footer className="cd-proposal__meta">
-        <span>Model: {proposal.modelVersion}</span>
+        <span>Model: {proposal.model}</span>
         <span>Prompt: {proposal.promptVersion}</span>
         <span data-testid="proposal-expiry">
           {expired
@@ -139,7 +171,10 @@ export function ActionProposalCard({
           >
             Approve
             {proposal.requiredPermission ? (
-              <span className="cd-proposal__perm"> (requires {proposal.requiredPermission})</span>
+              <span className="cd-proposal__perm">
+                {' '}
+                (requires {proposal.requiredPermission})
+              </span>
             ) : null}
           </button>
           <button

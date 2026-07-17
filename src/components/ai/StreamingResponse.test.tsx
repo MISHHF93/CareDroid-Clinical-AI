@@ -1,10 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import {
-  ACTIVE_STREAM_PHASES,
-  STREAM_PHASE_LABELS,
-  TERMINAL_STREAM_PHASES,
-} from '../../contracts/aiInteraction';
+  AI_STREAM_STATES,
+  streamStateLabel,
+} from '../../contracts/interactiveAi';
 import { StreamingResponse } from './StreamingResponse';
 
 describe('StreamingResponse', () => {
@@ -17,9 +16,9 @@ describe('StreamingResponse', () => {
   });
 
   it('renders a label for every phase in the contract', () => {
-    for (const phase of [...ACTIVE_STREAM_PHASES, ...TERMINAL_STREAM_PHASES]) {
+    for (const phase of AI_STREAM_STATES) {
       const { unmount } = render(<StreamingResponse phase={phase} />);
-      expect(screen.getByTestId('stream-phase')).toHaveTextContent(STREAM_PHASE_LABELS[phase]);
+      expect(screen.getByTestId('stream-phase')).toHaveTextContent(streamStateLabel(phase));
       unmount();
     }
   });
@@ -51,7 +50,7 @@ describe('StreamingResponse', () => {
         errorMessage="Blocked by safety policy: autonomous triage is not permitted."
       />,
     );
-    expect(screen.getByTestId('stream-phase')).toHaveTextContent('Blocked by safety policy');
+    expect(screen.getByTestId('stream-phase')).toHaveTextContent('Blocked by safety');
     expect(screen.getByTestId('stream-detail')).toHaveTextContent(/autonomous triage/);
   });
 });

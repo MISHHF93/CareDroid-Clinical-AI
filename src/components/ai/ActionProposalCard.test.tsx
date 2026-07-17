@@ -1,23 +1,34 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { createActionProposal, transitionProposal } from '../../contracts/aiInteraction';
+import type { AIActionProposal } from '../../contracts/interactiveAi';
 import { ActionProposalCard } from './ActionProposalCard';
 
 const fixedNow = () => new Date('2026-07-16T12:00:00.000Z');
 
-function proposal(overrides: Partial<Parameters<typeof createActionProposal>[0]> = {}) {
-  return createActionProposal({
+function proposal(overrides: Partial<AIActionProposal> = {}): AIActionProposal {
+  return {
     proposalId: 'prop-ui-1',
     originatingRequestId: 'req-ui-1',
+    correlationId: 'corr-ui-1',
     toolName: 'flag_patient',
     validatedArguments: { patientId: 'P-1', flag: 'reassess' },
     expectedEffect: 'Flags patient P-1 for reassessment.',
+    previewSummary: 'Flag patient for reassessment',
     riskLevel: 'moderate',
-    modelVersion: 'claude-sonnet-4-6',
+    requiredPermission: 'WRITE_PHI',
+    requiresApproval: true,
+    evidence: [],
+    citations: [],
+    model: 'claude-sonnet-4-6',
     promptVersion: 'ed-copilot@1.0.0',
-    now: fixedNow,
+    expiresAt: '2026-07-16T12:20:00.000Z',
+    rollbackCapable: false,
+    state: 'proposed',
+    dataWillChange: ['patient.flags'],
+    createdAt: '2026-07-16T12:00:00.000Z',
+    updatedAt: '2026-07-16T12:00:00.000Z',
     ...overrides,
-  });
+  };
 }
 
 describe('ActionProposalCard', () => {
@@ -72,20 +83,21 @@ describe('ActionProposalCard', () => {
     expect(screen.getByTestId('proposal-closed')).toHaveTextContent(/expired before a decision/);
   });
 
-  it('terminal proposals show the outcome and the full audit trail', () => {
-    let done = proposal();
-    done = transitionProposal(done, 'approved', 'charge-nurse-7', undefined, fixedNow);
-    done = transitionProposal(done, 'executing', 'system', undefined, fixedNow);
-    done = transitionProposal(done, 'failed', 'system', 'Patient P-1 was not found.', fixedNow);
-
-    render(<ActionProposalCard proposal={done} now={fixedNow} />);
+  it('terminal proposals show the outcome without actions', () => {
+    render(
+      <ActionProposalCard
+        proposal={proposal({
+          state: 'failed',
+          errorCode: 'Patient P-1 was not found.',
+        })}
+        now={fixedNow}
+      />,
+    );
 
     expect(screen.getByTestId('proposal-state')).toHaveTextContent('failed');
     expect(screen.queryByTestId('proposal-approve')).toBeNull();
     expect(screen.getByTestId('proposal-closed')).toHaveTextContent(/proposal is failed/);
-    const history = screen.getByTestId('proposal-history');
-    expect(history).toHaveTextContent('proposed → approved by charge-nurse-7');
-    expect(history).toHaveTextContent('executing → failed by system — Patient P-1 was not found.');
+    expect(screen.getByTestId('proposal-error')).toHaveTextContent(/not found/);
   });
 
   it('flags session-only proposals that have no authoritative record', () => {
