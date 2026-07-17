@@ -19,10 +19,11 @@ import {
   AiRoutingEngineService,
 } from './foundation';
 import { AiActionProposalService } from './ai-action-proposal.service';
+import { AIActionProposalRecord } from './entities/ai-action-proposal-record.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([AIQuery, Subscription, User]),
+    TypeOrmModule.forFeature([AIQuery, AIActionProposalRecord, Subscription, User]),
     AuditModule,
     MetricsModule,
     OrganizationsModule,

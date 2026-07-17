@@ -159,7 +159,7 @@
 | IX13 | Personal interaction inbox + collaboration | **PARTIAL** | P2 | Cy74: `InteractionInbox` + `interactionInbox.ts` in workspace | Assign/comment collaboration still open | 2026-07-16 Cy74 |
 | IX14 | Command-palette typed AI commands | **OPEN** | P2 | — | Searchable permissioned commands | — |
 | IX15 | Simulation mode scoring on scenario library | **OPEN** | P2 | Scenario library exists | Training score without prod writes | — |
-| IX16 | Persist proposals server-side | **PARTIAL** | P2 | Cy74: Nest `AiActionProposalService` + `/api/ai/proposals/*` in-memory. Cy76 note: a full TypeORM implementation (entity + migration + hash-chain audit + tenant-scoped 404s + dynamic `requiredPermission` at approve + supertest e2e incl. cross-tenant denial) existed pre-consolidation and was dropped in the history rewrite — recover that design when closing this row | TypeORM migration + audit + tenant-scoped HTTP proof | 2026-07-16 Cy74 |
+| IX16 | Persist proposals server-side | **VERIFIED** | P2 | Cy77: write-through TypeORM journal (`AIActionProposalRecord`, table `ai_action_proposals`, migration `1772701600000`, chain 30/30 from empty) behind the unchanged synchronous contract; module-init rehydration proven (restart survival test); journal failure never breaks the workflow; corrupt rows skipped. 5 persistence tests + existing spec untouched-green | `npx jest src/modules/ai/ai-action-proposal.persistence.spec.ts` (5/5) · Remainder tracked here: hash-chain audit per transition (pre-consolidation design) + multi-instance read model | 2026-07-17 Cy77 |
 | IX17 | Triage interactive assist mount | **VERIFIED** | P1 | `TriageQueueFeature` + `TriageInteractiveAssistPanel` | Channel triage seed cards | 2026-07-16 Cy74 |
 
 ## Cycle 71–73 validation commands
