@@ -93,6 +93,20 @@ export {
   ROOM12_GENERATED_AT,
 } from './fixtures/room12Delay.fixture';
 
+export {
+  adaptFeEmergencyBoardToNeutralDto,
+  type FeEmergencyBoardSource,
+  type FePatientLike,
+  type FeStaffLike,
+  type FeRoomLike,
+  type FeQueueLike,
+  type FeAlertLike,
+  type FeEmsLike,
+  type FeRecommendationLike,
+  type FeServiceSignalLike,
+  type FeDepartmentLike,
+} from './adapters/feEmergencyStoreAdapter';
+
 /** Frozen entity type list for runtime validation. */
 export const CIG_ENTITY_TYPES = Object.freeze([
   'patient',

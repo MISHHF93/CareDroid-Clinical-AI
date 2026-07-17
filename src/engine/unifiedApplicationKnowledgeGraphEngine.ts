@@ -1,6 +1,7 @@
 import { UNIFIED_OPERATIONAL_INTELLIGENCE_TRIGGER_EVENTS } from '../config/unifiedOperationalIntelligenceModel';
 import { startWorkflowTrace } from '../services/observabilityTrace';
 import { buildUnifiedApplicationKnowledgeGraph } from '../services/unifiedApplicationKnowledgeGraphService';
+import { buildCigSnapshotFromEmergencyBoard } from '../services/cigFeProjection';
 import { getUnifiedApplicationKnowledgeGraphStoreState } from '../store/unifiedApplicationKnowledgeGraphStore';
 import { useUnifiedOperationalIntelligenceStore } from '../store/unifiedOperationalIntelligenceStore';
 import { useEmergencyStore } from '../store/emergencyStore';
@@ -53,6 +54,30 @@ export function refreshUnifiedApplicationKnowledgeGraph(eventType?: string): voi
     operationalInsights: operationalSnapshot?.insights,
   });
 
+  // Mode B CIG shadow projection (session durability — no multi-user twin claim).
+  // Not yet published to a dual-read store (PR-8); metrics only until then.
+  const cigSnapshot = buildCigSnapshotFromEmergencyBoard({
+    generatedAt: snapshot.generatedAt,
+    snapshotVersion: 1,
+    patients: emergencyState.patients,
+    staff: emergencyState.staff,
+    alerts: emergencyState.alerts,
+    rooms: emergencyState.rooms,
+    queues: emergencyState.queues,
+    emsArrivals: emergencyState.emsArrivals,
+    recommendations: (operationalSnapshot?.insights || [])
+      .filter((insight) => insight.type === 'intervention' || insight.type === 'recommendation')
+      .map((insight) => ({
+        id: insight.id,
+        action: insight.title,
+        rationale: insight.summary,
+        patientId: insight.patientId,
+        humanReviewRequired: insight.humanReviewRequired ?? true,
+        confidence: insight.confidence,
+        updatedAt: insight.updatedAt,
+      })),
+  });
+
   const store = getUnifiedApplicationKnowledgeGraphStoreState();
   if (eventType) store.setLastTriggerEvent(eventType);
   store.setSnapshot(snapshot);
@@ -60,6 +85,9 @@ export function refreshUnifiedApplicationKnowledgeGraph(eventType?: string): voi
   trace.end('success', {
     nodeCount: snapshot.metrics.nodeCount,
     edgeCount: snapshot.metrics.edgeCount,
+    cigNodeCount: cigSnapshot.meta.nodeCount,
+    cigEdgeCount: cigSnapshot.meta.edgeCount,
+    cigDurability: cigSnapshot.durability,
     triggerEvent: eventType,
   });
 }
