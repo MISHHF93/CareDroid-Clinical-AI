@@ -236,10 +236,15 @@ export default defineConfig(({ mode }) => {
             // no manual assignment it stays in the lazily-loaded tools graph.
             if (normalizedId.includes('ClinicalToolCatalog')) return 'clinical-catalog';
             if (normalizedId.includes('pages/Dashboard')) return 'dashboard';
-            if (
-              normalizedId.includes('AnalyticsDashboard') ||
-              normalizedId.includes('CostAnalyticsDashboard')
-            ) return 'analytics';
+            // Deliberately NO manual chunk for AnalyticsDashboard/CostAnalyticsDashboard
+            // (same reasoning as Calculators.tsx above): both are reached exclusively
+            // through lazyRoute() in platformConsoleRouteTree.tsx. Forcing them into a
+            // named 'analytics' chunk fused ~200 shared startup modules into it the
+            // same way, making the entry statically modulepreload it -- and pulled its
+            // own recharts import along for the ride, eagerly preloading vendor-charts
+            // (252KB) on every route. Confirmed via a real build: removing this rule
+            // dropped both 'analytics' and 'vendor-charts' out of the entry's
+            // modulepreload list entirely (measured before/after, not assumed).
             if (normalizedId.includes('components/charts/')) return 'charts';
 
             return undefined;
