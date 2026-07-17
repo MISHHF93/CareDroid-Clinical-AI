@@ -127,6 +127,48 @@ test('reception: an assist run names its stream phases and reaches a terminal ou
   }
 });
 
+test('reception: realtime status never claims live without a connection, and the workspace survives an offline/online cycle', async ({
+  page,
+  context,
+}) => {
+  const workspace = await openWorkspace(page, RECEPTION_PATH);
+  const status = workspace.getByTestId('interactive-realtime-status');
+
+  // Hermetic mode has no backend: the status must not present as live.
+  await expect(status).toHaveAttribute('data-live', 'false');
+  await expect(status).not.toHaveText('');
+
+  // Hard network loss on top of that — still truthful, still operable.
+  await context.setOffline(true);
+  await expect(status).toHaveAttribute('data-live', 'false');
+
+  const composer = workspace.getByPlaceholder('Ask for help completing this workflow…');
+  await composer.fill('Summarize current registration status');
+  await workspace.locator('button.cd-iaw__send').click();
+
+  const progress = workspace.getByTestId('interactive-stream-progress');
+  await expect(progress).toBeVisible({ timeout: 10_000 });
+  await expect
+    .poll(
+      async () => {
+        if (await workspace.getByTestId('interactive-response').count()) return 'response';
+        if (await workspace.getByTestId('action-proposal-card').count()) return 'proposal';
+        const text = ((await progress.innerText().catch(() => '')) || '').toLowerCase();
+        if (/completed|failed|blocked|insufficient|cancelled|timed/.test(text)) {
+          return 'terminal';
+        }
+        return 'pending';
+      },
+      { timeout: 30_000 },
+    )
+    .not.toBe('pending');
+
+  // Back online: no crash, status still present and truthful.
+  await context.setOffline(false);
+  await expect(status).toBeVisible();
+  await expect(status).not.toHaveText('');
+});
+
 test('ems: the same workspace architecture mounts on the EMS pipeline', async ({ page }) => {
   const workspace = await openWorkspace(page, EMS_PATH);
   await expect(workspace.getByTestId('interactive-realtime-status')).toBeVisible();

@@ -41,6 +41,9 @@ const A11Y_PAGES = [
   { id: 'clinical-alerts', label: 'Clinical Alerts', path: '/clinical/alerts' },
   { id: 'hospital-map', label: 'Hospital Map', path: '/hospital-map' },
   { id: 'devices', label: 'Device Fleet Management', path: '/devices' },
+  // Interactive-Intelligence workspaces (Cy79 coverage growth).
+  { id: 'reception-workspace', label: 'Reception Workspace (interactive AI)', path: '/emergency/reception' },
+  { id: 'ems-pipeline', label: 'EMS Pipeline (interactive AI)', path: '/emergency/ems' },
 ];
 
 /** WCAG 2.1 A/AA is the baseline every page must clear; best-practice rules are reported, not enforced yet. */
