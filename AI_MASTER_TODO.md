@@ -155,7 +155,7 @@
 | IX9 | Reception workspace mount | **VERIFIED** | P0 | `ReceptionWorkspace.tsx` sidebar | Channel reception + seed cards | 2026-07-16 |
 | IX10 | EMS handoff panel component | **VERIFIED** | P1 | Mounted on `EMSPipeline.tsx` (Cy74) | Live on /emergency/ems | 2026-07-16 Cy74 |
 | IX11 | Interactive assist orchestrator (unified node) | **VERIFIED** | P0 | `interactiveAiOrchestrator.ts` | Safety block + progress + proposals | 2026-07-16 |
-| IX12 | Playwright streaming/reconnect/a11y suite | **OPEN** | P1 | — | Browser proof | — |
+| IX12 | Playwright streaming/reconnect/a11y suite | **PARTIAL** | P1 | Cy78: `e2e/interactive-ai.spec.mjs` 5/5 via system-Edge — Reception+EMS mounts, named stream phases to terminal outcome, keyboard card ops, live-region semantics, scoped axe zero serious/critical. First run caught + fixed a real no-op Acknowledge (fake interactivity). `npm run test:e2e:interactive-ai` | Reconnect simulation still open | 2026-07-17 Cy78 |
 | IX13 | Personal interaction inbox + collaboration | **PARTIAL** | P2 | Cy74: `InteractionInbox` + `interactionInbox.ts` in workspace | Assign/comment collaboration still open | 2026-07-16 Cy74 |
 | IX14 | Command-palette typed AI commands | **OPEN** | P2 | — | Searchable permissioned commands | — |
 | IX15 | Simulation mode scoring on scenario library | **OPEN** | P2 | Scenario library exists | Training score without prod writes | — |

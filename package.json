@@ -73,6 +73,7 @@
     "interaction:scan": "node scripts/scan-interaction-inventory.mjs",
     "interaction:test": "node node_modules/vitest/vitest.mjs run src/data/interactionInventory.test.ts",
     "test:e2e:interaction": "playwright test e2e/interaction-execution.spec.mjs --config=playwright.interaction.config.ts",
+    "test:e2e:interactive-ai": "playwright test --config=playwright.interactive.ai.config.ts",
     "orphan-detection:write-docs": "node scripts/write-orphan-detection-report.mjs",
     "duplicate-system-audit:write-docs": "node scripts/write-duplicate-system-audit.mjs",
     "product-packaging-audit:write-docs": "node scripts/write-product-packaging-audit.mjs",

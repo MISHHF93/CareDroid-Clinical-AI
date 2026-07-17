@@ -111,7 +111,6 @@ export function InteractiveAIWorkspace({
       }),
     );
     // seedTriggers content is summarized by seedKey to avoid identity thrash
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [channel, role, pageId, patientId, seedKey, refreshCards]);
 
   useEffect(() => {
@@ -358,15 +357,21 @@ export function InteractiveAIWorkspace({
                   {action.requiresApproval ? ' (review)' : ''}
                 </button>
               ))}
-              <button
-                type="button"
-                onClick={() => {
-                  acknowledgeWorkflowCard(card.cardId);
-                  refreshCards();
-                }}
-              >
-                Acknowledge
-              </button>
+              {card.acknowledged ? (
+                <span className="cd-iaw-card__ack" data-testid="workflow-card-acknowledged">
+                  Acknowledged
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    acknowledgeWorkflowCard(card.cardId);
+                    refreshCards();
+                  }}
+                >
+                  Acknowledge
+                </button>
+              )}
               {card.dismissible ? (
                 <button
                   type="button"

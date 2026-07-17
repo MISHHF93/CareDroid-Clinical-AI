@@ -201,7 +201,10 @@ export function rejectProposal(proposalId: string, reason: string): AIActionProp
   return transitionActionProposal(proposalId, 'rejected', { rejectionReason: reason });
 }
 
-export function executeProposal(
+// Async so guard failures REJECT instead of throwing synchronously — a
+// promise-returning API must fail one way, not two (Cy78; fixes the
+// pre-existing `.rejects` test failure).
+export async function executeProposal(
   proposalId: string,
   executor: (proposal: AIActionProposal) => Promise<Record<string, unknown>> | Record<string, unknown>,
 ): Promise<AIActionProposal> {
