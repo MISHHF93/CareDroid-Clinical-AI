@@ -87,6 +87,48 @@ test('reception: seeded workflow card renders and Acknowledge works from the key
     .not.toBe('unchanged');
 });
 
+test('ems: inbox items can be assigned and commented on (IX13)', async ({ page }) => {
+  // The Reception-seeded card's ownerRole ('registration_clerk') doesn't
+  // match this QA fixture's resolved role, so the (correctly) role-scoped
+  // inbox shows 0 items there. EMS seeds an 'ems_prearrival' card whose
+  // ownerFor() is 'charge_nurse' — the same value the fixture resolves to —
+  // so this proves the real collaboration wiring against an item the
+  // pre-existing personal-inbox role filter actually surfaces.
+  const workspace = await openWorkspace(page, EMS_PATH);
+
+  const inbox = workspace.getByTestId('interaction-inbox');
+  await expect(inbox).toBeVisible();
+
+  const assignment = inbox.getByTestId('inbox-item-assignment').first();
+  await expect(assignment).toHaveText('Unassigned');
+
+  const assignToggle = inbox.getByTestId('inbox-item-assign-toggle').first();
+  await assignToggle.click();
+  await expect(assignment).toHaveText(/^Assigned to /);
+  await expect(assignToggle).toHaveText('Unassign');
+
+  const commentsToggle = inbox.getByTestId('inbox-item-comments-toggle').first();
+  await expect(commentsToggle).toHaveText('0 comments');
+  await commentsToggle.click();
+
+  const commentInput = inbox.getByTestId('inbox-item-comment-input').first();
+  await commentInput.fill('Escalating to charge nurse for review');
+  await inbox.getByTestId('inbox-item-comment-submit').first().click();
+
+  await expect(inbox.getByText('Escalating to charge nurse for review')).toBeVisible();
+  await expect(commentInput).toHaveValue('');
+
+  // Collapse and reopen — the thread and the visible count must both persist.
+  await commentsToggle.click();
+  await expect(commentsToggle).toHaveText('1 comment');
+  await commentsToggle.click();
+  await expect(inbox.getByText('Escalating to charge nurse for review')).toBeVisible();
+
+  // Toggling assignment off releases it — never leaves stale ownership displayed.
+  await assignToggle.click();
+  await expect(assignment).toHaveText('Unassigned');
+});
+
 test('reception: an assist run names its stream phases and reaches a terminal outcome — never an anonymous spinner', async ({
   page,
 }) => {

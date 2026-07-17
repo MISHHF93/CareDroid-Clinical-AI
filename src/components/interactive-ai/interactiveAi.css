@@ -386,6 +386,72 @@
   color: var(--medical-ink-subtle, #64748b);
 }
 
+.cd-iaw-inbox__collab {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.2rem;
+  padding: 0 0.1rem;
+}
+
+.cd-iaw-inbox__assignment {
+  font-size: 0.68rem;
+  color: var(--medical-ink-subtle, #64748b);
+  flex: 1 1 auto;
+}
+
+.cd-iaw-inbox__thread {
+  border: 1px solid var(--medical-border, #e2e8f0);
+  border-radius: 8px;
+  background: var(--medical-surface, #f8fafc);
+  padding: 0.45rem 0.55rem;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.cd-iaw-inbox__comment-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.3rem;
+}
+
+.cd-iaw-inbox__comment {
+  display: grid;
+  gap: 0.1rem;
+  font-size: 0.72rem;
+}
+
+.cd-iaw-inbox__comment-author {
+  font-weight: 650;
+  color: var(--medical-ink, #0f172a);
+}
+
+.cd-iaw-inbox__comment-body {
+  color: var(--medical-ink, #0f172a);
+  white-space: pre-wrap;
+}
+
+.cd-iaw-inbox__comment-form {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.cd-iaw-inbox__comment-form textarea {
+  resize: vertical;
+  min-height: 2.4rem;
+  font: inherit;
+  padding: 0.35rem 0.45rem;
+  border: 1px solid var(--medical-border, #e2e8f0);
+  border-radius: 6px;
+}
+
+.cd-iaw-inbox__comment-form button {
+  justify-self: start;
+}
+
 @media (min-width: 1600px) {
   .cd-iaw {
     padding: 1rem 1.15rem;

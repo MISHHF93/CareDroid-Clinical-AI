@@ -6,6 +6,7 @@
 import type { AIActionProposal, WorkflowAiCard } from '../../contracts/interactiveAi';
 import { listActionProposals } from './actionProposalService';
 import { listWorkflowAiCards } from './workflowAiCards';
+import { countInboxComments, getInboxAssignment } from './inboxCollaboration';
 
 export type InboxItemKind = 'proposal' | 'workflow_card' | 'human_review' | 'failed_action' | 'draft';
 
@@ -24,6 +25,9 @@ export type InteractionInboxItem = {
   sourceId: string;
   href?: string;
   resumable: boolean;
+  assignedToUserId?: string;
+  assignedToRole?: string;
+  commentCount: number;
 };
 
 export type InteractionInboxFilter = {
@@ -41,9 +45,22 @@ function proposalUrgency(p: AIActionProposal): InteractionInboxItem['urgency'] {
   return 'info';
 }
 
-function cardToInbox(card: WorkflowAiCard): InteractionInboxItem {
+function withCollaboration(
+  id: string,
+  item: Omit<InteractionInboxItem, 'id' | 'assignedToUserId' | 'assignedToRole' | 'commentCount'>,
+): InteractionInboxItem {
+  const assignment = getInboxAssignment(id);
   return {
-    id: `card:${card.cardId}`,
+    id,
+    ...item,
+    assignedToUserId: assignment?.assignedToUserId,
+    assignedToRole: assignment?.assignedToRole,
+    commentCount: countInboxComments(id),
+  };
+}
+
+function cardToInbox(card: WorkflowAiCard): InteractionInboxItem {
+  return withCollaboration(`card:${card.cardId}`, {
     kind: 'workflow_card',
     title: card.title,
     summary: card.summary,
@@ -57,7 +74,7 @@ function cardToInbox(card: WorkflowAiCard): InteractionInboxItem {
     sourceId: card.cardId,
     href: card.workspaceLink,
     resumable: !card.dismissed,
-  };
+  });
 }
 
 function proposalToInbox(p: AIActionProposal): InteractionInboxItem {
@@ -69,8 +86,7 @@ function proposalToInbox(p: AIActionProposal): InteractionInboxItem {
         : p.state === 'completed'
           ? 'draft'
           : 'proposal';
-  return {
-    id: `proposal:${p.proposalId}`,
+  return withCollaboration(`proposal:${p.proposalId}`, {
     kind,
     title: `Action: ${p.toolName}`,
     summary: p.previewSummary || p.expectedEffect,
@@ -83,7 +99,7 @@ function proposalToInbox(p: AIActionProposal): InteractionInboxItem {
     createdAt: p.createdAt,
     sourceId: p.proposalId,
     resumable: p.state === 'proposed' || p.state === 'reviewing' || p.state === 'approved',
-  };
+  });
 }
 
 const TERMINAL_PROPOSAL = new Set([

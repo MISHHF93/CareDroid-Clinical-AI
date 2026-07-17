@@ -104,6 +104,10 @@ export function InteractiveAIWorkspace({
       });
     }
     refreshCards();
+    // The personal inbox is a separate component with its own memoized read
+    // of the card/proposal stores — without this it never learns that
+    // seeding just added cards, and silently under-reports open items.
+    if (seedTriggers.length) setInboxTick((n) => n + 1);
     setSuggestions(
       getSuggestedPrompts({
         channel,
