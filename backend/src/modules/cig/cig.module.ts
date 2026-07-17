@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { CigEventBus } from './cig-event.bus';
+import { CigProjectionFacade } from './cig-projection.facade';
 import {
   CigEdgeEntity,
   CigEventEntity,
@@ -9,8 +11,8 @@ import {
 } from './entities';
 
 /**
- * Clinical Intelligence Graph durable storage (PR-4).
- * Projection facade / APIs land in later PRs — this module registers schema entities only.
+ * Clinical Intelligence Graph (PR-4 schema + PR-5a projection facade).
+ * Domain mutator wiring lands in PR-5b+.
  */
 @Module({
   imports: [
@@ -22,6 +24,7 @@ import {
       CigSnapshotEntity,
     ]),
   ],
-  exports: [TypeOrmModule],
+  providers: [CigEventBus, CigProjectionFacade],
+  exports: [TypeOrmModule, CigEventBus, CigProjectionFacade],
 })
 export class CigModule {}
