@@ -1,10 +1,4 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  Index,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 
 /**
  * Transactional outbox for Mode A projection (K14).
@@ -13,7 +7,7 @@ import {
 @Entity({ name: 'cig_outbox' })
 @Index('cig_outbox_tenant_created', ['tenantId', 'createdAt'])
 export class CigOutboxEntity {
-  @PrimaryGeneratedColumn({ name: 'id', type: 'bigint' })
+  @PrimaryGeneratedColumn({ name: 'id', type: 'integer' })
   id: string;
 
   @Column({ name: 'tenant_id', type: 'varchar', length: 120 })

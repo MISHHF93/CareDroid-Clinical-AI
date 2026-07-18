@@ -220,8 +220,11 @@ async function bootstrap() {
     registerProductionFrontendAssets(app);
   }
 
-  // API prefix (health and root endpoints will be at /)
-  app.setGlobalPrefix('api', { exclude: ['health', ''] });
+  // API prefix (health, metrics, and root endpoints will be at /). metrics
+  // must stay unprefixed: MetricsController is documented and built as a
+  // standard Prometheus scrape target, and a default `scrape_config` (no
+  // explicit metrics_path override) requests /metrics, not /api/metrics.
+  app.setGlobalPrefix('api', { exclude: ['health', 'metrics', ''] });
   const expressApp = app.getHttpAdapter().getInstance();
   expressApp.set('typeormDataSource', app.get(DataSource));
   registerAllRoutes(expressApp, { mountRoutes: false });
