@@ -2061,6 +2061,7 @@ export default function EmergencySettings() {
                 onChange={(enabled) => updateAlertRule(rule, { enabled })}
               />
               <select
+                aria-label={`${rule} severity`}
                 value={(config as any).severity}
                 onChange={(event) => updateAlertRule(rule, { severity: event.target.value })}
               >

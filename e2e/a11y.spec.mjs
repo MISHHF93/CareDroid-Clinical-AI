@@ -44,6 +44,13 @@ const A11Y_PAGES = [
   // Interactive-Intelligence workspaces (Cy79 coverage growth).
   { id: 'reception-workspace', label: 'Reception Workspace (interactive AI)', path: '/emergency/reception' },
   { id: 'ems-pipeline', label: 'EMS Pipeline (interactive AI)', path: '/emergency/ems' },
+  // Cy95 coverage growth: 5 more archetypes (patient board, chart-heavy
+  // dashboard, settings form, triage queue, interactive scenario list).
+  { id: 'emergency-whiteboard', label: 'Emergency Whiteboard (patient board)', path: '/emergency/whiteboard' },
+  { id: 'emergency-analytics', label: 'Emergency Analytics (charts)', path: '/emergency/analytics' },
+  { id: 'emergency-settings', label: 'Emergency Settings (form)', path: '/emergency/settings' },
+  { id: 'triage-queue', label: 'Triage Queue', path: '/triage' },
+  { id: 'simulation', label: 'Medical Simulation Suite', path: '/simulation' },
 ];
 
 /** WCAG 2.1 A/AA is the baseline every page must clear; best-practice rules are reported, not enforced yet. */
