@@ -1,0 +1,356 @@
+{
+  "config": {
+    "configFile": "C:\\Users\\borah\\CareDroid-Clinical-AI\\playwright.interactive.ai.config.ts",
+    "rootDir": "C:/Users/borah/CareDroid-Clinical-AI/e2e",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": "C:\\Users\\borah\\CareDroid-Clinical-AI\\e2e\\global-setup.mjs",
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 2
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "C:/Users/borah/CareDroid-Clinical-AI/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 2
+        },
+        "id": "chromium-interactive-ai",
+        "name": "chromium-interactive-ai",
+        "testDir": "C:/Users/borah/CareDroid-Clinical-AI/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "interactive-ai.spec.mjs"
+        ],
+        "timeout": 90000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "qa/playwright-interactive-ai-report.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.60.0",
+    "workers": 2,
+    "webServer": {
+      "command": "npx vite --strictPort --port 5194",
+      "url": "http://localhost:5194",
+      "reuseExistingServer": false,
+      "timeout": 180000
+    }
+  },
+  "suites": [
+    {
+      "title": "interactive-ai.spec.mjs",
+      "file": "interactive-ai.spec.mjs",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "reception: workspace mounts with realtime status, context bar, and correct live-region semantics",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-interactive-ai",
+              "projectName": "chromium-interactive-ai",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 13674,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-18T01:22:42.668Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bb5696b46ca1a285c460-c65e6c7f8c9e274fb5cb",
+          "file": "interactive-ai.spec.mjs",
+          "line": 43,
+          "column": 1
+        },
+        {
+          "title": "reception: seeded workflow card renders and Acknowledge works from the keyboard",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-interactive-ai",
+              "projectName": "chromium-interactive-ai",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 13731,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-18T01:22:42.667Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bb5696b46ca1a285c460-48a868d4d4961966e606",
+          "file": "interactive-ai.spec.mjs",
+          "line": 61,
+          "column": 1
+        },
+        {
+          "title": "ems: inbox items can be assigned and commented on (IX13)",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-interactive-ai",
+              "projectName": "chromium-interactive-ai",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5850,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-18T01:22:57.561Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bb5696b46ca1a285c460-0df677d6b7cbfcf6ba90",
+          "file": "interactive-ai.spec.mjs",
+          "line": 90,
+          "column": 1
+        },
+        {
+          "title": "reception: an assist run names its stream phases and reaches a terminal outcome — never an anonymous spinner",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-interactive-ai",
+              "projectName": "chromium-interactive-ai",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 4809,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-18T01:22:57.629Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bb5696b46ca1a285c460-4c3f1cd338b05215e1cb",
+          "file": "interactive-ai.spec.mjs",
+          "line": 132,
+          "column": 1
+        },
+        {
+          "title": "reception: realtime status never claims live without a connection, and the workspace survives an offline/online cycle",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-interactive-ai",
+              "projectName": "chromium-interactive-ai",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 4481,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-18T01:23:02.455Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bb5696b46ca1a285c460-33bb5e1f4f145354665e",
+          "file": "interactive-ai.spec.mjs",
+          "line": 172,
+          "column": 1
+        },
+        {
+          "title": "reception: a typed AI command from the command palette runs in the workspace — id-only handoff, no text execution (IX14)",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-interactive-ai",
+              "projectName": "chromium-interactive-ai",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4541,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-18T01:23:03.426Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bb5696b46ca1a285c460-22cc59324d8393e1d215",
+          "file": "interactive-ai.spec.mjs",
+          "line": 214,
+          "column": 1
+        },
+        {
+          "title": "ems: the same workspace architecture mounts on the EMS pipeline",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-interactive-ai",
+              "projectName": "chromium-interactive-ai",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 4462,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-18T01:23:06.958Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bb5696b46ca1a285c460-dbac72c575ec1cab18dd",
+          "file": "interactive-ai.spec.mjs",
+          "line": 261,
+          "column": 1
+        },
+        {
+          "title": "reception: axe scan of the workspace — zero serious/critical violations",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 90000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium-interactive-ai",
+              "projectName": "chromium-interactive-ai",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4610,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-07-18T01:23:07.990Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bb5696b46ca1a285c460-b4fd238c3c86f026db50",
+          "file": "interactive-ai.spec.mjs",
+          "line": 270,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-07-18T01:22:39.251Z",
+    "duration": 34164.340000000004,
+    "expected": 8,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}
