@@ -13,6 +13,9 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SkipTenantIsolation } from '../tenant-context/tenant-scope.decorator';
+import { AuthorizationGuard } from '../auth/guards/authorization.guard';
+import { RequirePermission } from '../auth/decorators/permissions.decorator';
+import { Permission } from '../auth/enums/permission.enum';
 import { CollaborationHubService } from './collaboration-hub.service';
 import { CreateChannelDto } from './dto/create-channel.dto';
 import { PostMessageDto } from './dto/post-message.dto';
@@ -38,7 +41,7 @@ import { CollaborationExternalProvider } from './entities/collaboration-external
  */
 @ApiTags('collaboration')
 @ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(AuthGuard('jwt'), AuthorizationGuard)
 @SkipTenantIsolation()
 @Controller('collaboration')
 export class CollaborationHubController {
@@ -289,6 +292,7 @@ export class CollaborationHubController {
     );
   }
 
+  @RequirePermission(Permission.READ_PHI)
   @Get('patients/:patientId/thread')
   @ApiOperation({ summary: "Get or create the patient's auto-thread and join it" })
   async getPatientThread(@Req() req: any, @Param('patientId') patientId: string) {
