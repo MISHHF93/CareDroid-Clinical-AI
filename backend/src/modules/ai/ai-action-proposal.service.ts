@@ -14,8 +14,9 @@ import { Injectable, BadRequestException, NotFoundException, Optional } from '@n
 import { OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { randomUUID } from 'crypto';
+import { randomUUID, createHash } from 'crypto';
 import { AIActionProposalRecord } from './entities/ai-action-proposal-record.entity';
+import { AIActionProposalAuditEntry } from './entities/ai-action-proposal-audit-entry.entity';
 
 export type AiRiskLevel = 'low' | 'moderate' | 'high' | 'critical';
 export type AiActionProposalState =
@@ -60,6 +61,52 @@ export interface ServerAiActionProposal {
   errorCode?: string;
 }
 
+export interface AiActionProposalAuditEntryView {
+  proposalId: string;
+  sequenceIndex: number;
+  fromState: AiActionProposalState | null;
+  toState: AiActionProposalState;
+  actorUserId?: string;
+  occurredAt: string;
+  metadata?: Record<string, unknown>;
+  previousHash: string | null;
+  entryHash: string;
+}
+
+export interface AuditChainVerification {
+  valid: boolean;
+  entryCount: number;
+  brokenAtSequenceIndex?: number;
+}
+
+/**
+ * Pure so the exact same computation used to append an entry is used to
+ * verify one — a verifier that recomputes hashes with slightly different
+ * logic than the writer would silently accept tampering.
+ */
+function computeAuditEntryHash(entry: {
+  proposalId: string;
+  sequenceIndex: number;
+  fromState: string | null;
+  toState: string;
+  actorUserId: string | null;
+  occurredAt: string;
+  metadataJson: string | null;
+  previousHash: string | null;
+}): string {
+  const canonical = [
+    entry.proposalId,
+    entry.sequenceIndex,
+    entry.fromState ?? '',
+    entry.toState,
+    entry.actorUserId ?? '',
+    entry.occurredAt,
+    entry.metadataJson ?? '',
+    entry.previousHash ?? '',
+  ].join('|');
+  return createHash('sha256').update(canonical).digest('hex');
+}
+
 const ALLOWED: Record<AiActionProposalState, AiActionProposalState[]> = {
   proposed: ['reviewing', 'approved', 'rejected', 'cancelled', 'expired'],
   reviewing: ['approved', 'rejected', 'cancelled', 'expired', 'proposed'],
@@ -76,29 +123,156 @@ const ALLOWED: Record<AiActionProposalState, AiActionProposalState[]> = {
 @Injectable()
 export class AiActionProposalService implements OnModuleInit {
   private readonly store = new Map<string, ServerAiActionProposal>();
+  /** Ordered audit trail per proposal — the in-process read model for the hash chain. */
+  private readonly auditTrails = new Map<string, AiActionProposalAuditEntryView[]>();
 
   constructor(
     @Optional()
     @InjectRepository(AIActionProposalRecord)
     private readonly journal?: Repository<AIActionProposalRecord>,
+    @Optional()
+    @InjectRepository(AIActionProposalAuditEntry)
+    private readonly auditLog?: Repository<AIActionProposalAuditEntry>,
   ) {}
 
   /** Rehydrate the in-process read model from the durable journal. */
   async onModuleInit(): Promise<void> {
-    if (!this.journal) return;
-    try {
-      const rows = await this.journal.find();
-      for (const row of rows) {
-        if (this.store.has(row.proposalId)) continue;
-        try {
-          this.store.set(row.proposalId, JSON.parse(row.payload) as ServerAiActionProposal);
-        } catch {
-          // A corrupt payload must not block startup; skip that row.
+    if (this.journal) {
+      try {
+        const rows = await this.journal.find();
+        for (const row of rows) {
+          if (this.store.has(row.proposalId)) continue;
+          try {
+            this.store.set(row.proposalId, JSON.parse(row.payload) as ServerAiActionProposal);
+          } catch {
+            // A corrupt payload must not block startup; skip that row.
+          }
         }
+      } catch {
+        // Journal unavailable (e.g. migrations not run yet): stay in-memory.
       }
-    } catch {
-      // Journal unavailable (e.g. migrations not run yet): stay in-memory.
     }
+
+    if (this.auditLog) {
+      try {
+        const rows = await this.auditLog.find({
+          order: { proposalId: 'ASC', sequenceIndex: 'ASC' },
+        });
+        for (const row of rows) {
+          const trail = this.auditTrails.get(row.proposalId) || [];
+          trail.push({
+            proposalId: row.proposalId,
+            sequenceIndex: row.sequenceIndex,
+            fromState: (row.fromState as AiActionProposalState | null) ?? null,
+            toState: row.toState as AiActionProposalState,
+            actorUserId: row.actorUserId ?? undefined,
+            occurredAt: row.occurredAt,
+            metadata: row.metadataJson ? JSON.parse(row.metadataJson) : undefined,
+            previousHash: row.previousHash,
+            entryHash: row.entryHash,
+          });
+          this.auditTrails.set(row.proposalId, trail);
+        }
+      } catch {
+        // Audit log unavailable (e.g. migrations not run yet): chains start fresh.
+      }
+    }
+  }
+
+  /** Append one entry to a proposal's hash chain; fire-and-forget durable write, same contract as `persist()`. */
+  private appendAuditEntry(
+    proposalId: string,
+    fromState: AiActionProposalState | null,
+    toState: AiActionProposalState,
+    actorUserId: string | undefined,
+    metadata: Record<string, unknown> | undefined,
+  ): void {
+    const trail = this.auditTrails.get(proposalId) || [];
+    const previous = trail.length ? trail[trail.length - 1] : undefined;
+    const sequenceIndex = trail.length;
+    const occurredAt = new Date().toISOString();
+    const hasMetadata = Boolean(metadata && Object.keys(metadata).length);
+    const metadataJson = hasMetadata ? JSON.stringify(metadata) : null;
+    const previousHash = previous ? previous.entryHash : null;
+    const entryHash = computeAuditEntryHash({
+      proposalId,
+      sequenceIndex,
+      fromState,
+      toState,
+      actorUserId: actorUserId ?? null,
+      occurredAt,
+      metadataJson,
+      previousHash,
+    });
+
+    const entry: AiActionProposalAuditEntryView = {
+      proposalId,
+      sequenceIndex,
+      fromState,
+      toState,
+      actorUserId,
+      occurredAt,
+      metadata: hasMetadata ? metadata : undefined,
+      previousHash,
+      entryHash,
+    };
+    trail.push(entry);
+    this.auditTrails.set(proposalId, trail);
+
+    if (!this.auditLog) return;
+    void this.auditLog
+      .save({
+        proposalId,
+        sequenceIndex,
+        fromState,
+        toState,
+        actorUserId: actorUserId ?? null,
+        occurredAt,
+        metadataJson,
+        previousHash,
+        entryHash,
+      } as AIActionProposalAuditEntry)
+      .catch(() => undefined);
+  }
+
+  /** Full ordered audit trail for a proposal (empty array if none/unknown). */
+  getAuditTrail(proposalId: string): AiActionProposalAuditEntryView[] {
+    return (this.auditTrails.get(proposalId) || []).map((entry) => ({ ...entry }));
+  }
+
+  /**
+   * Recomputes every entry's hash from its own stored fields and the
+   * previous entry's hash, comparing against the stored `entryHash`. Any
+   * edited field or removed/reordered entry breaks the chain from that
+   * point forward.
+   */
+  verifyAuditChain(proposalId: string): AuditChainVerification {
+    const trail = this.auditTrails.get(proposalId) || [];
+    let previousHash: string | null = null;
+    for (const entry of trail) {
+      const expected = computeAuditEntryHash({
+        proposalId: entry.proposalId,
+        sequenceIndex: entry.sequenceIndex,
+        fromState: entry.fromState,
+        toState: entry.toState,
+        actorUserId: entry.actorUserId ?? null,
+        occurredAt: entry.occurredAt,
+        metadataJson:
+          entry.metadata && Object.keys(entry.metadata).length
+            ? JSON.stringify(entry.metadata)
+            : null,
+        previousHash,
+      });
+      if (expected !== entry.entryHash || entry.previousHash !== previousHash) {
+        return {
+          valid: false,
+          entryCount: trail.length,
+          brokenAtSequenceIndex: entry.sequenceIndex,
+        };
+      }
+      previousHash = entry.entryHash;
+    }
+    return { valid: true, entryCount: trail.length };
   }
 
   /**
@@ -180,6 +354,13 @@ export class AiActionProposalService implements OnModuleInit {
     };
     this.store.set(proposal.proposalId, proposal);
     this.persist(proposal);
+    this.appendAuditEntry(
+      proposal.proposalId,
+      null,
+      proposal.state,
+      proposal.ownerUserId,
+      undefined,
+    );
     return this.clone(proposal);
   }
 
@@ -264,6 +445,10 @@ export class AiActionProposalService implements OnModuleInit {
     };
     this.store.set(proposalId, next);
     this.persist(next);
+    this.appendAuditEntry(proposalId, current.state, to, patch?.ownerUserId, {
+      ...(patch?.rejectionReason ? { rejectionReason: patch.rejectionReason } : {}),
+      ...(patch?.errorCode ? { errorCode: patch.errorCode } : {}),
+    });
     return this.clone(next);
   }
 
@@ -294,6 +479,7 @@ export class AiActionProposalService implements OnModuleInit {
 
   clearForTests(): void {
     this.store.clear();
+    this.auditTrails.clear();
   }
 
   private expireIfNeeded(proposal: ServerAiActionProposal): void {
@@ -307,10 +493,12 @@ export class AiActionProposalService implements OnModuleInit {
     ]);
     if (terminal.has(proposal.state)) return;
     if (Date.parse(proposal.expiresAt) < Date.now()) {
+      const fromState = proposal.state;
       proposal.state = 'expired';
       proposal.updatedAt = new Date().toISOString();
       this.store.set(proposal.proposalId, proposal);
       this.persist(proposal);
+      this.appendAuditEntry(proposal.proposalId, fromState, 'expired', undefined, undefined);
     }
   }
 

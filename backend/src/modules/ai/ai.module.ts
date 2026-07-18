@@ -20,10 +20,17 @@ import {
 } from './foundation';
 import { AiActionProposalService } from './ai-action-proposal.service';
 import { AIActionProposalRecord } from './entities/ai-action-proposal-record.entity';
+import { AIActionProposalAuditEntry } from './entities/ai-action-proposal-audit-entry.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([AIQuery, AIActionProposalRecord, Subscription, User]),
+    TypeOrmModule.forFeature([
+      AIQuery,
+      AIActionProposalRecord,
+      AIActionProposalAuditEntry,
+      Subscription,
+      User,
+    ]),
     AuditModule,
     MetricsModule,
     OrganizationsModule,

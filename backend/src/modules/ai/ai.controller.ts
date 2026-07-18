@@ -12,16 +12,8 @@ import {
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { AIService } from './ai.service';
-import {
-  AIQueryDto,
-  CareDroidAINodeDto,
-  StructuredJSONDto,
-  UnifiedAiQueryDto,
-} from './dto/ai.dto';
-import {
-  AiActionProposalService,
-  type AiActionProposalState,
-} from './ai-action-proposal.service';
+import { AIQueryDto, CareDroidAINodeDto, StructuredJSONDto, UnifiedAiQueryDto } from './dto/ai.dto';
+import { AiActionProposalService, type AiActionProposalState } from './ai-action-proposal.service';
 import { OrganizationsService } from '../organizations/organizations.service';
 import { Permission } from '../auth/enums/permission.enum';
 import { TenantIsolationGuard } from '../tenant-context/tenant-isolation.guard';
@@ -119,12 +111,16 @@ export class AIController {
       channel: dto.channel,
       task: dto.task,
     });
-    return this.aiService.runUnifiedAiQuery(req.user.id, dto as unknown as Record<string, unknown>, {
-      organizationId: req.tenantContext?.organizationId,
-      workspaceId: req.tenantContext?.workspaceId,
-      role: req.tenantContext?.role || dto.role,
-      subscriptionPlan: req.tenantContext?.subscriptionPlan,
-    });
+    return this.aiService.runUnifiedAiQuery(
+      req.user.id,
+      dto as unknown as Record<string, unknown>,
+      {
+        organizationId: req.tenantContext?.organizationId,
+        workspaceId: req.tenantContext?.workspaceId,
+        role: req.tenantContext?.role || dto.role,
+        subscriptionPlan: req.tenantContext?.subscriptionPlan,
+      },
+    );
   }
 
   @Post('proposals')
@@ -145,15 +141,11 @@ export class AIController {
           : {},
       expectedEffect: String(body.expectedEffect || 'No effect described'),
       riskLevel: (body.riskLevel as any) || 'moderate',
-      requiredPermission: body.requiredPermission
-        ? String(body.requiredPermission)
-        : 'use_ai_chat',
+      requiredPermission: body.requiredPermission ? String(body.requiredPermission) : 'use_ai_chat',
       requiresApproval:
         typeof body.requiresApproval === 'boolean' ? body.requiresApproval : undefined,
       previewSummary: String(body.previewSummary || body.expectedEffect || 'Preview required'),
-      dataWillChange: Array.isArray(body.dataWillChange)
-        ? body.dataWillChange.map(String)
-        : [],
+      dataWillChange: Array.isArray(body.dataWillChange) ? body.dataWillChange.map(String) : [],
       model: body.model ? String(body.model) : undefined,
       promptVersion: body.promptVersion ? String(body.promptVersion) : undefined,
       rollbackCapable: Boolean(body.rollbackCapable),
@@ -188,6 +180,21 @@ export class AIController {
     return this.actionProposals.get(proposalId);
   }
 
+  @Get('proposals/:proposalId/audit')
+  @WorkspaceScoped({ permissions: [Permission.USE_AI_CHAT] })
+  @ApiOperation({
+    summary:
+      'Hash-chained transition audit trail for one AI action proposal, with tamper verification',
+  })
+  async getProposalAudit(@Param('proposalId') proposalId: string) {
+    // 404s the same way getProposal does if the proposal itself doesn't exist.
+    this.actionProposals.get(proposalId);
+    return {
+      trail: this.actionProposals.getAuditTrail(proposalId),
+      verification: this.actionProposals.verifyAuditChain(proposalId),
+    };
+  }
+
   @Post('proposals/:proposalId/approve')
   @WorkspaceScoped({ permissions: [Permission.USE_AI_CHAT] })
   @ApiOperation({ summary: 'Approve an AI action proposal' })
@@ -211,7 +218,8 @@ export class AIController {
   @Post('proposals/:proposalId/execute')
   @WorkspaceScoped({ permissions: [Permission.USE_AI_CHAT] })
   @ApiOperation({
-    summary: 'Execute an approved AI action proposal (records draft outcome; no silent chart writes)',
+    summary:
+      'Execute an approved AI action proposal (records draft outcome; no silent chart writes)',
   })
   async executeProposal(
     @Param('proposalId') proposalId: string,
