@@ -106,10 +106,13 @@ describe('Calculators — Tier-A form sections', () => {
     '$slug renders calculator interface, inputs, and calculate action',
     async ({ slug, interfaceClass }) => {
       const { container } = renderCalculator(slug);
-      const iface = container.querySelector(`.${interfaceClass.split(' ')[0]}`) as HTMLElement | null;
-
-      expect(iface).toBeTruthy();
-      if (!iface) throw new Error(`expected calculator interface for ${slug}`);
+      // Specialty families resolve via React.lazy (Cycle 67); the interface node
+      // is not present on the synchronous first render, only after Suspense resolves.
+      const iface = await waitFor(() => {
+        const el = container.querySelector(`.${interfaceClass.split(' ')[0]}`) as HTMLElement | null;
+        expect(el).toBeTruthy();
+        return el as HTMLElement;
+      });
       expect(
         iface.querySelector(
           '.calc-input-group, .calc-has-bled-fieldset, .calc-timi-criteria, .calc-input-grid, select, input'
@@ -143,10 +146,11 @@ describe('Calculators — Tier-A form sections', () => {
           </Routes>
         </MemoryRouter>
       );
-      const iface = container.querySelector(`.${smokeRow.interfaceClass.split(' ')[0]}`) as HTMLElement | null;
-
-      expect(iface).toBeTruthy();
-      if (!iface) throw new Error(`expected calculator interface for ${calculatorSlug}`);
+      const iface = await waitFor(() => {
+        const el = container.querySelector(`.${smokeRow.interfaceClass.split(' ')[0]}`) as HTMLElement | null;
+        expect(el).toBeTruthy();
+        return el as HTMLElement;
+      });
       expect(iface.querySelector('input, select, textarea, .calc-checkbox-group')).toBeTruthy();
       expect(within(iface).getByRole('button', { name: /calculate/i })).toBeInTheDocument();
       expect(iface.querySelector('.calculator-results')).toBeTruthy();
@@ -173,8 +177,11 @@ describe('Calculators — compact viewport mock', () => {
     '%s exposes reset control for mobile form completion',
     async (slug) => {
       const { container } = renderCalculator(slug);
-      const root =
-        (container.querySelector(`[class*="calculator-interface"]`) as HTMLElement | null) ?? container;
+      const root = await waitFor(() => {
+        const el = container.querySelector(`[class*="calculator-interface"]`) as HTMLElement | null;
+        expect(el).toBeTruthy();
+        return el as HTMLElement;
+      });
       expect(within(root).getByRole('button', { name: /reset/i })).toBeInTheDocument();
     }
   );

@@ -1077,7 +1077,11 @@ describe('Route pages smoke — calculator forms', () => {
       expect(
         await screen.findByRole('heading', { level: 1, name: /medical calculators/i })
       ).toBeInTheDocument();
-      expect(container.querySelector(`.${interfaceClass}`), slug).toBeTruthy();
+      // Specialty families resolve via React.lazy (Cycle 67); wait for Suspense
+      // to settle before asserting on the interface node.
+      await waitFor(() => {
+        expect(container.querySelector(`.${interfaceClass}`), slug).toBeTruthy();
+      });
       expectNonEmptyPage(container);
     },
     15_000
