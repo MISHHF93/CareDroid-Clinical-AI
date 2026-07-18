@@ -277,7 +277,16 @@ const Calculators = ({ embedded = false, onCloseEmbedded, initialCalculatorId = 
     category: 'Calculator',
   };
 
-  const [selectedCalculator, setSelectedCalculator] = useState<any>(null);
+  // Lazy-initialize from the incoming slug so a known calculator renders on the
+  // first paint instead of placeholder -> effect -> full re-render. CALCULATORS
+  // is a stable module-level array, so this returns the same object reference
+  // the sync effect below would also find, making its setSelectedCalculator(match)
+  // call a same-reference no-op on mount rather than a second full render.
+  const [selectedCalculator, setSelectedCalculator] = useState<any>(() => {
+    const slug = initialCalculatorId || calcFromUrl;
+    if (!slug) return null;
+    return CALCULATORS.find((c) => c.id === slug) || null;
+  });
   const [sharedResult, setSharedResult] = useState<any>(null);
   const [unknownSlug, setUnknownSlug] = useState<any>(null);
 
