@@ -68,13 +68,21 @@ import { Patient } from './entities/patient.entity';
 import { Room } from './entities/room.entity';
 import { Staff } from './entities/staff.entity';
 import { Alert } from './entities/alert.entity';
+import { WorkflowActionLogEntry } from './entities/workflow-action-log-entry.entity';
 import { EmergencyReferenceDataSeedService } from './emergency-reference-data.seed.service';
 import { WorkflowOrchestrationService } from './emergency-os.workflow-orchestration.service';
 import { EmergencyOperatingSurfacesService } from './emergency-os.operating-surfaces.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([AdministrativeAutomationTaskEntity, Patient, Room, Staff, Alert]),
+    TypeOrmModule.forFeature([
+      AdministrativeAutomationTaskEntity,
+      Patient,
+      Room,
+      Staff,
+      Alert,
+      WorkflowActionLogEntry,
+    ]),
     ConfigModule,
     AuthModule,
     AuditModule,

@@ -1,4 +1,4 @@
-import { Injectable, Logger, Optional } from '@nestjs/common';
+import { Injectable, Logger, Optional, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import type { Repository } from 'typeorm';
 import {
@@ -43,6 +43,7 @@ import type {
 import { ensurePatientArrivalBlock } from './patient-arrival.sync';
 import { Patient } from './entities/patient.entity';
 import { Alert } from './entities/alert.entity';
+import { WorkflowActionLogEntry } from './entities/workflow-action-log-entry.entity';
 import { EncryptionService } from '../encryption/encryption.service';
 
 function clone<T>(value: T): T {
@@ -544,13 +545,56 @@ const COLLABORATION_NOTABLE_WORKFLOW_TYPES = new Set<WorkflowActionType>([
 ]);
 
 @Injectable()
-export class WorkflowActionLogService {
+export class WorkflowActionLogService implements OnModuleInit {
   private readonly logs: WorkflowActionLog[] = [];
 
   constructor(
     @Optional() private readonly realtimeService?: EmergencyRealtimeService,
     @Optional() private readonly collaborationHubService?: CollaborationHubService,
+    @Optional()
+    @InjectRepository(WorkflowActionLogEntry)
+    private readonly journal?: Repository<WorkflowActionLogEntry>,
   ) {}
+
+  /**
+   * Rehydrate the in-process buffer from the durable journal (Cycle 92).
+   * Newest `WORKFLOW_LOG_BUFFER_LIMIT` rows, matching the buffer's own
+   * eviction policy so a restart doesn't resurrect entries record() would
+   * already have evicted.
+   */
+  async onModuleInit(): Promise<void> {
+    if (!this.journal) return;
+    try {
+      const rows = await this.journal.find({
+        order: { timestamp: 'DESC' },
+        take: WORKFLOW_LOG_BUFFER_LIMIT,
+      });
+      for (const row of rows) {
+        try {
+          this.logs.push(JSON.parse(row.payload) as WorkflowActionLog);
+        } catch {
+          // A corrupt payload must not block startup; skip that row.
+        }
+      }
+    } catch {
+      // Journal unavailable (e.g. migrations not run yet): stay in-memory.
+    }
+  }
+
+  /** Fire-and-forget write-through; a journal failure never breaks the synchronous log contract. */
+  private persist(log: WorkflowActionLog): void {
+    if (!this.journal) return;
+    void this.journal
+      .save({
+        id: log.id,
+        tenantId: log.tenantId ?? null,
+        patientId: log.patientId ?? null,
+        type: log.type,
+        timestamp: log.timestamp,
+        payload: JSON.stringify(log),
+      })
+      .catch(() => undefined);
+  }
 
   record(input: WorkflowActionInput): WorkflowActionLog {
     const timestamp = input.timestamp || new Date().toISOString();
@@ -582,6 +626,7 @@ export class WorkflowActionLogService {
     if (this.logs.length > WORKFLOW_LOG_BUFFER_LIMIT) {
       this.logs.length = WORKFLOW_LOG_BUFFER_LIMIT;
     }
+    this.persist(log);
     this.realtimeService?.publish({ type: 'workflow_log_created', payload: clone(log) });
     void this.syncToCollaborationHub(log).catch(() => {
       // Best-effort side channel — never let a collaboration sync failure affect workflow logging.
@@ -713,16 +758,12 @@ export class EmergencyPatientService {
    */
   private projectCigBoard(sourceEventName: string, eventId?: string): void {
     if (!this.cigProjection) return;
-    const tenantId =
-      process.env.CIG_DEFAULT_TENANT_ID?.trim() || 'emergency-os-default';
+    const tenantId = process.env.CIG_DEFAULT_TENANT_ID?.trim() || 'emergency-os-default';
     const staffLoad = new Map<string, number>();
     for (const patient of this.patients) {
       if (!patient.assignedStaffId) continue;
       if (patient.state === 'Discharge') continue;
-      staffLoad.set(
-        patient.assignedStaffId,
-        (staffLoad.get(patient.assignedStaffId) || 0) + 1,
-      );
+      staffLoad.set(patient.assignedStaffId, (staffLoad.get(patient.assignedStaffId) || 0) + 1);
     }
     void this.cigProjection
       .afterBoardMutation({
@@ -749,9 +790,7 @@ export class EmergencyPatientService {
         }
       })
       .catch((error) => {
-        this.logger.warn(
-          `CIG Mode B projection threw after ${sourceEventName}: ${error}`,
-        );
+        this.logger.warn(`CIG Mode B projection threw after ${sourceEventName}: ${error}`);
       });
   }
 
