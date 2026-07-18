@@ -201,20 +201,38 @@ export class EmergencyOsController {
     return this.documentArtifactService.getEnvelope(patientId);
   }
 
+  @RequirePermission(Permission.WRITE_PHI)
   @Post('patients/:patientId/document-artifacts/extract')
-  extractPatientDocumentArtifacts(
+  async extractPatientDocumentArtifacts(
     @Param('patientId') patientId: string,
     @Body() body: ExtractDocumentArtifactsInput,
+    @TenantContext() tenantContext: TenantContextValue | undefined,
+    @Req() request: Request,
   ) {
+    await this.patientAuditService.logPatientAccess({
+      request,
+      tenantContext,
+      patientId,
+      resource: `emergency/patients/${patientId}/document-artifacts/extract`,
+    });
     return this.documentArtifactService.extract(patientId, { ...body, patientId });
   }
 
+  @RequirePermission(Permission.WRITE_PHI)
   @Patch('patients/:patientId/document-artifacts/:artifactId/review')
-  reviewPatientDocumentArtifact(
+  async reviewPatientDocumentArtifact(
     @Param('patientId') patientId: string,
     @Param('artifactId') artifactId: string,
     @Body() body: PatientDocumentArtifactReviewInput,
+    @TenantContext() tenantContext: TenantContextValue | undefined,
+    @Req() request: Request,
   ) {
+    await this.patientAuditService.logPatientAccess({
+      request,
+      tenantContext,
+      patientId,
+      resource: `emergency/patients/${patientId}/document-artifacts/${artifactId}/review`,
+    });
     return this.documentArtifactService.review(patientId, artifactId, {
       ...body,
       artifactId,

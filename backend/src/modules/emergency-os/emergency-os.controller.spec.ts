@@ -1,6 +1,8 @@
 import { Test } from '@nestjs/testing';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthorizationGuard } from '../auth/guards/authorization.guard';
+import { PERMISSIONS_KEY } from '../auth/decorators/permissions.decorator';
+import { Permission } from '../auth/enums/permission.enum';
 import { EmergencyOsController } from './emergency-os.controller';
 import {
   FederatedLearningService,
@@ -702,5 +704,64 @@ describe('EmergencyOsController', () => {
         }),
       ]),
     );
+  });
+
+  // extract/review were reachable by any authenticated user with no
+  // permission check at all and skipped the HIPAA patient-access audit
+  // trail their own sibling GET route performs on the same resource — the
+  // same "PHI-writing route open" bug class already fixed once in
+  // ArtifactsController (see artifacts.controller.spec.ts). Locks in that
+  // both now require WRITE_PHI, matching the module's ems/handoff and
+  // reception/handoff mutation routes.
+  const documentArtifactWriteRoutes: Array<keyof EmergencyOsController> = [
+    'extractPatientDocumentArtifacts',
+    'reviewPatientDocumentArtifact',
+  ];
+
+  it.each(documentArtifactWriteRoutes)('%s requires WRITE_PHI permission', (method) => {
+    const permissions = Reflect.getMetadata(
+      PERMISSIONS_KEY,
+      EmergencyOsController.prototype[method],
+    );
+    expect(permissions).toEqual([Permission.WRITE_PHI]);
+  });
+
+  it('logs a HIPAA patient-access audit entry when extracting document artifacts', async () => {
+    const auditSpy = jest.spyOn(EmergencyPatientAuditService.prototype, 'logPatientAccess');
+
+    await controller.extractPatientDocumentArtifacts(
+      'patient-doc-artifact-1',
+      { rawText: 'Chief complaint: chest pain' } as any,
+      undefined,
+      {} as any,
+    );
+
+    expect(auditSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        patientId: 'patient-doc-artifact-1',
+        resource: 'emergency/patients/patient-doc-artifact-1/document-artifacts/extract',
+      }),
+    );
+    auditSpy.mockRestore();
+  });
+
+  it('logs a HIPAA patient-access audit entry when reviewing a document artifact', async () => {
+    const auditSpy = jest.spyOn(EmergencyPatientAuditService.prototype, 'logPatientAccess');
+
+    await controller.reviewPatientDocumentArtifact(
+      'patient-doc-artifact-1',
+      'artifact-1',
+      { reviewStatus: 'accepted', reviewer: 'nurse-1' } as any,
+      undefined,
+      {} as any,
+    );
+
+    expect(auditSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        patientId: 'patient-doc-artifact-1',
+        resource: 'emergency/patients/patient-doc-artifact-1/document-artifacts/artifact-1/review',
+      }),
+    );
+    auditSpy.mockRestore();
   });
 });
