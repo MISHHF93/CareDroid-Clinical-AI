@@ -211,6 +211,43 @@ const checkFile = (sourceFile) => {
   }
 };
 
+// Vite treats a `.env`-declared `NODE_ENV=development` as an explicit
+// request to build in development mode -- even for `vite build` -- unless
+// NODE_ENV is already set in the shell before Vite starts (Vite's own
+// `isNodeEnvSet` check; see node_modules/vite/dist/node/chunks/config.js).
+// That mode silently ships React's dev runtime: bigger chunks, slower
+// renders, source file paths baked into every bundle. There's no build
+// warning for it -- `vite build` "succeeds" and the mistake only shows up
+// as an unexplained performance/size regression. Found the hard way
+// (Cycle 109): this repo's own `.env.example` shipped exactly this line,
+// so any checkout that copied it to `.env` per the setup instructions was
+// producing a comparable regression from that point on.
+const checkProductionNodeEnv = () => {
+  if (process.env.NODE_ENV) {
+    // Already explicitly set for this invocation (CI, or an explicit
+    // `NODE_ENV=production npm run build`) -- Vite always honors an
+    // already-set NODE_ENV over any .env file, so nothing can go wrong.
+    return;
+  }
+  for (const name of ['.env', '.env.production', '.env.local', '.env.production.local']) {
+    const filePath = path.join(rootDir, name);
+    if (!fs.existsSync(filePath)) continue;
+    for (const line of fs.readFileSync(filePath, 'utf8').split(/\r?\n/)) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('#')) continue;
+      const match = trimmed.match(/^NODE_ENV\s*=\s*(.*)$/);
+      const value = match?.[1]?.trim().replace(/^['"]|['"]$/g, '');
+      if (value === 'development') {
+        failures.push(
+          `${name}: NODE_ENV=development with no NODE_ENV set in the shell environment. ` +
+            `Vite will build in development mode even for 'vite build' (see https://vite.dev/guide/env-and-mode) -- ` +
+            `remove the NODE_ENV line from ${name}, or export NODE_ENV=production before building if you specifically need this forced.`,
+        );
+      }
+    }
+  }
+};
+
 const checkLargeAssets = () => {
   const assetFilePattern = new RegExp(`\\.(${assetExtensionPattern})$`, 'i');
   for (const entry of ['public', 'src/assets', 'src/images']) {
@@ -233,6 +270,7 @@ for (const file of scanRoots.flatMap(walk)) {
 }
 
 checkLargeAssets();
+checkProductionNodeEnv();
 
 if (warnings.length) {
   console.warn('Asset validation warnings:');
