@@ -8,6 +8,7 @@ import {
   resolvePredictiveRiskBand,
   searchPredictiveModels,
 } from '../../data/predictiveAnalyticsDashboard';
+import './PredictiveAnalyticsDashboard.css';
 
 // ── constants ─────────────────────────────────────────────────────────────────
 
@@ -29,7 +30,7 @@ const BAND_BG: Record<string, string> = {
 
 function SummaryStrip({ summary }: { summary: ReturnType<typeof buildPredictiveAnalyticsSummary> }) {
   return (
-    <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 20 }}>
+    <div className="pad-summary-strip">
       {[
         { label: 'Models active', value: summary.modelCount },
         {
@@ -44,29 +45,8 @@ function SummaryStrip({ summary }: { summary: ReturnType<typeof buildPredictiveA
           accent: BAND_COLOR[summary.highestRisk?.band ?? 'low'],
         },
       ].map(({ label, value, accent }) => (
-        <div
-          key={label}
-          style={{
-            background: MEDICAL_THEME.surfaceCard,
-            border: `1px solid ${MEDICAL_THEME.border}`,
-            borderRadius: 12,
-            padding: '14px 18px',
-            flex: '1 1 140px',
-            minWidth: 0,
-          }}
-        >
-          <div
-            style={{
-              fontSize: 10,
-              fontWeight: 700,
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
-              color: MEDICAL_THEME.inkSubtle,
-              marginBottom: 6,
-            }}
-          >
-            {label}
-          </div>
+        <div key={label} className="pad-summary-card">
+          <div className="pad-eyebrow-label">{label}</div>
           <div
             style={{
               fontSize: 20,
@@ -86,16 +66,8 @@ function SummaryStrip({ summary }: { summary: ReturnType<typeof buildPredictiveA
 function ScoreBar({ score, band }: { score: number; band: string }) {
   const color = BAND_COLOR[band] || MEDICAL_THEME.inkSubtle;
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-      <div
-        style={{
-          flex: 1,
-          height: 8,
-          borderRadius: 4,
-          background: MEDICAL_THEME.border,
-          overflow: 'hidden',
-        }}
-      >
+    <div className="pad-score-bar">
+      <div className="pad-score-track">
         <div
           style={{
             height: '100%',
@@ -147,12 +119,10 @@ function ModelCard({
       }}
     >
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 8 }}>
+      <div className="pad-card-header">
         <div className="u-flex-1">
-          <div style={{ fontWeight: 700, fontSize: 15, color: MEDICAL_THEME.ink }}>
-            {model.title}
-          </div>
-          <div style={{ fontSize: 12, color: MEDICAL_THEME.inkMuted, marginTop: 2 }}>
+          <div className="pad-card-title">{model.title}</div>
+          <div className="pad-card-subtitle">
             {model.domain} · {model.horizon}
           </div>
         </div>
@@ -179,7 +149,7 @@ function ModelCard({
 
       {/* Confidence */}
       <div style={{ fontSize: 12, color: MEDICAL_THEME.inkMuted, marginBottom: expanded ? 12 : 0 }}>
-        Confidence: <strong style={{ color: MEDICAL_THEME.ink }}>{Math.round(model.confidence * 100)}%</strong>
+        Confidence: <strong className="pad-confidence-value">{Math.round(model.confidence * 100)}%</strong>
         {' · '}
         {expanded ? 'Hide details ▲' : 'Show details ▼'}
       </div>
@@ -187,43 +157,12 @@ function ModelCard({
       {/* Expanded detail */}
       {expanded && (
         // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- onClick only stops propagation to the card's own toggle handler, it is not an interactive control itself
-        <div
-          style={{
-            borderTop: `1px solid ${MEDICAL_THEME.border}`,
-            paddingTop: 12,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 10,
-          }}
-          onClick={(e) => e.stopPropagation()}
-        >
+        <div className="pad-expanded-detail" onClick={(e) => e.stopPropagation()}>
           {/* Signals */}
           <div>
-            <div
-              style={{
-                fontSize: 10,
-                fontWeight: 700,
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-                color: MEDICAL_THEME.inkSubtle,
-                marginBottom: 6,
-              }}
-            >
-              Risk signals
-            </div>
+            <div className="pad-eyebrow-label">Risk signals</div>
             {model.signals.map((signal) => (
-              <div
-                key={signal}
-                style={{
-                  fontSize: 13,
-                  color: MEDICAL_THEME.ink,
-                  padding: '3px 0',
-                  borderBottom: `1px solid ${MEDICAL_THEME.border}`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 6,
-                }}
-              >
+              <div key={signal} className="pad-signal-row">
                 <span style={{ color, fontSize: 8 }}>●</span>
                 {signal}
               </div>
@@ -232,31 +171,9 @@ function ModelCard({
 
           {/* Recommended actions */}
           <div>
-            <div
-              style={{
-                fontSize: 10,
-                fontWeight: 700,
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-                color: MEDICAL_THEME.inkSubtle,
-                marginBottom: 6,
-              }}
-            >
-              Recommended actions
-            </div>
+            <div className="pad-eyebrow-label">Recommended actions</div>
             {model.recommendedActions.map((action, i) => (
-              <div
-                key={action}
-                style={{
-                  fontSize: 13,
-                  color: MEDICAL_THEME.ink,
-                  padding: '3px 0',
-                  borderBottom: `1px solid ${MEDICAL_THEME.border}`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                }}
-              >
+              <div key={action} className="pad-action-row">
                 <span
                   style={{
                     fontSize: 11,
@@ -281,20 +198,10 @@ function ModelCard({
 
           {/* Open linked page */}
           {model.linkedPath && (
-            <button type="button"
+            <button
+              type="button"
               onClick={() => onNavigate(model.linkedPath)}
-              style={{
-                alignSelf: 'flex-start',
-                background: MEDICAL_THEME.accent,
-                color: MEDICAL_THEME.onAccent,
-                border: 'none',
-                borderRadius: 8,
-                padding: '6px 14px',
-                fontSize: 12,
-                fontWeight: 600,
-                cursor: 'pointer',
-                marginTop: 4,
-              }}
+              className="pad-open-button"
             >
               Open related module →
             </button>
@@ -320,39 +227,17 @@ export default function PredictiveAnalyticsDashboard() {
   }, [query]);
 
   return (
-    <main
-      style={{
-        background: MEDICAL_THEME.surfacePage,
-        minHeight: '100vh',
-        padding: '24px 28px',
-        fontFamily: 'Inter, system-ui, sans-serif',
-      }}
-    >
+    <main className="pad-page">
       {/* Header */}
       <div className="u-mb-20">
-        <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800, color: MEDICAL_THEME.ink }}>
-          Predictive Analytics Dashboard
-        </h1>
-        <p style={{ margin: '2px 0 0', fontSize: 13, color: MEDICAL_THEME.inkMuted }}>
+        <h1 className="pad-page-title">Predictive Analytics Dashboard</h1>
+        <p className="pad-page-subtitle">
           Deterioration · Sepsis · Readmission · ICU transfer · Device & fleet risk
         </p>
       </div>
 
       {/* Demo notice */}
-      <div
-        style={{
-          background: CHART_PALETTE.moderateBg,
-          border: `1px solid ${CHART_PALETTE.moderate}`,
-          borderRadius: 8,
-          padding: '8px 14px',
-          fontSize: 12,
-          color: 'var(--semantic-attention)',
-          marginBottom: 16,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 8,
-        }}
-      >
+      <div className="pad-demo-notice">
         <span className="u-fw-700">Demo models</span> — predictions shown are not live
         patient, device, or fleet data. Connect live data pipelines to activate real predictions.
       </div>
@@ -361,47 +246,21 @@ export default function PredictiveAnalyticsDashboard() {
       <SummaryStrip summary={summary} />
 
       {/* Search */}
-      <div style={{ marginBottom: 18 }}>
+      <div className="pad-search-wrap">
         <input
           type="text"
           placeholder="Search models, domains, signals…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          style={{
-            width: '100%',
-            maxWidth: 420,
-            padding: '8px 14px',
-            fontSize: 13,
-            border: `1.5px solid ${MEDICAL_THEME.border}`,
-            borderRadius: 8,
-            background: MEDICAL_THEME.surfaceCard,
-            color: MEDICAL_THEME.ink,
-            outline: 'none',
-            boxSizing: 'border-box',
-          }}
+          className="pad-search-input"
         />
       </div>
 
       {/* Model cards */}
       {models.length === 0 ? (
-        <div
-          style={{
-            textAlign: 'center',
-            padding: '40px 20px',
-            color: MEDICAL_THEME.inkSubtle,
-            fontSize: 14,
-          }}
-        >
-          No models match "{query}"
-        </div>
+        <div className="pad-empty-state">No models match "{query}"</div>
       ) : (
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-            gap: 14,
-          }}
-        >
+        <div className="pad-model-grid">
           {models.map((model) => (
             <ModelCard key={model.id} model={model} onNavigate={navigate} />
           ))}
