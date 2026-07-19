@@ -128,14 +128,8 @@ export const EMPTY_STATE_COPY = Object.freeze({
     shiftClear: { label: 'Stable', hint: 'No shift handoff signals elevated' },
   },
   clinical: {
-    noCitations: {
-      guidance: 'Sources appear when the response includes evidence-backed clinical content.',
-    },
     noRiskFactors: {
       guidance: 'Risk factors populate when clinical context is available for this patient.',
-    },
-    noSources: {
-      guidance: 'RAG references appear when the AI response cites clinical evidence.',
     },
   },
 });

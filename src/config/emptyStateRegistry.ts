@@ -14,9 +14,7 @@ export const EMPTY_STATE_SURFACE_REGISTRY = Object.freeze([
   { id: 'protocol-suggestions', component: 'ProtocolSuggestion.jsx', hasGuidance: true, hasActions: false, hasStatus: false, hasNextSteps: true },
   { id: 'vitals-chart', component: 'PatientDetailPanel.tsx', hasGuidance: true, hasActions: false, hasStatus: true, hasNextSteps: true },
   { id: 'attention-strips', component: 'ChargeNurseOperationalStrip.jsx', hasGuidance: true, hasActions: false, hasStatus: true, hasNextSteps: false },
-  { id: 'clinical-citations', component: 'Citations.jsx', hasGuidance: true, hasActions: false, hasStatus: true, hasNextSteps: false },
   { id: 'clinical-risk-factors', component: 'RiskFactorsList.jsx', hasGuidance: true, hasActions: false, hasStatus: true, hasNextSteps: false },
-  { id: 'clinical-ai-sources', component: 'AISourcePanel.jsx', hasGuidance: true, hasActions: false, hasStatus: true, hasNextSteps: false },
 ]);
 
 export function auditEmptyStateSurfaces(surfaces = EMPTY_STATE_SURFACE_REGISTRY) {
