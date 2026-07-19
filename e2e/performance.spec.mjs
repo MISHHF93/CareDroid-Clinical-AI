@@ -33,7 +33,14 @@ test.beforeEach(async ({ page }) => {
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const RESULTS_DIR = join(__dirname, '..', 'qa', 'performance-results');
 
-/** Same representative page set as the a11y suite, for a directly comparable baseline. */
+/**
+ * Same representative page set as the a11y suite, for a directly comparable
+ * baseline -- re-synced Cycle 105: the a11y suite grew 8->10 (Cy79) then
+ * 10->15 (Cy95) routes and this array was never updated to match, so the
+ * "directly comparable" claim above had been false since Cy79. The original
+ * 8 stay first (unchanged ids/order, so historical per-page comparisons
+ * still line up) with the 7 pages a11y already covers appended after.
+ */
 const PERF_PAGES = [
   { id: 'dashboard', label: 'Command Dashboard', path: '/dashboard' },
   { id: 'assistant', label: 'AI Assistant / Chat', path: '/assistant' },
@@ -43,6 +50,13 @@ const PERF_PAGES = [
   { id: 'clinical-alerts', label: 'Clinical Alerts', path: '/clinical/alerts' },
   { id: 'hospital-map', label: 'Hospital Map', path: '/hospital-map' },
   { id: 'devices', label: 'Device Fleet Management', path: '/devices' },
+  { id: 'reception-workspace', label: 'Reception Workspace (interactive AI)', path: '/emergency/reception' },
+  { id: 'ems-pipeline', label: 'EMS Pipeline (interactive AI)', path: '/emergency/ems' },
+  { id: 'emergency-whiteboard', label: 'Emergency Whiteboard (patient board)', path: '/emergency/whiteboard' },
+  { id: 'emergency-analytics', label: 'Emergency Analytics (charts)', path: '/emergency/analytics' },
+  { id: 'emergency-settings', label: 'Emergency Settings (form)', path: '/emergency/settings' },
+  { id: 'triage-queue', label: 'Triage Queue', path: '/triage' },
+  { id: 'simulation', label: 'Medical Simulation Suite', path: '/simulation' },
 ];
 
 for (const pageDef of PERF_PAGES) {
