@@ -4,6 +4,7 @@ import { dispatchAlert } from '../engine/alertEngine';
 import { routeComplaint, type ComplaintRoute } from '../engine/complaintRouter';
 import { useEmergencyStore, hasPatientFlag } from '../store/emergencyStore';
 import { Patient, PatientFlag, Room, Staff, type Note } from '../types/emergency';
+import './StrokeCodeProtocol.css';
 
 export type StrokeTimelineStepId = 'Arrive' | 'CT Ord' | 'CT Done' | 'Decision' | 'tPA';
 
@@ -233,10 +234,10 @@ function CheckboxGroup({
 }) {
   return (
     <div>
-      <h5 style={{ margin: '0 0 8px', color: MEDICAL_THEME.inkDisabled, fontSize: 12 }}>{title}</h5>
-      <div style={{ display: 'grid', gap: 7 }}>
+      <h5 className="scp-checkbox-group-title">{title}</h5>
+      <div className="scp-checkbox-grid">
         {criteria.map((criterion) => (
-          <label key={criterion.id} style={{ display: 'flex', gap: 8, color: '#E5E7EB', fontSize: 12, lineHeight: 1.35 }}>
+          <label key={criterion.id} className="scp-checkbox-label">
             <input
               type="checkbox"
               checked={Boolean(values[criterion.id])}
@@ -310,10 +311,10 @@ export default function StrokeCodeProtocol({
   if (!active && !strokeRouteMatch) {
     return (
       <section className="u-pad-16-border-b" aria-labelledby="stroke-manual-heading">
-        <h3 id="stroke-manual-heading" style={{ margin: '0 0 8px', fontSize: 13, color: MEDICAL_THEME.inkSubtle }}>
+        <h3 id="stroke-manual-heading" className="scp-manual-heading">
           Stroke Protocol
         </h3>
-        <p style={{ margin: '0 0 10px', color: MEDICAL_THEME.inkMuted, fontSize: 12 }}>
+        <p className="scp-manual-desc">
           Manual physician activation is available for concerning neurologic presentations not matched by the complaint router.
         </p>
         <div className="u-flex-wrap u-gap-8">
@@ -331,21 +332,14 @@ export default function StrokeCodeProtocol({
   return (
     <section className="u-pad-16-border-b" aria-labelledby="stroke-code-heading">
       {!active ? (
-        <div
-          style={{
-            border: '1px solid #F59E0B',
-            background: '#451A03',
-            borderRadius: 12,
-            padding: 12,
-          }}
-        >
-          <h3 id="stroke-code-heading" style={{ margin: 0, color: '#FCD34D', fontSize: 14 }}>
+        <div className="scp-pending-banner">
+          <h3 id="stroke-code-heading" className="scp-pending-heading">
             ⚡ Stroke Protocol — Activate Code?
           </h3>
-          <p style={{ margin: '6px 0 0', color: '#FDE68A', fontSize: 12 }}>
+          <p className="scp-pending-desc">
             Complaint routing matched stroke workflow or NIHSS guidance. Activation still requires clinician confirmation.
           </p>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 10 }}>
+          <div className="scp-button-row">
             <button type="button" style={buttonStyle('primary')} disabled={!canManageFlags || !canWriteNote} onClick={activateStrokeCode}>
               Activate Stroke Code
             </button>
@@ -359,24 +353,24 @@ export default function StrokeCodeProtocol({
         </div>
       ) : (
         <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
+          <div className="scp-active-header">
             <div>
-              <h3 id="stroke-code-heading" style={{ margin: 0, color: 'var(--medical-ink, #111827)', fontSize: 14 }}>
+              <h3 id="stroke-code-heading" className="scp-active-heading">
                 Stroke Code Active
               </h3>
-              <p style={{ margin: '4px 0 0', color: MEDICAL_THEME.inkSubtle, fontSize: 12 }}>
+              <p className="scp-active-subtext">
                 Activated {formatClock(parsedState.activatedAt)} by {parsedState.activatedBy || 'unknown staff'}
               </p>
             </div>
-            <div style={{ color: '#EF4444', fontSize: 11, fontWeight: 800 }}>60min target</div>
+            <div className="scp-target-badge">60min target</div>
           </div>
 
-          <div style={{ marginTop: 14, overflowX: 'auto' }}>
-            <div style={{ minWidth: 560, position: 'relative', padding: '18px 4px 8px' }}>
-              <div style={{ position: 'absolute', top: 26, left: 22, right: 22, height: 2, background: '#e0f2fe' }} />
-              <div style={{ position: 'absolute', top: 14, right: 22, width: 2, height: 44, background: '#EF4444' }} />
-              <div style={{ position: 'absolute', top: 0, right: 0, color: '#EF4444', fontSize: 10 }}>+60min</div>
-              <div style={{ display: 'grid', gridTemplateColumns: `repeat(${STROKE_TIMELINE_STEPS.length}, 1fr)`, gap: 8 }}>
+          <div className="scp-timeline-scroll">
+            <div className="scp-timeline-track">
+              <div className="scp-timeline-line" />
+              <div className="scp-timeline-target-marker" />
+              <div className="scp-timeline-target-label">+60min</div>
+              <div className="scp-timeline-steps-grid">
                 {STROKE_TIMELINE_STEPS.map((step, index) => {
                   const stepState = step === 'Arrive' && !parsedState.steps.Arrive && patient.arrivalTime
                     ? { completedAt: patient.arrivalTime, by: 'arrival record' }
@@ -428,8 +422,8 @@ export default function StrokeCodeProtocol({
                         {stepState ? '✓' : ''}
                       </span>
                       <strong className="u-fs-11">{step}</strong>
-                      <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 10 }}>{formatClock(stepState?.completedAt)}</span>
-                      {duration !== null ? <span style={{ color: MEDICAL_THEME.inkMuted, fontSize: 10 }}>+{duration}min</span> : null}
+                      <span className="scp-step-time">{formatClock(stepState?.completedAt)}</span>
+                      {duration !== null ? <span className="scp-step-duration">+{duration}min</span> : null}
                     </button>
                   );
                 })}
@@ -460,13 +454,13 @@ export default function StrokeCodeProtocol({
       )}
 
       {cincinnatiOpen ? (
-        <div style={{ marginTop: 12, border: '1px solid #e0f2fe', borderRadius: 10, background: MEDICAL_THEME.surfaceCard, padding: 10 }}>
-          <h4 style={{ margin: '0 0 8px', color: 'var(--medical-ink, #111827)', fontSize: 13 }}>Cincinnati Screen</h4>
-          <p style={{ margin: '0 0 8px', color: MEDICAL_THEME.inkSubtle, fontSize: 12 }}>
+        <div className="scp-cincinnati-box">
+          <h4 className="scp-cincinnati-heading">Cincinnati Screen</h4>
+          <p className="scp-cincinnati-desc">
             Lightweight checklist until a dedicated Cincinnati calculator exists.
           </p>
           {['Facial droop', 'Arm drift', 'Speech abnormality'].map((item) => (
-            <label key={item} style={{ display: 'flex', gap: 8, color: '#E5E7EB', fontSize: 12, marginTop: 6 }}>
+            <label key={item} className="scp-cincinnati-label">
               <input type="checkbox" />
               <span>{item}</span>
             </label>
@@ -476,8 +470,8 @@ export default function StrokeCodeProtocol({
 
       {active ? (
         <div className="u-mt-16">
-          <h4 style={{ margin: '0 0 10px', color: 'var(--medical-ink, #111827)', fontSize: 13 }}>tPA Eligibility Checklist</h4>
-          <div style={{ display: 'grid', gap: 14 }}>
+          <h4 className="scp-tpa-heading">tPA Eligibility Checklist</h4>
+          <div className="scp-tpa-grid">
             <CheckboxGroup
               title="Include criteria"
               criteria={TPA_INCLUDE_CRITERIA}

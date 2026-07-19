@@ -1,0 +1,178 @@
+/* Static (non-state-dependent) styles extracted from StrokeCodeProtocol.tsx's
+   inline style={{...}} blocks -- see scripts/check-inline-styles.mjs.
+   Genuinely dynamic styles (color/border keyed off tone/canWriteNote/step
+   completion state) stay inline; only fixed-value blocks moved here. */
+
+.scp-checkbox-group-title {
+  margin: 0 0 8px;
+  color: #d1d5db;
+  font-size: 12px;
+}
+
+.scp-checkbox-grid {
+  display: grid;
+  gap: 7px;
+}
+
+.scp-checkbox-label {
+  display: flex;
+  gap: 8px;
+  color: #e5e7eb;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.scp-manual-heading {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: #475569;
+}
+
+.scp-manual-desc {
+  margin: 0 0 10px;
+  color: #475569;
+  font-size: 12px;
+}
+
+.scp-pending-banner {
+  border: 1px solid #f59e0b;
+  background: #451a03;
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.scp-pending-heading {
+  margin: 0;
+  color: #fcd34d;
+  font-size: 14px;
+}
+
+.scp-pending-desc {
+  margin: 6px 0 0;
+  color: #fde68a;
+  font-size: 12px;
+}
+
+.scp-button-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.scp-active-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.scp-active-heading {
+  margin: 0;
+  color: var(--medical-ink, #111827);
+  font-size: 14px;
+}
+
+.scp-active-subtext {
+  margin: 4px 0 0;
+  color: #475569;
+  font-size: 12px;
+}
+
+.scp-target-badge {
+  color: #ef4444;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.scp-timeline-scroll {
+  margin-top: 14px;
+  overflow-x: auto;
+}
+
+.scp-timeline-track {
+  min-width: 560px;
+  position: relative;
+  padding: 18px 4px 8px;
+}
+
+.scp-timeline-line {
+  position: absolute;
+  top: 26px;
+  left: 22px;
+  right: 22px;
+  height: 2px;
+  background: #e0f2fe;
+}
+
+.scp-timeline-target-marker {
+  position: absolute;
+  top: 14px;
+  right: 22px;
+  width: 2px;
+  height: 44px;
+  background: #ef4444;
+}
+
+.scp-timeline-target-label {
+  position: absolute;
+  top: 0;
+  right: 0;
+  color: #ef4444;
+  font-size: 10px;
+}
+
+.scp-timeline-steps-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.scp-step-time {
+  color: #475569;
+  font-size: 10px;
+}
+
+.scp-step-duration {
+  color: #475569;
+  font-size: 10px;
+}
+
+.scp-cincinnati-box {
+  margin-top: 12px;
+  border: 1px solid #e0f2fe;
+  border-radius: 10px;
+  background: #ffffff;
+  padding: 10px;
+}
+
+.scp-cincinnati-heading {
+  margin: 0 0 8px;
+  color: var(--medical-ink, #111827);
+  font-size: 13px;
+}
+
+.scp-cincinnati-desc {
+  margin: 0 0 8px;
+  color: #475569;
+  font-size: 12px;
+}
+
+.scp-cincinnati-label {
+  display: flex;
+  gap: 8px;
+  color: #e5e7eb;
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+.scp-tpa-heading {
+  margin: 0 0 10px;
+  color: var(--medical-ink, #111827);
+  font-size: 13px;
+}
+
+.scp-tpa-grid {
+  display: grid;
+  gap: 14px;
+}
