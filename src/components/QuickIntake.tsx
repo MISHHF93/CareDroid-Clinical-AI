@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { MEDICAL_THEME, MEDICAL_TYPE } from '../config/medicalTheme.constants';
-import type { CSSProperties, FormEvent, KeyboardEvent } from 'react';
+import { MEDICAL_THEME } from '../config/medicalTheme.constants';
+import type { FormEvent, KeyboardEvent } from 'react';
+import './QuickIntake.css';
 import { Patient, PatientFlag, PatientState, Priority, Vitals } from '../types/emergency';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
@@ -580,20 +581,9 @@ export default function QuickIntake({
       </style>
       {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- a <form> is a real interactive element; onKeyDown handles Escape-to-cancel/Enter-to-submit shortcuts */}
       <form
-        className="quick-intake-modal"
+        className="quick-intake-modal qi-modal"
         onSubmit={submit}
         onKeyDown={handleKeyDown}
-        style={{
-          width: 'min(600px, calc(100vw - 24px))',
-          maxWidth: '100%',
-          maxHeight: 'min(92vh, calc(var(--app-viewport-height, 100dvh) - 24px))',
-          overflowY: 'auto',
-          background: MEDICAL_THEME.surfaceCard,
-          border: 0,
-          borderRadius: 14,
-          color: 'var(--medical-ink, #111827)',
-          boxShadow: '0 30px 80px rgba(0,0,0,0.45)',
-        }}
       >
         <header
           className="u-panel-header-row"
@@ -602,7 +592,7 @@ export default function QuickIntake({
             <h2 id="quick-intake-title" className="u-title-18-750">
               {copy.title}
             </h2>
-            <div style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 12, marginTop: 4 }}>
+            <div className="qi-subtitle">
               {variant === 'reception'
                 ? 'Fast registration for front desk — patient enters triage queue after submit.'
                 : `Unified input and escalation for ${centralControl.inputProfile.label}`}
@@ -618,10 +608,7 @@ export default function QuickIntake({
           </button>
         </header>
 
-        <div
-          className="quick-intake-grid"
-          style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: 14, padding: 16 }}
-        >
+        <div className="quick-intake-grid qi-grid">
           <section className="u-flex-col-gap-12">
             {variant === 'reception' && duplicateCandidates.length ? (
               <DuplicateReviewAlert
@@ -637,19 +624,7 @@ export default function QuickIntake({
               />
             ) : null}
             {copy.showCentralBanner ? (
-            <div
-              aria-label="Central node input mode"
-              style={{
-                border: 0,
-                borderRadius: 12,
-                background: 'rgba(37, 99, 235, 0.12)',
-                boxShadow: 'inset 3px 0 0 rgba(96,165,250,0.72)',
-                color: MEDICAL_THEME.accent,
-                padding: 10,
-                fontSize: 12,
-                fontWeight: 700,
-              }}
-            >
+            <div aria-label="Central node input mode" className="qi-central-banner">
               {centralControl.label} receives this as {centralControl.inputProfile.label}.
               Escalation path: {centralControl.inputProfile.escalationPath.replace(/-/g, ' ')}.
             </div>
@@ -679,7 +654,7 @@ export default function QuickIntake({
                       padding: '0 12px',
                     }}
                   >
-                    <span aria-hidden="true" style={{ marginRight: 6 }}>
+                    <span aria-hidden="true" className="qi-category-icon">
                       {category.icon}
                     </span>
                     {category.label}
@@ -689,52 +664,27 @@ export default function QuickIntake({
             </div>
 
             <label className="u-flex-col-gap-6">
-              <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 12, fontWeight: 700 }}>Complaint</span>
+              <span className="qi-label-md">Complaint</span>
               <textarea
                 ref={complaintInputRef}
                 value={complaint}
                 onChange={(event) => setComplaint(event.target.value)}
                 placeholder="Describe complaint..."
                 rows={2}
-                style={{
-                  resize: 'vertical',
-                  minHeight: 68,
-                  border: '1px solid #e0f2fe',
-                  borderRadius: 12,
-                  background: MEDICAL_THEME.surfaceCard,
-                  color: 'var(--medical-ink, #111827)',
-                  padding: 12,
-                  outline: 'none',
-                }}
+                className="qi-textarea"
               />
             </label>
 
             {protocols.length ? (
-              <div
-                aria-label="Suggested protocols"
-                style={{
-                  border: 0,
-                  borderRadius: 12,
-                  background: MEDICAL_THEME.surfaceCard,
-                  padding: 10,
-                }}
-              >
-                <div style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 11, fontWeight: 700, marginBottom: 8 }}>
+              <div aria-label="Suggested protocols" className="qi-protocols-box">
+                <div className="qi-label-sm-mb8">
                   Suggested protocols
                 </div>
                 <div className="u-flex-wrap u-gap-8">
                   {protocols.map((protocol) => (
                     <span
                       key={protocol}
-                      style={{
-                        borderRadius: 999,
-                        background: 'rgba(14, 165, 233, 0.12)',
-                        border: '1px solid #0ea5e9',
-                        color: MEDICAL_THEME.accent,
-                        padding: '5px 8px',
-                        fontSize: 12,
-                        fontWeight: 700,
-                      }}
+                      className="qi-protocol-badge"
                     >
                       {protocol}
                     </span>
@@ -743,36 +693,21 @@ export default function QuickIntake({
               </div>
             ) : null}
             {detectedComplaintFlags.length ? (
-              <div
-                style={{
-                  borderRadius: 10,
-                  border: '1px solid #DC2626',
-                  background: '#7F1D1D22',
-                  padding: 10,
-                }}
-              >
-                <div style={{ color: MEDICAL_TYPE.statusCritical, fontSize: 11, fontWeight: 700, marginBottom: 8 }}>
+              <div className="qi-highrisk-box">
+                <div className="qi-label-critical-mb8">
                   High-risk complaint flags — staff alert only
                 </div>
                 <div className="u-flex-wrap u-gap-8">
                   {detectedComplaintFlags.map((flag) => (
                     <span
                       key={flag.id}
-                      style={{
-                        borderRadius: 999,
-                        background: '#991B1B33',
-                        border: '1px solid #EF4444',
-                        color: '#FEE2E2',
-                        padding: '5px 8px',
-                        fontSize: 12,
-                        fontWeight: 700,
-                      }}
+                      className="qi-flag-badge"
                     >
                       {flag.label}
                     </span>
                   ))}
                 </div>
-                <p style={{ color: MEDICAL_TYPE.statusCritical, fontSize: 11, margin: '8px 0 0' }}>
+                <p className="qi-highrisk-note">
                   Sends to rapid review queue. Does not assign triage level.
                 </p>
               </div>
@@ -782,27 +717,27 @@ export default function QuickIntake({
           <section className="u-flex-col u-gap-10">
             <div className="u-grid-2">
               <label className="u-flex-col-gap-5">
-                <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 11, fontWeight: 700 }}>First</span>
+                <span className="qi-label-sm">First</span>
                 <input
                   value={firstName}
                   onChange={(event) => setFirstName(event.target.value)}
                   disabled={submitting}
-                  style={inputStyle}
+                  className="qi-input"
                 />
               </label>
               <label className="u-flex-col-gap-5">
-                <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 11, fontWeight: 700 }}>Last</span>
+                <span className="qi-label-sm">Last</span>
                 <input
                   value={lastName}
                   onChange={(event) => setLastName(event.target.value)}
                   disabled={submitting}
-                  style={inputStyle}
+                  className="qi-input"
                 />
               </label>
             </div>
 
             <label className="u-flex-col-gap-5">
-              <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 11, fontWeight: 700 }}>
+              <span className="qi-label-sm">
                 DOB {dob ? `(Age ${age})` : ''}
               </span>
               <input
@@ -810,15 +745,15 @@ export default function QuickIntake({
                 value={dob}
                 onChange={(event) => setDob(event.target.value)}
                 disabled={submitting}
-                style={inputStyle}
+                className="qi-input"
               />
             </label>
 
             <div>
-              <div style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 11, fontWeight: 700, marginBottom: 5 }}>
+              <div className="qi-label-sm-mb5">
                 Sex
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
+              <div className="qi-grid-3">
                 {(['M', 'F', 'Other'] as Sex[]).map((candidate) => (
                   <button
                     key={candidate}
@@ -841,20 +776,20 @@ export default function QuickIntake({
             </div>
 
             <label className="u-flex-col-gap-5">
-              <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 11, fontWeight: 700 }}>MRN</span>
+              <span className="qi-label-sm">MRN</span>
               <input
                 value={mrn}
                 readOnly
                 aria-readonly="true"
-                style={{ ...inputStyle, color: MEDICAL_THEME.inkSubtle }}
+                className="qi-input qi-input-readonly"
               />
             </label>
 
             <div>
-              <div style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 11, fontWeight: 700, marginBottom: 5 }}>
+              <div className="qi-label-sm-mb5">
                 Vitals
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
+              <div className="qi-grid-4">
                 {(
                   [
                     ['hr', 'HR'],
@@ -872,7 +807,7 @@ export default function QuickIntake({
                     }
                     inputMode="decimal"
                     placeholder={label}
-                    style={{ ...inputStyle, padding: '8px 6px', textAlign: 'center' }}
+                    className="qi-input qi-input-compact"
                   />
                 ))}
               </div>
@@ -881,20 +816,9 @@ export default function QuickIntake({
         </div>
 
         <footer
-          className="quick-intake-footer"
-          style={{
-            position: 'sticky',
-            bottom: 0,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 12,
-            padding: 16,
-            borderTop: '1px solid #e0f2fe',
-            background: MEDICAL_THEME.surfaceCard,
-          }}
+          className="quick-intake-footer qi-footer"
         >
-          <div style={{ position: 'relative' }}>
+          <div className="qi-priority-wrap">
             <button
               type="button"
               onClick={() => setShowPriorityPicker((visible) => !visible)}
@@ -915,20 +839,7 @@ export default function QuickIntake({
               {priorityOverride ? ' override' : ''}
             </button>
             {showPriorityPicker ? (
-              <div
-                style={{
-                  position: 'absolute',
-                  left: 0,
-                  bottom: 44,
-                  display: 'flex',
-                  gap: 6,
-                  padding: 8,
-                  border: '1px solid #e0f2fe',
-                  borderRadius: 12,
-                  background: MEDICAL_THEME.surfaceCard,
-                  boxShadow: '0 18px 40px rgba(0,0,0,0.35)',
-                }}
-              >
+              <div className="qi-priority-dropdown">
                 {PRIORITIES.map((candidate) => (
                   <button
                     key={candidate}
@@ -956,7 +867,7 @@ export default function QuickIntake({
           </div>
 
           {submitError ? (
-            <div role="alert" style={{ color: MEDICAL_TYPE.statusCritical, fontSize: 12, flex: '1 1 auto' }}>
+            <div role="alert" className="qi-submit-error">
               {submitError}
             </div>
           ) : null}
@@ -985,12 +896,3 @@ export default function QuickIntake({
     </div>
   );
 }
-
-const inputStyle = {
-  border: '1px solid #e0f2fe',
-  borderRadius: 10,
-  background: MEDICAL_THEME.surfaceCard,
-  color: 'var(--medical-ink, #111827)',
-  padding: '9px 10px',
-  outline: 'none',
-} satisfies CSSProperties;
