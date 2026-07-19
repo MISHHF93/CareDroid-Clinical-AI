@@ -130,6 +130,37 @@ export async function upsertSentinelInbound(
  */
 const SNAPSHOT_CACHE_KEY = 'caredroid.sentinel.commandSnapshot.v1';
 
+/**
+ * Guards against a truthy-but-wrong-shaped response reaching `HospitalCommandCenter` —
+ * the dev-only offline shim (`apiClient.ts`'s `buildDevOfflineJsonBody`) has no
+ * Sentinel-specific case, so an unreachable backend in dev mode returns its generic
+ * `{data:null, items:[], ...}` placeholder with a 200 status. `sentinelFetch` sees
+ * `ok:true` and passes it straight through, and every consumer (`buildSentinelCommandMetrics`,
+ * `buildSentinelLiveRegionText`, this page's own direct `.units.length` reads) assumed a
+ * truthy snapshot was a well-shaped one and crashed on `.filter`/`.length` of a missing field.
+ */
+function isPlausibleSentinelSnapshot(data: unknown): data is SentinelCommandSnapshot {
+  if (!data || typeof data !== 'object') return false;
+  const d = data as Record<string, unknown>;
+  return (
+    Array.isArray(d.units) ||
+    Array.isArray(d.openAlarms) ||
+    Array.isArray(d.aiRecommendations) ||
+    Array.isArray(d.inboundPatients)
+  );
+}
+
+function normalizeSentinelCommandSnapshot(data: SentinelCommandSnapshot): SentinelCommandSnapshot {
+  return {
+    units: Array.isArray(data.units) ? data.units : [],
+    geofences: Array.isArray(data.geofences) ? data.geofences : [],
+    episodes: Array.isArray(data.episodes) ? data.episodes : [],
+    inboundPatients: Array.isArray(data.inboundPatients) ? data.inboundPatients : [],
+    openAlarms: Array.isArray(data.openAlarms) ? data.openAlarms : [],
+    aiRecommendations: Array.isArray(data.aiRecommendations) ? data.aiRecommendations : [],
+  };
+}
+
 export function cacheSentinelCommandSnapshot(snapshot: SentinelCommandSnapshot): void {
   try {
     if (typeof localStorage === 'undefined') return;
@@ -151,8 +182,8 @@ export function readCachedSentinelCommandSnapshot(): {
     const raw = localStorage.getItem(SNAPSHOT_CACHE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as { savedAt: string; snapshot: SentinelCommandSnapshot };
-    if (!parsed?.snapshot) return null;
-    return parsed;
+    if (!isPlausibleSentinelSnapshot(parsed?.snapshot)) return null;
+    return { savedAt: parsed.savedAt, snapshot: normalizeSentinelCommandSnapshot(parsed.snapshot) };
   } catch {
     return null;
   }
@@ -165,10 +196,11 @@ export async function loadSentinelCommandSnapshotWithFallback(): Promise<{
   stale: boolean;
 }> {
   const live = await fetchSentinelCommandSnapshot();
-  if (live.ok) {
-    cacheSentinelCommandSnapshot(live.data);
+  if (live.ok && isPlausibleSentinelSnapshot(live.data)) {
+    const normalized = normalizeSentinelCommandSnapshot(live.data);
+    cacheSentinelCommandSnapshot(normalized);
     return {
-      snapshot: live.data,
+      snapshot: normalized,
       source: 'live',
       message: live.message,
       stale: false,
@@ -185,7 +217,7 @@ export async function loadSentinelCommandSnapshotWithFallback(): Promise<{
     };
   }
 
-  if (live.unsupported) {
+  if (!live.ok && live.unsupported) {
     throw new SentinelCapabilityUnavailableError(live.message);
   }
 

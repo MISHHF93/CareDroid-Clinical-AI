@@ -40,6 +40,12 @@ export default function ChromeStatusChips() {
     <ul
       className="alarm-kpi-rail chrome-status-chips"
       aria-label="Department status"
+      // `.alarm-kpi-rail` scrolls horizontally (overflow-x: auto) once chips
+      // overflow its width — tabIndex makes that scroll region reachable by
+      // keyboard, the standard WCAG technique (SCR29) for a scrollable
+      // non-interactive container (axe: scrollable-region-focusable).
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- intentional: this is the documented fix for a keyboard-inaccessible scroll region, not an accidental focus stop
+      tabIndex={0}
       {...(hasCritical ? { 'aria-live': 'assertive' as const } : {})}
     >
       {metrics.map((metric) => (
