@@ -59,6 +59,23 @@
   padding: 4px 12px;
 }
 
+/* `visibility: hidden` (not display:none) keeps this badge's box in the
+   flex layout even when the demo/live state resolves to "not demo", so
+   the actions row's total width -- and therefore whether it wraps onto a
+   second line -- never changes when isDemo flips (Cycle 105/106 CLS fix). */
+.device-fleet-page__demo-badge--hidden {
+  visibility: hidden;
+}
+
+/* Reserves height for the larger of this notice's two possible variants
+   (3 source-state rows / no details block vs. 2 rows / with a details
+   block, depending on whether `isDemo` resolves before or after the
+   backend-availability fetch settles) so the swap doesn't shift the
+   metrics/table below it -- see the CLS finding this fixes, Cycle 105/106. */
+.device-fleet-page__notice {
+  min-height: 233px;
+}
+
 .device-fleet-page__metrics {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -99,6 +116,14 @@
   display: block;
   font-size: 11px;
   color: var(--medical-text-muted, var(--app-text-muted));
+}
+
+/* Sized to approximate a real data row's two-line first cell (name + id),
+   so the loading -> loaded swap doesn't visibly shift the page (CLS). */
+.device-fleet-table__skeleton-bar {
+  display: block;
+  height: 32px;
+  border-radius: 6px;
 }
 
 @media (max-width: 900px) {

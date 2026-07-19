@@ -9,6 +9,9 @@ import { DEMO_LIVE_STATES } from '../../utils/demoLiveState';
 import { categoryLabel, resolveDeviceCategory } from '../../utils/medicalIotChartModel';
 import './DeviceFleetManagement.css';
 
+/** Matches the demo snapshot's row count so the loading->loaded transition doesn't shift layout (CLS). */
+const SKELETON_ROW_COUNT = 3;
+
 type FleetDevice = {
   id: string;
   name: string;
@@ -78,7 +81,12 @@ export default function DeviceFleetManagement() {
           </div>
         </div>
         <div className="device-fleet-page__actions">
-          {isDemo ? <span className="device-fleet-page__demo-badge">Demo registry</span> : null}
+          <span
+            className={`device-fleet-page__demo-badge${isDemo ? '' : ' device-fleet-page__demo-badge--hidden'}`}
+            aria-hidden={!isDemo}
+          >
+            Demo registry
+          </span>
           <Link to={CANONICAL_ROUTES.medicalIot}>Medical IoT dashboard</Link>
           <Link to={CANONICAL_ROUTES.hospitalMap}>Hospital map</Link>
         </div>
@@ -86,6 +94,7 @@ export default function DeviceFleetManagement() {
 
       <StateSourceNotice
         title="Device fleet source state"
+        className="device-fleet-page__notice"
         states={
           isDemo
             ? [DEMO_LIVE_STATES.DEMO, DEMO_LIVE_STATES.BACKEND_UNAVAILABLE, DEMO_LIVE_STATES.UNSUPPORTED]
@@ -119,9 +128,14 @@ export default function DeviceFleetManagement() {
           </thead>
           <tbody>
             {loading ? (
-              <tr>
-                <td colSpan={6}>Loading device registry…</td>
-              </tr>
+              Array.from({ length: SKELETON_ROW_COUNT }).map((_, index) => (
+                <tr key={`device-skeleton-${index}`} className="device-fleet-table__skeleton-row">
+                  <td colSpan={6}>
+                    {index === 0 ? <span className="sr-only">Loading device registry…</span> : null}
+                    <span className="cd-skeleton-shimmer device-fleet-table__skeleton-bar" aria-hidden="true" />
+                  </td>
+                </tr>
+              ))
             ) : devices.length ? (
               devices.map((device) => (
                 <tr key={device.id}>
