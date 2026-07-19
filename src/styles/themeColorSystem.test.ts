@@ -28,7 +28,6 @@ const badgeCss = readFileSync(join(srcRoot, 'components/ui/Badge.css'), 'utf8');
 const alertCss = readFileSync(join(srcRoot, 'components/ui/Alert.css'), 'utf8');
 const platformEntryCss = readFileSync(join(srcRoot, 'pages/PlatformEntryHub.css'), 'utf8');
 const settingsCss = readFileSync(join(srcRoot, 'pages/Settings.css'), 'utf8');
-const featureMgmtCss = readFileSync(join(srcRoot, 'pages/settings/FeatureManagement.css'), 'utf8');
 const teamMgmtCss = readFileSync(join(srcRoot, 'pages/team/TeamManagement.css'), 'utf8');
 const notificationCss = readFileSync(join(srcRoot, 'components/notifications/NotificationToast.css'), 'utf8');
 const toolPreflightCss = readFileSync(join(srcRoot, 'components/clinical/ToolPreflightStatus.css'), 'utf8');
@@ -154,7 +153,6 @@ describe('theme color system revamp', () => {
     const migratedCss = [
       platformEntryCss,
       settingsCss,
-      featureMgmtCss,
       teamMgmtCss,
       notificationCss,
       toolPreflightCss,
