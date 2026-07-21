@@ -48,7 +48,7 @@ export interface IntentClassification {
   confidence: number;
 
   // Classification method used
-  method: 'keyword' | 'nlu' | 'llm';
+  method: 'keyword' | 'nlu' | 'llm' | 'keyword+node';
 
   // Extracted parameters from the message
   extractedParameters: Record<string, any>;
@@ -65,6 +65,9 @@ export interface IntentClassification {
     toolId?: string;
     confidence: number;
   }>;
+
+  /** CareDroid unified AI node id when Phase 2 (or enrichment) ran. */
+  nodeId?: string;
 
   // Timestamp
   classifiedAt: Date;

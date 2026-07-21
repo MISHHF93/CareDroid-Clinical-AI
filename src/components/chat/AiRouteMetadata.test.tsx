@@ -61,4 +61,35 @@ describe('AiRouteMetadata', () => {
 
     expect(container).toBeEmptyDOMElement();
   });
+
+  it('renders CareDroid unified AI node badge and artifact routing chips', () => {
+    render(
+      <AiRouteMetadata
+        {...({
+          aiFoundation: {
+            route: 'clinical_tool',
+            selectedExpert: 'operations',
+            confidence: 0.88,
+            requiresHumanReview: true,
+            unifiedNode: {
+              nodeId: 'caredroid-unified-ai-node',
+              method: 'nlu',
+              toolId: 'sofa-calculator',
+              artifactType: 'calculator',
+              artifactRouteConfidence: 0.91,
+              confidence: 0.88,
+            },
+          },
+        } as unknown as React.ComponentProps<typeof AiRouteMetadata>)}
+      />
+    );
+
+    const panel = screen.getByLabelText(/ai routing metadata/i);
+    expect(within(panel).getByLabelText(/caredroid unified ai node/i)).toBeInTheDocument();
+    expect(within(panel).getByText(/1-node/i)).toBeInTheDocument();
+    expect(within(panel).getByText(/caredroid-unified-ai-node/i)).toBeInTheDocument();
+    expect(within(panel).getByText(/artifact: calculator/i)).toBeInTheDocument();
+    expect(within(panel).getByText(/tool: sofa calculator/i)).toBeInTheDocument();
+    expect(within(panel).getByText(/method: nlu/i)).toBeInTheDocument();
+  });
 });

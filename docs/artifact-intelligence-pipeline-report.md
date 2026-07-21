@@ -2,49 +2,47 @@
 
 ## Summary
 
-- Artifacts exported: 2460
-- Feature rows exported: 2460
-- Training label rows exported: 8320
-- Intent routing labels: 940
+- Artifacts exported: 2210
+- Feature rows exported: 2210
+- Training label rows exported: 7132
+- Intent routing labels: 502
 - Duplicate artifact IDs: 0
-- Orphan findings: 612
-- Duplicate-name groups: 18
-- Missing metadata findings: 1687
+- Orphan findings: 714
+- Duplicate-name groups: 13
+- Missing metadata findings: 1919
 
 The pipeline prepares local, model-ready data only. It does not claim that a machine-learning model has been trained.
 
 ## Capture Sources
 
-- backend-executors: 11
-- backend-services: 171
+- backend-executors: 48
+- backend-services: 215
 - core-catalog: routes|tools|api|prompts|packs|products|ai-models|nlu|medical-knowledge
-- docs-markdown: 85
+- docs-markdown: 159
 - engines: 28
-- lib-registries: 38
-- ml-services: 6
-- pages: 146
+- lib-registries: 57
+- ml-services: 7
+- pages: 147
 
 ## Artifact Types
 
-- ai-model: 21
-- api-endpoint: 871
+- ai-model: 19
+- api-endpoint: 927
 - asset-pack: 14
-- backend-service: 171
+- backend-service: 215
 - calculator: 92
 - dashboard: 11
-- document: 85
+- document: 159
 - engine: 28
-- executor: 11
+- executor: 48
 - fleet: 5
 - governance: 17
 - hub: 1
 - iot: 2
-- medical-knowledge: 4
-- nlu-example: 476
-- page: 146
+- page: 147
 - product: 12
 - prompt: 214
-- registry: 42
+- registry: 62
 - route: 74
 - simulation: 8
 - tool: 155
@@ -59,6 +57,6 @@ The pipeline prepares local, model-ready data only. It does not claim that a mac
 ## Resonance Checks
 
 - Local similarity engine: enabled
-- Orphan detection: 612 findings
-- Duplicate detection: 18 groups
-- Missing metadata detection: 1687 findings
+- Orphan detection: 714 findings
+- Duplicate detection: 13 groups
+- Missing metadata detection: 1919 findings

@@ -1,33 +1,26 @@
 {
   "version": 1,
   "name": "caredroid-unified-ai-node",
-  "updatedAt": "2026-07-05T23:21:54.899Z",
+  "updatedAt": "2026-07-20T21:17:06.370Z",
   "embeddingModel": "Xenova/all-mpnet-base-v2",
   "heads": {
     "nlu": {
-      "classifierPath": "C:\\Users\\borah\\CareDroid-Clinical-AI\\backend\\ml-services\\models\\nlu\\classifier.json",
-      "metricsPath": "C:\\Users\\borah\\CareDroid-Clinical-AI\\backend\\ml-services\\models\\nlu\\metrics.json",
+      "classifierPath": "C:\\Users\\borah\\.grok\\worktrees\\borah-caredroid-clinical-ai\\2026-07-20-4672477f\\backend\\ml-services\\models\\nlu\\classifier.json",
+      "metricsPath": "C:\\Users\\borah\\.grok\\worktrees\\borah-caredroid-clinical-ai\\2026-07-20-4672477f\\backend\\ml-services\\models\\nlu\\metrics.json",
       "architecture": "mlp",
       "accuracy": 1,
       "testSetSize": 51,
-      "syncedFromLegacy": true,
-      "numClasses": 10,
-      "embeddingModel": "Xenova/all-mpnet-base-v2",
-      "trainedAt": "2026-07-05T04:00:24.329Z",
-      "evaluatedAt": "2026-07-05T04:01:52.954Z"
+      "syncedFromLegacy": false
     },
     "artifact-router": {
-      "classifierPath": "C:\\Users\\borah\\CareDroid-Clinical-AI\\backend\\ml-services\\models\\artifact-router\\classifier.json",
-      "metricsPath": "C:\\Users\\borah\\CareDroid-Clinical-AI\\backend\\ml-services\\models\\artifact-router\\metrics.json",
+      "classifierPath": "C:\\Users\\borah\\.grok\\worktrees\\borah-caredroid-clinical-ai\\2026-07-20-4672477f\\backend\\ml-services\\models\\artifact-router\\classifier.json",
+      "metricsPath": "C:\\Users\\borah\\.grok\\worktrees\\borah-caredroid-clinical-ai\\2026-07-20-4672477f\\backend\\ml-services\\models\\artifact-router\\metrics.json",
       "architecture": "mlp",
-      "accuracy": 0.9468085106382979,
+      "accuracy": 0.9419354838709677,
       "targetMode": "artifact-type",
-      "testSetSize": 282,
-      "evaluatedAt": "2026-07-05T23:21:54.896Z",
-      "syncedFromLegacy": true,
-      "numClasses": 10,
-      "embeddingModel": "Xenova/all-mpnet-base-v2",
-      "trainedAt": "2026-07-05T23:21:47.432Z"
+      "testSetSize": 310,
+      "evaluatedAt": "2026-07-20T18:37:16.392Z",
+      "syncedFromLegacy": false
     }
   }
 }

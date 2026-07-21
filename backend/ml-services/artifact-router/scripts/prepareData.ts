@@ -50,8 +50,16 @@ function prepareArtifactRouterData(): void {
 
   const [train, rest] = stratifiedSplitByLabel(filtered, 0.2, TRAINING_CONFIG.seed, TRAINING_CONFIG.targetMode);
   const [val, test] = stratifiedSplitByLabel(rest, 0.5, TRAINING_CONFIG.seed, TRAINING_CONFIG.targetMode);
-  const hardExamples = loadHardExamples();
-  const mergedTrain = [...train, ...hardExamples];
+  // Collapse + re-format hard examples so they cannot reintroduce rare types that
+  // were already merged into `platform` (that previously ballooned class count
+  // from 11 → 14 and diluted the head).
+  const hardExamples = collapseRareArtifactTypes(
+    formatRouterExamples(enrichArtifactTypes(loadHardExamples())),
+    TRAINING_CONFIG.targetMode,
+  );
+  const knownLabels = new Set(filtered.map((row) => resolveLabelKey(row, TRAINING_CONFIG.targetMode)));
+  const safeHard = hardExamples.filter((row) => knownLabels.has(resolveLabelKey(row, TRAINING_CONFIG.targetMode)));
+  const mergedTrain = [...train, ...safeHard];
 
   writeJsonlDataset(MODEL_PATHS.trainData, mergedTrain);
   writeJsonlDataset(MODEL_PATHS.validationData, val);
@@ -63,7 +71,7 @@ function prepareArtifactRouterData(): void {
   console.log(`Target mode: ${TRAINING_CONFIG.targetMode}`);
   console.log(`Labels:    ${labels.size}`);
   console.log(`Artifacts: ${artifacts.size}`);
-  if (hardExamples.length) console.log(`Hard examples appended to train: ${hardExamples.length}`);
+  if (safeHard.length) console.log(`Hard examples appended to train: ${safeHard.length}`);
   console.log(`Train: ${mergedTrain.length}`);
   console.log(`Val:   ${val.length}`);
   console.log(`Test:  ${test.length}`);

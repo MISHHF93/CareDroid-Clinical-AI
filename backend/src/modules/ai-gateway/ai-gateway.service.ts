@@ -6,8 +6,10 @@ import {
   AiGatewayMetadata,
   ExpertRoutePlan,
   GatewayRunEnvelope,
+  UnifiedNodeRouteSnapshot,
 } from '../moe-router/moe-router.types';
 import { IntentClassification } from '../medical-control-plane/intent-classifier/dto/intent-classification.dto';
+import { UnifiedAiNodeService } from '../../../ml-services/unified-ai-node/unified-ai-node.service';
 
 interface CreateRunEnvelopeInput {
   message: string;
@@ -55,6 +57,42 @@ export class AIGatewayService {
     };
   }
 
+  /**
+   * Attach CareDroid unified AI node (IntentClassifier → NLU + artifact-router)
+   * snapshot onto the gateway envelope so MoE routing and audit share one source.
+   */
+  attachUnifiedNode(
+    envelope: GatewayRunEnvelope,
+    classification: IntentClassification | null | undefined,
+  ): GatewayRunEnvelope {
+    if (!classification) return envelope;
+    const snapshot: UnifiedNodeRouteSnapshot = {
+      nodeId: classification.nodeId || UnifiedAiNodeService.NODE_ID,
+      method: classification.method,
+      primaryIntent: classification.primaryIntent,
+      toolId: classification.toolId,
+      artifactType: classification.artifactType,
+      artifactRouteConfidence: classification.artifactRouteConfidence,
+      confidence: classification.confidence,
+      isEmergency: classification.isEmergency,
+    };
+    // Prefer node-resolved tool when envelope has no explicit tool allowlist entry.
+    const allowedTools =
+      envelope.policy.allowedTools.length > 0
+        ? envelope.policy.allowedTools
+        : classification.toolId
+          ? [classification.toolId]
+          : [];
+    return {
+      ...envelope,
+      unifiedNode: snapshot,
+      policy: {
+        ...envelope.policy,
+        allowedTools,
+      },
+    };
+  }
+
   toMetadata(envelope: GatewayRunEnvelope, routePlan: ExpertRoutePlan): AiGatewayMetadata {
     return {
       runId: envelope.runId,
@@ -73,6 +111,7 @@ export class AIGatewayService {
       phiAccessed: envelope.policy.phiAccessed,
       requiresHumanReview: routePlan.safetyPlan.requiresHumanReview,
       startedAt: envelope.trace.startedAt,
+      unifiedNode: envelope.unifiedNode,
     };
   }
 
@@ -107,6 +146,11 @@ export class AIGatewayService {
           fallbackApplied: routePlan.fallbackApplied,
           toolIds: routePlan.toolPlan.allowedToolIds,
           method: classification?.method || 'fallback',
+          nodeId: classification?.nodeId || envelope.unifiedNode?.nodeId,
+          artifactType: classification?.artifactType || envelope.unifiedNode?.artifactType,
+          artifactRouteConfidence:
+            classification?.artifactRouteConfidence ??
+            envelope.unifiedNode?.artifactRouteConfidence,
           messageCharacters: envelope.input.message?.length || 0,
         },
       });

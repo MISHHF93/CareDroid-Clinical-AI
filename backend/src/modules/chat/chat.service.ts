@@ -215,6 +215,7 @@ export class ChatService {
             artifactRouteConfidence: classification.artifactRouteConfidence,
             confidence: classification.confidence,
             method: classification.method,
+            nodeId: classification.nodeId,
             isEmergency: classification.isEmergency,
           },
           ipAddress: '0.0.0.0',
@@ -229,6 +230,10 @@ export class ChatService {
     }
 
     classification = this.mergeUiToolRegistryHint(tool, classification);
+    // Bind IntentClassifier → Unified AI Node onto the gateway envelope for MoE + audit.
+    // Reassign so all later compose/finalize/audit paths carry nodeId + artifactType.
+    const boundEnvelope = this.aiGateway.attachUnifiedNode(aiRunEnvelope, classification);
+    Object.assign(aiRunEnvelope, boundEnvelope);
     const routePlan = this.aiRoutingEngine.createRoutePlan(aiRunEnvelope, classification);
     const contextPacket = this.aiContextManager.buildContextPacket(aiRunEnvelope, routePlan);
     const costOptimization = this.routingOptimizer.optimizeRequest({
@@ -242,6 +247,7 @@ export class ChatService {
       metadata: {
         selectedExpert: routePlan.selectedExpert,
         primaryIntent: routePlan.primaryIntent,
+        unifiedNode: aiRunEnvelope.unifiedNode,
       },
     });
     const memoryContext = {
@@ -255,6 +261,7 @@ export class ChatService {
       memoryContext,
       knowledgeBaseContext,
       workspaceContext,
+      unifiedNode: aiRunEnvelope.unifiedNode,
     };
     const integrationMetadata = {
       costOptimization,
@@ -262,6 +269,7 @@ export class ChatService {
       knowledgeBaseContext,
       workspaceContext,
       platformGovernance: governanceDecision,
+      unifiedNode: aiRunEnvelope.unifiedNode,
     };
     await this.aiGateway.logRoutingAudit({
       envelope: aiRunEnvelope,

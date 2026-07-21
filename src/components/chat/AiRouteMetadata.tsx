@@ -53,17 +53,23 @@ export default function AiRouteMetadata({ aiFoundation, routePlan, aiGateway }) 
           ? [{ expertId: aiFoundation.selectedExpert, role: 'primary' }]
           : [];
 
-  if (!selectedExperts.length && !aiFoundation.route) return null;
+  const unifiedNode = aiFoundation.unifiedNode || aiGateway?.unifiedNode || null;
+
+  if (!selectedExperts.length && !aiFoundation.route && !unifiedNode) return null;
 
   const primaryExpert = selectedExperts[0];
   const routeScore = formatScore(aiFoundation.routeScore ?? primaryExpert?.score);
-  const confidence = formatPercent(aiFoundation.confidence ?? primaryExpert?.confidence);
+  const confidence = formatPercent(
+    aiFoundation.confidence ?? unifiedNode?.confidence ?? primaryExpert?.confidence
+  );
   const estimatedCost = formatCost(
     aiFoundation.estimatedCost ?? routePlan?.costPlan?.estimatedCost
   );
   const reviewRequired =
     aiFoundation.requiresHumanReview ?? routePlan?.safetyPlan?.requiresHumanReview;
   const pipeline = Array.isArray(aiGateway?.pipeline) ? aiGateway.pipeline : [];
+  const nodeConf = formatPercent(unifiedNode?.confidence);
+  const artifactConf = formatPercent(unifiedNode?.artifactRouteConfidence);
 
   return (
     <section className="ai-route-metadata" aria-label="AI routing metadata">
@@ -71,6 +77,38 @@ export default function AiRouteMetadata({ aiFoundation, routePlan, aiGateway }) 
         <span className="ai-route-metadata__eyebrow">AI route</span>
         {reviewRequired && <span className="ai-route-metadata__review">Human review</span>}
       </div>
+      {unifiedNode && (
+        <div
+          className="ai-route-metadata__node"
+          aria-label="CareDroid unified AI node"
+        >
+          <span className="ai-route-metadata__node-badge">1-node</span>
+          <span className="ai-route-metadata__node-id">
+            {unifiedNode.nodeId || 'caredroid-unified-ai-node'}
+          </span>
+          {unifiedNode.method && (
+            <span className="ai-route-metadata__chip ai-route-metadata__chip--node">
+              Method: {formatLabel(unifiedNode.method)}
+            </span>
+          )}
+          {unifiedNode.artifactType && (
+            <span className="ai-route-metadata__chip ai-route-metadata__chip--node">
+              Artifact: {formatLabel(unifiedNode.artifactType)}
+              {artifactConf ? ` · ${artifactConf}` : ''}
+            </span>
+          )}
+          {unifiedNode.toolId && (
+            <span className="ai-route-metadata__chip ai-route-metadata__chip--node">
+              Tool: {formatLabel(unifiedNode.toolId)}
+            </span>
+          )}
+          {nodeConf && (
+            <span className="ai-route-metadata__chip ai-route-metadata__chip--node">
+              Node conf: {nodeConf}
+            </span>
+          )}
+        </div>
+      )}
       <div className="ai-route-metadata__chips">
         {selectedExperts.slice(0, 3).map((expert) => (
           <span className="ai-route-metadata__chip" key={`${expert.expertId}-${expert.role}`}>

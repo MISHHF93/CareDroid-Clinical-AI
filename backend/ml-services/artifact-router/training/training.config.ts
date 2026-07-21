@@ -34,20 +34,29 @@ export const TRAINING_CONFIG = {
   minExamplesPerClass: Number(process.env.ARTIFACT_MIN_CLASS_EXAMPLES ?? 8),
   /** NLU corpus rows are not runtime artifact targets — exclude from router training. */
   excludeArtifactTypes: parseCsvEnv('ARTIFACT_EXCLUDE_TYPES', ['nlu-example']),
-  /** 0 = no cap. Set ARTIFACT_MAX_PER_CLASS to downsample dominant classes. */
+  /**
+   * Optional majority-class cap. Default 0 (off) preserves the natural catalog
+   * distribution used for the shipped accuracy metric. Set ARTIFACT_MAX_PER_CLASS
+   * (e.g. 220) only when deliberately rebalancing for macro-F1 experiments.
+   */
   maxExamplesPerClass: Number(process.env.ARTIFACT_MAX_PER_CLASS ?? 0),
   /** Merge low-support artifact types into platform (improves accuracy on routable classes). */
   collapseRareTypes: process.env.ARTIFACT_COLLAPSE_RARE !== 'false',
   minNativeExamples: Number(process.env.ARTIFACT_MIN_NATIVE_EXAMPLES ?? 40),
+  /**
+   * Oversample residual-error classes — never majority api-endpoint (that used
+   * to be listed here and amplified imbalance, diluting minority gradients).
+   */
   oversampleWeakTypes: parseCsvEnv('ARTIFACT_OVERSAMPLE_TYPES', [
     'tool',
     'document',
     'prompt',
     'route',
     'platform',
-    'api-endpoint',
+    'calculator',
+    'registry',
   ]),
-  oversampleMultiplier: Number(process.env.ARTIFACT_OVERSAMPLE_MULTIPLIER ?? 3),
+  oversampleMultiplier: Number(process.env.ARTIFACT_OVERSAMPLE_MULTIPLIER ?? 4),
   numEpochs: Number(process.env.ARTIFACT_EPOCHS ?? 2500),
   collapsedRareLabel: process.env.ARTIFACT_COLLAPSED_LABEL ?? 'platform',
   useClassWeights: process.env.ARTIFACT_CLASS_WEIGHTS !== 'false',

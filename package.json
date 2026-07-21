@@ -138,6 +138,7 @@
     "artifact-intelligence:generate": "node scripts/generate-artifact-intelligence.mjs",
     "train:unified-models": "node scripts/train-unified-models.mjs",
     "sync:unified-models": "node scripts/sync-unified-models.mjs",
+    "ai-node:worker": "node scripts/ai-node-worker.mjs",
     "docs:generate": "node scripts/generate-living-documentation.mjs",
     "docs:check": "node scripts/check-living-documentation.mjs",
     "test:living-docs": "vitest run src/config/livingDocumentationModel.test.ts src/services/livingDocumentationService.test.ts && npm run docs:check",
@@ -162,7 +163,9 @@
     "ai:eval:gate": "node scripts/ai-eval-gate.mjs",
     "ai:query": "node scripts/ai-query.mjs",
     "verify:model-registry": "node scripts/validate-model-registry.mjs",
-    "verify:ai-assurance": "node scripts/validate-knowledge-registry.mjs && node scripts/validate-model-registry.mjs && node scripts/ai-eval-gate.mjs"
+    "verify:ai-assurance": "node scripts/validate-knowledge-registry.mjs && node scripts/validate-model-registry.mjs && node scripts/ai-eval-gate.mjs && node scripts/verify-unified-ai-node.mjs",
+    "verify:ai-node": "node scripts/verify-unified-ai-node.mjs",
+    "report:ai-node-worker": "node scripts/export-ai-node-worker-report.mjs"
   },
   "dependencies": {
     "@tabler/icons-react": "^3.44.0",

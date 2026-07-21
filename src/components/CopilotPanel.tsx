@@ -58,8 +58,10 @@ import useRouteScreenMode from '../hooks/useRouteScreenMode';
 import { MetricChip } from './ui/CareDroidPrimitives';
 import { persistCopilotInteractionSafely } from '../services/emergencyOsApi';
 import { AccountableRecommendationCard } from './ai/AccountableRecommendationCard';
+import AiRouteMetadata from './chat/AiRouteMetadata';
 import { accountableFromGatewayPayload } from '../utils/accountableFromGateway';
 import { abstainFromAiFailure } from '../services/aiFailureAbstention';
+import { normalizeAiFoundationMetadata } from '../services/clinicalChatService';
 import type { AccountableRecommendation } from '../contracts/accountableAi';
 
 type CopilotMessage = {
@@ -70,6 +72,9 @@ type CopilotMessage = {
   attachments?: CopilotAttachment[];
   /** Stage G: structured evidence / safety envelope when available */
   accountable?: AccountableRecommendation;
+  /** CareDroid gateway + unified AI node routing snapshot */
+  aiFoundation?: Record<string, unknown>;
+  aiGateway?: Record<string, unknown>;
 };
 
 type StoreCopilotMessage = ReturnType<typeof useEmergencyStore.getState>['copilotMessages'][number];
@@ -934,14 +939,26 @@ export function CopilotPanel() {
 
       const responseText =
         typeof response.content === 'string' ? response.content : extractResponseText(response.data);
-      const accountable = accountableFromGatewayPayload(
-        response.data ?? response,
-        responseText,
+      const responsePayload =
+        response.data && typeof response.data === 'object'
+          ? (response.data as Record<string, unknown>)
+          : (response as unknown as Record<string, unknown>);
+      const accountable = accountableFromGatewayPayload(responsePayload, responseText);
+      const aiFoundation = normalizeAiFoundationMetadata(
+        (responsePayload.metadata as Record<string, unknown>) || {},
       );
+      const aiGateway =
+        responsePayload.metadata &&
+        typeof responsePayload.metadata === 'object' &&
+        (responsePayload.metadata as { aiGateway?: Record<string, unknown> }).aiGateway
+          ? (responsePayload.metadata as { aiGateway: Record<string, unknown> }).aiGateway
+          : undefined;
       await streamIntoMessage(accountable.content || responseText, assistantId, setMessages);
       setMessages((current) =>
         current.map((message) =>
-          message.id === assistantId ? { ...message, accountable } : message,
+          message.id === assistantId
+            ? { ...message, accountable, aiFoundation, aiGateway }
+            : message,
         ),
       );
       appendCopilotMessage({
@@ -1069,6 +1086,12 @@ export function CopilotPanel() {
             ) : (
               message.content || (message.role === 'copilot' && loading ? <TypingIndicator /> : null)
             )}
+            {message.role === 'copilot' && message.aiFoundation ? (
+              <AiRouteMetadata
+                aiFoundation={message.aiFoundation}
+                aiGateway={message.aiGateway}
+              />
+            ) : null}
             {message.attachments?.length ? (
               <div className="ed-copilot-panel__message-attachments">
                 {message.attachments.map((attachment) => (

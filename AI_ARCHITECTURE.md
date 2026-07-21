@@ -1,7 +1,7 @@
 # CareDroid Unified AI Architecture
 
-**Status:** living document · **Updated:** 2026-07-15 (Cycle 71 — AI Execution Plan activation)  
-**Authority:** verified source paths + offline eval gate (`npm run ai:eval:gate`)  
+**Status:** living document · **Updated:** 2026-07-21 (1-node CareDroid AI backbone)  
+**Authority:** verified source paths + offline eval gate (`npm run ai:eval:gate`) + `npm run verify:ai-node`  
 **Plan:** [`AI_EXECUTION_PLAN.md`](./AI_EXECUTION_PLAN.md) · Register: [`AI_MASTER_TODO.md`](./AI_MASTER_TODO.md)
 
 ---
@@ -11,6 +11,21 @@
 One **CareDroid Unified AI Node** that receives requests from every approved channel, selects tools and knowledge, retrieves evidence, executes deterministic functions, calls approved models, validates outputs, enforces safety, creates human-review tasks when required, records activity, and returns structured responses.
 
 This is **not** a page-local chatbot. Feature modules must not call foundation providers directly.
+
+### 1.1 Local ML backbone = **exactly one node**
+
+| Fact | Value |
+|------|--------|
+| Node id | `caredroid-unified-ai-node` |
+| Registry | `mdl-unified-ai-node-v1` (`approved`, not quarantined) |
+| Nest module | `backend/ml-services/unified-ai-node/unified-ai-node.module.ts` (wired in `AppModule`) |
+| HTTP | `GET /api/ai/node/health`, `GET /api/ai/node/models/health`, `POST /api/ai/node/models/route` |
+| Heads | **NLU** (10 intents) + **artifact-router** (artifact-type) — shared `Xenova/all-mpnet-base-v2` |
+| Weights | Only under `backend/ml-services/models/{nlu,artifact-router}/` |
+| Offline gate | `npm run verify:ai-node` |
+| Live scores (2026-07-21) | NLU **100%** (n=51) · artifact-router **96.45%** (n=310) |
+
+Layers above the node (LLM egress, RAG, 39 calculators, heuristic `careDroidAI` intents) **consume** or sit beside this node — they must not fork a second trained local classifier tree.
 
 ---
 

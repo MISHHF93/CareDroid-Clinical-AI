@@ -549,6 +549,7 @@ export class AIService {
         userRole: String(request.context?.userRole || request.context?.tenant?.role || 'clinician'),
       });
       return {
+        nodeId: classification.nodeId || 'caredroid-unified-ai-node',
         primaryIntent: classification.primaryIntent,
         toolId: classification.toolId,
         artifactType: classification.artifactType,
@@ -556,6 +557,7 @@ export class AIService {
         confidence: classification.confidence,
         method: classification.method,
         isEmergency: classification.isEmergency,
+        matchedPatterns: classification.matchedPatterns,
       };
     } catch (error) {
       this.logger.warn(
@@ -810,6 +812,17 @@ export class AIService {
 
     const intent = resolveUnifiedTaskToIntent(request.task, request.channel);
     if (intent) {
+      // CareDroid unified ML node (NLU + artifact-router) for routing metadata.
+      const unifiedNode = await this.classifyStructuredNodeInput(userId, {
+        intent,
+        input: {
+          query: request.query,
+          message: request.query,
+          ...(request.patientContext || {}),
+        },
+        context: { userRole: request.role },
+      });
+
       const nodeResponse = await this.runCareDroidAINode(
         userId,
         {
@@ -819,6 +832,7 @@ export class AIService {
             ...(request.emsContext || {}),
             ...(request.workflowContext || {}),
             query: request.query,
+            message: request.query,
             channel: request.channel,
             task: request.task,
           },
@@ -836,6 +850,7 @@ export class AIService {
               subscriptionPlan: tenantContext?.subscriptionPlan,
               source: 'unified_ai_query',
             },
+            ...(unifiedNode ? { unifiedClassification: unifiedNode } : {}),
           },
         },
         {
@@ -857,7 +872,7 @@ export class AIService {
         .join(' ')
         .trim();
 
-      return mapHeuristicNodeToUnifiedResponse({
+      const mapped = mapHeuristicNodeToUnifiedResponse({
         requestId: request.requestId,
         correlationId: request.correlationId,
         intent: String(nodeResponse.intent),
@@ -865,7 +880,7 @@ export class AIService {
         content: content || nodeResponse.status,
         confidence: nodeResponse.confidence,
         requiresClinicianReview: nodeResponse.requiresClinicianReview !== false,
-        model: 'careDroidAI-node-v1',
+        model: unifiedNode ? 'caredroid-unified-ai-node+heuristic' : 'careDroidAI-node-v1',
         latencyMs: Date.now() - started,
         uncertainty: nodeResponse.warnings || [],
         limitations: [nodeResponse.safetyDisclaimer],
@@ -873,9 +888,49 @@ export class AIService {
           ? { status: 'pending', reviewType: 'clinical_ai', severity: 'high' }
           : undefined,
       });
+
+      return {
+        ...mapped,
+        structuredData: {
+          heuristicIntent: nodeResponse.intent,
+          ...(unifiedNode ? { unifiedNode } : {}),
+        },
+      };
     }
 
-    // Free-text / no structured intent: deterministic review-required answer (no LLM math).
+    // Free-text / no structured task→intent map: still run the CareDroid unified
+    // ML node (NLU + artifact-router) so routing metadata is always present, then
+    // return a deterministic review-required answer (no silent LLM clinical claims).
+    let nodeRoute: Record<string, unknown> | null = null;
+    if (this.intentClassifier && request.query.trim().length >= 8) {
+      try {
+        const classification = await this.intentClassifier.classify(request.query, {
+          userId,
+          userRole: request.role,
+        });
+        nodeRoute = {
+          nodeId: classification.nodeId || 'caredroid-unified-ai-node',
+          primaryIntent: classification.primaryIntent,
+          toolId: classification.toolId,
+          artifactType: classification.artifactType,
+          artifactRouteConfidence: classification.artifactRouteConfidence,
+          confidence: classification.confidence,
+          method: classification.method,
+          isEmergency: classification.isEmergency,
+        };
+      } catch (error) {
+        this.logger.warn(
+          `[runUnifiedAiQuery] Unified node classify failed: ${
+            error instanceof Error ? error.message : String(error)
+          }`,
+        );
+      }
+    }
+
+    const routeSummary = nodeRoute
+      ? `Node route: intent=${String(nodeRoute.primaryIntent)} artifact=${String(nodeRoute.artifactType || 'n/a')} tool=${String(nodeRoute.toolId || 'n/a')} method=${String(nodeRoute.method)}.`
+      : 'Node route: unavailable for this request.';
+
     return {
       requestId: request.requestId,
       correlationId: request.correlationId,
@@ -884,29 +939,45 @@ export class AIService {
       content: [
         'CareDroid Unified AI Node received your request.',
         `Channel: ${request.channel}; task: ${request.task}.`,
+        routeSummary,
         'No foundation model was invoked for this path (safe default).',
         'A licensed clinician must review before any clinical action.',
         `Query: ${request.query.slice(0, 400)}`,
       ].join(' '),
+      structuredData: nodeRoute ? { unifiedNode: nodeRoute } : undefined,
       evidence: [],
       citations: [],
-      confidence: 0.35,
+      confidence:
+        typeof nodeRoute?.confidence === 'number' ? (nodeRoute.confidence as number) : 0.35,
       uncertainty: ['Deterministic unified path does not perform clinical reasoning.'],
       missingInformation: [],
       limitations: [
         'Use structured node intents or an enabled foundation-model path for richer answers.',
+        'Local ML node provides routing only (NLU + artifact-type), not clinical advice.',
       ],
-      toolExecutions: [],
+      toolExecutions: nodeRoute?.toolId
+        ? [
+            {
+              toolName: String(nodeRoute.toolId),
+              status: 'skipped' as const,
+              requiresHumanApproval: true,
+            },
+          ]
+        : [],
       model: {
         provider: 'local',
-        model: 'unified-ai-deterministic-v1',
+        model: nodeRoute ? 'caredroid-unified-ai-node' : 'unified-ai-deterministic-v1',
         latencyMs: Date.now() - started,
         fallbackApplied: false,
       },
       safety: {
         allowed: true,
         requiresHumanReview: true,
-        reasons: ['unified_deterministic_path', 'clinician_review_required'],
+        reasons: [
+          'unified_deterministic_path',
+          'clinician_review_required',
+          ...(nodeRoute?.isEmergency ? ['emergency_signal_from_node'] : []),
+        ],
         disclaimer: safety.disclaimer,
       },
       humanReview: { status: 'pending', reviewType: 'clinical_ai', severity: 'high' },

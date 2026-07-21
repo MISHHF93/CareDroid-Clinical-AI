@@ -260,6 +260,21 @@ export function normalizeAiFoundationMetadata(metadata: any = {}) {
             ]
           : [];
 
+  let unifiedNode = foundation.unifiedNode || metadata.unifiedNode;
+  if (!unifiedNode && metadata?.intentClassification?.nodeId) {
+    const ic = metadata.intentClassification;
+    unifiedNode = {
+      nodeId: ic.nodeId,
+      method: ic.method,
+      primaryIntent: ic.primaryIntent,
+      toolId: ic.toolId,
+      artifactType: ic.artifactType,
+      artifactRouteConfidence: ic.artifactRouteConfidence,
+      confidence: ic.confidence,
+      isEmergency: ic.isEmergency,
+    };
+  }
+
   return {
     ...foundation,
     selectedExperts,
@@ -277,6 +292,7 @@ export function normalizeAiFoundationMetadata(metadata: any = {}) {
       [],
     requiresHumanReview:
       foundation.requiresHumanReview ?? metadata.safety?.requiresHumanReview ?? false,
+    unifiedNode,
   };
 }
 

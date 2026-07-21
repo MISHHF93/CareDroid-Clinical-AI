@@ -11,8 +11,8 @@
 
 | Layer | What it is | Actually trained? | Real metric exists? | Live in this environment right now? |
 |---|---|---|---|---|
-| NLU intent classifier | MLP head over frozen sentence embeddings | **Yes** | ✅ accuracy 1.00 (n=51) | ❌ `NLU_SERVICE_ENABLED=false` in `backend/.env` |
-| Artifact-type router | MLP head over frozen sentence embeddings | **Yes** | ✅ accuracy 0.947 (n=282) | Loaded via the same Unified AI Node as above |
+| NLU intent classifier | MLP head over frozen sentence embeddings | **Yes** | ✅ accuracy 1.00 (n=51) | ✅ `NLU_SERVICE_ENABLED=true` (in-process); backend must be up for HTTP probe |
+| Artifact-type router | MLP head over frozen sentence embeddings | **Yes** | ✅ accuracy **0.9645** (n=310) | Loaded via the same Unified AI Node as above |
 | Foundation LLM (Claude Sonnet 4.6) | Third-party API, not trained by CareDroid | No (provider-managed) | Offline fixture gate only, no live-LLM eval | ❌ no `ANTHROPIC_API_KEY` set, `AI_ENABLED=false` |
 | RAG retrieval | Embedding + vector search + citations | No (retrieval, not training) | Fixture: 5/5 retrieval cases | ⚠️ degraded — see §5 (stale `RAG_MODEL` forces hash embeddings, not semantic) |
 | 39 clinical calculators (tool-orchestrator) | Hand-coded validated clinical formulas | **Never — by design** | Deterministic, unit-tested | ✅ yes, always (no model involved) |
@@ -20,7 +20,7 @@
 | Anomaly detection | Was sklearn IsolationForest; now z-score threshold | **No longer** (ML removed) | N/A | Standalone script, not wired into request path |
 | OCR (document intake) | Tesseract.js real OCR engine | Pretrained (Tesseract's own model), not CareDroid-trained | Confidence blended per field | ✅ real, wired |
 
-**One-line answer to "what's the training score":** two real, gradient-trained classifiers exist (NLU intent + artifact router), scoring **100% / n=51** and **94.7% / n=282**. Everything else that reads as "AI" in the product — 17 declared AI services, 39 clinical calculators, deterioration/discharge/admission prediction, protocol triggers — is either a third-party foundation model called over HTTP (not trained here), or hand-written deterministic/heuristic logic wearing an AI label. Full breakdown below.
+**One-line answer to "what's the training score":** two real, gradient-trained classifiers exist (NLU intent + artifact router), scoring **100% / n=51** and **96.45% / n=310** (measured 2026-07-21). Everything else that reads as "AI" in the product — 17 declared AI services, 39 clinical calculators, deterioration/discharge/admission prediction, protocol triggers — is either a third-party foundation model called over HTTP (not trained here), or hand-written deterministic/heuristic logic wearing an AI label. Full breakdown below.
 
 ---
 
@@ -49,15 +49,16 @@ Both live under `backend/ml-services/`, share one embedding backbone, and are co
 
 - Same embedding backbone, separate MLP head, target mode `artifact-type` (~20 classes after rare-type collapsing).
 - **Training config** (`backend/ml-services/artifact-router/training/training.config.ts`): learning rate 0.25, L2 reg 0.0003, 2500 epochs, class-weighting and oversampling enabled for weak classes (`tool`, `document`, `prompt`, `route`, `platform`, `api-endpoint`).
-- **Measured result** (`backend/ml-services/models/artifact-router/metrics.json`, evaluated 2026-07-05):
+- **Measured result** (`backend/ml-services/models/artifact-router/metrics.json`, evaluated 2026-07-21):
 
   | Metric | Value |
   |---|---|
-  | Accuracy | 0.9468 (282/298-ish test set) |
-  | Test set size | 282 |
+  | Accuracy | **0.9645** (299/310) |
+  | Test set size | 310 |
+  | Residual errors | 11 (mostly catalog-ambiguous tool/route names) |
   | p50 / p95 latency | 0ms / 1ms |
 
-- This is a credible score — larger test set, no perfect-score red flag.
+- Credible score — larger test set, no perfect-score red flag. Single-pass train only (hard-example second pass opt-in; it previously regressed test accuracy).
 
 **Retraining commands** (both real, runnable): `cd backend && npm run nlu:pipeline` / `npm run artifact-router:pipeline`.
 

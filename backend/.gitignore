@@ -50,3 +50,8 @@ tmp/
 
 # Generated ML training caches (large, machine-local, safe to regenerate)
 ml-services/embedding-cache.json
+
+# ai-node-worker operational state (local run log/lock, not source content)
+ml-services/models/worker-state.json
+ml-services/models/worker-runs.jsonl
+ml-services/models/.worker.lock

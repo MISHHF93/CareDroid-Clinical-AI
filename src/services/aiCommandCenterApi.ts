@@ -10,6 +10,11 @@ import {
   fetchEvaluationDashboard,
 } from './evaluationApi';
 import { LOCAL_MEMORY_DASHBOARD, fetchMemoryDashboard } from './memoryApi';
+import {
+  LOCAL_UNIFIED_AI_NODE_HEALTH,
+  fetchUnifiedAiNodeModelsHealth,
+  type UnifiedAiNodeModelsHealth,
+} from './unifiedAiNodeApi';
 
 export const AI_COMMAND_CENTER_REFRESH_MS = 15000;
 
@@ -218,23 +223,40 @@ function buildWarnings(results) {
 }
 
 export async function fetchAiCommandCenterSnapshot() {
-  const [evaluationResult, memoryResult, costResult, auditResult] = await Promise.all([
-    fetchEvaluationDashboard(),
-    fetchMemoryDashboard(),
-    fetchCostDashboard(),
-    fetchMyAuditLogs(6),
-  ]);
+  const [evaluationResult, memoryResult, costResult, auditResult, unifiedNodeResult] =
+    await Promise.all([
+      fetchEvaluationDashboard(),
+      fetchMemoryDashboard(),
+      fetchCostDashboard(),
+      fetchMyAuditLogs(6),
+      fetchUnifiedAiNodeModelsHealth(),
+    ]);
 
   const evaluationDashboard = (evaluationResult as any).data || LOCAL_EVALUATION_DASHBOARD;
   const memoryDashboard = (memoryResult as any).data || LOCAL_MEMORY_DASHBOARD;
   const costDashboard = (costResult as any).data || LOCAL_COST_DASHBOARD;
   const auditLogs = (auditResult as any).ok ? (auditResult as any).logs || [] : [];
+  const unifiedNode: UnifiedAiNodeModelsHealth =
+    (unifiedNodeResult as any).data || LOCAL_UNIFIED_AI_NODE_HEALTH;
   const metrics =
     evaluationDashboard.aggregateMetrics || LOCAL_EVALUATION_DASHBOARD.aggregateMetrics;
   const failedBenchmarks = (evaluationDashboard.benchmarks || []).filter(
     (benchmark) => !benchmark.passed
   );
-  const warnings = buildWarnings([evaluationResult, memoryResult, costResult, auditResult]);
+  const warnings = buildWarnings([
+    evaluationResult,
+    memoryResult,
+    costResult,
+    auditResult,
+    unifiedNodeResult,
+  ]);
+
+  const nodeComposite =
+    unifiedNode.scores?.composite ??
+    (typeof unifiedNode.scores?.nluAccuracy === 'number' &&
+    typeof unifiedNode.scores?.artifactRouterAccuracy === 'number'
+      ? (unifiedNode.scores.nluAccuracy + unifiedNode.scores.artifactRouterAccuracy) / 2
+      : null);
 
   return {
     ok: warnings.length === 0,
@@ -245,14 +267,40 @@ export async function fetchAiCommandCenterSnapshot() {
       memory: memoryResult.ok ? 'live' : 'fallback',
       cost: costResult.ok ? 'live' : 'fallback',
       audit: auditResult.ok ? 'live' : 'fallback',
+      unifiedNode: unifiedNodeResult.ok ? 'live' : 'fallback',
+    },
+    /** CareDroid 1-node local ML backbone (NLU + artifact-router). */
+    unifiedNode: {
+      ...unifiedNode,
+      composite: nodeComposite,
+      nluLabel:
+        typeof unifiedNode.scores?.nluAccuracy === 'number'
+          ? `${Math.round(unifiedNode.scores.nluAccuracy * 1000) / 10}%`
+          : '—',
+      artifactLabel:
+        typeof unifiedNode.scores?.artifactRouterAccuracy === 'number'
+          ? `${Math.round(unifiedNode.scores.artifactRouterAccuracy * 1000) / 10}%`
+          : '—',
+      compositeLabel:
+        typeof nodeComposite === 'number' ? `${Math.round(nodeComposite * 1000) / 10}%` : '—',
     },
     health: {
-      status: failedBenchmarks.length ? 'review' : warnings.length ? 'degraded' : 'healthy',
-      label: failedBenchmarks.length ? 'Review' : warnings.length ? 'Degraded' : 'Healthy',
+      status: failedBenchmarks.length
+        ? 'review'
+        : warnings.length || unifiedNode.status === 'degraded'
+          ? 'degraded'
+          : 'healthy',
+      label: failedBenchmarks.length
+        ? 'Review'
+        : warnings.length || unifiedNode.status === 'degraded'
+          ? 'Degraded'
+          : 'Healthy',
       latencyMs: metrics.latencyMs || 0,
       accuracy: metrics.accuracy || 0,
       activeExperts: AI_EXPERTS.length,
       failedBenchmarks: failedBenchmarks.length,
+      unifiedNodeReady: Boolean(unifiedNode.ready || unifiedNode.status === 'ready'),
+      unifiedNodeId: unifiedNode.nodeId,
     },
     experts: buildExpertRows(costDashboard, evaluationDashboard),
     ragMetrics: {

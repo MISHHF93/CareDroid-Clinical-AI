@@ -3,19 +3,12 @@ import { existsSync } from 'fs';
 import { embedText } from '../nlu/training/embeddings';
 import { loadAnyClassifier, predictFromAny, type AnyClassifierWeights } from '../nlu/training/classifier';
 import { resolveClassifierPath } from '../shared/paths';
-import { formatArtifactRouterInput, inferRouterLabelType } from '../shared/router-input';
-
-function inferArtifactTypeHint(text: string): string | undefined {
-  const trimmed = text.trim();
-  const lower = trimmed.toLowerCase();
-  if (inferRouterLabelType(trimmed) === 'route' && /^\/products/.test(trimmed)) return 'platform';
-  if (inferRouterLabelType(trimmed) === 'route' && /^\/settings/.test(trimmed)) return 'route';
-  if (/\.service$|dto$/i.test(trimmed)) return 'platform';
-  if (/registry|types|disclaimer/i.test(trimmed)) return 'platform';
-  if (/^frontend-api-|reports-|dashboard|status|policies|tracking/i.test(lower)) return 'api-endpoint';
-  if (/\bprompt\b/i.test(trimmed)) return 'prompt';
-  return undefined;
-}
+import {
+  applyRouterPathPrior,
+  formatArtifactRouterInput,
+  inferArtifactTypeHintFromText,
+  inferRouterLabelType,
+} from '../shared/router-input';
 import { TRAINING_CONFIG } from '../artifact-router/training/training.config';
 
 export interface ArtifactRouteResult {
@@ -67,12 +60,17 @@ export class ArtifactRouterService {
     if (!this.classifier) return fallback;
 
     try {
-      const embedding = await embedText(formatArtifactRouterInput(text, undefined, inferArtifactTypeHint(text)));
+      const labelType = inferRouterLabelType(text);
+      const typeHint = inferArtifactTypeHintFromText(text);
+      const formatted = formatArtifactRouterInput(text, labelType, typeHint);
+      const embedding = await embedText(formatted);
       const { labelId, confidence } = predictFromAny(this.classifier, embedding);
       const labelNames = this.classifier.labelToIntent ?? {};
+      const raw = labelNames[labelId] ?? 'unknown';
+      const prior = applyRouterPathPrior(formatted, raw, confidence);
       return {
-        artifactType: labelNames[labelId] ?? 'unknown',
-        confidence: Math.round(confidence * 1000) / 1000,
+        artifactType: prior.artifactType,
+        confidence: Math.round(prior.confidence * 1000) / 1000,
         labelId,
         targetMode: TRAINING_CONFIG.targetMode,
         latencyMs: Date.now() - start,

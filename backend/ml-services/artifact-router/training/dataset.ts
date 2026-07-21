@@ -77,6 +77,9 @@ export function loadArtifactTrainingCsv(filePath = MODEL_PATHS.trainingDataset):
 export function formatRouterExamples(rows: ArtifactTrainingExample[]): ArtifactTrainingExample[] {
   return rows.map((row) => {
     const labelType = row.labelType === 'route' ? 'route' : 'name';
+    // Pass gold artifactType so structural type prefixes (platform / api-endpoint /
+    // backend-service) and agreeing path: families match the original high-score
+    // formatting. Conflicting path families are suppressed inside the formatter.
     return {
       ...row,
       inputText: formatArtifactRouterInput(row.inputText, labelType, row.artifactType),

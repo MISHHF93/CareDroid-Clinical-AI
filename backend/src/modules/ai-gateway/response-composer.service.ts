@@ -38,6 +38,7 @@ export class ResponseComposerService {
       phiAccessed: envelope.policy.phiAccessed,
       requiresHumanReview: true, // PR-6: clinician review always required on composed AI output
       startedAt: envelope.trace.startedAt,
+      unifiedNode: envelope.unifiedNode,
     };
     const pipeline = [
       ...contextPacket.pipeline,

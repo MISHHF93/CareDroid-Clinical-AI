@@ -165,6 +165,7 @@ export default function AiCommandCenterDashboard() {
   const rag    = snapshot?.ragMetrics;
   const mem    = snapshot?.memoryUsage;
   const tools  = snapshot?.toolUsage;
+  const node   = snapshot?.unifiedNode;
 
   return (
     <main className="ai-cc-page">
@@ -175,7 +176,7 @@ export default function AiCommandCenterDashboard() {
             AI Command Center
           </h1>
           <p className="ai-cc-header__subtitle">
-            Evaluation · Memory · Cost · Expert routing
+            Unified AI Node · Evaluation · Memory · Cost · Expert routing
           </p>
         </div>
         <div className="ai-cc-header__actions">
@@ -231,6 +232,55 @@ export default function AiCommandCenterDashboard() {
         <LoadingShell />
       ) : (
         <>
+          {/* -- CareDroid Unified AI Node (1-node backbone) -- */}
+          {node && (
+            <SectionCard title="CareDroid Unified AI Node">
+              <div className="ai-cc-metrics-strip" style={{ marginBottom: 0 }}>
+                <MetricTile
+                  label="Node"
+                  value={node.ready || node.status === 'ready' ? 'Ready' : String(node.status || '—')}
+                  sub={node.nodeId || 'caredroid-unified-ai-node'}
+                  accent={
+                    node.ready || node.status === 'ready'
+                      ? MEDICAL_THEME.success
+                      : MEDICAL_THEME.warning
+                  }
+                />
+                <MetricTile
+                  label="NLU head"
+                  value={node.nluLabel ?? '—'}
+                  sub="intent classifier"
+                  accent={MEDICAL_THEME.success}
+                />
+                <MetricTile
+                  label="Artifact head"
+                  value={node.artifactLabel ?? '—'}
+                  sub="type router"
+                  accent={MEDICAL_THEME.success}
+                />
+                <MetricTile
+                  label="Composite"
+                  value={node.compositeLabel ?? '—'}
+                  sub={
+                    node.singleNode !== false
+                      ? `1 node · quarantine: ${node.quarantine || 'none'}`
+                      : 'multi-node?'
+                  }
+                />
+                <MetricTile
+                  label="Source"
+                  value={node.source === 'live' ? 'Live' : 'Fallback'}
+                  sub={node.embeddingModel || 'Xenova/all-mpnet-base-v2'}
+                />
+                <MetricTile
+                  label="Registry"
+                  value={node.registryModelId ? 'Approved' : '—'}
+                  sub={node.registryModelId || 'mdl-unified-ai-node-v1'}
+                />
+              </div>
+            </SectionCard>
+          )}
+
           {/* -- Top metrics strip -- */}
           <div className="ai-cc-metrics-strip">
             <MetricTile

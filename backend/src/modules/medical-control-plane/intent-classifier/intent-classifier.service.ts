@@ -27,7 +27,11 @@ import {
 } from './patterns/emergency.patterns';
 import { matchToolPatterns, extractToolParameters } from './patterns/tool.patterns';
 import { classifyClinicalQuery } from './patterns/clinical.patterns';
-import { resolveExecutorToolId } from '../../../../ml-services/shared/routing-maps';
+import {
+  fuseUnifiedHeadConfidence,
+  resolveExecutorToolId,
+  shouldAcceptUnifiedNodeResult,
+} from '../../../../ml-services/shared/routing-maps';
 import { UnifiedAiNodeService } from '../../../../ml-services/unified-ai-node/unified-ai-node.service';
 
 @Injectable()
@@ -115,12 +119,17 @@ export class IntentClassifierService {
       // Record successful classification
       this.nluMetrics.recordIntentClassification(keywordResult.primaryIntent, 'keyword');
 
+      // Still enrich with the unified AI node (artifact type + tool id) when safe —
+      // keywords own the primary intent; the node adds routing metadata.
+      const enrichment = await this.enrichWithUnifiedNode(message, keywordResult);
+
       return {
         ...keywordResult,
+        ...enrichment,
         isEmergency,
         emergencyKeywords: this.mapEmergencyKeywords(emergencyPatterns),
         emergencySeverity,
-        method: 'keyword',
+        method: enrichment.nodeId ? 'keyword+node' : 'keyword',
         classifiedAt: new Date(),
       };
     }
@@ -141,9 +150,23 @@ export class IntentClassifierService {
       this.nluMetrics.recordModelPhaseDuration(nluDurationSec, 'success');
       this.nluMetrics.recordConfidenceScore(nluResult.confidence, nluResult.primaryIntent, 'model');
 
-      if (nluResult.confidence >= 0.7) {
+      const acceptNode = shouldAcceptUnifiedNodeResult({
+        intentConfidence: nluResult.confidence,
+        artifactType: nluResult.artifactType,
+        artifactConfidence: nluResult.artifactRouteConfidence,
+        primaryIsClinicalTool: nluResult.primaryIntent === PrimaryIntent.CLINICAL_TOOL,
+      });
+
+      if (acceptNode) {
+        const fusedConfidence = fuseUnifiedHeadConfidence({
+          intentConfidence: nluResult.confidence,
+          artifactType: nluResult.artifactType,
+          artifactConfidence: nluResult.artifactRouteConfidence,
+          primaryIsClinicalTool: nluResult.primaryIntent === PrimaryIntent.CLINICAL_TOOL,
+        });
+
         this.logger.log(
-          `✅ Phase 2 (NLU): High confidence (${nluResult.confidence.toFixed(2)}) - ${nluResult.primaryIntent}`,
+          `✅ Phase 2 (Unified AI Node): accept conf=${fusedConfidence.toFixed(2)} intent=${nluResult.primaryIntent} artifact=${nluResult.artifactType ?? 'n/a'}`,
         );
 
         // Record successful classification
@@ -151,10 +174,12 @@ export class IntentClassifierService {
 
         return {
           ...nluResult,
+          confidence: fusedConfidence,
           isEmergency,
           emergencyKeywords: this.mapEmergencyKeywords(emergencyPatterns),
           emergencySeverity,
           method: 'nlu',
+          nodeId: UnifiedAiNodeService.NODE_ID,
           classifiedAt: new Date(),
         };
       }
@@ -347,14 +372,23 @@ export class IntentClassifierService {
         }
       }
 
+      const intentConfidence = result.confidence ?? 0.0;
+      const fused = fuseUnifiedHeadConfidence({
+        intentConfidence,
+        artifactType: result.artifactType,
+        artifactConfidence: result.artifactRouteConfidence,
+        primaryIsClinicalTool: primaryIntent === PrimaryIntent.CLINICAL_TOOL,
+      });
+
       return {
         primaryIntent,
         toolId,
         artifactType: result.artifactType,
         artifactRouteConfidence: result.artifactRouteConfidence,
-        confidence: result.confidence ?? 0.0,
+        confidence: fused,
         extractedParameters,
         matchedPatterns: ['unified-ai-node'],
+        nodeId: UnifiedAiNodeService.NODE_ID,
       };
     } catch (error) {
       this.logger.warn(
@@ -362,6 +396,62 @@ export class IntentClassifierService {
       );
       this.recordFailure(this.nluCircuitBreaker, this.nluFailureThreshold, this.nluResetMs);
       return null;
+    }
+  }
+
+  /**
+   * Non-blocking enrichment for high-confidence keyword results.
+   * Never overrides primaryIntent; only fills artifactType / toolId / nodeId.
+   */
+  private async enrichWithUnifiedNode(
+    message: string,
+    keywordResult: Omit<
+      IntentClassification,
+      'isEmergency' | 'emergencyKeywords' | 'emergencySeverity' | 'method' | 'classifiedAt'
+    >,
+  ): Promise<Partial<IntentClassification>> {
+    if (!this.nluEnabled || this.isCircuitOpen(this.nluCircuitBreaker)) {
+      return {};
+    }
+    try {
+      const routed = this.nluUseInProcess
+        ? await this.predictWithUnifiedNode(message)
+        : await this.predictWithHttpUnifiedNode(message);
+      if (!routed) return {};
+
+      this.recordSuccess(this.nluCircuitBreaker);
+
+      const toolId =
+        keywordResult.toolId ||
+        resolveExecutorToolId(routed.intent, routed.artifactType, message);
+
+      const extractedParameters = { ...keywordResult.extractedParameters };
+      if (routed.artifactType && routed.artifactType !== 'unknown') {
+        extractedParameters.artifactType = routed.artifactType;
+        if (routed.artifactRouteConfidence !== undefined) {
+          extractedParameters.artifactRouteConfidence = routed.artifactRouteConfidence;
+        }
+      }
+      if (routed.parameters?.keyTerms) {
+        extractedParameters.nodeKeyTerms = routed.parameters.keyTerms;
+      }
+
+      return {
+        toolId,
+        artifactType: routed.artifactType,
+        artifactRouteConfidence: routed.artifactRouteConfidence,
+        extractedParameters,
+        matchedPatterns: [
+          ...(keywordResult.matchedPatterns || []),
+          'unified-ai-node-enrichment',
+        ],
+        nodeId: UnifiedAiNodeService.NODE_ID,
+      };
+    } catch (error) {
+      this.logger.debug(
+        `Unified node enrichment skipped: ${error instanceof Error ? error.message : String(error)}`,
+      );
+      return {};
     }
   }
 

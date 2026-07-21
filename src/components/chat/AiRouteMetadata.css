@@ -50,6 +50,42 @@
   font-weight: 700;
 }
 
+.ai-route-metadata__node {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid color-mix(in srgb, var(--app-success, #1a7f4b) 35%, var(--panel-border));
+  background: color-mix(in srgb, var(--app-success, #1a7f4b) 8%, transparent);
+}
+
+.ai-route-metadata__node-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--app-success, #1a7f4b);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ai-route-metadata__node-id {
+  font-size: var(--font-12, 12px);
+  font-weight: 700;
+  color: var(--text-color);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.ai-route-metadata__chip--node {
+  border-color: color-mix(in srgb, var(--app-success, #1a7f4b) 40%, var(--panel-border));
+}
+
 .ai-route-metadata__metrics {
   display: flex;
   flex-wrap: wrap;

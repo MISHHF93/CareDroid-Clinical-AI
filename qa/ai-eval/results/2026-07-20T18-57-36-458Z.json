@@ -1,8 +1,8 @@
 {
   "suiteId": "caredroid-ai-eval-v1",
   "suiteVersion": "1.0.0",
-  "evaluatedAt": "2026-07-20T20:24:35.322Z",
-  "durationMs": 13,
+  "evaluatedAt": "2026-07-20T18:57:36.458Z",
+  "durationMs": 8,
   "mode": "offline_fixture",
   "notes": "Fixture-based offline eval. Does not call external LLMs. Seeds in EvaluationService remain non-authoritative.",
   "packSummaries": [

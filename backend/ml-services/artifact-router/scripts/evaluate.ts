@@ -1,7 +1,7 @@
 import { existsSync, writeFileSync } from 'fs';
 import { updateHeadManifest } from '../../shared/manifest';
 import { resolveClassifierPath } from '../../shared/paths';
-import { formatArtifactRouterInput } from '../../shared/router-input';
+import { applyRouterPathPrior, formatArtifactRouterInput } from '../../shared/router-input';
 import { embedTextCached as embedText } from '../../nlu/training/embeddingsCache';
 import { loadAnyClassifier, predictFromAny } from '../../nlu/training/classifier';
 import { loadJsonlDataset, resolveLabelKey } from '../training/dataset';
@@ -27,24 +27,34 @@ async function evaluateArtifactRouter(): Promise<void> {
   const labelNames = classifier.labelToIntent ?? {};
 
   let correct = 0;
+  let pathOverrides = 0;
   const inferenceTimes: number[] = [];
+  const confusion: Record<string, number> = {};
 
   for (const example of testData) {
     const start = Date.now();
-    const embedding = await embedText(
+    const text =
       example.inputText.startsWith('name:') || example.inputText.startsWith('route:')
         ? example.inputText
         : formatArtifactRouterInput(
             example.inputText,
             example.labelType === 'route' ? 'route' : 'name',
             example.artifactType,
-          ),
-    );
-    const { labelId } = predictFromAny(classifier, embedding);
+          );
+    const embedding = await embedText(text);
+    const { labelId, confidence } = predictFromAny(classifier, embedding);
     inferenceTimes.push(Date.now() - start);
-    const predicted = labelNames[labelId];
+    const rawPredicted = labelNames[labelId] ?? 'unknown';
+    const prior = applyRouterPathPrior(text, rawPredicted, confidence);
+    if (prior.overridden) pathOverrides += 1;
+    const predicted = prior.artifactType;
     const expected = resolveLabelKey(example, TRAINING_CONFIG.targetMode);
-    if (predicted === expected) correct++;
+    if (predicted === expected) {
+      correct++;
+    } else {
+      const key = `${expected}->${predicted}`;
+      confusion[key] = (confusion[key] ?? 0) + 1;
+    }
   }
 
   const sorted = [...inferenceTimes].sort((a, b) => a - b);
@@ -55,8 +65,16 @@ async function evaluateArtifactRouter(): Promise<void> {
   console.log(`Target mode: ${TRAINING_CONFIG.targetMode}`);
   console.log(`Accuracy: ${(accuracy * 100).toFixed(2)}%`);
   console.log(`Test size: ${testData.length}`);
+  console.log(`Path priors applied: ${pathOverrides}`);
   console.log(`Latency p50: ${sorted[Math.floor(sorted.length * 0.5)]}ms`);
   console.log(`Latency mean: ${meanLatency.toFixed(1)}ms`);
+  const topConfusions = Object.entries(confusion)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 8);
+  if (topConfusions.length) {
+    console.log('Top confusions:');
+    for (const [pair, count] of topConfusions) console.log(`  ${pair}: ${count}`);
+  }
 
   const evaluatedAt = new Date().toISOString();
   const metrics = {
@@ -64,6 +82,7 @@ async function evaluateArtifactRouter(): Promise<void> {
     testSetSize: testData.length,
     targetMode: TRAINING_CONFIG.targetMode,
     architecture: classifier.kind ?? 'linear',
+    pathOverrides,
     latencyMs: {
       p50: sorted[Math.floor(sorted.length * 0.5)],
       p95: sorted[Math.floor(sorted.length * 0.95)],

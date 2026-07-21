@@ -28,6 +28,18 @@ export type ExpertModelTier = 'none' | 'small' | 'standard' | 'large';
 
 export type RoutingMode = 'lightweight' | 'single_expert' | 'multi_expert' | 'fallback';
 
+/** Snapshot of CareDroid unified AI node (NLU + artifact-router) on this run. */
+export interface UnifiedNodeRouteSnapshot {
+  nodeId: string;
+  method?: string;
+  primaryIntent?: string;
+  toolId?: string;
+  artifactType?: string;
+  artifactRouteConfidence?: number;
+  confidence?: number;
+  isEmergency?: boolean;
+}
+
 export interface GatewayRunEnvelope {
   runId: string;
   capabilityId: string;
@@ -47,6 +59,8 @@ export interface GatewayRunEnvelope {
     allowedTools: string[];
     maxCostUsd?: number;
   };
+  /** Filled when IntentClassifier / Unified AI Node has run for this envelope. */
+  unifiedNode?: UnifiedNodeRouteSnapshot;
   trace: {
     sourceSurface: string;
     clientRequestId?: string;
@@ -73,7 +87,14 @@ export interface MoEExpertDescriptor {
 
 export interface RouteEvidence {
   expertId: MoEExpertId;
-  kind: 'keyword' | 'intent' | 'tool_id' | 'feature' | 'source_surface' | 'policy';
+  kind:
+    | 'keyword'
+    | 'intent'
+    | 'tool_id'
+    | 'feature'
+    | 'source_surface'
+    | 'policy'
+    | 'artifact_type';
   value: string;
   weight: number;
 }
@@ -214,4 +235,6 @@ export interface AiGatewayMetadata {
   phiAccessed: boolean;
   requiresHumanReview: boolean;
   startedAt: string;
+  /** Present when CareDroid unified AI node contributed to this run. */
+  unifiedNode?: UnifiedNodeRouteSnapshot;
 }

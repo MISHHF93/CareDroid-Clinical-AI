@@ -84,7 +84,7 @@ import { EmergencyOsModule } from './modules/emergency-os/emergency-os.module';
 import { CigModule } from './modules/cig/cig.module';
 import { CollaborationHubModule } from './modules/collaboration-hub/collaboration-hub.module';
 import { NativeAiModule } from './modules/native-ai/native-ai.module';
-import { NluModule } from '../ml-services/nlu/nlu.module';
+import { UnifiedAiNodeModule } from '../ml-services/unified-ai-node/unified-ai-node.module';
 import { SentinelModule } from './modules/sentinel/sentinel.module';
 
 // Monitoring & Observability
@@ -238,9 +238,11 @@ function resolveDatabaseClient() {
     SentinelModule,
     CollaborationHubModule,
     NativeAiModule,
-    NluModule,
+    // CareDroid 1-node local ML backbone (ADR-0003): NLU + artifact-router + /api/ai/node/*
+    // UnifiedAiNodeModule imports NluModule (keeps /api/nlu/*) and registers the unified surface.
+    UnifiedAiNodeModule,
 
-    // Medical Control Plane (Intent Classification, Tool Orchestration, Unified AI Node)
+    // Medical Control Plane (Intent Classification, Tool Orchestration)
     MedicalControlPlaneModule,
 
     // Encryption (Batch 4)

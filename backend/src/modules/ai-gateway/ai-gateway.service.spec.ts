@@ -121,6 +121,36 @@ describe('AIGatewayService', () => {
     );
     expect(auditService.log.mock.calls[0][0].metadata.message).toBeUndefined();
   });
+
+  it('attaches CareDroid unified AI node snapshot onto the envelope', () => {
+    const service = new AIGatewayService();
+    const envelope = createEnvelope();
+    const bound = service.attachUnifiedNode(envelope, {
+      primaryIntent: PrimaryIntent.CLINICAL_TOOL,
+      toolId: 'sofa-calculator',
+      artifactType: 'calculator',
+      artifactRouteConfidence: 0.91,
+      confidence: 0.88,
+      method: 'nlu',
+      nodeId: 'caredroid-unified-ai-node',
+      isEmergency: false,
+      emergencyKeywords: [],
+      extractedParameters: {},
+      matchedPatterns: ['unified-ai-node'],
+      classifiedAt: new Date(),
+    });
+
+    expect(bound.unifiedNode).toMatchObject({
+      nodeId: 'caredroid-unified-ai-node',
+      toolId: 'sofa-calculator',
+      artifactType: 'calculator',
+      method: 'nlu',
+    });
+    expect(bound.policy.allowedTools).toEqual(['sofa-calculator']);
+
+    const meta = service.toMetadata(bound, createRoutePlan());
+    expect(meta.unifiedNode?.nodeId).toBe('caredroid-unified-ai-node');
+  });
 });
 
 describe('ContextBuilderService and ResponseComposerService', () => {

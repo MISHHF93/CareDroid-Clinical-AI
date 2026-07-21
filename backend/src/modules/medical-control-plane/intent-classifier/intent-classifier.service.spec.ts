@@ -39,6 +39,10 @@ describe('IntentClassifierService', () => {
     route: jest.fn().mockRejectedValue(new Error('Unified AI node unavailable')),
   };
 
+  // Attach static NODE_ID used by the service for observability
+  (UnifiedAiNodeService as unknown as { NODE_ID: string }).NODE_ID =
+    UnifiedAiNodeService.NODE_ID || 'caredroid-unified-ai-node';
+
   const mockNluMetricsService = {
     recordKeywordPhaseDuration: jest.fn(),
     recordConfidenceScore: jest.fn(),
@@ -164,7 +168,40 @@ describe('IntentClassifierService', () => {
       expect(result.primaryIntent).toBe(PrimaryIntent.CLINICAL_TOOL);
       expect(result.toolId).toBe('sofa-calculator');
       expect(result.confidence).toBeGreaterThan(0.5);
-      expect(result.method).toBe('keyword');
+      // keyword primary; node enrichment may be absent when mock rejects
+      expect(['keyword', 'keyword+node']).toContain(result.method);
+    });
+
+    it('should use unified AI node when keywords are weak and node is confident', async () => {
+      mockUnifiedAiNode.route.mockResolvedValueOnce({
+        intent: {
+          intent: 'sofa_score_calculation',
+          confidence: 0.82,
+          keyTerms: ['sofa'],
+          subcategory: null,
+        },
+        artifact: {
+          artifactType: 'calculator',
+          confidence: 0.91,
+          labelId: 0,
+          targetMode: 'artifact-type',
+        },
+        nodeId: 'caredroid-unified-ai-node',
+        embeddingModel: 'Xenova/all-mpnet-base-v2',
+        latencyMs: 12,
+      });
+
+      // Avoid strong keyword tool aliases so Phase 2 (unified node) owns the path.
+      const result = await service.classify(
+        'Help me quantify multi-system organ dysfunction severity for this ICU admission',
+      );
+
+      expect(['nlu', 'keyword+node']).toContain(result.method);
+      expect(result.primaryIntent).toBe(PrimaryIntent.CLINICAL_TOOL);
+      expect(result.toolId).toBe('sofa-calculator');
+      expect(result.artifactType).toBe('calculator');
+      expect(result.nodeId).toBe('caredroid-unified-ai-node');
+      expect(result.confidence).toBeGreaterThanOrEqual(0.7);
     });
 
     it('should detect drug interaction checker', async () => {

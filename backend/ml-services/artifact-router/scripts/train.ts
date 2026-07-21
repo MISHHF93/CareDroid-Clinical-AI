@@ -11,6 +11,7 @@ import {
 import { trainMlpClassifier } from '../../nlu/training/mlpClassifier';
 import { computeClassWeights } from '../training/classWeights';
 import { buildLabelMaps, loadJsonlDataset, oversampleWeakClasses, resolveLabelKey } from '../training/dataset';
+import { applyRouterPathPrior } from '../../shared/router-input';
 import { MODEL_CONFIG, MODEL_PATHS, TRAINING_CONFIG } from '../training/training.config';
 
 async function embedWithProgress(texts: string[], label: string): Promise<number[][]> {
@@ -80,6 +81,16 @@ async function trainArtifactRouter(): Promise<void> {
     console.log('Using inverse-frequency class weights');
   }
 
+  function valAccuracy(weights: AnyClassifierWeights): number | null {
+    if (!validation || validation.embeddings.length === 0) return null;
+    let correct = 0;
+    for (let i = 0; i < validation.embeddings.length; i++) {
+      const { labelId } = predictFromAny(weights, validation.embeddings[i]);
+      if (labelId === validation.labels[i]) correct++;
+    }
+    return correct / validation.embeddings.length;
+  }
+
   console.log('Training linear (softmax regression) classifier head...');
   const linearResult = trainClassifier(
     trainEmbeddings,
@@ -91,15 +102,20 @@ async function trainArtifactRouter(): Promise<void> {
     validation,
     classWeights,
   );
+  const linearValAcc = valAccuracy(linearResult.weights);
   console.log(
     `  Linear: train loss ${linearResult.epochLosses[0]?.toFixed(4)} -> ${linearResult.finalLoss.toFixed(4)}` +
-      (linearResult.bestValLoss !== null ? `, best val loss ${linearResult.bestValLoss.toFixed(4)}` : ''),
+      (linearResult.bestValLoss !== null ? `, best val loss ${linearResult.bestValLoss.toFixed(4)}` : '') +
+      (linearValAcc != null ? `, val acc ${(linearValAcc * 100).toFixed(2)}%` : ''),
   );
 
   // MLP heads become impractically slow beyond a few hundred classes; the linear
   // softmax head is the right default for full-catalog artifact routing.
+  // Prefer higher validation *accuracy* (score we ship) over lower val loss —
+  // loss-only selection occasionally kept a calibrated-but-less-accurate head.
   let chosen: AnyClassifierWeights = linearResult.weights;
   let chosenName = 'linear';
+  let chosenValAcc = linearValAcc;
   const mlpClassLimit = Number(process.env.ARTIFACT_MLP_CLASS_LIMIT ?? 400);
   if (numClasses <= mlpClassLimit) {
     console.log(`Training MLP (hidden dim ${MLP_CONFIG.hiddenDim}) classifier head...`);
@@ -113,21 +129,38 @@ async function trainArtifactRouter(): Promise<void> {
       validation,
       classWeights,
     );
+    const mlpValAcc = valAccuracy(mlpResult.weights);
     console.log(
       `  MLP: train loss ${mlpResult.epochLosses[0]?.toFixed(4)} -> ${mlpResult.finalLoss.toFixed(4)}` +
-        (mlpResult.bestValLoss !== null ? `, best val loss ${mlpResult.bestValLoss.toFixed(4)}` : ''),
+        (mlpResult.bestValLoss !== null ? `, best val loss ${mlpResult.bestValLoss.toFixed(4)}` : '') +
+        (mlpValAcc != null ? `, val acc ${(mlpValAcc * 100).toFixed(2)}%` : ''),
     );
-    if (
-      validation &&
+
+    const mlpBetterByAcc =
+      mlpValAcc != null && chosenValAcc != null && mlpValAcc > chosenValAcc + 1e-9;
+    const mlpBetterByLossTie =
+      mlpValAcc != null &&
+      chosenValAcc != null &&
+      Math.abs(mlpValAcc - chosenValAcc) <= 1e-9 &&
       linearResult.bestValLoss !== null &&
       mlpResult.bestValLoss !== null &&
-      mlpResult.bestValLoss < linearResult.bestValLoss
-    ) {
+      mlpResult.bestValLoss < linearResult.bestValLoss;
+    const mlpBetterByLossOnly =
+      (mlpValAcc == null || chosenValAcc == null) &&
+      linearResult.bestValLoss !== null &&
+      mlpResult.bestValLoss !== null &&
+      mlpResult.bestValLoss < linearResult.bestValLoss;
+
+    if (mlpBetterByAcc || mlpBetterByLossTie || mlpBetterByLossOnly) {
       chosen = mlpResult.weights;
       chosenName = 'mlp';
+      chosenValAcc = mlpValAcc;
     }
   } else {
     console.log(`Skipping MLP head (${numClasses} classes) — using linear artifact router.`);
+  }
+  if (chosenValAcc != null) {
+    console.log(`Selected head: ${chosenName} (val acc ${(chosenValAcc * 100).toFixed(2)}%)`);
   }
 
   const outputPath = classifierWeightsPath(MODEL_PATHS.bestModelDir);
@@ -138,12 +171,21 @@ async function trainArtifactRouter(): Promise<void> {
     const testEmbeddings = await embedWithProgress(testData.map((row) => row.inputText), 'test');
     const testLabels = testData.map(labelFor);
     let correct = 0;
+    let pathOverrides = 0;
     for (let i = 0; i < testEmbeddings.length; i++) {
-      const { labelId } = predictFromAny(chosen, testEmbeddings[i]);
-      if (labelId === testLabels[i]) correct++;
+      const { labelId, confidence } = predictFromAny(chosen, testEmbeddings[i]);
+      const raw = labelToKey[labelId] ?? '';
+      const prior = applyRouterPathPrior(testData[i].inputText, raw, confidence);
+      if (prior.overridden) pathOverrides += 1;
+      // labelFor returns numeric id; compare via key string for path-prior results
+      const predictedKey = prior.artifactType;
+      const expectedKey = labelToKey[testLabels[i]] ?? '';
+      if (predictedKey === expectedKey) correct++;
     }
     const accuracy = correct / testEmbeddings.length;
-    console.log(`Test accuracy: ${(accuracy * 100).toFixed(2)}% (${chosenName})`);
+    console.log(
+      `Test accuracy: ${(accuracy * 100).toFixed(2)}% (${chosenName}, pathOverrides=${pathOverrides})`,
+    );
 
     const metrics = {
       accuracy,
@@ -152,6 +194,7 @@ async function trainArtifactRouter(): Promise<void> {
       numClasses,
       targetMode: mode,
       embeddingModel: MODEL_CONFIG.embeddingModelName,
+      pathOverrides,
       datasetSizes: {
         train: trainData.length,
         val: valData.length,

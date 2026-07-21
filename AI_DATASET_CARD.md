@@ -30,7 +30,7 @@ Packs: refusal_injection, calculator_parity, protocol_retrieval, tool_selection,
 | Model | Path | Notes |
 |-------|------|-------|
 | NLU intent | `backend/ml-services/nlu/` | Test n=51 — not external validity |
-| Artifact router | `backend/ml-services/artifact-router/` | Test n=282, accuracy ~0.95 |
+| Artifact router | `backend/ml-services/artifact-router/` | Test n=310, accuracy 0.9419 (retrained 2026-07-20; corpus grew since the n=282/0.9468 baseline) |
 
 ## Explicit non-datasets
 

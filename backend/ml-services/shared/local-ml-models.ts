@@ -42,8 +42,9 @@ export function loadLocalMlModelDescriptors(repoRoot = resolveRepoRoot()): Local
 
     const isNlu = head === 'nlu';
     return {
-      modelId: isNlu ? 'nlu-intent-classifier' : 'artifact-router',
-      name: isNlu ? 'NLU Intent Classifier' : 'Artifact Router',
+      // Both heads belong to the single CareDroid unified node (ADR-0003).
+      modelId: isNlu ? 'caredroid-unified-ai-node:nlu' : 'caredroid-unified-ai-node:artifact-router',
+      name: isNlu ? 'CareDroid Node · NLU Intent' : 'CareDroid Node · Artifact Router',
       purpose: isNlu
         ? 'Maps clinical utterances to 10 governed intent classes for chat and AI Chief routing.'
         : 'Maps utterances to artifact types (calculator, tool, route, …) for unified AI node routing.',
