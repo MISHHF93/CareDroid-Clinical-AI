@@ -1,0 +1,90 @@
+[
+  {
+    "inputText": "name: Resource Utilization Index | shape:score-like",
+    "expected": "calculator",
+    "predicted": "document",
+    "confidence": 0.8011836111303037,
+    "artifactId": "resource-utilization-index",
+    "labelType": "name"
+  },
+  {
+    "inputText": "name: Fluid Resuscitation Calculator Plugin",
+    "expected": "tool",
+    "predicted": "calculator",
+    "confidence": 0.6750623443109796,
+    "artifactId": "plugin-fluid-resuscitation-calculator",
+    "labelType": "name"
+  },
+  {
+    "inputText": "name: FHIR Connector",
+    "expected": "tool",
+    "predicted": "calculator",
+    "confidence": 0.4862722234345929,
+    "artifactId": "fhir-connector",
+    "labelType": "name"
+  },
+  {
+    "inputText": "name: Rome IV IBS",
+    "expected": "tool",
+    "predicted": "calculator",
+    "confidence": 0.8619853732883048,
+    "artifactId": "rome-iv-ibs",
+    "labelType": "name"
+  },
+  {
+    "inputText": "route: /ai-evaluation",
+    "expected": "tool",
+    "predicted": "route",
+    "confidence": 0.49322018288428804,
+    "artifactId": "ai-evaluation",
+    "labelType": "route"
+  },
+  {
+    "inputText": "route: /artifacts",
+    "expected": "tool",
+    "predicted": "route",
+    "confidence": 0.5312605583284066,
+    "artifactId": "ai-artifacts",
+    "labelType": "route"
+  },
+  {
+    "inputText": "route: /review",
+    "expected": "tool",
+    "predicted": "route",
+    "confidence": 0.8954444614190938,
+    "artifactId": "human-review-queue",
+    "labelType": "route"
+  },
+  {
+    "inputText": "name: api-endpoint | analytics-metrics",
+    "expected": "api-endpoint",
+    "predicted": "tool",
+    "confidence": 0.6911265323438913,
+    "artifactId": "frontend-api-analytics-metrics",
+    "labelType": "name"
+  },
+  {
+    "inputText": "route: /brain",
+    "expected": "route",
+    "predicted": "tool",
+    "confidence": 0.48424829328638586,
+    "artifactId": "route-brain",
+    "labelType": "route"
+  },
+  {
+    "inputText": "route: /workflow-mining",
+    "expected": "route",
+    "predicted": "tool",
+    "confidence": 0.6844442252944265,
+    "artifactId": "route-workflowMining",
+    "labelType": "route"
+  },
+  {
+    "inputText": "route: platform | /platform-analytics",
+    "expected": "route",
+    "predicted": "platform",
+    "confidence": 0.8970336594035685,
+    "artifactId": "route-platformAnalytics",
+    "labelType": "route"
+  }
+]

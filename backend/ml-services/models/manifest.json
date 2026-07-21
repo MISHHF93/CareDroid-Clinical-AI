@@ -1,25 +1,25 @@
 {
   "version": 1,
   "name": "caredroid-unified-ai-node",
-  "updatedAt": "2026-07-20T21:17:06.370Z",
+  "updatedAt": "2026-07-21T06:11:55.476Z",
   "embeddingModel": "Xenova/all-mpnet-base-v2",
   "heads": {
     "nlu": {
-      "classifierPath": "C:\\Users\\borah\\.grok\\worktrees\\borah-caredroid-clinical-ai\\2026-07-20-4672477f\\backend\\ml-services\\models\\nlu\\classifier.json",
-      "metricsPath": "C:\\Users\\borah\\.grok\\worktrees\\borah-caredroid-clinical-ai\\2026-07-20-4672477f\\backend\\ml-services\\models\\nlu\\metrics.json",
+      "classifierPath": "C:\\Users\\borah\\CareDroid-Clinical-AI\\backend\\ml-services\\models\\nlu\\classifier.json",
+      "metricsPath": "C:\\Users\\borah\\CareDroid-Clinical-AI\\backend\\ml-services\\models\\nlu\\metrics.json",
       "architecture": "mlp",
       "accuracy": 1,
       "testSetSize": 51,
       "syncedFromLegacy": false
     },
     "artifact-router": {
-      "classifierPath": "C:\\Users\\borah\\.grok\\worktrees\\borah-caredroid-clinical-ai\\2026-07-20-4672477f\\backend\\ml-services\\models\\artifact-router\\classifier.json",
-      "metricsPath": "C:\\Users\\borah\\.grok\\worktrees\\borah-caredroid-clinical-ai\\2026-07-20-4672477f\\backend\\ml-services\\models\\artifact-router\\metrics.json",
+      "classifierPath": "C:\\Users\\borah\\CareDroid-Clinical-AI\\backend\\ml-services\\models\\artifact-router\\classifier.json",
+      "metricsPath": "C:\\Users\\borah\\CareDroid-Clinical-AI\\backend\\ml-services\\models\\artifact-router\\metrics.json",
       "architecture": "mlp",
-      "accuracy": 0.9419354838709677,
+      "accuracy": 0.964516129032258,
       "targetMode": "artifact-type",
       "testSetSize": 310,
-      "evaluatedAt": "2026-07-20T18:37:16.392Z",
+      "evaluatedAt": "2026-07-21T03:37:52.735Z",
       "syncedFromLegacy": false
     }
   }

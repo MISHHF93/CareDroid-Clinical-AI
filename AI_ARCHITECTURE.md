@@ -25,7 +25,17 @@ This is **not** a page-local chatbot. Feature modules must not call foundation p
 | Offline gate | `npm run verify:ai-node` |
 | Live scores (2026-07-21) | NLU **100%** (n=51) · artifact-router **96.45%** (n=310) |
 
-Layers above the node (LLM egress, RAG, 39 calculators, heuristic `careDroidAI` intents) **consume** or sit beside this node — they must not fork a second trained local classifier tree.
+**Product wiring (2026-07-21):**
+
+| Surface | How it uses the 1-node backbone |
+|---------|----------------------------------|
+| `IntentClassifierService` | Phase 2 = `UnifiedAiNodeService.route()`; keyword path enriches with node |
+| `ChatService` | Classifies via IntentClassifier → `AIGatewayService.attachUnifiedNode()` → MoE |
+| `AIGatewayService` | Envelope + audit + `aiFoundation.unifiedNode` on composed responses |
+| `MoERouter` / expert selector | Artifact-type head is routing evidence (`artifact_type`) |
+| `AIService.runUnifiedAiQuery` | Always classifies free text through the node; structured tasks get `structuredData.unifiedNode` |
+
+Layers above the node (LLM egress, RAG, 39 calculators, heuristic `careDroidAI` intents) **consume** this node for routing — they must not fork a second trained local classifier tree.
 
 ---
 

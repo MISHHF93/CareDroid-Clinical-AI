@@ -2,7 +2,7 @@
   "schemaVersion": "1.0.0",
   "baselineId": "AI_BASELINE_REPORT_v1",
   "frozenAt": "2026-07-11",
-  "notes": "Populated by ai-eval-run.mjs at 2026-07-20T20:24:35.322Z (offline fixtures).",
+  "notes": "Populated by ai-eval-run.mjs at 2026-07-21T03:37:48.478Z (offline fixtures).",
   "series": [
     {
       "metricId": "refusal_quality_rate",
@@ -16,7 +16,7 @@
       },
       "value": 1,
       "sampleSize": 41,
-      "measuredAt": "2026-07-20T20:24:35.322Z",
+      "measuredAt": "2026-07-21T03:37:48.478Z",
       "method": "offline_fixture_harness_v1",
       "datasetId": "caredroid-ai-eval-v1"
     },
@@ -32,7 +32,7 @@
       },
       "value": 1,
       "sampleSize": 41,
-      "measuredAt": "2026-07-20T20:24:35.322Z",
+      "measuredAt": "2026-07-21T03:37:48.478Z",
       "method": "offline_fixture_harness_v1",
       "datasetId": "caredroid-ai-eval-v1"
     },
@@ -48,7 +48,7 @@
       },
       "value": 1,
       "sampleSize": 41,
-      "measuredAt": "2026-07-20T20:24:35.322Z",
+      "measuredAt": "2026-07-21T03:37:48.478Z",
       "method": "offline_fixture_harness_v1",
       "datasetId": "caredroid-ai-eval-v1"
     },
@@ -64,7 +64,7 @@
       },
       "value": 1,
       "sampleSize": 41,
-      "measuredAt": "2026-07-20T20:24:35.322Z",
+      "measuredAt": "2026-07-21T03:37:48.478Z",
       "method": "offline_fixture_harness_v1",
       "datasetId": "caredroid-ai-eval-v1"
     },
@@ -80,7 +80,7 @@
       },
       "value": 1,
       "sampleSize": 41,
-      "measuredAt": "2026-07-20T20:24:35.322Z",
+      "measuredAt": "2026-07-21T03:37:48.478Z",
       "method": "offline_fixture_harness_v1",
       "datasetId": "caredroid-ai-eval-v1"
     },
@@ -96,7 +96,7 @@
       },
       "value": 1,
       "sampleSize": 41,
-      "measuredAt": "2026-07-20T20:24:35.322Z",
+      "measuredAt": "2026-07-21T03:37:48.478Z",
       "method": "offline_fixture_harness_v1",
       "datasetId": "caredroid-ai-eval-v1"
     },
@@ -112,7 +112,7 @@
       },
       "value": 0,
       "sampleSize": 41,
-      "measuredAt": "2026-07-20T20:24:35.322Z",
+      "measuredAt": "2026-07-21T03:37:48.478Z",
       "method": "offline_fixture_harness_v1",
       "datasetId": "caredroid-ai-eval-v1"
     },
@@ -128,7 +128,7 @@
       },
       "value": 1,
       "sampleSize": 41,
-      "measuredAt": "2026-07-20T20:24:35.322Z",
+      "measuredAt": "2026-07-21T03:37:48.478Z",
       "method": "offline_fixture_harness_v1",
       "datasetId": "caredroid-ai-eval-v1"
     },
@@ -144,7 +144,7 @@
       },
       "value": 1,
       "sampleSize": 41,
-      "measuredAt": "2026-07-20T20:24:35.322Z",
+      "measuredAt": "2026-07-21T03:37:48.478Z",
       "method": "offline_fixture_harness_v1",
       "datasetId": "caredroid-ai-eval-v1"
     },
@@ -160,7 +160,7 @@
       },
       "value": 0,
       "sampleSize": 41,
-      "measuredAt": "2026-07-20T20:24:35.322Z",
+      "measuredAt": "2026-07-21T03:37:48.478Z",
       "method": "offline_fixture_harness_v1",
       "datasetId": "caredroid-ai-eval-v1"
     },
@@ -176,7 +176,7 @@
       },
       "value": 0,
       "sampleSize": 41,
-      "measuredAt": "2026-07-20T20:24:35.322Z",
+      "measuredAt": "2026-07-21T03:37:48.478Z",
       "method": "offline_fixture_harness_v1",
       "datasetId": "caredroid-ai-eval-v1"
     },
@@ -192,7 +192,7 @@
       },
       "value": 1,
       "sampleSize": 41,
-      "measuredAt": "2026-07-20T20:24:35.322Z",
+      "measuredAt": "2026-07-21T03:37:48.478Z",
       "method": "offline_fixture_harness_v1",
       "datasetId": "caredroid-ai-eval-v1"
     },
@@ -208,7 +208,7 @@
       },
       "value": 0,
       "sampleSize": 41,
-      "measuredAt": "2026-07-20T20:24:35.322Z",
+      "measuredAt": "2026-07-21T03:37:48.478Z",
       "method": "offline_fixture_harness_v1",
       "datasetId": "caredroid-ai-eval-v1"
     },
@@ -224,7 +224,7 @@
       },
       "value": 1,
       "sampleSize": 41,
-      "measuredAt": "2026-07-20T20:24:35.322Z",
+      "measuredAt": "2026-07-21T03:37:48.478Z",
       "method": "offline_fixture_harness_v1",
       "datasetId": "caredroid-ai-eval-v1"
     }

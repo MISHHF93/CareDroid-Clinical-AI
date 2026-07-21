@@ -4215,7 +4215,7 @@ MEWS,mews,Calculator,cardiology|clinical|calculator,cardiology-pack,product-card
 calculator|Calculator|cardiology|clinical|cardiology-pack,mews,Calculator,cardiology|clinical|calculator,cardiology-pack,product-cardiology,tags,0.78
 "Adult early-warning score from respiratory rate, heart rate, systolic blood pressure, temperature, and AVPU.",mews,Calculator,cardiology|clinical|calculator,cardiology-pack,product-cardiology,intent,0.88
 artifact-router classifier head,ml-head-artifact-router,local-ml-head,ai-workflow|clinical,ai-workflow-pack,product-core-platform,name,0.92
-Unified CareDroid AI node artifact-router classifier (94.2% accuracy).,ml-head-artifact-router,local-ml-head,ai-workflow|clinical,ai-workflow-pack,product-core-platform,description,0.72
+Unified CareDroid AI node artifact-router classifier (96.5% accuracy).,ml-head-artifact-router,local-ml-head,ai-workflow|clinical,ai-workflow-pack,product-core-platform,description,0.72
 ml-head|artifact-router|mlp|unified-ai-node,ml-head-artifact-router,local-ml-head,ai-workflow|clinical,ai-workflow-pack,product-core-platform,tags,0.78
 nlu classifier head,ml-head-nlu,local-ml-head,ai-workflow|clinical,ai-workflow-pack,product-core-platform,name,0.92
 Unified CareDroid AI node nlu classifier (100.0% accuracy).,ml-head-nlu,local-ml-head,ai-workflow|clinical,ai-workflow-pack,product-core-platform,description,0.72

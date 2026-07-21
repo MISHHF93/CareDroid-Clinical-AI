@@ -1,12 +1,13 @@
 {
-  "accuracy": 0.9419354838709677,
+  "accuracy": 0.964516129032258,
   "testSetSize": 310,
   "targetMode": "artifact-type",
   "architecture": "mlp",
+  "pathOverrides": 0,
   "latencyMs": {
     "p50": 0,
     "p95": 1,
-    "mean": 1.2096774193548387
+    "mean": 1.6709677419354838
   },
-  "evaluatedAt": "2026-07-20T18:37:16.392Z"
+  "evaluatedAt": "2026-07-21T03:37:52.735Z"
 }

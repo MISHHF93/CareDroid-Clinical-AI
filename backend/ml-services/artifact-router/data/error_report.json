@@ -1,45 +1,81 @@
 [
   {
-    "inputText": "name: Shock Index",
+    "inputText": "name: NIHSS Summary View",
     "expected": "calculator",
-    "predicted": "prompt",
-    "confidence": 0.2498054218413735,
+    "predicted": "document",
+    "confidence": 0.8644324340410626,
     "labelType": "name",
-    "artifactId": "shock-index",
+    "artifactId": "nihss-summary-view",
     "artifactType": "calculator"
   },
   {
-    "inputText": "route: /tools/calculators/copd-gold-assessment",
-    "expected": "calculator",
-    "predicted": "prompt",
-    "confidence": 0.5149501974357402,
+    "inputText": "route: /integrations/hl7",
+    "expected": "tool",
+    "predicted": "route",
+    "confidence": 0.4115118887006201,
     "labelType": "route",
-    "artifactId": "copd-gold-assessment",
-    "artifactType": "calculator"
+    "artifactId": "hl7-bridge",
+    "artifactType": "tool"
   },
   {
-    "inputText": "route: /tools/calculators/sofa",
-    "expected": "calculator",
-    "predicted": "tool",
-    "confidence": 0.3977699237684198,
+    "inputText": "route: /costs",
+    "expected": "tool",
+    "predicted": "route",
+    "confidence": 0.951184980495309,
     "labelType": "route",
-    "artifactId": "sofa-score",
-    "artifactType": "calculator"
+    "artifactId": "ai-cost-optimization",
+    "artifactType": "tool"
   },
   {
-    "inputText": "route: /tools/guideline-rag",
+    "inputText": "name: Prompt Firewall",
     "expected": "tool",
     "predicted": "prompt",
-    "confidence": 0.49456223755153184,
-    "labelType": "route",
-    "artifactId": "ai-rag",
+    "confidence": 0.7844773523642631,
+    "labelType": "name",
+    "artifactId": "prompt-firewall",
     "artifactType": "tool"
+  },
+  {
+    "inputText": "name: NEXUS C-Spine Rule",
+    "expected": "tool",
+    "predicted": "calculator",
+    "confidence": 0.45729529293848614,
+    "labelType": "name",
+    "artifactId": "nexus-cspine",
+    "artifactType": "tool"
+  },
+  {
+    "inputText": "name: Deployment Observability",
+    "expected": "tool",
+    "predicted": "document",
+    "confidence": 0.9880599071076035,
+    "labelType": "name",
+    "artifactId": "deployment-observability",
+    "artifactType": "tool"
+  },
+  {
+    "inputText": "name: Vertigo HINTS Assistant",
+    "expected": "tool",
+    "predicted": "prompt",
+    "confidence": 0.5548504877622343,
+    "labelType": "name",
+    "artifactId": "vertigo-hints-assistant",
+    "artifactType": "tool"
+  },
+  {
+    "inputText": "name: api-endpoint | ai-explainability-trace",
+    "expected": "api-endpoint",
+    "predicted": "tool",
+    "confidence": 0.5106096816955304,
+    "labelType": "name",
+    "artifactId": "frontend-api-ai-explainability-trace",
+    "artifactType": "api-endpoint"
   },
   {
     "inputText": "name: SaaS Service Journey Map",
     "expected": "document",
     "predicted": "route",
-    "confidence": 0.6440623179930255,
+    "confidence": 0.6789602016293467,
     "labelType": "name",
     "artifactId": "doc-docs-specs-saas-service-journey-map-md",
     "artifactType": "document"
@@ -48,7 +84,7 @@
     "inputText": "name: Production AI monitoring v1",
     "expected": "document",
     "predicted": "tool",
-    "confidence": 0.7155553576454371,
+    "confidence": 0.6615826031884303,
     "labelType": "name",
     "artifactId": "doc-docs-ai-production-monitoring-v1-md",
     "artifactType": "document"
@@ -57,7 +93,7 @@
     "inputText": "name: Door-to-Doctor Intelligence",
     "expected": "document",
     "predicted": "tool",
-    "confidence": 0.8649006497758776,
+    "confidence": 0.8777922355065434,
     "labelType": "name",
     "artifactId": "doc-docs-workflows-door-to-doctor-intelligence-md",
     "artifactType": "document"
@@ -66,7 +102,7 @@
     "inputText": "name: Full Emergency-Care Journey",
     "expected": "document",
     "predicted": "tool",
-    "confidence": 0.4406718044367168,
+    "confidence": 0.3867333229257369,
     "labelType": "name",
     "artifactId": "doc-docs-specs-full-emergency-care-journey-md",
     "artifactType": "document"
@@ -75,16 +111,16 @@
     "inputText": "name: Stage J — Final Measure & Rescore",
     "expected": "document",
     "predicted": "calculator",
-    "confidence": 0.9127547880282549,
+    "confidence": 0.8367460254092467,
     "labelType": "name",
     "artifactId": "doc-docs-architecture-architect-mode-stage-j-rescore-md",
     "artifactType": "document"
   },
   {
-    "inputText": "route: /tools/cardiology/remote-cardiology-monitoring-dashboard",
+    "inputText": "route: api-endpoint | /tools/cardiology/remote-cardiology-monitoring-dashboard",
     "expected": "prompt",
     "predicted": "tool",
-    "confidence": 0.7032363384790464,
+    "confidence": 0.8720097506058371,
     "labelType": "route",
     "artifactId": "prompt-remote-cardiology-monitoring-dashboard",
     "artifactType": "prompt"
@@ -93,18 +129,27 @@
     "inputText": "name: HUMAN_REVIEW_DISCLAIMER",
     "expected": "registry",
     "predicted": "tool",
-    "confidence": 0.6721668741929544,
+    "confidence": 0.623855374803051,
     "labelType": "name",
     "artifactId": "registry-lib-ai-safetypolicy-ts",
     "artifactType": "registry"
   },
   {
-    "inputText": "route: /platform-admin",
+    "inputText": "route: platform | /platform-admin",
     "expected": "route",
     "predicted": "platform",
-    "confidence": 0.49407153675927745,
+    "confidence": 0.949690827491114,
     "labelType": "route",
     "artifactId": "route-platformAdmin",
+    "artifactType": "route"
+  },
+  {
+    "inputText": "route: /usage",
+    "expected": "route",
+    "predicted": "tool",
+    "confidence": 0.6498564423692921,
+    "labelType": "route",
+    "artifactId": "route-usage",
     "artifactType": "route"
   }
 ]

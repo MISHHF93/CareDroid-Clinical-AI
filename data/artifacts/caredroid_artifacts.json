@@ -29517,7 +29517,7 @@
     "roles": "clinician|platform-admin",
     "organizationTypes": "hospital",
     "riskLevel": "high",
-    "description": "Unified CareDroid AI node artifact-router classifier (94.2% accuracy).",
+    "description": "Unified CareDroid AI node artifact-router classifier (96.5% accuracy).",
     "dependencies": "backend/ml-services/models/artifact-router",
     "tags": "ml-head|artifact-router|mlp|unified-ai-node",
     "embeddingText": "artifact-router classifier unified ai node mlp artifact-type",

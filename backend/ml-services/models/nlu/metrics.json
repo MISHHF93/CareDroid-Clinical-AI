@@ -7,8 +7,8 @@
   "latencyMs": {
     "p50": 0,
     "p95": 1,
-    "p99": 201,
-    "mean": 4.03921568627451
+    "p99": 516,
+    "mean": 10.196078431372548
   },
   "testSetSize": 51,
   "usedTrainedClassifier": true,
