@@ -131,4 +131,39 @@
   --semantic-infrastructure-health: var(--cdl-ops);
   --semantic-infrastructure-health-bg: var(--cdl-ops-bg);
   --semantic-infrastructure-health-border: var(--cdl-ops-border);
+
+  /* Card contracts — AA muted ink, not light greys */
+  --medical-card-bg: var(--cdl-card-bg, var(--cdl-surface-card));
+  --medical-card-fg: var(--cdl-card-fg, var(--cdl-ink));
+  --medical-card-fg-muted: var(--cdl-ink-muted);
+  --medical-card-fg-subtle: var(--cdl-ink-subtle);
+  --medical-card-border: var(--cdl-border);
+  --medical-card-muted-bg: var(--cdl-surface-muted);
+  --medical-card-muted-fg: var(--cdl-ink);
+  --medical-card-muted-fg-muted: var(--cdl-ink-muted);
+  --medical-card-critical-bg: var(--cdl-critical-bg);
+  --medical-card-critical-fg: var(--cdl-critical-text);
+  --medical-card-warning-bg: var(--cdl-warning-bg);
+  --medical-card-warning-fg: var(--cdl-warning-text);
+  --medical-card-success-bg: var(--cdl-ok-bg);
+  --medical-card-success-fg: var(--cdl-ok-text);
+  --card-contract-bg: var(--medical-card-bg);
+  --card-contract-fg: var(--medical-card-fg);
+  --card-contract-fg-muted: var(--medical-card-fg-muted);
+  --card-contract-fg-subtle: var(--medical-card-fg-subtle);
+  --card-contract-border: var(--medical-card-border);
+  --color-card: var(--cdl-surface-card);
+  --color-text-primary: var(--cdl-ink);
+  --color-text-secondary: var(--cdl-ink-muted);
+  --color-text-muted: var(--cdl-ink-muted);
+  --priority-p1: var(--cdl-acuity-p1);
+  --priority-p2: var(--cdl-acuity-p2);
+  --priority-p3: var(--cdl-acuity-p3);
+  --priority-p4: var(--cdl-acuity-p4);
+  --priority-p5: var(--cdl-acuity-p5);
+  --status-danger: var(--cdl-critical);
+  --status-critical: var(--cdl-critical);
+  --status-warning: var(--cdl-warning);
+  --status-success: var(--cdl-ok);
+  --status-info: var(--cdl-info);
 }

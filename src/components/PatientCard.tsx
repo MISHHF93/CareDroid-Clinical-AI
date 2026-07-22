@@ -82,6 +82,7 @@ import { GraphicIconBadge, PatientAcuityRing } from './graphics/CdlGraphicKit';
 import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
 import { resolveCopilotChromeLabels } from '../config/profileDesignLanguage.config';
 import { usePhiViewAudit } from '../hooks/usePhiAccess';
+import { resolveAlarmSeverity, type AlarmSeverity } from '../alarm/types';
 import './PatientCard.css';
 
 type PatientCardWorkflowProfile = 'none' | 'charge' | 'physician';
@@ -244,10 +245,24 @@ function truncateComplaint(complaint: string): string {
   return complaint.length > 42 ? `${complaint.slice(0, 42)}...` : complaint;
 }
 
-function waitColor(minutes: number): string {
-  if (minutes > 60) return 'var(--status-danger)';
-  if (minutes > 45) return 'var(--status-warning)';
-  return 'var(--color-text-secondary)';
+/** Wait duration → CDL severity (no hex). */
+function waitSeverity(minutes: number): AlarmSeverity {
+  if (minutes > 60) return 'critical';
+  if (minutes > 45) return 'warning';
+  if (minutes > 30) return 'urgent';
+  return 'neutral';
+}
+
+function resolvePatientCardSeverity(input: {
+  hasLwbsRisk: boolean;
+  hasDeteriorationRisk: boolean;
+  hasReassessmentDue: boolean;
+  hasLongWait: boolean;
+  minutesWaiting: number;
+}): AlarmSeverity {
+  if (input.hasLwbsRisk || input.hasDeteriorationRisk) return 'critical';
+  if (input.hasReassessmentDue || input.hasLongWait) return 'warning';
+  return waitSeverity(input.minutesWaiting);
 }
 
 function navigateTo(path: string): void {
@@ -445,7 +460,18 @@ function PatientCard({
     (capacityBand === 'Orange' || capacityBand === 'Red') &&
     (isBoarding || hasLongWait || hasReassessmentDue || hasEmsArrival);
   const scores = scoreBadges(patient);
-  const waitStatusColor = hasLwbsRisk ? '#EF4444' : hasLongWait ? '#F59E0B' : waitColor(minutesWaiting);
+  const cardSeverity = resolvePatientCardSeverity({
+    hasLwbsRisk,
+    hasDeteriorationRisk,
+    hasReassessmentDue,
+    hasLongWait,
+    minutesWaiting,
+  });
+  const waitStatusSeverity: AlarmSeverity = hasLwbsRisk
+    ? 'critical'
+    : hasLongWait
+      ? 'warning'
+      : waitSeverity(minutesWaiting);
   const priorityLabel = PriorityLabel[displayPriority] || String(displayPriority);
   const activeMission = useThreeMinuteMissionStore((state) =>
     state.missions.find((mission) => mission.patientId === patient.id && !mission.acknowledgedAt),
@@ -606,6 +632,7 @@ function PatientCard({
   // Prefer static ARIA role strings (not JSX expressions) for a11y tooling.
   const rowClassName = [
     'patient-card',
+    'cdl-card',
     'patient-card--row',
     `patient-card--priority-${displayPriority}`,
     hasReassessmentDue ? 'patient-card--reassessment-due' : '',
@@ -621,6 +648,7 @@ function PatientCard({
 
   const cardClassName = [
     'patient-card',
+    'cdl-card',
     `patient-card--density-${densityVariant}`,
     `patient-card--priority-${displayPriority}`,
     hasReassessmentDue ? 'patient-card--reassessment-due' : '',
@@ -634,6 +662,11 @@ function PatientCard({
   ]
     .filter(Boolean)
     .join(' ');
+
+  const cardSeverityAttrs = {
+    'data-severity': resolveAlarmSeverity(cardSeverity),
+    'data-acuity': displayPriority,
+  } as const;
 
   if (layout === 'row') {
     const rowBody = (
@@ -677,8 +710,11 @@ function PatientCard({
           {truncateComplaint(patientComplaint)}
         </div>
 
-        <div className="patient-card__row-cell patient-card__row-cell--wait" style={{ color: waitStatusColor }}>
-          <Clock3 size={14} strokeWidth={2.25} aria-hidden />
+        <div
+          className="patient-card__row-cell patient-card__row-cell--wait cdl-wait cdl-text-severity"
+          data-severity={waitStatusSeverity}
+        >
+          <Clock3 size={14} strokeWidth={1.85} aria-hidden />
           <span>
             {queueTiming ? queueTiming.elapsedLabel : `${minutesWaiting}m`}
           </span>
@@ -713,6 +749,7 @@ function PatientCard({
         <div
           className={rowClassName}
           data-patient-card-id={patient.id}
+          {...cardSeverityAttrs}
           onFocus={onKeyboardFocus}
           role="row"
           tabIndex={-1}
@@ -728,6 +765,7 @@ function PatientCard({
       <div
         className={rowClassName}
         data-patient-card-id={patient.id}
+        {...cardSeverityAttrs}
         onClick={handleSelect}
         onFocus={onKeyboardFocus}
         role="button"
@@ -881,7 +919,7 @@ function PatientCard({
       <div className="patient-card__meta-grid">
         <div className="patient-card__meta-item">
           <span>{queueTiming?.isOnline ? 'Queue' : 'Wait'}</span>
-          <strong style={{ color: waitStatusColor }}>
+          <strong className="cdl-wait cdl-text-severity" data-severity={waitStatusSeverity}>
             {queueTiming ? (
               <>
                 {queueTiming.elapsedLabel}
@@ -1131,6 +1169,7 @@ function PatientCard({
       <div
         className={cardClassName}
         data-patient-card-id={patient.id}
+        {...cardSeverityAttrs}
         onFocus={onKeyboardFocus}
         role="article"
         tabIndex={-1}
@@ -1146,6 +1185,7 @@ function PatientCard({
     <div
       className={cardClassName}
       data-patient-card-id={patient.id}
+      {...cardSeverityAttrs}
       onClick={handleSelect}
       onFocus={onKeyboardFocus}
       role="button"

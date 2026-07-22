@@ -1,6 +1,7 @@
 /**
  * Card contrast contracts — ensures foreground always matches card surface.
  * Loaded after surface-normalization.css.
+ * CDL v2: defaults use AA muted ink; severity-tinted cards keep their data-severity surfaces.
  */
 
 .session-chrome-bar__drawer :is(
@@ -8,17 +9,17 @@
     .cd-dashboard-card,
     .cd-surface,
     [class$='-card']
-  ) {
-  --card-contract-bg: var(--medical-card-bg, #ffffff);
-  --card-contract-fg: var(--medical-card-fg, #111827);
-  --card-contract-fg-muted: var(--medical-card-fg-muted, #6b7280);
-  --card-contract-border: var(--medical-card-border, #e0f2fe);
+  ):not([data-severity]):not(.cdl-card[data-severity]) {
+  --card-contract-bg: var(--cdl-surface-card, var(--medical-card-bg, #ffffff));
+  --card-contract-fg: var(--cdl-ink, var(--medical-card-fg, #111827));
+  --card-contract-fg-muted: var(--cdl-ink-muted, var(--medical-card-fg-muted, #475569));
+  --card-contract-border: var(--cdl-border, var(--medical-card-border, #e2e8f0));
   background-color: var(--card-contract-bg);
   border-color: var(--card-contract-border);
   color: var(--card-contract-fg);
 }
 
-/* Base contract for all card-like surfaces */
+/* Base contract for card-like surfaces — skip severity-tinted CDL cards */
 :is(.app-shell, .emergency-app-shell) :is(
     .card,
     .card-subtle,
@@ -36,15 +37,22 @@
     [class*='-card '],
     [class$='-panel']:not([class*='modal']):not([class*='overlay']),
     [class*='-panel ']:not([class*='modal']):not([class*='overlay'])
-  ) {
-  --card-contract-bg: var(--medical-card-bg, #ffffff);
-  --card-contract-fg: var(--medical-card-fg, #111827);
-  --card-contract-fg-muted: var(--medical-card-fg-muted, #6b7280);
-  --card-contract-fg-subtle: var(--medical-card-fg-subtle, #9ca3af);
-  --card-contract-border: var(--medical-card-border, #e0f2fe);
+  ):not([data-severity]):not(.cdl-alarm-banner):not(.cdl-alarm-kpi) {
+  --card-contract-bg: var(--cdl-surface-card, var(--medical-card-bg, #ffffff));
+  --card-contract-fg: var(--cdl-ink, var(--medical-card-fg, #111827));
+  --card-contract-fg-muted: var(--cdl-ink-muted, #475569);
+  --card-contract-fg-subtle: var(--cdl-ink-subtle, #64748b);
+  --card-contract-border: var(--cdl-border, var(--medical-card-border, #e2e8f0));
   background-color: var(--card-contract-bg);
   border-color: var(--card-contract-border);
   color: var(--card-contract-fg);
+}
+
+/* Severity cards own their contrast via CDL tokens */
+:is(.app-shell, .emergency-app-shell) :is(.cdl-card, .patient-card, [class$='-card'])[data-severity] {
+  /* do not force white contract over tinted severity surfaces */
+  background-color: unset;
+  color: unset;
 }
 
 .card-subtle,

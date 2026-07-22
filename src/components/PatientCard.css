@@ -29,17 +29,24 @@
 
 .patient-card {
   animation: patient-card-enter var(--motion-duration-normal, 180ms) var(--motion-ease-standard, ease-out);
-  background: var(--color-card);
-  color: var(--color-text-primary);
+  /* CDL v2 contract — paired bg/fg; severity via data-severity on .cdl-card */
+  background: var(--cdl-card-bg, var(--color-card, #ffffff));
+  color: var(--cdl-card-fg, var(--color-text-primary, #111827));
   inline-size: 100%;
   min-inline-size: 0;
   isolation: isolate;
+  overflow: hidden;
   transition:
     background-color var(--motion-transition-fast, 120ms ease),
     border-color var(--motion-transition-fast, 120ms ease),
     box-shadow var(--motion-transition-fast, 120ms ease),
     transform var(--motion-transition-fast, 120ms ease);
   will-change: transform;
+}
+
+.patient-card .cdl-wait,
+.patient-card .cdl-text-severity {
+  font-variant-numeric: tabular-nums;
 }
 
 .patient-card [style*='var(--color-floating-surface)'] {
@@ -255,7 +262,7 @@
   align-items: center;
   gap: 6px;
   font-weight: 700;
-  color: #374151;
+  color: var(--cdl-ink-muted, #475569);
 }
 
 /* Visual QA clarity pass: make triage/state/risk readable without relying on tiny color marks. */

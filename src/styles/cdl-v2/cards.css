@@ -1,0 +1,350 @@
+/**
+ * CareDroid Design Language v2 — card surface contracts.
+ * Paired background + foreground for AA contrast. Severity via data-severity.
+ */
+
+:root {
+  --cdl-card-bg: var(--cdl-surface-card);
+  --cdl-card-fg: var(--cdl-ink);
+  --cdl-card-fg-muted: var(--cdl-ink-muted);
+  --cdl-card-fg-subtle: var(--cdl-ink-subtle);
+  --cdl-card-border: var(--cdl-border);
+  --cdl-card-radius: var(--cdl-radius-lg);
+  --cdl-card-pad: var(--cdl-space-3) var(--cdl-space-4);
+  --cdl-card-rail-width: 4px;
+}
+
+/* ── Base card ── */
+.cdl-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--cdl-space-2);
+  min-width: 0;
+  padding: var(--cdl-card-pad);
+  background: var(--cdl-card-bg);
+  color: var(--cdl-card-fg);
+  border: 1px solid var(--cdl-card-border);
+  border-radius: var(--cdl-card-radius);
+  box-shadow: var(--cdl-elev-1);
+  isolation: isolate;
+  box-sizing: border-box;
+  transition:
+    box-shadow var(--cdl-duration-normal) var(--cdl-ease-standard),
+    border-color var(--cdl-duration-normal) var(--cdl-ease-standard),
+    transform var(--cdl-duration-fast) var(--cdl-ease-standard);
+}
+
+.cdl-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: var(--cdl-card-rail-width);
+  border-radius: var(--cdl-card-radius) 0 0 var(--cdl-card-radius);
+  background: transparent;
+  pointer-events: none;
+}
+
+.cdl-card:hover {
+  box-shadow: var(--cdl-elev-2);
+  border-color: var(--cdl-border-strong);
+}
+
+.cdl-card:focus-visible {
+  outline: none;
+  box-shadow: var(--cdl-focus-ring), var(--cdl-elev-2);
+}
+
+/* Typography roles — always on-card ink, never orphan greys */
+.cdl-card__title {
+  margin: 0;
+  color: var(--cdl-card-fg);
+  font-size: var(--cdl-text-md);
+  font-weight: var(--cdl-font-semibold);
+  line-height: var(--cdl-leading-snug);
+}
+
+.cdl-card__meta,
+.cdl-card__muted {
+  color: var(--cdl-card-fg-muted);
+  font-size: var(--cdl-text-sm);
+  line-height: var(--cdl-leading-normal);
+}
+
+.cdl-card__subtle {
+  color: var(--cdl-card-fg-subtle);
+  font-size: var(--cdl-text-xs);
+}
+
+.cdl-card__mono {
+  font-family: var(--cdl-font-mono);
+  font-size: var(--cdl-text-xs);
+  color: var(--cdl-card-fg-muted);
+}
+
+/* Severity surfaces — tinted bg with dark readable ink (not white-on-tint) */
+.cdl-card[data-severity='critical'] {
+  --cdl-card-bg: var(--cdl-critical-bg);
+  --cdl-card-fg: var(--cdl-critical-text);
+  --cdl-card-fg-muted: var(--cdl-critical-text);
+  --cdl-card-border: var(--cdl-critical-border);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--cdl-critical) 16%, transparent),
+    var(--cdl-elev-2);
+}
+
+.cdl-card[data-severity='critical']::before {
+  background: var(--cdl-critical);
+  width: 5px;
+}
+
+.cdl-card[data-severity='urgent'] {
+  --cdl-card-bg: var(--cdl-urgent-bg);
+  --cdl-card-fg: var(--cdl-urgent-text);
+  --cdl-card-fg-muted: var(--cdl-urgent-text);
+  --cdl-card-border: var(--cdl-urgent-border);
+}
+
+.cdl-card[data-severity='urgent']::before {
+  background: var(--cdl-urgent);
+}
+
+.cdl-card[data-severity='warning'] {
+  --cdl-card-bg: var(--cdl-warning-bg);
+  --cdl-card-fg: var(--cdl-warning-text);
+  --cdl-card-fg-muted: var(--cdl-warning-text);
+  --cdl-card-border: var(--cdl-warning-border);
+}
+
+.cdl-card[data-severity='warning']::before {
+  background: var(--cdl-warning);
+}
+
+.cdl-card[data-severity='info'] {
+  --cdl-card-bg: var(--cdl-info-bg);
+  --cdl-card-fg: var(--cdl-info-text);
+  --cdl-card-border: var(--cdl-info-border);
+}
+
+.cdl-card[data-severity='info']::before {
+  background: var(--cdl-info);
+}
+
+.cdl-card[data-severity='ok'] {
+  --cdl-card-bg: var(--cdl-ok-bg);
+  --cdl-card-fg: var(--cdl-ok-text);
+  --cdl-card-border: var(--cdl-ok-border);
+}
+
+.cdl-card[data-severity='ok']::before {
+  background: var(--cdl-ok);
+}
+
+.cdl-card[data-severity='ai'] {
+  --cdl-card-bg: var(--cdl-ai-bg);
+  --cdl-card-fg: var(--cdl-ai-text);
+  --cdl-card-border: var(--cdl-ai-border);
+}
+
+.cdl-card[data-severity='ai']::before {
+  background: var(--cdl-ai);
+}
+
+/* Acuity rail (P1–P5) — left rail color without full surface tint */
+.cdl-card[data-acuity='P1']::before {
+  background: var(--cdl-acuity-p1);
+  width: 5px;
+}
+.cdl-card[data-acuity='P2']::before {
+  background: var(--cdl-acuity-p2);
+  width: 4px;
+}
+.cdl-card[data-acuity='P3']::before {
+  background: var(--cdl-acuity-p3);
+}
+.cdl-card[data-acuity='P4']::before {
+  background: var(--cdl-acuity-p4);
+}
+.cdl-card[data-acuity='P5']::before {
+  background: var(--cdl-acuity-p5);
+}
+
+/* Severity text utilities (wait times, labels) — never hex */
+.cdl-text-severity[data-severity='critical'],
+.cdl-wait[data-severity='critical'] {
+  color: var(--cdl-critical-text) !important;
+  font-weight: var(--cdl-font-semibold);
+}
+
+.cdl-text-severity[data-severity='urgent'],
+.cdl-wait[data-severity='urgent'] {
+  color: var(--cdl-urgent-text) !important;
+  font-weight: var(--cdl-font-semibold);
+}
+
+.cdl-text-severity[data-severity='warning'],
+.cdl-wait[data-severity='warning'] {
+  color: var(--cdl-warning-text) !important;
+  font-weight: var(--cdl-font-semibold);
+}
+
+.cdl-text-severity[data-severity='info'],
+.cdl-wait[data-severity='info'] {
+  color: var(--cdl-info-text) !important;
+}
+
+.cdl-text-severity[data-severity='ok'],
+.cdl-wait[data-severity='ok'] {
+  color: var(--cdl-ok-text) !important;
+}
+
+.cdl-text-severity[data-severity='neutral'],
+.cdl-wait[data-severity='neutral'] {
+  color: var(--cdl-ink-muted) !important;
+}
+
+/* Compact badge chip */
+.cdl-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+  min-height: 20px;
+  padding: 1px 7px;
+  border-radius: var(--cdl-radius-full);
+  border: 1px solid var(--cdl-border);
+  background: var(--cdl-surface-muted);
+  color: var(--cdl-ink);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cdl-badge[data-tone='critical'] {
+  background: var(--cdl-critical-bg);
+  border-color: var(--cdl-critical-border);
+  color: var(--cdl-critical-text);
+}
+
+.cdl-badge[data-tone='urgent'] {
+  background: var(--cdl-urgent-bg);
+  border-color: var(--cdl-urgent-border);
+  color: var(--cdl-urgent-text);
+}
+
+.cdl-badge[data-tone='warning'] {
+  background: var(--cdl-warning-bg);
+  border-color: var(--cdl-warning-border);
+  color: var(--cdl-warning-text);
+}
+
+.cdl-badge[data-tone='info'] {
+  background: var(--cdl-info-bg);
+  border-color: var(--cdl-info-border);
+  color: var(--cdl-info-text);
+}
+
+.cdl-badge[data-tone='ok'] {
+  background: var(--cdl-ok-bg);
+  border-color: var(--cdl-ok-border);
+  color: var(--cdl-ok-text);
+}
+
+.cdl-badge[data-tone='ai'] {
+  background: var(--cdl-ai-bg);
+  border-color: var(--cdl-ai-border);
+  color: var(--cdl-ai-text);
+}
+
+.cdl-badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  min-width: 0;
+}
+
+.cdl-badge-row--budget > .cdl-badge:nth-child(n + 4) {
+  /* Show first 3; overflow controlled in React via +N */
+}
+
+/* Patient card bridge — adopt contract without renaming every rule yet */
+.patient-card.cdl-card,
+.patient-card {
+  --color-card: var(--cdl-card-bg);
+  --color-text-primary: var(--cdl-card-fg);
+  --color-text-secondary: var(--cdl-card-fg-muted);
+  --color-text-muted: var(--cdl-card-fg-muted);
+  --patient-priority-color: var(--cdl-brand-500);
+  background: var(--cdl-card-bg) !important;
+  color: var(--cdl-card-fg) !important;
+  border: 1px solid var(--cdl-card-border);
+  border-radius: var(--cdl-card-radius);
+  box-shadow: var(--cdl-elev-1);
+}
+
+.patient-card.cdl-card {
+  padding: var(--cdl-space-3);
+}
+
+.patient-card--priority-P1 {
+  --patient-priority-color: var(--cdl-acuity-p1);
+}
+.patient-card--priority-P2 {
+  --patient-priority-color: var(--cdl-acuity-p2);
+}
+.patient-card--priority-P3 {
+  --patient-priority-color: var(--cdl-acuity-p3);
+}
+.patient-card--priority-P4 {
+  --patient-priority-color: var(--cdl-acuity-p4);
+}
+.patient-card--priority-P5 {
+  --patient-priority-color: var(--cdl-acuity-p5);
+}
+
+.patient-card.cdl-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  border-radius: inherit 0 0 inherit;
+  background: var(--patient-priority-color, transparent);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.patient-card[data-severity='critical'].cdl-card::before,
+.patient-card--deterioration-risk.cdl-card::before,
+.patient-card--lwbs-risk.cdl-card::before {
+  background: var(--cdl-critical);
+  width: 5px;
+}
+
+.patient-card[data-severity='warning'].cdl-card::before,
+.patient-card--long-wait.cdl-card::before,
+.patient-card--reassessment-due.cdl-card::before {
+  background: var(--cdl-warning);
+}
+
+/* Kill muddy light greys on cards */
+.patient-card .patient-card__vitals,
+.patient-card .patient-card__meta,
+.patient-card [class*='__muted'],
+.patient-card [class*='__secondary'] {
+  color: var(--cdl-card-fg-muted, var(--cdl-ink-muted)) !important;
+}
+
+.patient-card__lwbs-badge {
+  background: var(--cdl-critical) !important;
+  border-color: var(--cdl-critical-border) !important;
+  color: var(--cdl-ink-inverse) !important;
+}
