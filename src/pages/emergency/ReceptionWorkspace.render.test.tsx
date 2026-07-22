@@ -49,6 +49,11 @@ vi.mock('../../hooks/useReceptionDeskUi', () => ({
     slim: false,
     inlineQuickIntake: false,
     stripMetricIds: null,
+    attentionStrip: true,
+    taskSheet: true,
+    showInlineCopilot: true,
+    showNestedEscalationStrip: false,
+    showNestedEscalationQuickActions: false,
     show: () => true,
   }),
 }));

@@ -1,45 +1,62 @@
-import { Bell, FolderOpen, Timer } from 'lucide-react';
-import type { Alert, Patient } from '../../types/emergency';
+import { useMemo } from 'react';
+import type { Patient } from '../../types/emergency';
+import {
+  resolveReceptionQueueRowModel,
+  type ReceptionQueueRowAction,
+} from './receptionAttentionModel';
+import ReceptionAttentionStrip from './ReceptionAttentionStrip';
+import type { ReceptionAttentionRow, ReceptionAttentionSnapshot } from './receptionAttentionModel';
 
 export type ReceptionOperationalRailProps = {
   queue: Patient[];
-  criticalAlerts: Alert[];
+  attention: ReceptionAttentionSnapshot;
   selectedPatient: Patient | null;
-  now: number;
   onSelectPatient: (patientId: string) => void;
-  onOpenProfile: (patientId: string) => void;
+  onAttentionSelect: (row: ReceptionAttentionRow) => void;
+  onRowAction: (patientId: string, action: ReceptionQueueRowAction) => void;
   patientDisplayName: (patient: Patient) => string;
   queueStatus: (patient: Patient) => string;
   nextStep: (patient: Patient) => string;
-  ownerRole: (patient: Patient) => string;
   waitMinutes: (patient: Patient) => number;
   isHighRiskPatient: (patient: Patient) => boolean;
-  formatTimer: (alert: Alert, now: number) => string;
-  isTimerBreached: (alert: Alert, now: number) => boolean;
   activeQueueTab: string;
   emptyQueueMessage: string;
 };
 
 export default function ReceptionOperationalRail({
   queue,
-  criticalAlerts,
+  attention,
   selectedPatient,
-  now,
   onSelectPatient,
-  onOpenProfile,
+  onAttentionSelect,
+  onRowAction,
   patientDisplayName,
   queueStatus,
   nextStep,
-  ownerRole,
   waitMinutes,
   isHighRiskPatient,
-  formatTimer,
-  isTimerBreached,
   activeQueueTab,
   emptyQueueMessage,
 }: ReceptionOperationalRailProps) {
+  const rowModels = useMemo(
+    () =>
+      queue.slice(0, 12).map((patient) => ({
+        patient,
+        model: resolveReceptionQueueRowModel({
+          patientId: patient.id,
+          isHighRisk: isHighRiskPatient(patient),
+          registrationStatus: patient.registrationStatus,
+          triagePending: patient.triagePending,
+          state: patient.state,
+        }),
+      })),
+    [isHighRiskPatient, queue],
+  );
+
   return (
     <aside className="reception-operational-rail" aria-label="Reception operations">
+      <ReceptionAttentionStrip snapshot={attention} onSelectRow={onAttentionSelect} />
+
       <section className="reception-command-panel reception-operational-rail__panel" aria-labelledby="queue-title">
         <div className="reception-command-panel__header">
           <h2 id="queue-title">Waiting list</h2>
@@ -48,77 +65,63 @@ export default function ReceptionOperationalRail({
         <p className="reception-operational-rail__tab-label" role="status">
           Showing: {activeQueueTab}
         </p>
-        <div className="reception-command-queue reception-operational-rail__queue">
-          {queue.length ? (
-            queue.slice(0, 10).map((patient) => (
-              <button
-                key={patient.id}
-                type="button"
-                className={`reception-command-queue-row${isHighRiskPatient(patient) ? ' reception-command-queue-row--risk' : ''}${
-                  selectedPatient?.id === patient.id ? ' reception-command-queue-row--selected' : ''
-                }`}
-                onClick={() => onSelectPatient(patient.id)}
-              >
-                <span>
-                  <strong>{patientDisplayName(patient)}</strong>
-                  <small>{patient.chiefComplaint || patient.complaint || 'Complaint pending'}</small>
-                </span>
-                <span>{queueStatus(patient)}</span>
-                <span>{nextStep(patient)}</span>
-                <span>{waitMinutes(patient)}m</span>
-              </button>
-            ))
+        <div className="reception-command-queue reception-operational-rail__queue" role="list">
+          {rowModels.length ? (
+            rowModels.map(({ patient, model }) => {
+              const selected = selectedPatient?.id === patient.id;
+              return (
+                <div
+                  key={patient.id}
+                  role="listitem"
+                  className={[
+                    'reception-command-queue-row',
+                    'reception-queue-row',
+                    model.riskTone === 'critical' ? 'reception-command-queue-row--risk' : '',
+                    model.riskTone === 'warning' ? 'reception-queue-row--warning' : '',
+                    selected ? 'reception-command-queue-row--selected' : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
+                >
+                  <button
+                    type="button"
+                    className="reception-queue-row__select"
+                    onClick={() => onSelectPatient(patient.id)}
+                    aria-pressed={selected}
+                    aria-label={`${patientDisplayName(patient)}, ${queueStatus(patient)}, ${waitMinutes(patient)} minutes, next ${nextStep(patient)}`}
+                  >
+                    <span className="reception-queue-row__who">
+                      <strong>{patientDisplayName(patient)}</strong>
+                      <small>
+                        {patient.chiefComplaint || patient.complaint || 'Complaint pending'}
+                      </small>
+                    </span>
+                    <span
+                      className={`reception-queue-row__chip reception-queue-row__chip--${model.riskTone}`}
+                      data-tone={model.riskTone === 'neutral' ? 'neutral' : model.riskTone}
+                    >
+                      {model.riskLabel}
+                    </span>
+                    <span className="reception-queue-row__status">{queueStatus(patient)}</span>
+                    <span className="reception-queue-row__wait">{waitMinutes(patient)}m</span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`reception-queue-row__cta${
+                      model.primaryAction === 'escalate' ? ' reception-queue-row__cta--critical' : ''
+                    }`}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onRowAction(patient.id, model.primaryAction);
+                    }}
+                  >
+                    {model.primaryLabel}
+                  </button>
+                </div>
+              );
+            })
           ) : (
             <div className="reception-command-empty">{emptyQueueMessage}</div>
-          )}
-        </div>
-        {selectedPatient ? (
-          <div className="reception-command-selected" role="status">
-            <strong>{patientDisplayName(selectedPatient)}</strong>
-            <span>
-              {selectedPatient.mrn} · {ownerRole(selectedPatient)}
-            </span>
-            <button type="button" onClick={() => onOpenProfile(selectedPatient.id)}>
-              <FolderOpen size={16} aria-hidden="true" />
-              Open profile
-            </button>
-          </div>
-        ) : null}
-      </section>
-
-      <section className="reception-command-panel reception-operational-rail__panel" aria-labelledby="alerts-title">
-        <div className="reception-command-panel__header">
-          <h2 id="alerts-title">Critical alerts</h2>
-          <span
-            className={
-              criticalAlerts.length ? 'reception-command-chip reception-command-chip--critical' : 'reception-command-chip'
-            }
-          >
-            {criticalAlerts.length}
-          </span>
-        </div>
-        <div className="reception-command-alerts">
-          {criticalAlerts.length ? (
-            criticalAlerts.slice(0, 4).map((alert) => (
-              <article
-                key={alert.id}
-                className={`reception-command-alert${isTimerBreached(alert, now) ? ' reception-command-alert--breached' : ''}`}
-              >
-                <div>
-                  <strong>{alert.title}</strong>
-                  <p>{alert.message}</p>
-                </div>
-                <div className="reception-command-alert__timer" aria-label="3-minute response timer">
-                  <Timer size={18} aria-hidden="true" />
-                  <span>{formatTimer(alert, now)}</span>
-                </div>
-              </article>
-            ))
-          ) : (
-            <div className="reception-command-empty">
-              <Bell size={20} aria-hidden="true" />
-              <span>No active critical alerts.</span>
-            </div>
           )}
         </div>
       </section>

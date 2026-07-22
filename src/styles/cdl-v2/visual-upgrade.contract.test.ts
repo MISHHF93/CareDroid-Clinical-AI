@@ -38,3 +38,63 @@ describe('visual upgrade waves V3–V4', () => {
     }
   });
 });
+
+describe('patient-card pill AA contract', () => {
+  it('loads CDL pills stylesheet from package index and re-asserts after design-system', () => {
+    const index = readFileSync(join(__dirname, 'index.css'), 'utf8');
+    const main = readFileSync(join(root, 'main.tsx'), 'utf8');
+    expect(index).toContain("pills.css");
+    expect(main).toContain("cdl-v2/pills.css");
+    // pills.css appears after design-system so dual-mode tokens win
+    expect(main.indexOf('design-system.css')).toBeLessThan(main.lastIndexOf('cdl-v2/pills.css'));
+  });
+
+  it('pills.css defines dual-mode pill tokens for light and dark', () => {
+    const pills = readFileSync(join(__dirname, 'pills.css'), 'utf8');
+    expect(pills).toContain("html[data-theme='light']");
+    expect(pills).toContain("html[data-theme='dark']");
+    expect(pills).toContain('--cdl-pill-critical-fg');
+    expect(pills).toContain('--cdl-pill-critical-bg');
+    // Light uses dark red text; dark uses light red text
+    expect(pills).toMatch(/--cdl-pill-critical-fg:\s*#991b1b/);
+    expect(pills).toMatch(/html\[data-theme='dark'\][\s\S]*--cdl-pill-critical-fg:\s*#fecaca/);
+    for (const tone of ['critical', 'warning', 'info', 'ok', 'ops', 'neutral']) {
+      expect(pills).toContain(`data-tone='${tone}'`);
+    }
+  });
+
+  it('does not blanket-force white text on all pills', () => {
+    const contrast = readFileSync(join(root, 'styles/card-contrast-normalization.css'), 'utf8');
+    expect(contrast).not.toMatch(/\[class\*='pill'\]:not\(\[class\*='--warn'\]\)/);
+    expect(contrast).toContain("data-pill-fill='solid'");
+  });
+
+  it('PatientCard maps signals/flags with data-tone and dual-mode pairs', () => {
+    const tsx = readFileSync(join(root, 'components/PatientCard.tsx'), 'utf8');
+    const css = readFileSync(join(root, 'components/PatientCard.css'), 'utf8');
+    expect(tsx).toContain('data-tone={signal.tone}');
+    expect(tsx).toContain('resolveFlagTone');
+    expect(tsx).toContain("data-tone={tone}");
+    expect(css).toContain('--cdl-pill-critical-fg');
+    expect(css).toContain('--cdl-pill-neutral-fg');
+    expect(css).not.toMatch(/\.patient-card__signal--critical[\s\S]{0,120}color:\s*var\(--status-/);
+    expect(css).not.toMatch(/\.patient-card__state-pill[\s\S]{0,200}color:\s*var\(--app-on-solid\)/);
+  });
+
+  it('card-surface badges avoid hard-coded light-only #fecaca without dual tokens', () => {
+    const files = [
+      'components/waiting-room/LwbsRiskBadge.css',
+      'components/waiting-room/FitToWaitBadge.css',
+      'components/waiting-room/DeteriorationWatchBadge.css',
+      'components/triage/TriageBreachBadge.css',
+      'components/queues/QueueReasonBadge.css',
+      'components/reception/HighRiskComplaintFlagBadge.css',
+      'components/guidance/WhatHappensNextBadge.css',
+    ];
+    for (const rel of files) {
+      const css = readFileSync(join(root, rel), 'utf8');
+      expect(css, rel).not.toMatch(/color:\s*#fecaca/i);
+      expect(css, rel).toContain('--cdl-critical-text');
+    }
+  });
+});

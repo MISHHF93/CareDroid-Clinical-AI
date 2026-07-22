@@ -299,7 +299,7 @@
 }
 
 .patient-card__lwbs-badge {
-  background: var(--cdl-critical);
-  border-color: var(--cdl-critical-border);
-  color: var(--cdl-ink-inverse);
+  background: var(--cdl-pill-critical-bg, var(--cdl-critical-bg));
+  border-color: var(--cdl-pill-critical-bd, var(--cdl-critical-border));
+  color: var(--cdl-pill-critical-fg, var(--cdl-critical-text));
 }

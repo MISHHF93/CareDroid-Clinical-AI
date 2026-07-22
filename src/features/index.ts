@@ -1,7 +1,5 @@
 export * from './reception';
 export * from './triage';
-export * from './triage-queue';
-export * from './ems-module';
 export * from './ems';
 export * from './waiting-room';
 export * from './command';

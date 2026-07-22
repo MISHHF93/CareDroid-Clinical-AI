@@ -1,0 +1,142 @@
+/* Flat attention strip — not a nested card stack */
+.reception-attention {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--cdl-border, var(--reception-command-border, #e2e8f0));
+  border-radius: var(--cdl-radius-md, 8px);
+  background: var(--cdl-surface-card, var(--reception-command-panel, #fff));
+  color: var(--cdl-ink, var(--reception-command-ink, #0f172a));
+}
+
+.reception-attention--empty {
+  padding: 8px 12px;
+}
+
+.reception-attention__status {
+  margin: 0;
+  color: var(--cdl-ink-muted, #334155);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.reception-attention__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.reception-attention__title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--cdl-ink, #0f172a);
+}
+
+.reception-attention__count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  min-height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--cdl-surface-muted, #f1f5f9);
+  border: 1px solid var(--cdl-border, #e2e8f0);
+  color: var(--cdl-ink-muted, #334155);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.reception-attention__count--critical {
+  background: var(--cdl-critical-bg);
+  border-color: var(--cdl-critical-border);
+  color: var(--cdl-critical-text);
+}
+
+.reception-attention__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.reception-attention__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1px solid var(--cdl-border, #e2e8f0);
+  border-radius: var(--cdl-radius-md, 8px);
+  background: var(--cdl-surface-muted, #f8fafc);
+  color: var(--cdl-ink, #0f172a);
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+}
+
+.reception-attention__row:hover,
+.reception-attention__row:focus-visible {
+  border-color: var(--cdl-border-strong, #cbd5e1);
+  outline: none;
+  box-shadow: var(--cdl-focus-ring, 0 0 0 3px rgba(14, 165, 233, 0.25));
+}
+
+.reception-attention__row--critical,
+.reception-attention__row--breached {
+  background: var(--cdl-critical-bg) !important;
+  border-color: var(--cdl-critical-border) !important;
+  color: var(--cdl-critical-text) !important;
+}
+
+.reception-attention__row--warning {
+  background: var(--cdl-warning-bg) !important;
+  border-color: var(--cdl-warning-border) !important;
+  color: var(--cdl-warning-text) !important;
+}
+
+.reception-attention__row-main {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.reception-attention__row-main strong {
+  font-size: 12px;
+  font-weight: 800;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reception-attention__row-main small {
+  font-size: 11px;
+  font-weight: 600;
+  opacity: 0.9;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reception-attention__timer,
+.reception-attention__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.reception-attention__cta {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--cdl-ink) 8%, transparent);
+}

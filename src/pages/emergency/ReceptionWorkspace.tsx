@@ -1,16 +1,19 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { FolderOpen, ShieldCheck, X } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { FolderOpen, ShieldCheck } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 
-import ReceptionDeskToolbar from '../../components/reception/ReceptionDeskToolbar';
-import ReceptionEscalationAttentionStrip from '../../components/reception/ReceptionEscalationAttentionStrip';
 import ReceptionEscalationPanel from '../../components/reception/ReceptionEscalationPanel';
 import ReceptionEscalationQuickActions from '../../components/reception/ReceptionEscalationQuickActions';
-import { type ReceptionJourneyStage } from '../../components/reception/ReceptionJourneyTimeline';
 import ReceptionOperationalRail from '../../components/reception/ReceptionOperationalRail';
 import ReceptionSmartIntakeOverlay from '../../components/reception/ReceptionSmartIntakeOverlay';
 import PreparePatientChooser from '../../components/reception/PreparePatientChooser';
 import UnifiedIntakePanel from '../../components/reception/UnifiedIntakePanel';
+import ReceptionPatientTaskSheet from '../../components/reception/ReceptionPatientTaskSheet';
+import {
+  buildReceptionAttentionSnapshot,
+  type ReceptionAttentionRow,
+  type ReceptionQueueRowAction,
+} from '../../components/reception/receptionAttentionModel';
 import { RECEPTION_COPY } from '../../components/reception/receptionCopy';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { CARE_DROID_SCREEN_MODES } from '../../config/careDroidScreenModes';
@@ -23,7 +26,7 @@ import useRouteScreenMode from '../../hooks/useRouteScreenMode';
 import useReceptionDeskUi from '../../hooks/useReceptionDeskUi';
 import useReceptionPinnedActions from '../../hooks/useReceptionPinnedActions';
 import { useEmergencyStore } from '../../store/emergencyStore';
-import { PatientFlag, PatientState, Priority, type Alert, type Patient } from '../../types/emergency';
+import { PatientFlag, PatientState, Priority, type Patient } from '../../types/emergency';
 import {
   assertReceptionMutationAllowed,
   createPatientAndRouteFromReception,
@@ -40,7 +43,6 @@ import type {
   ReceptionEscalationInput,
   ReceptionEscalationReasonId,
 } from '../../services/receptionEscalationWorkflow';
-import { buildArrivalControlSummary } from '../../services/arrivalControlLayer';
 import { ReceptionFlowGraphic } from '../../components/graphics/CdlGraphicKit';
 import ContextualGuidance from '../../components/ui/ContextualGuidance';
 import { showActionError, showActionSuccess } from '../../services/careDroidInteractionFeedback';
@@ -117,12 +119,6 @@ function waitMinutes(patient: Patient): number {
   return Math.max(0, Math.round((Date.now() - time) / 60000));
 }
 
-function averageWaitMinutes(patients: Patient[]): number | null {
-  if (!patients.length) return null;
-  const total = patients.reduce((sum, patient) => sum + waitMinutes(patient), 0);
-  return Math.round(total / patients.length);
-}
-
 function queueStatus(patient: Patient): string {
   if (patient.registrationStatus === 'provisional') return 'Temporary identity';
   if (patient.registrationStatus === 'in-progress') return 'Incomplete registration';
@@ -144,33 +140,6 @@ function ownerRole(patient: Patient): string {
     return 'Registration clerk';
   }
   return 'Triage nurse';
-}
-
-function isReceptionCriticalAlert(alert: Alert): boolean {
-  return (
-    alert.severity === 'Critical' &&
-    !alert.dismissed &&
-    !alert.acknowledged &&
-    ['reception-critical-intake', 'reception-escalation-workflow', 'three-minute-timer-engine'].includes(
-      String(alert.source || ''),
-    )
-  );
-}
-
-function formatTimer(alert: Alert, now: number): string {
-  const startedAt = String(alert.metadata?.responseStartedAt || alert.createdAt || '');
-  const started = new Date(startedAt).getTime();
-  if (!Number.isFinite(started)) return '3:00';
-  const remaining = Math.max(0, 180 - Math.floor((now - started) / 1000));
-  const minutes = Math.floor(remaining / 60);
-  const seconds = String(remaining % 60).padStart(2, '0');
-  return `${minutes}:${seconds}`;
-}
-
-function isTimerBreached(alert: Alert, now: number): boolean {
-  const startedAt = String(alert.metadata?.responseStartedAt || alert.createdAt || '');
-  const started = new Date(startedAt).getTime();
-  return Number.isFinite(started) && now - started >= 180000;
 }
 
 function mapQueueParamToTab(queueParam: string): QueueTabId {
@@ -275,7 +244,7 @@ export default function ReceptionWorkspace() {
   const [escalationDialogOpen, setEscalationDialogOpen] = useState(false);
   const [escalationReasonId, setEscalationReasonId] = useState<ReceptionEscalationReasonId | null>(null);
   const [patientDetailOpen, setPatientDetailOpen] = useState(false);
-  const workspaceRef = useRef<HTMLDivElement>(null);
+  const [assistOpen, setAssistOpen] = useState(false);
 
   const clearIntakeQueryParams = useCallback(() => {
     const next = new URLSearchParams(searchParams);
@@ -370,49 +339,16 @@ export default function ReceptionWorkspace() {
     [activeQueueTab, receptionQueueAll],
   );
 
-  const criticalAlerts = useMemo(() => alerts.filter(isReceptionCriticalAlert), [alerts]);
+  const attention = useMemo(
+    () =>
+      buildReceptionAttentionSnapshot(alerts, {
+        roleId: emergencyRole.role,
+        limit: 3,
+        now,
+      }),
+    [alerts, emergencyRole.role, now],
+  );
 
-  const journeyStages: ReceptionJourneyStage[] = useMemo(() => {
-    const summary = buildArrivalControlSummary(receptionQueueAll);
-    const registrationWait = averageWaitMinutes(filterQueueByTab(receptionQueueAll, 'verification'));
-    const triageWait = averageWaitMinutes(filterQueueByTab(receptionQueueAll, 'pretriage'));
-
-    return [
-      {
-        id: 'arrived',
-        label: 'Arrived (30m)',
-        count: summary.recentArrivals,
-        avgWaitMinutes: null,
-        queueTab: null,
-        tone: 'neutral',
-      },
-      {
-        id: 'registration',
-        label: 'Registration / ID check',
-        count: summary.awaitingRegistration,
-        avgWaitMinutes: registrationWait,
-        queueTab: 'verification',
-        tone: summary.awaitingRegistration ? 'attention' : 'neutral',
-      },
-      {
-        id: 'waiting-for-triage',
-        label: 'Waiting for triage nurse',
-        count: summary.triagePending,
-        avgWaitMinutes: triageWait,
-        queueTab: 'pretriage',
-        tone: summary.rapidReview ? 'critical' : summary.triagePending ? 'attention' : 'neutral',
-        badge: summary.rapidReview ? `${summary.rapidReview} rapid review` : null,
-      },
-      {
-        id: 'waiting-room',
-        label: 'In waiting room',
-        count: summary.inWaitingRoom,
-        avgWaitMinutes: null,
-        queueTab: null,
-        tone: 'neutral',
-      },
-    ];
-  }, [receptionQueueAll]);
   const selectedPatient = useMemo(
     () => (selectedPatientId ? patients.find((patient) => patient.id === selectedPatientId) || null : null),
     [patients, selectedPatientId],
@@ -427,6 +363,54 @@ export default function ReceptionWorkspace() {
       setShowChooser(false);
     },
     [receptionCapabilities.canOpenSmartIntake],
+  );
+
+  const openEscalationDialog = useCallback((reasonId: ReceptionEscalationReasonId | null = null) => {
+    setEscalationReasonId(reasonId);
+    setEscalationDialogOpen(true);
+  }, []);
+
+  const openPatientTask = useCallback(
+    (patientId: string) => {
+      selectPatient(patientId);
+      setPatientDetailOpen(true);
+    },
+    [selectPatient],
+  );
+
+  const handleAttentionSelect = useCallback(
+    (row: ReceptionAttentionRow) => {
+      if (row.patientId) {
+        openPatientTask(row.patientId);
+        return;
+      }
+      if (row.primaryAction === 'escalate' && receptionCapabilities.canEscalateToNurse) {
+        openEscalationDialog(null);
+      }
+    },
+    [openEscalationDialog, openPatientTask, receptionCapabilities.canEscalateToNurse],
+  );
+
+  const handleQueueRowAction = useCallback(
+    (patientId: string, action: ReceptionQueueRowAction) => {
+      selectPatient(patientId);
+      if (action === 'complete_id') {
+        openSmartIntake({ step: 'capture', patientId, autostart: true });
+        return;
+      }
+      if (action === 'escalate') {
+        setPatientDetailOpen(true);
+        openEscalationDialog('urgent-triage-attention');
+        return;
+      }
+      if (action === 'handoff') {
+        setPatientDetailOpen(true);
+        profileNavigate(CANONICAL_ROUTES.emergencyWhiteboard);
+        return;
+      }
+      setPatientDetailOpen(true);
+    },
+    [openEscalationDialog, openSmartIntake, profileNavigate, selectPatient],
   );
 
   useEffect(() => {
@@ -580,24 +564,20 @@ export default function ReceptionWorkspace() {
     }
   };
 
-  const openEscalationDialog = useCallback((reasonId: ReceptionEscalationReasonId | null = null) => {
-    setEscalationReasonId(reasonId);
-    setEscalationDialogOpen(true);
-  }, []);
-
   const submitEscalation = useCallback(
     (input: ReceptionEscalationInput) => useEmergencyStore.getState().submitReceptionEscalation(input),
     [],
   );
 
   const situationTone =
-    criticalAlerts.length || criticalNeeded
+    attention.criticalCount || criticalNeeded
       ? 'critical'
-      : liveRedFlags.length || missingCriticalFields.length
+      : liveRedFlags.length || missingCriticalFields.length || attention.count
         ? 'warning'
         : 'neutral';
 
   return (
+    <div className="reception-front-door reception-workspace">
     <ReceptionPageLayout
       header={
         <ReceptionHeader
@@ -608,26 +588,22 @@ export default function ReceptionWorkspace() {
               tone: 'neutral',
             },
             {
-              label: 'Critical Alerts',
-              value: criticalAlerts.length,
-              tone: criticalAlerts.length > 0 ? 'critical' : 'neutral',
+              label: 'Needs attention',
+              value: attention.count,
+              tone: attention.criticalCount > 0 ? 'critical' : attention.count > 0 ? 'warning' : 'neutral',
             },
             {
-              label: 'Red Flags',
-              value: liveRedFlags.length,
-              tone: liveRedFlags.length > 0 ? 'warning' : 'neutral',
-            },
-            {
-              label: 'Missing Fields',
-              value: missingCriticalFields.length,
-              tone: missingCriticalFields.length > 0 ? 'warning' : 'neutral',
+              label: 'Draft flags',
+              value: liveRedFlags.length + missingCriticalFields.length,
+              tone:
+                liveRedFlags.length || missingCriticalFields.length ? 'warning' : 'neutral',
             },
           ]}
           situation={{
             status: `${receptionQueueAll.length} patient${receptionQueueAll.length === 1 ? '' : 's'} in reception`,
             attention:
-              criticalAlerts.length
-                ? `${criticalAlerts.length} critical alert${criticalAlerts.length === 1 ? '' : 's'}`
+              attention.count
+                ? `${attention.count} item${attention.count === 1 ? '' : 's'} need attention`
                 : liveRedFlags.length
                   ? `${liveRedFlags.length} red flag${liveRedFlags.length === 1 ? '' : 's'} in draft`
                   : 'No critical arrivals flagged',
@@ -739,14 +715,11 @@ export default function ReceptionWorkspace() {
             ) : null}
           </ReceptionContentSection>
 
-          {receptionCapabilities.canEscalateToNurse && (
+          {/* Nested escalation strip removed — single attention surface lives in sidebar.
+              Optional non-slim: compact quick flags only (no second attention list). */}
+          {receptionCapabilities.canEscalateToNurse &&
+          receptionDesk.showNestedEscalationQuickActions ? (
             <ReceptionContentSection>
-              <ReceptionEscalationAttentionStrip
-                alerts={alerts}
-                roleId={emergencyRole.role}
-                onSelectPatient={selectPatient}
-                className="reception-front-door__escalation-strip"
-              />
               <ReceptionEscalationQuickActions
                 defaultPatientId={selectedPatientId}
                 actorStaffId={emergencyRole.canonicalProfile?.employeeId || emergencyRole.canonicalProfile?.id}
@@ -756,56 +729,60 @@ export default function ReceptionWorkspace() {
                 className="reception-front-door__escalation-quick-actions"
               />
             </ReceptionContentSection>
-          )}
+          ) : null}
         </>
       }
       sidebar={
         <>
           <ReceptionOperationalRail
             queue={receptionQueue}
-            criticalAlerts={criticalAlerts}
+            attention={attention}
             selectedPatient={selectedPatient}
-            now={now}
-            onSelectPatient={(patientId) => { selectPatient(patientId); setPatientDetailOpen(true); }}
-            onOpenProfile={(patientId) => {
-              selectPatient(patientId);
-              setPatientDetailOpen(true);
-            }}
+            onSelectPatient={openPatientTask}
+            onAttentionSelect={handleAttentionSelect}
+            onRowAction={handleQueueRowAction}
             patientDisplayName={patientDisplayName}
             queueStatus={queueStatus}
             nextStep={nextStep}
-            ownerRole={ownerRole}
             waitMinutes={waitMinutes}
             isHighRiskPatient={isHighRiskPatient}
-            formatTimer={formatTimer}
-            isTimerBreached={isTimerBreached}
             activeQueueTab={RECEPTION_COPY.queues.tabs[activeQueueTab]}
             emptyQueueMessage={emptyQueueMessage}
           />
-          <div className="reception-interactive-ai">
-            <InteractiveAIWorkspace
-              role={emergencyRole.role || 'registration_clerk'}
-              userId={emergencyRole.canonicalProfile?.id}
-              organizationId={emergencyRole.canonicalProfile?.organizationId}
-              patientId={selectedPatient?.id}
-              pageId="reception_workspace"
-              channel="reception"
-              purpose="reception_interactive_assist"
-              title="Reception Copilot"
-              seedTriggers={[
-                {
-                  kind: 'incomplete_registration',
-                  summary: 'Check missing registration fields before triage handoff.',
-                  urgency: 'attention',
-                },
-                {
-                  kind: 'new_ocr_document',
-                  summary: 'Review OCR confidence before committing document fields.',
-                  urgency: 'info',
-                },
-              ]}
-            />
-          </div>
+          {receptionDesk.showInlineCopilot || assistOpen ? (
+            <div className="reception-interactive-ai">
+              <InteractiveAIWorkspace
+                role={emergencyRole.role || 'registration_clerk'}
+                userId={emergencyRole.canonicalProfile?.id}
+                organizationId={emergencyRole.canonicalProfile?.organizationId}
+                patientId={selectedPatient?.id}
+                pageId="reception_workspace"
+                channel="reception"
+                purpose="reception_interactive_assist"
+                title="Reception Copilot"
+                seedTriggers={[
+                  {
+                    kind: 'incomplete_registration',
+                    summary: 'Check missing registration fields before triage handoff.',
+                    urgency: 'attention',
+                  },
+                  {
+                    kind: 'new_ocr_document',
+                    summary: 'Review OCR confidence before committing document fields.',
+                    urgency: 'info',
+                  },
+                ]}
+              />
+            </div>
+          ) : (
+            <button
+              type="button"
+              className="reception-assist-toggle"
+              onClick={() => setAssistOpen(true)}
+            >
+              Open assist
+            </button>
+          )}
         </>
       }
       footer={
@@ -872,60 +849,34 @@ export default function ReceptionWorkspace() {
       />
 
       {patientDetailOpen && selectedPatient ? (
-        <div
-          className="reception-patient-detail-flyout"
-          role="dialog"
-          aria-label={`Patient detail: ${patientDisplayName(selectedPatient)}`}
-          aria-modal="false"
-        >
-          <div className="reception-patient-detail-flyout__header">
-            <strong>{patientDisplayName(selectedPatient)}</strong>
-            <span className="reception-patient-detail-flyout__mrn">{selectedPatient.mrn}</span>
-            <button
-              type="button"
-              className="reception-patient-detail-flyout__close"
-              onClick={() => setPatientDetailOpen(false)}
-              aria-label="Close patient detail"
-            >
-              <X size={16} />
-            </button>
-          </div>
-          <div className="reception-patient-detail-flyout__body">
-            <dl>
-              <dt>State</dt>
-              <dd>{selectedPatient.state}</dd>
-              <dt>Priority</dt>
-              <dd>{selectedPatient.priority}</dd>
-              <dt>Chief Complaint</dt>
-              <dd>{selectedPatient.chiefComplaint || '—'}</dd>
-              <dt>Arrival</dt>
-              <dd>{selectedPatient.arrival?.arrivalMode || selectedPatient.source || '—'}</dd>
-              <dt>Wait</dt>
-              <dd>{waitMinutes(selectedPatient)}m</dd>
-              <dt>Queue</dt>
-              <dd>{queueStatus(selectedPatient)}</dd>
-              <dt>Next Step</dt>
-              <dd>{nextStep(selectedPatient)}</dd>
-              <dt>Owner</dt>
-              <dd>{ownerRole(selectedPatient)}</dd>
-              {selectedPatient.flags.length > 0 ? (
-                <>
-                  <dt>Flags</dt>
-                  <dd>{selectedPatient.flags.join(', ')}</dd>
-                </>
-              ) : null}
-            </dl>
-          </div>
-          <div className="reception-patient-detail-flyout__footer">
-            <button
-              type="button"
-              onClick={() => profileNavigate(`${CANONICAL_ROUTES.emergencyPatients}?patientId=${encodeURIComponent(selectedPatient.id)}`)}
-            >
-              <FolderOpen size={14} aria-hidden="true" /> Open Full Record
-            </button>
-          </div>
-        </div>
+        <ReceptionPatientTaskSheet
+          patient={selectedPatient}
+          displayName={patientDisplayName(selectedPatient)}
+          statusLabel={queueStatus(selectedPatient)}
+          nextStepLabel={nextStep(selectedPatient)}
+          ownerLabel={ownerRole(selectedPatient)}
+          waitMinutes={waitMinutes(selectedPatient)}
+          isHighRisk={isHighRiskPatient(selectedPatient)}
+          canEscalate={receptionCapabilities.canEscalateToNurse}
+          canSmartIntake={receptionCapabilities.canOpenSmartIntake}
+          onClose={() => setPatientDetailOpen(false)}
+          onCompleteId={() => {
+            openSmartIntake({
+              step: 'capture',
+              patientId: selectedPatient.id,
+              autostart: true,
+            });
+          }}
+          onEscalate={() => openEscalationDialog('urgent-triage-attention')}
+          onHandoff={() => profileNavigate(CANONICAL_ROUTES.emergencyWhiteboard)}
+          onOpenFullRecord={() =>
+            profileNavigate(
+              `${CANONICAL_ROUTES.emergencyPatients}?patientId=${encodeURIComponent(selectedPatient.id)}`,
+            )
+          }
+        />
       ) : null}
     </ReceptionPageLayout>
+    </div>
   );
 }

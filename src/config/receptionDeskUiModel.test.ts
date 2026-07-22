@@ -15,6 +15,11 @@ describe('receptionDeskUiModel', () => {
     expect(desk.slim).toBe(true);
     expect(desk.show(RECEPTION_DESK_UI.surfaces.queueAuditPanel)).toBe(false);
     expect(desk.show(RECEPTION_DESK_UI.surfaces.dataQualityPanel)).toBe(false);
+    expect(desk.showNestedEscalationStrip).toBe(false);
+    expect(desk.showNestedEscalationQuickActions).toBe(false);
+    expect(desk.showInlineCopilot).toBe(false);
+    expect(desk.attentionStrip).toBe(true);
+    expect(desk.taskSheet).toBe(true);
     expect(desk.stripMetricIds).toEqual(RECEPTION_DESK_UI.coreStripMetricIds);
   });
 

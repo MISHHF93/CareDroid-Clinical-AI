@@ -116,16 +116,25 @@ const priorityColors = {
   P5: 'var(--priority-p5)',
 };
 
-const flagColors: Partial<Record<PatientFlag, string>> = {
-  [PatientFlag.SepsisAlert]: 'var(--status-danger)',
-  [PatientFlag.DeteriorationRisk]: 'var(--status-danger)',
-  [PatientFlag.ReassessmentDue]: 'var(--status-warning)',
-  [PatientFlag.ScoreReassessmentRecommended]: 'var(--status-warning)',
-  [PatientFlag.LongWait]: 'var(--capacity-orange)',
-  [PatientFlag.LWBSRisk]: 'var(--status-danger)',
-  [PatientFlag.HighRisk]: 'var(--status-danger)',
-  [PatientFlag.EMSArrival]: 'var(--color-secondary)',
-  [PatientFlag.PendingAdmission]: 'var(--color-accent)',
+/** Pill semantic tone → CDL AA bg+text pair in PatientCard.css / cdl-v2/pills.css */
+type SignalTone = 'critical' | 'warning' | 'info' | 'flow';
+
+/** CDL pill tone for each PatientFlag — drives AA bg+text pairs on the card */
+const flagTones: Partial<Record<PatientFlag, SignalTone>> = {
+  [PatientFlag.SepsisAlert]: 'critical',
+  [PatientFlag.DeteriorationRisk]: 'critical',
+  [PatientFlag.LWBSRisk]: 'critical',
+  [PatientFlag.HighRisk]: 'critical',
+  [PatientFlag.StrokeCode]: 'critical',
+  [PatientFlag.DeterioratingNeuro]: 'critical',
+  [PatientFlag.ReassessmentDue]: 'warning',
+  [PatientFlag.ScoreReassessmentRecommended]: 'warning',
+  [PatientFlag.LongWait]: 'warning',
+  [PatientFlag.PsychAlert]: 'warning',
+  [PatientFlag.Isolation]: 'warning',
+  [PatientFlag.EMSArrival]: 'info',
+  [PatientFlag.IdentityPending]: 'info',
+  [PatientFlag.PendingAdmission]: 'flow',
 };
 
 const flagLabels: Partial<Record<PatientFlag, string>> = {
@@ -145,7 +154,9 @@ const flagLabels: Partial<Record<PatientFlag, string>> = {
   [PatientFlag.IdentityPending]: 'Identity pending',
 };
 
-type SignalTone = 'critical' | 'warning' | 'info' | 'flow';
+function resolveFlagTone(flag: PatientFlag): SignalTone {
+  return flagTones[flag] ?? 'info';
+}
 
 type StatusSignal = {
   id: string;
@@ -893,6 +904,7 @@ function PatientCard({
               <span
                 key={signal.id}
                 className={`patient-card__signal cdl-badge patient-card__signal--${signal.tone}`}
+                data-tone={signal.tone}
               >
                 {signal.label}
               </span>
@@ -900,6 +912,7 @@ function PatientCard({
             {signalBadges.length > Math.min(3, maxPatientCardBadges) ? (
               <span
                 className="patient-card__signal patient-card__signal--overflow cdl-badge"
+                data-tone="neutral"
                 title={signalBadges
                   .slice(Math.min(3, maxPatientCardBadges))
                   .map((signal) => signal.label)
@@ -910,7 +923,10 @@ function PatientCard({
             ) : null}
           </>
         ) : (
-          <span className="patient-card__signal patient-card__signal--stable cdl-badge">
+          <span
+            className="patient-card__signal patient-card__signal--stable cdl-badge"
+            data-tone="ok"
+          >
             No active risk flags
           </span>
         )}
@@ -999,7 +1015,16 @@ function PatientCard({
           {scores.map((score) => (
             <span
               key={score.key}
-              className={`patient-card__score patient-card__score--${score.tone}`}
+              className={`patient-card__score cdl-badge patient-card__score--${score.tone}`}
+              data-tone={
+                score.tone === 'red'
+                  ? 'critical'
+                  : score.tone === 'yellow'
+                    ? 'warning'
+                    : score.tone === 'green'
+                      ? 'ok'
+                      : 'info'
+              }
               title={score.label}
             >
               {score.label}
@@ -1011,28 +1036,28 @@ function PatientCard({
       {!cardDensity.showSignalsRow ? (
         <div className="patient-card__flags" aria-label="Patient flags and statuses">
           {(() => {
-            const visibleFlags = patientFlags(patient).filter(
-              (flag) => flagColors[flag] && flagLabels[flag],
-            );
+            const visibleFlags = patientFlags(patient).filter((flag) => flagLabels[flag]);
             const overflow = visibleFlags.length - maxPatientCardBadges;
             return (
               <>
-                {visibleFlags.slice(0, maxPatientCardBadges).map((flag) => (
-                  <span
-                    key={flag}
-                    title={flag}
-                    aria-label={flagLabels[flag]}
-                    style={{
-                      '--patient-flag-color': flagColors[flag],
-                    } as CSSProperties}
-                    className="patient-card__flag"
-                  >
-                    {flagLabels[flag]}
-                  </span>
-                ))}
+                {visibleFlags.slice(0, maxPatientCardBadges).map((flag) => {
+                  const tone = resolveFlagTone(flag);
+                  return (
+                    <span
+                      key={flag}
+                      title={flag}
+                      aria-label={flagLabels[flag]}
+                      data-tone={tone}
+                      className={`patient-card__flag patient-card__flag--${tone} cdl-badge`}
+                    >
+                      {flagLabels[flag]}
+                    </span>
+                  );
+                })}
                 {overflow > 0 ? (
                   <span
-                    className="patient-card__flag patient-card__flag--overflow"
+                    className="patient-card__flag patient-card__flag--overflow cdl-badge"
+                    data-tone="neutral"
                     title={visibleFlags
                       .slice(maxPatientCardBadges)
                       .map((flag) => flagLabels[flag])

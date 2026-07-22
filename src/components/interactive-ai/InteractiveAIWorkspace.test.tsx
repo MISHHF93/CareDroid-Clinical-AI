@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/aria-role -- `role` here is InteractiveAIWorkspace's own user-role prop (e.g. "reception-lead"), not a DOM ARIA role attribute; the rule can't tell literal-string component props apart from native elements. */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { InteractiveAIWorkspace } from './InteractiveAIWorkspace';

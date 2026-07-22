@@ -17,23 +17,23 @@
 }
 
 .high-risk-complaint-badge__review {
-  background: #991b1b;
-  border: 1px solid #ef4444;
-  color: #fee2e2;
+  background: var(--cdl-critical-bg, rgba(220, 38, 38, 0.12));
+  border: 1px solid var(--cdl-critical-border, #fca5a5);
+  color: var(--cdl-critical-text, #991b1b);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 
 .high-risk-complaint-badge__flag {
-  background: #7f1d1d33;
-  border: 1px solid #dc2626;
-  color: #fecaca;
+  background: var(--cdl-critical-bg, rgba(220, 38, 38, 0.12));
+  border: 1px solid var(--cdl-critical-border, #fca5a5);
+  color: var(--cdl-critical-text, #991b1b);
 }
 
 .high-risk-complaint-badge__more {
-  background: #e0f2fe;
-  border: 1px solid #6b7280;
-  color: #e5e7eb;
+  background: var(--cdl-info-bg, rgba(14, 165, 233, 0.1));
+  border: 1px solid var(--cdl-info-border, #7dd3fc);
+  color: var(--cdl-info-text, #075985);
 }
 
 .high-risk-complaint-badge--compact .high-risk-complaint-badge__flag {

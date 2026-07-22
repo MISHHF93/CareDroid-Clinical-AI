@@ -15,23 +15,27 @@
 }
 
 .deterioration-watch-badge--neutral {
-  background: rgba(148, 163, 184, 0.18);
-  color: var(--medical-text-muted, #6b7280);
+  background: var(--cdl-surface-muted, rgba(148, 163, 184, 0.18));
+  border: 1px solid var(--cdl-border, #e2e8f0);
+  color: var(--cdl-ink-muted, #334155);
 }
 
 .deterioration-watch-badge--info {
-  background: rgba(59, 130, 246, 0.18);
-  color: #374151;
+  background: var(--cdl-info-bg, rgba(59, 130, 246, 0.12));
+  border: 1px solid var(--cdl-info-border, #93c5fd);
+  color: var(--cdl-info-text, #075985);
 }
 
 .deterioration-watch-badge--watch {
-  background: rgba(245, 158, 11, 0.18);
-  color: var(--medical-status-warning-text, #b45309);
+  background: var(--cdl-warning-bg, rgba(245, 158, 11, 0.14));
+  border: 1px solid var(--cdl-warning-border, #fbbf24);
+  color: var(--cdl-warning-text, #92400e);
 }
 
 .deterioration-watch-badge--critical {
-  background: rgba(239, 68, 68, 0.18);
-  color: #fecaca;
+  background: var(--cdl-critical-bg, rgba(220, 38, 38, 0.12));
+  border: 1px solid var(--cdl-critical-border, #fca5a5);
+  color: var(--cdl-critical-text, #991b1b);
 }
 
 .deterioration-watch-strip {

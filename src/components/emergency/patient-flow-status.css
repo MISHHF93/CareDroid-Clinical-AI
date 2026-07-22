@@ -34,28 +34,37 @@
 }
 
 .patient-flow-status__badge {
+  border: 1px solid var(--cdl-border, #e2e8f0);
   border-radius: 999px;
   padding: 0.15rem 0.55rem;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
 }
 
-.patient-flow-status__badge--clear,
+.patient-flow-status__badge--clear {
+  background: var(--cdl-ok-bg, #ecfdf5);
+  border-color: var(--cdl-ok-border, #6ee7b7);
+  color: var(--cdl-ok-text, #065f46);
+}
+
 .patient-flow-status__badge--watch {
-  background: #e2e8f0;
-  color: #334155;
+  background: var(--cdl-warning-bg, #fffbeb);
+  border-color: var(--cdl-warning-border, #fbbf24);
+  color: var(--cdl-warning-text, #92400e);
 }
 
 .patient-flow-status__badge--congestion {
-  background: #fef3c7;
-  color: #92400e;
+  background: var(--cdl-warning-bg, #fef3c7);
+  border-color: var(--cdl-warning-border, #fbbf24);
+  color: var(--cdl-warning-text, #92400e);
 }
 
 .patient-flow-status__badge--overload,
 .patient-flow-status__badge--handoff-delay {
-  background: #fee2e2;
-  color: #991b1b;
+  background: var(--cdl-critical-bg, #fee2e2);
+  border-color: var(--cdl-critical-border, #fca5a5);
+  color: var(--cdl-critical-text, #991b1b);
 }
 
 .patient-flow-status__metrics {

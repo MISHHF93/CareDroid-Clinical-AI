@@ -140,7 +140,7 @@
   color: var(--card-contract-fg-muted, var(--medical-card-fg-muted));
 }
 
-/* Light card bodies must not use on-solid text (except explicit solid badges) */
+/* Light card bodies must not use on-solid text (except explicit solid fills) */
 :is(.app-shell, .emergency-app-shell) :is(
     .card,
     [class$='-card'],
@@ -150,16 +150,20 @@
   )
   :is(p, span, li, td, th, label, small, h1, h2, h3, h4, h5, h6):not(
     [class*='badge']
-  ):not([class*='pill']):not([class*='chip']):not([class*='--solid']):not([class*='--primary']) {
+  ):not([class*='pill']):not([class*='chip']):not([class*='--solid']):not([class*='--primary']):not([data-pill-fill='solid']) {
   color: inherit;
 }
 
-/* Solid badges/pills on light cards keep on-solid only when background is saturated */
-:is(.app-shell, .emergency-app-shell) [class*='pill']:not([class*='--warn']),
+/*
+ * ONLY saturated solid fills use on-solid (white) text.
+ * Do NOT match all [class*='pill'] — that forced white on muted state-pills
+ * and made patient-card chips unreadable in light mode.
+ */
+:is(.app-shell, .emergency-app-shell) [data-pill-fill='solid'],
 :is(.app-shell, .emergency-app-shell) [class*='badge'][class*='--solid'],
-:is(.app-shell, .emergency-app-shell) [class*='badge'][class*='--danger'],
-:is(.app-shell, .emergency-app-shell) [class*='badge'][class*='--primary'] {
-  color: var(--medical-card-solid-fg, #ffffff);
+:is(.app-shell, .emergency-app-shell) .patient-card__priority-code,
+:is(.app-shell, .emergency-app-shell) .patient-card__row-triage-code {
+  color: var(--medical-card-solid-fg, var(--app-on-solid, #ffffff));
 }
 
 /* Copilot / native-ai cards resolve to medical contract */

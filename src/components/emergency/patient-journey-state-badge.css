@@ -3,28 +3,28 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 4px 8px;
-  padding: 2px 8px;
+  padding: 3px 8px;
   border-radius: 999px;
-  border: 1px solid var(--ed-border-subtle, #e2e8f0);
-  background: color-mix(in srgb, var(--ed-accent, #64748b) 6%, var(--ed-surface-raised, #f8fafc));
+  border: 1px solid var(--cdl-border, var(--ed-border-subtle, #e2e8f0));
+  background: var(--cdl-surface-muted, var(--ed-surface-raised, #f1f5f9));
   font-size: var(--ed-type-meta, 11px);
-  color: var(--ed-text-meta, #64748b);
+  color: var(--cdl-ink-muted, var(--ed-text-meta, #334155));
   text-decoration: none;
   line-height: 1.3;
 }
 
 .patient-journey-badge:hover {
-  border-color: color-mix(in srgb, var(--ed-accent, #64748b) 35%, transparent);
-  color: var(--ed-text-primary, #0f172a);
+  border-color: var(--cdl-border-strong, #cbd5e1);
+  color: var(--cdl-ink, var(--ed-text-primary, #0f172a));
 }
 
 .patient-journey-badge__phase {
   font-weight: 700;
-  color: var(--ed-text-primary, #0f172a);
+  color: var(--cdl-ink, var(--ed-text-primary, #0f172a));
 }
 
 .patient-journey-badge__stage {
-  color: var(--ed-text-meta, #64748b);
+  color: var(--cdl-ink-muted, var(--ed-text-meta, #334155));
 }
 
 .patient-journey-badge--compact .patient-journey-badge__phase {

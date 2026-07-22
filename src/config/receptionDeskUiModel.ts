@@ -24,6 +24,13 @@ export function resolveReceptionDeskUi({ role, isReceptionRoute = false, screenM
     slim,
     inlineQuickIntake:
       enabled && (RECEPTION_DESK_UI as any).inlineQuickIntakeForSlim !== false,
+    /** Single attention strip + interactive queue (always on when desk enabled). */
+    attentionStrip: enabled,
+    taskSheet: enabled,
+    showInlineCopilot: enabled && !hiddenSurfaces.has('inlineCopilot'),
+    showNestedEscalationStrip: enabled && !hiddenSurfaces.has('nestedEscalationStrip'),
+    showNestedEscalationQuickActions:
+      enabled && !hiddenSurfaces.has('nestedEscalationQuickActions'),
     role: normalizedRole,
     show(surfaceId) {
       if (!surfaceId) return true;

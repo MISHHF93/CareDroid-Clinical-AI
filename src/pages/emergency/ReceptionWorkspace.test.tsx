@@ -16,10 +16,12 @@ describe('Reception front door wiring', () => {
     expect(receptionSource).toContain('reception-front-door');
     expect(receptionSource).toContain('RECEPTION_COPY');
     expect(receptionSource).toContain('UnifiedIntakePanel');
-    expect(receptionSource).toContain('ReceptionDeskToolbar');
+    expect(receptionSource).toContain('ReceptionPatientTaskSheet');
+    expect(receptionSource).toContain('buildReceptionAttentionSnapshot');
     expect(receptionSource).toContain('ReceptionSmartIntakeOverlay');
     expect(receptionSource).toContain('PreparePatientChooser');
     expect(receptionSource).toContain('ReceptionOperationalRail');
+    expect(receptionSource).not.toContain('ReceptionEscalationAttentionStrip');
     expect(unifiedIntakeSource).toContain('Life-critical intake');
     expect(receptionSource).toContain('createPatientAndRouteFromReception');
     expect(receptionSource).not.toContain('ReceptionQuickIntake');

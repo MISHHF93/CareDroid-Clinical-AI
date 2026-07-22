@@ -1,7 +1,5 @@
 import { getFeatureModuleContract } from '../featureModuleContract';
 
-export * from '../triage-queue';
-
 export const triageFeatureContract = getFeatureModuleContract('triage');
 export const triageFeatureRoute = triageFeatureContract.primaryRoute;
 export const triageFeatureFixtures = Object.freeze([

@@ -1,0 +1,265 @@
+/**
+ * CDL v2 pills / badges — dual-mode AA text ON tinted backgrounds.
+ *
+ * Light: dark semantic text (#991b1b etc.) on pale tint.
+ * Dark:  light semantic text (#fecaca etc.) on dark tint.
+ * Never force white/on-solid text on muted/tinted pills.
+ */
+
+/* ── Shared structure ── */
+.cdl-badge,
+.cdl-pill,
+.patient-card__signal,
+.patient-card__flag,
+.patient-card__score,
+.patient-card__state-pill {
+  align-items: center;
+  border-radius: var(--cdl-radius-full, 999px);
+  box-sizing: border-box;
+  display: inline-flex;
+  font-size: var(--cdl-text-2xs, 10px);
+  font-weight: var(--cdl-font-bold, 700);
+  gap: 4px;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  max-width: 100%;
+  min-height: 22px;
+  padding: 3px 8px;
+  white-space: nowrap;
+}
+
+/* ── Neutral default (both modes via tokens) ── */
+.cdl-badge,
+.cdl-pill,
+.patient-card__signal,
+.patient-card__flag,
+.patient-card__score,
+.patient-card__state-pill {
+  background: var(--cdl-surface-muted, #f1f5f9) !important;
+  border: 1px solid var(--cdl-border, #e2e8f0) !important;
+  color: var(--cdl-ink, #0f172a) !important;
+  box-shadow: none !important;
+}
+
+/* ═══════════════════════════════════════════════
+ * LIGHT MODE — dark text on pale tint (AA)
+ * html default + explicit data-theme=light
+ * ═══════════════════════════════════════════════ */
+html,
+html[data-theme='light'] {
+  --cdl-pill-critical-bg: #fef2f2;
+  --cdl-pill-critical-fg: #991b1b;
+  --cdl-pill-critical-bd: #fecaca;
+
+  --cdl-pill-urgent-bg: #fff7ed;
+  --cdl-pill-urgent-fg: #9a3412;
+  --cdl-pill-urgent-bd: #fed7aa;
+
+  --cdl-pill-warning-bg: #fffbeb;
+  --cdl-pill-warning-fg: #92400e;
+  --cdl-pill-warning-bd: #fde68a;
+
+  --cdl-pill-info-bg: #f0f9ff;
+  --cdl-pill-info-fg: #075985;
+  --cdl-pill-info-bd: #bae6fd;
+
+  --cdl-pill-ok-bg: #ecfdf5;
+  --cdl-pill-ok-fg: #065f46;
+  --cdl-pill-ok-bd: #a7f3d0;
+
+  --cdl-pill-ops-bg: #f0fdfa;
+  --cdl-pill-ops-fg: #115e59;
+  --cdl-pill-ops-bd: #99f6e4;
+
+  --cdl-pill-ai-bg: #f5f3ff;
+  --cdl-pill-ai-fg: #5b21b6;
+  --cdl-pill-ai-bd: #ddd6fe;
+
+  --cdl-pill-neutral-bg: #f1f5f9;
+  --cdl-pill-neutral-fg: #334155;
+  --cdl-pill-neutral-bd: #cbd5e1;
+}
+
+/* ═══════════════════════════════════════════════
+ * DARK MODE — light text on dark tint (AA)
+ * ═══════════════════════════════════════════════ */
+html[data-theme='dark'] {
+  --cdl-pill-critical-bg: color-mix(in srgb, #dc2626 28%, #1e293b);
+  --cdl-pill-critical-fg: #fecaca;
+  --cdl-pill-critical-bd: color-mix(in srgb, #f87171 45%, #334155);
+
+  --cdl-pill-urgent-bg: color-mix(in srgb, #ea580c 26%, #1e293b);
+  --cdl-pill-urgent-fg: #fed7aa;
+  --cdl-pill-urgent-bd: color-mix(in srgb, #fb923c 40%, #334155);
+
+  --cdl-pill-warning-bg: color-mix(in srgb, #f59e0b 22%, #1e293b);
+  --cdl-pill-warning-fg: #fde68a;
+  --cdl-pill-warning-bd: color-mix(in srgb, #fbbf24 40%, #334155);
+
+  --cdl-pill-info-bg: color-mix(in srgb, #0ea5e9 22%, #1e293b);
+  --cdl-pill-info-fg: #bae6fd;
+  --cdl-pill-info-bd: color-mix(in srgb, #38bdf8 40%, #334155);
+
+  --cdl-pill-ok-bg: color-mix(in srgb, #10b981 22%, #1e293b);
+  --cdl-pill-ok-fg: #bbf7d0;
+  --cdl-pill-ok-bd: color-mix(in srgb, #4ade80 40%, #334155);
+
+  --cdl-pill-ops-bg: color-mix(in srgb, #14b8a6 22%, #1e293b);
+  --cdl-pill-ops-fg: #99f6e4;
+  --cdl-pill-ops-bd: color-mix(in srgb, #2dd4bf 40%, #334155);
+
+  --cdl-pill-ai-bg: color-mix(in srgb, #8b5cf6 26%, #1e293b);
+  --cdl-pill-ai-fg: #ddd6fe;
+  --cdl-pill-ai-bd: color-mix(in srgb, #a78bfa 40%, #334155);
+
+  --cdl-pill-neutral-bg: #1e293b;
+  --cdl-pill-neutral-fg: #cbd5e1;
+  --cdl-pill-neutral-bd: #475569;
+}
+
+/* ── Tone pairs (use dual-mode pill tokens) ── */
+.cdl-badge[data-tone='critical'],
+.cdl-pill[data-tone='critical'],
+.cdl-badge--critical,
+.cdl-pill--critical,
+.patient-card__signal--critical,
+.patient-card__flag--critical,
+.patient-card__score--red,
+.patient-card [data-tone='critical'],
+.patient-card [class*='--critical'],
+.patient-card [class*='--danger'],
+.patient-card [class*='--overload'],
+.patient-card [class*='--handoff-delay'],
+.patient-card [class*='high-risk-complaint-badge__review'],
+.patient-card [class*='high-risk-complaint-badge__flag'] {
+  background: var(--cdl-pill-critical-bg, var(--cdl-critical-bg, #fef2f2)) !important;
+  border-color: var(--cdl-pill-critical-bd, var(--cdl-critical-border, #fecaca)) !important;
+  color: var(--cdl-pill-critical-fg, var(--cdl-critical-text, #991b1b)) !important;
+}
+
+.cdl-badge[data-tone='urgent'],
+.cdl-pill[data-tone='urgent'],
+.cdl-badge--urgent,
+.cdl-pill--urgent,
+.patient-card [data-tone='urgent'] {
+  background: var(--cdl-pill-urgent-bg, var(--cdl-urgent-bg, #fff7ed)) !important;
+  border-color: var(--cdl-pill-urgent-bd, var(--cdl-urgent-border, #fed7aa)) !important;
+  color: var(--cdl-pill-urgent-fg, var(--cdl-urgent-text, #9a3412)) !important;
+}
+
+.cdl-badge[data-tone='warning'],
+.cdl-badge[data-tone='watch'],
+.cdl-pill[data-tone='warning'],
+.cdl-pill[data-tone='watch'],
+.cdl-badge--warning,
+.cdl-badge--watch,
+.cdl-pill--warning,
+.patient-card__signal--warning,
+.patient-card__flag--warning,
+.patient-card__score--yellow,
+.patient-card [data-tone='warning'],
+.patient-card [data-tone='watch'],
+.patient-card [class*='--warning'],
+.patient-card [class*='--watch'],
+.patient-card [class*='--congestion'],
+.patient-card [class*='--review']:not([class*='high-risk']) {
+  background: var(--cdl-pill-warning-bg, var(--cdl-warning-bg, #fffbeb)) !important;
+  border-color: var(--cdl-pill-warning-bd, var(--cdl-warning-border, #fde68a)) !important;
+  color: var(--cdl-pill-warning-fg, var(--cdl-warning-text, #92400e)) !important;
+}
+
+.cdl-badge[data-tone='info'],
+.cdl-pill[data-tone='info'],
+.cdl-badge--info,
+.cdl-pill--info,
+.patient-card__signal--info,
+.patient-card__flag--info,
+.patient-card [data-tone='info'],
+.patient-card [class*='--info'],
+.patient-card [class*='high-risk-complaint-badge__more'] {
+  background: var(--cdl-pill-info-bg, var(--cdl-info-bg, #f0f9ff)) !important;
+  border-color: var(--cdl-pill-info-bd, var(--cdl-info-border, #bae6fd)) !important;
+  color: var(--cdl-pill-info-fg, var(--cdl-info-text, #075985)) !important;
+}
+
+.cdl-badge[data-tone='ok'],
+.cdl-badge[data-tone='success'],
+.cdl-badge[data-tone='stable'],
+.cdl-pill[data-tone='ok'],
+.cdl-pill[data-tone='success'],
+.cdl-badge--ok,
+.cdl-badge--success,
+.cdl-badge--stable,
+.patient-card__signal--stable,
+.patient-card__score--green,
+.patient-card [data-tone='ok'],
+.patient-card [data-tone='success'],
+.patient-card [data-tone='stable'],
+.patient-card [class*='--stable'],
+.patient-card [class*='--success'],
+.patient-card [class*='--ok'],
+.patient-card [class*='--clear'],
+.patient-card [class*='--fresh'] {
+  background: var(--cdl-pill-ok-bg, var(--cdl-ok-bg, #ecfdf5)) !important;
+  border-color: var(--cdl-pill-ok-bd, var(--cdl-ok-border, #a7f3d0)) !important;
+  color: var(--cdl-pill-ok-fg, var(--cdl-ok-text, #065f46)) !important;
+}
+
+.cdl-badge[data-tone='flow'],
+.cdl-badge[data-tone='ops'],
+.cdl-pill[data-tone='flow'],
+.cdl-pill[data-tone='ops'],
+.cdl-badge--flow,
+.cdl-badge--ops,
+.patient-card__signal--flow,
+.patient-card__flag--flow,
+.patient-card [data-tone='flow'],
+.patient-card [data-tone='ops'],
+.patient-card [class*='--flow'],
+.patient-card [class*='--ops'] {
+  background: var(--cdl-pill-ops-bg, var(--cdl-ops-bg, #f0fdfa)) !important;
+  border-color: var(--cdl-pill-ops-bd, var(--cdl-ops-border, #99f6e4)) !important;
+  color: var(--cdl-pill-ops-fg, var(--cdl-ops-text, #115e59)) !important;
+}
+
+.cdl-badge[data-tone='ai'],
+.cdl-pill[data-tone='ai'],
+.cdl-badge--ai,
+.patient-card [data-tone='ai'] {
+  background: var(--cdl-pill-ai-bg, var(--cdl-ai-bg, #f5f3ff)) !important;
+  border-color: var(--cdl-pill-ai-bd, var(--cdl-ai-border, #ddd6fe)) !important;
+  color: var(--cdl-pill-ai-fg, var(--cdl-ai-text, #5b21b6)) !important;
+}
+
+.cdl-badge[data-tone='neutral'],
+.cdl-badge[data-tone='overflow'],
+.cdl-pill[data-tone='neutral'],
+.cdl-badge--neutral,
+.cdl-badge--overflow,
+.patient-card__signal--overflow,
+.patient-card__flag--overflow,
+.patient-card [data-tone='neutral'],
+.patient-card [class*='--neutral'],
+.patient-card [class*='--overflow'] {
+  background: var(--cdl-pill-neutral-bg, var(--cdl-surface-muted, #f1f5f9)) !important;
+  border: 1px dashed var(--cdl-pill-neutral-bd, var(--cdl-border-strong, #cbd5e1)) !important;
+  color: var(--cdl-pill-neutral-fg, var(--cdl-ink-muted, #334155)) !important;
+}
+
+.cdl-badge-row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-width: 0;
+}
+
+/*
+ * Solid fill exception — ONLY for saturated blocks (priority codes).
+ * Text is white/inverse on solid hue, works both themes.
+ */
+[data-pill-fill='solid'],
+.patient-card__priority-code,
+.patient-card__row-triage-code {
+  color: var(--app-on-solid, #ffffff) !important;
+}

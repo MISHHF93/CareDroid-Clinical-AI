@@ -5,8 +5,9 @@ import './styles/cdl-v2/index.css';
 import './styles/design-system.css';
 import './styles/alarm-system.css';
 import './styles/inline-style-utilities.css';
-/* Re-assert CDL shell readability after legacy cascade (prevents faded header/sidebar). */
+/* Re-assert CDL shell + dual-mode pills after legacy cascade (prevents white-on-light pills). */
 import './styles/cdl-v2/shell-readability.css';
+import './styles/cdl-v2/pills.css';
 import './index.css';
 
 import React from 'react';
