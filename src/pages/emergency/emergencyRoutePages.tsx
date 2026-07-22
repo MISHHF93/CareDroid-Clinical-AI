@@ -43,6 +43,7 @@ import {
   PATIENT_ROUTE_PARAM_KEYS,
   readPatientRouteContext,
 } from '../../utils/receptionQueryParams';
+import { AlarmBanner, AlarmKpi } from '../../alarm';
 
 
 export function PatientsRoute() {
@@ -153,17 +154,29 @@ export function PatientsRoute() {
         backendAvailable={backendAvailable}
         compact
       />
-      <MetricGrid
-        metrics={[
-          { label: 'Total patients', value: patients.length, color: MEDICAL_THEME.accent },
-          { label: 'High risk', value: patients.filter(isHighRisk).length, color: '#EF4444' },
-          {
-            label: 'Waiting',
-            value: patients.filter((patient) => patient.state === PatientState.Waiting).length,
-            color: '#F59E0B',
-          },
-        ]}
-      />
+      {highRiskCount > 0 ? (
+        <AlarmBanner
+          severity="critical"
+          title={`${highRiskCount} high-risk patient${highRiskCount === 1 ? '' : 's'} on the board`}
+          message="Open a patient card to review flags, assignment, and next clinical action. AI suggestions require human review."
+          actions={[{ id: 'review', label: 'Review list', variant: 'primary' }]}
+        />
+      ) : null}
+      <div className="cdl-alarm-kpi-rail emergency-route-metric-kpi-rail" aria-label="Department patient metrics">
+        <AlarmKpi severity="info" value={patients.length} label="Total patients" />
+        <AlarmKpi
+          severity={highRiskCount > 0 ? 'critical' : 'ok'}
+          value={highRiskCount}
+          label="High risk"
+          acknowledged={highRiskCount === 0}
+        />
+        <AlarmKpi
+          severity={waitingCount > 0 ? 'warning' : 'ok'}
+          value={waitingCount}
+          label="Waiting"
+          acknowledged={waitingCount === 0}
+        />
+      </div>
       {surfaces.emergencyRoutes.showJourneyEngineCard ? (
         <>
           <ApiStateBanner

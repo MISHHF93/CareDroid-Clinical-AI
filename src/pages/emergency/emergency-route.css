@@ -1,25 +1,26 @@
 @import '../../styles/emergency-tokens.css';
 
+/* CDL v2 bridges for emergency routes (patients, queues, etc.) */
 .emergency-route-page {
   min-height: 100%;
-  background: var(--ed-surface-base);
-  color: var(--ed-text-primary);
+  background: var(--cdl-surface-page, var(--ed-surface-base));
+  color: var(--cdl-ink, var(--ed-text-primary));
 }
 
 .emergency-route-page__content {
-  gap: var(--ed-space-4);
+  gap: var(--cdl-section-gap, var(--ed-space-4));
 }
 
 .emergency-route-page__hero {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: var(--ed-space-4);
+  gap: var(--cdl-space-4, var(--ed-space-4));
   margin: 0;
 }
 
 .emergency-route-page__eyebrow {
-  color: var(--app-accent-interactiae, var(--status-info));
+  color: var(--cdl-brand-600, var(--app-accent-interactive, var(--status-info)));
   font-size: var(--ed-type-body);
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -27,26 +28,37 @@
 }
 
 .emergency-route-situation-brief {
-  border: 1px solid var(--cdl-clinical-border, var(--ed-border-subtle));
-  border-radius: var(--cdl-clinical-radius, var(--radius-lg, 12px));
-  background: var(--ed-surface-raised);
-  box-shadow: var(--cdl-clinical-shadow-rest, var(--app-eleaation-card));
-  padding: var(--ed-space-4, 16px);
+  border: 1px solid var(--cdl-border, var(--cdl-clinical-border, var(--ed-border-subtle)));
+  border-radius: var(--cdl-radius-lg, var(--cdl-clinical-radius, var(--radius-lg, 12px)));
+  background: var(--cdl-surface-card, var(--ed-surface-raised));
+  box-shadow: var(--cdl-elev-2, var(--cdl-clinical-shadow-rest, var(--app-elevation-card)));
+  padding: var(--cdl-space-4, var(--ed-space-4, 16px));
 }
 
 .emergency-route-situation-brief--info {
-  border-color: color-mix(in srgb, var(--app-accent-interactiae, var(--status-info)) 28%, var(--ed-border-subtle));
-  background: var(--ed-surface-raised);
+  border-color: color-mix(in srgb, var(--cdl-info, var(--status-info)) 28%, var(--cdl-border, var(--ed-border-subtle)));
+  background: var(--cdl-info-bg, var(--ed-surface-raised));
 }
 
 .emergency-route-situation-brief--warning {
-  border-color: color-mix(in srgb, var(--status-warning, #f59e0b) 34%, var(--ed-border-subtle));
-  background: var(--ed-surface-raised);
+  border-color: var(--cdl-warning-border, color-mix(in srgb, var(--status-warning, #b45309) 34%, var(--ed-border-subtle)));
+  background: var(--cdl-warning-bg, var(--ed-surface-raised));
 }
 
 .emergency-route-situation-brief--critical {
-  border-color: color-mix(in srgb, var(--status-critical, #ef4444) 38%, var(--ed-border-subtle));
-  background: var(--ed-surface-raised);
+  border-color: var(--cdl-critical-border, color-mix(in srgb, var(--status-critical, #dc2626) 38%, var(--ed-border-subtle)));
+  background: var(--cdl-critical-bg, var(--ed-surface-raised));
+}
+
+.emergency-route-metric-kpi-rail {
+  margin: 0 0 var(--cdl-space-3, 12px);
+}
+
+.emergency-route-card {
+  box-shadow: var(--cdl-elev-1, none);
+  border-color: var(--cdl-border, var(--ed-border-subtle));
+  border-radius: var(--cdl-radius-lg, 12px);
+  background: var(--cdl-surface-card, var(--ed-surface-raised));
 }
 
 .emergency-route-situation-brief__list {
@@ -72,8 +84,9 @@
   text-transform: uppercase;
 }
 
+.emergency-route-situation-brief__value,
 .emergency-route-situation-brief__aalue {
-  color: var(--ed-text-primary);
+  color: var(--cdl-ink, var(--ed-text-primary));
   font-size: var(--ed-type-section);
   font-weight: 600;
   line-height: 1.35;

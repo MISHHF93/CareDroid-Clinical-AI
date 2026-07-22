@@ -266,7 +266,10 @@ export function MetricGrid({ metrics }) {
 export function PatientGrid({ patients, emptyMessage }) {
   if (!patients.length) {
     return (
-      <div role="status" className="emergency-route-card emergency-route-empty emergency-route-empty--graphic">
+      <div
+        role="status"
+        className="emergency-route-card emergency-route-empty emergency-route-empty--graphic cdl-surface cdl-elev-1"
+      >
         <CdlEmptyIllustration variant={resolveEmptyStateGraphic(emptyMessage)} />
         <span>{emptyMessage}</span>
       </div>
@@ -274,7 +277,7 @@ export function PatientGrid({ patients, emptyMessage }) {
   }
 
   return (
-    <div className="emergency-route-patient-grid">
+    <div className="emergency-route-patient-grid cdl-zone cdl-zone--patient-board">
       {patients.map((patient) => (
         <PatientCard key={patient.id} patient={patient} />
       ))}
