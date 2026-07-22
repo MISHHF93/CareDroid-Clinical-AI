@@ -779,72 +779,76 @@ function PatientCard({
     );
   }
 
-  // Card layout: static ARIA role strings on each branch (article vs button).
+  // Card layout: ONE shell (.cdl-card). Slim header — badges live in signals (budgeted).
+  const secondaryHeaderBadges = (
+    <>
+      {patientCardSurfaces.showJourneyBadge ? (
+        <PatientJourneyStateBadge patient={patient} compact />
+      ) : null}
+      {showThreeMinuteTimer && threeMinuteTimerStart ? (
+        <ThreeMinuteTimer startTime={threeMinuteTimerStart} compact />
+      ) : null}
+      {cardDensity.showLwbsAndDeterioration && patient.state === PatientState.Waiting ? (
+        <LwbsRiskBadge
+          patient={patient}
+          waitingPatientCount={allPatients.filter((candidate) => candidate.state === PatientState.Waiting).length}
+          compact
+        />
+      ) : null}
+      {cardDensity.showLwbsAndDeterioration && patient.state === PatientState.Waiting ? (
+        <DeteriorationWatchBadge patient={patient} emsArrivals={emsArrivals} compact />
+      ) : null}
+      {cardDensity.showSafetyFlags && isAwaitingTriage(patient) ? (
+        <TriageBreachBadge patient={patient} settings={emergencySettings} compact showElapsed />
+      ) : null}
+      {admissionPredictionEnabled && patientCardSurfaces.showPredictiveBadges ? (
+        <AdmissionProbabilityBadge
+          patient={patient}
+          boardingSignals={boardingSignals}
+          consultPending={patient.state === PatientState.Orders || patient.state === PatientState.Results}
+          compact
+        />
+      ) : null}
+      {admissionPredictionEnabled &&
+      patientCardSurfaces.showPredictiveBadges &&
+      (workflowProfile === 'charge' || workflowProfile === 'physician') ? (
+        <JourneyPredictionBadge patient={patient} boardingSignals={boardingSignals} compact />
+      ) : null}
+      {cardDensity.showExperienceBadge ? (
+        <PatientExperienceStatusBadge patient={patient} referrals={referrals} compact showStaffDetail />
+      ) : null}
+      {cardDensity.showWhatHappensNext ? (
+        <WhatHappensNextBadge patient={patient} referrals={referrals} staff={staff} compact showGuidance />
+      ) : null}
+      {cardDensity.showWhatHappensNext ? <PatientFlowBadge patient={patient} /> : null}
+      {cardDensity.showCommunicationBadge && patient.state === PatientState.Waiting ? (
+        <WaitingRoomCommunicationBadge
+          patient={patient}
+          workflowLogs={workflowLogs}
+          staff={staff}
+          compact
+        />
+      ) : null}
+      <WhiteboardOperationalIconStrip
+        patient={patient}
+        room={patientRoom}
+        consultPending={patient.state === PatientState.Orders || patient.state === PatientState.Results}
+        resultsPending={patient.state === PatientState.Results}
+        boardingSignals={boardingSignals}
+        compact
+      />
+    </>
+  );
+
   const cardBody = (
       <>
-      <div className="patient-card__priority-strip patient-card__priority-strip--graphic" aria-label={`${displayPriority} ${priorityLabel}`}>
+      <div
+        className="patient-card__priority-strip"
+        aria-label={`${displayPriority} ${priorityLabel}`}
+      >
         <PatientAcuityRing priority={displayPriority} className="patient-card__acuity-ring" />
         <span className="patient-card__priority-label">{priorityLabel}</span>
         <span className="patient-card__state-pill">{whiteboardStateLabel}</span>
-        {patientCardSurfaces.showJourneyBadge ? (
-          <PatientJourneyStateBadge patient={patient} compact />
-        ) : null}
-        {showThreeMinuteTimer && threeMinuteTimerStart && (
-          <ThreeMinuteTimer startTime={threeMinuteTimerStart} compact />
-        )}
-        <WhiteboardOperationalIconStrip
-          patient={patient}
-          room={patientRoom}
-          consultPending={patient.state === PatientState.Orders || patient.state === PatientState.Results}
-          resultsPending={patient.state === PatientState.Results}
-          boardingSignals={boardingSignals}
-          compact
-        />
-        {admissionPredictionEnabled && patientCardSurfaces.showPredictiveBadges ? (
-          <AdmissionProbabilityBadge
-            patient={patient}
-            boardingSignals={boardingSignals}
-            consultPending={patient.state === PatientState.Orders || patient.state === PatientState.Results}
-            compact
-          />
-        ) : null}
-        {admissionPredictionEnabled &&
-        patientCardSurfaces.showPredictiveBadges &&
-        (workflowProfile === 'charge' || workflowProfile === 'physician') ? (
-          <JourneyPredictionBadge
-            patient={patient}
-            boardingSignals={boardingSignals}
-            compact
-          />
-        ) : null}
-        {cardDensity.showExperienceBadge ? (
-          <PatientExperienceStatusBadge patient={patient} referrals={referrals} compact showStaffDetail />
-        ) : null}
-        {cardDensity.showWhatHappensNext ? (
-          <WhatHappensNextBadge patient={patient} referrals={referrals} staff={staff} compact showGuidance />
-        ) : null}
-        {cardDensity.showWhatHappensNext ? <PatientFlowBadge patient={patient} /> : null}
-        {cardDensity.showLwbsAndDeterioration && patient.state === PatientState.Waiting ? (
-          <LwbsRiskBadge
-            patient={patient}
-            waitingPatientCount={allPatients.filter((candidate) => candidate.state === PatientState.Waiting).length}
-            compact
-          />
-        ) : null}
-        {cardDensity.showLwbsAndDeterioration && patient.state === PatientState.Waiting ? (
-          <DeteriorationWatchBadge patient={patient} emsArrivals={emsArrivals} compact />
-        ) : null}
-        {cardDensity.showCommunicationBadge && patient.state === PatientState.Waiting ? (
-          <WaitingRoomCommunicationBadge
-            patient={patient}
-            workflowLogs={workflowLogs}
-            staff={staff}
-            compact
-          />
-        ) : null}
-        {cardDensity.showSafetyFlags && isAwaitingTriage(patient) ? (
-          <TriageBreachBadge patient={patient} settings={emergencySettings} compact showElapsed />
-        ) : null}
       </div>
 
       <div className="patient-card__identity">
@@ -878,38 +882,50 @@ function PatientCard({
       ) : null}
 
       {cardDensity.showSignalsRow ? (
-      <div className="patient-card__signals" aria-label="Patient priority signals">
+      <div className="patient-card__signals cdl-badge-row" aria-label="Patient priority signals">
         {privacyPolicy.showComplaintFlags ? (
           <HighRiskComplaintFlagBadge patient={patient} compact />
         ) : null}
         {patient.state === PatientState.Waiting ? <FitToWaitBadge patient={patient} compact /> : null}
         {signalBadges.length ? (
           <>
-            {signalBadges.slice(0, maxPatientCardBadges).map((signal) => (
-              <span key={signal.id} className={`patient-card__signal patient-card__signal--${signal.tone}`}>
+            {signalBadges.slice(0, Math.min(3, maxPatientCardBadges)).map((signal) => (
+              <span
+                key={signal.id}
+                className={`patient-card__signal cdl-badge patient-card__signal--${signal.tone}`}
+              >
                 {signal.label}
               </span>
             ))}
-            {signalBadges.length > maxPatientCardBadges ? (
+            {signalBadges.length > Math.min(3, maxPatientCardBadges) ? (
               <span
-                className="patient-card__signal patient-card__signal--overflow"
+                className="patient-card__signal patient-card__signal--overflow cdl-badge"
                 title={signalBadges
-                  .slice(maxPatientCardBadges)
+                  .slice(Math.min(3, maxPatientCardBadges))
                   .map((signal) => signal.label)
                   .join(' · ')}
               >
-                +{signalBadges.length - maxPatientCardBadges}
+                +{signalBadges.length - Math.min(3, maxPatientCardBadges)}
               </span>
             ) : null}
           </>
         ) : (
-          <span className="patient-card__signal patient-card__signal--stable">No active risk flags</span>
+          <span className="patient-card__signal patient-card__signal--stable cdl-badge">
+            No active risk flags
+          </span>
         )}
         {cardDensity.showReassessmentTimer && patient.state === PatientState.Waiting ? (
           <ReassessmentTimerBadge patient={patient} />
         ) : null}
       </div>
       ) : null}
+
+      <div
+        className="patient-card__secondary-badges cdl-badge-row"
+        aria-label="Additional patient signals"
+      >
+        {secondaryHeaderBadges}
+      </div>
 
       {cardDensity.showReassessmentTimer && reassessmentTimer ? (
         <ReassessmentTimerStrip timer={reassessmentTimer} className="patient-card__timer-grid" />

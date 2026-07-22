@@ -27,21 +27,77 @@
   }
 }
 
+/**
+ * SINGLE shell for patient cards — do not re-declare full chrome later in this file.
+ * Visual frame comes from .cdl-card (border, elev, data-severity, data-acuity rail).
+ */
+.patient-card.cdl-card,
 .patient-card {
-  animation: patient-card-enter var(--motion-duration-normal, 180ms) var(--motion-ease-standard, ease-out);
-  /* CDL v2 contract — paired bg/fg; severity via data-severity on .cdl-card */
-  background: var(--cdl-card-bg, var(--color-card, #ffffff));
-  color: var(--cdl-card-fg, var(--color-text-primary, #111827));
+  --patient-priority-color: var(--cdl-brand-500);
+  animation: patient-card-enter var(--cdl-duration-normal, 180ms) var(--cdl-ease-standard, ease-out);
+  display: grid;
+  gap: var(--cdl-space-2, 8px);
   inline-size: 100%;
   min-inline-size: 0;
+  min-height: 0;
+  position: relative;
+  padding: var(--cdl-space-3, 12px);
   isolation: isolate;
   overflow: hidden;
+  cursor: pointer;
+  background: var(--cdl-card-bg, var(--cdl-surface-card, #ffffff));
+  color: var(--cdl-card-fg, var(--cdl-ink, #111827));
+  border: 1px solid var(--cdl-card-border, var(--cdl-border, #e2e8f0));
+  border-radius: var(--cdl-radius-lg, 12px);
+  box-shadow: var(--cdl-elev-1);
+  /* One acuity rail only (border-left). CDL ::before disabled for patient-card. */
+  border-left: 4px solid var(--patient-priority-color, var(--cdl-brand-500));
   transition:
-    background-color var(--motion-transition-fast, 120ms ease),
-    border-color var(--motion-transition-fast, 120ms ease),
-    box-shadow var(--motion-transition-fast, 120ms ease),
-    transform var(--motion-transition-fast, 120ms ease);
-  will-change: transform;
+    background-color var(--cdl-duration-fast, 120ms) var(--cdl-ease-standard, ease),
+    border-color var(--cdl-duration-fast, 120ms) var(--cdl-ease-standard, ease),
+    box-shadow var(--cdl-duration-fast, 120ms) var(--cdl-ease-standard, ease);
+}
+
+.patient-card--priority-P1 { --patient-priority-color: var(--cdl-acuity-p1, #dc2626); }
+.patient-card--priority-P2 { --patient-priority-color: var(--cdl-acuity-p2, #ea580c); }
+.patient-card--priority-P3 { --patient-priority-color: var(--cdl-acuity-p3, #d97706); }
+.patient-card--priority-P4 { --patient-priority-color: var(--cdl-acuity-p4, #0284c7); }
+.patient-card--priority-P5 { --patient-priority-color: var(--cdl-acuity-p5, #64748b); }
+
+.patient-card[data-severity='critical'],
+.patient-card--deterioration-risk,
+.patient-card--lwbs-risk {
+  border-left-color: var(--cdl-critical, #dc2626);
+  border-left-width: 5px;
+}
+
+.patient-card[data-severity='warning'],
+.patient-card--long-wait,
+.patient-card--reassessment-due {
+  border-left-color: var(--cdl-warning, #b45309);
+}
+
+/* EMS: no full-card gradient shell — acuity/severity rail is enough */
+
+.patient-card__secondary-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  min-width: 0;
+  max-height: 4.5rem;
+  overflow: hidden;
+}
+
+.patient-card__secondary-badges > * {
+  flex: 0 1 auto;
+  max-width: 100%;
+}
+
+.patient-card--row {
+  display: grid;
+  min-height: 0;
+  border-left-width: 4px;
 }
 
 .patient-card .cdl-wait,
@@ -50,56 +106,35 @@
 }
 
 .patient-card [style*='var(--color-floating-surface)'] {
-  background: transparent !important;
-  border: 0 !important;
-  box-shadow: var(--component-inner-shadow) !important;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
 }
 
 .patient-card:hover,
-.patient-card:active,
 .patient-card:focus-visible,
 .patient-card--highlighted,
 .patient-card--keyboard-selected {
-  box-shadow:
-    0 0 0 2px color-mix(in srgb, var(--color-primary) 28%, transparent),
-    var(--app-elevation-card) !important;
+  box-shadow: var(--cdl-elev-2);
+  border-color: var(--cdl-border-strong, var(--cdl-slate-300, #cbd5e1));
   outline: none;
-  transform: translateY(-1px);
 }
 
-.patient-card:active {
-  transform: translateY(0) scale(0.996);
+.patient-card:focus-visible {
+  box-shadow: var(--cdl-focus-ring), var(--cdl-elev-2);
 }
 
 .patient-card--reassessment-due {
   animation:
-    patient-card-enter var(--motion-duration-normal, 180ms) var(--motion-ease-standard, ease-out),
-    patient-card-reassessment-pulse 1.4s var(--motion-ease-standard, ease-in-out) infinite
-      var(--motion-duration-normal, 180ms);
+    patient-card-enter var(--cdl-duration-normal, 180ms) var(--cdl-ease-standard, ease-out),
+    patient-card-reassessment-pulse 1.4s var(--cdl-ease-standard, ease-in-out) infinite
+      var(--cdl-duration-normal, 180ms);
 }
 
-.patient-card--deterioration-risk {
-  box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--status-danger) 36%, transparent),
-    var(--app-elevation-card) !important;
-}
-
-.patient-card--long-wait {
-  box-shadow:
-    inset 0 3px 0 var(--status-warning),
-    var(--app-elevation-card) !important;
-}
-
-.patient-card--lwbs-risk {
-  box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--status-danger) 40%, transparent),
-    var(--app-elevation-floating, var(--app-elevation-card)) !important;
-}
-
-.patient-card--ems-arrival {
-  background:
-    linear-gradient(90deg, color-mix(in srgb, var(--color-secondary) 12%, transparent), transparent 46%),
-    var(--color-card) !important;
+@media (prefers-reduced-motion: reduce) {
+  .patient-card--reassessment-due {
+    animation: none;
+  }
 }
 
 .patient-card--mission-control .patient-card__scores,
@@ -265,74 +300,23 @@
   color: var(--cdl-ink-muted, #475569);
 }
 
-/* Visual QA clarity pass: make triage/state/risk readable without relying on tiny color marks. */
-.patient-card {
-  --patient-priority-color: var(--status-info);
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--patient-priority-color) 10%, var(--color-card)) 0%,
-      var(--color-card) 42%
-    ) !important;
-  border: 1px solid color-mix(in srgb, var(--patient-priority-color) 34%, var(--color-border-default)) !important;
-  border-left: 7px solid var(--patient-priority-color) !important;
-  border-radius: var(--radius-lg) !important;
-  box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--patient-priority-color) 10%, transparent),
-    var(--app-elevation-card) !important;
-  cursor: pointer;
-  display: grid;
-  gap: 9px;
-  min-height: 246px;
-  overflow: hidden;
-  padding: 0 12px 12px !important;
-  position: relative;
-}
-
+/* Slim header strip — NOT a second card shell (no full gradients / forced min-height) */
 .patient-card--mission-control {
-  min-height: 338px !important;
-}
-
-.patient-card--priority-P1,
-.patient-card--deterioration-risk,
-.patient-card--lwbs-risk {
-  box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--status-danger) 38%, transparent),
-    0 14px 30px color-mix(in srgb, var(--status-danger) 13%, transparent),
-    var(--app-elevation-card) !important;
-}
-
-.patient-card--priority-P2 {
-  box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--status-warning) 26%, transparent),
-    var(--app-elevation-card) !important;
-}
-
-.patient-card--long-wait {
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--status-warning) 12%, var(--color-card)) 0%,
-      var(--color-card) 44%
-    ) !important;
+  /* content-driven height; no forced 338px second frame */
 }
 
 .patient-card__priority-strip {
   align-items: center;
-  background:
-    linear-gradient(
-      90deg,
-      color-mix(in srgb, var(--patient-priority-color) 30%, var(--color-background)),
-      color-mix(in srgb, var(--patient-priority-color) 12%, var(--color-card))
-    );
-  border-bottom: 1px solid color-mix(in srgb, var(--patient-priority-color) 32%, var(--color-border-default));
-  color: var(--color-text-primary);
-  display: grid;
-  gap: 7px;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  margin: 0 -12px;
-  min-height: 42px;
-  padding: 8px 10px 8px 12px;
+  background: var(--cdl-surface-muted, var(--cdl-slate-50, #f8fafc));
+  border: 1px solid var(--cdl-border, #e2e8f0);
+  border-radius: var(--cdl-radius-md, 8px);
+  color: var(--cdl-ink, #111827);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 0;
+  margin: 0;
+  padding: 6px 8px;
 }
 
 .patient-card__priority-code {

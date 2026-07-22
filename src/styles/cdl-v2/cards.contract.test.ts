@@ -31,4 +31,21 @@ describe('CDL v2 card contrast contract', () => {
     expect(patientCardTsx).not.toContain("'#EF4444'");
     expect(patientCardTsx).not.toContain("'#F59E0B'");
   });
+
+  it('PatientCard disables double rail (::before off; single border-left shell)', () => {
+    expect(cardsCss).toContain('.patient-card.cdl-card::before');
+    expect(cardsCss).toMatch(/\.patient-card\.cdl-card::before\s*\{[\s\S]*display:\s*none/);
+    expect(patientCardTsx).toContain('secondaryHeaderBadges');
+    expect(patientCardTsx).toContain('patient-card__secondary-badges');
+  });
+
+  it('does not force nested Visual QA min-height shells', () => {
+    const patientCss = readFileSync(
+      join(__dirname, '../../components/PatientCard.css'),
+      'utf8',
+    );
+    expect(patientCss).not.toContain('min-height: 246px');
+    expect(patientCss).not.toContain('min-height: 338px');
+    expect(patientCss).not.toContain('border-left: 7px');
+  });
 });

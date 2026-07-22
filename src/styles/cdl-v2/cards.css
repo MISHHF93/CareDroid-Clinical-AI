@@ -274,77 +274,32 @@
   /* Show first 3; overflow controlled in React via +N */
 }
 
-/* Patient card bridge — adopt contract without renaming every rule yet */
-.patient-card.cdl-card,
-.patient-card {
+/*
+ * Patient card bridge — token aliases only.
+ * Shell chrome lives in PatientCard.css (ONE border-left rail).
+ * Disable .cdl-card::before on patient cards to avoid double rails.
+ */
+.patient-card.cdl-card {
   --color-card: var(--cdl-card-bg);
   --color-text-primary: var(--cdl-card-fg);
   --color-text-secondary: var(--cdl-card-fg-muted);
   --color-text-muted: var(--cdl-card-fg-muted);
-  --patient-priority-color: var(--cdl-brand-500);
-  background: var(--cdl-card-bg) !important;
-  color: var(--cdl-card-fg) !important;
-  border: 1px solid var(--cdl-card-border);
-  border-radius: var(--cdl-card-radius);
-  box-shadow: var(--cdl-elev-1);
-}
-
-.patient-card.cdl-card {
-  padding: var(--cdl-space-3);
-}
-
-.patient-card--priority-P1 {
-  --patient-priority-color: var(--cdl-acuity-p1);
-}
-.patient-card--priority-P2 {
-  --patient-priority-color: var(--cdl-acuity-p2);
-}
-.patient-card--priority-P3 {
-  --patient-priority-color: var(--cdl-acuity-p3);
-}
-.patient-card--priority-P4 {
-  --patient-priority-color: var(--cdl-acuity-p4);
-}
-.patient-card--priority-P5 {
-  --patient-priority-color: var(--cdl-acuity-p5);
 }
 
 .patient-card.cdl-card::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 4px;
-  border-radius: inherit 0 0 inherit;
-  background: var(--patient-priority-color, transparent);
-  z-index: 1;
-  pointer-events: none;
+  content: none;
+  display: none;
 }
 
-.patient-card[data-severity='critical'].cdl-card::before,
-.patient-card--deterioration-risk.cdl-card::before,
-.patient-card--lwbs-risk.cdl-card::before {
-  background: var(--cdl-critical);
-  width: 5px;
-}
-
-.patient-card[data-severity='warning'].cdl-card::before,
-.patient-card--long-wait.cdl-card::before,
-.patient-card--reassessment-due.cdl-card::before {
-  background: var(--cdl-warning);
-}
-
-/* Kill muddy light greys on cards */
 .patient-card .patient-card__vitals,
 .patient-card .patient-card__meta,
 .patient-card [class*='__muted'],
 .patient-card [class*='__secondary'] {
-  color: var(--cdl-card-fg-muted, var(--cdl-ink-muted)) !important;
+  color: var(--cdl-card-fg-muted, var(--cdl-ink-muted));
 }
 
 .patient-card__lwbs-badge {
-  background: var(--cdl-critical) !important;
-  border-color: var(--cdl-critical-border) !important;
-  color: var(--cdl-ink-inverse) !important;
+  background: var(--cdl-critical);
+  border-color: var(--cdl-critical-border);
+  color: var(--cdl-ink-inverse);
 }
