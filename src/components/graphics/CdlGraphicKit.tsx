@@ -267,7 +267,7 @@ export function EmsUnitTrackGraphic({ status, unitId, breach = false, className 
       <div className="cdl-ems-unit-track__rail" aria-hidden>
         <span className="cdl-ems-unit-track__fill" style={{ width: `${progress}%` }} />
         {[15, 35, 55, 80, 100].map((mark) => (
-          <span key={mark} className="cdl-ems-unit-track__mark" style={{ left: `${mark}%` }} />
+          <span key={mark} className={`cdl-ems-unit-track__mark cdl-ems-unit-track__mark--${mark}`} />
         ))}
       </div>
       <GraphicIconBadge iconKey="ems" accent={breach ? 'critical' : progress >= 80 ? 'action' : 'information'} size="sm" />

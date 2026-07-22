@@ -68,7 +68,7 @@ export default function BillingPage() {
         tenantContext?.organizationName || 'this organization'
       }.`}
     >
-      {error && <p style={{ color: 'var(--app-danger)' }}>{error}</p>}
+      {error && <p className="commercial-error-text">{error}</p>}
 
       <div className="commercial-grid">
         <Card className="commercial-card">

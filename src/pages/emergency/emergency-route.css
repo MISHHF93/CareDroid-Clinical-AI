@@ -405,6 +405,32 @@
   gap: 4px;
 }
 
+.emergency-route-queue-row__patient--inline {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.emergency-route-queue-row__escalate-btn {
+  padding: 1px 7px;
+  border-radius: 4px;
+  background: #ef4444;
+  color: #fff;
+  border: none;
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+}
+
+.emergency-route-queue-row__escalated-badge {
+  font-size: 10px;
+  font-weight: 700;
+  color: #10b981;
+}
+
 .emergency-route-queue-row__patient-btn {
   border: 1px solid var(--ed-border-subtle);
   border-radius: 999px;

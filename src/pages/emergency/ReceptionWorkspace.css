@@ -1095,3 +1095,7 @@
 .reception-patient-detail-flyout__footer button:hover {
   background: var(--reception-command-border);
 }
+
+.reception-interactive-ai {
+  margin-top: 0.75rem;
+}

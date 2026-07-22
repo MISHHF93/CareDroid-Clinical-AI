@@ -149,6 +149,10 @@
   color: var(--app-on-solid);
 }
 
+.tool-card-score-pill--critical {
+  background-color: #dc2626;
+}
+
 .tool-card-pill {
   display: inline-block;
   padding: 2px 10px;

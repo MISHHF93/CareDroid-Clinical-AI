@@ -59,6 +59,10 @@
   margin-bottom: 20px;
 }
 
+.ai-cc-metrics-strip--tight {
+  margin-bottom: 0;
+}
+
 .ai-cc-metric-tile {
   background: #ffffff;
   border: 1px solid #e2e8f0;

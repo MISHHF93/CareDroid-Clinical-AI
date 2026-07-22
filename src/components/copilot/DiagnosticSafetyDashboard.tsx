@@ -78,15 +78,7 @@ export default function DiagnosticSafetyDashboard({
                   <button
                     type="button"
                     onClick={() => onSelectPatient(entry.patientId)}
-                    style={{
-                      border: 0,
-                      background: 'transparent',
-                      color: 'inherit',
-                      font: 'inherit',
-                      padding: 0,
-                      cursor: 'pointer',
-                      textAlign: 'left',
-                    }}
+                    className="diagnostic-safety-dashboard__name-btn"
                   >
                     {entry.name}
                   </button>

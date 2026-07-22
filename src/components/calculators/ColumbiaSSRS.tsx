@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { MEDICAL_THEME, MEDICAL_TYPE } from '../../config/medicalTheme.constants';
+import { MEDICAL_TYPE } from '../../config/medicalTheme.constants';
 import { dispatchAlert } from '../../engine/alertEngine';
 import { saveCalculatorResult } from './calculatorSave';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { PatientFlag } from '../../types/emergency';
+import './ColumbiaSSRS.css';
 
 type ColumbiaSSRSProps = {
   patientId?: string;
@@ -126,7 +127,7 @@ function AnswerButtons({
   onAnswer: (answer: Answer) => void;
 }) {
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 10, marginTop: 12 }}>
+    <div className="cssrs-answer-grid">
       {(['yes', 'no'] as Answer[]).map((answer) => (
         <button
           key={answer}
@@ -250,19 +251,7 @@ export default function ColumbiaSSRS({ patientId, onClose }: ColumbiaSSRSProps) 
       aria-labelledby="cssrs-title"
       className="u-modal-scrim"
     >
-      <div
-        style={{
-          width: '100%',
-          maxWidth: 720,
-          maxHeight: '92vh',
-          overflowY: 'auto',
-          background: MEDICAL_THEME.surfaceCard,
-          border: '1px solid #e0f2fe',
-          borderRadius: 12,
-          color: 'var(--medical-ink, #111827)',
-          boxShadow: '0 30px 80px rgba(0,0,0,0.45)',
-        }}
-      >
+      <div className="cssrs-panel">
         <header
           className="u-panel-header-row"
         >
@@ -271,7 +260,7 @@ export default function ColumbiaSSRS({ patientId, onClose }: ColumbiaSSRSProps) 
               Columbia Suicide Severity Rating Scale
             </h2>
             {patient ? (
-              <div style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 12, marginTop: 4 }}>
+              <div className="cssrs-patient-subtitle">
                 {patientName(patient)} · {patient.mrn}
               </div>
             ) : null}
@@ -287,25 +276,16 @@ export default function ColumbiaSSRS({ patientId, onClose }: ColumbiaSSRSProps) 
         </header>
 
         <div className="u-stack-14">
-          <section
-            style={{
-              background: '#f0f9ff',
-              border: '1px solid #e0f2fe',
-              borderRadius: 12,
-              padding: 14,
-              color: '#E5E7EB',
-              lineHeight: 1.5,
-            }}
-          >
+          <section className="cssrs-disclaimer">
             This tool is a clinical aid. It does not replace clinical judgment. All results require immediate physician review.
           </section>
 
           <section>
-            <h3 style={{ margin: '0 0 10px', fontSize: 15 }}>Ideation Section</h3>
-            <div style={{ display: 'grid', gap: 12 }}>
+            <h3 className="cssrs-section-heading">Ideation Section</h3>
+            <div className="cssrs-question-list">
               {visibleItems.map((item) => (
                 <section key={item.id} className="u-card-border">
-                  <strong style={{ display: 'block', color: 'var(--medical-ink, #111827)', lineHeight: 1.45 }}>{item.question}</strong>
+                  <strong className="cssrs-question-text">{item.question}</strong>
                   <AnswerButtons
                     label={item.id}
                     value={answers[item.id]}
@@ -314,7 +294,7 @@ export default function ColumbiaSSRS({ patientId, onClose }: ColumbiaSSRSProps) 
                 </section>
               ))}
               {ideationStopped ? (
-                <div role="status" style={{ color: '#38bdf8', fontSize: 13, fontWeight: 700 }}>
+                <div role="status" className="cssrs-ideation-complete">
                   Ideation section complete
                 </div>
               ) : null}
@@ -322,9 +302,9 @@ export default function ColumbiaSSRS({ patientId, onClose }: ColumbiaSSRSProps) 
           </section>
 
           <section className="u-card-border">
-            <h3 style={{ margin: '0 0 10px', fontSize: 15 }}>Behavior Section</h3>
-            <strong style={{ display: 'block', color: 'var(--medical-ink, #111827)', lineHeight: 1.45 }}>{BEHAVIOR.question}</strong>
-            <p style={{ margin: '8px 0 0', color: MEDICAL_THEME.inkSubtle, fontSize: 13 }}>{BEHAVIOR.examples}</p>
+            <h3 className="cssrs-section-heading">Behavior Section</h3>
+            <strong className="cssrs-question-text">{BEHAVIOR.question}</strong>
+            <p className="cssrs-behavior-examples">{BEHAVIOR.examples}</p>
             <AnswerButtons
               label={BEHAVIOR.id}
               value={answers.q6}
@@ -350,58 +330,22 @@ export default function ColumbiaSSRS({ patientId, onClose }: ColumbiaSSRSProps) 
                 <section
                   role="alertdialog"
                   aria-label="Confirm Columbia SSR Scale save"
-                  style={{ border: '1px solid #F97316', borderRadius: 12, padding: 14, background: '#7C2D1266' }}
+                  className="cssrs-confirm-dialog"
                 >
-                  <p style={{ margin: '0 0 12px', color: 'var(--medical-ink, #111827)', fontWeight: 700 }}>
+                  <p className="cssrs-confirm-text">
                     Saving this score will alert the clinical team. Continue?
                   </p>
                   <div className="u-grid-2-gap-10">
-                    <button
-                      type="button"
-                      onClick={saveAndAlert}
-                      style={{
-                        border: 'none',
-                        borderRadius: 10,
-                        background: '#DC2626',
-                        color: 'var(--medical-ink, #111827)',
-                        padding: '10px 12px',
-                        cursor: 'pointer',
-                        fontWeight: 800,
-                      }}
-                    >
+                    <button type="button" onClick={saveAndAlert} className="cssrs-save-alert-btn">
                       Save and Alert
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => setConfirmingSave(false)}
-                      style={{
-                        border: '1px solid #e0f2fe',
-                        borderRadius: 10,
-                        background: 'transparent',
-                        color: 'var(--medical-ink, #111827)',
-                        padding: '10px 12px',
-                        cursor: 'pointer',
-                        fontWeight: 700,
-                      }}
-                    >
+                    <button type="button" onClick={() => setConfirmingSave(false)} className="cssrs-cancel-btn">
                       Cancel
                     </button>
                   </div>
                 </section>
               ) : (
-                <button
-                  type="button"
-                  onClick={() => setConfirmingSave(true)}
-                  style={{
-                    background: MEDICAL_THEME.accent,
-                    border: 'none',
-                    color: 'var(--medical-ink, #111827)',
-                    borderRadius: 10,
-                    padding: '10px 12px',
-                    cursor: 'pointer',
-                    fontWeight: 700,
-                  }}
-                >
+                <button type="button" onClick={() => setConfirmingSave(true)} className="cssrs-save-btn">
                   Save to Patient
                 </button>
               )}

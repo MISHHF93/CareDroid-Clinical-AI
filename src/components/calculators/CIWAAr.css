@@ -1,0 +1,62 @@
+/* Static (non-state-dependent) styles extracted from CIWAAr.tsx's inline
+   style={{...}} blocks -- see scripts/check-inline-styles.mjs.
+   Genuinely dynamic styles (the protocol band's border/background/text
+   color, keyed off protocolFor(total).color) stay inline; only fixed-value
+   blocks moved here. */
+
+.ciwa-panel {
+  width: 100%;
+  max-width: 720px;
+  max-height: 92vh;
+  overflow-y: auto;
+  background: #ffffff;
+  border: 1px solid #e0f2fe;
+  border-radius: 12px;
+  color: var(--medical-ink, #111827);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+}
+
+.ciwa-patient-subtitle {
+  color: #475569;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.ciwa-recommendation {
+  margin: 8px 0 0;
+  color: var(--medical-ink, #111827);
+  font-size: 13px;
+}
+
+.ciwa-item-label {
+  color: var(--medical-ink, #111827);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.ciwa-range-row {
+  display: flex;
+  justify-content: space-between;
+  color: #475569;
+  font-size: 12px;
+}
+
+.ciwa-range-value {
+  color: var(--medical-ink, #111827);
+}
+
+.ciwa-item-description {
+  margin: 8px 0 0;
+  color: #d1d5db;
+  font-size: 13px;
+}
+
+.ciwa-save-btn {
+  background: #0ea5e9;
+  border: none;
+  color: var(--medical-ink, #111827);
+  border-radius: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  font-weight: 700;
+}

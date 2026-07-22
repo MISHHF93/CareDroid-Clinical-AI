@@ -312,7 +312,7 @@ export function InteractiveAIWorkspace({
           <span className="cd-iaw__ai-mark" aria-hidden="true" />
           {heading}
         </h2>
-        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+        <div className="cd-iaw__header-actions">
           <button
             type="button"
             className="cd-iaw__suggestion"
@@ -383,7 +383,7 @@ export function InteractiveAIWorkspace({
             data-testid="workflow-ai-card"
           >
             <h3 className="cd-iaw-card__title">{card.title}</h3>
-            <p className="cd-iaw-card__preview" style={{ margin: 0, fontSize: '0.8rem' }}>
+            <p className="cd-iaw-card__preview">
               {card.summary}
             </p>
             <div className="cd-iaw-card__meta">
@@ -528,19 +528,8 @@ export function InteractiveAIWorkspace({
         role="status"
         aria-live="polite"
         aria-atomic="true"
-        className="visually-hidden"
+        className="cd-iaw__sr-only"
         data-testid="interactive-live-region"
-        style={{
-          position: 'absolute',
-          width: 1,
-          height: 1,
-          padding: 0,
-          margin: -1,
-          overflow: 'hidden',
-          clip: 'rect(0, 0, 0, 0)',
-          whiteSpace: 'nowrap',
-          border: 0,
-        }}
       >
         {statusMessage}
       </div>

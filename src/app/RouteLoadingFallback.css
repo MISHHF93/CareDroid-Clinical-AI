@@ -1,0 +1,12 @@
+/* Static (non-state-dependent) style extracted from router.tsx's inline
+   style={{...}} block -- see scripts/check-inline-styles.mjs. Fully static:
+   `label` only ever affects rendered text, never the styling. */
+
+.route-loading-fallback {
+  padding: 24px;
+  min-height: 40vh;
+  color: #475569;
+  background: #f8fafc;
+  font-family: system-ui, sans-serif;
+  font-size: 16px;
+}

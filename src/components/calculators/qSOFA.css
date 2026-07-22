@@ -1,0 +1,84 @@
+/* Static (non-state-dependent) styles extracted from qSOFA.tsx's inline
+   style={{...}} blocks -- see scripts/check-inline-styles.mjs.
+   Genuinely dynamic styles (criteria-toggle selected state, result-band
+   color/background keyed off resultFor(total)) stay inline; only fixed-value
+   blocks moved here. */
+
+.qsofa-checkbox {
+  width: 22px;
+  height: 22px;
+  accent-color: #0ea5e9;
+}
+
+.qsofa-toggle-label {
+  color: var(--medical-ink, #111827);
+  font-size: 14px;
+}
+
+.qsofa-toggle-current {
+  color: #475569;
+  font-size: 12px;
+}
+
+.qsofa-toggle-autofilled {
+  color: #0ea5e9;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.qsofa-panel {
+  width: 100%;
+  max-width: 480px;
+  max-height: 92vh;
+  overflow-y: auto;
+  background: #ffffff;
+  border: 1px solid #e0f2fe;
+  border-radius: 12px;
+  color: var(--medical-ink, #111827);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+}
+
+.qsofa-patient-subtitle {
+  color: #475569;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.qsofa-sepsis-alert {
+  color: #b91c1c;
+  font-size: 13px;
+  margin-top: 6px;
+  font-weight: 700;
+}
+
+.qsofa-recommendation {
+  color: var(--medical-ink, #111827);
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.qsofa-save-btn {
+  background: #0ea5e9;
+  border: none;
+  color: var(--medical-ink, #111827);
+  border-radius: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.qsofa-saved-message {
+  color: #15803d;
+  font-size: 13px;
+}
+
+.qsofa-disclaimer {
+  margin: 0;
+  font-size: 12px;
+  color: #475569;
+  line-height: 1.45;
+}
+
+.qsofa-source {
+  font-style: italic;
+}

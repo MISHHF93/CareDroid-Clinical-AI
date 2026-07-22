@@ -7,6 +7,7 @@ import { dispatchScoreAlert } from '../../engine/alertEngine';
 import { QSOFA_META } from '../../clinical-calculators/qsofa';
 import { saveCalculatorResult } from './calculatorSave';
 import './mobileCalculator.css';
+import './qSOFA.css';
 
 type QSOFAProps = {
   patientId?: string;
@@ -174,14 +175,12 @@ export default function QSOFA({ patientId, onClose }: QSOFAProps) {
         type="checkbox"
         checked={criteria[keyName]}
         onChange={() => toggleCriteria(keyName)}
-        style={{ width: 22, height: 22, accentColor: MEDICAL_THEME.accent }}
+        className="qsofa-checkbox"
       />
       <span className="u-flex-col-gap-5">
-        <strong style={{ color: 'var(--medical-ink, #111827)', fontSize: 14 }}>{label}</strong>
-        {current ? <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 12 }}>{current}</span> : null}
-        {autoFilledFromVitals ? (
-          <span style={{ color: MEDICAL_THEME.accent, fontSize: 12, fontWeight: 700 }}>Auto-filled from vitals</span>
-        ) : null}
+        <strong className="qsofa-toggle-label">{label}</strong>
+        {current ? <span className="qsofa-toggle-current">{current}</span> : null}
+        {autoFilledFromVitals ? <span className="qsofa-toggle-autofilled">Auto-filled from vitals</span> : null}
       </span>
     </label>
   );
@@ -194,20 +193,7 @@ export default function QSOFA({ patientId, onClose }: QSOFAProps) {
       aria-labelledby="qsofa-title"
       
     >
-      <div
-        className="clinical-calculator-modal__panel"
-        style={{
-          width: '100%',
-          maxWidth: 480,
-          maxHeight: '92vh',
-          overflowY: 'auto',
-          background: MEDICAL_THEME.surfaceCard,
-          border: '1px solid #e0f2fe',
-          borderRadius: 12,
-          color: 'var(--medical-ink, #111827)',
-          boxShadow: '0 30px 80px rgba(0,0,0,0.45)',
-        }}
-      >
+      <div className="clinical-calculator-modal__panel qsofa-panel">
         <header
           className="u-panel-header-row"
         >
@@ -216,7 +202,7 @@ export default function QSOFA({ patientId, onClose }: QSOFAProps) {
               qSOFA
             </h2>
             {patient ? (
-              <div style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 12, marginTop: 4 }}>
+              <div className="qsofa-patient-subtitle">
                 {patient.firstName} {patient.lastName} · {patient.mrn}
               </div>
             ) : null}
@@ -265,48 +251,32 @@ export default function QSOFA({ patientId, onClose }: QSOFAProps) {
               {total}/3
             </div>
             {result.alert ? (
-              <div style={{ color: MEDICAL_TYPE.statusCritical, fontSize: 13, marginTop: 6, fontWeight: 700 }}>
+              <div className="qsofa-sepsis-alert">
                 SEPSIS ALERT - High risk for organ dysfunction
                 <br />
                 Initiate sepsis bundle immediately
               </div>
             ) : (
-              <div style={{ color: 'var(--medical-ink, #111827)', fontSize: 13, marginTop: 4 }}>{result.recommendation}</div>
+              <div className="qsofa-recommendation">{result.recommendation}</div>
             )}
           </section>
 
           {patient ? (
-            <button
-              className="clinical-calculator-modal__submit"
-              type="button"
-              onClick={saveToPatient}
-              style={{
-                background: MEDICAL_THEME.accent,
-                border: 'none',
-                color: 'var(--medical-ink, #111827)',
-                borderRadius: 10,
-                padding: '10px 12px',
-                cursor: 'pointer',
-                fontWeight: 700,
-              }}
-            >
+            <button className="clinical-calculator-modal__submit qsofa-save-btn" type="button" onClick={saveToPatient}>
               Save to Patient
             </button>
           ) : null}
 
           {savedMessage ? (
-            <div role="status" style={{ color: MEDICAL_THEME.success, fontSize: 13 }}>
+            <div role="status" className="qsofa-saved-message">
               {savedMessage}
             </div>
           ) : null}
 
-          <p
-            className="clinical-calculator-modal__disclaimer"
-            style={{ margin: 0, fontSize: 12, color: MEDICAL_THEME.inkSubtle, lineHeight: 1.45 }}
-          >
+          <p className="clinical-calculator-modal__disclaimer qsofa-disclaimer">
             {QSOFA_META.disclaimer}
             <br />
-            <span style={{ fontStyle: 'italic' }}>Source: {QSOFA_META.sourceLabel}</span>
+            <span className="qsofa-source">Source: {QSOFA_META.sourceLabel}</span>
           </p>
         </div>
       </div>

@@ -782,7 +782,7 @@ export default function ReceptionWorkspace() {
             activeQueueTab={RECEPTION_COPY.queues.tabs[activeQueueTab]}
             emptyQueueMessage={emptyQueueMessage}
           />
-          <div className="reception-interactive-ai" style={{ marginTop: '0.75rem' }}>
+          <div className="reception-interactive-ai">
             <InteractiveAIWorkspace
               role={emergencyRole.role || 'registration_clerk'}
               userId={emergencyRole.canonicalProfile?.id}

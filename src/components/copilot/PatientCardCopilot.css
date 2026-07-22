@@ -79,6 +79,12 @@
   text-transform: uppercase;
 }
 
+.patient-card-copilot__no-recommendations {
+  margin: 0;
+  color: var(--medical-card-fg-muted, #6b7280);
+  font-size: 12px;
+}
+
 .patient-card-copilot__quick-action,
 .patient-card-copilot__tool-action {
   width: 100%;

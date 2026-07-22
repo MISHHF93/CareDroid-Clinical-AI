@@ -46,7 +46,9 @@ describe('mobile performance — routing & bundles', () => {
 
   it('vite manualChunks isolates calculators, catalog, dashboard, dexie, firebase', () => {
     const vite = read('vite.config.ts');
-    expect(vite).toContain("'calculators'");
+    // Cycle 84 split the single 'calculators' chunk into 11 per-specialty
+    // chunks (e.g. 'calculators-cardiology') — assert the real naming scheme.
+    expect(vite).toMatch(/'calculators-[a-z-]+'/);
     expect(vite).toContain("'clinical-catalog'");
     expect(vite).toContain("'dashboard'");
     expect(vite).toContain("'vendor-idb'");

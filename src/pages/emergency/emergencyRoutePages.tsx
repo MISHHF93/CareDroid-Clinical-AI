@@ -458,7 +458,7 @@ export function QueueRoute() {
                       const patientBreached = patientWait > target;
                       const alreadyEscalated = escalatedIds.has(patient.id);
                       return (
-                        <span key={patient.id} className="emergency-route-queue-row__patient" style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                        <span key={patient.id} className="emergency-route-queue-row__patient emergency-route-queue-row__patient--inline">
                           <button
                             type="button"
                             onClick={() => selectPatient(patient.id)}
@@ -481,23 +481,13 @@ export function QueueRoute() {
                                 escalatePatient(patient.id, { staffId: 'charge-nurse-current', staffName: 'Charge Nurse' });
                                 setEscalatedIds((prev) => new Set([...prev, patient.id]));
                               }}
-                              style={{
-                                padding: '1px 7px',
-                                borderRadius: 4,
-                                background: '#EF4444',
-                                color: '#fff',
-                                border: 'none',
-                                fontSize: 10,
-                                fontWeight: 800,
-                                cursor: 'pointer',
-                                letterSpacing: '0.04em',
-                              }}
+                              className="emergency-route-queue-row__escalate-btn"
                             >
                               ⚡ Escalate
                             </button>
                           )}
                           {alreadyEscalated && (
-                            <span style={{ fontSize: 10, fontWeight: 700, color: '#10B981' }}>✓ Escalated</span>
+                            <span className="emergency-route-queue-row__escalated-badge">✓ Escalated</span>
                           )}
                         </span>
                       );

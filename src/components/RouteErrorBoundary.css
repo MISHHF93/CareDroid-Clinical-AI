@@ -1,0 +1,62 @@
+/* Static (non-state-dependent) styles extracted from RouteErrorBoundary.tsx's
+   inline style={{...}} blocks -- see scripts/check-inline-styles.mjs.
+   All 8 were fully static (fallbackTitle/route path/error text are content,
+   never styling); this file has zero inline styles left. */
+
+.reb-wrapper {
+  padding: 24px;
+  margin: 16px;
+  border: 1px solid var(--app-border-subtle, #e5e7eb);
+  border-radius: 8px;
+  background: var(--app-surface-1, #ffffff);
+}
+
+.reb-title {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--app-text-primary, #111827);
+}
+
+.reb-message {
+  margin: 0 0 4px;
+  font-size: 13px;
+  color: var(--app-text-secondary, #6b7280);
+}
+
+.reb-route {
+  margin: 0 0 12px;
+  font-size: 12px;
+  color: var(--app-text-muted, #9ca3af);
+  font-family: monospace;
+}
+
+.reb-details {
+  margin: 0 0 12px;
+  font-size: 12px;
+  font-family: monospace;
+  color: var(--app-text-secondary, #6b7280);
+}
+
+.reb-summary {
+  cursor: pointer;
+}
+
+.reb-pre {
+  margin: 8px 0 0;
+  padding: 8px;
+  background: var(--app-surface-muted, #f9fafb);
+  border-radius: 4px;
+  overflow: auto;
+  max-height: 200px;
+}
+
+.reb-retry-btn {
+  padding: 6px 16px;
+  border: 1px solid var(--app-border-subtle, #d1d5db);
+  border-radius: 6px;
+  background: var(--app-surface-1, #ffffff);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+}

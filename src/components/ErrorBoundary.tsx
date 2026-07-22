@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { MEDICAL_THEME, MEDICAL_TYPE } from '../config/medicalTheme.constants';
 import crashReportingService from '../services/crashReportingService';
 import logger from '../utils/logger';
+import './ErrorBoundary.css';
 
 const SESSION_KEY = 'caredroid_session_id';
 
@@ -90,21 +90,12 @@ class ErrorBoundary extends Component<any, any> {
       if (this.props.fallbackText || this.props.fallback) {
         return (
           this.props.fallback || (
-            <div role="alert" style={{ padding: 16, color: MEDICAL_TYPE.statusCritical }}>
-              <p style={{ margin: '0 0 12px' }}>{this.props.fallbackText}</p>
+            <div role="alert" className="eb-fallback-text">
+              <p className="eb-fallback-msg">{this.props.fallbackText}</p>
               {this.state.error && (
-                <details
-                  style={{
-                    marginBottom: '12px',
-                    textAlign: 'left',
-                    backgroundColor: 'rgba(255,255,255,0.1)',
-                    padding: '10px',
-                    borderRadius: '5px',
-                    color: 'var(--text-color, #E5E7EB)',
-                  }}
-                >
-                  <summary style={{ cursor: 'pointer', marginBottom: '10px' }}>Error Details</summary>
-                  <pre style={{ fontSize: '12px', overflow: 'auto', whiteSpace: 'pre-wrap' }}>
+                <details className="eb-details">
+                  <summary className="eb-details-summary">Error Details</summary>
+                  <pre className="eb-error-pre--wrap">
                     {this.state.error.toString()}
                     {this.state.errorInfo && this.state.errorInfo.componentStack}
                   </pre>
@@ -119,58 +110,22 @@ class ErrorBoundary extends Component<any, any> {
       }
 
       return (
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            height: '100vh',
-            backgroundColor: 'var(--navy-bg)',
-            color: 'var(--text-color)',
-            padding: '20px',
-          }}
-        >
-          <div
-            style={{
-              maxWidth: '600px',
-              textAlign: 'center',
-            }}
-          >
-            <h1 style={{ color: '#FF0000', marginBottom: '20px' }}>Something went wrong</h1>
-            <p style={{ marginBottom: '20px', fontSize: '16px' }}>
+        <div className="eb-page">
+          <div className="eb-page-content">
+            <h1 className="eb-page-title">Something went wrong</h1>
+            <p className="eb-page-desc">
               The application encountered an unexpected error. This has been automatically reported.
             </p>
             {showErrorDetails && this.state.error && (
-              <details
-                style={{
-                  marginBottom: '20px',
-                  textAlign: 'left',
-                  backgroundColor: 'rgba(255,255,255,0.1)',
-                  padding: '10px',
-                  borderRadius: '5px',
-                }}
-              >
-                <summary style={{ cursor: 'pointer', marginBottom: '10px' }}>Error Details</summary>
-                <pre style={{ fontSize: '12px', overflow: 'auto' }}>
+              <details className="eb-details--full-page">
+                <summary className="eb-details-summary">Error Details</summary>
+                <pre className="eb-error-pre">
                   {this.state.error.toString()}
                   {this.state.errorInfo && this.state.errorInfo.componentStack}
                 </pre>
               </details>
             )}
-            <button type="button"
-              onClick={this.handleReload}
-              style={{
-                backgroundColor: '#00FF88',
-                color: 'var(--navy-ink)',
-                border: 'none',
-                padding: '15px 30px',
-                fontSize: '16px',
-                borderRadius: '5px',
-                cursor: 'pointer',
-                fontWeight: 'bold',
-              }}
-            >
+            <button type="button" onClick={this.handleReload} className="eb-reload-btn">
               Reload Application
             </button>
           </div>

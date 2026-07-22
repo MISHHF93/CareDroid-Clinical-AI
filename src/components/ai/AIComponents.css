@@ -85,6 +85,10 @@
   text-transform: uppercase;
 }
 
+.cd-ai-card__provenance-line {
+  margin: 0;
+}
+
 .cd-ai-card__provenance ul {
   margin: 0;
   padding-left: 1.1rem;
@@ -161,6 +165,14 @@
   background: color-mix(in srgb, #ef4444 8%, #ffffff);
   border-color: color-mix(in srgb, #ef4444 36%, #ffffff);
   color: var(--medical-status-critical-text, #b91c1c);
+}
+
+.cd-ai-panel__patient-link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-weight: 700;
 }
 
 .cd-ai-panel__list {
@@ -379,6 +391,10 @@
 .cd-ai-actions__button--escalate {
   border-color: color-mix(in srgb, #ef4444 35%, #ffffff);
   color: var(--medical-status-critical-text, #b91c1c);
+}
+
+.cd-ai-actions__button--dismissed-toggle {
+  align-self: flex-start;
 }
 
 .cd-ai-actions__button:focus-visible {

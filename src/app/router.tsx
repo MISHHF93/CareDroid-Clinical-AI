@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
-import { MEDICAL_THEME } from '../config/medicalTheme.constants';
 import { lazyWithRetry } from '../utils/lazyWithRetry';
+import './RouteLoadingFallback.css';
 import {
   Navigate,
   Outlet,
@@ -125,19 +125,12 @@ import { shouldRedirectEmergencySurface } from '../services/navigateToEmergencyS
 
 // ── Loading fallback ─────────────────────────────────────────────────────────
 
-function RouteLoadingFallback({ label = 'Loading CareDroid...' }) {
+export function RouteLoadingFallback({ label = 'Loading CareDroid...' }) {
   return (
     <div
       role="status"
       aria-live="polite"
-      style={{
-        padding: 24,
-        minHeight: '40vh',
-        color: MEDICAL_THEME.inkMuted || '#475569',
-        background: MEDICAL_THEME.surfacePage || '#f8fafc',
-        fontFamily: 'system-ui, sans-serif',
-        fontSize: 16,
-      }}
+      className="route-loading-fallback"
     >
       {label}
     </div>

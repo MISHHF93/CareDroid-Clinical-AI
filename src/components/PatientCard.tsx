@@ -885,7 +885,7 @@ function PatientCard({
             {queueTiming ? (
               <>
                 {queueTiming.elapsedLabel}
-                <small style={{ display: 'block', fontSize: '0.72em', opacity: 0.9 }}>
+                <small className="patient-card__wait-remaining">
                   {queueTiming.remainingLabel}
                 </small>
               </>

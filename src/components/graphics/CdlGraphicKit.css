@@ -302,6 +302,13 @@
   transform: translate(-50%, -50%);
 }
 
+/* Fixed phase-boundary positions — the marker set is a constant [15, 35, 55, 80, 100] array, never state-driven */
+.cdl-ems-unit-track__mark--15 { left: 15%; }
+.cdl-ems-unit-track__mark--35 { left: 35%; }
+.cdl-ems-unit-track__mark--55 { left: 55%; }
+.cdl-ems-unit-track__mark--80 { left: 80%; }
+.cdl-ems-unit-track__mark--100 { left: 100%; }
+
 .cdl-ems-unit-track--breach .cdl-ems-unit-track__fill {
   background: linear-gradient(90deg, var(--status-warning, #f59e0b), var(--status-critical, #ef4444));
 }

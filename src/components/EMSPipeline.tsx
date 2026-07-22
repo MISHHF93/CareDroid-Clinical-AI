@@ -630,7 +630,7 @@ export default function EMSPipeline() {
         />
       ) : null}
 
-      <div className="ems-pipeline__interactive-ai" style={{ margin: '0.75rem 0 1rem' }}>
+      <div className="ems-pipeline__interactive-ai">
         <EmsInteractiveAssistPanel
           role={emergencyRole.role || 'paramedic'}
           userId={emergencyRole.canonicalProfile?.id}

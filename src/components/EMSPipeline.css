@@ -9,6 +9,10 @@
   color: var(--color-text-primary);
 }
 
+.ems-pipeline__interactive-ai {
+  margin: 0.75rem 0 1rem;
+}
+
 .ems-pipeline__header {
   display: flex;
   align-items: center;

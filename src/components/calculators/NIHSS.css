@@ -1,0 +1,82 @@
+/* Static (non-state-dependent) styles extracted from NIHSS.tsx's inline
+   style={{...}} blocks -- see scripts/check-inline-styles.mjs.
+   Genuinely dynamic styles (last-known-well tPA-window border/background/text
+   color, stroke-severity border/background/text color) stay inline; only
+   fixed-value blocks moved here. */
+
+.nihss-panel {
+  width: 100%;
+  max-width: 760px;
+  max-height: 92vh;
+  overflow-y: auto;
+  background: #ffffff;
+  border: 1px solid #e0f2fe;
+  border-radius: 12px;
+  color: var(--medical-ink, #111827);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+}
+
+.nihss-patient-subtitle {
+  color: #475569;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.nihss-lkw-heading {
+  display: block;
+  margin-bottom: 10px;
+}
+
+.nihss-lkw-label {
+  display: grid;
+  gap: 6px;
+  color: #d1d5db;
+  font-size: 13px;
+}
+
+.nihss-lkw-input {
+  border: 1px solid #e0f2fe;
+  border-radius: 8px;
+  background: #f0f9ff;
+  color: var(--medical-ink, #111827);
+  padding: 10px;
+}
+
+.nihss-item-fieldset {
+  border: 1px solid #e0f2fe;
+  border-radius: 10px;
+  padding: 12px;
+  margin: 0;
+}
+
+.nihss-item-legend {
+  color: var(--medical-ink, #111827);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 0 4px;
+}
+
+.nihss-options {
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.nihss-option-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #d1d5db;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.nihss-save-btn {
+  background: #0ea5e9;
+  border: none;
+  color: var(--medical-ink, #111827);
+  border-radius: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  font-weight: 700;
+}

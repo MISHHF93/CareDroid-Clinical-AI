@@ -1,0 +1,84 @@
+/* Static styles extracted from ErrorBoundary.tsx's inline style={{...}}
+   blocks -- see scripts/check-inline-styles.mjs. Every occurrence here is
+   fully static: this component's only state-dependent behavior is which
+   fallback branch renders (fallbackText vs. the full-page crash screen),
+   not the styling within either branch. */
+
+.eb-fallback-text {
+  padding: 16px;
+  color: #b91c1c;
+}
+
+.eb-fallback-msg {
+  margin: 0 0 12px;
+}
+
+.eb-details {
+  margin-bottom: 12px;
+  text-align: left;
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 10px;
+  border-radius: 5px;
+  color: var(--text-color, #E5E7EB);
+}
+
+.eb-details--full-page {
+  margin-bottom: 20px;
+  text-align: left;
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.eb-details-summary {
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.eb-error-pre {
+  font-size: 12px;
+  overflow: auto;
+}
+
+.eb-error-pre--wrap {
+  font-size: 12px;
+  overflow: auto;
+  white-space: pre-wrap;
+}
+
+.eb-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: var(--navy-bg);
+  color: var(--text-color);
+  padding: 20px;
+}
+
+.eb-page-content {
+  max-width: 600px;
+  text-align: center;
+}
+
+.eb-page-title {
+  color: #FF0000;
+  margin-bottom: 20px;
+}
+
+.eb-page-desc {
+  margin-bottom: 20px;
+  font-size: 16px;
+}
+
+.eb-reload-btn {
+  background-color: #00FF88;
+  color: var(--navy-ink);
+  border: none;
+  padding: 15px 30px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}

@@ -291,7 +291,7 @@ function renderLabInterpreter(data) {
           {hasCritical && (
             <>
               {' '}
-              <span className="tool-card-score-pill" style={{ backgroundColor: '#dc2626' }}>
+              <span className="tool-card-score-pill tool-card-score-pill--critical">
                 {data.summary.critical} critical
               </span>
             </>

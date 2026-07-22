@@ -1,18 +1,13 @@
+import './SkeletonLoader.css';
+
 type SkeletonLoaderProps = {
   variant?: 'whiteboard' | 'panel' | 'card';
   rows?: number;
 };
 
-const shimmerStyle = {
-  background:
-    'linear-gradient(90deg, var(--color-surface, #111827) 0%, color-mix(in srgb, var(--status-info, #06b6d4) 12%, var(--color-floating-surface, #e0f2fe)) 45%, var(--color-surface, #111827) 90%)',
-  backgroundSize: '220% 100%',
-  animation:
-    'caredroid-skeleton-shimmer var(--motion-skeleton-duration, 1.15s) var(--motion-ease-standard, ease-in-out) infinite',
-};
-
 export default function SkeletonLoader({ variant = 'panel', rows = 3 }: SkeletonLoaderProps) {
   const cardCount = variant === 'whiteboard' ? 6 : rows;
+  const isTallCard = variant === 'card' || variant === 'whiteboard';
 
   return (
     <div role="status" aria-busy="true" aria-label="Loading" className="u-pad-16">
@@ -31,29 +26,19 @@ export default function SkeletonLoader({ variant = 'panel', rows = 3 }: Skeleton
       </style>
       <div
         data-caredroid-skeleton
-        style={{
-          display: 'grid',
-          gridTemplateColumns: variant === 'whiteboard' ? 'repeat(auto-fill, minmax(280px, 1fr))' : '1fr',
-          gap: 12,
-        }}
+        className={`skeleton-grid${variant === 'whiteboard' ? ' skeleton-grid--whiteboard' : ''}`}
       >
         {Array.from({ length: cardCount }).map((_, index) => (
           <div
             key={index}
-            style={{
-              border: '1px solid var(--color-border-subtle, #e0f2fe)',
-              borderRadius: 'var(--radius-lg, 12px)',
-              background: 'var(--color-card, #ffffff)',
-              padding: 14,
-              minHeight: variant === 'card' || variant === 'whiteboard' ? 120 : 72,
-            }}
+            className={`skeleton-card${isTallCard ? ' skeleton-card--tall' : ''}`}
           >
-            <div style={{ ...shimmerStyle, width: '46%', height: 16, borderRadius: 999 }} />
-            <div style={{ ...shimmerStyle, width: '72%', height: 12, borderRadius: 999, marginTop: 14 }} />
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginTop: 18 }}>
-              <div style={{ ...shimmerStyle, height: 18, borderRadius: 8 }} />
-              <div style={{ ...shimmerStyle, height: 18, borderRadius: 8 }} />
-              <div style={{ ...shimmerStyle, height: 18, borderRadius: 8 }} />
+            <div className="skeleton-shimmer skeleton-line--title" />
+            <div className="skeleton-shimmer skeleton-line--subtitle" />
+            <div className="skeleton-stats-row">
+              <div className="skeleton-shimmer skeleton-stat" />
+              <div className="skeleton-shimmer skeleton-stat" />
+              <div className="skeleton-shimmer skeleton-stat" />
             </div>
           </div>
         ))}

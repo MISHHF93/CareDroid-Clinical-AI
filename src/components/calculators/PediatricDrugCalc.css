@@ -1,0 +1,128 @@
+/* Static (non-state-dependent) styles extracted from PediatricDrugCalc.tsx's
+   inline style={{...}} blocks -- see scripts/check-inline-styles.mjs.
+   Genuinely dynamic styles (Save-to-Patient button and dose-cell colors keyed
+   off weight/drug.critical state) stay inline; only fixed-value blocks moved here. */
+
+.pdc-panel {
+  width: 100%;
+  max-width: 760px;
+  max-height: 92vh;
+  overflow-y: auto;
+  background: #ffffff;
+  border: 1px solid #e0f2fe;
+  border-radius: 12px;
+  color: var(--medical-ink, #111827);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+}
+
+.pdc-patient-subtitle {
+  color: #475569;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.pdc-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pdc-input-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) auto auto;
+  gap: 10px;
+  align-items: end;
+}
+
+.pdc-input-label {
+  color: #475569;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.pdc-weight-input {
+  width: 100%;
+  border: 1px solid #e0f2fe;
+  border-radius: 12px;
+  background: #ffffff;
+  color: var(--medical-ink, #111827);
+  font-size: 24px;
+  font-weight: 700;
+  padding: 12px 14px;
+  outline: none;
+}
+
+.pdc-estimate-btn {
+  border: 1px solid #0ea5e9;
+  border-radius: 10px;
+  background: #0ea5e9;
+  color: var(--medical-ink, #111827);
+  cursor: pointer;
+  font-weight: 700;
+  padding: 12px 14px;
+  white-space: nowrap;
+}
+
+.pdc-print-btn {
+  border: 1px solid #e0f2fe;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--medical-ink, #111827);
+  cursor: pointer;
+  font-weight: 700;
+  padding: 12px 14px;
+}
+
+.pdc-estimate-note {
+  color: #0ea5e9;
+  font-size: 12px;
+}
+
+.pdc-table-title {
+  margin: 0 0 4px;
+  font-size: 18px;
+}
+
+.pdc-weight-summary {
+  color: #475569;
+  font-size: 13px;
+}
+
+.pdc-table-scroll {
+  overflow-x: auto;
+}
+
+.pdc-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 680px;
+}
+
+.pdc-table-head-row {
+  background: #ffffff;
+  color: #475569;
+  text-align: left;
+  font-size: 12px;
+}
+
+.pdc-drug-row {
+  border-left: 4px solid transparent;
+  background: transparent;
+}
+
+.pdc-drug-row--critical {
+  border-left: 4px solid #EF4444;
+  background: #7F1D1D20;
+}
+
+.pdc-drug-category {
+  color: #475569;
+  font-size: 12px;
+}
+
+.pdc-muted-cell {
+  padding: 10px;
+  border-bottom: 1px solid #e0f2fe;
+  color: #d1d5db;
+}

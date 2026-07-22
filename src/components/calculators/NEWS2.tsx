@@ -13,6 +13,7 @@ import {
   type NEWS2Values,
 } from '../../utils/news2';
 import { saveCalculatorResult } from './calculatorSave';
+import './NEWS2.css';
 
 type NEWS2Props = {
   patientId?: string;
@@ -132,19 +133,7 @@ export default function NEWS2({ patientId, onClose }: NEWS2Props) {
       aria-labelledby="news2-title"
       className="u-modal-scrim"
     >
-      <div
-        style={{
-          width: '100%',
-          maxWidth: 720,
-          maxHeight: '92vh',
-          overflowY: 'auto',
-          background: MEDICAL_THEME.surfaceCard,
-          border: '1px solid #e0f2fe',
-          borderRadius: 12,
-          color: 'var(--medical-ink, #111827)',
-          boxShadow: '0 30px 80px rgba(0,0,0,0.45)',
-        }}
-      >
+      <div className="news2-panel">
         <header
           className="u-panel-header-row"
         >
@@ -153,7 +142,7 @@ export default function NEWS2({ patientId, onClose }: NEWS2Props) {
               NEWS2 Early Warning Score
             </h2>
             {patient ? (
-              <div style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 12, marginTop: 4 }}>
+              <div className="news2-patient-subtitle">
                 {patientName(patient)} · {patient.mrn}
               </div>
             ) : null}
@@ -169,9 +158,7 @@ export default function NEWS2({ patientId, onClose }: NEWS2Props) {
         </header>
 
         <div className="u-stack-14">
-          {autoFilled ? (
-            <div style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 13 }}>Auto-filled from vitals</div>
-          ) : null}
+          {autoFilled ? <div className="news2-autofilled-note">Auto-filled from vitals</div> : null}
 
           <section
             aria-live="polite"
@@ -187,7 +174,7 @@ export default function NEWS2({ patientId, onClose }: NEWS2Props) {
               {score.total}/20
             </div>
             {score.hasSingleRed ? (
-              <p style={{ margin: '8px 0 0', color: '#FDE68A', fontSize: 13 }}>
+              <p className="news2-single-red-note">
                 Single parameter scoring 3 detected.
               </p>
             ) : null}
@@ -198,34 +185,22 @@ export default function NEWS2({ patientId, onClose }: NEWS2Props) {
             return (
               <section key={item.id} className="u-card-border">
                 <label className="u-grid-gap-8">
-                  <span style={{ color: 'var(--medical-ink, #111827)', fontSize: 14, fontWeight: 700 }}>{item.label}</span>
-                  {'note' in item && item.note ? <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 12 }}>{item.note}</span> : null}
+                  <span className="news2-item-label">{item.label}</span>
+                  {'note' in item && item.note ? <span className="news2-item-note">{item.note}</span> : null}
                   {item.input === 'number' ? (
                     <input
                       type="number"
                       value={inputValue(values[item.id])}
                       aria-label={item.label}
                       onChange={(event) => updateNumber(item.id, event.target.value)}
-                      style={{
-                        border: '1px solid #e0f2fe',
-                        borderRadius: 8,
-                        background: '#f0f9ff',
-                        color: 'var(--medical-ink, #111827)',
-                        padding: 10,
-                      }}
+                      className="news2-field-input"
                     />
                   ) : (
                     <select
                       value={values[item.id] || item.options[0].label}
                       aria-label={item.label}
                       onChange={(event) => updateSelect(item.id, event.target.value)}
-                      style={{
-                        border: '1px solid #e0f2fe',
-                        borderRadius: 8,
-                        background: '#f0f9ff',
-                        color: 'var(--medical-ink, #111827)',
-                        padding: 10,
-                      }}
+                      className="news2-field-input"
                     >
                       {item.options.map((option) => (
                         <option key={option.label} value={option.label}>
@@ -244,19 +219,7 @@ export default function NEWS2({ patientId, onClose }: NEWS2Props) {
           })}
 
           {patient ? (
-            <button
-              type="button"
-              onClick={saveToPatient}
-              style={{
-                background: MEDICAL_THEME.accent,
-                border: 'none',
-                color: 'var(--medical-ink, #111827)',
-                borderRadius: 10,
-                padding: '10px 12px',
-                cursor: 'pointer',
-                fontWeight: 700,
-              }}
-            >
+            <button type="button" onClick={saveToPatient} className="news2-save-btn">
               Save to Patient
             </button>
           ) : null}

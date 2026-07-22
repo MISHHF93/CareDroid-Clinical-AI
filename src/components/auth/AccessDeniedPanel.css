@@ -1,0 +1,51 @@
+/* Static (non-state-dependent) styles extracted from AccessDeniedPanel.tsx's
+   inline style={{...}} blocks -- see scripts/check-inline-styles.mjs. All 6
+   were fully static: roleLabel/title/message/fallbackPath only ever affect
+   rendered content, never the styling itself. Zero inline styles left. */
+
+.adp-page {
+  min-height: 100%;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: #f8fafc;
+}
+
+.adp-card {
+  max-width: 560px;
+  border: 1px solid #7f1d1d;
+  border-radius: 16px;
+  background: #ffffff;
+  color: #111827;
+  padding: 24px;
+  box-shadow: none;
+}
+
+.adp-eyebrow {
+  color: #b91c1c;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.adp-title {
+  margin: 6px 0 0;
+  font-size: 22px;
+}
+
+.adp-message {
+  color: #475569;
+  line-height: 1.5;
+}
+
+.adp-link {
+  display: inline-flex;
+  margin-top: 10px;
+  border-radius: 10px;
+  background: #0ea5e9;
+  color: #ffffff;
+  padding: 10px 13px;
+  text-decoration: none;
+  font-weight: 700;
+}

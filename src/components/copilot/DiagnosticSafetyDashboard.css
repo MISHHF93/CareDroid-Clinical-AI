@@ -116,6 +116,16 @@
   font-weight: 700;
 }
 
+.diagnostic-safety-dashboard__name-btn {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+}
+
 .diagnostic-safety-dashboard__meta {
   margin: 2px 0 0;
   color: var(--medical-text-subtle, #9ca3af);

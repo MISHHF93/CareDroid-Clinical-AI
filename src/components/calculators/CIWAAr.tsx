@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { MEDICAL_THEME } from '../../config/medicalTheme.constants';
 import { dispatchAlert } from '../../engine/alertEngine';
 import { saveCalculatorResult } from './calculatorSave';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import type { Note, Patient } from '../../types/emergency';
+import './CIWAAr.css';
 
 type CIWAArProps = {
   patientId?: string;
@@ -280,19 +280,7 @@ export default function CIWAAr({ patientId, onClose }: CIWAArProps) {
       aria-labelledby="ciwa-title"
       className="u-modal-scrim"
     >
-      <div
-        style={{
-          width: '100%',
-          maxWidth: 720,
-          maxHeight: '92vh',
-          overflowY: 'auto',
-          background: MEDICAL_THEME.surfaceCard,
-          border: '1px solid #e0f2fe',
-          borderRadius: 12,
-          color: 'var(--medical-ink, #111827)',
-          boxShadow: '0 30px 80px rgba(0,0,0,0.45)',
-        }}
-      >
+      <div className="ciwa-panel">
         <header
           className="u-panel-header-row"
         >
@@ -301,7 +289,7 @@ export default function CIWAAr({ patientId, onClose }: CIWAArProps) {
               CIWA-Ar Alcohol Withdrawal
             </h2>
             {patient ? (
-              <div style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 12, marginTop: 4 }}>
+              <div className="ciwa-patient-subtitle">
                 {patientName(patient)} · {patient.mrn}
               </div>
             ) : null}
@@ -330,7 +318,7 @@ export default function CIWAAr({ patientId, onClose }: CIWAArProps) {
             <div className="u-mono-32">
               {total}/67
             </div>
-            <p style={{ margin: '8px 0 0', color: 'var(--medical-ink, #111827)', fontSize: 13 }}>{protocol.recommendation}</p>
+            <p className="ciwa-recommendation">{protocol.recommendation}</p>
           </section>
 
           {CIWA_ITEMS.map((item) => {
@@ -338,7 +326,7 @@ export default function CIWAAr({ patientId, onClose }: CIWAArProps) {
             return (
               <section key={item.id} className="u-card-border">
                 <label className="u-grid-gap-10">
-                  <span style={{ color: 'var(--medical-ink, #111827)', fontSize: 14, fontWeight: 700 }}>{item.label}</span>
+                  <span className="ciwa-item-label">{item.label}</span>
                   <input
                     type="range"
                     min={0}
@@ -348,12 +336,12 @@ export default function CIWAAr({ patientId, onClose }: CIWAArProps) {
                     onChange={(event) => updateScore(item.id, Number(event.target.value))}
                   />
                 </label>
-                <div style={{ display: 'flex', justifyContent: 'space-between', color: MEDICAL_THEME.inkSubtle, fontSize: 12 }}>
+                <div className="ciwa-range-row">
                   <span>0</span>
-                  <strong style={{ color: 'var(--medical-ink, #111827)' }}>{value}</strong>
+                  <strong className="ciwa-range-value">{value}</strong>
                   <span>{item.max}</span>
                 </div>
-                <p style={{ margin: '8px 0 0', color: MEDICAL_THEME.inkDisabled, fontSize: 13 }}>
+                <p className="ciwa-item-description">
                   {closestDescription(item, value)}
                 </p>
               </section>
@@ -364,15 +352,7 @@ export default function CIWAAr({ patientId, onClose }: CIWAArProps) {
             <button
               type="button"
               onClick={saveToPatient}
-              style={{
-                background: MEDICAL_THEME.accent,
-                border: 'none',
-                color: 'var(--medical-ink, #111827)',
-                borderRadius: 10,
-                padding: '10px 12px',
-                cursor: 'pointer',
-                fontWeight: 700,
-              }}
+              className="ciwa-save-btn"
             >
               Save to Patient
             </button>

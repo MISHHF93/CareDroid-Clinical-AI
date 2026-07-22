@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
-import { MEDICAL_THEME } from '../../config/medicalTheme.constants';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { saveCalculatorResult } from './calculatorSave';
 import './mobileCalculator.css';
+import './HEARTScore.css';
 
 type ScoreValue = 0 | 1 | 2;
 
@@ -157,20 +157,7 @@ export default function HEARTScore({ patientId, onClose }: HEARTScoreProps) {
       aria-labelledby="heart-score-title"
       
     >
-      <div
-        className="clinical-calculator-modal__panel"
-        style={{
-          width: '100%',
-          maxWidth: 480,
-          maxHeight: '92vh',
-          overflowY: 'auto',
-          background: MEDICAL_THEME.surfaceCard,
-          border: '1px solid #e0f2fe',
-          borderRadius: 12,
-          color: 'var(--medical-ink, #111827)',
-          boxShadow: '0 30px 80px rgba(0,0,0,0.45)',
-        }}
-      >
+      <div className="clinical-calculator-modal__panel heart-panel">
         <header
           className="u-panel-header-row"
         >
@@ -179,7 +166,7 @@ export default function HEARTScore({ patientId, onClose }: HEARTScoreProps) {
               HEART Score
             </h2>
             {patient ? (
-              <div style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 12, marginTop: 4 }}>
+              <div className="heart-patient-subtitle">
                 {patient.firstName} {patient.lastName} · {patient.mrn}
               </div>
             ) : null}
@@ -196,21 +183,13 @@ export default function HEARTScore({ patientId, onClose }: HEARTScoreProps) {
 
         <div className="u-stack-14">
           {FIELD_OPTIONS.map((field) => (
-            <section key={field.key} style={{ border: '1px solid #e0f2fe', borderRadius: 10, padding: 12 }}>
-              <h3 style={{ margin: '0 0 10px', color: MEDICAL_THEME.inkSubtle, fontSize: 12 }}>{field.title}</h3>
+            <section key={field.key} className="heart-field-section">
+              <h3 className="heart-field-title">{field.title}</h3>
               <div className="u-flex-col u-gap-8">
                 {field.options.map((option) => (
                   <label
-                    className="clinical-calculator-modal__choice"
+                    className="clinical-calculator-modal__choice heart-choice-label"
                     key={option.value}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 8,
-                      color: 'var(--medical-ink, #111827)',
-                      fontSize: 13,
-                      cursor: 'pointer',
-                    }}
                   >
                     <input
                       type="radio"
@@ -242,23 +221,14 @@ export default function HEARTScore({ patientId, onClose }: HEARTScoreProps) {
             <div className="u-mono-32">
               {total}/10
             </div>
-            <div style={{ color: 'var(--medical-ink, #111827)', fontSize: 13, marginTop: 4 }}>{result.recommendation}</div>
+            <div className="heart-recommendation">{result.recommendation}</div>
           </section>
 
           {patient ? (
             <button
-              className="clinical-calculator-modal__submit"
+              className="clinical-calculator-modal__submit heart-save-btn"
               type="button"
               onClick={saveToPatient}
-              style={{
-                background: MEDICAL_THEME.accent,
-                border: 'none',
-                color: 'var(--medical-ink, #111827)',
-                borderRadius: 10,
-                padding: '10px 12px',
-                cursor: 'pointer',
-                fontWeight: 700,
-              }}
             >
               Save to Patient
             </button>

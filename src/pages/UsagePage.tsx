@@ -73,7 +73,7 @@ export default function UsagePage() {
         </select>
       }
     >
-      {error && <p style={{ color: 'var(--app-danger)' }}>{error}</p>}
+      {error && <p className="commercial-error-text">{error}</p>}
       {isLoading ? (
         <p>Loading usage...</p>
       ) : (

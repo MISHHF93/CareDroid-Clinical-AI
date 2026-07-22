@@ -3,6 +3,7 @@ import { MEDICAL_THEME } from '../../config/medicalTheme.constants';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { saveCalculatorResult } from './calculatorSave';
 import './mobileCalculator.css';
+import './PediatricDrugCalc.css';
 
 type PediatricDrugCalcProps = {
   patientId?: string;
@@ -149,20 +150,7 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
           }
         `}
       </style>
-      <div
-        className="clinical-calculator-modal__panel"
-        style={{
-          width: '100%',
-          maxWidth: 760,
-          maxHeight: '92vh',
-          overflowY: 'auto',
-          background: MEDICAL_THEME.surfaceCard,
-          border: '1px solid #e0f2fe',
-          borderRadius: 12,
-          color: 'var(--medical-ink, #111827)',
-          boxShadow: '0 30px 80px rgba(0,0,0,0.45)',
-        }}
-      >
+      <div className="clinical-calculator-modal__panel pdc-panel">
         <header
           data-print-hide="true"
           className="u-panel-header-row"
@@ -172,7 +160,7 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
               Pediatric Drug Calculator
             </h2>
             {patient ? (
-              <div style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 12, marginTop: 4 }}>
+              <div className="pdc-patient-subtitle">
                 {patient.firstName} {patient.lastName} · Age {patient.age} · {patient.mrn}
               </div>
             ) : null}
@@ -187,19 +175,13 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
           </button>
         </header>
 
-        <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div className="pdc-body">
           <section
-            className="clinical-calculator-modal__mobile-stack"
+            className="clinical-calculator-modal__mobile-stack pdc-input-row"
             data-print-hide="true"
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'minmax(220px, 1fr) auto auto',
-              gap: 10,
-              alignItems: 'end',
-            }}
           >
             <label className="u-flex-col-gap-6">
-              <span style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 12, fontWeight: 700 }}>Weight (kg)</span>
+              <span className="pdc-input-label">Weight (kg)</span>
               <input
                 ref={weightInputRef}
                 type="number"
@@ -209,51 +191,19 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
                 value={weightInput}
                 onChange={(event) => setWeightInput(event.target.value)}
                 placeholder="Enter weight in kg"
-                style={{
-                  width: '100%',
-                  border: '1px solid #e0f2fe',
-                  borderRadius: 12,
-                  background: MEDICAL_THEME.surfaceCard,
-                  color: 'var(--medical-ink, #111827)',
-                  fontSize: 24,
-                  fontWeight: 700,
-                  padding: '12px 14px',
-                  outline: 'none',
-                }}
+                className="pdc-weight-input"
               />
             </label>
             {canEstimateWeight && estimatedWeight !== null ? (
               <button
-                className="clinical-calculator-modal__submit"
+                className="clinical-calculator-modal__submit pdc-estimate-btn"
                 type="button"
                 onClick={() => setWeightInput(String(estimatedWeight))}
-                style={{
-                  border: '1px solid #0ea5e9',
-                  borderRadius: 10,
-                  background: MEDICAL_THEME.accent,
-                  color: 'var(--medical-ink, #111827)',
-                  cursor: 'pointer',
-                  fontWeight: 700,
-                  padding: '12px 14px',
-                  whiteSpace: 'nowrap',
-                }}
               >
                 Use estimated weight
               </button>
             ) : null}
-            <button
-              type="button"
-              onClick={() => window.print()}
-              style={{
-                border: '1px solid #e0f2fe',
-                borderRadius: 10,
-                background: 'transparent',
-                color: 'var(--medical-ink, #111827)',
-                cursor: 'pointer',
-                fontWeight: 700,
-                padding: '12px 14px',
-              }}
-            >
+            <button type="button" onClick={() => window.print()} className="pdc-print-btn">
               Print
             </button>
             {patient ? (
@@ -277,22 +227,22 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
           </section>
 
           {canEstimateWeight && estimatedWeight !== null ? (
-            <div data-print-hide="true" style={{ color: MEDICAL_THEME.accent, fontSize: 12 }}>
+            <div data-print-hide="true" className="pdc-estimate-note">
               Estimated weight uses Luscombe formula: (age x 2) + 8 kg = {estimatedWeight} kg.
             </div>
           ) : null}
 
           <section className="pediatric-drug-print-area">
             <div data-print-hide="true" className="u-mb-12">
-              <h3 style={{ margin: '0 0 4px', fontSize: 18 }}>Pediatric Drug Doses</h3>
-              <div style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 13 }}>
+              <h3 className="pdc-table-title">Pediatric Drug Doses</h3>
+              <div className="pdc-weight-summary">
                 Weight: {weight === null ? 'not entered' : `${weight.toFixed(1)} kg`}
               </div>
             </div>
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 680 }}>
+            <div className="pdc-table-scroll">
+              <table className="pdc-table">
                 <thead>
-                  <tr style={{ background: MEDICAL_THEME.surfaceCard, color: MEDICAL_THEME.inkSubtle, textAlign: 'left', fontSize: 12 }}>
+                  <tr className="pdc-table-head-row">
                     <th className="u-pad-10-border-b">Drug</th>
                     <th className="u-pad-10-border-b">Dose/kg</th>
                     <th className="u-pad-10-border-b">CALCULATED DOSE</th>
@@ -304,16 +254,13 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
                   {DRUGS.map((drug) => (
                     <tr
                       key={drug.name}
-                      style={{
-                        borderLeft: drug.critical ? '4px solid #EF4444' : '4px solid transparent',
-                        background: drug.critical ? '#7F1D1D20' : 'transparent',
-                      }}
+                      className={drug.critical ? 'pdc-drug-row pdc-drug-row--critical' : 'pdc-drug-row'}
                     >
                       <td className="u-pad-10-border-b">
                         <strong>{drug.name}</strong>
-                        <div style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 12 }}>{drug.category}</div>
+                        <div className="pdc-drug-category">{drug.category}</div>
                       </td>
-                      <td style={{ padding: 10, borderBottom: '1px solid #e0f2fe', color: MEDICAL_THEME.inkDisabled }}>
+                      <td className="pdc-muted-cell">
                         {dosePerKgLabel(drug)}
                       </td>
                       <td
@@ -327,10 +274,10 @@ export default function PediatricDrugCalc({ patientId, onClose }: PediatricDrugC
                       >
                         {calculatedDose(weight, drug)}
                       </td>
-                      <td style={{ padding: 10, borderBottom: '1px solid #e0f2fe', color: MEDICAL_THEME.inkDisabled }}>
+                      <td className="pdc-muted-cell">
                         {drug.max.toFixed(drug.max < 10 ? 2 : 0)}
                       </td>
-                      <td style={{ padding: 10, borderBottom: '1px solid #e0f2fe', color: MEDICAL_THEME.inkDisabled }}>{drug.unit}</td>
+                      <td className="pdc-muted-cell">{drug.unit}</td>
                     </tr>
                   ))}
                 </tbody>

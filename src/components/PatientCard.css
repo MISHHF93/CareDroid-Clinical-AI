@@ -566,6 +566,12 @@
   white-space: nowrap;
 }
 
+.patient-card__wait-remaining {
+  display: block;
+  font-size: 0.72em;
+  opacity: 0.9;
+}
+
 .patient-card__vitals {
   border-top: 1px solid var(--component-inner-surface-border);
   display: grid;

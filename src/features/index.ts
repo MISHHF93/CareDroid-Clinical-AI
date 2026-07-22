@@ -1,7 +1,6 @@
 export * from './reception';
 export * from './triage';
 export * from './triage-queue';
-export * from './patient-detail';
 export * from './ems-module';
 export * from './ems';
 export * from './waiting-room';
@@ -16,5 +15,3 @@ export * from './team';
 export * from './settings';
 export * from './auth';
 export * from './whiteboard';
-export * from './capacity';
-export * from './alerts-center';

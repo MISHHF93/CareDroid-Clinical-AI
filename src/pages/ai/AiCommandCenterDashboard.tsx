@@ -235,7 +235,7 @@ export default function AiCommandCenterDashboard() {
           {/* -- CareDroid Unified AI Node (1-node backbone) -- */}
           {node && (
             <SectionCard title="CareDroid Unified AI Node">
-              <div className="ai-cc-metrics-strip" style={{ marginBottom: 0 }}>
+              <div className="ai-cc-metrics-strip ai-cc-metrics-strip--tight">
                 <MetricTile
                   label="Node"
                   value={node.ready || node.status === 'ready' ? 'Ready' : String(node.status || '—')}

@@ -1,5 +1,6 @@
 import { useLocation } from 'react-router-dom';
 import ErrorBoundary from './ErrorBoundary';
+import './RouteErrorBoundary.css';
 
 type RouteErrorBoundaryProps = {
   children: React.ReactNode;
@@ -21,29 +22,20 @@ export default function RouteErrorBoundary({
   return (
     <ErrorBoundary
       fallbackRender={({ error, resetErrorBoundary }) => (
-        <div
-          role="alert"
-          style={{
-            padding: '24px',
-            margin: '16px',
-            border: '1px solid var(--app-border-subtle, #e5e7eb)',
-            borderRadius: '8px',
-            background: 'var(--app-surface-1, #ffffff)',
-          }}
-        >
-          <h2 style={{ margin: '0 0 8px', fontSize: '16px', fontWeight: 600, color: 'var(--app-text-primary, #111827)' }}>
+        <div role="alert" className="reb-wrapper">
+          <h2 className="reb-title">
             {fallbackTitle || 'Something went wrong'}
           </h2>
-          <p style={{ margin: '0 0 4px', fontSize: '13px', color: 'var(--app-text-secondary, #6b7280)' }}>
+          <p className="reb-message">
             This section encountered an error and could not render.
           </p>
-          <p style={{ margin: '0 0 12px', fontSize: '12px', color: 'var(--app-text-muted, #9ca3af)', fontFamily: 'monospace' }}>
+          <p className="reb-route">
             Route: {location.pathname}
           </p>
           {import.meta.env.DEV && error && (
-            <details style={{ margin: '0 0 12px', fontSize: '12px', fontFamily: 'monospace', color: 'var(--app-text-secondary, #6b7280)' }}>
-              <summary style={{ cursor: 'pointer' }}>Error details</summary>
-              <pre style={{ margin: '8px 0 0', padding: '8px', background: 'var(--app-surface-muted, #f9fafb)', borderRadius: '4px', overflow: 'auto', maxHeight: '200px' }}>
+            <details className="reb-details">
+              <summary className="reb-summary">Error details</summary>
+              <pre className="reb-pre">
                 {error.message}
                 {'\n'}
                 {error.stack}
@@ -53,15 +45,7 @@ export default function RouteErrorBoundary({
           <button
             type="button"
             onClick={resetErrorBoundary}
-            style={{
-              padding: '6px 16px',
-              border: '1px solid var(--app-border-subtle, #d1d5db)',
-              borderRadius: '6px',
-              background: 'var(--app-surface-1, #ffffff)',
-              cursor: 'pointer',
-              fontSize: '13px',
-              fontWeight: 500,
-            }}
+            className="reb-retry-btn"
           >
             Try again
           </button>

@@ -1,0 +1,64 @@
+/* Static (non-state-dependent) styles extracted from NEWS2.tsx's inline
+   style={{...}} blocks -- see scripts/check-inline-styles.mjs.
+   Genuinely dynamic styles (the response band's border/background/text
+   color, keyed off news2Response(); and each item row's score color, keyed
+   off that item's own currentScore) stay inline; only fixed-value blocks
+   moved here. */
+
+.news2-panel {
+  width: 100%;
+  max-width: 720px;
+  max-height: 92vh;
+  overflow-y: auto;
+  background: #ffffff;
+  border: 1px solid #e0f2fe;
+  border-radius: 12px;
+  color: var(--medical-ink, #111827);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+}
+
+.news2-patient-subtitle {
+  color: #475569;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.news2-autofilled-note {
+  color: #475569;
+  font-size: 13px;
+}
+
+.news2-single-red-note {
+  margin: 8px 0 0;
+  color: #FDE68A;
+  font-size: 13px;
+}
+
+.news2-item-label {
+  color: var(--medical-ink, #111827);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.news2-item-note {
+  color: #475569;
+  font-size: 12px;
+}
+
+.news2-field-input {
+  border: 1px solid #e0f2fe;
+  border-radius: 8px;
+  background: #f0f9ff;
+  color: var(--medical-ink, #111827);
+  padding: 10px;
+}
+
+.news2-save-btn {
+  background: #0ea5e9;
+  border: none;
+  color: var(--medical-ink, #111827);
+  border-radius: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  font-weight: 700;
+}

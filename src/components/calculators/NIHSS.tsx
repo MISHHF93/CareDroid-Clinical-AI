@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { MEDICAL_THEME, MEDICAL_TYPE } from '../../config/medicalTheme.constants';
 import { saveCalculatorResult } from './calculatorSave';
 import { useEmergencyStore } from '../../store/emergencyStore';
+import './NIHSS.css';
 
 type NIHSSProps = {
   patientId?: string;
@@ -264,19 +265,7 @@ export default function NIHSS({ patientId, onClose }: NIHSSProps) {
       aria-labelledby="nihss-title"
       className="u-modal-scrim"
     >
-      <div
-        style={{
-          width: '100%',
-          maxWidth: 760,
-          maxHeight: '92vh',
-          overflowY: 'auto',
-          background: MEDICAL_THEME.surfaceCard,
-          border: '1px solid #e0f2fe',
-          borderRadius: 12,
-          color: 'var(--medical-ink, #111827)',
-          boxShadow: '0 30px 80px rgba(0,0,0,0.45)',
-        }}
-      >
+      <div className="nihss-panel">
         <header
           className="u-panel-header-row"
         >
@@ -285,7 +274,7 @@ export default function NIHSS({ patientId, onClose }: NIHSSProps) {
               NIHSS
             </h2>
             {patient ? (
-              <div style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 12, marginTop: 4 }}>
+              <div className="nihss-patient-subtitle">
                 {patientName(patient)} · {patient.mrn}
               </div>
             ) : null}
@@ -309,10 +298,10 @@ export default function NIHSS({ patientId, onClose }: NIHSSProps) {
               padding: 14,
             }}
           >
-            <strong style={{ display: 'block', marginBottom: 10 }}>
+            <strong className="nihss-lkw-heading">
               ⏱ Document time of symptom onset or last known well
             </strong>
-            <label style={{ display: 'grid', gap: 6, color: MEDICAL_THEME.inkDisabled, fontSize: 13 }}>
+            <label className="nihss-lkw-label">
               Last Known Well time
               <input
                 type="datetime-local"
@@ -321,13 +310,7 @@ export default function NIHSS({ patientId, onClose }: NIHSSProps) {
                   setLastKnownWell(event.target.value);
                   setSavedMessage('');
                 }}
-                style={{
-                  border: '1px solid #e0f2fe',
-                  borderRadius: 8,
-                  background: '#f0f9ff',
-                  color: 'var(--medical-ink, #111827)',
-                  padding: 10,
-                }}
+                className="nihss-lkw-input"
               />
             </label>
             <div
@@ -360,31 +343,13 @@ export default function NIHSS({ patientId, onClose }: NIHSSProps) {
           </section>
 
           {NIHSS_ITEMS.map((item) => (
-            <fieldset
-              key={item.id}
-              style={{
-                border: '1px solid #e0f2fe',
-                borderRadius: 10,
-                padding: 12,
-                margin: 0,
-              }}
-            >
-              <legend style={{ color: 'var(--medical-ink, #111827)', fontSize: 14, fontWeight: 700, padding: '0 4px' }}>
+            <fieldset key={item.id} className="nihss-item-fieldset">
+              <legend className="nihss-item-legend">
                 {item.label}
               </legend>
-              <div style={{ display: 'grid', gap: 8, marginTop: 8 }}>
+              <div className="nihss-options">
                 {item.options.map((option) => (
-                  <label
-                    key={`${item.id}-${option.score}-${option.text}`}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 8,
-                      color: MEDICAL_THEME.inkDisabled,
-                      fontSize: 13,
-                      cursor: 'pointer',
-                    }}
-                  >
+                  <label key={`${item.id}-${option.score}-${option.text}`} className="nihss-option-label">
                     <input
                       type="radio"
                       name={`nihss-${item.id}`}
@@ -405,19 +370,7 @@ export default function NIHSS({ patientId, onClose }: NIHSSProps) {
           ))}
 
           {patient ? (
-            <button
-              type="button"
-              onClick={saveToPatient}
-              style={{
-                background: MEDICAL_THEME.accent,
-                border: 'none',
-                color: 'var(--medical-ink, #111827)',
-                borderRadius: 10,
-                padding: '10px 12px',
-                cursor: 'pointer',
-                fontWeight: 700,
-              }}
-            >
+            <button type="button" onClick={saveToPatient} className="nihss-save-btn">
               Save to Patient
             </button>
           ) : null}

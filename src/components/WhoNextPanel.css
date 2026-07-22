@@ -1,140 +1,90 @@
-.who-next-panel {
-  display: grid;
-  gap: 6px;
-  min-height: 120px;
-  padding: var(--space-3);
-  border: 1px solid color-mix(in srgb, var(--status-info) 34%, var(--color-border-default));
-  border-left: 4px solid var(--status-info);
-  border-radius: var(--radius-lg);
-  background: color-mix(in srgb, var(--color-elevated) 94%, var(--status-info) 6%);
-  color: var(--color-text-primary);
-  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.34);
-}
+/* Static (non-state-dependent) styles extracted from WhoNextPanel.tsx's
+   inline style={{...}} blocks -- see scripts/check-inline-styles.mjs.
+   Genuinely dynamic styles (the panel's pinned border/floating shadow, and
+   the two Pin/Pinned button variants keyed off the `pinned` toggle) stay
+   inline; only fixed-value blocks moved here. The reassessment button row's
+   gridTemplateColumns ternary resolved to the identical '1fr 1fr' string on
+   both branches (dead conditional, confirmed by reading both arms) -- safe
+   to hardcode as a plain constant, not a behavior change.
 
-.who-next-panel--floating {
-  position: absolute;
-  right: var(--space-4);
-  bottom: var(--space-4);
-  z-index: 35;
-  width: min(420px, calc(100% - var(--space-8)));
-}
+   This file previously held an unrelated, fully orphaned stylesheet (a
+   `.who-next-panel*` design-token-based version with no importer anywhere
+   in src/ and no class overlap with the live inline-styled component) --
+   replaced rather than appended to, since nothing referenced it. */
 
-.who-next-panel--detail {
-  position: sticky;
-  bottom: 0;
-  z-index: 2;
-  margin-top: auto;
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-}
-
-.who-next-panel--current {
-  border-left-color: var(--status-stable);
-}
-
-.who-next-panel__header {
+.wnp-header-row {
+  align-items: center;
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  gap: var(--space-2);
+  gap: 8px;
 }
 
-.who-next-panel__header span {
-  color: var(--status-info);
-  font-size: var(--font-size-xs);
-  font-weight: 950;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
+.wnp-eyebrow {
+  color: #38bdf8;
+  font-size: 11px;
+  letter-spacing: 0.12em;
 }
 
-.who-next-panel strong {
-  overflow: hidden;
-  color: var(--color-text-primary);
-  font-size: var(--font-size-base);
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.wnp-header-actions {
+  display: flex;
+  gap: 6px;
 }
 
-.who-next-panel p {
-  margin: 0;
-  overflow: hidden;
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-  font-weight: 800;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.who-next-panel__long-wait {
-  overflow: hidden;
-  color: var(--status-warning);
-  font-size: var(--font-size-xs);
-  font-weight: 950;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.who-next-panel__actions {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-2);
-  padding-top: var(--space-2);
-  border-top: 1px solid var(--color-border-subtle);
-}
-
-.who-next-panel button,
-.who-next-panel__pin-tab {
-  border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
-  color: var(--color-text-primary);
+.wnp-btn {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 9px;
+  background: #f0f9ff;
+  color: var(--medical-ink, #111827);
   cursor: pointer;
-  font: inherit;
-  font-size: var(--font-size-sm);
-  font-weight: 900;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 7px 9px;
 }
 
-.who-next-panel button:hover,
-.who-next-panel button:focus-visible,
-.who-next-panel__pin-tab:hover,
-.who-next-panel__pin-tab:focus-visible {
-  border-color: var(--status-info);
-  outline: none;
+.wnp-btn--icon {
+  padding: 5px 8px;
+  color: #475569;
 }
 
-.who-next-panel button:disabled {
-  cursor: not-allowed;
-  opacity: 0.5;
+.wnp-btn--go {
+  background: #0ea5e9;
+  border-color: #0ea5e9;
 }
 
-.who-next-panel__actions button {
-  min-height: 34px;
+.wnp-btn--reassess {
+  background: color-mix(in srgb, #F59E0B 18%, #f0f9ff);
+  border-color: #F59E0B;
+  color: #FDE68A;
 }
 
-.who-next-panel__pin {
-  display: inline-grid;
-  place-items: center;
-  width: 28px;
-  height: 28px;
-  padding: 0;
+.wnp-btn--full {
+  margin-top: 8px;
+  width: 100%;
 }
 
-.who-next-panel__pin-tab {
-  position: absolute;
-  right: var(--space-4);
-  bottom: var(--space-4);
-  z-index: 35;
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  min-height: 34px;
-  padding: 0 var(--space-3);
-  background: var(--color-elevated);
+.wnp-patient-line {
+  color: var(--medical-ink, #111827);
+  font-size: 14px;
+  font-weight: 700;
+  margin-top: 10px;
 }
 
-@media (max-width: 720px) {
-  .who-next-panel--floating {
-    right: var(--space-2);
-    bottom: var(--space-2);
-    width: calc(100% - var(--space-4));
-  }
+.wnp-detail-parts {
+  color: #475569;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.wnp-reason {
+  color: #0ea5e9;
+  font-size: 12px;
+  font-weight: 700;
+  margin-top: 6px;
+}
+
+.wnp-action-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 12px;
 }

@@ -161,8 +161,7 @@ export function AiChiefRouteRecommendationsPanel({
                   Patient:{' '}
                   <button
                     type="button"
-                    className="emergency-route-muted"
-                    style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontWeight: 700 }}
+                    className="emergency-route-muted cd-ai-panel__patient-link-btn"
                     onClick={() => recommendation.patientId && selectPatient(recommendation.patientId)}
                   >
                     {patientLabel}
@@ -210,8 +209,7 @@ export function AiChiefRouteRecommendationsPanel({
       {dismissed.size > 0 ? (
         <button
           type="button"
-          className="cd-ai-actions__button"
-          style={{ alignSelf: 'flex-start' }}
+          className="cd-ai-actions__button cd-ai-actions__button--dismissed-toggle"
           onClick={() => setDismissed(new Set())}
         >
           Show {dismissed.size} dismissed

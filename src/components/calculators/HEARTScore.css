@@ -1,0 +1,60 @@
+/* Static (non-state-dependent) styles extracted from HEARTScore.tsx's inline
+   style={{...}} blocks -- see scripts/check-inline-styles.mjs.
+   Genuinely dynamic styles (the risk-band border/background/text color,
+   keyed off resultFor(total).color) stay inline; only fixed-value blocks
+   moved here. */
+
+.heart-panel {
+  width: 100%;
+  max-width: 480px;
+  max-height: 92vh;
+  overflow-y: auto;
+  background: #ffffff;
+  border: 1px solid #e0f2fe;
+  border-radius: 12px;
+  color: var(--medical-ink, #111827);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+}
+
+.heart-patient-subtitle {
+  color: #475569;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.heart-field-section {
+  border: 1px solid #e0f2fe;
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.heart-field-title {
+  margin: 0 0 10px;
+  color: #475569;
+  font-size: 12px;
+}
+
+.heart-choice-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--medical-ink, #111827);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.heart-recommendation {
+  color: var(--medical-ink, #111827);
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.heart-save-btn {
+  background: #0ea5e9;
+  border: none;
+  color: var(--medical-ink, #111827);
+  border-radius: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  font-weight: 700;
+}

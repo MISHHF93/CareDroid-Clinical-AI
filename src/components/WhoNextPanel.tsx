@@ -5,6 +5,7 @@ import OperationalEmptyState from './ui/OperationalEmptyState';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { Patient, PatientFlag, PatientState, Priority, Room } from '../types/emergency';
 import { hasPatientFlag, patientFlags } from '../utils/patientVitals';
+import './WhoNextPanel.css';
 
 export const CURRENT_STAFF_ID = 'current-staff';
 export const WHO_NEXT_REFRESH_MS = 30_000;
@@ -312,9 +313,9 @@ export default function WhoNextPanel({ mode = 'detail' }: WhoNextPanelProps) {
           padding: 12,
         }}
       >
-        <div style={{ alignItems: 'center', display: 'flex', justifyContent: 'space-between', gap: 8 }}>
-          <strong style={{ color: '#38bdf8', fontSize: 11, letterSpacing: '0.12em' }}>SEE NEXT</strong>
-          <div style={{ display: 'flex', gap: 6 }}>
+        <div className="wnp-header-row">
+          <strong className="wnp-eyebrow">SEE NEXT</strong>
+          <div className="wnp-header-actions">
             {pinned ? (<button
               type="button"
               aria-pressed="true"
@@ -344,11 +345,7 @@ export default function WhoNextPanel({ mode = 'detail' }: WhoNextPanelProps) {
               type="button"
               aria-label="Close see next panel"
               onClick={closePanel}
-              style={{
-                ...buttonStyle,
-                color: MEDICAL_THEME.inkSubtle,
-                padding: '5px 8px',
-              }}
+              className="wnp-btn wnp-btn--icon"
             >
               ×
             </button>
@@ -357,45 +354,36 @@ export default function WhoNextPanel({ mode = 'detail' }: WhoNextPanelProps) {
 
         {recommendation ? (
           <>
-            <div style={{ color: 'var(--medical-ink, #111827)', fontSize: 14, fontWeight: 700, marginTop: 10 }}>
+            <div className="wnp-patient-line">
               {patientName(recommendation.patient)} · {patientLocation(recommendation.patient, rooms)} ·{' '}
               {truncate(recommendation.patient.chiefComplaint, 36)}
             </div>
-            <div style={{ color: MEDICAL_THEME.inkSubtle, fontSize: 12, marginTop: 5 }}>
+            <div className="wnp-detail-parts">
               {recommendation.detailParts.join(' · ')}
             </div>
-            <div style={{ color: MEDICAL_THEME.accent, fontSize: 12, fontWeight: 700, marginTop: 6 }}>
+            <div className="wnp-reason">
               {recommendation.reason || 'Assigned patient needs review'}
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: recommendationNeedsReassessment ? '1fr 1fr' : '1fr 1fr', gap: 8, marginTop: 12 }}>
+            <div className="wnp-action-row">
               <button
                 type="button"
                 onClick={() => selectPatient(recommendation.patient.id)}
-                style={{ ...buttonStyle, background: MEDICAL_THEME.accent, borderColor: MEDICAL_THEME.accent }}
+                className="wnp-btn wnp-btn--go"
               >
                 Go to Patient
               </button>
               {recommendationNeedsReassessment ? (
-                <button
-                  type="button"
-                  onClick={openReassessment}
-                  style={{
-                    ...buttonStyle,
-                    background: 'color-mix(in srgb, #F59E0B 18%, #f0f9ff)',
-                    borderColor: '#F59E0B',
-                    color: '#FDE68A',
-                  }}
-                >
+                <button type="button" onClick={openReassessment} className="wnp-btn wnp-btn--reassess">
                   Reassess now
                 </button>
               ) : (
-                <button type="button" onClick={skipPatient} style={buttonStyle}>
+                <button type="button" onClick={skipPatient} className="wnp-btn">
                   Skip — next
                 </button>
               )}
             </div>
             {recommendationNeedsReassessment ? (
-              <button type="button" onClick={skipPatient} style={{ ...buttonStyle, marginTop: 8, width: '100%' }}>
+              <button type="button" onClick={skipPatient} className="wnp-btn wnp-btn--full">
                 Skip — next
               </button>
             ) : null}

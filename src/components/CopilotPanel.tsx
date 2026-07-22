@@ -1,5 +1,4 @@
 import './CopilotPanel.css';
-import { MEDICAL_THEME } from '../config/medicalTheme.constants';
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -22,7 +21,6 @@ import { EMERGENCY_OS_BRANDING } from '../config/emergencyOsBranding.config';
 import { resolveCopilotChromeLabels } from '../config/profileDesignLanguage.config';
 import { EMPTY_STATE_COPY } from '../config/emptyStateCopy';
 import OperationalEmptyState, { OperationalEmptyAction } from './ui/OperationalEmptyState';
-import './CopilotPanel.css';
 import type { OperationalIntelligenceSnapshot } from '../operational-intelligence/operationalIntelligence.types';
 import { formatLongWaitAttentionForCopilot } from '../utils/longWaitRescue';
 import { formatCopilotRecommendationsForPrompt } from '../config/copilotRecommendationModel';
@@ -411,19 +409,9 @@ function panelMessagesFromStoreMessage(message: StoreCopilotMessage): CopilotMes
 
 function TypingIndicator() {
   return (
-    <div style={{ display: 'flex', gap: 4, padding: '4px 0' }} aria-label="Copilot typing">
+    <div className="ed-copilot-typing-indicator" aria-label="Copilot typing">
       {[0, 1, 2].map((index) => (
-        <span
-          key={index}
-          className="ed-copilot-typing-dot"
-          style={{
-            width: 6,
-            height: 6,
-            borderRadius: 999,
-            background: MEDICAL_THEME.inkSubtle,
-            animationDelay: `${index * 120}ms`,
-          }}
-        />
+        <span key={index} className="ed-copilot-typing-dot" />
       ))}
     </div>
   );
@@ -1122,7 +1110,7 @@ export function CopilotPanel() {
         />
       ) : null}
       {loading && messages[messages.length - 1]?.content ? (
-        <div style={{ alignSelf: 'flex-start' }}>
+        <div className="ed-copilot-typing-indicator-wrap">
           <TypingIndicator />
         </div>
       ) : null}

@@ -1,0 +1,110 @@
+/* Static (non-state-dependent) styles extracted from ColumbiaSSRS.tsx's
+   inline style={{...}} blocks -- see scripts/check-inline-styles.mjs.
+   Genuinely dynamic styles (answer-button selected state, risk-level color/
+   background keyed off classifyRisk()) stay inline; only fixed-value blocks
+   moved here. */
+
+.cssrs-answer-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.cssrs-panel {
+  width: 100%;
+  max-width: 720px;
+  max-height: 92vh;
+  overflow-y: auto;
+  background: #ffffff;
+  border: 1px solid #e0f2fe;
+  border-radius: 12px;
+  color: var(--medical-ink, #111827);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+}
+
+.cssrs-patient-subtitle {
+  color: #475569;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.cssrs-disclaimer {
+  background: #f0f9ff;
+  border: 1px solid #e0f2fe;
+  border-radius: 12px;
+  padding: 14px;
+  color: #E5E7EB;
+  line-height: 1.5;
+}
+
+.cssrs-section-heading {
+  margin: 0 0 10px;
+  font-size: 15px;
+}
+
+.cssrs-question-list {
+  display: grid;
+  gap: 12px;
+}
+
+.cssrs-question-text {
+  display: block;
+  color: var(--medical-ink, #111827);
+  line-height: 1.45;
+}
+
+.cssrs-ideation-complete {
+  color: #38bdf8;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.cssrs-behavior-examples {
+  margin: 8px 0 0;
+  color: #475569;
+  font-size: 13px;
+}
+
+.cssrs-confirm-dialog {
+  border: 1px solid #F97316;
+  border-radius: 12px;
+  padding: 14px;
+  background: #7C2D1266;
+}
+
+.cssrs-confirm-text {
+  margin: 0 0 12px;
+  color: var(--medical-ink, #111827);
+  font-weight: 700;
+}
+
+.cssrs-save-alert-btn {
+  border: none;
+  border-radius: 10px;
+  background: #DC2626;
+  color: var(--medical-ink, #111827);
+  padding: 10px 12px;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.cssrs-cancel-btn {
+  border: 1px solid #e0f2fe;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--medical-ink, #111827);
+  padding: 10px 12px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.cssrs-save-btn {
+  background: #0ea5e9;
+  border: none;
+  color: var(--medical-ink, #111827);
+  border-radius: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  font-weight: 700;
+}
