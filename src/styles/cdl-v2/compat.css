@@ -43,30 +43,64 @@
   --cd-z-toast: var(--cdl-z-toast);
   --cd-z-tooltip: var(--cdl-z-tooltip);
 
-  /* Medical / app surfaces */
+  /* Medical / app surfaces + text — always follow CDL mode */
   --medical-surface-page: var(--cdl-surface-page);
+  --medical-canvas: var(--cdl-surface-page);
   --medical-surface-card: var(--cdl-surface-card);
   --medical-surface-muted: var(--cdl-surface-muted);
+  --medical-surface-inset: var(--cdl-surface-inset);
+  --medical-white: var(--cdl-surface-card);
   --medical-border: var(--cdl-border);
+  --medical-border-strong: var(--cdl-border-strong);
   --medical-ink: var(--cdl-ink);
   --medical-ink-muted: var(--cdl-ink-muted);
   --medical-ink-subtle: var(--cdl-ink-subtle);
+  --medical-ink-secondary: var(--cdl-ink-muted);
+  --medical-text-heading: var(--cdl-ink);
+  --medical-text-body: var(--cdl-ink);
+  --medical-text-muted: var(--cdl-ink-muted);
+  --medical-text-subtle: var(--cdl-ink-subtle);
+  --medical-text-disabled: var(--cdl-ink-disabled);
+  --medical-text-placeholder: var(--cdl-ink-subtle);
+  --medical-text-link: var(--cdl-brand-600);
+  --medical-text-link-hover: var(--cdl-brand-700);
   --medical-accent: var(--cdl-brand-500);
 
+  --app-bg: var(--cdl-surface-page);
+  --app-fg: var(--cdl-ink);
+  --app-fg-muted: var(--cdl-ink-muted);
+  --app-text-primary: var(--cdl-ink);
+  --app-text-secondary: var(--cdl-ink-muted);
+  --app-text-muted: var(--cdl-ink-muted);
   --app-surface-page: var(--cdl-surface-page);
   --app-surface-card: var(--cdl-surface-card);
+  --app-surface-0: var(--cdl-surface-card);
+  --app-surface-1: var(--cdl-surface-card);
+  --app-surface-2: var(--cdl-surface-elevated);
+  --app-surface-muted: var(--cdl-surface-muted);
+  --app-panel-bg: var(--cdl-surface-card);
+  --app-panel-border: var(--cdl-border);
   --app-border: var(--cdl-border);
+  --app-border-subtle: var(--cdl-border);
   --app-ink: var(--cdl-ink);
   --app-accent: var(--cdl-brand-500);
+  --app-accent-interactive: var(--cdl-brand-500);
+  --app-accent-hover: var(--cdl-brand-600);
+  --app-navy-ink: var(--cdl-ink);
 
   /* CD component tokens */
   --cd-text-primary: var(--cdl-ink);
   --cd-text-secondary: var(--cdl-ink-muted);
+  --cd-text-muted: var(--cdl-ink-muted);
+  --cd-text-tertiary: var(--cdl-ink-subtle);
   --cd-text-disabled: var(--cdl-ink-disabled);
   --cd-text-brand: var(--cdl-brand-600);
   --cd-text-danger: var(--cdl-critical-text);
   --cd-success-text: var(--cdl-ok-text);
   --cd-warning-text: var(--cdl-warning-text);
+  --cd-bg-base: var(--cdl-surface-page);
+  --cd-bg-surface: var(--cdl-surface-card);
+  --cd-bg-elevated: var(--cdl-surface-elevated);
 
   --cd-space-2: var(--cdl-space-2);
   --cd-space-3: var(--cdl-space-3);

@@ -1,34 +1,35 @@
 /**
- * Layer 2 — platform-wide text hierarchy for the locked light medical theme.
- * Loaded after color-normalization.css.
+ * Layer 2 — platform-wide text hierarchy for light AND dark.
+ * Uses CDL ink pairs (via medical/app aliases) — never mode-locked greys.
  */
 
 html,
 html[data-theme='light'],
+html[data-theme='dark'],
 :is(.app-shell, .emergency-app-shell) {
-  color: var(--app-text-primary, var(--medical-text-body));
+  color: var(--cdl-ink, var(--app-text-primary, var(--medical-text-body)));
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 :is(.app-shell, .emergency-app-shell) :is(h1, h2, h3, h4, h5, h6) {
-  color: var(--medical-text-heading);
+  color: var(--cdl-ink, var(--medical-text-heading));
   font-weight: 700;
   line-height: 1.25;
 }
 
 :is(.app-shell, .emergency-app-shell) p {
-  color: var(--medical-text-body);
+  color: var(--cdl-ink, var(--medical-text-body));
   line-height: 1.5;
 }
 
 :is(.app-shell, .emergency-app-shell) :is(label, legend, .form-label, [class*='__label']) {
-  color: var(--medical-text-muted);
+  color: var(--cdl-ink-muted, var(--medical-text-muted));
   font-weight: 600;
 }
 
 :is(.app-shell, .emergency-app-shell) :is(small, .text-caption, [class*='__caption'], [class*='-caption']) {
-  color: var(--medical-text-subtle);
+  color: var(--cdl-ink-muted, var(--medical-text-muted));
 }
 
 :is(.app-shell, .emergency-app-shell) :is(
@@ -41,7 +42,7 @@ html[data-theme='light'],
     [class*='__subtitle'],
     [class*='-subtitle']
   ) {
-  color: var(--medical-text-muted);
+  color: var(--cdl-ink-muted, var(--medical-text-muted));
 }
 
 :is(.app-shell, .emergency-app-shell) a:not([class*='btn']):not([class*='button']):not([role='button']) {

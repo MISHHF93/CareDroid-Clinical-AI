@@ -1,0 +1,177 @@
+/**
+ * CDL v2 dual-mode theme SSOT — surfaces + ink + semantic pairs for light AND dark.
+ * Loaded after color.css. Components must use --cdl-* only for chrome text/surfaces.
+ */
+
+/* ── Light (default) — strengthen muted ink for AA ── */
+html,
+html[data-theme='light'] {
+  color-scheme: light;
+
+  --cdl-surface-page: #f8fafc;
+  --cdl-surface-card: #ffffff;
+  --cdl-surface-muted: #f1f5f9;
+  --cdl-surface-inset: #f1f5f9;
+  --cdl-surface-elevated: #ffffff;
+  --cdl-border: #e2e8f0;
+  --cdl-border-strong: #cbd5e1;
+  --cdl-border-input: #cbd5e1;
+
+  /* Primary ink: near-black; muted: slate-600 (≥4.5:1 on white) — not #9ca3af */
+  --cdl-ink: #0f172a;
+  --cdl-ink-muted: #334155;
+  --cdl-ink-subtle: #475569;
+  --cdl-ink-disabled: #94a3b8;
+  --cdl-ink-inverse: #ffffff;
+
+  --cdl-critical: #dc2626;
+  --cdl-critical-text: #991b1b;
+  --cdl-critical-bg: color-mix(in srgb, #dc2626 12%, #ffffff);
+  --cdl-critical-border: color-mix(in srgb, #dc2626 45%, #e2e8f0);
+
+  --cdl-urgent: #c2410c;
+  --cdl-urgent-text: #9a3412;
+  --cdl-urgent-bg: color-mix(in srgb, #ea580c 12%, #ffffff);
+  --cdl-urgent-border: color-mix(in srgb, #ea580c 45%, #e2e8f0);
+
+  --cdl-warning: #b45309;
+  --cdl-warning-text: #92400e;
+  --cdl-warning-bg: color-mix(in srgb, #f59e0b 14%, #ffffff);
+  --cdl-warning-border: color-mix(in srgb, #b45309 45%, #e2e8f0);
+
+  --cdl-info: #0369a1;
+  --cdl-info-text: #075985;
+  --cdl-info-bg: color-mix(in srgb, #0ea5e9 10%, #ffffff);
+  --cdl-info-border: color-mix(in srgb, #0284c7 40%, #e2e8f0);
+
+  --cdl-ok: #047857;
+  --cdl-ok-text: #065f46;
+  --cdl-ok-bg: color-mix(in srgb, #10b981 10%, #ffffff);
+  --cdl-ok-border: color-mix(in srgb, #059669 35%, #e2e8f0);
+
+  --cdl-neutral-text: var(--cdl-ink);
+  --cdl-neutral-bg: var(--cdl-surface-card);
+  --cdl-neutral-border: var(--cdl-border);
+
+  --cdl-ai: #6d28d9;
+  --cdl-ai-text: #5b21b6;
+  --cdl-ai-bg: color-mix(in srgb, #8b5cf6 12%, #ffffff);
+  --cdl-ai-border: color-mix(in srgb, #7c3aed 40%, #e2e8f0);
+
+  --cdl-ops: #0f766e;
+  --cdl-ops-text: #115e59;
+  --cdl-ops-bg: color-mix(in srgb, #14b8a6 10%, #ffffff);
+  --cdl-ops-border: color-mix(in srgb, #0f766e 40%, #e2e8f0);
+
+  --cdl-card-bg: var(--cdl-surface-card);
+  --cdl-card-fg: var(--cdl-ink);
+  --cdl-card-fg-muted: var(--cdl-ink-muted);
+  --cdl-card-fg-subtle: var(--cdl-ink-subtle);
+  --cdl-card-border: var(--cdl-border);
+
+  --cdl-overlay: rgba(15, 23, 42, 0.4);
+  --cdl-scrim: rgba(15, 23, 42, 0.5);
+}
+
+/* ── Dark — surfaces and ink flip together; severity tints mix into dark card ── */
+html[data-theme='dark'] {
+  color-scheme: dark;
+
+  --cdl-surface-page: #0f172a;
+  --cdl-surface-card: #1e293b;
+  --cdl-surface-muted: #1e293b;
+  --cdl-surface-inset: #0f172a;
+  --cdl-surface-elevated: #334155;
+  --cdl-border: #334155;
+  --cdl-border-strong: #475569;
+  --cdl-border-input: #475569;
+
+  /* Primary near-white; muted slate-300 for AA on #1e293b */
+  --cdl-ink: #f8fafc;
+  --cdl-ink-muted: #cbd5e1;
+  --cdl-ink-subtle: #94a3b8;
+  --cdl-ink-disabled: #64748b;
+  --cdl-ink-inverse: #0f172a;
+
+  --cdl-critical: #f87171;
+  --cdl-critical-text: #fecaca;
+  --cdl-critical-bg: color-mix(in srgb, #dc2626 28%, #1e293b);
+  --cdl-critical-border: color-mix(in srgb, #f87171 45%, #334155);
+
+  --cdl-urgent: #fb923c;
+  --cdl-urgent-text: #fed7aa;
+  --cdl-urgent-bg: color-mix(in srgb, #ea580c 26%, #1e293b);
+  --cdl-urgent-border: color-mix(in srgb, #fb923c 40%, #334155);
+
+  --cdl-warning: #fbbf24;
+  --cdl-warning-text: #fde68a;
+  --cdl-warning-bg: color-mix(in srgb, #f59e0b 22%, #1e293b);
+  --cdl-warning-border: color-mix(in srgb, #fbbf24 40%, #334155);
+
+  --cdl-info: #38bdf8;
+  --cdl-info-text: #bae6fd;
+  --cdl-info-bg: color-mix(in srgb, #0ea5e9 22%, #1e293b);
+  --cdl-info-border: color-mix(in srgb, #38bdf8 40%, #334155);
+
+  --cdl-ok: #4ade80;
+  --cdl-ok-text: #bbf7d0;
+  --cdl-ok-bg: color-mix(in srgb, #10b981 22%, #1e293b);
+  --cdl-ok-border: color-mix(in srgb, #4ade80 40%, #334155);
+
+  --cdl-neutral-text: var(--cdl-ink);
+  --cdl-neutral-bg: var(--cdl-surface-card);
+  --cdl-neutral-border: var(--cdl-border);
+
+  --cdl-ai: #a78bfa;
+  --cdl-ai-text: #ddd6fe;
+  --cdl-ai-bg: color-mix(in srgb, #8b5cf6 26%, #1e293b);
+  --cdl-ai-border: color-mix(in srgb, #a78bfa 40%, #334155);
+
+  --cdl-ops: #2dd4bf;
+  --cdl-ops-text: #99f6e4;
+  --cdl-ops-bg: color-mix(in srgb, #14b8a6 22%, #1e293b);
+  --cdl-ops-border: color-mix(in srgb, #2dd4bf 40%, #334155);
+
+  --cdl-acuity-p1: #f87171;
+  --cdl-acuity-p1-bg: color-mix(in srgb, #dc2626 24%, #1e293b);
+  --cdl-acuity-p2: #fb923c;
+  --cdl-acuity-p2-bg: color-mix(in srgb, #ea580c 22%, #1e293b);
+  --cdl-acuity-p3: #fbbf24;
+  --cdl-acuity-p3-bg: color-mix(in srgb, #d97706 20%, #1e293b);
+  --cdl-acuity-p4: #38bdf8;
+  --cdl-acuity-p4-bg: color-mix(in srgb, #0284c7 22%, #1e293b);
+  --cdl-acuity-p5: #94a3b8;
+  --cdl-acuity-p5-bg: color-mix(in srgb, #64748b 20%, #1e293b);
+
+  --cdl-card-bg: var(--cdl-surface-card);
+  --cdl-card-fg: var(--cdl-ink);
+  --cdl-card-fg-muted: var(--cdl-ink-muted);
+  --cdl-card-fg-subtle: var(--cdl-ink-subtle);
+  --cdl-card-border: var(--cdl-border);
+
+  --cdl-elev-1: 0 1px 2px rgba(0, 0, 0, 0.35), 0 1px 1px rgba(0, 0, 0, 0.2);
+  --cdl-elev-2: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --cdl-elev-3: 0 12px 28px rgba(0, 0, 0, 0.45);
+  --cdl-elev-4: 0 20px 48px rgba(0, 0, 0, 0.55);
+
+  --cdl-overlay: rgba(0, 0, 0, 0.55);
+  --cdl-scrim: rgba(0, 0, 0, 0.65);
+
+  --cdl-brand-500: #38bdf8;
+  --cdl-brand-600: #0ea5e9;
+  --cdl-brand-700: #7dd3fc;
+  --cdl-on-brand: #0f172a;
+}
+
+/* Document body follows CDL page ink (all modes) */
+html,
+html[data-theme='light'],
+html[data-theme='dark'] {
+  background-color: var(--cdl-surface-page);
+  color: var(--cdl-ink);
+}
+
+body {
+  background-color: var(--cdl-surface-page);
+  color: var(--cdl-ink);
+}
