@@ -11,6 +11,7 @@ import { useEMSIntake } from '../hooks/useEmergencyOs';
 import { convertEmsArrivalForReception } from '../services/receptionIntakeBridge';
 import { fetchEmsFleetSnapshot, fetchEmergencyDiversionStatus } from '../services/emergencyTransportApi';
 import { postEmsHandoff } from '../services/emergencyOsApi';
+import { reportEmsHandoffSyncFailure } from '../services/emsHandoffSyncFailure';
 import EmsOffloadTrackerPanel from './ems/EmsOffloadTrackerPanel';
 import EmsOffloadAttentionStrip from './ems/EmsOffloadAttentionStrip';
 import EmsOperationalStrip from './ems/EmsOperationalStrip';
@@ -542,7 +543,12 @@ export default function EMSPipeline() {
       arrivedAt: arrival?.arrivedAt,
       checklist: { handoffAccepted: true, handoffAcceptedAt: timestamp },
     }).catch((error) => {
-      console.error('[EMSPipeline] EMS handoff persistence failed (local state kept):', error);
+      reportEmsHandoffSyncFailure({
+        arrivalId,
+        patientId: arrival?.patientId,
+        unitName: arrival?.unitName,
+        error,
+      });
     });
   };
   const handleHandoffChecklistUpdate = (arrivalId, patch, actor) => {
