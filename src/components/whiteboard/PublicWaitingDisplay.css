@@ -108,7 +108,7 @@
 .public-waiting-display__footer p {
   margin: 0;
   font-size: clamp(13px, 1.5vw, 17px);
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, var(--cdl-ink-muted, #334155));
   line-height: 1.5;
 }
 
@@ -162,21 +162,21 @@ html.public-waiting-kiosk-active .emergency-app-shell--public-waiting-kiosk .app
 .public-waiting-display__subtitle {
   margin: 6px 0 0;
   font-size: 13px;
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, var(--cdl-ink-muted, #334155));
 }
 
 .public-waiting-display__meta {
   display: grid;
   gap: 4px;
   font-size: 12px;
-  color: var(--medical-text-muted, #6b7280);
+  color: var(--medical-text-muted, var(--cdl-ink-muted, #334155));
   text-align: right;
 }
 
 .public-waiting-display__summary {
   margin: 0;
   font-size: 15px;
-  color: var(--medical-text-muted, #6b7280);
+  color: var(--medical-text-muted, var(--cdl-ink-muted, #334155));
   font-weight: 600;
 }
 
@@ -184,13 +184,13 @@ html.public-waiting-kiosk-active .emergency-app-shell--public-waiting-kiosk .app
   margin: 0;
   font-size: 12px;
   line-height: 1.5;
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, var(--cdl-ink-muted, #334155));
 }
 
 .public-waiting-display__disclaimer-inline {
   font-size: 11px;
   line-height: 1.45;
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, var(--cdl-ink-muted, #334155));
 }
 
 .public-waiting-display__grid {
@@ -235,12 +235,12 @@ html.public-waiting-kiosk-active .emergency-app-shell--public-waiting-kiosk .app
 .public-waiting-display__label {
   font-size: 14px;
   font-weight: 700;
-  color: var(--medical-text-muted, #6b7280);
+  color: var(--medical-text-muted, var(--cdl-ink-muted, #334155));
 }
 
 .public-waiting-display__detail {
   font-size: 12px;
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, var(--cdl-ink-muted, #334155));
   line-height: 1.45;
 }
 
@@ -254,7 +254,7 @@ html.public-waiting-kiosk-active .emergency-app-shell--public-waiting-kiosk .app
 .public-waiting-display__stages-note {
   margin: 0 0 12px;
   font-size: 12px;
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, var(--cdl-ink-muted, #334155));
 }
 
 .public-waiting-display__stage-list {
@@ -278,7 +278,7 @@ html.public-waiting-kiosk-active .emergency-app-shell--public-waiting-kiosk .app
 
 .public-waiting-display__stage-label {
   font-size: 14px;
-  color: var(--medical-text-muted, #6b7280);
+  color: var(--medical-text-muted, var(--cdl-ink-muted, #334155));
 }
 
 .public-waiting-display__stage-count {
@@ -297,7 +297,7 @@ html.public-waiting-kiosk-active .emergency-app-shell--public-waiting-kiosk .app
   padding-left: 20px;
   display: grid;
   gap: 8px;
-  color: var(--medical-text-muted, #6b7280);
+  color: var(--medical-text-muted, var(--cdl-ink-muted, #334155));
   font-size: 14px;
   line-height: 1.5;
 }

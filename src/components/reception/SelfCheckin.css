@@ -18,7 +18,7 @@
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--color-text-secondary, #9ca3af);
+  color: var(--color-text-secondary, var(--cdl-ink-muted, #334155));
 }
 
 .self-checkin__hero h1 {
@@ -29,7 +29,7 @@
 
 .self-checkin__hero p {
   margin: 0;
-  color: var(--color-text-secondary, #9ca3af);
+  color: var(--color-text-secondary, var(--cdl-ink-muted, #334155));
   font-size: 15px;
 }
 
@@ -42,11 +42,11 @@
   border: 1px dashed rgba(148, 163, 184, 0.35);
   background: var(--medical-surface-card, #ffffff);
   font-size: 13px;
-  color: var(--medical-text-muted, #6b7280);
+  color: var(--medical-text-muted, var(--cdl-ink-muted, #334155));
 }
 
 .self-checkin__integration strong {
-  color: var(--medical-text-muted, #6b7280);
+  color: var(--medical-text-muted, var(--cdl-ink-muted, #334155));
 }
 
 .self-checkin__progress {
@@ -72,7 +72,7 @@
   display: flex;
   justify-content: space-between;
   font-size: 12px;
-  color: var(--color-text-secondary, #9ca3af);
+  color: var(--color-text-secondary, var(--cdl-ink-muted, #334155));
 }
 
 .self-checkin__panel {
@@ -91,7 +91,7 @@
 
 .self-checkin__panel p {
   margin: 0;
-  color: var(--color-text-secondary, #9ca3af);
+  color: var(--color-text-secondary, var(--cdl-ink-muted, #334155));
   font-size: 14px;
 }
 
@@ -190,7 +190,7 @@
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--color-text-secondary, #9ca3af);
+  color: var(--color-text-secondary, var(--cdl-ink-muted, #334155));
 }
 
 .self-checkin__reaiew-list dd {
@@ -275,7 +275,7 @@
 .self-checkin__disclaimer {
   margin: 0;
   font-size: 11px;
-  color: var(--color-text-secondary, #9ca3af);
+  color: var(--color-text-secondary, var(--cdl-ink-muted, #334155));
 }
 
 .self-checkin__confirmation {

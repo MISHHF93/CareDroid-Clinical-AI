@@ -27,7 +27,7 @@
 .amb-handoff-checklist__header p {
   margin: 0;
   font-size: 0.78rem;
-  color: var(--text-muted, #94a3b8);
+  color: var(--text-muted, var(--cdl-ink-subtle, #475569));
 }
 
 .amb-handoff-checklist__status {
@@ -54,7 +54,7 @@
 .amb-handoff-checklist__progress span {
   display: block;
   height: 100%;
-  background: linear-gradient(90deg, #94a3b8, #22c55e);
+  background: linear-gradient(90deg, var(--cdl-ink-subtle, #475569), #22c55e);
   transition: width 0.2s ease;
 }
 
@@ -84,11 +84,11 @@
 }
 
 .amb-handoff-checklist__steps li[data-status='pending'] span {
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, var(--cdl-ink-muted, #334155));
 }
 
 .amb-handoff-checklist__steps small {
-  color: var(--text-muted, #94a3b8);
+  color: var(--text-muted, var(--cdl-ink-subtle, #475569));
   text-align: right;
 }
 
@@ -103,7 +103,7 @@
   font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--text-muted, #94a3b8);
+  color: var(--text-muted, var(--cdl-ink-subtle, #475569));
   margin-bottom: 0.2rem;
 }
 
@@ -136,7 +136,7 @@
   gap: 0.35rem 0.55rem;
   margin-top: 0.35rem;
   font-size: 0.75rem;
-  color: var(--text-muted, #94a3b8);
+  color: var(--text-muted, var(--cdl-ink-subtle, #475569));
 }
 
 .amb-handoff-checklist__meds {
@@ -181,7 +181,7 @@
 
 .amb-handoff-checklist__muted {
   margin: 0;
-  color: var(--text-muted, #94a3b8);
+  color: var(--text-muted, var(--cdl-ink-subtle, #475569));
   font-size: 0.78rem;
 }
 
@@ -189,7 +189,7 @@
 .amb-handoff-checklist__notes {
   margin-top: 0.65rem;
   font-size: 0.78rem;
-  color: var(--text-muted, #94a3b8);
+  color: var(--text-muted, var(--cdl-ink-subtle, #475569));
 }
 
 .amb-handoff-checklist__notes {

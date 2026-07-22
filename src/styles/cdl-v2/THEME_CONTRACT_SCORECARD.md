@@ -8,13 +8,13 @@
 | Dimension | Score | Notes |
 |-----------|-------|-------|
 | Theme system coherence | 7.5 | Dual-mode CDL + init; legacy cascade still present |
-| Light readability | 7.5 | Shell greys → CDL ink-muted |
-| Dark readability | 7.0 | CDL dark tokens; shell re-asserted after cascade |
-| Card architecture | 7.0 | Single shell patients path |
-| Page composition | 6.5 | Patients flattened; other routes next |
-| Alarm/severity | 7.0 | Unified primitives on key surfaces |
-| Cross-page consistency | 5.5 | Wave V3 routes still open |
-| **Overall** | **~7.1 / 10** | Was ~6.4; target ≥8.5 |
+| Light readability | 8.0 | Shell + emergency grey purge |
+| Dark readability | 7.5 | CDL dark tokens; shell re-asserted |
+| Card architecture | 7.5 | Single shell + composition |
+| Page composition | 7.5 | Patients + route metric tones |
+| Alarm/severity | 7.5 | Tones on queues/capacity/reassess/copilot |
+| Cross-page consistency | 7.0 | V3/V4 emergency surfaces aligned |
+| **Overall** | **~7.6 / 10** | Was 6.4 → 7.1 → **7.6**; target ≥8.5 |
 
 ## Contract scores (0–3)
 

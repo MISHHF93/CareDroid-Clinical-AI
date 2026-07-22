@@ -39,7 +39,7 @@
 .reception-metric__label {
   font-size: 10px;
   font-weight: 700;
-  color: var(--app-text-secondary, #6b7280);
+  color: var(--app-text-secondary, var(--cdl-ink-muted, #334155));
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -76,7 +76,7 @@
 .reception-situation-item__label {
   font-size: 10px;
   font-weight: 700;
-  color: var(--app-text-secondary, #6b7280);
+  color: var(--app-text-secondary, var(--cdl-ink-muted, #334155));
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
@@ -152,7 +152,7 @@
   background: transparent;
   border: none;
   border-radius: 6px;
-  color: var(--app-text-secondary, #6b7280);
+  color: var(--app-text-secondary, var(--cdl-ink-muted, #334155));
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;

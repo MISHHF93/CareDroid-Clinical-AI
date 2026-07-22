@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { MEDICAL_THEME } from '../../config/medicalTheme.constants';
 import { Link, Navigate, useLocation, useSearchParams } from 'react-router-dom';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { PatientFlag, PatientState } from '../../types/emergency';
@@ -410,15 +409,16 @@ export function QueueRoute() {
       />
       <MetricGrid
         metrics={[
-          { label: 'Total queued', value: queueMetrics.totalQueued, color: MEDICAL_THEME.accent },
+          { label: 'Total queued', value: queueMetrics.totalQueued, tone: 'info' },
           {
             label: 'Breached queues',
             value: queueMetrics.breachedQueues,
-            color: queueMetrics.breachedQueues ? '#EF4444' : '#10B981',
+            tone: queueMetrics.breachedQueues ? 'critical' : 'success',
           },
           {
             label: effectiveQueueFilter ? 'Filtered queue' : 'Tracked queues',
             value: effectiveQueueFilter || visibleQueueRows.length,
+            tone: 'neutral',
           },
         ]}
       />
@@ -603,10 +603,14 @@ export function ReassessmentRoute() {
           {
             label: 'Due now',
             value: prioritizedDuePatients.length,
-            color: prioritizedDuePatients.length ? '#F59E0B' : '#10B981',
+            tone: prioritizedDuePatients.length ? 'warning' : 'success',
           },
-          { label: 'Overdue', value: overdueCount, color: '#EF4444' },
-          { label: 'Next action', value: reassessment.data?.data?.nextAction || 'Review queue' },
+          { label: 'Overdue', value: overdueCount, tone: overdueCount ? 'critical' : 'success' },
+          {
+            label: 'Next action',
+            value: reassessment.data?.data?.nextAction || 'Review queue',
+            tone: 'info',
+          },
         ]}
       />
       <PatientGrid patients={prioritizedDuePatients} emptyMessage="No reassessments are due right now." />
@@ -714,13 +718,21 @@ export function CapacityRoute() {
           />
           <MetricGrid
             metrics={[
-              { label: 'Boarding patients', value: boardingPatients.length, color: '#F59E0B' },
+              {
+                label: 'Boarding patients',
+                value: boardingPatients.length,
+                tone: boardingPatients.length ? 'warning' : 'success',
+              },
               {
                 label: 'Longest boarding',
                 value: `${boarding.data?.data?.longestBoardingMinutes ?? 0}m`,
-                color: '#F97316',
+                tone: 'urgent',
               },
-              { label: 'Escalation', value: boarding.data?.data?.escalation || 'No escalation' },
+              {
+                label: 'Escalation',
+                value: boarding.data?.data?.escalation || 'No escalation',
+                tone: 'info',
+              },
             ]}
           />
           <PatientGrid patients={boardingPatients} emptyMessage="No active boarding patients." />
@@ -738,13 +750,29 @@ export function CapacityRoute() {
               {
                 label: 'Capacity score',
                 value: `${capacity.score} ${capacity.band}`,
-                color: MEDICAL_THEME.accent,
+                tone: 'info',
               },
-              { label: 'Occupied rooms', value: capacity.occupiedRooms },
-              { label: 'Available rooms', value: availableRooms, color: '#10B981' },
-              { label: 'Blocked rooms', value: blockedRooms, color: '#F97316' },
-              { label: 'Boarding patients', value: capacity.boardingCount, color: '#F59E0B' },
-              { label: 'Reassessment due', value: capacity.reassessmentDue, color: '#EF4444' },
+              { label: 'Occupied rooms', value: capacity.occupiedRooms, tone: 'neutral' },
+              {
+                label: 'Available rooms',
+                value: availableRooms,
+                tone: availableRooms ? 'success' : 'warning',
+              },
+              {
+                label: 'Blocked rooms',
+                value: blockedRooms,
+                tone: blockedRooms ? 'urgent' : 'success',
+              },
+              {
+                label: 'Boarding patients',
+                value: capacity.boardingCount,
+                tone: capacity.boardingCount ? 'warning' : 'success',
+              },
+              {
+                label: 'Reassessment due',
+                value: capacity.reassessmentDue,
+                tone: capacity.reassessmentDue ? 'critical' : 'success',
+              },
             ]}
           />
           {capacityStatus.data?.data?.recommendations?.length ? (
@@ -843,16 +871,23 @@ export function CopilotRoute() {
       {showRouteMetrics ? (
         <MetricGrid
           metrics={[
-            { label: 'Active patients', value: promptContext.patientCount ?? activePatients.length },
+            {
+              label: 'Active patients',
+              value: promptContext.patientCount ?? activePatients.length,
+              tone: 'info',
+            },
             {
               label: 'High risk',
               value: promptContext.highRiskCount ?? highRiskPatients.length,
-              color: '#EF4444',
+              tone:
+                (promptContext.highRiskCount ?? highRiskPatients.length) > 0
+                  ? 'critical'
+                  : 'success',
             },
             {
               label: 'Capacity band',
               value: promptContext.capacity?.band ?? capacity.band,
-              color: MEDICAL_THEME.accent,
+              tone: 'info',
             },
           ]}
         />

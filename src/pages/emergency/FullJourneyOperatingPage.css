@@ -15,8 +15,8 @@
 }
 
 .fj-status-chip[data-status='ready'] {
-  color: var(--medical-ink-subtle, #94a3b8);
-  border-color: var(--medical-ink-subtle, #94a3b8);
+  color: var(--medical-ink-subtle, var(--cdl-ink-subtle, #475569));
+  border-color: var(--medical-ink-subtle, var(--cdl-ink-subtle, #475569));
 }
 
 .fj-metric-chip {
@@ -44,36 +44,36 @@
 
 .fj-metric-chip__label {
   font-size: 11px;
-  color: var(--medical-ink-subtle, #94a3b8);
+  color: var(--medical-ink-subtle, var(--cdl-ink-subtle, #475569));
   font-weight: 600;
 }
 
 .fj-caption {
   font-size: 12px;
   margin-top: 2px;
-  color: var(--medical-ink-subtle, #94a3b8);
+  color: var(--medical-ink-subtle, var(--cdl-ink-subtle, #475569));
 }
 
 .fj-caption-11 {
   font-size: 11px;
-  color: var(--medical-ink-subtle, #94a3b8);
+  color: var(--medical-ink-subtle, var(--cdl-ink-subtle, #475569));
 }
 
 .fj-caption-11-mt {
   font-size: 11px;
-  color: var(--medical-ink-subtle, #94a3b8);
+  color: var(--medical-ink-subtle, var(--cdl-ink-subtle, #475569));
   margin-top: 2px;
 }
 
 .fj-caption-12-mt {
   font-size: 12px;
-  color: var(--medical-ink-subtle, #94a3b8);
+  color: var(--medical-ink-subtle, var(--cdl-ink-subtle, #475569));
   margin-top: 2px;
 }
 
 .fj-caption-13-mt {
   font-size: 13px;
-  color: var(--medical-ink-subtle, #94a3b8);
+  color: var(--medical-ink-subtle, var(--cdl-ink-subtle, #475569));
   margin-top: 10px;
 }
 
@@ -81,14 +81,14 @@
   display: block;
   font-size: 11px;
   font-weight: 700;
-  color: var(--medical-ink-subtle, #94a3b8);
+  color: var(--medical-ink-subtle, var(--cdl-ink-subtle, #475569));
   margin-bottom: 3px;
 }
 
 .fj-label-mb4 {
   font-size: 11px;
   font-weight: 700;
-  color: var(--medical-ink-subtle, #94a3b8);
+  color: var(--medical-ink-subtle, var(--cdl-ink-subtle, #475569));
   margin-bottom: 4px;
 }
 
@@ -128,11 +128,11 @@
 }
 
 .fj-text-subtle {
-  color: var(--medical-ink-subtle, #94a3b8);
+  color: var(--medical-ink-subtle, var(--cdl-ink-subtle, #475569));
 }
 
 .fj-text-subtle-flex {
-  color: var(--medical-ink-subtle, #94a3b8);
+  color: var(--medical-ink-subtle, var(--cdl-ink-subtle, #475569));
   flex-shrink: 0;
 }
 
@@ -271,7 +271,7 @@
 }
 
 .fj-priority-badge[data-priority='routine'] {
-  color: var(--medical-ink-subtle, #94a3b8);
+  color: var(--medical-ink-subtle, var(--cdl-ink-subtle, #475569));
 }
 
 .fj-dx-status[data-status='resulted'] {
@@ -284,7 +284,7 @@
 
 .fj-dx-status[data-status='ordered'],
 .fj-dx-status[data-status='pending'] {
-  color: var(--medical-ink-subtle, #94a3b8);
+  color: var(--medical-ink-subtle, var(--cdl-ink-subtle, #475569));
 }
 
 .fj-arrival-status[data-status='Handoff'] {
@@ -344,7 +344,7 @@
   border-radius: 20px;
   border: 1px solid var(--medical-border, #e2e8f0);
   background: transparent;
-  color: var(--medical-ink-subtle, #94a3b8);
+  color: var(--medical-ink-subtle, var(--cdl-ink-subtle, #475569));
   font-size: 11px;
   font-weight: 600;
   cursor: pointer;
@@ -390,7 +390,7 @@
   padding: 5px 10px;
   border-radius: 6px;
   background: transparent;
-  color: var(--medical-ink-subtle, #94a3b8);
+  color: var(--medical-ink-subtle, var(--cdl-ink-subtle, #475569));
   border: 1px solid var(--medical-border, #e2e8f0);
   font-size: 12px;
   font-weight: 700;

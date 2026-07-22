@@ -109,7 +109,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, var(--cdl-ink-muted, #334155));
   font-size: 12px;
 }
 
@@ -118,7 +118,7 @@
   border: 1px solid var(--medical-border, #e0f2fe);
   border-radius: 8px;
   background: var(--medical-surface-card, #ffffff);
-  color: var(--medical-text-muted, #6b7280);
+  color: var(--medical-text-muted, var(--cdl-ink-muted, #334155));
   cursor: pointer;
   transition:
     background-color var(--motion-transition-fast),
@@ -243,7 +243,7 @@
   border: 0;
   border-radius: 999px;
   background: var(--component-inner-surface-bg);
-  color: var(--medical-text-muted, #6b7280);
+  color: var(--medical-text-muted, var(--cdl-ink-muted, #334155));
   font-size: 12px;
   font-weight: 900;
 }
@@ -307,7 +307,7 @@
 
 .reassessment-drawer__name-line span,
 .reassessment-drawer__flag-time {
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, var(--cdl-ink-muted, #334155));
   font-size: 11px;
 }
 
@@ -325,7 +325,7 @@
   border: 0;
   border-radius: 999px;
   background: transparent;
-  color: var(--medical-text-muted, #6b7280);
+  color: var(--medical-text-muted, var(--cdl-ink-muted, #334155));
   font-size: 11px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -414,7 +414,7 @@
   gap: 6px;
   min-height: 180px;
   padding: 32px 18px 40px;
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, var(--cdl-ink-muted, #334155));
   animation: reassessment-row-enter var(--motion-transition-slow) both;
 }
 

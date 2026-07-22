@@ -85,7 +85,7 @@
 
 .dispatch-console__summary-card__label {
   font-size: 11px;
-  color: var(--medical-ink-subtle, #94a3b8);
+  color: var(--medical-ink-subtle, var(--cdl-ink-subtle, #475569));
   font-weight: 600;
 }
 
@@ -123,14 +123,14 @@
   display: block;
   font-size: 12px;
   font-weight: 700;
-  color: var(--medical-ink-subtle, #94a3b8);
+  color: var(--medical-ink-subtle, var(--cdl-ink-subtle, #475569));
   margin-bottom: 4px;
 }
 
 .dc-field-label-mb6 {
   font-size: 12px;
   font-weight: 700;
-  color: var(--medical-ink-subtle, #94a3b8);
+  color: var(--medical-ink-subtle, var(--cdl-ink-subtle, #475569));
   margin-bottom: 6px;
 }
 
@@ -146,23 +146,23 @@
 }
 
 .dc-muted {
-  color: var(--medical-ink-subtle, #94a3b8);
+  color: var(--medical-ink-subtle, var(--cdl-ink-subtle, #475569));
 }
 
 .dc-muted-12 {
   font-size: 12px;
-  color: var(--medical-ink-subtle, #94a3b8);
+  color: var(--medical-ink-subtle, var(--cdl-ink-subtle, #475569));
 }
 
 .dc-muted-12-mt {
   font-size: 12px;
-  color: var(--medical-ink-subtle, #94a3b8);
+  color: var(--medical-ink-subtle, var(--cdl-ink-subtle, #475569));
   margin-top: 2px;
 }
 
 .dc-muted-12-mt4 {
   font-size: 12px;
-  color: var(--medical-ink-subtle, #94a3b8);
+  color: var(--medical-ink-subtle, var(--cdl-ink-subtle, #475569));
   margin-top: 4px;
 }
 
@@ -291,7 +291,7 @@
 .dc-meta-caps {
   font-size: 11px;
   font-weight: 700;
-  color: var(--medical-ink-subtle, #94a3b8);
+  color: var(--medical-ink-subtle, var(--cdl-ink-subtle, #475569));
   letter-spacing: 0.06em;
 }
 
@@ -339,7 +339,7 @@
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  color: var(--medical-ink-subtle, #94a3b8);
+  color: var(--medical-ink-subtle, var(--cdl-ink-subtle, #475569));
 }
 
 .dc-resource-chip--on {
@@ -360,7 +360,7 @@
 
 .dc-muted-strong {
   font-weight: 700;
-  color: var(--medical-ink-subtle, #94a3b8);
+  color: var(--medical-ink-subtle, var(--cdl-ink-subtle, #475569));
 }
 
 .dc-row-between {

@@ -92,7 +92,7 @@
 }
 
 .emergency-whiteboard-page__command-layer-meta {
-  color: var(--color-text-muted, #9ca3af);
+  color: var(--color-text-muted, var(--cdl-ink-muted, #334155));
   font-size: 12px;
   font-weight: 750;
 }
@@ -122,7 +122,7 @@
 }
 
 .emergency-whiteboard-page__command-metric-btn:disabled {
-  color: var(--color-text-muted, #9ca3af);
+  color: var(--color-text-muted, var(--cdl-ink-muted, #334155));
   cursor: not-allowed;
   opacity: 0.58;
 }
@@ -172,7 +172,7 @@
 }
 
 .emergency-whiteboard-page__mission-eyebrow {
-  color: var(--status-info, #94a3b8);
+  color: var(--status-info, var(--cdl-ink-subtle, #475569));
   font-size: 11px;
   font-weight: 900;
   letter-spacing: 0.08em;
@@ -205,13 +205,13 @@
 .emergency-whiteboard-page__mission-link-btn {
   background: transparent;
   border: 0;
-  color: var(--status-info, #94a3b8);
+  color: var(--status-info, var(--cdl-ink-subtle, #475569));
   cursor: pointer;
   font-weight: 850;
 }
 
 .emergency-whiteboard-page__mission-link-btn:disabled {
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, var(--cdl-ink-muted, #334155));
   cursor: not-allowed;
 }
 
@@ -222,7 +222,7 @@
 }
 
 .emergency-whiteboard-page__mission-empty {
-  color: var(--color-text-muted, #9ca3af);
+  color: var(--color-text-muted, var(--cdl-ink-muted, #334155));
   font-size: 13px;
   margin: 0;
 }
@@ -252,7 +252,7 @@
 }
 
 .emergency-whiteboard-page__mission-btn:disabled {
-  color: var(--color-text-muted, #6b7280);
+  color: var(--color-text-muted, var(--cdl-ink-muted, #334155));
   cursor: not-allowed;
   opacity: 0.58;
 }
@@ -260,8 +260,8 @@
 /* EMS arrival cards */
 .emergency-whiteboard-page__arrival-card {
   background: var(--color-surface, var(--app-surface-1, #ffffff));
-  border: 1px solid color-mix(in srgb, var(--status-info, #94a3b8) 22%, var(--cdl-clinical-border, var(--color-border-default, var(--medical-border, #e0f2fe))));
-  border-left: 2px solid color-mix(in srgb, var(--status-info, #94a3b8) 45%, transparent);
+  border: 1px solid color-mix(in srgb, var(--status-info, var(--cdl-ink-subtle, #475569)) 22%, var(--cdl-clinical-border, var(--color-border-default, var(--medical-border, #e0f2fe))));
+  border-left: 2px solid color-mix(in srgb, var(--status-info, var(--cdl-ink-subtle, #475569)) 45%, transparent);
   border-radius: var(--cdl-clinical-radius, 12px);
   box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
   display: grid;
@@ -276,7 +276,7 @@
 }
 
 .emergency-whiteboard-page__arrival-detail {
-  color: var(--color-text-muted, #9ca3af);
+  color: var(--color-text-muted, var(--cdl-ink-muted, #334155));
   font-size: 12px;
   margin: 3px 0 0;
 }
@@ -288,7 +288,7 @@
 
 .emergency-whiteboard-page__arrival-btn--prepare {
   background: var(--color-floating-surface, var(--app-surface-elevated, #ffffff));
-  border: 1px solid color-mix(in srgb, var(--status-info, #94a3b8) 40%, var(--color-border-default, var(--medical-border, #e0f2fe)));
+  border: 1px solid color-mix(in srgb, var(--status-info, var(--cdl-ink-subtle, #475569)) 40%, var(--color-border-default, var(--medical-border, #e0f2fe)));
   border-radius: 8px;
   color: var(--medical-status-info-text, #475569);
   cursor: pointer;
@@ -378,7 +378,7 @@
 
 .emergency-whiteboard-page__referral-task-detail,
 .emergency-whiteboard-page__reassess-task-detail {
-  color: var(--color-text-secondary, #6b7280);
+  color: var(--color-text-secondary, var(--cdl-ink-muted, #334155));
   font-size: 12px;
 }
 
@@ -419,7 +419,7 @@
 }
 
 .emergency-whiteboard-page__awareness-banner-subtitle {
-  color: var(--medical-text-muted, #6b7280);
+  color: var(--medical-text-muted, var(--cdl-ink-muted, #334155));
   font-size: 12px;
 }
 
@@ -462,7 +462,7 @@
 }
 
 .emergency-whiteboard-page__awareness-meta {
-  color: var(--color-text-muted, #9ca3af);
+  color: var(--color-text-muted, var(--cdl-ink-muted, #334155));
   font-size: 12px;
   font-weight: 750;
 }
@@ -493,7 +493,7 @@
 
 /* Inbound EMS banner */
 .emergency-whiteboard-page__inbound-banner {
-  background: color-mix(in srgb, var(--color-secondary, #94a3b8) 8%, var(--color-surface, var(--app-surface-1, #ffffff)));
+  background: color-mix(in srgb, var(--color-secondary, var(--cdl-ink-subtle, #475569)) 8%, var(--color-surface, var(--app-surface-1, #ffffff)));
   border-bottom: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   display: grid;
   gap: 8px;
@@ -516,8 +516,8 @@
 
 .emergency-whiteboard-page__inbound-banner-card {
   background: var(--color-card, var(--app-surface-2, #ffffff));
-  border: 1px solid color-mix(in srgb, var(--color-secondary, #94a3b8) 22%, var(--cdl-clinical-border, var(--color-border-default, var(--medical-border, #e0f2fe))));
-  border-left: 2px solid color-mix(in srgb, var(--color-secondary, #94a3b8) 45%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-secondary, var(--cdl-ink-subtle, #475569)) 22%, var(--cdl-clinical-border, var(--color-border-default, var(--medical-border, #e0f2fe))));
+  border-left: 2px solid color-mix(in srgb, var(--color-secondary, var(--cdl-ink-subtle, #475569)) 45%, transparent);
   border-radius: var(--cdl-clinical-radius, 12px);
   box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
   color: var(--color-text-primary, #111827);
@@ -534,7 +534,7 @@
 }
 
 .emergency-whiteboard-page__inbound-banner-card-meta {
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, var(--cdl-ink-muted, #334155));
   font-size: 12px;
 }
 
@@ -588,7 +588,7 @@
   background: transparent;
   border: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   border-radius: 999px;
-  color: var(--color-text-muted, #9ca3af);
+  color: var(--color-text-muted, var(--cdl-ink-muted, #334155));
   cursor: pointer;
   font-size: 13px;
   font-weight: 600;
@@ -631,7 +631,7 @@
 }
 
 .emergency-whiteboard-page__card-key-swatch--ems {
-  background: var(--color-secondary, #94a3b8);
+  background: var(--color-secondary, var(--cdl-ink-subtle, #475569));
 }
 
 .emergency-whiteboard-page__card-key-swatch--boarding {
@@ -771,12 +771,12 @@
 }
 
 .emergency-whiteboard-page__display-banner-subtitle {
-  color: var(--color-text-muted, #9ca3af);
+  color: var(--color-text-muted, var(--cdl-ink-muted, #334155));
   font-size: 12px;
 }
 
 .emergency-whiteboard-page__display-banner-meta {
-  color: var(--medical-text-muted, #6b7280);
+  color: var(--medical-text-muted, var(--cdl-ink-muted, #334155));
   font-size: 12px;
   font-weight: 750;
 }

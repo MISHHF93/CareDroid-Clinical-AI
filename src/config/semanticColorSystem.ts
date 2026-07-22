@@ -83,7 +83,9 @@ export type SemanticColorRole = keyof typeof SEMANTIC_COLOR_ROLES;
 export const OPERATIONAL_TONE_TO_SEMANTIC: Readonly<Record<string, SemanticColorRole>> =
   Object.freeze({
     critical: 'critical',
+    danger: 'critical',
     warning: 'warning',
+    attention: 'attention',
     watch: 'attention',
     ai: 'ai_assistance',
     copilot: 'ai_assistance',
@@ -96,8 +98,12 @@ export const OPERATIONAL_TONE_TO_SEMANTIC: Readonly<Record<string, SemanticColor
     high: 'urgent',
     stable: 'healthy',
     success: 'healthy',
+    ok: 'healthy',
+    healthy: 'healthy',
     info: 'information',
+    information: 'information',
     neutral: 'inactive',
+    inactive: 'inactive',
   });
 
 export function resolveSemanticColorRole(

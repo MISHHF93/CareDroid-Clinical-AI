@@ -34,7 +34,7 @@
 
 .emergency-pulse__live {
   align-items: center;
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, var(--cdl-ink-muted, #334155));
   display: inline-flex;
   font-size: 12px;
   gap: 8px;
@@ -80,7 +80,7 @@
 }
 
 .emergency-pulse__stat span {
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, var(--cdl-ink-muted, #334155));
   font-size: 12px;
   font-weight: 650;
 }
@@ -131,7 +131,7 @@
 }
 
 .emergency-pulse__section-heading span {
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, var(--cdl-ink-muted, #334155));
   font-size: 12px;
 }
 
@@ -146,7 +146,7 @@
 .emergency-pulse__changes li,
 .emergency-pulse__empty,
 .emergency-pulse__bottleneck {
-  color: var(--medical-text-muted, #6b7280);
+  color: var(--medical-text-muted, var(--cdl-ink-muted, #334155));
   font-size: 13px;
   margin: 0;
 }
@@ -208,7 +208,7 @@
 
 .emergency-pulse__attention-row small,
 .emergency-pulse__attention-row em {
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, var(--cdl-ink-muted, #334155));
   font-size: 12px;
   font-style: normal;
   overflow: hidden;
@@ -238,7 +238,7 @@
 
 .emergency-pulse__queue-row span:not(.emergency-pulse__health),
 .emergency-pulse__queue-row small {
-  color: var(--medical-text-muted, #6b7280);
+  color: var(--medical-text-muted, var(--cdl-ink-muted, #334155));
   font-size: 12px;
   text-align: right;
 }
@@ -291,7 +291,7 @@
   align-items: center;
   background: var(--app-surface-muted, #f1f5f9);
   border-radius: 999px;
-  color: var(--medical-text-muted, #6b7280);
+  color: var(--medical-text-muted, var(--cdl-ink-muted, #334155));
   display: flex;
   font-size: 12px;
   font-weight: 800;
@@ -310,7 +310,7 @@
 }
 
 .emergency-pulse__staff small {
-  color: var(--medical-text-subtle, #9ca3af);
+  color: var(--medical-text-subtle, var(--cdl-ink-muted, #334155));
   font-size: 12px;
 }
 
