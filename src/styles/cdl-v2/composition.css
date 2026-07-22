@@ -1,0 +1,188 @@
+/**
+ * CDL v2 page composition — kill nested card illusion.
+ *
+ * Rule: page shell and zones are FLAT. Only leaf product surfaces
+ * (patient-card, alarm banner/kpi, one summary surface) may paint
+ * border + elevation. Children inside a card must not look like cards.
+ */
+
+/* ── Zones are layout only ── */
+.cdl-operational-page,
+.cd-page-shell__content,
+.emergency-route-page__content,
+[data-cdl-zone],
+.cdl-zone {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.cdl-operational-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cdl-section-gap, 16px);
+}
+
+/* ── Situation summary: ONE outer surface, flat cells ── */
+.emergency-route-situation-brief.cdl-situation-brief,
+.cdl-situation-brief[data-cdl-surface='summary'] {
+  padding: var(--cdl-space-3) var(--cdl-space-4);
+  background: var(--cdl-surface-card);
+  border: 1px solid var(--cdl-border);
+  border-radius: var(--cdl-radius-lg);
+  box-shadow: var(--cdl-elev-1);
+}
+
+.cdl-situation-grid,
+.emergency-route-situation-brief__list--graphic {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+  gap: var(--cdl-space-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Flat cells — not mini-cards */
+.cdl-situation-cell,
+.cdl-situation-graphic-card[data-cdl-surface='flat'],
+li.cdl-situation-cell {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px 10px;
+  align-items: start;
+  min-width: 0;
+  padding: 8px 10px;
+  margin: 0;
+  background: var(--cdl-surface-muted);
+  border: 0;
+  border-radius: var(--cdl-radius-md);
+  box-shadow: none !important;
+  overflow: hidden;
+}
+
+.cdl-situation-cell .cdl-situation-graphic-card__motif,
+.cdl-situation-cell .cdl-graphic-motif {
+  display: none;
+}
+
+/* ── Metric tiles: single surface class only ── */
+.cdl-metric-graphic-card {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  padding: var(--cdl-space-3);
+  background: var(--cdl-surface-card);
+  border: 1px solid var(--cdl-border);
+  border-radius: var(--cdl-radius-lg);
+  box-shadow: var(--cdl-elev-1);
+  color: var(--cdl-ink);
+}
+
+.cdl-metric-graphic-card.emergency-route-card {
+  /* neutralize accidental double class */
+  box-shadow: var(--cdl-elev-1);
+}
+
+/* ── Patient board: flat grid, cards are leaves ── */
+.cdl-patient-board,
+.emergency-route-patient-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+  gap: var(--cdl-space-3);
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.cdl-patient-board__item {
+  min-width: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+/* ── Inside a patient card, never re-paint full card chrome ── */
+.patient-card.cdl-card .patient-card__priority-strip,
+.patient-card .patient-card__meta-grid,
+.patient-card .patient-card__meta-item,
+.patient-card .patient-card__identity,
+.patient-card .patient-card__signals,
+.patient-card .patient-card__secondary-badges,
+.patient-card .patient-card__vitals,
+.patient-card .patient-card__scores,
+.patient-card .patient-card__flags,
+.patient-card .patient-card__mission-actions {
+  box-shadow: none !important;
+}
+
+.patient-card.cdl-card .patient-card__priority-strip {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--cdl-border);
+  border-radius: 0;
+  margin: 0 0 var(--cdl-space-1);
+  padding: 0 0 var(--cdl-space-2);
+  min-height: 0;
+}
+
+/* Collapse nested badge components that ship their own card shells */
+.patient-card .patient-card__secondary-badges [class*='badge'],
+.patient-card .patient-card__secondary-badges [class*='Badge'],
+.patient-card .patient-card__secondary-badges [class*='strip'],
+.patient-card .patient-card__secondary-badges [class*='Strip'] {
+  box-shadow: none !important;
+  max-width: 100%;
+}
+
+.patient-card__more-signals {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.patient-card__more-signals-summary {
+  cursor: pointer;
+  list-style: none;
+  font-size: var(--cdl-text-xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--cdl-ink-muted);
+  padding: 4px 0;
+  user-select: none;
+}
+
+.patient-card__more-signals-summary::-webkit-details-marker {
+  display: none;
+}
+
+.patient-card__more-signals[open] .patient-card__secondary-badges {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--cdl-border);
+}
+
+/* KPI rail is a strip of chips — not a card wrapping cards */
+.cdl-alarm-kpi-rail,
+.emergency-route-metric-kpi-rail {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+/* Journey engine / section blocks: one surface, no nested elev */
+.emergency-route-journey-card.emergency-route-card {
+  box-shadow: var(--cdl-elev-1);
+  padding: var(--cdl-space-3) var(--cdl-space-4);
+}
+
+.emergency-route-journey-card .emergency-route-state-chip {
+  box-shadow: none;
+}

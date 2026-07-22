@@ -27,12 +27,13 @@
   text-transform: uppercase;
 }
 
+/* Outer summary only — composition.css owns the final single-surface treatment */
 .emergency-route-situation-brief {
-  border: 1px solid var(--cdl-border, var(--cdl-clinical-border, var(--ed-border-subtle)));
-  border-radius: var(--cdl-radius-lg, var(--cdl-clinical-radius, var(--radius-lg, 12px)));
+  border: 1px solid var(--cdl-border, var(--ed-border-subtle));
+  border-radius: var(--cdl-radius-lg, 12px);
   background: var(--cdl-surface-card, var(--ed-surface-raised));
-  box-shadow: var(--cdl-elev-2, var(--cdl-clinical-shadow-rest, var(--app-elevation-card)));
-  padding: var(--cdl-space-4, var(--ed-space-4, 16px));
+  box-shadow: var(--cdl-elev-1);
+  padding: var(--cdl-space-3, 12px) var(--cdl-space-4, 16px);
 }
 
 .emergency-route-situation-brief--info {

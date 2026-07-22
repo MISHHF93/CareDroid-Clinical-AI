@@ -48,4 +48,21 @@ describe('CDL v2 card contrast contract', () => {
     expect(patientCss).not.toContain('min-height: 338px');
     expect(patientCss).not.toContain('border-left: 7px');
   });
+
+  it('composition rules keep zones flat and patient board leaf-only', () => {
+    const composition = readFileSync(join(__dirname, 'composition.css'), 'utf8');
+    expect(composition).toContain('data-cdl-zone');
+    expect(composition).toContain('cdl-patient-board');
+    expect(composition).toContain('box-shadow: none');
+    expect(composition).toContain('cdl-situation-cell');
+  });
+
+  it('MetricGraphicCard is a single surface class (no emergency-route-card stack)', () => {
+    const kit = readFileSync(
+      join(__dirname, '../../components/graphics/CdlGraphicKit.tsx'),
+      'utf8',
+    );
+    expect(kit).toContain('cdl-metric-graphic-card');
+    expect(kit).not.toMatch(/cdl-metric-graphic-card['"\s,\n]+'emergency-route-card'/);
+  });
 });

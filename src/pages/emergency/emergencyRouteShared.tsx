@@ -67,10 +67,10 @@ export function WorkflowSituationBrief({
   return (
     <section
       className={[
+        /* One summary surface — cells inside are flat, not nested cards */
         'emergency-route-situation-brief',
         'cdl-situation-brief',
-        'cdl-zone',
-        'cdl-zone--operational-summary',
+        'cdl-surface-flat',
         `emergency-route-situation-brief--${tone}`,
         tone !== 'neutral' ? `cdl-situation-brief--${cdlTone}` : '',
         className,
@@ -78,8 +78,9 @@ export function WorkflowSituationBrief({
         .filter(Boolean)
         .join(' ')}
       aria-label="Workflow situation summary"
+      data-cdl-surface="summary"
     >
-      <ol className="emergency-route-situation-brief__list emergency-route-situation-brief__list--graphic">
+      <ol className="emergency-route-situation-brief__list emergency-route-situation-brief__list--graphic cdl-situation-grid">
         {items.map((item) => (
           <SituationGraphicCard
             key={item.id}
@@ -277,9 +278,16 @@ export function PatientGrid({ patients, emptyMessage }) {
   }
 
   return (
-    <div className="emergency-route-patient-grid cdl-zone cdl-zone--patient-board">
+    <div
+      className="emergency-route-patient-grid cdl-patient-board"
+      data-cdl-surface="board"
+      role="list"
+      aria-label="Patient cards"
+    >
       {patients.map((patient) => (
-        <PatientCard key={patient.id} patient={patient} />
+        <div key={patient.id} className="cdl-patient-board__item" role="listitem">
+          <PatientCard patient={patient} />
+        </div>
       ))}
     </div>
   );

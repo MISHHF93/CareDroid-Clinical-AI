@@ -920,12 +920,13 @@ function PatientCard({
       </div>
       ) : null}
 
-      <div
-        className="patient-card__secondary-badges cdl-badge-row"
-        aria-label="Additional patient signals"
-      >
-        {secondaryHeaderBadges}
-      </div>
+      {/* Nested badge landfill collapsed — expand only on demand (no nested card chrome) */}
+      <details className="patient-card__more-signals">
+        <summary className="patient-card__more-signals-summary">More signals</summary>
+        <div className="patient-card__secondary-badges cdl-badge-row" aria-label="Additional patient signals">
+          {secondaryHeaderBadges}
+        </div>
+      </details>
 
       {cardDensity.showReassessmentTimer && reassessmentTimer ? (
         <ReassessmentTimerStrip timer={reassessmentTimer} className="patient-card__timer-grid" />
