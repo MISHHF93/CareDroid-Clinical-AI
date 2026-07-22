@@ -115,3 +115,25 @@ describe('Profile page migrated to cdl-v2 (Cycle 150)', () => {
     expect(profileCss).toContain('var(--cdl-info-text)');
   });
 });
+
+describe('Profile sub-pages migrated to cdl-v2 (Cycle 151)', () => {
+  const identityPagesCss = readFileSync(join(root, 'pages/profile/ProfileIdentityPages.css'), 'utf8');
+  const settingsCss = readFileSync(join(root, 'pages/ProfileSettings.css'), 'utf8');
+
+  it('ProfileIdentityPages.css (shared by Preferences/Tools/Workspaces/Security/Activity) uses cdl-v2 tokens only', () => {
+    expect(identityPagesCss).toMatch(/--cdl-/);
+    expect(identityPagesCss).not.toMatch(/--app-fg-muted|--panel-border|--panel-background|--card-background|--text-color|#374151|#07120d/);
+  });
+
+  it('fixes the illegible .profile-identity-button (near-black text on dark-slate background)', () => {
+    expect(identityPagesCss).not.toMatch(/#07120d/);
+    const buttonRule = identityPagesCss.slice(identityPagesCss.indexOf('.profile-identity-button {'));
+    expect(buttonRule).toContain('background: var(--cdl-info)');
+    expect(buttonRule).toContain('color: var(--cdl-ink-inverse)');
+  });
+
+  it('ProfileSettings.css uses cdl-v2 for its one color-bearing rule', () => {
+    expect(settingsCss).not.toMatch(/#374151/);
+    expect(settingsCss).toContain('var(--cdl-info-text)');
+  });
+});

@@ -18,7 +18,7 @@
 
 .profile-identity-page__header p {
   margin: 8px 0 0;
-  color: var(--app-fg-muted);
+  color: var(--cdl-ink-muted);
 }
 
 .profile-identity-grid {
@@ -30,8 +30,8 @@
 .profile-identity-card {
   padding: 16px;
   border-radius: 16px;
-  border: 1px solid var(--panel-border);
-  background: var(--panel-background);
+  border: 1px solid var(--cdl-card-border);
+  background: var(--cdl-card-bg);
 }
 
 .profile-identity-card h3 {
@@ -40,7 +40,7 @@
 
 .profile-identity-card p,
 .profile-identity-muted {
-  color: var(--app-fg-muted);
+  color: var(--cdl-ink-muted);
 }
 
 .profile-identity-list {
@@ -54,9 +54,9 @@
   gap: 12px;
   align-items: center;
   padding: 12px;
-  border: 1px solid var(--panel-border);
+  border: 1px solid var(--cdl-card-border);
   border-radius: 14px;
-  background: var(--card-background, var(--panel-background));
+  background: var(--cdl-card-bg);
 }
 
 .profile-identity-row strong,
@@ -65,7 +65,7 @@
 }
 
 .profile-identity-row span {
-  color: var(--app-fg-muted);
+  color: var(--cdl-ink-muted);
   font-size: 13px;
 }
 
@@ -85,9 +85,9 @@
 .profile-identity-form select {
   padding: 10px 12px;
   border-radius: 10px;
-  border: 1px solid var(--panel-border);
-  background: var(--panel-background);
-  color: var(--text-color);
+  border: 1px solid var(--cdl-border-input);
+  background: var(--cdl-surface-card);
+  color: var(--cdl-ink);
 }
 
 .profile-identity-actions {
@@ -100,16 +100,16 @@
   padding: 10px 14px;
   border: 0;
   border-radius: 10px;
-  background: #374151;
-  color: #07120d;
+  background: var(--cdl-info);
+  color: var(--cdl-ink-inverse);
   font-weight: 700;
   cursor: pointer;
 }
 
 .profile-identity-button--secondary {
   background: transparent;
-  color: #374151;
-  border: 1px solid var(--panel-border);
+  color: var(--cdl-info-text);
+  border: 1px solid var(--cdl-card-border);
 }
 
 @media (max-width: 720px) {
