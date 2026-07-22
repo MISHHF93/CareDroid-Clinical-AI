@@ -60,6 +60,15 @@
   --cdl-radius-2xl: 20px;
   --cdl-radius-full: 9999px;
 
+  /* ── Primary workflow card contract (platform-wide) ── */
+  --cdl-card-min-width: 320px;
+  --cdl-card-max-width: 400px;
+  --cdl-card-min-height: 220px;
+  --cdl-card-padding-min: 16px;
+  --cdl-card-padding-max: 24px;
+  --cdl-card-radius-min: 12px;
+  --cdl-card-radius-max: 16px;
+
   /* ── Elevation (clinical depth 0–4) ── */
   --cdl-elev-0: none;
   --cdl-elev-1: 0 1px 2px hsl(222 47% 11% / 0.05), 0 1px 1px hsl(222 47% 11% / 0.03);

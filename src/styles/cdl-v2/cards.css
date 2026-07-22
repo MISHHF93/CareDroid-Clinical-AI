@@ -35,6 +35,20 @@
     transform var(--cdl-duration-fast) var(--cdl-ease-standard);
 }
 
+/**
+ * Primary workflow card contract (CEDS): the standardized shape for patient/
+ * clinician/workflow/AI-recommendation cards in list and grid layouts.
+ * Opt-in modifier — does not change the shared .cdl-card base used elsewhere.
+ */
+.cdl-card--workflow {
+  width: 100%;
+  min-width: var(--cdl-card-min-width);
+  max-width: var(--cdl-card-max-width);
+  min-height: var(--cdl-card-min-height);
+  padding: clamp(var(--cdl-card-padding-min), 2vw, var(--cdl-card-padding-max));
+  border-radius: clamp(var(--cdl-card-radius-min), 1vw, var(--cdl-card-radius-max));
+}
+
 .cdl-card::before {
   content: '';
   position: absolute;
