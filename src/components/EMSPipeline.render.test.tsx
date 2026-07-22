@@ -1,0 +1,138 @@
+import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { render } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
+import EMSPipeline from './EMSPipeline';
+import { HelpHubProvider } from '../contexts/HelpHubContext';
+import { PractitionerVisibilityProvider } from '../contexts/PractitionerVisibilityContext';
+import { RouteChromeProvider } from '../contexts/RouteChromeContext';
+import { useEmergencyStore } from '../store/emergencyStore';
+import type { EmsScreenCapabilities } from '../config/emsScreenModel';
+
+const emsScreenCapabilities: EmsScreenCapabilities = {
+  isEmsScreen: false,
+  screenMode: 'emergency' as any,
+  role: 'paramedic',
+  roleLabel: 'Paramedic',
+  defaultFocus: 'incoming',
+  defaultLandingRoute: '/emergency/ems',
+  emsPath: '/emergency/ems',
+  showWidget: () => true,
+  canPerform: () => true,
+  showInboundAmbulances: true,
+  showEtaDisplay: true,
+  showHandoffChecklist: true,
+  showOffloadTimers: true,
+  showReceivingArea: true,
+  showEncounterConversion: true,
+  showEmsPressure: true,
+  showOperationalStrip: true,
+  canPrepareEmsBay: true,
+  canConvertArrival: true,
+  canCompleteHandoff: true,
+  canCreatePatient: true,
+  canFocusReceivingArea: true,
+  canOpenOffloadTracker: true,
+  visibleOperationalSurfaces: [],
+};
+
+vi.mock('../hooks/useEmsScreen', () => ({
+  useEmsScreen: () => emsScreenCapabilities,
+  default: () => emsScreenCapabilities,
+}));
+
+vi.mock('../hooks/useEmergencyOs', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../hooks/useEmergencyOs')>();
+  return {
+    ...actual,
+    useEMSIntake: () => ({
+      data: { source: 'fixture', generatedAt: new Date().toISOString(), arrivals: [] },
+      loading: false,
+      error: null,
+      refresh: vi.fn(),
+    }),
+  };
+});
+
+vi.mock('../hooks/useEmergencyRolePermissions', () => ({
+  useEmergencyRolePermissions: () => ({
+    role: 'paramedic',
+    roleLabel: 'Paramedic',
+    staffId: 'staff-ems-1',
+    can: () => true,
+    canMutate: () => true,
+    canAccessRoute: () => true,
+    nearestRoute: (path: string) => path,
+    presentAction: () => ({ visible: true, enabled: true }),
+    canonicalProfile: {
+      id: 'staff-ems-1',
+      employeeId: 'staff-ems-1',
+      preferredName: 'EMS Test',
+      fullName: 'EMS Test',
+      hospitalSite: 'Test Hospital',
+      shiftStatus: 'On shift',
+    },
+  }),
+}));
+
+vi.mock('../hooks/useProfileNavigate', () => ({
+  default: () => ({
+    profileNavigate: vi.fn(),
+    rawNavigate: vi.fn(),
+    saasRole: 'paramedic',
+  }),
+}));
+
+const originalState = useEmergencyStore.getState();
+
+beforeEach(() => {
+  useEmergencyStore.setState(
+    {
+      ...originalState,
+      patients: [],
+      emsArrivals: [],
+      staff: [],
+      rooms: [],
+      alerts: [],
+      capacity: originalState.capacity,
+      emergencySettings: originalState.emergencySettings,
+    },
+    true,
+  );
+});
+
+describe('EMSPipeline render', () => {
+  it('renders without throwing', () => {
+    let error: unknown;
+    try {
+      render(
+        <MemoryRouter initialEntries={['/emergency/ems']}>
+          <RouteChromeProvider>
+            <PractitionerVisibilityProvider>
+              <HelpHubProvider>
+                <EMSPipeline />
+              </HelpHubProvider>
+            </PractitionerVisibilityProvider>
+          </RouteChromeProvider>
+        </MemoryRouter>,
+      );
+    } catch (e) {
+      error = e;
+    }
+    expect(error).toBeUndefined();
+  });
+
+  it('renders the empty-inbound state when there are no active arrivals', () => {
+    const { getByText } = render(
+      <MemoryRouter initialEntries={['/emergency/ems']}>
+        <RouteChromeProvider>
+          <PractitionerVisibilityProvider>
+            <HelpHubProvider>
+              <EMSPipeline />
+            </HelpHubProvider>
+          </PractitionerVisibilityProvider>
+        </RouteChromeProvider>
+      </MemoryRouter>,
+    );
+    expect(getByText('No inbound EMS units in the active CareDroid state.')).toBeInTheDocument();
+  });
+});
