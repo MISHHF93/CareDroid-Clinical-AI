@@ -12,15 +12,15 @@
   align-items: center;
   justify-content: flex-end;
   flex: 0 0 auto;
-  height: var(--app-chrome-control-h, 36px);
-  min-height: var(--app-chrome-control-h, 36px);
-  max-height: var(--app-chrome-control-h, 36px);
+  height: var(--cdl-control-height-md, var(--app-chrome-control-h, 36px));
+  min-height: var(--cdl-control-height-md, var(--app-chrome-control-h, 36px));
+  max-height: var(--cdl-control-height-md, var(--app-chrome-control-h, 36px));
   max-width: none;
   padding: 0;
   margin: 0;
   border: 0;
   box-sizing: border-box;
-  z-index: var(--z-sticky, 300);
+  z-index: var(--cdl-z-sticky, var(--z-sticky, 300));
 }
 
 .emergency-app-shell {
@@ -32,50 +32,52 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  height: var(--app-chrome-control-h, 36px);
-  min-height: var(--app-chrome-control-h, 36px);
-  max-height: var(--app-chrome-control-h, 36px);
+  height: var(--cdl-control-height-md, var(--app-chrome-control-h, 36px));
+  min-height: var(--cdl-control-height-md, var(--app-chrome-control-h, 36px));
+  max-height: var(--cdl-control-height-md, var(--app-chrome-control-h, 36px));
   max-width: 100%;
   padding: 0 10px 0 8px;
-  border: 1px solid color-mix(in srgb, var(--medical-border, #e2e8f0) 65%, transparent);
-  border-radius: var(--app-chrome-control-radius, 9px);
-  background: color-mix(in srgb, var(--medical-slate-50, #f8fafc) 40%, #ffffff);
+  border: 1px solid color-mix(in srgb, var(--cdl-border, var(--medical-border, #e2e8f0)) 65%, transparent);
+  border-radius: var(--cdl-radius-md, var(--app-chrome-control-radius, 9px));
+  background: color-mix(in srgb, var(--cdl-slate-50, #f8fafc) 40%, #ffffff);
+  box-shadow: var(--cdl-elev-1, none);
   cursor: pointer;
   font: inherit;
   font-size: 12px;
-  color: var(--medical-ink, #111827);
+  color: var(--cdl-ink, var(--medical-ink, #111827));
   text-align: left;
   box-sizing: border-box;
   line-height: 1;
 }
 
 .operational-alarm-dock__chip:hover {
-  border-color: color-mix(in srgb, #374151 40%, var(--medical-border));
-  background: color-mix(in srgb, #374151 4%, #ffffff);
+  border-color: var(--cdl-border-strong, var(--cdl-slate-300, #cbd5e1));
+  background: var(--cdl-slate-50, #f8fafc);
+  box-shadow: var(--cdl-elev-2, none);
 }
 
 .operational-alarm-dock__chip:focus-visible {
-  outline: 2px solid #374151;
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: var(--cdl-focus-ring, 0 0 0 3px hsl(200 98% 48% / 0.35));
 }
 
 .operational-alarm-dock--tier-critical .operational-alarm-dock__chip {
-  border-color: color-mix(in srgb, var(--status-critical, #ef4444) 45%, var(--medical-border));
-  background: color-mix(in srgb, var(--status-critical, #ef4444) 8%, var(--medical-white));
+  border-color: var(--cdl-critical-border, color-mix(in srgb, #dc2626 55%, #e2e8f0));
+  background: var(--cdl-critical-bg, color-mix(in srgb, #dc2626 12%, #ffffff));
 }
 
 .operational-alarm-dock--tier-high .operational-alarm-dock__chip {
-  border-color: color-mix(in srgb, var(--status-warning, #f59e0b) 45%, var(--medical-border));
-  background: color-mix(in srgb, var(--status-warning, #f59e0b) 9%, var(--medical-white));
+  border-color: var(--cdl-urgent-border, color-mix(in srgb, #ea580c 50%, #e2e8f0));
+  background: var(--cdl-urgent-bg, color-mix(in srgb, #ea580c 12%, #ffffff));
 }
 
 .operational-alarm-dock__chip-icon {
   flex-shrink: 0;
-  color: var(--status-critical, #ef4444);
+  color: var(--cdl-critical, #dc2626);
 }
 
 .operational-alarm-dock--tier-high .operational-alarm-dock__chip-icon {
-  color: var(--status-warning, #f59e0b);
+  color: var(--cdl-urgent, #c2410c);
 }
 
 .operational-alarm-dock__chip-count {

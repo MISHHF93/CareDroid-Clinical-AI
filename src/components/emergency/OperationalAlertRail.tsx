@@ -1,5 +1,7 @@
 import { useMemo } from 'react';
 import type { CareDroidScreenMode } from '../../config/careDroidScreenModes';
+import { AlarmKpi } from '../../alarm';
+import { resolveAlarmSeverity } from '../../alarm/types';
 import OperationalStrip from './OperationalStrip';
 import {
   buildHeaderOperationalAlertMetrics,
@@ -63,6 +65,34 @@ export default function OperationalAlertRail({
     hint: metric.hint,
     interactive: false,
   }));
+
+  if (isHeader) {
+    return (
+      <div
+        className={[
+          'operational-alert-rail',
+          'operational-alert-rail--header',
+          'cdl-alarm-kpi-rail',
+          syncPulse ? 'operational-alert-rail--sync-pulse' : '',
+          className,
+        ]
+          .filter(Boolean)
+          .join(' ')}
+        aria-label={ariaLabel}
+      >
+        {metrics.map((metric) => (
+          <AlarmKpi
+            key={metric.id}
+            severity={resolveAlarmSeverity(metric.tone)}
+            value={metric.value}
+            label={metric.label}
+            size="sm"
+            className="operational-alert-rail__kpi"
+          />
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div
