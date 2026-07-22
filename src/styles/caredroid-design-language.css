@@ -27,8 +27,9 @@
   --cdl-zone-gap: var(--app-layout-section-gap);
   --cdl-panel-gap: var(--app-layout-panel-gap);
   --cdl-zone-padding: var(--cdl-panel-gap);
-  --cdl-secondary-opacity: 0.72;
-  --cdl-tertiary-opacity: 0.56;
+  /* Opacity must not wash operational text — use ink tokens for hierarchy */
+  --cdl-secondary-opacity: 0.92;
+  --cdl-tertiary-opacity: 0.88;
 
   /* —— Motion —— */
   --cdl-motion-fast: 120ms;

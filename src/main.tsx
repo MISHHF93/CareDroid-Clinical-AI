@@ -5,6 +5,8 @@ import './styles/cdl-v2/index.css';
 import './styles/design-system.css';
 import './styles/alarm-system.css';
 import './styles/inline-style-utilities.css';
+/* Re-assert CDL shell readability after legacy cascade (prevents faded header/sidebar). */
+import './styles/cdl-v2/shell-readability.css';
 import './index.css';
 
 import React from 'react';

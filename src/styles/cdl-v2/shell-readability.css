@@ -1,0 +1,51 @@
+/**
+ * Shell readability overrides — CDL ink wins over legacy pale greys
+ * on header/sidebar after design-system cascade loads.
+ */
+
+:is(.app-shell, .emergency-app-shell, .cdl-shell) {
+  color: var(--cdl-ink);
+}
+
+:is(.app-shell, .emergency-app-shell)
+  :is(
+    .app-header,
+    .header,
+    [class*='Header'],
+    .sidebar,
+    [class*='Sidebar'],
+    [class*='sidebar']
+  )
+  :is(
+    [class*='__label'],
+    [class*='__meta'],
+    [class*='__hint'],
+    [class*='__caption'],
+    [class*='__subtitle'],
+    [class*='__eyebrow'],
+    [class*='group-label'],
+    [class*='nav-label'],
+    [class*='section-label']
+  ) {
+  color: var(--cdl-ink-muted) !important;
+  opacity: 1 !important;
+}
+
+:is(.app-shell, .emergency-app-shell)
+  :is(.app-header, .header, .sidebar, [class*='Sidebar'])
+  :is(h1, h2, h3, h4, strong, [class*='__title'], [class*='brand']) {
+  color: var(--cdl-ink) !important;
+  opacity: 1 !important;
+}
+
+/* Search / muted chrome placeholders stay subtle but readable */
+:is(.app-shell, .emergency-app-shell) :is(input, textarea)::placeholder {
+  color: var(--cdl-ink-subtle);
+  opacity: 1;
+}
+
+/* Theme toggle / icon buttons inherit ink, not washed grey */
+:is(.app-shell, .emergency-app-shell) :is(button, a)[class*='theme'],
+:is(.app-shell, .emergency-app-shell) [class*='ThemeToggle'] {
+  color: var(--cdl-ink-muted);
+}

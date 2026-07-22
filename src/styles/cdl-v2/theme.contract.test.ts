@@ -73,4 +73,23 @@ describe('CDL v2 theme contract', () => {
     expect(textNorm).toContain('--cdl-ink');
     expect(textNorm).toContain('--cdl-ink-muted');
   });
+
+  it('shell-readability re-asserts CDL ink after legacy cascade', () => {
+    const shell = readFileSync(join(__dirname, 'shell-readability.css'), 'utf8');
+    const main = readFileSync(join(__dirname, '../../main.tsx'), 'utf8');
+    expect(shell).toContain('--cdl-ink-muted');
+    expect(shell).toContain('opacity: 1 !important');
+    expect(main).toContain('shell-readability.css');
+    // loaded after design-system.css
+    const ds = main.indexOf('design-system.css');
+    const sr = main.indexOf('shell-readability.css');
+    expect(sr).toBeGreaterThan(ds);
+  });
+
+  it('Header/Sidebar product CSS avoid pale hex fallbacks', () => {
+    const header = readFileSync(join(__dirname, '../../components/Header.css'), 'utf8');
+    const sidebar = readFileSync(join(__dirname, '../../components/Sidebar.css'), 'utf8');
+    expect(header).not.toContain('#9ca3af');
+    expect(sidebar).not.toContain('#9ca3af');
+  });
 });
