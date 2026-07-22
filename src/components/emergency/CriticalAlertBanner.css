@@ -1,58 +1,47 @@
+/**
+ * Critical alert strip — consumes CDL v2 semantic tokens.
+ * Visual weight comes from .cdl-alarm-banner + data-severity.
+ */
+
 .critical-alert-banner {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 16px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  border: 2px solid transparent;
+  gap: var(--cdl-space-2-5, 10px);
+  padding: var(--cdl-space-2-5, 10px) var(--cdl-space-4, 16px);
+  border-radius: var(--cdl-radius-md, 8px);
+  font-size: var(--cdl-text-sm, 14px);
+  font-weight: var(--cdl-font-medium, 500);
 }
 
-.critical-alert-banner--critical {
-  background: color-mix(in srgb, #ef4444 12%, var(--app-surface-1, #fff));
-  border-color: color-mix(in srgb, #ef4444 40%, transparent);
-  color: #7f1d1d;
-}
-
-.critical-alert-banner--high {
-  background: color-mix(in srgb, #f59e0b 12%, var(--app-surface-1, #fff));
-  border-color: color-mix(in srgb, #f59e0b 40%, transparent);
-  color: #78350f;
-}
-
-.critical-alert-banner__dot {
+.critical-alert-banner__icon {
   flex-shrink: 0;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  animation: alert-dot-pulse 1.2s ease-in-out infinite alternate;
-}
-
-.critical-alert-banner--critical .critical-alert-banner__dot { background: #ef4444; }
-.critical-alert-banner--high    .critical-alert-banner__dot { background: #f59e0b; }
-
-@keyframes alert-dot-pulse {
-  from { opacity: 1; transform: scale(1); }
-  to   { opacity: 0.4; transform: scale(0.8); }
+  display: inline-flex;
 }
 
 .critical-alert-banner__message {
   flex: 1;
   min-width: 0;
+  color: inherit;
+}
+
+.critical-alert-banner[data-severity='critical'] .critical-alert-banner__message,
+.critical-alert-banner[data-severity='critical'] .critical-alert-banner__icon {
+  color: var(--cdl-critical-text, #991b1b);
+}
+
+.critical-alert-banner[data-severity='urgent'] .critical-alert-banner__message,
+.critical-alert-banner[data-severity='urgent'] .critical-alert-banner__icon {
+  color: var(--cdl-urgent-text, #9a3412);
 }
 
 .critical-alert-banner__link {
   flex-shrink: 0;
-  padding: 4px 12px;
-  border-radius: 5px;
-  font-size: 13px;
-  font-weight: 700;
   text-decoration: none;
-  border: 1.5px solid currentColor;
-  color: inherit;
   white-space: nowrap;
-  transition: opacity 0.15s;
 }
 
-.critical-alert-banner__link:hover { opacity: 0.75; }
+@media (prefers-reduced-motion: reduce) {
+  .critical-alert-banner.cdl-alarm-banner--pulse {
+    animation: none !important;
+  }
+}

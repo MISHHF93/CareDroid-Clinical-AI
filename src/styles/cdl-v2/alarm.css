@@ -1,0 +1,471 @@
+/**
+ * CareDroid Design Language v2 — unified alarm system.
+ * Severity via data-severity="critical|urgent|warning|info|ok|neutral|ai".
+ * Surfaces: .cdl-alarm-kpi | .cdl-alarm-row | .cdl-alarm-banner | .cdl-alarm-rail | .cdl-alarm-dock
+ */
+
+/* ── KPI chip ── */
+.cdl-alarm-kpi {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2px;
+  flex: 0 0 auto;
+  min-width: 68px;
+  max-width: 128px;
+  min-height: 38px;
+  padding: 5px 10px 5px 12px;
+  border: 1px solid var(--cdl-neutral-border);
+  border-radius: var(--cdl-radius-md);
+  background: var(--cdl-neutral-bg);
+  box-sizing: border-box;
+  list-style: none;
+  overflow: hidden;
+  box-shadow: var(--cdl-elev-1);
+}
+
+.cdl-alarm-kpi::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: transparent;
+  border-radius: var(--cdl-radius-md) 0 0 var(--cdl-radius-md);
+}
+
+.cdl-alarm-kpi__value {
+  color: var(--cdl-ink);
+  font-family: var(--cdl-font-mono);
+  font-size: var(--cdl-text-sm);
+  font-weight: var(--cdl-font-bold);
+  line-height: 1.15;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.cdl-alarm-kpi__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--cdl-ink-muted);
+  font-size: 10.5px;
+  font-weight: 650;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.cdl-alarm-kpi__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 14px;
+  height: 14px;
+  padding: 0 4px;
+  border-radius: var(--cdl-radius-full);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--cdl-ink-inverse);
+}
+
+/* Severity modifiers */
+.cdl-alarm-kpi[data-severity='critical'],
+.cdl-alarm-banner[data-severity='critical'],
+.cdl-alarm-row[data-severity='critical'] {
+  border-color: var(--cdl-critical-border);
+  background: var(--cdl-critical-bg);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--cdl-critical) 18%, transparent),
+    var(--cdl-elev-2);
+}
+
+.cdl-alarm-kpi[data-severity='critical']::before,
+.cdl-alarm-banner[data-severity='critical']::before,
+.cdl-alarm-row[data-severity='critical']::before {
+  background: var(--cdl-critical);
+  width: 4px;
+}
+
+.cdl-alarm-kpi[data-severity='critical'] .cdl-alarm-kpi__value,
+.cdl-alarm-kpi[data-severity='critical'] .cdl-alarm-kpi__label {
+  color: var(--cdl-critical-text);
+}
+
+.cdl-alarm-kpi[data-severity='critical'] .cdl-alarm-kpi__badge {
+  background: var(--cdl-critical);
+}
+
+.cdl-alarm-kpi[data-severity='urgent'],
+.cdl-alarm-banner[data-severity='urgent'],
+.cdl-alarm-row[data-severity='urgent'] {
+  border-color: var(--cdl-urgent-border);
+  background: var(--cdl-urgent-bg);
+}
+
+.cdl-alarm-kpi[data-severity='urgent']::before,
+.cdl-alarm-banner[data-severity='urgent']::before,
+.cdl-alarm-row[data-severity='urgent']::before {
+  background: var(--cdl-urgent);
+  width: 4px;
+}
+
+.cdl-alarm-kpi[data-severity='urgent'] .cdl-alarm-kpi__value,
+.cdl-alarm-kpi[data-severity='urgent'] .cdl-alarm-kpi__label {
+  color: var(--cdl-urgent-text);
+}
+
+.cdl-alarm-kpi[data-severity='warning'],
+.cdl-alarm-banner[data-severity='warning'],
+.cdl-alarm-row[data-severity='warning'] {
+  border-color: var(--cdl-warning-border);
+  background: var(--cdl-warning-bg);
+}
+
+.cdl-alarm-kpi[data-severity='warning']::before,
+.cdl-alarm-banner[data-severity='warning']::before,
+.cdl-alarm-row[data-severity='warning']::before {
+  background: var(--cdl-warning);
+  width: 4px;
+}
+
+.cdl-alarm-kpi[data-severity='warning'] .cdl-alarm-kpi__value,
+.cdl-alarm-kpi[data-severity='warning'] .cdl-alarm-kpi__label {
+  color: var(--cdl-warning-text);
+}
+
+.cdl-alarm-kpi[data-severity='warning'] .cdl-alarm-kpi__badge {
+  background: var(--cdl-warning);
+  color: #ffffff;
+}
+
+.cdl-alarm-kpi[data-severity='info'],
+.cdl-alarm-banner[data-severity='info'],
+.cdl-alarm-row[data-severity='info'] {
+  border-color: var(--cdl-info-border);
+  background: var(--cdl-info-bg);
+}
+
+.cdl-alarm-kpi[data-severity='info']::before {
+  background: var(--cdl-info);
+}
+
+.cdl-alarm-kpi[data-severity='info'] .cdl-alarm-kpi__value {
+  color: var(--cdl-info-text);
+}
+
+.cdl-alarm-kpi[data-severity='ok'],
+.cdl-alarm-banner[data-severity='ok'],
+.cdl-alarm-row[data-severity='ok'] {
+  border-color: var(--cdl-ok-border);
+  background: var(--cdl-ok-bg);
+}
+
+.cdl-alarm-kpi[data-severity='ok']::before {
+  background: var(--cdl-ok);
+}
+
+.cdl-alarm-kpi[data-severity='ok'] .cdl-alarm-kpi__value {
+  color: var(--cdl-ok-text);
+}
+
+.cdl-alarm-kpi[data-severity='ai'],
+.cdl-alarm-banner[data-severity='ai'] {
+  border-color: var(--cdl-ai-border);
+  background: var(--cdl-ai-bg);
+}
+
+.cdl-alarm-kpi[data-severity='ai']::before {
+  background: var(--cdl-ai);
+}
+
+.cdl-alarm-kpi[data-severity='ai'] .cdl-alarm-kpi__value,
+.cdl-alarm-kpi[data-severity='ai'] .cdl-alarm-kpi__label {
+  color: var(--cdl-ai-text);
+}
+
+/* Pulse only for unacked critical */
+.cdl-alarm-kpi--pulse[data-severity='critical'],
+.cdl-alarm-banner--pulse[data-severity='critical'] {
+  animation: cdl-alarm-critical-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes cdl-alarm-critical-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--cdl-critical) 22%, transparent),
+      var(--cdl-elev-2);
+  }
+  50% {
+    box-shadow:
+      0 0 0 3px color-mix(in srgb, var(--cdl-critical) 28%, transparent),
+      0 4px 14px color-mix(in srgb, var(--cdl-critical) 22%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cdl-alarm-kpi--pulse,
+  .cdl-alarm-banner--pulse {
+    animation: none !important;
+  }
+}
+
+.cdl-alarm-kpi--sm {
+  min-width: 58px;
+  min-height: 32px;
+  padding: 3px 8px 3px 10px;
+}
+
+.cdl-alarm-kpi-rail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cdl-space-2);
+  align-items: stretch;
+}
+
+/* ── Banner ── */
+.cdl-alarm-banner {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--cdl-space-3);
+  padding: var(--cdl-space-3) var(--cdl-space-4) var(--cdl-space-3) var(--cdl-space-4);
+  border: 1px solid var(--cdl-border);
+  border-radius: var(--cdl-radius-lg);
+  background: var(--cdl-surface-card);
+  box-shadow: var(--cdl-elev-2);
+  color: var(--cdl-ink);
+}
+
+.cdl-alarm-banner::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  border-radius: var(--cdl-radius-lg) 0 0 var(--cdl-radius-lg);
+  background: var(--cdl-slate-400);
+}
+
+.cdl-alarm-banner__icon {
+  flex-shrink: 0;
+  display: inline-flex;
+  color: inherit;
+  margin-top: 1px;
+}
+
+.cdl-alarm-banner__body {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--cdl-space-1);
+}
+
+.cdl-alarm-banner__title {
+  margin: 0;
+  font-size: var(--cdl-text-md);
+  font-weight: var(--cdl-font-semibold);
+  line-height: var(--cdl-leading-snug);
+}
+
+.cdl-alarm-banner__message {
+  margin: 0;
+  font-size: var(--cdl-text-sm);
+  color: var(--cdl-ink-muted);
+  line-height: var(--cdl-leading-normal);
+}
+
+.cdl-alarm-banner[data-severity='critical'] .cdl-alarm-banner__title,
+.cdl-alarm-banner[data-severity='critical'] .cdl-alarm-banner__icon {
+  color: var(--cdl-critical-text);
+}
+
+.cdl-alarm-banner[data-severity='urgent'] .cdl-alarm-banner__title,
+.cdl-alarm-banner[data-severity='urgent'] .cdl-alarm-banner__icon {
+  color: var(--cdl-urgent-text);
+}
+
+.cdl-alarm-banner[data-severity='warning'] .cdl-alarm-banner__title,
+.cdl-alarm-banner[data-severity='warning'] .cdl-alarm-banner__icon {
+  color: var(--cdl-warning-text);
+}
+
+.cdl-alarm-banner__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cdl-space-2);
+  flex-shrink: 0;
+  align-items: center;
+}
+
+.cdl-alarm-banner__action {
+  appearance: none;
+  border: 1px solid var(--cdl-border-strong);
+  background: var(--cdl-white);
+  color: var(--cdl-ink);
+  border-radius: var(--cdl-radius-md);
+  min-height: var(--cdl-control-height-sm);
+  padding: 0 var(--cdl-space-3);
+  font-size: var(--cdl-text-sm);
+  font-weight: var(--cdl-font-semibold);
+  cursor: pointer;
+  box-shadow: var(--cdl-elev-1);
+  transition:
+    background var(--cdl-duration-fast) var(--cdl-ease-standard),
+    box-shadow var(--cdl-duration-fast) var(--cdl-ease-standard);
+}
+
+.cdl-alarm-banner__action:hover {
+  background: var(--cdl-slate-50);
+  box-shadow: var(--cdl-elev-2);
+}
+
+.cdl-alarm-banner__action:focus-visible {
+  outline: none;
+  box-shadow: var(--cdl-focus-ring);
+}
+
+.cdl-alarm-banner__action--primary {
+  background: var(--cdl-brand-600);
+  border-color: var(--cdl-brand-700);
+  color: var(--cdl-on-brand);
+}
+
+.cdl-alarm-banner__action--primary:hover {
+  background: var(--cdl-brand-700);
+}
+
+.cdl-alarm-banner[data-severity='critical'] .cdl-alarm-banner__action--primary {
+  background: var(--cdl-critical);
+  border-color: var(--cdl-critical-text);
+}
+
+/* ── Row (list) ── */
+.cdl-alarm-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: var(--cdl-space-3);
+  align-items: center;
+  padding: var(--cdl-space-3) var(--cdl-space-3) var(--cdl-space-3) var(--cdl-space-4);
+  border: 1px solid var(--cdl-border);
+  border-radius: var(--cdl-radius-md);
+  background: var(--cdl-surface-card);
+  box-shadow: var(--cdl-elev-1);
+}
+
+.cdl-alarm-row::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  border-radius: var(--cdl-radius-md) 0 0 var(--cdl-radius-md);
+  background: var(--cdl-slate-300);
+}
+
+/* ── Rail ── */
+.cdl-alarm-rail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cdl-space-2);
+  padding: var(--cdl-space-3);
+  background: var(--cdl-surface-muted);
+  border: 1px solid var(--cdl-border);
+  border-radius: var(--cdl-radius-lg);
+  box-shadow: var(--cdl-elev-1);
+}
+
+.cdl-alarm-rail__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cdl-space-2);
+}
+
+.cdl-alarm-rail__title {
+  margin: 0;
+  font-size: var(--cdl-text-sm);
+  font-weight: var(--cdl-font-semibold);
+  color: var(--cdl-ink);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.cdl-alarm-rail__count {
+  font-size: var(--cdl-text-xs);
+  font-weight: var(--cdl-font-bold);
+  color: var(--cdl-ink-muted);
+  font-family: var(--cdl-font-mono);
+}
+
+.cdl-alarm-rail__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cdl-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cdl-alarm-rail__empty {
+  margin: 0;
+  font-size: var(--cdl-text-sm);
+  color: var(--cdl-ink-subtle);
+  padding: var(--cdl-space-2) 0;
+}
+
+/* ── Global dock (critical strip) ── */
+.cdl-alarm-dock {
+  position: sticky;
+  top: 0;
+  z-index: var(--cdl-z-alarm-dock);
+  display: flex;
+  flex-direction: column;
+  gap: var(--cdl-space-2);
+  padding: var(--cdl-space-2) var(--cdl-page-gutter);
+  background: color-mix(in srgb, var(--cdl-critical-bg) 92%, #ffffff);
+  border-bottom: 1px solid var(--cdl-critical-border);
+  box-shadow: var(--cdl-elev-3);
+}
+
+.cdl-alarm-dock[data-empty='true'] {
+  display: none;
+}
+
+.cdl-alarm-dock__live {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Legacy class bridges (alarm-system.css consumers) ── */
+.alarm-kpi {
+  composes: none;
+}
+
+/* Map legacy data-alarm → same visuals via attribute selectors on old classes */
+.alarm-kpi,
+.alarm-kpi[data-alarm] {
+  /* ensure old chips pick up cdl colors when both sheets load */
+}

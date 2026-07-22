@@ -1,0 +1,134 @@
+/**
+ * CareDroid Design Language v2 — temporary compatibility aliases.
+ * Maps legacy --cd-*, --app-*, --medical-*, --alarm-*, --shell-*, --z-* to --cdl-*.
+ * Remove once all consumers migrate.
+ */
+
+:root {
+  /* Shell */
+  --shell-header-height: var(--cdl-header-height);
+  --shell-workspace-height: var(--cdl-workspace-height);
+  --shell-chrome-stack-height: var(--cdl-chrome-stack-height);
+  --shell-sidebar-width: var(--cdl-sidebar-width);
+  --shell-sidebar-width-collapsed: var(--cdl-sidebar-width-collapsed);
+  --shell-content-max: var(--cdl-content-max);
+  --shell-page-gutter: var(--cdl-page-gutter);
+  --shell-control-height: var(--cdl-control-height-md);
+  --shell-touch-target: var(--cdl-touch-min);
+
+  --app-shell-header-height: var(--cdl-header-height);
+  --app-sidebar-width-expanded: var(--cdl-sidebar-width);
+  --app-sidebar-width-collapsed: var(--cdl-sidebar-width-collapsed);
+
+  /* Z-index */
+  --z-base: var(--cdl-z-base);
+  --z-raised: var(--cdl-z-raised);
+  --z-sidebar: var(--cdl-z-sidebar);
+  --z-header: var(--cdl-z-header);
+  --z-sticky: var(--cdl-z-sticky);
+  --z-dropdown: var(--cdl-z-dropdown);
+  --z-overlay: var(--cdl-z-overlay);
+  --z-popover: var(--cdl-z-popover);
+  --z-drawer: var(--cdl-z-drawer);
+  --z-modal: var(--cdl-z-modal);
+  --z-toast: var(--cdl-z-toast);
+  --z-tooltip: var(--cdl-z-tooltip);
+
+  --cd-z-base: var(--cdl-z-base);
+  --cd-z-raised: var(--cdl-z-raised);
+  --cd-z-dropdown: var(--cdl-z-dropdown);
+  --cd-z-sticky: var(--cdl-z-sticky);
+  --cd-z-overlay: var(--cdl-z-overlay);
+  --cd-z-modal: var(--cdl-z-modal);
+  --cd-z-toast: var(--cdl-z-toast);
+  --cd-z-tooltip: var(--cdl-z-tooltip);
+
+  /* Medical / app surfaces */
+  --medical-surface-page: var(--cdl-surface-page);
+  --medical-surface-card: var(--cdl-surface-card);
+  --medical-surface-muted: var(--cdl-surface-muted);
+  --medical-border: var(--cdl-border);
+  --medical-ink: var(--cdl-ink);
+  --medical-ink-muted: var(--cdl-ink-muted);
+  --medical-ink-subtle: var(--cdl-ink-subtle);
+  --medical-accent: var(--cdl-brand-500);
+
+  --app-surface-page: var(--cdl-surface-page);
+  --app-surface-card: var(--cdl-surface-card);
+  --app-border: var(--cdl-border);
+  --app-ink: var(--cdl-ink);
+  --app-accent: var(--cdl-brand-500);
+
+  /* CD component tokens */
+  --cd-text-primary: var(--cdl-ink);
+  --cd-text-secondary: var(--cdl-ink-muted);
+  --cd-text-disabled: var(--cdl-ink-disabled);
+  --cd-text-brand: var(--cdl-brand-600);
+  --cd-text-danger: var(--cdl-critical-text);
+  --cd-success-text: var(--cdl-ok-text);
+  --cd-warning-text: var(--cdl-warning-text);
+
+  --cd-space-2: var(--cdl-space-2);
+  --cd-space-3: var(--cdl-space-3);
+  --cd-space-4: var(--cdl-space-4);
+  --cd-radius-md: var(--cdl-radius-md);
+  --cd-radius-lg: var(--cdl-radius-lg);
+  --cd-shadow-sm: var(--cdl-elev-1);
+  --cd-shadow-md: var(--cdl-elev-2);
+  --cd-shadow-lg: var(--cdl-elev-3);
+  --cd-shadow-focus: var(--cdl-focus-ring);
+
+  /* Alarm legacy */
+  --alarm-critical: var(--cdl-critical);
+  --alarm-critical-bg: var(--cdl-critical-bg);
+  --alarm-critical-border: var(--cdl-critical-border);
+  --alarm-critical-text: var(--cdl-critical-text);
+  --alarm-warning: var(--cdl-warning);
+  --alarm-warning-bg: var(--cdl-warning-bg);
+  --alarm-warning-border: var(--cdl-warning-border);
+  --alarm-warning-text: var(--cdl-warning-text);
+  --alarm-info: var(--cdl-slate-600);
+  --alarm-info-bg: var(--cdl-info-bg);
+  --alarm-info-border: var(--cdl-info-border);
+  --alarm-info-text: var(--cdl-info-text);
+  --alarm-ok: var(--cdl-ok);
+  --alarm-ok-bg: var(--cdl-ok-bg);
+  --alarm-ok-border: var(--cdl-ok-border);
+  --alarm-ok-text: var(--cdl-ok-text);
+  --alarm-neutral-bg: var(--cdl-neutral-bg);
+  --alarm-neutral-border: var(--cdl-neutral-border);
+  --alarm-neutral-text: var(--cdl-neutral-text);
+  --alarm-neutral-label: var(--cdl-ink-muted);
+
+  /* Semantic */
+  --semantic-critical: var(--cdl-critical);
+  --semantic-critical-bg: var(--cdl-critical-bg);
+  --semantic-critical-border: var(--cdl-critical-border);
+  --semantic-urgent: var(--cdl-urgent);
+  --semantic-urgent-bg: var(--cdl-urgent-bg);
+  --semantic-urgent-border: var(--cdl-urgent-border);
+  --semantic-attention: var(--cdl-warning);
+  --semantic-attention-bg: var(--cdl-warning-bg);
+  --semantic-attention-border: var(--cdl-warning-border);
+  --semantic-healthy: var(--cdl-ok);
+  --semantic-healthy-bg: var(--cdl-ok-bg);
+  --semantic-healthy-border: var(--cdl-ok-border);
+  --semantic-information: var(--cdl-info);
+  --semantic-information-bg: var(--cdl-info-bg);
+  --semantic-information-border: var(--cdl-info-border);
+  --semantic-warning: var(--cdl-warning);
+  --semantic-warning-bg: var(--cdl-warning-bg);
+  --semantic-warning-border: var(--cdl-warning-border);
+  --semantic-ai-assistance: var(--cdl-ai);
+  --semantic-ai-assistance-bg: var(--cdl-ai-bg);
+  --semantic-ai-assistance-border: var(--cdl-ai-border);
+  --semantic-operational-status: var(--cdl-ops);
+  --semantic-operational-status-bg: var(--cdl-ops-bg);
+  --semantic-operational-status-border: var(--cdl-ops-border);
+  --semantic-inactive: var(--cdl-slate-500);
+  --semantic-inactive-bg: var(--cdl-slate-100);
+  --semantic-inactive-border: var(--cdl-border);
+  --semantic-infrastructure-health: var(--cdl-ops);
+  --semantic-infrastructure-health-bg: var(--cdl-ops-bg);
+  --semantic-infrastructure-health-border: var(--cdl-ops-border);
+}

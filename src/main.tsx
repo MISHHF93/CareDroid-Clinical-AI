@@ -1,4 +1,7 @@
 import './theme-init';
+/* CDL v2 foundation first — single SSOT for tokens, severity, elevation, shell. */
+import './styles/cdl-v2/index.css';
+/* Legacy design-system cascade remains until full route migration completes. */
 import './styles/design-system.css';
 import './styles/alarm-system.css';
 import './styles/inline-style-utilities.css';

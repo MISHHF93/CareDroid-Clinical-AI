@@ -1,0 +1,30 @@
+/**
+ * CareDroid Design Language v2 — shell dimensions & z-index (single scale).
+ */
+
+:root {
+  --cdl-header-height: 52px;
+  --cdl-workspace-height: 44px;
+  --cdl-chrome-stack-height: calc(var(--cdl-header-height) + var(--cdl-workspace-height));
+  --cdl-header-height-compact: 44px;
+
+  --cdl-sidebar-width: 232px;
+  --cdl-sidebar-width-collapsed: 56px;
+  --cdl-sidebar-drawer-max: min(280px, 88vw);
+  --cdl-mobile-nav-height: 72px;
+
+  /* Z-index: single monotonic scale */
+  --cdl-z-base: 0;
+  --cdl-z-raised: 10;
+  --cdl-z-sidebar: 100;
+  --cdl-z-header: 200;
+  --cdl-z-sticky: 300;
+  --cdl-z-dropdown: 400;
+  --cdl-z-overlay: 500;
+  --cdl-z-popover: 600;
+  --cdl-z-drawer: 700;
+  --cdl-z-modal: 800;
+  --cdl-z-toast: 900;
+  --cdl-z-tooltip: 1000;
+  --cdl-z-alarm-dock: 950;
+}

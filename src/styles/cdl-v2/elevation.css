@@ -1,0 +1,98 @@
+/**
+ * CareDroid Design Language v2 — clinical depth surfaces.
+ */
+
+.cdl-elev-0 {
+  box-shadow: var(--cdl-elev-0);
+}
+
+.cdl-elev-1 {
+  box-shadow: var(--cdl-elev-1);
+}
+
+.cdl-elev-2 {
+  box-shadow: var(--cdl-elev-2);
+}
+
+.cdl-elev-3 {
+  box-shadow: var(--cdl-elev-3);
+}
+
+.cdl-elev-4 {
+  box-shadow: var(--cdl-elev-4);
+}
+
+.cdl-surface {
+  background: var(--cdl-surface-card);
+  border: 1px solid var(--cdl-border);
+  border-radius: var(--cdl-radius-lg);
+  color: var(--cdl-ink);
+  box-shadow: var(--cdl-elev-1);
+}
+
+.cdl-surface--muted {
+  background: var(--cdl-surface-muted);
+}
+
+.cdl-surface--raised {
+  box-shadow: var(--cdl-elev-2);
+}
+
+.cdl-surface--float {
+  box-shadow: var(--cdl-elev-3);
+}
+
+.cdl-surface--modal {
+  box-shadow: var(--cdl-elev-4);
+  border-radius: var(--cdl-radius-xl);
+}
+
+.cdl-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cdl-space-3);
+  padding: var(--cdl-space-4);
+  background: var(--cdl-surface-card);
+  border: 1px solid var(--cdl-border);
+  border-radius: var(--cdl-radius-lg);
+  box-shadow: var(--cdl-elev-1);
+  color: var(--cdl-ink);
+  transition:
+    box-shadow var(--cdl-duration-normal) var(--cdl-ease-standard),
+    border-color var(--cdl-duration-normal) var(--cdl-ease-standard);
+}
+
+.cdl-card:hover {
+  box-shadow: var(--cdl-elev-2);
+  border-color: var(--cdl-border-strong);
+}
+
+.cdl-card--interactive {
+  cursor: pointer;
+}
+
+.cdl-card--interactive:focus-visible {
+  outline: none;
+  box-shadow: var(--cdl-focus-ring), var(--cdl-elev-2);
+}
+
+.cdl-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cdl-space-3);
+  margin-bottom: var(--cdl-space-3);
+}
+
+.cdl-section-header__title {
+  margin: 0;
+  font-size: var(--cdl-text-lg);
+  font-weight: var(--cdl-font-semibold);
+  line-height: var(--cdl-leading-tight);
+  color: var(--cdl-ink);
+}
+
+.cdl-section-header__meta {
+  font-size: var(--cdl-text-sm);
+  color: var(--cdl-ink-muted);
+}

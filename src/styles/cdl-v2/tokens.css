@@ -1,0 +1,111 @@
+/**
+ * CareDroid Design Language v2 — numeric primitives.
+ * Clinical depth: spacing, type, radius, elevation, motion, focus.
+ * New code must use --cdl-* only.
+ */
+
+:root {
+  /* ── Spacing (4px grid) ── */
+  --cdl-space-0: 0;
+  --cdl-space-0-5: 2px;
+  --cdl-space-1: 4px;
+  --cdl-space-1-5: 6px;
+  --cdl-space-2: 8px;
+  --cdl-space-2-5: 10px;
+  --cdl-space-3: 12px;
+  --cdl-space-3-5: 14px;
+  --cdl-space-4: 16px;
+  --cdl-space-5: 20px;
+  --cdl-space-6: 24px;
+  --cdl-space-7: 28px;
+  --cdl-space-8: 32px;
+  --cdl-space-10: 40px;
+  --cdl-space-12: 48px;
+  --cdl-space-14: 56px;
+  --cdl-space-16: 64px;
+
+  --cdl-space-fluid-sm: clamp(8px, 1.5vw, 12px);
+  --cdl-space-fluid-md: clamp(12px, 2vw, 20px);
+  --cdl-space-fluid-lg: clamp(16px, 2.5vw, 28px);
+
+  /* ── Typography ── */
+  --cdl-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --cdl-font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+
+  --cdl-text-2xs: 10px;
+  --cdl-text-xs: 11px;
+  --cdl-text-sm: 13px;
+  --cdl-text-md: 15px;
+  --cdl-text-lg: 17px;
+  --cdl-text-xl: 20px;
+  --cdl-text-2xl: 24px;
+  --cdl-text-3xl: 30px;
+
+  --cdl-font-regular: 400;
+  --cdl-font-medium: 500;
+  --cdl-font-semibold: 600;
+  --cdl-font-bold: 700;
+
+  --cdl-leading-tight: 1.2;
+  --cdl-leading-snug: 1.3;
+  --cdl-leading-normal: 1.5;
+  --cdl-leading-relaxed: 1.6;
+
+  /* ── Radius ── */
+  --cdl-radius-xs: 2px;
+  --cdl-radius-sm: 4px;
+  --cdl-radius-md: 8px;
+  --cdl-radius-lg: 12px;
+  --cdl-radius-xl: 16px;
+  --cdl-radius-2xl: 20px;
+  --cdl-radius-full: 9999px;
+
+  /* ── Elevation (clinical depth 0–4) ── */
+  --cdl-elev-0: none;
+  --cdl-elev-1: 0 1px 2px hsl(222 47% 11% / 0.05), 0 1px 1px hsl(222 47% 11% / 0.03);
+  --cdl-elev-2: 0 2px 6px hsl(222 47% 11% / 0.06), 0 1px 2px hsl(222 47% 11% / 0.04);
+  --cdl-elev-3: 0 8px 16px hsl(222 47% 11% / 0.08), 0 2px 6px hsl(222 47% 11% / 0.04);
+  --cdl-elev-4: 0 16px 40px hsl(222 47% 11% / 0.14), 0 4px 12px hsl(222 47% 11% / 0.06);
+
+  /* ── Focus ── */
+  --cdl-focus-ring: 0 0 0 3px hsl(200 98% 48% / 0.35);
+  --cdl-focus-ring-danger: 0 0 0 3px hsl(0 72% 51% / 0.3);
+
+  /* ── Motion ── */
+  --cdl-duration-instant: 0ms;
+  --cdl-duration-fast: 80ms;
+  --cdl-duration-normal: 150ms;
+  --cdl-duration-slow: 250ms;
+  --cdl-duration-slower: 400ms;
+  --cdl-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --cdl-ease-decelerate: cubic-bezier(0, 0, 0.2, 1);
+  --cdl-ease-accelerate: cubic-bezier(0.4, 0, 1, 1);
+
+  /* ── Control / icon optical sizes ── */
+  --cdl-touch-min: 44px;
+  --cdl-control-height-sm: 32px;
+  --cdl-control-height-md: 36px;
+  --cdl-control-height-lg: 40px;
+  --cdl-icon-xs: 12px;
+  --cdl-icon-sm: 16px;
+  --cdl-icon-md: 20px;
+  --cdl-icon-lg: 24px;
+  --cdl-icon-xl: 32px;
+  --cdl-icon-stroke: 1.85;
+
+  /* ── Layout ── */
+  --cdl-content-max: 1680px;
+  --cdl-content-max-wide: 2400px;
+  --cdl-page-gutter: clamp(16px, 2vw, 24px);
+  --cdl-section-gap: 16px;
+  --cdl-panel-gap: 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --cdl-duration-fast: 0ms;
+    --cdl-duration-normal: 0ms;
+    --cdl-duration-slow: 0ms;
+    --cdl-duration-slower: 0ms;
+  }
+}

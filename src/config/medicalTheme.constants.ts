@@ -1,6 +1,6 @@
 /**
  * Canonical CareDroid medical palette for JS/TS inline styles.
- * CSS should prefer --medical-* / --app-* tokens from medical-color-layer.css.
+ * Prefer CSS --cdl-* / --medical-* / --app-* tokens. Values mirror CDL v2 color.css.
  */
 export const MEDICAL_THEME = Object.freeze({
   surfacePage: '#f8fafc',
@@ -10,7 +10,7 @@ export const MEDICAL_THEME = Object.freeze({
   border: '#e2e8f0',
   borderInput: '#cbd5e1',
   ink: '#111827',
-  // Align with CSS --medical-ink-muted / --medical-ink-subtle (WCAG AA on Medical Light)
+  // Align with CSS --cdl-ink-muted / --medical-ink-muted (WCAG AA on Medical Light)
   inkMuted: '#475569',
   inkSubtle: '#475569',
   inkDisabled: '#d1d5db',
@@ -21,19 +21,20 @@ export const MEDICAL_THEME = Object.freeze({
   accentTintStrong: 'rgba(14, 165, 233, 0.18)',
   accentBorder: 'rgba(14, 165, 233, 0.45)',
   onAccent: '#ffffff',
-  overlay: 'rgba(17, 24, 39, 0.32)',
-  shadow: '0 12px 32px rgba(15, 23, 42, 0.08)',
-  shadowModal: '0 20px 48px rgba(15, 23, 42, 0.12)',
+  overlay: 'rgba(17, 24, 39, 0.4)',
+  // Clinical depth elevation (CDL v2 elev-2 / elev-4)
+  shadow: '0 2px 6px hsl(222 47% 11% / 0.06), 0 1px 2px hsl(222 47% 11% / 0.04)',
+  shadowModal: '0 16px 40px hsl(222 47% 11% / 0.14), 0 4px 12px hsl(222 47% 11% / 0.06)',
   // Solid semantic inks for text-on-white (WCAG AA large ≥3:1 / normal ≥4.5:1)
-  danger: '#b91c1c',
+  danger: '#991b1b',
   warning: '#b45309',
-  warningTint: '#fef3c7',
-  warningBorder: '#92400e',
-  success: '#15803d',
+  warningTint: '#fffbeb',
+  warningBorder: '#b45309',
+  success: '#047857',
   successTint: '#ecfdf5',
-  successBorder: '#166534',
+  successBorder: '#059669',
   criticalTint: '#fef2f2',
-  criticalBorder: '#7f1d1d',
+  criticalBorder: '#dc2626',
 });
 
 /** Text roles for inline TSX styles — mirrors --medical-text-* CSS tokens. */

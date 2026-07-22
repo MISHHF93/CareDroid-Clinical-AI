@@ -9,17 +9,18 @@ type IconColor =
   | 'danger'
   | 'success'
   | 'warning'
+  | 'ai'
   | 'inherit';
 
-type TablerIconComponent = React.ComponentType<{
+type IconComponentType = React.ComponentType<{
   size?: number;
   className?: string;
   'aria-hidden'?: boolean;
-  style?: React.CSSProperties;
+  strokeWidth?: number;
 }>;
 
 type IconProps = {
-  icon: TablerIconComponent;
+  icon: IconComponentType;
   size?: IconSize;
   color?: IconColor;
   className?: string;
@@ -34,17 +35,9 @@ const SIZE_MAP: Record<IconSize, number> = {
   xl: 32,
 };
 
-const COLOR_MAP: Record<IconColor, string> = {
-  primary:   'var(--cd-text-primary)',
-  secondary: 'var(--cd-text-secondary)',
-  disabled:  'var(--cd-text-disabled)',
-  brand:     'var(--cd-text-brand)',
-  danger:    'var(--cd-text-danger)',
-  success:   'var(--cd-success-text)',
-  warning:   'var(--cd-warning-text)',
-  inherit:   'currentColor',
-};
-
+/**
+ * CDL v2 Icon — lucide/tabler-compatible. Color & size via CSS tokens (no hex).
+ */
 export function Icon({
   icon: IconComponent,
   size = 'md',
@@ -53,26 +46,25 @@ export function Icon({
   label,
 }: IconProps) {
   const px = SIZE_MAP[size];
-  const colorValue = COLOR_MAP[color];
+  const wrapClass = ['cdl-icon', `cdl-icon--${size}`, `cdl-icon--${color}`, className]
+    .filter(Boolean)
+    .join(' ');
+
+  const glyph = (
+    <IconComponent size={px} className="cdl-icon__glyph" aria-hidden strokeWidth={1.85} />
+  );
 
   if (label) {
     return (
-      <span
-        role="img"
-        aria-label={label}
-        style={{ display: 'inline-flex', color: colorValue, flexShrink: 0 }}
-      >
-        <IconComponent size={px} className={className} aria-hidden />
+      <span role="img" aria-label={label} className={wrapClass}>
+        {glyph}
       </span>
     );
   }
 
   return (
-    <IconComponent
-      size={px}
-      className={className}
-      aria-hidden
-      style={{ color: colorValue, flexShrink: 0 } as React.CSSProperties}
-    />
+    <span className={wrapClass} aria-hidden>
+      {glyph}
+    </span>
   );
 }
