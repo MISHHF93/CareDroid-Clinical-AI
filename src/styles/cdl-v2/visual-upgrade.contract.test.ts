@@ -98,3 +98,20 @@ describe('patient-card pill AA contract', () => {
     }
   });
 });
+
+describe('Profile page migrated to cdl-v2 (Cycle 150)', () => {
+  const profileCss = readFileSync(join(root, 'pages/Profile.css'), 'utf8');
+
+  it('uses cdl-v2 tokens, not the legacy --medical-*/--app-*/--surface-* family', () => {
+    expect(profileCss).toMatch(/--cdl-/);
+    expect(profileCss).not.toMatch(/--medical-|--app-desktop-page-padding|--app-mobile-page-padding|--app-fg-muted|--surface-1|--surface-2|--panel-border|--panel-background|--semantic-attention|--text-color|--text-muted/);
+  });
+
+  it('has no hardcoded hex/rgba color literals left over from the legacy slate accent', () => {
+    expect(profileCss).not.toMatch(/#374151|#b45309|#b91c1c|#fffbeb/i);
+  });
+
+  it('links and CTAs use the semantic info tone instead of a flat neutral slate', () => {
+    expect(profileCss).toContain('var(--cdl-info-text)');
+  });
+});
