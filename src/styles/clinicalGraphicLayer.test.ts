@@ -53,7 +53,10 @@ describe('clinical graphic layer', () => {
 
   it('upgrades patient cards with acuity rings', () => {
     expect(patientCardSource).toContain('PatientAcuityRing');
-    expect(patientCardSource).toContain('patient-card__priority-strip--graphic');
+    // The --graphic BEM modifier was folded into the base class once the
+    // graphic acuity-ring treatment became the only treatment (no plain
+    // variant left to distinguish it from).
+    expect(patientCardSource).toContain('patient-card__priority-strip');
   });
 
   it('upgrades EMS pipeline rows with unit track graphics', () => {

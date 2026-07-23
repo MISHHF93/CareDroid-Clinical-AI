@@ -5,6 +5,7 @@ const capabilityStatus = vi.hoisted(() => vi.fn((_capability: string) => 'real')
 const fetchEvaluationDashboard = vi.hoisted(() => vi.fn());
 const fetchMemoryDashboard = vi.hoisted(() => vi.fn());
 const fetchMyAuditLogs = vi.hoisted(() => vi.fn());
+const fetchUnifiedAiNodeModelsHealth = vi.hoisted(() => vi.fn());
 
 const evaluationDashboard = vi.hoisted(() => ({
   aggregateMetrics: {
@@ -89,6 +90,20 @@ vi.mock('./auditApi', () => ({
   fetchMyAuditLogs: (...args) => fetchMyAuditLogs(...args),
 }));
 
+vi.mock('./unifiedAiNodeApi', () => ({
+  LOCAL_UNIFIED_AI_NODE_HEALTH: {
+    status: 'unknown',
+    nodeId: 'caredroid-unified-ai-node',
+    singleNode: true,
+    quarantine: 'none',
+    ready: false,
+    scores: { nluAccuracy: 1, artifactRouterAccuracy: 0.9645, composite: 0.9823 },
+    source: 'fallback',
+    message: 'Using last known node scores (backend health unavailable).',
+  },
+  fetchUnifiedAiNodeModelsHealth: (...args) => fetchUnifiedAiNodeModelsHealth(...args),
+}));
+
 const { fetchAiCommandCenterSnapshot, LOCAL_COST_DASHBOARD } = await import('./aiCommandCenterApi');
 
 describe('aiCommandCenterApi', () => {
@@ -116,6 +131,18 @@ describe('aiCommandCenterApi', () => {
       ok: true,
       logs: [{ id: 'audit-1', action: 'AI_EVALUATION_VIEWED' }],
       total: 1,
+    });
+    fetchUnifiedAiNodeModelsHealth.mockResolvedValue({
+      ok: true,
+      data: {
+        status: 'ready',
+        nodeId: 'caredroid-unified-ai-node',
+        singleNode: true,
+        quarantine: 'none',
+        ready: true,
+        scores: { nluAccuracy: 1, artifactRouterAccuracy: 0.947, composite: 0.9735 },
+        source: 'live',
+      },
     });
     apiFetchJson.mockResolvedValue({
       response: { ok: true },

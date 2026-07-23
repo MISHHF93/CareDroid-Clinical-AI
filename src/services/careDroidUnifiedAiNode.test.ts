@@ -39,7 +39,11 @@ describe('careDroidUnifiedAiNode service', () => {
       capabilityId: 'triageSupport',
     });
 
-    expect(result).toBe(response);
+    // Structured responses now carry an attached unifiedAiEnvelope (non-schema
+    // field consumed by accountableFromGatewayPayload / plan-aware clients),
+    // so the result is response + that envelope rather than reference-equal.
+    expect(result).toMatchObject({ status: 'success' });
+    expect((result as unknown as { unifiedAiEnvelope: unknown }).unifiedAiEnvelope).toBeDefined();
     expect(requestAiChiefStructured).toHaveBeenCalledWith(
       expect.objectContaining({
         intent: 'triage_recommendation',

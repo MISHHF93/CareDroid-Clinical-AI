@@ -59,6 +59,10 @@ const mentalHealthSource = readFileSync(
   join(__dirname, '../pages/tools/mentalHealthCalculators.tsx'),
   'utf8'
 );
+const lazySpecialtyCalculatorsSource = readFileSync(
+  join(__dirname, '../pages/tools/lazySpecialtyCalculators.tsx'),
+  'utf8'
+);
 const _hubIdx = appSource.indexOf("path: '/tools/calculators', element:");
 
 describe('Wiring audit — frozen tool id lists', () => {
@@ -135,7 +139,9 @@ describe('Wiring audit — hub-only vs Tier-A form wiring', () => {
     const builtin = builtinUiCalculators.find((c) => c.id === id);
     expect(builtin?.path).toBe(spec.routePath);
     expect(calculatorsSource).toContain(`case '${spec.calcSwitchCase}':`);
-    expect(calculatorsSource).toContain("from './mentalHealthCalculators'");
+    // Lazy-loaded via lazySpecialtyCalculators.tsx rather than imported directly.
+    expect(calculatorsSource).toContain("} from './lazySpecialtyCalculators'");
+    expect(lazySpecialtyCalculatorsSource).toContain("import('./mentalHealthCalculators')");
     expect(mentalHealthSource).toMatch(
       id === 'phq9' ? /Phq9Calculator/ : /Gad7Calculator/
     );

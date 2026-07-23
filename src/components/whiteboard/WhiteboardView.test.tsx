@@ -138,10 +138,10 @@ describe('WhiteboardView', () => {
 
     expect(patientOrder()).toEqual(['p1', 'p3', 'p2']);
 
-    await user.click(within(rowHeader).getByRole('button', { name: /patient/i }));
+    await user.click(within(rowHeader).getByRole('columnheader', { name: /patient/i }));
     expect(patientOrder()).toEqual(['p1', 'p2', 'p3']);
 
-    await user.click(within(rowHeader).getByRole('button', { name: /patient/i }));
+    await user.click(within(rowHeader).getByRole('columnheader', { name: /patient/i }));
     expect(patientOrder()).toEqual(['p3', 'p2', 'p1']);
   });
 });

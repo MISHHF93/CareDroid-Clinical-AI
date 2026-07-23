@@ -25,7 +25,7 @@ describe('build and service config consistency', () => {
     expect(compose).toContain(
       'DATABASE_URL: postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-secure123}@postgres:5432/${DB_NAME:-caredroid}',
     );
-    expect(read('backend/src/config/database.config.ts')).toContain('buildPostgresOptions');
+    expect(read('backend/src/config/database-url.config.ts')).toContain('buildPostgresOptions');
     expect(read('backend/src/data-source.ts')).toContain('buildPostgresOptions');
   });
 

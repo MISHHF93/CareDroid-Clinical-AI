@@ -52,7 +52,7 @@ function demoOk(extra: Record<string, unknown> = {}) {
   };
 }
 
-async function postJson(path, body) {
+async function postJson(path, body): Promise<Record<string, any>> {
   if (!liveIdentitySessionsEnabled()) {
     // Soft local path — reception identity check must not hard-fail offline.
     if (String(path).endsWith('/sessions') || String(path).includes('/sessions')) {
@@ -81,7 +81,7 @@ async function postJson(path, body) {
   return payload;
 }
 
-async function getJson(path) {
+async function getJson(path): Promise<Record<string, any>> {
   if (!liveIdentitySessionsEnabled()) {
     return demoOk({
       sessionId: SMART_INTAKE_DEMO.sessionId,

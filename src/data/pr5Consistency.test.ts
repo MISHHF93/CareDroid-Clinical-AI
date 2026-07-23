@@ -52,6 +52,10 @@ const mentalHealthCalculatorsSource = readFileSync(
   join(__dirname, '../pages/tools/mentalHealthCalculators.tsx'),
   'utf8'
 );
+const lazySpecialtyCalculatorsSource = readFileSync(
+  join(__dirname, '../pages/tools/lazySpecialtyCalculators.tsx'),
+  'utf8'
+);
 
 describe('PR5 consistency — centralized audit lists', () => {
   it('freezes the PR5 Tier-A registry ids', () => {
@@ -148,7 +152,9 @@ describe('PR5 consistency — catalog, routes, and UI wiring', () => {
   it('wires PR5 calculators in Calculators.jsx switch and mental health module', () => {
     expect(calculatorsSource).toContain("case 'phq9':");
     expect(calculatorsSource).toContain('Phq9Calculator');
-    expect(calculatorsSource).toContain("from './mentalHealthCalculators'");
+    // Lazy-loaded via lazySpecialtyCalculators.tsx rather than imported directly.
+    expect(calculatorsSource).toContain("} from './lazySpecialtyCalculators'");
+    expect(lazySpecialtyCalculatorsSource).toContain("import('./mentalHealthCalculators')");
     expect(calculatorsSource).toContain("case 'gad7':");
     expect(calculatorsSource).toContain('Gad7Calculator');
     expect(mentalHealthCalculatorsSource).toContain('computePhq9Result');

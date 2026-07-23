@@ -92,6 +92,10 @@ import {
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appSource = readFileSync(join(__dirname, '../app/router.tsx'), 'utf8');
 const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.tsx'), 'utf8');
+const lazySpecialtyCalculatorsSource = readFileSync(
+  join(__dirname, '../pages/tools/lazySpecialtyCalculators.tsx'),
+  'utf8'
+);
 const patternsSource = readFileSync(TOOL_PATTERNS_PATH, 'utf8');
 
 /** Ten deterministic PR4A audit areas (no snapshots). */
@@ -379,7 +383,11 @@ describe('PR4A comprehensive — 8. route resolution', () => {
   ])('Calculators.jsx case %s renders %s from pr4aCalculators', (id, component) => {
     expect(calculatorsSource).toContain(`case '${id}':`);
     expect(calculatorsSource).toContain(`<${component}`);
-    expect(calculatorsSource).toContain("from './pr4aCalculators'");
+    // Lazy-loaded via lazySpecialtyCalculators.tsx rather than imported directly, to keep the
+    // calculators route from executing every specialty chunk up front.
+    expect(calculatorsSource).toContain("} from './lazySpecialtyCalculators'");
+    expect(lazySpecialtyCalculatorsSource).toContain(`${component} = lazyExport`);
+    expect(lazySpecialtyCalculatorsSource).toContain("import('./pr4aCalculators')");
   });
 });
 

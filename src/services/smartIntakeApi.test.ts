@@ -29,11 +29,10 @@ describe('SmartIntakeApi', () => {
     parseApiResponse.mockResolvedValue({ sessionId: 'session-1' });
   });
 
-  it('does not call optional CareDroid runtime when Smart Intake is disabled', async () => {
-    await expect(SmartIntakeApi.createSession('RN')).rejects.toThrow(
-      'Backend Smart Intake endpoint is not available yet.'
-    );
+  it('soft-fails to a local demo session when Smart Intake is disabled, without calling the runtime', async () => {
+    const result = await SmartIntakeApi.createSession('RN');
 
+    expect(result).toMatchObject({ ok: true, localDemo: true });
     expect(isBackendCapabilityEnabled).toHaveBeenCalledWith('emergencySmartIntakeIdentitySession');
     expect(apiFetch).not.toHaveBeenCalled();
   });

@@ -23,6 +23,10 @@ const calculatorPrimitivesSource = readFileSync(
   'utf8'
 );
 const calculatorsCssSource = readFileSync(join(__dirname, '../pages/tools/Calculators.css'), 'utf8');
+const lazySpecialtyCalculatorsSource = readFileSync(
+  join(__dirname, '../pages/tools/lazySpecialtyCalculators.tsx'),
+  'utf8'
+);
 
 function sliceExportedComponent(source, componentName) {
   const start = source.indexOf(`export function ${componentName}`);
@@ -38,7 +42,9 @@ const gad7Ui = sliceExportedComponent(mentalHealthUiSource, 'Gad7Calculator');
 
 describe('Mental health calculators — hub wiring', () => {
   it('imports Tier-A calculators and exposes chat-assisted data-calc-id', () => {
-    expect(calculatorsSource).toContain("from './mentalHealthCalculators'");
+    // Lazy-loaded via lazySpecialtyCalculators.tsx rather than imported directly.
+    expect(calculatorsSource).toContain("} from './lazySpecialtyCalculators'");
+    expect(lazySpecialtyCalculatorsSource).toContain("import('./mentalHealthCalculators')");
     expect(calculatorsSource).toContain("case 'phq9':");
     expect(calculatorsSource).toContain("case 'gad7':");
     expect(calculatorsSource).toContain('data-calc-id={tool.toolId}');

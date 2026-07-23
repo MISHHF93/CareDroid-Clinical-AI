@@ -112,6 +112,7 @@ export const FRONTEND_API_CALLS = Object.freeze([
   { id: 'emergency-patient-create', method: 'POST', path: '/api/emergency/patients', client: 'emergencyOsApi.js / createEmergencyPatient', capability: 'emergencyPatients' },
   { id: 'emergency-journey', method: 'GET', path: '/api/emergency/journey', client: 'emergencyOsApi.js / usePatientJourney / PatientsRoute journey status', capability: 'emergencyPatientJourney' },
   { id: 'emergency-ems', method: 'GET', path: '/api/emergency/ems', client: 'emergencyOsApi.js / useEMSIntake', capability: 'emergencyEmsRuntime' },
+  { id: 'emergency-ems-handoff', method: 'POST', path: '/api/emergency/ems/handoff', client: 'emergencyOsApi.js', capability: 'emergencyEmsRuntime' },
   { id: 'emergency-intake', method: 'GET', path: '/api/emergency/intake', client: 'emergencyOsApi.js / useSmartIntake', capability: 'emergencySmartIntake' },
   { id: 'emergency-intake-create', method: 'POST', path: '/api/emergency/intake', client: 'emergencyOsApi.js / QuickIntake', capability: 'emergencySmartIntake' },
   { id: 'emergency-smart-intake-vertical-slice', method: 'POST', path: '/api/emergency/intake/vertical-slice', client: 'emergencyOsApi.js / NewPatientIntake', capability: 'emergencySmartIntake' },

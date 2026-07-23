@@ -222,7 +222,7 @@ export const SEGMENT_INVENTORY = Object.freeze([
     label: 'AI Assistant',
     area: SEGMENT_AREAS.CORE,
     purpose: 'Core clinical conversation, NLU routing, tool execution previews, citations, and emergency handling.',
-    status: SEGMENT_STATUSES.FRAGMENTED,
+    status: SEGMENT_STATUSES.COMPLETE,
     frontendOnlyType: null,
     backendOnlyType: null,
     frontendFiles: ['src/components/CopilotPanel.tsx', 'src/services/clinicalChatService.ts'],

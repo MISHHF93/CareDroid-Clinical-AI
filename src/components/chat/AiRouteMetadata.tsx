@@ -41,7 +41,15 @@ function formatCost(value) {
   return `$${Number(value).toFixed(4)}`;
 }
 
-export default function AiRouteMetadata({ aiFoundation, routePlan, aiGateway }) {
+export default function AiRouteMetadata({
+  aiFoundation,
+  routePlan,
+  aiGateway,
+}: {
+  aiFoundation: any;
+  routePlan?: any;
+  aiGateway?: any;
+}) {
   if (!aiFoundation) return null;
 
   const selectedExperts =

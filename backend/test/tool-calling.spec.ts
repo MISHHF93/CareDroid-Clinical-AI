@@ -157,9 +157,10 @@ describe('Tool Calling Integration (Batch 15 Phase 1)', () => {
             createRunEnvelope: jest.fn().mockReturnValue({
               runId: 'test-run-id',
               capabilityId: 'assistant-chat',
-              policy: { phiAccessed: false },
+              policy: { phiAccessed: false, allowedTools: [] },
               trace: { startedAt: new Date().toISOString() },
             }),
+            attachUnifiedNode: jest.fn((envelope) => envelope),
             logRoutingAudit: jest.fn().mockResolvedValue(undefined),
           },
         },
