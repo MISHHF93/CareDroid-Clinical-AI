@@ -283,7 +283,7 @@ describe('Audit Logging E2E', () => {
         AuditAction.SECURITY_EVENT,
       ];
 
-      const logs = [];
+      const logs: Array<Awaited<ReturnType<AuditService['log']>>> = [];
 
       for (const action of criticalActions) {
         const log = await auditService.log({

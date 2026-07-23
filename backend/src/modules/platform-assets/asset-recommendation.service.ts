@@ -77,7 +77,7 @@ export class AssetRecommendationService {
     ];
 
     const seen = new Set<string>();
-    const recommendations = [];
+    const recommendations: Array<{ assetId: string; reason: string }> = [];
     for (const assetId of candidates) {
       if (seen.has(assetId) || !allowed.has(assetId)) continue;
       seen.add(assetId);

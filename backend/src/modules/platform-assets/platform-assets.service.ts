@@ -371,7 +371,7 @@ export class PlatformAssetsService {
     dependencies: Array<{ enabled: boolean; name: string }>,
     dependentPacks: Array<{ enabled: boolean; name: string }>,
   ) {
-    const warnings = [];
+    const warnings: Array<{ type: string; message: string }> = [];
     const missingDependencies = dependencies.filter((dependency) => !dependency.enabled);
     if (missingDependencies.length) {
       warnings.push({

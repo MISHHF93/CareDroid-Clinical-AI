@@ -93,7 +93,12 @@ export class SentinelTrackingService implements OnModuleInit {
     unitCount: number;
   }> {
     const config = getSentinelRuntimeConfig();
-    const adapters = [];
+    const adapters: Array<{
+      vendorId: string;
+      healthy: boolean;
+      detail: string;
+      lastEventAt: string | null;
+    }> = [];
     for (const adapter of this.listAdapters()) {
       const h = await adapter.health();
       adapters.push({

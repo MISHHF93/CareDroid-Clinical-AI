@@ -223,7 +223,7 @@ export class AnalyticsService {
   async getRetentionMetrics(
     startDate: Date,
   ): Promise<Array<{ day: number; retentionRate: number }>> {
-    const retentionData = [];
+    const retentionData: Array<{ day: number; retentionRate: number }> = [];
 
     // Get users who signed up on start date
     const cohortUsers = await this.analyticsEventRepository

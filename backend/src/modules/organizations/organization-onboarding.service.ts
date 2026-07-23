@@ -103,7 +103,7 @@ export class OrganizationOnboardingService {
       await this.profileRepository.save(profile);
     }
 
-    const workspaces = [];
+    const workspaces: Array<Awaited<ReturnType<WorkspacesService['createWorkspace']>>> = [];
     for (const ws of dto.workspaceSetups || []) {
       try {
         const workspace = await this.workspacesService.createWorkspace(

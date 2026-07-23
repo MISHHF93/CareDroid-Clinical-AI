@@ -1358,7 +1358,7 @@ export class ChatService {
   }
 
   async suggestNextAction(patientId: string, context: any): Promise<any> {
-    const suggestions = [];
+    const suggestions: string[] = [];
 
     if (context.vitals?.HR > 100) {
       suggestions.push('Check for tachycardia causes');
@@ -1376,7 +1376,7 @@ export class ChatService {
   }
 
   async analyzeVitals(vitals: Record<string, any>): Promise<any> {
-    const analysis = {
+    const analysis: { normal: string[]; caution: string[]; critical: string[] } = {
       normal: [],
       caution: [],
       critical: [],

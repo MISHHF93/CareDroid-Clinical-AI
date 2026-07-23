@@ -145,7 +145,7 @@ export function buildOperationalIntelligenceSnapshot(
     },
   ];
 
-  const anomalies = [];
+  const anomalies: OperationalIntelligenceSnapshotOutput['anomalies'] = [];
   if (dataFreshnessStatus === 'stale') {
     anomalies.push({
       id: 'anomaly-stale-data',
@@ -183,7 +183,7 @@ export function buildOperationalIntelligenceSnapshot(
     });
   }
 
-  const recommendations = [];
+  const recommendations: OperationalIntelligenceSnapshotOutput['recommendations'] = [];
   if (central.reassessmentsDue > 0) {
     recommendations.push({
       id: 'rec-review-reassessment',

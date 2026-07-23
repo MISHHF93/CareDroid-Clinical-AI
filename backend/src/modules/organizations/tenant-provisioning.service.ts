@@ -228,8 +228,9 @@ export class TenantProvisioningService {
       .filter(
         (
           workspace,
-        ): workspace is ReturnType<TenantProvisioningService['normalizeWorkspaceDefault']> =>
-          Boolean(workspace),
+        ): workspace is NonNullable<
+          ReturnType<TenantProvisioningService['normalizeWorkspaceDefault']>
+        > => Boolean(workspace),
       );
   }
 
@@ -259,7 +260,7 @@ export class TenantProvisioningService {
       NonNullable<ReturnType<TenantProvisioningService['normalizeWorkspaceDefault']>>
     >,
   ) {
-    const created = [];
+    const created: Array<Awaited<ReturnType<WorkspacesService['createWorkspace']>>> = [];
     for (const workspace of workspaceDefaults) {
       const existing = await this.workspaceRepository.findOne({
         where: { organizationId: organization.id, type: workspace.type },

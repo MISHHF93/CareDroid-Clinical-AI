@@ -249,7 +249,12 @@ describe('TLS 1.3 & Security Headers (E2E)', () => {
 
     it('should have consistent headers across different routes', async () => {
       const routes = ['/', '/api', '/health'];
-      const headersList = [];
+      const headersList: Array<{
+        route: string;
+        hsts: string | undefined;
+        csp: string | undefined;
+        xframe: string | undefined;
+      }> = [];
 
       for (const route of routes) {
         const response = await request(app.getHttpServer()).get(route).expect([200, 404]); // Some routes may not exist
