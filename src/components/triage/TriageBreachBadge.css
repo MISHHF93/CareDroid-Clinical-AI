@@ -104,9 +104,19 @@
   border-color: rgba(239, 68, 68, 0.35);
 }
 
+.triage-breach-panel__metric[data-tone='critical'] strong,
+.triage-breach-strip__count[data-tone='critical'] strong {
+  color: var(--cdl-critical-text, #991b1b);
+}
+
 .triage-breach-panel__metric[data-tone='watch'],
 .triage-breach-strip__count[data-tone='watch'] {
   border-color: rgba(245, 158, 11, 0.35);
+}
+
+.triage-breach-panel__metric[data-tone='watch'] strong,
+.triage-breach-strip__count[data-tone='watch'] strong {
+  color: var(--cdl-warning-text, #92400e);
 }
 
 .triage-breach-strip__list {

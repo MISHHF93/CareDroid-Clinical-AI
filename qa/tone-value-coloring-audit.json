@@ -1,0 +1,2022 @@
+{
+  "generatedAt": "2026-07-23T00:16:48.490Z",
+  "totalCssFilesScanned": 412,
+  "totalModifiersFound": 402,
+  "flaggedCount": 139,
+  "cleanCount": 263,
+  "note": "Inventory only — human review required before fixing any flagged row. False positives expected (e.g. intentionally-neutral tiles, or a value-color rule living in a different file than the modifier).",
+  "flagged": [
+    {
+      "file": "src/components/ai/ActionProposalCard.css",
+      "modifier": ".cd-proposal--good",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/ai/ActionProposalCard.css",
+      "modifier": ".cd-proposal--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/ai/StreamingResponse.css",
+      "modifier": ".cd-stream--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/bottlenecks/BottleneckPanels.css",
+      "modifier": ".service-health-card--healthy",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/calculators/PediatricDrugCalc.css",
+      "modifier": ".pdc-drug-row--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/copilot/DiagnosticSafetyDashboard.css",
+      "modifier": ".diagnostic-safety-dashboard__row--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/emergency/CriticalAlertBanner.css",
+      "modifier": "[data-severity='critical']",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/emergency/CriticalAlertBanner.css",
+      "modifier": "[data-severity='urgent']",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/emergency/operational-intelligence-bar.css",
+      "modifier": ".operational-intelligence-bar--warning",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/emergency/operational-intelligence-bar.css",
+      "modifier": ".operational-intelligence-bar--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/emergency/patient-flow-status.css",
+      "modifier": ".patient-flow-status__row--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/emergency/patient-flow-status.css",
+      "modifier": ".patient-flow-status__row--warning",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/emergency/unified-operational-intelligence-panel.css",
+      "modifier": ".unified-operational-intelligence-panel--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/emergency/unified-operational-intelligence-panel.css",
+      "modifier": ".unified-operational-intelligence-panel--warning",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/emergency/unified-operational-intelligence-panel.css",
+      "modifier": ".unified-operational-intelligence-panel__insight--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/emergency/unified-operational-intelligence-panel.css",
+      "modifier": ".unified-operational-intelligence-panel__insight--warning",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/emergency/workflow-automation-command-bar.css",
+      "modifier": ".workflow-automation-command-bar--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/emergency/workflow-automation-command-bar.css",
+      "modifier": ".workflow-automation-command-bar__item--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/ems/EmsOffloadAttentionStrip.css",
+      "modifier": "[data-tone='critical']",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/ems/EmsOffloadAttentionStrip.css",
+      "modifier": "[data-tone='watch']",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/ems/EmsOffloadTrackerPanel.css",
+      "modifier": "[data-tone='critical']",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/ems/EmsOffloadTrackerPanel.css",
+      "modifier": "[data-tone='watch']",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/ems/ResourceActivationStrip.css",
+      "modifier": ".resource-activation-strip__item--urgent",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/interactive-ai/interactiveAi.css",
+      "modifier": ".cd-iaw-card--urgent",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/interactive-ai/interactiveAi.css",
+      "modifier": ".cd-iaw-card--attention",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/interactive-ai/interactiveAi.css",
+      "modifier": ".cd-iaw-inbox__item--urgent",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/interactive-ai/interactiveAi.css",
+      "modifier": ".cd-iaw-inbox__item--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/interactive-ai/interactiveAi.css",
+      "modifier": ".cd-iaw-inbox__item--attention",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/patient-experience/PatientExperienceStatusStrip.css",
+      "modifier": "[data-tone='warning']",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/patient-experience/PatientExperienceStatusStrip.css",
+      "modifier": "[data-tone='critical']",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/patient-experience/WaitingRoomStatusMessagingStrip.css",
+      "modifier": "[data-tone='warning']",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/patient-experience/WaitingRoomStatusMessagingStrip.css",
+      "modifier": "[data-tone='critical']",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/PatientCard.css",
+      "modifier": ".patient-card__signal--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/predictive/JourneyPredictionBadge.css",
+      "modifier": ".journey-prediction-badge__los--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/predictive/JourneyPredictionBadge.css",
+      "modifier": ".journey-prediction-badge__los--warning",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/provider-wait/ProviderWaitBreachBadge.css",
+      "modifier": "[data-tone='critical']",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/provider-wait/ProviderWaitBreachBadge.css",
+      "modifier": "[data-tone='watch']",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/queues/QueueReasonAttentionStrip.css",
+      "modifier": "[data-tone='critical']",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/queues/QueueReasonAttentionStrip.css",
+      "modifier": "[data-tone='watch']",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/reassessment/ReassessmentTimerStrip.css",
+      "modifier": "[data-tone='warning']",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/reassessment/ReassessmentTimerStrip.css",
+      "modifier": "[data-tone='critical']",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/reception/ReceptionDeskToolbar.css",
+      "modifier": ".reception-desk-toolbar__flow-step--attention",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/reception/ReceptionDeskToolbar.css",
+      "modifier": ".reception-desk-toolbar__flow-step--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/reception/ReceptionEscalationQuickActions.css",
+      "modifier": ".reception-escalation-quick-actions__button--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/reception/ReceptionJourneyTimeline.css",
+      "modifier": ".reception-journey-timeline__stage--attention",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/reception/ReceptionJourneyTimeline.css",
+      "modifier": ".reception-journey-timeline__stage--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/styles/CopilotPanel-part-01.css",
+      "modifier": "[data-severity='critical']",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/ToolCard.css",
+      "modifier": ".tool-card-notice--warning",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/ToolCard.css",
+      "modifier": ".tool-card-score-pill--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/ui/Alert.css",
+      "modifier": ".cd-alert--warning",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/ui/CareDroidPrimitives.css",
+      "modifier": ".cd-metric-card--warning",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/ui/CareDroidPrimitives.css",
+      "modifier": ".cd-status-widget--warning",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/ui/CareDroidPrimitives.css",
+      "modifier": ".cd-info-notice--warning",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/waiting-room/FitToWaitAttentionStrip.css",
+      "modifier": "[data-tone='critical']",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/waiting-room/FitToWaitAttentionStrip.css",
+      "modifier": "[data-tone='warning']",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/waiting-room/HighRiskComplaintAttentionStrip.css",
+      "modifier": "[data-tone='critical']",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/waiting-room/PatientCommunicationStatusPanel.css",
+      "modifier": "[data-tone='critical']",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/whiteboard/CommandCenterSurgePanel.css",
+      "modifier": ".command-center-surge__metric--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/whiteboard/CommandCenterSurgePanel.css",
+      "modifier": ".command-center-surge__metric--warning",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/whiteboard/CommandCenterSurgePanel.css",
+      "modifier": ".command-center-surge__zone--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/whiteboard/CommandCenterSurgePanel.css",
+      "modifier": ".command-center-surge__zone--warning",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/whiteboard/CommandCenterThroughputScreen.css",
+      "modifier": "[data-tone='warning']",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/whiteboard/CommandCenterThroughputScreen.css",
+      "modifier": "[data-tone='critical']",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/whiteboard/CommandCenterThroughputScreen.css",
+      "modifier": "[data-tone='watch']",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/whiteboard/DepartmentStatusScreen.css",
+      "modifier": "[data-tone='info']",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/whiteboard/DepartmentStatusScreen.css",
+      "modifier": "[data-tone='watch']",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/whiteboard/DepartmentStatusScreen.css",
+      "modifier": "[data-tone='warning']",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/whiteboard/DepartmentStatusScreen.css",
+      "modifier": "[data-tone='critical']",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/whiteboard/DigitalDoorSign.css",
+      "modifier": ".digital-door-sign__flag--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/whiteboard/DigitalDoorSign.css",
+      "modifier": ".digital-door-sign__flag--warning",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/whiteboard/PublicWaitingDisplay.css",
+      "modifier": "[data-tone='critical']",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/whiteboard/PublicWaitingDisplay.css",
+      "modifier": "[data-tone='warning']",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/whiteboard/PublicWaitingDisplay.css",
+      "modifier": "[data-tone='watch']",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/whiteboard/RoleOperationalSummaryStrip.css",
+      "modifier": ".role-operational-summary__card--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/whiteboard/RoleOperationalSummaryStrip.css",
+      "modifier": ".role-operational-summary__card--warning",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/components/whiteboard/RoleOperationalSummaryStrip.css",
+      "modifier": ".role-operational-summary__card--healthy",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/pages/emergency/DispatchConsole.css",
+      "modifier": ".dc-call-card--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/pages/emergency/DispatchConsole.css",
+      "modifier": ".dc-btn-primary--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/pages/emergency/emergency-route.css",
+      "modifier": ".emergency-route-situation-brief--warning",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/pages/emergency/emergency-route.css",
+      "modifier": ".emergency-route-situation-brief--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/pages/emergency/emergency-route.css",
+      "modifier": ".emergency-command-action--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/pages/emergency/emergency-route.css",
+      "modifier": ".emergency-command-action--warning",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/pages/emergency/emergency-whiteboard-cleanup.css",
+      "modifier": ".emergency-whiteboard-page__mission-btn--warning",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/pages/emergency/emergency-whiteboard-cleanup.css",
+      "modifier": ".emergency-whiteboard-page__card-key-swatch--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/pages/emergency/FullJourneyOperatingPage.css",
+      "modifier": ".emergency-command-action__tone--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/pages/emergency/FullJourneyOperatingPage.css",
+      "modifier": ".emergency-command-action__tone--warning",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/pages/emergency/ReceptionWorkspace.css",
+      "modifier": ".reception-queue-row--warning",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/pages/executive/ExecutiveCommandCenter.css",
+      "modifier": ".executive-health-row__dot--warning",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/pages/executive/ExecutiveCommandCenter.css",
+      "modifier": ".executive-health-row__dot--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/pages/executive/ExecutiveCommandCenter.css",
+      "modifier": ".executive-capacity-row__fill--healthy",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/pages/executive/ExecutiveCommandCenter.css",
+      "modifier": ".executive-capacity-row__fill--attention",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/pages/executive/ExecutiveCommandCenter.css",
+      "modifier": ".executive-capacity-row__fill--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/pages/fleet/FleetLiveMap.css",
+      "modifier": "[data-tone='warning']",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/pages/fleet/FleetLiveMap.css",
+      "modifier": "[data-tone='critical']",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/pages/fleet/PredictiveMaintenance.css",
+      "modifier": ".predictive-maintenance-page__band--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/pages/saas/SaasHealthCenter.css",
+      "modifier": ".saas-health-verdict--healthy",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/pages/saas/SaasHealthCenter.css",
+      "modifier": ".saas-health-verdict--attention",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/pages/saas/SaasHealthCenter.css",
+      "modifier": ".saas-health-verdict--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/pages/saas/SaasHealthCenter.css",
+      "modifier": ".saas-health-check-row__dot--warning",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/pages/saas/SaasHealthCenter.css",
+      "modifier": ".saas-health-check-row__dot--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/pages/SystemHealth.css",
+      "modifier": ".system-health-status--ok",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/styles/alarm-system.css",
+      "modifier": ".alarm-row--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/styles/alarm-system.css",
+      "modifier": ".alarm-row--warning",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/styles/alarm-system.css",
+      "modifier": ".alarm-dot--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/styles/alarm-system.css",
+      "modifier": ".alarm-dot--warning",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/styles/alarm-system.css",
+      "modifier": ".alarm-dot--ok",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/styles/alarm-system.css",
+      "modifier": ".alarm-surface--ok",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/styles/alarm-system.css",
+      "modifier": ".alarm-badge--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/styles/alarm-system.css",
+      "modifier": ".alarm-badge--warning",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/styles/caredroid-design-language.css",
+      "modifier": ".emergency-route-situation-brief--warning",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/styles/caredroid-design-language.css",
+      "modifier": ".cdl-situation-brief--warning",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/styles/caredroid-design-language.css",
+      "modifier": ".cdl-situation-brief--attention",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/styles/caredroid-design-language.css",
+      "modifier": ".emergency-route-situation-brief--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/styles/caredroid-design-language.css",
+      "modifier": ".cdl-situation-brief--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/styles/caredroid-design-language.css",
+      "modifier": ".cd-metric-card--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/styles/caredroid-design-language.css",
+      "modifier": ".cd-metric-card--warning",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/styles/caredroid-design-language.css",
+      "modifier": ".cd-metric-card--attention",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/styles/caredroid-design-language.css",
+      "modifier": ".cd-metric-card--healthy",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/styles/caredroid-design-language.css",
+      "modifier": ".hospital-command-center__status--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/styles/caredroid-design-language.css",
+      "modifier": ".system-health-status--ok",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/styles/cdl-v2/cards.css",
+      "modifier": "[data-severity='ai']",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/styles/clinical-figma-polish.css",
+      "modifier": ".cdl-situation-graphic-card--warning",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/styles/clinical-figma-polish.css",
+      "modifier": ".cdl-situation-graphic-card--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/styles/clinical-figma-polish.css",
+      "modifier": ".cdl-graphic-icon-badge--warning",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/styles/clinical-figma-polish.css",
+      "modifier": ".cdl-graphic-icon-badge--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/styles/clinical-figma-polish.css",
+      "modifier": ".role-operational-summary__card--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/styles/clinical-figma-polish.css",
+      "modifier": ".role-operational-summary__card--warning",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/styles/clinical-figma-polish.css",
+      "modifier": ".role-operational-summary__card--healthy",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/styles/clinical-figma-polish.css",
+      "modifier": ".critical-alert-banner--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/styles/clinical-operational-flow.css",
+      "modifier": "[data-tone='watch']",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/styles/clinical-page-canvas.css",
+      "modifier": ".cdl-surface--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/styles/clinical-page-canvas.css",
+      "modifier": ".cdl-surface--urgent",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/styles/clinical-page-canvas.css",
+      "modifier": ".cdl-surface--warning",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/styles/clinical-page-canvas.css",
+      "modifier": ".cdl-surface--attention",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/styles/clinical-page-canvas.css",
+      "modifier": ".cdl-surface--healthy",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/styles/clinical-page-canvas.css",
+      "modifier": ".emergency-route-situation-brief--warning",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/styles/clinical-page-canvas.css",
+      "modifier": ".emergency-route-situation-brief--critical",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/styles/clinical-page-sweep.css",
+      "modifier": ".command-dashboard__card--warning",
+      "hasValueColorRule": false
+    },
+    {
+      "file": "src/styles/clinical-page-sweep.css",
+      "modifier": ".command-dashboard__card--critical",
+      "hasValueColorRule": false
+    }
+  ],
+  "clean": [
+    {
+      "file": "src/components/ai/ActionProposalCard.css",
+      "modifier": ".cd-proposal__pill--good",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/ai/ActionProposalCard.css",
+      "modifier": ".cd-proposal__pill--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/ai/StreamingResponse.css",
+      "modifier": ".cd-stream__phase--good",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/ai/StreamingResponse.css",
+      "modifier": ".cd-stream__phase--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/ai/StreamingResponse.css",
+      "modifier": ".cd-stream__detail--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/bottlenecks/BottleneckPanels.css",
+      "modifier": ".bottleneck-severity--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/chat/OperationalResultCard.css",
+      "modifier": ".operational-result-card__status--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/chrome/OperationalAlarmDock.css",
+      "modifier": ".operational-alarm-dock__card--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/chrome/OperationsCenterMenu.css",
+      "modifier": ".operations-center-menu__trigger--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/chrome/OperationsCenterMenu.css",
+      "modifier": ".operations-center-menu__trigger--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/chrome/SessionChromeBar.css",
+      "modifier": ".session-chrome-bar__segment--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/copilot/DiagnosticSafetyDashboard.css",
+      "modifier": ".diagnostic-safety-dashboard__tier-chip--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/copilot/DiagnosticSafetyDashboard.css",
+      "modifier": ".diagnostic-safety-dashboard__tier-chip--watch",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/dashboard/DashboardVisualizations.css",
+      "modifier": ".dashboard-metric-card--good",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/dashboard/DashboardVisualizations.css",
+      "modifier": ".dashboard-status-card--good",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/dashboard/DashboardVisualizations.css",
+      "modifier": ".dashboard-metric-card--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/dashboard/DashboardVisualizations.css",
+      "modifier": ".dashboard-status-card--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/dashboard/DashboardVisualizations.css",
+      "modifier": ".dashboard-metric-card--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/dashboard/DashboardVisualizations.css",
+      "modifier": ".dashboard-status-card--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/dataQuality/DataQualityRiskPanel.css",
+      "modifier": ".data-quality-risk-panel__chip--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/dataQuality/DataQualityRiskPanel.css",
+      "modifier": ".data-quality-risk-badge__tag--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/emergency/administrative-automation-review.css",
+      "modifier": ".automation-review__row--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/emergency/CommandDashboard.css",
+      "modifier": ".command-dashboard__activation--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/emergency/OperationalStrip.css",
+      "modifier": "[data-tone='info']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/emergency/OperationalStrip.css",
+      "modifier": "[data-tone='warning']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/emergency/OperationalStrip.css",
+      "modifier": "[data-tone='critical']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/emergency/patient-flow-status.css",
+      "modifier": ".patient-flow-status__badge--watch",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/emergency/ThreeMinuteTimer.css",
+      "modifier": ".three-minute-timer--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/emergency/ThreeMinuteTimer.css",
+      "modifier": ".three-minute-timer-badge--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/emergency/unified-operational-intelligence-panel.css",
+      "modifier": ".unified-operational-intelligence-panel__domain--healthy",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/emergency/unified-operational-intelligence-panel.css",
+      "modifier": ".unified-operational-intelligence-panel__domain--watch",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/emergency/unified-operational-intelligence-panel.css",
+      "modifier": ".unified-operational-intelligence-panel__domain--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/ems/AmbulanceHandoffChecklistBadge.css",
+      "modifier": "[data-tone='watch']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/ems/EmsOffloadAggregateStrip.css",
+      "modifier": "[data-tone='critical']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/ems/EmsOffloadAggregateStrip.css",
+      "modifier": "[data-tone='warning']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/ems/EmsOffloadAggregateStrip.css",
+      "modifier": "[data-tone='watch']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/ems/EmsOffloadAggregateStrip.css",
+      "modifier": "[data-tone='info']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/EMSPipeline.css",
+      "modifier": ".ems-pipeline__row--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/EMSPipeline.css",
+      "modifier": ".ems-pipeline__row--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/EMSPipeline.css",
+      "modifier": ".ems-pipeline__severity--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/EMSPipeline.css",
+      "modifier": ".ems-pipeline__eta--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/EMSPipeline.css",
+      "modifier": ".ems-pipeline__eta--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/EMSPressureScore.css",
+      "modifier": ".ems-pressure--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/feedback/Alert.css",
+      "modifier": ".cd-alert--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/feedback/Banner.css",
+      "modifier": ".cd-banner--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/graphics/CdlGraphicKit.css",
+      "modifier": ".cdl-graphic-icon-badge--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/graphics/CdlGraphicKit.css",
+      "modifier": ".cdl-graphic-icon-badge--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/graphics/CdlGraphicKit.css",
+      "modifier": ".cdl-situation-graphic-card--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/graphics/CdlGraphicKit.css",
+      "modifier": ".cdl-situation-graphic-card--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/guidance/WhatHappensNextBadge.css",
+      "modifier": ".what-next-badge--watch",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/guidance/WhatHappensNextBadge.css",
+      "modifier": ".what-next-badge--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/patient-experience/PatientExperienceStatusBadge.css",
+      "modifier": ".patient-experience-badge--watch",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/PatientCard.css",
+      "modifier": "[data-severity='critical']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/PatientCard.css",
+      "modifier": "[data-severity='warning']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/PatientCard.css",
+      "modifier": ".patient-card__flag--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/PatientCard.css",
+      "modifier": ".patient-card__signal--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/PatientCard.css",
+      "modifier": ".patient-card__flag--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/PatientCard.css",
+      "modifier": "[data-tone='critical']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/PatientCard.css",
+      "modifier": "[data-tone='warning']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/PatientCard.css",
+      "modifier": "[data-tone='watch']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/PatientCard.css",
+      "modifier": "[data-tone='urgent']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/PatientCard.css",
+      "modifier": "[data-tone='info']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/PatientCard.css",
+      "modifier": "[data-tone='ok']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/PatientCard.css",
+      "modifier": "[data-tone='ops']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/PatientCard.css",
+      "modifier": ".patient-card__vital--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/PatientCard.css",
+      "modifier": ".patient-card__vital--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/PediatricDrugCalculator.css",
+      "modifier": ".pediatric-drug-calculator__row--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/PediatricDrugCalculator.css",
+      "modifier": ".pediatric-drug-calculator__row--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/primitives/Badge.css",
+      "modifier": ".cd-badge--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/provider-wait/ProviderWaitBreachBadge.css",
+      "modifier": ".provider-wait-breach-badge--watch",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/provider-wait/ProviderWaitBreachBadge.css",
+      "modifier": ".provider-wait-breach-badge--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/queues/PatientQueueTimingBadge.css",
+      "modifier": "[data-tone='watch']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/queues/PatientQueueTimingBadge.css",
+      "modifier": "[data-tone='critical']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/queues/QueueOperationalPanel.css",
+      "modifier": ".queue-operational-panel__chip--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/queues/QueueOperationalPanel.css",
+      "modifier": ".queue-operational-panel__chip--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/queues/QueueOperationalPanel.css",
+      "modifier": ".queue-audit-badge__tag--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/queues/QueueOperationalPanel.css",
+      "modifier": ".queue-audit-badge__tag--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/queues/QueueReasonBadge.css",
+      "modifier": ".queue-reason-badge--watch",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/queues/QueueReasonBadge.css",
+      "modifier": ".queue-reason-badge--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/reassessment/ReassessmentTimerPanel.css",
+      "modifier": "[data-tone='watch']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/reassessment/ReassessmentTimerPanel.css",
+      "modifier": "[data-tone='critical']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/reassessment/ReassessmentTimerPanel.css",
+      "modifier": "[data-tone='warning']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/reception/ReceptionAttentionStrip.css",
+      "modifier": ".reception-attention__count--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/reception/ReceptionAttentionStrip.css",
+      "modifier": ".reception-attention__row--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/reception/ReceptionAttentionStrip.css",
+      "modifier": ".reception-attention__row--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/reception/ReceptionPatientTaskSheet.css",
+      "modifier": ".reception-task-sheet__chip--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/reception/ReceptionPatientTaskSheet.css",
+      "modifier": "[data-tone='critical']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/reception/ReceptionPatientTaskSheet.css",
+      "modifier": "[data-tone='warning']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/reception/ReceptionPatientTaskSheet.css",
+      "modifier": ".reception-task-sheet__action--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/reception/UnifiedIntakePanel.css",
+      "modifier": ".reception-command-ai__urgency--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/reception/UnifiedIntakePanel.css",
+      "modifier": ".reception-command-ai__urgency--urgent",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/reception/UnifiedIntakePanel.css",
+      "modifier": ".reception-command-ai__urgency--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/ReferralPanel.css",
+      "modifier": ".referral-row--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/ReferralPanel.css",
+      "modifier": ".referral-row--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/ReferralPanel.css",
+      "modifier": ".referral-row__urgency--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/ReferralPanel.css",
+      "modifier": ".referral-row__urgency--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/styles/EmergencyWhiteboard-part-02.css",
+      "modifier": ".ed-whiteboard__wait--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/styles/EmergencyWhiteboard-part-02.css",
+      "modifier": ".ed-whiteboard__wait--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/ToolCard.css",
+      "modifier": ".tool-card-tag--ok",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/triage/TriageBreachBadge.css",
+      "modifier": ".triage-breach-badge--watch",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/triage/TriageBreachBadge.css",
+      "modifier": ".triage-breach-badge--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/triage/TriageBreachBadge.css",
+      "modifier": "[data-tone='critical']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/triage/TriageBreachBadge.css",
+      "modifier": "[data-tone='watch']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/ui/Badge.css",
+      "modifier": ".cd-badge--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/waiting-room/DeteriorationWatchBadge.css",
+      "modifier": ".deterioration-watch-badge--watch",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/waiting-room/DeteriorationWatchBadge.css",
+      "modifier": ".deterioration-watch-badge--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/waiting-room/FitToWaitBadge.css",
+      "modifier": ".fit-to-wait-badge--watch",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/waiting-room/FitToWaitBadge.css",
+      "modifier": ".fit-to-wait-badge--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/waiting-room/LwbsRiskBadge.css",
+      "modifier": ".lwbs-risk-badge--watch",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/waiting-room/LwbsRiskBadge.css",
+      "modifier": ".lwbs-risk-badge--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/waiting-room/WaitingRoomCommunicationBadge.css",
+      "modifier": ".waiting-room-communication-badge--watch",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/waiting-room/WaitingRoomCommunicationBadge.css",
+      "modifier": ".waiting-room-communication-badge--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/waiting-room/WaitingRoomCommunicationBadge.css",
+      "modifier": ".waiting-room-communication-badge--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/waiting-room/WaitingRoomSafetyEscalationStrip.css",
+      "modifier": "[data-tone='critical']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/waiting-room/WaitingRoomSafetyEscalationStrip.css",
+      "modifier": "[data-tone='warning']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/waiting-room/WaitingRoomSafetyEscalationStrip.css",
+      "modifier": "[data-tone='watch']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/whiteboard/ChargeNurseOperationalStrip.css",
+      "modifier": "[data-tone='critical']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/whiteboard/ChargeNurseOperationalStrip.css",
+      "modifier": "[data-tone='warning']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/whiteboard/ChargeNurseOperationalStrip.css",
+      "modifier": "[data-tone='info']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/whiteboard/OperationalHandoffDomainBar.css",
+      "modifier": "[data-tone='critical']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/whiteboard/OperationalHandoffDomainBar.css",
+      "modifier": "[data-tone='warning']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/whiteboard/OperationalHandoffDomainBar.css",
+      "modifier": "[data-tone='info']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/whiteboard/WaitingRoomSafetyBoard.css",
+      "modifier": "[data-tone='critical']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/whiteboard/WaitingRoomSafetyBoard.css",
+      "modifier": "[data-tone='warning']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/whiteboard/WaitingRoomSafetyBoard.css",
+      "modifier": "[data-tone='info']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/whiteboard/WhiteboardOperationalIconStrip.css",
+      "modifier": ".wb-op-icon-strip__icon--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/components/whiteboard/WhiteboardOperationalIconStrip.css",
+      "modifier": ".wb-op-icon-strip__icon--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/analytics/AnalyticsDashboard.css",
+      "modifier": ".platform-analytics-page__pill--good",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/analytics/AnalyticsDashboard.css",
+      "modifier": ".platform-analytics-page__pill--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/analytics/AnalyticsDashboard.css",
+      "modifier": ".platform-analytics-page__pill--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/clinical/LaboratoryDashboard.css",
+      "modifier": ".laboratory-page__status--good",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/clinical/LaboratoryDashboard.css",
+      "modifier": ".laboratory-page__status--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/clinical/LaboratoryDashboard.css",
+      "modifier": ".laboratory-page__status--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/clinical/Medical3DViewer.css",
+      "modifier": ".medical-3d-page__status--good",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/clinical/Medical3DViewer.css",
+      "modifier": ".medical-3d-page__status--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/clinical/Medical3DViewer.css",
+      "modifier": ".medical-3d-page__status--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/ClinicalAlertsPage.css",
+      "modifier": ".alerts-summary-chip--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/ClinicalAlertsPage.css",
+      "modifier": ".alerts-filter-chip--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/commercial/CommercialIntelligence.css",
+      "modifier": ".commercial-page__pill--good",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/commercial/CommercialIntelligence.css",
+      "modifier": ".commercial-page__pill--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/commercial/CommercialIntelligence.css",
+      "modifier": ".commercial-page__pill--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/emergency/emergency-route.css",
+      "modifier": ".emergency-route-queue-row__oldest--ok",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/emergency/emergency-whiteboard-cleanup.css",
+      "modifier": ".emergency-whiteboard-page__command-metric-label--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/emergency/emergency-whiteboard-cleanup.css",
+      "modifier": ".emergency-whiteboard-page__command-metric-label--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/emergency/ReceptionWorkspace.css",
+      "modifier": ".reception-command-chip--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/emergency/ReceptionWorkspace.css",
+      "modifier": ".reception-command-metric--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/emergency/ReceptionWorkspace.css",
+      "modifier": ".reception-command-stepper__item--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/emergency/ReceptionWorkspace.css",
+      "modifier": ".reception-command-ai__urgency--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/emergency/ReceptionWorkspace.css",
+      "modifier": ".reception-queue-row__chip--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/emergency/ReceptionWorkspace.css",
+      "modifier": ".reception-queue-row__chip--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/emergency/ReceptionWorkspace.css",
+      "modifier": ".reception-queue-row__cta--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/emergency/ReceptionWorkspace.new-header.css",
+      "modifier": ".reception-metric--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/emergency/ReceptionWorkspace.new-header.css",
+      "modifier": ".reception-metric--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/emergency/ReceptionWorkspace.new-header.css",
+      "modifier": ".reception-header__situation--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/emergency/ReceptionWorkspace.new-header.css",
+      "modifier": ".reception-header__situation--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/executive/ExecutiveCommandCenter.css",
+      "modifier": ".executive-capacity-row__score--healthy",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/executive/ExecutiveCommandCenter.css",
+      "modifier": ".executive-capacity-row__score--attention",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/executive/ExecutiveCommandCenter.css",
+      "modifier": ".executive-capacity-row__score--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/executive/ExecutiveCommandCenter.css",
+      "modifier": ".executive-queue-row__wait--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/governance/DependencyGraph.css",
+      "modifier": ".dependency-graph-page__pill--good",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/governance/DependencyGraph.css",
+      "modifier": ".dependency-graph-page__pill--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/governance/DependencyGraph.css",
+      "modifier": ".dependency-graph-page__pill--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/governance/DependencyMap.css",
+      "modifier": ".dependency-map-page__pill--good",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/governance/DependencyMap.css",
+      "modifier": ".dependency-map-page__pill--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/governance/DependencyMap.css",
+      "modifier": ".dependency-map-page__pill--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/governance/GovernanceRegistry.css",
+      "modifier": ".governance-registry-page__pill--good",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/governance/GovernanceRegistry.css",
+      "modifier": ".governance-registry-page__pill--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/governance/GovernanceRegistry.css",
+      "modifier": ".governance-registry-page__pill--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/MedicalIotDashboard.css",
+      "modifier": ".medical-iot-page__badge--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/organization/OrganizationPages.css",
+      "modifier": ".org-status-pill--healthy",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/organization/OrganizationPages.css",
+      "modifier": ".org-status-pill--watch",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/platform/BusinessBrain.css",
+      "modifier": ".business-brain-page__pill--good",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/platform/BusinessBrain.css",
+      "modifier": ".business-brain-page__pill--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/platform/DepartmentIntelligence.css",
+      "modifier": ".department-intelligence-page__pill--good",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/platform/DepartmentIntelligence.css",
+      "modifier": ".department-intelligence-page__pill--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/platform/DepartmentIntelligence.css",
+      "modifier": ".department-intelligence-page__pill--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/platform/PlatformGovernanceWorkspace.css",
+      "modifier": ".governance-workspace-page__pill--good",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/platform/PlatformGovernanceWorkspace.css",
+      "modifier": ".governance-workspace-page__pill--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/platform/PlatformGovernanceWorkspace.css",
+      "modifier": ".governance-workspace-page__pill--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/platform/PlatformSelfDiagnostics.css",
+      "modifier": ".self-diagnostics-page__pill--good",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/platform/PlatformSelfDiagnostics.css",
+      "modifier": ".self-diagnostics-page__pill--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/platform/PlatformSelfDiagnostics.css",
+      "modifier": ".self-diagnostics-page__pill--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/platform/PlatformSystemPage.css",
+      "modifier": ".platform-system-page__pill--good",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/platform/PlatformSystemPage.css",
+      "modifier": ".platform-system-page__pill--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/platform/PlatformSystemPage.css",
+      "modifier": ".platform-system-page__pill--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/platform/WorkflowBuilder.css",
+      "modifier": ".workflow-builder-page__pill--good",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/platform/WorkflowBuilder.css",
+      "modifier": ".workflow-builder-page__pill--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/platform/WorkflowBuilder.css",
+      "modifier": ".workflow-builder-page__pill--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/platform/WorkspaceDependencyGraph.css",
+      "modifier": ".workspace-graph-page__pill--good",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/platform/WorkspaceDependencyGraph.css",
+      "modifier": ".workspace-graph-page__pill--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/saas/FeatureFlagCenter.css",
+      "modifier": ".feature-flag-page__pill--good",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/saas/FeatureFlagCenter.css",
+      "modifier": ".feature-flag-page__pill--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/saas/FeatureFlagCenter.css",
+      "modifier": ".feature-flag-page__pill--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/tools/Calculators.css",
+      "modifier": ".pediatric-drug-reference-table__row--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/training/Competencies.css",
+      "modifier": ".competencies-page__status--good",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/training/Competencies.css",
+      "modifier": ".competencies-page__status--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/training/Credentials.css",
+      "modifier": ".credentials-page__status--good",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/pages/training/Credentials.css",
+      "modifier": ".credentials-page__status--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/alarm-system.css",
+      "modifier": ".alarm-kpi--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/alarm-system.css",
+      "modifier": "[data-alarm='critical']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/alarm-system.css",
+      "modifier": ".alarm-kpi--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/alarm-system.css",
+      "modifier": "[data-alarm='warning']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/alarm-system.css",
+      "modifier": "[data-alarm='info']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/alarm-system.css",
+      "modifier": ".alarm-kpi--ok",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/alarm-system.css",
+      "modifier": "[data-alarm='ok']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/alarm-system.css",
+      "modifier": ".alarm-surface--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/alarm-system.css",
+      "modifier": ".alarm-surface--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/caredroid-design-language.css",
+      "modifier": ".cdl-surface--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/caredroid-design-language.css",
+      "modifier": ".cdl-surface--urgent",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/caredroid-design-language.css",
+      "modifier": ".cdl-surface--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/caredroid-design-language.css",
+      "modifier": ".cdl-surface--attention",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/caredroid-design-language.css",
+      "modifier": ".cdl-surface--healthy",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/caredroid-design-language.css",
+      "modifier": ".hospital-command-center__metric-card--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/caredroid-design-language.css",
+      "modifier": ".hospital-command-center__metric-card--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/caredroid-design-language.css",
+      "modifier": ".hospital-command-center__metric-card--watch",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/caredroid-design-language.css",
+      "modifier": ".hospital-command-center__status--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/caredroid-design-language.css",
+      "modifier": ".hospital-command-center__severity--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/caredroid-design-language.css",
+      "modifier": ".hospital-command-center__severity--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/cdl-v2/alarm.css",
+      "modifier": "[data-severity='critical']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/cdl-v2/alarm.css",
+      "modifier": "[data-severity='urgent']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/cdl-v2/alarm.css",
+      "modifier": "[data-severity='warning']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/cdl-v2/alarm.css",
+      "modifier": "[data-severity='info']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/cdl-v2/alarm.css",
+      "modifier": "[data-severity='ok']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/cdl-v2/alarm.css",
+      "modifier": "[data-severity='ai']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/cdl-v2/cards.css",
+      "modifier": "[data-severity='critical']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/cdl-v2/cards.css",
+      "modifier": "[data-severity='urgent']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/cdl-v2/cards.css",
+      "modifier": "[data-severity='warning']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/cdl-v2/cards.css",
+      "modifier": "[data-severity='info']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/cdl-v2/cards.css",
+      "modifier": "[data-severity='ok']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/cdl-v2/cards.css",
+      "modifier": "[data-tone='critical']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/cdl-v2/cards.css",
+      "modifier": "[data-tone='urgent']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/cdl-v2/cards.css",
+      "modifier": "[data-tone='warning']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/cdl-v2/cards.css",
+      "modifier": "[data-tone='info']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/cdl-v2/cards.css",
+      "modifier": "[data-tone='ok']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/cdl-v2/cards.css",
+      "modifier": "[data-tone='ai']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/cdl-v2/icon.css",
+      "modifier": ".cdl-icon--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/cdl-v2/pills.css",
+      "modifier": ".cdl-badge--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/cdl-v2/pills.css",
+      "modifier": ".cdl-pill--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/cdl-v2/pills.css",
+      "modifier": ".patient-card__signal--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/cdl-v2/pills.css",
+      "modifier": ".patient-card__flag--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/cdl-v2/pills.css",
+      "modifier": "[data-tone='critical']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/cdl-v2/pills.css",
+      "modifier": ".cdl-badge--urgent",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/cdl-v2/pills.css",
+      "modifier": ".cdl-pill--urgent",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/cdl-v2/pills.css",
+      "modifier": "[data-tone='urgent']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/cdl-v2/pills.css",
+      "modifier": ".cdl-badge--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/cdl-v2/pills.css",
+      "modifier": ".cdl-badge--watch",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/cdl-v2/pills.css",
+      "modifier": ".cdl-pill--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/cdl-v2/pills.css",
+      "modifier": ".patient-card__signal--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/cdl-v2/pills.css",
+      "modifier": ".patient-card__flag--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/cdl-v2/pills.css",
+      "modifier": "[data-tone='warning']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/cdl-v2/pills.css",
+      "modifier": "[data-tone='watch']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/cdl-v2/pills.css",
+      "modifier": "[data-tone='info']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/cdl-v2/pills.css",
+      "modifier": ".cdl-badge--ok",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/cdl-v2/pills.css",
+      "modifier": "[data-tone='ok']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/cdl-v2/pills.css",
+      "modifier": "[data-tone='ops']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/cdl-v2/pills.css",
+      "modifier": "[data-tone='ai']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/clinical-operational-flow.css",
+      "modifier": ".ems-pipeline__row--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/clinical-operational-flow.css",
+      "modifier": ".ems-pipeline__row--critical",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/clinical-operational-flow.css",
+      "modifier": "[data-tone='critical']",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/dashboard-route.css",
+      "modifier": ".dashboard-summary-card--good",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/dashboard-route.css",
+      "modifier": ".dashboard-summary-card--warning",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/dashboard-route.css",
+      "modifier": ".dashboard-status--ok",
+      "hasValueColorRule": true
+    },
+    {
+      "file": "src/styles/dashboard-route.css",
+      "modifier": ".dashboard-text--warning",
+      "hasValueColorRule": true
+    }
+  ]
+}

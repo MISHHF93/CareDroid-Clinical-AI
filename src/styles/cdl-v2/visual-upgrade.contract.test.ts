@@ -137,3 +137,63 @@ describe('Profile sub-pages migrated to cdl-v2 (Cycle 151)', () => {
     expect(settingsCss).toContain('var(--cdl-info-text)');
   });
 });
+
+describe('KPI/button tone data reaches the displayed value, not just the border (Cycle 152)', () => {
+  it('DashboardVisualizations.css: --good/--warning/--critical strong text is recolored, not just the border', () => {
+    const css = readFileSync(join(root, 'components/dashboard/DashboardVisualizations.css'), 'utf8');
+    expect(css).toContain('.dashboard-metric-card--good strong');
+    expect(css).toContain('.dashboard-status-card--good strong');
+    expect(css.slice(css.indexOf('.dashboard-metric-card--good strong'))).toContain('color: var(--app-success)');
+    expect(css).toContain('.dashboard-metric-card--warning strong');
+    expect(css.slice(css.indexOf('.dashboard-metric-card--warning strong'))).toContain('color: var(--app-warning)');
+    expect(css).toContain('.dashboard-metric-card--critical strong');
+    expect(css.slice(css.indexOf('.dashboard-metric-card--critical strong'))).toContain('color: var(--app-danger)');
+  });
+
+  it('TriageBreachBadge.css: critical/watch strip counts recolor the number, not just the border', () => {
+    const css = readFileSync(join(root, 'components/triage/TriageBreachBadge.css'), 'utf8');
+    expect(css).toContain("[data-tone='critical'] strong");
+    expect(css.slice(css.indexOf("[data-tone='critical'] strong"))).toContain('--cdl-critical-text');
+    expect(css).toContain("[data-tone='watch'] strong");
+    expect(css.slice(css.indexOf("[data-tone='watch'] strong"))).toContain('--cdl-warning-text');
+  });
+
+  it('caredroid-design-language.css: Hospital Command Center metric value recolors per tone', () => {
+    const css = readFileSync(join(root, 'styles/caredroid-design-language.css'), 'utf8');
+    expect(css).toContain(
+      '.hospital-command-center__metric-card--critical .hospital-command-center__metric-value',
+    );
+    expect(css).toContain(
+      '.hospital-command-center__metric-card--warning .hospital-command-center__metric-value',
+    );
+    expect(css).toContain(
+      '.hospital-command-center__metric-card--watch .hospital-command-center__metric-value',
+    );
+    expect(css).toContain('color: var(--semantic-critical)');
+    expect(css).toContain('color: var(--semantic-warning)');
+    expect(css).toContain('color: var(--semantic-operational-status)');
+  });
+
+  it('button.css: .btn-danger/.btn-success use --app-on-solid, not the same-hue -contrast tokens', () => {
+    const css = readFileSync(join(root, 'components/ui/button.css'), 'utf8');
+    const dangerRule = css.slice(css.indexOf('.btn-danger {'), css.indexOf('.btn-danger:hover'));
+    const successRule = css.slice(css.indexOf('.btn-success {'), css.indexOf('.btn-success:hover'));
+    expect(dangerRule).toContain('color: var(--app-on-solid)');
+    expect(dangerRule).not.toContain('--app-danger-contrast');
+    expect(successRule).toContain('color: var(--app-on-solid)');
+    expect(successRule).not.toContain('--app-success-contrast');
+  });
+
+  it('theme-surfaces.css: the global !important .btn-danger override does not reintroduce the same-hue invisible-text bug', () => {
+    // Found during computed-style verification of the button.css fix above: this
+    // unconditional, un-themed !important rule was silently neutralizing it for
+    // every .btn-danger in the app (proven via getComputedStyle, not assumed).
+    const css = readFileSync(join(root, 'styles/theme-surfaces.css'), 'utf8');
+    const rule = css.slice(
+      css.indexOf(':where(.btn-danger, .btn-remove-med:hover, .lab-value-remove:hover)'),
+      css.indexOf(':where(.medication-input'),
+    );
+    expect(rule).toContain('color: var(--app-on-solid) !important');
+    expect(rule).not.toContain('--app-danger-contrast');
+  });
+});

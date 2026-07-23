@@ -55,16 +55,31 @@
   background: color-mix(in srgb, var(--app-success) 9%, var(--app-surface-1));
 }
 
+.dashboard-metric-card--good strong,
+.dashboard-status-card--good strong {
+  color: var(--app-success);
+}
+
 .dashboard-metric-card--warning,
 .dashboard-status-card--warning {
   border-color: color-mix(in srgb, var(--app-warning) 38%, transparent);
   background: color-mix(in srgb, var(--app-warning) 10%, var(--app-surface-1));
 }
 
+.dashboard-metric-card--warning strong,
+.dashboard-status-card--warning strong {
+  color: var(--app-warning);
+}
+
 .dashboard-metric-card--critical,
 .dashboard-status-card--critical {
   border-color: color-mix(in srgb, var(--app-danger) 38%, transparent);
   background: color-mix(in srgb, var(--app-danger) 10%, var(--app-surface-1));
+}
+
+.dashboard-metric-card--critical strong,
+.dashboard-status-card--critical strong {
+  color: var(--app-danger);
 }
 
 .dashboard-visual-grid {

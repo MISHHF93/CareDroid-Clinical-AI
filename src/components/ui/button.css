@@ -127,7 +127,7 @@
 
 .btn-danger {
   background: var(--app-danger);
-  color: var(--app-danger-contrast);
+  color: var(--app-on-solid);
   border-color: color-mix(in srgb, var(--app-danger) 88%, transparent);
   box-shadow: var(--app-elevation-subtle, var(--app-shadow-1));
 }
@@ -140,7 +140,7 @@
 
 .btn-success {
   background: var(--app-success);
-  color: var(--app-success-contrast);
+  color: var(--app-on-solid);
   border-color: color-mix(in srgb, var(--app-success) 88%, transparent);
   box-shadow: var(--app-elevation-subtle, var(--app-shadow-1));
 }

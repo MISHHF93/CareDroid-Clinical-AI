@@ -481,12 +481,24 @@
   border-color: color-mix(in srgb, var(--semantic-critical) 35%, var(--app-border));
 }
 
+.hospital-command-center__metric-card--critical .hospital-command-center__metric-value {
+  color: var(--semantic-critical);
+}
+
 .hospital-command-center__metric-card--warning {
   border-color: color-mix(in srgb, var(--semantic-warning) 35%, var(--app-border));
 }
 
+.hospital-command-center__metric-card--warning .hospital-command-center__metric-value {
+  color: var(--semantic-warning);
+}
+
 .hospital-command-center__metric-card--watch {
   border-color: color-mix(in srgb, var(--semantic-operational-status) 30%, var(--app-border));
+}
+
+.hospital-command-center__metric-card--watch .hospital-command-center__metric-value {
+  color: var(--semantic-operational-status);
 }
 
 .hospital-command-center__metric-value,

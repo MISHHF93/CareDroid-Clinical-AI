@@ -262,7 +262,7 @@ body {
 
 :where(.btn-danger, .btn-remove-med:hover, .lab-value-remove:hover) {
   background: linear-gradient(135deg, var(--app-danger), color-mix(in srgb, var(--app-danger) 78%, #f1f5f9)) !important;
-  color: var(--app-danger-contrast) !important;
+  color: var(--app-on-solid) !important;
 }
 
 :where(.medication-input, .calc-input-field, .calc-select-field, .context-input, .context-select, .context-textarea, .lab-input-field, .simple-tool-search-input, .diagnosis-field) {
