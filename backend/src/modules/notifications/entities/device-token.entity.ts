@@ -33,13 +33,13 @@ export class DeviceToken {
   platform: DevicePlatform;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  deviceModel: string;
+  deviceModel?: string;
 
   @Column({ type: 'varchar', length: 100, nullable: true })
-  osVersion: string;
+  osVersion?: string;
 
   @Column({ type: 'varchar', length: 100, nullable: true })
-  appVersion: string;
+  appVersion?: string;
 
   @Column({ type: 'boolean', default: true })
   isActive: boolean;

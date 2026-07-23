@@ -85,7 +85,7 @@ export class IntentClassifierService {
     // ========================================
     const emergencyPatterns = detectEmergencyKeywords(message);
     const isEmergency = emergencyPatterns.length > 0;
-    const emergencySeverity = getHighestSeverity(emergencyPatterns);
+    const emergencySeverity = getHighestSeverity(emergencyPatterns) ?? undefined;
 
     if (isEmergency) {
       this.logger.warn(

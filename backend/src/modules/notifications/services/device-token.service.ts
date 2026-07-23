@@ -179,7 +179,7 @@ export class DeviceTokenService {
       if (!tokenMap.has(userId)) {
         tokenMap.set(userId, []);
       }
-      tokenMap.get(userId).push(device.token);
+      tokenMap.get(userId)!.push(device.token);
     });
 
     return tokenMap;
