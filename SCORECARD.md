@@ -8,7 +8,7 @@
 
 **Architect Mode (2026-07-15) — structural coherence rescore:** **97/100** measured. Unified proof pack: [docs/architecture/architect-mode/PROOF-PACK.md](docs/architecture/architect-mode/PROOF-PACK.md). Gates: Architect FE **100**, BE **51**, contract-matrix **19**, cohesion-security **30**, redirect-parity **58**, dual builds **PASS**. Residual: dual Nest/Express, Postgres tenant e2e, full Playwright. *(Carried forward, not re-verified this cycle.)*
 
-**Companion artifact (interactive):** <https://claude.ai/code/artifact/f613bb99-0c0b-43a3-ae9e-55cfbece7438> (kept current per cycle; supersedes `5b85f8ca…`)
+**Companion artifact (interactive):** <https://claude.ai/code/artifact/01325587-a9ae-4c6a-920a-c48378ba3352> (kept current per cycle, now reflecting Cycle 164; this line had drifted to point at a stale Cycle 111 snapshot — corrected)
 
 > A self-reported internal "maturity model" script (`scripts/platform-scorecard.mjs`) also exists in this repo and outputs ~86/100 — that reflects the app's own sample/demo self-assessment data, not measured reality, and is **not** used here. Every score below is tied to a specific command, file, or test run.
 
