@@ -151,7 +151,7 @@ export class WorkspacesService {
       type: dto.type,
       name: dto.name.trim(),
       slug,
-      organizationId: options.organizationId || null,
+      organizationId: options.organizationId || undefined,
       ownerUserId: user.id,
       branding: {
         displayName: dto.displayName?.trim() || dto.name.trim(),
@@ -375,7 +375,7 @@ export class WorkspacesService {
       status: WorkspaceMembershipStatus.ACTIVE,
       permissions: this.permissionsService.getWorkspaceRolePermissions(role),
       teams: [],
-      department: user.profile?.institution || null,
+      department: user.profile?.institution || undefined,
       joinedAt: new Date(),
       lastAccessedAt: new Date(),
     });
@@ -387,7 +387,7 @@ export class WorkspacesService {
     if (!state) {
       state = this.stateRepository.create({
         userId,
-        activeWorkspaceId: fallbackWorkspaceId || null,
+        activeWorkspaceId: fallbackWorkspaceId || undefined,
         recentWorkspaceIds: fallbackWorkspaceId ? [fallbackWorkspaceId] : [],
       });
       state = await this.stateRepository.save(state);

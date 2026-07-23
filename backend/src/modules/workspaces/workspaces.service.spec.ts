@@ -160,7 +160,7 @@ describe('WorkspacesService strict entitlements', () => {
     expect(platformAssetsService.resolveEntitledAssetIds).not.toHaveBeenCalled();
     expect(workspaceRepository.save).toHaveBeenCalledWith(
       expect.objectContaining({
-        organizationId: null,
+        organizationId: undefined,
         settings: expect.objectContaining({ enabledToolIds: ['offline-tool'] }),
       }),
     );
