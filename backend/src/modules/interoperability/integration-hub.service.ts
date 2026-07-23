@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { AuditAction } from '../audit/entities/audit-log.entity';
 import { AuditService } from '../audit/audit.service';
 import { IntegrationAutomationRouter } from './integration-automation-router.service';
@@ -70,7 +70,7 @@ export class IntegrationHubService {
       const existing = await this.eventRepository.findOne({
         where: {
           idempotencyKey,
-          organizationId: event.organizationId || null,
+          organizationId: event.organizationId || IsNull(),
           sourceSystem: event.sourceSystem || 'unknown-source',
         },
       });
@@ -183,18 +183,27 @@ export class IntegrationHubService {
   }
 
   private async findOrCreateSource(event: IntegrationEvent) {
-    const where = {
-      organizationId: event.organizationId || null,
-      workspaceId: event.workspaceId || null,
-      sourceSystem: event.sourceSystem || 'unknown-source',
-      family: normalizeFamily(event.family),
-    };
-    const existing = await this.sourceRepository.findOne({ where });
+    const organizationId = event.organizationId || null;
+    const workspaceId = event.workspaceId || null;
+    const sourceSystem = event.sourceSystem || 'unknown-source';
+    const family = normalizeFamily(event.family);
+
+    const existing = await this.sourceRepository.findOne({
+      where: {
+        organizationId: organizationId ?? IsNull(),
+        workspaceId: workspaceId ?? IsNull(),
+        sourceSystem,
+        family,
+      },
+    });
     if (existing) return existing;
 
     return this.sourceRepository.save(
       this.sourceRepository.create({
-        ...where,
+        organizationId,
+        workspaceId,
+        sourceSystem,
+        family,
         vendor: event.vendor || null,
         status: IntegrationSourceStatus.ACTIVE,
         authMode: 'shared-secret-or-token',

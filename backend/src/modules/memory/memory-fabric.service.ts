@@ -463,8 +463,8 @@ export class MemoryFabricService {
   ) {
     await this.auditService.log({
       userId: input.user?.id || input.user?.userId || input.user?.sub,
-      organizationId: input.tenantContext?.organizationId,
-      workspaceId: input.tenantContext?.workspaceId,
+      organizationId: input.tenantContext?.organizationId ?? undefined,
+      workspaceId: input.tenantContext?.workspaceId ?? undefined,
       action,
       resource,
       ipAddress: input.ipAddress || '0.0.0.0',

@@ -16,7 +16,7 @@ export class ShortMemoryService {
   async remember(userId: string, dto: CreateShortMemoryDto) {
     const entry = this.shortMemoryRepository.create({
       userId,
-      workspaceId: dto.workspaceId || null,
+      workspaceId: dto.workspaceId || undefined,
       type: dto.type,
       title: compactTitle(dto.title),
       content: dto.content || {},

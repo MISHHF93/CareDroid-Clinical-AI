@@ -158,7 +158,7 @@ describe('IntegrationHubService', () => {
 
     expect(result.duplicate).toBe(true);
     expect(result.event.id).toBe('raw-existing');
-    expect(result.normalizedEvent.id).toBe('normalized-existing');
+    expect(result.normalizedEvent?.id).toBe('normalized-existing');
     expect(eventRepository.save).not.toHaveBeenCalled();
     expect(auditService.log).not.toHaveBeenCalled();
   });

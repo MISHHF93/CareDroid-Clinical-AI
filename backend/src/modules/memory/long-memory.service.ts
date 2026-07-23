@@ -16,7 +16,7 @@ export class LongMemoryService {
   async remember(userId: string, dto: CreateLongMemoryDto) {
     const entry = this.longMemoryRepository.create({
       userId,
-      workspaceId: dto.workspaceId || null,
+      workspaceId: dto.workspaceId || undefined,
       type: dto.type,
       title: compactTitle(dto.title),
       content: dto.content || {},

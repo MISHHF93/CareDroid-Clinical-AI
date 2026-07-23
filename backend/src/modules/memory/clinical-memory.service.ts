@@ -16,12 +16,12 @@ export class ClinicalMemoryService {
   async record(userId: string, dto: CreateClinicalMemoryDto) {
     const entry = this.clinicalMemoryRepository.create({
       userId,
-      workspaceId: dto.workspaceId || null,
-      patientId: dto.patientId || null,
+      workspaceId: dto.workspaceId || undefined,
+      patientId: dto.patientId || undefined,
       type: dto.type,
       title: compactTitle(dto.title),
       content: dto.content || {},
-      source: dto.source || null,
+      source: dto.source || undefined,
     });
     return this.serialize(await this.clinicalMemoryRepository.save(entry));
   }
