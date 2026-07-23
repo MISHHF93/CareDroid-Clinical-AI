@@ -2,7 +2,7 @@
 
 **CareDroid — Emergency Department operations platform** (Vite + React frontend, NestJS backend, embedded clinical copilot). This file tracks a long-running, cycle-by-cycle quality-improvement program: one well-scoped, evidence-backed lever per cycle, never a fabricated score.
 
-**Last updated: 2026-07-23 (Cycle 159 — closed all 18 test failures + 6 tsc errors Cycle 158 found; see Cycle log below).**
+**Last updated: 2026-07-23 (Cycle 160 — dependency-audit regression closed: frontend 2→0 vulnerabilities, backend 8→2 (critical cleared); see Cycle log below).**
 
 **Rebuilt: 2026-07-23 (Cycle 158).** The previous version of this file had become structurally broken: its "Last updated" line had grown, by prepending each cycle's narrative for 157 cycles, to **162,783 characters on a single line** — unreadable by normal editors and tooling. Several other sections had the same runaway-accumulation shape. Nothing was deleted: the full prior file is preserved verbatim at [docs/archive/SCORECARD-archive-2026-07-23-cycles-1-157.md](docs/archive/SCORECARD-archive-2026-07-23-cycles-1-157.md), and the complete cycle-by-cycle narrative (157+ cycles) remains in project memory (`project-quality-baseline-cycle0.md`). This rebuild also found that parts of the old file were internally stale before it was even retired, and that the frontend test suite's last-recorded pass count was stale too — see the Cycle 158 entries in "Testing, accessibility & delivery" and "Cycle log" below.
 
@@ -33,6 +33,20 @@ Everything in this section was actually executed on 2026-07-23 against the curre
 
 *(Test suite result rows below were filled in after both suites finished — see "Testing, accessibility & delivery" gauge.)*
 
+## Cycle 160 — dependency-audit regression, closed (mostly)
+
+| Check | Result |
+|---|---|
+| Frontend `npm audit --omit=dev` | **0 vulnerabilities** (was 2) — `npm audit fix` cleanly bumped `axios`, `protobufjs`, `js-yaml`, `shell-quote`, `brace-expansion` within their existing `package.json` semver ranges |
+| Backend `npm audit --omit=dev` | **2 high** (was 8: 1 moderate, 6 high, 1 critical) — `npm audit fix` (non-force) cleared `typeorm`, `brace-expansion`, `dd-trace` and dependents; a targeted `overrides` entry (`protobufjs: ^7.6.5`, package.json) deduped the last critical finding (arbitrary code execution via `onnx-proto`'s vendored `protobufjs@6.11.6`) onto the same 7.6.5 already used elsewhere in this tree via `firebase-admin`/`google-gax` — zero new packages introduced |
+| Real embedding smoke test | **Verified** — `pipeline('feature-extraction', 'Xenova/all-mpnet-base-v2')` against real cached model weights, real text in, real 768-dim float vector out, after the `protobufjs` override. This is the actual runtime path the critical finding sat on (`@xenova/transformers` → `onnxruntime-web` → `onnx-proto` → `protobufjs`), not just a clean `npm ls` |
+| Backend test suite | 245/245 suites, 1922/1922 tests — unchanged, re-run twice across the dependency changes |
+| Frontend test suite | **Not re-verified this cycle** — see below |
+
+**Still open: `sharp <0.35.0` (high, libvips CVEs) via `@xenova/transformers`'s vendored copy.** Attempted the same override approach; the fix requires npm to write a fresh native `.node` binary, which a local Windows Application Control policy in this dev sandbox blocked outright (`ERR_DLOPEN_FAILED`) — confirmed via direct `dlopen()` test, not just the wrapped error. Reverted to the original, already-trusted `sharp@0.32.6` rather than ship an unverified native-dependency bump; `sharp` is 0.x (pre-1.0 semver, minor bumps can be breaking) and is eagerly imported by `@xenova/transformers`'s pipeline machinery even for text-only feature-extraction — a broken sharp would take the whole embedding path down, so this isn't a low-stakes swap to make blind. Left open for a cycle with CI/Linux verification access (production runs `FROM node:20-alpine`, a different binary entirely, so this sandbox's block has no bearing on production safety — it's a *local verification* blocker, not a production risk indicator either way).
+
+**Frontend runtime verification also blocked this cycle, unrelated to the dependency changes' correctness:** after `npm audit fix` touched `node_modules`, the same Application Control policy re-flagged the `esbuild` native binary Vite/Vitest depend on to even load their config file — `tsc` and `eslint` don't spawn it and both stayed clean, but `npm run test:run` cannot run in this sandbox for the remainder of this session. Reported honestly rather than assumed passing.
+
 ---
 
 ## Exit-criteria gauges
@@ -47,7 +61,7 @@ Everything in this section was actually executed on 2026-07-23 against the curre
 | Performance | 81 / 90 | 90 | carried forward |
 | Accessibility | 86 / 90 | 90 | carried forward |
 | Testing & quality | 90 / 90 | 90 | **Cycle 159: both suites now clean — 927/927 frontend files (12045/12045 tests), 245/245 backend suites (1922/1922 tests). All 18 failures found in Cycle 158 root-caused and fixed. Number carried forward but no longer contradicted by known failures.** |
-| Security & privacy | 94 / 95 | 95 | carried forward — **Cycle 158 found a fresh dependency-audit regression (see above) not yet reflected in this number** |
+| Security & privacy | 94 / 95 | 95 | **Cycle 160: frontend audit fully clean, backend down to 2 high (from 8 incl. 1 critical) — the critical finding that prompted this number's flag in Cycle 158 is resolved and verified** |
 | Clinical workflow | 85 / 95 | 95 | carried forward |
 | **Overall readiness** | **95 / 95** | **95** | carried forward |
 
@@ -100,7 +114,7 @@ Every category but Frontend UX/UI still sits below target — an honest reflecti
 | Perimeter security | GOOD 60 | Unchanged. |
 | Authorization depth (RBAC) | WARN 73 | Entire remaining RBAC controller triage list closed — all ~17 remaining controllers read in full and found clean under 4 legitimate authorization patterns. |
 | PHI encryption reach | WARN 57 (was 56) | Verified `User.emailEncrypted` genuinely encrypted (AES-256-GCM); `UserProfile`'s DOB/history/allergy/medication encrypted columns were found never actually written to (non-functional no-op lifecycle hooks) — removed/documented. |
-| Dependency security | GOOD 75 (was 74) | Last recorded: backend 4 findings unchanged, frontend 0 vulnerabilities. **Cycle 158 re-check: this has regressed — frontend now 2, backend now 8 including 1 critical. See fresh evidence above; this GOOD rating needs revisiting next cycle.** |
+| Dependency security | GOOD 75 (was 74) | Regressed Cycle 158 (frontend 2, backend 8 incl. 1 critical). **Cycle 160: frontend back to 0, backend down to 2 high (critical cleared, verified via a real embedding smoke test) — remaining `sharp` finding is a native-binary version bump this sandbox can't safely verify locally, left open rather than shipped blind.** |
 | Multi-tenant data isolation | WARN 62 | Closed a RAG tenant-scoping gap (vector DB had no `organizationId` concept) — not yet exploitable in practice, but was a real cross-tenant PHI-leak risk once org-specific ingestion ships. |
 
 ### Testing, accessibility & delivery
@@ -154,6 +168,7 @@ Every category but Frontend UX/UI still sits below target — an honest reflecti
 - **(Cycle 156)** Confirmed backend/frontend wiring is sound (0 unguarded API calls, 0 contract gaps) via the app's own audit infrastructure; fixed a report-test timeout bug that had silently prevented that confirmation from ever being regenerated into docs.
 - **(Cycle 157)** Found and fixed a tool-catalog status-labeling bug that mislabeled 7 deliberately chat-only clinical tools as broken ("component gap") after they gained real backend executors.
 - **(Cycle 159)** First fully clean full-suite run recorded in this file's history: frontend 927/927 files (12045/12045 tests), backend 245/245 suites (1922/1922 tests), both `tsc` trees and `eslint` at 0 errors — closed an 18-test regression across 2 suites plus 6 previously-uncaught `tsc` errors, all individually root-caused rather than mass-suppressed.
+- **(Cycle 160)** Frontend `npm audit` back to 0 vulnerabilities; backend's critical RCE finding (`protobufjs` via `onnx-proto`) fixed via a targeted `overrides` entry and verified with a real embedding smoke test against the actual cached ONNX model, not just a clean dependency tree.
 
 ---
 
@@ -164,13 +179,13 @@ Every category but Frontend UX/UI still sits below target — an honest reflecti
 | # | Status | Item | Note |
 |---|---|---|---|
 | — | ~~P1~~ DONE | 17 frontend test files (25 tests) failing with real named-assertion failures, not teardown noise | Closed 2026-07-23 (Cycle 159) — root-caused into ~8 distinct clusters (calculator lazy-loading refactor, backend route inventory gaps, renamed config file, intentional soft-fail behavior change, 2 stale doc/status fields, a new unmocked AI dependency, a dropped BEM modifier, an aria-role query mismatch) and fixed individually; full suite re-verified clean: **927/927 files, 12045/12045 tests.** |
-| — | P1 OPEN | Backend `npm audit` still shows 1 critical + 6 high findings (was "4 known, unchanged") | Found Cycle 158, not yet fixed — `npm audit fix --force` is a breaking downgrade of `@xenova/transformers` (item #5 below) and deserves its own verified pass. Now the most urgent unresolved item on this list given the critical severity. |
+| — | ~~P1~~ DONE (mostly) | Backend `npm audit` critical + frontend audit regression | Closed 2026-07-23 (Cycle 160) — frontend 2→0 vulnerabilities via `npm audit fix`; backend 8→2 via `npm audit fix` (non-force) + a targeted `protobufjs` override, verified with a real embedding smoke test. Remaining `sharp` high finding (item #5 below) needs native-binary verification this sandbox can't provide locally. |
 | — | ~~P2~~ DONE | 1 backend test file failing: stale test double missing `AiGatewayService.attachUnifiedNode` | Closed 2026-07-23 (Cycle 159) — added the missing mock method to `test/tool-calling.spec.ts`'s `AIGatewayService` provider; backend suite now **245/245 suites, 1922/1922 tests.** |
 | 1 | P1 OPEN | Untangle 72 frontend circular deps centered on `emergencyStore.ts` | First `madge --circular` scan; needs a dedicated architecture pass, not a drive-by. |
 | 2 | P1 OPEN | Cut `EmergencyPatientService` reads to the database (Phase 2) | One of two blockers closed (entities exist); remaining reentrancy/race issue needs a dedicated design pass. |
 | 3 | P1 OPEN | Get a real pass on the ported integration test suite | Blocked locally by sandbox Application Control policy on in-memory Mongo; not blocked on real CI. |
 | 4 | P2 OPEN | Triage ~1,953 frontend / ~702 backend `ts-prune` unused exports | Investigation-only so far; found 7 unregistered page components. |
-| 5 | P2 OPEN | Decide whether to migrate off `@xenova/transformers` | Abandoned package, no safe version bump; now the direct source of the backend's 1 critical + several high audit findings (see NEW row above). |
+| 5 | P2 OPEN | `sharp <0.35.0` (high) via `@xenova/transformers`'s vendored copy, and whether to migrate off `@xenova/transformers` entirely | Cycle 160: critical `protobufjs` finding in the same chain is now fixed via override (verified). `sharp`'s fix needs a fresh native binary this dev sandbox's Application Control policy blocks from loading — needs CI/Linux verification, not a local one. `@xenova/transformers` itself is still abandoned at 2.17.2 (no newer version exists); `@huggingface/transformers` is the maintained successor and a plausible drop-in (same `pipeline()` API) but not evaluated end-to-end this cycle. |
 | 6 | P2 OPEN | Wire Prometheus/Grafana into `docker-compose.app.yml` | Real, consumed stack just missing from the compose file; needs Docker to verify. |
 | 7 | P2 OPEN (partially advanced) | Run Playwright/axe-core + Lighthouse profiling in a real browser | System-Edge workaround works; axe-core + Web Vitals run for real; suite coverage grown 8→15 pages. |
 | 8 | P2 OPEN | Fix TBT/page-weight finding from perf measurement | Root cause found and fixed (dev JSX runtime shipping in prod), -27.5% JS; row not marked fully closed. |
@@ -233,3 +248,15 @@ Picked up the top item Cycle 158 left open: 17 frontend files (25 tests) + 1 bac
 Ran `tsc --noEmit` after all fixes as a sanity check and found **6 fresh errors Cycle 158's "0 errors" claim hadn't caught** — `smartIntakeApi.ts`'s `postJson`/`getJson` had no explicit return type, so TS inferred an overly-narrow union across their 3 distinct return shapes (real payload / demo session / demo-ok), breaking property access at 5 call sites in `SmartIntake.tsx` and the file itself; separately, an unrelated latent gap in `AiRouteMetadata.tsx` (a destructured `routePlan` param with no default, making it structurally required even though the component already handles it being absent) surfaced too. Fixed both with explicit type annotations rather than casts. Could not conclusively determine why Cycle 158's tsc run — against the same `HEAD` commit — didn't report these; noted honestly rather than guessed at (possible incremental-build-cache staleness, not reproduced).
 
 **Final state, all fresh this cycle:** frontend `tsc` 0 errors, backend `tsc` 0 errors, frontend `eslint` 0 errors, backend suite 245/245 (1922/1922), frontend suite **927/927 files, 12045/12045 tests** — the first fully clean full-suite run recorded in this file's history (the 43 `EnvironmentTeardownError` occurrences are unchanged from Cycle 158's count, pre-existing async-teardown noise, not test failures). Did not touch the still-open backend `npm audit` critical/high findings (Cycle 158's other top item) — a dependency-upgrade decision, not a test-drift fix, left for its own cycle.
+
+### Cycle 160 (2026-07-23) — closed the dependency-audit regression: frontend 2→0, backend 8→2 (critical cleared and verified)
+
+Picked up the other top item Cycle 158 left open. Started with the safe path: `npm audit fix` (non-force) on both trees. Frontend went straight to 0 vulnerabilities — `axios`, `protobufjs`, `js-yaml`, `shell-quote`, and `brace-expansion` all had patch/minor fixes within the ranges already declared in `package.json`, confirmed via `tsc`/`eslint` staying clean afterward. Backend dropped from 8 to 5 (clearing `typeorm`, `brace-expansion`, `dd-trace` and dependents), leaving only the `@xenova/transformers` chain — a critical `protobufjs` RCE (via `onnx-proto`'s vendored `protobufjs@6.11.6`) and a high `sharp` finding, both requiring `npm audit fix --force`'s breaking `@xenova/transformers@1.4.2` downgrade per npm's own suggestion.
+
+Investigated before accepting that downgrade. `@xenova/transformers` is genuinely capped at 2.17.2 (checked `npm view ... versions` — no newer release exists, confirming the roadmap's "abandoned package" note) and the maintained successor, `@huggingface/transformers`, exists at 4.2.0 — but a full library migration is a separate, larger body of work, not evaluated end-to-end here. Instead tried the smaller, more surgical fix: an `overrides` entry forcing `protobufjs` to `^7.6.5` repo-wide. A nested override (`{"onnx-proto": {"protobufjs": "..."}}`) silently failed to apply through incremental `npm install` (left the tree in an "invalid" state); a blanket top-level override worked cleanly, deduping `onnx-proto`'s copy onto the same `7.6.5` already used elsewhere in this exact tree via `firebase-admin`/`google-gax` — zero new packages, zero version conflicts.
+
+Did not stop at a clean `npm ls`. Since this override changes which `protobufjs` build actually parses ONNX model definitions at runtime, wrote a smoke script calling the real `pipeline('feature-extraction', 'Xenova/all-mpnet-base-v2')` against the already-cached model weights with real text — got back a genuine 768-dimension float vector, confirming the override doesn't break the actual inference path, not just its dependency tree.
+
+Attempted the same override approach for the remaining `sharp <0.35.0` finding and hit a real environment wall: forcing a new `sharp` version requires npm to write a fresh native `.node` binary, and this dev sandbox's Windows Application Control policy blocked it outright — confirmed two ways (through the wrapped `ERR_DLOPEN_FAILED` error, and via a direct `node -e "require(...)"` `dlopen()` call on the file itself, both citing the same policy). The exact same policy separately re-flagged the frontend's `esbuild` binary after its own `npm audit fix` touched `node_modules`, blocking `npm run test:run` for the rest of this session — confirmed by retrying after a wait, not assumed permanent. Rather than ship a native-dependency version bump nobody had verified, reverted `sharp` to its original, already-trusted `0.32.6` — re-ran the smoke test to confirm the revert didn't undo the real fix (it didn't; the 768-dim vector still came back clean) — and left the `sharp` finding open, flagged for a cycle with CI or Linux-container verification access, where this Windows-only local restriction doesn't apply and production (`FROM node:20-alpine`) was never affected by it either way.
+
+Verified nothing else regressed: backend `tsc` 0 errors and full suite 245/245 (1922/1922) re-run twice across the changes. Frontend `tsc` and `eslint` confirmed clean before the sandbox blocked further frontend runtime verification; frontend's own test suite was not re-run this cycle for that reason, reported honestly rather than assumed passing.
