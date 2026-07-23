@@ -21,7 +21,7 @@ describe('administrative-automation-orchestration.lib', () => {
       flags: [],
       notes: [],
       timeline: [],
-    } as Patient;
+    } as unknown as Patient;
 
     const snapshot = await buildBackendEnrichedAdministrativeAutomationSnapshot({
       patients: [patient],
@@ -61,7 +61,7 @@ describe('administrative-automation-orchestration.lib', () => {
       flags: [],
       notes: [],
       timeline: [],
-    } as Patient;
+    } as unknown as Patient;
 
     const snapshot = await buildBackendEnrichedAdministrativeAutomationSnapshot({
       patients: [patient],

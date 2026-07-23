@@ -213,7 +213,7 @@ export class SofaCalculatorService implements ClinicalToolService {
       renal: this.calculateRenalScore(parameters),
     };
 
-    const totalScore = Object.values(scores).reduce((sum, score) => sum + (score || 0), 0);
+    const totalScore = Object.values(scores).reduce<number>((sum, score) => sum + (score || 0), 0);
 
     // Interpret the score
     const interpretation = this.interpretScore(totalScore);

@@ -831,11 +831,11 @@ export class EmergencyPatientService {
       notes: patient.notes,
       timeline: patient.timeline,
       triageAssist: patient.triageAssist,
-      triageAssistGeneratedAt: patient.triageAssistGeneratedAt,
+      triageAssistGeneratedAt: patient.triageAssistGeneratedAt ?? undefined,
       arrivalMode: patient.arrivalMode,
       registrationStatus: patient.registrationStatus,
       triagePending: patient.triagePending,
-      firstContactAt: patient.firstContactAt,
+      firstContactAt: patient.firstContactAt ?? undefined,
       queueDestination: patient.queueDestination,
       arrival: patient.arrival,
       quickSafetyFlags: patient.quickSafetyFlags,
@@ -1415,8 +1415,8 @@ export class EMSIntakeService {
         metadata: {
           handoff: 'ems.handoff',
           arrivalId,
-          unitId: input.unitId,
-          unitName: input.unitName,
+          unitId: input.unitId ?? null,
+          unitName: input.unitName ?? null,
         },
       });
     }
