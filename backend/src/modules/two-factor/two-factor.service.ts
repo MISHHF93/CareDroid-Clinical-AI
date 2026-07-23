@@ -34,6 +34,7 @@ export class TwoFactorService {
       name: `CareDroid (${user.email})`,
       issuer: 'CareDroid',
       length: 32,
+      otpauth_url: true,
     });
 
     // Generate QR code

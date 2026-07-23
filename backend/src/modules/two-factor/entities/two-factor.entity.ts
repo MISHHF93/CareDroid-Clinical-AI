@@ -20,10 +20,10 @@ export class TwoFactor {
   enabled: boolean;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  secret: string; // TOTP secret (encrypted)
+  secret: string | null; // TOTP secret (encrypted)
 
   @Column({ type: 'simple-array', nullable: true })
-  backupCodes: string[]; // Hashed backup codes
+  backupCodes: string[] | null; // Hashed backup codes
 
   @Column({ type: 'datetime', nullable: true })
   lastUsedAt: Date;

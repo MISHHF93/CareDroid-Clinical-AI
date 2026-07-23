@@ -116,6 +116,7 @@ describe('TwoFactorService', () => {
         name: speakerEasyName,
         issuer: 'CareDroid',
         length: 32,
+        otpauth_url: true,
       });
     });
 

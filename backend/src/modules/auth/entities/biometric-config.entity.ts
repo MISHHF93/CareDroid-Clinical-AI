@@ -58,7 +58,7 @@ export class BiometricConfig {
   failedAttempts: number;
 
   @Column({ type: 'datetime', nullable: true })
-  lockedUntil: Date;
+  lockedUntil: Date | null;
 
   @CreateDateColumn()
   createdAt: Date;

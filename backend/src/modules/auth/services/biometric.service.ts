@@ -102,10 +102,10 @@ export class BiometricService {
    * Verify biometric authentication
    */
   async verifyBiometric(dto: VerifyBiometricDto): Promise<{
-    success: boolean;
-    accessToken?: string;
-    refreshToken?: string;
-    user?: User;
+    success: true;
+    accessToken: string;
+    refreshToken: string;
+    user: User;
   }> {
     try {
       const config = await this.biometricRepository.findOne({

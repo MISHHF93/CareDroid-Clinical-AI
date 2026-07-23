@@ -40,7 +40,7 @@ export class AssetAccessService {
       this.resolveWorkspaceAssetIds(activeWorkspace?.settings?.recommendedAssetIds || []),
     );
     const roleRecommended = new Set<string>(
-      (ctx.roleProfile?.recommendedAssetIds || []) as string[],
+      (ctx.roleProfile?.preferredAssetIds || []) as string[],
     );
     const prefs = await this.userPreferencesService.getPreferences(user.id);
     const pinned = new Set([
@@ -64,7 +64,9 @@ export class AssetAccessService {
     const assetById = new Map(dbAssets.map((a) => [a.id, a]));
 
     const ids =
-      assetIds?.length > 0 ? assetIds : [...new Set([...entitled, ...dbAssets.map((a) => a.id)])];
+      assetIds && assetIds.length > 0
+        ? assetIds
+        : [...new Set([...entitled, ...dbAssets.map((a) => a.id)])];
 
     const access: AssetAccessRecord[] = ids
       .map((assetId) =>
