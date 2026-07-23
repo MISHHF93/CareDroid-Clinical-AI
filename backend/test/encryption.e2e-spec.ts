@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -7,6 +8,7 @@ import { EncryptionService } from '../src/modules/encryption/encryption.service'
 import { KeyRotationService } from '../src/modules/encryption/key-rotation.service';
 import { EncryptionKey } from '../src/modules/encryption/entities/encryption-key.entity';
 import { EncryptionModule } from '../src/modules/encryption/encryption.module';
+import encryptionConfig from '../src/config/encryption.config';
 
 /**
  * End-to-End tests for Encryption module
@@ -28,6 +30,11 @@ describe('Encryption Module E2E', () => {
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [
+        ConfigModule.forRoot({
+          isGlobal: true,
+          ignoreEnvFile: true,
+          load: [encryptionConfig],
+        }),
         TypeOrmModule.forRoot({
           type: 'sqlite',
           database: ':memory:',
@@ -135,9 +142,9 @@ describe('Encryption Module E2E', () => {
 
       // Simulate completion
       await keyRotationService.updateRotationProgress(keyVersion, 100, 5000);
-      const updatedKey = await encryptionKeyRepository.findOne({
+      const updatedKey = (await encryptionKeyRepository.findOne({
         where: { keyVersion },
-      });
+      }))!;
 
       expect(updatedKey.progressPercentage).toBe(100);
       expect(updatedKey.recordsProcessed).toBe(5000);
@@ -195,9 +202,9 @@ describe('Encryption Module E2E', () => {
         const oldestKey = oldKeys[0];
         await keyRotationService.scheduleOldKeyDeletion(7); // 7 days
 
-        const scheduled = await encryptionKeyRepository.findOne({
+        const scheduled = (await encryptionKeyRepository.findOne({
           where: { keyVersion: oldestKey.keyVersion },
-        });
+        }))!;
 
         expect(scheduled.deletionScheduledAt).toBeDefined();
       }
@@ -229,7 +236,7 @@ describe('Encryption Module E2E', () => {
 
       // For this test, we simulate the re-encryption process
       // In production, a background job would do this
-      const originalKey = Buffer.from(process.env.ENCRYPTION_MASTER_KEY, 'hex');
+      const originalKey = Buffer.from(process.env.ENCRYPTION_MASTER_KEY!, 'hex');
       const newEncrypted = encryptionService.reEncryptWithNewKey(oldEncrypted, originalKey);
 
       // Both should decrypt to original plaintext
@@ -245,7 +252,7 @@ describe('Encryption Module E2E', () => {
       await keyRotationService.initiateKeyRotation('BATCH_REENCRYPT');
 
       // Simulate re-encryption of batch
-      const masterKey = Buffer.from(process.env.ENCRYPTION_MASTER_KEY, 'hex');
+      const masterKey = Buffer.from(process.env.ENCRYPTION_MASTER_KEY!, 'hex');
       const reencrypted = encrypted.map((e) => encryptionService.reEncryptWithNewKey(e, masterKey));
 
       // Verify all decrypt correctly
@@ -312,9 +319,9 @@ describe('Encryption Module E2E', () => {
     it('should record audit information', async () => {
       const rotation = await keyRotationService.initiateKeyRotation('AUDIT_TEST');
 
-      const keyRecord = await encryptionKeyRepository.findOne({
+      const keyRecord = (await encryptionKeyRepository.findOne({
         where: { keyVersion: rotation.keyVersion },
-      });
+      }))!;
 
       expect(keyRecord).toBeDefined();
       expect(keyRecord.auditInfo).toBeDefined();
