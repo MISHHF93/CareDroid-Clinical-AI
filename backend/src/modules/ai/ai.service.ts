@@ -741,9 +741,7 @@ export class AIService {
     const candidate = {
       requestId,
       correlationId,
-      organizationId: String(
-        body.organizationId || tenantContext?.organizationId || 'unknown-org',
-      ),
+      organizationId: String(body.organizationId || tenantContext?.organizationId || 'unknown-org'),
       workspaceId: body.workspaceId
         ? String(body.workspaceId)
         : tenantContext?.workspaceId
@@ -752,9 +750,7 @@ export class AIService {
       facilityId: body.facilityId ? String(body.facilityId) : undefined,
       userId: String(body.userId || userId),
       role: String(body.role || tenantContext?.role || 'unknown'),
-      permissions: Array.isArray(body.permissions)
-        ? body.permissions.map(String)
-        : ['use_ai_chat'],
+      permissions: Array.isArray(body.permissions) ? body.permissions.map(String) : ['use_ai_chat'],
       channel: body.channel,
       task: body.task,
       patientContext: isPlainRecord(body.patientContext) ? body.patientContext : undefined,
@@ -789,8 +785,7 @@ export class AIService {
           allowed: false,
           requiresHumanReview: true,
           reasons: validation.errors.map((e) => e.message),
-          disclaimer:
-            'Human review required. This is not a replacement for clinical judgment.',
+          disclaimer: 'Human review required. This is not a replacement for clinical judgment.',
         },
         createdAt: new Date().toISOString(),
       };
@@ -1598,15 +1593,15 @@ function isPlainRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value && typeof value === 'object' && !Array.isArray(value));
 }
 
-function resolveUnifiedTaskToIntent(
-  task: string,
-  channel: string,
-): CareDroidAIIntent | null {
+function resolveUnifiedTaskToIntent(task: string, channel: string): CareDroidAIIntent | null {
   if (task === 'prepare_handoff') {
     return channel === 'ems' ? 'ems_prearrival_risk_summary' : 'handoff_summary';
   }
   if (task === 'suggest_next_action' && channel === 'triage') return 'triage_recommendation';
-  if (task === 'detect_missing_information' || (task === 'answer_question' && channel === 'reception')) {
+  if (
+    task === 'detect_missing_information' ||
+    (task === 'answer_question' && channel === 'reception')
+  ) {
     return 'patient_intake_assist';
   }
   if (task === 'explain_alert') return 'critical_alert_assessment';

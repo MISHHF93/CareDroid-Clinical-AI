@@ -1,7 +1,4 @@
-import {
-  buildRoom12DelayBoardDto,
-  projectFromNeutralDto,
-} from '../../../../lib/cig';
+import { buildRoom12DelayBoardDto, projectFromNeutralDto } from '../../../../lib/cig';
 import {
   cigEdgeToEntity,
   cigEntityToEdge,

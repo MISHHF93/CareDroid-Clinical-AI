@@ -93,8 +93,7 @@ describe('CigProjectionFacade Mode B', () => {
   });
 
   it('projects Room 12 board DTO, persists nodes/edges, emits graph updated', async () => {
-    const { facade, nodeRepo, edgeRepo, snapshotRepo, outboxRepo, eventRepo, bus } =
-      buildFacade();
+    const { facade, nodeRepo, edgeRepo, snapshotRepo, outboxRepo, eventRepo, bus } = buildFacade();
 
     const graphEvents: unknown[] = [];
     bus.onGraphUpdated((p) => graphEvents.push(p));

@@ -118,4 +118,3 @@ describe('EmergencyPatientService CIG Mode B hooks (PR-5b)', () => {
     expect(rejectFn).toHaveBeenCalled();
   });
 });
-

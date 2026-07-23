@@ -422,8 +422,7 @@ export class IntentClassifierService {
       this.recordSuccess(this.nluCircuitBreaker);
 
       const toolId =
-        keywordResult.toolId ||
-        resolveExecutorToolId(routed.intent, routed.artifactType, message);
+        keywordResult.toolId || resolveExecutorToolId(routed.intent, routed.artifactType, message);
 
       const extractedParameters = { ...keywordResult.extractedParameters };
       if (routed.artifactType && routed.artifactType !== 'unknown') {
@@ -441,10 +440,7 @@ export class IntentClassifierService {
         artifactType: routed.artifactType,
         artifactRouteConfidence: routed.artifactRouteConfidence,
         extractedParameters,
-        matchedPatterns: [
-          ...(keywordResult.matchedPatterns || []),
-          'unified-ai-node-enrichment',
-        ],
+        matchedPatterns: [...(keywordResult.matchedPatterns || []), 'unified-ai-node-enrichment'],
         nodeId: UnifiedAiNodeService.NODE_ID,
       };
     } catch (error) {

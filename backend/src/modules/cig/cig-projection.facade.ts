@@ -11,11 +11,7 @@ import {
   type NestEmergencyBoardSource,
 } from '../../../../lib/cig';
 import { cigSnapshotRedisKey } from './cig-schema.constants';
-import {
-  cigEdgeToEntity,
-  cigNodeToEntity,
-  cigSnapshotMetaToEntity,
-} from './cig-entity-mappers';
+import { cigEdgeToEntity, cigNodeToEntity, cigSnapshotMetaToEntity } from './cig-entity-mappers';
 import { CigEventBus } from './cig-event.bus';
 import { CigEdgeEntity } from './entities/cig-edge.entity';
 import { CigEventEntity } from './entities/cig-event.entity';
@@ -99,9 +95,7 @@ export class CigProjectionFacade {
 
     try {
       const prior = await this.snapshotRepo.findOne({ where: { tenantId } });
-      const nextVersion =
-        input.snapshotVersion ??
-        (prior ? Number(prior.version) + 1 : 1);
+      const nextVersion = input.snapshotVersion ?? (prior ? Number(prior.version) + 1 : 1);
 
       const generatedAt = input.generatedAt || new Date().toISOString();
       const dto = this.resolveDto(input, tenantId, nextVersion, generatedAt, mode);
@@ -184,7 +178,7 @@ export class CigProjectionFacade {
       workspaceId: input.workspaceId ?? input.board?.workspaceId,
       generatedAt,
       snapshotVersion,
-      durability: mode === 'A' ? input.board?.durability ?? 'session' : 'session',
+      durability: mode === 'A' ? (input.board?.durability ?? 'session') : 'session',
     };
     return adaptNestEmergencyOsToNeutralDto(board);
   }
@@ -355,11 +349,7 @@ export class CigProjectionFacade {
     await this.eventRepo.save(entity);
   }
 
-  private fail(
-    mode: CigProjectionMode,
-    tenantId: string,
-    error: string,
-  ): CigProjectionResult {
+  private fail(mode: CigProjectionMode, tenantId: string, error: string): CigProjectionResult {
     return {
       ok: false,
       mode,

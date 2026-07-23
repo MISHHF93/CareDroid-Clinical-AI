@@ -75,8 +75,7 @@ export function cigEntityToNode(entity: CigNodeEntity): CigNode {
     version: entity.version,
     projectorGeneration: entity.projectorGeneration,
     contentHash: entity.contentHash ?? undefined,
-    lastGraphVersion:
-      entity.lastGraphVersion == null ? undefined : Number(entity.lastGraphVersion),
+    lastGraphVersion: entity.lastGraphVersion == null ? undefined : Number(entity.lastGraphVersion),
     updatedAt: toIso(entity.updatedAt),
     createdAt: toIso(entity.createdAt),
     archivedAt: entity.archivedAt ? toIso(entity.archivedAt) : null,

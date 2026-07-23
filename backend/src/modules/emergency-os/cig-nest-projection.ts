@@ -31,9 +31,7 @@ export type BuildCigFromNestBoardInput = {
   recommendations?: NestEmergencyBoardSource['recommendations'];
 };
 
-export function buildCigSnapshotFromNestBoard(
-  input: BuildCigFromNestBoardInput,
-): CigGraphSnapshot {
+export function buildCigSnapshotFromNestBoard(input: BuildCigFromNestBoardInput): CigGraphSnapshot {
   const source: NestEmergencyBoardSource = {
     tenantId: input.tenantId,
     organizationId: input.organizationId,

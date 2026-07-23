@@ -6,7 +6,13 @@ export class CreateAiActionProposalAuditEntries1772701700000 implements Migratio
       new Table({
         name: 'ai_action_proposal_audit_entries',
         columns: [
-          { name: 'id', type: 'uuid', isPrimary: true, isGenerated: true, generationStrategy: 'uuid' },
+          {
+            name: 'id',
+            type: 'uuid',
+            isPrimary: true,
+            isGenerated: true,
+            generationStrategy: 'uuid',
+          },
           { name: 'proposalId', type: 'varchar', length: '36' },
           { name: 'sequenceIndex', type: 'int' },
           { name: 'fromState', type: 'varchar', length: '20', isNullable: true },

@@ -60,7 +60,9 @@ describe('DocumentChunker edge-case matrix (RG8)', () => {
   it('force-splits a single oversized sentence by token budget', () => {
     const longWord = Array.from({ length: 80 }, (_, i) => `token${i}`).join(' ');
     const chunks = chunker.chunkDocument(
-      sourceDto(longWord, { chunkingOptions: { chunkSize: 16, overlap: 0, respectBoundaries: true } }),
+      sourceDto(longWord, {
+        chunkingOptions: { chunkSize: 16, overlap: 0, respectBoundaries: true },
+      }),
     );
     expect(chunks.length).toBeGreaterThan(1);
     expect(chunks.every((c) => c.tokenCount <= 16)).toBe(true);
@@ -76,9 +78,7 @@ describe('DocumentChunker edge-case matrix (RG8)', () => {
   });
 
   it('preserves source metadata on every produced chunk', () => {
-    const chunks = chunker.chunkDocument(
-      sourceDto('Protocol step one. Protocol step two.'),
-    );
+    const chunks = chunker.chunkDocument(sourceDto('Protocol step one. Protocol step two.'));
     expect(chunks.length).toBeGreaterThan(0);
     for (const chunk of chunks) {
       expect(chunk.metadata.sourceId).toBe('src-edge');
