@@ -1,6 +1,6 @@
 # Endpoint-to-frontend matrix
 
-**Generated:** 2026-07-09T00:27:17.259Z
+**Generated:** 2026-07-23T04:14:46.624Z
 
 | Method | Path | Backend | Frontend client | Exposure |
 |--------|------|---------|-----------------|----------|
@@ -363,13 +363,13 @@
 - `GET /api/emergency/implementation-readiness`
 - `GET /api/emergency/patients/:patientId/workflow-logs`
 - `GET /api/emergency/ems`
+- `POST /api/emergency/ems/handoff`
 - `GET /api/emergency/intake`
 - `POST /api/emergency/intake`
 - `POST /api/emergency/intake/vertical-slice`
 - `GET /api/emergency/queues`
 - `GET /api/emergency/reassessment`
 - `GET /api/emergency/capacity`
-- `GET /api/emergency/boarding`
 
-_…and 548 more in src/data/backendHttpRouteInventory.js_
+_…and 566 more in src/data/backendHttpRouteInventory.js_
 

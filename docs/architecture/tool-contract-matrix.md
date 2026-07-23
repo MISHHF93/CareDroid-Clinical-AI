@@ -1,6 +1,6 @@
 # Tool contract matrix
 
-**Generated:** 2026-07-07T14:11:23.174Z
+**Generated:** 2026-07-23T04:14:37.662Z
 
 > **Source:** `src/data/toolContractMatrix.ts` (derived from `backendFrontendToolContract.ts`)
 > **Regenerate:** `npm run contract:write-docs`
@@ -12,14 +12,14 @@
 | Total rows | 252 |
 | NLU profiles | 219 |
 | Registry tools | 242 |
-| POST executors | 3 |
+| POST executors | 39 |
 
 ### Status distribution
 
 | Status | Count |
 |--------|------:|
-| fully wired | 4 |
-| frontend-only | 240 |
+| fully wired | 40 |
+| frontend-only | 204 |
 | backend-only | 0 |
 | broken | 0 |
 | planned | 8 |
@@ -28,8 +28,8 @@
 
 | Classification | Count |
 |----------------|------:|
-| user-facing and wired | 310 |
-| backend-only/internal | 224 |
+| user-facing and wired | 346 |
+| backend-only/internal | 280 |
 | user-facing but missing frontend route | 0 |
 | frontend-visible but backend missing | 0 |
 | planned/unsupported | 36 |
@@ -49,15 +49,51 @@
 - `sofa-calculator` → `POST /api/tools/sofa-calculator/execute`
 - `drug-interactions` → `POST /api/tools/drug-interactions/execute`
 - `lab-interpreter` → `POST /api/tools/lab-interpreter/execute`
+- `heart-score` → `POST /api/tools/heart-score/execute`
+- `cha2ds2vasc-calculator` → `POST /api/tools/cha2ds2vasc-calculator/execute`
+- `wells-pe` → `POST /api/tools/wells-pe/execute`
+- `shock-index` → `POST /api/tools/shock-index/execute`
+- `apache2-calculator` → `POST /api/tools/apache2-calculator/execute`
+- `anion-gap` → `POST /api/tools/anion-gap/execute`
+- `aa-gradient` → `POST /api/tools/aa-gradient/execute`
+- `news2` → `POST /api/tools/news2/execute`
+- `abcd2` → `POST /api/tools/abcd2/execute`
+- `canadian-c-spine` → `POST /api/tools/canadian-c-spine/execute`
+- `nexus-cspine` → `POST /api/tools/nexus-cspine/execute`
+- `gcs-calculator` → `POST /api/tools/gcs-calculator/execute`
+- `chads2` → `POST /api/tools/chads2/execute`
+- `duke-treadmill-score` → `POST /api/tools/duke-treadmill-score/execute`
+- `reynolds-risk-score` → `POST /api/tools/reynolds-risk-score/execute`
+- `has-bled` → `POST /api/tools/has-bled/execute`
+- `timi-ua-nstemi` → `POST /api/tools/timi-ua-nstemi/execute`
+- `framingham-risk` → `POST /api/tools/framingham-risk/execute`
+- `grace-acs` → `POST /api/tools/grace-acs/execute`
+- `corrected-calcium` → `POST /api/tools/corrected-calcium/execute`
+- `corrected-sodium` → `POST /api/tools/corrected-sodium/execute`
+- `fena` → `POST /api/tools/fena/execute`
+- `feurea` → `POST /api/tools/feurea/execute`
+- `osmolal-gap` → `POST /api/tools/osmolal-gap/execute`
+- `serum-osmolality` → `POST /api/tools/serum-osmolality/execute`
+- `pao2-fio2-ratio` → `POST /api/tools/pao2-fio2-ratio/execute`
+- `rox-index` → `POST /api/tools/rox-index/execute`
+- `mews` → `POST /api/tools/mews/execute`
+- `revised-trauma-score` → `POST /api/tools/revised-trauma-score/execute`
+- `hunt-hess-scale` → `POST /api/tools/hunt-hess-scale/execute`
+- `ich-score` → `POST /api/tools/ich-score/execute`
+- `four-score` → `POST /api/tools/four-score/execute`
+- `modified-rankin-scale` → `POST /api/tools/modified-rankin-scale/execute`
+- `pecarn-head` → `POST /api/tools/pecarn-head/execute`
+- `wells-dvt-calculator` → `POST /api/tools/wells-dvt-calculator/execute`
+- `abg-interpreter` → `POST /api/tools/abg-interpreter/execute`
 
 ## Full matrix
 
 <!-- markdownlint-disable MD013 -->
 | ID | Route | Component | Catalog | Registry | NLU | Executor | Endpoint | DTO | API client | Status |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| aa-gradient | /tools/calculators/aa-gradient | src/pages/tools/Calculators.tsx | yes | aa-gradient | aa-gradient | no | — | — | — | frontend-only |
-| abcd2 | /tools/calculators/abcd2 | src/pages/tools/Calculators.tsx | yes | abcd2 | abcd2 | no | — | — | — | frontend-only |
-| abg-interpreter | /tools/lab-interpreter | src/pages/tools/LabInterpreter.tsx | yes | abg-interpreter | abg-interpreter | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
+| aa-gradient | /tools/calculators/aa-gradient | src/pages/tools/Calculators.tsx | yes | aa-gradient | aa-gradient | aa-gradient | /api/tools/aa-gradient/execute | ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`) → ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, ...) | src/services/clinicalOrchestratorApi.ts | fully wired |
+| abcd2 | /tools/calculators/abcd2 | src/pages/tools/Calculators.tsx | yes | abcd2 | abcd2 | abcd2 | /api/tools/abcd2/execute | ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`) → ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, ...) | src/services/clinicalOrchestratorApi.ts | fully wired |
+| abg-interpreter | /tools/lab-interpreter | src/pages/tools/LabInterpreter.tsx | yes | abg-interpreter | abg-interpreter | abg-interpreter | /api/tools/abg-interpreter/execute | ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`) → ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, ...) | src/services/clinicalOrchestratorApi.ts | fully wired |
 | acls-protocol | /protocols | src/pages/tools/Protocols.tsx | yes | acls-protocol | acls-protocol | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | acs-workflow-assistant | /tools/cardiology/acs-workflow-assistant | src/pages/tools/CardiologyAssistantPage.tsx | yes | acs-workflow-assistant | acs-workflow-assistant | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | adjusted-body-weight | /tools/calculators/adjusted-body-weight | src/pages/tools/Calculators.tsx | yes | adjusted-body-weight | adjusted-body-weight | no | — | — | — | frontend-only |
@@ -73,9 +109,9 @@
 | ai-tool-calling | /assistant | src/pages/Assistant.jsx | yes | ai-tool-calling | ai-tool-calling | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | ai-training | /training | src/pages/TrainingDashboard.tsx | yes | ai-training | ai-training | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | aki-staging-assistant | /tools/nephrology/aki-staging-assistant | src/pages/tools/NephrologyAssistantPage.tsx | yes | aki-staging-assistant | aki-staging-assistant | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
-| anion-gap | /tools/calculators/anion-gap | src/pages/tools/Calculators.tsx | yes | anion-gap | anion-gap | no | — | — | — | frontend-only |
+| anion-gap | /tools/calculators/anion-gap | src/pages/tools/Calculators.tsx | yes | anion-gap | anion-gap | anion-gap | /api/tools/anion-gap/execute | ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`) → ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, ...) | src/services/clinicalOrchestratorApi.ts | fully wired |
 | antibiotic-guide | /tools/diagnosis | src/pages/tools/DiagnosisAssistant.tsx | yes | antibiotic-guide | antibiotic-guide | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
-| apache2-calculator | /tools/calculators/apache-ii | src/pages/tools/Calculators.tsx | yes | apache2-calculator | apache2-calculator | no | — | — | — | frontend-only |
+| apache2-calculator | /tools/calculators/apache-ii | src/pages/tools/Calculators.tsx | yes | apache2-calculator | apache2-calculator | apache2-calculator | /api/tools/apache2-calculator/execute | ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`) → ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, ...) | src/services/clinicalOrchestratorApi.ts | fully wired |
 | apgar-score | /tools/calculators/apgar-score | src/pages/tools/Calculators.tsx | yes | apgar-score | apgar-score | no | — | — | — | frontend-only |
 | apri | /tools/calculators/apri | src/pages/tools/Calculators.tsx | yes | apri | apri | no | — | — | — | frontend-only |
 | arrhythmia-risk-classifier | /tools/cardiology/arrhythmia-risk-classifier | src/pages/tools/CardiologyAssistantPage.tsx | yes | arrhythmia-risk-classifier | arrhythmia-risk-classifier | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
@@ -95,12 +131,12 @@
 | bun-creatinine-ratio | /tools/calculators/bun-creatinine-ratio | src/pages/tools/Calculators.tsx | yes | bun-creatinine-ratio | bun-creatinine-ratio | no | — | — | — | frontend-only |
 | cage | /tools/calculators/cage | src/pages/tools/Calculators.tsx | yes | cage | cage | no | — | — | — | frontend-only |
 | calculator-recommender-ai | /tools/calculator-recommender | src/pages/tools/CalculatorRecommender.tsx | yes | calculator-recommender-ai | calculator-recommender-ai | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
-| canadian-c-spine | /tools/calculators | src/pages/tools/Calculators.tsx | yes | canadian-c-spine | canadian-c-spine | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
+| canadian-c-spine | /tools/calculators | src/pages/tools/Calculators.jsx (hub card) + src/components/ChatInterface.jsx (ED Copilot) | yes | canadian-c-spine | canadian-c-spine | canadian-c-spine | /api/tools/canadian-c-spine/execute | ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`) → ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, ...) | src/services/clinicalOrchestratorApi.ts | fully wired |
 | cardiac-telemetry-analyzer | /tools/cardiology/cardiac-telemetry-analyzer | src/pages/tools/CardiologyAssistantPage.tsx | yes | cardiac-telemetry-analyzer | cardiac-telemetry-analyzer | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | cardiology-command-center | /tools/cardiology/cardiology-command-center | src/pages/tools/CardiologyAssistantPage.tsx | yes | cardiology-command-center | cardiology-command-center | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | centor-mcisaac | /tools/calculators/centor-mcisaac | src/pages/tools/Calculators.tsx | yes | centor-mcisaac | centor-mcisaac | no | — | — | — | frontend-only |
-| cha2ds2vasc-calculator | /tools/calculators/chads2vasc | src/pages/tools/Calculators.tsx | yes | calc-chads2vasc | cha2ds2vasc-calculator | no | — | — | — | frontend-only |
-| chads2 | /tools/calculators/chads2 | src/pages/tools/Calculators.tsx | yes | chads2 | chads2 | no | — | — | — | frontend-only |
+| cha2ds2vasc-calculator | /tools/calculators/chads2vasc | src/pages/tools/Calculators.tsx | yes | calc-chads2vasc | cha2ds2vasc-calculator | cha2ds2vasc-calculator | /api/tools/cha2ds2vasc-calculator/execute | ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`) → ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, ...) | src/services/clinicalOrchestratorApi.ts | fully wired |
+| chads2 | /tools/calculators/chads2 | src/pages/tools/Calculators.tsx | yes | chads2 | chads2 | chads2 | /api/tools/chads2/execute | ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`) → ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, ...) | src/services/clinicalOrchestratorApi.ts | fully wired |
 | child-pugh | /tools/calculators/child-pugh | src/pages/tools/Calculators.tsx | yes | child-pugh | child-pugh | no | — | — | — | frontend-only |
 | cirrhosis-monitoring-engine | /tools/gastroenterology/cirrhosis-monitoring-engine | src/pages/tools/GastroenterologyAssistantPage.tsx | yes | cirrhosis-monitoring-engine | cirrhosis-monitoring-engine | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | ckd-progression-predictor | /tools/nephrology/ckd-progression-predictor | src/pages/tools/NephrologyAssistantPage.tsx | yes | ckd-progression-predictor | ckd-progression-predictor | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
@@ -116,8 +152,8 @@
 | copd-gold | /tools/calculators | src/pages/tools/Calculators.tsx | yes | copd-gold | copd-gold | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | copd-gold-assessment | /tools/calculators/copd-gold-assessment | src/pages/tools/Calculators.tsx | yes | copd-gold-assessment | copd-gold-assessment | no | — | — | — | frontend-only |
 | copd-workflow-assistant | /tools/pulmonology/copd-workflow-assistant | src/pages/tools/PulmonologyAssistantPage.tsx | yes | copd-workflow-assistant | copd-workflow-assistant | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
-| corrected-calcium | /tools/calculators/corrected-calcium | src/pages/tools/Calculators.tsx | yes | corrected-calcium | corrected-calcium | no | — | — | — | frontend-only |
-| corrected-sodium | /tools/calculators/corrected-sodium | src/pages/tools/Calculators.tsx | yes | corrected-sodium | corrected-sodium | no | — | — | — | frontend-only |
+| corrected-calcium | /tools/calculators/corrected-calcium | src/pages/tools/Calculators.tsx | yes | corrected-calcium | corrected-calcium | corrected-calcium | /api/tools/corrected-calcium/execute | ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`) → ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, ...) | src/services/clinicalOrchestratorApi.ts | fully wired |
+| corrected-sodium | /tools/calculators/corrected-sodium | src/pages/tools/Calculators.tsx | yes | corrected-sodium | corrected-sodium | corrected-sodium | /api/tools/corrected-sodium/execute | ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`) → ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, ...) | src/services/clinicalOrchestratorApi.ts | fully wired |
 | creatinine-clearance-cg | /tools/calculators/creatinine-clearance-cg | src/pages/tools/Calculators.tsx | yes | creatinine-clearance-cg | creatinine-clearance-cg | no | — | — | — | frontend-only |
 | credentialing-platform | /credentials | src/pages/Credentials.jsx | yes | credentialing-platform | credentialing-platform | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | crisis-escalation-audit-log | /tools/psychiatry/crisis-escalation-audit-log | src/pages/tools/PsychiatryAssistantPage.tsx | yes | crisis-escalation-audit-log | crisis-escalation-audit-log | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
@@ -134,7 +170,7 @@
 | dka-pathway-assistant | /tools/endocrine/dka-pathway-assistant | src/pages/tools/EndocrineMetabolicAssistantPage.tsx | yes | dka-pathway-assistant | dka-pathway-assistant | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | dose-calculator | /tools/calculators | src/pages/tools/Calculators.tsx | yes | dose-calculator | dose-calculator | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | drug-interactions | /tools/drug-checker | src/pages/tools/DrugChecker.tsx | yes | drug-check | drug-interactions | drug-interactions | /api/tools/drug-interactions/execute | ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`) → ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, ...) | src/services/clinicalOrchestratorApi.ts | fully wired |
-| duke-treadmill-score | /tools/calculators/duke-treadmill-score | src/pages/tools/Calculators.tsx | yes | duke-treadmill-score | duke-treadmill-score | no | — | — | — | frontend-only |
+| duke-treadmill-score | /tools/calculators/duke-treadmill-score | src/pages/tools/Calculators.tsx | yes | duke-treadmill-score | duke-treadmill-score | duke-treadmill-score | /api/tools/duke-treadmill-score/execute | ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`) → ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, ...) | src/services/clinicalOrchestratorApi.ts | fully wired |
 | ecg-interpretation-assistant | /tools/cardiology/ecg-interpretation-assistant | src/pages/tools/CardiologyAssistantPage.tsx | yes | ecg-interpretation-assistant | ecg-interpretation-assistant | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | ecg-trend-engine | /tools/cardiology/ecg-trend-engine | src/pages/tools/CardiologyAssistantPage.tsx | yes | ecg-trend-engine | ecg-trend-engine | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | eeg-trend-dashboard | /tools/neurology/eeg-trend-dashboard | src/pages/tools/NeurologyAssistantPage.tsx | yes | eeg-trend-dashboard | eeg-trend-dashboard | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
@@ -144,36 +180,36 @@
 | endocrine-monitoring-system | /tools/endocrine/endocrine-monitoring-system | src/pages/tools/EndocrineMetabolicAssistantPage.tsx | yes | endocrine-monitoring-system | endocrine-monitoring-system | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | endoscopy-workflow-assistant | /tools/gastroenterology/endoscopy-workflow-assistant | src/pages/tools/GastroenterologyAssistantPage.tsx | yes | endoscopy-workflow-assistant | endoscopy-workflow-assistant | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | epworth-sleepiness-scale | /tools/calculators/epworth-sleepiness-scale | src/pages/tools/Calculators.tsx | yes | epworth-sleepiness-scale | epworth-sleepiness-scale | no | — | — | — | frontend-only |
-| fena | /tools/calculators/fena | src/pages/tools/Calculators.tsx | yes | fena | fena | no | — | — | — | frontend-only |
+| fena | /tools/calculators/fena | src/pages/tools/Calculators.tsx | yes | fena | fena | fena | /api/tools/fena/execute | ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`) → ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, ...) | src/services/clinicalOrchestratorApi.ts | fully wired |
 | fenton-growth-chart-helper | /tools/calculators/fenton-growth-chart-helper | src/pages/tools/Calculators.tsx | yes | fenton-growth-chart-helper | fenton-growth-chart-helper | no | — | — | — | frontend-only |
-| feurea | /tools/calculators/feurea | src/pages/tools/Calculators.tsx | yes | feurea | feurea | no | — | — | — | frontend-only |
+| feurea | /tools/calculators/feurea | src/pages/tools/Calculators.tsx | yes | feurea | feurea | feurea | /api/tools/feurea/execute | ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`) → ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, ...) | src/services/clinicalOrchestratorApi.ts | fully wired |
 | fib4 | /tools/calculators/fib4 | src/pages/tools/Calculators.tsx | yes | fib4 | fib4 | no | — | — | — | frontend-only |
 | fleet-command | /fleet/command | src/pages/fleet/FleetDashboard.tsx | yes | fleet-command | fleet-command | no | — | — | src/services/fleetTelemetryService.ts | frontend-only |
 | fluid-balance-monitor | /tools/nephrology/fluid-balance-monitor | src/pages/tools/NephrologyAssistantPage.tsx | yes | fluid-balance-monitor | fluid-balance-monitor | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
-| four-score | /tools/calculators/four-score | src/pages/tools/Calculators.tsx | yes | four-score | four-score | no | — | — | — | frontend-only |
-| framingham-risk | /tools/calculators/framingham-risk | src/pages/tools/Calculators.tsx | yes | framingham-risk | framingham-risk | no | — | — | — | frontend-only |
+| four-score | /tools/calculators/four-score | src/pages/tools/Calculators.tsx | yes | four-score | four-score | four-score | /api/tools/four-score/execute | ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`) → ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, ...) | src/services/clinicalOrchestratorApi.ts | fully wired |
+| framingham-risk | /tools/calculators/framingham-risk | src/pages/tools/Calculators.tsx | yes | framingham-risk | framingham-risk | framingham-risk | /api/tools/framingham-risk/execute | ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`) → ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, ...) | src/services/clinicalOrchestratorApi.ts | fully wired |
 | free-water-deficit | /tools/calculators/free-water-deficit | src/pages/tools/Calculators.tsx | yes | free-water-deficit | free-water-deficit | no | — | — | — | frontend-only |
 | gad7 | /tools/calculators/gad7 | src/pages/tools/Calculators.tsx | yes | gad7 | gad7 | no | — | — | — | frontend-only |
-| gcs-calculator | /tools/calculators/gcs | src/pages/tools/Calculators.tsx | yes | gcs-calculator | gcs-calculator | no | — | — | — | frontend-only |
+| gcs-calculator | /tools/calculators/gcs | src/pages/tools/Calculators.tsx | yes | gcs-calculator | gcs-calculator | gcs-calculator | /api/tools/gcs-calculator/execute | ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`) → ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, ...) | src/services/clinicalOrchestratorApi.ts | fully wired |
 | gestational-age-calculator | /tools/calculators/gestational-age-calculator | src/pages/tools/Calculators.tsx | yes | gestational-age-calculator | gestational-age-calculator | no | — | — | — | frontend-only |
 | gi-bleed-workflow-assistant | /tools/gastroenterology/gi-bleed-workflow-assistant | src/pages/tools/GastroenterologyAssistantPage.tsx | yes | gi-bleed-workflow-assistant | gi-bleed-workflow-assistant | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | gi-command-center | /tools/gastroenterology/gi-command-center | src/pages/tools/GastroenterologyAssistantPage.tsx | yes | gi-command-center | gi-command-center | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | gi-surveillance-dashboard | /tools/gastroenterology/gi-surveillance-dashboard | src/pages/tools/GastroenterologyAssistantPage.tsx | yes | gi-surveillance-dashboard | gi-surveillance-dashboard | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | glasgow-blatchford-score | /tools/calculators/glasgow-blatchford-score | src/pages/tools/Calculators.tsx | yes | glasgow-blatchford-score | glasgow-blatchford-score | no | — | — | — | frontend-only |
 | glucose-telemetry-dashboard | /tools/endocrine/glucose-telemetry-dashboard | src/pages/tools/EndocrineMetabolicAssistantPage.tsx | yes | glucose-telemetry-dashboard | glucose-telemetry-dashboard | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
-| grace-acs | /tools/calculators | src/pages/tools/Calculators.tsx | yes | grace-acs | grace-acs | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
+| grace-acs | /tools/calculators | src/pages/tools/Calculators.jsx (hub card) + src/components/ChatInterface.jsx (ED Copilot) | yes | grace-acs | grace-acs | grace-acs | /api/tools/grace-acs/execute | ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`) → ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, ...) | src/services/clinicalOrchestratorApi.ts | fully wired |
 | growth-trend-analytics | /tools/pediatrics-obgyn/growth-trend-analytics | src/pages/tools/PediatricsObgynAssistantPage.tsx | yes | growth-trend-analytics | growth-trend-analytics | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
-| has-bled | /tools/calculators/has-bled | src/pages/tools/Calculators.tsx | yes | has-bled | has-bled | no | — | — | — | frontend-only |
+| has-bled | /tools/calculators/has-bled | src/pages/tools/Calculators.tsx | yes | has-bled | has-bled | has-bled | /api/tools/has-bled/execute | ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`) → ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, ...) | src/services/clinicalOrchestratorApi.ts | fully wired |
 | hcm-sudden-death-risk | /tools/calculators/hcm-sudden-death-risk | src/pages/tools/Calculators.tsx | yes | hcm-sudden-death-risk | hcm-sudden-death-risk | no | — | — | — | frontend-only |
 | headache-red-flag-assistant | /tools/neurology/headache-red-flag-assistant | src/pages/tools/NeurologyAssistantPage.tsx | yes | headache-red-flag-assistant | headache-red-flag-assistant | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | heart-failure-assistant | /tools/cardiology/heart-failure-assistant | src/pages/tools/CardiologyAssistantPage.tsx | yes | heart-failure-assistant | heart-failure-assistant | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | heart-failure-staging | /tools/calculators/heart-failure-staging | src/pages/tools/Calculators.tsx | yes | heart-failure-staging | heart-failure-staging | no | — | — | — | frontend-only |
-| heart-score | /tools/calculators/heart-score | src/pages/tools/Calculators.tsx | yes | heart-score | heart-score | no | — | — | — | frontend-only |
+| heart-score | /tools/calculators/heart-score | src/pages/tools/Calculators.tsx | yes | heart-score | heart-score | heart-score | /api/tools/heart-score/execute | ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`) → ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, ...) | src/services/clinicalOrchestratorApi.ts | fully wired |
 | hepatic-trend-analytics | /tools/gastroenterology/hepatic-trend-analytics | src/pages/tools/GastroenterologyAssistantPage.tsx | yes | hepatic-trend-analytics | hepatic-trend-analytics | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | homa-ir | /tools/calculators/homa-ir | src/pages/tools/Calculators.tsx | yes | homa-ir | homa-ir | no | — | — | — | frontend-only |
 | hospital-command-assistant | /tools/calculators | src/pages/tools/Calculators.tsx | yes | hospital-command-assistant | hospital-command-assistant | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
-| hunt-hess-scale | /tools/calculators/hunt-hess-scale | src/pages/tools/Calculators.tsx | yes | hunt-hess-scale | hunt-hess-scale | no | — | — | — | frontend-only |
-| ich-score | /tools/calculators/ich-score | src/pages/tools/Calculators.tsx | yes | ich-score | ich-score | no | — | — | — | frontend-only |
+| hunt-hess-scale | /tools/calculators/hunt-hess-scale | src/pages/tools/Calculators.tsx | yes | hunt-hess-scale | hunt-hess-scale | hunt-hess-scale | /api/tools/hunt-hess-scale/execute | ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`) → ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, ...) | src/services/clinicalOrchestratorApi.ts | fully wired |
+| ich-score | /tools/calculators/ich-score | src/pages/tools/Calculators.tsx | yes | ich-score | ich-score | ich-score | /api/tools/ich-score/execute | ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`) → ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, ...) | src/services/clinicalOrchestratorApi.ts | fully wired |
 | ideal-body-weight | /tools/calculators/ideal-body-weight | src/pages/tools/Calculators.tsx | yes | ideal-body-weight | ideal-body-weight | no | — | — | — | frontend-only |
 | insulin-trend-engine | /tools/endocrine/insulin-trend-engine | src/pages/tools/EndocrineMetabolicAssistantPage.tsx | yes | insulin-trend-engine | insulin-trend-engine | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | kfre | /tools/calculators/kfre | src/pages/tools/Calculators.tsx | yes | kfre | kfre | no | — | — | — | frontend-only |
@@ -189,10 +225,10 @@
 | mental-health-screening-assistant | /tools/psychiatry/mental-health-screening-assistant | src/pages/tools/PsychiatryAssistantPage.tsx | yes | mental-health-screening-assistant | mental-health-screening-assistant | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | metabolic-analytics | /tools/endocrine/metabolic-analytics | src/pages/tools/EndocrineMetabolicAssistantPage.tsx | yes | metabolic-analytics | metabolic-analytics | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | metabolic-syndrome-assistant | /tools/endocrine/metabolic-syndrome-assistant | src/pages/tools/EndocrineMetabolicAssistantPage.tsx | yes | metabolic-syndrome-assistant | metabolic-syndrome-assistant | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
-| mews | /tools/calculators/mews | src/pages/tools/Calculators.tsx | yes | mews | mews | no | — | — | — | frontend-only |
+| mews | /tools/calculators/mews | src/pages/tools/Calculators.tsx | yes | mews | mews | mews | /api/tools/mews/execute | ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`) → ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, ...) | src/services/clinicalOrchestratorApi.ts | fully wired |
 | mmse | /tools/calculators/mmse | src/pages/tools/Calculators.tsx | yes | mmse | mmse | no | — | — | — | frontend-only |
 | moca-placeholder-workflow | /tools/calculators/moca-placeholder-workflow | src/pages/tools/Calculators.tsx | yes | moca-placeholder-workflow | moca-placeholder-workflow | no | — | — | — | frontend-only |
-| modified-rankin-scale | /tools/calculators/modified-rankin-scale | src/pages/tools/Calculators.tsx | yes | modified-rankin-scale | modified-rankin-scale | no | — | — | — | frontend-only |
+| modified-rankin-scale | /tools/calculators/modified-rankin-scale | src/pages/tools/Calculators.tsx | yes | modified-rankin-scale | modified-rankin-scale | modified-rankin-scale | /api/tools/modified-rankin-scale/execute | ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`) → ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, ...) | src/services/clinicalOrchestratorApi.ts | fully wired |
 | moe-router | /assistant | src/pages/Assistant.jsx | yes | moe-router | moe-router | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | morse-fall-scale | /tools/calculators/morse-fall-scale | src/pages/tools/Calculators.tsx | yes | morse-fall-scale | morse-fall-scale | no | — | — | — | frontend-only |
 | neonatal-assessment-assistant | /tools/pediatrics-obgyn/neonatal-assessment-assistant | src/pages/tools/PediatricsObgynAssistantPage.tsx | yes | neonatal-assessment-assistant | neonatal-assessment-assistant | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
@@ -202,18 +238,18 @@
 | neuro-monitoring-engine | /tools/neurology/neuro-monitoring-engine | src/pages/tools/NeurologyAssistantPage.tsx | yes | neuro-monitoring-engine | neuro-monitoring-engine | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | neuro-telemetry-dashboard | /tools/neurology/neuro-telemetry-dashboard | src/pages/tools/NeurologyAssistantPage.tsx | yes | neuro-telemetry-dashboard | neuro-telemetry-dashboard | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | neurology-timeline-ai | /tools/neurology/neurology-timeline-ai | src/pages/tools/NeurologyAssistantPage.tsx | yes | neurology-timeline-ai | neurology-timeline-ai | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
-| news2 | /tools/calculators/news2 | src/pages/tools/Calculators.tsx | yes | news2 | news2 | no | — | — | — | frontend-only |
-| nexus-cspine | /tools/calculators | src/pages/tools/Calculators.tsx | yes | nexus-cspine | nexus-cspine | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
+| news2 | /tools/calculators/news2 | src/pages/tools/Calculators.tsx | yes | news2 | news2 | news2 | /api/tools/news2/execute | ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`) → ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, ...) | src/services/clinicalOrchestratorApi.ts | fully wired |
+| nexus-cspine | /tools/calculators | src/pages/tools/Calculators.jsx (hub card) + src/components/ChatInterface.jsx (ED Copilot) | yes | nexus-cspine | nexus-cspine | nexus-cspine | /api/tools/nexus-cspine/execute | ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`) → ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, ...) | src/services/clinicalOrchestratorApi.ts | fully wired |
 | nihss | /tools/calculators | src/pages/tools/Calculators.tsx | yes | nihss | nihss | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | nihss-summary-view | /tools/calculators/nihss-summary-view | src/pages/tools/Calculators.tsx | yes | nihss-summary-view | nihss-summary-view | no | — | — | — | frontend-only |
 | ob-triage-assistant | /tools/pediatrics-obgyn/ob-triage-assistant | src/pages/tools/PediatricsObgynAssistantPage.tsx | yes | ob-triage-assistant | ob-triage-assistant | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
-| osmolal-gap | /tools/calculators/osmolal-gap | src/pages/tools/Calculators.tsx | yes | osmolal-gap | osmolal-gap | no | — | — | — | frontend-only |
+| osmolal-gap | /tools/calculators/osmolal-gap | src/pages/tools/Calculators.tsx | yes | osmolal-gap | osmolal-gap | osmolal-gap | /api/tools/osmolal-gap/execute | ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`) → ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, ...) | src/services/clinicalOrchestratorApi.ts | fully wired |
 | ottawa-ankle | /tools/calculators | src/pages/tools/Calculators.tsx | yes | ottawa-ankle | ottawa-ankle | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | oxygen-escalation-helper | /tools/pulmonology/oxygen-escalation-helper | src/pages/tools/PulmonologyAssistantPage.tsx | yes | oxygen-escalation-helper | oxygen-escalation-helper | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | pancreatitis-workflow-assistant | /tools/gastroenterology/pancreatitis-workflow-assistant | src/pages/tools/GastroenterologyAssistantPage.tsx | yes | pancreatitis-workflow-assistant | pancreatitis-workflow-assistant | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
-| pao2-fio2-ratio | /tools/calculators/pao2-fio2-ratio | src/pages/tools/Calculators.tsx | yes | pao2-fio2-ratio | pao2-fio2-ratio | no | — | — | — | frontend-only |
+| pao2-fio2-ratio | /tools/calculators/pao2-fio2-ratio | src/pages/tools/Calculators.tsx | yes | pao2-fio2-ratio | pao2-fio2-ratio | pao2-fio2-ratio | /api/tools/pao2-fio2-ratio/execute | ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`) → ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, ...) | src/services/clinicalOrchestratorApi.ts | fully wired |
 | pcl5 | /tools/calculators/pcl5 | src/pages/tools/Calculators.tsx | yes | pcl5 | pcl5 | no | — | — | — | frontend-only |
-| pecarn-head | /tools/calculators | src/pages/tools/Calculators.tsx | yes | pecarn-head | pecarn-head | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
+| pecarn-head | /tools/calculators | src/pages/tools/Calculators.jsx (hub card) + src/components/ChatInterface.jsx (ED Copilot) | yes | pecarn-head | pecarn-head | pecarn-head | /api/tools/pecarn-head/execute | ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`) → ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, ...) | src/services/clinicalOrchestratorApi.ts | fully wired |
 | pediatric-bp-percentile | /tools/calculators/pediatric-bp-percentile | src/pages/tools/Calculators.tsx | yes | pediatric-bp-percentile | pediatric-bp-percentile | no | — | — | — | frontend-only |
 | pediatric-command-center | /tools/pediatrics-obgyn/pediatric-command-center | src/pages/tools/PediatricsObgynAssistantPage.tsx | yes | pediatric-command-center | pediatric-command-center | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | pediatric-dose-safety-checker | /tools/calculators/pediatric-dose-safety-checker | src/pages/tools/Calculators.tsx | yes | pediatric-dose-safety-checker | pediatric-dose-safety-checker | no | — | — | — | frontend-only |
@@ -243,17 +279,17 @@
 | resource-utilization-index | /tools/calculators/resource-utilization-index | src/pages/tools/Calculators.tsx | yes | resource-utilization-index | resource-utilization-index | no | — | — | — | frontend-only |
 | respiratory-command-center | /tools/pulmonology/respiratory-command-center | src/pages/tools/PulmonologyAssistantPage.tsx | yes | respiratory-command-center | respiratory-command-center | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | respiratory-telemetry-dashboard | /tools/pulmonology/respiratory-telemetry-dashboard | src/pages/tools/PulmonologyAssistantPage.tsx | yes | respiratory-telemetry-dashboard | respiratory-telemetry-dashboard | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
-| revised-trauma-score | /tools/calculators/revised-trauma-score | src/pages/tools/Calculators.tsx | yes | revised-trauma-score | revised-trauma-score | no | — | — | — | frontend-only |
-| reynolds-risk-score | /tools/calculators/reynolds-risk-score | src/pages/tools/Calculators.tsx | yes | reynolds-risk-score | reynolds-risk-score | no | — | — | — | frontend-only |
+| revised-trauma-score | /tools/calculators/revised-trauma-score | src/pages/tools/Calculators.tsx | yes | revised-trauma-score | revised-trauma-score | revised-trauma-score | /api/tools/revised-trauma-score/execute | ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`) → ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, ...) | src/services/clinicalOrchestratorApi.ts | fully wired |
+| reynolds-risk-score | /tools/calculators/reynolds-risk-score | src/pages/tools/Calculators.tsx | yes | reynolds-risk-score | reynolds-risk-score | reynolds-risk-score | /api/tools/reynolds-risk-score/execute | ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`) → ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, ...) | src/services/clinicalOrchestratorApi.ts | fully wired |
 | rockall-score | /tools/calculators/rockall-score | src/pages/tools/Calculators.tsx | yes | rockall-score | rockall-score | no | — | — | — | frontend-only |
 | rome-iv-ibs | /tools/calculators | src/pages/tools/Calculators.tsx | yes | rome-iv-ibs | rome-iv-ibs | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | route-optimizer | /fleet/route-optimizer | src/pages/fleet/RouteOptimizer.jsx | yes | route-optimizer | route-optimizer | no | — | — | src/services/fleetTelemetryService.ts | frontend-only |
-| rox-index | /tools/calculators/rox-index | src/pages/tools/Calculators.tsx | yes | rox-index | rox-index | no | — | — | — | frontend-only |
+| rox-index | /tools/calculators/rox-index | src/pages/tools/Calculators.tsx | yes | rox-index | rox-index | rox-index | /api/tools/rox-index/execute | ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`) → ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, ...) | src/services/clinicalOrchestratorApi.ts | fully wired |
 | scenario-player | /simulation/sepsis-deterioration | src/pages/SimulationScenarioPlayer.jsx | yes | scenario-player | scenario-player | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | screening-trend-engine | /tools/psychiatry/screening-trend-engine | src/pages/tools/PsychiatryAssistantPage.tsx | yes | screening-trend-engine | screening-trend-engine | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | seizure-assistant | /tools/neurology/seizure-assistant | src/pages/tools/NeurologyAssistantPage.tsx | yes | seizure-assistant | seizure-assistant | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
-| serum-osmolality | /tools/calculators/serum-osmolality | src/pages/tools/Calculators.tsx | yes | serum-osmolality | serum-osmolality | no | — | — | — | frontend-only |
-| shock-index | /tools/calculators/shock-index | src/pages/tools/Calculators.tsx | yes | shock-index | shock-index | no | — | — | — | frontend-only |
+| serum-osmolality | /tools/calculators/serum-osmolality | src/pages/tools/Calculators.tsx | yes | serum-osmolality | serum-osmolality | serum-osmolality | /api/tools/serum-osmolality/execute | ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`) → ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, ...) | src/services/clinicalOrchestratorApi.ts | fully wired |
+| shock-index | /tools/calculators/shock-index | src/pages/tools/Calculators.tsx | yes | shock-index | shock-index | shock-index | /api/tools/shock-index/execute | ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`) → ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, ...) | src/services/clinicalOrchestratorApi.ts | fully wired |
 | simulation-outcomes | /simulation/outcomes | src/pages/SimulationOutcomes.jsx | yes | simulation-outcomes | simulation-outcomes | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | simulation-suite | /simulation | src/pages/MedicalSimulationSuite.jsx | yes | simulation-suite | simulation-suite | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | sleep-apnea-analytics | /tools/pulmonology/sleep-apnea-analytics | src/pages/tools/PulmonologyAssistantPage.tsx | yes | sleep-apnea-analytics | sleep-apnea-analytics | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
@@ -266,14 +302,14 @@
 | substance-use-screening-assistant | /tools/psychiatry/substance-use-screening-assistant | src/pages/tools/PsychiatryAssistantPage.tsx | yes | substance-use-screening-assistant | substance-use-screening-assistant | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | suicide-risk-workflow-assistant | /tools/psychiatry/suicide-risk-workflow-assistant | src/pages/tools/PsychiatryAssistantPage.tsx | yes | suicide-risk-workflow-assistant | suicide-risk-workflow-assistant | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | thyroid-disorder-assistant | /tools/endocrine/thyroid-disorder-assistant | src/pages/tools/EndocrineMetabolicAssistantPage.tsx | yes | thyroid-disorder-assistant | thyroid-disorder-assistant | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
-| timi-ua-nstemi | /tools/calculators/timi-ua-nstemi | src/pages/tools/Calculators.tsx | yes | timi-ua-nstemi | timi-ua-nstemi | no | — | — | — | frontend-only |
+| timi-ua-nstemi | /tools/calculators/timi-ua-nstemi | src/pages/tools/Calculators.tsx | yes | timi-ua-nstemi | timi-ua-nstemi | timi-ua-nstemi | /api/tools/timi-ua-nstemi/execute | ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`) → ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, ...) | src/services/clinicalOrchestratorApi.ts | fully wired |
 | turnaround-time-calculator | /tools/calculators/turnaround-time-calculator | src/pages/tools/Calculators.tsx | yes | turnaround-time-calculator | turnaround-time-calculator | no | — | — | — | frontend-only |
 | ventilator-monitoring-dashboard | /tools/pulmonology/ventilator-monitoring-dashboard | src/pages/tools/PulmonologyAssistantPage.tsx | yes | ventilator-monitoring-dashboard | ventilator-monitoring-dashboard | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | ventilator-support-assistant | /tools/pulmonology/ventilator-support-assistant | src/pages/tools/PulmonologyAssistantPage.tsx | yes | ventilator-support-assistant | ventilator-support-assistant | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | vertigo-hints-assistant | /tools/neurology/vertigo-hints-assistant | src/pages/tools/NeurologyAssistantPage.tsx | yes | vertigo-hints-assistant | vertigo-hints-assistant | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
 | waist-hip-ratio | /tools/calculators/waist-hip-ratio | src/pages/tools/Calculators.tsx | yes | waist-hip-ratio | waist-hip-ratio | no | — | — | — | frontend-only |
-| wells-dvt-calculator | /tools/calculators | src/pages/tools/Calculators.tsx | yes | wells-dvt-calculator | wells-dvt-calculator | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
-| wells-pe | /tools/calculators | src/pages/tools/Calculators.tsx | yes | wells-pe | wells-pe | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.ts | frontend-only |
+| wells-dvt-calculator | /tools/calculators | src/pages/tools/Calculators.jsx (hub card) + src/components/ChatInterface.jsx (ED Copilot) | yes | wells-dvt-calculator | wells-dvt-calculator | wells-dvt-calculator | /api/tools/wells-dvt-calculator/execute | ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`) → ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, ...) | src/services/clinicalOrchestratorApi.ts | fully wired |
+| wells-pe | /tools/calculators | src/pages/tools/Calculators.jsx (hub card) + src/components/ChatInterface.jsx (ED Copilot) | yes | wells-pe | wells-pe | wells-pe | /api/tools/wells-pe/execute | ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`) → ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, ...) | src/services/clinicalOrchestratorApi.ts | fully wired |
 | ai-explainability | /tools/ai-explainability | src/pages/tools/AiExplainability.tsx | yes | ai-explainability | — | no | /api/clinical-intelligence/ai-explainability/trace | AiExplainabilityQueryDto (`toolId?`, `clinicalQuestion?`, `limit?`) → AiExplainabilityResponseDto (`runId`, `confidence`, `source`, `reasoning`, `toolChain`, `executionLogs`) | src/services/clinicalIntelligenceApi.ts | frontend-only |
 | ambient-scribe | /tools/ambient-scribe | src/pages/tools/AmbientScribe.tsx | yes | ambient-scribe | — | no | /api/clinical-intelligence/ambient-scribe/generate | AmbientScribeGenerateDto (`noteType`, `transcriptText`, `patientContext?`) → AmbientScribeResponseDto (`runId`, `status`, `draft`, `safety`, `reviewRequired`) | src/services/clinicalIntelligenceApi.ts | frontend-only |
 | asset-tracking-dashboard | /hospital-map | src/pages/HospitalMapDashboard.jsx | yes | asset-tracking-dashboard | — | no | — | — | src/services/hospitalMapService.ts | frontend-only |
@@ -332,7 +368,6 @@
 - **bsa:** Calculator slug: bsa
 - **bun-creatinine-ratio:** Calculator slug: bun-creatinine-ratio
 - **cage:** Calculator slug: cage
-- **canadian-c-spine:** Tier-B: catalog launch seeds dashboard chat; no tool POST
 - **centor-mcisaac:** Calculator slug: centor-mcisaac
 - **cha2ds2vasc-calculator:** Calculator slug: chads2vasc
 - **chads2:** Calculator slug: chads2
@@ -366,7 +401,6 @@
 - **gestational-age-calculator:** Calculator slug: gestational-age-calculator
 - **gi-bleed-workflow-assistant:** Tier-B: catalog launch seeds dashboard chat; no tool POST; Launch nav may use /tools/gastroenterology/gi-bleed-workflow-assistant
 - **glasgow-blatchford-score:** Calculator slug: glasgow-blatchford-score
-- **grace-acs:** Tier-B: catalog launch seeds dashboard chat; no tool POST
 - **has-bled:** Calculator slug: has-bled
 - **hcm-sudden-death-risk:** Calculator slug: hcm-sudden-death-risk
 - **headache-red-flag-assistant:** Tier-B: catalog launch seeds dashboard chat; no tool POST
@@ -394,7 +428,6 @@
 - **neonatal-bilirubin-risk-helper:** Calculator slug: neonatal-bilirubin-risk-helper
 - **neuro-exam-assistant:** Tier-B: catalog launch seeds dashboard chat; no tool POST
 - **news2:** Calculator slug: news2
-- **nexus-cspine:** Tier-B: catalog launch seeds dashboard chat; no tool POST
 - **nihss:** Tier-B: catalog launch seeds dashboard chat; no tool POST
 - **nihss-summary-view:** Calculator slug: nihss-summary-view
 - **ob-triage-assistant:** Tier-B: catalog launch seeds dashboard chat; no tool POST
@@ -404,7 +437,6 @@
 - **pancreatitis-workflow-assistant:** Tier-B: catalog launch seeds dashboard chat; no tool POST; Launch nav may use /tools/gastroenterology/pancreatitis-workflow-assistant
 - **pao2-fio2-ratio:** Calculator slug: pao2-fio2-ratio
 - **pcl5:** Calculator slug: pcl5
-- **pecarn-head:** Tier-B: catalog launch seeds dashboard chat; no tool POST
 - **pediatric-bp-percentile:** Calculator slug: pediatric-bp-percentile
 - **pediatric-dose-safety-checker:** Calculator slug: pediatric-dose-safety-checker
 - **pediatric-gcs:** Calculator slug: pediatric-gcs
@@ -440,8 +472,6 @@
 - **ventilator-support-assistant:** Tier-B: catalog launch seeds dashboard chat; no tool POST
 - **vertigo-hints-assistant:** Tier-B: catalog launch seeds dashboard chat; no tool POST
 - **waist-hip-ratio:** Calculator slug: waist-hip-ratio
-- **wells-dvt-calculator:** Tier-B: catalog launch seeds dashboard chat; no tool POST
-- **wells-pe:** Tier-B: catalog launch seeds dashboard chat; no tool POST
 - **ai-explainability:** No dedicated clinicalIntentTools row
 - **ambient-scribe:** No dedicated clinicalIntentTools row
 - **asset-tracking-dashboard:** No dedicated clinicalIntentTools row

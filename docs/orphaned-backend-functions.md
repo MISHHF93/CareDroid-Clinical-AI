@@ -1,6 +1,6 @@
 # Orphaned backend functions
 
-**Generated:** 2026-07-09T00:27:44.687Z
+**Generated:** 2026-07-23T04:15:14.388Z
 
 > Regenerate: `npm run exposure:write-docs`
 
@@ -54,6 +54,7 @@ Every backend HTTP route is either **wired** to a frontend client or listed belo
 | Route | Controller | Reason |
 |-------|------------|--------|
 | `/api/emergency/patients/:patientId/workflow-logs` | EmergencyOsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/emergency/ems/handoff` | EmergencyOsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/emergency/copilot/interactions` | EmergencyOsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/emergency/clinical-calculators/results` | EmergencyOsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/emergency/digital-twin/organizational/simulate` | OrganizationalDigitalTwinController | Research controller; active ED digital twin UI uses the core EmergencyOsController endpoints |
@@ -257,6 +258,23 @@ Every backend HTTP route is either **wired** to a frontend client or listed belo
 | `/api/surveillance/iot/registry` | SurveillanceController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/surveillance/nexus/snapshot` | SurveillanceController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/surveillance/zones` | SurveillanceController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/sentinel/ai/recommendations` | SentinelController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/sentinel/alarms` | SentinelController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/sentinel/alarms/:id/events` | SentinelController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/sentinel/analytics` | SentinelController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/sentinel/command-snapshot` | SentinelController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/sentinel/geofences` | SentinelController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/sentinel/health` | SentinelController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/sentinel/inbound` | SentinelController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/sentinel/units` | SentinelController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/sentinel/units/:unitId/positions` | SentinelController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/sentinel/ai/recommendations/:id/review` | SentinelController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/sentinel/alarms` | SentinelController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/sentinel/alarms/:id/:action` | SentinelController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/sentinel/inbound` | SentinelController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/sentinel/inbound/:id/prep-recommendation` | SentinelController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/sentinel/ingest/cad` | SentinelController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/sentinel/poll` | SentinelController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/workspaces/invitations/:token` | WorkspaceInvitationsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/workspaces/invitations/:token/accept` | WorkspaceInvitationsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/collaboration/channels` | CollaborationHubController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
@@ -341,9 +359,9 @@ Every backend HTTP route is either **wired** to a frontend client or listed belo
 
 ## E. POST executors
 
-Registered: `sofa-calculator`, `drug-interactions`, `lab-interpreter`
+Registered: `sofa-calculator`, `drug-interactions`, `lab-interpreter`, `heart-score`, `cha2ds2vasc-calculator`, `wells-pe`, `shock-index`, `apache2-calculator`, `anion-gap`, `aa-gradient`, `news2`, `abcd2`, `canadian-c-spine`, `nexus-cspine`, `gcs-calculator`, `chads2`, `duke-treadmill-score`, `reynolds-risk-score`, `has-bled`, `timi-ua-nstemi`, `framingham-risk`, `grace-acs`, `corrected-calcium`, `corrected-sodium`, `fena`, `feurea`, `osmolal-gap`, `serum-osmolality`, `pao2-fio2-ratio`, `rox-index`, `mews`, `revised-trauma-score`, `hunt-hess-scale`, `ich-score`, `four-score`, `modified-rankin-scale`, `pecarn-head`, `wells-dvt-calculator`, `abg-interpreter`
 
-NLU profiles without POST executor (216): client-side / chat only.
+NLU profiles without POST executor (180): client-side / chat only.
 
 ## F. Exposure strategy summary
 
@@ -359,11 +377,11 @@ NLU profiles without POST executor (216): client-side / chat only.
 
 | Category | Count |
 |----------|------:|
-| Backend HTTP routes (total inventory) | 568 |
+| Backend HTTP routes (total inventory) | 586 |
 | Wired frontend → backend | 307 |
-| Backend-only / deferred (policy) | 262 |
+| Backend-only / deferred (policy) | 280 |
 | Gated frontend (no route) | 36 |
-| POST executors | 3 |
+| POST executors | 39 |
 
-_Cross-check: total inventory (568) should equal wired (307) + backend-only (262) + any remaining unlisted routes. See [backend-exposure-report.md](./backend-exposure-report.md) for the authoritative scan._
+_Cross-check: total inventory (586) should equal wired (307) + backend-only (280) + any remaining unlisted routes. See [backend-exposure-report.md](./backend-exposure-report.md) for the authoritative scan._
 

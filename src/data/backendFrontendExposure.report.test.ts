@@ -17,7 +17,7 @@ import { formatOrphanedBackendFunctionsMarkdown } from './backendOrphanAudit';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const docsDir = join(__dirname, '../../docs');
-const HEAVY_EXPOSURE_SCAN_TIMEOUT_MS = 30_000;
+const HEAVY_EXPOSURE_SCAN_TIMEOUT_MS = 180_000;
 
 describe('backendFrontendExposure report', () => {
   it('scan passes before writing docs', () => {
@@ -49,5 +49,9 @@ describe('backendFrontendExposure report', () => {
       join(docsDir, 'orphaned-backend-functions.md'),
       `${formatOrphanedBackendFunctionsMarkdown()}\n`
     );
-  });
+  }, HEAVY_EXPOSURE_SCAN_TIMEOUT_MS);
+  // This test re-runs the same scan as the one above (assertExposureScanPasses
+  // is not memoized across `it` blocks) plus 4 more corpus-wide formatters —
+  // measured ~57s and still climbing before this fix (Cycle 156), against a
+  // 30s default timeout that made it fail even though nothing was broken.
 });
