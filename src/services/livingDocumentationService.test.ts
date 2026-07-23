@@ -39,4 +39,11 @@ describe('livingDocumentationService', () => {
     const page = resolveLivingDocumentationForPath(CANONICAL_ROUTES.emergencyPatients, snapshot);
     expect(page?.permissions.length).toBeGreaterThan(0);
   });
+
+  it('routes.md is honest about being a curated journey-stage subset, not the full route surface (Cycle 153)', () => {
+    const files = generateLivingDocumentationFiles();
+    expect(files['routes.md']).toContain('curated ED journey stages');
+    expect(files['routes.md']).toContain('not the full route surface');
+    expect(files['routes.md']).toContain('audit-routes-nav-full-scan.mjs');
+  });
 });

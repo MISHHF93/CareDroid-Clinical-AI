@@ -1,6 +1,6 @@
 # Orphan Detection Report
 
-Generated: 2026-07-07 (regenerate with `npm run orphan-detection:write-docs`)
+Generated: 2026-07-23 (regenerate with `npm run orphan-detection:write-docs`)
 
 ## Classification key
 
@@ -15,26 +15,26 @@ Generated: 2026-07-07 (regenerate with `npm run orphan-detection:write-docs`)
 
 | Metric | Count |
 |--------|------:|
-| Total orphan findings | 386 |
-| App.jsx routes | 151 |
-| Orphan / gap routes | 222 |
-| Orphan pages | 1 |
-| Orphan components | 0 |
-| Domain module findings (dashboard / simulation / lab / 3D) | 1 |
-| Orphan services | 0 |
+| Total orphan findings | 570 |
+| App.jsx routes | 152 |
+| Orphan / gap routes | 221 |
+| Orphan pages | 150 |
+| Orphan components | 7 |
+| Domain module findings (dashboard / simulation / lab / 3D) | 20 |
+| Orphan services | 11 |
 | Executor contract gaps | 0 |
 | API orphans / stubs | 141 |
-| Weakly linked markdown | 21 |
-| **wire** | 218 |
+| Weakly linked markdown | 20 |
+| **wire** | 263 |
 | **merge** | 0 |
-| **quarantine** | 15 |
-| **legacy** | 153 |
+| **quarantine** | 34 |
+| **legacy** | 273 |
 
 ## Merge candidates (explicit)
 
 | ID | Primary | Duplicate | Note |
 |----|---------|-----------|------|
-| dashboard-dual-home | src/pages/CommandDashboard.jsx | removed: src/pages/Dashboard.jsx | Former assistant page duplicate removed; ED Copilot now lives in src/components/ChatInterface.jsx. |
+| dashboard-dual-home | src/pages/CommandDashboard.jsx | removed: src/pages/Dashboard.jsx | Former assistant page duplicate removed; ED Copilot now lives in src/components/CopilotPanel.tsx (ChatInterface.tsx superseded it and was itself removed as dead code, 2026-07-17). |
 | pack-marketplace-dual | src/pages/organization/OrganizationPages.jsx (PackMarketplace) | /asset-packs vs /settings/organization/packs | Intentional dual context: product discovery and organization entitlement management share PackMarketplace. |
 | notification-services-dual | src/services/NotificationService.ts | src/test/fixtures/legacyNotificationService.ts | Legacy queue-style client moved to test fixtures; active app client is src/services/NotificationService.ts. |
 
@@ -58,7 +58,6 @@ Generated: 2026-07-07 (regenerate with `npm run orphan-detection:write-docs`)
 | /verify-email | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /admin | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /admin/staff-workflows | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /dashboard | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /intake | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /alerts | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /ai-chief | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
@@ -276,11 +275,168 @@ Generated: 2026-07-07 (regenerate with `npm run orphan-detection:write-docs`)
 
 | Page file | Class | Evidence |
 | --- | --- | --- |
-| src/pages/PlatformEntryHub.jsx | legacy | import:./pages/PlatformEntryHub |
+| src/pages/admin/AdminOperationsHome.tsx | legacy | import:./pages/admin/AdminOperationsHome |
+| src/pages/admin/EdStaffWorkflowAdmin.tsx | legacy | import:./pages/admin/EdStaffWorkflowAdmin |
+| src/pages/ai/AiCommandCenterDashboard.tsx | legacy | import:AiCommandCenterDashboard |
+| src/pages/ai/AiEvaluationDashboard.tsx | legacy | import:./pages/ai/AiEvaluationDashboard |
+| src/pages/ai/CostAnalyticsDashboard.tsx | legacy | import:./pages/ai/CostAnalyticsDashboard |
+| src/pages/ai/MemoryDashboard.tsx | legacy | import:./pages/ai/MemoryDashboard |
+| src/pages/analytics/AnalyticsDashboard.tsx | legacy | import:./pages/analytics/AnalyticsDashboard |
+| src/pages/analytics/PredictiveAnalyticsDashboard.tsx | legacy | import:PredictiveAnalyticsDashboard |
+| src/pages/AutomationAuditTrail.tsx | legacy | import:./pages/AutomationAuditTrail |
+| src/pages/BillingPage.tsx | legacy | import:./pages/BillingPage |
+| src/pages/clinical/ClinicalDecisionSupport.tsx | legacy | import:./pages/clinical/ClinicalDecisionSupport |
+| src/pages/clinical/ClinicalKnowledgeGraph.tsx | legacy | import:./pages/clinical/ClinicalKnowledgeGraph |
+| src/pages/clinical/LaboratoryDashboard.tsx | legacy | import:./pages/clinical/LaboratoryDashboard |
+| src/pages/clinical/Medical3DViewer.tsx | legacy | import:./pages/clinical/Medical3DViewer |
+| src/pages/clinical/ResearchEvidenceHub.tsx | legacy | import:./pages/clinical/ResearchEvidenceHub |
+| src/pages/ClinicalAlertsPage.tsx | legacy | import:src/pages/ClinicalAlertsPage.tsx |
+| src/pages/ClinicalDocumentationAssistant.tsx | wire | import:src/pages/ClinicalDocumentationAssistant.tsx |
+| src/pages/collaboration/CollaborationHub.tsx | legacy | import:./pages/collaboration/CollaborationHub |
+| src/pages/commercial/CommercialPages.tsx | legacy | import:src/pages/commercial/CommercialPages |
+| src/pages/commercial/CommercialPageShell.tsx | legacy | import:CommercialPageShell |
+| src/pages/commercial/ExpansionOpportunities.tsx | legacy | import:./pages/commercial/ExpansionOpportunities |
+| src/pages/commercial/MaturityAssessment.tsx | legacy | import:./pages/commercial/MaturityAssessment |
+| src/pages/commercial/ProductIntelligence.tsx | legacy | import:./pages/commercial/ProductIntelligence |
+| src/pages/emergency/DispatchConsole.tsx | legacy | import:src/pages/emergency/DispatchConsole |
+| src/pages/emergency/EmergencyAnalytics.tsx | legacy | import:./pages/emergency/EmergencyAnalytics |
+| src/pages/emergency/emergencyRoutePages.tsx | legacy | import:./pages/emergency/emergencyRoutePages |
+| src/pages/emergency/emergencyRouteShared.tsx | legacy | import:./pages/emergency/emergencyRouteShared |
+| src/pages/emergency/EmergencySettings.tsx | legacy | import:./pages/emergency/EmergencySettings |
+| src/pages/emergency/EmergencySurfaceRedirect.tsx | legacy | import:./pages/emergency/EmergencySurfaceRedirect |
+| src/pages/emergency/FullJourneyOperatingPage.tsx | legacy | import:./pages/emergency/FullJourneyOperatingPage |
+| src/pages/emergency/HelpHubPage.tsx | legacy | import:./pages/emergency/HelpHubPage |
+| src/pages/emergency/HospitalCommandCenter.tsx | legacy | import:src/pages/emergency/HospitalCommandCenter.tsx |
+| src/pages/emergency/index.tsx | legacy | import:src/pages/emergency/index |
+| src/pages/emergency/PatientRoomDisplay.tsx | legacy | import:src/pages/emergency/PatientRoomDisplay |
+| src/pages/emergency/pulse/index.tsx | legacy | import:index |
+| src/pages/emergency/ReceptionWorkspace.tsx | legacy | import:src/pages/emergency/ReceptionWorkspace.tsx |
+| src/pages/emergency/SelfArrivalCheckIn.tsx | legacy | import:src/pages/emergency/SelfArrivalCheckIn.tsx |
+| src/pages/emergency/shift/index.tsx | legacy | import:index |
+| src/pages/emergency/shift/shiftSummaryData.ts | legacy | import:shiftSummaryData |
+| src/pages/emergency/SmartIntake.tsx | legacy | import:src/pages/emergency/SmartIntake |
+| src/pages/executive/CommandDashboard.tsx | legacy | import:CommandDashboard |
+| src/pages/executive/ExecutiveCommandCenter.tsx | legacy | import:src/pages/executive/ExecutiveCommandCenter.tsx |
+| src/pages/fleet/FleetDashboard.tsx | wire | import:src/pages/fleet/FleetDashboard.tsx |
+| src/pages/fleet/FleetLiveMap.tsx | legacy | import:src/pages/fleet/FleetLiveMap |
+| src/pages/fleet/PredictiveMaintenance.tsx | legacy | import:src/pages/fleet/PredictiveMaintenance.tsx |
+| src/pages/fleet/RouteOptimizer.tsx | legacy | import:src/pages/fleet/RouteOptimizer.tsx |
+| src/pages/GDPRNotice.tsx | legacy | import:src/pages/GDPRNotice.tsx |
+| src/pages/governance/Artifacts.tsx | legacy | import:./pages/governance/Artifacts |
+| src/pages/governance/DataLineageExplorer.tsx | legacy | import:./pages/governance/DataLineageExplorer |
+| src/pages/governance/DependencyGraph.tsx | legacy | import:./pages/governance/DependencyGraph |
+| src/pages/governance/DependencyMap.tsx | legacy | import:./pages/governance/DependencyMap |
+| src/pages/governance/GovernanceRegistry.tsx | legacy | import:./pages/governance/GovernanceRegistry |
+| src/pages/HelpCenter.tsx | legacy | import:src/pages/HelpCenter.tsx |
+| src/pages/HIPAANotice.tsx | legacy | import:src/pages/HIPAANotice.tsx |
+| src/pages/integrations/IntegrationHubPage.tsx | legacy | import:./pages/integrations/IntegrationHubPage |
+| src/pages/legal/ConsentFlow.tsx | legacy | import:src/pages/legal/ConsentFlow.tsx |
+| src/pages/legal/ConsentHistory.tsx | legacy | import:src/pages/legal/ConsentHistory.tsx |
+| src/pages/legal/index.ts | legacy | import:index |
+| src/pages/legal/PrivacyPolicy.tsx | legacy | import:src/pages/legal/PrivacyPolicy.tsx |
+| src/pages/legal/TermsOfService.tsx | legacy | import:src/pages/legal/TermsOfService.tsx |
+| src/pages/NotificationPreferences.tsx | legacy | import:src/pages/NotificationPreferences.tsx |
+| src/pages/operations/DeviceFleetManagement.tsx | legacy | import:./pages/operations/DeviceFleetManagement |
+| src/pages/operations/HospitalMapDashboard.tsx | legacy | import:./pages/operations/HospitalMapDashboard |
+| src/pages/operations/LiveTrackingMap.tsx | legacy | import:./pages/operations/LiveTrackingMap |
+| src/pages/operations/MedicalIotDashboard.tsx | legacy | import:./pages/operations/MedicalIotDashboard |
+| src/pages/operations/Operations.tsx | legacy | import:./pages/operations/Operations |
+| src/pages/organization/OrganizationPages.tsx | legacy | import:src/pages/organization/OrganizationPages |
+| src/pages/platform/BusinessBrain.tsx | legacy | import:./pages/platform/BusinessBrain |
+| src/pages/platform/components/PlatformWorkflowPrimitives.tsx | quarantine | No production import path found |
+| src/pages/platform/DepartmentIntelligence.tsx | legacy | import:./pages/platform/DepartmentIntelligence |
+| src/pages/platform/HealthcareKnowledgeHub.tsx | legacy | import:./pages/platform/HealthcareKnowledgeHub |
+| src/pages/platform/PlatformGovernanceWorkspace.tsx | wire | import:src/pages/platform/PlatformGovernanceWorkspace.tsx |
+| src/pages/platform/PlatformOSPages.tsx | quarantine | No production import path found |
+| src/pages/platform/PlatformSelfDiagnostics.tsx | legacy | import:./pages/platform/PlatformSelfDiagnostics |
+| src/pages/platform/PlatformSystemPage.tsx | wire | import:src/pages/platform/PlatformSystemPage.tsx |
+| src/pages/platform/WorkflowBuilder.tsx | legacy | import:./pages/platform/WorkflowBuilder |
+| src/pages/platform/WorkflowMiningEngine.tsx | legacy | import:./pages/platform/WorkflowMiningEngine |
+| src/pages/platform/WorkspaceDependencyGraph.tsx | legacy | import:./pages/platform/WorkspaceDependencyGraph |
+| src/pages/PlatformEntryHub.tsx | legacy | import:./pages/PlatformEntryHub |
+| src/pages/profile/ProfileActivity.tsx | legacy | import:src/pages/profile/ProfileActivity.tsx |
+| src/pages/profile/ProfilePreferences.tsx | legacy | import:./pages/profile/ProfilePreferences |
+| src/pages/profile/ProfileSecurity.tsx | legacy | import:src/pages/profile/ProfileSecurity.tsx |
+| src/pages/profile/ProfileToolPreferences.tsx | legacy | import:./pages/profile/ProfileToolPreferences |
+| src/pages/profile/ProfileWorkspaces.tsx | legacy | import:src/pages/profile/ProfileWorkspaces.tsx |
+| src/pages/Profile.tsx | legacy | import:src/pages/Profile.tsx |
+| src/pages/ProfileSettings.tsx | legacy | import:src/pages/ProfileSettings.tsx |
+| src/pages/saas/CapabilityDiscovery.tsx | legacy | import:./pages/saas/CapabilityDiscovery |
+| src/pages/saas/FeatureFlagCenter.tsx | legacy | import:./pages/saas/FeatureFlagCenter |
+| src/pages/saas/PluginMarketplace.tsx | legacy | import:./pages/saas/PluginMarketplace |
+| src/pages/saas/SaasHealthCenter.tsx | legacy | import:./pages/saas/SaasHealthCenter |
+| src/pages/Settings.tsx | legacy | import:src/pages/Settings.tsx |
+| src/pages/SystemHealth.tsx | legacy | import:./pages/SystemHealth |
+| src/pages/team/index.ts | legacy | import:index |
+| src/pages/team/TeamManagement.tsx | legacy | import:src/pages/team/TeamManagement.tsx |
+| src/pages/tools/abcd2Calculator.tsx | legacy | import:abcd2Calculator |
+| src/pages/tools/AiExplainability.tsx | wire | import:src/pages/tools/AiExplainability.tsx |
+| src/pages/tools/AmbientScribe.tsx | wire | import:src/pages/tools/AmbientScribe.tsx |
+| src/pages/tools/calculatorPrimitives.tsx | legacy | import:calculatorPrimitives |
+| src/pages/tools/CalculatorRecommender.tsx | wire | import:src/pages/tools/CalculatorRecommender.tsx |
+| src/pages/tools/Calculators.tsx | legacy | import:src/pages/tools/Calculators.tsx |
+| src/pages/tools/CardiologyAssistantPage.tsx | wire | import:src/pages/tools/CardiologyAssistantPage.tsx |
+| src/pages/tools/cardiologyCalculators.tsx | legacy | import:cardiologyCalculators |
+| src/pages/tools/ClinicalAudit.tsx | wire | import:src/pages/tools/ClinicalAudit.tsx |
+| src/pages/tools/ClinicalToolCatalog.tsx | wire | import:src/pages/tools/ClinicalToolCatalog.tsx |
+| src/pages/tools/DiagnosisAssistant.tsx | wire | import:src/pages/tools/DiagnosisAssistant.tsx |
+| src/pages/tools/DifferentialAi.tsx | wire | import:src/pages/tools/DifferentialAi.tsx |
+| src/pages/tools/DrugChecker.tsx | wire | import:src/pages/tools/DrugChecker.tsx |
+| src/pages/tools/emergencyCriticalCareCalculators.tsx | legacy | import:emergencyCriticalCareCalculators |
+| src/pages/tools/EndocrineMetabolicAssistantPage.tsx | wire | import:src/pages/tools/EndocrineMetabolicAssistantPage.tsx |
+| src/pages/tools/endocrineMetabolicCalculators.tsx | legacy | import:endocrineMetabolicCalculators |
+| src/pages/tools/GastroenterologyAssistantPage.tsx | wire | import:src/pages/tools/GastroenterologyAssistantPage.tsx |
+| src/pages/tools/GuidelineRag.tsx | wire | import:src/pages/tools/GuidelineRag.tsx |
+| src/pages/tools/hepatologyGiCalculators.tsx | legacy | import:hepatologyGiCalculators |
+| src/pages/tools/hospitalOperationsCalculators.tsx | legacy | import:hospitalOperationsCalculators |
+| src/pages/tools/LabInterpreter.tsx | wire | import:src/pages/tools/LabInterpreter.tsx |
+| src/pages/tools/lazySpecialtyCalculators.tsx | legacy | import:lazySpecialtyCalculators |
+| src/pages/tools/mentalHealthCalculators.tsx | legacy | import:src/pages/tools/mentalHealthCalculators.tsx |
+| src/pages/tools/NephrologyAssistantPage.tsx | wire | import:src/pages/tools/NephrologyAssistantPage.tsx |
+| src/pages/tools/nephrologyCalculators.tsx | legacy | import:nephrologyCalculators |
+| src/pages/tools/NeurologyAssistantPage.tsx | wire | import:src/pages/tools/NeurologyAssistantPage.tsx |
+| src/pages/tools/neurologyCalculators.tsx | legacy | import:neurologyCalculators |
+| src/pages/tools/nextWaveCalculators.tsx | legacy | import:nextWaveCalculators |
+| src/pages/tools/OrderSetAi.tsx | wire | import:src/pages/tools/OrderSetAi.tsx |
+| src/pages/tools/PatientSummaryAi.tsx | wire | import:src/pages/tools/PatientSummaryAi.tsx |
+| src/pages/tools/PediatricsObgynAssistantPage.tsx | wire | import:src/pages/tools/PediatricsObgynAssistantPage.tsx |
+| src/pages/tools/pediatricsObgynCalculators.tsx | legacy | import:pediatricsObgynCalculators |
+| src/pages/tools/pr4aCalculators.tsx | legacy | import:src/pages/tools/pr4aCalculators.tsx |
+| src/pages/tools/pr8ClinicalBatchCalculators.tsx | legacy | import:pr8ClinicalBatchCalculators |
+| src/pages/tools/ProcedureGuide.tsx | wire | import:src/pages/tools/ProcedureGuide.tsx |
+| src/pages/tools/Protocols.tsx | wire | import:src/pages/tools/Protocols.tsx |
+| src/pages/tools/PsychiatryAssistantPage.tsx | wire | import:src/pages/tools/PsychiatryAssistantPage.tsx |
+| src/pages/tools/psychiatryScreeningCalculators.tsx | legacy | import:psychiatryScreeningCalculators |
+| src/pages/tools/PulmonologyAssistantPage.tsx | wire | import:src/pages/tools/PulmonologyAssistantPage.tsx |
+| src/pages/tools/pulmonologyCalculators.tsx | legacy | import:pulmonologyCalculators |
+| src/pages/tools/SharedToolSession.tsx | legacy | import:src/pages/tools/SharedToolSession.tsx |
+| src/pages/tools/sourceBackedClinicalCalculators.tsx | legacy | import:sourceBackedClinicalCalculators |
+| src/pages/tools/TimelineAi.tsx | wire | import:src/pages/tools/TimelineAi.tsx |
+| src/pages/tools/ToolNotFound.tsx | legacy | import:./pages/tools/ToolNotFound |
+| src/pages/tools/ToolPageLayout.tsx | legacy | import:src/pages/tools/ToolPageLayout.tsx |
+| src/pages/tools/ToolsAreaFallback.tsx | legacy | import:ToolsAreaFallback |
+| src/pages/tools/ToolsFilteredConsole.tsx | legacy | import:./pages/tools/ToolsFilteredConsole |
+| src/pages/tools/ToolsOverview.tsx | legacy | import:src/pages/tools/ToolsOverview.tsx |
+| src/pages/training/Competencies.tsx | legacy | import:./pages/training/Competencies |
+| src/pages/training/Credentials.tsx | legacy | import:./pages/training/Credentials |
+| src/pages/training/MedicalSimulationSuite.tsx | legacy | import:./pages/training/MedicalSimulationSuite |
+| src/pages/training/SimulationOutcomes.tsx | legacy | import:./pages/training/SimulationOutcomes |
+| src/pages/training/SimulationScenarioPlayer.tsx | legacy | import:./pages/training/SimulationScenarioPlayer |
+| src/pages/training/TrainingDashboard.tsx | legacy | import:TrainingDashboard |
+| src/pages/UsagePage.tsx | legacy | import:./pages/UsagePage |
+| src/pages/Version.tsx | legacy | import:./pages/Version |
 
 ## Orphan components
 
-_None detected._
+| Component | Class | Evidence |
+| --- | --- | --- |
+| src/components/emergency/OperationalStrip.d.ts | quarantine | No production import |
+| src/components/EMSCriticalBroadcast.d.ts | quarantine | No production import |
+| src/components/layout/Box.tsx | quarantine | No production import |
+| src/components/ReassessmentDrawer.d.ts | quarantine | No production import |
+| src/components/reception/receptionAlertRailModel.ts | quarantine | No production import |
+| src/components/whiteboard/operationalHandoffArtifactRegistry.ts | quarantine | No production import |
+| src/components/WorkloadBalancePanel.d.ts | quarantine | No production import |
 
 ## Dashboards
 
@@ -292,7 +448,10 @@ _None detected._
 
 ## Laboratory modules
 
-_None detected._
+| Module | Class | Evidence |
+| --- | --- | --- |
+| src/pages/clinical/LaboratoryDashboard.tsx | wire | import:./pages/clinical/LaboratoryDashboard |
+| src/pages/tools/LabInterpreter.tsx | wire | import:src/pages/tools/LabInterpreter.tsx |
 
 ## 3D viewer code
 
@@ -300,7 +459,19 @@ _None detected._
 
 ## Orphan services
 
-_None detected._
+| Service | Class | Evidence |
+| --- | --- | --- |
+| src/services/aiChiefRecommendationPresentation.ts | quarantine | No production import of service module |
+| src/services/customerPortalApi.ts | quarantine | No production import of service module |
+| src/services/integrationPreArrivalConsumer.ts | quarantine | No production import of service module |
+| src/services/livingDocumentationGenerator.ts | quarantine | No production import of service module |
+| src/services/nativeAiTriageRuleLlm.ts | quarantine | No production import of service module |
+| src/services/reassessmentApi.ts | quarantine | No production import of service module |
+| src/services/receptionPatientAnswersModel.ts | quarantine | No production import of service module |
+| src/services/roomStatusSync.ts | quarantine | No production import of service module |
+| src/services/successCenterApi.ts | quarantine | No production import of service module |
+| src/services/surveillanceIoTService.ts | quarantine | No production import of service module |
+| src/services/voiceInterviewAssistant.ts | quarantine | No production import of service module |
 
 ## Orphan executors
 
@@ -347,6 +518,7 @@ _None detected._
 | reports-schedule-create | legacy | Gated stub — intentional no-op until backend exists |
 | reports-schedule-cancel | legacy | Gated stub — intentional no-op until backend exists |
 | GET /api/emergency/patients/:patientId/workflow-logs | legacy | Backend-only route (no SPA client) |
+| POST /api/emergency/ems/handoff | legacy | Backend-only route (no SPA client) |
 | POST /api/emergency/copilot/interactions | legacy | Backend-only route (no SPA client) |
 | POST /api/emergency/clinical-calculators/results | legacy | Backend-only route (no SPA client) |
 | POST /api/emergency/digital-twin/organizational/simulate | legacy | Backend-only route (no SPA client) |
@@ -425,7 +597,6 @@ _None detected._
 | GET /api/tool-calling/catalog | legacy | Backend-only route (no SPA client) |
 | GET /api/tool-calling/resolve | legacy | Backend-only route (no SPA client) |
 | GET /api/tool-calling/logs | legacy | Backend-only route (no SPA client) |
-| POST /api/cost-optimizer/route | legacy | Backend-only route (no SPA client) |
 | POST /api/platform/users/me/pinned-assets | legacy | Platform/product API is deferred and not frontend-inventory wired |
 | POST /api/platform/users/me/hidden-assets | legacy | Platform/product API is deferred and not frontend-inventory wired |
 | GET /api/platform/assets/:assetId | legacy | Platform/product API is deferred and not frontend-inventory wired |
@@ -437,7 +608,6 @@ _… and 21 more API rows._
 
 | Doc | Class | Evidence |
 | --- | --- | --- |
-| docs/architecture/architecture-map.md | quarantine | No inbound links from README, src, or other docs |
 | docs/architecture/clickable-map-report.md | legacy | No inbound links from README, src, or other docs |
 | docs/architecture/component-mounting-report.md | legacy | No inbound links from README, src, or other docs |
 | docs/architecture/emergency-resource-board.md | quarantine | No inbound links from README, src, or other docs |

@@ -507,11 +507,11 @@ export const MANUAL_TOPICS: readonly ManualTopic[] = Object.freeze([
     title: 'Patient Room Display',
     eyebrow: 'Room screen · bedside display',
     purpose: 'Single-patient display optimised for a room-mounted screen — shows active patient status, next action, and care team.',
-    route: '/emergency/room',
+    route: CANONICAL_ROUTES.emergencyPatientRoom,
     roles: [EMERGENCY_ROLE_IDS.chargeNurse, EMERGENCY_ROLE_IDS.physician, EMERGENCY_ROLE_IDS.edManager, EMERGENCY_ROLE_IDS.readOnlyViewer],
     whenToUse: 'Mount on a room display or tablet to show the patient and care team what is happening without exposing the full whiteboard.',
     procedure: [
-      { order: 1, action: 'Navigate to /emergency/room/:patientId', detail: 'Or access via the patient card → "Room display" action.' },
+      { order: 1, action: 'Open the patient card → "Room display" action', detail: 'Or navigate directly to /emergency/patient-room?patientId=<id>.' },
       { order: 2, action: 'Display auto-refreshes', detail: 'No interaction needed — screen updates as patient status changes.' },
       { order: 3, action: 'Care team and next step shown', detail: 'Assigned nurse, physician, acuity, and next scheduled reassessment.' },
     ],

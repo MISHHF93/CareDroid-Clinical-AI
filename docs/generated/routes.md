@@ -1,7 +1,8 @@
-# Routes & pages
+# Routes & pages (curated ED journey stages)
 
 > Auto-generated from implementation. Do not edit manually.
 > Regenerate: `npm run docs:generate`
+> This is the curated 911→outcome ED journey-stage subset (`caredroidPageArchitecture.config.ts`), not the full route surface. For the complete route inventory and a wiring/reachability scan, see `CANONICAL_ROUTES` in `src/config/routes.config.ts` or run `node scripts/audit-routes-nav-full-scan.mjs`.
 
 **Entries:** 16
 

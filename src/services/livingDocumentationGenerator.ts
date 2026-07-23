@@ -8,7 +8,7 @@ import { buildLivingDocumentationSnapshot } from './livingDocumentationService';
 
 function sectionTitle(section: LivingDocumentationSection): string {
   const titles: Record<LivingDocumentationSection, string> = {
-    routes: 'Routes & pages',
+    routes: 'Routes & pages (curated ED journey stages)',
     apis: 'APIs & page bindings',
     roles: 'User roles',
     workflows: 'Workflows & automation',
@@ -19,6 +19,17 @@ function sectionTitle(section: LivingDocumentationSection): string {
     configuration: 'Configuration sources',
   };
   return titles[section];
+}
+
+/** Extra scope-clarifying line shown only for sections whose entry count could
+ * otherwise be mistaken for the app's full surface (see Cycle 153 audit — this
+ * doc's old "Routes & pages" title with 16 entries misled readers into
+ * thinking it was the full route inventory, when CANONICAL_ROUTES has ~190+). */
+function sectionScopeNote(section: LivingDocumentationSection): string | null {
+  if (section === 'routes') {
+    return '> This is the curated 911→outcome ED journey-stage subset (`caredroidPageArchitecture.config.ts`), not the full route surface. For the complete route inventory and a wiring/reachability scan, see `CANONICAL_ROUTES` in `src/config/routes.config.ts` or run `node scripts/audit-routes-nav-full-scan.mjs`.';
+  }
+  return null;
 }
 
 function formatEntryMarkdown(entry: LivingDocumentationEntry): string {
@@ -49,11 +60,13 @@ function formatSectionMarkdown(
   section: LivingDocumentationSection,
   entries: readonly LivingDocumentationEntry[],
 ): string {
+  const scopeNote = sectionScopeNote(section);
   return [
     `# ${sectionTitle(section)}`,
     '',
     `> Auto-generated from implementation. Do not edit manually.`,
     `> Regenerate: \`npm run docs:generate\``,
+    ...(scopeNote ? [scopeNote] : []),
     '',
     `**Entries:** ${entries.length}`,
     '',

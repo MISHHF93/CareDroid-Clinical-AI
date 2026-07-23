@@ -281,7 +281,7 @@ function detectOrphanRoutes(appPaths, navPaths) {
 
 function detectOrphanPages(corpus, appImports) {
   const pageFiles = walkFiles(join(REPO_ROOT, 'src/pages'), {
-    extensions: ['.jsx', '.js'],
+    extensions: ['.tsx', '.jsx', '.ts', '.js'],
     excludeTest: true,
   });
   const appWired = new Set(
@@ -340,16 +340,16 @@ function domainForPath(rel) {
 
 function detectDomainModuleOrphans(corpus, appImports) {
   const domains = {
-    dashboards: walkFiles(join(REPO_ROOT, 'src/pages'), { extensions: ['.jsx'], excludeTest: true }).filter(
+    dashboards: walkFiles(join(REPO_ROOT, 'src/pages'), { extensions: ['.tsx', '.jsx'], excludeTest: true }).filter(
       (f) => /Dashboard/.test(f)
     ),
-    simulations: walkFiles(join(REPO_ROOT, 'src/pages'), { extensions: ['.jsx'], excludeTest: true }).filter(
+    simulations: walkFiles(join(REPO_ROOT, 'src/pages'), { extensions: ['.tsx', '.jsx'], excludeTest: true }).filter(
       (f) => /Simulation|MedicalSimulation/.test(f)
     ),
-    laboratory: walkFiles(join(REPO_ROOT, 'src/pages'), { extensions: ['.jsx'], excludeTest: true }).filter(
+    laboratory: walkFiles(join(REPO_ROOT, 'src/pages'), { extensions: ['.tsx', '.jsx'], excludeTest: true }).filter(
       (f) => /Laboratory|Lab[A-Z]/.test(f)
     ),
-    viewer3d: walkFiles(join(REPO_ROOT, 'src'), { extensions: ['.jsx', '.js', '.css'], excludeTest: true }).filter(
+    viewer3d: walkFiles(join(REPO_ROOT, 'src'), { extensions: ['.tsx', '.jsx', '.ts', '.js', '.css'], excludeTest: true }).filter(
       (f) => /3[Dd]|Medical3D|SimulationLaboratoryViewer/.test(f)
     ),
   };
@@ -383,9 +383,9 @@ function detectDomainModuleOrphans(corpus, appImports) {
 
 function detectOrphanComponents(corpus) {
   const componentFiles = walkFiles(join(REPO_ROOT, 'src/components'), {
-    extensions: ['.jsx', '.js'],
+    extensions: ['.tsx', '.jsx', '.ts', '.js'],
     excludeTest: true,
-  }).filter((f) => !f.endsWith('index.js') && !f.endsWith('index.jsx'));
+  }).filter((f) => !/index\.(tsx|jsx|ts|js)$/.test(f));
 
   return componentFiles
     .map((full) => {
@@ -406,7 +406,7 @@ function detectOrphanComponents(corpus) {
 
 function detectOrphanServices(corpus) {
   const serviceFiles = walkFiles(join(REPO_ROOT, 'src/services'), {
-    extensions: ['.js'],
+    extensions: ['.ts', '.js'],
     excludeTest: true,
   });
 

@@ -204,14 +204,18 @@
   position: absolute;
 }
 
-.patient-card__timeline-button {
+.patient-card__timeline-button,
+.patient-card__room-display-button {
+  align-items: center;
   border: 1px solid transparent;
   border-radius: 999px;
   background: color-mix(in srgb, var(--color-primary) 8%, transparent);
   color: var(--color-primary);
   cursor: pointer;
+  display: inline-flex;
   font-size: 10px;
   font-weight: 700;
+  gap: 4px;
   min-height: 30px;
   padding: 3px 7px;
   transition:
@@ -223,14 +227,18 @@
 
 .patient-card__timeline-button:hover,
 .patient-card__timeline-button:active,
-.patient-card__timeline-button:focus-visible {
+.patient-card__timeline-button:focus-visible,
+.patient-card__room-display-button:hover,
+.patient-card__room-display-button:active,
+.patient-card__room-display-button:focus-visible {
   background: color-mix(in srgb, var(--color-primary) 14%, transparent);
   border-color: color-mix(in srgb, var(--color-primary) 34%, var(--color-border-default));
   color: var(--color-text-primary);
   outline: none;
 }
 
-.patient-card__timeline-button:active {
+.patient-card__timeline-button:active,
+.patient-card__room-display-button:active {
   transform: scale(0.985);
 }
 
@@ -796,7 +804,8 @@
 
 /* Flag/score tone rules live with the pill inventory block above */
 
-.patient-card__timeline-button {
+.patient-card__timeline-button,
+.patient-card__room-display-button {
   align-items: center;
   align-self: end;
   background: color-mix(in srgb, var(--color-primary) 10%, var(--color-card));
@@ -870,7 +879,8 @@
     display: none;
   }
 
-  .patient-card__timeline-button {
+  .patient-card__timeline-button,
+  .patient-card__room-display-button {
     min-height: 34px;
   }
 
@@ -917,6 +927,7 @@
   .patient-card--highlighted,
   .patient-card--keyboard-selected,
   .patient-card__timeline-button:active,
+  .patient-card__room-display-button:active,
   .patient-card__mission-actions button:hover,
   .patient-card__mission-actions button:active,
   .patient-card__mission-actions button:focus-visible {

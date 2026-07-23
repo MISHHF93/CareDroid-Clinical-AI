@@ -5,6 +5,7 @@ import {
   Clock3,
   DoorOpen,
   FileText,
+  Monitor,
   MonitorSmartphone,
   Shield,
   Timer,
@@ -602,6 +603,16 @@ function PatientCard({
     const params = new URLSearchParams({ patientId: patient.id, new: '1' });
     navigateTo(`${CANONICAL_ROUTES.emergencyReferrals}?${params.toString()}`);
   }, [canManageReferral, emergencyRole, patient.id, selectPatient]);
+  // PatientRoomDisplay is mounted in router.tsx with no CareDroidRouteGuard — it's
+  // an ungated bedside/room-mounted display, not a permissioned in-shell route — so
+  // this action stays unconditionally visible like the Timeline button, rather than
+  // gating on canAccessRoute (which would always be false: the route has no
+  // CANONICAL_ROUTE_MAP entry to grant access from, recreating the orphan bug).
+  const handleRoomDisplay = useCallback((event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    const params = new URLSearchParams({ patientId: patient.id });
+    navigateTo(`${CANONICAL_ROUTES.emergencyPatientRoom}?${params.toString()}`);
+  }, [patient.id]);
   const handleBoarding = useCallback((event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     if (!canBoardPatient) return;
@@ -1104,6 +1115,17 @@ function PatientCard({
         onClick={handleTimelineClick}
       >
         Timeline
+      </button>
+
+      <button
+        type="button"
+        className="patient-card__room-display-button"
+        aria-label={`Open room display for ${patientName}`}
+        title="Open the room-mounted bedside display for this patient"
+        onClick={handleRoomDisplay}
+      >
+        <Monitor size={14} strokeWidth={2.25} aria-hidden />
+        Room display
       </button>
 
       {showWorkflowActions ? (

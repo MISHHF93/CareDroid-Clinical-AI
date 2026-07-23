@@ -1,0 +1,100 @@
+{
+  "generatedAt": "2026-07-23T02:37:46.611Z",
+  "note": "Inventory only — text-level heuristics, not a runtime simulation of Pilot Mode/entitlement/profile-scoped nav filtering. \"orphanCandidates\" found no evidence of the path anywhere outside routes.config.ts; \"deadNamedConstants\" found the URL mounted/mentioned elsewhere but not via the named CANONICAL_ROUTES export (may include prose/FAQ mentions, not just real routes/links). Human review required before treating any row as a confirmed defect.",
+  "totals": {
+    "canonicalRoutes": 192,
+    "routeMapEntries": 42,
+    "routeMapEntriesShowInNavFalse": 4,
+    "hospitalRolesCovered": 24
+  },
+  "orphanCandidates": [
+    {
+      "name": "authInvite",
+      "path": "/auth/invite"
+    },
+    {
+      "name": "helpCenter",
+      "path": "/help-center"
+    },
+    {
+      "name": "legalTerms",
+      "path": "/legal/terms"
+    },
+    {
+      "name": "onboardingConsent",
+      "path": "/onboarding/consent"
+    },
+    {
+      "name": "consentHistory",
+      "path": "/legal/consent-history"
+    }
+  ],
+  "deadNamedConstants": [
+    {
+      "name": "authForgotPassword",
+      "path": "/auth/forgot-password"
+    },
+    {
+      "name": "authMagicLink",
+      "path": "/auth/magic-link"
+    },
+    {
+      "name": "resetPassword",
+      "path": "/reset-password"
+    },
+    {
+      "name": "verifyEmail",
+      "path": "/verify-email"
+    },
+    {
+      "name": "toolsCardiology",
+      "path": "/emergency/tools/cardiology/:toolId"
+    },
+    {
+      "name": "toolsNephrology",
+      "path": "/emergency/tools/nephrology/:toolId"
+    },
+    {
+      "name": "toolsNeurology",
+      "path": "/emergency/tools/neurology/:toolId"
+    },
+    {
+      "name": "toolsGastroenterology",
+      "path": "/emergency/tools/gastroenterology/:toolId"
+    },
+    {
+      "name": "toolsEndocrine",
+      "path": "/emergency/tools/endocrine/:toolId"
+    },
+    {
+      "name": "toolsPediatrics",
+      "path": "/emergency/tools/pediatrics/:toolId"
+    },
+    {
+      "name": "toolsPsychiatry",
+      "path": "/emergency/tools/psychiatry/:toolId"
+    },
+    {
+      "name": "toolsPulmonology",
+      "path": "/emergency/tools/pulmonology/:toolId"
+    },
+    {
+      "name": "legalGdpr",
+      "path": "/legal/gdpr"
+    },
+    {
+      "name": "legalHipaa",
+      "path": "/legal/hipaa"
+    }
+  ],
+  "curatedButHiddenFromNav": [
+    {
+      "navId": "medical-iot",
+      "path": "/medical-iot",
+      "roles": [
+        "it_admin"
+      ]
+    }
+  ],
+  "deadNavIdsCuratedByRoles": []
+}

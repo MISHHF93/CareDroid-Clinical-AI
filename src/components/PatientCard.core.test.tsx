@@ -83,4 +83,18 @@ describe('PatientCard core whiteboard row', () => {
     fireEvent.click(screen.getByRole('button', { name: /jordan lee/i }));
     expect(selectPatient).toHaveBeenCalledWith('wb-patient-1');
   });
+
+  it('wires the Room display action to /emergency/patient-room?patientId=<id> (Cycle 153 — was orphaned, no UI reached it)', () => {
+    render(
+      <MemoryRouter>
+        <PatientCard patient={patientWithArrival()} layout="card" />
+      </MemoryRouter>,
+    );
+
+    const roomDisplayButton = screen.getByRole('button', { name: /open room display for jordan lee/i });
+    fireEvent.click(roomDisplayButton);
+
+    expect(window.location.pathname).toBe('/emergency/patient-room');
+    expect(window.location.search).toBe('?patientId=wb-patient-1');
+  });
 });

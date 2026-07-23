@@ -34,4 +34,10 @@ describe('userManual.config', () => {
     expect(ids.has('copilot')).toBe(true);
     expect(ids.has('tools')).toBe(true);
   });
+
+  it('points the patient-room topic at the real route (Cycle 153 — was hand-typed /emergency/room, a dead path)', () => {
+    const topic = getManualTopicById('patient-room');
+    expect(topic?.route).toBe(CANONICAL_ROUTES.emergencyPatientRoom);
+    expect(topic?.route).not.toBe('/emergency/room');
+  });
 });
