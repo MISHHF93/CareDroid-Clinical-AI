@@ -79,7 +79,7 @@ export class PersonalizationService {
   async savePrompt(userId: string, dto: SavedPromptDto) {
     const prompt = this.savedPromptRepository.create({
       userId,
-      workspaceId: dto.workspaceId || null,
+      workspaceId: dto.workspaceId || undefined,
       title: dto.title.trim(),
       prompt: dto.prompt,
       tags: dto.tags || [],

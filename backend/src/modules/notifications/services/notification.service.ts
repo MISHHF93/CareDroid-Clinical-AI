@@ -311,7 +311,7 @@ export class NotificationService {
     dto: SendNotificationDto,
     status: NotificationStatus,
   ): Promise<Notification> {
-    const expiresAt = dto.expiresIn ? new Date(Date.now() + dto.expiresIn) : null;
+    const expiresAt = dto.expiresIn ? new Date(Date.now() + dto.expiresIn) : undefined;
 
     const notification = this.notificationRepository.create({
       userId: dto.userId,

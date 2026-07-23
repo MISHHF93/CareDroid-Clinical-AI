@@ -65,7 +65,7 @@ export class Notification {
   status: NotificationStatus;
 
   @Column({ type: 'varchar', length: 500, nullable: true })
-  fcmMessageId: string;
+  fcmMessageId?: string;
 
   @Column({ type: 'varchar', length: 500, nullable: true })
   apnsMessageId: string;

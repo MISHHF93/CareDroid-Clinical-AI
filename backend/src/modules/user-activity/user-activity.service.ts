@@ -47,10 +47,10 @@ export class UserActivityService {
   async record(userId: string, dto: RecordUserActivityDto) {
     const activity = this.activityRepository.create({
       userId,
-      workspaceId: dto.workspaceId || null,
+      workspaceId: dto.workspaceId || undefined,
       category: dto.category,
       label: this.safeLabel(dto.label),
-      route: dto.route || null,
+      route: dto.route || undefined,
       metadata: this.safeMetadata(dto.metadata),
       occurredAt: new Date(),
     });
