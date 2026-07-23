@@ -15,6 +15,15 @@ import {
 import { enrichToolWithSegmentation } from './profileToolSegmentation';
 import { FRONTEND_API_CALLS } from './frontendApiCallsInventory';
 import { findBackendRoute } from './backendHttpRouteInventory';
+import { TIER_B_CHAT_CALCULATOR_REGISTRY_IDS } from './clinicalToolIdContract';
+
+// Tier B tools are intentionally chat-guided with no dedicated form component
+// (verified per-tool, e.g. canadianCSpineWiring.test.ts / graceAcsWiring.test.ts).
+// Gaining a backend executor later (Cycle 44's 3->39 executor expansion) flips
+// their computed launchType from CHAT_ASSISTED to BACKEND_BACKED, which made
+// frontendStatusLabel() below mislabel them as a component gap even though the
+// tested, working chat pathway never needed a form in the first place.
+const TIER_B_CHAT_ONLY_IDS = new Set(TIER_B_CHAT_CALCULATOR_REGISTRY_IDS);
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(__dirname, '../..');
@@ -94,7 +103,10 @@ function backendStatusLabel(record) {
 function frontendStatusLabel(record) {
   if (!record.catalogVisible && !record.sidebarVisible) return 'Hidden';
   if (!record.route && !record.navigationPath) return 'No route';
-  if (!record.component && record.route) return 'Route only (component gap)';
+  if (!record.component && record.route) {
+    if (TIER_B_CHAT_ONLY_IDS.has(record.id)) return 'Chat-guided (hub-only, no form by design)';
+    return 'Route only (component gap)';
+  }
   if (record.launchType === TOOL_LAUNCH_TYPES.UNSUPPORTED_PLANNED) return 'Planned';
   return 'Routed';
 }

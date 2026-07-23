@@ -1,6 +1,6 @@
 # SaaS Architecture Compliance Audit
 
-Generated: 2026-07-09 (regenerate with `npm run saas-compliance-audit:write-docs`)
+Generated: 2026-07-23 (regenerate with `npm run saas-compliance-audit:write-docs`)
 
 ## Charter reference
 
@@ -117,9 +117,9 @@ Assets in `SEED_PLATFORM_ASSETS` without pack assignment:
 | Organization Onboarding | /onboarding | onboarding-wizard | onboarding-wizard | core-platform | Yes | active | Complete (seed template) | — |
 | Simulation Suite | /simulation | simulation-suite | simulation-suite | simulation-training-pack, ai-workflow-pack, core-platform, emergency-medicine, emergency-department-pack | Yes | draft | Complete (seed template) | — |
 | 3D Viewer | /3d-viewer | medical-3d-viewer | medical-3d-viewer | simulation-training-pack, research-education, core-platform | Yes | draft | Complete (seed template) | — |
-| A-a Gradient | /tools/calculators/aa-gradient | aa-gradient | aa-gradient | core-platform | Yes | draft | Complete (seed template) | — |
-| ABCD² score | /tools/calculators/abcd2 | abcd2 | abcd2 | emergency-medicine, emergency-department-pack | Yes | draft | Complete (seed template) | — |
-| ABG Interpreter | /tools/lab-interpreter | abg-interpreter | abg-interpreter | laboratory-intelligence | Yes | draft | Complete (seed template) | — |
+| A-a Gradient | /tools/calculators/aa-gradient | aa-gradient | aa-gradient | core-platform | Yes | active | Complete (seed template) | — |
+| ABCD² score | /tools/calculators/abcd2 | abcd2 | abcd2 | emergency-medicine, emergency-department-pack | Yes | active | Complete (seed template) | — |
+| ABG Interpreter | /tools/lab-interpreter | abg-interpreter | abg-interpreter | laboratory-intelligence | Yes | active | Complete (seed template) | — |
 | ACLS Protocol | /protocols | acls-protocol | acls-protocol | ai-workflow-pack, core-platform, cardiology-pack, laboratory-intelligence, simulation-training-pack | Yes | draft | Complete (seed template) | — |
 | ACS Workflow Assistant | /tools/cardiology/acs-workflow-assistant | acs-workflow-assistant | acs-workflow-assistant | ai-workflow-pack, core-platform, cardiology-pack | Yes | draft | Complete (seed template) | — |
 | Adjusted Body Weight | /tools/calculators/adjusted-body-weight | adjusted-body-weight | adjusted-body-weight | laboratory-intelligence | Yes | draft | Complete (seed template) | — |
@@ -137,10 +137,10 @@ Assets in `SEED_PLATFORM_ASSETS` without pack assignment:
 | AKI Staging Assistant | /tools/nephrology/aki-staging-assistant | aki-staging-assistant | aki-staging-assistant | ai-workflow-pack, core-platform | Yes | draft | Complete (seed template) | — |
 | All calculators | /tools/calculators | calculators | calculators | core-platform, emergency-medicine, emergency-department-pack, cardiology-pack | Yes | active | Complete (seed template) | — |
 | Ambient Clinical Scribe | /tools/ambient-scribe | ambient-scribe | ambient-scribe | ai-workflow-pack, core-platform | Yes | active | Complete (seed template) | — |
-| Anion Gap | /tools/calculators/anion-gap | anion-gap | anion-gap | core-platform | Yes | draft | Complete (seed template) | — |
+| Anion Gap | /tools/calculators/anion-gap | anion-gap | anion-gap | core-platform | Yes | active | Complete (seed template) | — |
 | Antibiotic Guide | /tools/diagnosis | antibiotic-guide | antibiotic-guide | cardiology-pack, laboratory-intelligence, medical-iot-pack, hospital-operations, digital-twin-pack | Yes | draft | Complete (seed template) | — |
 | Anticoagulation Protocol Plugin | /protocols | plugin-anticoagulation-protocol | plugin-anticoagulation-protocol | research-education | Yes | beta | Complete (seed template) | — |
-| APACHE-II | /tools/calculators/apache-ii | apache2-calculator | apache2-calculator | icu-pack | Yes | draft | Complete (seed template) | — |
+| APACHE-II | /tools/calculators/apache-ii | apache2-calculator | apache2-calculator | icu-pack | Yes | active | Complete (seed template) | — |
 | Apgar score | /tools/calculators/apgar-score | apgar-score | apgar-score | core-platform | Yes | draft | Complete (seed template) | — |
 | APRI | /tools/calculators/apri | apri | apri | core-platform | Yes | draft | Complete (seed template) | — |
 | Arrhythmia Risk Classifier | /tools/cardiology/arrhythmia-risk-classifier | arrhythmia-risk-classifier | arrhythmia-risk-classifier | cardiology-pack, medical-iot-pack, hospital-operations, digital-twin-pack | Yes | draft | Complete (seed template) | — |
@@ -165,15 +165,15 @@ Assets in `SEED_PLATFORM_ASSETS` without pack assignment:
 | BUN/Creatinine Ratio | /tools/calculators/bun-creatinine-ratio | bun-creatinine-ratio | bun-creatinine-ratio | core-platform | Yes | draft | Complete (seed template) | — |
 | CAGE | /tools/calculators/cage | cage | cage | ai-workflow-pack, core-platform | Yes | draft | Complete (seed template) | — |
 | Calculator Recommendation AI | /tools/calculator-recommender | calculator-recommender-ai | calculator-recommender-ai | ai-workflow-pack, core-platform, emergency-medicine, emergency-department-pack | Yes | draft | Complete (seed template) | — |
-| Canadian C-Spine Rule | /tools/calculators | canadian-c-spine | canadian-c-spine | emergency-medicine, emergency-department-pack | Yes | draft | Complete (seed template) | — |
+| Canadian C-Spine Rule | /tools/calculators | canadian-c-spine | canadian-c-spine | emergency-medicine, emergency-department-pack | Yes | deprecated | Complete (seed template) | — |
 | Capacity Command Dashboard Plugin | /operations | plugin-capacity-command-dashboard | plugin-capacity-command-dashboard | medical-iot-pack, hospital-operations, digital-twin-pack | Yes | beta | Complete (seed template) | — |
 | Capacity Prediction Engine | /hospital-map | capacity-prediction-engine | capacity-prediction-engine | medical-iot-pack, fleet-logistics, hospital-operations, digital-twin-pack | Yes | beta | Complete (seed template) | — |
 | Cardiac Telemetry Analyzer | /tools/cardiology/cardiac-telemetry-analyzer | cardiac-telemetry-analyzer | cardiac-telemetry-analyzer | cardiology-pack, medical-iot-pack, hospital-operations, digital-twin-pack | Yes | draft | Complete (seed template) | — |
 | Cardiology Command Center | /tools/cardiology/cardiology-command-center | cardiology-command-center | cardiology-command-center | cardiology-pack, medical-iot-pack, hospital-operations, digital-twin-pack | Yes | draft | Complete (seed template) | — |
 | Care Plan View | /patients/:patientId/care-plan | care-plan-view | care-plan-view | core-platform | Yes | beta | Complete (seed template) | — |
 | Centor / McIsaac | /tools/calculators/centor-mcisaac | centor-mcisaac | centor-mcisaac | laboratory-intelligence, medical-iot-pack, hospital-operations, digital-twin-pack | Yes | draft | Complete (seed template) | — |
-| CHA₂DS₂-VASc | /tools/calculators/chads2vasc | calc-chads2vasc | calc-chads2vasc | emergency-medicine, emergency-department-pack, cardiology-pack | Yes | draft | Complete (seed template) | — |
-| CHADS2 | /tools/calculators/chads2 | chads2 | chads2 | emergency-medicine, emergency-department-pack, cardiology-pack | Yes | draft | Complete (seed template) | — |
+| CHA₂DS₂-VASc | /tools/calculators/chads2vasc | calc-chads2vasc | calc-chads2vasc | emergency-medicine, emergency-department-pack, cardiology-pack | Yes | active | Complete (seed template) | — |
+| CHADS2 | /tools/calculators/chads2 | chads2 | chads2 | emergency-medicine, emergency-department-pack, cardiology-pack | Yes | active | Complete (seed template) | — |
 | Child-Pugh | /tools/calculators/child-pugh | child-pugh | child-pugh | core-platform | Yes | draft | Complete (seed template) | — |
 | Cirrhosis Monitoring Engine | /tools/gastroenterology/cirrhosis-monitoring-engine | cirrhosis-monitoring-engine | cirrhosis-monitoring-engine | core-platform | Yes | draft | Complete (seed template) | — |
 | CKD Progression Predictor | /tools/nephrology/ckd-progression-predictor | ckd-progression-predictor | ckd-progression-predictor | core-platform | Yes | draft | Complete (seed template) | — |
@@ -198,8 +198,8 @@ Assets in `SEED_PLATFORM_ASSETS` without pack assignment:
 | COPD GOLD | /tools/calculators | copd-gold | copd-gold | core-platform | Yes | draft | Complete (seed template) | — |
 | COPD GOLD Assessment | /tools/calculators/copd-gold-assessment | copd-gold-assessment | copd-gold-assessment | laboratory-intelligence, medical-iot-pack, hospital-operations, digital-twin-pack | Yes | draft | Complete (seed template) | — |
 | COPD Workflow Assistant | /tools/pulmonology/copd-workflow-assistant | copd-workflow-assistant | copd-workflow-assistant | ai-workflow-pack, core-platform | Yes | draft | Complete (seed template) | — |
-| Corrected Calcium | /tools/calculators/corrected-calcium | corrected-calcium | corrected-calcium | core-platform | Yes | draft | Complete (seed template) | — |
-| Corrected Sodium | /tools/calculators/corrected-sodium | corrected-sodium | corrected-sodium | core-platform | Yes | draft | Complete (seed template) | — |
+| Corrected Calcium | /tools/calculators/corrected-calcium | corrected-calcium | corrected-calcium | core-platform | Yes | active | Complete (seed template) | — |
+| Corrected Sodium | /tools/calculators/corrected-sodium | corrected-sodium | corrected-sodium | core-platform | Yes | active | Complete (seed template) | — |
 | Cost Optimization Control Plane | /governance/costs | cost-optimization-control-plane | cost-optimization-control-plane | cardiology-pack, governance-compliance-pack | Yes | beta | Complete (seed template) | — |
 | Creatinine Clearance (Cockcroft-Gault) | /tools/calculators/creatinine-clearance-cg | creatinine-clearance-cg | creatinine-clearance-cg | laboratory-intelligence | Yes | draft | Complete (seed template) | — |
 | Credentialing Platform | /credentials | credentialing-platform | credentialing-platform | ai-workflow-pack, core-platform, simulation-training-pack, research-education | Yes | draft | Complete (seed template) | — |
@@ -220,7 +220,7 @@ Assets in `SEED_PLATFORM_ASSETS` without pack assignment:
 | Dispatch Intelligence | /tools/calculators | dispatch-ai | dispatch-ai | fleet-logistics, ai-workflow-pack, core-platform, hospital-operations, digital-twin-pack | Yes | deprecated | Complete (seed template) | — |
 | DKA Pathway Assistant | /tools/endocrine/dka-pathway-assistant | dka-pathway-assistant | dka-pathway-assistant | ai-workflow-pack, core-platform, emergency-medicine, emergency-department-pack | Yes | draft | Complete (seed template) | — |
 | Drug Checker | /tools/drug-checker | drug-check | drug-check | laboratory-intelligence, medical-iot-pack, hospital-operations, digital-twin-pack | Yes | active | Complete (seed template) | — |
-| Duke Treadmill Score | /tools/calculators/duke-treadmill-score | duke-treadmill-score | duke-treadmill-score | cardiology-pack | Yes | draft | Complete (seed template) | — |
+| Duke Treadmill Score | /tools/calculators/duke-treadmill-score | duke-treadmill-score | duke-treadmill-score | cardiology-pack | Yes | active | Complete (seed template) | — |
 | ECG Interpretation Assistant | /tools/cardiology/ecg-interpretation-assistant | ecg-interpretation-assistant | ecg-interpretation-assistant | ai-workflow-pack, core-platform, cardiology-pack, fleet-logistics | Yes | draft | Complete (seed template) | — |
 | ECG Trend Engine | /tools/cardiology/ecg-trend-engine | ecg-trend-engine | ecg-trend-engine | cardiology-pack | Yes | draft | Complete (seed template) | — |
 | EEG Trend Dashboard | /tools/neurology/eeg-trend-dashboard | eeg-trend-dashboard | eeg-trend-dashboard | core-platform | Yes | draft | Complete (seed template) | — |
@@ -233,36 +233,36 @@ Assets in `SEED_PLATFORM_ASSETS` without pack assignment:
 | Endoscopy Workflow Assistant | /tools/gastroenterology/endoscopy-workflow-assistant | endoscopy-workflow-assistant | endoscopy-workflow-assistant | ai-workflow-pack, core-platform | Yes | draft | Complete (seed template) | — |
 | Epworth Sleepiness Scale | /tools/calculators/epworth-sleepiness-scale | epworth-sleepiness-scale | epworth-sleepiness-scale | laboratory-intelligence | Yes | draft | Complete (seed template) | — |
 | Equity Monitoring | /governance/equity | equity-monitoring | equity-monitoring | governance-compliance-pack, research-education | Yes | beta | Complete (seed template) | — |
-| FeNa | /tools/calculators/fena | fena | fena | core-platform | Yes | draft | Complete (seed template) | — |
+| FeNa | /tools/calculators/fena | fena | fena | core-platform | Yes | active | Complete (seed template) | — |
 | Fenton Growth Chart Helper | /tools/calculators/fenton-growth-chart-helper | fenton-growth-chart-helper | fenton-growth-chart-helper | emergency-medicine, emergency-department-pack | Yes | draft | Complete (seed template) | — |
-| FeUrea | /tools/calculators/feurea | feurea | feurea | core-platform | Yes | draft | Complete (seed template) | — |
+| FeUrea | /tools/calculators/feurea | feurea | feurea | core-platform | Yes | active | Complete (seed template) | — |
 | FHIR Connector | /integrations/fhir | fhir-connector | fhir-connector | core-platform | Yes | beta | Complete (seed template) | — |
 | FIB-4 | /tools/calculators/fib4 | fib4 | fib4 | core-platform | Yes | draft | Complete (seed template) | — |
 | Fleet Command | /fleet/command | fleet-command | fleet-command | medical-iot-pack, fleet-logistics, hospital-operations, digital-twin-pack | Yes | draft | Complete (seed template) | — |
 | Fleet Live Map | /fleet/map | fleet-live-map | fleet-live-map | fleet-logistics, hospital-operations, digital-twin-pack | Yes | active | Complete (seed template) | — |
 | Fluid Balance Monitor | /tools/nephrology/fluid-balance-monitor | fluid-balance-monitor | fluid-balance-monitor | core-platform | Yes | draft | Complete (seed template) | — |
 | Fluid Resuscitation Calculator Plugin | /tools/catalog | plugin-fluid-resuscitation-calculator | plugin-fluid-resuscitation-calculator | core-platform | Yes | beta | Complete (seed template) | — |
-| FOUR Score | /tools/calculators/four-score | four-score | four-score | core-platform | Yes | draft | Complete (seed template) | — |
-| Framingham CHD risk | /tools/calculators/framingham-risk | framingham-risk | framingham-risk | cardiology-pack | Yes | draft | Complete (seed template) | — |
+| FOUR Score | /tools/calculators/four-score | four-score | four-score | core-platform | Yes | active | Complete (seed template) | — |
+| Framingham CHD risk | /tools/calculators/framingham-risk | framingham-risk | framingham-risk | cardiology-pack | Yes | active | Complete (seed template) | — |
 | Free Water Deficit | /tools/calculators/free-water-deficit | free-water-deficit | free-water-deficit | core-platform | Yes | draft | Complete (seed template) | — |
 | GAD-7 | /tools/calculators/gad7 | gad7 | gad7 | ai-workflow-pack, core-platform, laboratory-intelligence | Yes | draft | Complete (seed template) | — |
 | Gestational Age Calculator | /tools/calculators/gestational-age-calculator | gestational-age-calculator | gestational-age-calculator | core-platform | Yes | draft | Complete (seed template) | — |
 | GI Bleed Workflow Assistant | /tools/gastroenterology/gi-bleed-workflow-assistant | gi-bleed-workflow-assistant | gi-bleed-workflow-assistant | ai-workflow-pack, core-platform, laboratory-intelligence | Yes | draft | Complete (seed template) | — |
 | GI Command Center | /tools/gastroenterology/gi-command-center | gi-command-center | gi-command-center | core-platform | Yes | draft | Complete (seed template) | — |
 | GI Surveillance Dashboard | /tools/gastroenterology/gi-surveillance-dashboard | gi-surveillance-dashboard | gi-surveillance-dashboard | core-platform | Yes | draft | Complete (seed template) | — |
-| Glasgow Coma Scale (GCS) | /tools/calculators/gcs | gcs-calculator | gcs-calculator | emergency-medicine, emergency-department-pack | Yes | draft | Complete (seed template) | — |
+| Glasgow Coma Scale (GCS) | /tools/calculators/gcs | gcs-calculator | gcs-calculator | emergency-medicine, emergency-department-pack | Yes | active | Complete (seed template) | — |
 | Glasgow-Blatchford Score | /tools/calculators/glasgow-blatchford-score | glasgow-blatchford-score | glasgow-blatchford-score | core-platform | Yes | draft | Complete (seed template) | — |
 | Glucose Telemetry Dashboard | /tools/endocrine/glucose-telemetry-dashboard | glucose-telemetry-dashboard | glucose-telemetry-dashboard | medical-iot-pack, hospital-operations, digital-twin-pack | Yes | draft | Complete (seed template) | — |
-| GRACE ACS Risk | /tools/calculators | grace-acs | grace-acs | cardiology-pack | Yes | draft | Complete (seed template) | — |
+| GRACE ACS Risk | /tools/calculators | grace-acs | grace-acs | cardiology-pack | Yes | deprecated | Complete (seed template) | — |
 | Growth Trend Analytics | /tools/pediatrics-obgyn/growth-trend-analytics | growth-trend-analytics | growth-trend-analytics | emergency-medicine, emergency-department-pack, research-education | Yes | draft | Complete (seed template) | — |
 | Guideline Copilot AI Extension | /assistant | plugin-guideline-copilot-extension | plugin-guideline-copilot-extension | ai-workflow-pack, core-platform, research-education | Yes | active | Complete (seed template) | — |
 | Guideline Retrieval + Evidence Engine | /tools/guideline-rag | guideline-rag | guideline-rag | research-education | Yes | active | Complete (seed template) | — |
-| HAS-BLED | /tools/calculators/has-bled | has-bled | has-bled | emergency-medicine, emergency-department-pack, cardiology-pack, laboratory-intelligence | Yes | draft | Complete (seed template) | — |
+| HAS-BLED | /tools/calculators/has-bled | has-bled | has-bled | emergency-medicine, emergency-department-pack, cardiology-pack, laboratory-intelligence | Yes | active | Complete (seed template) | — |
 | HCM Sudden Death Risk | /tools/calculators/hcm-sudden-death-risk | hcm-sudden-death-risk | hcm-sudden-death-risk | cardiology-pack | Yes | draft | Complete (seed template) | — |
 | Headache Red Flag Assistant | /tools/neurology/headache-red-flag-assistant | headache-red-flag-assistant | headache-red-flag-assistant | ai-workflow-pack, core-platform, emergency-medicine, emergency-department-pack | Yes | draft | Complete (seed template) | — |
 | Heart Failure Assistant | /tools/cardiology/heart-failure-assistant | heart-failure-assistant | heart-failure-assistant | ai-workflow-pack, core-platform, cardiology-pack, medical-iot-pack, hospital-operations, digital-twin-pack | Yes | draft | Complete (seed template) | — |
 | Heart Failure Staging Helper | /tools/calculators/heart-failure-staging | heart-failure-staging | heart-failure-staging | ai-workflow-pack, core-platform, cardiology-pack | Yes | draft | Complete (seed template) | — |
-| HEART score | /tools/calculators/heart-score | heart-score | heart-score | ai-workflow-pack, core-platform, emergency-medicine, emergency-department-pack, cardiology-pack | Yes | draft | Complete (seed template) | — |
+| HEART score | /tools/calculators/heart-score | heart-score | heart-score | ai-workflow-pack, core-platform, emergency-medicine, emergency-department-pack, cardiology-pack | Yes | active | Complete (seed template) | — |
 | Hepatic Trend Analytics | /tools/gastroenterology/hepatic-trend-analytics | hepatic-trend-analytics | hepatic-trend-analytics | research-education | Yes | draft | Complete (seed template) | — |
 | HL7 Bridge | /integrations/hl7 | hl7-bridge | hl7-bridge | core-platform | Yes | beta | Complete (seed template) | — |
 | HOMA-IR | /tools/calculators/homa-ir | homa-ir | homa-ir | laboratory-intelligence, research-education | Yes | draft | Complete (seed template) | — |
@@ -271,8 +271,8 @@ Assets in `SEED_PLATFORM_ASSETS` without pack assignment:
 | Hospital Operations Cockpit | /hospital-map | hospital-operations-cockpit | hospital-operations-cockpit | medical-iot-pack, fleet-logistics, hospital-operations, digital-twin-pack | Yes | beta | Complete (seed template) | — |
 | Hospital Operations Command | /hospital-map | hospital-operations-command | hospital-operations-command | hospital-operations, digital-twin-pack, medical-iot-pack, fleet-logistics | Yes | beta | Complete (seed template) | — |
 | Human Review Queue | /review | human-review-queue | human-review-queue | core-platform | Yes | active | Complete (seed template) | — |
-| Hunt-Hess Scale | /tools/calculators/hunt-hess-scale | hunt-hess-scale | hunt-hess-scale | emergency-medicine, emergency-department-pack | Yes | draft | Complete (seed template) | — |
-| ICH Score | /tools/calculators/ich-score | ich-score | ich-score | emergency-medicine, emergency-department-pack | Yes | draft | Complete (seed template) | — |
+| Hunt-Hess Scale | /tools/calculators/hunt-hess-scale | hunt-hess-scale | hunt-hess-scale | emergency-medicine, emergency-department-pack | Yes | active | Complete (seed template) | — |
+| ICH Score | /tools/calculators/ich-score | ich-score | ich-score | emergency-medicine, emergency-department-pack | Yes | active | Complete (seed template) | — |
 | Ideal Body Weight | /tools/calculators/ideal-body-weight | ideal-body-weight | ideal-body-weight | laboratory-intelligence | Yes | draft | Complete (seed template) | — |
 | Incident Command Center | /hospital-map | incident-command-center | incident-command-center | medical-iot-pack, fleet-logistics, hospital-operations, digital-twin-pack | Yes | beta | Complete (seed template) | — |
 | Insulin Trend Engine | /tools/endocrine/insulin-trend-engine | insulin-trend-engine | insulin-trend-engine | laboratory-intelligence | Yes | draft | Complete (seed template) | — |
@@ -297,12 +297,12 @@ Assets in `SEED_PLATFORM_ASSETS` without pack assignment:
 | Mental Health Screening Assistant | /tools/psychiatry/mental-health-screening-assistant | mental-health-screening-assistant | mental-health-screening-assistant | ai-workflow-pack, core-platform, emergency-medicine, emergency-department-pack | Yes | draft | Complete (seed template) | — |
 | Metabolic Analytics | /tools/endocrine/metabolic-analytics | metabolic-analytics | metabolic-analytics | fleet-logistics, research-education | Yes | draft | Complete (seed template) | — |
 | Metabolic Syndrome Assistant | /tools/endocrine/metabolic-syndrome-assistant | metabolic-syndrome-assistant | metabolic-syndrome-assistant | ai-workflow-pack, core-platform, cardiology-pack, fleet-logistics | Yes | draft | Complete (seed template) | — |
-| MEWS | /tools/calculators/mews | mews | mews | cardiology-pack | Yes | draft | Complete (seed template) | — |
+| MEWS | /tools/calculators/mews | mews | mews | cardiology-pack | Yes | active | Complete (seed template) | — |
 | MMSE | /tools/calculators/mmse | mmse | mmse | core-platform | Yes | draft | Complete (seed template) | — |
 | MoCA Placeholder Workflow | /tools/calculators/moca-placeholder-workflow | moca-placeholder-workflow | moca-placeholder-workflow | ai-workflow-pack, core-platform, simulation-training-pack | Yes | draft | Complete (seed template) | — |
 | Model Access Policy | /governance/ai-security/model-access | model-access-policy | model-access-policy | ai-workflow-pack, core-platform, governance-compliance-pack | Yes | beta | Complete (seed template) | — |
 | Model Usage Dashboard | /governance/model-usage | model-usage-dashboard | model-usage-dashboard | governance-compliance-pack | Yes | beta | Complete (seed template) | — |
-| Modified Rankin Scale | /tools/calculators/modified-rankin-scale | modified-rankin-scale | modified-rankin-scale | emergency-medicine, emergency-department-pack | Yes | draft | Complete (seed template) | — |
+| Modified Rankin Scale | /tools/calculators/modified-rankin-scale | modified-rankin-scale | modified-rankin-scale | emergency-medicine, emergency-department-pack | Yes | active | Complete (seed template) | — |
 | MoE Router | /assistant | moe-router | moe-router | ai-workflow-pack, core-platform, research-education | Yes | draft | Complete (seed template) | — |
 | Morse Fall Scale | /tools/calculators/morse-fall-scale | morse-fall-scale | morse-fall-scale | core-platform | Yes | draft | Complete (seed template) | — |
 | Neonatal Assessment Assistant | /tools/pediatrics-obgyn/neonatal-assessment-assistant | neonatal-assessment-assistant | neonatal-assessment-assistant | ai-workflow-pack, core-platform | Yes | draft | Complete (seed template) | — |
@@ -312,24 +312,24 @@ Assets in `SEED_PLATFORM_ASSETS` without pack assignment:
 | Neuro Monitoring Engine | /tools/neurology/neuro-monitoring-engine | neuro-monitoring-engine | neuro-monitoring-engine | core-platform | Yes | draft | Complete (seed template) | — |
 | Neuro Telemetry Dashboard | /tools/neurology/neuro-telemetry-dashboard | neuro-telemetry-dashboard | neuro-telemetry-dashboard | emergency-medicine, emergency-department-pack, medical-iot-pack, hospital-operations, digital-twin-pack | Yes | draft | Complete (seed template) | — |
 | Neurology Timeline AI | /tools/neurology/neurology-timeline-ai | neurology-timeline-ai | neurology-timeline-ai | ai-workflow-pack, core-platform, emergency-medicine, emergency-department-pack | Yes | draft | Complete (seed template) | — |
-| NEWS2 | /tools/calculators/news2 | news2 | news2 | emergency-medicine, emergency-department-pack | Yes | draft | Complete (seed template) | — |
-| NEXUS C-Spine Rule | /tools/calculators | nexus-cspine | nexus-cspine | emergency-medicine, emergency-department-pack | Yes | draft | Complete (seed template) | — |
+| NEWS2 | /tools/calculators/news2 | news2 | news2 | emergency-medicine, emergency-department-pack | Yes | active | Complete (seed template) | — |
+| NEXUS C-Spine Rule | /tools/calculators | nexus-cspine | nexus-cspine | emergency-medicine, emergency-department-pack | Yes | deprecated | Complete (seed template) | — |
 | NIH Stroke Scale (NIHSS) | /tools/calculators | nihss | nihss | emergency-medicine, emergency-department-pack | Yes | draft | Complete (seed template) | — |
 | NIHSS Summary View | /tools/calculators/nihss-summary-view | nihss-summary-view | nihss-summary-view | ai-workflow-pack, core-platform, emergency-medicine, emergency-department-pack | Yes | draft | Complete (seed template) | — |
 | OB Triage Assistant | /tools/pediatrics-obgyn/ob-triage-assistant | ob-triage-assistant | ob-triage-assistant | ai-workflow-pack, core-platform, emergency-medicine, emergency-department-pack | Yes | draft | Complete (seed template) | — |
 | Observation And Vitals Import | /patients/:patientId/observations/import | observation-vitals-import | observation-vitals-import | medical-iot-pack, hospital-operations, digital-twin-pack | Yes | beta | Complete (seed template) | — |
 | Operations Hub | /operations | digital-operations-center | digital-operations-center | hospital-operations, digital-twin-pack, medical-iot-pack, fleet-logistics | Yes | draft | Complete (seed template) | — |
 | Operations Incident Center | /operations/incidents | operations-incident-center | operations-incident-center | hospital-operations, digital-twin-pack | Yes | active | Complete (seed template) | — |
-| Osmolal Gap | /tools/calculators/osmolal-gap | osmolal-gap | osmolal-gap | core-platform | Yes | draft | Complete (seed template) | — |
+| Osmolal Gap | /tools/calculators/osmolal-gap | osmolal-gap | osmolal-gap | core-platform | Yes | active | Complete (seed template) | — |
 | Ottawa Ankle Rule | /tools/calculators | ottawa-ankle | ottawa-ankle | emergency-medicine, emergency-department-pack | Yes | draft | Complete (seed template) | — |
 | Oxygen Escalation Helper | /tools/pulmonology/oxygen-escalation-helper | oxygen-escalation-helper | oxygen-escalation-helper | medical-iot-pack, hospital-operations, digital-twin-pack | Yes | draft | Complete (seed template) | — |
 | Pancreatitis Workflow Assistant | /tools/gastroenterology/pancreatitis-workflow-assistant | pancreatitis-workflow-assistant | pancreatitis-workflow-assistant | ai-workflow-pack, core-platform | Yes | draft | Complete (seed template) | — |
-| PaO2/FiO2 Ratio | /tools/calculators/pao2-fio2-ratio | pao2-fio2-ratio | pao2-fio2-ratio | core-platform | Yes | draft | Complete (seed template) | — |
+| PaO2/FiO2 Ratio | /tools/calculators/pao2-fio2-ratio | pao2-fio2-ratio | pao2-fio2-ratio | core-platform | Yes | active | Complete (seed template) | — |
 | Patient Summary AI | /tools/patient-summary-ai | patient-summary-ai | patient-summary-ai | ai-workflow-pack, core-platform, laboratory-intelligence | Yes | active | Complete (seed template) | — |
 | Patient Timeline AI | /tools/timeline-ai | timeline-ai | timeline-ai | ai-workflow-pack, core-platform | Yes | active | Complete (seed template) | — |
 | Patient Workspace | /patients/:patientId/workspace | patient-workspace | patient-workspace | core-platform | Yes | beta | Complete (seed template) | — |
 | PCL-5 | /tools/calculators/pcl5 | pcl5 | pcl5 | emergency-medicine, emergency-department-pack | Yes | draft | Complete (seed template) | — |
-| PECARN Head Injury Rule | /tools/calculators | pecarn-head | pecarn-head | emergency-medicine, emergency-department-pack | Yes | draft | Complete (seed template) | — |
+| PECARN Head Injury Rule | /tools/calculators | pecarn-head | pecarn-head | emergency-medicine, emergency-department-pack | Yes | deprecated | Complete (seed template) | — |
 | Pediatric BP Percentile | /tools/calculators/pediatric-bp-percentile | pediatric-bp-percentile | pediatric-bp-percentile | emergency-medicine, emergency-department-pack | Yes | draft | Complete (seed template) | — |
 | Pediatric Code Simulation Plugin | /simulation | plugin-pediatric-code-simulation | plugin-pediatric-code-simulation | ai-workflow-pack, core-platform, simulation-training-pack | Yes | beta | Complete (seed template) | — |
 | Pediatric Command Center | /tools/pediatrics-obgyn/pediatric-command-center | pediatric-command-center | pediatric-command-center | emergency-medicine, emergency-department-pack | Yes | draft | Complete (seed template) | — |
@@ -366,17 +366,17 @@ Assets in `SEED_PLATFORM_ASSETS` without pack assignment:
 | Resource Utilization Index | /tools/calculators/resource-utilization-index | resource-utilization-index | resource-utilization-index | medical-iot-pack, fleet-logistics, hospital-operations, digital-twin-pack, research-education | Yes | draft | Complete (seed template) | — |
 | Respiratory Command Center | /tools/pulmonology/respiratory-command-center | respiratory-command-center | respiratory-command-center | hospital-operations, digital-twin-pack, research-education | Yes | draft | Complete (seed template) | — |
 | Respiratory Telemetry Dashboard | /tools/pulmonology/respiratory-telemetry-dashboard | respiratory-telemetry-dashboard | respiratory-telemetry-dashboard | medical-iot-pack, hospital-operations, digital-twin-pack | Yes | draft | Complete (seed template) | — |
-| Revised Trauma Score | /tools/calculators/revised-trauma-score | revised-trauma-score | revised-trauma-score | emergency-medicine, emergency-department-pack | Yes | draft | Complete (seed template) | — |
-| Reynolds Risk Score Helper | /tools/calculators/reynolds-risk-score | reynolds-risk-score | reynolds-risk-score | cardiology-pack | Yes | draft | Complete (seed template) | — |
+| Revised Trauma Score | /tools/calculators/revised-trauma-score | revised-trauma-score | revised-trauma-score | emergency-medicine, emergency-department-pack | Yes | active | Complete (seed template) | — |
+| Reynolds Risk Score Helper | /tools/calculators/reynolds-risk-score | reynolds-risk-score | reynolds-risk-score | cardiology-pack | Yes | active | Complete (seed template) | — |
 | Risk Score History | /patients/:patientId/risk-history | risk-score-history | risk-score-history | core-platform | Yes | beta | Complete (seed template) | — |
 | Rockall Score | /tools/calculators/rockall-score | rockall-score | rockall-score | core-platform | Yes | draft | Complete (seed template) | — |
 | Rome IV IBS | /tools/calculators | rome-iv-ibs | rome-iv-ibs | core-platform | Yes | draft | Complete (seed template) | — |
 | Route Optimization Engine | /fleet/route-optimizer | route-optimizer | route-optimizer | fleet-logistics, cardiology-pack, hospital-operations, digital-twin-pack | Yes | draft | Complete (seed template) | — |
-| ROX Index | /tools/calculators/rox-index | rox-index | rox-index | icu-pack | Yes | draft | Complete (seed template) | — |
+| ROX Index | /tools/calculators/rox-index | rox-index | rox-index | icu-pack | Yes | active | Complete (seed template) | — |
 | Screening Trend Engine | /tools/psychiatry/screening-trend-engine | screening-trend-engine | screening-trend-engine | core-platform | Yes | draft | Complete (seed template) | — |
 | Seizure Assistant | /tools/neurology/seizure-assistant | seizure-assistant | seizure-assistant | ai-workflow-pack, core-platform, laboratory-intelligence | Yes | draft | Complete (seed template) | — |
-| Serum Osmolality | /tools/calculators/serum-osmolality | serum-osmolality | serum-osmolality | core-platform | Yes | draft | Complete (seed template) | — |
-| Shock Index | /tools/calculators/shock-index | shock-index | shock-index | emergency-medicine, emergency-department-pack, cardiology-pack | Yes | draft | Complete (seed template) | — |
+| Serum Osmolality | /tools/calculators/serum-osmolality | serum-osmolality | serum-osmolality | core-platform | Yes | active | Complete (seed template) | — |
+| Shock Index | /tools/calculators/shock-index | shock-index | shock-index | emergency-medicine, emergency-department-pack, cardiology-pack | Yes | active | Complete (seed template) | — |
 | Simulation Competency Dashboard | /simulation/outcomes | competency-dashboard | competency-dashboard | ai-workflow-pack, core-platform, emergency-medicine, emergency-department-pack, laboratory-intelligence, hospital-operations, digital-twin-pack, simulation-training-pack, research-education | Yes | draft | Complete (seed template) | — |
 | Simulation Debrief Dashboard | /simulation/sepsis-deterioration | debrief-dashboard | debrief-dashboard | ai-workflow-pack, core-platform, emergency-medicine, emergency-department-pack, simulation-training-pack, research-education | Yes | draft | Complete (seed template) | — |
 | Simulation Outcomes | /simulation/outcomes | simulation-outcomes | simulation-outcomes | simulation-training-pack, ai-workflow-pack, core-platform, research-education | Yes | draft | Complete (seed template) | — |
@@ -396,15 +396,15 @@ Assets in `SEED_PLATFORM_ASSETS` without pack assignment:
 | Telemetry Monitoring Center | /medical-iot | telemetry-monitoring | telemetry-monitoring | medical-iot-pack, hospital-operations, digital-twin-pack | Yes | beta | Complete (seed template) | — |
 | Thyroid Disorder Assistant | /tools/endocrine/thyroid-disorder-assistant | thyroid-disorder-assistant | thyroid-disorder-assistant | ai-workflow-pack, core-platform, emergency-medicine, emergency-department-pack, laboratory-intelligence | Yes | draft | Complete (seed template) | — |
 | Timeline Live | /patients/:patientId/timeline | timeline-live | timeline-live | ai-workflow-pack, core-platform | Yes | beta | Complete (seed template) | — |
-| TIMI (UA/NSTEMI) | /tools/calculators/timi-ua-nstemi | timi-ua-nstemi | timi-ua-nstemi | cardiology-pack | Yes | draft | Complete (seed template) | — |
+| TIMI (UA/NSTEMI) | /tools/calculators/timi-ua-nstemi | timi-ua-nstemi | timi-ua-nstemi | cardiology-pack | Yes | active | Complete (seed template) | — |
 | Turnaround Time Calculator | /tools/calculators/turnaround-time-calculator | turnaround-time-calculator | turnaround-time-calculator | medical-iot-pack, fleet-logistics, hospital-operations, digital-twin-pack | Yes | draft | Complete (seed template) | — |
 | Validation Sandbox | /governance/validation | validation-sandbox | validation-sandbox | ai-workflow-pack, core-platform, simulation-training-pack, governance-compliance-pack | Yes | beta | Complete (seed template) | — |
 | Ventilator Monitoring Dashboard | /tools/pulmonology/ventilator-monitoring-dashboard | ventilator-monitoring-dashboard | ventilator-monitoring-dashboard | icu-pack | Yes | draft | Complete (seed template) | — |
 | Ventilator Support Assistant | /tools/pulmonology/ventilator-support-assistant | ventilator-support-assistant | ventilator-support-assistant | ai-workflow-pack, core-platform, icu-pack | Yes | draft | Complete (seed template) | — |
 | Vertigo HINTS Assistant | /tools/neurology/vertigo-hints-assistant | vertigo-hints-assistant | vertigo-hints-assistant | ai-workflow-pack, core-platform, emergency-medicine, emergency-department-pack | Yes | draft | Complete (seed template) | — |
 | Waist-to-Hip Ratio | /tools/calculators/waist-hip-ratio | waist-hip-ratio | waist-hip-ratio | ai-workflow-pack, core-platform, cardiology-pack | Yes | draft | Complete (seed template) | — |
-| Wells DVT | /tools/calculators | wells-dvt-calculator | wells-dvt-calculator | emergency-medicine, emergency-department-pack | Yes | draft | Complete (seed template) | — |
-| Wells PE | /tools/calculators | wells-pe | wells-pe | emergency-medicine, emergency-department-pack | Yes | draft | Complete (seed template) | — |
+| Wells DVT | /tools/calculators | wells-dvt-calculator | wells-dvt-calculator | emergency-medicine, emergency-department-pack | Yes | deprecated | Complete (seed template) | — |
+| Wells PE | /tools/calculators | wells-pe | wells-pe | emergency-medicine, emergency-department-pack | Yes | deprecated | Complete (seed template) | — |
 | Why Engine | /tools/why-engine | why-engine | why-engine | core-platform | Yes | beta | Complete (seed template) | — |
 | Workflow Builder AI | /tools/workflow-builder-ai | workflow-builder-ai | workflow-builder-ai | ai-workflow-pack, core-platform | Yes | beta | Complete (seed template) | — |
 | Command Whiteboard | /dashboard | dashboard | dashboard | core-platform | Yes | active | Complete (seed template) | — |

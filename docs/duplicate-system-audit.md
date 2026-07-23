@@ -1,6 +1,6 @@
 # Duplicate System Audit
 
-Generated: 2026-07-07 (regenerate with `npm run duplicate-system-audit:write-docs`)
+Generated: 2026-07-23 (regenerate with `npm run duplicate-system-audit:write-docs`)
 
 ## Purpose
 
@@ -13,8 +13,8 @@ Identify competing sources of truth that cause drift, double registration, or am
 | Audit sections | 12 |
 | Duplicate findings documented | 38 |
 | CANONICAL_ROUTES ∩ TOOL_LAUNCH_PATHS (same path string) | 33 |
-| POST executor ids (frontend) | drug-interactions, lab-interpreter, sofa-calculator |
-| REGISTRY_ID_TO_ORCHESTRATOR_TOOL entries | 3 |
+| POST executor ids (frontend) | aa-gradient, abcd2, abg-interpreter, anion-gap, apache2-calculator, canadian-c-spine, cha2ds2vasc-calculator, chads2, corrected-calcium, corrected-sodium, drug-interactions, duke-treadmill-score, fena, feurea, four-score, framingham-risk, gcs-calculator, grace-acs, has-bled, heart-score, hunt-hess-scale, ich-score, lab-interpreter, mews, modified-rankin-scale, news2, nexus-cspine, osmolal-gap, pao2-fio2-ratio, pecarn-head, revised-trauma-score, reynolds-risk-score, rox-index, serum-osmolality, shock-index, sofa-calculator, timi-ua-nstemi, wells-dvt-calculator, wells-pe |
+| REGISTRY_ID_TO_ORCHESTRATOR_TOOL entries | 40 |
 
 ### Top consolidation priorities
 
