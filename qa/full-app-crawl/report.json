@@ -1,0 +1,3075 @@
+{
+  "summary": {
+    "generatedAt": "2026-07-23T03:49:46.820Z",
+    "totalCrawled": 182,
+    "totalSkippedDynamic": 10,
+    "crashed": 0,
+    "blank": 0,
+    "overflow": 0,
+    "clean": 182
+  },
+  "note": "Any row flagged here should be re-checked in a single fresh browser instance before treating it as real — a page late in a long crawl can show a transient net::ERR_INSUFFICIENT_RESOURCES blank render even with browser rotation under heavy load. See script header comment.",
+  "skippedDynamicRoutes": [
+    {
+      "name": "patientProfile",
+      "path": "/patients/:id"
+    },
+    {
+      "name": "calculatorDetail",
+      "path": "/tools/calculators/:slug"
+    },
+    {
+      "name": "toolsCardiology",
+      "path": "/emergency/tools/cardiology/:toolId"
+    },
+    {
+      "name": "toolsNephrology",
+      "path": "/emergency/tools/nephrology/:toolId"
+    },
+    {
+      "name": "toolsNeurology",
+      "path": "/emergency/tools/neurology/:toolId"
+    },
+    {
+      "name": "toolsGastroenterology",
+      "path": "/emergency/tools/gastroenterology/:toolId"
+    },
+    {
+      "name": "toolsEndocrine",
+      "path": "/emergency/tools/endocrine/:toolId"
+    },
+    {
+      "name": "toolsPediatrics",
+      "path": "/emergency/tools/pediatrics/:toolId"
+    },
+    {
+      "name": "toolsPsychiatry",
+      "path": "/emergency/tools/psychiatry/:toolId"
+    },
+    {
+      "name": "toolsPulmonology",
+      "path": "/emergency/tools/pulmonology/:toolId"
+    }
+  ],
+  "results": [
+    {
+      "name": "auth",
+      "path": "/auth",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "authCallback",
+      "path": "/auth-callback",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "authForgotPassword",
+      "path": "/auth/forgot-password",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "authMagicLink",
+      "path": "/auth/magic-link",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "authInvite",
+      "path": "/auth/invite",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "resetPassword",
+      "path": "/reset-password",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "verifyEmail",
+      "path": "/verify-email",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "platformStart",
+      "path": "/start",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "CAREDROID · CAREDROID\nPlatform entry\nSkip to clinical workspace\nStart at recepti",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 0,
+      "consoleErrorSample": []
+    },
+    {
+      "name": "adminOperations",
+      "path": "/admin",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "adminEdStaff",
+      "path": "/admin/staff-workflows",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "dashboard",
+      "path": "/dashboard",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 40,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "intake",
+      "path": "/intake",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 16,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "queue",
+      "path": "/queue",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "triage",
+      "path": "/triage",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "alerts",
+      "path": "/alerts",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "aiChief",
+      "path": "/ai-chief",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "staff",
+      "path": "/staff",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "analytics",
+      "path": "/analytics",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "reports",
+      "path": "/reports",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "executive",
+      "path": "/executive",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 17,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "discover",
+      "path": "/discover",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "recommendations",
+      "path": "/recommendations",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "automation",
+      "path": "/automation",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 40,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "automationAudit",
+      "path": "/automation-audit",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "automationAnalytics",
+      "path": "/automation-analytics",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 40,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "assistant",
+      "path": "/assistant",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 40,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "aiCommandCenter",
+      "path": "/ai-command-center",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "tools",
+      "path": "/tools",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "operations",
+      "path": "/operations",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 19,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "emergencyWorkspace",
+      "path": "/emergency/whiteboard",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "emergencyWhiteboard",
+      "path": "/emergency/whiteboard",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "emergencyCommandCenter",
+      "path": "/emergency/command-center",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "emergencyPatients",
+      "path": "/emergency/patients",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 39,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "emergencyJourney",
+      "path": "/emergency/journey",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "emergencyEms",
+      "path": "/emergency/ems",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 17,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "emergencySmartIntake",
+      "path": "/emergency/intake",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "emergencyIntake",
+      "path": "/emergency/intake",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "emergencyReception",
+      "path": "/emergency/reception",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "emergencySelfArrival",
+      "path": "/emergency/self-arrival",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "emergencyPatientRoom",
+      "path": "/emergency/patient-room",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "emergencyQueues",
+      "path": "/emergency/queues",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "emergencyReassessment",
+      "path": "/emergency/reassessment",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 29,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "emergencyOperations",
+      "path": "/emergency/queues",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "emergencyCapacity",
+      "path": "/emergency/capacity",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "emergencyAnalytics",
+      "path": "/emergency/analytics",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "emergencySimulation",
+      "path": "/emergency/simulation",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "emergencyFederatedLearning",
+      "path": "/emergency/federated-learning",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "emergencyDigitalTwin",
+      "path": "/emergency/digital-twin",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 42,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "emergencyCopilot",
+      "path": "/emergency/copilot",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "emergencyDocumentation",
+      "path": "/emergency/documentation",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "emergencyBoarding",
+      "path": "/emergency/boarding",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 19,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "emergencyReferrals",
+      "path": "/emergency/referrals",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "emergencyProvincialHealth",
+      "path": "/emergency/provincial-health",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "emergencyIntegrations",
+      "path": "/emergency/integrations",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 19,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "integrationHub",
+      "path": "/integrations/hub",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 19,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "cosmosViewer",
+      "path": "/cosmos",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "emergencyAiGovernance",
+      "path": "/emergency/ai-governance",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "emergencyPulse",
+      "path": "/emergency/pulse",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "emergencyShift",
+      "path": "/emergency/shift",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "emergencySettings",
+      "path": "/emergency/settings",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "emergencyHelp",
+      "path": "/emergency/help",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "emergencyAlerts",
+      "path": "/emergency/alerts",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "emergencyCollaboration",
+      "path": "/emergency/collaboration",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 16,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "emergencyTools",
+      "path": "/emergency/tools",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "emergencyDispatch",
+      "path": "/emergency/dispatch",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "emergencyEdReadiness",
+      "path": "/emergency/ed-readiness",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "emergencyDiagnostics",
+      "path": "/emergency/diagnostics",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "emergencyHandoffs",
+      "path": "/emergency/handoffs",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "emergencyReports",
+      "path": "/emergency/reports",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "workspace",
+      "path": "/workspace",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "CAREDROID · CAREDROID\nPlatform entry\nSkip to clinical workspace\nStart at recepti",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "workspaces",
+      "path": "/workspaces",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "operationsCenter",
+      "path": "/operations-center",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "calculators",
+      "path": "/tools/calculators",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "protocols",
+      "path": "/protocols",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "research",
+      "path": "/research",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "documentation",
+      "path": "/documentation",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "knowledgeGraph",
+      "path": "/knowledge-graph",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "predictiveAnalytics",
+      "path": "/predictive-analytics",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "clinicalDecisionSupport",
+      "path": "/clinical-decision-support",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "competencies",
+      "path": "/competencies",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "credentials",
+      "path": "/credentials",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "simulation",
+      "path": "/simulation",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "simulationOutcomes",
+      "path": "/simulation/outcomes",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "laboratory",
+      "path": "/laboratory",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "medical3dViewer",
+      "path": "/3d-viewer",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "liveMap",
+      "path": "/live-map",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 19,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "hospitalMap",
+      "path": "/hospital-map",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "medicalIot",
+      "path": "/medical-iot",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "devices",
+      "path": "/devices",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "fleetCommand",
+      "path": "/fleet/command",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 16,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "fleetMap",
+      "path": "/fleet/map",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 19,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "surveillanceNexus",
+      "path": "/surveillance/nexus",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "digitalTwin",
+      "path": "/digital-twin",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 40,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "digitalTwinIntelligence",
+      "path": "/digital-twin-intelligence",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "profile",
+      "path": "/profile",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "profileSettings",
+      "path": "/profile/settings",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "profileToolPreferences",
+      "path": "/profile/tool-preferences",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "settings",
+      "path": "/settings",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "settingsFeatures",
+      "path": "/settings/features",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "version",
+      "path": "/version",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "← Back\n\nDEPLOYMENT VERIFICATION\n\nCareDroid build version\n\nCompare local, GitHub,",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 0,
+      "consoleErrorSample": []
+    },
+    {
+      "name": "helpCenter",
+      "path": "/help-center",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "← Back\n\nCAREDROID SUPPORT\n\nHelp center\n\nOperational FAQs for ED staff, administr",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 0,
+      "consoleErrorSample": []
+    },
+    {
+      "name": "legalPrivacyPolicy",
+      "path": "/legal/privacy-policy",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Privacy Policy\n\nLast Updated: January 31, 2026\n\nCareDroid is committed to protec",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 0,
+      "consoleErrorSample": []
+    },
+    {
+      "name": "legalTerms",
+      "path": "/legal/terms",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Terms of Service\n\nLast Updated: January 31, 2026\n\nThese Terms of Service (\"Terms",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 0,
+      "consoleErrorSample": []
+    },
+    {
+      "name": "legalGdpr",
+      "path": "/legal/gdpr",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "← Back\n\nCOMPLIANCE\n\nGDPR notice\n\nGeneral Data Protection Regulation (GDPR) compl",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 0,
+      "consoleErrorSample": []
+    },
+    {
+      "name": "legalHipaa",
+      "path": "/legal/hipaa",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "← Back\n\nCOMPLIANCE\n\nHIPAA notice\n\nHealth Insurance Portability and Accountabilit",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 0,
+      "consoleErrorSample": []
+    },
+    {
+      "name": "onboardingConsent",
+      "path": "/onboarding/consent",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "consentHistory",
+      "path": "/legal/consent-history",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "customerPortal",
+      "path": "/customer-portal",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "knowledgeHub",
+      "path": "/knowledge-hub",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "knowledgeBase",
+      "path": "/knowledge-base",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 40,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "marketplace",
+      "path": "/marketplace",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "enterpriseReadiness",
+      "path": "/enterprise-readiness",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "trackMindWorkspace",
+      "path": "/trackmind",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "trackMindMaturity",
+      "path": "/trackmind-maturity",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "enterprisePlatform",
+      "path": "/enterprise-platform",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "platformIntelligence",
+      "path": "/platform-intelligence",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "platformAdmin",
+      "path": "/platform-admin",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "billing",
+      "path": "/billing",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "usage",
+      "path": "/usage",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "notifications",
+      "path": "/notifications",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "timeline",
+      "path": "/timeline",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "workflows",
+      "path": "/workflows",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "workflowMining",
+      "path": "/workflow-mining",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "workspaceDependencyGraph",
+      "path": "/workspace-dependency-graph",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "search",
+      "path": "/search",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 40,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "developerCatalog",
+      "path": "/tools/catalog",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "plugins",
+      "path": "/plugins",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "featureFlags",
+      "path": "/feature-flags",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "dependencyMap",
+      "path": "/dependency-map",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "dependencyGraph",
+      "path": "/dependency-graph",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "dataLineage",
+      "path": "/data-lineage",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "selfDiagnostics",
+      "path": "/self-diagnostics",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "systemHealth",
+      "path": "/system-health",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 17,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "saasHealth",
+      "path": "/saas-health",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 19,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "governanceRegistry",
+      "path": "/governance-registry",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "aiGovernance",
+      "path": "/ai-governance",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "security",
+      "path": "/security",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 17,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "audit",
+      "path": "/audit",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "regulatory",
+      "path": "/regulatory",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "humanReview",
+      "path": "/human-review",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "assets",
+      "path": "/assets",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "artifacts",
+      "path": "/artifacts",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "memory",
+      "path": "/memory",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "trainingDashboard",
+      "path": "/training",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "costs",
+      "path": "/costs",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "fleetPredictiveMaintenance",
+      "path": "/fleet/predictive-maintenance",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "fleetRouteOptimizer",
+      "path": "/fleet/route-optimizer",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "aiModels",
+      "path": "/ai-models",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "aiEvaluation",
+      "path": "/ai-evaluation",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "platformLearningEngine",
+      "path": "/platform-learning-engine",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "brain",
+      "path": "/brain",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "businessBrain",
+      "path": "/business-brain",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "organization",
+      "path": "/organization",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "organizationIntelligence",
+      "path": "/organization-intelligence",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "organizationSettings",
+      "path": "/settings/organization",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "tenantAdmin",
+      "path": "/tenant-admin",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "tenantAdminWorkspaces",
+      "path": "/tenant-admin/workspaces",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "organizationPacks",
+      "path": "/settings/organization/packs",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "organizationAssets",
+      "path": "/settings/organization/assets",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "platformAnalytics",
+      "path": "/platform-analytics",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "departmentIntelligence",
+      "path": "/department-intelligence",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "departments",
+      "path": "/departments",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "serviceLines",
+      "path": "/service-lines",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "products",
+      "path": "/products",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "assetPacks",
+      "path": "/asset-packs",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "plans",
+      "path": "/plans",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "specialties",
+      "path": "/specialties",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "carePathways",
+      "path": "/care-pathways",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "agents",
+      "path": "/agents",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "maturityAssessment",
+      "path": "/maturity-assessment",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "outcomes",
+      "path": "/outcomes",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "valueTracking",
+      "path": "/value-tracking",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "productIntelligence",
+      "path": "/product-intelligence",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "expansionOpportunities",
+      "path": "/expansion-opportunities",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "customerSuccess",
+      "path": "/customer-success",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "successCenter",
+      "path": "/success-center",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 15,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+      ]
+    },
+    {
+      "name": "integrationsMarketplace",
+      "path": "/integrations-marketplace",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "integrationReadiness",
+      "path": "/integration-readiness",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "solutionBuilder",
+      "path": "/solution-builder",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "configurationStudio",
+      "path": "/configuration-studio",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "welcome",
+      "path": "/welcome",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    },
+    {
+      "name": "onboarding",
+      "path": "/onboarding",
+      "httpStatus": 200,
+      "navError": null,
+      "isBlank": false,
+      "bodyPreview": "Skip to main content\nC\nCareDroid\nCLINICAL OS\nCOMMAND\nWhiteboard\nCollaboration Hu",
+      "hasOverflow": false,
+      "overflowBy": 0,
+      "pageErrors": [],
+      "consoleErrorCount": 2,
+      "consoleErrorSample": [
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+        "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+      ]
+    }
+  ]
+}

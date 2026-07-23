@@ -1,14 +1,8 @@
-import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { CANONICAL_ROUTES } from '../config/routes.config';
-import { CAREDROID_PRODUCT } from '../config/caredroidProduct.config';
 import { PageShell } from '../components/ui/CareDroidPrimitives';
-import { useRouteChromeRegistration } from '../contexts/RouteChromeContext';
 import { getPublicWaitingDisplayPath } from '../config/publicWaitingScreenModel';
-import {
-  countPageRebuildByStatus,
-  PAGE_REBUILD_WAVES,
-} from '../config/pageRebuildRegistry';
+import { countPageRebuildByStatus } from '../config/pageRebuildRegistry';
 import { PAGE_REBUILD_STATUS } from '../config/pageUxContract';
 import {
   resolveAdminHomeRoute,
@@ -36,18 +30,6 @@ export default function PlatformEntryHub() {
   const adminHome = resolveAdminHomeRoute();
   const waitingRoomPath = getPublicWaitingDisplayPath();
   const rebuildCounts = countPageRebuildByStatus();
-  const activeWave = PAGE_REBUILD_WAVES[0];
-
-  useRouteChromeRegistration(
-    useMemo(
-      () => ({
-        eyebrow: `${CAREDROID_PRODUCT.name} · ${activeWave.label}`,
-        title: 'Choose how you enter the department',
-        subtitle: `${CAREDROID_PRODUCT.firstResolutionLine} Walk ED 18 as ${DEMO_PERSONA.displayName}, open your role workspace, or configure the department.`,
-      }),
-      [],
-    ),
-  );
 
   return (
     <PageShell
