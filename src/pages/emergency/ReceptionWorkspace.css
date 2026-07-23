@@ -1,14 +1,14 @@
 .reception-command {
-  --reception-command-bg: var(--app-surface-0);
-  --reception-command-panel: var(--app-surface-1);
-  --reception-command-inset: var(--app-surface-muted);
-  --reception-command-border: var(--app-border-subtle);
-  --reception-command-ink: var(--app-text-primary);
-  --reception-command-muted: var(--app-text-secondary);
-  --reception-command-primary: var(--app-text-primary, #111827);
-  --reception-command-primary-strong: var(--app-text-secondary, #374151);
-  --reception-command-critical: var(--app-danger);
-  --reception-command-warning: var(--app-warning);
+  --reception-command-bg: var(--cdl-surface-page, var(--app-surface-0));
+  --reception-command-panel: var(--cdl-surface-card, var(--app-surface-1));
+  --reception-command-inset: var(--cdl-surface-muted, var(--app-surface-muted));
+  --reception-command-border: var(--cdl-border, var(--app-border-subtle));
+  --reception-command-ink: var(--cdl-ink, var(--app-text-primary));
+  --reception-command-muted: var(--cdl-ink-muted, var(--app-text-secondary));
+  --reception-command-primary: var(--cdl-brand-600, #0284c7);
+  --reception-command-primary-strong: var(--cdl-brand-700, #0369a1);
+  --reception-command-critical: var(--cdl-critical, var(--app-danger));
+  --reception-command-warning: var(--cdl-warning, var(--app-warning));
   display: grid;
   gap: var(--cdl-panel-gap, var(--app-layout-panel-gap, 12px));
   padding: 0;

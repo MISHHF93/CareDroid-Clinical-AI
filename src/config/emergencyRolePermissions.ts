@@ -301,6 +301,8 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
       ROUTES.integrationHub,
       ROUTES.audit,
       ROUTES.adminOperations,
+      // Team coordination only (IT Operations channel) — not clinical PHI surfaces
+      ROUTES.collaboration,
       ROUTES.help,
     ],
     actions: [EMERGENCY_ACTIONS.manageSettings],
@@ -483,7 +485,8 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
     id: EMERGENCY_ROLE_IDS.publicDisplay,
     label: EMERGENCY_ROLE_LABELS[EMERGENCY_ROLE_IDS.publicDisplay],
     description: 'Public waiting-room display — aggregate status only, no staff actions.',
-    routes: [ROUTES.whiteboard, ROUTES.analytics, ROUTES.collaboration, ROUTES.help],
+    // No Collaboration Hub — this is patient-facing, not an ED staff profile
+    routes: [ROUTES.whiteboard, ROUTES.analytics, ROUTES.help],
     actions: [EMERGENCY_ACTIONS.displayPublicWaitboard, EMERGENCY_ACTIONS.displayPublicPublish],
     defaultRoute: getDefaultRouteForProfile(EMERGENCY_ROLE_IDS.publicDisplay),
     readOnly: true,

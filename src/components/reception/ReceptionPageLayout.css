@@ -11,8 +11,8 @@
   min-height: 0;
   height: 100%;
   width: 100%;
-  background: var(--app-bg, #f8fafc);
-  color: var(--app-text-primary, #111827);
+  background: var(--cdl-surface-page, var(--app-bg, #f8fafc));
+  color: var(--cdl-ink, var(--app-text-primary, #111827));
 }
 
 /* Workspace Header — sticky within the scrollport so it stays visible */
@@ -101,10 +101,11 @@
 
 /* ── Card Component ── */
 .reception-card {
-  background: var(--app-surface-1, #ffffff);
-  border: 1px solid var(--app-border-subtle, rgba(0, 0, 0, 0.04));
-  border-radius: var(--cdl-clinical-radius, 10px);
-  box-shadow: var(--app-elevation-card, 0 1px 2px rgba(0, 0, 0, 0.02));
+  background: var(--cdl-surface-card, var(--app-surface-1, #ffffff));
+  border: 1px solid var(--cdl-border, var(--app-border-subtle, #e2e8f0));
+  border-radius: var(--cdl-radius-lg, 12px);
+  box-shadow: var(--cdl-elev-1, 0 1px 2px rgba(0, 0, 0, 0.04));
+  color: var(--cdl-ink, #0f172a);
 }
 
 .reception-card--none { padding: 0; }

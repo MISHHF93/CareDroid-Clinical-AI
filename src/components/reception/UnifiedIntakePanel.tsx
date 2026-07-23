@@ -13,6 +13,7 @@ import {
   type UnifiedIntakePhase,
 } from '../../services/receptionIntakeOrchestrator';
 import { RECEPTION_COPY } from './receptionCopy';
+import './UnifiedIntakePanel.css';
 
 const ARRIVAL_TYPES: Array<{ id: ReceptionArrivalType; label: string }> = [
   { id: 'walk-in', label: 'Walk-in' },
@@ -542,7 +543,11 @@ export default function UnifiedIntakePanel({
       </div>
 
       <div className="reception-command-actionbar unified-intake-actionbar" aria-label="Unified intake actions">
-        <button type="button" className="reception-command-actionbar__secondary" onClick={onSaveDraft}>
+        <button
+          type="button"
+          className="reception-command-actionbar__secondary unified-intake-actionbar__secondary"
+          onClick={onSaveDraft}
+        >
           <Save size={17} aria-hidden="true" />
           Save draft
         </button>
@@ -550,8 +555,8 @@ export default function UnifiedIntakePanel({
           type="button"
           className={
             primaryAction.tone === 'critical'
-              ? 'reception-command-actionbar__critical'
-              : 'reception-command-actionbar__primary'
+              ? 'reception-command-actionbar__critical unified-intake-actionbar__primary'
+              : 'reception-command-actionbar__primary unified-intake-actionbar__primary'
           }
           disabled={submitting || !canCreatePatient}
           onClick={() => void onRoute()}
@@ -564,7 +569,11 @@ export default function UnifiedIntakePanel({
           {submitting ? 'Routing...' : primaryAction.label}
         </button>
         {result && onReset ? (
-          <button type="button" className="reception-command-actionbar__secondary" onClick={onReset}>
+          <button
+            type="button"
+            className="reception-command-actionbar__secondary unified-intake-actionbar__secondary"
+            onClick={onReset}
+          >
             Next patient
           </button>
         ) : null}

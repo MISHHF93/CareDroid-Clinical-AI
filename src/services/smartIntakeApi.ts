@@ -1,5 +1,6 @@
 import { apiFetch, ApiResponseError, getApiErrorMessage, parseApiResponse } from './apiClient';
 import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
+import { SMART_INTAKE_DEMO } from '../data/smartIntakeFixtures';
 
 const jsonHeaders = { 'Content-Type': 'application/json' };
 const SMART_INTAKE_UNAVAILABLE_MESSAGE = 'Backend Smart Intake endpoint is not available yet.';
@@ -17,9 +18,47 @@ function assertValidApiResponse(response) {
   }
 }
 
+function liveIdentitySessionsEnabled() {
+  // Identity session controller may be disabled while smart-intake demo envelope remains available.
+  return (
+    isBackendCapabilityEnabled('emergencySmartIntakeIdentitySession') ||
+    isBackendCapabilityEnabled('emergencySmartIntake')
+  );
+}
+
+function demoSessionResult(staff = 'Current staff') {
+  return {
+    ok: true,
+    localDemo: true,
+    sessionId: SMART_INTAKE_DEMO.sessionId,
+    data: {
+      sessionId: SMART_INTAKE_DEMO.sessionId,
+      staff,
+      status: 'local-demo',
+      steps: SMART_INTAKE_DEMO.steps,
+      extractedFields: SMART_INTAKE_DEMO.extractedFields,
+      candidates: SMART_INTAKE_DEMO.candidates,
+    },
+    message: 'Using local identity-check demo session (live intake session API offline).',
+  };
+}
+
+function demoOk(extra: Record<string, unknown> = {}) {
+  return {
+    ok: true,
+    localDemo: true,
+    ...extra,
+    message: 'Saved in local desk demo mode.',
+  };
+}
+
 async function postJson(path, body) {
-  if (!isBackendCapabilityEnabled('emergencySmartIntakeIdentitySession')) {
-    throw new Error(SMART_INTAKE_UNAVAILABLE_MESSAGE);
+  if (!liveIdentitySessionsEnabled()) {
+    // Soft local path — reception identity check must not hard-fail offline.
+    if (String(path).endsWith('/sessions') || String(path).includes('/sessions')) {
+      return demoSessionResult(body?.staff);
+    }
+    return demoOk({ path, body });
   }
 
   const response = await apiFetch(path, {
@@ -30,20 +69,37 @@ async function postJson(path, body) {
   assertValidApiResponse(response);
   const payload = await parseApiResponse(response);
   if (!response?.ok) {
+    // Prefer local demo over hard failure for desk continuity
+    if (response.status === 401 || response.status === 404 || response.status === 501) {
+      if (String(path).includes('/sessions') && !String(path).includes('/sessions/')) {
+        return demoSessionResult(body?.staff);
+      }
+      return demoOk({ path, body, degraded: true });
+    }
     throw new Error(payload?.error || payload?.message || getApiErrorMessage(null, response));
   }
   return payload;
 }
 
 async function getJson(path) {
-  if (!isBackendCapabilityEnabled('emergencySmartIntakeIdentitySession')) {
-    throw new Error(SMART_INTAKE_UNAVAILABLE_MESSAGE);
+  if (!liveIdentitySessionsEnabled()) {
+    return demoOk({
+      sessionId: SMART_INTAKE_DEMO.sessionId,
+      auditLog: SMART_INTAKE_DEMO.auditLog,
+    });
   }
 
   const response = await apiFetch(path);
   assertValidApiResponse(response);
   const payload = await parseApiResponse(response);
   if (!response?.ok) {
+    if (response.status === 401 || response.status === 404) {
+      return demoOk({
+        sessionId: SMART_INTAKE_DEMO.sessionId,
+        auditLog: SMART_INTAKE_DEMO.auditLog,
+        degraded: true,
+      });
+    }
     throw new Error(payload?.error || payload?.message || getApiErrorMessage(null, response));
   }
   return payload;
@@ -63,7 +119,19 @@ export const SmartIntakeApi = Object.freeze({
     return postJson(`/api/emergency/intake/${sessionId}/ocr-results`, { ...payload, staff });
   },
   matchPatient(sessionId, staff = 'Current staff') {
-    return postJson(`/api/emergency/intake/${sessionId}/match`, { staff });
+    return postJson(`/api/emergency/intake/${sessionId}/match`, { staff }).then((result) => {
+      if (result?.localDemo) {
+        return {
+          ...result,
+          candidates: SMART_INTAKE_DEMO.candidates,
+          data: {
+            ...(result.data || {}),
+            candidates: SMART_INTAKE_DEMO.candidates,
+          },
+        };
+      }
+      return result;
+    });
   },
   verifyField(sessionId, field, decision, editedValue, staff = 'Current staff') {
     return postJson(`/api/emergency/intake/${sessionId}/verify-field`, {

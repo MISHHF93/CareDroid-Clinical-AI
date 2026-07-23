@@ -1,0 +1,272 @@
+/**
+ * Unified intake (create patient) — CDL form language for reception dashboard.
+ */
+
+.unified-intake-phase-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 4px;
+  border-radius: var(--cdl-radius-lg, 12px);
+  background: var(--cdl-surface-muted, #f1f5f9);
+  border: 1px solid var(--cdl-border, #e2e8f0);
+}
+
+.unified-intake-phase-nav__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: var(--cdl-radius-md, 8px);
+  background: transparent;
+  color: var(--cdl-ink-muted, #334155);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.unified-intake-phase-nav__btn.is-active {
+  background: var(--cdl-surface-card, #fff);
+  border-color: var(--cdl-border, #e2e8f0);
+  color: var(--cdl-ink, #0f172a);
+  box-shadow: var(--cdl-elev-1);
+}
+
+.unified-intake-phase-nav__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  min-height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--cdl-critical-bg, #fef2f2);
+  border: 1px solid var(--cdl-critical-border, #fecaca);
+  color: var(--cdl-critical-text, #991b1b);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.unified-intake-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.unified-intake-admin-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 0 12px;
+  margin-top: 4px;
+  border: 1px dashed var(--cdl-border-strong, #cbd5e1);
+  border-radius: var(--cdl-radius-md, 8px);
+  background: transparent;
+  color: var(--cdl-ink-muted, #334155);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.unified-intake-admin-toggle:hover {
+  color: var(--cdl-ink, #0f172a);
+  border-color: var(--cdl-brand-500, #0ea5e9);
+  background: var(--cdl-info-bg, #f0f9ff);
+}
+
+.unified-intake-actionbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--cdl-border, #e2e8f0);
+}
+
+.unified-intake-actionbar button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: var(--cdl-radius-md, 8px);
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.unified-intake-actionbar__primary,
+.reception-command-actionbar__primary {
+  background: var(--cdl-brand-600, #0284c7) !important;
+  border: 1px solid var(--cdl-brand-600, #0284c7) !important;
+  color: var(--cdl-on-brand, #fff) !important;
+}
+
+.unified-intake-actionbar__primary:disabled,
+.reception-command-actionbar__primary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.reception-command-actionbar__critical {
+  background: var(--cdl-critical, #dc2626) !important;
+  border: 1px solid var(--cdl-critical, #dc2626) !important;
+  color: #fff !important;
+}
+
+.unified-intake-actionbar__secondary,
+.reception-command-actionbar__secondary {
+  background: var(--cdl-surface-muted, #f1f5f9) !important;
+  border: 1px solid var(--cdl-border, #e2e8f0) !important;
+  color: var(--cdl-ink, #0f172a) !important;
+}
+
+/* Tighten field labels */
+.reception-command-field span {
+  color: var(--cdl-ink-muted, #334155) !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.reception-command-field input,
+.reception-command-field select,
+.reception-command-field textarea {
+  min-height: 40px;
+  border: 1px solid var(--cdl-border-strong, #cbd5e1) !important;
+  border-radius: var(--cdl-radius-md, 8px) !important;
+  background: var(--cdl-surface-card, #fff) !important;
+  color: var(--cdl-ink, #0f172a) !important;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+html[data-theme='dark'] .reception-command-field input,
+html[data-theme='dark'] .reception-command-field select,
+html[data-theme='dark'] .reception-command-field textarea {
+  background: var(--cdl-surface-inset, #0f172a) !important;
+  border-color: var(--cdl-border-strong, #475569) !important;
+  color: var(--cdl-ink, #f8fafc) !important;
+}
+
+.reception-command-segmented {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px;
+  max-width: none;
+}
+
+.reception-command-segmented button {
+  min-height: 40px !important;
+  border-radius: var(--cdl-radius-md, 8px) !important;
+  font-weight: 700 !important;
+  background: var(--cdl-surface-muted, #f1f5f9) !important;
+  border: 1px solid var(--cdl-border, #e2e8f0) !important;
+  color: var(--cdl-ink-muted, #334155) !important;
+}
+
+.reception-command-segmented button.is-active {
+  background: var(--cdl-info-bg, #f0f9ff) !important;
+  border-color: var(--cdl-info-border, #7dd3fc) !important;
+  color: var(--cdl-info-text, #075985) !important;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--cdl-brand-500, #0ea5e9) 20%, transparent);
+}
+
+.reception-quick-complaints__chip {
+  background: var(--cdl-surface-card, #fff) !important;
+  border: 1px solid var(--cdl-border, #e2e8f0) !important;
+  color: var(--cdl-ink, #0f172a) !important;
+  border-radius: 999px !important;
+  font-weight: 700 !important;
+}
+
+.reception-quick-complaints__chip.is-active,
+.reception-quick-complaints__chip:hover {
+  background: var(--cdl-info-bg, #f0f9ff) !important;
+  border-color: var(--cdl-info-border, #7dd3fc) !important;
+  color: var(--cdl-info-text, #075985) !important;
+}
+
+.reception-command-check {
+  background: var(--cdl-surface-muted, #f1f5f9) !important;
+  border: 1px solid var(--cdl-border, #e2e8f0);
+  color: var(--cdl-ink, #0f172a);
+}
+
+.reception-command-check:has(input:checked) {
+  background: var(--cdl-warning-bg, #fffbeb) !important;
+  border-color: var(--cdl-warning-border, #fde68a);
+  color: var(--cdl-warning-text, #92400e);
+}
+
+.reception-command-missing {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  border-radius: var(--cdl-radius-md, 8px);
+  background: var(--cdl-warning-bg, #fffbeb);
+  border: 1px solid var(--cdl-warning-border, #fde68a);
+  color: var(--cdl-warning-text, #92400e);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.reception-command-panel h2 {
+  color: var(--cdl-ink, #0f172a);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.reception-command-ai__urgency {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: var(--cdl-radius-md, 8px);
+  font-weight: 800;
+  text-transform: capitalize;
+}
+
+.reception-command-ai__urgency--critical {
+  background: var(--cdl-critical-bg, #fef2f2);
+  border: 1px solid var(--cdl-critical-border, #fecaca);
+  color: var(--cdl-critical-text, #991b1b);
+}
+
+.reception-command-ai__urgency--urgent,
+.reception-command-ai__urgency--warning {
+  background: var(--cdl-warning-bg, #fffbeb);
+  border: 1px solid var(--cdl-warning-border, #fde68a);
+  color: var(--cdl-warning-text, #92400e);
+}
+
+.reception-command-ai__urgency--routine,
+.reception-command-ai__urgency--standard {
+  background: var(--cdl-ok-bg, #ecfdf5);
+  border: 1px solid var(--cdl-ok-border, #a7f3d0);
+  color: var(--cdl-ok-text, #065f46);
+}
+
+@media (max-width: 900px) {
+  .reception-command-form-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .reception-command-form-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .reception-command-segmented {
+    grid-template-columns: 1fr 1fr;
+  }
+}

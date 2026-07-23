@@ -7,8 +7,9 @@
   display: grid;
   gap: var(--cdl-panel-gap, 12px);
   padding: var(--cdl-page-gutter-block, 10px) var(--cdl-page-gutter-inline, 16px);
-  background: var(--app-surface-1, #ffffff);
-  border-bottom: 1px solid var(--app-border-subtle, rgba(0, 0, 0, 0.06));
+  background: var(--cdl-surface-card, var(--app-surface-1, #ffffff));
+  border-bottom: 1px solid var(--cdl-border, var(--app-border-subtle, #e2e8f0));
+  color: var(--cdl-ink, #0f172a);
 }
 
 /* Metrics Row */
@@ -23,30 +24,30 @@
   flex-direction: column;
   gap: 2px;
   padding: 10px 12px;
-  background: var(--app-surface-muted, #f9fafb);
-  border: 1px solid var(--app-border-subtle, rgba(0, 0, 0, 0.04));
-  border-radius: 8px;
+  background: var(--cdl-surface-muted, #f1f5f9);
+  border: 1px solid var(--cdl-border, #e2e8f0);
+  border-radius: var(--cdl-radius-md, 8px);
 }
 
 .reception-metric__value {
   font-size: 22px;
-  font-weight: 700;
+  font-weight: 800;
   line-height: 1;
-  color: var(--app-text-primary, #111827);
+  color: var(--cdl-ink, #0f172a);
   font-variant-numeric: tabular-nums;
 }
 
 .reception-metric__label {
   font-size: 10px;
   font-weight: 700;
-  color: var(--app-text-secondary, var(--cdl-ink-muted, #334155));
+  color: var(--cdl-ink-muted, #334155);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
-.reception-metric--critical .reception-metric__value { color: var(--app-danger, #ef4444); }
-.reception-metric--warning .reception-metric__value { color: var(--app-warning, #f59e0b); }
-.reception-metric--success .reception-metric__value { color: var(--app-success, #22c55e); }
+.reception-metric--critical .reception-metric__value { color: var(--cdl-critical-text, #991b1b); }
+.reception-metric--warning .reception-metric__value { color: var(--cdl-warning-text, #92400e); }
+.reception-metric--success .reception-metric__value { color: var(--cdl-ok-text, #065f46); }
 
 /* Situation Brief */
 .reception-header__situation {
@@ -125,14 +126,14 @@
 }
 
 .reception-header__action-btn--primary {
-  background: var(--app-text-primary, #111827);
-  border-color: var(--app-text-primary, #111827);
-  color: var(--app-surface-1, #ffffff);
+  background: var(--cdl-brand-600, #0284c7);
+  border-color: var(--cdl-brand-600, #0284c7);
+  color: var(--cdl-on-brand, #ffffff);
 }
 
 .reception-header__action-btn--primary:hover {
-  background: var(--app-text-secondary, #374151);
-  border-color: var(--app-text-secondary, #374151);
+  background: var(--cdl-brand-500, #0ea5e9);
+  border-color: var(--cdl-brand-500, #0ea5e9);
 }
 
 .reception-header__queue-tabs {

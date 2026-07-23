@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
-import { showActionError, showActionSuccess } from '../../services/careDroidInteractionFeedback';
+import {
+  showActionError,
+  showActionFeedback,
+} from '../../services/careDroidInteractionFeedback';
 import {
   RECEPTION_ESCALATION_REASONS,
   resolveReceptionEscalationReason,
@@ -7,6 +10,7 @@ import {
   type ReceptionEscalationReasonId,
   type ReceptionEscalationRecord,
 } from '../../services/receptionEscalationWorkflow';
+import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { RECEPTION_COPY } from './receptionCopy';
 import './ReceptionEscalationQuickActions.css';
 
@@ -57,10 +61,22 @@ export default function ReceptionEscalationQuickActions({
         return;
       }
 
-      showActionSuccess(
-        RECEPTION_COPY.escalation.submitSuccess,
-        `${record.reasonLabel} — nurses notified`,
-      );
+      const collabPath = (() => {
+        const params = new URLSearchParams({ channel: 'reception' });
+        if (record.patientId) params.set('patientId', record.patientId);
+        return `${CANONICAL_ROUTES.emergencyCollaboration}?${params.toString()}`;
+      })();
+
+      showActionFeedback({
+        tone: 'success',
+        title: RECEPTION_COPY.escalation.submitSuccess,
+        description: `${record.reasonLabel} — nurses notified`,
+        actionLabel: 'Open team chat',
+        onAction: () => {
+          window.history.pushState(null, '', collabPath);
+          window.dispatchEvent(new PopStateEvent('popstate'));
+        },
+      });
     } finally {
       setPendingReasonId(null);
     }

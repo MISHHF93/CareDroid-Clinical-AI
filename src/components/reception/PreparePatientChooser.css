@@ -1,3 +1,5 @@
+/* Create / prepare patient modal — CDL dual-mode, dashboard-aligned */
+
 .reception-prepare {
   position: fixed;
   inset: 0;
@@ -5,15 +7,39 @@
   display: grid;
   place-items: center;
   padding: 24px;
-  background: rgb(0 0 0 / 55%);
+  background: var(--cdl-scrim, rgba(15, 23, 42, 0.55));
+  backdrop-filter: blur(4px);
+  animation: reception-prepare-fade 0.16s ease-out;
+}
+
+@keyframes reception-prepare-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .reception-prepare__panel {
   width: min(560px, 100%);
-  border: 1px solid var(--app-border-subtle);
-  border-radius: 16px;
-  background: var(--app-surface-1);
-  box-shadow: 0 24px 48px rgb(0 0 0 / 35%);
+  border: 1px solid var(--cdl-border, #e2e8f0);
+  border-radius: var(--cdl-radius-xl, 16px);
+  background: var(--cdl-surface-card, #ffffff);
+  color: var(--cdl-ink, #0f172a);
+  box-shadow: var(--cdl-elev-4, 0 20px 48px rgba(0, 0, 0, 0.2));
+  animation: reception-prepare-rise 0.18s ease-out;
+}
+
+@keyframes reception-prepare-rise {
+  from {
+    transform: translateY(8px);
+    opacity: 0.9;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .reception-prepare__header {
@@ -25,35 +51,45 @@
 
 .reception-prepare__eyebrow {
   margin: 0 0 4px;
-  color: var(--app-text-secondary);
+  color: var(--cdl-brand-600, #0284c7);
   font-size: 11px;
-  font-weight: 900;
-  letter-spacing: 0.08em;
+  font-weight: 800;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
 .reception-prepare__header h2 {
   margin: 0;
-  color: var(--color-text-primary, var(--medical-ink, #111827));
-  font-size: 22px;
+  color: var(--cdl-ink, #0f172a);
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.25;
 }
 
 .reception-prepare__description {
   margin: 8px 0 0;
-  color: var(--color-text-secondary, #9ca3af);
-  font-size: 14px;
+  color: var(--cdl-ink-muted, #334155);
+  font-size: 13px;
   line-height: 1.5;
 }
 
 .reception-prepare__close {
   flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 36px;
   height: 36px;
-  border: 1px solid var(--app-border-subtle);
-  border-radius: 10px;
-  background: transparent;
-  color: var(--app-text-secondary);
+  border: 1px solid var(--cdl-border, #e2e8f0);
+  border-radius: var(--cdl-radius-md, 8px);
+  background: var(--cdl-surface-muted, #f1f5f9);
+  color: var(--cdl-ink-muted, #334155);
   cursor: pointer;
+}
+
+.reception-prepare__close:hover {
+  color: var(--cdl-ink, #0f172a);
+  border-color: var(--cdl-border-strong, #cbd5e1);
 }
 
 .reception-prepare__options {
@@ -68,33 +104,63 @@
   gap: 12px;
   min-height: 72px;
   padding: 14px 16px;
-  border: 1px solid var(--app-border-subtle);
-  border-radius: 12px;
-  background: var(--app-surface-muted);
-  color: var(--app-text-primary);
+  border: 1px solid var(--cdl-border, #e2e8f0);
+  border-radius: var(--cdl-radius-lg, 12px);
+  background: var(--cdl-surface-muted, #f8fafc);
+  color: var(--cdl-ink, #0f172a);
   text-align: left;
   cursor: pointer;
+  transition:
+    border-color 0.12s ease,
+    background 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.reception-prepare__option svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--cdl-brand-600, #0284c7);
 }
 
 .reception-prepare__option strong {
   display: block;
   font-size: 15px;
+  font-weight: 800;
+  color: var(--cdl-ink, #0f172a);
 }
 
 .reception-prepare__option small {
   display: block;
   margin-top: 4px;
-  color: var(--color-text-secondary, #9ca3af);
+  color: var(--cdl-ink-muted, #334155);
   font-size: 12px;
   line-height: 1.4;
+  font-weight: 600;
 }
 
 .reception-prepare__option--primary {
-  border-color: var(--app-border-strong);
-  background: var(--app-surface-muted);
+  border-color: color-mix(in srgb, var(--cdl-brand-500, #0ea5e9) 45%, var(--cdl-border, #e2e8f0));
+  background: var(--cdl-info-bg, #f0f9ff);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--cdl-brand-500, #0ea5e9) 18%, transparent);
+}
+
+.reception-prepare__option--primary strong {
+  color: var(--cdl-info-text, #075985);
+}
+
+.reception-prepare__option--primary svg {
+  color: var(--cdl-info-text, #075985);
 }
 
 .reception-prepare__option:hover,
 .reception-prepare__option:focus-visible {
-  border-color: var(--app-text-primary);
+  border-color: var(--cdl-brand-500, #0ea5e9);
+  background: var(--cdl-surface-card, #fff);
+  box-shadow: var(--cdl-elev-2);
+  outline: none;
+}
+
+html[data-theme='dark'] .reception-prepare__option:hover,
+html[data-theme='dark'] .reception-prepare__option:focus-visible {
+  background: var(--cdl-surface-elevated, #334155);
 }

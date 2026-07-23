@@ -38,6 +38,8 @@ export const HOSPITAL_ROLE_HOME_ROUTES: Readonly<Record<string, string>> = Objec
   pharmacist:               CANONICAL_ROUTES.emergencyDiagnostics,
   lab_technician:           CANONICAL_ROUTES.emergencyDiagnostics,
   radiology_technician:     CANONICAL_ROUTES.emergencyDiagnostics,
+  social_worker:            CANONICAL_ROUTES.emergencyPatients,
+  security_officer:         CANONICAL_ROUTES.emergencyAlerts,
   // Cluster F — Operations & Leadership
   patient_flow_coordinator: CANONICAL_ROUTES.emergencyQueues,
   hospital_admin:           CANONICAL_ROUTES.emergencyAnalytics,
@@ -48,6 +50,7 @@ export const HOSPITAL_ROLE_HOME_ROUTES: Readonly<Record<string, string>> = Objec
   super_admin:              CANONICAL_ROUTES.emergencySettings,
   // Cluster H — Demo / Observer
   demo_observer:            CANONICAL_ROUTES.emergencyWhiteboard,
+  public_waiting:           CANONICAL_ROUTES.emergencyWhiteboard,
 });
 
 // ─── Curated nav item ID lists (ordered positive allowlist) ──────────────────
@@ -114,6 +117,12 @@ export const HOSPITAL_ROLE_NAV_IDS: Readonly<Record<string, readonly string[]>> 
   radiology_technician: Object.freeze([
     'diagnostics', 'patients', 'alerts', 'collaboration', 'help',
   ]),
+  social_worker: Object.freeze([
+    'patients', 'alerts', 'handoffs', 'collaboration', 'help',
+  ]),
+  security_officer: Object.freeze([
+    'alerts', 'patients', 'collaboration', 'help',
+  ]),
 
   // ── Cluster F: Operations & Leadership ────────────────────────────────────
   patient_flow_coordinator: Object.freeze([
@@ -133,8 +142,13 @@ export const HOSPITAL_ROLE_NAV_IDS: Readonly<Record<string, readonly string[]>> 
   super_admin: CANONICAL_PILOT_VISIBLE_NAV_IDS,
 
   // ── Cluster H: Demo / Observer ─────────────────────────────────────────────
+  // Ops wall / read-only ED board keeps collab for staff briefings.
   demo_observer: Object.freeze([
     'whiteboard', 'analytics', 'collaboration', 'help',
+  ]),
+  // Patient-facing waiting wall — no staff Collaboration Hub.
+  public_waiting: Object.freeze([
+    'whiteboard', 'analytics', 'help',
   ]),
 });
 
@@ -153,7 +167,7 @@ const EMERGENCY_TO_HOSPITAL_ROLE: Readonly<Record<string, string>> = Object.free
   dispatcher:         'dispatcher',
   ems_coordinator:    'ems_coordinator',
   read_only_viewer:   'demo_observer',
-  public_display:     'demo_observer',
+  public_display:     'public_waiting',
 });
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -182,8 +196,31 @@ export function getHomeRouteForRole(role: string | null | undefined): string {
  * Accepts both hospital role IDs (e.g. 'emergency_physician') and legacy
  * emergency role IDs (e.g. 'physician').
  * Falls back to the demo_observer list for unknown roles.
+ *
+ * Collaboration Hub is guaranteed for every known clinical/ops profile so
+ * team channels stay reachable from the sidebar (not only via deep links).
  */
 export function getNavItemIdsForRole(role: string | null | undefined): readonly string[] {
+  const raw = normalizeRoleId(role);
+  // Patient-facing wall never gets staff Collaboration Hub
+  if (raw === 'public_display' || raw === 'public_waiting') {
+    return HOSPITAL_ROLE_NAV_IDS.public_waiting;
+  }
   const hospitalRole = resolveToHospitalRole(role);
-  return HOSPITAL_ROLE_NAV_IDS[hospitalRole] || HOSPITAL_ROLE_NAV_IDS.emergency_physician;
+  const base =
+    HOSPITAL_ROLE_NAV_IDS[hospitalRole] ||
+    HOSPITAL_ROLE_NAV_IDS.demo_observer ||
+    Object.freeze(['collaboration', 'help']);
+  if (base.includes('collaboration') || hospitalRole === 'public_waiting') return base;
+  // Defensive: ED staff profiles always keep Collaboration Hub reachable
+  const list = [...base];
+  const helpIdx = list.indexOf('help');
+  if (helpIdx >= 0) list.splice(helpIdx, 0, 'collaboration');
+  else list.push('collaboration');
+  return Object.freeze(list);
+}
+
+/** True when sidebar allowlist includes Collaboration Hub for this role. */
+export function roleNavIncludesCollaboration(role: string | null | undefined): boolean {
+  return getNavItemIdsForRole(role).includes('collaboration');
 }

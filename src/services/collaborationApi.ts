@@ -1,16 +1,37 @@
-import { apiFetch, getApiErrorMessage, parseApiResponse } from './apiClient';
+import { apiFetch, getApiErrorMessage, getStoredAccessToken, parseApiResponse } from './apiClient';
 import { isBackendCapabilityEnabled, UNSUPPORTED_CAPABILITY_MESSAGE } from '../config/backendApiCapabilities';
+import {
+  normalizeChannelListPayload,
+  normalizeMessageListPayload,
+} from './collaborationLocalCatalog';
 
-function disabledResult(action: string) {
+export type CollaborationApiResult<T> = {
+  ok: boolean;
+  disabled?: boolean;
+  unauthorized?: boolean;
+  data: T | null;
+  message: string;
+};
+
+function disabledResult(action: string): CollaborationApiResult<null> {
   return {
-    ok: false as const,
+    ok: false,
     disabled: true,
     data: null,
-    message: `${UNSUPPORTED_CAPABILITY_MESSAGE} ${action} is available locally only.`,
+    message: `${UNSUPPORTED_CAPABILITY_MESSAGE} ${action} is available in desk demo mode.`,
   };
 }
 
-async function requestJson(path: string, options: any = {}) {
+function unauthorizedResult(action: string): CollaborationApiResult<null> {
+  return {
+    ok: false,
+    unauthorized: true,
+    data: null,
+    message: `Sign in required for live ${action.toLowerCase()}. Using desk demo channels.`,
+  };
+}
+
+async function requestJson(path: string, options: any = {}): Promise<CollaborationApiResult<any>> {
   try {
     const response = await apiFetch(path, {
       ...options,
@@ -20,25 +41,57 @@ async function requestJson(path: string, options: any = {}) {
       },
     });
     const data = await parseApiResponse<any>(response, { fallback: {} });
-    if (!response.ok) {
-      return { ok: false as const, data: null, message: data?.message || getApiErrorMessage(null, response) };
+    if (response.status === 401 || response.status === 403) {
+      return unauthorizedResult(path);
     }
-    return { ok: true as const, data, message: '' };
+    if (!response.ok) {
+      return {
+        ok: false,
+        data: null,
+        message: data?.message || getApiErrorMessage(null, response),
+      };
+    }
+    return { ok: true, data, message: '' };
   } catch (error: any) {
-    return { ok: false as const, data: null, message: getApiErrorMessage(error) };
+    return { ok: false, data: null, message: getApiErrorMessage(error) };
   }
 }
 
-function guarded(action: string, fn: () => Promise<any>) {
-  if (!isBackendCapabilityEnabled('collaborationHub')) return Promise.resolve(disabledResult(action));
+function guarded(action: string, fn: () => Promise<CollaborationApiResult<any>>) {
+  if (!isBackendCapabilityEnabled('collaborationHub')) {
+    return Promise.resolve(disabledResult(action));
+  }
+  if (!getStoredAccessToken()) {
+    return Promise.resolve(unauthorizedResult(action));
+  }
   return fn();
 }
 
-export function fetchChannels() {
-  return guarded('Collaboration channels', () => requestJson('/api/collaboration/channels'));
+export function hasCollaborationLiveAuth() {
+  return Boolean(isBackendCapabilityEnabled('collaborationHub') && getStoredAccessToken());
 }
 
-export function createChannel(payload: { type: string; name: string; description?: string; departmentKey?: string; patientId?: string }) {
+export async function fetchChannels(): Promise<
+  CollaborationApiResult<Array<{ channel: any; membership?: any }>>
+> {
+  const result = await guarded('Collaboration channels', () =>
+    requestJson('/api/collaboration/channels'),
+  );
+  if (!result.ok) return result as CollaborationApiResult<null> as any;
+  return {
+    ok: true,
+    data: normalizeChannelListPayload(result.data),
+    message: '',
+  };
+}
+
+export function createChannel(payload: {
+  type: string;
+  name: string;
+  description?: string;
+  departmentKey?: string;
+  patientId?: string;
+}) {
   return guarded('Channel creation', () =>
     requestJson('/api/collaboration/channels', { method: 'POST', body: JSON.stringify(payload) }),
   );
@@ -46,24 +99,37 @@ export function createChannel(payload: { type: string; name: string; description
 
 export function archiveChannel(channelId: string) {
   return guarded('Channel archive', () =>
-    requestJson(`/api/collaboration/channels/${encodeURIComponent(channelId)}/archive`, { method: 'POST' }),
+    requestJson(`/api/collaboration/channels/${encodeURIComponent(channelId)}/archive`, {
+      method: 'POST',
+    }),
   );
 }
 
-export function fetchMessages(channelId: string, query: { before?: string; limit?: number; threadRootId?: string } = {}) {
+export async function fetchMessages(
+  channelId: string,
+  query: { before?: string; limit?: number; threadRootId?: string } = {},
+): Promise<CollaborationApiResult<any[]>> {
   const params = new URLSearchParams();
   if (query.before) params.set('before', query.before);
   if (query.limit) params.set('limit', String(query.limit));
   if (query.threadRootId) params.set('threadRootId', query.threadRootId);
   const qs = params.toString();
-  return guarded('Message history', () =>
+  const result = await guarded('Message history', () =>
     requestJson(`/api/collaboration/channels/${encodeURIComponent(channelId)}/messages${qs ? `?${qs}` : ''}`),
   );
+  if (!result.ok) return result as any;
+  return { ok: true, data: normalizeMessageListPayload(result.data), message: '' };
 }
 
 export function postMessage(
   channelId: string,
-  payload: { body: string; threadRootId?: string; mentionedUserIds?: string[]; sourceType?: string; sourceId?: string },
+  payload: {
+    body: string;
+    threadRootId?: string;
+    mentionedUserIds?: string[];
+    sourceType?: string;
+    sourceId?: string;
+  },
 ) {
   return guarded('Sending a message', () =>
     requestJson(`/api/collaboration/channels/${encodeURIComponent(channelId)}/messages`, {
@@ -84,7 +150,9 @@ export function editMessage(messageId: string, body: string) {
 
 export function deleteMessage(messageId: string) {
   return guarded('Message delete', () =>
-    requestJson(`/api/collaboration/messages/${encodeURIComponent(messageId)}`, { method: 'DELETE' }),
+    requestJson(`/api/collaboration/messages/${encodeURIComponent(messageId)}`, {
+      method: 'DELETE',
+    }),
   );
 }
 
@@ -108,13 +176,17 @@ export function removeReaction(messageId: string, emoji: string) {
 
 export function pinMessage(messageId: string) {
   return guarded('Pin message', () =>
-    requestJson(`/api/collaboration/messages/${encodeURIComponent(messageId)}/pin`, { method: 'POST' }),
+    requestJson(`/api/collaboration/messages/${encodeURIComponent(messageId)}/pin`, {
+      method: 'POST',
+    }),
   );
 }
 
 export function unpinMessage(messageId: string) {
   return guarded('Unpin message', () =>
-    requestJson(`/api/collaboration/messages/${encodeURIComponent(messageId)}/pin`, { method: 'DELETE' }),
+    requestJson(`/api/collaboration/messages/${encodeURIComponent(messageId)}/pin`, {
+      method: 'DELETE',
+    }),
   );
 }
 
@@ -151,7 +223,10 @@ export function sendTyping(channelId: string, isTyping: boolean) {
   );
 }
 
-export function uploadAttachment(messageId: string, payload: { fileName: string; mimeType: string; dataBase64: string }) {
+export function uploadAttachment(
+  messageId: string,
+  payload: { fileName: string; mimeType: string; dataBase64: string },
+) {
   return guarded('Attachment upload', () =>
     requestJson(`/api/collaboration/messages/${encodeURIComponent(messageId)}/attachments`, {
       method: 'POST',
@@ -183,39 +258,3 @@ export function createIncident(payload: {
     requestJson('/api/collaboration/incidents', { method: 'POST', body: JSON.stringify(payload) }),
   );
 }
-
-export function resolveIncident(channelId: string) {
-  return guarded('Incident resolution', () =>
-    requestJson(`/api/collaboration/incidents/${encodeURIComponent(channelId)}/resolve`, { method: 'POST' }),
-  );
-}
-
-export function fetchAnalyticsSummary(windowDays = 7) {
-  return guarded('Collaboration analytics', () =>
-    requestJson(`/api/collaboration/analytics/summary?windowDays=${windowDays}`),
-  );
-}
-
-export default {
-  fetchChannels,
-  createChannel,
-  archiveChannel,
-  fetchMessages,
-  postMessage,
-  editMessage,
-  deleteMessage,
-  addReaction,
-  removeReaction,
-  pinMessage,
-  unpinMessage,
-  fetchPinnedMessages,
-  markChannelRead,
-  updateChannelMembership,
-  sendTyping,
-  uploadAttachment,
-  searchMessages,
-  fetchPatientThread,
-  createIncident,
-  resolveIncident,
-  fetchAnalyticsSummary,
-};

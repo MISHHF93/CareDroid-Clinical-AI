@@ -23,9 +23,28 @@ describe('Reception front door wiring', () => {
     expect(receptionSource).toContain('ReceptionOperationalRail');
     expect(receptionSource).not.toContain('ReceptionEscalationAttentionStrip');
     expect(unifiedIntakeSource).toContain('Life-critical intake');
+    expect(unifiedIntakeSource).toContain('UnifiedIntakePanel.css');
     expect(receptionSource).toContain('createPatientAndRouteFromReception');
     expect(receptionSource).not.toContain('ReceptionQuickIntake');
     expect(receptionSource).not.toContain('QuickIntake');
+  });
+
+  it('create-patient surface uses CDL dual-mode theme (not forced chalk white)', () => {
+    const theme = readFileSync(
+      join(__dirname, '../../styles/reception-desk-theme.css'),
+      'utf8',
+    );
+    const chooserCss = readFileSync(
+      join(__dirname, '../../components/reception/PreparePatientChooser.css'),
+      'utf8',
+    );
+    expect(theme).toContain('--cdl-surface-card');
+    expect(theme).toContain('--cdl-brand-600');
+    expect(theme).toContain("html[data-theme='dark']");
+    // Legacy theme forced pure white on every panel/button — must not return
+    expect(theme).not.toMatch(/\.reception-workspace\s+\[class\*="card"\][\s\S]{0,80}background:\s*#ffffff/);
+    expect(chooserCss).toContain('--cdl-surface-card');
+    expect(chooserCss).toContain('--cdl-info-bg');
   });
 
   it('uses the unified reception intake orchestrator from the UI', () => {
