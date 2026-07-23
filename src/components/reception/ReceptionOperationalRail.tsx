@@ -7,6 +7,14 @@ import {
 import ReceptionAttentionStrip from './ReceptionAttentionStrip';
 import type { ReceptionAttentionRow, ReceptionAttentionSnapshot } from './receptionAttentionModel';
 
+/** "578" -> "9h 38m" so long waits read as a duration, not a raw minute count. */
+function formatWaitDisplay(minutes: number): string {
+  if (!Number.isFinite(minutes) || minutes < 60) return `${Math.max(0, minutes)}m`;
+  const hours = Math.floor(minutes / 60);
+  const remainder = minutes % 60;
+  return remainder ? `${hours}h ${remainder}m` : `${hours}h`;
+}
+
 export type ReceptionOperationalRailProps = {
   queue: Patient[];
   attention: ReceptionAttentionSnapshot;
@@ -92,18 +100,24 @@ export default function ReceptionOperationalRail({
                   >
                     <span className="reception-queue-row__who">
                       <strong>{patientDisplayName(patient)}</strong>
-                      <small>
+                      <small title={patient.chiefComplaint || patient.complaint || 'Complaint pending'}>
                         {patient.chiefComplaint || patient.complaint || 'Complaint pending'}
                       </small>
                     </span>
-                    <span
-                      className={`reception-queue-row__chip reception-queue-row__chip--${model.riskTone}`}
-                      data-tone={model.riskTone === 'neutral' ? 'neutral' : model.riskTone}
-                    >
-                      {model.riskLabel}
+                    <span className="reception-queue-row__meta">
+                      <span
+                        className={`reception-queue-row__chip reception-queue-row__chip--${model.riskTone}`}
+                        data-tone={model.riskTone === 'neutral' ? 'neutral' : model.riskTone}
+                      >
+                        {model.riskLabel}
+                      </span>
+                      <span className="reception-queue-row__status" title={queueStatus(patient)}>
+                        {queueStatus(patient)}
+                      </span>
                     </span>
-                    <span className="reception-queue-row__status">{queueStatus(patient)}</span>
-                    <span className="reception-queue-row__wait">{waitMinutes(patient)}m</span>
+                    <span className="reception-queue-row__wait">
+                      Wait {formatWaitDisplay(waitMinutes(patient))}
+                    </span>
                   </button>
                   <button
                     type="button"

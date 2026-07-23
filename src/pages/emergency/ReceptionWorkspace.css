@@ -833,10 +833,10 @@
 
 .reception-queue-row__select {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-rows: auto auto;
-  gap: 2px 8px;
-  align-items: center;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto auto;
+  gap: 4px;
+  align-items: start;
   min-width: 0;
   padding: 8px 10px;
   border: 0;
@@ -848,7 +848,6 @@
 }
 
 .reception-queue-row__who {
-  grid-column: 1 / -1;
   min-width: 0;
 }
 
@@ -866,8 +865,16 @@
   font-weight: 600;
 }
 
+.reception-queue-row__meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
 .reception-queue-row__chip {
   display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
   min-height: 20px;
   padding: 1px 7px;
@@ -898,9 +905,16 @@
   font-weight: 700;
 }
 
+.reception-queue-row__status {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .reception-queue-row__wait {
-  font-variant-numeric: tabular-nums;
   justify-self: end;
+  font-variant-numeric: tabular-nums;
 }
 
 .reception-queue-row__cta {

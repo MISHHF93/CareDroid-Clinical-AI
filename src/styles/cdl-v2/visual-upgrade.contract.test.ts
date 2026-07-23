@@ -197,3 +197,32 @@ describe('KPI/button tone data reaches the displayed value, not just the border 
     expect(rule).not.toContain('--app-danger-contrast');
   });
 });
+
+describe('Reception "Waiting list" row layout (Cycle 155)', () => {
+  it('groups the risk chip and status on one flex row instead of relying on broken 2-column grid auto-placement', () => {
+    // The old markup gave chip/status/wait no explicit grid placement inside a
+    // 2-col/2-row grid whose only positioned child (__who) spanned both
+    // columns — auto-placement scattered the remaining 3 items across
+    // mismatched rows/columns, leaving the wait time floating alone,
+    // disconnected from its row, unaligned. Visually confirmed via live
+    // dev-server screenshot before and after.
+    const css = readFileSync(join(root, 'pages/emergency/ReceptionWorkspace.css'), 'utf8');
+    expect(css).toContain('.reception-queue-row__meta {');
+    const metaRule = css.slice(css.indexOf('.reception-queue-row__meta {'));
+    expect(metaRule).toContain('display: flex');
+  });
+
+  it('formats long waits as hours+minutes instead of a raw 3-digit minute count', () => {
+    const tsx = readFileSync(join(root, 'components/reception/ReceptionOperationalRail.tsx'), 'utf8');
+    expect(tsx).toContain('function formatWaitDisplay');
+    expect(tsx).toMatch(/formatWaitDisplay\(waitMinutes\(patient\)\)/);
+  });
+
+  it('truncated complaint and status text carry a title tooltip with the full value', () => {
+    const tsx = readFileSync(join(root, 'components/reception/ReceptionOperationalRail.tsx'), 'utf8');
+    const whoBlock = tsx.slice(tsx.indexOf('reception-queue-row__who'), tsx.indexOf('reception-queue-row__meta'));
+    expect(whoBlock).toContain('title={patient.chiefComplaint');
+    const statusBlock = tsx.slice(tsx.indexOf('reception-queue-row__status'));
+    expect(statusBlock.slice(0, 120)).toContain('title={queueStatus(patient)}');
+  });
+});
