@@ -172,7 +172,9 @@ export class SentinelController {
     let inbound: {
       id: string;
       missingFields: readonly string[];
-      validation: Awaited<ReturnType<SentinelInboundService['upsertFromCadOrNemsis']>>['validation'];
+      validation: Awaited<
+        ReturnType<SentinelInboundService['upsertFromCadOrNemsis']>
+      >['validation'];
     } | null = null;
     if (hasClinical || body?.patient) {
       const payload =

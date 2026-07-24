@@ -179,9 +179,9 @@ describe('SubscriptionsService', () => {
     it('should throw ServiceUnavailableException when Stripe is not configured', async () => {
       (service as any).stripe = null;
 
-      await expect(service.createCheckoutSession('1', SubscriptionTier.PROFESSIONAL)).rejects.toThrow(
-        'Payment processing is not configured.',
-      );
+      await expect(
+        service.createCheckoutSession('1', SubscriptionTier.PROFESSIONAL),
+      ).rejects.toThrow('Payment processing is not configured.');
     });
   });
 

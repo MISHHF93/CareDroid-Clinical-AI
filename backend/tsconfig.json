@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "strict": true,
-    "strictNullChecks": false,
+    "strictNullChecks": true,
     "strictPropertyInitialization": false,
     "noImplicitAny": false,
     "module": "commonjs",

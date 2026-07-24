@@ -228,12 +228,10 @@ export class FeatureFlagService {
     if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
     return Object.fromEntries(
       Object.entries(value as Record<string, unknown>)
-        .map(
-          ([scopeKey, flags]): [string | null, Record<string, FeatureFlagState>] => [
-            this.scopeKey(scopeKey),
-            this.recordOfStates(flags),
-          ],
-        )
+        .map(([scopeKey, flags]): [string | null, Record<string, FeatureFlagState>] => [
+          this.scopeKey(scopeKey),
+          this.recordOfStates(flags),
+        ])
         .filter(([scopeKey, flags]) => Boolean(scopeKey) && Boolean(Object.keys(flags).length)),
     );
   }

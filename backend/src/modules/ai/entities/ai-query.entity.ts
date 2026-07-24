@@ -31,7 +31,7 @@ export class AIQuery {
   prompt: string;
 
   @Column({ type: 'text', nullable: true })
-  response: string;
+  response: string | null;
 
   @Column({ type: 'varchar', enum: QueryStatus, default: QueryStatus.SUCCESS })
   status: QueryStatus;
