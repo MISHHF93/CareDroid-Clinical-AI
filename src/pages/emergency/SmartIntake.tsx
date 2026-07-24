@@ -548,6 +548,12 @@ export default function SmartIntake({
           isAiDerived: false,
         }).catch(() => undefined);
       }
+      if (routeResult.backendSyncStatus === 'failed') {
+        setOcrUploadStatus(
+          routeResult.backendSyncError ||
+            'Patient created locally. Backend sync is pending — retry when connectivity returns.',
+        );
+      }
       finishIntakeNavigation(routeResult.patientId);
       return routeResult.patient;
     } catch {

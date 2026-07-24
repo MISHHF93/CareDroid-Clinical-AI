@@ -24,6 +24,7 @@ export const EMERGENCY_OS_API_ENDPOINTS = Object.freeze({
   emsHandoff: '/api/emergency/ems/handoff',
   receptionSnapshot: '/api/emergency/reception/snapshot',
   receptionHandoff: '/api/emergency/reception/handoff',
+  receptionEscalation: '/api/emergency/reception/escalation',
   triageAssist: '/api/emergency/triage/assist',
   patientOrchestration: '/api/emergency/patients',
   intake: '/api/emergency/intake',
@@ -97,6 +98,7 @@ export const ACTIVE_EMERGENCY_OS_API_ENDPOINT_KEYS = Object.freeze([
   'emsHandoff',
   'receptionSnapshot',
   'receptionHandoff',
+  'receptionEscalation',
   'triageAssist',
   'intake',
   'smartIntakeVerticalSlice',
@@ -196,6 +198,11 @@ export const fetchReceptionSnapshot = () =>
   requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.receptionSnapshot);
 export const postReceptionHandoff = (payload) =>
   requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.receptionHandoff, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+export const postReceptionEscalation = (payload) =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.receptionEscalation, {
     method: 'POST',
     body: JSON.stringify(payload),
   });
@@ -426,6 +433,7 @@ export default Object.freeze({
   fetchEMSIntake,
   fetchReceptionSnapshot,
   postReceptionHandoff,
+  postReceptionEscalation,
   postTriageAssist,
   fetchSmartIntake,
   fetchEmergencyQueues,

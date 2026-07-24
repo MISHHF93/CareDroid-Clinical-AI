@@ -1,9 +1,18 @@
-import { Injectable, NotFoundException, OnModuleDestroy } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  OnModuleDestroy,
+  Optional,
+} from '@nestjs/common';
 import { resolveArtifactId } from '../../../../src/config/intakeArtifactRegistry';
 import { createOcrProvider } from './ocr-providers';
 import { PatientDocumentArtifactService } from './patient-document-artifact.service';
+import { EmergencyPatientService } from './emergency-os.services';
 import type {
   CreateOcrJobInput,
+  OcrAppliedDemographicsPatch,
+  OcrExtractedField,
   OcrFieldReviewInput,
   OcrHealthSnapshot,
   OcrJob,
@@ -19,6 +28,21 @@ const OUTCOME_WINDOW = 20;
 const DEGRADED_FAILURE_RATE = 0.2;
 const DOWN_FAILURE_RATE = 0.5;
 const MIN_SAMPLES_FOR_HEALTH_SIGNAL = 3;
+const MIN_FIELD_CONFIDENCE = 0.55;
+const HIGH_CONFIDENCE_AUTO_ACCEPT = 0.9;
+const IDENTITY_FIELDS = new Set([
+  'firstName',
+  'lastName',
+  'fullName',
+  'dateOfBirth',
+  'dob',
+  'sex',
+  'nationalId',
+  'idNumber',
+  'phone',
+  'address',
+  'healthCardNumber',
+]);
 
 function createId(prefix: string): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -56,13 +80,61 @@ function referralSourceType(
   return 'uploaded_document';
 }
 
+function isFieldAuthoritative(field: OcrExtractedField): boolean {
+  if (field.status !== 'accepted' && field.status !== 'edited') return false;
+  const value = (field.status === 'edited' ? field.editedValue : field.value)?.trim();
+  if (!value) return false;
+  if (field.status === 'accepted' && field.confidence < MIN_FIELD_CONFIDENCE) return false;
+  return true;
+}
+
+function buildDemographicsFromReviewedFields(
+  fields: OcrExtractedField[],
+): OcrAppliedDemographicsPatch {
+  const patch: OcrAppliedDemographicsPatch = {};
+  for (const field of fields.filter(isFieldAuthoritative)) {
+    const key = field.field;
+    if (!IDENTITY_FIELDS.has(key)) continue;
+    const value = (field.status === 'edited' ? field.editedValue : field.value)?.trim();
+    if (!value) continue;
+    if (key === 'fullName') {
+      const parts = value.split(/\s+/);
+      if (parts.length >= 2) {
+        patch.firstName = patch.firstName ?? parts[0];
+        patch.lastName = patch.lastName ?? parts.slice(1).join(' ');
+      }
+      continue;
+    }
+    if (key === 'dob') {
+      patch.dateOfBirth = value;
+      continue;
+    }
+    if (key === 'idNumber') {
+      patch.nationalId = value;
+      continue;
+    }
+    if (key === 'firstName') patch.firstName = value;
+    else if (key === 'lastName') patch.lastName = value;
+    else if (key === 'dateOfBirth') patch.dateOfBirth = value;
+    else if (key === 'sex') patch.sex = value;
+    else if (key === 'phone') patch.phone = value;
+    else if (key === 'address') patch.address = value;
+    else if (key === 'nationalId') patch.nationalId = value;
+    else if (key === 'healthCardNumber') patch.healthCardNumber = value;
+  }
+  return patch;
+}
+
 @Injectable()
 export class OcrIntakeService implements OnModuleDestroy {
   private readonly jobs = new Map<string, OcrJob>();
   private readonly provider: OcrProvider = createOcrProvider();
   private recentOutcomes: boolean[] = [];
 
-  constructor(private readonly documentArtifactService: PatientDocumentArtifactService) {}
+  constructor(
+    private readonly documentArtifactService: PatientDocumentArtifactService,
+    @Optional() private readonly patientService?: EmergencyPatientService,
+  ) {}
 
   /** Releases the OCR provider's resources (e.g. a live Tesseract worker) on
    * app shutdown, so the process can exit cleanly instead of hanging on an
@@ -182,20 +254,98 @@ export class OcrIntakeService implements OnModuleDestroy {
     return job;
   }
 
-  async applyToIntake(jobId: string, actor: string): Promise<OcrJob> {
+  async applyToIntake(
+    jobId: string,
+    actor: string,
+    options: { autoAcceptHighConfidence?: boolean } = {},
+  ): Promise<OcrJob> {
     const job = this.getJob(jobId);
     if (job.status !== 'completed') {
-      throw new Error('Only completed OCR jobs can be applied to an intake draft');
+      throw new BadRequestException('Only completed OCR jobs can be applied to an intake draft');
+    }
+
+    const actorName = actor || 'unknown';
+    const now = nowIso();
+
+    // Optional bulk-accept for high-confidence fields (still human-triggered apply).
+    if (options.autoAcceptHighConfidence) {
+      for (const field of job.extractedFields) {
+        if (field.status !== 'pending') continue;
+        if (field.confidence < HIGH_CONFIDENCE_AUTO_ACCEPT) continue;
+        if (!String(field.value || '').trim()) continue;
+        field.status = 'accepted';
+        field.reviewedBy = actorName;
+        field.reviewedAt = now;
+      }
+    }
+
+    const authoritative = job.extractedFields.filter(isFieldAuthoritative);
+    if (authoritative.length === 0) {
+      throw new BadRequestException(
+        'No OCR fields have been accepted or edited. Review identity fields before applying.',
+      );
+    }
+
+    const demographics = buildDemographicsFromReviewedFields(job.extractedFields);
+    if (Object.keys(demographics).length === 0) {
+      throw new BadRequestException(
+        'Validated OCR fields did not include demographics that can be applied.',
+      );
     }
 
     job.appliedToIntake = true;
-    job.appliedAt = nowIso();
-    job.updatedAt = nowIso();
+    job.appliedAt = now;
+    job.updatedAt = now;
+    job.appliedDemographics = demographics;
+    job.reviewer = actorName;
+    job.reviewedAt = now;
+    job.patientUpdated = false;
     job.auditLog.push(
-      this.audit('applied_to_intake', actor || 'unknown', {
-        fieldCount: job.extractedFields.length,
+      this.audit('applied_to_intake', actorName, {
+        fieldCount: authoritative.length,
+        demographicsKeys: Object.keys(demographics),
+        patientId: job.patientId || null,
       }),
     );
+
+    if (job.patientId && this.patientService) {
+      try {
+        const existing = this.patientService.getPatient(job.patientId);
+        if (existing) {
+          const patch: Record<string, unknown> = {};
+          if (demographics.firstName) patch.firstName = demographics.firstName;
+          if (demographics.lastName) patch.lastName = demographics.lastName;
+          if (demographics.dateOfBirth) patch.dob = demographics.dateOfBirth;
+          if (demographics.sex) patch.sex = demographics.sex;
+          if (demographics.phone) {
+            patch.phone = demographics.phone;
+            patch.mobilePhone = demographics.phone;
+          }
+          if (demographics.healthCardNumber) patch.mrn = existing.mrn || demographics.healthCardNumber;
+          if (demographics.firstName || demographics.lastName) {
+            patch.name = [demographics.firstName || existing.firstName, demographics.lastName || existing.lastName]
+              .filter(Boolean)
+              .join(' ')
+              .trim();
+          }
+          this.patientService.updatePatient(job.patientId, patch as any);
+          job.patientUpdated = true;
+          job.auditLog.push(
+            this.audit('applied_to_intake', actorName, {
+              action: 'patient_demographics_updated',
+              patientId: job.patientId,
+              fields: Object.keys(patch),
+            }),
+          );
+        }
+      } catch {
+        // Patient update is best-effort when the board id is missing or stale.
+        job.warnings = [
+          ...(job.warnings || []),
+          'OCR applied to intake draft, but patient board update was skipped.',
+        ];
+      }
+    }
 
     if (job.patientId) {
       try {

@@ -1,0 +1,760 @@
+{
+  "generatedAt": "2026-07-24T04:40:17.338Z",
+  "backendPort": 3350,
+  "frontendPort": 5190,
+  "apiPort": 3350,
+  "auth": {
+    "via": 3350,
+    "ms": 39
+  },
+  "patientCount": 6,
+  "probes": [
+    {
+      "label": "Backend /health (:3350)",
+      "ok": true,
+      "status": 200,
+      "ms": 7,
+      "body": "{\"status\":\"degraded\",\"timestamp\":\"2026-07-24T04:40:17.345Z\",\"responseTimeMs\":1,\"components\":{\"database\":{\"status\":\"not-configured\",\"configured\":false,\"details\":{\"connector\":\"mongoose\",\"readyState\":0,\"stateName\":\"disconnected\",\"message\":\"Mongoose is not connected and no MongoDB URI is configured.\"},\"critical\":true,\"checkedAt\":\"2026-07-24T04:40:17.345Z\",\"responseTimeMs\":1},\"sqlDatabase\":{\"status\":\"healthy\",\"configured\":true,\"details\":{\"connector\":\"typeorm\",\"type\":\"sqlite\"},\"critical\":true,\"checkedAt\":\"2026-07-24T04:40:17.345Z\",\"responseTimeMs\":1},\"services\":{\"status\":\"degraded\",\"configured\":true,\"details\":{\"generatedAt\":\"2026-07-24T04:40:17.345Z\",\"totals\":{\"registered\":27,\"ready\":27,\"failed\":0},\"degradedServices\":[{\"name\":\"mohFhirService\",\"status\":\"not_connected\"},{\"name\":\"wearableRPMService\",\"status\":\"not_connected\"}],\"services\":{\"capacityService\":{\"status\":\"ready\",\"checkedAt\":\"2026-07-24T04:40:17.344Z\"},\"emsService\":{\"status\":\"ready\",\"checkedAt\":\"2026-07-24T04:40:17.344Z\"},\"reassessmentService\":{\"status\":\"ready\",\"checkedAt\":\"2026-07-24T04:40:17.344Z\"},\"patientJourneyService\":{\"status\":\"ready\",\"checkedAt\":\"2026-07-24T04:40:17.344Z\"},\"queueIntelligenceService\":{\"status\":\"ready\",\"checkedAt\":\"2026-07-24T04:40:17.344Z\"},\"surgeCapacityService\":{\"status\":\"ready\",\"checkedAt\":\"2026-07-24T04:40:17.344Z\"},\"boardingService\":{\"status\":\"ready\",\"checkedAt\":\"2026-07-24T04:40:17.344Z\"},\"dischargePredictionService\":{\"status\":\"ready\",\"checkedAt\":\"2026-07-24T04:40:17.344Z\"},\"clinicalProtocolService\":{\"status\":\"ready\",\"protocolCount\":3,\"checkedAt\":\"2026-07-24T04:40:17.344Z\",\"method\":\"checkHealth\"},\"deteriorationPredictionV3Service\":{\"status\":\"ready\",\"modelVersion\":\"deterioration-v3-deterministic\",\"checkedAt\":\"2026-07-24T04:40:17.345Z\",\"method\":\"checkHealth\"},\"copilotService\":{\"status\":\"ready\",\"checkedAt\":\"2026-07-24T04:40:17.345Z\"},\"erPulseHandoverService\":{\"status\":\"ready\",\"checkedAt\":\"2026-07-24T04:40:17.345Z\"},\"aiCallInterrogationService\":{\"status\":\"ready\",\"checkedAt\":\"2026-07-24T04:40:17.345Z\"},\"smartIntakeService\":{\"status\":\"ready\",\"checkedAt\":\"2026-07-24T04:40:17.345Z\"},\"mpiService\":{\"status\":\"ready\",\"checkedAt\":\"2026-07-24T04:40:17.345Z\"},\"ocrService\":{\"status\":\"ready\",\"checkedAt\":\"2026-07-24T04:40:17.345Z\"},\"mohFhirService\":{\"status\":\"not_connected\",\"connector\":\"MOH FHIR\",\"configured\":false,\"baseUrl\":null,\"checkedAt\":\"2026-07-24T04:40:17.345Z\",\"method\":\"checkHealth\"},\"wearableRPMService\":{\"status\":\"not_connected\",\"trackedPatients\":0,\"configured\":false,\"healthkitConfigured\":false,\"checkedAt\":\"2026-07-24T04:40:17.345Z\",\"method\":\"checkHealth\"},\"federatedEMSService\":{\"status\":\"ready\",\"checkedAt\":\"2026-07-24T04:40:17.345Z\"},\"lmecsService\":{\"status\":\"ready\",\"checkedAt\":\"2026-07-24T04:40:17.345Z\"},\"iotDigitalTwinService\":{\"status\":\"ready\",\"trackedEntities\":0,\"mqttConfigured\":false,\"mqttBrokerUrl\":null,\"checkedAt\":\"2026-07-24T04:40:17.345Z\",\"method\":\"checkHealth\"},\"realTimeSimulationService\":{\"status\":\"ready\",\"checkedAt\":\"2026-07-24T04:40:17.345Z\"},\"hybridDigitalTwinService\":{\"status\":\"ready\",\"checkedAt\":\"2026-07-24T04:40:17.345Z\"},\"organizationalDigitalTwinService\":{\"status\":\"ready\",\"checkedAt\":\"2026-07-24T04:40:17.345Z\"},\"aiGovernanceService\":{\"status\":\"ready\",\"checkedAt\":\"2026-07-24T04:40:17.345Z\"},\"incidentReportingService\":{\"status\":\"ready\",\"openIncidents\":0,\"escalationRecipients\":0,\"smsGatewayConfigured\":false,\"checkedAt\":\"2026-07-24T04:40:17.345Z\",\"method\":\"checkHealth\"},\"consentService\":{\"status\":\"ready\",\"consentRecords\":0,\"checkedAt\":\"2026-07-24T04:40:17.345Z\",\"method\":\"checkHealth\"}}},\"critical\":true,\"checkedAt\":\"2026-07-24T04:40:17.345Z\",\"responseTimeMs\":1},\"websocket\":{\"status\":\"healthy\",\"configured\":true,\"details\":{\"servers\":[{\"name\":\"edge-ai-ambulance\",\"path\":\"/ws/edge-ai/ambulance\",\"clients\":0}]},\"critical\":false,\"checkedAt\":\"2026-07-24T04:40:17.345Z\",\"responseTimeMs\":1},\"mqtt\":{\"status\":\"not-configured\",\"configured\":false,\"details\":{\"message\":\"No MQTT broker environment variables are configured.\",\"supportedEnv\":[\"MQTT_BROKER_URL\",\"MQTT_URL\",\"MQTT_SERVER_URL\",\"MQTT_HOST\"]},\"critical\":false,\"checkedAt\":\"2026-07-24T04:40:17.345Z\",\"responseTimeMs\":0},\"mohFhirApi\":{\"status\":\"not-configured\",\"configured\":false,\"details\":{\"label\":\"MoH FHIR\",\"supportedEnv\":[\"MOH_FHIR_BASE_URL\",\"MOH_FHIR_URL\",\"FHIR_BASE_URL\",\"FHIR_API_URL\"]},\"critical\":false,\"checkedAt\":\"2026-07-24T04:40:17.345Z\",\"responseTimeMs\":0},\"wearableApi\":{\"status\":\"not-configured\",\"configured\":false,\"details\":{\"label\":\"Wearable API\",\"supportedEnv\":[\"WEARABLE_API_URL\",\"WEARABLES_API_URL\",\"WEARABLE_RPM_API_URL\",\"WEARABLE_BASE_URL\"]},\"critical\":false,\"checkedAt\":\"2026-07-24T04:40:17.345Z\",\"responseTimeMs\":0}}}",
+      "json": {
+        "status": "degraded",
+        "timestamp": "2026-07-24T04:40:17.345Z",
+        "responseTimeMs": 1,
+        "components": {
+          "database": {
+            "status": "not-configured",
+            "configured": false,
+            "details": {
+              "connector": "mongoose",
+              "readyState": 0,
+              "stateName": "disconnected",
+              "message": "Mongoose is not connected and no MongoDB URI is configured."
+            },
+            "critical": true,
+            "checkedAt": "2026-07-24T04:40:17.345Z",
+            "responseTimeMs": 1
+          },
+          "sqlDatabase": {
+            "status": "healthy",
+            "configured": true,
+            "details": {
+              "connector": "typeorm",
+              "type": "sqlite"
+            },
+            "critical": true,
+            "checkedAt": "2026-07-24T04:40:17.345Z",
+            "responseTimeMs": 1
+          },
+          "services": {
+            "status": "degraded",
+            "configured": true,
+            "details": {
+              "generatedAt": "2026-07-24T04:40:17.345Z",
+              "totals": {
+                "registered": 27,
+                "ready": 27,
+                "failed": 0
+              },
+              "degradedServices": [
+                {
+                  "name": "mohFhirService",
+                  "status": "not_connected"
+                },
+                {
+                  "name": "wearableRPMService",
+                  "status": "not_connected"
+                }
+              ],
+              "services": {
+                "capacityService": {
+                  "status": "ready",
+                  "checkedAt": "2026-07-24T04:40:17.344Z"
+                },
+                "emsService": {
+                  "status": "ready",
+                  "checkedAt": "2026-07-24T04:40:17.344Z"
+                },
+                "reassessmentService": {
+                  "status": "ready",
+                  "checkedAt": "2026-07-24T04:40:17.344Z"
+                },
+                "patientJourneyService": {
+                  "status": "ready",
+                  "checkedAt": "2026-07-24T04:40:17.344Z"
+                },
+                "queueIntelligenceService": {
+                  "status": "ready",
+                  "checkedAt": "2026-07-24T04:40:17.344Z"
+                },
+                "surgeCapacityService": {
+                  "status": "ready",
+                  "checkedAt": "2026-07-24T04:40:17.344Z"
+                },
+                "boardingService": {
+                  "status": "ready",
+                  "checkedAt": "2026-07-24T04:40:17.344Z"
+                },
+                "dischargePredictionService": {
+                  "status": "ready",
+                  "checkedAt": "2026-07-24T04:40:17.344Z"
+                },
+                "clinicalProtocolService": {
+                  "status": "ready",
+                  "protocolCount": 3,
+                  "checkedAt": "2026-07-24T04:40:17.344Z",
+                  "method": "checkHealth"
+                },
+                "deteriorationPredictionV3Service": {
+                  "status": "ready",
+                  "modelVersion": "deterioration-v3-deterministic",
+                  "checkedAt": "2026-07-24T04:40:17.345Z",
+                  "method": "checkHealth"
+                },
+                "copilotService": {
+                  "status": "ready",
+                  "checkedAt": "2026-07-24T04:40:17.345Z"
+                },
+                "erPulseHandoverService": {
+                  "status": "ready",
+                  "checkedAt": "2026-07-24T04:40:17.345Z"
+                },
+                "aiCallInterrogationService": {
+                  "status": "ready",
+                  "checkedAt": "2026-07-24T04:40:17.345Z"
+                },
+                "smartIntakeService": {
+                  "status": "ready",
+                  "checkedAt": "2026-07-24T04:40:17.345Z"
+                },
+                "mpiService": {
+                  "status": "ready",
+                  "checkedAt": "2026-07-24T04:40:17.345Z"
+                },
+                "ocrService": {
+                  "status": "ready",
+                  "checkedAt": "2026-07-24T04:40:17.345Z"
+                },
+                "mohFhirService": {
+                  "status": "not_connected",
+                  "connector": "MOH FHIR",
+                  "configured": false,
+                  "baseUrl": null,
+                  "checkedAt": "2026-07-24T04:40:17.345Z",
+                  "method": "checkHealth"
+                },
+                "wearableRPMService": {
+                  "status": "not_connected",
+                  "trackedPatients": 0,
+                  "configured": false,
+                  "healthkitConfigured": false,
+                  "checkedAt": "2026-07-24T04:40:17.345Z",
+                  "method": "checkHealth"
+                },
+                "federatedEMSService": {
+                  "status": "ready",
+                  "checkedAt": "2026-07-24T04:40:17.345Z"
+                },
+                "lmecsService": {
+                  "status": "ready",
+                  "checkedAt": "2026-07-24T04:40:17.345Z"
+                },
+                "iotDigitalTwinService": {
+                  "status": "ready",
+                  "trackedEntities": 0,
+                  "mqttConfigured": false,
+                  "mqttBrokerUrl": null,
+                  "checkedAt": "2026-07-24T04:40:17.345Z",
+                  "method": "checkHealth"
+                },
+                "realTimeSimulationService": {
+                  "status": "ready",
+                  "checkedAt": "2026-07-24T04:40:17.345Z"
+                },
+                "hybridDigitalTwinService": {
+                  "status": "ready",
+                  "checkedAt": "2026-07-24T04:40:17.345Z"
+                },
+                "organizationalDigitalTwinService": {
+                  "status": "ready",
+                  "checkedAt": "2026-07-24T04:40:17.345Z"
+                },
+                "aiGovernanceService": {
+                  "status": "ready",
+                  "checkedAt": "2026-07-24T04:40:17.345Z"
+                },
+                "incidentReportingService": {
+                  "status": "ready",
+                  "openIncidents": 0,
+                  "escalationRecipients": 0,
+                  "smsGatewayConfigured": false,
+                  "checkedAt": "2026-07-24T04:40:17.345Z",
+                  "method": "checkHealth"
+                },
+                "consentService": {
+                  "status": "ready",
+                  "consentRecords": 0,
+                  "checkedAt": "2026-07-24T04:40:17.345Z",
+                  "method": "checkHealth"
+                }
+              }
+            },
+            "critical": true,
+            "checkedAt": "2026-07-24T04:40:17.345Z",
+            "responseTimeMs": 1
+          },
+          "websocket": {
+            "status": "healthy",
+            "configured": true,
+            "details": {
+              "servers": [
+                {
+                  "name": "edge-ai-ambulance",
+                  "path": "/ws/edge-ai/ambulance",
+                  "clients": 0
+                }
+              ]
+            },
+            "critical": false,
+            "checkedAt": "2026-07-24T04:40:17.345Z",
+            "responseTimeMs": 1
+          },
+          "mqtt": {
+            "status": "not-configured",
+            "configured": false,
+            "details": {
+              "message": "No MQTT broker environment variables are configured.",
+              "supportedEnv": [
+                "MQTT_BROKER_URL",
+                "MQTT_URL",
+                "MQTT_SERVER_URL",
+                "MQTT_HOST"
+              ]
+            },
+            "critical": false,
+            "checkedAt": "2026-07-24T04:40:17.345Z",
+            "responseTimeMs": 0
+          },
+          "mohFhirApi": {
+            "status": "not-configured",
+            "configured": false,
+            "details": {
+              "label": "MoH FHIR",
+              "supportedEnv": [
+                "MOH_FHIR_BASE_URL",
+                "MOH_FHIR_URL",
+                "FHIR_BASE_URL",
+                "FHIR_API_URL"
+              ]
+            },
+            "critical": false,
+            "checkedAt": "2026-07-24T04:40:17.345Z",
+            "responseTimeMs": 0
+          },
+          "wearableApi": {
+            "status": "not-configured",
+            "configured": false,
+            "details": {
+              "label": "Wearable API",
+              "supportedEnv": [
+                "WEARABLE_API_URL",
+                "WEARABLES_API_URL",
+                "WEARABLE_RPM_API_URL",
+                "WEARABLE_BASE_URL"
+              ]
+            },
+            "critical": false,
+            "checkedAt": "2026-07-24T04:40:17.345Z",
+            "responseTimeMs": 0
+          }
+        }
+      },
+      "path": "/health",
+      "method": "GET"
+    },
+    {
+      "label": "Backend GET /api/emergency/patients (unauth probe)",
+      "ok": true,
+      "status": 401,
+      "ms": 2
+    },
+    {
+      "label": "Frontend proxy /health (:5190)",
+      "ok": false,
+      "status": 0,
+      "ms": 2,
+      "body": "",
+      "json": null,
+      "path": "/health",
+      "method": "GET",
+      "error": "connect ECONNREFUSED 127.0.0.1:5190"
+    },
+    {
+      "label": "Frontend / (:5190)",
+      "ok": false,
+      "status": 0,
+      "ms": 1
+    },
+    {
+      "label": "GET /api/emergency/patients (auth)",
+      "ok": true,
+      "status": 200,
+      "ms": 27
+    },
+    {
+      "label": "GET /api/emergency/reception/snapshot (auth)",
+      "ok": true,
+      "status": 200,
+      "ms": 33
+    }
+  ],
+  "journeys": [
+    {
+      "personaId": "walkin-chest-pain-1",
+      "label": "Walk-in chest pain (return visit risk)",
+      "patientId": "perf-walkin-chest-pain-1-mrygc0fj",
+      "totalMs": 1951,
+      "createOk": true,
+      "handoffOk": true,
+      "escalateOk": true,
+      "ocrJobId": "ocr-job-1784868017754-y3ggof",
+      "stepCount": 9,
+      "failedSteps": [],
+      "steps": [
+        {
+          "step": "create_intake",
+          "ok": true,
+          "status": 201,
+          "ms": 212,
+          "error": null
+        },
+        {
+          "step": "ocr_create",
+          "ok": true,
+          "status": 201,
+          "ms": 87,
+          "error": null
+        },
+        {
+          "step": "ocr_review_firstName",
+          "ok": true,
+          "status": 201,
+          "ms": 33,
+          "error": null
+        },
+        {
+          "step": "ocr_review_lastName",
+          "ok": true,
+          "status": 201,
+          "ms": 32,
+          "error": null
+        },
+        {
+          "step": "ocr_review_dateOfBirth",
+          "ok": true,
+          "status": 201,
+          "ms": 26,
+          "error": null
+        },
+        {
+          "step": "ocr_review_sex",
+          "ok": true,
+          "status": 201,
+          "ms": 26,
+          "error": null
+        },
+        {
+          "step": "ocr_apply",
+          "ok": true,
+          "status": 201,
+          "ms": 144,
+          "error": null
+        },
+        {
+          "step": "reception_handoff",
+          "ok": true,
+          "status": 201,
+          "ms": 916,
+          "error": null
+        },
+        {
+          "step": "reception_escalation",
+          "ok": true,
+          "status": 201,
+          "ms": 472,
+          "error": null
+        }
+      ],
+      "pass": true
+    },
+    {
+      "personaId": "walkin-pediatric-fever-2",
+      "label": "Parent with febrile child",
+      "patientId": "perf-walkin-pediatric-fever-2-mrygc1xr",
+      "totalMs": 1069,
+      "createOk": true,
+      "handoffOk": true,
+      "escalateOk": null,
+      "ocrJobId": "ocr-job-1784868019828-uw84q5",
+      "stepCount": 7,
+      "failedSteps": [],
+      "steps": [
+        {
+          "step": "create_intake",
+          "ok": true,
+          "status": 201,
+          "ms": 315,
+          "error": null
+        },
+        {
+          "step": "ocr_create",
+          "ok": true,
+          "status": 201,
+          "ms": 106,
+          "error": null
+        },
+        {
+          "step": "ocr_review_firstName",
+          "ok": true,
+          "status": 201,
+          "ms": 34,
+          "error": null
+        },
+        {
+          "step": "ocr_review_lastName",
+          "ok": true,
+          "status": 201,
+          "ms": 21,
+          "error": null
+        },
+        {
+          "step": "ocr_review_dateOfBirth",
+          "ok": true,
+          "status": 201,
+          "ms": 23,
+          "error": null
+        },
+        {
+          "step": "ocr_apply",
+          "ok": true,
+          "status": 201,
+          "ms": 146,
+          "error": null
+        },
+        {
+          "step": "reception_handoff",
+          "ok": true,
+          "status": 201,
+          "ms": 423,
+          "error": null
+        }
+      ],
+      "pass": true
+    },
+    {
+      "personaId": "walkin-spanish-sob-3",
+      "label": "Shortness of breath — Spanish speaker",
+      "patientId": "perf-walkin-spanish-sob-3-mrygc2rg",
+      "totalMs": 1650,
+      "createOk": true,
+      "handoffOk": true,
+      "escalateOk": null,
+      "ocrJobId": "ocr-job-1784868021505-zhegy2",
+      "stepCount": 5,
+      "failedSteps": [],
+      "steps": [
+        {
+          "step": "create_intake",
+          "ok": true,
+          "status": 201,
+          "ms": 223,
+          "error": null
+        },
+        {
+          "step": "ocr_create",
+          "ok": true,
+          "status": 201,
+          "ms": 807,
+          "error": null
+        },
+        {
+          "step": "ocr_review_dateOfBirth",
+          "ok": true,
+          "status": 201,
+          "ms": 45,
+          "error": null
+        },
+        {
+          "step": "ocr_apply",
+          "ok": true,
+          "status": 201,
+          "ms": 137,
+          "error": null
+        },
+        {
+          "step": "reception_handoff",
+          "ok": true,
+          "status": 201,
+          "ms": 437,
+          "error": null
+        }
+      ],
+      "pass": true
+    },
+    {
+      "personaId": "unknown-collapse-4",
+      "label": "Unknown / unresponsive at entrance",
+      "patientId": "perf-unknown-collapse-4-mrygc41a",
+      "totalMs": 2060,
+      "createOk": true,
+      "handoffOk": true,
+      "escalateOk": true,
+      "ocrJobId": null,
+      "stepCount": 3,
+      "failedSteps": [],
+      "steps": [
+        {
+          "step": "create_intake",
+          "ok": true,
+          "status": 201,
+          "ms": 229,
+          "error": null
+        },
+        {
+          "step": "reception_handoff",
+          "ok": true,
+          "status": 201,
+          "ms": 1263,
+          "error": null
+        },
+        {
+          "step": "reception_escalation",
+          "ok": true,
+          "status": 201,
+          "ms": 568,
+          "error": null
+        }
+      ],
+      "pass": true
+    },
+    {
+      "personaId": "walkin-ankle-5",
+      "label": "Minor ankle injury",
+      "patientId": "perf-walkin-ankle-5-mrygc5mi",
+      "totalMs": 1120,
+      "createOk": true,
+      "handoffOk": true,
+      "escalateOk": null,
+      "ocrJobId": "ocr-job-1784868024570-tg3mqh",
+      "stepCount": 8,
+      "failedSteps": [],
+      "steps": [
+        {
+          "step": "create_intake",
+          "ok": true,
+          "status": 201,
+          "ms": 284,
+          "error": null
+        },
+        {
+          "step": "ocr_create",
+          "ok": true,
+          "status": 201,
+          "ms": 100,
+          "error": null
+        },
+        {
+          "step": "ocr_review_firstName",
+          "ok": true,
+          "status": 201,
+          "ms": 58,
+          "error": null
+        },
+        {
+          "step": "ocr_review_lastName",
+          "ok": true,
+          "status": 201,
+          "ms": 37,
+          "error": null
+        },
+        {
+          "step": "ocr_review_healthCardNumber",
+          "ok": true,
+          "status": 201,
+          "ms": 22,
+          "error": null
+        },
+        {
+          "step": "ocr_review_dateOfBirth",
+          "ok": true,
+          "status": 201,
+          "ms": 27,
+          "error": null
+        },
+        {
+          "step": "ocr_apply",
+          "ok": true,
+          "status": 201,
+          "ms": 145,
+          "error": null
+        },
+        {
+          "step": "reception_handoff",
+          "ok": true,
+          "status": 201,
+          "ms": 444,
+          "error": null
+        }
+      ],
+      "pass": true
+    },
+    {
+      "personaId": "ems-style-transfer-6",
+      "label": "Transfer-style arrival (staff-created)",
+      "patientId": "perf-ems-style-transfer-6-mrygc6hn",
+      "totalMs": 2102,
+      "createOk": true,
+      "handoffOk": true,
+      "escalateOk": true,
+      "ocrJobId": "ocr-job-1784868026430-40o020",
+      "stepCount": 8,
+      "failedSteps": [],
+      "steps": [
+        {
+          "step": "create_intake",
+          "ok": true,
+          "status": 201,
+          "ms": 504,
+          "error": null
+        },
+        {
+          "step": "ocr_create",
+          "ok": true,
+          "status": 201,
+          "ms": 621,
+          "error": null
+        },
+        {
+          "step": "ocr_review_firstName",
+          "ok": true,
+          "status": 201,
+          "ms": 36,
+          "error": null
+        },
+        {
+          "step": "ocr_review_lastName",
+          "ok": true,
+          "status": 201,
+          "ms": 23,
+          "error": null
+        },
+        {
+          "step": "ocr_review_dateOfBirth",
+          "ok": true,
+          "status": 201,
+          "ms": 23,
+          "error": null
+        },
+        {
+          "step": "ocr_apply",
+          "ok": true,
+          "status": 201,
+          "ms": 159,
+          "error": null
+        },
+        {
+          "step": "reception_handoff",
+          "ok": true,
+          "status": 201,
+          "ms": 496,
+          "error": null
+        },
+        {
+          "step": "reception_escalation",
+          "ok": true,
+          "status": 201,
+          "ms": 239,
+          "error": null
+        }
+      ],
+      "pass": true
+    }
+  ],
+  "burst": {
+    "parallel": 3,
+    "wallClockMs": 6629,
+    "passRate": 1,
+    "results": [
+      {
+        "id": "burst-walkin-chest-pain-1",
+        "pass": true,
+        "totalMs": 6629
+      },
+      {
+        "id": "burst-walkin-pediatric-fever-2",
+        "pass": true,
+        "totalMs": 4860
+      },
+      {
+        "id": "burst-walkin-spanish-sob-3",
+        "pass": true,
+        "totalMs": 2971
+      }
+    ]
+  },
+  "summary": {
+    "passRate": 1,
+    "passed": 6,
+    "total": 6,
+    "avgTotalMs": 1659,
+    "p50Ms": 1650,
+    "p95Ms": 2102,
+    "maxMs": 2102
+  },
+  "stepStats": {
+    "create_intake": {
+      "failures": 0,
+      "avgMs": 295
+    },
+    "ocr_create": {
+      "failures": 0,
+      "avgMs": 344
+    },
+    "ocr_review_firstName": {
+      "failures": 0,
+      "avgMs": 40
+    },
+    "ocr_review_lastName": {
+      "failures": 0,
+      "avgMs": 28
+    },
+    "ocr_review_dateOfBirth": {
+      "failures": 0,
+      "avgMs": 29
+    },
+    "ocr_review_sex": {
+      "failures": 0,
+      "avgMs": 26
+    },
+    "ocr_apply": {
+      "failures": 0,
+      "avgMs": 146
+    },
+    "reception_handoff": {
+      "failures": 0,
+      "avgMs": 663
+    },
+    "reception_escalation": {
+      "failures": 0,
+      "avgMs": 426
+    },
+    "ocr_review_healthCardNumber": {
+      "failures": 0,
+      "avgMs": 22
+    }
+  },
+  "failures": [],
+  "grade": {
+    "grade": "C",
+    "label": "Fair — investigate slow/failing steps"
+  },
+  "recommendation": "Platform responds but latency or intermittent failures need attention on create/handoff/OCR/auth. Re-run after checking Nest logs and JWT permissions (READ_PHI/WRITE_PHI)."
+}

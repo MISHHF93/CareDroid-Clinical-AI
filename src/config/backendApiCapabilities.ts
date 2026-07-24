@@ -68,7 +68,8 @@ export const BACKEND_API_CAPABILITY_STATUS = Object.freeze({
   /** Mounted CareDroid module envelopes under /api/emergency/*; currently fixture/demo backed. */
   emergencyCentralNode: BACKEND_CAPABILITY_STATUS.DEMO,
   emergencyWhiteboard: BACKEND_CAPABILITY_STATUS.DEMO,
-  emergencyPatients: BACKEND_CAPABILITY_STATUS.DEMO,
+  /** Session-scoped board mutators (create/list share EmergencyPatientService in-memory + optional DB write-through). */
+  emergencyPatients: BACKEND_CAPABILITY_STATUS.REAL,
   emergencyPatientJourney: BACKEND_CAPABILITY_STATUS.DEMO,
   emergencyQueues: BACKEND_CAPABILITY_STATUS.DEMO,
   emergencyCapacity: BACKEND_CAPABILITY_STATUS.DEMO,
@@ -82,8 +83,11 @@ export const BACKEND_API_CAPABILITY_STATUS = Object.freeze({
   emergencyPulseView: BACKEND_CAPABILITY_STATUS.DEMO,
   emergencyShiftView: BACKEND_CAPABILITY_STATUS.DEMO,
   emergencyEdReadinessView: BACKEND_CAPABILITY_STATUS.DEMO,
-  emergencyReceptionSnapshot: BACKEND_CAPABILITY_STATUS.DEMO,
+  /** Snapshot is built from live listPatients + queues after create/handoff. */
+  emergencyReceptionSnapshot: BACKEND_CAPABILITY_STATUS.REAL,
   emergencyReceptionHandoff: BACKEND_CAPABILITY_STATUS.REAL,
+  /** POST /api/emergency/reception/escalation — durable alert + realtime fan-out */
+  emergencyReceptionEscalation: BACKEND_CAPABILITY_STATUS.REAL,
   emergencyTriageAssist: BACKEND_CAPABILITY_STATUS.REAL,
   emergencyOperationalIntelligence: BACKEND_CAPABILITY_STATUS.DEMO,
   emergencyPatientOrchestration: BACKEND_CAPABILITY_STATUS.REAL,
@@ -97,7 +101,8 @@ export const BACKEND_API_CAPABILITY_STATUS = Object.freeze({
   emergencyGovernance: BACKEND_CAPABILITY_STATUS.REAL,
   emergencyReassessment: BACKEND_CAPABILITY_STATUS.DEMO,
   emergencySurge: BACKEND_CAPABILITY_STATUS.DISABLED,
-  emergencySmartIntake: BACKEND_CAPABILITY_STATUS.DEMO,
+  /** POST /api/emergency/intake createFromIntake is a real board mutator. */
+  emergencySmartIntake: BACKEND_CAPABILITY_STATUS.REAL,
   emergencySmartIntakeIdentitySession: BACKEND_CAPABILITY_STATUS.DISABLED,
   emergencyOcrIntake: BACKEND_CAPABILITY_STATUS.REAL,
   emergencyCopilotRuntime: BACKEND_CAPABILITY_STATUS.DEMO,

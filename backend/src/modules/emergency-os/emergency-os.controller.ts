@@ -146,11 +146,13 @@ export class EmergencyOsController {
     );
   }
 
+  @RequirePermission(Permission.READ_PHI)
   @Get('patients')
   getPatients() {
     return this.patientService.getPatientEnvelope();
   }
 
+  @RequirePermission(Permission.WRITE_PHI)
   @Post('patients')
   createPatient(@Body() dto: Partial<EmergencyPatient>) {
     return this.smartIntakeService.createFromIntake(dto);
@@ -239,11 +241,13 @@ export class EmergencyOsController {
     });
   }
 
+  @RequirePermission(Permission.WRITE_PHI)
   @Post('intake/ocr-jobs')
   createOcrJob(@Body() body: CreateOcrJobInput) {
     return this.ocrIntakeService.createJob(body);
   }
 
+  @RequirePermission(Permission.READ_PHI)
   @Get('intake/ocr-jobs')
   listOcrJobs(
     @Query('patientId') patientId?: string,
@@ -252,11 +256,13 @@ export class EmergencyOsController {
     return { jobs: this.ocrIntakeService.listJobs({ patientId, intakeSessionId }) };
   }
 
+  @RequirePermission(Permission.READ_PHI)
   @Get('intake/ocr-health')
   getOcrIntakeHealth() {
     return this.ocrIntakeService.getHealth();
   }
 
+  @RequirePermission(Permission.READ_PHI)
   @Get('intake/ocr-jobs/:jobId')
   async getOcrJob(
     @Param('jobId') jobId: string,
@@ -275,6 +281,7 @@ export class EmergencyOsController {
     return job;
   }
 
+  @RequirePermission(Permission.WRITE_PHI)
   @Post('intake/ocr-jobs/:jobId/fields/:field/review')
   reviewOcrJobField(
     @Param('jobId') jobId: string,
@@ -284,9 +291,15 @@ export class EmergencyOsController {
     return this.ocrIntakeService.reviewField(jobId, field, body);
   }
 
+  @RequirePermission(Permission.WRITE_PHI)
   @Post('intake/ocr-jobs/:jobId/apply')
-  applyOcrJobToIntake(@Param('jobId') jobId: string, @Body() body: { actor?: string }) {
-    return this.ocrIntakeService.applyToIntake(jobId, body?.actor || 'unknown');
+  applyOcrJobToIntake(
+    @Param('jobId') jobId: string,
+    @Body() body: { actor?: string; autoAcceptHighConfidence?: boolean },
+  ) {
+    return this.ocrIntakeService.applyToIntake(jobId, body?.actor || 'unknown', {
+      autoAcceptHighConfidence: body?.autoAcceptHighConfidence,
+    });
   }
 
   @Get('patients/:patientId/orchestration')
@@ -359,6 +372,24 @@ export class EmergencyOsController {
   @Get('reception/snapshot')
   getReceptionSnapshot() {
     return this.receptionWorkspaceService.getSnapshot();
+  }
+
+  @RequirePermission(Permission.WRITE_PHI)
+  @Post('reception/escalation')
+  postReceptionEscalation(
+    @Body()
+    body: {
+      reasonId?: string;
+      reasonLabel?: string;
+      patientId?: string;
+      detail?: string;
+      actorName?: string;
+      actorStaffId?: string;
+      severity?: 'Info' | 'Warning' | 'Critical';
+      notifyTargets?: Array<'triage' | 'charge'>;
+    },
+  ) {
+    return this.receptionWorkspaceService.raiseEscalation(body || {});
   }
 
   @RequirePermission(Permission.WRITE_PHI)
@@ -438,16 +469,19 @@ export class EmergencyOsController {
     };
   }
 
+  @RequirePermission(Permission.READ_PHI)
   @Get('intake')
   getIntake() {
     return this.smartIntakeService.getSmartIntake();
   }
 
+  @RequirePermission(Permission.WRITE_PHI)
   @Post('intake')
   createIntakePatient(@Body() dto: Partial<EmergencyPatient>) {
     return this.smartIntakeService.createFromIntake(dto);
   }
 
+  @RequirePermission(Permission.WRITE_PHI)
   @Post('intake/vertical-slice')
   createSmartIntakeVerticalSlice(
     @Body()

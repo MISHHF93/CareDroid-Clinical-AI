@@ -23,7 +23,7 @@ describe('aiCommandRegistry — closed set', () => {
     expect(new Set(ids).size).toBe(ids.length);
     for (const command of AI_PALETTE_COMMANDS) {
       expect(command.query.trim().length).toBeGreaterThan(10);
-      expect(command.requiredPermission).toBe('use_ai_chat');
+      expect(['use_ai_chat', 'view_operations']).toContain(command.requiredPermission);
     }
   });
 

@@ -1,0 +1,159 @@
+.reception-patient-lookup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  margin-bottom: var(--cdl-space-3, 0.75rem);
+  border-radius: var(--cdl-radius-md, 0.5rem);
+  border: 1px solid var(--cdl-border-subtle, rgba(15, 23, 42, 0.1));
+  background: var(--cdl-surface-card, #fff);
+}
+
+.reception-patient-lookup__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.35rem 0.75rem;
+}
+
+.reception-patient-lookup__header h2 {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  font-size: var(--cdl-text-sm, 0.875rem);
+  font-weight: 650;
+  color: var(--cdl-text-primary, #0f172a);
+}
+
+.reception-patient-lookup__hint {
+  font-size: var(--cdl-text-xs, 0.75rem);
+  color: var(--cdl-text-tertiary, #94a3b8);
+}
+
+.reception-patient-lookup__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.reception-patient-lookup__field {
+  flex: 1 1 14rem;
+  margin: 0;
+}
+
+.reception-patient-lookup__field input {
+  width: 100%;
+  min-height: 2.5rem;
+  padding: 0.45rem 0.75rem;
+  border-radius: var(--cdl-radius-sm, 0.375rem);
+  border: 1px solid var(--cdl-border-default, #cbd5e1);
+  background: var(--cdl-surface-input, #fff);
+  color: var(--cdl-text-primary, #0f172a);
+  font-size: var(--cdl-text-sm, 0.875rem);
+}
+
+.reception-patient-lookup__field input:focus {
+  outline: 2px solid var(--cdl-brand-500, #0ea5e9);
+  outline-offset: 1px;
+}
+
+.reception-patient-lookup__new {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2.5rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--cdl-radius-sm, 0.375rem);
+  border: 1px solid var(--cdl-border-default, #cbd5e1);
+  background: var(--cdl-surface-muted, #f8fafc);
+  color: var(--cdl-text-primary, #0f172a);
+  font-size: var(--cdl-text-sm, 0.875rem);
+  font-weight: 550;
+  cursor: pointer;
+}
+
+.reception-patient-lookup__new:hover:not(:disabled) {
+  border-color: var(--cdl-brand-500, #0ea5e9);
+}
+
+.reception-patient-lookup__status {
+  margin: 0;
+  font-size: var(--cdl-text-xs, 0.75rem);
+  color: var(--cdl-text-secondary, #64748b);
+}
+
+.reception-patient-lookup__results {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  max-height: 14rem;
+  overflow: auto;
+}
+
+.reception-patient-lookup__result {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.55rem;
+  align-items: center;
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 0.6rem;
+  border-radius: var(--cdl-radius-sm, 0.375rem);
+  border: 1px solid transparent;
+  background: var(--cdl-surface-muted, #f8fafc);
+  cursor: pointer;
+  color: inherit;
+}
+
+.reception-patient-lookup__result:hover {
+  border-color: var(--cdl-brand-400, #38bdf8);
+}
+
+.reception-patient-lookup__result-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.reception-patient-lookup__result-main strong {
+  font-size: var(--cdl-text-sm, 0.875rem);
+}
+
+.reception-patient-lookup__result-main small {
+  font-size: var(--cdl-text-xs, 0.75rem);
+  color: var(--cdl-text-secondary, #64748b);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reception-patient-lookup__match {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--cdl-text-tertiary, #94a3b8);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+html[data-theme='dark'] .reception-patient-lookup,
+html[data-theme='dark'] .reception-patient-lookup__result {
+  background: rgba(15, 23, 42, 0.55);
+}

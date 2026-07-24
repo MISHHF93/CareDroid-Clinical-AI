@@ -81,19 +81,52 @@ describe('OcrIntakeService', () => {
     expect(reviewed.auditLog.some((entry) => entry.action === 'field_reviewed')).toBe(true);
   });
 
-  it('applies a completed job to intake and records the audit event', async () => {
+  it('applies a completed job to intake only after field review and returns demographics', async () => {
     const service = new OcrIntakeService(buildDocumentArtifactService(['patient-1']));
     const job = await service.createJob({
       filename: 'health-card.jpg',
-      rawText: 'First name: Jordan\nLast name: Rivera',
+      rawText: 'First name: Jordan\nLast name: Rivera\nDate of birth: 1990-04-12',
       patientId: 'patient-1',
       actor: 'staff-1',
     });
 
+    service.reviewField(job.id, 'firstName', { decision: 'accepted', actor: 'staff-1' });
+    service.reviewField(job.id, 'lastName', { decision: 'accepted', actor: 'staff-1' });
+
     const applied = await service.applyToIntake(job.id, 'staff-1');
     expect(applied.appliedToIntake).toBe(true);
     expect(applied.appliedAt).toBeTruthy();
+    expect(applied.appliedDemographics?.firstName).toBe('Jordan');
+    expect(applied.appliedDemographics?.lastName).toBe('Rivera');
     expect(applied.auditLog.some((entry) => entry.action === 'applied_to_intake')).toBe(true);
+  });
+
+  it('rejects apply when no fields have been accepted or edited', async () => {
+    const service = new OcrIntakeService(buildDocumentArtifactService());
+    const job = await service.createJob({
+      filename: 'health-card.jpg',
+      rawText: 'First name: Jordan\nLast name: Rivera',
+      actor: 'staff-1',
+    });
+
+    await expect(service.applyToIntake(job.id, 'staff-1')).rejects.toThrow(/accepted or edited/i);
+  });
+
+  it('auto-accepts high-confidence fields when requested and applies demographics', async () => {
+    const service = new OcrIntakeService(buildDocumentArtifactService());
+    const job = await service.createJob({
+      filename: 'health-card.jpg',
+      rawText: 'First name: Jordan\nLast name: Rivera\nDate of birth: 1990-04-12',
+      actor: 'staff-1',
+    });
+    // Force high confidence for auto-accept path
+    for (const field of job.extractedFields) {
+      field.confidence = 0.95;
+    }
+
+    const applied = await service.applyToIntake(job.id, 'staff-1', { autoAcceptHighConfidence: true });
+    expect(applied.appliedToIntake).toBe(true);
+    expect(applied.appliedDemographics?.firstName).toBe('Jordan');
   });
 
   it('rejects applying a job that has not completed', async () => {

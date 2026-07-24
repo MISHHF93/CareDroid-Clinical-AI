@@ -62,7 +62,8 @@ export default function ReceptionOperationalRail({
   );
 
   return (
-    <aside className="reception-operational-rail" aria-label="Reception operations">
+    <aside
+      data-testid="reception-operational-rail" className="reception-operational-rail" aria-label="Reception operations">
       <ReceptionAttentionStrip snapshot={attention} onSelectRow={onAttentionSelect} />
 
       <section className="reception-command-panel reception-operational-rail__panel" aria-labelledby="queue-title">

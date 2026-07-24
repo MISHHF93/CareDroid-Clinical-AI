@@ -185,7 +185,11 @@ export function buildReceptionEscalationAlert(
       actorStaffId: input.actorStaffId || null,
       actorName,
       detail: detail || null,
-      suppressToast: true,
+      // Critical escalations surface as toasts for triage/charge recipients on shared boards.
+      suppressToast: reason.severity !== 'Critical',
+      notifyRoles: reason.notifyTargets
+        .map((target) => (target === 'triage' ? 'triage_nurse' : 'charge_nurse'))
+        .join(','),
     },
   };
 }
@@ -371,11 +375,35 @@ export function buildReceptionEscalationNotificationAlerts(alerts: Alert[] = [])
 
 export function broadcastReceptionEscalation(alert: Alert): void {
   if (typeof document === 'undefined') return;
+  const targets = escalationAlertTargets(alert);
   document.dispatchEvent(
     new CustomEvent('reception-escalation-raised', {
-      detail: { alert },
+      detail: {
+        alert,
+        notifyTargets: targets,
+        patientId: alert.patientId,
+        severity: alert.severity,
+        reasonId: alert.metadata?.receptionEscalationReason,
+      },
     }),
   );
+  // Cross-tab same-origin fan-out for multi-screen ED stations sharing a browser profile.
+  try {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(
+        'caredroid:reception-escalation-ping',
+        JSON.stringify({
+          alertId: alert.id,
+          patientId: alert.patientId,
+          severity: alert.severity,
+          targets,
+          at: Date.now(),
+        }),
+      );
+    }
+  } catch {
+    // private mode / quota — non-fatal
+  }
 }
 
 export function isClinicalEscalationRecipientRole(roleId: string | null | undefined): boolean {

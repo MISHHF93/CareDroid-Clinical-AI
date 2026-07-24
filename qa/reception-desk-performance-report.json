@@ -1,0 +1,113 @@
+{
+  "generatedAt": "2026-07-24T04:40:17.221Z",
+  "runner": "scripts/reception-desk-performance.mjs",
+  "grade": "A",
+  "offline": {
+    "iterations": 2000,
+    "nextBestAction": {
+      "n": 2000,
+      "minMs": 0.0001,
+      "maxMs": 0.0226,
+      "meanMs": 0.0002,
+      "p50Ms": 0.0002,
+      "p95Ms": 0.0004,
+      "p99Ms": 0.0015
+    },
+    "promptNavigationIntent": {
+      "n": 2000,
+      "minMs": 0.0004,
+      "maxMs": 1.1553,
+      "meanMs": 0.0088,
+      "p50Ms": 0.0069,
+      "p95Ms": 0.015,
+      "p99Ms": 0.0335
+    },
+    "applyNavigationProposal": {
+      "n": 500,
+      "minMs": 0.0001,
+      "maxMs": 0.1752,
+      "meanMs": 0.0007,
+      "p50Ms": 0.0002,
+      "p95Ms": 0.0003,
+      "p99Ms": 0.0015
+    },
+    "budgets": {
+      "nextBestActionP95Ms": 1,
+      "promptIntentP95Ms": 2,
+      "applyNavP95Ms": 1
+    },
+    "pass": true
+  },
+  "live": {
+    "available": true,
+    "patients": [
+      {
+        "index": 0,
+        "status": 201,
+        "ms": 160.2,
+        "ok": true
+      },
+      {
+        "index": 1,
+        "status": 201,
+        "ms": 216,
+        "ok": true
+      },
+      {
+        "index": 2,
+        "status": 201,
+        "ms": 449.8,
+        "ok": true
+      },
+      {
+        "index": 3,
+        "status": 201,
+        "ms": 190.3,
+        "ok": true
+      },
+      {
+        "index": 4,
+        "status": 201,
+        "ms": 794.3,
+        "ok": true
+      },
+      {
+        "index": 5,
+        "status": 201,
+        "ms": 514.8,
+        "ok": true
+      },
+      {
+        "index": 6,
+        "status": 201,
+        "ms": 202.4,
+        "ok": true
+      },
+      {
+        "index": 7,
+        "status": 201,
+        "ms": 471,
+        "ok": true
+      }
+    ],
+    "summary": {
+      "attempted": 8,
+      "succeeded": 8,
+      "create": {
+        "n": 8,
+        "minMs": 160.2,
+        "maxMs": 794.3,
+        "meanMs": 374.85,
+        "p50Ms": 216,
+        "p95Ms": 794.3,
+        "p99Ms": 794.3
+      }
+    },
+    "note": null,
+    "healthMs": 9.7,
+    "authMs": 0.1,
+    "auth": "bearer",
+    "listMs": 84.9,
+    "listStatus": 200
+  }
+}

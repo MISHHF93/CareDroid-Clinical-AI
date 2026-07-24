@@ -5,6 +5,7 @@
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   isTerminalStreamState,
   streamStateLabel,
@@ -16,7 +17,9 @@ import {
 } from '../../contracts/interactiveAi';
 import {
   approveProposal,
+  createActionProposal,
   executeProposal,
+  getActionProposal,
   rejectProposal,
   rollbackProposal,
 } from '../../services/interactiveAi/actionProposalService';
@@ -36,11 +39,17 @@ import {
   getAiPaletteCommand,
 } from '../../services/interactiveAi/aiCommandRegistry';
 import { getSuggestedPrompts } from '../../services/interactiveAi/suggestedPrompts';
+import {
+  applyNavigationProposal,
+  isNavigationProposalTool,
+  looksLikeNavigationPrompt,
+  navigationIntentToProposalInput,
+  resolvePromptNavigationIntent,
+} from '../../services/interactiveAi/promptNavigationIntent';
 import { resolveUnifiedChannelFromRole } from '../../services/unifiedAiEnvelope';
 import { AccountableRecommendationCard } from '../ai/AccountableRecommendationCard';
 import type { AccountableRecommendation } from '../../contracts/accountableAi';
 import { InteractionInbox } from './InteractionInbox';
-import { getActionProposal } from '../../services/interactiveAi/actionProposalService';
 import './interactiveAi.css';
 
 export type InteractiveAIWorkspaceProps = {
@@ -69,6 +78,8 @@ export function InteractiveAIWorkspace({
   permissions = ['use_ai_chat', 'view_phi', 'view_operations'],
 }: InteractiveAIWorkspaceProps) {
   const channel = channelProp || resolveUnifiedChannelFromRole(role, 'api');
+  const navigate = useNavigate();
+  const location = useLocation();
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState<StreamProgressEvent | null>(null);
@@ -85,6 +96,7 @@ export function InteractiveAIWorkspace({
   const liveRegionRef = useRef<HTMLDivElement | null>(null);
 
   const heading = title || (channel === 'reception' ? 'Reception Copilot' : channel === 'ems' ? 'EMS Assist' : 'CareDroid Assist');
+  const isNavProposal = proposal ? isNavigationProposalTool(proposal.toolName) : false;
 
   const refreshCards = useCallback(() => {
     setCards(listWorkflowAiCards({ channel, patientId }));
@@ -151,6 +163,39 @@ export function InteractiveAIWorkspace({
       announce('Starting assist request');
 
       try {
+        // Closed-catalog navigation/open before free-text assist.
+        // Never lets the model invent routes — only known intents open pages/tools.
+        if (looksLikeNavigationPrompt(clean)) {
+          const intent = resolvePromptNavigationIntent(clean, { role, permissions });
+          if (intent) {
+            const requestId = `nav-${Date.now().toString(36)}`;
+            const created = createActionProposal(
+              navigationIntentToProposalInput(intent, {
+                originatingRequestId: requestId,
+                correlationId: requestId,
+                patientId,
+                userId,
+                role,
+              }),
+            );
+            setProposal(created);
+            setContent(
+              `I can open ${intent.label} for you. Review the action card, then confirm to open it in CareDroid.`,
+            );
+            setSuggestions(
+              getSuggestedPrompts({
+                channel,
+                role,
+                pageId,
+                hasPatient: Boolean(patientId),
+              }),
+            );
+            setInboxTick((n) => n + 1);
+            announce(`Ready to open: ${intent.label}`);
+            return;
+          }
+        }
+
         const result = await runInteractiveAssist({
           query: clean,
           role,
@@ -246,16 +291,41 @@ export function InteractiveAIWorkspace({
   const onApproveProposal = async () => {
     if (!proposal) return;
     try {
-      approveProposal(proposal.proposalId, userId);
-      const executed = await executeProposal(proposal.proposalId, async (p) => ({
-        ok: true,
-        toolName: p.toolName,
-        draftSaved: true,
-        note: 'Draft stored for review — no chart write performed.',
-      }));
+      // Navigation proposals may execute from proposed when requiresApproval is false.
+      if (proposal.requiresApproval || proposal.state === 'proposed' || proposal.state === 'reviewing') {
+        if (proposal.state === 'proposed' || proposal.state === 'reviewing') {
+          approveProposal(proposal.proposalId, userId);
+        }
+      }
+      const executed = await executeProposal(proposal.proposalId, async (p) => {
+        if (isNavigationProposalTool(p.toolName)) {
+          const result = applyNavigationProposal(p, {
+            navigate: (path) => navigate(path),
+            currentPath: location.pathname + location.search,
+          });
+          const opened =
+            typeof result.opened === 'string' ? result.opened : p.previewSummary || p.toolName;
+          announce(`Opened ${opened}`);
+          return result;
+        }
+        return {
+          ok: true,
+          toolName: p.toolName,
+          draftSaved: true,
+          note: 'Draft stored for review — no chart write performed.',
+        };
+      });
       setProposal(executed);
       setInboxTick((n) => n + 1);
-      announce(`Proposal ${executed.state}`);
+      if (!isNavigationProposalTool(executed.toolName)) {
+        announce(`Proposal ${executed.state}`);
+      } else if (executed.state === 'completed') {
+        const label =
+          typeof executed.validatedArguments?.label === 'string'
+            ? executed.validatedArguments.label
+            : executed.previewSummary;
+        setContent((prev) => (prev ? `${prev}\n\nOpened: ${label}` : `Opened: ${label}`));
+      }
     } catch (error) {
       announce(error instanceof Error ? error.message : 'Proposal failed');
     }
@@ -462,13 +532,18 @@ export function InteractiveAIWorkspace({
               ))}
             </ul>
             <div className="cd-iaw-proposal__actions">
-              {(proposal.state === 'proposed' || proposal.state === 'reviewing') && (
+              {(proposal.state === 'proposed' || proposal.state === 'reviewing' || proposal.state === 'approved') && (
                 <>
-                  <button type="button" className="cd-iaw-approve" onClick={onApproveProposal}>
-                    Approve & execute draft
+                  <button
+                    type="button"
+                    className="cd-iaw-approve"
+                    data-testid="action-proposal-approve"
+                    onClick={onApproveProposal}
+                  >
+                    {isNavProposal ? 'Open' : 'Approve & execute draft'}
                   </button>
                   <button type="button" className="cd-iaw-reject" onClick={onRejectProposal}>
-                    Reject
+                    Cancel
                   </button>
                 </>
               )}

@@ -1,0 +1,136 @@
+.reception-job-profile-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 1rem 1.1rem;
+  border-radius: var(--cdl-radius-md, 0.5rem);
+  border: 1px solid var(--cdl-border-subtle, rgba(15, 23, 42, 0.1));
+  background: var(--cdl-surface-muted, #f8fafc);
+  margin-top: 1rem;
+}
+
+.reception-job-profile-card__header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.reception-job-profile-card__eyebrow {
+  margin: 0;
+  font-size: 0.7rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--cdl-text-secondary, #64748b);
+}
+
+.reception-job-profile-card__title {
+  margin: 0.2rem 0 0;
+  font-size: 1.05rem;
+  color: var(--cdl-text-primary, #0f172a);
+}
+
+.reception-job-profile-card__description {
+  margin: 0.35rem 0 0;
+  font-size: var(--cdl-text-sm, 0.875rem);
+  color: var(--cdl-text-secondary, #64748b);
+  max-width: 40rem;
+}
+
+.reception-job-profile-card__cta {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.25rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: var(--cdl-radius-sm, 0.375rem);
+  background: var(--cdl-brand-600, #0284c7);
+  color: #fff;
+  font-size: var(--cdl-text-sm, 0.875rem);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.reception-job-profile-card__cta:hover {
+  filter: brightness(1.05);
+}
+
+.reception-job-profile-card__guardrail {
+  padding: 0.55rem 0.7rem;
+  border-radius: var(--cdl-radius-sm, 0.375rem);
+  border-left: 3px solid var(--cdl-brand-500, #0ea5e9);
+  background: var(--cdl-surface-card, #fff);
+  font-size: var(--cdl-text-sm, 0.875rem);
+  color: var(--cdl-text-primary, #0f172a);
+}
+
+.reception-job-profile-card__skills h4,
+.reception-job-profile-card__shortcuts h4 {
+  margin: 0 0 0.4rem;
+  font-size: var(--cdl-text-sm, 0.875rem);
+}
+
+.reception-job-profile-card__skills ul,
+.reception-job-profile-card__shortcuts ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.reception-job-profile-card__skills li {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.45rem 0.55rem;
+  border-radius: var(--cdl-radius-sm, 0.375rem);
+  background: var(--cdl-surface-card, #fff);
+  font-size: var(--cdl-text-xs, 0.75rem);
+}
+
+.reception-job-profile-card__skills strong {
+  font-size: var(--cdl-text-sm, 0.875rem);
+}
+
+.reception-job-profile-card__skills span {
+  color: var(--cdl-text-secondary, #64748b);
+}
+
+.reception-job-profile-card__shortcuts li {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: var(--cdl-text-sm, 0.875rem);
+}
+
+.reception-job-profile-card__shortcuts kbd {
+  display: inline-block;
+  min-width: 5.5rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.25rem;
+  border: 1px solid var(--cdl-border-default, #cbd5e1);
+  background: var(--cdl-surface-card, #fff);
+  font-size: 0.7rem;
+  font-family: ui-monospace, monospace;
+  text-align: center;
+}
+
+.reception-job-profile-card__empty {
+  margin: 0;
+  font-size: var(--cdl-text-sm, 0.875rem);
+  color: var(--cdl-text-secondary, #64748b);
+}
+
+html[data-theme='dark'] .reception-job-profile-card {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+html[data-theme='dark'] .reception-job-profile-card__guardrail,
+html[data-theme='dark'] .reception-job-profile-card__skills li,
+html[data-theme='dark'] .reception-job-profile-card__shortcuts kbd {
+  background: rgba(15, 23, 42, 0.65);
+}

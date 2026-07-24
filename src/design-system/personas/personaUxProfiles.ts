@@ -111,10 +111,17 @@ export const PERSONA_UX_PROFILES: Readonly<Partial<Record<HospitalRole, PersonaU
   registration_clerk: {
     role: 'registration_clerk',
     label: 'Registration Clerk',
-    cognitivePriority: 'documentation-accuracy',
+    // ED desk under load is interruption-driven speed + safety signaling, not form completeness.
+    cognitivePriority: 'time-critical-triage',
     informationDensity: 'compact',
     aiInteractionStyle: 'guided-workflow',
-    primaryConcerns: ['identity verification tasks', 'critical/escalation attention items', 'queue handoff to triage'],
+    primaryConcerns: [
+      'find existing patient before create',
+      'door-to-nurse handoff speed',
+      'crash/unknown pathway',
+      'identity verification without blocking care',
+      'escalation when red flags present',
+    ],
   },
   hospital_admin: {
     role: 'hospital_admin',

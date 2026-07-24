@@ -1,16 +1,37 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { EMERGENCY_ACTIONS, EMERGENCY_ROLE_IDS } from '../config/emergencyRolePermissions';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { PatientFlag, PatientState, Priority } from '../types/emergency';
-import {
+
+const createSmartIntakePatient = vi.fn();
+const createEmergencyPatient = vi.fn();
+const capabilityEnabled = vi.fn((_capability?: string) => true);
+
+vi.mock('../config/backendApiCapabilities', () => ({
+  isBackendCapabilityEnabled: (capability: string) => capabilityEnabled(capability),
+}));
+
+vi.mock('./emergencyOsApi', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('./emergencyOsApi')>();
+  return {
+    ...actual,
+    createSmartIntakePatient: (...args: unknown[]) => createSmartIntakePatient(...args),
+    createEmergencyPatient: (...args: unknown[]) => createEmergencyPatient(...args),
+  };
+});
+
+const {
   assertReceptionMutationAllowed,
+  applyExtractedFieldsToReceptionDraft,
   createPatientAndRouteFromReception,
   mapQuickIntakeInputToDraft,
   resolveUnifiedIntakePrimaryAction,
   routeQuickIntakeThroughOrchestrator,
   runReceptionAiIntakeAssist,
-  type ReceptionIntakeDraft,
-} from './receptionIntakeOrchestrator';
+  syncReceptionPatientToBackend,
+} = await import('./receptionIntakeOrchestrator');
+
+import type { ReceptionIntakeDraft } from './receptionIntakeOrchestrator';
 
 const originalState = useEmergencyStore.getState();
 
@@ -57,6 +78,16 @@ function baseDraft(patch: Partial<ReceptionIntakeDraft> = {}): ReceptionIntakeDr
 describe('receptionIntakeOrchestrator', () => {
   beforeEach(() => {
     resetStore();
+    vi.clearAllMocks();
+    capabilityEnabled.mockReturnValue(true);
+    createSmartIntakePatient.mockImplementation(async (patient: { id?: string }) => ({
+      module: 'Smart Intake',
+      data: { patient: { id: patient?.id || 'backend-patient-1' } },
+    }));
+    createEmergencyPatient.mockResolvedValue({
+      module: 'Patients',
+      data: { patient: { id: 'backend-patient-2' } },
+    });
   });
 
   it('routes walk-in chest pain as a critical reception arrival with a 3-minute timer', async () => {
@@ -76,6 +107,9 @@ describe('receptionIntakeOrchestrator', () => {
     expect(patient?.flags).toContain(PatientFlag.HighRisk);
     expect(result.criticalAlertId).toBeTruthy();
     expect(result.responseTimerId).toBeTruthy();
+    expect(result.backendSyncStatus).toBe('synced');
+    expect(result.duplicateCandidates).toEqual(expect.any(Array));
+    expect(createSmartIntakePatient).toHaveBeenCalled();
     expect(state.alerts.some((alert) => alert.source === 'reception-critical-intake')).toBe(true);
   });
 
@@ -90,6 +124,7 @@ describe('receptionIntakeOrchestrator', () => {
     expect(patient?.priority).toBe(Priority.P3);
     expect(patient?.state).toBe(PatientState.Triage);
     expect(result.criticalAlertId).toBeUndefined();
+    expect(result.backendSyncStatus).toBe('synced');
     expect(state.alerts.some((alert) => alert.source === 'reception-critical-intake')).toBe(false);
   });
 
@@ -129,6 +164,40 @@ describe('receptionIntakeOrchestrator', () => {
     expect(useEmergencyStore.getState().patients).toHaveLength(1);
   });
 
+  it('still routes locally when backend create fails and reports sync failure', async () => {
+    createSmartIntakePatient.mockRejectedValueOnce(new Error('Network down'));
+    const result = await createPatientAndRouteFromReception(baseDraft(), {
+      actorName: 'Reception Clerk',
+      now: '2026-06-29T12:20:00.000Z',
+    });
+    expect(result.patientId).toBeTruthy();
+    expect(result.backendSyncStatus).toBe('failed');
+    expect(result.backendSyncError).toBeTruthy();
+    expect(useEmergencyStore.getState().patients).toHaveLength(1);
+    expect(useEmergencyStore.getState().patients[0].state).toBe(PatientState.Triage);
+  });
+
+  it('skips backend sync when intake capabilities are disabled', async () => {
+    capabilityEnabled.mockReturnValue(false);
+    const result = await createPatientAndRouteFromReception(baseDraft(), {
+      actorName: 'Reception Clerk',
+      now: '2026-06-29T12:25:00.000Z',
+    });
+    expect(result.backendSyncStatus).toBe('skipped');
+    expect(createSmartIntakePatient).not.toHaveBeenCalled();
+    expect(createEmergencyPatient).not.toHaveBeenCalled();
+  });
+
+  it('syncReceptionPatientToBackend returns synced on successful create envelope', async () => {
+    const sync = await syncReceptionPatientToBackend({
+      id: 'patient-local-1',
+      firstName: 'A',
+      lastName: 'B',
+    } as any);
+    expect(sync.status).toBe('synced');
+    expect(sync.backendPatientId).toBe('patient-local-1');
+  });
+
   it('blocks reception clinical override attempts', () => {
     expect(
       assertReceptionMutationAllowed(EMERGENCY_ROLE_IDS.registrationClerk, EMERGENCY_ACTIONS.triage),
@@ -153,6 +222,23 @@ describe('receptionIntakeOrchestrator', () => {
     expect(draft.painLevel).toBeGreaterThanOrEqual(2);
   });
 
+  it('merges OCR-extracted identity fields into the reception draft without overwriting complaint', () => {
+    const merged = applyExtractedFieldsToReceptionDraft(baseDraft({ chiefComplaint: 'Abdominal pain' }), [
+      { field: 'firstName', value: 'Jordan', status: 'accepted' },
+      { field: 'lastName', value: 'Lee', status: 'accepted' },
+      { field: 'dateOfBirth', value: '1990-04-12', status: 'accepted' },
+      { field: 'sex', value: 'F', status: 'accepted' },
+      { field: 'phone', value: '555-9999', status: 'edited', editedValue: '555-1111' },
+      { field: 'healthCardNumber', value: 'HC-123', status: 'accepted' },
+    ]);
+    expect(merged.chiefComplaint).toBe('Abdominal pain');
+    expect(merged.firstName).toBe('Jordan');
+    expect(merged.lastName).toBe('Lee');
+    expect(merged.dob).toBe('1990-04-12');
+    expect(merged.contactCallback).toBe('555-1111');
+    expect(merged.documentStatus).toBe('captured');
+  });
+
   it('routes quick intake through the same orchestrator path as reception command desk', async () => {
     const result = await routeQuickIntakeThroughOrchestrator(
       {
@@ -164,6 +250,7 @@ describe('receptionIntakeOrchestrator', () => {
       { actorName: 'Reception Clerk', now: '2026-06-29T12:30:00.000Z' },
     );
     expect(result.patientId).toBeTruthy();
+    expect(result.backendSyncStatus).toBe('synced');
     expect(useEmergencyStore.getState().patients.some((entry) => entry.id === result.patientId)).toBe(true);
   });
 
@@ -177,5 +264,26 @@ describe('receptionIntakeOrchestrator', () => {
     expect(action.startsThreeMinuteResponse).toBe(true);
     expect(action.label).toContain('3-minute');
   });
-});
 
+  it('labels standard create action as create-and-route to triage', () => {
+    const action = resolveUnifiedIntakePrimaryAction(baseDraft(), null);
+    expect(action.label.toLowerCase()).toContain('create');
+    expect(action.label.toLowerCase()).toContain('triage');
+  });
+
+  it('uses crash validation mode so incomplete safety fields do not block critical route', async () => {
+    const { resolveReceptionRouteValidationMode, validateReceptionMinimumCriticalData } =
+      await import('./receptionIntakeOrchestrator');
+    const draft = baseDraft({
+      chiefComplaint: 'Not breathing',
+      breathingStatus: 'not-breathing',
+      consciousnessStatus: 'unknown',
+      painLevel: '',
+      visibleDistress: 'unknown',
+    });
+    const mode = resolveReceptionRouteValidationMode(draft);
+    expect(mode).toBe('crash');
+    expect(validateReceptionMinimumCriticalData(draft, 'crash')).toEqual([]);
+    expect(validateReceptionMinimumCriticalData(draft, 'standard').length).toBeGreaterThan(0);
+  });
+});

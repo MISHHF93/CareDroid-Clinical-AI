@@ -1,0 +1,74 @@
+{
+  "generatedAt": "2026-07-24T04:40:34.053Z",
+  "runner": "scripts/run-reception-full-qa.mjs",
+  "grade": "A",
+  "allPass": true,
+  "vitestTargets": [
+    "src/config/receptionSkillModel.test.ts",
+    "src/config/receptionDeskExecutableActions.test.ts",
+    "src/config/receptionUserProfile.test.ts",
+    "src/components/reception/ReceptionSkillStrip.test.tsx",
+    "src/services/interactiveAi/promptNavigationIntent.test.ts",
+    "src/services/interactiveAi/aiCommandRegistry.test.ts",
+    "src/components/interactive-ai/InteractiveAIWorkspace.test.tsx",
+    "src/services/receptionIntakeOrchestrator.test.ts"
+  ],
+  "steps": [
+    {
+      "label": "vitest-reception",
+      "pass": true,
+      "skipped": false,
+      "exitCode": 0,
+      "durationMs": 13570,
+      "counts": {
+        "passed": 68,
+        "total": 68
+      }
+    },
+    {
+      "label": "prompt-nav-portable",
+      "pass": true,
+      "skipped": false,
+      "exitCode": 0,
+      "durationMs": 440
+    },
+    {
+      "label": "reception-desk-perf",
+      "pass": true,
+      "skipped": false,
+      "exitCode": 0,
+      "durationMs": 3602
+    },
+    {
+      "label": "patient-journey-perf",
+      "pass": true,
+      "skipped": false,
+      "exitCode": 0,
+      "durationMs": 16809
+    }
+  ],
+  "deskPerformance": {
+    "grade": "A",
+    "offlinePass": true,
+    "nextBestActionP95Ms": 0.0004,
+    "promptIntentP95Ms": 0.015,
+    "live": {
+      "attempted": 8,
+      "succeeded": 8,
+      "create": {
+        "n": 8,
+        "minMs": 160.2,
+        "maxMs": 794.3,
+        "meanMs": 374.85,
+        "p50Ms": 216,
+        "p95Ms": 794.3,
+        "p99Ms": 794.3
+      }
+    }
+  },
+  "patientJourney": {
+    "grade": "see qa/patient-journey-performance-report.md",
+    "pass": true,
+    "patients": 6
+  }
+}

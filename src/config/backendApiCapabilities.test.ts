@@ -94,12 +94,21 @@ describe('backendApiCapabilities', () => {
     expect(isBackendCapabilityEnabled('emergencyIntegrationHub')).toBe(true);
     expect(isBackendCapabilityEnabled('emergencyProvincialHealth')).toBe(true);
     expect(isBackendCapabilityEnabled('emergencySmartIntake')).toBe(true);
+    expect(isBackendCapabilityEnabled('emergencyPatients')).toBe(true);
+    expect(isBackendCapabilityEnabled('emergencyReceptionSnapshot')).toBe(true);
     expect(getBackendCapabilityStatus('emergencyCentralNode')).toBe(BACKEND_CAPABILITY_STATUS.DEMO);
     expect(getBackendCapabilityStatus('emergencyPatientJourney')).toBe(BACKEND_CAPABILITY_STATUS.DEMO);
     expect(getBackendCapabilityStatus('emergencyQueues')).toBe(BACKEND_CAPABILITY_STATUS.DEMO);
     expect(getBackendCapabilityStatus('emergencyCapacity')).toBe(BACKEND_CAPABILITY_STATUS.DEMO);
     expect(getBackendCapabilityStatus('emergencyIntegrationHub')).toBe(BACKEND_CAPABILITY_STATUS.DEMO);
-    expect(getBackendCapabilityStatus('emergencySmartIntake')).toBe(BACKEND_CAPABILITY_STATUS.DEMO);
+    // Create/list/handoff intake path is a real session board mutator (not fixture-only demo).
+    expect(getBackendCapabilityStatus('emergencySmartIntake')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
+    expect(getBackendCapabilityStatus('emergencyPatients')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
+    expect(getBackendCapabilityStatus('emergencyReceptionSnapshot')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
+    expect(getBackendCapabilityStatus('emergencyReceptionHandoff')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
+    expect(getBackendCapabilityStatus('emergencyReceptionEscalation')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
+    expect(isBackendCapabilityEnabled('emergencyReceptionEscalation')).toBe(true);
+    expect(getBackendCapabilityStatus('emergencyOcrIntake')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
   });
 
   it('enables read-only live tracking contracts as demo-backed capabilities', () => {

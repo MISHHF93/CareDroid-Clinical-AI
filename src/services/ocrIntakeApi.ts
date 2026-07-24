@@ -37,6 +37,17 @@ export type OcrJob = {
   reviewedAt?: string;
   appliedToIntake: boolean;
   appliedAt?: string;
+  appliedDemographics?: {
+    firstName?: string;
+    lastName?: string;
+    dateOfBirth?: string;
+    sex?: string;
+    phone?: string;
+    address?: string;
+    nationalId?: string;
+    healthCardNumber?: string;
+  };
+  patientUpdated?: boolean;
   errorMessage?: string;
   createdBy: string;
   createdAt: string;
@@ -123,14 +134,34 @@ export const OcrIntakeApi = Object.freeze({
   /**
    * Apply OCR to intake only after client-side validation gate.
    * Pass preloadedJob when available to avoid a race; otherwise fetches job first.
+   * Set autoAcceptHighConfidence to bulk-accept ≥0.90 confidence pending fields before apply.
    */
-  async applyToIntake(jobId: string, actor: string, preloadedJob?: OcrJob): Promise<OcrJob> {
-    const job = preloadedJob ?? (await OcrIntakeApi.getJob(jobId));
+  async applyToIntake(
+    jobId: string,
+    actor: string,
+    preloadedJob?: OcrJob,
+    options: { autoAcceptHighConfidence?: boolean } = {},
+  ): Promise<OcrJob> {
+    let job = preloadedJob ?? (await OcrIntakeApi.getJob(jobId));
+    if (options.autoAcceptHighConfidence) {
+      // Mirror server bulk-accept so client gate sees accepted fields.
+      job = {
+        ...job,
+        extractedFields: job.extractedFields.map((field) => {
+          if (field.status !== 'pending') return field;
+          if (field.confidence < 0.9 || !String(field.value || '').trim()) return field;
+          return { ...field, status: 'accepted' as const, reviewedBy: actor, reviewedAt: new Date().toISOString() };
+        }),
+      };
+    }
     const gate = assertOcrJobSafeForIntakeApply(job);
     if (!gate.ok) {
       throw new Error(gate.error.message);
     }
-    return postJson(`/api/emergency/intake/ocr-jobs/${jobId}/apply`, { actor });
+    return postJson(`/api/emergency/intake/ocr-jobs/${jobId}/apply`, {
+      actor,
+      autoAcceptHighConfidence: Boolean(options.autoAcceptHighConfidence),
+    });
   },
   fetchHealth(): Promise<OcrHealthSnapshot> {
     return getJson('/api/emergency/intake/ocr-health');

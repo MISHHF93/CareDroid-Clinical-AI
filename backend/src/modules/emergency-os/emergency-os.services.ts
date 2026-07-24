@@ -1,4 +1,5 @@
 import { Injectable, Logger, Optional, OnModuleInit } from '@nestjs/common';
+// OnModuleInit used by EmergencyPatientService board rehydrate
 import { InjectRepository } from '@nestjs/typeorm';
 import type { Repository } from 'typeorm';
 import {
@@ -725,13 +726,14 @@ export class WorkflowActionLogService implements OnModuleInit {
 }
 
 @Injectable()
-export class EmergencyPatientService {
+export class EmergencyPatientService implements OnModuleInit {
   private readonly logger = new Logger(EmergencyPatientService.name);
   private readonly patients: EmergencyPatient[] = clone(emergencyPatientsFixture);
   private readonly rooms: EmergencyRoom[] = clone(emergencyRoomsFixture);
   private readonly staff: EmergencyStaff[] = clone(emergencyStaffFixture);
   private readonly alerts: EmergencyAlert[] = clone(emergencyAlertsFixture);
   private lastCapacityScore: number | undefined;
+  private boardRehydrated = false;
 
   constructor(
     private readonly workflowLogService: WorkflowActionLogService,
@@ -748,6 +750,113 @@ export class EmergencyPatientService {
   ) {
     for (const alert of this.alerts) {
       this.persistAlertToDatabase(alert);
+    }
+  }
+
+  /**
+   * Load durable patients (and open alerts) from TypeORM so create/handoff
+   * survives process restart. Empty tables keep the demo fixture board.
+   */
+  async onModuleInit(): Promise<void> {
+    await this.rehydrateBoardFromDatabase();
+  }
+
+  isBoardRehydratedFromDatabase(): boolean {
+    return this.boardRehydrated;
+  }
+
+  private mapEntityToEmergencyPatient(entity: Patient): EmergencyPatient {
+    const now = new Date().toISOString();
+    return ensurePatientArrivalBlock({
+      id: entity.id,
+      mrn: entity.mrn,
+      firstName: entity.firstName,
+      lastName: entity.lastName,
+      dob: entity.dob,
+      age: Number(entity.age) || 0,
+      sex: entity.sex as EmergencyPatient['sex'],
+      arrivalTime: entity.arrivalTime || now,
+      triageTime: entity.triageTime,
+      chiefComplaint: entity.chiefComplaint || 'Unspecified complaint',
+      complaintCategory: entity.complaintCategory || 'Other',
+      state: (entity.state as EmergencyPatient['state']) || 'Triage',
+      priority: (entity.priority as EmergencyPatient['priority']) || 'P3',
+      vitals: Array.isArray(entity.vitals) ? (entity.vitals as EmergencyPatient['vitals']) : [],
+      flags: Array.isArray(entity.flags) ? entity.flags : [],
+      assignedStaffId: entity.assignedStaffId,
+      roomId: entity.roomId,
+      notes: Array.isArray(entity.notes) ? (entity.notes as EmergencyPatient['notes']) : [],
+      timeline: Array.isArray(entity.timeline)
+        ? (entity.timeline as EmergencyPatient['timeline'])
+        : [],
+      triageAssist: entity.triageAssist as EmergencyPatient['triageAssist'],
+      triageAssistGeneratedAt: entity.triageAssistGeneratedAt,
+      arrivalMode: entity.arrivalMode as EmergencyPatient['arrivalMode'],
+      registrationStatus: entity.registrationStatus as EmergencyPatient['registrationStatus'],
+      triagePending: entity.triagePending,
+      firstContactAt: entity.firstContactAt,
+      queueDestination: entity.queueDestination as EmergencyPatient['queueDestination'],
+      arrival: entity.arrival as EmergencyPatient['arrival'],
+      quickSafetyFlags: entity.quickSafetyFlags as EmergencyPatient['quickSafetyFlags'],
+      highRiskComplaintFlags:
+        entity.highRiskComplaintFlags as EmergencyPatient['highRiskComplaintFlags'],
+    }) as EmergencyPatient;
+  }
+
+  private async rehydrateBoardFromDatabase(): Promise<void> {
+    if (!this.patientRepository) {
+      this.logger.log('Patient repository unavailable — board remains fixture-seeded');
+      return;
+    }
+    try {
+      const rows = await this.patientRepository.find({
+        order: { arrivalTime: 'DESC' },
+        take: 500,
+      });
+      if (!rows.length) {
+        this.logger.log('No durable patients in database — keeping fixture seed board');
+        // Ensure fixture seed is written through so a cold DB starts gaining durable rows.
+        for (const patient of this.patients) {
+          this.persistPatientToDatabase(patient);
+        }
+        return;
+      }
+
+      const hydrated = rows.map((row) => this.mapEntityToEmergencyPatient(row));
+      this.patients.splice(0, this.patients.length, ...hydrated);
+      this.boardRehydrated = true;
+      this.logger.log(`Rehydrated emergency board with ${hydrated.length} durable patient(s)`);
+
+      if (this.alertRepository) {
+        try {
+          const alertRows = await this.alertRepository.find({
+            where: { dismissed: false },
+            order: { dispatchedAt: 'DESC' },
+            take: 100,
+          });
+          if (alertRows.length) {
+            const mapped: EmergencyAlert[] = alertRows.map((row) => ({
+              id: row.id,
+              severity: (row.severity as EmergencyAlert['severity']) || 'Warning',
+              title: row.title,
+              message: row.message,
+              patientId: row.patientId,
+              createdAt: row.dispatchedAt || new Date().toISOString(),
+              dismissed: Boolean(row.dismissed),
+            }));
+            this.alerts.splice(0, this.alerts.length, ...mapped);
+            this.logger.log(`Rehydrated ${mapped.length} open alert(s) from database`);
+          }
+        } catch (alertError) {
+          this.logger.warn(`Alert rehydrate skipped: ${alertError}`);
+        }
+      }
+    } catch (error) {
+      this.logger.warn(
+        `Board rehydrate failed — continuing with fixture seed: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
     }
   }
 
@@ -1633,6 +1742,7 @@ export class ReceptionWorkspaceService {
     private readonly emsIntakeService: EMSIntakeService,
     private readonly queueService: QueueIntelligenceService,
     private readonly workflowLogService: WorkflowActionLogService,
+    @Optional() private readonly realtimeService?: EmergencyRealtimeService,
   ) {}
 
   getSnapshot() {
@@ -1723,6 +1833,125 @@ export class ReceptionWorkspaceService {
       receptionPath: `/emergency/reception?arrived=${encodeURIComponent(patientId)}`,
       queuesPath: `/emergency/reception?queue=pretriage&patient=${encodeURIComponent(patientId)}`,
       whiteboardPath: `/emergency/whiteboard?patient=${encodeURIComponent(patientId)}${input.encounterId ? `&encounter=${encodeURIComponent(input.encounterId)}` : ''}`,
+    });
+  }
+
+  /**
+   * Durable reception escalation for multi-station EDs: alert + workflow log + realtime fan-out.
+   */
+  raiseEscalation(input: {
+    reasonId?: string;
+    reasonLabel?: string;
+    patientId?: string;
+    detail?: string;
+    actorName?: string;
+    actorStaffId?: string;
+    severity?: 'Info' | 'Warning' | 'Critical';
+    notifyTargets?: Array<'triage' | 'charge'>;
+  }) {
+    const reasonId = String(input.reasonId || 'urgent-triage-attention').trim();
+    const reasonLabel = String(input.reasonLabel || reasonId).trim();
+    const severity = input.severity || 'Critical';
+    const notifyTargets = input.notifyTargets?.length
+      ? input.notifyTargets
+      : (['triage', 'charge'] as Array<'triage' | 'charge'>);
+    const notifyRoles = notifyTargets.map((target) =>
+      target === 'triage' ? 'triage_nurse' : 'charge_nurse',
+    );
+    const patientId = input.patientId ? String(input.patientId).trim() : undefined;
+    const patient = patientId ? this.patientService.getPatient(patientId) : undefined;
+    const patientLabel = patient
+      ? `${patient.firstName} ${patient.lastName}`.trim()
+      : patientId || 'No patient linked';
+    const actorName = input.actorName || 'Reception';
+    const detail = input.detail?.trim();
+    const message = [
+      `Flagged by ${actorName}`,
+      patientLabel,
+      detail,
+      `Notify: ${notifyTargets.map((t) => (t === 'triage' ? 'Triage nurse' : 'Charge nurse')).join(' · ')}`,
+    ]
+      .filter(Boolean)
+      .join(' · ');
+
+    const alert = this.patientService.dispatchOperationalAlert({
+      severity,
+      title: `Reception escalation — ${reasonLabel}`,
+      message,
+      patientId,
+      source: 'reception-escalation-workflow',
+      metadata: {
+        receptionEscalationReason: reasonId,
+        receptionEscalationTargets: notifyTargets.join(','),
+        notifyRoles: notifyRoles.join(','),
+        actorName,
+        detail: detail || null,
+      },
+    });
+
+    // Explicit realtime event for clinical workstations (beyond generic alert_created).
+    this.realtimeService?.publish({
+      type: 'reception_escalation',
+      payload: {
+        alertId: alert.id,
+        patientId,
+        reasonId,
+        reasonLabel,
+        severity,
+        notifyTargets,
+        notifyRoles,
+        actorName,
+        detail,
+        timestamp: alert.createdAt,
+        message,
+      },
+    });
+
+    this.workflowLogService.record({
+      type: 'patient_escalated',
+      title: 'Reception escalation',
+      summary: message,
+      patientId,
+      actorName,
+      actorStaffId: input.actorStaffId,
+      source: 'reception-workspace',
+      severity: severity === 'Critical' ? 'Critical' : 'Warning',
+      metadata: {
+        reasonId,
+        notifyTargets: notifyTargets.join(','),
+        alertId: alert.id,
+      },
+    });
+
+    if (patientId && patient) {
+      try {
+        const flags = patient.flags || [];
+        if (!flags.includes('Escalated')) {
+          this.patientService.updatePatient(patientId, {
+            flags: [...flags, 'Escalated'],
+          } as any);
+        }
+      } catch {
+        // patient may not exist on board yet
+      }
+    }
+
+    return envelope('Reception Escalation', {
+      ok: true,
+      alert,
+      record: {
+        id: `reception-esc-${alert.id}`,
+        alertId: alert.id,
+        reasonId,
+        reasonLabel,
+        patientId,
+        patientLabel,
+        detail,
+        actorName,
+        actorStaffId: input.actorStaffId,
+        timestamp: alert.createdAt,
+        notifyTargets,
+      },
     });
   }
 }

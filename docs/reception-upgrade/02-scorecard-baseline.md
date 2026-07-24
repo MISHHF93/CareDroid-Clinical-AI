@@ -5,6 +5,43 @@
 
 ---
 
+## Re-score after FE↔BE create/handoff wire-up (2026-07-23)
+
+Code audit + implementation pass (awaited `createSmartIntakePatient`, capability flags REAL for patients/smart-intake/reception snapshot, OCR→draft helpers, registration_clerk persona density).
+
+| Surface | Prior (plan audit) | Updated | Notes |
+|---------|-------------------:|--------:|-------|
+| Reception Desk | 68 | **78** | Create & route awaits backend; sync status UX; primary action labels; queue focus after create |
+| User Profile | 74 | **80** | Clerk actions already had `createPatient`; persona density wired into reception desk slim mode |
+| Patient onboarding | 70 | **82** | Local-first + awaited BE create; provisional/verification tab routing; Smart Intake same orchestrator |
+| Smart Intake + OCR | 72 | **78** | OCR field merge helpers; BE sync status on Smart Intake create; OCR capability REAL |
+| FE↔BE contract | 65 | **84** | `emergencyPatients` / `emergencySmartIntake` / `emergencyReceptionSnapshot` promoted REAL (session board mutators) |
+
+## Full E2E audit re-score (2026-07-23, later same day)
+
+Full-module audit + hardening: PHI RBAC on create/OCR, OCR apply demographics + review gate, desk OCR capture strip, live duplicate scan, reception staff profiles, provisional backend sync, clerk stays on desk after create, real handoff CTA.
+
+| Domain | Score |
+|--------|------:|
+| Backend integrity | **72** |
+| Frontend completeness | **84** |
+| AI execution | **62** |
+| OCR performance | **76** |
+| Workflow completeness | **80** |
+| Design consistency | **78** |
+| Accessibility | **74** |
+| Security | **78** |
+| Interoperability | **70** |
+| Testing | **72** |
+| Documentation | **82** |
+| **Production readiness** | **74** |
+
+See [RECEPTION_HEALTH_REPORT.md](./RECEPTION_HEALTH_REPORT.md) for the full matrix and residual P0 items (board rehydrate, durable OCR store, MPI).
+
+**Not claimed:** multi-tab durability of in-memory OCR jobs / board after process restart; full Playwright live browser create path (sandbox esbuild block may prevent vitest in some envs).
+
+---
+
 ## Scoring Summary
 
 | # | Dimension | Score | Weight | Weighted | Key Finding |

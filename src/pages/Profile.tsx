@@ -6,6 +6,8 @@ import ProfileCopilotCard from '../components/profile/ProfileCopilotCard';
 import ProfileInsightsPanel from '../components/profile/ProfileInsightsPanel';
 import ProfileSectionHeader from '../components/profile/ProfileSectionHeader';
 import ProfileSettingsShell from '../components/profile/ProfileSettingsShell';
+import ReceptionJobProfileCard from '../components/profile/ReceptionJobProfileCard';
+import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import {
   resolveProfileOverviewCard,
   resolveProfileShellSection,
@@ -52,6 +54,7 @@ function formatDate(value) {
 const Profile = () => {
   const surfaces = usePractitionerSurfaceVisibility();
   const { user, hasPermission } = useUser();
+  const emergencyRole = useEmergencyRolePermissions();
   const { account, preferences, activity, activeWorkspace, accessSummary, saasProfile } = useUserIdentity();
   const { accessSummary: hookAccessSummary, profileCopy } = useEffectiveUserProfile();
   const resolvedAccessSummary = accessSummary || hookAccessSummary;
@@ -219,6 +222,16 @@ const Profile = () => {
           recentTools={recentToolItems}
           competencySummary={competencySnapshot.summary}
           showCompetency={surfaces.profile.showCompetencyCard}
+        />
+
+        <ReceptionJobProfileCard
+          role={
+            emergencyRole.role ||
+            resolvedAccessSummary?.emergencyRole ||
+            account?.role ||
+            user?.role ||
+            role
+          }
         />
 
         <section className="profile-overview-grid" aria-label="Profile tools and preferences">

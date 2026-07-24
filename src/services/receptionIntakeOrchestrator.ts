@@ -1,4 +1,6 @@
 import { CANONICAL_ROUTES } from '../config/routes.config';
+import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
+import { formatSyncRecoveryMessage } from '../config/errorRecoveryModel';
 import { EMERGENCY_ACTIONS, EMERGENCY_ROLE_IDS, normalizeEmergencyRole } from '../config/emergencyRolePermissions';
 import { startResponseTimer } from '../engine/threeMinuteTimerEngine';
 import { useEmergencyStore } from '../store/emergencyStore';
@@ -20,8 +22,14 @@ import {
   type ReceptionQuickIntakeInput,
 } from './receptionQuickIntakeService';
 import { buildPatientArrivalRecord, syncPatientFromArrival } from './patientArrivalModel';
+import { serializePatientForBackendApi } from './patientArrivalBackendSync';
 import { completeReceptionHandoff } from './receptionHandoff';
 import { buildClientTriageAssist } from './triageAssist';
+import { createEmergencyPatient, createSmartIntakePatient } from './emergencyOsApi';
+import {
+  findDuplicateCandidates,
+  type PatientDuplicateCandidate,
+} from '../utils/patientDuplicateDetection';
 
 export type ReceptionArrivalType =
   | 'walk-in'
@@ -54,7 +62,15 @@ export type ReceptionIntakeDraft = {
   consentStatus?: 'captured' | 'deferred' | 'unable' | 'unknown';
   documentStatus?: 'captured' | 'missing' | 'deferred' | 'unknown';
   notes?: string;
+  /** Preferred language for care (language_access skill). */
+  preferredLanguage?: string;
+  interpreterNeeded?: 'yes' | 'no' | 'unknown';
+  nextOfKinName?: string;
+  nextOfKinPhone?: string;
 };
+
+/** How hard we block create & route on incomplete safety fields. */
+export type ReceptionRouteValidationMode = 'standard' | 'rapid' | 'crash';
 
 export type ReceptionAiIntakeAssist = {
   generatedAt: string;
@@ -81,6 +97,8 @@ export type SmartIntakeFieldRow = {
   extracted?: string;
 };
 
+export type ReceptionBackendSyncStatus = 'synced' | 'pending' | 'skipped' | 'failed';
+
 export type ReceptionRouteResult = {
   patient: Patient;
   patientId: string;
@@ -93,6 +111,22 @@ export type ReceptionRouteResult = {
   missingCriticalFields: string[];
   redFlags: string[];
   clinicalOverrideBlocked: boolean;
+  /** Backend create result for the reception intake patient. */
+  backendSyncStatus: ReceptionBackendSyncStatus;
+  backendSyncError?: string;
+  backendPatientId?: string;
+  /** Non-blocking duplicate matches from the local board before/after create. */
+  duplicateCandidates: PatientDuplicateCandidate[];
+};
+
+/** OCR / verification field row accepted by mapSmartIntakeFieldsToDraft and apply helpers. */
+export type IntakeFieldLike = {
+  field?: string;
+  name?: string;
+  extracted?: string;
+  value?: string;
+  editedValue?: string;
+  status?: string;
 };
 
 type OrchestratorOptions = {
@@ -212,9 +246,47 @@ export function detectReceptionRedFlags(draft: ReceptionIntakeDraft): string[] {
   return unique([...selected, ...detected]);
 }
 
-export function validateReceptionMinimumCriticalData(draft: ReceptionIntakeDraft): string[] {
+/**
+ * Resolve validation mode from draft + live urgency.
+ * - standard: full critical set (quality registration)
+ * - rapid: high urgency — identity optional, safety preferred not hard-blocked
+ * - crash: critical red flags — complaint OR red flags only (identity provisional OK)
+ */
+export function resolveReceptionRouteValidationMode(
+  draft: ReceptionIntakeDraft,
+  options: { urgency?: 'critical' | 'high' | 'standard' | null } = {},
+): ReceptionRouteValidationMode {
+  const redFlags = detectReceptionRedFlags(draft);
+  const urgency =
+    options.urgency ||
+    runReceptionAiIntakeAssist(draft).urgencySuggestion;
+  if (urgency === 'critical' || redFlags.length >= 2) return 'crash';
+  if (urgency === 'high' || redFlags.length >= 1) return 'rapid';
+  return 'standard';
+}
+
+export function validateReceptionMinimumCriticalData(
+  draft: ReceptionIntakeDraft,
+  mode: ReceptionRouteValidationMode = 'standard',
+): string[] {
   const missing: string[] = [];
-  if (!String(draft.chiefComplaint || '').trim()) missing.push('chief complaint');
+  const hasComplaint = Boolean(String(draft.chiefComplaint || '').trim());
+  const redFlags = detectReceptionRedFlags(draft);
+
+  // Crash path: complaint OR observable red flags — never block on full safety matrix.
+  if (mode === 'crash') {
+    if (!hasComplaint && !redFlags.length) missing.push('chief complaint or critical red flag');
+    return missing;
+  }
+
+  // Rapid path: need complaint; safety fields soft (not blocking).
+  if (mode === 'rapid') {
+    if (!hasComplaint) missing.push('chief complaint');
+    return missing;
+  }
+
+  // Standard quality registration.
+  if (!hasComplaint) missing.push('chief complaint');
   if (!draft.dob && !normalizeAge(draft.estimatedAge)) missing.push('estimated age or DOB');
   if (!draft.consciousnessStatus || draft.consciousnessStatus === 'unknown') {
     missing.push('consciousness status');
@@ -229,6 +301,24 @@ export function validateReceptionMinimumCriticalData(draft: ReceptionIntakeDraft
     missing.push('pain level');
   }
   return missing;
+}
+
+/** Soft recommendations shown in UI — never hard-block rapid/crash route. */
+export function listReceptionRecommendedSafetyFields(draft: ReceptionIntakeDraft): string[] {
+  const recommended: string[] = [];
+  if (!draft.consciousnessStatus || draft.consciousnessStatus === 'unknown') {
+    recommended.push('consciousness');
+  }
+  if (!draft.breathingStatus || draft.breathingStatus === 'unknown') {
+    recommended.push('breathing');
+  }
+  if (!draft.visibleDistress || draft.visibleDistress === 'unknown') {
+    recommended.push('visible distress');
+  }
+  if (draft.painLevel === '' || draft.painLevel === undefined || draft.painLevel === null) {
+    recommended.push('pain level');
+  }
+  return recommended;
 }
 
 function resolvePriority(redFlags: string[], draft: ReceptionIntakeDraft): Priority {
@@ -271,10 +361,16 @@ export function runReceptionAiIntakeAssist(
 ): ReceptionAiIntakeAssist {
   const now = options.now || new Date().toISOString();
   const redFlags = detectReceptionRedFlags(draft);
-  const missingCriticalFields = validateReceptionMinimumCriticalData(draft);
   const suggestedPriority = resolvePriority(redFlags, draft);
   const urgencySuggestion =
     suggestedPriority === Priority.P1 ? 'critical' : suggestedPriority === Priority.P2 ? 'high' : 'standard';
+  const mode =
+    urgencySuggestion === 'critical' || redFlags.length >= 2
+      ? 'crash'
+      : urgencySuggestion === 'high' || redFlags.length >= 1
+        ? 'rapid'
+        : 'standard';
+  const missingCriticalFields = validateReceptionMinimumCriticalData(draft, mode);
   const nextAction =
     urgencySuggestion === 'critical'
       ? 'Start 3-minute response and route to priority triage.'
@@ -292,8 +388,10 @@ export function runReceptionAiIntakeAssist(
     nextAction,
     confidence: options.aiUnavailable ? 0.42 : Math.min(0.94, 0.72 + redFlags.length * 0.04),
     safetyNotice: options.aiUnavailable
-      ? 'AI Intake Assist is unavailable. Manual intake fallback is active; clinical staff must review.'
-      : 'AI is decision support only. Reception cannot assign final triage level or override clinical escalation.',
+      ? 'Desk assist is unavailable. Manual intake fallback is active; clinical staff must review.'
+      : mode === 'standard'
+        ? 'Desk assist is decision support only. Reception cannot assign final triage level.'
+        : `Rapid route mode (${mode}): complete complaint and send — full safety fields preferred but not required.`,
     manualFallback: Boolean(options.aiUnavailable),
   };
 }
@@ -348,11 +446,15 @@ function buildReceptionIntakeNote(
     `Breathing: ${draft.breathingStatus || 'unknown'}.`,
     `Distress: ${draft.visibleDistress || 'unknown'}.`,
     `Pain: ${draft.painLevel || 'unknown'}.`,
+    `Language: ${draft.preferredLanguage || 'not captured'}; interpreter: ${draft.interpreterNeeded || 'unknown'}.`,
+    draft.nextOfKinName || draft.nextOfKinPhone
+      ? `Next of kin: ${draft.nextOfKinName || '—'} ${draft.nextOfKinPhone || ''}`.trim()
+      : '',
     `Allergies: ${draft.allergiesKnown || 'unknown'}${draft.allergies ? ` - ${draft.allergies}` : ''}.`,
     `Medications: ${draft.medicationsKnown || 'unknown'}${draft.medications ? ` - ${draft.medications}` : ''}.`,
     `Admin: insurance ${draft.insuranceStatus || 'unknown'}, consent ${draft.consentStatus || 'unknown'}, documents ${draft.documentStatus || 'unknown'}.`,
     draft.notes ? `Notes: ${draft.notes}` : '',
-    `AI Intake Assist: ${aiAssist.nextAction}`,
+    `Desk assist: ${aiAssist.nextAction}`,
   ]
     .filter(Boolean)
     .join(' ');
@@ -371,6 +473,10 @@ function buildReceptionIntakeNote(
       aiConfidence: aiAssist.confidence,
       manualFallback: aiAssist.manualFallback,
       redFlags: aiAssist.redFlags.join(', '),
+      preferredLanguage: draft.preferredLanguage || '',
+      interpreterNeeded: draft.interpreterNeeded || 'unknown',
+      nextOfKinName: draft.nextOfKinName || '',
+      nextOfKinPhone: draft.nextOfKinPhone || '',
     },
   };
 }
@@ -552,6 +658,47 @@ export function assertReceptionMutationAllowed(
   return { allowed: true };
 }
 
+/**
+ * Persist a newly built reception patient to the emergency OS backend.
+ * Awaits create so reception UI can surface success/failure (no silent fire-and-forget).
+ * Local chart remains usable when the backend is down.
+ */
+export async function syncReceptionPatientToBackend(
+  patient: Patient,
+): Promise<{
+  status: ReceptionBackendSyncStatus;
+  backendPatientId?: string;
+  error?: string;
+}> {
+  const canSyncSmartIntake = isBackendCapabilityEnabled('emergencySmartIntake');
+  const canSyncPatients = isBackendCapabilityEnabled('emergencyPatients');
+  if (!canSyncSmartIntake && !canSyncPatients) {
+    return { status: 'skipped' };
+  }
+
+  try {
+    const payload = serializePatientForBackendApi(patient);
+    const response = canSyncSmartIntake
+      ? await createSmartIntakePatient(payload)
+      : await createEmergencyPatient(payload);
+    const remotePatient =
+      response?.data?.patient ||
+      response?.patient ||
+      (response?.data && response.data.id ? response.data : null) ||
+      response;
+    const backendPatientId =
+      (remotePatient && typeof remotePatient === 'object' && remotePatient.id
+        ? String(remotePatient.id)
+        : undefined) || patient.id;
+    return { status: 'synced', backendPatientId };
+  } catch (error) {
+    return {
+      status: 'failed',
+      error: formatSyncRecoveryMessage(error),
+    };
+  }
+}
+
 export async function createPatientAndRouteFromReception(
   intakeDraft: ReceptionIntakeDraft,
   options: OrchestratorOptions = {},
@@ -568,6 +715,18 @@ export async function createPatientAndRouteFromReception(
     throw new Error('Capture a chief complaint or observable critical red flag before routing.');
   }
 
+  const duplicateCandidates = findDuplicateCandidates(
+    store.patients,
+    {
+      firstName: intakeDraft.firstName,
+      lastName: intakeDraft.lastName,
+      dateOfBirth: intakeDraft.dob,
+      phone: intakeDraft.contactCallback,
+      sex: intakeDraft.sex,
+    },
+    { minScore: 35, limit: 5 },
+  );
+
   const patient = buildReceptionPatient(intakeDraft, aiAssist, { actorName, now });
   const triageAssist = buildClientTriageAssist(patient, store.patients, {
     arrivalReason: patient.chiefComplaint,
@@ -580,7 +739,30 @@ export async function createPatientAndRouteFromReception(
     triageAssistGeneratedAt: triageAssist.generatedAt,
   };
 
-  store.addPatient(enrichedPatient, { syncToBackend: true });
+  // Local-first create; backend sync is awaited explicitly below (not fire-and-forget).
+  store.addPatient(enrichedPatient, { syncToBackend: false });
+
+  const backendSync = await syncReceptionPatientToBackend(enrichedPatient);
+  if (backendSync.status === 'synced') {
+    useEmergencyStore.getState().updatePatient(
+      enrichedPatient.id,
+      {
+        handoffSyncPending: false,
+        handoffSyncError: undefined,
+        ...(backendSync.backendPatientId && backendSync.backendPatientId !== enrichedPatient.id
+          ? { backendPatientId: backendSync.backendPatientId }
+          : {}),
+      } as unknown as Partial<Patient>,
+    );
+  } else if (backendSync.status === 'failed') {
+    useEmergencyStore.getState().updatePatient(
+      enrichedPatient.id,
+      {
+        handoffSyncPending: true,
+        handoffSyncError: backendSync.error,
+      } as unknown as Partial<Patient>,
+    );
+  }
 
   const afterCreate = useEmergencyStore.getState();
   afterCreate.registerArrivalControl(enrichedPatient.id, { source: 'reception-command-desk' });
@@ -600,6 +782,8 @@ export async function createPatientAndRouteFromReception(
       redFlags: aiAssist.redFlags.join(', '),
       aiConfidence: aiAssist.confidence,
       manualFallback: aiAssist.manualFallback,
+      backendSyncStatus: backendSync.status,
+      backendPatientId: backendSync.backendPatientId || '',
     },
   });
 
@@ -664,9 +848,12 @@ export async function createPatientAndRouteFromReception(
     console.error('[ReceptionIntakeOrchestrator] scheduleWorkflowAutomationRefresh failed:', error);
   });
 
+  const latestPatient =
+    useEmergencyStore.getState().patients.find((entry) => entry.id === enrichedPatient.id) || enrichedPatient;
+
   return {
     patient: {
-      ...enrichedPatient,
+      ...latestPatient,
       state: PatientState.Triage,
       registrationStatus: enrichedPatient.registrationStatus === 'provisional' ? 'provisional' : 'complete',
       queueDestination: 'triage-queue',
@@ -682,7 +869,32 @@ export async function createPatientAndRouteFromReception(
     missingCriticalFields: aiAssist.missingCriticalFields,
     redFlags: aiAssist.redFlags,
     clinicalOverrideBlocked: !canReceptionPerformClinicalOverride(EMERGENCY_ROLE_IDS.registrationClerk),
+    backendSyncStatus: backendSync.status,
+    backendSyncError: backendSync.error,
+    backendPatientId: backendSync.backendPatientId,
+    duplicateCandidates,
   };
+}
+
+/** Live board duplicate scan for reception draft fields (non-mutating). */
+export function scanReceptionDraftDuplicates(
+  draft: ReceptionIntakeDraft,
+  patients: Patient[] = useEmergencyStore.getState().patients,
+): PatientDuplicateCandidate[] {
+  if (!String(draft.firstName || '').trim() && !String(draft.lastName || '').trim() && !draft.dob) {
+    return [];
+  }
+  return findDuplicateCandidates(
+    patients,
+    {
+      firstName: draft.firstName,
+      lastName: draft.lastName,
+      dateOfBirth: draft.dob,
+      phone: draft.contactCallback,
+      sex: draft.sex,
+    },
+    { minScore: 35, limit: 5 },
+  );
 }
 
 const ARRIVAL_MODE_TO_RECEPTION_TYPE: Record<ArrivalMode, ReceptionArrivalType> = {
@@ -876,7 +1088,66 @@ export function resolveUnifiedIntakePrimaryAction(
     };
   }
   if (urgency === 'high') {
-    return { label: 'Route to priority triage', startsThreeMinuteResponse: false, tone: 'primary' };
+    return { label: 'Create & route to priority triage', startsThreeMinuteResponse: false, tone: 'primary' };
   }
-  return { label: 'Create patient & route', startsThreeMinuteResponse: false, tone: 'primary' };
+  return { label: 'Create patient & route to triage', startsThreeMinuteResponse: false, tone: 'primary' };
+}
+
+function intakeFieldName(row: IntakeFieldLike): string {
+  return String(row.field || row.name || '').trim();
+}
+
+function intakeFieldValue(row: IntakeFieldLike): string {
+  if (row.status === 'rejected') return '';
+  if (row.status === 'edited' && row.editedValue != null) return String(row.editedValue).trim();
+  return String(row.editedValue || row.extracted || row.value || '').trim();
+}
+
+/** Normalize OCR / verification fields into SmartIntakeFieldRow for draft mapping. */
+export function mapOcrOrExtractedFieldsToSmartIntakeRows(fields: IntakeFieldLike[] = []): SmartIntakeFieldRow[] {
+  return fields
+    .map((row) => ({
+      field: intakeFieldName(row),
+      extracted: intakeFieldValue(row),
+    }))
+    .filter((row) => row.field && row.extracted);
+}
+
+/**
+ * Merge staff-accepted OCR / identity fields into a reception intake draft.
+ * Does not auto-create a patient — caller still routes after human review.
+ */
+export function applyExtractedFieldsToReceptionDraft(
+  draft: ReceptionIntakeDraft,
+  fields: IntakeFieldLike[],
+  options: { complaint?: string; arrivalType?: ReceptionArrivalType; sessionId?: string } = {},
+): ReceptionIntakeDraft {
+  const rows = mapOcrOrExtractedFieldsToSmartIntakeRows(fields);
+  if (!rows.length) return draft;
+  const mapped = mapSmartIntakeFieldsToDraft(rows, {
+    arrivalType: options.arrivalType || draft.arrivalType,
+    complaint: options.complaint || draft.chiefComplaint,
+    sessionId: options.sessionId,
+  });
+  return {
+    ...draft,
+    firstName: mapped.firstName || draft.firstName,
+    lastName: mapped.lastName || draft.lastName,
+    dob: mapped.dob || draft.dob,
+    sex: mapped.sex || draft.sex,
+    contactCallback: mapped.contactCallback || draft.contactCallback,
+    allergies: mapped.allergies || draft.allergies,
+    allergiesKnown: mapped.allergies ? 'yes' : draft.allergiesKnown,
+    medications: mapped.medications || draft.medications,
+    medicationsKnown: mapped.medications ? 'yes' : draft.medicationsKnown,
+    insuranceStatus:
+      mapped.insuranceStatus && mapped.insuranceStatus !== 'unknown'
+        ? mapped.insuranceStatus
+        : draft.insuranceStatus,
+    documentStatus: 'captured',
+    chiefComplaint: String(draft.chiefComplaint || '').trim()
+      ? draft.chiefComplaint
+      : mapped.chiefComplaint,
+    notes: [draft.notes, mapped.notes].filter(Boolean).join(' · ') || draft.notes,
+  };
 }

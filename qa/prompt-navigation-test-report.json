@@ -1,0 +1,89 @@
+{
+  "generatedAt": "2026-07-24T04:40:13.620Z",
+  "runner": "scripts/run-prompt-navigation-tests.mjs",
+  "note": "Vitest blocked in this environment (esbuild.exe Application Control). This runner executes the real transpiled modules.",
+  "totals": {
+    "passed": 19,
+    "failed": 0,
+    "total": 19
+  },
+  "grade": "PASS",
+  "results": [
+    {
+      "name": "exposes a non-empty closed catalog with unique ids",
+      "status": "PASS"
+    },
+    {
+      "name": "resolves open reception desk prompts",
+      "status": "PASS"
+    },
+    {
+      "name": "resolves whiteboard and HEART score",
+      "status": "PASS"
+    },
+    {
+      "name": "resolves reception panel intents (OCR, lookup, shift clearance)",
+      "status": "PASS"
+    },
+    {
+      "name": "returns null for unknown / question prompts (chat path)",
+      "status": "PASS"
+    },
+    {
+      "name": "denies clinical calculators for registration clerk",
+      "status": "PASS"
+    },
+    {
+      "name": "requires permission held by the user",
+      "status": "PASS"
+    },
+    {
+      "name": "builds proposal input from intent without inventing paths",
+      "status": "PASS"
+    },
+    {
+      "name": "navigates for open_route",
+      "status": "PASS"
+    },
+    {
+      "name": "dispatches panel events when already on reception",
+      "status": "PASS"
+    },
+    {
+      "name": "navigates then dispatches when not on reception",
+      "status": "PASS"
+    },
+    {
+      "name": "identifies navigation tool names",
+      "status": "PASS"
+    },
+    {
+      "name": "looksLikeNavigationPrompt gates questions vs open phrases",
+      "status": "PASS"
+    },
+    {
+      "name": "registry is frozen with unique ids and non-empty queries",
+      "status": "PASS"
+    },
+    {
+      "name": "includes AI open-route palette commands",
+      "status": "PASS"
+    },
+    {
+      "name": "open palette commands require view_operations and are listable",
+      "status": "PASS"
+    },
+    {
+      "name": "unknown palette ids are refused",
+      "status": "PASS"
+    },
+    {
+      "name": "InteractiveAIWorkspace imports and uses navigation execute path",
+      "status": "PASS"
+    },
+    {
+      "name": "ReceptionWorkspace listens for lookup and shift-clearance events",
+      "status": "PASS"
+    }
+  ]
+}

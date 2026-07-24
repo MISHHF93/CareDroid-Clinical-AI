@@ -75,7 +75,9 @@ import {
   fetchReferrals,
   fetchReceptionSnapshot,
   createSmartIntakePatient,
+  postReceptionEscalation,
 } from '../services/emergencyOsApi';
+import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
 import { apiFetch } from '../services/apiClient';
 import logger from '../utils/logger';
 import {
@@ -4338,6 +4340,45 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
 
       broadcastReceptionEscalation(submission.alert);
       syncReceptionEscalationOperationalSurfaces(nextAlerts);
+
+      // Realtime fan-out for clinical workstations listening on the emergency bus.
+      try {
+        get().dispatchWebSocketEvent?.({
+          type: 'reception_escalation',
+          payload: {
+            alertId: submission.alert.id,
+            patientId: submission.record.patientId,
+            reasonId: submission.record.reasonId,
+            reasonLabel: submission.record.reasonLabel,
+            severity: submission.alert.severity,
+            notifyTargets: submission.record.notifyTargets,
+            notifyRoles: submission.record.notifyTargets.map((target) =>
+              target === 'triage' ? 'triage_nurse' : 'charge_nurse',
+            ),
+            actorName: submission.record.actorName,
+            detail: submission.record.detail,
+            timestamp: submission.record.timestamp,
+            message: submission.alert.message,
+          },
+        });
+      } catch {
+        // WS dispatch is best-effort; local alert + custom event still apply.
+      }
+
+      // Durable multi-station path: POST Nest reception escalation (alert + DB write-through).
+      if (isBackendCapabilityEnabled('emergencyReceptionEscalation')) {
+        void postReceptionEscalation({
+          reasonId: submission.record.reasonId,
+          reasonLabel: submission.record.reasonLabel,
+          patientId: submission.record.patientId,
+          detail: submission.record.detail,
+          actorName: submission.record.actorName,
+          actorStaffId: submission.record.actorStaffId,
+          severity: submission.alert.severity,
+          notifyTargets: submission.record.notifyTargets,
+        }).catch(() => undefined);
+      }
+
       return submission.record;
     },
 

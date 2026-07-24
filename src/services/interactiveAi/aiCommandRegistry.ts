@@ -12,6 +12,10 @@ import type { AiRiskLevel } from '../../contracts/interactiveAi';
 export type AiPaletteCommandId =
   | 'ai-reception-missing-info'
   | 'ai-reception-handoff-draft'
+  | 'ai-open-reception'
+  | 'ai-open-patient-lookup'
+  | 'ai-open-ocr-scan'
+  | 'ai-open-whiteboard'
   | 'ai-ems-prepare-arrival'
   | 'ai-ems-eta-summary'
   | 'ai-workflow-next-steps'
@@ -57,6 +61,46 @@ export const AI_PALETTE_COMMANDS: readonly AiPaletteCommand[] = Object.freeze([
     requiredPermission: 'use_ai_chat',
     riskLevel: 'moderate',
     query: 'Prepare a registration to triage handoff draft for clinician review.',
+  },
+  {
+    id: 'ai-open-reception',
+    label: 'AI: Open Reception desk',
+    description: 'Propose opening the Reception desk (closed catalog navigate — human confirms).',
+    keywords: ['ai', 'open', 'reception', 'desk', 'navigate', 'front desk'],
+    channel: 'any',
+    requiredPermission: 'view_operations',
+    riskLevel: 'low',
+    query: 'Open reception desk',
+  },
+  {
+    id: 'ai-open-patient-lookup',
+    label: 'AI: Focus patient lookup',
+    description: 'Propose focusing Reception lookup-before-create (human confirms).',
+    keywords: ['ai', 'lookup', 'find patient', 'search patient', 'duplicate'],
+    channel: 'reception',
+    requiredPermission: 'view_operations',
+    riskLevel: 'low',
+    query: 'Focus patient lookup',
+  },
+  {
+    id: 'ai-open-ocr-scan',
+    label: 'AI: Open document scan / OCR',
+    description: 'Propose opening smart intake / OCR capture on Reception (human confirms).',
+    keywords: ['ai', 'ocr', 'scan', 'document', 'health card', 'id'],
+    channel: 'reception',
+    requiredPermission: 'view_operations',
+    riskLevel: 'low',
+    query: 'Show OCR document scan',
+  },
+  {
+    id: 'ai-open-whiteboard',
+    label: 'AI: Open Whiteboard',
+    description: 'Propose opening the ED whiteboard (closed catalog navigate — human confirms).',
+    keywords: ['ai', 'open', 'whiteboard', 'board', 'navigate'],
+    channel: 'any',
+    requiredPermission: 'view_operations',
+    riskLevel: 'low',
+    query: 'Open the whiteboard',
   },
   {
     id: 'ai-ems-prepare-arrival',

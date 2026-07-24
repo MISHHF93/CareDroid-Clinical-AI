@@ -17,6 +17,8 @@ export type ReceptionPatientTaskSheetProps = {
   onEscalate: () => void;
   onHandoff: () => void;
   onOpenFullRecord: () => void;
+  interpreterNeeded?: string;
+  preferredLanguage?: string;
 };
 
 /**
@@ -37,17 +39,29 @@ export default function ReceptionPatientTaskSheet({
   onEscalate,
   onHandoff,
   onOpenFullRecord,
+  interpreterNeeded,
+  preferredLanguage,
 }: ReceptionPatientTaskSheetProps) {
   const flagLabels = (patient.flags || []).slice(0, 2).map((flag) => String(flag));
   const provisional =
     patient.registrationStatus === 'provisional' || patient.registrationStatus === 'in-progress';
+  const intakeMeta = (patient.notes || []).find((note) => note.metadata?.source === 'reception-command-desk')
+    ?.metadata as { interpreterNeeded?: string; preferredLanguage?: string } | undefined;
+  const language =
+    preferredLanguage ||
+    intakeMeta?.preferredLanguage ||
+    '';
+  const interpreter =
+    interpreterNeeded ||
+    intakeMeta?.interpreterNeeded ||
+    '';
 
   return (
     <div
       className="reception-task-sheet"
       role="dialog"
       aria-label={`Patient tasks: ${displayName}`}
-      aria-modal="false"
+      aria-modal="true"
     >
       <header className="reception-task-sheet__header">
         <div className="reception-task-sheet__identity">
@@ -92,6 +106,15 @@ export default function ReceptionPatientTaskSheet({
             <dt>Arrival</dt>
             <dd>{patient.arrival?.arrivalMode || patient.source || '—'}</dd>
           </div>
+          {language || interpreter === 'yes' ? (
+            <div>
+              <dt>Language</dt>
+              <dd>
+                {language || '—'}
+                {interpreter === 'yes' ? ' · Interpreter needed' : ''}
+              </dd>
+            </div>
+          ) : null}
         </dl>
 
         {flagLabels.length ? (

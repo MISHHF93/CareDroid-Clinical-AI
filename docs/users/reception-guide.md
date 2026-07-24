@@ -13,6 +13,34 @@ You are the first clinical touchpoint for every patient who enters the Emergency
 
 **Target:** Every walk-in patient ready for triage within 3 minutes of arrival.
 
+## Skills that run your shift (not manager metrics)
+
+The desk is built around **job skills** (see `src/config/receptionSkillModel.ts`):
+
+| Skill | What you do |
+|-------|-------------|
+| **Find before create** | Search name / DOB / health card before opening a new chart |
+| **Rapid walk-in** | Complaint + identity → create & send to nurse |
+| **Crash / unknown** | Critical or unknown patient → send to nurse without finishing insurance |
+| **Scan ID & review** | OCR fields need your accept/edit before they count |
+| **Resolve possible match** | Confirm link vs create-new when a chart looks familiar |
+| **Defer admin** | Insurance/consent can wait on the ID-check list |
+| **Clear your lists** | Empty verification / waiting-for-nurse before you leave — use **End of shift** checklist |
+| **Language access** | Preferred language + interpreter on the **first intake screen** (and registration details) |
+
+The yellow/blue **What to do next** strip is rule-based desk guidance — not a chatbot, and not triage.
+
+### Rapid / crash routing
+- **Standard walk-in:** complete life-critical fields (consciousness, breathing, distress, pain) when you can.
+- **High-risk or red flags:** rapid route — complaint is enough to create & send; safety fields recommended only.
+- **Crash / unknown:** use **Send unknown / crash** or Other arrivals → Patient unknown. Care first; identity later.
+
+### Escalations
+When you escalate, CareDroid raises a desk alert and broadcasts to **triage nurse** and **charge nurse** targets (live board + realtime event). Confirm the toast shows who was notified.
+
+### End of shift
+Open shift clearance from **What to do next** when lists are long, or clear EMS / ID-check / waiting-for-nurse tabs. Record a shift handoff note so the next clerk knows what was left.
+
 ---
 
 ## Your Screens
@@ -21,6 +49,9 @@ You are the first clinical touchpoint for every patient who enters the Emergency
 |--------|-------|-----|
 | Reception Workspace | `/emergency/reception` | **Your home screen** — start here |
 | Smart Intake | Embedded in Reception | Patient registration form |
+| Profile | `/profile` | Your **Reception job profile** — desk skills, shortcuts, open desk |
+
+**Pilot handoff package:** [`docs/reception-upgrade/RECEPTION_HANDOFF.md`](../reception-upgrade/RECEPTION_HANDOFF.md)
 
 > **Note:** The whiteboard, EMS pipeline, and clinical screens are not available to your role. This is intentional — reception-first means you handle arrivals, not clinical decisions.
 
