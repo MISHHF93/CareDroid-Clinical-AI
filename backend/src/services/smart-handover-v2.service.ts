@@ -61,7 +61,17 @@ interface ERPulsePatientContext {
   consults?: string[];
 }
 
-interface StructuredSummaryInput extends ERPulsePatientContext {
+interface HydratedPatientContext extends ERPulsePatientContext {
+  pmh: string[];
+  medications: string[];
+  allergies: string[];
+  vitals: ClinicalVital[];
+  labs: ClinicalLab[];
+  imaging: ClinicalImagingStudy[];
+  consults: string[];
+}
+
+interface StructuredSummaryInput extends HydratedPatientContext {
   latestVital: ClinicalVital;
 }
 
@@ -123,7 +133,7 @@ export class ERPulseHandoverService {
   private buildPatientContext(
     patientId: string,
     context: Partial<ERPulsePatientContext>,
-  ): ERPulsePatientContext {
+  ): HydratedPatientContext {
     return {
       patientId,
       name: context.name || 'Demo Emergency Patient',
