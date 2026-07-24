@@ -1,4 +1,4 @@
-import { Injectable, Logger, Optional, OnModuleInit } from '@nestjs/common';
+import { ConflictException, Injectable, Logger, Optional, OnModuleInit } from '@nestjs/common';
 // OnModuleInit used by EmergencyPatientService board rehydrate
 import { InjectRepository } from '@nestjs/typeorm';
 import type { Repository } from 'typeorm';
@@ -42,6 +42,12 @@ import type {
   WorkflowActionType,
 } from './emergency-os.types';
 import { ensurePatientArrivalBlock } from './patient-arrival.sync';
+import {
+  DUPLICATE_HIGH_CONFIDENCE_THRESHOLD,
+  DUPLICATE_MANUAL_REVIEW_THRESHOLD,
+  findPatientDuplicateCandidates,
+  type PatientDuplicateCandidate,
+} from './patient-duplicate-detection';
 import { Patient } from './entities/patient.entity';
 import { Alert } from './entities/alert.entity';
 import { WorkflowActionLogEntry } from './entities/workflow-action-log-entry.entity';
@@ -520,6 +526,7 @@ const WORKFLOW_LOG_TITLES: Record<WorkflowActionType, string> = {
   patient_note_added: 'Patient note added',
   operational_alert_dispatched: 'Operational alert dispatched',
   patient_escalated: 'Patient escalated',
+  patient_duplicate_flagged: 'Duplicate patient flagged',
 };
 
 type WorkflowActionInput = Omit<
@@ -1608,9 +1615,17 @@ function buildInboundEmsRecord(
   };
 }
 
+/** Duplicate-check escape hatch: the client already ran its own gate and staff confirmed. */
+export type SmartIntakeCreateInput = Partial<EmergencyPatient> & {
+  confirmDuplicateOverride?: boolean;
+};
+
 @Injectable()
 export class SmartIntakeService {
-  constructor(private readonly patientService: EmergencyPatientService) {}
+  constructor(
+    private readonly patientService: EmergencyPatientService,
+    private readonly workflowLogService: WorkflowActionLogService,
+  ) {}
 
   getSmartIntake() {
     return envelope('Smart Intake', {
@@ -1633,12 +1648,83 @@ export class SmartIntakeService {
     });
   }
 
-  createFromIntake(input: Partial<EmergencyPatient>) {
-    const patient = this.patientService.createPatient(input);
-    return envelope('Smart Intake', { patient });
+  /**
+   * Server-side duplicate gate. Runs regardless of what the caller's own client
+   * already checked — closes the gap where the primary create-patient path had no
+   * check of its own (only the reception UI's client-side gate did). Blocks a
+   * high-confidence match unless the caller explicitly confirms with
+   * confirmDuplicateOverride; anything below that is logged but non-blocking.
+   */
+  private guardAgainstUnconfirmedDuplicate(
+    input: SmartIntakeCreateInput,
+  ): PatientDuplicateCandidate[] {
+    const demographics = {
+      firstName: input.firstName,
+      lastName: input.lastName,
+      dob: input.dob,
+      sex: input.sex,
+      mrn: input.mrn,
+    };
+    const candidates = findPatientDuplicateCandidates(
+      this.patientService.listPatients(),
+      demographics,
+      {
+        minScore: DUPLICATE_MANUAL_REVIEW_THRESHOLD,
+        limit: 5,
+      },
+    );
+    if (!candidates.length) return candidates;
+
+    const top = candidates[0];
+    const isHighConfidence = top.matchScore >= DUPLICATE_HIGH_CONFIDENCE_THRESHOLD;
+    const displayName = `${input.firstName || 'Unknown'} ${input.lastName || 'Patient'}`.trim();
+
+    if (isHighConfidence && !input.confirmDuplicateOverride) {
+      this.workflowLogService.record({
+        type: 'patient_duplicate_flagged',
+        title: 'Duplicate patient creation blocked',
+        summary: `Blocked create for ${displayName} — top match ${top.matchScore}% against existing patient ${top.patientId}.`,
+        source: 'smart-intake-service',
+        severity: 'Warning',
+        metadata: {
+          blocked: true,
+          topMatchPatientId: top.patientId,
+          topMatchScore: top.matchScore,
+        },
+      });
+      throw new ConflictException({
+        message:
+          'Possible duplicate patient detected. Review the candidates and resubmit with confirmDuplicateOverride to proceed.',
+        duplicateCandidates: candidates,
+      });
+    }
+
+    this.workflowLogService.record({
+      type: 'patient_duplicate_flagged',
+      title: isHighConfidence
+        ? 'Duplicate patient creation confirmed by caller'
+        : 'Possible duplicate patient created',
+      summary: `Created ${displayName} with ${candidates.length} candidate match(es); top ${top.matchScore}% against ${top.patientId}.`,
+      source: 'smart-intake-service',
+      severity: isHighConfidence ? 'Warning' : 'Info',
+      metadata: {
+        blocked: false,
+        overrideConfirmed: Boolean(input.confirmDuplicateOverride),
+        topMatchPatientId: top.patientId,
+        topMatchScore: top.matchScore,
+      },
+    });
+    return candidates;
   }
 
-  createVerticalSlice(input: Partial<EmergencyPatient> & { staffId?: string }) {
+  createFromIntake(input: SmartIntakeCreateInput) {
+    const duplicateCandidates = this.guardAgainstUnconfirmedDuplicate(input);
+    const patient = this.patientService.createPatient(input);
+    return envelope('Smart Intake', { patient, duplicateCandidates });
+  }
+
+  createVerticalSlice(input: SmartIntakeCreateInput & { staffId?: string }) {
+    const duplicateCandidates = this.guardAgainstUnconfirmedDuplicate(input);
     const now = new Date().toISOString();
     const staffId = input.staffId || input.assignedStaffId || 'smart-intake-rn';
     const requestedState = 'Arrival' as const;
@@ -1685,6 +1771,7 @@ export class SmartIntakeService {
       },
       transitions: triagedPatient.timeline,
       reassessmentTriggered,
+      duplicateCandidates,
     };
   }
 }

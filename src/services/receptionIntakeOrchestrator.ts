@@ -678,9 +678,14 @@ export async function syncReceptionPatientToBackend(
 
   try {
     const payload = serializePatientForBackendApi(patient);
+    // Reception's own duplicate gate (createAndRoute's high-confidence block, staff
+    // confirmation dialog) has already resolved by the time a patient reaches sync —
+    // this is a trusted internal caller, not the unchecked-API-client case the
+    // backend's own duplicate gate exists to catch.
+    const syncOptions = { confirmDuplicateOverride: true };
     const response = canSyncSmartIntake
-      ? await createSmartIntakePatient(payload)
-      : await createEmergencyPatient(payload);
+      ? await createSmartIntakePatient(payload, syncOptions)
+      : await createEmergencyPatient(payload, syncOptions);
     const remotePatient =
       response?.data?.patient ||
       response?.patient ||

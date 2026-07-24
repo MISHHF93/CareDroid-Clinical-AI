@@ -45,6 +45,7 @@ import {
   ReassessmentService,
   ReferralService,
   SmartIntakeService,
+  type SmartIntakeCreateInput,
   WorkflowActionLogService,
 } from './emergency-os.services';
 import { PatientDocumentArtifactService } from './patient-document-artifact.service';
@@ -62,7 +63,7 @@ import type {
   RecordClinicalCalculatorDto,
   RecordCopilotInteractionDto,
 } from './clinical-decision-support.types';
-import type { EmergencyOsSettingsPatch, EmergencyPatient } from './emergency-os.types';
+import type { EmergencyOsSettingsPatch } from './emergency-os.types';
 import type {
   ExtractDocumentArtifactsInput,
   PatientDocumentArtifactReviewInput,
@@ -154,7 +155,7 @@ export class EmergencyOsController {
 
   @RequirePermission(Permission.WRITE_PHI)
   @Post('patients')
-  createPatient(@Body() dto: Partial<EmergencyPatient>) {
+  createPatient(@Body() dto: SmartIntakeCreateInput) {
     return this.smartIntakeService.createFromIntake(dto);
   }
 
@@ -477,7 +478,7 @@ export class EmergencyOsController {
 
   @RequirePermission(Permission.WRITE_PHI)
   @Post('intake')
-  createIntakePatient(@Body() dto: Partial<EmergencyPatient>) {
+  createIntakePatient(@Body() dto: SmartIntakeCreateInput) {
     return this.smartIntakeService.createFromIntake(dto);
   }
 
@@ -485,10 +486,12 @@ export class EmergencyOsController {
   @Post('intake/vertical-slice')
   createSmartIntakeVerticalSlice(
     @Body()
-    dto: Partial<EmergencyPatient> & { patient?: Partial<EmergencyPatient>; staffId?: string },
+    dto: SmartIntakeCreateInput & { patient?: SmartIntakeCreateInput; staffId?: string },
   ) {
     const slice = this.smartIntakeService.createVerticalSlice({
       ...(dto.patient || dto),
+      confirmDuplicateOverride:
+        dto.patient?.confirmDuplicateOverride ?? dto.confirmDuplicateOverride,
       staffId: dto.staffId,
     });
     const whiteboard = this.whiteboardService.getWhiteboard().data;

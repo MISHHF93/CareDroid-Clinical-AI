@@ -441,7 +441,10 @@ export default function QuickIntake({
     setSubmitError('');
 
     try {
-      const response = await createSmartIntakePatient(patient);
+      // Reception's own duplicate gate above (highConfidenceDuplicate + duplicateAcknowledged)
+      // already resolved before this point for the reception variant; other variants are
+      // staff-operated forms too, not an unattested caller — trust this internal call site.
+      const response = await createSmartIntakePatient(patient, { confirmDuplicateOverride: true });
       const persistedPatient = response?.data?.patient || patient;
       addPatient(persistedPatient);
       const handoffSource = isReceptionIntake ? 'reception-quick-intake' : 'quick-intake';

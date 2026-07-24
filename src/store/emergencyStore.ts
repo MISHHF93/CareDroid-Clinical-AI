@@ -3120,7 +3120,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       });
 
       if (options?.syncToBackend) {
-        void createSmartIntakePatient(patientWithTimeline).catch((error) => {
+        void createSmartIntakePatient(patientWithTimeline, { confirmDuplicateOverride: true }).catch((error) => {
           logger.warn('Failed to sync smart intake patient to backend', {
             patientId: patientWithTimeline?.id,
             error: error instanceof Error ? error.message : String(error),

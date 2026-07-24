@@ -64,7 +64,8 @@ export type WorkflowActionType =
   | 'staff_assigned'
   | 'patient_note_added'
   | 'operational_alert_dispatched'
-  | 'patient_escalated';
+  | 'patient_escalated'
+  | 'patient_duplicate_flagged';
 
 export type WorkflowActionSeverity = 'Info' | 'Warning' | 'Critical';
 export type WorkflowActionStatus = 'recorded' | 'pending' | 'completed' | 'failed';

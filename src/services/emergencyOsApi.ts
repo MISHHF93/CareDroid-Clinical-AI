@@ -400,16 +400,22 @@ export const evaluateHybridDigitalTwinScenario = (payload: any = {}) =>
     body: JSON.stringify(payload),
   });
 
-export const createEmergencyPatient = (patient) =>
+export const createEmergencyPatient = (patient, options: { confirmDuplicateOverride?: boolean } = {}) =>
   requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.patients, {
     method: 'POST',
-    body: JSON.stringify(serializePatientForBackendApi(patient)),
+    body: JSON.stringify({
+      ...serializePatientForBackendApi(patient),
+      confirmDuplicateOverride: options.confirmDuplicateOverride,
+    }),
   });
 
-export const createSmartIntakePatient = (patient) =>
+export const createSmartIntakePatient = (patient, options: { confirmDuplicateOverride?: boolean } = {}) =>
   requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.intake, {
     method: 'POST',
-    body: JSON.stringify(serializePatientForBackendApi(patient)),
+    body: JSON.stringify({
+      ...serializePatientForBackendApi(patient),
+      confirmDuplicateOverride: options.confirmDuplicateOverride,
+    }),
   });
 
 export const runSmartIntakeVerticalSlice = (payload: any = {}) =>

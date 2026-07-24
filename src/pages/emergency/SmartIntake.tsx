@@ -918,7 +918,13 @@ export default function SmartIntake({
             () =>
               isBackendCapabilityEnabled('emergencySmartIntakeIdentitySession')
                 ? SmartIntakeApi.createPatient(sessionId, emergencyRole.roleLabel)
-                : runSmartIntakeVerticalSlice({ patient, staffId: 'smart-intake-rn' }),
+                : runSmartIntakeVerticalSlice({
+                    patient,
+                    staffId: 'smart-intake-rn',
+                    // Staff already reviewed matchCandidates and explicitly chose
+                    // "Create patient" over "Link patient" above.
+                    confirmDuplicateOverride: true,
+                  }),
             (result) =>
               result
                 ? hydrateSmartIntakeResult(result, patient)
