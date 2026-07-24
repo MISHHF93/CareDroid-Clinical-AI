@@ -42,17 +42,17 @@ export class User {
 
   @Column({ type: 'varchar', length: 64, nullable: true })
   @Exclude()
-  emailVerificationToken: string;
+  emailVerificationToken: string | null;
 
   @Column({ type: 'datetime', nullable: true })
-  emailVerificationExpiry: Date;
+  emailVerificationExpiry: Date | null;
 
   @Column({ type: 'varchar', length: 64, nullable: true })
   @Exclude()
-  passwordResetToken: string;
+  passwordResetToken: string | null;
 
   @Column({ type: 'datetime', nullable: true })
-  passwordResetExpiry: Date;
+  passwordResetExpiry: Date | null;
 
   @Column({ type: 'boolean', default: true })
   isActive: boolean;

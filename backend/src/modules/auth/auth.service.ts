@@ -3,6 +3,7 @@ import {
   UnauthorizedException,
   BadRequestException,
   ForbiddenException,
+  InternalServerErrorException,
   Optional,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -357,6 +358,10 @@ export class AuthService {
       });
     }
 
+    if (!user) {
+      throw new InternalServerErrorException('Failed to bootstrap dev session user');
+    }
+
     user.lastLoginAt = new Date();
     user.lastLoginIp = ipAddress;
     await this.userRepository.save(user);
@@ -508,7 +513,7 @@ export class AuthService {
       throw new BadRequestException('Invalid verification token');
     }
 
-    if (new Date() > user.emailVerificationExpiry) {
+    if (!user.emailVerificationExpiry || new Date() > user.emailVerificationExpiry) {
       throw new BadRequestException('Verification token expired');
     }
 
