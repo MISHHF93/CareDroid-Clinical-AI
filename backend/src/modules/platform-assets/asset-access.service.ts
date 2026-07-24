@@ -39,9 +39,7 @@ export class AssetAccessService {
     const workspaceRecommended = new Set(
       this.resolveWorkspaceAssetIds(activeWorkspace?.settings?.recommendedAssetIds || []),
     );
-    const roleRecommended = new Set<string>(
-      (ctx.roleProfile?.preferredAssetIds || []) as string[],
-    );
+    const roleRecommended = new Set<string>((ctx.roleProfile?.preferredAssetIds || []) as string[]);
     const prefs = await this.userPreferencesService.getPreferences(user.id);
     const pinned = new Set([
       ...(prefs.toolPreferences?.pinnedAssetIds || []),

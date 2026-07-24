@@ -124,7 +124,9 @@ describe('OcrIntakeService', () => {
       field.confidence = 0.95;
     }
 
-    const applied = await service.applyToIntake(job.id, 'staff-1', { autoAcceptHighConfidence: true });
+    const applied = await service.applyToIntake(job.id, 'staff-1', {
+      autoAcceptHighConfidence: true,
+    });
     expect(applied.appliedToIntake).toBe(true);
     expect(applied.appliedDemographics?.firstName).toBe('Jordan');
   });

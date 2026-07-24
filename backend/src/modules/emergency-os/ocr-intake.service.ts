@@ -321,9 +321,13 @@ export class OcrIntakeService implements OnModuleDestroy {
             patch.phone = demographics.phone;
             patch.mobilePhone = demographics.phone;
           }
-          if (demographics.healthCardNumber) patch.mrn = existing.mrn || demographics.healthCardNumber;
+          if (demographics.healthCardNumber)
+            patch.mrn = existing.mrn || demographics.healthCardNumber;
           if (demographics.firstName || demographics.lastName) {
-            patch.name = [demographics.firstName || existing.firstName, demographics.lastName || existing.lastName]
+            patch.name = [
+              demographics.firstName || existing.firstName,
+              demographics.lastName || existing.lastName,
+            ]
               .filter(Boolean)
               .join(' ')
               .trim();
