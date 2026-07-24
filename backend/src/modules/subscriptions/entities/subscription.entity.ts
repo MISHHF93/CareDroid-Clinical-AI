@@ -68,10 +68,10 @@ export class Subscription {
   canceledAt: Date;
 
   @Column({ type: 'datetime', nullable: true })
-  trialStart: Date;
+  trialStart: Date | null;
 
   @Column({ type: 'datetime', nullable: true })
-  trialEnd: Date;
+  trialEnd: Date | null;
 
   @Column({ type: 'simple-json', nullable: true })
   metadata: Record<string, any>;

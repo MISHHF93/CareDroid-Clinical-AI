@@ -2,6 +2,7 @@ import {
   Injectable,
   BadRequestException,
   NotFoundException,
+  ServiceUnavailableException,
   Logger,
   Optional,
 } from '@nestjs/common';
@@ -60,6 +61,11 @@ export class SubscriptionsService {
     successUrl?: string,
     cancelUrl?: string,
   ) {
+    if (!this.stripe) {
+      throw new ServiceUnavailableException('Payment processing is not configured.');
+    }
+    const stripe = this.stripe;
+
     const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!user) {
       throw new NotFoundException('User not found');
@@ -70,7 +76,7 @@ export class SubscriptionsService {
     // Create or get Stripe customer
     let customerId = subscription?.stripeCustomerId;
     if (!customerId) {
-      const customer = await this.stripe.customers.create({
+      const customer = await stripe.customers.create({
         email: user.email,
         metadata: { userId: user.id },
       });
@@ -84,7 +90,7 @@ export class SubscriptionsService {
     }
 
     // Create checkout session
-    const session = await this.stripe.checkout.sessions.create({
+    const session = await stripe.checkout.sessions.create({
       customer: customerId,
       payment_method_types: ['card'],
       line_items: [
@@ -119,12 +125,17 @@ export class SubscriptionsService {
   }
 
   async createCustomerPortalSession(userId: string, returnUrl?: string) {
+    if (!this.stripe) {
+      throw new ServiceUnavailableException('Payment processing is not configured.');
+    }
+    const stripe = this.stripe;
+
     const subscription = await this.subscriptionRepository.findOne({ where: { userId } });
     if (!subscription?.stripeCustomerId) {
       throw new BadRequestException('No active subscription found');
     }
 
-    const session = await this.stripe.billingPortal.sessions.create({
+    const session = await stripe.billingPortal.sessions.create({
       customer: subscription.stripeCustomerId,
       return_url: returnUrl || this.configService.get<string>('stripe.successUrl'),
     });
@@ -282,21 +293,23 @@ export class SubscriptionsService {
       case SubscriptionTier.FREE:
       case SubscriptionTier.TRIAL:
       case SubscriptionTier.STARTER:
-        return this.configService.get<string>('stripe.plans.free.priceId');
+        return this.configService.get<string>('stripe.plans.free.priceId') ?? null;
       case SubscriptionTier.PROFESSIONAL:
-        return this.configService.get<string>('stripe.plans.professional.priceId');
+        return this.configService.get<string>('stripe.plans.professional.priceId') ?? null;
       case SubscriptionTier.INSTITUTIONAL:
       case SubscriptionTier.ENTERPRISE:
-        return this.configService.get<string>('stripe.plans.institutional.priceId');
+        return this.configService.get<string>('stripe.plans.institutional.priceId') ?? null;
       case SubscriptionTier.ACADEMIC:
         return (
           this.configService.get<string>('stripe.plans.academic.priceId') ||
-          this.configService.get<string>('stripe.plans.professional.priceId')
+          this.configService.get<string>('stripe.plans.professional.priceId') ||
+          null
         );
       case SubscriptionTier.GOVERNMENT:
         return (
           this.configService.get<string>('stripe.plans.government.priceId') ||
-          this.configService.get<string>('stripe.plans.institutional.priceId')
+          this.configService.get<string>('stripe.plans.institutional.priceId') ||
+          null
         );
       default:
         return null;

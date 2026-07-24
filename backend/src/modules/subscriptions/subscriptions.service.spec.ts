@@ -175,6 +175,14 @@ describe('SubscriptionsService', () => {
 
       await expect(service.createCheckoutSession(userId, tier)).rejects.toThrow('User not found');
     });
+
+    it('should throw ServiceUnavailableException when Stripe is not configured', async () => {
+      (service as any).stripe = null;
+
+      await expect(service.createCheckoutSession('1', SubscriptionTier.PROFESSIONAL)).rejects.toThrow(
+        'Payment processing is not configured.',
+      );
+    });
   });
 
   describe('createCustomerPortalSession', () => {
@@ -205,6 +213,14 @@ describe('SubscriptionsService', () => {
 
       await expect(service.createCustomerPortalSession(userId)).rejects.toThrow(
         'No active subscription found',
+      );
+    });
+
+    it('should throw ServiceUnavailableException when Stripe is not configured', async () => {
+      (service as any).stripe = null;
+
+      await expect(service.createCustomerPortalSession('1')).rejects.toThrow(
+        'Payment processing is not configured.',
       );
     });
   });
@@ -285,8 +301,8 @@ describe('SubscriptionsService', () => {
       await (service as any).handleCheckoutCompleted(session);
 
       expect(mockSubscriptionRepository.create).toHaveBeenCalledWith({
-        userId: session.metadata.userId,
-        tier: session.metadata.tier,
+        userId: session.metadata!.userId,
+        tier: session.metadata!.tier,
         status: SubscriptionStatus.ACTIVE,
         stripeCustomerId: session.customer,
         stripeSubscriptionId: session.subscription,
