@@ -290,7 +290,8 @@ describe('DrugCheckerService', () => {
         medications: ['warfarin', 'aspirin'],
       });
 
-      const interpretation = result.interpretation.toLowerCase();
+      expect(result.interpretation).toBeDefined();
+      const interpretation = result.interpretation!.toLowerCase();
       expect(
         interpretation.includes('major') ||
           interpretation.includes('interaction') ||

@@ -224,7 +224,7 @@ export class PineconeService implements IVectorDatabase, OnModuleInit {
 
       // Filter by minimum score and map to VectorMatch
       const matches: VectorMatch[] = response.matches
-        .filter((match) => match.score >= minScore)
+        .filter((match) => (match.score ?? 0) >= minScore)
         .map((match) => this.mapToVectorMatch(match, includeVectors));
 
       const latencyMs = Date.now() - startTime;

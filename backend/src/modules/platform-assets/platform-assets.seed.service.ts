@@ -210,7 +210,7 @@ export class PlatformAssetsSeedService implements OnModuleInit {
       title: asset.title,
       description: asset.description,
       category: asset.category,
-      clinicalSpecialty: asset.specialties?.[0] || null,
+      clinicalSpecialty: asset.specialties?.[0] || undefined,
       route: asset.route,
       launchType: asset.launchType,
       permissionPolicy: asset.permissionPolicy,

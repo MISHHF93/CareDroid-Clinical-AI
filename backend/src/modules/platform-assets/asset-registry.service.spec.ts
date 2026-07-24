@@ -168,10 +168,12 @@ describe('AssetRegistryService', () => {
     );
 
     for (const asset of SEED_PLATFORM_ASSETS) {
+      const registryType = normalizeRegistryType(asset.assetType);
+      expect(registryType).not.toBeNull();
       const projection = {
         assetId: asset.id,
         title: asset.title,
-        type: normalizeRegistryType(asset.assetType),
+        type: registryType as AssetRegistryType,
         category: asset.category,
         route: asset.route,
         organizationTypes: asset.organizationTypes,

@@ -31,16 +31,21 @@ import { TenantIsolationGuard } from '../tenant-context/tenant-isolation.guard';
 @ApiTags('subscriptions')
 @Controller('subscriptions')
 export class SubscriptionsController {
-  private stripe: Stripe;
+  private stripe: Stripe | null;
 
   constructor(
     private readonly subscriptionsService: SubscriptionsService,
     private readonly configService: ConfigService,
   ) {
     const stripeSecret = this.configService.get<string>('stripe.secretKey');
-    this.stripe = new Stripe(stripeSecret, {
-      apiVersion: '2023-10-16',
-    });
+    if (!stripeSecret) {
+      console.warn('Stripe secret key not configured. Payment features will be disabled.');
+      this.stripe = null;
+    } else {
+      this.stripe = new Stripe(stripeSecret, {
+        apiVersion: '2023-10-16',
+      });
+    }
   }
 
   @Get('plans')
@@ -189,7 +194,16 @@ export class SubscriptionsController {
     let event: Stripe.Event;
 
     try {
+      if (!this.stripe) {
+        return { error: 'Stripe is not configured' };
+      }
+      if (!req.rawBody) {
+        throw new Error('Missing raw request body');
+      }
       const webhookSecret = this.configService.get<string>('stripe.webhookSecret');
+      if (!webhookSecret) {
+        throw new Error('Stripe webhook secret not configured');
+      }
       event = this.stripe.webhooks.constructEvent(req.rawBody, signature, webhookSecret);
     } catch (err) {
       console.error(

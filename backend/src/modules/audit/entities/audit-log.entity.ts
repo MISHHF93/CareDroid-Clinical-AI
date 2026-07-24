@@ -40,7 +40,7 @@ export class AuditLog {
   id: string;
 
   @Column({ type: 'uuid', nullable: true })
-  userId: string;
+  userId: string | null;
 
   @Column({ type: 'uuid', nullable: true })
   workspaceId: string;

@@ -127,7 +127,7 @@ export class AuditService {
 
       // Recalculate the expected hash
       const expectedHash = this.calculateHash({
-        userId: log.userId,
+        userId: log.userId ?? undefined,
         action: log.action,
         resource: log.resource,
         ipAddress: log.ipAddress,

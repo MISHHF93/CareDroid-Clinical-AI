@@ -307,7 +307,7 @@ export class EntitlementService {
         },
         {
           organizationId: input.organizationId || input.organization?.id,
-          workspaceId: input.workspaceId,
+          workspaceId: input.workspaceId ?? undefined,
         },
         {
           id: input.userId || undefined,

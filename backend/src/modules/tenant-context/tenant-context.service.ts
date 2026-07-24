@@ -60,7 +60,7 @@ export class TenantContextService {
 
     const organizationMembership = await this.resolveOrganizationMembership(
       user.id,
-      requestedOrganizationId || profile?.organizationId,
+      requestedOrganizationId || profile?.organizationId || undefined,
     );
     const workspaceMembership = await this.resolveWorkspaceMembership(
       user.id,

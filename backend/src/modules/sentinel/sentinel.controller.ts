@@ -169,7 +169,11 @@ export class SentinelController {
       'priority',
     ];
     const hasClinical = clinicalKeys.some((k) => body && body[k] != null);
-    let inbound = null;
+    let inbound: {
+      id: string;
+      missingFields: readonly string[];
+      validation: Awaited<ReturnType<SentinelInboundService['upsertFromCadOrNemsis']>>['validation'];
+    } | null = null;
     if (hasClinical || body?.patient) {
       const payload =
         body.patient && typeof body.patient === 'object'
