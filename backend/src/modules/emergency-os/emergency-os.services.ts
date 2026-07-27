@@ -159,6 +159,44 @@ function normalizePatientFlags(rawFlags: unknown): string[] {
   return withUniqueFlags(normalized);
 }
 
+/**
+ * Some callers (e.g. Smart Intake's vertical-slice flow, via
+ * `normalizeSmartIntakeVitals`) send blood pressure as `bpSystolic`/
+ * `bpDiastolic` rather than the canonical `EmergencyVitals.sbp`/`.dbp`, and
+ * omit `recordedBy` entirely. Widely-consumed hypotension/reassessment logic
+ * (alertEngine, reassessmentEngine, qSOFA, clinical-protocol/deterioration
+ * services) reads `.sbp`/`.dbp` directly — normalize here, the single
+ * patient-creation choke point, so BP never silently goes missing.
+ */
+function normalizeVitalsEntry(
+  raw: Record<string, unknown>,
+  fallbackStaffId: string,
+  now: string,
+): EmergencyVitals {
+  const sbp = raw.sbp ?? raw.bpSystolic;
+  const dbp = raw.dbp ?? raw.bpDiastolic;
+  return {
+    ...(raw as Partial<EmergencyVitals>),
+    sbp: typeof sbp === 'number' ? sbp : undefined,
+    dbp: typeof dbp === 'number' ? dbp : undefined,
+    recordedAt: (raw.recordedAt as string) || now,
+    recordedBy: (raw.recordedBy as string) || fallbackStaffId,
+  } as EmergencyVitals;
+}
+
+function normalizePatientVitals(
+  rawVitals: unknown,
+  fallbackStaffId: string,
+  now: string,
+): EmergencyVitals[] {
+  const list = Array.isArray(rawVitals) ? rawVitals : rawVitals ? [rawVitals] : [];
+  return list
+    .filter(
+      (entry): entry is Record<string, unknown> => Boolean(entry) && typeof entry === 'object',
+    )
+    .map((entry) => normalizeVitalsEntry(entry, fallbackStaffId, now));
+}
+
 const aiProviderConfig = readAIProviderConfig();
 const CARE_DROID_SCREEN_MODES: CareDroidScreenMode[] = [
   'TRIAGE_SCREEN',
@@ -1082,11 +1120,11 @@ export class EmergencyPatientService implements OnModuleInit {
       complaintCategory: normalized.complaintCategory || 'Other',
       state,
       priority,
-      vitals: (Array.isArray(normalized.vitals)
-        ? normalized.vitals
-        : normalized.vitals
-          ? [normalized.vitals as unknown as EmergencyVitals]
-          : []) as EmergencyVitals[],
+      vitals: normalizePatientVitals(
+        normalized.vitals,
+        normalized.assignedStaffId || 'intake',
+        now,
+      ),
       flags: normalized.flags
         ? normalizePatientFlags(normalized.flags)
         : priority === 'P1' || priority === 'P2'
