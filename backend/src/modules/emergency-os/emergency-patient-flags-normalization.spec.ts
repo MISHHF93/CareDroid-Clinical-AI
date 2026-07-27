@@ -1,0 +1,121 @@
+import { EmergencyPatientService } from './emergency-os.services';
+
+function makeService() {
+  const workflowLogService = { record: jest.fn() } as unknown as { record: jest.Mock };
+  const service = new EmergencyPatientService(workflowLogService as any);
+  return { service, workflowLogService };
+}
+
+describe('EmergencyPatientService.createPatient — flags normalization', () => {
+  it('stores a plain string[] as-is (the common, correct case)', () => {
+    const { service } = makeService();
+
+    const patient = service.createPatient({
+      firstName: 'Amy',
+      lastName: 'Rivera',
+      flags: ['HighRisk', 'EMSArrival'],
+    });
+
+    expect(patient.flags).toEqual(['HighRisk', 'EMSArrival']);
+  });
+
+  it("extracts .type from object-shaped flags — the real shape Smart Intake's vertical-slice flow sends", () => {
+    const { service } = makeService();
+
+    // Matches src/data/smartIntakeVerticalSlice.ts's createFlag() output exactly:
+    // { type, reason, severity, detectedAt }.
+    const patient = service.createPatient({
+      firstName: 'Jordan',
+      lastName: 'Lee',
+      flags: [
+        {
+          type: 'HighRisk',
+          reason: 'Smart Intake assigned P1 priority.',
+          severity: 'Critical',
+          detectedAt: '2026-07-25T10:00:00.000Z',
+        },
+        {
+          type: 'ReassessmentDue',
+          reason: 'Requires reassessment after triage.',
+          severity: 'Warning',
+          detectedAt: '2026-07-25T10:00:00.000Z',
+        },
+      ] as any,
+    });
+
+    expect(patient.flags).toEqual(['HighRisk', 'ReassessmentDue']);
+    // Every stored entry must be a real string — none of the original objects
+    // (or their metadata) leak through, since downstream code does
+    // `flags.includes(PatientFlag.X)`, which silently never matches an object.
+    for (const flag of patient.flags) {
+      expect(typeof flag).toBe('string');
+    }
+  });
+
+  it('handles a mix of string and object entries in the same array', () => {
+    const { service } = makeService();
+
+    const patient = service.createPatient({
+      firstName: 'Sam',
+      lastName: 'Okafor',
+      flags: [
+        'EMSArrival',
+        { type: 'SepsisAlert', reason: 'qSOFA positive', severity: 'Critical', detectedAt: 'x' },
+      ] as any,
+    });
+
+    expect(patient.flags).toEqual(['EMSArrival', 'SepsisAlert']);
+  });
+
+  it('drops unrecognizable entries rather than storing garbage', () => {
+    const { service } = makeService();
+
+    const patient = service.createPatient({
+      firstName: 'Priya',
+      lastName: 'Nair',
+      flags: ['HighRisk', null, undefined, 42, { noTypeField: true }] as any,
+    });
+
+    expect(patient.flags).toEqual(['HighRisk']);
+  });
+
+  it('deduplicates flags that resolve to the same string from different sources', () => {
+    const { service } = makeService();
+
+    const patient = service.createPatient({
+      firstName: 'Chen',
+      lastName: 'Wu',
+      flags: [
+        'HighRisk',
+        { type: 'HighRisk', reason: 'dup', severity: 'Critical', detectedAt: 'x' },
+      ] as any,
+    });
+
+    expect(patient.flags).toEqual(['HighRisk']);
+  });
+
+  it('still defaults to ["HighRisk"] for P1/P2 priority when no flags are given at all', () => {
+    const { service } = makeService();
+
+    const patient = service.createPatient({
+      firstName: 'No',
+      lastName: 'Flags',
+      priority: 'P1',
+    });
+
+    expect(patient.flags).toEqual(['HighRisk']);
+  });
+
+  it('stores an empty array as an empty array, not the P1/P2 default (matches pre-fix behavior)', () => {
+    const { service } = makeService();
+
+    const patient = service.createPatient({
+      firstName: 'Empty',
+      lastName: 'Flags',
+      priority: 'P1',
+      flags: [],
+    });
+
+    expect(patient.flags).toEqual([]);
+  });
+});

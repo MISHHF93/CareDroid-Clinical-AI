@@ -134,6 +134,31 @@ function withUniqueFlags(flags: string[]): string[] {
   return Array.from(new Set(flags.filter(Boolean)));
 }
 
+/**
+ * Some callers (e.g. Smart Intake's vertical-slice flow) build flags as
+ * `{ type, reason, severity, detectedAt }` objects rather than the canonical
+ * `string[]`. Coerce to canonical shape here — the single patient-creation
+ * choke point — so a corrupted array can never reach `.includes(PatientFlag.X)`
+ * checks elsewhere in the app, where an object entry would silently never match.
+ */
+function normalizePatientFlags(rawFlags: unknown): string[] {
+  if (!Array.isArray(rawFlags)) return [];
+  const normalized = rawFlags
+    .map((flag) => {
+      if (typeof flag === 'string') return flag;
+      if (
+        flag &&
+        typeof flag === 'object' &&
+        typeof (flag as { type?: unknown }).type === 'string'
+      ) {
+        return (flag as { type: string }).type;
+      }
+      return null;
+    })
+    .filter((flag): flag is string => Boolean(flag));
+  return withUniqueFlags(normalized);
+}
+
 const aiProviderConfig = readAIProviderConfig();
 const CARE_DROID_SCREEN_MODES: CareDroidScreenMode[] = [
   'TRIAGE_SCREEN',
@@ -1062,7 +1087,11 @@ export class EmergencyPatientService implements OnModuleInit {
         : normalized.vitals
           ? [normalized.vitals as unknown as EmergencyVitals]
           : []) as EmergencyVitals[],
-      flags: normalized.flags || (priority === 'P1' || priority === 'P2' ? ['HighRisk'] : []),
+      flags: normalized.flags
+        ? normalizePatientFlags(normalized.flags)
+        : priority === 'P1' || priority === 'P2'
+          ? ['HighRisk']
+          : [],
       assignedStaffId: normalized.assignedStaffId,
       roomId: normalized.roomId,
       notes: normalized.notes || [],
