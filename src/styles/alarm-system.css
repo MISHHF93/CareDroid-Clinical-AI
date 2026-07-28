@@ -258,6 +258,14 @@
   max-width: 100%;
   overflow-x: auto;
   scrollbar-width: thin;
+  /* When chips overflow the rail's width, the last one gets clipped by
+     overflow-x with no visual cue that it's scrollable — reads as a broken
+     render (a word cut mid-letter) rather than "scroll for more". Fade the
+     trailing edge instead of hard-clipping it; mask-image fades the alpha
+     channel rather than compositing a background color, so it looks correct
+     regardless of theme or whatever sits behind the rail. */
+  -webkit-mask-image: linear-gradient(to right, black calc(100% - 18px), transparent 100%);
+  mask-image: linear-gradient(to right, black calc(100% - 18px), transparent 100%);
 }
 
 /* ── List / table row alarming ── */
