@@ -159,26 +159,40 @@ export const ROLE_PERMISSION_PRESETS: Record<SaasUserRole, string[]> = Object.fr
 });
 
 export function normalizeSaasRole(role?: string | null): SaasUserRole {
-  if (role && (SAAS_USER_ROLES as readonly string[]).includes(role)) return role as SaasUserRole;
-  if (role === 'physician') return 'emergency-physician';
-  if (role === 'admin') return 'hospital-administrator';
-  if (role === 'nurse') return 'nurse';
+  // Normalize case/whitespace before matching (Cycle 220): every comparison
+  // below is a strict, case-sensitive `===`, so a differently-cased or
+  // padded input (e.g. dto.role from a client-controlled API request body —
+  // user-profile.service.ts persists it straight into roleProfileId) fell
+  // straight through to the DEFAULT_SAAS_PROFILE.role fallback instead of
+  // matching its real alias. Fails safe (student, minimal privilege), not
+  // unsafe, but still a genuine "Admin"/"ADMIN" silently becomes "student"
+  // data-quality bug for any real client that doesn't happen to send exactly
+  // lowercase.
+  const normalized = role == null ? role : role.trim().toLowerCase();
+  if (normalized && (SAAS_USER_ROLES as readonly string[]).includes(normalized)) {
+    return normalized as SaasUserRole;
+  }
+  if (normalized === 'physician') return 'emergency-physician';
+  if (normalized === 'admin') return 'hospital-administrator';
+  if (normalized === 'nurse') return 'nurse';
   if (
-    role === 'registration_clerk' ||
-    role === 'registration-clerk' ||
-    role === 'receptionist' ||
-    role === 'clerk'
+    normalized === 'registration_clerk' ||
+    normalized === 'registration-clerk' ||
+    normalized === 'receptionist' ||
+    normalized === 'clerk'
   ) {
     return 'registration-clerk';
   }
-  if (role === 'platform_super_admin' || role === 'platform-admin') return 'platform-admin';
-  if (role === 'organization_admin' || role === 'racetrack_admin') return 'racetrack-admin';
-  if (role === 'race_day_operations_manager') return 'race-day-operations-manager';
-  if (role === 'steward' || role === 'racing_steward') return 'steward';
-  if (role === 'equine_welfare_officer') return 'equine-welfare-officer';
-  if (role === 'veterinarian' || role === 'vet') return 'veterinarian';
-  if (role === 'executive_leadership') return 'executive-leadership';
-  if (role === 'auditor_regulator') return 'auditor-regulator';
+  if (normalized === 'platform_super_admin' || normalized === 'platform-admin')
+    return 'platform-admin';
+  if (normalized === 'organization_admin' || normalized === 'racetrack_admin')
+    return 'racetrack-admin';
+  if (normalized === 'race_day_operations_manager') return 'race-day-operations-manager';
+  if (normalized === 'steward' || normalized === 'racing_steward') return 'steward';
+  if (normalized === 'equine_welfare_officer') return 'equine-welfare-officer';
+  if (normalized === 'veterinarian' || normalized === 'vet') return 'veterinarian';
+  if (normalized === 'executive_leadership') return 'executive-leadership';
+  if (normalized === 'auditor_regulator') return 'auditor-regulator';
   return DEFAULT_SAAS_PROFILE.role;
 }
 
