@@ -1,5 +1,20 @@
 import { apiFetchJson, getApiErrorMessage } from './apiClient';
 
+// Explicit labels rather than deriving from `id` (e.g. `${id[0].toUpperCase()}${id.slice(1)}`):
+// a blind capitalize-first-letter transform reads correctly for ordinary words
+// ("frontend" -> "Frontend Health") but produces "Api Health" / "Ai Health" for
+// the 2 checks whose id is itself an acronym. A small, fixed, enumerable set is
+// safer made correct by construction than by a smarter-but-still-fragile heuristic.
+const SAAS_HEALTH_CHECK_LABELS = Object.freeze({
+  frontend: 'Frontend Health',
+  backend: 'Backend Health',
+  api: 'API Health',
+  integrations: 'Integrations Health',
+  tenant: 'Tenant Health',
+  ai: 'AI Health',
+  simulation: 'Simulation Health',
+});
+
 export const SAAS_HEALTH_FALLBACK = Object.freeze({
   status: 'critical',
   label: 'Critical',
@@ -15,7 +30,7 @@ export const SAAS_HEALTH_FALLBACK = Object.freeze({
     'simulation',
   ].map((id) => ({
     id,
-    label: `${id.charAt(0).toUpperCase()}${id.slice(1)} Health`,
+    label: SAAS_HEALTH_CHECK_LABELS[id],
     status: 'critical',
     displayStatus: 'Critical',
     summary: 'SaaS health endpoint is unavailable.',
