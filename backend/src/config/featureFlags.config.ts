@@ -29,7 +29,7 @@ export const FEATURE_FLAG_REGISTRY: FeatureFlagDefinition[] = [
     defaultState: FeatureFlagState.ENABLED,
     route: '/tools',
     owner: 'Clinical Platform',
-    assetIds: ['drug-check', 'lab-interp', 'protocols', 'diagnosis-assistant'],
+    assetIds: ['drug-check', 'lab-interp', 'protocols', 'diagnosis'],
   },
   {
     id: 'clinical-calculators',
@@ -56,7 +56,7 @@ export const FEATURE_FLAG_REGISTRY: FeatureFlagDefinition[] = [
     defaultState: FeatureFlagState.BETA,
     route: '/documentation',
     owner: 'CareDroid',
-    assetIds: ['ambient-scribe', 'documentation-assistant', 'order-set-ai'],
+    assetIds: ['ambient-scribe', 'clinical-documentation-assistant', 'order-set-ai'],
   },
   {
     id: 'simulation-suite',

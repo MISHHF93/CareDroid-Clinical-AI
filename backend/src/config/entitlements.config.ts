@@ -42,7 +42,7 @@ export const ENTITLEMENT_REGISTRY: EntitlementRule[] = [
     requiredPackIds: [CORE_PACK],
   },
   {
-    assetIds: ['drug-check', 'lab-interp', 'protocols', 'diagnosis-assistant'],
+    assetIds: ['drug-check', 'lab-interp', 'protocols', 'diagnosis'],
     category: EntitlementCategory.TOOLS,
     featureFlagId: 'clinical-tools-core',
     requiredPlan: SubscriptionTier.FREE,

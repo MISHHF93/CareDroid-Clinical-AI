@@ -37,7 +37,7 @@ export const ENTITLEMENT_REGISTRY = Object.freeze([
     requiredPackIds: [CORE_PACK],
   },
   {
-    assetIds: ['drug-check', 'lab-interp', 'protocols', 'diagnosis-assistant'],
+    assetIds: ['drug-check', 'lab-interp', 'protocols', 'diagnosis'],
     category: ENTITLEMENT_CATEGORIES.TOOLS,
     featureFlagId: 'clinical-tools-core',
     requiredPlan: SUBSCRIPTION_TIERS.FREE,
