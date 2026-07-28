@@ -9,6 +9,10 @@ export const HOSPITAL_READINESS_DIMENSIONS = Object.freeze([
   {
     id: 'digital_maturity',
     label: 'Digital maturity',
+    // Mid-sentence form for question text below — kept explicit rather than
+    // derived via .toLowerCase(), which mangles the acronyms in "AI maturity"
+    // and "IoT readiness" into "ai maturity"/"iot readiness".
+    midSentenceLabel: 'digital maturity',
     baseScore: 72,
     signals: ['Standardized workflows', 'Operational dashboards', 'Digital tool adoption'],
     gaps: ['Connect digital outcomes to executive value tracking'],
@@ -16,6 +20,7 @@ export const HOSPITAL_READINESS_DIMENSIONS = Object.freeze([
   {
     id: 'ai_maturity',
     label: 'AI maturity',
+    midSentenceLabel: 'AI maturity',
     baseScore: 64,
     signals: ['Assistant usage', 'Human review patterns', 'AI workflow interest'],
     gaps: ['Formalize AI evaluation, audit, and model governance routines'],
@@ -23,6 +28,7 @@ export const HOSPITAL_READINESS_DIMENSIONS = Object.freeze([
   {
     id: 'interoperability',
     label: 'Interoperability',
+    midSentenceLabel: 'interoperability',
     baseScore: 58,
     signals: ['FHIR readiness', 'HL7 planning', 'Identity and integration inventory'],
     gaps: ['Prioritize EHR, lab, and identity integrations before scale rollout'],
@@ -30,6 +36,7 @@ export const HOSPITAL_READINESS_DIMENSIONS = Object.freeze([
   {
     id: 'simulation_readiness',
     label: 'Simulation readiness',
+    midSentenceLabel: 'simulation readiness',
     baseScore: 67,
     signals: ['Scenario library fit', 'Competency workflows', 'Training program readiness'],
     gaps: ['Convert simulation usage into recurring readiness programs'],
@@ -37,6 +44,7 @@ export const HOSPITAL_READINESS_DIMENSIONS = Object.freeze([
   {
     id: 'iot_readiness',
     label: 'IoT readiness',
+    midSentenceLabel: 'IoT readiness',
     baseScore: 55,
     signals: ['Device fleet visibility', 'Telemetry quality checks', 'Maintenance workflows'],
     gaps: ['Connect device telemetry, uptime, fleet, and operations signals'],
@@ -44,6 +52,7 @@ export const HOSPITAL_READINESS_DIMENSIONS = Object.freeze([
   {
     id: 'governance_readiness',
     label: 'Governance readiness',
+    midSentenceLabel: 'governance readiness',
     baseScore: 70,
     signals: ['Audit controls', 'Privacy workflows', 'Security and regulatory ownership'],
     gaps: ['Package governance evidence for AI and enterprise review'],
@@ -53,7 +62,7 @@ export const HOSPITAL_READINESS_DIMENSIONS = Object.freeze([
 export const DEFAULT_HOSPITAL_READINESS_QUESTIONNAIRE = Object.freeze({
   questions: HOSPITAL_READINESS_DIMENSIONS.map((dimension) => ({
     id: dimension.id,
-    question: `How mature is your hospital's ${dimension.label.toLowerCase()}?`,
+    question: `How mature is your hospital's ${dimension.midSentenceLabel}?`,
     options: [
       { value: 1, label: 'Emerging' },
       { value: 2, label: 'Developing' },
