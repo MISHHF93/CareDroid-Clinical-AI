@@ -130,6 +130,49 @@ export const FEATURE_FLAG_REGISTRY: FeatureFlagDefinition[] = [
     owner: 'Compliance',
     assetIds: ['regulatory', 'governance-regulatory', 'audit-logs'],
   },
+  // The 3 flags below were missing entirely (Cycle 221) even though
+  // entitlements.config.ts's ENTITLEMENT_REGISTRY already referenced their
+  // featureFlagId — EntitlementService.resolveDecisionFromContext() only
+  // falls back to a by-assetId lookup when rule.featureFlagId is falsy, so a
+  // truthy-but-nonexistent id like these permanently resolved to
+  // FeatureFlagState.DISABLED (normalizeFeatureFlagState's own safe-fallback
+  // behavior for an unrecognized flag), making every listed asset
+  // unconditionally isVisible:false/isLaunchable:false for every user
+  // regardless of subscription tier or pack ownership — including
+  // patient-whiteboard/patient-room-display/digital-door-sign, core
+  // FREE-tier ED workflow features, not gated premium ones.
+  {
+    id: 'patient-experience-pack',
+    name: 'Patient Experience',
+    category: FeatureFlagCategory.TOOLS,
+    defaultState: FeatureFlagState.ENABLED,
+    route: '/emergency/whiteboard',
+    owner: 'Clinical Platform',
+    assetIds: ['patient-whiteboard', 'patient-room-display', 'digital-door-sign'],
+  },
+  {
+    id: 'predictive-analytics-pack',
+    name: 'Predictive Analytics',
+    category: FeatureFlagCategory.AI,
+    defaultState: FeatureFlagState.BETA,
+    route: '/predictive-analytics',
+    owner: 'CareDroid',
+    assetIds: [
+      'admission-prediction',
+      'journey-prediction',
+      'command-predictive-alerts',
+      'predictive-analytics-dashboard',
+    ],
+  },
+  {
+    id: 'ems-pre-arrival-pack',
+    name: 'EMS Pre-Arrival',
+    category: FeatureFlagCategory.TOOLS,
+    defaultState: FeatureFlagState.BETA,
+    route: '/emergency/ems',
+    owner: 'Clinical Platform',
+    assetIds: ['ems-pre-arrival', 'pre-arrival-activation', 'trauma-team-activation'],
+  },
 ];
 
 export function normalizeFeatureFlagState(state?: string): FeatureFlagState {
