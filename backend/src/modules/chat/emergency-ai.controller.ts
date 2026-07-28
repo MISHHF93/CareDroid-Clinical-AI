@@ -1,6 +1,6 @@
 import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { IsArray, IsObject, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsBoolean, IsObject, IsOptional, IsString } from 'class-validator';
 import { AuthorizationGuard } from '../auth/guards/authorization.guard';
 import { RequirePermission } from '../auth/decorators/permissions.decorator';
 import { Permission } from '../auth/enums/permission.enum';
@@ -9,7 +9,7 @@ import { appendRequiredDisclaimer } from '../../../../lib/ai/safetyPolicy';
 import { EntitlementService } from '../platform-assets/entitlement.service';
 import { assertEntitlementLaunchFromRequest } from '../platform-assets/entitlement-launch.util';
 
-class UnifiedNodeConversationalDto {
+export class UnifiedNodeConversationalDto {
   @IsString()
   message: string;
 
@@ -48,6 +48,14 @@ class UnifiedNodeConversationalDto {
   @IsOptional()
   @IsObject()
   memoryContext?: Record<string, any>;
+
+  // The real browser client (src/lib/ai/client.ts's bodyForBackendRequest)
+  // always includes this key, even when false — forbidNonWhitelisted would
+  // otherwise reject every request to this endpoint. Not yet wired to an
+  // SSE/chunked response here; accepted so real traffic isn't blocked.
+  @IsOptional()
+  @IsBoolean()
+  stream?: boolean;
 }
 
 const UNIFIED_NODE_CONVERSATIONAL_ROUTES: Record<string, { feature: string; requestType: string }> =
