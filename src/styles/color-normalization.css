@@ -61,11 +61,17 @@ html {
   border-color: color-mix(in srgb, var(--medical-border) 88%, var(--medical-accent) 12%);
 }
 
+/* [class*='--primary'] is a deliberate sweep for BEM "--primary" button
+   modifiers (see role-accent-theme.css's comment on this rule) but, being a
+   plain substring match, it also caught .cdl-zone--primary-actions — a
+   layout zone, not a button — painting its entire section dark instead of
+   just its intended button children. Excluded the same way the file already
+   excludes .reception-desk-toolbar__action. */
 :is(.app-shell, .emergency-app-shell) :is(
     [class*='--primary'],
     .btn-primary,
     [class*='cta']
-  ):not(.reception-desk-toolbar__action) {
+  ):not(.reception-desk-toolbar__action):not(.cdl-zone--primary-actions) {
   background: #374151;
   border-color: color-mix(in srgb, var(--medical-accent) 55%, var(--medical-border));
   color: var(--app-on-solid, #ffffff);
