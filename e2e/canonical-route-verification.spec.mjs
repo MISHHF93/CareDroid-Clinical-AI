@@ -83,7 +83,13 @@ async function assertNoConsoleErrors(consoleErrors, pageErrors) {
   );
   const filteredConsole = consoleErrors.filter(
     (msg) =>
-      !/proxy error|ECONNREFUSED|Failed to load resource|net::ERR_|ResizeObserver/i.test(
+      // EventSource's own MIME-type warning and configService.ts's structured
+      // "Config fetch error" log are both expected, already-gracefully-handled
+      // noise in this static-serve/no-backend QA environment (real-time SSE
+      // services fall back to polling; config fetches fall back to local
+      // defaults) — the same category of offline-backend noise this filter
+      // already tolerates, just 2 patterns it hadn't seen yet (Cycle 215).
+      !/proxy error|ECONNREFUSED|Failed to load resource|net::ERR_|ResizeObserver|EventSource's response has a MIME type|Config fetch error/i.test(
         String(msg),
       ),
   );
