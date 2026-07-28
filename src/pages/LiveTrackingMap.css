@@ -102,6 +102,16 @@
   stroke-width: 0.45;
 }
 
+/* No font-size was ever set for the marker's F/I label, so it fell back to
+   the browser's default text size (~16px) interpreted directly as SVG user
+   units in this 0-100 viewBox — next to a radius-2.2 circle, that renders as
+   a letter roughly 7x the marker's own diameter. */
+.live-map-canvas__marker text {
+  font-size: 2.4px;
+  font-weight: 700;
+  fill: var(--app-text-primary, #1f2937);
+}
+
 .live-map-canvas__marker--fleet circle {
   fill: var(--app-chart-1);
 }
@@ -127,6 +137,12 @@
   background: var(--app-surface-muted, #f8fafc);
   text-align: left;
   cursor: pointer;
+  /* strong/span/small are all inline by default, so without an explicit
+     stacking layout they run together with no gap (e.g. "North route"
+     immediately followed by "FLEET" — reads as "North routeFLEET"). */
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .live-map__marker-item--selected {

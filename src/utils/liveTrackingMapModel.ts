@@ -44,7 +44,6 @@ export function buildFleetTrackingMarkers(
     x: vehicle.mapPosition?.x ?? 12 + (index % 6) * 14,
     y: vehicle.mapPosition?.y ?? 18 + Math.floor(index / 6) * 16,
     subtitle: [
-      FLEET_STATUS_TONE[vehicle.status] ? vehicle.status : vehicle.status,
       vehicle.destination,
       vehicle.etaMinutes != null ? `ETA ${vehicle.etaMinutes}m` : null,
     ]
