@@ -1089,10 +1089,22 @@ export class EmergencyPatientService implements OnModuleInit {
   updatePatient(patientId: string, patch: Partial<EmergencyPatient>): EmergencyPatient {
     const index = this.patients.findIndex((patient) => patient.id === patientId);
     if (index === -1) throw new Error(`Emergency patient ${patientId} not found`);
+    const current = this.patients[index];
+    const normalizedPatch: Partial<EmergencyPatient> = { ...patch };
+    if (patch.flags !== undefined) {
+      normalizedPatch.flags = normalizePatientFlags(patch.flags);
+    }
+    if (patch.vitals !== undefined) {
+      normalizedPatch.vitals = normalizePatientVitals(
+        patch.vitals,
+        patch.assignedStaffId || current.assignedStaffId || 'intake',
+        new Date().toISOString(),
+      );
+    }
     this.patients[index] = {
-      ...this.patients[index],
-      ...patch,
-      id: this.patients[index].id,
+      ...current,
+      ...normalizedPatch,
+      id: current.id,
     };
     const updated = clone(this.patients[index]);
     this.persistPatientToDatabase(updated);
