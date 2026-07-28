@@ -83,6 +83,23 @@ describe('CareDroid role-based views', () => {
     expect(normalizeEmergencyRole('receptionist')).toBe(EMERGENCY_ROLE_IDS.registrationClerk);
   });
 
+  it('fails closed to readOnlyViewer for an unrecognized role string, not physician (Cycle 219)', () => {
+    // Used to default to EMERGENCY_ROLE_IDS.physician (full clinical write
+    // access) for any input that matched none of ROLE_ALIASES' ~50 explicit
+    // aliases, including a genuine typo or stale value — the opposite of
+    // least privilege, and inconsistent with canonicalAccess.ts's
+    // resolveHospitalRole(), which already fails safely to demo_observer
+    // (emergencyRoleId 'read_only_viewer') for the identical situation.
+    // demoPersonaModel.ts's applyDemoRoleView() calls this function directly,
+    // so seeding an unrecognized role (e.g. a hospitalRole-vocabulary string
+    // like 'super_admin' that isn't itself a valid EMERGENCY_ROLE_IDS value)
+    // used to silently grant physician-level access instead of the safe
+    // default either system resolves an unknown role to elsewhere.
+    expect(normalizeEmergencyRole('super_admin')).toBe(EMERGENCY_ROLE_IDS.readOnlyViewer);
+    expect(normalizeEmergencyRole('totally-unrecognized-xyz')).toBe(EMERGENCY_ROLE_IDS.readOnlyViewer);
+    expect(normalizeEmergencyRole('')).toBe(EMERGENCY_ROLE_IDS.readOnlyViewer);
+  });
+
   it('exposes default screen modes from the role-screen matrix', () => {
     expect(getDefaultScreenModeForRole(EMERGENCY_ROLE_IDS.triageNurse)).toBe('TRIAGE_SCREEN');
     expect(getDefaultScreenModeForRole(EMERGENCY_ROLE_IDS.registrationClerk)).toBe(

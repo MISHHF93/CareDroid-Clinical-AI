@@ -569,7 +569,17 @@ export function normalizeEmergencyRole(role) {
   return (
     ROLE_ALIASES[normalized] ||
     ROLE_ALIASES[normalized.replace(/_/g, ' ')] ||
-    EMERGENCY_ROLE_IDS.physician
+    // Fail closed on an unrecognized string (Cycle 219): this used to default
+    // to EMERGENCY_ROLE_IDS.physician — full clinical write access — for
+    // *any* input that didn't match a known alias, including a genuine typo
+    // or a stale/malformed value. The parallel role system in
+    // canonicalAccess.ts's resolveHospitalRole() already fails safely to
+    // demo_observer (read-only) for the identical situation; readOnlyViewer
+    // is this vocabulary's equivalent minimal-privilege role
+    // (emergencyRoleId 'read_only_viewer' on both sides), so an unrecognized
+    // role now lands on the same safe default either system resolves it
+    // through, instead of silently granting the opposite of least privilege.
+    EMERGENCY_ROLE_IDS.readOnlyViewer
   );
 }
 
