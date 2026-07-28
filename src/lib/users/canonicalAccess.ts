@@ -255,37 +255,54 @@ export const CANONICAL_ROLE_CATALOG: Readonly<Record<HospitalRole, CanonicalRole
     }),
   });
 
+// Built in two priority passes (Cycle 218), not one flat reduce: a role's
+// own self-key and explicitly-declared `aliases` are deliberate, authored
+// statements of intent and must always win; another role's auto-derived
+// emergencyRoleId/saasRole alias is incidental (a byproduct of a *different*
+// field happening to normalize to the same string) and must never be able to
+// shadow them. The single-pass version this replaced processed both in one
+// left-to-right scan with an `if (!acc[key])`-once guard, so priority was
+// really just "whichever claim happened to run first" — accidental catalog
+// order, not authored intent. That silently broke two real declared aliases
+// before this fix: `super_admin`'s `'admin'` (Cycle 217 — shadowed by a
+// hardcoded seed entry, `admin: 'it_admin'`, itself a single-pass-era
+// workaround for this exact prioritization gap) and `demo_observer`'s
+// `'read-only-viewer'` (Cycle 218 — shadowed by `lab_technician`'s
+// auto-derived `emergencyRoleId: 'read_only_viewer'` alias, since
+// `lab_technician` is earlier in the catalog and neither role's own
+// `aliases` list even mentions the other's claim). Restructuring so every
+// role's own declarations are registered first, in one pass, before any
+// auto-derived fallback is ever considered, fixes both real cases and
+// forecloses the entire class going forward — no future catalog addition can
+// silently re-shadow another role's own declared alias, the way both prior
+// bugs did.
 const ALIAS_TO_HOSPITAL_ROLE: Readonly<Record<string, HospitalRole>> = Object.freeze(
-  Object.entries(CANONICAL_ROLE_CATALOG).reduce<Record<string, HospitalRole>>((acc, [roleId, mapping]) => {
-    acc[normalizeAlias(roleId)] = roleId as HospitalRole;
-    const emergencyAlias = normalizeAlias(mapping.emergencyRoleId);
-    const saasAlias = normalizeAlias(mapping.saasRole);
-    if (!acc[emergencyAlias]) acc[emergencyAlias] = roleId as HospitalRole;
-    if (!acc[saasAlias]) acc[saasAlias] = roleId as HospitalRole;
-    mapping.aliases.forEach((alias) => {
-      const normalizedAlias = normalizeAlias(alias);
-      if (!acc[normalizedAlias]) acc[normalizedAlias] = roleId as HospitalRole;
-    });
-    return acc;
-  }, {
-    nurse: 'registered_nurse',
-    rn: 'registered_nurse',
-    physician: 'emergency_physician',
-    // No 'admin' seed here (removed Cycle 217): it silently shadowed
-    // super_admin's own explicit `aliases: ['admin', ...]` declaration below,
-    // since this reduce's `if (!acc[key])` guard only ever sets an alias
-    // once — the seed always won regardless of catalog order. Both were
-    // added in the same commit (bb18f2b7), a genuine internal
-    // inconsistency, not an intentional restriction: it_admin's own alias
-    // list is ['it-admin', 'technical-admin'], never 'admin', so it never
-    // legitimately owned this alias. The real-world effect: any account
-    // literally assigned the 'admin' emergency role (EMERGENCY_ROLE_IDS.admin
-    // — a full-access role per emergencyRolePermissions.ts's own definition)
-    // was silently downgraded to it_admin's metadata-only, no-clinical-AI
-    // restrictions everywhere this alias table is consulted (route access,
-    // command-palette visibility, etc.) — confirmed live via a real browser
-    // session, not just this table in isolation.
-  }),
+  (() => {
+    const catalogEntries = Object.entries(CANONICAL_ROLE_CATALOG);
+    const declared = catalogEntries.reduce<Record<string, HospitalRole>>(
+      (acc, [roleId, mapping]) => {
+        const selfAlias = normalizeAlias(roleId);
+        if (!acc[selfAlias]) acc[selfAlias] = roleId as HospitalRole;
+        mapping.aliases.forEach((alias) => {
+          const normalizedAlias = normalizeAlias(alias);
+          if (!acc[normalizedAlias]) acc[normalizedAlias] = roleId as HospitalRole;
+        });
+        return acc;
+      },
+      {
+        nurse: 'registered_nurse',
+        rn: 'registered_nurse',
+        physician: 'emergency_physician',
+      },
+    );
+    return catalogEntries.reduce<Record<string, HospitalRole>>((acc, [roleId, mapping]) => {
+      const emergencyAlias = normalizeAlias(mapping.emergencyRoleId);
+      const saasAlias = normalizeAlias(mapping.saasRole);
+      if (!acc[emergencyAlias]) acc[emergencyAlias] = roleId as HospitalRole;
+      if (!acc[saasAlias]) acc[saasAlias] = roleId as HospitalRole;
+      return acc;
+    }, declared);
+  })(),
 );
 
 const ROUTE_REQUIRED_PERMISSIONS: Readonly<Record<string, readonly CareDroidPermission[]>> =

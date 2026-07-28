@@ -246,11 +246,33 @@ describe('resolveHospitalRole alias resolution', () => {
   });
 
   it('maps saasRole aliases to canonical HospitalRole', () => {
-    // 'platform-admin' saasRole is shared by super_admin and it_admin; super_admin wins (first in catalog)
+    // 'platform-admin' saasRole is shared by super_admin and it_admin;
+    // super_admin wins because it's the one that explicitly declares
+    // 'platform-admin' in its own `aliases` list — not just catalog order
+    // (it_admin's own aliases are ['it-admin', 'technical-admin'] only).
     expect(resolveHospitalRole('platform-admin')).toBe('super_admin');
     // it_admin resolves via its own alias
     expect(resolveHospitalRole('it-admin')).toBe('it_admin');
     expect(resolveHospitalRole('ems-user')).toBe('paramedic');
+  });
+
+  it("a role's own declared alias always wins over another role's auto-derived emergencyRoleId/saasRole alias (Cycle 218)", () => {
+    // demo_observer explicitly declares 'read-only-viewer' as its own alias,
+    // but lab_technician (earlier in the catalog) shares the identical
+    // emergencyRoleId ('read_only_viewer'), which auto-derives to the same
+    // normalized string. Before the two-pass restructure, lab_technician's
+    // incidental auto-derived claim silently won — demo_observer's own,
+    // deliberate declaration never took effect. Same bug shape as the
+    // 'admin' case above, different mechanism (catalog order, not a seed).
+    expect(resolveHospitalRole('read-only-viewer')).toBe('demo_observer');
+    // The bare emergencyRoleId string is inherently shared/ambiguous across
+    // multiple hospital roles (lab_technician, radiology_technician,
+    // demo_observer all use it) — demo_observer winning here is a deliberate
+    // side effect of the same fix, not a separate assertion of "the" owner:
+    // it lands on the most data-restrictive of the roles that share it
+    // (metadata_only vs. lab_technician's clinical), the safer default for
+    // an inherently ambiguous generic string.
+    expect(resolveHospitalRole('read_only_viewer')).toBe('demo_observer');
   });
 
   it('falls back to demo_observer for unknown roles', () => {
