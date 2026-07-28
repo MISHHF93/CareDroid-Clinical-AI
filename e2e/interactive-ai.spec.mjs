@@ -32,6 +32,32 @@ test.beforeEach(async ({ page }) => {
   await installQaNetworkStubs(page);
 });
 
+/**
+ * Override the shared QA fixture's role for tests that need a specific one.
+ * QA_AUTH_STORAGE seeds role: 'admin' (Cycle 214) — a real, currently-broken
+ * role for command-palette permission-gated entries (every requiredAction
+ * command, not just AI ones, vanishes; root cause traced partway into
+ * canonicalAccess.ts's admin -> super_admin alias round-trip but not fully
+ * pinned — see SCORECARD roadmap). 'charge_nurse' is what these 2 tests were
+ * actually authored and verified against (see the IX13 test's own comment on
+ * ownerFor() matching), so seed it explicitly here rather than depend on
+ * whatever the shared fixture happens to resolve to.
+ */
+async function seedRole(page, role) {
+  await page.addInitScript((r) => {
+    const raw = localStorage.getItem('caredroid_user_profile');
+    if (!raw) return;
+    try {
+      const parsed = JSON.parse(raw);
+      parsed.role = r;
+      if (parsed.profile) parsed.profile.roleProfileId = r;
+      localStorage.setItem('caredroid_user_profile', JSON.stringify(parsed));
+    } catch {
+      // Malformed stored profile — leave it to seedQaAuth's own shape.
+    }
+  }, role);
+}
+
 async function openWorkspace(page, path) {
   await page.goto(path);
   await waitForAppReady(page);
@@ -89,11 +115,14 @@ test('reception: seeded workflow card renders and Acknowledge works from the key
 
 test('ems: inbox items can be assigned and commented on (IX13)', async ({ page }) => {
   // The Reception-seeded card's ownerRole ('registration_clerk') doesn't
-  // match this QA fixture's resolved role, so the (correctly) role-scoped
-  // inbox shows 0 items there. EMS seeds an 'ems_prearrival' card whose
-  // ownerFor() is 'charge_nurse' — the same value the fixture resolves to —
-  // so this proves the real collaboration wiring against an item the
-  // pre-existing personal-inbox role filter actually surfaces.
+  // match charge_nurse, so the (correctly) role-scoped inbox shows 0 items
+  // there. EMS seeds an 'ems_prearrival' card whose ownerFor() is
+  // 'charge_nurse' — so this proves the real collaboration wiring against an
+  // item the pre-existing personal-inbox role filter actually surfaces.
+  // Seeded explicitly (Cycle 215): the shared QA_AUTH_STORAGE fixture now
+  // correctly resolves to its literal 'admin' role (Cycle 214 fix), not the
+  // charge_nurse this test was actually authored and verified against.
+  await seedRole(page, 'charge_nurse');
   const workspace = await openWorkspace(page, EMS_PATH);
 
   const inbox = workspace.getByTestId('interaction-inbox');
@@ -214,6 +243,15 @@ test('reception: realtime status never claims live without a connection, and the
 test('reception: a typed AI command from the command palette runs in the workspace — id-only handoff, no text execution (IX14)', async ({
   page,
 }) => {
+  // Seeded explicitly (Cycle 215): under the shared QA_AUTH_STORAGE fixture's
+  // literal 'admin' role (now correctly resolved as of Cycle 214), every
+  // command-palette entry with a requiredAction — not just this AI one —
+  // vanishes entirely, a real, reproducible app bug traced partway into
+  // canonicalAccess.ts's admin -> super_admin alias round-trip (see
+  // SCORECARD roadmap; root cause not fully pinned). 'charge_nurse' exercises
+  // the actual feature this test verifies without depending on that bug being
+  // fixed first.
+  await seedRole(page, 'charge_nurse');
   const workspace = await openWorkspace(page, RECEPTION_PATH);
 
   // Reception autofocuses its search input; global shortcuts deliberately
