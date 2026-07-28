@@ -585,7 +585,7 @@ export default function ReferralPanel() {
       ) : null}
       {referralsModule.error ? (
         <p className="referral-panel__backend-status" role="alert">
-          {referralsModule.error}. Showing the last local referral queue; confirm live referral status before external handoff.
+          {referralsModule.error.replace(/\.+\s*$/, '')}. Showing the last local referral queue; confirm live referral status before external handoff.
         </p>
       ) : null}
       <div className="referral-panel__metrics" aria-label="Referral metrics">
