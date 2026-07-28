@@ -95,6 +95,16 @@
   overflow: hidden;
 }
 
+/* A grid item with overflow:hidden gets an implied automatic minimum
+   size of 0 rather than its content's natural size (CSS Grid/Flexbox
+   spec) — when this panel is a direct grid item (no intermediate
+   chart-specific grid wrapper, e.g. Competencies/Credentials), the row
+   collapsed to ~42px, clipping the entire .dashboard-chart (210px) below
+   it. Restoring an explicit minimum only for chart-bearing panels. */
+.dashboard-visual-panel:has(.dashboard-chart) {
+  min-height: 300px;
+}
+
 .dashboard-visual-panel__header {
   display: flex;
   flex-wrap: wrap;
