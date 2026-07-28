@@ -50,3 +50,31 @@ describe('fj-critical-banner__cta contrast (Cycle 207)', () => {
     );
   });
 });
+
+const profileSurfaceNormCss = readFileSync(
+  join(__dirname, 'profile-surface-normalization.css'),
+  'utf8',
+);
+
+describe('profile-copilot-card__cta contrast (Cycle 208)', () => {
+  // Regression guard for the same sweep-rule footgun as fj-critical-banner__cta
+  // (see above), a second real instance: this button is a real <button>, not an
+  // <a>, so only the [class*='cta'] background sweep applies (the plain a:not()
+  // and __cta-specific text-normalization.css rules both already resolve to the
+  // element's own intended --medical-text-link color, so no exclusion needed
+  // there — verified live before excluding only the one rule that was wrong).
+
+  it('color-normalization.css excludes profile-copilot-card__cta from the dark-navy CTA sweep', () => {
+    const sweepRule = colorNormalizationCss.match(
+      /\[class\*='cta'\]\s*\):[\s\S]*?\{[\s\S]*?\}/,
+    )?.[0];
+    expect(sweepRule).toBeDefined();
+    expect(sweepRule).toContain(':not(.profile-copilot-card__cta)');
+  });
+
+  it('profile-surface-normalization.css still declares the intended light-muted-surface styling (unchanged)', () => {
+    expect(profileSurfaceNormCss).toContain(
+      '.profile-copilot-card__cta {\n  color: var(--medical-text-link, var(--app-link-fg));\n  border-color: var(--medical-card-border, var(--app-border));\n  background: var(--medical-card-muted-bg, var(--app-surface-muted));\n}',
+    );
+  });
+});

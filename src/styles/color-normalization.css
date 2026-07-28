@@ -70,12 +70,15 @@ html {
    [class*='cta'] has the same substring-match risk: it also caught
    .fj-critical-banner__cta, a critical-alert "Acknowledge" action whose own
    CSS (FullJourneyOperatingPage.css) deliberately paints it red, not the
-   generic dark navy this sweep applies to ordinary CTAs. */
+   generic dark navy this sweep applies to ordinary CTAs — and
+   .profile-copilot-card__cta, a secondary/ghost button whose own CSS
+   (profile-surface-normalization.css) deliberately paints it with a light
+   muted surface + link-colored text, not a solid dark button either. */
 :is(.app-shell, .emergency-app-shell) :is(
     [class*='--primary'],
     .btn-primary,
     [class*='cta']
-  ):not(.reception-desk-toolbar__action):not(.cdl-zone--primary-actions):not(.fj-critical-banner__cta) {
+  ):not(.reception-desk-toolbar__action):not(.cdl-zone--primary-actions):not(.fj-critical-banner__cta):not(.profile-copilot-card__cta) {
   background: #374151;
   border-color: color-mix(in srgb, var(--medical-accent) 55%, var(--medical-border));
   color: var(--app-on-solid, #ffffff);
