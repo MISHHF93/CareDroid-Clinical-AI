@@ -559,6 +559,14 @@
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+  /* Sibling of the card title in a flex row (.clinical-calculator-card__header);
+     without flex-shrink: 0 this single-word badge gets squeezed below its
+     natural width by a long title and, having no space to wrap at, breaks
+     mid-letter ("GENERAL" -> "GENERA"/"L") instead of onto a new line. The
+     title already wraps gracefully at word boundaries, so let it absorb any
+     space pressure instead. */
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .clinical-calculator-hub--practitioner-compact .clinical-calculator-card {
