@@ -110,12 +110,13 @@ export const NotificationService = {
           'Authorization': `Bearer ${getStoredAccessToken()}`,
         },
       });
+      const data = await parseApiResponse(response, { fallback: {} });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch notifications');
+        throw new Error(data?.message || getApiErrorMessage(null, response));
       }
 
-      return await response.json();
+      return data;
     } catch (error: any) {
       logger.error('Error fetching notifications', { error });
       throw error;
@@ -231,12 +232,13 @@ export const NotificationService = {
           'Authorization': `Bearer ${getStoredAccessToken()}`,
         },
       });
+      const data = await parseApiResponse(response, { fallback: {} });
 
       if (!response.ok) {
-        throw new Error('Failed to mark notification as read');
+        throw new Error(data?.message || getApiErrorMessage(null, response));
       }
 
-      return await response.json();
+      return data;
     } catch (error: any) {
       logger.error('Error marking notification as read', { error });
       throw error;
@@ -276,12 +278,13 @@ export const NotificationService = {
           'Authorization': `Bearer ${getStoredAccessToken()}`,
         },
       });
+      const data = await parseApiResponse(response, { fallback: {} });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch preferences');
+        throw new Error(data?.message || getApiErrorMessage(null, response));
       }
 
-      return await response.json();
+      return data;
     } catch (error: any) {
       logger.error('Error fetching preferences', { error });
       throw error;
@@ -301,12 +304,13 @@ export const NotificationService = {
         },
         body: JSON.stringify(preferences),
       });
+      const data = await parseApiResponse(response, { fallback: {} });
 
       if (!response.ok) {
-        throw new Error('Failed to update preferences');
+        throw new Error(data?.message || getApiErrorMessage(null, response));
       }
 
-      return await response.json();
+      return data;
     } catch (error: any) {
       logger.error('Error updating preferences', { error });
       throw error;
