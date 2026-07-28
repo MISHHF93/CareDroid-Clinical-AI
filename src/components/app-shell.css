@@ -174,6 +174,33 @@
   flex-shrink: 0;
 }
 
+/* Rendered eagerly by AppShell itself (not the lazy-loaded CopilotPanel
+   module) whenever the panel is closed, so its styling has to live in a
+   stylesheet AppShell imports directly — moved here from
+   CopilotPanel-part-02.css, which only loads once a user has opened
+   Copilot at least once and left the unstyled button broken until then. */
+.ed-copilot-launch {
+  position: fixed;
+  right: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  z-index: 40;
+  border: 1px solid color-mix(in srgb, #374151 40%, transparent);
+  border-radius: 999px;
+  padding: 10px 14px;
+  background: color-mix(in srgb, var(--color-surface, var(--app-surface-1, #ffffff)) 92%, #f1f5f9);
+  color: var(--color-text-primary, var(--medical-ink, #111827));
+  font-size: 0.8125rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 28px rgba(2, 6, 23, 0.35);
+}
+
+.ed-copilot-launch:hover,
+.ed-copilot-launch:focus-visible {
+  border-color: color-mix(in srgb, #374151 70%, transparent);
+  transform: translateY(-1px);
+}
+
 .emergency-wall-kiosk-header {
   padding: var(--ed-space-3, 12px) var(--ed-space-5, 20px);
   border-bottom: 1px solid var(--ed-border-subtle);

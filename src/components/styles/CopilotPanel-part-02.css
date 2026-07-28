@@ -372,24 +372,9 @@
   }
 }
 
-.ed-copilot-launch {
-  position: fixed;
-  right: 16px;
-  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
-  z-index: 40;
-  border: 1px solid color-mix(in srgb, #374151 40%, transparent);
-  border-radius: 999px;
-  padding: 10px 14px;
-  background: color-mix(in srgb, var(--color-surface, var(--app-surface-1, #ffffff)) 92%, #f1f5f9);
-  color: var(--color-text-primary, var(--medical-ink, #111827));
-  font-size: 0.8125rem;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 10px 28px rgba(2, 6, 23, 0.35);
-}
-
-.ed-copilot-launch:hover,
-.ed-copilot-launch:focus-visible {
-  border-color: color-mix(in srgb, #374151 70%, transparent);
-  transform: translateY(-1px);
-}
+/* .ed-copilot-launch lives in components/app-shell.css, not here: AppShell
+   renders the launch button eagerly (whenever the Copilot panel is closed),
+   but this stylesheet only loads as a side effect of lazily importing
+   CopilotPanel — so the button rendered on every page load before a user
+   ever opens Copilot once had no styling at all (fell back to a bare,
+   full-height <button>, stretched by the app shell's flex layout). */
