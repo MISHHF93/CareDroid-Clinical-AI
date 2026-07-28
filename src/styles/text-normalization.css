@@ -45,18 +45,30 @@ html[data-theme='dark'],
   color: var(--cdl-ink-muted, var(--medical-text-muted));
 }
 
-:is(.app-shell, .emergency-app-shell) a:not([class*='btn']):not([class*='button']):not([role='button']) {
+/* :not(.fj-critical-banner__cta): this plain-anchor rule assumes any <a>
+   without "btn"/"button" in its class is inline text, but the critical-alert
+   "Acknowledge" link is a solid red button rendered as an <a> — see the fuller
+   explanation on the __cta-specific rule below, which hits the same element
+   via a second, independent path. */
+:is(.app-shell, .emergency-app-shell) a:not([class*='btn']):not([class*='button']):not([role='button']):not(.fj-critical-banner__cta) {
   color: var(--medical-text-link);
   text-decoration-color: color-mix(in srgb, var(--medical-text-link) 35%, transparent);
 }
 
-/* Accent fill is for chrome; readable action text on white uses link tokens. */
+/* Accent fill is for chrome; readable action text on white uses link tokens.
+   [class*='__cta']:not(--solid):not(--primary) assumes solid-filled CTAs are
+   always BEM-flagged that way, but .fj-critical-banner__cta is a solid red
+   "Acknowledge" button with no such modifier — this rule was overriding its
+   deliberate white text with the link-teal token, leaving ~1.4:1 contrast
+   against its own dark/red background (WCAG AA needs 4.5:1). Excluded so its
+   own CSS (FullJourneyOperatingPage.css) wins (it's also excluded from the
+   plain a:not() rule above, which independently matches the same element). */
 :is(.app-shell, .emergency-app-shell)
   :is(
     [class*='__link'],
     [class*='-link']:not([class*='btn']):not([class*='button']),
     [class*='__cta']:not([class*='--solid']):not([class*='--primary'])
-  ):not([class*='btn']):not([class*='button']):not([role='button']) {
+  ):not([class*='btn']):not([class*='button']):not([role='button']):not(.fj-critical-banner__cta) {
   color: var(--medical-text-link);
 }
 

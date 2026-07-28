@@ -66,12 +66,16 @@ html {
    plain substring match, it also caught .cdl-zone--primary-actions — a
    layout zone, not a button — painting its entire section dark instead of
    just its intended button children. Excluded the same way the file already
-   excludes .reception-desk-toolbar__action. */
+   excludes .reception-desk-toolbar__action.
+   [class*='cta'] has the same substring-match risk: it also caught
+   .fj-critical-banner__cta, a critical-alert "Acknowledge" action whose own
+   CSS (FullJourneyOperatingPage.css) deliberately paints it red, not the
+   generic dark navy this sweep applies to ordinary CTAs. */
 :is(.app-shell, .emergency-app-shell) :is(
     [class*='--primary'],
     .btn-primary,
     [class*='cta']
-  ):not(.reception-desk-toolbar__action):not(.cdl-zone--primary-actions) {
+  ):not(.reception-desk-toolbar__action):not(.cdl-zone--primary-actions):not(.fj-critical-banner__cta) {
   background: #374151;
   border-color: color-mix(in srgb, var(--medical-accent) 55%, var(--medical-border));
   color: var(--app-on-solid, #ffffff);
