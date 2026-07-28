@@ -18,6 +18,9 @@ import {
   waitForAppReady,
 } from './responsive-qa.helpers.mjs';
 
+// authMode required so demoPersonaModel.ts's hydrateStoredDemoUser() honors
+// role: 'physician' instead of silently discarding it (see the identical fix
+// + comment in e2e/responsive-qa.helpers.mjs, Cycle 214).
 const DEFAULT_QA_USER = {
   id: 'production-smoke-user',
   email: 'production-smoke@caredroid.local',
@@ -27,6 +30,7 @@ const DEFAULT_QA_USER = {
   isEmailVerified: true,
   twoFactorEnabled: false,
   createdAt: '2026-01-01T00:00:00.000Z',
+  authMode: 'open-access',
 };
 
 const AUTH_TOKEN_KEY = 'caredroid_access_token';

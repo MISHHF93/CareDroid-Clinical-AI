@@ -429,7 +429,11 @@ const Calculators = ({ embedded = false, onCloseEmbedded, initialCalculatorId = 
           </section>
         ) : null}
 
-        <div className="calculator-selection" role="list" aria-label="Built-in calculator forms">
+        {/* role="group", not "list": children are role="button" toggle
+            controls (aria-pressed, click/keydown), not static listitems —
+            axe's aria-required-children rule flags role="list" without
+            role="listitem" children (Cycle 214). */}
+        <div className="calculator-selection" role="group" aria-label="Built-in calculator forms">
           {CALCULATORS.map((calc) => (
             <CalculatorSelectCard
               key={calc.id}

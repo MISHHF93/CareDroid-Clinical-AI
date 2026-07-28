@@ -263,6 +263,10 @@ export function EmsUnitTrackGraphic({ status, unitId, breach = false, className 
       ]
         .filter(Boolean)
         .join(' ')}
+      role="progressbar"
+      aria-valuenow={progress}
+      aria-valuemin={0}
+      aria-valuemax={100}
       aria-label={unitId ? `${unitId} track ${progress}%` : `EMS track ${progress}%`}
     >
       <div className="cdl-ems-unit-track__rail" aria-hidden>

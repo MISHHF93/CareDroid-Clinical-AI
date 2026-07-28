@@ -269,6 +269,16 @@ export async function measureVisibleElementOverlaps(page) {
 
 export const QA_AUTH_STORAGE = {
   caredroid_access_token: 'responsive-qa-token',
+  // `authMode: 'open-access'` is required: UserContext.tsx reads this profile
+  // through demoPersonaModel.ts's hydrateStoredDemoUser(), which only honors
+  // a stored `role` when isDemoPersonaUser() recognizes the payload (id ===
+  // OPEN_ACCESS_USER_ID, or authMode open-access/platform-access, or a
+  // matching demoPersona marker). Without one of those, the whole payload —
+  // including `role: 'admin'` below — was silently discarded and every
+  // consumer of this constant (11 e2e specs/scripts) has been testing under
+  // the app's default demo role (charge_nurse) instead of admin this whole
+  // time (roadmap item #22, Cycle 214 — same root cause as Cycle 213's
+  // capture-reception-screenshots.mjs fix).
   caredroid_user_profile: JSON.stringify({
     id: 'responsive-qa-user',
     email: 'qa@caredroid.local',
@@ -278,6 +288,7 @@ export const QA_AUTH_STORAGE = {
     isEmailVerified: true,
     twoFactorEnabled: false,
     createdAt: '2026-01-01T00:00:00.000Z',
+    authMode: 'open-access',
   }),
 };
 

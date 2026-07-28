@@ -33,6 +33,9 @@ const routePath = process.argv[2] || '/clinical/alerts';
 
 const QA_AUTH_STORAGE = {
   caredroid_access_token: 'responsive-qa-token',
+  // authMode required so demoPersonaModel.ts's hydrateStoredDemoUser() honors
+  // role: 'admin' instead of silently discarding it (see the identical fix +
+  // comment in e2e/responsive-qa.helpers.mjs, Cycle 214).
   caredroid_user_profile: JSON.stringify({
     id: 'responsive-qa-user',
     email: 'qa@caredroid.local',
@@ -42,6 +45,7 @@ const QA_AUTH_STORAGE = {
     isEmailVerified: true,
     twoFactorEnabled: false,
     createdAt: '2026-01-01T00:00:00.000Z',
+    authMode: 'open-access',
   }),
 };
 

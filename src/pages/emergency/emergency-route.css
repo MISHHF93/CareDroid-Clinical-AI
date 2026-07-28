@@ -430,7 +430,12 @@
 .emergency-route-queue-row__escalate-btn {
   padding: 1px 7px;
   border-radius: 4px;
-  background: #ef4444;
+  /* #ef4444 (Tailwind red-500) with white text measured 3.76:1 via live
+     axe-core scan (Cycle 214) — short of WCAG AA's 4.5:1. --cdl-danger-600
+     is this codebase's already-verified-safe critical-red (4.83:1 with
+     white text, same token used by ReceptionSkillStrip.css's --critical
+     tone). */
+  background: var(--cdl-danger-600, #dc2626);
   color: #fff;
   border: none;
   font-size: 10px;
