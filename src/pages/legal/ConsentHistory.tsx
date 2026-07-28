@@ -124,11 +124,12 @@ export const ConsentHistory = () => {
         <EmptyState
           icon="⚠️"
           title="Error Loading Consent History"
-          message={error}
-          action={{
-            label: 'Try Again',
-            onClick: fetchConsentHistory,
-          }}
+          description={error}
+          action={
+            <button type="button" className="btn-consent-secondary" onClick={fetchConsentHistory}>
+              Try Again
+            </button>
+          }
         />
       </div>
     );
@@ -140,11 +141,16 @@ export const ConsentHistory = () => {
         <EmptyState
           icon="📄"
           title="No Consent Records"
-          message="You haven't provided any consents yet"
-          action={{
-            label: 'Provide Consent',
-            onClick: () => window.location.href = '/consent',
-          }}
+          description="You haven't provided any consents yet"
+          action={
+            <button
+              type="button"
+              className="btn-consent-secondary"
+              onClick={() => (window.location.href = '/consent')}
+            >
+              Provide Consent
+            </button>
+          }
         />
       </div>
     );
