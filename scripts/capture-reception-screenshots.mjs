@@ -10,6 +10,15 @@ const baseURL = process.env.QA_BASE_URL || 'http://localhost:8000';
 function authStorage(role) {
   return {
     caredroid_access_token: 'screenshot-audit-token',
+    // `authMode: 'open-access'` is required: UserContext.tsx reads this
+    // profile through demoPersonaModel.ts's hydrateStoredDemoUser(), which
+    // only honors a stored `role` when isDemoPersonaUser() recognizes the
+    // payload (id === OPEN_ACCESS_USER_ID, or authMode open-access/
+    // platform-access, or a matching demoPersona marker). Without one of
+    // those, the whole payload is discarded and every role here silently
+    // fell back to the app's default demo role (charge_nurse) instead of
+    // the one requested — confirmed via a standalone reconstruction of the
+    // real hydration logic (roadmap item #22, Cycle 213).
     caredroid_user_profile: JSON.stringify({
       id: 'screenshot-audit-user',
       email: 'audit@caredroid.local',
@@ -18,6 +27,7 @@ function authStorage(role) {
       fullName: 'Audit User',
       isEmailVerified: true,
       twoFactorEnabled: false,
+      authMode: 'open-access',
     }),
   };
 }

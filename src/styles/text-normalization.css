@@ -49,8 +49,10 @@ html[data-theme='dark'],
    without "btn"/"button" in its class is inline text, but the critical-alert
    "Acknowledge" link is a solid red button rendered as an <a> — see the fuller
    explanation on the __cta-specific rule below, which hits the same element
-   via a second, independent path. */
-:is(.app-shell, .emergency-app-shell) a:not([class*='btn']):not([class*='button']):not([role='button']):not(.fj-critical-banner__cta) {
+   via a second, independent path. .reception-job-profile-card__cta (the
+   "Open reception desk" link on /profile) is the same shape — a solid
+   brand-blue button rendered as an <a> via react-router's <Link>. */
+:is(.app-shell, .emergency-app-shell) a:not([class*='btn']):not([class*='button']):not([role='button']):not(.fj-critical-banner__cta):not(.reception-job-profile-card__cta) {
   color: var(--medical-text-link);
   text-decoration-color: color-mix(in srgb, var(--medical-text-link) 35%, transparent);
 }
@@ -62,13 +64,19 @@ html[data-theme='dark'],
    deliberate white text with the link-teal token, leaving ~1.4:1 contrast
    against its own dark/red background (WCAG AA needs 4.5:1). Excluded so its
    own CSS (FullJourneyOperatingPage.css) wins (it's also excluded from the
-   plain a:not() rule above, which independently matches the same element). */
+   plain a:not() rule above, which independently matches the same element).
+   .reception-job-profile-card__cta and .reception-skill-strip__cta hit the
+   same rule the same way — both solid brand-blue buttons with no --solid/
+   --primary modifier — measured at ~1.02:1 (own ink-on-dark background,
+   worse than the 1.4:1 cases above since --medical-text-link resolves to a
+   near-black navy under the reception role-accent theme, close to the
+   sweep's own #374151 fill from color-normalization.css). */
 :is(.app-shell, .emergency-app-shell)
   :is(
     [class*='__link'],
     [class*='-link']:not([class*='btn']):not([class*='button']),
     [class*='__cta']:not([class*='--solid']):not([class*='--primary'])
-  ):not([class*='btn']):not([class*='button']):not([role='button']):not(.fj-critical-banner__cta) {
+  ):not([class*='btn']):not([class*='button']):not([role='button']):not(.fj-critical-banner__cta):not(.reception-job-profile-card__cta):not(.reception-skill-strip__cta) {
   color: var(--medical-text-link);
 }
 

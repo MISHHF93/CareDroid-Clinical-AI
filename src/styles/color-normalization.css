@@ -73,12 +73,19 @@ html {
    generic dark navy this sweep applies to ordinary CTAs — and
    .profile-copilot-card__cta, a secondary/ghost button whose own CSS
    (profile-surface-normalization.css) deliberately paints it with a light
-   muted surface + link-colored text, not a solid dark button either. */
+   muted surface + link-colored text, not a solid dark button either. Same
+   collision again with .reception-job-profile-card__cta and
+   .reception-skill-strip__cta (both solid brand-blue buttons, own CSS in
+   ReceptionJobProfileCard.css / ReceptionSkillStrip.css) — this sweep
+   overwrote their deliberate brand-blue background with #374151, which on
+   its own would still be readable, but combined with text-normalization.css's
+   __cta rule (see there) collapsed to ~1.02:1, worse than the two cases
+   above. */
 :is(.app-shell, .emergency-app-shell) :is(
     [class*='--primary'],
     .btn-primary,
     [class*='cta']
-  ):not(.reception-desk-toolbar__action):not(.cdl-zone--primary-actions):not(.fj-critical-banner__cta):not(.profile-copilot-card__cta) {
+  ):not(.reception-desk-toolbar__action):not(.cdl-zone--primary-actions):not(.fj-critical-banner__cta):not(.profile-copilot-card__cta):not(.reception-job-profile-card__cta):not(.reception-skill-strip__cta) {
   background: #374151;
   border-color: color-mix(in srgb, var(--medical-accent) 55%, var(--medical-border));
   color: var(--app-on-solid, #ffffff);
