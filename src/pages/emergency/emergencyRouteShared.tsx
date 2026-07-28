@@ -155,6 +155,11 @@ export function EmergencyRoutePage({
   analytics = undefined,
   history = undefined,
   operationalSummaryExtra = undefined,
+  // Accepted as an alias for `children` — two real pages (ClinicalAlertsPage,
+  // HospitalCommandCenter) pass their main content this way, matching the
+  // `activeWork` zone name below; without this, that content was silently
+  // dropped (this component's props are typed `any`, so nothing caught it).
+  activeWork = undefined,
 }: any = {}) {
   const surfaces = usePractitionerSurfaceVisibility();
   const operatingSurface = useEdOperatingSurface();
@@ -228,7 +233,7 @@ export function EmergencyRoutePage({
             </>
           ),
           primaryActions,
-          activeWork: children,
+          activeWork: activeWork ?? children,
           supportingContext,
           analytics,
           history,
