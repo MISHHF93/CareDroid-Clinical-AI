@@ -1119,6 +1119,14 @@ export class EmergencyPatientService implements OnModuleInit {
     const state = normalized.state || 'Triage';
     const priority = normalized.priority || 'P3';
     const patient: EmergencyPatient = {
+      // Spread every field the caller sent (normalized already carries the
+      // full input through via its own spread in syncPatientFromArrival) so
+      // fields with no defaulting/normalization need -- phone, mobilePhone,
+      // healthCardNumber, healthCard, phn, source, location, symptoms,
+      // waitTimeMinutes, lastAssessedTime, and any future Patient field --
+      // survive creation instead of being silently dropped by an allowlist
+      // that only a handful of fields ever made it onto.
+      ...normalized,
       id: normalized.id || createId('patient'),
       mrn: normalized.mrn || `ED-${Math.floor(100000 + Math.random() * 900000)}`,
       firstName: normalized.firstName || 'Unknown',
@@ -1142,8 +1150,6 @@ export class EmergencyPatientService implements OnModuleInit {
         : priority === 'P1' || priority === 'P2'
           ? ['HighRisk']
           : [],
-      assignedStaffId: normalized.assignedStaffId,
-      roomId: normalized.roomId,
       notes: normalized.notes || [],
       timeline: normalized.timeline || [
         {
@@ -1154,16 +1160,6 @@ export class EmergencyPatientService implements OnModuleInit {
           note: 'Created through Smart Intake.',
         },
       ],
-      arrivalMode: normalized.arrivalMode,
-      registrationStatus: normalized.registrationStatus,
-      triagePending: normalized.triagePending,
-      firstContactAt: normalized.firstContactAt,
-      queueDestination: normalized.queueDestination,
-      arrival: normalized.arrival,
-      triageAssist: normalized.triageAssist,
-      triageAssistGeneratedAt: normalized.triageAssistGeneratedAt,
-      quickSafetyFlags: normalized.quickSafetyFlags,
-      highRiskComplaintFlags: normalized.highRiskComplaintFlags,
     };
     this.patients.push(patient);
     this.workflowLogService.record({
