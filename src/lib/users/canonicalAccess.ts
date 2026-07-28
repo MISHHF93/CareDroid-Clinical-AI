@@ -271,7 +271,20 @@ const ALIAS_TO_HOSPITAL_ROLE: Readonly<Record<string, HospitalRole>> = Object.fr
     nurse: 'registered_nurse',
     rn: 'registered_nurse',
     physician: 'emergency_physician',
-    admin: 'it_admin',
+    // No 'admin' seed here (removed Cycle 217): it silently shadowed
+    // super_admin's own explicit `aliases: ['admin', ...]` declaration below,
+    // since this reduce's `if (!acc[key])` guard only ever sets an alias
+    // once — the seed always won regardless of catalog order. Both were
+    // added in the same commit (bb18f2b7), a genuine internal
+    // inconsistency, not an intentional restriction: it_admin's own alias
+    // list is ['it-admin', 'technical-admin'], never 'admin', so it never
+    // legitimately owned this alias. The real-world effect: any account
+    // literally assigned the 'admin' emergency role (EMERGENCY_ROLE_IDS.admin
+    // — a full-access role per emergencyRolePermissions.ts's own definition)
+    // was silently downgraded to it_admin's metadata-only, no-clinical-AI
+    // restrictions everywhere this alias table is consulted (route access,
+    // command-palette visibility, etc.) — confirmed live via a real browser
+    // session, not just this table in isolation.
   }),
 );
 

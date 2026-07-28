@@ -235,7 +235,13 @@ describe('resolveHospitalRole alias resolution', () => {
   it('maps emergency role aliases to canonical HospitalRole', () => {
     expect(resolveHospitalRole('nurse')).toBe('registered_nurse');
     expect(resolveHospitalRole('physician')).toBe('emergency_physician');
-    expect(resolveHospitalRole('admin')).toBe('it_admin');
+    // 'admin' resolves to super_admin (its own declared alias, matching
+    // EMERGENCY_ROLE_IDS.admin's full-access intent) — NOT it_admin, which
+    // never declares 'admin' among its own aliases (['it-admin',
+    // 'technical-admin'] only). A hardcoded seed previously shadowed this
+    // and silently downgraded the literal 'admin' role's access everywhere
+    // this alias table is consulted; fixed Cycle 217.
+    expect(resolveHospitalRole('admin')).toBe('super_admin');
     expect(resolveHospitalRole('triage_nurse')).toBe('triage_nurse');
   });
 
