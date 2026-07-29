@@ -32,7 +32,9 @@ export default registerAs('stripe', () => ({
       features: [
         'All Professional features',
         '10,000 AI queries/day',
-        'FHIR/HL7/DICOM integration',
+        // Honest claim: live FHIR/HL7/DICOM writeback is not production-ready yet
+        // (interop hub reports synthetic_ready). See docs/enterprise-subsystems-capability-map.md QW-3.
+        'Integration hub (demo adapters; live FHIR/HL7/DICOM writeback not included)',
         'Custom branding',
         'Dedicated support',
         'SSO/SAML',

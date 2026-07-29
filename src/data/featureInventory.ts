@@ -89,9 +89,10 @@ export const featureInventory = [
     id: 'fhir-hl7-dicom',
     type: 'feature',
     category: 'Integrations',
-    name: 'FHIR/HL7/DICOM Integration',
-    description: 'Interoperability with EHR and imaging systems',
-    prompt: 'Explain how to integrate FHIR data sources.'
+    name: 'Integration Hub (Demo Adapters)',
+    description:
+      'Demo interoperability adapters for EHR-style exchange. Live FHIR/HL7/DICOM writeback is not production-ready; hub reports synthetic readiness until real connectors ship.',
+    prompt: 'What interoperability capabilities exist today versus roadmap FHIR/HL7/DICOM work?'
   },
   {
     id: 'custom-branding',
