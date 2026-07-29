@@ -430,11 +430,20 @@ Be concise and clinically relevant.`;
     }
 
     try {
-      const result = await this.aiService.generateStructuredJSON('system', prompt, {
-        findings: ['string'],
-        clinicalSignificance: 'string',
-        suggestedActions: ['string'],
-      });
+      const result = await this.aiService.generateStructuredJSON(
+        'system',
+        prompt,
+        {
+          findings: ['string'],
+          clinicalSignificance: 'string',
+          suggestedActions: ['string'],
+        },
+        // AI-generated clinical lab interpretation must be flagged for human
+        // review the same way the chat/gateway path unconditionally requires
+        // it (AIGatewayService.createRunEnvelope hardcodes requiresHumanReview:
+        // true) -- generateStructuredJSON's default without this is false.
+        { aiFoundation: { requiresHumanReview: true } },
+      );
 
       const interpretation = {
         category,

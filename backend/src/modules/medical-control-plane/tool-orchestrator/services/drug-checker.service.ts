@@ -320,18 +320,27 @@ Focus on interactions that require dose adjustment, monitoring, or contraindicat
 Respond in JSON format as an array of interactions.`;
 
     try {
-      const result = await this.aiService.generateStructuredJSON('system', prompt, {
-        interactions: [
-          {
-            drug1: 'string',
-            drug2: 'string',
-            severity: 'string',
-            mechanism: 'string',
-            clinicalSignificance: 'string',
-            management: 'string',
-          },
-        ],
-      });
+      const result = await this.aiService.generateStructuredJSON(
+        'system',
+        prompt,
+        {
+          interactions: [
+            {
+              drug1: 'string',
+              drug2: 'string',
+              severity: 'string',
+              mechanism: 'string',
+              clinicalSignificance: 'string',
+              management: 'string',
+            },
+          ],
+        },
+        // AI-generated drug-interaction analysis must be flagged for human
+        // review the same way the chat/gateway path unconditionally requires
+        // it (AIGatewayService.createRunEnvelope hardcodes requiresHumanReview:
+        // true) -- generateStructuredJSON's default without this is false.
+        { aiFoundation: { requiresHumanReview: true } },
+      );
 
       const interactions = result.interactions || [];
       this.aiInteractionCache.set(cacheKey, {
