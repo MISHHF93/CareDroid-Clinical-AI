@@ -1,0 +1,149 @@
+# Enterprise Subsystems Capability Map
+
+**Generated:** 2026-07-29
+**Method:** Hand-written, not scripted/regenerable. 3 parallel research passes across the whole repo (`src/`, `backend/src/`, `lib/`, `data/`, `docs/`), followed by direct file/line verification of every load-bearing claim before it was written down here. Not a mechanical grep-and-report — several findings below required judgment calls (is a given implementation "partial" or "mocked"?) the same way `docs/specs/product-discovery-report.md` did.
+**Origin:** [`research.md`](../research.md) at the repo root proposes 14 new enterprise subsystems for CareDroid and, in its own embedded "Master prompt extension for Claude," explicitly calls for "a complete discovery audit" and a "verified capability map" *before* any implementation — "do not assume that any existing page, route, component, API, database entity, AI function, OCR function, workflow, integration, theme, permission, test, or documentation artifact is complete merely because it exists." This document is that audit.
+
+## Scope note (non-negotiable)
+
+**This document audits existing capability only.** It does not propose, size, scaffold, or begin building any of the 14 subsystems `research.md` describes, and it makes no claim of real HIPAA/PHIPA/Health-Canada regulatory compliance — it describes what code exists today, not a legal compliance determination (`research.md` itself says the final legal requirements need review by qualified privacy counsel). Where this document recommends a next step, it is limited to the **Quick wins** appendix (§3), which lists small, code-only fixes distinct from the 14-subsystem roadmap itself.
+
+## Headline finding
+
+This is **not** "14 things built from zero." Real, working, tested code already exists relevant to 11 of the 14 areas — it is fragmented across duplicate/parallel systems that don't share a write path, switched off by default behind one specific, well-documented architectural flag, or honestly self-reporting itself as demo/synthetic data. Only 3 areas (imaging, Canadian NACRS reporting, human-factors usability lab) are genuine greenfield with zero existing code. The single most useful thing this document does is separate "needs wiring/consolidation/enabling" from "needs building" — those are different kinds of work with different owners and different risk profiles, and conflating them would make every one of the 14 areas look like a from-scratch project when most aren't.
+
+## 1. Classification key
+
+Two independent axes. **Status** is `research.md`'s own literal ask, used as originally specified. **Pattern** is added here because the evidence below shows "duplicated" and "disconnected" alone can't distinguish four materially different situations — knowing *why* something is in the state it's in changes what fixing it actually costs.
+
+| Status | Meaning |
+|---|---|
+| **production-ready** | Real, correct, exercised by real callers, no known gaps for its stated purpose |
+| **partially implemented** | Real logic exists but is incomplete against its stated purpose |
+| **mocked** | Runs, but returns fabricated/placeholder data by design |
+| **disconnected** | Real code exists but nothing in the real app calls it |
+| **duplicated** | Two or more implementations of overlapping scope |
+| **deprecated** | Superseded, kept only for compatibility |
+| **unsafe** | Reserved for a concrete failure scenario — a user or the system relies on a claim about this capability that is false, not merely "incomplete" |
+| **missing** | Genuinely does not exist |
+
+| Pattern | Meaning | Where it shows up below |
+|---|---|---|
+| **split-authority** | 2+ independently real, non-identical implementations, no single source of truth, no shared write path | Consent (§4), Clinical Knowledge Registry (§5) |
+| **gated-by-design** | Real, more capable code exists but is off by default behind one specific, documented config flag | MPI Tier 2, part of Digital Twin (§2, §10) |
+| **self-reporting-synthetic** | Wired and running, but its own response shape honestly declares the data fake | Interoperability, Digital Twin (§1, §10) |
+| **narrowly-scoped** | Real, wired, tested governance exists, but only for a slice of what the stated purpose implies | Clinical Safety System, Regulatory Registry (§7, §14) |
+
+## 2. Executive summary
+
+| # | Area | Status | Pattern | Evidence anchor |
+|---|---|---|---|---|
+| 1 | FHIR/HL7/interoperability | partially implemented | self-reporting-synthetic | `backend/src/modules/interoperability/integration-automation-router.service.ts` |
+| 2 | Enterprise MPI / duplicate detection | partially implemented (2 tiers) | gated-by-design (Tier 2) | `backend/src/services/mpi.service.ts` |
+| 3 | Structured/adaptive intake forms | missing | none | `src/pages/emergency/SmartIntake.tsx` |
+| 4 | Consent/privacy/provenance/break-glass | partially implemented + **unsafe** (break-glass specifically) | split-authority | `backend/src/modules/compliance/compliance.service.ts` |
+| 5 | Clinical Knowledge Artifact Registry | partially implemented | split-authority | `backend/src/modules/clinical/protocol.service.ts` |
+| 6 | CDS Hooks / workflow-triggered decision support | missing | none | `src/engine/journeyEngine.ts` |
+| 7 | Clinical Safety Management System | partially implemented | narrowly-scoped | `lib/ai/modelRegistry.ts` |
+| 8 | AI Execution Gateway | partially implemented | none (confirmed bypass) | `backend/src/modules/ai-gateway/ai-gateway.service.ts` |
+| 9 | OCR Document Intelligence | partially implemented (most mature of the 14) | none | `backend/src/modules/emergency-os/ocr-intake.service.ts` |
+| 10 | Digital twin / bed management | mocked | self-reporting-synthetic + gated-by-design | `backend/src/modules/platform-assets/digital-twin.service.ts` |
+| 11 | Imaging/diagnostics | missing (but marketed as sold — see §11) | none | `backend/src/config/stripe.config.ts` |
+| 12 | Canadian NACRS/ICD-10-CA/CCI reporting | missing | none | (zero hits repo-wide) |
+| 13 | Human-factors/usability lab | missing | none | (zero hits repo-wide) |
+| 14 | Regulatory boundary / Feature Intended-Use Registry | partially implemented | narrowly-scoped | `backend/src/modules/platform-governance/platform-governance.service.ts` |
+
+## 3. Quick wins (separate from the 14-subsystem roadmap)
+
+Shaped like SCORECARD.md's own `Prioritized roadmap` table so top rows can be copied there directly once this audit is reviewed. These are small, code-only, single-cycle-sized fixes — distinct in kind from the 14 subsystems above, which each need their own dedicated design pass.
+
+| # | Size | Item | Why it's a quick win |
+|---|---|---|---|
+| QW-1 | Single cycle, code-only | Route `moe-router.service.ts` through `AIGatewayService` instead of calling `UNIFIED_AI_MODEL` directly | Closes a confirmed AI-gateway bypass with no new subsystem — just changing which existing service a call goes through |
+| QW-2 | Single cycle, decision + code | Resolve the `Permission.BREAK_GLASS_ACCESS` / `breakGlassAllowed` **unsafe** finding (§4): either wire a real guard check, or remove the unused grant/field and correct `docs/architecture/system-architecture.md:484` and `docs/services/service-catalog.md:235`, which currently misattribute `emergency-access.service.ts` (2FA recovery) as clinical break-glass | Cheapest way to close a live false-assurance gap — either direction (build the real check, or stop claiming it exists) is a small, well-scoped change |
+| QW-3 | Single cycle, docs-only | Remove or correct "FHIR/HL7/DICOM integration" from the Institutional Stripe tier's `features` list (`backend/src/config/stripe.config.ts:35`) and `src/data/featureInventory.ts:92` until real interoperability exists | A paid-tier feature claim and an AI-copilot-facing capability description both currently promise something the codebase doesn't deliver |
+| QW-4 | Needs its own design pass — flagged, not sized here | Consolidate the two consent stores (`compliance.service.ts` vs `platform-governance.service.ts`) | Same caution as SCORECARD.md items #17/#18: don't rush a merge of two independently-real systems without a dedicated pass |
+| QW-5 | Needs its own design pass — flagged, not sized here | Consolidate the two clinical-knowledge registries (`protocol.service.ts` vs `src/clinical-calculators/`) | Same caution as QW-4 |
+
+## 4. Area detail
+
+### 4.1 FHIR/HL7/interoperability — partially implemented, self-reporting-synthetic
+
+Real code exists: `backend/src/modules/interoperability/integration-hub.service.ts` and `integration-automation-router.service.ts` do genuine field-mapping for FHIR `Patient`/`Observation`/`MedicationRequest`/`Encounter` resources, audit-logged via the real `AuditService`. But HL7 v2 handling is explicitly unimplemented — the methods are literally named `normalizeHl7AdtPlaceholder`/`normalizeHl7OruPlaceholder`. The controller (`InteroperabilityController.getSummary()`) self-reports `status: 'synthetic_ready'`, `connectionState: 'demo_unconfigured'`, `writebackAllowed: false`. `backend/src/services/fhir.service.ts` and `moh-fhir.service.ts` are ~10-40 line field-renaming stubs with no outbound HTTP calls; `backend/src/api/moh.routes.ts` is a `createPlaceholderRoute(...)`. No SMART on FHIR OAuth flow, no CDS Hooks discovery/prefetch protocol, no DICOMweb client exist anywhere in the repo.
+
+### 4.2 Enterprise MPI / duplicate detection — partially implemented, two tiers
+
+**Tier 1 (always-on):** deterministic weighted-field matching (`backend/src/modules/emergency-os/patient-duplicate-detection.ts`, frontend twin `src/utils/patientDuplicateDetection.ts`), genuinely wired into `SmartIntakeService.guardAgainstUnconfirmedDuplicate`, which throws a real `ConflictException` on an unconfirmed high-confidence match. No fuzzy/probabilistic matching, no merge/unmerge, no identity-correction workflow, no multi-identifier-domain support beyond flat `mrn`/`healthCard`/`phone` string fields.
+
+**Tier 2 (materially more sophisticated):** `backend/src/services/mpi.service.ts` (Mongoose) supports multi-identifier-domain search (mrn/health_card/external_ehr/referral_source + phone/email/previousNames), plus `smart-intake.service.ts` implements session-based OCR/EMS evidence capture, staff field verification, match/link/create, `continueUnknown` (temporary "Unknown Male/Female" patient records), `reconcileUnknown` (later identity merge), biometric consent, and a per-session audit log — genuinely closer to what `research.md` describes.
+
+**Gating, confirmed precisely:** Tier 2 is entirely off by default. `backend/src/main.ts`'s `registerEmergencyMongooseRuntime()` checks `config.database.enableMongooseEmergencyOs` (`ENABLE_MONGOOSE_EMERGENCY_OS` env var, default off per `backend/src/config/environment.config.ts`) and, if false, returns before mounting **the entire legacy Express route registry** (`registerAllRoutes`, mounted at both the default prefix and again at `/api/emergency`) *and* the EMS/ambulance WebSocket support — not just MPI. This is a documented, accepted architectural decision: **ADR-0002** ("Dual persistence — TypeORM + optional Mongoose") states it explicitly, including the real cost ("A load-bearing feature flag... easy to miss when debugging 'why are patient endpoints returning nothing' in a fresh environment") and that "no foreign-key integrity between the two stores" exists. This is `gated-by-design`, not an oversight — treat any other "disconnected"-looking legacy Express/Mongoose finding in this repo with the same lens before calling it dead code.
+
+### 4.3 Structured/adaptive intake forms — missing
+
+`src/components/QuickIntake.tsx` is plain `useState` fields. `src/pages/emergency/SmartIntake.tsx` renders a fixed field set sourced from `src/data/smartIntakeFixtures.ts`'s `SMART_INTAKE_DEMO.extractedFields` — an OCR-review UI over a named field set, not a declarative/branching form engine. No FHIR `Questionnaire`/`QuestionnaireResponse` concept, conditional-question logic, or versioned form-template system exists anywhere in `src/`.
+
+### 4.4 Consent/privacy/provenance/break-glass — partially implemented, split-authority, **break-glass is unsafe**
+
+**Consent is split-authority.** `backend/src/modules/compliance/compliance.service.ts`'s `getConsentStatus()`/`updateConsent()` read/write real `UserProfile.consentDataProcessing`/`consentMarketingCommunications`/`consentThirdPartySharing`/`consentEssentialCookies` columns (Cycle 227 of the ongoing QA program fixed a real bug here: `getConsentStatus()` was reporting these from `user.emailVerified` instead of the real columns `updateConsent()` writes — fixed, but the fix only touched this one system's reads). Separately, `backend/src/modules/platform-governance/platform-governance.service.ts` has its own, independent `PlatformConsentRecord`/`upsertConsent`/`getConsent`, plus `PlatformPrivacyRequest` and `PlatformSourceProvenance` (the latter defaults `freshness: 'demo'`, seeded only with synthetic FHIR/HL7 fixtures) — wired to its own real, guarded controller (`platform-governance.controller.ts`). **Confirmed via a direct cross-import grep: zero references either direction between `compliance/` and `platform-governance/`** — genuinely two disconnected systems, not merely differently named views of the same data. The audit log backing both (`backend/src/modules/audit/audit.service.ts`) is real and substantial — SHA-256 hash-chained, tamper-evident, with a `phiAccessed` flag — but is not FHIR `Provenance`/`AuditEvent`-shaped (no coded who/what/why).
+
+**Break-glass access is genuinely `unsafe`, not merely missing.** Three independent pieces of evidence converge:
+1. `Permission.BREAK_GLASS_ACCESS` is defined (`backend/src/modules/auth/enums/permission.enum.ts:56`) and granted to a role (`role-permissions.config.ts:162`) — but is never referenced by any guard or controller anywhere in the backend.
+2. `src/lib/users/canonicalAccess.ts` has a live `breakGlassAllowed: boolean` field, threaded through the whole role-resolution pipeline (`resolveHospitalRole`-adjacent functions) and set `true` for 4 distinct role mappings — but is never *read* anywhere outside `canonicalAccess.ts`/`userTypes.ts` itself. No component checks it to show a UI affordance; no service checks it to gate an action.
+3. **This repo's own documentation actively misattributes a working break-glass mechanism**: `docs/architecture/system-architecture.md:484` states *"Emergency Access | Break-glass access via `emergency-access.service.ts`"*, and `docs/services/service-catalog.md:235` repeats the same claim. `docs/glossary.md:46` confidently defines "Break-glass" as "Emergency access override allowing a user to temporarily exceed their normal access scope, logged distinctly in the audit trail." But `emergency-access.service.ts` (confirmed by direct read) implements bcrypt-hashed 2FA backup-code **account recovery** — not a clinical emergency-override-with-justification workflow. No substitute-decision-maker or permitted-purpose-of-use tracking exists anywhere.
+
+The failure scenario this produces is concrete, matching this document's own "unsafe" bar: a role with `breakGlassAllowed: true` needs a justified emergency access-scope override; platform documentation and a live RBAC field both assert this capability exists; no code path implements it. This is false assurance about a safety-relevant access control, not an absent feature nobody claimed. See QW-2.
+
+### 4.5 Clinical Knowledge Artifact Registry — partially implemented, split-authority
+
+`backend/src/modules/clinical/protocol.service.ts` + `protocol.entity.ts` is a real, DB-backed CRUD registry — but a flat `{name, category, description, steps: string[]}` table with no versioning, governance workflow, or execution semantics. Separately, `src/clinical-calculators/` (`qsofa.ts`, `heart.ts`, `news2.ts`, `nihss.ts`, `gcs.ts`, `wellsPe.ts`, and others feeding `CLINICAL_CALCULATOR_REGISTRY`) is a real, clinically-correct, hardcoded-in-TypeScript registry — each formula is inline code, not data-driven or independently versioned. No `PlanDefinition`/`ActivityDefinition`/CQL/FHIRPath concept, and no single governed source of truth across the two.
+
+### 4.6 CDS Hooks / workflow-triggered decision support — missing
+
+`src/engine/journeyEngine.ts` is confirmed to be a pure patient-state finite-state machine (`VALID_TRANSITIONS` between Arrival→Registration→Triage→...→Discharge) — no hook/prefetch/service-definition concept at all. `backend/src/modules/emergency-os/clinical-decision-support.service.ts` is the closest named artifact, but it's an in-memory array (capped at 500 entries, no DB persistence) that stores calculator results and copilot-interaction logs *after the fact* — it does not trigger on events like `patient-arrived` or `critical-result-received`. (Its own `envelope()` helper *can* mark a response `status: 'placeholder'` when gaps remain, but every call site in the file currently passes an empty gap list, so in practice every response self-reports `'active'` today — the mechanism exists but isn't presently triggered; stated precisely rather than implying live responses come back flagged incomplete.) No hook registry, prefetch template, or event-subscription mechanism exists anywhere.
+
+### 4.7 Clinical Safety Management System — partially implemented, narrowly-scoped to AI
+
+No hazard log or safety case exists anywhere in the repo (confirmed by full-text search; the only hits are `research.md` itself). But real, wired AI-specific governance does exist: `lib/ai/modelRegistry.ts` reads `data/model-registry/entries/*.json` — confirmed exactly **5** real seeded model entries (`mdl-caredroid-heuristic-node-v1`, `mdl-claude-sonnet-4-6-v1`, `mdl-local-deterministic-v1`, `mdl-offline-eval-harness-v1`, `mdl-unified-ai-node-v1`), each with a purpose/prohibited-uses/limitations schema (`data/model-registry/schema/model-entry.schema.json`), documented in `docs/ai/MODEL_REGISTRY_v1.md`. `lib/ai/productionMonitoring.ts` is a real event recorder (egress success/failure, kill-switch, PHI redaction), called from `lib/ai/providers/egress.ts`. `docs/ai/CLINICIAN_REVIEW_CHECKLIST_v1.md` exists. All of this is genuine — but narrowly scoped to AI/model risk specifically, not the platform's broader non-AI clinical risk (e.g. a miscalibrated triage-priority rule with no AI involved has no equivalent governance artifact).
+
+### 4.8 AI Execution Gateway — partially implemented, confirmed bypass
+
+`AIGatewayService` (`backend/src/modules/ai-gateway/ai-gateway.service.ts`) is real — envelope creation, audit logging, PHI-capability flagging — but is only called from one place: `backend/src/modules/chat/chat.service.ts`. `backend/src/modules/moe-router/moe-router.service.ts` imports `UNIFIED_AI_MODEL` from `lib/ai/serverClient` **directly**, and never imports `AIGatewayService` — a confirmed, code-verified bypass of the gateway for at least one real AI-routing path. The AI evaluation lab is real: `backend/src/modules/evaluation/` (service + spec + controller), `docs/ai/AI_EVAL_HARNESS_v1.md`, an `npm run ai:eval:gate` script referenced in the clinician checklist — but only chat-path traffic is actually gated and audited end-to-end today. See QW-1.
+
+### 4.9 OCR Document Intelligence — partially implemented, most mature of the 14 areas
+
+`backend/src/modules/emergency-os/ocr-providers.ts` has a genuine `TesseractOcrProvider` using real `tesseract.js` `worker.recognize()` against decoded image buffers, with a `MockOcrProvider` available for dev/test (selected via `OCR_PROVIDER` env var; defaults to real Tesseract). `ocr-intake.service.ts` + `ocr-intake.types.ts` implement: document-type classification against exactly **10** real artifact types defined in `src/config/intakeArtifactRegistry.ts`'s `IntakeArtifactId` (`government_id`, `health_card`, `drivers_license`, `passport`, `insurance_card`, `medication_list`, `allergy_list`, `referral_letter`, `clinic_notes`, `discharge_summary`), per-field confidence scoring, a real human-review state machine (`pending`/`accepted`/`edited`/`rejected`), a full per-job audit log (`OcrJobAuditEntry`), and a health/drift signal (`OcrHealthSnapshot`, tracking failure rate into `healthy`/`degraded`/`down`). Confirmed gaps: `OcrProviderResult`'s `fields` array is `{field, value, confidence}` with **no bounding-box/coordinate data** at all; no explicit image-quality pre-check step exists before OCR runs; "model-version tracking" is just the `provider` string (e.g. `"tesseract"`), not a real versioned model card.
+
+### 4.10 Digital twin / bed management — mocked, self-reporting-synthetic and gated-by-design
+
+`backend/src/modules/platform-assets/digital-twin.service.ts` is wired to a real endpoint (`platform-assets.controller.ts:336`) and genuinely consumed by the frontend (`src/services/platformAssetsApi.ts`, `src/pages/operations/Operations.tsx`) — not orphaned. But the service hardcodes occupancy/floors/rooms and its own response explicitly self-labels `demoData: true, liveDataAvailable: false`, `sourceLabel: "...live data not connected"`. A **second**, entirely separate implementation, `backend/src/api/digital-twin.routes.ts`, is a `createPlaceholderRoute(...)` stub returning `status: 'available-unimplemented'` — this second route is registered (`enabled: true` in `routes-registry.ts`) but only reachable when `ENABLE_MONGOOSE_EMERGENCY_OS` is on (§4.2), so it exhibits *both* patterns at once: the live NestJS side is honestly self-reporting synthetic; the dead Express side is gated-by-design, not simply orphaned. No distinction between observed/derived/predicted/simulated state exists anywhere in either implementation.
+
+### 4.11 Imaging/diagnostics — missing, but marketed as sold
+
+Zero real hits for DICOMweb/`ImagingStudy`/`DiagnosticReport`/`ServiceRequest` client or server logic anywhere in the repo. `src/pages/clinical/Medical3DViewer.tsx` is an anatomy-model demo that **explicitly self-documents** its own limitation ("Asset-safe anatomy model shell with demo markers — no committed Three.js or DICOM viewer") — an honest disclaimer, not imaging support. `src/pages/clinical/LaboratoryDashboard.tsx` is a lab-specimen-queue demo, unrelated to imaging. The scattered `'DiagnosticReport'` strings found elsewhere (`patientDocumentArtifactModel.ts`, `patient-document-artifact.service.ts`) are internal document-artifact type labels borrowing FHIR resource-name vocabulary for categorization, not a real FHIR/imaging integration.
+
+**Worth flagging above and beyond "missing":** the exact phrase **"FHIR/HL7/DICOM integration"** is listed as a real feature of the Institutional (custom-priced, highest) subscription tier in `backend/src/config/stripe.config.ts:35`, whose `priceId` values are genuinely wired into live billing lookups (`subscriptions.service.ts`). The same phrase, as `"FHIR/HL7/DICOM Integration"`, is a named entry in `src/data/featureInventory.ts:92` (category "Integrations," with its own AI-copilot discovery prompt: "Explain how to integrate FHIR data sources"), which feeds `platformCapabilitiesCatalog.ts`/`platformInventory.ts` — surfaces that could plausibly answer a user or the AI copilot's own "what integrations do you support" question. This is a genuine commercial/capability claim resting on functionality confirmed absent. See QW-3.
+
+### 4.12 Canadian NACRS/ICD-10-CA/CCI reporting — missing
+
+A repo-wide, case-insensitive sweep for `NACRS|ICD-10-CA|CCI|CIHI` across both `src/` and `backend/src/` returns **zero matches** anywhere except `research.md` itself. No Canadian regulatory-reporting or data-quality validation layer of any kind exists.
+
+### 4.13 Human-factors/usability lab — missing
+
+A repo-wide, case-insensitive sweep for `system usability scale|SUS score|time on task|cognitive workload|human factors` across both `src/` and `backend/src/` returns **zero matches**. No timing telemetry or usability-measurement instrumentation exists anywhere.
+
+### 4.14 Regulatory boundary / Feature Intended-Use Registry — partially implemented, narrowly-scoped
+
+`backend/src/modules/platform-governance/entities/platform-governance.entities.ts`'s `PlatformRegulatoryClassification` (jurisdiction, classification, riskLevel, `intendedUse`, `excludedUses`, `requiresHumanReview`) is real and DB-backed. Its `evaluateGate()` genuinely blocks real actions when classification/policy/consent data is missing, and — checked directly, not assumed — is actually called from **6 real sites**: `chat.service.ts`, `clinical-intelligence.service.ts`, `governance.controller.ts`, `platform-governance.controller.ts`, `llm-security.module.ts`, and `tool-orchestrator.service.ts`. This is real, load-bearing governance scaffolding — but it's seeded only with synthetic FHIR/HL7 fixtures, not a registry that classifies the app's actual ~100+ real features one by one. `src/pages/legal/TermsOfService.tsx` has a one-line "Not a Medical Device" disclaimer — legal boilerplate, not a registry entry. For context, this same entitlement/gating machinery has had genuine live bugs before (see §5, Cycle 221) — real code, exercised, occasionally wrong, not untested.
+
+## 5. Cross-references to this session's Quality Baseline QA program
+
+- **§4.4 (Consent)** — Cycle 227 fixed `ComplianceService.getConsentStatus()` reporting `dataProcessingConsent`/etc. from `user.emailVerified` instead of the real `UserProfile.consent*` columns `updateConsent()` writes. The fix closed a real, live compliance-reporting bug in the `compliance.service.ts` system specifically; the split-authority finding against `platform-governance.service.ts`'s separate `PlatformConsentRecord` stands unaffected.
+- **§4.2 / §4.10 (MPI gating / Digital Twin gating)** — **ADR-0002**, confirmed real and accurate above, is the necessary citation any time `ENABLE_MONGOOSE_EMERGENCY_OS`-gated code looks "disconnected." It is a documented, accepted tradeoff, not an oversight.
+- **§4.14 (Regulatory/entitlements)** — Cycle 221 found and fixed 3 entitlement rules referencing feature flags that were never registered, permanently hiding FREE-tier assets for every user. Cycle 222 found and fixed 2 more assets silently bypassing entitlement enforcement via a fail-open default. Both are evidence this gating machinery is real, live-consumed, and has needed real bug fixes — not evidence it's untrustworthy, but evidence it deserves the same rigor applied elsewhere in this document rather than a quick read-and-conclude.
+- **Any RBAC/permission claim** (including §4.4's `breakGlassAllowed`) — Cycle 220 found `normalizeSaasRole()` silently defaulting a mis-cased role string to the minimal-privilege default due to a missing `.toLowerCase()`. Precedent for holding every permission-adjacent claim in this document to a "verify by direct read" bar, which is what produced the §4.4 break-glass finding.
+- **Split-authority findings generally (§4.4, §4.5)** — see `docs/duplicate-system-audit.md` and its own `wire | merge | quarantine | legacy` action taxonomy for the established precedent on how this repo has previously classified and prioritized duplicate-system findings. This document's "split-authority" pattern is a sibling classification, not a replacement — cross-link rather than compete.
+
+## Non-goals (restated)
+
+This document is a capability map. It does not implement, size, or schedule the 14 subsystems `research.md` proposes. The only forward-looking recommendations it makes are the 5 small, code-only items in §3 — everything else is deliberately left as "here is what's real, partial, or missing" for a future, separate scoping conversation.

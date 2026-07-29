@@ -54,6 +54,7 @@ CareDroid is one Vite + React frontend plus one NestJS backend, run together wit
 - [architecture/feature-coverage-matrix.md](architecture/feature-coverage-matrix.md) — generated feature coverage (regen via `npm run feature-coverage-matrix:write-docs`)
 - [architecture/platform-inventory.md](architecture/platform-inventory.md) — generated platform inventory (regen via `npm run inventory:report`)
 - [duplicate-system-audit.md](duplicate-system-audit.md), [orphan-detection-report.md](orphan-detection-report.md) — audits of competing/orphaned code paths
+- [enterprise-subsystems-capability-map.md](enterprise-subsystems-capability-map.md) — hand-written capability audit against `research.md`'s 14 proposed enterprise subsystems (FHIR/HL7 interop, MPI, adaptive intake forms, consent/privacy, clinical knowledge registry, CDS Hooks, clinical safety, AI execution gateway, OCR, digital twin, imaging, NACRS reporting, human-factors lab, regulatory registry) — audit only, no implementation started
 
 ---
 
@@ -117,6 +118,7 @@ Two parallel sets of role documentation exist — see [Known Documentation Debt]
 - [operations/saas-compliance-audit.md](operations/saas-compliance-audit.md) — SaaS architecture compliance audit
 - Backend governance modules: `platform-governance`, `ai-governance`, `llm-security`, `regulatory`, `privacy-center`, `human-review` — see [API Reference §Governance](api/api-reference.md#governance--compliance)
 - `platform_governance_policies`, `clinical_release_gates`, `clinical_safety_findings`, `platform_consent_records` and related entities — see [Data Model Reference §Governance](data-model/data-model-reference.md#governance--compliance-entities)
+- [enterprise-subsystems-capability-map.md](enterprise-subsystems-capability-map.md) — confirms `compliance.service.ts`'s and `platform-governance.service.ts`'s consent stores are independently real but disconnected (split-authority, no shared write path), and that `Permission.BREAK_GLASS_ACCESS`/`breakGlassAllowed` are defined and documented but never checked by any guard — a live false-assurance gap, not merely an absent feature
 
 ---
 
