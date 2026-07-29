@@ -1,5 +1,6 @@
 import {
   Injectable,
+  Logger,
   UnauthorizedException,
   BadRequestException,
   ForbiddenException,
@@ -32,6 +33,8 @@ import {
   WorkspaceMembershipStatus,
 } from '../workspaces/entities/workspace-membership.entity';
 import { OrganizationType } from '../platform-assets/enums/platform-asset.enums';
+import { DEFAULT_PACKS_BY_ORGANIZATION_TYPE } from '../platform-assets/data/platform-asset-seed.data';
+import { PlatformAssetsService } from '../platform-assets/platform-assets.service';
 import { AuditService } from '../audit/audit.service';
 import { AuditAction } from '../audit/entities/audit-log.entity';
 import { TwoFactorService } from '../two-factor/two-factor.service';
@@ -41,6 +44,8 @@ import { buildAccessTokenClaims } from './config/jwt-claims.util';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
@@ -64,6 +69,7 @@ export class AuthService {
     private readonly twoFactorService: TwoFactorService,
     private readonly encryptionService: EncryptionService,
     @Optional() private readonly emailService?: EmailService,
+    @Optional() private readonly platformAssetsService?: PlatformAssetsService,
   ) {}
 
   /**
@@ -415,6 +421,8 @@ export class AuthService {
       );
     }
 
+    await this.ensureDevOrganizationPacksInstalled(organization);
+
     let workspace = await this.workspaceRepository.findOne({
       where: { slug: DEV_WORKSPACE_SLUG, organizationId: organization.id },
     });
@@ -466,6 +474,33 @@ export class AuthService {
       source: 'dev-session',
       isDemoTenant: true,
     };
+  }
+
+  /**
+   * The dev-session org otherwise ends up with zero OrganizationEntitlement
+   * rows -- unlike the real onboarding flow (OrganizationOnboardingService),
+   * which always installs the org type's default packs. EntitlementService's
+   * pack-required check applies whenever an organization exists at all, so a
+   * dev-session user (who does have an org, just no packs) ends up more
+   * locked out than an org-less self-registered user: almost every asset,
+   * including FREE-tier ones like clinical-tools-core, resolves to
+   * isLaunchable:false/reason:'pack-required'. installPackForOrganization is
+   * idempotent, so this is safe to call on every dev-session bootstrap.
+   */
+  private async ensureDevOrganizationPacksInstalled(organization: Organization) {
+    if (!this.platformAssetsService) return;
+    const defaultPackIds = DEFAULT_PACKS_BY_ORGANIZATION_TYPE[organization.organizationType] || [];
+    const packIds = new Set(defaultPackIds);
+    packIds.add('core-platform');
+    for (const packId of packIds) {
+      try {
+        await this.platformAssetsService.installPackForOrganization(organization.id, packId);
+      } catch (error) {
+        this.logger.warn(
+          `[AuthService] Failed to install dev-session pack ${packId}: ${error instanceof Error ? error.message : String(error)}`,
+        );
+      }
+    }
   }
 
   async generateTokens(user: User) {

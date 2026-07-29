@@ -15,6 +15,7 @@ import { AuditService } from '../audit/audit.service';
 import { TwoFactorService } from '../two-factor/two-factor.service';
 import { EmailService } from '../email/email.service';
 import { EncryptionService } from '../encryption/encryption.service';
+import { PlatformAssetsService } from '../platform-assets/platform-assets.service';
 import * as bcrypt from 'bcrypt';
 
 jest.mock('bcrypt');
@@ -54,6 +55,7 @@ describe('AuthService', () => {
   const mockProfileRepository = {
     create: jest.fn(),
     save: jest.fn(),
+    findOne: jest.fn(),
   };
 
   const mockOauthRepository = {
@@ -64,6 +66,7 @@ describe('AuthService', () => {
   const mockSubscriptionRepository = {
     create: jest.fn(),
     save: jest.fn(),
+    findOne: jest.fn(),
   };
 
   const mockAuditService = {
@@ -110,6 +113,10 @@ describe('AuthService', () => {
     decryptFromBuffer: jest.fn((buffer: Buffer) =>
       buffer.toString('utf8').replace('encrypted:', ''),
     ),
+  };
+
+  const mockPlatformAssetsService = {
+    installPackForOrganization: jest.fn().mockResolvedValue({ status: 'enabled' }),
   };
 
   beforeEach(async () => {
@@ -171,6 +178,10 @@ describe('AuthService', () => {
         {
           provide: EncryptionService,
           useValue: mockEncryptionService,
+        },
+        {
+          provide: PlatformAssetsService,
+          useValue: mockPlatformAssetsService,
         },
       ],
     }).compile();
@@ -288,6 +299,144 @@ describe('AuthService', () => {
       await expect(service.createDevSession('127.0.0.1', 'test-agent')).rejects.toThrow(
         'ALLOW_DEMO_AUTH_IN_PRODUCTION',
       );
+    });
+
+    it("installs the org type's default packs for a freshly-created dev org (Cycle 226 regression)", async () => {
+      // Before this fix, ensureDevTenantForUser created an Organization +
+      // OrganizationMembership + Workspace but never installed any pack --
+      // EntitlementService's pack-required check applies whenever an
+      // organization exists at all, so the dev-session user ended up MORE
+      // locked out than an org-less self-registered user: almost every
+      // asset, including FREE-tier ones, resolved to isLaunchable:false.
+      process.env.ENABLE_DEV_AUTH_BYPASS = 'true';
+
+      const devUser = {
+        id: 'dev-user-1',
+        email: 'dev@caredroid.local',
+        role: 'physician',
+        profile: null,
+        subscription: null,
+        twoFactor: null,
+      };
+      const organization = {
+        id: 'org-1',
+        organizationType: 'hospital',
+      };
+
+      mockUserRepository.findOne
+        .mockResolvedValueOnce(null) // no existing dev user
+        .mockResolvedValueOnce(devUser); // re-fetch with relations after create
+      mockUserRepository.create.mockReturnValue(devUser);
+      mockUserRepository.save.mockResolvedValue(devUser);
+
+      mockProfileRepository.create.mockReturnValue({ userId: devUser.id });
+      mockProfileRepository.save.mockResolvedValue({ userId: devUser.id });
+      mockProfileRepository.findOne.mockResolvedValue(null);
+
+      mockSubscriptionRepository.create.mockReturnValue({ userId: devUser.id, tier: 'free' });
+      mockSubscriptionRepository.save.mockResolvedValue({ userId: devUser.id, tier: 'free' });
+      mockSubscriptionRepository.findOne.mockResolvedValue(null);
+
+      mockOrganizationRepository.findOne.mockResolvedValue(null); // no existing dev org
+      mockOrganizationRepository.create.mockReturnValue(organization);
+      mockOrganizationRepository.save.mockResolvedValue(organization);
+
+      mockOrganizationMembershipRepository.findOne.mockResolvedValue(null);
+      mockOrganizationMembershipRepository.create.mockReturnValue({});
+      mockOrganizationMembershipRepository.save.mockResolvedValue({});
+
+      mockWorkspaceRepository.findOne.mockResolvedValue(null);
+      mockWorkspaceRepository.create.mockReturnValue({ id: 'ws-1', name: 'Emergency Operations' });
+      mockWorkspaceRepository.save.mockResolvedValue({ id: 'ws-1', name: 'Emergency Operations' });
+
+      mockWorkspaceMembershipRepository.findOne.mockResolvedValue(null);
+      mockWorkspaceMembershipRepository.create.mockReturnValue({});
+      mockWorkspaceMembershipRepository.save.mockResolvedValue({});
+
+      mockJwtService.sign.mockReturnValue('signed-token');
+
+      await service.createDevSession('127.0.0.1', 'test-agent');
+
+      const installedPackIds = mockPlatformAssetsService.installPackForOrganization.mock.calls.map(
+        (call) => call[1],
+      );
+      expect(mockPlatformAssetsService.installPackForOrganization).toHaveBeenCalled();
+      expect(
+        mockPlatformAssetsService.installPackForOrganization.mock.calls.every(
+          (call) => call[0] === organization.id,
+        ),
+      ).toBe(true);
+      // Matches DEFAULT_PACKS_BY_ORGANIZATION_TYPE[HOSPITAL], which already
+      // includes 'core-platform' -- the fix also unconditionally adds it in
+      // case a future org type's defaults ever omit it.
+      expect(installedPackIds).toEqual(
+        expect.arrayContaining([
+          'core-platform',
+          'reception-desk',
+          'emergency-medicine',
+          'laboratory-intelligence',
+          'hospital-operations',
+        ]),
+      );
+    });
+
+    it('does not throw when platformAssetsService is unavailable (optional dependency)', async () => {
+      process.env.ENABLE_DEV_AUTH_BYPASS = 'true';
+
+      const devUser = {
+        id: 'dev-user-2',
+        email: 'dev@caredroid.local',
+        role: 'physician',
+        profile: null,
+        subscription: null,
+        twoFactor: null,
+      };
+      const organization = { id: 'org-2', organizationType: 'hospital' };
+
+      mockUserRepository.findOne.mockResolvedValueOnce(null).mockResolvedValueOnce(devUser);
+      mockUserRepository.create.mockReturnValue(devUser);
+      mockUserRepository.save.mockResolvedValue(devUser);
+      mockProfileRepository.create.mockReturnValue({ userId: devUser.id });
+      mockProfileRepository.save.mockResolvedValue({ userId: devUser.id });
+      mockProfileRepository.findOne.mockResolvedValue(null);
+      mockSubscriptionRepository.create.mockReturnValue({ userId: devUser.id, tier: 'free' });
+      mockSubscriptionRepository.save.mockResolvedValue({ userId: devUser.id, tier: 'free' });
+      mockSubscriptionRepository.findOne.mockResolvedValue(null);
+      mockOrganizationRepository.findOne.mockResolvedValue(null);
+      mockOrganizationRepository.create.mockReturnValue(organization);
+      mockOrganizationRepository.save.mockResolvedValue(organization);
+      mockOrganizationMembershipRepository.findOne.mockResolvedValue(null);
+      mockOrganizationMembershipRepository.create.mockReturnValue({});
+      mockOrganizationMembershipRepository.save.mockResolvedValue({});
+      mockWorkspaceRepository.findOne.mockResolvedValue(null);
+      mockWorkspaceRepository.create.mockReturnValue({ id: 'ws-2', name: 'Emergency Operations' });
+      mockWorkspaceRepository.save.mockResolvedValue({ id: 'ws-2', name: 'Emergency Operations' });
+      mockWorkspaceMembershipRepository.findOne.mockResolvedValue(null);
+      mockWorkspaceMembershipRepository.create.mockReturnValue({});
+      mockWorkspaceMembershipRepository.save.mockResolvedValue({});
+      mockJwtService.sign.mockReturnValue('signed-token');
+
+      const withoutPlatformAssets = new (service.constructor as any)(
+        mockUserRepository,
+        mockProfileRepository,
+        mockOauthRepository,
+        mockSubscriptionRepository,
+        mockOrganizationRepository,
+        mockOrganizationMembershipRepository,
+        mockWorkspaceRepository,
+        mockWorkspaceMembershipRepository,
+        mockJwtService,
+        mockConfigService,
+        mockAuditService,
+        mockTwoFactorService,
+        mockEncryptionService,
+        mockEmailService,
+        undefined,
+      );
+
+      await expect(
+        withoutPlatformAssets.createDevSession('127.0.0.1', 'test-agent'),
+      ).resolves.toBeDefined();
     });
   });
 

@@ -27,6 +27,7 @@ import { AuditModule } from '../audit/audit.module';
 import { TwoFactorModule } from '../two-factor/two-factor.module';
 import { EmailModule } from '../email/email.module';
 import { EncryptionModule } from '../encryption/encryption.module';
+import { PlatformAssetsModule } from '../platform-assets/platform-assets.module';
 import { AuthorizationGuard } from './guards/authorization.guard';
 
 @Module({
@@ -64,6 +65,7 @@ import { AuthorizationGuard } from './guards/authorization.guard';
     TwoFactorModule,
     EmailModule,
     EncryptionModule,
+    PlatformAssetsModule,
   ],
   controllers: [AuthController, BiometricController],
   providers: [
