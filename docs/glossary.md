@@ -43,7 +43,7 @@
 | **Permission (backend)** | A fine-grained backend capability (`READ_PHI`, `WRITE_PHI`, `MANAGE_USERS`, `VIEW_AUDIT_LOGS`, ...), mapped per `UserRole` and enforced by `AuthorizationGuard`. |
 | **CareDroid permission string (frontend)** | A colon-delimited permission string (`patient:read`, `triage:override-ai`, `ai:configure`) used by frontend `PermissionGate`/`RoleGate` components — a separate vocabulary from backend `Permission` enum values. |
 | **Access scope** | How broadly a user's data access extends: `none \| self \| assigned \| department \| site \| network \| all` — set per user for `patientAccessScope`, `aiReviewScope`, `alertOwnershipScope`. |
-| **Break-glass** | Emergency access override allowing a user to temporarily exceed their normal access scope, logged distinctly in the audit trail. |
+| **Break-glass** | *(Planned / not implemented.)* A clinical emergency access override that would temporarily expand a user's access scope with justification + distinct audit. **Do not confuse** with `emergency-access.service.ts`, which only verifies 2FA backup codes for account login recovery. `Permission.BREAK_GLASS_ACCESS` is reserved and not granted. |
 | **Data minimization level** | Per-user setting (`none` → `metadata_only`) controlling how much PHI detail a role sees by default. |
 
 ## AI governance terms

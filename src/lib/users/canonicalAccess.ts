@@ -148,9 +148,10 @@ const ALL_CAREDROID_ROUTES = Object.freeze([
 
 export const CANONICAL_ROLE_CATALOG: Readonly<Record<HospitalRole, CanonicalRoleMapping>> =
   Object.freeze({
+    // breakGlassAllowed stays false for every role: clinical break-glass is not implemented
+    // (field retained for forward-compat only; no UI/guard reads it). See capability-map QW-2.
     super_admin: role('super_admin', 'admin', 'platform-admin', 'admin', {
       admin: true,
-      breakGlassAllowed: true,
       aliases: ['admin', 'super-admin', 'platform-admin'],
     }),
     hospital_admin: role('hospital_admin', 'ed_manager', 'hospital-administrator', 'admin', {
@@ -161,7 +162,6 @@ export const CANONICAL_ROLE_CATALOG: Readonly<Record<HospitalRole, CanonicalRole
     ed_director: role('ed_director', 'ed_manager', 'emergency-physician', 'physician', {
       clinical: true,
       admin: true,
-      breakGlassAllowed: true,
       aliases: ['ed-director', 'medical-director'],
     }),
     charge_nurse: role('charge_nurse', 'charge_nurse', 'nurse', 'nurse', {
@@ -178,12 +178,10 @@ export const CANONICAL_ROLE_CATALOG: Readonly<Record<HospitalRole, CanonicalRole
     }),
     emergency_physician: role('emergency_physician', 'physician', 'emergency-physician', 'physician', {
       clinical: true,
-      breakGlassAllowed: true,
       aliases: ['emergency-physician', 'doctor', 'md'],
     }),
     attending_physician: role('attending_physician', 'physician', 'emergency-physician', 'physician', {
       clinical: true,
-      breakGlassAllowed: true,
       aliases: ['attending', 'attending-physician'],
     }),
     resident_physician: role('resident_physician', 'physician', 'emergency-physician', 'physician', {

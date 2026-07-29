@@ -81,7 +81,8 @@ export const BACKEND_ROLE_PERMISSIONS: Readonly<Record<string, readonly string[]
   registration_clerk: Object.freeze([P.READ_PHI, P.WRITE_PHI, P.IMPORT_PATIENT_DATA]),
   ems_user: Object.freeze([P.READ_PHI, P.WRITE_PHI, P.TRIGGER_EMERGENCY_PROTOCOL]),
   read_only_viewer: Object.freeze([P.READ_PHI, P.VIEW_ANALYTICS, P.VIEW_OPERATIONS]),
-  admin: Object.freeze(Object.values(P)),
+  // Mirror backend: admin is near-full grant, but clinical break-glass is reserved/not implemented.
+  admin: Object.freeze(Object.values(P).filter((permission) => permission !== P.BREAK_GLASS_ACCESS)),
 });
 
 export function resolveBackendRoleKey(role: string | null | undefined): string {

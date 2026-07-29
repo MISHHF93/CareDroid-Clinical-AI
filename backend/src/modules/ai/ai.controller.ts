@@ -38,6 +38,19 @@ const withTenantContext = (context: any, tenantContext: any) => ({
     : context?.tenant,
 });
 
+/**
+ * Clinical AI HTTP entry points (POST /ai/query, /ai/structured) must match the
+ * gateway fail-safe: requiresHumanReview defaults true. AIService only enables
+ * review when context.aiFoundation.requiresHumanReview is set (see Cycle 230).
+ */
+const withClinicalHumanReview = (context: any) => ({
+  ...(context || {}),
+  aiFoundation: {
+    ...((context && context.aiFoundation) || {}),
+    requiresHumanReview: true,
+  },
+});
+
 @ApiTags('ai')
 @Controller('ai')
 @UseGuards(AuthGuard('jwt'), TenantIsolationGuard)
@@ -60,7 +73,7 @@ export class AIController {
     return this.aiService.invokeLLM(
       req.user.id,
       dto.prompt,
-      withTenantContext(dto.context, req.tenantContext),
+      withTenantContext(withClinicalHumanReview(dto.context), req.tenantContext),
     );
   }
 
@@ -74,7 +87,7 @@ export class AIController {
       req.user.id,
       dto.prompt,
       dto.schema,
-      withTenantContext(undefined, req.tenantContext),
+      withTenantContext(withClinicalHumanReview(undefined), req.tenantContext),
     );
   }
 

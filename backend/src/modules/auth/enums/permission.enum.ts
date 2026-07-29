@@ -300,7 +300,8 @@ export const PermissionMetadata: Record<
     riskLevel: 'critical',
   },
   [Permission.BREAK_GLASS_ACCESS]: {
-    description: 'Use emergency break-glass access with elevated audit requirements',
+    description:
+      'RESERVED — clinical break-glass / emergency access-scope override is not implemented. Do not grant until a real guard, justification workflow, and audit path exist. (emergency-access.service.ts is 2FA backup-code recovery only.)',
     category: 'Emergency & Safety',
     riskLevel: 'critical',
   },

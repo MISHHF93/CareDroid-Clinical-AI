@@ -232,7 +232,7 @@
 - **Services:**
   - `auth.service.ts` — login, token issuance
   - `biometric.service.ts` — biometric auth
-  - `emergency-access.service.ts` — break-glass access
+  - `emergency-access.service.ts` — 2FA backup-code account recovery (when authenticator device unavailable); **not** clinical break-glass / emergency PHI-scope override
   - `device-fingerprint.service.ts` — device tracking
 - **Strategies:** JWT, Google OAuth, LinkedIn OAuth
 - **Guards:** `authorization.guard.ts`, `two-factor-enforcement.guard.ts`

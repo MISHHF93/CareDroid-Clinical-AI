@@ -481,4 +481,4 @@ Enforced by `EmergencyRouteGuard` in `src/app/router.tsx`:
 | Audit Log | HMAC-hashed tamper-evident logs |
 | LLM Security | Prompt injection detection (`llm-security.module.ts`) |
 | PHI Redaction | `privacy-center.module.ts` for display redaction |
-| Emergency Access | Break-glass access via `emergency-access.service.ts` |
+| Emergency Access (2FA recovery) | Account recovery via 2FA backup codes in `emergency-access.service.ts` — **not** clinical break-glass / PHI scope override (that capability is not implemented; see capability-map QW-2) |

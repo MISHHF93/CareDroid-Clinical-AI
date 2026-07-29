@@ -159,7 +159,9 @@ export const RolePermissions: Record<UserRole, Permission[]> = {
     Permission.MANAGE_INTEGRATIONS,
     Permission.IMPORT_PATIENT_DATA,
     Permission.RESOLVE_DATA_CONFLICTS,
-    Permission.BREAK_GLASS_ACCESS,
+    // BREAK_GLASS_ACCESS intentionally not granted: clinical break-glass is not implemented.
+    // Permission enum value is reserved for a future justified emergency-override workflow.
+    // See docs/enterprise-subsystems-capability-map.md QW-2 / §4.4.
     Permission.VIEW_REGULATORY,
     Permission.MANAGE_REGULATORY,
     Permission.APPROVE_REGULATORY,

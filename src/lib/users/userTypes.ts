@@ -85,6 +85,7 @@ export type CareDroidUserProfile = Readonly<{
   dashboardProfile: DashboardProfile;
   readOnly: boolean;
   mfaRequired: boolean;
+  /** Always false today — clinical break-glass is not implemented (reserved for a future workflow). */
   breakGlassAllowed: boolean;
   auditScope: AccessScope;
   dataMinimizationLevel: DataMinimizationLevel;

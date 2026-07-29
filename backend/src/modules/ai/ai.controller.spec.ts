@@ -153,6 +153,8 @@ describe('AIController organization usage', () => {
       'Assess sepsis risk',
       expect.objectContaining({
         feature: 'assistant',
+        // Cycle 233: public clinical endpoints force human-review flag (gateway parity)
+        aiFoundation: expect.objectContaining({ requiresHumanReview: true }),
         tenant: expect.objectContaining({
           organizationId: 'org-1',
           workspaceId: 'workspace-1',
@@ -182,12 +184,26 @@ describe('AIController organization usage', () => {
       'Generate JSON',
       { type: 'object' },
       expect.objectContaining({
+        aiFoundation: expect.objectContaining({ requiresHumanReview: true }),
         tenant: expect.objectContaining({
           organizationId: 'org-1',
           workspaceId: 'workspace-1',
         }),
       }),
     );
+  });
+
+  it('forces requiresHumanReview on /query even when client omits or denies it (Cycle 233)', async () => {
+    const { controller, aiService } = buildController();
+
+    await controller.query(tenantReq, {
+      prompt: 'Draft differential',
+      context: { aiFoundation: { requiresHumanReview: false, capabilityId: 'client' } },
+    } as any);
+
+    const [, , context] = (aiService.invokeLLM as jest.Mock).mock.calls[0];
+    expect(context.aiFoundation.requiresHumanReview).toBe(true);
+    expect(context.aiFoundation.capabilityId).toBe('client');
   });
 
   it('rejects organization usage when path organization differs from tenant context', async () => {

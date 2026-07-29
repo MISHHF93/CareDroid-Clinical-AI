@@ -58,6 +58,19 @@ describe('canonical CareDroid access', () => {
     });
   });
 
+  it('does not advertise clinical break-glass on any catalog role (QW-2)', () => {
+    for (const role of [
+      'super_admin',
+      'ed_director',
+      'emergency_physician',
+      'attending_physician',
+      'charge_nurse',
+      'demo_observer',
+    ] as const) {
+      expect(getCanonicalRoleMapping(role).breakGlassAllowed).toBe(false);
+    }
+  });
+
   it('compiles route access and dashboard personalization from one profile', () => {
     const profile = getDemoUserById('demo-maya-chen');
     expect(profile).toBeTruthy();
