@@ -68,6 +68,7 @@ describe('ConsentHistory', () => {
         privacyPolicyAccepted: true,
         dataProcessingConsent: false,
         marketingConsent: false,
+        thirdPartySharingConsent: false,
         lastUpdated: '2026-01-15T10:00:00Z',
       },
     } as any);
@@ -77,6 +78,9 @@ describe('ConsentHistory', () => {
     await waitFor(() => {
       expect(screen.getByText('Consent History')).toBeInTheDocument();
     });
-    expect(screen.getAllByText('Consent Event')).toHaveLength(4);
+    // 5 rows: terms, privacy policy, data processing, marketing, and
+    // third-party sharing (Cycle 227 -- previously omitted from the backend
+    // response entirely despite having a real, tracked consent column).
+    expect(screen.getAllByText('Consent Event')).toHaveLength(5);
   });
 });

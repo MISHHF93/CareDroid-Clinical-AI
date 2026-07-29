@@ -298,24 +298,51 @@ describe('ComplianceService', () => {
   });
 
   describe('getConsentStatus', () => {
-    it('should return consent status from user profile', async () => {
+    it('reads dataProcessingConsent/marketingConsent/thirdPartySharingConsent from the real UserProfile columns, not emailVerified (Cycle 227 regression)', async () => {
+      // Before this fix, all 3 of these were reported as `= user.emailVerified`
+      // -- a user who explicitly withdrew consent via updateConsent() (which
+      // DOES write the real UserProfile.consent* columns) would still see it
+      // reported as granted here, as long as their email was verified.
       const userId = '1';
 
-      mockUserRepository.findOne.mockResolvedValue(mockUser);
+      mockUserRepository.findOne.mockResolvedValue({
+        ...mockUser,
+        profile: {
+          ...mockProfile,
+          consentDataProcessing: false,
+          consentMarketingCommunications: true,
+          consentThirdPartySharing: false,
+          updatedAt: new Date('2026-01-10'),
+        },
+      });
 
       const result = await service.getConsentStatus(userId);
 
       expect(result).toEqual({
         userId: '1',
-        termsAccepted: true,
+        termsAccepted: true, // still emailVerified-derived: no dedicated column exists
         privacyPolicyAccepted: true,
-        dataProcessingConsent: true,
-        marketingConsent: false,
-        lastUpdated: mockUser.updatedAt,
+        dataProcessingConsent: false,
+        marketingConsent: true,
+        thirdPartySharingConsent: false,
+        lastUpdated: new Date('2026-01-10'),
       });
     });
 
-    it('should return default false values when profile not found', async () => {
+    it('defaults all 3 real consent fields to false when the user has no profile yet', async () => {
+      const userId = '1';
+
+      mockUserRepository.findOne.mockResolvedValue({ ...mockUser, profile: null });
+
+      const result = await service.getConsentStatus(userId);
+
+      expect(result.dataProcessingConsent).toBe(false);
+      expect(result.marketingConsent).toBe(false);
+      expect(result.thirdPartySharingConsent).toBe(false);
+      expect(result.lastUpdated).toBe(mockUser.updatedAt);
+    });
+
+    it('should throw error when user not found', async () => {
       const userId = '1';
 
       mockUserRepository.findOne.mockResolvedValue(null);

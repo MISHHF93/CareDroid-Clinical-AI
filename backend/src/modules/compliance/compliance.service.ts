@@ -172,19 +172,30 @@ export class ComplianceService {
   async getConsentStatus(userId: string) {
     const user = await this.userRepository.findOne({
       where: { id: userId },
+      relations: ['profile'],
     });
 
     if (!user) {
       throw new Error('User not found');
     }
 
+    const profile = user.profile;
+
     return {
       userId,
-      termsAccepted: user.emailVerified, // Email verification implies terms acceptance
+      // No dedicated terms/privacy-policy acceptance column exists yet, so
+      // email verification remains the closest available signal for these
+      // two. dataProcessingConsent/marketingConsent/thirdPartySharingConsent
+      // DO have real, actively-written UserProfile columns (updateConsent()
+      // below writes them) -- reporting emailVerified for those instead
+      // meant a user's explicit withdrawal of consent was silently ignored
+      // by every subsequent status read.
+      termsAccepted: user.emailVerified,
       privacyPolicyAccepted: user.emailVerified,
-      dataProcessingConsent: user.emailVerified,
-      marketingConsent: false, // Default, would be stored in profile
-      lastUpdated: user.updatedAt,
+      dataProcessingConsent: profile?.consentDataProcessing ?? false,
+      marketingConsent: profile?.consentMarketingCommunications ?? false,
+      thirdPartySharingConsent: profile?.consentThirdPartySharing ?? false,
+      lastUpdated: profile?.updatedAt ?? user.updatedAt,
     };
   }
 

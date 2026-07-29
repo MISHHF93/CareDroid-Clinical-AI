@@ -59,6 +59,11 @@ export const ConsentHistory = () => {
           granted: status.marketingConsent,
           updatedAt: status.lastUpdated,
         },
+        {
+          key: 'thirdPartySharingConsent',
+          granted: status.thirdPartySharingConsent,
+          updatedAt: status.lastUpdated,
+        },
       ];
       setConsents(
         snapshot.map((row) => ({
@@ -103,6 +108,7 @@ export const ConsentHistory = () => {
       privacyPolicyAccepted: 'Privacy Policy',
       dataProcessingConsent: 'Data processing (HIPAA / clinical use)',
       marketingConsent: 'Marketing communications',
+      thirdPartySharingConsent: 'Third-party data sharing',
       data_sharing: 'Anonymized Data for Research',
       marketing_communications: 'Communications Preferences',
     };
