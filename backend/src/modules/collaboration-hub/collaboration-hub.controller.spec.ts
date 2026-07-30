@@ -27,6 +27,24 @@ describe('CollaborationHubController', () => {
     expect(permissions).toEqual([Permission.READ_PHI]);
   });
 
+  // Cycle 240: analyticsSummary is a second, distinct exception to the
+  // membership-scoped model below. CollaborationHubService.getAnalyticsSummary()
+  // takes only an organizationId, never the caller's userId -- confirmed by
+  // direct read that it aggregates message/channel counts, unresolved-mention
+  // counts, and incident-resolution timings across every channel in the org
+  // (including PATIENT_THREAD and INCIDENT channels), with no
+  // listMemberChannelIds()/assertAccess()-style filter to the caller's own
+  // memberships, unlike every method in the list below. Before this fix, any
+  // authenticated user -- including STUDENT -- could see organization-wide
+  // communication analytics for channels they'd never joined.
+  it('analyticsSummary requires VIEW_ANALYTICS permission (not membership-scoped, unlike the rest of this controller)', () => {
+    const permissions = Reflect.getMetadata(
+      PERMISSIONS_KEY,
+      CollaborationHubController.prototype.analyticsSummary,
+    );
+    expect(permissions).toEqual([Permission.VIEW_ANALYTICS]);
+  });
+
   it('the rest of the routes stay membership-scoped, not permission-gated', () => {
     const membershipScopedMethods: Array<keyof CollaborationHubController> = [
       'listChannels',
@@ -50,7 +68,6 @@ describe('CollaborationHubController', () => {
       'search',
       'createIncident',
       'resolveIncident',
-      'analyticsSummary',
     ];
     for (const method of membershipScopedMethods) {
       const permissions = Reflect.getMetadata(

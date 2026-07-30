@@ -331,6 +331,7 @@ export class CollaborationHubController {
     );
   }
 
+  @RequirePermission(Permission.VIEW_ANALYTICS)
   @Get('analytics/summary')
   @ApiOperation({
     summary:
