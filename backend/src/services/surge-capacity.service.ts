@@ -1,3 +1,4 @@
+import { Injectable } from '@nestjs/common';
 import { EventEmitter } from 'events';
 import mongoose from 'mongoose';
 import { UnifiedPatient as Patient } from '../models/unified-patient.model';
@@ -71,6 +72,7 @@ function getMongoDb() {
   return db;
 }
 
+@Injectable()
 export class SurgeCapacityService extends EventEmitter {
   private activeSurgeEvent: SurgeEvent | null = null;
 

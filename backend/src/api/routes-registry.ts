@@ -15,7 +15,6 @@ import mohRoutes from './moh.routes';
 import protocolRoutes from './protocol.routes';
 import reassessmentRoutes from './reassessment.routes';
 import simulationRoutes from './simulation.routes';
-import surgeRoutes from './surge.routes';
 import wearableRoutes from './wearable.routes';
 
 export type ApiRouteVersion = 'v1';
@@ -67,13 +66,6 @@ export const ROUTES: ApiRouteRegistration[] = [
     version: 'v1',
     enabled: true,
     description: 'EMS intake and tracking',
-  },
-  {
-    path: '/surge',
-    router: surgeRoutes,
-    version: 'v1',
-    enabled: true,
-    description: 'surge capacity and MCI',
   },
   {
     path: '/boarding',

@@ -3,7 +3,6 @@ import { getRouteList, ROUTES } from './routes-registry';
 const REQUESTED_ROUTE_PATHS = [
   '/capacity',
   '/ems',
-  '/surge',
   '/boarding',
   '/protocol',
   '/deterioration',

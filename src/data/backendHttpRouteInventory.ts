@@ -1076,6 +1076,12 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
 
   { method: 'POST', path: '/api/emergency/governance/evaluate-priority-change', controller: 'EmergencyAIGovernanceController' },
   { method: 'POST', path: '/api/v1/governance/evaluate-priority-change', controller: 'AIGovernanceV1Controller' },
+
+  { method: 'POST', path: '/api/emergency/surge/activate', controller: 'SurgeController' },
+  { method: 'POST', path: '/api/emergency/surge/batch-ems-intake', controller: 'SurgeController' },
+  { method: 'GET', path: '/api/emergency/surge/bottlenecks', controller: 'SurgeController' },
+  { method: 'POST', path: '/api/emergency/surge/deactivate', controller: 'SurgeController' },
+  { method: 'GET', path: '/api/emergency/surge/status', controller: 'SurgeController' },
 ]);
 
 /** @typedef {BackendHttpRoute & { runtime: 'mongoose-emergency-os', mountFlag: string }} OptionalRuntimeBackendRoute */
@@ -1320,41 +1326,6 @@ export const OPTIONAL_RUNTIME_BACKEND_ROUTES = Object.freeze([
     method: 'POST',
     path: '/api/emergency/reassessment/:patientId/dismiss',
     controller: 'ExpressReassessmentRoutes',
-    runtime: 'mongoose-emergency-os',
-    mountFlag: 'ENABLE_MONGOOSE_EMERGENCY_OS',
-  },
-  {
-    method: 'POST',
-    path: '/api/emergency/surge/activate',
-    controller: 'ExpressSurgeRoutes',
-    runtime: 'mongoose-emergency-os',
-    mountFlag: 'ENABLE_MONGOOSE_EMERGENCY_OS',
-  },
-  {
-    method: 'POST',
-    path: '/api/emergency/surge/batch-ems-intake',
-    controller: 'ExpressSurgeRoutes',
-    runtime: 'mongoose-emergency-os',
-    mountFlag: 'ENABLE_MONGOOSE_EMERGENCY_OS',
-  },
-  {
-    method: 'GET',
-    path: '/api/emergency/surge/bottlenecks',
-    controller: 'ExpressSurgeRoutes',
-    runtime: 'mongoose-emergency-os',
-    mountFlag: 'ENABLE_MONGOOSE_EMERGENCY_OS',
-  },
-  {
-    method: 'POST',
-    path: '/api/emergency/surge/deactivate',
-    controller: 'ExpressSurgeRoutes',
-    runtime: 'mongoose-emergency-os',
-    mountFlag: 'ENABLE_MONGOOSE_EMERGENCY_OS',
-  },
-  {
-    method: 'GET',
-    path: '/api/emergency/surge/status',
-    controller: 'ExpressSurgeRoutes',
     runtime: 'mongoose-emergency-os',
     mountFlag: 'ENABLE_MONGOOSE_EMERGENCY_OS',
   },

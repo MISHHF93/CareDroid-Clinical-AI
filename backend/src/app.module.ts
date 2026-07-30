@@ -86,6 +86,7 @@ import { CollaborationHubModule } from './modules/collaboration-hub/collaboratio
 import { NativeAiModule } from './modules/native-ai/native-ai.module';
 import { UnifiedAiNodeModule } from '../ml-services/unified-ai-node/unified-ai-node.module';
 import { SentinelModule } from './modules/sentinel/sentinel.module';
+import { SurgeModule } from './modules/surge/surge.module';
 
 // Monitoring & Observability
 import { LoggerModule } from './modules/common/logger.module';
@@ -236,6 +237,7 @@ function resolveDatabaseClient() {
     EmergencyOsModule,
     CigModule,
     SentinelModule,
+    SurgeModule,
     CollaborationHubModule,
     NativeAiModule,
     // CareDroid 1-node local ML backbone (ADR-0003): NLU + artifact-router + /api/ai/node/*

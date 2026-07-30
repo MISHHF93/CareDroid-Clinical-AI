@@ -57,6 +57,10 @@ export const RolePermissions: Record<UserRole, Permission[]> = {
     Permission.ACK_SENTINEL_ALARMS,
     Permission.REVIEW_SENTINEL_AI,
     Permission.VIEW_SENTINEL_ANALYTICS,
+
+    // Surge capacity (view + bedside/triage batch intake, not activation authority)
+    Permission.VIEW_SURGE_COMMAND,
+    Permission.INGEST_SURGE_PATIENTS,
   ],
 
   /**
@@ -104,6 +108,10 @@ export const RolePermissions: Record<UserRole, Permission[]> = {
     Permission.ACK_SENTINEL_ALARMS,
     Permission.REVIEW_SENTINEL_AI,
     Permission.VIEW_SENTINEL_ANALYTICS,
+
+    // Surge capacity (attending/incident-commander activation authority)
+    Permission.VIEW_SURGE_COMMAND,
+    Permission.ACTIVATE_SURGE_MODE,
   ],
 
   /**
@@ -195,6 +203,11 @@ export const RolePermissions: Record<UserRole, Permission[]> = {
     Permission.INGEST_SENTINEL_CAD,
     Permission.REVIEW_SENTINEL_AI,
     Permission.VIEW_SENTINEL_ANALYTICS,
+
+    // Surge capacity (full)
+    Permission.VIEW_SURGE_COMMAND,
+    Permission.ACTIVATE_SURGE_MODE,
+    Permission.INGEST_SURGE_PATIENTS,
 
     // TrackMind Nexus
     Permission.VIEW_TRACKMIND,

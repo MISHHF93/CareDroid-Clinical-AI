@@ -58,7 +58,6 @@ describe('AppController environment config', () => {
           routeGroups: expect.arrayContaining([
             '/api/capacity',
             '/api/ems',
-            '/api/surge',
             '/api/boarding',
             '/api/protocol',
             '/api/deterioration',

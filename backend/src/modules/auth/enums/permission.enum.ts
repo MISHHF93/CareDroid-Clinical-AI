@@ -110,6 +110,11 @@ export enum Permission {
   REVIEW_SENTINEL_AI = 'REVIEW_SENTINEL_AI',
   VIEW_SENTINEL_ANALYTICS = 'VIEW_SENTINEL_ANALYTICS',
 
+  // Surge Capacity (mass-casualty-incident / disaster surge command)
+  VIEW_SURGE_COMMAND = 'VIEW_SURGE_COMMAND',
+  ACTIVATE_SURGE_MODE = 'ACTIVATE_SURGE_MODE',
+  INGEST_SURGE_PATIENTS = 'INGEST_SURGE_PATIENTS',
+
   // Two-Factor Authentication
   ENFORCE_MFA = 'ENFORCE_MFA', // Require 2FA for specific users
   MANAGE_MFA = 'MANAGE_MFA', // Configure MFA settings
@@ -544,6 +549,23 @@ export const PermissionMetadata: Record<
     description: 'View Sentinel EMS and alarm analytics KPIs',
     category: 'Sentinel',
     riskLevel: 'medium',
+  },
+
+  // Surge Capacity
+  [Permission.VIEW_SURGE_COMMAND]: {
+    description: 'View mass-casualty-incident / disaster surge status and resource bottlenecks',
+    category: 'Surge Capacity',
+    riskLevel: 'high',
+  },
+  [Permission.ACTIVATE_SURGE_MODE]: {
+    description: 'Activate or deactivate a hospital-wide mass-casualty surge event',
+    category: 'Surge Capacity',
+    riskLevel: 'critical',
+  },
+  [Permission.INGEST_SURGE_PATIENTS]: {
+    description: 'Batch-create patient records from EMS mass-casualty intake',
+    category: 'Surge Capacity',
+    riskLevel: 'critical',
   },
 
   // Two-Factor Authentication
