@@ -320,12 +320,16 @@ describe('SentinelController', () => {
 
   describe('upsertInbound', () => {
     it('coerces provided numeric/string fields and passes null for organizationId when absent', async () => {
+      // Simulates a raw pre-ValidationPipe body (this unit test calls the
+      // controller directly, bypassing Nest's real transform pipeline) to
+      // prove the controller's own Number() coercion is defense-in-depth,
+      // independent of whatever the pipe already normalized upstream.
       await controller.upsertInbound({
         unitId: 'M1',
         etaPointMin: '8',
         etaLowMin: '6',
         etaHighMin: '10',
-      });
+      } as any);
 
       expect(inbound.upsertFromCadOrNemsis).toHaveBeenCalledWith({
         payload: expect.any(Object),

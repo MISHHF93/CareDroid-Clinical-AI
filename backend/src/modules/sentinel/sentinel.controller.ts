@@ -10,6 +10,12 @@ import { SentinelInboundService } from './sentinel-inbound.service';
 import { SentinelOutboxService } from './sentinel-outbox.service';
 import { SentinelTrackingService } from './sentinel-tracking.service';
 import { getSentinelRuntimeConfig } from './sentinel.config';
+import { IngestCadDto } from './dto/ingest-cad.dto';
+import { UpsertInboundDto } from './dto/upsert-inbound.dto';
+import { PrepRecommendationDto } from './dto/prep-recommendation.dto';
+import { RaiseAlarmDto } from './dto/raise-alarm.dto';
+import { AlarmActionDto } from './dto/alarm-action.dto';
+import { ReviewAiDto } from './dto/review-ai.dto';
 import type { SentinelAlarmStatus } from '../../../../lib/sentinel/types';
 
 function envelope<T>(data: T, message: string) {
@@ -155,8 +161,8 @@ export class SentinelController {
     Permission.MANAGE_SENTINEL_UNITS,
   )
   @ApiOperation({ summary: 'Vendor-agnostic CAD/AVL webhook ingest' })
-  async ingestCad(@Body() body: Record<string, unknown>) {
-    const events = normalizeWebhookPayload(body || {});
+  async ingestCad(@Body() body: IngestCadDto) {
+    const events = normalizeWebhookPayload((body as Record<string, unknown>) || {});
     this.tracking.getWebhookAdapter().enqueue(events);
     const result = await this.tracking.ingestCadEvents(events);
 
@@ -218,9 +224,9 @@ export class SentinelController {
     Permission.WRITE_PHI,
     Permission.INGEST_SENTINEL_CAD,
   )
-  async upsertInbound(@Body() body: Record<string, unknown>) {
+  async upsertInbound(@Body() body: UpsertInboundDto) {
     const result = await this.inbound.upsertFromCadOrNemsis({
-      payload: body || {},
+      payload: (body as Record<string, unknown>) || {},
       unitId: body.unitId != null ? String(body.unitId) : undefined,
       organizationId: body.organizationId != null ? String(body.organizationId) : null,
       etaPointMin: body.etaPointMin != null ? Number(body.etaPointMin) : null,
@@ -244,7 +250,7 @@ export class SentinelController {
     Permission.USE_AI_CHAT,
     Permission.VIEW_SENTINEL_COMMAND,
   )
-  async prepRecommendation(@Param('id') id: string, @Body() body: { preferAi?: boolean }) {
+  async prepRecommendation(@Param('id') id: string, @Body() body: PrepRecommendationDto) {
     const rec = await this.inbound.producePrepRecommendation(id, {
       preferAi: body?.preferAi !== false,
     });
@@ -263,19 +269,7 @@ export class SentinelController {
 
   @Post('alarms')
   @AnyPermission(Permission.ACK_SENTINEL_ALARMS, Permission.MANAGE_SENTINEL_UNITS)
-  async raiseAlarm(
-    @Body()
-    body: {
-      source: string;
-      category: string;
-      ruleId: string;
-      subjectId: string;
-      severity: 'critical' | 'warning' | 'info';
-      urgency: 'immediate' | 'soon' | 'routine';
-      title: string;
-      message: string;
-    },
-  ) {
+  async raiseAlarm(@Body() body: RaiseAlarmDto) {
     const result = await this.alarms.raise({
       source: body.source,
       category: body.category,
@@ -285,6 +279,9 @@ export class SentinelController {
       urgency: body.urgency,
       title: body.title,
       message: body.message,
+      organizationId: body.organizationId,
+      metadata: body.metadata,
+      actorId: body.actorId,
     });
     return envelope(
       result,
@@ -298,7 +295,7 @@ export class SentinelController {
     @Param('id') id: string,
     @Param('action') action: string,
     @Req() req: { user?: { id?: string; userId?: string; role?: string } },
-    @Body() body: { reason?: string },
+    @Body() body: AlarmActionDto,
   ) {
     const allowed = new Set([
       'acknowledged',
@@ -356,7 +353,7 @@ export class SentinelController {
   @AnyPermission(Permission.REVIEW_SENTINEL_AI)
   async reviewAi(
     @Param('id') id: string,
-    @Body() body: { status: 'accepted' | 'rejected' | 'modified' },
+    @Body() body: ReviewAiDto,
     @Req() req: { user?: { id?: string; userId?: string } },
   ) {
     const reviewerId = req.user?.id || req.user?.userId || 'unknown';

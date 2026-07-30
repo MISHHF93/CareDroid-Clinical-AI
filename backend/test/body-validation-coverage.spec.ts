@@ -18,9 +18,9 @@ import * as ts from 'typescript';
  * controller (via the TypeScript compiler API + full type checker, not
  * grep/regex -- a regex can't tell an interface from a class through an
  * import, and can't resolve `SmartIntakeCreateInput`-style aliased types) and
- * asserts the exact current baseline (123 as of Cycle 242; 135 originally
- * found Cycle 241, worked down 5 at a time since -- see SCORECARD.md for the
- * per-cycle history). This is NOT a claim that all of them are equally
+ * asserts the exact current baseline (117 as of Cycle 244; 135 originally
+ * found Cycle 241, worked down incrementally since -- see SCORECARD.md for
+ * the per-cycle history). This is NOT a claim that all of them are equally
  * severe -- verified examples span the full range, from a public,
  * unauthenticated telemetry-ingestion endpoint down to services that only
  * ever read specific known fields off the raw body (e.g. `createReferral`'s
@@ -233,12 +233,6 @@ const BASELINE: string[] = [
   'src/modules/platform-systems/platform-systems.controller.ts :: PlatformSystemsController.createEmergencyPatient',
   'src/modules/platform-systems/platform-systems.controller.ts :: PlatformSystemsController.createEmergencyReferral',
   'src/modules/platform-systems/platform-systems.controller.ts :: PlatformSystemsController.updateEmergencyPatient',
-  'src/modules/sentinel/sentinel.controller.ts :: SentinelController.alarmAction',
-  'src/modules/sentinel/sentinel.controller.ts :: SentinelController.ingestCad',
-  'src/modules/sentinel/sentinel.controller.ts :: SentinelController.prepRecommendation',
-  'src/modules/sentinel/sentinel.controller.ts :: SentinelController.raiseAlarm',
-  'src/modules/sentinel/sentinel.controller.ts :: SentinelController.reviewAi',
-  'src/modules/sentinel/sentinel.controller.ts :: SentinelController.upsertInbound',
   'src/modules/tool-calling/tool-calling.controller.ts :: ToolCallingController.execute',
 ].sort();
 
