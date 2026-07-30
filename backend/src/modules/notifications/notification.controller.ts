@@ -18,6 +18,7 @@ import { NotificationService } from './services/notification.service';
 import { DeviceTokenService, RegisterDeviceDto } from './services/device-token.service';
 import {
   NotificationPreferenceService,
+  ToggleAllNotificationsDto,
   UpdatePreferencesDto,
 } from './services/notification-preference.service';
 import { NotificationType } from './entities/notification.entity';
@@ -130,7 +131,7 @@ export class NotificationController {
    */
   @Post('preferences/toggle-all')
   @ApiOperation({ summary: 'Enable/disable all notifications' })
-  async toggleAllNotifications(@Request() req, @Body() body: { enabled: boolean }) {
+  async toggleAllNotifications(@Request() req, @Body() body: ToggleAllNotificationsDto) {
     await this.preferenceService.toggleAllNotifications(req.user.id, body.enabled);
 
     return {

@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { IsISO8601, IsOptional, IsString, MaxLength } from 'class-validator';
 import { AnyPermission } from '../auth/decorators/permissions.decorator';
 import { AuthorizationGuard } from '../auth/guards/authorization.guard';
 import { Permission } from '../auth/enums/permission.enum';
@@ -14,6 +15,23 @@ type RequestWithUser = {
     organizationId?: string;
   };
 };
+
+class AcknowledgeAlertDto {
+  @IsOptional()
+  @IsISO8601()
+  acknowledgedAt?: string;
+}
+
+class DismissAlertDto {
+  @IsOptional()
+  @IsString()
+  @MaxLength(2000)
+  reason?: string;
+
+  @IsOptional()
+  @IsISO8601()
+  dismissedAt?: string;
+}
 
 @ApiTags('clinical-alerts')
 @Controller('clinical/alerts')
@@ -37,7 +55,7 @@ export class ClinicalAlertsController {
   acknowledge(
     @Req() req: RequestWithUser,
     @Param('alertId') alertId: string,
-    @Body() body: { acknowledgedAt?: string } = {},
+    @Body() body: AcknowledgeAlertDto = {},
   ) {
     return this.clinicalAlertsService.acknowledge(this.userId(req), alertId, body.acknowledgedAt);
   }
@@ -47,7 +65,7 @@ export class ClinicalAlertsController {
   dismiss(
     @Req() req: RequestWithUser,
     @Param('alertId') alertId: string,
-    @Body() body: { reason?: string; dismissedAt?: string } = {},
+    @Body() body: DismissAlertDto = {},
   ) {
     return this.clinicalAlertsService.dismiss(
       this.userId(req),

@@ -26,6 +26,7 @@ import { UpdateMembershipDto } from './dto/update-membership.dto';
 import { CreateIncidentDto } from './dto/create-incident.dto';
 import { UploadAttachmentDto } from './dto/upload-attachment.dto';
 import { LinkExternalProviderDto } from './dto/link-external-provider.dto';
+import { TypingDto } from './dto/typing.dto';
 import { CollaborationExternalProvider } from './entities/collaboration-external-link.entity';
 
 /**
@@ -227,11 +228,7 @@ export class CollaborationHubController {
 
   @Post('channels/:channelId/typing')
   @ApiOperation({ summary: 'Broadcast a typing indicator (ephemeral, not persisted)' })
-  async typing(
-    @Req() req: any,
-    @Param('channelId') channelId: string,
-    @Body() body: { isTyping: boolean },
-  ) {
+  async typing(@Req() req: any, @Param('channelId') channelId: string, @Body() body: TypingDto) {
     this.collaborationHubService.broadcastTyping(channelId, req.user.id, Boolean(body?.isTyping));
     return { ok: true };
   }

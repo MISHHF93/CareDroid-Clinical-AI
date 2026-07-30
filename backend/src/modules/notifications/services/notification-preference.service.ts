@@ -5,6 +5,11 @@ import { IsBoolean, IsOptional, IsString } from 'class-validator';
 import { NotificationPreference } from '../entities/notification-preference.entity';
 import { User } from '../../users/entities/user.entity';
 
+export class ToggleAllNotificationsDto {
+  @IsBoolean()
+  enabled: boolean;
+}
+
 export class UpdatePreferencesDto {
   @IsOptional()
   @IsBoolean()

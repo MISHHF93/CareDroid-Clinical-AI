@@ -18,8 +18,10 @@ import * as ts from 'typescript';
  * controller (via the TypeScript compiler API + full type checker, not
  * grep/regex -- a regex can't tell an interface from a class through an
  * import, and can't resolve `SmartIntakeCreateInput`-style aliased types) and
- * asserts the exact current baseline. This is NOT a claim that all 128 are
- * equally severe -- verified examples span the full range, from a public,
+ * asserts the exact current baseline (123 as of Cycle 242; 135 originally
+ * found Cycle 241, worked down 5 at a time since -- see SCORECARD.md for the
+ * per-cycle history). This is NOT a claim that all of them are equally
+ * severe -- verified examples span the full range, from a public,
  * unauthenticated telemetry-ingestion endpoint down to services that only
  * ever read specific known fields off the raw body (e.g. `createReferral`'s
  * `String(input.patientId || '')`-style extraction), which is safe from
@@ -110,18 +112,15 @@ function findUnvalidatedBodyParams(backendRoot: string): string[] {
   return results.sort();
 }
 
-// Generated 2026-07-30 (Cycle 241) via the exact walk above. 135 originally
-// found; 7 fixed same cycle (simulation/training/evaluation run DTOs +
-// telemetry ingestion), leaving this 128-entry baseline.
+// Generated 2026-07-30 (Cycle 242) via the exact walk above. 135 originally
+// found Cycle 241 (7 fixed that cycle); 5 more fixed this cycle (resetPassword,
+// acknowledge/dismiss, typing, toggleAllNotifications), leaving this 123-entry
+// baseline.
 const BASELINE: string[] = [
   'src/modules/ai/ai.controller.ts :: AIController.createProposal',
   'src/modules/ai/ai.controller.ts :: AIController.executeProposal',
   'src/modules/ai/ai.controller.ts :: AIController.rejectProposal',
   'src/modules/audit/audit.controller.ts :: AuditController.syncAuditEvent',
-  'src/modules/auth/auth.controller.ts :: AuthController.resetPassword',
-  'src/modules/clinical-alerts/clinical-alerts.controller.ts :: ClinicalAlertsController.acknowledge',
-  'src/modules/clinical-alerts/clinical-alerts.controller.ts :: ClinicalAlertsController.dismiss',
-  'src/modules/collaboration-hub/collaboration-hub.controller.ts :: CollaborationHubController.typing',
   'src/modules/cost-optimizer/cost-optimizer.controller.ts :: CostOptimizerController.route',
   'src/modules/emergency-os/ed-copilot.nest-parity.controller.ts :: EdCopilotNestParityController.query',
   'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.applyOcrJobToIntake',
@@ -164,7 +163,6 @@ const BASELINE: string[] = [
   'src/modules/native-ai/native-ai.controller.ts :: NativeAiController.getClinicalAcuity',
   'src/modules/native-ai/native-ai.controller.ts :: NativeAiController.inferSpecialists',
   'src/modules/native-ai/native-ai.controller.ts :: NativeAiController.routePatient',
-  'src/modules/notifications/notification.controller.ts :: NotificationController.toggleAllNotifications',
   'src/modules/organizations/organizations.controller.ts :: OrganizationsController.updateFeatureFlags',
   'src/modules/organizations/organizations.controller.ts :: OrganizationsController.updateSettings',
   'src/modules/organizations/organizations.controller.ts :: OrganizationsController.updateTenantAdministration',
