@@ -83,4 +83,18 @@ describe('PlatformGovernanceWorkspace governance/security dashboards', () => {
       '/security',
     );
   });
+
+  it('does not claim governance/consent controls block production action (Cycle 235 — evaluateGate() is only acted on, not blocking, at 1 of 4 real call sites)', async () => {
+    platformGovernanceApiMock.fetchPlatformGovernanceSurface.mockResolvedValue({
+      ok: true,
+      sourceStatus: 'live',
+      data: { status: 'guarded', readiness: { blocked: false }, panels: {} },
+    });
+
+    renderRoute('/ai-governance');
+
+    expect(await screen.findByRole('heading', { name: /human review gate/i })).toBeVisible();
+    expect(screen.queryByText(/controls block production action/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/always marked as requiring human review/i)).toBeVisible();
+  });
 });

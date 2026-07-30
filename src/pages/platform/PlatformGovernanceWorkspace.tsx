@@ -148,8 +148,8 @@ export default function PlatformGovernanceWorkspace() {
         <p>Approval, rejection, escalation, export, and writeback remain disabled until durable review records are approved.</p>
         <div className="governance-workspace-page__cards">
           <article className="governance-workspace-page__card">
-            <strong>Fail-closed behavior</strong>
-            <span>Missing governance, consent, validation, classification, or audit controls block production action.</span>
+            <strong>Governance decisioning</strong>
+            <span>Every AI run is evaluated for missing governance, consent, validation, classification, or audit controls, logged to the audit trail, and always marked as requiring human review. Today only ambient-scribe drafting routes a missing-control decision to the review queue; other integration points record the decision but do not yet block the underlying action on it.</span>
           </article>
           <article className="governance-workspace-page__card">
             <strong>No autonomous action</strong>
