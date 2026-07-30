@@ -795,6 +795,18 @@ export class WorkflowActionLogService implements OnModuleInit {
   }
 }
 
+/**
+ * In-memory-authoritative: every per-request read/write goes through
+ * `this.patients` directly; `persistPatientToDatabase()` is fire-and-forget,
+ * for durability/rehydration only, never read from during normal operation.
+ * This is safe against reentrancy/races today *only* because every
+ * per-request method body is fully synchronous (no `await`), which makes it
+ * atomic under Node's run-to-completion model. Do not add an `await` inside
+ * a read-modify-write method (e.g. an async validation call) without first
+ * re-reading SCORECARD.md roadmap item #2 — doing so would silently
+ * reintroduce a real race condition. `emergency-patient-atomicity-invariant.spec.ts`
+ * enforces this mechanically.
+ */
 @Injectable()
 export class EmergencyPatientService implements OnModuleInit {
   private readonly logger = new Logger(EmergencyPatientService.name);
