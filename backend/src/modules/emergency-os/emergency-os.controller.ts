@@ -114,31 +114,37 @@ export class EmergencyOsController {
     private readonly ocrIntakeService: OcrIntakeService,
   ) {}
 
+  @RequirePermission(Permission.READ_PHI)
   @Get('whiteboard')
   getWhiteboard() {
     return this.whiteboardService.getWhiteboard();
   }
 
+  @RequirePermission(Permission.READ_PHI)
   @Get('central-node/snapshot')
   getCentralNodeSnapshot() {
     return this.centralNodeService.getSnapshot();
   }
 
+  @RequirePermission(Permission.VIEW_OBSERVABILITY)
   @Get('operational-intelligence/snapshot')
   getOperationalIntelligenceSnapshot() {
     return this.operationalIntelligenceService.getSnapshotEnvelope();
   }
 
+  @RequirePermission(Permission.VIEW_OBSERVABILITY)
   @Get('operational-intelligence/model-health')
   getOperationalIntelligenceModelHealth() {
     return this.operationalIntelligenceService.getModelHealthEnvelope();
   }
 
+  @RequirePermission(Permission.VIEW_OBSERVABILITY)
   @Get('operational-intelligence/alerts')
   getOperationalIntelligenceAlerts() {
     return this.operationalIntelligenceService.getAlertsEnvelope();
   }
 
+  @RequirePermission(Permission.VIEW_OBSERVABILITY)
   @Post('operational-intelligence/evaluate')
   evaluateOperationalIntelligence(@Body() body: { events?: unknown[] }) {
     const events = Array.isArray(body?.events) ? body.events : [];
@@ -159,16 +165,19 @@ export class EmergencyOsController {
     return this.smartIntakeService.createFromIntake(dto);
   }
 
+  @RequirePermission(Permission.READ_PHI)
   @Get('journey')
   getJourney() {
     return this.journeyService.getJourney();
   }
 
+  @RequirePermission(Permission.READ_PHI)
   @Get('workflow-logs')
   getWorkflowLogs() {
     return this.workflowActionLogService.getEnvelope();
   }
 
+  @RequirePermission(Permission.VIEW_OPERATIONS)
   @Get('implementation-readiness')
   getImplementationReadiness() {
     return this.implementationReadinessService.getReadiness();
@@ -346,6 +355,7 @@ export class EmergencyOsController {
     };
   }
 
+  @RequirePermission(Permission.READ_PHI)
   @Get('ems')
   getEMS() {
     return this.emsIntakeService.getEMSIntake();
@@ -435,6 +445,7 @@ export class EmergencyOsController {
     });
   }
 
+  @RequirePermission(Permission.WRITE_PHI)
   @Post('triage/assist')
   async postTriageAssist(
     @Body()
@@ -534,16 +545,19 @@ export class EmergencyOsController {
     };
   }
 
+  @RequirePermission(Permission.READ_PHI)
   @Get('queues')
   getQueues() {
     return this.queueService.getQueues();
   }
 
+  @RequirePermission(Permission.READ_PHI)
   @Get('reassessment')
   getReassessment() {
     return this.reassessmentService.getReassessmentQueue();
   }
 
+  @RequirePermission(Permission.READ_PHI)
   @Get('operating-surfaces/:surfaceId')
   getOperatingSurface(
     @Param('surfaceId') surfaceId: OperatingSurfaceId,
@@ -552,11 +566,13 @@ export class EmergencyOsController {
     return this.operatingSurfacesService.getSurface(surfaceId, tenantContext);
   }
 
+  @RequirePermission(Permission.READ_PHI)
   @Get('workflow-orchestration')
   getWorkflowOrchestration(@TenantContext() tenantContext?: TenantContextValue) {
     return this.workflowOrchestrationService.getWorkflowOrchestration(tenantContext);
   }
 
+  @RequirePermission(Permission.WRITE_PHI)
   @Post('workflow-orchestration/review')
   reviewWorkflowAutomation(
     @Body()
@@ -566,6 +582,7 @@ export class EmergencyOsController {
     return this.workflowOrchestrationService.reviewTask(body, tenantContext);
   }
 
+  @RequirePermission(Permission.READ_PHI)
   @Get('patient-flow')
   getPatientFlow() {
     return this.patientFlowService.getPatientFlow();
@@ -577,36 +594,43 @@ export class EmergencyOsController {
     return this.patientFlowService.getPatientFlow(patientId);
   }
 
+  @RequirePermission(Permission.READ_PHI)
   @Get('capacity')
   getCapacity() {
     return this.capacityService.getCapacity();
   }
 
+  @RequirePermission(Permission.READ_PHI)
   @Get('boarding')
   getBoarding() {
     return this.boardingService.getBoarding();
   }
 
+  @RequirePermission(Permission.READ_PHI)
   @Get('referrals')
   getReferrals() {
     return this.referralService.getReferrals();
   }
 
+  @RequirePermission(Permission.WRITE_PHI)
   @Post('referrals')
   createReferral(@Body() dto: Record<string, unknown>) {
     return this.referralService.createReferral(dto);
   }
 
+  @RequirePermission(Permission.READ_PHI)
   @Get('provincial-health')
   getProvincialHealth() {
     return this.provincialHealthService.getProvincialHealth();
   }
 
+  @RequirePermission(Permission.VIEW_INTEGRATIONS)
   @Get('integrations')
   getIntegrations() {
     return this.integrationHubService.getIntegrationHub();
   }
 
+  @RequirePermission(Permission.USE_AI_CHAT)
   @Get('copilot')
   async getCopilot(@Req() request?: Request, @TenantContext() tenantContext?: TenantContextValue) {
     await assertEntitlementLaunchFromRequest(
@@ -617,6 +641,7 @@ export class EmergencyOsController {
     return this.copilotService.getCopilotContext();
   }
 
+  @RequirePermission(Permission.USE_AI_CHAT)
   @Post('copilot/query')
   async queryCopilot(
     @Body() dto: { query?: string; user_role?: string; context?: Record<string, unknown> },
@@ -704,51 +729,61 @@ export class EmergencyOsController {
     });
   }
 
+  @RequirePermission(Permission.VIEW_ANALYTICS)
   @Get('analytics')
   getAnalytics() {
     return this.analyticsService.getAnalytics();
   }
 
+  @RequirePermission(Permission.READ_PHI)
   @Get('upgrade-harness')
   getUpgradeHarness() {
     return this.upgradeHarnessService.getHarness();
   }
 
+  @RequirePermission(Permission.READ_PHI)
   @Get('upgrade-harness/capacity')
   getUpgradeHarnessCapacity() {
     return this.upgradeHarnessService.getCapacityAndForecasting();
   }
 
+  @RequirePermission(Permission.READ_PHI)
   @Get('upgrade-harness/patient-flow')
   getUpgradeHarnessPatientFlow() {
     return this.upgradeHarnessService.getPatientFlow();
   }
 
+  @RequirePermission(Permission.READ_PHI)
   @Get('upgrade-harness/patient-flow/:patientId')
   getUpgradeHarnessPatientFlowForPatient(@Param('patientId') patientId: string) {
     return this.upgradeHarnessService.getPatientFlow(patientId);
   }
 
+  @RequirePermission(Permission.READ_PHI)
   @Get('upgrade-harness/clinical-intelligence')
   getUpgradeHarnessClinicalIntelligence() {
     return this.upgradeHarnessService.getClinicalDecisionSupport();
   }
 
+  @RequirePermission(Permission.READ_PHI)
   @Get('upgrade-harness/clinical-intelligence/:patientId')
   getUpgradeHarnessClinicalIntelligenceForPatient(@Param('patientId') patientId: string) {
     return this.upgradeHarnessService.getClinicalDecisionSupport(patientId);
   }
 
+  @RequirePermission(Permission.READ_PHI)
   @Get('upgrade-harness/audit-summary')
   getUpgradeHarnessAuditSummary() {
     return this.upgradeHarnessService.getAuditSummary();
   }
 
+  @RequirePermission(Permission.CONFIGURE_SYSTEM)
   @Get('settings')
   getSettings(@TenantContext() tenantContext?: TenantContextValue) {
     return this.settingsService.getSettings(tenantContext?.organizationId);
   }
 
+  @RequirePermission(Permission.CONFIGURE_SYSTEM)
   @Patch('settings')
   updateSettings(
     @Body() dto: EmergencyOsSettingsPatch,
@@ -757,21 +792,25 @@ export class EmergencyOsController {
     return this.settingsService.updateSettings(dto, tenantContext?.organizationId);
   }
 
+  @RequirePermission(Permission.VIEW_ANALYTICS)
   @Post('simulation/update-live')
   updateLiveSimulation(@Body() dto: any): any {
     return this.realTimeSimulationService.updateLiveState(dto);
   }
 
+  @RequirePermission(Permission.VIEW_ANALYTICS)
   @Post('simulation/evaluate')
   evaluateSimulation(@Body() dto: any): any {
     return this.realTimeSimulationService.evaluateIntervention(dto);
   }
 
+  @RequirePermission(Permission.VIEW_ANALYTICS)
   @Post('simulation/compare')
   compareSimulation(@Body() dto: any): any {
     return this.realTimeSimulationService.compareInterventions(dto);
   }
 
+  @RequirePermission(Permission.VIEW_ANALYTICS)
   @Get('simulation/recommendations')
   getSimulationRecommendations(): any {
     return this.realTimeSimulationService.getRecommendations();
