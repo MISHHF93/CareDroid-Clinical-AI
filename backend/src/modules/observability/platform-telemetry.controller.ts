@@ -1,15 +1,107 @@
 import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { Type } from 'class-transformer';
+import {
+  ArrayMaxSize,
+  IsArray,
+  IsNumber,
+  IsObject,
+  IsOptional,
+  IsString,
+  MaxLength,
+  ValidateNested,
+} from 'class-validator';
 import { AuthorizationGuard } from '../auth/guards/authorization.guard';
 import { Permissions } from '../auth/decorators/permissions.decorator';
 import { Permission } from '../auth/enums/permission.enum';
-import { PlatformTelemetryEvent, PlatformTelemetryService } from './platform-telemetry.service';
+import { PlatformTelemetryService } from './platform-telemetry.service';
 
-type TelemetryIngestDto = {
-  sessionId?: string;
+class PlatformTelemetryEventDto {
+  @IsString()
+  @MaxLength(200)
+  id: string;
+
+  @IsString()
+  @MaxLength(120)
+  category: string;
+
+  @IsString()
+  @MaxLength(200)
+  name: string;
+
+  @IsString()
+  @MaxLength(50)
+  severity: string;
+
+  @IsString()
+  @MaxLength(60)
+  timestamp: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
   correlationId?: string;
-  events: PlatformTelemetryEvent[];
-};
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  sessionId?: string;
+
+  @IsOptional()
+  @IsNumber()
+  durationMs?: number;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  patientId?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(120)
+  workflowType?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(120)
+  source?: string;
+
+  @IsOptional()
+  @IsNumber()
+  statusCode?: number;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  path?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(2000)
+  message?: string;
+
+  @IsOptional()
+  @IsObject()
+  metadata?: Record<string, unknown>;
+}
+
+class TelemetryIngestDto {
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  sessionId?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  correlationId?: string;
+
+  @IsArray()
+  @ArrayMaxSize(500)
+  @ValidateNested({ each: true })
+  @Type(() => PlatformTelemetryEventDto)
+  events: PlatformTelemetryEventDto[];
+}
 
 @Controller('observability')
 export class PlatformTelemetryController {

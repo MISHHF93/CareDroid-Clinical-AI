@@ -42,20 +42,52 @@ export interface SimulationRun {
   }>;
 }
 
-export interface StartSimulationDto {
+import { IsArray, IsOptional, IsString, MaxLength } from 'class-validator';
+
+export class StartSimulationDto {
+  @IsString()
+  @MaxLength(200)
   scenarioId: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
   learnerId?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
   role?: string;
 }
 
-export interface SubmitSimulationStepDto {
+export class SubmitSimulationStepDto {
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
   stepId?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(2000)
   decision?: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  @MaxLength(500, { each: true })
   selectedActions?: string[];
 }
 
-export interface CompleteSimulationDto {
+export class CompleteSimulationDto {
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  @MaxLength(500, { each: true })
   selectedActions?: string[];
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(5000)
   reflection?: string;
 }
 

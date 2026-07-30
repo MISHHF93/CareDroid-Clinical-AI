@@ -50,18 +50,61 @@ export interface TrainingRun {
   deploymentTarget?: string;
 }
 
-export interface CreateTrainingRunDto {
+import { IsArray, IsIn, IsNumber, IsOptional, IsString, MaxLength, Min } from 'class-validator';
+
+const TRAINING_CAPABILITY_IDS: TrainingCapabilityId[] = [
+  'prompt_engineering',
+  'rag',
+  'lora',
+  'moe_routing',
+];
+
+export class CreateTrainingRunDto {
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
   modelName?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
   datasetName?: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsIn(TRAINING_CAPABILITY_IDS, { each: true })
   capabilities?: TrainingCapabilityId[];
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
   deploymentTarget?: string;
 }
 
-export interface EvaluateTrainingRunDto {
+export class EvaluateTrainingRunDto {
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
   accuracy?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
   hallucinationRate?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
   precision?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
   latencyMs?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
   costUsd?: number;
 }
 

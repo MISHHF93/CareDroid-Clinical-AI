@@ -92,16 +92,58 @@ export interface EvaluationRawScores {
   costUsd?: number;
 }
 
-export interface CreateEvaluationRunDto {
+import { IsIn, IsNumber, IsObject, IsOptional, IsString, MaxLength, Min } from 'class-validator';
+
+export class CreateEvaluationRunDto {
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
   modelName?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
   promptName?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
   agentName?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
   ragStrategy?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
   datasetName?: string;
+
+  @IsOptional()
+  @IsIn(['completed', 'failed'])
   status?: 'completed' | 'failed';
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
   sampleCount?: number;
+
+  // Loosely validated: a partial, per-metric numeric bag whose keys mirror
+  // EvaluationMetricId -- deep-validating each optional key isn't worth the
+  // ceremony for this internal QA/eval-harness endpoint (JWT-authenticated,
+  // no PHI involved), unlike the class DTOs used on clinical write paths.
+  @IsOptional()
+  @IsObject()
   metrics?: Partial<EvaluationMetrics>;
+
+  @IsOptional()
+  @IsObject()
   rawScores?: EvaluationRawScores;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(5000)
   notes?: string;
 }
 
