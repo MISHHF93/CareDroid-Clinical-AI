@@ -174,6 +174,7 @@ export class EmergencyOsController {
     return this.implementationReadinessService.getReadiness();
   }
 
+  @RequirePermission(Permission.READ_PHI)
   @Get('patients/:patientId/workflow-logs')
   async getPatientWorkflowLogs(
     @Param('patientId') patientId: string,
@@ -189,6 +190,7 @@ export class EmergencyOsController {
     return this.workflowActionLogService.getEnvelope(patientId);
   }
 
+  @RequirePermission(Permission.READ_PHI)
   @Get('patients/:patientId/document-artifacts')
   async getPatientDocumentArtifacts(
     @Param('patientId') patientId: string,
@@ -303,6 +305,7 @@ export class EmergencyOsController {
     });
   }
 
+  @RequirePermission(Permission.READ_PHI)
   @Get('patients/:patientId/orchestration')
   async getPatientOrchestration(
     @Param('patientId') patientId: string,
@@ -568,6 +571,7 @@ export class EmergencyOsController {
     return this.patientFlowService.getPatientFlow();
   }
 
+  @RequirePermission(Permission.READ_PHI)
   @Get('patient-flow/:patientId')
   getPatientFlowForPatient(@Param('patientId') patientId: string) {
     return this.patientFlowService.getPatientFlow(patientId);
@@ -658,6 +662,7 @@ export class EmergencyOsController {
     return response;
   }
 
+  @RequirePermission(Permission.USE_CALCULATORS)
   @Post('clinical-calculators/results')
   recordClinicalCalculatorResult(
     @Body() dto: RecordClinicalCalculatorDto,
@@ -669,6 +674,7 @@ export class EmergencyOsController {
     });
   }
 
+  @RequirePermission(Permission.USE_CALCULATORS)
   @Get('clinical-calculators/results')
   listClinicalCalculatorResults(
     @Query('patientId') patientId?: string,
@@ -680,11 +686,13 @@ export class EmergencyOsController {
     });
   }
 
+  @RequirePermission(Permission.USE_AI_CHAT)
   @Get('copilot/interactions')
   listCopilotInteractions(@Query('patientId') patientId?: string) {
     return this.clinicalDecisionSupportService.listCopilotInteractions({ patientId });
   }
 
+  @RequirePermission(Permission.USE_AI_CHAT)
   @Post('copilot/interactions')
   recordCopilotInteraction(
     @Body() dto: RecordCopilotInteractionDto,
