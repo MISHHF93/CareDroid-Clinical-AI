@@ -20,6 +20,10 @@ import {
 import { ImportLabsDto } from '../src/modules/platform-systems/dto/patient-clinical-data-actions.dto';
 import { TestFhirConnectionDto } from '../src/modules/platform-systems/dto/integrations-actions.dto';
 import {
+  AddTriageRuleDto,
+  PatientPayloadDto,
+} from '../src/modules/native-ai/dto/native-ai-actions.dto';
+import {
   HandoverRequestDto,
   Process112CallDto,
 } from '../src/modules/emergency-os/dto/emergency-os-research-actions.dto';
@@ -382,6 +386,76 @@ describe('backend contract hardening', () => {
     ).resolves.toMatchObject({ testOnly: true });
     await expect(
       pipe.transform({ testOnly: true, unexpectedField: 'x' }, bodyMetadata(TestFhirConnectionDto)),
+    ).rejects.toThrow(BadRequestException);
+  });
+
+  /**
+   * Cycle 253: same proof for NativeAiController's DTOs. PatientPayloadDto
+   * wraps PatientDto via @ValidateNested()/@Type() -- unlike the other
+   * cycles' nested-DTO proofs, this confirms whitelist rejection reaches
+   * INTO the nested `patient` object itself (not just the top-level wrapper),
+   * since PatientDto mirrors the real, large Patient interface field-for-
+   * field and any drift there would silently reopen the mass-assignment gap
+   * this cycle closed.
+   */
+  it('native-ai DTO classes actually get whitelist-validated by the real global ValidationPipe, including the nested Patient object (Cycle 253)', async () => {
+    const pipe = new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    });
+    const bodyMetadata = (metatype: ArgumentMetadata['metatype']): ArgumentMetadata => ({
+      type: 'body',
+      metatype,
+      data: undefined,
+    });
+
+    const minimalPatient = {
+      id: 'p-1',
+      mrn: 'MRN-1',
+      firstName: 'Jane',
+      lastName: 'Doe',
+      dob: '1990-01-01',
+      age: 34,
+      sex: 'F',
+      arrivalTime: '2026-07-31T00:00:00.000Z',
+      chiefComplaint: 'Chest pain',
+      complaintCategory: 'Cardiac',
+      state: 'Triage',
+      priority: 'P2',
+      vitals: [],
+      flags: [],
+      notes: [],
+      timeline: [],
+    };
+
+    await expect(
+      pipe.transform({ patient: minimalPatient }, bodyMetadata(PatientPayloadDto)),
+    ).resolves.toMatchObject({ patient: { id: 'p-1' } });
+    await expect(
+      pipe.transform(
+        { patient: minimalPatient, unexpectedField: 'x' },
+        bodyMetadata(PatientPayloadDto),
+      ),
+    ).rejects.toThrow(BadRequestException);
+    await expect(
+      pipe.transform(
+        { patient: { ...minimalPatient, unexpectedField: 'x' } },
+        bodyMetadata(PatientPayloadDto),
+      ),
+    ).rejects.toThrow(BadRequestException);
+
+    await expect(
+      pipe.transform(
+        { naturalLanguage: 'If age > 65 and chest pain, suggest P2' },
+        bodyMetadata(AddTriageRuleDto),
+      ),
+    ).resolves.toMatchObject({ naturalLanguage: 'If age > 65 and chest pain, suggest P2' });
+    await expect(
+      pipe.transform(
+        { naturalLanguage: 'rule text', unexpectedField: 'x' },
+        bodyMetadata(AddTriageRuleDto),
+      ),
     ).rejects.toThrow(BadRequestException);
   });
 });

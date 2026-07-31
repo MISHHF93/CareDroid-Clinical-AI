@@ -7,7 +7,11 @@ import { Permission } from '../auth/enums/permission.enum';
 import { EntitlementService } from '../platform-assets/entitlement.service';
 import { assertEntitlementLaunchFromRequest } from '../platform-assets/entitlement-launch.util';
 import { NativeAiService } from './native-ai.service';
-import type { Patient } from '../../../../src/types/emergency';
+import {
+  AddTriageRuleDto,
+  ClinicalAcuityDto,
+  PatientPayloadDto,
+} from './dto/native-ai-actions.dto';
 
 @ApiTags('native-ai')
 @ApiBearerAuth()
@@ -45,14 +49,14 @@ export class NativeAiController {
 
   @RequirePermission(Permission.READ_PHI)
   @Post('route')
-  async routePatient(@Body() body: { patient: Patient }, @Req() req: any) {
+  async routePatient(@Body() body: PatientPayloadDto, @Req() req: any) {
     await this.assertNativeAiAccess(req);
     return this.nativeAiService.routePatient(body.patient);
   }
 
   @RequirePermission(Permission.READ_PHI)
   @Post('clinical-acuity')
-  async getClinicalAcuity(@Body() body: { patients: Patient[] }, @Req() req: any) {
+  async getClinicalAcuity(@Body() body: ClinicalAcuityDto, @Req() req: any) {
     await this.assertNativeAiAccess(req);
     return this.nativeAiService.getClinicalAcuity(body.patients || []);
   }
@@ -66,24 +70,21 @@ export class NativeAiController {
 
   @RequirePermission(Permission.MANAGE_CLINICAL_POLICY)
   @Post('triage-rules')
-  async addTriageRule(
-    @Body() body: { naturalLanguage: string; createdBy?: string },
-    @Req() req: any,
-  ) {
+  async addTriageRule(@Body() body: AddTriageRuleDto, @Req() req: any) {
     await this.assertNativeAiAccess(req);
     return this.nativeAiService.addTriageRule(body.naturalLanguage, body.createdBy);
   }
 
   @RequirePermission(Permission.READ_PHI)
   @Post('triage-rules/evaluate')
-  async evaluateTriage(@Body() body: { patient: Patient }, @Req() req: any) {
+  async evaluateTriage(@Body() body: PatientPayloadDto, @Req() req: any) {
     await this.assertNativeAiAccess(req);
     return this.nativeAiService.evaluateTriage(body.patient);
   }
 
   @RequirePermission(Permission.READ_PHI)
   @Post('specialists/infer')
-  async inferSpecialists(@Body() body: { patient: Patient }, @Req() req: any) {
+  async inferSpecialists(@Body() body: PatientPayloadDto, @Req() req: any) {
     await this.assertNativeAiAccess(req);
     return this.nativeAiService.inferSpecialists(body.patient);
   }

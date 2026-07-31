@@ -96,6 +96,22 @@ import * as ts from 'typescript';
  * {testOnly: true}) but is itself never invoked from any component --
  * real code, just not yet wired to a UI trigger; its field is honored
  * alongside this controller's own test fixtures anyway.
+ *
+ * Cycle 253: closed NativeAiController's 5 routes (route/clinical-acuity/
+ * triage-rules/triage-rules-evaluate/specialists-infer) -- unlike the last
+ * several cycles' demo passthroughs, native-ai.service.ts confirmed by
+ * direct read to run 4 of these straight through routePatientToClinical
+ * Specialists/buildClinicalAcuityLeaderboard/inferTriageFromExpertSystem
+ * with sourceState: 'live'. The new PatientDto (backend/src/modules/
+ * native-ai/dto/native-ai-actions.dto.ts) mirrors src/types/emergency.ts's
+ * Patient interface field-for-field rather than a reverse-engineered
+ * subset, since every real caller constructs a Patient through that one
+ * canonical interface (unlike EmergencyOsController's still-deferred
+ * createPatient/createIntakePatient, there's no evidence of divergent
+ * intake-time shapes here). A frontend sweep found all 5 wrapper functions
+ * in src/services/nativeAiApi.ts send exactly the expected shapes, but only
+ * fetchClinicalAcuityLeaderboard is actually invoked today -- the other 4
+ * are real, wired code with no UI trigger yet.
  */
 
 const HTTP_BODY_DECORATORS = new Set(['Post', 'Patch', 'Put']);
@@ -176,11 +192,11 @@ function findUnvalidatedBodyParams(backendRoot: string): string[] {
   return results.sort();
 }
 
-// Generated 2026-07-31 (Cycle 252) via the exact walk above. 135 originally
-// found Cycle 241; worked down across Cycles 242/244/247/248/249/250/251/252
-// (5 + 6 + 39 + 13 + 23 + 8 + 6 + 5 fixed) to this 23-entry baseline. Cycle
-// 252 closed every route on IntegrationsController -- see SCORECARD.md and
-// the DTO header comment for the full writeup.
+// Generated 2026-07-31 (Cycle 253) via the exact walk above. 135 originally
+// found Cycle 241; worked down across Cycles 242/244/247/248/249/250/251/
+// 252/253 (5 + 6 + 39 + 13 + 23 + 8 + 6 + 5 + 5 fixed) to this 18-entry
+// baseline. Cycle 253 closed every route on NativeAiController -- see
+// SCORECARD.md and the DTO header comment for the full writeup.
 const BASELINE: string[] = [
   'src/modules/ai/ai.controller.ts :: AIController.createProposal',
   'src/modules/ai/ai.controller.ts :: AIController.executeProposal',
@@ -192,11 +208,6 @@ const BASELINE: string[] = [
   'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.createPatient',
   'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.createSmartIntakeVerticalSlice',
   'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.updateSettings',
-  'src/modules/native-ai/native-ai.controller.ts :: NativeAiController.addTriageRule',
-  'src/modules/native-ai/native-ai.controller.ts :: NativeAiController.evaluateTriage',
-  'src/modules/native-ai/native-ai.controller.ts :: NativeAiController.getClinicalAcuity',
-  'src/modules/native-ai/native-ai.controller.ts :: NativeAiController.inferSpecialists',
-  'src/modules/native-ai/native-ai.controller.ts :: NativeAiController.routePatient',
   'src/modules/organizations/organizations.controller.ts :: OrganizationsController.updateFeatureFlags',
   'src/modules/organizations/organizations.controller.ts :: OrganizationsController.updateSettings',
   'src/modules/organizations/organizations.controller.ts :: OrganizationsController.updateTenantAdministration',
