@@ -67,6 +67,14 @@ import * as ts from 'typescript';
  * whitelist); updateSettings takes EmergencyOsSettingsPatch, a mapped type
  * over a ~12-section nested settings contract that deserves its own
  * dedicated DTO-building cycle, not a drive-by alongside 23 other routes.
+ *
+ * Cycle 250: closed emergency-os.research.controller.ts's 8 routes
+ * (federated EMS/LMECS, AI call interrogation, organizational digital
+ * twin, ER Pulse handover). A frontend sweep found zero real callers for
+ * any of the 8 -- only static documentation/inventory files reference
+ * these paths -- so the new DTOs (backend/src/modules/emergency-os/dto/
+ * emergency-os-research-actions.dto.ts) mirror the backend's own
+ * already-declared, fully-enumerable interfaces exactly.
  */
 
 const HTTP_BODY_DECORATORS = new Set(['Post', 'Patch', 'Put']);
@@ -147,12 +155,11 @@ function findUnvalidatedBodyParams(backendRoot: string): string[] {
   return results.sort();
 }
 
-// Generated 2026-07-31 (Cycle 249) via the exact walk above. 135 originally
-// found Cycle 241; worked down across Cycles 242/244/247/248/249
-// (5 + 6 + 39 + 13 + 23 fixed) to this 42-entry baseline. Cycle 249 closed
-// 23 of EmergencyOsController's 27 routes -- see SCORECARD.md and the DTO
-// header comment for the full writeup, including the 4 routes deliberately
-// still open on that same controller.
+// Generated 2026-07-31 (Cycle 250) via the exact walk above. 135 originally
+// found Cycle 241; worked down across Cycles 242/244/247/248/249/250
+// (5 + 6 + 39 + 13 + 23 + 8 fixed) to this 34-entry baseline. Cycle 250
+// closed every route on emergency-os.research.controller.ts -- see
+// SCORECARD.md and the DTO header comment for the full writeup.
 const BASELINE: string[] = [
   'src/modules/ai/ai.controller.ts :: AIController.createProposal',
   'src/modules/ai/ai.controller.ts :: AIController.executeProposal',
@@ -164,14 +171,6 @@ const BASELINE: string[] = [
   'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.createPatient',
   'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.createSmartIntakeVerticalSlice',
   'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.updateSettings',
-  'src/modules/emergency-os/emergency-os.research.controller.ts :: AICallInterrogationController.detectOHCA',
-  'src/modules/emergency-os/emergency-os.research.controller.ts :: AICallInterrogationController.interpretECG',
-  'src/modules/emergency-os/emergency-os.research.controller.ts :: ERPulseHandoverController.generateERPulseHandover',
-  'src/modules/emergency-os/emergency-os.research.controller.ts :: FederatedEMSController.process112Call',
-  'src/modules/emergency-os/emergency-os.research.controller.ts :: LMECSController.predictSeverity',
-  'src/modules/emergency-os/emergency-os.research.controller.ts :: LMECSController.selectClients',
-  'src/modules/emergency-os/emergency-os.research.controller.ts :: OrganizationalDigitalTwinController.runPredictiveSimulation',
-  'src/modules/emergency-os/emergency-os.research.controller.ts :: OrganizationalDigitalTwinController.synchronizePatientFlow',
   'src/modules/native-ai/native-ai.controller.ts :: NativeAiController.addTriageRule',
   'src/modules/native-ai/native-ai.controller.ts :: NativeAiController.evaluateTriage',
   'src/modules/native-ai/native-ai.controller.ts :: NativeAiController.getClinicalAcuity',

@@ -17,6 +17,10 @@ import {
   PostReceptionHandoffDto,
   RecordClinicalCalculatorResultDto,
 } from '../src/modules/emergency-os/dto/emergency-os-actions.dto';
+import {
+  HandoverRequestDto,
+  Process112CallDto,
+} from '../src/modules/emergency-os/dto/emergency-os-research-actions.dto';
 
 const root = join(__dirname, '..');
 
@@ -270,6 +274,54 @@ describe('backend contract hardening', () => {
     const { riskCategory: _omit, ...missingRequiredField } = validCalculatorResult;
     await expect(
       pipe.transform(missingRequiredField, bodyMetadata(RecordClinicalCalculatorResultDto)),
+    ).rejects.toThrow(BadRequestException);
+  });
+
+  /**
+   * Cycle 250: same proof for emergency-os.research.controller.ts's DTOs,
+   * this time exercising nested @ValidateNested() arrays/objects (labs[],
+   * location) rather than just flat fields -- confirms a bad value inside
+   * a nested object is caught, not just top-level whitelist violations.
+   */
+  it('emergency-os research DTO classes actually get whitelist-validated by the real global ValidationPipe, including nested objects (Cycle 250)', async () => {
+    const pipe = new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    });
+    const bodyMetadata = (metatype: ArgumentMetadata['metatype']): ArgumentMetadata => ({
+      type: 'body',
+      metatype,
+      data: undefined,
+    });
+
+    await expect(
+      pipe.transform(
+        {
+          patientId: 'patient-1',
+          patient: { chiefComplaint: 'Chest pain', labs: [{ name: 'Troponin', value: 0.12 }] },
+        },
+        bodyMetadata(HandoverRequestDto),
+      ),
+    ).resolves.toMatchObject({ patientId: 'patient-1' });
+    await expect(
+      pipe.transform(
+        { patientId: 'patient-1', patient: { labs: [{ name: 'Troponin', unexpectedField: 'x' }] } },
+        bodyMetadata(HandoverRequestDto),
+      ),
+    ).rejects.toThrow(BadRequestException);
+
+    await expect(
+      pipe.transform(
+        { callId: '112-test', location: { lat: 43.65, lng: -79.38, accuracy: 20 } },
+        bodyMetadata(Process112CallDto),
+      ),
+    ).resolves.toMatchObject({ callId: '112-test' });
+    await expect(
+      pipe.transform(
+        { callId: '112-test', location: { lat: 43.65, unexpectedField: 'x' } },
+        bodyMetadata(Process112CallDto),
+      ),
     ).rejects.toThrow(BadRequestException);
   });
 });

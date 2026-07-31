@@ -6,12 +6,19 @@ import {
 } from '../../services/ai-call-interrogation.service';
 import { FederatedEMSService, type EMS112Call } from '../../services/federated-ems.service';
 import { LMECSService, type HospitalClient } from '../../services/lmecs.service';
-import {
-  OrganizationalDigitalTwin,
-  type EDState,
-} from '../../services/organizational-digital-twin.service';
+import { OrganizationalDigitalTwin } from '../../services/organizational-digital-twin.service';
 import { ERPulseHandoverService } from '../../services/smart-handover-v2.service';
 import { SkipTenantIsolation } from '../tenant-context/tenant-scope.decorator';
+import {
+  HandoverRequestDto,
+  Process112CallDto,
+  SelectClientsDto,
+  PredictSeverityDto,
+  CallInterrogationRequestDto,
+  InterpretEcgDto,
+  SynchronizePatientFlowDto,
+  RunPredictiveSimulationDto,
+} from './dto/emergency-os-research-actions.dto';
 
 /**
  * These research/demo controllers (federated EMS, LMECS, AI call
@@ -25,20 +32,6 @@ import { SkipTenantIsolation } from '../tenant-context/tenant-scope.decorator';
  * user, matching every other PHI-adjacent endpoint in this module.
  */
 
-interface HandoverRequest {
-  patientId?: string;
-  patient?: Record<string, unknown>;
-}
-
-interface CallInterrogationRequest {
-  callId?: string;
-  audioBase64?: string;
-  transcriptHint?: string;
-  callerLanguage?: string;
-  backgroundNoise?: number;
-  timestamp?: string;
-}
-
 @UseGuards(AuthGuard('jwt'))
 @SkipTenantIsolation()
 @Controller('handover')
@@ -46,7 +39,7 @@ export class ERPulseHandoverController {
   constructor(private readonly handoverService: ERPulseHandoverService) {}
 
   @Post('er-pulse')
-  generateERPulseHandover(@Body() dto: HandoverRequest) {
+  generateERPulseHandover(@Body() dto: HandoverRequestDto) {
     const patientId =
       dto.patientId || String(dto.patient?.patientId || dto.patient?.id || 'demo-patient');
     return this.handoverService.generateHandoverSummary(patientId, dto.patient as any);
@@ -60,7 +53,7 @@ export class FederatedEMSController {
   constructor(private readonly federatedEMSService: FederatedEMSService) {}
 
   @Post('112-call')
-  async process112Call(@Body() dto: Partial<EMS112Call>) {
+  async process112Call(@Body() dto: Process112CallDto) {
     const call = this.normalizeCall(dto);
     const [triage, dispatch] = await Promise.all([
       this.federatedEMSService.processEmergencyCall(call),
@@ -80,18 +73,28 @@ export class FederatedEMSController {
     };
   }
 
-  private normalizeCall(dto: Partial<EMS112Call>): EMS112Call {
+  private normalizeCall(dto: Process112CallDto): EMS112Call {
     return {
       callId: dto.callId || `112-${Date.now()}`,
       timestamp: dto.timestamp ? new Date(dto.timestamp) : new Date(),
-      location: dto.location || { lat: 43.6532, lng: -79.3832, accuracy: 25 },
+      location: {
+        lat: dto.location?.lat ?? 43.6532,
+        lng: dto.location?.lng ?? -79.3832,
+        accuracy: dto.location?.accuracy ?? 25,
+      },
       urgencyLevel: dto.urgencyLevel || 'emergency',
       callerMetadata: {
         language: dto.callerMetadata?.language || 'en',
         distressLevel: dto.callerMetadata?.distressLevel ?? 7,
         backgroundNoise: dto.callerMetadata?.backgroundNoise ?? 35,
       },
-      wearableData: dto.wearableData,
+      wearableData: dto.wearableData
+        ? {
+            heartRate: dto.wearableData.heartRate ?? 0,
+            oxygenSaturation: dto.wearableData.oxygenSaturation ?? 0,
+            fallDetected: dto.wearableData.fallDetected ?? false,
+          }
+        : undefined,
     };
   }
 }
@@ -103,13 +106,13 @@ export class LMECSController {
   constructor(private readonly lmecsService: LMECSService) {}
 
   @Post('select')
-  selectClients(@Body() dto: { clients?: HospitalClient[] }) {
+  selectClients(@Body() dto: SelectClientsDto) {
     const clients = dto.clients?.length ? dto.clients : this.defaultClients();
     return this.lmecsService.selectOptimalClients(clients);
   }
 
   @Post('predict')
-  predictSeverity(@Body() dto: { patientData?: Record<string, unknown>; hospitalId?: string }) {
+  predictSeverity(@Body() dto: PredictSeverityDto) {
     return this.lmecsService.predictSeverity(
       dto.patientData || {},
       dto.hospitalId || 'demo-hospital',
@@ -148,7 +151,7 @@ export class AICallInterrogationController {
   constructor(private readonly callInterrogationService: AICallInterrogationService) {}
 
   @Post('ai-call-interrogation')
-  async detectOHCA(@Body() dto: CallInterrogationRequest) {
+  async detectOHCA(@Body() dto: CallInterrogationRequestDto) {
     const call = this.normalizeEmergencyCall(dto);
     const detection = await this.callInterrogationService.detectOHCA(call);
     const dispatch = await this.callInterrogationService.recommendDispatch(detection);
@@ -156,11 +159,11 @@ export class AICallInterrogationController {
   }
 
   @Post('ai-call-interrogation/ecg')
-  interpretECG(@Body() dto: { ecgData?: number[] }) {
+  interpretECG(@Body() dto: InterpretEcgDto) {
     return this.callInterrogationService.interpretECG(dto.ecgData || []);
   }
 
-  private normalizeEmergencyCall(dto: CallInterrogationRequest): EmergencyCall {
+  private normalizeEmergencyCall(dto: CallInterrogationRequestDto): EmergencyCall {
     return {
       callId: dto.callId || `ems-call-${Date.now()}`,
       audioStream: dto.audioBase64
@@ -181,12 +184,12 @@ export class OrganizationalDigitalTwinController {
   constructor(private readonly organizationalDigitalTwin: OrganizationalDigitalTwin) {}
 
   @Post('synchronize')
-  synchronizePatientFlow(@Body() dto: Partial<EDState>) {
+  synchronizePatientFlow(@Body() dto: SynchronizePatientFlowDto) {
     return this.organizationalDigitalTwin.synchronizePatientFlow(dto);
   }
 
   @Post('simulate')
-  runPredictiveSimulation(@Body() dto: { scenario?: string }) {
+  runPredictiveSimulation(@Body() dto: RunPredictiveSimulationDto) {
     return this.organizationalDigitalTwin.runPredictiveSimulation(dto.scenario || 'baseline');
   }
 }
