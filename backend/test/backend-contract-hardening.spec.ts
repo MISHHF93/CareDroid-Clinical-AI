@@ -18,6 +18,7 @@ import {
   RecordClinicalCalculatorResultDto,
 } from '../src/modules/emergency-os/dto/emergency-os-actions.dto';
 import { ImportLabsDto } from '../src/modules/platform-systems/dto/patient-clinical-data-actions.dto';
+import { TestFhirConnectionDto } from '../src/modules/platform-systems/dto/integrations-actions.dto';
 import {
   HandoverRequestDto,
   Process112CallDto,
@@ -353,6 +354,34 @@ describe('backend contract hardening', () => {
     ).resolves.toMatchObject({ panel: 'BMP', patientId: 'pt-001' });
     await expect(
       pipe.transform({ panel: 'BMP', unexpectedField: 'x' }, bodyMetadata(ImportLabsDto)),
+    ).rejects.toThrow(BadRequestException);
+  });
+
+  /**
+   * Cycle 252: same proof for IntegrationsController's DTOs.
+   * TestFhirConnectionDto's `testOnly` field is the one real (if currently
+   * unreachable) payload shape found in source
+   * (emergencySettingsApi.tsx's testIntegrationConnection()) -- confirms
+   * that exact shape passes cleanly while an unrelated injected field
+   * still gets rejected.
+   */
+  it('integrations DTO classes actually get whitelist-validated by the real global ValidationPipe (Cycle 252)', async () => {
+    const pipe = new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    });
+    const bodyMetadata = (metatype: ArgumentMetadata['metatype']): ArgumentMetadata => ({
+      type: 'body',
+      metatype,
+      data: undefined,
+    });
+
+    await expect(
+      pipe.transform({ testOnly: true }, bodyMetadata(TestFhirConnectionDto)),
+    ).resolves.toMatchObject({ testOnly: true });
+    await expect(
+      pipe.transform({ testOnly: true, unexpectedField: 'x' }, bodyMetadata(TestFhirConnectionDto)),
     ).rejects.toThrow(BadRequestException);
   });
 });

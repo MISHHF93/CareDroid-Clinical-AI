@@ -16,6 +16,13 @@ import { Permission } from '../auth/enums/permission.enum';
 import { AuthorizationGuard } from '../auth/guards/authorization.guard';
 import { PlatformSystemsService } from './platform-systems.service';
 import { PlatformGovernanceService } from '../platform-governance';
+import {
+  CreateFhirConnectionDto,
+  TestFhirConnectionDto,
+  SyncFhirConnectionDto,
+  TestHl7MessageDto,
+  PreviewHl7MessageReplayDto,
+} from './dto/integrations-actions.dto';
 
 /**
  * Platform capability contracts and external-system integrations (FHIR/HL7,
@@ -61,8 +68,8 @@ export class IntegrationsController {
   @Post('integrations/fhir/connections')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.MANAGE_INTEGRATIONS)
-  createFhirConnection(@Body() body: Record<string, unknown>) {
-    return this.platformSystemsService.demo('fhir-connector', 'demo-patient', body);
+  createFhirConnection(@Body() body: CreateFhirConnectionDto) {
+    return this.platformSystemsService.demo('fhir-connector', 'demo-patient', { ...body });
   }
 
   @Post('integrations/fhir/:connectionId/test')
@@ -70,9 +77,9 @@ export class IntegrationsController {
   @Permissions(Permission.MANAGE_INTEGRATIONS)
   testFhirConnection(
     @Param('connectionId') connectionId: string,
-    @Body() body: Record<string, unknown>,
+    @Body() body: TestFhirConnectionDto,
   ) {
-    return this.platformSystemsService.demo('fhir-connector', connectionId, body);
+    return this.platformSystemsService.demo('fhir-connector', connectionId, { ...body });
   }
 
   @Post('integrations/fhir/:connectionId/sync')
@@ -80,9 +87,9 @@ export class IntegrationsController {
   @Permissions(Permission.MANAGE_INTEGRATIONS)
   syncFhirConnection(
     @Param('connectionId') connectionId: string,
-    @Body() body: Record<string, unknown>,
+    @Body() body: SyncFhirConnectionDto,
   ) {
-    return this.platformSystemsService.demo('fhir-connector', connectionId, body);
+    return this.platformSystemsService.demo('fhir-connector', connectionId, { ...body });
   }
 
   @Get('integrations/hl7/interfaces')
@@ -94,8 +101,8 @@ export class IntegrationsController {
   @Post('integrations/hl7/interfaces/:interfaceId/test-message')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.MANAGE_INTEGRATIONS)
-  testHl7Message(@Param('interfaceId') interfaceId: string, @Body() body: Record<string, unknown>) {
-    return this.platformSystemsService.demo('hl7-bridge', interfaceId, body);
+  testHl7Message(@Param('interfaceId') interfaceId: string, @Body() body: TestHl7MessageDto) {
+    return this.platformSystemsService.demo('hl7-bridge', interfaceId, { ...body });
   }
 
   @Get('integrations/hl7/messages/quarantine')
@@ -109,7 +116,7 @@ export class IntegrationsController {
   @Permissions(Permission.MANAGE_INTEGRATIONS)
   previewHl7MessageReplay(
     @Param('messageId') messageId: string,
-    @Body() body: Record<string, unknown>,
+    @Body() body: PreviewHl7MessageReplayDto,
   ) {
     return this.platformSystemsService.demo('hl7-bridge', messageId, {
       ...body,

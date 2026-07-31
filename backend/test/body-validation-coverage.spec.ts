@@ -85,6 +85,17 @@ import * as ts from 'typescript';
  * established in Cycle 248; createPatientEvent/addRiskScore have no
  * reachable caller at all -- their registry entries point at a different
  * backend route or a GET method respectively.
+ *
+ * Cycle 252: closed IntegrationsController's 5 routes (FHIR connection
+ * create/test/sync, HL7 message test/replay-preview) -- also pure
+ * PlatformSystemsService.demo() passthroughs, matching item #30's finding
+ * that FHIR/HL7 integration is confirmed placeholder-only. Both capability
+ * registry entries point at GET list endpoints, not these POST routes, so
+ * the demo button never reaches any of the 5. One real caller exists in
+ * source (emergencySettingsApi.tsx's testIntegrationConnection(), sending
+ * {testOnly: true}) but is itself never invoked from any component --
+ * real code, just not yet wired to a UI trigger; its field is honored
+ * alongside this controller's own test fixtures anyway.
  */
 
 const HTTP_BODY_DECORATORS = new Set(['Post', 'Patch', 'Put']);
@@ -165,11 +176,11 @@ function findUnvalidatedBodyParams(backendRoot: string): string[] {
   return results.sort();
 }
 
-// Generated 2026-07-31 (Cycle 251) via the exact walk above. 135 originally
-// found Cycle 241; worked down across Cycles 242/244/247/248/249/250/251
-// (5 + 6 + 39 + 13 + 23 + 8 + 6 fixed) to this 28-entry baseline. Cycle 251
-// closed every route on PatientClinicalDataController -- see SCORECARD.md
-// and the DTO header comment for the full writeup.
+// Generated 2026-07-31 (Cycle 252) via the exact walk above. 135 originally
+// found Cycle 241; worked down across Cycles 242/244/247/248/249/250/251/252
+// (5 + 6 + 39 + 13 + 23 + 8 + 6 + 5 fixed) to this 23-entry baseline. Cycle
+// 252 closed every route on IntegrationsController -- see SCORECARD.md and
+// the DTO header comment for the full writeup.
 const BASELINE: string[] = [
   'src/modules/ai/ai.controller.ts :: AIController.createProposal',
   'src/modules/ai/ai.controller.ts :: AIController.executeProposal',
@@ -190,11 +201,6 @@ const BASELINE: string[] = [
   'src/modules/organizations/organizations.controller.ts :: OrganizationsController.updateSettings',
   'src/modules/organizations/organizations.controller.ts :: OrganizationsController.updateTenantAdministration',
   'src/modules/organizations/settings-features.controller.ts :: SettingsFeaturesController.updateFeatureSettings',
-  'src/modules/platform-systems/integrations.controller.ts :: IntegrationsController.createFhirConnection',
-  'src/modules/platform-systems/integrations.controller.ts :: IntegrationsController.previewHl7MessageReplay',
-  'src/modules/platform-systems/integrations.controller.ts :: IntegrationsController.syncFhirConnection',
-  'src/modules/platform-systems/integrations.controller.ts :: IntegrationsController.testFhirConnection',
-  'src/modules/platform-systems/integrations.controller.ts :: IntegrationsController.testHl7Message',
   'src/modules/platform-systems/platform-systems.controller.ts :: PlatformSystemsController.createEmergencyPatient',
   'src/modules/platform-systems/platform-systems.controller.ts :: PlatformSystemsController.createEmergencyReferral',
   'src/modules/platform-systems/platform-systems.controller.ts :: PlatformSystemsController.updateEmergencyPatient',
