@@ -139,13 +139,25 @@ cd backend && npx jest src/modules/sentinel --passWithNoTests
 # GET /api/sentinel/command-snapshot
 ```
 
+**2026-07-30 (Cycle 246, "Mission Intelligence Engine v1" plan, Cycle D) — actually run, not just recommended.** Built the real production bundle (`npm run build`), booted the compiled server with `SENTINEL_ENABLED=true SENTINEL_MOCK_ADAPTER=true NODE_ENV=development`, bootstrapped a real PHYSICIAN session via `POST /api/auth/dev-session` (the same real entry point this program's own live-verification cycles have used since Cycle 201), and hit every endpoint above plus `/api/sentinel/analytics` with the real bearer token:
+
+| Endpoint | Result |
+|---|---|
+| `GET /api/sentinel/health` | `sentinelEnabled:true`, both adapters (`mock-cad`, `webhook-cad`) healthy, `unitCount:2` |
+| `POST /api/sentinel/poll` | `200`, force-polled both adapters, returned 2 units |
+| `GET /api/sentinel/command-snapshot` | 2 real units (**Medic-12**, **Medic-4** — the documented mock-adapter fixtures, not live fleet data), each with a real Haversine-computed ETA (`method: "haversine_speed"`, real confidence scores), 2 geofences (Hospital approach + Ambulance bay, auto-seeded on boot), 2 open alarms (auto-raised by real geofence-entry detection during the mock adapter's own 30s poll cycle — not manually triggered) |
+| `GET /api/sentinel/analytics` | Real KPIs: `episodeCount:2`, `outbox.pending:4`, `alarms.openCount:2` |
+| `GET /api/sentinel/health` with no `Authorization` header | `401` — confirmed auth is still enforced with the flag on |
+
+This uses SQLite (this program's standard local dev/test datastore), not Postgres/PostGIS — the first risk row below is updated to reflect that distinction precisely, not claimed as fully closed.
+
 ---
 
 ## 7. Remaining risks
 
 | Risk | Severity | Mitigation / next step |
 |------|----------|------------------------|
-| Full Nest E2E against real Postgres/PostGIS not exercised in this session | Medium | CI job with `SENTINEL_ENABLED=true` + mock poll |
+| Full Nest E2E against real Postgres/PostGIS not exercised (**partially closed 2026-07-30, Cycle 246**: real SQLite-backed e2e webhook-ingest test + a real live server boot both done and passing — see `test/sentinel-webhook-ingest.e2e-spec.ts` and the verification table above; Postgres/PostGIS specifically still unexercised) | Medium | CI job against real Postgres with `SENTINEL_POSTGIS=true` |
 | Dual EMS APIs still coexist | Medium | Continue funneling writes through Sentinel events |
 | Clinical-alerts demo backend still present | Medium | Consumers should prefer Sentinel alarms when flag on |
 | NEMSIS is core subset, not full XSD | Medium | Expand element map per agency needs |
