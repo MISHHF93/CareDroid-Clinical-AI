@@ -13,6 +13,10 @@ import {
   SuggestCalculatorDto,
   DraftReferralDto,
 } from '../src/modules/platform-systems/dto/clinical-intelligence-actions.dto';
+import {
+  PostReceptionHandoffDto,
+  RecordClinicalCalculatorResultDto,
+} from '../src/modules/emergency-os/dto/emergency-os-actions.dto';
 
 const root = join(__dirname, '..');
 
@@ -206,6 +210,66 @@ describe('backend contract hardening', () => {
         { specialty: 'cardiology', ssn: '000-00-0000' },
         bodyMetadata(DraftReferralDto),
       ),
+    ).rejects.toThrow(BadRequestException);
+  });
+
+  /**
+   * Cycle 249: same proof for EmergencyOsController's largest cluster.
+   * PostReceptionHandoffDto specifically proves the real-caller-discovered
+   * `queue` field survives whitelist (it would previously have been an
+   * unrelated extra field the backend just ignored; now it must be
+   * declared or the real caller's request would 400).
+   * RecordClinicalCalculatorResultDto proves a route with several required
+   * (not just optional) fields still accepts a complete real payload and
+   * rejects both an injected field and a missing required one.
+   */
+  it('emergency-os DTO classes actually get whitelist-validated by the real global ValidationPipe (Cycle 249)', async () => {
+    const pipe = new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    });
+    const bodyMetadata = (metatype: ArgumentMetadata['metatype']): ArgumentMetadata => ({
+      type: 'body',
+      metatype,
+      data: undefined,
+    });
+
+    await expect(
+      pipe.transform(
+        { patientId: 'pt-1', source: 'quick-intake', queue: 'triage-pending' },
+        bodyMetadata(PostReceptionHandoffDto),
+      ),
+    ).resolves.toMatchObject({ patientId: 'pt-1', queue: 'triage-pending' });
+    await expect(
+      pipe.transform(
+        { patientId: 'pt-1', unexpectedField: 'unexpected' },
+        bodyMetadata(PostReceptionHandoffDto),
+      ),
+    ).rejects.toThrow(BadRequestException);
+
+    const validCalculatorResult = {
+      calculatorId: 'news2',
+      patientId: 'pt-1',
+      inputs: { respiratoryRate: 22 },
+      score: 5,
+      riskCategory: 'medium',
+      interpretation: 'Monitor closely.',
+      disclaimer: 'Clinical decision support only.',
+      referenceLine: 'RCP NEWS2',
+    };
+    await expect(
+      pipe.transform(validCalculatorResult, bodyMetadata(RecordClinicalCalculatorResultDto)),
+    ).resolves.toMatchObject({ calculatorId: 'news2', score: 5 });
+    await expect(
+      pipe.transform(
+        { ...validCalculatorResult, injectedField: 'unexpected' },
+        bodyMetadata(RecordClinicalCalculatorResultDto),
+      ),
+    ).rejects.toThrow(BadRequestException);
+    const { riskCategory: _omit, ...missingRequiredField } = validCalculatorResult;
+    await expect(
+      pipe.transform(missingRequiredField, bodyMetadata(RecordClinicalCalculatorResultDto)),
     ).rejects.toThrow(BadRequestException);
   });
 });

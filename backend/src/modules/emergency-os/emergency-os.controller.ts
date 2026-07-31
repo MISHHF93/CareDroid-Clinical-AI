@@ -59,17 +59,34 @@ import {
 } from './emergency-os.operating-surfaces.service';
 import { EntitlementService } from '../platform-assets/entitlement.service';
 import { assertEntitlementLaunchFromRequest } from '../platform-assets/entitlement-launch.util';
-import type {
-  RecordClinicalCalculatorDto,
-  RecordCopilotInteractionDto,
-} from './clinical-decision-support.types';
+import type { RecordClinicalCalculatorDto } from './clinical-decision-support.types';
 import type { EmergencyOsSettingsPatch } from './emergency-os.types';
-import type {
-  ExtractDocumentArtifactsInput,
-  PatientDocumentArtifactReviewInput,
-} from '../../../../src/types/patientDocumentArtifact';
 import { OcrIntakeService } from './ocr-intake.service';
-import type { CreateOcrJobInput, OcrFieldReviewInput } from './ocr-intake.types';
+import {
+  EvaluateOperationalIntelligenceDto,
+  ExtractDocumentArtifactsDto,
+  PatientDocumentArtifactReviewDto,
+  CreateOcrJobDto,
+  OcrFieldReviewDto,
+  ApplyOcrJobToIntakeDto,
+  PostEmsHandoffDto,
+  PostReceptionEscalationDto,
+  PostReceptionHandoffDto,
+  PostTriageAssistDto,
+  ReviewWorkflowAutomationDto,
+  CreateReferralDto,
+  QueryCopilotDto,
+  RecordClinicalCalculatorResultDto,
+  RecordCopilotInteractionDto,
+  UpdateLiveSimulationDto,
+  EvaluateSimulationDto,
+  CompareSimulationDto,
+  RegisterFederatedHospitalDto,
+  UpdateFederatedModelDto,
+  InitializeDigitalTwinDto,
+  SimulateDigitalTwinDto,
+  EvaluateDigitalTwinScenarioDto,
+} from './dto/emergency-os-actions.dto';
 
 @ApiTags('emergency')
 @ApiBearerAuth()
@@ -146,7 +163,7 @@ export class EmergencyOsController {
 
   @RequirePermission(Permission.VIEW_OBSERVABILITY)
   @Post('operational-intelligence/evaluate')
-  evaluateOperationalIntelligence(@Body() body: { events?: unknown[] }) {
+  evaluateOperationalIntelligence(@Body() body: EvaluateOperationalIntelligenceDto) {
     const events = Array.isArray(body?.events) ? body.events : [];
     return this.operationalIntelligenceService.evaluate(
       events as import('./emergency-os.types').OperationalInputEvent[],
@@ -219,7 +236,7 @@ export class EmergencyOsController {
   @Post('patients/:patientId/document-artifacts/extract')
   async extractPatientDocumentArtifacts(
     @Param('patientId') patientId: string,
-    @Body() body: ExtractDocumentArtifactsInput,
+    @Body() body: ExtractDocumentArtifactsDto,
     @TenantContext() tenantContext: TenantContextValue | undefined,
     @Req() request: Request,
   ) {
@@ -237,7 +254,7 @@ export class EmergencyOsController {
   async reviewPatientDocumentArtifact(
     @Param('patientId') patientId: string,
     @Param('artifactId') artifactId: string,
-    @Body() body: PatientDocumentArtifactReviewInput,
+    @Body() body: PatientDocumentArtifactReviewDto,
     @TenantContext() tenantContext: TenantContextValue | undefined,
     @Req() request: Request,
   ) {
@@ -255,7 +272,7 @@ export class EmergencyOsController {
 
   @RequirePermission(Permission.WRITE_PHI)
   @Post('intake/ocr-jobs')
-  createOcrJob(@Body() body: CreateOcrJobInput) {
+  createOcrJob(@Body() body: CreateOcrJobDto) {
     return this.ocrIntakeService.createJob(body);
   }
 
@@ -298,17 +315,14 @@ export class EmergencyOsController {
   reviewOcrJobField(
     @Param('jobId') jobId: string,
     @Param('field') field: string,
-    @Body() body: OcrFieldReviewInput,
+    @Body() body: OcrFieldReviewDto,
   ) {
     return this.ocrIntakeService.reviewField(jobId, field, body);
   }
 
   @RequirePermission(Permission.WRITE_PHI)
   @Post('intake/ocr-jobs/:jobId/apply')
-  applyOcrJobToIntake(
-    @Param('jobId') jobId: string,
-    @Body() body: { actor?: string; autoAcceptHighConfidence?: boolean },
-  ) {
+  applyOcrJobToIntake(@Param('jobId') jobId: string, @Body() body: ApplyOcrJobToIntakeDto) {
     return this.ocrIntakeService.applyToIntake(jobId, body?.actor || 'unknown', {
       autoAcceptHighConfidence: body?.autoAcceptHighConfidence,
     });
@@ -363,22 +377,7 @@ export class EmergencyOsController {
 
   @RequirePermission(Permission.WRITE_PHI)
   @Post('ems/handoff')
-  postEmsHandoff(
-    @Body()
-    body: {
-      arrivalId?: string;
-      patientId?: string;
-      actorName?: string;
-      unitId?: string;
-      unitName?: string;
-      chiefComplaint?: string;
-      handoffAcceptedAt?: string;
-      handoffStartedAt?: string;
-      arrivedAt?: string;
-      checklist?: Record<string, unknown>;
-      notes?: string;
-    },
-  ) {
+  postEmsHandoff(@Body() body: PostEmsHandoffDto) {
     return this.emsIntakeService.completeHandoff(body);
   }
 
@@ -390,38 +389,13 @@ export class EmergencyOsController {
 
   @RequirePermission(Permission.WRITE_PHI)
   @Post('reception/escalation')
-  postReceptionEscalation(
-    @Body()
-    body: {
-      reasonId?: string;
-      reasonLabel?: string;
-      patientId?: string;
-      detail?: string;
-      actorName?: string;
-      actorStaffId?: string;
-      severity?: 'Info' | 'Warning' | 'Critical';
-      notifyTargets?: Array<'triage' | 'charge'>;
-    },
-  ) {
+  postReceptionEscalation(@Body() body: PostReceptionEscalationDto) {
     return this.receptionWorkspaceService.raiseEscalation(body || {});
   }
 
   @RequirePermission(Permission.WRITE_PHI)
   @Post('reception/handoff')
-  async postReceptionHandoff(
-    @Body()
-    body: {
-      patientId?: string;
-      source?: string;
-      actorName?: string;
-      encounterId?: string | null;
-      arrivalReason?: string;
-      complaintCategory?: string;
-      verificationSummary?: string;
-      triageAssist?: unknown;
-      triageAssistGeneratedAt?: string;
-    },
-  ) {
+  async postReceptionHandoff(@Body() body: PostReceptionHandoffDto) {
     let triageAssist = body.triageAssist as Awaited<
       ReturnType<PatientOrchestrationService['buildTriageAssist']>
     > | null;
@@ -447,16 +421,7 @@ export class EmergencyOsController {
 
   @RequirePermission(Permission.WRITE_PHI)
   @Post('triage/assist')
-  async postTriageAssist(
-    @Body()
-    body: {
-      patientId?: string;
-      arrivalReason?: string;
-      complaintCategory?: string;
-      encounterId?: string | null;
-      verificationSummary?: string;
-    },
-  ) {
+  async postTriageAssist(@Body() body: PostTriageAssistDto) {
     const patientId = String(body.patientId || '').trim();
     if (!patientId) {
       return {
@@ -575,8 +540,7 @@ export class EmergencyOsController {
   @RequirePermission(Permission.WRITE_PHI)
   @Post('workflow-orchestration/review')
   reviewWorkflowAutomation(
-    @Body()
-    body: import('../../../../src/types/administrativeAutomation').ReviewAdministrativeAutomationInput,
+    @Body() body: ReviewWorkflowAutomationDto,
     @TenantContext() tenantContext?: TenantContextValue,
   ) {
     return this.workflowOrchestrationService.reviewTask(body, tenantContext);
@@ -614,8 +578,8 @@ export class EmergencyOsController {
 
   @RequirePermission(Permission.WRITE_PHI)
   @Post('referrals')
-  createReferral(@Body() dto: Record<string, unknown>) {
-    return this.referralService.createReferral(dto);
+  createReferral(@Body() dto: CreateReferralDto) {
+    return this.referralService.createReferral({ ...dto });
   }
 
   @RequirePermission(Permission.READ_PHI)
@@ -644,7 +608,7 @@ export class EmergencyOsController {
   @RequirePermission(Permission.USE_AI_CHAT)
   @Post('copilot/query')
   async queryCopilot(
-    @Body() dto: { query?: string; user_role?: string; context?: Record<string, unknown> },
+    @Body() dto: QueryCopilotDto,
     @TenantContext() tenantContext?: TenantContextValue,
     @Req() request?: Request,
   ) {
@@ -690,7 +654,7 @@ export class EmergencyOsController {
   @RequirePermission(Permission.USE_CALCULATORS)
   @Post('clinical-calculators/results')
   recordClinicalCalculatorResult(
-    @Body() dto: RecordClinicalCalculatorDto,
+    @Body() dto: RecordClinicalCalculatorResultDto,
     @TenantContext() tenantContext?: TenantContextValue,
   ) {
     return this.clinicalDecisionSupportService.recordCalculatorResult(dto, {
@@ -794,19 +758,19 @@ export class EmergencyOsController {
 
   @RequirePermission(Permission.VIEW_ANALYTICS)
   @Post('simulation/update-live')
-  updateLiveSimulation(@Body() dto: any): any {
+  updateLiveSimulation(@Body() dto: UpdateLiveSimulationDto): any {
     return this.realTimeSimulationService.updateLiveState(dto);
   }
 
   @RequirePermission(Permission.VIEW_ANALYTICS)
   @Post('simulation/evaluate')
-  evaluateSimulation(@Body() dto: any): any {
+  evaluateSimulation(@Body() dto: EvaluateSimulationDto): any {
     return this.realTimeSimulationService.evaluateIntervention(dto);
   }
 
   @RequirePermission(Permission.VIEW_ANALYTICS)
   @Post('simulation/compare')
-  compareSimulation(@Body() dto: any): any {
+  compareSimulation(@Body() dto: CompareSimulationDto): any {
     return this.realTimeSimulationService.compareInterventions(dto);
   }
 
@@ -817,12 +781,12 @@ export class EmergencyOsController {
   }
 
   @Post('federated-learning/register')
-  registerFederatedHospital(@Body() dto: any): any {
+  registerFederatedHospital(@Body() dto: RegisterFederatedHospitalDto): any {
     return this.federatedLearningService.registerHospital(dto);
   }
 
   @Post('federated-learning/update')
-  updateFederatedModel(@Body() dto: any): any {
+  updateFederatedModel(@Body() dto: UpdateFederatedModelDto): any {
     return this.federatedLearningService.receiveLocalUpdate(dto);
   }
 
@@ -842,12 +806,12 @@ export class EmergencyOsController {
   }
 
   @Post('digital-twin/initialize')
-  initializeDigitalTwin(@Body() dto: any): any {
+  initializeDigitalTwin(@Body() dto: InitializeDigitalTwinDto): any {
     return this.hybridDigitalTwinService.initialize(dto);
   }
 
   @Post('digital-twin/simulate')
-  simulateDigitalTwin(@Body() dto: any): any {
+  simulateDigitalTwin(@Body() dto: SimulateDigitalTwinDto): any {
     return this.hybridDigitalTwinService.simulate(dto);
   }
 
@@ -857,7 +821,7 @@ export class EmergencyOsController {
   }
 
   @Post('digital-twin/scenario')
-  evaluateDigitalTwinScenario(@Body() dto: any): any {
+  evaluateDigitalTwinScenario(@Body() dto: EvaluateDigitalTwinScenarioDto): any {
     return this.hybridDigitalTwinService.evaluateScenario(dto);
   }
 }

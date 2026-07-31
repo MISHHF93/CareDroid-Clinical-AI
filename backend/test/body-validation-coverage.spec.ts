@@ -52,6 +52,21 @@ import * as ts from 'typescript';
  * clinical-intelligence-actions.dto.ts) formalize each route's intended
  * shape as already encoded in this controller's own pre-existing unit-test
  * fixtures, not a reverse-engineered live contract.
+ *
+ * Cycle 249: closed 23 of EmergencyOsController's 27 routes (the largest
+ * cluster in the codebase) -- unlike the two prior cycles, most of these
+ * are real, live, PHI-adjacent routes with genuine frontend callers, so
+ * each one's actual sent payload was checked field-by-field before adding
+ * forbidNonWhitelisted (2 real mismatches found and preserved rather than
+ * rejected -- see backend/src/modules/emergency-os/dto/
+ * emergency-os-actions.dto.ts's header for specifics). The remaining 4
+ * routes on this controller are deliberately still open: createPatient/
+ * createIntakePatient/createSmartIntakeVerticalSlice are patient-creation
+ * endpoints already under roadmap item #18's own multi-cycle caution since
+ * Cycle 191 (real divergent field shapes across callers, not yet safe to
+ * whitelist); updateSettings takes EmergencyOsSettingsPatch, a mapped type
+ * over a ~12-section nested settings contract that deserves its own
+ * dedicated DTO-building cycle, not a drive-by alongside 23 other routes.
  */
 
 const HTTP_BODY_DECORATORS = new Set(['Post', 'Patch', 'Put']);
@@ -132,11 +147,12 @@ function findUnvalidatedBodyParams(backendRoot: string): string[] {
   return results.sort();
 }
 
-// Generated 2026-07-31 (Cycle 248) via the exact walk above. 135 originally
-// found Cycle 241; worked down across Cycles 242/244/247/248
-// (5 + 6 + 39 + 13 fixed) to this 65-entry baseline. Cycle 248 closed every
-// ClinicalIntelligenceController route (13 -- see SCORECARD.md and the DTO
-// header comment for the full writeup).
+// Generated 2026-07-31 (Cycle 249) via the exact walk above. 135 originally
+// found Cycle 241; worked down across Cycles 242/244/247/248/249
+// (5 + 6 + 39 + 13 + 23 fixed) to this 42-entry baseline. Cycle 249 closed
+// 23 of EmergencyOsController's 27 routes -- see SCORECARD.md and the DTO
+// header comment for the full writeup, including the 4 routes deliberately
+// still open on that same controller.
 const BASELINE: string[] = [
   'src/modules/ai/ai.controller.ts :: AIController.createProposal',
   'src/modules/ai/ai.controller.ts :: AIController.executeProposal',
@@ -144,32 +160,9 @@ const BASELINE: string[] = [
   'src/modules/audit/audit.controller.ts :: AuditController.syncAuditEvent',
   'src/modules/cost-optimizer/cost-optimizer.controller.ts :: CostOptimizerController.route',
   'src/modules/emergency-os/ed-copilot.nest-parity.controller.ts :: EdCopilotNestParityController.query',
-  'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.applyOcrJobToIntake',
-  'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.compareSimulation',
   'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.createIntakePatient',
-  'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.createOcrJob',
   'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.createPatient',
-  'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.createReferral',
   'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.createSmartIntakeVerticalSlice',
-  'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.evaluateDigitalTwinScenario',
-  'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.evaluateOperationalIntelligence',
-  'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.evaluateSimulation',
-  'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.extractPatientDocumentArtifacts',
-  'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.initializeDigitalTwin',
-  'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.postEmsHandoff',
-  'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.postReceptionEscalation',
-  'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.postReceptionHandoff',
-  'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.postTriageAssist',
-  'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.queryCopilot',
-  'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.recordClinicalCalculatorResult',
-  'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.recordCopilotInteraction',
-  'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.registerFederatedHospital',
-  'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.reviewOcrJobField',
-  'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.reviewPatientDocumentArtifact',
-  'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.reviewWorkflowAutomation',
-  'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.simulateDigitalTwin',
-  'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.updateFederatedModel',
-  'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.updateLiveSimulation',
   'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.updateSettings',
   'src/modules/emergency-os/emergency-os.research.controller.ts :: AICallInterrogationController.detectOHCA',
   'src/modules/emergency-os/emergency-os.research.controller.ts :: AICallInterrogationController.interpretECG',
