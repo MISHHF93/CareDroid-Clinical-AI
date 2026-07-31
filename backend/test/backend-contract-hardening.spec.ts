@@ -9,6 +9,10 @@ import {
   GovernanceDecisionDto,
   ConsentActionDto,
 } from '../src/modules/platform-governance';
+import {
+  SuggestCalculatorDto,
+  DraftReferralDto,
+} from '../src/modules/platform-systems/dto/clinical-intelligence-actions.dto';
 
 const root = join(__dirname, '..');
 
@@ -156,6 +160,52 @@ describe('backend contract hardening', () => {
     ).resolves.toMatchObject({ status: 'active', source: 'patient_portal' });
     await expect(
       pipe.transform({ status: 'active', ssn: '000-00-0000' }, bodyMetadata(ConsentActionDto)),
+    ).rejects.toThrow(BadRequestException);
+  });
+
+  /**
+   * Cycle 248: same proof for ClinicalIntelligenceController's 13 routes,
+   * all pure PlatformSystemsService.demo() passthroughs. Confirms the
+   * shared PlatformDemoContractFieldsDto base (the one real caller's fixed
+   * shape today) plus each subclass's documented intended fields still
+   * whitelist-validate correctly through inheritance.
+   */
+  it('clinical-intelligence DTO classes actually get whitelist-validated by the real global ValidationPipe (Cycle 248)', async () => {
+    const pipe = new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    });
+    const bodyMetadata = (metatype: ArgumentMetadata['metatype']): ArgumentMetadata => ({
+      type: 'body',
+      metatype,
+      data: undefined,
+    });
+
+    await expect(
+      pipe.transform(
+        { capabilityId: 'calculator-recommender-ai', patientId: 'demo-patient', mode: 'demo' },
+        bodyMetadata(SuggestCalculatorDto),
+      ),
+    ).resolves.toMatchObject({ capabilityId: 'calculator-recommender-ai', mode: 'demo' });
+    await expect(
+      pipe.transform({ chiefComplaint: 'chest pain' }, bodyMetadata(SuggestCalculatorDto)),
+    ).resolves.toMatchObject({ chiefComplaint: 'chest pain' });
+    await expect(
+      pipe.transform(
+        { chiefComplaint: 'chest pain', injectedField: 'unexpected' },
+        bodyMetadata(SuggestCalculatorDto),
+      ),
+    ).rejects.toThrow(BadRequestException);
+
+    await expect(
+      pipe.transform({ specialty: 'cardiology', reason: 'NSTEMI' }, bodyMetadata(DraftReferralDto)),
+    ).resolves.toMatchObject({ specialty: 'cardiology', reason: 'NSTEMI' });
+    await expect(
+      pipe.transform(
+        { specialty: 'cardiology', ssn: '000-00-0000' },
+        bodyMetadata(DraftReferralDto),
+      ),
     ).rejects.toThrow(BadRequestException);
   });
 });

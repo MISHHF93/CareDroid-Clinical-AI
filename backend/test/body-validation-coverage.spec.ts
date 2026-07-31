@@ -42,6 +42,16 @@ import * as ts from 'typescript';
  * governance-actions.dto.ts) were designed from what the controllers/service
  * actually read off the body plus the real TypeORM entity columns each
  * write eventually lands on, not from a reverse-engineered live payload.
+ *
+ * Cycle 248: closed the next-largest cluster -- ClinicalIntelligenceController's
+ * 13 routes, all pure PlatformSystemsService.demo() passthroughs with zero
+ * real persistence. A frontend sweep found zero callers with a
+ * capability-specific payload (10 of 13 only ever reached via a generic
+ * demo-button component sending an identical fixed shape; 2 have no caller
+ * at all), so the new DTOs (backend/src/modules/platform-systems/dto/
+ * clinical-intelligence-actions.dto.ts) formalize each route's intended
+ * shape as already encoded in this controller's own pre-existing unit-test
+ * fixtures, not a reverse-engineered live contract.
  */
 
 const HTTP_BODY_DECORATORS = new Set(['Post', 'Patch', 'Put']);
@@ -122,10 +132,10 @@ function findUnvalidatedBodyParams(backendRoot: string): string[] {
   return results.sort();
 }
 
-// Generated 2026-07-30 (Cycle 247) via the exact walk above. 135 originally
-// found Cycle 241; worked down across Cycles 242/244/247 (5 + 6 + 39 fixed)
-// to this 78-entry baseline. Cycle 247 closed every GovernanceController and
-// PlatformGovernanceController route (39 -- see SCORECARD.md and the DTO
+// Generated 2026-07-31 (Cycle 248) via the exact walk above. 135 originally
+// found Cycle 241; worked down across Cycles 242/244/247/248
+// (5 + 6 + 39 + 13 fixed) to this 65-entry baseline. Cycle 248 closed every
+// ClinicalIntelligenceController route (13 -- see SCORECARD.md and the DTO
 // header comment for the full writeup).
 const BASELINE: string[] = [
   'src/modules/ai/ai.controller.ts :: AIController.createProposal',
@@ -178,19 +188,6 @@ const BASELINE: string[] = [
   'src/modules/organizations/organizations.controller.ts :: OrganizationsController.updateSettings',
   'src/modules/organizations/organizations.controller.ts :: OrganizationsController.updateTenantAdministration',
   'src/modules/organizations/settings-features.controller.ts :: SettingsFeaturesController.updateFeatureSettings',
-  'src/modules/platform-systems/clinical-intelligence.controller.ts :: ClinicalIntelligenceController.analyzeReasoning',
-  'src/modules/platform-systems/clinical-intelligence.controller.ts :: ClinicalIntelligenceController.approveDocument',
-  'src/modules/platform-systems/clinical-intelligence.controller.ts :: ClinicalIntelligenceController.draftClinicalEvent',
-  'src/modules/platform-systems/clinical-intelligence.controller.ts :: ClinicalIntelligenceController.draftDischargeSummary',
-  'src/modules/platform-systems/clinical-intelligence.controller.ts :: ClinicalIntelligenceController.draftPriorAuth',
-  'src/modules/platform-systems/clinical-intelligence.controller.ts :: ClinicalIntelligenceController.draftReferral',
-  'src/modules/platform-systems/clinical-intelligence.controller.ts :: ClinicalIntelligenceController.draftSoap',
-  'src/modules/platform-systems/clinical-intelligence.controller.ts :: ClinicalIntelligenceController.explainWhy',
-  'src/modules/platform-systems/clinical-intelligence.controller.ts :: ClinicalIntelligenceController.exportDocument',
-  'src/modules/platform-systems/clinical-intelligence.controller.ts :: ClinicalIntelligenceController.generateWorkflow',
-  'src/modules/platform-systems/clinical-intelligence.controller.ts :: ClinicalIntelligenceController.suggestCalculator',
-  'src/modules/platform-systems/clinical-intelligence.controller.ts :: ClinicalIntelligenceController.summarizeAuditTrail',
-  'src/modules/platform-systems/clinical-intelligence.controller.ts :: ClinicalIntelligenceController.transcribeDictation',
   'src/modules/platform-systems/integrations.controller.ts :: IntegrationsController.createFhirConnection',
   'src/modules/platform-systems/integrations.controller.ts :: IntegrationsController.previewHl7MessageReplay',
   'src/modules/platform-systems/integrations.controller.ts :: IntegrationsController.syncFhirConnection',

@@ -5,6 +5,21 @@ import { Permissions } from '../auth/decorators/permissions.decorator';
 import { Permission } from '../auth/enums/permission.enum';
 import { AuthorizationGuard } from '../auth/guards/authorization.guard';
 import { PlatformSystemsService } from './platform-systems.service';
+import {
+  SuggestCalculatorDto,
+  GenerateWorkflowDto,
+  AnalyzeReasoningDto,
+  ExplainWhyDto,
+  SummarizeAuditTrailDto,
+  DraftClinicalEventDto,
+  DraftSoapDto,
+  TranscribeDictationDto,
+  DraftDischargeSummaryDto,
+  DraftReferralDto,
+  DraftPriorAuthDto,
+  ApproveDocumentDto,
+  ExportDocumentDto,
+} from './dto/clinical-intelligence-actions.dto';
 
 /**
  * Clinical-intelligence AI demos and clinical-documentation drafting -- split
@@ -26,91 +41,95 @@ export class ClinicalIntelligenceController {
   @Post('clinical-intelligence/calculator-recommender/suggest')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.READ_PHI, Permission.USE_AI_CHAT)
-  suggestCalculator(@Body() body: Record<string, unknown>) {
-    return this.platformSystemsService.demo('calculator-recommender-ai', 'demo-patient', body);
+  suggestCalculator(@Body() body: SuggestCalculatorDto) {
+    return this.platformSystemsService.demo('calculator-recommender-ai', 'demo-patient', {
+      ...body,
+    });
   }
 
   @Post('clinical-intelligence/workflow-builder/generate')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.READ_PHI, Permission.USE_AI_CHAT)
-  generateWorkflow(@Body() body: Record<string, unknown>) {
-    return this.platformSystemsService.demo('workflow-builder-ai', 'demo-patient', body);
+  generateWorkflow(@Body() body: GenerateWorkflowDto) {
+    return this.platformSystemsService.demo('workflow-builder-ai', 'demo-patient', { ...body });
   }
 
   @Post('clinical-intelligence/reasoning/analyze')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.READ_PHI, Permission.USE_AI_CHAT)
-  analyzeReasoning(@Body() body: Record<string, unknown>) {
-    return this.platformSystemsService.demo('clinical-reasoning-engine', 'demo-patient', body);
+  analyzeReasoning(@Body() body: AnalyzeReasoningDto) {
+    return this.platformSystemsService.demo('clinical-reasoning-engine', 'demo-patient', {
+      ...body,
+    });
   }
 
   @Post('clinical-intelligence/why-engine/explain')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.READ_PHI, Permission.USE_AI_CHAT)
-  explainWhy(@Body() body: Record<string, unknown>) {
-    return this.platformSystemsService.demo('why-engine', 'demo-patient', body);
+  explainWhy(@Body() body: ExplainWhyDto) {
+    return this.platformSystemsService.demo('why-engine', 'demo-patient', { ...body });
   }
 
   @Post('clinical-intelligence/audit-trail/summarize')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.VIEW_AUDIT_LOGS, Permission.USE_AI_CHAT)
-  summarizeAuditTrail(@Body() body: Record<string, unknown>) {
-    return this.platformSystemsService.demo('audit-trail-ai', 'demo-patient', body);
+  summarizeAuditTrail(@Body() body: SummarizeAuditTrailDto) {
+    return this.platformSystemsService.demo('audit-trail-ai', 'demo-patient', { ...body });
   }
 
   @Post('clinical-intelligence/clinical-event-ai/draft')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.READ_PHI, Permission.USE_AI_CHAT)
-  draftClinicalEvent(@Body() body: Record<string, unknown>) {
-    return this.platformSystemsService.demo('clinical-event-ai', 'demo-patient', body);
+  draftClinicalEvent(@Body() body: DraftClinicalEventDto) {
+    return this.platformSystemsService.demo('clinical-event-ai', 'demo-patient', { ...body });
   }
 
   @Post('documentation/soap/draft')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.READ_PHI, Permission.USE_AI_CHAT)
-  draftSoap(@Body() body: Record<string, unknown>) {
-    return this.platformSystemsService.demo('soap-builder', 'demo-patient', body);
+  draftSoap(@Body() body: DraftSoapDto) {
+    return this.platformSystemsService.demo('soap-builder', 'demo-patient', { ...body });
   }
 
   @Post('documentation/dictation/transcribe')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.READ_PHI, Permission.USE_AI_CHAT)
-  transcribeDictation(@Body() body: Record<string, unknown>) {
-    return this.platformSystemsService.demo('clinical-dictation', 'demo-patient', body);
+  transcribeDictation(@Body() body: TranscribeDictationDto) {
+    return this.platformSystemsService.demo('clinical-dictation', 'demo-patient', { ...body });
   }
 
   @Post('documentation/discharge-summary/draft')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.READ_PHI, Permission.USE_AI_CHAT)
-  draftDischargeSummary(@Body() body: Record<string, unknown>) {
-    return this.platformSystemsService.demo('discharge-summary-ai', 'demo-patient', body);
+  draftDischargeSummary(@Body() body: DraftDischargeSummaryDto) {
+    return this.platformSystemsService.demo('discharge-summary-ai', 'demo-patient', { ...body });
   }
 
   @Post('documentation/referral/draft')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.READ_PHI, Permission.USE_AI_CHAT)
-  draftReferral(@Body() body: Record<string, unknown>) {
-    return this.platformSystemsService.demo('referral-ai', 'demo-patient', body);
+  draftReferral(@Body() body: DraftReferralDto) {
+    return this.platformSystemsService.demo('referral-ai', 'demo-patient', { ...body });
   }
 
   @Post('documentation/prior-auth/draft')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.READ_PHI, Permission.USE_AI_CHAT)
-  draftPriorAuth(@Body() body: Record<string, unknown>) {
-    return this.platformSystemsService.demo('prior-auth-ai', 'demo-patient', body);
+  draftPriorAuth(@Body() body: DraftPriorAuthDto) {
+    return this.platformSystemsService.demo('prior-auth-ai', 'demo-patient', { ...body });
   }
 
   @Post('documentation/:documentId/approve')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.READ_PHI, Permission.WRITE_PHI)
-  approveDocument(@Param('documentId') documentId: string, @Body() body: Record<string, unknown>) {
-    return this.platformSystemsService.demo('soap-builder', documentId, body);
+  approveDocument(@Param('documentId') documentId: string, @Body() body: ApproveDocumentDto) {
+    return this.platformSystemsService.demo('soap-builder', documentId, { ...body });
   }
 
   @Post('documentation/:documentId/export')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.READ_PHI, Permission.EXPORT_PHI)
-  exportDocument(@Param('documentId') documentId: string, @Body() body: Record<string, unknown>) {
-    return this.platformSystemsService.demo('soap-builder', documentId, body);
+  exportDocument(@Param('documentId') documentId: string, @Body() body: ExportDocumentDto) {
+    return this.platformSystemsService.demo('soap-builder', documentId, { ...body });
   }
 }
