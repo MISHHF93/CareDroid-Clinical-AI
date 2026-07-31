@@ -17,6 +17,7 @@ import {
   PostReceptionHandoffDto,
   RecordClinicalCalculatorResultDto,
 } from '../src/modules/emergency-os/dto/emergency-os-actions.dto';
+import { ImportLabsDto } from '../src/modules/platform-systems/dto/patient-clinical-data-actions.dto';
 import {
   HandoverRequestDto,
   Process112CallDto,
@@ -322,6 +323,36 @@ describe('backend contract hardening', () => {
         { callId: '112-test', location: { lat: 43.65, unexpectedField: 'x' } },
         bodyMetadata(Process112CallDto),
       ),
+    ).rejects.toThrow(BadRequestException);
+  });
+
+  /**
+   * Cycle 251: same proof for PatientClinicalDataController's DTOs.
+   * ImportLabsDto extends the shared PlatformDemoContractFieldsDto base
+   * (Cycle 248) via class inheritance -- this confirms whitelist
+   * validation still works correctly through that inheritance chain, not
+   * just on a flat, single-class DTO.
+   */
+  it('patient-clinical-data DTO classes actually get whitelist-validated by the real global ValidationPipe (Cycle 251)', async () => {
+    const pipe = new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    });
+    const bodyMetadata = (metatype: ArgumentMetadata['metatype']): ArgumentMetadata => ({
+      type: 'body',
+      metatype,
+      data: undefined,
+    });
+
+    await expect(
+      pipe.transform(
+        { panel: 'BMP', patientId: 'pt-001', mode: 'demo' },
+        bodyMetadata(ImportLabsDto),
+      ),
+    ).resolves.toMatchObject({ panel: 'BMP', patientId: 'pt-001' });
+    await expect(
+      pipe.transform({ panel: 'BMP', unexpectedField: 'x' }, bodyMetadata(ImportLabsDto)),
     ).rejects.toThrow(BadRequestException);
   });
 });

@@ -16,6 +16,14 @@ import { Permission } from '../auth/enums/permission.enum';
 import { AuthorizationGuard } from '../auth/guards/authorization.guard';
 import { PlatformSystemsService } from './platform-systems.service';
 import { PlatformGovernanceService } from '../platform-governance';
+import {
+  EhrPatientImportDto,
+  ImportLabsDto,
+  ImportMedicationsDto,
+  ImportObservationsDto,
+  CreatePatientEventDto,
+  AddRiskScoreDto,
+} from './dto/patient-clinical-data-actions.dto';
 
 /**
  * Per-patient clinical data operations (EHR/labs/medications/observations
@@ -42,29 +50,29 @@ export class PatientClinicalDataController {
   @Post('patients/import/ehr')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.IMPORT_PATIENT_DATA)
-  importEhrPatient(@Body() body: Record<string, unknown>) {
-    return this.platformSystemsService.demo('ehr-patient-import', 'demo-patient', body);
+  importEhrPatient(@Body() body: EhrPatientImportDto) {
+    return this.platformSystemsService.demo('ehr-patient-import', 'demo-patient', { ...body });
   }
 
   @Post('patients/:patientId/import/labs')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.READ_PHI, Permission.WRITE_PHI)
-  importLabs(@Param('patientId') patientId: string, @Body() body: Record<string, unknown>) {
-    return this.platformSystemsService.demo('lab-result-import', patientId, body);
+  importLabs(@Param('patientId') patientId: string, @Body() body: ImportLabsDto) {
+    return this.platformSystemsService.demo('lab-result-import', patientId, { ...body });
   }
 
   @Post('patients/:patientId/import/medications')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.READ_PHI, Permission.WRITE_PHI)
-  importMedications(@Param('patientId') patientId: string, @Body() body: Record<string, unknown>) {
-    return this.platformSystemsService.demo('medication-list-import', patientId, body);
+  importMedications(@Param('patientId') patientId: string, @Body() body: ImportMedicationsDto) {
+    return this.platformSystemsService.demo('medication-list-import', patientId, { ...body });
   }
 
   @Post('patients/:patientId/import/observations')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.READ_PHI, Permission.WRITE_PHI)
-  importObservations(@Param('patientId') patientId: string, @Body() body: Record<string, unknown>) {
-    return this.platformSystemsService.demo('observation-vitals-import', patientId, body);
+  importObservations(@Param('patientId') patientId: string, @Body() body: ImportObservationsDto) {
+    return this.platformSystemsService.demo('observation-vitals-import', patientId, { ...body });
   }
 
   @Get('patients/:patientId/workspace')
@@ -97,8 +105,8 @@ export class PatientClinicalDataController {
   @Post('patients/:patientId/events')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.READ_PHI, Permission.WRITE_PHI)
-  createPatientEvent(@Param('patientId') patientId: string, @Body() body: Record<string, unknown>) {
-    return this.platformSystemsService.demo('clinical-event-ai', patientId, body);
+  createPatientEvent(@Param('patientId') patientId: string, @Body() body: CreatePatientEventDto) {
+    return this.platformSystemsService.demo('clinical-event-ai', patientId, { ...body });
   }
 
   @Get('patients/:patientId/risk-scores')
@@ -110,8 +118,8 @@ export class PatientClinicalDataController {
   @Post('patients/:patientId/risk-scores')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.READ_PHI, Permission.WRITE_PHI)
-  addRiskScore(@Param('patientId') patientId: string, @Body() body: Record<string, unknown>) {
-    return this.platformSystemsService.demo('risk-score-history', patientId, body);
+  addRiskScore(@Param('patientId') patientId: string, @Body() body: AddRiskScoreDto) {
+    return this.platformSystemsService.demo('risk-score-history', patientId, { ...body });
   }
 
   @Get('patients/:patientId/care-plan')

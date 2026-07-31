@@ -75,6 +75,16 @@ import * as ts from 'typescript';
  * these paths -- so the new DTOs (backend/src/modules/emergency-os/dto/
  * emergency-os-research-actions.dto.ts) mirror the backend's own
  * already-declared, fully-enumerable interfaces exactly.
+ *
+ * Cycle 251: closed PatientClinicalDataController's 6 routes (EHR/labs/
+ * medications/observations import, patient events, risk scores) -- all 6
+ * pure PlatformSystemsService.demo() passthroughs. A registry sweep
+ * (platformSystems.tsx) found the 4 import routes ARE reached by the
+ * generic demo button (their entries are correctly wired `method: 'POST'`,
+ * unlike governance's), always sending the same fixed demo-contract shape
+ * established in Cycle 248; createPatientEvent/addRiskScore have no
+ * reachable caller at all -- their registry entries point at a different
+ * backend route or a GET method respectively.
  */
 
 const HTTP_BODY_DECORATORS = new Set(['Post', 'Patch', 'Put']);
@@ -155,11 +165,11 @@ function findUnvalidatedBodyParams(backendRoot: string): string[] {
   return results.sort();
 }
 
-// Generated 2026-07-31 (Cycle 250) via the exact walk above. 135 originally
-// found Cycle 241; worked down across Cycles 242/244/247/248/249/250
-// (5 + 6 + 39 + 13 + 23 + 8 fixed) to this 34-entry baseline. Cycle 250
-// closed every route on emergency-os.research.controller.ts -- see
-// SCORECARD.md and the DTO header comment for the full writeup.
+// Generated 2026-07-31 (Cycle 251) via the exact walk above. 135 originally
+// found Cycle 241; worked down across Cycles 242/244/247/248/249/250/251
+// (5 + 6 + 39 + 13 + 23 + 8 + 6 fixed) to this 28-entry baseline. Cycle 251
+// closed every route on PatientClinicalDataController -- see SCORECARD.md
+// and the DTO header comment for the full writeup.
 const BASELINE: string[] = [
   'src/modules/ai/ai.controller.ts :: AIController.createProposal',
   'src/modules/ai/ai.controller.ts :: AIController.executeProposal',
@@ -185,12 +195,6 @@ const BASELINE: string[] = [
   'src/modules/platform-systems/integrations.controller.ts :: IntegrationsController.syncFhirConnection',
   'src/modules/platform-systems/integrations.controller.ts :: IntegrationsController.testFhirConnection',
   'src/modules/platform-systems/integrations.controller.ts :: IntegrationsController.testHl7Message',
-  'src/modules/platform-systems/patient-clinical-data.controller.ts :: PatientClinicalDataController.addRiskScore',
-  'src/modules/platform-systems/patient-clinical-data.controller.ts :: PatientClinicalDataController.createPatientEvent',
-  'src/modules/platform-systems/patient-clinical-data.controller.ts :: PatientClinicalDataController.importEhrPatient',
-  'src/modules/platform-systems/patient-clinical-data.controller.ts :: PatientClinicalDataController.importLabs',
-  'src/modules/platform-systems/patient-clinical-data.controller.ts :: PatientClinicalDataController.importMedications',
-  'src/modules/platform-systems/patient-clinical-data.controller.ts :: PatientClinicalDataController.importObservations',
   'src/modules/platform-systems/platform-systems.controller.ts :: PlatformSystemsController.createEmergencyPatient',
   'src/modules/platform-systems/platform-systems.controller.ts :: PlatformSystemsController.createEmergencyReferral',
   'src/modules/platform-systems/platform-systems.controller.ts :: PlatformSystemsController.updateEmergencyPatient',
