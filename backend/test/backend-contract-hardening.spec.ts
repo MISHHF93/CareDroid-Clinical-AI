@@ -4,6 +4,11 @@ import { BadRequestException, ValidationPipe, type ArgumentMetadata } from '@nes
 import { StartSimulationDto } from '../src/modules/simulation/simulation.types';
 import { CreateTrainingRunDto } from '../src/modules/training/training.types';
 import { CreateEvaluationRunDto } from '../src/modules/evaluation/evaluation.types';
+import {
+  CreateClinicalPolicyDto,
+  GovernanceDecisionDto,
+  ConsentActionDto,
+} from '../src/modules/platform-governance';
 
 const root = join(__dirname, '..');
 
@@ -94,6 +99,63 @@ describe('backend contract hardening', () => {
         { modelName: 'gpt', injectedField: 'unexpected' },
         bodyMetadata(CreateEvaluationRunDto),
       ),
+    ).rejects.toThrow(BadRequestException);
+  });
+
+  /**
+   * Cycle 247: same proof, this time for the largest single cluster in
+   * body-validation-coverage.spec.ts's baseline -- GovernanceController's 33
+   * routes and PlatformGovernanceController's 6 (39 total, all previously
+   * @Body() body: Record<string, unknown/any>). GovernanceDecisionDto in
+   * particular is reused across 13 different routes, so it's the highest-
+   * leverage single DTO to prove live here.
+   */
+  it('governance/consent DTO classes actually get whitelist-validated by the real global ValidationPipe (Cycle 247)', async () => {
+    const pipe = new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    });
+    const bodyMetadata = (metatype: ArgumentMetadata['metatype']): ArgumentMetadata => ({
+      type: 'body',
+      metatype,
+      data: undefined,
+    });
+
+    await expect(
+      pipe.transform(
+        { capabilityId: 'clinical-governance', policyType: 'clinical_safety', version: 'v2' },
+        bodyMetadata(CreateClinicalPolicyDto),
+      ),
+    ).resolves.toMatchObject({ capabilityId: 'clinical-governance', version: 'v2' });
+    await expect(
+      pipe.transform(
+        { capabilityId: 'clinical-governance', unexpectedColumn: 'drop-me' },
+        bodyMetadata(CreateClinicalPolicyDto),
+      ),
+    ).rejects.toThrow(BadRequestException);
+
+    await expect(
+      pipe.transform(
+        { decision: 'approve', notes: 'looks fine' },
+        bodyMetadata(GovernanceDecisionDto),
+      ),
+    ).resolves.toMatchObject({ decision: 'approve', notes: 'looks fine' });
+    await expect(
+      pipe.transform(
+        { decision: 'approve', arbitraryField: 'unexpected' },
+        bodyMetadata(GovernanceDecisionDto),
+      ),
+    ).rejects.toThrow(BadRequestException);
+
+    await expect(
+      pipe.transform(
+        { status: 'active', source: 'patient_portal' },
+        bodyMetadata(ConsentActionDto),
+      ),
+    ).resolves.toMatchObject({ status: 'active', source: 'patient_portal' });
+    await expect(
+      pipe.transform({ status: 'active', ssn: '000-00-0000' }, bodyMetadata(ConsentActionDto)),
     ).rejects.toThrow(BadRequestException);
   });
 });

@@ -16,7 +16,24 @@ import { Permissions } from '../auth/decorators/permissions.decorator';
 import { Permission } from '../auth/enums/permission.enum';
 import { AuthorizationGuard } from '../auth/guards/authorization.guard';
 import { PlatformSystemsService } from './platform-systems.service';
-import { PlatformGovernanceService } from '../platform-governance';
+import {
+  PlatformGovernanceService,
+  CreateClinicalPolicyDto,
+  UpdateClinicalPolicyDto,
+  GovernanceDecisionDto,
+  GovernanceConfigUpdateDto,
+  EvaluateGateDto,
+  UpdateRegulatoryClassificationDto,
+  CreateRegulatoryEvidenceArtifactDto,
+  EquityCohortDto,
+  EquityReportDto,
+  CreateValidationScenarioDto,
+  CreateValidationRunDto,
+  CreateReviewItemDto,
+  ConsentActionDto,
+  PrivacyRequestDto,
+  AuditPlaceholderDto,
+} from '../platform-governance';
 
 /**
  * Governance, compliance, and operations surface -- split out from
@@ -57,24 +74,24 @@ export class GovernanceController {
   @Post('governance/clinical/policies')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
-  async createClinicalPolicy(@Body() body: Record<string, unknown>) {
+  async createClinicalPolicy(@Body() body: CreateClinicalPolicyDto) {
     if (this.platformGovernanceService) {
-      return this.platformGovernanceService.createPolicy(body);
+      return this.platformGovernanceService.createPolicy({ ...body });
     }
-    return this.platformSystemsService.demo('clinical-governance', 'policy-draft', body);
+    return this.platformSystemsService.demo('clinical-governance', 'policy-draft', { ...body });
   }
 
   @Put('governance/clinical/policies/:policyId')
   @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
   async updateClinicalPolicy(
     @Param('policyId') policyId: string,
-    @Body() body: Record<string, unknown>,
+    @Body() body: UpdateClinicalPolicyDto,
   ) {
     if (this.platformGovernanceService) {
-      const result = await this.platformGovernanceService.updatePolicy(policyId, body);
+      const result = await this.platformGovernanceService.updatePolicy(policyId, { ...body });
       if (result) return result;
     }
-    return this.platformSystemsService.demo('clinical-governance', policyId, body);
+    return this.platformSystemsService.demo('clinical-governance', policyId, { ...body });
   }
 
   @Post('governance/clinical/policies/:policyId/approve')
@@ -82,13 +99,13 @@ export class GovernanceController {
   @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
   async approveClinicalPolicy(
     @Param('policyId') policyId: string,
-    @Body() body: Record<string, unknown>,
+    @Body() body: GovernanceDecisionDto,
   ) {
     if (this.platformGovernanceService) {
-      const result = await this.platformGovernanceService.approvePolicy(policyId, body);
+      const result = await this.platformGovernanceService.approvePolicy(policyId, { ...body });
       if (result) return result;
     }
-    return this.platformSystemsService.demo('clinical-governance', policyId, body);
+    return this.platformSystemsService.demo('clinical-governance', policyId, { ...body });
   }
 
   @Get('governance/clinical/release-gates')
@@ -105,13 +122,13 @@ export class GovernanceController {
   @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
   async decideClinicalReleaseGate(
     @Param('gateId') gateId: string,
-    @Body() body: Record<string, unknown>,
+    @Body() body: GovernanceDecisionDto,
   ) {
     if (this.platformGovernanceService) {
-      const result = await this.platformGovernanceService.decideReleaseGate(gateId, body);
+      const result = await this.platformGovernanceService.decideReleaseGate(gateId, { ...body });
       if (result) return result;
     }
-    return this.platformSystemsService.demo('clinical-release-gates', gateId, body);
+    return this.platformSystemsService.demo('clinical-release-gates', gateId, { ...body });
   }
 
   @Get('governance/clinical/safety-findings')
@@ -128,13 +145,15 @@ export class GovernanceController {
   @Permissions(Permission.VIEW_AUDIT_LOGS)
   async reviewGovernanceSafetyFinding(
     @Param('findingId') findingId: string,
-    @Body() body: Record<string, unknown>,
+    @Body() body: GovernanceDecisionDto,
   ) {
     if (this.platformGovernanceService) {
-      const result = await this.platformGovernanceService.reviewSafetyFinding(findingId, body);
+      const result = await this.platformGovernanceService.reviewSafetyFinding(findingId, {
+        ...body,
+      });
       if (result) return result;
     }
-    return this.platformSystemsService.demo('clinical-safety-findings', findingId, body);
+    return this.platformSystemsService.demo('clinical-safety-findings', findingId, { ...body });
   }
 
   @Get('governance/ai/policies')
@@ -145,8 +164,8 @@ export class GovernanceController {
 
   @Put('governance/ai/policies/:policyId')
   @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
-  updateAiPolicy(@Param('policyId') policyId: string, @Body() body: Record<string, unknown>) {
-    return this.platformSystemsService.demo('ai-governance', policyId, body);
+  updateAiPolicy(@Param('policyId') policyId: string, @Body() body: GovernanceConfigUpdateDto) {
+    return this.platformSystemsService.demo('ai-governance', policyId, { ...body });
   }
 
   @Get('governance/ai-security/summary')
@@ -163,14 +182,17 @@ export class GovernanceController {
 
   @Put('governance/ai-security/rules/:ruleId')
   @Permissions(Permission.CONFIGURE_SYSTEM, Permission.MANAGE_ENCRYPTION)
-  updatePromptFirewallRule(@Param('ruleId') ruleId: string, @Body() body: Record<string, unknown>) {
-    return this.platformSystemsService.demo('prompt-firewall', ruleId, body);
+  updatePromptFirewallRule(
+    @Param('ruleId') ruleId: string,
+    @Body() body: GovernanceConfigUpdateDto,
+  ) {
+    return this.platformSystemsService.demo('prompt-firewall', ruleId, { ...body });
   }
 
   @Post('governance/ai-security/evaluate')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.CONFIGURE_SYSTEM, Permission.MANAGE_ENCRYPTION)
-  async evaluatePromptSecurity(@Body() body: Record<string, unknown>) {
+  async evaluatePromptSecurity(@Body() body: EvaluateGateDto) {
     if (this.platformGovernanceService) {
       return this.platformGovernanceService.evaluateGate({
         runId: String(body.runId || 'security-evaluation'),
@@ -181,7 +203,7 @@ export class GovernanceController {
         action: 'ai-security/evaluate',
       });
     }
-    return this.platformSystemsService.demo('prompt-firewall', 'evaluation', body);
+    return this.platformSystemsService.demo('prompt-firewall', 'evaluation', { ...body });
   }
 
   @Get('governance/ai-security/model-access')
@@ -194,9 +216,9 @@ export class GovernanceController {
   @Permissions(Permission.CONFIGURE_SYSTEM, Permission.MANAGE_ENCRYPTION)
   updateModelAccessPolicy(
     @Param('policyId') policyId: string,
-    @Body() body: Record<string, unknown>,
+    @Body() body: GovernanceConfigUpdateDto,
   ) {
-    return this.platformSystemsService.demo('model-access-policy', policyId, body);
+    return this.platformSystemsService.demo('model-access-policy', policyId, { ...body });
   }
 
   @Get('governance/ai-security/incidents')
@@ -210,9 +232,9 @@ export class GovernanceController {
   @Permissions(Permission.CONFIGURE_SYSTEM, Permission.MANAGE_ENCRYPTION)
   reviewAiSecurityIncident(
     @Param('incidentId') incidentId: string,
-    @Body() body: Record<string, unknown>,
+    @Body() body: GovernanceDecisionDto,
   ) {
-    return this.platformSystemsService.demo('ai-security', incidentId, body);
+    return this.platformSystemsService.demo('ai-security', incidentId, { ...body });
   }
 
   @Get('governance/model-usage/summary')
@@ -235,8 +257,10 @@ export class GovernanceController {
 
   @Put('governance/costs/budgets/:budgetId')
   @Permissions(Permission.MANAGE_SUBSCRIPTIONS, Permission.VIEW_ANALYTICS)
-  updateCostBudget(@Param('budgetId') budgetId: string, @Body() body: Record<string, unknown>) {
-    return this.platformSystemsService.demo('cost-optimization-control-plane', budgetId, body);
+  updateCostBudget(@Param('budgetId') budgetId: string, @Body() body: GovernanceConfigUpdateDto) {
+    return this.platformSystemsService.demo('cost-optimization-control-plane', budgetId, {
+      ...body,
+    });
   }
 
   @Get('governance/clinical-safety/findings')
@@ -250,9 +274,9 @@ export class GovernanceController {
   @Permissions(Permission.VIEW_AUDIT_LOGS)
   reviewClinicalSafetyFinding(
     @Param('findingId') findingId: string,
-    @Body() body: Record<string, unknown>,
+    @Body() body: GovernanceDecisionDto,
   ) {
-    return this.platformSystemsService.demo('clinical-safety-audit', findingId, body);
+    return this.platformSystemsService.demo('clinical-safety-audit', findingId, { ...body });
   }
 
   @Get('consent/:patientId')
@@ -267,10 +291,7 @@ export class GovernanceController {
   @Post('consent/:patientId')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.MANAGE_CONSENT)
-  async updateConsent(
-    @Param('patientId') patientId: string,
-    @Body() body: Record<string, unknown>,
-  ) {
+  async updateConsent(@Param('patientId') patientId: string, @Body() body: ConsentActionDto) {
     if (this.platformGovernanceService) {
       return this.platformGovernanceService.upsertConsent(
         patientId,
@@ -278,16 +299,13 @@ export class GovernanceController {
         body,
       );
     }
-    return this.platformSystemsService.demo('consent-manager', patientId, body);
+    return this.platformSystemsService.demo('consent-manager', patientId, { ...body });
   }
 
   @Post('consent/:patientId/revoke')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.MANAGE_CONSENT)
-  async revokeConsent(
-    @Param('patientId') patientId: string,
-    @Body() body: Record<string, unknown>,
-  ) {
+  async revokeConsent(@Param('patientId') patientId: string, @Body() body: ConsentActionDto) {
     if (this.platformGovernanceService) {
       return this.platformGovernanceService.upsertConsent(
         patientId,
@@ -298,7 +316,7 @@ export class GovernanceController {
         },
       );
     }
-    return this.platformSystemsService.demo('consent-manager', patientId, body);
+    return this.platformSystemsService.demo('consent-manager', patientId, { ...body });
   }
 
   @Get('privacy/access-log')
@@ -322,7 +340,7 @@ export class GovernanceController {
   @Post('privacy/export')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.MANAGE_PRIVACY)
-  async requestPrivacyExport(@Body() body: Record<string, unknown>) {
+  async requestPrivacyExport(@Body() body: PrivacyRequestDto) {
     if (this.platformGovernanceService) {
       return this.platformGovernanceService.createPrivacyRequest(
         String(body.patientId || 'demo-patient'),
@@ -330,13 +348,13 @@ export class GovernanceController {
         body,
       );
     }
-    return this.platformSystemsService.demo('privacy-center', 'privacy-export', body);
+    return this.platformSystemsService.demo('privacy-center', 'privacy-export', { ...body });
   }
 
   @Post('privacy/delete-request')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.MANAGE_PRIVACY)
-  async requestPrivacyDelete(@Body() body: Record<string, unknown>) {
+  async requestPrivacyDelete(@Body() body: PrivacyRequestDto) {
     if (this.platformGovernanceService) {
       return this.platformGovernanceService.createPrivacyRequest(
         String(body.patientId || 'demo-patient'),
@@ -344,7 +362,9 @@ export class GovernanceController {
         body,
       );
     }
-    return this.platformSystemsService.demo('privacy-center', 'privacy-delete-request', body);
+    return this.platformSystemsService.demo('privacy-center', 'privacy-delete-request', {
+      ...body,
+    });
   }
 
   @Get('privacy/requests')
@@ -361,13 +381,15 @@ export class GovernanceController {
   @Permissions(Permission.MANAGE_PRIVACY, Permission.VIEW_AUDIT_LOGS)
   async reviewPrivacyRequest(
     @Param('requestId') requestId: string,
-    @Body() body: Record<string, unknown>,
+    @Body() body: GovernanceDecisionDto,
   ) {
     if (this.platformGovernanceService) {
-      const result = await this.platformGovernanceService.reviewPrivacyRequest(requestId, body);
+      const result = await this.platformGovernanceService.reviewPrivacyRequest(requestId, {
+        ...body,
+      });
       if (result) return result;
     }
-    return this.platformSystemsService.demo('privacy-center', requestId, body);
+    return this.platformSystemsService.demo('privacy-center', requestId, { ...body });
   }
 
   @Get('governance/regulatory/capabilities')
@@ -386,9 +408,9 @@ export class GovernanceController {
   @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
   updateRegulatoryClassification(
     @Param('capabilityId') capabilityId: string,
-    @Body() body: Record<string, unknown>,
+    @Body() body: UpdateRegulatoryClassificationDto,
   ) {
-    return this.platformSystemsService.demo('regulatory-classification', capabilityId, body);
+    return this.platformSystemsService.demo('regulatory-classification', capabilityId, { ...body });
   }
 
   @Post('governance/regulatory/capabilities/:capabilityId/approve')
@@ -396,9 +418,9 @@ export class GovernanceController {
   @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
   approveRegulatoryClassification(
     @Param('capabilityId') capabilityId: string,
-    @Body() body: Record<string, unknown>,
+    @Body() body: GovernanceDecisionDto,
   ) {
-    return this.platformSystemsService.demo('regulatory-classification', capabilityId, body);
+    return this.platformSystemsService.demo('regulatory-classification', capabilityId, { ...body });
   }
 
   @Get('governance/regulatory/evidence/:capabilityId')
@@ -412,9 +434,9 @@ export class GovernanceController {
   @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
   createRegulatoryEvidenceArtifact(
     @Param('capabilityId') capabilityId: string,
-    @Body() body: Record<string, unknown>,
+    @Body() body: CreateRegulatoryEvidenceArtifactDto,
   ) {
-    return this.platformSystemsService.demo('intended-use-registry', capabilityId, body);
+    return this.platformSystemsService.demo('intended-use-registry', capabilityId, { ...body });
   }
 
   @Get('governance/equity/summary')
@@ -432,8 +454,8 @@ export class GovernanceController {
   @Post('governance/equity/cohorts')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.VIEW_ANALYTICS, Permission.VIEW_AUDIT_LOGS)
-  createEquityCohort(@Body() body: Record<string, unknown>) {
-    return this.platformSystemsService.demo('equity-monitoring', 'cohort', body);
+  createEquityCohort(@Body() body: EquityCohortDto) {
+    return this.platformSystemsService.demo('equity-monitoring', 'cohort', { ...body });
   }
 
   @Get('governance/equity/cohorts')
@@ -451,15 +473,15 @@ export class GovernanceController {
   @Post('governance/equity/findings/:findingId/review')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.VIEW_ANALYTICS, Permission.VIEW_AUDIT_LOGS)
-  reviewBiasFinding(@Param('findingId') findingId: string, @Body() body: Record<string, unknown>) {
-    return this.platformSystemsService.demo('bias-finding-review', findingId, body);
+  reviewBiasFinding(@Param('findingId') findingId: string, @Body() body: GovernanceDecisionDto) {
+    return this.platformSystemsService.demo('bias-finding-review', findingId, { ...body });
   }
 
   @Post('governance/equity/reports')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.VIEW_ANALYTICS, Permission.VIEW_AUDIT_LOGS)
-  createEquityReport(@Body() body: Record<string, unknown>) {
-    return this.platformSystemsService.demo('equity-monitoring', 'report', body);
+  createEquityReport(@Body() body: EquityReportDto) {
+    return this.platformSystemsService.demo('equity-monitoring', 'report', { ...body });
   }
 
   @Get('governance/validation/scenarios')
@@ -474,11 +496,11 @@ export class GovernanceController {
   @Post('governance/validation/scenarios')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
-  async createValidationScenario(@Body() body: Record<string, unknown>) {
+  async createValidationScenario(@Body() body: CreateValidationScenarioDto) {
     if (this.platformGovernanceService) {
-      return this.platformGovernanceService.createValidationScenario(body);
+      return this.platformGovernanceService.createValidationScenario({ ...body });
     }
-    return this.platformSystemsService.demo('validation-sandbox', 'scenario', body);
+    return this.platformSystemsService.demo('validation-sandbox', 'scenario', { ...body });
   }
 
   @Get('governance/validation/synthetic-patients')
@@ -496,7 +518,7 @@ export class GovernanceController {
   @Post('governance/validation/runs')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
-  async createValidationRun(@Body() body: Record<string, unknown>) {
+  async createValidationRun(@Body() body: CreateValidationRunDto) {
     if (this.platformGovernanceService) {
       const runId = String(body.runId || `validation-${Date.now()}`);
       const gate = await this.platformGovernanceService.createReleaseGate({
@@ -513,7 +535,7 @@ export class GovernanceController {
         synthetic: true,
       };
     }
-    return this.platformSystemsService.demo('validation-sandbox', 'run', body);
+    return this.platformSystemsService.demo('validation-sandbox', 'run', { ...body });
   }
 
   @Get('governance/validation/runs/:runId')
@@ -525,8 +547,8 @@ export class GovernanceController {
   @Post('governance/validation/runs/:runId/approve')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
-  approveValidationRun(@Param('runId') runId: string, @Body() body: Record<string, unknown>) {
-    return this.platformSystemsService.demo('validation-sandbox', runId, body);
+  approveValidationRun(@Param('runId') runId: string, @Body() body: GovernanceDecisionDto) {
+    return this.platformSystemsService.demo('validation-sandbox', runId, { ...body });
   }
 
   @Get('governance/validation/release-gates/:capabilityId')
@@ -550,11 +572,11 @@ export class GovernanceController {
   @Post('review/items')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.VIEW_AUDIT_LOGS)
-  async createReviewItem(@Body() body: Record<string, unknown>) {
+  async createReviewItem(@Body() body: CreateReviewItemDto) {
     if (this.platformGovernanceService) {
-      return this.platformGovernanceService.createReviewItem(body);
+      return this.platformGovernanceService.createReviewItem({ ...body });
     }
-    return this.platformSystemsService.demo('human-review-queue', 'review-item', body);
+    return this.platformSystemsService.demo('human-review-queue', 'review-item', { ...body });
   }
 
   @Get('review/items/:itemId')
@@ -570,26 +592,26 @@ export class GovernanceController {
   @Post('review/items/:itemId/assign')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.VIEW_AUDIT_LOGS)
-  assignReviewItem(@Param('itemId') itemId: string, @Body() body: Record<string, unknown>) {
-    return this.platformSystemsService.demo('human-review-queue', itemId, body);
+  assignReviewItem(@Param('itemId') itemId: string, @Body() body: GovernanceDecisionDto) {
+    return this.platformSystemsService.demo('human-review-queue', itemId, { ...body });
   }
 
   @Post('review/items/:itemId/decision')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.VIEW_AUDIT_LOGS)
-  async decideReviewItem(@Param('itemId') itemId: string, @Body() body: Record<string, unknown>) {
+  async decideReviewItem(@Param('itemId') itemId: string, @Body() body: GovernanceDecisionDto) {
     if (this.platformGovernanceService) {
-      const result = await this.platformGovernanceService.decideReviewItem(itemId, body);
+      const result = await this.platformGovernanceService.decideReviewItem(itemId, { ...body });
       if (result) return result;
     }
-    return this.platformSystemsService.demo('human-review-queue', itemId, body);
+    return this.platformSystemsService.demo('human-review-queue', itemId, { ...body });
   }
 
   @Post('review/items/:itemId/comments')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.VIEW_AUDIT_LOGS)
-  commentOnReviewItem(@Param('itemId') itemId: string, @Body() body: Record<string, unknown>) {
-    return this.platformSystemsService.demo('human-review-queue', itemId, body);
+  commentOnReviewItem(@Param('itemId') itemId: string, @Body() body: GovernanceDecisionDto) {
+    return this.platformSystemsService.demo('human-review-queue', itemId, { ...body });
   }
 
   @Get('patients/:patientId/review-items')
@@ -652,15 +674,15 @@ export class GovernanceController {
   @Post('audit/integrity/verify')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.VERIFY_AUDIT_INTEGRITY)
-  verifyAuditIntegrityPlaceholder(@Body() body: Record<string, unknown>) {
-    return this.platformSystemsService.demo('audit-trail-spine', 'integrity-verify', body);
+  verifyAuditIntegrityPlaceholder(@Body() body: AuditPlaceholderDto) {
+    return this.platformSystemsService.demo('audit-trail-spine', 'integrity-verify', { ...body });
   }
 
   @Post('audit/export')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.EXPORT_AUDIT_LOGS)
-  exportAuditPlaceholder(@Body() body: Record<string, unknown>) {
-    return this.platformSystemsService.demo('audit-trail-spine', 'audit-export', body);
+  exportAuditPlaceholder(@Body() body: AuditPlaceholderDto) {
+    return this.platformSystemsService.demo('audit-trail-spine', 'audit-export', { ...body });
   }
 
   @Get('operations/health')
@@ -722,8 +744,8 @@ export class GovernanceController {
   @Permissions(Permission.VIEW_ANALYTICS)
   reviewOperationsIncident(
     @Param('incidentId') incidentId: string,
-    @Body() body: Record<string, unknown>,
+    @Body() body: GovernanceDecisionDto,
   ) {
-    return this.platformSystemsService.demo('operations-incident-center', incidentId, body);
+    return this.platformSystemsService.demo('operations-incident-center', incidentId, { ...body });
   }
 }

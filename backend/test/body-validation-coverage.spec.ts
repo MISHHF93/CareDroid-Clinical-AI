@@ -32,6 +32,16 @@ import * as ts from 'typescript';
  * because the count went DOWN, a route got fixed -- update BASELINE to
  * remove it (not because the test is wrong). If it went UP, a new route was
  * added with the same unvalidated-body gap -- fix it or add it deliberately.
+ *
+ * Cycle 247: closed the single largest cluster in this baseline -- all 33
+ * GovernanceController routes plus the 6 PlatformGovernanceController routes
+ * hitting the same underlying PlatformGovernanceService (39 total, one-third
+ * of the original 117). A frontend-caller sweep confirmed zero of the 32
+ * mutation routes across both controllers have any real UI caller today, so
+ * the new DTOs (backend/src/modules/platform-governance/dto/
+ * governance-actions.dto.ts) were designed from what the controllers/service
+ * actually read off the body plus the real TypeORM entity columns each
+ * write eventually lands on, not from a reverse-engineered live payload.
  */
 
 const HTTP_BODY_DECORATORS = new Set(['Post', 'Patch', 'Put']);
@@ -112,10 +122,11 @@ function findUnvalidatedBodyParams(backendRoot: string): string[] {
   return results.sort();
 }
 
-// Generated 2026-07-30 (Cycle 242) via the exact walk above. 135 originally
-// found Cycle 241 (7 fixed that cycle); 5 more fixed this cycle (resetPassword,
-// acknowledge/dismiss, typing, toggleAllNotifications), leaving this 123-entry
-// baseline.
+// Generated 2026-07-30 (Cycle 247) via the exact walk above. 135 originally
+// found Cycle 241; worked down across Cycles 242/244/247 (5 + 6 + 39 fixed)
+// to this 78-entry baseline. Cycle 247 closed every GovernanceController and
+// PlatformGovernanceController route (39 -- see SCORECARD.md and the DTO
+// header comment for the full writeup).
 const BASELINE: string[] = [
   'src/modules/ai/ai.controller.ts :: AIController.createProposal',
   'src/modules/ai/ai.controller.ts :: AIController.executeProposal',
@@ -167,12 +178,6 @@ const BASELINE: string[] = [
   'src/modules/organizations/organizations.controller.ts :: OrganizationsController.updateSettings',
   'src/modules/organizations/organizations.controller.ts :: OrganizationsController.updateTenantAdministration',
   'src/modules/organizations/settings-features.controller.ts :: SettingsFeaturesController.updateFeatureSettings',
-  'src/modules/platform-governance/platform-governance.controller.ts :: PlatformGovernanceController.createPrivacyRequest',
-  'src/modules/platform-governance/platform-governance.controller.ts :: PlatformGovernanceController.createReviewItem',
-  'src/modules/platform-governance/platform-governance.controller.ts :: PlatformGovernanceController.createValidationScenario',
-  'src/modules/platform-governance/platform-governance.controller.ts :: PlatformGovernanceController.decideReviewItem',
-  'src/modules/platform-governance/platform-governance.controller.ts :: PlatformGovernanceController.evaluateGate',
-  'src/modules/platform-governance/platform-governance.controller.ts :: PlatformGovernanceController.upsertConsent',
   'src/modules/platform-systems/clinical-intelligence.controller.ts :: ClinicalIntelligenceController.analyzeReasoning',
   'src/modules/platform-systems/clinical-intelligence.controller.ts :: ClinicalIntelligenceController.approveDocument',
   'src/modules/platform-systems/clinical-intelligence.controller.ts :: ClinicalIntelligenceController.draftClinicalEvent',
@@ -186,39 +191,6 @@ const BASELINE: string[] = [
   'src/modules/platform-systems/clinical-intelligence.controller.ts :: ClinicalIntelligenceController.suggestCalculator',
   'src/modules/platform-systems/clinical-intelligence.controller.ts :: ClinicalIntelligenceController.summarizeAuditTrail',
   'src/modules/platform-systems/clinical-intelligence.controller.ts :: ClinicalIntelligenceController.transcribeDictation',
-  'src/modules/platform-systems/governance.controller.ts :: GovernanceController.approveClinicalPolicy',
-  'src/modules/platform-systems/governance.controller.ts :: GovernanceController.approveRegulatoryClassification',
-  'src/modules/platform-systems/governance.controller.ts :: GovernanceController.approveValidationRun',
-  'src/modules/platform-systems/governance.controller.ts :: GovernanceController.assignReviewItem',
-  'src/modules/platform-systems/governance.controller.ts :: GovernanceController.commentOnReviewItem',
-  'src/modules/platform-systems/governance.controller.ts :: GovernanceController.createClinicalPolicy',
-  'src/modules/platform-systems/governance.controller.ts :: GovernanceController.createEquityCohort',
-  'src/modules/platform-systems/governance.controller.ts :: GovernanceController.createEquityReport',
-  'src/modules/platform-systems/governance.controller.ts :: GovernanceController.createRegulatoryEvidenceArtifact',
-  'src/modules/platform-systems/governance.controller.ts :: GovernanceController.createReviewItem',
-  'src/modules/platform-systems/governance.controller.ts :: GovernanceController.createValidationRun',
-  'src/modules/platform-systems/governance.controller.ts :: GovernanceController.createValidationScenario',
-  'src/modules/platform-systems/governance.controller.ts :: GovernanceController.decideClinicalReleaseGate',
-  'src/modules/platform-systems/governance.controller.ts :: GovernanceController.decideReviewItem',
-  'src/modules/platform-systems/governance.controller.ts :: GovernanceController.evaluatePromptSecurity',
-  'src/modules/platform-systems/governance.controller.ts :: GovernanceController.exportAuditPlaceholder',
-  'src/modules/platform-systems/governance.controller.ts :: GovernanceController.requestPrivacyDelete',
-  'src/modules/platform-systems/governance.controller.ts :: GovernanceController.requestPrivacyExport',
-  'src/modules/platform-systems/governance.controller.ts :: GovernanceController.reviewAiSecurityIncident',
-  'src/modules/platform-systems/governance.controller.ts :: GovernanceController.reviewBiasFinding',
-  'src/modules/platform-systems/governance.controller.ts :: GovernanceController.reviewClinicalSafetyFinding',
-  'src/modules/platform-systems/governance.controller.ts :: GovernanceController.reviewGovernanceSafetyFinding',
-  'src/modules/platform-systems/governance.controller.ts :: GovernanceController.reviewOperationsIncident',
-  'src/modules/platform-systems/governance.controller.ts :: GovernanceController.reviewPrivacyRequest',
-  'src/modules/platform-systems/governance.controller.ts :: GovernanceController.revokeConsent',
-  'src/modules/platform-systems/governance.controller.ts :: GovernanceController.updateAiPolicy',
-  'src/modules/platform-systems/governance.controller.ts :: GovernanceController.updateClinicalPolicy',
-  'src/modules/platform-systems/governance.controller.ts :: GovernanceController.updateConsent',
-  'src/modules/platform-systems/governance.controller.ts :: GovernanceController.updateCostBudget',
-  'src/modules/platform-systems/governance.controller.ts :: GovernanceController.updateModelAccessPolicy',
-  'src/modules/platform-systems/governance.controller.ts :: GovernanceController.updatePromptFirewallRule',
-  'src/modules/platform-systems/governance.controller.ts :: GovernanceController.updateRegulatoryClassification',
-  'src/modules/platform-systems/governance.controller.ts :: GovernanceController.verifyAuditIntegrityPlaceholder',
   'src/modules/platform-systems/integrations.controller.ts :: IntegrationsController.createFhirConnection',
   'src/modules/platform-systems/integrations.controller.ts :: IntegrationsController.previewHl7MessageReplay',
   'src/modules/platform-systems/integrations.controller.ts :: IntegrationsController.syncFhirConnection',

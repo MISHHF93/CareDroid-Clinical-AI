@@ -15,6 +15,14 @@ import { Permissions } from '../auth/decorators/permissions.decorator';
 import { Permission } from '../auth/enums/permission.enum';
 import { AuthorizationGuard } from '../auth/guards/authorization.guard';
 import { PlatformGovernanceService } from './platform-governance.service';
+import {
+  EvaluateGateDto,
+  CreateReviewItemDto,
+  GovernanceDecisionDto,
+  ConsentActionDto,
+  PrivacyRequestDto,
+  CreateValidationScenarioDto,
+} from './dto/governance-actions.dto';
 
 @ApiTags('platform-governance')
 @ApiBearerAuth()
@@ -32,7 +40,7 @@ export class PlatformGovernanceController {
   @Post('gate/evaluate')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.USE_AI_CHAT)
-  evaluateGate(@Body() body: Record<string, any>, @Req() req: any) {
+  evaluateGate(@Body() body: EvaluateGateDto, @Req() req: any) {
     return this.platformGovernanceService.evaluateGate({
       runId: body.runId,
       capabilityId: body.capabilityId || 'clinical-chat',
@@ -66,15 +74,15 @@ export class PlatformGovernanceController {
   @Post('review/items')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.VIEW_AUDIT_LOGS)
-  createReviewItem(@Body() body: Record<string, any>) {
-    return this.platformGovernanceService.createReviewItem(body);
+  createReviewItem(@Body() body: CreateReviewItemDto) {
+    return this.platformGovernanceService.createReviewItem({ ...body });
   }
 
   @Post('review/items/:itemId/decision')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.VIEW_AUDIT_LOGS)
-  decideReviewItem(@Param('itemId') itemId: string, @Body() body: Record<string, any>) {
-    return this.platformGovernanceService.decideReviewItem(itemId, body);
+  decideReviewItem(@Param('itemId') itemId: string, @Body() body: GovernanceDecisionDto) {
+    return this.platformGovernanceService.decideReviewItem(itemId, { ...body });
   }
 
   @Get('consent/:patientId')
@@ -89,9 +97,9 @@ export class PlatformGovernanceController {
   upsertConsent(
     @Param('patientId') patientId: string,
     @Param('scope') scope: string,
-    @Body() body: Record<string, any>,
+    @Body() body: ConsentActionDto,
   ) {
-    return this.platformGovernanceService.upsertConsent(patientId, scope, body);
+    return this.platformGovernanceService.upsertConsent(patientId, scope, { ...body });
   }
 
   @Post('privacy/:patientId/:requestType')
@@ -100,9 +108,9 @@ export class PlatformGovernanceController {
   createPrivacyRequest(
     @Param('patientId') patientId: string,
     @Param('requestType') requestType: string,
-    @Body() body: Record<string, any>,
+    @Body() body: PrivacyRequestDto,
   ) {
-    return this.platformGovernanceService.createPrivacyRequest(patientId, requestType, body);
+    return this.platformGovernanceService.createPrivacyRequest(patientId, requestType, { ...body });
   }
 
   @Get('source-provenance/:sourceId')
@@ -132,8 +140,8 @@ export class PlatformGovernanceController {
   @Post('validation/scenarios')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
-  createValidationScenario(@Body() body: Record<string, any>) {
-    return this.platformGovernanceService.createValidationScenario(body);
+  createValidationScenario(@Body() body: CreateValidationScenarioDto) {
+    return this.platformGovernanceService.createValidationScenario({ ...body });
   }
 
   @Get('observability')
