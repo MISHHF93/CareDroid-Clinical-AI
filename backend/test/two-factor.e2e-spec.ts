@@ -6,6 +6,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import request from 'supertest';
 import * as speakeasy from 'speakeasy';
 import { AuthModule } from '../src/modules/auth/auth.module';
+import { TenantContextModule } from '../src/modules/tenant-context/tenant-context.module';
 import { AuthService } from '../src/modules/auth/auth.service';
 import { TwoFactorService } from '../src/modules/two-factor/two-factor.service';
 import { AuditService } from '../src/modules/audit/audit.service';
@@ -17,6 +18,17 @@ import { Subscription } from '../src/modules/subscriptions/entities/subscription
 import { AuditLog } from '../src/modules/audit/entities/audit-log.entity';
 import { TwoFactor } from '../src/modules/two-factor/entities/two-factor.entity';
 import { BiometricConfig } from '../src/modules/auth/entities/biometric-config.entity';
+import { Organization } from '../src/modules/workspaces/entities/organization.entity';
+import { OrganizationMembership } from '../src/modules/organizations/entities/organization-membership.entity';
+import { Workspace } from '../src/modules/workspaces/entities/workspace.entity';
+import { WorkspaceMembership } from '../src/modules/workspaces/entities/workspace-membership.entity';
+import { UserWorkspaceState } from '../src/modules/workspaces/entities/user-workspace-state.entity';
+import { PlatformAsset } from '../src/modules/platform-assets/entities/platform-asset.entity';
+import { AssetPack } from '../src/modules/platform-assets/entities/asset-pack.entity';
+import { RoleProfile } from '../src/modules/platform-assets/entities/role-profile.entity';
+import { OrganizationEntitlement } from '../src/modules/platform-assets/entities/organization-entitlement.entity';
+import { UsageEvent } from '../src/modules/subscriptions/entities/usage-event.entity';
+import { Product } from '../src/modules/product-catalog/entities/product.entity';
 
 jest.setTimeout(120_000);
 
@@ -60,11 +72,23 @@ describe('Two-Factor Authentication (e2e)', () => {
             AuditLog,
             TwoFactor,
             BiometricConfig,
+            Organization,
+            OrganizationMembership,
+            Workspace,
+            WorkspaceMembership,
+            UserWorkspaceState,
+            PlatformAsset,
+            AssetPack,
+            RoleProfile,
+            OrganizationEntitlement,
+            UsageEvent,
+            Product,
           ],
           synchronize: true,
           logging: false,
         }),
         ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
+        TenantContextModule,
         AuthModule,
       ],
     }).compile();

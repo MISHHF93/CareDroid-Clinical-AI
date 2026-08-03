@@ -22,6 +22,7 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { IdentityProviderRegistryService } from './identity-provider-registry.service';
+import { SkipTenantIsolation } from '../tenant-context/tenant-scope.decorator';
 
 // Tighter than the app-wide default (100 req/min) — credential-guessing
 // endpoints get a stricter ceiling than general API traffic.
@@ -231,6 +232,7 @@ export class AuthController {
 
   @Get('me')
   @UseGuards(AuthGuard('jwt'))
+  @SkipTenantIsolation()
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get current authenticated user' })
   @ApiResponse({ status: 200, description: 'Current user data' })

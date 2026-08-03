@@ -6,6 +6,9 @@ describe('TenantContextInterceptor', () => {
   const tenantContextService = {
     resolveForRequest: jest.fn(),
   };
+  const reflector = {
+    getAllAndOverride: jest.fn(),
+  };
   const next = { handle: jest.fn(() => of('ok')) };
 
   const buildContext = (request: any) =>
@@ -14,10 +17,13 @@ describe('TenantContextInterceptor', () => {
       switchToHttp: () => ({
         getRequest: () => request,
       }),
+      getHandler: () => ({}),
+      getClass: () => ({}),
     }) as any;
 
   beforeEach(() => {
     jest.clearAllMocks();
+    reflector.getAllAndOverride.mockReturnValue(undefined);
     tenantContextService.resolveForRequest.mockResolvedValue({
       organizationId: 'org-1',
       workspaceId: 'workspace-1',
@@ -36,7 +42,7 @@ describe('TenantContextInterceptor', () => {
       method: 'GET',
       originalUrl: '/api/ai/usage',
     };
-    const interceptor = new TenantContextInterceptor(tenantContextService as any);
+    const interceptor = new TenantContextInterceptor(tenantContextService as any, reflector as any);
 
     await interceptor.intercept(buildContext(request), next as any);
 
@@ -54,7 +60,7 @@ describe('TenantContextInterceptor', () => {
       method: 'GET',
       originalUrl: '/api/subscriptions/plans',
     };
-    const interceptor = new TenantContextInterceptor(tenantContextService as any);
+    const interceptor = new TenantContextInterceptor(tenantContextService as any, reflector as any);
 
     await interceptor.intercept(buildContext(request), next as any);
 
@@ -72,10 +78,35 @@ describe('TenantContextInterceptor', () => {
       method: 'GET',
       originalUrl: '/api/ai/usage',
     };
-    const interceptor = new TenantContextInterceptor(tenantContextService as any);
+    const interceptor = new TenantContextInterceptor(tenantContextService as any, reflector as any);
 
     await expect(interceptor.intercept(buildContext(request), next as any)).rejects.toBeInstanceOf(
       ForbiddenException,
     );
+  });
+
+  /**
+   * Regression test: this interceptor previously only checked the static
+   * bootstrap-path allowlist, so @SkipTenantIsolation() silently had no
+   * effect here even though TenantIsolationGuard honored it -- an
+   * authenticated request to a skip-decorated route (e.g. GET /auth/me)
+   * would pass the guard but still get its tenant context resolved (and
+   * thrown on) by this interceptor.
+   */
+  it('skips tenant resolution for routes marked @SkipTenantIsolation(), matching the guard', async () => {
+    reflector.getAllAndOverride.mockReturnValue(true);
+    const request: any = {
+      user: { id: 'user-1' },
+      headers: {},
+      method: 'GET',
+      originalUrl: '/api/auth/me',
+    };
+    const interceptor = new TenantContextInterceptor(tenantContextService as any, reflector as any);
+
+    await interceptor.intercept(buildContext(request), next as any);
+
+    expect(tenantContextService.resolveForRequest).not.toHaveBeenCalled();
+    expect(request.tenantContext).toBeUndefined();
+    expect(next.handle).toHaveBeenCalled();
   });
 });

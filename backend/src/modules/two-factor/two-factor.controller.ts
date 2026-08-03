@@ -3,10 +3,20 @@ import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse } from '@nestjs/swagg
 import { AuthGuard } from '@nestjs/passport';
 import { TwoFactorService } from './two-factor.service';
 import { EnableTwoFactorDto, VerifyTwoFactorDto } from './dto/two-factor.dto';
+import { SkipTenantIsolation } from '../tenant-context/tenant-scope.decorator';
 
+/**
+ * Every route here operates purely on req.user.id (the caller's own 2FA
+ * settings) with no organization/workspace-scoped data, so this controller
+ * is exempt from tenant isolation -- users must be able to manage their own
+ * 2FA before joining or creating any organization, matching the same
+ * bootstrap-safety reasoning already applied to /organizations (current/
+ * create) and /auth/me.
+ */
 @ApiTags('two-factor')
 @Controller('two-factor')
 @UseGuards(AuthGuard('jwt'))
+@SkipTenantIsolation()
 @ApiBearerAuth()
 export class TwoFactorController {
   constructor(private readonly twoFactorService: TwoFactorService) {}
