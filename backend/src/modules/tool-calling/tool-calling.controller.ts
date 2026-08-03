@@ -12,12 +12,12 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { ToolExecutionService } from './tool-execution.service';
 import { ToolResolverService } from './tool-resolver.service';
-import { ToolCallingRequest } from './tool-calling.types';
 import { EntitlementService } from '../platform-assets/entitlement.service';
 import {
   assertEntitlementLaunchFromRequest,
   resolveToolCallingAssetId,
 } from '../platform-assets/entitlement-launch.util';
+import { ToolCallingExecuteDto } from './dto/tool-calling-execute.dto';
 
 @Controller('tool-calling')
 @UseGuards(AuthGuard('jwt'))
@@ -30,7 +30,7 @@ export class ToolCallingController {
 
   @Post('execute')
   @HttpCode(HttpStatus.OK)
-  async execute(@Body() body: ToolCallingRequest, @Request() req: any) {
+  async execute(@Body() body: ToolCallingExecuteDto, @Request() req: any) {
     await assertEntitlementLaunchFromRequest(
       this.entitlementService,
       req,

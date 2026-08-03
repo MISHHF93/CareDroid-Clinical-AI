@@ -1,7 +1,7 @@
 import { Body, Controller, Get, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { CostOptimizationRequest } from './cost-optimizer.types';
 import { RoutingOptimizerService } from './routing-optimizer.service';
+import { CostOptimizationRequestDto } from './dto/cost-optimizer-request.dto';
 
 @Controller('cost-optimizer')
 @UseGuards(AuthGuard('jwt'))
@@ -10,7 +10,7 @@ export class CostOptimizerController {
 
   @Post('route')
   @HttpCode(HttpStatus.OK)
-  route(@Body() body: CostOptimizationRequest) {
+  route(@Body() body: CostOptimizationRequestDto) {
     return this.routingOptimizer.optimizeRequest(body);
   }
 

@@ -7,6 +7,7 @@ import { TenantScoped } from '../tenant-context/tenant-scope.decorator';
 import { AuditService } from '../audit/audit.service';
 import { AuditAction } from '../audit/entities/audit-log.entity';
 import { OrganizationsService } from './organizations.service';
+import { UpdateFeatureSettingDto } from './dto/update-feature-setting.dto';
 
 @ApiTags('settings')
 @Controller('settings/features')
@@ -35,7 +36,7 @@ export class SettingsFeaturesController {
     permissions: [Permission.CONFIGURE_SYSTEM],
   })
   @ApiOperation({ summary: 'Update an CareDroid feature flag for the current tenant' })
-  async updateFeatureSettings(@Req() req: any, @Body() body: Record<string, any>) {
+  async updateFeatureSettings(@Req() req: any, @Body() body: UpdateFeatureSettingDto) {
     const result = await this.organizationsService.updateEmergencyFeatureSetting(
       req.user,
       req.tenantContext.organizationId,

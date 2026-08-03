@@ -28,6 +28,11 @@ import {
   ExecuteAiActionProposalDto,
   RejectAiActionProposalDto,
 } from '../src/modules/ai/dto/ai-action-proposal-actions.dto';
+import { SyncAuditEventDto } from '../src/modules/audit/dto/sync-audit-event.dto';
+import { CostOptimizationRequestDto } from '../src/modules/cost-optimizer/dto/cost-optimizer-request.dto';
+import { EdCopilotQueryDto } from '../src/modules/emergency-os/dto/ed-copilot-nest-parity.dto';
+import { UpdateFeatureSettingDto } from '../src/modules/organizations/dto/update-feature-setting.dto';
+import { ToolCallingExecuteDto } from '../src/modules/tool-calling/dto/tool-calling-execute.dto';
 import {
   HandoverRequestDto,
   Process112CallDto,
@@ -520,6 +525,93 @@ describe('backend contract hardening', () => {
       pipe.transform(
         { result: { orderId: 'ord-1' }, unexpectedField: 'x' },
         bodyMetadata(ExecuteAiActionProposalDto),
+      ),
+    ).rejects.toThrow(BadRequestException);
+  });
+
+  /**
+   * Cycle 255: same proof for the 5 small single-route DTOs closed this
+   * cycle. SyncAuditEventDto and UpdateFeatureSettingDto in particular
+   * mirror real caller payloads exactly (src/services/syncService.ts and
+   * src/services/emergencySettingsApi.tsx respectively), so a legitimate
+   * real-world body must still pass cleanly.
+   */
+  it('the 5 single-route DTOs closed this cycle actually get whitelist-validated by the real global ValidationPipe (Cycle 255)', async () => {
+    const pipe = new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    });
+    const bodyMetadata = (metatype: ArgumentMetadata['metatype']): ArgumentMetadata => ({
+      type: 'body',
+      metatype,
+      data: undefined,
+    });
+
+    await expect(
+      pipe.transform(
+        {
+          action: 'patient.viewed',
+          resourceType: 'patient',
+          resourceId: 'p-1',
+          timestamp: '2026-08-03T00:00:00.000Z',
+        },
+        bodyMetadata(SyncAuditEventDto),
+      ),
+    ).resolves.toMatchObject({ action: 'patient.viewed', resourceId: 'p-1' });
+    await expect(
+      pipe.transform(
+        { action: 'patient.viewed', unexpectedField: 'x' },
+        bodyMetadata(SyncAuditEventDto),
+      ),
+    ).rejects.toThrow(BadRequestException);
+
+    await expect(
+      pipe.transform(
+        { prompt: 'summarize this patient' },
+        bodyMetadata(CostOptimizationRequestDto),
+      ),
+    ).resolves.toMatchObject({ prompt: 'summarize this patient' });
+    await expect(
+      pipe.transform(
+        { prompt: 'x', unexpectedField: 'x' },
+        bodyMetadata(CostOptimizationRequestDto),
+      ),
+    ).rejects.toThrow(BadRequestException);
+
+    await expect(
+      pipe.transform(
+        { query: 'chest pain workup', user_role: 'physician' },
+        bodyMetadata(EdCopilotQueryDto),
+      ),
+    ).resolves.toMatchObject({ query: 'chest pain workup', user_role: 'physician' });
+    await expect(
+      pipe.transform({ query: 'x', unexpectedField: 'x' }, bodyMetadata(EdCopilotQueryDto)),
+    ).rejects.toThrow(BadRequestException);
+
+    await expect(
+      pipe.transform(
+        { featureId: 'smart-triage', enabled: true },
+        bodyMetadata(UpdateFeatureSettingDto),
+      ),
+    ).resolves.toMatchObject({ featureId: 'smart-triage', enabled: true });
+    await expect(
+      pipe.transform(
+        { featureId: 'smart-triage', unexpectedField: 'x' },
+        bodyMetadata(UpdateFeatureSettingDto),
+      ),
+    ).rejects.toThrow(BadRequestException);
+
+    await expect(
+      pipe.transform({ prompt: 'order a troponin' }, bodyMetadata(ToolCallingExecuteDto)),
+    ).resolves.toMatchObject({ prompt: 'order a troponin' });
+    await expect(
+      pipe.transform({ unexpectedField: 'x' }, bodyMetadata(ToolCallingExecuteDto)),
+    ).rejects.toThrow(BadRequestException);
+    await expect(
+      pipe.transform(
+        { prompt: 'order a troponin', unexpectedField: 'x' },
+        bodyMetadata(ToolCallingExecuteDto),
       ),
     ).rejects.toThrow(BadRequestException);
   });

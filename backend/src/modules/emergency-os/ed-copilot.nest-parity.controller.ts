@@ -11,6 +11,7 @@ import { RequirePermission } from '../auth/decorators/permissions.decorator';
 import { Permission } from '../auth/enums/permission.enum';
 import { EDCopilotService } from './emergency-os.services';
 import { buildAccountableRecommendationDto } from '../ai/dto/accountable-recommendation.dto';
+import { EdCopilotQueryDto } from './dto/ed-copilot-nest-parity.dto';
 
 @ApiTags('copilot')
 @ApiBearerAuth()
@@ -22,9 +23,7 @@ export class EdCopilotNestParityController {
   @Post('query')
   @RequirePermission(Permission.USE_AI_CHAT)
   @ApiOperation({ summary: 'ED Copilot query (Nest parity for Express /api/copilot/query)' })
-  async query(
-    @Body() body: { query?: string; user_role?: string; context?: Record<string, unknown> },
-  ) {
+  async query(@Body() body: EdCopilotQueryDto) {
     if (!body?.query || !body?.user_role) {
       return {
         success: false,

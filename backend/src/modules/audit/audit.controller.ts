@@ -16,6 +16,7 @@ import { AuditAction } from './entities/audit-log.entity';
 import { AuthorizationGuard } from '../auth/guards/authorization.guard';
 import { RequirePermission } from '../auth/decorators/permissions.decorator';
 import { Permission } from '../auth/enums/permission.enum';
+import { SyncAuditEventDto } from './dto/sync-audit-event.dto';
 
 @Controller('audit')
 @UseGuards(AuthGuard('jwt'), AuthorizationGuard)
@@ -25,7 +26,7 @@ export class AuditController {
   constructor(private readonly auditService: AuditService) {}
 
   @Post('sync')
-  async syncAuditEvent(@Body() body: Record<string, any>, @Req() req: any) {
+  async syncAuditEvent(@Body() body: SyncAuditEventDto, @Req() req: any) {
     const action = String(body.action || body.eventType || 'client_audit_event');
     const resourceType = String(body.resourceType || 'client');
     const resourceId = body.resourceId ? String(body.resourceId) : 'event';

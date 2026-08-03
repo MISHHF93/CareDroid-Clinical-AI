@@ -133,6 +133,28 @@ import * as ts from 'typescript';
  * caused `EmergencyOsController.updateSettings` to be deferred back in
  * Cycle 249 -- the same risk profile, not newly discovered here, deserving
  * its own dedicated cycle rather than a rushed drive-by.
+ *
+ * Cycle 255: closed all 5 remaining single-route, non-deferred files in one
+ * pass -- each small enough that bundling them was more efficient than 5
+ * separate cycles (matching Cycle 242's precedent of closing several small
+ * single-entry routes together): AuditController.syncAuditEvent (real
+ * caller: src/services/syncService.ts's syncAuditLogs(), the offline-sync-
+ * on-reconnect flow, sending exactly {action, resourceType, resourceId,
+ * timestamp}); CostOptimizerController.route (zero real callers, DTO
+ * mirrors cost-optimizer.types.ts's own CostOptimizationRequest exactly);
+ * EdCopilotNestParityController.query (zero real callers -- confirmed real
+ * traffic goes to the separate, already-DTO'd /api/emergency/copilot/query
+ * instead; both fields kept optional to preserve the handler's existing
+ * manual validation-error response instead of Nest's generic 400);
+ * SettingsFeaturesController.updateFeatureSettings (real caller:
+ * src/services/emergencySettingsApi.tsx's updateSettingsFeatureFlag(),
+ * invoked from src/store/emergencyStore.ts, sending exactly the 4 fields
+ * organizations.service.ts's updateEmergencyFeatureSetting() already
+ * declares); ToolCallingController.execute (zero real callers, DTO mirrors
+ * tool-calling.types.ts's own ToolCallingRequest exactly, including typing
+ * `classification` as the real IntentClassification rather than a loosened
+ * Record<> so the DTO stays structurally assignable to
+ * ToolExecutionService.executePrompt()'s parameter type).
  */
 
 const HTTP_BODY_DECORATORS = new Set(['Post', 'Patch', 'Put']);
@@ -213,15 +235,15 @@ function findUnvalidatedBodyParams(backendRoot: string): string[] {
   return results.sort();
 }
 
-// Generated 2026-07-31 (Cycle 254) via the exact walk above. 135 originally
+// Generated 2026-08-03 (Cycle 255) via the exact walk above. 135 originally
 // found Cycle 241; worked down across Cycles 242/244/247/248/249/250/251/
-// 252/253/254 (5 + 6 + 39 + 13 + 23 + 8 + 6 + 5 + 5 + 3 fixed) to this
-// 15-entry baseline. Cycle 254 closed every route on AIController -- see
-// SCORECARD.md and the DTO header comment for the full writeup.
+// 252/253/254/255 (5 + 6 + 39 + 13 + 23 + 8 + 6 + 5 + 5 + 3 + 5 fixed) to
+// this 10-entry baseline. Cycle 255 closed the 5 remaining non-deferred
+// single-route files -- see SCORECARD.md and the DTO header comments for
+// the full writeup. All 10 remaining entries are deliberately deferred
+// (patient-creation shape-divergence risk or large nested settings blobs),
+// not newly discovered gaps.
 const BASELINE: string[] = [
-  'src/modules/audit/audit.controller.ts :: AuditController.syncAuditEvent',
-  'src/modules/cost-optimizer/cost-optimizer.controller.ts :: CostOptimizerController.route',
-  'src/modules/emergency-os/ed-copilot.nest-parity.controller.ts :: EdCopilotNestParityController.query',
   'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.createIntakePatient',
   'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.createPatient',
   'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.createSmartIntakeVerticalSlice',
@@ -229,11 +251,9 @@ const BASELINE: string[] = [
   'src/modules/organizations/organizations.controller.ts :: OrganizationsController.updateFeatureFlags',
   'src/modules/organizations/organizations.controller.ts :: OrganizationsController.updateSettings',
   'src/modules/organizations/organizations.controller.ts :: OrganizationsController.updateTenantAdministration',
-  'src/modules/organizations/settings-features.controller.ts :: SettingsFeaturesController.updateFeatureSettings',
   'src/modules/platform-systems/platform-systems.controller.ts :: PlatformSystemsController.createEmergencyPatient',
   'src/modules/platform-systems/platform-systems.controller.ts :: PlatformSystemsController.createEmergencyReferral',
   'src/modules/platform-systems/platform-systems.controller.ts :: PlatformSystemsController.updateEmergencyPatient',
-  'src/modules/tool-calling/tool-calling.controller.ts :: ToolCallingController.execute',
 ].sort();
 
 describe('body validation coverage (Cycle 241)', () => {
