@@ -112,6 +112,27 @@ import * as ts from 'typescript';
  * in src/services/nativeAiApi.ts send exactly the expected shapes, but only
  * fetchClinicalAcuityLeaderboard is actually invoked today -- the other 4
  * are real, wired code with no UI trigger yet.
+ *
+ * Cycle 254: closed AIController's 3 remaining routes (createProposal/
+ * rejectProposal/executeProposal). All 3 previously took `Record<string,
+ * unknown>` and manually coerced every field with `String(x || y ||
+ * default)`-style fallbacks -- the controller's own code already proved
+ * every field is honestly optional at this boundary. The new DTOs
+ * (backend/src/modules/ai/dto/ai-action-proposal-actions.dto.ts) mirror
+ * AiActionProposalService.create()'s own already-declared inline input
+ * type field-for-field. A frontend sweep found the interactive-AI action-
+ * proposal UI (actionProposalService.ts) is a fully separate, local-only,
+ * in-memory implementation that never calls these backend routes at all --
+ * real, wired code with zero live callers today, same pattern as several
+ * prior cycles. `organizations.controller.ts`'s 3 routes (updateSettings/
+ * updateFeatureFlags/updateTenantAdministration) were investigated and
+ * deliberately left open this cycle: their service methods merge into the
+ * same kind of large, multi-section, deeply-nested settings blob (branding,
+ * subscription, integrations, departments, workspaceDefaults, permissions
+ * overrides, navigation, dashboardLayout, feature-flag platform state) that
+ * caused `EmergencyOsController.updateSettings` to be deferred back in
+ * Cycle 249 -- the same risk profile, not newly discovered here, deserving
+ * its own dedicated cycle rather than a rushed drive-by.
  */
 
 const HTTP_BODY_DECORATORS = new Set(['Post', 'Patch', 'Put']);
@@ -192,15 +213,12 @@ function findUnvalidatedBodyParams(backendRoot: string): string[] {
   return results.sort();
 }
 
-// Generated 2026-07-31 (Cycle 253) via the exact walk above. 135 originally
+// Generated 2026-07-31 (Cycle 254) via the exact walk above. 135 originally
 // found Cycle 241; worked down across Cycles 242/244/247/248/249/250/251/
-// 252/253 (5 + 6 + 39 + 13 + 23 + 8 + 6 + 5 + 5 fixed) to this 18-entry
-// baseline. Cycle 253 closed every route on NativeAiController -- see
+// 252/253/254 (5 + 6 + 39 + 13 + 23 + 8 + 6 + 5 + 5 + 3 fixed) to this
+// 15-entry baseline. Cycle 254 closed every route on AIController -- see
 // SCORECARD.md and the DTO header comment for the full writeup.
 const BASELINE: string[] = [
-  'src/modules/ai/ai.controller.ts :: AIController.createProposal',
-  'src/modules/ai/ai.controller.ts :: AIController.executeProposal',
-  'src/modules/ai/ai.controller.ts :: AIController.rejectProposal',
   'src/modules/audit/audit.controller.ts :: AuditController.syncAuditEvent',
   'src/modules/cost-optimizer/cost-optimizer.controller.ts :: CostOptimizerController.route',
   'src/modules/emergency-os/ed-copilot.nest-parity.controller.ts :: EdCopilotNestParityController.query',

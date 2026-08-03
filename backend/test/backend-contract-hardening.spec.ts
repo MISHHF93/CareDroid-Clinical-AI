@@ -24,6 +24,11 @@ import {
   PatientPayloadDto,
 } from '../src/modules/native-ai/dto/native-ai-actions.dto';
 import {
+  CreateAiActionProposalDto,
+  ExecuteAiActionProposalDto,
+  RejectAiActionProposalDto,
+} from '../src/modules/ai/dto/ai-action-proposal-actions.dto';
+import {
   HandoverRequestDto,
   Process112CallDto,
 } from '../src/modules/emergency-os/dto/emergency-os-research-actions.dto';
@@ -455,6 +460,66 @@ describe('backend contract hardening', () => {
       pipe.transform(
         { naturalLanguage: 'rule text', unexpectedField: 'x' },
         bodyMetadata(AddTriageRuleDto),
+      ),
+    ).rejects.toThrow(BadRequestException);
+  });
+
+  /**
+   * Cycle 254: same proof for AIController's action-proposal DTOs.
+   * CreateAiActionProposalDto in particular mirrors AiActionProposalService
+   * .create()'s own already-declared inline input type -- every field is
+   * honestly optional, matching the controller's pre-existing
+   * String(x || y || default)-style fallback behavior, so a minimal or
+   * empty body still passes cleanly while an injected field is rejected.
+   */
+  it('AI action-proposal DTO classes actually get whitelist-validated by the real global ValidationPipe (Cycle 254)', async () => {
+    const pipe = new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    });
+    const bodyMetadata = (metatype: ArgumentMetadata['metatype']): ArgumentMetadata => ({
+      type: 'body',
+      metatype,
+      data: undefined,
+    });
+
+    await expect(
+      pipe.transform(
+        { toolName: 'order_troponin', riskLevel: 'moderate', previewSummary: 'Order troponin' },
+        bodyMetadata(CreateAiActionProposalDto),
+      ),
+    ).resolves.toMatchObject({ toolName: 'order_troponin', riskLevel: 'moderate' });
+    await expect(
+      pipe.transform({}, bodyMetadata(CreateAiActionProposalDto)),
+    ).resolves.toMatchObject({});
+    await expect(
+      pipe.transform(
+        { toolName: 'order_troponin', unexpectedField: 'x' },
+        bodyMetadata(CreateAiActionProposalDto),
+      ),
+    ).rejects.toThrow(BadRequestException);
+
+    await expect(
+      pipe.transform(
+        { reason: 'Not clinically indicated' },
+        bodyMetadata(RejectAiActionProposalDto),
+      ),
+    ).resolves.toMatchObject({ reason: 'Not clinically indicated' });
+    await expect(
+      pipe.transform(
+        { reason: 'x', unexpectedField: 'x' },
+        bodyMetadata(RejectAiActionProposalDto),
+      ),
+    ).rejects.toThrow(BadRequestException);
+
+    await expect(
+      pipe.transform({ result: { orderId: 'ord-1' } }, bodyMetadata(ExecuteAiActionProposalDto)),
+    ).resolves.toMatchObject({ result: { orderId: 'ord-1' } });
+    await expect(
+      pipe.transform(
+        { result: { orderId: 'ord-1' }, unexpectedField: 'x' },
+        bodyMetadata(ExecuteAiActionProposalDto),
       ),
     ).rejects.toThrow(BadRequestException);
   });

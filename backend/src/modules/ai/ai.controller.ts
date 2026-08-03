@@ -14,6 +14,11 @@ import { AuthGuard } from '@nestjs/passport';
 import { AIService } from './ai.service';
 import { AIQueryDto, CareDroidAINodeDto, StructuredJSONDto, UnifiedAiQueryDto } from './dto/ai.dto';
 import { AiActionProposalService, type AiActionProposalState } from './ai-action-proposal.service';
+import {
+  CreateAiActionProposalDto,
+  ExecuteAiActionProposalDto,
+  RejectAiActionProposalDto,
+} from './dto/ai-action-proposal-actions.dto';
 import { OrganizationsService } from '../organizations/organizations.service';
 import { Permission } from '../auth/enums/permission.enum';
 import { TenantIsolationGuard } from '../tenant-context/tenant-isolation.guard';
@@ -139,7 +144,7 @@ export class AIController {
   @Post('proposals')
   @WorkspaceScoped({ permissions: [Permission.USE_AI_CHAT] })
   @ApiOperation({ summary: 'Create an AI action proposal (preview before execute)' })
-  async createProposal(@Req() req: any, @Body() body: Record<string, unknown>) {
+  async createProposal(@Req() req: any, @Body() body: CreateAiActionProposalDto) {
     await this.assertAiFeatureAllowed(req, { assetId: 'agent-clinical' });
     return this.actionProposals.create({
       organizationId: req.tenantContext?.organizationId || (body.organizationId as string),
@@ -220,7 +225,7 @@ export class AIController {
   @ApiOperation({ summary: 'Reject an AI action proposal' })
   async rejectProposal(
     @Param('proposalId') proposalId: string,
-    @Body() body: Record<string, unknown>,
+    @Body() body: RejectAiActionProposalDto,
   ) {
     return this.actionProposals.reject(
       proposalId,
@@ -236,7 +241,7 @@ export class AIController {
   })
   async executeProposal(
     @Param('proposalId') proposalId: string,
-    @Body() body: Record<string, unknown>,
+    @Body() body: ExecuteAiActionProposalDto,
   ) {
     return this.actionProposals.execute(
       proposalId,
