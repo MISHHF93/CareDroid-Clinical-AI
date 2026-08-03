@@ -235,7 +235,7 @@
 }
 
 /* —— Reception desk: borderless action areas —— */
-.emergency-app-shell .reception-command :is(
+.emergency-app-shell .reception-workspace :is(
     .reception-command-header,
     .reception-command-panel,
     .reception-desk-toolbar,
@@ -248,7 +248,7 @@
   box-shadow: none;
 }
 
-.emergency-app-shell .reception-command {
+.emergency-app-shell .reception-workspace {
   gap: var(--cdl-clinical-section-gap);
 }
 

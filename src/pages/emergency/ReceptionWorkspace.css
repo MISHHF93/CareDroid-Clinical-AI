@@ -1,4 +1,16 @@
-.reception-command {
+.reception-workspace {
+  /*
+   * These custom properties used to live on a `.reception-command` selector
+   * that no DOM node ever carries (confirmed by a full grep of every .tsx
+   * consumer -- only compound class names like `.reception-command-panel`
+   * are ever rendered, never the bare class), so every var(--reception-
+   * command-*) reference below was invalid at computed-value time and
+   * silently dropped: panel/row backgrounds fell through to transparent,
+   * color-mix() risk tints never rendered, and descendant color rules
+   * resolved through inheritance instead of the token pairing their author
+   * intended. `.reception-workspace` is the real class on the page root
+   * (ReceptionWorkspace.tsx), so the definitions now actually apply.
+   */
   --reception-command-bg: var(--cdl-surface-page, var(--app-surface-0));
   --reception-command-panel: var(--cdl-surface-card, var(--app-surface-1));
   --reception-command-inset: var(--cdl-surface-muted, var(--app-surface-muted));
@@ -12,24 +24,21 @@
   display: grid;
   gap: var(--cdl-panel-gap, var(--app-layout-panel-gap, 12px));
   padding: 0;
+  background: var(--app-bg);
   color: var(--reception-command-ink);
 }
 
-.reception-workspace {
-  background: var(--app-bg);
-}
-
-.reception-command button,
-.reception-command input,
-.reception-command select,
-.reception-command textarea {
+.reception-workspace button,
+.reception-workspace input,
+.reception-workspace select,
+.reception-workspace textarea {
   font: inherit;
 }
 
-.reception-command button:focus-visible,
-.reception-command input:focus-visible,
-.reception-command select:focus-visible,
-.reception-command textarea:focus-visible {
+.reception-workspace button:focus-visible,
+.reception-workspace input:focus-visible,
+.reception-workspace select:focus-visible,
+.reception-workspace textarea:focus-visible {
   outline: 3px solid rgba(15, 23, 42, 0.24);
   outline-offset: 2px;
 }
@@ -492,16 +501,22 @@
   white-space: nowrap;
 }
 
-.reception-command-queue-row small,
-.reception-command-queue-row span {
-  color: var(--reception-command-muted);
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.reception-command-queue-row span:first-child {
-  color: var(--reception-command-ink);
-}
+/*
+ * Removed: a blanket `.reception-command-queue-row small, span { color:
+ * var(--reception-command-muted) }` + `span:first-child { color:
+ * var(--reception-command-ink) }` pair used to sit here. Its specificity
+ * (0,1,1 / 0,2,1) beat the row's own child components -- .reception-queue-
+ * row__chip, __status, and __wait (each 0,1,0) -- so their correctly
+ * theme-paired `--cdl-ink-muted`/`--cdl-critical-text`/`--cdl-warning-text`
+ * colors were silently discarded in favor of this rule, which itself
+ * referenced the dead `--reception-command-*` variables (see the
+ * `.reception-workspace` comment above) and so resolved to plain
+ * inheritance -- the exact "background from one token, text color from
+ * something unrelated" mismatch reported in the Waiting List. Every span
+ * that actually renders text inside a row already has its own specific,
+ * theme-correct color rule; the wrapper spans (__who, __meta) render no
+ * text of their own, so this blanket rule was never needed.
+ */
 
 .reception-command-selected {
   display: grid;
@@ -661,7 +676,7 @@
 }
 
 @media (max-width: 760px) {
-  .reception-command {
+  .reception-workspace {
     padding-bottom: 156px;
   }
 
@@ -932,10 +947,17 @@
   white-space: nowrap;
 }
 
+/*
+ * !important matches .reception-queue-row__chip--critical/--warning's own
+ * pattern: reception-desk-theme.css's blanket, higher-specificity
+ * `button:not(...)` reset (0,5,1) otherwise strips this back to the plain
+ * muted-button colors, losing the "Escalate" CTA's urgency signal for
+ * high-risk patients.
+ */
 .reception-queue-row__cta--critical {
-  background: var(--cdl-critical-bg);
-  border-color: var(--cdl-critical-border);
-  color: var(--cdl-critical-text);
+  background: var(--cdl-critical-bg) !important;
+  border-color: var(--cdl-critical-border) !important;
+  color: var(--cdl-critical-text) !important;
 }
 
 .reception-queue-row__cta:hover {
