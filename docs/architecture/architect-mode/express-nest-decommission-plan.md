@@ -1,8 +1,48 @@
 # Express → Nest Decommission Plan
 
-**Status:** `backend/src/api/routes-registry.ts` no longer exists (Cycle 287) — Nest owns 100% of the HTTP routing surface. Of `registerEmergencyMongooseRuntime()`'s four remaining non-route responsibilities, EMS WebSocket support is now unconditional (Cycle 288); the Mongoose connection itself, the reassessment scheduler, and service-registry init still sit behind `ENABLE_MONGOOSE_EMERGENCY_OS` (default `false`) and are each their own remaining decision.  
-**Date:** 2026-07-15 (updated 2026-08-05, Cycles 277–288)  
+**Status:** `backend/src/api/routes-registry.ts` no longer exists (Cycle 287) — Nest owns 100% of the HTTP routing surface. Of `registerEmergencyMongooseRuntime()`'s four original non-route responsibilities, EMS WebSocket support (Cycle 288) and service-registry init (Cycle 289) are now unconditional; only the Mongoose connection itself and the reassessment scheduler still sit behind `ENABLE_MONGOOSE_EMERGENCY_OS` (default `false`).  
+**Date:** 2026-07-15 (updated 2026-08-05, Cycles 277–289)  
 **Goal:** Single HTTP authority = Nest controllers; Express registry becomes adapter-only then removed.
+
+## 2026-08-05 update (Cycle 289) — service-registry init made unconditional
+
+Second of the four non-route responsibilities, continuing "one at a time."
+Before touching it, read every service referenced by
+`emergencyOsServiceRegistry` (`backend/src/services/service-registry.ts`,
+~26 services) for an `initialize`/`start`/`connect`/`startScheduler` method
+— `initializeAllServices()` calls whichever of those four exist on each
+service. Only 4 of the ~26 have any such method at all, and all 4 turned out
+to be trivial, synchronous, in-memory operations with zero Mongo or network
+dependency: `ocr.service.ts`'s `initialize()` is an empty placeholder,
+`wearable-rpm.service.ts` and `moh-fhir.service.ts`'s `connect()` each just
+set a boolean flag from config, and
+`emergency-os.advanced-services.ts`'s `HybridDigitalTwinService.initialize()`
+seeds in-memory twin state from a local simulation call. Combined with
+`initializeAllServices()` already wrapping each service call in its own
+try/catch (a failure in one can never crash another, let alone bootstrap),
+there was no real risk in running this unconditionally — and a real,
+live gap in leaving it gated: the ~22 non-Mongo services in the registry
+(`aiGovernanceService`, `consentService`, `incidentReportingService`,
+`patientJourneyService`, and others) were never being initialized or
+health-reported at all whenever the flag was off, i.e. in every default
+deployment.
+
+Moved the `initializeAllServices()` call and its result logging out of
+`registerEmergencyMongooseRuntime()` into `bootstrap()` directly, right
+after the Mongoose runtime call returns. `registerEmergencyMongooseRuntime()`
+now owns exactly two things: the Mongoose connection and the reassessment
+scheduler.
+
+Verified: full backend suite (277/277 suites, 2,371/2,371 tests — one
+flaky `encryption.service.spec.ts` perf-timing assertion failed on the full
+parallel run and passed clean in isolation immediately after, confirmed
+unrelated to this change and unrelated to any file this cycle touched),
+clean `nest build`, and a live compiled-server boot with the flag unset
+(documented default): the boot log now shows `CareDroid service registry
+initialized (27/27 ready)` — a message that previously could never appear
+at all in default config — with no new errors (the only warnings present,
+Redis connection refused, are pre-existing sandbox noise unrelated to this
+change, confirmed by their unchanged presence before and after).
 
 ## 2026-08-05 update (Cycle 288) — EMS WebSocket support made unconditional
 
@@ -296,13 +336,13 @@ ENABLE_EXPRESS_LEGACY_ROUTES=false  # new explicit flag if split needed
 ### Phase 4 — Remove — route-level work DONE, runtime-level cleanup still open
 - Delete `routes-registry` mounts from `main.ts` — **done.** `backend/src/api/routes-registry.ts` itself is deleted (Cycle 287), not just emptied; `registerAllRoutes`/`getRouteList`/the `/api/routes` discovery endpoint no longer exist anywhere in the codebase.
 - Quarantine `backend/src/api/*.routes.ts` for one release — N/A: every file was deleted outright once real (Nest parity confirmed) or dead (placeholder stub), not quarantined, matching the Surge precedent (`git show 5bed1bf9`)
-- Remove Mongoose emergency OS if TypeORM covers patients — **3 of 4 pieces left.** Not a route question anymore: `registerEmergencyMongooseRuntime()` now owns only the Mongoose connection, the reassessment scheduler, and service-registry init (EMS WebSocket support moved out and became unconditional in Cycle 288), all three still gated behind the same flag. Each needs its own deliberate decision (unconditional vs. removed), not a mechanical deletion — continuing one at a time.
+- Remove Mongoose emergency OS if TypeORM covers patients — **2 of 4 pieces left.** Not a route question anymore: `registerEmergencyMongooseRuntime()` now owns only the Mongoose connection and the reassessment scheduler (EMS WebSocket support moved out in Cycle 288, service-registry init moved out in Cycle 289), both still gated behind the same flag. Each needs its own deliberate decision (unconditional vs. removed), not a mechanical deletion — continuing one at a time. The reassessment scheduler is NOT a safe unconditional flip like the other two were: it's a `node-cron` job polling Mongo every minute, so running it without Mongo configured would error-log every 60 seconds forever — it needs a Mongo-configured guard of its own, not a blanket removal of the outer gate.
 
 ## Exit criteria
 - [x] All real (non-placeholder) route groups migrated to Nest controllers (Cycle 285)
 - [x] 6 placeholder-only route groups retired outright, `routes-registry.ts` `ROUTES` is `[]` (Cycle 286)
 - [x] `routes-registry.ts` itself deleted — no legacy Express registry exists at any size, empty or otherwise (Cycle 287)
-- [ ] `registerEmergencyMongooseRuntime()`'s non-route responsibilities resolved to unconditional-or-removed — 1 of 4 done (EMS WebSocket support, Cycle 288); Mongoose connection, reassessment scheduler, and service-registry init remain
+- [ ] `registerEmergencyMongooseRuntime()`'s non-route responsibilities resolved to unconditional-or-removed — 2 of 4 done (EMS WebSocket support Cycle 288, service-registry init Cycle 289); Mongoose connection and reassessment scheduler remain
 - [ ] Production boot with the Mongoose runtime block disabled entirely
 - [ ] All e2e EMS/intake/copilot green against Nest only
 - [ ] No FE hard-coded `/api/emergency/*` without Nest alias

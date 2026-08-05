@@ -47,24 +47,14 @@ async function registerEmergencyMongooseRuntime(
   const mongoUri = config.database.mongodbUri;
   if (!mongoUri) {
     logger.warn(
-      'ENABLE_MONGOOSE_EMERGENCY_OS=true but MONGODB_URI/DATABASE_MONGO_URI is not set; skipping Mongoose connection, reassessment scheduler, and service-registry init.',
+      'ENABLE_MONGOOSE_EMERGENCY_OS=true but MONGODB_URI/DATABASE_MONGO_URI is not set; skipping Mongoose connection and reassessment scheduler.',
     );
     return;
   }
 
   await mongoose.connect(mongoUri);
   reassessmentScheduler.start();
-  const initialization = await initializeAllServices();
-  if (initialization.totals.failed > 0) {
-    logger.warn(
-      `CareDroid service registry initialized with ${initialization.totals.failed} failed service(s).`,
-    );
-  } else {
-    logger.log(
-      `CareDroid service registry initialized (${initialization.totals.ready}/${initialization.totals.registered} ready).`,
-    );
-  }
-  logger.log('Mongoose CareDroid runtime ready: connection established, reassessment scheduler, service registry.');
+  logger.log('Mongoose CareDroid runtime ready: connection established, reassessment scheduler running.');
 }
 
 function registerProductionFrontendAssets(app: Awaited<ReturnType<typeof NestFactory.create>>) {
@@ -204,6 +194,25 @@ async function bootstrap() {
   expressApp.use('/health', healthRoutes);
 
   await registerEmergencyMongooseRuntime(app, logger, environment);
+  // Service-registry init made unconditional in Cycle 289: every one of the
+  // ~26 services in emergencyOsServiceRegistry that has a lifecycle method
+  // at all (initialize/start/connect/startScheduler -- most have none) does
+  // trivial, synchronous, in-memory setup with no Mongo/network dependency
+  // (verified by reading each one), and initializeAllServices() already
+  // try/catches per service, so a failure here can never crash bootstrap.
+  // Previously this only ran when ENABLE_MONGOOSE_EMERGENCY_OS was on, which
+  // meant the many non-Mongo services in the registry never got initialized
+  // or reported at all in default config.
+  const initialization = await initializeAllServices();
+  if (initialization.totals.failed > 0) {
+    logger.warn(
+      `CareDroid service registry initialized with ${initialization.totals.failed} failed service(s).`,
+    );
+  } else {
+    logger.log(
+      `CareDroid service registry initialized (${initialization.totals.ready}/${initialization.totals.registered} ready).`,
+    );
+  }
   const authenticateSocket = createRuntimeJwtAuthenticator(
     app.get(JwtService),
     app.get(ConfigService),
