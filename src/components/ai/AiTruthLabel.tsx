@@ -106,6 +106,83 @@ export function fromEnhancementMaturity(
   };
 }
 
+/**
+ * Normalizes AI Chief's `modelOrRuleId` field (src/config/aiChiefOrchestrationModel.ts).
+ * Every real value populated anywhere in this codebase (grepped exhaustively)
+ * is a literal rule id — 'rule-operational-baseline-v1', 'operational-workflow-v1'
+ * — never a reference to either of the 2 real trained models this codebase
+ * has (the NLU intent classifier and the artifact-type router, per
+ * AI_CONFIGURATION_MAP.md). Defaults to 'Manual'; only reports 'Live' if the
+ * id itself names one of those two real exceptions, so this stays correct
+ * if AI Chief is ever wired to a real model later without needing a rewrite.
+ */
+export function fromAiChiefRecommendation(recommendation: {
+  modelOrRuleId: string;
+}): AiTruthLabelInfo {
+  const backedByTrainedModel = /nlu-classifier|artifact-router/i.test(
+    recommendation.modelOrRuleId,
+  );
+
+  return {
+    state: backedByTrainedModel ? 'Live' : 'Manual',
+    sourceContext: backedByTrainedModel
+      ? 'AI Chief recommendation backed by a trained model'
+      : 'AI Chief rule-based recommendation engine — not a trained model',
+    reviewRequired: true,
+  };
+}
+
+/**
+ * Sentinel's AI recommendation envelope (lib/sentinel/aiEnvelope.ts,
+ * SentinelAiRecommendation.sourceState: 'live' | 'degraded' | 'rules_only')
+ * has the same trap as native-ai's sourceState. Read every real caller of
+ * buildSentinelAiRecommendation: the one production path
+ * (backend/src/modules/sentinel/sentinel-inbound.service.ts's
+ * producePrepRecommendation, preferAi branch) sets modelId:
+ * 'sentinel-grounded-rules' — self-describing as rules — while still
+ * setting sourceState: 'live'; the fallback path
+ * (buildRulesOnlyPrepChecklist) sets modelId: 'sentinel-rules',
+ * sourceState: 'rules_only'. Neither is backed by a trained model.
+ * The frontend's SentinelCommandSnapshot.aiRecommendations is typed as
+ * `Record<string, unknown>[]` (not a guaranteed SentinelAiRecommendation
+ * shape at the type level), so this deliberately does not attempt a
+ * per-item runtime read of sourceState/modelId that the type system can't
+ * back up — it reports the single, verified-true state for every real
+ * code path that produces this data today.
+ */
+export function sentinelAiRecommendationsTruthLabel(): AiTruthLabelInfo {
+  return {
+    state: 'Manual',
+    sourceContext: 'Sentinel AI recommendation engine — rule-based, not a trained model',
+    reviewRequired: true,
+  };
+}
+
+/**
+ * HospitalCommandCenter.tsx's "AI recommendations" panel merges three
+ * sources (src/services/hospitalCommandCenterModel.ts): AI Chief
+ * recommendations (rule-based, confirmed via fromAiChiefRecommendation
+ * above), patient-flow insights, and
+ * mapUnifiedOperationalRecommendations() — which reads
+ * UnifiedOperationalIntelligenceSnapshot.insights, itself deterministic
+ * threshold/rule scoring, not model-backed (matches the same
+ * AI_CONFIGURATION_MAP.md finding: only the NLU intent classifier and
+ * artifact-type router are real trained models anywhere in this codebase).
+ * The merge step (mapUnifiedOperationalRecommendations,
+ * hospitalCommandCenterModel.ts) reshapes every source down to
+ * {id, action, rationale, route} before this panel ever sees it, discarding
+ * modelOrRuleId — so, same as Sentinel above, this reports the single
+ * verified-true state for the panel rather than guessing per item against
+ * data the type system doesn't back up.
+ */
+export function hospitalCommandCenterRecommendationsTruthLabel(): AiTruthLabelInfo {
+  return {
+    state: 'Manual',
+    sourceContext: 'Operational intelligence recommendations — rule-based, not a trained model',
+    reviewRequired: true,
+  };
+}
+
 export type AiTruthLabelProps = AiTruthLabelInfo & {
   compact?: boolean;
   className?: string;

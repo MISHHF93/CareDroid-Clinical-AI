@@ -11,6 +11,7 @@ import {
   showActionSuccess,
 } from '../../services/careDroidInteractionFeedback';
 import { ClinicalSafetyNotice } from './ClinicalSafetyNotice';
+import { AiTruthLabel, fromAiChiefRecommendation } from './AiTruthLabel';
 import './AIComponents.css';
 import '../../pages/emergency/emergency-route.css';
 
@@ -153,6 +154,8 @@ export function AiChiefRouteRecommendationsPanel({
                   {TONE_LABELS[recommendation.tone]}
                 </span>
               </header>
+
+              <AiTruthLabel {...fromAiChiefRecommendation(recommendation)} compact />
 
               <p className="cd-ai-card__primary">{recommendation.rationale}</p>
 

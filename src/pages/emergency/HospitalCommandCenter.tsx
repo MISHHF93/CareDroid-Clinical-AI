@@ -32,6 +32,11 @@ import {
 } from '../../services/sentinel';
 import type { SentinelCommandSnapshot, SentinelUnitView } from '../../types/sentinel';
 
+import {
+  AiTruthLabel,
+  hospitalCommandCenterRecommendationsTruthLabel,
+  sentinelAiRecommendationsTruthLabel,
+} from '../../components/ai/AiTruthLabel';
 import EdDataSourceBanner from '../../components/emergency/EdDataSourceBanner';
 import useEdRouteDataContext from '../../hooks/useEdRouteDataContext';
 import useUnifiedOperatingSurface from '../../hooks/useUnifiedOperatingSurface';
@@ -296,10 +301,13 @@ export default function HospitalCommandCenter() {
               </p>
             )}
             {sentinelSnapshot && sentinelSnapshot.aiRecommendations.length > 0 ? (
-              <p className="emergency-route-section-card__lead" role="note">
-                {sentinelSnapshot.aiRecommendations.length} AI recommendation(s) require clinician
-                review before any pathway activation.
-              </p>
+              <>
+                <p className="emergency-route-section-card__lead" role="note">
+                  {sentinelSnapshot.aiRecommendations.length} AI recommendation(s) require clinician
+                  review before any pathway activation.
+                </p>
+                <AiTruthLabel {...sentinelAiRecommendationsTruthLabel()} compact />
+              </>
             ) : null}
           </section>
           <section className="emergency-route-card cd-surface-card">
@@ -445,6 +453,9 @@ export default function HospitalCommandCenter() {
                 {snapshot.aiRecommendations.length}
               </span>
             </div>
+            {snapshot.aiRecommendations.length > 0 ? (
+              <AiTruthLabel {...hospitalCommandCenterRecommendationsTruthLabel()} compact />
+            ) : null}
             {snapshot.aiRecommendations.length === 0 ? (
               <p className="emergency-route-section-card__lead">
                 No pending CareDroid Copilot recommendations —{' '}

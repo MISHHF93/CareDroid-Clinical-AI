@@ -85,6 +85,19 @@ describe('AiChiefRouteRecommendationsPanel', () => {
     expect(screen.getByRole('note', { name: /ai safety review notice/i })).toBeInTheDocument();
   });
 
+  it('labels the recommendation as Manual (rule-based, not a trained model)', () => {
+    render(
+      <MemoryRouter>
+        <AiChiefRouteRecommendationsPanel />
+      </MemoryRouter>,
+    );
+
+    const chip = screen.getByTestId('ai-truth-label-chip');
+    expect(chip).toHaveTextContent('Manual');
+    expect(chip.getAttribute('title')).toMatch(/rule-based/i);
+    expect(chip.getAttribute('title')).toMatch(/not a trained model/i);
+  });
+
   it('accepts patient-linked escalation recommendations after confirmation', async () => {
     const user = userEvent.setup();
     const { confirmCareDroidAction, showActionSuccess } = await import(

@@ -3,8 +3,11 @@ import {
   AiTruthLabel,
   DEFAULT_PROHIBITED_ACTION_COPY,
   DEFAULT_REVIEW_COPY,
+  fromAiChiefRecommendation,
   fromEnhancementMaturity,
   fromNativeAiSourceState,
+  hospitalCommandCenterRecommendationsTruthLabel,
+  sentinelAiRecommendationsTruthLabel,
 } from './AiTruthLabel';
 
 describe('AiTruthLabel', () => {
@@ -106,5 +109,46 @@ describe('fromEnhancementMaturity', () => {
     expect(
       fromEnhancementMaturity('live', { sourceContext: 'x', backedByTrainedModel: true }).state,
     ).toBe('Live');
+  });
+});
+
+describe('fromAiChiefRecommendation', () => {
+  it('maps every real modelOrRuleId shape (rule-x, ai-chief-v1, operational-workflow-v1) to Manual', () => {
+    expect(fromAiChiefRecommendation({ modelOrRuleId: 'rule-operational-baseline-v1' }).state).toBe(
+      'Manual',
+    );
+    expect(fromAiChiefRecommendation({ modelOrRuleId: 'ai-chief-v1' }).state).toBe('Manual');
+    expect(fromAiChiefRecommendation({ modelOrRuleId: 'operational-workflow-v1' }).state).toBe(
+      'Manual',
+    );
+  });
+
+  it('maps to Live only when modelOrRuleId names one of the 2 real trained models', () => {
+    expect(fromAiChiefRecommendation({ modelOrRuleId: 'nlu-classifier-v2' }).state).toBe('Live');
+    expect(fromAiChiefRecommendation({ modelOrRuleId: 'artifact-router' }).state).toBe('Live');
+  });
+
+  it('always requires review', () => {
+    expect(fromAiChiefRecommendation({ modelOrRuleId: 'rule-x' }).reviewRequired).toBe(true);
+  });
+});
+
+describe('sentinelAiRecommendationsTruthLabel', () => {
+  it('reports Manual with a rule-based, review-required source context', () => {
+    const info = sentinelAiRecommendationsTruthLabel();
+    expect(info.state).toBe('Manual');
+    expect(info.sourceContext).toMatch(/rule-based/i);
+    expect(info.sourceContext).toMatch(/not a trained model/i);
+    expect(info.reviewRequired).toBe(true);
+  });
+});
+
+describe('hospitalCommandCenterRecommendationsTruthLabel', () => {
+  it('reports Manual with a rule-based, review-required source context', () => {
+    const info = hospitalCommandCenterRecommendationsTruthLabel();
+    expect(info.state).toBe('Manual');
+    expect(info.sourceContext).toMatch(/rule-based/i);
+    expect(info.sourceContext).toMatch(/not a trained model/i);
+    expect(info.reviewRequired).toBe(true);
   });
 });
