@@ -33,17 +33,10 @@ const SYSTEM_CONFIG_DEFAULTS = {
     absoluteTimeoutMs: 28800000,
   },
   emergencyOs: {
-    defaultNestSurface: 'partial',
+    defaultNestSurface: 'complete',
     conditionalRuntime: 'mongoose',
     configuredForMount: false,
     status: 'unknown',
-    routeGroups: [
-      '/api/capacity',
-      '/api/copilot',
-      '/api/ems',
-      '/api/emergency/intake',
-      '/api/reassessment',
-    ],
   },
 };
 

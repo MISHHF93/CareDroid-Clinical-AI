@@ -93,6 +93,7 @@ import { ProtocolModule } from './modules/protocol/protocol.module';
 import { ReassessmentModule } from './modules/reassessment/reassessment.module';
 import { EmsModule } from './modules/ems/ems.module';
 import { BoardingModule } from './modules/boarding/boarding.module';
+import { SmartIntakeModule } from './modules/smart-intake/smart-intake.module';
 
 // Monitoring & Observability
 import { LoggerModule } from './modules/common/logger.module';
@@ -250,6 +251,7 @@ function resolveDatabaseClient() {
     ReassessmentModule,
     EmsModule,
     BoardingModule,
+    SmartIntakeModule,
     CollaborationHubModule,
     NativeAiModule,
     // CareDroid 1-node local ML backbone (ADR-0003): NLU + artifact-router + /api/ai/node/*

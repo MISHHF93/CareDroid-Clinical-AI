@@ -63,6 +63,36 @@ describe('CareDroid research controllers', () => {
     expect(summary.generationTimeSeconds).toBeLessThan(5);
   });
 
+  it('reports federated EMS service info and health (Cycle 285)', () => {
+    expect(federatedEMSController.info()).toMatchObject({
+      path: '/federated',
+      version: 'v1',
+      status: 'active',
+    });
+    expect(federatedEMSController.health()).toEqual({
+      status: 'ready',
+      service: 'federated-ems',
+    });
+  });
+
+  it('runs a federated training round and registers the contributing hospital (Cycle 285)', async () => {
+    const result = await federatedEMSController.trainingRound({
+      hospitalId: 'hospital-b',
+      dataQualityScore: 0.95,
+    });
+
+    expect(result).toEqual({
+      success: true,
+      round: { status: 'completed', contributor: 'hospital-b' },
+    });
+  });
+
+  it('defaults the training round contributor and local model when omitted', async () => {
+    const result = await federatedEMSController.trainingRound({});
+
+    expect(result.round.contributor).toBe('integration-hospital');
+  });
+
   it('processes federated 112 calls with dispatch coordination', async () => {
     const result = await federatedEMSController.process112Call({
       callId: '112-test',

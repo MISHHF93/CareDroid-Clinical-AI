@@ -17,7 +17,6 @@ import {
   registerSentinelAvlWebSocketSupport,
 } from './api/ems.socket';
 import healthRoutes from './api/health.routes';
-import { registerAllRoutes } from './api/routes-registry';
 import { reassessmentScheduler } from './scheduler/reassessment.scheduler';
 import { initializeAllServices } from './services/service-registry';
 import { initSentry } from './config/sentry.config';
@@ -30,11 +29,7 @@ import {
 } from './static-asset-excludes';
 import { ApiExceptionFilter } from './common/filters/api-exception.filter';
 import { LoggingMiddleware } from './middleware/logging.middleware';
-import {
-  createLegacyApiAuthMiddleware,
-  createRuntimeJwtAuthenticator,
-  createSocketJwtAuthMiddleware,
-} from './api/runtime-auth';
+import { createRuntimeJwtAuthenticator, createSocketJwtAuthMiddleware } from './api/runtime-auth';
 import { User } from './modules/users/entities/user.entity';
 import { Permission } from './modules/auth/enums/permission.enum';
 
@@ -59,19 +54,12 @@ async function registerEmergencyMongooseRuntime(
 
   await mongoose.connect(mongoUri);
   const expressApp = app.getHttpAdapter().getInstance();
-  // Legacy mongoose CareDroid routes require JWT + PHI permissions (security audit D-path).
+  // EMS WebSocket auth requires JWT + PHI permissions (security audit D-path).
   const authenticate = createRuntimeJwtAuthenticator(
     app.get(JwtService),
     app.get(ConfigService),
     app.get(DataSource).getRepository(User),
   );
-  const middleware = [createLegacyApiAuthMiddleware(authenticate)];
-  const mountedRoutes = registerAllRoutes(expressApp, { mountDiscovery: false, middleware });
-  registerAllRoutes(expressApp, {
-    apiPrefix: '/api/emergency',
-    mountDiscovery: false,
-    middleware,
-  });
   registerEMSWebSocketSupport(
     expressApp,
     app.getHttpServer(),
@@ -89,9 +77,7 @@ async function registerEmergencyMongooseRuntime(
       `CareDroid service registry initialized (${initialization.totals.ready}/${initialization.totals.registered} ready).`,
     );
   }
-  logger.log(
-    `Mongoose CareDroid routes mounted under /api/* (${mountedRoutes.length} route groups; legacy aliases under /api/emergency/*)`,
-  );
+  logger.log('Mongoose CareDroid runtime ready: EMS WebSocket bridge, reassessment scheduler, service registry.');
 }
 
 function registerProductionFrontendAssets(app: Awaited<ReturnType<typeof NestFactory.create>>) {
@@ -227,7 +213,6 @@ async function bootstrap() {
   app.setGlobalPrefix('api', { exclude: ['health', 'metrics', ''] });
   const expressApp = app.getHttpAdapter().getInstance();
   expressApp.set('typeormDataSource', app.get(DataSource));
-  registerAllRoutes(expressApp, { mountRoutes: false });
   expressApp.use('/api/health', healthRoutes);
   expressApp.use('/health', healthRoutes);
 

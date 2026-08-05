@@ -1,6 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { getRouteList } from './api/routes-registry';
 
 @Controller()
 export class AppController {
@@ -52,7 +51,7 @@ export class AppController {
         absoluteTimeoutMs: sessionConfig.absoluteTimeout || 28800000, // 8 hours
       },
       emergencyOs: {
-        defaultNestSurface: 'partial',
+        defaultNestSurface: 'complete',
         conditionalRuntime: 'mongoose',
         configuredForMount: emergencyMongooseEnabled && emergencyMongoConfigured,
         status: emergencyMongooseEnabled
@@ -60,10 +59,6 @@ export class AppController {
             ? 'configured'
             : 'missing-mongo-uri'
           : 'disabled',
-        routeGroups: getRouteList().map((route) => route.fullPath),
-        legacyRouteGroups: getRouteList({ apiPrefix: '/api/emergency' }).map(
-          (route) => route.fullPath,
-        ),
       },
     };
   }

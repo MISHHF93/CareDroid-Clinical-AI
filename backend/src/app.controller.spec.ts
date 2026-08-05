@@ -52,20 +52,13 @@ describe('AppController environment config', () => {
           commit: 'abc123',
         },
         emergencyOs: {
+          // Cycle 287: routes-registry.ts itself was deleted -- there is no
+          // legacy Express registry left to report route groups from, so
+          // Nest owns the entire HTTP surface, not a "partial" one.
+          defaultNestSurface: 'complete',
           conditionalRuntime: 'mongoose',
           configuredForMount: true,
           status: 'configured',
-          routeGroups: expect.arrayContaining([
-            '/api/intake',
-            '/api/moh',
-            '/api/wearable',
-            '/api/iot',
-            '/api/simulation',
-            '/api/handover',
-            '/api/federated',
-            '/api/digital-twin',
-          ]),
-          legacyRouteGroups: expect.arrayContaining(['/api/emergency/intake']),
         },
       });
     } finally {

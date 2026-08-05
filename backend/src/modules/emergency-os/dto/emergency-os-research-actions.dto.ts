@@ -184,3 +184,18 @@ export class SynchronizePatientFlowDto {
 export class RunPredictiveSimulationDto {
   @IsOptional() @IsString() @MaxLength(120) scenario?: string;
 }
+
+/**
+ * Cycle 285: mirrors FederatedEMSModel (federated-ems.service.ts) plus the
+ * two snake_case aliases the legacy Express /federated/round handler
+ * accepted (hospital_id, local_model) -- zero real callers found for this
+ * route either, matching every other route in this file.
+ */
+export class FederatedTrainingRoundDto {
+  @IsOptional() @IsString() @MaxLength(96) hospitalId?: string;
+  @IsOptional() @IsString() @MaxLength(96) hospital_id?: string;
+  @IsOptional() @IsObject() localModel?: Record<string, number>;
+  @IsOptional() @IsObject() local_model?: Record<string, number>;
+  @IsOptional() @IsString() @MaxLength(64) globalModelVersion?: string;
+  @IsOptional() @IsNumber() dataQualityScore?: number;
+}

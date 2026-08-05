@@ -1,3 +1,4 @@
+import { Injectable } from '@nestjs/common';
 import {
   UnifiedPatient as Patient,
   type IPatientIdentifier,
@@ -38,6 +39,7 @@ function redactedEvidence(evidence: IdentityEvidence): IdentityEvidence {
   return { ...evidence, value: '[redacted until verification]' };
 }
 
+@Injectable()
 export class SmartIntakeService {
   private matcher = mpiService;
   private ocr = ocrService;

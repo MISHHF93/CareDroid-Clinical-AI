@@ -15,7 +15,6 @@ import {
 } from './backendFrontendExposure';
 import { findBackendRoute, BACKEND_HTTP_ROUTES } from './backendHttpRouteInventory';
 import {
-  BACKEND_ROUTE_EXPOSURE_POLICY,
   OPTIONAL_RUNTIME_ROUTE_EXPOSURE_POLICY,
   getOptionalRuntimeBackendRoutes,
 } from './backendRouteExposurePolicy';
@@ -151,26 +150,38 @@ describe('backendFrontendExposure scan', () => {
   });
 
   scanIt('classifies optional Mongoose CareDroid routes separately from always-mounted Nest routes', () => {
+    // Cycle 284: /api/emergency/intake/* (the prior example here) moved off
+    // this list entirely — SmartIntakeController is now unconditionally
+    // mounted, not Mongoose-flag-gated. /api/emergency/governance/* is a
+    // documented compatibility alias still on the gated list.
     const optionalRoutes = getOptionalRuntimeBackendRoutes();
 
     expect(optionalRoutes).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          method: 'POST',
-          path: '/api/emergency/intake/sessions',
+          method: 'GET',
+          path: '/api/emergency/governance/compliance',
           runtime: 'mongoose-emergency-os',
         }),
       ])
     );
-    expect(OPTIONAL_RUNTIME_ROUTE_EXPOSURE_POLICY['POST /api/emergency/intake/sessions']).toMatchObject({
+    expect(
+      OPTIONAL_RUNTIME_ROUTE_EXPOSURE_POLICY['GET /api/emergency/governance/compliance']
+    ).toMatchObject({
       strategy: 'optional-runtime',
     });
-    expect(BACKEND_ROUTE_EXPOSURE_POLICY['POST /api/emergency/intake/sessions']).toBeUndefined();
+    expect(
+      OPTIONAL_RUNTIME_ROUTE_EXPOSURE_POLICY['POST /api/emergency/intake/sessions']
+    ).toBeUndefined();
   });
 
-  scanIt('gates optional CareDroid frontend calls when the optional runtime is disabled', () => {
+  scanIt('smart-intake frontend calls are wired to the always-mounted SmartIntakeController', () => {
+    // Cycle 284: these 14 routes moved off the Mongoose-flag-gated list onto
+    // an unconditionally-registered Nest controller, so they now resolve as
+    // genuinely wired rather than a gated-stub — this test previously lived
+    // under the "gates optional CareDroid frontend calls" name/expectation.
     const scan = runBackendFrontendExposureScan();
-    const optionalSmartIntakeIds = [
+    const wiredSmartIntakeIds = [
       'emergency-smart-intake-session-create',
       'emergency-smart-intake-manual-entry',
       'emergency-smart-intake-document',
@@ -189,7 +200,7 @@ describe('backendFrontendExposure scan', () => {
 
     expect(FRONTEND_API_CALLS).toEqual(
       expect.arrayContaining([
-        ...optionalSmartIntakeIds.map((id) =>
+        ...wiredSmartIntakeIds.map((id) =>
           expect.objectContaining({
             id,
             capability: 'emergencySmartIntakeIdentitySession',
@@ -198,8 +209,8 @@ describe('backendFrontendExposure scan', () => {
         expect.objectContaining({ id: 'emergency-referral-create', capability: 'emergencyReferralPersistence' }),
       ])
     );
-    for (const id of optionalSmartIntakeIds) {
-      expect(scan.analyzed.find((row) => row.id === id)?.exposure).toBe('gated-stub');
+    for (const id of wiredSmartIntakeIds) {
+      expect(scan.analyzed.find((row) => row.id === id)?.exposure).toBe('wired');
     }
   });
 

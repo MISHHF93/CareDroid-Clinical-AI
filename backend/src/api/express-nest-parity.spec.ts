@@ -13,80 +13,150 @@
  * Deleting the legacy files removes that shadowing risk entirely rather than
  * just documenting it as residual. RETIRED tracks what was removed so the
  * decommission history stays visible after the entries leave NEST_PREFERRED.
+ *
+ * Cycle 286: the last 6 entries (moh/wearable/iot/simulation/handover/
+ * digital-twin) were pure `createPlaceholderRoute()` stubs with zero real
+ * functionality and zero live callers — deleted outright rather than
+ * migrated to a Nest controller, since there was nothing to port. `/health`
+ * left this registry too, but isn't a retirement in the same sense: it was
+ * always a redundant second/third/fourth mount of the exact same
+ * `healthRoutes` router main.ts already mounts directly at `/health` and
+ * `/api/health`, independent of this file. With those gone, `ROUTES` was
+ * genuinely empty — of the 17 original entries (16 real-or-placeholder
+ * groups plus health), all 16 were retired and health was never unique to
+ * this registry to begin with.
+ *
+ * Cycle 287: `backend/src/api/routes-registry.ts` itself (the `ROUTES`
+ * array, `registerAllRoutes()`, `getRouteList()`, and the `/api/routes`
+ * discovery endpoint it mounted) was deleted outright — an empty registry
+ * with no route to ever populate it again was pure dead weight, not a
+ * documented extension point. This file now survives on its own as a
+ * standalone historical record of the migration: which Nest controller
+ * replaced each legacy Express group, in which cycle, migrated vs. deleted.
  */
-import { getRouteList, ROUTES } from './routes-registry';
 
-/** Nest-preferred ownership (documentation contract — not HTTP probes). */
-const NEST_PREFERRED: Record<
+/** Every group this registry originally listed, and how it was retired. */
+const RETIRED: Record<
   string,
-  { nestOwner: string; retirePriority: 'P0' | 'P1' | 'P2' | 'keep' }
+  { nestOwner: string; retiredCycle: number; method: 'migrated' | 'deleted-placeholder' }
 > = {
-  '/health': { nestOwner: 'app/health', retirePriority: 'keep' },
-  '/surge': { nestOwner: 'emergency-os', retirePriority: 'P2' },
-  '/intake': { nestOwner: 'emergency-os / smart-intake', retirePriority: 'P1' },
-  '/moh': { nestOwner: 'interoperability', retirePriority: 'P2' },
-  '/wearable': { nestOwner: 'telemetry', retirePriority: 'P2' },
-  '/iot': { nestOwner: 'telemetry / iot', retirePriority: 'P2' },
-  '/simulation': { nestOwner: 'simulation', retirePriority: 'P2' },
-  '/handover': { nestOwner: 'emergency-os', retirePriority: 'P1' },
-  '/federated': { nestOwner: 'future — disable', retirePriority: 'P2' },
-  '/digital-twin': { nestOwner: 'digital-twin Nest', retirePriority: 'P2' },
-};
-
-/** Route groups whose Express legacy file has been deleted (Phase 4 complete). */
-const RETIRED: Record<string, { nestOwner: string; retiredCycle: number }> = {
-  '/capacity': { nestOwner: 'emergency-os / CapacityController', retiredCycle: 277 },
+  '/capacity': {
+    nestOwner: 'emergency-os / CapacityController',
+    retiredCycle: 277,
+    method: 'migrated',
+  },
   '/governance': {
     nestOwner: 'platform-governance / NestAiGovernanceController',
     retiredCycle: 278,
+    method: 'migrated',
   },
-  '/copilot': { nestOwner: 'ai-gateway / EdCopilotNestParityController', retiredCycle: 278 },
+  '/copilot': {
+    nestOwner: 'ai-gateway / EdCopilotNestParityController',
+    retiredCycle: 278,
+    method: 'migrated',
+  },
   '/deterioration': {
     nestOwner: 'clinical-intelligence / DeteriorationController',
     retiredCycle: 279,
+    method: 'migrated',
   },
-  '/protocol': { nestOwner: 'clinical / ProtocolController', retiredCycle: 280 },
-  '/reassessment': { nestOwner: 'emergency-os / ReassessmentController', retiredCycle: 281 },
-  '/ems': { nestOwner: 'emergency-os / EmsController', retiredCycle: 282 },
-  '/boarding': { nestOwner: 'emergency-os / BoardingController', retiredCycle: 283 },
+  '/protocol': {
+    nestOwner: 'clinical / ProtocolController',
+    retiredCycle: 280,
+    method: 'migrated',
+  },
+  '/reassessment': {
+    nestOwner: 'emergency-os / ReassessmentController',
+    retiredCycle: 281,
+    method: 'migrated',
+  },
+  '/ems': { nestOwner: 'emergency-os / EmsController', retiredCycle: 282, method: 'migrated' },
+  '/boarding': {
+    nestOwner: 'emergency-os / BoardingController',
+    retiredCycle: 283,
+    method: 'migrated',
+  },
+  '/intake': {
+    nestOwner: 'emergency-os / SmartIntakeController',
+    retiredCycle: 284,
+    method: 'migrated',
+  },
+  '/federated': {
+    nestOwner: 'emergency-os / FederatedEMSController',
+    retiredCycle: 285,
+    method: 'migrated',
+  },
+  '/moh': {
+    nestOwner: 'none — placeholder stub deleted',
+    retiredCycle: 286,
+    method: 'deleted-placeholder',
+  },
+  '/wearable': {
+    nestOwner: 'none — placeholder stub deleted',
+    retiredCycle: 286,
+    method: 'deleted-placeholder',
+  },
+  '/iot': {
+    nestOwner: 'none — placeholder stub deleted',
+    retiredCycle: 286,
+    method: 'deleted-placeholder',
+  },
+  '/simulation': {
+    nestOwner: 'none — placeholder stub deleted',
+    retiredCycle: 286,
+    method: 'deleted-placeholder',
+  },
+  '/handover': {
+    nestOwner:
+      'none — placeholder stub deleted (ERPulseHandoverController covers the real /er-pulse endpoint separately)',
+    retiredCycle: 286,
+    method: 'deleted-placeholder',
+  },
+  '/digital-twin': {
+    nestOwner:
+      'none — placeholder stub deleted (OrganizationalDigitalTwinController covers real functionality separately)',
+    retiredCycle: 286,
+    method: 'deleted-placeholder',
+  },
 };
 
 describe('Express→Nest parity inventory', () => {
-  it('lists only known Express route groups', () => {
-    const paths = ROUTES.map((r) => r.path).sort();
-    expect(paths.length).toBe(9);
-    for (const path of paths) {
-      expect(NEST_PREFERRED[path]).toBeDefined();
-    }
+  it('RETIRED documents all 16 originally-listed non-health groups', () => {
+    expect(Object.keys(RETIRED).sort()).toEqual(
+      [
+        '/capacity',
+        '/copilot',
+        '/governance',
+        '/deterioration',
+        '/protocol',
+        '/reassessment',
+        '/ems',
+        '/boarding',
+        '/intake',
+        '/federated',
+        '/moh',
+        '/wearable',
+        '/iot',
+        '/simulation',
+        '/handover',
+        '/digital-twin',
+      ].sort(),
+    );
   });
 
-  it('getRouteList exposes fullPath under /api prefix', () => {
-    const list = getRouteList({ apiPrefix: '/api' });
-    expect(list.every((item) => item.fullPath.startsWith('/api/'))).toBe(true);
-    expect(list.some((item) => item.path === '/intake')).toBe(true);
+  it('10 groups were migrated to real Nest controllers, 6 placeholder stubs were deleted outright', () => {
+    const migrated = Object.values(RETIRED).filter((entry) => entry.method === 'migrated');
+    const deleted = Object.values(RETIRED).filter(
+      (entry) => entry.method === 'deleted-placeholder',
+    );
+    expect(migrated).toHaveLength(10);
+    expect(deleted).toHaveLength(6);
   });
 
-  it('retired route groups are fully removed from the live Express registry', () => {
-    const paths = ROUTES.map((r) => r.path);
-    for (const retiredPath of Object.keys(RETIRED)) {
-      expect(paths).not.toContain(retiredPath);
-      expect(NEST_PREFERRED[retiredPath]).toBeUndefined();
-    }
-  });
-
-  it('documents Nest owners for retired P0 paths (parity controllers exist)', () => {
+  it('documents Nest owners for the two P0 priority groups (parity controllers exist)', () => {
     // Nest: @Controller('governance') NestAiGovernanceController
     // Nest: @Controller('copilot') EdCopilotNestParityController
-    // Nest: @Controller('emergency') .../copilot/query (primary)
     expect(RETIRED['/governance'].nestOwner).toMatch(/platform-governance|governance/i);
     expect(RETIRED['/copilot'].nestOwner).toMatch(/ai-gateway|chat|copilot/i);
-  });
-
-  it('every enabled route has a description for discovery', () => {
-    for (const route of ROUTES) {
-      if (!route.enabled) continue;
-      expect(route.description.trim().length).toBeGreaterThan(3);
-      expect(route.version).toBe('v1');
-    }
   });
 });

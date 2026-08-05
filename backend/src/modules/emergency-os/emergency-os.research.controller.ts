@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
   AICallInterrogationService,
@@ -18,6 +18,7 @@ import {
   InterpretEcgDto,
   SynchronizePatientFlowDto,
   RunPredictiveSimulationDto,
+  FederatedTrainingRoundDto,
 } from './dto/emergency-os-research-actions.dto';
 
 /**
@@ -51,6 +52,47 @@ export class ERPulseHandoverController {
 @Controller('ems/federated')
 export class FederatedEMSController {
   constructor(private readonly federatedEMSService: FederatedEMSService) {}
+
+  @Get()
+  info() {
+    return {
+      path: '/federated',
+      version: 'v1',
+      description: 'federated learning',
+      status: 'active',
+    };
+  }
+
+  @Get('health')
+  health() {
+    return {
+      status: 'ready',
+      service: 'federated-ems',
+    };
+  }
+
+  @Post('round')
+  async trainingRound(@Body() dto: FederatedTrainingRoundDto) {
+    const hospitalId = dto.hospitalId || dto.hospital_id || 'integration-hospital';
+    const localModel = dto.localModel || dto.local_model;
+
+    this.federatedEMSService.registerLocalModel({
+      hospitalId,
+      localModel: localModel || { urgency: 0.35, distress: 0.24, physiology: 0.31 },
+      globalModelVersion: dto.globalModelVersion || 'fed-ems-edge-v1',
+      lastSync: new Date(),
+      dataQualityScore: Number(dto.dataQualityScore ?? 0.9),
+    });
+    await this.federatedEMSService.federatedTrainingRound();
+
+    return {
+      success: true,
+      round: {
+        status: 'completed',
+        contributor: hospitalId,
+      },
+    };
+  }
 
   @Post('112-call')
   async process112Call(@Body() dto: Process112CallDto) {
