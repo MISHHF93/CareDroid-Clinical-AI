@@ -186,6 +186,10 @@ export const COMMAND_DASHBOARD_GROUPS = Object.freeze({
     REGISTRY.competencyDashboard,
     REGISTRY.laboratoryDashboard,
     REGISTRY.medical3dViewer,
+    REGISTRY.aiCostOptimization,
+    REGISTRY.aiCommandCenter,
+    REGISTRY.aiMemory,
+    REGISTRY.aiTraining,
   ]),
 });
 

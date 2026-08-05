@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { CANONICAL_ROUTES } from '../config/routes.config';
 import {
   CARE_WORKSPACES,
   buildCareWorkspaceModel,
@@ -233,6 +234,20 @@ describe('workspaceArchitecture', () => {
       simulation: '/simulation',
       competencies: '/competencies',
     });
+  });
+
+  it('duplicate-system-audit: every WORKSPACE_ROUTE_SHORTCUTS path derives from CANONICAL_ROUTES, never a hand-typed literal', () => {
+    // "Same path in three configs" -- docs/duplicate-system-audit.md's stated risk for
+    // this finding. A path either equals a CANONICAL_ROUTES value exactly or is a
+    // CANONICAL_ROUTES value with a query string appended (the emergencyTools deep-link
+    // shortcuts). Neither form allows a route string to be typed independently here.
+    const canonicalPaths = Object.values(CANONICAL_ROUTES);
+    for (const [id, shortcut] of Object.entries(WORKSPACE_ROUTE_SHORTCUTS)) {
+      const base = shortcut.path.split('?')[0];
+      expect(canonicalPaths, `${id} path "${shortcut.path}" must derive from CANONICAL_ROUTES`).toContain(
+        base
+      );
+    }
   });
 
   it('defines functionality modes and subpages for requested workspaces', () => {

@@ -232,16 +232,18 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
         ],
         overlap: null,
         risk: 'Different filters for same ids',
-        action: 'wire',
-        recommendation: 'Canonical: getUserFacingToolRegistryProjection; others call it internally.',
+        action: 'done',
+        recommendation:
+          'Done: getSidebarToolRegistryProjection is already @deprecated and already delegates to getUserFacingToolRegistryProjection internally (src/data/toolInventory.tsx). getCatalogToolInventory is not actually a competing catalog implementation -- it is one of four parallel raw-canonical-record stat counters (alongside getFrontendVisibleToolInventory, getSidebarToolInventory, getBackendBackedToolInventory) that all feed getCanonicalToolInventoryDocument() summary counts consistently off canonical record flags, deliberately not the enriched user-facing projection. The real catalog UI (src/pages/tools/ToolsOverview.tsx) already imports and calls getUserFacingToolRegistryProjection directly, confirmed by grep -- forcing getCatalogToolInventory through the projection would break the stat family\'s internal consistency, not fix a live drift risk.',
       },
       {
         name: 'Backend tools API',
         instances: ['GET /api/tools', 'toolInventory static registry'],
         overlap: null,
         risk: 'API list can drift from SPA registry',
-        action: 'wire',
-        recommendation: 'Generate /api/tools from same build step as toolInventory or treat API as read-only mirror.',
+        action: 'done',
+        recommendation:
+          'Done: correcting a prior triage pass on this same audit that checked only for a direct toolInventory import from backend/ and concluded this was open -- that check missed the real, indirect proof chain. GET /api/tools returns backend tool-orchestrator.service.ts this.toolRegistry, asserted to equal REGISTERED_EXECUTOR_TOOL_IDS exactly by backend/test/tool-orchestrator.spec.ts ("should include all tools in statistics", 73/73 passing). toolInventory.tsx marks a record TOOL_EXECUTOR_STATUS.REGISTERED only via hasExecutor, which reads ORCHESTRATOR_REGISTERED_NLU_TOOL_ID_SET from clinicalToolIdContract.ts, itself asserted to equal the same REGISTERED_EXECUTOR_TOOL_IDS by src/data/executorMappingAudit.test.ts (parses the real backend registry source, 6/6 passing). The two ends of the "API list vs SPA registry" risk are independently pinned to the same canonical array by two already-passing test suites; equal-scope drift cannot occur without breaking one of them. GET /api/tools intentionally covers only POST-executable calculators, a documented subset of the full SPA toolInventory (which also lists dashboards/workflows/fleet tools with no backend executor) -- generating one from the other as originally recommended would be wrong for that reason.',
       },
     ],
   },
@@ -309,9 +311,9 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
         instances: ['platformOperatingSystem.js PLATFORM_DASHBOARDS', 'commandDashboardModel widgets'],
         overlap: null,
         risk: 'Demo OS dashboards vs command dashboard tiles',
-        action: 'wire',
+        action: 'done',
         recommendation:
-          'Canonical command UX: commandDashboardModel; platformOperatingSystem for Platform OS pages only.',
+          'Done: verified by grep that commandDashboardModel.ts never references platformOperatingSystem, and the real /dashboard page (src/pages/executive/CommandDashboard.tsx) imports exclusively from commandDashboardModel.ts. platformOperatingSystem.ts PLATFORM_DASHBOARDS is consumed only by platformCapabilityMatrix.ts, searchFirstDiscovery.ts, and saasOperatingSystem.ts -- never a rendered page -- so no live "which dashboard renders /dashboard" ambiguity exists. Added a permanent regression guard (src/data/commandDashboardModel.test.ts) asserting commandDashboardModel.ts source never imports platformOperatingSystem.',
       },
       {
         name: 'Domain dashboards (15+ pages)',
@@ -325,14 +327,13 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
           'MedicalIotDashboard',
           'HospitalMapDashboard',
           'FleetDashboard',
-          'DigitalOperationsCenter',
           'OutcomesDashboardPage',
         ],
         overlap: null,
         risk: 'Overlapping KPIs across ops/analytics pages',
         action: 'wire',
         recommendation:
-          'Map each dashboard to one asset id in platform_assets; link from command dashboard via assetRecommendation.',
+          'Partially done, real gap remains -- also correcting a stale instance: DigitalOperationsCenter has zero references anywhere in src/ outside this audit file itself and was removed from the instances list (no such page exists any more). Of the rest, LaboratoryDashboard/MedicalIotDashboard/HospitalMapDashboard/FleetDashboard were already reachable from a commandDashboardModel panel. CostAnalyticsDashboard, AiCommandCenterDashboard, MemoryDashboard, and TrainingDashboard each had a real toolInventory record (ai-cost-optimization, ai-command-center, ai-memory, ai-training) but none were included in any COMMAND_DASHBOARD_GROUPS panel -- added all 4 to the expandedCare group and added a permanent regression guard (src/data/commandDashboardModel.test.ts) asserting each stays reachable. AnalyticsDashboard (/platform-analytics) and OutcomesDashboardPage (/outcomes) are real, mounted pages confirmed to have zero toolInventory record at all -- a deeper tool-catalog-completeness gap (they are likely also missing from Tools Overview/sidebar/search, not just the command dashboard) that needs a properly-scoped toolInventory registration with correct packId/segmentation/permissions, left open rather than guessed at.',
       },
     ],
   },
@@ -405,8 +406,9 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
         instances: ['WORKSPACE_ROUTE_SHORTCUTS', 'CANONICAL_ROUTES', 'PRIMARY_NAV_ITEMS.matchPaths'],
         overlap: null,
         risk: 'Same path in three configs',
-        action: 'wire',
-        recommendation: 'WORKSPACE_ROUTE_SHORTCUTS should import paths from CANONICAL_ROUTES.',
+        action: 'done',
+        recommendation:
+          'Done: this was a real, still-open gap -- 6 of 18 WORKSPACE_ROUTE_SHORTCUTS entries (governance, aiEvaluation, profile, systemHealth, developerCatalog, plus the already-correct settings) had hand-typed literal paths (e.g. "/ai-governance") instead of importing from CANONICAL_ROUTES, even though every other entry in the same object already did. Redirected all 5 to CANONICAL_ROUTES.aiGovernance/aiEvaluation/profile/systemHealth/developerCatalog. PRIMARY_NAV_ITEMS.matchPaths in navigation.config.ts already derived from CANONICAL_ROUTES throughout (verified by grep, no changes needed there). Added a permanent regression guard (src/data/workspaceArchitecture.test.ts) asserting every WORKSPACE_ROUTE_SHORTCUTS path resolves to a CANONICAL_ROUTES value, with or without a query string appended.',
       },
     ],
   },
@@ -424,16 +426,16 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
         risk: 'Manual projection drift if backend seed and frontend launch metadata diverge',
         action: 'wire',
         recommendation:
-          'Canonical launch: toolInventory; canonical entitlement: platform_assets; canonical frontend mount: assetInventory projection.',
+          'Partially done, real backlog remains, now precisely measured instead of vaguely stated: src/data/productPackagingAudit.ts already parses the real backend platform-asset-seed.data.ts source live and cross-references it against toolInventory and assetInventory (docs/product-packaging-audit.md, regenerate via npm run product-packaging-audit:write-docs). Current measured state: canonical frontend mount (toolInventory -> assetInventory projection) is fully closed, 0 of 291 user-facing tools lack mounted asset projection coverage. The real remaining gap is backend seed completeness: 245 of 291 frontend-mounted tools are not yet direct backend platform_assets seed rows -- correctly measured but not safely closeable here, since assigning each of the 245 tools to a solution/specialty/role pack is a product-taxonomy decision, not a structural wiring fix.',
       },
       {
         name: 'Frontend projections',
         instances: ['assetInventory.ts', 'assetAccess.ts', 'assetEntitlements.ts', 'buildAssetRegistry() demo'],
         overlap: null,
         risk: 'Projection must continue to include pack/product/workspace/role metadata for every user-facing asset',
-        action: 'wire',
+        action: 'done',
         recommendation:
-          'Canonical client context: UserIdentityContext + platformAssetsApi GET /api/platform/context; assetInventory derives offline/demo metadata when backend context is unavailable.',
+          'Done: verified UserIdentityContext.tsx imports PlatformAssetsApi and calls setPlatformEntitlementContext(ctx), matching the recommended layering exactly. assetEntitlements.ts getPlatformEntitlementContext() is a plain cache getter that returns null when no backend context has been set, and assetInventory.ts/productPackagingAudit.ts confirm the projection still reaches 100% coverage in that case (0 of 291 user-facing tools lack mounted asset projection, per docs/product-packaging-audit.md) -- the offline/demo fallback already works structurally, not just in theory. commandDashboardModel.test.ts already hard-asserts every rendered panel tool has non-empty packIds/productIds/workspaceIds/aiAliases.',
       },
       {
         name: 'Duplicate asset packs',
@@ -448,8 +450,9 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
         instances: ['product-catalog Product entities', 'platform_assets', 'solution packs docs'],
         overlap: null,
         risk: 'Commercial product id ≠ asset id',
-        action: 'wire',
-        recommendation: 'Canonical commercial: Product maps to packIds; assets remain operational unit.',
+        action: 'done',
+        recommendation:
+          'Done: already enforced by a passing test, not just documented. src/data/productPackagingAudit.report.test.ts hard-asserts, for every one of the 9 solution packs, both packExists (the pack referenced by PRODUCT_SOLUTION_PACKS is real in the backend seed) and productLinksPack (the product entity actual packIds array includes that pack id) -- built by parsing the real backend platform-asset-seed.data.ts and product-catalog-seed.data.ts source, not hand-typed assertions. Verified passing (2/2) as of this audit refresh.',
       },
     ],
   },
@@ -504,9 +507,9 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
         instances: ['unified-navigation.config.ts', 'navigation.config.ts (compat)'],
         overlap: 2,
         risk: 'New nav items added only to compat projections',
-        action: 'wire',
+        action: 'done',
         recommendation:
-          'Add to unified-navigation.config.ts first; navigation.config.ts projects for legacy consumers.',
+          'Done: correcting a prior triage pass on this audit that found only a lighter metadata-registry check and left this open. APP_SHELL_NAV_ITEMS/PRIMARY_NAV_ITEMS/EMERGENCY_SIDEBAR_NAV_ITEMS are a pure .map() over the canonical NAVIGATION_ITEMS array and cannot introduce a new nav id by construction. The other hand-authored lists in navigation.config.ts (ACCOUNT_UTILITY_NAV_ITEMS, SOLUTIONS_SIDEBAR_NAV_ITEMS, OPERATIONS_SIDEBAR_NAV_ITEMS, ADVANCED_SIDEBAR_NAV_ITEMS) are legitimately separate UI surfaces, not NAVIGATION_ITEMS projections -- but a full-file scan confirmed every entry primary path already derives from CANONICAL_ROUTES (matchPaths/matchPrefixes legitimately include hand-typed legacy sub-path variants for highlight-matching, a different concept from the canonical destination path). Added a permanent regression guard (src/config/navigation.config.test.ts) asserting every entry across all 5 lists resolves its primary path to CANONICAL_ROUTES.',
       },
       {
         name: 'Design token split',

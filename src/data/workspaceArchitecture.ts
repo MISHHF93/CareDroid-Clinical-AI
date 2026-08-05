@@ -90,19 +90,19 @@ export const WORKSPACE_ROUTE_SHORTCUTS = Object.freeze({
   governance: {
     id: 'governance',
     label: 'AI Governance',
-    path: '/ai-governance',
+    path: CANONICAL_ROUTES.aiGovernance,
     description: 'AI governance, auditability, policy, and review controls.',
   },
   aiEvaluation: {
     id: 'ai-evaluation',
     label: 'AI Evaluation',
-    path: '/ai-evaluation',
+    path: CANONICAL_ROUTES.aiEvaluation,
     description: 'Evaluation lab, model quality, benchmark, and safety review.',
   },
   profile: {
     id: 'profile',
     label: 'Profile',
-    path: '/profile',
+    path: CANONICAL_ROUTES.profile,
     description: 'User profile, workspaces, security, and activity.',
   },
   settings: {
@@ -114,13 +114,13 @@ export const WORKSPACE_ROUTE_SHORTCUTS = Object.freeze({
   systemHealth: {
     id: 'system-health',
     label: 'System Health',
-    path: '/system-health',
+    path: CANONICAL_ROUTES.systemHealth,
     description: 'Build metadata, backend readiness, and deployment health.',
   },
   developerCatalog: {
     id: 'developer-catalog',
     label: 'Developer Catalog / Source Audit',
-    path: '/tools/catalog',
+    path: CANONICAL_ROUTES.developerCatalog,
     description: 'Developer-only source audit and inventory inspection.',
   },
 });

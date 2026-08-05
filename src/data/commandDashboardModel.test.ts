@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { REGISTRY } from './clinicalToolIdContract';
 import {
@@ -42,6 +45,10 @@ describe('command dashboard model', () => {
       REGISTRY.competencyDashboard,
       REGISTRY.laboratoryDashboard,
       REGISTRY.medical3dViewer,
+      REGISTRY.aiCostOptimization,
+      REGISTRY.aiCommandCenter,
+      REGISTRY.aiMemory,
+      REGISTRY.aiTraining,
     ]);
     for (const tool of featured) {
       expect(inventoryIds.has(tool.id), tool.id).toBe(true);
@@ -119,5 +126,44 @@ describe('command dashboard model', () => {
       expect(tool.workspaceIds.length, tool.id).toBeGreaterThan(0);
       expect(tool.aiAliases.length, tool.id).toBeGreaterThan(0);
     }
+  });
+
+  it('duplicate-system-audit: Domain dashboards -- named dashboards with a real toolInventory record are reachable from a command dashboard panel', () => {
+    // "Overlapping KPIs across ops/analytics pages" -- docs/duplicate-system-audit.md's
+    // stated risk for this finding. Every one of these routes has a real toolInventory
+    // record (verified by path match); each record's id must appear in some panel so the
+    // dashboard is actually reachable from the command dashboard, not orphaned behind a
+    // direct URL only. AnalyticsDashboard (/platform-analytics) and OutcomesDashboardPage
+    // (/outcomes) are real, mounted pages with NO toolInventory record at all -- a deeper
+    // catalog-completeness gap than this finding covers, intentionally left open.
+    const tools = getUserFacingToolRegistryProjection();
+    const model = buildCommandDashboardModel();
+    const allPanelIds = new Set(Object.values(model.panels).flat().map((tool) => tool.id));
+    const routeToId: Record<string, string> = {
+      '/costs': REGISTRY.aiCostOptimization,
+      '/ai-command-center': REGISTRY.aiCommandCenter,
+      '/memory': REGISTRY.aiMemory,
+      '/training': REGISTRY.aiTraining,
+      '/laboratory': REGISTRY.laboratoryDashboard,
+      '/medical-iot': REGISTRY.medicalIotDashboard,
+      '/hospital-map': REGISTRY.hospitalMap,
+      '/fleet/command': REGISTRY.fleetCommand,
+    };
+    for (const [route, id] of Object.entries(routeToId)) {
+      expect(tools.some((tool) => tool.path === route || tool.route === route), route).toBe(true);
+      expect(allPanelIds, `${route} (${id})`).toContain(id);
+    }
+  });
+
+  it('duplicate-system-audit: Platform dashboard registry -- does not read platformOperatingSystem demo OS data', () => {
+    // "Demo OS dashboards vs command dashboard tiles" -- docs/duplicate-system-audit.md's
+    // stated risk for this finding. commandDashboardModel.ts is the canonical source for
+    // the real command dashboard tiles rendered at /dashboard (CommandDashboard.tsx);
+    // platformOperatingSystem.ts's PLATFORM_DASHBOARDS feeds unrelated capability-matrix /
+    // search-discovery / saas-operating-system data layers only, never a rendered page.
+    // Guard against a future import merging the two back together.
+    const __dirname = dirname(fileURLToPath(import.meta.url));
+    const source = readFileSync(join(__dirname, 'commandDashboardModel.ts'), 'utf8');
+    expect(source).not.toMatch(/platformOperatingSystem/);
   });
 });
