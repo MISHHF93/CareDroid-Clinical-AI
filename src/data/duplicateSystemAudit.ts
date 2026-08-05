@@ -67,9 +67,9 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
         instances: ['src/app/router.tsx (React Router mount table)', 'routes.config.ts'],
         overlap: null,
         risk: 'New routes added only in router.tsx bypass alias + nav contracts',
-        action: 'wire',
+        action: 'done',
         recommendation:
-          'Keep router.tsx as mount table; validate every `path:` exists in CANONICAL_ROUTES or ROUTE_ALIAS_GROUPS via routeHealth tests.',
+          'Done: src/routing/routeHealth.ts scans router.tsx and cross-checks every path against CANONICAL_APP_ROUTE_TREE/LEGACY_EMERGENCY_ROUTE_REDIRECTS; src/routing/routeHealth.test.ts asserts zero blank routes, zero unreachable active/hidden routes, zero duplicate route ownership, and zero orphan pages. Verified passing (5/5) as of this audit refresh.',
       },
       {
         name: 'Calculator deep links',
@@ -478,17 +478,18 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
         instances: ['sofa-score (registry)', 'sofa-calculator (executor)', 'drug-check / drug-interactions'],
         overlap: REGISTRY_ID_TO_ORCHESTRATOR_TOOL_COUNT(),
         risk: 'Inventory TOOL_EXECUTOR_STATUS.REGISTERED uses registry id',
-        action: 'wire',
+        action: 'done',
         recommendation:
-          'Canonical POST id: executor id; map at boundary via REGISTRY_ID_TO_ORCHESTRATOR_TOOL only.',
+          'Done: src/data/executorMappingAudit.test.ts reads backend/.../tool-orchestrator.registry.ts source directly and asserts REGISTRY_ID_TO_ORCHESTRATOR_TOOL equals the backend REGISTRY_ID_TO_EXECUTOR_TOOL_ID map exactly, plus that registered executors are never also marked unsupported. Verified passing (6/6) as of this audit refresh.',
       },
       {
         name: 'NLU catalog postExecutable flags',
         instances: ['clinicalIntentToolCatalog postExecutable', 'ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS'],
         overlap: null,
         risk: 'Catalog claims executable without backend registerTool()',
-        action: 'wire',
-        recommendation: 'Generate postExecutable from backend registry in CI.',
+        action: 'done',
+        recommendation:
+          'Done: the same executorMappingAudit.test.ts asserts every NLU profile tool id is either POST-executable (isOrchestratorPostExecutable, cross-checked against the real backend registry) or documented unsupported, and never both. Verified passing (6/6) as of this audit refresh.',
       },
     ],
   },

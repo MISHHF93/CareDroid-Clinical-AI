@@ -1,6 +1,6 @@
 # Duplicate System Audit
 
-Generated: 2026-07-23 (regenerate with `npm run duplicate-system-audit:write-docs`)
+Generated: 2026-08-05 (regenerate with `npm run duplicate-system-audit:write-docs`)
 
 ## Purpose
 
@@ -60,7 +60,7 @@ Identify competing sources of truth that cause drift, double registration, or am
 | Duplicate | Instances | Risk | Action | Recommendation |
 |-----------|-----------|------|--------|----------------|
 | Canonical route map vs tool launch paths | routes.config.js → CANONICAL_ROUTES; clinicalToolIdContract.js → TOOL_LAUNCH_PATHS | Drift when adding fleet/simulation paths to one file only | merge | Import CANONICAL_ROUTES into clinicalToolIdContract (or shared routes module); deprecate overlapping TOOL_LAUNCH_PATHS keys. |
-| Router mount table vs canonical routes | src/app/router.tsx (React Router mount table); routes.config.ts | New routes added only in router.tsx bypass alias + nav contracts | wire | Keep router.tsx as mount table; validate every `path:` exists in CANONICAL_ROUTES or ROUTE_ALIAS_GROUPS via routeHealth tests. |
+| Router mount table vs canonical routes | src/app/router.tsx (React Router mount table); routes.config.ts | New routes added only in router.tsx bypass alias + nav contracts | done | Done: src/routing/routeHealth.ts scans router.tsx and cross-checks every path against CANONICAL_APP_ROUTE_TREE/LEGACY_EMERGENCY_ROUTE_REDIRECTS; src/routing/routeHealth.test.ts asserts zero blank routes, zero unreachable active/hidden routes, zero duplicate route ownership, and zero orphan pages. Verified passing (5/5) as of this audit refresh. |
 | Calculator deep links | clinicalToolRoutes.js → CALCULATOR_ROUTE_DEFS; App.jsx LegacyCalculatorRouteRedirect for /tools/calculators; toolInventory per-tool `route` | Slug/path mismatch between hub and inventory | merge | Canonical: `clinicalToolRoutes.js` indexes calculator slugs; App.jsx keeps one Copilot redirect surface for calculator paths. |
 | Pack marketplace URLs | /asset-packs; /settings/organization/packs | Same component is mounted in product discovery and organization-admin contexts | legacy | Keep `/asset-packs` as product/pack discovery and `/settings/organization/packs` as organization entitlement management; both must share `PackMarketplace` and route-health coverage. |
 | Workflow surfaces | /automation → WorkflowAutomationBuilder; /workflows → WorkflowBuilderPage (PlatformOS) | Two workflow UIs under different nav ids | merge | Pick one workflow builder (Platform OS `WorkflowBuilderPage` or legacy `WorkflowAutomationBuilder`); alias the other route. |
@@ -184,8 +184,8 @@ Identify competing sources of truth that cause drift, double registration, or am
 | Duplicate | Instances | Risk | Action | Recommendation |
 |-----------|-----------|------|--------|----------------|
 | Frontend orchestrator mirror | clinicalToolIdContract ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS; REGISTRY_ID_TO_ORCHESTRATOR_TOOL; backendApiCapabilities BACKEND_EXECUTOR_NLU_TOOL_IDS | Copy-paste drift (tests catch) | legacy | Canonical: backend registry; frontend parses it in drift tests (already in executorMappingAudit.test.js). |
-| Registry id vs executor id | sofa-score (registry); sofa-calculator (executor); drug-check / drug-interactions | Inventory TOOL_EXECUTOR_STATUS.REGISTERED uses registry id | wire | Canonical POST id: executor id; map at boundary via REGISTRY_ID_TO_ORCHESTRATOR_TOOL only. |
-| NLU catalog postExecutable flags | clinicalIntentToolCatalog postExecutable; ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS | Catalog claims executable without backend registerTool() | wire | Generate postExecutable from backend registry in CI. |
+| Registry id vs executor id | sofa-score (registry); sofa-calculator (executor); drug-check / drug-interactions | Inventory TOOL_EXECUTOR_STATUS.REGISTERED uses registry id | done | Done: src/data/executorMappingAudit.test.ts reads backend/.../tool-orchestrator.registry.ts source directly and asserts REGISTRY_ID_TO_ORCHESTRATOR_TOOL equals the backend REGISTRY_ID_TO_EXECUTOR_TOOL_ID map exactly, plus that registered executors are never also marked unsupported. Verified passing (6/6) as of this audit refresh. |
+| NLU catalog postExecutable flags | clinicalIntentToolCatalog postExecutable; ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS | Catalog claims executable without backend registerTool() | done | Done: the same executorMappingAudit.test.ts asserts every NLU profile tool id is either POST-executable (isOrchestratorPostExecutable, cross-checked against the real backend registry) or documented unsupported, and never both. Verified passing (6/6) as of this audit refresh. |
 
 ## Configuration
 
