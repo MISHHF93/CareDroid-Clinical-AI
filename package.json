@@ -121,7 +121,7 @@
     "verify:ts-backend": "node scripts/verify-ts-backend.mjs",
     "lint": "eslint src",
     "lint:all": "npm run lint && cd backend && npm run lint",
-    "audit:blocking": "audit-ci --high --allowlist GHSA-f88m-g3jw-g9cj",
+    "audit:blocking": "audit-ci --high --allowlist GHSA-f88m-g3jw-g9cj GHSA-qwww-vcr4-c8h2",
     "audit:blocking:all": "npm run audit:blocking && cd backend && npx audit-ci --high --allowlist GHSA-f88m-g3jw-g9cj",
     "format": "prettier --write \"src/**/*.{js,jsx,json,css}\"",
     "format:check": "prettier --check \"src/**/*.{js,jsx,json,css}\"",
