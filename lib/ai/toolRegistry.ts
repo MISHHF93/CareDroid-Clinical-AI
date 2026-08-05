@@ -5,7 +5,7 @@ import type {
   PatientState,
   Priority,
   QueueType,
-} from '../../types/emergency';
+} from '../../src/types/emergency';
 
 export type EmergencyToolName =
   | 'get_patient_details'

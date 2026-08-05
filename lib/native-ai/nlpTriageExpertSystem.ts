@@ -1,5 +1,5 @@
 import { Priority, type Patient } from '../../src/types/emergency';
-import { suggestTriagePriority } from '../../engine/triageEngine';
+import { suggestTriagePriority } from '../../src/engine/triageEngine';
 import { loadPersistedTriageRules, persistTriageRules } from './persistence';
 import type { NativeAiSourceState, StructuredTriageRule, TriageExpertInference } from './types';
 

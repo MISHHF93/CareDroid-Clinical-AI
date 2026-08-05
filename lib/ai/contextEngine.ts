@@ -1,5 +1,5 @@
 import type { AIRequestType } from './types';
-import type { PatientState, Priority } from '../../types/emergency';
+import type { PatientState, Priority } from '../../src/types/emergency';
 import { promptForRequestType } from './promptRegistry';
 import { HUMAN_REVIEW_DISCLAIMER } from './safetyPolicy';
 

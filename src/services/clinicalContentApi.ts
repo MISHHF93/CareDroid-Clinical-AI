@@ -131,7 +131,7 @@ export async function fetchDrugs(query: any = {}) {
 }
 
 /**
- * @returns {Promise<import('../../types/api').DrugCategoriesResponse>}
+ * @returns {Promise<import('../types/api').DrugCategoriesResponse>}
  */
 export async function fetchDrugCategories() {
   try {
@@ -154,7 +154,7 @@ export async function fetchDrugCategories() {
 
 /**
  * @param {string} drugId
- * @returns {Promise<import('../../types/api').DrugDetailResponse>}
+ * @returns {Promise<import('../types/api').DrugDetailResponse>}
  */
 export async function fetchDrugById(drugId) {
   if (!drugId) {

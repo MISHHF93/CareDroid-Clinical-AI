@@ -4,7 +4,7 @@ import {
   suggestTriagePriority,
   type TriageSuggestionInput,
   type TriageVitalsInput,
-} from '../../engine/triageEngine';
+} from '../../src/engine/triageEngine';
 import type {
   TriageAssistBuildContext,
   TriageAssistEnvelope,

@@ -4,7 +4,7 @@ import { UNSUPPORTED_CAPABILITY_MESSAGE } from '../config/backendApiCapabilities
  * @param {string} capability
  * @param {string} endpoint
  * @param {unknown} [data]
- * @returns {import('../../types/api').ApiUnavailableResponse}
+ * @returns {import('../types/api').ApiUnavailableResponse}
  */
 export function makeDisabledCapabilityResponse(capability, endpoint, data = null) {
   return {
@@ -21,7 +21,7 @@ export function makeDisabledCapabilityResponse(capability, endpoint, data = null
 /**
  * TODO(backend): Replace with POST /api/sync once the bulk sync contract is implemented.
  * @param {number} queued
- * @returns {import('../../types/api').OfflineSyncResponse}
+ * @returns {import('../types/api').OfflineSyncResponse}
  */
 export function makeBulkSyncDisabledResponse(queued = 0) {
   return {
@@ -37,7 +37,7 @@ export function makeBulkSyncDisabledResponse(queued = 0) {
 
 /**
  * TODO(backend): Replace with server-side notification stream once SSE/WebSocket support ships.
- * @returns {import('../../types/api').NotificationStreamResponse}
+ * @returns {import('../types/api').NotificationStreamResponse}
  */
 export function makeNotificationStreamDisabledResponse() {
   return {
@@ -51,7 +51,7 @@ export function makeNotificationStreamDisabledResponse() {
 /**
  * TODO(backend): Replace with POST /api/notifications/send/:channel.
  * @param {string} channel
- * @returns {import('../../types/api').NotificationSendResponse}
+ * @returns {import('../types/api').NotificationSendResponse}
  */
 export function makeNotificationSendDisabledResponse(channel) {
   return {

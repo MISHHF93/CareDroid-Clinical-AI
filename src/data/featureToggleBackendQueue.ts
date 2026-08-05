@@ -1,4 +1,4 @@
-import type { BackendQueueItem } from '../../types/api';
+import type { BackendQueueItem } from '../types/api';
 
 export const FEATURE_TOGGLE_BACKEND_QUEUE: BackendQueueItem[] = [
   {
