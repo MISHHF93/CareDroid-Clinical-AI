@@ -53,4 +53,11 @@ describe('DiagnosticSafetyDashboard', () => {
     expect(screen.getByRole('heading', { name: 'Diagnostic Safety Dashboard' })).toBeInTheDocument();
     expect(screen.getByRole('list')).toBeEmptyDOMElement();
   });
+
+  it('P0.4: labels the dashboard Manual, not Live, since its risk scoring is rule-based, not a trained model', () => {
+    render(<DiagnosticSafetyDashboard patients={[patient()]} />);
+    const label = screen.getByTestId('ai-truth-label-chip');
+    expect(label).toHaveTextContent('Manual');
+    expect(label.getAttribute('title')).toMatch(/deterministic, not a trained model/i);
+  });
 });

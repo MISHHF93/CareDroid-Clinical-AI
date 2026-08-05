@@ -3,16 +3,13 @@
  * Loaded after card-contrast-normalization.css.
  */
 
-:is(.app-shell, .emergency-app-shell) :is(
-    .profile-settings-shell,
-    .profile-page,
-    .profile-identity-page,
-    .profile-settings-page
-  ) {
+:is(.app-shell, .emergency-app-shell)
+  :is(.profile-settings-shell, .profile-page, .profile-identity-page, .profile-settings-page) {
   color: var(--medical-text-body, var(--app-text-primary));
 }
 
-:is(.app-shell, .emergency-app-shell) :is(
+:is(.app-shell, .emergency-app-shell)
+  :is(
     .profile-settings-shell__header h1,
     .profile-card__title,
     .profile-overview-card__header h3,
@@ -24,7 +21,8 @@
   color: var(--medical-text-heading, var(--app-text-primary));
 }
 
-:is(.app-shell, .emergency-app-shell) :is(
+:is(.app-shell, .emergency-app-shell)
+  :is(
     .profile-settings-shell__eyebrow,
     .profile-settings-shell__subtitle,
     .profile-settings-shell__access,
@@ -43,7 +41,8 @@
   color: var(--medical-text-muted, var(--app-text-muted));
 }
 
-:is(.app-shell, .emergency-app-shell) :is(
+:is(.app-shell, .emergency-app-shell)
+  :is(
     .profile-nav-links a,
     .profile-back-link,
     .profile-overview-card__header a,
@@ -57,7 +56,8 @@
   text-decoration-color: color-mix(in srgb, var(--medical-text-link, #0369a1) 35%, transparent);
 }
 
-:is(.app-shell, .emergency-app-shell) :is(
+:is(.app-shell, .emergency-app-shell)
+  :is(
     .profile-nav-links a:hover,
     .profile-back-link:hover,
     .profile-overview-card__header a:hover,
@@ -70,7 +70,8 @@
   color: var(--medical-text-link-hover, var(--app-link-hover));
 }
 
-:is(.app-shell, .emergency-app-shell) :is(
+:is(.app-shell, .emergency-app-shell)
+  :is(
     .profile-overview-card,
     .profile-activity-item,
     .profile-competency-summary div,

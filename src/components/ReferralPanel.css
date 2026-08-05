@@ -509,7 +509,11 @@
 }
 
 .referral-row__decline {
-  border-color: color-mix(in srgb, var(--status-critical) 42%, var(--color-border-default)) !important;
+  border-color: color-mix(
+    in srgb,
+    var(--status-critical) 42%,
+    var(--color-border-default)
+  ) !important;
   background: color-mix(in srgb, var(--status-critical) 12%, var(--color-elevated)) !important;
   color: var(--status-critical) !important;
 }

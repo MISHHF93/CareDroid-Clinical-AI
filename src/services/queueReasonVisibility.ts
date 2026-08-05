@@ -7,7 +7,7 @@ import {
   classifyReferralBucket,
   isClosedReferralStatus,
 } from '../components/whiteboard/referralAwarenessModel';
-import { deriveProviderWaitingStatus } from '../components/whiteboard/waitingRoomSafetyBoardModel';
+import { deriveProviderWaitingStatus } from './providerWaitingStatus';
 import { buildReassessmentTimerSnapshot } from '../engine/reassessmentTimerEngine';
 import {
   deriveQueueDestination,

@@ -6,6 +6,7 @@ import {
   formatPrivacySafePatientName,
   pseudonymizePatientId,
   resolveEmergencyDisplayPrivacyPolicy,
+  shouldRedactCentralNodeForDisplayPrivacy,
   shouldRedactSensitiveEmergencyData,
 } from './emergencyDisplayPrivacyPolicy';
 import { WALL_DISPLAY_MONITOR_PRIVACY } from './wallDisplayMonitorPrivacyModel';
@@ -89,5 +90,26 @@ describe('emergencyDisplayPrivacyPolicy', () => {
 
   it('pseudonymizes using stable patient id suffix', () => {
     expect(pseudonymizePatientId('patient-abc-1234')).toBe('Patient 1234');
+  });
+
+  it('requires central-node redaction for restricted and minimal read-only whiteboard privacy', () => {
+    expect(
+      shouldRedactCentralNodeForDisplayPrivacy(CARE_DROID_SCREEN_MODES.readOnlyWhiteboard, 'minimal'),
+    ).toBe(true);
+    expect(
+      shouldRedactCentralNodeForDisplayPrivacy(
+        CARE_DROID_SCREEN_MODES.readOnlyWhiteboard,
+        'restricted',
+      ),
+    ).toBe(true);
+    expect(
+      shouldRedactCentralNodeForDisplayPrivacy(
+        CARE_DROID_SCREEN_MODES.readOnlyWhiteboard,
+        'operational',
+      ),
+    ).toBe(false);
+    expect(
+      shouldRedactCentralNodeForDisplayPrivacy(CARE_DROID_SCREEN_MODES.chargeNurse, 'minimal'),
+    ).toBe(false);
   });
 });

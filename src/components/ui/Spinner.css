@@ -34,7 +34,11 @@
 
 /* Color variants */
 .spinner-accent {
-  border-color: color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 22%, transparent);
+  border-color: color-mix(
+    in srgb,
+    var(--app-accent-action, var(--app-accent-interactive)) 22%,
+    transparent
+  );
   border-top-color: var(--app-accent-action, var(--app-accent-interactive));
 }
 

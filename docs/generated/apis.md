@@ -3,7 +3,7 @@
 > Auto-generated from implementation. Do not edit manually.
 > Regenerate: `npm run docs:generate`
 
-**Entries:** 50
+**Entries:** 52
 
 ### centralNodeSnapshot
 
@@ -77,6 +77,14 @@ Emergency OS endpoint: /api/emergency/ems
 - **Status:** disabled
 - **Endpoints:** `/api/emergency/ems`
 
+### emsHandoff
+
+Emergency OS endpoint: /api/emergency/ems/handoff
+
+- **Source:** `emergencyOsApi.ts`
+- **Status:** disabled
+- **Endpoints:** `/api/emergency/ems/handoff`
+
 ### receptionSnapshot
 
 Emergency OS endpoint: /api/emergency/reception/snapshot
@@ -92,6 +100,14 @@ Emergency OS endpoint: /api/emergency/reception/handoff
 - **Source:** `emergencyOsApi.ts`
 - **Status:** disabled
 - **Endpoints:** `/api/emergency/reception/handoff`
+
+### receptionEscalation
+
+Emergency OS endpoint: /api/emergency/reception/escalation
+
+- **Source:** `emergencyOsApi.ts`
+- **Status:** disabled
+- **Endpoints:** `/api/emergency/reception/escalation`
 
 ### triageAssist
 

@@ -180,7 +180,7 @@
 
 .slider:before {
   position: absolute;
-  content: "";
+  content: '';
   height: 20px;
   width: 20px;
   left: 4px;
@@ -224,7 +224,7 @@
   font-weight: 500;
 }
 
-.time-input-group input[type="time"] {
+.time-input-group input[type='time'] {
   padding: 0.75rem;
   background: var(--bg-secondary, #1a1b1e);
   border: 1px solid var(--border-color, #2a2b2e);
@@ -234,7 +234,7 @@
   font-family: inherit;
 }
 
-.time-input-group input[type="time"]:focus {
+.time-input-group input[type='time']:focus {
   outline: none;
   border-color: var(--primary-color, var(--primary-color));
 }

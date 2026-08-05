@@ -140,6 +140,15 @@ describe('AdministrativeAutomationReviewPanel', () => {
     expect(screen.getByText('Clinician review required')).toBeInTheDocument();
   });
 
+  it('P0.4: labels the AI decision block Live, with review required', () => {
+    renderPanel();
+
+    const label = screen.getByTestId('ai-truth-label-chip');
+    expect(label).toHaveTextContent('Live');
+    expect(label.getAttribute('title')).toMatch(/AI Chief gateway/i);
+    expect(label.getAttribute('title')).toMatch(/human review required/i);
+  });
+
   it('renders automation queue charts', () => {
     renderPanel();
 

@@ -7,11 +7,17 @@ import {
   CARE_DROID_SCREEN_MODES,
   CARE_DROID_SCREEN_MODE_CONFIG,
   CARE_DROID_SCREEN_MODE_OPTIONS,
+  coerceEnabledScreenMode,
   isValidCareDroidScreenMode,
   normalizeCareDroidScreenMode,
   shouldUseMinimalAppChromeForMode,
   type CareDroidScreenMode,
 } from './careDroidScreenModes';
+
+// Re-exported for existing callers (e.g. emergencyRoleNavigationModel.ts) —
+// the real definition lives in careDroidScreenModeRegistry.ts now, moved
+// there to break a circular dependency with emergencyDeviceContextModel.ts.
+export { coerceEnabledScreenMode };
 import {
   resolveDeviceContextScreenMode,
   type EmergencyDeviceContextId,
@@ -130,20 +136,6 @@ export type ResolveEmergencyScreenModeInput = {
 
 function isValidScreenMode(value: unknown): value is CareDroidScreenMode {
   return isValidCareDroidScreenMode(value);
-}
-
-export function coerceEnabledScreenMode(
-  mode: CareDroidScreenMode | string,
-  enabledScreenModes: string[] | undefined,
-): CareDroidScreenMode {
-  const canonical = normalizeCareDroidScreenMode(mode) || (mode as CareDroidScreenMode);
-  if (!enabledScreenModes?.length) return canonical;
-  const enabled = enabledScreenModes
-    .map((entry) => normalizeCareDroidScreenMode(entry))
-    .filter((entry): entry is CareDroidScreenMode => Boolean(entry));
-  if (!enabled.length) return canonical;
-  if (enabled.includes(canonical)) return canonical;
-  return enabled[0];
 }
 
 export function resolveDisplayParamScreenMode(

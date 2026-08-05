@@ -31,7 +31,9 @@
     align-items: center;
   }
 
-  .emergency-app-shell .app-shell-main-content > :is(
+  .emergency-app-shell
+    .app-shell-main-content
+    > :is(
       .cd-page-shell,
       .emergency-route-page,
       .emergency-whiteboard-page,
@@ -45,7 +47,9 @@
     margin-inline: auto;
   }
 
-  .emergency-app-shell .app-shell-main-content :is(
+  .emergency-app-shell
+    .app-shell-main-content
+    :is(
       .emergency-route-metric-grid,
       .emergency-route-situation-brief__list--graphic,
       .hospital-command-center__metric-grid,
@@ -85,9 +89,7 @@
 
   /* ── Reception: 3-column layout on ultrawide ──
      Primary intake dominates, operational rail is capped and sticky. */
-  .reception-front-door
-    > .emergency-route-page__content
-    > .cdl-operational-page {
+  .reception-front-door > .emergency-route-page__content > .cdl-operational-page {
     grid-template-columns:
       minmax(0, 1fr)
       minmax(var(--cd-uw-rail-min), var(--cd-uw-rail-max));

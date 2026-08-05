@@ -221,10 +221,9 @@
 
 .ems-pipeline__row {
   display: grid;
-  grid-template-columns: minmax(150px, 0.9fr) minmax(260px, 1.35fr) auto minmax(
-      260px,
-      1fr
-    ) auto;
+  grid-template-columns:
+    minmax(150px, 0.9fr) minmax(260px, 1.35fr) auto minmax(260px, 1fr)
+    auto;
   align-items: center;
   gap: var(--space-3);
   min-width: 0;

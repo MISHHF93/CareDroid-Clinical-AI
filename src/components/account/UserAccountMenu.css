@@ -20,7 +20,10 @@
   background: var(--app-overlay-on-surface, rgba(255, 255, 255, 0.04));
   color: var(--text-color);
   cursor: pointer;
-  transition: border-color 120ms ease, background-color 120ms ease, box-shadow 120ms ease;
+  transition:
+    border-color 120ms ease,
+    background-color 120ms ease,
+    box-shadow 120ms ease;
 }
 
 .account-menu__trigger:hover {
@@ -107,7 +110,9 @@
   border: 1px solid var(--medical-border, #e2e8f0);
   background: var(--app-surface-1, #ffffff);
   color: var(--medical-ink, #111827);
-  box-shadow: 0 4px 6px rgba(15, 23, 42, 0.04), 0 12px 32px rgba(15, 23, 42, 0.12);
+  box-shadow:
+    0 4px 6px rgba(15, 23, 42, 0.04),
+    0 12px 32px rgba(15, 23, 42, 0.12);
   direction: ltr;
   text-align: left;
   unicode-bidi: isolate;

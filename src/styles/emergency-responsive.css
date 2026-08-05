@@ -202,7 +202,10 @@
 
 @media (min-width: 1024px) {
   .emergency-whiteboard-page__grid {
-    grid-template-columns: repeat(auto-fill, minmax(var(--ed-whiteboard-card-min-wide), 1fr)) !important;
+    grid-template-columns: repeat(
+      auto-fill,
+      minmax(var(--ed-whiteboard-card-min-wide), 1fr)
+    ) !important;
   }
 }
 
@@ -218,7 +221,10 @@
   }
 
   .emergency-whiteboard-page__grid {
-    grid-template-columns: repeat(auto-fill, minmax(var(--ed-whiteboard-card-min-wide), 1fr)) !important;
+    grid-template-columns: repeat(
+      auto-fill,
+      minmax(var(--ed-whiteboard-card-min-wide), 1fr)
+    ) !important;
   }
 }
 

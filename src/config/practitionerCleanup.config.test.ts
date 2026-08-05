@@ -19,7 +19,6 @@ import {
   shouldSuppressWhiteboardRoleStrips,
   shouldSuppressReceptionAlertRail,
   getPractitionerPatientCardBadgeLimit,
-  mergePractitionerDensityProfile,
   shouldSuppressEmergencyRouteDescriptions,
   shouldSuppressEmergencyRouteMetricCards,
   shouldSuppressEmergencyRouteCrossLinks,
@@ -45,6 +44,7 @@ import {
   shouldSuppressCopilotSafetyBadge,
   getMaxCopilotQuickActions,
 } from './practitionerCleanup.config';
+import { mergePractitionerDensityProfile } from './practitionerRoleSurfacePolicy';
 import { PILOT_CUSTOMER_MODE } from './unified-navigation.config';
 
 describe('practitionerCleanup.config', () => {

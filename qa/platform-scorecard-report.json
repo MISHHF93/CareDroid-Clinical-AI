@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-10T01:51:45.643Z",
+  "generatedAt": "2026-08-04T01:41:33.933Z",
   "goal": "CareDroid platform scorecard across intelligence, enterprise readiness, customer success, maturity, and production readiness",
   "overallScore": 86,
   "overallStatus": "excellent",
@@ -303,7 +303,7 @@
         "unified_artifact_registry": 100,
         "artifact_relationship_mapping": 100,
         "enterprise_metadata": 88,
-        "data_catalog": 98,
+        "data_catalog": 100,
         "data_lineage": 76,
         "kpi_intelligence": 88,
         "operational_intelligence_graph": 100,

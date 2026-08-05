@@ -4,11 +4,11 @@ import {
   buildWaitingRoomSafetyBoard,
   buildWaitingRoomSafetyRow,
   deriveHighRiskComplaintFlags,
-  deriveProviderWaitingStatus,
   deriveTestWaitingStatus,
   deriveTriageLevelLabel,
   formatDurationLabel,
 } from './waitingRoomSafetyBoardModel';
+import { deriveProviderWaitingStatus } from '../../services/providerWaitingStatus';
 
 function buildPatient(overrides: Partial<Patient> = {}): Patient {
   return {

@@ -8,20 +8,51 @@
   border: 1px solid transparent;
   white-space: nowrap;
 }
-.cd-badge--sm { font-size: var(--cd-text-xs);  padding: 1px  var(--cd-space-1-5); }
-.cd-badge--md { font-size: var(--cd-text-xs);  padding: 2px  var(--cd-space-2); }
+.cd-badge--sm {
+  font-size: var(--cd-text-xs);
+  padding: 1px var(--cd-space-1-5);
+}
+.cd-badge--md {
+  font-size: var(--cd-text-xs);
+  padding: 2px var(--cd-space-2);
+}
 
 .cd-badge__dot {
-  width: 6px; height: 6px;
+  width: 6px;
+  height: 6px;
   border-radius: var(--cd-radius-full);
   background: currentColor;
   flex-shrink: 0;
 }
 
 /* Variants */
-.cd-badge--neutral { background: var(--cd-bg-sunken);      color: var(--cd-text-secondary); border-color: var(--cd-border-subtle); }
-.cd-badge--brand   { background: var(--cd-brand-bg-subtle); color: var(--cd-brand-fg-subtle); border-color: var(--cd-border-brand); }
-.cd-badge--info    { background: var(--cd-info-bg-subtle);  color: var(--cd-info-text);    border-color: var(--cd-info-border); }
-.cd-badge--success { background: var(--cd-success-bg-subtle); color: var(--cd-success-text); border-color: var(--cd-success-border); }
-.cd-badge--warning { background: var(--cd-warning-bg-subtle); color: var(--cd-warning-text); border-color: var(--cd-warning-border); }
-.cd-badge--danger  { background: var(--cd-danger-bg-subtle);  color: var(--cd-danger-text);  border-color: var(--cd-danger-border); }
+.cd-badge--neutral {
+  background: var(--cd-bg-sunken);
+  color: var(--cd-text-secondary);
+  border-color: var(--cd-border-subtle);
+}
+.cd-badge--brand {
+  background: var(--cd-brand-bg-subtle);
+  color: var(--cd-brand-fg-subtle);
+  border-color: var(--cd-border-brand);
+}
+.cd-badge--info {
+  background: var(--cd-info-bg-subtle);
+  color: var(--cd-info-text);
+  border-color: var(--cd-info-border);
+}
+.cd-badge--success {
+  background: var(--cd-success-bg-subtle);
+  color: var(--cd-success-text);
+  border-color: var(--cd-success-border);
+}
+.cd-badge--warning {
+  background: var(--cd-warning-bg-subtle);
+  color: var(--cd-warning-text);
+  border-color: var(--cd-warning-border);
+}
+.cd-badge--danger {
+  background: var(--cd-danger-bg-subtle);
+  color: var(--cd-danger-text);
+  border-color: var(--cd-danger-border);
+}

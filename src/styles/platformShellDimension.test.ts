@@ -37,7 +37,8 @@ describe('platform shell dimension contract', () => {
     expect(layoutEngineCss).toContain(
       'scroll-padding-top: calc(var(--app-layout-header-height)',
     );
-    expect(shellHeaderPolishCss).toContain('scroll-padding-top: calc(var(--cdl-chrome-stack-height)');
+    expect(shellHeaderPolishCss).toContain('scroll-padding-top: calc(');
+    expect(shellHeaderPolishCss).toContain('var(--cdl-chrome-stack-height)');
   });
 
   it('wires shell chrome stack in AppShell', () => {

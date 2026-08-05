@@ -80,7 +80,7 @@ describe('CareDroid design language fit contract', () => {
       /:is\(\.app-shell, \.emergency-app-shell\) :is\([\s\S]*table[\s\S]*width:\s*100%/,
     );
     expect(responsiveCss).toMatch(
-      /:is\(\.app-shell, \.emergency-app-shell\) :is\(input[\s\S]*max-width:\s*100%/,
+      /:is\(\.app-shell, \.emergency-app-shell\)\s*:is\(input[\s\S]*max-width:\s*100%/,
     );
     expect(responsiveCss).toMatch(
       /:is\(\.app-shell, \.emergency-app-shell\) :is\(img, svg, canvas, video, iframe\)[\s\S]*max-width:\s*100%/,

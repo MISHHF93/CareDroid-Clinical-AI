@@ -28,11 +28,13 @@ html[data-theme='dark'],
   font-weight: 600;
 }
 
-:is(.app-shell, .emergency-app-shell) :is(small, .text-caption, [class*='__caption'], [class*='-caption']) {
+:is(.app-shell, .emergency-app-shell)
+  :is(small, .text-caption, [class*='__caption'], [class*='-caption']) {
   color: var(--cdl-ink-muted, var(--medical-text-muted));
 }
 
-:is(.app-shell, .emergency-app-shell) :is(
+:is(.app-shell, .emergency-app-shell)
+  :is(
     [class*='__meta'],
     [class*='-meta'],
     [class*='__eyebrow'],
@@ -51,8 +53,29 @@ html[data-theme='dark'],
    explanation on the __cta-specific rule below, which hits the same element
    via a second, independent path. .reception-job-profile-card__cta (the
    "Open reception desk" link on /profile) is the same shape — a solid
-   brand-blue button rendered as an <a> via react-router's <Link>. */
-:is(.app-shell, .emergency-app-shell) a:not([class*='btn']):not([class*='button']):not([role='button']):not(.fj-critical-banner__cta):not(.reception-job-profile-card__cta) {
+   brand-blue button rendered as an <a> via react-router's <Link>.
+   Cycle 261: .profile-section-header__cta and .profile-activity-cta (both
+   plain react-router <Link> text actions with their own deliberate
+   accent/link-token colors) are excluded here too — see the fuller writeup
+   on color-normalization.css's dark-navy sweep, which is what actually made
+   these two visible bugs rather than a redundant-but-harmless mismatch.
+   Cycle 266: .platform-entry__card--primary and .entry-shell__link--primary
+   are both react-router <Link>s hit by the color-normalization.css
+   --primary sweep too — see that file for the full writeup.
+   Cycle 269: .critical-alert-banner__link (the "View alerts" action on the
+   unacknowledged-critical-alerts banner) is hit by both this rule AND the
+   __link-substring rule below via two independent selector paths (it's an
+   <a> with no "btn"/"button"/role="button" marker). Its own CSS is a solid
+   critical-red button with white text — see color-normalization.css's
+   --primary sweep for the measured ~1.18:1 contrast this produces. */
+:is(.app-shell, .emergency-app-shell)
+  a:not([class*='btn']):not([class*='button']):not([role='button']):not(
+    .fj-critical-banner__cta
+  ):not(.reception-job-profile-card__cta):not(.profile-section-header__cta):not(
+    .profile-activity-cta
+  ):not(.platform-entry__card--primary):not(.entry-shell__link--primary):not(
+    .critical-alert-banner__link
+  ) {
   color: var(--medical-text-link);
   text-decoration-color: color-mix(in srgb, var(--medical-text-link) 35%, transparent);
 }
@@ -70,13 +93,27 @@ html[data-theme='dark'],
    --primary modifier — measured at ~1.02:1 (own ink-on-dark background,
    worse than the 1.4:1 cases above since --medical-text-link resolves to a
    near-black navy under the reception role-accent theme, close to the
-   sweep's own #374151 fill from color-normalization.css). */
+   sweep's own #374151 fill from color-normalization.css).
+   Cycle 261: .cdl-public-page__cta, .profile-section-header__cta,
+   .reception-attention__cta, .platform-entry__cta, and
+   .reception-queue-row__cta all match [class*='__cta'] too — see
+   color-normalization.css's dark-navy sweep for the full writeup on why each
+   is a real, previously-unprotected instance of this exact collision.
+   Cycle 266: .entry-shell__link--primary matches [class*='__link'] here too
+   (that branch has no --primary/--solid exclusion, unlike the __cta one) —
+   see color-normalization.css's --primary sweep for the full writeup. */
 :is(.app-shell, .emergency-app-shell)
   :is(
     [class*='__link'],
     [class*='-link']:not([class*='btn']):not([class*='button']),
     [class*='__cta']:not([class*='--solid']):not([class*='--primary'])
-  ):not([class*='btn']):not([class*='button']):not([role='button']):not(.fj-critical-banner__cta):not(.reception-job-profile-card__cta):not(.reception-skill-strip__cta) {
+  ):not([class*='btn']):not([class*='button']):not([role='button']):not(
+    .fj-critical-banner__cta
+  ):not(.reception-job-profile-card__cta):not(.reception-skill-strip__cta):not(
+    .cdl-public-page__cta
+  ):not(.profile-section-header__cta):not(.reception-attention__cta):not(.platform-entry__cta):not(
+    .reception-queue-row__cta
+  ):not(.entry-shell__link--primary):not(.critical-alert-banner__link) {
   color: var(--medical-text-link);
 }
 
@@ -118,21 +155,23 @@ html[data-theme='dark'],
 
 /* Copilot / safety panels — light medical surfaces */
 :is(
-    .diagnostic-safety-dashboard,
-    .patient-card-copilot,
-    .copilot-risk-layer-panel,
-    .ai-transparency-dashboard
-  ) {
+  .diagnostic-safety-dashboard,
+  .patient-card-copilot,
+  .copilot-risk-layer-panel,
+  .ai-transparency-dashboard
+) {
   color: var(--medical-text-body);
   background: var(--medical-surface-card);
   border-color: var(--medical-border);
 }
 
-:is(.diagnostic-safety-dashboard, .patient-card-copilot) :is(h1, h2, h3, h4, h5, h6, [class*='__title']) {
+:is(.diagnostic-safety-dashboard, .patient-card-copilot)
+  :is(h1, h2, h3, h4, h5, h6, [class*='__title']) {
   color: var(--medical-text-heading);
 }
 
-:is(.diagnostic-safety-dashboard, .patient-card-copilot) :is([class*='__subtitle'], [class*='__toggle']) {
+:is(.diagnostic-safety-dashboard, .patient-card-copilot)
+  :is([class*='__subtitle'], [class*='__toggle']) {
   color: var(--medical-text-muted);
 }
 

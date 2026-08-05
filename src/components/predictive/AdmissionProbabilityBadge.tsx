@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import type { BoardingSignals } from '../../services/boardingSignals';
 import { assessPatientAdmissionProbability } from '../../services/predictiveAdmissionModel';
 import type { Patient } from '../../types/emergency';
+import { AiTruthLabel } from '../ai/AiTruthLabel';
 import './AdmissionProbabilityBadge.css';
 
 type AdmissionProbabilityBadgeProps = {
@@ -53,6 +54,12 @@ export default function AdmissionProbabilityBadge({
       aria-label={`Admission probability ${assessment.probabilityPercent} percent. Admit score ${assessment.admitScore} out of ${assessment.admitScoreMax}.`}
     >
       Admit Score: {assessment.admitScore}/{assessment.admitScoreMax}
+      <AiTruthLabel
+        state="Manual"
+        sourceContext="Blended rule-based admission score (anticipated-admission rules + admission heuristic) — not a trained model"
+        reviewRequired
+        compact
+      />
     </span>
   );
 }

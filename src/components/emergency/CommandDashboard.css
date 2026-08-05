@@ -84,7 +84,11 @@
 .command-dashboard__ai {
   display: grid;
   gap: 12px;
-  border-color: color-mix(in srgb, var(--app-accent-action, #0ea5e9) 32%, var(--medical-border, #e0f2fe));
+  border-color: color-mix(
+    in srgb,
+    var(--app-accent-action, #0ea5e9) 32%,
+    var(--medical-border, #e0f2fe)
+  );
 }
 
 .command-dashboard__ai-heading {

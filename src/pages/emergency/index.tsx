@@ -123,7 +123,8 @@ import { AiTriageAssistPanelForPatientId } from '../../components/reception/AiTr
 import EdDataSourceBanner from '../../components/emergency/EdDataSourceBanner';
 import CriticalAlertBanner from '../../components/emergency/CriticalAlertBanner';
 import { FIRST_CUSTOMER_DEMO_MODE } from '../../data/firstCustomerDemoMode';
-import { mergePractitionerDensityProfile, shouldShowWalkthroughActionOnEmptyBoard } from '../../config/practitionerCleanup.config';
+import { shouldShowWalkthroughActionOnEmptyBoard } from '../../config/practitionerCleanup.config';
+import { mergePractitionerDensityProfile } from '../../config/practitionerRoleSurfacePolicy';
 import {
   usePractitionerSurfaceVisibility,
   usePractitionerVisibilityContext,

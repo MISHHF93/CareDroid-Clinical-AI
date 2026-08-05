@@ -51,7 +51,11 @@
 }
 
 .input-field:hover {
-  border-color: color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 26%, var(--app-input-border));
+  border-color: color-mix(
+    in srgb,
+    var(--app-accent-action, var(--app-accent-interactive)) 26%,
+    var(--app-input-border)
+  );
   background: var(--app-input-bg-hover);
 }
 

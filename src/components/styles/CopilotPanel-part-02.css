@@ -66,7 +66,11 @@
   height: 40px;
   border: 1px solid color-mix(in srgb, var(--copilot-action) 70%, var(--copilot-border));
   border-radius: 12px;
-  background: linear-gradient(135deg, var(--copilot-action), color-mix(in srgb, var(--copilot-ai) 60%, var(--copilot-action)));
+  background: linear-gradient(
+    135deg,
+    var(--copilot-action),
+    color-mix(in srgb, var(--copilot-ai) 60%, var(--copilot-action))
+  );
   color: var(--app-on-solid, #fff);
   cursor: pointer;
 }
@@ -273,7 +277,9 @@
     width: 100% !important;
     min-width: 0;
     height: min(52dvh, 500px) !important;
-    max-height: calc(var(--app-viewport-height, 100dvh) - var(--app-visual-viewport-offset-top, 0px) - 18px);
+    max-height: calc(
+      var(--app-viewport-height, 100dvh) - var(--app-visual-viewport-offset-top, 0px) - 18px
+    );
     min-height: min(320px, calc(var(--app-viewport-height, 100dvh) - 96px));
     border: 0 !important;
     border-radius: 18px 18px 0 0;

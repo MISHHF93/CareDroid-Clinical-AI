@@ -96,6 +96,40 @@ vi.mock('../hooks/useEmergencyRolePermissions', () => ({
   default: () => emergencyRoleMock,
 }));
 
+// Without a UserContext, resolveEmergencyRoleId() fails closed to
+// readOnlyViewer (Cycle 219 security hardening), whose default screen mode
+// is the wall-kiosk readOnlyWhiteboard. shouldStartShellEngine() gates every
+// engine off for kiosk screens, so this "startup wiring" test — which only
+// cares whether AppShell wires engines up when capabilities say to, not
+// which role/route maps to which screen — pins the screen to a normal
+// clinical mode (charge_nurse, matching emergencyRoleMock above) via a
+// hand-built capabilities object covering every field AppShell.tsx reads.
+const screenCapabilitiesMock = {
+  screenMode: 'CHARGE_NURSE_SCREEN',
+  label: 'Charge Nurse',
+  productLabel: 'CareDroid',
+  isPublicDisplay: false,
+  isWallKiosk: false,
+  useMinimalAppChrome: false,
+  isRegistrationScreen: false,
+  isReceptionScreen: false,
+  isTriageScreen: false,
+  showReassessmentEngine: true,
+  showCapacityEngine: true,
+  showPatientFlowEngine: true,
+  showAdministrativeAutomationEngine: true,
+  showOperationalIntelligenceEngine: true,
+  showReassessAction: true,
+  showEmsCriticalOverlay: true,
+  showCentralNodeBadge: true,
+  showOperationalStrip: true,
+};
+
+vi.mock('../hooks/useScreenModeCapabilities', () => ({
+  useScreenModeCapabilities: () => screenCapabilitiesMock,
+  default: () => screenCapabilitiesMock,
+}));
+
 vi.mock('../contexts/SimulationModeContext', () => ({
   useSimulationMode: () => ({
     enabled: true,

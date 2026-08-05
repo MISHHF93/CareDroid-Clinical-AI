@@ -5,8 +5,13 @@
   margin-top: 0.5rem;
   padding: 0.55rem 0.65rem;
   border-radius: 0.5rem;
-  background: color-mix(in srgb, var(--medical-card-muted-bg, #f1f5f9) 88%, var(--medical-accent, #64748b) 12%);
-  border: 1px solid color-mix(in srgb, var(--color-border, var(--medical-text-muted, #6b7280)) 80%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--medical-card-muted-bg, #f1f5f9) 88%,
+    var(--medical-accent, #64748b) 12%
+  );
+  border: 1px solid
+    color-mix(in srgb, var(--color-border, var(--medical-text-muted, #6b7280)) 80%, transparent);
   font-size: 0.78rem;
   line-height: 1.35;
 }
@@ -23,7 +28,8 @@
 }
 
 .patient-doc-artifacts__section--copilot {
-  border-top: 1px dashed color-mix(in srgb, var(--color-border, var(--medical-text-muted, #6b7280)) 70%, transparent);
+  border-top: 1px dashed
+    color-mix(in srgb, var(--color-border, var(--medical-text-muted, #6b7280)) 70%, transparent);
   padding-top: 0.35rem;
 }
 

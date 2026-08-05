@@ -109,7 +109,6 @@ jobs:
 
   security-scan:
     runs-on: ubuntu-latest
-    continue-on-error: true
 
     steps:
       - uses: actions/checkout@v4
@@ -121,6 +120,7 @@ jobs:
           scan-ref: .
           format: sarif
           output: trivy-results.sarif
+        continue-on-error: true
 
       - name: Upload Trivy results to GitHub Security
         uses: github/codeql-action/upload-sarif@v4
@@ -128,14 +128,20 @@ jobs:
           sarif_file: trivy-results.sarif
         continue-on-error: true
 
-      - name: Run npm audit
-        run: npm audit --audit-level=high
-        continue-on-error: true
+      # Blocking on new high/critical findings (Cycle 265). GHSA-f88m-g3jw-g9cj
+      # (sharp/@xenova/transformers, libvips CVEs) is allowlisted, not hidden —
+      # it's a known, already-triaged risk with no safe fix today (npm audit fix
+      # --force only offers downgrading @xenova/transformers to a broken 1.4.2;
+      # re-confirmed unfixable across many prior audit cycles, see SCORECARD.md).
+      # audit-ci still prints and flags the allowlisted finding every run so it
+      # stays visible, it just doesn't fail the build for a risk already accepted.
+      # Any NEW high/critical finding, on either tree, fails this job for real.
+      - name: Run npm audit (frontend, blocking on new high/critical)
+        run: npx audit-ci@7.1.0 --high --allowlist GHSA-f88m-g3jw-g9cj
 
-      - name: Run backend npm audit
+      - name: Run npm audit (backend, blocking on new high/critical)
         working-directory: backend
-        run: npm audit --audit-level=high
-        continue-on-error: true
+        run: npx audit-ci@7.1.0 --high --allowlist GHSA-f88m-g3jw-g9cj
 
       - name: Check outdated dependencies
         run: npm outdated

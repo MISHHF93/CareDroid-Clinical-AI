@@ -4,7 +4,11 @@
   margin-top: 12px;
   border: 1px solid rgba(96, 165, 250, 0.28);
   border-radius: 14px;
-  background: linear-gradient(180deg, var(--medical-surface-card, #ffffff), var(--medical-surface-page, #f1f5f9));
+  background: linear-gradient(
+    180deg,
+    var(--medical-surface-card, #ffffff),
+    var(--medical-surface-page, #f1f5f9)
+  );
   overflow: hidden;
 }
 

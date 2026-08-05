@@ -125,7 +125,9 @@
   font-size: 0.78rem;
   font-weight: 600;
   cursor: pointer;
-  transition: border-color 120ms ease, background-color 120ms ease;
+  transition:
+    border-color 120ms ease,
+    background-color 120ms ease;
 }
 
 .profile-role-switcher__chip:hover {

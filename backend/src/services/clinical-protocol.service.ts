@@ -1,3 +1,5 @@
+import { Injectable } from '@nestjs/common';
+
 export interface ClinicalProtocol {
   id: string;
   name: string;
@@ -42,6 +44,7 @@ const CLINICAL_PROTOCOLS: ClinicalProtocol[] = [
   },
 ];
 
+@Injectable()
 export class ClinicalProtocolService {
   listProtocols(): ClinicalProtocol[] {
     return CLINICAL_PROTOCOLS.map((protocol) => ({ ...protocol }));

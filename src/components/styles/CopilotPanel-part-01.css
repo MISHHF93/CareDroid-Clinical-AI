@@ -19,11 +19,31 @@
 }
 
 .ed-copilot-panel {
-  --copilot-bg: color-mix(in srgb, var(--color-surface, var(--app-surface-1, #ffffff)) 90%, #f1f5f9);
-  --copilot-surface: color-mix(in srgb, var(--color-floating-surface, var(--app-surface-elevated, #ffffff)) 76%, #f1f5f9);
-  --copilot-surface-soft: color-mix(in srgb, var(--color-card, var(--app-surface-2, #ffffff)) 68%, #f1f5f9);
-  --copilot-border: color-mix(in srgb, var(--color-border-default, var(--medical-border, #e0f2fe)) 76%, transparent);
-  --copilot-border-strong: color-mix(in srgb, #374151 34%, var(--color-border-default, var(--medical-border, #e0f2fe)));
+  --copilot-bg: color-mix(
+    in srgb,
+    var(--color-surface, var(--app-surface-1, #ffffff)) 90%,
+    #f1f5f9
+  );
+  --copilot-surface: color-mix(
+    in srgb,
+    var(--color-floating-surface, var(--app-surface-elevated, #ffffff)) 76%,
+    #f1f5f9
+  );
+  --copilot-surface-soft: color-mix(
+    in srgb,
+    var(--color-card, var(--app-surface-2, #ffffff)) 68%,
+    #f1f5f9
+  );
+  --copilot-border: color-mix(
+    in srgb,
+    var(--color-border-default, var(--medical-border, #e0f2fe)) 76%,
+    transparent
+  );
+  --copilot-border-strong: color-mix(
+    in srgb,
+    #374151 34%,
+    var(--color-border-default, var(--medical-border, #e0f2fe))
+  );
   --copilot-ai: #374151;
   --copilot-action: #374151;
   --copilot-text: var(--color-text-primary, var(--medical-ink, #111827));
@@ -41,7 +61,11 @@
   height: var(--app-viewport-height, 100dvh);
   border-left: 1px solid var(--copilot-border);
   background:
-    radial-gradient(circle at 20% 0%, color-mix(in srgb, var(--copilot-ai) 10%, transparent), transparent 34%),
+    radial-gradient(
+      circle at 20% 0%,
+      color-mix(in srgb, var(--copilot-ai) 10%, transparent),
+      transparent 34%
+    ),
     linear-gradient(180deg, var(--copilot-surface), var(--copilot-bg));
   color: var(--copilot-text);
   box-shadow: -18px 0 44px rgba(2, 6, 23, 0.22);

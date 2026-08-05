@@ -23,7 +23,8 @@
   color: var(--nai-text);
 }
 
-:is(.app-shell, .emergency-app-shell) :is(
+:is(.app-shell, .emergency-app-shell)
+  :is(
     [class*='-panel'],
     [class*='-card'],
     [class*='-strip'],
@@ -34,7 +35,8 @@
   --component-border-fallback: var(--medical-border, #e0f2fe);
 }
 
-:is(.app-shell, .emergency-app-shell) :is(
+:is(.app-shell, .emergency-app-shell)
+  :is(
     .operational-strip__chip,
     .charge-nurse-operational-strip__chip,
     .whiteboard-alert-rail__item

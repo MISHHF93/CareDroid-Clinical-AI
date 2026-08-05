@@ -113,7 +113,10 @@
 }
 
 .cd-dashboard-grid--cards {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--app-grid-card-min-density, 14rem)), 1fr));
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(min(100%, var(--app-grid-card-min-density, 14rem)), 1fr)
+  );
 }
 
 .cd-dashboard-grid--metrics {
@@ -134,7 +137,10 @@
 }
 
 .cd-dashboard-grid--summary {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--app-grid-min-summary, 16rem)), 1fr));
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(min(100%, var(--app-grid-min-summary, 16rem)), 1fr)
+  );
 }
 
 .cd-page-stack {
@@ -155,7 +161,10 @@
 .cd-surface {
   background: var(--app-surface);
   border: 1px solid var(--cdl-clinical-border, var(--app-border));
-  border-radius: var(--cdl-clinical-radius, var(--compact-panel-radius, var(--app-radius-xl, var(--app-radius-lg))));
+  border-radius: var(
+    --cdl-clinical-radius,
+    var(--compact-panel-radius, var(--app-radius-xl, var(--app-radius-lg)))
+  );
   box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
   display: grid;
   gap: var(--compact-panel-gap, var(--app-space-md));
@@ -165,7 +174,11 @@
 
 .cd-hero-panel {
   background:
-    linear-gradient(135deg, color-mix(in srgb, var(--app-accent) 12%, transparent), transparent 54%),
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--app-accent) 12%, transparent),
+      transparent 54%
+    ),
     var(--app-surface);
 }
 
@@ -208,7 +221,10 @@
   align-items: start;
   display: grid;
   gap: var(--compact-panel-gap, var(--app-space-lg));
-  grid-template-columns: minmax(0, 1fr) minmax(min(100%, var(--app-detail-rail-width, 22rem)), 0.38fr);
+  grid-template-columns: minmax(0, 1fr) minmax(
+      min(100%, var(--app-detail-rail-width, 22rem)),
+      0.38fr
+    );
   min-width: 0;
 }
 
@@ -217,11 +233,17 @@
 }
 
 .cd-workspace-split--wide {
-  grid-template-columns: minmax(0, 1fr) minmax(min(100%, var(--app-detail-rail-width, 20rem)), 0.32fr);
+  grid-template-columns: minmax(0, 1fr) minmax(
+      min(100%, var(--app-detail-rail-width, 20rem)),
+      0.32fr
+    );
 }
 
 .cd-workspace-split--rail-left {
-  grid-template-columns: minmax(min(100%, var(--app-detail-rail-width, 20rem)), 0.34fr) minmax(0, 1fr);
+  grid-template-columns: minmax(min(100%, var(--app-detail-rail-width, 20rem)), 0.34fr) minmax(
+      0,
+      1fr
+    );
 }
 
 .cd-detail-rail {

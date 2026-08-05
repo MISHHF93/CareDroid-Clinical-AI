@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import type { Patient } from '../../types/emergency';
 import { buildNativeAiPatientSnapshot, formatRoutingLabel } from '../../services/nativeAiCore';
+import { AiTruthLabel, fromNativeAiSourceState } from '../ai/AiTruthLabel';
 import './NativeAiRoutingBadge.css';
 
 type NativeAiRoutingBadgeProps = {
@@ -15,6 +16,10 @@ export default function NativeAiRoutingBadge({
   className = '',
 }: NativeAiRoutingBadgeProps) {
   const snapshot = useMemo(() => buildNativeAiPatientSnapshot(patient), [patient]);
+  const truthLabel = fromNativeAiSourceState(snapshot.routing.sourceState, {
+    sourceContext: `Panel-of-experts routing engine ${snapshot.routing.routerModelVersion}`,
+    reviewRequired: true,
+  });
 
   return (
     <span
@@ -33,6 +38,7 @@ export default function NativeAiRoutingBadge({
       <span className="native-ai-routing-badge__meta">
         {Math.round(snapshot.routing.confidence * 100)}% · {snapshot.sourceState}
       </span>
+      <AiTruthLabel {...truthLabel} compact />
     </span>
   );
 }

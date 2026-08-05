@@ -3,9 +3,7 @@ import {
   WALL_DISPLAY_MONITOR_PRIVACY,
   applyWallDisplayMonitorPrivacy,
   normalizeWallDisplayMonitorPrivacy,
-  shouldRedactCentralNodeForMonitorPrivacy,
 } from './wallDisplayMonitorPrivacyModel';
-import { CARE_DROID_SCREEN_MODES } from './careDroidScreenModes';
 import type { DepartmentStatusSnapshot } from '../components/whiteboard/departmentStatusScreenModel';
 
 const baseSnapshot: DepartmentStatusSnapshot = {
@@ -79,29 +77,5 @@ describe('wallDisplayMonitorPrivacyModel', () => {
     const snapshot = applyWallDisplayMonitorPrivacy(baseSnapshot, 'minimal');
     expect(snapshot.metrics.find((metric) => metric.id === 'longest-wait')?.value).toBe('1–2 hr');
     expect(snapshot.metrics.find((metric) => metric.id === 'capacity-status')?.value).toBe('Orange');
-  });
-
-  it('requires central-node redaction for restricted and minimal read-only whiteboard privacy', () => {
-    expect(
-      shouldRedactCentralNodeForMonitorPrivacy(
-        CARE_DROID_SCREEN_MODES.readOnlyWhiteboard,
-        'minimal',
-      ),
-    ).toBe(true);
-    expect(
-      shouldRedactCentralNodeForMonitorPrivacy(
-        CARE_DROID_SCREEN_MODES.readOnlyWhiteboard,
-        'restricted',
-      ),
-    ).toBe(true);
-    expect(
-      shouldRedactCentralNodeForMonitorPrivacy(
-        CARE_DROID_SCREEN_MODES.readOnlyWhiteboard,
-        'operational',
-      ),
-    ).toBe(false);
-    expect(
-      shouldRedactCentralNodeForMonitorPrivacy(CARE_DROID_SCREEN_MODES.chargeNurse, 'minimal'),
-    ).toBe(false);
   });
 });

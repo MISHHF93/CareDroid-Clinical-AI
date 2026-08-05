@@ -1,8 +1,10 @@
+import { Injectable } from '@nestjs/common';
 import {
   UnifiedPatient as Patient,
   type IUnifiedPatient as IPatient,
 } from '../models/unified-patient.model';
 
+@Injectable()
 export class ReassessmentService {
   getReassessmentDueMinutes(dpsScore: number): number {
     const schedule: Record<number, number> = {

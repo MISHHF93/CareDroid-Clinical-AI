@@ -52,14 +52,18 @@
   width: var(--cdl-sidebar-width, 232px);
   background: var(--cdl-sidebar-bg, var(--medical-white));
   border-right: 0;
-  box-shadow: var(--cdl-sidebar-shadow, 1px 0 0 color-mix(in srgb, var(--medical-border) 45%, transparent));
+  box-shadow: var(
+    --cdl-sidebar-shadow,
+    1px 0 0 color-mix(in srgb, var(--medical-border) 45%, transparent)
+  );
 }
 
 .cdl-shell__header {
   min-height: var(--cdl-header-height, 52px);
   background: var(--cdl-header-bg, var(--medical-white));
   border-bottom: 0;
-  box-shadow: 0 1px 0 var(--cdl-header-border, color-mix(in srgb, var(--medical-border) 50%, transparent));
+  box-shadow: 0 1px 0
+    var(--cdl-header-border, color-mix(in srgb, var(--medical-border) 50%, transparent));
 }
 
 .cdl-shell__canvas {
@@ -324,7 +328,9 @@
 }
 
 /* —— Layout engine: register CDL page templates —— */
-.emergency-app-shell .app-shell-main-content :is(
+.emergency-app-shell
+  .app-shell-main-content
+  :is(
     .cdl-operational-page,
     .cd-page-shell.cdl-operational-page,
     .system-health-page,

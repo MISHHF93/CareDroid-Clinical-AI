@@ -156,7 +156,7 @@
    DARK MODE OVERRIDES
    ════════════════════════════════════════════════════════════════════════ */
 
-html[data-theme="dark"] {
+html[data-theme='dark'] {
   --shell-header-bg: var(--app-surface-0, #1e293b);
   --shell-header-border: var(--app-border, #334155);
   --shell-header-fg: var(--app-text-primary, #f1f5f9);

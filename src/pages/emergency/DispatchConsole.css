@@ -70,7 +70,11 @@
 }
 
 .dispatch-console__summary-card--highlight {
-  border-color: color-mix(in srgb, var(--status-critical, #ef4444) 35%, var(--cdl-clinical-border)) !important;
+  border-color: color-mix(
+    in srgb,
+    var(--status-critical, #ef4444) 35%,
+    var(--cdl-clinical-border)
+  ) !important;
 }
 
 .dispatch-console__summary-card__value {
@@ -285,7 +289,11 @@
 }
 
 .dc-call-card--critical {
-  border-color: color-mix(in srgb, var(--medical-text-status-critical, #b91c1c) 45%, var(--medical-border));
+  border-color: color-mix(
+    in srgb,
+    var(--medical-text-status-critical, #b91c1c) 45%,
+    var(--medical-border)
+  );
 }
 
 .dc-meta-caps {

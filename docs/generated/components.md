@@ -54,12 +54,12 @@ Operational command bars for journey and workflow surfaces.
 - **Source:** `src/components/emergency/HospitalJourneyCommandBar.tsx`
 - **Components:** `HospitalJourneyCommandBar`
 
-### AI Chief orchestration bar
+### Operational intelligence bar
 
-Continuous monitoring recommendations with explainable rationale.
+Continuous monitoring recommendations with explainable rationale, surfaced from the header Operations Center.
 
-- **Source:** `src/components/ai/AiChiefOrchestrationBar.tsx`
-- **Components:** `AiChiefOrchestrationBar`
+- **Source:** `src/components/emergency/OperationalIntelligenceBar.tsx`
+- **Components:** `OperationalIntelligenceBar`
 
 ### Living contextual help banner
 

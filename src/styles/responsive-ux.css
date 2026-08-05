@@ -13,7 +13,8 @@
   box-sizing: border-box;
 }
 
-:is(.app-shell, .emergency-app-shell) :is(
+:is(.app-shell, .emergency-app-shell)
+  :is(
     main,
     section,
     article,
@@ -36,7 +37,8 @@
   max-width: 100%;
 }
 
-:is(.app-shell, .emergency-app-shell) :is(
+:is(.app-shell, .emergency-app-shell)
+  :is(
     .command-dashboard,
     .operating-workspace,
     .dashboard-root,
@@ -58,26 +60,32 @@
   overflow-x: clip;
 }
 
-:is(.app-shell, .emergency-app-shell) :is(p, li, dd, dt, small, span, strong, h1, h2, h3, h4, h5, h6) {
+:is(.app-shell, .emergency-app-shell)
+  :is(p, li, dd, dt, small, span, strong, h1, h2, h3, h4, h5, h6) {
   overflow-wrap: break-word;
   word-break: normal;
 }
 
-:is(.app-shell, .emergency-app-shell) :is(button, a.btn, .btn, input, select, textarea, summary, [role='button']) {
+:is(.app-shell, .emergency-app-shell)
+  :is(button, a.btn, .btn, input, select, textarea, summary, [role='button']) {
   max-width: 100%;
 }
 
-:is(.app-shell, .emergency-app-shell) :is(button, a.btn, .btn, [role='button'], .launch-action-card) {
+:is(.app-shell, .emergency-app-shell)
+  :is(button, a.btn, .btn, [role='button'], .launch-action-card) {
   min-width: 0;
   white-space: normal;
   text-align: center;
 }
 
-:is(.app-shell, .emergency-app-shell) :is(button, a.btn, .btn) > :is(svg, .nav-icon, [class*='icon']) {
+:is(.app-shell, .emergency-app-shell)
+  :is(button, a.btn, .btn)
+  > :is(svg, .nav-icon, [class*='icon']) {
   flex: 0 0 auto;
 }
 
-:is(.app-shell, .emergency-app-shell) :is(input:not([type='checkbox']):not([type='radio']), select, textarea) {
+:is(.app-shell, .emergency-app-shell)
+  :is(input:not([type='checkbox']):not([type='radio']), select, textarea) {
   width: 100%;
   min-width: 0;
   max-width: 100%;
@@ -92,7 +100,8 @@
   border-collapse: collapse;
 }
 
-:is(.app-shell, .emergency-app-shell) :is(.table-wrap, .table-wrapper, [class*='table-container'], [class*='table-scroll']) {
+:is(.app-shell, .emergency-app-shell)
+  :is(.table-wrap, .table-wrapper, [class*='table-container'], [class*='table-scroll']) {
   max-width: 100%;
   overflow-x: auto;
   overflow-y: hidden;
@@ -103,21 +112,18 @@
   max-width: 100%;
 }
 
-:is(.app-shell, .emergency-app-shell) :is([class*='map'], [class*='chart'], [class*='visualization']) {
+:is(.app-shell, .emergency-app-shell)
+  :is([class*='map'], [class*='chart'], [class*='visualization']) {
   min-width: 0;
 }
 
-:is(.app-shell, .emergency-app-shell) :is(
-    [class*='card'],
-    [class*='panel'],
-    [class*='summary'],
-    [class*='metric'],
-    [class*='tile']
-  ) {
+:is(.app-shell, .emergency-app-shell)
+  :is([class*='card'], [class*='panel'], [class*='summary'], [class*='metric'], [class*='tile']) {
   min-width: 0;
 }
 
-:is(.app-shell, .emergency-app-shell) :is(
+:is(.app-shell, .emergency-app-shell)
+  :is(
     [class*='actions'],
     [class*='controls'],
     [class*='toolbar'],
@@ -128,7 +134,8 @@
   max-width: 100%;
 }
 
-:is(.app-shell, .emergency-app-shell) :is([class*='actions'], [class*='controls'], [class*='toolbar']) {
+:is(.app-shell, .emergency-app-shell)
+  :is([class*='actions'], [class*='controls'], [class*='toolbar']) {
   flex-wrap: wrap;
 }
 
@@ -148,16 +155,16 @@
     .cost-analytics-dashboard,
     .tools-overview,
     .audit-logs-container,
-      .profile-page,
-      .settings-page,
-      .operating-workspace,
-      .command-dashboard,
-      .live-map-page,
-      .hospital-map-page,
-      .medical-iot-page,
-      .device-fleet-page,
-      .fleet-live-map-page,
-      .ops-demo-page,
+    .profile-page,
+    .settings-page,
+    .operating-workspace,
+    .command-dashboard,
+    .live-map-page,
+    .hospital-map-page,
+    .medical-iot-page,
+    .device-fleet-page,
+    .fleet-live-map-page,
+    .ops-demo-page,
     [class*='fleet-page'],
     [class*='fleet-dashboard'],
     [class*='predictive-maintenance'],
@@ -312,23 +319,23 @@
 /* —— Card padding on small screens —— */
 @media (max-width: 640px) {
   :is(
-      .tool-header,
-      .calculator-card,
-      .summary-card,
-      .cost-card,
-      .analytics-panel,
-      .catalog-stat,
-      .tool-card-large,
-      .launch-action-card,
-      .operating-card,
-      .operating-drilldown,
-      .profile-overview-card,
-      .settings-privacy-card,
-      .settings-billing-card,
-      .command-panel,
-      .command-hero,
-      .tip-card
-    ) {
+    .tool-header,
+    .calculator-card,
+    .summary-card,
+    .cost-card,
+    .analytics-panel,
+    .catalog-stat,
+    .tool-card-large,
+    .launch-action-card,
+    .operating-card,
+    .operating-drilldown,
+    .profile-overview-card,
+    .settings-privacy-card,
+    .settings-billing-card,
+    .command-panel,
+    .command-hero,
+    .tip-card
+  ) {
     padding: var(--app-card-padding-compact);
   }
 
@@ -358,25 +365,25 @@
 /* —— Warning / disclaimer callouts: visible but not layout-breaking —— */
 @media (max-width: 640px) {
   :is(
-      .clinical-ds-disclaimer,
-      .tool-card-notice,
-      .calc-qsofa-disclaimer,
-      .calc-news2-disclaimer,
-      .calc-child-pugh-disclaimer,
-      .calc-has-bled-disclaimer,
-      .calc-meld-disclaimer,
-      .calc-timi-disclaimer,
-      .calc-validation-errors,
-      .calc-has-bled-anticoag-warning,
-      .calc-news2-scale2-warning,
-      .calc-phq9-q9-inline-warning,
-      .calc-phq9-q9-form-warning,
-      .calc-phq9-q9-result-warning,
-      .calc-phq9-high-symptom-warning,
-      .calc-gad7-severe-warning,
-      .calc-gad7-moderate-warning,
-      .calc-interpretation-box
-    ) {
+    .clinical-ds-disclaimer,
+    .tool-card-notice,
+    .calc-qsofa-disclaimer,
+    .calc-news2-disclaimer,
+    .calc-child-pugh-disclaimer,
+    .calc-has-bled-disclaimer,
+    .calc-meld-disclaimer,
+    .calc-timi-disclaimer,
+    .calc-validation-errors,
+    .calc-has-bled-anticoag-warning,
+    .calc-news2-scale2-warning,
+    .calc-phq9-q9-inline-warning,
+    .calc-phq9-q9-form-warning,
+    .calc-phq9-q9-result-warning,
+    .calc-phq9-high-symptom-warning,
+    .calc-gad7-severe-warning,
+    .calc-gad7-moderate-warning,
+    .calc-interpretation-box
+  ) {
     padding: var(--app-callout-padding-compact);
     font-size: var(--app-type-caption);
     line-height: 1.5;

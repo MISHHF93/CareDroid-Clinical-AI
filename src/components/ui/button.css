@@ -72,7 +72,10 @@
 }
 
 .btn-md {
-  min-height: var(--app-control-height-density, var(--app-button-height, var(--compact-control-height, 38px)));
+  min-height: var(
+    --app-control-height-density,
+    var(--app-button-height, var(--compact-control-height, 38px))
+  );
   padding: calc(var(--compact-panel-gap, 8px) * 0.85) 14px;
   font-size: var(--font-14);
 }
@@ -88,7 +91,11 @@
 .btn-primary {
   background: var(--app-accent-action, var(--app-accent-interactive));
   color: var(--app-on-solid);
-  border-color: color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 88%, transparent);
+  border-color: color-mix(
+    in srgb,
+    var(--app-accent-action, var(--app-accent-interactive)) 88%,
+    transparent
+  );
   box-shadow: var(--app-elevation-subtle, var(--app-shadow-1));
 }
 
@@ -122,7 +129,11 @@
 
 .btn-ghost:hover {
   background: var(--app-hover);
-  border-color: color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 28%, transparent);
+  border-color: color-mix(
+    in srgb,
+    var(--app-accent-action, var(--app-accent-interactive)) 28%,
+    transparent
+  );
 }
 
 .btn-danger {
@@ -183,8 +194,12 @@
 }
 
 @keyframes btn-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .spinner-icon {

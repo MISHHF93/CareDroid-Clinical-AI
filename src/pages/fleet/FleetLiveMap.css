@@ -75,8 +75,11 @@
   position: relative;
   min-height: 360px;
   border-radius: calc(var(--compact-panel-radius, 14px) - 4px);
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--app-chart-1) 6%, var(--app-surface-muted, #f8fafc)) 0%, var(--app-surface-1, #fff) 100%);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--app-chart-1) 6%, var(--app-surface-muted, #f8fafc)) 0%,
+    var(--app-surface-1, #fff) 100%
+  );
   overflow-x: auto;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;

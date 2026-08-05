@@ -42,7 +42,11 @@
 
 .emergency-whiteboard-page__filter-chip {
   border-color: color-mix(in srgb, var(--cdl-clinical-border) 80%, transparent);
-  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 50%, var(--app-surface-1, #ffffff));
+  background: color-mix(
+    in srgb,
+    var(--app-surface-muted, #f1f5f9) 50%,
+    var(--app-surface-1, #ffffff)
+  );
   color: var(--app-text-muted, #475569);
   transition:
     background-color var(--cdl-clinical-motion),
@@ -57,7 +61,9 @@
   box-shadow: none;
 }
 
-.emergency-whiteboard-page__filter-chip--reassess:not(.emergency-whiteboard-page__filter-chip--active) {
+.emergency-whiteboard-page__filter-chip--reassess:not(
+  .emergency-whiteboard-page__filter-chip--active
+) {
   box-shadow: none;
 }
 
@@ -65,7 +71,11 @@
 .emergency-whiteboard-page__awareness-chip,
 .emergency-whiteboard-page__queue-filter-clear {
   border-color: color-mix(in srgb, var(--cdl-clinical-border) 72%, transparent);
-  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 45%, var(--app-surface-1, #ffffff));
+  background: color-mix(
+    in srgb,
+    var(--app-surface-muted, #f1f5f9) 45%,
+    var(--app-surface-1, #ffffff)
+  );
   box-shadow: none;
 }
 
@@ -78,7 +88,11 @@
 .emergency-whiteboard-page__controls,
 .emergency-whiteboard-page__queue-filter-bar {
   border-bottom-color: var(--cdl-clinical-border);
-  background: color-mix(in srgb, var(--app-surface-1, #ffffff) 92%, var(--app-surface-muted, #f1f5f9));
+  background: color-mix(
+    in srgb,
+    var(--app-surface-1, #ffffff) 92%,
+    var(--app-surface-muted, #f1f5f9)
+  );
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -116,7 +130,11 @@
 .tools-overview .tools-profile-summary span,
 .tools-overview .tools-execution-badge {
   border-color: color-mix(in srgb, var(--cdl-clinical-border) 72%, transparent);
-  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 45%, var(--app-surface-1, #ffffff));
+  background: color-mix(
+    in srgb,
+    var(--app-surface-muted, #f1f5f9) 45%,
+    var(--app-surface-1, #ffffff)
+  );
   box-shadow: none;
 }
 
@@ -146,7 +164,11 @@
 
 .clinical-tool-catalog .catalog-category-chip {
   border-color: color-mix(in srgb, var(--cdl-clinical-border) 72%, transparent);
-  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 45%, var(--app-surface-1, #ffffff));
+  background: color-mix(
+    in srgb,
+    var(--app-surface-muted, #f1f5f9) 45%,
+    var(--app-surface-1, #ffffff)
+  );
   box-shadow: none;
 }
 
@@ -157,7 +179,11 @@
 }
 
 .clinical-tool-catalog .catalog-table th {
-  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 50%, var(--app-surface-1, #ffffff));
+  background: color-mix(
+    in srgb,
+    var(--app-surface-muted, #f1f5f9) 50%,
+    var(--app-surface-1, #ffffff)
+  );
   border-bottom-color: var(--cdl-clinical-border);
 }
 
@@ -189,12 +215,11 @@
 }
 
 .patient-detail-panel__header {
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, #374151 4%, var(--app-surface-1, #ffffff)) 0%,
-      var(--app-surface-1, #ffffff) 100%
-    );
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, #374151 4%, var(--app-surface-1, #ffffff)) 0%,
+    var(--app-surface-1, #ffffff) 100%
+  );
   border-bottom-color: var(--cdl-clinical-border);
 }
 
@@ -204,7 +229,11 @@
 
 .patient-detail-panel__badge {
   border: 1px solid color-mix(in srgb, var(--cdl-clinical-border) 65%, transparent);
-  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 40%, var(--app-surface-1, #ffffff));
+  background: color-mix(
+    in srgb,
+    var(--app-surface-muted, #f1f5f9) 40%,
+    var(--app-surface-1, #ffffff)
+  );
   color: var(--app-text-secondary, #64748b);
 }
 
@@ -225,7 +254,11 @@
 .patient-detail-action-panel,
 .patient-detail-workflow-log {
   border-radius: var(--cdl-clinical-radius-sm) !important;
-  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 35%, var(--app-surface-1, #ffffff)) !important;
+  background: color-mix(
+    in srgb,
+    var(--app-surface-muted, #f1f5f9) 35%,
+    var(--app-surface-1, #ffffff)
+  ) !important;
   box-shadow: none !important;
 }
 

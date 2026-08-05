@@ -1,3 +1,4 @@
+import { Injectable } from '@nestjs/common';
 import { UnifiedPatient as Patient } from '../models/unified-patient.model';
 
 interface CapacityMetrics {
@@ -12,7 +13,7 @@ interface CapacityMetrics {
   boarding_patients: number;
 }
 
-interface CapacityResponse {
+export interface CapacityResponse {
   score: number;
   color: 'Green' | 'Yellow' | 'Orange' | 'Red';
   triggers: string[];
@@ -21,6 +22,7 @@ interface CapacityResponse {
   timestamp: Date;
 }
 
+@Injectable()
 export class CapacityService {
   private theoretical_max = 25; // Configurable per site
 

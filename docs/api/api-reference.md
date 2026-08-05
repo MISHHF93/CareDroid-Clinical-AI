@@ -157,6 +157,6 @@ Separate stdio process for MCP-compatible clients (Claude Desktop, Cursor). See 
 | SMTP (Nodemailer) | Transactional email | `modules/email/email.service.ts` |
 | Google / LinkedIn OAuth2 | Social login | `modules/auth/strategies/` |
 | Sentry, Datadog | Error tracking, APM | `main.ts`, `observability/datadog.ts` |
-| Prometheus | Metrics scraping | `GET /api/metrics` |
+| Prometheus | Metrics scraping | `GET /metrics` (excluded from the global `/api` prefix) |
 
 See [Configuration Reference](../configuration-reference.md) for every environment variable these integrations need.

@@ -34,7 +34,7 @@
   border: 1px solid #e0f2fe;
   border-radius: 12px;
   padding: 14px;
-  color: #E5E7EB;
+  color: #e5e7eb;
   line-height: 1.5;
 }
 
@@ -67,10 +67,10 @@
 }
 
 .cssrs-confirm-dialog {
-  border: 1px solid #F97316;
+  border: 1px solid #f97316;
   border-radius: 12px;
   padding: 14px;
-  background: #7C2D1266;
+  background: #7c2d1266;
 }
 
 .cssrs-confirm-text {
@@ -82,7 +82,7 @@
 .cssrs-save-alert-btn {
   border: none;
   border-radius: 10px;
-  background: #DC2626;
+  background: #dc2626;
   color: var(--medical-ink, #111827);
   padding: 10px 12px;
   cursor: pointer;

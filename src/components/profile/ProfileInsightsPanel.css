@@ -6,11 +6,7 @@
   border: 1px solid var(--medical-card-border, var(--panel-border));
   border-radius: 16px;
   background:
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, #374151 4%, transparent),
-      transparent 42%
-    ),
+    linear-gradient(180deg, color-mix(in srgb, #374151 4%, transparent), transparent 42%),
     var(--medical-card-bg, var(--surface-1));
 }
 

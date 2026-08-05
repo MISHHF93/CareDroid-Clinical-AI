@@ -79,6 +79,7 @@ describe('emergencyOsApi advanced CareDroid capabilities', () => {
       'emsHandoff',
       'receptionSnapshot',
       'receptionHandoff',
+      'receptionEscalation',
       'triageAssist',
       'intake',
       'smartIntakeVerticalSlice',

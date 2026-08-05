@@ -8,7 +8,10 @@
   --app-viewport-height: 100dvh;
   --app-layout-content-max: var(--app-visual-page-max, min(100%, 1680px));
   --app-layout-readable-max: var(--app-visual-readable-max, 1120px);
-  --app-layout-page-gutter-inline: var(--app-shell-page-gutter-inline, var(--app-visual-page-gutter, 24px));
+  --app-layout-page-gutter-inline: var(
+    --app-shell-page-gutter-inline,
+    var(--app-visual-page-gutter, 24px)
+  );
   --app-layout-page-gutter-block: var(--app-shell-page-gutter-block, clamp(12px, 2vw, 24px));
   --app-layout-section-gap: var(--app-visual-section-gap, var(--compact-page-gap, 22px));
   --app-layout-panel-gap: var(--app-visual-panel-gap, var(--compact-panel-gap, 18px));
@@ -77,7 +80,9 @@
 }
 
 /* —— Canonical page templates (no duplicate horizontal padding) —— */
-.emergency-app-shell .app-shell-main-content :is(
+.emergency-app-shell
+  .app-shell-main-content
+  :is(
     .cd-page-shell,
     .emergency-route-page,
     .help-hub-page,
@@ -107,18 +112,14 @@
   gap: var(--app-layout-section-gap);
 }
 
-.emergency-app-shell .app-shell-main-content :is(
-    .cd-page-shell__content,
-    .emergency-route-page__content
-  ) {
+.emergency-app-shell
+  .app-shell-main-content
+  :is(.cd-page-shell__content, .emergency-route-page__content) {
   gap: var(--app-layout-section-gap);
 }
 
 /* —— Page headers / heroes align to content grid —— */
-.emergency-app-shell .app-shell-main-content :is(
-    .cd-page-header,
-    .emergency-route-page__hero
-  ) {
+.emergency-app-shell .app-shell-main-content :is(.cd-page-header, .emergency-route-page__hero) {
   width: 100%;
   margin-inline: 0;
   padding: var(--app-layout-panel-gap);
@@ -130,7 +131,9 @@
 }
 
 /* —— Unified dashboard / metric grids —— */
-.emergency-app-shell .app-shell-main-content :is(
+.emergency-app-shell
+  .app-shell-main-content
+  :is(
     .cd-dashboard-grid,
     .emergency-route-metric-grid,
     .emergency-route-signal-grid,
@@ -149,7 +152,9 @@
   width: 100%;
 }
 
-.emergency-app-shell .app-shell-main-content :is(
+.emergency-app-shell
+  .app-shell-main-content
+  :is(
     .cd-dashboard-grid--cards,
     .cd-dashboard-grid--summary,
     .cd-dashboard-grid--metrics,
@@ -172,7 +177,9 @@
 }
 
 /* —— Toolbars, action rows, chip rows —— */
-.emergency-app-shell .app-shell-main-content :is(
+.emergency-app-shell
+  .app-shell-main-content
+  :is(
     .cd-action-row,
     .cd-section-header__actions,
     .emergency-route-page__actions,
@@ -227,7 +234,9 @@
   --app-layout-panel-gap: var(--compact-panel-gap, 10px);
 }
 
-[data-practitioner-compact='true'] .app-shell-main-content :is(.cd-page-shell, .emergency-route-page) {
+[data-practitioner-compact='true']
+  .app-shell-main-content
+  :is(.cd-page-shell, .emergency-route-page) {
   padding: 0;
 }
 
@@ -240,7 +249,9 @@
     max-width: 100%;
   }
 
-  .emergency-app-shell .app-shell-main-content :is(
+  .emergency-app-shell
+    .app-shell-main-content
+    :is(
       .cd-workspace-split,
       .cd-workspace-split--balanced,
       .cd-workspace-split--wide,
@@ -251,7 +262,9 @@
 }
 
 @media (max-width: 520px) {
-  .emergency-app-shell .app-shell-main-content :is(
+  .emergency-app-shell
+    .app-shell-main-content
+    :is(
       .cd-dashboard-grid--cards,
       .cd-dashboard-grid--summary,
       .emergency-route-metric-grid,

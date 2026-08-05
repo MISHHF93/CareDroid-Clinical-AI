@@ -5,6 +5,7 @@ import {
   type DiagnosticRiskTier,
 } from '../../services/diagnosticSafetyDashboardModel';
 import { COPILOT_SAFETY_BOUNDED_DISCLAIMER } from '../../config/copilotSafety.config';
+import { AiTruthLabel } from '../ai/AiTruthLabel';
 import './DiagnosticSafetyDashboard.css';
 
 type DiagnosticSafetyDashboardProps = {
@@ -45,6 +46,11 @@ export default function DiagnosticSafetyDashboard({
             Patients sorted by combined clinical rule and anticipated-admission risk signals.
             {` ${COPILOT_SAFETY_BOUNDED_DISCLAIMER}`}
           </p>
+          <AiTruthLabel
+            state="Manual"
+            sourceContext="Combined clinical-rule + anticipated-admission risk scoring — deterministic, not a trained model"
+            reviewRequired
+          />
         </div>
         <div className="diagnostic-safety-dashboard__tiers" aria-label="Risk tier counts">
           {(Object.keys(TIER_LABELS) as DiagnosticRiskTier[]).map((tier) =>

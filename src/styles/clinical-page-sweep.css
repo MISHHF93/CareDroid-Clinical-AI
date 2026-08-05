@@ -7,7 +7,9 @@
    Page roots — transparent canvas, breathable section rhythm
    ══════════════════════════════════════════════════════════════════ */
 
-.emergency-app-shell .app-shell-main-content :is(
+.emergency-app-shell
+  .app-shell-main-content
+  :is(
     .emergency-route-page,
     .cd-page-shell,
     .clinical-alerts-page,
@@ -52,7 +54,8 @@
    Operational strip family — no dark cell walls
    ══════════════════════════════════════════════════════════════════ */
 
-.emergency-app-shell :is(
+.emergency-app-shell
+  :is(
     .charge-nurse-operational-strip,
     .reception-operational-strip,
     .operational-handoff-domain-bar,
@@ -66,7 +69,8 @@
   box-shadow: var(--cdl-clinical-shadow-rest);
 }
 
-.emergency-app-shell :is(
+.emergency-app-shell
+  :is(
     .charge-nurse-operational-strip__metric,
     .charge-nurse-operational-strip__eyebrow,
     .reception-operational-strip__metric,
@@ -79,14 +83,19 @@
   border-bottom: 0 !important;
   border-color: transparent !important;
   border-radius: var(--cdl-clinical-radius-sm);
-  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 38%, var(--app-surface-1, #ffffff));
+  background: color-mix(
+    in srgb,
+    var(--app-surface-muted, #f1f5f9) 38%,
+    var(--app-surface-1, #ffffff)
+  );
 }
 
 /* ══════════════════════════════════════════════════════════════════
    Emergency route surfaces — queue rows, command actions, signals
    ══════════════════════════════════════════════════════════════════ */
 
-.emergency-app-shell :is(
+.emergency-app-shell
+  :is(
     .emergency-route-queue-row,
     .emergency-command-action,
     .emergency-route-signal-row,
@@ -94,7 +103,8 @@
     .emergency-route-copilot-hint
   ) {
   border: 1px solid var(--cdl-clinical-border);
-  border-left: 2px solid color-mix(in srgb, var(--queue-accent, var(--command-action-accent, #374151)) 45%, transparent);
+  border-left: 2px solid
+    color-mix(in srgb, var(--queue-accent, var(--command-action-accent, #374151)) 45%, transparent);
   border-radius: var(--cdl-clinical-radius);
   background: var(--app-surface-1, #ffffff);
   box-shadow: var(--cdl-clinical-shadow-rest);
@@ -104,7 +114,11 @@
 .emergency-app-shell .emergency-route-filter-banner__btn,
 .emergency-app-shell .emergency-route-queue-row__patient-btn {
   border-color: color-mix(in srgb, var(--cdl-clinical-border) 72%, transparent);
-  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 40%, var(--app-surface-1, #ffffff));
+  background: color-mix(
+    in srgb,
+    var(--app-surface-muted, #f1f5f9) 40%,
+    var(--app-surface-1, #ffffff)
+  );
   box-shadow: none;
 }
 
@@ -112,7 +126,8 @@
    Clinical alerts · analytics · settings · pulse · admin
    ══════════════════════════════════════════════════════════════════ */
 
-.emergency-app-shell :is(
+.emergency-app-shell
+  :is(
     .clinical-alerts-page .alerts-summary-chip,
     .clinical-alerts-page .alerts-controls,
     .clinical-alerts-page .alert-card,
@@ -151,7 +166,8 @@
    Referral · command dashboard · queue panels · whiteboard legacy
    ══════════════════════════════════════════════════════════════════ */
 
-.emergency-app-shell :is(
+.emergency-app-shell
+  :is(
     .referral-panel__card,
     .referral-panel__task,
     .referral-panel__bucket,
@@ -168,7 +184,8 @@
   box-shadow: var(--cdl-clinical-shadow-rest);
 }
 
-.emergency-app-shell :is(
+.emergency-app-shell
+  :is(
     .referral-panel__task,
     .command-dashboard__card--success,
     .command-dashboard__card--warning,
@@ -182,7 +199,8 @@
    Smart intake · reception panels · copilot hints
    ══════════════════════════════════════════════════════════════════ */
 
-.emergency-app-shell :is(
+.emergency-app-shell
+  :is(
     .smart-intake__step,
     .smart-intake__candidate,
     .smart-intake__field,
@@ -200,7 +218,8 @@
    Tools detail pages — calculators, labs, protocols, AI tools
    ══════════════════════════════════════════════════════════════════ */
 
-.emergency-app-shell :is(
+.emergency-app-shell
+  :is(
     .calculators-content,
     .calculator-card,
     .calculator-panel,
@@ -216,12 +235,8 @@
   box-shadow: var(--cdl-clinical-shadow-rest);
 }
 
-.emergency-app-shell :is(
-    .calculator-result,
-    .lab-result-card,
-    .drug-checker__interaction,
-    .timeline-ai__event
-  ) {
+.emergency-app-shell
+  :is(.calculator-result, .lab-result-card, .drug-checker__interaction, .timeline-ai__event) {
   border-left-width: 2px;
   border-left-color: color-mix(in srgb, #374151 40%, var(--cdl-clinical-border));
   box-shadow: none;
@@ -261,7 +276,11 @@
 .dispatch-console__status-pill {
   border-color: color-mix(in srgb, var(--cdl-clinical-border) 72%, transparent);
   border-radius: var(--cdl-clinical-radius-sm);
-  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 40%, var(--app-surface-1, #ffffff));
+  background: color-mix(
+    in srgb,
+    var(--app-surface-muted, #f1f5f9) 40%,
+    var(--app-surface-1, #ffffff)
+  );
 }
 
 .dispatch-console__chip--active,
@@ -274,7 +293,8 @@
    Fleet · IoT · 3D viewer · platform governance
    ══════════════════════════════════════════════════════════════════ */
 
-.emergency-app-shell :is(
+.emergency-app-shell
+  :is(
     .fleet-dashboard__card,
     .fleet-live-map__panel,
     .medical-iot-card,
@@ -293,12 +313,8 @@
    Banners & semantic notices — tint not slab
    ══════════════════════════════════════════════════════════════════ */
 
-.emergency-app-shell :is(
-    .clinical-alert-banner,
-    .anomaly-banner,
-    .api-state-banner,
-    .escalate-button__panel
-  ) {
+.emergency-app-shell
+  :is(.clinical-alert-banner, .anomaly-banner, .api-state-banner, .escalate-button__panel) {
   border-left-width: 2px;
   border-radius: var(--cdl-clinical-radius-sm);
   box-shadow: none;

@@ -53,7 +53,10 @@
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   width: 100%;
-  max-height: min(50vh, calc(var(--app-viewport-height, 100dvh) - var(--app-visual-viewport-offset-top, 0px)));
+  max-height: min(
+    50vh,
+    calc(var(--app-viewport-height, 100dvh) - var(--app-visual-viewport-offset-top, 0px))
+  );
   overflow-y: auto;
   border-bottom: 1px solid rgba(248, 113, 113, 0.35);
   background: var(--medical-surface-page, #f1f5f9);

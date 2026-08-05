@@ -584,7 +584,7 @@ Fetch timeout for apiClient (milliseconds). (parser: apiEnv)
 
 ### Configuration audit
 
-69 registry entries, 55 env vars, 2 conflicts (4 compat shims).
+69 registry entries, 55 env vars, 1 conflicts (4 compat shims).
 
 - **Source:** `canonicalConfigurationAudit.ts`
 - **Status:** active

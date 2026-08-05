@@ -15,7 +15,10 @@
     overflow-x: clip;
     overflow-y: auto;
     overscroll-behavior-y: contain;
-    scroll-padding-top: var(--app-compact-content-offset-top, var(--app-compact-chrome-height, 52px));
+    scroll-padding-top: var(
+      --app-compact-content-offset-top,
+      var(--app-compact-chrome-height, 52px)
+    );
     scroll-padding-bottom: max(
       var(--app-mobile-action-reach-padding),
       var(--app-keyboard-inset-bottom, 0px)
@@ -73,7 +76,8 @@
 }
 
 @media (max-width: 768px) {
-  .app-shell :is(
+  .app-shell
+    :is(
       .command-dashboard,
       .tools-overview,
       .tool-page,
@@ -99,7 +103,8 @@
     padding-inline: var(--app-mobile-page-gutter);
   }
 
-  .app-shell :is(
+  .app-shell
+    :is(
       .dashboard-grid,
       .analytics-grid,
       .analytics-panel-grid,
@@ -119,7 +124,8 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .app-shell :is(
+  .app-shell
+    :is(
       .tool-header-actions,
       .calc-actions,
       .catalog-actions,
@@ -141,7 +147,8 @@
     max-width: 100%;
   }
 
-  .app-shell :is(
+  .app-shell
+    :is(
       .tool-header-actions,
       .calc-actions,
       .catalog-actions,
@@ -172,7 +179,8 @@
 }
 
 @media (max-width: 640px) {
-  .app-shell :is(
+  .app-shell
+    :is(
       .live-map-canvas,
       .hospital-map-canvas,
       .medical-iot-map-canvas,
@@ -194,16 +202,14 @@
     -webkit-overflow-scrolling: touch;
   }
 
-  .app-shell :is(
-      .live-map-canvas,
-      .hospital-map-canvas,
-      .medical-iot-map-canvas,
-      .fleet-map-canvas
-    ) > * {
+  .app-shell
+    :is(.live-map-canvas, .hospital-map-canvas, .medical-iot-map-canvas, .fleet-map-canvas)
+    > * {
     min-width: min(640px, calc(100vw - (2 * var(--app-mobile-page-gutter))));
   }
 
-  .app-shell :is(
+  .app-shell
+    :is(
       .app-table-scroll-x,
       .catalog-table-wrap,
       .fleet-data-table-wrap,
@@ -213,18 +219,27 @@
       .artifacts-table-wrap,
       .lab-category-section
     )
-    :is(table, .catalog-table, .device-fleet-table, .artifacts-table, .org-lifecycle-table, .user-table) {
+    :is(
+      table,
+      .catalog-table,
+      .device-fleet-table,
+      .artifacts-table,
+      .org-lifecycle-table,
+      .user-table
+    ) {
     min-width: max-content;
   }
 
-  .app-shell :is(.drawer-actions, .modal-actions, .form-actions, .settings-actions, .profile-actions)
+  .app-shell
+    :is(.drawer-actions, .modal-actions, .form-actions, .settings-actions, .profile-actions)
     > :is(button, a):not([class*='icon']):not([class*='marker']):not([class*='toggle']) {
     width: 100%;
   }
 }
 
 @media (max-width: 380px) {
-  .app-shell :is(
+  .app-shell
+    :is(
       .command-dashboard,
       .tools-overview,
       .tool-page,

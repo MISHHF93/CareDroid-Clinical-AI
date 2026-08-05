@@ -1,3 +1,4 @@
+import { Injectable } from '@nestjs/common';
 import {
   UnifiedPatient as Patient,
   type IUnifiedPatient as IPatient,
@@ -25,6 +26,7 @@ export interface EMSAlert {
 
 type EMSStatus = 'dispatched' | 'on_scene' | 'en_route' | 'arrived';
 
+@Injectable()
 export class EMSService {
   async createPrehospitalAlert(alert: EMSAlert): Promise<IPatient> {
     const dpsScore = this.triageToDPS(alert.triage_code);

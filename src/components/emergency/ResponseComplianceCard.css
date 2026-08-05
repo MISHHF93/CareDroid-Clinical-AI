@@ -44,9 +44,18 @@
   border-radius: 4px;
 }
 
-.response-compliance-card__rag--green  { background: #dcfce7; color: #15803d; }
-.response-compliance-card__rag--amber  { background: #fef3c7; color: #b45309; }
-.response-compliance-card__rag--red    { background: #fee2e2; color: #dc2626; }
+.response-compliance-card__rag--green {
+  background: #dcfce7;
+  color: #15803d;
+}
+.response-compliance-card__rag--amber {
+  background: #fef3c7;
+  color: #b45309;
+}
+.response-compliance-card__rag--red {
+  background: #fee2e2;
+  color: #dc2626;
+}
 
 .response-compliance-card__rate {
   font-size: 32px;

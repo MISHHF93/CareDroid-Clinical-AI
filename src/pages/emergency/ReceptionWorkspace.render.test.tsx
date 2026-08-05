@@ -55,6 +55,10 @@ vi.mock('../../hooks/useReceptionDeskUi', () => ({
     showNestedEscalationStrip: false,
     showNestedEscalationQuickActions: false,
     show: () => true,
+    canUseRegistrationSkills: true,
+    lookupBeforeCreateDefault: false,
+    labelAssistAsDeskNotAi: true,
+    staffProfile: { skillIds: ['registration'] },
   }),
 }));
 

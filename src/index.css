@@ -359,7 +359,8 @@ textarea {
     rgba(255, 255, 255, 0.05) 75%
   );
   background-size: 200% 100%;
-  animation: skeleton-loading var(--motion-skeleton-duration, 1.15s) var(--motion-ease-standard) infinite;
+  animation: skeleton-loading var(--motion-skeleton-duration, 1.15s) var(--motion-ease-standard)
+    infinite;
   border-radius: var(--radius-sm);
 }
 

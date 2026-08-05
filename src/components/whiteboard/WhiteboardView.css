@@ -81,7 +81,8 @@
 .whiteboard-view__select {
   appearance: none;
   background:
-    linear-gradient(45deg, transparent 50%, #bbf7d0 50%) calc(100% - 16px) calc(50% + 2px) / 8px 8px no-repeat,
+    linear-gradient(45deg, transparent 50%, #bbf7d0 50%) calc(100% - 16px) calc(50% + 2px) / 8px 8px
+      no-repeat,
     color-mix(in srgb, #052e16 72%, #000);
   border: 1px solid color-mix(in srgb, #86efac 42%, #14532d);
   border-radius: 8px;

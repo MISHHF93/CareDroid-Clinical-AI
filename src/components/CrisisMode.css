@@ -5,7 +5,8 @@
   gap: var(--space-3);
   min-height: 88px;
   padding: var(--space-3) var(--space-4);
-  border-bottom: 1px solid color-mix(in srgb, var(--status-warning) 48%, var(--color-border-default));
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--status-warning) 48%, var(--color-border-default));
   background: color-mix(in srgb, var(--status-warning) 16%, var(--color-elevated));
   color: var(--color-text-primary);
   box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28);
@@ -241,9 +242,14 @@
 }
 
 .ed-os-shell:has(.ems-critical-checklist--expanded) .crisis-action-panel {
-  inset-block-start: calc(var(--ed-header-height, 48px) + var(--ed-critical-ems-banner-height, 44px));
+  inset-block-start: calc(
+    var(--ed-header-height, 48px) + var(--ed-critical-ems-banner-height, 44px)
+  );
   inset-inline-end: var(--ed-right-alarm-lane-width, 360px);
-  width: min(320px, calc(100vw - var(--ed-rail-width, 56px) - var(--ed-right-alarm-lane-width, 360px)));
+  width: min(
+    320px,
+    calc(100vw - var(--ed-rail-width, 56px) - var(--ed-right-alarm-lane-width, 360px))
+  );
 }
 
 @media (max-width: 1280px) {

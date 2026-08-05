@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { PriorityLabel, type Patient } from '../../types/emergency';
 import { inferTriageFromExpertSystem } from '../../services/nativeAiCore';
+import { AiTruthLabel, fromNativeAiSourceState } from '../ai/AiTruthLabel';
 import './TriageExpertBadge.css';
 
 type TriageExpertBadgeProps = {
@@ -19,6 +20,11 @@ export default function TriageExpertBadge({
   const differsFromAssigned = inference.suggestedPriority !== patient.priority;
   if (!differsFromAssigned && !patient.triagePending) return null;
 
+  const truthLabel = fromNativeAiSourceState(inference.sourceState, {
+    sourceContext: 'NLP triage rules engine + baseline acuity heuristic (not a trained model)',
+    reviewRequired: inference.requiresHumanReview,
+  });
+
   return (
     <span
       className={[
@@ -34,6 +40,7 @@ export default function TriageExpertBadge({
       Suggested triage: {inference.suggestedPriority}
       <small>{PriorityLabel[inference.suggestedPriority] || inference.suggestedPriority}</small>
       <span className="triage-expert-badge__review">pending review</span>
+      <AiTruthLabel {...truthLabel} compact />
     </span>
   );
 }

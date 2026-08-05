@@ -231,7 +231,9 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .sync-status-text h4 {
@@ -270,7 +272,11 @@
 
 /* Offline Warning */
 .offline-warning {
-  background: linear-gradient(135deg, color-mix(in srgb, var(--app-warning) 10%, transparent), color-mix(in srgb, var(--app-danger) 5%, transparent));
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--app-warning) 10%, transparent),
+    color-mix(in srgb, var(--app-danger) 5%, transparent)
+  );
   border: 1px solid rgba(255, 165, 2, 0.3);
   border-radius: var(--radius-lg);
   padding: var(--space-4);

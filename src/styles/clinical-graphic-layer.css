@@ -34,7 +34,9 @@
 }
 
 .emergency-app-shell .cdl-zone--operational-summary .cdl-situation-graphic-card {
-  transition: box-shadow 160ms ease, transform 160ms ease;
+  transition:
+    box-shadow 160ms ease,
+    transform 160ms ease;
 }
 
 .emergency-app-shell .cdl-zone--operational-summary .cdl-situation-graphic-card:hover {
@@ -59,7 +61,9 @@
 .sidebar-nav-item--active .sidebar-nav-item__icon {
   transform: scale(1.08);
   filter: drop-shadow(0 2px 6px color-mix(in srgb, var(--medical-accent) 35%, transparent));
-  transition: transform 160ms ease, filter 160ms ease;
+  transition:
+    transform 160ms ease,
+    filter 160ms ease;
 }
 
 .sidebar-nav-item--active::after {

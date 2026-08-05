@@ -92,7 +92,10 @@
 
 .pediatric-drug-calculator__inputs {
   display: grid;
-  grid-template-columns: minmax(280px, 0.9fr) minmax(200px, 0.6fr) minmax(180px, 0.5fr) minmax(220px, 0.7fr);
+  grid-template-columns: minmax(280px, 0.9fr) minmax(200px, 0.6fr) minmax(180px, 0.5fr) minmax(
+      220px,
+      0.7fr
+    );
   gap: var(--space-4);
   align-items: end;
   padding: var(--space-4) var(--space-5);

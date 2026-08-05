@@ -25,19 +25,23 @@
   text-transform: uppercase;
 }
 
-.operational-presentation-frame[data-operational-emphasis='reassuring'] .operational-presentation-frame__eyebrow {
+.operational-presentation-frame[data-operational-emphasis='reassuring']
+  .operational-presentation-frame__eyebrow {
   color: rgba(148, 163, 184, 0.95);
 }
 
-.operational-presentation-frame[data-operational-emphasis='speed'] .operational-presentation-frame__eyebrow {
+.operational-presentation-frame[data-operational-emphasis='speed']
+  .operational-presentation-frame__eyebrow {
   color: var(--medical-status-warning-text, #b45309);
 }
 
-.operational-presentation-frame[data-operational-emphasis='assessment'] .operational-presentation-frame__eyebrow {
+.operational-presentation-frame[data-operational-emphasis='assessment']
+  .operational-presentation-frame__eyebrow {
   color: var(--medical-status-critical-text, #b91c1c);
 }
 
-.operational-presentation-frame[data-operational-emphasis='patient'] .operational-presentation-frame__eyebrow {
+.operational-presentation-frame[data-operational-emphasis='patient']
+  .operational-presentation-frame__eyebrow {
   color: #c4b5fd;
 }
 

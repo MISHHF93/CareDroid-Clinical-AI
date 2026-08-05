@@ -8,14 +8,7 @@
 }
 
 :is(.app-shell, .emergency-app-shell)
-  :is(
-    .app-header,
-    .header,
-    [class*='Header'],
-    .sidebar,
-    [class*='Sidebar'],
-    [class*='sidebar']
-  )
+  :is(.app-header, .header, [class*='Header'], .sidebar, [class*='Sidebar'], [class*='sidebar'])
   :is(
     [class*='__label'],
     [class*='__meta'],

@@ -19,6 +19,11 @@ import {
   ReferralService,
   EMSIntakeService,
 } from '../emergency-os/emergency-os.services';
+import {
+  CreateEmergencyPatientDto,
+  UpdateEmergencyPatientDto,
+  CreateEmergencyReferralDto,
+} from './dto/emergency-patient-actions.dto';
 
 @ApiTags('platform-systems')
 @ApiBearerAuth()
@@ -52,7 +57,7 @@ export class PlatformSystemsController {
   @Post('patients')
   @Permissions(Permission.READ_PHI, Permission.WRITE_PHI)
   @ApiOperation({ summary: 'Create an CareDroid intake patient' })
-  createEmergencyPatient(@Body() body: Record<string, any>) {
+  createEmergencyPatient(@Body() body: CreateEmergencyPatientDto) {
     if (!body?.chiefComplaint && !body?.complaint) {
       throw new BadRequestException('chiefComplaint or complaint is required');
     }
@@ -65,7 +70,10 @@ export class PlatformSystemsController {
   @Patch('patients/:patientId')
   @Permissions(Permission.READ_PHI, Permission.WRITE_PHI)
   @ApiOperation({ summary: 'Patch an CareDroid patient' })
-  updateEmergencyPatient(@Param('patientId') patientId: string, @Body() body: Record<string, any>) {
+  updateEmergencyPatient(
+    @Param('patientId') patientId: string,
+    @Body() body: UpdateEmergencyPatientDto,
+  ) {
     try {
       return this.emergencyPatientService.updatePatient(patientId, body);
     } catch {
@@ -120,13 +128,14 @@ export class PlatformSystemsController {
   @Post('referrals')
   @Permissions(Permission.READ_PHI, Permission.WRITE_PHI)
   @ApiOperation({ summary: 'Create an CareDroid referral' })
-  createEmergencyReferral(@Body() body: Record<string, any>) {
+  createEmergencyReferral(@Body() body: CreateEmergencyReferralDto) {
     if (!body?.patientId) {
       throw new BadRequestException('patientId is required');
     }
     if (!this.emergencyPatientService.getPatient(body.patientId)) {
       throw new NotFoundException(`Emergency patient ${body.patientId} was not found`);
     }
-    return this.referralService.createReferral(body).data.referral;
+    return this.referralService.createReferral(body as unknown as Record<string, unknown>).data
+      .referral;
   }
 }

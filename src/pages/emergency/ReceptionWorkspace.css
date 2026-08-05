@@ -105,7 +105,11 @@
 
 .reception-command-chip--critical {
   border-color: color-mix(in srgb, var(--reception-command-critical) 35%, transparent);
-  background: color-mix(in srgb, var(--reception-command-critical) 8%, var(--reception-command-panel));
+  background: color-mix(
+    in srgb,
+    var(--reception-command-critical) 8%,
+    var(--reception-command-panel)
+  );
   color: var(--reception-command-critical);
 }
 
@@ -166,7 +170,11 @@
 }
 
 .reception-command-stepper__item--complete {
-  border-color: color-mix(in srgb, var(--reception-command-primary) 50%, var(--reception-command-border));
+  border-color: color-mix(
+    in srgb,
+    var(--reception-command-primary) 50%,
+    var(--reception-command-border)
+  );
   background: var(--reception-command-panel);
   color: var(--reception-command-primary-strong);
 }
@@ -174,7 +182,11 @@
 .reception-command-stepper__item--critical {
   grid-column: 1 / -1;
   border-color: color-mix(in srgb, var(--reception-command-critical) 35%, transparent);
-  background: color-mix(in srgb, var(--reception-command-critical) 8%, var(--reception-command-panel));
+  background: color-mix(
+    in srgb,
+    var(--reception-command-critical) 8%,
+    var(--reception-command-panel)
+  );
   color: var(--reception-command-critical);
 }
 
@@ -199,7 +211,11 @@
 
 .reception-command-missing {
   border-color: color-mix(in srgb, var(--reception-command-warning) 34%, transparent);
-  background: color-mix(in srgb, var(--reception-command-warning) 8%, var(--reception-command-panel));
+  background: color-mix(
+    in srgb,
+    var(--reception-command-warning) 8%,
+    var(--reception-command-panel)
+  );
   color: var(--reception-command-warning);
 }
 
@@ -268,7 +284,11 @@
 }
 
 .reception-command-segmented button.is-active {
-  border-color: color-mix(in srgb, var(--reception-command-primary) 50%, var(--reception-command-border));
+  border-color: color-mix(
+    in srgb,
+    var(--reception-command-primary) 50%,
+    var(--reception-command-border)
+  );
   background: var(--reception-command-panel);
   color: var(--reception-command-primary-strong);
 }
@@ -369,12 +389,20 @@
 }
 
 .reception-command-ai__urgency--critical {
-  background: color-mix(in srgb, var(--reception-command-critical) 10%, var(--reception-command-panel));
+  background: color-mix(
+    in srgb,
+    var(--reception-command-critical) 10%,
+    var(--reception-command-panel)
+  );
   color: var(--reception-command-critical);
 }
 
 .reception-command-ai__urgency--high {
-  background: color-mix(in srgb, var(--reception-command-warning) 10%, var(--reception-command-panel));
+  background: color-mix(
+    in srgb,
+    var(--reception-command-warning) 10%,
+    var(--reception-command-panel)
+  );
   color: var(--reception-command-warning);
 }
 
@@ -489,7 +517,11 @@
 
 .reception-command-queue-row--risk {
   border-color: color-mix(in srgb, var(--reception-command-critical) 32%, transparent);
-  background: color-mix(in srgb, var(--reception-command-critical) 5%, var(--reception-command-panel));
+  background: color-mix(
+    in srgb,
+    var(--reception-command-critical) 5%,
+    var(--reception-command-panel)
+  );
 }
 
 .reception-command-queue-row strong,
@@ -548,7 +580,11 @@
   min-height: 78px;
   border: 1px solid color-mix(in srgb, var(--reception-command-critical) 32%, transparent);
   border-radius: 8px;
-  background: color-mix(in srgb, var(--reception-command-critical) 5%, var(--reception-command-panel));
+  background: color-mix(
+    in srgb,
+    var(--reception-command-critical) 5%,
+    var(--reception-command-panel)
+  );
   padding: 10px;
 }
 
@@ -574,7 +610,11 @@
   min-width: 72px;
   min-height: 58px;
   border-radius: 8px;
-  background: color-mix(in srgb, var(--reception-command-critical) 15%, var(--reception-command-panel));
+  background: color-mix(
+    in srgb,
+    var(--reception-command-critical) 15%,
+    var(--reception-command-panel)
+  );
   color: var(--reception-command-critical);
   font-weight: 900;
 }
@@ -611,7 +651,11 @@
 
 .reception-command-toast--error {
   border-color: color-mix(in srgb, var(--reception-command-critical) 35%, transparent);
-  background: color-mix(in srgb, var(--reception-command-critical) 10%, var(--reception-command-panel));
+  background: color-mix(
+    in srgb,
+    var(--reception-command-critical) 10%,
+    var(--reception-command-panel)
+  );
   color: var(--reception-command-critical);
 }
 
@@ -746,7 +790,11 @@
 }
 
 .unified-intake-phase-nav__btn.is-active {
-  border-color: color-mix(in srgb, var(--reception-command-primary) 42%, var(--reception-command-border));
+  border-color: color-mix(
+    in srgb,
+    var(--reception-command-primary) 42%,
+    var(--reception-command-border)
+  );
   background: color-mix(in srgb, var(--reception-command-primary) 10%, #ffffff);
   color: var(--reception-command-primary-strong);
 }
@@ -971,7 +1019,11 @@
 
 .reception-command-queue-row--selected {
   border-color: color-mix(in srgb, var(--cdl-brand-500, #0ea5e9) 42%, var(--cdl-border, #e2e8f0));
-  background: color-mix(in srgb, var(--cdl-brand-500, #0ea5e9) 8%, var(--cdl-surface-card, #ffffff));
+  background: color-mix(
+    in srgb,
+    var(--cdl-brand-500, #0ea5e9) 8%,
+    var(--cdl-surface-card, #ffffff)
+  );
 }
 
 .reception-assist-toggle {
@@ -1008,7 +1060,11 @@
 
 .reception-quick-complaints__chip.is-active,
 .reception-quick-complaints__chip:hover {
-  border-color: color-mix(in srgb, var(--reception-command-primary) 40%, var(--reception-command-border));
+  border-color: color-mix(
+    in srgb,
+    var(--reception-command-primary) 40%,
+    var(--reception-command-border)
+  );
   background: color-mix(in srgb, var(--reception-command-primary) 10%, #ffffff);
 }
 
@@ -1124,8 +1180,7 @@
 
   .unified-intake-actionbar {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    padding: 8px max(10px, env(safe-area-inset-right))
-      calc(8px + env(safe-area-inset-bottom))
+    padding: 8px max(10px, env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom))
       max(10px, env(safe-area-inset-left));
   }
 
@@ -1161,8 +1216,12 @@
 }
 
 @keyframes reception-flyout-slide-in {
-  from { transform: translateX(100%); }
-  to { transform: translateX(0); }
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
 }
 
 .reception-patient-detail-flyout__header {

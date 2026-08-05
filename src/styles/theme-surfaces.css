@@ -6,14 +6,24 @@ body {
   max-width: 100%;
   min-height: 100dvh;
   min-height: 100vh;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
-    'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-family:
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    'Roboto',
+    'Oxygen',
+    'Ubuntu',
+    'Cantarell',
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background:
     radial-gradient(circle at 50% 0%, var(--app-mesh-cyan), transparent 42%),
-    radial-gradient(circle at 18% 22%, var(--app-mesh-green), transparent 46%),
-    var(--app-bg);
+    radial-gradient(circle at 18% 22%, var(--app-mesh-green), transparent 46%), var(--app-bg);
   color: var(--text-color);
   overflow-x: clip;
   overflow-y: auto;
@@ -250,27 +260,44 @@ body {
   color: var(--app-fg-muted);
 }
 
-:where(
-  .calc-calculate-btn,
-  .lab-add-button,
-  .lab-interpret-button,
-  .btn-primary
-) {
+:where(.calc-calculate-btn, .lab-add-button, .lab-interpret-button, .btn-primary) {
   background: var(--accent-gradient) !important;
   color: var(--app-accent-contrast) !important;
 }
 
 :where(.btn-danger, .btn-remove-med:hover, .lab-value-remove:hover) {
-  background: linear-gradient(135deg, var(--app-danger), color-mix(in srgb, var(--app-danger) 78%, #f1f5f9)) !important;
+  background: linear-gradient(
+    135deg,
+    var(--app-danger),
+    color-mix(in srgb, var(--app-danger) 78%, #f1f5f9)
+  ) !important;
   color: var(--app-on-solid) !important;
 }
 
-:where(.medication-input, .calc-input-field, .calc-select-field, .context-input, .context-select, .context-textarea, .lab-input-field, .simple-tool-search-input, .diagnosis-field) {
+:where(
+  .medication-input,
+  .calc-input-field,
+  .calc-select-field,
+  .context-input,
+  .context-select,
+  .context-textarea,
+  .lab-input-field,
+  .simple-tool-search-input,
+  .diagnosis-field
+) {
   background: var(--app-input-bg) !important;
   border-color: var(--app-input-border) !important;
   color: var(--app-fg) !important;
 }
 
-:where(.tool-header-info p, .section-subtitle, .calculator-description, .calc-input-help, .lab-input-label, .context-label, .tool-card-muted) {
+:where(
+  .tool-header-info p,
+  .section-subtitle,
+  .calculator-description,
+  .calc-input-help,
+  .lab-input-label,
+  .context-label,
+  .tool-card-muted
+) {
   color: var(--app-fg-muted) !important;
 }

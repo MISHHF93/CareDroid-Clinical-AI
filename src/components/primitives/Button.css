@@ -159,7 +159,9 @@
 }
 
 @keyframes cd-btn-spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .cd-btn--loading {

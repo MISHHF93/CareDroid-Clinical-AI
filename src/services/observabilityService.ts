@@ -12,6 +12,7 @@ import {
   type WorkflowTelemetrySpan,
 } from '../config/observabilityModel';
 import { apiFetch } from './apiClient';
+import { registerApiTelemetryHooks } from './apiTelemetryBridge';
 import { isBackendKnownOffline } from './backendReachability';
 import logger from '../utils/logger';
 
@@ -385,6 +386,10 @@ class ObservabilityService {
 }
 
 const observabilityService = new ObservabilityService();
+registerApiTelemetryHooks({
+  buildTraceHeaders: (workflowTraceId) => observabilityService.buildTraceHeaders(workflowTraceId),
+  recordApiTiming: (input) => observabilityService.recordApiTiming(input),
+});
 export default observabilityService;
 export {
   observabilityService,

@@ -77,7 +77,9 @@
   padding: 8px 12px;
 }
 
-.emergency-whiteboard-page--practitioner-compact .emergency-whiteboard-page__hero > div:first-child {
+.emergency-whiteboard-page--practitioner-compact
+  .emergency-whiteboard-page__hero
+  > div:first-child {
   align-items: baseline;
   display: flex;
   flex: 1 1 auto;
@@ -127,7 +129,8 @@
   padding: 8px 12px;
 }
 
-.emergency-whiteboard-page--practitioner-compact .emergency-whiteboard-page__awareness-banner-title {
+.emergency-whiteboard-page--practitioner-compact
+  .emergency-whiteboard-page__awareness-banner-title {
   font-size: 12px;
 }
 

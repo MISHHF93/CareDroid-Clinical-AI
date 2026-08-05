@@ -48,7 +48,11 @@ html[data-theme='light'] {
   --app-input-bg: var(--medical-white, #ffffff);
   --app-input-bg-hover: var(--medical-white, #ffffff);
   --app-input-border: var(--medical-border, #cbd5e1);
-  --app-table-header-bg: color-mix(in srgb, var(--medical-surface-muted, #eef4f7) 78%, var(--medical-white, #ffffff));
+  --app-table-header-bg: color-mix(
+    in srgb,
+    var(--medical-surface-muted, #eef4f7) 78%,
+    var(--medical-white, #ffffff)
+  );
   --app-table-row-hover: rgba(7, 89, 133, 0.055);
   --app-accent-contrast: #ffffff;
   --app-danger-contrast: var(--semantic-critical-bg, #fff7f7);
@@ -57,9 +61,21 @@ html[data-theme='light'] {
   --app-on-solid: #ffffff;
   --app-mesh-cyan: color-mix(in srgb, var(--medical-accent, #075985) 3%, transparent);
   --app-mesh-green: transparent;
-  --app-scrollbar-track: color-mix(in srgb, var(--medical-surface-muted, #eef4f7) 72%, var(--medical-white, #ffffff));
-  --app-scrollbar-thumb: color-mix(in srgb, var(--medical-accent, #075985) 24%, var(--medical-border, #cbd5e1));
-  --app-scrollbar-thumb-hover: color-mix(in srgb, var(--medical-accent, #075985) 40%, var(--medical-border-strong, #94a3b8));
+  --app-scrollbar-track: color-mix(
+    in srgb,
+    var(--medical-surface-muted, #eef4f7) 72%,
+    var(--medical-white, #ffffff)
+  );
+  --app-scrollbar-thumb: color-mix(
+    in srgb,
+    var(--medical-accent, #075985) 24%,
+    var(--medical-border, #cbd5e1)
+  );
+  --app-scrollbar-thumb-hover: color-mix(
+    in srgb,
+    var(--medical-accent, #075985) 40%,
+    var(--medical-border-strong, #94a3b8)
+  );
   --app-code-bg: var(--medical-surface-muted, #eef4f7);
   --app-tool-card-body-bg: rgba(255, 255, 255, 0.98);
   --app-tool-card-body-fg: var(--medical-ink, #102a43);
@@ -100,7 +116,11 @@ html[data-theme='light'] {
   --sidebar-control-hover-bg: color-mix(in srgb, var(--app-navy-ink) 8%, transparent);
   --sidebar-control-hover-fg: var(--app-fg);
   --sidebar-cta-from: var(--app-accent-interactive);
-  --sidebar-cta-to: color-mix(in srgb, var(--app-accent-interactive) 65%, var(--medical-accent-hover, #054364));
+  --sidebar-cta-to: color-mix(
+    in srgb,
+    var(--app-accent-interactive) 65%,
+    var(--medical-accent-hover, #054364)
+  );
   --sidebar-cta-fg: var(--app-on-solid);
   --sidebar-cta-shadow: 0 2px 8px color-mix(in srgb, var(--app-accent-interactive) 16%, transparent);
   --sidebar-logo-surface: linear-gradient(

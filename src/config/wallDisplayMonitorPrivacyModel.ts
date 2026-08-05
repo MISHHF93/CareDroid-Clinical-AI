@@ -1,8 +1,6 @@
 /**
  * Hallway / nurse-station monitor privacy — governs PHI exposure on wall displays.
  */
-import type { CareDroidScreenMode } from './careDroidScreenModes';
-import { shouldRedactCentralNodeForDisplayPrivacy } from './emergencyDisplayPrivacyPolicy';
 import type {
   DepartmentStatusMetric,
   DepartmentStatusSnapshot,
@@ -154,18 +152,6 @@ export function resolveReadOnlyWhiteboardPrivacyLabel(
 ): string {
   const privacy = normalizeWallDisplayMonitorPrivacy(value, fallback);
   return PRIVACY_MODE_LABELS[privacy];
-}
-
-export function shouldRedactCentralNodeForMonitorPrivacy(
-  screenMode: CareDroidScreenMode,
-  monitorPrivacy?: WallDisplayMonitorPrivacy | string | null,
-  readOnlyDisplayMode?: boolean,
-): boolean {
-  return shouldRedactCentralNodeForDisplayPrivacy(
-    screenMode,
-    monitorPrivacy,
-    readOnlyDisplayMode,
-  );
 }
 
 export function buildReadOnlyWhiteboardSummaryLine(

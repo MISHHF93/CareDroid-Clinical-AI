@@ -136,16 +136,28 @@
 }
 
 .clinical-score-modal__field--requires-assessment {
-  border-color: color-mix(in srgb, var(--status-warning) 42%, var(--color-border-default)) !important;
+  border-color: color-mix(
+    in srgb,
+    var(--status-warning) 42%,
+    var(--color-border-default)
+  ) !important;
 }
 
 .clinical-score-modal__field--needs-confirmation {
-  border-color: color-mix(in srgb, var(--status-warning) 52%, var(--color-border-default)) !important;
+  border-color: color-mix(
+    in srgb,
+    var(--status-warning) 52%,
+    var(--color-border-default)
+  ) !important;
   background: color-mix(in srgb, var(--status-warning) 10%, var(--color-elevated)) !important;
 }
 
 .clinical-score-modal__field--reviewed {
-  border-color: color-mix(in srgb, var(--status-stable) 56%, var(--color-border-default)) !important;
+  border-color: color-mix(
+    in srgb,
+    var(--status-stable) 56%,
+    var(--color-border-default)
+  ) !important;
   background: color-mix(in srgb, var(--status-stable) 12%, var(--color-elevated)) !important;
 }
 

@@ -79,6 +79,8 @@ describe('mobile-first recovery layer', () => {
     expect(recoveryCss).toMatch(
       /\.app-shell :is\(\.hospital-map-detail, \.fleet-map-detail, \.artifacts-detail\)[\s\S]*position:\s*static/
     );
-    expect(recoveryCss).toMatch(/:is\(table[\s\S]*\.user-table\)[\s\S]*min-width:\s*max-content/);
+    expect(recoveryCss).toMatch(
+      /:is\(\s*table[\s\S]*\.user-table\s*\)[\s\S]*min-width:\s*max-content/,
+    );
   });
 });

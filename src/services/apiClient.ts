@@ -12,7 +12,7 @@ import {
   markBackendUnreachable,
 } from './backendReachability';
 import { BACKEND_PROBE_TIMEOUT_MS } from '../config/startupTimeouts';
-import observabilityService from './observabilityService';
+import { buildTraceHeaders, recordApiTiming } from './apiTelemetryBridge';
 import { isPublicApiPath as isSecurityPublicApiPath } from './securityAccessService';
 import { toUserFacingApiErrorMessage } from '../config/errorRecoveryModel';
 
@@ -363,7 +363,7 @@ export const apiFetch = async (path, options: any = {}) => {
     if (offline) return offline;
   }
 
-  const traceHeaders = observabilityService.buildTraceHeaders();
+  const traceHeaders = buildTraceHeaders();
   for (const [headerName, headerValue] of Object.entries(traceHeaders)) {
     setHeaderIfMissing(mergedHeaders, headerName, headerValue);
   }
@@ -378,7 +378,7 @@ export const apiFetch = async (path, options: any = {}) => {
       headers: mergedHeaders,
       signal,
     });
-    observabilityService.recordApiTiming({
+    recordApiTiming({
       path: apiPath,
       method: requestMethod,
       durationMs: Math.round(performance.now() - requestStartedAt),
@@ -389,7 +389,7 @@ export const apiFetch = async (path, options: any = {}) => {
     }
     return response;
   } catch (error: any) {
-    observabilityService.recordApiTiming({
+    recordApiTiming({
       path: apiPath,
       method: requestMethod,
       durationMs: Math.round(performance.now() - requestStartedAt),

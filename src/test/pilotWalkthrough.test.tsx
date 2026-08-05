@@ -285,8 +285,10 @@ describe('pilot walkthrough', () => {
     // Primary CTA label escalates to "Route to priority triage" for
     // red-flag complaints like chest pain (see
     // resolveUnifiedIntakePrimaryAction), replacing the default
-    // "Create patient & route" — match on the shared "route" wording.
-    await user.click(screen.getByRole('button', { name: /route/i }));
+    // "Create patient & route". A separate reception-skill-strip quick
+    // action also contains "route" in its text, so target the action-bar
+    // CTA's stable test id rather than a name regex to avoid ambiguity.
+    await user.click(screen.getByTestId('reception-create-route'));
 
     const createdPatient = await waitForNewPatient(beforePatientIds);
     expect(createdPatient.state).toBe(PatientState.Triage);

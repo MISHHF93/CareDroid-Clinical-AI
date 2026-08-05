@@ -37,7 +37,8 @@
   max-height: var(--cdl-control-height-md, var(--app-chrome-control-h, 36px));
   max-width: 100%;
   padding: 0 10px 0 8px;
-  border: 1px solid color-mix(in srgb, var(--cdl-border, var(--medical-border, #e2e8f0)) 65%, transparent);
+  border: 1px solid
+    color-mix(in srgb, var(--cdl-border, var(--medical-border, #e2e8f0)) 65%, transparent);
   border-radius: var(--cdl-radius-md, var(--app-chrome-control-radius, 9px));
   background: color-mix(in srgb, var(--cdl-slate-50, #f8fafc) 40%, #ffffff);
   box-shadow: var(--cdl-elev-1, none);

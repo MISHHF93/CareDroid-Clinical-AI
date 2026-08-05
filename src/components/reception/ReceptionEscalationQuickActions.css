@@ -56,7 +56,11 @@
 }
 
 .reception-escalation-quick-actions__button--critical {
-  border-color: color-mix(in srgb, var(--semantic-critical, #b91c1c) 44%, var(--medical-border, #e2e8f0));
+  border-color: color-mix(
+    in srgb,
+    var(--semantic-critical, #b91c1c) 44%,
+    var(--medical-border, #e2e8f0)
+  );
 }
 
 .reception-escalation-quick-actions__button--critical:hover:not(:disabled) {

@@ -9,7 +9,10 @@
   overflow: hidden;
   background: var(--cdl-sidebar-bg, var(--medical-white));
   border-right: 0;
-  box-shadow: var(--cdl-sidebar-shadow, 1px 0 0 color-mix(in srgb, var(--medical-border) 45%, transparent));
+  box-shadow: var(
+    --cdl-sidebar-shadow,
+    1px 0 0 color-mix(in srgb, var(--medical-border) 45%, transparent)
+  );
   color: var(--sidebar-fg, var(--medical-ink));
 }
 
@@ -26,7 +29,8 @@
   min-height: var(--cdl-sidebar-brand-height, 44px);
   padding: 8px 10px;
   border-bottom: 0;
-  box-shadow: 0 1px 0 color-mix(in srgb, var(--cdl-sidebar-footer-border, var(--medical-border)) 55%, transparent);
+  box-shadow: 0 1px 0
+    color-mix(in srgb, var(--cdl-sidebar-footer-border, var(--medical-border)) 55%, transparent);
 }
 
 .sidebar__brand-mark {
@@ -111,7 +115,8 @@
   gap: 6px;
   padding: 6px 6px 8px;
   border-top: 0;
-  box-shadow: 0 -1px 0 color-mix(in srgb, var(--cdl-sidebar-footer-border, var(--medical-border)) 55%, transparent);
+  box-shadow: 0 -1px 0
+    color-mix(in srgb, var(--cdl-sidebar-footer-border, var(--medical-border)) 55%, transparent);
   background: var(--medical-slate-50);
 }
 
@@ -313,7 +318,9 @@
   opacity: 0;
   pointer-events: none;
   z-index: var(--z-tooltip, 1000);
-  transition: opacity var(--motion-transition-fast), transform var(--motion-transition-fast);
+  transition:
+    opacity var(--motion-transition-fast),
+    transform var(--motion-transition-fast);
 }
 
 .sidebar-nav-item--alerts.sidebar-nav-item--pulse .sidebar-nav-item__count--alert {
@@ -416,7 +423,9 @@
     background: var(--medical-white);
     overflow: visible !important;
     position: fixed !important;
-    box-shadow: 0 -1px 0 color-mix(in srgb, var(--medical-border) 50%, transparent), 0 -4px 20px rgba(15, 23, 42, 0.06);
+    box-shadow:
+      0 -1px 0 color-mix(in srgb, var(--medical-border) 50%, transparent),
+      0 -4px 20px rgba(15, 23, 42, 0.06);
   }
 
   aside[aria-label='Emergency navigation'] {
@@ -561,7 +570,9 @@
     border-radius: 18px 18px 0 0;
     background: var(--medical-white);
     padding: 14px 14px calc(14px + env(safe-area-inset-bottom, 0px));
-    box-shadow: 0 -1px 0 color-mix(in srgb, var(--medical-border) 45%, transparent), var(--medical-shadow-lift);
+    box-shadow:
+      0 -1px 0 color-mix(in srgb, var(--medical-border) 45%, transparent),
+      var(--medical-shadow-lift);
     animation: sidebar-more-sheet-up var(--motion-transition-normal) both;
   }
 

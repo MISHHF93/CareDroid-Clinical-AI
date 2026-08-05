@@ -15,12 +15,8 @@
   --cdl-clinical-radius: 12px;
   --cdl-clinical-radius-sm: 10px;
   --cdl-clinical-radius-lg: 14px;
-  --cdl-clinical-shadow-rest:
-    0 1px 2px rgba(15, 23, 42, 0.04),
-    0 4px 14px rgba(15, 23, 42, 0.06);
-  --cdl-clinical-shadow-hover:
-    0 4px 8px rgba(15, 23, 42, 0.07),
-    0 12px 24px rgba(15, 23, 42, 0.09);
+  --cdl-clinical-shadow-rest: 0 1px 2px rgba(15, 23, 42, 0.04), 0 4px 14px rgba(15, 23, 42, 0.06);
+  --cdl-clinical-shadow-hover: 0 4px 8px rgba(15, 23, 42, 0.07), 0 12px 24px rgba(15, 23, 42, 0.09);
   --cdl-clinical-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.9);
   --cdl-clinical-panel-padding: clamp(14px, 1.6vw, 20px);
   --cdl-clinical-card-padding: clamp(12px, 1.4vw, 16px);
@@ -39,7 +35,8 @@
 }
 
 /* —— Shared clinical surface recipe —— */
-:is(.app-shell, .emergency-app-shell) :is(
+:is(.app-shell, .emergency-app-shell)
+  :is(
     .cdl-surface,
     .cd-dashboard-section,
     .cd-hero-panel,
@@ -74,7 +71,8 @@
 }
 
 /* Hover lift — tighter focus ring on interactive surfaces */
-:is(.app-shell, .emergency-app-shell) :is(
+:is(.app-shell, .emergency-app-shell)
+  :is(
     .cdl-surface,
     .cd-dashboard-section,
     .cd-hero-panel,
@@ -97,9 +95,12 @@
 }
 
 /* Legacy page cards/panels/widgets — override visual-consistency flat boxes */
-:is(.app-shell, .emergency-app-shell) :is(
+:is(.app-shell, .emergency-app-shell)
+  :is(
     .card,
-    [class$='-card']:not([class*='metric-chip']):not([class*='badge']):not([class*='chip']):not([class*='avatar']),
+    [class$='-card']:not([class*='metric-chip']):not([class*='badge']):not([class*='chip']):not(
+        [class*='avatar']
+      ),
     [class*='-card ']:not([class*='metric-chip']):not([class*='badge']),
     [class$='-panel'],
     [class*='-panel '],
@@ -115,7 +116,8 @@
   box-shadow: var(--cdl-clinical-shadow-rest);
 }
 
-:is(.app-shell, .emergency-app-shell) :is(
+:is(.app-shell, .emergency-app-shell)
+  :is(
     .summary-card,
     .cost-card,
     .analytics-panel,
@@ -135,7 +137,8 @@
 }
 
 /* Interactive cards lift on hover */
-:is(.app-shell, .emergency-app-shell) :is(
+:is(.app-shell, .emergency-app-shell)
+  :is(
     a[class$='-card'],
     a[class*='-card '],
     button[class$='-card'],
@@ -150,18 +153,24 @@
 }
 
 /* Nested / inset surfaces — softer, no heavy shadow stack */
-:is(.app-shell, .emergency-app-shell) :is(
+:is(.app-shell, .emergency-app-shell)
+  :is(
     .cd-surface--nested,
     .cd-surface--subtle,
     .cd-surface-card--muted,
     .emergency-route-situation-brief
   ) {
-  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 42%, var(--app-surface-1, #ffffff));
+  background: color-mix(
+    in srgb,
+    var(--app-surface-muted, #f1f5f9) 42%,
+    var(--app-surface-1, #ffffff)
+  );
   box-shadow: none;
 }
 
 /* —— Section rhythm —— */
-:is(.app-shell, .emergency-app-shell) :is(
+:is(.app-shell, .emergency-app-shell)
+  :is(
     .cd-page-shell,
     .cd-page-shell__content,
     .cdl-operational-page,
@@ -171,17 +180,14 @@
   gap: var(--cdl-clinical-section-gap);
 }
 
-:is(.app-shell, .emergency-app-shell) :is(
-    .cd-dashboard-section,
-    .cd-dashboard-section__content,
-    .cd-dashboard-grid,
-    .cdl-zone
-  ) {
+:is(.app-shell, .emergency-app-shell)
+  :is(.cd-dashboard-section, .cd-dashboard-section__content, .cd-dashboard-grid, .cdl-zone) {
   gap: var(--cdl-clinical-card-padding);
 }
 
 /* —— Tabs & chips: tint-first, not bordered pills —— */
-:is(.app-shell, .emergency-app-shell) :is(
+:is(.app-shell, .emergency-app-shell)
+  :is(
     .emergency-route-view-tabs__btn,
     .emergency-route-maturity-chip,
     .cd-metric-chip,
@@ -189,14 +195,16 @@
     .reception-command-chip
   ) {
   border-color: color-mix(in srgb, var(--cdl-clinical-border) 72%, transparent);
-  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 55%, var(--app-surface-1, #ffffff));
+  background: color-mix(
+    in srgb,
+    var(--app-surface-muted, #f1f5f9) 55%,
+    var(--app-surface-1, #ffffff)
+  );
   box-shadow: none;
 }
 
-:is(.app-shell, .emergency-app-shell) :is(
-    .emergency-route-view-tabs__btn--active,
-    .reception-command-chip--active
-  ) {
+:is(.app-shell, .emergency-app-shell)
+  :is(.emergency-route-view-tabs__btn--active, .reception-command-chip--active) {
   border-color: color-mix(in srgb, #374151 28%, transparent);
   background: color-mix(in srgb, #374151 10%, var(--app-surface-1, #ffffff));
   color: #111827;
@@ -204,16 +212,19 @@
 }
 
 /* —— Secondary controls: ghost over bordered boxes —— */
-:is(.app-shell, .emergency-app-shell) :is(
-    .emergency-route-filter-banner__btn,
-    .emergency-route-help-trigger
-  ) {
+:is(.app-shell, .emergency-app-shell)
+  :is(.emergency-route-filter-banner__btn, .emergency-route-help-trigger) {
   border-color: color-mix(in srgb, var(--cdl-clinical-border) 80%, transparent);
-  background: color-mix(in srgb, var(--app-surface-1, #ffffff) 88%, var(--app-surface-muted, #f1f5f9));
+  background: color-mix(
+    in srgb,
+    var(--app-surface-1, #ffffff) 88%,
+    var(--app-surface-muted, #f1f5f9)
+  );
   box-shadow: none;
 }
 
-:is(.app-shell, .emergency-app-shell) :is(
+:is(.app-shell, .emergency-app-shell)
+  :is(
     .emergency-route-filter-banner__btn:hover,
     .emergency-route-filter-banner__btn:focus-visible,
     .emergency-route-help-trigger:hover,
@@ -226,7 +237,11 @@
 
 /* —— Data tables: hairline rows, soft header band —— */
 :is(.app-shell, .emergency-app-shell) :is(.cd-data-table th) {
-  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 55%, var(--app-surface-1, #ffffff));
+  background: color-mix(
+    in srgb,
+    var(--app-surface-muted, #f1f5f9) 55%,
+    var(--app-surface-1, #ffffff)
+  );
   border-bottom-color: var(--cdl-clinical-border);
 }
 
@@ -235,7 +250,9 @@
 }
 
 /* —— Reception desk: borderless action areas —— */
-.emergency-app-shell .reception-workspace :is(
+.emergency-app-shell
+  .reception-workspace
+  :is(
     .reception-command-header,
     .reception-command-panel,
     .reception-desk-toolbar,
@@ -258,7 +275,8 @@
 }
 
 /* —— Semantic surfaces keep meaning, lose harsh edges —— */
-:is(.app-shell, .emergency-app-shell) :is(
+:is(.app-shell, .emergency-app-shell)
+  :is(
     .cdl-surface--critical,
     .cdl-surface--urgent,
     .cdl-surface--warning,
@@ -273,23 +291,19 @@
 }
 
 /* —— Form inputs: inset softness —— */
-:is(.app-shell, .emergency-app-shell) :is(
-    input:not([type='checkbox']):not([type='radio']):not([type='range']),
-    select,
-    textarea
-  ) {
+:is(.app-shell, .emergency-app-shell)
+  :is(input:not([type='checkbox']):not([type='radio']):not([type='range']), select, textarea) {
   border-color: var(--cdl-clinical-border);
   border-radius: var(--cdl-clinical-radius-sm);
   background: var(--app-input-bg, #ffffff);
   box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.03);
-  transition: border-color var(--cdl-clinical-motion), box-shadow var(--cdl-clinical-motion);
+  transition:
+    border-color var(--cdl-clinical-motion),
+    box-shadow var(--cdl-clinical-motion);
 }
 
-:is(.app-shell, .emergency-app-shell) :is(
-    input:focus-visible,
-    select:focus-visible,
-    textarea:focus-visible
-  ) {
+:is(.app-shell, .emergency-app-shell)
+  :is(input:focus-visible, select:focus-visible, textarea:focus-visible) {
   border-color: var(--cdl-clinical-border-focus);
   box-shadow:
     inset 0 1px 2px rgba(15, 23, 42, 0.03),
@@ -297,7 +311,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  :is(.app-shell, .emergency-app-shell) :is(
+  :is(.app-shell, .emergency-app-shell)
+    :is(
       a[class$='-card'],
       a[class*='-card '],
       button[class$='-card'],
@@ -350,7 +365,8 @@
 }
 
 /* Cards & panels: prefer soft edge + shadow over hard boxes */
-:is(.app-shell, .emergency-app-shell) :is(
+:is(.app-shell, .emergency-app-shell)
+  :is(
     .card,
     .cdl-surface,
     .cd-dashboard-section,
@@ -385,7 +401,9 @@
     .operating-drilldown,
     .device-summary-card,
     .medical-iot-card,
-    [class$='-card']:not([class*='metric-chip']):not([class*='badge']):not([class*='chip']):not([class*='avatar']),
+    [class$='-card']:not([class*='metric-chip']):not([class*='badge']):not([class*='chip']):not(
+        [class*='avatar']
+      ),
     [class$='-panel'],
     [class$='-widget'],
     [class$='-notice']
@@ -395,7 +413,8 @@
 }
 
 /* Inner card/panel headers: soft divider, not a second frame */
-:is(.app-shell, .emergency-app-shell) :is(
+:is(.app-shell, .emergency-app-shell)
+  :is(
     .cd-card__header,
     .cd-drawer__header,
     .cd-modal__header,
@@ -409,7 +428,8 @@
 }
 
 /* Nested surfaces inside cards: no extra box border */
-:is(.app-shell, .emergency-app-shell) :is(
+:is(.app-shell, .emergency-app-shell)
+  :is(
     .cd-surface--nested,
     .cd-surface--subtle,
     .cd-surface-card--muted,
@@ -417,7 +437,11 @@
   ) {
   border-color: transparent;
   box-shadow: none;
-  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 38%, var(--app-surface-1, #ffffff));
+  background: color-mix(
+    in srgb,
+    var(--app-surface-muted, #f1f5f9) 38%,
+    var(--app-surface-1, #ffffff)
+  );
 }
 
 /* Session chrome chips: tint-first, border only on interaction */

@@ -3,7 +3,11 @@
   gap: 20px;
   padding: 20px 24px 32px;
   border-bottom: 1px solid var(--medical-border, #e0f2fe);
-  background: linear-gradient(180deg, var(--medical-surface-page, #f1f5f9) 0%, var(--medical-card-bg, #ffffff) 100%);
+  background: linear-gradient(
+    180deg,
+    var(--medical-surface-page, #f1f5f9) 0%,
+    var(--medical-card-bg, #ffffff) 100%
+  );
 }
 
 .command-center-throughput__header {
@@ -203,12 +207,15 @@
   color: #374151;
 }
 
-.command-center-throughput__trend-card[data-tone='warning'] .command-center-throughput__trend-direction,
-.command-center-throughput__trend-card[data-tone='critical'] .command-center-throughput__trend-direction {
+.command-center-throughput__trend-card[data-tone='warning']
+  .command-center-throughput__trend-direction,
+.command-center-throughput__trend-card[data-tone='critical']
+  .command-center-throughput__trend-direction {
   color: #fbbf24;
 }
 
-.command-center-throughput__trend-card[data-tone='stable'] .command-center-throughput__trend-direction {
+.command-center-throughput__trend-card[data-tone='stable']
+  .command-center-throughput__trend-direction {
   color: #34d399;
 }
 

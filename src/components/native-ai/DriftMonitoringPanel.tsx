@@ -9,6 +9,7 @@ import {
 import { ensureDevBackendSession } from '../../services/devBackendAuth';
 import { evaluateNativeAiDrift, fetchNativeAiDriftEnvelope } from '../../services/nativeAiApi';
 import { runWeeklyNativeAiDriftEvaluation } from '../../services/nativeAiCore';
+import { AiTruthLabel, fromNativeAiSourceState } from '../ai/AiTruthLabel';
 import './native-ai-dashboard-theme.css';
 import './DriftMonitoringPanel.css';
 
@@ -179,6 +180,13 @@ export default function DriftMonitoringPanel({ className = '' }: DriftMonitoring
                   F1 {model.metrics.f1 ?? '—'} · Acc {model.metrics.accuracy ?? '—'}
                   {model.rollbackVersion ? ` · Rollback v${model.rollbackVersion}` : ''}
                 </small>
+                <AiTruthLabel
+                  {...fromNativeAiSourceState(model.maturity, {
+                    sourceContext: `${model.algorithm === 'rules' ? 'Rule-based scoring' : model.algorithm} — registry metrics not traced to any evaluation run in this repo`,
+                    reviewRequired: model.requiresHumanReview,
+                  })}
+                  compact
+                />
               </li>
             ))}
           </ul>
@@ -193,6 +201,13 @@ export default function DriftMonitoringPanel({ className = '' }: DriftMonitoring
                   <strong>{alert.modelId}</strong>
                   <span>{alert.summary}</span>
                   <small>{alert.severity} · {alert.sourceState}</small>
+                  <AiTruthLabel
+                    {...fromNativeAiSourceState(alert.sourceState, {
+                      sourceContext: `Drift evaluation for ${alert.modelId}`,
+                      reviewRequired: true,
+                    })}
+                    compact
+                  />
                 </li>
               ))}
             </ul>

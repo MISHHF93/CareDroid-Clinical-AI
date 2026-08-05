@@ -108,5 +108,5 @@
 }
 
 html[data-theme='dark'] .reception-dupe-confirm__panel {
-  background: #0f172a;
+  background: var(--app-panel-bg, #1e293b);
 }

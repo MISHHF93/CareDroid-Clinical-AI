@@ -1,5 +1,25 @@
 import type { ModelMaturityLabel, ModelPerformanceSnapshot } from './types';
 
+/**
+ * Cycle 272 (P0.4 AI truth-label audit): 7 of these 8 entries previously
+ * claimed a trained-model algorithm (xgboost/random_forest/nlp_hybrid/
+ * router) while their actual implementation is confirmed, by direct
+ * reading, to be keyword/regex/rule-based scoring with zero training —
+ * admission-likelihood -> calculateAdmissionHeuristicScore, prolonged-stay
+ * -> predictProlongedEdStay (both hand-weighted additive scoring in
+ * commandMlModels.ts), post-ed-orientation -> postEdOrientationClassifier
+ * .ts's threshold logic, nlp-triage-expert -> nlpTriageExpertSystem.ts's
+ * rule matching, native-ai-router -> panelOfExpertsRouter.ts's keyword
+ * scoring, native-ai-cardiac-vascular-v1/native-ai-pulmonary-v1 ->
+ * clinicalDomainSpecialists.ts's runClinicalSpecialistInference (keyword +
+ * regex pattern matching, +0.03-0.08 additive confidence per matched
+ * signal). `algorithm` corrected to 'rules' for all 7. The `metrics`
+ * (f1/accuracy/auc) below could not be traced to any evaluation run
+ * anywhere in this repo or docs/ai/ — left unchanged rather than guessed
+ * at, but flagged in SCORECARD.md/the project scorecard for clinician/
+ * product review before being cited externally. `multi-channel-text` was
+ * not traced this pass and its algorithm claim is left as-is.
+ */
 export type RegisteredNativeAiModel = {
   id: string;
   label: string;
@@ -24,7 +44,7 @@ const REGISTRY: RegisteredNativeAiModel[] = [
     label: 'Panel-of-Experts Router',
     version: '1.0.0',
     domain: 'routing',
-    algorithm: 'router',
+    algorithm: 'rules',
     status: 'active',
     maturity: 'live',
     metrics: { f1: 0.82, accuracy: 0.86 },
@@ -37,7 +57,7 @@ const REGISTRY: RegisteredNativeAiModel[] = [
     label: 'Post-ED Orientation Classifier',
     version: '1.0.0',
     domain: 'disposition',
-    algorithm: 'xgboost',
+    algorithm: 'rules',
     status: 'active',
     maturity: 'demo',
     metrics: { accuracy: 0.68, f1: 0.61 },
@@ -50,7 +70,7 @@ const REGISTRY: RegisteredNativeAiModel[] = [
     label: 'Prolonged ED Stay Predictor',
     version: '1.0.0',
     domain: 'operations',
-    algorithm: 'xgboost',
+    algorithm: 'rules',
     status: 'active',
     maturity: 'demo',
     metrics: { accuracy: 0.71, auc: 0.74 },
@@ -63,7 +83,7 @@ const REGISTRY: RegisteredNativeAiModel[] = [
     label: 'Admission Likelihood Classifier',
     version: '1.0.0',
     domain: 'operations',
-    algorithm: 'xgboost',
+    algorithm: 'rules',
     status: 'active',
     maturity: 'demo',
     metrics: { accuracy: 0.73, f1: 0.67 },
@@ -76,7 +96,7 @@ const REGISTRY: RegisteredNativeAiModel[] = [
     label: 'NLP-augmented Triage Expert System',
     version: '1.0.0',
     domain: 'triage',
-    algorithm: 'nlp_hybrid',
+    algorithm: 'rules',
     status: 'active',
     maturity: 'live',
     metrics: { f1: 0.79 },
@@ -101,7 +121,7 @@ const REGISTRY: RegisteredNativeAiModel[] = [
     label: 'Cardiac-Vascular Domain Specialist',
     version: '1.0.0',
     domain: 'cardiac_vascular',
-    algorithm: 'nlp_hybrid',
+    algorithm: 'rules',
     status: 'active',
     maturity: 'live',
     metrics: { f1: 0.81, accuracy: 0.84 },
@@ -114,7 +134,7 @@ const REGISTRY: RegisteredNativeAiModel[] = [
     label: 'Pulmonary Domain Specialist',
     version: '1.0.0',
     domain: 'pulmonary',
-    algorithm: 'nlp_hybrid',
+    algorithm: 'rules',
     status: 'active',
     maturity: 'live',
     metrics: { f1: 0.78, accuracy: 0.82 },

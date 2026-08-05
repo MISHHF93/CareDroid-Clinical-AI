@@ -37,6 +37,11 @@ import {
   HandoverRequestDto,
   Process112CallDto,
 } from '../src/modules/emergency-os/dto/emergency-os-research-actions.dto';
+import {
+  CreateEmergencyPatientDto,
+  UpdateEmergencyPatientDto,
+  CreateEmergencyReferralDto,
+} from '../src/modules/platform-systems/dto/emergency-patient-actions.dto';
 
 const root = join(__dirname, '..');
 
@@ -612,6 +617,63 @@ describe('backend contract hardening', () => {
       pipe.transform(
         { prompt: 'order a troponin', unexpectedField: 'x' },
         bodyMetadata(ToolCallingExecuteDto),
+      ),
+    ).rejects.toThrow(BadRequestException);
+  });
+
+  /**
+   * Cycle 270: same proof for PlatformSystemsController's 3 routes -- the
+   * last un-deferred entries in roadmap item #18. Confirmed zero live
+   * callers (see the DTO file's header), so these prove the mirrored-shape
+   * contract holds for a legitimate full patient/referral payload while
+   * still rejecting mass-assignment, not that they preserve some specific
+   * real caller's exact fields the way Cycles 249/251 do.
+   */
+  it('platform-systems emergency-patient/referral DTO classes actually get whitelist-validated by the real global ValidationPipe (Cycle 270)', async () => {
+    const pipe = new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    });
+    const bodyMetadata = (metatype: ArgumentMetadata['metatype']): ArgumentMetadata => ({
+      type: 'body',
+      metatype,
+      data: undefined,
+    });
+
+    await expect(
+      pipe.transform(
+        { complaint: 'Fever', priority: 'P3', sex: 'F' },
+        bodyMetadata(CreateEmergencyPatientDto),
+      ),
+    ).resolves.toMatchObject({ complaint: 'Fever', priority: 'P3' });
+    await expect(
+      pipe.transform(
+        { complaint: 'Fever', injectedField: 'unexpected' },
+        bodyMetadata(CreateEmergencyPatientDto),
+      ),
+    ).rejects.toThrow(BadRequestException);
+
+    await expect(
+      pipe.transform({ priority: 'P1', roomId: 'room-4' }, bodyMetadata(UpdateEmergencyPatientDto)),
+    ).resolves.toMatchObject({ priority: 'P1', roomId: 'room-4' });
+    await expect(
+      pipe.transform(
+        { priority: 'P1', injectedField: 'unexpected' },
+        bodyMetadata(UpdateEmergencyPatientDto),
+      ),
+    ).rejects.toThrow(BadRequestException);
+
+    await expect(
+      pipe.transform(
+        { patientId: 'pt-001', targetDepartment: 'Cardiology' },
+        bodyMetadata(CreateEmergencyReferralDto),
+      ),
+    ).resolves.toMatchObject({ patientId: 'pt-001', targetDepartment: 'Cardiology' });
+    await expect(
+      pipe.transform(
+        { patientId: 'pt-001', unexpectedField: 'unexpected' },
+        bodyMetadata(CreateEmergencyReferralDto),
       ),
     ).rejects.toThrow(BadRequestException);
   });

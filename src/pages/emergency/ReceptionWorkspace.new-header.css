@@ -45,9 +45,15 @@
   letter-spacing: 0.05em;
 }
 
-.reception-metric--critical .reception-metric__value { color: var(--cdl-critical-text, #991b1b); }
-.reception-metric--warning .reception-metric__value { color: var(--cdl-warning-text, #92400e); }
-.reception-metric--success .reception-metric__value { color: var(--cdl-ok-text, #065f46); }
+.reception-metric--critical .reception-metric__value {
+  color: var(--cdl-critical-text, #991b1b);
+}
+.reception-metric--warning .reception-metric__value {
+  color: var(--cdl-warning-text, #92400e);
+}
+.reception-metric--success .reception-metric__value {
+  color: var(--cdl-ok-text, #065f46);
+}
 
 /* Situation Brief */
 .reception-header__situation {
@@ -117,7 +123,9 @@
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: border-color 0.15s ease, background 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
 }
 
 .reception-header__action-btn:hover {
@@ -157,7 +165,9 @@
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
 }
 
 .reception-header__queue-tab:hover {

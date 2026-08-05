@@ -74,7 +74,8 @@
   margin-bottom: 1rem;
 }
 
-.legal-content ul, .legal-content ol {
+.legal-content ul,
+.legal-content ol {
   margin: 1rem 0 1rem 1.5rem;
 }
 

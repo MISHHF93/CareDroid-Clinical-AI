@@ -332,7 +332,10 @@
 /* ── Cards / widgets (MetricCard, StatusWidget, StatCard) ── */
 .alarm-surface {
   position: relative;
-  transition: border-color 120ms ease, background-color 120ms ease, box-shadow 120ms ease;
+  transition:
+    border-color 120ms ease,
+    background-color 120ms ease,
+    box-shadow 120ms ease;
 }
 
 .alarm-surface--critical,

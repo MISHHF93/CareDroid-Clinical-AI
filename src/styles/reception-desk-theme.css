@@ -51,8 +51,14 @@ html[data-theme='dark'] .reception-page-layout {
 }
 
 /* Default buttons — muted surface, not chalk white */
-.reception-front-door button:not([class*='ghost']):not([class*='link']):not(.reception-header__action-btn--primary):not(.unified-intake-actionbar__primary):not(.reception-prepare__option--primary),
-.reception-workspace button:not([class*='ghost']):not([class*='link']):not(.reception-header__action-btn--primary):not(.unified-intake-actionbar__primary) {
+.reception-front-door
+  button:not([class*='ghost']):not([class*='link']):not(.reception-header__action-btn--primary):not(
+    .unified-intake-actionbar__primary
+  ):not(.reception-prepare__option--primary),
+.reception-workspace
+  button:not([class*='ghost']):not([class*='link']):not(.reception-header__action-btn--primary):not(
+    .unified-intake-actionbar__primary
+  ) {
   background: var(--reception-surface-inset);
   border: 1px solid var(--reception-border);
   box-shadow: none;

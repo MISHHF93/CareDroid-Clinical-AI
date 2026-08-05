@@ -101,7 +101,11 @@
   border: 1px solid color-mix(in srgb, var(--app-warning) 34%, transparent);
   border-radius: 12px;
   background:
-    linear-gradient(135deg, color-mix(in srgb, var(--app-warning) 8%, transparent), color-mix(in srgb, var(--app-danger) 6%, transparent)),
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--app-warning) 8%, transparent),
+      color-mix(in srgb, var(--app-danger) 6%, transparent)
+    ),
     var(--surface-1);
 }
 

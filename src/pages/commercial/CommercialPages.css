@@ -233,7 +233,10 @@
 
 .commercial-config-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--app-grid-card-min-wide, 16rem)), 1fr));
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(min(100%, var(--app-grid-card-min-wide, 16rem)), 1fr)
+  );
   gap: 16px;
 }
 
@@ -300,7 +303,10 @@ button.commercial-chip {
 }
 
 .commercial-agent-grid {
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--app-grid-card-min-wide, 16rem)), 1fr));
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(min(100%, var(--app-grid-card-min-wide, 16rem)), 1fr)
+  );
 }
 
 .commercial-agent-card {

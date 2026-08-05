@@ -52,9 +52,9 @@
 }
 
 .wnp-btn--reassess {
-  background: color-mix(in srgb, #F59E0B 18%, #f0f9ff);
-  border-color: #F59E0B;
-  color: #FDE68A;
+  background: color-mix(in srgb, #f59e0b 18%, #f0f9ff);
+  border-color: #f59e0b;
+  color: #fde68a;
 }
 
 .wnp-btn--full {

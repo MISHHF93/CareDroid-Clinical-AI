@@ -11,7 +11,8 @@
   grid-template-columns: repeat(auto-fit, minmax(108px, 1fr));
   gap: 6px;
   padding: 8px 10px;
-  border: 1px solid var(--cdl-clinical-border, var(--color-border-subtle, var(--medical-border, #e0f2fe)));
+  border: 1px solid
+    var(--cdl-clinical-border, var(--color-border-subtle, var(--medical-border, #e0f2fe)));
   border-radius: var(--cdl-clinical-radius, 12px);
   background: var(--app-surface-1, #ffffff);
   box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
@@ -69,7 +70,11 @@
   white-space: nowrap;
   border-right: 0;
   border-radius: var(--cdl-clinical-radius-sm, 10px);
-  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 42%, var(--app-surface-1, #ffffff));
+  background: color-mix(
+    in srgb,
+    var(--app-surface-muted, #f1f5f9) 42%,
+    var(--app-surface-1, #ffffff)
+  );
 }
 
 .operational-strip__metric,
@@ -82,7 +87,11 @@
   border: 0;
   border-right: 0;
   border-radius: var(--cdl-clinical-radius-sm, 10px);
-  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 38%, var(--app-surface-1, #ffffff));
+  background: color-mix(
+    in srgb,
+    var(--app-surface-muted, #f1f5f9) 38%,
+    var(--app-surface-1, #ffffff)
+  );
   color: var(--color-text-secondary, #9ca3af);
   padding: 4px 10px;
   text-align: left;
@@ -169,53 +178,96 @@
 }
 
 .operational-strip--accent-reassessment {
-  border-bottom-color: color-mix(in srgb, var(--status-warning, #f59e0b) 28%, var(--cdl-clinical-border, var(--color-border-subtle, var(--medical-border, #e0f2fe))));
+  border-bottom-color: color-mix(
+    in srgb,
+    var(--status-warning, #f59e0b) 28%,
+    var(--cdl-clinical-border, var(--color-border-subtle, var(--medical-border, #e0f2fe)))
+  );
   box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
 }
 
 .operational-strip--accent-reassessment .operational-strip__eyebrow {
   color: var(--medical-status-warning-text, #b45309);
-  background: color-mix(in srgb, var(--status-warning, #f59e0b) 16%, var(--medical-surface-card, #ffffff));
+  background: color-mix(
+    in srgb,
+    var(--status-warning, #f59e0b) 16%,
+    var(--medical-surface-card, #ffffff)
+  );
 }
 
 .operational-strip--accent-reassessment .operational-strip__metric {
-  background: color-mix(in srgb, var(--status-warning, #f59e0b) 8%, var(--medical-surface-card, #ffffff));
+  background: color-mix(
+    in srgb,
+    var(--status-warning, #f59e0b) 8%,
+    var(--medical-surface-card, #ffffff)
+  );
 }
 
 .operational-strip--accent-referral {
-  border-bottom-color: color-mix(in srgb, var(--color-accent, #a78bfa) 28%, var(--cdl-clinical-border, var(--color-border-subtle, var(--medical-border, #e0f2fe))));
+  border-bottom-color: color-mix(
+    in srgb,
+    var(--color-accent, #a78bfa) 28%,
+    var(--cdl-clinical-border, var(--color-border-subtle, var(--medical-border, #e0f2fe)))
+  );
   box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
 }
 
 .operational-strip--accent-referral .operational-strip__eyebrow {
   color: #ddd6fe;
-  background: color-mix(in srgb, var(--color-accent, #a78bfa) 16%, var(--medical-surface-card, #ffffff));
+  background: color-mix(
+    in srgb,
+    var(--color-accent, #a78bfa) 16%,
+    var(--medical-surface-card, #ffffff)
+  );
 }
 
 .operational-strip--accent-referral .operational-strip__metric {
-  background: color-mix(in srgb, var(--color-accent, #a78bfa) 8%, var(--medical-surface-card, #ffffff));
+  background: color-mix(
+    in srgb,
+    var(--color-accent, #a78bfa) 8%,
+    var(--medical-surface-card, #ffffff)
+  );
 }
 
 .operational-strip--accent-ems {
-  border-bottom-color: color-mix(in srgb, var(--color-secondary, #94a3b8) 28%, var(--cdl-clinical-border, var(--color-border-subtle, var(--medical-border, #e0f2fe))));
+  border-bottom-color: color-mix(
+    in srgb,
+    var(--color-secondary, #94a3b8) 28%,
+    var(--cdl-clinical-border, var(--color-border-subtle, var(--medical-border, #e0f2fe)))
+  );
   box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
 }
 
 .operational-strip--accent-ems .operational-strip__eyebrow {
   color: #bae6fd;
-  background: color-mix(in srgb, var(--color-secondary, #94a3b8) 16%, var(--medical-surface-card, #ffffff));
+  background: color-mix(
+    in srgb,
+    var(--color-secondary, #94a3b8) 16%,
+    var(--medical-surface-card, #ffffff)
+  );
 }
 
 .operational-strip--accent-ems .operational-strip__metric {
-  background: color-mix(in srgb, var(--color-secondary, #94a3b8) 8%, var(--medical-surface-card, #ffffff));
+  background: color-mix(
+    in srgb,
+    var(--color-secondary, #94a3b8) 8%,
+    var(--medical-surface-card, #ffffff)
+  );
 }
 
 .operational-strip--accent-shift-handoff {
   position: sticky;
   top: 0;
   z-index: 6;
-  border-bottom-color: color-mix(in srgb, #374151 28%, var(--cdl-clinical-border, var(--color-border-subtle, var(--medical-border, #e0f2fe))));
-  box-shadow: var(--cdl-clinical-shadow-hover, var(--cdl-clinical-shadow-rest, var(--app-elevation-card)));
+  border-bottom-color: color-mix(
+    in srgb,
+    #374151 28%,
+    var(--cdl-clinical-border, var(--color-border-subtle, var(--medical-border, #e0f2fe)))
+  );
+  box-shadow: var(
+    --cdl-clinical-shadow-hover,
+    var(--cdl-clinical-shadow-rest, var(--app-elevation-card))
+  );
 }
 
 .operational-strip--accent-shift-handoff .operational-strip__eyebrow {

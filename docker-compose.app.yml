@@ -56,8 +56,71 @@ services:
     networks:
       - caredroid-app
 
+  # Scrapes the backend's real Prometheus-format /metrics endpoint
+  # (backend/src/modules/metrics, prom-client-backed). Config was already
+  # fully authored (config/prometheus.yml + config/prometheus/alert.rules.yml)
+  # but never wired into this compose file until now. Mirrors the already-
+  # proven prometheus/grafana blocks in docker-compose.yml (image tags, env
+  # var names, healthchecks) rather than inventing a divergent config — the
+  # only deliberate difference is scope: no alertmanager/elasticsearch/
+  # sentry here, keeping this file's documented "lightweight app" framing
+  # (see docs/deployment-guide.md). Prometheus will log a benign connection
+  # warning for the alertmanager target in prometheus.yml since it's not
+  # part of this lighter stack; that doesn't affect scraping or dashboards.
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: caredroid-prometheus
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./config/prometheus:/etc/prometheus/rules:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    ports:
+      - '9090:9090'
+    healthcheck:
+      test: ['CMD', 'curl', '-s', 'http://localhost:9090/-/healthy']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      - backend
+    networks:
+      - caredroid-app
+
+  # Dashboards were already fully authored (config/grafana/provisioning/) —
+  # 11 CareDroid dashboards plus datasource provisioning — but never wired
+  # into this compose file until now. Elasticsearch is also declared as a
+  # datasource in caredroid-datasources.yml but not part of this compose
+  # file; its panels will show as unreachable until that's added separately.
+  grafana:
+    image: grafana/grafana:latest
+    container_name: caredroid-grafana
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_USER:-admin}
+      GF_USERS_ALLOW_SIGN_UP: 'false'
+    volumes:
+      - ./config/grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana_data:/var/lib/grafana
+    ports:
+      - '3001:3000'
+    healthcheck:
+      test: ['CMD', 'curl', '-s', 'http://localhost:3000/api/health']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    networks:
+      - caredroid-app
+
 volumes:
   backend_sqlite:
+  prometheus_data:
+  grafana_data:
 
 networks:
   caredroid-app:

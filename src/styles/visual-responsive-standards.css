@@ -122,26 +122,8 @@
   text-rendering: optimizeLegibility;
 }
 
-:is(.app-shell, .emergency-app-shell) :is(
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6,
-    p,
-    li,
-    dd,
-    dt,
-    span,
-    strong,
-    small,
-    label,
-    button,
-    a,
-    th,
-    td
-  ) {
+:is(.app-shell, .emergency-app-shell)
+  :is(h1, h2, h3, h4, h5, h6, p, li, dd, dt, span, strong, small, label, button, a, th, td) {
   min-width: 0;
   max-width: 100%;
   letter-spacing: 0;
@@ -169,12 +151,14 @@
   line-height: var(--app-readable-line-height);
 }
 
-:is(.app-shell, .emergency-app-shell) :is(small, figcaption, [class*='caption'], [class*='meta'], [class*='eyebrow']) {
+:is(.app-shell, .emergency-app-shell)
+  :is(small, figcaption, [class*='caption'], [class*='meta'], [class*='eyebrow']) {
   font-size: var(--app-readable-caption-size);
   line-height: 1.45;
 }
 
-:is(.app-shell, .emergency-app-shell) :is(
+:is(.app-shell, .emergency-app-shell)
+  :is(
     .cd-page-shell,
     .emergency-route-page,
     .help-hub-page,
@@ -200,7 +184,8 @@
 
 /* Page / section heroes only — do NOT match chrome controls like
  * .operational-alarm-dock--header or .app-chrome (false positives on *-header). */
-:is(.app-shell, .emergency-app-shell) :is(
+:is(.app-shell, .emergency-app-shell)
+  :is(
     .cd-page-header,
     .emergency-route-page__hero,
     [class$='-hero'],
@@ -215,7 +200,8 @@
   padding: var(--app-visual-header-padding);
 }
 
-:is(.app-shell, .emergency-app-shell) :is(
+:is(.app-shell, .emergency-app-shell)
+  :is(
     .card,
     [class$='-card'],
     [class*='-card '],
@@ -230,7 +216,8 @@
   padding: var(--app-visual-card-padding);
 }
 
-:is(.app-shell, .emergency-app-shell) :is(
+:is(.app-shell, .emergency-app-shell)
+  :is(
     .cd-dashboard-grid,
     .emergency-route-metric-grid,
     .emergency-route-signal-grid,
@@ -244,7 +231,8 @@
   gap: var(--app-visual-panel-gap);
 }
 
-:is(.app-shell, .emergency-app-shell) :is(
+:is(.app-shell, .emergency-app-shell)
+  :is(
     .cd-dashboard-grid--cards,
     .cd-dashboard-grid--summary,
     .emergency-route-metric-grid,
@@ -257,7 +245,8 @@
   grid-template-columns: repeat(auto-fit, var(--app-visual-grid-min));
 }
 
-:is(.app-shell, .emergency-app-shell) :is(
+:is(.app-shell, .emergency-app-shell)
+  :is(
     button,
     a[role='button'],
     [role='button'],
@@ -269,18 +258,14 @@
   font-size: max(15px, var(--app-readable-body-size));
 }
 
-:is(.app-shell, .emergency-app-shell) :is(
-    button,
-    a[role='button'],
-    [role='button'],
-    .help-topic__related-btn,
-    .help-hub__tab
-  ) {
+:is(.app-shell, .emergency-app-shell)
+  :is(button, a[role='button'], [role='button'], .help-topic__related-btn, .help-hub__tab) {
   white-space: normal;
   text-wrap: pretty;
 }
 
-:is(.app-shell, .emergency-app-shell) :is(
+:is(.app-shell, .emergency-app-shell)
+  :is(
     [class*='actions'],
     [class*='controls'],
     [class*='toolbar'],
@@ -294,13 +279,8 @@
   gap: var(--app-visual-control-gap);
 }
 
-:is(.app-shell, .emergency-app-shell) :is(
-    [class*='badge'],
-    [class*='chip'],
-    [class*='pill'],
-    [class*='tag'],
-    .cd-metric-chip
-  ) {
+:is(.app-shell, .emergency-app-shell)
+  :is([class*='badge'], [class*='chip'], [class*='pill'], [class*='tag'], .cd-metric-chip) {
   min-height: 28px;
   align-items: center;
   white-space: normal;
@@ -308,7 +288,8 @@
 }
 
 @media (max-width: 900px) {
-  :is(.app-shell, .emergency-app-shell) :is(
+  :is(.app-shell, .emergency-app-shell)
+    :is(
       .cd-workspace-split,
       .cd-workspace-split--balanced,
       .cd-workspace-split--wide,
@@ -320,7 +301,8 @@
     grid-template-columns: minmax(0, 1fr) !important;
   }
 
-  :is(.app-shell, .emergency-app-shell) :is(
+  :is(.app-shell, .emergency-app-shell)
+    :is(
       .cd-section-header,
       .cd-dashboard-card__header,
       .cd-tool-card__header,
@@ -333,7 +315,8 @@
 }
 
 @media (max-width: 520px) {
-  :is(.app-shell, .emergency-app-shell) :is(
+  :is(.app-shell, .emergency-app-shell)
+    :is(
       .cd-dashboard-grid--cards,
       .cd-dashboard-grid--summary,
       .emergency-route-metric-grid,

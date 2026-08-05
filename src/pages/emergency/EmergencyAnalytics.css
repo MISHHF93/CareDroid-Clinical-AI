@@ -135,7 +135,9 @@
 }
 
 @keyframes app-shell-loading-spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -298,24 +300,50 @@
     transform var(--motion-transition-fast);
 }
 
-.emergency-analytics__heatmap-cell--0 { --heat: 0; }
-.emergency-analytics__heatmap-cell--1 { --heat: 0.17; }
-.emergency-analytics__heatmap-cell--2 { --heat: 0.33; }
-.emergency-analytics__heatmap-cell--3 { --heat: 0.5; }
-.emergency-analytics__heatmap-cell--4 { --heat: 0.67; }
-.emergency-analytics__heatmap-cell--5 { --heat: 0.83; }
-.emergency-analytics__heatmap-cell--6 { --heat: 1; }
+.emergency-analytics__heatmap-cell--0 {
+  --heat: 0;
+}
+.emergency-analytics__heatmap-cell--1 {
+  --heat: 0.17;
+}
+.emergency-analytics__heatmap-cell--2 {
+  --heat: 0.33;
+}
+.emergency-analytics__heatmap-cell--3 {
+  --heat: 0.5;
+}
+.emergency-analytics__heatmap-cell--4 {
+  --heat: 0.67;
+}
+.emergency-analytics__heatmap-cell--5 {
+  --heat: 0.83;
+}
+.emergency-analytics__heatmap-cell--6 {
+  --heat: 1;
+}
 
 .emergency-analytics__heatmap-cell:hover {
   transform: translateY(-1px);
 }
 
-.emergency-analytics__legend-swatch--0 { background: var(--cdl-ink-subtle, #475569); }
-.emergency-analytics__legend-swatch--1 { background: #22c55e; }
-.emergency-analytics__legend-swatch--2 { background: #f59e0b; }
-.emergency-analytics__legend-swatch--3 { background: #f97316; }
-.emergency-analytics__legend-swatch--4 { background: #ef4444; }
-.emergency-analytics__legend-swatch--5 { background: #a78bfa; }
+.emergency-analytics__legend-swatch--0 {
+  background: var(--cdl-ink-subtle, #475569);
+}
+.emergency-analytics__legend-swatch--1 {
+  background: #22c55e;
+}
+.emergency-analytics__legend-swatch--2 {
+  background: #f59e0b;
+}
+.emergency-analytics__legend-swatch--3 {
+  background: #f97316;
+}
+.emergency-analytics__legend-swatch--4 {
+  background: #ef4444;
+}
+.emergency-analytics__legend-swatch--5 {
+  background: #a78bfa;
+}
 
 @keyframes emergency-page-enter {
   from {

@@ -48,7 +48,9 @@
   padding: 14px 16px;
   cursor: default;
   outline: none;
-  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+  transition:
+    box-shadow 0.15s ease,
+    border-color 0.15s ease;
 }
 
 .cd-role-widget-card:focus-visible {

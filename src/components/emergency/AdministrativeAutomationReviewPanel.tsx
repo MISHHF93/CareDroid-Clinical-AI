@@ -8,6 +8,7 @@ import { GraphicIconBadge } from '../graphics/CdlGraphicKit';
 import { VisualizationPanel } from '../dashboard/DashboardVisualizations';
 import { CategoryBarChart, DistributionDonutChart } from '../dashboard/DashboardCharts';
 import { buildAutomationStatusChart } from '../../utils/administrativeAutomationChartModel';
+import { AiTruthLabel } from '../ai/AiTruthLabel';
 import './administrative-automation-review.css';
 
 type AiDecisionPayload = Readonly<{
@@ -83,6 +84,23 @@ function AiDecisionBlock({ decision }: { decision: AiDecisionPayload }) {
           <span className="automation-review__ai-badge">Clinician review required</span>
         ) : null}
       </div>
+      {/*
+       * This payload comes from patientJourneyAiDecisionService, which does
+       * call the real AI Chief gateway (invokeUnifiedAiStructuredByIntent) —
+       * unlike the predictive badges' heuristics, this is architecturally a
+       * genuine "Live" AI surface. Per-decision success/failure provenance
+       * (CareDroidAIResponse.status/provenance) is stripped before it
+       * reaches this component (enrichAdministrativeAutomationsWithAi.ts
+       * only forwards `.data`), so this label reflects the pathway's
+       * architecture, not a live per-response confirmation — a real,
+       * honestly-flagged gap, not silently expanded scope for this pass.
+       */}
+      <AiTruthLabel
+        state="Live"
+        sourceContext="Patient Journey AI decision service via the CareDroid AI Chief gateway"
+        reviewRequired={decision.requiresClinicianReview ?? true}
+        compact
+      />
       <dl className="automation-review__ai-fields">
         {triageLevel ? (
           <>

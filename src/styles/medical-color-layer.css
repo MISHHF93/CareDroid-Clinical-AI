@@ -112,7 +112,7 @@
    Clinical accent colors (sky) brighten to maintain legibility on dark
    surfaces. Semantic status colors shift to lighter tints for contrast.
    ════════════════════════════════════════════════════════════════════════ */
-html[data-theme="dark"] {
+html[data-theme='dark'] {
   /* Clinical neutrals — inverted for dark surfaces */
   --medical-slate-50: #0f172a;
   --medical-slate-100: #1e293b;

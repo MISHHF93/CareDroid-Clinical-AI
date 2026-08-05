@@ -7,6 +7,7 @@ export {
   CARE_DROID_SCREEN_MODE_OPTIONS,
   CARE_DROID_SCREEN_MODE_REGISTRY,
   canEditInScreenMode,
+  coerceEnabledScreenMode,
   getScreenModeActionPermission,
   getScreenModeDefaultLandingRoute,
   getScreenModeDefinition,

@@ -6,7 +6,11 @@
   border: 1px solid var(--medical-accent-border);
   border-radius: 14px;
   background:
-    linear-gradient(135deg, var(--medical-accent-tint-subtle), color-mix(in srgb, #374151 6%, transparent)),
+    linear-gradient(
+      135deg,
+      var(--medical-accent-tint-subtle),
+      color-mix(in srgb, #374151 6%, transparent)
+    ),
     var(--surface-1);
 }
 

@@ -151,5 +151,5 @@
 }
 
 html[data-theme='dark'] .reception-shift-clearance__panel {
-  background: #0f172a;
+  background: var(--app-panel-bg, #1e293b);
 }

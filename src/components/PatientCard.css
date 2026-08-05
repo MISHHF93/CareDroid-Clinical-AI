@@ -58,11 +58,21 @@
     box-shadow var(--cdl-duration-fast, 120ms) var(--cdl-ease-standard, ease);
 }
 
-.patient-card--priority-P1 { --patient-priority-color: var(--cdl-acuity-p1, #dc2626); }
-.patient-card--priority-P2 { --patient-priority-color: var(--cdl-acuity-p2, #ea580c); }
-.patient-card--priority-P3 { --patient-priority-color: var(--cdl-acuity-p3, #d97706); }
-.patient-card--priority-P4 { --patient-priority-color: var(--cdl-acuity-p4, #0284c7); }
-.patient-card--priority-P5 { --patient-priority-color: var(--cdl-acuity-p5, #64748b); }
+.patient-card--priority-P1 {
+  --patient-priority-color: var(--cdl-acuity-p1, #dc2626);
+}
+.patient-card--priority-P2 {
+  --patient-priority-color: var(--cdl-acuity-p2, #ea580c);
+}
+.patient-card--priority-P3 {
+  --patient-priority-color: var(--cdl-acuity-p3, #d97706);
+}
+.patient-card--priority-P4 {
+  --patient-priority-color: var(--cdl-acuity-p4, #0284c7);
+}
+.patient-card--priority-P5 {
+  --patient-priority-color: var(--cdl-acuity-p5, #64748b);
+}
 
 .patient-card[data-severity='critical'],
 .patient-card--deterioration-risk,
@@ -417,13 +427,13 @@
 }
 
 .patient-card__demographics span:first-child::before {
-  content: "Age ";
+  content: 'Age ';
   font-family: inherit;
 }
 
 .patient-card__demographics span + span::before {
   color: var(--color-text-muted);
-  content: "/";
+  content: '/';
   margin-right: 5px;
 }
 
@@ -442,7 +452,7 @@
 }
 
 .patient-card__complaint--redacted {
-  color: var(--color-text-muted, #6B7280);
+  color: var(--color-text-muted, #6b7280);
   font-style: italic;
 }
 

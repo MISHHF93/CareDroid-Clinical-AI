@@ -50,11 +50,20 @@
 
 /* Tone-specific emphasized state overrides (extends base warning emphasis from part-03) */
 .emergency-whiteboard-page__stat--emphasized.emergency-whiteboard-page__stat--tone-critical {
-  background: color-mix(in srgb, var(--status-critical, #ef4444) 10%, var(--color-surface, var(--app-surface-1, #ffffff)));
+  background: color-mix(
+    in srgb,
+    var(--status-critical, #ef4444) 10%,
+    var(--color-surface, var(--app-surface-1, #ffffff))
+  );
   box-shadow: inset 0 3px 0 color-mix(in srgb, var(--status-critical, #ef4444) 72%, transparent);
 }
 .emergency-whiteboard-page__stat--emphasized.emergency-whiteboard-page__stat--tone-critical.emergency-whiteboard-page__stat--interactive {
-  border: 1px solid color-mix(in srgb, var(--status-critical, #ef4444) 34%, var(--color-border-subtle, var(--medical-border, #e0f2fe)));
+  border: 1px solid
+    color-mix(
+      in srgb,
+      var(--status-critical, #ef4444) 34%,
+      var(--color-border-subtle, var(--medical-border, #e0f2fe))
+    );
 }
 
 /* Interactive stat hover and keyboard focus ring */
@@ -106,7 +115,8 @@
 .emergency-whiteboard-page__command-metric,
 .emergency-whiteboard-page__command-metric-btn {
   background: var(--color-card, var(--app-surface-2, #ffffff));
-  border: 1px solid var(--cdl-clinical-border, var(--color-border-subtle, var(--medical-border, #e0f2fe)));
+  border: 1px solid
+    var(--cdl-clinical-border, var(--color-border-subtle, var(--medical-border, #e0f2fe)));
   border-radius: var(--cdl-clinical-radius, 12px);
   box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
   color: var(--color-text-primary, var(--medical-ink, #111827));
@@ -164,7 +174,8 @@
 }
 
 .emergency-whiteboard-page__mission-card {
-  border: 1px solid var(--cdl-clinical-border, var(--color-border-subtle, var(--medical-border, #e0f2fe)));
+  border: 1px solid
+    var(--cdl-clinical-border, var(--color-border-subtle, var(--medical-border, #e0f2fe)));
   border-radius: var(--cdl-clinical-radius, 14px);
   background: var(--color-card, var(--app-surface-2, #ffffff));
   box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
@@ -244,7 +255,11 @@
 }
 
 .emergency-whiteboard-page__mission-btn--warning {
-  background: color-mix(in srgb, var(--status-warning, #f59e0b) 14%, var(--color-card, var(--app-surface-2, #ffffff)));
+  background: color-mix(
+    in srgb,
+    var(--status-warning, #f59e0b) 14%,
+    var(--color-card, var(--app-surface-2, #ffffff))
+  );
 }
 
 .emergency-whiteboard-page__mission-btn--default {
@@ -260,8 +275,14 @@
 /* EMS arrival cards */
 .emergency-whiteboard-page__arrival-card {
   background: var(--color-surface, var(--app-surface-1, #ffffff));
-  border: 1px solid color-mix(in srgb, var(--status-info, var(--cdl-ink-subtle, #475569)) 22%, var(--cdl-clinical-border, var(--color-border-default, var(--medical-border, #e0f2fe))));
-  border-left: 2px solid color-mix(in srgb, var(--status-info, var(--cdl-ink-subtle, #475569)) 45%, transparent);
+  border: 1px solid
+    color-mix(
+      in srgb,
+      var(--status-info, var(--cdl-ink-subtle, #475569)) 22%,
+      var(--cdl-clinical-border, var(--color-border-default, var(--medical-border, #e0f2fe)))
+    );
+  border-left: 2px solid
+    color-mix(in srgb, var(--status-info, var(--cdl-ink-subtle, #475569)) 45%, transparent);
   border-radius: var(--cdl-clinical-radius, 12px);
   box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
   display: grid;
@@ -288,7 +309,12 @@
 
 .emergency-whiteboard-page__arrival-btn--prepare {
   background: var(--color-floating-surface, var(--app-surface-elevated, #ffffff));
-  border: 1px solid color-mix(in srgb, var(--status-info, var(--cdl-ink-subtle, #475569)) 40%, var(--color-border-default, var(--medical-border, #e0f2fe)));
+  border: 1px solid
+    color-mix(
+      in srgb,
+      var(--status-info, var(--cdl-ink-subtle, #475569)) 40%,
+      var(--color-border-default, var(--medical-border, #e0f2fe))
+    );
   border-radius: 8px;
   color: var(--medical-status-info-text, #475569);
   cursor: pointer;
@@ -302,8 +328,17 @@
 }
 
 .emergency-whiteboard-page__arrival-btn--convert {
-  background: color-mix(in srgb, var(--status-stable, #10b981) 12%, var(--color-card, var(--app-surface-2, #ffffff)));
-  border: 1px solid color-mix(in srgb, var(--status-stable, #10b981) 40%, var(--color-border-default, var(--medical-border, #e0f2fe)));
+  background: color-mix(
+    in srgb,
+    var(--status-stable, #10b981) 12%,
+    var(--color-card, var(--app-surface-2, #ffffff))
+  );
+  border: 1px solid
+    color-mix(
+      in srgb,
+      var(--status-stable, #10b981) 40%,
+      var(--color-border-default, var(--medical-border, #e0f2fe))
+    );
   border-radius: 8px;
   color: var(--medical-status-success-text, #15803d);
   cursor: pointer;
@@ -363,8 +398,17 @@
 }
 
 .emergency-whiteboard-page__referral-task-btn {
-  background: color-mix(in srgb, var(--color-accent, #a78bfa) 8%, var(--color-card, var(--app-surface-2, #ffffff)));
-  border: 1px solid color-mix(in srgb, var(--color-accent, #a78bfa) 22%, var(--cdl-clinical-border, var(--color-border-default, var(--medical-border, #e0f2fe))));
+  background: color-mix(
+    in srgb,
+    var(--color-accent, #a78bfa) 8%,
+    var(--color-card, var(--app-surface-2, #ffffff))
+  );
+  border: 1px solid
+    color-mix(
+      in srgb,
+      var(--color-accent, #a78bfa) 22%,
+      var(--cdl-clinical-border, var(--color-border-default, var(--medical-border, #e0f2fe)))
+    );
   border-left: 2px solid color-mix(in srgb, var(--color-accent, #a78bfa) 42%, transparent);
   border-radius: var(--cdl-clinical-radius, 12px);
   box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
@@ -383,8 +427,17 @@
 }
 
 .emergency-whiteboard-page__reassess-task-btn {
-  background: color-mix(in srgb, var(--status-warning, #f59e0b) 8%, var(--color-card, var(--app-surface-2, #ffffff)));
-  border: 1px solid color-mix(in srgb, var(--status-warning, #f59e0b) 22%, var(--cdl-clinical-border, var(--color-border-default, var(--medical-border, #e0f2fe))));
+  background: color-mix(
+    in srgb,
+    var(--status-warning, #f59e0b) 8%,
+    var(--color-card, var(--app-surface-2, #ffffff))
+  );
+  border: 1px solid
+    color-mix(
+      in srgb,
+      var(--status-warning, #f59e0b) 22%,
+      var(--cdl-clinical-border, var(--color-border-default, var(--medical-border, #e0f2fe)))
+    );
   border-left: 2px solid color-mix(in srgb, var(--status-warning, #f59e0b) 42%, transparent);
   border-radius: var(--cdl-clinical-radius, 12px);
   box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
@@ -399,7 +452,11 @@
 /* Awareness banner & chips */
 .emergency-whiteboard-page__awareness-banner {
   align-items: center;
-  background: color-mix(in srgb, var(--status-warning, #f59e0b) 10%, var(--color-surface, var(--app-surface-1, #ffffff)));
+  background: color-mix(
+    in srgb,
+    var(--status-warning, #f59e0b) 10%,
+    var(--color-surface, var(--app-surface-1, #ffffff))
+  );
   border-bottom: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   display: flex;
   flex-wrap: wrap;
@@ -431,7 +488,12 @@
 
 .emergency-whiteboard-page__awareness-chip {
   background: var(--color-floating-surface, var(--app-surface-elevated, #ffffff));
-  border: 1px solid color-mix(in srgb, var(--status-warning, #f59e0b) 40%, var(--color-border-subtle, var(--medical-border, #e0f2fe)));
+  border: 1px solid
+    color-mix(
+      in srgb,
+      var(--status-warning, #f59e0b) 40%,
+      var(--color-border-subtle, var(--medical-border, #e0f2fe))
+    );
   border-radius: 999px;
   color: var(--medical-status-warning-text, #b45309);
   cursor: pointer;
@@ -493,7 +555,11 @@
 
 /* Inbound EMS banner */
 .emergency-whiteboard-page__inbound-banner {
-  background: color-mix(in srgb, var(--color-secondary, var(--cdl-ink-subtle, #475569)) 8%, var(--color-surface, var(--app-surface-1, #ffffff)));
+  background: color-mix(
+    in srgb,
+    var(--color-secondary, var(--cdl-ink-subtle, #475569)) 8%,
+    var(--color-surface, var(--app-surface-1, #ffffff))
+  );
   border-bottom: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   display: grid;
   gap: 8px;
@@ -516,8 +582,14 @@
 
 .emergency-whiteboard-page__inbound-banner-card {
   background: var(--color-card, var(--app-surface-2, #ffffff));
-  border: 1px solid color-mix(in srgb, var(--color-secondary, var(--cdl-ink-subtle, #475569)) 22%, var(--cdl-clinical-border, var(--color-border-default, var(--medical-border, #e0f2fe))));
-  border-left: 2px solid color-mix(in srgb, var(--color-secondary, var(--cdl-ink-subtle, #475569)) 45%, transparent);
+  border: 1px solid
+    color-mix(
+      in srgb,
+      var(--color-secondary, var(--cdl-ink-subtle, #475569)) 22%,
+      var(--cdl-clinical-border, var(--color-border-default, var(--medical-border, #e0f2fe)))
+    );
+  border-left: 2px solid
+    color-mix(in srgb, var(--color-secondary, var(--cdl-ink-subtle, #475569)) 45%, transparent);
   border-radius: var(--cdl-clinical-radius, 12px);
   box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
   color: var(--color-text-primary, #111827);
@@ -602,11 +674,17 @@
 }
 
 .emergency-whiteboard-page__filter-chip--reassess {
-  border-color: color-mix(in srgb, var(--status-warning, #f59e0b) 52%, var(--color-border-subtle, var(--medical-border, #e0f2fe)));
+  border-color: color-mix(
+    in srgb,
+    var(--status-warning, #f59e0b) 52%,
+    var(--color-border-subtle, var(--medical-border, #e0f2fe))
+  );
   font-weight: 800;
 }
 
-.emergency-whiteboard-page__filter-chip--reassess:not(.emergency-whiteboard-page__filter-chip--active) {
+.emergency-whiteboard-page__filter-chip--reassess:not(
+  .emergency-whiteboard-page__filter-chip--active
+) {
   background: color-mix(in srgb, var(--status-warning, #f59e0b) 14%, transparent);
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--status-warning, #f59e0b) 24%, transparent);
   color: var(--medical-status-warning-text, #b45309);
@@ -703,7 +781,11 @@
 /* Board limit banner */
 .emergency-whiteboard-page__board-limit {
   align-items: center;
-  background: color-mix(in srgb, var(--status-warning, #f59e0b) 8%, var(--color-surface, var(--app-surface-1, #ffffff)));
+  background: color-mix(
+    in srgb,
+    var(--status-warning, #f59e0b) 8%,
+    var(--color-surface, var(--app-surface-1, #ffffff))
+  );
   border-bottom: 1px solid var(--color-border-subtle, var(--medical-border, #e0f2fe));
   color: var(--medical-status-warning-text, #b45309);
   display: flex;

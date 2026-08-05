@@ -8,7 +8,6 @@
  * User-facing documentation: `docs/USER-MANUAL.md` §4.5 and §10.
  */
 import { PILOT_CUSTOMER_MODE, PILOT_EXTENSION_NAV_ITEM_IDS } from './unified-navigation.config';
-import { mergeRoleAwarePractitionerDensityProfile } from './practitionerRoleSurfacePolicy';
 import {
   PRACTITIONER_COPILOT_NOTES_LIMIT,
   PRACTITIONER_COPILOT_ORCHESTRATION_LIMIT,
@@ -526,23 +525,4 @@ export function getMaxPrimaryWhiteboardStats() {
   return isPractitionerCleanupEnabled()
     ? PRACTITIONER_CLEANUP.maxPrimaryWhiteboardStats
     : null;
-}
-
-/**
- * @param {import('./screenDensityModeModel').ScreenDensityProfile | null | undefined} profile
- * @param {{ role?: string | null, screenMode?: string | null }} [context]
- */
-export function mergePractitionerDensityProfile(profile, context: any = {}) {
-  if (!isPractitionerCleanupEnabled() || !profile) {
-    return profile ?? null;
-  }
-
-  if (!context?.role && !context?.screenMode) {
-    return mergeRoleAwarePractitionerDensityProfile(profile, {
-      role: 'registration_clerk',
-      screenMode: 'RECEPTION_SCREEN',
-    });
-  }
-
-  return mergeRoleAwarePractitionerDensityProfile(profile, context);
 }

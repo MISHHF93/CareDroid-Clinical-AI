@@ -56,12 +56,3 @@ export async function transportCareDroidAINode(
     };
   }
 }
-
-/** @deprecated Use `requestAiChiefStructured` from `aiChiefOrchestrator` for canonical routing. */
-export async function requestCareDroidAI(
-  request: CareDroidAIRequest,
-  options: CareDroidAIRequestOptions = {},
-): Promise<CareDroidAIResponse> {
-  const { requestAiChiefStructured } = await import('./aiChiefOrchestrator');
-  return requestAiChiefStructured({ ...request, skipEnrichment: true }, options);
-}

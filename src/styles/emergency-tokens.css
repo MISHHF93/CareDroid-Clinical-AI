@@ -16,11 +16,17 @@
   --ed-radius-lg: var(--radius-lg, 14px);
 
   --ed-surface-base: var(--color-background, var(--app-bg, var(--medical-white, #ffffff)));
-  --ed-surface-raised: var(--color-surface, var(--app-surface-1, var(--medical-surface-card, #ffffff)));
+  --ed-surface-raised: var(
+    --color-surface,
+    var(--app-surface-1, var(--medical-surface-card, #ffffff))
+  );
   --ed-surface-overlay: var(--color-floating-surface, var(--app-surface-elevated, #ffffff));
 
   --ed-text-primary: var(--color-text-primary, var(--app-fg, var(--medical-ink, #111827)));
-  --ed-text-secondary: var(--color-text-secondary, var(--app-fg-muted, var(--medical-ink-muted, #6b7280)));
+  --ed-text-secondary: var(
+    --color-text-secondary,
+    var(--app-fg-muted, var(--medical-ink-muted, #6b7280))
+  );
   --ed-text-meta: var(--color-text-muted, var(--medical-ink-subtle, #9ca3af));
 
   --ed-border-subtle: var(--app-border-subtle, var(--medical-border, #e2e8f0));

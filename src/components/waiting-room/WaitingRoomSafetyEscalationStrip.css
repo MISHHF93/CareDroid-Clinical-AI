@@ -5,7 +5,11 @@
   padding: 12px 14px;
   border: 1px solid #7f1d1d;
   border-radius: 14px;
-  background: linear-gradient(180deg, rgba(254, 242, 242, 0.9), var(--medical-surface-card, #ffffff));
+  background: linear-gradient(
+    180deg,
+    rgba(254, 242, 242, 0.9),
+    var(--medical-surface-card, #ffffff)
+  );
 }
 
 .waiting-room-safety-escalation-strip__header h3 {

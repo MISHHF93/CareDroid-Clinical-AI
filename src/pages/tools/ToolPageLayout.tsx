@@ -14,6 +14,7 @@ import analyticsService from '../../services/analyticsService';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS, getToolIcon } from '../../navigation/iconRegistry';
 import ClinicalDecisionSupportDisclaimer from '../../components/clinical/ClinicalDecisionSupportDisclaimer';
+import { AiTruthLabel } from '../../components/ai/AiTruthLabel';
 import { useNotificationActions } from '../../hooks/useNotificationActions';
 import {
   ActionRow,
@@ -54,6 +55,32 @@ function disclaimerVariantForTool(toolId) {
   if (FLEET_TOOL_IDS.has(toolId)) return 'fleet';
   if (AI_DOCUMENTATION_TOOL_IDS.has(toolId)) return 'ai-documentation';
   return 'clinical';
+}
+
+/**
+ * P0.4 gate: this layout is shared by every calculator/tool page (~40+),
+ * so it is the single place to correctly separate two groups this app has
+ * historically blurred under one "AI Chief"/tool-orchestrator UX (see
+ * AI_CONFIGURATION_MAP.md §6) — most tools here are deterministic formulas
+ * or rule engines (never AI, regardless of surrounding AI-branded chrome),
+ * a minority are genuinely AI-assisted. Per AI_CONFIGURATION_MAP.md's own
+ * audit, 0 of 17 declared AI services in this codebase are currently
+ * producing a live foundation-model response in this environment (no LLM
+ * provider configured) — so AI-documentation tools are labeled Demo, not
+ * Live, until that changes; deterministic calculators are always Manual.
+ */
+export function truthLabelForTool(toolId) {
+  if (AI_DOCUMENTATION_TOOL_IDS.has(toolId)) {
+    return {
+      state: 'Demo' as const,
+      sourceContext:
+        'AI-assisted tool — no LLM provider is configured in this environment (see AI_CONFIGURATION_MAP.md)',
+    };
+  }
+  return {
+    state: 'Manual' as const,
+    sourceContext: 'Deterministic calculator or rule engine — not a trained model',
+  };
 }
 
 const ToolPageLayout = ({
@@ -221,6 +248,7 @@ const ToolPageLayout = ({
       {/* Tool Content */}
       <Surface className="tool-content">
         <ClinicalDecisionSupportDisclaimer variant={disclaimerVariantForTool(tool.id)} />
+        <AiTruthLabel {...truthLabelForTool(tool.id)} reviewRequired compact />
         {children}
       </Surface>
 

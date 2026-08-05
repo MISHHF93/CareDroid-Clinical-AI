@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events';
-import { Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import {
   UnifiedPatient as Patient,
   type IUnifiedPatient as IPatient,
@@ -30,6 +30,7 @@ export interface BoardingDecisionResult {
   clinicianId: string;
 }
 
+@Injectable()
 export class BoardingService extends EventEmitter {
   private readonly BENCHMARK_MINUTES = 158;
   private readonly WARNING_THRESHOLD = 240;

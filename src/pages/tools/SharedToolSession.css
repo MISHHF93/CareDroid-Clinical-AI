@@ -4,7 +4,13 @@
   align-items: center;
   justify-content: center;
   padding: 24px;
-  background: radial-gradient(circle at top, color-mix(in srgb, var(--semantic-ai-assistance) 15%, transparent), transparent 60%), var(--navy-bg, var(--medical-surface-page, #f1f5f9));
+  background:
+    radial-gradient(
+      circle at top,
+      color-mix(in srgb, var(--semantic-ai-assistance) 15%, transparent),
+      transparent 60%
+    ),
+    var(--navy-bg, var(--medical-surface-page, #f1f5f9));
 }
 
 .shared-session-card {

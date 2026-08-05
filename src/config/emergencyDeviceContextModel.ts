@@ -5,10 +5,11 @@
  */
 import {
   CARE_DROID_SCREEN_MODES,
+  coerceEnabledScreenMode,
   getScreenModeDefaultLandingRoute,
   type CareDroidScreenMode,
 } from './careDroidScreenModes';
-import { coerceEnabledScreenMode, type EmergencyScreenSettings } from './emergencyRoleScreenMatrix';
+import type { EmergencyScreenSettings } from './emergencyRoleScreenMatrix';
 
 export const EMERGENCY_DEVICE_CONTEXT_STORAGE_KEY = 'caredroid.emergency.deviceContext.v1';
 

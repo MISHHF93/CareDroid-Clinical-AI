@@ -1,3 +1,5 @@
+import { Injectable } from '@nestjs/common';
+
 export interface DeteriorationPredictionInput {
   age?: number;
   triageCode?: string;
@@ -29,6 +31,7 @@ function round(value: number): number {
   return Math.round(value * 1000) / 1000;
 }
 
+@Injectable()
 export class DeteriorationPredictionV3Service {
   predict(input: DeteriorationPredictionInput): DeteriorationPrediction {
     const vitals = input.vitals || {};

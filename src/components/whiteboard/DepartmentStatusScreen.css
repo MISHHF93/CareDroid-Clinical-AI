@@ -3,7 +3,11 @@
   gap: 16px;
   padding: 20px 24px 28px;
   border-bottom: 1px solid var(--medical-border, #e0f2fe);
-  background: linear-gradient(135deg, var(--medical-surface-page, #f1f5f9), var(--medical-card-bg, #ffffff)) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--medical-surface-page, #f1f5f9),
+    var(--medical-card-bg, #ffffff)
+  );
 }
 
 .department-status-screen__header {

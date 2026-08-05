@@ -3,7 +3,7 @@
 > Auto-generated from implementation. Do not edit manually.
 > Regenerate: `npm run docs:generate`
 
-**Entries:** 11
+**Entries:** 12
 
 ### Admin
 
@@ -11,6 +11,13 @@ Emergency role: admin
 
 - **Source:** `emergencyRolePermissions.ts`
 - **Permissions:** `patient.create`, `patient.demographics.edit`, `encounter.create`, `intake.verify`, `triage.assign_acuity`, `queue.move`, `reassessment.complete`, `vitals.write`, `notes.write`, `flags.manage`, `ems.handoff.complete`, `ems.prepareBay`, `ems.convertArrival`, `referral.create`, `transfers.manage`, `capacity.manage`, `boarding.manage`, `workload.reassign`, `patient.escalate`, `reception.escalate`, `patient.discharge`, `patient.assignStaff`, `patient.assignRoom`, `copilot.use`, `analytics.view`, `simulation.run`, `settings.manage`, `display.public.waitboard`, `display.public.publish`, `display.whiteboard.readonly`, `screen.admin`, `screen.command_center`, `screen.charge_nurse`, `screen.triage`, `screen.registration`, `screen.physician`, `screen.ems`
+
+### IT Admin
+
+Emergency role: it_admin
+
+- **Source:** `emergencyRolePermissions.ts`
+- **Permissions:** `settings.manage`, `screen.admin`, `analytics.view`
 
 ### ED Manager
 

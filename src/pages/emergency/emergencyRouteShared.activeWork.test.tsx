@@ -49,7 +49,7 @@ describe('EmergencyRoutePage — activeWork prop', () => {
       />,
     );
 
-    expect(container.querySelector('[data-cdl-zone="activeWork"]')).toBeTruthy();
+    expect(container.querySelector('[data-cdl-zone="active-work"]')).toBeTruthy();
     expect(container.querySelector('.alerts-summary-strip')).toBeTruthy();
     expect(getByText('Real alert list content')).toBeInTheDocument();
   });
@@ -61,7 +61,7 @@ describe('EmergencyRoutePage — activeWork prop', () => {
       </EmergencyRoutePage>,
     );
 
-    expect(container.querySelector('[data-cdl-zone="activeWork"]')).toBeTruthy();
+    expect(container.querySelector('[data-cdl-zone="active-work"]')).toBeTruthy();
     expect(getByText('Real dispatch content')).toBeInTheDocument();
   });
 
@@ -70,6 +70,6 @@ describe('EmergencyRoutePage — activeWork prop', () => {
       <EmergencyRoutePage title="Empty Page" situationBrief={{ status: 'nothing' }} />,
     );
 
-    expect(container.querySelector('[data-cdl-zone="activeWork"]')).toBeFalsy();
+    expect(container.querySelector('[data-cdl-zone="active-work"]')).toBeFalsy();
   });
 });

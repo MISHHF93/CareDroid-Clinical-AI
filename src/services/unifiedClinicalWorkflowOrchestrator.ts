@@ -21,7 +21,7 @@ import { buildContinuousPatientFlowSnapshot } from '../engine/continuousPatientF
 import { resolveWhatHappensNext } from './whatHappensNextGuidance';
 import { recommendRouting, routingForPriority } from './staffRoutingService';
 import { deriveTriagePending } from './arrivalControlLayer';
-import { deriveProviderWaitingStatus } from '../components/whiteboard/waitingRoomSafetyBoardModel';
+import { deriveProviderWaitingStatus } from './providerWaitingStatus';
 import { logAutomationAuditEvent, AUTOMATION_AUDIT_STATUSES } from '../data/automationAuditTrail';
 import {
   ADMINISTRATIVE_AUTOMATION_SAFETY_STATEMENT,

@@ -488,6 +488,29 @@ export function isValidCareDroidScreenMode(mode: unknown): mode is CareDroidScre
   return Boolean(canonical && REGISTRY_BY_ID.has(canonical));
 }
 
+/**
+ * Coerces a screen mode to one of a tenant's enabled modes, falling back to
+ * the first enabled mode if the requested one isn't allowed.
+ * Lives here (not emergencyRoleScreenMatrix.ts, its original home) because
+ * moving it broke a real circular dependency: it only ever depended on
+ * normalizeCareDroidScreenMode, already canonical to this file, and
+ * emergencyDeviceContextModel.ts needed only this one function from
+ * emergencyRoleScreenMatrix.ts — a clean split with no functional change.
+ */
+export function coerceEnabledScreenMode(
+  mode: CareDroidScreenMode | string,
+  enabledScreenModes: string[] | undefined,
+): CareDroidScreenMode {
+  const canonical = normalizeCareDroidScreenMode(mode) || (mode as CareDroidScreenMode);
+  if (!enabledScreenModes?.length) return canonical;
+  const enabled = enabledScreenModes
+    .map((entry) => normalizeCareDroidScreenMode(entry))
+    .filter((entry): entry is CareDroidScreenMode => Boolean(entry));
+  if (!enabled.length) return canonical;
+  if (enabled.includes(canonical)) return canonical;
+  return enabled[0];
+}
+
 export function getScreenModeDefinition(
   mode: string | CareDroidScreenMode,
 ): CareDroidScreenModeDefinition | undefined {

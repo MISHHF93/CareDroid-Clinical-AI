@@ -5,6 +5,7 @@ import {
   type PatientJourneyPrediction,
 } from '../../engine/patientJourneyPrediction';
 import type { Patient } from '../../types/emergency';
+import { AiTruthLabel, fromEnhancementMaturity } from '../ai/AiTruthLabel';
 import './JourneyPredictionBadge.css';
 
 type JourneyPredictionBadgeProps = {
@@ -37,6 +38,11 @@ export default function JourneyPredictionBadge({
     return null;
   }
 
+  const truthLabel = fromEnhancementMaturity(prediction.envelope.maturity, {
+    sourceContext: 'Boarding-signal-driven journey/LOS heuristic',
+    reviewRequired: prediction.envelope.humanReviewRequired,
+  });
+
   return (
     <span
       className={[
@@ -61,6 +67,7 @@ export default function JourneyPredictionBadge({
           CXR {prediction.chestXrayUtilizationProbability}%
         </span>
       ) : null}
+      <AiTruthLabel {...truthLabel} compact />
     </span>
   );
 }

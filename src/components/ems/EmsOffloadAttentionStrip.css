@@ -50,7 +50,11 @@
   padding: 6px 10px;
   border: 1px solid var(--cdl-clinical-border, #e0f2fe);
   border-radius: var(--cdl-clinical-radius-sm, 10px);
-  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 40%, var(--app-surface-1, #ffffff));
+  background: color-mix(
+    in srgb,
+    var(--app-surface-muted, #f1f5f9) 40%,
+    var(--app-surface-1, #ffffff)
+  );
 }
 
 .ems-offload-attention-strip__counts strong {
@@ -64,12 +68,20 @@
 }
 
 .ems-offload-attention-strip__counts span[data-tone='critical'] {
-  border-color: color-mix(in srgb, var(--status-critical, #ef4444) 32%, var(--cdl-clinical-border, #e0f2fe));
+  border-color: color-mix(
+    in srgb,
+    var(--status-critical, #ef4444) 32%,
+    var(--cdl-clinical-border, #e0f2fe)
+  );
   background: color-mix(in srgb, var(--status-critical, #ef4444) 6%, var(--app-surface-1, #ffffff));
 }
 
 .ems-offload-attention-strip__counts span[data-tone='watch'] {
-  border-color: color-mix(in srgb, var(--status-warning, #f59e0b) 32%, var(--cdl-clinical-border, #e0f2fe));
+  border-color: color-mix(
+    in srgb,
+    var(--status-warning, #f59e0b) 32%,
+    var(--cdl-clinical-border, #e0f2fe)
+  );
   background: color-mix(in srgb, var(--status-warning, #f59e0b) 6%, var(--app-surface-1, #ffffff));
 }
 
@@ -100,19 +112,31 @@
   padding: 10px 12px;
   border: 1px solid var(--cdl-clinical-border, #e0f2fe);
   border-radius: var(--cdl-clinical-radius-sm, 10px);
-  background: color-mix(in srgb, var(--app-surface-muted, #f1f5f9) 35%, var(--app-surface-1, #ffffff));
+  background: color-mix(
+    in srgb,
+    var(--app-surface-muted, #f1f5f9) 35%,
+    var(--app-surface-1, #ffffff)
+  );
   color: var(--medical-ink, #111827);
   cursor: pointer;
   text-align: left;
 }
 
 .ems-offload-attention-strip__item[data-tone='critical'] {
-  border-color: color-mix(in srgb, var(--status-critical, #ef4444) 32%, var(--cdl-clinical-border, #e0f2fe));
+  border-color: color-mix(
+    in srgb,
+    var(--status-critical, #ef4444) 32%,
+    var(--cdl-clinical-border, #e0f2fe)
+  );
   background: color-mix(in srgb, var(--status-critical, #ef4444) 5%, var(--app-surface-1, #ffffff));
 }
 
 .ems-offload-attention-strip__item[data-tone='watch'] {
-  border-color: color-mix(in srgb, var(--status-warning, #f59e0b) 32%, var(--cdl-clinical-border, #e0f2fe));
+  border-color: color-mix(
+    in srgb,
+    var(--status-warning, #f59e0b) 32%,
+    var(--cdl-clinical-border, #e0f2fe)
+  );
   background: color-mix(in srgb, var(--status-warning, #f59e0b) 5%, var(--app-surface-1, #ffffff));
 }
 

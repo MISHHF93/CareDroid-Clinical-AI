@@ -87,6 +87,12 @@ import { NativeAiModule } from './modules/native-ai/native-ai.module';
 import { UnifiedAiNodeModule } from '../ml-services/unified-ai-node/unified-ai-node.module';
 import { SentinelModule } from './modules/sentinel/sentinel.module';
 import { SurgeModule } from './modules/surge/surge.module';
+import { CapacityModule } from './modules/capacity/capacity.module';
+import { DeteriorationModule } from './modules/deterioration/deterioration.module';
+import { ProtocolModule } from './modules/protocol/protocol.module';
+import { ReassessmentModule } from './modules/reassessment/reassessment.module';
+import { EmsModule } from './modules/ems/ems.module';
+import { BoardingModule } from './modules/boarding/boarding.module';
 
 // Monitoring & Observability
 import { LoggerModule } from './modules/common/logger.module';
@@ -238,6 +244,12 @@ function resolveDatabaseClient() {
     CigModule,
     SentinelModule,
     SurgeModule,
+    CapacityModule,
+    DeteriorationModule,
+    ProtocolModule,
+    ReassessmentModule,
+    EmsModule,
+    BoardingModule,
     CollaborationHubModule,
     NativeAiModule,
     // CareDroid 1-node local ML backbone (ADR-0003): NLU + artifact-router + /api/ai/node/*

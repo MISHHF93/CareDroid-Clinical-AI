@@ -235,14 +235,19 @@ function findUnvalidatedBodyParams(backendRoot: string): string[] {
   return results.sort();
 }
 
-// Generated 2026-08-03 (Cycle 255) via the exact walk above. 135 originally
-// found Cycle 241; worked down across Cycles 242/244/247/248/249/250/251/
-// 252/253/254/255 (5 + 6 + 39 + 13 + 23 + 8 + 6 + 5 + 5 + 3 + 5 fixed) to
-// this 10-entry baseline. Cycle 255 closed the 5 remaining non-deferred
-// single-route files -- see SCORECARD.md and the DTO header comments for
-// the full writeup. All 10 remaining entries are deliberately deferred
-// (patient-creation shape-divergence risk or large nested settings blobs),
-// not newly discovered gaps.
+// Generated 2026-08-03 (Cycle 255), re-generated 2026-08-04 (Cycle 270) via
+// the exact walk above. 135 originally found Cycle 241; worked down across
+// Cycles 242/244/247/248/249/250/251/252/253/254/255 (5 + 6 + 39 + 13 + 23 +
+// 8 + 6 + 5 + 5 + 3 + 5 fixed) to a 10-entry baseline. Cycle 270 closed
+// PlatformSystemsController's 3 routes (createEmergencyPatient/
+// updateEmergencyPatient/createEmergencyReferral) -- confirmed zero live
+// callers (a second, unwired front door onto the same EmergencyPatientService/
+// ReferralService the deferred EmergencyOsController routes below also use),
+// so the "shape-divergence" risk that blocks those doesn't apply here; see
+// backend/src/modules/platform-systems/dto/emergency-patient-actions.dto.ts's
+// header for the full writeup. The remaining 7 entries are deliberately
+// deferred (real, live divergent-shape patient-creation callers, or large
+// nested settings blobs), not newly discovered gaps.
 const BASELINE: string[] = [
   'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.createIntakePatient',
   'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.createPatient',
@@ -251,9 +256,6 @@ const BASELINE: string[] = [
   'src/modules/organizations/organizations.controller.ts :: OrganizationsController.updateFeatureFlags',
   'src/modules/organizations/organizations.controller.ts :: OrganizationsController.updateSettings',
   'src/modules/organizations/organizations.controller.ts :: OrganizationsController.updateTenantAdministration',
-  'src/modules/platform-systems/platform-systems.controller.ts :: PlatformSystemsController.createEmergencyPatient',
-  'src/modules/platform-systems/platform-systems.controller.ts :: PlatformSystemsController.createEmergencyReferral',
-  'src/modules/platform-systems/platform-systems.controller.ts :: PlatformSystemsController.updateEmergencyPatient',
 ].sort();
 
 describe('body validation coverage (Cycle 241)', () => {

@@ -60,7 +60,11 @@
 }
 
 .card-hover:hover {
-  border-color: color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 34%, var(--app-border));
+  border-color: color-mix(
+    in srgb,
+    var(--app-accent-action, var(--app-accent-interactive)) 34%,
+    var(--app-border)
+  );
   box-shadow: var(--compact-shadow, var(--app-elevation-card, var(--app-shadow-1)));
   transform: translateY(-1px);
 }
@@ -98,12 +102,7 @@
   bottom: 0;
   left: 0;
   transform: translateX(-100%);
-  background: linear-gradient(
-    90deg,
-    transparent,
-    var(--app-overlay-on-surface),
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, var(--app-overlay-on-surface), transparent);
   animation: shimmer 2s infinite;
 }
 

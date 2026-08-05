@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import type { Patient } from '../../types/emergency';
 import { DEFAULT_NATIVE_AI_THRESHOLDS } from '../../config/nativeAiThresholds.config';
 import { predictPostEdOrientation } from '../../services/nativeAiCore';
+import { AiTruthLabel, fromNativeAiSourceState } from '../ai/AiTruthLabel';
 import './PostEdOrientationBadge.css';
 
 const ORIENTATION_LABELS = {
@@ -26,6 +27,11 @@ export default function PostEdOrientationBadge({
 
   if (topProbability < DEFAULT_NATIVE_AI_THRESHOLDS.orientationDisplayPercent) return null;
 
+  const truthLabel = fromNativeAiSourceState(prediction.sourceState, {
+    sourceContext: `Post-ED orientation classifier ${prediction.modelId}@${prediction.modelVersion}`,
+    reviewRequired: prediction.requiresHumanReview,
+  });
+
   return (
     <span
       className={[
@@ -40,6 +46,7 @@ export default function PostEdOrientationBadge({
       aria-label={`Predicted post-ED orientation ${ORIENTATION_LABELS[prediction.orientation]} at ${topProbability} percent`}
     >
       Orient: {ORIENTATION_LABELS[prediction.orientation]} {topProbability}%
+      <AiTruthLabel {...truthLabel} compact />
     </span>
   );
 }

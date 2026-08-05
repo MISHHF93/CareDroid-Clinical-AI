@@ -37,8 +37,8 @@
     var(--color-surface, #111827) 90%
   );
   background-size: 220% 100%;
-  animation: caredroid-skeleton-shimmer var(--motion-skeleton-duration, 1.15s) var(--motion-ease-standard, ease-in-out)
-    infinite;
+  animation: caredroid-skeleton-shimmer var(--motion-skeleton-duration, 1.15s)
+    var(--motion-ease-standard, ease-in-out) infinite;
 }
 
 .skeleton-line--title {

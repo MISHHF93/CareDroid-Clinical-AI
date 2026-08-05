@@ -8,6 +8,7 @@ import { PatientState, Priority, type Patient } from '../../types/emergency';
 
 vi.mock('../../services/careDroidUnifiedAiNode', () => ({
   invokeUnifiedAiConversational: vi.fn().mockResolvedValue({
+    ok: true,
     content: 'Reviewed the chart — vitals stable, no new red flags.',
   }),
 }));
@@ -102,5 +103,32 @@ describe('PatientCardCopilot', () => {
       expect.objectContaining({ patientId: patient.id, message: 'Any allergy concerns?' }),
     );
     expect(await screen.findByText(/Reviewed the chart/)).toBeInTheDocument();
+  });
+
+  it('P0.4: labels a successful AI reply Live, distinguishing it from the static welcome message', async () => {
+    const user = userEvent.setup();
+    seedPatient();
+    render(<PatientCardCopilot patient={patient} />, { wrapper: MemoryRouter });
+
+    await user.type(screen.getByLabelText('Patient Copilot message'), 'Any allergy concerns?');
+    await user.click(screen.getByRole('button', { name: 'Send' }));
+    await screen.findByText(/Reviewed the chart/);
+
+    const labels = screen.getAllByTestId('ai-truth-label-chip');
+    expect(labels).toHaveLength(1);
+    expect(labels[0]).toHaveTextContent('Live');
+  });
+
+  it('P0.4: labels a failed AI call Stale rather than claiming a live reply', async () => {
+    vi.mocked(invokeUnifiedAiConversational).mockRejectedValueOnce(new Error('network down'));
+    const user = userEvent.setup();
+    seedPatient();
+    render(<PatientCardCopilot patient={patient} />, { wrapper: MemoryRouter });
+
+    await user.type(screen.getByLabelText('Patient Copilot message'), 'Any allergy concerns?');
+    await user.click(screen.getByRole('button', { name: 'Send' }));
+    await screen.findByText(/Copilot is unavailable/);
+
+    expect(screen.queryByTestId('ai-truth-label-chip')).not.toBeInTheDocument();
   });
 });

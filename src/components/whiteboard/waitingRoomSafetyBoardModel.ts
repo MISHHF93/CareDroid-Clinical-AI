@@ -25,6 +25,7 @@ import {
 } from '../../services/patientExperienceStatus';
 import { resolveQueueReason, type QueueReasonId } from '../../services/queueReasonVisibility';
 import { resolveWhatHappensNext, type WhatHappensNextTone } from '../../services/whatHappensNextGuidance';
+import { deriveProviderWaitingStatus } from '../../services/providerWaitingStatus';
 import {
   resolveLwbsRisk,
   shouldSurfaceLwbsRisk,
@@ -225,38 +226,6 @@ export function deriveHighRiskComplaintFlags(patient: Patient): string[] {
   }
 
   return Array.from(labels);
-}
-
-export function deriveProviderWaitingStatus(
-  patient: Patient,
-  staff: Staff[] = [],
-): { label: string; tone: WaitingRoomStatusTone } {
-  if (patient.state === PatientState.Assessment) {
-    return { label: 'With provider', tone: 'info' };
-  }
-
-  if (patient.state !== PatientState.Waiting) {
-    return { label: 'Not in waiting room', tone: 'neutral' };
-  }
-
-  const assignee = staff.find((member) => member.id === patient.assignedStaffId);
-  const assigneeName = assignee?.displayName || assignee?.name || patient.assignedTo;
-
-  if (!patient.assignedStaffId) {
-    return { label: 'Awaiting provider', tone: 'warning' };
-  }
-
-  if (!patient.lastAssessedTime) {
-    return {
-      label: assigneeName ? `Assigned · ${assigneeName}` : 'Assigned · not seen',
-      tone: 'warning',
-    };
-  }
-
-  return {
-    label: assigneeName ? `Return · ${assigneeName}` : 'Return · awaiting provider',
-    tone: 'info',
-  };
 }
 
 export function deriveTestWaitingStatus(patient: Patient): {

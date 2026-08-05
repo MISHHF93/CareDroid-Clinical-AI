@@ -7,11 +7,19 @@
 }
 
 .workflow-automation-command-bar--critical {
-  background: color-mix(in srgb, var(--status-danger, #dc2626) 6%, var(--ed-surface-raised, #f8fafc));
+  background: color-mix(
+    in srgb,
+    var(--status-danger, #dc2626) 6%,
+    var(--ed-surface-raised, #f8fafc)
+  );
 }
 
 .workflow-automation-command-bar--active {
-  background: color-mix(in srgb, var(--status-warning, #d97706) 5%, var(--ed-surface-raised, #f8fafc));
+  background: color-mix(
+    in srgb,
+    var(--status-warning, #d97706) 5%,
+    var(--ed-surface-raised, #f8fafc)
+  );
 }
 
 .workflow-automation-command-bar__identity {

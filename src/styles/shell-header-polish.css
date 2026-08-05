@@ -55,7 +55,9 @@
 }
 
 .emergency-app-shell .app-shell-main-content {
-  scroll-padding-top: calc(var(--cdl-chrome-stack-height) + var(--app-layout-page-gutter-block, 16px));
+  scroll-padding-top: calc(
+    var(--cdl-chrome-stack-height) + var(--app-layout-page-gutter-block, 16px)
+  );
 }
 
 @media (max-width: 768px) {

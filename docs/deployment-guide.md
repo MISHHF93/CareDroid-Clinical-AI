@@ -61,9 +61,9 @@ There is currently no changelog artifact produced by `release.yml` that this res
 
 Defined under `config/` and wired into the full `docker-compose.yml`:
 
-- **Prometheus** (`config/prometheus.yml`, `config/prometheus/alert.rules.yml`) — scrapes `GET /api/metrics`.
-- **Alertmanager** (`config/alertmanager/config.yml`, notification templates).
-- **Grafana** (`config/grafana/provisioning/`) — 9 pre-built dashboards: alert-status, api-performance, audit-compliance, business-metrics, cache-health, database-performance, error-analysis, master-clinical-intelligence, nlu-intelligence, system-health, user-activity, plus a cost-intelligence dashboard.
+- **Prometheus** (`config/prometheus.yml`, `config/prometheus/alert.rules.yml`) — scrapes `GET /metrics` (excluded from the global `/api` prefix in `backend/src/main.ts`'s `setGlobalPrefix`, not `/api/metrics` as previously stated here). Also wired into the lighter `docker-compose.app.yml` as of Cycle 267 (Prometheus + Grafana only, no alertmanager/elasticsearch/sentry, matching that file's "lightweight app" scope).
+- **Alertmanager** (`config/alertmanager/config.yml`, notification templates) — full stack only (`docker-compose.yml`), not part of `docker-compose.app.yml`.
+- **Grafana** (`config/grafana/provisioning/`) — 11 pre-built CareDroid dashboards: alert-status, api-performance, audit-compliance, business-metrics, cache-health, database-performance, error-analysis, master-clinical-intelligence, nlu-intelligence, system-health, user-activity, plus a cost-intelligence dashboard (12 total; previously undercounted here as "9").
 - **Elasticsearch / Logstash / Kibana** — log aggregation (`config/logstash.conf`, `config/kibana/saved-searches.json`).
 - **Sentry** — error tracking (`SENTRY_DSN`), initialized first-line in `backend/src/main.ts`.
 - **Datadog** — optional APM/tracing (`dd-trace`, `DATADOG_*` env vars).

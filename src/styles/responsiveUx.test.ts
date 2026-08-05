@@ -177,7 +177,7 @@ describe('responsive-ux.css — global normalization', () => {
     expect(layoutVisibilityCss).toMatch(/\.device-fleet-page[\s\S]*overflow-x:\s*clip/);
     expect(layoutVisibilityCss).toMatch(/\.device-fleet-table-wrap[\s\S]*overflow-x:\s*auto/);
     expect(mobileFirstRecoveryCss).toMatch(
-      /:is\(table,\s*\.catalog-table,\s*\.device-fleet-table[\s\S]*min-width:\s*max-content/,
+      /:is\(\s*table,\s*\.catalog-table,\s*\.device-fleet-table[\s\S]*min-width:\s*max-content/,
     );
     expect(layoutVisibilityCss).toMatch(/\.fleet-data-table-wrap,[\s\S]*overflow-x:\s*auto/);
   });

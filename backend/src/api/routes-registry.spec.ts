@@ -1,18 +1,11 @@
 import { getRouteList, ROUTES } from './routes-registry';
 
 const REQUESTED_ROUTE_PATHS = [
-  '/capacity',
-  '/ems',
-  '/boarding',
-  '/protocol',
-  '/deterioration',
-  '/copilot',
   '/intake',
   '/moh',
   '/wearable',
   '/iot',
   '/simulation',
-  '/governance',
   '/handover',
   '/federated',
   '/digital-twin',
@@ -31,22 +24,22 @@ describe('API routes registry', () => {
 
   it('does not expose router internals in discovery metadata', () => {
     const routeList = getRouteList();
-    const capacityRoute = routeList.find((route) => route.path === '/capacity');
+    const intakeRoute = routeList.find((route) => route.path === '/intake');
 
-    expect(capacityRoute).toMatchObject({
-      path: '/capacity',
-      fullPath: '/api/capacity',
+    expect(intakeRoute).toMatchObject({
+      path: '/intake',
+      fullPath: '/api/intake',
       version: 'v1',
       enabled: true,
     });
-    expect(capacityRoute).not.toHaveProperty('router');
+    expect(intakeRoute).not.toHaveProperty('router');
   });
 
   it('builds full paths from a custom API prefix', () => {
-    const capacityRoute = getRouteList({ apiPrefix: '/api/emergency/' }).find(
-      (route) => route.path === '/capacity',
+    const intakeRoute = getRouteList({ apiPrefix: '/api/emergency/' }).find(
+      (route) => route.path === '/intake',
     );
 
-    expect(capacityRoute?.fullPath).toBe('/api/emergency/capacity');
+    expect(intakeRoute?.fullPath).toBe('/api/emergency/intake');
   });
 });

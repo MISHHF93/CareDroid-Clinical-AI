@@ -17,12 +17,15 @@ import {
   formatPatientToolRecommendationsForCopilot,
 } from '../../../lib/patient-orchestration';
 import { persistCopilotInteractionSafely } from '../../services/emergencyOsApi';
+import { AiTruthLabel, type AiTruthLabelState } from '../ai/AiTruthLabel';
 import './PatientCardCopilot.css';
 
 type CopilotMessage = {
   id: string;
   role: 'staff' | 'copilot';
   content: string;
+  /** Set only on real AI Chief gateway replies — unavailable/fallback text needs no truth label. */
+  truthState?: AiTruthLabelState;
 };
 
 type PatientCardCopilotProps = {
@@ -129,10 +132,15 @@ export default function PatientCardCopilot({
             : typeof response.data === 'object' && response.data && 'content' in response.data
               ? String((response.data as { content?: string }).content || '')
               : `${EMERGENCY_OS_BRANDING.copilotName} unavailable — continue with human clinical review.`;
+        // response.ok distinguishes a real AI Chief gateway reply from a
+        // degraded/placeholder body Nest still returned 200 for — only the
+        // former gets a "Live" truth label, matching AI_CONFIGURATION_MAP's
+        // finding that this environment often has no live provider configured.
+        const truthState: AiTruthLabelState = response.ok ? 'Live' : 'Stale';
 
         setMessages((current) =>
           current.map((message) =>
-            message.id === assistantId ? { ...message, content: responseText } : message,
+            message.id === assistantId ? { ...message, content: responseText, truthState } : message,
           ),
         );
         persistCopilotInteractionSafely({
@@ -242,6 +250,14 @@ export default function PatientCardCopilot({
                   <div className="patient-card-copilot__bubble">
                     {message.content || (loading && message.role === 'copilot' ? 'Thinking…' : null)}
                   </div>
+                  {message.truthState ? (
+                    <AiTruthLabel
+                      state={message.truthState}
+                      sourceContext={`${EMERGENCY_OS_BRANDING.copilotName} AI Chief gateway`}
+                      reviewRequired
+                      compact
+                    />
+                  ) : null}
                 </div>
               ))}
             </div>

@@ -1,21 +1,44 @@
-.cd-switch-row { display: inline-flex; align-items: center; gap: var(--cd-space-2); cursor: pointer; }
+.cd-switch-row {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cd-space-2);
+  cursor: pointer;
+}
 .cd-switch-track {
-  position: relative; display: inline-flex; align-items: center;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
   flex-shrink: 0;
   background: var(--cd-border-default);
   border-radius: var(--cd-radius-full);
   transition: background var(--cd-transition-fast);
   cursor: pointer;
 }
-.cd-switch-track--sm { width: 32px; height: 18px; }
-.cd-switch-track--md { width: 44px; height: 24px; }
+.cd-switch-track--sm {
+  width: 32px;
+  height: 18px;
+}
+.cd-switch-track--md {
+  width: 44px;
+  height: 24px;
+}
 
 .cd-switch-input {
-  position: absolute; inset: 0; opacity: 0; cursor: pointer; margin: 0; width: 100%; height: 100%;
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  margin: 0;
+  width: 100%;
+  height: 100%;
 }
-.cd-switch-input:focus-visible + .cd-switch-thumb { box-shadow: var(--cd-shadow-focus); }
+.cd-switch-input:focus-visible + .cd-switch-thumb {
+  box-shadow: var(--cd-shadow-focus);
+}
 .cd-switch-input:checked ~ .cd-switch-track,
-.cd-switch-track:has(.cd-switch-input:checked) { background: var(--cd-brand-bg); }
+.cd-switch-track:has(.cd-switch-input:checked) {
+  background: var(--cd-brand-bg);
+}
 
 .cd-switch-thumb {
   position: absolute;
@@ -25,10 +48,28 @@
   transition: transform var(--cd-transition-fast);
   pointer-events: none;
 }
-.cd-switch-track--sm .cd-switch-thumb { width: 14px; height: 14px; top: 2px; left: 2px; }
-.cd-switch-track--md .cd-switch-thumb { width: 18px; height: 18px; top: 3px; left: 3px; }
+.cd-switch-track--sm .cd-switch-thumb {
+  width: 14px;
+  height: 14px;
+  top: 2px;
+  left: 2px;
+}
+.cd-switch-track--md .cd-switch-thumb {
+  width: 18px;
+  height: 18px;
+  top: 3px;
+  left: 3px;
+}
 
-.cd-switch-input:checked + .cd-switch-thumb { transform: translateX(14px); }
-.cd-switch-track--md .cd-switch-input:checked + .cd-switch-thumb { transform: translateX(20px); }
+.cd-switch-input:checked + .cd-switch-thumb {
+  transform: translateX(14px);
+}
+.cd-switch-track--md .cd-switch-input:checked + .cd-switch-thumb {
+  transform: translateX(20px);
+}
 
-.cd-switch-label { font-size: var(--cd-text-sm); font-weight: var(--cd-font-medium); color: var(--cd-text-primary); }
+.cd-switch-label {
+  font-size: var(--cd-text-sm);
+  font-weight: var(--cd-font-medium);
+  color: var(--cd-text-primary);
+}

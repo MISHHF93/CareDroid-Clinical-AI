@@ -216,7 +216,10 @@
   background: var(--color-card, #ffffff);
   position: relative;
   z-index: 1;
-  transition: border-color 200ms ease, background 200ms ease, box-shadow 200ms ease;
+  transition:
+    border-color 200ms ease,
+    background 200ms ease,
+    box-shadow 200ms ease;
 }
 
 /* Completed stages — green fill */
@@ -237,7 +240,8 @@
 }
 
 @keyframes journey-dot-pulse {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow:
       0 0 0 3px color-mix(in srgb, #374151 20%, transparent),
       0 0 0 6px color-mix(in srgb, #374151 8%, transparent);

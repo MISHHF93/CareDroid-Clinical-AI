@@ -453,8 +453,13 @@ describe('unified navigation config', () => {
     expect(getVisibleNavigation('doctor').map((item) => item.id)).toEqual(
       getVisibleNavigation('physician').map((item) => item.id),
     );
+    // Cycle 219 (fail-closed hardening): an unrecognized role string used to
+    // default to physician-equivalent full access; it now normalizes to
+    // read_only_viewer, the minimal-privilege role, matching
+    // normalizeEmergencyRole()'s fail-closed behavior in
+    // emergencyRolePermissions.ts.
     expect(getVisibleNavigation('unknown-role').map((item) => item.id)).toEqual(
-      getVisibleNavigation('physician').map((item) => item.id),
+      getVisibleNavigation('read_only_viewer').map((item) => item.id),
     );
   });
 });

@@ -153,7 +153,10 @@
   background: var(--app-surface-1, #ffffff);
   color: var(--cdl-ink-muted, var(--medical-text-muted, #334155));
   cursor: pointer;
-  transition: border-color 120ms ease, color 120ms ease, background-color 120ms ease;
+  transition:
+    border-color 120ms ease,
+    color 120ms ease,
+    background-color 120ms ease;
 }
 
 .caredroid-header__palette-trigger:not(:disabled):hover,
@@ -161,7 +164,11 @@
   border-color: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 42%, transparent);
   color: var(--medical-ink, #111827);
   outline: none;
-  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 6%, var(--app-surface-1, #ffffff));
+  background: color-mix(
+    in srgb,
+    var(--app-accent-interactive, #0ea5e9) 6%,
+    var(--app-surface-1, #ffffff)
+  );
 }
 
 .caredroid-header__central-node {
@@ -249,14 +256,22 @@
   font-weight: 850;
   padding: 0 9px;
   white-space: nowrap;
-  transition: border-color 120ms ease, color 120ms ease, background-color 120ms ease, box-shadow 120ms ease;
+  transition:
+    border-color 120ms ease,
+    color 120ms ease,
+    background-color 120ms ease,
+    box-shadow 120ms ease;
 }
 
 .caredroid-header__action:not(:disabled):hover,
 .caredroid-header__action:not(:disabled):focus-visible {
   border-color: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 52%, transparent);
   color: var(--medical-ink, #111827);
-  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 6%, var(--app-surface-1, #ffffff));
+  background: color-mix(
+    in srgb,
+    var(--app-accent-interactive, #0ea5e9) 6%,
+    var(--app-surface-1, #ffffff)
+  );
   outline: none;
 }
 
@@ -388,11 +403,17 @@
   border-color: var(--medical-border, #e2e8f0);
   background: var(--app-surface-1, #ffffff);
   color: var(--medical-ink, #111827);
-  transition: border-color 120ms ease, background-color 120ms ease;
+  transition:
+    border-color 120ms ease,
+    background-color 120ms ease;
 }
 .caredroid-header .account-menu__trigger:hover {
   border-color: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 40%, transparent);
-  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 5%, var(--app-surface-1, #ffffff));
+  background: color-mix(
+    in srgb,
+    var(--app-accent-interactive, #0ea5e9) 5%,
+    var(--app-surface-1, #ffffff)
+  );
 }
 .caredroid-header .account-menu__name {
   color: var(--medical-ink, #111827);
@@ -404,7 +425,11 @@
   font-size: 10px;
 }
 .caredroid-header .account-menu__avatar {
-  background: color-mix(in srgb, var(--app-accent-interactive, #0ea5e9) 14%, var(--medical-accent-tint, #e0f2fe));
+  background: color-mix(
+    in srgb,
+    var(--app-accent-interactive, #0ea5e9) 14%,
+    var(--medical-accent-tint, #e0f2fe)
+  );
   color: var(--medical-accent-hover, #0284c7);
   font-size: 10px;
   font-weight: 700;

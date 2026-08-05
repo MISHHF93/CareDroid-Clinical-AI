@@ -4,12 +4,10 @@
  * CDL v2: defaults use AA muted ink; severity-tinted cards keep their data-severity surfaces.
  */
 
-.session-chrome-bar__drawer :is(
-    .card,
-    .cd-dashboard-card,
-    .cd-surface,
-    [class$='-card']
-  ):not([data-severity]):not(.cdl-card[data-severity]) {
+.session-chrome-bar__drawer
+  :is(.card, .cd-dashboard-card, .cd-surface, [class$='-card']):not([data-severity]):not(
+    .cdl-card[data-severity]
+  ) {
   --card-contract-bg: var(--cdl-surface-card, var(--medical-card-bg, #ffffff));
   --card-contract-fg: var(--cdl-ink, var(--medical-card-fg, #111827));
   --card-contract-fg-muted: var(--cdl-ink-muted, var(--medical-card-fg-muted, #475569));
@@ -20,7 +18,8 @@
 }
 
 /* Base contract for card-like surfaces — skip severity-tinted CDL cards */
-:is(.app-shell, .emergency-app-shell) :is(
+:is(.app-shell, .emergency-app-shell)
+  :is(
     .card,
     .card-subtle,
     .card-glass,
@@ -49,7 +48,8 @@
 }
 
 /* Severity cards own their contrast via CDL tokens */
-:is(.app-shell, .emergency-app-shell) :is(.cdl-card, .patient-card, [class$='-card'])[data-severity] {
+:is(.app-shell, .emergency-app-shell)
+  :is(.cdl-card, .patient-card, [class$='-card'])[data-severity] {
   /* do not force white contract over tinted severity surfaces */
   background-color: unset;
   color: unset;
@@ -98,35 +98,20 @@
 }
 
 /* Typography roles inside cards — never inherit white from legacy tokens */
-:is(.app-shell, .emergency-app-shell) :is(
-    .card,
-    [class$='-card'],
-    [class*='-card '],
-    [class$='-panel'],
-    [class*='-panel ']
-  )
+:is(.app-shell, .emergency-app-shell)
+  :is(.card, [class$='-card'], [class*='-card '], [class$='-panel'], [class*='-panel '])
   :is(h1, h2, h3, h4, h5, h6, strong, dt) {
   color: var(--card-contract-fg, var(--medical-card-fg));
 }
 
-:is(.app-shell, .emergency-app-shell) :is(
-    .card,
-    [class$='-card'],
-    [class*='-card '],
-    [class$='-panel'],
-    [class*='-panel ']
-  )
+:is(.app-shell, .emergency-app-shell)
+  :is(.card, [class$='-card'], [class*='-card '], [class$='-panel'], [class*='-panel '])
   :is(p, li, td, th, label, span, small, figcaption) {
   color: inherit;
 }
 
-:is(.app-shell, .emergency-app-shell) :is(
-    .card,
-    [class$='-card'],
-    [class*='-card '],
-    [class$='-panel'],
-    [class*='-panel ']
-  )
+:is(.app-shell, .emergency-app-shell)
+  :is(.card, [class$='-card'], [class*='-card '], [class$='-panel'], [class*='-panel '])
   :is(
     [class*='__meta'],
     [class*='-meta'],
@@ -141,16 +126,13 @@
 }
 
 /* Light card bodies must not use on-solid text (except explicit solid fills) */
-:is(.app-shell, .emergency-app-shell) :is(
-    .card,
-    [class$='-card'],
-    [class*='-card '],
-    [class$='-panel'],
-    [class*='-panel ']
-  )
-  :is(p, span, li, td, th, label, small, h1, h2, h3, h4, h5, h6):not(
-    [class*='badge']
-  ):not([class*='pill']):not([class*='chip']):not([class*='--solid']):not([class*='--primary']):not([data-pill-fill='solid']) {
+:is(.app-shell, .emergency-app-shell)
+  :is(.card, [class$='-card'], [class*='-card '], [class$='-panel'], [class*='-panel '])
+  :is(p, span, li, td, th, label, small, h1, h2, h3, h4, h5, h6):not([class*='badge']):not(
+    [class*='pill']
+  ):not([class*='chip']):not([class*='--solid']):not([class*='--primary']):not(
+    [data-pill-fill='solid']
+  ) {
   color: inherit;
 }
 

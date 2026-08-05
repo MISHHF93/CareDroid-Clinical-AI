@@ -10,7 +10,9 @@
   --cdl-sidebar-width: 232px;
   --cdl-sidebar-bg: var(--medical-white);
   --cdl-sidebar-border: color-mix(in srgb, var(--medical-border) 55%, transparent);
-  --cdl-sidebar-shadow: 1px 0 0 color-mix(in srgb, var(--medical-border) 45%, transparent), 4px 0 24px rgba(15, 23, 42, 0.05);
+  --cdl-sidebar-shadow:
+    1px 0 0 color-mix(in srgb, var(--medical-border) 45%, transparent),
+    4px 0 24px rgba(15, 23, 42, 0.05);
   --cdl-sidebar-brand-height: 44px;
   --cdl-sidebar-nav-gap: 1px;
   --cdl-sidebar-group-gap: 4px;

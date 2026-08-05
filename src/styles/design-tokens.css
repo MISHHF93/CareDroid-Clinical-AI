@@ -70,7 +70,8 @@
   --app-type-label: var(--text-small);
   --app-type-helper: var(--text-caption);
 
-  --app-font-family-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --app-font-family-body:
+    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --app-font-family-mono: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 
   --type-heading-line-height: 1.3;
@@ -328,15 +329,15 @@
 }
 
 .cd-skeleton-shimmer {
-  background:
-    linear-gradient(
-      90deg,
-      color-mix(in srgb, var(--app-surface-raised) 72%, transparent) 0%,
-      color-mix(in srgb, var(--app-accent-action) 12%, var(--app-surface-raised)) 42%,
-      color-mix(in srgb, var(--app-surface-raised) 72%, transparent) 84%
-    );
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--app-surface-raised) 72%, transparent) 0%,
+    color-mix(in srgb, var(--app-accent-action) 12%, var(--app-surface-raised)) 42%,
+    color-mix(in srgb, var(--app-surface-raised) 72%, transparent) 84%
+  );
   background-size: 220% 100%;
-  animation: cd-skeleton-shimmer var(--motion-skeleton-duration) var(--motion-ease-standard) infinite;
+  animation: cd-skeleton-shimmer var(--motion-skeleton-duration) var(--motion-ease-standard)
+    infinite;
 }
 
 @keyframes cd-motion-enter-soft {

@@ -9,11 +9,23 @@
     "allowedWorkspaces": ["emergency", "icu", "cardiology"],
     "navigationGroups": ["emergency", "tools", "clinical"],
     "defaultScreenMode": "physician",
-    "toolPolicy": { "allowedPacks": ["core-platform", "emergency-clinical"], "restrictedToolIds": [] },
+    "toolPolicy": {
+      "allowedPacks": ["core-platform", "emergency-clinical"],
+      "restrictedToolIds": []
+    },
     "requiredToolIds": ["calculators", "protocols", "heart-score", "qsofa", "nihss"],
     "restrictedToolIds": ["fleet-command", "medical-iot-dashboard", "route-optimizer"],
     "profileBenefits": "Emergency whiteboard, patient review, clinical tools, copilot, and analytics.",
-    "assignableOrganizationTypes": ["hospital", "clinic", "EMS", "university", "research-center", "long-term-care", "telehealth", "government"],
+    "assignableOrganizationTypes": [
+      "hospital",
+      "clinic",
+      "EMS",
+      "university",
+      "research-center",
+      "long-term-care",
+      "telehealth",
+      "government"
+    ],
     "requiredEntitlementPacks": ["emergency-clinical"]
   },
   {
@@ -30,7 +42,16 @@
     "requiredToolIds": ["calculators", "protocols", "qsofa"],
     "restrictedToolIds": ["fleet-command", "route-optimizer"],
     "profileBenefits": "ICU and emergency workspaces with critical-care calculators and monitoring tools.",
-    "assignableOrganizationTypes": ["hospital", "clinic", "EMS", "university", "research-center", "long-term-care", "telehealth", "government"],
+    "assignableOrganizationTypes": [
+      "hospital",
+      "clinic",
+      "EMS",
+      "university",
+      "research-center",
+      "long-term-care",
+      "telehealth",
+      "government"
+    ],
     "requiredEntitlementPacks": ["emergency-clinical"]
   },
   {
@@ -47,7 +68,16 @@
     "requiredToolIds": ["calculators", "protocols", "heart-score"],
     "restrictedToolIds": ["fleet-command", "medical-iot-dashboard"],
     "profileBenefits": "Cardiology workspace, emergency handoffs, and cardiac clinical tools.",
-    "assignableOrganizationTypes": ["hospital", "clinic", "EMS", "university", "research-center", "long-term-care", "telehealth", "government"],
+    "assignableOrganizationTypes": [
+      "hospital",
+      "clinic",
+      "EMS",
+      "university",
+      "research-center",
+      "long-term-care",
+      "telehealth",
+      "government"
+    ],
     "requiredEntitlementPacks": ["emergency-clinical"]
   },
   {
@@ -60,11 +90,23 @@
     "allowedWorkspaces": ["emergency", "icu"],
     "navigationGroups": ["emergency", "tools", "clinical"],
     "defaultScreenMode": "triage",
-    "toolPolicy": { "allowedPacks": ["core-platform", "emergency-clinical"], "restrictedToolIds": [] },
+    "toolPolicy": {
+      "allowedPacks": ["core-platform", "emergency-clinical"],
+      "restrictedToolIds": []
+    },
     "requiredToolIds": ["calculators", "protocols", "qsofa"],
     "restrictedToolIds": ["fleet-command", "medical-iot-dashboard", "simulation-suite"],
     "profileBenefits": "Triage, intake, reassessment, and patient-care workflows.",
-    "assignableOrganizationTypes": ["hospital", "clinic", "EMS", "university", "research-center", "long-term-care", "telehealth", "government"],
+    "assignableOrganizationTypes": [
+      "hospital",
+      "clinic",
+      "EMS",
+      "university",
+      "research-center",
+      "long-term-care",
+      "telehealth",
+      "government"
+    ],
     "requiredEntitlementPacks": ["emergency-clinical"]
   },
   {
@@ -77,11 +119,34 @@
     "allowedWorkspaces": ["emergency"],
     "navigationGroups": ["emergency", "reception"],
     "defaultScreenMode": "reception",
-    "toolPolicy": { "allowedPacks": ["core-platform", "reception-desk"], "restrictedToolIds": ["simulation-suite", "fleet-command", "medical-iot-dashboard", "protocols", "differential-ai"] },
+    "toolPolicy": {
+      "allowedPacks": ["core-platform", "reception-desk"],
+      "restrictedToolIds": [
+        "simulation-suite",
+        "fleet-command",
+        "medical-iot-dashboard",
+        "protocols",
+        "differential-ai"
+      ]
+    },
     "requiredToolIds": ["calculators"],
-    "restrictedToolIds": ["simulation-suite", "fleet-command", "medical-iot-dashboard", "protocols", "differential-ai", "route-optimizer"],
+    "restrictedToolIds": [
+      "simulation-suite",
+      "fleet-command",
+      "medical-iot-dashboard",
+      "protocols",
+      "differential-ai",
+      "route-optimizer"
+    ],
     "profileBenefits": "Emergency reception command desk, life-critical intake capture, patient search, queue handoff, EMS conversion, and limited patient profile handoff.",
-    "assignableOrganizationTypes": ["hospital", "clinic", "EMS", "long-term-care", "telehealth", "government"],
+    "assignableOrganizationTypes": [
+      "hospital",
+      "clinic",
+      "EMS",
+      "long-term-care",
+      "telehealth",
+      "government"
+    ],
     "requiredEntitlementPacks": ["reception-desk"]
   },
   {
@@ -98,7 +163,16 @@
     "requiredToolIds": ["drug-check", "calculators"],
     "restrictedToolIds": ["fleet-command", "simulation-suite"],
     "profileBenefits": "Pharmacy workspace and medication safety tools.",
-    "assignableOrganizationTypes": ["hospital", "clinic", "EMS", "university", "research-center", "long-term-care", "telehealth", "government"],
+    "assignableOrganizationTypes": [
+      "hospital",
+      "clinic",
+      "EMS",
+      "university",
+      "research-center",
+      "long-term-care",
+      "telehealth",
+      "government"
+    ],
     "requiredEntitlementPacks": []
   },
   {
@@ -115,7 +189,16 @@
     "requiredToolIds": ["lab-interp", "calculators"],
     "restrictedToolIds": ["fleet-command", "simulation-suite"],
     "profileBenefits": "Laboratory workspace and lab interpretation tools.",
-    "assignableOrganizationTypes": ["hospital", "clinic", "EMS", "university", "research-center", "long-term-care", "telehealth", "government"],
+    "assignableOrganizationTypes": [
+      "hospital",
+      "clinic",
+      "EMS",
+      "university",
+      "research-center",
+      "long-term-care",
+      "telehealth",
+      "government"
+    ],
     "requiredEntitlementPacks": ["hospital-operations"]
   },
   {
@@ -132,7 +215,16 @@
     "requiredToolIds": ["medical-iot-dashboard", "calculators"],
     "restrictedToolIds": ["simulation-suite", "protocols"],
     "profileBenefits": "Device operations, IoMT monitoring, and biomedical tooling.",
-    "assignableOrganizationTypes": ["hospital", "clinic", "EMS", "university", "research-center", "long-term-care", "telehealth", "government"],
+    "assignableOrganizationTypes": [
+      "hospital",
+      "clinic",
+      "EMS",
+      "university",
+      "research-center",
+      "long-term-care",
+      "telehealth",
+      "government"
+    ],
     "requiredEntitlementPacks": ["hospital-operations"]
   },
   {
@@ -149,7 +241,16 @@
     "requiredToolIds": ["fleet-command", "route-optimizer", "predictive-maintenance"],
     "restrictedToolIds": ["protocols", "differential-ai", "simulation-suite"],
     "profileBenefits": "Fleet command, routing, and operational telemetry.",
-    "assignableOrganizationTypes": ["hospital", "clinic", "EMS", "university", "research-center", "long-term-care", "telehealth", "government"],
+    "assignableOrganizationTypes": [
+      "hospital",
+      "clinic",
+      "EMS",
+      "university",
+      "research-center",
+      "long-term-care",
+      "telehealth",
+      "government"
+    ],
     "requiredEntitlementPacks": ["hospital-operations"]
   },
   {
@@ -162,11 +263,23 @@
     "allowedWorkspaces": ["emergency", "operations", "governance"],
     "navigationGroups": ["emergency", "operations", "admin", "analytics"],
     "defaultScreenMode": "command-center",
-    "toolPolicy": { "allowedPacks": ["core-platform", "operations", "analytics"], "restrictedToolIds": [] },
+    "toolPolicy": {
+      "allowedPacks": ["core-platform", "operations", "analytics"],
+      "restrictedToolIds": []
+    },
     "requiredToolIds": ["calculators", "protocols"],
     "restrictedToolIds": [],
     "profileBenefits": "Command center, analytics, org operations, and emergency oversight.",
-    "assignableOrganizationTypes": ["hospital", "clinic", "EMS", "university", "research-center", "long-term-care", "telehealth", "government"],
+    "assignableOrganizationTypes": [
+      "hospital",
+      "clinic",
+      "EMS",
+      "university",
+      "research-center",
+      "long-term-care",
+      "telehealth",
+      "government"
+    ],
     "requiredEntitlementPacks": []
   },
   {
@@ -183,7 +296,13 @@
     "requiredToolIds": ["calculators"],
     "restrictedToolIds": ["fleet-command", "medical-iot-dashboard"],
     "profileBenefits": "Research tools, read-only operational views, and analytics exports.",
-    "assignableOrganizationTypes": ["hospital", "clinic", "university", "research-center", "government"],
+    "assignableOrganizationTypes": [
+      "hospital",
+      "clinic",
+      "university",
+      "research-center",
+      "government"
+    ],
     "requiredEntitlementPacks": []
   },
   {
@@ -200,7 +319,13 @@
     "requiredToolIds": ["calculators", "simulation-suite"],
     "restrictedToolIds": ["fleet-command", "medical-iot-dashboard"],
     "profileBenefits": "Education workspace, simulation, and teaching-oriented tools.",
-    "assignableOrganizationTypes": ["hospital", "clinic", "university", "research-center", "government"],
+    "assignableOrganizationTypes": [
+      "hospital",
+      "clinic",
+      "university",
+      "research-center",
+      "government"
+    ],
     "requiredEntitlementPacks": []
   },
   {
@@ -213,11 +338,26 @@
     "allowedWorkspaces": ["education", "emergency"],
     "navigationGroups": ["tools", "education"],
     "defaultScreenMode": null,
-    "toolPolicy": { "allowedPacks": ["core-platform"], "restrictedToolIds": ["audit-logs", "system-config", "team-management", "fleet-command"] },
+    "toolPolicy": {
+      "allowedPacks": ["core-platform"],
+      "restrictedToolIds": ["audit-logs", "system-config", "team-management", "fleet-command"]
+    },
     "requiredToolIds": ["calculators"],
-    "restrictedToolIds": ["audit-logs", "system-config", "team-management", "fleet-command", "medical-iot-dashboard"],
+    "restrictedToolIds": [
+      "audit-logs",
+      "system-config",
+      "team-management",
+      "fleet-command",
+      "medical-iot-dashboard"
+    ],
     "profileBenefits": "Learning tools, assistant access, and supervised clinical calculators.",
-    "assignableOrganizationTypes": ["hospital", "clinic", "university", "research-center", "government"],
+    "assignableOrganizationTypes": [
+      "hospital",
+      "clinic",
+      "university",
+      "research-center",
+      "government"
+    ],
     "requiredEntitlementPacks": []
   },
   {
@@ -234,7 +374,17 @@
     "requiredToolIds": ["audit-logs"],
     "restrictedToolIds": ["simulation-suite"],
     "profileBenefits": "Governance registry, audit logs, and compliance oversight.",
-    "assignableOrganizationTypes": ["hospital", "clinic", "EMS", "university", "research-center", "long-term-care", "telehealth", "government", "racetrack"],
+    "assignableOrganizationTypes": [
+      "hospital",
+      "clinic",
+      "EMS",
+      "university",
+      "research-center",
+      "long-term-care",
+      "telehealth",
+      "government",
+      "racetrack"
+    ],
     "requiredEntitlementPacks": []
   },
   {
@@ -251,7 +401,17 @@
     "requiredToolIds": ["calculators", "audit-logs"],
     "restrictedToolIds": [],
     "profileBenefits": "Full platform administration, tenant management, and all product modules.",
-    "assignableOrganizationTypes": ["hospital", "clinic", "EMS", "university", "research-center", "long-term-care", "telehealth", "government", "racetrack"],
+    "assignableOrganizationTypes": [
+      "hospital",
+      "clinic",
+      "EMS",
+      "university",
+      "research-center",
+      "long-term-care",
+      "telehealth",
+      "government",
+      "racetrack"
+    ],
     "requiredEntitlementPacks": ["platform-admin"]
   },
   {
@@ -264,7 +424,10 @@
     "allowedWorkspaces": ["operations", "governance"],
     "navigationGroups": ["trackmind", "admin"],
     "defaultScreenMode": null,
-    "toolPolicy": { "allowedPacks": ["core-platform", "trackmind"], "restrictedToolIds": ["protocols", "differential-ai"] },
+    "toolPolicy": {
+      "allowedPacks": ["core-platform", "trackmind"],
+      "restrictedToolIds": ["protocols", "differential-ai"]
+    },
     "requiredToolIds": ["calculators"],
     "restrictedToolIds": ["protocols", "differential-ai", "simulation-suite", "fleet-command"],
     "profileBenefits": "TrackMind enterprise hub, org administration, and race-day configuration.",
@@ -298,7 +461,10 @@
     "allowedWorkspaces": ["operations", "governance"],
     "navigationGroups": ["trackmind", "governance"],
     "defaultScreenMode": null,
-    "toolPolicy": { "allowedPacks": ["core-platform", "trackmind"], "restrictedToolIds": ["simulation-suite"] },
+    "toolPolicy": {
+      "allowedPacks": ["core-platform", "trackmind"],
+      "restrictedToolIds": ["simulation-suite"]
+    },
     "requiredToolIds": ["calculators"],
     "restrictedToolIds": ["simulation-suite", "fleet-command", "protocols"],
     "profileBenefits": "Stewarding workspace, incident review, and audit visibility.",
@@ -349,11 +515,24 @@
     "allowedWorkspaces": ["operations", "governance", "emergency"],
     "navigationGroups": ["trackmind", "analytics", "executive"],
     "defaultScreenMode": "command-center",
-    "toolPolicy": { "allowedPacks": ["core-platform", "analytics", "trackmind"], "restrictedToolIds": [] },
+    "toolPolicy": {
+      "allowedPacks": ["core-platform", "analytics", "trackmind"],
+      "restrictedToolIds": []
+    },
     "requiredToolIds": ["calculators"],
     "restrictedToolIds": [],
     "profileBenefits": "Executive command center, enterprise platform intelligence, and throughput analytics.",
-    "assignableOrganizationTypes": ["hospital", "clinic", "EMS", "university", "research-center", "long-term-care", "telehealth", "government", "racetrack"],
+    "assignableOrganizationTypes": [
+      "hospital",
+      "clinic",
+      "EMS",
+      "university",
+      "research-center",
+      "long-term-care",
+      "telehealth",
+      "government",
+      "racetrack"
+    ],
     "requiredEntitlementPacks": []
   },
   {
@@ -366,11 +545,24 @@
     "allowedWorkspaces": ["governance"],
     "navigationGroups": ["governance", "audit", "trackmind"],
     "defaultScreenMode": "read-only-whiteboard",
-    "toolPolicy": { "allowedPacks": ["core-platform", "governance"], "restrictedToolIds": ["simulation-suite"] },
+    "toolPolicy": {
+      "allowedPacks": ["core-platform", "governance"],
+      "restrictedToolIds": ["simulation-suite"]
+    },
     "requiredToolIds": ["audit-logs"],
     "restrictedToolIds": ["simulation-suite", "fleet-command"],
     "profileBenefits": "Read-only operational views, audit exports, and governance registry access.",
-    "assignableOrganizationTypes": ["hospital", "clinic", "EMS", "university", "research-center", "long-term-care", "telehealth", "government", "racetrack"],
+    "assignableOrganizationTypes": [
+      "hospital",
+      "clinic",
+      "EMS",
+      "university",
+      "research-center",
+      "long-term-care",
+      "telehealth",
+      "government",
+      "racetrack"
+    ],
     "requiredEntitlementPacks": []
   }
 ]

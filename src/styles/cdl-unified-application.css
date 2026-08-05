@@ -111,7 +111,9 @@
    Page template registry — every authenticated route family
    ══════════════════════════════════════════════════════════════════ */
 
-.emergency-app-shell .app-shell-main-content :is(
+.emergency-app-shell
+  .app-shell-main-content
+  :is(
     .platform-entry,
     .settings-page,
     .platform-settings-page,

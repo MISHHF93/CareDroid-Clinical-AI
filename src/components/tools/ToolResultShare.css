@@ -61,7 +61,11 @@
   justify-content: space-between;
   padding: 28px 32px;
   border-bottom: 1px solid var(--border-color);
-  background: linear-gradient(135deg, var(--medical-accent-tint-faint), var(--medical-accent-tint-faint));
+  background: linear-gradient(
+    135deg,
+    var(--medical-accent-tint-faint),
+    var(--medical-accent-tint-faint)
+  );
 }
 
 .share-modal-header h2 {

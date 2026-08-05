@@ -7,6 +7,12 @@
   padding-left: var(--cd-layout-gutter);
   padding-right: var(--cd-layout-gutter);
 }
-.cd-page-container--default { max-width: var(--cd-layout-max-content); }
-.cd-page-container--wide    { max-width: var(--cd-layout-max-wide); }
-.cd-page-container--full    { max-width: 100%; }
+.cd-page-container--default {
+  max-width: var(--cd-layout-max-content);
+}
+.cd-page-container--wide {
+  max-width: var(--cd-layout-max-wide);
+}
+.cd-page-container--full {
+  max-width: 100%;
+}

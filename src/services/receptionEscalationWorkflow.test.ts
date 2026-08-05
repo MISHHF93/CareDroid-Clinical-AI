@@ -48,7 +48,7 @@ describe('receptionEscalationWorkflow', () => {
     );
   });
 
-  it('creates a critical alert for collapse distress with suppressToast metadata', () => {
+  it('creates a critical alert for collapse distress that is not toast-suppressed', () => {
     const alert = buildReceptionEscalationAlert(
       {
         reasonId: 'collapse-distress',
@@ -60,7 +60,10 @@ describe('receptionEscalationWorkflow', () => {
 
     expect(alert.source).toBe(RECEPTION_ESCALATION_ALERT_SOURCE);
     expect(alert.severity).toBe('Critical');
-    expect(alert.metadata?.suppressToast).toBe(true);
+    // Critical escalations surface as toasts for triage/charge recipients on
+    // shared boards (see buildReceptionEscalationAlert); only non-Critical
+    // reasons are toast-suppressed.
+    expect(alert.metadata?.suppressToast).toBe(false);
     expect(alert.title).toContain('Collapse / distress');
     expect(alert.message).toContain('Patient on floor near chairs');
   });

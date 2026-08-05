@@ -4,9 +4,21 @@
   gap: var(--split-gap, 0);
   min-height: 0;
 }
-.cd-split--right { grid-template-columns: 1fr var(--split-sidebar-width, var(--cd-layout-sidebar-width)); }
-.cd-split--collapsed { grid-template-columns: 0 1fr; overflow: hidden; }
-.cd-split--collapsed.cd-split--right { grid-template-columns: 1fr 0; }
+.cd-split--right {
+  grid-template-columns: 1fr var(--split-sidebar-width, var(--cd-layout-sidebar-width));
+}
+.cd-split--collapsed {
+  grid-template-columns: 0 1fr;
+  overflow: hidden;
+}
+.cd-split--collapsed.cd-split--right {
+  grid-template-columns: 1fr 0;
+}
 
-.cd-split__sidebar { min-width: 0; overflow: hidden; }
-.cd-split__main    { min-width: 0; }
+.cd-split__sidebar {
+  min-width: 0;
+  overflow: hidden;
+}
+.cd-split__main {
+  min-width: 0;
+}

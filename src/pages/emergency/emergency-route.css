@@ -37,17 +37,27 @@
 }
 
 .emergency-route-situation-brief--info {
-  border-color: color-mix(in srgb, var(--cdl-info, var(--status-info)) 28%, var(--cdl-border, var(--ed-border-subtle)));
+  border-color: color-mix(
+    in srgb,
+    var(--cdl-info, var(--status-info)) 28%,
+    var(--cdl-border, var(--ed-border-subtle))
+  );
   background: var(--cdl-info-bg, var(--ed-surface-raised));
 }
 
 .emergency-route-situation-brief--warning {
-  border-color: var(--cdl-warning-border, color-mix(in srgb, var(--status-warning, #b45309) 34%, var(--ed-border-subtle)));
+  border-color: var(
+    --cdl-warning-border,
+    color-mix(in srgb, var(--status-warning, #b45309) 34%, var(--ed-border-subtle))
+  );
   background: var(--cdl-warning-bg, var(--ed-surface-raised));
 }
 
 .emergency-route-situation-brief--critical {
-  border-color: var(--cdl-critical-border, color-mix(in srgb, var(--status-critical, #dc2626) 38%, var(--ed-border-subtle)));
+  border-color: var(
+    --cdl-critical-border,
+    color-mix(in srgb, var(--status-critical, #dc2626) 38%, var(--ed-border-subtle))
+  );
   background: var(--cdl-critical-bg, var(--ed-surface-raised));
 }
 
@@ -267,7 +277,8 @@
 }
 
 .emergency-route-banner--error {
-  border: 1px solid color-mix(in srgb, var(--status-critical, #ef4444) 54%, var(--color-border-default, #7f1d1d));
+  border: 1px solid
+    color-mix(in srgb, var(--status-critical, #ef4444) 54%, var(--color-border-default, #7f1d1d));
   border-radius: var(--radius-lg, 12px);
   background: color-mix(in srgb, var(--status-critical, #ef4444) 12%, var(--ed-surface-raised));
   color: var(--status-critical, #fca5a5);
@@ -393,7 +404,12 @@
   align-items: center;
   padding: var(--ed-space-3);
   border: 1px solid var(--cdl-clinical-border, var(--ed-border-subtle));
-  border-left: 2px solid color-mix(in srgb, var(--queue-accent, var(--app-accent-interactiae, var(--status-info))) 45%, transparent);
+  border-left: 2px solid
+    color-mix(
+      in srgb,
+      var(--queue-accent, var(--app-accent-interactiae, var(--status-info))) 45%,
+      transparent
+    );
   border-radius: var(--cdl-clinical-radius, var(--radius-lg, 12px));
   background: var(--app-surface-1, var(--ed-surface-raised));
   box-shadow: var(--cdl-clinical-shadow-rest, var(--app-eleaation-card));
@@ -430,11 +446,10 @@
 .emergency-route-queue-row__escalate-btn {
   padding: 1px 7px;
   border-radius: 4px;
-  /* #ef4444 (Tailwind red-500) with white text measured 3.76:1 via live
-     axe-core scan (Cycle 214) — short of WCAG AA's 4.5:1. --cdl-danger-600
-     is this codebase's already-verified-safe critical-red (4.83:1 with
-     white text, same token used by ReceptionSkillStrip.css's --critical
-     tone). */
+  /* Tailwind red-500 with white text measured 3.76:1 via live axe-core scan
+     (Cycle 214) — short of WCAG AA's 4.5:1. --cdl-danger-600 is this
+     codebase's already-verified-safe critical-red (4.83:1 with white text,
+     same token used by ReceptionSkillStrip.css's --critical tone). */
   background: var(--cdl-danger-600, #dc2626);
   color: #fff;
   border: none;
@@ -580,7 +595,12 @@
   min-width: 0;
   padding: var(--ed-space-3);
   border: 1px solid var(--cdl-clinical-border, var(--ed-border-subtle));
-  border-left: 2px solid color-mix(in srgb, var(--command-action-accent, var(--app-accent-interactiae, var(--status-info))) 45%, transparent);
+  border-left: 2px solid
+    color-mix(
+      in srgb,
+      var(--command-action-accent, var(--app-accent-interactiae, var(--status-info))) 45%,
+      transparent
+    );
   border-radius: var(--cdl-clinical-radius, var(--radius-lg, 12px));
   background: var(--app-surface-1, var(--ed-surface-raised));
   box-shadow: var(--cdl-clinical-shadow-rest, var(--app-eleaation-card));

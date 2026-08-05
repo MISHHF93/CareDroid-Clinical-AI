@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import type { Patient } from '../../types/emergency';
 import { buildNativeAiPatientSnapshot } from '../../services/nativeAiCore';
+import { AiTruthLabel, fromNativeAiSourceState } from '../ai/AiTruthLabel';
 import './SpecialistInferenceBadge.css';
 
 type SpecialistInferenceBadgeProps = {
@@ -19,6 +20,11 @@ export default function SpecialistInferenceBadge({
 
   if (!primary || primary.confidence < 0.5) return null;
 
+  const truthLabel = fromNativeAiSourceState(primary.sourceState, {
+    sourceContext: `Clinical specialist routing engine ${primary.modelId}@${primary.modelVersion}`,
+    reviewRequired: primary.requiresHumanReview,
+  });
+
   return (
     <span
       className={[
@@ -36,6 +42,7 @@ export default function SpecialistInferenceBadge({
       <span className="specialist-inference-badge__meta">
         {Math.round(primary.confidence * 100)}% · {primary.sourceState}
       </span>
+      <AiTruthLabel {...truthLabel} compact />
     </span>
   );
 }

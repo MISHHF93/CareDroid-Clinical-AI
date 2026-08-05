@@ -8,9 +8,15 @@
   border-color: color-mix(in srgb, var(--tone-color, #22c55e) 30%, transparent);
 }
 
-.three-minute-timer--green  { --tone-color: #22c55e; }
-.three-minute-timer--amber  { --tone-color: #f59e0b; }
-.three-minute-timer--critical { --tone-color: #ef4444; }
+.three-minute-timer--green {
+  --tone-color: #22c55e;
+}
+.three-minute-timer--amber {
+  --tone-color: #f59e0b;
+}
+.three-minute-timer--critical {
+  --tone-color: #ef4444;
+}
 
 .three-minute-timer__label {
   font-size: 11px;
@@ -39,8 +45,12 @@
 }
 
 @keyframes timer-breach-pulse {
-  from { opacity: 1; }
-  to   { opacity: 0.55; }
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.55;
+  }
 }
 
 /* Compact badge */
@@ -57,8 +67,14 @@
   white-space: nowrap;
 }
 
-.three-minute-timer-badge--green   { background: #dcfce7; color: #15803d; }
-.three-minute-timer-badge--amber   { background: #fef3c7; color: #b45309; }
+.three-minute-timer-badge--green {
+  background: #dcfce7;
+  color: #15803d;
+}
+.three-minute-timer-badge--amber {
+  background: #fef3c7;
+  color: #b45309;
+}
 .three-minute-timer-badge--critical {
   background: #fee2e2;
   color: #dc2626;

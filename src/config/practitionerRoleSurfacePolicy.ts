@@ -302,6 +302,31 @@ export function mergeRoleAwarePractitionerDensityProfile(profile, context: any =
   };
 }
 
+/**
+ * Thin defaulting wrapper around mergeRoleAwarePractitionerDensityProfile.
+ * Lives here (not practitionerCleanup.config.tsx, its only caller's original
+ * home) because moving it broke a real circular dependency: this file already
+ * imports isPractitionerCleanupEnabled/PRACTITIONER_CLEANUP from
+ * practitionerCleanup.config.tsx, which in turn only needed this file for
+ * this one wrapper — a clean split with no functional change.
+ * @param {import('./screenDensityModeModel').ScreenDensityProfile | null | undefined} profile
+ * @param {{ role?: string | null, screenMode?: string | null }} [context]
+ */
+export function mergePractitionerDensityProfile(profile, context: any = {}) {
+  if (!isPractitionerCleanupEnabled() || !profile) {
+    return profile ?? null;
+  }
+
+  if (!context?.role && !context?.screenMode) {
+    return mergeRoleAwarePractitionerDensityProfile(profile, {
+      role: 'registration_clerk',
+      screenMode: 'RECEPTION_SCREEN',
+    });
+  }
+
+  return mergeRoleAwarePractitionerDensityProfile(profile, context);
+}
+
 export function resolvePractitionerPatientCardBadgeLimit(context: any = {}) {
   const tier = resolvePractitionerLayoutTier(context);
   if (

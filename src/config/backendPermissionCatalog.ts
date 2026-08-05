@@ -88,6 +88,9 @@ export const Permission = Object.freeze({
   OVERRIDE_SAFETY_CHECKS: 'OVERRIDE_SAFETY_CHECKS',
   ENFORCE_MFA: 'ENFORCE_MFA',
   MANAGE_MFA: 'MANAGE_MFA',
+  VIEW_SURGE_COMMAND: 'VIEW_SURGE_COMMAND',
+  ACTIVATE_SURGE_MODE: 'ACTIVATE_SURGE_MODE',
+  INGEST_SURGE_PATIENTS: 'INGEST_SURGE_PATIENTS',
 } as const);
 
 export type BackendPermission = (typeof Permission)[keyof typeof Permission];

@@ -1,19 +1,11 @@
 import type { Application, RequestHandler, Router } from 'express';
-import boardingRoutes from './boarding.routes';
-import capacityRoutes from './capacity.routes';
-import copilotRoutes from './copilot.routes';
-import deteriorationRoutes from './deterioration.routes';
 import digitalTwinRoutes from './digital-twin.routes';
-import emsRoutes from './ems.routes';
 import federatedRoutes from './federated.routes';
-import governanceRoutes from './governance.routes';
 import handoverRoutes from './handover.routes';
 import healthRoutes from './health.routes';
 import intakeRoutes from './smart-intake.routes';
 import iotRoutes from './iot.routes';
 import mohRoutes from './moh.routes';
-import protocolRoutes from './protocol.routes';
-import reassessmentRoutes from './reassessment.routes';
 import simulationRoutes from './simulation.routes';
 import wearableRoutes from './wearable.routes';
 
@@ -54,48 +46,6 @@ export const ROUTES: ApiRouteRegistration[] = [
     description: 'comprehensive system health checks',
   },
   {
-    path: '/capacity',
-    router: capacityRoutes,
-    version: 'v1',
-    enabled: true,
-    description: 'capacity dashboard',
-  },
-  {
-    path: '/ems',
-    router: emsRoutes,
-    version: 'v1',
-    enabled: true,
-    description: 'EMS intake and tracking',
-  },
-  {
-    path: '/boarding',
-    router: boardingRoutes,
-    version: 'v1',
-    enabled: true,
-    description: 'boarding metrics',
-  },
-  {
-    path: '/protocol',
-    router: protocolRoutes,
-    version: 'v1',
-    enabled: true,
-    description: 'clinical protocol triggers',
-  },
-  {
-    path: '/deterioration',
-    router: deteriorationRoutes,
-    version: 'v1',
-    enabled: true,
-    description: 'deterioration prediction',
-  },
-  {
-    path: '/copilot',
-    router: copilotRoutes,
-    version: 'v1',
-    enabled: true,
-    description: 'ED Copilot',
-  },
-  {
     path: '/intake',
     router: intakeRoutes,
     version: 'v1',
@@ -131,13 +81,6 @@ export const ROUTES: ApiRouteRegistration[] = [
     description: 'real-time simulation',
   },
   {
-    path: '/governance',
-    router: governanceRoutes,
-    version: 'v1',
-    enabled: true,
-    description: 'AI governance',
-  },
-  {
     path: '/handover',
     router: handoverRoutes,
     version: 'v1',
@@ -157,13 +100,6 @@ export const ROUTES: ApiRouteRegistration[] = [
     version: 'v1',
     enabled: true,
     description: 'digital twin',
-  },
-  {
-    path: '/reassessment',
-    router: reassessmentRoutes,
-    version: 'v1',
-    enabled: true,
-    description: 'reassessment queue and scheduling',
   },
 ];
 

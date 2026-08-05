@@ -1,4 +1,4 @@
-import { Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import {
   UnifiedPatient as Patient,
   type IUnifiedPatient as IPatient,
@@ -24,6 +24,7 @@ export interface DischargeReadiness {
   barriersToDischarge: string[];
 }
 
+@Injectable()
 export class DischargePredictionService {
   async calculateDischargeReadiness(patientId: string): Promise<DischargeReadiness> {
     const patient = await Patient.findById(patientId);

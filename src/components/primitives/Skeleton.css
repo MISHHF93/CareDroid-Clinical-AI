@@ -3,15 +3,21 @@
   background: linear-gradient(
     90deg,
     var(--cd-bg-sunken) 25%,
-    hsl(var(--cd-palette-slate-200) / .7) 50%,
+    hsl(var(--cd-palette-slate-200) / 0.7) 50%,
     var(--cd-bg-sunken) 75%
   );
   background-size: 200% 100%;
   animation: cd-shimmer 1.6s ease-in-out infinite;
   border-radius: var(--cd-radius-sm);
 }
-.cd-skeleton--rounded { border-radius: var(--cd-radius-full); }
+.cd-skeleton--rounded {
+  border-radius: var(--cd-radius-full);
+}
 @keyframes cd-shimmer {
-  0%   { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }

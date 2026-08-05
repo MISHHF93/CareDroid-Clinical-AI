@@ -110,7 +110,8 @@
     color-mix(in srgb, var(--color-surface) 86%, white 0%) 84%
   );
   background-size: 220% 100%;
-  animation: ed-whiteboard-skeleton var(--motion-skeleton-duration, 1.15s) var(--motion-ease-standard, ease-in-out) infinite;
+  animation: ed-whiteboard-skeleton var(--motion-skeleton-duration, 1.15s)
+    var(--motion-ease-standard, ease-in-out) infinite;
 }
 
 @keyframes ed-whiteboard-skeleton {

@@ -10,7 +10,7 @@ import { spawnSync } from 'node:child_process';
 import { execSync } from 'node:child_process';
 
 const STEPS = [
-  ['feature-coverage-matrix:write-docs', 'docs/feature-coverage-matrix.md'],
+  ['feature-coverage-matrix:write-docs', 'docs/architecture/feature-coverage-matrix.md'],
   ['saas-compliance-audit:write-docs', 'docs/saas-compliance-audit.md'],
   ['orphan-detection:write-docs', 'docs/orphan-detection-report.md'],
   ['duplicate-system-audit:write-docs', 'docs/duplicate-system-audit.md'],

@@ -66,7 +66,8 @@
 .tool-header {
   background: var(--app-surface-1);
   border: 1px solid var(--cdl-clinical-border, var(--app-border));
-  border-left: 3px solid color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 55%, transparent);
+  border-left: 3px solid
+    color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 55%, transparent);
   border-radius: var(--cdl-clinical-radius-lg, var(--app-radius-lg, 18px));
   padding: 32px;
   margin-bottom: 32px;
@@ -97,8 +98,17 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  background: color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 10%, var(--app-surface-muted));
-  border: 1px solid color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 22%, var(--app-border));
+  background: color-mix(
+    in srgb,
+    var(--app-accent-action, var(--app-accent-interactive)) 10%,
+    var(--app-surface-muted)
+  );
+  border: 1px solid
+    color-mix(
+      in srgb,
+      var(--app-accent-action, var(--app-accent-interactive)) 22%,
+      var(--app-border)
+    );
   color: var(--app-accent-action, var(--app-accent-interactive));
 }
 
@@ -139,9 +149,18 @@
 
 .tool-category-badge {
   padding: 6px 12px;
-  border: 1px solid color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 28%, var(--app-border));
+  border: 1px solid
+    color-mix(
+      in srgb,
+      var(--app-accent-action, var(--app-accent-interactive)) 28%,
+      var(--app-border)
+    );
   border-radius: 999px;
-  background: color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 9%, var(--app-surface));
+  background: color-mix(
+    in srgb,
+    var(--app-accent-action, var(--app-accent-interactive)) 9%,
+    var(--app-surface)
+  );
   color: var(--app-accent-action, var(--app-accent-interactive));
   font-size: 12px;
   font-weight: 600;
@@ -175,8 +194,17 @@
 .btn-share-tool {
   min-height: var(--touch-target-min);
   padding: 10px 16px;
-  border: 1px solid color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 34%, var(--app-border));
-  background: color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 9%, var(--app-surface));
+  border: 1px solid
+    color-mix(
+      in srgb,
+      var(--app-accent-action, var(--app-accent-interactive)) 34%,
+      var(--app-border)
+    );
+  background: color-mix(
+    in srgb,
+    var(--app-accent-action, var(--app-accent-interactive)) 9%,
+    var(--app-surface)
+  );
   border-radius: var(--app-radius-md, 12px);
   font-weight: 600;
   font-size: clamp(0.875rem, 2vw + 0.5rem, 0.9375rem);
@@ -357,7 +385,11 @@
 }
 
 .ai-integration-panel {
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--app-accent-2, var(--accent-2)) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--primary-color) 0%,
+    var(--app-accent-2, var(--accent-2)) 100%
+  );
   color: var(--app-on-solid);
   border-radius: 12px;
   padding: 32px;
@@ -577,7 +609,9 @@
   border-radius: 8px;
   color: var(--app-fg);
   cursor: pointer;
-  transition: border-color 0.2s ease, background 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
   font-family: inherit;
   font-size: 14px;
 }
@@ -860,4 +894,3 @@
   background: var(--app-overlay-on-surface-strong);
   color: var(--app-fg);
 }
-

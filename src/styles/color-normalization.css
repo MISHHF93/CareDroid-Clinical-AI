@@ -40,24 +40,27 @@ html {
   background-color: var(--app-bg, var(--medical-surface-page));
 }
 
-:is(.app-shell, .emergency-app-shell) :is(
-    .sidebar,
-    .caredroid-header--compact,
-    .ed-os-header,
-    .session-chrome-bar
-  ) {
+:is(.app-shell, .emergency-app-shell)
+  :is(.sidebar, .caredroid-header--compact, .ed-os-header, .session-chrome-bar) {
   background: var(--app-surface-1, var(--medical-surface-card));
   border-color: var(--medical-border);
   color: var(--medical-ink);
 }
 
-:is(.app-shell, .emergency-app-shell) :is(
-    button,
-    [role='button'],
-    .btn,
-    [class*='__action'],
-    [class*='-button']
-  ):not([class*='--danger']):not([class*='--primary']):not(.btn-danger) {
+/* Cycle 269: [class*='__action'] is a 4th substring family on this file's
+   border-color sweep, exempting [class*='--danger']/[class*='--primary'] BEM
+   modifiers but not [class*='--critical'] — a distinct severity modifier used
+   by reception-task-sheet__action--critical (ReceptionPatientTaskSheet.tsx's
+   "Escalate to nurse" action, shown only when isHighRisk is true). Its own
+   CSS deliberately sets border-color: var(--cdl-critical-border) (a
+   color-mix of #dc2626 red into the neutral border), the visual cue that
+   this is an urgent, patient-safety-relevant escalation — this sweep was
+   flattening it to the same neutral gray-blue border as every ordinary
+   action button, silently erasing the one signal this button most needs. */
+:is(.app-shell, .emergency-app-shell)
+  :is(button, [role='button'], .btn, [class*='__action'], [class*='-button']):not(
+    [class*='--danger']
+  ):not([class*='--primary']):not([class*='--critical']):not(.btn-danger) {
   border-color: color-mix(in srgb, var(--medical-border) 88%, var(--medical-accent) 12%);
 }
 
@@ -80,12 +83,72 @@ html {
    overwrote their deliberate brand-blue background with #374151, which on
    its own would still be readable, but combined with text-normalization.css's
    __cta rule (see there) collapsed to ~1.02:1, worse than the two cases
-   above. */
-:is(.app-shell, .emergency-app-shell) :is(
-    [class*='--primary'],
-    .btn-primary,
-    [class*='cta']
-  ):not(.reception-desk-toolbar__action):not(.cdl-zone--primary-actions):not(.fj-critical-banner__cta):not(.profile-copilot-card__cta):not(.reception-job-profile-card__cta):not(.reception-skill-strip__cta) {
+   above.
+   Cycle 261: swept every remaining "cta"-substring className in the app for
+   the same collision rather than waiting to be told about one more instance
+   at a time (same discipline as Cycle 218's alias-table sweep). 6 more real
+   hits, none previously excluded, none protected by !important: .cdl-public-
+   page__cta (a light "supporting info" <aside> on /help, own CSS in
+   cdl-public-page.css), .profile-section-header__cta and .profile-activity-
+   cta (plain react-router <Link> text actions on /profile with their own
+   deliberate link-token colors — .profile-activity-cta even has its own
+   dedicated override in profile-surface-normalization.css that this sweep's
+   higher specificity was silently defeating), .reception-attention__cta (a
+   subtle inline "Open" label inside a reception alert row, own background a
+   faint ink tint, not solid navy), .platform-entry__cta (plain dark-gray
+   text labels on the /start entry cards, no background of their own at all
+   until this sweep added one), and .reception-queue-row__cta (the base,
+   non-critical Waiting List action button — its --critical sibling already
+   has !important protection from Cycle 257, but the plain state didn't).
+   Cycle 266: swept the [class*='--primary'] side of this same rule for the
+   first time (previously only the [class*='cta'] side had been audited).
+   6 more real hits, ranked by severity: .platform-entry__card--primary is
+   the worst — a whole card (not a button), own CSS only sets a subtle
+   border tint, and this sweep was painting its entire surface solid dark
+   navy, the same "whole section painted dark" bug class as Cycle 199's
+   original .cdl-zone--primary-actions finding. .patient-orchestration__chip
+   --primary is a semantic warning-amber chip (own CSS: amber background,
+   amber text) that this sweep was silently repainting as a plain dark
+   "primary action" chip, destroying the warning signal. .reception-prepare
+   __option--primary and .entry-shell__link--primary both had a light tinted
+   background with dark text (info-blue and #374151-at-10%-opacity
+   respectively) inverted to solid dark background with white text — same
+   "flips design intent, not necessarily unreadable but clearly wrong" shape
+   as several Cycle 261 cases. .account-menu__item--primary had no
+   background/color of its own at all (just font-weight), so the sweep was
+   adding an unwanted solid box around a menu item meant to read as plain
+   bold text. .workflow-automation-command-bar__btn--primary's own CSS uses
+   a subtle 12%-opacity accent tint, also inverted to solid. The other 12
+   --primary-suffixed classNames found in the same sweep already have their
+   own solid, readable brand-colored button styling (different hue than this
+   sweep's #374151, but not a contrast break) — left alone as a lower-value
+   brand-consistency nit, not the same bug class as the 6 fixed here.
+   Cycle 269: .critical-alert-banner__link (CriticalAlertBanner.tsx's "View
+   alerts" action — cdl-alarm-banner__action--primary matches [class*=
+   '--primary'] too) is the worst instance of this bug class found in the
+   whole campaign. Its own CSS (cdl-v2/alarm.css) is a solid critical-red
+   button (--cdl-critical, #dc2626 in light theme) with white text
+   (--cdl-on-brand) for AA-passing 4.83:1 contrast — this is the action
+   button on the platform's unacknowledged-critical-alerts banner. This sweep
+   overwrites that background with #374151, destroying the "this is CRITICAL"
+   red visual weight; combined with text-normalization.css's __link rule (see
+   there) also overwriting the white text to link-blue, measured contrast
+   drops to ~1.18:1 against the intended red background — effectively
+   invisible text on the app's single highest-severity alert action. */
+:is(.app-shell, .emergency-app-shell)
+  :is([class*='--primary'], .btn-primary, [class*='cta']):not(.reception-desk-toolbar__action):not(
+    .cdl-zone--primary-actions
+  ):not(.fj-critical-banner__cta):not(.profile-copilot-card__cta):not(
+    .reception-job-profile-card__cta
+  ):not(.reception-skill-strip__cta):not(.cdl-public-page__cta):not(
+    .profile-section-header__cta
+  ):not(.profile-activity-cta):not(.reception-attention__cta):not(.platform-entry__cta):not(
+    .reception-queue-row__cta
+  ):not(.platform-entry__card--primary):not(.patient-orchestration__chip--primary):not(
+    .reception-prepare__option--primary
+  ):not(.entry-shell__link--primary):not(.account-menu__item--primary):not(
+    .workflow-automation-command-bar__btn--primary
+  ):not(.critical-alert-banner__link) {
   background: #374151;
   border-color: color-mix(in srgb, var(--medical-accent) 55%, var(--medical-border));
   color: var(--app-on-solid, #ffffff);
@@ -97,7 +160,8 @@ html {
   color: var(--medical-ink);
 }
 
-:is(.app-shell, .emergency-app-shell) :is(
+:is(.app-shell, .emergency-app-shell)
+  :is(
     [class$='-card'],
     [class*='-card '],
     [class$='-panel'],

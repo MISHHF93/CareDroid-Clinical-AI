@@ -134,7 +134,7 @@
 }
 
 .btn-check-interactions:hover:not(:disabled) {
-  background: #E6578A;
+  background: #e6578a;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(255, 107, 157, 0.3);
 }
