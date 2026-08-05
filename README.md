@@ -162,10 +162,11 @@ CareDroid runs **17 distinct AI services** across generation, prediction, edge i
 | Anomaly detection | External ML service (`anomaly-detection:5000`) |
 | Real-time | WebSocket + SSE (`WebSocketManager`, `RealTimeCostService`) |
 | MCP tooling | Custom MCP server package (`mcp/`) |
+| App navigator | Standalone route-lookup RAG (`navigator/`, catalog-only by default) |
 | Charts | Recharts |
 | Icons | Tabler Icons, Lucide React |
 | Optional | Redis cache, observability stack |
-| Package manager | npm (separate locks for root, `backend/`, and `mcp/`) |
+| Package manager | npm (separate locks for root, `backend/`, `mcp/`, and `navigator/`) |
 
 **Requirements:** Node `>=20.19.0 <25`, npm `>=10` (see `.node-version`).
 
@@ -192,6 +193,7 @@ CareDroid-Clinical-AI/
 ├── backend/               # NestJS API, TypeORM entities, AI executors
 │   └── src/modules/       # Patients, AI, auth, audit, tenant, fleet, …
 ├── mcp/                   # MCP server package
+├── navigator/             # Standalone "where do I find X" route-lookup RAG
 ├── e2e/                   # Playwright end-to-end specs
 ├── tests/                 # Cross-stack integration tests
 ├── scripts/               # Dev stack, audits, QA, build utilities
@@ -243,17 +245,21 @@ Local defaults use **SQLite** and disable optional ML/RAG services so the app bo
 | Backend (direct, internal) | http://localhost:3350 |
 | Health check | http://localhost:5190/health |
 | API docs (Swagger) | http://localhost:5190/api/docs |
+| App navigator ("where do I find X?") | http://localhost:4178 |
 
 ### Focused commands
 
 ```bash
 npm run dev:web          # Frontend only (Vite on :5190)
 npm run dev:api          # Backend only (Nest on :3350)
+npm start -- --no-navigator  # Full stack, skip the app navigator
 npm run backend:build    # Compile NestJS
 npm run backend:start    # Run compiled backend
 npm run typecheck:frontend
 npm run lint:all
 ```
+
+`navigator/` (see `navigator/README.md`) is a standalone dev aid, not part of the app itself — it answers "where do I manage X?" from the canonical route catalog (`src/config/routes.config.ts`), grounded so it can never invent a route. It has zero runtime dependencies and starts automatically alongside the rest of the stack; refresh its catalog after adding routes with `cd navigator && npm run sync:catalog`.
 
 ### Demo walkthrough
 

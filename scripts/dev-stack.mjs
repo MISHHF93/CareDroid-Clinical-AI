@@ -8,6 +8,7 @@ import http from 'node:http';
 
 const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const backendDir = resolve(rootDir, 'backend');
+const navigatorDir = resolve(rootDir, 'navigator');
 const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 
 const spawnDevProcess = (entry) => {
@@ -31,6 +32,10 @@ const args = new Set(rawArgs);
 const backendOnly = args.has('--backend-only') || args.has('--api-only');
 const frontendOnly = args.has('--frontend-only') || args.has('--web-only');
 const forceRestart = args.has('--force-restart');
+// Navigator is an optional, independent dev-aid (no dependency on backend/frontend
+// health) — it defaults to on, alongside the rest of the stack, and only opts out
+// explicitly, unlike backend/frontend which use *-only flags to narrow the stack.
+const noNavigator = args.has('--no-navigator') || backendOnly || frontendOnly;
 
 if (backendOnly && frontendOnly) {
   console.error('Choose either --backend-only or --frontend-only, not both.');
@@ -58,11 +63,17 @@ const parsePort = (value, fallback, label) => {
 /** CareDroid-local defaults — kept away from 3000/5173/8000 (common other-app ports). */
 const DEFAULT_FRONTEND_PORT = '5190';
 const DEFAULT_BACKEND_PORT = '3350';
+const DEFAULT_NAVIGATOR_PORT = '4178';
 
 const preferredFrontendPort = parsePort(
   argValue('--frontend-port') || process.env.FRONTEND_PORT || process.env.VITE_DEV_PORT,
   DEFAULT_FRONTEND_PORT,
   'frontend',
+);
+const preferredNavigatorPort = parsePort(
+  argValue('--navigator-port') || process.env.NAVIGATOR_PORT,
+  DEFAULT_NAVIGATOR_PORT,
+  'navigator',
 );
 const preferredBackendPort = parsePort(
   argValue('--backend-port') || process.env.BACKEND_PORT || process.env.PORT,
@@ -413,6 +424,16 @@ const shutdown = (code = 0) => {
   for (const child of children) {
     terminateChild(child);
   }
+  // Belt-and-suspenders for navigator specifically: observed live that
+  // `taskkill /pid <cmd.exe> /T /F` does not reliably reach the node process
+  // npm.cmd ultimately spawns for `npm start` on Windows (backend's `npm run
+  // start:prod` tree-kills cleanly; navigator's plain `npm start` sometimes
+  // leaves node src/server.js listening after its cmd.exe wrapper is gone).
+  // killProcessesOnPort is synchronous (spawnSync), so this actually frees
+  // the port before shutdown proceeds, rather than racing the async taskkill above.
+  if (!noNavigator) {
+    killProcessesOnPort(Number.parseInt(preferredNavigatorPort, 10), 'navigator');
+  }
   setTimeout(() => process.exit(code), 250);
 };
 
@@ -439,12 +460,20 @@ const spawnManagedProcess = (entry) => {
       `[${entry.name}] failed to start ${entry.command} ${entry.args.join(' ')} in ${entry.cwd}`,
     );
     console.error(error?.stack || error?.message || error);
+    if (entry.optional) return;
     shutdown(1);
   });
 
   child.on('exit', async (code, signal) => {
     if (stopping) return;
     const exitCode = code ?? (signal ? 1 : 0);
+
+    if (entry.optional && exitCode !== 0) {
+      console.warn(
+        `[${entry.name}] exited${signal ? ` with signal ${signal}` : ` with code ${exitCode}`} — optional process, rest of the stack keeps running.`,
+      );
+      return;
+    }
 
     if (entry.name === 'api' && exitCode !== 0) {
       const healthy = await probeBackendHealth(backendPort);
@@ -541,6 +570,9 @@ console.log('Starting CareDroid local stack...');
 console.log(`App:      ${frontendOrigin}  (API proxied via /api)`);
 console.log(`Backend:  http://localhost:${backendPort}  (internal Nest)`);
 console.log(`Health:   ${frontendOrigin}/health`);
+if (!noNavigator) {
+  console.log(`Navigator: http://localhost:${preferredNavigatorPort}  (ask "where do I manage X?")`);
+}
 if (backendAlreadyHealthy) {
   console.log(
     `Backend already healthy on port ${backendPort}; skipping API restart. Use --force-restart to start a new instance.`,
@@ -617,5 +649,33 @@ if (!backendOnly) {
     args: ['run', 'dev:web'],
     env: frontendEnv,
   });
+  }
+}
+
+// Navigator has no dependency on backend/frontend health (it only reads its own
+// committed route catalog), so it starts independently rather than joining the
+// wait-for-backend/reuse-detection chain above. Errors here are warnings, not
+// stack-fatal, since it is a dev-aid, not a required part of the app.
+if (!noNavigator) {
+  const navigatorCatalogPath = resolve(navigatorDir, 'data', 'catalog.json');
+  if (!existsSync(navigatorCatalogPath)) {
+    console.warn(
+      '[navigator] data/catalog.json missing — run "npm run sync:catalog" inside navigator/ first. Skipping.',
+    );
+  } else if (await probeHttpHealth(preferredNavigatorPort, '/api/health').then((result) => result.ok)) {
+    console.log(`[navigator] reusing existing instance on port ${preferredNavigatorPort}.`);
+  } else if (await isPortInUse(preferredNavigatorPort)) {
+    console.warn(
+      `[navigator] port ${preferredNavigatorPort} is in use by another process — skipping (use --navigator-port to choose another, or --no-navigator to disable).`,
+    );
+  } else {
+    spawnManagedProcess({
+      name: 'navigator',
+      cwd: navigatorDir,
+      command: npmCommand,
+      args: ['start'],
+      env: withDefaults({ PORT: preferredNavigatorPort, HOST: '127.0.0.1' }),
+      optional: true,
+    });
   }
 }

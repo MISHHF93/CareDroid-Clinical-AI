@@ -1,0 +1,757 @@
+{
+  "schemaVersion": 1,
+  "source": "CareDroid CANONICAL_ROUTE_MAP",
+  "sourceCommit": "44f68a7c699bb0a99d3613854c422582d6277198",
+  "generatedAt": "2026-08-05T20:29:41.209Z",
+  "records": [
+    {
+      "id": "command-center",
+      "label": "Hospital Command Center",
+      "description": "Real-time ED operational awareness — occupancy, waits, staff, EMS, bottlenecks, alerts, AI recommendations, and 3-minute compliance.",
+      "path": "/emergency/command-center",
+      "component": "HospitalCommandCenter",
+      "navigationGroup": "Command",
+      "breadcrumbs": [
+        "Command",
+        "Command Center"
+      ],
+      "aliases": [],
+      "workflowOwner": "Charge nurse / ED command",
+      "requiredPermissions": [
+        "patient:read"
+      ]
+    },
+    {
+      "id": "reception",
+      "label": "Reception",
+      "description": "Emergency reception desk for arrival capture, identity verification, and queue handoff.",
+      "path": "/emergency/reception",
+      "component": "ReceptionWorkspace",
+      "navigationGroup": "Emergency",
+      "breadcrumbs": [
+        "Emergency",
+        "Reception"
+      ],
+      "aliases": [],
+      "workflowOwner": "Registration clerk / emergency receptionist",
+      "requiredPermissions": [
+        "patient:read"
+      ]
+    },
+    {
+      "id": "whiteboard",
+      "label": "Whiteboard",
+      "description": "Role-aware operational dashboard and emergency whiteboard.",
+      "path": "/emergency/whiteboard",
+      "component": "EmergencyWhiteboard",
+      "navigationGroup": "Command",
+      "breadcrumbs": [
+        "Command",
+        "Whiteboard"
+      ],
+      "aliases": [],
+      "workflowOwner": "ED operations",
+      "requiredPermissions": [
+        "patient:read"
+      ]
+    },
+    {
+      "id": "dispatch",
+      "label": "Dispatch",
+      "description": "Emergency call intake and dispatch coordination.",
+      "path": "/emergency/dispatch",
+      "component": "DispatchConsole",
+      "navigationGroup": "Emergency",
+      "breadcrumbs": [
+        "Emergency",
+        "Calls"
+      ],
+      "aliases": [
+        "/emergency/calls"
+      ],
+      "workflowOwner": "Dispatcher",
+      "requiredPermissions": [
+        "patient:read"
+      ]
+    },
+    {
+      "id": "collaboration",
+      "label": "Collaboration Hub",
+      "description": "Department channels, patient threads, incident coordination, and AI Chief recommendations in one place.",
+      "path": "/emergency/collaboration",
+      "component": "CollaborationHub",
+      "navigationGroup": "Command",
+      "breadcrumbs": [
+        "Command",
+        "Collaboration Hub"
+      ],
+      "aliases": [],
+      "workflowOwner": "All ED staff",
+      "requiredPermissions": [
+        "collaboration:read"
+      ]
+    },
+    {
+      "id": "ems",
+      "label": "EMS",
+      "description": "EMS arrivals, pre-arrival notifications, bay readiness, and handoff completion.",
+      "path": "/emergency/ems",
+      "component": "EMSPipeline",
+      "navigationGroup": "Emergency",
+      "breadcrumbs": [
+        "Emergency",
+        "EMS"
+      ],
+      "aliases": [
+        "/emergency/pre-arrival"
+      ],
+      "workflowOwner": "EMS coordinator / paramedic",
+      "requiredPermissions": [
+        "patient:read"
+      ]
+    },
+    {
+      "id": "ed-readiness",
+      "label": "ED Readiness",
+      "description": "ED readiness board for inbound critical arrivals and operational preparedness.",
+      "path": "/emergency/ed-readiness",
+      "component": "FullJourneyOperatingPage",
+      "navigationGroup": "Emergency",
+      "breadcrumbs": [
+        "Emergency",
+        "Readiness"
+      ],
+      "aliases": [
+        "/emergency/readiness"
+      ],
+      "workflowOwner": "EMS coordinator",
+      "requiredPermissions": [
+        "patient:read"
+      ]
+    },
+    {
+      "id": "intake",
+      "label": "Intake",
+      "description": "Standalone intake surface; reception-embedded Smart Intake is the canonical arrival workflow.",
+      "path": "/emergency/intake",
+      "component": "SmartIntake",
+      "navigationGroup": "Patients",
+      "breadcrumbs": [
+        "Patients",
+        "Intake"
+      ],
+      "aliases": [
+        "/intake"
+      ],
+      "workflowOwner": "Reception / triage",
+      "requiredPermissions": [
+        "patient:create"
+      ]
+    },
+    {
+      "id": "patients",
+      "label": "Patients",
+      "description": "Patient list and journey overview.",
+      "path": "/emergency/patients",
+      "component": "PatientsRoute",
+      "navigationGroup": "Patients",
+      "breadcrumbs": [
+        "Patients"
+      ],
+      "aliases": [
+        "/patients"
+      ],
+      "workflowOwner": "Clinical team",
+      "requiredPermissions": [
+        "patient:read"
+      ]
+    },
+    {
+      "id": "patient-detail",
+      "label": "Patient Profile",
+      "description": "Patient-specific detail route for direct chart review.",
+      "path": "/patients/:id",
+      "component": "PatientProfileRoute",
+      "navigationGroup": "Patients",
+      "breadcrumbs": [
+        "Patients",
+        "Patient Profile"
+      ],
+      "aliases": [],
+      "workflowOwner": "Clinical team",
+      "requiredPermissions": [
+        "patient:read"
+      ]
+    },
+    {
+      "id": "queues",
+      "label": "Queues",
+      "description": "Waiting, triage, reassessment, and treatment queue coordination.",
+      "path": "/emergency/queues",
+      "component": "QueueRoute",
+      "navigationGroup": "Patients",
+      "breadcrumbs": [
+        "Patients",
+        "Queue"
+      ],
+      "aliases": [
+        "/queue"
+      ],
+      "workflowOwner": "Charge nurse / patient flow coordinator",
+      "requiredPermissions": [
+        "patient:read"
+      ]
+    },
+    {
+      "id": "triage",
+      "label": "Triage",
+      "description": "Triage nurse entry point focused on pretriage and acuity workflow.",
+      "path": "/triage",
+      "component": "TriageWorkspaceRoute",
+      "navigationGroup": "Clinical",
+      "breadcrumbs": [
+        "Clinical",
+        "Triage"
+      ],
+      "aliases": [],
+      "workflowOwner": "Triage nurse",
+      "requiredPermissions": [
+        "patient:read",
+        "triage:read"
+      ]
+    },
+    {
+      "id": "reassessment",
+      "label": "Reassess",
+      "description": "Reassessment timers and overdue clinical review.",
+      "path": "/emergency/reassessment",
+      "component": "ReassessmentRoute",
+      "navigationGroup": "Clinical",
+      "breadcrumbs": [
+        "Clinical",
+        "Reassessment"
+      ],
+      "aliases": [],
+      "workflowOwner": "Nursing",
+      "requiredPermissions": [
+        "patient:read",
+        "triage:read"
+      ]
+    },
+    {
+      "id": "alerts",
+      "label": "Critical Alerts",
+      "description": "Critical alerts, escalation status, and acknowledgement workflow.",
+      "path": "/emergency/alerts",
+      "component": "ClinicalAlertsPage",
+      "navigationGroup": "Emergency",
+      "breadcrumbs": [
+        "Emergency",
+        "Alerts"
+      ],
+      "aliases": [
+        "/alerts"
+      ],
+      "workflowOwner": "Charge nurse / safety officer",
+      "requiredPermissions": [
+        "alert:read"
+      ]
+    },
+    {
+      "id": "diagnostics",
+      "label": "Diagnostics",
+      "description": "Diagnostic coordination for lab, radiology, medication, and order review.",
+      "path": "/emergency/diagnostics",
+      "component": "FullJourneyOperatingPage",
+      "navigationGroup": "Clinical",
+      "breadcrumbs": [
+        "Clinical",
+        "Diagnostics"
+      ],
+      "aliases": [
+        "/diagnostics"
+      ],
+      "workflowOwner": "Diagnostics team",
+      "requiredPermissions": [
+        "patient:read"
+      ]
+    },
+    {
+      "id": "handoffs",
+      "label": "Handoffs",
+      "description": "Shift, EMS, referral, and patient movement handoff coordination.",
+      "path": "/emergency/handoffs",
+      "component": "FullJourneyOperatingPage",
+      "navigationGroup": "Operations",
+      "breadcrumbs": [
+        "Operations",
+        "Handoffs"
+      ],
+      "aliases": [
+        "/handoffs"
+      ],
+      "workflowOwner": "Charge nurse / patient flow coordinator",
+      "requiredPermissions": [
+        "patient:read"
+      ]
+    },
+    {
+      "id": "capacity",
+      "label": "Flow & Capacity",
+      "description": "Capacity, boarding, bed pressure, and department throughput management.",
+      "path": "/emergency/capacity",
+      "component": "CapacityRoute",
+      "navigationGroup": "Operations",
+      "breadcrumbs": [
+        "Operations",
+        "Flow & Capacity"
+      ],
+      "aliases": [
+        "/departments"
+      ],
+      "workflowOwner": "Charge nurse / patient flow coordinator",
+      "requiredPermissions": [
+        "analytics:read"
+      ]
+    },
+    {
+      "id": "referrals",
+      "label": "Referrals",
+      "description": "Referral, consult, and transfer coordination.",
+      "path": "/emergency/referrals",
+      "component": "ReferralPanel",
+      "navigationGroup": "Clinical",
+      "breadcrumbs": [
+        "Clinical",
+        "Referrals"
+      ],
+      "aliases": [],
+      "workflowOwner": "Physician / charge nurse",
+      "requiredPermissions": [
+        "patient:read"
+      ]
+    },
+    {
+      "id": "copilot",
+      "label": "Copilot",
+      "description": "Sole conversational AI entry — opens the docked CareDroid Copilot (Unified AI node). Chat/Context/Safety live inside the panel.",
+      "path": "/emergency/copilot",
+      "component": "CopilotRoute",
+      "navigationGroup": "Intelligence",
+      "breadcrumbs": [
+        "Intelligence",
+        "CareDroid Copilot"
+      ],
+      "aliases": [
+        "/ai-chief",
+        "/copilot",
+        "/assistant",
+        "/chat",
+        "/ai"
+      ],
+      "workflowOwner": "Clinical leadership",
+      "requiredPermissions": [
+        "ai:read"
+      ]
+    },
+    {
+      "id": "tools",
+      "label": "Medical Tools",
+      "description": "Clinical calculators, protocols, and supporting medical tools.",
+      "path": "/emergency/tools",
+      "component": "ToolsOverview",
+      "navigationGroup": "Clinical",
+      "breadcrumbs": [
+        "Clinical",
+        "Medical Tools"
+      ],
+      "aliases": [],
+      "workflowOwner": "Clinical team",
+      "requiredPermissions": [
+        "patient:read"
+      ]
+    },
+    {
+      "id": "analytics",
+      "label": "Analytics",
+      "description": "Operational and clinical analytics for throughput, safety, and compliance review.",
+      "path": "/emergency/analytics",
+      "component": "EmergencyAnalytics",
+      "navigationGroup": "Intelligence",
+      "breadcrumbs": [
+        "Intelligence",
+        "Analytics"
+      ],
+      "aliases": [
+        "/analytics"
+      ],
+      "workflowOwner": "Hospital administrator / quality safety officer",
+      "requiredPermissions": [
+        "analytics:read"
+      ]
+    },
+    {
+      "id": "reports",
+      "label": "Reports",
+      "description": "Operational reporting, quality review, and safety evidence.",
+      "path": "/emergency/reports",
+      "component": "FullJourneyOperatingPage",
+      "navigationGroup": "Intelligence",
+      "breadcrumbs": [
+        "Intelligence",
+        "Reports"
+      ],
+      "aliases": [
+        "/reports"
+      ],
+      "workflowOwner": "Quality safety officer",
+      "requiredPermissions": [
+        "reports:read"
+      ]
+    },
+    {
+      "id": "staff",
+      "label": "Staff",
+      "description": "Staffing and shift coordination entry; routed to handoff/shift surfaces in the current app.",
+      "path": "/staff",
+      "component": "EmergencyShiftSummary",
+      "navigationGroup": "Operations",
+      "breadcrumbs": [
+        "Operations",
+        "Staff"
+      ],
+      "aliases": [],
+      "workflowOwner": "Charge nurse",
+      "requiredPermissions": [
+        "staff:read"
+      ]
+    },
+    {
+      "id": "pulse",
+      "label": "Pulse",
+      "description": "Live ED pulse and status summary.",
+      "path": "/emergency/pulse",
+      "component": "EmergencyDepartmentPulse",
+      "navigationGroup": "Intelligence",
+      "breadcrumbs": [
+        "Intelligence",
+        "Pulse"
+      ],
+      "aliases": [],
+      "workflowOwner": "ED operations",
+      "requiredPermissions": [
+        "analytics:read"
+      ]
+    },
+    {
+      "id": "shift",
+      "label": "Shift",
+      "description": "Shift summary and handoff readiness.",
+      "path": "/emergency/shift",
+      "component": "EmergencyShiftSummary",
+      "navigationGroup": "Operations",
+      "breadcrumbs": [
+        "Operations",
+        "Shift"
+      ],
+      "aliases": [],
+      "workflowOwner": "Charge nurse",
+      "requiredPermissions": [
+        "staff:read"
+      ]
+    },
+    {
+      "id": "settings",
+      "label": "Settings",
+      "description": "Role-aware ED settings and platform configuration.",
+      "path": "/emergency/settings",
+      "component": "EmergencySettings",
+      "navigationGroup": "Administration",
+      "breadcrumbs": [
+        "Administration",
+        "Settings"
+      ],
+      "aliases": [],
+      "workflowOwner": "IT administrator",
+      "requiredPermissions": [
+        "settings:read"
+      ]
+    },
+    {
+      "id": "help",
+      "label": "Help",
+      "description": "Route-aware and role-aware CareDroid user manual.",
+      "path": "/emergency/help",
+      "component": "HelpHubPage",
+      "navigationGroup": "Help",
+      "breadcrumbs": [
+        "Help"
+      ],
+      "aliases": [
+        "/help"
+      ],
+      "workflowOwner": "CareDroid support",
+      "requiredPermissions": []
+    },
+    {
+      "id": "fleet",
+      "label": "Fleet",
+      "description": "EMS fleet command dashboard for ambulance tracking, dispatch coordination, and live status.",
+      "path": "/fleet/command",
+      "component": "FleetDashboard",
+      "navigationGroup": "Operations",
+      "breadcrumbs": [
+        "Operations",
+        "Fleet"
+      ],
+      "aliases": [],
+      "workflowOwner": "EMS operations",
+      "requiredPermissions": [
+        "patient:read"
+      ]
+    },
+    {
+      "id": "hospital-map",
+      "label": "Hospital Map",
+      "description": "Hospital-wide bed map with unit occupancy, capacity score, and diversion status.",
+      "path": "/hospital-map",
+      "component": "HospitalMapDashboard",
+      "navigationGroup": "Operations",
+      "breadcrumbs": [
+        "Operations",
+        "Hospital Map"
+      ],
+      "aliases": [],
+      "workflowOwner": "Hospital administrator / patient flow coordinator",
+      "requiredPermissions": [
+        "analytics:read"
+      ]
+    },
+    {
+      "id": "executive",
+      "label": "Executive",
+      "description": "C-suite KPI dashboard: patient volumes, wait times, LOS, platform health, and surge status.",
+      "path": "/executive",
+      "component": "HospitalCommandCenter",
+      "navigationGroup": "Intelligence",
+      "breadcrumbs": [
+        "Intelligence",
+        "Executive"
+      ],
+      "aliases": [],
+      "workflowOwner": "Hospital administrator",
+      "requiredPermissions": [
+        "analytics:read"
+      ]
+    },
+    {
+      "id": "predictive-analytics",
+      "label": "Predictive AI",
+      "description": "Predictive risk models for deterioration, readmission, mortality, and overcrowding.",
+      "path": "/predictive-analytics",
+      "component": "HospitalCommandCenter",
+      "navigationGroup": "Intelligence",
+      "breadcrumbs": [
+        "Intelligence",
+        "Predictive AI"
+      ],
+      "aliases": [],
+      "workflowOwner": "Clinical leadership",
+      "requiredPermissions": [
+        "analytics:read"
+      ]
+    },
+    {
+      "id": "medical-iot",
+      "label": "Medical IoT",
+      "description": "Medical IoT device roster with battery, alarm, and connectivity monitoring.",
+      "path": "/medical-iot",
+      "component": "MedicalIotDashboard",
+      "navigationGroup": "Operations",
+      "breadcrumbs": [
+        "Operations",
+        "Medical IoT"
+      ],
+      "aliases": [],
+      "workflowOwner": "IT administrator",
+      "requiredPermissions": [
+        "settings:read"
+      ]
+    },
+    {
+      "id": "surveillance",
+      "label": "Surveillance",
+      "description": "Surveillance extension route redirected to the ED whiteboard until a dedicated nexus page ships.",
+      "path": "/surveillance/nexus",
+      "component": "EmergencyWhiteboard",
+      "navigationGroup": "Operations",
+      "breadcrumbs": [
+        "Operations",
+        "Surveillance"
+      ],
+      "aliases": [],
+      "workflowOwner": "IT administrator",
+      "requiredPermissions": [
+        "settings:read"
+      ]
+    },
+    {
+      "id": "simulation",
+      "label": "Simulation",
+      "description": "Medical simulation suite — scenario library, player, debrief, and outcomes.",
+      "path": "/simulation",
+      "component": "MedicalSimulationSuite",
+      "navigationGroup": "Intelligence",
+      "breadcrumbs": [
+        "Intelligence",
+        "Simulation"
+      ],
+      "aliases": [
+        "/emergency/simulation",
+        "/medical-simulation"
+      ],
+      "workflowOwner": "Education / quality",
+      "requiredPermissions": [
+        "analytics:read"
+      ]
+    },
+    {
+      "id": "laboratory",
+      "label": "Laboratory",
+      "description": "Laboratory results dashboard — specimen tracking, pending orders, and critical values.",
+      "path": "/laboratory",
+      "component": "LaboratoryDashboard",
+      "navigationGroup": "Clinical",
+      "breadcrumbs": [
+        "Clinical",
+        "Laboratory"
+      ],
+      "aliases": [],
+      "workflowOwner": "Laboratory",
+      "requiredPermissions": [
+        "labs:read"
+      ]
+    },
+    {
+      "id": "knowledge",
+      "label": "Knowledge Graph",
+      "description": "Knowledge graph extension route redirected to tools and guidance surfaces when not mounted.",
+      "path": "/knowledge-graph",
+      "component": "ToolsOverview",
+      "navigationGroup": "Intelligence",
+      "breadcrumbs": [
+        "Intelligence",
+        "Knowledge Graph"
+      ],
+      "aliases": [],
+      "workflowOwner": "Platform intelligence",
+      "requiredPermissions": [
+        "ai:read"
+      ]
+    },
+    {
+      "id": "ai-center",
+      "label": "AI Center",
+      "description": "AI operations dashboard: model health, expert roster, memory usage, RAG metrics, cost, and audit logs.",
+      "path": "/ai-command-center",
+      "component": "HospitalCommandCenter",
+      "navigationGroup": "Intelligence",
+      "breadcrumbs": [
+        "Intelligence",
+        "AI Center"
+      ],
+      "aliases": [],
+      "workflowOwner": "AI governance",
+      "requiredPermissions": [
+        "ai:read"
+      ]
+    },
+    {
+      "id": "cosmos",
+      "label": "Cosmos",
+      "description": "Retired visual extension route redirected to the operational dashboard.",
+      "path": "/cosmos",
+      "component": "EmergencyWhiteboard",
+      "navigationGroup": "Intelligence",
+      "breadcrumbs": [
+        "Intelligence",
+        "Cosmos"
+      ],
+      "aliases": [],
+      "workflowOwner": "CareDroid platform",
+      "requiredPermissions": [
+        "patient:read"
+      ]
+    },
+    {
+      "id": "admin",
+      "label": "Admin",
+      "description": "Administrative operations, staff workflows, tenant settings, and audit views.",
+      "path": "/admin",
+      "component": "AdminOperationsShell",
+      "navigationGroup": "Administration",
+      "breadcrumbs": [
+        "Administration",
+        "Admin"
+      ],
+      "aliases": [],
+      "workflowOwner": "Hospital administrator / IT administrator",
+      "requiredPermissions": [
+        "settings:read"
+      ]
+    },
+    {
+      "id": "audit",
+      "label": "Audit",
+      "description": "Governance and audit workspace.",
+      "path": "/audit",
+      "component": "PlatformGovernanceWorkspace",
+      "navigationGroup": "Administration",
+      "breadcrumbs": [
+        "Administration",
+        "Audit"
+      ],
+      "aliases": [],
+      "workflowOwner": "Quality safety officer / IT administrator",
+      "requiredPermissions": [
+        "audit:read"
+      ]
+    },
+    {
+      "id": "integrations",
+      "label": "Integrations",
+      "description": "Integration hub for connected systems and external handoffs.",
+      "path": "/integrations/hub",
+      "component": "IntegrationHubPage",
+      "navigationGroup": "Administration",
+      "breadcrumbs": [
+        "Administration",
+        "Integrations"
+      ],
+      "aliases": [],
+      "workflowOwner": "IT administrator",
+      "requiredPermissions": [
+        "settings:read"
+      ]
+    },
+    {
+      "id": "platform",
+      "label": "Platform",
+      "description": "Platform entry hub for role selection, demos, and workspace launch.",
+      "path": "/start",
+      "component": "PlatformEntryHub",
+      "navigationGroup": "Administration",
+      "breadcrumbs": [
+        "Administration",
+        "Platform"
+      ],
+      "aliases": [
+        "/workspace"
+      ],
+      "workflowOwner": "CareDroid platform",
+      "requiredPermissions": [
+        "patient:read"
+      ]
+    }
+  ]
+}

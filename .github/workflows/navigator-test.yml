@@ -1,0 +1,27 @@
+name: navigator-test
+on:
+  push:
+    paths:
+      - 'navigator/**'
+      - '.github/workflows/navigator-test.yml'
+  pull_request:
+    paths:
+      - 'navigator/**'
+      - '.github/workflows/navigator-test.yml'
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: navigator
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: navigator/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - name: Reject committed API keys
+        run: '! grep -R -E "gsk_[A-Za-z0-9]{20,}" --exclude-dir=.git --exclude=package-lock.json .'
