@@ -1,8 +1,47 @@
 # Express → Nest Decommission Plan
 
-**Status:** `backend/src/api/routes-registry.ts` no longer exists (Cycle 287) — an empty `ROUTES` array with nothing left to ever populate it was dead weight, not a documented extension point. Nest owns 100% of the HTTP routing surface. Only the Mongoose runtime connection itself (behind `ENABLE_MONGOOSE_EMERGENCY_OS`, default `false`) remains as a live dependency for anything outside routing (WebSocket support, the reassessment scheduler, service-registry init).  
-**Date:** 2026-07-15 (updated 2026-08-05, Cycles 277–287)  
+**Status:** `backend/src/api/routes-registry.ts` no longer exists (Cycle 287) — Nest owns 100% of the HTTP routing surface. Of `registerEmergencyMongooseRuntime()`'s four remaining non-route responsibilities, EMS WebSocket support is now unconditional (Cycle 288); the Mongoose connection itself, the reassessment scheduler, and service-registry init still sit behind `ENABLE_MONGOOSE_EMERGENCY_OS` (default `false`) and are each their own remaining decision.  
+**Date:** 2026-07-15 (updated 2026-08-05, Cycles 277–288)  
 **Goal:** Single HTTP authority = Nest controllers; Express registry becomes adapter-only then removed.
+
+## 2026-08-05 update (Cycle 288) — EMS WebSocket support made unconditional
+
+The first of the four non-route responsibilities named in Cycle 287's list,
+taken "one at a time" per that update's own framing. `registerEMSWebSocketSupport`
+was the one candidate of the three WebSocket setups still gated behind
+`ENABLE_MONGOOSE_EMERGENCY_OS`, unlike its siblings
+`registerEdgeAIAmbulanceWebSocketSupport`/`registerSentinelAvlWebSocketSupport`,
+which already ran unconditionally right below it. That inconsistency was a
+real, live gap: `EmsController` (`backend/src/modules/ems/ems.controller.ts`,
+built Cycle 282) is registered unconditionally in `AppModule` — not gated —
+and its `emitToWhiteboard()` method depends on `app.get('io')` having been
+set by this function. With the flag at its documented default (`false`), the
+whiteboard bridge silently never existed even though the controller using it
+was always live.
+
+Checked `registerEMSWebSocketSupport` itself (`backend/src/api/ems.socket.ts`)
+for any Mongo dependency before moving it — none: it's pure Socket.IO
+bootstrapping (auth middleware, room join/leave, `app.set('io', io)`), the
+same shape as its two already-unconditional siblings. Hoisted the call (and
+consolidated the JWT authenticator it needs into the same `authenticateSocket`
+instance already built for the other two, removing a second, redundant
+`createRuntimeJwtAuthenticator(...)` call that used to live inside the gated
+function) out to `bootstrap()`, directly above
+`registerEdgeAIAmbulanceWebSocketSupport`. `registerEmergencyMongooseRuntime()`
+now owns exactly three things: the Mongoose connection, the reassessment
+scheduler, and service-registry init — all still gated, each still its own
+decision.
+
+Verified: full backend suite (277/277 suites, 2,371/2,371 tests, unchanged
+from Cycle 287 — this was a pure `main.ts` reorganization, no test file
+touched), clean `nest build`, and a live compiled-server boot with
+`ENABLE_MONGOOSE_EMERGENCY_OS` unset (the documented default): `GET
+/api/config/system` confirms `emergencyOs.status: 'disabled'`, and a raw
+`socket.io-client` handshake against the server (no auth token) got
+`connect_error: "Authentication required."` from the real
+`createSocketJwtAuthMiddleware` chain — not a connection refusal — proving
+the EMS `io` server now genuinely exists and is running its real auth guard
+in default config, which was structurally impossible before this cycle.
 
 ## 2026-08-05 update (Cycle 287) — routes-registry.ts deleted entirely
 
@@ -257,13 +296,13 @@ ENABLE_EXPRESS_LEGACY_ROUTES=false  # new explicit flag if split needed
 ### Phase 4 — Remove — route-level work DONE, runtime-level cleanup still open
 - Delete `routes-registry` mounts from `main.ts` — **done.** `backend/src/api/routes-registry.ts` itself is deleted (Cycle 287), not just emptied; `registerAllRoutes`/`getRouteList`/the `/api/routes` discovery endpoint no longer exist anywhere in the codebase.
 - Quarantine `backend/src/api/*.routes.ts` for one release — N/A: every file was deleted outright once real (Nest parity confirmed) or dead (placeholder stub), not quarantined, matching the Surge precedent (`git show 5bed1bf9`)
-- Remove Mongoose emergency OS if TypeORM covers patients — **the only piece left.** Not a route question anymore: `registerEmergencyMongooseRuntime()` still owns the Mongoose connection, EMS/edge-ambulance/sentinel-AVL WebSocket bootstrapping, the reassessment scheduler, and service-registry init, all gated behind the same flag. Needs a deliberate per-responsibility decision (unconditional vs. removed), not a mechanical deletion — scoped as its own next cycle.
+- Remove Mongoose emergency OS if TypeORM covers patients — **3 of 4 pieces left.** Not a route question anymore: `registerEmergencyMongooseRuntime()` now owns only the Mongoose connection, the reassessment scheduler, and service-registry init (EMS WebSocket support moved out and became unconditional in Cycle 288), all three still gated behind the same flag. Each needs its own deliberate decision (unconditional vs. removed), not a mechanical deletion — continuing one at a time.
 
 ## Exit criteria
 - [x] All real (non-placeholder) route groups migrated to Nest controllers (Cycle 285)
 - [x] 6 placeholder-only route groups retired outright, `routes-registry.ts` `ROUTES` is `[]` (Cycle 286)
 - [x] `routes-registry.ts` itself deleted — no legacy Express registry exists at any size, empty or otherwise (Cycle 287)
-- [ ] `registerEmergencyMongooseRuntime()`'s non-route responsibilities (WebSocket, scheduler, service-registry init) resolved to unconditional-or-removed
+- [ ] `registerEmergencyMongooseRuntime()`'s non-route responsibilities resolved to unconditional-or-removed — 1 of 4 done (EMS WebSocket support, Cycle 288); Mongoose connection, reassessment scheduler, and service-registry init remain
 - [ ] Production boot with the Mongoose runtime block disabled entirely
 - [ ] All e2e EMS/intake/copilot green against Nest only
 - [ ] No FE hard-coded `/api/emergency/*` without Nest alias

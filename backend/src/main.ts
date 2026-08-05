@@ -47,25 +47,12 @@ async function registerEmergencyMongooseRuntime(
   const mongoUri = config.database.mongodbUri;
   if (!mongoUri) {
     logger.warn(
-      'ENABLE_MONGOOSE_EMERGENCY_OS=true but MONGODB_URI/DATABASE_MONGO_URI is not set; skipping Mongoose CareDroid routes.',
+      'ENABLE_MONGOOSE_EMERGENCY_OS=true but MONGODB_URI/DATABASE_MONGO_URI is not set; skipping Mongoose connection, reassessment scheduler, and service-registry init.',
     );
     return;
   }
 
   await mongoose.connect(mongoUri);
-  const expressApp = app.getHttpAdapter().getInstance();
-  // EMS WebSocket auth requires JWT + PHI permissions (security audit D-path).
-  const authenticate = createRuntimeJwtAuthenticator(
-    app.get(JwtService),
-    app.get(ConfigService),
-    app.get(DataSource).getRepository(User),
-  );
-  registerEMSWebSocketSupport(
-    expressApp,
-    app.getHttpServer(),
-    config.server.corsOrigins,
-    createSocketJwtAuthMiddleware(authenticate, Permission.READ_PHI),
-  );
   reassessmentScheduler.start();
   const initialization = await initializeAllServices();
   if (initialization.totals.failed > 0) {
@@ -77,7 +64,7 @@ async function registerEmergencyMongooseRuntime(
       `CareDroid service registry initialized (${initialization.totals.ready}/${initialization.totals.registered} ready).`,
     );
   }
-  logger.log('Mongoose CareDroid runtime ready: EMS WebSocket bridge, reassessment scheduler, service registry.');
+  logger.log('Mongoose CareDroid runtime ready: connection established, reassessment scheduler, service registry.');
 }
 
 function registerProductionFrontendAssets(app: Awaited<ReturnType<typeof NestFactory.create>>) {
@@ -221,6 +208,20 @@ async function bootstrap() {
     app.get(JwtService),
     app.get(ConfigService),
     app.get(DataSource).getRepository(User),
+  );
+  // EMS WebSocket bridge: EmsController (registered unconditionally in
+  // AppModule, not gated) depends on this having run for its whiteboard
+  // emission (emitToWhiteboard -> app.get('io'), Cycle 282). Made
+  // unconditional in Cycle 288 to match its two siblings below -- previously
+  // this only ran when ENABLE_MONGOOSE_EMERGENCY_OS was on, which meant the
+  // bridge silently never existed in default config even though the
+  // controller using it was always live. registerEMSWebSocketSupport itself
+  // has no Mongo dependency; it just waits for connections until it does.
+  registerEMSWebSocketSupport(
+    expressApp,
+    app.getHttpServer(),
+    environment.server.corsOrigins,
+    createSocketJwtAuthMiddleware(authenticateSocket, Permission.READ_PHI),
   );
   registerEdgeAIAmbulanceWebSocketSupport(
     expressApp,
