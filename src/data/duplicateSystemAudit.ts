@@ -521,8 +521,9 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
         instances: ['appConfig.ts', 'featureFlags.config.ts', 'env.config.ts'],
         overlap: 3,
         risk: 'Direct appConfig.features reads bypass FEATURE_FLAGS projection',
-        action: 'wire',
-        recommendation: 'Parse in appConfig; consume FEATURE_FLAGS or ENV_CONFIG everywhere else.',
+        action: 'done',
+        recommendation:
+          'Done: this was a real, still-open gap (not stale tracking) -- NotificationService.ts and deferStartupTasks.ts read appConfig.features.enablePushNotifications/enableOfflineMode directly. Redirected both to FEATURE_FLAGS. Added a permanent regression guard (src/config/featureFlags.config.test.ts) that scans every src/ file for appConfig.features reads outside featureFlags.config.ts itself.',
       },
     ],
   },

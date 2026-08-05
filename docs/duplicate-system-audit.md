@@ -198,7 +198,7 @@ Identify competing sources of truth that cause drift, double registration, or am
 |-----------|-----------|------|--------|----------------|
 | Navigation dual config | unified-navigation.config.ts; navigation.config.ts (compat) | New nav items added only to compat projections | wire | Add to unified-navigation.config.ts first; navigation.config.ts projects for legacy consumers. |
 | Design token split | theme.tokens.ts; layout/designTokens.ts; caredroidDesignLanguage.ts; designSystem.ts | Token drift across CSS and programmatic consumers | merge | Import design tokens through designSystem.ts barrel; CSS via design-system.css only. |
-| Env parsing chain | appConfig.ts; featureFlags.config.ts; env.config.ts | Direct appConfig.features reads bypass FEATURE_FLAGS projection | wire | Parse in appConfig; consume FEATURE_FLAGS or ENV_CONFIG everywhere else. |
+| Env parsing chain | appConfig.ts; featureFlags.config.ts; env.config.ts | Direct appConfig.features reads bypass FEATURE_FLAGS projection | done | Done: this was a real, still-open gap (not stale tracking) -- NotificationService.ts and deferStartupTasks.ts read appConfig.features.enablePushNotifications/enableOfflineMode directly. Redirected both to FEATURE_FLAGS. Added a permanent regression guard (src/config/featureFlags.config.test.ts) that scans every src/ file for appConfig.features reads outside featureFlags.config.ts itself. |
 
 ## Route path overlap detail (CANONICAL_ROUTES ∩ TOOL_LAUNCH_PATHS)
 

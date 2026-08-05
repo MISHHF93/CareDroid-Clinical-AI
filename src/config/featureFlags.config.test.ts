@@ -1,3 +1,6 @@
+import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { dirname, join, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import {
   buildFeatureFlagStateMap,
@@ -8,6 +11,24 @@ import {
   normalizeFeatureFlagState,
   summarizeFeatureFlags,
 } from './featureFlags.config';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const srcRoot = join(__dirname, '..');
+
+function collectSourceFiles(dir: string, out: string[] = []): string[] {
+  for (const entry of readdirSync(dir)) {
+    const full = join(dir, entry);
+    const stat = statSync(full);
+    if (stat.isDirectory()) {
+      collectSourceFiles(full, out);
+      continue;
+    }
+    if (/\.(ts|tsx)$/.test(entry) && !/\.test\.tsx?$/.test(entry)) {
+      out.push(full);
+    }
+  }
+  return out;
+}
 
 describe('featureFlags.config rollout registry', () => {
   it('covers all requested rollout states and categories', () => {
@@ -80,5 +101,31 @@ describe('featureFlags.config rollout registry', () => {
         }),
       ])
     );
+  });
+});
+
+describe('duplicate-system-audit: Env parsing chain', () => {
+  // "Direct appConfig.features reads bypass FEATURE_FLAGS projection" --
+  // docs/duplicate-system-audit.md's stated risk for this finding. appConfig
+  // parses env vars; this file is the one canonical place allowed to read
+  // appConfig.features directly (it IS the FEATURE_FLAGS projection).
+  // Regression-guard against future call sites reintroducing the bypass
+  // this test file's own fix (NotificationService.ts, deferStartupTasks.ts)
+  // just closed.
+  it('no source file outside featureFlags.config.ts reads appConfig.features directly', () => {
+    // duplicateSystemAudit.ts is excluded deliberately, not by oversight: it
+    // contains the literal risk-description string for this exact finding
+    // ("Direct appConfig.features reads bypass FEATURE_FLAGS projection"),
+    // which is documentation ABOUT the pattern, not a violation of it.
+    const allowedFiles = [join('config', 'featureFlags.config.ts'), join('data', 'duplicateSystemAudit.ts')];
+    const offenders: string[] = [];
+    for (const file of collectSourceFiles(srcRoot)) {
+      if (allowedFiles.some((allowed) => file.endsWith(allowed))) continue;
+      const content = readFileSync(file, 'utf8');
+      if (/appConfig\.features\b/.test(content)) {
+        offenders.push(relative(srcRoot, file));
+      }
+    }
+    expect(offenders).toEqual([]);
   });
 });

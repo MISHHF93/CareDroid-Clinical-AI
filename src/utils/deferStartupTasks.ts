@@ -3,6 +3,7 @@
  */
 
 import appConfig from '../config/appConfig';
+import { FEATURE_FLAGS } from '../config/featureFlags.config';
 import logger from './logger';
 import observabilityService from '../services/observabilityService';
 import { runAfterFirstPaint } from './deferStartup';
@@ -57,7 +58,7 @@ export function scheduleDeferredStartupTasks() {
       }
     }
 
-    if (appConfig.features.enablePushNotifications) {
+    if (FEATURE_FLAGS.enablePushNotifications) {
       NotificationService.requestPermission()
         .then((granted) => {
           if (granted) {
@@ -70,7 +71,7 @@ export function scheduleDeferredStartupTasks() {
     }
   });
 
-  if (appConfig.features.enableOfflineMode) {
+  if (FEATURE_FLAGS.enableOfflineMode) {
     runAfterFirstPaint(async () => {
       const [{ default: offlineService }, { default: syncService }] = await Promise.all([
         import('../services/offlineService'),

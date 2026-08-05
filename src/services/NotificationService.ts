@@ -8,6 +8,7 @@ import { apiFetch, buildStreamUrl, getApiErrorMessage, getStoredAccessToken, par
 import { AUTH_CONFIG } from '../config/auth.config';
 import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
 import appConfig from '../config/appConfig';
+import { FEATURE_FLAGS } from '../config/featureFlags.config';
 import { getFirebaseMessagingToken } from './firebaseClient';
 import { recordAutomationBlocked, recordAutomationFailure } from './automationAuditLogger';
 import { makeNotificationStreamDisabledResponse } from './disabledBackendMocks';
@@ -45,7 +46,7 @@ export const NotificationService = {
    */
   async registerPushToken() {
     try {
-      if (!appConfig.features.enablePushNotifications) {
+      if (!FEATURE_FLAGS.enablePushNotifications) {
         return false;
       }
 
