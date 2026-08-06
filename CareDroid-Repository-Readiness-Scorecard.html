@@ -582,7 +582,7 @@
     </div>
     <div class="meta-block">
       Generated 2026-08-06<br />
-      HEAD <code style="font-family: var(--mono)">50473d17</code><br />
+      HEAD <code style="font-family: var(--mono)">fe1e683a</code><br />
       <a href="https://github.com/MISHHF93/CareDroid-Clinical-AI">github.com/MISHHF93/CareDroid-Clinical-AI</a>
     </div>
   </header>
@@ -700,15 +700,15 @@
         </div>
         <span class="status-chip good">Strong</span>
         <h3>Documentation accuracy</h3>
-        <p class="dim-summary">Found a second real instance of the "docs describe deleted infrastructure" bug class by proactively checking, not waiting for the scanner to flag it.</p>
+        <p class="dim-summary">Every high-traffic doc checked closely this campaign has had at least one real, fixable inaccuracy — a systematic sweep in progress, not yet complete.</p>
         <div class="progress-track"><div class="progress-fill good" style="width: 90%"></div></div>
       </div>
       <details>
         <summary>Evidence</summary>
         <div class="detail-body">
           <p><span class="detail-label">Prior passes</span>10 point-in-time historical reports archived; 4 previously-unindexed docs (incl. the P0.3 intended-use boundary statement) linked; one actively-misleading legacy-architecture claim in the developer guide fixed; the remaining 14 orphan-flagged docs closed (11 linked as live reference material, 3 more archived); a real <code>SECURITY.md</code> added with no invented contact info — 30+ of ~90+ documents triaged across three passes.</p>
-          <p><span class="detail-label">This pass</span>went beyond what the orphan scanner flags (it only catches unlinked docs, not stale content in linked ones) and proactively spot-checked two more high-traffic docs for drift against current code. <code>platform-architecture-overview.md</code>'s "Two names, two places — don't conflate" section described BOTH a duplicate top-level <code>store/</code> directory and an <code>engine/</code> compatibility shim as if they still existed — both were actually deleted in the 2026-08-05 repo-consolidation cleanup; fixed, plus a stale file count (37→38) in the same paragraph. <code>developer-guide.md</code> had two more: its own "Coding conventions (<strong>observed</strong>, not aspirational)" section claimed extending <code>src/components/primitives/</code> as observed practice — checked real adoption and found it's exactly 5 files, all in one feature area, a genuinely thin-adoption library (the same underlying pattern as the card-component gap, this time for atoms — Button/Input/Badge/Avatar/etc.), so reworded it to say what's actually true instead of what was aspirational; also its test-file count (~825 claimed, 917 actual) had drifted by over 10%. Re-ran <code>docs:check</code> after each — still clean.</p>
-          <p><span class="detail-label">Why not 10/10</span>still not a comprehensive line-by-line accuracy sweep of all ~90+ documents — three docs checked closely this cycle, each with a real finding, suggests more are likely out there.</p>
+          <p><span class="detail-label">This pass</span>went beyond what the orphan scanner flags (it only catches unlinked docs, not stale content in linked ones) and proactively spot-checked more high-traffic docs for drift against current code — five now, in this session alone. <code>platform-architecture-overview.md</code>'s "Two names, two places" section described a deleted <code>store/</code> directory and <code>engine/</code> shim as if they still existed, plus a stale file count. <code>developer-guide.md</code>'s "observed, not aspirational" conventions section claimed <code>src/components/primitives/</code> adoption that's actually 5 files in one feature area, plus a test-count drift over 10%. <code>README.md</code> claimed Vite 5 — the installed version (and every other doc) says Vite 7 — and overstated the service-module count (300+ claimed, 252 real, corrected to 250+). <code>glossary.md</code> said the frontend role taxonomy has 22 roles; direct count of <code>HospitalRole</code> in <code>userTypes.ts</code> is 23, matching README's own (correct) figure — glossary was the outlier. <code>configuration-reference.md</code> checked clean — it deliberately defers to <code>.env.example</code> as the literal source of truth rather than duplicating values, an inherently lower-drift-risk pattern worth noting as a model other docs could follow. Re-ran <code>docs:check</code> after every edit — still clean throughout.</p>
+          <p><span class="detail-label">Why not 10/10</span>5 of ~90+ documents checked this closely, 4 of 5 with a real finding — that hit rate is itself evidence more are likely out there in the ~85 not yet checked. Full 10/10 would need that comprehensive sweep, which is real remaining labor, not risk.</p>
         </div>
       </details>
     </article>

@@ -154,7 +154,7 @@ CareDroid runs **17 distinct AI services** across generation, prediction, edge i
 
 | Layer | Technology |
 |-------|------------|
-| Frontend | React 18, Vite 5, React Router v6, Zustand, TypeScript |
+| Frontend | React 18, Vite 7, React Router v6, Zustand, TypeScript |
 | Backend | NestJS 10, TypeORM, SQLite (local dev), PostgreSQL (production) |
 | AI runtime | Anthropic Claude API (default), OpenAI, Azure OpenAI, Gemini, Local |
 | Vector knowledge | Pinecone (RAG for medical knowledge retrieval) |
@@ -182,7 +182,7 @@ CareDroid-Clinical-AI/
 │   ├── app/               # Router, App root, providers
 │   ├── components/        # Shared components (Header, Shell, Chrome, etc.)
 │   ├── pages/             # Page components organized by domain
-│   ├── services/          # 300+ service modules (API, AI, flow, analytics)
+│   ├── services/          # 250+ service modules (API, AI, flow, analytics)
 │   ├── store/             # Zustand state (emergencyStore.ts is canonical)
 │   ├── styles/            # Design system CSS (design-system.css is the entry)
 │   ├── lib/               # Auth, AI client, user types, navigation
