@@ -1,7 +1,7 @@
 # Pharmacist Manual
 
 **Role ID:** `pharmacist`  
-**Landing page:** `/emergency/alerts`  
+**Landing page:** `/emergency/diagnostics`  
 **Mission:** Catch medication risks before they reach the patient. Deliver clear recommendations to the clinical team.
 
 ---

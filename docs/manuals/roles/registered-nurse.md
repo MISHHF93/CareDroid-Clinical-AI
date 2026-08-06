@@ -1,7 +1,7 @@
 # Registered Nurse Manual
 
 **Role ID:** `registered_nurse`  
-**Landing page:** `/emergency/whiteboard`  
+**Landing page:** `/emergency/queues`  
 **Mission:** Keep every assigned patient safe, documented, and progressing through the care pathway.
 
 ---

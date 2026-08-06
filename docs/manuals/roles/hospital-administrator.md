@@ -2,7 +2,7 @@
 
 > **Related:** [`docs/users/administrator-guide.md`](../../users/administrator-guide.md) covers this and related admin roles (`hospital_admin`, `ed_director`, `super_admin`) in a shorter guide format. Flagged as overlapping documentation in the [Documentation Center](../../DOCUMENTATION_CENTER.md#known-documentation-debt).
 
-**Role ID:** `hospital_administrator`  
+**Role ID:** `hospital_admin`  
 **Landing page:** `/emergency/analytics`  
 **Mission:** Maintain operational excellence. Know the numbers. Protect patient flow. Support your teams.
 

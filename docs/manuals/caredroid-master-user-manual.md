@@ -140,12 +140,12 @@ Reviews medication risk alerts, medication order alerts, and drug interaction no
 
 ### Administrative Roles
 
-#### Hospital Administrator (`hospital_administrator`)
+#### Hospital Administrator (`hospital_admin`)
 Reviews operational reports, sets hospital-level settings, monitors aggregate performance.  
 **Landing page:** `/emergency/analytics`  
 **Scope:** Read-only clinical. Full analytics and settings access.
 
-#### IT Administrator (`it_administrator`)
+#### IT Administrator (`it_admin`)
 Manages identity, integrations, audit trail, downtime coordination, and system health.  
 **Landing page:** `/emergency/settings`  
 **Scope:** System configuration. Audit access. No clinical patient access.

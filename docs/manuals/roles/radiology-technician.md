@@ -1,7 +1,7 @@
 # Radiology Technician Manual
 
 **Role ID:** `radiology_technician`  
-**Landing page:** `/emergency/alerts`  
+**Landing page:** `/emergency/diagnostics`  
 **Mission:** Deliver every urgent image on time. Notify the clinical team of imaging availability and delays.
 
 ---

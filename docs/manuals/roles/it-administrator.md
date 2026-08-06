@@ -2,7 +2,7 @@
 
 > **Related:** [`docs/users/it-admin-guide.md`](../../users/it-admin-guide.md) covers the same role in a shorter guide format. Flagged as overlapping documentation in the [Documentation Center](../../DOCUMENTATION_CENTER.md#known-documentation-debt).
 
-**Role ID:** `it_administrator`  
+**Role ID:** `it_admin`  
 **Landing page:** `/emergency/settings`  
 **Mission:** Keep every service running. Respond to every degradation before it becomes a patient safety event.
 

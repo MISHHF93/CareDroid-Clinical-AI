@@ -138,7 +138,7 @@ type AIChiefResponse = {
 **When used:** Administrator, quality officer, or charge nurse needs aggregate department state.  
 **Inputs:** full department snapshot (patients, alerts, capacity, bottlenecks, staff, timers).  
 **Output:** Department summary with risk areas, bottleneck impacts, and recommended operational adjustments.  
-**Required reviewer:** `charge_nurse`, `hospital_administrator`, or `quality_safety_officer`.  
+**Required reviewer:** `charge_nurse`, `hospital_admin`, or `quality_safety_officer`.  
 **Implementation:** Add handler. Input from `CareDroidCentralNodeSource` in `careDroidCentralNode.ts`.
 
 ---
@@ -148,7 +148,7 @@ type AIChiefResponse = {
 **When used:** IT Admin or patient flow coordinator needs an analysis of current service degradation.  
 **Inputs:** `BottleneckRegistrySnapshot` from `buildBottleneckRegistrySnapshot()`.  
 **Output:** Analysis of which services are degraded, patient impact, risk projection, and recovery steps.  
-**Required reviewer:** `it_administrator` or `patient_flow_coordinator`.  
+**Required reviewer:** `it_admin` or `patient_flow_coordinator`.  
 **Implementation:** Add handler. Direct input from `src/services/bottleneckRegistry.ts`.
 
 ---

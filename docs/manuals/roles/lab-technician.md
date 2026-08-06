@@ -1,7 +1,7 @@
 # Lab Technician Manual
 
 **Role ID:** `lab_technician`  
-**Landing page:** `/emergency/alerts`  
+**Landing page:** `/emergency/diagnostics`  
 **Mission:** Deliver every critical lab value to the right clinician before it becomes a patient safety event.
 
 ---

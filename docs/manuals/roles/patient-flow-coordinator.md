@@ -3,7 +3,7 @@
 > **Related:** [`docs/users/patient-flow-coordinator-guide.md`](../../users/patient-flow-coordinator-guide.md) covers the same role in a shorter guide format. Flagged as overlapping documentation in the [Documentation Center](../../DOCUMENTATION_CENTER.md#known-documentation-debt).
 
 **Role ID:** `patient_flow_coordinator`  
-**Landing page:** `/emergency/capacity`  
+**Landing page:** `/emergency/queues`  
 **Mission:** Keep every patient moving toward disposition. No patient stuck. No department at capacity without a plan.
 
 ---
