@@ -24,7 +24,7 @@ describe('saasComplianceAudit report', () => {
     expect(rows.some((r) => r.assetId === 'qsofa' && r.packAssignment.includes('emergency-medicine'))).toBe(true);
   });
 
-  it('writes docs/saas-compliance-audit.md when SAAS_COMPLIANCE_WRITE_DOCS=1', () => {
+  it('writes docs/operations/saas-compliance-audit.md when SAAS_COMPLIANCE_WRITE_DOCS=1', () => {
     if (!process.env.SAAS_COMPLIANCE_WRITE_DOCS) return;
 
     const doc = getSaasComplianceDocument();

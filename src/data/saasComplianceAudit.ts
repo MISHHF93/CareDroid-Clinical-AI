@@ -256,7 +256,10 @@ function evaluateRow(params) {
   if (!isPlatformAsset) {
     violations.push({
       rule: 'everything-is-asset',
-      message: 'No `platform_assets` seed row; only `toolInventory.js` projection',
+      message:
+        lifecycleSource === 'system-route-purpose'
+          ? 'No `platform_assets` seed row and no `toolInventory.js`/`assetInventory.js` mounted projection -- a hand-tracked system route with no packaging entitlement of its own'
+          : 'No `platform_assets` seed row; only `toolInventory.js` projection',
     });
   }
 

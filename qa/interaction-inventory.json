@@ -1,15 +1,46 @@
 {
-  "generatedAt": "2026-07-11T20:25:43.259Z",
-  "filesScanned": 563,
-  "total": 1192,
+  "generatedAt": "2026-08-06T12:28:11.780Z",
+  "filesScanned": 498,
+  "total": 1136,
   "byClass": {
-    "LIVE": 1189,
-    "DISABLED_REASONED": 1,
+    "LIVE": 1132,
+    "BROKEN": 2,
     "NEEDS_REVIEW": 2
   },
-  "brokenCount": 0,
+  "brokenCount": 2,
   "edBrokenCount": 0,
   "edBroken": [],
-  "brokenSample": [],
+  "brokenSample": [
+    {
+      "id": "ctrl-2",
+      "file": "src/alarm/AlarmKpi.tsx",
+      "line": 55,
+      "kind": "button",
+      "snippet": "<button type=\"button\" {...shared}>",
+      "accessibleNameHint": null,
+      "hasClickHandler": false,
+      "hasSubmitType": false,
+      "hasNavigation": false,
+      "isDisabled": false,
+      "hasDisabledReason": false,
+      "class": "BROKEN",
+      "reason": "Interactive control has no onClick/onSubmit/navigation binding"
+    },
+    {
+      "id": "ctrl-904",
+      "file": "src/pages/tools/Calculators.tsx",
+      "line": 432,
+      "kind": "role-button",
+      "snippet": "{/* role=\"group\", not \"list\": children are role=\"button\" toggle",
+      "accessibleNameHint": "Built-in calculator forms",
+      "hasClickHandler": false,
+      "hasSubmitType": false,
+      "hasNavigation": false,
+      "isDisabled": false,
+      "hasDisabledReason": false,
+      "class": "BROKEN",
+      "reason": "Interactive control has no onClick/onSubmit/navigation binding"
+    }
+  ],
   "note": "Static classification is conservative. LIVE means a handler binding was found, not that runtime succeeds. Playwright interaction-execution suite validates observable outcomes."
 }

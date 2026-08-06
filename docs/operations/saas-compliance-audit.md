@@ -1,6 +1,6 @@
 # SaaS Architecture Compliance Audit
 
-Generated: 2026-07-23 (regenerate with `npm run saas-compliance-audit:write-docs`)
+Generated: 2026-08-06 (regenerate with `npm run saas-compliance-audit:write-docs`)
 
 ## Charter reference
 
@@ -36,10 +36,10 @@ CareDroid now runs a **mounted registry projection**: 291 user-facing tools in `
 
 ### Everything is an asset (4 violations)
 
-- **3D Medical Viewer** (`3d-viewer`, /3d-viewer) — No `platform_assets` seed row; only `toolInventory.js` projection
-- **Platform Analytics** (`platform-analytics`, /platform-analytics) — No `platform_assets` seed row; only `toolInventory.js` projection
-- **User Welcome** (`welcome`, /welcome) — No `platform_assets` seed row; only `toolInventory.js` projection
-- **Workflow Builder** (`workflows`, /workflows) — No `platform_assets` seed row; only `toolInventory.js` projection
+- **3D Medical Viewer** (`3d-viewer`, /3d-viewer) — No `platform_assets` seed row and no `toolInventory.js`/`assetInventory.js` mounted projection -- a hand-tracked system route with no packaging entitlement of its own
+- **Platform Analytics** (`platform-analytics`, /platform-analytics) — No `platform_assets` seed row and no `toolInventory.js`/`assetInventory.js` mounted projection -- a hand-tracked system route with no packaging entitlement of its own
+- **User Welcome** (`welcome`, /welcome) — No `platform_assets` seed row and no `toolInventory.js`/`assetInventory.js` mounted projection -- a hand-tracked system route with no packaging entitlement of its own
+- **Workflow Builder** (`workflows`, /workflows) — No `platform_assets` seed row and no `toolInventory.js`/`assetInventory.js` mounted projection -- a hand-tracked system route with no packaging entitlement of its own
 
 
 ### Every asset belongs to a pack (0 violations)
