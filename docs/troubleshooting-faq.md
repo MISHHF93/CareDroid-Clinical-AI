@@ -11,11 +11,8 @@ Confirm `AI_ENABLED=true` and `ANTHROPIC_API_KEY` is set in `backend/.env`, plus
 **"`npm install` didn't install backend or MCP dependencies."**
 Root, `backend/`, and `mcp/` each have their own `package.json`/lockfile. Run `npm install`, `npm --prefix backend install`, and (if you need the MCP server) `npm --prefix mcp install` separately.
 
-**"I edited `engine/alertEngine.ts` and nothing changed."**
-The top-level `engine/` directory is a compatibility shim that re-exports from `src/engine/`. Edit `src/engine/alertEngine.ts` instead.
-
-**"Which `lib/` or `store/` am I supposed to edit?"**
-There are two of each — see [Developer Guide §Repo layout gotchas](developer-guide.md#repo-layout-gotchas). `@lib` in imports always means the top-level `lib/`, not `src/lib/`.
+**"Which `lib/` am I supposed to edit?"**
+There are two: `src/lib/` and a separate top-level `lib/` — see [Developer Guide §Repo layout gotchas](developer-guide.md#repo-layout-gotchas). `@lib` in imports always means the top-level `lib/`, not `src/lib/`. (The equivalent top-level `store/` and `engine/` compatibility shims were removed in the 2026-08-05 repo-consolidation cleanup — `src/store/` and `src/engine/` are now each the single canonical location, no duplicate to worry about for those two.)
 
 **"`docs:check` is failing in CI."**
 You likely changed a registry file that feeds `docs/generated/*` (e.g. `src/config/routes.config.ts`, `src/lib/users/permissions.ts`) without regenerating. Run `npm run docs:generate` and commit the result.
@@ -45,7 +42,7 @@ No. Every AI output requires human clinician review; mutating Copilot tool calls
 **"Why do I see both `docs/manuals/roles/charge-nurse.md` and `docs/users/charge-nurse-guide.md`?"**
 Known duplication, not yet reconciled — see [Known Documentation Debt](DOCUMENTATION_CENTER.md#known-documentation-debt).
 
-**"What's the difference between the frontend's 22 hospital roles and the backend's 4 `UserRole` values?"**
+**"What's the difference between the frontend's 23 hospital roles and the backend's 4 `UserRole` values?"**
 The frontend role taxonomy drives UX (nav visibility, dashboard defaults, AI scope); the backend's coarser `PHYSICIAN | NURSE | STUDENT | ADMIN` plus its own `Permission` enum is what's actually enforced on API calls. They are two independent systems, not a shared source of truth. See [Platform Architecture Overview §Authorization](architecture/platform-architecture-overview.md#4-authorization--rbac).
 
 **"Is `agent-tools/` at the repo root a tool registry I should register new AI tools in?"**

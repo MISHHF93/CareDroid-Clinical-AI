@@ -126,7 +126,7 @@ flowchart TB
         BPerm --> BMap
     end
     subgraph Frontend["Frontend — client-side mirror + UX gating"]
-        FRole["HospitalRole\n22 roles: charge_nurse, triage_nurse,\nparamedic, dispatcher, pharmacist, ...\n(src/lib/users/userTypes.ts)"]
+        FRole["HospitalRole\n23 roles: charge_nurse, triage_nurse,\nparamedic, dispatcher, pharmacist, ...\n(src/lib/users/userTypes.ts)"]
         FPerm["CAREDROID_PERMISSIONS\n(string permissions:\npatient:read, ai:configure, ...)"]
         FMirror["backendRolePermissions.ts\n('mirrors' backend config —\nused as last-resort fallback only)"]
         FGate["PermissionGate / RouteGuard /\nRoleBasedNav (UI-level gating)"]
@@ -138,7 +138,7 @@ flowchart TB
 ```
 
 - **Backend enforcement** (what actually blocks an API call): `Permission` enum + `RolePermissions` map in `backend/src/modules/auth/`, checked by `AuthorizationGuard` per-controller against the coarse `UserRole` (`PHYSICIAN | NURSE | STUDENT | ADMIN`). Every permission check is written to the audit log (HIPAA §164.308(a)(4) cited in code comments). A separate, independent `TenantIsolationGuard` additionally scopes by organization/workspace role.
-- **Frontend UX/route gating**: a much finer 22-role hospital taxonomy (`src/lib/users/userTypes.ts`) with string permissions (`patient:read`, `triage:override-ai`, `ai:configure`, ...), access scopes (`none|self|assigned|department|site|network|all`), and 16 hardcoded demo users (`src/lib/users/demoUsers.ts`). `backendRolePermissions.ts` claims to mirror the backend config but is a hand-maintained TypeScript copy, used only as a last-resort fallback inside `securityAccessService` — the backend does not import from `src/lib/users/` at all.
+- **Frontend UX/route gating**: a much finer 23-role hospital taxonomy (`src/lib/users/userTypes.ts`) with string permissions (`patient:read`, `triage:override-ai`, `ai:configure`, ...), access scopes (`none|self|assigned|department|site|network|all`), and 16 hardcoded demo users (`src/lib/users/demoUsers.ts`). `backendRolePermissions.ts` claims to mirror the backend config but is a hand-maintained TypeScript copy, used only as a last-resort fallback inside `securityAccessService` — the backend does not import from `src/lib/users/` at all.
 - **Practical implication:** the fine-grained hospital-role experience (what nav items, dashboards, and AI scope a "triage nurse" sees) is a **frontend UX concern**; the actual API-level access control is coarser and lives entirely in the backend's own `UserRole`/`Permission` system. Don't assume adding a new `HospitalRole` on the frontend changes what the backend will allow — it won't, until the corresponding backend `Permission`/`UserRole` mapping is also updated.
 
 ## 5. AI Platform
