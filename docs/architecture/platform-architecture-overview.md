@@ -69,11 +69,11 @@ flowchart LR
 
 **Page inventory:** 297 files across 20 populated domain subfolders under `src/pages/` (`emergency/` is the largest — the core ED workspace; `tools/` has 46 files of calculators and specialty AI assistants), plus 5 currently-empty placeholder folders (`auth/`, `cosmos/`, `customer-portal/`, `success-center/`, `surveillance/`) whose routes exist in `src/config/routes.config.ts` but aren't yet backed by page components in those folders. Full generated route list: [`docs/generated/routes.md`](../generated/routes.md).
 
-**Two names, two places — don't conflate:**
-- There is `src/store/` (Zustand — `emergencyStore.ts` is the canonical ED state) **and** a separate top-level `store/` directory outside `src/`.
+**One name, two places — don't conflate:**
 - There is `src/lib/` (RBAC, auth, browser-safe AI client) **and** a separate top-level `lib/` directory (`@lib` alias in `vite.config.ts`) containing `native-ai/` and `patient-orchestration/` modules, plus the AI config/tool/prompt registries consumed by both frontend and backend.
+- The equivalent top-level `store/` and `engine/` compatibility shims (thin re-exports for legacy imports) were deleted in the 2026-08-05 repo-consolidation cleanup — `src/store/` and `src/engine/` are now each the single, canonical location, no duplicate root-level directory exists for either.
 
-**Client-side "engines":** `src/engine/` (37 files) runs deterministic clinical/operational logic (triage scoring, capacity math, alert derivation, journey state machines) as plain TypeScript modules driven by store subscriptions — not React components, not a backend service. A root-level `engine/` directory is a thin compatibility shim that re-exports from `src/engine/` for legacy imports.
+**Client-side "engines":** `src/engine/` (38 files) runs deterministic clinical/operational logic (triage scoring, capacity math, alert derivation, journey state machines) as plain TypeScript modules driven by store subscriptions — not React components, not a backend service.
 
 **No client-side data-fetching library** (no React Query/SWR) — all HTTP goes through a hand-rolled axios client (`src/services/apiClient.ts`, re-exported via `src/lib/apiClient.ts`), with ~300 domain service files wrapping specific endpoints and writing results into Zustand/Context directly.
 

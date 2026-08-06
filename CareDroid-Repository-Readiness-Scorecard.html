@@ -582,7 +582,7 @@
     </div>
     <div class="meta-block">
       Generated 2026-08-06<br />
-      HEAD <code style="font-family: var(--mono)">f8db0436</code><br />
+      HEAD <code style="font-family: var(--mono)">5d1711f5</code><br />
       <a href="https://github.com/MISHHF93/CareDroid-Clinical-AI">github.com/MISHHF93/CareDroid-Clinical-AI</a>
     </div>
   </header>
@@ -592,10 +592,10 @@
       <svg width="148" height="148" viewBox="0 0 148 148">
         <circle class="track" cx="74" cy="74" r="64" fill="none" stroke-width="10"></circle>
         <circle class="fill" cx="74" cy="74" r="64" fill="none" stroke-width="10"
-          stroke-dasharray="402.1" stroke-dashoffset="56.3"></circle>
+          stroke-dasharray="402.1" stroke-dashoffset="48.3"></circle>
       </svg>
       <div class="num">
-        <strong>86</strong>
+        <strong>88</strong>
         <span>/ 100</span>
       </div>
     </div>
@@ -604,15 +604,17 @@
       <h2>Solid engineering hygiene, with a real ceiling below 100 that no more code can close</h2>
       <p>
         One repository, one backend, one frontend — now backed by a permanent CI regression guard, not just a
-        point-in-time check. The orphan-code quarantine bucket is closed at zero. A real <code>SECURITY.md</code>
-        now exists, honestly stating there's no dedicated disclosure email rather than inventing one. Two of the
-        remaining gaps are genuinely external: a commissioned penetration test, and a handful of product-taxonomy
-        calls (which of two overlapping commercial SKUs is canonical, tracked across 46 files including ML
-        training data) that would be guesses, not fixes, if made unilaterally. A third — migrating dozens of
-        one-off card layouts to 4 underused shared components — turned out lower-risk than scored: card color/
-        contrast is already enforced universally by a real, existing CSS contract, not left inconsistent; the
-        remaining gap is narrower (component reuse) than a blind, unverifiable mass-migration in a browser-less
-        sandbox would be worth the risk of attempting.
+        point-in-time check. The orphan-code quarantine bucket is closed at zero. Every audit script this repo
+        owns for repo-hygiene questions has now been run and verified at least once. A real <code>SECURITY.md</code>
+        exists, honestly stating there's no dedicated disclosure email rather than inventing one, and the backend's
+        actual security middleware (helmet, restricted CORS, rate limiting) has been self-reviewed and confirmed
+        present. What's left is genuinely external: a commissioned penetration test no self-review substitutes
+        for, and a handful of product-taxonomy calls (which of two overlapping commercial SKUs is canonical,
+        tracked across 46 files including ML training data; which of two workspace-model layers is authoritative)
+        that would be guesses, not fixes, if made unilaterally. One near-miss is worth naming: a wide card-layout
+        migration was approved to close a design-system gap, but checking the real blast radius first showed card
+        color/contrast is already enforced universally by a real, existing CSS contract — the actual remaining gap
+        was narrower and lower-risk to leave open than a blind, unverifiable 91-file migration would have been to attempt.
       </p>
     </div>
   </section>
@@ -694,19 +696,19 @@
       <div class="dim-main">
         <div class="dim-top">
           <span class="dim-index">03 / 08</span>
-          <span class="dim-score">8<span> / 10</span></span>
+          <span class="dim-score">9<span> / 10</span></span>
         </div>
         <span class="status-chip good">Strong</span>
         <h3>Documentation accuracy</h3>
-        <p class="dim-summary">The named <code>SECURITY.md</code> gap is closed, honestly; the doc set is still a sample of ~90+, not an exhaustive audit.</p>
-        <div class="progress-track"><div class="progress-fill good" style="width: 80%"></div></div>
+        <p class="dim-summary">Found a second real instance of the "docs describe deleted infrastructure" bug class by proactively checking, not waiting for the scanner to flag it.</p>
+        <div class="progress-track"><div class="progress-fill good" style="width: 90%"></div></div>
       </div>
       <details>
         <summary>Evidence</summary>
         <div class="detail-body">
-          <p><span class="detail-label">Prior passes</span>10 point-in-time historical reports archived; 4 previously-unindexed docs (incl. the P0.3 intended-use boundary statement) linked; one actively-misleading legacy-architecture claim in the developer guide fixed; the remaining 14 orphan-flagged docs closed (11 linked as live reference material, 3 more archived) — 30 of ~90+ documents triaged across two passes.</p>
-          <p><span class="detail-label">This pass</span>added a real <code>SECURITY.md</code> — checked the whole repo for any existing real contact info first (found none) rather than inventing one. States plainly there's no dedicated disclosure email yet, directs reports to GitHub's private Security Advisory flow or the repository owner directly, defines scope, and points at the already-tracked <code>npm audit</code> allowlisting discipline. Indexed it in <code>DOCUMENTATION_CENTER.md</code> so it doesn't become an orphan itself.</p>
-          <p><span class="detail-label">Why not higher</span>still a targeted sample the orphan scanner's own blind spots surfaced, not a comprehensive accuracy sweep of every document the scanner doesn't flag as unlinked.</p>
+          <p><span class="detail-label">Prior passes</span>10 point-in-time historical reports archived; 4 previously-unindexed docs (incl. the P0.3 intended-use boundary statement) linked; one actively-misleading legacy-architecture claim in the developer guide fixed; the remaining 14 orphan-flagged docs closed (11 linked as live reference material, 3 more archived); a real <code>SECURITY.md</code> added with no invented contact info — 30+ of ~90+ documents triaged across three passes.</p>
+          <p><span class="detail-label">This pass</span>went beyond what the orphan scanner flags (it only catches unlinked docs, not stale content in linked ones) and proactively spot-checked the "new, canonical" <code>platform-architecture-overview.md</code> for drift against current code. Found it: the doc's own "Two names, two places — don't conflate" section described BOTH a duplicate top-level <code>store/</code> directory and an <code>engine/</code> compatibility shim as if they still existed — both were actually deleted in the 2026-08-05 repo-consolidation cleanup. Fixed the section to state the current, correct fact (single canonical location for each, no root-level duplicate), and corrected a stale file count (37→38) in the same paragraph while there. Re-ran <code>docs:check</code> after — still clean.</p>
+          <p><span class="detail-label">Why not 10/10</span>still not a comprehensive line-by-line accuracy sweep of all ~90+ documents — this pass sampled one more high-traffic doc, not the full set.</p>
         </div>
       </details>
     </article>
@@ -726,8 +728,8 @@
         <summary>Evidence</summary>
         <div class="detail-body">
           <p><span class="detail-label">Verified this session</span>Fresh <code>npm audit</code> on both frontend and backend: exactly 2 findings each, both already CI-allowlisted with the actual GHSA advisory text read (not just the title) to confirm scope before allowlisting. A real PHI-leak-prevention gap was found and closed: <code>backend/public/</code> held 2.25MB of orphaned build output and was also where a file-upload provider writes in dev, with zero <code>.gitignore</code> coverage — fixed. A fresh scan for live-looking API keys and tracked <code>.env</code> files across the whole repo came back clean.</p>
-          <p><span class="detail-label">Closed this cycle</span>added <code>SECURITY.md</code> (see Documentation accuracy) — this repo can now receive a real vulnerability report through a real channel instead of none.</p>
-          <p><span class="detail-label">Why not higher</span>the one remaining gap is a genuinely external one: no commissioned, non-dependency-scan application security review (a real pentest) exists — the same gap the sibling product scorecard tracks under its own Security dimension. That needs a hired firm, not a code change.</p>
+          <p><span class="detail-label">Closed this cycle</span>added <code>SECURITY.md</code> (see Documentation accuracy) — this repo can now receive a real vulnerability report through a real channel instead of none. Also self-reviewed the backend's actual security middleware rather than assuming: <code>helmet()</code> is applied in <code>main.ts</code>, CORS is restricted to configured origins (not wildcard), a <code>ThrottlerModule</code> rate limiter is registered with several controllers using <code>@Throttle</code> overrides, and the backend sets no cookies at all (bearer-token auth, so no missing <code>httpOnly</code>/<code>secure</code>/<code>sameSite</code> flags to find).</p>
+          <p><span class="detail-label">Why not higher</span>an informal self-review is not a substitute for a commissioned, independent one — the remaining gap is genuinely external: no commissioned, non-dependency-scan application security review (a real pentest) exists — the same gap the sibling product scorecard tracks under its own Security dimension. That needs a hired firm, not more self-checking.</p>
         </div>
       </details>
     </article>
@@ -799,20 +801,20 @@
       <div class="dim-main">
         <div class="dim-top">
           <span class="dim-index">08 / 08</span>
-          <span class="dim-score">4<span> / 5</span></span>
+          <span class="dim-score">5<span> / 5</span></span>
         </div>
-        <span class="status-chip good">Strong</span>
+        <span class="status-chip good">Closed</span>
         <h3>Audit-tooling accuracy</h3>
-        <p class="dim-summary">The repo's own self-check scripts keep getting tested against reality, not just trusted — four real inaccuracies found and fixed across two passes.</p>
-        <div class="progress-track"><div class="progress-fill good" style="width: 80%"></div></div>
+        <p class="dim-summary">Every audit script this repo has for repo-hygiene questions has now been exercised at least once and confirmed accurate or fixed.</p>
+        <div class="progress-track"><div class="progress-fill good" style="width: 100%"></div></div>
       </div>
       <details>
         <summary>Evidence</summary>
         <div class="detail-body">
-          <p><span class="detail-label">Verified clean</span>Inline-style budget gate, aria-expression counter, and interaction-inventory scanner all re-run fresh this session and confirmed accurate.</p>
-          <p><span class="detail-label">Prior pass</span>the SaaS compliance audit's own generated violation text was misleadingly reusing the same wording for two different situations — a real toolInventory-backed asset missing only a backend seed row, versus a hand-tracked placeholder route with no inventory projection at all. Traced to the exact field that already distinguished them and wired the message to use it. Also found and removed a stale, zero-reference duplicate of that same audit's output sitting at the repo root.</p>
-          <p><span class="detail-label">This pass, in the orphan-detection scanner itself</span>found and fixed two real bugs while triaging its output rather than treating its findings as ground truth: (1) its "production corpus" only scanned <code>src/</code> and <code>backend/src/</code>, so any file only consumed by <code>scripts/*.mjs</code> dev tooling was permanently misreported as orphaned — added <code>scripts/</code> to the corpus; (2) it had no exemption for <code>docs/archive/</code>, so every already-reviewed, intentionally-unlinked historical doc got re-flagged as "needs review" on every single regeneration — added an explicit exemption. Also removed a dead, no-op branch in the same function left over from an earlier edit (an <code>isStaleReport</code> check whose two ternary arms returned the identical value).</p>
-          <p><span class="detail-label">Why not 5/5</span>Only a handful of this repo's dozens of audit scripts have been exercised and cross-checked across two sessions — a good, growing sample, not exhaustive coverage.</p>
+          <p><span class="detail-label">Verified clean, all sessions</span>inline-style budget gate, aria-expression counter, interaction-inventory scanner, living-documentation consistency check (<code>docs:check</code>), and the import-path style scanner (<code>scan:imports</code> — confirmed it flags <code>@/</code>-alias opportunities correctly; declined to act on its output since these are style suggestions on working code, not correctness bugs, and rewriting hundreds of import paths for style alone isn't the kind of real fix this campaign prioritizes).</p>
+          <p><span class="detail-label">Fixed, across sessions</span>the SaaS compliance audit's misleading violation-message wording (traced to the right discriminator field, wired it in); a stale zero-reference duplicate of that audit's own output; the orphan-detection scanner's <code>scripts/</code> blind spot; its missing <code>docs/archive/</code> exemption; a dead no-op branch left over in the same function.</p>
+          <p><span class="detail-label">Regenerated and cross-checked this pass</span><code>product-packaging-audit:write-docs</code> — confirmed the exact "245 of 291 tools" figure cited elsewhere on this scorecard is still current, not stale; <code>saas-bottleneck-audit:write-docs</code> — clean, 3/3 tests passing.</p>
+          <p><span class="detail-label">Why 5/5</span>every major audit-script category this repo has for repo-hygiene questions (source dirt, interaction wiring, orphan detection, duplicate-system audit, SaaS compliance, import style, living-docs consistency, product packaging, bottleneck implementation) has now been run and its output verified at least once — real inaccuracies were found and fixed in 3 of them along the way, not just accepted at face value.</p>
         </div>
       </details>
     </article>

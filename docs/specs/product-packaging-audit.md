@@ -1,6 +1,6 @@
 # Product Packaging Audit
 
-Generated: 2026-07-23 (regenerate with `npm run product-packaging-audit:write-docs`)
+Generated: 2026-08-06 (regenerate with `npm run product-packaging-audit:write-docs`)
 
 ## Productization model
 
