@@ -10,7 +10,7 @@
 ### Emergency OS Services
 
 #### `emergencyStore` (Zustand)
-- **File:** `src/store/emergencyStore.ts` (~5000 LOC)
+- **File:** `src/store/emergencyStore.ts` (~6500 LOC)
 - **Purpose:** Central state for all ED operations
 - **Inputs:** Backend API payloads, WebSocket events, user actions
 - **Outputs:** Reactive state for all whiteboard components

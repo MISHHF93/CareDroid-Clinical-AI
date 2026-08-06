@@ -12,7 +12,7 @@ CareDroid has two distinct kinds of data with different shapes and access patter
 Keep both persistence layers rather than forcing the patient domain into the relational schema:
 
 - **TypeORM** (PostgreSQL in production, SQLite in local dev via `DATABASE_CLIENT`) for the ~55 platform entities.
-- **Mongoose/MongoDB** for `UnifiedPatient` and `SmartIntake`, connected only when `ENABLE_MONGOOSE_EMERGENCY_OS=true` (`registerEmergencyMongooseRuntime()` in `backend/src/main.ts`). This also gates the `reassessment.scheduler.ts` cron job and the legacy Express routes that operate on Mongo patient documents.
+- **Mongoose/MongoDB** for `UnifiedPatient` and `SmartIntake`, connected only when `ENABLE_MONGOOSE_EMERGENCY_OS=true` (`registerEmergencyMongooseRuntime()` in `backend/src/main.ts`). This also gates the `reassessment.scheduler.ts` cron job and the Mongo-backed NestJS controllers (`ReassessmentController`, `EmsController`, `SmartIntakeController`, etc. — see [API Reference §1](../api/api-reference.md#1-files-still-mounted-directly-on-express-backendsrcapi) for what these replaced) that operate on Mongo patient documents.
 
 ## Consequences
 

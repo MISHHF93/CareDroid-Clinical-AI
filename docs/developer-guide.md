@@ -100,7 +100,7 @@ Training data and trained weights live in `backend/ml-services/nlu/data/` and `b
 - TypeScript throughout both frontend and backend; class-validator DTOs on the NestJS side.
 - Feature-module pattern on the frontend (`src/features/*Feature.tsx` + `use*.ts` hook + `index.ts`) for encapsulated domain slices (alerts-center, capacity, copilot, ems-module, patient-detail, triage-queue, whiteboard).
 - Backend modules follow standard Nest structure (`*.module.ts`, `*.controller.ts`, `*.service.ts`, `entities/*.entity.ts`).
-- No UI component library dependency — `src/components/primitives/` (Button, Input, Badge, Avatar, Checkbox, Divider, Icon, IconButton, Skeleton, Spinner, Switch) is the intended shared atom library, but real adoption is currently thin (5 files, all in `src/components/collaboration/`) — treat it as the direction for new code, not yet an "observed" repo-wide pattern.
+- No UI component library dependency — `src/components/primitives/` (Text, Button, Input, Textarea, Badge, Avatar, Checkbox, Divider, Icon, IconButton, Skeleton, Spinner, Switch) is the intended shared atom library, but real adoption is currently thin (5 files, all in `src/components/collaboration/`) — treat it as the direction for new code, not yet an "observed" repo-wide pattern.
 - AI provider access is server-side only — never add an Anthropic/OpenAI API key to frontend code; go through `lib/ai/serverClient.ts` via a backend endpoint.
 
 See also: [Platform Architecture Overview](architecture/platform-architecture-overview.md), [API Reference](api/api-reference.md), [Data Model Reference](data-model/data-model-reference.md), [Deployment Guide](deployment-guide.md), [Configuration Reference](configuration-reference.md).

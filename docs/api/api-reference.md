@@ -1,43 +1,26 @@
 # API Reference
 
-> Consolidates both of CareDroid's API surfaces into one reference. For the frontend-page-consumption view (which page calls which endpoint), see [`docs/generated/apis.md`](../generated/apis.md) — that file is generated from `pageApiBinding.registry.ts` and `emergencyOsApi.ts` and should be treated as authoritative for those 50 bindings. This document is the authoritative *complete* endpoint inventory (500+ endpoints across two route systems) and explains how the two systems relate.
+> Consolidates both of CareDroid's API surfaces into one reference. For the frontend-page-consumption view (which page calls which endpoint), see [`docs/generated/apis.md`](../generated/apis.md) — that file is generated from `pageApiBinding.registry.ts` and `emergencyOsApi.ts` and should be treated as authoritative for those 50 bindings. This document is the endpoint inventory for the current, single NestJS routing system (§2) plus the small set of files still mounted directly on the Express app underneath it (§1).
 >
-> **Live, always-current source of truth:** `GET /api/routes` (lists every legacy Express route at runtime) and the Swagger UI at `http://localhost:5190/api/docs` (all NestJS controllers, request/response schemas). Regenerate this document's NestJS section by re-reading `backend/src/modules/**/*.controller.ts` if it drifts.
+> **Live, always-current source of truth:** the Swagger UI at `http://localhost:5190/api/docs` (all NestJS controllers, request/response schemas). Regenerate this document's NestJS section by re-reading `backend/src/modules/**/*.controller.ts` if it drifts.
 
-## Two route systems, one Express app
+## One routing system, not two
 
-All requests hit a single Express app. `app.setGlobalPrefix('api')` in `backend/src/main.ts` puts every NestJS controller under `/api/*`. Legacy Express routers (`backend/src/api/*.routes.ts`) are also mounted under `/api/*` directly (not through Nest's DI/guard system). There is real overlap between the two — e.g. governance, capacity, boarding, and copilot logic exists in **both** the Emergency-OS mega-controller and standalone legacy routers/services. See [Known Documentation Debt](../DOCUMENTATION_CENTER.md#known-documentation-debt) for the consolidation recommendation.
+`backend/src/api/routes-registry.ts` — the legacy Express route registry and its `GET /api/routes` discovery endpoint — was deleted outright in the Express→Nest decommission (see `backend/src/api/express-nest-parity.spec.ts` for the full retirement history: which Nest controller replaced each of the 16 original route groups, and in which cycle). `app.setGlobalPrefix('api')` in `backend/src/main.ts` puts every NestJS controller under `/api/*`; NestJS is now the sole routing authority. §1 below is not a second, parallel system — it's the 3 files still mounted directly on the underlying Express app for reasons that don't fit the Nest DI/guard model (a health check needed before Nest's DI container is ready, a raw WebSocket handler, and a JWT-verification helper both of those use).
 
-**Authentication:** NestJS controllers are protected per-controller via `AuthGuard('jwt')` + `AuthorizationGuard` (see [Platform Architecture Overview §Authorization](../architecture/platform-architecture-overview.md#authorization--rbac)). **Legacy Express routers generally have no auth middleware at all** — treat any endpoint under §1 below as unauthenticated unless you've verified otherwise in the source file.
+**Authentication:** NestJS controllers are protected per-controller via `AuthGuard('jwt')` + `AuthorizationGuard` (see [Platform Architecture Overview §Authorization](../architecture/platform-architecture-overview.md#authorization--rbac)). The one exception is `/health`, which is deliberately unauthenticated (see §1).
 
 ---
 
-## 1. Legacy Express routers (`backend/src/api/`)
+## 1. Files still mounted directly on Express (`backend/src/api/`)
 
-Mounted at `/api/*` (plus `/api/emergency/*` legacy aliases when `ENABLE_MONGOOSE_EMERGENCY_OS=true`). Runtime discovery: `GET /api/routes`.
-
-| Base path | File | Endpoints | Notes |
+| File | Mounted as | Endpoints | Why it's not a Nest controller |
 |---|---|---|---|
-| `/health` (also `/api/health`, `/health` directly) | `health.routes.ts` | `GET /` | Comprehensive system health check |
-| `/capacity` | `capacity.routes.ts` | `GET /dashboard` | |
-| `/ems` | `ems.routes.ts` | `POST /alert`, `PATCH /status/:emsUnitId`, `POST /arrive/:emsUnitId`, `GET /incoming` | |
-| `/surge` | `surge.routes.ts` | `POST /activate`, `POST /batch-ems-intake`, `GET /bottlenecks`, `POST /deactivate`, `GET /status` | |
-| `/boarding` | `boarding.routes.ts` | `POST /track-decision`, `GET /metrics`, `GET /report`, `GET /boarded`, `GET /discharge-readiness/:patientId`, `GET /same-day-discharges` | |
-| `/protocol` | `protocol.routes.ts` | `GET /`, `GET /health`, `GET /evaluate` | |
-| `/deterioration` | `deterioration.routes.ts` | `GET /`, `GET /health`, `POST /predict` | |
-| `/copilot` | `copilot.routes.ts` | `POST /query` | Legacy copilot entry point — see also NestJS `chat`/`ai` modules |
-| `/intake` | `smart-intake.routes.ts` | `POST /sessions`, `POST /:id/manual-entry`, `POST /:id/documents`, `POST /:id/ocr-results`, `POST /:id/ems-evidence`, `POST /:id/match`, `POST /:id/verify-field`, `POST /:id/link-patient`, `POST /:id/create-patient`, `POST /:id/continue-unknown`, `POST /:id/reconcile-unknown`, `POST /:id/biometric-consent`, `POST /:id/biometric-consent/withdraw`, `GET /:id/audit-log` | Backs [AI Patient Intake](../AI_PATIENT_INTAKE.md) |
-| `/moh` | `moh.routes.ts` | `GET /`, `GET /health` | **Placeholder stub** — Ministry of Health FHIR integration described but not implemented |
-| `/wearable` | `wearable.routes.ts` | `GET /`, `GET /health` | **Placeholder stub** |
-| `/iot` | `iot.routes.ts` | `GET /`, `GET /health` | **Placeholder stub** |
-| `/simulation` | `simulation.routes.ts` | `GET /`, `GET /health` | **Placeholder stub** — see also NestJS `simulation` module, which is real |
-| `/governance` | `governance.routes.ts` | `GET /registry`, `GET /safety-rules`, `GET /compliance`, `GET /violations`, `GET /validate-prompts`, `POST /evaluate-priority-change` | Duplicated in NestJS `v1/governance` and `emergency/governance` controllers |
-| `/handover` | `handover.routes.ts` | `GET /`, `GET /health` | **Placeholder stub** |
-| `/federated` | `federated.routes.ts` | `GET /`, `GET /health`, `POST /round` | |
-| `/digital-twin` | `digital-twin.routes.ts` | `GET /`, `GET /health` | **Placeholder stub** — see also NestJS `emergency-os` `/digital-twin/*` endpoints, which are real |
-| `/reassessment` | `reassessment.routes.ts` | `GET /due`, `POST /:patientId/reassess`, `POST /:patientId/dismiss` | Backed by `reassessment.scheduler.ts` (runs every minute when Mongoose runtime is enabled) |
+| `health.routes.ts` | `/health`, `/api/health` | `GET /`, `GET /live` | Deliberately unauthenticated liveness/readiness check, mounted before Nest's DI container is guaranteed ready |
+| `ems.socket.ts` | Raw WebSocket handlers (`registerEMSWebSocketSupport`, `registerEdgeAIAmbulanceWebSocketSupport`) on the HTTP server | — | WebSocket upgrade handling, guarded by `JwtQueryAuthGuard` |
+| `runtime-auth.ts` | Not a route — a JWT-verification helper (`createRuntimeJwtAuthenticator`, `createSocketJwtAuthMiddleware`) | — | Shared by the two files above, which run before/outside Nest's own guard pipeline |
 
-Non-HTTP: `ems.socket.ts` registers raw WebSocket handlers (`registerEMSWebSocketSupport`, `registerEdgeAIAmbulanceWebSocketSupport`) directly on the HTTP server, guarded by `JwtQueryAuthGuard`.
+**Everything else that used to live here was migrated to a real NestJS controller, not deleted silently:** `/capacity`→`CapacityController`, `/governance`→`NestAiGovernanceController`, `/copilot`→`EdCopilotNestParityController`, `/deterioration`→`DeteriorationController`, `/protocol`→`ProtocolController`, `/reassessment`→`ReassessmentController`, `/ems`→`EmsController`, `/boarding`→`BoardingController`, `/intake`→`SmartIntakeController`, `/federated`→`FederatedEMSController`, `/surge`→`SurgeController`. The 6 remaining groups (`/moh`, `/wearable`, `/iot`, `/simulation`, `/handover`, `/digital-twin`) were pure placeholder stubs with zero real functionality and were deleted outright rather than migrated — `/handover`'s real functionality lives in `ERPulseHandoverController` and `/digital-twin`'s in `OrganizationalDigitalTwinController`, both listed under Emergency-OS in §2 below.
 
 ---
 

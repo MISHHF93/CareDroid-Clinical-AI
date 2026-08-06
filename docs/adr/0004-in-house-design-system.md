@@ -9,7 +9,7 @@ Most React SPAs of this scope adopt a component library (MUI, Chakra, Radix/shad
 
 ## Decision
 
-Build and maintain an in-house set of primitives (`src/components/primitives/`: `Text`, `Icon`, `Button`, `IconButton`, `Badge`, `Input`, `Textarea`, `Checkbox`, `Switch`, `Avatar`, `Spinner`, `Skeleton`, `Divider`) and layout components (`src/components/layout/`: `Box`, `Stack`, `Grid`, `Cluster`, `Inline`, `Center`, `Spacer`, `SplitLayout`, `PageContainer`), styled via Tailwind with CSS-custom-property-backed semantic tokens (`src/styles/design-system.css`, `src/config/theme.tokens.ts`) rather than a fixed color palette baked into `tailwind.config.ts`.
+Build and maintain an in-house set of primitives (`src/components/primitives/`: `Text`, `Icon`, `Button`, `IconButton`, `Badge`, `Input`, `Textarea`, `Checkbox`, `Switch`, `Avatar`, `Spinner`, `Skeleton`, `Divider`) and layout components (`src/components/layout/`: `Stack`, `Grid`, `Cluster`, `Inline`, `Center`, `Spacer`, `SplitLayout`, `PageContainer` — an earlier `Box` component was removed as a dead barrel re-export in a later cleanup cycle), styled via Tailwind with CSS-custom-property-backed semantic tokens (`src/styles/design-system.css`, `src/config/theme.tokens.ts`) rather than a fixed color palette baked into `tailwind.config.ts`.
 
 ## Consequences
 
