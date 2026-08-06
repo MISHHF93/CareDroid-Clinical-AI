@@ -279,9 +279,16 @@
   min-width: 0;
 }
 
-.cd-insight-card,
-.cd-metric-card,
-.cd-status-widget {
+/*
+ * .cd-metric-card and .cd-status-widget are NOT included here: both render via
+ * the shared <Card compact> primitive (src/components/surfaces/Card.tsx), which
+ * already applies padding to its inner .cd-card__body via
+ * .cd-card--compact .cd-card__body. Adding padding here too stacked on top of
+ * that, roughly doubling the effective padding for those two card types
+ * relative to every other compact-card consumer. .cd-insight-card renders a
+ * plain element with no Card wrapper, so it still needs its own padding here.
+ */
+.cd-insight-card {
   padding: var(--compact-card-padding, var(--app-card-padding-compact, 14px));
 }
 
