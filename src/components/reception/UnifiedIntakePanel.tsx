@@ -747,7 +747,7 @@ export default function UnifiedIntakePanel({
                 ? 'Creating patient and routing to triage…'
                 : primaryAction.label
           }
-          aria-disabled={submitting || !canCreatePatient}
+          aria-disabled={(submitting || !canCreatePatient) ? 'true' : 'false'}
           onClick={() => {
             if (submitting || !canCreatePatient) return;
             void onRoute();

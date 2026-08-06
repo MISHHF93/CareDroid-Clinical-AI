@@ -1,4 +1,3 @@
-import React from 'react';
 import { resolveWhatHappensNext } from '../../services/whatHappensNextGuidance';
 import './WhatHappensNextBadge.css';
 

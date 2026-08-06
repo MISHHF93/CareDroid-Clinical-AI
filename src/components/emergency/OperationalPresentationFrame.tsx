@@ -1,4 +1,3 @@
-import React from 'react';
 import { resolveOperationalPresentation } from '../../config/emergencyOperationalPresentationModel';
 import { resolveScreenDensityProfile } from '../../config/screenDensityModeModel';
 import './OperationalPresentationFrame.css';

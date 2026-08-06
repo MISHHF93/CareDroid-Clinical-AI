@@ -1,4 +1,3 @@
-import React from 'react';
 import { AlertTriangle } from 'lucide-react';
 import { duplicateActionLabel } from '../../utils/patientDuplicateDetection';
 import './DuplicateCandidatePanel.css';

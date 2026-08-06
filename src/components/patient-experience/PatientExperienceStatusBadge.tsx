@@ -1,4 +1,3 @@
-import React from 'react';
 import { resolvePatientExperienceStatus } from '../../services/patientExperienceStatus';
 import { resolvePatientWaitingRoomMessage } from '../../services/waitingRoomStatusMessaging';
 import './PatientExperienceStatusBadge.css';

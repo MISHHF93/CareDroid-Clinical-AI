@@ -1,4 +1,3 @@
-import React from 'react';
 import { NavLink } from 'react-router-dom';
 import useSecurityAccess from '../../hooks/useSecurityAccess';
 import { getNavVisibleRoutes } from '../../lib/navigation';

@@ -386,7 +386,7 @@ export function InteractiveAIWorkspace({
           <button
             type="button"
             className="cd-iaw__suggestion"
-            aria-pressed={showInbox}
+            aria-pressed={showInbox ? 'true' : 'false'}
             onClick={() => setShowInbox((v) => !v)}
           >
             Inbox

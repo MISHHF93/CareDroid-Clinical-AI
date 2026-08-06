@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import HospitalMapInsights from '../../components/operations/HospitalMapInsights';
 import { GraphicIconBadge } from '../../components/graphics/CdlGraphicKit';
 import '../HospitalMapDashboard.css';

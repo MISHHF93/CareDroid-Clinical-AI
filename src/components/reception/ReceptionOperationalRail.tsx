@@ -96,7 +96,7 @@ export default function ReceptionOperationalRail({
                     type="button"
                     className="reception-queue-row__select"
                     onClick={() => onSelectPatient(patient.id)}
-                    aria-pressed={selected}
+                    aria-pressed={selected ? 'true' : 'false'}
                     aria-label={`${patientDisplayName(patient)}, ${queueStatus(patient)}, ${waitMinutes(patient)} minutes, next ${nextStep(patient)}`}
                   >
                     <span className="reception-queue-row__who">

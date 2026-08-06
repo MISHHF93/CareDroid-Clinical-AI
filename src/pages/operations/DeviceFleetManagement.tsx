@@ -83,7 +83,7 @@ export default function DeviceFleetManagement() {
         <div className="device-fleet-page__actions">
           <span
             className={`device-fleet-page__demo-badge${isDemo ? '' : ' device-fleet-page__demo-badge--hidden'}`}
-            aria-hidden={!isDemo}
+            aria-hidden={!isDemo ? 'true' : 'false'}
           >
             Demo registry
           </span>

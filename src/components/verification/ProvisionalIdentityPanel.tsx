@@ -1,4 +1,3 @@
-import React from 'react';
 import { PROVISIONAL_IDENTITY_PROFILES } from '../../services/provisionalIdentityIntake';
 import './ProvisionalIdentityPanel.css';
 

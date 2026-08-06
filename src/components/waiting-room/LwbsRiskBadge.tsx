@@ -1,4 +1,3 @@
-import React from 'react';
 import { resolveLwbsRisk, shouldSurfaceLwbsRisk } from '../../services/lwbsRiskLayer';
 import './LwbsRiskBadge.css';
 

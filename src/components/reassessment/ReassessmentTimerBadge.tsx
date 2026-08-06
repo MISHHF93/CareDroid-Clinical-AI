@@ -1,4 +1,3 @@
-import React from 'react';
 import { selectReassessmentTimerForPatient } from '../../engine/reassessmentTimerEngine';
 import './ReassessmentTimerPanel.css';
 

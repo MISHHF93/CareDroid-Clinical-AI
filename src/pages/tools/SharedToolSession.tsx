@@ -1,4 +1,3 @@
-import React from 'react';
 import { useParams } from 'react-router-dom';
 import useProfileNavigate from '../../hooks/useProfileNavigate';
 import { getSharedSession } from '../../utils/sharedSessions';

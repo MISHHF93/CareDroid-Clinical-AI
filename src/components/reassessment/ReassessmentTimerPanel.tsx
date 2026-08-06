@@ -1,4 +1,3 @@
-import React from 'react';
 import { formatTimerLabel } from '../../engine/reassessmentTimerEngine';
 import './ReassessmentTimerPanel.css';
 

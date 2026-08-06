@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import useTrackMindRolePermissions from '../hooks/useTrackMindRolePermissions';
 import { useUser } from '../contexts/UserContext';

@@ -1,4 +1,3 @@
-import React from 'react';
 import useEmergencyDeviceContext from '../../hooks/useEmergencyDeviceContext';
 import './DeviceContextPanel.css';
 

@@ -1,4 +1,3 @@
-import React from 'react';
 import useSecurityAccess from '../../hooks/useSecurityAccess';
 import type { HospitalRole } from '../../lib/users/userTypes';
 import { useCareDroidUser } from '../../hooks/useCareDroidUser';

@@ -1,4 +1,3 @@
-import React from 'react';
 import { EMPTY_STATE_COPY } from '../../config/emptyStateCopy';
 import ChargeNurseOperationalStrip from './ChargeNurseOperationalStrip';
 

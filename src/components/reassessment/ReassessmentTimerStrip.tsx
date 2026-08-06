@@ -1,4 +1,3 @@
-import React from 'react';
 import { formatTimerClockTime } from '../../engine/reassessmentTimerEngine';
 import './ReassessmentTimerStrip.css';
 

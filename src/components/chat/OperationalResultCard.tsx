@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import { ToolResultBody } from '../ToolCard';
 import { NavIcon } from '../../navigation/NavIcon';

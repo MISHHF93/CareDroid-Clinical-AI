@@ -94,7 +94,7 @@ export function InteractionInbox({
             key={f.id}
             type="button"
             className="cd-iaw__suggestion"
-            aria-pressed={kind === f.id}
+            aria-pressed={kind === f.id ? 'true' : 'false'}
             onClick={() => setKind(f.id)}
           >
             {f.label}
@@ -141,7 +141,7 @@ export function InteractionInbox({
                     type="button"
                     className="cd-iaw__suggestion"
                     data-testid="inbox-item-assign-toggle"
-                    aria-pressed={assignedToMe}
+                    aria-pressed={assignedToMe ? 'true' : 'false'}
                     onClick={() => toggleAssignToMe(item)}
                   >
                     {assignedToMe ? 'Unassign' : 'Assign to me'}
@@ -150,7 +150,7 @@ export function InteractionInbox({
                     type="button"
                     className="cd-iaw__suggestion"
                     data-testid="inbox-item-comments-toggle"
-                    aria-expanded={isExpanded}
+                    aria-expanded={isExpanded ? 'true' : 'false'}
                     onClick={() => {
                       setExpandedItemId(isExpanded ? null : item.id);
                       setCommentDraft('');

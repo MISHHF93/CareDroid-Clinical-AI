@@ -1,4 +1,3 @@
-import React from 'react';
 import { FileScan, UserPlus, UserRoundX, UserSearch, X } from 'lucide-react';
 import { RECEPTION_COPY } from './receptionCopy';
 import './PreparePatientChooser.css';

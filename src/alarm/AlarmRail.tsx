@@ -1,4 +1,3 @@
-import React from 'react';
 import { AlarmBanner } from './AlarmBanner';
 import type { AlarmItem } from './types';
 

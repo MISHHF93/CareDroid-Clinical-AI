@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   FIT_TO_WAIT_CLASSIFICATIONS,
   canClassifyFitToWait,

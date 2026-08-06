@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CHART_PALETTE } from '../../config/colorSchema.registry';
 import { MEDICAL_THEME } from '../../config/medicalTheme.constants';
@@ -101,7 +101,7 @@ function ModelCard({
     <div
       role="button"
       tabIndex={0}
-      aria-expanded={expanded}
+      aria-expanded={expanded ? 'true' : 'false'}
       style={{
         background: MEDICAL_THEME.surfaceCard,
         border: `1.5px solid ${color}44`,

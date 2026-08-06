@@ -1,4 +1,3 @@
-import React from 'react';
 import ToolApiErrorBanner from './ToolApiErrorBanner';
 import {
   LoadingState,

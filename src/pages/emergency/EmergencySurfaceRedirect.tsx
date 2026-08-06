@@ -1,4 +1,3 @@
-import React from 'react';
 import { Navigate, useLocation, useSearchParams } from 'react-router-dom';
 import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermissions';
 import {

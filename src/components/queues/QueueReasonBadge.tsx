@@ -1,4 +1,3 @@
-import React from 'react';
 import { resolveQueueReason } from '../../services/queueReasonVisibility';
 import './QueueReasonBadge.css';
 

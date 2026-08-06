@@ -1,4 +1,3 @@
-import React from 'react';
 import { RECEPTION_COPY } from './receptionCopy';
 import SmartIntake from '../../pages/emergency/SmartIntake';
 import './ReceptionSmartIntakeOverlay.css';
