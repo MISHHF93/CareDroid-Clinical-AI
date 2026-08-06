@@ -8,6 +8,15 @@ import { fileURLToPath } from 'node:url';
 // commands) across many separate audit cycles. Encodes those manual checks so
 // future drift — a second .git, a second HTTP server, a duplicated app root —
 // fails CI instead of waiting for the next manual audit.
+//
+// Until 2026-08-06 this repo genuinely had 2 frontends and 2 backend/server
+// processes (navigator/, a merged-in standalone route-lookup app with zero
+// links from the real product) and this guard carried an explicit exception
+// for it. navigator/ was consolidated into the main app
+// (backend/src/modules/app-navigator/, src/pages/AppNavigator.tsx) and
+// deleted — the exceptions below are gone, not just narrowed, so a future
+// re-introduction of a second frontend/backend fails this test with no
+// carve-out to quietly widen.
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(__dirname, '../..');
@@ -35,7 +44,6 @@ function findNestedGitDirs(dir: string, depth = 0): string[] {
 // integration tests, which is expected and not a second production backend.
 const ALLOWED_LISTEN_FILES = new Set([
   'backend/src/main.ts',
-  'navigator/src/server.js',
 ]);
 
 function findStrayListenCalls(dir: string): string[] {
@@ -85,7 +93,7 @@ describe('repositoryStructureAudit', () => {
     expect(findNestedGitDirs(REPO_ROOT)).toEqual([]);
   });
 
-  it('has no HTTP .listen() calls outside the one real backend and the disclosed navigator/ companion', () => {
+  it('has no HTTP .listen() calls outside the one real backend', () => {
     expect(findStrayListenCalls(REPO_ROOT)).toEqual([]);
   });
 
@@ -99,13 +107,13 @@ describe('repositoryStructureAudit', () => {
     expect(existsSync(join(REPO_ROOT, 'backend/src/api/routes-registry.ts'))).toBe(false);
   });
 
-  it('has no frontend build entry points beyond the main app and the disclosed navigator/ companion', () => {
+  it('has no frontend build entry points beyond the one real app', () => {
     // A 2026-08-06 audit found the "exactly one frontend" claim above checks the
     // right path exists but never checks that nothing ELSE like it exists
     // anywhere else in the tree — this closes that gap by enumerating every
     // index.html/vite.config*/webpack.config* in the repo and asserting the set
-    // is exactly the two known, disclosed ones (main app + navigator/), not more.
+    // is exactly the one real app's, not more.
     const found = findFrontendEntryPoints(REPO_ROOT).sort();
-    expect(found).toEqual(['index.html', 'navigator/public/index.html', 'vite.config.ts'].sort());
+    expect(found).toEqual(['index.html', 'vite.config.ts'].sort());
   });
 });

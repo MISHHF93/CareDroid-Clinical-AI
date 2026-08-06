@@ -132,7 +132,7 @@
 
 .self-checkin__field textarea {
   min-height: 120px;
-  resize: aertical;
+  resize: vertical;
 }
 
 .self-checkin__chips {
@@ -157,43 +157,43 @@
   font-size: 16px;
 }
 
-.self-checkin__chip--actiae {
+.self-checkin__chip--active {
   border-color: var(--app-text-primary);
   background: var(--app-surface-muted);
   color: var(--app-text-primary);
 }
 
-.self-checkin__preaiew {
+.self-checkin__preview {
   padding: 14px;
   border-radius: 12px;
   background: var(--app-surface-muted);
   border: 1px solid var(--app-border-subtle);
 }
 
-.self-checkin__preaiew h3 {
+.self-checkin__preview h3 {
   margin: 0 0 8px;
   font-size: 14px;
 }
 
-.self-checkin__reaiew-list {
+.self-checkin__review-list {
   display: grid;
   gap: 10px;
   margin: 0;
 }
 
-.self-checkin__reaiew-list dia {
+.self-checkin__review-list div {
   display: grid;
   gap: 2px;
 }
 
-.self-checkin__reaiew-list dt {
+.self-checkin__review-list dt {
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--color-text-secondary, var(--cdl-ink-muted, #334155));
 }
 
-.self-checkin__reaiew-list dd {
+.self-checkin__review-list dd {
   margin: 0;
   font-weight: 650;
 }

@@ -20,6 +20,11 @@ services:
       ANOMALY_DETECTION_ENABLED: 'false'
       RAG_ENABLED: 'false'
       AI_ENABLED: ${AI_ENABLED:-false}
+      # Optional: enables LLM-synthesized answers for the in-app navigator
+      # (backend/src/modules/app-navigator/); degrades to deterministic
+      # catalog-only matching when unset.
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      GROQ_MODEL: ${GROQ_MODEL:-}
       JWT_SECRET: ${JWT_SECRET:-CHANGE_ME_IN_PRODUCTION}
       ENCRYPTION_MASTER_KEY: ${ENCRYPTION_MASTER_KEY:-0000000000000000000000000000000000000000000000000000000000000000}
     ports:
@@ -53,39 +58,6 @@ services:
       - '8000:8000'
     depends_on:
       - backend
-    networks:
-      - caredroid-app
-
-  # Standalone "where do I find X?" route-lookup RAG (navigator/), grounded
-  # against src/config/routes.config.ts's CANONICAL_ROUTE_MAP. Zero runtime
-  # dependencies, catalog-only by default (Groq synthesis only if
-  # GROQ_API_KEY is supplied). Not required by backend/frontend and never
-  # blocks their startup — a dev/ops aid, not part of the app itself.
-  navigator:
-    build:
-      context: ./navigator
-      dockerfile: Dockerfile
-    container_name: caredroid-navigator
-    environment:
-      HOST: 0.0.0.0
-      PORT: 4178
-      GROQ_API_KEY: ${GROQ_API_KEY:-}
-      GROQ_MODEL: ${GROQ_MODEL:-}
-      NAVIGATOR_ACCESS_TOKEN: ${NAVIGATOR_ACCESS_TOKEN:-}
-    ports:
-      - '4178:4178'
-    healthcheck:
-      test:
-        [
-          'CMD',
-          'node',
-          '-e',
-          "require('http').get('http://localhost:4178/api/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))",
-        ]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 10s
     networks:
       - caredroid-app
 

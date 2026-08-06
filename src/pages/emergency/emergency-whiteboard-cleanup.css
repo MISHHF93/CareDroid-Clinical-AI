@@ -173,6 +173,17 @@
   padding: 16px;
 }
 
+/* The 3-column grid above needs ~790px of content width (3 minmax floors +
+   gaps/padding) and cannot shrink below that. The app shell's scrollport
+   (.app-shell-main-content) uses overflow-x: clip, not auto, so without a
+   breakpoint the third card is silently cut off rather than scrollable on
+   any viewport narrower than ~950px (2026-08-06 layout audit). */
+@media (max-width: 960px) {
+  .emergency-whiteboard-page__mission {
+    grid-template-columns: 1fr;
+  }
+}
+
 .emergency-whiteboard-page__mission-card {
   border: 1px solid
     var(--cdl-clinical-border, var(--color-border-subtle, var(--medical-border, #e0f2fe)));

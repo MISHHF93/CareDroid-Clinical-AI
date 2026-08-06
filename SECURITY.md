@@ -26,8 +26,7 @@ program is in place.
 
 ## Scope
 
-- **In scope:** the application code in this repository (`src/`, `backend/`, `lib/`, `mcp/`,
-  `navigator/`).
+- **In scope:** the application code in this repository (`src/`, `backend/`, `lib/`, `mcp/`).
 - **Out of scope:** third-party dependencies (report those upstream) and social-engineering
   or physical-access attacks against any specific deployment.
 

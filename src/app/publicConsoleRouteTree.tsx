@@ -12,6 +12,7 @@ const lazyNamed = (loader: () => Promise<Record<string, unknown>>, exportName: s
 
 const VersionPage = lazyRoute(() => import('../pages/Version'));
 const HelpCenterPage = lazyRoute(() => import('../pages/HelpCenter'));
+const AppNavigatorPage = lazyRoute(() => import('../pages/AppNavigator'));
 const GdprNoticePage = lazyRoute(() => import('../pages/GDPRNotice'));
 const HipaaNoticePage = lazyRoute(() => import('../pages/HIPAANotice'));
 const PrivacyPolicyPage = lazyNamed(() => import('../pages/legal/PrivacyPolicy'), 'PrivacyPolicy');
@@ -22,6 +23,7 @@ const ConsentHistoryPage = lazyNamed(() => import('../pages/legal/ConsentHistory
 const PUBLIC_CONSOLE_PAGE_COMPONENTS = Object.freeze({
   version: VersionPage,
   helpCenter: HelpCenterPage,
+  appNavigator: AppNavigatorPage,
   gdprNotice: GdprNoticePage,
   hipaaNotice: HipaaNoticePage,
   privacyPolicy: PrivacyPolicyPage,

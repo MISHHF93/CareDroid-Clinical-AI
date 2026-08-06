@@ -84,6 +84,7 @@
     "product-packaging-audit:write-docs": "node scripts/write-product-packaging-audit.mjs",
     "closure-audit:write-docs": "node scripts/run-closure-audit-sequence.mjs",
     "contract:write-docs": "node scripts/write-backend-frontend-tool-contract.mjs",
+    "navigator-catalog:sync": "node scripts/sync-app-navigator-catalog.mjs",
     "test:contract-matrix": "vitest run src/data/backendFrontendToolContract.test.ts src/data/backendFrontendToolContract.report.test.ts src/data/toolContractMatrix.test.ts",
     "test:backend-exposure": "vitest run src/data/backendFrontendExposure.test.ts src/data/backendFrontendExposure.report.test.ts src/data/backendFrontendToolContract.test.ts src/data/executorMappingAudit.test.ts src/data/backendOrphanAudit.test.ts src/data/backendControllerRouteScan.test.ts src/config/backendApiCapabilities.test.ts src/services/clinicalOrchestratorApi.test.ts src/services/clinicalToolsApi.test.ts src/services/complianceApi.test.ts",
     "exposure:write-docs": "node scripts/write-backend-exposure-report.mjs",

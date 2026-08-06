@@ -49,11 +49,10 @@ For the full stack, run `docker compose up` against the root `docker-compose.yml
 |---|---|---|
 | `ci-cd.yml` | push to main/develop, PRs | CI/CD pipeline |
 | `validate.yml` | push to main/develop, PRs | Validation gate (mirrors `npm run validate:ci`) |
-| `navigator-test.yml` | push/PR touching `navigator/**` | `navigator/`'s own test suite + a committed-API-key rejection check (added when `navigator/` was merged in) |
 | `release.yml` | push to main + tags | Release |
 | `dependency-updates.yml` | weekly cron (Mon 09:00 UTC) | Dependency updates |
 
-(`ci.yml`, `test.yml`, and `quality.yml` no longer exist in `.github/workflows/` — the 5 files above are the complete, current list; verified directly, not assumed from a prior version of this doc.)
+(`ci.yml`, `test.yml`, `quality.yml`, and `navigator-test.yml` no longer exist in `.github/workflows/` — the 4 files above are the complete, current list; verified directly, not assumed from a prior version of this doc. `navigator-test.yml` covered the formerly-standalone `navigator/` app, retired 2026-08-06 when it was consolidated into the main backend/frontend — its tests now run as part of the normal backend `validate:ci` suite, same as every other module.)
 
 There is currently no changelog artifact produced by `release.yml` that this research pass could find — see [Documentation Center §Roadmap/Release Notes](DOCUMENTATION_CENTER.md#roadmap--release-notes--changelog).
 

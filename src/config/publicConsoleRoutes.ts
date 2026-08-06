@@ -20,6 +20,7 @@ export type PublicConsoleRedirectRoute = {
 export const PUBLIC_CONSOLE_ROUTES = Object.freeze<PublicConsoleRoute[]>([
   { path: CANONICAL_ROUTES.version, label: 'Build version', componentKey: 'version', outsideShell: true },
   { path: CANONICAL_ROUTES.helpCenter, label: 'Help center', componentKey: 'helpCenter', outsideShell: true },
+  { path: CANONICAL_ROUTES.appNavigator, label: 'App navigator', componentKey: 'appNavigator' },
   { path: CANONICAL_ROUTES.legalPrivacyPolicy, label: 'Privacy policy', componentKey: 'privacyPolicy', outsideShell: true },
   { path: CANONICAL_ROUTES.legalTerms, label: 'Terms of service', componentKey: 'termsOfService', outsideShell: true },
   { path: CANONICAL_ROUTES.legalGdpr, label: 'GDPR notice', componentKey: 'gdprNotice', outsideShell: true },

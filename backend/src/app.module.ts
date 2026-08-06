@@ -88,6 +88,7 @@ import { UnifiedAiNodeModule } from '../ml-services/unified-ai-node/unified-ai-n
 import { SentinelModule } from './modules/sentinel/sentinel.module';
 import { SurgeModule } from './modules/surge/surge.module';
 import { CapacityModule } from './modules/capacity/capacity.module';
+import { AppNavigatorModule } from './modules/app-navigator/app-navigator.module';
 import { DeteriorationModule } from './modules/deterioration/deterioration.module';
 import { ProtocolModule } from './modules/protocol/protocol.module';
 import { ReassessmentModule } from './modules/reassessment/reassessment.module';
@@ -246,6 +247,7 @@ function resolveDatabaseClient() {
     SentinelModule,
     SurgeModule,
     CapacityModule,
+    AppNavigatorModule,
     DeteriorationModule,
     ProtocolModule,
     ReassessmentModule,

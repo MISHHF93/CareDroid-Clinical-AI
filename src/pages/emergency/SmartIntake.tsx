@@ -36,6 +36,7 @@ import { EmergencyRoutePage } from './emergencyRouteShared';
 import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
 import { RECEPTION_FIRST_UX } from '../../config/receptionFirstUx.config';
 import './emergency-route.css';
+import './SmartIntake.css';
 import {
   SMART_INTAKE_STEP_INDEX,
   SMART_INTAKE_STREAMLINED_STEPS,

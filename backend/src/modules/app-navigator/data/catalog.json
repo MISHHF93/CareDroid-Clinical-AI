@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "source": "CareDroid CANONICAL_ROUTE_MAP",
-  "sourceCommit": "44f68a7c699bb0a99d3613854c422582d6277198",
-  "generatedAt": "2026-08-05T20:29:41.209Z",
+  "sourceCommit": "737df0fc7f8d74562a2159e787eaf0647149b584",
+  "generatedAt": "2026-08-06T22:53:24.598Z",
   "records": [
     {
       "id": "command-center",
@@ -490,6 +490,21 @@
       "aliases": [
         "/help"
       ],
+      "workflowOwner": "CareDroid support",
+      "requiredPermissions": []
+    },
+    {
+      "id": "app-navigator",
+      "label": "App navigator",
+      "description": "Ask a workflow question in plain language and get grounded matches from the verified route catalog.",
+      "path": "/navigator",
+      "component": "AppNavigator",
+      "navigationGroup": "Help",
+      "breadcrumbs": [
+        "Help",
+        "App navigator"
+      ],
+      "aliases": [],
       "workflowOwner": "CareDroid support",
       "requiredPermissions": []
     },

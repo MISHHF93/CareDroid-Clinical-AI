@@ -130,13 +130,13 @@
   gap: var(--ed-space-2);
 }
 
-.emergency-route-aiew-tabs {
+.emergency-route-view-tabs {
   display: inline-flex;
   flex-wrap: wrap;
   gap: var(--ed-space-2);
 }
 
-.emergency-route-aiew-tabs__btn {
+.emergency-route-view-tabs__btn {
   border: 1px solid var(--app-border-subtle);
   border-radius: var(--radius-pill, 999px);
   background: var(--app-surface-1);
@@ -149,10 +149,10 @@
   padding: 0 var(--ed-space-3);
 }
 
-.emergency-route-aiew-tabs__btn--actiae {
-  border-color: var(--app-accent-interactiae);
+.emergency-route-view-tabs__btn--active {
+  border-color: var(--app-accent-interactive);
   background: var(--app-surface-1);
-  color: var(--app-accent-hoaer);
+  color: var(--app-accent-hover);
 }
 
 .emergency-route-card {
@@ -407,7 +407,7 @@
   border-left: 2px solid
     color-mix(
       in srgb,
-      var(--queue-accent, var(--app-accent-interactiae, var(--status-info))) 45%,
+      var(--queue-accent, var(--app-accent-interactive, var(--status-info))) 45%,
       transparent
     );
   border-radius: var(--cdl-clinical-radius, var(--radius-lg, 12px));
@@ -476,7 +476,7 @@
   padding: 4px 8px;
 }
 
-.emergency-route-queue-row__moaement {
+.emergency-route-queue-row__movement {
   color: #374151;
   display: block;
   font-size: var(--ed-type-body);
@@ -555,12 +555,12 @@
 }
 
 .emergency-route-muted a {
-  color: var(--app-accent-interactiae, var(--status-info));
+  color: var(--app-accent-interactive, var(--status-info));
   font-weight: 700;
   text-decoration: none;
 }
 
-.emergency-route-muted a:hoaer {
+.emergency-route-muted a:hover {
   text-decoration: underline;
 }
 
@@ -576,7 +576,7 @@
   border: 1px solid var(--app-border-subtle);
   border-radius: 999px;
   background: var(--app-surface-1);
-  color: var(--app-accent-interactiae);
+  color: var(--app-accent-interactive);
   padding: 6px 10px;
   font-size: var(--ed-type-body);
   font-weight: 800;
@@ -598,7 +598,7 @@
   border-left: 2px solid
     color-mix(
       in srgb,
-      var(--command-action-accent, var(--app-accent-interactiae, var(--status-info))) 45%,
+      var(--command-action-accent, var(--app-accent-interactive, var(--status-info))) 45%,
       transparent
     );
   border-radius: var(--cdl-clinical-radius, var(--radius-lg, 12px));
@@ -615,14 +615,14 @@
 }
 
 .emergency-command-action--info {
-  --command-action-accent: var(--app-accent-interactiae, var(--status-info));
+  --command-action-accent: var(--app-accent-interactive, var(--status-info));
 }
 
 .emergency-command-action--success {
   --command-action-accent: var(--status-success, #10b981);
 }
 
-.emergency-command-action--actiae {
+.emergency-command-action--active {
   background: color-mix(in srgb, var(--command-action-accent) 7%, var(--ed-surface-raised));
 }
 
