@@ -6,7 +6,7 @@
 
 Canonical POST `/tools/:id/execute` ids live in:
 
-`backend/.../tool-orchestrator.registry.ts` → `REGISTERED_EXECUTOR_TOOL_IDS` (22 calculators/tools).
+`backend/.../tool-orchestrator.registry.ts` → `REGISTERED_EXECUTOR_TOOL_IDS` (39 calculators/tools as of this check — re-verify by comparing this array's length against `registerTool()` call count in `tool-orchestrator.service.ts` before citing, since this list has grown before without docs catching up).
 
 Aliases expanded for common names (`heart`, `gcs`, `news-2`, `sofa`, `wells`, …) via `EXECUTOR_ID_ALIASES` and `REGISTRY_ID_TO_EXECUTOR_TOOL_ID`.
 

@@ -63,7 +63,7 @@ All paths below are relative to `/api`. JWT-guarded modules are noted; assume JW
 | `clinical-alerts` | `clinical/alerts` | `GET /`, `POST /:id/acknowledge`, `POST /:id/dismiss` |
 | `native-ai` | `native-ai` | `GET /registry`, `GET /drift`, `POST /drift/evaluate`, `POST /route`, `POST /clinical-acuity`, `GET/POST /triage-rules(+/evaluate)`, `POST /specialists/infer` |
 | `tool-calling` | `tool-calling` | `POST /execute`, `GET /catalog`, `GET /resolve`, `GET /logs` |
-| `tool-orchestrator` (medical-control-plane) | `tools` | `GET /`, `GET /available`, `GET /statistics`, `GET /catalog/executors`, `GET /:id`, `POST /:id/validate`, `POST /:id/execute`, `POST /execute`, `POST /results` — **only 3 tools have real executors:** `sofa-calculator`, `drug-interactions`, `lab-interpreter` |
+| `tool-orchestrator` (medical-control-plane) | `tools` | `GET /`, `GET /available`, `GET /statistics`, `GET /catalog/executors`, `GET /:id`, `POST /:id/validate`, `POST /:id/execute`, `POST /execute`, `POST /results` — **39 tools have real, live server-side executors** (`REGISTERED_EXECUTOR_TOOL_IDS`, each backed by a real `registerTool()` call — counts cross-verified to match) |
 | `training` | `training` | `GET /pipeline(+/dashboard,+/runs)`, `POST /runs(+/:id/evaluate)`, `GET /moe-plan` |
 | `evaluation` | `evaluation` | `GET /dashboard(+/metrics,+/runs)`, `POST /runs` |
 | `cost-optimizer` | `cost-optimizer` | `POST /route`, `GET /dashboard` |
