@@ -40,7 +40,7 @@ From `vite.config.ts`:
 
 | Layer | Tool | Config | Notes |
 |---|---|---|---|
-| Frontend unit/integration | Vitest | `vitest.config.ts` | jsdom, `pool: 'threads'`, ~825 `*.test.*` files under `src/` |
+| Frontend unit/integration | Vitest | `vitest.config.ts` | jsdom, `pool: 'threads'`, 917 `*.test.*` files under `src/` |
 | Heavy route-tree test (isolated) | Vitest | `vitest.route-tree.config.ts` | Forces `pool: 'forks'`, `maxWorkers: 1` — avoids OOM/hangs on the canonical route redirect test |
 | Root integration | Jest | `jest.config.cjs` | Runs `tests/integration/**/*.test.ts` only (currently `emergency-os.test.ts`) |
 | Backend unit/e2e | Jest | `backend/test/jest-e2e.json` | Run via `cd backend && npm test` (`jest --runInBand`). Covers auth/RBAC/2FA/encryption/audit e2e, RAG/chat e2e, intent classification, tool-orchestrator, and a large bank of clinical-calculator spec files (NEWS2, HEART, Wells PE/DVT, PERC, GRACE ACS, SOFA, MELD, Child-Pugh, NIHSS, PHQ-9, GAD-7, STOP-BANG, ABCD2, CHA2DS2-VASc/HAS-BLED, Ottawa ankle, NEXUS/Canadian C-spine, PECARN, CKD staging, COPD GOLD) |
@@ -100,7 +100,7 @@ Training data and trained weights live in `backend/ml-services/nlu/data/` and `b
 - TypeScript throughout both frontend and backend; class-validator DTOs on the NestJS side.
 - Feature-module pattern on the frontend (`src/features/*Feature.tsx` + `use*.ts` hook + `index.ts`) for encapsulated domain slices (alerts-center, capacity, copilot, ems-module, patient-detail, triage-queue, whiteboard).
 - Backend modules follow standard Nest structure (`*.module.ts`, `*.controller.ts`, `*.service.ts`, `entities/*.entity.ts`).
-- No UI component library dependency — extend `src/components/primitives/` rather than introducing a new one.
+- No UI component library dependency — `src/components/primitives/` (Button, Input, Badge, Avatar, Checkbox, Divider, Icon, IconButton, Skeleton, Spinner, Switch) is the intended shared atom library, but real adoption is currently thin (5 files, all in `src/components/collaboration/`) — treat it as the direction for new code, not yet an "observed" repo-wide pattern.
 - AI provider access is server-side only — never add an Anthropic/OpenAI API key to frontend code; go through `lib/ai/serverClient.ts` via a backend endpoint.
 
 See also: [Platform Architecture Overview](architecture/platform-architecture-overview.md), [API Reference](api/api-reference.md), [Data Model Reference](data-model/data-model-reference.md), [Deployment Guide](deployment-guide.md), [Configuration Reference](configuration-reference.md).
