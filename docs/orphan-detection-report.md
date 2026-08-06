@@ -15,20 +15,20 @@ Generated: 2026-08-06 (regenerate with `npm run orphan-detection:write-docs`)
 
 | Metric | Count |
 |--------|------:|
-| Total orphan findings | 536 |
+| Total orphan findings | 522 |
 | App.jsx routes | 152 |
 | Orphan / gap routes | 221 |
-| Orphan pages | 149 |
-| Orphan components | 1 |
+| Orphan pages | 148 |
+| Orphan components | 0 |
 | Domain module findings (dashboard / simulation / lab / 3D) | 20 |
-| Orphan services | 1 |
+| Orphan services | 0 |
 | Executor contract gaps | 0 |
 | API orphans / stubs | 127 |
-| Weakly linked markdown | 17 |
+| Weakly linked markdown | 6 |
 | **wire** | 263 |
 | **merge** | 0 |
-| **quarantine** | 17 |
-| **legacy** | 256 |
+| **quarantine** | 0 |
+| **legacy** | 259 |
 
 ## Merge candidates (explicit)
 
@@ -276,7 +276,7 @@ Generated: 2026-08-06 (regenerate with `npm run orphan-detection:write-docs`)
 | Page file | Class | Evidence |
 | --- | --- | --- |
 | src/pages/admin/AdminOperationsHome.tsx | legacy | import:./pages/admin/AdminOperationsHome |
-| src/pages/admin/EdStaffWorkflowAdmin.tsx | legacy | import:./pages/admin/EdStaffWorkflowAdmin |
+| src/pages/admin/EdStaffWorkflowAdmin.tsx | legacy | import:src/pages/admin/EdStaffWorkflowAdmin |
 | src/pages/ai/AiCommandCenterDashboard.tsx | legacy | import:AiCommandCenterDashboard |
 | src/pages/ai/AiEvaluationDashboard.tsx | legacy | import:./pages/ai/AiEvaluationDashboard |
 | src/pages/ai/CostAnalyticsDashboard.tsx | legacy | import:./pages/ai/CostAnalyticsDashboard |
@@ -298,13 +298,13 @@ Generated: 2026-08-06 (regenerate with `npm run orphan-detection:write-docs`)
 | src/pages/commercial/ExpansionOpportunities.tsx | legacy | import:./pages/commercial/ExpansionOpportunities |
 | src/pages/commercial/MaturityAssessment.tsx | legacy | import:./pages/commercial/MaturityAssessment |
 | src/pages/commercial/ProductIntelligence.tsx | legacy | import:./pages/commercial/ProductIntelligence |
-| src/pages/emergency/DispatchConsole.tsx | legacy | import:src/pages/emergency/DispatchConsole |
-| src/pages/emergency/EmergencyAnalytics.tsx | legacy | import:./pages/emergency/EmergencyAnalytics |
-| src/pages/emergency/emergencyRoutePages.tsx | legacy | import:./pages/emergency/emergencyRoutePages |
-| src/pages/emergency/emergencyRouteShared.tsx | legacy | import:./pages/emergency/emergencyRouteShared |
+| src/pages/emergency/DispatchConsole.tsx | legacy | import:src/pages/emergency/DispatchConsole.tsx |
+| src/pages/emergency/EmergencyAnalytics.tsx | legacy | import:src/pages/emergency/EmergencyAnalytics |
+| src/pages/emergency/emergencyRoutePages.tsx | legacy | import:src/pages/emergency/emergencyRoutePages |
+| src/pages/emergency/emergencyRouteShared.tsx | legacy | import:src/pages/emergency/emergencyRouteShared |
 | src/pages/emergency/EmergencySettings.tsx | legacy | import:./pages/emergency/EmergencySettings |
 | src/pages/emergency/EmergencySurfaceRedirect.tsx | legacy | import:./pages/emergency/EmergencySurfaceRedirect |
-| src/pages/emergency/FullJourneyOperatingPage.tsx | legacy | import:./pages/emergency/FullJourneyOperatingPage |
+| src/pages/emergency/FullJourneyOperatingPage.tsx | legacy | import:src/pages/emergency/FullJourneyOperatingPage.tsx |
 | src/pages/emergency/HelpHubPage.tsx | legacy | import:./pages/emergency/HelpHubPage |
 | src/pages/emergency/HospitalCommandCenter.tsx | legacy | import:src/pages/emergency/HospitalCommandCenter.tsx |
 | src/pages/emergency/index.tsx | legacy | import:src/pages/emergency/index |
@@ -346,7 +346,6 @@ Generated: 2026-08-06 (regenerate with `npm run orphan-detection:write-docs`)
 | src/pages/platform/DepartmentIntelligence.tsx | legacy | import:./pages/platform/DepartmentIntelligence |
 | src/pages/platform/HealthcareKnowledgeHub.tsx | legacy | import:./pages/platform/HealthcareKnowledgeHub |
 | src/pages/platform/PlatformGovernanceWorkspace.tsx | wire | import:src/pages/platform/PlatformGovernanceWorkspace.tsx |
-| src/pages/platform/PlatformOSPages.tsx | quarantine | No production import path found |
 | src/pages/platform/PlatformSelfDiagnostics.tsx | legacy | import:./pages/platform/PlatformSelfDiagnostics |
 | src/pages/platform/PlatformSystemPage.tsx | wire | import:src/pages/platform/PlatformSystemPage.tsx |
 | src/pages/platform/WorkflowBuilder.tsx | legacy | import:./pages/platform/WorkflowBuilder |
@@ -427,9 +426,7 @@ Generated: 2026-08-06 (regenerate with `npm run orphan-detection:write-docs`)
 
 ## Orphan components
 
-| Component | Class | Evidence |
-| --- | --- | --- |
-| src/components/whiteboard/operationalHandoffArtifactRegistry.ts | quarantine | No production import |
+_None detected._
 
 ## Dashboards
 
@@ -452,9 +449,7 @@ _None detected._
 
 ## Orphan services
 
-| Service | Class | Evidence |
-| --- | --- | --- |
-| src/services/livingDocumentationGenerator.ts | quarantine | No production import of service module |
+_None detected._
 
 ## Orphan executors
 
@@ -593,21 +588,10 @@ _… and 7 more API rows._
 | --- | --- | --- |
 | docs/architecture/clickable-map-report.md | legacy | No inbound links from README, src, or other docs |
 | docs/architecture/component-mounting-report.md | legacy | No inbound links from README, src, or other docs |
-| docs/architecture/emergency-resource-board.md | quarantine | No inbound links from README, src, or other docs |
 | docs/architecture/layout-routing-consolidation-report.md | legacy | No inbound links from README, src, or other docs |
-| docs/architecture/system-evaluation.md | quarantine | No inbound links from README, src, or other docs |
-| docs/architecture/ui-surface-compression.md | quarantine | No inbound links from README, src, or other docs |
-| docs/manuals/roles/demo-observer.md | quarantine | No inbound links from README, src, or other docs |
-| docs/manuals/roles/lab-technician.md | quarantine | No inbound links from README, src, or other docs |
-| docs/manuals/roles/paramedic.md | quarantine | No inbound links from README, src, or other docs |
-| docs/manuals/roles/pharmacist.md | quarantine | No inbound links from README, src, or other docs |
-| docs/manuals/roles/radiology-technician.md | quarantine | No inbound links from README, src, or other docs |
-| docs/manuals/roles/registered-nurse.md | quarantine | No inbound links from README, src, or other docs |
-| docs/specs/current-codebase-findings.md | quarantine | No inbound links from README, src, or other docs |
-| docs/specs/saas-service-journey-map.md | quarantine | No inbound links from README, src, or other docs |
-| docs/specs/service-bottleneck-spec.md | quarantine | No inbound links from README, src, or other docs |
-| docs/specs/three-minute-response-spec.md | quarantine | No inbound links from README, src, or other docs |
-| docs/specs/visual-responsive-standards.md | quarantine | No inbound links from README, src, or other docs |
+| docs/archive/current-codebase-findings.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
+| docs/archive/system-evaluation.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
+| docs/archive/ui-surface-compression.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
 
 ## Appendix
 

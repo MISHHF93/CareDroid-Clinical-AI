@@ -42,6 +42,10 @@ CareDroid is one Vite + React frontend plus one NestJS backend, run together wit
 - [generated/roles.md](generated/roles.md) — all 11 modeled roles with generated metadata (frontend also models 23 fine-grained hospital roles — see [Platform Architecture Overview §RBAC](architecture/platform-architecture-overview.md#authorization--rbac))
 - [generated/workflows.md](generated/workflows.md) — the 21 generated workflow/automation records
 - [Full Emergency Care Journey](specs/full-emergency-care-journey.md) — mission and clinical-safety principles behind the 20-stage 911→outcome journey
+- [specs/saas-service-journey-map.md](specs/saas-service-journey-map.md) — per-service implementation status (Existing/Extended/Runtime stub) for every service backing the journey, keyed to `fullEmergencyCareJourneyService.ts`
+- [specs/service-bottleneck-spec.md](specs/service-bottleneck-spec.md) — tracked-service patient-impact levels and degradation detection, keyed to `bottleneckRegistry.ts`
+- [specs/three-minute-response-spec.md](specs/three-minute-response-spec.md) — the 3-minute critical-alert ownership timer spec, keyed to `threeMinuteTimerEngine.ts`
+- [specs/visual-responsive-standards.md](specs/visual-responsive-standards.md) — cross-device typography, layout, and touch-target standards
 
 ---
 
@@ -56,6 +60,7 @@ CareDroid is one Vite + React frontend plus one NestJS backend, run together wit
 - [duplicate-system-audit.md](duplicate-system-audit.md), [orphan-detection-report.md](orphan-detection-report.md) — audits of competing/orphaned code paths
 - [enterprise-subsystems-capability-map.md](enterprise-subsystems-capability-map.md) — hand-written capability audit against `research.md`'s 14 proposed enterprise subsystems (FHIR/HL7 interop, MPI, adaptive intake forms, consent/privacy, clinical knowledge registry, CDS Hooks, clinical safety, AI execution gateway, OCR, digital twin, imaging, NACRS reporting, human-factors lab, regulatory registry) — audit only, no implementation started
 - [architecture/RECEPTION_WORKSPACE_REFERENCE.md](architecture/RECEPTION_WORKSPACE_REFERENCE.md) — the Reception workspace as the canonical architectural template (route → screen mode → role → KPI layering) for building any other role workspace
+- [architecture/emergency-resource-board.md](architecture/emergency-resource-board.md) — the resource-board concept (rooms, stretchers, monitors, telemetry, infusion pumps) and how its acceptance criteria map onto the existing `/emergency/capacity`, `/emergency/ems`, and `/emergency/analytics` routes rather than a standalone page
 
 ---
 
@@ -99,7 +104,7 @@ CareDroid is one Vite + React frontend plus one NestJS backend, run together wit
 Two parallel sets of role documentation exist — see [Known Documentation Debt](#known-documentation-debt) for the reconciliation plan. Until merged, treat `docs/manuals/roles/` as the fuller "mission-framed" reference and `docs/users/` as the shorter guide-style companion.
 
 - [Master User Manual](manuals/caredroid-master-user-manual.md) — all roles, v2.0
-- [`docs/manuals/roles/`](manuals/roles/) — charge-nurse, demo-observer, emergency-physician, hospital-administrator, it-administrator, lab-technician, paramedic, patient-flow-coordinator, pharmacist, quality-safety-officer, radiology-technician, reception-clerk, registered-nurse, specialist, triage-nurse
+- [`docs/manuals/roles/`](manuals/roles/) — [charge-nurse](manuals/roles/charge-nurse.md), [demo-observer](manuals/roles/demo-observer.md), [emergency-physician](manuals/roles/emergency-physician.md), [hospital-administrator](manuals/roles/hospital-administrator.md), [it-administrator](manuals/roles/it-administrator.md), [lab-technician](manuals/roles/lab-technician.md), [paramedic](manuals/roles/paramedic.md), [patient-flow-coordinator](manuals/roles/patient-flow-coordinator.md), [pharmacist](manuals/roles/pharmacist.md), [quality-safety-officer](manuals/roles/quality-safety-officer.md), [radiology-technician](manuals/roles/radiology-technician.md), [reception-clerk](manuals/roles/reception-clerk.md), [registered-nurse](manuals/roles/registered-nurse.md), [specialist](manuals/roles/specialist.md), [triage-nurse](manuals/roles/triage-nurse.md)
 - [`docs/users/`](users/) — administrator, charge-nurse, developer, executive, it-admin, patient-flow-coordinator, physician, quality-safety, reception, specialist, triage-nurse
 
 ---

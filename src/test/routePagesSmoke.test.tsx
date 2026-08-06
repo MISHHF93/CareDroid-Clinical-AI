@@ -65,14 +65,12 @@ import DeviceFleetManagement from '../pages/operations/DeviceFleetManagement';
 import ClinicalAlertsPage from '../pages/ClinicalAlertsPage';
 import FleetLiveMap from '../pages/fleet/FleetLiveMap';
 import { OrganizationIntelligenceProfile } from '../pages/organization/OrganizationPages';
-import {
-  CareDroidBusinessBrainPage,
-  DepartmentIntelligencePage,
-  HealthcareKnowledgeHubPage,
-  WorkflowBuilderPage,
-  WorkflowMiningEnginePage,
-  WorkspaceDependencyGraphPage,
-} from '../pages/platform/PlatformOSPages';
+import { CareDroidBusinessBrainPage } from '../pages/platform/BusinessBrain';
+import { DepartmentIntelligencePage } from '../pages/platform/DepartmentIntelligence';
+import { HealthcareKnowledgeHubPage } from '../pages/platform/HealthcareKnowledgeHub';
+import { WorkflowBuilderPage } from '../pages/platform/WorkflowBuilder';
+import { WorkflowMiningEnginePage } from '../pages/platform/WorkflowMiningEngine';
+import { WorkspaceDependencyGraphPage } from '../pages/platform/WorkspaceDependencyGraph';
 import {
   CustomerExpansionOpportunitiesPage,
   MaturityAssessmentPage,

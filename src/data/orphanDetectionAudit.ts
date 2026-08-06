@@ -98,10 +98,14 @@ function walkFiles(dir, { extensions, excludeTest = false }) {
 
 function buildProductionCorpus() {
   const dirs = [
-    join(REPO_ROOT, 'src'),
-    join(REPO_ROOT, 'backend', 'src'),
+    { dir: join(REPO_ROOT, 'src'), extensions: ['.js', '.jsx', '.ts', '.tsx'] },
+    { dir: join(REPO_ROOT, 'backend', 'src'), extensions: ['.js', '.jsx', '.ts', '.tsx'] },
+    // scripts/*.mjs are real dev-tooling consumers (e.g. living-documentation and
+    // operational-handoff generators) that only import src/ modules, never the other
+    // way around — included so those modules aren't misreported as orphaned.
+    { dir: join(REPO_ROOT, 'scripts'), extensions: ['.mjs', '.js'] },
   ];
-  const files = dirs.flatMap((d) => walkFiles(d, { extensions: ['.js', '.jsx', '.ts', '.tsx'], excludeTest: true }));
+  const files = dirs.flatMap(({ dir, extensions }) => walkFiles(dir, { extensions, excludeTest: true }));
   return { files, text: files.map((f) => readFileSync(f, 'utf8')).join('\n') };
 }
 
@@ -516,6 +520,17 @@ function detectOrphanApis() {
   return rows;
 }
 
+// docs/archive/ is a deliberate, already-reviewed historical record (see
+// docs/DOCUMENTATION_CENTER.md's archiving convention) — its contents are meant
+// to stay unlinked from active docs, not re-flagged for review every scan.
+// baseline-report.md is a similarly reviewed, intentionally-unlinked exception:
+// it lives alongside the vitest JSON snapshots it documents inside the still-active
+// architect-mode/ program's own subfolder.
+const ARCHIVED_DOC_PREFIXES = ['docs/archive/'];
+const EXPECTED_UNLINKED_DOCS = new Set([
+  'docs/architecture/architect-mode/baseline/baseline-report.md',
+]);
+
 function detectOrphanMarkdown(srcCorpus) {
   const docFiles = walkFiles(join(REPO_ROOT, 'docs'), { extensions: ['.md'], excludeTest: false });
   const readme = readRepoFile('README.md');
@@ -538,16 +553,21 @@ function detectOrphanMarkdown(srcCorpus) {
       );
       if (inbound) return null;
 
+      const isArchived = ARCHIVED_DOC_PREFIXES.some((p) => rel.startsWith(p)) || EXPECTED_UNLINKED_DOCS.has(rel);
+      if (isArchived) {
+        return {
+          id: rel,
+          path: rel,
+          classification: ORPHAN_CLASSIFICATIONS.LEGACY,
+          evidence: 'Intentionally archived/unlinked historical record — already reviewed, kept for git history',
+        };
+      }
+
       const isGenerated = /Generated:|regenerate with/i.test(text.slice(0, 500));
-      const isStaleReport = /report|investigation|scan-report/i.test(base);
       return {
         id: rel,
         path: rel,
-        classification: isGenerated
-          ? ORPHAN_CLASSIFICATIONS.LEGACY
-          : isStaleReport
-            ? ORPHAN_CLASSIFICATIONS.QUARANTINE
-            : ORPHAN_CLASSIFICATIONS.QUARANTINE,
+        classification: isGenerated ? ORPHAN_CLASSIFICATIONS.LEGACY : ORPHAN_CLASSIFICATIONS.QUARANTINE,
         evidence: 'No inbound links from README, src, or other docs',
       };
     })

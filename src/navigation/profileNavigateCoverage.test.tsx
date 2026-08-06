@@ -22,7 +22,6 @@ const WIRED_SURFACE_FILES = [
   'src/pages/CommandDashboard.jsx',
 
   'src/pages/commercial/CommercialPages.tsx',
-  'src/pages/PlatformOSPages.tsx',
   'src/pages/tools/ClinicalToolCatalog.tsx',
   'src/pages/emergency/SmartIntake.tsx',
   'src/pages/HospitalMapDashboard.jsx',
