@@ -17,7 +17,7 @@ CareDroid now has a **traceable, human-governed AI control plane**:
 1. **Honest baseline** of what is live vs heuristic vs seed/demo  
 2. **Governed knowledge registry** with hash/license gates  
 3. **Single LLM egress** with PHI minimize, multi-provider adapters, kill switch  
-4. **Offline safety eval gate** (35 synthetic cases) as promotion blocker  
+4. **Offline safety eval gate** (41 synthetic cases across 9 packs as of this check — count `cases` in each `data/ai-eval/v1/packs/*.json` before citing, this suite has grown silently before) as promotion blocker  
 5. **Hybrid RAG** + citation entailment grounding  
 6. **Response provenance contract** on structured AI + chat composers  
 7. **Tool capability honesty** (no fake server execute success)  
