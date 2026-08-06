@@ -1,6 +1,6 @@
 ## Platform inventory
 
-*Reverse-engineered from shipped source on **2026-06-26**. Regenerate counts: `npm run inventory:report`. Detailed wiring matrices live under `docs/` (not in repo root).*
+*Reverse-engineered from shipped source on **2026-06-26**, hand-updated since. `npm run inventory:report` validates the counts in-memory (via `platformInventory.report.test.ts`) but does not write this file — there is no working one-command regeneration path; verify counts against `src/data/platformInventory.ts`'s source constants directly and edit this table by hand. Detailed wiring matrices live under `docs/` (not in repo root).*
 
 ### Summary
 
@@ -12,7 +12,7 @@
 | Calculator SPA routes | 92 | `src/routes/clinicalToolRoutes.ts` |
 | Unified catalog rows (search) | 291 | `/tools/catalog` index |
 | Known tool-area paths | 255 | `KNOWN_TOOL_AREA_PATHS` |
-| Backend POST executors | 3 | SOFA, drug interactions, lab interpreter |
+| Backend POST executors | 39 | see `REGISTERED_EXECUTOR_TOOL_IDS` in `tool-orchestrator.registry.ts` for the full, current list |
 | E2E validation matrix rows | 242 | `e2eToolValidationMatrix.ts` |
 
 ### Medical tools by delivery tier

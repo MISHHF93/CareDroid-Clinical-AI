@@ -1,5 +1,6 @@
 /**
- * Writes docs/backend-frontend-tool-contract.md when CONTRACT_WRITE_DOCS=1.
+ * Writes docs/architecture/backend-frontend-tool-contract.md and
+ * docs/architecture/tool-contract-matrix.md when CONTRACT_WRITE_DOCS=1.
  *
  * Usage:
  *   npm run contract:write-docs
@@ -28,7 +29,7 @@ const repoRoot = join(__dirname, '../..');
 const docsDir = join(repoRoot, 'docs', 'architecture');
 
 describe('backendFrontendToolContract report', () => {
-  it('covers every NLU profile and three POST executors', () => {
+  it('covers every NLU profile and matches the live set of registered POST executors', () => {
     const patterns = parseClinicalToolPatterns(readToolPatternsSource());
     const patternIds = new Set(patterns.map((p) => p.toolId));
     const rows = buildBackendFrontendContractRows();

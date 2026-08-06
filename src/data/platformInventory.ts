@@ -189,7 +189,7 @@ export function formatPlatformInventoryMarkdown(inv = getPlatformInventory()) {
 | Calculator SPA routes | ${c.calculatorSpaRoutes} | \`src/routes/clinicalToolRoutes.ts\` |
 | Unified catalog rows (search) | ${c.catalogSearchableRows} | \`/tools/catalog\` index |
 | Known tool-area paths | ${c.knownToolAreaPaths} | \`KNOWN_TOOL_AREA_PATHS\` |
-| Backend POST executors | ${c.backendPostExecutors} | SOFA, drug interactions, lab interpreter |
+| Backend POST executors | ${c.backendPostExecutors} | see \`REGISTERED_EXECUTOR_TOOL_IDS\` in \`tool-orchestrator.registry.ts\` for the full, current list |
 | E2E validation matrix rows | ${c.e2eMatrixRows} | \`e2eToolValidationMatrix.ts\` |
 
 ### Medical tools by delivery tier

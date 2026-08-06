@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /**
- * Regenerate docs/backend-frontend-tool-contract.md from canonical JS sources.
+ * Regenerate docs/architecture/backend-frontend-tool-contract.md and
+ * docs/architecture/tool-contract-matrix.md from canonical JS sources.
  *
  * Usage: npm run contract:write-docs
  */

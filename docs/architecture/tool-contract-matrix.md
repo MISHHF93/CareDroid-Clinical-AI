@@ -1,6 +1,6 @@
 # Tool contract matrix
 
-**Generated:** 2026-07-23T04:14:37.662Z
+**Generated:** 2026-08-06T21:09:19.449Z
 
 > **Source:** `src/data/toolContractMatrix.ts` (derived from `backendFrontendToolContract.ts`)
 > **Regenerate:** `npm run contract:write-docs`
@@ -28,11 +28,11 @@
 
 | Classification | Count |
 |----------------|------:|
-| user-facing and wired | 346 |
-| backend-only/internal | 280 |
+| user-facing and wired | 375 |
+| backend-only/internal | 314 |
 | user-facing but missing frontend route | 0 |
 | frontend-visible but backend missing | 0 |
-| planned/unsupported | 36 |
+| planned/unsupported | 22 |
 
 ## Status definitions
 
