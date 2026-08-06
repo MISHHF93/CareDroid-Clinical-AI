@@ -2,8 +2,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import QueueIntelligencePanel from './QueueIntelligencePanel';
-import { selectQueueBottleneckAlert, useEmergencyStore } from '../../store/emergencyStore';
-import type { QueueSummary, QueueType } from '../../types/emergency';
+import { selectQueueBottleneckAlert, useEmergencyStore } from '../store/emergencyStore';
+import type { QueueSummary, QueueType } from '../types/emergency';
 
 import './QueueIntelligencePanel.css';
 

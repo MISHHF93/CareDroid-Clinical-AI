@@ -18,7 +18,7 @@ import { TenantContextProvider } from '../contexts/TenantContext';
 import { useUser } from '../contexts/UserContext';
 import { AppRoutes } from '../App';
 import { PatientFlag, PatientState, Priority } from '../types/emergency';
-import { getPatientFlagType, useEmergencyStore } from '../../store/emergencyStore';
+import { getPatientFlagType, useEmergencyStore } from '../store/emergencyStore';
 import { compileCareDroidAccessProfile, normalizeCareDroidProfile } from '../lib/users/canonicalAccess';
 
 vi.mock('recharts', () => {

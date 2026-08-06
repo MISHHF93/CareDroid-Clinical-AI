@@ -3,7 +3,7 @@ import { act, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import DepartmentPulse from './pulse';
-import { useEmergencyStore } from '../../../store/emergencyStore';
+import { useEmergencyStore } from '../../store/emergencyStore';
 
 const originalState = useEmergencyStore.getState();
 const lastViewKey = 'caredroid.ed.departmentPulse.lastView.v1';
