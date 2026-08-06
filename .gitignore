@@ -37,6 +37,11 @@ dist-ssr
 # Local RAG in-memory vector index (dev)
 backend/.rag-local/
 
+# Local dev static-asset output + collaboration-hub attachment uploads.
+# LocalDiskAttachmentStorageProvider writes here in dev; must never be
+# committed since uploaded attachments can contain PHI.
+backend/public/
+
 # Local databases
 *.sqlite
 *.sqlite-*
