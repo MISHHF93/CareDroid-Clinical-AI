@@ -34,7 +34,6 @@ export {
 export { API_ROUTES, normalizeApiPath } from './api.config';
 export { CANONICAL_ROUTES, ROUTE_RECORDS, getRouteAliasTarget } from './routes.config';
 export { NAVIGATION_ITEMS, getVisibleNavigation } from './unified-navigation.config';
-export { THEME_CONFIG } from './theme.tokens';
-export { DESIGN_SYSTEM_CSS_ENTRY } from './designSystem';
+export { THEME_CONFIG, DESIGN_SYSTEM_CSS_ENTRY } from './designSystem';
 export { EMERGENCY_PLATFORM_CONTRACT } from './emergencyPlatform.config';
 export { PLATFORM_COHESION_CONTRACT, PLATFORM_COHESION_ENGINE_ID } from './platformCohesionModel';

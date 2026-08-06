@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { THEME_CONFIG } from '../config/theme.tokens';
+import { THEME_CONFIG } from '../config/designSystem';
 
 const DEFAULT_THEME = THEME_CONFIG.standardTheme;
 const STORAGE_KEY = 'caredroid-theme-preference';

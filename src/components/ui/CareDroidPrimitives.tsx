@@ -1,6 +1,6 @@
 import React, { HTMLAttributes, LabelHTMLAttributes, TableHTMLAttributes } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { CDL_PAGE_ZONES, type CdlPageZoneId } from '../../config/caredroidDesignLanguage';
+import { CDL_PAGE_ZONES, type CdlPageZoneId } from '../../config/designSystem';
 import {
   alarmKpiClassNames,
   alarmSeverityAriaLabel,

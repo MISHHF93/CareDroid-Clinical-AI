@@ -208,7 +208,7 @@ describe('canonical configuration contract', () => {
     expect(THEME_CONFIG.cssEntry).toBe('src/styles/design-system.css');
     expect(THEME_CONFIG.cssTokenSources).toContain('src/styles/design-system-bridge.css');
     expect(THEME_CONFIG.cssTokenSources).toContain('src/styles/theme-tokens.css');
-    expect(read('contexts/ThemeContext.tsx')).toContain("from '../config/theme.tokens'");
+    expect(read('contexts/ThemeContext.tsx')).toContain("from '../config/designSystem'");
 
     expect(LAYOUT_SCROLL_CONTRACT.viewportOwner).toBe('AppShell');
     expect(LAYOUT_SCROLL_CONTRACT.primaryScrollContainer).toBe('.app-shell-main-content');

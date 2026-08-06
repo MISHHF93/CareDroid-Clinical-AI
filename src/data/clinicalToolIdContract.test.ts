@@ -6,6 +6,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
+import { CANONICAL_ROUTES } from '../config/routes.config';
 import toolRegistry, { toolRegistryById } from './toolRegistry';
 import { clinicalIntentTools, builtinUiCalculators, nluCalculatorHubOnly } from './clinicalIntentToolCatalog';
 import { CHAT_ASSISTED_HUB_GROUPS } from './chatAssistedHubGroups';
@@ -278,5 +279,16 @@ describe('clinicalToolIdContract — NLU profile drift', () => {
     expect(ORCHESTRATOR_TO_REGISTRY_ID[NLU.sofaCalculator]).toBe(REGISTRY.sofaScore);
     expect(ORCHESTRATOR_TO_REGISTRY_ID[NLU.drugInteractions]).toBe(REGISTRY.drugCheck);
     expect(ORCHESTRATOR_TO_REGISTRY_ID[NLU.wellsPe]).toBe(REGISTRY.wellsPe);
+  });
+
+  it('duplicate-system-audit: Canonical route map vs tool launch paths -- every TOOL_LAUNCH_PATHS value derives from CANONICAL_ROUTES', () => {
+    // "Drift when adding fleet/simulation paths to one file only" -- docs/duplicate-
+    // system-audit.md's stated risk for this finding. Every one of the 33 entries already
+    // reads CANONICAL_ROUTES.X rather than a hand-typed literal; this guards it staying
+    // that way instead of a future addition reintroducing a second path definition.
+    const canonicalPaths = new Set(Object.values(CANONICAL_ROUTES));
+    for (const [key, path] of Object.entries(TOOL_LAUNCH_PATHS)) {
+      expect(canonicalPaths, `${key} path "${path}"`).toContain(path);
+    }
   });
 });

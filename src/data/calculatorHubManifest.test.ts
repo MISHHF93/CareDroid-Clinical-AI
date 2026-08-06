@@ -7,7 +7,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
 import { builtinUiCalculators } from './clinicalIntentToolCatalog';
-import { NLU_HUB_ONLY_PROFILE_TOOL_IDS } from './clinicalToolIdContract';
+import { BUILTIN_CALC, NLU_HUB_ONLY_PROFILE_TOOL_IDS } from './clinicalToolIdContract';
 import { CALCULATOR_ROUTE_DEFS } from '../routes/clinicalToolRoutes';
 import { CHAT_ASSISTED_HUB_GROUPS } from './chatAssistedHubGroups';
 import {
@@ -68,5 +68,21 @@ describe('calculatorHubManifest', () => {
 
   it.each(BUILTIN_CALCULATOR_SWITCH_SLUGS)('Calculators.jsx switch implements %s', (slug) => {
     expect(calculatorsSource).toContain(`case '${slug}':`);
+  });
+
+  it('duplicate-system-audit: Builtin calculator definitions -- every UI-form calculator id is registered in BUILTIN_CALC', () => {
+    // "Slug/id drift (e.g. registry id vs hub slug)" -- docs/duplicate-system-audit.md's
+    // stated risk for this finding. BUILTIN_CALCULATOR_SWITCH_SLUGS already derives
+    // directly from builtinUiCalculators (calculatorHubManifest.ts's own source), so that
+    // pair cannot drift. BUILTIN_CALC (clinicalToolIdContract.ts) is a broader registry-id
+    // namespace that legitimately includes calculators with no dedicated UI form (they
+    // render through the generic hub instead, same hasDedicatedForm distinction already
+    // established elsewhere in this audit) -- BUILTIN_CALC having MORE entries than
+    // builtinUiCalculators is expected, not drift. What would be a real bug: a UI form
+    // calculator whose id was never registered in BUILTIN_CALC at all.
+    const builtinCalcValues = new Set(Object.values(BUILTIN_CALC));
+    for (const calculator of builtinUiCalculators) {
+      expect(builtinCalcValues, calculator.id).toContain(calculator.id);
+    }
   });
 });
