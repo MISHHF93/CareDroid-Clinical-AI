@@ -1,6 +1,6 @@
 # Orphaned backend functions
 
-**Generated:** 2026-07-23T04:15:14.388Z
+**Generated:** 2026-08-06T21:22:42.521Z
 
 > Regenerate: `npm run exposure:write-docs`
 
@@ -54,13 +54,15 @@ Every backend HTTP route is either **wired** to a frontend client or listed belo
 | Route | Controller | Reason |
 |-------|------------|--------|
 | `/api/emergency/patients/:patientId/workflow-logs` | EmergencyOsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
-| `/api/emergency/ems/handoff` | EmergencyOsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/emergency/copilot/interactions` | EmergencyOsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/emergency/clinical-calculators/results` | EmergencyOsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/emergency/digital-twin/organizational/simulate` | OrganizationalDigitalTwinController | Research controller; active ED digital twin UI uses the core EmergencyOsController endpoints |
 | `/api/emergency/digital-twin/organizational/synchronize` | OrganizationalDigitalTwinController | Research controller; no dedicated SPA workflow yet |
 | `/api/ems/ai-call-interrogation` | AICallInterrogationController | Research EMS call interrogation endpoint; not exposed in active ED shell |
 | `/api/ems/ai-call-interrogation/ecg` | AICallInterrogationController | Research ECG interrogation endpoint; not exposed in active ED shell |
+| `/api/ems/federated` | FederatedEMSController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/ems/federated/health` | FederatedEMSController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/ems/federated/round` | FederatedEMSController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/ems/federated/112-call` | FederatedEMSController | Research federated EMS endpoint; no frontend intake workflow is wired |
 | `/api/federated/lmecs/predict` | LMECSController | Research severity-prediction endpoint; no SPA client is wired |
 | `/api/federated/lmecs/select` | LMECSController | Research client-selection endpoint; no SPA client is wired |
@@ -238,6 +240,26 @@ Every backend HTTP route is either **wired** to a frontend client or listed belo
 | `/api/auth/magic-link/verify` | AuthController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/auth/forgot-password` | AuthController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/auth/reset-password` | AuthController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/ai/unified` | AIController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/ai/proposals` | AIController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/ai/proposals` | AIController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/ai/proposals/:proposalId` | AIController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/ai/proposals/:proposalId/audit` | AIController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/ai/proposals/:proposalId/approve` | AIController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/ai/proposals/:proposalId/reject` | AIController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/ai/proposals/:proposalId/execute` | AIController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/ai/proposals/:proposalId/rollback` | AIController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/ai/providers/health` | AIController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/ai/models` | AIController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/ai/tools` | AIController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/ai/requests/:requestId` | AIController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/governance/registry` | NestAiGovernanceController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/governance/safety-rules` | NestAiGovernanceController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/governance/compliance` | NestAiGovernanceController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/governance/violations` | NestAiGovernanceController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/governance/validate-prompts` | NestAiGovernanceController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/governance/evaluate-priority-change` | NestAiGovernanceController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/copilot/query` | EdCopilotNestParityController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/emergency/patients/:patientId/document-artifacts` | EmergencyOsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/emergency/patients/:patientId/document-artifacts/extract` | EmergencyOsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/emergency/patients/:patientId/document-artifacts/:artifactId/review` | EmergencyOsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
@@ -315,6 +337,18 @@ Every backend HTTP route is either **wired** to a frontend client or listed belo
 | `/api/rag/stats` | RAGController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/emergency/governance/evaluate-priority-change` | EmergencyAIGovernanceController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/v1/governance/evaluate-priority-change` | AIGovernanceV1Controller | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/emergency/surge/activate` | SurgeController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/emergency/surge/batch-ems-intake` | SurgeController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/emergency/surge/bottlenecks` | SurgeController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/emergency/surge/deactivate` | SurgeController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/emergency/surge/status` | SurgeController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/emergency/capacity/dashboard` | CapacityController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/deterioration` | DeteriorationController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/deterioration/health` | DeteriorationController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/deterioration/predict` | DeteriorationController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/protocol` | ProtocolController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/protocol/health` | ProtocolController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/protocol/evaluate` | ProtocolController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 
 ## D. Frontend calls without backend (gated)
 
@@ -337,20 +371,6 @@ Every backend HTTP route is either **wired** to a frontend client or listed belo
 | emergency-referral-history | GET | `/api/emergency/patients/:patientId/referrals` | emergencyReferralHistory | emergencyTransportApi.js |
 | emergency-transfer-status | PATCH | `/api/emergency/transfers/:referralId/status` | emergencyTransferWorkflow | emergencyTransportApi.js |
 | emergency-diversion-status | GET | `/api/emergency/diversion/status` | emergencyDiversionStatus | emergencyTransportApi.js |
-| emergency-smart-intake-session-create | POST | `/api/emergency/intake/sessions` | emergencySmartIntakeIdentitySession | smartIntakeApi.js |
-| emergency-smart-intake-manual-entry | POST | `/api/emergency/intake/:sessionId/manual-entry` | emergencySmartIntakeIdentitySession | smartIntakeApi.js |
-| emergency-smart-intake-document | POST | `/api/emergency/intake/:sessionId/documents` | emergencySmartIntakeIdentitySession | smartIntakeApi.js |
-| emergency-smart-intake-ocr | POST | `/api/emergency/intake/:sessionId/ocr-results` | emergencySmartIntakeIdentitySession | smartIntakeApi.js |
-| emergency-smart-intake-match | POST | `/api/emergency/intake/:sessionId/match` | emergencySmartIntakeIdentitySession | smartIntakeApi.js |
-| emergency-smart-intake-verify-field | POST | `/api/emergency/intake/:sessionId/verify-field` | emergencySmartIntakeIdentitySession | smartIntakeApi.js |
-| emergency-smart-intake-link-patient | POST | `/api/emergency/intake/:sessionId/link-patient` | emergencySmartIntakeIdentitySession | smartIntakeApi.js |
-| emergency-smart-intake-create-patient | POST | `/api/emergency/intake/:sessionId/create-patient` | emergencySmartIntakeIdentitySession | smartIntakeApi.js |
-| emergency-smart-intake-continue-unknown | POST | `/api/emergency/intake/:sessionId/continue-unknown` | emergencySmartIntakeIdentitySession | smartIntakeApi.js |
-| emergency-smart-intake-ems-evidence | POST | `/api/emergency/intake/:sessionId/ems-evidence` | emergencySmartIntakeIdentitySession | smartIntakeApi.js |
-| emergency-smart-intake-reconcile-unknown | POST | `/api/emergency/intake/:sessionId/reconcile-unknown` | emergencySmartIntakeIdentitySession | smartIntakeApi.js |
-| emergency-smart-intake-biometric-consent | POST | `/api/emergency/intake/:sessionId/biometric-consent` | emergencySmartIntakeIdentitySession | smartIntakeApi.js |
-| emergency-smart-intake-biometric-consent-withdraw | POST | `/api/emergency/intake/:sessionId/biometric-consent/withdraw` | emergencySmartIntakeIdentitySession | smartIntakeApi.js |
-| emergency-smart-intake-audit-log | GET | `/api/emergency/intake/:sessionId/audit-log` | emergencySmartIntakeIdentitySession | smartIntakeApi.js |
 | exports-pdf | POST | `/api/exports/pdf` | exportsPdf | export/ExportService.js |
 | exports-excel | POST | `/api/exports/excel` | exportsExcel | export/ExportService.js |
 | reports-generate | POST | `/api/reports/generate` | reportsGenerate | export/ExportService.js |
@@ -377,11 +397,11 @@ NLU profiles without POST executor (180): client-side / chat only.
 
 | Category | Count |
 |----------|------:|
-| Backend HTTP routes (total inventory) | 586 |
-| Wired frontend → backend | 307 |
-| Backend-only / deferred (policy) | 280 |
-| Gated frontend (no route) | 36 |
+| Backend HTTP routes (total inventory) | 649 |
+| Wired frontend → backend | 336 |
+| Backend-only / deferred (policy) | 314 |
+| Gated frontend (no route) | 22 |
 | POST executors | 39 |
 
-_Cross-check: total inventory (586) should equal wired (307) + backend-only (280) + any remaining unlisted routes. See [backend-exposure-report.md](./backend-exposure-report.md) for the authoritative scan._
+_Cross-check: total inventory (649) should equal wired (336) + backend-only (314) + any remaining unlisted routes. See [backend-exposure-report.md](./backend-exposure-report.md) for the authoritative scan._
 

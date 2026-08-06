@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 /**
- * Regenerate docs/feature-coverage-matrix.md from canonical sources.
+ * Regenerate docs/architecture/feature-coverage-matrix.md from canonical
+ * sources. (A stale duplicate used to also exist at repo-root
+ * docs/feature-coverage-matrix.md — it's now a redirect stub, not a second
+ * write target; see that file's own history note before trusting it.)
  *
  * Usage: npm run feature-coverage-matrix:write-docs
  */

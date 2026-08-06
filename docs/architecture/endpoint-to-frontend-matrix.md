@@ -1,6 +1,6 @@
 # Endpoint-to-frontend matrix
 
-**Generated:** 2026-07-23T04:14:46.624Z
+**Generated:** 2026-08-06T21:22:18.374Z
 
 | Method | Path | Backend | Frontend client | Exposure |
 |--------|------|---------|-----------------|----------|
@@ -76,6 +76,7 @@
 | POST | `/api/emergency/operational-intelligence/evaluate` | EmergencyOsController | emergencyOsApi.js / useOperationalIntelligence | ✅ |
 | GET | `/api/emergency/reception/snapshot` | EmergencyOsController | emergencyOsApi.js / fetchReceptionSnapshot | ✅ |
 | POST | `/api/emergency/reception/handoff` | EmergencyOsController | emergencyOsApi.js / postReceptionHandoff | ✅ |
+| POST | `/api/emergency/reception/escalation` | EmergencyOsController | emergencyOsApi.js / postReceptionEscalation | ✅ |
 | POST | `/api/emergency/triage/assist` | EmergencyOsController | emergencyOsApi.js / postTriageAssist | ✅ |
 | GET | `/api/emergency/patients/:patientId/orchestration` | EmergencyOsController | emergencyOsApi.js / fetchPatientOrchestration | ✅ |
 | GET | `/api/emergency/patient-flow` | EmergencyOsController | emergencyOsApi.js / fetchPatientFlow | ✅ |
@@ -91,13 +92,27 @@
 | POST | `/api/emergency/patients` | EmergencyOsController | emergencyOsApi.js / createEmergencyPatient | ✅ |
 | GET | `/api/emergency/journey` | EmergencyOsController | emergencyOsApi.js / usePatientJourney / PatientsRoute journey status | ✅ |
 | GET | `/api/emergency/ems` | EmergencyOsController | emergencyOsApi.js / useEMSIntake | ✅ |
+| POST | `/api/emergency/ems/handoff` | EmergencyOsController | emergencyOsApi.js | ✅ |
+| POST | `/api/emergency/ems/alert` | EmsController | emergencyTransportApi.ts / createEmergencyEmsAlert | ✅ |
+| PATCH | `/api/emergency/ems/status/:emsUnitId` | EmsController | emergencyTransportApi.ts / updateEmergencyEmsStatus | ✅ |
+| POST | `/api/emergency/ems/arrive/:emsUnitId` | EmsController | emergencyTransportApi.ts / confirmEmergencyEmsArrival | ✅ |
+| GET | `/api/emergency/ems/incoming` | EmsController | emergencyTransportApi.ts / fetchIncomingEmergencyEms | ✅ |
 | GET | `/api/emergency/intake` | EmergencyOsController | emergencyOsApi.js / useSmartIntake | ✅ |
 | POST | `/api/emergency/intake` | EmergencyOsController | emergencyOsApi.js / QuickIntake | ✅ |
 | POST | `/api/emergency/intake/vertical-slice` | EmergencyOsController | emergencyOsApi.js / NewPatientIntake | ✅ |
 | GET | `/api/emergency/queues` | EmergencyOsController | emergencyOsApi.js / useEmergencyQueues | ✅ |
 | GET | `/api/emergency/reassessment` | EmergencyOsController | emergencyOsApi.js / useReassessmentQueue | ✅ |
+| GET | `/api/emergency/reassessment/due` | ReassessmentController | reassessmentApi.ts / fetchDueReassessments | ✅ |
+| POST | `/api/emergency/reassessment/:patientId/reassess` | ReassessmentController | reassessmentApi.ts / recordPatientReassessment | ✅ |
+| POST | `/api/emergency/reassessment/:patientId/dismiss` | ReassessmentController | reassessmentApi.ts / dismissPatientReassessment | ✅ |
 | GET | `/api/emergency/capacity` | EmergencyOsController | emergencyOsApi.js / useCapacityStatus | ✅ |
 | GET | `/api/emergency/boarding` | EmergencyOsController | emergencyOsApi.js / useBoardingStatus | ✅ |
+| POST | `/api/emergency/boarding/track-decision` | BoardingController | boardingApi.ts / trackBoardingDecision | ✅ |
+| GET | `/api/emergency/boarding/metrics` | BoardingController | boardingApi.ts / fetchBoardingMetrics | ✅ |
+| GET | `/api/emergency/boarding/report` | BoardingController | boardingApi.ts / fetchBoardingReport | ✅ |
+| GET | `/api/emergency/boarding/boarded` | BoardingController | boardingApi.ts / fetchBoardedPatients | ✅ |
+| GET | `/api/emergency/boarding/discharge-readiness/:patientId` | BoardingController | boardingApi.ts / fetchDischargeReadiness | ✅ |
+| GET | `/api/emergency/boarding/same-day-discharges` | BoardingController | boardingApi.ts / fetchSameDayDischarges | ✅ |
 | GET | `/api/emergency/referrals` | EmergencyOsController | emergencyOsApi.js / useReferrals | ✅ |
 | GET | `/api/emergency/provincial-health` | EmergencyOsController | emergencyOsApi.js / useProvincialHealth / EmergencySettings runtime card | ✅ |
 | GET | `/api/emergency/integrations` | EmergencyOsController | emergencyOsApi.js / useIntegrationHub / EmergencySettings runtime card | ✅ |
@@ -140,20 +155,20 @@
 | GET | `/api/emergency/patients/:patientId/referrals` | — | emergencyTransportApi.js | ⚠️ gated |
 | PATCH | `/api/emergency/transfers/:referralId/status` | — | emergencyTransportApi.js | ⚠️ gated |
 | GET | `/api/emergency/diversion/status` | — | emergencyTransportApi.js | ⚠️ gated |
-| POST | `/api/emergency/intake/sessions` | — | smartIntakeApi.js | ⚠️ gated |
-| POST | `/api/emergency/intake/:sessionId/manual-entry` | — | smartIntakeApi.js | ⚠️ gated |
-| POST | `/api/emergency/intake/:sessionId/documents` | — | smartIntakeApi.js | ⚠️ gated |
-| POST | `/api/emergency/intake/:sessionId/ocr-results` | — | smartIntakeApi.js | ⚠️ gated |
-| POST | `/api/emergency/intake/:sessionId/match` | — | smartIntakeApi.js | ⚠️ gated |
-| POST | `/api/emergency/intake/:sessionId/verify-field` | — | smartIntakeApi.js | ⚠️ gated |
-| POST | `/api/emergency/intake/:sessionId/link-patient` | — | smartIntakeApi.js | ⚠️ gated |
-| POST | `/api/emergency/intake/:sessionId/create-patient` | — | smartIntakeApi.js | ⚠️ gated |
-| POST | `/api/emergency/intake/:sessionId/continue-unknown` | — | smartIntakeApi.js | ⚠️ gated |
-| POST | `/api/emergency/intake/:sessionId/ems-evidence` | — | smartIntakeApi.js | ⚠️ gated |
-| POST | `/api/emergency/intake/:sessionId/reconcile-unknown` | — | smartIntakeApi.js | ⚠️ gated |
-| POST | `/api/emergency/intake/:sessionId/biometric-consent` | — | smartIntakeApi.js | ⚠️ gated |
-| POST | `/api/emergency/intake/:sessionId/biometric-consent/withdraw` | — | smartIntakeApi.js | ⚠️ gated |
-| GET | `/api/emergency/intake/:sessionId/audit-log` | — | smartIntakeApi.js | ⚠️ gated |
+| POST | `/api/emergency/intake/sessions` | SmartIntakeController | smartIntakeApi.ts | ✅ |
+| POST | `/api/emergency/intake/:sessionId/manual-entry` | SmartIntakeController | smartIntakeApi.ts | ✅ |
+| POST | `/api/emergency/intake/:sessionId/documents` | SmartIntakeController | smartIntakeApi.ts | ✅ |
+| POST | `/api/emergency/intake/:sessionId/ocr-results` | SmartIntakeController | smartIntakeApi.ts | ✅ |
+| POST | `/api/emergency/intake/:sessionId/match` | SmartIntakeController | smartIntakeApi.ts | ✅ |
+| POST | `/api/emergency/intake/:sessionId/verify-field` | SmartIntakeController | smartIntakeApi.ts | ✅ |
+| POST | `/api/emergency/intake/:sessionId/link-patient` | SmartIntakeController | smartIntakeApi.ts | ✅ |
+| POST | `/api/emergency/intake/:sessionId/create-patient` | SmartIntakeController | smartIntakeApi.ts | ✅ |
+| POST | `/api/emergency/intake/:sessionId/continue-unknown` | SmartIntakeController | smartIntakeApi.ts | ✅ |
+| POST | `/api/emergency/intake/:sessionId/ems-evidence` | SmartIntakeController | smartIntakeApi.ts | ✅ |
+| POST | `/api/emergency/intake/:sessionId/reconcile-unknown` | SmartIntakeController | smartIntakeApi.ts | ✅ |
+| POST | `/api/emergency/intake/:sessionId/biometric-consent` | SmartIntakeController | smartIntakeApi.ts | ✅ |
+| POST | `/api/emergency/intake/:sessionId/biometric-consent/withdraw` | SmartIntakeController | smartIntakeApi.ts | ✅ |
+| GET | `/api/emergency/intake/:sessionId/audit-log` | SmartIntakeController | smartIntakeApi.ts | ✅ |
 | POST | `/api/clinical-intelligence/ambient-scribe/generate` | ClinicalIntelligenceController | clinicalIntelligenceApi.js / AmbientScribe.jsx | ✅ |
 | POST | `/api/clinical-intelligence/guideline-rag/query` | ClinicalIntelligenceController | clinicalIntelligenceApi.js / GuidelineRag.jsx | ✅ |
 | POST | `/api/clinical-intelligence/differential-ai/generate` | ClinicalIntelligenceController | clinicalIntelligenceApi.js / DifferentialAi.jsx | ✅ |
@@ -371,5 +386,5 @@
 - `GET /api/emergency/reassessment`
 - `GET /api/emergency/capacity`
 
-_…and 566 more in src/data/backendHttpRouteInventory.js_
+_…and 629 more in src/data/backendHttpRouteInventory.js_
 

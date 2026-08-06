@@ -1,6 +1,6 @@
 # Backend exposure report
 
-**Generated:** 2026-07-23T04:14:46.622Z
+**Generated:** 2026-08-06T21:22:18.372Z
 
 > Regenerate: `npm run exposure:write-docs`
 
@@ -8,10 +8,10 @@
 
 | Metric | Count |
 |--------|------:|
-| Backend HTTP routes (inventory) | 586 |
-| Frontend API calls (inventory) | 343 |
-| Wired (route exists) | 307 |
-| Gated stubs (no route, capability off) | 36 |
+| Backend HTTP routes (inventory) | 649 |
+| Frontend API calls (inventory) | 358 |
+| Wired (route exists) | 336 |
+| Gated stubs (no route, capability off) | 22 |
 | Unguarded missing routes | 0 |
 | POST executors (backend) | 39 |
 | Contract gaps (matrix) | 0 |
@@ -92,20 +92,6 @@
 | emergency-referral-history | GET | `/api/emergency/patients/:patientId/referrals` | emergencyReferralHistory | emergencyTransportApi.js |
 | emergency-transfer-status | PATCH | `/api/emergency/transfers/:referralId/status` | emergencyTransferWorkflow | emergencyTransportApi.js |
 | emergency-diversion-status | GET | `/api/emergency/diversion/status` | emergencyDiversionStatus | emergencyTransportApi.js |
-| emergency-smart-intake-session-create | POST | `/api/emergency/intake/sessions` | emergencySmartIntakeIdentitySession | smartIntakeApi.js |
-| emergency-smart-intake-manual-entry | POST | `/api/emergency/intake/:sessionId/manual-entry` | emergencySmartIntakeIdentitySession | smartIntakeApi.js |
-| emergency-smart-intake-document | POST | `/api/emergency/intake/:sessionId/documents` | emergencySmartIntakeIdentitySession | smartIntakeApi.js |
-| emergency-smart-intake-ocr | POST | `/api/emergency/intake/:sessionId/ocr-results` | emergencySmartIntakeIdentitySession | smartIntakeApi.js |
-| emergency-smart-intake-match | POST | `/api/emergency/intake/:sessionId/match` | emergencySmartIntakeIdentitySession | smartIntakeApi.js |
-| emergency-smart-intake-verify-field | POST | `/api/emergency/intake/:sessionId/verify-field` | emergencySmartIntakeIdentitySession | smartIntakeApi.js |
-| emergency-smart-intake-link-patient | POST | `/api/emergency/intake/:sessionId/link-patient` | emergencySmartIntakeIdentitySession | smartIntakeApi.js |
-| emergency-smart-intake-create-patient | POST | `/api/emergency/intake/:sessionId/create-patient` | emergencySmartIntakeIdentitySession | smartIntakeApi.js |
-| emergency-smart-intake-continue-unknown | POST | `/api/emergency/intake/:sessionId/continue-unknown` | emergencySmartIntakeIdentitySession | smartIntakeApi.js |
-| emergency-smart-intake-ems-evidence | POST | `/api/emergency/intake/:sessionId/ems-evidence` | emergencySmartIntakeIdentitySession | smartIntakeApi.js |
-| emergency-smart-intake-reconcile-unknown | POST | `/api/emergency/intake/:sessionId/reconcile-unknown` | emergencySmartIntakeIdentitySession | smartIntakeApi.js |
-| emergency-smart-intake-biometric-consent | POST | `/api/emergency/intake/:sessionId/biometric-consent` | emergencySmartIntakeIdentitySession | smartIntakeApi.js |
-| emergency-smart-intake-biometric-consent-withdraw | POST | `/api/emergency/intake/:sessionId/biometric-consent/withdraw` | emergencySmartIntakeIdentitySession | smartIntakeApi.js |
-| emergency-smart-intake-audit-log | GET | `/api/emergency/intake/:sessionId/audit-log` | emergencySmartIntakeIdentitySession | smartIntakeApi.js |
 | exports-pdf | POST | `/api/exports/pdf` | exportsPdf | export/ExportService.js |
 | exports-excel | POST | `/api/exports/excel` | exportsExcel | export/ExportService.js |
 | reports-generate | POST | `/api/reports/generate` | reportsGenerate | export/ExportService.js |
