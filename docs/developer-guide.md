@@ -9,8 +9,8 @@ CareDroid's repo has a few directory-naming collisions that are easy to trip ove
 | Gotcha | Detail |
 |---|---|
 | **Two `lib/` directories** | `src/lib/` (RBAC via `src/lib/users/`, auth, browser-safe AI client) vs. top-level `lib/` (aliased `@lib` in `vite.config.ts`; holds `native-ai/`, `patient-orchestration/`, and the AI config/tool/prompt registries shared by frontend and backend). |
-| **`agent-tools/` is not a tool registry** | It's ~82 gitignored session-transcript `.txt` files and a few screenshots. The real tool registries are `lib/ai/toolRegistry.ts` and `backend/src/modules/medical-control-plane/tool-orchestrator/`. |
-| **Two backend route systems** | `backend/src/api/*.routes.ts` (legacy Express, largely unauthenticated) and `backend/src/modules/**/*.controller.ts` (NestJS, ~65 modules, the actively developed surface). See [API Reference](api/api-reference.md). |
+| **`agent-tools/` is not a tool registry** | It's gitignored session-transcript `.txt` files and screenshots (repo-local, count varies by session). The real tool registries are `lib/ai/toolRegistry.ts` and `backend/src/modules/medical-control-plane/tool-orchestrator/`. |
+| **One backend route system (as of the Express→Nest decommission)** | All 10 real legacy Express route groups were migrated to NestJS controllers and the 6 placeholder-only groups deleted; `backend/src/api/routes-registry.ts` itself was deleted, not just emptied. `backend/src/modules/**/*.controller.ts` (NestJS) is the sole HTTP routing authority — there is no second, bare-Express mount to confuse it with. See [API Reference](api/api-reference.md). |
 | **Separate npm installs** | Root, `backend/`, and `mcp/` each have their own `package.json`/lockfile — `npm install` at the root does not install backend or MCP dependencies. |
 
 ## Path aliases

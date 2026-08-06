@@ -55,12 +55,13 @@ CareDroid is one Vite + React frontend plus one NestJS backend, run together wit
 - [architecture/platform-inventory.md](architecture/platform-inventory.md) — generated platform inventory (regen via `npm run inventory:report`)
 - [duplicate-system-audit.md](duplicate-system-audit.md), [orphan-detection-report.md](orphan-detection-report.md) — audits of competing/orphaned code paths
 - [enterprise-subsystems-capability-map.md](enterprise-subsystems-capability-map.md) — hand-written capability audit against `research.md`'s 14 proposed enterprise subsystems (FHIR/HL7 interop, MPI, adaptive intake forms, consent/privacy, clinical knowledge registry, CDS Hooks, clinical safety, AI execution gateway, OCR, digital twin, imaging, NACRS reporting, human-factors lab, regulatory registry) — audit only, no implementation started
+- [architecture/RECEPTION_WORKSPACE_REFERENCE.md](architecture/RECEPTION_WORKSPACE_REFERENCE.md) — the Reception workspace as the canonical architectural template (route → screen mode → role → KPI layering) for building any other role workspace
 
 ---
 
 ## Developer Guide
 
-**[Developer Guide](developer-guide.md)** — repo layout gotchas (two `lib/` dirs, two `store/` dirs), path aliases, testing infrastructure (Vitest/Jest/Playwright), coding conventions, and the living-documentation generator.
+**[Developer Guide](developer-guide.md)** — repo layout gotchas (two `lib/` dirs, one consolidated backend route system), path aliases, testing infrastructure (Vitest/Jest/Playwright), coding conventions, and the living-documentation generator.
 
 ---
 
@@ -119,6 +120,7 @@ Two parallel sets of role documentation exist — see [Known Documentation Debt]
 - Backend governance modules: `platform-governance`, `ai-governance`, `llm-security`, `regulatory`, `privacy-center`, `human-review` — see [API Reference §Governance](api/api-reference.md#governance--compliance)
 - `platform_governance_policies`, `clinical_release_gates`, `clinical_safety_findings`, `platform_consent_records` and related entities — see [Data Model Reference §Governance](data-model/data-model-reference.md#governance--compliance-entities)
 - [enterprise-subsystems-capability-map.md](enterprise-subsystems-capability-map.md) — confirms `compliance.service.ts`'s and `platform-governance.service.ts`'s consent stores are independently real but disconnected (split-authority, no shared write path), and that `Permission.BREAK_GLASS_ACCESS`/`breakGlassAllowed` are defined and documented but never checked by any guard — a live false-assurance gap, not merely an absent feature
+- **[INTENDED_USE_BOUNDARY_v1.md](INTENDED_USE_BOUNDARY_v1.md)** — the P0.3 release-gate intended-use boundary statement (decision support only, human review required, explicit not-positioned-as list). **Draft awaiting CMIO/clinical-safety reviewer sign-off — not yet an approved boundary.**
 
 ---
 
@@ -132,7 +134,9 @@ Two parallel sets of role documentation exist — see [Known Documentation Debt]
 
 ## Testing Guide
 
-Covered in the [Developer Guide §Testing Infrastructure](developer-guide.md#testing-infrastructure): Vitest (frontend, ~825 test files), Jest (backend + root integration), Playwright (3 configs: responsive QA, canonical routes, production smoke), and the `qa/` audit-artifact scripts.
+Covered in the [Developer Guide §Testing Infrastructure](developer-guide.md#testing-infrastructure): Vitest (frontend, ~950 test files), Jest (backend + root integration), Playwright (3 configs: responsive QA, canonical routes, production smoke), and the `qa/` audit-artifact scripts.
+
+- [tool-render-execute-manual-qa.md](tool-render-execute-manual-qa.md) — manual QA checklist for wired clinical & fleet tools, run after `npm run test:e2e-matrix` passes; canonical source is `src/data/e2eManualQaChecklist.ts`
 
 ---
 
@@ -159,6 +163,7 @@ Covered in the [Developer Guide §Testing Infrastructure](developer-guide.md#tes
 - [operations/emergency-demo-environment.md](operations/emergency-demo-environment.md), [operations/emergency-demo-mode.md](operations/emergency-demo-mode.md) — **overlapping**, see [Known Documentation Debt](#known-documentation-debt)
 - [operations/emergency-pilot-readiness.md](operations/emergency-pilot-readiness.md) — first hospital ED pilot readiness assessment
 - [operations/saas-compliance-audit.md](operations/saas-compliance-audit.md)
+- [operations/surge-mongo-local-setup.md](operations/surge-mongo-local-setup.md) — reproducible path to a real MongoDB for `SurgeCapacityService` (mass-casualty/disaster-surge logic); no MongoDB is provisioned by default in this repo
 
 ---
 
