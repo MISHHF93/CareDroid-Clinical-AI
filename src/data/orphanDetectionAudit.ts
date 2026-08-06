@@ -563,7 +563,14 @@ function detectOrphanMarkdown(srcCorpus) {
         };
       }
 
-      const isGenerated = /Generated:|regenerate with/i.test(text.slice(0, 500));
+      // "regenerate with `npm run ...`" is the real signal of an actively-maintained
+      // generated doc. A bare "Generated: <date>" is also used by one-time, hand-run
+      // historical audit reports that nothing ever regenerates or reviews again — 3
+      // such docs (clickable-map-report.md, component-mounting-report.md,
+      // layout-routing-consolidation-report.md, all dated 2026-06-12/13) hid behind
+      // this looser check for 2 months, misclassified LEGACY ("fine") instead of
+      // QUARANTINE ("needs review") despite having zero inbound links or generator.
+      const isGenerated = /regenerate with/i.test(text.slice(0, 500));
       return {
         id: rel,
         path: rel,
