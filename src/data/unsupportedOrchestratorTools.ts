@@ -5,7 +5,8 @@
  * Backend source: `backend/.../tool-orchestrator.registry.ts` (`NLU_TOOL_IDS_WITHOUT_EXECUTOR`).
  *
  * `backendExecutable: true` in clinicalIntentTools means NLU/chat may route to the backend —
- * only the three orchestrator ids support POST /tools/:id/execute.
+ * only `ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS` (currently 39; see REGISTERED_EXECUTOR_TOOL_IDS
+ * in tool-orchestrator.registry.ts, not a hardcoded count here) support POST /tools/:id/execute.
  */
 
 import {

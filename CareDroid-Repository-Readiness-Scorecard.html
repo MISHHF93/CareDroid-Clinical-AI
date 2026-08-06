@@ -582,7 +582,7 @@
     </div>
     <div class="meta-block">
       Generated 2026-08-06<br />
-      HEAD <code style="font-family: var(--mono)">ccf06625</code><br />
+      HEAD <code style="font-family: var(--mono)">9c14ad5d</code><br />
       <a href="https://github.com/MISHHF93/CareDroid-Clinical-AI">github.com/MISHHF93/CareDroid-Clinical-AI</a>
     </div>
   </header>
@@ -592,10 +592,10 @@
       <svg width="148" height="148" viewBox="0 0 148 148">
         <circle class="track" cx="74" cy="74" r="64" fill="none" stroke-width="10"></circle>
         <circle class="fill" cx="74" cy="74" r="64" fill="none" stroke-width="10"
-          stroke-dasharray="402.1" stroke-dashoffset="44.2"></circle>
+          stroke-dasharray="402.1" stroke-dashoffset="40.2"></circle>
       </svg>
       <div class="num">
-        <strong>89</strong>
+        <strong>90</strong>
         <span>/ 100</span>
       </div>
     </div>
@@ -603,21 +603,24 @@
       <span class="band-chip">Actively maintained, real gaps tracked</span>
       <h2>Solid engineering hygiene, with a real ceiling below 100 that no more code can close</h2>
       <p>
-        One repository, one backend, one frontend — now backed by a permanent CI regression guard, not just a
-        point-in-time check. The orphan-code quarantine bucket is closed at zero. Every audit script this repo
-        owns for repo-hygiene questions has now been run and verified at least once. Documentation accuracy is
-        maxed: every undated evergreen reference doc plus a full field-by-field audit of all 15 role manuals
-        against live source code — which found and fixed 9 real errors an earlier sample had missed. A real
-        <code>SECURITY.md</code> exists, honestly stating there's no dedicated disclosure email rather than
-        inventing one, and the backend's actual security middleware (helmet, restricted CORS, rate limiting) has
-        been self-reviewed and confirmed present. What's left is genuinely external: a commissioned penetration
-        test no self-review substitutes for, and a handful of product-taxonomy calls (which of two overlapping
-        commercial SKUs is canonical,
-        tracked across 46 files including ML training data; which of two workspace-model layers is authoritative)
-        that would be guesses, not fixes, if made unilaterally. One near-miss is worth naming: a wide card-layout
-        migration was approved to close a design-system gap, but checking the real blast radius first showed card
-        color/contrast is already enforced universally by a real, existing CSS contract — the actual remaining gap
-        was narrower and lower-risk to leave open than a blind, unverifiable 91-file migration would have been to attempt.
+        One backend and one frontend for the actual product — plus a genuinely separate, disclosed-but-disconnected
+        second frontend+backend (<code>navigator/</code>, an app-route-lookup companion) this cycle stopped
+        describing as a footnote. An owner question about consolidation prompted a from-scratch re-audit, which
+        found the repo's own "permanent CI regression guard" for this claim was never actually wired into the
+        workflow that gates merges — fixed for real this cycle, plus a second coverage gap (a new third frontend
+        anywhere else in the tree would have passed silently) closed alongside it. The orphan-code quarantine
+        bucket is closed at zero. Documentation accuracy is maxed: every undated evergreen reference doc plus a
+        full field-by-field audit of all 15 role manuals against live source code. A real <code>SECURITY.md</code>
+        exists, and the one concrete production-exposure bug found by a deeper self-review — Swagger UI's full API
+        schema reachable in production — is now actually fixed, with explicit owner sign-off, not just flagged.
+        The design system's own component registry was also corrected: one "canonical" card component
+        (<code>surfaces/Card.tsx</code>) turned out to be fully dead code despite being documented as the base
+        primitive — deleted — while the real most-used card primitive had never been documented at all. What's
+        left is genuinely external or decision-gated: a commissioned penetration test no self-review substitutes
+        for; a handful of product-taxonomy calls (which of two overlapping commercial SKUs is canonical, tracked
+        across 46 files including ML training data; which of two workspace-model layers is authoritative) that
+        would be guesses, not fixes, if made unilaterally; and linking <code>navigator/</code> into the product UI,
+        which needs a real UX decision, not a blind wire-up.
       </p>
     </div>
   </section>
@@ -660,14 +663,16 @@
         </div>
         <span class="status-chip good">Closed</span>
         <h3>Structural consolidation</h3>
-        <p class="dim-summary">One repo, one NestJS backend, one Vite frontend — now a permanent CI-enforced guard, not just a point-in-time check.</p>
+        <p class="dim-summary">One NestJS backend, one Vite frontend for the actual product — plus a genuinely separate, disclosed-but-disconnected second frontend+backend (navigator/) this cycle stopped calling a footnote. The regression guard now really is wired into the CI gate that blocks merges — it wasn't, until this cycle.</p>
         <div class="progress-track"><div class="progress-fill good" style="width: 100%"></div></div>
       </div>
       <details>
         <summary>Evidence</summary>
         <div class="detail-body">
-          <p><span class="detail-label">Verified</span>Zero nested <code>.git</code> directories anywhere in the tree. Exactly one backend (<code>backend/</code>, single <code>main.ts</code>, <code>@nestjs/core</code>, zero stray <code>.listen()</code> calls anywhere else in the codebase) and exactly one frontend (root <code>vite.config.ts</code>/<code>index.html</code>; top-level <code>lib/</code> is shared source for that same app, no independent <code>package.json</code>). <code>mcp/</code> is a stdio-only Model Context Protocol bridge with zero HTTP listeners; <code>navigator/</code> is a small, disclosed standalone route-lookup companion. <code>backend/ml-services/</code> lives inside <code>backend/</code> as an in-process library, not a sibling app. The legacy bare-Express route system was fully decommissioned in an earlier cycle — all real route groups migrated to NestJS, <code>routes-registry.ts</code> itself deleted, not just emptied.</p>
-          <p><span class="detail-label">Closed this cycle</span>the previous version of this scorecard flagged that none of this was enforced going forward, only manually re-checked each cycle. Added <code>src/data/repositoryStructureAudit.test.ts</code>, a permanent regression guard that fails CI if: a second <code>.git</code> directory appears anywhere in the tree, any file outside <code>backend/src/main.ts</code> or the disclosed <code>navigator/src/server.js</code> calls <code>.listen()</code> (the exact signature of a second production HTTP server), or the decommissioned <code>routes-registry.ts</code> ever comes back. Verified the guard actually catches real drift, not just passing trivially — 3/3 tests green in isolation.</p>
+          <p><span class="detail-label">Verified</span>Zero nested <code>.git</code> directories anywhere in the tree. One backend for the actual product (<code>backend/</code>, single <code>main.ts</code>, <code>@nestjs/core</code>) and one frontend for the actual product (root <code>vite.config.ts</code>/<code>index.html</code>; top-level <code>lib/</code> is shared source for that same app, no independent <code>package.json</code>). <code>mcp/</code> is a stdio-only Model Context Protocol bridge with zero HTTP listeners; <code>backend/ml-services/</code> lives inside <code>backend/</code> as an in-process library (confirmed: no package.json, no listen call, no container, imported directly by <code>app.module.ts</code>), not a sibling app. The legacy bare-Express route system was fully decommissioned in an earlier cycle — all real route groups migrated to NestJS, <code>routes-registry.ts</code> itself deleted, not just emptied.</p>
+          <p><span class="detail-label">Corrected this cycle: the repo genuinely has 2 frontends and 2 backend/server processes, not 1 and 1</span>an owner question ("is this really consolidated?") prompted a from-scratch re-derivation rather than trusting either the owner's framing or this scorecard's own prior claim. <code>navigator/</code> is not a mode of the main app — it's a fully separate, independently deployable frontend (<code>navigator/public/index.html</code>, no bundler, served as static files) and its own backend (<code>navigator/src/server.js</code>, its own <code>.listen()</code> call, its own <code>/api/health</code>/<code>/api/catalog</code>/<code>/api/query</code> routes), with its own Dockerfile and its own Docker Compose service. Confirmed via full-repo grep that <strong>zero files in <code>src/</code> or <code>lib/</code> reference <code>navigator</code> or port <code>4178</code></strong> — a real user of the main CareDroid product has no path to it. The previous wording ("exactly one frontend," "small, disclosed standalone companion") was true in the narrow sense that navigator isn't a competing product-database-holding app, but oversold the "one and one" framing for a general reader. Also found and fixed: the "zero stray <code>.listen()</code> calls anywhere else" sentence was literally false as written — <code>tests/integration/emergency-os.test.ts</code> has two more, ephemeral-port test-harness servers, correctly exempted by the guard's own <code>*.test.ts</code> rule but not covered by that sentence's wording.</p>
+          <p><span class="detail-label">The bigger correction: the "permanent regression guard" wasn't actually gating merges</span><code>src/data/repositoryStructureAudit.test.ts</code> (added last cycle) is logically sound and its 3 assertions all pass — but it was never added to <code>validate:ci</code>, the script <code>.github/workflows/validate.yml</code> actually runs on every push/PR to <code>main</code>/<code>develop</code>. It was only ever swept up incidentally by the weekly/manual dependency-update workflow's bare <code>vitest</code> call, which doesn't block ordinary merges. A second stray <code>.git</code>, a new stray <code>.listen()</code>, or a resurrected <code>routes-registry.ts</code> would not have failed CI, contrary to what last cycle's evidence claimed. <strong>Fixed for real this cycle</strong>: added the test file to the explicit <code>vitest run</code> list inside <code>validate:ci</code> (<code>package.json</code>) — confirmed <code>validate.yml:72</code> invokes exactly that script. Also closed a second, independent gap the same audit found: the guard asserted the 2 known frontend entry points exist, but never checked that no <em>third</em> one had appeared anywhere else in the tree — a new <code>admin/vite.config.ts</code> would have passed silently forever. Added a 4th test, <code>findFrontendEntryPoints()</code>, that walks the whole repo by file-name shape (<code>index.html</code>/<code>vite.config.*</code>/<code>webpack.config.*</code>) and asserts the result is exactly the 2 known, disclosed paths — nothing more. Verified: 4/4 tests green in isolation, confirming the current real state is exactly 2 frontend entry points, not 3+.</p>
+          <p><span class="detail-label">Why still 15/15, not downgraded</span>the owner's instinct that something here needed "healing" was correct, and the specific mechanism (an unenforced guard, an overclaimed sentence) is now identified and fixed rather than merely re-described. The remaining gap — <code>navigator/</code> being disconnected from the product UI — is a real, separate, and larger decision (how/whether to integrate it) tracked below and in dimension 07/08's related evidence, not a structural-consolidation defect by itself: two disclosed, intentionally-separate apps in one repo, now honestly described and now actually CI-enforced against silent growth, is what this dimension measures.</p>
         </div>
       </details>
     </article>
@@ -728,20 +733,21 @@
       <div class="dim-main">
         <div class="dim-top">
           <span class="dim-index">04 / 08</span>
-          <span class="dim-score">11<span> / 15</span></span>
+          <span class="dim-score">12<span> / 15</span></span>
         </div>
         <span class="status-chip warn">Developing</span>
         <h3>Dependency &amp; security hygiene</h3>
-        <p class="dim-summary">A real disclosure process now exists; the one gap left needs a commissioned pentest, not more code.</p>
-        <div class="progress-track"><div class="progress-fill warn" style="width: 73%"></div></div>
+        <p class="dim-summary">A real disclosure process exists and the one concrete production-exposure bug found this campaign is now actually fixed; the remaining gap needs a commissioned pentest, not more code.</p>
+        <div class="progress-track"><div class="progress-fill warn" style="width: 80%"></div></div>
       </div>
       <details>
         <summary>Evidence</summary>
         <div class="detail-body">
           <p><span class="detail-label">Verified this session</span>Fresh <code>npm audit</code> on both frontend and backend: exactly 2 findings each, both already CI-allowlisted with the actual GHSA advisory text read (not just the title) to confirm scope before allowlisting. A real PHI-leak-prevention gap was found and closed: <code>backend/public/</code> held 2.25MB of orphaned build output and was also where a file-upload provider writes in dev, with zero <code>.gitignore</code> coverage — fixed. A fresh scan for live-looking API keys and tracked <code>.env</code> files across the whole repo came back clean.</p>
           <p><span class="detail-label">Closed this cycle</span>added <code>SECURITY.md</code> (see Documentation accuracy) — this repo can now receive a real vulnerability report through a real channel instead of none. Also self-reviewed the backend's actual security middleware rather than assuming: <code>helmet()</code> is applied in <code>main.ts</code>, CORS is restricted to configured origins (not wildcard), a <code>ThrottlerModule</code> rate limiter is registered with several controllers using <code>@Throttle</code> overrides, and the backend sets no cookies at all (bearer-token auth, so no missing <code>httpOnly</code>/<code>secure</code>/<code>sameSite</code> flags to find).</p>
-          <p><span class="detail-label">Deeper self-review this pass — found one real, concrete, actionable issue</span>checked for the classes of bug a pentest would actually look for, not just re-confirmed the same baseline: zero <code>dangerouslySetInnerHTML</code> anywhere in the frontend; zero string-interpolated raw SQL in the backend; the global exception filter (<code>api-exception.filter.ts</code>) sends stack traces to the server log and Sentry but never to the client response — correctly designed. <strong>Found one real thing worth fixing: Swagger UI (<code>/api/docs</code>, the full 500+ endpoint schema, including tags literally named "HIPAA Audit Logs" and "GDPR &amp; Compliance") is mounted unconditionally in <code>main.ts</code> — live in production, not gated behind the same <code>nodeEnv === 'production'</code> check this exact file already uses elsewhere (<code>shouldServeFrontendAssets</code>).</strong> Deliberately did not patch this myself: disabling it is a real production-behavior change I can't verify won't break a legitimate current consumer (an internal tool, a partner integration) from static analysis alone — exactly the kind of hard-to-reverse, shared-system change this campaign's own discipline says to flag, not force. Recorded here as a concrete, scoped, low-effort recommendation for whoever owns that call.</p>
-          <p><span class="detail-label">Why not higher</span>an informal self-review — however concrete its findings — is not a substitute for a commissioned, independent one. The remaining gap is genuinely external: no commissioned, non-dependency-scan application security review (a real pentest) exists — the same gap the sibling product scorecard tracks under its own Security dimension. That needs a hired firm, not more self-checking.</p>
+          <p><span class="detail-label">Deeper self-review a prior pass — found one real, concrete, actionable issue</span>checked for the classes of bug a pentest would actually look for, not just re-confirmed the same baseline: zero <code>dangerouslySetInnerHTML</code> anywhere in the frontend; zero string-interpolated raw SQL in the backend; the global exception filter (<code>api-exception.filter.ts</code>) sends stack traces to the server log and Sentry but never to the client response — correctly designed. Found Swagger UI (<code>/api/docs</code>, the full 500+ endpoint schema, including tags literally named "HIPAA Audit Logs" and "GDPR &amp; Compliance") mounted unconditionally in <code>main.ts</code> — live in production, not gated behind the same <code>nodeEnv === 'production'</code> check this exact file already uses elsewhere (<code>shouldServeFrontendAssets</code>). Deliberately not patched at the time — a real production-behavior change that couldn't be verified safe from static analysis alone without knowing whether a legitimate consumer depended on it.</p>
+          <p><span class="detail-label">Fixed this cycle, with explicit owner sign-off</span>asked the repo owner directly rather than guess; they confirmed: gate it behind the production check. Added <code>shouldServeSwaggerDocs(config)</code> (<code>nodeEnv !== 'production'</code>) mirroring the existing <code>shouldServeFrontendAssets</code> pattern, wrapped both the <code>SwaggerModule.setup()</code> call and its startup log line in the check so the log doesn't claim availability that no longer exists. Verified: backend build, <code>app.module.spec.ts</code> (asserts the route constant unaffected), and lint all clean on the changed file.</p>
+          <p><span class="detail-label">Why not higher</span>an informal self-review — however concrete its findings, and now with one of them actually fixed rather than just flagged — is not a substitute for a commissioned, independent one. The remaining gap is genuinely external: no commissioned, non-dependency-scan application security review (a real pentest) exists — the same gap the sibling product scorecard tracks under its own Security dimension. That needs a hired firm, not more self-checking.</p>
         </div>
       </details>
     </article>
@@ -796,7 +802,7 @@
         </div>
         <span class="status-chip warn">Developing</span>
         <h3>Design-system consistency</h3>
-        <p class="dim-summary">The real gap is narrower than previously scored: color/contrast is already universally consolidated; component reuse is the honest remainder.</p>
+        <p class="dim-summary">Color/contrast is universally consolidated; real component reuse is 11 files (not the previously-cited 52), one canonical component is fully dead code and now removed.</p>
         <div class="progress-track"><div class="progress-fill warn" style="width: 60%"></div></div>
       </div>
       <details>
@@ -804,7 +810,9 @@
         <div class="detail-body">
           <p><span class="detail-label">Fixed, prior pass</span>two of the design system's canonical card components were applying padding twice — once from a shared wrapper, once from a second rule layered on top. Confirmed as a structural CSS-cascade fact via source tracing, not a visual guess, and fixed.</p>
           <p><span class="detail-label">Re-investigated this cycle before attempting the bigger migration</span>the user approved migrating one-off card layouts to the 5 shared card components; before touching ~91 files that define card-shaped CSS, checked what the real problem actually is. Two findings changed the picture: (1) card color/contrast is <em>already</em> universally enforced by a real, sophisticated existing system (<code>card-contrast-normalization.css</code>) that targets any <code>[class$='-card']</code>/<code>[class*='-panel']</code> element via attribute selectors — it doesn't require the canonical JSX components at all, and it already works today. (2) A spot-check of the highest-traffic one-off card (<code>PatientCard.css</code>) shows it already reads from its own design-token namespace (<code>--cdl-radius-lg</code>, <code>--cdl-elev-1</code>), not hardcoded magic numbers — it isn't "broken," it's a second, parallel token system worth reconciling on its own terms.</p>
-          <p><span class="detail-label">Why not force the full migration</span>swapping real page markup into the 5 components' fixed prop shapes (title/meta/badge/actions) is a per-page redesign decision, not a mechanical fix — each one-off card almost certainly encodes real, specific content structure. Attempting that blind, across ~91 files, in a sandbox with no browser to catch a broken layout, is a materially different and riskier bet than the provable CSS-cascade bug fixed last cycle. Component-reuse (52 files vs. 0–1) remains a real, honest gap — just a narrower and lower-severity one than "visual inconsistency across the app" implied.</p>
+          <p><span class="detail-label">Why not force the full migration</span>swapping real page markup into the 5 components' fixed prop shapes (title/meta/badge/actions) is a per-page redesign decision, not a mechanical fix — each one-off card almost certainly encodes real, specific content structure. Attempting that blind, across ~91 files, in a sandbox with no browser to catch a broken layout, is a materially different and riskier bet than the provable CSS-cascade bug fixed last cycle.</p>
+          <p><span class="detail-label">Re-verified the "52 vs. 91" figures independently this cycle — both were wrong, and not in the reassuring direction</span>a fresh audit (real <code>import</code> statements, not string-mention greps) found the real component-reuse count is <strong>11 files, only 4 of them production code</strong> (not 52 — that number was reproduced by an unfiltered substring grep counting type references, CSS-class coincidences, and doc mentions). Two of the "5 canonical" components, <code>DashboardCard</code> and <code>StatCard</code>, have <strong>zero</strong> real production consumers anywhere — and <code>src/pages/emergency/index.tsx</code> defines and uses its own unrelated local <code>StatCard</code> function under the identical name, a shadow one-off hiding behind the canonical name. The one-off count is <strong>98 files</strong>, not 91 (reproducible selector grep, not a sample). Worse: the design system's own registry (<code>DESIGN_SYSTEM.md</code>) was itself wrong about which <code>Card</code> is real — it named <code>src/components/surfaces/Card.tsx</code> as "the base card, duplicated with <code>.cdl-card</code>," but that file had <strong>zero real importers anywhere</strong> (confirmed by tracing every import chain, including the barrels that re-exported it) — not duplicated, just dead. Deleted it (<code>Card.tsx</code> + <code>Card.css</code>, plus the two now-dead barrel export lines pointing at it) and fixed <code>DESIGN_SYSTEM.md</code>'s registry and a wrong CSS comment in <code>CareDroidPrimitives.css</code> that also cited the deleted file. The actual base primitive every real compact card (<code>DashboardCard</code>, <code>MetricCard</code>, <code>StatusWidget</code>) builds on is a <em>different</em>, previously-undocumented file — <code>src/components/ui/card.tsx</code> (<code>.card</code>/<code>.card-compact</code>) — which turned out to be the most-reused card primitive in the app (11 real importers) despite never appearing in the design system's own component registry until this fix.</p>
+          <p><span class="detail-label">Investigated the single best migration candidate the prior cycle identified before attempting it — and it doesn't hold up either</span>the most promising candidate (<code>ProfileSummaryCard.tsx</code>: single call site, real dedicated test, simple-looking structure) fails under closer inspection: its CSS (<code>ProfileSummaryCard.css</code>) hand-tunes a 3-column CSS grid (<code>grid-template-columns: auto 1fr auto</code>) directly on the outer card element, with avatar/body/link as its three direct grid children. <code>DashboardCard</code> unconditionally injects its own <code>.cd-dashboard-card__header</code> wrapper div into that same position, which would silently shift the grid from 3 clean items to a mismatched set — a real, concrete breakage mechanism, not a generic risk. jsdom-based tests would keep passing (they check text content, not computed grid layout), making this exactly the kind of false-confidence bug this sandbox has no way to catch. Declined for the same reason as the full migration, but now with the specific failure mode identified rather than a general caution.</p>
         </div>
       </details>
     </article>

@@ -37,6 +37,10 @@ function shouldServeFrontendAssets(config: EnvironmentConfig) {
   return config.server.nodeEnv === 'production' && !config.runtime.jestWorkerId;
 }
 
+function shouldServeSwaggerDocs(config: EnvironmentConfig) {
+  return config.server.nodeEnv !== 'production';
+}
+
 async function registerEmergencyMongooseRuntime(
   app: INestApplication,
   logger: Logger,
@@ -246,23 +250,27 @@ async function bootstrap() {
     createSocketJwtAuthMiddleware(authenticateSocket, Permission.VIEW_SENTINEL_COMMAND),
   );
 
-  // Swagger documentation
-  const config = new DocumentBuilder()
-    .setTitle('CareDroid API')
-    .setDescription('HIPAA-compliant clinical platform backend')
-    .setVersion('1.0')
-    .addBearerAuth()
-    .addTag('auth', 'Authentication & Authorization')
-    .addTag('users', 'User Management')
-    .addTag('subscriptions', 'Stripe Subscription Management')
-    .addTag('clinical', 'Clinical Data (Drugs, Protocols, Lab Values)')
-    .addTag('ai', 'OpenAI GPT-4 Integration')
-    .addTag('audit', 'HIPAA Audit Logs')
-    .addTag('compliance', 'GDPR & Compliance')
-    .build();
+  // Swagger documentation — dev/staging only. The full API schema (incl. tags
+  // like "HIPAA Audit Logs" and "GDPR & Compliance") should not be reachable
+  // in production, mirroring the shouldServeFrontendAssets() prod gate above.
+  if (shouldServeSwaggerDocs(environment)) {
+    const config = new DocumentBuilder()
+      .setTitle('CareDroid API')
+      .setDescription('HIPAA-compliant clinical platform backend')
+      .setVersion('1.0')
+      .addBearerAuth()
+      .addTag('auth', 'Authentication & Authorization')
+      .addTag('users', 'User Management')
+      .addTag('subscriptions', 'Stripe Subscription Management')
+      .addTag('clinical', 'Clinical Data (Drugs, Protocols, Lab Values)')
+      .addTag('ai', 'OpenAI GPT-4 Integration')
+      .addTag('audit', 'HIPAA Audit Logs')
+      .addTag('compliance', 'GDPR & Compliance')
+      .build();
 
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup(SWAGGER_DOCS_PATH, app, document);
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup(SWAGGER_DOCS_PATH, app, document);
+  }
 
   // Sentry error handler: must be registered after all routes/controllers
   // are mounted and before app.listen(), so it only catches errors that
@@ -273,7 +281,9 @@ async function bootstrap() {
   await app.listen(port);
 
   logger.log(`CareDroid Backend running on: http://localhost:${port}`);
-  logger.log(`Swagger docs available at: http://localhost:${port}/${SWAGGER_DOCS_PATH}`);
+  if (shouldServeSwaggerDocs(environment)) {
+    logger.log(`Swagger docs available at: http://localhost:${port}/${SWAGGER_DOCS_PATH}`);
+  }
   logger.log(`Prometheus metrics at: http://localhost:${port}/api/metrics`);
   logger.log(`Environment: ${environment.server.nodeEnv}`);
   logger.log('TLS 1.3: ENFORCED (only TLS 1.3+ allowed)');

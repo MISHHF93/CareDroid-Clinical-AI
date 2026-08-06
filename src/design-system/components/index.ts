@@ -12,7 +12,6 @@ export { DashboardCard } from '../../components/ui/CareDroidPrimitives';
 export { StatCard } from '../../components/data-display/StatCard';
 export { AIRecommendationCard, AIChiefRecommendationCard } from '../../components/ai';
 export { ActionProposalCard, type ActionProposalCardProps } from '../../components/ai';
-export { Card } from '../../components/surfaces/Card';
 
 /**
  * AlertCard was deleted as confirmed dead code (Cycle 146, zero real

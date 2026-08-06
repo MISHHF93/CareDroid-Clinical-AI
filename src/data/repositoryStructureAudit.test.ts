@@ -58,6 +58,28 @@ function findStrayListenCalls(dir: string): string[] {
   return found;
 }
 
+// Every genuinely separate frontend build entry point in the repo, found by
+// shape (index.html / vite.config* / webpack.config*) rather than by name —
+// so a brand-new third frontend dropped in anywhere else gets caught instead
+// of silently passing the way a fixed-path existsSync() check would.
+const FRONTEND_ENTRY_PATTERN = /^(index\.html|vite\.config\.[cm]?[jt]s|webpack\.config\.[cm]?[jt]s)$/;
+
+function findFrontendEntryPoints(dir: string): string[] {
+  if (!existsSync(dir)) return [];
+  const found: string[] = [];
+  for (const entry of readdirSync(dir)) {
+    if (SKIP_DIRS.has(entry) || entry === '.git') continue;
+    const full = join(dir, entry);
+    if (statSync(full).isDirectory()) {
+      found.push(...findFrontendEntryPoints(full));
+      continue;
+    }
+    if (!FRONTEND_ENTRY_PATTERN.test(entry)) continue;
+    found.push(relative(REPO_ROOT, full).replace(/\\/g, '/'));
+  }
+  return found;
+}
+
 describe('repositoryStructureAudit', () => {
   it('has no nested .git directories anywhere except the repo root', () => {
     expect(findNestedGitDirs(REPO_ROOT)).toEqual([]);
@@ -75,5 +97,15 @@ describe('repositoryStructureAudit', () => {
     // in an earlier campaign cycle — if it ever comes back, that's a second routing
     // authority, not a refactor.
     expect(existsSync(join(REPO_ROOT, 'backend/src/api/routes-registry.ts'))).toBe(false);
+  });
+
+  it('has no frontend build entry points beyond the main app and the disclosed navigator/ companion', () => {
+    // A 2026-08-06 audit found the "exactly one frontend" claim above checks the
+    // right path exists but never checks that nothing ELSE like it exists
+    // anywhere else in the tree — this closes that gap by enumerating every
+    // index.html/vite.config*/webpack.config* in the repo and asserting the set
+    // is exactly the two known, disclosed ones (main app + navigator/), not more.
+    const found = findFrontendEntryPoints(REPO_ROOT).sort();
+    expect(found).toEqual(['index.html', 'navigator/public/index.html', 'vite.config.ts'].sort());
   });
 });

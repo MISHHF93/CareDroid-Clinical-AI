@@ -79,6 +79,12 @@ services:
       PINECONE_INDEX_NAME: ${PINECONE_INDEX_NAME:-caredroid-medical-knowledge}
       RAG_MODEL: ${RAG_MODEL:-local-deterministic-embedding}
       # ML Services
+      # NOTE (2026-08-06 audit): no `anomaly-detection` service is defined in
+      # this compose file (or docker-compose.app.yml) — this URL points at a
+      # container that doesn't exist here. Harmless while disabled by default
+      # below; backend/src/ml-services/anomaly-detection/ is real but runs
+      # in-process, not as this separate service. Fix the URL or drop these
+      # two lines before ever flipping ANOMALY_DETECTION_ENABLED to true.
       ANOMALY_DETECTION_URL: ${ANOMALY_DETECTION_URL:-http://anomaly-detection:5000}
       ANOMALY_DETECTION_ENABLED: ${ANOMALY_DETECTION_ENABLED:-false}
       NLU_SERVICE_ENABLED: ${NLU_SERVICE_ENABLED:-true}

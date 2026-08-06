@@ -15,10 +15,21 @@ overlapping token/component systems**:
    actively-developed, dual-theme (light/dark), contract-tested system. ~30
    commits of investment: token scale, AA-verified light/dark color pairs,
    card contracts, badge/pill tone system, composition rules.
-3. `src/components/layout/*` + `src/components/primitives/*` +
-   `src/components/surfaces/Card.tsx` — a third, undocumented `--cd-space-*`
-   token namespace, with its **own competing `Card` implementation**
-   (`.cd-card`) separate from CDL v2's `.cdl-card`.
+3. `src/components/layout/*` + `src/components/primitives/*` — a third,
+   undocumented `--cd-space-*` token namespace, separate from CDL v2's
+   `--cdl-*`.
+   `src/components/surfaces/Card.tsx` (`.cd-card`) was originally catalogued
+   here too as a "competing `Card` implementation," but a Repository
+   Readiness Scorecard re-audit (2026-08-06) found it had **zero real
+   importers anywhere** — not competing, just dead. Deleted. The actual
+   compact-card primitive real components build on is a *different*,
+   previously-undocumented file: `src/components/ui/card.tsx` (`.card`/
+   `.card-compact`) — it backs `DashboardCard`, `MetricCard`, and
+   `StatusWidget` in `CareDroidPrimitives.tsx`, and is directly imported by
+   11 more production files (mostly `src/pages/profile/*` and
+   `src/pages/{Settings,BillingPage,UsagePage}.tsx`). It's the
+   most-reused card-shaped primitive in the app and was missing from this
+   registry entirely until this correction.
 
 Building a brand-new `/design-system` token set from scratch, as first
 requested, would have created a **fourth** parallel system — the opposite of
@@ -34,8 +45,8 @@ requested, would have created a **fourth** parallel system — the opposite of
 - The `src/components/layout/*` (`--cd-*`) vs. `cdl-v2` (`--cdl-*`) split is a
   **known, real gap** — not addressed by this package. It needs its own
   migration cycle (retire `--cd-*`, move `layout/*` primitives onto `--cdl-*`,
-  merge `surfaces/Card.tsx` into `.cdl-card`), tracked as an open roadmap item
-  below rather than silently left implicit.
+  reconcile `ui/card.tsx`'s `.card`/`.card-compact` classes with `.cdl-card`),
+  tracked as an open roadmap item below rather than silently left implicit.
 
 ## Token layer (`tokens/`)
 
@@ -66,12 +77,12 @@ migrate on their own schedule, not as a side effect of this cycle.
 
 | Requested name | Status | Real implementation |
 |---|---|---|
-| `PatientCard` | exists | `src/components/PatientCard.tsx` |
-| `DashboardCard` | exists | `src/components/ui/CareDroidPrimitives.tsx` |
-| `AIRecommendationCard` | exists | `src/components/ai/AIRecommendationCard.tsx` (aliased as `AIChiefRecommendationCard`) |
-| `ActionCard` | exists, different name | `ActionProposalCard` — `src/components/ai/ActionProposalCard.tsx` |
-| `StatCard` | exists | `src/components/data-display/StatCard.tsx` |
-| `Card` (base) | exists, **duplicated** | `src/components/surfaces/Card.tsx` (`.cd-card`) **and** `cdl-v2/cards.css` (`.cdl-card`) — unify before adding more card variants |
+| `PatientCard` | exists, real usage | `src/components/PatientCard.tsx` — 2 production call sites |
+| `DashboardCard` | exists, **zero real production usage** | `src/components/ui/CareDroidPrimitives.tsx` — defined but not actually imported by any page/feature component today (only its own definition file) |
+| `AIRecommendationCard` | exists, real usage | `src/components/ai/AIRecommendationCard.tsx` (aliased as `AIChiefRecommendationCard`) — 2 production call sites |
+| `ActionCard` | exists, different name, **zero real production usage** | `ActionProposalCard` — `src/components/ai/ActionProposalCard.tsx` (test-only today) |
+| `StatCard` | exists, **zero real production usage** | `src/components/data-display/StatCard.tsx` — note `src/pages/emergency/index.tsx` defines and uses its own unrelated local `StatCard` function under the same name, which is not this component |
+| `Card` (base) | **deleted, was fully dead** | `src/components/surfaces/Card.tsx` (`.cd-card`) had zero real importers — removed 2026-08-06. The real base primitive in active use is the previously-undocumented `src/components/ui/card.tsx` (`.card`/`.card-compact`), separate again from `cdl-v2/cards.css` (`.cdl-card`) — three names for card-shaped surfaces, not two |
 | `AlertCard` | **deleted** (Cycle 146, confirmed zero importers) | use `src/alarm/{AlarmBanner,AlarmKpi,AlarmRail}` — the real, live equivalent |
 | `ClinicianCard` | **does not exist** | no live call site yet — see roadmap |
 | `WorkflowCard` | **does not exist** | only `acknowledgeWorkflowCard`/`dismissWorkflowCard` functions exist (`InteractiveAIWorkspace.tsx`), no component |
@@ -87,9 +98,12 @@ shape contract, not before.
 
 ## Roadmap (open, prioritized)
 
-1. **Unify the two `Card` implementations** (`surfaces/Card.tsx` `.cd-card`
-   vs. `cdl-v2/cards.css` `.cdl-card`) — the single biggest source of future
-   drift if left alone.
+1. **Reconcile the two remaining `Card` implementations** (`ui/card.tsx`
+   `.card`/`.card-compact` vs. `cdl-v2/cards.css` `.cdl-card`) — the single
+   biggest source of future drift if left alone. (`surfaces/Card.tsx`
+   `.cd-card`, previously tracked here as a third competing implementation,
+   was confirmed fully dead and deleted 2026-08-06 — it was never actually
+   competing for real usage.)
 2. **Migrate `src/components/layout/*` primitives off `--cd-space-*` onto
    `--cdl-space-*`** so there's one spacing namespace, not two.
 3. Build `WorkflowCard` / `EvidenceCard` / `TimelineCard` / `ClinicianCard`
