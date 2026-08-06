@@ -15,20 +15,20 @@ Generated: 2026-08-06 (regenerate with `npm run orphan-detection:write-docs`)
 
 | Metric | Count |
 |--------|------:|
-| Total orphan findings | 527 |
+| Total orphan findings | 529 |
 | App.jsx routes | 152 |
-| Orphan / gap routes | 221 |
-| Orphan pages | 148 |
+| Orphan / gap routes | 222 |
+| Orphan pages | 149 |
 | Orphan components | 0 |
 | Domain module findings (dashboard / simulation / lab / 3D) | 20 |
 | Orphan services | 0 |
 | Executor contract gaps | 0 |
 | API orphans / stubs | 127 |
 | Weakly linked markdown | 11 |
-| **wire** | 263 |
+| **wire** | 264 |
 | **merge** | 0 |
 | **quarantine** | 0 |
-| **legacy** | 264 |
+| **legacy** | 265 |
 
 ## Merge candidates (explicit)
 
@@ -93,6 +93,7 @@ Generated: 2026-08-06 (regenerate with `npm run orphan-detection:write-docs`)
 | /profile/tool-preferences | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /version | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /help-center | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
+| /navigator | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /legal/privacy-policy | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /legal/terms | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /legal/gdpr | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
@@ -283,6 +284,7 @@ Generated: 2026-08-06 (regenerate with `npm run orphan-detection:write-docs`)
 | src/pages/ai/MemoryDashboard.tsx | legacy | import:./pages/ai/MemoryDashboard |
 | src/pages/analytics/AnalyticsDashboard.tsx | legacy | import:./pages/analytics/AnalyticsDashboard |
 | src/pages/analytics/PredictiveAnalyticsDashboard.tsx | legacy | import:PredictiveAnalyticsDashboard |
+| src/pages/AppNavigator.tsx | legacy | import:./pages/AppNavigator |
 | src/pages/AutomationAuditTrail.tsx | legacy | import:./pages/AutomationAuditTrail |
 | src/pages/BillingPage.tsx | legacy | import:./pages/BillingPage |
 | src/pages/clinical/ClinicalDecisionSupport.tsx | legacy | import:./pages/clinical/ClinicalDecisionSupport |
