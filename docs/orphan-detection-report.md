@@ -15,20 +15,20 @@ Generated: 2026-08-06 (regenerate with `npm run orphan-detection:write-docs`)
 
 | Metric | Count |
 |--------|------:|
-| Total orphan findings | 551 |
+| Total orphan findings | 536 |
 | App.jsx routes | 152 |
 | Orphan / gap routes | 221 |
-| Orphan pages | 150 |
-| Orphan components | 7 |
+| Orphan pages | 149 |
+| Orphan components | 1 |
 | Domain module findings (dashboard / simulation / lab / 3D) | 20 |
-| Orphan services | 10 |
+| Orphan services | 1 |
 | Executor contract gaps | 0 |
 | API orphans / stubs | 127 |
-| Weakly linked markdown | 16 |
+| Weakly linked markdown | 17 |
 | **wire** | 263 |
 | **merge** | 0 |
-| **quarantine** | 35 |
-| **legacy** | 253 |
+| **quarantine** | 17 |
+| **legacy** | 256 |
 
 ## Merge candidates (explicit)
 
@@ -343,7 +343,6 @@ Generated: 2026-08-06 (regenerate with `npm run orphan-detection:write-docs`)
 | src/pages/operations/Operations.tsx | legacy | import:./pages/operations/Operations |
 | src/pages/organization/OrganizationPages.tsx | legacy | import:src/pages/organization/OrganizationPages |
 | src/pages/platform/BusinessBrain.tsx | legacy | import:./pages/platform/BusinessBrain |
-| src/pages/platform/components/PlatformWorkflowPrimitives.tsx | quarantine | No production import path found |
 | src/pages/platform/DepartmentIntelligence.tsx | legacy | import:./pages/platform/DepartmentIntelligence |
 | src/pages/platform/HealthcareKnowledgeHub.tsx | legacy | import:./pages/platform/HealthcareKnowledgeHub |
 | src/pages/platform/PlatformGovernanceWorkspace.tsx | wire | import:src/pages/platform/PlatformGovernanceWorkspace.tsx |
@@ -430,13 +429,7 @@ Generated: 2026-08-06 (regenerate with `npm run orphan-detection:write-docs`)
 
 | Component | Class | Evidence |
 | --- | --- | --- |
-| src/components/emergency/OperationalStrip.d.ts | quarantine | No production import |
-| src/components/EMSCriticalBroadcast.d.ts | quarantine | No production import |
-| src/components/layout/Box.tsx | quarantine | No production import |
-| src/components/ReassessmentDrawer.d.ts | quarantine | No production import |
-| src/components/reception/receptionAlertRailModel.ts | quarantine | No production import |
 | src/components/whiteboard/operationalHandoffArtifactRegistry.ts | quarantine | No production import |
-| src/components/WorkloadBalancePanel.d.ts | quarantine | No production import |
 
 ## Dashboards
 
@@ -461,16 +454,7 @@ _None detected._
 
 | Service | Class | Evidence |
 | --- | --- | --- |
-| src/services/aiChiefRecommendationPresentation.ts | quarantine | No production import of service module |
-| src/services/customerPortalApi.ts | quarantine | No production import of service module |
-| src/services/integrationPreArrivalConsumer.ts | quarantine | No production import of service module |
 | src/services/livingDocumentationGenerator.ts | quarantine | No production import of service module |
-| src/services/nativeAiTriageRuleLlm.ts | quarantine | No production import of service module |
-| src/services/receptionPatientAnswersModel.ts | quarantine | No production import of service module |
-| src/services/roomStatusSync.ts | quarantine | No production import of service module |
-| src/services/successCenterApi.ts | quarantine | No production import of service module |
-| src/services/surveillanceIoTService.ts | quarantine | No production import of service module |
-| src/services/voiceInterviewAssistant.ts | quarantine | No production import of service module |
 
 ## Orphan executors
 
@@ -607,22 +591,23 @@ _… and 7 more API rows._
 
 | Doc | Class | Evidence |
 | --- | --- | --- |
-| docs/architecture/architect-mode/baseline/baseline-report.md | quarantine | No inbound links from README, src, or other docs |
-| docs/architecture/CAREDROID_ARCHITECTURE_CLEANUP_REPORT.md | quarantine | No inbound links from README, src, or other docs |
-| docs/architecture/CLINICAL_PROCESS_SAAS_HARMONIZATION_REPORT.md | quarantine | No inbound links from README, src, or other docs |
-| docs/architecture/PLATFORM_MODERNIZATION_REPORT.md | quarantine | No inbound links from README, src, or other docs |
-| docs/architecture/RECEPTION_WORKSPACE_REFERENCE.md | quarantine | No inbound links from README, src, or other docs |
-| docs/archive/SCORECARD-archive-2026-07-23-cycles-1-157.md | quarantine | No inbound links from README, src, or other docs |
-| docs/INTENDED_USE_BOUNDARY_v1.md | quarantine | No inbound links from README, src, or other docs |
-| docs/INTERACTION_EXECUTION_REPORT.md | quarantine | No inbound links from README, src, or other docs |
-| docs/operations/surge-mongo-local-setup.md | quarantine | No inbound links from README, src, or other docs |
-| docs/reception-upgrade/02-dependency-map.md | quarantine | No inbound links from README, src, or other docs |
-| docs/reception-upgrade/02-scorecard-baseline.md | quarantine | No inbound links from README, src, or other docs |
-| docs/reception-upgrade/03-orphaned-code.md | quarantine | No inbound links from README, src, or other docs |
-| docs/reception-upgrade/04-rbac-permission-matrix.md | quarantine | No inbound links from README, src, or other docs |
-| docs/reception-upgrade/05-information-architecture.md | quarantine | No inbound links from README, src, or other docs |
-| docs/reception-upgrade/NEW_HEADER_INTEGRATION_GUIDE.md | quarantine | No inbound links from README, src, or other docs |
-| docs/tool-render-execute-manual-qa.md | quarantine | No inbound links from README, src, or other docs |
+| docs/architecture/clickable-map-report.md | legacy | No inbound links from README, src, or other docs |
+| docs/architecture/component-mounting-report.md | legacy | No inbound links from README, src, or other docs |
+| docs/architecture/emergency-resource-board.md | quarantine | No inbound links from README, src, or other docs |
+| docs/architecture/layout-routing-consolidation-report.md | legacy | No inbound links from README, src, or other docs |
+| docs/architecture/system-evaluation.md | quarantine | No inbound links from README, src, or other docs |
+| docs/architecture/ui-surface-compression.md | quarantine | No inbound links from README, src, or other docs |
+| docs/manuals/roles/demo-observer.md | quarantine | No inbound links from README, src, or other docs |
+| docs/manuals/roles/lab-technician.md | quarantine | No inbound links from README, src, or other docs |
+| docs/manuals/roles/paramedic.md | quarantine | No inbound links from README, src, or other docs |
+| docs/manuals/roles/pharmacist.md | quarantine | No inbound links from README, src, or other docs |
+| docs/manuals/roles/radiology-technician.md | quarantine | No inbound links from README, src, or other docs |
+| docs/manuals/roles/registered-nurse.md | quarantine | No inbound links from README, src, or other docs |
+| docs/specs/current-codebase-findings.md | quarantine | No inbound links from README, src, or other docs |
+| docs/specs/saas-service-journey-map.md | quarantine | No inbound links from README, src, or other docs |
+| docs/specs/service-bottleneck-spec.md | quarantine | No inbound links from README, src, or other docs |
+| docs/specs/three-minute-response-spec.md | quarantine | No inbound links from README, src, or other docs |
+| docs/specs/visual-responsive-standards.md | quarantine | No inbound links from README, src, or other docs |
 
 ## Appendix
 

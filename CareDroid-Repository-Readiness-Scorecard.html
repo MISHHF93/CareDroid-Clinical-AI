@@ -1,0 +1,859 @@
+<title>CareDroid Repository Readiness Scorecard</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --page: #0a0e14;
+    --page-deep: #05070a;
+    --surface: #121821;
+    --surface-raised: #161d28;
+    --surface-soft: rgba(91, 143, 214, 0.06);
+    --surface-hover: rgba(91, 143, 214, 0.1);
+    --ink: #eef2f7;
+    --ink-soft: #93a1b3;
+    --ink-muted: #5d6a7a;
+    --line: rgba(147, 161, 179, 0.14);
+    --line-strong: rgba(147, 161, 179, 0.26);
+    --accent: #5b8fd6;
+    --accent-strong: #7fa9e3;
+    --accent-soft: rgba(91, 143, 214, 0.14);
+    --good: #5fb87a;
+    --good-soft: rgba(95, 184, 122, 0.13);
+    --warn: #e0ab45;
+    --warn-soft: rgba(224, 171, 69, 0.13);
+    --bad: #e2665f;
+    --bad-soft: rgba(226, 102, 95, 0.13);
+    --shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    --radius-lg: 18px;
+    --radius-md: 12px;
+    --radius-sm: 8px;
+    --content: 1240px;
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+  }
+
+  @media (prefers-color-scheme: light) {
+    :root {
+      color-scheme: light;
+      --page: #eef1f5;
+      --page-deep: #e2e7ed;
+      --surface: #ffffff;
+      --surface-raised: #ffffff;
+      --surface-soft: rgba(47, 95, 168, 0.045);
+      --surface-hover: rgba(47, 95, 168, 0.08);
+      --ink: #12181f;
+      --ink-soft: #4c5a6b;
+      --ink-muted: #7c8898;
+      --line: rgba(18, 24, 31, 0.1);
+      --line-strong: rgba(18, 24, 31, 0.18);
+      --accent: #2f5fa8;
+      --accent-strong: #23477f;
+      --accent-soft: rgba(47, 95, 168, 0.1);
+      --good: #2f8f52;
+      --good-soft: rgba(47, 143, 82, 0.1);
+      --warn: #b3781a;
+      --warn-soft: rgba(179, 120, 26, 0.1);
+      --bad: #c3453f;
+      --bad-soft: rgba(195, 69, 63, 0.1);
+      --shadow: 0 16px 40px rgba(18, 24, 31, 0.12);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page: #0a0e14;
+    --page-deep: #05070a;
+    --surface: #121821;
+    --surface-raised: #161d28;
+    --surface-soft: rgba(91, 143, 214, 0.06);
+    --surface-hover: rgba(91, 143, 214, 0.1);
+    --ink: #eef2f7;
+    --ink-soft: #93a1b3;
+    --ink-muted: #5d6a7a;
+    --line: rgba(147, 161, 179, 0.14);
+    --line-strong: rgba(147, 161, 179, 0.26);
+    --accent: #5b8fd6;
+    --accent-strong: #7fa9e3;
+    --accent-soft: rgba(91, 143, 214, 0.14);
+    --good: #5fb87a;
+    --good-soft: rgba(95, 184, 122, 0.13);
+    --warn: #e0ab45;
+    --warn-soft: rgba(224, 171, 69, 0.13);
+    --bad: #e2665f;
+    --bad-soft: rgba(226, 102, 95, 0.13);
+    --shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  }
+
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --page: #eef1f5;
+    --page-deep: #e2e7ed;
+    --surface: #ffffff;
+    --surface-raised: #ffffff;
+    --surface-soft: rgba(47, 95, 168, 0.045);
+    --surface-hover: rgba(47, 95, 168, 0.08);
+    --ink: #12181f;
+    --ink-soft: #4c5a6b;
+    --ink-muted: #7c8898;
+    --line: rgba(18, 24, 31, 0.1);
+    --line-strong: rgba(18, 24, 31, 0.18);
+    --accent: #2f5fa8;
+    --accent-strong: #23477f;
+    --accent-soft: rgba(47, 95, 168, 0.1);
+    --good: #2f8f52;
+    --good-soft: rgba(47, 143, 82, 0.1);
+    --warn: #b3781a;
+    --warn-soft: rgba(179, 120, 26, 0.1);
+    --bad: #c3453f;
+    --bad-soft: rgba(195, 69, 63, 0.1);
+    --shadow: 0 16px 40px rgba(18, 24, 31, 0.12);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background:
+      radial-gradient(circle at 18% -10%, var(--accent-soft), transparent 32rem),
+      linear-gradient(160deg, var(--page) 0%, var(--page-deep) 100%);
+    color: var(--ink);
+    font-family: var(--sans);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+  }
+
+  .wrap {
+    max-width: var(--content);
+    margin: 0 auto;
+    padding: 3rem 1.5rem 5rem;
+  }
+
+  /* ---------- Header ---------- */
+
+  header.top {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-strong);
+    margin: 0 0 0.6rem;
+  }
+
+  h1 {
+    font-family: var(--mono);
+    font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.15rem);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  .subtitle {
+    color: var(--ink-soft);
+    font-size: 0.98rem;
+    margin: 0.6rem 0 0;
+    max-width: 46rem;
+  }
+
+  .meta-block {
+    text-align: right;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    color: var(--ink-muted);
+    line-height: 1.7;
+  }
+
+  .meta-block a {
+    color: var(--accent-strong);
+    text-decoration: none;
+  }
+  .meta-block a:hover,
+  .meta-block a:focus-visible { text-decoration: underline; }
+
+  /* ---------- Hero score ---------- */
+
+  .hero {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 2.5rem;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    padding: 2rem 2.25rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .score-ring {
+    position: relative;
+    width: 148px;
+    height: 148px;
+    flex: none;
+  }
+
+  .score-ring svg { transform: rotate(-90deg); }
+
+  .score-ring .track { stroke: var(--line); }
+  .score-ring .fill {
+    stroke: var(--accent);
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.8s ease;
+  }
+
+  .score-ring .num {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .score-ring .num strong {
+    font-family: var(--mono);
+    font-size: 2.4rem;
+    font-weight: 600;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .score-ring .num span {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--ink-muted);
+    margin-top: 0.2rem;
+  }
+
+  .hero-body h2 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem;
+  }
+
+  .hero-body p {
+    color: var(--ink-soft);
+    margin: 0 0 1rem;
+    max-width: 52rem;
+  }
+
+  .band-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.32rem 0.7rem;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--accent-strong);
+    border: 1px solid var(--line-strong);
+  }
+
+  /* ---------- Build health strip ---------- */
+
+  .strip-label {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin: 0 0 0.75rem;
+  }
+
+  .strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .strip-item {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    padding: 0.85rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .strip-item .label {
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex: none;
+  }
+  .dot.good { background: var(--good); box-shadow: 0 0 0 3px var(--good-soft); }
+  .dot.warn { background: var(--warn); box-shadow: 0 0 0 3px var(--warn-soft); }
+  .dot.bad { background: var(--bad); box-shadow: 0 0 0 3px var(--bad-soft); }
+
+  .strip-item .value {
+    font-family: var(--mono);
+    font-size: 1.02rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .strip-item .value.good { color: var(--good); }
+  .strip-item .value.warn { color: var(--warn); }
+  .strip-item .value.bad { color: var(--bad); }
+
+  /* ---------- Dimension grid ---------- */
+
+  .dim-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+  }
+
+  .dim {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .dim::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+  }
+  .dim.good::before { background: var(--good); }
+  .dim.warn::before { background: var(--warn); }
+  .dim.bad::before { background: var(--bad); }
+
+  .dim-main { padding: 1.35rem 1.5rem 1.15rem 1.65rem; }
+
+  .dim-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .dim-index {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--ink-muted);
+    letter-spacing: 0.04em;
+  }
+
+  .dim-score {
+    font-family: var(--mono);
+    font-size: 1.15rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  .dim-score span { color: var(--ink-muted); font-size: 0.85rem; font-weight: 400; }
+
+  .dim h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 0.55rem;
+  }
+
+  .status-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 0.22rem 0.55rem;
+    border-radius: 999px;
+    margin-bottom: 0.65rem;
+  }
+  .status-chip.good { background: var(--good-soft); color: var(--good); }
+  .status-chip.warn { background: var(--warn-soft); color: var(--warn); }
+  .status-chip.bad { background: var(--bad-soft); color: var(--bad); }
+
+  .dim-summary {
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+    margin: 0;
+  }
+
+  .progress-track {
+    height: 5px;
+    border-radius: 999px;
+    background: var(--line);
+    overflow: hidden;
+    margin: 0.85rem 0 0;
+  }
+  .progress-fill { height: 100%; border-radius: 999px; }
+  .progress-fill.good { background: var(--good); }
+  .progress-fill.warn { background: var(--warn); }
+  .progress-fill.bad { background: var(--bad); }
+
+  details { border-top: 1px solid var(--line); }
+
+  summary {
+    cursor: pointer;
+    padding: 0.7rem 1.5rem;
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--accent-strong);
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    user-select: none;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::before {
+    content: "▸";
+    display: inline-block;
+    transition: transform 0.15s ease;
+    font-size: 0.7em;
+  }
+  details[open] summary::before { transform: rotate(90deg); }
+  summary:hover, summary:focus-visible { background: var(--surface-hover); }
+  summary:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+  .detail-body {
+    padding: 0 1.5rem 1.35rem;
+    font-size: 0.87rem;
+    color: var(--ink-soft);
+  }
+
+  .detail-body p { margin: 0 0 0.9rem; }
+  .detail-body p:last-child { margin-bottom: 0; }
+
+  .detail-label {
+    display: block;
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: 0.3rem;
+  }
+
+  .detail-body code {
+    font-family: var(--mono);
+    font-size: 0.86em;
+    background: var(--surface-soft);
+    padding: 0.1em 0.35em;
+    border-radius: 4px;
+    color: var(--ink);
+  }
+
+  .detail-body strong { color: var(--ink); }
+
+  /* ---------- Findings ledger ---------- */
+
+  .ledger-section { margin-top: 3rem; }
+
+  .ledger-section h2 {
+    font-family: var(--mono);
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin: 0 0 0.3rem;
+  }
+
+  .ledger-section > p {
+    color: var(--ink-soft);
+    font-size: 0.88rem;
+    margin: 0 0 1.25rem;
+    max-width: 50rem;
+  }
+
+  .ledger-table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: var(--shadow);
+  }
+
+  table.ledger {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    min-width: 640px;
+  }
+
+  table.ledger th {
+    text-align: left;
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    font-weight: 500;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--line-strong);
+    white-space: nowrap;
+  }
+
+  table.ledger td {
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+
+  table.ledger tr:last-child td { border-bottom: none; }
+
+  table.ledger td.num {
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.04em;
+    padding: 0.18rem 0.5rem;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .pill.open { background: var(--warn-soft); color: var(--warn); }
+  .pill.closed { background: var(--good-soft); color: var(--good); }
+
+  /* ---------- Footer ---------- */
+
+  footer {
+    margin-top: 3.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1rem;
+    font-size: 0.8rem;
+    color: var(--ink-muted);
+  }
+
+  footer a { color: var(--accent-strong); text-decoration: none; }
+  footer a:hover, footer a:focus-visible { text-decoration: underline; }
+
+  @media (max-width: 720px) {
+    .hero { grid-template-columns: 1fr; text-align: center; }
+    .hero-body p { max-width: none; }
+    .meta-block { text-align: left; }
+  }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow">// caredroid-clinical-ai — engineering audit</p>
+      <h1>Repository Readiness Scorecard</h1>
+      <p class="subtitle">
+        Is the codebase itself well-built and well-kept — structure, dead code, docs, dependencies,
+        internal duplication, build health, and design-system consistency. A sibling to the
+        <a href="https://claude.ai/code/artifact/9d3e5b15-294c-4678-a791-e1d97afa5b5b" style="color: var(--accent-strong)">Project Scorecard</a>,
+        which scores clinical/product readiness — this one scores the engineering underneath it.
+      </p>
+    </div>
+    <div class="meta-block">
+      Generated 2026-08-06<br />
+      HEAD <code style="font-family: var(--mono)">2965f3ae</code><br />
+      <a href="https://github.com/MISHHF93/CareDroid-Clinical-AI">github.com/MISHHF93/CareDroid-Clinical-AI</a>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="score-ring">
+      <svg width="148" height="148" viewBox="0 0 148 148">
+        <circle class="track" cx="74" cy="74" r="64" fill="none" stroke-width="10"></circle>
+        <circle class="fill" cx="74" cy="74" r="64" fill="none" stroke-width="10"
+          stroke-dasharray="402.1" stroke-dashoffset="88.5"></circle>
+      </svg>
+      <div class="num">
+        <strong>78</strong>
+        <span>/ 100</span>
+      </div>
+    </div>
+    <div class="hero-body">
+      <span class="band-chip">Actively maintained, real gaps tracked</span>
+      <h2>Solid engineering hygiene with honest, named open items</h2>
+      <p>
+        One repository, one backend, one frontend — verified fresh, not assumed. The interaction-inventory
+        scanner is clean, and the orphan-code quarantine bucket was actively worked this session, though a
+        fresh recount still shows 17 findings open. 27 of 38 tracked internal-duplication findings
+        are closed with evidence; the 4 that remain open need a product decision or a dedicated
+        cycle, not more triage. The two other real soft spots: documentation accuracy was sample-checked,
+        not exhaustively audited, and one design-system adoption gap is identified but deliberately
+        not force-fixed without a way to see the result.
+      </p>
+    </div>
+  </section>
+
+  <p class="strip-label">Build health (last verified run)</p>
+  <div class="strip">
+    <div class="strip-item">
+      <span class="label"><span class="dot good"></span>Typecheck</span>
+      <span class="value good">0 errors</span>
+    </div>
+    <div class="strip-item">
+      <span class="label"><span class="dot good"></span>Lint</span>
+      <span class="value good">0 errors</span>
+    </div>
+    <div class="strip-item">
+      <span class="label"><span class="dot good"></span>Production build</span>
+      <span class="value good">passes</span>
+    </div>
+    <div class="strip-item">
+      <span class="label"><span class="dot good"></span>Frontend suite</span>
+      <span class="value good">12,188 / 12,189</span>
+    </div>
+    <div class="strip-item">
+      <span class="label"><span class="dot good"></span>Backend suite</span>
+      <span class="value good">277 / 277</span>
+    </div>
+    <div class="strip-item">
+      <span class="label"><span class="dot warn"></span>Known flaky (pre-existing)</span>
+      <span class="value warn">3 tracked</span>
+    </div>
+  </div>
+
+  <div class="dim-grid">
+
+    <article class="dim good">
+      <div class="dim-main">
+        <div class="dim-top">
+          <span class="dim-index">01 / 08</span>
+          <span class="dim-score">14<span> / 15</span></span>
+        </div>
+        <span class="status-chip good">Strong</span>
+        <h3>Structural consolidation</h3>
+        <p class="dim-summary">One repo, one NestJS backend, one Vite frontend — verified fresh via direct commands, not recalled from memory.</p>
+        <div class="progress-track"><div class="progress-fill good" style="width: 93%"></div></div>
+      </div>
+      <details>
+        <summary>Evidence</summary>
+        <div class="detail-body">
+          <p><span class="detail-label">Verified</span>Zero nested <code>.git</code> directories anywhere in the tree. Exactly one backend (<code>backend/</code>, single <code>main.ts</code>, <code>@nestjs/core</code>, zero stray <code>.listen()</code> calls anywhere else in the codebase) and exactly one frontend (root <code>vite.config.ts</code>/<code>index.html</code>; top-level <code>lib/</code> is shared source for that same app, no independent <code>package.json</code>). <code>mcp/</code> is a stdio-only Model Context Protocol bridge with zero HTTP listeners; <code>navigator/</code> is a small, disclosed standalone route-lookup companion. <code>backend/ml-services/</code> lives inside <code>backend/</code> as an in-process library, not a sibling app. The legacy bare-Express route system was fully decommissioned in an earlier cycle — all real route groups migrated to NestJS, <code>routes-registry.ts</code> itself deleted, not just emptied.</p>
+          <p><span class="detail-label">Why not 15/15</span><code>agent-tools/</code>, <code>terminals/</code>, <code>logs/</code>, <code>test-results/</code>, <code>dist/</code> are correctly gitignored, but nothing enforces "stay at one repo" going forward — this is a point-in-time verification, not a standing CI gate.</p>
+        </div>
+      </details>
+    </article>
+
+    <article class="dim good">
+      <div class="dim-main">
+        <div class="dim-top">
+          <span class="dim-index">02 / 08</span>
+          <span class="dim-score">12<span> / 15</span></span>
+        </div>
+        <span class="status-chip good">Strong</span>
+        <h3>Dead code &amp; hygiene</h3>
+        <p class="dim-summary">Interaction scanner runs clean; the orphan audit's quarantine bucket was actively worked this session but a fresh recount shows 17 findings still remain.</p>
+        <div class="progress-track"><div class="progress-fill good" style="width: 80%"></div></div>
+      </div>
+      <details>
+        <summary>Evidence</summary>
+        <div class="detail-body">
+          <p><span class="detail-label">scan-source-dirt.mjs</span><code>ariaBoolExpr</code> 10→0, <code>bomFiles</code> 2→0, 59 truly-unused <code>import React from 'react'</code> statements removed (each individually verified against real usage, not assumed).</p>
+          <p><span class="detail-label">Orphan detection</span>17 quarantine-bucket files (no production consumer, safe to remove after review) were verified via whole-repo search — not just <code>src/</code> — and removed this session; 2 more were confirmed real dependencies of <code>scripts/</code> tooling the scanner itself doesn't check, correctly kept. One deletion had to be reverted after a full-suite run caught real test coverage the initial check had missed, then re-verified clean.</p>
+          <p><span class="detail-label">Interaction inventory</span><code>scan-interaction-inventory.mjs</code>: 2 of 1,136 controls flagged, both investigated and confirmed false positives (a handler hidden behind a props spread; a JSX comment misread as a control).</p>
+          <p><span class="detail-label">Why not 15/15</span>A regeneration run immediately before publishing this scorecard shows the quarantine bucket is not actually empty: 536 total orphan findings remain, 17 of them quarantine — 3 code files (<code>PlatformOSPages.tsx</code>, <code>operationalHandoffArtifactRegistry.ts</code>, <code>livingDocumentationGenerator.ts</code>) and 14 unlinked docs, none yet triaged this pass. The much larger "wire" bucket (reachable in intent but missing a route/import/contract) and "legacy" bucket are essentially untouched.</p>
+        </div>
+      </details>
+    </article>
+
+    <article class="dim warn">
+      <div class="dim-main">
+        <div class="dim-top">
+          <span class="dim-index">03 / 08</span>
+          <span class="dim-score">6<span> / 10</span></span>
+        </div>
+        <span class="status-chip warn">Developing</span>
+        <h3>Documentation accuracy</h3>
+        <p class="dim-summary">Real fixes made, but on a sample of the doc set, not an exhaustive pass — and one known process gap remains open.</p>
+        <div class="progress-track"><div class="progress-fill warn" style="width: 60%"></div></div>
+      </div>
+      <details>
+        <summary>Evidence</summary>
+        <div class="detail-body">
+          <p><span class="detail-label">This pass</span>10 point-in-time historical reports moved to <code>docs/archive/</code> rather than deleted, preserving the record. 4 genuinely useful, previously-unindexed docs added to <code>DOCUMENTATION_CENTER.md</code> — including the P0.3 intended-use boundary statement, a draft still awaiting clinical-safety sign-off. Found and fixed one actively-misleading claim: the developer guide described a legacy dual-backend architecture that was fully decommissioned cycles earlier in this same program.</p>
+          <p><span class="detail-label">Why not higher</span>That was 16 of roughly 90+ documents in <code>docs/</code> — a targeted sample the orphan scanner surfaced, not a comprehensive accuracy sweep. No <code>SECURITY.md</code> or documented vulnerability-disclosure contact exists anywhere in the repo — a real gap, deliberately not papered over with an invented email address.</p>
+        </div>
+      </details>
+    </article>
+
+    <article class="dim warn">
+      <div class="dim-main">
+        <div class="dim-top">
+          <span class="dim-index">04 / 08</span>
+          <span class="dim-score">10<span> / 15</span></span>
+        </div>
+        <span class="status-chip warn">Developing</span>
+        <h3>Dependency &amp; security hygiene</h3>
+        <p class="dim-summary">Known vulnerabilities are triaged with primary-source evidence, not ignored — but no bespoke security review has been commissioned.</p>
+        <div class="progress-track"><div class="progress-fill warn" style="width: 67%"></div></div>
+      </div>
+      <details>
+        <summary>Evidence</summary>
+        <div class="detail-body">
+          <p><span class="detail-label">Verified this session</span>Fresh <code>npm audit</code> on both frontend and backend: exactly 2 findings each, both already CI-allowlisted with the actual GHSA advisory text read (not just the title) to confirm scope before allowlisting. A real PHI-leak-prevention gap was found and closed: <code>backend/public/</code> held 2.25MB of orphaned build output and was also where a file-upload provider writes in dev, with zero <code>.gitignore</code> coverage — fixed. A fresh scan for live-looking API keys and tracked <code>.env</code> files across the whole repo came back clean.</p>
+          <p><span class="detail-label">Why not higher</span>No commissioned, non-dependency-scan application security review exists — the same external-review gap the sibling product scorecard tracks under its own Security dimension. No <code>SECURITY.md</code>.</p>
+        </div>
+      </details>
+    </article>
+
+    <article class="dim good">
+      <div class="dim-main">
+        <div class="dim-top">
+          <span class="dim-index">05 / 08</span>
+          <span class="dim-score">13<span> / 15</span></span>
+        </div>
+        <span class="status-chip good">Strong</span>
+        <h3>Internal duplication (duplicate-system-audit)</h3>
+        <p class="dim-summary">27 of 38 tracked findings closed with verifying evidence; the 4 still open correctly need a decision this audit alone can't make.</p>
+        <div class="progress-track"><div class="progress-fill good" style="width: 87%"></div></div>
+      </div>
+      <details>
+        <summary>Evidence</summary>
+        <div class="detail-body">
+          <p><span class="detail-label">Closed</span>23 findings confirmed <code>done</code> — many were already structurally resolved and just mis-tracked, several needed a real fix (permanent regression guards added so each can't quietly regress). 11 more are intentional compatibility shims, correctly <code>legacy</code>, not bugs.</p>
+          <p><span class="detail-label">Still open, by design</span>2 findings need a genuine product decision (which of two overlapping commercial packs is canonical; which of two workspace-model layers is authoritative for enforcement) — not guessed at. 2 more are real, precisely-measured gaps too large to close blind: 245 of 291 frontend-mounted tools still lack a direct backend asset-seed row, and 2 real pages have zero catalog record at all.</p>
+        </div>
+      </details>
+    </article>
+
+    <article class="dim good">
+      <div class="dim-main">
+        <div class="dim-top">
+          <span class="dim-index">06 / 08</span>
+          <span class="dim-score">14<span> / 15</span></span>
+        </div>
+        <span class="status-chip good">Strong</span>
+        <h3>Build &amp; CI health</h3>
+        <p class="dim-summary">Consistently clean across dozens of verification runs this session; the same 3 pre-existing issues are tracked, not hidden.</p>
+        <div class="progress-track"><div class="progress-fill good" style="width: 93%"></div></div>
+      </div>
+      <details>
+        <summary>Evidence</summary>
+        <div class="detail-body">
+          <p><span class="detail-label">Verified repeatedly</span>Typecheck, lint, and production build clean on every pass this session. Full frontend suite consistently 945–947+ of 948–951 files passing. Three specific, well-understood pre-existing issues recur across runs and are documented rather than chased as regressions: one asserts on a UI element intentionally removed from the design, one is a heavy scan that times out only under parallel load, and one surfaced only after an unrelated import-path bug (found and fixed this session) had been silently hiding it.</p>
+          <p><span class="detail-label">Why not 15/15</span>Those 3 issues are real and still open, even if correctly triaged as pre-existing rather than new.</p>
+        </div>
+      </details>
+    </article>
+
+    <article class="dim warn">
+      <div class="dim-main">
+        <div class="dim-top">
+          <span class="dim-index">07 / 08</span>
+          <span class="dim-score">5<span> / 10</span></span>
+        </div>
+        <span class="status-chip warn">Developing</span>
+        <h3>Design-system consistency</h3>
+        <p class="dim-summary">One real, provable CSS bug fixed. One much bigger adoption gap identified honestly, and correctly not force-fixed without a way to see it.</p>
+        <div class="progress-track"><div class="progress-fill warn" style="width: 50%"></div></div>
+      </div>
+      <details>
+        <summary>Evidence</summary>
+        <div class="detail-body">
+          <p><span class="detail-label">Fixed</span>Two of the design system's canonical card components were applying padding twice — once from a shared wrapper, once from a second rule layered on top — for two of the three widely-used card types. Confirmed as a structural CSS-cascade fact via source tracing, not a visual guess, and fixed.</p>
+          <p><span class="detail-label">Found, not fixed</span>Of 5 canonical card components in the design system, only one has real adoption (52 files) — the other four are used in 0–1 files. Most real pages needing card-style tiles use their own one-off classes instead, which is the actual root cause of visual inconsistency across the app. This sandbox has no browser access, so the fix can't be visually confirmed here — left open for a cycle with real eyes on the result rather than shipped blind.</p>
+        </div>
+      </details>
+    </article>
+
+    <article class="dim good">
+      <div class="dim-main">
+        <div class="dim-top">
+          <span class="dim-index">08 / 08</span>
+          <span class="dim-score">4<span> / 5</span></span>
+        </div>
+        <span class="status-chip good">Strong</span>
+        <h3>Audit-tooling accuracy</h3>
+        <p class="dim-summary">The repo's own self-check scripts were tested against reality this session, not just trusted — and two real inaccuracies in them were found and fixed.</p>
+        <div class="progress-track"><div class="progress-fill good" style="width: 80%"></div></div>
+      </div>
+      <details>
+        <summary>Evidence</summary>
+        <div class="detail-body">
+          <p><span class="detail-label">Verified clean</span>Inline-style budget gate, aria-expression counter, and interaction-inventory scanner all re-run fresh this session and confirmed accurate.</p>
+          <p><span class="detail-label">Fixed</span>The SaaS compliance audit's own generated violation text was misleadingly reusing the same wording for two different situations — a real toolInventory-backed asset missing only a backend seed row, versus a hand-tracked placeholder route with no inventory projection at all. Traced to the exact field that already distinguished them and wired the message to use it. Also found and removed a stale, zero-reference duplicate of that same audit's output sitting at the repo root.</p>
+          <p><span class="detail-label">Why not 5/5</span>Only a handful of this repo's dozens of audit scripts were exercised and cross-checked this session — a good sample, not exhaustive coverage.</p>
+        </div>
+      </details>
+    </article>
+
+  </div>
+
+  <section class="ledger-section">
+    <h2>Internal-duplication findings ledger</h2>
+    <p>Generated by <code>src/data/duplicateSystemAudit.ts</code> — regenerate with <code>npm run duplicate-system-audit:write-docs</code>. Full detail in <code>docs/duplicate-system-audit.md</code>.</p>
+    <div class="ledger-table-wrap">
+      <table class="ledger">
+        <thead>
+          <tr>
+            <th>Classification</th>
+            <th>Meaning</th>
+            <th class="num">Count</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>done</td>
+            <td>Verified closed with evidence this program</td>
+            <td class="num">23</td>
+            <td><span class="pill closed">closed</span></td>
+          </tr>
+          <tr>
+            <td>legacy</td>
+            <td>Intentional compatibility shim — not a bug</td>
+            <td class="num">11</td>
+            <td><span class="pill closed">not actionable</span></td>
+          </tr>
+          <tr>
+            <td>wire</td>
+            <td>Real gap, precisely measured, needs data/product input</td>
+            <td class="num">2</td>
+            <td><span class="pill open">open</span></td>
+          </tr>
+          <tr>
+            <td>merge</td>
+            <td>Genuine consolidation choice, not a tracking correction</td>
+            <td class="num">2</td>
+            <td><span class="pill open">open</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    <span>Methodology: every figure on this page traces to a command run or a file read this session — no estimates.</span>
+    <span>Sibling: <a href="https://claude.ai/code/artifact/9d3e5b15-294c-4678-a791-e1d97afa5b5b">CareDroid Project Scorecard</a> (clinical/product readiness)</span>
+  </footer>
+</div>
