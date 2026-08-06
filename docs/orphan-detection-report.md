@@ -1,6 +1,6 @@
 # Orphan Detection Report
 
-Generated: 2026-07-23 (regenerate with `npm run orphan-detection:write-docs`)
+Generated: 2026-08-06 (regenerate with `npm run orphan-detection:write-docs`)
 
 ## Classification key
 
@@ -15,20 +15,20 @@ Generated: 2026-07-23 (regenerate with `npm run orphan-detection:write-docs`)
 
 | Metric | Count |
 |--------|------:|
-| Total orphan findings | 570 |
+| Total orphan findings | 551 |
 | App.jsx routes | 152 |
 | Orphan / gap routes | 221 |
 | Orphan pages | 150 |
 | Orphan components | 7 |
 | Domain module findings (dashboard / simulation / lab / 3D) | 20 |
-| Orphan services | 11 |
+| Orphan services | 10 |
 | Executor contract gaps | 0 |
-| API orphans / stubs | 141 |
-| Weakly linked markdown | 20 |
+| API orphans / stubs | 127 |
+| Weakly linked markdown | 16 |
 | **wire** | 263 |
 | **merge** | 0 |
-| **quarantine** | 34 |
-| **legacy** | 273 |
+| **quarantine** | 35 |
+| **legacy** | 253 |
 
 ## Merge candidates (explicit)
 
@@ -315,7 +315,7 @@ Generated: 2026-07-23 (regenerate with `npm run orphan-detection:write-docs`)
 | src/pages/emergency/shift/index.tsx | legacy | import:index |
 | src/pages/emergency/shift/shiftSummaryData.ts | legacy | import:shiftSummaryData |
 | src/pages/emergency/SmartIntake.tsx | legacy | import:src/pages/emergency/SmartIntake |
-| src/pages/executive/CommandDashboard.tsx | legacy | import:CommandDashboard |
+| src/pages/executive/CommandDashboard.tsx | legacy | import:src/pages/executive/CommandDashboard.tsx |
 | src/pages/executive/ExecutiveCommandCenter.tsx | legacy | import:src/pages/executive/ExecutiveCommandCenter.tsx |
 | src/pages/fleet/FleetDashboard.tsx | wire | import:src/pages/fleet/FleetDashboard.tsx |
 | src/pages/fleet/FleetLiveMap.tsx | legacy | import:src/pages/fleet/FleetLiveMap |
@@ -466,7 +466,6 @@ _None detected._
 | src/services/integrationPreArrivalConsumer.ts | quarantine | No production import of service module |
 | src/services/livingDocumentationGenerator.ts | quarantine | No production import of service module |
 | src/services/nativeAiTriageRuleLlm.ts | quarantine | No production import of service module |
-| src/services/reassessmentApi.ts | quarantine | No production import of service module |
 | src/services/receptionPatientAnswersModel.ts | quarantine | No production import of service module |
 | src/services/roomStatusSync.ts | quarantine | No production import of service module |
 | src/services/successCenterApi.ts | quarantine | No production import of service module |
@@ -498,33 +497,21 @@ _None detected._
 | emergency-referral-history | legacy | Gated stub — intentional no-op until backend exists |
 | emergency-transfer-status | legacy | Gated stub — intentional no-op until backend exists |
 | emergency-diversion-status | legacy | Gated stub — intentional no-op until backend exists |
-| emergency-smart-intake-session-create | legacy | Gated stub — intentional no-op until backend exists |
-| emergency-smart-intake-manual-entry | legacy | Gated stub — intentional no-op until backend exists |
-| emergency-smart-intake-document | legacy | Gated stub — intentional no-op until backend exists |
-| emergency-smart-intake-ocr | legacy | Gated stub — intentional no-op until backend exists |
-| emergency-smart-intake-match | legacy | Gated stub — intentional no-op until backend exists |
-| emergency-smart-intake-verify-field | legacy | Gated stub — intentional no-op until backend exists |
-| emergency-smart-intake-link-patient | legacy | Gated stub — intentional no-op until backend exists |
-| emergency-smart-intake-create-patient | legacy | Gated stub — intentional no-op until backend exists |
-| emergency-smart-intake-continue-unknown | legacy | Gated stub — intentional no-op until backend exists |
-| emergency-smart-intake-ems-evidence | legacy | Gated stub — intentional no-op until backend exists |
-| emergency-smart-intake-reconcile-unknown | legacy | Gated stub — intentional no-op until backend exists |
-| emergency-smart-intake-biometric-consent | legacy | Gated stub — intentional no-op until backend exists |
-| emergency-smart-intake-biometric-consent-withdraw | legacy | Gated stub — intentional no-op until backend exists |
-| emergency-smart-intake-audit-log | legacy | Gated stub — intentional no-op until backend exists |
 | exports-pdf | legacy | Gated stub — intentional no-op until backend exists |
 | exports-excel | legacy | Gated stub — intentional no-op until backend exists |
 | reports-generate | legacy | Gated stub — intentional no-op until backend exists |
 | reports-schedule-create | legacy | Gated stub — intentional no-op until backend exists |
 | reports-schedule-cancel | legacy | Gated stub — intentional no-op until backend exists |
 | GET /api/emergency/patients/:patientId/workflow-logs | legacy | Backend-only route (no SPA client) |
-| POST /api/emergency/ems/handoff | legacy | Backend-only route (no SPA client) |
 | POST /api/emergency/copilot/interactions | legacy | Backend-only route (no SPA client) |
 | POST /api/emergency/clinical-calculators/results | legacy | Backend-only route (no SPA client) |
 | POST /api/emergency/digital-twin/organizational/simulate | legacy | Backend-only route (no SPA client) |
 | POST /api/emergency/digital-twin/organizational/synchronize | legacy | Backend-only route (no SPA client) |
 | POST /api/ems/ai-call-interrogation | legacy | Backend-only route (no SPA client) |
 | POST /api/ems/ai-call-interrogation/ecg | legacy | Backend-only route (no SPA client) |
+| GET /api/ems/federated | legacy | Backend-only route (no SPA client) |
+| GET /api/ems/federated/health | legacy | Backend-only route (no SPA client) |
+| POST /api/ems/federated/round | legacy | Backend-only route (no SPA client) |
 | POST /api/ems/federated/112-call | legacy | Backend-only route (no SPA client) |
 | POST /api/federated/lmecs/predict | legacy | Backend-only route (no SPA client) |
 | POST /api/federated/lmecs/select | legacy | Backend-only route (no SPA client) |
@@ -595,39 +582,47 @@ _None detected._
 | POST /api/tools/execute | legacy | Backend-only route (no SPA client) |
 | POST /api/tool-calling/execute | legacy | Backend-only route (no SPA client) |
 | GET /api/tool-calling/catalog | legacy | Backend-only route (no SPA client) |
-| GET /api/tool-calling/resolve | legacy | Backend-only route (no SPA client) |
-| GET /api/tool-calling/logs | legacy | Backend-only route (no SPA client) |
 | POST /api/platform/users/me/pinned-assets | legacy | Platform/product API is deferred and not frontend-inventory wired |
 | POST /api/platform/users/me/hidden-assets | legacy | Platform/product API is deferred and not frontend-inventory wired |
 | GET /api/platform/assets/:assetId | legacy | Platform/product API is deferred and not frontend-inventory wired |
 | GET /api/platform/packs/:packId | legacy | Platform/product API is deferred and not frontend-inventory wired |
+| GET /api/platform/role-profiles/:id | legacy | Platform/product API is deferred and not frontend-inventory wired |
+| GET /api/platform/organizations/:organizationId/entitlements | legacy | Platform/product API is deferred and not frontend-inventory wired |
+| POST /api/platform/organizations/:organizationId/packs/:packId/install | legacy | Platform/product API is deferred and not frontend-inventory wired |
+| POST /api/platform/organizations/:organizationId/packs/:packId/remove | legacy | Platform/product API is deferred and not frontend-inventory wired |
+| GET /api/platform-governance/consent/:patientId | legacy | Platform/product API is deferred and not frontend-inventory wired |
+| POST /api/platform-governance/consent/:patientId/:scope | legacy | Platform/product API is deferred and not frontend-inventory wired |
+| POST /api/platform-governance/gate/evaluate | legacy | Platform/product API is deferred and not frontend-inventory wired |
+| GET /api/platform-governance/observability | legacy | Platform/product API is deferred and not frontend-inventory wired |
+| POST /api/platform-governance/privacy/:patientId/:requestType | legacy | Platform/product API is deferred and not frontend-inventory wired |
+| GET /api/platform-governance/review/items | legacy | Platform/product API is deferred and not frontend-inventory wired |
+| POST /api/platform-governance/review/items | legacy | Platform/product API is deferred and not frontend-inventory wired |
+| POST /api/platform-governance/review/items/:itemId/decision | legacy | Platform/product API is deferred and not frontend-inventory wired |
+| GET /api/platform-governance/security/events | legacy | Platform/product API is deferred and not frontend-inventory wired |
+| GET /api/platform-governance/source-provenance/:sourceId | legacy | Platform/product API is deferred and not frontend-inventory wired |
 
-_… and 21 more API rows._
+_… and 7 more API rows._
 
 ## Orphan markdown (weak inbound links)
 
 | Doc | Class | Evidence |
 | --- | --- | --- |
-| docs/architecture/clickable-map-report.md | legacy | No inbound links from README, src, or other docs |
-| docs/architecture/component-mounting-report.md | legacy | No inbound links from README, src, or other docs |
-| docs/architecture/emergency-resource-board.md | quarantine | No inbound links from README, src, or other docs |
-| docs/architecture/layout-routing-consolidation-report.md | legacy | No inbound links from README, src, or other docs |
-| docs/architecture/system-evaluation.md | quarantine | No inbound links from README, src, or other docs |
-| docs/architecture/ui-surface-compression.md | quarantine | No inbound links from README, src, or other docs |
-| docs/manuals/roles/demo-observer.md | quarantine | No inbound links from README, src, or other docs |
-| docs/manuals/roles/lab-technician.md | quarantine | No inbound links from README, src, or other docs |
-| docs/manuals/roles/paramedic.md | quarantine | No inbound links from README, src, or other docs |
-| docs/manuals/roles/pharmacist.md | quarantine | No inbound links from README, src, or other docs |
-| docs/manuals/roles/radiology-technician.md | quarantine | No inbound links from README, src, or other docs |
-| docs/manuals/roles/registered-nurse.md | quarantine | No inbound links from README, src, or other docs |
-| docs/product-packaging-audit.md | legacy | No inbound links from README, src, or other docs |
-| docs/specs/current-codebase-findings.md | quarantine | No inbound links from README, src, or other docs |
-| docs/specs/product-discovery-report.md | legacy | No inbound links from README, src, or other docs |
-| docs/specs/product-packaging-audit.md | legacy | No inbound links from README, src, or other docs |
-| docs/specs/saas-service-journey-map.md | quarantine | No inbound links from README, src, or other docs |
-| docs/specs/service-bottleneck-spec.md | quarantine | No inbound links from README, src, or other docs |
-| docs/specs/three-minute-response-spec.md | quarantine | No inbound links from README, src, or other docs |
-| docs/specs/visual-responsive-standards.md | quarantine | No inbound links from README, src, or other docs |
+| docs/architecture/architect-mode/baseline/baseline-report.md | quarantine | No inbound links from README, src, or other docs |
+| docs/architecture/CAREDROID_ARCHITECTURE_CLEANUP_REPORT.md | quarantine | No inbound links from README, src, or other docs |
+| docs/architecture/CLINICAL_PROCESS_SAAS_HARMONIZATION_REPORT.md | quarantine | No inbound links from README, src, or other docs |
+| docs/architecture/PLATFORM_MODERNIZATION_REPORT.md | quarantine | No inbound links from README, src, or other docs |
+| docs/architecture/RECEPTION_WORKSPACE_REFERENCE.md | quarantine | No inbound links from README, src, or other docs |
+| docs/archive/SCORECARD-archive-2026-07-23-cycles-1-157.md | quarantine | No inbound links from README, src, or other docs |
+| docs/INTENDED_USE_BOUNDARY_v1.md | quarantine | No inbound links from README, src, or other docs |
+| docs/INTERACTION_EXECUTION_REPORT.md | quarantine | No inbound links from README, src, or other docs |
+| docs/operations/surge-mongo-local-setup.md | quarantine | No inbound links from README, src, or other docs |
+| docs/reception-upgrade/02-dependency-map.md | quarantine | No inbound links from README, src, or other docs |
+| docs/reception-upgrade/02-scorecard-baseline.md | quarantine | No inbound links from README, src, or other docs |
+| docs/reception-upgrade/03-orphaned-code.md | quarantine | No inbound links from README, src, or other docs |
+| docs/reception-upgrade/04-rbac-permission-matrix.md | quarantine | No inbound links from README, src, or other docs |
+| docs/reception-upgrade/05-information-architecture.md | quarantine | No inbound links from README, src, or other docs |
+| docs/reception-upgrade/NEW_HEADER_INTEGRATION_GUIDE.md | quarantine | No inbound links from README, src, or other docs |
+| docs/tool-render-execute-manual-qa.md | quarantine | No inbound links from README, src, or other docs |
 
 ## Appendix
 
