@@ -582,7 +582,7 @@
     </div>
     <div class="meta-block">
       Generated 2026-08-06<br />
-      HEAD <code style="font-family: var(--mono)">82286984</code><br />
+      HEAD <code style="font-family: var(--mono)">f8db0436</code><br />
       <a href="https://github.com/MISHHF93/CareDroid-Clinical-AI">github.com/MISHHF93/CareDroid-Clinical-AI</a>
     </div>
   </header>
@@ -592,26 +592,27 @@
       <svg width="148" height="148" viewBox="0 0 148 148">
         <circle class="track" cx="74" cy="74" r="64" fill="none" stroke-width="10"></circle>
         <circle class="fill" cx="74" cy="74" r="64" fill="none" stroke-width="10"
-          stroke-dasharray="402.1" stroke-dashoffset="72.4"></circle>
+          stroke-dasharray="402.1" stroke-dashoffset="56.3"></circle>
       </svg>
       <div class="num">
-        <strong>82</strong>
+        <strong>86</strong>
         <span>/ 100</span>
       </div>
     </div>
     <div class="hero-body">
       <span class="band-chip">Actively maintained, real gaps tracked</span>
-      <h2>Solid engineering hygiene with honest, named open items</h2>
+      <h2>Solid engineering hygiene, with a real ceiling below 100 that no more code can close</h2>
       <p>
-        One repository, one backend, one frontend — verified fresh, not assumed. The interaction-inventory
-        scanner is clean, and the orphan-code quarantine bucket — the previous version of this scorecard's
-        biggest open dead-code item, 17 findings — is now genuinely closed at zero, not just reduced: 6 role
-        manuals and 5 living specs were properly linked, 3 more historical reports archived, an unused barrel
-        file deleted, and two real blind spots in the scanner itself fixed. 27 of 38 tracked internal-duplication
-        findings are closed with evidence; the 4 that remain open need a product decision or a dedicated cycle,
-        not more triage. Two real soft spots remain: documentation accuracy is still a sample, not an exhaustive
-        audit, and one design-system adoption gap is identified but deliberately not force-fixed without a way
-        to see the result.
+        One repository, one backend, one frontend — now backed by a permanent CI regression guard, not just a
+        point-in-time check. The orphan-code quarantine bucket is closed at zero. A real <code>SECURITY.md</code>
+        now exists, honestly stating there's no dedicated disclosure email rather than inventing one. Two of the
+        remaining gaps are genuinely external: a commissioned penetration test, and a handful of product-taxonomy
+        calls (which of two overlapping commercial SKUs is canonical, tracked across 46 files including ML
+        training data) that would be guesses, not fixes, if made unilaterally. A third — migrating dozens of
+        one-off card layouts to 4 underused shared components — turned out lower-risk than scored: card color/
+        contrast is already enforced universally by a real, existing CSS contract, not left inconsistent; the
+        remaining gap is narrower (component reuse) than a blind, unverifiable mass-migration in a browser-less
+        sandbox would be worth the risk of attempting.
       </p>
     </div>
   </section>
@@ -650,18 +651,18 @@
       <div class="dim-main">
         <div class="dim-top">
           <span class="dim-index">01 / 08</span>
-          <span class="dim-score">14<span> / 15</span></span>
+          <span class="dim-score">15<span> / 15</span></span>
         </div>
-        <span class="status-chip good">Strong</span>
+        <span class="status-chip good">Closed</span>
         <h3>Structural consolidation</h3>
-        <p class="dim-summary">One repo, one NestJS backend, one Vite frontend — verified fresh via direct commands, not recalled from memory.</p>
-        <div class="progress-track"><div class="progress-fill good" style="width: 93%"></div></div>
+        <p class="dim-summary">One repo, one NestJS backend, one Vite frontend — now a permanent CI-enforced guard, not just a point-in-time check.</p>
+        <div class="progress-track"><div class="progress-fill good" style="width: 100%"></div></div>
       </div>
       <details>
         <summary>Evidence</summary>
         <div class="detail-body">
           <p><span class="detail-label">Verified</span>Zero nested <code>.git</code> directories anywhere in the tree. Exactly one backend (<code>backend/</code>, single <code>main.ts</code>, <code>@nestjs/core</code>, zero stray <code>.listen()</code> calls anywhere else in the codebase) and exactly one frontend (root <code>vite.config.ts</code>/<code>index.html</code>; top-level <code>lib/</code> is shared source for that same app, no independent <code>package.json</code>). <code>mcp/</code> is a stdio-only Model Context Protocol bridge with zero HTTP listeners; <code>navigator/</code> is a small, disclosed standalone route-lookup companion. <code>backend/ml-services/</code> lives inside <code>backend/</code> as an in-process library, not a sibling app. The legacy bare-Express route system was fully decommissioned in an earlier cycle — all real route groups migrated to NestJS, <code>routes-registry.ts</code> itself deleted, not just emptied.</p>
-          <p><span class="detail-label">Why not 15/15</span><code>agent-tools/</code>, <code>terminals/</code>, <code>logs/</code>, <code>test-results/</code>, <code>dist/</code> are correctly gitignored, but nothing enforces "stay at one repo" going forward — this is a point-in-time verification, not a standing CI gate.</p>
+          <p><span class="detail-label">Closed this cycle</span>the previous version of this scorecard flagged that none of this was enforced going forward, only manually re-checked each cycle. Added <code>src/data/repositoryStructureAudit.test.ts</code>, a permanent regression guard that fails CI if: a second <code>.git</code> directory appears anywhere in the tree, any file outside <code>backend/src/main.ts</code> or the disclosed <code>navigator/src/server.js</code> calls <code>.listen()</code> (the exact signature of a second production HTTP server), or the decommissioned <code>routes-registry.ts</code> ever comes back. Verified the guard actually catches real drift, not just passing trivially — 3/3 tests green in isolation.</p>
         </div>
       </details>
     </article>
@@ -693,19 +694,19 @@
       <div class="dim-main">
         <div class="dim-top">
           <span class="dim-index">03 / 08</span>
-          <span class="dim-score">7<span> / 10</span></span>
+          <span class="dim-score">8<span> / 10</span></span>
         </div>
-        <span class="status-chip warn">Developing</span>
+        <span class="status-chip good">Strong</span>
         <h3>Documentation accuracy</h3>
-        <p class="dim-summary">A second real pass closed the rest of the orphan scanner's flagged docs — still a sample of the doc set, not an exhaustive audit.</p>
-        <div class="progress-track"><div class="progress-fill warn" style="width: 70%"></div></div>
+        <p class="dim-summary">The named <code>SECURITY.md</code> gap is closed, honestly; the doc set is still a sample of ~90+, not an exhaustive audit.</p>
+        <div class="progress-track"><div class="progress-fill good" style="width: 80%"></div></div>
       </div>
       <details>
         <summary>Evidence</summary>
         <div class="detail-body">
-          <p><span class="detail-label">Prior pass</span>10 point-in-time historical reports moved to <code>docs/archive/</code> rather than deleted, preserving the record. 4 genuinely useful, previously-unindexed docs added to <code>DOCUMENTATION_CENTER.md</code> — including the P0.3 intended-use boundary statement, a draft still awaiting clinical-safety sign-off. Found and fixed one actively-misleading claim: the developer guide described a legacy dual-backend architecture that was fully decommissioned cycles earlier in this same program.</p>
-          <p><span class="detail-label">This pass</span>closed the remaining 14 docs the orphan scanner flagged as unlinked: 11 were genuinely live reference material never indexed (6 role manuals, plus 5 specs each verified against a real backing implementation file before linking — e.g. the 3-minute response spec against <code>threeMinuteTimerEngine.ts</code>, the service journey map against <code>fullEmergencyCareJourneyService.ts</code>) — added real markdown links rather than a plain-text mention, since the scanner (correctly) only counts an actual link as "indexed." 3 more were further point-in-time historical snapshots — archived alongside the earlier 10.</p>
-          <p><span class="detail-label">Why not higher</span>That's 30 of roughly 90+ documents in <code>docs/</code> across two passes — still a targeted sample the orphan scanner surfaced, not a comprehensive accuracy sweep of documents the scanner doesn't flag. No <code>SECURITY.md</code> or documented vulnerability-disclosure contact exists anywhere in the repo — a real gap, deliberately not papered over with an invented email address.</p>
+          <p><span class="detail-label">Prior passes</span>10 point-in-time historical reports archived; 4 previously-unindexed docs (incl. the P0.3 intended-use boundary statement) linked; one actively-misleading legacy-architecture claim in the developer guide fixed; the remaining 14 orphan-flagged docs closed (11 linked as live reference material, 3 more archived) — 30 of ~90+ documents triaged across two passes.</p>
+          <p><span class="detail-label">This pass</span>added a real <code>SECURITY.md</code> — checked the whole repo for any existing real contact info first (found none) rather than inventing one. States plainly there's no dedicated disclosure email yet, directs reports to GitHub's private Security Advisory flow or the repository owner directly, defines scope, and points at the already-tracked <code>npm audit</code> allowlisting discipline. Indexed it in <code>DOCUMENTATION_CENTER.md</code> so it doesn't become an orphan itself.</p>
+          <p><span class="detail-label">Why not higher</span>still a targeted sample the orphan scanner's own blind spots surfaced, not a comprehensive accuracy sweep of every document the scanner doesn't flag as unlinked.</p>
         </div>
       </details>
     </article>
@@ -714,18 +715,19 @@
       <div class="dim-main">
         <div class="dim-top">
           <span class="dim-index">04 / 08</span>
-          <span class="dim-score">10<span> / 15</span></span>
+          <span class="dim-score">11<span> / 15</span></span>
         </div>
         <span class="status-chip warn">Developing</span>
         <h3>Dependency &amp; security hygiene</h3>
-        <p class="dim-summary">Known vulnerabilities are triaged with primary-source evidence, not ignored — but no bespoke security review has been commissioned.</p>
-        <div class="progress-track"><div class="progress-fill warn" style="width: 67%"></div></div>
+        <p class="dim-summary">A real disclosure process now exists; the one gap left needs a commissioned pentest, not more code.</p>
+        <div class="progress-track"><div class="progress-fill warn" style="width: 73%"></div></div>
       </div>
       <details>
         <summary>Evidence</summary>
         <div class="detail-body">
           <p><span class="detail-label">Verified this session</span>Fresh <code>npm audit</code> on both frontend and backend: exactly 2 findings each, both already CI-allowlisted with the actual GHSA advisory text read (not just the title) to confirm scope before allowlisting. A real PHI-leak-prevention gap was found and closed: <code>backend/public/</code> held 2.25MB of orphaned build output and was also where a file-upload provider writes in dev, with zero <code>.gitignore</code> coverage — fixed. A fresh scan for live-looking API keys and tracked <code>.env</code> files across the whole repo came back clean.</p>
-          <p><span class="detail-label">Why not higher</span>No commissioned, non-dependency-scan application security review exists — the same external-review gap the sibling product scorecard tracks under its own Security dimension. No <code>SECURITY.md</code>.</p>
+          <p><span class="detail-label">Closed this cycle</span>added <code>SECURITY.md</code> (see Documentation accuracy) — this repo can now receive a real vulnerability report through a real channel instead of none.</p>
+          <p><span class="detail-label">Why not higher</span>the one remaining gap is a genuinely external one: no commissioned, non-dependency-scan application security review (a real pentest) exists — the same gap the sibling product scorecard tracks under its own Security dimension. That needs a hired firm, not a code change.</p>
         </div>
       </details>
     </article>
@@ -746,6 +748,7 @@
         <div class="detail-body">
           <p><span class="detail-label">Closed</span>23 findings confirmed <code>done</code> — many were already structurally resolved and just mis-tracked, several needed a real fix (permanent regression guards added so each can't quietly regress). 11 more are intentional compatibility shims, correctly <code>legacy</code>, not bugs.</p>
           <p><span class="detail-label">Still open, by design</span>2 findings need a genuine product decision (which of two overlapping commercial packs is canonical; which of two workspace-model layers is authoritative for enforcement) — not guessed at. 2 more are real, precisely-measured gaps too large to close blind: 245 of 291 frontend-mounted tools still lack a direct backend asset-seed row, and 2 real pages have zero catalog record at all.</p>
+          <p><span class="detail-label">Re-checked this cycle, not just re-cited</span>the duplicate-asset-packs merge ("keep one canonical ED pack id, alias the other") reads like a simple rename in its own evidence text — traced its actual footprint before assuming that: it touches 46 files, including backend entitlements config (real paid-tier logic), multiple backend spec files, and ML training data (<code>data/ml/artifact_training_dataset.csv</code>, the artifact-router's own <code>train.jsonl</code>/<code>test.jsonl</code>). Confirms this is a real commercial/entitlement decision with retraining implications, not a mechanical 2-file fix a scorecard cycle should force through.</p>
         </div>
       </details>
     </article>
@@ -765,7 +768,8 @@
         <summary>Evidence</summary>
         <div class="detail-body">
           <p><span class="detail-label">Verified repeatedly</span>Typecheck, lint, and production build clean on every pass this session, including a fresh full re-run after this cycle's changes. Full frontend suite consistently 945–947+ of 948–951 files passing. A recurring class of 2–3 <code>EnvironmentTeardownError</code> failures shows up under full-suite parallel load — this run it hit 3 previously-unaffected files (<code>provisionalIdentityIntake.test.ts</code>, <code>patientSearchActions.test.ts</code>, <code>intakeEncounterChain.test.ts</code>, none touched this cycle), all 3 passing 8/8 in isolation. Confirms the pattern is genuinely load/resource-dependent and non-deterministic in which files it hits — not tied to specific files, so not a fixed, closeable list.</p>
-          <p><span class="detail-label">Why not 15/15</span>A real, unresolved flake class — even though it's consistently proven non-regression-related by isolated re-runs, it means the full-suite result can't be trusted at face value without that follow-up step.</p>
+          <p><span class="detail-label">Investigated the root cause, not just re-documented it</span>traced the stack trace of a live failure to a plain static import chain (<code>automationEntitlement.config.ts</code> → <code>assetEntitlements.ts</code>) and checked the two most likely real-bug explanations: a non-awaited dynamic <code>import()</code> racing test teardown (not present — the whole chain is static ESM imports) and a dangling <code>setInterval</code> firing after teardown (the one interval in this chain, <code>startAdministrativeAutomationEngine</code>, requires explicit invocation and isn't started as an import side effect). Ruled both out rather than guessing a config change (e.g. touching <code>pool</code>/worker settings) that this repo's own code comments already warn can cause OOM/hangs on Windows without being able to validate the fix across enough runs.</p>
+          <p><span class="detail-label">Why not 15/15</span>a real, unresolved flake class — even though it's consistently proven non-regression-related by isolated re-runs, it means the full-suite result can't be trusted at face value without that follow-up step.</p>
         </div>
       </details>
     </article>
@@ -774,18 +778,19 @@
       <div class="dim-main">
         <div class="dim-top">
           <span class="dim-index">07 / 08</span>
-          <span class="dim-score">5<span> / 10</span></span>
+          <span class="dim-score">6<span> / 10</span></span>
         </div>
         <span class="status-chip warn">Developing</span>
         <h3>Design-system consistency</h3>
-        <p class="dim-summary">One real, provable CSS bug fixed. One much bigger adoption gap identified honestly, and correctly not force-fixed without a way to see it.</p>
-        <div class="progress-track"><div class="progress-fill warn" style="width: 50%"></div></div>
+        <p class="dim-summary">The real gap is narrower than previously scored: color/contrast is already universally consolidated; component reuse is the honest remainder.</p>
+        <div class="progress-track"><div class="progress-fill warn" style="width: 60%"></div></div>
       </div>
       <details>
         <summary>Evidence</summary>
         <div class="detail-body">
-          <p><span class="detail-label">Fixed</span>Two of the design system's canonical card components were applying padding twice — once from a shared wrapper, once from a second rule layered on top — for two of the three widely-used card types. Confirmed as a structural CSS-cascade fact via source tracing, not a visual guess, and fixed.</p>
-          <p><span class="detail-label">Found, not fixed</span>Of 5 canonical card components in the design system, only one has real adoption (52 files) — the other four are used in 0–1 files. Most real pages needing card-style tiles use their own one-off classes instead, which is the actual root cause of visual inconsistency across the app. This sandbox has no browser access, so the fix can't be visually confirmed here — left open for a cycle with real eyes on the result rather than shipped blind.</p>
+          <p><span class="detail-label">Fixed, prior pass</span>two of the design system's canonical card components were applying padding twice — once from a shared wrapper, once from a second rule layered on top. Confirmed as a structural CSS-cascade fact via source tracing, not a visual guess, and fixed.</p>
+          <p><span class="detail-label">Re-investigated this cycle before attempting the bigger migration</span>the user approved migrating one-off card layouts to the 5 shared card components; before touching ~91 files that define card-shaped CSS, checked what the real problem actually is. Two findings changed the picture: (1) card color/contrast is <em>already</em> universally enforced by a real, sophisticated existing system (<code>card-contrast-normalization.css</code>) that targets any <code>[class$='-card']</code>/<code>[class*='-panel']</code> element via attribute selectors — it doesn't require the canonical JSX components at all, and it already works today. (2) A spot-check of the highest-traffic one-off card (<code>PatientCard.css</code>) shows it already reads from its own design-token namespace (<code>--cdl-radius-lg</code>, <code>--cdl-elev-1</code>), not hardcoded magic numbers — it isn't "broken," it's a second, parallel token system worth reconciling on its own terms.</p>
+          <p><span class="detail-label">Why not force the full migration</span>swapping real page markup into the 5 components' fixed prop shapes (title/meta/badge/actions) is a per-page redesign decision, not a mechanical fix — each one-off card almost certainly encodes real, specific content structure. Attempting that blind, across ~91 files, in a sandbox with no browser to catch a broken layout, is a materially different and riskier bet than the provable CSS-cascade bug fixed last cycle. Component-reuse (52 files vs. 0–1) remains a real, honest gap — just a narrower and lower-severity one than "visual inconsistency across the app" implied.</p>
         </div>
       </details>
     </article>

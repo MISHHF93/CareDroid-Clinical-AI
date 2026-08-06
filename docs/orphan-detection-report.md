@@ -15,7 +15,7 @@ Generated: 2026-08-06 (regenerate with `npm run orphan-detection:write-docs`)
 
 | Metric | Count |
 |--------|------:|
-| Total orphan findings | 522 |
+| Total orphan findings | 527 |
 | App.jsx routes | 152 |
 | Orphan / gap routes | 221 |
 | Orphan pages | 148 |
@@ -24,11 +24,11 @@ Generated: 2026-08-06 (regenerate with `npm run orphan-detection:write-docs`)
 | Orphan services | 0 |
 | Executor contract gaps | 0 |
 | API orphans / stubs | 127 |
-| Weakly linked markdown | 6 |
+| Weakly linked markdown | 11 |
 | **wire** | 263 |
 | **merge** | 0 |
 | **quarantine** | 0 |
-| **legacy** | 259 |
+| **legacy** | 264 |
 
 ## Merge candidates (explicit)
 
@@ -586,12 +586,17 @@ _… and 7 more API rows._
 
 | Doc | Class | Evidence |
 | --- | --- | --- |
-| docs/architecture/clickable-map-report.md | legacy | No inbound links from README, src, or other docs |
-| docs/architecture/component-mounting-report.md | legacy | No inbound links from README, src, or other docs |
-| docs/architecture/layout-routing-consolidation-report.md | legacy | No inbound links from README, src, or other docs |
-| docs/archive/current-codebase-findings.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
-| docs/archive/system-evaluation.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
-| docs/archive/ui-surface-compression.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
+| docs/archive/CAREDROID_ARCHITECTURE_CLEANUP_REPORT.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
+| docs/archive/CLINICAL_PROCESS_SAAS_HARMONIZATION_REPORT.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
+| docs/archive/INTERACTION_EXECUTION_REPORT.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
+| docs/archive/PLATFORM_MODERNIZATION_REPORT.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
+| docs/archive/reception-upgrade/02-dependency-map.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
+| docs/archive/reception-upgrade/02-scorecard-baseline.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
+| docs/archive/reception-upgrade/03-orphaned-code.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
+| docs/archive/reception-upgrade/04-rbac-permission-matrix.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
+| docs/archive/reception-upgrade/05-information-architecture.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
+| docs/archive/reception-upgrade/NEW_HEADER_INTEGRATION_GUIDE.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
+| docs/archive/SCORECARD-archive-2026-07-23-cycles-1-157.md | legacy | Intentionally archived/unlinked historical record — already reviewed, kept for git history |
 
 ## Appendix
 

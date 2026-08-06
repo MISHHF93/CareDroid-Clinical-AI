@@ -120,6 +120,7 @@ Two parallel sets of role documentation exist — see [Known Documentation Debt]
 
 ## Governance, Security & Compliance
 
+- [SECURITY.md](../SECURITY.md) — vulnerability disclosure process (GitHub Security Advisories — **no dedicated security email exists yet**), scope, and known-tracked gaps
 - [README §Security & governance](../README.md#security--governance) — tenant isolation, RBAC, audit logging, AI governance, secrets posture (**note: CareDroid does not claim HIPAA/PHIPA certification** — see that section for the exact scope)
 - [operations/saas-compliance-audit.md](operations/saas-compliance-audit.md) — SaaS architecture compliance audit
 - Backend governance modules: `platform-governance`, `ai-governance`, `llm-security`, `regulatory`, `privacy-center`, `human-review` — see [API Reference §Governance](api/api-reference.md#governance--compliance)
