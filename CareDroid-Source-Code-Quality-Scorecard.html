@@ -208,7 +208,7 @@
     </div>
     <div class="meta-block">
       Generated 2026-08-06<br />
-      HEAD <code style="font-family: var(--mono)">7f21837f</code><br />
+      HEAD <code style="font-family: var(--mono)">41d20777</code><br />
       <a href="https://github.com/MISHHF93/CareDroid-Clinical-AI">github.com/MISHHF93/CareDroid-Clinical-AI</a>
     </div>
   </header>
@@ -217,9 +217,9 @@
     <div class="score-ring">
       <svg width="148" height="148" viewBox="0 0 148 148">
         <circle class="track" cx="74" cy="74" r="64" fill="none" stroke-width="10"></circle>
-        <circle class="fill" cx="74" cy="74" r="64" fill="none" stroke-width="10" stroke-dasharray="402.1" stroke-dashoffset="52.3"></circle>
+        <circle class="fill" cx="74" cy="74" r="64" fill="none" stroke-width="10" stroke-dasharray="402.1" stroke-dashoffset="48.3"></circle>
       </svg>
-      <div class="num"><strong>87</strong><span>/ 100</span></div>
+      <div class="num"><strong>88</strong><span>/ 100</span></div>
     </div>
     <div class="hero-body">
       <span class="band-chip">Good — minor gaps remain</span>
@@ -268,12 +268,12 @@
         <tr><td>3. Architecture &amp; Repository Structure</td><td class="num">15</td><td class="num">15</td><td class="num">100%</td><td>Confirmed</td><td><span class="pill good">Excellent</span></td></tr>
         <tr><td>4. Frontend Quality</td><td class="num">10</td><td class="num">7</td><td class="num">70%</td><td>Confirmed</td><td><span class="pill warn">Partial</span></td></tr>
         <tr><td>5. Backend &amp; API Quality</td><td class="num">10</td><td class="num">9</td><td class="num">90%</td><td>Confirmed</td><td><span class="pill good">Strong</span></td></tr>
-        <tr><td>6. Type Safety &amp; Data Contracts</td><td class="num">10</td><td class="num">8</td><td class="num">80%</td><td>Confirmed</td><td><span class="pill good">Strong</span></td></tr>
+        <tr><td>6. Type Safety &amp; Data Contracts</td><td class="num">10</td><td class="num">9</td><td class="num">90%</td><td>Confirmed</td><td><span class="pill good">Strong</span></td></tr>
         <tr><td>7. Testing &amp; Verification</td><td class="num">10</td><td class="num">8</td><td class="num">80%</td><td>Confirmed</td><td><span class="pill good">Strong</span></td></tr>
         <tr><td>8. Security &amp; Defensive Coding</td><td class="num">8</td><td class="num">7</td><td class="num">88%</td><td>Confirmed</td><td><span class="pill good">Strong</span></td></tr>
         <tr><td>9. Maintainability &amp; Code Hygiene</td><td class="num">7</td><td class="num">6</td><td class="num">86%</td><td>Confirmed</td><td><span class="pill good">Strong</span></td></tr>
         <tr><td>10. Configuration, Dependencies &amp; Operations</td><td class="num">5</td><td class="num">4</td><td class="num">80%</td><td>Confirmed</td><td><span class="pill good">Strong</span></td></tr>
-        <tr><td><strong>Total</strong></td><td class="num"><strong>100</strong></td><td class="num"><strong>87</strong></td><td class="num"><strong>87%</strong></td><td>—</td><td>—</td></tr>
+        <tr><td><strong>Total</strong></td><td class="num"><strong>100</strong></td><td class="num"><strong>88</strong></td><td class="num"><strong>88%</strong></td><td>—</td><td>—</td></tr>
       </tbody>
     </table>
   </div>
@@ -450,10 +450,10 @@
 
     <article class="cat-card good">
       <div class="cat-main">
-        <div class="cat-top"><span class="cat-index">06 / 10</span><span class="cat-score">8<span> / 10</span></span></div>
+        <div class="cat-top"><span class="cat-index">06 / 10</span><span class="cat-score">9<span> / 10</span></span></div>
         <span class="status-chip good">Strong</span>
         <h3>Type Safety and Data Contracts</h3>
-        <div class="progress-track"><div class="progress-fill good" style="width: 80%"></div></div>
+        <div class="progress-track"><div class="progress-fill good" style="width: 90%"></div></div>
       </div>
       <details>
         <summary>Full review</summary>
@@ -469,12 +469,14 @@
             <li>A stale, hardcoded English count ("covers every NLU profile and three POST executors") was found baked into a test title in <code>backendFrontendToolContract.report.test.ts</code> even though the test's actual assertion logic was already dynamically correct against the live tool-id set<span class="conf confirmed">Confirmed</span>, fixed this campaign — a class of drift-prone hardcoding (numbers embedded in English strings, not in the checked logic itself) that could recur elsewhere undetected.</li>
             <li>A propagated documentation-vs-code count mismatch (backend really has 39 registered tool executors; multiple docs claimed "3" or "22") existed across 8 separate files before being independently re-derived and fixed this campaign — while these were doc-only drifts (the underlying runtime contract was always internally correct), the fact that 8 independent files could all cite a wrong number for this long indicates no CI check compares doc claims to the live constant<span class="conf strong-ev">Strong evidence</span>. 2 more instances found 2026-08-07 during a systematic regeneration sweep: <code>scripts/write-unsupported-orchestrator-docs.mjs</code>'s own generated-doc header hardcoded <code>"(3)"</code> (fixed by interpolating the real array length instead of a literal, closing the gap for good rather than just re-stating a fresher number); <code>src/data/e2eRegressionChecklist.ts</code>'s static release checklist had regressed back to <code>"(3 only)"</code> even though the already-committed generated doc had at some point been hand-patched to say "39" — the underlying source never got the same fix, so the next regeneration would have silently reverted it.</li>
           </ul>
+          <h4>Fixed this session — a first real regression guard, not just another one-off patch</h4>
+          <p>Added a test in <code>src/data/executorMappingAudit.test.ts</code> (reusing its existing live-registry parser, not a new mechanism) that asserts <code>e2eRegressionChecklist.ts</code>'s checklist text cites the current executor count, failing CI if it drifts again<span class="conf confirmed">Confirmed</span> working — deliberately reintroduced the stale "3 only" text, watched the test fail with a clear diff, then restored the correct value and confirmed it passes (7/7). This is scoped to the one instance already found twice, not the general lint rule below; it's a real, verified step toward "Required for full marks," not a full closure of it.</p>
           <h4>Evidence</h4>
-          <p><code>backend/src/modules/medical-control-plane/tool-orchestrator/tool-orchestrator.registry.ts</code> (39-entry array), <code>src/data/backendFrontendToolContract.report.test.ts</code>, <code>scripts/write-unsupported-orchestrator-docs.mjs</code> (fixed), <code>src/data/e2eRegressionChecklist.ts</code> (fixed), the 8-file doc-drift trail documented across this campaign's memory.</p>
+          <p><code>backend/src/modules/medical-control-plane/tool-orchestrator/tool-orchestrator.registry.ts</code> (39-entry array), <code>src/data/backendFrontendToolContract.report.test.ts</code>, <code>scripts/write-unsupported-orchestrator-docs.mjs</code> (fixed), <code>src/data/e2eRegressionChecklist.ts</code> (fixed), <code>src/data/executorMappingAudit.test.ts</code> (new guard, 7/7 passing), the 8-file doc-drift trail documented across this campaign's memory.</p>
           <h4>Point Deductions</h4>
-          <p>−2 for the demonstrated pattern of numeric/contract facts drifting silently in prose (tests and docs) even where the underlying enforced logic was correct — a gap in "keeping the description honest," not in the contract itself.</p>
+          <p>−1 for the still-open general case — a real, working regression guard now exists for the one recurring instance, but no repo-wide lint rule catches a brand-new hardcoded count appearing somewhere else for the first time.</p>
           <h4>Requirements for Full Marks</h4>
-          <p>Add a lint rule or CI check that flags hardcoded small integers in test-title strings adjacent to dynamically-computed assertions, or convert remaining hand-written counts in docs to values pulled from a single generated source (as several already are via the <code>*:write-docs</code> scripts).</p>
+          <p>Add a lint rule or CI check that flags hardcoded small integers in test-title strings adjacent to dynamically-computed assertions generally, or convert remaining hand-written counts in docs to values pulled from a single generated source (as several already are via the <code>*:write-docs</code> scripts) — the scoped guard added this session covers one instance, not the general case.</p>
         </div>
       </details>
     </article>
@@ -615,7 +617,7 @@
 
   <div class="section-head">
     <h2>Defect register</h2>
-    <p>Every material finding above, consolidated with severity and points recoverable. D3's naming half and D4 closed 2026-08-06 (3 points recovered, 76→78); D1 corrected (a stale "128 remaining" claim was actually 6) and its 7th entry closed the same day, recovering points across all 3 categories it touches — Code Correctness, Backend &amp; API Quality, Security (7 points recovered, 78→85). D7 fully closed 2026-08-07 across both categories it touched — both the "legacy docker-compose" and "2 dead scripts" claims were wrong; the docker-compose file is real, deliberate infrastructure (Architecture's −1 recovered) and both scripts were broken, now fixed, not dead (Config/Ops' −1 recovered) — the only remaining gap in either category is D5, tracked separately (2 points recovered, 85→87). Total recoverable ≈ 13 points, explaining most of the 87→100 gap (the remainder is the external pentest, which no amount of code can close).</p>
+    <p>Every material finding above, consolidated with severity and points recoverable. D3's naming half and D4 closed 2026-08-06 (3 points recovered, 76→78); D1 corrected (a stale "128 remaining" claim was actually 6) and its 7th entry closed the same day, recovering points across all 3 categories it touches — Code Correctness, Backend &amp; API Quality, Security (7 points recovered, 78→85). D7 fully closed 2026-08-07 across both categories it touched — both the "legacy docker-compose" and "2 dead scripts" claims were wrong; the docker-compose file is real, deliberate infrastructure (Architecture's −1 recovered) and both scripts were broken, now fixed, not dead (Config/Ops' −1 recovered) — the only remaining gap in either category is D5, tracked separately (2 points recovered, 85→87). D8 partially closed the same day — a real, verified regression guard now exists for the one recurring hardcoded-count instance, though the general CI lint rule it calls for is still open (1 point recovered, 87→88). Total recoverable ≈ 12 points, explaining most of the 88→100 gap (the remainder is the external pentest, which no amount of code can close).</p>
   </div>
   <div class="ledger-table-wrap">
     <table class="ledger">
@@ -628,7 +630,7 @@
         <tr><td>D5</td><td><span class="pill p1">P1</span></td><td>Configuration/Ops</td><td><code>ANTHROPIC_API_KEY</code> missing from <code>.env</code> entirely</td><td>Default AI provider very likely non-functional in this environment</td><td class="num">2</td></tr>
         <tr><td>D6</td><td><span class="pill p3">P3</span></td><td>Maintainability</td><td>Orphan-scanner <code>isGenerated</code> classifier hid 3 stale docs as "legacy" for ~2 months</td><td>Reduced trust in the primary hygiene-audit tool until fixed</td><td class="num">1</td></tr>
         <tr><td>D7</td><td><span class="pill good">Closed</span></td><td>Configuration/Ops</td><td><strong>CLOSED 2026-08-07</strong>: neither original claim held up. <code>docker-compose.yml</code> is real, deliberate 3-tier infrastructure (all 9 doc references reviewed, mutually consistent), not legacy duplication — the one real defect (dangling <code>anomaly-detection</code> ref) was already annotated. <code>inventory:write-docs</code>/<code>orchestrator:write-docs</code> were broken (stale <code>.js</code> extensions on 2 renamed <code>.ts</code> files), not dead — both fixed and verified working</td><td>Was: config duplication, one landmine if ever enabled</td><td class="num">0</td></tr>
-        <tr><td>D8</td><td><span class="pill p2">P2</span></td><td>Type Safety</td><td>Hardcoded counts drift silently in test titles/docs/scripts even when underlying logic is dynamically correct (8-file doc-drift trail this campaign; 2 more found and fixed 2026-08-07 during a systematic regeneration sweep, one now dynamically interpolated instead of just re-stated)</td><td>False confidence from stale-but-plausible numbers</td><td class="num">2</td></tr>
+        <tr><td>D8</td><td><span class="pill p3">P3 (was P2)</span></td><td>Type Safety</td><td>Hardcoded counts drift silently in test titles/docs/scripts even when underlying logic is dynamically correct (8-file doc-drift trail; 2 more found+fixed 2026-08-07). A regression guard now locks down the one recurring instance (<code>executorMappingAudit.test.ts</code>, verified to actually fail on drift) — the general case (a repo-wide CI lint rule) remains open</td><td>False confidence from stale-but-plausible numbers</td><td class="num">1</td></tr>
         <tr><td>D9</td><td><span class="pill p3">P3</span></td><td>Build</td><td>No clean-install (<code>npm ci</code>) build verified this session; sandbox needs <code>ESBUILD_USE_WASM=1</code></td><td>Reproducibility not independently confirmed</td><td class="num">1</td></tr>
         <tr><td>D10</td><td><span class="pill p1">P1</span></td><td>Security</td><td>No commissioned penetration test exists</td><td>Self-review, however deep, is not independent validation</td><td class="num">external</td></tr>
       </tbody>
@@ -689,7 +691,7 @@
         <tr><td>4</td><td><span class="pill good">DONE</span> Add a route-registry cross-check (D4)</td><td><code>src/data/orphanDetectionAudit.ts</code>, all 7 console-route-tree files, <code>router.tsx</code></td><td>The scanner fails to classify a route as "wired" unless it resolves in one of the 3 real registration layers</td><td><code>orphanDetectionAudit.report.test.ts</code> 3/3 passing; regenerated report confirms 99 false positives eliminated</td><td class="num">0</td></tr>
         <tr><td>5</td><td>Supply <code>ANTHROPIC_API_KEY</code> or correct the documented default (D5)</td><td>Root <code>.env</code>, <code>docs/architecture/platform-architecture-overview.md</code></td><td>AI copilot features functional end-to-end, or docs stop claiming a provider that isn't configured</td><td>Live chat request returns a real completion, not <code>AI_CONFIG_ERROR</code></td><td class="num">2</td></tr>
         <tr><td>6</td><td><span class="pill good">DONE</span> Reviewed and fixed D7 (docker-compose + doc-generator scripts)</td><td><code>docker-compose.yml</code> (9 docs reviewed), <code>scripts/write-platform-inventory.mjs</code>, <code>scripts/write-unsupported-orchestrator-docs.mjs</code></td><td>Docker-compose confirmed deliberate, not duplication; both scripts fixed and verified working</td><td>Both scripts run clean; <code>docs/architecture/platform-inventory.md</code> and <code>docs/unsupported-orchestrator-tools.md</code> regenerated and indexed</td><td class="num">0</td></tr>
-        <tr><td>7</td><td>Add a CI check preventing hardcoded counts from drifting (D8) — 8 individual instances fixed so far, no systemic guard yet</td><td><code>backendFrontendToolContract.report.test.ts</code>, <code>write-unsupported-orchestrator-docs.mjs</code>, <code>e2eRegressionChecklist.ts</code>, and likely more unaudited</td><td>No English string in a test title, script, or doc hardcodes a number that a nearby dynamic check already computes, enforced by CI not just found by hand</td><td>Lint rule or CI check flags hardcoded small integers adjacent to "tools"/"executors"/"roles" etc.</td><td class="num">2</td></tr>
+        <tr><td>7</td><td><span class="pill good">PARTIAL</span> Add a CI check preventing hardcoded counts from drifting (D8) — 8 individual instances fixed, 1 now regression-guarded, general case still open</td><td><code>src/data/executorMappingAudit.test.ts</code> (new guard, verified), and a repo-wide lint rule for any future first-time occurrence elsewhere</td><td>No English string in a test title, script, or doc hardcodes a number that a nearby dynamic check already computes, enforced by CI not just found by hand</td><td>The new guard's 7/7 pass, verified to fail on reintroduced drift; a general lint rule remains to be built</td><td class="num">1</td></tr>
         <tr><td>8</td><td>Run and record a clean-install build (D9)</td><td>Whole repo</td><td><code>rm -rf node_modules &amp;&amp; npm ci &amp;&amp; npm run build</code> succeeds without the sandbox-specific WASM workaround</td><td>Build log</td><td class="num">1</td></tr>
         <tr><td>9</td><td>Commission an independent penetration test (D10)</td><td>Whole application, external</td><td>Findings report from a qualified external firm</td><td>External deliverable</td><td class="num">external</td></tr>
       </tbody>
