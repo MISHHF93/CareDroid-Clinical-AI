@@ -36,7 +36,9 @@
     [class*='-card '],
     [class$='-panel']:not([class*='modal']):not([class*='overlay']),
     [class*='-panel ']:not([class*='modal']):not([class*='overlay'])
-  ):not([data-severity]):not(.cdl-alarm-banner):not(.cdl-alarm-kpi) {
+  ):not([data-severity]):not(.cdl-alarm-banner):not(.cdl-alarm-kpi):not([class*='--critical']):not(
+    [class*='--danger']
+  ):not([class*='--warning']) {
   --card-contract-bg: var(--cdl-surface-card, var(--medical-card-bg, #ffffff));
   --card-contract-fg: var(--cdl-ink, var(--medical-card-fg, #111827));
   --card-contract-fg-muted: var(--cdl-ink-muted, #475569);
@@ -99,13 +101,17 @@
 
 /* Typography roles inside cards — never inherit white from legacy tokens */
 :is(.app-shell, .emergency-app-shell)
-  :is(.card, [class$='-card'], [class*='-card '], [class$='-panel'], [class*='-panel '])
+  :is(.card, [class$='-card'], [class*='-card '], [class$='-panel'], [class*='-panel ']):not(
+    [class*='--critical']
+  ):not([class*='--danger']):not([class*='--warning'])
   :is(h1, h2, h3, h4, h5, h6, strong, dt) {
   color: var(--card-contract-fg, var(--medical-card-fg));
 }
 
 :is(.app-shell, .emergency-app-shell)
-  :is(.card, [class$='-card'], [class*='-card '], [class$='-panel'], [class*='-panel '])
+  :is(.card, [class$='-card'], [class*='-card '], [class$='-panel'], [class*='-panel ']):not(
+    [class*='--critical']
+  ):not([class*='--danger']):not([class*='--warning'])
   :is(p, li, td, th, label, span, small, figcaption) {
   color: inherit;
 }
@@ -127,7 +133,9 @@
 
 /* Light card bodies must not use on-solid text (except explicit solid fills) */
 :is(.app-shell, .emergency-app-shell)
-  :is(.card, [class$='-card'], [class*='-card '], [class$='-panel'], [class*='-panel '])
+  :is(.card, [class$='-card'], [class*='-card '], [class$='-panel'], [class*='-panel ']):not(
+    [class*='--critical']
+  ):not([class*='--danger']):not([class*='--warning'])
   :is(p, span, li, td, th, label, small, h1, h2, h3, h4, h5, h6):not([class*='badge']):not(
     [class*='pill']
   ):not([class*='chip']):not([class*='--solid']):not([class*='--primary']):not(

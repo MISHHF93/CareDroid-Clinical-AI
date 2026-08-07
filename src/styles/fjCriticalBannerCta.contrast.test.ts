@@ -391,3 +391,83 @@ describe('reception-task-sheet__action--critical border-color (Cycle 269, 4th sw
     );
   });
 });
+
+const cardContrastCss = readFileSync(join(__dirname, 'card-contrast-normalization.css'), 'utf8');
+const dispatchConsoleCss = readFileSync(
+  join(__dirname, '../pages/emergency/DispatchConsole.css'),
+  'utf8',
+);
+const dispatchConsoleTsx = readFileSync(
+  join(__dirname, '../pages/emergency/DispatchConsole.tsx'),
+  'utf8',
+);
+
+describe('dc-panel critical dispatch styling contrast (2026-08-07, 5th sweep family)', () => {
+  // card-contrast-normalization.css had never been audited for this bug class
+  // — only surface-normalization.css, color-normalization.css, and
+  // text-normalization.css had exclusions for --critical/--danger/--warning
+  // BEM modifiers. DispatchConsole's "Dispatch Unit Now" panel
+  // (isCritical branch renders className="dc-panel dc-call-card--critical")
+  // lost all 3 of its urgency cues at once: the base card-contract rule
+  // matched via [class*='-panel '] and forced the panel's border-color back
+  // to the plain default (silently erasing .dc-call-card--critical's red-
+  // tinted border), while two typography rules matched the same
+  // [class*='-panel '] ancestor and forced dc-title-14-critical's red
+  // heading color and dc-critical-11's red "3-minute response target"
+  // badge color back to inherited/default ink — because unlike its sibling
+  // surface-normalization.css, this file's color-forcing rules had no
+  // severity-modifier exclusion at all.
+
+  const baseContractRule = cardContrastCss.slice(
+    cardContrastCss.indexOf('/* Base contract for card-like surfaces'),
+    cardContrastCss.indexOf('/* Severity cards own their contrast'),
+  );
+  const headingAndSpanRules = cardContrastCss.slice(
+    cardContrastCss.indexOf('/* Typography roles inside cards'),
+    cardContrastCss.indexOf('/* Light card bodies must not use on-solid text'),
+  );
+  const lightCardBodiesRule = cardContrastCss.slice(
+    cardContrastCss.indexOf('/* Light card bodies must not use on-solid text'),
+  );
+
+  it('the base card-contract rule excludes critical/danger/warning containers from the forced background/border/color', () => {
+    const flat = flattenCss(baseContractRule);
+    expect(flat).toContain(":not([class*='--critical'])");
+    expect(flat).toContain(":not([class*='--danger'])");
+    expect(flat).toContain(":not([class*='--warning'])");
+  });
+
+  it('both the heading/strong rule and the span/p rule exclude critical/danger/warning ancestors (each needs its own exclusion, or the other still repaints it)', () => {
+    const flat = flattenCss(headingAndSpanRules);
+    (['--critical', '--danger', '--warning'] as const).forEach((modifier) => {
+      const needle = `:not([class*='${modifier}'])`;
+      const occurrences = flat.split(needle).length - 1;
+      expect(occurrences, `expected 2 occurrences of ${needle}`).toBe(2);
+    });
+  });
+
+  it('the higher-specificity light-card-bodies rule also excludes critical/danger/warning ancestors (it would otherwise still repaint dc-critical-11 even after the span rule above is fixed)', () => {
+    const flat = flattenCss(lightCardBodiesRule);
+    expect(flat).toContain(":not([class*='--critical'])");
+    expect(flat).toContain(":not([class*='--danger'])");
+    expect(flat).toContain(":not([class*='--warning'])");
+  });
+
+  it('DispatchConsole.css still declares the intended critical-red border/title/badge styling (unchanged)', () => {
+    expect(dispatchConsoleCss).toContain(
+      '.dc-call-card--critical {\n  border-color: color-mix(\n    in srgb,\n    var(--medical-text-status-critical, #b91c1c) 45%,\n    var(--medical-border)\n  );\n}',
+    );
+    expect(dispatchConsoleCss).toContain(
+      '.dc-title-14-critical {\n  font-size: 14px;\n  font-weight: 700;\n  color: var(--medical-text-status-critical, #b91c1c);\n}',
+    );
+    expect(dispatchConsoleCss).toContain(
+      '.dc-critical-11 {\n  font-size: 11px;\n  color: var(--medical-text-status-critical, #b91c1c);\n  font-weight: 700;\n}',
+    );
+  });
+
+  it('DispatchConsole.tsx still applies dc-call-card--critical alongside dc-panel when isCritical (unchanged)', () => {
+    expect(dispatchConsoleTsx).toContain(
+      'className={`dc-panel ${isCritical ? "dc-call-card--critical" : ""}`}',
+    );
+  });
+});
