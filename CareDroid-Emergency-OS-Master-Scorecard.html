@@ -165,7 +165,7 @@
     </div>
     <div class="meta-block">
       Generated 2026-08-06, updated 2026-08-08<br />
-      HEAD <code style="font-family: var(--mono)">a511b376</code><br />
+      HEAD <code style="font-family: var(--mono)">6050eaef</code><br />
       <a href="https://github.com/MISHHF93/CareDroid-Clinical-AI">github.com/MISHHF93/CareDroid-Clinical-AI</a>
     </div>
   </header>
@@ -174,15 +174,15 @@
     <div class="score-ring">
       <svg width="160" height="160" viewBox="0 0 160 160">
         <circle class="track" cx="80" cy="80" r="68" fill="none" stroke-width="11"></circle>
-        <circle class="fill" cx="80" cy="80" r="68" fill="none" stroke-width="11" stroke-dasharray="427.3" stroke-dashoffset="141.4"</circle>
+        <circle class="fill" cx="80" cy="80" r="68" fill="none" stroke-width="11" stroke-dasharray="427.3" stroke-dashoffset="137.2"</circle>
       </svg>
-      <div class="num"><strong>66.9</strong><span>/ 100</span></div>
+      <div class="num"><strong>67.9</strong><span>/ 100</span></div>
     </div>
     <div class="hero-body">
       <span class="band-chip">Significant improvement required (repository-verifiable ceiling)</span>
       <h2>Corrected 2026-08-06: 3 of the scorecard's own original findings were themselves wrong — a dedicated verification pass found real mechanisms this first draft had scored as absent, and 3 concrete bugs found along the way are now fixed. Updated 2026-08-08: a symptom/complaint-recognition audit found a real safety-relevant gap in Reception's primary intake path (three unsynchronized keyword systems, the weakest one wired into the main flow) and a same-day demo-identity fix that hadn't actually reached production — both fixed and tested; see Domain 1</h2>
       <p>
-        <strong>Repository Implementation Score: 669/1000 (66.9%), up from an initial 520/1000.</strong>
+        <strong>Repository Implementation Score: 679/1000 (67.9%), up from an initial 520/1000.</strong>
         <strong>Pilot Evidence Score: ~10/100</strong> — unchanged; code existing and being wired is still not
         evidence of clinical validation. A dedicated research pass corrected 3 domains this scorecard originally
         got wrong: <strong>Waiting Room Safety</strong> (42→58/100) — a real backend cron and a real client-side
@@ -208,7 +208,7 @@
 
   <div class="decision-strip">
     <div class="decision-card"><span class="decision-label">Pilot gate</span><div class="decision-value" style="color:var(--red)">NOT READY FOR PILOT</div><p>6 P0 gates open on the sibling scorecard; none require more code alone.</p></div>
-    <div class="decision-card"><span class="decision-label">Repo implementation</span><div class="decision-value">669 / 1000</div><p>Evidence-backed, code-level maturity across 12 domains.</p></div>
+    <div class="decision-card"><span class="decision-label">Repo implementation</span><div class="decision-value">679 / 1000</div><p>Evidence-backed, code-level maturity across 12 domains.</p></div>
     <div class="decision-card"><span class="decision-label">Pilot evidence</span><div class="decision-value" style="color:var(--amber)">~10 / 100</div><p>Live/clinician/external validation, separated from implementation.</p></div>
     <div class="decision-card"><span class="decision-label">Evidence confidence</span><div class="decision-value">High</div><p>Every score cites a file, route, test, or command — 3 domains marked NOT VERIFIED rather than guessed.</p></div>
   </div>
@@ -224,7 +224,7 @@
         <tr><td>1. Product &amp; Workflow Completeness</td><td class="num">150</td><td class="num">94</td><td class="num">63%</td><td>Confirmed</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
         <tr><td>2. Waiting Room Safety</td><td class="num">100</td><td class="num">58</td><td class="num">58%</td><td>Confirmed</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
         <tr><td>3. Emergency Whiteboard &amp; Queue Intelligence</td><td class="num">100</td><td class="num">61</td><td class="num">61%</td><td>Confirmed</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
-        <tr><td>4. EMS &amp; Offload</td><td class="num">75</td><td class="num">48</td><td class="num">64%</td><td>Confirmed</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
+        <tr><td>4. EMS &amp; Offload</td><td class="num">75</td><td class="num">58</td><td class="num">77%</td><td>Confirmed</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
         <tr><td>5. Capacity, Boarding &amp; Referral Intelligence</td><td class="num">75</td><td class="num">50</td><td class="num">67%</td><td>Confirmed</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
         <tr><td>6. Multi-Screen &amp; Role-Specific Architecture</td><td class="num">75</td><td class="num">64</td><td class="num">85%</td><td>Confirmed</td><td>🔵 <span class="pill strong">Strong</span></td></tr>
         <tr><td>7. RBAC, Privacy &amp; Security</td><td class="num">100</td><td class="num">59</td><td class="num">59%</td><td>Confirmed</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
@@ -233,7 +233,7 @@
         <tr><td>10. Quality Engineering &amp; Pilot Readiness</td><td class="num">100</td><td class="num">63</td><td class="num">63%</td><td>Confirmed</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
         <tr><td>11. Interoperability, Data &amp; Integration Readiness</td><td class="num">25</td><td class="num">12</td><td class="num">48%</td><td>Confirmed (mixed)</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
         <tr><td>12. AI Governance &amp; Operational Intelligence</td><td class="num">25</td><td class="num">24</td><td class="num">96%</td><td>Strong evidence</td><td>🔵 <span class="pill strong">Strong</span></td></tr>
-        <tr><td><strong>Total</strong></td><td class="num"><strong>1000</strong></td><td class="num"><strong>669</strong></td><td class="num"><strong>67%</strong></td><td>—</td><td>—</td></tr>
+        <tr><td><strong>Total</strong></td><td class="num"><strong>1000</strong></td><td class="num"><strong>679</strong></td><td class="num"><strong>68%</strong></td><td>—</td><td>—</td></tr>
       </tbody>
     </table>
   </div>
@@ -357,10 +357,10 @@
 
     <article class="dom-card partial">
       <div class="dom-main">
-        <div class="dom-top"><span class="dom-index">04 / 12</span><span class="dom-score">48<span> / 75</span></span></div>
+        <div class="dom-top"><span class="dom-index">04 / 12</span><span class="dom-score">58<span> / 75</span></span></div>
         <span class="status-chip partial">Partial</span>
         <h3>EMS &amp; Offload</h3>
-        <div class="progress-track"><div class="progress-fill partial" style="width: 64%"></div></div>
+        <div class="progress-track"><div class="progress-fill partial" style="width: 77%"></div></div>
       </div>
       <details>
         <summary>Full review</summary>
@@ -372,17 +372,19 @@
             <li>A best-effort Sentinel dual-write bridge for AVL/tracking integration exists, fails safe (no-ops if disabled, swallows failures rather than breaking the primary write)<span class="conf confirmed">Confirmed</span>.</li>
             <li><strong>CORRECTED 2026-08-06 — the prior "misleading demo metric" claim was itself wrong.</strong> Direct code read of <code>src/services/emsOffloadTracker.ts</code> shows <code>averageOffloadMinutes</code> is real, tested elapsed-time math (<code>minutesBetween(arrivedAt, handoffCompleteTime, now)</code>) driven by real ISO timestamps that a dedicated normalizer (<code>normalizeEmsArrivalOffloadPatch</code>) stamps at the exact moment a real status transition happens — not a hardcoded or fabricated value<span class="conf confirmed">Confirmed</span> by source read plus 6 passing unit tests (<code>emsOffloadTracker.test.ts</code>).</li>
             <li><strong>A real, live bug in this exact feature was found and fixed the same day.</strong> <code>emergencyStore.ts</code>'s <code>hydrateFromApi</code> did a blind full-array replace (<code>emsArrivals: payload.emsArrivals || state.emsArrivals</code>) on every real-time whiteboard-update WebSocket push — fired by ANY user's action anywhere in the app, not just a manual refresh — silently wiping every EMS arrival's locally-tracked "Arrived"/"Handoff" status and its offload timestamps back to the backend's timestamp-free baseline. Fixed with a proper per-arrival merge (<code>mergeEmsArrivalHydration</code>) that preserves locally-tracked progression fields while still taking fresh field values (chief complaint, vitals, etc.) from the backend, and correctly drops arrivals the backend no longer lists<span class="conf confirmed">Confirmed</span> — this had been silently breaking the offload timer under normal multi-user load since before this audit found it.</li>
+            <li><strong>FOUND AND FIXED 2026-08-08 — closed the exact gap this domain's own "Required for full marks" named, in the correct one of two parallel EMS backend modules.</strong> Verified first, not assumed: <code>EMSPipeline.tsx</code>'s real <code>emsArrivals</code>/offload-clock data comes from <code>useEMSIntake()</code> → <code>fetchEMSIntake()</code> → <code>EMSIntakeService.getEMSIntake()</code> (in <code>emergency-os.services.ts</code>) — a genuinely different, parallel module from the Mongo-backed <code>EmsController</code>/<code>ems.service.ts</code> cited above, which the frontend only uses for fleet/diversion status (<code>fetchEmsFleetSnapshot</code>/<code>fetchEmergencyDiversionStatus</code>), not per-arrival tracking. <code>getEMSIntake()</code>'s own prior comment already documented the exact gap: "Local whiteboard status remains the frontend source of truth for unit tracking" — only the final handoff-completion event got a durable record (via the workflow log), never as queryable current state, and never the intermediate "arrived"/"handoff started" transitions the clock is built on. Added a new <code>EmsArrivalStatus</code> TypeORM entity + migration (same graceful-degradation pattern as the Referral fix above — <code>@Optional()</code> injection, synchronous in-memory mirror rehydrated at boot so <code>getEMSIntake()</code>'s 7 real callers didn't need an async conversion, fire-and-forget persist), a new <code>PATCH /api/emergency/ems/arrivals/:arrivalId/status</code> endpoint, and wired the frontend's real transition trigger (<code>convertEMSArrivalToPatient</code>, traced via its actual callers, not assumed) to sync durably — matching <code>EMSPipeline.tsx</code>'s own existing <code>completeHandoff</code> fire-and-forget precedent exactly. 8 new tests (4 backend, 2 frontend, matching the prior round's proven pattern), 0 regressions across 23 backend test suites / 184 tests and 29 frontend EMS-suite tests<span class="conf confirmed">Confirmed</span>.</li>
+            <li><strong>Confirmed 2026-08-08 — the domain's other named item already exists in full, no fix needed.</strong> <code>Patient.fitToWaitClassification</code> (<code>FitToWaitClassificationId</code>: <code>fit-to-sit</code> / <code>monitored-chair</code> / <code>stretcher-needed</code> / <code>immediate-room-needed</code> / <code>reassessment-required</code>) already exists as an explicit, typed, triage-adjacent field, wired into real UI (<code>FitToWaitBadge.tsx</code>, <code>FitToWaitClassificationSelect.tsx</code>, <code>FitToWaitAttentionStrip.tsx</code>)<span class="conf confirmed">Confirmed</span>.</li>
           </ul>
           <h4>What is partial / not verified</h4>
           <ul>
-            <li><strong>Confirmed 2026-08-06 — the backend Mongo EMS module still has no offload-duration endpoint.</strong> <code>EmsController</code> exposes only <code>alert</code>/<code>status</code>/<code>arrive</code>/<code>incoming</code>. <code>backend/src/services/ems.service.ts:59-113</code> tracks state-history timestamps but never computes a duration, and <code>confirmArrival</code> doesn't record a distinct handoff/room-assigned event separate from arrival<span class="conf confirmed">Confirmed absent</span>. Combined with the fix above, the real remaining gap is durability, not fakery: the offload clock lives entirely in the browser tab (now correctly preserved across real-time updates, but still not backed by a persistent server-side EMS-arrival entity), so it still won't survive a hard page reload or stay consistent across simultaneous workstations without a fresh hydration re-establishing it from local memory that may no longer exist.</li>
+            <li>The separate Mongo <code>EmsController</code> module (fleet/diversion tracking, not per-arrival offload) still has no offload-duration endpoint of its own — unchanged by this round, since it's not the module the offload clock actually runs on<span class="conf confirmed">Confirmed absent</span>, low priority given the real clock is now durable elsewhere.</li>
           </ul>
           <h4>Risks</h4>
-          <p>The durability gap above is real but bounded and well-understood now — unlike the previous session's framing ("a misleading fake metric"), which risked steering a future fix toward relabeling a genuinely-working feature as demo-only instead of the real fix it actually needed (a hydration merge bug, now closed).</p>
+          <p>Substantially reduced: both named gaps in this domain's own "Required for full marks" are now closed or confirmed already-satisfied. Remaining risk is scoped to a module the real UI doesn't depend on for this feature.</p>
           <h4>Evidence</h4>
-          <p><code>backend/src/modules/ems/ems.controller.ts</code>, <code>ems.controller.spec.ts</code> (14/14), <code>src/services/emergencyTransportApi.ts</code>, <code>src/services/emsOffloadTracker.ts</code> (6/6 tests passing incl. new hydration-merge test), <code>src/store/emergencyStore.ts</code> (fixed this session).</p>
+          <p><code>backend/src/modules/ems/ems.controller.ts</code>, <code>ems.controller.spec.ts</code> (14/14); <code>src/services/emergencyTransportApi.ts</code>, <code>src/services/emsOffloadTracker.ts</code> (6/6); <code>backend/src/modules/emergency-os/emergency-os.services.ts</code> (<code>EMSIntakeService</code>), <code>entities/ems-arrival-status.entity.ts</code>, <code>database/migrations/1772702000000-CreateEmsArrivalStatus.ts</code>, <code>ems-arrival-status-persistence.spec.ts</code> (4/4, 2026-08-08); <code>src/store/emergencyStore.ts</code> (<code>convertEMSArrivalToPatient</code>), <code>emergencyStore.emsArrivalStatusSync.test.ts</code> (2/2, 2026-08-08); <code>types/emergency.ts</code>'s <code>FitToWaitClassificationId</code>.</p>
           <h4>Required for full marks</h4>
-          <p>Persist EMS arrival status transitions (arrived/handoff-started/handoff-completed) server-side in a durable entity so the offload clock survives a reload and stays consistent across workstations — a real, scoped backend feature, not a relabeling exercise. Add fit-to-sit/monitored-chair/stretcher-needed as an explicit triage-adjacent field if not already present.</p>
+          <p>No further code-closable items identified for this domain's core EMS offload-tracking path as of this pass. The separate fleet/diversion Mongo module could optionally gain its own offload-duration endpoint, but the real UI doesn't depend on it for this feature.</p>
         </div>
       </details>
     </article>
@@ -663,7 +665,7 @@
 
   <div class="section-head">
     <h2>Full-mark gap register</h2>
-    <p>Every material finding above, prioritized. G6, G7, and G9 closed 2026-08-06; G3 and G5 corrected the same day (both had been significantly overstated — DTO validation is 95.6% done, not ~60%; the EMS offload metric is real and tested, not a demo placeholder, and a real bug in it was fixed). G13 closed 2026-08-07 — found and fixed the precise mechanism behind the FHIR/HL7 confusability risk (a demo/live classifier that missed "synthetic_ready"). G10 further narrowed the same day — 4 real truthfulness bugs hiding behind the flagged modelRegistry metrics were found and fixed (the drift-monitoring baseline, 2 separate recurrences of the same failure in 2 different native-AI code paths, and an internal inconsistency in the registry's own prior audit correction), though the core 23-surface labeling gap is unchanged. Sum of Points Recoverable from the named findings above ≈ 80 — this is narrower than the full 347-point gap to 1000, which also includes smaller, not-individually-named domain-level deductions (including Domain 1's 2026-08-07 downward correction on Reassessment/Boarding/EMS endpoint wiring) plus the external-only items (pentest, clinician sign-off, live infrastructure, counsel review) no amount of code alone closes.</p>
+    <p>Every material finding above, prioritized. G6, G7, and G9 closed 2026-08-06; G3 and G5 corrected the same day (both had been significantly overstated — DTO validation is 95.6% done, not ~60%; the EMS offload metric is real and tested, not a demo placeholder, and a real bug in it was fixed). G13 closed 2026-08-07 — found and fixed the precise mechanism behind the FHIR/HL7 confusability risk (a demo/live classifier that missed "synthetic_ready"). G10 further narrowed the same day — 4 real truthfulness bugs hiding behind the flagged modelRegistry metrics were found and fixed (the drift-monitoring baseline, 2 separate recurrences of the same failure in 2 different native-AI code paths, and an internal inconsistency in the registry's own prior audit correction), though the core 23-surface labeling gap is unchanged. G5 and G6 both fully closed 2026-08-08 — real TypeORM persistence added for EMS arrival status transitions and referrals respectively, closing the durability gap named in each. Sum of Points Recoverable from the named findings above ≈ 64 — this is narrower than the full remaining gap to 1000, which also includes smaller, not-individually-named domain-level deductions plus the external-only items (pentest, clinician sign-off, live infrastructure, counsel review) no amount of code alone closes.</p>
   </div>
   <div class="ledger-table-wrap">
     <table class="ledger">
@@ -673,8 +675,8 @@
         <tr><td>G2</td><td>RBAC/Security</td><td><span class="pill p0">P0</span></td><td>No commissioned pentest or bespoke app-sec review</td><td>External engagement</td><td class="num">external</td></tr>
         <tr><td>G3</td><td>RBAC/Security</td><td><span class="pill p3">P3 (was P1)</span></td><td><strong>Corrected 2026-08-06</strong> — was "~60% unvalidated"; the live regression-guard test shows 129/135 backend DTOs (95.6%) actually validated. 6 remain, each deliberately deferred (3 need a product decision, 3 need dedicated settings-blob DTO cycles)</td><td>Resolve the 6 remaining deferred routes — see Source Code Quality Scorecard's D1 for the full breakdown</td><td class="num">4</td></tr>
         <tr><td>G4</td><td>UX/Accessibility</td><td><span class="pill p1">P1</span></td><td>Zero live browser/axe-core verification ever run</td><td>Run real accessibility scan on unrestricted hardware</td><td class="num">18</td></tr>
-        <tr><td>G5</td><td>EMS &amp; Offload</td><td><span class="pill p2">P2 (was P1)</span></td><td><strong>Corrected 2026-08-06</strong> — the "misleading demo metric" claim was wrong: <code>averageOffloadMinutes</code> is real, tested timestamp math, and a real bug wiping its state on every real-time update was found and fixed the same day. Remaining gap: no backend-persisted offload-duration timer, so the clock isn't durable across a reload</td><td>Persist EMS arrival status transitions server-side in a durable entity</td><td class="num">8</td></tr>
-        <tr><td>G6</td><td>Capacity/Boarding/Referral</td><td><span class="pill p3">P3 (was P1)</span></td><td><strong>CLOSED 2026-08-06</strong> — dead endpoint (<code>PATCH transfers/:id/status</code>) fixed with a real service method + validated DTO + 2 tests. Remaining: referral storage is still in-memory, not persisted</td><td>Move <code>ReferralService</code> off its in-memory array onto real persistence</td><td class="num">8</td></tr>
+        <tr><td>G5</td><td>EMS &amp; Offload</td><td><span class="pill good">Closed</span></td><td><strong>CLOSED 2026-08-08</strong> — a new <code>EmsArrivalStatus</code> TypeORM entity + migration + <code>PATCH /api/emergency/ems/arrivals/:arrivalId/status</code> endpoint now durably persists arrived/handoff-started/handoff-completed transitions, wired from the real frontend trigger (<code>convertEMSArrivalToPatient</code>); the offload clock survives a reload and stays consistent across workstations</td><td>None — done</td><td class="num">0</td></tr>
+        <tr><td>G6</td><td>Capacity/Boarding/Referral</td><td><span class="pill good">Closed</span></td><td><strong>CLOSED 2026-08-06</strong> — dead endpoint (<code>PATCH transfers/:id/status</code>) fixed with a real service method + validated DTO + 2 tests. <strong>CLOSED further 2026-08-08</strong> — <code>ReferralService</code> now has a real <code>Referral</code> TypeORM entity + migration; referrals no longer vanish on restart</td><td>None — done</td><td class="num">0</td></tr>
         <tr><td>G7</td><td>Multi-Screen Architecture</td><td>—</td><td><strong>CLOSED 2026-08-06</strong> — public-display zero-PHI claim directly confirmed by component read</td><td>None — done</td><td class="num">0</td></tr>
         <tr><td>G8</td><td>Product/Workflow</td><td><span class="pill p2">P2</span></td><td>Only 41 of 87 workflow-suite assignments confirmed live</td><td>Independently re-verify or re-scope the other 46</td><td class="num">20</td></tr>
         <tr><td>G9</td><td>Architecture</td><td>—</td><td><strong>CLOSED 2026-08-06</strong> — route-registry scanner now reads all 8 real route sources; 99 false-positive findings eliminated (264→165 wire count)</td><td>None — done</td><td class="num">0</td></tr>
