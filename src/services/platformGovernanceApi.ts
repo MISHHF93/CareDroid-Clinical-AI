@@ -92,6 +92,25 @@ export const LOCAL_PLATFORM_GOVERNANCE_STATE = Object.freeze({
   },
 });
 
+/**
+ * Found 2026-08-07: the interoperability surface's real backend response
+ * (InteroperabilityController.getSummary(), mounted at
+ * /api/interoperability/summary) sets `status: 'synthetic_ready'` -- a
+ * real, deliberate non-live marker (this endpoint is entirely
+ * synthetic/demo data, confirmed by its own `uiStates.connectionState:
+ * 'demo_unconfigured'` and `provenance.freshness: 'demo'` fields) -- but
+ * the previous `status.includes('demo')` check only recognized the literal
+ * word "demo", so this surface silently reported sourceStatus: 'live' to
+ * the FHIR + HL7 Integration governance page, the opposite of what
+ * StateSourceNotice's demo/live legend promises. Widened to match this
+ * codebase's other non-live vocabulary (synthetic/mock/simulated), not
+ * just "demo".
+ */
+function isNonLiveSourceStatus(status: unknown): boolean {
+  if (typeof status !== 'string') return false;
+  return /demo|synthetic|mock|simulated/i.test(status);
+}
+
 export async function fetchPlatformGovernanceSurface(surface = 'governance', pathname = '') {
   const endpoint = endpointForSurface(surface, pathname);
   try {
@@ -112,7 +131,7 @@ export async function fetchPlatformGovernanceSurface(surface = 'governance', pat
     return {
       ok: true,
       data,
-      sourceStatus: data?.status?.includes?.('demo') ? 'demo' : 'live',
+      sourceStatus: isNonLiveSourceStatus(data?.status) ? 'demo' : 'live',
       message: '',
     };
   } catch (error: any) {

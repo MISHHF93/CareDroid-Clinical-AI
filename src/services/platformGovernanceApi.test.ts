@@ -60,6 +60,29 @@ describe('platformGovernanceApi', () => {
     expect(apiFetchJson).toHaveBeenNthCalledWith(13, '/api/operations/service-health', expect.any(Object));
   });
 
+  it('classifies the interoperability surface as demo, not live, when the backend returns synthetic_ready', async () => {
+    apiFetchJson.mockResolvedValue({
+      response: { ok: true },
+      data: { status: 'synthetic_ready' },
+    });
+
+    const result = await fetchPlatformGovernanceSurface('interoperability', '/integrations');
+
+    expect(result.sourceStatus).toBe('demo');
+  });
+
+  it('still classifies a real demo status as demo, and a genuinely live status as live', async () => {
+    apiFetchJson.mockResolvedValue({ response: { ok: true }, data: { status: 'demo_ready' } });
+    expect((await fetchPlatformGovernanceSurface('governance', '/ai-governance')).sourceStatus).toBe(
+      'demo',
+    );
+
+    apiFetchJson.mockResolvedValue({ response: { ok: true }, data: { status: 'ready' } });
+    expect((await fetchPlatformGovernanceSurface('governance', '/ai-governance')).sourceStatus).toBe(
+      'live',
+    );
+  });
+
   it('evaluates platform gates through the enterprise LLM security contract', async () => {
     await evaluatePlatformGate({ capabilityId: 'clinical-chat', prompt: 'hello' });
 

@@ -96,7 +96,7 @@ export default function PlatformGovernanceWorkspace() {
           DEMO_LIVE_STATES.BACKEND_UNAVAILABLE,
           DEMO_LIVE_STATES.UNSUPPORTED,
         ]}
-        details="Governance, security, regulatory, review, privacy, audit, and observability routes show the current source status. Demo or synthetic panels are review artifacts only; unavailable or unsupported controls should not be treated as active production enforcement."
+        details="Governance, security, regulatory, review, privacy, audit, observability, and FHIR/HL7 interoperability routes show the current source status. Demo or synthetic panels are review artifacts only; unavailable or unsupported controls should not be treated as active production enforcement."
       />
 
       <div className="governance-workspace-page__metrics" role="group" aria-label="Governance summary metrics">
