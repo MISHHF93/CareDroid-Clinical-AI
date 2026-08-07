@@ -208,7 +208,7 @@
     </div>
     <div class="meta-block">
       Generated 2026-08-06<br />
-      HEAD <code style="font-family: var(--mono)">f78d9e4d</code><br />
+      HEAD <code style="font-family: var(--mono)">0b3976a7</code><br />
       <a href="https://github.com/MISHHF93/CareDroid-Clinical-AI">github.com/MISHHF93/CareDroid-Clinical-AI</a>
     </div>
   </header>
@@ -463,6 +463,7 @@
             <li>Frontend TypeScript compiles with zero errors under <code>tsc --noEmit</code><span class="conf confirmed">Confirmed</span>, re-verified repeatedly this session including after every new file added.</li>
             <li>Frontend/backend tool-executor contract count (39 real tool executors, <code>REGISTERED_EXECUTOR_TOOL_IDS</code> in <code>tool-orchestrator.registry.ts</code>) is independently derivable and was cross-checked by three separate methods (array-parse, grep -c, manual count) this campaign, all agreeing<span class="conf confirmed">Confirmed</span>.</li>
             <li>DTOs that do exist use real <code>class-validator</code> decorators, not hand-rolled checks (<code>track-decision.dto.ts</code>, this session's <code>navigator-query.dto.ts</code>)<span class="conf confirmed">Confirmed</span>.</li>
+            <li>2026-08-07: found+fixed a real <code>as any</code>-masked type gap in <code>ToolPageLayout.tsx</code> — it read <code>(riskData as any).confidence</code> and passed it to <code>RiskScoreGauge</code>, but <code>computeRiskScore()</code>'s real return type has no <code>confidence</code> field at all, so the cast existed specifically to suppress the compile error a correct access would have caught<span class="conf confirmed">Confirmed</span> by removing the cast and watching <code>tsc</code> immediately flag it. Not a truthfulness bug (nothing false ever rendered — the gauge's own conditional meant the dead prop never fired), but a real instance of the broader pattern this category already flags: a type-safety escape hatch hiding a genuine mismatch rather than fixing it. Also gave <code>RiskScoreGauge</code> proper TypeScript prop types for the first time (previously untyped destructuring).</li>
           </ul>
           <h4>Defects and Weaknesses</h4>
           <ul>
