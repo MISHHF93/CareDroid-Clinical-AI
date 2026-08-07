@@ -160,13 +160,16 @@ export default function QueueIntelligencePanel({ collapsed, onCollapsedChange })
 
       {bottleneckAlert && !collapsed ? (
         <section
-          className={`queue-intel__bottleneck queue-intel__bottleneck--${bottleneckAlert.severity.toLowerCase()}`}
+          className={`queue-intel__bottleneck${
+            bottleneckAlert.severity === 'Critical' ? ' queue-intel__bottleneck--critical' : ''
+          }`}
           role="status"
         >
           <strong>
-            Bottleneck: {(bottleneckAlert as any).queue} — {(bottleneckAlert as any).reason}
+            Bottleneck: {bottleneckAlert.queueType ?? bottleneckAlert.title} —{' '}
+            {bottleneckAlert.queueBottleneckReason ?? bottleneckAlert.message}
           </strong>
-          <small>{suggestedAction((bottleneckAlert as any).queue)}</small>
+          <small>{suggestedAction(bottleneckAlert.queueType)}</small>
         </section>
       ) : null}
 
@@ -174,7 +177,7 @@ export default function QueueIntelligencePanel({ collapsed, onCollapsedChange })
         {queueRows.map((queue) => {
           const Icon = queue.icon;
           const isActive = activeQueueFilter === queue.type;
-          const isBottlenecked = (bottleneckAlert as any)?.queue === queue.type;
+          const isBottlenecked = bottleneckAlert?.queueType === queue.type;
           return (
             <button
               key={queue.type}

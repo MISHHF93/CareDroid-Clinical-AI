@@ -94,7 +94,7 @@
     border-color var(--motion-transition-fast);
 }
 
-.queue-intel__bottleneck--red {
+.queue-intel__bottleneck--critical {
   border-color: var(--status-critical);
   background: color-mix(in srgb, var(--status-critical) 10%, transparent);
 }
@@ -116,7 +116,7 @@
   font-weight: 800;
 }
 
-.queue-intel__bottleneck--red small {
+.queue-intel__bottleneck--critical small {
   color: var(--status-critical);
 }
 

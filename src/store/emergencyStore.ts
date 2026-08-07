@@ -6278,17 +6278,18 @@ export const selectQueueBottleneckAlert = (state: EmergencyStoreState): Alert | 
 
   if (!bottleneck || Number(bottleneck.averageWaitMinutes || 0) <= 0) return null;
 
+  const bottleneckReason = `${bottleneck.count} patients, avg ${bottleneck.averageWaitMinutes}min`;
   return {
     id: `queue-bottleneck-${bottleneck.type}`,
     type: 'Capacity',
-    severity: bottleneck.health === 'red' ? 'Red' : 'Warning',
+    severity: bottleneck.health === 'red' ? 'Critical' : 'Warning',
     title: `Bottleneck: ${bottleneck.type}`,
-    message: `${bottleneck.count} patients, avg ${bottleneck.averageWaitMinutes}min`,
-    queue: bottleneck.type,
-    reason: `${bottleneck.count} patients, avg ${bottleneck.averageWaitMinutes}min`,
+    message: bottleneckReason,
+    queueType: bottleneck.type,
+    queueBottleneckReason: bottleneckReason,
     createdAt: nowIso(),
     dismissed: false,
-  } as Alert & { queue: string; reason: string };
+  };
 };
 
 export type EmergencyOperationalMetricKey =

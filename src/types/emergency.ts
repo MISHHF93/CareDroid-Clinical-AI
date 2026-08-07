@@ -949,6 +949,9 @@ export interface Alert {
   resolutionReason?: string;
   escalatedAt?: ISODateString;
   metadata?: Record<string, string | number | boolean | null | undefined>;
+  /** Set on queue-breach/bottleneck alerts so consumers can identify the affected queue without parsing `title`. */
+  queueType?: QueueType;
+  queueBottleneckReason?: string;
 }
 
 export const QueueType = Object.freeze({
