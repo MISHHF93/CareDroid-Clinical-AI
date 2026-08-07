@@ -208,7 +208,7 @@
     </div>
     <div class="meta-block">
       Generated 2026-08-06<br />
-      HEAD <code style="font-family: var(--mono)">41d20777</code><br />
+      HEAD <code style="font-family: var(--mono)">f78d9e4d</code><br />
       <a href="https://github.com/MISHHF93/CareDroid-Clinical-AI">github.com/MISHHF93/CareDroid-Clinical-AI</a>
     </div>
   </header>
@@ -562,6 +562,7 @@
             <li>59 truly-unused <code>import React from 'react'</code> statements removed, each individually verified against real usage rather than assumed, earlier this campaign<span class="conf strong-ev">Strong evidence</span>.</li>
             <li>Dead code is deleted outright when confirmed, not just commented out or left as "// removed" markers<span class="conf confirmed">Confirmed</span> — this session's own <code>src/components/surfaces/Card.tsx</code> deletion (zero real importers, traced through every barrel re-export) is a direct example.</li>
             <li>A second, more consequential instance found+removed this session: <code>backend/src/services/copilot.service.ts</code> (a pre-migration Mongoose service) had zero real HTTP reachability — its only consumers were a generic service-registry health-check loop that never calls its business-logic method<span class="conf confirmed">Confirmed</span> by tracing every import site. It had also already been flagged obsolete in <code>src/config/unifiedServiceRegistry.config.ts</code>'s <code>OBSOLETE_SERVICE_REDIRECTS</code> from an earlier session — deleted, its 2 dead re-export sites cleaned up, and the now-stale redirect entry removed rather than left pointing at a file that no longer exists. Its one piece of real, non-duplicated logic (a clinical safety-floor check) was ported to the live copilot path first, not discarded — see the Emergency OS Master Scorecard's AI Governance domain for that half of the fix.</li>
+            <li>A third instance, 2026-08-07: <code>docs/product-packaging-audit.md</code> at repo root was a month-stale (2026-07-09) orphaned duplicate of the real, actively-regenerated <code>docs/specs/product-packaging-audit.md</code><span class="conf confirmed">Confirmed</span> — the generator had moved paths at some point and left the old copy behind. Deleted it, fixed 2 stale path references to it inside <code>duplicateSystemAudit.ts</code>'s own real audit findings, fixed 3 more stale artifact-path labels in <code>run-closure-audit-sequence.mjs</code>, and removed a fully dead reference in that same script pointing at <code>docs/closure-audit-sequence.md</code> — a whole 10-prompt manual-checklist doc (plus 5 companions) deleted in an earlier commit and never recreated, superseded by this repo's 3 actively-maintained scorecards.</li>
           </ul>
           <h4>Defects and Weaknesses</h4>
           <ul>
