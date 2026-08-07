@@ -175,7 +175,11 @@ function resolveDatabaseClient() {
       },
     }),
 
-    // Rate limiting (100 requests per 15 minutes)
+    // Rate limiting: 100 requests per 60s window per client. (Corrected
+    // 2026-08-07 — this comment previously said "100 requests per 15
+    // minutes", mismatched with the ttl below since the line was first
+    // added; verified live that the actual enforced window is 60s, not 15
+    // minutes, before correcting the comment to match the real behavior.)
     ThrottlerModule.forRoot([
       {
         ttl: 60000, // 1 minute in milliseconds
