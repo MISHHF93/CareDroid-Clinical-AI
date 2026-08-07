@@ -165,7 +165,7 @@
     </div>
     <div class="meta-block">
       Generated 2026-08-06<br />
-      HEAD <code style="font-family: var(--mono)">bebf0c6a</code><br />
+      HEAD <code style="font-family: var(--mono)">cd643a9f</code><br />
       <a href="https://github.com/MISHHF93/CareDroid-Clinical-AI">github.com/MISHHF93/CareDroid-Clinical-AI</a>
     </div>
   </header>
@@ -174,15 +174,15 @@
     <div class="score-ring">
       <svg width="160" height="160" viewBox="0 0 160 160">
         <circle class="track" cx="80" cy="80" r="68" fill="none" stroke-width="11"></circle>
-        <circle class="fill" cx="80" cy="80" r="68" fill="none" stroke-width="11" stroke-dasharray="427.3" stroke-dashoffset="154.7"></circle>
+        <circle class="fill" cx="80" cy="80" r="68" fill="none" stroke-width="11" stroke-dasharray="427.3" stroke-dashoffset="153.8"></circle>
       </svg>
-      <div class="num"><strong>63.8</strong><span>/ 100</span></div>
+      <div class="num"><strong>64.0</strong><span>/ 100</span></div>
     </div>
     <div class="hero-body">
       <span class="band-chip">Significant improvement required (repository-verifiable ceiling)</span>
       <h2>Corrected 2026-08-06: 3 of the scorecard's own original findings were themselves wrong — a dedicated verification pass found real mechanisms this first draft had scored as absent, and 3 concrete bugs found along the way are now fixed</h2>
       <p>
-        <strong>Repository Implementation Score: 638/1000 (63.8%), up from an initial 520/1000.</strong>
+        <strong>Repository Implementation Score: 640/1000 (64.0%), up from an initial 520/1000.</strong>
         <strong>Pilot Evidence Score: ~10/100</strong> — unchanged; code existing and being wired is still not
         evidence of clinical validation. A dedicated research pass corrected 3 domains this scorecard originally
         got wrong: <strong>Waiting Room Safety</strong> (42→58/100) — a real backend cron and a real client-side
@@ -208,7 +208,7 @@
 
   <div class="decision-strip">
     <div class="decision-card"><span class="decision-label">Pilot gate</span><div class="decision-value" style="color:var(--red)">NOT READY FOR PILOT</div><p>6 P0 gates open on the sibling scorecard; none require more code alone.</p></div>
-    <div class="decision-card"><span class="decision-label">Repo implementation</span><div class="decision-value">638 / 1000</div><p>Evidence-backed, code-level maturity across 12 domains.</p></div>
+    <div class="decision-card"><span class="decision-label">Repo implementation</span><div class="decision-value">640 / 1000</div><p>Evidence-backed, code-level maturity across 12 domains.</p></div>
     <div class="decision-card"><span class="decision-label">Pilot evidence</span><div class="decision-value" style="color:var(--amber)">~10 / 100</div><p>Live/clinician/external validation, separated from implementation.</p></div>
     <div class="decision-card"><span class="decision-label">Evidence confidence</span><div class="decision-value">High</div><p>Every score cites a file, route, test, or command — 3 domains marked NOT VERIFIED rather than guessed.</p></div>
   </div>
@@ -231,9 +231,9 @@
         <tr><td>8. Architecture &amp; Repository Convergence</td><td class="num">100</td><td class="num">90</td><td class="num">90%</td><td>Confirmed</td><td>🔵 <span class="pill strong">Strong</span></td></tr>
         <tr><td>9. UX, Accessibility &amp; Design-System Quality</td><td class="num">75</td><td class="num">44</td><td class="num">59%</td><td>Confirmed (static only)</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
         <tr><td>10. Quality Engineering &amp; Pilot Readiness</td><td class="num">100</td><td class="num">63</td><td class="num">63%</td><td>Confirmed</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
-        <tr><td>11. Interoperability, Data &amp; Integration Readiness</td><td class="num">25</td><td class="num">10</td><td class="num">40%</td><td>Confirmed (mixed)</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
+        <tr><td>11. Interoperability, Data &amp; Integration Readiness</td><td class="num">25</td><td class="num">12</td><td class="num">48%</td><td>Confirmed (mixed)</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
         <tr><td>12. AI Governance &amp; Operational Intelligence</td><td class="num">25</td><td class="num">18</td><td class="num">72%</td><td>Strong evidence</td><td>🔵 <span class="pill strong">Strong</span></td></tr>
-        <tr><td><strong>Total</strong></td><td class="num"><strong>1000</strong></td><td class="num"><strong>638</strong></td><td class="num"><strong>64%</strong></td><td>—</td><td>—</td></tr>
+        <tr><td><strong>Total</strong></td><td class="num"><strong>1000</strong></td><td class="num"><strong>640</strong></td><td class="num"><strong>64%</strong></td><td>—</td><td>—</td></tr>
       </tbody>
     </table>
   </div>
@@ -569,10 +569,10 @@
 
     <article class="dom-card partial">
       <div class="dom-main">
-        <div class="dom-top"><span class="dom-index">11 / 12</span><span class="dom-score">10<span> / 25</span></span></div>
+        <div class="dom-top"><span class="dom-index">11 / 12</span><span class="dom-score">12<span> / 25</span></span></div>
         <span class="status-chip partial">Partial</span>
         <h3>Interoperability, Data &amp; Integration Readiness</h3>
-        <div class="progress-track"><div class="progress-fill partial" style="width: 40%"></div></div>
+        <div class="progress-track"><div class="progress-fill partial" style="width: 48%"></div></div>
       </div>
       <details>
         <summary>Full review</summary>
@@ -581,18 +581,18 @@
           <ul>
             <li><strong>Corrected 2026-08-06 — the original "no FHIR/HL7 code" finding was wrong.</strong> <code>lib/sentinel/fhirMap.ts:1-60</code> builds genuine HL7 FHIR R4-shaped resources (<code>resourceType: 'Bundle'|'Patient'|'Encounter'</code>, real <code>meta</code>/<code>extension</code> structure) from NEMSIS EMS data — and it is not dead code: it's imported and invoked in a live service, <code>backend/src/modules/sentinel/sentinel-inbound.service.ts:10,119</code><span class="conf confirmed">Confirmed</span> — maturity 3 (Integrated) for this specific EMS pre-arrival path.</li>
             <li>Patient/encounter identifiers are generated through the one confirmed canonical <code>EmergencyPatientService</code> (TypeORM/SQL) path<span class="conf confirmed">Confirmed</span>.</li>
+            <li><strong>G13 CLOSED 2026-08-07 — found and fixed the precise mechanism behind the confusability risk, not just relabeled it.</strong> Tracing the "FHIR + HL7 Integration" governance console page (<code>PlatformGovernanceWorkspace.tsx</code>, mounted at <code>/integrations/fhir</code>) found its real backend response (<code>InteroperabilityController.getSummary()</code>, <code>/api/interoperability/summary</code>) sets <code>status: 'synthetic_ready'</code> — genuinely non-live, confirmed by its own nested <code>uiStates.connectionState: 'demo_unconfigured'</code> and <code>provenance.freshness: 'demo'</code> fields — but the frontend's demo/live classifier (<code>src/services/platformGovernanceApi.ts</code>) only recognized the literal substring "demo", so this page silently reported <code>sourceStatus: 'live'</code> to its own <code>StateSourceNotice</code> legend, the exact opposite of what that legend promises<span class="conf confirmed">Confirmed</span>. Widened the classifier to also recognize synthetic/mock/simulated (vocabulary this codebase already uses elsewhere for the same concept), and fixed the legend's own text, which listed 7 covered route categories and silently omitted interoperability/FHIR+HL7 even though it's rendered by the same component. 2 new regression tests confirm the fix and that a genuinely live status still classifies as live.</li>
           </ul>
           <h4>What is missing</h4>
           <ul>
-            <li><strong>A mixed, honestly-reported picture, not uniform absence.</strong> <code>backend/src/modules/platform-systems/platform-systems.service.ts:656-687</code> (<code>getFhirConnections</code>/<code>getHl7Interfaces</code>) return purely demo data (<code>status: 'demo_unconfigured'</code>, <code>'demo_listener'</code>) — genuinely fake, not real integrations. <code>backend/src/services/fhir.service.ts</code> is a trivial field-renamer, not a real transform<span class="conf confirmed">Confirmed</span>. The one real piece (Sentinel's <code>fhirMap.ts</code>) is narrow — a single EMS-data-shaping path, not a general interoperability layer.</li>
-            <li>No real external EHR/HIE integration point exists beyond this one narrow path.</li>
+            <li><strong>The core gap is unchanged: no real external EHR/HIE integration point exists beyond one narrow EMS path.</strong> <code>backend/src/modules/platform-systems/platform-systems.service.ts:656-687</code> (<code>getFhirConnections</code>/<code>getHl7Interfaces</code>) return purely demo data (<code>status: 'demo_unconfigured'</code>, <code>'demo_listener'</code>) — genuinely fake, not real integrations, and correctly self-labeled as such at that layer. <code>backend/src/services/fhir.service.ts</code> is a trivial field-renamer, not a real transform<span class="conf confirmed">Confirmed</span>. The one real piece (Sentinel's <code>fhirMap.ts</code>) is narrow — a single EMS-data-shaping path, not a general interoperability layer. Closing G13 fixed a real UI-truthfulness bug; it does not create real interoperability where none existed.</li>
           </ul>
           <h4>Risks</h4>
-          <p><strong>The risk profile changed from "nothing to overclaim" to "something real exists next to something fake using the same vocabulary."</strong> A reader seeing "FHIR" mentioned in this codebase could easily assume the demo-stub <code>getFhirConnections</code> is as real as the genuinely-live <code>fhirMap.ts</code> — worth explicitly distinguishing in any product communication.</p>
+          <p>The confusability risk this domain previously flagged (a reader assuming demo FHIR/HL7 data is as real as <code>fhirMap.ts</code>) is now closed for the one concrete mechanism found — the governance console's own truthfulness legend. Worth a fresh sweep for any other surface using non-"demo" vocabulary (synthetic/mock/simulated/stub) that a similarly narrow classifier elsewhere might still misclassify.</p>
           <h4>Evidence</h4>
-          <p><code>lib/sentinel/fhirMap.ts:1-60</code>, <code>backend/src/modules/sentinel/sentinel-inbound.service.ts:10,119</code>, <code>backend/src/modules/platform-systems/platform-systems.service.ts:656-687</code>, <code>backend/src/services/fhir.service.ts</code>. Verified by a dedicated research pass, 2026-08-06.</p>
+          <p><code>lib/sentinel/fhirMap.ts:1-60</code>, <code>backend/src/modules/sentinel/sentinel-inbound.service.ts:10,119</code>, <code>backend/src/modules/platform-systems/platform-systems.service.ts:656-687</code>, <code>backend/src/services/fhir.service.ts</code>, <code>backend/src/modules/interoperability/interoperability.module.ts:88</code>, <code>src/services/platformGovernanceApi.ts</code> (fixed, 4/4 tests passing).</p>
           <h4>Required for full marks</h4>
-          <p>Either build real <code>getFhirConnections</code>/<code>getHl7Interfaces</code> backing (only if a real integration partner exists — building speculatively would violate this rubric's own anti-gaming rule) or relabel them unambiguously as demo/placeholder in their own API responses so no caller can mistake them for the real <code>fhirMap.ts</code> path.</p>
+          <p>Build real external EHR/HIE integration if a real partner exists (building speculatively would violate this rubric's own anti-gaming rule) — this is the only path to a materially higher score here; the confusability/truthfulness fix already closed is necessary but not sufficient.</p>
         </div>
       </details>
     </article>
@@ -646,7 +646,7 @@
 
   <div class="section-head">
     <h2>Full-mark gap register</h2>
-    <p>Every material finding above, prioritized. G6, G7, and G9 closed 2026-08-06; G3 and G5 corrected the same day (both had been significantly overstated — DTO validation is 95.6% done, not ~60%; the EMS offload metric is real and tested, not a demo placeholder, and a real bug in it was fixed). Sum of Points Recoverable from the named findings above ≈ 90 — this is narrower than the full 362-point gap to 1000, which also includes smaller, not-individually-named domain-level deductions plus the external-only items (pentest, clinician sign-off, live infrastructure, counsel review) no amount of code alone closes.</p>
+    <p>Every material finding above, prioritized. G6, G7, and G9 closed 2026-08-06; G3 and G5 corrected the same day (both had been significantly overstated — DTO validation is 95.6% done, not ~60%; the EMS offload metric is real and tested, not a demo placeholder, and a real bug in it was fixed). G13 closed 2026-08-07 — found and fixed the precise mechanism behind the FHIR/HL7 confusability risk (a demo/live classifier that missed "synthetic_ready"). Sum of Points Recoverable from the named findings above ≈ 85 — this is narrower than the full 360-point gap to 1000, which also includes smaller, not-individually-named domain-level deductions plus the external-only items (pentest, clinician sign-off, live infrastructure, counsel review) no amount of code alone closes.</p>
   </div>
   <div class="ledger-table-wrap">
     <table class="ledger">
@@ -664,7 +664,7 @@
         <tr><td>G10</td><td>AI Governance</td><td><span class="pill p2">P2</span></td><td>23 of 38 AI surfaces still unlabeled; modelRegistry metrics still unresolved</td><td>Complete labeling; clinician review of flagged metrics</td><td class="num">7</td></tr>
         <tr><td>G11</td><td>Quality Eng/Pilot Readiness</td><td><span class="pill p2">P2</span></td><td>No live infra: no restore drill, SLOs, rollback rehearsal, tagged release</td><td>Real deployment environment</td><td class="num">external</td></tr>
         <tr><td>G12</td><td>Product/Legal</td><td><span class="pill p0">P0</span></td><td>Public HIPAA/GDPR/BAA claims unresolved vs. README disclaimer</td><td>Counsel review</td><td class="num">external</td></tr>
-        <tr><td>G13</td><td>Interoperability</td><td><span class="pill p2">P2</span></td><td><strong>New finding:</strong> real FHIR code (<code>fhirMap.ts</code>) sits next to demo-stub FHIR/HL7 endpoints (<code>getFhirConnections</code>/<code>getHl7Interfaces</code>) using the same vocabulary — confusable as equally real</td><td>Relabel the demo stubs unambiguously in their own API responses</td><td class="num">5</td></tr>
+        <tr><td>G13</td><td>Interoperability</td><td><span class="pill good">Closed</span></td><td><strong>CLOSED 2026-08-07</strong>: the governance console's FHIR+HL7 surface was silently misclassifying real synthetic/demo data as "live" (a narrow `status.includes('demo')` check missed `'synthetic_ready'`) — fixed the classifier and the legend text that omitted this surface</td><td>None — done. Core interoperability gap (no real EHR/HIE integration) remains open, tracked separately in Domain 11's "Required for full marks"</td><td class="num">0</td></tr>
       </tbody>
     </table>
   </div>
