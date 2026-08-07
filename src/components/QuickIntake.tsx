@@ -27,6 +27,8 @@ import {
   buildHighRiskComplaintPatch,
   detectHighRiskComplaintFlags,
 } from '../services/highRiskComplaintFlags';
+import { recognizeComplaint } from '../data/clinicalTerminology/recognizeComplaint';
+import { recordTerminologyGap } from '../services/terminologyGapQueue';
 
 type QuickIntakeVariant = 'whiteboard' | 'reception';
 
@@ -262,6 +264,7 @@ export default function QuickIntake({
       }),
     [complaint, complaintCategory],
   );
+  const complaintRecognition = useMemo(() => recognizeComplaint(complaint), [complaint]);
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
@@ -271,6 +274,22 @@ export default function QuickIntake({
 
     return () => window.clearTimeout(timeout);
   }, [complaint]);
+
+  useEffect(() => {
+    // High-risk flags already surface their own recognition + category UI below —
+    // only record a terminology gap when no flag fired, so a genuinely unrecognized
+    // or general (non-flag) complaint is still captured for staff review rather than
+    // silently dropped, without duplicating the high-risk box's own signal.
+    if (detectedComplaintFlags.length) return;
+    if (complaintRecognition.confidenceTier !== 'NO_MATCH' && complaintRecognition.confidenceTier !== 'LOW_CONFIDENCE') {
+      return;
+    }
+    if (!complaintRecognition.normalizedText) return;
+    const timeout = window.setTimeout(() => {
+      recordTerminologyGap(complaintRecognition);
+    }, 1200);
+    return () => window.clearTimeout(timeout);
+  }, [complaintRecognition, detectedComplaintFlags.length]);
 
   const chooseCategory = (category: ComplaintCategory) => {
     setComplaintCategory(category);
@@ -676,6 +695,23 @@ export default function QuickIntake({
                 rows={2}
                 className="qi-textarea"
               />
+              {complaint.trim() && !detectedComplaintFlags.length ? (
+                <p
+                  className={`qi-complaint-recognition qi-complaint-recognition--${complaintRecognition.confidenceTier.toLowerCase()}`}
+                  role="status"
+                >
+                  {complaintRecognition.confidenceTier === 'NO_MATCH' ? (
+                    <>Not recognized as a standard complaint — original text kept, flagged for triage review.</>
+                  ) : (
+                    <>
+                      Recognized: <strong>{complaintRecognition.canonicalName}</strong>
+                      {complaintRecognition.confidenceTier !== 'HIGH_CONFIDENCE'
+                        ? ` (${complaintRecognition.confidenceTier === 'MEDIUM_CONFIDENCE' ? 'medium' : 'low'} confidence)`
+                        : ''}
+                    </>
+                  )}
+                </p>
+              ) : null}
             </label>
 
             {protocols.length ? (
