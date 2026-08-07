@@ -177,7 +177,7 @@ export function formatPlatformInventoryMarkdown(inv = getPlatformInventory()) {
 
   return `## Platform inventory
 
-*Reverse-engineered from shipped source on **${inv.auditedAt}**. Regenerate counts: \`npm run inventory:report\`. Detailed wiring matrices live under \`docs/\` (not in repo root).*
+*Reverse-engineered from shipped source on **${inv.auditedAt}**. Regenerate this file: \`npm run inventory:write-docs\`. Validate counts in-memory only (no file write): \`npm run inventory:report\`. Detailed wiring matrices live under \`docs/\` (not in repo root).*
 
 ### Summary
 
@@ -245,7 +245,7 @@ ${marketing}
 
 \`\`\`bash
 npm run e2e-matrix:write-docs      # docs/e2e-tool-validation-matrix.md
-npm run contract:write-docs        # docs/backend-frontend-tool-contract.md
+npm run contract:write-docs        # docs/architecture/backend-frontend-tool-contract.md
 npm run tool-matrix:write-docs     # docs/tool-render-execute-matrix.md
 npm run inventory:report           # print summary to stdout
 \`\`\``;
