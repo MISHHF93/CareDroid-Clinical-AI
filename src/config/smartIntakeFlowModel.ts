@@ -37,7 +37,12 @@ export const SMART_INTAKE_CLICK_BUDGET = Object.freeze({
 });
 
 const FIELD_COUNT = 8;
-const REQUIRED_IDENTITY_FIELDS = ['firstName', 'lastName', 'dateOfBirth', 'healthCardNumber'];
+export const REQUIRED_IDENTITY_FIELDS = [
+  'firstName',
+  'lastName',
+  'dateOfBirth',
+  'healthCardNumber',
+];
 
 function normalize(value) {
   return String(value || '')

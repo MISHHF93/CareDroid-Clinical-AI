@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { formatAuditLogEntry } from './SmartIntake';
+import { formatAuditLogEntry, buildBlankRequiredIdentityFields } from './SmartIntake';
+import {
+  buildAutoApprovedFieldDecisions,
+  REQUIRED_IDENTITY_FIELDS,
+} from '../../config/smartIntakeFlowModel';
+import { isVerificationComplete } from '../../utils/verificationWorkflow';
 
 describe('formatAuditLogEntry (2026-08-07)', () => {
   // Regression guard for a real bug: identityAuditLog was seeded from
@@ -32,5 +37,43 @@ describe('formatAuditLogEntry (2026-08-07)', () => {
     expect(formatAuditLogEntry({})).toBe('event');
     expect(formatAuditLogEntry(null)).toBe('event');
     expect(formatAuditLogEntry(undefined)).toBe('event');
+  });
+});
+
+describe('buildBlankRequiredIdentityFields (2026-08-07)', () => {
+  // Regression guard for a more severe bug found while tracing the audit-log
+  // fix: extractedFields/fieldDecisions were ALSO seeded from
+  // SMART_INTAKE_DEMO.extractedFields — a full fabricated patient ("Mei Li",
+  // DOB 1991-06-18, fake allergy "Penicillin - rash", fake medication
+  // "Metformin 500mg BID") with firstName/lastName/dateOfBirth/sex all
+  // pre-marked status: 'verified'. canContinueSmartIntakeStep allows
+  // `sessionReady` alone (set true unconditionally once a session starts) to
+  // satisfy the capture step, so staff can reach Verify Fields and Create
+  // Patient without ever uploading a document — meaning this fake identity
+  // could flow into a real new patient's record with the 4 core identity
+  // fields never surfaced for review (only the fixture's already-conflicting
+  // fields would visibly need attention).
+
+  it('returns one blank row per required identity field, matching REQUIRED_IDENTITY_FIELDS exactly', () => {
+    const fields = buildBlankRequiredIdentityFields();
+    expect(fields.map((field) => field.field)).toEqual(REQUIRED_IDENTITY_FIELDS);
+    fields.forEach((field) => {
+      expect(field.extracted).toBe('');
+      expect(field.existing).toBe('');
+      expect(field.status).toBe('unverified');
+    });
+  });
+
+  it('contains no trace of the demo fixture identity ("Mei Li", 1991-06-18, etc.)', () => {
+    const fields = buildBlankRequiredIdentityFields();
+    const serialized = JSON.stringify(fields);
+    expect(serialized).not.toMatch(/Mei|1991-06-18/);
+  });
+
+  it('is NOT auto-verified — isVerificationComplete requires staff to explicitly resolve every required field before Create Patient is reachable', () => {
+    const fields = buildBlankRequiredIdentityFields();
+    const decisions = buildAutoApprovedFieldDecisions(fields);
+    expect(Object.keys(decisions)).toHaveLength(REQUIRED_IDENTITY_FIELDS.length);
+    expect(isVerificationComplete(decisions)).toBe(false);
   });
 });

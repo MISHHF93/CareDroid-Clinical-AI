@@ -38,6 +38,7 @@ import { RECEPTION_FIRST_UX } from '../../config/receptionFirstUx.config';
 import './emergency-route.css';
 import './SmartIntake.css';
 import {
+  REQUIRED_IDENTITY_FIELDS,
   SMART_INTAKE_STEP_INDEX,
   SMART_INTAKE_STREAMLINED_STEPS,
   buildAutoApprovedFieldDecisions,
@@ -75,6 +76,28 @@ export function formatAuditLogEntry(entry: unknown): string {
   const record = entry as { action?: string; actor?: string } | null | undefined;
   const actionLabel = String(record?.action || 'event').replace(/_/g, ' ');
   return record?.actor ? `${actionLabel} — ${record.actor}` : actionLabel;
+}
+
+// A real session has none of the demo fixture's fabricated identity ("Mei Li",
+// DOB 1991-06-18, etc.) — this replaces it with blank, explicitly unverified
+// rows for the required identity fields, so isVerificationComplete() still
+// forces staff to resolve each one (approve/reject/manually enter) instead of
+// either inheriting a stranger's identity or, if simply cleared to [], letting
+// an empty field list vacuously satisfy "every field verified".
+export function buildBlankRequiredIdentityFields(): Array<{
+  field: string;
+  extracted: string;
+  existing: string;
+  status: 'unverified';
+  source: string;
+}> {
+  return REQUIRED_IDENTITY_FIELDS.map((field) => ({
+    field,
+    extracted: '',
+    existing: '',
+    status: 'unverified' as const,
+    source: 'Pending capture',
+  }));
 }
 
 function ageFromDob(dob) {
@@ -429,6 +452,15 @@ export default function SmartIntake({
           // replace the seed with the session's real (initially near-empty)
           // audit trail instead of showing fabricated history that never happened.
           setIdentityAuditLog([]);
+          // The demo fixture's fabricated identity ("Mei Li", DOB 1991-06-18,
+          // fake allergy/medication rows, pre-marked "verified") must not carry
+          // into a real session — staff can reach Create Patient without ever
+          // uploading a document (canContinueSmartIntakeStep allows sessionReady
+          // alone to satisfy the capture step), so this fake identity could
+          // otherwise flow straight into a real patient record unnoticed.
+          const blankFields = buildBlankRequiredIdentityFields();
+          setExtractedFields(blankFields);
+          setFieldDecisions(buildAutoApprovedFieldDecisions(blankFields));
           void SmartIntakeApi.fetchAuditLog(resolvedSessionId)
             .then((auditResult: any) => {
               const entries = auditResult?.auditLog || auditResult?.data?.auditLog;
