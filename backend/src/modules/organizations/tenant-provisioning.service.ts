@@ -386,6 +386,7 @@ export class TenantProvisioningService {
     if (role === UserRole.ADMIN) return 'administrator';
     if (role === UserRole.NURSE) return 'nurse';
     if (role === UserRole.STUDENT) return 'medical-student';
+    if (role === UserRole.READ_ONLY_VIEWER) return 'read-only-viewer';
     return 'emergency-physician';
   }
 

@@ -30,6 +30,16 @@ export const RolePermissions: Record<UserRole, Permission[]> = {
   ],
 
   /**
+   * READ_ONLY_VIEWER Role
+   * - Can view PHI (e.g. the Whiteboard, patient lists) for hallway monitors,
+   *   observers, or auditors
+   * - Cannot write, export, or delete PHI
+   * - Cannot use clinical tools or trigger protocols (viewing only)
+   * - Cannot manage users or system
+   */
+  [UserRole.READ_ONLY_VIEWER]: [Permission.READ_PHI],
+
+  /**
    * NURSE Role
    * - Bedside clinical access
    * - Can read and write PHI

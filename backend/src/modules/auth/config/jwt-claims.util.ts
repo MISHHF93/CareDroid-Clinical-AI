@@ -36,6 +36,7 @@ export const NEST_ROLE_DEFAULT_EMERGENCY_ROLE: Record<UserRole, EmergencyRoleCla
   [UserRole.NURSE]: 'charge_nurse',
   [UserRole.ADMIN]: 'admin',
   [UserRole.STUDENT]: 'read_only_viewer',
+  [UserRole.READ_ONLY_VIEWER]: 'read_only_viewer',
 };
 
 export type CareDroidAccessTokenClaims = {

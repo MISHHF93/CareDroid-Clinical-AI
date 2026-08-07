@@ -19,6 +19,16 @@ export enum UserRole {
   NURSE = 'nurse',
   STUDENT = 'student',
   ADMIN = 'admin',
+  /**
+   * Read-only PHI access with zero write/export/delete permissions -- e.g. a hallway
+   * monitor or an observer/auditor account. Before this role existed, the frontend's
+   * 'read_only_viewer'/'public_display' operational labels (see
+   * jwt-claims.util.ts's EMERGENCY_ROLE_CLAIM_IDS) had no corresponding backend
+   * UserRole at all, so a real account provisioned to view PHI had to be granted
+   * NURSE (READ_PHI + WRITE_PHI) or fall back to STUDENT (no PHI access at all) --
+   * "read-only" was enforced only by hiding UI controls, not at the permission layer.
+   */
+  READ_ONLY_VIEWER = 'read_only_viewer',
 }
 
 @Entity('users')
