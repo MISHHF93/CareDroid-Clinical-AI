@@ -28,6 +28,7 @@ import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermission
 import { advancePatientJourneyState, advancePatientToBoarding, getDefaultNextPatientState } from '../services/queueAssignment';
 import { arrivalModeLabel } from '../services/arrivalControlLayer';
 import { normalizePatientArrival, triageAcuityToPriority } from '../services/patientArrivalModel';
+import { recognizeComplaint } from '../data/clinicalTerminology/recognizeComplaint';
 import ReassessmentTimerBadge from './reassessment/ReassessmentTimerBadge';
 import ThreeMinuteTimer from './emergency/ThreeMinuteTimer';
 import ReassessmentTimerStrip from './reassessment/ReassessmentTimerStrip';
@@ -436,6 +437,24 @@ function PatientCard({
   );
   const displayPriority = triageAcuityToPriority(arrival.triageAcuity);
   const patientComplaint = formatPrivacySafeComplaint(arrival.chiefComplaint, privacyPolicy);
+  // Gated on the same privacy flag as the raw text itself — recognition metadata about
+  // a hidden complaint must never leak through a tooltip/badge side channel on a
+  // display where showChiefComplaint is false (e.g. Public/Read-Only Display).
+  const complaintRecognition = useMemo(
+    () => (privacyPolicy.showChiefComplaint ? recognizeComplaint(arrival.chiefComplaint) : null),
+    [arrival.chiefComplaint, privacyPolicy.showChiefComplaint],
+  );
+  const complaintTooltip =
+    complaintRecognition?.canonicalName && complaintRecognition.confidenceTier !== 'NO_MATCH'
+      ? `${patientComplaint} — Recognized: ${complaintRecognition.canonicalName}`
+      : patientComplaint;
+  // High-risk flags already surface their own badge (HighRiskComplaintFlagBadge below) —
+  // only show this hint for genuinely unrecognized, non-flagged complaints so the two
+  // signals don't compete for the same small area on a busy whiteboard.
+  const showUnrecognizedComplaintHint =
+    Boolean(privacyPolicy.showChiefComplaint) &&
+    complaintRecognition?.confidenceTier === 'NO_MATCH' &&
+    !patient.highRiskComplaintFlags?.length;
   // Merged from src/components/EmergencyPatientCard.jsx: tolerate legacy vital field names.
   const vitals = latestVitals(patient);
   const minutesWaiting = operationalMeta.waitingMinutes;
@@ -727,9 +746,14 @@ function PatientCard({
           ]
             .filter(Boolean)
             .join(' ')}
-          title={patientComplaint}
+          title={complaintTooltip}
         >
           {truncateComplaint(patientComplaint)}
+          {showUnrecognizedComplaintHint ? (
+            <span className="patient-card__complaint-unrecognized" title="Not recognized as a standard complaint — needs triage review">
+              ⚠ unrecognized
+            </span>
+          ) : null}
         </div>
 
         <div
@@ -888,8 +912,13 @@ function PatientCard({
       </div>
 
       {privacyPolicy.showChiefComplaint ? (
-        <div className="patient-card__complaint" title={patientComplaint}>
+        <div className="patient-card__complaint" title={complaintTooltip}>
           {truncateComplaint(patientComplaint)}
+          {showUnrecognizedComplaintHint ? (
+            <span className="patient-card__complaint-unrecognized" title="Not recognized as a standard complaint — needs triage review">
+              ⚠ unrecognized
+            </span>
+          ) : null}
         </div>
       ) : (
         <div className="patient-card__complaint patient-card__complaint--redacted">

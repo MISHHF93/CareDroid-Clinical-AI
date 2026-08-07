@@ -456,6 +456,18 @@
   font-style: italic;
 }
 
+.patient-card__complaint-unrecognized {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(217, 119, 6, 0.14);
+  color: #b45309;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 .patient-card__queue-reason {
   display: flex;
   flex-wrap: wrap;
