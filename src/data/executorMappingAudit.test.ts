@@ -82,4 +82,28 @@ describe('executorMappingAudit — frontend ? backend', () => {
     expect(REGISTRY_ID_TO_ORCHESTRATOR_TOOL['dispatch-ai']).toBeUndefined();
     expect(parseBackendRegistryMap()['dispatch-ai']).toBeUndefined();
   });
+
+  /**
+   * D8 regression guard (2026-08-07): the "N registered executors" figure
+   * has drifted silently 8 separate times across this campaign because
+   * nothing ever compared a hand-written mention of the count against the
+   * live registry -- e2eRegressionChecklist.ts's own hardcoded checklist
+   * text regressed from a correctly-hand-patched "39" back to a stale "3"
+   * simply because nobody re-ran this specific check. This test can't
+   * catch every future hardcoded mention (that needs the CI-wide lint rule
+   * this scorecard's D8 still calls for), but it locks down the one
+   * instance already found and fixed twice, so a 3rd regression fails CI
+   * instead of waiting for the next manual sweep.
+   */
+  it('e2eRegressionChecklist.ts cites the current registered-executor count, not a stale one', async () => {
+    const { E2E_REGRESSION_CHECKLIST } = await import('./e2eRegressionChecklist');
+    const realCount = parseBackendRegistered().length;
+    const contractDriftGroup = E2E_REGRESSION_CHECKLIST.find((group) => group.id === 'contract-drift');
+    const executorCheck = contractDriftGroup?.checks.find((check) =>
+      check.includes('REGISTERED_EXECUTOR_TOOL_IDS'),
+    );
+
+    expect(executorCheck).toBeDefined();
+    expect(executorCheck).toContain(`(${realCount} as of`);
+  });
 });
