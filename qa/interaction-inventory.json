@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-08-06T12:28:11.780Z",
-  "filesScanned": 498,
-  "total": 1136,
+  "generatedAt": "2026-08-07T06:18:40.597Z",
+  "filesScanned": 497,
+  "total": 1139,
   "byClass": {
-    "LIVE": 1132,
+    "LIVE": 1135,
     "BROKEN": 2,
     "NEEDS_REVIEW": 2
   },
@@ -27,7 +27,7 @@
       "reason": "Interactive control has no onClick/onSubmit/navigation binding"
     },
     {
-      "id": "ctrl-904",
+      "id": "ctrl-907",
       "file": "src/pages/tools/Calculators.tsx",
       "line": 432,
       "kind": "role-button",
