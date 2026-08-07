@@ -19,13 +19,32 @@ import type { ModelMaturityLabel, ModelPerformanceSnapshot } from './types';
  * at, but flagged in SCORECARD.md/the project scorecard for clinician/
  * product review before being cited externally. `multi-channel-text` was
  * not traced this pass and its algorithm claim is left as-is.
+ *
+ * 2026-08-07: that same conclusion ("confirmed... zero training" for all 7)
+ * was never applied to `maturity` — 4 of the 7 (native-ai-router,
+ * nlp-triage-expert, native-ai-cardiac-vascular-v1, native-ai-pulmonary-v1)
+ * were still marked `maturity: 'live'` while the other 3 correctly said
+ * 'demo', an internal inconsistency this same audit's own text rules out
+ * (it names all 7 in one list with no distinction). Corrected the 4 to
+ * 'demo' to match. This also fixes 3 downstream consumers that read
+ * `.maturity` directly: DriftMonitoringPanel's Model Registry display,
+ * driftMonitoring.ts's synthetic performance-snapshot sourceState (built
+ * from these same unvalidated metrics when no real history exists), and
+ * the backend operational-intelligence snapshot's `fallbackMode` flag
+ * (display-only, no consumer branches on it).
  */
 export type RegisteredNativeAiModel = {
   id: string;
   label: string;
   version: string;
   domain: string;
-  algorithm: 'xgboost' | 'random_forest' | 'logistic_regression' | 'rules' | 'router' | 'nlp_hybrid';
+  algorithm:
+    | 'xgboost'
+    | 'random_forest'
+    | 'logistic_regression'
+    | 'rules'
+    | 'router'
+    | 'nlp_hybrid';
   status: 'active' | 'shadow' | 'deprecated' | 'rollback_candidate';
   maturity: ModelMaturityLabel;
   metrics: {
@@ -46,7 +65,7 @@ const REGISTRY: RegisteredNativeAiModel[] = [
     domain: 'routing',
     algorithm: 'rules',
     status: 'active',
-    maturity: 'live',
+    maturity: 'demo',
     metrics: { f1: 0.82, accuracy: 0.86 },
     deployedAt: '2026-01-15T00:00:00.000Z',
     rollbackVersion: '0.9.0',
@@ -98,7 +117,7 @@ const REGISTRY: RegisteredNativeAiModel[] = [
     domain: 'triage',
     algorithm: 'rules',
     status: 'active',
-    maturity: 'live',
+    maturity: 'demo',
     metrics: { f1: 0.79 },
     deployedAt: '2026-02-01T00:00:00.000Z',
     rollbackVersion: '0.9.0',
@@ -123,7 +142,7 @@ const REGISTRY: RegisteredNativeAiModel[] = [
     domain: 'cardiac_vascular',
     algorithm: 'rules',
     status: 'active',
-    maturity: 'live',
+    maturity: 'demo',
     metrics: { f1: 0.81, accuracy: 0.84 },
     deployedAt: '2026-02-15T00:00:00.000Z',
     rollbackVersion: '0.9.0',
@@ -136,7 +155,7 @@ const REGISTRY: RegisteredNativeAiModel[] = [
     domain: 'pulmonary',
     algorithm: 'rules',
     status: 'active',
-    maturity: 'live',
+    maturity: 'demo',
     metrics: { f1: 0.78, accuracy: 0.82 },
     deployedAt: '2026-02-15T00:00:00.000Z',
     rollbackVersion: '0.9.0',

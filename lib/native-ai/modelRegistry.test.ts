@@ -25,10 +25,19 @@ describe('modelRegistry (P0.4 audit)', () => {
     expect(model?.algorithm).toBe('nlp_hybrid');
   });
 
-  it('still exposes maturity and requiresHumanReview for every entry, unchanged by the algorithm-field correction', () => {
+  it('exposes requiresHumanReview for every entry, unchanged by the algorithm-field correction', () => {
     for (const model of listRegisteredModels()) {
       expect(model.requiresHumanReview).toBe(true);
       expect(['live', 'demo', 'simulated', 'shadow']).toContain(model.maturity);
+    }
+  });
+
+  it('reports maturity "demo" for every entry confirmed heuristic/rule-based (2026-08-07 correction — 4 of these 7 were still marked "live", inconsistent with this same file\'s own "confirmed... zero training" conclusion for all 7)', () => {
+    const models = listRegisteredModels();
+    for (const id of HEURISTIC_IDS) {
+      const model = models.find((entry) => entry.id === id);
+      expect(model, `expected a registry entry for ${id}`).toBeDefined();
+      expect(model!.maturity).toBe('demo');
     }
   });
 });
