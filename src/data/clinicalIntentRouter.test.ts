@@ -98,3 +98,38 @@ describe('ClinicalIntentRouter', () => {
     expect(routeClinicalIntent('medication refill')).toBeNull();
   });
 });
+
+describe('ClinicalIntentRouter — canonical recognizeComplaint() fallback (2026-08-08)', () => {
+  // This router's own alias lists predate and don't share a source with
+  // highRiskComplaintFlags.ts's richer, actively-maintained synonym registry (the
+  // canonical source recognizeComplaint() consults) -- a real MISSING_SYNONYM gap:
+  // phrasings recognized everywhere else in the app returned null here. Verified
+  // empirically before fixing, not assumed from reading the alias arrays.
+
+  it('routes "pain in chest" (reversed word order the alias list never had) to the chest-pain workflow', () => {
+    expect(routeClinicalIntent('pain in chest')).toEqual(
+      expect.objectContaining({ complaint: 'Chest Pain', workflows: ['ACS Workflow'] }),
+    );
+  });
+
+  it('routes "difficulty breathing" (a phrasing the alias list never had) to the respiratory workflow', () => {
+    expect(routeClinicalIntent('difficulty breathing')).toEqual(
+      expect.objectContaining({ complaint: 'Shortness of Breath', workflows: ['Respiratory Workflow'] }),
+    );
+  });
+
+  it('routes "stomach pain" (a lay term the alias list never had) to the abdominal-pain workflow via the general concept', () => {
+    expect(routeClinicalIntent('stomach pain')).toEqual(
+      expect.objectContaining({ complaint: 'Abdominal Pain', workflows: ['Abdominal Pain Workflow'] }),
+    );
+  });
+
+  it('does not invent a workflow route for a recognized concept with no corresponding route (dizziness has no chief-complaint-dizziness route)', () => {
+    expect(routeClinicalIntent('dizzy')).toBeNull();
+  });
+
+  it('still returns null for genuinely unrelated text even though the fallback now runs on every miss', () => {
+    expect(routeClinicalIntent('medication refill')).toBeNull();
+    expect(routeClinicalIntent('xyzzy purple wombat requisition')).toBeNull();
+  });
+});

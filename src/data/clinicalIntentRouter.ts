@@ -1,4 +1,5 @@
 import { REGISTRY } from './clinicalToolIdContract';
+import { recognizeComplaint } from './clinicalTerminology/recognizeComplaint';
 
 export const COMPLAINT_FIRST_NAVIGATION_STEPS = Object.freeze([
   'Complaint',
@@ -175,16 +176,47 @@ function normalizeComplaintText(complaint = '') {
   return String(complaint).trim().toLowerCase().replace(/[^a-z0-9]+/g, ' ');
 }
 
+const ROUTES_BY_ID = new Map(CLINICAL_INTENT_ROUTES.map((route) => [route.routeId, route]));
+
+/**
+ * Maps a canonical concept id (from recognizeComplaint(), src/data/clinicalTerminology/)
+ * to the CLINICAL_INTENT_ROUTES routeId it corresponds to. This router's own alias
+ * lists predate and don't share a source with that canonical, actively-maintained
+ * registry, so a phrasing the alias list misses ("pain in chest", "difficulty
+ * breathing") can still resolve via this fallback. Deliberately conservative: only
+ * concepts with a genuine, already-existing workflow route are listed here — concepts
+ * with no corresponding route (syncope, anaphylaxis-concern, dizziness-lightheadedness,
+ * fever, palpitations, etc.) are left unmapped rather than inventing a workflow for
+ * them, matching this repo's "do not map ambiguous language directly to a diagnosis or
+ * workflow" discipline.
+ */
+const CONCEPT_ID_TO_ROUTE_ID: Readonly<Record<string, string>> = Object.freeze({
+  'chest-pain': 'chief-complaint-chest-pain',
+  'shortness-of-breath': 'chief-complaint-shortness-of-breath',
+  'stroke-symptoms': 'chief-complaint-stroke-symptoms',
+  'sepsis-concern': 'chief-complaint-sepsis-concern',
+  'severe-abdominal-pain': 'chief-complaint-abdominal-pain',
+  'abdominal-pain-general': 'chief-complaint-abdominal-pain',
+});
+
 export function routeClinicalIntent(complaint = '') {
   const normalized = normalizeComplaintText(complaint);
   if (!normalized) return null;
 
-  const route = CLINICAL_INTENT_ROUTES.find((candidate) =>
+  let route = CLINICAL_INTENT_ROUTES.find((candidate) =>
     candidate.aliases.some((alias) => {
       const normalizedAlias = normalizeComplaintText(alias);
       return normalized.includes(normalizedAlias) || normalizedAlias.includes(normalized);
     })
   );
+
+  if (!route) {
+    const recognized = recognizeComplaint(complaint);
+    const routeId = recognized.matchedConceptId
+      ? CONCEPT_ID_TO_ROUTE_ID[recognized.matchedConceptId]
+      : undefined;
+    if (routeId) route = ROUTES_BY_ID.get(routeId);
+  }
 
   if (!route) return null;
 
