@@ -26,6 +26,7 @@ import { serializePatientForBackendApi } from './patientArrivalBackendSync';
 import { completeReceptionHandoff } from './receptionHandoff';
 import { buildClientTriageAssist } from './triageAssist';
 import { createEmergencyPatient, createSmartIntakePatient } from './emergencyOsApi';
+import { detectHighRiskComplaintFlags } from './highRiskComplaintFlags';
 import {
   findDuplicateCandidates,
   type PatientDuplicateCandidate,
@@ -179,6 +180,7 @@ const FLAG_TO_PATIENT_FLAG: Record<string, PatientFlag> = {
   'Sepsis concern': PatientFlag.SepsisAlert,
   'Pregnancy emergency': PatientFlag.HighRisk,
   'Self-harm risk': PatientFlag.PsychAlert,
+  'Severe abdominal pain': PatientFlag.HighRisk,
 };
 
 function createId(prefix: string, now = Date.now()): string {
@@ -228,9 +230,22 @@ function complaintCategoryFromFlags(redFlags: string[], complaint: string): stri
 export function detectReceptionRedFlags(draft: ReceptionIntakeDraft): string[] {
   const complaint = String(draft.chiefComplaint || '').toLowerCase();
   const selected = draft.redFlagSymptoms || [];
-  const detected = HIGH_RISK_TERMS
+  // HIGH_RISK_TERMS is this orchestrator's own local list — kept because its labels
+  // ("Unconscious", "Collapse", "Seizure", "Self-harm risk") drive FLAG_TO_PATIENT_FLAG
+  // and resolvePriority's critical-severity match below, and those categories aren't in
+  // the canonical high-risk-flag registry. It was found (2026-08-08) to be a materially
+  // WEAKER independent duplicate for the categories both lists share — e.g. "SOB" typed
+  // alone matched nothing here even though it's a recognized shortness-of-breath synonym
+  // everywhere else in the app (whiteboard, notification center, quick intake). Merging
+  // in the canonical detector's matches closes that gap without dropping this list's
+  // own unique categories.
+  const legacyTextMatches = HIGH_RISK_TERMS
     .filter(({ term }) => complaint.includes(term))
     .map(({ flag }) => flag);
+  const canonicalTextMatches = detectHighRiskComplaintFlags({ complaint: draft.chiefComplaint }).map(
+    (record) => record.label,
+  );
+  const detected = [...legacyTextMatches, ...canonicalTextMatches];
 
   if (draft.consciousnessStatus === 'unresponsive') detected.push('Unconscious');
   if (draft.consciousnessStatus === 'confused') detected.push('Altered mental status');

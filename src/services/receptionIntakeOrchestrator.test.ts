@@ -286,4 +286,50 @@ describe('receptionIntakeOrchestrator', () => {
     expect(validateReceptionMinimumCriticalData(draft, 'crash')).toEqual([]);
     expect(validateReceptionMinimumCriticalData(draft, 'standard').length).toBeGreaterThan(0);
   });
+
+  describe('detectReceptionRedFlags — canonical high-risk registry merge (2026-08-08 regression)', () => {
+    // detectReceptionRedFlags previously matched complaint text ONLY against this
+    // file's own local HIGH_RISK_TERMS list (18 plain-substring terms) — a materially
+    // weaker, independently-maintained duplicate of highRiskComplaintFlags.ts's
+    // canonical, regex-based registry (used by the whiteboard, notification center,
+    // quick intake, ambulance handoff checklist, and arrival control layer). A patient
+    // typed into the Reception Command Desk's real chief-complaint field as "SOB" got
+    // NO red flag and NO priority bump, even though "sob" is a recognized
+    // shortness-of-breath synonym everywhere else in the app.
+
+    it('recognizes "SOB" as a red flag (previously matched nothing — HIGH_RISK_TERMS has no "sob" entry)', async () => {
+      const { detectReceptionRedFlags } = await import('./receptionIntakeOrchestrator');
+      const flags = detectReceptionRedFlags(baseDraft({ chiefComplaint: 'SOB' }));
+      expect(flags).toContain('Shortness of breath');
+    });
+
+    it('still recognizes "Seizure" and "Unconscious" — categories only in the local list, not the canonical registry', async () => {
+      const { detectReceptionRedFlags } = await import('./receptionIntakeOrchestrator');
+      expect(detectReceptionRedFlags(baseDraft({ chiefComplaint: 'Seizure witnessed' }))).toContain('Seizure');
+      expect(detectReceptionRedFlags(baseDraft({ chiefComplaint: 'Found unconscious' }))).toContain('Unconscious');
+    });
+
+    it('picks up canonical-registry-only synonyms (stroke FAST-positive, anaphylaxis epipen) the local list never had', async () => {
+      const { detectReceptionRedFlags } = await import('./receptionIntakeOrchestrator');
+      expect(detectReceptionRedFlags(baseDraft({ chiefComplaint: 'facial droop, slurred speech' }))).toContain(
+        'Stroke symptoms',
+      );
+      expect(detectReceptionRedFlags(baseDraft({ chiefComplaint: 'used epipen for allergic reaction' }))).toContain(
+        'Anaphylaxis concern',
+      );
+    });
+
+    it('bumps suggested priority to P2 for a SOB-only complaint via runReceptionAiIntakeAssist (previously fell through to P3/standard)', async () => {
+      const draft = baseDraft({
+        chiefComplaint: 'SOB',
+        breathingStatus: 'unknown',
+        consciousnessStatus: 'unknown',
+        visibleDistress: 'unknown',
+        painLevel: '',
+      });
+      const assist = runReceptionAiIntakeAssist(draft);
+      expect(assist.redFlags).toContain('Shortness of breath');
+      expect(assist.urgencySuggestion).not.toBe('standard');
+    });
+  });
 });

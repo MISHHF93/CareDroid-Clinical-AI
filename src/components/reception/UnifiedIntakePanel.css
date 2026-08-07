@@ -193,6 +193,27 @@ html[data-theme='dark'] .reception-command-field textarea {
   color: var(--cdl-info-text, #075985) !important;
 }
 
+.reception-complaint-recognition {
+  margin: 6px 0 0;
+  padding: 4px 10px;
+  border-radius: var(--cdl-radius-sm, 6px);
+  font-size: 12px;
+  font-weight: 600;
+  width: fit-content;
+}
+
+.reception-complaint-recognition--high_confidence {
+  background: var(--cdl-info-bg, #f0f9ff);
+  color: var(--cdl-info-text, #075985);
+}
+
+.reception-complaint-recognition--medium_confidence,
+.reception-complaint-recognition--low_confidence,
+.reception-complaint-recognition--no_match {
+  background: var(--cdl-warning-bg, #fffbeb);
+  color: var(--cdl-warning-text, #92400e);
+}
+
 .reception-command-check {
   background: var(--cdl-surface-muted, #f1f5f9) !important;
   border: 1px solid var(--cdl-border, #e2e8f0);

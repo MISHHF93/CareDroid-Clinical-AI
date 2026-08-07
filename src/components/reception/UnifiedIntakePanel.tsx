@@ -16,6 +16,8 @@ import {
 } from '../../services/receptionIntakeOrchestrator';
 import { RECEPTION_COPY } from './receptionCopy';
 import ReceptionDocumentCapture from './ReceptionDocumentCapture';
+import { recognizeComplaint } from '../../data/clinicalTerminology/recognizeComplaint';
+import { recordTerminologyGap } from '../../services/terminologyGapQueue';
 import './UnifiedIntakePanel.css';
 
 const ARRIVAL_TYPES: Array<{ id: ReceptionArrivalType; label: string }> = [
@@ -105,6 +107,10 @@ export default function UnifiedIntakePanel({
   );
   const recommendedSafety = useMemo(() => listReceptionRecommendedSafetyFields(draft), [draft]);
   const liveRedFlags = useMemo(() => detectReceptionRedFlags(draft), [draft]);
+  const complaintRecognition = useMemo(
+    () => recognizeComplaint(draft.chiefComplaint),
+    [draft.chiefComplaint],
+  );
   const primaryAction = useMemo(
     () => resolveUnifiedIntakePrimaryAction(draft, aiAssist),
     [draft, aiAssist],
@@ -140,6 +146,20 @@ export default function UnifiedIntakePanel({
     }, 450);
     return () => window.clearTimeout(timer);
   }, [draft, liveRedFlags.length, onAiAssistChange]);
+
+  useEffect(() => {
+    if (complaintRecognition.confidenceTier !== 'NO_MATCH' && complaintRecognition.confidenceTier !== 'LOW_CONFIDENCE') {
+      return;
+    }
+    if (!complaintRecognition.normalizedText) return;
+    // Debounced so we don't write a gap event on every keystroke — only once
+    // typing settles on text that stayed unrecognized. Raw text is preserved as
+    // typed; never replaced or discarded (see terminologyGapQueue.ts).
+    const timer = window.setTimeout(() => {
+      recordTerminologyGap(complaintRecognition);
+    }, 1200);
+    return () => window.clearTimeout(timer);
+  }, [complaintRecognition]);
 
   const toggleRedFlag = (flag: string) => {
     const next = new Set(draft.redFlagSymptoms || []);
@@ -282,6 +302,24 @@ export default function UnifiedIntakePanel({
                 placeholder="Primary symptom or observable emergency"
                 rows={3}
               />
+              {draft.chiefComplaint?.trim() ? (
+                <p
+                  className={`reception-complaint-recognition reception-complaint-recognition--${complaintRecognition.confidenceTier.toLowerCase()}`}
+                  role="status"
+                >
+                  {complaintRecognition.confidenceTier === 'NO_MATCH' ? (
+                    <>Not recognized as a standard complaint — original text will be used and flagged for triage review.</>
+                  ) : (
+                    <>
+                      Suggested: <strong>{complaintRecognition.canonicalName}</strong>
+                      {complaintRecognition.confidenceTier !== 'HIGH_CONFIDENCE'
+                        ? ` (${complaintRecognition.confidenceTier === 'MEDIUM_CONFIDENCE' ? 'medium' : 'low'} confidence — confirm before routing)`
+                        : ''}
+                      {' · original wording is kept as entered'}
+                    </>
+                  )}
+                </p>
+              ) : null}
             </label>
             <label className="reception-command-field">
               <span>Estimated age</span>
