@@ -61,6 +61,7 @@ import {
 } from './patient-duplicate-detection';
 import { Patient } from './entities/patient.entity';
 import { Alert } from './entities/alert.entity';
+import { Referral as ReferralEntity } from './entities/referral.entity';
 import { WorkflowActionLogEntry } from './entities/workflow-action-log-entry.entity';
 import { EncryptionService } from '../encryption/encryption.service';
 
@@ -2203,10 +2204,78 @@ export class BoardingService {
 }
 
 @Injectable()
-export class ReferralService {
-  constructor(private readonly patientService: EmergencyPatientService) {}
+export class ReferralService implements OnModuleInit {
+  private readonly logger = new Logger(ReferralService.name);
+
+  constructor(
+    private readonly patientService: EmergencyPatientService,
+    @Optional()
+    @InjectRepository(ReferralEntity)
+    private readonly referralRepository?: Repository<ReferralEntity>,
+  ) {}
 
   private readonly createdReferrals: Array<Record<string, unknown>> = [];
+
+  /** Load durable referrals from TypeORM so a created referral survives process restart. */
+  async onModuleInit(): Promise<void> {
+    if (!this.referralRepository) return;
+    try {
+      const rows = await this.referralRepository.find();
+      for (const row of rows) {
+        if (this.createdReferrals.some((existing) => existing.id === row.id)) continue;
+        this.createdReferrals.push(this.mapEntityToReferral(row));
+      }
+    } catch (error) {
+      this.logger.warn(`Failed to rehydrate referrals from database: ${error}`);
+    }
+  }
+
+  private mapEntityToReferral(entity: ReferralEntity): Record<string, unknown> {
+    // Re-derived fresh from the live patient list rather than stored on the entity --
+    // a persisted snapshot would go stale the moment the patient's own record changes
+    // (state, flags, etc.), the same reasoning getReferrals()'s synthetic rows already
+    // use for patient-derived referrals.
+    const patient = this.patientService
+      .listPatients()
+      .find((candidate) => candidate.id === entity.patientId);
+    return {
+      id: entity.id,
+      patientId: entity.patientId,
+      patient,
+      requestingStaffId: entity.requestingStaffId,
+      targetDepartment: entity.targetDepartment,
+      specialty: entity.specialty,
+      urgency: entity.urgency,
+      reason: entity.reason,
+      clinicalSummary: entity.clinicalSummary,
+      status: entity.status,
+      workflow: entity.workflow,
+      requestedAt: entity.requestedAt,
+      statusUpdatedAt: entity.statusUpdatedAt,
+      createdAt: entity.requestedAt,
+    };
+  }
+
+  private persistReferralToDatabase(referral: Record<string, unknown>): void {
+    if (!this.referralRepository) return;
+    const entity = this.referralRepository.create({
+      id: String(referral.id),
+      patientId: String(referral.patientId || ''),
+      requestingStaffId: String(referral.requestingStaffId || ''),
+      targetDepartment: String(referral.targetDepartment || ''),
+      specialty: String(referral.specialty || ''),
+      urgency: String(referral.urgency || ''),
+      reason: String(referral.reason || ''),
+      clinicalSummary: String(referral.clinicalSummary || ''),
+      status: String(referral.status || ''),
+      workflow: String(referral.workflow || ''),
+      requestedAt: String(referral.requestedAt || ''),
+      statusUpdatedAt: referral.statusUpdatedAt ? String(referral.statusUpdatedAt) : undefined,
+    });
+    this.referralRepository.save(entity).catch((error) => {
+      this.logger.warn(`Failed to persist referral ${entity.id} to database: ${error}`);
+    });
+  }
 
   getReferrals() {
     const patients = this.patientService
@@ -2260,6 +2329,7 @@ export class ReferralService {
     };
 
     this.createdReferrals.push(referral);
+    this.persistReferralToDatabase(referral);
 
     return envelope('Referral Created', {
       referral,
@@ -2277,6 +2347,7 @@ export class ReferralService {
     }
     referral.status = status;
     referral.statusUpdatedAt = new Date().toISOString();
+    this.persistReferralToDatabase(referral);
 
     return envelope('Referral Status Updated', {
       referral,

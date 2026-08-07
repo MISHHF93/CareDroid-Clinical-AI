@@ -68,6 +68,7 @@ import { Patient } from './entities/patient.entity';
 import { Room } from './entities/room.entity';
 import { Staff } from './entities/staff.entity';
 import { Alert } from './entities/alert.entity';
+import { Referral } from './entities/referral.entity';
 import { WorkflowActionLogEntry } from './entities/workflow-action-log-entry.entity';
 import { EmergencyReferenceDataSeedService } from './emergency-reference-data.seed.service';
 import { WorkflowOrchestrationService } from './emergency-os.workflow-orchestration.service';
@@ -81,6 +82,7 @@ import { EmergencyOperatingSurfacesService } from './emergency-os.operating-surf
       Room,
       Staff,
       Alert,
+      Referral,
       WorkflowActionLogEntry,
     ]),
     ConfigModule,
