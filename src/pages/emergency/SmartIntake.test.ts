@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { formatAuditLogEntry, buildBlankRequiredIdentityFields } from './SmartIntake';
 import {
@@ -5,6 +8,10 @@ import {
   REQUIRED_IDENTITY_FIELDS,
 } from '../../config/smartIntakeFlowModel';
 import { isVerificationComplete } from '../../utils/verificationWorkflow';
+import { BACKEND_API_CAPABILITY_STATUS, BACKEND_CAPABILITY_STATUS } from '../../config/backendApiCapabilities';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const smartIntakeSource = readFileSync(join(__dirname, 'SmartIntake.tsx'), 'utf8');
 
 describe('formatAuditLogEntry (2026-08-07)', () => {
   // Regression guard for a real bug: identityAuditLog was seeded from
@@ -75,5 +82,54 @@ describe('buildBlankRequiredIdentityFields (2026-08-07)', () => {
     const decisions = buildAutoApprovedFieldDecisions(fields);
     expect(Object.keys(decisions)).toHaveLength(REQUIRED_IDENTITY_FIELDS.length);
     expect(isVerificationComplete(decisions)).toBe(false);
+  });
+});
+
+describe('startBackendSession demo-identity clearing (2026-08-08 regression)', () => {
+  // The 2026-08-07 fix above (buildBlankRequiredIdentityFields) was only ever
+  // invoked from the `isBackendCapabilityEnabled('emergencySmartIntakeIdentitySession')`
+  // branch of startBackendSession. But that capability is DISABLED by default
+  // (asserted below, matching backendApiCapabilities.test.ts) — so every real
+  // session in the actual running app takes the `else` (fetchSmartIntake)
+  // branch instead, which never called the clearing logic at all. The fix was
+  // real code, wired to a branch that never executes: the fabricated "Mei Li"
+  // identity and demo audit log were still live for every real staff session.
+  // These are source-wiring checks (this codebase's own established pattern —
+  // see ReceptionWorkspace.test.tsx, platformWiring.contract.test.ts) because
+  // startBackendSession is a component-internal closure, not an exported unit.
+
+  it('emergencySmartIntakeIdentitySession is disabled by default, so the fallback branch is the one real sessions actually take', () => {
+    expect(BACKEND_API_CAPABILITY_STATUS.emergencySmartIntakeIdentitySession).toBe(
+      BACKEND_CAPABILITY_STATUS.DISABLED,
+    );
+  });
+
+  it('the fallback (else) branch that runs when the identity-session capability is disabled clears the demo identity seed', () => {
+    const elseBranchStart = smartIntakeSource.indexOf('const result = await fetchSmartIntake();');
+    const elseBranchEnd = smartIntakeSource.indexOf(
+      "setActiveStepTracked(resolveSessionStartStep(), 'session-start');",
+    );
+    expect(elseBranchStart).toBeGreaterThan(-1);
+    expect(elseBranchEnd).toBeGreaterThan(elseBranchStart);
+    const elseBranch = smartIntakeSource.slice(elseBranchStart, elseBranchEnd);
+    expect(elseBranch).toContain('clearDemoIdentitySeed(resolvedSessionId, { fetchAuditLog: false })');
+  });
+
+  it('the catch (safeguarded review mode) branch also clears the demo identity seed, since sessionReady is still set true on error', () => {
+    const catchStart = smartIntakeSource.indexOf('} catch (error: any) {');
+    const catchEnd = smartIntakeSource.indexOf('} finally {');
+    expect(catchStart).toBeGreaterThan(-1);
+    expect(catchEnd).toBeGreaterThan(catchStart);
+    const catchBranch = smartIntakeSource.slice(catchStart, catchEnd);
+    expect(catchBranch).toContain('clearDemoIdentitySeed(null, { fetchAuditLog: false })');
+  });
+
+  it('the fallback branch does not fetch /audit-log with a non-identity session id (would 404 and silently reintroduce the demo audit log via the API client\'s own fallback)', () => {
+    const elseBranchStart = smartIntakeSource.indexOf('const result = await fetchSmartIntake();');
+    const elseBranchEnd = smartIntakeSource.indexOf(
+      "setActiveStepTracked(resolveSessionStartStep(), 'session-start');",
+    );
+    const elseBranch = smartIntakeSource.slice(elseBranchStart, elseBranchEnd);
+    expect(elseBranch).not.toContain('fetchAuditLog(resolvedSessionId)');
   });
 });

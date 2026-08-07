@@ -433,6 +433,40 @@ export default function SmartIntake({
     [fieldDecisions],
   );
 
+  // The demo fixture's fabricated identity ("Mei Li", DOB 1991-06-18, fake
+  // allergy/medication rows, pre-marked "verified") must not carry into any
+  // real session — staff can reach Create Patient without ever uploading a
+  // document (canContinueSmartIntakeStep allows sessionReady alone to satisfy
+  // the capture step), so this fake identity could otherwise flow straight
+  // into a real patient record unnoticed. This must run on every path that
+  // can set sessionReady, not only the identity-session branch: with
+  // `emergencySmartIntakeIdentitySession` currently DISABLED (see
+  // backendApiCapabilities.ts), every real session in production takes the
+  // `else`/fallback branch below, which never reached this clearing logic
+  // before — the original 2026-08-07 fix only patched a branch that is
+  // presently unreachable.
+  const clearDemoIdentitySeed = (resolvedSessionId: string | null, { fetchAuditLog = true } = {}) => {
+    // A real session has none of the demo fixture's canned audit events —
+    // replace the seed with the session's real (initially near-empty) audit
+    // trail instead of showing fabricated history that never happened.
+    setIdentityAuditLog([]);
+    const blankFields = buildBlankRequiredIdentityFields();
+    setExtractedFields(blankFields);
+    setFieldDecisions(buildAutoApprovedFieldDecisions(blankFields));
+    if (!fetchAuditLog || !resolvedSessionId) return;
+    void SmartIntakeApi.fetchAuditLog(resolvedSessionId)
+      .then((auditResult: any) => {
+        const entries = auditResult?.auditLog || auditResult?.data?.auditLog;
+        if (Array.isArray(entries) && entries.length) {
+          // Prepend rather than replace: a fast staff action between the
+          // session starting and this fetch resolving may have already
+          // appended a locally-tracked entry — don't drop it.
+          setIdentityAuditLog((current) => [...entries.map(formatAuditLogEntry), ...current]);
+        }
+      })
+      .catch(() => undefined);
+  };
+
   const startBackendSession = async () => {
     if (!canVerifyIntake) {
       setErrorMessage(`${emergencyRole.roleLabel} cannot start Smart Intake review.`);
@@ -448,38 +482,18 @@ export default function SmartIntake({
         setSessionId(resolvedSessionId);
         setStatusMessage('Identity session started with backend OCR and match pipeline.');
         if (!result?.localDemo) {
-          // A real session has none of the demo fixture's canned audit events —
-          // replace the seed with the session's real (initially near-empty)
-          // audit trail instead of showing fabricated history that never happened.
-          setIdentityAuditLog([]);
-          // The demo fixture's fabricated identity ("Mei Li", DOB 1991-06-18,
-          // fake allergy/medication rows, pre-marked "verified") must not carry
-          // into a real session — staff can reach Create Patient without ever
-          // uploading a document (canContinueSmartIntakeStep allows sessionReady
-          // alone to satisfy the capture step), so this fake identity could
-          // otherwise flow straight into a real patient record unnoticed.
-          const blankFields = buildBlankRequiredIdentityFields();
-          setExtractedFields(blankFields);
-          setFieldDecisions(buildAutoApprovedFieldDecisions(blankFields));
-          void SmartIntakeApi.fetchAuditLog(resolvedSessionId)
-            .then((auditResult: any) => {
-              const entries = auditResult?.auditLog || auditResult?.data?.auditLog;
-              if (Array.isArray(entries) && entries.length) {
-                // Prepend rather than replace: a fast staff action between the
-                // session starting and this fetch resolving may have already
-                // appended a locally-tracked entry — don't drop it.
-                setIdentityAuditLog((current) => [
-                  ...entries.map(formatAuditLogEntry),
-                  ...current,
-                ]);
-              }
-            })
-            .catch(() => undefined);
+          clearDemoIdentitySeed(resolvedSessionId);
         }
       } else {
         const result = await fetchSmartIntake();
-        setSessionId(result.data?.sessionId || result.generatedAt || SMART_INTAKE_DEMO.sessionId);
+        const resolvedSessionId =
+          result.data?.sessionId || result.generatedAt || SMART_INTAKE_DEMO.sessionId;
+        setSessionId(resolvedSessionId);
         setStatusMessage('Backend Smart Intake contract loaded for staff review.');
+        // This branch's sessionId isn't a genuine identity-session id, so
+        // fetching /audit-log against it would 404 and silently fall back to
+        // the SAME demo audit log this function exists to clear — skip it.
+        clearDemoIdentitySeed(resolvedSessionId, { fetchAuditLog: false });
       }
       setActiveStepTracked(resolveSessionStartStep(), 'session-start');
     } catch (error: any) {
@@ -487,6 +501,9 @@ export default function SmartIntake({
         `${formatApiRecoveryMessage(error, 'Smart Intake session')} Continue verification in safeguarded review mode.`,
       );
       setStatusMessage('Safeguarded identity review is active for this session.');
+      // Safeguarded review mode still sets sessionReady=true below, so the
+      // demo identity must be cleared here too, not just on the success paths.
+      clearDemoIdentitySeed(null, { fetchAuditLog: false });
       setActiveStepTracked(resolveSessionStartStep(), 'session-start-fallback');
     } finally {
       setIsStarting(false);
