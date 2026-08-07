@@ -70,6 +70,13 @@ function extractedFieldValue(fieldName, fields = [] as any[], fallback = '') {
   return fields.find((field) => field.field === fieldName)?.extracted || fallback;
 }
 
+export function formatAuditLogEntry(entry: unknown): string {
+  if (typeof entry === 'string') return entry;
+  const record = entry as { action?: string; actor?: string } | null | undefined;
+  const actionLabel = String(record?.action || 'event').replace(/_/g, ' ');
+  return record?.actor ? `${actionLabel} — ${record.actor}` : actionLabel;
+}
+
 function ageFromDob(dob) {
   const date = new Date(`${dob}T00:00:00`);
   if (!Number.isFinite(date.getTime())) return 0;
@@ -413,8 +420,30 @@ export default function SmartIntake({
     try {
       if (isBackendCapabilityEnabled('emergencySmartIntakeIdentitySession')) {
         const result = await SmartIntakeApi.createSession(emergencyRole.roleLabel);
-        setSessionId(result?.sessionId || result?.data?.sessionId || SMART_INTAKE_DEMO.sessionId);
+        const resolvedSessionId =
+          result?.sessionId || result?.data?.sessionId || SMART_INTAKE_DEMO.sessionId;
+        setSessionId(resolvedSessionId);
         setStatusMessage('Identity session started with backend OCR and match pipeline.');
+        if (!result?.localDemo) {
+          // A real session has none of the demo fixture's canned audit events —
+          // replace the seed with the session's real (initially near-empty)
+          // audit trail instead of showing fabricated history that never happened.
+          setIdentityAuditLog([]);
+          void SmartIntakeApi.fetchAuditLog(resolvedSessionId)
+            .then((auditResult: any) => {
+              const entries = auditResult?.auditLog || auditResult?.data?.auditLog;
+              if (Array.isArray(entries) && entries.length) {
+                // Prepend rather than replace: a fast staff action between the
+                // session starting and this fetch resolving may have already
+                // appended a locally-tracked entry — don't drop it.
+                setIdentityAuditLog((current) => [
+                  ...entries.map(formatAuditLogEntry),
+                  ...current,
+                ]);
+              }
+            })
+            .catch(() => undefined);
+        }
       } else {
         const result = await fetchSmartIntake();
         setSessionId(result.data?.sessionId || result.generatedAt || SMART_INTAKE_DEMO.sessionId);

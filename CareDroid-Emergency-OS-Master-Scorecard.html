@@ -174,15 +174,15 @@
     <div class="score-ring">
       <svg width="160" height="160" viewBox="0 0 160 160">
         <circle class="track" cx="80" cy="80" r="68" fill="none" stroke-width="11"></circle>
-        <circle class="fill" cx="80" cy="80" r="68" fill="none" stroke-width="11" stroke-dasharray="427.3" stroke-dashoffset="149.1"></circle>
+        <circle class="fill" cx="80" cy="80" r="68" fill="none" stroke-width="11" stroke-dasharray="427.3" stroke-dashoffset="147.9"></circle>
       </svg>
-      <div class="num"><strong>65.1</strong><span>/ 100</span></div>
+      <div class="num"><strong>65.4</strong><span>/ 100</span></div>
     </div>
     <div class="hero-body">
       <span class="band-chip">Significant improvement required (repository-verifiable ceiling)</span>
       <h2>Corrected 2026-08-06: 3 of the scorecard's own original findings were themselves wrong — a dedicated verification pass found real mechanisms this first draft had scored as absent, and 3 concrete bugs found along the way are now fixed</h2>
       <p>
-        <strong>Repository Implementation Score: 651/1000 (65.1%), up from an initial 520/1000.</strong>
+        <strong>Repository Implementation Score: 654/1000 (65.4%), up from an initial 520/1000.</strong>
         <strong>Pilot Evidence Score: ~10/100</strong> — unchanged; code existing and being wired is still not
         evidence of clinical validation. A dedicated research pass corrected 3 domains this scorecard originally
         got wrong: <strong>Waiting Room Safety</strong> (42→58/100) — a real backend cron and a real client-side
@@ -208,7 +208,7 @@
 
   <div class="decision-strip">
     <div class="decision-card"><span class="decision-label">Pilot gate</span><div class="decision-value" style="color:var(--red)">NOT READY FOR PILOT</div><p>6 P0 gates open on the sibling scorecard; none require more code alone.</p></div>
-    <div class="decision-card"><span class="decision-label">Repo implementation</span><div class="decision-value">651 / 1000</div><p>Evidence-backed, code-level maturity across 12 domains.</p></div>
+    <div class="decision-card"><span class="decision-label">Repo implementation</span><div class="decision-value">654 / 1000</div><p>Evidence-backed, code-level maturity across 12 domains.</p></div>
     <div class="decision-card"><span class="decision-label">Pilot evidence</span><div class="decision-value" style="color:var(--amber)">~10 / 100</div><p>Live/clinician/external validation, separated from implementation.</p></div>
     <div class="decision-card"><span class="decision-label">Evidence confidence</span><div class="decision-value">High</div><p>Every score cites a file, route, test, or command — 3 domains marked NOT VERIFIED rather than guessed.</p></div>
   </div>
@@ -221,7 +221,7 @@
     <table class="cat">
       <thead><tr><th>Domain</th><th class="num">Weight</th><th class="num">Score</th><th class="num">%</th><th>Confidence</th><th>Status</th></tr></thead>
       <tbody>
-        <tr><td>1. Product &amp; Workflow Completeness</td><td class="num">150</td><td class="num">83</td><td class="num">55%</td><td>Strong evidence</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
+        <tr><td>1. Product &amp; Workflow Completeness</td><td class="num">150</td><td class="num">86</td><td class="num">57%</td><td>Confirmed</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
         <tr><td>2. Waiting Room Safety</td><td class="num">100</td><td class="num">58</td><td class="num">58%</td><td>Confirmed</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
         <tr><td>3. Emergency Whiteboard &amp; Queue Intelligence</td><td class="num">100</td><td class="num">61</td><td class="num">61%</td><td>Confirmed</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
         <tr><td>4. EMS &amp; Offload</td><td class="num">75</td><td class="num">48</td><td class="num">64%</td><td>Confirmed</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
@@ -233,7 +233,7 @@
         <tr><td>10. Quality Engineering &amp; Pilot Readiness</td><td class="num">100</td><td class="num">63</td><td class="num">63%</td><td>Confirmed</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
         <tr><td>11. Interoperability, Data &amp; Integration Readiness</td><td class="num">25</td><td class="num">12</td><td class="num">48%</td><td>Confirmed (mixed)</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
         <tr><td>12. AI Governance &amp; Operational Intelligence</td><td class="num">25</td><td class="num">24</td><td class="num">96%</td><td>Strong evidence</td><td>🔵 <span class="pill strong">Strong</span></td></tr>
-        <tr><td><strong>Total</strong></td><td class="num"><strong>1000</strong></td><td class="num"><strong>651</strong></td><td class="num"><strong>65%</strong></td><td>—</td><td>—</td></tr>
+        <tr><td><strong>Total</strong></td><td class="num"><strong>1000</strong></td><td class="num"><strong>654</strong></td><td class="num"><strong>65%</strong></td><td>—</td><td>—</td></tr>
       </tbody>
     </table>
   </div>
@@ -247,10 +247,10 @@
 
     <article class="dom-card partial">
       <div class="dom-main">
-        <div class="dom-top"><span class="dom-index">01 / 12</span><span class="dom-score">83<span> / 150</span></span></div>
+        <div class="dom-top"><span class="dom-index">01 / 12</span><span class="dom-score">86<span> / 150</span></span></div>
         <span class="status-chip partial">Partial</span>
         <h3>Product &amp; Workflow Completeness</h3>
-        <div class="progress-track"><div class="progress-fill partial" style="width: 55%"></div></div>
+        <div class="progress-track"><div class="progress-fill partial" style="width: 57%"></div></div>
       </div>
       <details>
         <summary>Full review</summary>
@@ -259,22 +259,24 @@
           <ul>
             <li>Clear reception-first ED model with 23 defined role personas and an explicit human-review boundary for AI<span class="conf confirmed">Confirmed</span> — README scope, 11 workflow suites.</li>
             <li>The 911→outcome journey (arrival → registration → triage → waiting → reassessment → provider → disposition) has real, live-wired backend controllers for the majority of its stages: <code>SmartIntakeController</code> (14 endpoints, 6 with confirmed real frontend callers), <code>ReassessmentController</code> (3 endpoints, all with real callers), <code>BoardingController</code> (6 endpoints, all real callers), <code>EmsController</code> (4 endpoints, all real callers, real Socket.IO whiteboard bridge)<span class="conf confirmed">Confirmed</span> — each migrated off legacy Express onto NestJS with <code>AuthGuard('jwt')</code>+<code>AuthorizationGuard</code>, live-boot-verified returning 401 (not 404) without a token.</li>
+            <li><strong>CORRECTED 2026-08-07 — the "8 of 14 SmartIntake endpoints unwired" claim overcounted by 2.</strong> Traced every one of <code>SmartIntakeController</code>'s 14 endpoints against <code>smartIntakeApi.ts</code>'s real client methods (all 14 present) and then against real callers in <code>SmartIntake.tsx</code> — confirmed 6 are called directly (<code>createSession</code>, <code>matchPatient</code>, <code>verifyField</code>, <code>linkPatient</code>, <code>createPatient</code>, <code>addEmsEvidence</code>). Of the remaining 8, 2 (<code>uploadDocument</code>, <code>submitOcrResult</code>) are NOT actually gaps — the real document-upload/OCR flow (<code>handleDocumentUpload</code> → <code>captureIntakeArtifact</code>) already runs through a separate, newer, genuinely live pipeline (<code>OcrIntakeApi.createJob</code>/<code>applyToIntake</code>, hitting <code>EmergencyOsController</code>'s <code>ocr-jobs</code> routes), confirmed by direct code read, not inferred. The real remaining gap is 6 of 14, not 8<span class="conf confirmed">Confirmed</span>.</li>
+            <li><strong>FOUND AND FIXED 2026-08-07 — a real, previously-unknown bug surfaced while tracing this: every real Smart Intake session's identity-verification audit log started pre-populated with 4 fabricated demo events ("Document uploaded", "OCR extracted", "Candidate match generated", "Duplicate warning shown") that never happened in that session.</strong> <code>identityAuditLog</code> was seeded once from <code>SMART_INTAKE_DEMO.auditLog</code> and never cleared or reconciled with the real backend audit trail (<code>SmartIntakeController</code>'s <code>GET :id/audit-log</code> — itself one of the 6 genuinely-unwired endpoints above) even when a real backend session started successfully. A staff member reviewing a real session's audit history for a clinical identity-verification decision would see 4 plausible-looking events that were never real. Fixed by clearing the seed and fetching the real audit log on a successful live session start, formatting each real entry (<code>{action, actor, timestamp, details}</code>) into the plain-string shape the rendering component already expects — closing one of the 6 genuinely-unwired endpoints as a side effect. New <code>src/pages/emergency/SmartIntake.test.ts</code> (this page had zero prior test coverage at all), guard proven by revert-and-restore.</li>
           </ul>
           <h4>What is partial</h4>
           <ul>
             <li><strong>Of 87 tracked workflow-suite assignments, only 41 are classified "live"</strong> — 30 are demo/fixture-backed, 12 are preview-stage, 4 are planned-only<span class="conf strong-ev">Strong evidence</span> (Project Scorecard dim 2 evidence). Capability breadth genuinely exceeds fully-wired live depth across the platform, not just in the domains scored separately below.</li>
-            <li>SmartIntake specifically: 8 of its 14 real backend endpoints have no confirmed UI trigger yet — "real, wired, not yet invoked," a pattern this program's own campaign documented recurring since a much earlier cycle<span class="conf confirmed">Confirmed</span>.</li>
+            <li>SmartIntake specifically: 6 of its 14 real backend endpoints still have no confirmed UI trigger (<code>submitManualEntry</code>, <code>continueUnknown</code>, <code>reconcileUnknown</code>, <code>captureBiometricConsent</code>, <code>withdrawBiometricConsent</code>, <code>fetchAuditLog</code> — the last of which is now at least fetched, just not shown as a standalone "audit log" view of its own) — "real, wired, not yet invoked," a pattern this program's own campaign documented recurring since a much earlier cycle<span class="conf confirmed">Confirmed</span>.</li>
           </ul>
           <h4>What is missing</h4>
           <ul>
             <li>A single, reviewed live/demo/preview/planned claims registry does not yet exist — the 41/30/12/4 split above is the closest thing, and it is itself not independently re-verified per-suite in this pass.</li>
           </ul>
           <h4>Risks</h4>
-          <p>A stakeholder reading "11 workflow suites" as a completeness claim would be misled without also knowing under half are confirmed live.</p>
+          <p>A stakeholder reading "11 workflow suites" as a completeness claim would be misled without also knowing under half are confirmed live. The audit-log finding above is a good example of a smaller, boundedly-scoped claim ("8 of 14 unwired") being worth the same direct-code-tracing discipline as the larger, harder-to-verify 41/87 claim — it surfaced both a real correction and a real, fixable bug the original claim's framing would not have led anyone toward.</p>
           <h4>Evidence</h4>
-          <p>README.md scope section; Project Scorecard dims 1-2; <code>backend/src/modules/{smart-intake,reassessment,boarding,ems}/*.controller.ts</code> (this session's own live-boot verification history).</p>
+          <p>README.md scope section; Project Scorecard dims 1-2; <code>backend/src/modules/{smart-intake,reassessment,boarding,ems}/*.controller.ts</code> (this session's own live-boot verification history); <code>src/services/smartIntakeApi.ts</code>, <code>src/services/intakeArtifactCapture.ts</code>, <code>src/pages/emergency/SmartIntake.tsx</code>+<code>SmartIntake.test.ts</code> (2026-08-07 additions).</p>
           <h4>Required for full marks</h4>
-          <p>Publish and maintain one authoritative live/demo/preview/planned registry per workflow suite, independently re-verified (not self-reported), and close the 46 non-live suite assignments to "live" or explicitly re-scope them as roadmap.</p>
+          <p>Publish and maintain one authoritative live/demo/preview/planned registry per workflow suite, independently re-verified (not self-reported), and close the 46 non-live suite assignments to "live" or explicitly re-scope them as roadmap. Wire or explicitly retire the 6 remaining unwired SmartIntake endpoints.</p>
         </div>
       </details>
     </article>
