@@ -208,7 +208,7 @@
     </div>
     <div class="meta-block">
       Generated 2026-08-06<br />
-      HEAD <code style="font-family: var(--mono)">08bbba65</code><br />
+      HEAD <code style="font-family: var(--mono)">ef5ebadd</code><br />
       <a href="https://github.com/MISHHF93/CareDroid-Clinical-AI">github.com/MISHHF93/CareDroid-Clinical-AI</a>
     </div>
   </header>
@@ -554,6 +554,7 @@
             <li>The orphan-detection scanner's quarantine bucket is genuinely at zero<span class="conf confirmed">Confirmed</span> by regenerating the report directly this session (<code>npm run orphan-detection:write-docs</code>) — <code>quarantine: 0</code> in both the pre- and post-regeneration runs.</li>
             <li>59 truly-unused <code>import React from 'react'</code> statements removed, each individually verified against real usage rather than assumed, earlier this campaign<span class="conf strong-ev">Strong evidence</span>.</li>
             <li>Dead code is deleted outright when confirmed, not just commented out or left as "// removed" markers<span class="conf confirmed">Confirmed</span> — this session's own <code>src/components/surfaces/Card.tsx</code> deletion (zero real importers, traced through every barrel re-export) is a direct example.</li>
+            <li>A second, more consequential instance found+removed this session: <code>backend/src/services/copilot.service.ts</code> (a pre-migration Mongoose service) had zero real HTTP reachability — its only consumers were a generic service-registry health-check loop that never calls its business-logic method<span class="conf confirmed">Confirmed</span> by tracing every import site. It had also already been flagged obsolete in <code>src/config/unifiedServiceRegistry.config.ts</code>'s <code>OBSOLETE_SERVICE_REDIRECTS</code> from an earlier session — deleted, its 2 dead re-export sites cleaned up, and the now-stale redirect entry removed rather than left pointing at a file that no longer exists. Its one piece of real, non-duplicated logic (a clinical safety-floor check) was ported to the live copilot path first, not discarded — see the Emergency OS Master Scorecard's AI Governance domain for that half of the fix.</li>
           </ul>
           <h4>Defects and Weaknesses</h4>
           <ul>
