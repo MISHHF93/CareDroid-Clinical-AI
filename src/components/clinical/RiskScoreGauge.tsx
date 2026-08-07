@@ -1,6 +1,15 @@
 import './RiskScoreGauge.css';
 
-const RiskScoreGauge = ({ value, category, confidence, size = 'medium', label = 'Risk Score' }) => {
+type RiskScoreGaugeProps = {
+  value?: number | null;
+  category?: string;
+  /** Optional: no current caller computes a real confidence value for a risk score. */
+  confidence?: number;
+  size?: 'small' | 'medium' | 'large';
+  label?: string;
+};
+
+const RiskScoreGauge = ({ value, category, confidence, size = 'medium', label = 'Risk Score' }: RiskScoreGaugeProps) => {
   if (value === undefined || value === null) return null;
 
   const getSeverityColor = (cat) => {

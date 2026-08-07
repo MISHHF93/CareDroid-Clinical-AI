@@ -267,7 +267,6 @@ const ToolPageLayout = ({
               <RiskScoreGauge
                 value={riskData.riskScore}
                 category={riskData.severity}
-                confidence={(riskData as any).confidence}
                 size="medium"
                 label="Overall Patient Risk"
               />
