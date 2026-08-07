@@ -51,3 +51,39 @@ describe('calculatorRecommendationService', () => {
     expect(message).toContain('Clinical keywords: PE DVT');
   });
 });
+
+describe('calculatorRecommendationService — canonical recognizeComplaint() fallback (2026-08-08)', () => {
+  // A 4th, previously-undiscovered independent complaint-keyword registry, found while
+  // extending the terminology-recognition round to workflow-launcher surfaces. Its
+  // RECOMMENDATION_RULES keyword lists use plain substring matching with no
+  // word-boundary or synonym handling. Verified empirically before fixing: neither
+  // "sob" nor "pain in chest" matched any rule despite both being recognized
+  // elsewhere in the app.
+
+  it('recommends dyspnea/PE tools for "sob" (no direct keyword — the rule list only has "shortness of breath"/"dyspnea")', () => {
+    const result = recommendCalculators({ chiefComplaint: 'sob' });
+    expect(result.status).toBe('matched');
+    expect(result.recommendations.map((tool) => tool.id)).toEqual(
+      expect.arrayContaining(['wells-pe', 'perc']),
+    );
+  });
+
+  it('recommends chest-pain tools for "pain in chest" (reversed word order the rule list never had)', () => {
+    const result = recommendCalculators({ chiefComplaint: 'pain in chest' });
+    expect(result.status).toBe('matched');
+    expect(result.recommendations.map((tool) => tool.id)).toEqual(
+      expect.arrayContaining(['heart-score']),
+    );
+  });
+
+  it('does not duplicate a rule the direct keyword match already found', () => {
+    const result = recommendCalculators({ chiefComplaint: 'chest pain' });
+    const chestPainMatches = result.matchedContexts.filter((context) => context.id === 'chest-pain');
+    expect(chestPainMatches).toHaveLength(1);
+  });
+
+  it('still returns needs_more_context for genuinely unrelated text even though the fallback now runs on every input', () => {
+    const result = recommendCalculators({ chiefComplaint: 'medication refill request' });
+    expect(result.status).toBe('needs_more_context');
+  });
+});

@@ -1,4 +1,5 @@
 import { getUserFacingToolInventory } from '../data/toolInventory';
+import { recognizeComplaint } from '../data/clinicalTerminology/recognizeComplaint';
 
 const RECOMMENDATION_RULES = Object.freeze([
   {
@@ -107,6 +108,24 @@ const RECOMMENDATION_RULES = Object.freeze([
 
 export const CALCULATOR_RECOMMENDER_TOOL_ID = 'calculator-recommender-ai';
 
+/**
+ * Maps a canonical concept id (from recognizeComplaint(), src/data/clinicalTerminology/)
+ * to the RECOMMENDATION_RULES rule id(s) it corresponds to. This service's own keyword
+ * lists above use plain substring matching with no word-boundary or synonym handling —
+ * a real, previously-undiscovered 4th independent complaint-keyword registry, found
+ * while extending the terminology-recognition round to ED Copilot/workflow-launcher
+ * surfaces. Same conservative fallback pattern as clinicalIntentRouter.ts: only
+ * concepts with a genuine, already-existing rule are listed.
+ */
+const CONCEPT_ID_TO_RULE_IDS: Readonly<Record<string, readonly string[]>> = Object.freeze({
+  'chest-pain': ['chest-pain'],
+  'shortness-of-breath': ['dyspnea-pe'],
+  'stroke-symptoms': ['stroke-tia'],
+  'sepsis-concern': ['infection-sepsis'],
+  fever: ['infection-sepsis'],
+  palpitations: ['atrial-fibrillation'],
+});
+
 function normalizeInput(value) {
   if (Array.isArray(value)) return value.join(' ');
   return String(value || '');
@@ -153,16 +172,42 @@ export function recommendCalculators(input: any = {}, options: any = {}) {
   const text = buildInputText(input);
   const byId = inventoryById();
 
-  const scoredRules = RECOMMENDATION_RULES.map((rule) => {
+  const directRules = RECOMMENDATION_RULES.map((rule) => {
     const matches = rule.keywords.filter((keyword) => text.includes(keyword));
     return {
       ...rule,
       matches,
       score: matches.length,
     };
-  })
-    .filter((rule) => rule.score > 0)
-    .sort((a, b) => b.score - a.score || a.label.localeCompare(b.label));
+  }).filter((rule) => rule.score > 0);
+
+  // Fallback: the direct keyword lists above miss phrasings the canonical registry
+  // already recognizes (e.g. "sob", "pain in chest" — reversed word order). Only
+  // fires for rules the direct match didn't already find, and only adds a rule that
+  // has an explicit, pre-approved mapping — never invents a new rule from a concept.
+  const matchedRuleIds = new Set(directRules.map((rule) => rule.id));
+  const fallbackRules: typeof directRules = [];
+  if (text) {
+    const recognized = recognizeComplaint(text);
+    const fallbackRuleIds = recognized.matchedConceptId
+      ? CONCEPT_ID_TO_RULE_IDS[recognized.matchedConceptId] || []
+      : [];
+    for (const ruleId of fallbackRuleIds) {
+      if (matchedRuleIds.has(ruleId)) continue;
+      const rule = RECOMMENDATION_RULES.find((candidate) => candidate.id === ruleId);
+      if (!rule) continue;
+      matchedRuleIds.add(ruleId);
+      fallbackRules.push({
+        ...rule,
+        matches: [`recognized: ${recognized.canonicalName}`],
+        score: 1,
+      });
+    }
+  }
+
+  const scoredRules = [...directRules, ...fallbackRules].sort(
+    (a, b) => b.score - a.score || a.label.localeCompare(b.label),
+  );
 
   const recommendedToolIds = unique(scoredRules.flatMap((rule) => rule.toolIds)).slice(0, limit);
   const recommendations = resolveRecommendedTools(recommendedToolIds, byId);
