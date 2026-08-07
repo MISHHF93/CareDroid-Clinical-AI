@@ -75,6 +75,7 @@ import {
   PostTriageAssistDto,
   ReviewWorkflowAutomationDto,
   CreateReferralDto,
+  UpdateReferralStatusDto,
   QueryCopilotDto,
   RecordClinicalCalculatorResultDto,
   RecordCopilotInteractionDto,
@@ -580,6 +581,18 @@ export class EmergencyOsController {
   @Post('referrals')
   createReferral(@Body() dto: CreateReferralDto) {
     return this.referralService.createReferral({ ...dto });
+  }
+
+  /** ReferralPanel.tsx's updateEmergencyTransferWorkflow() has called this
+   * exact path (via emergencyTransportApi.ts) since before this route
+   * existed on the backend -- found 2026-08-06, the frontend was silently
+   * 404ing and falling back to "live sync is pending" every time. Mounted
+   * under /emergency/transfers (not /emergency/referrals) to match the real
+   * caller's URL exactly, not the sibling GET/POST referrals routes' prefix. */
+  @RequirePermission(Permission.WRITE_PHI)
+  @Patch('transfers/:id/status')
+  updateTransferStatus(@Param('id') id: string, @Body() dto: UpdateReferralStatusDto) {
+    return this.referralService.updateReferralStatus(id, dto.status);
   }
 
   @RequirePermission(Permission.READ_PHI)

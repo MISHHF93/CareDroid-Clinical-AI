@@ -195,7 +195,7 @@ function findUpgradeSignal(
   return signals.find((signal) => signal.capability === capability) || null;
 }
 
-function StatCard({
+function WhiteboardStatTile({
   value,
   label,
   tone = 'default',
@@ -1835,9 +1835,9 @@ export default function EmergencyWhiteboard() {
         />
       ) : null}
       <div className="emergency-whiteboard-page__stats emergency-whiteboard-page__stats--bar">
-        <StatCard value={stats.waiting} label="Waiting" emphasized={prioritizeAwareness && stats.waiting > 0} />
+        <WhiteboardStatTile value={stats.waiting} label="Waiting" emphasized={prioritizeAwareness && stats.waiting > 0} />
         {surfaces.compactLayout ? (
-          <StatCard
+          <WhiteboardStatTile
             value={stats.highRisk}
             label="High risk"
             tone={stats.highRisk ? 'critical' : 'success'}
@@ -1857,15 +1857,15 @@ export default function EmergencyWhiteboard() {
         !suppressOperationalSurface('analytics-charts') &&
         whiteboardDensity.surfaces.secondaryStats.visible ? (
           <>
-        <StatCard value={stats.total} label="Total" />
-        <StatCard value={stats.highRisk} label="High Risk" tone={stats.highRisk ? 'critical' : 'success'} />
+        <WhiteboardStatTile value={stats.total} label="Total" />
+        <WhiteboardStatTile value={stats.highRisk} label="High Risk" tone={stats.highRisk ? 'critical' : 'success'} />
           </>
         ) : null}
         {!surfaces.compactLayout ? (
-        <StatCard value={`${capacity.score} ${capacity.band}`} label="Capacity" tone={capacityTone(capacity.band)} />
+        <WhiteboardStatTile value={`${capacity.score} ${capacity.band}`} label="Capacity" tone={capacityTone(capacity.band)} />
         ) : null}
         {!surfaces.compactLayout ? (
-        <StatCard
+        <WhiteboardStatTile
           value={stats.reassessmentDue}
           label="Reassess Due"
           tone={stats.reassessmentDue ? 'warning' : 'success'}
@@ -1879,7 +1879,7 @@ export default function EmergencyWhiteboard() {
         />
         ) : null}
         {!surfaces.compactLayout ? (
-        <StatCard
+        <WhiteboardStatTile
           value={emsAwareness.soonestEtaLabel || emsAwareness.inboundCount || '—'}
           label="EMS ETA"
           tone={
@@ -1908,7 +1908,7 @@ export default function EmergencyWhiteboard() {
         {!surfaces.compactLayout &&
         !suppressOperationalSurface('analytics-charts') &&
         whiteboardDensity.surfaces.secondaryStats.visible ? (
-        <StatCard
+        <WhiteboardStatTile
           value={emsAwareness.riskCount}
           label="EMS Risk"
           tone={emsAwareness.riskCount ? 'critical' : 'success'}
@@ -1927,7 +1927,7 @@ export default function EmergencyWhiteboard() {
         {!surfaces.compactLayout &&
         !suppressOperationalSurface('analytics-charts') &&
         whiteboardDensity.surfaces.secondaryStats.visible ? (
-        <StatCard
+        <WhiteboardStatTile
           value={
             emsAwareness.awaitingHandoff
               ? `${emsAwareness.offloadMinutes}m`
@@ -1959,10 +1959,10 @@ export default function EmergencyWhiteboard() {
         {!surfaces.compactLayout &&
         !suppressOperationalSurface('analytics-charts') &&
         whiteboardDensity.surfaces.secondaryStats.visible ? (
-        <StatCard value={stats.boarding} label="Boarding" tone={stats.boarding ? 'warning' : 'success'} />
+        <WhiteboardStatTile value={stats.boarding} label="Boarding" tone={stats.boarding ? 'warning' : 'success'} />
         ) : null}
         {!surfaces.compactLayout ? (
-        <StatCard
+        <WhiteboardStatTile
           value={referralAwareness.buckets.pending}
           label="Referrals Pending"
           tone={referralAwareness.buckets.pending ? 'warning' : 'success'}
@@ -1982,7 +1982,7 @@ export default function EmergencyWhiteboard() {
         !suppressOperationalSurface('analytics-charts') &&
         whiteboardDensity.surfaces.secondaryStats.visible ? (
         <>
-        <StatCard
+        <WhiteboardStatTile
           value={referralAwareness.buckets.accepted}
           label="Referrals Accepted"
           tone={referralAwareness.buckets.accepted ? 'success' : 'default'}
@@ -1993,7 +1993,7 @@ export default function EmergencyWhiteboard() {
               : () => openReferralWorkflow(undefined, 'accepted')
           }
         />
-        <StatCard
+        <WhiteboardStatTile
           value={referralAwareness.buckets.delayed}
           label="Referrals Delayed"
           tone={referralAwareness.buckets.delayed ? 'critical' : 'success'}
@@ -2005,7 +2005,7 @@ export default function EmergencyWhiteboard() {
               : () => openReferralWorkflow(undefined, 'delayed')
           }
         />
-        <StatCard
+        <WhiteboardStatTile
           value={formatFreshness(capacity.updatedAt || whiteboardGeneratedAt)}
           label="Data Freshness"
           tone="info"

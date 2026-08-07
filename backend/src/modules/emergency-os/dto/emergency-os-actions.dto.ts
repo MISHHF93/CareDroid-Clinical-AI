@@ -215,6 +215,17 @@ export class CreateReferralDto {
   @IsOptional() @IsString() createdAt?: string;
 }
 
+/** Backs PATCH /emergency/transfers/:id/status -- ReferralPanel.tsx's
+ * updateEmergencyTransferWorkflow() has called this exact path since before
+ * this route existed on the backend (confirmed 2026-08-06: zero matching
+ * route anywhere in emergency-os.controller.ts). The frontend already
+ * degrades gracefully on failure ("Transfer updated for this shift, live
+ * sync is pending"), so this wasn't crashing anything -- just silently never
+ * actually syncing. */
+export class UpdateReferralStatusDto {
+  @IsDefined() @IsString() @MaxLength(40) status!: string;
+}
+
 /** No live frontend caller exists for this route today (confirmed by
  * sweep) -- formalizes the backend's already-declared inline shape. */
 export class QueryCopilotDto {

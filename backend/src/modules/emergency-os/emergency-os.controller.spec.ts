@@ -211,6 +211,41 @@ describe('EmergencyOsController', () => {
     );
   });
 
+  it('updates a created referral/transfer status via PATCH transfers/:id/status (ReferralPanel.tsx real caller)', () => {
+    const createdPatient = controller.createIntakePatient({
+      mrn: 'ED-REF-2',
+      firstName: 'Transfer',
+      lastName: 'Patient',
+      chiefComplaint: 'Transfer workflow validation',
+      complaintCategory: 'Cardiac',
+    });
+    const createdReferral = controller.createReferral({
+      patientId: createdPatient.data.patient.id,
+      targetDepartment: 'Cardiology',
+      workflow: 'Transfer',
+      status: 'Sent',
+    });
+    const referralId = (createdReferral.data.referral as { id: string }).id;
+
+    const updated = controller.updateTransferStatus(referralId, { status: 'TransferRequested' });
+
+    expect(updated).toMatchObject({
+      module: 'Referral Status Updated',
+      data: {
+        referral: expect.objectContaining({ id: referralId, status: 'TransferRequested' }),
+      },
+    });
+    expect(controller.getReferrals().data.referrals).toEqual(
+      expect.arrayContaining([expect.objectContaining({ id: referralId, status: 'TransferRequested' })]),
+    );
+  });
+
+  it('rejects a status update for a referral id that does not exist', () => {
+    expect(() => controller.updateTransferStatus('ref-does-not-exist', { status: 'PatientDeparted' })).toThrow(
+      'Referral ref-does-not-exist not found',
+    );
+  });
+
   it('exposes normalized workflow action logs for admin and patient timeline views', async () => {
     const created = controller.createIntakePatient({
       id: 'workflow-log-patient-1',

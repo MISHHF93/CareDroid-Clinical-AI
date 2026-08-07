@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, Logger, Optional, OnModuleInit } from '@nestjs/common';
+import { ConflictException, Injectable, Logger, NotFoundException, Optional, OnModuleInit } from '@nestjs/common';
 // OnModuleInit used by EmergencyPatientService board rehydrate
 import { InjectRepository } from '@nestjs/typeorm';
 import type { Repository } from 'typeorm';
@@ -2243,6 +2243,23 @@ export class ReferralService {
     this.createdReferrals.push(referral);
 
     return envelope('Referral Created', {
+      referral,
+      referrals: this.getReferrals().data.referrals,
+    });
+  }
+
+  /** Backs PATCH /emergency/transfers/:id/status -- only real, created
+   * referrals (this.createdReferrals) can be updated; the synthetic
+   * patient-derived rows in getReferrals() aren't real records to mutate. */
+  updateReferralStatus(referralId: string, status: string) {
+    const referral = this.createdReferrals.find((entry) => entry.id === referralId);
+    if (!referral) {
+      throw new NotFoundException(`Referral ${referralId} not found`);
+    }
+    referral.status = status;
+    referral.statusUpdatedAt = new Date().toISOString();
+
+    return envelope('Referral Status Updated', {
       referral,
       referrals: this.getReferrals().data.referrals,
     });

@@ -13,6 +13,13 @@ import {
   NON_ED_WORKSPACE_REDIRECT_ROUTES,
   ROUTE_ALIAS_REDIRECTS,
 } from '../config/routes.config';
+import { PROFILE_CONSOLE_ROUTE_PATHS } from '../config/profileConsoleRoutes';
+import { PUBLIC_CONSOLE_ROUTE_PATHS } from '../config/publicConsoleRoutes';
+import { TOOLS_CONSOLE_ROUTE_PATHS } from '../config/toolsConsoleRoutes';
+import { PLATFORM_CONSOLE_ROUTE_PATHS } from '../config/platformConsoleRoutes';
+import { OPERATIONS_FLEET_CONSOLE_ROUTE_PATHS } from '../config/operationsFleetConsoleRoutes';
+import { ADMIN_CONSOLE_ROUTE_PATHS } from '../config/adminConsoleRoutes';
+import { TRAINING_CONSOLE_ROUTE_PATHS } from '../config/trainingConsoleRoutes';
 import {
   getCanonicalToolInventory,
   getUserFacingToolInventory,
@@ -140,6 +147,24 @@ function parseAppRoutePaths() {
     ...app.matchAll(/import\(['"](\.\/[^'"]+)['"]\)/g),
     ...app.matchAll(/from\s+['"](\.\/pages\/[^'"]+)['"]/g),
   ].map((m) => m[1]);
+  // router.tsx is not the only place a route gets genuinely mounted — 7 separate
+  // "console route tree" files (profile/public/tools/platform/operations-fleet/
+  // admin/training) each register real routes via renderXConsoleRoutes(), called
+  // from router.tsx but with paths defined in their own config files that the
+  // regexes above never scan. Without these, every console-route-tree path (e.g.
+  // /navigator, /help-center, /version) was a false-positive "wire" gap here —
+  // found 2026-08-06 when a newly-added real route (/navigator) got flagged
+  // despite being live and working, matching several pre-existing same-shaped
+  // false positives already in this report.
+  const consoleTreePaths = [
+    ...PROFILE_CONSOLE_ROUTE_PATHS,
+    ...PUBLIC_CONSOLE_ROUTE_PATHS,
+    ...TOOLS_CONSOLE_ROUTE_PATHS,
+    ...PLATFORM_CONSOLE_ROUTE_PATHS,
+    ...OPERATIONS_FLEET_CONSOLE_ROUTE_PATHS,
+    ...ADMIN_CONSOLE_ROUTE_PATHS,
+    ...TRAINING_CONSOLE_ROUTE_PATHS,
+  ];
   return {
     paths: [
       ...new Set([
@@ -151,6 +176,7 @@ function parseAppRoutePaths() {
         ...generatedAliasPaths,
         ...legacyEmergencyPaths,
         ...futureReleasePaths,
+        ...consoleTreePaths,
       ]),
     ],
     redirectTargets: [...new Set(redirectTargets.filter((t) => t.startsWith('/')))],
