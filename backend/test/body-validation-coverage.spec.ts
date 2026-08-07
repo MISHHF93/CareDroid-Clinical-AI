@@ -245,15 +245,26 @@ function findUnvalidatedBodyParams(backendRoot: string): string[] {
 // ReferralService the deferred EmergencyOsController routes below also use),
 // so the "shape-divergence" risk that blocks those doesn't apply here; see
 // backend/src/modules/platform-systems/dto/emergency-patient-actions.dto.ts's
-// header for the full writeup. The remaining 7 entries are deliberately
-// deferred (real, live divergent-shape patient-creation callers, or large
-// nested settings blobs), not newly discovered gaps.
+// header for the full writeup.
+//
+// 2026-08-06: closed OrganizationsController.updateFeatureFlags (see
+// backend/src/modules/organizations/dto/update-feature-flags.dto.ts's
+// header) -- it had been lumped in with the other 2 OrganizationsController
+// entries as "large nested settings blob," but on direct read its service
+// method (FeatureFlagService.applyUpdate) takes a small, already-typed,
+// flat 7-field interface (FeatureFlagUpdateInput), not a settings blob --
+// the deferral reason didn't actually apply to this one route. The other 6
+// remain deliberately deferred: 3 EmergencyOsController patient-creation
+// routes have real, live divergent-shape callers (roadmap item #18, open
+// since Cycle 191); EmergencyOsController.updateSettings and
+// OrganizationsController's updateSettings/updateTenantAdministration take
+// genuinely large, multi-section nested settings contracts that deserve
+// their own dedicated DTO-building cycle, not a drive-by.
 const BASELINE: string[] = [
   'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.createIntakePatient',
   'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.createPatient',
   'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.createSmartIntakeVerticalSlice',
   'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.updateSettings',
-  'src/modules/organizations/organizations.controller.ts :: OrganizationsController.updateFeatureFlags',
   'src/modules/organizations/organizations.controller.ts :: OrganizationsController.updateSettings',
   'src/modules/organizations/organizations.controller.ts :: OrganizationsController.updateTenantAdministration',
 ].sort();

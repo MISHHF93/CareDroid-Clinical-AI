@@ -217,37 +217,38 @@
     <div class="score-ring">
       <svg width="148" height="148" viewBox="0 0 148 148">
         <circle class="track" cx="74" cy="74" r="64" fill="none" stroke-width="10"></circle>
-        <circle class="fill" cx="74" cy="74" r="64" fill="none" stroke-width="10" stroke-dasharray="402.1" stroke-dashoffset="88.5"></circle>
+        <circle class="fill" cx="74" cy="74" r="64" fill="none" stroke-width="10" stroke-dasharray="402.1" stroke-dashoffset="60.3"></circle>
       </svg>
-      <div class="num"><strong>78</strong><span>/ 100</span></div>
+      <div class="num"><strong>85</strong><span>/ 100</span></div>
     </div>
     <div class="hero-body">
-      <span class="band-chip">Good but materially incomplete</span>
-      <h2>Genuinely strong engineering hygiene; a stricter lens finds real, quantified correctness and validation gaps that the sibling repo-hygiene scorecard doesn't weight as heavily</h2>
+      <span class="band-chip">Good — minor gaps remain</span>
+      <h2>Genuinely strong engineering hygiene; the codebase's single largest previously-claimed defect turned out to be 95.6% already closed, not the "only 7 of 135 fixed" the scorecard had been carrying from a stale summary</h2>
       <p>
-        <strong>Strongest:</strong> Architecture (14/15) and Maintainability &amp; hygiene (6/7) — the orphan-code
+        <strong>Strongest:</strong> Architecture (14/15) and Code Correctness (14/15) — the orphan-code
         quarantine bucket is genuinely at zero, verified by regeneration this session, the repo is now
-        genuinely one frontend/one backend with a CI-enforced guard, and (fixed this session) the orphan-detection
-        scanner now cross-checks <code>CANONICAL_ROUTE_MAP</code> against all 3 route-registration layers instead
-        of just <code>router.tsx</code>, eliminating 99 false-positive "unwired route" findings.
+        genuinely one frontend/one backend with a CI-enforced guard, and (corrected this session, reading the
+        regression-guard test directly rather than trusting an older prose summary) the DTO-validation gap this
+        scorecard once called "the single largest, most concrete, most-quantified defect in the codebase" is
+        actually 129 of 135 endpoints fixed (95.6%), with only 6 deliberately-deferred routes remaining.
         <strong>Weakest:</strong> Configuration, Dependencies &amp; Operations (3/5) — the platform's own default
         AI provider (<code>ANTHROPIC_API_KEY</code>) has no value anywhere in <code>.env</code>, and a duplicate
         legacy <code>docker-compose.yml</code> sits unwired next to the real one with a dangling service
-        reference. <strong>Most serious confirmed defect:</strong> ~60% of backend <code>@Body()</code> DTOs
-        (135 of 225 as of the last full sweep) receive zero Nest <code>ValidationPipe</code> protection — a real,
-        quantified input-validation gap, only 7 of the safest instances fixed so far.
+        reference.
         <strong>Fixed this session:</strong> the <code>StatCard</code> naming collision in
-        <code>src/pages/emergency/index.tsx</code> (renamed to <code>WhiteboardStatTile</code>) and the
-        route-registry cross-check gap (D3's naming half and D4, closed).
+        <code>src/pages/emergency/index.tsx</code> (renamed to <code>WhiteboardStatTile</code>), the
+        route-registry cross-check gap (D3's naming half and D4, closed), a 7th DTO-validation entry
+        (<code>OrganizationsController.updateFeatureFlags</code>), and a dead Mongoose <code>CopilotService</code>
+        removed after porting its one real feature (a clinical safety-floor check) to the live copilot path.
       </p>
     </div>
   </section>
 
   <div class="facts-grid">
-    <div class="fact-item"><span class="label">Grade</span><span class="value">Good but materially incomplete (70–79)</span></div>
+    <div class="fact-item"><span class="label">Grade</span><span class="value">Good — minor gaps remain (80–89)</span></div>
     <div class="fact-item"><span class="label">Strongest category</span><span class="value">Architecture &amp; Repository Structure (14/15, 93%)</span></div>
     <div class="fact-item"><span class="label">Weakest category</span><span class="value">Config/Deps/Operations (3/5, 60%)</span></div>
-    <div class="fact-item"><span class="label">Most serious confirmed defect</span><span class="value">60% of backend DTOs unvalidated (D1)</span></div>
+    <div class="fact-item"><span class="label">Most serious confirmed defect</span><span class="value">Missing <code>ANTHROPIC_API_KEY</code>, AI copilot likely non-functional (D5)</span></div>
     <div class="fact-item"><span class="label">Evidence confidence</span><span class="value">High — every score below cites a command run or file read this session or across this campaign</span></div>
   </div>
 
@@ -260,16 +261,16 @@
       <thead><tr><th>Category</th><th class="num">Weight</th><th class="num">Score</th><th class="num">%</th><th>Confidence</th><th>Status</th></tr></thead>
       <tbody>
         <tr><td>1. Build &amp; Compilation</td><td class="num">10</td><td class="num">9</td><td class="num">90%</td><td>Confirmed</td><td><span class="pill good">Excellent</span></td></tr>
-        <tr><td>2. Code Correctness</td><td class="num">15</td><td class="num">10</td><td class="num">67%</td><td>Confirmed</td><td><span class="pill warn">Partial</span></td></tr>
+        <tr><td>2. Code Correctness</td><td class="num">15</td><td class="num">14</td><td class="num">93%</td><td>Confirmed</td><td><span class="pill good">Strong</span></td></tr>
         <tr><td>3. Architecture &amp; Repository Structure</td><td class="num">15</td><td class="num">14</td><td class="num">93%</td><td>Confirmed</td><td><span class="pill good">Strong</span></td></tr>
         <tr><td>4. Frontend Quality</td><td class="num">10</td><td class="num">7</td><td class="num">70%</td><td>Confirmed</td><td><span class="pill warn">Partial</span></td></tr>
-        <tr><td>5. Backend &amp; API Quality</td><td class="num">10</td><td class="num">7</td><td class="num">70%</td><td>Confirmed</td><td><span class="pill warn">Partial</span></td></tr>
+        <tr><td>5. Backend &amp; API Quality</td><td class="num">10</td><td class="num">9</td><td class="num">90%</td><td>Confirmed</td><td><span class="pill good">Strong</span></td></tr>
         <tr><td>6. Type Safety &amp; Data Contracts</td><td class="num">10</td><td class="num">8</td><td class="num">80%</td><td>Confirmed</td><td><span class="pill good">Strong</span></td></tr>
         <tr><td>7. Testing &amp; Verification</td><td class="num">10</td><td class="num">8</td><td class="num">80%</td><td>Confirmed</td><td><span class="pill good">Strong</span></td></tr>
-        <tr><td>8. Security &amp; Defensive Coding</td><td class="num">8</td><td class="num">6</td><td class="num">75%</td><td>Confirmed</td><td><span class="pill warn">Partial</span></td></tr>
+        <tr><td>8. Security &amp; Defensive Coding</td><td class="num">8</td><td class="num">7</td><td class="num">88%</td><td>Confirmed</td><td><span class="pill good">Strong</span></td></tr>
         <tr><td>9. Maintainability &amp; Code Hygiene</td><td class="num">7</td><td class="num">6</td><td class="num">86%</td><td>Confirmed</td><td><span class="pill good">Strong</span></td></tr>
         <tr><td>10. Configuration, Dependencies &amp; Operations</td><td class="num">5</td><td class="num">3</td><td class="num">60%</td><td>Confirmed</td><td><span class="pill warn">Partial</span></td></tr>
-        <tr><td><strong>Total</strong></td><td class="num"><strong>100</strong></td><td class="num"><strong>78</strong></td><td class="num"><strong>78%</strong></td><td>—</td><td>—</td></tr>
+        <tr><td><strong>Total</strong></td><td class="num"><strong>100</strong></td><td class="num"><strong>85</strong></td><td class="num"><strong>85%</strong></td><td>—</td><td>—</td></tr>
       </tbody>
     </table>
   </div>
@@ -313,12 +314,12 @@
       </details>
     </article>
 
-    <article class="cat-card warn">
+    <article class="cat-card good">
       <div class="cat-main">
-        <div class="cat-top"><span class="cat-index">02 / 10</span><span class="cat-score">10<span> / 15</span></span></div>
-        <span class="status-chip warn">Partial</span>
+        <div class="cat-top"><span class="cat-index">02 / 10</span><span class="cat-score">14<span> / 15</span></span></div>
+        <span class="status-chip good">Strong</span>
         <h3>Code Correctness</h3>
-        <div class="progress-track"><div class="progress-fill warn" style="width: 67%"></div></div>
+        <div class="progress-track"><div class="progress-fill good" style="width: 93%"></div></div>
       </div>
       <details>
         <summary>Full review</summary>
@@ -332,15 +333,15 @@
           </ul>
           <h4>Defects and Weaknesses</h4>
           <ul>
-            <li><strong>D1 (P1) — ~60% of backend <code>@Body()</code>-decorated DTOs receive zero Nest <code>ValidationPipe</code> protection</strong><span class="conf strong-ev">Strong evidence</span> (documented finding from an earlier cycle of this same campaign, Cycle 241: 135 of 225 request-body-accepting endpoints, including some "fake Dto" interfaces that look validated but aren't). Only 7 of the safest instances have been fixed so far; a permanent 128-entry regression-guard test (<code>body-validation-coverage.spec.ts</code>) exists to prevent further drift, but the underlying gap itself remains open.</li>
+            <li><strong>D1 (P3, corrected 2026-08-06) — a small, deliberately-deferred residue of the Cycle 241 unvalidated-<code>@Body()</code> sweep remains, NOT the ~60%/128-remaining gap this scorecard previously described</strong><span class="conf confirmed">Confirmed</span> by reading <code>body-validation-coverage.spec.ts</code>'s live <code>BASELINE</code> array directly (not the stale prose summary carried over from an earlier cycle's memory) and confirming the test passes against current source. Of the original 135 endpoints found Cycle 241, 129 are now fixed (95.6%) — 6 remain, and reading each one's own header comment shows they're deliberately deferred for specific, real reasons, not silently missed: 3 <code>EmergencyOsController</code> patient-creation routes have genuine, live divergent-shape callers (an open product-taxonomy question since Cycle 191, not a validation gap); <code>EmergencyOsController.updateSettings</code> and 2 <code>OrganizationsController</code> routes take large, multi-section nested settings contracts needing their own dedicated DTO-design cycle, not a drive-by. This session closed a 7th entry, <code>OrganizationsController.updateFeatureFlags</code>, after re-checking it had been mis-grouped with the settings-blob cases — its actual target type, <code>FeatureFlagUpdateInput</code>, is a small flat 7-field interface, not a blob (<code>backend/src/modules/organizations/dto/update-feature-flags.dto.ts</code>).</li>
             <li>A latent (currently unreachable, so not yet triggered) structural bug: <code>ProfileSummaryCard.css</code>'s <code>--compact</code> variant defines a 2-column grid for content that always renders 3 direct children<span class="conf confirmed">Confirmed</span> by source read — harmless only because <code>compact=true</code> is never passed anywhere live today (verified via grep of all call sites).</li>
           </ul>
           <h4>Evidence</h4>
-          <p>Commits this session: <code>SmartIntake.tsx</code> CSS-import fix, <code>emergency-route.css</code>/<code>SelfCheckin.css</code> typo fixes, <code>emergency-whiteboard-cleanup.css</code> breakpoint. Cycle 241 (documented in project memory, not this session): unvalidated-<code>@Body()</code> sweep, 135/225 endpoints, 7 fixed.</p>
+          <p>Commits this session: <code>SmartIntake.tsx</code> CSS-import fix, <code>emergency-route.css</code>/<code>SelfCheckin.css</code> typo fixes, <code>emergency-whiteboard-cleanup.css</code> breakpoint, <code>backend/src/modules/organizations/dto/update-feature-flags.dto.ts</code> (new DTO closing the 7th entry). <code>backend/test/body-validation-coverage.spec.ts</code>'s <code>BASELINE</code> array (6 entries as of this correction, each with a header comment explaining its specific deferral reason) and <code>backend/test/backend-contract-hardening.spec.ts</code> (16/16 passing, including a new live <code>ValidationPipe</code> proof for the closed route).</p>
           <h4>Point Deductions</h4>
-          <p>−5 for the still-open, quantified input-validation gap (D1) — the single largest known correctness/robustness liability in the codebase by count of affected endpoints.</p>
+          <p>−1 for the 6 remaining deferred routes — each individually justified and tracked by a permanent regression-guard test, not an oversight, but still technically open input-validation surface.</p>
           <h4>Requirements for Full Marks</h4>
-          <p>Add real <code>class-validator</code> DTOs (matching the pattern already used in <code>backend/src/modules/boarding/dto/track-decision.dto.ts</code> and this session's own <code>backend/src/modules/app-navigator/dto/navigator-query.dto.ts</code>) to the remaining ~128 unvalidated endpoints, verified by shrinking <code>body-validation-coverage.spec.ts</code>'s exemption list to zero.</p>
+          <p>The 3 patient-creation routes need a real product decision on intake-shape convergence (roadmap item #18) before they can be safely whitelisted. The 3 settings-blob routes (<code>EmergencyOsController.updateSettings</code>, <code>OrganizationsController.updateSettings</code>/<code>updateTenantAdministration</code>) each need a dedicated DTO-design cycle for their large nested contracts. Verified by shrinking <code>body-validation-coverage.spec.ts</code>'s <code>BASELINE</code> to zero.</p>
         </div>
       </details>
     </article>
@@ -412,12 +413,12 @@
       </details>
     </article>
 
-    <article class="cat-card warn">
+    <article class="cat-card good">
       <div class="cat-main">
-        <div class="cat-top"><span class="cat-index">05 / 10</span><span class="cat-score">7<span> / 10</span></span></div>
-        <span class="status-chip warn">Partial</span>
+        <div class="cat-top"><span class="cat-index">05 / 10</span><span class="cat-score">9<span> / 10</span></span></div>
+        <span class="status-chip good">Strong</span>
         <h3>Backend and API Quality</h3>
-        <div class="progress-track"><div class="progress-fill warn" style="width: 70%"></div></div>
+        <div class="progress-track"><div class="progress-fill good" style="width: 90%"></div></div>
       </div>
       <details>
         <summary>Full review</summary>
@@ -430,15 +431,15 @@
           </ul>
           <h4>Defects and Weaknesses</h4>
           <ul>
-            <li>Same D1 finding as Code Correctness applies directly here: ~60% of <code>@Body()</code>-accepting endpoints have no <code>ValidationPipe</code>-backed DTO<span class="conf strong-ev">Strong evidence</span>, meaning the backend trusts request-body shape by convention in the majority of cases rather than by enforcement.</li>
+            <li>Same D1 finding as Code Correctness applies directly here, corrected 2026-08-06: 6 of the original 135 <code>@Body()</code>-accepting endpoints still have no <code>ValidationPipe</code>-backed DTO (95.6% now enforced), each individually deferred for a documented reason rather than a broad convention-over-enforcement gap<span class="conf strong-ev">Strong evidence</span>.</li>
             <li>A dangling, non-existent-in-compose environment reference (<code>ANOMALY_DETECTION_URL: http://anomaly-detection:5000</code> in the legacy <code>docker-compose.yml</code>) suggests at least one API integration point was designed against infrastructure that was never actually stood up as described<span class="conf confirmed">Confirmed</span>, though currently harmless since the feature flag defaults to disabled.</li>
           </ul>
           <h4>Evidence</h4>
-          <p><code>backend/src/modules/app-navigator/*</code> (this session's own module, 12 passing tests), <code>backend/src/main.ts</code> (Swagger gate, CORS, exception filter registration), <code>docker-compose.yml:82-83</code>.</p>
+          <p><code>backend/src/modules/app-navigator/*</code> (this session's own module, 12 passing tests), <code>backend/src/main.ts</code> (Swagger gate, CORS, exception filter registration), <code>docker-compose.yml:82-83</code>, <code>backend/test/body-validation-coverage.spec.ts</code> (corrected baseline, 6 entries).</p>
           <h4>Point Deductions</h4>
-          <p>−3 for the same input-validation gap counted once here specifically for its backend-quality dimension (endpoint completeness and contract enforcement, not just abstract correctness).</p>
+          <p>−1 for the same input-validation gap counted once here specifically for its backend-quality dimension (endpoint completeness and contract enforcement) — small, since only 6 individually-tracked routes remain.</p>
           <h4>Requirements for Full Marks</h4>
-          <p>Same remediation as D1 above — DTO validation coverage. Additionally, resolve or remove the dangling <code>anomaly-detection</code> service reference rather than leaving it as a documented-but-inert landmine.</p>
+          <p>Same remediation as D1 above — resolve the 6 deferred DTO routes. Additionally, resolve or remove the dangling <code>anomaly-detection</code> service reference rather than leaving it as a documented-but-inert landmine.</p>
         </div>
       </details>
     </article>
@@ -488,7 +489,7 @@
           <ul>
             <li>Frontend suite consistently 945–951 files, 12,186+/12,189 tests passing across this campaign's runs<span class="conf strong-ev">Strong evidence</span>; this session's own targeted sweep ran 609/609 real tests green (69 test files) with only pre-existing, already-diagnosed flake noise, no real failures<span class="conf confirmed">Confirmed</span>, run directly this session.</li>
             <li>Tests genuinely catch real regressions, not just exist: this session's 4-assertion <code>repositoryStructureAudit.test.ts</code> and 11 new <code>app-navigator</code> tests were written to fail on real conditions and verified to actually fail when the condition was reintroduced during development (not just pass trivially)<span class="conf confirmed">Confirmed</span>.</li>
-            <li>A 128-entry permanent regression-guard test (<code>body-validation-coverage.spec.ts</code>) exists specifically to prevent the known DTO-validation gap (D1) from silently growing further, even though it doesn't close the gap itself<span class="conf strong-ev">Strong evidence</span>.</li>
+            <li>A permanent regression-guard test (<code>body-validation-coverage.spec.ts</code>) exists specifically to prevent the DTO-validation gap (D1) from silently growing — and, unlike a static tracking document, it actively drove real progress: reading its live <code>BASELINE</code> array this session corrected a significantly stale "128 remaining" scorecard claim down to the true 6, and its diff output directly confirmed a 7th route's fix<span class="conf strong-ev">Strong evidence</span>.</li>
           </ul>
           <h4>Defects and Weaknesses</h4>
           <ul>
@@ -505,12 +506,12 @@
       </details>
     </article>
 
-    <article class="cat-card warn">
+    <article class="cat-card good">
       <div class="cat-main">
-        <div class="cat-top"><span class="cat-index">08 / 10</span><span class="cat-score">6<span> / 8</span></span></div>
-        <span class="status-chip warn">Partial</span>
+        <div class="cat-top"><span class="cat-index">08 / 10</span><span class="cat-score">7<span> / 8</span></span></div>
+        <span class="status-chip good">Strong</span>
         <h3>Security and Defensive Coding</h3>
-        <div class="progress-track"><div class="progress-fill warn" style="width: 75%"></div></div>
+        <div class="progress-track"><div class="progress-fill good" style="width: 88%"></div></div>
       </div>
       <details>
         <summary>Full review</summary>
@@ -525,16 +526,16 @@
           </ul>
           <h4>Defects and Weaknesses</h4>
           <ul>
-            <li>The same D1 input-validation gap counted a third time here specifically for its security dimension: unvalidated request bodies are a defensive-coding gap, not just a correctness one — malformed or unexpected payload shapes on ~60% of endpoints are trusted rather than rejected at the boundary.</li>
+            <li>The same D1 input-validation gap counted a third time here specifically for its security dimension, corrected 2026-08-06: unvalidated request bodies are a defensive-coding gap, not just a correctness one — but only 6 individually-tracked, deliberately-deferred routes remain, not the ~60% previously claimed.</li>
             <li>No commissioned, independent application security review (a real penetration test) exists<span class="conf confirmed">Confirmed</span> absence — this can only ever be an external validation, not something a repository audit can score directly, but its absence is a real, material gap for a system handling PHI.</li>
             <li><code>ANTHROPIC_API_KEY</code> — the platform's stated default AI provider — has no value anywhere in <code>.env</code> (not even an empty placeholder, unlike <code>.env.example</code>)<span class="conf confirmed">Confirmed</span> this session by direct file read; the adapter degrades cleanly (<code>AIError</code>, code <code>AI_CONFIG_ERROR</code>) rather than crashing, which is itself good defensive design, but the practical effect is that AI-copilot features are very likely non-functional in this environment for lack of a key.</li>
           </ul>
           <h4>Evidence</h4>
           <p><code>lib/ai/providers/anthropicAdapter.ts:36-40</code> (clean config-error throw), root <code>.env</code> (missing key, confirmed by grep), <code>backend/src/main.ts</code> (helmet/CORS/Swagger gate), campaign-documented PHI-leak fix.</p>
           <h4>Point Deductions</h4>
-          <p>−2 for the input-validation gap's security dimension. No deduction taken for the missing pentest itself (external, not repository-scoreable), but flagged as the reason 8/8 is not achievable by code alone.</p>
+          <p>−1 for the input-validation gap's security dimension, reduced from −2 now that only 6 tracked routes remain. No deduction taken for the missing pentest itself (external, not repository-scoreable), but flagged as the reason 8/8 is not achievable by code alone.</p>
           <h4>Requirements for Full Marks</h4>
-          <p>DTO validation coverage (shared remediation with D1). A commissioned penetration test, external to this repository, is required before this category could reasonably be called complete regardless of any further code changes.</p>
+          <p>Resolve the 6 deferred DTO routes (shared remediation with D1). A commissioned penetration test, external to this repository, is required before this category could reasonably be called complete regardless of any further code changes.</p>
         </div>
       </details>
     </article>
@@ -607,13 +608,13 @@
 
   <div class="section-head">
     <h2>Defect register</h2>
-    <p>Every material finding above, consolidated with severity and points recoverable. D3's naming half and D4 closed this session (3 points recovered, 76→78). Total recoverable ≈ 20 points, explaining most of the 78→100 gap (the remainder is the external pentest, which no amount of code can close).</p>
+    <p>Every material finding above, consolidated with severity and points recoverable. D3's naming half and D4 closed 2026-08-06 (3 points recovered, 76→78); D1 corrected (a stale "128 remaining" claim was actually 6) and its 7th entry closed the same day, recovering points across all 3 categories it touches — Code Correctness, Backend &amp; API Quality, Security (7 points recovered, 78→85 — see the correction note on D1 below). Total recoverable ≈ 16 points, explaining most of the 85→100 gap (the remainder is the external pentest, which no amount of code can close).</p>
   </div>
   <div class="ledger-table-wrap">
     <table class="ledger">
       <thead><tr><th>ID</th><th>Sev</th><th>Category</th><th>Defect</th><th>Impact</th><th class="num">Pts</th></tr></thead>
       <tbody>
-        <tr><td>D1</td><td><span class="pill p1">P1</span></td><td>Correctness/Backend/Security</td><td>~60% of backend <code>@Body()</code> DTOs unvalidated (135/225, 7 fixed)</td><td>Malformed payloads trusted, not rejected, on most endpoints</td><td class="num">7</td></tr>
+        <tr><td>D1</td><td><span class="pill p3">P3</span></td><td>Correctness/Backend/Security</td><td><strong>CORRECTED 2026-08-06</strong>: was described as "~60% unvalidated, 128 remaining" — the live regression-guard test (<code>body-validation-coverage.spec.ts</code>) shows 129/135 (95.6%) actually fixed. 6 routes remain, each individually deferred for a documented reason (3 divergent-shape patient-creation callers, 3 large settings-blob DTOs). This session closed a 7th (<code>updateFeatureFlags</code>) that had been mis-grouped with the settings-blob cases.</td><td>Malformed payloads trusted, not rejected, on 6 specific, tracked routes — not "most endpoints"</td><td class="num">3</td></tr>
         <tr><td>D2</td><td><span class="pill p2">P2</span></td><td>Testing</td><td>Known <code>EnvironmentTeardownError</code> flake class, root-caused, unresolved</td><td>Full-suite reds need isolated re-run to trust</td><td class="num">2</td></tr>
         <tr><td>D3</td><td><span class="pill p2">P2</span></td><td>Frontend Quality</td><td>Canonical card components: 11 real importers (4 production), 2 of 5 with zero production use. <code>StatCard</code> naming collision — <strong>CLOSED 2026-08-06</strong> (renamed to <code>WhiteboardStatTile</code>)</td><td>Design system and real UI have diverged (adoption gap still open; naming-collision confusion risk resolved)</td><td class="num">3</td></tr>
         <tr><td>D4</td><td><span class="pill good">Closed</span></td><td>Architecture</td><td><strong>CLOSED 2026-08-06</strong>: 3 parallel route-registration systems now cross-checked by the orphan-detection scanner (<code>orphanDetectionAudit.ts</code> reads all 3 layers)</td><td>Was: a route can be wired in one layer, invisible in another (already happened once, this session's own <code>/navigator</code>)</td><td class="num">0</td></tr>
@@ -675,7 +676,7 @@
     <table class="cat">
       <thead><tr><th>#</th><th>Task</th><th>Files/areas</th><th>Acceptance criteria</th><th>Validation</th><th class="num">Pts</th></tr></thead>
       <tbody>
-        <tr><td>1</td><td>Close the DTO validation gap (D1)</td><td>~128 remaining backend controllers/DTOs</td><td>Every <code>@Body()</code> parameter has a <code>class-validator</code>-decorated DTO</td><td><code>body-validation-coverage.spec.ts</code> exemption list shrinks to 0</td><td class="num">7</td></tr>
+        <tr><td>1</td><td>Resolve the 6 remaining deferred DTO-validation routes (D1)</td><td>3 <code>EmergencyOsController</code> patient-creation routes (product decision needed); <code>EmergencyOsController.updateSettings</code>, <code>OrganizationsController.updateSettings</code>/<code>updateTenantAdministration</code> (dedicated settings-blob DTO cycles needed)</td><td>Patient-creation shape convergence decided; 3 settings DTOs built matching each nested contract</td><td><code>body-validation-coverage.spec.ts</code> <code>BASELINE</code> shrinks to 0</td><td class="num">3</td></tr>
         <tr><td>2</td><td>Resolve the async-teardown test flake (D2)</td><td><code>unifiedWorkflowAutomationEngine.ts</code>, <code>unifiedOperationalIntelligenceEngine.ts</code>, Vitest pool config</td><td>3 consecutive full-suite runs with zero <code>EnvironmentTeardownError</code></td><td>Full <code>vitest run</code>, repeated</td><td class="num">2</td></tr>
         <tr><td>3</td><td><span class="pill good">DONE</span> Rename the shadow <code>StatCard</code> (D3 naming half); grow real canonical-component adoption (D3 remainder, still open)</td><td><code>src/pages/emergency/index.tsx</code> (renamed <code>WhiteboardStatTile</code>), <code>DashboardCard</code>/<code>StatCard</code> call sites</td><td>Zero name collisions (met); &gt;0 production consumers for every "canonical" component or formal registry retirement (open)</td><td>Grep for duplicate exported names; typecheck — both passed</td><td class="num">3</td></tr>
         <tr><td>4</td><td><span class="pill good">DONE</span> Add a route-registry cross-check (D4)</td><td><code>src/data/orphanDetectionAudit.ts</code>, all 7 console-route-tree files, <code>router.tsx</code></td><td>The scanner fails to classify a route as "wired" unless it resolves in one of the 3 real registration layers</td><td><code>orphanDetectionAudit.report.test.ts</code> 3/3 passing; regenerated report confirms 99 false positives eliminated</td><td class="num">0</td></tr>
@@ -690,12 +691,12 @@
 
   <div class="verdict-box">
     <h3>What prevents 100/100?</h3>
-    <p>One thing now dominates the gap: the DTO-validation coverage gap (D1, worth 7 of the ~20 remaining code-recoverable points) is the single largest, most concrete, most-quantified defect in the codebase — a real, systemic input-boundary weakness, not a style nit. A smaller residual cluster remains (canonical-component adoption, a legacy compose file, hardcoded counts) — individually minor, but the route-registration cross-check and the <code>StatCard</code> naming collision that used to headline this cluster were both closed this session. Beyond code, one item is permanently external: a commissioned penetration test.</p>
+    <p>No single dominant gap remains after this session's correction — the DTO-validation coverage gap (D1), previously described as the largest, most-quantified defect in the codebase, turned out to be 95.6% already closed once the live regression-guard test was read directly instead of an older prose summary. What's left is a residual cluster of individually-minor, individually-tracked items: 6 deliberately-deferred DTO routes (D1, each needing a real product/design decision, not more mechanical DTO-writing), the missing <code>ANTHROPIC_API_KEY</code> (D5), a legacy compose file (D7), and low canonical-component adoption (D3's remaining half). Beyond code, one item is permanently external: a commissioned penetration test.</p>
     <h3>Highest-value fixes</h3>
-    <p>In order: (1) DTO validation coverage — largest single point recovery, touches correctness/backend/security simultaneously. (2) The <code>ANTHROPIC_API_KEY</code> gap — a one-line config fix once a real key is supplied, with an outsized functional impact. (3) Growing real production adoption of the canonical card components, now that the naming collision confusing that count is gone.</p>
+    <p>In order: (1) The <code>ANTHROPIC_API_KEY</code> gap — a one-line config fix once a real key is supplied, with an outsized functional impact, now the single highest-leverage remaining item. (2) A product decision on patient-creation intake-shape convergence, unblocking 3 of D1's 6 remaining routes. (3) Growing real production adoption of the canonical card components, now that the naming collision confusing that count is gone.</p>
     <h3>Final Engineering Verdict</h3>
-    <p class="verdict-gate">Functional but requires hardening</p>
-    <p>The codebase is genuinely well-structured, actively and honestly maintained, and free of the kind of chaos "materially incomplete" might suggest — dead code is deleted, not hidden; a real CI-enforced structural guard exists; 12,000+ tests pass; security fundamentals (helmet, CORS, exception handling, no raw SQL, no dangerouslySetInnerHTML) are all present and verified. What keeps this from "Strong" is one concrete, sizeable, still-open input-validation gap and a small set of unreconciled duplicate systems that each work individually but aren't cross-checked against each other — exactly the profile of "functional, needs hardening," not "unstable."</p>
+    <p class="verdict-gate">Solid, minor hardening remains</p>
+    <p>The codebase is genuinely well-structured, actively and honestly maintained, and free of the kind of chaos "materially incomplete" might suggest — dead code is deleted, not hidden (2 more confirmed-dead files closed this session); a real CI-enforced structural guard exists; 12,000+ tests pass; security fundamentals (helmet, CORS, exception handling, no raw SQL, no dangerouslySetInnerHTML) are all present and verified; and the codebase's own primary input-validation liability turned out to be far smaller than previously documented once independently re-verified against the live test suite rather than a stale summary. What keeps this from "Excellent" is a handful of individually-small, individually-tracked gaps — a missing API key, a few deliberately-deferred DTOs pending product decisions, and one external pentest — not a systemic weakness.</p>
   </div>
 
   <footer>

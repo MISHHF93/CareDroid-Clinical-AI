@@ -42,6 +42,7 @@ import {
   UpdateEmergencyPatientDto,
   CreateEmergencyReferralDto,
 } from '../src/modules/platform-systems/dto/emergency-patient-actions.dto';
+import { UpdateFeatureFlagsDto } from '../src/modules/organizations/dto/update-feature-flags.dto';
 
 const root = join(__dirname, '..');
 
@@ -675,6 +676,56 @@ describe('backend contract hardening', () => {
         { patientId: 'pt-001', unexpectedField: 'unexpected' },
         bodyMetadata(CreateEmergencyReferralDto),
       ),
+    ).rejects.toThrow(BadRequestException);
+  });
+
+  /**
+   * 2026-08-06: same proof for OrganizationsController.updateFeatureFlags,
+   * closed after re-checking it wasn't actually one of the large nested-
+   * settings-blob cases the other 2 OrganizationsController entries remain
+   * deferred for -- see update-feature-flags.dto.ts's header. Zero real
+   * callers today, so this proves the DTO mirrors FeatureFlagService's own
+   * FeatureFlagUpdateInput shape correctly rather than preserving a live
+   * payload.
+   */
+  it('OrganizationsController.updateFeatureFlags DTO actually gets whitelist-validated by the real global ValidationPipe (2026-08-06)', async () => {
+    const pipe = new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    });
+    const bodyMetadata = (metatype: ArgumentMetadata['metatype']): ArgumentMetadata => ({
+      type: 'body',
+      metatype,
+      data: undefined,
+    });
+
+    await expect(
+      pipe.transform(
+        { scope: 'workspace', flagId: 'smart-triage', workspaceId: 'ws-1', state: 'enabled' },
+        bodyMetadata(UpdateFeatureFlagsDto),
+      ),
+    ).resolves.toMatchObject({ scope: 'workspace', flagId: 'smart-triage', workspaceId: 'ws-1' });
+    await expect(
+      pipe.transform(
+        { scope: 'tenant', flagId: 'smart-triage', reset: true },
+        bodyMetadata(UpdateFeatureFlagsDto),
+      ),
+    ).resolves.toMatchObject({ scope: 'tenant', flagId: 'smart-triage', reset: true });
+    await expect(
+      pipe.transform(
+        { scope: 'tenant', flagId: 'smart-triage', unexpectedField: 'drop-me' },
+        bodyMetadata(UpdateFeatureFlagsDto),
+      ),
+    ).rejects.toThrow(BadRequestException);
+    await expect(
+      pipe.transform(
+        { scope: 'not-a-real-scope', flagId: 'smart-triage' },
+        bodyMetadata(UpdateFeatureFlagsDto),
+      ),
+    ).rejects.toThrow(BadRequestException);
+    await expect(
+      pipe.transform({ scope: 'tenant' }, bodyMetadata(UpdateFeatureFlagsDto)),
     ).rejects.toThrow(BadRequestException);
   });
 });

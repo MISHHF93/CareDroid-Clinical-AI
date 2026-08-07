@@ -17,6 +17,7 @@ import { TenantIsolationGuard } from '../tenant-context/tenant-isolation.guard';
 import { OrganizationScoped, SkipTenantIsolation } from '../tenant-context/tenant-scope.decorator';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
+import { UpdateFeatureFlagsDto } from './dto/update-feature-flags.dto';
 import { OrganizationOnboardingService } from './organization-onboarding.service';
 import { OrganizationsService } from './organizations.service';
 
@@ -117,14 +118,10 @@ export class OrganizationsController {
   async updateFeatureFlags(
     @Req() req: any,
     @Param('organizationId') organizationId: string,
-    @Body() dto: Record<string, unknown>,
+    @Body() dto: UpdateFeatureFlagsDto,
   ) {
     this.assertTenantOrganization(req, organizationId);
-    return this.organizationsService.updateFeatureFlagAdministration(
-      req.user,
-      organizationId,
-      dto as any,
-    );
+    return this.organizationsService.updateFeatureFlagAdministration(req.user, organizationId, dto);
   }
 
   @Patch(':organizationId')
