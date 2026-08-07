@@ -15,7 +15,7 @@ Canonical source: `src/data/e2eRegressionChecklist.ts`.
 
 - [ ] ALL_REGISTRY_TOOL_IDS matches toolRegistry.js
 - [ ] NLU_PROFILE_TOOL_IDS matches clinicalIntentTools + backend tool.patterns.ts
-- [ ] REGISTRY_ID_TO_ORCHESTRATOR_TOOL matches backend REGISTERED_EXECUTOR_TOOL_IDS (39 as of this check — re-count before trusting a cached number, this list has grown silently before)
+- [ ] REGISTRY_ID_TO_ORCHESTRATOR_TOOL matches backend REGISTERED_EXECUTOR_TOOL_IDS (39 as of 2026-08-07 — re-count before trusting a cached number, this list has grown silently before)
 - [ ] No dispatch-ai in REGISTRY_ID_TO_ORCHESTRATOR_TOOL
 
 ## SPA routes
