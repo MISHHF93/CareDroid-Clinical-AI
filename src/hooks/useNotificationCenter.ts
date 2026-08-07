@@ -4,6 +4,7 @@ import { raiseOperationalAlarm } from '../services/notificationToastPolicy';
 import { useEmergencyStore } from '../store/emergencyStore';
 import type { Alert } from '../types/emergency';
 import { CANONICAL_ROUTES } from '../config/routes.config';
+import { EMERGENCY_ROLE_IDS } from '../config/emergencyRolePermissions';
 import {
   filterOperationalMetrics,
   getOperationalMetricRoute,
@@ -421,8 +422,8 @@ export function useNotificationCenter() {
       if (!alert?.id) return;
 
       const targets = escalationAlertTargets(alert);
-      if (emergencyRole.role === 'triage_nurse' && !targets.includes('triage')) return;
-      if (emergencyRole.role === 'charge_nurse' && !targets.includes('charge')) return;
+      if (emergencyRole.role === EMERGENCY_ROLE_IDS.triageNurse && !targets.includes('triage')) return;
+      if (emergencyRole.role === EMERGENCY_ROLE_IDS.chargeNurse && !targets.includes('charge')) return;
 
       const envelope = resolveOperationalAlertEnvelope(alert);
       if (!envelope.showToast || toastedAlertIdsRef.current.has(alert.id)) return;

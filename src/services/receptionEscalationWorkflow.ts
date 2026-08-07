@@ -1,6 +1,7 @@
 import type { Alert, Patient, Staff, WorkflowActionLog } from '../types/emergency';
 import { PatientFlag, PatientState } from '../types/emergency';
 import { createWaitingRoomCommunicationLogInput } from './waitingRoomCommunicationLog';
+import { EMERGENCY_ROLE_IDS } from '../config/emergencyRolePermissions';
 
 export type ReceptionEscalationReasonId =
   | 'worsening-symptoms'
@@ -439,8 +440,8 @@ export function filterReceptionEscalationsForRole(
   roleId: string | null | undefined,
 ): Alert[] {
   const role = String(roleId || '');
-  if (role === 'triage_nurse') return filterReceptionEscalationsForTarget(alerts, 'triage');
-  if (role === 'charge_nurse') return filterReceptionEscalationsForTarget(alerts, 'charge');
+  if (role === EMERGENCY_ROLE_IDS.triageNurse) return filterReceptionEscalationsForTarget(alerts, 'triage');
+  if (role === EMERGENCY_ROLE_IDS.chargeNurse) return filterReceptionEscalationsForTarget(alerts, 'charge');
   if (isClinicalEscalationRecipientRole(role)) return listActiveReceptionEscalations(alerts);
   return [];
 }
