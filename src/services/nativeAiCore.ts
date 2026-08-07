@@ -48,6 +48,23 @@ function resolveSourceState(explicit?: NativeAiSourceState): NativeAiSourceState
   return isSimulationModeActive() ? 'simulated' : 'live';
 }
 
+/**
+ * predictPostEdOrientation/predictProlongedEdStay/predictAdmissionLikelihoodMl/
+ * extractMultiChannelClinicalTextFeatures are hand-coded heuristic formulas
+ * (their own MODEL_VERSION strings say so: "*-xgboost-heuristic",
+ * "*-roberta-mha-cnn-heuristic") and each already defaults its own
+ * sourceState to 'demo' — an honest, correct self-classification. Passing
+ * the session-level resolveSourceState() result straight through overrides
+ * that honest default with 'live' outside simulation mode, mislabeling
+ * every one of these unvalidated heuristics as real live inference
+ * (surfaced most visibly in AiTransparencyDashboard). Only forward the
+ * resolved state when it's the (also honest) 'simulated' case; otherwise
+ * let each function's own 'demo' default stand.
+ */
+function heuristicSourceState(sourceState: NativeAiSourceState): NativeAiSourceState | undefined {
+  return sourceState === 'simulated' ? sourceState : undefined;
+}
+
 export function buildNativeAiPatientSnapshot(
   patient: Patient,
   options: {
@@ -82,17 +99,23 @@ export function buildNativeAiPatientSnapshot(
     routing,
     specialistInferences,
     triageInference: inferTriageFromExpertSystem(patient, { sourceState }),
-    orientation: predictPostEdOrientation(patient, { abnormalLabs: options.abnormalLabs, sourceState }),
-    prolongedStay: predictProlongedEdStay(patient, { sourceState, now: options.now }),
+    orientation: predictPostEdOrientation(patient, {
+      abnormalLabs: options.abnormalLabs,
+      sourceState: heuristicSourceState(sourceState),
+    }),
+    prolongedStay: predictProlongedEdStay(patient, {
+      sourceState: heuristicSourceState(sourceState),
+      now: options.now,
+    }),
     admissionMl: predictAdmissionLikelihoodMl(patient, {
       abnormalLabs: options.abnormalLabs,
       consultPending: options.consultPending,
-      sourceState,
+      sourceState: heuristicSourceState(sourceState),
     }),
     textFeatures: extractMultiChannelClinicalTextFeatures({
       text: complaintText,
       sourceLabel: 'patient-card',
-      sourceState,
+      sourceState: heuristicSourceState(sourceState),
     }),
   };
 }
