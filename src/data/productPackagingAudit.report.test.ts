@@ -20,7 +20,7 @@ describe('productPackagingAudit report', () => {
     expect(audit.solutionPackChecks.every((p) => p.productLinksPack)).toBe(true);
   });
 
-  it('writes docs/product-packaging-audit.md when PRODUCT_PACKAGING_AUDIT_WRITE_DOCS=1', () => {
+  it('writes docs/specs/product-packaging-audit.md when PRODUCT_PACKAGING_AUDIT_WRITE_DOCS=1', () => {
     if (!process.env.PRODUCT_PACKAGING_AUDIT_WRITE_DOCS) return;
 
     const markdown = formatProductPackagingAuditMarkdown();

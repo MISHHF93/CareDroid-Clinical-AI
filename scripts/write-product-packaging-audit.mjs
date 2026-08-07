@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Regenerate docs/product-packaging-audit.md
+ * Regenerate docs/specs/product-packaging-audit.md
  *
  * Usage: npm run product-packaging-audit:write-docs
  */
