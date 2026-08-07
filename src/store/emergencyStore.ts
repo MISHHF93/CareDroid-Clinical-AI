@@ -148,6 +148,7 @@ import {
   type HighRiskComplaintFlagRecord,
 } from '../services/highRiskComplaintFlags';
 import {
+  mergeEmsArrivalHydration,
   normalizeEmsArrivalOffloadPatch,
   syncEmsOffloadOperationalSurfaces,
 } from '../services/emsOffloadTracker';
@@ -6113,7 +6114,9 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
           workflowLogs,
           activeShift: payload.activeShift || state.activeShift,
           emsUnits: payload.emsUnits || state.emsUnits,
-          emsArrivals: payload.emsArrivals || state.emsArrivals,
+          emsArrivals: payload.emsArrivals
+            ? mergeEmsArrivalHydration(payload.emsArrivals, state.emsArrivals)
+            : state.emsArrivals,
           referrals,
           queues: payload.queues || state.queues,
           activeQueueFilter: payload.activeQueueFilter ?? state.activeQueueFilter,

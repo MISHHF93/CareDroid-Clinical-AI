@@ -4,6 +4,7 @@ import {
   buildEmsOffloadAlerts,
   buildEmsOffloadTrackerRow,
   buildEmsOffloadTrackerSummary,
+  mergeEmsArrivalHydration,
   normalizeEmsArrivalOffloadPatch,
   syncEmsOffloadOperationalSurfaces,
 } from './emsOffloadTracker';
@@ -157,6 +158,58 @@ describe('emsOffloadTracker', () => {
     );
     expect(patch.arrivedAt).toBeTruthy();
     expect(patch.handoffStartedAt).toBeTruthy();
+  });
+
+  it('preserves locally-tracked handoff progress across a real-time whiteboard hydration', () => {
+    // The backend always resynthesizes arrivals as fresh 'Inbound' rows with
+    // no arrivedAt (EMSIntakeService.getEMSIntake() has no durable EMS-arrival
+    // status store) -- this is what a whiteboard_updated WebSocket push sends.
+    const payloadArrival: EMSArrival = {
+      id: 'ems-6',
+      unitId: 'Medic 6',
+      unitName: 'Medic 6',
+      crewNames: [],
+      patientAge: 60,
+      patientSex: 'F',
+      chiefComplaint: 'Updated chief complaint from backend',
+      prearrivalComplaint: 'Chest pain',
+      eta: 0,
+      severity: 'Critical',
+      dispatchTime: '2026-06-20T11:00:00.000Z',
+      estimatedArrivalTime: '2026-06-20T11:20:00.000Z',
+      notes: '',
+      status: 'Inbound',
+      priority: Priority.P1,
+    };
+    // ...while the local store already progressed this same arrival through
+    // a real handoff, driven by normalizeEmsArrivalOffloadPatch above.
+    const localArrival: EMSArrival = {
+      ...payloadArrival,
+      chiefComplaint: 'Chest pain',
+      status: 'Handoff',
+      patientId: 'patient-6',
+      arrivedAt: '2026-06-20T11:20:00.000Z',
+      handoffStartedAt: '2026-06-20T11:25:00.000Z',
+      preparedRoomId: 'resus-2',
+    };
+    // A second local arrival the backend no longer lists at all (converted
+    // to a real patient / departed) must NOT be zombie-preserved.
+    const droppedLocalArrival: EMSArrival = { ...localArrival, id: 'ems-7' };
+
+    const merged = mergeEmsArrivalHydration(
+      [payloadArrival],
+      [localArrival, droppedLocalArrival],
+    );
+
+    expect(merged).toHaveLength(1);
+    const result = merged[0];
+    expect(result.status).toBe('Handoff');
+    expect(result.arrivedAt).toBe('2026-06-20T11:20:00.000Z');
+    expect(result.handoffStartedAt).toBe('2026-06-20T11:25:00.000Z');
+    expect(result.preparedRoomId).toBe('resus-2');
+    expect(result.patientId).toBe('patient-6');
+    // Fresh, non-progression fields from the backend still flow through.
+    expect(result.chiefComplaint).toBe('Updated chief complaint from backend');
   });
 
   it('builds attention snapshot and sync payload surfaces', () => {

@@ -368,6 +368,52 @@ export function normalizeEmsArrivalOffloadPatch(
   return normalized;
 }
 
+/**
+ * The backend's EMSIntakeService.getEMSIntake() synthesizes EMS arrivals
+ * fresh from patient records on every request -- it never tracks a real
+ * arrived/handoff timestamp or status transition server-side (its own
+ * comment: "Local whiteboard status remains the frontend source of truth
+ * for unit tracking"). Every arrival it returns is status: 'Inbound' with
+ * no arrivedAt/handoffStartedAt/handoffCompletedAt. Before this fix,
+ * emergencyStore's hydrateFromApi did `emsArrivals: payload.emsArrivals ||
+ * state.emsArrivals` -- a blind full-array replace, run on every real-time
+ * whiteboard-update WebSocket push (emergency_snapshot/whiteboard_updated/
+ * etc, which fire on ANY user's action across the app, not just a manual
+ * refresh). That silently reset every EMS arrival's locally-tracked
+ * "Arrived"/"Handoff" status and its offload timestamps back to the
+ * backend's timestamp-free 'Inbound' baseline -- effectively breaking the
+ * offload-timer feature (buildEmsOffloadTrackerSummary/normalizeEmsArrival
+ * OffloadPatch above) under real-time multi-user load, since the clock
+ * driving it kept getting wiped out from under it. Merges the backend's
+ * fresh field values (chief complaint, vitals, eta, etc.) while preserving
+ * locally-tracked workflow-progression fields the backend never reports;
+ * an arrival the backend no longer lists (converted to a real patient,
+ * cancelled) correctly drops out rather than being zombie-preserved.
+ */
+export function mergeEmsArrivalHydration(
+  payloadArrivals: EMSArrival[],
+  localArrivals: EMSArrival[],
+): EMSArrival[] {
+  const localById = new Map(localArrivals.map((arrival) => [arrival.id, arrival]));
+  return payloadArrivals.map((arrival) => {
+    const local = localById.get(arrival.id);
+    if (!local) return arrival;
+    return {
+      ...arrival,
+      status: local.status ?? arrival.status,
+      patientId: local.patientId ?? arrival.patientId,
+      arrivedAt: local.arrivedAt ?? arrival.arrivedAt,
+      handoffStartedAt: local.handoffStartedAt ?? arrival.handoffStartedAt,
+      handoffCompletedAt: local.handoffCompletedAt ?? arrival.handoffCompletedAt,
+      preparedRoomId: local.preparedRoomId ?? arrival.preparedRoomId,
+      criticalChecklist: local.criticalChecklist ?? arrival.criticalChecklist,
+      handoffSummary: local.handoffSummary ?? arrival.handoffSummary,
+      ambulanceHandoffChecklist: local.ambulanceHandoffChecklist ?? arrival.ambulanceHandoffChecklist,
+      handoffClose: local.handoffClose ?? arrival.handoffClose,
+    };
+  });
+}
+
 export type EmsOffloadTrackerStore = {
   emsArrivals: EMSArrival[];
   patients?: Patient[];
