@@ -76,6 +76,7 @@ import {
   fetchReceptionSnapshot,
   createSmartIntakePatient,
   postReceptionEscalation,
+  patchEmsArrivalStatus,
 } from '../services/emergencyOsApi';
 import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
 import { apiFetch } from '../services/apiClient';
@@ -5516,12 +5517,12 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         ),
       })),
 
-    convertEMSArrivalToPatient: (arrivalId) =>
+    convertEMSArrivalToPatient: (arrivalId) => {
+      const timestamp = nowIso();
       set((state) => {
         const arrival = state.emsArrivals.find((candidate) => candidate.id === arrivalId);
         if (!arrival || arrival.patientId) return {};
 
-        const timestamp = nowIso();
         const patient = emsArrivalToPatient(
           {
             ...arrival,
@@ -5590,7 +5591,27 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
             },
           ]),
         };
-      }),
+      });
+
+      // Fire-and-forget durable sync, matching EMSPipeline.tsx's completeHandoff
+      // precedent -- the local optimistic update above is the source of truth for
+      // immediate UI responsiveness; this is what makes the offload clock survive a
+      // reload or a different workstation instead of resetting to the backend's
+      // synthetic 'Inbound' default.
+      const convertedArrival = get().emsArrivals.find((candidate) => candidate.id === arrivalId);
+      if (convertedArrival) {
+        void patchEmsArrivalStatus(arrivalId, {
+          status: 'Handoff',
+          patientId: convertedArrival.patientId,
+          unitId: convertedArrival.unitId,
+          unitName: convertedArrival.unitName,
+          arrivedAt: convertedArrival.arrivedAt,
+          handoffStartedAt: convertedArrival.handoffStartedAt,
+        }).catch((error) => {
+          logger.warn('[emergencyStore] Failed to sync EMS arrival status to backend', error);
+        });
+      }
+    },
 
     initializeFlags: async () => {
       const tier = get().tier || DEFAULT_TIER;

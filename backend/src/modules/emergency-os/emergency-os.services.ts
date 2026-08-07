@@ -62,6 +62,7 @@ import {
 import { Patient } from './entities/patient.entity';
 import { Alert } from './entities/alert.entity';
 import { Referral as ReferralEntity } from './entities/referral.entity';
+import { EmsArrivalStatus } from './entities/ems-arrival-status.entity';
 import { WorkflowActionLogEntry } from './entities/workflow-action-log-entry.entity';
 import { EncryptionService } from '../encryption/encryption.service';
 
@@ -1562,11 +1563,95 @@ export class PatientJourneyService {
 }
 
 @Injectable()
-export class EMSIntakeService {
+export class EMSIntakeService implements OnModuleInit {
+  private readonly logger = new Logger(EMSIntakeService.name);
+  /** In-memory mirror of ems_arrival_status, kept synchronous like ReferralService's
+   * createdReferrals so getEMSIntake() never needs to become async for its 7 real
+   * callers -- rehydrated once at boot, updated on every write, persisted in the
+   * background. */
+  private readonly arrivalStatusById = new Map<string, Record<string, unknown>>();
+
   constructor(
     private readonly patientService: EmergencyPatientService,
     private readonly workflowLogService: WorkflowActionLogService,
+    @Optional()
+    @InjectRepository(EmsArrivalStatus)
+    private readonly arrivalStatusRepository?: Repository<EmsArrivalStatus>,
   ) {}
+
+  /**
+   * Load durable EMS arrival status transitions so the offload clock (arrived /
+   * handoff-started / handoff-completed) survives a process restart and stays
+   * consistent across workstations, instead of living only in each browser's local
+   * store (see emsOffloadTracker.ts's own documented gap on the frontend side).
+   */
+  async onModuleInit(): Promise<void> {
+    if (!this.arrivalStatusRepository) return;
+    try {
+      const rows = await this.arrivalStatusRepository.find();
+      for (const row of rows) {
+        this.arrivalStatusById.set(row.id, this.mapEntityToStatusRecord(row));
+      }
+    } catch (error) {
+      this.logger.warn(`Failed to rehydrate EMS arrival status from database: ${error}`);
+    }
+  }
+
+  private mapEntityToStatusRecord(entity: EmsArrivalStatus): Record<string, unknown> {
+    return {
+      status: entity.status,
+      patientId: entity.patientId,
+      unitId: entity.unitId,
+      unitName: entity.unitName,
+      arrivedAt: entity.arrivedAt,
+      handoffStartedAt: entity.handoffStartedAt,
+      handoffCompletedAt: entity.handoffCompletedAt,
+    };
+  }
+
+  private persistArrivalStatus(arrivalId: string, record: Record<string, unknown>): void {
+    if (!this.arrivalStatusRepository) return;
+    const entity = this.arrivalStatusRepository.create({
+      id: arrivalId,
+      status: String(record.status || ''),
+      patientId: record.patientId ? String(record.patientId) : undefined,
+      unitId: record.unitId ? String(record.unitId) : undefined,
+      unitName: record.unitName ? String(record.unitName) : undefined,
+      arrivedAt: record.arrivedAt ? String(record.arrivedAt) : undefined,
+      handoffStartedAt: record.handoffStartedAt ? String(record.handoffStartedAt) : undefined,
+      handoffCompletedAt: record.handoffCompletedAt ? String(record.handoffCompletedAt) : undefined,
+    });
+    this.arrivalStatusRepository.save(entity).catch((error) => {
+      this.logger.warn(`Failed to persist EMS arrival status ${arrivalId} to database: ${error}`);
+    });
+  }
+
+  /**
+   * Upserts a durable status transition for one EMS arrival, keyed by the same
+   * arrivalId the frontend already generates. Merges onto whatever's already tracked
+   * rather than replacing it, so a later "handoff started" call doesn't erase an
+   * earlier "arrived" timestamp -- mirrors how normalizeEmsArrivalOffloadPatch already
+   * merges on the frontend.
+   */
+  updateArrivalStatus(
+    arrivalId: string,
+    patch: Record<string, unknown>,
+  ): EmergencyModuleEnvelope<Record<string, unknown>> {
+    const id = String(arrivalId || '').trim();
+    if (!id) {
+      return envelope('EMS Arrival Status', { ok: false, error: 'arrivalId is required' });
+    }
+    const existing = this.arrivalStatusById.get(id) || {};
+    const merged: Record<string, unknown> = {
+      ...existing,
+      ...Object.fromEntries(Object.entries(patch).filter(([, value]) => value != null)),
+    };
+    if (!merged.status) merged.status = existing.status || 'Inbound';
+    this.arrivalStatusById.set(id, merged);
+    this.persistArrivalStatus(id, merged);
+
+    return envelope('EMS Arrival Status', { ok: true, arrivalId: id, ...merged });
+  }
 
   getEMSIntake() {
     const patients = this.patientService
@@ -1584,7 +1669,9 @@ export class EMSIntakeService {
     }));
     const emsArrivals = arrivals
       .filter((row) => row.handoffStatus === 'pre-arrival')
-      .map((row, index) => buildInboundEmsRecord(row, index));
+      .map((row, index) =>
+        buildInboundEmsRecord(row, index, this.arrivalStatusById.get(`ems-arrival-${row.patient.id}`)),
+      );
     return envelope('EMS Intake', {
       arrivals,
       emsArrivals,
@@ -1644,6 +1731,16 @@ export class EMSIntakeService {
       });
     }
 
+    this.updateArrivalStatus(arrivalId, {
+      status: 'Complete',
+      patientId: patientId || undefined,
+      unitId: input.unitId,
+      unitName: input.unitName,
+      arrivedAt: input.arrivedAt,
+      handoffStartedAt: input.handoffStartedAt,
+      handoffCompletedAt: timestamp,
+    });
+
     const log = this.workflowLogService.record({
       type: patientId && patient ? 'ems_converted_to_patient' : 'journey_state_changed',
       title: 'EMS handoff completed',
@@ -1695,6 +1792,7 @@ function buildInboundEmsRecord(
     handoffStatus: string;
   },
   index: number,
+  trackedStatus?: Record<string, unknown>,
 ) {
   const { patient, etaMinutes, offloadRisk } = row;
   const estimatedArrivalTime = new Date(Date.now() + etaMinutes * 60000).toISOString();
@@ -1702,8 +1800,8 @@ function buildInboundEmsRecord(
   return {
     id: `ems-arrival-${patient.id || index}`,
     patientId: undefined,
-    unitId: patient.mrn || `EMS-${index + 1}`,
-    unitName: patient.mrn || `EMS Unit ${index + 1}`,
+    unitId: (trackedStatus?.unitId as string) || patient.mrn || `EMS-${index + 1}`,
+    unitName: (trackedStatus?.unitName as string) || patient.mrn || `EMS Unit ${index + 1}`,
     crewNames: ['EMS crew en route'],
     patientAge: patient.age,
     patientSex: patient.sex,
@@ -1715,7 +1813,13 @@ function buildInboundEmsRecord(
     severity: emsSeverityFromPatient(patient, offloadRisk),
     dispatchTime: patient.arrivalTime,
     estimatedArrivalTime,
-    status: 'Inbound' as const,
+    // Durable status/timestamps win over the synthetic 'Inbound' default the moment
+    // this arrival has any tracked transition (see EMSIntakeService.updateArrivalStatus) --
+    // this is what makes the offload clock survive a reload / different workstation.
+    status: (trackedStatus?.status as 'Inbound') || 'Inbound',
+    arrivedAt: (trackedStatus?.arrivedAt as string) || undefined,
+    handoffStartedAt: (trackedStatus?.handoffStartedAt as string) || undefined,
+    handoffCompletedAt: (trackedStatus?.handoffCompletedAt as string) || undefined,
     priority: patient.priority,
     notes: patient.timeline?.[patient.timeline.length - 1]?.note || patient.chiefComplaint,
     mechanismOfInjury: patient.complaintCategory,

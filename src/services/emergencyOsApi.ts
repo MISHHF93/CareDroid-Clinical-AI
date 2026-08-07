@@ -194,6 +194,17 @@ export const postEmsHandoff = (payload) =>
     method: 'POST',
     body: JSON.stringify(payload),
   });
+/**
+ * Durable EMS arrival status transition (arrived / handoff-started / handoff-completed).
+ * Fire-and-forget from the store — the local optimistic update is the source of truth
+ * for immediate UI responsiveness; this call is what makes it survive a reload or a
+ * different workstation instead of resetting to the backend's synthetic 'Inbound'.
+ */
+export const patchEmsArrivalStatus = (arrivalId: string, payload: Record<string, unknown>) =>
+  requestEmergencyJson(`${EMERGENCY_OS_API_ENDPOINTS.ems}/arrivals/${encodeURIComponent(arrivalId)}/status`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
 export const fetchReceptionSnapshot = () =>
   requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.receptionSnapshot);
 export const postReceptionHandoff = (payload) =>

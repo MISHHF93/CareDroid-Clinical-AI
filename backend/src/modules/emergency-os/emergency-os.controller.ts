@@ -70,6 +70,7 @@ import {
   OcrFieldReviewDto,
   ApplyOcrJobToIntakeDto,
   PostEmsHandoffDto,
+  PatchEmsArrivalStatusDto,
   PostReceptionEscalationDto,
   PostReceptionHandoffDto,
   PostTriageAssistDto,
@@ -380,6 +381,17 @@ export class EmergencyOsController {
   @Post('ems/handoff')
   postEmsHandoff(@Body() body: PostEmsHandoffDto) {
     return this.emsIntakeService.completeHandoff(body);
+  }
+
+  /** Durable EMS arrival status transitions (arrived / handoff-started) -- see
+   * EMSIntakeService.updateArrivalStatus's own doc comment for why this exists. */
+  @RequirePermission(Permission.WRITE_PHI)
+  @Patch('ems/arrivals/:arrivalId/status')
+  patchEmsArrivalStatus(
+    @Param('arrivalId') arrivalId: string,
+    @Body() body: PatchEmsArrivalStatusDto,
+  ) {
+    return this.emsIntakeService.updateArrivalStatus(arrivalId, { ...body });
   }
 
   @RequirePermission(Permission.READ_PHI)

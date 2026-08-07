@@ -143,6 +143,16 @@ export class PostEmsHandoffDto {
   @IsOptional() @IsString() @MaxLength(2000) notes?: string;
 }
 
+export class PatchEmsArrivalStatusDto {
+  @IsOptional() @IsString() @MaxLength(32) status?: string;
+  @IsOptional() @IsString() @MaxLength(96) patientId?: string;
+  @IsOptional() @IsString() @MaxLength(96) unitId?: string;
+  @IsOptional() @IsString() @MaxLength(120) unitName?: string;
+  @IsOptional() @IsString() arrivedAt?: string;
+  @IsOptional() @IsString() handoffStartedAt?: string;
+  @IsOptional() @IsString() handoffCompletedAt?: string;
+}
+
 export class PostReceptionEscalationDto {
   @IsOptional() @IsString() @MaxLength(96) reasonId?: string;
   @IsOptional() @IsString() @MaxLength(200) reasonLabel?: string;
