@@ -1,4 +1,11 @@
-import { ConflictException, Injectable, Logger, NotFoundException, Optional, OnModuleInit } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  Logger,
+  NotFoundException,
+  Optional,
+  OnModuleInit,
+} from '@nestjs/common';
 // OnModuleInit used by EmergencyPatientService board rehydrate
 import { InjectRepository } from '@nestjs/typeorm';
 import type { Repository } from 'typeorm';
@@ -11,6 +18,10 @@ import {
   EXTERNAL_DATA_REVIEW_DISCLAIMER,
   HUMAN_REVIEW_DISCLAIMER,
 } from '../../../../lib/ai/safetyPolicy';
+import {
+  evaluatePriorityChange,
+  patientSafetyContextFromRecord,
+} from '../../../../lib/ai/clinicalSafetyRules';
 import { CigProjectionFacade } from '../cig/cig-projection.facade';
 import { EmergencyRealtimeService } from './emergency-realtime.service';
 import { CollaborationHubService } from '../collaboration-hub/collaboration-hub.service';
@@ -109,6 +120,14 @@ function numericVital(vitals: Partial<EmergencyVitals>, ...keys: string[]): numb
     if (Number.isFinite(parsed)) return parsed;
   }
   return null;
+}
+
+/** Extracts a requested DPS 1-5 target from copilot free text, e.g. "DPS 2" or "priority 3". */
+function extractRequestedDps(query: string): 1 | 2 | 3 | 4 | 5 | null {
+  const match = query.match(/(?:dps|priority)\s*([1-5])/i);
+  if (!match) return null;
+  const score = Number(match[1]);
+  return [1, 2, 3, 4, 5].includes(score) ? (score as 1 | 2 | 3 | 4 | 5) : null;
 }
 
 function requiresReassessment(patient: EmergencyPatient): boolean {
@@ -2392,102 +2411,6 @@ export class EDCopilotService {
     });
   }
 
-  private processQueryLegacy(input: {
-    query?: string;
-    user_role?: string;
-    context?: Record<string, unknown>;
-  }) {
-    const query = String(input.query || '').trim();
-    const lowerQuery = query.toLowerCase();
-    const patients = this.patientService.listPatients();
-    const capacity = this.patientService.computeCapacity();
-    const reassessmentPatients = patients.filter(
-      (patient) => patient.flags.includes('ReassessmentDue') || requiresReassessment(patient),
-    );
-    const emsPatients = patients.filter(
-      (patient) =>
-        patient.flags.includes('EMSArrival') ||
-        /ems|ambulance|pre-arrival/i.test(patient.chiefComplaint),
-    );
-    let response =
-      'Ask about longest wait, reassessment queue, EMS inbound, current capacity, or major clinical workflows.';
-    let data: Record<string, unknown> = {
-      supportedQueries: ['longest wait', 'reassessment', 'ems inbound', 'capacity', 'bottleneck'],
-    };
-    let requiresReview = false;
-
-    if (lowerQuery.includes('waited longest') || lowerQuery.includes('longest wait')) {
-      const longestWait = [...patients].sort(
-        (left, right) => minutesSince(right.arrivalTime) - minutesSince(left.arrivalTime),
-      )[0];
-      response = longestWait
-        ? `${longestWait.firstName} ${longestWait.lastName} has waited ${minutesSince(
-            longestWait.arrivalTime,
-          )} minutes and is currently in ${longestWait.state}.`
-        : 'No active patients are available in the CareDroid fixture.';
-      data = { patient: longestWait || null };
-    } else if (lowerQuery.includes('reassessment') || lowerQuery.includes('needs attention')) {
-      response = `${reassessmentPatients.length} patient(s) need reassessment or high-priority review.`;
-      data = { patients: reassessmentPatients };
-      requiresReview = reassessmentPatients.length > 0;
-    } else if (lowerQuery.includes('ems') || lowerQuery.includes('ambulance')) {
-      response = `${emsPatients.length} EMS/pre-arrival patient(s) are represented in the current ED board.`;
-      data = { patients: emsPatients };
-    } else if (lowerQuery.includes('capacity') || lowerQuery.includes('bottleneck')) {
-      const waitingCount = patients.filter((patient) => patient.state === 'Waiting').length;
-      const boardingCount = patients.filter(isBoarding).length;
-      response = `Current capacity is ${capacity.band} at ${capacity.occupancyPercent}% occupancy with ${waitingCount} waiting and ${boardingCount} boarding.`;
-      data = {
-        capacity,
-        waitingCount,
-        boardingCount,
-        reassessmentDue: reassessmentPatients.length,
-      };
-      requiresReview = capacity.band !== 'Green';
-    } else if (lowerQuery.includes('chest pain')) {
-      response = `Chest pain workflow: ECG within 10 minutes, troponin, aspirin if not contraindicated, and clinician-directed risk stratification. ${HUMAN_REVIEW_DISCLAIMER}`;
-      data = {
-        protocol: 'chest_pain',
-        steps: ['ECG', 'Troponin', 'Aspirin', 'Risk stratification'],
-      };
-      requiresReview = true;
-    } else if (lowerQuery.includes('sepsis')) {
-      response = `Sepsis workflow: lactate, blood cultures before antibiotics, broad-spectrum antibiotics, fluids as appropriate, and escalation for shock. ${HUMAN_REVIEW_DISCLAIMER}`;
-      data = { protocol: 'sepsis', steps: ['Lactate', 'Cultures', 'Antibiotics', 'Fluids'] };
-      requiresReview = true;
-    } else if (lowerQuery.includes('stroke')) {
-      response = `Stroke workflow: last-known-well, NIHSS, non-contrast CT, CTA when indicated, and time-window review by the stroke team. ${HUMAN_REVIEW_DISCLAIMER}`;
-      data = { protocol: 'stroke', steps: ['Last-known-well', 'NIHSS', 'CT', 'CTA'] };
-      requiresReview = true;
-    }
-
-    this.workflowLogService.record({
-      type: 'copilot_used',
-      title: 'Copilot query processed',
-      summary: query || 'Empty Copilot query received.',
-      source: 'ed-copilot-query',
-      metadata: {
-        userRole: input.user_role || 'unknown',
-        requiresReview,
-      },
-    });
-
-    return envelope('ED Copilot Query', {
-      id: createId('copilot-query'),
-      query,
-      response,
-      answer: response,
-      message: response,
-      data,
-      requires_review: requiresReview,
-      safetyStatus: requiresReview ? 'review-required' : 'safe',
-      safety_check_passed: true,
-      safetyNotice: HUMAN_REVIEW_DISCLAIMER,
-      userRole: input.user_role || 'unknown',
-      createdAt: new Date().toISOString(),
-    });
-  }
-
   processQuery(input: { query?: string; user_role?: string; context?: Record<string, unknown> }) {
     const query = String(input.query || '').trim();
     const lowerQuery = query.toLowerCase();
@@ -2507,6 +2430,8 @@ export class EDCopilotService {
       supportedQueries: ['longest wait', 'reassessment', 'ems inbound', 'capacity', 'bottleneck'],
     };
     let requiresReview = false;
+    let safetyCheckPassed = true;
+    let safetyMessage: string | undefined;
 
     if (lowerQuery.includes('waited longest') || lowerQuery.includes('longest wait')) {
       const longestWait = [...patients].sort(
@@ -2551,6 +2476,70 @@ export class EDCopilotService {
       response = `Stroke workflow: last-known-well, NIHSS, non-contrast CT, CTA when indicated, and time-window review by the stroke team. ${HUMAN_REVIEW_DISCLAIMER}`;
       data = { protocol: 'stroke', steps: ['Last-known-well', 'NIHSS', 'CT', 'CTA'] };
       requiresReview = true;
+    } else if (lowerQuery.includes('move patient') || lowerQuery.includes('change priority')) {
+      /**
+       * Restores a safety-floor check that existed in the pre-migration Mongoose
+       * copilot (services/copilot.service.ts's now-deleted handlePriorityChange)
+       * but was never carried over when the real, HTTP-reachable copilot moved
+       * to this TypeORM-backed class -- found 2026-08-06: a clinician typing
+       * "move patient X to priority Y" into the live copilot got only the
+       * generic fallback response, with no safety-floor evaluation at all.
+       * Advisory only, matching the old behavior: never auto-applies a
+       * priority change, always requires human review either way.
+       */
+      requiresReview = true;
+      const patientMatch = query.match(/patient\s+([A-Za-z0-9_-]+)/i);
+      const targetPatient = patientMatch
+        ? patients.find((patient) => patient.id === patientMatch[1])
+        : undefined;
+      const requestedDps = extractRequestedDps(query);
+
+      if (!patientMatch) {
+        response = 'Please specify which patient. Example: "Move patient PT-1042 to DPS 2".';
+        data = { supportedQueries: ['move patient <id> to DPS <1-5>'] };
+        safetyCheckPassed = false;
+        safetyMessage =
+          'Priority changes require an explicit patient identifier and clinician review.';
+      } else if (!targetPatient) {
+        response = 'Patient not found. No priority change was made.';
+        data = { patientId: patientMatch[1] };
+        safetyCheckPassed = false;
+        safetyMessage = 'Priority changes cannot proceed without a valid patient record.';
+      } else if (!requestedDps) {
+        response = 'No DPS target was detected. Use DPS 1 through DPS 5.';
+        data = { patient: targetPatient };
+        safetyCheckPassed = false;
+        safetyMessage = 'Priority changes require a target DPS score.';
+      } else {
+        const vitals = latestVitals(targetPatient);
+        const safety = evaluatePriorityChange(
+          patientSafetyContextFromRecord({
+            dps_score: Number(targetPatient.priority.replace('P', '')),
+            chief_complaint: targetPatient.chiefComplaint,
+            alerts: targetPatient.flags,
+            vitals: {
+              hr: vitals.hr,
+              rr: vitals.rr,
+              spo2: vitals.spo2,
+              bp:
+                vitals.sbp != null && vitals.dbp != null
+                  ? `${vitals.sbp}/${vitals.dbp}`
+                  : undefined,
+            },
+          }),
+          requestedDps,
+        );
+        response = safety.allowed
+          ? `Safety check passed for changing ${targetPatient.firstName} ${targetPatient.lastName} to DPS ${requestedDps}. Human review is required before applying.`
+          : 'Priority change blocked by safety floor. No autonomous change was made.';
+        data = {
+          patient: targetPatient,
+          requestedDpsScore: requestedDps,
+          floorReasons: safety.floorReasons,
+        };
+        safetyCheckPassed = safety.allowed;
+        safetyMessage = safety.allowed ? undefined : safety.message;
+      }
     }
 
     this.workflowLogService.record({
@@ -2561,6 +2550,7 @@ export class EDCopilotService {
       metadata: {
         userRole: input.user_role || 'unknown',
         requiresReview,
+        safetyCheckPassed,
       },
     });
 
@@ -2573,7 +2563,8 @@ export class EDCopilotService {
       data,
       requires_review: requiresReview,
       safetyStatus: requiresReview ? 'review-required' : 'safe',
-      safety_check_passed: true,
+      safety_check_passed: safetyCheckPassed,
+      safety_message: safetyMessage,
       safetyNotice: HUMAN_REVIEW_DISCLAIMER,
       userRole: input.user_role || 'unknown',
       createdAt: new Date().toISOString(),

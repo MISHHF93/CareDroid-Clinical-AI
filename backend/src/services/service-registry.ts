@@ -14,7 +14,6 @@ import { boardingService } from './boarding.service';
 import { capacityService } from './capacity.service';
 import { clinicalProtocolService } from './clinical-protocol.service';
 import { consentService } from './consent.service';
-import { copilotService } from './copilot.service';
 import { deteriorationPredictionV3Service } from './deterioration-prediction-v3.service';
 import { dischargePredictionService } from './discharge-prediction.service';
 import { emsService } from './ems.service';
@@ -55,7 +54,6 @@ export {
   capacityService,
   clinicalProtocolService,
   consentService,
-  copilotService,
   deteriorationPredictionV3Service,
   dischargePredictionService,
   emsService,
@@ -84,7 +82,6 @@ export const emergencyOsServiceRegistry = {
   dischargePredictionService,
   clinicalProtocolService,
   deteriorationPredictionV3Service,
-  copilotService,
   erPulseHandoverService,
   aiCallInterrogationService,
   smartIntakeService,

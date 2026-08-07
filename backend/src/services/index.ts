@@ -6,7 +6,6 @@ export {
   checkServiceHealth,
   clinicalProtocolService,
   consentService,
-  copilotService,
   deteriorationPredictionV3Service,
   dischargePredictionService,
   emergencyOsServiceRegistry,
@@ -43,7 +42,6 @@ export { BoardingService } from './boarding.service';
 export { CapacityService } from './capacity.service';
 export { ClinicalProtocolService } from './clinical-protocol.service';
 export { ConsentService } from './consent.service';
-export { CopilotService } from './copilot.service';
 export { DeteriorationPredictionV3Service } from './deterioration-prediction-v3.service';
 export { DischargePredictionService } from './discharge-prediction.service';
 export { edgeAIAmbulanceService, EdgeAIAmbulanceService } from './edge-ai-ambulance.service';

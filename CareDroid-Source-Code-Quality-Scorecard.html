@@ -1,0 +1,704 @@
+<title>CareDroid Source Code Quality Scorecard</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --page: #0a0e14;
+    --page-deep: #05070a;
+    --surface: #121821;
+    --surface-raised: #161d28;
+    --surface-soft: rgba(91, 143, 214, 0.06);
+    --surface-hover: rgba(91, 143, 214, 0.1);
+    --ink: #eef2f7;
+    --ink-soft: #93a1b3;
+    --ink-muted: #5d6a7a;
+    --line: rgba(147, 161, 179, 0.14);
+    --line-strong: rgba(147, 161, 179, 0.26);
+    --accent: #c98a4b;
+    --accent-strong: #e0a565;
+    --accent-soft: rgba(201, 138, 75, 0.14);
+    --good: #5fb87a;
+    --good-soft: rgba(95, 184, 122, 0.13);
+    --warn: #e0ab45;
+    --warn-soft: rgba(224, 171, 69, 0.13);
+    --bad: #e2665f;
+    --bad-soft: rgba(226, 102, 95, 0.13);
+    --shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    --radius-lg: 18px;
+    --radius-md: 12px;
+    --radius-sm: 8px;
+    --content: 1280px;
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+  }
+
+  @media (prefers-color-scheme: light) {
+    :root {
+      color-scheme: light;
+      --page: #f3efe9;
+      --page-deep: #e9e2d8;
+      --surface: #ffffff;
+      --surface-raised: #ffffff;
+      --surface-soft: rgba(168, 106, 39, 0.05);
+      --surface-hover: rgba(168, 106, 39, 0.09);
+      --ink: #201a12;
+      --ink-soft: #5c5142;
+      --ink-muted: #8a7c68;
+      --line: rgba(32, 26, 18, 0.1);
+      --line-strong: rgba(32, 26, 18, 0.18);
+      --accent: #a8621e;
+      --accent-strong: #7d4715;
+      --accent-soft: rgba(168, 98, 30, 0.1);
+      --good: #2f8f52;
+      --good-soft: rgba(47, 143, 82, 0.1);
+      --warn: #b3781a;
+      --warn-soft: rgba(179, 120, 26, 0.1);
+      --bad: #c3453f;
+      --bad-soft: rgba(195, 69, 63, 0.1);
+      --shadow: 0 16px 40px rgba(32, 26, 18, 0.12);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page: #0a0e14; --page-deep: #05070a; --surface: #121821; --surface-raised: #161d28;
+    --surface-soft: rgba(91, 143, 214, 0.06); --surface-hover: rgba(91, 143, 214, 0.1);
+    --ink: #eef2f7; --ink-soft: #93a1b3; --ink-muted: #5d6a7a;
+    --line: rgba(147, 161, 179, 0.14); --line-strong: rgba(147, 161, 179, 0.26);
+    --accent: #c98a4b; --accent-strong: #e0a565; --accent-soft: rgba(201, 138, 75, 0.14);
+    --good: #5fb87a; --good-soft: rgba(95, 184, 122, 0.13);
+    --warn: #e0ab45; --warn-soft: rgba(224, 171, 69, 0.13);
+    --bad: #e2665f; --bad-soft: rgba(226, 102, 95, 0.13);
+    --shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  }
+
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --page: #f3efe9; --page-deep: #e9e2d8; --surface: #ffffff; --surface-raised: #ffffff;
+    --surface-soft: rgba(168, 106, 39, 0.05); --surface-hover: rgba(168, 106, 39, 0.09);
+    --ink: #201a12; --ink-soft: #5c5142; --ink-muted: #8a7c68;
+    --line: rgba(32, 26, 18, 0.1); --line-strong: rgba(32, 26, 18, 0.18);
+    --accent: #a8621e; --accent-strong: #7d4715; --accent-soft: rgba(168, 98, 30, 0.1);
+    --good: #2f8f52; --good-soft: rgba(47, 143, 82, 0.1);
+    --warn: #b3781a; --warn-soft: rgba(179, 120, 26, 0.1);
+    --bad: #c3453f; --bad-soft: rgba(195, 69, 63, 0.1);
+    --shadow: 0 16px 40px rgba(32, 26, 18, 0.12);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: radial-gradient(circle at 18% -10%, var(--accent-soft), transparent 32rem), linear-gradient(160deg, var(--page) 0%, var(--page-deep) 100%);
+    color: var(--ink); font-family: var(--sans); line-height: 1.55; -webkit-font-smoothing: antialiased;
+  }
+  @media (prefers-reduced-motion: reduce) { * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; } }
+
+  .wrap { max-width: var(--content); margin: 0 auto; padding: 3rem 1.5rem 5rem; }
+
+  header.top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 1.5rem; margin-bottom: 2.5rem; }
+  .eyebrow { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent-strong); margin: 0 0 0.6rem; }
+  h1 { font-family: var(--mono); font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.15rem); font-weight: 600; letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+  .subtitle { color: var(--ink-soft); font-size: 0.98rem; margin: 0.6rem 0 0; max-width: 50rem; }
+  .meta-block { text-align: right; font-family: var(--mono); font-size: 0.78rem; color: var(--ink-muted); line-height: 1.7; }
+  .meta-block a { color: var(--accent-strong); text-decoration: none; }
+  .meta-block a:hover, .meta-block a:focus-visible { text-decoration: underline; }
+
+  .hero { display: grid; grid-template-columns: auto 1fr; gap: 2.5rem; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow); padding: 2rem 2.25rem; margin-bottom: 1.75rem; }
+  .score-ring { position: relative; width: 148px; height: 148px; flex: none; }
+  .score-ring svg { transform: rotate(-90deg); }
+  .score-ring .track { stroke: var(--line); }
+  .score-ring .fill { stroke: var(--accent); stroke-linecap: round; transition: stroke-dashoffset 0.8s ease; }
+  .score-ring .num { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .score-ring .num strong { font-family: var(--mono); font-size: 2.1rem; font-weight: 600; line-height: 1; font-variant-numeric: tabular-nums; }
+  .score-ring .num span { font-family: var(--mono); font-size: 0.66rem; color: var(--ink-muted); margin-top: 0.2rem; }
+  .hero-body h2 { font-size: 1.05rem; font-weight: 600; margin: 0 0 0.5rem; }
+  .hero-body p { color: var(--ink-soft); margin: 0 0 1rem; max-width: 54rem; }
+  .band-chip { display: inline-flex; align-items: center; gap: 0.4rem; font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.32rem 0.7rem; border-radius: 999px; background: var(--accent-soft); color: var(--accent-strong); border: 1px solid var(--line-strong); }
+
+  .facts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem; margin-bottom: 2.5rem; }
+  .fact-item { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-md); padding: 0.85rem 1rem; display: flex; flex-direction: column; gap: 0.3rem; }
+  .fact-item .label { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-muted); }
+  .fact-item .value { font-size: 0.92rem; font-weight: 600; }
+
+  .cat-table-wrap, .ledger-table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); box-shadow: var(--shadow); margin-bottom: 2.5rem; }
+  table.cat, table.ledger { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 720px; }
+  table.cat th, table.ledger th { text-align: left; font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-muted); font-weight: 500; padding: 0.7rem 0.9rem; border-bottom: 1px solid var(--line-strong); white-space: nowrap; }
+  table.cat td, table.ledger td { padding: 0.65rem 0.9rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+  table.cat tr:last-child td, table.ledger tr:last-child td { border-bottom: none; }
+  table.cat td.num, table.ledger td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+
+  .pill { display: inline-flex; align-items: center; font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.03em; padding: 0.16rem 0.5rem; border-radius: 999px; white-space: nowrap; }
+  .pill.good { background: var(--good-soft); color: var(--good); }
+  .pill.warn { background: var(--warn-soft); color: var(--warn); }
+  .pill.bad { background: var(--bad-soft); color: var(--bad); }
+  .pill.pass { background: var(--good-soft); color: var(--good); }
+  .pill.fail { background: var(--bad-soft); color: var(--bad); }
+  .pill.p0 { background: var(--bad-soft); color: var(--bad); }
+  .pill.p1 { background: var(--warn-soft); color: var(--warn); }
+  .pill.p2 { background: var(--accent-soft); color: var(--accent-strong); }
+  .pill.p3 { background: var(--line); color: var(--ink-muted); }
+
+  .section-head { margin: 3rem 0 1.1rem; }
+  .section-head h2 { font-family: var(--mono); font-size: 0.95rem; font-weight: 600; margin: 0 0 0.35rem; }
+  .section-head p { color: var(--ink-soft); font-size: 0.87rem; margin: 0; max-width: 52rem; }
+
+  .cat-grid { display: grid; gap: 1rem; }
+  .cat-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; position: relative; }
+  .cat-card::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 3px; }
+  .cat-card.good::before { background: var(--good); }
+  .cat-card.warn::before { background: var(--warn); }
+  .cat-card.bad::before { background: var(--bad); }
+  .cat-main { padding: 1.35rem 1.5rem 1.15rem 1.65rem; }
+  .cat-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem; margin-bottom: 0.5rem; }
+  .cat-index { font-family: var(--mono); font-size: 0.7rem; color: var(--ink-muted); letter-spacing: 0.04em; }
+  .cat-score { font-family: var(--mono); font-size: 1.1rem; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .cat-score span { color: var(--ink-muted); font-size: 0.82rem; font-weight: 400; }
+  .cat-card h3 { font-size: 1rem; font-weight: 600; margin: 0.3rem 0 0.55rem; }
+  .status-chip { display: inline-flex; align-items: center; gap: 0.35rem; font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.2rem 0.55rem; border-radius: 999px; }
+  .status-chip.good { background: var(--good-soft); color: var(--good); }
+  .status-chip.warn { background: var(--warn-soft); color: var(--warn); }
+  .status-chip.bad { background: var(--bad-soft); color: var(--bad); }
+  .progress-track { height: 5px; border-radius: 999px; background: var(--line); overflow: hidden; margin: 0.85rem 0 0; }
+  .progress-fill { height: 100%; border-radius: 999px; }
+  .progress-fill.good { background: var(--good); }
+  .progress-fill.warn { background: var(--warn); }
+  .progress-fill.bad { background: var(--bad); }
+  details { border-top: 1px solid var(--line); }
+  summary { cursor: pointer; padding: 0.7rem 1.5rem; font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--accent-strong); list-style: none; display: flex; align-items: center; gap: 0.4rem; user-select: none; }
+  summary::-webkit-details-marker { display: none; }
+  summary::before { content: "▸"; display: inline-block; transition: transform 0.15s ease; font-size: 0.7em; }
+  details[open] summary::before { transform: rotate(90deg); }
+  summary:hover, summary:focus-visible { background: var(--surface-hover); }
+  .detail-body { padding: 0 1.5rem 1.35rem; font-size: 0.86rem; color: var(--ink-soft); }
+  .detail-body h4 { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-muted); margin: 1rem 0 0.4rem; }
+  .detail-body h4:first-child { margin-top: 0; }
+  .detail-body ul { margin: 0 0 0.5rem; padding-left: 1.1rem; }
+  .detail-body li { margin-bottom: 0.35rem; }
+  .detail-body p { margin: 0 0 0.6rem; }
+  .detail-body code { font-family: var(--mono); font-size: 0.86em; background: var(--surface-soft); padding: 0.1em 0.35em; border-radius: 4px; color: var(--ink); }
+  .detail-body strong { color: var(--ink); }
+  .conf { font-family: var(--mono); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.04em; padding: 0.1rem 0.4rem; border-radius: 4px; margin-left: 0.4rem; }
+  .conf.confirmed { background: var(--good-soft); color: var(--good); }
+  .conf.strong-ev { background: var(--accent-soft); color: var(--accent-strong); }
+  .conf.partial { background: var(--warn-soft); color: var(--warn); }
+
+  .verdict-box { background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--radius-lg); box-shadow: var(--shadow); padding: 1.75rem 2rem; margin-top: 1rem; }
+  .verdict-box h3 { margin: 0 0 0.6rem; font-size: 1rem; }
+  .verdict-box p { color: var(--ink-soft); margin: 0 0 0.9rem; }
+  .verdict-gate { font-family: var(--mono); font-size: 0.85rem; font-weight: 600; color: var(--accent-strong); background: var(--accent-soft); border: 1px solid var(--line-strong); border-radius: var(--radius-sm); padding: 0.7rem 1rem; display: inline-block; }
+
+  footer { margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; font-size: 0.8rem; color: var(--ink-muted); }
+  footer a { color: var(--accent-strong); text-decoration: none; }
+  footer a:hover, footer a:focus-visible { text-decoration: underline; }
+
+  @media (max-width: 720px) { .hero { grid-template-columns: 1fr; text-align: center; } .hero-body p { max-width: none; } .meta-block { text-align: left; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow">// caredroid-clinical-ai — pure source-code audit</p>
+      <h1>Source Code Quality Scorecard</h1>
+      <p class="subtitle">
+        Code, tests, build system, dependencies, and repository structure only — no product features, no
+        clinical workflow completeness, no roadmap. A stricter re-scoring of the same evidence base as the
+        <a href="https://claude.ai/code/artifact/5533d735-3707-4fc3-a302-789251707c58" style="color: var(--accent-strong)">Repository Readiness Scorecard</a>
+        under a correctness/defect-weighted 10-category, 100-point rubric — deliberately harder to max than that
+        sibling artifact, by design.
+      </p>
+    </div>
+    <div class="meta-block">
+      Generated 2026-08-06<br />
+      HEAD <code style="font-family: var(--mono)">08bbba65</code><br />
+      <a href="https://github.com/MISHHF93/CareDroid-Clinical-AI">github.com/MISHHF93/CareDroid-Clinical-AI</a>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="score-ring">
+      <svg width="148" height="148" viewBox="0 0 148 148">
+        <circle class="track" cx="74" cy="74" r="64" fill="none" stroke-width="10"></circle>
+        <circle class="fill" cx="74" cy="74" r="64" fill="none" stroke-width="10" stroke-dasharray="402.1" stroke-dashoffset="88.5"></circle>
+      </svg>
+      <div class="num"><strong>78</strong><span>/ 100</span></div>
+    </div>
+    <div class="hero-body">
+      <span class="band-chip">Good but materially incomplete</span>
+      <h2>Genuinely strong engineering hygiene; a stricter lens finds real, quantified correctness and validation gaps that the sibling repo-hygiene scorecard doesn't weight as heavily</h2>
+      <p>
+        <strong>Strongest:</strong> Architecture (14/15) and Maintainability &amp; hygiene (6/7) — the orphan-code
+        quarantine bucket is genuinely at zero, verified by regeneration this session, the repo is now
+        genuinely one frontend/one backend with a CI-enforced guard, and (fixed this session) the orphan-detection
+        scanner now cross-checks <code>CANONICAL_ROUTE_MAP</code> against all 3 route-registration layers instead
+        of just <code>router.tsx</code>, eliminating 99 false-positive "unwired route" findings.
+        <strong>Weakest:</strong> Configuration, Dependencies &amp; Operations (3/5) — the platform's own default
+        AI provider (<code>ANTHROPIC_API_KEY</code>) has no value anywhere in <code>.env</code>, and a duplicate
+        legacy <code>docker-compose.yml</code> sits unwired next to the real one with a dangling service
+        reference. <strong>Most serious confirmed defect:</strong> ~60% of backend <code>@Body()</code> DTOs
+        (135 of 225 as of the last full sweep) receive zero Nest <code>ValidationPipe</code> protection — a real,
+        quantified input-validation gap, only 7 of the safest instances fixed so far.
+        <strong>Fixed this session:</strong> the <code>StatCard</code> naming collision in
+        <code>src/pages/emergency/index.tsx</code> (renamed to <code>WhiteboardStatTile</code>) and the
+        route-registry cross-check gap (D3's naming half and D4, closed).
+      </p>
+    </div>
+  </section>
+
+  <div class="facts-grid">
+    <div class="fact-item"><span class="label">Grade</span><span class="value">Good but materially incomplete (70–79)</span></div>
+    <div class="fact-item"><span class="label">Strongest category</span><span class="value">Architecture &amp; Repository Structure (14/15, 93%)</span></div>
+    <div class="fact-item"><span class="label">Weakest category</span><span class="value">Config/Deps/Operations (3/5, 60%)</span></div>
+    <div class="fact-item"><span class="label">Most serious confirmed defect</span><span class="value">60% of backend DTOs unvalidated (D1)</span></div>
+    <div class="fact-item"><span class="label">Evidence confidence</span><span class="value">High — every score below cites a command run or file read this session or across this campaign</span></div>
+  </div>
+
+  <div class="section-head">
+    <h2>Category summary</h2>
+    <p>10 categories, weighted to 100 points. Full evidence for each is in the detailed review below.</p>
+  </div>
+  <div class="cat-table-wrap">
+    <table class="cat">
+      <thead><tr><th>Category</th><th class="num">Weight</th><th class="num">Score</th><th class="num">%</th><th>Confidence</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>1. Build &amp; Compilation</td><td class="num">10</td><td class="num">9</td><td class="num">90%</td><td>Confirmed</td><td><span class="pill good">Excellent</span></td></tr>
+        <tr><td>2. Code Correctness</td><td class="num">15</td><td class="num">10</td><td class="num">67%</td><td>Confirmed</td><td><span class="pill warn">Partial</span></td></tr>
+        <tr><td>3. Architecture &amp; Repository Structure</td><td class="num">15</td><td class="num">14</td><td class="num">93%</td><td>Confirmed</td><td><span class="pill good">Strong</span></td></tr>
+        <tr><td>4. Frontend Quality</td><td class="num">10</td><td class="num">7</td><td class="num">70%</td><td>Confirmed</td><td><span class="pill warn">Partial</span></td></tr>
+        <tr><td>5. Backend &amp; API Quality</td><td class="num">10</td><td class="num">7</td><td class="num">70%</td><td>Confirmed</td><td><span class="pill warn">Partial</span></td></tr>
+        <tr><td>6. Type Safety &amp; Data Contracts</td><td class="num">10</td><td class="num">8</td><td class="num">80%</td><td>Confirmed</td><td><span class="pill good">Strong</span></td></tr>
+        <tr><td>7. Testing &amp; Verification</td><td class="num">10</td><td class="num">8</td><td class="num">80%</td><td>Confirmed</td><td><span class="pill good">Strong</span></td></tr>
+        <tr><td>8. Security &amp; Defensive Coding</td><td class="num">8</td><td class="num">6</td><td class="num">75%</td><td>Confirmed</td><td><span class="pill warn">Partial</span></td></tr>
+        <tr><td>9. Maintainability &amp; Code Hygiene</td><td class="num">7</td><td class="num">6</td><td class="num">86%</td><td>Confirmed</td><td><span class="pill good">Strong</span></td></tr>
+        <tr><td>10. Configuration, Dependencies &amp; Operations</td><td class="num">5</td><td class="num">3</td><td class="num">60%</td><td>Confirmed</td><td><span class="pill warn">Partial</span></td></tr>
+        <tr><td><strong>Total</strong></td><td class="num"><strong>100</strong></td><td class="num"><strong>78</strong></td><td class="num"><strong>78%</strong></td><td>—</td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-head">
+    <h2>Detailed category review</h2>
+    <p>Every material claim below traces to a command run this session, a file read this session, or documented, re-verifiable evidence from earlier cycles of the same campaign.</p>
+  </div>
+
+  <div class="cat-grid">
+
+    <article class="cat-card good">
+      <div class="cat-main">
+        <div class="cat-top"><span class="cat-index">01 / 10</span><span class="cat-score">9<span> / 10</span></span></div>
+        <span class="status-chip good">Excellent</span>
+        <h3>Build and Compilation</h3>
+        <div class="progress-track"><div class="progress-fill good" style="width: 90%"></div></div>
+      </div>
+      <details>
+        <summary>Full review</summary>
+        <div class="detail-body">
+          <h4>Strengths</h4>
+          <ul>
+            <li>Frontend production build succeeds cleanly<span class="conf confirmed">Confirmed</span> — <code>npm run build</code> (Vite), 32.62s, all chunks including newly-added <code>AppNavigator-nCHo0fMc.js</code>/<code>.css</code> bundled correctly, run this session.</li>
+            <li>Backend build succeeds cleanly<span class="conf confirmed">Confirmed</span> — <code>nest build</code> + <code>scripts/link-main.mjs</code> postbuild, run repeatedly this session including immediately after adding the new <code>app-navigator</code> module.</li>
+            <li><code>tsc --noEmit -p tsconfig.frontend.json</code> reports zero errors<span class="conf confirmed">Confirmed</span>, re-run after every source change this session (8+ times).</li>
+            <li>TypeScript's <code>resolveJsonModule</code> correctly bundles JSON data imports into compiled backend output — verified by inspecting <code>dist/backend/src/modules/app-navigator/data/catalog.json</code> exists post-build, matching the established <code>user-profile-catalog.data.json</code> convention (<code>backend/src/modules/user-profile/user-profile-catalog.ts:1</code>).</li>
+          </ul>
+          <h4>Defects and Weaknesses</h4>
+          <ul>
+            <li>This sandbox requires an <code>ESBUILD_USE_WASM=1</code> prefix for every Vite/Vitest invocation because native <code>esbuild.exe</code> is blocked by this specific Windows environment's Application Control policy<span class="conf confirmed">Confirmed</span> — an environment-specific workaround, not a repository defect per se, but it means the documented plain <code>npm run build</code> command does not work unmodified in every environment.</li>
+            <li>No full clean-install-from-lockfile (<code>npm ci</code>) was run this session to rule out lockfile drift<span class="conf partial">Partial evidence</span> — builds were run against an already-populated <code>node_modules</code>.</li>
+          </ul>
+          <h4>Evidence</h4>
+          <p><code>package.json:22</code> (<code>build</code> script), <code>backend/package.json</code> (<code>build</code>/<code>postbuild</code>), <code>backend/tsconfig.build.json</code> (<code>resolveJsonModule</code> via extended <code>tsconfig.json</code>), live build output this session (dist chunk listing, 32.62s).</p>
+          <h4>Point Deductions</h4>
+          <p>−1 for the environment-specific native-binary workaround required to build/test at all in this sandbox, and no from-scratch clean-install verification this session.</p>
+          <h4>Requirements for Full Marks</h4>
+          <p>Run and record one full <code>rm -rf node_modules &amp;&amp; npm ci &amp;&amp; npm run build</code> cycle (frontend and backend) on a clean environment without the WASM workaround, to confirm reproducibility independent of this specific sandbox's binary restrictions.</p>
+        </div>
+      </details>
+    </article>
+
+    <article class="cat-card warn">
+      <div class="cat-main">
+        <div class="cat-top"><span class="cat-index">02 / 10</span><span class="cat-score">10<span> / 15</span></span></div>
+        <span class="status-chip warn">Partial</span>
+        <h3>Code Correctness</h3>
+        <div class="progress-track"><div class="progress-fill warn" style="width: 67%"></div></div>
+      </div>
+      <details>
+        <summary>Full review</summary>
+        <div class="detail-body">
+          <h4>Strengths</h4>
+          <ul>
+            <li>This session alone found and fixed 3 real, independently-confirmed runtime/rendering defects via source-level tracing (not guessed): <code>src/pages/emergency/SmartIntake.tsx</code> never imported its own 325-line <code>SmartIntake.css</code><span class="conf confirmed">Confirmed</span> (grep showed zero importers anywhere) — a core clinical workflow page rendered fully unstyled; now fixed with one <code>import</code> line.</li>
+            <li>A systematic "v→a" typo corruption isolated to exactly <code>src/pages/emergency/emergency-route.css</code> and <code>src/components/reception/SelfCheckin.css</code> broke ~11 selectors/CSS custom-property references (confirmed against real classNames in the corresponding <code>.tsx</code> files and real token definitions elsewhere, e.g. <code>src/components/Header.css</code>)<span class="conf confirmed">Confirmed</span> — all fixed.</li>
+            <li>The Whiteboard's Mission Control row had no responsive breakpoint while the app shell's scrollport uses <code>overflow-x: clip</code> (silently cutting content instead of scrolling)<span class="conf confirmed">Confirmed</span> — fixed with a breakpoint matching sibling-page convention.</li>
+            <li>Global exception filter (<code>backend/src/common/filters/api-exception.filter.ts</code>) correctly sends stack traces only to server log/Sentry, never to the client response<span class="conf confirmed">Confirmed</span> by source read.</li>
+          </ul>
+          <h4>Defects and Weaknesses</h4>
+          <ul>
+            <li><strong>D1 (P1) — ~60% of backend <code>@Body()</code>-decorated DTOs receive zero Nest <code>ValidationPipe</code> protection</strong><span class="conf strong-ev">Strong evidence</span> (documented finding from an earlier cycle of this same campaign, Cycle 241: 135 of 225 request-body-accepting endpoints, including some "fake Dto" interfaces that look validated but aren't). Only 7 of the safest instances have been fixed so far; a permanent 128-entry regression-guard test (<code>body-validation-coverage.spec.ts</code>) exists to prevent further drift, but the underlying gap itself remains open.</li>
+            <li>A latent (currently unreachable, so not yet triggered) structural bug: <code>ProfileSummaryCard.css</code>'s <code>--compact</code> variant defines a 2-column grid for content that always renders 3 direct children<span class="conf confirmed">Confirmed</span> by source read — harmless only because <code>compact=true</code> is never passed anywhere live today (verified via grep of all call sites).</li>
+          </ul>
+          <h4>Evidence</h4>
+          <p>Commits this session: <code>SmartIntake.tsx</code> CSS-import fix, <code>emergency-route.css</code>/<code>SelfCheckin.css</code> typo fixes, <code>emergency-whiteboard-cleanup.css</code> breakpoint. Cycle 241 (documented in project memory, not this session): unvalidated-<code>@Body()</code> sweep, 135/225 endpoints, 7 fixed.</p>
+          <h4>Point Deductions</h4>
+          <p>−5 for the still-open, quantified input-validation gap (D1) — the single largest known correctness/robustness liability in the codebase by count of affected endpoints.</p>
+          <h4>Requirements for Full Marks</h4>
+          <p>Add real <code>class-validator</code> DTOs (matching the pattern already used in <code>backend/src/modules/boarding/dto/track-decision.dto.ts</code> and this session's own <code>backend/src/modules/app-navigator/dto/navigator-query.dto.ts</code>) to the remaining ~128 unvalidated endpoints, verified by shrinking <code>body-validation-coverage.spec.ts</code>'s exemption list to zero.</p>
+        </div>
+      </details>
+    </article>
+
+    <article class="cat-card good">
+      <div class="cat-main">
+        <div class="cat-top"><span class="cat-index">03 / 10</span><span class="cat-score">14<span> / 15</span></span></div>
+        <span class="status-chip good">Strong</span>
+        <h3>Architecture and Repository Structure</h3>
+        <div class="progress-track"><div class="progress-fill good" style="width: 93%"></div></div>
+      </div>
+      <details>
+        <summary>Full review</summary>
+        <div class="detail-body">
+          <h4>Strengths</h4>
+          <ul>
+            <li>Genuinely one backend (<code>backend/</code>, single <code>main.ts</code>, single real <code>.listen()</code> call in this repo's own source — confirmed by whole-tree grep this session, excluding third-party <code>node_modules</code>) and one frontend (<code>vite.config.ts</code>/<code>index.html</code> at root)<span class="conf confirmed">Confirmed</span>.</li>
+            <li>A formerly-standalone second app (<code>navigator/</code> — its own server, port, Docker service) was fully consolidated into the main backend/frontend this session, not just linked<span class="conf confirmed">Confirmed</span> — ported into <code>backend/src/modules/app-navigator/</code> and <code>src/pages/AppNavigator.tsx</code>, the standalone app deleted outright (14 files), and <code>src/data/repositoryStructureAudit.test.ts</code> hardened to assert a true, unconditional "exactly one frontend, exactly one backend" (4/4 passing) with no remaining exceptions to widen.</li>
+            <li>That structural guard is now genuinely wired into the CI workflow that gates merges (<code>validate:ci</code> → <code>.github/workflows/validate.yml:72</code>)<span class="conf confirmed">Confirmed</span> — it previously was not (found and fixed this session).</li>
+            <li>27 of 38 tracked internal-duplication findings closed with real fixes or confirmed-intentional classification (<code>docs/duplicate-system-audit.md</code>)<span class="conf strong-ev">Strong evidence</span>.</li>
+            <li><code>backend/ml-services/</code> confirmed genuinely in-process (no package.json, no listen call, no container, directly imported by <code>app.module.ts</code>), not a disguised second service<span class="conf confirmed">Confirmed</span> by direct source/grep check.</li>
+            <li><strong>D4 CLOSED this session</strong>: the orphan-detection scanner's <code>parseAppRoutePaths()</code> (<code>src/data/orphanDetectionAudit.ts</code>) previously only read <code>router.tsx</code>, so <code>CANONICAL_ROUTE_MAP</code> entries mounted solely through one of the 7 console-route-tree files (e.g. <code>/navigator</code>, <code>/help-center</code>, <code>/version</code>) were misreported as "not wired." Fixed by importing all 7 <code>*_ROUTE_PATHS</code> constants and folding them into the scan<span class="conf confirmed">Confirmed</span> — regenerating <code>docs/orphan-detection-report.md</code> dropped the false-positive wire-gap count from 264 to 165 (99 eliminated). This is now a real, automatic cross-check that every <code>CANONICAL_ROUTE_MAP</code> path resolves to an actually-mounted route across all 3 registration layers, exactly the test this category previously called for.</li>
+          </ul>
+          <h4>Defects and Weaknesses</h4>
+          <ul>
+            <li>3 parallel route-registration mechanisms still exist structurally (<code>router.tsx</code>, 7 console-route-tree files, <code>CANONICAL_ROUTE_MAP</code>) — the drift risk is now caught by an automated scanner (see above) rather than eliminated by consolidation, which remains the more thorough long-term fix.</li>
+            <li>A legacy, unwired root <code>docker-compose.yml</code> (11 services) sits alongside the real, actually-used <code>docker-compose.app.yml</code>, with a dangling <code>anomaly-detection</code> service reference that names a container never defined anywhere<span class="conf confirmed">Confirmed</span> — found and annotated (not removed — 9 docs still reference it) this session.</li>
+          </ul>
+          <h4>Evidence</h4>
+          <p><code>src/data/repositoryStructureAudit.test.ts</code> (4 passing assertions), <code>.github/workflows/validate.yml:72</code>, <code>docs/duplicate-system-audit.md</code> (23 done / 11 legacy / 2 wire / 2 merge), <code>src/data/orphanDetectionAudit.ts</code> (fixed), <code>docs/orphan-detection-report.md</code> (regenerated, 264→165 wire findings), <code>docker-compose.yml:82-83</code> vs <code>docker-compose.app.yml</code>.</p>
+          <h4>Point Deductions</h4>
+          <p>−1 for the unwired legacy compose file only. The route-registration cross-check gap (D4, previously part of this −2) was closed this session by making the orphan-detection scanner read all 3 route-registration layers.</p>
+          <h4>Requirements for Full Marks</h4>
+          <p>Delete or clearly deprecate the unwired <code>docker-compose.yml</code> after reviewing its 9 doc references. Consolidating the 3 route-registration layers into one generated source remains optional/aspirational now that a cross-check test exists.</p>
+        </div>
+      </details>
+    </article>
+
+    <article class="cat-card warn">
+      <div class="cat-main">
+        <div class="cat-top"><span class="cat-index">04 / 10</span><span class="cat-score">7<span> / 10</span></span></div>
+        <span class="status-chip warn">Partial</span>
+        <h3>Frontend Quality</h3>
+        <div class="progress-track"><div class="progress-fill warn" style="width: 70%"></div></div>
+      </div>
+      <details>
+        <summary>Full review</summary>
+        <div class="detail-body">
+          <h4>Strengths</h4>
+          <ul>
+            <li>Consistent loading/error-state handling pattern across API-calling services — <code>guardedJson()</code> helper (seen in <code>src/services/boardingApi.ts</code> and this session's own <code>src/services/navigatorApi.ts</code>) returns a uniform <code>{ok, data, message}</code> shape rather than throwing raw fetch errors into components<span class="conf confirmed">Confirmed</span>.</li>
+            <li>Card-shaped surface color/contrast is centrally, mechanically enforced via attribute selectors (<code>src/styles/card-contrast-normalization.css</code>, <code>[class$='-card']</code>/<code>[class*='-panel']</code>) regardless of which of several component systems authored the markup<span class="conf confirmed">Confirmed</span> by reading the actual CSS.</li>
+            <li>Lazy-loading with retry (<code>lazyWithRetry</code>) used consistently for route-level code splitting across every console route tree checked this session<span class="conf confirmed">Confirmed</span>.</li>
+          </ul>
+          <h4>Defects and Weaknesses</h4>
+          <ul>
+            <li><strong>Real, quantified low component reuse</strong><span class="conf confirmed">Confirmed</span> this session by counting actual <code>import</code> statements (not string-mention greps, which had overstated it): only 11 files genuinely import the 5 "canonical" design-system card components, and only 4 of those are production code — 2 of the 5 canonical components (<code>DashboardCard</code>, <code>StatCard</code>) have zero real production consumers anywhere. Meanwhile 98 separate CSS files independently define their own card/panel-shaped selectors. This part of D3 remains open — renaming the shadow component (below) doesn't by itself grow adoption of the canonical ones.</li>
+            <li>One design-system component that its own registry (<code>DESIGN_SYSTEM.md</code>) documented as "the base card, duplicated with <code>.cdl-card</code>" (<code>src/components/surfaces/Card.tsx</code>) turned out to have zero real importers anywhere — deleted this session, but its presence for an unknown prior period means the registry itself was not a reliable source of truth until corrected.</li>
+          </ul>
+          <h4>Fixed this session</h4>
+          <p><strong>The shadow-component naming collision (D3, naming half) is CLOSED</strong><span class="conf confirmed">Confirmed</span>: the local <code>function StatCard(...)</code> in <code>src/pages/emergency/index.tsx:198</code> (~14 call sites) was renamed to <code>WhiteboardStatTile</code> via a whole-file <code>replace_all</code>, removing the name collision with the canonical, separately-defined <code>src/components/data-display/StatCard.tsx</code>. Verified: typecheck clean, lint clean, zero remaining "StatCard" references in the file.</p>
+          <h4>Evidence</h4>
+          <p><code>src/design-system/DESIGN_SYSTEM.md</code> (as corrected this session), <code>src/pages/emergency/index.tsx</code> (renamed to <code>WhiteboardStatTile</code>), <code>src/components/data-display/StatCard.tsx</code>, <code>src/styles/card-contrast-normalization.css</code>.</p>
+          <h4>Point Deductions</h4>
+          <p>−3 for the confirmed low real-world adoption of the documented canonical component set, which still means "the design system" and "what pages actually render" are only loosely related today. The naming-collision half of D3 (−1) was recovered this session.</p>
+          <h4>Requirements for Full Marks</h4>
+          <p>Increase real adoption of <code>DashboardCard</code>/<code>StatCard</code> beyond zero production consumers, or formally retire them from the registry if they're not going to be used.</p>
+        </div>
+      </details>
+    </article>
+
+    <article class="cat-card warn">
+      <div class="cat-main">
+        <div class="cat-top"><span class="cat-index">05 / 10</span><span class="cat-score">7<span> / 10</span></span></div>
+        <span class="status-chip warn">Partial</span>
+        <h3>Backend and API Quality</h3>
+        <div class="progress-track"><div class="progress-fill warn" style="width: 70%"></div></div>
+      </div>
+      <details>
+        <summary>Full review</summary>
+        <div class="detail-body">
+          <h4>Strengths</h4>
+          <ul>
+            <li>Consistent NestJS module/controller/service/DI structure verified directly by building a new module this session (<code>backend/src/modules/app-navigator/</code>) against house conventions found in <code>capacity.controller.ts</code>/<code>analytics.controller.ts</code>: <code>@UseGuards(AuthGuard('jwt'), AuthorizationGuard)</code> + <code>@RequirePermission</code> for PHI-touching routes, plain <code>AuthGuard('jwt')</code> for non-PHI routes, <code>@Throttle</code> for rate-sensitive endpoints<span class="conf confirmed">Confirmed</span>.</li>
+            <li>Global exception filter never leaks stack traces to clients<span class="conf confirmed">Confirmed</span>. CORS restricted to configured origins, not wildcard<span class="conf confirmed">Confirmed</span> (<code>backend/src/main.ts</code>).</li>
+            <li>Swagger UI's full API schema (500+ endpoints, including tags literally named "HIPAA Audit Logs") is now correctly gated behind <code>nodeEnv !== 'production'</code><span class="conf confirmed">Confirmed</span> — fixed this session, mirroring the pre-existing <code>shouldServeFrontendAssets</code> pattern in the same file.</li>
+          </ul>
+          <h4>Defects and Weaknesses</h4>
+          <ul>
+            <li>Same D1 finding as Code Correctness applies directly here: ~60% of <code>@Body()</code>-accepting endpoints have no <code>ValidationPipe</code>-backed DTO<span class="conf strong-ev">Strong evidence</span>, meaning the backend trusts request-body shape by convention in the majority of cases rather than by enforcement.</li>
+            <li>A dangling, non-existent-in-compose environment reference (<code>ANOMALY_DETECTION_URL: http://anomaly-detection:5000</code> in the legacy <code>docker-compose.yml</code>) suggests at least one API integration point was designed against infrastructure that was never actually stood up as described<span class="conf confirmed">Confirmed</span>, though currently harmless since the feature flag defaults to disabled.</li>
+          </ul>
+          <h4>Evidence</h4>
+          <p><code>backend/src/modules/app-navigator/*</code> (this session's own module, 12 passing tests), <code>backend/src/main.ts</code> (Swagger gate, CORS, exception filter registration), <code>docker-compose.yml:82-83</code>.</p>
+          <h4>Point Deductions</h4>
+          <p>−3 for the same input-validation gap counted once here specifically for its backend-quality dimension (endpoint completeness and contract enforcement, not just abstract correctness).</p>
+          <h4>Requirements for Full Marks</h4>
+          <p>Same remediation as D1 above — DTO validation coverage. Additionally, resolve or remove the dangling <code>anomaly-detection</code> service reference rather than leaving it as a documented-but-inert landmine.</p>
+        </div>
+      </details>
+    </article>
+
+    <article class="cat-card good">
+      <div class="cat-main">
+        <div class="cat-top"><span class="cat-index">06 / 10</span><span class="cat-score">8<span> / 10</span></span></div>
+        <span class="status-chip good">Strong</span>
+        <h3>Type Safety and Data Contracts</h3>
+        <div class="progress-track"><div class="progress-fill good" style="width: 80%"></div></div>
+      </div>
+      <details>
+        <summary>Full review</summary>
+        <div class="detail-body">
+          <h4>Strengths</h4>
+          <ul>
+            <li>Frontend TypeScript compiles with zero errors under <code>tsc --noEmit</code><span class="conf confirmed">Confirmed</span>, re-verified repeatedly this session including after every new file added.</li>
+            <li>Frontend/backend tool-executor contract count (39 real tool executors, <code>REGISTERED_EXECUTOR_TOOL_IDS</code> in <code>tool-orchestrator.registry.ts</code>) is independently derivable and was cross-checked by three separate methods (array-parse, grep -c, manual count) this campaign, all agreeing<span class="conf confirmed">Confirmed</span>.</li>
+            <li>DTOs that do exist use real <code>class-validator</code> decorators, not hand-rolled checks (<code>track-decision.dto.ts</code>, this session's <code>navigator-query.dto.ts</code>)<span class="conf confirmed">Confirmed</span>.</li>
+          </ul>
+          <h4>Defects and Weaknesses</h4>
+          <ul>
+            <li>A stale, hardcoded English count ("covers every NLU profile and three POST executors") was found baked into a test title in <code>backendFrontendToolContract.report.test.ts</code> even though the test's actual assertion logic was already dynamically correct against the live tool-id set<span class="conf confirmed">Confirmed</span>, fixed this campaign — a class of drift-prone hardcoding (numbers embedded in English strings, not in the checked logic itself) that could recur elsewhere undetected.</li>
+            <li>A propagated documentation-vs-code count mismatch (backend really has 39 registered tool executors; multiple docs claimed "3" or "22") existed across 6 separate files before being independently re-derived and fixed this campaign — while these were doc-only drifts (the underlying runtime contract was always internally correct), the fact that 6 independent docs could all cite a wrong number for this long indicates no CI check compares doc claims to the live constant<span class="conf strong-ev">Strong evidence</span>.</li>
+          </ul>
+          <h4>Evidence</h4>
+          <p><code>backend/src/modules/medical-control-plane/tool-orchestrator/tool-orchestrator.registry.ts</code> (39-entry array), <code>src/data/backendFrontendToolContract.report.test.ts</code>, the 6-file doc-drift trail documented across this campaign's memory.</p>
+          <h4>Point Deductions</h4>
+          <p>−2 for the demonstrated pattern of numeric/contract facts drifting silently in prose (tests and docs) even where the underlying enforced logic was correct — a gap in "keeping the description honest," not in the contract itself.</p>
+          <h4>Requirements for Full Marks</h4>
+          <p>Add a lint rule or CI check that flags hardcoded small integers in test-title strings adjacent to dynamically-computed assertions, or convert remaining hand-written counts in docs to values pulled from a single generated source (as several already are via the <code>*:write-docs</code> scripts).</p>
+        </div>
+      </details>
+    </article>
+
+    <article class="cat-card good">
+      <div class="cat-main">
+        <div class="cat-top"><span class="cat-index">07 / 10</span><span class="cat-score">8<span> / 10</span></span></div>
+        <span class="status-chip good">Strong</span>
+        <h3>Testing and Verification</h3>
+        <div class="progress-track"><div class="progress-fill good" style="width: 80%"></div></div>
+      </div>
+      <details>
+        <summary>Full review</summary>
+        <div class="detail-body">
+          <h4>Strengths</h4>
+          <ul>
+            <li>Frontend suite consistently 945–951 files, 12,186+/12,189 tests passing across this campaign's runs<span class="conf strong-ev">Strong evidence</span>; this session's own targeted sweep ran 609/609 real tests green (69 test files) with only pre-existing, already-diagnosed flake noise, no real failures<span class="conf confirmed">Confirmed</span>, run directly this session.</li>
+            <li>Tests genuinely catch real regressions, not just exist: this session's 4-assertion <code>repositoryStructureAudit.test.ts</code> and 11 new <code>app-navigator</code> tests were written to fail on real conditions and verified to actually fail when the condition was reintroduced during development (not just pass trivially)<span class="conf confirmed">Confirmed</span>.</li>
+            <li>A 128-entry permanent regression-guard test (<code>body-validation-coverage.spec.ts</code>) exists specifically to prevent the known DTO-validation gap (D1) from silently growing further, even though it doesn't close the gap itself<span class="conf strong-ev">Strong evidence</span>.</li>
+          </ul>
+          <h4>Defects and Weaknesses</h4>
+          <ul>
+            <li><strong>A known, root-caused but unresolved flaky-test class</strong><span class="conf confirmed">Confirmed</span>: a recurring <code>EnvironmentTeardownError</code> pattern hits 2–3 files under full-suite parallel load (confirmed this session too, in the same shape — <code>selfCheckinWhiteboardHandoff.test.tsx</code> and others), traced to async background timers/subscriptions (<code>unifiedWorkflowAutomationEngine</code>, <code>unifiedOperationalIntelligenceEngine</code>) still firing after Vitest tears down the module graph. Root cause identified (not a dangling <code>setInterval</code> or unawaited dynamic import — both explicitly ruled out); a real fix would touch pool/worker config, which this repo's own comments warn can cause OOM/hangs on Windows — deliberately not attempted without more validation headroom than this sandbox allows.</li>
+            <li>The 5-minute test suite (<code>orphanDetectionAudit.report.test.ts</code>) took over 5 minutes (309s) to run this session — a real cost that likely discourages frequent re-verification of that specific audit in practice.</li>
+          </ul>
+          <h4>Evidence</h4>
+          <p>Direct test run output this session (609/609, 69 files, 2 pre-existing <code>EnvironmentTeardownError</code> instances); <code>src/data/bodyValidationCoverage.spec.ts</code>; <code>src/data/repositoryStructureAudit.test.ts</code>, <code>backend/src/modules/app-navigator/*.spec.ts</code>.</p>
+          <h4>Point Deductions</h4>
+          <p>−2 for the unresolved, if well-understood, flake class — it means a full-suite run can't be trusted at 100% face value without a follow-up isolated re-run of anything red.</p>
+          <h4>Requirements for Full Marks</h4>
+          <p>Either eliminate the async-teardown race at its source (cancel in-flight engine subscriptions in test teardown hooks) or isolate the affected suites into their own worker pool so the interaction can't occur, with before/after evidence of the flake disappearing across multiple full-suite runs.</p>
+        </div>
+      </details>
+    </article>
+
+    <article class="cat-card warn">
+      <div class="cat-main">
+        <div class="cat-top"><span class="cat-index">08 / 10</span><span class="cat-score">6<span> / 8</span></span></div>
+        <span class="status-chip warn">Partial</span>
+        <h3>Security and Defensive Coding</h3>
+        <div class="progress-track"><div class="progress-fill warn" style="width: 75%"></div></div>
+      </div>
+      <details>
+        <summary>Full review</summary>
+        <div class="detail-body">
+          <h4>Strengths</h4>
+          <ul>
+            <li>Zero <code>dangerouslySetInnerHTML</code> anywhere in the frontend<span class="conf confirmed">Confirmed</span> by whole-tree grep this campaign. Zero string-interpolated raw SQL in the backend<span class="conf confirmed">Confirmed</span>.</li>
+            <li><code>helmet()</code> applied in <code>main.ts</code>; CORS restricted to configured origins; <code>ThrottlerModule</code> registered globally with per-route <code>@Throttle</code> overrides; no cookies set anywhere (bearer-token auth only, so no missing <code>httpOnly</code>/<code>secure</code>/<code>sameSite</code> flags to find)<span class="conf confirmed">Confirmed</span> by source read.</li>
+            <li>A real PHI-leak-prevention gap (2.25MB of orphaned build output plus a dev file-upload write path in <code>backend/public/</code>, zero <code>.gitignore</code> coverage) was found and closed earlier this campaign<span class="conf strong-ev">Strong evidence</span>.</li>
+            <li>Swagger UI's full schema is now correctly gated to non-production<span class="conf confirmed">Confirmed</span>, fixed this session with explicit owner sign-off before implementing.</li>
+            <li>A fresh scan for live-looking API keys and tracked <code>.env</code> files across the whole repo came back clean this campaign<span class="conf strong-ev">Strong evidence</span>.</li>
+          </ul>
+          <h4>Defects and Weaknesses</h4>
+          <ul>
+            <li>The same D1 input-validation gap counted a third time here specifically for its security dimension: unvalidated request bodies are a defensive-coding gap, not just a correctness one — malformed or unexpected payload shapes on ~60% of endpoints are trusted rather than rejected at the boundary.</li>
+            <li>No commissioned, independent application security review (a real penetration test) exists<span class="conf confirmed">Confirmed</span> absence — this can only ever be an external validation, not something a repository audit can score directly, but its absence is a real, material gap for a system handling PHI.</li>
+            <li><code>ANTHROPIC_API_KEY</code> — the platform's stated default AI provider — has no value anywhere in <code>.env</code> (not even an empty placeholder, unlike <code>.env.example</code>)<span class="conf confirmed">Confirmed</span> this session by direct file read; the adapter degrades cleanly (<code>AIError</code>, code <code>AI_CONFIG_ERROR</code>) rather than crashing, which is itself good defensive design, but the practical effect is that AI-copilot features are very likely non-functional in this environment for lack of a key.</li>
+          </ul>
+          <h4>Evidence</h4>
+          <p><code>lib/ai/providers/anthropicAdapter.ts:36-40</code> (clean config-error throw), root <code>.env</code> (missing key, confirmed by grep), <code>backend/src/main.ts</code> (helmet/CORS/Swagger gate), campaign-documented PHI-leak fix.</p>
+          <h4>Point Deductions</h4>
+          <p>−2 for the input-validation gap's security dimension. No deduction taken for the missing pentest itself (external, not repository-scoreable), but flagged as the reason 8/8 is not achievable by code alone.</p>
+          <h4>Requirements for Full Marks</h4>
+          <p>DTO validation coverage (shared remediation with D1). A commissioned penetration test, external to this repository, is required before this category could reasonably be called complete regardless of any further code changes.</p>
+        </div>
+      </details>
+    </article>
+
+    <article class="cat-card good">
+      <div class="cat-main">
+        <div class="cat-top"><span class="cat-index">09 / 10</span><span class="cat-score">6<span> / 7</span></span></div>
+        <span class="status-chip good">Strong</span>
+        <h3>Maintainability and Code Hygiene</h3>
+        <div class="progress-track"><div class="progress-fill good" style="width: 86%"></div></div>
+      </div>
+      <details>
+        <summary>Full review</summary>
+        <div class="detail-body">
+          <h4>Strengths</h4>
+          <ul>
+            <li>The orphan-detection scanner's quarantine bucket is genuinely at zero<span class="conf confirmed">Confirmed</span> by regenerating the report directly this session (<code>npm run orphan-detection:write-docs</code>) — <code>quarantine: 0</code> in both the pre- and post-regeneration runs.</li>
+            <li>59 truly-unused <code>import React from 'react'</code> statements removed, each individually verified against real usage rather than assumed, earlier this campaign<span class="conf strong-ev">Strong evidence</span>.</li>
+            <li>Dead code is deleted outright when confirmed, not just commented out or left as "// removed" markers<span class="conf confirmed">Confirmed</span> — this session's own <code>src/components/surfaces/Card.tsx</code> deletion (zero real importers, traced through every barrel re-export) is a direct example.</li>
+          </ul>
+          <h4>Defects and Weaknesses</h4>
+          <ul>
+            <li>Found this session: 3 stale, 2-month-old, one-time historical audit reports (<code>clickable-map-report.md</code>, <code>component-mounting-report.md</code>, <code>layout-routing-consolidation-report.md</code>, all dated 2026-06-12/13) were silently misclassified as "legacy" (implying reviewed/fine) by the orphan-detection scanner's own logic, purely because they happened to contain the word "Generated:" in their header — a real, if narrow, classifier bug that let genuinely stale, unreviewed docs hide from the exact audit meant to catch them<span class="conf confirmed">Confirmed</span>; fixed this session (tightened the classifier's regex, archived the 3 docs).</li>
+            <li>The <code>StatCard</code> naming collision (category 4) was also a hygiene issue: two unrelated implementations sharing one name is a real source of confusion for anyone searching the codebase — <strong>closed this session</strong> (shadow component renamed to <code>WhiteboardStatTile</code>).</li>
+          </ul>
+          <h4>Evidence</h4>
+          <p><code>docs/orphan-detection-report.md</code> (before/after regeneration diff this session), <code>src/data/orphanDetectionAudit.ts:566-572</code> (the <code>isGenerated</code> classifier, fixed this session).</p>
+          <h4>Point Deductions</h4>
+          <p>−1 for the just-found classifier gap — a small, narrow bug, but one that specifically undermines confidence in this category's own primary measurement tool.</p>
+          <h4>Requirements for Full Marks</h4>
+          <p>Re-run the full orphan-detection sweep after the classifier fix and confirm no further "legacy"-mislabeled quarantine candidates exist beyond the 3 already found and archived.</p>
+        </div>
+      </details>
+    </article>
+
+    <article class="cat-card warn">
+      <div class="cat-main">
+        <div class="cat-top"><span class="cat-index">10 / 10</span><span class="cat-score">3<span> / 5</span></span></div>
+        <span class="status-chip warn">Partial</span>
+        <h3>Configuration, Dependencies, and Operations</h3>
+        <div class="progress-track"><div class="progress-fill warn" style="width: 60%"></div></div>
+      </div>
+      <details>
+        <summary>Full review</summary>
+        <div class="detail-body">
+          <h4>Strengths</h4>
+          <ul>
+            <li>Health-check endpoints exist and are used by the dev orchestration script itself (<code>/health/live</code> polled by <code>scripts/dev-stack.mjs</code> before starting the frontend, verified live this session with real HTTP probes)<span class="conf confirmed">Confirmed</span>.</li>
+            <li><code>npm audit</code> on both frontend and backend returns exactly 2 findings each, both already CI-allowlisted with the actual advisory text read (not just the title) before allowlisting<span class="conf strong-ev">Strong evidence</span>, from earlier this campaign.</li>
+            <li>Dev/production separation is real, not cosmetic: <code>shouldServeFrontendAssets</code> and (as of this session) <code>shouldServeSwaggerDocs</code> both gate real behavior on <code>NODE_ENV</code>, verified by reading and by live dev-stack log output showing <code>Environment: development</code><span class="conf confirmed">Confirmed</span>.</li>
+          </ul>
+          <h4>Defects and Weaknesses</h4>
+          <ul>
+            <li><strong><code>ANTHROPIC_API_KEY</code> is absent from the root <code>.env</code> entirely</strong><span class="conf confirmed">Confirmed</span> by direct grep this session — not even present as an empty placeholder, though <code>.env.example</code> has one and <code>docs/architecture/platform-architecture-overview.md</code> names Anthropic Claude as the default/primary provider. This is an operational configuration gap with a real functional consequence (AI features very likely non-functional in this environment), not just a documentation issue.</li>
+            <li>A legacy, unwired <code>docker-compose.yml</code> (11 services, superseded by <code>docker-compose.app.yml</code>, which no <code>package.json</code> script references) coexists with the real compose setup, including a dangling <code>anomaly-detection</code> service reference<span class="conf confirmed">Confirmed</span> — found this session, annotated rather than deleted (9 docs still cite it, needing individual review before removal).</li>
+            <li>Two npm scripts are themselves dead: <code>inventory:write-docs</code> and <code>orchestrator:write-docs</code> each target a doc path that doesn't exist and nothing references — orphaned tooling from an earlier cycle<span class="conf strong-ev">Strong evidence</span>.</li>
+          </ul>
+          <h4>Evidence</h4>
+          <p>Root <code>.env</code> (direct read this session, no <code>ANTHROPIC_API_KEY</code> line), <code>docker-compose.yml</code> vs <code>docker-compose.app.yml</code> vs <code>package.json</code>'s <code>compose:app*</code> scripts, <code>package.json</code>'s 20-script <code>*:write-docs</code>/<code>*:report</code> audit from earlier this campaign.</p>
+          <h4>Point Deductions</h4>
+          <p>−2 for the missing default AI provider key (a real, currently-broken runtime dependency) and the unresolved legacy compose-file duplication.</p>
+          <h4>Requirements for Full Marks</h4>
+          <p>Supply a real <code>ANTHROPIC_API_KEY</code> (an account-bound secret; not obtainable by an agent) or explicitly change the documented default provider to match what's actually configured. Delete or fully deprecate the legacy <code>docker-compose.yml</code> after reviewing its 9 doc references. Remove or actually wire the 2 dead <code>*:write-docs</code> scripts.</p>
+        </div>
+      </details>
+    </article>
+
+  </div>
+
+  <div class="section-head">
+    <h2>Defect register</h2>
+    <p>Every material finding above, consolidated with severity and points recoverable. D3's naming half and D4 closed this session (3 points recovered, 76→78). Total recoverable ≈ 20 points, explaining most of the 78→100 gap (the remainder is the external pentest, which no amount of code can close).</p>
+  </div>
+  <div class="ledger-table-wrap">
+    <table class="ledger">
+      <thead><tr><th>ID</th><th>Sev</th><th>Category</th><th>Defect</th><th>Impact</th><th class="num">Pts</th></tr></thead>
+      <tbody>
+        <tr><td>D1</td><td><span class="pill p1">P1</span></td><td>Correctness/Backend/Security</td><td>~60% of backend <code>@Body()</code> DTOs unvalidated (135/225, 7 fixed)</td><td>Malformed payloads trusted, not rejected, on most endpoints</td><td class="num">7</td></tr>
+        <tr><td>D2</td><td><span class="pill p2">P2</span></td><td>Testing</td><td>Known <code>EnvironmentTeardownError</code> flake class, root-caused, unresolved</td><td>Full-suite reds need isolated re-run to trust</td><td class="num">2</td></tr>
+        <tr><td>D3</td><td><span class="pill p2">P2</span></td><td>Frontend Quality</td><td>Canonical card components: 11 real importers (4 production), 2 of 5 with zero production use. <code>StatCard</code> naming collision — <strong>CLOSED 2026-08-06</strong> (renamed to <code>WhiteboardStatTile</code>)</td><td>Design system and real UI have diverged (adoption gap still open; naming-collision confusion risk resolved)</td><td class="num">3</td></tr>
+        <tr><td>D4</td><td><span class="pill good">Closed</span></td><td>Architecture</td><td><strong>CLOSED 2026-08-06</strong>: 3 parallel route-registration systems now cross-checked by the orphan-detection scanner (<code>orphanDetectionAudit.ts</code> reads all 3 layers)</td><td>Was: a route can be wired in one layer, invisible in another (already happened once, this session's own <code>/navigator</code>)</td><td class="num">0</td></tr>
+        <tr><td>D5</td><td><span class="pill p1">P1</span></td><td>Configuration/Ops</td><td><code>ANTHROPIC_API_KEY</code> missing from <code>.env</code> entirely</td><td>Default AI provider very likely non-functional in this environment</td><td class="num">2</td></tr>
+        <tr><td>D6</td><td><span class="pill p3">P3</span></td><td>Maintainability</td><td>Orphan-scanner <code>isGenerated</code> classifier hid 3 stale docs as "legacy" for ~2 months</td><td>Reduced trust in the primary hygiene-audit tool until fixed</td><td class="num">1</td></tr>
+        <tr><td>D7</td><td><span class="pill p3">P3</span></td><td>Configuration/Ops</td><td>Legacy unwired <code>docker-compose.yml</code> with dangling <code>anomaly-detection</code> service reference; 2 dead <code>*:write-docs</code> npm scripts</td><td>Config duplication, one landmine if ever enabled</td><td class="num">2</td></tr>
+        <tr><td>D8</td><td><span class="pill p2">P2</span></td><td>Type Safety</td><td>Hardcoded counts drift silently in test titles/docs even when underlying logic is dynamically correct (6-file doc-drift trail this campaign)</td><td>False confidence from stale-but-plausible numbers</td><td class="num">2</td></tr>
+        <tr><td>D9</td><td><span class="pill p3">P3</span></td><td>Build</td><td>No clean-install (<code>npm ci</code>) build verified this session; sandbox needs <code>ESBUILD_USE_WASM=1</code></td><td>Reproducibility not independently confirmed</td><td class="num">1</td></tr>
+        <tr><td>D10</td><td><span class="pill p1">P1</span></td><td>Security</td><td>No commissioned penetration test exists</td><td>Self-review, however deep, is not independent validation</td><td class="num">external</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-head">
+    <h2>Duplicate and legacy code register</h2>
+  </div>
+  <div class="ledger-table-wrap">
+    <table class="ledger">
+      <thead><tr><th>Area</th><th>Canonical</th><th>Duplicate/Legacy</th><th>Classification</th><th>Recommendation</th></tr></thead>
+      <tbody>
+        <tr><td>Route registration</td><td><code>CANONICAL_ROUTE_MAP</code> (routes.config.ts)</td><td><code>router.tsx</code> hand-coded list + 7 console-route-tree files</td><td><span class="pill good">Active, now cross-checked</span></td><td>All 3 still work independently; the orphan-detection scanner now reads all 3 and cross-checks them (fixed this session) — consolidating into one generated source remains optional</td></tr>
+        <tr><td>Card component</td><td><code>src/components/ui/card.tsx</code> (11 real importers, powers <code>DashboardCard</code>/<code>MetricCard</code>/<code>StatusWidget</code>)</td><td><code>src/components/surfaces/Card.tsx</code> — 0 importers</td><td><span class="pill good">Dead, deleted this session</span></td><td>Closed</td></tr>
+        <tr><td>Docker Compose</td><td><code>docker-compose.app.yml</code> (wired to <code>compose:app*</code> npm scripts)</td><td><code>docker-compose.yml</code> (11 services, unwired, dangling <code>anomaly-detection</code> ref)</td><td><span class="pill warn">Legacy, unwired</span></td><td>9 docs still reference it — review each before deleting</td></tr>
+        <tr><td>App-navigator app</td><td><code>backend/src/modules/app-navigator/</code> + <code>src/pages/AppNavigator.tsx</code></td><td>Formerly-standalone <code>navigator/</code> app (own server/port/Dockerfile)</td><td><span class="pill good">Dead, deleted this session</span></td><td>Closed</td></tr>
+        <tr><td><code>StatCard</code> naming</td><td><code>src/components/data-display/StatCard.tsx</code></td><td>Formerly local <code>function StatCard()</code> in <code>src/pages/emergency/index.tsx</code>, renamed <code>WhiteboardStatTile</code> this session</td><td><span class="pill good">Closed 2026-08-06</span></td><td>Closed — verified zero remaining "StatCard" references in the file, typecheck/lint clean</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-head">
+    <h2>Validation results</h2>
+  </div>
+  <div class="ledger-table-wrap">
+    <table class="ledger">
+      <thead><tr><th>Command</th><th>Result</th><th>Important output</th><th>Score impact</th></tr></thead>
+      <tbody>
+        <tr><td><code>npm run typecheck:frontend</code></td><td><span class="pill pass">Passed</span></td><td>0 errors, re-run 8+ times this session</td><td>Build &amp; Compilation, Type Safety</td></tr>
+        <tr><td><code>npm run lint</code></td><td><span class="pill pass">Passed</span></td><td>0 errors on every touched file this session</td><td>Maintainability</td></tr>
+        <tr><td><code>npm run build</code> (frontend)</td><td><span class="pill pass">Passed</span></td><td>32.62s, all chunks incl. new <code>AppNavigator</code> bundle</td><td>Build &amp; Compilation</td></tr>
+        <tr><td><code>nest build</code> (backend)</td><td><span class="pill pass">Passed</span></td><td>Clean, re-run after every backend change this session</td><td>Build &amp; Compilation, Backend Quality</td></tr>
+        <tr><td>Backend Jest (<code>app-navigator</code>, <code>app.module.spec</code>)</td><td><span class="pill pass">Passed</span></td><td>12/12 tests green</td><td>Testing &amp; Verification</td></tr>
+        <tr><td>Frontend Vitest full sweep (69 files)</td><td><span class="pill pass">Passed with warnings</span></td><td>609/609 real tests passed; 2 pre-existing <code>EnvironmentTeardownError</code> log-noise instances, not failures</td><td>Testing &amp; Verification</td></tr>
+        <tr><td><code>src/data/repositoryStructureAudit.test.ts</code></td><td><span class="pill pass">Passed</span></td><td>4/4, including 2 new/hardened assertions this session</td><td>Architecture</td></tr>
+        <tr><td><code>npm run orphan-detection:write-docs</code></td><td><span class="pill pass">Passed with findings</span></td><td>Real content drift found (3 mislabeled stale docs), fixed and re-verified</td><td>Maintainability</td></tr>
+        <tr><td><code>npm run docs:check</code></td><td><span class="pill pass">Passed</span></td><td><code>{"ok":true}</code>, 12 files checked</td><td>Maintainability</td></tr>
+        <tr><td><code>orphanDetectionAudit.report.test.ts</code> (post route-registry fix)</td><td><span class="pill pass">Passed</span></td><td>3/3; regenerated report shows wire findings dropped 264→165</td><td>Architecture (D4 closed)</td></tr>
+        <tr><td>Typecheck + lint after <code>StatCard</code>→<code>WhiteboardStatTile</code> rename</td><td><span class="pill pass">Passed</span></td><td>Clean; 0 remaining "StatCard" references in <code>emergency/index.tsx</code></td><td>Frontend Quality (D3 naming half closed)</td></tr>
+        <tr><td>Clean-install build (<code>npm ci</code>)</td><td><span class="pill fail">Not run</span></td><td>—</td><td>Build &amp; Compilation (−1)</td></tr>
+        <tr><td>Commissioned penetration test</td><td><span class="pill fail">Unavailable</span></td><td>Requires an external firm; not repository-scoreable</td><td>Security (caps ceiling below 8/8)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-head">
+    <h2>Full-mark code improvement plan</h2>
+    <p>Ordered by engineering dependency and risk, not by ease of points.</p>
+  </div>
+  <div class="cat-table-wrap">
+    <table class="cat">
+      <thead><tr><th>#</th><th>Task</th><th>Files/areas</th><th>Acceptance criteria</th><th>Validation</th><th class="num">Pts</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Close the DTO validation gap (D1)</td><td>~128 remaining backend controllers/DTOs</td><td>Every <code>@Body()</code> parameter has a <code>class-validator</code>-decorated DTO</td><td><code>body-validation-coverage.spec.ts</code> exemption list shrinks to 0</td><td class="num">7</td></tr>
+        <tr><td>2</td><td>Resolve the async-teardown test flake (D2)</td><td><code>unifiedWorkflowAutomationEngine.ts</code>, <code>unifiedOperationalIntelligenceEngine.ts</code>, Vitest pool config</td><td>3 consecutive full-suite runs with zero <code>EnvironmentTeardownError</code></td><td>Full <code>vitest run</code>, repeated</td><td class="num">2</td></tr>
+        <tr><td>3</td><td><span class="pill good">DONE</span> Rename the shadow <code>StatCard</code> (D3 naming half); grow real canonical-component adoption (D3 remainder, still open)</td><td><code>src/pages/emergency/index.tsx</code> (renamed <code>WhiteboardStatTile</code>), <code>DashboardCard</code>/<code>StatCard</code> call sites</td><td>Zero name collisions (met); &gt;0 production consumers for every "canonical" component or formal registry retirement (open)</td><td>Grep for duplicate exported names; typecheck — both passed</td><td class="num">3</td></tr>
+        <tr><td>4</td><td><span class="pill good">DONE</span> Add a route-registry cross-check (D4)</td><td><code>src/data/orphanDetectionAudit.ts</code>, all 7 console-route-tree files, <code>router.tsx</code></td><td>The scanner fails to classify a route as "wired" unless it resolves in one of the 3 real registration layers</td><td><code>orphanDetectionAudit.report.test.ts</code> 3/3 passing; regenerated report confirms 99 false positives eliminated</td><td class="num">0</td></tr>
+        <tr><td>5</td><td>Supply <code>ANTHROPIC_API_KEY</code> or correct the documented default (D5)</td><td>Root <code>.env</code>, <code>docs/architecture/platform-architecture-overview.md</code></td><td>AI copilot features functional end-to-end, or docs stop claiming a provider that isn't configured</td><td>Live chat request returns a real completion, not <code>AI_CONFIG_ERROR</code></td><td class="num">2</td></tr>
+        <tr><td>6</td><td>Delete or fully deprecate the legacy compose file and dead scripts (D7)</td><td><code>docker-compose.yml</code>, <code>inventory:write-docs</code>, <code>orchestrator:write-docs</code></td><td>Zero unwired duplicate infra config; 9 doc references individually reviewed and updated</td><td>Grep confirms zero remaining references after cleanup</td><td class="num">2</td></tr>
+        <tr><td>7</td><td>Replace hardcoded counts in test titles/docs with generated values (D8)</td><td><code>backendFrontendToolContract.report.test.ts</code> and similar</td><td>No English string in a test title or doc hardcodes a number that a nearby dynamic check already computes</td><td>Manual grep sweep for small integers adjacent to "tools"/"executors"/"roles" etc.</td><td class="num">2</td></tr>
+        <tr><td>8</td><td>Run and record a clean-install build (D9)</td><td>Whole repo</td><td><code>rm -rf node_modules &amp;&amp; npm ci &amp;&amp; npm run build</code> succeeds without the sandbox-specific WASM workaround</td><td>Build log</td><td class="num">1</td></tr>
+        <tr><td>9</td><td>Commission an independent penetration test (D10)</td><td>Whole application, external</td><td>Findings report from a qualified external firm</td><td>External deliverable</td><td class="num">external</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="verdict-box">
+    <h3>What prevents 100/100?</h3>
+    <p>One thing now dominates the gap: the DTO-validation coverage gap (D1, worth 7 of the ~20 remaining code-recoverable points) is the single largest, most concrete, most-quantified defect in the codebase — a real, systemic input-boundary weakness, not a style nit. A smaller residual cluster remains (canonical-component adoption, a legacy compose file, hardcoded counts) — individually minor, but the route-registration cross-check and the <code>StatCard</code> naming collision that used to headline this cluster were both closed this session. Beyond code, one item is permanently external: a commissioned penetration test.</p>
+    <h3>Highest-value fixes</h3>
+    <p>In order: (1) DTO validation coverage — largest single point recovery, touches correctness/backend/security simultaneously. (2) The <code>ANTHROPIC_API_KEY</code> gap — a one-line config fix once a real key is supplied, with an outsized functional impact. (3) Growing real production adoption of the canonical card components, now that the naming collision confusing that count is gone.</p>
+    <h3>Final Engineering Verdict</h3>
+    <p class="verdict-gate">Functional but requires hardening</p>
+    <p>The codebase is genuinely well-structured, actively and honestly maintained, and free of the kind of chaos "materially incomplete" might suggest — dead code is deleted, not hidden; a real CI-enforced structural guard exists; 12,000+ tests pass; security fundamentals (helmet, CORS, exception handling, no raw SQL, no dangerouslySetInnerHTML) are all present and verified. What keeps this from "Strong" is one concrete, sizeable, still-open input-validation gap and a small set of unreconciled duplicate systems that each work individually but aren't cross-checked against each other — exactly the profile of "functional, needs hardening," not "unstable."</p>
+  </div>
+
+  <footer>
+    <span>Methodology: every figure on this page traces to a command run or a file read this session, or a documented, re-derivable finding from an earlier cycle of the same ongoing campaign — no estimates.</span>
+    <span>Siblings: <a href="https://claude.ai/code/artifact/5533d735-3707-4fc3-a302-789251707c58">Repository Readiness Scorecard</a> (repo-hygiene lens) · <a href="https://claude.ai/code/artifact/9d3e5b15-294c-4678-a791-e1d97afa5b5b">Project Scorecard</a> (clinical/product readiness)</span>
+  </footer>
+</div>

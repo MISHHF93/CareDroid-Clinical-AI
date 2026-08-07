@@ -44,6 +44,7 @@ import { OcrIntakeService } from './ocr-intake.service';
 
 describe('EmergencyOsController', () => {
   let controller: EmergencyOsController;
+  let patientService: EmergencyPatientService;
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -115,6 +116,7 @@ describe('EmergencyOsController', () => {
       .compile();
 
     controller = moduleRef.get(EmergencyOsController);
+    patientService = moduleRef.get(EmergencyPatientService);
   });
 
   it('returns backend envelopes for all normalized CareDroid modules', async () => {
@@ -236,14 +238,16 @@ describe('EmergencyOsController', () => {
       },
     });
     expect(controller.getReferrals().data.referrals).toEqual(
-      expect.arrayContaining([expect.objectContaining({ id: referralId, status: 'TransferRequested' })]),
+      expect.arrayContaining([
+        expect.objectContaining({ id: referralId, status: 'TransferRequested' }),
+      ]),
     );
   });
 
   it('rejects a status update for a referral id that does not exist', () => {
-    expect(() => controller.updateTransferStatus('ref-does-not-exist', { status: 'PatientDeparted' })).toThrow(
-      'Referral ref-does-not-exist not found',
-    );
+    expect(() =>
+      controller.updateTransferStatus('ref-does-not-exist', { status: 'PatientDeparted' }),
+    ).toThrow('Referral ref-does-not-exist not found');
   });
 
   it('exposes normalized workflow action logs for admin and patient timeline views', async () => {
@@ -399,6 +403,57 @@ describe('EmergencyOsController', () => {
         }),
       ]),
     );
+  });
+
+  it('copilot "move patient" query blocks lowering priority below the DPS1/DPS2 safety floor', async () => {
+    const created = controller.createIntakePatient({
+      mrn: 'ED-COPILOT-FLOOR',
+      firstName: 'Copilot',
+      lastName: 'Floor',
+      chiefComplaint: 'Copilot safety floor validation',
+      complaintCategory: 'Other',
+    });
+    const patientId = created.data.patient.id;
+    patientService.updatePatient(patientId, { priority: 'P1' });
+
+    const result = await controller.queryCopilot({
+      query: `Move patient ${patientId} to priority 5`,
+      user_role: 'charge_nurse',
+    });
+
+    expect(result).toMatchObject({
+      data: {
+        response: expect.stringMatching(/blocked by safety floor/i),
+        requires_review: true,
+        safety_check_passed: false,
+        safety_message: expect.stringMatching(/DPS1/),
+      },
+    });
+  });
+
+  it('copilot "move patient" query allows a priority escalation, pending human review', async () => {
+    const created = controller.createIntakePatient({
+      mrn: 'ED-COPILOT-ESCALATE',
+      firstName: 'Copilot',
+      lastName: 'Escalate',
+      chiefComplaint: 'Copilot escalation validation',
+      complaintCategory: 'Other',
+    });
+    const patientId = created.data.patient.id;
+    patientService.updatePatient(patientId, { priority: 'P3' });
+
+    const result = await controller.queryCopilot({
+      query: `Move patient ${patientId} to priority 2`,
+      user_role: 'charge_nurse',
+    });
+
+    expect(result).toMatchObject({
+      data: {
+        response: expect.stringMatching(/safety check passed/i),
+        requires_review: true,
+        safety_check_passed: true,
+      },
+    });
   });
 
   it('records clinical calculator results and copilot interactions', () => {

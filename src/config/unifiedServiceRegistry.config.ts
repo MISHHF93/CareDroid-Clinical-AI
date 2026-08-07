@@ -28,7 +28,6 @@ export type ServiceRegistryDomain = (typeof SERVICE_REGISTRY_DOMAINS)[number];
 /** Services superseded by a canonical orchestrator — kept for audit, not runtime dispatch. */
 export const OBSOLETE_SERVICE_REDIRECTS = Object.freeze({
   'src/services/advancedRecommendationService.ts': 'src/services/aiChiefOrchestrator.ts',
-  'backend/src/services/copilot.service.ts': 'backend/src/modules/chat/chat.service.ts',
   'backend/src/modules/ai/foundation/ai-routing-engine.service.ts':
     'backend/src/modules/moe-router/moe-router.service.ts',
   'backend/src/modules/ai/foundation/ai-gateway.service.ts':

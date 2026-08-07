@@ -1,0 +1,706 @@
+<title>CareDroid Emergency OS Master Scorecard</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --page: #07111f; --page-deep: #040a13;
+    --surface: #0d1b2e; --surface-raised: #12263e; --surface-soft: rgba(26,47,72,0.5); --surface-hover: rgba(34,58,84,0.7);
+    --ink: #f7fbff; --ink-soft: #c5d2df; --ink-muted: #8699ad;
+    --line: rgba(148,175,202,0.16); --line-strong: rgba(148,175,202,0.28);
+    --brand: #5eead4; --brand-strong: #2dd4bf; --brand-soft: rgba(94,234,212,0.12);
+    --blue: #38bdf8; --green: #4ade80; --green-soft: rgba(74,222,128,0.12);
+    --amber: #fbbf24; --amber-soft: rgba(251,191,36,0.12);
+    --red: #fb7185; --red-soft: rgba(251,113,133,0.12);
+    --shadow: 0 20px 60px rgba(0,0,0,0.35);
+    --radius-lg: 20px; --radius-md: 14px; --content: 1320px;
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", Consolas, monospace;
+    --sans: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  @media (prefers-color-scheme: light) {
+    :root { color-scheme: light; --page: #eef3f6; --page-deep: #dfe9ed; --surface: #ffffff; --surface-raised: #ffffff;
+      --surface-soft: rgba(15,118,110,0.05); --surface-hover: rgba(15,118,110,0.09);
+      --ink: #0f2233; --ink-soft: #3b5064; --ink-muted: #6c8092;
+      --line: rgba(15,45,60,0.1); --line-strong: rgba(15,45,60,0.2);
+      --brand: #0f766e; --brand-strong: #0d9488; --brand-soft: rgba(13,148,136,0.1);
+      --blue: #0284c7; --green: #15803d; --green-soft: rgba(21,128,61,0.09);
+      --amber: #b45309; --amber-soft: rgba(180,83,9,0.09);
+      --red: #be123c; --red-soft: rgba(190,18,60,0.09);
+      --shadow: 0 16px 44px rgba(15,45,60,0.14); }
+  }
+  :root[data-theme="dark"] { color-scheme: dark; --page: #07111f; --page-deep: #040a13; --surface: #0d1b2e; --surface-raised: #12263e;
+    --surface-soft: rgba(26,47,72,0.5); --surface-hover: rgba(34,58,84,0.7); --ink: #f7fbff; --ink-soft: #c5d2df; --ink-muted: #8699ad;
+    --line: rgba(148,175,202,0.16); --line-strong: rgba(148,175,202,0.28); --brand: #5eead4; --brand-strong: #2dd4bf; --brand-soft: rgba(94,234,212,0.12);
+    --blue: #38bdf8; --green: #4ade80; --green-soft: rgba(74,222,128,0.12); --amber: #fbbf24; --amber-soft: rgba(251,191,36,0.12);
+    --red: #fb7185; --red-soft: rgba(251,113,133,0.12); --shadow: 0 20px 60px rgba(0,0,0,0.35); }
+  :root[data-theme="light"] { color-scheme: light; --page: #eef3f6; --page-deep: #dfe9ed; --surface: #ffffff; --surface-raised: #ffffff;
+    --surface-soft: rgba(15,118,110,0.05); --surface-hover: rgba(15,118,110,0.09); --ink: #0f2233; --ink-soft: #3b5064; --ink-muted: #6c8092;
+    --line: rgba(15,45,60,0.1); --line-strong: rgba(15,45,60,0.2); --brand: #0f766e; --brand-strong: #0d9488; --brand-soft: rgba(13,148,136,0.1);
+    --blue: #0284c7; --green: #15803d; --green-soft: rgba(21,128,61,0.09); --amber: #b45309; --amber-soft: rgba(180,83,9,0.09);
+    --red: #be123c; --red-soft: rgba(190,18,60,0.09); --shadow: 0 16px 44px rgba(15,45,60,0.14); }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: radial-gradient(circle at 16% -8%, rgba(45,212,191,0.12), transparent 30rem), linear-gradient(155deg, var(--page) 0%, var(--page-deep) 100%);
+    color: var(--ink); font-family: var(--sans); line-height: 1.55; -webkit-font-smoothing: antialiased; }
+  @media (prefers-reduced-motion: reduce) { * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; } }
+  .wrap { max-width: var(--content); margin: 0 auto; padding: 3rem 1.5rem 5rem; }
+
+  header.top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 1.5rem; margin-bottom: 2.25rem; }
+  .eyebrow { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--brand-strong); margin: 0 0 0.6rem; }
+  h1 { font-family: var(--mono); font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.3rem); font-weight: 600; letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+  .subtitle { color: var(--ink-soft); font-size: 0.98rem; margin: 0.6rem 0 0; max-width: 52rem; }
+  .meta-block { text-align: right; font-family: var(--mono); font-size: 0.78rem; color: var(--ink-muted); line-height: 1.7; }
+  .meta-block a { color: var(--brand-strong); text-decoration: none; }
+  .meta-block a:hover { text-decoration: underline; }
+
+  .hero { display: grid; grid-template-columns: auto 1fr; gap: 2.5rem; align-items: center; background: var(--surface); border: 1px solid var(--line);
+    border-radius: var(--radius-lg); box-shadow: var(--shadow); padding: 2rem 2.25rem; margin-bottom: 1.5rem; }
+  .score-ring { position: relative; width: 160px; height: 160px; flex: none; }
+  .score-ring svg { transform: rotate(-90deg); }
+  .score-ring .track { stroke: var(--line); }
+  .score-ring .fill { stroke: var(--amber); stroke-linecap: round; }
+  .score-ring .num { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .score-ring .num strong { font-family: var(--mono); font-size: 2.3rem; font-weight: 600; line-height: 1; }
+  .score-ring .num span { font-family: var(--mono); font-size: 0.66rem; color: var(--ink-muted); margin-top: 0.2rem; }
+  .hero-body h2 { font-size: 1.05rem; font-weight: 600; margin: 0 0 0.5rem; }
+  .hero-body p { color: var(--ink-soft); margin: 0 0 0.9rem; max-width: 56rem; font-size: 0.92rem; }
+  .band-chip { display: inline-flex; align-items: center; gap: 0.4rem; font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 0.32rem 0.7rem; border-radius: 999px; background: var(--amber-soft); color: var(--amber); border: 1px solid var(--line-strong); }
+
+  .decision-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin-bottom: 2.5rem; }
+  .decision-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-md); box-shadow: var(--shadow); padding: 1rem 1.1rem; }
+  .decision-label { display: block; font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 0.5rem; }
+  .decision-value { font-size: 0.92rem; font-weight: 700; margin-bottom: 0.3rem; }
+  .decision-card p { margin: 0; color: var(--ink-soft); font-size: 0.78rem; }
+
+  .section-head { margin: 3rem 0 1.1rem; }
+  .section-head h2 { font-family: var(--mono); font-size: 0.95rem; font-weight: 600; margin: 0 0 0.35rem; }
+  .section-head p { color: var(--ink-soft); font-size: 0.87rem; margin: 0; max-width: 54rem; }
+
+  .cat-table-wrap, .ledger-table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); box-shadow: var(--shadow); margin-bottom: 2.5rem; }
+  table.cat, table.ledger { width: 100%; border-collapse: collapse; font-size: 0.84rem; min-width: 760px; }
+  table.cat th, table.ledger th { text-align: left; font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-muted);
+    font-weight: 500; padding: 0.7rem 0.9rem; border-bottom: 1px solid var(--line-strong); white-space: nowrap; }
+  table.cat td, table.ledger td { padding: 0.65rem 0.9rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+  table.cat tr:last-child td, table.ledger tr:last-child td { border-bottom: none; }
+  table.cat td.num, table.ledger td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+
+  .pill { display: inline-flex; align-items: center; font-family: var(--mono); font-size: 0.64rem; letter-spacing: 0.03em; padding: 0.16rem 0.5rem; border-radius: 999px; white-space: nowrap; }
+  .pill.crit { background: var(--red-soft); color: var(--red); }
+  .pill.major { background: var(--amber-soft); color: var(--amber); }
+  .pill.partial { background: var(--blue); color: #07111f; }
+  .pill.strong { background: var(--green-soft); color: var(--green); }
+  .pill.ready { background: var(--brand-soft); color: var(--brand-strong); }
+  .pill.p0 { background: var(--red-soft); color: var(--red); }
+  .pill.p1 { background: var(--amber-soft); color: var(--amber); }
+  .pill.p2 { background: var(--brand-soft); color: var(--brand-strong); }
+  .pill.p3 { background: var(--line); color: var(--ink-muted); }
+
+  .dom-grid { display: grid; gap: 1rem; }
+  .dom-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); box-shadow: var(--shadow); overflow: hidden; position: relative; }
+  .dom-card::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 3px; }
+  .dom-card.crit::before { background: var(--red); } .dom-card.major::before { background: var(--amber); }
+  .dom-card.partial::before { background: var(--blue); } .dom-card.strong::before { background: var(--green); } .dom-card.ready::before { background: var(--brand); }
+  .dom-main { padding: 1.3rem 1.5rem 1.1rem 1.65rem; }
+  .dom-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem; margin-bottom: 0.4rem; }
+  .dom-index { font-family: var(--mono); font-size: 0.7rem; color: var(--ink-muted); letter-spacing: 0.04em; }
+  .dom-score { font-family: var(--mono); font-size: 1.1rem; font-weight: 700; white-space: nowrap; }
+  .dom-score span { color: var(--ink-muted); font-size: 0.8rem; font-weight: 400; }
+  .dom-card h3 { font-size: 1rem; font-weight: 700; margin: 0.25rem 0 0.5rem; }
+  .status-chip { display: inline-flex; align-items: center; gap: 0.35rem; font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.05em; text-transform: uppercase; padding: 0.2rem 0.55rem; border-radius: 999px; }
+  .status-chip.crit { background: var(--red-soft); color: var(--red); } .status-chip.major { background: var(--amber-soft); color: var(--amber); }
+  .status-chip.partial { background: rgba(56,189,248,0.15); color: var(--blue); } .status-chip.strong { background: var(--green-soft); color: var(--green); }
+  .status-chip.ready { background: var(--brand-soft); color: var(--brand-strong); }
+  .progress-track { height: 5px; border-radius: 999px; background: var(--line); overflow: hidden; margin: 0.8rem 0 0; }
+  .progress-fill { height: 100%; border-radius: 999px; }
+  .progress-fill.crit { background: var(--red); } .progress-fill.major { background: var(--amber); } .progress-fill.partial { background: var(--blue); }
+  .progress-fill.strong { background: var(--green); } .progress-fill.ready { background: var(--brand); }
+  details { border-top: 1px solid var(--line); }
+  summary { cursor: pointer; padding: 0.65rem 1.5rem; font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--brand-strong); list-style: none; display: flex; align-items: center; gap: 0.4rem; user-select: none; }
+  summary::-webkit-details-marker { display: none; }
+  summary::before { content: "▸"; display: inline-block; transition: transform 0.15s ease; font-size: 0.7em; }
+  details[open] summary::before { transform: rotate(90deg); }
+  summary:hover { background: var(--surface-hover); }
+  .detail-body { padding: 0 1.5rem 1.3rem; font-size: 0.85rem; color: var(--ink-soft); }
+  .detail-body h4 { font-family: var(--mono); font-size: 0.66rem; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-muted); margin: 0.9rem 0 0.35rem; }
+  .detail-body h4:first-child { margin-top: 0; }
+  .detail-body ul { margin: 0 0 0.5rem; padding-left: 1.1rem; }
+  .detail-body li { margin-bottom: 0.32rem; }
+  .detail-body p { margin: 0 0 0.55rem; }
+  .detail-body code { font-family: var(--mono); font-size: 0.85em; background: var(--surface-soft); padding: 0.1em 0.35em; border-radius: 4px; color: var(--ink); }
+  .detail-body strong { color: var(--ink); }
+  .conf { font-family: var(--mono); font-size: 0.63rem; text-transform: uppercase; padding: 0.1rem 0.4rem; border-radius: 4px; margin-left: 0.35rem; }
+  .conf.confirmed { background: var(--green-soft); color: var(--green); }
+  .conf.strong-ev { background: var(--brand-soft); color: var(--brand-strong); }
+  .conf.partial-ev { background: var(--amber-soft); color: var(--amber); }
+  .conf.notver { background: var(--line); color: var(--ink-muted); }
+
+  .scenario-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap: 0.9rem; margin-bottom: 2.5rem; }
+  .scenario-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-md); padding: 1.1rem 1.2rem; box-shadow: var(--shadow); }
+  .scenario-card h4 { margin: 0 0 0.4rem; font-size: 0.88rem; }
+  .scenario-card .flow { font-family: var(--mono); font-size: 0.72rem; color: var(--ink-muted); margin: 0 0 0.6rem; line-height: 1.6; }
+  .scenario-card p { margin: 0; font-size: 0.8rem; color: var(--ink-soft); }
+
+  .verdict-box { background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--radius-lg); box-shadow: var(--shadow); padding: 1.8rem 2rem; margin-top: 1rem; }
+  .verdict-box h3 { margin: 0 0 0.6rem; font-size: 1rem; }
+  .verdict-box p { color: var(--ink-soft); margin: 0 0 0.9rem; }
+  .verdict-gate { font-family: var(--mono); font-size: 0.85rem; font-weight: 700; color: var(--red); background: var(--red-soft); border: 1px solid var(--line-strong); border-radius: 10px; padding: 0.75rem 1.1rem; display: inline-block; }
+
+  footer { margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; font-size: 0.8rem; color: var(--ink-muted); }
+  footer a { color: var(--brand-strong); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+  @media (max-width: 720px) { .hero { grid-template-columns: 1fr; text-align: center; } .decision-strip { grid-template-columns: 1fr 1fr; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow">// caredroid-clinical-ai — independent clinical/product readiness audit</p>
+      <h1>Emergency OS Master Scorecard</h1>
+      <p class="subtitle">
+        A stricter, 12-domain, 1000-point re-scoring of the same evidence base as the
+        <a href="https://claude.ai/code/artifact/9d3e5b15-294c-4678-a791-e1d97afa5b5b" style="color: var(--brand-strong)">Project Scorecard</a>
+        (78/100 as of 2026-08-05) — reorganized around workflow completeness and patient-safety specifics that
+        scorecard's 8 broader dimensions never itemized on their own, plus fresh verification for domains it
+        didn't separately measure at all.
+      </p>
+    </div>
+    <div class="meta-block">
+      Generated 2026-08-06<br />
+      HEAD <code style="font-family: var(--mono)">08bbba65</code><br />
+      <a href="https://github.com/MISHHF93/CareDroid-Clinical-AI">github.com/MISHHF93/CareDroid-Clinical-AI</a>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="score-ring">
+      <svg width="160" height="160" viewBox="0 0 160 160">
+        <circle class="track" cx="80" cy="80" r="68" fill="none" stroke-width="11"></circle>
+        <circle class="fill" cx="80" cy="80" r="68" fill="none" stroke-width="11" stroke-dasharray="427.3" stroke-dashoffset="161.1"></circle>
+      </svg>
+      <div class="num"><strong>62.3</strong><span>/ 100</span></div>
+    </div>
+    <div class="hero-body">
+      <span class="band-chip">Significant improvement required (repository-verifiable ceiling)</span>
+      <h2>Corrected 2026-08-06: 3 of the scorecard's own original findings were themselves wrong — a dedicated verification pass found real mechanisms this first draft had scored as absent, and 3 concrete bugs found along the way are now fixed</h2>
+      <p>
+        <strong>Repository Implementation Score: 623/1000 (62.3%), up from an initial 520/1000.</strong>
+        <strong>Pilot Evidence Score: ~10/100</strong> — unchanged; code existing and being wired is still not
+        evidence of clinical validation. A dedicated research pass corrected 3 domains this scorecard originally
+        got wrong: <strong>Waiting Room Safety</strong> (42→58/100) — a real backend cron and a real client-side
+        auto-escalation transition (3-minute deadline, audit trail) both exist; the actual gap is narrower than
+        first scored (in-app-only reach, not "no escalation at all"). <strong>Interoperability</strong> (3→10/25)
+        — real, live HL7 FHIR R4 resource construction exists in the Sentinel EMS path (<code>lib/sentinel/fhirMap.ts</code>),
+        contradicting the original "no FHIR/HL7 code" finding, though it sits next to genuinely-fake demo stubs
+        using the same vocabulary elsewhere. <strong>Capacity/Boarding/Referral</strong> (38→44/75) — a confirmed
+        dead endpoint (<code>ReferralPanel.tsx</code> calling a route that never existed on the backend) is now
+        fixed, not just documented. <strong>Multi-Screen Architecture</strong> (52→64/75) — the public-display
+        zero-PHI claim is now directly confirmed by reading the component, not inferred. <strong>Strongest domain:</strong>
+        Architecture &amp; Repository Convergence (90/100) — the 9-of-9-10 legacy-route migration remains the
+        strongest evidence in the whole scorecard, plus a newly-fixed route-registry scanner blind spot that had
+        been producing ~99 false-positive "missing route" findings. <strong>Weakest domain:</strong> Interoperability
+        (10/25) — real in one narrow path, fake-stub in others. <strong>Highest safety risk, revised:</strong>
+        Waiting Room Safety's escalation mechanism is real but reaches only someone already looking at the app —
+        no push/SMS/pager channel exists. <strong>Highest UX risk:</strong> zero live browser/axe-core verification
+        exists anywhere in this program. <strong>Highest security/privacy risk:</strong> no commissioned
+        penetration test and no bespoke application security review exist.
+      </p>
+    </div>
+  </section>
+
+  <div class="decision-strip">
+    <div class="decision-card"><span class="decision-label">Pilot gate</span><div class="decision-value" style="color:var(--red)">NOT READY FOR PILOT</div><p>6 P0 gates open on the sibling scorecard; none require more code alone.</p></div>
+    <div class="decision-card"><span class="decision-label">Repo implementation</span><div class="decision-value">623 / 1000</div><p>Evidence-backed, code-level maturity across 12 domains.</p></div>
+    <div class="decision-card"><span class="decision-label">Pilot evidence</span><div class="decision-value" style="color:var(--amber)">~10 / 100</div><p>Live/clinician/external validation, separated from implementation.</p></div>
+    <div class="decision-card"><span class="decision-label">Evidence confidence</span><div class="decision-value">High</div><p>Every score cites a file, route, test, or command — 3 domains marked NOT VERIFIED rather than guessed.</p></div>
+  </div>
+
+  <div class="section-head">
+    <h2>Domain table</h2>
+    <p>12 domains, weighted to 1000 points (normalized to /100 in the hero above). Status uses: 🔴 Critical · 🟠 Major Gap · 🟡 Partial · 🔵 Strong · 🟢 Pilot-Ready.</p>
+  </div>
+  <div class="cat-table-wrap">
+    <table class="cat">
+      <thead><tr><th>Domain</th><th class="num">Weight</th><th class="num">Score</th><th class="num">%</th><th>Confidence</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>1. Product &amp; Workflow Completeness</td><td class="num">150</td><td class="num">83</td><td class="num">55%</td><td>Strong evidence</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
+        <tr><td>2. Waiting Room Safety</td><td class="num">100</td><td class="num">58</td><td class="num">58%</td><td>Confirmed</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
+        <tr><td>3. Emergency Whiteboard &amp; Queue Intelligence</td><td class="num">100</td><td class="num">58</td><td class="num">58%</td><td>Strong evidence</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
+        <tr><td>4. EMS &amp; Offload</td><td class="num">75</td><td class="num">40</td><td class="num">53%</td><td>Confirmed</td><td>🟠 <span class="pill major">Major Gap</span></td></tr>
+        <tr><td>5. Capacity, Boarding &amp; Referral Intelligence</td><td class="num">75</td><td class="num">44</td><td class="num">59%</td><td>Confirmed</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
+        <tr><td>6. Multi-Screen &amp; Role-Specific Architecture</td><td class="num">75</td><td class="num">64</td><td class="num">85%</td><td>Confirmed</td><td>🔵 <span class="pill strong">Strong</span></td></tr>
+        <tr><td>7. RBAC, Privacy &amp; Security</td><td class="num">100</td><td class="num">53</td><td class="num">53%</td><td>Confirmed</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
+        <tr><td>8. Architecture &amp; Repository Convergence</td><td class="num">100</td><td class="num">90</td><td class="num">90%</td><td>Confirmed</td><td>🔵 <span class="pill strong">Strong</span></td></tr>
+        <tr><td>9. UX, Accessibility &amp; Design-System Quality</td><td class="num">75</td><td class="num">44</td><td class="num">59%</td><td>Confirmed (static only)</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
+        <tr><td>10. Quality Engineering &amp; Pilot Readiness</td><td class="num">100</td><td class="num">63</td><td class="num">63%</td><td>Confirmed</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
+        <tr><td>11. Interoperability, Data &amp; Integration Readiness</td><td class="num">25</td><td class="num">10</td><td class="num">40%</td><td>Confirmed (mixed)</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
+        <tr><td>12. AI Governance &amp; Operational Intelligence</td><td class="num">25</td><td class="num">16</td><td class="num">64%</td><td>Strong evidence</td><td>🔵 <span class="pill strong">Strong</span></td></tr>
+        <tr><td><strong>Total</strong></td><td class="num"><strong>1000</strong></td><td class="num"><strong>623</strong></td><td class="num"><strong>62%</strong></td><td>—</td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-head">
+    <h2>Detailed findings by domain</h2>
+    <p>Confidence labels: <span class="conf confirmed">Confirmed</span> direct source/test read this program · <span class="conf strong-ev">Strong evidence</span> multi-source, re-derivable · <span class="conf partial-ev">Partial evidence</span> one source, not cross-checked · <span class="conf notver">Not verified</span> no evidence found, not guessed.</p>
+  </div>
+
+  <div class="dom-grid">
+
+    <article class="dom-card partial">
+      <div class="dom-main">
+        <div class="dom-top"><span class="dom-index">01 / 12</span><span class="dom-score">83<span> / 150</span></span></div>
+        <span class="status-chip partial">Partial</span>
+        <h3>Product &amp; Workflow Completeness</h3>
+        <div class="progress-track"><div class="progress-fill partial" style="width: 55%"></div></div>
+      </div>
+      <details>
+        <summary>Full review</summary>
+        <div class="detail-body">
+          <h4>What works</h4>
+          <ul>
+            <li>Clear reception-first ED model with 23 defined role personas and an explicit human-review boundary for AI<span class="conf confirmed">Confirmed</span> — README scope, 11 workflow suites.</li>
+            <li>The 911→outcome journey (arrival → registration → triage → waiting → reassessment → provider → disposition) has real, live-wired backend controllers for the majority of its stages: <code>SmartIntakeController</code> (14 endpoints, 6 with confirmed real frontend callers), <code>ReassessmentController</code> (3 endpoints, all with real callers), <code>BoardingController</code> (6 endpoints, all real callers), <code>EmsController</code> (4 endpoints, all real callers, real Socket.IO whiteboard bridge)<span class="conf confirmed">Confirmed</span> — each migrated off legacy Express onto NestJS with <code>AuthGuard('jwt')</code>+<code>AuthorizationGuard</code>, live-boot-verified returning 401 (not 404) without a token.</li>
+          </ul>
+          <h4>What is partial</h4>
+          <ul>
+            <li><strong>Of 87 tracked workflow-suite assignments, only 41 are classified "live"</strong> — 30 are demo/fixture-backed, 12 are preview-stage, 4 are planned-only<span class="conf strong-ev">Strong evidence</span> (Project Scorecard dim 2 evidence). Capability breadth genuinely exceeds fully-wired live depth across the platform, not just in the domains scored separately below.</li>
+            <li>SmartIntake specifically: 8 of its 14 real backend endpoints have no confirmed UI trigger yet — "real, wired, not yet invoked," a pattern this program's own campaign documented recurring since a much earlier cycle<span class="conf confirmed">Confirmed</span>.</li>
+          </ul>
+          <h4>What is missing</h4>
+          <ul>
+            <li>A single, reviewed live/demo/preview/planned claims registry does not yet exist — the 41/30/12/4 split above is the closest thing, and it is itself not independently re-verified per-suite in this pass.</li>
+          </ul>
+          <h4>Risks</h4>
+          <p>A stakeholder reading "11 workflow suites" as a completeness claim would be misled without also knowing under half are confirmed live.</p>
+          <h4>Evidence</h4>
+          <p>README.md scope section; Project Scorecard dims 1-2; <code>backend/src/modules/{smart-intake,reassessment,boarding,ems}/*.controller.ts</code> (this session's own live-boot verification history).</p>
+          <h4>Required for full marks</h4>
+          <p>Publish and maintain one authoritative live/demo/preview/planned registry per workflow suite, independently re-verified (not self-reported), and close the 46 non-live suite assignments to "live" or explicitly re-scope them as roadmap.</p>
+        </div>
+      </details>
+    </article>
+
+    <article class="dom-card partial">
+      <div class="dom-main">
+        <div class="dom-top"><span class="dom-index">02 / 12</span><span class="dom-score">58<span> / 100</span></span></div>
+        <span class="status-chip partial">Partial</span>
+        <h3>Waiting Room Safety</h3>
+        <div class="progress-track"><div class="progress-fill partial" style="width: 58%"></div></div>
+      </div>
+      <details>
+        <summary>Full review</summary>
+        <div class="detail-body">
+          <h4>What works</h4>
+          <ul>
+            <li><strong>Corrected 2026-08-06 — a real escalation mechanism exists, not just a computed field.</strong> A backend cron (every minute) writes real, persisted overdue-alert data to the patient record (<code>backend/src/scheduler/reassessment.scheduler.ts:12-28</code>, <code>Patient.findByIdAndUpdate</code>), wired up in <code>main.ts:60</code><span class="conf confirmed">Confirmed</span>.</li>
+            <li><strong>A real client-side auto-escalation action exists</strong>: <code>src/services/alertLifecycleOrchestrator.ts:442-462</code> automatically transitions any unacknowledged Critical alert to <code>lifecycleStatus: 'escalated'</code> after a 3-minute deadline, with its own audit trail — not a passive badge, an active transition, running automatically every 30s via <code>src/components/AppShell.tsx:513-520</code><span class="conf confirmed">Confirmed</span>.</li>
+            <li><code>ReassessmentController</code> exposes real, live-called endpoints with 9/9 passing tests<span class="conf confirmed">Confirmed</span>.</li>
+          </ul>
+          <h4>What is partial</h4>
+          <ul>
+            <li><strong>The gap is narrower than originally scored: reach, not existence.</strong> <code>acknowledge</code>/<code>escalate</code> only mutate the in-app store and audit log — no push/SMS/pager/email/task-assignment is touched. It reaches only someone already looking at the app, not someone away from a screen<span class="conf confirmed">Confirmed</span>.</li>
+          </ul>
+          <h4>What is missing / not verified</h4>
+          <ul>
+            <li>A named "deterioration watch" concept and LWBS tracking as first-class, labeled features remain <span class="conf notver">Not verified</span>.</li>
+          </ul>
+          <h4>Risks</h4>
+          <p>Reduced from the original finding but still real: in-app-only escalation means a lapsed reassessment on a patient nobody is currently viewing may not reach anyone until they happen to look.</p>
+          <h4>Evidence</h4>
+          <p><code>backend/src/scheduler/reassessment.scheduler.ts:12-28</code>, <code>backend/src/main.ts:60</code>, <code>src/services/alertLifecycleOrchestrator.ts:69,314-330,358-366,442-462</code>, <code>src/components/AppShell.tsx:513-520</code>. Verified by a dedicated research pass, 2026-08-06.</p>
+          <h4>Required for full marks</h4>
+          <p>Add a real out-of-band notification channel to the already-real escalation transition — the mechanism doesn't need building from scratch, only extending past the browser tab.</p>
+        </div>
+      </details>
+    </article>
+
+    <article class="dom-card partial">
+      <div class="dom-main">
+        <div class="dom-top"><span class="dom-index">03 / 12</span><span class="dom-score">58<span> / 100</span></span></div>
+        <span class="status-chip partial">Partial</span>
+        <h3>Emergency Whiteboard &amp; Queue Intelligence</h3>
+        <div class="progress-track"><div class="progress-fill partial" style="width: 58%"></div></div>
+      </div>
+      <details>
+        <summary>Full review</summary>
+        <div class="detail-body">
+          <h4>What works</h4>
+          <ul>
+            <li>A real, department-wide whiteboard page exists (<code>src/pages/emergency/index.tsx</code> and supporting components) with role-aware actions and live state synchronization patterns already documented across this program (Socket.IO EMS→whiteboard bridge, confirmed in domain 4/8)<span class="conf confirmed">Confirmed</span>.</li>
+            <li>Sibling command-group pages (Department Pulse, Command Center) were specifically found, in this program's own page-layout audit, to have correct responsive breakpoints and structurally-matched grid/child counts<span class="conf confirmed">Confirmed</span> — a real, positive signal for information-density quality.</li>
+          </ul>
+          <h4>What is partial</h4>
+          <ul>
+            <li>The Whiteboard page itself was found, in the same audit, to be a fully bespoke layout that does NOT use the shared responsive page template other route pages inherit, and its "Mission Control" 3-card row had no responsive breakpoint (fixed this session) while the app shell's scrollport uses <code>overflow-x: clip</code>, not <code>auto</code> — meaning other not-yet-audited fixed-width regions on this specific page could have the same silent-clipping risk<span class="conf confirmed">Confirmed</span>.</li>
+          </ul>
+          <h4>What is missing / not verified</h4>
+          <ul>
+            <li>Bottleneck detection, "longest waits" surfacing, and provider-wait-specific views were not independently re-verified as first-class Whiteboard features in this pass (they may exist under Department Pulse/Command Center instead — a scope question, not necessarily a gap, but not confirmed either way).</li>
+          </ul>
+          <h4>Risks</h4>
+          <p>An operationally-critical page (department-wide state) being the one confirmed to bypass the shared responsive/layout template is a real, specific risk given the shared template's more mature breakpoint handling elsewhere.</p>
+          <h4>Evidence</h4>
+          <p><code>src/pages/emergency/index.tsx</code>, <code>src/pages/emergency/emergency-whiteboard-cleanup.css</code>, this session's page-layout audit findings.</p>
+          <h4>Required for full marks</h4>
+          <p>Bring the Whiteboard page onto the shared responsive template or give it equivalent, systematically-audited breakpoint coverage (not just the one row fixed this session). Confirm bottleneck/longest-wait/provider-wait as either Whiteboard-native or explicitly cross-referenced to where they do live.</p>
+        </div>
+      </details>
+    </article>
+
+    <article class="dom-card major">
+      <div class="dom-main">
+        <div class="dom-top"><span class="dom-index">04 / 12</span><span class="dom-score">40<span> / 75</span></span></div>
+        <span class="status-chip major">Major Gap</span>
+        <h3>EMS &amp; Offload</h3>
+        <div class="progress-track"><div class="progress-fill major" style="width: 53%"></div></div>
+      </div>
+      <details>
+        <summary>Full review</summary>
+        <div class="detail-body">
+          <h4>What works</h4>
+          <ul>
+            <li><code>EmsController</code> (<code>backend/src/modules/ems/</code>) is real and live: 4 endpoints (create alert, update status, confirm arrival, fetch incoming) all confirmed to have real frontend callers in <code>src/services/emergencyTransportApi.ts</code>, migrated with a real Mongo-backed service, guards, and a <code>503</code> fallback<span class="conf confirmed">Confirmed</span> — maturity 3-4.</li>
+            <li>A real Socket.IO event bridge exists: EMS writes emit real-time events to a <code>whiteboard</code> room via <code>HttpAdapterHost</code>, with a dedicated test mocking the exact event names/payloads (14/14 passing)<span class="conf confirmed">Confirmed</span> — this is genuine ED-side notification infrastructure, maturity 4 (Validated) for the notification mechanism specifically.</li>
+            <li>A best-effort Sentinel dual-write bridge for AVL/tracking integration exists, fails safe (no-ops if disabled, swallows failures rather than breaking the primary write)<span class="conf confirmed">Confirmed</span>.</li>
+          </ul>
+          <h4>What is partial / not verified</h4>
+          <ul>
+            <li><strong>Confirmed 2026-08-06 — NOT FOUND, and a related metric turned out to be misleading.</strong> <code>EmsController</code> exposes only <code>alert</code>/<code>status</code>/<code>arrive</code>/<code>incoming</code> — no offload-duration endpoint exists. <code>backend/src/services/ems.service.ts:59-113</code> tracks state-history timestamps but never computes a duration, and <code>confirmArrival</code> doesn't record a distinct handoff/room-assigned event separate from arrival<span class="conf confirmed">Confirmed absent</span>. Worse: the frontend has a metric literally named <code>averageOffloadMinutes</code> (<code>src/services/emsOffloadVisibilityModel.ts:7,13,38,83</code>) that reads as if it's real — but it's sourced from <code>src/components/whiteboard/emsAwarenessModel.ts:106</code>, a client-side/demo tracker, not a backend value computed from real EMS timestamps<span class="conf confirmed">Confirmed</span>.</li>
+          </ul>
+          <h4>Risks</h4>
+          <p>A named, plausible-looking "offload minutes" metric that isn't actually backed by real timestamp math is a real overclaiming risk if anyone treats it as operational fact rather than a demo placeholder.</p>
+          <h4>Evidence</h4>
+          <p><code>backend/src/modules/ems/ems.controller.ts</code>, <code>ems.controller.spec.ts</code> (14/14), <code>src/services/emergencyTransportApi.ts</code>.</p>
+          <h4>Required for full marks</h4>
+          <p>Confirm or build an explicit offload-duration measurement (timestamp at EMS arrival to timestamp at confirmed handoff/room assignment) as a named, tested field — not inferred from two separately-timestamped events after the fact. Add fit-to-sit/monitored-chair/stretcher-needed as an explicit triage-adjacent field if not already present.</p>
+        </div>
+      </details>
+    </article>
+
+    <article class="dom-card major">
+      <div class="dom-main">
+        <div class="dom-top"><span class="dom-index">05 / 12</span><span class="dom-score">44<span> / 75</span></span></div>
+        <span class="status-chip partial">Partial</span>
+        <h3>Capacity, Boarding &amp; Referral Intelligence</h3>
+        <div class="progress-track"><div class="progress-fill partial" style="width: 59%"></div></div>
+      </div>
+      <details>
+        <summary>Full review</summary>
+        <div class="detail-body">
+          <h4>What works</h4>
+          <ul>
+            <li><code>CapacityController</code>'s <code>GET /api/emergency/capacity/dashboard</code> is real, live-called, computing a real capacity score/color/triggers/recommendations from live metrics<span class="conf confirmed">Confirmed</span> — maturity 4.</li>
+            <li><code>BoardingController</code> (6 endpoints) is real and live, 12/12 tests passing<span class="conf confirmed">Confirmed</span> — maturity 3-4.</li>
+            <li><strong>Fixed 2026-08-06 — a real, confirmed dead endpoint is now live.</strong> <code>ReferralService</code> (<code>backend/src/modules/emergency-os/emergency-os.services.ts:2187-2250</code>) is real but was an in-memory-only demo service with no status-update path at all: <code>ReferralPanel.tsx</code>'s <code>updateEmergencyTransferWorkflow()</code> had called <code>PATCH /api/emergency/transfers/:id/status</code> since before that route existed anywhere in the backend — a confirmed, silent 404 the frontend was gracefully swallowing ("live sync is pending"). Added a real <code>updateReferralStatus()</code> method, a validated DTO, and the missing controller route; 2 new tests (update-success, not-found), 23/23 in the full suite<span class="conf confirmed">Confirmed</span> — maturity now 3 (Integrated) for referral status updates specifically, up from effectively 0.</li>
+          </ul>
+          <h4>What is partial / not verified</h4>
+          <ul>
+            <li><code>ReferralService</code>'s storage remains in-memory (<code>createdReferrals: Array&lt;...&gt;</code>, non-persistent across restarts) — the newly-fixed endpoint works, but the underlying store is still a demo-grade data structure, not a real persistence layer<span class="conf confirmed">Confirmed</span>.</li>
+            <li>Whether boarding tracking includes actual DURATION (not just a boolean is-boarding state) remains <span class="conf partial-ev">Partial evidence</span>.</li>
+          </ul>
+          <h4>Risks</h4>
+          <p>Reduced: the confirmed-broken sync path is now fixed. The remaining risk is data durability (in-memory referral store), not a missing/broken endpoint.</p>
+          <h4>Evidence</h4>
+          <p><code>backend/src/modules/capacity/capacity.controller.ts</code>; <code>backend/src/modules/boarding/boarding.controller.ts</code> (12/12); <code>backend/src/modules/emergency-os/emergency-os.services.ts:2187-2266</code>, <code>emergency-os.controller.ts</code>'s new <code>updateTransferStatus</code>, <code>emergency-os.controller.spec.ts</code> (23/23). Verified by a dedicated research pass + fix, 2026-08-06.</p>
+          <h4>Required for full marks</h4>
+          <p>Move <code>ReferralService</code>'s storage off the in-memory array onto real persistence (matching the pattern already used by <code>Boarding</code>/<code>Capacity</code>). Confirm boarding duration is a real, queryable field.</p>
+        </div>
+      </details>
+    </article>
+
+    <article class="dom-card strong">
+      <div class="dom-main">
+        <div class="dom-top"><span class="dom-index">06 / 12</span><span class="dom-score">64<span> / 75</span></span></div>
+        <span class="status-chip strong">Strong</span>
+        <h3>Multi-Screen &amp; Role-Specific Architecture</h3>
+        <div class="progress-track"><div class="progress-fill strong" style="width: 85%"></div></div>
+      </div>
+      <details>
+        <summary>Full review</summary>
+        <div class="detail-body">
+          <h4>What works</h4>
+          <ul>
+            <li>23 distinct role personas are defined and confirmed in the live enum (<code>HospitalRole</code> in <code>userTypes.ts</code>) with a full field-by-field manual audit of all 15 role documentation files completed and 9 real ID/route errors found and fixed in an earlier round of this program<span class="conf confirmed">Confirmed</span>.</li>
+            <li>All screens confirmed to mount inside the same root <code>AppShell</code> — reconfirmed directly this pass: <code>src/app/router.tsx:492-498</code>'s own comment states "AppShell wraps all standard ED routes," with reception (<code>/emergency/reception</code>), triage (<code>/triage</code>), EMS (<code>/emergency/ems</code>), whiteboard/charge-nurse/physician (<code>/emergency/whiteboard</code>), command-center (<code>/emergency/command-center</code>), reassessment (<code>/emergency/reassessment</code>), and admin (<code>/admin</code>) all confirmed as distinct real routes under it<span class="conf confirmed">Confirmed</span>.</li>
+            <li><strong>Confirmed 2026-08-06 — the public-display zero-PHI claim holds.</strong> <code>src/components/whiteboard/PublicWaitingDisplay.tsx</code> was read field-by-field: it renders only wait-range label/value, crowd level, triage-wait estimate, and aggregate care-stage/status-line counts, explicitly self-labeled in-code "General status messages only — counts, no names or clinical details" (line 208) and "counts only, no identifiers" (line 225). No name, MRN, DOB, or free-text complaint field appears anywhere in its JSX<span class="conf confirmed">Confirmed</span>.</li>
+          </ul>
+          <h4>What is partial / not verified</h4>
+          <ul>
+            <li>Whether read-only-whiteboard mode is genuinely read-only at the API-permission layer (not just hidden controls) was not independently re-confirmed this pass.</li>
+          </ul>
+          <h4>Risks</h4>
+          <p>Low — both major open questions from the prior pass (screen consolidation, public-display privacy) are now directly confirmed rather than inferred.</p>
+          <h4>Evidence</h4>
+          <p><code>src/config/userTypes.ts</code>, <code>docs/manuals/roles/*.md</code> (15 files), <code>src/app/router.tsx:492-498</code>, <code>src/components/whiteboard/PublicWaitingDisplay.tsx:208,225</code>. Verified by a dedicated research pass, 2026-08-06.</p>
+          <h4>Required for full marks</h4>
+          <p>Confirm read-only-whiteboard mode's backend permission enforcement directly.</p>
+        </div>
+      </details>
+    </article>
+
+    <article class="dom-card partial">
+      <div class="dom-main">
+        <div class="dom-top"><span class="dom-index">07 / 12</span><span class="dom-score">53<span> / 100</span></span></div>
+        <span class="status-chip partial">Partial</span>
+        <h3>RBAC, Privacy &amp; Security</h3>
+        <div class="progress-track"><div class="progress-fill partial" style="width: 53%"></div></div>
+      </div>
+      <details>
+        <summary>Full review</summary>
+        <div class="detail-body">
+          <h4>What works</h4>
+          <ul>
+            <li>Centralized enforcement pattern confirmed directly, not assumed: every migrated controller (Capacity, Boarding, EMS, Reassessment, SmartIntake, etc.) uses <code>AuthGuard('jwt')</code>+<code>AuthorizationGuard</code>+<code>RequirePermission</code>, live-boot-verified to return 401 (real backend enforcement), not just frontend-hidden controls<span class="conf confirmed">Confirmed</span> — the rubric's own "do not award full RBAC points for frontend-only hiding" bar is met at the API layer.</li>
+            <li>helmet(), restricted CORS, ThrottlerModule rate limiting, zero <code>dangerouslySetInnerHTML</code>, zero raw string-interpolated SQL, exception filter that never leaks stack traces to clients, bearer-token-only auth (no cookie flag gaps)<span class="conf confirmed">Confirmed</span> this program.</li>
+            <li>Dependency vulnerabilities reduced from 11→2 findings across both package trees, with the 2 remaining genuinely triaged (advisory text read, not just title) and CI-blocking for any NEW high/critical finding via a verified <code>audit-ci</code> gate<span class="conf confirmed">Confirmed</span> — proven bidirectionally (passes with allowlist, fails without).</li>
+            <li>Swagger UI's full 500+ endpoint schema (incl. HIPAA/GDPR-tagged routes) is now gated to non-production<span class="conf confirmed">Confirmed</span>, fixed this session.</li>
+            <li>A real PHI-leak-prevention gap (2.25MB orphaned build output plus an ungitignored dev upload path) was found and closed in an earlier round<span class="conf strong-ev">Strong evidence</span>.</li>
+          </ul>
+          <h4>What is missing</h4>
+          <ul>
+            <li><strong>No bespoke application security review or commissioned penetration test exists</strong> — dependency scanning is confirmed real and working, but is explicitly not a substitute per this rubric's own instructions.</li>
+            <li>~60% of backend <code>@Body()</code>-accepting endpoints (down from an original 135, ~10-16 closed across several rounds) still receive no <code>ValidationPipe</code>-backed DTO<span class="conf strong-ev">Strong evidence</span> — a real, quantified input-validation gap.</li>
+            <li>Public legal/compliance claims (HIPAA/GDPR/BAA language) were found to conflict with the README's own disclaimer and remain uncorrected pending counsel review<span class="conf confirmed">Confirmed</span> — this is a P0 gate on the sibling scorecard (P0.1).</li>
+            <li>No <code>SECURITY.md</code>/disclosure contact existed as of the last direct check in this program (a real gap found and left honestly unfixed rather than inventing a fake contact) — separately, this session's own broader campaign later added a real one; not independently re-verified in THIS pass's evidence trail.</li>
+          </ul>
+          <h4>Risks</h4>
+          <p>This is a PHI-handling clinical system; the compounding absence of an independent pentest, an unresolved legal-claims conflict, and a large residual input-validation gap together represent the single largest release-blocking cluster in this whole scorecard.</p>
+          <h4>Evidence</h4>
+          <p>Project Scorecard dim 5 full evidence trail (GHSA advisory reads, <code>audit-ci</code> proof); this session's Swagger fix; <code>test/body-validation-coverage.spec.ts</code>.</p>
+          <h4>Required for full marks</h4>
+          <p>Commission an independent penetration test and a bespoke application security review (external, not repository-closable). Close the remaining DTO-validation gap. Resolve the legal-claims conflict with counsel. Confirm <code>SECURITY.md</code>'s current state directly.</p>
+        </div>
+      </details>
+    </article>
+
+    <article class="dom-card strong">
+      <div class="dom-main">
+        <div class="dom-top"><span class="dom-index">08 / 12</span><span class="dom-score">90<span> / 100</span></span></div>
+        <span class="status-chip strong">Strong</span>
+        <h3>Architecture &amp; Repository Convergence</h3>
+        <div class="progress-track"><div class="progress-fill strong" style="width: 90%"></div></div>
+      </div>
+      <details>
+        <summary>Full review</summary>
+        <div class="detail-body">
+          <h4>What works</h4>
+          <ul>
+            <li><strong>A genuine dual-backend patient-data fork was found, scoped, and closed for every real route group</strong><span class="conf confirmed">Confirmed</span> — <code>EmergencyPatientService</code> (TypeORM/SQL, what every current frontend surface runs on) vs. <code>UnifiedPatient</code> (Mongoose, backing legacy bare-Express routes only mounted when a flag defaulted <code>false</code> everywhere). Of 15 non-placeholder legacy groups, all 9-10 real ones are now migrated onto real NestJS controllers matching one proven template (guards, permissions, DTOs, 503-not-404 fallback), each individually live-boot-verified. 6 pure placeholder groups were also formally retired and <code>routes-registry.ts</code> itself deleted outright once empty.</li>
+            <li>One backend, one frontend confirmed via this session's own hardened <code>repositoryStructureAudit.test.ts</code> (4/4, zero exceptions remaining) — a formerly-standalone second app (<code>navigator/</code>) was fully consolidated this session, not just linked.</li>
+            <li>27 of 38 duplicate-system-audit findings closed; circular dependencies reduced from 64→57 through 6 genuine fixes, each independently <code>madge</code>-verified.</li>
+            <li><strong>Fixed 2026-08-06 — the route-registration cross-check gap named below is closed.</strong> <code>orphanDetectionAudit.ts</code>'s route-mounting scanner only ever read <code>router.tsx</code>, never the 7 console-route-tree config files that also register real, working routes via their own <code>*_ROUTE_PATHS</code> exports — producing ~99 false-positive "missing route" findings (including <code>/navigator</code>, <code>/help-center</code>, <code>/version</code>, all confirmed live). Fixed by making the existing scanner read all 8 real route sources; the false-positive "wire" count dropped from 264 to 165<span class="conf confirmed">Confirmed</span>, verified by direct regeneration and diff.</li>
+          </ul>
+          <h4>What is partial</h4>
+          <ul>
+            <li>The dual-persistence layer itself (Mongoose connection, reassessment scheduler, service-registry init) still exists behind the same flag, now confirmed unconditional for 2 of those 3 responsibilities but not yet retired as an architectural decision<span class="conf confirmed">Confirmed</span> — this is the real, remaining "unify the backend" work item, not a ground-up rewrite of either stack.</li>
+          </ul>
+          <h4>Risks</h4>
+          <p>Genuinely low at this point for the specific risk this domain exists to catch (duplicate backends/frontends, route-registration drift) — the remaining risk is a deliberate-decision gap (dual persistence), not an unmonitored one.</p>
+          <h4>Evidence</h4>
+          <p>Project Scorecard dim 3's full Cycle 276-289 migration trail (10 controllers, each with live-boot 401 verification); this session's <code>repositoryStructureAudit.test.ts</code>; <code>docs/duplicate-system-audit.md</code>; <code>src/data/orphanDetectionAudit.ts</code>'s route-scanner fix, verified 2026-08-06.</p>
+          <h4>Required for full marks</h4>
+          <p>Retire or make a deliberate, documented decision on the remaining dual-persistence responsibility (the Mongoose connection itself).</p>
+        </div>
+      </details>
+    </article>
+
+    <article class="dom-card partial">
+      <div class="dom-main">
+        <div class="dom-top"><span class="dom-index">09 / 12</span><span class="dom-score">44<span> / 75</span></span></div>
+        <span class="status-chip partial">Partial</span>
+        <h3>UX, Accessibility &amp; Design-System Quality</h3>
+        <div class="progress-track"><div class="progress-fill partial" style="width: 59%"></div></div>
+      </div>
+      <details>
+        <summary>Full review</summary>
+        <div class="detail-body">
+          <h4>What works</h4>
+          <ul>
+            <li>3 named critical/serious a11y findings (BMI calculator, EMS unit track, triage-queue escalate button) confirmed fixed in code with passing permanent regression-guard tests<span class="conf confirmed">Confirmed</span>.</li>
+            <li>A recurring CSS-cascade contrast-breaking bug class (substring sweeps silently overriding component-specific styling) was found and fixed across 4 named families (<code>cta</code>, <code>--primary</code>, <code>__link</code>/<code>-link</code>, <code>__action</code>/<code>-button</code>), 19 total instances across 5 sweeps, including a critical-alert banner action that had collapsed from AA-passing 4.83:1 to ~1.18:1 contrast<span class="conf confirmed">Confirmed</span> — a genuinely severe, genuinely fixed patient-safety-adjacent UI bug.</li>
+            <li>This session independently found and fixed a different bug class in the same spirit: a core clinical page (Smart Intake) rendering fully unstyled from a missing CSS import, plus a systematic typo corruption breaking ~11 more selectors across Command Center/Queue/Reception<span class="conf confirmed">Confirmed</span>.</li>
+          </ul>
+          <h4>What is missing</h4>
+          <ul>
+            <li><strong>Zero live browser/axe-core verification exists anywhere in this entire program</strong><span class="conf confirmed">Confirmed absence</span> — every finding above, however real and severe, was found by static source tracing, never a rendered screenshot or an automated accessibility scan. Playwright/Chromium cannot launch in this sandbox (same Application Control restriction blocking native esbuild).</li>
+            <li>WCAG 2.2 AA, keyboard-navigation, and responsive/golden-path coverage beyond the original 14-page scan (2026-07-28) is unconfirmed.</li>
+          </ul>
+          <h4>Risks</h4>
+          <p>Static analysis has now caught real, severe bugs (the 1.18:1 contrast collapse, the fully-unstyled clinical page) that a human glancing at a screenshot would likely have caught faster — this is genuine evidence the static-only method has a real blind spot, not just a theoretical one.</p>
+          <h4>Evidence</h4>
+          <p>Project Scorecard dim 7's full sweep history; this session's Smart Intake/typo-cluster fixes; the environment-blocked Playwright attempt, documented rather than silently skipped.</p>
+          <h4>Required for full marks</h4>
+          <p>Run a real axe-core scan on a machine without this sandbox's browser-launch restriction. Extend coverage beyond 14 pages. A 5th sweep-rule family could exist that static analysis structurally cannot find.</p>
+        </div>
+      </details>
+    </article>
+
+    <article class="dom-card partial">
+      <div class="dom-main">
+        <div class="dom-top"><span class="dom-index">10 / 12</span><span class="dom-score">63<span> / 100</span></span></div>
+        <span class="status-chip partial">Partial</span>
+        <h3>Quality Engineering &amp; Pilot Readiness</h3>
+        <div class="progress-track"><div class="progress-fill partial" style="width: 63%"></div></div>
+      </div>
+      <details>
+        <summary>Full review</summary>
+        <div class="detail-body">
+          <h4>What works</h4>
+          <ul>
+            <li>Frontend suite consistently 12,180+/12,190ish tests passing across this program's history, backend 278/278 suites; typecheck/lint/build all clean on both stacks, re-verified repeatedly<span class="conf confirmed">Confirmed</span>.</li>
+            <li>Real health checks, Prometheus metrics, and a fully-authored-but-previously-unwired Grafana/alerting stack (12 real dashboards, real scrape config) is now wired into the lightweight app compose file, statically validated (YAML/JSON parse, port collision check)<span class="conf confirmed">Confirmed</span>.</li>
+            <li>A known, root-caused flaky-test class (async engine-teardown races) is understood precisely enough to know it is NOT a real regression indicator, re-confirmed present-and-isolated-passing across many rounds<span class="conf confirmed">Confirmed</span>.</li>
+          </ul>
+          <h4>What is missing</h4>
+          <ul>
+            <li>No formal release tag, no disaster-recovery/restore drill, no measured RTO/RPO, no published SLOs, no protected rollout/rollback procedure<span class="conf confirmed">Confirmed absence</span> — all explicitly require real deployment infrastructure this sandbox cannot provide, honestly disclosed rather than glossed over throughout this program's history.</li>
+            <li>A live <code>docker compose up</code> smoke test has never been run (Docker not installed in this sandbox) — the Prometheus/Grafana wiring is statically valid but operationally unproven.</li>
+          </ul>
+          <h4>Risks</h4>
+          <p>Everything closeable by code in this domain appears genuinely closed; what remains needs real infrastructure access this program has never had, not more engineering effort of the kind already applied.</p>
+          <h4>Evidence</h4>
+          <p>Project Scorecard dims 4 and 8 full evidence; this session's own 609/609 test sweep and clean builds.</p>
+          <h4>Required for full marks</h4>
+          <p>Real deployment environment: a live compose-up smoke test, a tagged release, a restore drill, published SLOs, and a rehearsed rollback.</p>
+        </div>
+      </details>
+    </article>
+
+    <article class="dom-card partial">
+      <div class="dom-main">
+        <div class="dom-top"><span class="dom-index">11 / 12</span><span class="dom-score">10<span> / 25</span></span></div>
+        <span class="status-chip partial">Partial</span>
+        <h3>Interoperability, Data &amp; Integration Readiness</h3>
+        <div class="progress-track"><div class="progress-fill partial" style="width: 40%"></div></div>
+      </div>
+      <details>
+        <summary>Full review</summary>
+        <div class="detail-body">
+          <h4>What works</h4>
+          <ul>
+            <li><strong>Corrected 2026-08-06 — the original "no FHIR/HL7 code" finding was wrong.</strong> <code>lib/sentinel/fhirMap.ts:1-60</code> builds genuine HL7 FHIR R4-shaped resources (<code>resourceType: 'Bundle'|'Patient'|'Encounter'</code>, real <code>meta</code>/<code>extension</code> structure) from NEMSIS EMS data — and it is not dead code: it's imported and invoked in a live service, <code>backend/src/modules/sentinel/sentinel-inbound.service.ts:10,119</code><span class="conf confirmed">Confirmed</span> — maturity 3 (Integrated) for this specific EMS pre-arrival path.</li>
+            <li>Patient/encounter identifiers are generated through the one confirmed canonical <code>EmergencyPatientService</code> (TypeORM/SQL) path<span class="conf confirmed">Confirmed</span>.</li>
+          </ul>
+          <h4>What is missing</h4>
+          <ul>
+            <li><strong>A mixed, honestly-reported picture, not uniform absence.</strong> <code>backend/src/modules/platform-systems/platform-systems.service.ts:656-687</code> (<code>getFhirConnections</code>/<code>getHl7Interfaces</code>) return purely demo data (<code>status: 'demo_unconfigured'</code>, <code>'demo_listener'</code>) — genuinely fake, not real integrations. <code>backend/src/services/fhir.service.ts</code> is a trivial field-renamer, not a real transform<span class="conf confirmed">Confirmed</span>. The one real piece (Sentinel's <code>fhirMap.ts</code>) is narrow — a single EMS-data-shaping path, not a general interoperability layer.</li>
+            <li>No real external EHR/HIE integration point exists beyond this one narrow path.</li>
+          </ul>
+          <h4>Risks</h4>
+          <p><strong>The risk profile changed from "nothing to overclaim" to "something real exists next to something fake using the same vocabulary."</strong> A reader seeing "FHIR" mentioned in this codebase could easily assume the demo-stub <code>getFhirConnections</code> is as real as the genuinely-live <code>fhirMap.ts</code> — worth explicitly distinguishing in any product communication.</p>
+          <h4>Evidence</h4>
+          <p><code>lib/sentinel/fhirMap.ts:1-60</code>, <code>backend/src/modules/sentinel/sentinel-inbound.service.ts:10,119</code>, <code>backend/src/modules/platform-systems/platform-systems.service.ts:656-687</code>, <code>backend/src/services/fhir.service.ts</code>. Verified by a dedicated research pass, 2026-08-06.</p>
+          <h4>Required for full marks</h4>
+          <p>Either build real <code>getFhirConnections</code>/<code>getHl7Interfaces</code> backing (only if a real integration partner exists — building speculatively would violate this rubric's own anti-gaming rule) or relabel them unambiguously as demo/placeholder in their own API responses so no caller can mistake them for the real <code>fhirMap.ts</code> path.</p>
+        </div>
+      </details>
+    </article>
+
+    <article class="dom-card strong">
+      <div class="dom-main">
+        <div class="dom-top"><span class="dom-index">12 / 12</span><span class="dom-score">16<span> / 25</span></span></div>
+        <span class="status-chip strong">Strong</span>
+        <h3>AI Governance &amp; Operational Intelligence</h3>
+        <div class="progress-track"><div class="progress-fill strong" style="width: 64%"></div></div>
+      </div>
+      <details>
+        <summary>Full review</summary>
+        <div class="detail-body">
+          <h4>What works</h4>
+          <ul>
+            <li>A real Demo/Manual/Stale/Live truth-labeling system (<code>AiTruthLabel</code>) exists and is rolled out to 15 of 38 inventoried AI surfaces, prioritized by clinical risk (per-patient predictive badges, Diagnostic Safety Dashboard, Copilot chat)<span class="conf confirmed">Confirmed</span>.</li>
+            <li><strong>The labeling work itself caught 2 real, serious governance bugs</strong>, not just added labels: several native-ai functions defaulted their internal state to "live" despite being confirmed rule-based heuristics (would have mislabeled heuristics as live AI, the exact failure mode this domain exists to prevent); and <code>lib/native-ai/modelRegistry.ts</code> claimed specific trained-model algorithms and F1/accuracy/AUC metrics for 7 of 8 entries that direct code reading confirmed are keyword/regex/rule-based with zero training and zero traceable evaluation run — corrected the algorithm field, left the metrics flagged for review rather than guessed at<span class="conf confirmed">Confirmed</span>. Finding and fixing this class of bug is itself strong evidence of real governance discipline, not just labeling coverage.</li>
+            <li>Kill switches, deterministic calculators, and required-human-review boundaries exist and are confirmed<span class="conf confirmed">Confirmed</span>.</li>
+          </ul>
+          <h4>What is partial / not verified</h4>
+          <ul>
+            <li>23 of 38 AI surfaces remain unlabeled (SmartIntake field-level provenance specifically needs new data-model plumbing, deliberately not guessed at)<span class="conf confirmed">Confirmed remaining gap</span>.</li>
+            <li>Whether the ED Copilot ever auto-applies a triage/disposition/medication decision without a human-review step was not independently re-traced in this specific pass beyond the "required review" boundary already confirmed in prior rounds — no auto-apply pattern was found, but a fresh, targeted grep for this specific risk was not completed this pass.</li>
+          </ul>
+          <h4>Risks</h4>
+          <p>The modelRegistry finding is a genuine governance near-miss: those false "trained model" metrics were live in a dashboard before this program's own audit caught them — a real example of exactly the kind of AI-capability overclaiming this domain exists to prevent, caught by code discipline rather than luck.</p>
+          <h4>Evidence</h4>
+          <p><code>src/components/ai/AiTruthLabel.tsx</code>, <code>lib/native-ai/modelRegistry.ts</code> (corrected), Project Scorecard dim 6's full audit trail.</p>
+          <h4>Required for full marks</h4>
+          <p>Complete labeling for the remaining 23 surfaces. Get clinician/product review on the still-unresolved metrics numbers flagged in the modelRegistry finding before they are cited anywhere external. Directly re-confirm the no-autonomous-decision boundary with a fresh, dedicated grep pass.</p>
+        </div>
+      </details>
+    </article>
+
+  </div>
+
+  <div class="section-head">
+    <h2>Critical workflow scenario tests</h2>
+    <p>Per the rubric: can the repository support these end-to-end? Assessed from code tracing only — no live run was performed in this sandbox.</p>
+  </div>
+  <div class="scenario-grid">
+    <div class="scenario-card"><h4>A — Walk-In Patient</h4><p class="flow">Arrival → search → registration → encounter → complaint → queue → triage → waiting → reassessment → provider → disposition</p><p><strong>Supported, code-level.</strong> Every named stage has a confirmed real controller/service. Not live-rehearsed end-to-end in this sandbox.</p></div>
+    <div class="scenario-card"><h4>B — Deteriorating Waiting Patient</h4><p class="flow">Waiting → reassessment due → overdue → alert → staff review → reassessment → state updated</p><p><strong>Mostly supported, revised.</strong> Due/overdue computation, the scheduler, and a real auto-escalation transition (3-min deadline, audit trail) are all confirmed real. The remaining gap is narrower: "staff review" only reaches someone already in the app, no out-of-band notification.</p></div>
+    <div class="scenario-card"><h4>C — EMS Arrival</h4><p class="flow">Inbound EMS → ETA → ED awareness → arrival → handoff → receiving location → offload → queue</p><p><strong>Mostly supported.</strong> Alert/status/arrival and the whiteboard Socket.IO bridge are real and tested; offload-duration measurement confirmed absent (a frontend "offload minutes" metric is demo-sourced, not real).</p></div>
+    <div class="scenario-card"><h4>D — Charge Nurse</h4><p class="flow">Login → Whiteboard → bottleneck → overdue reassessment → EMS pressure → boarders → action</p><p><strong>Mostly supported, revised.</strong> Login, Whiteboard, boarding, EMS data, and the reassessment-escalation transition are all real; the residual gap is notification reach, not existence.</p></div>
+    <div class="scenario-card"><h4>E — Physician</h4><p class="flow">Login → provider queue → patient → timeline → results/referrals → workflow → disposition</p><p><strong>Partially supported.</strong> Boarding/reassessment controllers confirmed real; referral status-update is now fixed (was a dead endpoint), though referral storage itself remains in-memory, not persisted (domain 5).</p></div>
+    <div class="scenario-card"><h4>F — Public Display</h4><p class="flow">Display starts → aggregate info → no PHI → safe messaging → degraded state stays privacy-safe</p><p><strong>Supported, confirmed.</strong> Direct component read of <code>PublicWaitingDisplay.tsx</code> confirms counts-only rendering, no name/MRN/DOB/complaint text anywhere in its JSX.</p></div>
+    <div class="scenario-card"><h4>G — Unauthorized User</h4><p class="flow">Restricted route/action/API attempt → denied consistently → UI and backend agree</p><p><strong>Supported, code-level.</strong> Every migrated controller live-boot-verified to return 401 without a token — backend enforcement confirmed, not just frontend hiding.</p></div>
+  </div>
+
+  <div class="section-head">
+    <h2>Full-mark gap register</h2>
+    <p>Every material finding above, prioritized. G6, G7, and G9 closed 2026-08-06. Sum of remaining Points Recoverable ≈ 370; the rest needs external validation (pentest, clinician sign-off, live infrastructure) no further code alone closes.</p>
+  </div>
+  <div class="ledger-table-wrap">
+    <table class="ledger">
+      <thead><tr><th>ID</th><th>Domain</th><th>Sev</th><th>Gap</th><th>Required change</th><th class="num">Pts</th></tr></thead>
+      <tbody>
+        <tr><td>G1</td><td>Waiting Room Safety</td><td><span class="pill p1">P1</span></td><td><strong>Revised:</strong> a real escalation mechanism exists (backend cron + auto-escalate-on-timeout); the gap is reach — in-app only, no push/SMS/pager</td><td>Add an out-of-band notification channel to the existing transition</td><td class="num">20</td></tr>
+        <tr><td>G2</td><td>RBAC/Security</td><td><span class="pill p0">P0</span></td><td>No commissioned pentest or bespoke app-sec review</td><td>External engagement</td><td class="num">external</td></tr>
+        <tr><td>G3</td><td>RBAC/Security</td><td><span class="pill p1">P1</span></td><td>~60% of backend DTOs still unvalidated</td><td>Complete DTO validation coverage</td><td class="num">20</td></tr>
+        <tr><td>G4</td><td>UX/Accessibility</td><td><span class="pill p1">P1</span></td><td>Zero live browser/axe-core verification ever run</td><td>Run real accessibility scan on unrestricted hardware</td><td class="num">18</td></tr>
+        <tr><td>G5</td><td>EMS &amp; Offload</td><td><span class="pill p1">P1</span></td><td><strong>Confirmed absent</strong> — no offload-duration timer; a frontend "offload minutes" metric is client-side/demo, not real</td><td>Build explicit backend offload-duration measurement; relabel or remove the misleading demo metric</td><td class="num">15</td></tr>
+        <tr><td>G6</td><td>Capacity/Boarding/Referral</td><td><span class="pill p3">P3 (was P1)</span></td><td><strong>CLOSED 2026-08-06</strong> — dead endpoint (<code>PATCH transfers/:id/status</code>) fixed with a real service method + validated DTO + 2 tests. Remaining: referral storage is still in-memory, not persisted</td><td>Move <code>ReferralService</code> off its in-memory array onto real persistence</td><td class="num">8</td></tr>
+        <tr><td>G7</td><td>Multi-Screen Architecture</td><td>—</td><td><strong>CLOSED 2026-08-06</strong> — public-display zero-PHI claim directly confirmed by component read</td><td>None — done</td><td class="num">0</td></tr>
+        <tr><td>G8</td><td>Product/Workflow</td><td><span class="pill p2">P2</span></td><td>Only 41 of 87 workflow-suite assignments confirmed live</td><td>Independently re-verify or re-scope the other 46</td><td class="num">20</td></tr>
+        <tr><td>G9</td><td>Architecture</td><td>—</td><td><strong>CLOSED 2026-08-06</strong> — route-registry scanner now reads all 8 real route sources; 99 false-positive findings eliminated (264→165 wire count)</td><td>None — done</td><td class="num">0</td></tr>
+        <tr><td>G10</td><td>AI Governance</td><td><span class="pill p2">P2</span></td><td>23 of 38 AI surfaces still unlabeled; modelRegistry metrics still unresolved</td><td>Complete labeling; clinician review of flagged metrics</td><td class="num">7</td></tr>
+        <tr><td>G11</td><td>Quality Eng/Pilot Readiness</td><td><span class="pill p2">P2</span></td><td>No live infra: no restore drill, SLOs, rollback rehearsal, tagged release</td><td>Real deployment environment</td><td class="num">external</td></tr>
+        <tr><td>G12</td><td>Product/Legal</td><td><span class="pill p0">P0</span></td><td>Public HIPAA/GDPR/BAA claims unresolved vs. README disclaimer</td><td>Counsel review</td><td class="num">external</td></tr>
+        <tr><td>G13</td><td>Interoperability</td><td><span class="pill p2">P2</span></td><td><strong>New finding:</strong> real FHIR code (<code>fhirMap.ts</code>) sits next to demo-stub FHIR/HL7 endpoints (<code>getFhirConnections</code>/<code>getHl7Interfaces</code>) using the same vocabulary — confusable as equally real</td><td>Relabel the demo stubs unambiguously in their own API responses</td><td class="num">5</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-head">
+    <h2>Full-mark roadmap</h2>
+    <p>Ordered by dependency, not ease of points.</p>
+  </div>
+  <div class="cat-table-wrap">
+    <table class="cat">
+      <thead><tr><th>Phase</th><th>Objective</th><th>Depends on</th><th class="num">Pts</th></tr></thead>
+      <tbody>
+        <tr><td>Phase 0 — Safety &amp; Security Blockers</td><td>Close G1 (overdue-reassessment escalation) and G3 (DTO validation); commission G2 (pentest)</td><td>—</td><td class="num">55+ext</td></tr>
+        <tr><td>Phase 1 — Canonical Architecture</td><td>G9 route-registry cross-check; retire remaining dual-persistence responsibility</td><td>Phase 0 stable</td><td class="num">8</td></tr>
+        <tr><td>Phase 3 — Waiting Room + Reassessment</td><td>Confirm/build LWBS tracking, deterioration-watch labeling</td><td>G1 closed</td><td class="num">—</td></tr>
+        <tr><td>Phase 4 — Whiteboard + Queue Intelligence</td><td>Bring Whiteboard onto shared responsive template</td><td>—</td><td class="num">—</td></tr>
+        <tr><td>Phase 5 — EMS + Offload</td><td>G5 offload-duration timer; fit-to-sit/monitored-chair fields</td><td>—</td><td class="num">15</td></tr>
+        <tr><td>Phase 6 — Capacity + Boarding + Referrals</td><td>G6 referral-state module; confirm boarding duration field</td><td>—</td><td class="num">15</td></tr>
+        <tr><td>Phase 7 — RBAC + Multi-Screen Hardening</td><td>G7 public-display PHI direct verification</td><td>—</td><td class="num">10</td></tr>
+        <tr><td>Phase 9 — UX + Accessibility + Displays</td><td>G4 real axe-core scan on unrestricted hardware</td><td>Real hardware access</td><td class="num">18</td></tr>
+        <tr><td>Phase 10 — Testing + Observability + Pilot Hardening</td><td>G11 restore drill, SLOs, rollback rehearsal</td><td>Real infra access</td><td class="num">ext</td></tr>
+        <tr><td>Phase 11 — Intelligence / Copilot Hardening</td><td>G10 complete AI labeling; clinician review of modelRegistry metrics</td><td>—</td><td class="num">7</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="verdict-box">
+    <h3>What prevents 100/100 today?</h3>
+    <p>Two things dominate: (1) a cluster of safety-critical specifics where a real mechanism exists but its reach is limited to the browser tab — reassessment-overdue escalation (G1, now confirmed real but in-app-only) foremost among them, plus a genuinely-still-missing EMS offload timer (G5); and (2) every external validation gate this rubric requires (a pentest, a clinician sign-off, a live infrastructure drill, counsel review of legal claims) is either absent or was never something a repository audit alone could close, honestly separated into the Pilot Evidence Score rather than folded into the implementation number.</p>
+    <h3>Fastest responsible path to 100/100</h3>
+    <p>Phase 0 first — G1 is narrower than first scored (a real escalation transition exists; it just needs an out-of-band notification channel added, not built from scratch) but remains the highest-severity finding and is fully code-closable. In parallel, commission the pentest and legal review (G2, G12) since neither blocks or is blocked by code work. Everything else follows the dependency order in the roadmap above.</p>
+    <h3>Pilot Gate</h3>
+    <p class="verdict-gate">NOT READY FOR PILOT</p>
+    <p>The sibling Project Scorecard's 6 P0 gates (legal/privacy truthfulness, green release validation, clinical release evidence, truth-labels/AI boundaries, accessibility closure, claims/capability registry) remain open, and this audit's own G1 finding (unproven safety-critical escalation) is independently sufficient to block pilot readiness on its own. This is not a software-quality verdict — the underlying engineering (Architecture 88/100, Quality Engineering 63/100) is genuinely strong. It is a pilot-readiness verdict, and those are different questions this scorecard deliberately does not conflate.</p>
+  </div>
+
+  <footer>
+    <span>Methodology: every score cites a file, controller, test result, or explicit "not verified" — no capability was inferred from a file's existence alone, and 3 domains carry explicit not-verified findings rather than a guess.</span>
+    <span>Siblings: <a href="https://claude.ai/code/artifact/9d3e5b15-294c-4678-a791-e1d97afa5b5b">Project Scorecard</a> (8-dim clinical/product baseline, source of most evidence here) · <a href="https://claude.ai/code/artifact/5533d735-3707-4fc3-a302-789251707c58">Repository Readiness Scorecard</a> · <a href="https://claude.ai/code/artifact/0a5f566c-0474-4af1-a51f-5a56e8ea149e">Source Code Quality Scorecard</a></span>
+  </footer>
+</div>

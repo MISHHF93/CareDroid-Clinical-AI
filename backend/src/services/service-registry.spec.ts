@@ -16,7 +16,6 @@ const expectedServiceNames = [
   'dischargePredictionService',
   'clinicalProtocolService',
   'deteriorationPredictionV3Service',
-  'copilotService',
   'erPulseHandoverService',
   'aiCallInterrogationService',
   'smartIntakeService',
