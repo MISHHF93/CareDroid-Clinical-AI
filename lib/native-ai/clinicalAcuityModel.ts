@@ -3,13 +3,27 @@ import { predictAdmissionLikelihoodMl, predictProlongedEdStay } from './commandM
 import { predictPostEdOrientation } from './postEdOrientationClassifier';
 import type { ClinicalAcuityEntry, NativeAiSourceState } from './types';
 
+// admission/prolonged/orientation are all hand-coded heuristic formulas (see
+// their own MODEL_VERSION strings), each honestly defaulting to 'demo'. This
+// composite score is entirely built from those 3 — it must not default to
+// 'live' on its own, or the honest per-prediction disclosure gets erased at
+// the exact point it's rendered (ClinicalAcuityLeaderboard.tsx). Only an
+// explicit 'simulated' override is worth propagating through.
+function heuristicSourceState(explicit?: NativeAiSourceState): NativeAiSourceState | undefined {
+  return explicit === 'simulated' ? explicit : undefined;
+}
+
 export function buildClinicalAcuityEntry(
   patient: Patient,
   options: { sourceState?: NativeAiSourceState; now?: number } = {},
 ): ClinicalAcuityEntry {
-  const admission = predictAdmissionLikelihoodMl(patient);
-  const prolonged = predictProlongedEdStay(patient, { now: options.now });
-  const orientation = predictPostEdOrientation(patient);
+  const heuristicOverride = heuristicSourceState(options.sourceState);
+  const admission = predictAdmissionLikelihoodMl(patient, { sourceState: heuristicOverride });
+  const prolonged = predictProlongedEdStay(patient, {
+    sourceState: heuristicOverride,
+    now: options.now,
+  });
+  const orientation = predictPostEdOrientation(patient, { sourceState: heuristicOverride });
   const triageLevel = normalizePriority(patient.priority);
 
   const acuityScore = Math.min(
@@ -37,7 +51,7 @@ export function buildClinicalAcuityEntry(
     prolongedStayProbability: prolonged.probabilityPercent,
     orientation: orientation.orientation,
     riskDrivers,
-    sourceState: options.sourceState || 'live',
+    sourceState: options.sourceState === 'simulated' ? options.sourceState : 'demo',
   };
 }
 
