@@ -36,4 +36,42 @@ describe('DriftMonitoringPanel', () => {
     );
     expect(registryLabel).toBeDefined();
   });
+
+  it('2026-08-07: a drift alert built on an unvalidated registry baseline says so, not just "Drift evaluation for X"', async () => {
+    const { ensureDevBackendSession } = await import('../../services/devBackendAuth');
+    (ensureDevBackendSession as ReturnType<typeof vi.fn>).mockResolvedValueOnce(undefined);
+    const { fetchNativeAiDriftEnvelope } = await import('../../services/nativeAiApi');
+    (fetchNativeAiDriftEnvelope as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      data: {
+        enabled: true,
+        driftDetected: true,
+        summary: '1 model drift alert(s) — retraining review required',
+        generatedAt: new Date().toISOString(),
+        alerts: [
+          {
+            id: 'drift-test-1',
+            modelId: 'post-ed-orientation',
+            detectedAt: new Date().toISOString(),
+            baselineMetric: 0.68,
+            currentMetric: 0.55,
+            dropPercent: 19.1,
+            thresholdPercent: 5,
+            severity: 'retrain_required',
+            summary: 'post-ed-orientation accuracy dropped 19.1% — baseline is an unvalidated registry default, not a prior measurement',
+            sourceState: 'demo',
+            baselineSource: 'unvalidated_registry_default',
+          },
+        ],
+      },
+    });
+
+    render(<DriftMonitoringPanel />);
+    await waitFor(() => expect(screen.getByText(/Source: api/)).toBeInTheDocument());
+
+    const labels = screen.getAllByTestId('ai-truth-label-chip');
+    const alertLabel = labels.find((label) =>
+      label.getAttribute('title')?.includes("modelRegistry.ts's unvalidated default"),
+    );
+    expect(alertLabel).toBeDefined();
+  });
 });

@@ -203,7 +203,10 @@ export default function DriftMonitoringPanel({ className = '' }: DriftMonitoring
                   <small>{alert.severity} · {alert.sourceState}</small>
                   <AiTruthLabel
                     {...fromNativeAiSourceState(alert.sourceState, {
-                      sourceContext: `Drift evaluation for ${alert.modelId}`,
+                      sourceContext:
+                        alert.baselineSource === 'unvalidated_registry_default'
+                          ? `Drift evaluation for ${alert.modelId} — baseline is modelRegistry.ts's unvalidated default, not a prior measurement`
+                          : `Drift evaluation for ${alert.modelId} — baseline is a recorded prior weekly snapshot`,
                       reviewRequired: true,
                     })}
                     compact

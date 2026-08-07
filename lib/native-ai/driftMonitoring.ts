@@ -40,13 +40,17 @@ export function evaluateModelDrift(
   const threshold = options.thresholdPercent ?? DRIFT_THRESHOLD_PERCENT;
   const history = performanceHistory.get(modelId) || [];
   const registered = getRegisteredModel(modelId);
-  const baselineValue = history.length
-    ? history[0].value
-    : current.metric === 'f1'
+  const baselineFromHistory = history.length ? history[0].value : undefined;
+  const baselineFromRegistry =
+    current.metric === 'f1'
       ? registered?.metrics.f1
       : current.metric === 'accuracy'
         ? registered?.metrics.accuracy
         : registered?.metrics.auc;
+  const baselineValue = baselineFromHistory ?? baselineFromRegistry;
+  const baselineSource: DriftAlert['baselineSource'] = baselineFromHistory
+    ? 'recorded_history'
+    : 'unvalidated_registry_default';
 
   if (baselineValue == null || !Number.isFinite(baselineValue)) return null;
 
@@ -62,8 +66,13 @@ export function evaluateModelDrift(
     dropPercent: Number(dropPercent.toFixed(1)),
     thresholdPercent: threshold,
     severity: dropPercent >= threshold * 2 ? 'retrain_required' : 'watch',
-    summary: `${modelId} ${current.metric} dropped ${dropPercent.toFixed(1)}% (baseline ${baselineValue.toFixed(2)} → ${current.value.toFixed(2)})`,
+    summary:
+      `${modelId} ${current.metric} dropped ${dropPercent.toFixed(1)}% (baseline ${baselineValue.toFixed(2)} → ${current.value.toFixed(2)})` +
+      (baselineSource === 'unvalidated_registry_default'
+        ? ' — baseline is an unvalidated registry default, not a prior measurement'
+        : ''),
     sourceState: options.sourceState || current.sourceState,
+    baselineSource,
   };
 }
 

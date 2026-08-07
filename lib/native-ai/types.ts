@@ -49,6 +49,19 @@ export type DriftAlert = {
   severity: 'watch' | 'retrain_required';
   summary: string;
   sourceState: NativeAiSourceState;
+  /**
+   * Found 2026-08-07: modelRegistry.ts's static metrics (f1/accuracy/auc)
+   * for 7 of 8 rule-based models could not be traced to any real evaluation
+   * run (see that file's own header comment) -- but evaluateModelDrift()
+   * falls back to those exact numbers as the baseline whenever no real
+   * weekly snapshot history exists yet, and the resulting alert previously
+   * carried no signal that its baseline was ever unvalidated. A "5% drop
+   * from baseline" reads identically whether the baseline was a real prior
+   * measurement or a number nobody can verify. 'recorded_history' means the
+   * baseline came from a real prior weekly snapshot; 'unvalidated_registry_default'
+   * means it came from modelRegistry.ts's static (unverified) metrics.
+   */
+  baselineSource: 'recorded_history' | 'unvalidated_registry_default';
 };
 
 export type RetrainingAlert = {
