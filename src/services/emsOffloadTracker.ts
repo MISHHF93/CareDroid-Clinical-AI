@@ -319,14 +319,6 @@ export function formatEmsOffloadOperationalValue(summary: EmsOffloadTrackerSumma
   return String(summary.activeCount);
 }
 
-export const EMS_OFFLOAD_TRACKER_SURFACES = Object.freeze([
-  'ems-screen',
-  'whiteboard',
-  'notification-center',
-  'operational-snapshot',
-  'reception-operational-strip',
-]);
-
 export type EmsOffloadAttentionSnapshot = EmsOffloadTrackerSummary & {
   previewRows: EmsOffloadTrackerRow[];
 };
@@ -412,73 +404,6 @@ export function mergeEmsArrivalHydration(
       handoffClose: local.handoffClose ?? arrival.handoffClose,
     };
   });
-}
-
-export type EmsOffloadTrackerStore = {
-  emsArrivals: EMSArrival[];
-  patients?: Patient[];
-  staff?: Staff[];
-  rooms?: RoomLike[];
-  emergencySettings?: { thresholds?: { emsOffloadTargetMinutes?: number; emsOffloadTargetMin?: number } };
-  dispatchWebSocketEvent?: (event: {
-    type: string;
-    payload: Record<string, unknown>;
-  }) => void;
-};
-
-/** Broadcast tracker snapshot to connected operational surfaces. */
-export function syncEmsOffloadOperationalSurfaces(
-  store: EmsOffloadTrackerStore,
-  options: { arrivalId?: string; source?: string } = {},
-): EmsOffloadAttentionSnapshot {
-  const offloadTargetMinutes =
-    Number(
-      store.emergencySettings?.thresholds?.emsOffloadTargetMinutes ??
-        store.emergencySettings?.thresholds?.emsOffloadTargetMin ??
-        15,
-    ) || 15;
-  const snapshot = buildEmsOffloadAttentionSnapshot(store.emsArrivals, {
-    patients: store.patients,
-    staff: store.staff,
-    rooms: store.rooms,
-    offloadTargetMinutes,
-  });
-
-  store.dispatchWebSocketEvent?.({
-    type: 'ems_offload_sync',
-    payload: {
-      arrivalId: options.arrivalId || null,
-      source: options.source || 'ems-offload-tracker',
-      surfaces: [...EMS_OFFLOAD_TRACKER_SURFACES],
-      summary: {
-        activeCount: snapshot.activeCount,
-        inboundCount: snapshot.inboundCount,
-        awaitingOffloadCount: snapshot.awaitingOffloadCount,
-        averageOffloadMinutes: snapshot.averageOffloadMinutes,
-        longestOffloadMinutes: snapshot.longestOffloadMinutes,
-        delayedCount: snapshot.delayedCount,
-        offloadTargetMinutes: snapshot.offloadTargetMinutes,
-      },
-      rows: snapshot.rows.map((row) => ({
-        arrivalId: row.arrivalId,
-        patientId: row.patientId,
-        unitLabel: row.unitLabel,
-        phase: row.phase,
-        dispatchEtaLabel: row.dispatchEtaLabel,
-        ambulanceArrivalLabel: row.ambulanceArrivalLabel,
-        triageHandoffStartLabel: row.triageHandoffStartLabel,
-        handoffCompleteLabel: row.handoffCompleteLabel,
-        offloadDelayLabel: row.offloadDelayLabel,
-        assignedReceivingArea: row.assignedReceivingArea,
-        handoffOwner: row.handoffOwner,
-        tone: row.tone,
-        isDelayed: row.isDelayed,
-      })),
-      generatedAt: new Date().toISOString(),
-    },
-  });
-
-  return snapshot;
 }
 
 /** Re-export for strip metrics that need ETA tone from tracker rows. */

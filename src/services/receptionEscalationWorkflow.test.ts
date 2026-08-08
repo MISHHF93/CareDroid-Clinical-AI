@@ -9,10 +9,8 @@ import {
   listActiveReceptionEscalations,
   RECEPTION_ESCALATION_ALERT_SOURCE,
   RECEPTION_ESCALATION_REASONS,
-  RECEPTION_ESCALATION_SURFACES,
   resolveReceptionEscalationReason,
   summarizeReceptionEscalationBoard,
-  syncReceptionEscalationOperationalSurfaces,
 } from './receptionEscalationWorkflow';
 
 function buildPatient(overrides: any = {}) {
@@ -157,8 +155,7 @@ describe('receptionEscalationWorkflow', () => {
     expect(buildReceptionEscalationAttentionSnapshot(alerts, { roleId: 'triage_nurse' }).rows).toHaveLength(1);
   });
 
-  it('syncs reception escalation attention to operational surfaces', () => {
-    const events: Array<{ type: string; payload: Record<string, unknown> }> = [];
+  it('builds reception escalation attention snapshot for the reception-workspace/triage-screen/charge-nurse/whiteboard/notification-center views', () => {
     const alerts: Alert[] = [
       {
         id: 'a1',
@@ -173,11 +170,9 @@ describe('receptionEscalationWorkflow', () => {
       },
     ];
 
-    syncReceptionEscalationOperationalSurfaces(alerts, {
-      dispatchWebSocketEvent: (event) => events.push(event),
-    });
+    const snapshot = buildReceptionEscalationAttentionSnapshot(alerts);
 
-    expect(events[0]?.type).toBe('reception_escalation_sync');
-    expect(events[0]?.payload.surfaces).toEqual([...RECEPTION_ESCALATION_SURFACES]);
+    expect(snapshot.rows).toHaveLength(1);
+    expect(snapshot.summary).toBeDefined();
   });
 });

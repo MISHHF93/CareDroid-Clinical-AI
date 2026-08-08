@@ -118,14 +118,6 @@ export type AmbulanceHandoffChecklistStep = {
   required: boolean;
 };
 
-export const AMBULANCE_HANDOFF_CHECKLIST_SURFACES = Object.freeze([
-  'ems-pipeline',
-  'reception-ems',
-  'whiteboard',
-  'ems-offload-tracker',
-  'patient-chart',
-]);
-
 type RoomLike = Pick<Room, 'id' | 'name' | 'type'>;
 
 const MEDICATION_PATTERNS: { pattern: RegExp; label: string }[] = [
@@ -614,50 +606,6 @@ export function buildPatientPatchFromHandoffChecklist(
   }
 
   return patch;
-}
-
-export type AmbulanceHandoffChecklistStore = {
-  emsArrivals: EMSArrival[];
-  dispatchWebSocketEvent?: (event: {
-    type: string;
-    payload: Record<string, unknown>;
-  }) => void;
-};
-
-export function syncAmbulanceHandoffChecklistSurfaces(
-  store: AmbulanceHandoffChecklistStore,
-  arrivalId: string,
-  checklist: AmbulanceHandoffChecklist,
-  options: { source?: string } = {},
-): void {
-  store.dispatchWebSocketEvent?.({
-    type: 'ambulance_handoff_checklist_sync',
-    payload: {
-      arrivalId,
-      patientId: checklist.patientId || null,
-      source: options.source || 'ambulance-handoff-checklist',
-      surfaces: [...AMBULANCE_HANDOFF_CHECKLIST_SURFACES],
-      completionPercent: ambulanceHandoffChecklistCompletionPercent(checklist),
-      steps: buildAmbulanceHandoffChecklistSteps(checklist).map((step) => ({
-        id: step.id,
-        label: step.label,
-        status: step.status,
-        value: step.value,
-        required: step.required,
-      })),
-      checklist: {
-        identityStatus: checklist.identityStatus,
-        complaintSummary: checklist.complaintSummary,
-        vitalsReceived: checklist.vitalsReceived,
-        medicationsEnRoute: checklist.medicationsEnRoute,
-        criticalFlags: checklist.criticalFlags,
-        handoffAccepted: checklist.handoffAccepted,
-        patientDestination: checklist.patientDestination,
-        destinationLabel: checklist.destinationLabel,
-      },
-      generatedAt: new Date().toISOString(),
-    },
-  });
 }
 
 export function normalizeAmbulanceHandoffChecklist(

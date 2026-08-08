@@ -11,7 +11,6 @@ import {
   normalizeAmbulanceHandoffChecklist,
   parseMedicationsEnRoute,
   resolveAmbulanceHandoffChecklist,
-  syncAmbulanceHandoffChecklistSurfaces,
 } from './ambulanceHandoffChecklist';
 
 const baseArrival = {
@@ -193,21 +192,10 @@ describe('ambulanceHandoffChecklist', () => {
     expect(patch.location).toBe('Waiting room');
   });
 
-  it('syncs structured checklist to operational surfaces', () => {
-    const payloads: Record<string, unknown>[] = [];
+  it('builds structured checklist steps for the ems-pipeline/reception-ems/whiteboard views', () => {
     const checklist = buildAmbulanceHandoffChecklist(baseArrival);
+    const steps = buildAmbulanceHandoffChecklistSteps(checklist);
 
-    syncAmbulanceHandoffChecklistSurfaces(
-      {
-        emsArrivals: [baseArrival],
-        dispatchWebSocketEvent: (event) => payloads.push(event.payload),
-      },
-      baseArrival.id,
-      checklist,
-      { source: 'test' },
-    );
-
-    expect(payloads[0]?.surfaces).toContain('ems-pipeline');
-    expect(payloads[0]?.steps).toHaveLength(AMBULANCE_HANDOFF_CHECKLIST_FIELDS.length);
+    expect(steps).toHaveLength(AMBULANCE_HANDOFF_CHECKLIST_FIELDS.length);
   });
 });

@@ -12,8 +12,6 @@ import {
 import { isWorkflowAutomationTriggerEvent } from '../config/unifiedWorkflowAutomationModel';
 import { getArrivalReasonFromPatient } from './intakeEncounterChain';
 import { syncArrivalOperationalSurfaces } from './arrivalControlLayer';
-import { syncPatientExperienceOperationalSurfaces } from './patientExperienceStatus';
-import { syncTriageBreachOperationalSurfaces } from './triageBreachTimer';
 import { buildClientTriageAssist } from './triageAssist';
 import { PatientState, type Patient } from '../types/emergency';
 import type { useEmergencyStore } from '../store/emergencyStore';
@@ -170,24 +168,7 @@ export function syncPatientWorkflowSurfaces(
       destination: 'triage-queue',
       source,
     });
-    syncTriageBreachOperationalSurfaces(
-      {
-        patients: store.patients,
-        settings: store.emergencySettings,
-        dispatchWebSocketEvent: store.dispatchWebSocketEvent,
-      },
-      { patientId, source },
-    );
   }
-
-  syncPatientExperienceOperationalSurfaces(
-    {
-      patients: store.patients,
-      referrals: store.referrals,
-      dispatchWebSocketEvent: store.dispatchWebSocketEvent,
-    },
-    { patientId, source },
-  );
 
   const patient = store.patients.find((entry) => entry.id === patientId);
   if (patient && (toState === PatientState.Triage || toState === PatientState.Assessment) && !patient.triageAssist) {

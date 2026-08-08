@@ -4,9 +4,9 @@ import {
   buildEmsOffloadAlerts,
   buildEmsOffloadTrackerRow,
   buildEmsOffloadTrackerSummary,
+  buildEmsOffloadAttentionSnapshot,
   mergeEmsArrivalHydration,
   normalizeEmsArrivalOffloadPatch,
-  syncEmsOffloadOperationalSurfaces,
 } from './emsOffloadTracker';
 
 describe('emsOffloadTracker', () => {
@@ -212,38 +212,27 @@ describe('emsOffloadTracker', () => {
     expect(result.chiefComplaint).toBe('Updated chief complaint from backend');
   });
 
-  it('builds attention snapshot and sync payload surfaces', () => {
-    const dispatched: Array<Record<string, unknown>> = [];
-    const snapshot = syncEmsOffloadOperationalSurfaces(
+  it('builds attention snapshot for the ems-screen/whiteboard/notification-center views', () => {
+    const snapshot = buildEmsOffloadAttentionSnapshot([
       {
-        emsArrivals: [
-          {
-            id: 'ems-5',
-            unitId: 'Medic 5',
-            unitName: 'Medic 5',
-            crewNames: [],
-            patientAge: 44,
-            patientSex: 'F',
-            chiefComplaint: 'Fall',
-            prearrivalComplaint: 'Fall',
-            eta: 6,
-            severity: 'Moderate',
-            dispatchTime: '2026-06-20T11:50:00.000Z',
-            estimatedArrivalTime: '2026-06-20T12:06:00.000Z',
-            notes: '',
-            status: 'Inbound',
-            priority: Priority.P3,
-          },
-        ],
-        dispatchWebSocketEvent: (event) => {
-          dispatched.push(event.payload);
-        },
+        id: 'ems-5',
+        unitId: 'Medic 5',
+        unitName: 'Medic 5',
+        crewNames: [],
+        patientAge: 44,
+        patientSex: 'F',
+        chiefComplaint: 'Fall',
+        prearrivalComplaint: 'Fall',
+        eta: 6,
+        severity: 'Moderate',
+        dispatchTime: '2026-06-20T11:50:00.000Z',
+        estimatedArrivalTime: '2026-06-20T12:06:00.000Z',
+        notes: '',
+        status: 'Inbound',
+        priority: Priority.P3,
       },
-      { arrivalId: 'ems-5', source: 'test' },
-    );
+    ] as EMSArrival[]);
 
     expect(snapshot.previewRows).toHaveLength(1);
-    expect(dispatched[0]?.surfaces).toContain('notification-center');
-    expect(dispatched[0]?.surfaces).toContain('operational-snapshot');
   });
 });

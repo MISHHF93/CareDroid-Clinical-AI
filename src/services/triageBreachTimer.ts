@@ -262,14 +262,6 @@ export function summarizeTriageBreachAnalytics(
   };
 }
 
-export const TRIAGE_BREACH_SURFACES = Object.freeze([
-  'reception-dashboard',
-  'waiting-room-board',
-  'whiteboard',
-  'analytics',
-  'command-center',
-]);
-
 export type TriageBreachAttentionRow = {
   patientId: string;
   displayName: string;
@@ -346,47 +338,6 @@ export function buildTriageBreachAttentionSnapshot(
     rows,
     previewRows: rows.slice(0, 4),
   };
-}
-
-export type TriageBreachTimerStore = {
-  patients?: Patient[];
-  settings?: Record<string, unknown>;
-  dispatchWebSocketEvent?: (event: {
-    type: string;
-    payload: Record<string, unknown>;
-  }) => void;
-};
-
-/** Broadcast triage breach snapshot to connected operational surfaces. */
-export function syncTriageBreachOperationalSurfaces(
-  store: TriageBreachTimerStore,
-  options: { patientId?: string; source?: string } = {},
-): TriageBreachAttentionSnapshot {
-  const snapshot = buildTriageBreachAttentionSnapshot(store.patients || [], {
-    settings: store.settings,
-  });
-
-  store.dispatchWebSocketEvent?.({
-    type: 'triage_breach_sync',
-    payload: {
-      patientId: options.patientId || null,
-      source: options.source || 'triage-breach-timer',
-      surfaces: [...TRIAGE_BREACH_SURFACES],
-      summary: snapshot.summary,
-      rows: snapshot.rows.map((row) => ({
-        patientId: row.patientId,
-        displayName: row.displayName,
-        phase: row.phase,
-        elapsedLabel: row.elapsedLabel,
-        label: row.label,
-        tone: row.tone,
-        remainingMinutes: row.remainingMinutes,
-      })),
-      generatedAt: new Date().toISOString(),
-    },
-  });
-
-  return snapshot;
 }
 
 export function buildTriageBreachAlerts(

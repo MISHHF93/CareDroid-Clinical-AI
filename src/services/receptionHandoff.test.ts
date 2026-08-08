@@ -50,8 +50,6 @@ describe('receptionHandoff', () => {
     expect(calls).toContain('queue:Triage');
     expect(calls).toContain('websocket:intake_handoff_complete');
     expect(calls).toContain('websocket:arrival_control_sync');
-    expect(calls).toContain('websocket:triage_breach_sync');
-    expect(calls).toContain('websocket:patient_experience_sync');
     expect(calls).toContain('capacity:update');
     expect(calls).toContain('alerts:update');
     expect(calls).toContain('workflow:reception.handoff');
@@ -83,8 +81,6 @@ describe('receptionHandoff', () => {
     expect(calls).not.toContain('move:patient-456:Triage');
     expect(calls).toContain('select:patient-456');
     expect(calls).toContain('queue:Triage');
-    expect(calls).toContain('websocket:triage_breach_sync');
-    expect(calls).toContain('websocket:patient_experience_sync');
     expect(calls).toContain('capacity:update');
     expect(calls).toContain('alerts:update');
   });

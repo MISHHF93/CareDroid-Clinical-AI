@@ -9,8 +9,6 @@ import {
   shouldSurfaceTriageBreach,
   summarizeTriageBreachAnalytics,
   summarizeTriageBreachBoard,
-  syncTriageBreachOperationalSurfaces,
-  TRIAGE_BREACH_SURFACES,
 } from './triageBreachTimer';
 
 const STABLE_NOW = new Date('2026-06-20T10:12:00.000Z');
@@ -120,8 +118,7 @@ describe('triageBreachTimer', () => {
     expect(analytics.completedWithinTargetCount).toBe(0);
   });
 
-  it('builds attention snapshot and syncs operational surfaces', () => {
-    const events: Array<{ type: string; payload: Record<string, unknown> }> = [];
+  it('builds attention snapshot for the reception-dashboard/waiting-room-board/whiteboard/analytics/command-center views', () => {
     const snapshot = buildTriageBreachAttentionSnapshot([buildPatient()], {
       now: STABLE_NOW,
       targetMinutes: 10,
@@ -130,18 +127,6 @@ describe('triageBreachTimer', () => {
 
     expect(snapshot.summary.breachedCount).toBe(1);
     expect(snapshot.previewRows[0]?.phase).toBe('breached');
-
-    syncTriageBreachOperationalSurfaces(
-      {
-        patients: [buildPatient()],
-        dispatchWebSocketEvent: (event) => events.push(event),
-      },
-      { patientId: 'patient-1', source: 'test' },
-    );
-
-    expect(events).toHaveLength(1);
-    expect(events[0]?.type).toBe('triage_breach_sync');
-    expect(events[0]?.payload.surfaces).toEqual([...TRIAGE_BREACH_SURFACES]);
   });
 
   it('emits triage breach alerts for breached boards', () => {

@@ -34,17 +34,12 @@ import {
   mergeAmbulanceHandoffChecklistPatch,
   resolveAmbulanceHandoffChecklist,
   buildPatientPatchFromHandoffChecklist,
-  syncAmbulanceHandoffChecklistSurfaces,
 } from '../services/ambulanceHandoffChecklist';
 import {
   buildFitToWaitClassificationPatch,
   canClassifyFitToWait,
   fitToWaitClassificationLabel,
-  syncFitToWaitOperationalSurfaces,
 } from '../services/fitToWaitPathway';
-import {
-  syncPatientExperienceOperationalSurfaces,
-} from '../services/patientExperienceStatus';
 import {
   ED_SCENARIO_DEMO_MODES,
   buildSrcEmergencyScenarioState,
@@ -151,7 +146,6 @@ import {
 import {
   mergeEmsArrivalHydration,
   normalizeEmsArrivalOffloadPatch,
-  syncEmsOffloadOperationalSurfaces,
 } from '../services/emsOffloadTracker';
 import {
   createWaitingRoomCommunicationLogInput,
@@ -162,7 +156,6 @@ import {
 import {
   buildReceptionEscalationSubmission,
   broadcastReceptionEscalation,
-  syncReceptionEscalationOperationalSurfaces,
   type ReceptionEscalationInput,
   type ReceptionEscalationRecord,
 } from '../services/receptionEscalationWorkflow';
@@ -3443,15 +3436,6 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
           }),
         };
       });
-
-      const nextState = get();
-      syncFitToWaitOperationalSurfaces(
-        {
-          patients: nextState.patients,
-          dispatchWebSocketEvent: nextState.dispatchWebSocketEvent,
-        },
-        { patientId, source: 'waiting-room-board' },
-      );
     },
 
     movePatientToState: (patientId, to, staffIdOrOptions = 's3', note) => {
@@ -3558,15 +3542,6 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       });
 
       const nextState = get();
-      syncPatientExperienceOperationalSurfaces(
-        {
-          patients: nextState.patients,
-          referrals: nextState.referrals,
-          dispatchWebSocketEvent: nextState.dispatchWebSocketEvent,
-        },
-        { patientId, source: 'patient-journey-engine' },
-      );
-
       const transitioned = nextState.patients.find((patient) => patient.id === patientId);
       if (fromState && transitioned && transitioned.state !== fromState) {
         void import('../services/unifiedPatientWorkflowOrchestrator').then(({ afterPatientWorkflowTransition }) =>
@@ -4341,31 +4316,6 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       }));
 
       broadcastReceptionEscalation(submission.alert);
-      syncReceptionEscalationOperationalSurfaces(nextAlerts);
-
-      // Realtime fan-out for clinical workstations listening on the emergency bus.
-      try {
-        get().dispatchWebSocketEvent?.({
-          type: 'reception_escalation',
-          payload: {
-            alertId: submission.alert.id,
-            patientId: submission.record.patientId,
-            reasonId: submission.record.reasonId,
-            reasonLabel: submission.record.reasonLabel,
-            severity: submission.alert.severity,
-            notifyTargets: submission.record.notifyTargets,
-            notifyRoles: submission.record.notifyTargets.map((target) =>
-              target === 'triage' ? 'triage_nurse' : 'charge_nurse',
-            ),
-            actorName: submission.record.actorName,
-            detail: submission.record.detail,
-            timestamp: submission.record.timestamp,
-            message: submission.alert.message,
-          },
-        });
-      } catch {
-        // WS dispatch is best-effort; local alert + custom event still apply.
-      }
 
       // Durable multi-station path: POST Nest reception escalation (alert + DB write-through).
       if (isBackendCapabilityEnabled('emergencyReceptionEscalation')) {
@@ -5381,18 +5331,6 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       });
 
       const nextState = get();
-      syncEmsOffloadOperationalSurfaces(
-        {
-          emsArrivals: nextState.emsArrivals,
-          patients: nextState.patients,
-          staff: nextState.staff,
-          rooms: nextState.rooms,
-          emergencySettings: nextState.emergencySettings,
-          dispatchWebSocketEvent: nextState.dispatchWebSocketEvent,
-        },
-        { arrivalId, source: 'ems-pipeline' },
-      );
-
       const updatedArrival = nextState.emsArrivals.find((entry) => entry.id === arrivalId);
       if (updatedArrival?.status && updatedArrival.status !== arrival.status) {
         void import('../services/emergencyCareJourneyOrchestrator').then(({ onEmsArrivalStatusChange }) =>
@@ -5462,13 +5400,6 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
             )
           : state.patients,
       });
-
-      syncAmbulanceHandoffChecklistSurfaces(
-        { emsArrivals: get().emsArrivals, dispatchWebSocketEvent: get().dispatchWebSocketEvent },
-        arrivalId,
-        checklist,
-        { source: 'ems-handoff-checklist' },
-      );
     },
 
     checkCriticalEMSChecklistItem: (arrivalId, input) =>

@@ -8,13 +8,11 @@ import {
 } from '../types/emergency';
 import {
   PATIENT_EXPERIENCE_STATUS_DEFINITIONS,
-  PATIENT_EXPERIENCE_SURFACES,
   assertPublicPatientExperienceViewIsPhiSafe,
   buildPatientExperienceBoardSummary,
   resolvePatientExperienceStatus,
   resolvePublicPatientExperienceStatus,
   summarizePatientExperienceStatuses,
-  syncPatientExperienceOperationalSurfaces,
   toPublicPatientExperienceStatusView,
 } from './patientExperienceStatus';
 
@@ -165,20 +163,5 @@ describe('patientExperienceStatus', () => {
     expect(publicView.label).toBe('Waiting for clinician');
     expect(JSON.stringify(publicView)).not.toContain('Secret');
     expect(JSON.stringify(publicView)).not.toContain('MRN-999');
-  });
-
-  it('syncs experience summary to operational surfaces', () => {
-    const events: Array<{ type: string; payload: Record<string, unknown> }> = [];
-    syncPatientExperienceOperationalSurfaces(
-      {
-        patients: [buildPatient()],
-        dispatchWebSocketEvent: (event) => events.push(event),
-      },
-      { patientId: 'patient-1', source: 'test' },
-    );
-
-    expect(events).toHaveLength(1);
-    expect(events[0]?.type).toBe('patient_experience_sync');
-    expect(events[0]?.payload.surfaces).toEqual([...PATIENT_EXPERIENCE_SURFACES]);
   });
 });

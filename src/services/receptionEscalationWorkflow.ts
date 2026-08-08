@@ -496,43 +496,6 @@ export function buildReceptionEscalationAttentionSnapshot(
   };
 }
 
-export const RECEPTION_ESCALATION_SURFACES = Object.freeze([
-  'reception-workspace',
-  'triage-screen',
-  'charge-nurse',
-  'whiteboard',
-  'notification-center',
-]);
-
-export function syncReceptionEscalationOperationalSurfaces(
-  alerts: Alert[] = [],
-  options: {
-    roleId?: string | null;
-    dispatchWebSocketEvent?: (event: {
-      type: string;
-      payload: Record<string, unknown>;
-    }) => void;
-    source?: string;
-  } = {},
-): ReceptionEscalationAttentionSnapshot {
-  const snapshot = buildReceptionEscalationAttentionSnapshot(alerts, {
-    roleId: options.roleId,
-  });
-
-  options.dispatchWebSocketEvent?.({
-    type: 'reception_escalation_sync',
-    payload: {
-      source: options.source || 'reception-escalation-workflow',
-      surfaces: [...RECEPTION_ESCALATION_SURFACES],
-      summary: snapshot.summary,
-      rows: snapshot.previewRows,
-      generatedAt: new Date().toISOString(),
-    },
-  });
-
-  return snapshot;
-}
-
 export function selectReceptionEscalationPatientOptions(
   patients: Patient[] = [],
 ): Array<{ id: string; label: string; state: PatientState }> {

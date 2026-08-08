@@ -11,8 +11,6 @@ import {
   resolveFitToWaitClassification,
   sortPatientsForFitToWaitAttention,
   summarizeFitToWaitBoardCounts,
-  syncFitToWaitOperationalSurfaces,
-  FIT_TO_WAIT_SURFACES,
 } from './fitToWaitPathway';
 
 function buildPatient(overrides: Partial<Patient> = {}): Patient {
@@ -131,20 +129,10 @@ describe('fitToWaitPathway', () => {
     expect(snapshot.previewRows[0]?.patientId).toBe('room');
   });
 
-  it('syncs operational surfaces without inferring classifications', () => {
-    const events: Array<{ type: string; payload: Record<string, unknown> }> = [];
-    syncFitToWaitOperationalSurfaces(
-      {
-        patients: [buildPatient()],
-        dispatchWebSocketEvent: (event) => events.push(event),
-      },
-      { patientId: 'patient-wait-1', source: 'test' },
-    );
+  it('builds an attention snapshot without inferring classifications', () => {
+    const snapshot = buildFitToWaitAttentionSnapshot([buildPatient()]);
 
-    expect(events).toHaveLength(1);
-    expect(events[0]?.type).toBe('fit_to_wait_sync');
-    expect(events[0]?.payload.surfaces).toEqual([...FIT_TO_WAIT_SURFACES]);
-    expect(events[0]?.payload.summary).toMatchObject({
+    expect(snapshot).toMatchObject({
       unclassifiedCount: 1,
       needsAttentionCount: 1,
     });
