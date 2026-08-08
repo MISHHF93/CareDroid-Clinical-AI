@@ -119,7 +119,7 @@ function sumCounts(value: any = {}) {
   return Object.values(value).reduce<number>((sum, count) => sum + Number(count || 0), 0);
 }
 
-function buildExpertRows(costDashboard, evaluationDashboard) {
+function buildExpertRows(costDashboard, evaluationDashboard, evaluationHonesty) {
   const routeTotal = Math.max(1, sumCounts(costDashboard.routeCounts));
   const accuracy = percent(evaluationDashboard.aggregateMetrics?.accuracy);
   const retrieval = percent(evaluationDashboard.aggregateMetrics?.retrievalPrecision);
@@ -127,9 +127,21 @@ function buildExpertRows(costDashboard, evaluationDashboard) {
   return AI_EXPERTS.map((expert, index) => {
     const active = index < 5 || expert.id === 'guidelines';
     const load = Math.min(99, Math.max(18, Math.round((routeTotal * (index + 2)) % 87)));
+    // Previously this also subtracted the array index (`- index`) -- a value
+    // with zero relationship to any real per-expert signal, purely
+    // array-position decoration that made every expert's "confidence" a
+    // different fabricated number regardless of actual behavior. No system
+    // in this codebase tracks retrospective accuracy per expert persona
+    // (MoERouterService's own confidence score is a real-time per-request
+    // routing decision, not a historical per-expert average), so there is no
+    // real per-expert measurement to show. This now reflects only the real,
+    // already-provenance-tracked aggregate accuracy uniformly across
+    // experts, with the guidelines-specific retrieval term kept since
+    // retrieval precision is a genuine signal for a RAG-heavy expert, not an
+    // arbitrary offset.
     const confidence = Math.max(
       70,
-      Math.min(99, accuracy - index + (expert.id === 'guidelines' ? retrieval - 88 : 0))
+      Math.min(99, accuracy + (expert.id === 'guidelines' ? retrieval - 88 : 0))
     );
 
     return {
@@ -137,6 +149,10 @@ function buildExpertRows(costDashboard, evaluationDashboard) {
       active,
       load,
       confidence,
+      // Lets the UI disclose when this shared confidence figure is derived
+      // from a seed-only evaluation aggregate rather than measured data --
+      // see buildEvaluationHonesty().
+      confidenceSeedOnly: evaluationHonesty.seedOnly,
     };
   });
 }
@@ -341,7 +357,7 @@ export async function fetchAiCommandCenterSnapshot() {
       unifiedNodeReady: Boolean(unifiedNode.ready || unifiedNode.status === 'ready'),
       unifiedNodeId: unifiedNode.nodeId,
     },
-    experts: buildExpertRows(costDashboard, evaluationDashboard),
+    experts: buildExpertRows(costDashboard, evaluationDashboard, evaluationHonesty),
     ragMetrics: {
       retrievalPrecision: metrics.retrievalPrecision || 0,
       retrievalLabel: formatCommandMetric('retrievalPrecision', metrics.retrievalPrecision),

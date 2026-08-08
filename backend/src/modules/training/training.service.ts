@@ -93,6 +93,7 @@ export class TrainingService implements OnModuleInit {
         accuracy?: number;
         macroPrecision?: number;
         macroF1?: number;
+        macroRecall?: number;
         latencyMs?: { mean?: number; p50?: number };
         testSetSize?: number;
         architecture?: string;
@@ -116,6 +117,10 @@ export class TrainingService implements OnModuleInit {
         hallucinationRate: run.metrics.hallucinationRate,
         latencyMs: raw.latencyMs?.p50 ?? raw.latencyMs?.mean ?? run.metrics.latencyMs,
         costUsd: 0,
+        // Real macro-recall from the same held-out test-set run, when the
+        // evaluator reports it (artifact-router's does not, so this stays
+        // undefined for that head rather than fabricating a value).
+        recall: raw.macroRecall ?? run.metrics.recall,
       };
       run.datasetName = `${head}-test-${raw.testSetSize ?? 'unknown'}${raw.targetMode ? `-${raw.targetMode}` : ''}`;
       run.updatedAt = new Date().toISOString();

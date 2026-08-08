@@ -79,7 +79,12 @@ function SectionCard({
 function ExpertRow({
   expert,
 }: {
-  expert: (typeof AI_EXPERTS)[number] & { active?: boolean; load?: number; confidence?: number };
+  expert: (typeof AI_EXPERTS)[number] & {
+    active?: boolean;
+    load?: number;
+    confidence?: number;
+    confidenceSeedOnly?: boolean;
+  };
 }) {
   const dot = toneColor[expert.tone] || MEDICAL_THEME.inkMuted;
   return (
@@ -100,6 +105,11 @@ function ExpertRow({
       {expert.confidence != null && (
         <span
           className="ai-cc-expert-row__confidence"
+          title={
+            expert.confidenceSeedOnly
+              ? 'Derived from a seed-only evaluation aggregate, not a measured per-expert value.'
+              : 'Derived from the measured evaluation aggregate, applied uniformly (no per-expert measurement exists).'
+          }
           style={{
             color:
               expert.confidence >= 90
@@ -109,7 +119,7 @@ function ExpertRow({
                   : MEDICAL_THEME.danger,
           }}
         >
-          {expert.confidence}% conf
+          {expert.confidence}% conf{expert.confidenceSeedOnly ? ' (demo)' : ''}
         </span>
       )}
     </div>

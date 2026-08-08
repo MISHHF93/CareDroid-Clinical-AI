@@ -183,6 +183,24 @@ describe('TrainingService', () => {
     });
   });
 
+  // 2026-08-08: ml-services/nlu/scripts/evaluate.ts already computes a real
+  // macroRecall from actual TP/FN counts and writes it to
+  // ml-services/models/nlu/metrics.json, but syncHeadMetrics() silently
+  // dropped it before it ever reached TrainingRun.metrics -- not fabricated,
+  // just never surfaced. This proves the real value now reaches the
+  // dashboard, and that artifact-router (whose evaluator does not report
+  // recall) is not given a fabricated one in its place.
+  it('surfaces real macro-recall from disk without fabricating one where the evaluator does not report it', () => {
+    service.onModuleInit();
+    const dashboard = service.getDashboard();
+    const nluRun = dashboard.runs.find((run) => run.id === 'training-run-baseline');
+    const routerRun = dashboard.runs.find((run) => run.id === 'training-run-artifact-router');
+
+    expect(typeof nluRun?.metrics.recall).toBe('number');
+    expect(nluRun?.provenance).toBe('MEASURED');
+    expect(routerRun?.metrics.recall).toBeUndefined();
+  });
+
   it('builds a MoE routing training plan', () => {
     const plan = service.getMoeTrainingPlan('Evaluate cardiology and nephrology routing.');
 

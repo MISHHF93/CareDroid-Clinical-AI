@@ -193,4 +193,34 @@ describe('aiCommandCenterApi', () => {
     expect(snapshot.costMetrics.totalUsd).toBe(LOCAL_COST_DASHBOARD.requestCost.totalUsd);
     expect(snapshot.warnings).toContain('Cost optimizer API is disabled.');
   });
+
+  // 2026-08-08: buildExpertRows() previously computed each expert's
+  // "confidence" as `accuracy - index`, a value with zero relationship to
+  // any real per-expert signal -- pure array-position decoration that made
+  // every expert display a different fabricated number regardless of actual
+  // behavior. No system in this codebase tracks retrospective accuracy per
+  // expert persona, so there is no real per-expert measurement to show.
+  describe('expert confidence honesty (2026-08-08 regression)', () => {
+    it('derives confidence from the real aggregate metric only, not a fabricated per-expert index offset', async () => {
+      const snapshot = await fetchAiCommandCenterSnapshot();
+
+      const nonGuidelinesExperts = snapshot.experts.filter((expert) => expert.id !== 'guidelines');
+      const confidences = new Set(nonGuidelinesExperts.map((expert) => expert.confidence));
+      // With no real per-expert measurement anywhere in the system, every
+      // expert sharing the same underlying aggregate metric must show the
+      // same confidence value -- not a different one per array position.
+      expect(confidences.size).toBe(1);
+
+      const guidelinesExpert = snapshot.experts.find((expert) => expert.id === 'guidelines');
+      // guidelines gets a real, grounded adjustment (retrieval precision,
+      // relevant to a RAG-heavy expert), not an arbitrary offset either.
+      expect(guidelinesExpert?.confidence).not.toBe([...confidences][0]);
+    });
+
+    it('marks expert confidence as seed-only when the evaluation aggregate has no honesty block (safe default)', async () => {
+      const snapshot = await fetchAiCommandCenterSnapshot();
+      expect(snapshot.experts.length).toBeGreaterThan(0);
+      expect(snapshot.experts.every((expert) => expert.confidenceSeedOnly === true)).toBe(true);
+    });
+  });
 });

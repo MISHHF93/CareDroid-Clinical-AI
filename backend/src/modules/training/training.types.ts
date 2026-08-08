@@ -18,6 +18,16 @@ export interface TrainingEvaluationMetrics {
   precision: number;
   latencyMs: number;
   costUsd: number;
+  /**
+   * Real macro-recall from a classifier's held-out test-set evaluation
+   * (ml-services/models/<head>/metrics.json's `macroRecall`). Added
+   * 2026-08-08: this value was already being computed from real TP/FN
+   * counts by ml-services/nlu/scripts/evaluate.ts but was silently dropped
+   * before reaching this type -- never fabricated, just never surfaced.
+   * Optional because not every classifier's metrics.json reports it (the
+   * artifact-router evaluator currently only emits accuracy).
+   */
+  recall?: number;
 }
 
 /**
