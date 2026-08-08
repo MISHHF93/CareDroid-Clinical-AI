@@ -1183,10 +1183,21 @@ export class ChatService {
       params.costOptimization?.routing?.estimatedCostUsd ||
       0;
 
+    // seedOnly: true is required, not just the safe default -- hallucinationRate,
+    // accuracy, retrievalPrecision, and userSatisfaction below are NOT measurements
+    // (no hallucination-detection ran, no human rated satisfaction; citations.length
+    // and toolStatus are real per-turn facts but only heuristic PROXIES for those
+    // metrics). Marking this seedOnly keeps it out of EvaluationService.getDashboard()'s
+    // "measured" aggregate/trend/benchmark pool, which the sibling qa/ai-eval
+    // offline-harness runs populate with genuinely measured data. latencyMs/costUsd/
+    // toolExecutionSuccess ARE real signals from this turn, but the schema has no
+    // per-metric provenance, so the whole run stays seedOnly to avoid corrupting the
+    // 4 fabricated fields' aggregates -- see EvaluationRun.seedOnly's doc comment.
     this.evaluationService.createRun({
       modelName: String(params.costOptimization?.routing?.model || 'caredroid-clinical-assistant'),
       datasetName: 'assistant-live-turns',
       sampleCount: 1,
+      seedOnly: true,
       metrics: {
         hallucinationRate: citations.length > 0 ? 0.02 : 0.05,
         accuracy: typeof params.response.confidence === 'number' ? params.response.confidence : 0.9,
@@ -1196,7 +1207,11 @@ export class ChatService {
         userSatisfaction: 4.5,
         costUsd: Number(estimatedCost) || 0,
       },
-      notes: 'Captured from assistant lifecycle integration.',
+      notes:
+        'Live-turn heuristic proxy, NOT a measured evaluation: hallucinationRate/accuracy/' +
+        'retrievalPrecision/userSatisfaction are rule-derived placeholders (citation presence, ' +
+        'a fixed default, a hardcoded score), not real detection/rating. latencyMs/costUsd/' +
+        'toolExecutionSuccess reflect this real turn. Use `npm run ai:eval` for authoritative metrics.',
     });
   }
 

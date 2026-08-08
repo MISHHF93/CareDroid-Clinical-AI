@@ -183,6 +183,10 @@ export class EvaluationService {
       metrics,
       evaluatedAt: new Date().toISOString(),
       notes: dto.notes,
+      // Safe-by-default: a run is only counted as measured (seedOnly: false)
+      // when a caller explicitly asserts it. See CreateEvaluationRunDto's
+      // own comment for why this can't default the other way.
+      seedOnly: dto.seedOnly ?? true,
     };
 
     this.runs.unshift(run);

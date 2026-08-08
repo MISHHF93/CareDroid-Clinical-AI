@@ -19,6 +19,7 @@
     "**/*.spec.ts",
     "**/*.test.ts",
     "../lib/**/*.test.ts",
+    "../src/types/**/*.test.ts",
     "../src/store/**/*",
     "../src/components/**/*",
     "../src/pages/**/*",

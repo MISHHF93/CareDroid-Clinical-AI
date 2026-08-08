@@ -29,4 +29,19 @@ describe('ChatService assistant lifecycle integration', () => {
     expect(source).toContain('uuidPattern');
     expect(source).toContain("reason: 'non_uuid_user'");
   });
+
+  it('marks live-turn evaluation runs seedOnly so fabricated metrics never contaminate the "measured" dashboard pool (2026-08-08)', () => {
+    // recordEvaluationRun()'s hallucinationRate/accuracy/retrievalPrecision/
+    // userSatisfaction are rule-derived placeholders, not real detection/rating
+    // -- see EvaluationRun.seedOnly's doc comment and evaluation.service.spec.ts's
+    // "seedOnly provenance" describe block for the full regression story.
+    const start = source.indexOf('private recordEvaluationRun(');
+    const end = source.indexOf('\n  private compactAssistantText', start);
+    expect(start).toBeGreaterThan(-1);
+    expect(end).toBeGreaterThan(start);
+    const functionBody = source.slice(start, end);
+
+    expect(functionBody).toContain('this.evaluationService.createRun({');
+    expect(functionBody).toContain('seedOnly: true');
+  });
 });

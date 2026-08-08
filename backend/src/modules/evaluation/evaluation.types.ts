@@ -92,9 +92,23 @@ export interface EvaluationRawScores {
   costUsd?: number;
 }
 
-import { IsIn, IsNumber, IsObject, IsOptional, IsString, MaxLength, Min } from 'class-validator';
+import { IsBoolean, IsIn, IsNumber, IsObject, IsOptional, IsString, MaxLength, Min } from 'class-validator';
 
 export class CreateEvaluationRunDto {
+  // Defaults to true in EvaluationService.createRun() -- unlike request DTOs
+  // elsewhere in this codebase where "optional" means "has a sensible
+  // production default," omitting this one must default to the SAFE
+  // (not-measured) state. A caller asserting real, measured data must do so
+  // explicitly. Added 2026-08-08 after finding chat.service.ts's live-turn
+  // calls (fabricated hallucinationRate/userSatisfaction figures with no
+  // real detection/rating behind them) were silently counted as "measured"
+  // in getDashboard()'s aggregate/trend/benchmark computations, since this
+  // field didn't exist on the DTO at all and createRun() left it undefined
+  // -- which getDashboard()'s `!run.seedOnly` filter treats as measured.
+  @IsOptional()
+  @IsBoolean()
+  seedOnly?: boolean;
+
   @IsOptional()
   @IsString()
   @MaxLength(200)
