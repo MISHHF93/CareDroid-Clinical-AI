@@ -174,7 +174,7 @@
     <div class="score-ring">
       <svg width="160" height="160" viewBox="0 0 160 160">
         <circle class="track" cx="80" cy="80" r="68" fill="none" stroke-width="11"></circle>
-        <circle class="fill" cx="80" cy="80" r="68" fill="none" stroke-width="11" stroke-dasharray="427.3" stroke-dashoffset="123.9"</circle>
+        <circle class="fill" cx="80" cy="80" r="68" fill="none" stroke-width="11" stroke-dasharray="427.3" stroke-dashoffset="123.1"</circle>
       </svg>
       <div class="num"><strong>71.0</strong><span>/ 100</span></div>
     </div>
@@ -182,7 +182,7 @@
       <span class="band-chip">Significant improvement required (repository-verifiable ceiling)</span>
       <h2>Corrected 2026-08-06: 3 of the scorecard's own original findings were themselves wrong — a dedicated verification pass found real mechanisms this first draft had scored as absent, and 3 concrete bugs found along the way are now fixed. Updated 2026-08-08: a symptom/complaint-recognition audit found a real safety-relevant gap in Reception's primary intake path (three unsynchronized keyword systems, the weakest one wired into the main flow) and a same-day demo-identity fix that hadn't actually reached production — both fixed and tested; see Domain 1. Also 2026-08-08: this scorecard's own "real backend cron" claim for Waiting Room Safety was itself wrong — it never runs by default — and the actual reach gap (in-app only, no out-of-band channel) is now partly closed with a real email notification on auto-escalation; see Domain 2. Round 31, same day: closed 2 of the 3 deferred "settings-blob" input-validation routes. Round 32, same day: closed the 3rd and largest one (<code>EmergencyOsController.updateSettings</code>'s ~12-section contract) — 97.8% of backend <code>@Body()</code> endpoints now validated, up from 95.6%, with only product-decision-gated routes left; see Domain 7. Round 33, same day: closed this scorecard's own named remaining UX risk — <code>card-contrast-normalization.css</code>'s meta/hint/caption/subtitle rule was the only one of 3 sibling typography rules missing the critical/danger/warning exclusion; see Domain 9. Round 39, same day: this scorecard's own "Not verified" tag on deterioration-watch/LWBS tracking was wrong — both are real, extensively-built, correctly role-gated features — and 2 confirmed-dead broadcast functions found while verifying that reach were removed; see Domain 2</h2>
       <p>
-        <strong>Repository Implementation Score: 710/1000 (71.0%), up from an initial 520/1000.</strong>
+        <strong>Repository Implementation Score: 712/1000 (71.2%), up from an initial 520/1000.</strong>
         <strong>Pilot Evidence Score: ~10/100</strong> — unchanged; code existing and being wired is still not
         evidence of clinical validation. A dedicated research pass corrected 3 domains this scorecard originally
         got wrong: <strong>Waiting Room Safety</strong> (42→58→64/100) — the 2026-08-06 pass credited a real backend
@@ -214,7 +214,7 @@
 
   <div class="decision-strip">
     <div class="decision-card"><span class="decision-label">Pilot gate</span><div class="decision-value" style="color:var(--red)">NOT READY FOR PILOT</div><p>6 P0 gates open on the sibling scorecard; none require more code alone.</p></div>
-    <div class="decision-card"><span class="decision-label">Repo implementation</span><div class="decision-value">710 / 1000</div><p>Evidence-backed, code-level maturity across 12 domains.</p></div>
+    <div class="decision-card"><span class="decision-label">Repo implementation</span><div class="decision-value">712 / 1000</div><p>Evidence-backed, code-level maturity across 12 domains.</p></div>
     <div class="decision-card"><span class="decision-label">Pilot evidence</span><div class="decision-value" style="color:var(--amber)">~10 / 100</div><p>Live/clinician/external validation, separated from implementation.</p></div>
     <div class="decision-card"><span class="decision-label">Evidence confidence</span><div class="decision-value">High</div><p>Every score cites a file, route, test, or command — 3 domains marked NOT VERIFIED rather than guessed.</p></div>
   </div>
@@ -236,10 +236,10 @@
         <tr><td>7. RBAC, Privacy &amp; Security</td><td class="num">100</td><td class="num">68</td><td class="num">68%</td><td>Confirmed</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
         <tr><td>8. Architecture &amp; Repository Convergence</td><td class="num">100</td><td class="num">90</td><td class="num">90%</td><td>Confirmed</td><td>🔵 <span class="pill strong">Strong</span></td></tr>
         <tr><td>9. UX, Accessibility &amp; Design-System Quality</td><td class="num">75</td><td class="num">49</td><td class="num">65%</td><td>Confirmed (static only)</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
-        <tr><td>10. Quality Engineering &amp; Pilot Readiness</td><td class="num">100</td><td class="num">63</td><td class="num">63%</td><td>Confirmed</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
+        <tr><td>10. Quality Engineering &amp; Pilot Readiness</td><td class="num">100</td><td class="num">65</td><td class="num">65%</td><td>Confirmed</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
         <tr><td>11. Interoperability, Data &amp; Integration Readiness</td><td class="num">25</td><td class="num">12</td><td class="num">48%</td><td>Confirmed (mixed)</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
         <tr><td>12. AI Governance &amp; Operational Intelligence</td><td class="num">25</td><td class="num">24</td><td class="num">96%</td><td>Strong evidence</td><td>🔵 <span class="pill strong">Strong</span></td></tr>
-        <tr><td><strong>Total</strong></td><td class="num"><strong>1000</strong></td><td class="num"><strong>710</strong></td><td class="num"><strong>71%</strong></td><td>—</td><td>—</td></tr>
+        <tr><td><strong>Total</strong></td><td class="num"><strong>1000</strong></td><td class="num"><strong>712</strong></td><td class="num"><strong>71%</strong></td><td>—</td><td>—</td></tr>
       </tbody>
     </table>
   </div>
@@ -563,10 +563,10 @@
 
     <article class="dom-card partial">
       <div class="dom-main">
-        <div class="dom-top"><span class="dom-index">10 / 12</span><span class="dom-score">63<span> / 100</span></span></div>
+        <div class="dom-top"><span class="dom-index">10 / 12</span><span class="dom-score">65<span> / 100</span></span></div>
         <span class="status-chip partial">Partial</span>
         <h3>Quality Engineering &amp; Pilot Readiness</h3>
-        <div class="progress-track"><div class="progress-fill partial" style="width: 63%"></div></div>
+        <div class="progress-track"><div class="progress-fill partial" style="width: 65%"></div></div>
       </div>
       <details>
         <summary>Full review</summary>
@@ -576,6 +576,7 @@
             <li>Frontend suite consistently 12,180+/12,190ish tests passing across this program's history, backend 278/278 suites; typecheck/lint/build all clean on both stacks, re-verified repeatedly<span class="conf confirmed">Confirmed</span>.</li>
             <li>Real health checks, Prometheus metrics, and a fully-authored-but-previously-unwired Grafana/alerting stack (12 real dashboards, real scrape config) is now wired into the lightweight app compose file, statically validated (YAML/JSON parse, port collision check)<span class="conf confirmed">Confirmed</span>.</li>
             <li>A known, root-caused flaky-test class (async engine-teardown races) is understood precisely enough to know it is NOT a real regression indicator, re-confirmed present-and-isolated-passing across many rounds<span class="conf confirmed">Confirmed</span>.</li>
+            <li><strong>FOUND AND FIXED 2026-08-08 (Round 44) — a fully-implemented, DI-registered service had zero real callers anywhere in the app, silently making its own health-check counters meaningless.</strong> <code>IncidentReportingService</code> (<code>report/list/updateStatus/checkHealth</code>) is registered in <code>service-registry.ts</code> and its <code>checkHealth()</code> is genuinely invoked by the real, wired <code>/health</code> aggregate (<code>health.routes.ts</code>'s <code>checkServiceHealth()</code>) — but exhaustive whole-repo grep confirmed <code>reportIncident()</code> had zero callers in any controller, service, or frontend client, so its <code>openIncidents</code> count was permanently 0 regardless of real backend errors, and the <code>escalationRecipients</code> count it reports had no actual send logic anywhere. Checked git history to rule out a migration regression (unlike the copilot safety-floor finding in Domain 12) — this was a from-inception gap, not a dropped handler. Wired <code>ApiExceptionFilter</code> — the single global filter every unhandled exception across the whole backend already passes through, already logging/Sentry/telemetry on every 5xx — as its first real caller, mapping severity from HTTP status (500 → <code>critical</code>, other 5xx → <code>high</code>) and threading through <code>correlationId</code>/<code>requestId</code>/route <code>patientId</code> when present. Also bounded the previously-unbounded in-memory <code>incidents</code> array (500-entry cap, matching <code>platform-telemetry.service.ts</code>'s existing <code>apiDurationSamples</code> pattern) since this method now has a real, always-on caller for the first time. 9 new tests (<code>api-exception.filter.spec.ts</code>'s first coverage, plus a new <code>incident-reporting.service.spec.ts</code>) verify severity mapping, patientId extraction, the 4xx-exclusion boundary, and the storage cap. Backend typecheck/build/lint clean; re-verified against the live running app (dev stack restarted to pick up the fix, <code>/health</code>'s <code>incidentReportingService</code> block confirmed still correctly reporting a real, non-fabricated count)<span class="conf confirmed">Confirmed</span>.</li>
           </ul>
           <h4>What is missing</h4>
           <ul>
@@ -583,9 +584,9 @@
             <li>A live <code>docker compose up</code> smoke test has never been run (Docker not installed in this sandbox) — the Prometheus/Grafana wiring is statically valid but operationally unproven.</li>
           </ul>
           <h4>Risks</h4>
-          <p>Everything closeable by code in this domain appears genuinely closed; what remains needs real infrastructure access this program has never had, not more engineering effort of the kind already applied.</p>
+          <p><strong>Corrected 2026-08-08 (Round 44):</strong> the prior claim that "everything closeable by code in this domain appears genuinely closed" was itself wrong — <code>IncidentReportingService</code> was a real, code-closable gap hiding behind DI registration and a passing health check, now fixed (see What works). What remains after that fix does still need real infrastructure access this program has never had, not more engineering effort of the kind already applied.</p>
           <h4>Evidence</h4>
-          <p>Project Scorecard dims 4 and 8 full evidence; this session's own 609/609 test sweep and clean builds.</p>
+          <p>Project Scorecard dims 4 and 8 full evidence; this session's own 609/609 test sweep and clean builds; <code>backend/src/common/filters/api-exception.filter.ts</code>+<code>.spec.ts</code>, <code>backend/src/services/incident-reporting.service.ts</code>+<code>.spec.ts</code>, <code>backend/src/services/service-registry.ts</code>, <code>backend/src/api/health.routes.ts</code> (2026-08-08, Round 44).</p>
           <h4>Required for full marks</h4>
           <p>Real deployment environment: a live compose-up smoke test, a tagged release, a restore drill, published SLOs, and a rehearsed rollback.</p>
         </div>
@@ -731,7 +732,7 @@
     <p>Phase 0 first — G1 is narrower than first scored (a real escalation transition exists; it just needs an out-of-band notification channel added, not built from scratch) but remains the highest-severity finding and is fully code-closable. In parallel, commission the pentest and legal review (G2, G12) since neither blocks or is blocked by code work. Everything else follows the dependency order in the roadmap above.</p>
     <h3>Pilot Gate</h3>
     <p class="verdict-gate">NOT READY FOR PILOT</p>
-    <p>The sibling Project Scorecard's 6 P0 gates (legal/privacy truthfulness, green release validation, clinical release evidence, truth-labels/AI boundaries, accessibility closure, claims/capability registry) remain open, and this audit's own G1 finding (unproven safety-critical escalation) is independently sufficient to block pilot readiness on its own. This is not a software-quality verdict — the underlying engineering (Architecture 88/100, Quality Engineering 63/100) is genuinely strong. It is a pilot-readiness verdict, and those are different questions this scorecard deliberately does not conflate.</p>
+    <p>The sibling Project Scorecard's 6 P0 gates (legal/privacy truthfulness, green release validation, clinical release evidence, truth-labels/AI boundaries, accessibility closure, claims/capability registry) remain open, and this audit's own G1 finding (unproven safety-critical escalation) is independently sufficient to block pilot readiness on its own. This is not a software-quality verdict — the underlying engineering (Architecture 90/100, Quality Engineering 65/100) is genuinely strong. It is a pilot-readiness verdict, and those are different questions this scorecard deliberately does not conflate.</p>
   </div>
 
   <footer>
