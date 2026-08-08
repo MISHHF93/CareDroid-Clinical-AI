@@ -25,16 +25,8 @@ import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVis
 import './ToolPageLayout.css';
 
 const AI_DOCUMENTATION_TOOL_IDS = new Set([
-  'ambient-scribe',
   'calculator-recommender-ai',
   'diagnosis',
-  'differential-ai',
-  'guideline-rag',
-  'ai-explainability',
-  'clinical-audit',
-  'order-set-ai',
-  'patient-summary-ai',
-  'timeline-ai',
   'procedures',
   'protocols',
   'ecg-interpretation-assistant',
@@ -47,6 +39,40 @@ const AI_DOCUMENTATION_TOOL_IDS = new Set([
   'arrhythmia-risk-classifier',
   'remote-cardiology-monitoring-dashboard',
   'cardiology-command-center',
+]);
+/**
+ * The 8 capabilities backed by backend/src/modules/clinical-intelligence/
+ * clinical-intelligence.service.ts (ambient-scribe, differential-ai,
+ * guideline-rag, ai-explainability, clinical-audit, order-set-ai,
+ * patient-summary-ai, timeline-ai) were previously lumped into
+ * AI_DOCUMENTATION_TOOL_IDS above and labeled 'Demo' with the reasoning "no
+ * LLM provider is configured" -- verified 2026-08-08 by direct source read
+ * that this is wrong: the service has zero import of aiService/
+ * unifiedAIClient/any AI provider client anywhere in its ~680 lines. Every
+ * response is keyword-trigger-table matching (buildRankedDifferentials,
+ * matchOrderSetSignals, etc.), or for guideline-rag, real vector retrieval
+ * (RAGService.retrieve()) with an EXTRACTIVE summary step -- never a
+ * generative model call. This is architecturally permanent, not "AI pending
+ * a provider being configured" like the tools above -- the correct,
+ * established convention for this exact shape (see this file's own 6 prior
+ * fixes: Sentinel, HospitalCommandCenter, ContinuousPatientFlow, native-ai
+ * general, AiChief, native-ai triage bridge) is 'Manual', not 'Demo': real
+ * computation on real submitted clinical text, but rule-based, not a
+ * trained model. Removing these ids from AI_DOCUMENTATION_TOOL_IDS also
+ * fixes disclaimerVariantForTool() below, which was showing
+ * AI_DOCUMENTATION_DISCLAIMER_UI's "AI-generated content requires review"
+ * copy -- also false for these tools -- and now correctly falls through to
+ * the generic decision-support disclaimer.
+ */
+const CLINICAL_INTELLIGENCE_DETERMINISTIC_TOOL_IDS = new Set([
+  'ambient-scribe',
+  'differential-ai',
+  'guideline-rag',
+  'ai-explainability',
+  'clinical-audit',
+  'order-set-ai',
+  'patient-summary-ai',
+  'timeline-ai',
 ]);
 const FLEET_TOOL_IDS = new Set(['route-optimizer', 'predictive-maintenance', 'fleet-command', 'dispatch-ai']);
 
@@ -70,6 +96,15 @@ function disclaimerVariantForTool(toolId) {
  * Live, until that changes; deterministic calculators are always Manual.
  */
 export function truthLabelForTool(toolId) {
+  if (CLINICAL_INTELLIGENCE_DETERMINISTIC_TOOL_IDS.has(toolId)) {
+    return {
+      state: 'Manual' as const,
+      sourceContext:
+        toolId === 'guideline-rag'
+          ? 'Clinical Intelligence guideline search — real vector retrieval over indexed guideline documents; summary text is extracted verbatim from retrieved passages, not model-generated'
+          : 'Clinical Intelligence module — deterministic keyword/pattern matching over submitted clinical text, not a trained model',
+    };
+  }
   if (AI_DOCUMENTATION_TOOL_IDS.has(toolId)) {
     return {
       state: 'Demo' as const,
