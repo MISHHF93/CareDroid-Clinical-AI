@@ -5,6 +5,7 @@ import {
   formatRoutingLabel,
   inferTriageFromExpertSystem,
 } from './nativeAiCore';
+import { NATIVE_AI_TRIAGE_RATIONALE_MARKER } from '../components/ai/AiTruthLabel';
 
 const PRIORITY_RANK: Record<Priority, number> = {
   [Priority.P1]: 1,
@@ -29,7 +30,7 @@ export function enrichTriageAssistWithNativeAi(
   const primarySpecialist = snapshot.specialistInferences[0];
   const nativeRationale = [
     ...inference.rationale,
-    `Native AI expert system suggests ${inference.suggestedPriority} (${Math.round(inference.confidence * 100)}% confidence).`,
+    `${NATIVE_AI_TRIAGE_RATIONALE_MARKER} ${inference.suggestedPriority} (${Math.round(inference.confidence * 100)}% confidence).`,
     `Panel-of-experts routing: ${routingLabel}.`,
     primarySpecialist
       ? `${primarySpecialist.specialistLabel}: ${primarySpecialist.prediction} (${Math.round(primarySpecialist.confidence * 100)}%).`

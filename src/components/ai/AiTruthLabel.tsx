@@ -203,6 +203,32 @@ export function continuousPatientFlowRecommendationsTruthLabel(): AiTruthLabelIn
   };
 }
 
+/**
+ * AiTriageAssistPanel.tsx's rationale list had a real overclaiming instance:
+ * src/services/nativeAiTriageBridge.ts's enrichTriageAssistWithNativeAi()
+ * (called unconditionally from buildClientTriageAssist(), so it runs on
+ * every client-built triage assist) injects a rationale line that literally
+ * reads "Native AI expert system suggests ... (NN% confidence)" -- with
+ * nothing on the panel disclosing that inferTriageFromExpertSystem/
+ * buildNativeAiPatientSnapshot are the same deterministic rule engines this
+ * file's other helpers already classify Manual, not a trained model.
+ * TriageAssistEnvelope.source ('rules' | 'rules+llm' | 'rules+oi') can't
+ * distinguish this case, since the native-ai bridge deliberately leaves
+ * `source` untouched (only lib/patient-orchestration's separate, real
+ * mergeLlmTriageEnrichment sets 'rules+llm') -- so the panel detects this
+ * bridge's contribution the same reliable way: by its own first-party
+ * rationale marker string, the only place that exact text is ever written.
+ */
+export const NATIVE_AI_TRIAGE_RATIONALE_MARKER = 'Native AI expert system suggests';
+
+export function nativeAiTriageBridgeTruthLabel(): AiTruthLabelInfo {
+  return {
+    state: 'Manual',
+    sourceContext: 'Native-AI expert-system triage signal — rule-based inference, not a trained model',
+    reviewRequired: true,
+  };
+}
+
 export type AiTruthLabelProps = AiTruthLabelInfo & {
   compact?: boolean;
   className?: string;

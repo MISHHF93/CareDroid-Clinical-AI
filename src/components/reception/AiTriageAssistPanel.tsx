@@ -13,6 +13,11 @@ import { CARE_STREAMING_LANES } from '../../config/edOperationalStandards';
 import { priorityToEsiLabel } from '../../config/edOperationalStandards';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { Priority } from '../../types/emergency';
+import {
+  AiTruthLabel,
+  NATIVE_AI_TRIAGE_RATIONALE_MARKER,
+  nativeAiTriageBridgeTruthLabel,
+} from '../ai/AiTruthLabel';
 import { RECEPTION_COPY } from './receptionCopy';
 import './AiTriageAssistPanel.css';
 
@@ -101,6 +106,9 @@ export default function AiTriageAssistPanel({
 
   const sourceLabel =
     patient.source === 'Self-arrival' ? 'Self-arrival check-in' : assist.source || 'Rules engine';
+  const hasNativeAiRationale = assist.rationale.some((line) =>
+    line.startsWith(NATIVE_AI_TRIAGE_RATIONALE_MARKER),
+  );
 
   return (
     <section
@@ -156,6 +164,10 @@ export default function AiTriageAssistPanel({
           <li key={line}>{line}</li>
         ))}
       </ul>
+
+      {hasNativeAiRationale ? (
+        <AiTruthLabel {...nativeAiTriageBridgeTruthLabel()} compact />
+      ) : null}
 
       {assist.operationalContext?.queuePressure ? (
         <p className="ai-triage-assist__context">
