@@ -381,14 +381,6 @@ export function buildDeteriorationWatchAlerts(
     }));
 }
 
-export const DETERIORATION_WATCH_SURFACES = Object.freeze([
-  'waiting-room-board',
-  'whiteboard',
-  'notification-center',
-  'patient-card',
-  'reception-queues',
-]);
-
 export type DeteriorationWatchAttentionRow = {
   patientId: string;
   displayName: string;
@@ -461,47 +453,3 @@ export function buildDeteriorationWatchAttentionSnapshot(
   };
 }
 
-export type DeteriorationWatchLayerStore = {
-  patients?: Patient[];
-  emsArrivals?: EMSArrival[];
-  dispatchWebSocketEvent?: (event: {
-    type: string;
-    payload: Record<string, unknown>;
-  }) => void;
-};
-
-/** Broadcast deterioration watch snapshot to connected operational surfaces. */
-export function syncDeteriorationWatchOperationalSurfaces(
-  store: DeteriorationWatchLayerStore,
-  options: { patientId?: string; source?: string } = {},
-): DeteriorationWatchAttentionSnapshot {
-  const snapshot = buildDeteriorationWatchAttentionSnapshot(store.patients || [], {
-    emsArrivals: store.emsArrivals,
-  });
-
-  store.dispatchWebSocketEvent?.({
-    type: 'deterioration_watch_sync',
-    payload: {
-      patientId: options.patientId || null,
-      source: options.source || 'deterioration-watch',
-      surfaces: [...DETERIORATION_WATCH_SURFACES],
-      summary: {
-        activeCount: snapshot.activeCount,
-        reviewAndUrgentCount: snapshot.reviewAndUrgentCount,
-        counts: snapshot.counts,
-      },
-      rows: snapshot.rows.map((row) => ({
-        patientId: row.patientId,
-        displayName: row.displayName,
-        level: row.level,
-        label: row.label,
-        tone: row.tone,
-        factorIds: row.factorIds,
-        advisoryOnly: true,
-      })),
-      generatedAt: new Date().toISOString(),
-    },
-  });
-
-  return snapshot;
-}

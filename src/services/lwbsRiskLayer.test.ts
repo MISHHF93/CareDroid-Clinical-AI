@@ -6,8 +6,6 @@ import {
   resolveLwbsRisk,
   shouldSurfaceLwbsRisk,
   summarizeLwbsRiskBoard,
-  syncLwbsRiskOperationalSurfaces,
-  LWBS_RISK_SURFACES,
 } from './lwbsRiskLayer';
 
 const STABLE_NOW = new Date('2026-06-20T22:30:00.000Z');
@@ -128,8 +126,7 @@ describe('lwbsRiskLayer', () => {
     expect(summary.elevated).toBe(1);
   });
 
-  it('builds attention snapshot and syncs advisory surfaces', () => {
-    const events: Array<{ type: string; payload: Record<string, unknown> }> = [];
+  it('builds attention snapshot for the waiting-room board and other real consumers', () => {
     const snapshot = buildLwbsRiskAttentionSnapshot(
       [buildPatient()],
       { now: STABLE_NOW, waitingPatientCount: 18 },
@@ -137,18 +134,5 @@ describe('lwbsRiskLayer', () => {
 
     expect(snapshot.elevatedAndHighCount).toBeGreaterThan(0);
     expect(snapshot.previewRows[0]?.level).toBe('elevated');
-
-    syncLwbsRiskOperationalSurfaces(
-      {
-        patients: [buildPatient()],
-        dispatchWebSocketEvent: (event) => events.push(event),
-      },
-      { patientId: 'patient-1', source: 'test' },
-    );
-
-    expect(events).toHaveLength(1);
-    expect(events[0]?.type).toBe('lwbs_risk_sync');
-    expect(events[0]?.payload.surfaces).toEqual([...LWBS_RISK_SURFACES]);
-    expect(events[0]?.payload.rows?.[0]).toMatchObject({ advisoryOnly: true });
   });
 });

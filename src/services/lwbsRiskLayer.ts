@@ -372,14 +372,6 @@ export function shouldSurfaceLwbsRisk(snapshot: LwbsRiskSnapshot | null | undefi
   return snapshot.level !== 'low';
 }
 
-export const LWBS_RISK_SURFACES = Object.freeze([
-  'waiting-room-board',
-  'whiteboard',
-  'notification-center',
-  'patient-card',
-  'command-center',
-]);
-
 export type LwbsRiskAttentionRow = {
   patientId: string;
   displayName: string;
@@ -455,50 +447,3 @@ export function buildLwbsRiskAttentionSnapshot(
   };
 }
 
-export type LwbsRiskLayerStore = {
-  patients?: Patient[];
-  workflowLogs?: WorkflowActionLog[];
-  staff?: Staff[];
-  dispatchWebSocketEvent?: (event: {
-    type: string;
-    payload: Record<string, unknown>;
-  }) => void;
-};
-
-/** Broadcast LWBS advisory snapshot to connected operational surfaces. */
-export function syncLwbsRiskOperationalSurfaces(
-  store: LwbsRiskLayerStore,
-  options: { patientId?: string; source?: string } = {},
-): LwbsRiskAttentionSnapshot {
-  const snapshot = buildLwbsRiskAttentionSnapshot(store.patients || [], {
-    workflowLogs: store.workflowLogs,
-    staff: store.staff,
-  });
-
-  store.dispatchWebSocketEvent?.({
-    type: 'lwbs_risk_sync',
-    payload: {
-      patientId: options.patientId || null,
-      source: options.source || 'lwbs-risk-layer',
-      surfaces: [...LWBS_RISK_SURFACES],
-      summary: {
-        waitingCount: snapshot.waitingCount,
-        elevatedAndHighCount: snapshot.elevatedAndHighCount,
-        counts: snapshot.counts,
-      },
-      rows: snapshot.rows.map((row) => ({
-        patientId: row.patientId,
-        displayName: row.displayName,
-        score: row.score,
-        level: row.level,
-        label: row.label,
-        tone: row.tone,
-        factorIds: row.factorIds,
-        advisoryOnly: true,
-      })),
-      generatedAt: new Date().toISOString(),
-    },
-  });
-
-  return snapshot;
-}

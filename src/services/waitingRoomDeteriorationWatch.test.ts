@@ -6,8 +6,6 @@ import {
   resolveDeteriorationWatch,
   shouldSurfaceDeteriorationWatch,
   summarizeDeteriorationWatchBoard,
-  syncDeteriorationWatchOperationalSurfaces,
-  DETERIORATION_WATCH_SURFACES,
 } from './waitingRoomDeteriorationWatch';
 
 const STABLE_NOW = new Date('2026-06-20T10:30:00.000Z');
@@ -140,26 +138,12 @@ describe('waitingRoomDeteriorationWatch', () => {
     expect(summary['urgent-review'] + summary['review-needed'] + summary.watch).toBeGreaterThan(0);
   });
 
-  it('builds attention snapshot and syncs advisory surfaces', () => {
-    const events: Array<{ type: string; payload: Record<string, unknown> }> = [];
+  it('builds attention snapshot for the waiting-room board and other real consumers', () => {
     const snapshot = buildDeteriorationWatchAttentionSnapshot([buildPatient()], {
       now: STABLE_NOW,
     });
 
     expect(snapshot.activeCount).toBeGreaterThan(0);
     expect(snapshot.reviewAndUrgentCount).toBeGreaterThan(0);
-
-    syncDeteriorationWatchOperationalSurfaces(
-      {
-        patients: [buildPatient()],
-        dispatchWebSocketEvent: (event) => events.push(event),
-      },
-      { patientId: 'patient-1', source: 'test' },
-    );
-
-    expect(events).toHaveLength(1);
-    expect(events[0]?.type).toBe('deterioration_watch_sync');
-    expect(events[0]?.payload.surfaces).toEqual([...DETERIORATION_WATCH_SURFACES]);
-    expect(events[0]?.payload.rows?.[0]).toMatchObject({ advisoryOnly: true });
   });
 });
