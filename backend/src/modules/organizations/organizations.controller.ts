@@ -17,6 +17,8 @@ import { TenantIsolationGuard } from '../tenant-context/tenant-isolation.guard';
 import { OrganizationScoped, SkipTenantIsolation } from '../tenant-context/tenant-scope.decorator';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
+import { UpdateOrganizationSettingsDto } from './dto/update-organization-settings.dto';
+import { UpdateTenantAdministrationDto } from './dto/update-tenant-administration.dto';
 import { UpdateFeatureFlagsDto } from './dto/update-feature-flags.dto';
 import { OrganizationOnboardingService } from './organization-onboarding.service';
 import { OrganizationsService } from './organizations.service';
@@ -98,10 +100,10 @@ export class OrganizationsController {
   async updateTenantAdministration(
     @Req() req: any,
     @Param('organizationId') organizationId: string,
-    @Body() dto: Record<string, unknown>,
+    @Body() dto: UpdateTenantAdministrationDto,
   ) {
     this.assertTenantOrganization(req, organizationId);
-    return this.organizationsService.updateTenantAdministration(req.user, organizationId, dto);
+    return this.organizationsService.updateTenantAdministration(req.user, organizationId, { ...dto });
   }
 
   @Get(':organizationId/feature-flags')
@@ -142,10 +144,10 @@ export class OrganizationsController {
   async updateSettings(
     @Req() req: any,
     @Param('organizationId') organizationId: string,
-    @Body() dto: Record<string, unknown>,
+    @Body() dto: UpdateOrganizationSettingsDto,
   ) {
     this.assertTenantOrganization(req, organizationId);
-    return this.organizationsService.updateOrganizationSettings(req.user, organizationId, dto);
+    return this.organizationsService.updateOrganizationSettings(req.user, organizationId, { ...dto });
   }
 
   private assertTenantOrganization(req: any, organizationId: string) {

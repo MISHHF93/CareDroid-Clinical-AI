@@ -253,20 +253,36 @@ function findUnvalidatedBodyParams(backendRoot: string): string[] {
 // entries as "large nested settings blob," but on direct read its service
 // method (FeatureFlagService.applyUpdate) takes a small, already-typed,
 // flat 7-field interface (FeatureFlagUpdateInput), not a settings blob --
-// the deferral reason didn't actually apply to this one route. The other 6
-// remain deliberately deferred: 3 EmergencyOsController patient-creation
-// routes have real, live divergent-shape callers (roadmap item #18, open
-// since Cycle 191); EmergencyOsController.updateSettings and
-// OrganizationsController's updateSettings/updateTenantAdministration take
-// genuinely large, multi-section nested settings contracts that deserve
-// their own dedicated DTO-building cycle, not a drive-by.
+// the deferral reason didn't actually apply to this one route.
+//
+// 2026-08-08 (Round 31): closed the other 2 OrganizationsController routes
+// this comment previously deferred (updateSettings/updateTenantAdministration).
+// Re-checked the "genuinely large, multi-section nested settings contract"
+// deferral reason against the real read/write shape in
+// OrganizationsService.updateOrganizationSettings/updateTenantAdministration
+// plus every real frontend caller (OrganizationPages.tsx's saveOrganization
+// and tenant-admin save(), emergencySettingsApi.tsx's
+// saveOrganizationEmergencyOsSettings) -- unlike EmergencyOsController.
+// updateSettings's ~12-section EmergencyOsSettingsPatch (still deliberately
+// open), both routes' actual field set is finite and enumerable (name/
+// organizationType/country/branding/settings/subscription/integrations for
+// the settings route; that plus departments/integrationsRequested/
+// enabled*Ids/workspaceDefaults/permissionsOverrides/navigation/
+// dashboardLayout for tenant-admin), just permissively typed as loose nested
+// objects/arrays rather than deep-validated -- matching this baseline's own
+// established "formalize the intended shape, don't deep-validate free-form
+// blobs" precedent from the governance/clinical-intelligence DTO cycles. See
+// backend/src/modules/organizations/dto/update-organization-settings.dto.ts
+// and update-tenant-administration.dto.ts's headers for the full field-by-
+// field evidence trail. 4 remain deliberately deferred: EmergencyOsController's
+// 3 patient-creation routes (roadmap item #18, open since Cycle 191) and its
+// updateSettings (the genuinely large nested contract this round's routes
+// were re-checked against and found NOT to match).
 const BASELINE: string[] = [
   'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.createIntakePatient',
   'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.createPatient',
   'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.createSmartIntakeVerticalSlice',
   'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.updateSettings',
-  'src/modules/organizations/organizations.controller.ts :: OrganizationsController.updateSettings',
-  'src/modules/organizations/organizations.controller.ts :: OrganizationsController.updateTenantAdministration',
 ].sort();
 
 describe('body validation coverage (Cycle 241)', () => {
