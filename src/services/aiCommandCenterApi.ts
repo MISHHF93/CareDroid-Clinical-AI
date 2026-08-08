@@ -222,6 +222,42 @@ function buildWarnings(results) {
     .slice(0, 3);
 }
 
+/**
+ * Mirrors AiEvaluationDashboard.tsx's honesty logic exactly. Previously this
+ * snapshot silently dropped EvaluationDashboard.honesty entirely, so
+ * AiCommandCenterDashboard.tsx showed an unconditional "LIVE" source notice
+ * based only on whether the HTTP call succeeded -- not on whether the
+ * underlying evaluation aggregate was seed-only. Defaults to seedOnly: true
+ * (the safe default) when honesty is absent, same as the eval dashboard.
+ */
+function buildEvaluationHonesty(evaluationDashboard) {
+  const honesty = evaluationDashboard?.honesty as
+    | {
+        aggregateIsSeedOnly?: boolean;
+        measuredRunCount?: number;
+        seedRunCount?: number;
+        measuredSource?: string;
+        guidance?: string;
+      }
+    | undefined;
+  const measuredRunCount = honesty?.measuredRunCount ?? 0;
+  const seedOnly = honesty?.aggregateIsSeedOnly !== false && !(measuredRunCount > 0);
+  return {
+    seedOnly,
+    measuredRunCount,
+    seedRunCount:
+      honesty?.seedRunCount ??
+      (Array.isArray(evaluationDashboard?.runs)
+        ? evaluationDashboard.runs.filter((run) => run.seedOnly !== false).length
+        : 0),
+    guidance:
+      honesty?.guidance ||
+      (seedOnly
+        ? 'Evaluation aggregates may be SEED-ONLY demo values. Run `npm run ai:eval` for measured results.'
+        : 'Evaluation API connected with measured offline harness runs preferred in aggregates.'),
+  };
+}
+
 export async function fetchAiCommandCenterSnapshot() {
   const [evaluationResult, memoryResult, costResult, auditResult, unifiedNodeResult] =
     await Promise.all([
@@ -257,11 +293,14 @@ export async function fetchAiCommandCenterSnapshot() {
     typeof unifiedNode.scores?.artifactRouterAccuracy === 'number'
       ? (unifiedNode.scores.nluAccuracy + unifiedNode.scores.artifactRouterAccuracy) / 2
       : null);
+  const evaluationHonesty = buildEvaluationHonesty(evaluationDashboard);
 
   return {
     ok: warnings.length === 0,
     generatedAt: new Date().toISOString(),
     warnings,
+    /** Never true when the evaluation aggregate feeding this snapshot is seed-only -- see buildEvaluationHonesty(). */
+    evaluationHonesty,
     sourceStatus: {
       evaluation: evaluationResult.ok ? 'live' : 'fallback',
       memory: memoryResult.ok ? 'live' : 'fallback',

@@ -134,4 +134,72 @@ describe('EvaluationService', () => {
       expect(after.honesty?.aggregateIsSeedOnly).toBe(false);
     });
   });
+
+  // 2026-08-08: the canonical AI Core Node evaluation-metric taxonomy
+  // (MEASURED/HUMAN_REVIEWED/DERIVED/HEURISTIC/SYNTHETIC/SEED_ONLY/UNKNOWN,
+  // lib/ai/provenanceContract.ts), added as a strict superset of the
+  // existing seedOnly boolean. Regression coverage for a second instance of
+  // the same class of bug this file already guards: an unrecognized or
+  // omitted provenance must never resolve to MEASURED, and a bare
+  // `seedOnly: false` claim with no real counted evidence (rawScores) behind
+  // it must not silently earn MEASURED status either.
+  describe('evaluation metric provenance taxonomy (2026-08-08)', () => {
+    it('defaults an unlabeled run to UNKNOWN, not SEED_ONLY or MEASURED', () => {
+      const run = service.createRun({ modelName: 'unlabeled-caller' });
+      expect(run.provenance).toBe('UNKNOWN');
+      expect(run.seedOnly).toBe(true);
+    });
+
+    it('a bare seedOnly:false claim with no rawScores resolves to UNKNOWN, not MEASURED', () => {
+      const run = service.createRun({
+        modelName: 'unverified-claim',
+        seedOnly: false,
+        metrics: { accuracy: 0.99 },
+      });
+      expect(run.provenance).toBe('UNKNOWN');
+      // Still excluded from the promotion-eligible pool despite the
+      // seedOnly:false claim -- UNKNOWN never enters the measured pool.
+      expect(run.seedOnly).toBe(true);
+    });
+
+    it('seedOnly:false WITH rawScores (real counted evidence) resolves to MEASURED', () => {
+      const run = service.createRun({
+        modelName: 'real-harness-run',
+        seedOnly: false,
+        rawScores: { correctAnswers: 9, totalAnswers: 10 },
+      });
+      expect(run.provenance).toBe('MEASURED');
+      expect(run.seedOnly).toBe(false);
+    });
+
+    it('an explicit provenance value is honored directly, without needing seedOnly at all', () => {
+      const run = service.createRun({ modelName: 'reviewed-run', provenance: 'HUMAN_REVIEWED' });
+      expect(run.provenance).toBe('HUMAN_REVIEWED');
+      expect(run.seedOnly).toBe(false);
+    });
+
+    it('an invalid/unrecognized provenance string is ignored, not trusted', () => {
+      const run = service.createRun({
+        modelName: 'bad-input',
+        provenance: 'TOTALLY_MADE_UP' as any,
+      });
+      expect(run.provenance).toBe('UNKNOWN');
+      expect(run.seedOnly).toBe(true);
+    });
+
+    it('SEED_ONLY, HEURISTIC, SYNTHETIC, and DERIVED are all excluded from the promotion-eligible pool', () => {
+      for (const provenance of ['SEED_ONLY', 'HEURISTIC', 'SYNTHETIC', 'DERIVED'] as const) {
+        const run = service.createRun({ modelName: `run-${provenance}`, provenance });
+        expect(run.provenance).toBe(provenance);
+        expect(run.seedOnly).toBe(true);
+      }
+    });
+
+    it('every bootstrap seed run is explicitly labeled SEED_ONLY, never left to a default', () => {
+      const dashboard = service.getDashboard();
+      const bootstrapSeeds = dashboard.runs.filter((run) => run.id.startsWith('evaluation-run-'));
+      expect(bootstrapSeeds.length).toBeGreaterThan(0);
+      expect(bootstrapSeeds.every((run) => run.provenance === 'SEED_ONLY')).toBe(true);
+    });
+  });
 });

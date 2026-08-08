@@ -66,8 +66,17 @@ export interface EvaluationRun {
   evaluatedAt: string;
   notes?: string;
   /**
+   * The canonical AI Core Node evaluation-metric taxonomy
+   * (lib/ai/provenanceContract.ts). Added 2026-08-08 as a strict superset of
+   * `seedOnly` below -- `seedOnly` is now DERIVED from this field
+   * (`!isPromotionEligibleEvaluationProvenance(provenance)`), kept for
+   * backward compatibility with existing consumers rather than removed.
+   */
+  provenance: EvaluationMetricProvenance;
+  /**
    * When true, metrics are demo seeds — not measured offline/live eval.
    * Prefer seedOnly=false runs (e.g. ai-eval-run harness) for promotion decisions.
+   * @deprecated Derived from `provenance`; read `provenance` directly for new code.
    */
   seedOnly?: boolean;
   /** Path or id of measured source (e.g. qa/ai-eval/results/latest.json) */
@@ -92,7 +101,20 @@ export interface EvaluationRawScores {
   costUsd?: number;
 }
 
-import { IsBoolean, IsIn, IsNumber, IsObject, IsOptional, IsString, MaxLength, Min } from 'class-validator';
+import {
+  IsBoolean,
+  IsIn,
+  IsNumber,
+  IsObject,
+  IsOptional,
+  IsString,
+  MaxLength,
+  Min,
+} from 'class-validator';
+import {
+  EVALUATION_METRIC_PROVENANCE_VALUES,
+  type EvaluationMetricProvenance,
+} from '../../../../lib/ai/provenanceContract';
 
 export class CreateEvaluationRunDto {
   // Defaults to true in EvaluationService.createRun() -- unlike request DTOs
@@ -108,6 +130,13 @@ export class CreateEvaluationRunDto {
   @IsOptional()
   @IsBoolean()
   seedOnly?: boolean;
+
+  // Prefer this over seedOnly for new callers -- the full 7-value taxonomy.
+  // Never resolved to MEASURED just because this is omitted; see
+  // EvaluationService.resolveProvenance().
+  @IsOptional()
+  @IsIn(EVALUATION_METRIC_PROVENANCE_VALUES)
+  provenance?: EvaluationMetricProvenance;
 
   @IsOptional()
   @IsString()

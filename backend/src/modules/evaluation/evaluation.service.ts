@@ -15,6 +15,11 @@ import {
   EvaluationRun,
   EvaluationTrendPoint,
 } from './evaluation.types';
+import {
+  isEvaluationMetricProvenance,
+  isPromotionEligibleEvaluationProvenance,
+  type EvaluationMetricProvenance,
+} from '../../../../lib/ai/provenanceContract';
 
 const METRIC_DEFINITIONS: EvaluationMetricDefinition[] = [
   {
@@ -170,6 +175,7 @@ export class EvaluationService {
       ...rawMetrics,
       ...(dto.metrics || {}),
     });
+    const provenance = this.resolveProvenance(dto, Boolean(dto.rawScores));
 
     const run: EvaluationRun = {
       id: randomUUID(),
@@ -183,14 +189,33 @@ export class EvaluationService {
       metrics,
       evaluatedAt: new Date().toISOString(),
       notes: dto.notes,
-      // Safe-by-default: a run is only counted as measured (seedOnly: false)
-      // when a caller explicitly asserts it. See CreateEvaluationRunDto's
-      // own comment for why this can't default the other way.
-      seedOnly: dto.seedOnly ?? true,
+      provenance,
+      // Derived from provenance, kept for backward compat -- see
+      // isPromotionEligibleEvaluationProvenance().
+      seedOnly: !isPromotionEligibleEvaluationProvenance(provenance),
     };
 
     this.runs.unshift(run);
     return run;
+  }
+
+  /**
+   * Resolves the canonical 7-value provenance for a caller-supplied run.
+   * Safe-by-default in every direction: an unrecognized/omitted
+   * `dto.provenance` never resolves to MEASURED, and legacy `seedOnly:
+   * false` callers only earn MEASURED when they also supplied `rawScores`
+   * (real counted numerator/denominator evidence) -- a bare `seedOnly:
+   * false` with only opaque `metrics` literals is UNKNOWN, not MEASURED,
+   * since nothing was actually verified.
+   */
+  private resolveProvenance(
+    dto: CreateEvaluationRunDto,
+    hasRawScores: boolean,
+  ): EvaluationMetricProvenance {
+    if (isEvaluationMetricProvenance(dto.provenance)) return dto.provenance;
+    if (dto.seedOnly === false) return hasRawScores ? 'MEASURED' : 'UNKNOWN';
+    if (dto.seedOnly === true) return 'SEED_ONLY';
+    return 'UNKNOWN';
   }
 
   private aggregateMetrics(runs: EvaluationRun[]): EvaluationMetrics {
@@ -494,6 +519,7 @@ export class EvaluationService {
             raw.notes ||
               'Measured offline fixtures from npm run ai:eval — not seeded DEFAULT_METRICS',
           ),
+          provenance: 'MEASURED',
           seedOnly: false,
           measuredSource: 'qa/ai-eval/results/dashboard-run.latest.json',
         };
@@ -615,6 +641,7 @@ export class EvaluationService {
       evaluatedAt: new Date(now - index * 7 * day).toISOString(),
       notes:
         'SEED ONLY — demo trend data. Not measured. Use npm run ai:eval for authoritative offline safety metrics.',
+      provenance: 'SEED_ONLY' as const,
       seedOnly: true,
     }));
   }

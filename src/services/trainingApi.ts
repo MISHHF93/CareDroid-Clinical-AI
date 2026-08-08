@@ -71,19 +71,30 @@ export const LOCAL_TRAINING_DASHBOARD = Object.freeze({
     costUsd: 12.45,
   },
   qualityGates: [
-    { id: 'accuracy', label: 'Accuracy', passed: true, threshold: '>= 90%', observed: '91%' },
+    { id: 'accuracy', label: 'Accuracy', passed: true, threshold: '>= 90%', observed: '91%', applicable: true },
     {
       id: 'hallucination-rate',
       label: 'Hallucination Rate',
       passed: true,
       threshold: '<= 5%',
       observed: '4%',
+      applicable: true,
     },
-    { id: 'precision', label: 'Precision', passed: true, threshold: '>= 85%', observed: '88%' },
-    { id: 'latency', label: 'Latency', passed: true, threshold: '<= 1200ms', observed: '820ms' },
-    { id: 'cost', label: 'Cost', passed: true, threshold: '<= $25/run', observed: '$12.45' },
+    { id: 'precision', label: 'Precision', passed: true, threshold: '>= 85%', observed: '88%', applicable: true },
+    { id: 'latency', label: 'Latency', passed: true, threshold: '<= 1200ms', observed: '820ms', applicable: true },
+    { id: 'cost', label: 'Cost', passed: true, threshold: '<= $25/run', observed: '$12.45', applicable: true },
   ],
   runs: [],
+  // Local fallback only (API disabled/unreachable) -- these are hardcoded
+  // demo literals, never real measured evaluation runs. Mirrors
+  // EvaluationDashboard.honesty / evaluationApi.ts's LOCAL_EVALUATION_DASHBOARD.
+  honesty: {
+    aggregateIsPromotionEligible: false,
+    promotionEligibleRunCount: 0,
+    otherRunCount: 0,
+    guidance:
+      'Local fallback dashboard (API disabled or unreachable) -- these are hardcoded demo numbers, not measured evaluation runs. Do not use for model promotion decisions.',
+  },
 });
 
 export async function fetchTrainingDashboard() {

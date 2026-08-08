@@ -214,12 +214,16 @@ export default function AiCommandCenterDashboard() {
           title="AI command center source state"
           states={
             snapshot.ok
-              ? [DEMO_LIVE_STATES.LIVE]
+              ? snapshot.evaluationHonesty?.seedOnly
+                ? [DEMO_LIVE_STATES.DEMO, DEMO_LIVE_STATES.LIVE]
+                : [DEMO_LIVE_STATES.LIVE]
               : [DEMO_LIVE_STATES.LIVE, DEMO_LIVE_STATES.BACKEND_UNAVAILABLE]
           }
           details={
             snapshot.ok
-              ? 'All evaluation, memory, cost, and audit sources connected.'
+              ? snapshot.evaluationHonesty?.seedOnly
+                ? `All sources connected, but evaluation metrics below are SEED-ONLY demo values (${snapshot.evaluationHonesty.guidance})`
+                : 'All evaluation, memory, cost, and audit sources connected with measured evaluation data.'
               : 'One or more sources fell back to local data. See warnings below.'
           }
         />

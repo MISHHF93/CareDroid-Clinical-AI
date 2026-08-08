@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS } from '../../navigation/iconRegistry';
 import { CareDroidPage, DashboardGrid, MetricCard } from '../../components/ui/CareDroidPrimitives';
+import { AiMaturityBadge } from '../../components/ai/AiMaturityBadge';
 import {
   LOCAL_TRAINING_DASHBOARD,
   createTrainingRun,
@@ -50,11 +51,16 @@ function PipelineStage({ stage, index }) {
 }
 
 function QualityGate({ gate }) {
+  const applicable = gate.applicable !== false;
   return (
-    <article className="training-gate" data-passed={gate.passed ? 'true' : 'false'}>
+    <article
+      className="training-gate"
+      data-passed={applicable && gate.passed ? 'true' : 'false'}
+      data-applicable={applicable ? 'true' : 'false'}
+    >
       <strong>{gate.label}</strong>
       <span>{gate.observed}</span>
-      <small>{gate.threshold}</small>
+      <small>{applicable ? gate.threshold : 'gate not applicable to this run type'}</small>
     </article>
   );
 }
@@ -85,6 +91,8 @@ export default function TrainingDashboard() {
 
   const metrics = dashboard.aggregateMetrics || LOCAL_TRAINING_DASHBOARD.aggregateMetrics;
   const pipeline = dashboard.pipeline || LOCAL_TRAINING_DASHBOARD.pipeline;
+  const honesty = dashboard.honesty || LOCAL_TRAINING_DASHBOARD.honesty;
+  const promotionEligible = Boolean(honesty?.aggregateIsPromotionEligible);
   const latestRun = dashboard.runs?.[0];
   const activeStage = latestRun ? stageIndex(latestRun.currentStage, pipeline) : 0;
   const progress = useMemo(
@@ -126,13 +134,34 @@ export default function TrainingDashboard() {
         </button>
       }
       zones={{
-        operationalSummary: notice ? (
-          <p className="training-notice cdl-ai-panel cd-info-notice cd-info-notice--ai">{notice}</p>
-        ) : null,
+        operationalSummary: (
+          <>
+            {notice ? (
+              <p className="training-notice cdl-ai-panel cd-info-notice cd-info-notice--ai">{notice}</p>
+            ) : null}
+            <p
+              className={`training-notice cdl-ai-panel cd-info-notice ${promotionEligible ? 'cd-info-notice--ai' : 'cd-info-notice--warning'}`}
+            >
+              <AiMaturityBadge kind={promotionEligible ? 'measured' : 'seed'} compact />{' '}
+              {honesty?.guidance ||
+                'Aggregate metrics and quality gates below reflect seed/demo data only. Do not use for model promotion decisions.'}
+            </p>
+          </>
+        ),
         analytics: (
           <DashboardGrid variant="metrics" className="training-metrics" aria-label="Evaluation metrics">
-            <MetricCard label="Accuracy" value={formatMetric('accuracy', metrics.accuracy)} tone="healthy" />
-            <MetricCard label="Hallucination rate" value={formatMetric('hallucinationRate', metrics.hallucinationRate)} tone="attention" />
+            <MetricCard
+              label="Accuracy"
+              value={formatMetric('accuracy', metrics.accuracy)}
+              tone="healthy"
+              helper={promotionEligible ? undefined : 'Not promotion-eligible'}
+            />
+            <MetricCard
+              label="Hallucination rate"
+              value={formatMetric('hallucinationRate', metrics.hallucinationRate)}
+              tone="attention"
+              helper={promotionEligible ? undefined : 'Not promotion-eligible'}
+            />
             <MetricCard label="Precision" value={formatMetric('precision', metrics.precision)} />
             <MetricCard label="Latency" value={formatMetric('latencyMs', metrics.latencyMs)} />
             <MetricCard label="Cost" value={formatMetric('costUsd', metrics.costUsd)} />

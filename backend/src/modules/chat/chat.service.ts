@@ -1206,6 +1206,12 @@ export class ChatService {
       datasetName: 'assistant-live-turns',
       sampleCount: 1,
       seedOnly: true,
+      // The canonical AI Core Node taxonomy (lib/ai/provenanceContract.ts):
+      // HEURISTIC, not UNKNOWN/SEED_ONLY -- this run's headline metrics
+      // really are computed by a documented, if crude, proxy formula
+      // (citations.length/toolStatus), not left unlabeled or presented as
+      // demo data.
+      provenance: 'HEURISTIC',
       metrics: {
         hallucinationRate: citations.length > 0 ? 0.02 : 0.05,
         accuracy: typeof params.response.confidence === 'number' ? params.response.confidence : 0.9,

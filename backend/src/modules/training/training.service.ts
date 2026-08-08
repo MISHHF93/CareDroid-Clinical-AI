@@ -13,7 +13,14 @@ import {
   TrainingPipelineStage,
   TrainingRun,
 } from './training.types';
+import {
+  isEvaluationMetricProvenance,
+  isPromotionEligibleEvaluationProvenance,
+} from '../../../../lib/ai/provenanceContract';
 
+// Demo/bootstrap-only defaults. NEVER treat as measured production quality
+// -- mirrors evaluation.service.ts's own DEFAULT_METRICS disclaimer, which
+// this module structurally duplicates.
 const DEFAULT_METRICS: TrainingEvaluationMetrics = {
   accuracy: 0.91,
   hallucinationRate: 0.04,
@@ -37,6 +44,11 @@ export class TrainingService implements OnModuleInit {
       createdAt: new Date(Date.now() - 86_400_000).toISOString(),
       updatedAt: new Date(Date.now() - 3_600_000).toISOString(),
       deploymentTarget: 'intent-classifier',
+      modelType: 'classifier',
+      // Overwritten to MEASURED by syncHeadMetrics() at boot if a real
+      // ml-services/models/nlu/metrics.json is found; SYNTHETIC (these
+      // hardcoded literals) until then.
+      provenance: 'SYNTHETIC',
     },
     {
       id: 'training-run-artifact-router',
@@ -49,6 +61,8 @@ export class TrainingService implements OnModuleInit {
       createdAt: new Date(Date.now() - 86_400_000).toISOString(),
       updatedAt: new Date(Date.now() - 3_600_000).toISOString(),
       deploymentTarget: 'unified-ai-node',
+      modelType: 'classifier',
+      provenance: 'SYNTHETIC',
     },
   ];
 
@@ -91,12 +105,23 @@ export class TrainingService implements OnModuleInit {
       run.metrics = {
         accuracy: raw.accuracy ?? run.metrics.accuracy,
         precision: raw.macroPrecision ?? raw.macroF1 ?? run.metrics.precision,
-        hallucinationRate: Math.max(0, 1 - (raw.macroF1 ?? raw.accuracy ?? 0.85)),
+        // Classifiers (NLU intent routing, artifact-type routing) have no
+        // free-text generation step, so "hallucination rate" isn't a
+        // meaningful measurement for them at all -- this used to compute
+        // `1 - macroF1`, a category error (reusing a routing-accuracy score
+        // as a hallucination proxy), not just an imprecise estimate. Left
+        // unchanged here; buildQualityGates() marks this gate inapplicable
+        // for classifier-only aggregates instead of showing a fabricated
+        // pass/fail.
+        hallucinationRate: run.metrics.hallucinationRate,
         latencyMs: raw.latencyMs?.p50 ?? raw.latencyMs?.mean ?? run.metrics.latencyMs,
         costUsd: 0,
       };
       run.datasetName = `${head}-test-${raw.testSetSize ?? 'unknown'}${raw.targetMode ? `-${raw.targetMode}` : ''}`;
       run.updatedAt = new Date().toISOString();
+      // accuracy/precision above are now real held-out test-set metrics
+      // read from ml-services/models/<head>/metrics.json, not literals.
+      run.provenance = 'MEASURED';
       this.logger.log(
         `Synced ${head} metrics (accuracy=${run.metrics.accuracy}, latencyMs=${run.metrics.latencyMs})`,
       );
@@ -216,7 +241,23 @@ export class TrainingService implements OnModuleInit {
 
   getDashboard(): TrainingDashboard {
     const runs = this.getRuns();
-    const aggregateMetrics = this.aggregateMetrics(runs);
+    const scoredRuns = runs.filter((run) => run.metrics.accuracy > 0);
+    const eligibleRuns = scoredRuns.filter((run) =>
+      isPromotionEligibleEvaluationProvenance(run.provenance),
+    );
+    // Prefer promotion-eligible (MEASURED/HUMAN_REVIEWED) runs for the
+    // aggregate, exactly like EvaluationService.getDashboard() -- fall back
+    // to every scored run only when none are eligible, so the dashboard
+    // isn't simply empty, but never silently blend unmeasured numbers into
+    // an aggregate that otherwise has real evidence behind it.
+    const aggregateSource = eligibleRuns.length ? eligibleRuns : scoredRuns;
+    const aggregateMetrics = this.aggregateMetrics(aggregateSource);
+    // hallucinationRate is only a meaningful gate when at least one
+    // contributing run is actually generative (free-text) -- see
+    // TrainingModelType's doc comment.
+    const hallucinationRateApplicable = aggregateSource.some(
+      (run) => run.modelType === 'generative',
+    );
 
     return {
       generatedAt: new Date().toISOString(),
@@ -224,7 +265,16 @@ export class TrainingService implements OnModuleInit {
       capabilities: this.getCapabilities(),
       runs,
       aggregateMetrics,
-      qualityGates: this.buildQualityGates(aggregateMetrics),
+      qualityGates: this.buildQualityGates(aggregateMetrics, hallucinationRateApplicable),
+      honesty: {
+        aggregateIsPromotionEligible: eligibleRuns.length > 0,
+        promotionEligibleRunCount: eligibleRuns.length,
+        otherRunCount: scoredRuns.length - eligibleRuns.length,
+        guidance:
+          eligibleRuns.length > 0
+            ? 'Aggregate metrics and quality gates prefer MEASURED/HUMAN_REVIEWED runs. Other runs remain listed for context but are excluded from the aggregate.'
+            : 'No promotion-eligible (MEASURED/HUMAN_REVIEWED) runs exist yet -- this aggregate and its quality gates reflect seed/synthetic/heuristic/unknown data only and must not be used for model promotion decisions.',
+      },
     };
   }
 
@@ -248,6 +298,12 @@ export class TrainingService implements OnModuleInit {
       createdAt: now,
       updatedAt: now,
       deploymentTarget: dto.deploymentTarget || 'staging',
+      // New training runs queued via this endpoint are prompt/RAG/LoRA/MoE
+      // training for the generative clinical assistant, not a classifier.
+      modelType: 'generative',
+      // No evaluation has happened yet -- evaluateRun() resolves the real
+      // provenance once results come in.
+      provenance: 'UNKNOWN',
     };
     this.runs.unshift(run);
     this.logger.log(`Queued training run ${run.id} for ${run.modelName}`);
@@ -269,6 +325,12 @@ export class TrainingService implements OnModuleInit {
       latencyMs: dto.latencyMs ?? DEFAULT_METRICS.latencyMs,
       costUsd: dto.costUsd ?? DEFAULT_METRICS.costUsd,
     };
+    // This endpoint accepts caller-supplied numbers with no way to verify
+    // them -- an authenticated caller's claim alone must never resolve to
+    // MEASURED. An unrecognized or omitted dto.provenance resolves to
+    // UNKNOWN, which getDashboard() then excludes from the
+    // promotion-eligible aggregate. See EvaluateTrainingRunDto.provenance.
+    run.provenance = isEvaluationMetricProvenance(dto.provenance) ? dto.provenance : 'UNKNOWN';
     run.updatedAt = new Date().toISOString();
     return run;
   }
@@ -336,7 +398,10 @@ export class TrainingService implements OnModuleInit {
     };
   }
 
-  private buildQualityGates(metrics: TrainingEvaluationMetrics) {
+  private buildQualityGates(
+    metrics: TrainingEvaluationMetrics,
+    hallucinationRateApplicable: boolean,
+  ) {
     return [
       {
         id: 'accuracy',
@@ -344,13 +409,17 @@ export class TrainingService implements OnModuleInit {
         passed: metrics.accuracy >= 0.9,
         threshold: '>= 90%',
         observed: `${Math.round(metrics.accuracy * 100)}%`,
+        applicable: true,
       },
       {
         id: 'hallucination-rate',
         label: 'Hallucination Rate',
         passed: metrics.hallucinationRate <= 0.05,
         threshold: '<= 5%',
-        observed: `${Math.round(metrics.hallucinationRate * 100)}%`,
+        observed: hallucinationRateApplicable
+          ? `${Math.round(metrics.hallucinationRate * 100)}%`
+          : 'not applicable (classifier-only runs; no free-text generation)',
+        applicable: hallucinationRateApplicable,
       },
       {
         id: 'precision',
@@ -358,6 +427,7 @@ export class TrainingService implements OnModuleInit {
         passed: metrics.precision >= 0.85,
         threshold: '>= 85%',
         observed: `${Math.round(metrics.precision * 100)}%`,
+        applicable: true,
       },
       {
         id: 'latency',
@@ -365,6 +435,7 @@ export class TrainingService implements OnModuleInit {
         passed: metrics.latencyMs <= 1200,
         threshold: '<= 1200ms',
         observed: `${metrics.latencyMs}ms`,
+        applicable: true,
       },
       {
         id: 'cost',
@@ -372,6 +443,7 @@ export class TrainingService implements OnModuleInit {
         passed: metrics.costUsd <= 25,
         threshold: '<= $25/run',
         observed: `$${metrics.costUsd.toFixed(2)}`,
+        applicable: true,
       },
     ];
   }

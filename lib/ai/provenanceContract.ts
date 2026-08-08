@@ -61,6 +61,71 @@ export function isAiResponseSourceCategory(value: unknown): value is AIResponseS
   );
 }
 
+/**
+ * How trustworthy an EVALUATION METRIC value is (accuracy, hallucination
+ * rate, user satisfaction, quality/safety score, latency, success rate,
+ * etc.) -- a different axis from AIResponseSourceCategory above, which
+ * describes one response's generation mechanism. This describes whether an
+ * aggregate/dashboard NUMBER reflects reality. Added 2026-08-08 after
+ * finding a second, unfixed instance of the exact bug already fixed once in
+ * `backend/src/modules/evaluation/evaluation.service.ts` (fabricated
+ * per-turn metrics silently counted as measured) inside a structurally
+ * identical sibling module (`backend/src/modules/training/`).
+ *
+ * - MEASURED: computed from real logged outcomes or a real offline/live
+ *   evaluation harness run (e.g. qa/ai-eval/results/*.json, a trained
+ *   classifier's held-out test-set metrics.json).
+ * - HUMAN_REVIEWED: a real clinician/reviewer rated or verified this value.
+ * - DERIVED: computed by a documented, deterministic formula from OTHER
+ *   real measured/reviewed inputs (e.g. a weighted composite score) --
+ *   trustworthy only as far as its inputs are.
+ * - HEURISTIC: a proxy formula standing in for something never actually
+ *   measured (e.g. "citations.length > 0 ? 0.02 : 0.05" as a
+ *   "hallucination rate" -- a rule, not a detector).
+ * - SYNTHETIC: a hardcoded literal or placeholder value, not computed from
+ *   any real input at all.
+ * - SEED_ONLY: explicitly demo/bootstrap data, self-identified as such,
+ *   shown only so a dashboard/trend chart isn't empty.
+ * - UNKNOWN: no producer asserted how this value was derived. MUST NEVER be
+ *   treated as MEASURED by a consumer -- see
+ *   PROMOTION_ELIGIBLE_EVALUATION_PROVENANCE below.
+ */
+export const EVALUATION_METRIC_PROVENANCE_VALUES = [
+  'MEASURED',
+  'HUMAN_REVIEWED',
+  'DERIVED',
+  'HEURISTIC',
+  'SYNTHETIC',
+  'SEED_ONLY',
+  'UNKNOWN',
+] as const;
+
+export type EvaluationMetricProvenance = (typeof EVALUATION_METRIC_PROVENANCE_VALUES)[number];
+
+export function isEvaluationMetricProvenance(value: unknown): value is EvaluationMetricProvenance {
+  return (
+    typeof value === 'string' &&
+    (EVALUATION_METRIC_PROVENANCE_VALUES as readonly string[]).includes(value)
+  );
+}
+
+/**
+ * Only these provenance values may enter a "measured production quality" or
+ * model-promotion aggregate pool. Every other value, including UNKNOWN,
+ * must be excluded -- an absent/unrecognized provenance is not evidence of
+ * quality, and must never silently default into the trusted pool.
+ */
+export const PROMOTION_ELIGIBLE_EVALUATION_PROVENANCE: readonly EvaluationMetricProvenance[] = [
+  'MEASURED',
+  'HUMAN_REVIEWED',
+];
+
+export function isPromotionEligibleEvaluationProvenance(
+  provenance: EvaluationMetricProvenance,
+): boolean {
+  return (PROMOTION_ELIGIBLE_EVALUATION_PROVENANCE as readonly string[]).includes(provenance);
+}
+
 export type ProvenanceEvidenceKind =
   | 'retrieved_chunk'
   | 'knowledge_registry'
