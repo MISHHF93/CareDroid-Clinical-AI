@@ -19,6 +19,14 @@ dist
 dist-ssr
 *.local
 
+# TypeScript incremental-build cache. Currently only ever lands inside an
+# already-gitignored dist/ (see backend/tsconfig.json's `incremental: true`,
+# no explicit tsBuildInfoFile override -- TS defaults it under outDir), but
+# that's true by inheritance, not by an explicit rule -- a future config
+# change (e.g. someone setting tsBuildInfoFile outside dist/) could commit a
+# stale build cache without this line catching it.
+*.tsbuildinfo
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
