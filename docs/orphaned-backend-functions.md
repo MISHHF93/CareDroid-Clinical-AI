@@ -1,6 +1,6 @@
 # Orphaned backend functions
 
-**Generated:** 2026-08-06T21:22:42.521Z
+**Generated:** 2026-08-08T13:22:00.199Z
 
 > Regenerate: `npm run exposure:write-docs`
 

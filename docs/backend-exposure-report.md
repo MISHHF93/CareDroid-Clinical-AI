@@ -1,6 +1,6 @@
 # Backend exposure report
 
-**Generated:** 2026-08-06T21:22:18.372Z
+**Generated:** 2026-08-08T13:21:38.099Z
 
 > Regenerate: `npm run exposure:write-docs`
 

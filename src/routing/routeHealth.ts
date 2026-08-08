@@ -1,5 +1,5 @@
-import { readFileSync } from 'node:fs';
-import { dirname, join, relative, sep } from 'node:path';
+import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { dirname, join, relative, sep, basename, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   CANONICAL_APP_ROUTE_TREE,
@@ -248,8 +248,67 @@ function routePathMatches(routePath, concretePath) {
   return routeParts.every((part, index) => part.startsWith(':') || part === concreteParts[index]);
 }
 
+const PAGE_FILE_PATTERN = /\.(tsx|jsx)$/;
+const TEST_FILE_PATTERN = /\.(test|spec)\.(tsx|jsx|ts|js)$/;
+const SOURCE_FILE_PATTERN = /\.(ts|tsx|js|jsx)$/;
+
+function walkFiles(dir: string, pattern: RegExp, acc: string[] = []): string[] {
+  for (const entry of readdirSync(dir)) {
+    const full = join(dir, entry);
+    const stat = statSync(full);
+    if (stat.isDirectory()) {
+      walkFiles(full, pattern, acc);
+    } else if (pattern.test(entry)) {
+      acc.push(full);
+    }
+  }
+  return acc;
+}
+
+// Real detector (previously a hardcoded `return []` stub -- every "No orphan pages" gate
+// this module reports passed unconditionally, regardless of actual repo state). A page file
+// under pagesDir is an orphan if its own basename (minus extension) is never referenced by
+// any OTHER source file under searchRoot -- the same whole-repo-reference technique this
+// codebase's own audit scripts use elsewhere, just applied to page-level files instead of
+// route paths. Parameterized (rather than hardcoded to src/pages + src/) so it can be
+// exercised against a synthetic fixture directory in tests -- proving it actually detects an
+// orphan, not just that it still returns [] for the current repo (which a stub would too).
+export function findOrphanPageFiles(
+  pagesDir: string,
+  searchRoot: string,
+): Array<{ path: string; [key: string]: any }> {
+  const pageFiles = walkFiles(pagesDir, PAGE_FILE_PATTERN).filter(
+    (file) => !TEST_FILE_PATTERN.test(basename(file)),
+  );
+  const allSourceFiles = walkFiles(searchRoot, SOURCE_FILE_PATTERN);
+  const fileContents = new Map(allSourceFiles.map((file) => [file, readFileSync(file, 'utf8')]));
+
+  const orphans: Array<{ path: string; [key: string]: any }> = [];
+  for (const pageFile of pageFiles) {
+    const name = basename(pageFile, extname(pageFile));
+    const referenced = allSourceFiles.some((otherFile) => {
+      if (otherFile === pageFile) return false;
+      return fileContents.get(otherFile)?.includes(name) ?? false;
+    });
+    if (!referenced) {
+      orphans.push({
+        path: relative(repoRoot, pageFile).split(sep).join('/'),
+        status: ROUTE_HEALTH_STATES.ORPHANED,
+        owner: 'no-referencing-file-found',
+        component: name,
+        source: 'orphan-page-scan',
+        blank: false,
+        wildcard: false,
+        authRequired: false,
+        permissioned: false,
+      });
+    }
+  }
+  return orphans;
+}
+
 function orphanPageEntries(): Array<{ path: string; [key: string]: any }> {
-  return [];
+  return findOrphanPageFiles(join(srcRoot, 'pages'), srcRoot);
 }
 
 export function buildRouteHealthGraph() {

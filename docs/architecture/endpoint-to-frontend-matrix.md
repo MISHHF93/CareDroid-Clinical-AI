@@ -1,6 +1,6 @@
 # Endpoint-to-frontend matrix
 
-**Generated:** 2026-08-06T21:22:18.374Z
+**Generated:** 2026-08-08T13:21:38.101Z
 
 | Method | Path | Backend | Frontend client | Exposure |
 |--------|------|---------|-----------------|----------|
