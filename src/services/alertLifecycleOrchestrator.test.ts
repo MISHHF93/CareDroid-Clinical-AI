@@ -52,7 +52,14 @@ vi.mock('../config/backendApiCapabilities', () => ({
   isBackendCapabilityEnabled: () => true,
 }));
 
+const postWaitingRoomEscalationNotify = vi.hoisted(() => vi.fn(async () => ({ ok: true })));
+
+vi.mock('./emergencyOsApi', () => ({
+  postWaitingRoomEscalationNotify: (...args: unknown[]) => postWaitingRoomEscalationNotify(...args),
+}));
+
 import {
+  checkUnacknowledgedAlertEscalations,
   filterAlertsForRole,
   getActiveAlerts,
   ingestClinicalApiAlert,
@@ -68,6 +75,7 @@ describe('alertLifecycleOrchestrator', () => {
     vi.spyOn(console, 'info').mockImplementation(() => undefined);
     ingestPreparedAlert.mockReset();
     acknowledgeClinicalAlertApi.mockReset();
+    postWaitingRoomEscalationNotify.mockClear();
   });
 
   afterEach(() => {
@@ -196,5 +204,34 @@ describe('alertLifecycleOrchestrator', () => {
     expect(() =>
       syncDerivedAlertsLifecycle(prepared, [], 'test-sync'),
     ).not.toThrow();
+  });
+
+  it('sends a real out-of-band notification when auto-escalating an unacknowledged critical alert (2026-08-08)', async () => {
+    const { useEmergencyStore } = await import('../store/emergencyStore');
+    useEmergencyStore.getState = () =>
+      ({
+        alerts: [
+          {
+            id: 'alert-escalate-me',
+            severity: 'Critical',
+            title: 'Chest pain',
+            message: 'Critical chest pain reported',
+            createdAt: new Date(Date.now() - 4 * 60 * 1000).toISOString(),
+            dismissed: false,
+            acknowledged: false,
+            source: 'vitals-alert-engine',
+          },
+        ],
+        ingestPreparedAlert,
+      }) as unknown as ReturnType<typeof useEmergencyStore.getState>;
+
+    // The seeded alert is Critical, not dismissed/acknowledged, and 4 minutes old --
+    // past the 3-minute escalation deadline.
+    const escalatedIds = checkUnacknowledgedAlertEscalations();
+
+    expect(escalatedIds).toContain('alert-escalate-me');
+    expect(postWaitingRoomEscalationNotify).toHaveBeenCalledWith(
+      expect.objectContaining({ alertId: 'alert-escalate-me' }),
+    );
   });
 });

@@ -10,6 +10,7 @@ import { EncryptionModule } from '../encryption/encryption.module';
 import { ChatModule } from '../chat/chat.module';
 import { PlatformAssetsModule } from '../platform-assets/platform-assets.module';
 import { CollaborationHubModule } from '../collaboration-hub/collaboration-hub.module';
+import { EmailModule } from '../email/email.module';
 import { EmergencyOsController } from './emergency-os.controller';
 import { EdCopilotNestParityController } from './ed-copilot.nest-parity.controller';
 import { EmergencyRealtimeController } from './emergency-realtime.controller';
@@ -95,6 +96,7 @@ import { EmergencyOperatingSurfacesService } from './emergency-os.operating-surf
     forwardRef(() => ChatModule),
     PlatformAssetsModule,
     CollaborationHubModule,
+    EmailModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {

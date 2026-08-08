@@ -105,6 +105,8 @@ export const BACKEND_API_CAPABILITY_STATUS = Object.freeze({
   emergencySmartIntake: BACKEND_CAPABILITY_STATUS.REAL,
   emergencySmartIntakeIdentitySession: BACKEND_CAPABILITY_STATUS.DISABLED,
   emergencyOcrIntake: BACKEND_CAPABILITY_STATUS.REAL,
+  /** POST /api/emergency/waiting-room-safety/escalation-notify -- real email out-of-band channel. */
+  waitingRoomEscalationNotify: BACKEND_CAPABILITY_STATUS.REAL,
   emergencyCopilotRuntime: BACKEND_CAPABILITY_STATUS.DEMO,
   /** Optional / absent CareDroid routes; keep frontend clients from calling them until mounted. */
   emergencyCapacityDashboard: BACKEND_CAPABILITY_STATUS.DISABLED,

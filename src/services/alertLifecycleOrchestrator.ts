@@ -34,6 +34,8 @@ import {
   fetchClinicalAlerts,
 } from './clinicalAlertsApi';
 import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
+import { postWaitingRoomEscalationNotify } from './emergencyOsApi';
+import logger from '../utils/logger';
 import { inferAlertScenario } from './aiChiefOrchestrator';
 
 export const ALERT_LIFECYCLE_ORCHESTRATOR_VERSION = '2026.06.30';
@@ -456,6 +458,20 @@ export function checkUnacknowledgedAlertEscalations(now = new Date()): string[] 
       sourceScreen: 'alert-escalation-timer',
     });
     escalatedIds.push(alert.id);
+
+    // Real out-of-band notification (email) -- extends the in-app escalation above
+    // past the browser tab. Fire-and-forget: the in-app transition already happened
+    // and is the source of truth regardless of whether the network call succeeds.
+    if (isBackendCapabilityEnabled('waitingRoomEscalationNotify')) {
+      void postWaitingRoomEscalationNotify({
+        patientId: alert.patientId,
+        alertId: alert.id,
+        title: `Unacknowledged critical alert escalated — ${alert.title || 'Waiting room safety'}`,
+        message: alert.message || 'A critical alert went unacknowledged for 3 minutes and was auto-escalated.',
+      }).catch((error) => {
+        logger.warn('[alertLifecycleOrchestrator] Failed to send waiting-room escalation notification', error);
+      });
+    }
   }
 
   return escalatedIds;

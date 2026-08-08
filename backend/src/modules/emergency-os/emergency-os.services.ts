@@ -63,6 +63,8 @@ import { Patient } from './entities/patient.entity';
 import { Alert } from './entities/alert.entity';
 import { Referral as ReferralEntity } from './entities/referral.entity';
 import { EmsArrivalStatus } from './entities/ems-arrival-status.entity';
+import { EmailService } from '../email/email.service';
+import { getEnvironmentConfig } from '../../config/environment.config';
 import { WorkflowActionLogEntry } from './entities/workflow-action-log-entry.entity';
 import { EncryptionService } from '../encryption/encryption.service';
 
@@ -2256,7 +2258,12 @@ export class ReceptionWorkspaceService {
 
 @Injectable()
 export class ReassessmentService {
-  constructor(private readonly patientService: EmergencyPatientService) {}
+  private readonly logger = new Logger(ReassessmentService.name);
+
+  constructor(
+    private readonly patientService: EmergencyPatientService,
+    @Optional() private readonly emailService?: EmailService,
+  ) {}
 
   getReassessmentQueue() {
     const patients = this.patientService
@@ -2268,6 +2275,66 @@ export class ReassessmentService {
       nextAction: patients.length
         ? 'Recheck vitals and pain score before disposition changes.'
         : 'No reassessments due.',
+    });
+  }
+
+  /**
+   * Real out-of-band notification for the waiting-room-safety escalation transition
+   * (src/services/alertLifecycleOrchestrator.ts's real, live 3-minute auto-escalation --
+   * NOT the Mongoose reassessment.scheduler.ts cron, which never runs by default since
+   * it only starts inside registerEmergencyMongooseRuntime(), gated behind
+   * ENABLE_MONGOOSE_EMERGENCY_OS=false). Extends the already-real in-app escalation past
+   * the browser tab via email to the same INCIDENT_ESCALATION_EMAILS distribution list
+   * incident-reporting.service.ts already reads but never actually sends to -- reuses
+   * the existing, parsed config rather than inventing a new env var.
+   */
+  async notifyWaitingRoomEscalation(input: {
+    patientId?: string;
+    alertId?: string;
+    title: string;
+    message: string;
+  }): Promise<EmergencyModuleEnvelope<Record<string, unknown>>> {
+    const recipients = getEnvironmentConfig().notifications.incidentEscalationEmails;
+    if (!recipients.length) {
+      this.logger.warn(
+        'No INCIDENT_ESCALATION_EMAILS configured -- waiting-room escalation notification not sent.',
+      );
+      return envelope('Waiting Room Escalation Notification', {
+        ok: true,
+        sent: false,
+        recipientCount: 0,
+      });
+    }
+    if (!this.emailService) {
+      return envelope('Waiting Room Escalation Notification', {
+        ok: true,
+        sent: false,
+        recipientCount: recipients.length,
+      });
+    }
+
+    const html = `<p>${input.message}</p>${
+      input.patientId ? `<p>Patient: ${input.patientId}</p>` : ''
+    }`;
+    const results = await Promise.all(
+      recipients.map((to) =>
+        this.emailService!.sendEmail({ to, subject: `[CareDroid] ${input.title}`, html }).catch(
+          (error) => {
+            this.logger.warn(`Failed to send escalation email to ${to}: ${error}`);
+            return false;
+          },
+        ),
+      ),
+    );
+    const sentCount = results.filter(Boolean).length;
+
+    return envelope('Waiting Room Escalation Notification', {
+      ok: true,
+      sent: sentCount > 0,
+      recipientCount: recipients.length,
+      sentCount,
+      alertId: input.alertId,
+      patientId: input.patientId,
     });
   }
 }

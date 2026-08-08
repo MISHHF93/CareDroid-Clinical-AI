@@ -22,6 +22,7 @@ export const EMERGENCY_OS_API_ENDPOINTS = Object.freeze({
   journey: '/api/emergency/journey',
   ems: '/api/emergency/ems',
   emsHandoff: '/api/emergency/ems/handoff',
+  waitingRoomEscalationNotify: '/api/emergency/waiting-room-safety/escalation-notify',
   receptionSnapshot: '/api/emergency/reception/snapshot',
   receptionHandoff: '/api/emergency/reception/handoff',
   receptionEscalation: '/api/emergency/reception/escalation',
@@ -96,6 +97,7 @@ export const ACTIVE_EMERGENCY_OS_API_ENDPOINT_KEYS = Object.freeze([
   'journey',
   'ems',
   'emsHandoff',
+  'waitingRoomEscalationNotify',
   'receptionSnapshot',
   'receptionHandoff',
   'receptionEscalation',
@@ -203,6 +205,21 @@ export const postEmsHandoff = (payload) =>
 export const patchEmsArrivalStatus = (arrivalId: string, payload: Record<string, unknown>) =>
   requestEmergencyJson(`${EMERGENCY_OS_API_ENDPOINTS.ems}/arrivals/${encodeURIComponent(arrivalId)}/status`, {
     method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
+/**
+ * Real out-of-band notification (email) for an escalated waiting-room-safety alert --
+ * fire-and-forget from alertLifecycleOrchestrator.ts's real 3-minute auto-escalation.
+ * Extends the existing in-app-only escalation past the browser tab.
+ */
+export const postWaitingRoomEscalationNotify = (payload: {
+  patientId?: string;
+  alertId?: string;
+  title: string;
+  message: string;
+}) =>
+  requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.waitingRoomEscalationNotify, {
+    method: 'POST',
     body: JSON.stringify(payload),
   });
 export const fetchReceptionSnapshot = () =>

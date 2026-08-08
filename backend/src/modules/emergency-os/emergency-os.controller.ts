@@ -71,6 +71,7 @@ import {
   ApplyOcrJobToIntakeDto,
   PostEmsHandoffDto,
   PatchEmsArrivalStatusDto,
+  PostWaitingRoomEscalationNotifyDto,
   PostReceptionEscalationDto,
   PostReceptionHandoffDto,
   PostTriageAssistDto,
@@ -533,6 +534,15 @@ export class EmergencyOsController {
   @Get('reassessment')
   getReassessment() {
     return this.reassessmentService.getReassessmentQueue();
+  }
+
+  /** Real out-of-band notification for the waiting-room-safety escalation transition --
+   * see ReassessmentService.notifyWaitingRoomEscalation's own doc comment for why this
+   * exists and which mechanism it actually extends. */
+  @RequirePermission(Permission.WRITE_PHI)
+  @Post('waiting-room-safety/escalation-notify')
+  postWaitingRoomEscalationNotify(@Body() body: PostWaitingRoomEscalationNotifyDto) {
+    return this.reassessmentService.notifyWaitingRoomEscalation(body);
   }
 
   @RequirePermission(Permission.READ_PHI)

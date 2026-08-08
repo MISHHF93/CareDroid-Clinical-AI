@@ -143,6 +143,13 @@ export class PostEmsHandoffDto {
   @IsOptional() @IsString() @MaxLength(2000) notes?: string;
 }
 
+export class PostWaitingRoomEscalationNotifyDto {
+  @IsOptional() @IsString() @MaxLength(96) patientId?: string;
+  @IsOptional() @IsString() @MaxLength(96) alertId?: string;
+  @IsDefined() @IsString() @MaxLength(200) title: string;
+  @IsDefined() @IsString() @MaxLength(2000) message: string;
+}
+
 export class PatchEmsArrivalStatusDto {
   @IsOptional() @IsString() @MaxLength(32) status?: string;
   @IsOptional() @IsString() @MaxLength(96) patientId?: string;

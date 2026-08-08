@@ -77,6 +77,7 @@ describe('emergencyOsApi advanced CareDroid capabilities', () => {
       'journey',
       'ems',
       'emsHandoff',
+      'waitingRoomEscalationNotify',
       'receptionSnapshot',
       'receptionHandoff',
       'receptionEscalation',
