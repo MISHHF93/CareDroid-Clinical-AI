@@ -165,7 +165,7 @@
     </div>
     <div class="meta-block">
       Generated 2026-08-06, updated 2026-08-08<br />
-      HEAD <code style="font-family: var(--mono)">3e90a75e</code><br />
+      HEAD <code style="font-family: var(--mono)">72087631</code><br />
       <a href="https://github.com/MISHHF93/CareDroid-Clinical-AI">github.com/MISHHF93/CareDroid-Clinical-AI</a>
     </div>
   </header>
@@ -174,15 +174,15 @@
     <div class="score-ring">
       <svg width="160" height="160" viewBox="0 0 160 160">
         <circle class="track" cx="80" cy="80" r="68" fill="none" stroke-width="11"></circle>
-        <circle class="fill" cx="80" cy="80" r="68" fill="none" stroke-width="11" stroke-dasharray="427.3" stroke-dashoffset="128.2"</circle>
+        <circle class="fill" cx="80" cy="80" r="68" fill="none" stroke-width="11" stroke-dasharray="427.3" stroke-dashoffset="126.9"</circle>
       </svg>
-      <div class="num"><strong>70.0</strong><span>/ 100</span></div>
+      <div class="num"><strong>70.3</strong><span>/ 100</span></div>
     </div>
     <div class="hero-body">
       <span class="band-chip">Significant improvement required (repository-verifiable ceiling)</span>
-      <h2>Corrected 2026-08-06: 3 of the scorecard's own original findings were themselves wrong — a dedicated verification pass found real mechanisms this first draft had scored as absent, and 3 concrete bugs found along the way are now fixed. Updated 2026-08-08: a symptom/complaint-recognition audit found a real safety-relevant gap in Reception's primary intake path (three unsynchronized keyword systems, the weakest one wired into the main flow) and a same-day demo-identity fix that hadn't actually reached production — both fixed and tested; see Domain 1. Also 2026-08-08: this scorecard's own "real backend cron" claim for Waiting Room Safety was itself wrong — it never runs by default — and the actual reach gap (in-app only, no out-of-band channel) is now partly closed with a real email notification on auto-escalation; see Domain 2. Round 31, same day: closed 2 of the 3 deferred "settings-blob" input-validation routes. Round 32, same day: closed the 3rd and largest one (<code>EmergencyOsController.updateSettings</code>'s ~12-section contract) — 97.8% of backend <code>@Body()</code> endpoints now validated, up from 95.6%, with only product-decision-gated routes left; see Domain 7</h2>
+      <h2>Corrected 2026-08-06: 3 of the scorecard's own original findings were themselves wrong — a dedicated verification pass found real mechanisms this first draft had scored as absent, and 3 concrete bugs found along the way are now fixed. Updated 2026-08-08: a symptom/complaint-recognition audit found a real safety-relevant gap in Reception's primary intake path (three unsynchronized keyword systems, the weakest one wired into the main flow) and a same-day demo-identity fix that hadn't actually reached production — both fixed and tested; see Domain 1. Also 2026-08-08: this scorecard's own "real backend cron" claim for Waiting Room Safety was itself wrong — it never runs by default — and the actual reach gap (in-app only, no out-of-band channel) is now partly closed with a real email notification on auto-escalation; see Domain 2. Round 31, same day: closed 2 of the 3 deferred "settings-blob" input-validation routes. Round 32, same day: closed the 3rd and largest one (<code>EmergencyOsController.updateSettings</code>'s ~12-section contract) — 97.8% of backend <code>@Body()</code> endpoints now validated, up from 95.6%, with only product-decision-gated routes left; see Domain 7. Round 33, same day: closed this scorecard's own named remaining UX risk — <code>card-contrast-normalization.css</code>'s meta/hint/caption/subtitle rule was the only one of 3 sibling typography rules missing the critical/danger/warning exclusion; see Domain 9</h2>
       <p>
-        <strong>Repository Implementation Score: 700/1000 (70.0%), up from an initial 520/1000.</strong>
+        <strong>Repository Implementation Score: 703/1000 (70.3%), up from an initial 520/1000.</strong>
         <strong>Pilot Evidence Score: ~10/100</strong> — unchanged; code existing and being wired is still not
         evidence of clinical validation. A dedicated research pass corrected 3 domains this scorecard originally
         got wrong: <strong>Waiting Room Safety</strong> (42→58→64/100) — the 2026-08-06 pass credited a real backend
@@ -214,7 +214,7 @@
 
   <div class="decision-strip">
     <div class="decision-card"><span class="decision-label">Pilot gate</span><div class="decision-value" style="color:var(--red)">NOT READY FOR PILOT</div><p>6 P0 gates open on the sibling scorecard; none require more code alone.</p></div>
-    <div class="decision-card"><span class="decision-label">Repo implementation</span><div class="decision-value">700 / 1000</div><p>Evidence-backed, code-level maturity across 12 domains.</p></div>
+    <div class="decision-card"><span class="decision-label">Repo implementation</span><div class="decision-value">703 / 1000</div><p>Evidence-backed, code-level maturity across 12 domains.</p></div>
     <div class="decision-card"><span class="decision-label">Pilot evidence</span><div class="decision-value" style="color:var(--amber)">~10 / 100</div><p>Live/clinician/external validation, separated from implementation.</p></div>
     <div class="decision-card"><span class="decision-label">Evidence confidence</span><div class="decision-value">High</div><p>Every score cites a file, route, test, or command — 3 domains marked NOT VERIFIED rather than guessed.</p></div>
   </div>
@@ -235,11 +235,11 @@
         <tr><td>6. Multi-Screen &amp; Role-Specific Architecture</td><td class="num">75</td><td class="num">70</td><td class="num">93%</td><td>Confirmed</td><td>🔵 <span class="pill strong">Strong</span></td></tr>
         <tr><td>7. RBAC, Privacy &amp; Security</td><td class="num">100</td><td class="num">68</td><td class="num">68%</td><td>Confirmed</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
         <tr><td>8. Architecture &amp; Repository Convergence</td><td class="num">100</td><td class="num">90</td><td class="num">90%</td><td>Confirmed</td><td>🔵 <span class="pill strong">Strong</span></td></tr>
-        <tr><td>9. UX, Accessibility &amp; Design-System Quality</td><td class="num">75</td><td class="num">46</td><td class="num">61%</td><td>Confirmed (static only)</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
+        <tr><td>9. UX, Accessibility &amp; Design-System Quality</td><td class="num">75</td><td class="num">49</td><td class="num">65%</td><td>Confirmed (static only)</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
         <tr><td>10. Quality Engineering &amp; Pilot Readiness</td><td class="num">100</td><td class="num">63</td><td class="num">63%</td><td>Confirmed</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
         <tr><td>11. Interoperability, Data &amp; Integration Readiness</td><td class="num">25</td><td class="num">12</td><td class="num">48%</td><td>Confirmed (mixed)</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
         <tr><td>12. AI Governance &amp; Operational Intelligence</td><td class="num">25</td><td class="num">24</td><td class="num">96%</td><td>Strong evidence</td><td>🔵 <span class="pill strong">Strong</span></td></tr>
-        <tr><td><strong>Total</strong></td><td class="num"><strong>1000</strong></td><td class="num"><strong>700</strong></td><td class="num"><strong>70%</strong></td><td>—</td><td>—</td></tr>
+        <tr><td><strong>Total</strong></td><td class="num"><strong>1000</strong></td><td class="num"><strong>703</strong></td><td class="num"><strong>70%</strong></td><td>—</td><td>—</td></tr>
       </tbody>
     </table>
   </div>
@@ -528,10 +528,10 @@
 
     <article class="dom-card partial">
       <div class="dom-main">
-        <div class="dom-top"><span class="dom-index">09 / 12</span><span class="dom-score">46<span> / 75</span></span></div>
+        <div class="dom-top"><span class="dom-index">09 / 12</span><span class="dom-score">49<span> / 75</span></span></div>
         <span class="status-chip partial">Partial</span>
         <h3>UX, Accessibility &amp; Design-System Quality</h3>
-        <div class="progress-track"><div class="progress-fill partial" style="width: 61%"></div></div>
+        <div class="progress-track"><div class="progress-fill partial" style="width: 65%"></div></div>
       </div>
       <details>
         <summary>Full review</summary>
@@ -542,6 +542,7 @@
             <li>A recurring CSS-cascade contrast-breaking bug class (substring sweeps silently overriding component-specific styling) was found and fixed across 4 named families (<code>cta</code>, <code>--primary</code>, <code>__link</code>/<code>-link</code>, <code>__action</code>/<code>-button</code>), 19 total instances across 5 sweeps, including a critical-alert banner action that had collapsed from AA-passing 4.83:1 to ~1.18:1 contrast<span class="conf confirmed">Confirmed</span> — a genuinely severe, genuinely fixed patient-safety-adjacent UI bug.</li>
             <li>This session independently found and fixed a different bug class in the same spirit: a core clinical page (Smart Intake) rendering fully unstyled from a missing CSS import, plus a systematic typo corruption breaking ~11 more selectors across Command Center/Queue/Reception<span class="conf confirmed">Confirmed</span>.</li>
             <li><strong>2026-08-07 — the "5th sweep-rule family" risk named below was directly investigated and confirmed real</strong><span class="conf confirmed">Confirmed</span>: <code>card-contrast-normalization.css</code> (a sibling of the already-audited <code>surface-normalization.css</code>/<code>color-normalization.css</code>/<code>text-normalization.css</code>) had never received the same <code>--critical</code>/<code>--danger</code>/<code>--warning</code> exclusion. On <code>DispatchConsole.tsx</code>'s "Dispatch Unit Now" panel (<code>dc-panel dc-call-card--critical</code>, shown for Echo/Delta-priority calls), this silently erased all 3 of the panel's urgency cues at once — the red-tinted border, the "⚡ Dispatch Unit Now" title's red text, and the "3-minute response target" badge's red text all lost to a higher-specificity contract rule that forced default ink/border back on. Fixed across the 3 affected rules; the guard was proven to actually fail by deliberately reverting one exclusion and re-running before restoring it.</li>
+            <li><strong>FOUND AND FIXED 2026-08-08 (Round 33) — closed this domain's own named remaining risk: <code>card-contrast-normalization.css</code>'s 3rd "Typography roles inside cards" rule (muted <code>__meta</code>/<code>-meta</code>/<code>__subtitle</code>/<code>-subtitle</code>/<code>__hint</code>/<code>-hint</code>/<code>__caption</code>/<code>-caption</code> text) was the only one of 3 sibling rules missing the <code>--critical</code>/<code>--danger</code>/<code>--warning</code> exclusion.</strong> An exhaustive live-consumer sweep — every component combining a <code>-card</code>/<code>-panel</code> ancestor with a <code>__meta</code>/<code>-meta</code>/<code>__subtitle</code>/<code>-subtitle</code>/<code>__hint</code>/<code>-hint</code>/<code>__caption</code>/<code>-caption</code> descendant — found zero live components currently relying on the muted color reaching a critical-flagged card (every real critical/warning chip already uses a different class shape or hardens itself with <code>!important</code>), so this was a latent gap, not a live bug, unlike the DispatchConsole finding above. Closed defensively to match the file's own established pattern and prevent a future component silently losing its urgency color the same way. 2 new tests added to the existing describe block, guard proven to fail without the fix by deliberate revert-and-restore, matching this file's own established discipline<span class="conf confirmed">Confirmed</span>.</li>
           </ul>
           <h4>What is missing</h4>
           <ul>
@@ -549,11 +550,11 @@
             <li>WCAG 2.2 AA, keyboard-navigation, and responsive/golden-path coverage beyond the original 14-page scan (2026-07-28) is unconfirmed.</li>
           </ul>
           <h4>Risks</h4>
-          <p>Static analysis has now caught real, severe bugs (the 1.18:1 contrast collapse, the fully-unstyled clinical page, the dispatch-console critical-panel silent-repaint) that a human glancing at a screenshot would likely have caught faster — this is genuine evidence the static-only method has a real blind spot, not just a theoretical one. The specific "5th family" risk this domain flagged is now closed, but the same shape of bug could still exist in a normalization file not yet swept this way (only 4 of the 5 <code>*-normalization.css</code> files have been fully checked for this bug class; <code>profile-surface-normalization.css</code> was checked and found to have no substring-sweep selectors at all).</p>
+          <p>Static analysis has now caught real, severe bugs (the 1.18:1 contrast collapse, the fully-unstyled clinical page, the dispatch-console critical-panel silent-repaint) that a human glancing at a screenshot would likely have caught faster — this is genuine evidence the static-only method has a real blind spot, not just a theoretical one. Both risks this domain named for <code>card-contrast-normalization.css</code> are now closed (the confirmed-real DispatchConsole bug and the now-provably-latent meta/hint/caption/subtitle gap); the same shape of bug could still exist in a normalization file not yet swept this way (only 4 of the 5 <code>*-normalization.css</code> files have been fully checked for this bug class; <code>profile-surface-normalization.css</code> was checked and found to have no substring-sweep selectors at all).</p>
           <h4>Evidence</h4>
-          <p>Project Scorecard dim 7's full sweep history; this session's Smart Intake/typo-cluster fixes; the environment-blocked Playwright attempt, documented rather than silently skipped; <code>src/styles/fjCriticalBannerCta.contrast.test.ts</code>'s 2026-08-07 <code>dc-panel</code> describe block (5 new tests, 30/30 passing).</p>
+          <p>Project Scorecard dim 7's full sweep history; this session's Smart Intake/typo-cluster fixes; the environment-blocked Playwright attempt, documented rather than silently skipped; <code>src/styles/fjCriticalBannerCta.contrast.test.ts</code>'s 2026-08-07 <code>dc-panel</code> describe block plus its 2026-08-08 meta/hint/caption/subtitle describe block (32/32 passing).</p>
           <h4>Required for full marks</h4>
-          <p>Run a real axe-core scan on a machine without this sandbox's browser-launch restriction. Extend coverage beyond 14 pages. Sweep <code>card-contrast-normalization.css</code>'s remaining unaudited rules (the <code>__meta</code>/<code>-meta</code>/<code>__subtitle</code>/<code>-subtitle</code>/<code>__hint</code>/<code>-hint</code>/<code>__caption</code>/<code>-caption</code> rule at its original lines 119-131 was left unexcluded — no live consumer was found matching that shape, but it wasn't proven absent either).</p>
+          <p>Run a real axe-core scan on a machine without this sandbox's browser-launch restriction. Extend coverage beyond 14 pages.</p>
         </div>
       </details>
     </article>
