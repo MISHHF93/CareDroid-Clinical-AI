@@ -16,9 +16,22 @@ import type {
   PatientDocumentSource,
 } from '../types/patientDocumentArtifact';
 import { hasPatientFlag } from '../utils/patientVitals';
+import type { AIResponseSourceCategory } from '../../lib/ai/provenanceContract';
 
-const MODEL_VERSION = 'document-extractor-v1';
-const EXTRACTOR_NAME = 'CareDroid Copilot';
+// Every artifact this file produces comes from a regex/keyword parser
+// (clinicalArtifactParser.ts, the labeled() helper below) or from directly
+// reading an existing patient flag/field -- zero LLM or model calls
+// anywhere in this file. Found 2026-08-08: buildArtifact() previously
+// defaulted safety.isAiDerived to true regardless, and several call sites
+// hardcoded extractedBy: 'CareDroid Copilot' -- misleading, matching the
+// exact same bug found and fixed in the backend's
+// patient-document-artifact.service.ts (this file is its client-side
+// offline-fallback twin, used by patientDocumentArtifactApi.ts whenever the
+// backend extraction endpoint is unreachable, so it's a real, live path,
+// not a preview).
+const MODEL_VERSION = 'document-field-extractor-v1';
+const EXTRACTOR_NAME = 'regex-field-extractor';
+const DETERMINISTIC: AIResponseSourceCategory = 'DETERMINISTIC_RULE';
 
 function createId(prefix: string): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -43,14 +56,18 @@ function labeled(text: string, labels: string[]): { value?: string; span?: { sta
   return {};
 }
 
-function defaultSafety(isAiDerived: boolean) {
+// requiresHumanReview is a clinical-safety property (does this need staff
+// sign-off before use?), independent of whether it was AI-derived --
+// deterministic extraction still needs review before clinical use. Kept as
+// an explicit param, decoupled from isAiDerived (always false in this
+// file), matching the same separation applied to the backend's
+// patient-document-artifact.service.ts.
+function defaultSafety(requiresHumanReview: boolean) {
   return {
-    isAiDerived,
-    requiresHumanReview: isAiDerived,
+    isAiDerived: false,
+    requiresHumanReview,
     mayAffectClinicalWorkflow: true,
-    disclaimer: isAiDerived
-      ? 'AI-extracted artifact — staff confirmation required before clinical use.'
-      : undefined,
+    disclaimer: undefined,
   };
 }
 
@@ -98,7 +115,8 @@ type BuildArtifactInput = Omit<
 > & {
   patientCardId?: string;
   confidence?: number;
-  isAiDerived?: boolean;
+  /** Whether this artifact needs staff sign-off before clinical use -- independent of extraction mechanism. */
+  requiresHumanReview: boolean;
   extractedBy?: string;
   modelVersion?: string;
   sourceState?: PatientDocumentArtifact['sourceState'];
@@ -110,8 +128,7 @@ type BuildArtifactInput = Omit<
 
 function buildArtifact(base: BuildArtifactInput): PatientDocumentArtifact {
   const timestamp = nowIso();
-  const isAiDerived = base.isAiDerived ?? true;
-  const { provenance: provenanceInput, isAiDerived: _ai, extractedBy, modelVersion, ...rest } = base;
+  const { provenance: provenanceInput, requiresHumanReview, extractedBy, modelVersion, ...rest } = base;
   return {
     ...rest,
     id: createId('artifact'),
@@ -124,8 +141,9 @@ function buildArtifact(base: BuildArtifactInput): PatientDocumentArtifact {
       modelVersion: modelVersion || provenanceInput?.modelVersion || MODEL_VERSION,
       extractedAt: timestamp,
       auditEventId: provenanceInput?.auditEventId,
+      responseSource: provenanceInput?.responseSource || DETERMINISTIC,
     },
-    safety: defaultSafety(isAiDerived),
+    safety: defaultSafety(requiresHumanReview),
     visibility: defaultVisibility(base.artifactType),
     fhirResourceHint: base.fhirResourceHint || fhirHintForType(base.artifactType),
     sourceState: base.sourceState || 'extracted',
@@ -170,13 +188,13 @@ function extractClinicalFactsFromText(
         sourceText: chiefComplaint,
         sourceSpan: span,
         confidence: input.confidence ?? 0.8,
-        isAiDerived: input.isAiDerived ?? true,
+        requiresHumanReview: true,
         sourceState: input.sourceState as ArtifactSourceStateLabel,
         provenance: {
           sourceType: input.sourceType,
           sourceSystem: input.sourceSystem || 'uploaded_document',
-          extractedBy: input.extractedBy || EXTRACTOR_NAME,
-          modelVersion: input.modelVersion || MODEL_VERSION,
+          extractedBy: EXTRACTOR_NAME,
+          modelVersion: MODEL_VERSION,
           extractedAt: nowIso(),
         },
       }),
@@ -201,13 +219,13 @@ function extractClinicalFactsFromText(
         },
         sourceText: allergy.allergy || allergy.substance,
         confidence: input.confidence ?? 0.86,
-        isAiDerived: input.isAiDerived ?? true,
+        requiresHumanReview: true,
         sourceState: input.sourceState as ArtifactSourceStateLabel,
         provenance: {
           sourceType: input.sourceType,
           sourceSystem: input.sourceSystem || 'uploaded_document',
-          extractedBy: input.extractedBy || EXTRACTOR_NAME,
-          modelVersion: input.modelVersion || MODEL_VERSION,
+          extractedBy: EXTRACTOR_NAME,
+          modelVersion: MODEL_VERSION,
           extractedAt: nowIso(),
         },
       }),
@@ -234,13 +252,13 @@ function extractClinicalFactsFromText(
         },
         sourceText: medLabel,
         confidence: input.confidence ?? 0.82,
-        isAiDerived: input.isAiDerived ?? true,
+        requiresHumanReview: true,
         sourceState: input.sourceState as ArtifactSourceStateLabel,
         provenance: {
           sourceType: input.sourceType,
           sourceSystem: input.sourceSystem || 'uploaded_document',
-          extractedBy: input.extractedBy || EXTRACTOR_NAME,
-          modelVersion: input.modelVersion || MODEL_VERSION,
+          extractedBy: EXTRACTOR_NAME,
+          modelVersion: MODEL_VERSION,
           extractedAt: nowIso(),
         },
       }),
@@ -262,13 +280,13 @@ function extractClinicalFactsFromText(
         value: { problem: diagnoses },
         sourceText: diagnoses,
         confidence: input.confidence ?? 0.74,
-        isAiDerived: input.isAiDerived ?? true,
+        requiresHumanReview: true,
         sourceState: input.sourceState as ArtifactSourceStateLabel,
         provenance: {
           sourceType: input.sourceType,
           sourceSystem: input.sourceSystem || 'uploaded_document',
-          extractedBy: input.extractedBy || EXTRACTOR_NAME,
-          modelVersion: input.modelVersion || MODEL_VERSION,
+          extractedBy: EXTRACTOR_NAME,
+          modelVersion: MODEL_VERSION,
           extractedAt: nowIso(),
         },
       }),
@@ -295,13 +313,13 @@ function extractClinicalFactsFromText(
         },
         sourceText: [vitalsHr.value, vitalsBp.value, vitalsSpo2.value].filter(Boolean).join(' · '),
         confidence: input.confidence ?? 0.7,
-        isAiDerived: input.isAiDerived ?? true,
+        requiresHumanReview: true,
         sourceState: input.sourceState as ArtifactSourceStateLabel,
         provenance: {
           sourceType: input.sourceType,
           sourceSystem: input.sourceSystem || 'uploaded_document',
-          extractedBy: input.extractedBy || EXTRACTOR_NAME,
-          modelVersion: input.modelVersion || MODEL_VERSION,
+          extractedBy: EXTRACTOR_NAME,
+          modelVersion: MODEL_VERSION,
           extractedAt: nowIso(),
         },
       }),
@@ -325,13 +343,13 @@ function extractClinicalFactsFromText(
         sourceText: troponin.value || 'troponin',
         sourceSpan: troponin.span,
         confidence: input.confidence ?? 0.78,
-        isAiDerived: input.isAiDerived ?? true,
+        requiresHumanReview: true,
         sourceState: input.sourceState as ArtifactSourceStateLabel,
         provenance: {
           sourceType: input.sourceType,
           sourceSystem: input.sourceSystem || 'uploaded_document',
-          extractedBy: input.extractedBy || EXTRACTOR_NAME,
-          modelVersion: input.modelVersion || MODEL_VERSION,
+          extractedBy: EXTRACTOR_NAME,
+          modelVersion: MODEL_VERSION,
           extractedAt: nowIso(),
         },
       }),
@@ -353,13 +371,13 @@ function extractClinicalFactsFromText(
         sourceText: handoff.value || rawText.slice(0, 240),
         sourceSpan: handoff.span,
         confidence: input.confidence ?? 0.75,
-        isAiDerived: input.isAiDerived ?? true,
+        requiresHumanReview: true,
         sourceState: input.sourceState as ArtifactSourceStateLabel,
         provenance: {
           sourceType: input.sourceType,
           sourceSystem: input.sourceSystem || 'uploaded_document',
-          extractedBy: input.extractedBy || EXTRACTOR_NAME,
-          modelVersion: input.modelVersion || MODEL_VERSION,
+          extractedBy: EXTRACTOR_NAME,
+          modelVersion: MODEL_VERSION,
           extractedAt: nowIso(),
         },
       }),
@@ -418,7 +436,7 @@ export function extractDocumentArtifacts(input: ExtractDocumentArtifactsInput): 
         filename: input.filename,
       },
       confidence: 1,
-      isAiDerived: false,
+      requiresHumanReview: false,
       sourceState: input.sourceState || 'extracted',
       provenance: {
         sourceType: input.sourceType,
@@ -457,7 +475,7 @@ function deriveCopilotArtifactsFromText(
         label: 'Consider HEART score tool',
         value: { toolId: 'heart-score', reason: 'Chest pain documented in source text' },
         confidence: 0.68,
-        isAiDerived: true,
+        requiresHumanReview: true,
         sourceState: input.sourceState as ArtifactSourceStateLabel,
         provenance: {
           sourceType: input.sourceType,
@@ -477,7 +495,7 @@ function deriveCopilotArtifactsFromText(
         label: 'Consider ECG checklist',
         value: { toolId: 'ecg-checklist', reason: 'Chest pain pathway' },
         confidence: 0.65,
-        isAiDerived: true,
+        requiresHumanReview: true,
         sourceState: input.sourceState as ArtifactSourceStateLabel,
         provenance: {
           sourceType: input.sourceType,
@@ -502,7 +520,7 @@ function deriveCopilotArtifactsFromText(
         label: 'Review anticoagulant medication history',
         value: { question: 'Confirm indication, last dose, and reversal plan if applicable.' },
         confidence: 0.7,
-        isAiDerived: true,
+        requiresHumanReview: true,
         sourceState: input.sourceState as ArtifactSourceStateLabel,
         provenance: {
           sourceType: input.sourceType,
@@ -529,7 +547,7 @@ function deriveCopilotArtifactsFromText(
           questions: ['Exact symptom onset?', 'Aspirin given prehospital?', 'Prior CAD history?'],
         },
         confidence: 0.62,
-        isAiDerived: true,
+        requiresHumanReview: true,
         sourceState: input.sourceState as ArtifactSourceStateLabel,
         provenance: {
           sourceType: input.sourceType,
@@ -560,7 +578,7 @@ export function extractArtifactsFromPatient(patient: Patient): PatientDocumentAr
         label: complaint,
         value: { complaint },
         confidence: 1,
-        isAiDerived: false,
+        requiresHumanReview: false,
         sourceState: 'staff_entered',
         provenance: {
           sourceType: 'patient_record',
@@ -587,7 +605,7 @@ export function extractArtifactsFromPatient(patient: Patient): PatientDocumentAr
           waitingRoomStatus: arrival.waitingRoomStatus,
         },
         confidence: 1,
-        isAiDerived: false,
+        requiresHumanReview: false,
         sourceState: 'live',
         provenance: {
           sourceType: 'patient_record',
@@ -612,7 +630,7 @@ export function extractArtifactsFromPatient(patient: Patient): PatientDocumentAr
         value: { summary, unitName: patient.emsArrival.unitName },
         sourceText: summary,
         confidence: 0.9,
-        isAiDerived: false,
+        requiresHumanReview: false,
         sourceState: 'live',
         provenance: {
           sourceType: 'ems_report',
@@ -635,7 +653,7 @@ export function extractArtifactsFromPatient(patient: Patient): PatientDocumentAr
         label: 'Reassessment due',
         value: { trigger: 'reassessment_flag' },
         confidence: 0.95,
-        isAiDerived: true,
+        requiresHumanReview: true,
         sourceState: 'live',
         provenance: {
           sourceType: 'patient_record',
@@ -661,7 +679,7 @@ export function extractArtifactsFromPatient(patient: Patient): PatientDocumentAr
           deterioration: hasPatientFlag(patient, PatientFlag.DeteriorationRisk),
         },
         confidence: 0.88,
-        isAiDerived: true,
+        requiresHumanReview: true,
         sourceState: 'live',
         provenance: {
           sourceType: 'patient_record',
@@ -688,7 +706,7 @@ export function extractArtifactsFromPatient(patient: Patient): PatientDocumentAr
           destination: (patient.referral as unknown as { destination?: string }).destination,
         },
         confidence: 1,
-        isAiDerived: false,
+        requiresHumanReview: false,
         sourceState: 'live',
         provenance: {
           sourceType: 'patient_record',
@@ -711,7 +729,7 @@ export function extractArtifactsFromPatient(patient: Patient): PatientDocumentAr
         label: 'Boarding in progress',
         value: { state: patient.state },
         confidence: 1,
-        isAiDerived: false,
+        requiresHumanReview: false,
         sourceState: 'live',
         provenance: {
           sourceType: 'patient_record',

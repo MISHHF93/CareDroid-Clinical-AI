@@ -35,7 +35,21 @@ describe('patientDocumentArtifactModel', () => {
     expect(artifacts.some((a) => a.artifactType === 'CHIEF_COMPLAINT')).toBe(true);
     expect(artifacts.some((a) => a.artifactType === 'LAB_RESULT')).toBe(true);
     expect(artifacts.some((a) => a.artifactType === 'COPILOT_TOOL_RECOMMENDATION')).toBe(true);
-    expect(artifacts.every((a) => a.safety.isAiDerived ? a.reviewStatus === 'pending_human_review' : true)).toBe(true);
+    // 2026-08-08: every artifact this module produces comes from a regex/
+    // keyword parser (clinicalArtifactParser.ts, labeled()) -- zero LLM or
+    // model calls anywhere. Locks in the fix for a real bug: safety
+    // .isAiDerived previously defaulted to true and several call sites
+    // (including the "Consider HEART score tool" copilot suggestion above)
+    // hardcoded it true, regardless of the extraction mechanism.
+    expect(artifacts.every((a) => a.safety.isAiDerived === false)).toBe(true);
+    expect(artifacts.every((a) => a.provenance.responseSource === 'DETERMINISTIC_RULE')).toBe(true);
+    // Deterministic extraction still needs staff sign-off before clinical
+    // use -- requiresHumanReview is a separate, unaffected concept.
+    expect(
+      artifacts
+        .filter((a) => a.reviewStatus === 'pending_human_review')
+        .every((a) => a.safety.requiresHumanReview === true),
+    ).toBe(true);
   });
 
   it('extracts workflow artifacts from patient record', () => {
@@ -91,6 +105,11 @@ describe('patientDocumentArtifactModel', () => {
     expect(artifacts.some((a) => a.artifactType === 'REASSESSMENT_TRIGGER')).toBe(true);
     expect(artifacts.some((a) => a.artifactType === 'DETERIORATION_SIGNAL')).toBe(true);
     expect(artifacts.some((a) => a.artifactType === 'ARRIVAL_CONTEXT')).toBe(true);
+    // 2026-08-08: REASSESSMENT_TRIGGER/DETERIORATION_SIGNAL previously
+    // hardcoded isAiDerived: true even though both are produced by directly
+    // reading an existing patient flag (hasPatientFlag) -- not AI at all.
+    expect(artifacts.every((a) => a.safety.isAiDerived === false)).toBe(true);
+    expect(artifacts.every((a) => a.provenance.responseSource === 'DETERMINISTIC_RULE')).toBe(true);
   });
 
   it('merges artifacts without duplicates and applies review', () => {

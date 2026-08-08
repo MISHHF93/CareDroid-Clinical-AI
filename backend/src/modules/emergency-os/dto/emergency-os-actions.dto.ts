@@ -77,12 +77,14 @@ export class ExtractDocumentArtifactsDto {
   @IsOptional() @IsString() @MaxLength(80) parser?: string;
   @IsOptional() @IsString() @MaxLength(255) filename?: string;
   @IsOptional() @IsNumber() confidence?: number;
-  @IsOptional() @IsString() @MaxLength(120) extractedBy?: string;
-  @IsOptional() @IsString() @MaxLength(120) modelVersion?: string;
   @IsOptional()
   @IsIn(['live', 'demo', 'simulated', 'extracted', 'staff_entered'])
   sourceState?: 'live' | 'demo' | 'simulated' | 'extracted' | 'staff_entered';
-  @IsOptional() @IsBoolean() isAiDerived?: boolean;
+  // extractedBy/modelVersion/isAiDerived removed 2026-08-08: these let an
+  // HTTP caller claim PatientDocumentArtifactService.extract()'s regex-based
+  // field extraction was AI-derived, when the extraction mechanism is
+  // always the same regardless of what's claimed. The service now reports
+  // its own real provenance (DETERMINISTIC_RULE) unconditionally.
 }
 
 /** Mirrors PatientDocumentArtifactReviewInput. */

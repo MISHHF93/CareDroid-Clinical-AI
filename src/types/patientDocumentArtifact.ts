@@ -1,4 +1,5 @@
 import type { ISODateString } from './emergency';
+import type { AIResponseSourceCategory } from '../../lib/ai/provenanceContract';
 
 /** FHIR-friendly resource hints for interoperability mapping. */
 export type FhirResourceHint =
@@ -101,9 +102,22 @@ export type PatientDocumentArtifactProvenance = {
   modelVersion: string;
   extractedAt: ISODateString;
   auditEventId?: string;
+  /**
+   * How this artifact was actually produced -- the canonical AI Core Node
+   * category (lib/ai/provenanceContract.ts). Added 2026-08-08 after finding
+   * every regex/keyword-extracted artifact (CHIEF_COMPLAINT, ALLERGY,
+   * MEDICATION, LAB_RESULT, COPILOT_TOOL_RECOMMENDATION) defaulted
+   * `safety.isAiDerived` to `true` regardless of the extraction mechanism,
+   * which is unconditionally regex matching in
+   * PatientDocumentArtifactService.extractArtifactsFromText() -- never a
+   * model call. `isAiDerived` below is now derived from this field rather
+   * than a second, independently-settable boolean.
+   */
+  responseSource: AIResponseSourceCategory;
 };
 
 export type PatientDocumentArtifactSafety = {
+  /** Derived from provenance.responseSource; kept for backward-compat display. */
   isAiDerived: boolean;
   requiresHumanReview: boolean;
   mayAffectClinicalWorkflow: boolean;
@@ -161,8 +175,12 @@ export type ExtractDocumentArtifactsInput = {
   parser?: string;
   filename?: string;
   confidence?: number;
-  extractedBy?: string;
-  modelVersion?: string;
   sourceState?: ArtifactSourceStateLabel;
-  isAiDerived?: boolean;
+  // extractedBy/modelVersion/isAiDerived were previously caller-settable
+  // here, letting a caller claim an extraction was AI-derived when
+  // PatientDocumentArtifactService.extractArtifactsFromText() always
+  // performs the same regex/keyword extraction regardless of what's
+  // claimed. Removed 2026-08-08 -- the service now reports its own real
+  // provenance (DETERMINISTIC_RULE) unconditionally, since that's what's
+  // actually true of every artifact this method produces.
 };

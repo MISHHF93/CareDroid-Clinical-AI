@@ -7,6 +7,7 @@ import {
   reviewStatusLabel,
 } from '../../services/patientDocumentArtifactModel';
 import { useEmergencyStore } from '../../store/emergencyStore';
+import { AiTruthLabel, fromAIResponseSourceCategory } from '../ai/AiTruthLabel';
 import './PatientDocumentArtifactsStrip.css';
 
 type PatientDocumentArtifactsStripProps = {
@@ -117,11 +118,20 @@ export default function PatientDocumentArtifactsStrip({
             {visibleCopilot.map((artifact) => (
               <li key={artifact.id} className="patient-doc-artifacts__item patient-doc-artifacts__item--copilot">
                 <span className="patient-doc-artifacts__label">{artifact.label}</span>
-                {artifact.safety.isAiDerived ? (
-                  <span className="patient-doc-artifacts__advisory" title="AI-derived — staff review required">
-                    advisory
-                  </span>
-                ) : null}
+                {/* Found 2026-08-08: this badge previously only rendered when
+                    safety.isAiDerived was true, and every artifact defaulted
+                    to isAiDerived: true regardless of extraction mechanism --
+                    a bespoke boolean that could only say "AI or nothing."
+                    Unconditional now, sourced from the real
+                    provenance.responseSource, so a "Copilot Suggestions"
+                    section can't imply model-generated intelligence for a
+                    keyword-matched recommendation. */}
+                <AiTruthLabel
+                  {...fromAIResponseSourceCategory(artifact.provenance.responseSource, {
+                    sourceContext: `${artifactTypeLabel(artifact.artifactType)} — ${artifact.provenance.extractedBy}`,
+                  })}
+                  compact
+                />
               </li>
             ))}
           </ul>

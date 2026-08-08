@@ -164,7 +164,20 @@ export class PatientDocumentArtifactService {
     if (!rawText) return [];
 
     const timestamp = nowIso();
-    const isAiDerived = input.isAiDerived ?? true;
+    // Every artifact below is produced by the labeled()/regex helpers or a
+    // literal keyword test just below -- unconditionally deterministic
+    // regex extraction, never a model call, regardless of what raw text is
+    // supplied or what any caller might claim. Found 2026-08-08: this
+    // method previously let a caller override safety.isAiDerived (defaulted
+    // to true), which meant every real chief-complaint/allergy/medication/
+    // lab-result artifact this service has ever produced was labeled
+    // AI-derived by default -- see patient-document-artifact.service.spec.ts
+    // for the regression guard.
+    const REGEX_EXTRACTION_PROVENANCE = {
+      extractedBy: 'regex-field-extractor',
+      modelVersion: 'document-field-extractor-v1',
+      responseSource: 'DETERMINISTIC_RULE' as const,
+    };
     const artifacts: PatientDocumentArtifact[] = [];
 
     const push = (
@@ -204,6 +217,10 @@ export class PatientDocumentArtifactService {
         extractedBy: 'CareDroid Intake',
         modelVersion: 'intake-v1',
         extractedAt: timestamp,
+        // Straight recording of caller-supplied documentType/sourceType/
+        // filename, not a fixed string -- DETERMINISTIC_RULE, not
+        // STATIC_CONTENT.
+        responseSource: 'DETERMINISTIC_RULE',
       },
       safety: { isAiDerived: false, requiresHumanReview: false, mayAffectClinicalWorkflow: false },
       visibility: { showOnPatientCard: true, showOnWhiteboard: false, showInCopilot: true },
@@ -240,11 +257,10 @@ export class PatientDocumentArtifactService {
         provenance: {
           sourceType: input.sourceType,
           sourceSystem: input.sourceSystem || 'uploaded_document',
-          extractedBy: input.extractedBy || 'CareDroid Copilot',
-          modelVersion: input.modelVersion || 'document-extractor-v1',
+          ...REGEX_EXTRACTION_PROVENANCE,
           extractedAt: timestamp,
         },
-        safety: { isAiDerived, requiresHumanReview: true, mayAffectClinicalWorkflow: true },
+        safety: { isAiDerived: false, requiresHumanReview: true, mayAffectClinicalWorkflow: true },
         visibility: { showOnPatientCard: true, showOnWhiteboard: false, showInCopilot: true },
         sourceState: input.sourceState || 'extracted',
         fhirResourceHint: 'Condition',
@@ -268,11 +284,10 @@ export class PatientDocumentArtifactService {
         provenance: {
           sourceType: input.sourceType,
           sourceSystem: input.sourceSystem || 'uploaded_document',
-          extractedBy: input.extractedBy || 'CareDroid Copilot',
-          modelVersion: input.modelVersion || 'document-extractor-v1',
+          ...REGEX_EXTRACTION_PROVENANCE,
           extractedAt: timestamp,
         },
-        safety: { isAiDerived, requiresHumanReview: true, mayAffectClinicalWorkflow: true },
+        safety: { isAiDerived: false, requiresHumanReview: true, mayAffectClinicalWorkflow: true },
         visibility: { showOnPatientCard: true, showOnWhiteboard: false, showInCopilot: true },
         sourceState: input.sourceState || 'extracted',
         fhirResourceHint: 'AllergyIntolerance',
@@ -296,11 +311,10 @@ export class PatientDocumentArtifactService {
         provenance: {
           sourceType: input.sourceType,
           sourceSystem: input.sourceSystem || 'uploaded_document',
-          extractedBy: input.extractedBy || 'CareDroid Copilot',
-          modelVersion: input.modelVersion || 'document-extractor-v1',
+          ...REGEX_EXTRACTION_PROVENANCE,
           extractedAt: timestamp,
         },
-        safety: { isAiDerived, requiresHumanReview: true, mayAffectClinicalWorkflow: true },
+        safety: { isAiDerived: false, requiresHumanReview: true, mayAffectClinicalWorkflow: true },
         visibility: { showOnPatientCard: true, showOnWhiteboard: false, showInCopilot: true },
         sourceState: input.sourceState || 'extracted',
         fhirResourceHint: 'MedicationStatement',
@@ -324,11 +338,10 @@ export class PatientDocumentArtifactService {
         provenance: {
           sourceType: input.sourceType,
           sourceSystem: input.sourceSystem || 'uploaded_document',
-          extractedBy: input.extractedBy || 'CareDroid Copilot',
-          modelVersion: input.modelVersion || 'document-extractor-v1',
+          ...REGEX_EXTRACTION_PROVENANCE,
           extractedAt: timestamp,
         },
-        safety: { isAiDerived, requiresHumanReview: true, mayAffectClinicalWorkflow: true },
+        safety: { isAiDerived: false, requiresHumanReview: true, mayAffectClinicalWorkflow: true },
         visibility: { showOnPatientCard: true, showOnWhiteboard: false, showInCopilot: true },
         sourceState: input.sourceState || 'extracted',
         fhirResourceHint: 'DiagnosticReport',
@@ -349,11 +362,10 @@ export class PatientDocumentArtifactService {
         provenance: {
           sourceType: input.sourceType,
           sourceSystem: input.sourceSystem || 'copilot_synthesis',
-          extractedBy: 'CareDroid Copilot',
-          modelVersion: 'document-extractor-v1',
+          ...REGEX_EXTRACTION_PROVENANCE,
           extractedAt: timestamp,
         },
-        safety: { isAiDerived: true, requiresHumanReview: true, mayAffectClinicalWorkflow: false },
+        safety: { isAiDerived: false, requiresHumanReview: true, mayAffectClinicalWorkflow: false },
         visibility: { showOnPatientCard: true, showOnWhiteboard: false, showInCopilot: true },
         sourceState: input.sourceState || 'extracted',
         fhirResourceHint: 'CarePlan',

@@ -353,20 +353,26 @@ export class OcrIntakeService implements OnModuleDestroy {
 
     if (job.patientId) {
       try {
+        // extractedBy/modelVersion/isAiDerived were previously passed here
+        // claiming this Tesseract/mock-OCR job's field extraction was
+        // AI-derived (modelVersion: job.provider, isAiDerived: true) --
+        // removed 2026-08-08: extractArtifactsFromText() always performs
+        // the same regex/keyword extraction over whatever raw text it's
+        // given, and now reports that honestly (DETERMINISTIC_RULE)
+        // unconditionally rather than accepting a caller override. Which
+        // OCR provider supplied the raw text is still recorded at the
+        // source level via sourceSystem/sourceType below.
         this.documentArtifactService.extract(job.patientId, {
           patientId: job.patientId,
           encounterId: job.intakeSessionId,
           sourceDocumentId: job.id,
           documentType: job.documentType,
-          sourceSystem: 'ocr_intake_service',
+          sourceSystem: `ocr_intake_service:${job.provider}`,
           sourceType: referralSourceType(job.documentType),
           rawText: job.extractedText,
           filename: job.sourceFilename,
           confidence: job.overallConfidence,
-          extractedBy: `OCR Intake Service (${job.provider})`,
-          modelVersion: job.provider,
           sourceState: 'extracted',
-          isAiDerived: true,
         });
       } catch {
         // Document artifact enrichment is best-effort; the OCR job itself remains applied.

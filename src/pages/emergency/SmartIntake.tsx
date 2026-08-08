@@ -32,6 +32,7 @@ import { invokeUnifiedAiConversational } from '../../services/careDroidUnifiedAi
 import { getAIPrompt } from '../../lib/ai/promptRegistry';
 import { HUMAN_REVIEW_DISCLAIMER } from '../../lib/ai/safety/policy';
 import { RECEPTION_COPY } from '../../components/reception/receptionCopy';
+import { AiTruthLabel, type AiTruthLabelState } from '../../components/ai/AiTruthLabel';
 import { EmergencyRoutePage } from './emergencyRouteShared';
 import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
 import { RECEPTION_FIRST_UX } from '../../config/receptionFirstUx.config';
@@ -207,6 +208,12 @@ export default function SmartIntake({
   );
   const [aiVerificationHint, setAiVerificationHint] = useState('');
   const [aiHintLoading, setAiHintLoading] = useState(false);
+  // Found 2026-08-08: the catch-block fallback below rendered identically
+  // to a real LLM response, with no signal that a network/provider failure
+  // silently swapped in a hardcoded tip. Tracks which actually happened so
+  // the UI can say so via AiTruthLabel rather than implying every hint is
+  // live AI guidance.
+  const [aiVerificationHintState, setAiVerificationHintState] = useState<AiTruthLabelState>('Live');
   const verifyIntakePresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.verifyIntake);
   const createPatientPresentation = emergencyRole.presentAction(EMERGENCY_ACTIONS.createPatient);
   const canVerifyIntake = verifyIntakePresentation.enabled;
@@ -603,7 +610,6 @@ export default function SmartIntake({
           filename: captured.filename,
           parser: selectedArtifact?.parser,
           sourceState: 'extracted',
-          isAiDerived: captured.source === 'ai_assist' || captured.source === 'text_parser',
         }).catch(() => undefined);
       }
     } catch {
@@ -634,7 +640,6 @@ export default function SmartIntake({
           sourceType: 'staff_paste',
           rawText: supplementalCaptureText,
           sourceState: 'staff_entered',
-          isAiDerived: false,
         }).catch(() => undefined);
       }
       if (routeResult.backendSyncStatus === 'failed') {
@@ -834,15 +839,25 @@ export default function SmartIntake({
           },
         },
       });
-      const hint =
+      const hintText =
         (typeof response?.content === 'string' && response.content) ||
-        (typeof response?.data?.response === 'string' && response.data.response) ||
-        'Review highlighted fields and confirm identity before handoff.';
-      setAiVerificationHint(`${hint}\n\n${HUMAN_REVIEW_DISCLAIMER}`);
+        (typeof response?.data?.response === 'string' && response.data.response);
+      if (hintText) {
+        setAiVerificationHint(`${hintText}\n\n${HUMAN_REVIEW_DISCLAIMER}`);
+        setAiVerificationHintState('Live');
+      } else {
+        // Real call succeeded but returned no usable text -- same fallback
+        // as the catch block, same honest labeling.
+        setAiVerificationHint(
+          `Review highlighted fields and confirm identity before handoff.\n\n${HUMAN_REVIEW_DISCLAIMER}`,
+        );
+        setAiVerificationHintState('Stale');
+      }
     } catch {
       setAiVerificationHint(
         `Verify name, date of birth, and health card against the document source before handoff.\n\n${HUMAN_REVIEW_DISCLAIMER}`,
       );
+      setAiVerificationHintState('Stale');
     } finally {
       setAiHintLoading(false);
     }
@@ -898,7 +913,21 @@ export default function SmartIntake({
                 ? RECEPTION_COPY.identityCheck.aiHelp
                 : 'AI verification help'}
           </button>
-          {aiVerificationHint ? <p>{aiVerificationHint}</p> : null}
+          {aiVerificationHint ? (
+            <>
+              <AiTruthLabel
+                state={aiVerificationHintState}
+                sourceContext={
+                  aiVerificationHintState === 'Live'
+                    ? 'Real-time AI verification guidance (Anthropic-backed intake assistant)'
+                    : 'AI verification call failed or returned nothing — showing a fixed fallback tip, not a live AI response'
+                }
+                reviewRequired
+                compact
+              />
+              <p>{aiVerificationHint}</p>
+            </>
+          ) : null}
         </div>
       ) : null}
       {errorMessage ? (

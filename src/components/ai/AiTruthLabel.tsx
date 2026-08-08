@@ -1,5 +1,6 @@
 import type { NativeAiSourceState } from '../../../lib/native-ai/types';
 import type { EnhancementMaturity } from '../../config/edPlatformEnhancementRegistry';
+import type { AIResponseSourceCategory } from '../../../lib/ai/provenanceContract';
 import './AiTruthLabel.css';
 
 /**
@@ -233,6 +234,44 @@ export function nativeAiTriageBridgeTruthLabel(): AiTruthLabelInfo {
     state: 'Manual',
     sourceContext: 'Native-AI expert-system triage signal — rule-based inference, not a trained model',
     reviewRequired: true,
+  };
+}
+
+/**
+ * Bridges the canonical AI Core Node provenance contract
+ * (lib/ai/provenanceContract.ts's AIResponseSourceCategory, 2026-08-08) to
+ * this file's Live/Manual/Stale/Demo display vocabulary. Any surface that
+ * already carries a real `responseSource` should use this instead of
+ * hand-rolling a new mapping -- this is the one place that decision is
+ * made, so a future 9th category doesn't need updating at every call site.
+ */
+export function fromAIResponseSourceCategory(
+  responseSource: AIResponseSourceCategory,
+  input: { sourceContext: string; reviewRequired?: boolean },
+): AiTruthLabelInfo {
+  const state: AiTruthLabelState = (() => {
+    switch (responseSource) {
+      case 'LLM_GENERATED':
+      case 'MODEL_PREDICTION':
+      case 'RAG_ASSISTED':
+        return 'Live';
+      case 'TOOL_RESULT':
+      case 'DETERMINISTIC_RULE':
+        return 'Manual';
+      case 'FIXTURE_DEMO':
+        return 'Demo';
+      case 'STATIC_CONTENT':
+      case 'UNAVAILABLE':
+        return 'Stale';
+      default:
+        return 'Manual';
+    }
+  })();
+
+  return {
+    state,
+    sourceContext: input.sourceContext,
+    reviewRequired: input.reviewRequired ?? true,
   };
 }
 
