@@ -165,7 +165,7 @@
     </div>
     <div class="meta-block">
       Generated 2026-08-06, updated 2026-08-08<br />
-      HEAD <code style="font-family: var(--mono)">ed1d244e</code><br />
+      HEAD <code style="font-family: var(--mono)">139c3442</code><br />
       <a href="https://github.com/MISHHF93/CareDroid-Clinical-AI">github.com/MISHHF93/CareDroid-Clinical-AI</a>
     </div>
   </header>
@@ -174,20 +174,24 @@
     <div class="score-ring">
       <svg width="160" height="160" viewBox="0 0 160 160">
         <circle class="track" cx="80" cy="80" r="68" fill="none" stroke-width="11"></circle>
-        <circle class="fill" cx="80" cy="80" r="68" fill="none" stroke-width="11" stroke-dasharray="427.3" stroke-dashoffset="134.6"</circle>
+        <circle class="fill" cx="80" cy="80" r="68" fill="none" stroke-width="11" stroke-dasharray="427.3" stroke-dashoffset="132.0"</circle>
       </svg>
-      <div class="num"><strong>68.5</strong><span>/ 100</span></div>
+      <div class="num"><strong>69.1</strong><span>/ 100</span></div>
     </div>
     <div class="hero-body">
       <span class="band-chip">Significant improvement required (repository-verifiable ceiling)</span>
-      <h2>Corrected 2026-08-06: 3 of the scorecard's own original findings were themselves wrong — a dedicated verification pass found real mechanisms this first draft had scored as absent, and 3 concrete bugs found along the way are now fixed. Updated 2026-08-08: a symptom/complaint-recognition audit found a real safety-relevant gap in Reception's primary intake path (three unsynchronized keyword systems, the weakest one wired into the main flow) and a same-day demo-identity fix that hadn't actually reached production — both fixed and tested; see Domain 1</h2>
+      <h2>Corrected 2026-08-06: 3 of the scorecard's own original findings were themselves wrong — a dedicated verification pass found real mechanisms this first draft had scored as absent, and 3 concrete bugs found along the way are now fixed. Updated 2026-08-08: a symptom/complaint-recognition audit found a real safety-relevant gap in Reception's primary intake path (three unsynchronized keyword systems, the weakest one wired into the main flow) and a same-day demo-identity fix that hadn't actually reached production — both fixed and tested; see Domain 1. Also 2026-08-08: this scorecard's own "real backend cron" claim for Waiting Room Safety was itself wrong — it never runs by default — and the actual reach gap (in-app only, no out-of-band channel) is now partly closed with a real email notification on auto-escalation; see Domain 2</h2>
       <p>
-        <strong>Repository Implementation Score: 685/1000 (68.5%), up from an initial 520/1000.</strong>
+        <strong>Repository Implementation Score: 691/1000 (69.1%), up from an initial 520/1000.</strong>
         <strong>Pilot Evidence Score: ~10/100</strong> — unchanged; code existing and being wired is still not
         evidence of clinical validation. A dedicated research pass corrected 3 domains this scorecard originally
-        got wrong: <strong>Waiting Room Safety</strong> (42→58/100) — a real backend cron and a real client-side
-        auto-escalation transition (3-minute deadline, audit trail) both exist; the actual gap is narrower than
-        first scored (in-app-only reach, not "no escalation at all"). <strong>Interoperability</strong> (3→10/25)
+        got wrong: <strong>Waiting Room Safety</strong> (42→58→64/100) — the 2026-08-06 pass credited a real backend
+        cron alongside a real client-side auto-escalation transition (3-minute deadline, audit trail); a follow-up
+        pass on 2026-08-08 found the cron only runs when <code>ENABLE_MONGOOSE_EMERGENCY_OS</code> is set — false by
+        default, so it never fires in production — and removed that credit, while extending the still-real
+        client-side escalation with an actual out-of-band email notification (via the already-existing
+        <code>EmailService</code> + <code>INCIDENT_ESCALATION_EMAILS</code> config, previously read by a legacy stub
+        that never sent anything). <strong>Interoperability</strong> (3→10/25)
         — real, live HL7 FHIR R4 resource construction exists in the Sentinel EMS path (<code>lib/sentinel/fhirMap.ts</code>),
         contradicting the original "no FHIR/HL7 code" finding, though it sits next to genuinely-fake demo stubs
         using the same vocabulary elsewhere. <strong>Capacity/Boarding/Referral</strong> (38→44/75) — a confirmed
@@ -198,8 +202,10 @@
         strongest evidence in the whole scorecard, plus a newly-fixed route-registry scanner blind spot that had
         been producing ~99 false-positive "missing route" findings. <strong>Weakest domain:</strong> Interoperability
         (10/25) — real in one narrow path, fake-stub in others. <strong>Highest safety risk, revised:</strong>
-        Waiting Room Safety's escalation mechanism is real but reaches only someone already looking at the app —
-        no push/SMS/pager channel exists. <strong>Highest UX risk:</strong> zero live browser/axe-core verification
+        Waiting Room Safety's escalation mechanism now reaches an out-of-band email list when one is configured
+        (<code>INCIDENT_ESCALATION_EMAILS</code>) — but that list is empty by default, so most deployments still
+        see in-app-only reach until an operator configures it, and no push/SMS/pager channel exists yet.
+        <strong>Highest UX risk:</strong> zero live browser/axe-core verification
         exists anywhere in this program. <strong>Highest security/privacy risk:</strong> no commissioned
         penetration test and no bespoke application security review exist.
       </p>
@@ -208,7 +214,7 @@
 
   <div class="decision-strip">
     <div class="decision-card"><span class="decision-label">Pilot gate</span><div class="decision-value" style="color:var(--red)">NOT READY FOR PILOT</div><p>6 P0 gates open on the sibling scorecard; none require more code alone.</p></div>
-    <div class="decision-card"><span class="decision-label">Repo implementation</span><div class="decision-value">685 / 1000</div><p>Evidence-backed, code-level maturity across 12 domains.</p></div>
+    <div class="decision-card"><span class="decision-label">Repo implementation</span><div class="decision-value">691 / 1000</div><p>Evidence-backed, code-level maturity across 12 domains.</p></div>
     <div class="decision-card"><span class="decision-label">Pilot evidence</span><div class="decision-value" style="color:var(--amber)">~10 / 100</div><p>Live/clinician/external validation, separated from implementation.</p></div>
     <div class="decision-card"><span class="decision-label">Evidence confidence</span><div class="decision-value">High</div><p>Every score cites a file, route, test, or command — 3 domains marked NOT VERIFIED rather than guessed.</p></div>
   </div>
@@ -222,7 +228,7 @@
       <thead><tr><th>Domain</th><th class="num">Weight</th><th class="num">Score</th><th class="num">%</th><th>Confidence</th><th>Status</th></tr></thead>
       <tbody>
         <tr><td>1. Product &amp; Workflow Completeness</td><td class="num">150</td><td class="num">94</td><td class="num">63%</td><td>Confirmed</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
-        <tr><td>2. Waiting Room Safety</td><td class="num">100</td><td class="num">58</td><td class="num">58%</td><td>Confirmed</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
+        <tr><td>2. Waiting Room Safety</td><td class="num">100</td><td class="num">64</td><td class="num">64%</td><td>Confirmed</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
         <tr><td>3. Emergency Whiteboard &amp; Queue Intelligence</td><td class="num">100</td><td class="num">61</td><td class="num">61%</td><td>Confirmed</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
         <tr><td>4. EMS &amp; Offload</td><td class="num">75</td><td class="num">58</td><td class="num">77%</td><td>Confirmed</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
         <tr><td>5. Capacity, Boarding &amp; Referral Intelligence</td><td class="num">75</td><td class="num">50</td><td class="num">67%</td><td>Confirmed</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
@@ -233,7 +239,7 @@
         <tr><td>10. Quality Engineering &amp; Pilot Readiness</td><td class="num">100</td><td class="num">63</td><td class="num">63%</td><td>Confirmed</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
         <tr><td>11. Interoperability, Data &amp; Integration Readiness</td><td class="num">25</td><td class="num">12</td><td class="num">48%</td><td>Confirmed (mixed)</td><td>🟡 <span class="pill partial">Partial</span></td></tr>
         <tr><td>12. AI Governance &amp; Operational Intelligence</td><td class="num">25</td><td class="num">24</td><td class="num">96%</td><td>Strong evidence</td><td>🔵 <span class="pill strong">Strong</span></td></tr>
-        <tr><td><strong>Total</strong></td><td class="num"><strong>1000</strong></td><td class="num"><strong>685</strong></td><td class="num"><strong>69%</strong></td><td>—</td><td>—</td></tr>
+        <tr><td><strong>Total</strong></td><td class="num"><strong>1000</strong></td><td class="num"><strong>691</strong></td><td class="num"><strong>69%</strong></td><td>—</td><td>—</td></tr>
       </tbody>
     </table>
   </div>
@@ -293,34 +299,35 @@
 
     <article class="dom-card partial">
       <div class="dom-main">
-        <div class="dom-top"><span class="dom-index">02 / 12</span><span class="dom-score">58<span> / 100</span></span></div>
+        <div class="dom-top"><span class="dom-index">02 / 12</span><span class="dom-score">64<span> / 100</span></span></div>
         <span class="status-chip partial">Partial</span>
         <h3>Waiting Room Safety</h3>
-        <div class="progress-track"><div class="progress-fill partial" style="width: 58%"></div></div>
+        <div class="progress-track"><div class="progress-fill partial" style="width: 64%"></div></div>
       </div>
       <details>
         <summary>Full review</summary>
         <div class="detail-body">
           <h4>What works</h4>
           <ul>
-            <li><strong>Corrected 2026-08-06 — a real escalation mechanism exists, not just a computed field.</strong> A backend cron (every minute) writes real, persisted overdue-alert data to the patient record (<code>backend/src/scheduler/reassessment.scheduler.ts:12-28</code>, <code>Patient.findByIdAndUpdate</code>), wired up in <code>main.ts:60</code><span class="conf confirmed">Confirmed</span>.</li>
+            <li><strong>Corrected 2026-08-08 — the 2026-08-06 "real backend cron" credit was itself wrong for production.</strong> <code>reassessmentScheduler.start()</code> only runs inside <code>registerEmergencyMongooseRuntime()</code>, which returns immediately unless <code>ENABLE_MONGOOSE_EMERGENCY_OS</code> is set (<code>backend/src/main.ts:49-60</code>) — false by default, so the cron in <code>backend/src/scheduler/reassessment.scheduler.ts:12-28</code> exists in the repo but never fires in the deployment this platform actually runs. Credit for it has been removed<span class="conf confirmed">Confirmed</span>.</li>
             <li><strong>A real client-side auto-escalation action exists</strong>: <code>src/services/alertLifecycleOrchestrator.ts:442-462</code> automatically transitions any unacknowledged Critical alert to <code>lifecycleStatus: 'escalated'</code> after a 3-minute deadline, with its own audit trail — not a passive badge, an active transition, running automatically every 30s via <code>src/components/AppShell.tsx:513-520</code><span class="conf confirmed">Confirmed</span>.</li>
+            <li><strong>FOUND AND FIXED 2026-08-08 — the auto-escalation transition now sends a real out-of-band email notification.</strong> A new endpoint (<code>POST /api/emergency/waiting-room-safety/escalation-notify</code>) emails every address in <code>INCIDENT_ESCALATION_EMAILS</code> via the already-working <code>EmailService</code> (<code>backend/src/modules/email/email.service.ts</code>) — the same config key a legacy stub (<code>incident-reporting.service.ts</code>) read but never actually sent to. Called fire-and-forget from the escalation loop in <code>alertLifecycleOrchestrator.ts</code>. 4 new backend tests cover all-recipients-sent, no-recipients-configured, no-email-service, and one-recipient-fails-doesn't-block-others<span class="conf confirmed">Confirmed</span>.</li>
             <li><code>ReassessmentController</code> exposes real, live-called endpoints with 9/9 passing tests<span class="conf confirmed">Confirmed</span>.</li>
           </ul>
           <h4>What is partial</h4>
           <ul>
-            <li><strong>The gap is narrower than originally scored: reach, not existence.</strong> <code>acknowledge</code>/<code>escalate</code> only mutate the in-app store and audit log — no push/SMS/pager/email/task-assignment is touched. It reaches only someone already looking at the app, not someone away from a screen<span class="conf confirmed">Confirmed</span>.</li>
+            <li><strong>The new channel is real but opt-in, not default-on.</strong> <code>INCIDENT_ESCALATION_EMAILS</code> is empty by default, so a fresh deployment still only reaches someone already looking at the app until an operator configures recipients (and SMTP on <code>EmailService</code>). The channel is also email-only, targeting a static distribution list rather than the specific on-duty charge nurse<span class="conf confirmed">Confirmed</span>.</li>
           </ul>
           <h4>What is missing / not verified</h4>
           <ul>
             <li>A named "deterioration watch" concept and LWBS tracking as first-class, labeled features remain <span class="conf notver">Not verified</span>.</li>
           </ul>
           <h4>Risks</h4>
-          <p>Reduced from the original finding but still real: in-app-only escalation means a lapsed reassessment on a patient nobody is currently viewing may not reach anyone until they happen to look.</p>
+          <p>Narrower than the prior finding but still real: without <code>INCIDENT_ESCALATION_EMAILS</code> configured (the default) or SMTP set up on <code>EmailService</code>, escalation is still in-app-only. Even configured, a static email list is slower and less targeted than a paging/SMS integration tied to the on-duty charge nurse.</p>
           <h4>Evidence</h4>
-          <p><code>backend/src/scheduler/reassessment.scheduler.ts:12-28</code>, <code>backend/src/main.ts:60</code>, <code>src/services/alertLifecycleOrchestrator.ts:69,314-330,358-366,442-462</code>, <code>src/components/AppShell.tsx:513-520</code>. Verified by a dedicated research pass, 2026-08-06.</p>
+          <p><code>backend/src/main.ts:49-60</code>, <code>backend/src/scheduler/reassessment.scheduler.ts:12-28</code>, <code>src/services/alertLifecycleOrchestrator.ts:442-462</code>, <code>backend/src/modules/emergency-os/emergency-os.services.ts</code> (<code>ReassessmentService.notifyWaitingRoomEscalation</code>), <code>backend/src/modules/emergency-os/emergency-os.controller.ts</code>, <code>backend/src/modules/email/email.service.ts</code>, <code>backend/src/modules/emergency-os/waiting-room-escalation-notification.spec.ts</code>. Verified and fixed 2026-08-08.</p>
           <h4>Required for full marks</h4>
-          <p>Add a real out-of-band notification channel to the already-real escalation transition — the mechanism doesn't need building from scratch, only extending past the browser tab.</p>
+          <p>Default-configure <code>INCIDENT_ESCALATION_EMAILS</code> (or add a real paging/SMS integration) for production deployments, and route the notification to the specific on-duty charge nurse/team rather than a static list.</p>
         </div>
       </details>
     </article>
@@ -663,13 +670,13 @@
 
   <div class="section-head">
     <h2>Full-mark gap register</h2>
-    <p>Every material finding above, prioritized. G6, G7, and G9 closed 2026-08-06; G3 and G5 corrected the same day (both had been significantly overstated — DTO validation is 95.6% done, not ~60%; the EMS offload metric is real and tested, not a demo placeholder, and a real bug in it was fixed). G13 closed 2026-08-07 — found and fixed the precise mechanism behind the FHIR/HL7 confusability risk (a demo/live classifier that missed "synthetic_ready"). G10 further narrowed the same day — 4 real truthfulness bugs hiding behind the flagged modelRegistry metrics were found and fixed (the drift-monitoring baseline, 2 separate recurrences of the same failure in 2 different native-AI code paths, and an internal inconsistency in the registry's own prior audit correction), though the core 23-surface labeling gap is unchanged. G5 and G6 both fully closed 2026-08-08 — real TypeORM persistence added for EMS arrival status transitions and referrals respectively, closing the durability gap named in each. Sum of Points Recoverable from the named findings above ≈ 64 — this is narrower than the full remaining gap to 1000, which also includes smaller, not-individually-named domain-level deductions plus the external-only items (pentest, clinician sign-off, live infrastructure, counsel review) no amount of code alone closes.</p>
+    <p>Every material finding above, prioritized. G6, G7, and G9 closed 2026-08-06; G3 and G5 corrected the same day (both had been significantly overstated — DTO validation is 95.6% done, not ~60%; the EMS offload metric is real and tested, not a demo placeholder, and a real bug in it was fixed). G13 closed 2026-08-07 — found and fixed the precise mechanism behind the FHIR/HL7 confusability risk (a demo/live classifier that missed "synthetic_ready"). G10 further narrowed the same day — 4 real truthfulness bugs hiding behind the flagged modelRegistry metrics were found and fixed (the drift-monitoring baseline, 2 separate recurrences of the same failure in 2 different native-AI code paths, and an internal inconsistency in the registry's own prior audit correction), though the core 23-surface labeling gap is unchanged. G5 and G6 both fully closed 2026-08-08 — real TypeORM persistence added for EMS arrival status transitions and referrals respectively, closing the durability gap named in each. G1 narrowed further 2026-08-08 — the escalation transition now sends a real out-of-band email notification (via the already-real <code>EmailService</code> + <code>INCIDENT_ESCALATION_EMAILS</code> config); the remaining gap is that the recipient list is empty by default and the channel is email-only, not push/SMS/pager. Sum of Points Recoverable from the named findings above ≈ 52 — this is narrower than the full remaining gap to 1000, which also includes smaller, not-individually-named domain-level deductions plus the external-only items (pentest, clinician sign-off, live infrastructure, counsel review) no amount of code alone closes.</p>
   </div>
   <div class="ledger-table-wrap">
     <table class="ledger">
       <thead><tr><th>ID</th><th>Domain</th><th>Sev</th><th>Gap</th><th>Required change</th><th class="num">Pts</th></tr></thead>
       <tbody>
-        <tr><td>G1</td><td>Waiting Room Safety</td><td><span class="pill p1">P1</span></td><td><strong>Revised:</strong> a real escalation mechanism exists (backend cron + auto-escalate-on-timeout); the gap is reach — in-app only, no push/SMS/pager</td><td>Add an out-of-band notification channel to the existing transition</td><td class="num">20</td></tr>
+        <tr><td>G1</td><td>Waiting Room Safety</td><td><span class="pill p1">P1</span></td><td><strong>Revised 2026-08-08:</strong> the "backend cron" previously credited here was dead code (gated behind a flag that defaults false); a real out-of-band email channel now exists on the client-side auto-escalation transition, but it's opt-in (empty recipient list by default) and email-only</td><td>Ship a default-configured recipient list (or real paging/SMS) and route to the specific on-duty charge nurse</td><td class="num">8</td></tr>
         <tr><td>G2</td><td>RBAC/Security</td><td><span class="pill p0">P0</span></td><td>No commissioned pentest or bespoke app-sec review</td><td>External engagement</td><td class="num">external</td></tr>
         <tr><td>G3</td><td>RBAC/Security</td><td><span class="pill p3">P3 (was P1)</span></td><td><strong>Corrected 2026-08-06</strong> — was "~60% unvalidated"; the live regression-guard test shows 129/135 backend DTOs (95.6%) actually validated. 6 remain, each deliberately deferred (3 need a product decision, 3 need dedicated settings-blob DTO cycles)</td><td>Resolve the 6 remaining deferred routes — see Source Code Quality Scorecard's D1 for the full breakdown</td><td class="num">4</td></tr>
         <tr><td>G4</td><td>UX/Accessibility</td><td><span class="pill p1">P1</span></td><td>Zero live browser/axe-core verification ever run</td><td>Run real accessibility scan on unrestricted hardware</td><td class="num">18</td></tr>
