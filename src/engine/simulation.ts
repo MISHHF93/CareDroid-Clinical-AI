@@ -25,7 +25,6 @@ const FLOW_INTERVAL_MS = 30_000;
 const ARRIVAL_AND_SAFETY_INTERVAL_MS = 60_000;
 const EMS_INTERVAL_MS = 180_000;
 const ALERT_INTERVAL_MS = 300_000;
-export const SIMULATION_STATUS_EVENT = 'ed:simulation-status';
 
 type TimerHandle = number;
 
@@ -703,15 +702,6 @@ export const isEmergencySimulationAvailable = (): boolean => {
   return !viteEnv.PROD || isDemoMode || isSimulationMode;
 };
 
-const emitSimulationStatus = (running: boolean): void => {
-  if (typeof window === 'undefined') return;
-  window.dispatchEvent(
-    new CustomEvent(SIMULATION_STATUS_EVENT, {
-      detail: { running, available: isEmergencySimulationAvailable() },
-    })
-  );
-};
-
 const createSimulationEngine = (): SimulationEngine => {
   let flowTimer: TimerHandle | null = null;
   let arrivalAndSafetyTimer: TimerHandle | null = null;
@@ -727,7 +717,6 @@ const createSimulationEngine = (): SimulationEngine => {
     arrivalAndSafetyTimer = null;
     emsTimer = null;
     alertTimer = null;
-    emitSimulationStatus(false);
   };
 
   const start = (): void => {
@@ -741,7 +730,6 @@ const createSimulationEngine = (): SimulationEngine => {
     emsTimer = window.setInterval(addEMSPreArrivalNotification, EMS_INTERVAL_MS);
     alertTimer = window.setInterval(triggerRandomDemoAlert, ALERT_INTERVAL_MS);
     runSafetyAndCapacityChecks();
-    emitSimulationStatus(true);
   };
 
   const toggle = (): boolean => {

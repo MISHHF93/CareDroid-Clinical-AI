@@ -5805,13 +5805,6 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       (set as any)(() => {
         const scenarioState = buildSrcEmergencyScenarioState(scenarioId) as any;
         persistEdScenarioId(scenarioState.activeScenarioId);
-        if (typeof window !== 'undefined') {
-          window.dispatchEvent(
-            new CustomEvent('ed:scenario-selected', {
-              detail: { scenarioId: scenarioState.activeScenarioId },
-            }),
-          );
-        }
         return {
           patients: scenarioState.patients,
           staff: scenarioState.staff,

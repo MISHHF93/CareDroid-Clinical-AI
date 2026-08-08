@@ -102,11 +102,6 @@ export function useCareDroidUser(): UseCareDroidUserResult {
         emergencyRoleId,
       );
       setUser(nextUser);
-      try {
-        window.dispatchEvent(new CustomEvent('caredroid:demo-user-switched', { detail: compiled }));
-      } catch {
-        // Expected when window is unavailable (SSR, test environment).
-      }
     },
     [setUser],
   );

@@ -99,11 +99,4 @@ export function raiseOperationalAlarm(alert: Alert): void {
   if (plan.surfaces.includes(ALARM_SURFACE.sidebarPulse)) {
     pulseNotificationCenter(alert);
   }
-  if (plan.surfaces.includes(ALARM_SURFACE.shellDock)) {
-    document.dispatchEvent(
-      new CustomEvent('operational-alarm-dock-refresh', {
-        detail: { alertId: alert.id, tier: classifyOperationalAlert(alert) },
-      }),
-    );
-  }
 }
