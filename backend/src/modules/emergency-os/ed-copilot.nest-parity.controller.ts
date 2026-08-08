@@ -69,8 +69,8 @@ export class EdCopilotNestParityController {
       confidence,
       model: {
         provider: 'caredroid',
-        name: chatResponse.metadata?.provenance?.modelOrTool || 'ed-copilot',
-        version: chatResponse.metadata?.provenance?.modelVersion || 'nest-parity',
+        name: chatResponse.metadata?.provenance?.modelOrEngine || 'ed-copilot',
+        version: chatResponse.metadata?.provenance?.responseSource || 'nest-parity',
       },
       promptVersion: 'ed-copilot@nest-parity',
       safetyStatus: requiresReview ? 'degraded' : 'ok',

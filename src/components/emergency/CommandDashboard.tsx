@@ -132,7 +132,14 @@ function AiDecisionSupportQueue({ snapshot }: { snapshot: OperationalCommandDash
         clinicianOverrideAvailable: true,
         generatedAt: snapshot.updatedAt,
         safetyDisclaimer: CLINICAL_DECISION_SUPPORT_DISCLAIMER,
-        provenance: buildAiResponseProvenance({ responseClass: 'operational' }),
+        // orientationPredictions/prolongedStayPredictions are real
+        // computations over real snapshot data (predictPostEdOrientation
+        // etc. in nativeAiCore.ts), but confirmed logistic-formula
+        // heuristics, not trained models (AI_CONFIGURATION_MAP.md).
+        provenance: buildAiResponseProvenance({
+          responseSource: 'DETERMINISTIC_RULE',
+          responseClass: 'operational',
+        }),
       }),
     );
 

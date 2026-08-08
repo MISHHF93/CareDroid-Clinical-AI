@@ -168,8 +168,7 @@ describe('ChatService ED Copilot deterministic dispatch', () => {
       expect(result).not.toBeNull();
       expect(result.text).toContain('Long Wait');
       expect(result.metadata.edCopilot.command).toBe('longest_waiting');
-      expect(result.metadata.provenance.deterministic).toBe(true);
-      expect(result.metadata.provenance.responseSource).toBe('deterministic-tool');
+      expect(result.metadata.provenance.responseSource).toBe('DETERMINISTIC_RULE');
     });
 
     it('answers a capacity query deterministically from capacitySnapshot', () => {
@@ -197,8 +196,8 @@ describe('ChatService ED Copilot deterministic dispatch', () => {
     });
   });
 
-  describe('buildEdCopilotResponse provenance', () => {
-    it('marks deterministic command responses as deterministic-rules, never anthropic', () => {
+  describe('buildEdCopilotResponse provenance (canonical AI Core Node contract)', () => {
+    it('marks deterministic command responses DETERMINISTIC_RULE, never LLM_GENERATED, by default', () => {
       const chatService = createChatServiceForEdCopilotTests();
 
       const result = chatService.buildEdCopilotResponse({
@@ -207,28 +206,47 @@ describe('ChatService ED Copilot deterministic dispatch', () => {
         edContext: {},
       });
 
-      expect(result.metadata.modelProvider).toBe('deterministic-rules');
-      expect(result.metadata.provenance.deterministic).toBe(true);
-      expect(result.metadata.provenance.responseSource).toBe('deterministic-tool');
-      expect(result.metadata.provenance.humanReviewRequired).toBe(true);
-      expect(result.metadata.provenance.retrievalUsed).toBe(false);
-      expect(typeof result.metadata.provenance.timestamp).toBe('string');
+      expect(result.metadata.provenance.responseSource).toBe('DETERMINISTIC_RULE');
+      expect(result.metadata.provenance.contractVersion).toBe('1.1.0');
+      expect(result.metadata.provenance.requiresClinicianReview).toBe(true);
+      expect(result.metadata.provenance.modelOrEngine).toBe('ed-copilot-deterministic-commands');
+      expect(typeof result.metadata.provenance.generatedAt).toBe('string');
+      // No retrieved_chunk/knowledge_registry evidence anywhere -- ED Copilot
+      // never performs retrieval -- only the structured_rule entry naming
+      // which command matched.
+      expect(result.metadata.provenance.evidence).toEqual([
+        expect.objectContaining({ kind: 'structured_rule', id: 'command-capacity_status' }),
+      ]);
     });
 
-    it('marks the LLM fallback response as anthropic, not deterministic', () => {
+    it('marks the LLM fallback response LLM_GENERATED when the caller explicitly overrides the default', () => {
       const chatService = createChatServiceForEdCopilotTests();
 
       const result = chatService.buildEdCopilotResponse({
         text: 'Model-generated answer',
         command: 'general',
         edContext: {},
-        deterministic: false,
+        responseSource: 'LLM_GENERATED',
       });
 
-      expect(result.metadata.modelProvider).toBe('anthropic');
-      expect(result.metadata.provenance.deterministic).toBe(false);
-      expect(result.metadata.provenance.responseSource).toBe('llm-generated');
-      expect(result.metadata.provenance.modelOrTool).toBe('anthropic-unified-ai-client');
+      expect(result.metadata.provenance.responseSource).toBe('LLM_GENERATED');
+      expect(result.metadata.provenance.modelOrEngine).toBe('anthropic-unified-ai-client');
+      expect(result.metadata.provenance.confidence).toBe(0.9);
+    });
+
+    it('marks the hardcoded fallback message STATIC_CONTENT, not LLM_GENERATED -- it is fixed text, not model output', () => {
+      const chatService = createChatServiceForEdCopilotTests();
+
+      const result = chatService.buildEdCopilotResponse({
+        text: 'I reviewed the current ED whiteboard context...',
+        command: 'general',
+        edContext: {},
+        responseSource: 'STATIC_CONTENT',
+      });
+
+      expect(result.metadata.provenance.responseSource).toBe('STATIC_CONTENT');
+      // STATIC_CONTENT has no real per-request confidence to report.
+      expect(result.metadata.provenance.confidence).toBe(0);
     });
 
     it('reads capacityBand/capacityScore and reassessmentQueueCount -- the field names CopilotPanel.tsx actually sends -- not just capacitySnapshot/flaggedReassessments', () => {

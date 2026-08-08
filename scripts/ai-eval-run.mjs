@@ -234,10 +234,24 @@ function scoreStructured(caseRow) {
       ? true
       : cand.requiresClinicianReview === true;
   const provenance = cand.provenance;
+  // Keep in sync with lib/ai/provenanceContract.ts's PROVENANCE_CONTRACT_VERSION
+  // and AI_RESPONSE_SOURCE_CATEGORIES (plain .mjs script, no TS import
+  // available without a build step).
+  const VALID_RESPONSE_SOURCES = [
+    'LLM_GENERATED',
+    'MODEL_PREDICTION',
+    'RAG_ASSISTED',
+    'TOOL_RESULT',
+    'DETERMINISTIC_RULE',
+    'STATIC_CONTENT',
+    'FIXTURE_DEMO',
+    'UNAVAILABLE',
+  ];
   const provenanceOk =
     !required.includes('provenance') ||
     (provenance &&
-      provenance.contractVersion === '1.0.0' &&
+      provenance.contractVersion === '1.1.0' &&
+      VALID_RESPONSE_SOURCES.includes(provenance.responseSource) &&
       provenance.requiresClinicianReview === true &&
       Array.isArray(provenance.evidence) &&
       Array.isArray(provenance.limitations));

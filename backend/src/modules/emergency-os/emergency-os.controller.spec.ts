@@ -413,12 +413,12 @@ describe('EmergencyOsController', () => {
       metadata: {
         safety: { requiresHumanReview: true },
         edCopilot: { command: 'longest_waiting' },
+        // Canonical AI Core Node contract (lib/ai/provenanceContract.ts).
         provenance: {
-          responseSource: 'deterministic-tool',
-          modelOrTool: 'ed-copilot-deterministic-commands',
-          modelVersion: 'v1',
-          deterministic: true,
-          humanReviewRequired: true,
+          contractVersion: '1.1.0',
+          responseSource: 'DETERMINISTIC_RULE',
+          modelOrEngine: 'ed-copilot-deterministic-commands',
+          requiresClinicianReview: true,
         },
       },
     });
@@ -452,7 +452,7 @@ describe('EmergencyOsController', () => {
         response: expect.stringContaining('waiting'),
         requires_review: true,
         safetyNotice: expect.stringContaining('not a replacement'),
-        provenance: expect.objectContaining({ deterministic: true }),
+        provenance: expect.objectContaining({ responseSource: 'DETERMINISTIC_RULE' }),
       },
     });
     expect(controller.getWorkflowLogs().data.logs).toEqual(
@@ -480,7 +480,7 @@ describe('EmergencyOsController', () => {
       metadata: {
         safety: { requiresHumanReview: true },
         edCopilot: { command: 'priority_change_safety_check', safetyCheckPassed: false },
-        provenance: { responseSource: 'deterministic-tool', deterministic: true },
+        provenance: { contractVersion: '1.1.0', responseSource: 'DETERMINISTIC_RULE' },
       },
     });
 
@@ -531,7 +531,7 @@ describe('EmergencyOsController', () => {
       metadata: {
         safety: { requiresHumanReview: true },
         edCopilot: { command: 'priority_change_safety_check', safetyCheckPassed: true },
-        provenance: { responseSource: 'deterministic-tool', deterministic: true },
+        provenance: { contractVersion: '1.1.0', responseSource: 'DETERMINISTIC_RULE' },
       },
     });
 

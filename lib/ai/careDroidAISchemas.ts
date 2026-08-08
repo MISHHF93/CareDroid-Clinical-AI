@@ -6,6 +6,7 @@ import {
   type CareDroidAIValidationIssue,
   type CareDroidAIValidationResult,
 } from './careDroidAITypes';
+import { isAiResponseSourceCategory, PROVENANCE_CONTRACT_VERSION } from './provenanceContract';
 
 type FieldType = 'string' | 'number' | 'object' | 'array' | 'boolean' | 'unknown';
 
@@ -485,7 +486,8 @@ export function validateCareDroidAIResponse(value: unknown): value is CareDroidA
   const provenance = value.provenance;
   const provenanceOk =
     isPlainObject(provenance) &&
-    provenance.contractVersion === '1.0.0' &&
+    provenance.contractVersion === PROVENANCE_CONTRACT_VERSION &&
+    isAiResponseSourceCategory(provenance.responseSource) &&
     provenance.requiresClinicianReview === true &&
     Array.isArray(provenance.evidence) &&
     Array.isArray(provenance.missingInformation) &&

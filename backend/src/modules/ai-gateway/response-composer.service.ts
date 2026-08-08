@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { buildAiResponseProvenance } from '../../../../lib/ai/provenanceContract';
+import {
+  buildAiResponseProvenance,
+  PROVENANCE_CONTRACT_VERSION,
+  type AIResponseSourceCategory,
+} from '../../../../lib/ai/provenanceContract';
 import {
   AiContextPacket,
   AiGatewayMetadata,
@@ -54,10 +58,28 @@ export class ResponseComposerService {
         ? (response as any).confidence
         : routePlan.confidence;
 
+    // Not explicit from the caller: this composer is a single, generic
+    // finishing step for many different underlying generation shapes (pure
+    // LLM free text, tool-orchestrator results, RAG-grounded answers), and
+    // ChatService.processMessage() does not yet pass through which one
+    // happened. Inferred conservatively from what's actually present on the
+    // response rather than assumed -- real retrieved chunks mean
+    // RAG_ASSISTED; an executed tool result means TOOL_RESULT; otherwise
+    // this composer is only reached after a real aiService LLM call
+    // upstream, so LLM_GENERATED. Threading an explicit signal through from
+    // ChatService is real future work, not guessed at here.
+    const inferredResponseSource: AIResponseSourceCategory = (response as any).toolResult
+      ? 'TOOL_RESULT'
+      : chunks.length > 0
+        ? 'RAG_ASSISTED'
+        : 'LLM_GENERATED';
+
     const provenance =
-      (response as any).provenance && (response as any).provenance.contractVersion === '1.0.0'
+      (response as any).provenance &&
+      (response as any).provenance.contractVersion === PROVENANCE_CONTRACT_VERSION
         ? (response as any).provenance
         : buildAiResponseProvenance({
+            responseSource: inferredResponseSource,
             confidence,
             ragSources: citations,
             ragChunks: chunks,

@@ -51,6 +51,10 @@ import {
   patientSafetyContextFromRecord,
 } from '../../../../lib/ai/clinicalSafetyRules';
 import {
+  buildAiResponseProvenance,
+  type AIResponseSourceCategory,
+} from '../../../../lib/ai/provenanceContract';
+import {
   mapRouterArtifactTypeToArtifactEntity,
   resolveExecutorToolId,
 } from '../../../ml-services/shared/routing-maps';
@@ -1444,16 +1448,17 @@ export class ChatService {
         '_Human review required. I will not make autonomous clinical decisions, orders, disposition, admission, discharge, or treatment recommendations._',
       ].join('\n');
 
-    // deterministic: !anthropicText -- when the real Anthropic call succeeded,
-    // this response is genuinely LLM-generated. When it returned nothing
-    // (unconfigured API key, provider error -- see invokeAnthropicEdCopilot's
-    // catch block), the text above is a hardcoded fallback string, not model
-    // output, and provenance must say so.
+    // responseSource: when the real Anthropic call succeeded, this response
+    // is genuinely LLM-generated. When it returned nothing (unconfigured API
+    // key, provider error -- see invokeAnthropicEdCopilot's catch block),
+    // the text above is a fixed fallback string returned regardless of
+    // input -- STATIC_CONTENT, not LLM_GENERATED -- and provenance must say
+    // so per the canonical AI Core Node contract (lib/ai/provenanceContract.ts).
     return this.buildEdCopilotResponse({
       text,
       command: 'general',
       edContext,
-      deterministic: !anthropicText,
+      responseSource: anthropicText ? 'LLM_GENERATED' : 'STATIC_CONTENT',
     });
   }
 
@@ -1955,7 +1960,7 @@ export class ChatService {
     edContext: Record<string, any>;
     items?: any[];
     whiteboardAction?: Record<string, any>;
-    deterministic?: boolean;
+    responseSource?: AIResponseSourceCategory;
     safetyCheckPassed?: boolean;
   }): QueryResponse {
     // capacitySnapshot/flaggedReassessments were the only fields ever read here,
@@ -1993,13 +1998,42 @@ export class ChatService {
         'Decision support only. No autonomous diagnosis, treatment, orders, disposition, admission, discharge, staffing, bed, or transfer decisions.',
     };
 
-    // Provenance (2026-08-08): every response from this path -- deterministic
-    // command match or LLM fallback -- must say plainly which it was.
-    // modelProvider: 'anthropic' was previously hardcoded here unconditionally,
-    // including for pure rule-based command responses that never called any
-    // model at all -- the exact "response implies model-generated intelligence
-    // when it's actually deterministic" failure this fix set out to close.
-    const deterministic = params.deterministic ?? true;
+    // Provenance (2026-08-08, upgraded to the canonical AI Core Node contract):
+    // every response from this path -- deterministic command match or LLM
+    // fallback -- must say plainly which it was. Every call site inside
+    // handleEdCopilotCommand()/handleEdCopilotPriorityChange() is real
+    // per-request rule dispatch, so DETERMINISTIC_RULE is the correct
+    // default at this specific, narrow boundary; handleEdCopilot()'s own
+    // LLM-fallback call site is the one place that deliberately overrides it
+    // to LLM_GENERATED or STATIC_CONTENT. modelProvider: 'anthropic' was
+    // previously hardcoded here unconditionally, including for pure
+    // rule-based command responses that never called any model at all --
+    // the exact "response implies model-generated intelligence when it's
+    // actually deterministic" failure this fix set out to close; the old
+    // 2-value ad-hoc responseSource ('deterministic-tool'/'llm-generated')
+    // is now the shared 8-value lib/ai/provenanceContract.ts enum instead of
+    // a 3rd local vocabulary.
+    const responseSource: AIResponseSourceCategory = params.responseSource ?? 'DETERMINISTIC_RULE';
+    const provenance = buildAiResponseProvenance({
+      responseSource,
+      confidence: responseSource === 'LLM_GENERATED' ? 0.9 : undefined,
+      modelOrEngine:
+        responseSource === 'LLM_GENERATED'
+          ? 'anthropic-unified-ai-client'
+          : 'ed-copilot-deterministic-commands',
+      responseClass: 'operational',
+      recommendedReviewerRole: 'Responsible clinician',
+      evidence: [
+        {
+          id: `command-${params.command}`,
+          kind: 'structured_rule',
+          title: `ED Copilot command: ${params.command}`,
+        },
+      ],
+      limitations: [
+        'Decision support only. No autonomous diagnosis, treatment, orders, disposition, admission, discharge, staffing, bed, or transfer decisions.',
+      ],
+    });
 
     return {
       text: params.text,
@@ -2014,28 +2048,15 @@ export class ChatService {
           data: structured,
         },
       ],
-      confidence: 0.9,
+      confidence: provenance.confidence,
       metadata: {
         edCopilot: structured,
         whiteboardAction: params.whiteboardAction,
-        modelProvider: deterministic ? 'deterministic-rules' : 'anthropic',
         safety: {
           requiresHumanReview: true,
           autonomousClinicalDecisionsAllowed: false,
         },
-        provenance: {
-          responseSource: deterministic ? 'deterministic-tool' : 'llm-generated',
-          modelOrTool: deterministic
-            ? 'ed-copilot-deterministic-commands'
-            : 'anthropic-unified-ai-client',
-          modelVersion: deterministic ? 'v1' : undefined,
-          confidence: deterministic ? undefined : 0.9,
-          deterministic,
-          humanReviewRequired: true,
-          retrievalUsed: false,
-          toolsUsed: [params.command],
-          timestamp: new Date().toISOString(),
-        },
+        provenance,
       },
     };
   }

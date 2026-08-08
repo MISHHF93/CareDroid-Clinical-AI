@@ -852,6 +852,7 @@ function buildSuccessResponse(
     result.data.missing;
 
   const provenance = buildAiResponseProvenance({
+    responseSource: 'DETERMINISTIC_RULE',
     confidence,
     responseClass: schema.clinical ? 'clinical' : 'operational',
     modelOrEngine: 'careDroidAI-heuristic-node',
@@ -904,6 +905,7 @@ function buildErrorResponse(
   issues: CareDroidAIValidationIssue[],
 ): CareDroidAIResponse {
   const provenance = buildAiResponseProvenance({
+    responseSource: 'UNAVAILABLE',
     confidence: 0,
     responseClass: 'error',
     modelOrEngine: 'careDroidAI-heuristic-node',

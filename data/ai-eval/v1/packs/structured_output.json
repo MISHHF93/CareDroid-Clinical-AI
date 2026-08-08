@@ -25,7 +25,8 @@
         "confidence": 0.72,
         "data": { "summary": "Synthetic SBAR draft for training only." },
         "provenance": {
-          "contractVersion": "1.0.0",
+          "contractVersion": "1.1.0",
+          "responseSource": "FIXTURE_DEMO",
           "requiresClinicianReview": true,
           "confidence": 0.72,
           "evidence": [],

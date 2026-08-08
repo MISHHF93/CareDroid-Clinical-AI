@@ -10,6 +10,7 @@ import {
 } from './unifiedAiEnvelope';
 import type { CareDroidAIResponse } from '../../lib/ai/careDroidAI';
 import type { AIResponse } from '../lib/ai/client';
+import { PROVENANCE_CONTRACT_VERSION } from '../../lib/ai/provenanceContract';
 
 describe('unifiedAiEnvelope', () => {
   it('maps reception roles to the reception channel', () => {
@@ -66,7 +67,8 @@ describe('unifiedAiEnvelope', () => {
       generatedAt: new Date().toISOString(),
       safetyDisclaimer: 'Review required',
       provenance: {
-        contractVersion: '1.0.0',
+        contractVersion: PROVENANCE_CONTRACT_VERSION,
+        responseSource: 'DETERMINISTIC_RULE',
         modelOrEngine: 'careDroidAI-heuristic-node',
         evidence: [],
         sourceVersions: [],

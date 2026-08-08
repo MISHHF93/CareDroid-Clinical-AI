@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { buildAiResponseProvenance } from '../../../../../lib/ai/provenanceContract';
+import {
+  buildAiResponseProvenance,
+  PROVENANCE_CONTRACT_VERSION,
+} from '../../../../../lib/ai/provenanceContract';
 import {
   AiContextPacket,
   AiFoundationMetadata,
@@ -37,9 +40,19 @@ export class AiResponseComposerService {
     };
 
     const provenance =
-      (response as any).provenance?.contractVersion === '1.0.0'
+      (response as any).provenance?.contractVersion === PROVENANCE_CONTRACT_VERSION
         ? (response as any).provenance
         : buildAiResponseProvenance({
+            // Confirmed dead code (zero real callers outside this module and
+            // its own specs, see AI_ORCHESTRATION_AUDIT.md §3.2) -- kept
+            // compiling against the canonical contract rather than deleted
+            // this round, since removal needs its own dedicated
+            // zero-callers verification pass. LLM_GENERATED matches this
+            // composer's own behavior: unlike its live sibling
+            // (ai-gateway/response-composer.service.ts), it never receives
+            // ragChunks/toolResult, so it is only ever reached downstream of
+            // a real LLM call.
+            responseSource: 'LLM_GENERATED',
             confidence: routePlan.confidence,
             modelOrEngine: routePlan.selectedExpert,
             responseClass: 'clinical',

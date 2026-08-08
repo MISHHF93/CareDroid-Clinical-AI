@@ -23,12 +23,14 @@ describe('EdCopilotNestParityController', () => {
         metadata: {
           safety: { requiresHumanReview: true },
           edCopilot: { command: 'longest_waiting' },
+          // Canonical AI Core Node contract (lib/ai/provenanceContract.ts) --
+          // responseSource is the 8-value enum, modelOrEngine replaces the
+          // old ad-hoc modelOrTool/modelVersion/deterministic fields.
           provenance: {
-            responseSource: 'deterministic-tool',
-            modelOrTool: 'ed-copilot-deterministic-commands',
-            modelVersion: 'v1',
-            deterministic: true,
-            humanReviewRequired: true,
+            contractVersion: '1.1.0',
+            responseSource: 'DETERMINISTIC_RULE',
+            modelOrEngine: 'ed-copilot-deterministic-commands',
+            requiresClinicianReview: true,
           },
         },
       }),
@@ -53,9 +55,9 @@ describe('EdCopilotNestParityController', () => {
     expect(result.accountableRecommendation.content).toMatch(/waited/i);
     expect(result.accountableRecommendation.model).toMatchObject({
       name: 'ed-copilot-deterministic-commands',
-      version: 'v1',
+      version: 'DETERMINISTIC_RULE',
     });
     expect(result.requiresClinicianReview).toBe(true);
-    expect(result.provenance).toMatchObject({ deterministic: true });
+    expect(result.provenance).toMatchObject({ responseSource: 'DETERMINISTIC_RULE' });
   });
 });
