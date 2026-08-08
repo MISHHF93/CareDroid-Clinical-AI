@@ -116,8 +116,11 @@
   color: inherit;
 }
 
+/* Muted meta/hint/caption/subtitle text inside cards */
 :is(.app-shell, .emergency-app-shell)
-  :is(.card, [class$='-card'], [class*='-card '], [class$='-panel'], [class*='-panel '])
+  :is(.card, [class$='-card'], [class*='-card '], [class$='-panel'], [class*='-panel ']):not(
+    [class*='--critical']
+  ):not([class*='--danger']):not([class*='--warning'])
   :is(
     [class*='__meta'],
     [class*='-meta'],

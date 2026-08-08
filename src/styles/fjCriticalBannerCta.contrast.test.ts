@@ -437,12 +437,12 @@ describe('dc-panel critical dispatch styling contrast (2026-08-07, 5th sweep fam
     expect(flat).toContain(":not([class*='--warning'])");
   });
 
-  it('both the heading/strong rule and the span/p rule exclude critical/danger/warning ancestors (each needs its own exclusion, or the other still repaints it)', () => {
+  it('the heading/strong rule, the span/p rule, and the muted meta/hint/caption/subtitle rule each exclude critical/danger/warning ancestors (each needs its own exclusion, or another still repaints it)', () => {
     const flat = flattenCss(headingAndSpanRules);
     (['--critical', '--danger', '--warning'] as const).forEach((modifier) => {
       const needle = `:not([class*='${modifier}'])`;
       const occurrences = flat.split(needle).length - 1;
-      expect(occurrences, `expected 2 occurrences of ${needle}`).toBe(2);
+      expect(occurrences, `expected 3 occurrences of ${needle}`).toBe(3);
     });
   });
 
@@ -469,5 +469,55 @@ describe('dc-panel critical dispatch styling contrast (2026-08-07, 5th sweep fam
     expect(dispatchConsoleTsx).toContain(
       'className={`dc-panel ${isCritical ? "dc-call-card--critical" : ""}`}',
     );
+  });
+});
+
+describe('card-contrast-normalization.css meta/hint/caption/subtitle exclusion (2026-08-08, Round 33)', () => {
+  // The 5th-sweep-family fix above closed the base contract rule and the 2
+  // heading/span typography rules, but left ONE sibling rule in the same
+  // "Typography roles inside cards" block unexcluded: the muted
+  // __meta/-meta/__subtitle/-subtitle/__hint/-hint/__caption/-caption rule
+  // (it forces color: var(--card-contract-fg-muted, ...) on any matching
+  // descendant of a card/panel, with no severity-modifier exclusion at all).
+  // An exhaustive live-consumer sweep (every tsx file combining a -card/
+  // -panel ancestor with a __meta/-meta/__subtitle/-subtitle/__hint/-hint/
+  // __caption/-caption descendant) found zero current components relying on
+  // this rule's muted color reaching a critical/danger/warning-flagged card
+  // -- every real chip/badge that needs a critical color already either uses
+  // a different class shape (e.g. __chip--critical, not __meta) or hardens
+  // itself with !important. So this was a latent gap, not a live bug: the
+  // 2 sibling rules already excluded --critical/--danger/--warning; this one
+  // didn't, for no evident reason, leaving the door open for a future
+  // component reusing __meta/__hint/__caption/__subtitle inside a critical
+  // card to silently lose its urgency color the same way DispatchConsole did.
+  // Closed defensively to match the pattern the file's own other 2 rules
+  // already established.
+
+  const mutedMetaRule = cardContrastCss.slice(
+    cardContrastCss.indexOf('/* Muted meta/hint/caption/subtitle text inside cards */'),
+    cardContrastCss.indexOf('/* Light card bodies must not use on-solid text'),
+  );
+
+  it("the muted meta/hint/caption/subtitle rule now excludes critical/danger/warning card ancestors, matching its 2 sibling rules", () => {
+    const flat = flattenCss(mutedMetaRule);
+    expect(flat).toContain(":not([class*='--critical'])");
+    expect(flat).toContain(":not([class*='--danger'])");
+    expect(flat).toContain(":not([class*='--warning'])");
+  });
+
+  it('still matches every one of the 8 original substrings (the fix only added an exclusion, it did not narrow the match)', () => {
+    const flat = flattenCss(mutedMetaRule);
+    [
+      "[class*='__meta']",
+      "[class*='-meta']",
+      "[class*='__subtitle']",
+      "[class*='-subtitle']",
+      "[class*='__hint']",
+      "[class*='-hint']",
+      "[class*='__caption']",
+      "[class*='-caption']",
+    ].forEach((needle) => {
+      expect(flat).toContain(needle);
+    });
   });
 });
