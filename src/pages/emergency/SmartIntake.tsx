@@ -519,6 +519,16 @@ export default function SmartIntake({
       ...current,
       [field]: nextStatus,
     }));
+    // The identity audit log's whole purpose is recording identity-
+    // verification history, but the actual per-field verify/reject/edit
+    // decisions -- the core of what "identity verification" means -- were
+    // never appended anywhere: the backend verifyField() call below only
+    // fires when emergencySmartIntakeIdentitySession is enabled (disabled
+    // by default, so real sessions never reach it), and nothing recorded
+    // the decision locally either. Track it the same way document-upload
+    // events already are, so the audit log a reviewer sees actually
+    // reflects what staff did to each field.
+    setIdentityAuditLog((current) => [...current, `${field} ${nextStatus} by ${emergencyRole.roleLabel}`]);
     if (isBackendCapabilityEnabled('emergencySmartIntakeIdentitySession') && sessionReady) {
       const apiDecision =
         decision === 'edited' ? 'edited' : decision === 'approved' ? 'approved' : 'rejected';

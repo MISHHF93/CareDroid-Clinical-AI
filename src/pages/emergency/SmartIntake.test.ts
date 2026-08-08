@@ -133,3 +133,40 @@ describe('startBackendSession demo-identity clearing (2026-08-08 regression)', (
     expect(elseBranch).not.toContain('fetchAuditLog(resolvedSessionId)');
   });
 });
+
+describe('updateDecision field-review audit tracking (2026-08-08)', () => {
+  // Found while confirming Domain 1's own "fetchAuditLog not shown as a
+  // standalone audit view" scorecard claim: the view genuinely exists
+  // (PatientVerificationExperience.tsx's "Identity audit log" section,
+  // visible by default via practitionerSurfaceVisibility.ts's
+  // showVerificationAuditLog: true) and IS fed locally for document
+  // uploads -- but the actual per-field verify/reject/edit decisions, the
+  // core of what "identity verification" means, were never appended
+  // anywhere. SmartIntakeApi.verifyField() only fires when
+  // emergencySmartIntakeIdentitySession is enabled (disabled by default,
+  // so real sessions never reach it — see the describe block above), and
+  // nothing recorded the decision locally either. Source-wiring check
+  // (updateDecision is a component-internal closure, not an exported
+  // unit) matching this file's own established pattern.
+
+  it('updateDecision appends a local audit entry unconditionally, not gated behind the disabled-by-default backend capability', () => {
+    const fnStart = smartIntakeSource.indexOf('const updateDecision = (field, decision) => {');
+    const fnEnd = smartIntakeSource.indexOf(
+      "if (ocrJobId && isBackendCapabilityEnabled('emergencyOcrIntake')) {",
+    );
+    expect(fnStart).toBeGreaterThan(-1);
+    expect(fnEnd).toBeGreaterThan(fnStart);
+    const fnBody = smartIntakeSource.slice(fnStart, fnEnd);
+
+    const auditAppendIndex = fnBody.indexOf('setIdentityAuditLog((current) => [...current,');
+    const capabilityGateIndex = fnBody.indexOf(
+      "if (isBackendCapabilityEnabled('emergencySmartIntakeIdentitySession') && sessionReady) {",
+    );
+    expect(auditAppendIndex).toBeGreaterThan(-1);
+    expect(capabilityGateIndex).toBeGreaterThan(-1);
+    // Must run BEFORE the capability check, i.e. unconditionally on every
+    // real decision -- not nested inside the branch that's dead by default.
+    expect(auditAppendIndex).toBeLessThan(capabilityGateIndex);
+    expect(fnBody).toContain('`${field} ${nextStatus} by ${emergencyRole.roleLabel}`');
+  });
+});
