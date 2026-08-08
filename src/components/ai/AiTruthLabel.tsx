@@ -183,6 +183,26 @@ export function hospitalCommandCenterRecommendationsTruthLabel(): AiTruthLabelIn
   };
 }
 
+/**
+ * src/engine/continuousPatientFlowEngine.ts's "AI operational recommendations"
+ * (PatientFlowStatusPanel.tsx) and per-patient aiRecommendation guidance text
+ * have no NativeAiSourceState field at all — read directly, the whole engine
+ * is deterministic threshold/rule scoring over patient/staff/referral state
+ * (bottleneckForPatient, resolveWhatHappensNext in
+ * src/services/whatHappensNextGuidance.ts), with zero model call anywhere.
+ * Matches the same AI_CONFIGURATION_MAP.md finding as every other helper in
+ * this file: only the NLU intent classifier and artifact-type router are
+ * real trained models in this codebase, so despite the section header
+ * literally reading "AI operational recommendations," this is Manual.
+ */
+export function continuousPatientFlowRecommendationsTruthLabel(): AiTruthLabelInfo {
+  return {
+    state: 'Manual',
+    sourceContext: 'Continuous patient flow engine — deterministic bottleneck/guidance rules, not a trained model',
+    reviewRequired: true,
+  };
+}
+
 export type AiTruthLabelProps = AiTruthLabelInfo & {
   compact?: boolean;
   className?: string;

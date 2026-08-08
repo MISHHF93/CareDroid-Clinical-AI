@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import useContinuousPatientFlow from '../../hooks/useContinuousPatientFlow';
 import type { PatientFlowPatientSnapshot } from '../../engine/continuousPatientFlowEngine';
+import { AiTruthLabel, continuousPatientFlowRecommendationsTruthLabel } from '../ai/AiTruthLabel';
 import './patient-flow-status.css';
 
 function bottleneckLabel(status: PatientFlowPatientSnapshot['bottleneckStatus']): string {
@@ -65,7 +66,10 @@ export function PatientFlowStatusPanel({
           </div>
         </dl>
         {patientSnapshot.aiRecommendation ? (
-          <p className="patient-flow-status__recommendation">{patientSnapshot.aiRecommendation}</p>
+          <p className="patient-flow-status__recommendation">
+            {patientSnapshot.aiRecommendation}
+            <AiTruthLabel {...continuousPatientFlowRecommendationsTruthLabel()} compact />
+          </p>
         ) : null}
         {patientSnapshot.bottleneckReason ? (
           <p className="patient-flow-status__reason">{patientSnapshot.bottleneckReason}</p>
@@ -125,6 +129,7 @@ export function PatientFlowStatusPanel({
       {topRecommendations.length > 0 ? (
         <div className="patient-flow-status__recommendations">
           <strong>AI operational recommendations</strong>
+          <AiTruthLabel {...continuousPatientFlowRecommendationsTruthLabel()} compact />
           <ul>
             {topRecommendations.map((rec) => (
               <li key={rec.id}>
