@@ -377,13 +377,6 @@ export function summarizeProviderWaitBreachAnalytics(
   };
 }
 
-export const PROVIDER_WAIT_BREACH_SURFACES = Object.freeze([
-  'charge-nurse',
-  'whiteboard',
-  'waiting-room-board',
-  'command-center',
-]);
-
 export type ProviderWaitBreachAttentionRow = {
   patientId: string;
   displayName: string;
@@ -527,45 +520,3 @@ export function buildProviderWaitBreachAlerts(
   return alerts;
 }
 
-export type ProviderWaitBreachTimerStore = {
-  patients?: Patient[];
-  settings?: Record<string, unknown>;
-  dispatchWebSocketEvent?: (event: {
-    type: string;
-    payload: Record<string, unknown>;
-  }) => void;
-};
-
-/** Broadcast provider wait breach snapshot to connected operational surfaces. */
-export function syncProviderWaitBreachOperationalSurfaces(
-  store: ProviderWaitBreachTimerStore,
-  options: { patientId?: string; source?: string } = {},
-): ProviderWaitBreachAttentionSnapshot {
-  const snapshot = buildProviderWaitBreachAttentionSnapshot(store.patients || [], {
-    settings: store.settings,
-  });
-
-  store.dispatchWebSocketEvent?.({
-    type: 'provider_wait_breach_sync',
-    payload: {
-      patientId: options.patientId || null,
-      source: options.source || 'provider-wait-breach-timer',
-      surfaces: [...PROVIDER_WAIT_BREACH_SURFACES],
-      summary: snapshot.summary,
-      rows: snapshot.rows.map((row) => ({
-        patientId: row.patientId,
-        displayName: row.displayName,
-        phase: row.phase,
-        elapsedLabel: row.elapsedLabel,
-        label: row.label,
-        tone: row.tone,
-        remainingMinutes: row.remainingMinutes,
-        highRiskException: row.highRiskException,
-        targetMinutes: row.targetMinutes,
-      })),
-      generatedAt: new Date().toISOString(),
-    },
-  });
-
-  return snapshot;
-}

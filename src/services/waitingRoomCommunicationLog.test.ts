@@ -9,9 +9,7 @@ import {
   recordWaitingRoomCommunication,
   resolveCommunicationRecency,
   summarizeCommunicationBoard,
-  syncWaitingRoomCommunicationOperationalSurfaces,
   WAITING_ROOM_COMMUNICATION_SOURCE,
-  WAITING_ROOM_COMMUNICATION_SURFACES,
 } from './waitingRoomCommunicationLog';
 
 const NOW = new Date('2026-06-20T10:00:00.000Z');
@@ -193,24 +191,5 @@ describe('waitingRoomCommunicationLog', () => {
 
     expect(recorded?.metadata?.communicationKind).toBe('delay-informed');
     expect(logs).toHaveLength(1);
-  });
-
-  it('syncs communication recency to operational surfaces', () => {
-    const events: Array<{ type: string; payload: Record<string, unknown> }> = [];
-    const patient = buildPatient({
-      notes: [{ id: 'n1', text: 'Checked in', timestamp: '2026-06-20T09:50:00.000Z' }],
-    });
-
-    syncWaitingRoomCommunicationOperationalSurfaces(
-      {
-        patients: [patient],
-        dispatchWebSocketEvent: (event) => events.push(event),
-      },
-      { patientId: patient.id, source: 'test' },
-    );
-
-    expect(events).toHaveLength(1);
-    expect(events[0]?.type).toBe('waiting_room_communication_sync');
-    expect(events[0]?.payload.surfaces).toEqual([...WAITING_ROOM_COMMUNICATION_SURFACES]);
   });
 });

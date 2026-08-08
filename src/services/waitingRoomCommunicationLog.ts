@@ -83,13 +83,6 @@ export const DEFAULT_COMMUNICATION_SUMMARIES: Record<WaitingRoomCommunicationKin
   'concern-escalated': 'Concern escalated for charge nurse review.',
 };
 
-export const WAITING_ROOM_COMMUNICATION_SURFACES = Object.freeze([
-  'patient-detail',
-  'waiting-room-board',
-  'whiteboard',
-  'notification-center',
-]);
-
 const DELAY_INFORMED_NOTE_PATTERN =
   /\b(delay|waiting|wait time|backlog|informed (the )?patient|patient (was )?informed|lwbs|left without)\b/i;
 
@@ -442,40 +435,3 @@ export function recordWaitingRoomCommunication(
   return store.recordWorkflowAction?.(logInput) || null;
 }
 
-/** Broadcast communication recency snapshot to connected operational surfaces. */
-export function syncWaitingRoomCommunicationOperationalSurfaces(
-  store: WaitingRoomCommunicationLogStore,
-  options: { patientId?: string; source?: string } = {},
-): {
-  summary: ReturnType<typeof summarizeCommunicationBoard>;
-  patientSnapshots: CommunicationRecencySnapshot[];
-} {
-  const patients = (store.patients || []).filter(isWaitingRoomCommunicationEligible);
-  const context = { workflowLogs: store.workflowLogs };
-  const summary = summarizeCommunicationBoard(patients, context);
-  const patientSnapshots = options.patientId
-    ? patients
-        .filter((patient) => patient.id === options.patientId)
-        .map((patient) => resolveCommunicationRecency(patient, context))
-    : patients.map((patient) => resolveCommunicationRecency(patient, context));
-
-  store.dispatchWebSocketEvent?.({
-    type: 'waiting_room_communication_sync',
-    payload: {
-      patientId: options.patientId || null,
-      source: options.source || 'waiting-room-communication-log',
-      surfaces: [...WAITING_ROOM_COMMUNICATION_SURFACES],
-      summary,
-      snapshots: patientSnapshots.map((snapshot) => ({
-        patientId: snapshot.patientId,
-        lastEventKind: snapshot.lastEventKind,
-        recencyLabel: snapshot.recencyLabel,
-        tone: snapshot.tone,
-        minutesSinceContact: snapshot.minutesSinceContact,
-      })),
-      generatedAt: new Date().toISOString(),
-    },
-  });
-
-  return { summary, patientSnapshots };
-}

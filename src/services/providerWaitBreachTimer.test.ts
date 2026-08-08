@@ -10,8 +10,6 @@ import {
   resolveTriageToProviderElapsedMinutes,
   shouldSurfaceProviderWaitBreach,
   summarizeProviderWaitBreachBoard,
-  syncProviderWaitBreachOperationalSurfaces,
-  PROVIDER_WAIT_BREACH_SURFACES,
 } from './providerWaitBreachTimer';
 
 const STABLE_NOW = new Date('2026-06-20T10:45:00.000Z');
@@ -138,25 +136,12 @@ describe('providerWaitBreachTimer', () => {
     ).toBe(false);
   });
 
-  it('builds attention snapshot and syncs operational surfaces', () => {
-    const events: Array<{ type: string; payload: Record<string, unknown> }> = [];
+  it('builds attention snapshot for the charge-nurse/whiteboard/waiting-room-board/command-center views', () => {
     const snapshot = buildProviderWaitBreachAttentionSnapshot([buildPatient()], {
       now: STABLE_NOW,
     });
 
     expect(snapshot.summary.breachedCount).toBe(1);
     expect(snapshot.previewRows[0]?.phase).toBe('breached');
-
-    syncProviderWaitBreachOperationalSurfaces(
-      {
-        patients: [buildPatient()],
-        dispatchWebSocketEvent: (event) => events.push(event),
-      },
-      { patientId: 'patient-1', source: 'test' },
-    );
-
-    expect(events).toHaveLength(1);
-    expect(events[0]?.type).toBe('provider_wait_breach_sync');
-    expect(events[0]?.payload.surfaces).toEqual([...PROVIDER_WAIT_BREACH_SURFACES]);
   });
 });
