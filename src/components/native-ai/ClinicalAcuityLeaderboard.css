@@ -58,12 +58,6 @@
   text-align: left;
 }
 
-.clinical-acuity-leaderboard__row small {
-  display: block;
-  color: var(--color-text-muted, #64748b);
-  font-size: 0.7rem;
-}
-
 .clinical-acuity-leaderboard__score {
   font-weight: 700;
 }

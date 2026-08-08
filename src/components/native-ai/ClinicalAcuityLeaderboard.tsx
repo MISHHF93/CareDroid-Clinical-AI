@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import type { Patient } from '../../types/emergency';
 import { buildClinicalAcuityLeaderboard } from '../../services/nativeAiCore';
 import type { NativeAiDataSource } from '../../hooks/useNativeAiDashboardData';
+import { AiTruthLabel, fromNativeAiSourceState } from '../ai/AiTruthLabel';
 import './ClinicalAcuityLeaderboard.css';
 import './native-ai-dashboard-theme.css';
 
@@ -62,7 +63,13 @@ export default function ClinicalAcuityLeaderboard({
               ) : (
                 entry.patientLabel
               )}
-              <small>{entry.sourceState}</small>
+              <AiTruthLabel
+                {...fromNativeAiSourceState(entry.sourceState, {
+                  sourceContext:
+                    'Composite acuity score — admission likelihood + prolonged-stay risk + orientation heuristics',
+                })}
+                compact
+              />
             </span>
             <span role="cell" className="clinical-acuity-leaderboard__score">
               {entry.acuityScore}

@@ -1,6 +1,7 @@
 import { COPILOT_RISK_LAYERS } from '@lib/native-ai';
 import type { Patient } from '../../types/emergency';
 import { buildNativeAiPatientSnapshot, formatRoutingLabel } from '../../services/nativeAiCore';
+import { AiTruthLabel, fromNativeAiSourceState } from '../ai/AiTruthLabel';
 import '../native-ai/native-ai-dashboard-theme.css';
 import './CopilotRiskLayerPanel.css';
 
@@ -81,6 +82,12 @@ export default function CopilotRiskLayerPanel({
                   Route: {formatRoutingLabel(nativeAiSnapshot.routing)} ·{' '}
                   {Math.round(nativeAiSnapshot.routing.confidence * 100)}%
                 </p>
+                <AiTruthLabel
+                  {...fromNativeAiSourceState(nativeAiSnapshot.sourceState, {
+                    sourceContext: 'Panel-of-experts routing + specialist inference (CDS layer)',
+                  })}
+                  compact
+                />
               </div>
             ) : null}
           </article>
