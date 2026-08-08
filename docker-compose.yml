@@ -48,8 +48,11 @@ services:
   # ============================================================
   backend:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      # Repo root, not ./backend -- backend/Dockerfile needs the sibling
+      # lib/ and src/types/ directories its own tsconfig.build.json
+      # requires; see backend/Dockerfile's header comment for why.
+      context: .
+      dockerfile: backend/Dockerfile
     container_name: caredroid-backend
     environment:
       NODE_ENV: ${NODE_ENV:-development}

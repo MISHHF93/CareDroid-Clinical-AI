@@ -1,0 +1,29 @@
+# Applies to backend/Dockerfile specifically (BuildKit's <Dockerfile>.dockerignore
+# convention: a file next to the Dockerfile it applies to takes precedence over
+# the build context root's own .dockerignore). Needed because the repo-root
+# .dockerignore deliberately excludes `backend` entirely -- correct for the root
+# Dockerfile's frontend build, wrong for this one, which now uses the repo root
+# as its context specifically so it CAN see backend/, lib/, and src/types/
+# together (see backend/Dockerfile's own header comment for why).
+#
+# Requires BuildKit (docker/setup-buildx-action + docker/build-push-action
+# already use it in CI; modern `docker compose build` defaults to it locally).
+# On non-BuildKit Docker this file is silently ignored and the repo-root
+# .dockerignore applies instead, which would exclude backend/ and fail the
+# build loudly at the first COPY step -- a visible failure, not a silent one.
+node_modules
+dist
+coverage
+.git
+.venv
+**/ml-services/nlu/models
+**/ml-services/nlu/.venv
+*.sqlite
+*.log
+npm-debug.log*
+android
+mcp
+docs
+archive
+e2e
+.cursor
