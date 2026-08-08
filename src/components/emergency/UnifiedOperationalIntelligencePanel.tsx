@@ -6,6 +6,7 @@ import type {
   UnifiedOperationalIntelligenceDomainStatus,
   UnifiedOperationalIntelligenceInsight,
 } from '../../config/unifiedOperationalIntelligenceModel';
+import { AiTruthLabel, hospitalCommandCenterRecommendationsTruthLabel } from '../ai/AiTruthLabel';
 import './unified-operational-intelligence-panel.css';
 
 type UnifiedOperationalIntelligencePanelProps = {
@@ -112,35 +113,38 @@ export function UnifiedOperationalIntelligencePanel({
           staffing, alerts, and workflow metrics.
         </p>
       ) : (
-        <ol className="unified-operational-intelligence-panel__insights">
-          {visibleInsights.map((insight) => (
-            <li
-              key={insight.id}
-              className={`unified-operational-intelligence-panel__insight unified-operational-intelligence-panel__insight--${insight.severity}`}
-            >
-              <div className="unified-operational-intelligence-panel__insight-main">
-                <span className="unified-operational-intelligence-panel__insight-type">
-                  {insight.domain.replace(/_/g, ' ')} · {insightTypeLabel(insight.type)}
-                </span>
-                <strong>{insight.title}</strong>
-                <p>{insight.summary}</p>
-                <span className="unified-operational-intelligence-panel__insight-meta">
-                  Owner: {insight.ownerRole.replace(/_/g, ' ')}
-                  {insight.sourceEventType ? ` · Event: ${insight.sourceEventType}` : ''}
-                  {` · Confidence ${Math.round(insight.confidence * 100)}%`}
-                </span>
-              </div>
-              {insight.route ? (
-                <Link
-                  to={insight.route}
-                  className="cd-btn cd-btn--secondary cd-btn--sm unified-operational-intelligence-panel__action"
-                >
-                  Open workflow
-                </Link>
-              ) : null}
-            </li>
-          ))}
-        </ol>
+        <>
+          <AiTruthLabel {...hospitalCommandCenterRecommendationsTruthLabel()} compact />
+          <ol className="unified-operational-intelligence-panel__insights">
+            {visibleInsights.map((insight) => (
+              <li
+                key={insight.id}
+                className={`unified-operational-intelligence-panel__insight unified-operational-intelligence-panel__insight--${insight.severity}`}
+              >
+                <div className="unified-operational-intelligence-panel__insight-main">
+                  <span className="unified-operational-intelligence-panel__insight-type">
+                    {insight.domain.replace(/_/g, ' ')} · {insightTypeLabel(insight.type)}
+                  </span>
+                  <strong>{insight.title}</strong>
+                  <p>{insight.summary}</p>
+                  <span className="unified-operational-intelligence-panel__insight-meta">
+                    Owner: {insight.ownerRole.replace(/_/g, ' ')}
+                    {insight.sourceEventType ? ` · Event: ${insight.sourceEventType}` : ''}
+                    {` · Confidence ${Math.round(insight.confidence * 100)}%`}
+                  </span>
+                </div>
+                {insight.route ? (
+                  <Link
+                    to={insight.route}
+                    className="cd-btn cd-btn--secondary cd-btn--sm unified-operational-intelligence-panel__action"
+                  >
+                    Open workflow
+                  </Link>
+                ) : null}
+              </li>
+            ))}
+          </ol>
+        </>
       )}
 
       <footer className="unified-operational-intelligence-panel__footer">

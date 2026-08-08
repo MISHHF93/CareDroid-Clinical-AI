@@ -174,6 +174,13 @@ export function sentinelAiRecommendationsTruthLabel(): AiTruthLabelInfo {
  * modelOrRuleId — so, same as Sentinel above, this reports the single
  * verified-true state for the panel rather than guessing per item against
  * data the type system doesn't back up.
+ *
+ * Also reused as-is (2026-08-08) by UnifiedOperationalIntelligencePanel.tsx,
+ * which renders the same UnifiedOperationalIntelligenceSnapshot.insights
+ * directly (unmerged, per-insight "Confidence NN%" text) rather than through
+ * HospitalCommandCenter's 3-way merge — same verified-true source, same
+ * correct verdict, so this helper is named after its consuming component
+ * only historically, not because the classification is specific to it.
  */
 export function hospitalCommandCenterRecommendationsTruthLabel(): AiTruthLabelInfo {
   return {
