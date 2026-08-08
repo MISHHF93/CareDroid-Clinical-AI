@@ -60,16 +60,6 @@ export function resolveAlarmSurfacePlan(
   }
 }
 
-export function shouldPulseSidebarForAlert(alert: Alert): boolean {
-  const plan = resolveAlarmSurfacePlan(alert);
-  return plan.surfaces.includes(ALARM_SURFACE.sidebarPulse);
-}
-
-export function shouldShowInShellDock(alert: Alert): boolean {
-  const plan = resolveAlarmSurfacePlan(alert);
-  return plan.surfaces.includes(ALARM_SURFACE.shellDock);
-}
-
 /** Operational alerts never use Sonner; user feedback toasts are separate. */
 export function shouldShowOperationalToast(_alert: Alert): boolean {
   return false;

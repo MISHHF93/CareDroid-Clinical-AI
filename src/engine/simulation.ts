@@ -755,31 +755,6 @@ export const startEmergencySimulation = (): void => emergencySimulationEngine.st
 
 export const stopEmergencySimulation = (): void => emergencySimulationEngine.stop();
 
-export const toggleEmergencySimulation = (): boolean => emergencySimulationEngine.toggle();
-
-export const isEmergencySimulationRunning = (): boolean => emergencySimulationEngine.isRunning();
-
-let keyboardShortcutInstalled = false;
-
-export const installEmergencySimulationShortcut = (): void => {
-  if (keyboardShortcutInstalled || typeof window === 'undefined' || !isEmergencySimulationAvailable()) {
-    return;
-  }
-
-  keyboardShortcutInstalled = true;
-  window.addEventListener('keydown', (event) => {
-    if (!event.ctrlKey || !event.shiftKey || event.key.toLowerCase() !== 'd') return;
-    event.preventDefault();
-    toggleEmergencySimulation();
-  });
-};
-
-export const initializeEmergencySimulation = (): void => {
-  if (typeof window === 'undefined' || !isEmergencySimulationAvailable()) return;
-  installEmergencySimulationShortcut();
-  startEmergencySimulation();
-};
-
 // Simulation auto-start is owned by AppShell when platform simulation mode is active.
 
 /** AppShell compatibility — delegates to the full emergency simulation engine. */
