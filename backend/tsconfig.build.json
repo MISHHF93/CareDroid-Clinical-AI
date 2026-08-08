@@ -9,7 +9,6 @@
     "ml-services/**/*",
     "../lib/**/*",
     "../src/types/**/*",
-    "../types/**/*",
     "../src/config/user-profile-catalog.data.json"
   ],
   "exclude": [
@@ -18,8 +17,6 @@
     "test",
     "**/*.spec.ts",
     "**/*.test.ts",
-    "../lib/**/*.test.ts",
-    "../src/types/**/*.test.ts",
     "../src/store/**/*",
     "../src/components/**/*",
     "../src/pages/**/*",
@@ -30,6 +27,8 @@
     "../lib/ai/client.ts",
     "../lib/ai/responseParser.ts",
     "../engine/**/*",
-    "../store/**/*"
+    "../store/**/*",
+    "../**/*.test.ts",
+    "../**/*.spec.ts"
   ]
 }

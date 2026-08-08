@@ -134,6 +134,7 @@
     "health:frontend": "npm run typecheck:frontend && npm run lint && node scripts/scan-imports.mjs src && node scripts/count-aria-expr-issues.mjs src && node scripts/scan-source-dirt.mjs",
     "scan:source-dirt": "node scripts/scan-source-dirt.mjs",
     "typecheck:frontend": "tsc --noEmit -p tsconfig.frontend.json",
+    "verify:clean-build": "node scripts/verify-clean-build.mjs",
     "test:all": "npm run test:run:frontend && cd backend && npm test",
     "test:bundle-budget": "vitest run src/build/bundleBudget.test.ts",
     "build:analyze": "npm run build && node scripts/analyze-bundle.mjs",
