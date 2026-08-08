@@ -18,6 +18,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { AuthorizationGuard } from '../auth/guards/authorization.guard';
 import { RequirePermission } from '../auth/decorators/permissions.decorator';
 import { Permission } from '../auth/enums/permission.enum';
+import { HUMAN_REVIEW_DISCLAIMER } from '../../../../lib/ai/safetyPolicy';
 import {
   FederatedLearningService,
   HybridDigitalTwinService,
@@ -62,6 +63,7 @@ import { assertEntitlementLaunchFromRequest } from '../platform-assets/entitleme
 import type { RecordClinicalCalculatorDto } from './clinical-decision-support.types';
 import { EmergencyOsSettingsPatchDto } from './dto/emergency-os-settings-patch.dto';
 import { OcrIntakeService } from './ocr-intake.service';
+import { ChatService } from '../chat/chat.service';
 import {
   EvaluateOperationalIntelligenceDto,
   ExtractDocumentArtifactsDto,
@@ -132,6 +134,7 @@ export class EmergencyOsController {
     private readonly operatingSurfacesService: EmergencyOperatingSurfacesService,
     private readonly entitlementService: EntitlementService,
     private readonly ocrIntakeService: OcrIntakeService,
+    private readonly chatService: ChatService,
   ) {}
 
   @RequirePermission(Permission.READ_PHI)
@@ -640,6 +643,17 @@ export class EmergencyOsController {
     return this.copilotService.getCopilotContext();
   }
 
+  // Converged 2026-08-08: this endpoint previously called EDCopilotService.processQuery(),
+  // a keyword-if/else matcher with zero LLM invocation (chest-pain/sepsis/stroke
+  // guidance was hardcoded canned text presented as if the assistant reasoned about
+  // it). A repository-wide call-graph trace found this route has zero real frontend
+  // callers -- so this change cannot break real traffic -- but the entitlement
+  // check, patient-audit logging, and governance review-item creation below ARE
+  // real and worth keeping stable for any future caller. Now delegates to
+  // ChatService.processMessage(), the same canonical orchestration pipeline the
+  // live copilot chat UI (CopilotPanel.tsx) actually uses, instead of a second,
+  // fake-AI runtime. See AI_ORCHESTRATION_AUDIT.md and the priority-change
+  // safety-floor fix in chat.service.ts's handleEdCopilotPriorityChange().
   @RequirePermission(Permission.USE_AI_CHAT)
   @Post('copilot/query')
   async queryCopilot(
@@ -652,9 +666,65 @@ export class EmergencyOsController {
       { user: (request as any)?.user, tenantContext },
       'agent-clinical',
     );
-    const response = this.copilotService.processQuery(dto || {});
-    const patientId =
-      typeof dto?.context?.patientId === 'string' ? dto.context.patientId : undefined;
+    const query = String(dto?.query || '');
+    const context = (dto?.context || {}) as Record<string, unknown>;
+    const explicitPatientId = typeof context.patientId === 'string' ? context.patientId : undefined;
+    const edCopilotContext = this.buildEdCopilotOperationalContext(query, explicitPatientId);
+    const patientId = explicitPatientId || edCopilotContext.selectedPatientId;
+    const chatResponse = await this.chatService.processMessage(
+      query,
+      undefined,
+      'ed-copilot',
+      undefined,
+      (request as any)?.user?.id,
+      dto?.user_role,
+      undefined,
+      { edCopilot: { enabled: true, ...edCopilotContext, ...context, patientId } },
+    );
+    const requiresReview = chatResponse.metadata?.safety?.requiresHumanReview ?? true;
+    const responseText = chatResponse.text || '';
+    const edCopilotData = (chatResponse.metadata?.edCopilot || {}) as Record<string, unknown>;
+    const safetyCheckPassed =
+      typeof edCopilotData.safetyCheckPassed === 'boolean'
+        ? edCopilotData.safetyCheckPassed
+        : undefined;
+    // Best-effort legacy-envelope compatibility for this route's pre-existing
+    // response contract (there are no real consumers to break, confirmed by
+    // whole-repo grep, but keeping the shape stable costs nothing and protects
+    // any future integration or test written against it).
+    const response = {
+      module: 'ED Copilot Query',
+      generatedAt: new Date().toISOString(),
+      source: 'chat-service',
+      status: 'active',
+      data: {
+        id: `copilot-query-${Date.now()}`,
+        query,
+        response: responseText,
+        answer: responseText,
+        message: responseText,
+        data: edCopilotData,
+        requires_review: requiresReview,
+        safetyStatus: requiresReview ? 'review-required' : 'safe',
+        safety_check_passed: safetyCheckPassed,
+        safetyNotice: HUMAN_REVIEW_DISCLAIMER,
+        provenance: chatResponse.metadata?.provenance,
+        userRole: dto?.user_role || 'unknown',
+        createdAt: new Date().toISOString(),
+      },
+      remainingGaps: [] as string[],
+    };
+    this.workflowActionLogService.record({
+      type: 'copilot_used',
+      title: 'Copilot query processed',
+      summary: query || 'Empty Copilot query received.',
+      source: 'ed-copilot-query',
+      metadata: {
+        userRole: dto?.user_role || 'unknown',
+        requiresReview,
+        safetyCheckPassed: safetyCheckPassed ?? null,
+      },
+    });
     if (patientId) {
       await this.patientAuditService.logPatientAccess({
         request,
@@ -663,18 +733,13 @@ export class EmergencyOsController {
         resource: `emergency/copilot/query`,
       });
     }
-    const data = response.data as {
-      query?: string;
-      response?: string;
-      requires_review?: boolean;
-    };
+    const data = response.data;
     this.clinicalDecisionSupportService.recordCopilotInteraction(
       {
-        question: String(dto?.query || ''),
+        question: query,
         patientId,
         userRole: dto?.user_role,
-        patientContextSummary:
-          typeof dto?.context?.summary === 'string' ? dto.context.summary : undefined,
+        patientContextSummary: typeof context.summary === 'string' ? context.summary : undefined,
         draftGuidance: String(data?.response || ''),
         requiresHumanReview: Boolean(data?.requires_review),
       },
@@ -684,6 +749,100 @@ export class EmergencyOsController {
       },
     );
     return response;
+  }
+
+  /**
+   * Builds real ED-operational context (patients, capacity, reassessment
+   * queue, and -- when the query names a patient -- verified patient-safety
+   * context) from this controller's already-injected services, so the
+   * canonical ChatService.handleEdCopilotCommand() dispatcher this route
+   * delegates to can answer deterministically instead of always falling
+   * through to the LLM. Mirrors, with real data, the shape
+   * handleEdCopilotCommand()/handleEdCopilotPriorityChange() already expect
+   * (chat.service.ts) -- this only assembles context, it does not classify
+   * intent or generate any response text itself.
+   */
+  private buildEdCopilotOperationalContext(
+    query: string,
+    explicitPatientId?: string,
+  ): {
+    patients: Array<Record<string, unknown>>;
+    patientCount: number;
+    flaggedReassessments: Array<Record<string, unknown>>;
+    capacitySnapshot: Record<string, unknown>;
+    selectedPatientId?: string;
+    patientArtifactContext?: Record<string, unknown>;
+  } {
+    const patients = this.patientService.listPatients();
+    const capacity = this.patientService.computeCapacity();
+
+    const mappedPatients = patients.map((patient) => ({
+      id: patient.id,
+      name: `${patient.firstName} ${patient.lastName}`,
+      location: patient.roomId || patient.state,
+      state: patient.state,
+      complaint: patient.chiefComplaint,
+      priority: patient.priority,
+      waitMinutes: Math.max(
+        0,
+        Math.round((Date.now() - new Date(patient.arrivalTime).getTime()) / 60000),
+      ),
+    }));
+
+    const flaggedReassessments = patients
+      .filter((patient) => patient.flags.includes('ReassessmentDue'))
+      .map((patient) => ({
+        patientId: patient.id,
+        patientName: `${patient.firstName} ${patient.lastName}`,
+        reasons: ['Reassessment due'],
+      }));
+
+    const capacitySnapshot = {
+      score: capacity.score,
+      band: capacity.band,
+      currentOccupancy: capacity.occupiedRooms,
+      maxCapacity: capacity.totalRooms,
+      occupancyPercent: capacity.occupancyPercent,
+      boardingCount: capacity.boardingCount,
+      reassessmentQueueLength: capacity.reassessmentDue,
+    };
+
+    const patientMatch = query.match(/patient\s+([A-Za-z0-9_-]+)/i);
+    const referencedPatientId = explicitPatientId || patientMatch?.[1];
+    const targetPatient = referencedPatientId
+      ? patients.find((patient) => patient.id === referencedPatientId)
+      : undefined;
+    const latestVitals =
+      targetPatient && Array.isArray(targetPatient.vitals)
+        ? targetPatient.vitals.at(-1)
+        : undefined;
+
+    return {
+      patients: mappedPatients,
+      patientCount: patients.length,
+      flaggedReassessments,
+      capacitySnapshot,
+      selectedPatientId: targetPatient?.id,
+      patientArtifactContext: targetPatient
+        ? {
+            patientId: targetPatient.id,
+            name: `${targetPatient.firstName} ${targetPatient.lastName}`,
+            chiefComplaint: targetPatient.chiefComplaint,
+            flags: targetPatient.flags,
+            priority: targetPatient.priority,
+            vitals: latestVitals
+              ? {
+                  hr: latestVitals.hr,
+                  rr: latestVitals.rr,
+                  spo2: latestVitals.spo2,
+                  sbp: latestVitals.sbp,
+                  dbp: latestVitals.dbp,
+                  temp: latestVitals.temp,
+                }
+              : {},
+          }
+        : undefined,
+    };
   }
 
   @RequirePermission(Permission.USE_CALCULATORS)

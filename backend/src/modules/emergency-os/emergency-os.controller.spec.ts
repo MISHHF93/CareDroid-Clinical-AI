@@ -41,15 +41,26 @@ import { WorkflowOrchestrationService } from './emergency-os.workflow-orchestrat
 import { EmergencyOperatingSurfacesService } from './emergency-os.operating-surfaces.service';
 import { EntitlementService } from '../platform-assets/entitlement.service';
 import { OcrIntakeService } from './ocr-intake.service';
+import { ChatService } from '../chat/chat.service';
 
 describe('EmergencyOsController', () => {
   let controller: EmergencyOsController;
   let patientService: EmergencyPatientService;
+  let chatService: { processMessage: jest.Mock };
 
   beforeEach(async () => {
+    // ChatService itself has 20+ AI-orchestration dependencies (intent
+    // classifier, MoE router, RAG, memory services, etc.) that are irrelevant
+    // to this controller's own behavior (context assembly + response
+    // shaping). Mocked here, matching how ChatController's own tests mock it
+    // (rbac.spec.ts) -- ChatService.handleEdCopilotCommand()'s real
+    // deterministic-dispatch and safety-floor logic is covered directly in
+    // chat.service.spec.ts instead.
+    chatService = { processMessage: jest.fn() };
     const moduleRef = await Test.createTestingModule({
       controllers: [EmergencyOsController],
       providers: [
+        { provide: ChatService, useValue: chatService },
         EmergencyWhiteboardService,
         WorkflowActionLogService,
         EmergencyPatientService,
@@ -379,20 +390,69 @@ describe('EmergencyOsController', () => {
     );
   });
 
-  it('handles active Emergency Copilot query requests without optional Mongoose routes', async () => {
+  // Converged 2026-08-08: queryCopilot() now delegates to ChatService.processMessage()
+  // (the canonical orchestration pipeline) instead of the removed
+  // EDCopilotService.processQuery() keyword matcher. ChatService is mocked
+  // here (see beforeEach) since its own 20+ AI-orchestration dependencies
+  // are irrelevant to what this controller is responsible for: assembling
+  // real ED operational context (patients, capacity, reassessment,
+  // patient-safety context) and shaping the response envelope. The
+  // deterministic dispatcher and priority-change safety-floor logic that
+  // context feeds into is covered directly, end-to-end, in
+  // chat.service.spec.ts.
+  it('assembles real ED operational context and delegates Emergency Copilot queries to ChatService.processMessage()', async () => {
+    controller.createIntakePatient({
+      mrn: 'ED-COPILOT-CTX',
+      firstName: 'Context',
+      lastName: 'Patient',
+      chiefComplaint: 'Copilot context validation',
+      complaintCategory: 'Other',
+    });
+    chatService.processMessage.mockResolvedValue({
+      text: '**Longest waiting patients**\n\n1. Context Patient - 0 min\n\n_Surface for human review before any clinical or operational action._',
+      metadata: {
+        safety: { requiresHumanReview: true },
+        edCopilot: { command: 'longest_waiting' },
+        provenance: {
+          responseSource: 'deterministic-tool',
+          modelOrTool: 'ed-copilot-deterministic-commands',
+          modelVersion: 'v1',
+          deterministic: true,
+          humanReviewRequired: true,
+        },
+      },
+    });
+
     const result = await controller.queryCopilot({
       query: 'Who waited longest?',
       user_role: 'charge-nurse',
     });
 
+    expect(chatService.processMessage).toHaveBeenCalledWith(
+      'Who waited longest?',
+      undefined,
+      'ed-copilot',
+      undefined,
+      undefined,
+      'charge-nurse',
+      undefined,
+      expect.objectContaining({
+        edCopilot: expect.objectContaining({
+          enabled: true,
+          patients: expect.arrayContaining([expect.objectContaining({ name: 'Context Patient' })]),
+          capacitySnapshot: expect.objectContaining({ score: expect.any(Number) }),
+        }),
+      }),
+    );
     expect(result).toMatchObject({
       module: 'ED Copilot Query',
-      source: 'backend-fixture',
+      source: 'chat-service',
       data: {
         query: 'Who waited longest?',
-        response: expect.stringContaining('waited'),
-        safety_check_passed: true,
+        response: expect.stringContaining('waiting'),
+        requires_review: true,
         safetyNotice: expect.stringContaining('not a replacement'),
+        provenance: expect.objectContaining({ deterministic: true }),
       },
     });
     expect(controller.getWorkflowLogs().data.logs).toEqual(
@@ -405,7 +465,7 @@ describe('EmergencyOsController', () => {
     );
   });
 
-  it('copilot "move patient" query blocks lowering priority below the DPS1/DPS2 safety floor', async () => {
+  it('resolves the patient a copilot "move patient" query names into real patientArtifactContext for the priority-change safety floor', async () => {
     const created = controller.createIntakePatient({
       mrn: 'ED-COPILOT-FLOOR',
       firstName: 'Copilot',
@@ -415,18 +475,43 @@ describe('EmergencyOsController', () => {
     });
     const patientId = created.data.patient.id;
     patientService.updatePatient(patientId, { priority: 'P1' });
+    chatService.processMessage.mockResolvedValue({
+      text: 'Priority change blocked by safety floor: DPS1/DPS2 patients cannot be de-escalated. No autonomous change was made.',
+      metadata: {
+        safety: { requiresHumanReview: true },
+        edCopilot: { command: 'priority_change_safety_check', safetyCheckPassed: false },
+        provenance: { responseSource: 'deterministic-tool', deterministic: true },
+      },
+    });
 
     const result = await controller.queryCopilot({
       query: `Move patient ${patientId} to priority 5`,
       user_role: 'charge_nurse',
     });
 
+    expect(chatService.processMessage).toHaveBeenCalledWith(
+      expect.any(String),
+      undefined,
+      'ed-copilot',
+      undefined,
+      undefined,
+      'charge_nurse',
+      undefined,
+      expect.objectContaining({
+        edCopilot: expect.objectContaining({
+          selectedPatientId: patientId,
+          patientArtifactContext: expect.objectContaining({
+            patientId,
+            priority: 'P1',
+          }),
+        }),
+      }),
+    );
     expect(result).toMatchObject({
       data: {
         response: expect.stringMatching(/blocked by safety floor/i),
         requires_review: true,
         safety_check_passed: false,
-        safety_message: expect.stringMatching(/DPS1/),
       },
     });
   });
@@ -441,6 +526,14 @@ describe('EmergencyOsController', () => {
     });
     const patientId = created.data.patient.id;
     patientService.updatePatient(patientId, { priority: 'P3' });
+    chatService.processMessage.mockResolvedValue({
+      text: 'Safety check passed for changing Copilot Escalate to DPS 2. Human review is required before applying.',
+      metadata: {
+        safety: { requiresHumanReview: true },
+        edCopilot: { command: 'priority_change_safety_check', safetyCheckPassed: true },
+        provenance: { responseSource: 'deterministic-tool', deterministic: true },
+      },
+    });
 
     const result = await controller.queryCopilot({
       query: `Move patient ${patientId} to priority 2`,

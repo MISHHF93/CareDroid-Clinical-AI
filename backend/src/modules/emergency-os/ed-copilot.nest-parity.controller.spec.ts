@@ -1,34 +1,61 @@
 import { EdCopilotNestParityController } from './ed-copilot.nest-parity.controller';
 
+// Converged 2026-08-08: this controller delegates to ChatService.processMessage()
+// (the canonical orchestration pipeline) instead of the removed
+// EDCopilotService.processQuery() keyword matcher -- see the controller's own
+// header comment and AI_ORCHESTRATION_AUDIT.md.
 describe('EdCopilotNestParityController', () => {
   it('returns validation envelope when query/user_role missing', async () => {
-    const copilotService = { processQuery: jest.fn() };
-    const controller = new EdCopilotNestParityController(copilotService as any);
+    const chatService = { processMessage: jest.fn() };
+    const controller = new EdCopilotNestParityController(chatService as any);
     const result = await controller.query({});
     expect(result).toMatchObject({
       success: false,
       error: { code: 'VALIDATION', statusCode: 400 },
     });
-    expect(copilotService.processQuery).not.toHaveBeenCalled();
+    expect(chatService.processMessage).not.toHaveBeenCalled();
   });
 
-  it('returns accountable recommendation for a recognized query', async () => {
-    const copilotService = {
-      processQuery: jest.fn().mockReturnValue({
-        suggestion: 'Patient X waited longest',
-        requires_review: true,
-        data: { response: 'Patient X waited longest' },
+  it('delegates to ChatService.processMessage() and returns an accountable recommendation', async () => {
+    const chatService = {
+      processMessage: jest.fn().mockResolvedValue({
+        text: 'Patient X waited longest',
+        metadata: {
+          safety: { requiresHumanReview: true },
+          edCopilot: { command: 'longest_waiting' },
+          provenance: {
+            responseSource: 'deterministic-tool',
+            modelOrTool: 'ed-copilot-deterministic-commands',
+            modelVersion: 'v1',
+            deterministic: true,
+            humanReviewRequired: true,
+          },
+        },
       }),
     };
-    const controller = new EdCopilotNestParityController(copilotService as any);
+    const controller = new EdCopilotNestParityController(chatService as any);
     const result = (await controller.query({
       query: 'Who waited longest?',
       user_role: 'charge_nurse',
     })) as any;
 
-    expect(copilotService.processQuery).toHaveBeenCalled();
+    expect(chatService.processMessage).toHaveBeenCalledWith(
+      'Who waited longest?',
+      undefined,
+      'ed-copilot',
+      undefined,
+      undefined,
+      'charge_nurse',
+      undefined,
+      expect.objectContaining({ edCopilot: expect.objectContaining({ enabled: true }) }),
+    );
     expect(result.accountableRecommendation).toBeDefined();
     expect(result.accountableRecommendation.content).toMatch(/waited/i);
+    expect(result.accountableRecommendation.model).toMatchObject({
+      name: 'ed-copilot-deterministic-commands',
+      version: 'v1',
+    });
     expect(result.requiresClinicianReview).toBe(true);
+    expect(result.provenance).toMatchObject({ deterministic: true });
   });
 });

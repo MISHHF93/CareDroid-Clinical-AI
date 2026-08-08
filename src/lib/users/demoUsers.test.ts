@@ -59,6 +59,51 @@ describe('DEMO_USERS', () => {
     const physician = DEMO_USERS.find((u) => u.role === 'emergency_physician');
     expect(physician?.canUseAIChief).toBe(true);
   });
+
+  // 2026-08-08 ED Copilot AI-runtime convergence: exactly these 8 of the 16
+  // demo profiles are Copilot-authorized (AI_REQUEST or AI_REVIEW). Every one
+  // of them reaches the same single canonical path -- CopilotPanel.tsx ->
+  // POST /api/ai/node/conversational -> ChatService.processMessage() -- there
+  // is no per-role branching to any alternate AI implementation, so this list
+  // is the full set that benefits from (and must be protected by) the
+  // priority-change safety floor ported into handleEdCopilotPriorityChange().
+  // Locks in the finding so future permission-table edits can't silently
+  // change who gets Copilot access without a test failing here.
+  it('exactly 8 demo profiles are Copilot-authorized (canUseAIChief)', () => {
+    const authorizedIds = DEMO_USERS.filter((u) => u.canUseAIChief)
+      .map((u) => u.id)
+      .sort();
+
+    expect(authorizedIds).toEqual(
+      [
+        'demo-maya-chen', // emergency_physician
+        'demo-omar-patel', // charge_nurse
+        'demo-sofia-alvarez', // triage_nurse
+        'demo-aisha-morgan', // ed_director
+        'demo-samuel-okafor', // specialist (cardiologist)
+        'demo-elena-rossi', // specialist (neurologist)
+        'demo-jordan-miles', // hospital_admin
+        'demo-morgan-ellis', // quality_safety_officer
+      ].sort(),
+    );
+  });
+
+  it('the 8 non-Copilot-authorized demo profiles are correctly excluded', () => {
+    const unauthorizedRoles = DEMO_USERS.filter((u) => !u.canUseAIChief).map((u) => u.role);
+
+    expect(new Set(unauthorizedRoles)).toEqual(
+      new Set([
+        'registration_clerk',
+        'patient_flow_coordinator',
+        'pharmacist',
+        'lab_technician',
+        'radiology_technician',
+        'it_admin',
+        'paramedic',
+        'demo_observer',
+      ]),
+    );
+  });
 });
 
 describe('getDemoUserById', () => {

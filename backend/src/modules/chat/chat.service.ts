@@ -47,6 +47,10 @@ import { Message, unifiedAIClient } from '../../../../lib/ai/serverClient';
 import { buildSystemPrompt } from '../../../../lib/ai/contextEngine';
 import { getToolsForRequestType } from '../../../../lib/ai/toolRegistry';
 import {
+  evaluatePriorityChange,
+  patientSafetyContextFromRecord,
+} from '../../../../lib/ai/clinicalSafetyRules';
+import {
   mapRouterArtifactTypeToArtifactEntity,
   resolveExecutorToolId,
 } from '../../../ml-services/shared/routing-maps';
@@ -1440,10 +1444,16 @@ export class ChatService {
         '_Human review required. I will not make autonomous clinical decisions, orders, disposition, admission, discharge, or treatment recommendations._',
       ].join('\n');
 
+    // deterministic: !anthropicText -- when the real Anthropic call succeeded,
+    // this response is genuinely LLM-generated. When it returned nothing
+    // (unconfigured API key, provider error -- see invokeAnthropicEdCopilot's
+    // catch block), the text above is a hardcoded fallback string, not model
+    // output, and provenance must say so.
     return this.buildEdCopilotResponse({
       text,
       command: 'general',
       edContext,
+      deterministic: !anthropicText,
     });
   }
 
@@ -1455,6 +1465,11 @@ export class ChatService {
     const patients = Array.isArray(edContext.patients) ? edContext.patients : [];
     const detectedIntent = edContext.detectedIntent || null;
     const intentName = this.normalizeEdCopilotIntentName(detectedIntent?.intent);
+
+    // Checked first, before every other command pattern: a real patient-safety
+    // gate must never lose to a looser pattern match below it.
+    const priorityChangeResponse = this.handleEdCopilotPriorityChange(message, edContext);
+    if (priorityChangeResponse) return priorityChangeResponse;
 
     if (/handoff|shift summary|shift handoff/i.test(message) && edContext.shiftSummary) {
       const summary = edContext.shiftSummary || {};
@@ -1678,7 +1693,7 @@ export class ChatService {
       });
     }
 
-    if (/waiting.*longest|longest.*waiting/.test(lower)) {
+    if (/waiting.*longest|longest.*waiting|waited.*longest|longest.*wait\b/.test(lower)) {
       const waiting = [...patients].sort(
         (a, b) => Number(b.waitMinutes || 0) - Number(a.waitMinutes || 0),
       );
@@ -1803,25 +1818,188 @@ export class ChatService {
     return null;
   }
 
+  /**
+   * Priority/DPS-change safety floor for the real, live ED copilot chat path.
+   *
+   * Ported 2026-08-08 from EDCopilotService.processQuery() (backend/src/modules/
+   * emergency-os/emergency-os.services.ts) after a repository-wide call-graph
+   * trace found that service's 2 HTTP routes (POST /api/emergency/copilot/query,
+   * POST /api/copilot/query) have ZERO real frontend callers -- confirmed by
+   * exhaustive grep across every component, hook, store, and command-palette
+   * action. This safety-floor check was ported into EDCopilotService on
+   * 2026-08-06 to close a gap found during a dual-persistence audit, but that
+   * fix landed in a service the live UI never actually calls. handleEdCopilotCommand()
+   * -- what CopilotPanel.tsx's real traffic hits via POST /api/ai/node/conversational
+   * -> ChatService.processMessage() -- had no equivalent check at all: a
+   * clinician asking the live copilot to change a patient's priority got a
+   * free-text LLM response with zero deterministic safety-floor evaluation.
+   *
+   * Reuses the exact same lib/ai/clinicalSafetyRules evaluatePriorityChange()/
+   * patientSafetyContextFromRecord() the governance module's own
+   * POST /governance/evaluate-priority-change endpoint already uses -- advisory
+   * only, never auto-applies, always requires human review.
+   *
+   * Unlike EDCopilotService's original (which had EmergencyPatientService
+   * injected and could look up any patient by id), ChatService has no direct
+   * patient-repository access. The only reliable, real patient-safety data
+   * available here is edContext.patientArtifactContext -- the CURRENTLY
+   * SELECTED patient's real vitals/complaint/flags, genuinely sent by
+   * CopilotPanel.tsx (src/services/patientAiContext.ts's
+   * buildCopilotPatientArtifactContext()). When the query names a different,
+   * unselected patient, or no patient context is available at all, this fails
+   * safe -- it never guesses or silently allows a change.
+   */
+  private handleEdCopilotPriorityChange(
+    message: string,
+    edContext: Record<string, any>,
+  ): QueryResponse | null {
+    const lowerQuery = message.toLowerCase();
+    if (!(lowerQuery.includes('move patient') || lowerQuery.includes('change priority'))) {
+      return null;
+    }
+
+    const isRecord = (value: unknown): value is Record<string, unknown> =>
+      typeof value === 'object' && value !== null;
+
+    const requestedDps = this.extractRequestedDpsFromQuery(message);
+    const patientMatch = message.match(/patient\s+([A-Za-z0-9_-]+)/i);
+    const explicitPatientId = patientMatch?.[1];
+    const artifactContext = isRecord(edContext.patientArtifactContext)
+      ? edContext.patientArtifactContext
+      : null;
+    const selectedPatientId =
+      typeof edContext.selectedPatientId === 'string' ? edContext.selectedPatientId : undefined;
+    const artifactPatientId =
+      typeof artifactContext?.patientId === 'string' ? artifactContext.patientId : undefined;
+
+    const resolvedToAvailableContext =
+      Boolean(artifactContext) &&
+      (!explicitPatientId ||
+        explicitPatientId === selectedPatientId ||
+        explicitPatientId === artifactPatientId);
+
+    const respond = (text: string, safetyCheckPassed: boolean, items?: any[]) =>
+      this.buildEdCopilotResponse({
+        text,
+        command: 'priority_change_safety_check',
+        edContext,
+        items,
+        safetyCheckPassed,
+      });
+
+    if (!explicitPatientId && !selectedPatientId) {
+      return respond(
+        'Please specify or select which patient. Example: "Move patient PT-1042 to DPS 2" -- or select a patient in the workspace and say "change this patient\'s priority to DPS 2".\n\n_No autonomous priority change was made._',
+        false,
+      );
+    }
+
+    if (!requestedDps) {
+      return respond(
+        'No DPS target was detected. Use DPS 1 through DPS 5.\n\n_No autonomous priority change was made._',
+        false,
+      );
+    }
+
+    if (!resolvedToAvailableContext || !artifactContext) {
+      return respond(
+        `I do not have verified clinical context for ${explicitPatientId ? `patient ${explicitPatientId}` : 'that patient'} in this conversation, so I cannot safely evaluate this priority change. Open that patient in the workspace and try again, or use the whiteboard priority-change action, which enforces the same safety review.\n\n_No autonomous priority change was made._`,
+        false,
+      );
+    }
+
+    const patientName = String(artifactContext.name || explicitPatientId || selectedPatientId);
+    const vitals = isRecord(artifactContext.vitals) ? artifactContext.vitals : {};
+    const dpsScore = this.parseDpsScoreFromPriority(artifactContext.priority);
+    const safety = evaluatePriorityChange(
+      patientSafetyContextFromRecord({
+        dps_score: dpsScore,
+        chief_complaint: artifactContext.chiefComplaint,
+        alerts: artifactContext.flags,
+        vitals: {
+          hr: vitals.hr,
+          rr: vitals.rr,
+          spo2: vitals.spo2,
+          bp: vitals.sbp != null && vitals.dbp != null ? `${vitals.sbp}/${vitals.dbp}` : undefined,
+        },
+      }),
+      requestedDps,
+    );
+
+    return respond(
+      safety.allowed
+        ? `Safety check passed for changing ${patientName} to DPS ${requestedDps}. Human review is required before applying.\n\n_No autonomous priority change was made._`
+        : `Priority change blocked by safety floor: ${(safety.floorReasons || []).join('; ') || safety.message}. No autonomous change was made.`,
+      safety.allowed,
+      [{ patientId: artifactPatientId, requestedDps, floorReasons: safety.floorReasons }],
+    );
+  }
+
+  /** Extracts a requested DPS 1-5 target from copilot free text, e.g. "DPS 2" or "priority 3". */
+  private extractRequestedDpsFromQuery(query: string): 1 | 2 | 3 | 4 | 5 | null {
+    const match = query.match(/(?:dps|priority)\s*([1-5])/i);
+    if (!match) return null;
+    const score = Number(match[1]);
+    return [1, 2, 3, 4, 5].includes(score) ? (score as 1 | 2 | 3 | 4 | 5) : null;
+  }
+
+  private parseDpsScoreFromPriority(priority: unknown): number | undefined {
+    if (typeof priority === 'number' && Number.isFinite(priority)) return priority;
+    const match = String(priority ?? '').match(/([1-5])/);
+    return match ? Number(match[1]) : undefined;
+  }
+
   private buildEdCopilotResponse(params: {
     text: string;
     command: string;
     edContext: Record<string, any>;
     items?: any[];
     whiteboardAction?: Record<string, any>;
+    deterministic?: boolean;
+    safetyCheckPassed?: boolean;
   }): QueryResponse {
+    // capacitySnapshot/flaggedReassessments were the only fields ever read here,
+    // but CopilotPanel.tsx (src/components/CopilotPanel.tsx) -- the only real
+    // caller of this whole handleEdCopilot path -- has never actually sent
+    // those field names; it sends capacityBand/capacityScore and
+    // reassessmentStatus/reassessmentQueueCount instead (found 2026-08-08
+    // during the same call-graph trace as the priority-change gap above).
+    // Reading both is real context recovery, not a stylistic fallback: for
+    // every request from the actual live UI, the *Snapshot/flagged* names
+    // were always undefined.
+    const capacityScore =
+      params.edContext.capacitySnapshot?.score ?? params.edContext.capacityScore ?? null;
+    const capacityBand =
+      params.edContext.capacitySnapshot?.band ?? params.edContext.capacityBand ?? null;
+    const flaggedReassessments =
+      params.edContext.flaggedReassessments ??
+      (typeof params.edContext.reassessmentQueueCount === 'number'
+        ? params.edContext.reassessmentQueueCount
+        : params.edContext.reassessmentStatus) ??
+      null;
+
     const structured = {
       command: params.command,
       patientCount: params.edContext.patientCount,
-      capacityScore: params.edContext.capacitySnapshot?.score,
+      capacityScore,
+      capacityBand,
       queueHealth: params.edContext.queueHealth,
-      flaggedReassessments: params.edContext.flaggedReassessments,
+      flaggedReassessments,
       items: params.items || [],
       whiteboardAction: params.whiteboardAction || null,
       requiresHumanReview: true,
+      safetyCheckPassed: params.safetyCheckPassed,
       safetyBoundary:
         'Decision support only. No autonomous diagnosis, treatment, orders, disposition, admission, discharge, staffing, bed, or transfer decisions.',
     };
+
+    // Provenance (2026-08-08): every response from this path -- deterministic
+    // command match or LLM fallback -- must say plainly which it was.
+    // modelProvider: 'anthropic' was previously hardcoded here unconditionally,
+    // including for pure rule-based command responses that never called any
+    // model at all -- the exact "response implies model-generated intelligence
+    // when it's actually deterministic" failure this fix set out to close.
+    const deterministic = params.deterministic ?? true;
 
     return {
       text: params.text,
@@ -1840,10 +2018,23 @@ export class ChatService {
       metadata: {
         edCopilot: structured,
         whiteboardAction: params.whiteboardAction,
-        modelProvider: 'anthropic',
+        modelProvider: deterministic ? 'deterministic-rules' : 'anthropic',
         safety: {
           requiresHumanReview: true,
           autonomousClinicalDecisionsAllowed: false,
+        },
+        provenance: {
+          responseSource: deterministic ? 'deterministic-tool' : 'llm-generated',
+          modelOrTool: deterministic
+            ? 'ed-copilot-deterministic-commands'
+            : 'anthropic-unified-ai-client',
+          modelVersion: deterministic ? 'v1' : undefined,
+          confidence: deterministic ? undefined : 0.9,
+          deterministic,
+          humanReviewRequired: true,
+          retrievalUsed: false,
+          toolsUsed: [params.command],
+          timestamp: new Date().toISOString(),
         },
       },
     };

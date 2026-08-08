@@ -2,14 +2,23 @@
  * Nest parity for Express `POST /api/copilot/query` (Architect Mode P0).
  * Prefer `POST /api/emergency/copilot/query` for full entitlement + audit.
  * This controller provides the same public path Nest-side so Express can be retired.
+ *
+ * Converged 2026-08-08: previously delegated to EDCopilotService.processQuery(),
+ * a keyword-if/else matcher with zero LLM invocation -- this DTO's own header
+ * comment already documented that a frontend sweep found zero real callers of
+ * this exact path, confirmed independently by this round's repository-wide
+ * call-graph trace. Now delegates to the same ChatService.processMessage()
+ * canonical pipeline EmergencyOsController.queryCopilot() and the live
+ * copilot chat UI use, instead of a second, fake-AI runtime answering the
+ * same public contract two different ways.
  */
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthorizationGuard } from '../auth/guards/authorization.guard';
 import { RequirePermission } from '../auth/decorators/permissions.decorator';
 import { Permission } from '../auth/enums/permission.enum';
-import { EDCopilotService } from './emergency-os.services';
+import { ChatService } from '../chat/chat.service';
 import { buildAccountableRecommendationDto } from '../ai/dto/accountable-recommendation.dto';
 import { EdCopilotQueryDto } from './dto/ed-copilot-nest-parity.dto';
 
@@ -18,12 +27,12 @@ import { EdCopilotQueryDto } from './dto/ed-copilot-nest-parity.dto';
 @Controller('copilot')
 @UseGuards(AuthGuard('jwt'), AuthorizationGuard)
 export class EdCopilotNestParityController {
-  constructor(private readonly copilotService: EDCopilotService) {}
+  constructor(private readonly chatService: ChatService) {}
 
   @Post('query')
   @RequirePermission(Permission.USE_AI_CHAT)
   @ApiOperation({ summary: 'ED Copilot query (Nest parity for Express /api/copilot/query)' })
-  async query(@Body() body: EdCopilotQueryDto) {
+  async query(@Body() body: EdCopilotQueryDto, @Req() request?: any) {
     if (!body?.query || !body?.user_role) {
       return {
         success: false,
@@ -35,27 +44,34 @@ export class EdCopilotNestParityController {
       };
     }
 
-    const response = this.copilotService.processQuery({
-      query: body.query,
-      user_role: body.user_role,
-      context: body.context,
-    }) as unknown as Record<string, unknown>;
+    const context = (body.context || {}) as Record<string, unknown>;
+    const patientId = typeof context.patientId === 'string' ? context.patientId : undefined;
+    const chatResponse = await this.chatService.processMessage(
+      body.query,
+      undefined,
+      'ed-copilot',
+      undefined,
+      request?.user?.id,
+      body.user_role,
+      undefined,
+      { edCopilot: { enabled: true, ...context, patientId } },
+    );
 
-    const data =
-      response.data && typeof response.data === 'object'
-        ? (response.data as Record<string, unknown>)
-        : response;
-    const suggestion =
-      String(response.suggestion || data.response || data.answer || data.message || '') ||
-      'No suggestion generated.';
-    const requiresReview = Boolean(response.requires_review ?? data.requires_review ?? true);
-    const confidenceRaw = response.confidence ?? data.confidence;
-    const confidence = typeof confidenceRaw === 'number' ? confidenceRaw : 0.55;
+    const requiresReview = chatResponse.metadata?.safety?.requiresHumanReview ?? true;
+    const suggestion = chatResponse.text || 'No suggestion generated.';
+    const confidence =
+      typeof chatResponse.metadata?.provenance?.confidence === 'number'
+        ? chatResponse.metadata.provenance.confidence
+        : 0.55;
 
     const accountableRecommendation = buildAccountableRecommendationDto({
       content: suggestion,
       confidence,
-      model: { provider: 'caredroid', name: 'ed-copilot', version: 'nest-parity' },
+      model: {
+        provider: 'caredroid',
+        name: chatResponse.metadata?.provenance?.modelOrTool || 'ed-copilot',
+        version: chatResponse.metadata?.provenance?.modelVersion || 'nest-parity',
+      },
       promptVersion: 'ed-copilot@nest-parity',
       safetyStatus: requiresReview ? 'degraded' : 'ok',
       safetyReasons: requiresReview ? ['human_review_required'] : [],
@@ -63,7 +79,13 @@ export class EdCopilotNestParityController {
     });
 
     return {
-      ...response,
+      query: body.query,
+      response: suggestion,
+      answer: suggestion,
+      message: suggestion,
+      data: chatResponse.metadata?.edCopilot || {},
+      requires_review: requiresReview,
+      provenance: chatResponse.metadata?.provenance,
       accountableRecommendation,
       requiresClinicianReview: true,
     };

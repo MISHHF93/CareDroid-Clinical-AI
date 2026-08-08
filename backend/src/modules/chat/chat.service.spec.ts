@@ -1,0 +1,252 @@
+import { ChatService } from './chat.service';
+
+/**
+ * Regression coverage for the 2026-08-08 ED Copilot AI-runtime convergence:
+ * a repository-wide call-graph trace found the real, live copilot chat path
+ * (CopilotPanel.tsx -> ChatService.processMessage()'s edCopilot branch) had
+ * no deterministic priority/DPS-change safety-floor check at all, while a
+ * separate, unreachable service (EDCopilotService.processQuery(), since
+ * removed) did. These tests exercise the ported safety-floor logic --
+ * handleEdCopilotPriorityChange() -- and the deterministic command
+ * dispatcher it sits inside directly.
+ *
+ * ChatService's constructor pulls in 20+ AI-orchestration dependencies
+ * (intent classifier, MoE router, RAG, memory services, tool orchestrator,
+ * etc.) that these private, self-contained methods never touch -- they
+ * operate only on their (message, edContext) arguments plus the plain
+ * lib/ai/clinicalSafetyRules import. Object.create(ChatService.prototype)
+ * builds an instance without running that constructor, which is safe here
+ * specifically because none of the methods under test read `this.<injected
+ * service>`.
+ */
+function createChatServiceForEdCopilotTests(): any {
+  return Object.create(ChatService.prototype);
+}
+
+describe('ChatService ED Copilot deterministic dispatch', () => {
+  describe('handleEdCopilotPriorityChange (priority/DPS-change safety floor)', () => {
+    it('blocks lowering priority below the DPS1/DPS2 safety floor', () => {
+      const chatService = createChatServiceForEdCopilotTests();
+      const edContext = {
+        selectedPatientId: 'PT-1042',
+        patientArtifactContext: {
+          patientId: 'PT-1042',
+          name: 'Floor Patient',
+          chiefComplaint: 'Trauma',
+          flags: [],
+          priority: 'P1',
+          vitals: { hr: 88, rr: 16, spo2: 98, sbp: 120, dbp: 80 },
+        },
+      };
+
+      const result = chatService.handleEdCopilotPriorityChange(
+        'Move patient PT-1042 to priority 5',
+        edContext,
+      );
+
+      expect(result.text).toMatch(/blocked by safety floor/i);
+      expect(result.text).toMatch(/DPS1/);
+      expect(result.text).toMatch(/no autonomous change was made/i);
+      expect(result.metadata.edCopilot.safetyCheckPassed).toBe(false);
+      expect(result.metadata.safety.requiresHumanReview).toBe(true);
+    });
+
+    it('allows a priority escalation, pending human review', () => {
+      const chatService = createChatServiceForEdCopilotTests();
+      const edContext = {
+        selectedPatientId: 'PT-2001',
+        patientArtifactContext: {
+          patientId: 'PT-2001',
+          name: 'Escalate Patient',
+          chiefComplaint: 'Ankle sprain',
+          flags: [],
+          priority: 'P3',
+          vitals: { hr: 76, rr: 14, spo2: 99, sbp: 118, dbp: 74 },
+        },
+      };
+
+      const result = chatService.handleEdCopilotPriorityChange(
+        'Move patient PT-2001 to priority 2',
+        edContext,
+      );
+
+      expect(result.text).toMatch(/safety check passed/i);
+      expect(result.text).toMatch(/human review is required/i);
+      expect(result.metadata.edCopilot.safetyCheckPassed).toBe(true);
+    });
+
+    it('fails safe when no patient is selected or named', () => {
+      const chatService = createChatServiceForEdCopilotTests();
+
+      const result = chatService.handleEdCopilotPriorityChange('Change priority to DPS 2', {});
+
+      expect(result.text).toMatch(/please specify or select which patient/i);
+      expect(result.metadata.edCopilot.safetyCheckPassed).toBe(false);
+    });
+
+    it('fails safe when no DPS target is detected', () => {
+      const chatService = createChatServiceForEdCopilotTests();
+      const edContext = {
+        selectedPatientId: 'PT-3003',
+        patientArtifactContext: { patientId: 'PT-3003', name: 'No Target', priority: 'P3' },
+      };
+
+      const result = chatService.handleEdCopilotPriorityChange(
+        'Move patient PT-3003 to a higher priority',
+        edContext,
+      );
+
+      expect(result.text).toMatch(/no dps target was detected/i);
+      expect(result.metadata.edCopilot.safetyCheckPassed).toBe(false);
+    });
+
+    it('fails safe -- never guesses -- when the named patient does not match any available clinical context', () => {
+      const chatService = createChatServiceForEdCopilotTests();
+      const edContext = {
+        selectedPatientId: 'PT-9999',
+        patientArtifactContext: { patientId: 'PT-9999', name: 'Selected Patient', priority: 'P2' },
+      };
+
+      const result = chatService.handleEdCopilotPriorityChange(
+        'Move patient PT-0001 to priority 4',
+        edContext,
+      );
+
+      expect(result.text).toMatch(/do not have verified clinical context/i);
+      expect(result.text).toMatch(/no autonomous priority change was made/i);
+      expect(result.metadata.edCopilot.safetyCheckPassed).toBe(false);
+    });
+
+    it('returns null for messages that are not priority/DPS-change requests, deferring to other dispatch branches', () => {
+      const chatService = createChatServiceForEdCopilotTests();
+
+      expect(
+        chatService.handleEdCopilotPriorityChange('Who has been waiting the longest?', {}),
+      ).toBeNull();
+    });
+
+    it('is checked before every other command pattern inside handleEdCopilotCommand', () => {
+      const chatService = createChatServiceForEdCopilotTests();
+      const edContext = {
+        selectedPatientId: 'PT-4004',
+        patientArtifactContext: {
+          patientId: 'PT-4004',
+          name: 'Precedence Patient',
+          priority: 'P1',
+          vitals: {},
+        },
+        patients: [],
+      };
+
+      const result = chatService.handleEdCopilotCommand(
+        'Move patient PT-4004 to priority 5',
+        edContext,
+      );
+
+      expect(result.metadata.edCopilot.command).toBe('priority_change_safety_check');
+    });
+  });
+
+  describe('handleEdCopilotCommand deterministic operational answers', () => {
+    it('answers "who waited longest" deterministically from real patients context (regex fallback)', () => {
+      const chatService = createChatServiceForEdCopilotTests();
+      const edContext = {
+        patients: [
+          { id: 'p1', name: 'Short Wait', waitMinutes: 5, state: 'Waiting', complaint: 'Cold' },
+          {
+            id: 'p2',
+            name: 'Long Wait',
+            waitMinutes: 90,
+            state: 'Waiting',
+            complaint: 'Back pain',
+          },
+        ],
+      };
+
+      const result = chatService.handleEdCopilotCommand('Who waited longest?', edContext);
+
+      expect(result).not.toBeNull();
+      expect(result.text).toContain('Long Wait');
+      expect(result.metadata.edCopilot.command).toBe('longest_waiting');
+      expect(result.metadata.provenance.deterministic).toBe(true);
+      expect(result.metadata.provenance.responseSource).toBe('deterministic-tool');
+    });
+
+    it('answers a capacity query deterministically from capacitySnapshot', () => {
+      const chatService = createChatServiceForEdCopilotTests();
+      const edContext = {
+        patients: [],
+        capacitySnapshot: {
+          score: 72,
+          currentOccupancy: 30,
+          maxCapacity: 40,
+          occupancyPercent: 75,
+          boardingCount: 3,
+          reassessmentQueueLength: 2,
+        },
+      };
+
+      const result = chatService.handleEdCopilotCommand(
+        "What's our capacity right now?",
+        edContext,
+      );
+
+      expect(result).not.toBeNull();
+      expect(result.text).toContain('75');
+      expect(result.metadata.edCopilot.command).toBe('capacity_status');
+    });
+  });
+
+  describe('buildEdCopilotResponse provenance', () => {
+    it('marks deterministic command responses as deterministic-rules, never anthropic', () => {
+      const chatService = createChatServiceForEdCopilotTests();
+
+      const result = chatService.buildEdCopilotResponse({
+        text: 'Deterministic answer',
+        command: 'capacity_status',
+        edContext: {},
+      });
+
+      expect(result.metadata.modelProvider).toBe('deterministic-rules');
+      expect(result.metadata.provenance.deterministic).toBe(true);
+      expect(result.metadata.provenance.responseSource).toBe('deterministic-tool');
+      expect(result.metadata.provenance.humanReviewRequired).toBe(true);
+      expect(result.metadata.provenance.retrievalUsed).toBe(false);
+      expect(typeof result.metadata.provenance.timestamp).toBe('string');
+    });
+
+    it('marks the LLM fallback response as anthropic, not deterministic', () => {
+      const chatService = createChatServiceForEdCopilotTests();
+
+      const result = chatService.buildEdCopilotResponse({
+        text: 'Model-generated answer',
+        command: 'general',
+        edContext: {},
+        deterministic: false,
+      });
+
+      expect(result.metadata.modelProvider).toBe('anthropic');
+      expect(result.metadata.provenance.deterministic).toBe(false);
+      expect(result.metadata.provenance.responseSource).toBe('llm-generated');
+      expect(result.metadata.provenance.modelOrTool).toBe('anthropic-unified-ai-client');
+    });
+
+    it('reads capacityBand/capacityScore and reassessmentQueueCount -- the field names CopilotPanel.tsx actually sends -- not just capacitySnapshot/flaggedReassessments', () => {
+      const chatService = createChatServiceForEdCopilotTests();
+
+      const result = chatService.buildEdCopilotResponse({
+        text: 'Answer',
+        command: 'general',
+        edContext: {
+          capacityBand: 'Orange',
+          capacityScore: 81,
+          reassessmentQueueCount: 4,
+        },
+      });
+
+      expect(result.metadata.edCopilot.capacityBand).toBe('Orange');
+      expect(result.metadata.edCopilot.capacityScore).toBe(81);
+      expect(result.metadata.edCopilot.flaggedReassessments).toBe(4);
+    });
+  });
+});
