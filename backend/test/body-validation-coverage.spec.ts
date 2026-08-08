@@ -278,11 +278,32 @@ function findUnvalidatedBodyParams(backendRoot: string): string[] {
 // 3 patient-creation routes (roadmap item #18, open since Cycle 191) and its
 // updateSettings (the genuinely large nested contract this round's routes
 // were re-checked against and found NOT to match).
+//
+// 2026-08-08 (Round 32): closed EmergencyOsController.updateSettings, the
+// one route the note above explicitly left open as "genuinely large." Built
+// out the full nested DTO tree (11 classes) mirrored field-for-field off
+// EmergencyOsSettingsContract/EmergencyOsSettingsPatch
+// (emergency-os.types.ts), the same contract emergencySettingsApi.tsx's own
+// EmergencyOsSettings JSDoc typedef already independently describes for its
+// real callers. EmergencySettingsService.updateSettings deep-merges
+// (mergeSettings is recursive), so every leaf field stays optional per
+// section -- except enabledModules (an array, and array-typed patch fields
+// keep the full non-partial item shape per EmergencyOsSettingsPatch's own
+// mapped-type definition) and operationalIntelligenceSettings (a separately
+// -declared named interface, which TypeScript's structural typing does NOT
+// treat as extending Record<string, unknown> the way an inline object-
+// literal type does -- so the mapped type resolves it to the full
+// non-partial OperationalIntelligenceSettings shape too, confirmed by the
+// compiler rejecting a Partial version of it). alertRules and
+// thresholds.reassessmentIntervals stay loosely-typed Record<string, X>
+// objects, matching this baseline's established free-form-blob convention.
+// See emergency-os-settings-patch.dto.ts's header for the full writeup. 3
+// remain: EmergencyOsController's patient-creation routes (roadmap item #18,
+// unchanged).
 const BASELINE: string[] = [
   'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.createIntakePatient',
   'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.createPatient',
   'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.createSmartIntakeVerticalSlice',
-  'src/modules/emergency-os/emergency-os.controller.ts :: EmergencyOsController.updateSettings',
 ].sort();
 
 describe('body validation coverage (Cycle 241)', () => {

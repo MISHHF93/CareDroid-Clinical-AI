@@ -60,7 +60,7 @@ import {
 import { EntitlementService } from '../platform-assets/entitlement.service';
 import { assertEntitlementLaunchFromRequest } from '../platform-assets/entitlement-launch.util';
 import type { RecordClinicalCalculatorDto } from './clinical-decision-support.types';
-import type { EmergencyOsSettingsPatch } from './emergency-os.types';
+import { EmergencyOsSettingsPatchDto } from './dto/emergency-os-settings-patch.dto';
 import { OcrIntakeService } from './ocr-intake.service';
 import {
   EvaluateOperationalIntelligenceDto,
@@ -785,10 +785,10 @@ export class EmergencyOsController {
   @RequirePermission(Permission.CONFIGURE_SYSTEM)
   @Patch('settings')
   updateSettings(
-    @Body() dto: EmergencyOsSettingsPatch,
+    @Body() dto: EmergencyOsSettingsPatchDto,
     @TenantContext() tenantContext?: TenantContextValue,
   ) {
-    return this.settingsService.updateSettings(dto, tenantContext?.organizationId);
+    return this.settingsService.updateSettings({ ...dto }, tenantContext?.organizationId);
   }
 
   @RequirePermission(Permission.VIEW_ANALYTICS)
