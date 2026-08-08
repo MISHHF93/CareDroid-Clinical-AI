@@ -115,7 +115,13 @@ export const BACKEND_API_CAPABILITY_STATUS = Object.freeze({
   emergencyAdvancedDecisionSupport: BACKEND_CAPABILITY_STATUS.DEMO,
   emergencyReferralPersistence: BACKEND_CAPABILITY_STATUS.REAL,
   emergencyReferralHistory: BACKEND_CAPABILITY_STATUS.DISABLED,
-  emergencyTransferWorkflow: BACKEND_CAPABILITY_STATUS.DISABLED,
+  /** PATCH /emergency/transfers/:id/status has been a real, DTO-validated
+   * route since 2026-08-06 (emergency-os.controller.ts's updateTransferStatus).
+   * This flag was left DISABLED after that fix landed, so ReferralPanel.tsx's
+   * updateEmergencyTransferWorkflow() has never actually attempted the call --
+   * every TransferRequested/TransportArranged/PatientDeparted transition has
+   * been synced only to local Zustand state, never persisted server-side. */
+  emergencyTransferWorkflow: BACKEND_CAPABILITY_STATUS.REAL,
   emergencyDiversionStatus: BACKEND_CAPABILITY_STATUS.DISABLED,
   emergencyDepartmentSettings: BACKEND_CAPABILITY_STATUS.DEMO,
   emergencyThresholdSettings: BACKEND_CAPABILITY_STATUS.DEMO,

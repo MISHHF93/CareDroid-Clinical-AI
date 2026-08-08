@@ -109,6 +109,11 @@ describe('backendApiCapabilities', () => {
     expect(getBackendCapabilityStatus('emergencyReceptionEscalation')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
     expect(isBackendCapabilityEnabled('emergencyReceptionEscalation')).toBe(true);
     expect(getBackendCapabilityStatus('emergencyOcrIntake')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
+    // PATCH /emergency/transfers/:id/status has been a real, DTO-validated
+    // route since 2026-08-06 -- this flag was left DISABLED after that fix
+    // landed, silently preventing ReferralPanel.tsx from ever calling it.
+    expect(getBackendCapabilityStatus('emergencyTransferWorkflow')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
+    expect(isBackendCapabilityEnabled('emergencyTransferWorkflow')).toBe(true);
   });
 
   it('enables read-only live tracking contracts as demo-backed capabilities', () => {
