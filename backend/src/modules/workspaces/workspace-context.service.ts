@@ -13,6 +13,7 @@ import {
   workspaceRouteKey,
   workspaceSettingsForType,
 } from './workspace-taxonomy';
+import { WorkspaceContextEnvelopeSchema } from './workspace.contracts';
 
 @Injectable()
 export class WorkspaceContextService {
@@ -127,19 +128,30 @@ export class WorkspaceContextService {
       defaultFilters: definition.defaultFilters || {},
     };
 
-    return {
-      workspace: {
-        ...workspace,
-        workspaceKey,
-        routePath: `/workspace/${workspaceKey}`,
-        description: workspace.branding?.description || definition.description,
-        assistantContext: settings.assistantContext || definition.assistantContext,
-        defaultDashboard: settings.defaultDashboard,
-        workspaceProfile,
-        defaultDashboardWidgets: workspaceProfile.defaultDashboardWidgets,
-        defaultFilters: workspaceProfile.defaultFilters,
-        restrictedAssets: workspaceProfile.restrictedAssets,
-      },
+    // Canonical envelope shape (workspace.contracts.ts's WorkspaceContextEnvelopeSchema).
+    // Previously duplicated enabledToolIds/defaultDashboardWidgets/defaultFilters/
+    // restrictedAssets/assistantContext/shortcuts at BOTH this envelope's root AND
+    // nested under `workspace` -- up to 3 copies of the same value in one response
+    // (workspace.workspaceProfile.X, workspace.X, and root X). Confirmed via
+    // whole-repo grep that the only real consumer (WorkspaceContext.tsx) can read
+    // every one of these from `workspace.*` alone; `enabledToolIds` specifically
+    // had zero consumers at the envelope root at all. recommendedAIAgents/
+    // recommendedAssetPacks are still exposed via workspace.workspaceProfile.
+    const contextWorkspace = {
+      ...workspace,
+      workspaceKey,
+      routePath: `/workspace/${workspaceKey}`,
+      description: workspace.branding?.description || definition.description,
+      assistantContext: settings.assistantContext || definition.assistantContext,
+      defaultDashboard: settings.defaultDashboard,
+      shortcuts,
+      workspaceProfile,
+      defaultDashboardWidgets: workspaceProfile.defaultDashboardWidgets,
+      defaultFilters: workspaceProfile.defaultFilters,
+      restrictedAssets: workspaceProfile.restrictedAssets,
+    };
+    const envelope = {
+      workspace: contextWorkspace,
       workspaceState,
       membership,
       effectivePermissions,
@@ -152,19 +164,12 @@ export class WorkspaceContextService {
             branding: organization.branding,
           }
         : null,
-      enabledToolIds,
-      defaultDashboardWidgets: workspaceProfile.defaultDashboardWidgets,
-      defaultFilters: workspaceProfile.defaultFilters,
-      restrictedAssets: workspaceProfile.restrictedAssets,
-      recommendedAIAgents: workspaceProfile.recommendedAIAgents,
-      recommendedAssetPacks: workspaceProfile.recommendedAssetPacks,
       visibleAssetIds,
       entitledPackIds,
       assetAccessDecisions,
       recommendations,
-      assistantContext: settings.assistantContext || definition.assistantContext,
-      shortcuts,
       workspaceTypes: Object.values(WorkspaceType),
     };
+    return WorkspaceContextEnvelopeSchema.parse(envelope);
   }
 }

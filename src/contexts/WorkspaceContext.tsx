@@ -8,19 +8,20 @@ import {
 import { mergeWorkspacesWithRegistry } from '../data/sidebarToolPresentation';
 import { getUserFacingToolRegistryProjection } from '../data/toolInventory';
 import { apiFetch, getApiErrorMessage, parseApiResponse } from '../services/apiClient';
+import { WorkspaceContextEnvelopeContractSchema, WorkspaceContractSchema } from '../types/workspaceContracts';
 import logger from '../utils/logger';
 import { useUser } from './UserContext';
 
 const STORAGE_KEY = 'careDroid.workspaces.v1';
 
 function workspaceKeyFromContext(context) {
-  return (
-    context?.workspace?.workspaceKey ||
-    context?.workspace?.settings?.workspaceKey ||
-    context?.workspace?.type ||
-    context?.workspace?.id ||
-    ''
-  );
+  // context.workspace.workspaceKey is always populated by the backend now (both
+  // serializeWorkspace() and buildContext() set it) -- `type` is a real,
+  // required fallback since it's the same underlying value under a different
+  // name. The raw entity `id` (a UUID) was removed as a fallback here: it can
+  // never actually match an activeWorkspaceId (always workspaceKey-shaped),
+  // so checking it was a latent bug, not a real safety net.
+  return context?.workspace?.workspaceKey || context?.workspace?.type || '';
 }
 
 function workspaceContextMatchesActive(context, activeWorkspaceId) {
@@ -158,36 +159,72 @@ export const WorkspaceProvider = ({ children }) => {
 
   const applyBackendContext = useCallback((context) => {
     if (!context?.workspace) return null;
-    const backendWorkspaces = context.workspaceState?.workspaces || [];
+
+    // Trust-boundary validation (2026-08-08): the backend previously had two
+    // different serializers producing genuinely different shapes for the same
+    // Workspace entity (WorkspacesService.serializeWorkspace() vs.
+    // WorkspaceContextService.buildContext()) -- see
+    // backend/src/modules/workspaces/workspace.contracts.ts for the full
+    // history. Both are now required to conform to WorkspaceContractSchema.
+    // Validating here means a future regression on either side surfaces as a
+    // logged contract violation instead of silently reintroducing dead
+    // fallback branches on the frontend (the old code checked
+    // `workspace.displayName`/`workspace.label`/top-level `workspace.workspaceKey`
+    // -- fields the real backend response never actually populated).
+    const envelopeResult = WorkspaceContextEnvelopeContractSchema.safeParse(context);
+    if (!envelopeResult.success) {
+      logger.warn('Workspace context response violated the canonical contract', {
+        issues: envelopeResult.error.issues.slice(0, 10),
+      });
+    }
+    const validatedContext = envelopeResult.success ? envelopeResult.data : context;
+
+    const backendWorkspaces = validatedContext.workspaceState?.workspaces || [];
     const fallbackById = Object.fromEntries(defaultWorkspaces(null, user?.role).map((workspace) => [workspace.id, workspace]));
     const normalizedWorkspaces = backendWorkspaces.map((workspace) => {
-      const workspaceKey = workspace.workspaceKey || workspace.settings?.workspaceKey || workspace.type;
+      const workspaceResult = WorkspaceContractSchema.safeParse(workspace);
+      if (!workspaceResult.success) {
+        logger.warn('A workspace in workspaceState.workspaces violated the canonical contract', {
+          workspaceId: workspace?.id,
+          issues: workspaceResult.error.issues.slice(0, 10),
+        });
+      }
+      // Once validated, every field below is guaranteed present (backend always
+      // populates them -- serializeWorkspace() falls back to workspaceSettingsForType()
+      // internally, so a real workspace type never has empty assistantContext/
+      // shortcuts/enabledToolIds). Local CARE_WORKSPACES fallback is now only a
+      // defensive net for the case validation itself failed (a malformed
+      // response), not routine per-field reconciliation.
+      const validated = workspaceResult.success ? workspaceResult.data : null;
+      const workspaceKey = validated?.workspaceKey || workspace.type || workspace.workspaceKey;
       const fallback = fallbackById[workspaceKey] || {};
       return {
         ...fallback,
         ...workspace,
         id: workspaceKey,
         workspaceKey,
-        backendWorkspaceId: workspace.id,
-        name: workspace.displayName || workspace.label || workspace.branding?.displayName || workspace.name || fallback.name,
-        path: `/workspace/${workspaceKey}`,
-        assistantContext:
-          workspace.assistantContext || workspace.settings?.assistantContext || fallback.assistantContext,
-        shortcuts: workspace.settings?.shortcuts || fallback.shortcuts || [],
-        toolIds: workspace.settings?.enabledToolIds || fallback.toolIds || [],
-        workspaceProfile: workspace.workspaceProfile || workspace.settings?.workspaceProfile || null,
-        defaultDashboardWidgets: workspace.defaultDashboardWidgets || workspace.settings?.workspaceProfile?.defaultDashboardWidgets || [],
-        defaultFilters: workspace.defaultFilters || workspace.settings?.workspaceProfile?.defaultFilters || {},
-        restrictedAssets: workspace.restrictedAssets || workspace.settings?.workspaceProfile?.restrictedAssets || [],
+        backendWorkspaceId: validated?.id || workspace.id,
+        name: validated?.name || fallback.name,
+        path: validated?.routePath || `/workspace/${workspaceKey}`,
+        assistantContext: validated?.assistantContext || fallback.assistantContext,
+        shortcuts: validated?.shortcuts || fallback.shortcuts || [],
+        toolIds: validated?.enabledToolIds || fallback.toolIds || [],
+        workspaceProfile: validated?.workspaceProfile || fallback.workspaceProfile || null,
+        defaultDashboardWidgets: validated?.defaultDashboardWidgets || fallback.defaultDashboardWidgets || [],
+        defaultFilters: validated?.defaultFilters || fallback.defaultFilters || {},
+        restrictedAssets: validated?.restrictedAssets || fallback.restrictedAssets || [],
       };
     });
     const merged = mergeWorkspacesWithRegistry(normalizedWorkspaces, defaultWorkspaces());
-    const activeWorkspaceId =
-      context.workspace.workspaceKey || context.workspace.settings?.workspaceKey || context.workspace.type;
+    // The raw entity `id` (a UUID) must never be used as a fallback here -- it
+    // can never match activeWorkspaceId, which is always a workspaceKey-shaped
+    // string (e.g. "emergency"). Removed as a real, if practically unreachable,
+    // latent bug alongside the dead-field cleanup above.
+    const activeWorkspaceId = validatedContext.workspace.workspaceKey || validatedContext.workspace.type;
     setWorkspaces(merged);
     setActiveWorkspaceId(activeWorkspaceId || DEFAULT_CARE_WORKSPACE_ID);
-    setWorkspaceContext(context);
-    return context;
+    setWorkspaceContext(validatedContext);
+    return validatedContext;
   }, [user?.role]);
 
   const refreshWorkspaceContext = useCallback(async () => {
@@ -303,15 +340,32 @@ export const WorkspaceProvider = ({ children }) => {
       workspaceContext: activeWorkspaceContext,
       visibleAssetIds: activeWorkspaceContext?.visibleAssetIds || activeWorkspace?.toolIds || [],
       recommendations: activeWorkspaceContext?.recommendations || [],
-      assistantContext: activeWorkspaceContext?.assistantContext || activeWorkspace?.assistantContext || '',
-      shortcuts: activeWorkspaceContext?.shortcuts || activeWorkspace?.shortcuts || [],
+      // 2026-08-08: all of the below now read from `workspace.*` uniformly for
+      // both the backend-context branch and the local-fallback branch, instead
+      // of the backend-context branch reading a context-root duplicate that
+      // backend/src/modules/workspaces/workspace-context.service.ts no longer
+      // sends (removed as confirmed-redundant with workspace.* -- see
+      // workspace.contracts.ts). recommendedAIAgents/recommendedAssetPacks'
+      // local-fallback branch was ALSO silently checking a field that never
+      // existed (`workspaceProfile.defaultAIAgents`/`.defaultAssetPacks` --
+      // the real WorkspaceProfile fields are `recommendedAIAgents`/
+      // `recommendedAssetPacks`, confirmed in workspace-taxonomy.ts), fixed
+      // alongside this pass.
+      assistantContext: activeWorkspaceContext?.workspace?.assistantContext || activeWorkspace?.assistantContext || '',
+      shortcuts: activeWorkspaceContext?.workspace?.shortcuts || activeWorkspace?.shortcuts || [],
       workspaceProfile: activeWorkspaceContext?.workspace?.workspaceProfile || activeWorkspace?.workspaceProfile || null,
       defaultDashboardWidgets:
-        activeWorkspaceContext?.defaultDashboardWidgets || activeWorkspace?.defaultDashboardWidgets || [],
-      defaultFilters: activeWorkspaceContext?.defaultFilters || activeWorkspace?.defaultFilters || {},
-      restrictedAssets: activeWorkspaceContext?.restrictedAssets || activeWorkspace?.restrictedAssets || [],
-      recommendedAIAgents: activeWorkspaceContext?.recommendedAIAgents || activeWorkspace?.workspaceProfile?.defaultAIAgents || [],
-      recommendedAssetPacks: activeWorkspaceContext?.recommendedAssetPacks || activeWorkspace?.workspaceProfile?.defaultAssetPacks || [],
+        activeWorkspaceContext?.workspace?.defaultDashboardWidgets || activeWorkspace?.defaultDashboardWidgets || [],
+      defaultFilters: activeWorkspaceContext?.workspace?.defaultFilters || activeWorkspace?.defaultFilters || {},
+      restrictedAssets: activeWorkspaceContext?.workspace?.restrictedAssets || activeWorkspace?.restrictedAssets || [],
+      recommendedAIAgents:
+        activeWorkspaceContext?.workspace?.workspaceProfile?.recommendedAIAgents ||
+        activeWorkspace?.workspaceProfile?.recommendedAIAgents ||
+        [],
+      recommendedAssetPacks:
+        activeWorkspaceContext?.workspace?.workspaceProfile?.recommendedAssetPacks ||
+        activeWorkspace?.workspaceProfile?.recommendedAssetPacks ||
+        [],
       clientProfile,
       workspaceEmptyState: workspaces.length
         ? ''

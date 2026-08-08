@@ -28,8 +28,10 @@ import { UserWorkspaceState } from './entities/user-workspace-state.entity';
 import {
   REQUESTED_WORKSPACE_TYPES,
   getWorkspaceDefinition,
+  workspaceRouteKey,
   workspaceSettingsForType,
 } from './workspace-taxonomy';
+import { WorkspaceSchema } from './workspace.contracts';
 
 @Injectable()
 export class WorkspacesService {
@@ -473,17 +475,33 @@ export class WorkspacesService {
     return slug;
   }
 
+  // Canonical serializer for the Workspace entity (backend/src/modules/workspaces/
+  // workspace.contracts.ts). Previously omitted workspaceKey/routePath/description/
+  // assistantContext/defaultDashboard/shortcuts entirely -- a real, confirmed
+  // structural disagreement with WorkspaceContextService.buildContext()'s shape
+  // for the exact same entity. Both now produce the same fields for the same
+  // concept. Validated against WorkspaceSchema so a future edit that reintroduces
+  // that drift fails fast (a thrown ZodError) instead of silently shipping.
   private serializeWorkspace(workspace: Workspace) {
     const settings = workspace.settings || this.settingsForType(workspace.type);
-    return {
+    const workspaceKey = settings.workspaceKey || workspaceRouteKey(workspace.type);
+    const payload = {
       id: workspace.id,
+      workspaceKey,
       type: workspace.type,
       name: workspace.name,
       slug: workspace.slug,
       organizationId: workspace.organizationId,
       parentWorkspaceId: workspace.parentWorkspaceId,
+      routePath: `/workspace/${workspaceKey}`,
+      description: workspace.branding?.description || settings.workspaceProfile?.description || '',
+      assistantContext: settings.assistantContext || '',
+      defaultDashboard: settings.defaultDashboard,
       branding: workspace.branding || { displayName: workspace.name },
       settings,
+      enabledToolIds: settings.enabledToolIds || [],
+      enabledModules: settings.enabledModules || [],
+      shortcuts: settings.shortcuts || [],
       workspaceProfile: settings.workspaceProfile,
       defaultDashboardWidgets: settings.workspaceProfile?.defaultDashboardWidgets || [],
       defaultFilters: settings.workspaceProfile?.defaultFilters || {},
@@ -491,6 +509,7 @@ export class WorkspacesService {
       createdAt: workspace.createdAt,
       updatedAt: workspace.updatedAt,
     };
+    return WorkspaceSchema.parse(payload);
   }
 
   private serializeMembership(membership: WorkspaceMembership) {

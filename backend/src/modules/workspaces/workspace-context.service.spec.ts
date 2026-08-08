@@ -45,7 +45,15 @@ describe('WorkspaceContextService', () => {
       enabledToolIds: ['qsofa', 'news2'],
       recommendedAssetIds: ['qsofa'],
       assistantContext: 'Emergency context',
-      shortcuts: [{ id: 'qsofa', label: 'qSOFA', path: '/tools/calculators', assetId: 'qsofa' }],
+      shortcuts: [
+        {
+          id: 'qsofa',
+          label: 'qSOFA',
+          path: '/tools/calculators',
+          description: 'Open qSOFA scoring.',
+          assetId: 'qsofa',
+        },
+      ],
     },
   };
 
@@ -64,7 +72,9 @@ describe('WorkspaceContextService', () => {
     jest.clearAllMocks();
     workspacesService.getActiveWorkspaceState.mockResolvedValue({
       workspaces: [emergencyWorkspace],
-      memberships: [{ workspaceId: 'workspace-1', role: 'clinician' }],
+      memberships: [
+        { id: 'membership-1', workspaceId: 'workspace-1', userId: 'user-1', role: 'clinician', status: 'active' },
+      ],
       activeWorkspaceId: 'workspace-1',
       effectivePermissions: ['ACCESS_TOOLS'],
       activeWorkspace: emergencyWorkspace,
@@ -101,7 +111,11 @@ describe('WorkspaceContextService', () => {
     expect(context.recommendations).toEqual(
       expect.arrayContaining([expect.objectContaining({ assetId: 'qsofa', reason: 'workspace' })]),
     );
-    expect(context.shortcuts).toEqual([expect.objectContaining({ id: 'qsofa' })]);
+    // Regression guard (2026-08-08): shortcuts now live ONLY at context.workspace.shortcuts,
+    // not duplicated at the envelope root -- see workspace.contracts.ts's
+    // WorkspaceContextEnvelopeSchema for the full canonical-shape rationale.
+    expect(context.workspace.shortcuts).toEqual([expect.objectContaining({ id: 'qsofa' })]);
+    expect((context as Record<string, unknown>).shortcuts).toBeUndefined();
     expect(platformAssetsService.resolveEntitledAssetIds).toHaveBeenCalledWith({
       organizationId: 'org-1',
       workspaceEnabledToolIds: ['qsofa', 'news2'],
