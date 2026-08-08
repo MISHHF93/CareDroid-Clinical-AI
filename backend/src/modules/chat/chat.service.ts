@@ -2067,14 +2067,32 @@ export class ChatService {
     };
   }
 
+  /**
+   * edContext.systemPrompt arrives via workspaceContext.edCopilot.systemPrompt --
+   * a caller-supplied string (see sanitizeEdCopilotContext, which whitelists but
+   * does not validate its content, capping only length). It used to be used
+   * verbatim AS the entire system prompt whenever present, silently discarding
+   * buildSystemPrompt()'s safety boundary, human-review disclaimer, and true
+   * live department context. Any authenticated USE_AI_CHAT caller hitting
+   * /emergency/copilot/message directly (skipping the trusted frontend's own
+   * prompt builder) could blank those out and steer the real Anthropic call
+   * with an unconstrained prompt. The server-authored prompt must never be
+   * replaceable, only supplemented -- so it is always appended last here,
+   * never conditionally skipped.
+   */
+  private buildEdCopilotSystemPrompt(edContext: Record<string, any>): string {
+    const frontendPrompt =
+      typeof edContext?.systemPrompt === 'string' ? edContext.systemPrompt.trim() : '';
+    const serverSystemPrompt = buildSystemPrompt(edContext as any, 'COPILOT_CHAT');
+    return frontendPrompt ? `${frontendPrompt}\n\n${serverSystemPrompt}` : serverSystemPrompt;
+  }
+
   private async invokeAnthropicEdCopilot(
     message: string,
     edContext: Record<string, any>,
     requestMessages?: Array<{ role: string; content: string }>,
   ): Promise<string> {
-    const frontendPrompt =
-      typeof edContext?.systemPrompt === 'string' ? edContext.systemPrompt.trim() : '';
-    const systemPrompt = frontendPrompt || buildSystemPrompt(edContext as any, 'COPILOT_CHAT');
+    const systemPrompt = this.buildEdCopilotSystemPrompt(edContext);
     const messages: Message[] =
       requestMessages
         ?.filter((item) => item?.role === 'user' || item?.role === 'assistant')
