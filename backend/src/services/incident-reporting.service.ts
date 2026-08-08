@@ -15,8 +15,10 @@ export interface IncidentReport extends IncidentReportInput {
   reportedAt: string;
 }
 
+const MAX_STORED_INCIDENTS = 500;
+
 export class IncidentReportingService {
-  private readonly incidents: IncidentReport[] = [];
+  private incidents: IncidentReport[] = [];
   private readonly notificationConfig = getEnvironmentConfig().notifications;
 
   reportIncident(input: IncidentReportInput): IncidentReport {
@@ -27,6 +29,12 @@ export class IncidentReportingService {
       reportedAt: new Date().toISOString(),
     };
     this.incidents.push(incident);
+    // Bounded like platform-telemetry.service.ts's apiDurationSamples -- this method now has
+    // a real, always-on caller (ApiExceptionFilter, on every unhandled 5xx), so an unbounded
+    // array here would be a genuine production memory leak over long backend uptime.
+    if (this.incidents.length > MAX_STORED_INCIDENTS) {
+      this.incidents = this.incidents.slice(-MAX_STORED_INCIDENTS);
+    }
     return { ...incident };
   }
 
