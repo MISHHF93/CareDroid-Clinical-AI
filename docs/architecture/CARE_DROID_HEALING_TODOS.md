@@ -33,7 +33,7 @@
 - **Dependencies**: None.
 - **Recommended canonical solution**: Applied — deleted the barrel, repointed its one real consumer to the direct source files.
 - **Validation requirements**: Confirmed exactly one real importer via repo-wide grep before deletion. `npx tsc --noEmit -p tsconfig.frontend.json` and ESLint clean.
-- **Commit when resolved**: Pending (staged, not yet committed at ledger-write time).
+- **Commit when resolved**: `0e010271`
 - **Scorecard impact when resolved**: Pending next scorecard sync pass.
 
 ### HEAL-026 — `RoleDashboardPanel.tsx` was a fully dead component: zero real importers, and every widget it would have rendered was a permanent placeholder that never loaded real data (HEAL-EPIC-A, "old dashboards" category, bonus finding)
@@ -414,7 +414,7 @@
 - **Dependencies**: None blocking the remaining 4 from being investigated further; each needs a specific product/naming decision to close.
 - **Recommended canonical solution for the remaining 4**: `AssetLifecycleAdmin` — assign a canonical path (no prior evidence to reuse). `PlatformAnalyticsPage`(org) — assign a distinct path that doesn't collide with `AnalyticsDashboard.tsx`'s `/platform-analytics` (e.g. an org-scoped path like `/organization/analytics`). `OrganizationDashboard`/`CustomerSuccessDashboard` — same 3-option shape as HEAL-022 (migrate content into `TenantAdministrationCenter`, add both a link-back AND a distinct new path, or confirm the redirect is deliberate final design).
 - **Validation requirements**: `npx tsc --noEmit -p tsconfig.frontend.json` clean, ESLint clean on all touched files. Real `vite build`/`vitest` blocked in this sandbox (established constraint) — relied on typecheck + direct route-tree tracing + zero-collision verification per path before wiring, consistent with this campaign's established verification ceiling.
-- **Commit when resolved**: Pending (staged, not yet committed at ledger-write time).
+- **Commit when resolved**: `0e010271`
 - **Scorecard impact when resolved**: Pending next scorecard sync pass.
 
 ### HEAL-029 — `ClinicalToolCatalog.tsx` (1,535 lines) is orphaned — a large, fully-built meta-catalog page with zero route, marked as a "future" slot in a doc comment that doesn't actually work
