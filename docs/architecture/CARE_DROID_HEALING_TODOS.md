@@ -161,13 +161,28 @@
 - **Current status**: `CONFIRMED`, deliberately not fixed — same reasoning as HEAL-011 (needs a scope decision, not a unilateral build).
 - **Recommended canonical solution**: `FUTURE_MODULE` — needs product sign-off on whether/when to build the review surface.
 
-### HEAL-010 — 3 remaining independent model/expert-selection systems (down from 4 after HEAL-004)
+### HEAL-010 — `lib/native-ai/panelOfExpertsRouter.ts` is a frontend-only routing decision that never reaches the backend
 
-- **Severity**: P1_HIGH
+- **Severity**: P2_MEDIUM (downgraded — see HEAL-010b for why the paired finding turned out lower-severity than framed)
 - **Domain**: AI/ML Core Node — duplicate architecture
-- **Source evidence**: `AI_ORCHESTRATION_AUDIT.md` §3.2: (1) `MoERouterService`+`expert-selector.service.ts` — real, wired, live path. (2) `RoutingOptimizerService` — real, wired, but independently re-picks a model *after* MoE already chose an expert; nothing reconciles the two, both stuffed into response metadata side by side. (3) `lib/native-ai/panelOfExpertsRouter.ts` — real, frontend-only, scores an entirely different catalog (`CLINICAL_DOMAIN_SPECIALISTS`); its decision never reaches the backend.
-- **Current status**: `CONFIRMED`, not yet fixed. Neither #2 nor #3 currently produces a wrong *routing* decision reaching a patient (both #1/#2 execute, they just don't agree on which model to bill/log; #3 never reaches the backend at all so is inert, not wrong) — real but not yet P0.
-- **Recommended canonical solution**: For #2: either reconcile `RoutingOptimizerService`'s re-pick with MoE's original choice (single source of truth) or retire one. For #3: either wire its decision into the real backend path or explicitly document it as a frontend-only, non-authoritative UI hint. Needs its own dedicated round — do not rush into an existing round's tail end.
+- **Source evidence**: `AI_ORCHESTRATION_AUDIT.md` §3.2's original 4-system list, narrowed by HEAL-004 (deleted `ai/foundation/`) and HEAL-010b (below, `RoutingOptimizerService` reconciled via disclosure, not deletion). Remaining: `lib/native-ai/panelOfExpertsRouter.ts` — real, frontend-only, scores an entirely different catalog (`CLINICAL_DOMAIN_SPECIALISTS`) from `MoERouterService`'s expert set; its decision never reaches the backend.
+- **Current status**: `CONFIRMED`, not yet fixed. Inert, not wrong — it never influences the real backend response, so no patient-facing output can currently disagree with it.
+- **Recommended canonical solution**: Either wire its decision into the real backend path (if there's a genuine reason a frontend-only pre-selection should matter) or explicitly document it as a frontend-only, non-authoritative UI hint (matching HEAL-010b's disclosure pattern) if it's meant to stay presentation-only. Needs direct investigation of what UI actually consumes `panelOfExpertsRouter.ts`'s output before deciding which.
+
+### HEAL-010b — `RoutingOptimizerService`'s independent re-pick — investigated, real but lower severity than framed, fixed via disclosure not reconciliation
+
+- **Severity**: P2_MEDIUM (was framed as P1_HIGH "duplicate active architecture" pending investigation)
+- **Domain**: AI/ML Core Node — truthfulness
+- **Source evidence**: `AI_ORCHESTRATION_AUDIT.md` §3.2 originally framed this as `RoutingOptimizerService` "independently re-picking a model after MoE already chose an expert; nothing reconciles the two." Traced precisely: `chat.service.ts`'s real ED Copilot call path (`invokeAnthropicEdCopilot` → `unifiedAIClient.request()`) never reads the `costOptimization` object `RoutingOptimizerService.optimizeRequest()` computes — confirmed by reading the real dispatch call site directly, not inferred. Every real request is served by the same configured provider/model regardless of what "route" (`lightweight_model`/`rag`/`expert_model`) or fictional model name (`caredroid-lightweight-mini` etc.) this service predicts. **The actual bug was narrower than the audit's framing**: no wrong response can ever result (nothing consequential reads the estimate) — but `src/pages/ai/AiCommandCenterDashboard.tsx`'s "Tool Routing" panel rendered these fictional cost-tier route counts with zero disclosure, reading to any Site Admin/Manager viewer as real operational model-dispatch tracking of distinct models that don't actually exist as separate infrastructure.
+- **Affected files**: `backend/src/modules/cost-optimizer/routing-optimizer.service.ts` (new class-level doc comment), `src/pages/ai/AiCommandCenterDashboard.tsx`(+`.css`+`.test.tsx`)
+- **Runtime impact**: None (cosmetic/informational only — no real routing behavior changed, since none ever depended on this).
+- **AI/ML impact**: Closes the "false AI claims" risk of this specific panel; `RoutingOptimizerService` itself kept as-is (real, useful cost-estimation tool for planning), not deleted.
+- **Affected user profiles**: Site Admin, Department Manager/Director (AI Command Center Dashboard viewers).
+- **Current status**: `VALIDATED`
+- **Recommended canonical solution**: Applied — renamed the panel to "Cost-Tier Routing (Estimated)" with an explicit caption; added a class-level doc comment to `RoutingOptimizerService` so this doesn't get re-flagged as a live routing conflict in a future audit.
+- **Validation requirements**: Backend `tsc`/ESLint clean, 5/5 `routing-optimizer` tests + 34/34 `chat` tests passing (confirms the real dispatch path is genuinely untouched). Frontend `tsc`/ESLint clean; new regression test asserts the disclosure renders and the old misleading title is gone (`vitest` blocked in this sandbox per established constraint — manually traced the render logic against the test's own mock data).
+- **Commit when resolved**: `fb67fbcc`
+- **Scorecard impact when resolved**: Pending next scorecard sync pass.
 
 ### HEAL-011 — User/Role `roleProfileId` vocabulary mismatch (access-widening risk)
 
