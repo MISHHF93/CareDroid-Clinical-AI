@@ -5,7 +5,7 @@ import { chromium } from '@playwright/test';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const outDir = join(__dirname, '..', 'qa', 'screenshots', 'reception-audit');
-const baseURL = process.env.QA_BASE_URL || 'http://localhost:8000';
+const baseURL = process.env.QA_BASE_URL || 'http://localhost:3000';
 
 function authStorage(role) {
   return {

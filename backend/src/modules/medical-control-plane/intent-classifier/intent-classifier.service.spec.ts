@@ -30,7 +30,7 @@ describe('IntentClassifierService', () => {
     get: jest.fn().mockReturnValue({
       enabled: true,
       mode: 'in-process',
-      url: 'http://127.0.0.1:3350/api/nlu',
+      url: 'http://127.0.0.1:8000/api/nlu',
     }),
   };
 

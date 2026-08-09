@@ -6,7 +6,7 @@
 
 import { registerAs } from '@nestjs/config';
 
-const backendPort = process.env.BACKEND_PORT || process.env.PORT || '3350';
+const backendPort = process.env.BACKEND_PORT || process.env.PORT || '8000';
 
 export default registerAs('nlu', () => ({
   enabled: process.env.NLU_SERVICE_ENABLED !== 'false',

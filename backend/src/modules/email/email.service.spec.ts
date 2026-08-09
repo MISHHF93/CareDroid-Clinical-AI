@@ -195,7 +195,7 @@ describe('EmailService', () => {
       await service.sendVerificationEmail('user@example.com', 'tok-789');
 
       const call = mockSendMail.mock.calls[0][0];
-      expect(call.html).toContain('http://localhost:8000/verify-email?token=tok-789');
+      expect(call.html).toContain('http://localhost:3000/verify-email?token=tok-789');
     });
   });
 });

@@ -18,13 +18,13 @@ export const oauthConfig = registerAs('oauth', () => ({
     clientId: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackUrl:
-      process.env.GOOGLE_CALLBACK_URL || 'http://localhost:8000/api/auth/google/callback',
+      process.env.GOOGLE_CALLBACK_URL || 'http://localhost:3000/api/auth/google/callback',
   },
   linkedin: {
     clientId: process.env.LINKEDIN_CLIENT_ID,
     clientSecret: process.env.LINKEDIN_CLIENT_SECRET,
     callbackUrl:
-      process.env.LINKEDIN_CALLBACK_URL || 'http://localhost:8000/api/auth/linkedin/callback',
+      process.env.LINKEDIN_CALLBACK_URL || 'http://localhost:3000/api/auth/linkedin/callback',
     scope: ['r_liteprofile', 'r_emailaddress'],
   },
 }));

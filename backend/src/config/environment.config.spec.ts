@@ -48,7 +48,7 @@ describe('environment config', () => {
     expect(config.server).toMatchObject({
       port: 3000,
       nodeEnv: 'development',
-      corsOrigins: ['http://localhost:8000'],
+      corsOrigins: ['http://localhost:3000'],
     });
     expect(config.database).toMatchObject({
       dbName: 'caredroid',

@@ -284,7 +284,7 @@ describe('Vite proxy and ports', () => {
     expect(vite.devPort).toBe(3000);
     expect(vite.previewPort).toBe(3000);
     // Prefers 127.0.0.1 over localhost (Windows IPv6 ECONNREFUSED fix).
-    expect(vite.proxyTarget).toBe('http://127.0.0.1:3350');
+    expect(vite.proxyTarget).toBe('http://127.0.0.1:8000');
     expect(vite.proxiesApi).toBe(true);
     expect(vite.proxiesHealth).toBe(true);
     expect(vite.proxiesSocketIo).toBe(true);

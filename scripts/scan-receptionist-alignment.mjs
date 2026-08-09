@@ -83,7 +83,7 @@ else fail('sidebar-mobile-trim', 'Sidebar mobile chrome not trimmed');
 
 async function liveScan() {
   mkdirSync(outDir, { recursive: true });
-  const baseURL = process.env.QA_BASE_URL || 'http://localhost:8000';
+  const baseURL = process.env.QA_BASE_URL || 'http://localhost:3000';
   const browser = await chromium.launch();
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
 

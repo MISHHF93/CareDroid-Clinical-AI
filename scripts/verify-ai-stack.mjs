@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Verifies the in-process TypeScript AI stack (NLU + training metrics sync).
- * Requires the Nest backend to be running (default :3350).
+ * Requires the Nest backend to be running (default :8000).
  */
 import http from 'node:http';
 import { existsSync, readFileSync } from 'node:fs';
@@ -9,7 +9,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const rootDir = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const backendPort = Number.parseInt(process.env.BACKEND_PORT || process.env.PORT || '3350', 10);
+const backendPort = Number.parseInt(process.env.BACKEND_PORT || process.env.PORT || '8000', 10);
 
 const requestJson = (path, { method = 'GET', body } = {}) =>
   new Promise((resolveRequest, reject) => {

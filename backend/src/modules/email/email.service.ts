@@ -180,6 +180,6 @@ export class EmailService {
 
   private getFrontendBaseUrl(): string {
     const emailConfig = this.configService.get<any>('email');
-    return emailConfig?.frontendUrl || 'http://localhost:8000';
+    return emailConfig?.frontendUrl || 'http://localhost:3000';
   }
 }

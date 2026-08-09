@@ -26,7 +26,7 @@ const EMERGENCY_PAGE_SCREENSHOT_TARGETS = [
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..');
-const baseUrl = process.env.QA_BASE_URL || 'http://localhost:8000';
+const baseUrl = process.env.QA_BASE_URL || 'http://localhost:3000';
 const outputDir = process.env.PAGE_SCREENSHOT_DIR || join(root, 'qa', 'page-screenshots');
 const reportPath = join(outputDir, 'page-screenshot-report.json');
 const viewport = {

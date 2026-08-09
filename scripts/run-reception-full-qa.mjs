@@ -10,7 +10,7 @@
  *
  * Usage:
  *   node scripts/run-reception-full-qa.mjs
- *   BACKEND_PORT=3350 PATIENTS=6 node scripts/run-reception-full-qa.mjs
+ *   BACKEND_PORT=8000 PATIENTS=6 node scripts/run-reception-full-qa.mjs
  *
  * Writes:
  *   qa/reception-full-qa-report.json
@@ -234,7 +234,7 @@ const md = [
   '# or pieces:',
   '$env:ESBUILD_USE_WASM="1"; npx vitest run ' + VITEST_TARGETS.join(' '),
   'node scripts/reception-desk-performance.mjs',
-  'BACKEND_PORT=3350 node scripts/patient-journey-performance.mjs',
+  'BACKEND_PORT=8000 node scripts/patient-journey-performance.mjs',
   '```',
   '',
 ].join('\n');

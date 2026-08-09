@@ -11,7 +11,7 @@ import { dismissOverlays, installQaNetworkStubs, seedQaAuth } from '../e2e/respo
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..');
-const baseUrl = (process.env.QA_BASE_URL || 'http://localhost:8000').trim().replace(/\/$/, '');
+const baseUrl = (process.env.QA_BASE_URL || 'http://localhost:3000').trim().replace(/\/$/, '');
 const outputDir = process.env.SHELL_RESPONSIVE_DIR || join(root, 'qa', 'shell-ux-audit', 'responsive');
 const previewDir = join(outputDir, 'previews');
 
@@ -69,7 +69,7 @@ async function assertServerRenderable(page) {
   if (!response || !response.ok()) {
     throw new Error(
       `Probe ${probeUrl} returned HTTP ${response?.status() ?? 'unknown'}. ` +
-        'Use production preview (npm run preview on :8000), not Vite dev while CSS is rebuilding.',
+        'Use production preview (npm run preview on :3000), not Vite dev while CSS is rebuilding.',
     );
   }
 

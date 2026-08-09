@@ -3,4 +3,4 @@ services:
     environment:
       NLU_SERVICE_MODE: in-process
       NLU_SERVICE_ENABLED: 'true'
-      NLU_SERVICE_URL: http://backend:3000/api/nlu
+      NLU_SERVICE_URL: http://backend:8000/api/nlu

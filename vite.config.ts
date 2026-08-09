@@ -138,7 +138,7 @@ export default defineConfig(({ mode }) => {
     env.BACKEND_PORT,
     process.env.BACKEND_PORT,
     process.env.PORT,
-    '3350',
+    '8000',
   );
   // Prefer 127.0.0.1 over localhost on Windows to avoid IPv6 ECONNREFUSED (-102)
   // when Nest is bound on IPv4 and `localhost` resolves to ::1 first.

@@ -116,7 +116,7 @@ export interface EnvironmentConfig {
 }
 
 const DEFAULT_JWT_SECRET = 'CHANGE_ME_IN_PRODUCTION';
-const DEFAULT_FRONTEND_URL = 'http://localhost:8000';
+const DEFAULT_FRONTEND_URL = 'http://localhost:3000';
 const DEFAULT_PORT = 3000;
 
 const productionSecret = (name: string, unsafeDefault: string) =>

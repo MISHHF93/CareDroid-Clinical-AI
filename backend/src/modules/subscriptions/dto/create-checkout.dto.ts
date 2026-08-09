@@ -7,12 +7,12 @@ export class CreateCheckoutDto {
   @IsEnum(SubscriptionTier)
   tier: SubscriptionTier;
 
-  @ApiProperty({ required: false, example: 'http://localhost:8000/subscription/success' })
+  @ApiProperty({ required: false, example: 'http://localhost:3000/subscription/success' })
   @IsOptional()
   @IsUrl()
   successUrl?: string;
 
-  @ApiProperty({ required: false, example: 'http://localhost:8000/subscription/cancel' })
+  @ApiProperty({ required: false, example: 'http://localhost:3000/subscription/cancel' })
   @IsOptional()
   @IsUrl()
   cancelUrl?: string;

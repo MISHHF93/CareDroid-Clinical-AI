@@ -64,7 +64,7 @@ export class IntentClassifierService {
     private readonly unifiedAiNode: UnifiedAiNodeService,
   ) {
     const nluConfig = this.configService.get<any>('nlu');
-    const baseUrl = nluConfig?.url || 'http://127.0.0.1:3350/api/nlu';
+    const baseUrl = nluConfig?.url || 'http://127.0.0.1:8000/api/nlu';
     this.nluServiceUrl = baseUrl.replace(/\/$/, '');
     this.nluEnabled = nluConfig?.enabled !== false;
     this.nluUseInProcess = nluConfig?.mode !== 'http';

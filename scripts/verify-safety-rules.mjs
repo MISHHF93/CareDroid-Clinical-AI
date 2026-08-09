@@ -4,7 +4,7 @@
  */
 import http from 'node:http';
 
-const backendPort = Number.parseInt(process.env.BACKEND_PORT || process.env.PORT || '3350', 10);
+const backendPort = Number.parseInt(process.env.BACKEND_PORT || process.env.PORT || '8000', 10);
 
 const requestJson = (path, { method = 'GET', body } = {}) =>
   new Promise((resolveRequest, reject) => {

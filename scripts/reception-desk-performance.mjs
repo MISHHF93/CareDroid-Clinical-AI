@@ -4,7 +4,7 @@
  *
  * Usage:
  *   node scripts/reception-desk-performance.mjs
- *   PATIENTS=10 BACKEND_PORT=3350 node scripts/reception-desk-performance.mjs
+ *   PATIENTS=10 BACKEND_PORT=8000 node scripts/reception-desk-performance.mjs
  *
  * Writes:
  *   qa/reception-desk-performance-report.json
@@ -23,7 +23,7 @@ const outDir = join(root, '.tmp-reception-perf');
 const outJson = join(root, 'qa', 'reception-desk-performance-report.json');
 const outMd = join(root, 'qa', 'reception-desk-performance-report.md');
 
-const BACKEND_PORT = Number(process.env.BACKEND_PORT || process.env.PORT || 3350);
+const BACKEND_PORT = Number(process.env.BACKEND_PORT || process.env.PORT || 8000);
 const HOST = process.env.PERF_HOST || '127.0.0.1';
 const PATIENT_COUNT = Math.max(1, Number(process.env.PATIENTS || 8));
 const ITERATIONS = Math.max(100, Number(process.env.PERF_ITERS || 2000));

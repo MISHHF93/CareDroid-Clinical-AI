@@ -241,7 +241,7 @@ export function readViteDevConfig() {
     // Proxy target prefers 127.0.0.1 over localhost (Windows IPv6 ECONNREFUSED fix).
     proxyTarget: proxyMatch
       ? proxyMatch[0].includes('backendPort')
-        ? `http://127.0.0.1:${source.match(/backendPort = readPort\([\s\S]*?'(\d{4})',/)?.[1] || '3350'}`
+        ? `http://127.0.0.1:${source.match(/backendPort = readPort\([\s\S]*?'(\d{4})',/)?.[1] || '8000'}`
         : proxyMatch[1]
       : null,
     proxiesApi: source.includes("'/api'"),

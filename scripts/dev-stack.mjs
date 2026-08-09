@@ -55,9 +55,9 @@ const parsePort = (value, fallback, label) => {
   return String(port);
 };
 
-/** CareDroid-local defaults. Frontend reconfigured 2026-08-09 to :3000 (was :5190). */
+/** CareDroid-local defaults. Reconfigured 2026-08-09: frontend :3000 (was :5190), backend :8000 (was :3350). */
 const DEFAULT_FRONTEND_PORT = '3000';
-const DEFAULT_BACKEND_PORT = '3350';
+const DEFAULT_BACKEND_PORT = '8000';
 
 const preferredFrontendPort = parsePort(
   argValue('--frontend-port') || process.env.FRONTEND_PORT || process.env.VITE_DEV_PORT,

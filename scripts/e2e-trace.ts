@@ -8,7 +8,7 @@ type EndpointCheck = {
 };
 
 const BACKEND_URL = process.env.E2E_BACKEND_URL || 'http://localhost:3001';
-const FRONTEND_URL = process.env.E2E_FRONTEND_URL || 'http://localhost:8000';
+const FRONTEND_URL = process.env.E2E_FRONTEND_URL || 'http://localhost:3000';
 
 const backendChecks: EndpointCheck[] = [
   { method: 'GET', path: '/api/whiteboard', expectedStatus: 200 },

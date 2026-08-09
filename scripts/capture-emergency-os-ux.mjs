@@ -12,7 +12,7 @@ import {
 } from '../e2e/responsive-qa.helpers.mjs';
 
 const phase = process.env.ED_UX_PHASE || 'before';
-const baseURL = process.env.QA_BASE_URL || 'http://localhost:8000';
+const baseURL = process.env.QA_BASE_URL || 'http://localhost:3000';
 const root = process.cwd();
 const screenshotDir = join(root, 'qa', 'emergency-os-ux-screenshots', phase);
 const diagnosticsPath = join(root, 'qa', 'emergency-os-ux-screenshots', `${phase}-diagnostics.json`);

@@ -11,7 +11,7 @@ const mockAppConfig = vi.hoisted(() => ({
     version: 'test',
     environment: 'test',
   },
-  api: { baseUrl: '', wsUrl: 'ws://localhost:8000' },
+  api: { baseUrl: '', wsUrl: 'ws://localhost:3000' },
   features: {
     enableDemoMode: false,
     allowLocalDemoAuth: false,
@@ -167,13 +167,13 @@ describe('buildStreamUrl', () => {
   it('normalizes notification stream paths when wsUrl is empty', () => {
     mockAppConfig.api.wsUrl = '';
     expect(buildStreamUrl('/notifications/stream')).toBe('/api/notifications/stream');
-    mockAppConfig.api.wsUrl = 'ws://localhost:8000';
+    mockAppConfig.api.wsUrl = 'ws://localhost:3000';
   });
 
   it('uses wsUrl host when configured', () => {
     mockAppConfig.api.wsUrl = 'ws://api.test';
     expect(buildStreamUrl('/api/notifications/stream')).toContain('api.test');
-    mockAppConfig.api.wsUrl = 'ws://localhost:8000';
+    mockAppConfig.api.wsUrl = 'ws://localhost:3000';
   });
 });
 

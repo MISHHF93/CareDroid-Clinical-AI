@@ -25,7 +25,7 @@ page.on('console', (msg) => {
   if (msg.type() === 'error') failed.push({ console: msg.text() });
 });
 
-await page.goto('http://localhost:8000/emergency/whiteboard', {
+await page.goto('http://localhost:3000/emergency/whiteboard', {
   waitUntil: 'networkidle',
   timeout: 60000,
 });

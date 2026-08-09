@@ -5,7 +5,7 @@ type EndpointCheck = {
 };
 
 const BACKEND_BASE_URL = process.env.BACKEND_BASE_URL || 'http://localhost:3000';
-const FRONTEND_BASE_URL = process.env.FRONTEND_BASE_URL || 'http://localhost:8000';
+const FRONTEND_BASE_URL = process.env.FRONTEND_BASE_URL || 'http://localhost:3000';
 
 async function request(check: EndpointCheck): Promise<number | 'connect-failed'> {
   try {

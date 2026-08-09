@@ -5,7 +5,7 @@ import { QA_AUTH_STORAGE } from './responsive-qa.helpers.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const authFile = join(__dirname, '.auth', 'qa-user.json');
-const baseURL = process.env.QA_BASE_URL || 'http://localhost:8000';
+const baseURL = process.env.QA_BASE_URL || 'http://localhost:3000';
 
 /** Writes Playwright storage state with QA auth (no server required). */
 export default async function globalSetup() {

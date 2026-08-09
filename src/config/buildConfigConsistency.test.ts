@@ -20,7 +20,7 @@ describe('build and service config consistency', () => {
     expect(packageJson).toContain('"dev:lan": "vite --strictPort --host"');
     expect(read('vite.config.ts')).toContain('strictPort: true');
     expect(compose).toContain(
-      'VITE_API_PROXY_TARGET: ${VITE_API_PROXY_TARGET:-http://backend:3000}',
+      'VITE_API_PROXY_TARGET: ${VITE_API_PROXY_TARGET:-http://backend:8000}',
     );
     expect(compose).toContain(
       'DATABASE_URL: postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-secure123}@postgres:5432/${DB_NAME:-caredroid}',
@@ -36,7 +36,7 @@ describe('build and service config consistency', () => {
     expect(appCompose).toContain("- '8000:8000'");
     expect(appCompose).toContain('DATABASE_CLIENT: sqlite');
     expect(appCompose).toContain('SQLITE_PATH: /data/caredroid.dev.sqlite');
-    expect(appCompose).toContain('VITE_API_PROXY_TARGET: http://backend:3000');
+    expect(appCompose).toContain('VITE_API_PROXY_TARGET: http://backend:8000');
     // In-process NLU no longer needs a separate service, so the app-only
     // compose now defaults it on (matches docker-compose.ml.yml's default).
     expect(appCompose).toContain('NLU_SERVICE_ENABLED: ${NLU_SERVICE_ENABLED:-true}');
@@ -74,7 +74,7 @@ describe('build and service config consistency', () => {
 
     expect(mlCompose).toContain("NLU_SERVICE_MODE: in-process");
     expect(mlCompose).toContain("NLU_SERVICE_ENABLED: 'true'");
-    expect(mlCompose).toContain('NLU_SERVICE_URL: http://backend:3000/api/nlu');
+    expect(mlCompose).toContain('NLU_SERVICE_URL: http://backend:8000/api/nlu');
     expect(mlCompose).not.toContain('- nlu');
     expect(packageJson).toContain(
       '-f docker-compose.app.yml -f docker-compose.ml.yml --profile ml',
@@ -182,12 +182,12 @@ describe('build and service config consistency', () => {
 
   it('normalizes NLU defaults to in-process TypeScript on the Nest backend', () => {
     expect(read('backend/.env.example')).toContain('NLU_SERVICE_MODE=in-process');
-    expect(read('backend/.env.example')).toContain('NLU_SERVICE_URL=http://127.0.0.1:3350/api/nlu');
+    expect(read('backend/.env.example')).toContain('NLU_SERVICE_URL=http://127.0.0.1:8000/api/nlu');
     expect(read('backend/src/config/nlu.config.ts')).toContain("NLU_SERVICE_MODE || 'in-process'");
     expect(read('docker-compose.yml')).toContain(
-      'NLU_SERVICE_URL: ${NLU_SERVICE_URL:-http://backend:3000/api/nlu}',
+      'NLU_SERVICE_URL: ${NLU_SERVICE_URL:-http://backend:8000/api/nlu}',
     );
-    expect(read('lib/ai/config.ts')).toContain('http://127.0.0.1:3350/api/nlu');
+    expect(read('lib/ai/config.ts')).toContain('http://127.0.0.1:8000/api/nlu');
   });
 
   it('keeps NLU confidence threshold aligned across backend and classifier config', () => {
@@ -199,7 +199,7 @@ describe('build and service config consistency', () => {
   it('provides the root frontend Dockerfile used by docker-compose', () => {
     const dockerfile = read('Dockerfile');
 
-    expect(dockerfile).toContain('EXPOSE 8000');
+    expect(dockerfile).toContain('EXPOSE 3000');
     expect(dockerfile).toContain('CMD ["npm", "run", "dev:lan"]');
   });
 

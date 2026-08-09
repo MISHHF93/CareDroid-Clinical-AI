@@ -2,7 +2,7 @@
 import http from 'node:http';
 
 const frontendPort = Number.parseInt(process.env.FRONTEND_PORT || process.env.VITE_DEV_PORT || '3000', 10);
-const backendPort = Number.parseInt(process.env.BACKEND_PORT || process.env.PORT || '3350', 10);
+const backendPort = Number.parseInt(process.env.BACKEND_PORT || process.env.PORT || '8000', 10);
 
 const requestJson = (port, path, { method = 'GET', headers = {}, body } = {}) =>
   new Promise((resolve, reject) => {

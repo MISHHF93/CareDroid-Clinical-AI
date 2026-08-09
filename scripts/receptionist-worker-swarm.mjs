@@ -12,7 +12,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..');
 const outDir = join(root, 'qa', 'screenshots', 'reception-workers');
 const reportPath = join(root, 'qa', 'receptionist-worker-swarm-report.json');
-const baseURL = process.env.QA_BASE_URL || 'http://localhost:8000';
+const baseURL = process.env.QA_BASE_URL || 'http://localhost:3000';
 
 function read(rel) {
   try {

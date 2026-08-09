@@ -16,7 +16,7 @@ import {
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..');
-const baseUrl = process.env.QA_BASE_URL || 'http://localhost:8000';
+const baseUrl = process.env.QA_BASE_URL || 'http://localhost:3000';
 const outputDir = process.env.DASHBOARD_RESIZE_DIR || join(root, 'qa', 'dashboard-resize-audit');
 
 const DASHBOARD_TARGETS = [
