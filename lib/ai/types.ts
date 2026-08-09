@@ -7,7 +7,8 @@ export type AIRequestType =
   | 'HANDOFF_BRIEF'
   | 'PROTOCOL_SUGGEST'
   | 'TRIAGE_ASSIST'
-  | 'SHIFT_SUMMARY';
+  | 'SHIFT_SUMMARY'
+  | 'APP_NAVIGATION';
 
 export interface ToolDefinition {
   name: string;

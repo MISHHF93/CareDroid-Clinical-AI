@@ -1,11 +1,22 @@
 import { Injectable, Logger } from '@nestjs/common';
 import catalogData from './data/catalog.json';
+import { callAI } from '../../../../lib/ai/serverClient';
 
 /**
  * Ported from navigator/ (a formerly-standalone, merged-in repo) as part of
  * the 2026-08-06 consolidation into one real frontend + one real backend.
  * Deterministic lexical retrieval logic is unchanged from
  * navigator/src/retrieval.js; only the module system and types changed.
+ *
+ * Groq synthesis routes through the shared LLM egress boundary
+ * (lib/ai/providers/egress.ts's completeViaEgress, "the single CareDroid
+ * LLM egress boundary" that AI_KILL_SWITCH / AI_EXTERNAL_LLM_DISABLED,
+ * per-provider circuit breakers, and AI monitor events all depend on) —
+ * found 2026-08-08 to have been calling api.groq.com directly with its own
+ * bespoke fetch, which meant flipping the kill switch during an incident
+ * would not actually stop this path, and no monitor/audit event was ever
+ * recorded for it. Fixed to call through lib/ai/serverClient's callAI()
+ * like every other real backend AI caller (chat.service.ts, ai.service.ts).
  */
 
 const STOP_WORDS = new Set([
@@ -253,25 +264,25 @@ export class AppNavigatorService {
   }
 
   private async groqAnswer(query: string, hits: NavigatorHit[]): Promise<string | null> {
-    const apiKey = process.env.GROQ_API_KEY;
-    if (!apiKey) return null;
+    if (!process.env.GROQ_API_KEY) return null;
     const timeoutMs = Number(process.env.GROQ_TIMEOUT_MS || 15_000);
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
-      body: JSON.stringify({
-        model: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
-        messages: [
-          { role: 'system', content: 'Use supplied route evidence only. Do not provide clinical advice.' },
-          { role: 'user', content: groundingPrompt(query, hits) },
-        ],
-        temperature: 0.2,
-        max_tokens: 350,
-      }),
-      signal: AbortSignal.timeout(timeoutMs),
-    });
-    if (!response.ok) throw new Error(`Groq returned HTTP ${response.status}`);
-    const body = (await response.json()) as { choices?: Array<{ message?: { content?: string } }> };
-    return String(body?.choices?.[0]?.message?.content || '').trim() || null;
+
+    const response = await callAI(
+      {
+        requestType: 'APP_NAVIGATION',
+        systemPrompt: 'Use supplied route evidence only. Do not provide clinical advice.',
+        messages: [{ role: 'user', content: groundingPrompt(query, hits) }],
+        maxTokens: 350,
+      },
+      {
+        provider: 'groq',
+        // Preserve prior behavior: any Groq failure degrades to the
+        // deterministic catalog answer rather than silently trying a
+        // different real provider on the caller's behalf.
+        disableFallback: true,
+        timeoutMs,
+      },
+    );
+    return String(response.content || '').trim() || null;
   }
 }

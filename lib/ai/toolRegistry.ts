@@ -208,6 +208,7 @@ const TOOLS_BY_REQUEST_TYPE: Record<AIRequestType, EmergencyToolName[]> = {
   PROTOCOL_SUGGEST: ['launch_calculator', 'search_patients'],
   TRIAGE_ASSIST: ['search_patients', 'get_patient_details', 'get_queue_status', 'get_capacity_status'],
   SHIFT_SUMMARY: ['get_capacity_status', 'get_queue_status', 'search_patients'],
+  APP_NAVIGATION: [],
 };
 
 const VALID_TRANSITIONS: Record<string, string[]> = {
