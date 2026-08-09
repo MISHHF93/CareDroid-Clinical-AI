@@ -37,7 +37,7 @@
 - **Dependencies**: None remaining for this entry's scope.
 - **Recommended canonical solution**: Applied for HEART/qSOFA/NIHSS. Longer-term, the whole "2 live implementations of the same calculator" architecture (not just the missing tests) is itself worth a future consolidation decision — see the "old calculators" HEAL-EPIC-A category notes below.
 - **Validation requirements**: `npx tsc --noEmit -p tsconfig.frontend.json` and ESLint clean on all touched/new files. All 3 new test files' assertions independently hand-verified against each implementation's actual boundary logic (documented in this entry) since `vitest` is blocked in this sandbox (established constraint) — every threshold and boundary claimed above was traced against the real source, not assumed.
-- **Commit when resolved**: `e235ec3b` (HEART/qSOFA); NIHSS pending (staged, not yet committed at ledger-write time).
+- **Commit when resolved**: `e235ec3b` (HEART/qSOFA); `76e29221` (NIHSS).
 - **Scorecard impact when resolved**: Pending next scorecard sync pass.
 
 ### HEAL-028 — `CommercialPages.tsx` was a dead 3-line re-export barrel kept alive only by one smoke test's import path
