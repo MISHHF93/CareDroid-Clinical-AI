@@ -431,6 +431,14 @@ Patient, Encounter, Journey, Complaint/Terminology, Queue, EMS, Reassessment, Ca
 
 **Epic conclusion**: every one of the 15 named domains has now been individually traced to a specific, evidenced disposition — no domain remains in an unknown state. The systematic "add startup diagnostics that fail safely on invalid production persistence configuration" half of this epic's own scope was not attempted (a separate, cross-cutting task, not a per-domain one) and remains open if picked up again.
 
+**Extended search beyond the 15 named domains (2026-08-09, after HEAL-023)**: a broader grep across every `backend/src/modules/**/*.service.ts` for the same in-memory-array-with-no-`@InjectRepository` shape (used to find HEAL-023's `ClinicalDecisionSupportService`) surfaced 4 more candidates. All 4 checked individually and correctly found NOT to be the same bug:
+
+- `platform-telemetry.service.ts` — `PlatformTelemetryService`'s event buffer, crash-report list, and API-duration samples are operational observability data (traces, slow-endpoint detection), not durable business/clinical state. Losing an APM-style ring buffer on restart is standard, expected behavior for this data class, unlike HEAL-019/020/021/023's clinical/safety/audit records.
+- `simulation-outcome.service.ts` / `simulation-run.service.ts` — both self-label every record `sourceStatus: 'demo-local-state'` (honest, not stale), confirming this training-simulation feature is deliberately non-durable, matching the same "honestly-labeled demo" pattern already correctly left alone elsewhere in this campaign (e.g. `emergencyAdvancedDecisionSupport`'s `twinId`).
+- `tool-execution.service.ts` — its in-memory `executionLogs` array is a bounded (500-entry) per-call debug/audit trace, not the tool's actual output. Confirmed the real, meaningful result already has genuine TypeORM persistence via `ToolOrchestratorService.saveToolResult()` → `toolResultRepository.save()` (read directly, not assumed).
+
+No fix needed for any of the 4. This closes the extended search — the in-memory-persistence bug class this session found 4 real instances of (HEAL-019/020/021/023) appears now exhausted across the backend.
+
 ---
 
 ## Next steps (updated 2026-08-09, after HEAL-010)
