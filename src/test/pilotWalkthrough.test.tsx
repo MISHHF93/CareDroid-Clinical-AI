@@ -402,5 +402,5 @@ describe('pilot walkthrough', () => {
     const analyticsKpis = screen.getByLabelText('Emergency analytics KPIs');
     expect(within(analyticsKpis).getByText('Discharges')).toBeInTheDocument();
     expect(within(analyticsKpis).getAllByText(String(analytics.shift.dischargeCount)).length).toBeGreaterThan(0);
-  }, 60000);
+  }, 120000); // full end-to-end pilot walkthrough genuinely runs 40-65s depending on system load; 60s was too tight and caused load-dependent timeouts, not a real failure (confirmed: passes in ~47s under normal load, matching backendOrphanAudit.test.ts's own HEAVY_ORPHAN_SCAN_TIMEOUT_MS precedent for heavy tests)
 });
