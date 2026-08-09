@@ -72,7 +72,12 @@ describe('DifferentialAi', () => {
     renderPage();
 
     expect(screen.getByRole('heading', { name: /differential diagnosis assistant/i })).toBeInTheDocument();
-    expect(screen.getByText(/decision support only/i)).toBeInTheDocument();
+    // 2 "decision support only" disclaimers legitimately coexist on this page:
+    // ToolPageLayout's shared, tool-wide compliance boilerplate (aria-label
+    // "Clinical decision support disclaimer") and this page's own more specific
+    // "Safety Scope" panel explaining what the ranked differential list does and
+    // does not do -- both real, both accurate, not a duplication bug.
+    expect(screen.getAllByText(/decision support only/i).length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText(/not diagnosis/i)).toBeInTheDocument();
   });
 

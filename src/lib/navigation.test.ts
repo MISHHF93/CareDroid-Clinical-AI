@@ -9,7 +9,13 @@ import {
 
 // Routes intentionally open to every role with no fine-grained permission gate
 // (e.g. the role-aware user manual) — role membership alone controls access.
-const ROUTES_WITHOUT_REQUIRED_PERMISSIONS = new Set(['/emergency/help']);
+// '/navigator' (App navigator): same permission-free shape as '/emergency/help' --
+// backend AppNavigatorController only requires @UseGuards(AuthGuard('jwt')) (any
+// authenticated user), no @RequirePermission, and its route config has
+// allowedRoles: ALL_USER_PROFILES with no requiredPermissions, consistent with
+// its own 2026-08-06 shipping commit describing it as "a real sidebar entry
+// under Help".
+const ROUTES_WITHOUT_REQUIRED_PERMISSIONS = new Set(['/emergency/help', '/navigator']);
 
 describe('ROUTE_ACCESS_CONFIG', () => {
   it('every entry has required fields', () => {

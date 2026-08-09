@@ -42,6 +42,7 @@ function buildPatient(overrides: Partial<Patient> = {}): Patient {
     notes: [],
     timeline: [],
     reassessmentReminders: [],
+    ...overrides,
   } as Patient;
 }
 

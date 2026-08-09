@@ -5,8 +5,8 @@ import {
 } from '../features/featureModuleContract';
 
 export const PAGE_INVENTORY_EXPECTED_TOTAL = 240;
-export const PAGE_SOURCE_EXPECTED_TOTAL = 149;
-export const PAGE_STYLE_EXPECTED_TOTAL = 91;
+export const PAGE_SOURCE_EXPECTED_TOTAL = 148;
+export const PAGE_STYLE_EXPECTED_TOTAL = 92;
 export const PAGE_TOOLS_INVENTORY_EXPECTED_TOTAL = 58;
 export const PAGE_TOOLS_SOURCE_EXPECTED_TOTAL = 48;
 

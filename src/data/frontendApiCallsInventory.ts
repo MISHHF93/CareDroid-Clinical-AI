@@ -98,6 +98,7 @@ export const FRONTEND_API_CALLS = Object.freeze([
   { id: 'emergency-reception-snapshot', method: 'GET', path: '/api/emergency/reception/snapshot', client: 'emergencyOsApi.js / fetchReceptionSnapshot', capability: 'emergencyReceptionSnapshot' },
   { id: 'emergency-reception-handoff', method: 'POST', path: '/api/emergency/reception/handoff', client: 'emergencyOsApi.js / postReceptionHandoff', capability: 'emergencyReceptionHandoff' },
   { id: 'emergency-reception-escalation', method: 'POST', path: '/api/emergency/reception/escalation', client: 'emergencyOsApi.js / postReceptionEscalation', capability: 'emergencyReceptionEscalation' },
+  { id: 'emergency-waiting-room-escalation-notify', method: 'POST', path: '/api/emergency/waiting-room-safety/escalation-notify', client: 'emergencyOsApi.js / postWaitingRoomEscalationNotify', capability: 'waitingRoomEscalationNotify' },
   { id: 'emergency-triage-assist', method: 'POST', path: '/api/emergency/triage/assist', client: 'emergencyOsApi.js / postTriageAssist', capability: 'emergencyTriageAssist' },
   { id: 'emergency-patient-orchestration', method: 'GET', path: '/api/emergency/patients/:patientId/orchestration', client: 'emergencyOsApi.js / fetchPatientOrchestration', capability: 'emergencyPatientOrchestration' },
   { id: 'emergency-patient-flow', method: 'GET', path: '/api/emergency/patient-flow', client: 'emergencyOsApi.js / fetchPatientFlow', capability: 'emergencyPatientFlow' },
