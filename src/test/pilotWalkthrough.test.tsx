@@ -5,7 +5,6 @@ import { MemoryRouter, useNavigate } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ThemeProvider } from '../contexts/ThemeContext';
 import { UserProvider } from '../contexts/UserContext';
-import { NotificationProvider } from '../contexts/NotificationContext';
 import { ConversationProvider } from '../contexts/ConversationContext';
 import { ToolPreferencesProvider } from '../contexts/ToolPreferencesContext';
 import { WorkspaceProvider } from '../contexts/WorkspaceContext';
@@ -172,31 +171,29 @@ function AppRouteHarness({ initialPath = '/emergency/whiteboard' }) {
     <MemoryRouter initialEntries={[initialPath]}>
       <ThemeProvider>
         <UserProvider>
-          <NotificationProvider>
-            <WorkspaceProvider>
-              <CostTrackingProvider>
-                <ToolPreferencesProvider>
-                  <TenantContextProvider>
-                    <UserIdentityProvider>
-                      <OrganizationContextProvider>
-                        <WhiteLabelProvider>
-                          <ConversationProvider>
-                            <SystemConfigProvider>
-                              <Suspense fallback={<div>Loading route</div>}>
-                                <DemoAccessRole />
-                                <AppRoutes />
-                                <PilotRouteControls />
-                              </Suspense>
-                            </SystemConfigProvider>
-                          </ConversationProvider>
-                        </WhiteLabelProvider>
-                      </OrganizationContextProvider>
-                    </UserIdentityProvider>
-                  </TenantContextProvider>
-                </ToolPreferencesProvider>
-              </CostTrackingProvider>
-            </WorkspaceProvider>
-          </NotificationProvider>
+          <WorkspaceProvider>
+            <CostTrackingProvider>
+              <ToolPreferencesProvider>
+                <TenantContextProvider>
+                  <UserIdentityProvider>
+                    <OrganizationContextProvider>
+                      <WhiteLabelProvider>
+                        <ConversationProvider>
+                          <SystemConfigProvider>
+                            <Suspense fallback={<div>Loading route</div>}>
+                              <DemoAccessRole />
+                              <AppRoutes />
+                              <PilotRouteControls />
+                            </Suspense>
+                          </SystemConfigProvider>
+                        </ConversationProvider>
+                      </WhiteLabelProvider>
+                    </OrganizationContextProvider>
+                  </UserIdentityProvider>
+                </TenantContextProvider>
+              </ToolPreferencesProvider>
+            </CostTrackingProvider>
+          </WorkspaceProvider>
         </UserProvider>
       </ThemeProvider>
     </MemoryRouter>

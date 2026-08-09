@@ -19,6 +19,25 @@
 
 ## VALIDATED (this campaign, most recent first)
 
+### HEAL-017 — `NotificationContext.tsx`/`NotificationProvider` was globally-mounted dead code, deleted (HEAL-EPIC-A, first bounded slice)
+
+- **Severity**: P3_LOW
+- **Domain**: Dead-code reachability (HEAL-EPIC-A's "old notification systems" category)
+- **Source evidence**: `src/contexts/NotificationContext.tsx` exported `NotificationProvider` (mounted at the app root in `src/app/providers.tsx`, wrapping nearly the entire component tree) and a `useNotifications()` hook. Exhaustive grep for `useNotifications()` calls found zero real consumers anywhere in the app — its only 2 other references were both test-harness files (`src/routing/canonicalRouteTree.testShared.tsx`, `src/test/pilotWalkthrough.test.tsx`) that mirror `app/providers.tsx`'s own provider tree structurally, not tests of this context's own behavior. Git history places it in an older commit ("complete JS→TS migration") than the genuinely comprehensive, actively-used replacement, `src/contexts/NotificationShellContext.tsx`'s `NotificationShellProvider` (mounted in `AppShell.tsx`, consumed by `Sidebar.tsx`/`OperationalAlarmDock.tsx`/`SidebarNotificationPanel.tsx`, backed by `useNotificationCenter()` — a much larger, real system pulling from LWBS risk, deterioration watch, triage breach, EMS offload, and high-risk-complaint alert builders, all previously verified real in this campaign). `NotificationContext.tsx` itself had no dedicated test file. Applying last round's own "check for existing tests before assuming an oversight" lesson: confirmed no test exercises `useNotifications()`'s return value anywhere, only the app-root provider wrap — this is a clean dead-code case, not a deliberate deferral like the HEAL-008-round-3 near-miss.
+- **Affected files**: `src/contexts/NotificationContext.tsx` (deleted), `src/app/providers.tsx`, `src/routing/canonicalRouteTree.testShared.tsx`, `src/test/pilotWalkthrough.test.tsx` (import + provider-wrap removed from all 3)
+- **Runtime impact**: One fewer Context.Provider re-rendering (with a non-memoized `value` object literal, recomputed every render) on every `useEmergencyStore` alerts change, for a component tree with zero consumers — a small but real removal of wasted render work across nearly the whole app.
+- **Frontend impact**: No behavior change for any real user-facing feature (confirmed zero consumers). `NotificationShellContext`/`useNotificationCenter` — the real notification system — untouched.
+- **AI/ML impact**: N/A.
+- **Affected user profiles**: None directly (invisible dead code); indirectly all profiles benefit from the small render-cost reduction.
+- **Security/privacy impact**: None.
+- **Clinical-safety impact**: None.
+- **Current status**: `VALIDATED`
+- **Dependencies**: None.
+- **Recommended canonical solution**: Applied — `DELETE_PROVEN_DEAD` per the epic's own 6-way disposition taxonomy.
+- **Validation requirements**: Full frontend `tsc --noEmit -p tsconfig.frontend.json` clean (whole-repo, not just an ad-hoc subset — confirms no transitive/barrel-export reference survived). ESLint clean on all 3 touched files. `vitest` blocked in this sandbox per established constraint; the change is purely subtractive (removing a provider wrap + its matching close tag), and a full-repo `tsc` pass would have caught any JSX mismatch as a compile error.
+- **Commit when resolved**: `TBD` (this round, pending commit).
+- **Scorecard impact when resolved**: Pending next scorecard sync pass.
+
 ### HEAL-008 — 9 of `EmergencyOsController`'s `DEMO`-labeled capability keys traced individually, all found genuinely real (same bug class as HEAL-002)
 
 - **Severity**: P2_MEDIUM
@@ -259,7 +278,7 @@ These are each genuinely multi-day/multi-round efforts per the operating directi
 
 ### HEAL-EPIC-A — Dead-code reachability sweep (14 named legacy categories)
 
-Old dashboards, Android/mobile paths, Express/Mongoose runtime, duplicate AI services, unused classifier models, stale symptom datasets, old calculators, prototype workspaces, duplicate AppShells, alternate API clients, old stores/providers, old notification systems, unused route trees, experimental integrations. 6-way disposition required per artifact (KEEP_CANONICAL/MIGRATE_THEN_REMOVE/QUARANTINE/DELETE_PROVEN_DEAD/FUTURE_MODULE/MANUAL_REVIEW), verified via DI/dynamic-import/registry/build-script/test/config evidence, not import counts alone. **Status: not started this campaign iteration** (HEAL-004 is one concrete instance found opportunistically, not from a systematic sweep).
+Old dashboards, Android/mobile paths, Express/Mongoose runtime, duplicate AI services, unused classifier models, stale symptom datasets, old calculators, prototype workspaces, duplicate AppShells, alternate API clients, old stores/providers, old notification systems, unused route trees, experimental integrations. 6-way disposition required per artifact (KEEP_CANONICAL/MIGRATE_THEN_REMOVE/QUARANTINE/DELETE_PROVEN_DEAD/FUTURE_MODULE/MANUAL_REVIEW), verified via DI/dynamic-import/registry/build-script/test/config evidence, not import counts alone. **Status: first bounded slice complete (HEAL-017, "old notification systems" category — `NotificationContext.tsx` deleted, `DELETE_PROVEN_DEAD`)**; 13 of 14 categories remain unswept. HEAL-004 (`ai/foundation/`, "duplicate AI services") was a separate, earlier, opportunistic instance, not from this systematic sweep either — 2 concrete instances closed opportunistically so far, no category fully audited end-to-end yet.
 
 ### HEAL-EPIC-B — 8-profile end-to-end integration test matrix
 

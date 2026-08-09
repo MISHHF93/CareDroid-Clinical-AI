@@ -6,7 +6,6 @@ import { MemoryRouter, useLocation } from 'react-router-dom';
 import { beforeAll, vi } from 'vitest';
 import { ThemeProvider } from '../contexts/ThemeContext';
 import { UserProvider } from '../contexts/UserContext';
-import { NotificationProvider } from '../contexts/NotificationContext';
 import { ConversationProvider } from '../contexts/ConversationContext';
 import { ToolPreferencesProvider } from '../contexts/ToolPreferencesContext';
 import { WorkspaceProvider } from '../contexts/WorkspaceContext';
@@ -517,30 +516,28 @@ export function AppRouteHarness({ initialPath }) {
     <MemoryRouter initialEntries={[initialPath]}>
       <ThemeProvider>
         <UserProvider>
-          <NotificationProvider>
-            <WorkspaceProvider>
-              <CostTrackingProvider>
-                <ToolPreferencesProvider>
-                  <TenantContextProvider>
-                    <UserIdentityProvider>
-                      <OrganizationContextProvider>
-                        <WhiteLabelProvider>
-                          <ConversationProvider>
-                            <SystemConfigProvider>
-                              <Suspense fallback={<div>Loading route</div>}>
-                                <LazyAppRoutes />
-                                <LocationProbe />
-                              </Suspense>
-                            </SystemConfigProvider>
-                          </ConversationProvider>
-                        </WhiteLabelProvider>
-                      </OrganizationContextProvider>
-                    </UserIdentityProvider>
-                  </TenantContextProvider>
-                </ToolPreferencesProvider>
-              </CostTrackingProvider>
-            </WorkspaceProvider>
-          </NotificationProvider>
+          <WorkspaceProvider>
+            <CostTrackingProvider>
+              <ToolPreferencesProvider>
+                <TenantContextProvider>
+                  <UserIdentityProvider>
+                    <OrganizationContextProvider>
+                      <WhiteLabelProvider>
+                        <ConversationProvider>
+                          <SystemConfigProvider>
+                            <Suspense fallback={<div>Loading route</div>}>
+                              <LazyAppRoutes />
+                              <LocationProbe />
+                            </Suspense>
+                          </SystemConfigProvider>
+                        </ConversationProvider>
+                      </WhiteLabelProvider>
+                    </OrganizationContextProvider>
+                  </UserIdentityProvider>
+                </TenantContextProvider>
+              </ToolPreferencesProvider>
+            </CostTrackingProvider>
+          </WorkspaceProvider>
         </UserProvider>
       </ThemeProvider>
     </MemoryRouter>
