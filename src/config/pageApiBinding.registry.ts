@@ -81,7 +81,7 @@ export const PAGE_API_BINDINGS: readonly PageApiBinding[] = Object.freeze([
     path: CANONICAL_ROUTES.emergencyHandoffs,
     mode: 'wired',
     endpoints: [`${EMERGENCY_OS_API_ENDPOINTS.operatingSurface}/handoffs`],
-    capabilities: ['emergencyHandoffsView', 'emergencyOperatingSurfaces', 'workflowOrchestration'],
+    capabilities: ['emergencyHandoffsView', 'emergencyOperatingSurfaces', 'emergencyWorkflowOrchestration'],
   }),
   Object.freeze({
     pageId: 'reports',
