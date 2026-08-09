@@ -225,7 +225,7 @@ function readVitePortFallback(source, blockName) {
     ? Number(frontendLiteral[1])
     : readPortDefault
       ? Number(readPortDefault[1])
-      : 5190;
+      : 3000;
 }
 
 export function readViteDevConfig() {

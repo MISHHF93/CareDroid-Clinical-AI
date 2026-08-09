@@ -7,7 +7,7 @@
  *
  * Usage:
  *   node scripts/patient-journey-performance.mjs
- *   BACKEND_PORT=3350 FRONTEND_PORT=5190 PATIENTS=8 node scripts/patient-journey-performance.mjs
+ *   BACKEND_PORT=3350 FRONTEND_PORT=3000 PATIENTS=8 node scripts/patient-journey-performance.mjs
  *
  * Writes:
  *   qa/patient-journey-performance-report.json
@@ -25,7 +25,7 @@ const outJson = join(root, 'qa', 'patient-journey-performance-report.json');
 const outMd = join(root, 'qa', 'patient-journey-performance-report.md');
 
 const BACKEND_PORT = Number(process.env.BACKEND_PORT || process.env.PORT || 3350);
-const FRONTEND_PORT = Number(process.env.FRONTEND_PORT || process.env.VITE_DEV_PORT || 5190);
+const FRONTEND_PORT = Number(process.env.FRONTEND_PORT || process.env.VITE_DEV_PORT || 3000);
 const HOST = process.env.PERF_HOST || '127.0.0.1';
 const PATIENT_COUNT = Math.max(1, Number(process.env.PATIENTS || 6));
 const TIMEOUT_MS = Number(process.env.PERF_TIMEOUT_MS || 15000);
@@ -580,7 +580,7 @@ async function main() {
       failures: [],
       grade: { grade: 'F', label: 'Backend not reachable — start npm run dev' },
       recommendation:
-        'Start the CareDroid stack (`npm run dev`) so backend listens on 3350 and frontend on 5190, then re-run this harness.',
+        'Start the CareDroid stack (`npm run dev`) so backend listens on 3350 and frontend on 3000, then re-run this harness.',
     };
     mkdirSync(dirname(outJson), { recursive: true });
     writeFileSync(outJson, `${JSON.stringify(report, null, 2)}\n`);

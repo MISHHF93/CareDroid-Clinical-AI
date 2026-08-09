@@ -1,8 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
-// CareDroid Vite default is 5190 (dev-stack.mjs). Older a11y configs used 8000;
+// CareDroid Vite default is 3000 (dev-stack.mjs). Older a11y configs used 8000;
 // keep an override path via QA_BASE_URL / VITE_DEV_PORT.
-const port = process.env.VITE_DEV_PORT || process.env.FRONTEND_PORT || '5190';
+const port = process.env.VITE_DEV_PORT || process.env.FRONTEND_PORT || '3000';
 const baseURL = (process.env.QA_BASE_URL || `http://localhost:${port}`).replace(/\/+$/, '');
 
 /**

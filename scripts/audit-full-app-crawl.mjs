@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Crawls every static (non-parameterized) CANONICAL_ROUTES path against a real
- * running dev stack (`npm run dev`, default http://localhost:5190) and flags:
+ * running dev stack (`npm run dev`, default http://localhost:3000) and flags:
  * uncaught page errors (crashes), blank renders, and horizontal layout
  * overflow. Screenshots only pages that flag something.
  *
@@ -28,7 +28,7 @@ const outDir = join(repoRoot, 'qa', 'full-app-crawl');
 const shotDir = join(outDir, 'screenshots');
 mkdirSync(shotDir, { recursive: true });
 
-const baseURL = process.argv[2] || process.env.QA_BASE_URL || 'http://localhost:5190';
+const baseURL = process.argv[2] || process.env.QA_BASE_URL || 'http://localhost:3000';
 const EDGE_PATH =
   process.env.QA_CHROMIUM_EXECUTABLE || 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe';
 const ROTATE_EVERY = 15;

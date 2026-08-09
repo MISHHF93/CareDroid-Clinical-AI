@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
-// Hermetic Vite on 5190 (same pattern as EMS-copilot; avoid contaminated :8000 / full dev-stack).
-const port = process.env.VITE_DEV_PORT || process.env.FRONTEND_PORT || '5190';
+// Hermetic Vite on 3000 (same pattern as EMS-copilot; avoid contaminated :8000 / full dev-stack).
+const port = process.env.VITE_DEV_PORT || process.env.FRONTEND_PORT || '3000';
 const baseURL = (process.env.QA_BASE_URL || `http://localhost:${port}`).replace(/\/+$/, '');
 
 export default defineConfig({

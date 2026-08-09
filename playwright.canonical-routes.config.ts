@@ -1,6 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const port = process.env.VITE_DEV_PORT || process.env.FRONTEND_PORT || '5190';
+const port = process.env.VITE_DEV_PORT || process.env.FRONTEND_PORT || '3000';
 const baseURL = (process.env.QA_BASE_URL || `http://localhost:${port}`).replace(/\/+$/, '');
 
 export default defineConfig({

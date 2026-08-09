@@ -28,7 +28,7 @@ import { chromium } from 'playwright-core';
 const executablePath =
   process.env.QA_CHROMIUM_EXECUTABLE ||
   'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe';
-const baseURL = process.env.QA_BASE_URL || 'http://localhost:5190';
+const baseURL = process.env.QA_BASE_URL || 'http://localhost:3000';
 const routePath = process.argv[2] || '/clinical/alerts';
 
 const QA_AUTH_STORAGE = {

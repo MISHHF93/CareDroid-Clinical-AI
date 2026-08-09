@@ -42,7 +42,7 @@ const backendHealthPlugin = (proxyTarget: string): Plugin => ({
             `\nCareDroid API is not reachable at ${proxyTarget}.\n` +
               '  Full stack: npm run dev:fullstack\n' +
               '  API only:   npm run dev:api\n' +
-              '  Open app at http://localhost:5190 (not :5173/:8000/:3000)\n',
+              '  Open app at http://localhost:3000 (not :5173/:8000)\n',
           );
         });
     });
@@ -122,7 +122,7 @@ const readPort = (...values: (string | undefined)[]): number => {
     const parsed = Number.parseInt(value || '', 10);
     if (Number.isInteger(parsed) && parsed > 0 && parsed <= 65535) return parsed;
   }
-  return 5190;
+  return 3000;
 };
 
 export default defineConfig(({ mode }) => {
@@ -132,7 +132,7 @@ export default defineConfig(({ mode }) => {
     env.VITE_DEV_PORT,
     process.env.FRONTEND_PORT,
     process.env.VITE_DEV_PORT,
-    '5190',
+    '3000',
   );
   const backendPort = readPort(
     env.BACKEND_PORT,

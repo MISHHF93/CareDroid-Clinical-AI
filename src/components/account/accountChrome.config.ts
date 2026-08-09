@@ -7,7 +7,7 @@
  * - Compact profile switcher does NOT sit in the header shelf; demo role switching
  *   lives inside the account menu Session section when allowed.
  *
- * Browser dev surface: http://localhost:5190 (Vite proxies /api → backend).
+ * Browser dev surface: http://localhost:3000 (Vite proxies /api → backend).
  */
 
 import { CANONICAL_ROUTES } from '../../config/routes.config';
