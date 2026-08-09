@@ -97,8 +97,13 @@ describe('backendApiCapabilities', () => {
     expect(isBackendCapabilityEnabled('emergencyPatients')).toBe(true);
     expect(isBackendCapabilityEnabled('emergencyReceptionSnapshot')).toBe(true);
     expect(getBackendCapabilityStatus('emergencyCentralNode')).toBe(BACKEND_CAPABILITY_STATUS.DEMO);
-    expect(getBackendCapabilityStatus('emergencyPatientJourney')).toBe(BACKEND_CAPABILITY_STATUS.DEMO);
-    expect(getBackendCapabilityStatus('emergencyQueues')).toBe(BACKEND_CAPABILITY_STATUS.DEMO);
+    // Corrected 2026-08-09 (HEAL-008): both compute from the same real
+    // EmergencyPatientService.listPatients() list -- see backendApiCapabilities.ts's own comments.
+    expect(getBackendCapabilityStatus('emergencyPatientJourney')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
+    expect(getBackendCapabilityStatus('emergencyQueues')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
+    expect(getBackendCapabilityStatus('emergencyBoarding')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
+    expect(getBackendCapabilityStatus('emergencyEmsRuntime')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
+    expect(getBackendCapabilityStatus('emergencyOperatingSurfaces')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
     // Corrected 2026-08-09: computes from the real TypeORM patient repository
     // (calculateEmergencyOsCapacity), not a fixture -- see backendApiCapabilities.ts's own comment.
     expect(getBackendCapabilityStatus('emergencyCapacity')).toBe(BACKEND_CAPABILITY_STATUS.REAL);

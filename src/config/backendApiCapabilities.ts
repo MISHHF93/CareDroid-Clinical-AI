@@ -70,8 +70,21 @@ export const BACKEND_API_CAPABILITY_STATUS = Object.freeze({
   emergencyWhiteboard: BACKEND_CAPABILITY_STATUS.DEMO,
   /** Session-scoped board mutators (create/list share EmergencyPatientService in-memory + optional DB write-through). */
   emergencyPatients: BACKEND_CAPABILITY_STATUS.REAL,
-  emergencyPatientJourney: BACKEND_CAPABILITY_STATUS.DEMO,
-  emergencyQueues: BACKEND_CAPABILITY_STATUS.DEMO,
+  /**
+   * Corrected 2026-08-09 (HEAL-008): EmergencyOsController.getJourney() calls
+   * PatientJourneyService.getJourney(), which builds journey events entirely
+   * from EmergencyPatientService.listPatients() -- the same real, always-on
+   * TypeORM-backed patient list emergencyCapacity was already corrected for.
+   * No fixture/demo data anywhere in this path.
+   */
+  emergencyPatientJourney: BACKEND_CAPABILITY_STATUS.REAL,
+  /**
+   * Corrected 2026-08-09 (HEAL-008): EmergencyOsController.getQueues() calls
+   * QueueIntelligenceService.getQueues(), which buckets the same real
+   * EmergencyPatientService.listPatients() list by patient.state -- no
+   * fixture data.
+   */
+  emergencyQueues: BACKEND_CAPABILITY_STATUS.REAL,
   /**
    * Corrected 2026-08-09: EmergencyOsController.getCapacity() calls
    * CapacityService.getCapacity() (backend/src/modules/emergency-os/
@@ -83,9 +96,33 @@ export const BACKEND_API_CAPABILITY_STATUS = Object.freeze({
    * this one specifically has been directly verified real.
    */
   emergencyCapacity: BACKEND_CAPABILITY_STATUS.REAL,
-  emergencyBoarding: BACKEND_CAPABILITY_STATUS.DEMO,
-  emergencyEmsRuntime: BACKEND_CAPABILITY_STATUS.DEMO,
-  emergencyOperatingSurfaces: BACKEND_CAPABILITY_STATUS.DEMO,
+  /**
+   * Corrected 2026-08-09 (HEAL-008): EmergencyOsController.getBoarding() calls
+   * BoardingService.getBoarding(), which filters the same real
+   * EmergencyPatientService.listPatients() list by isBoarding() -- no fixture
+   * data. (The separate Mongoose-gated BoardingController sub-routes --
+   * track-decision/metrics/report/etc. -- remain a distinct, optional tier;
+   * this key covers only the always-on GET /emergency/boarding route.)
+   */
+  emergencyBoarding: BACKEND_CAPABILITY_STATUS.REAL,
+  /**
+   * Corrected 2026-08-09 (HEAL-008): EmergencyOsController.getEMS() calls
+   * EMSIntakeService.getEMSIntake(), which derives EMS arrivals from the same
+   * real EmergencyPatientService.listPatients() list (filtered by EMS
+   * flags/complaint text) -- no fixture data. (The separate Mongoose-gated
+   * EmsController sub-routes -- alert/status/arrive/incoming -- remain a
+   * distinct, optional tier with zero real frontend callers; this key covers
+   * only the always-on GET /emergency/ems route.)
+   */
+  emergencyEmsRuntime: BACKEND_CAPABILITY_STATUS.REAL,
+  /**
+   * Corrected 2026-08-09 (HEAL-008): EmergencyOsController.getOperatingSurface()
+   * calls EmergencyOperatingSurfacesService.getSurface(), whose baseContext()
+   * assembles real patients/alerts/capacity/EMS/queues/analytics/referrals --
+   * every one of them already-verified real, TypeORM/EmergencyPatientService-
+   * backed sources -- no fixture data.
+   */
+  emergencyOperatingSurfaces: BACKEND_CAPABILITY_STATUS.REAL,
   emergencyDispatch: BACKEND_CAPABILITY_STATUS.DEMO,
   emergencyDiagnosticsView: BACKEND_CAPABILITY_STATUS.DEMO,
   emergencyHandoffsView: BACKEND_CAPABILITY_STATUS.DEMO,

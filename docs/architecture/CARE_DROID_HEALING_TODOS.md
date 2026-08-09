@@ -19,6 +19,24 @@
 
 ## VALIDATED (this campaign, most recent first)
 
+### HEAL-008 — 5 of `EmergencyOsController`'s `DEMO`-labeled capability keys traced individually, all found genuinely real (same bug class as HEAL-002)
+
+- **Severity**: P2_MEDIUM
+- **Domain**: Documentation truthfulness / capability registry
+- **Source evidence**: Per-key trace (controller method → service → confirm real-data-source vs. fixture), same method used for HEAL-002, applied to the 6 keys HEAL-002's own investigation had flagged as needing individual verification. 5 of 6 confirmed real, not demo: `emergencyPatientJourney` (`EmergencyOsController.getJourney()` → `PatientJourneyService.getJourney()` → builds journey events from `EmergencyPatientService.listPatients()`); `emergencyQueues` (`getQueues()` → `QueueIntelligenceService.getQueues()` → buckets the same real patient list by `state`); `emergencyBoarding` (`getBoarding()` → `BoardingService.getBoarding()` → filters the same real patient list by `isBoarding()`); `emergencyEmsRuntime` (`getEMS()` → `EMSIntakeService.getEMSIntake()` → derives EMS arrivals from the same real patient list, filtered by EMS flags/complaint text); `emergencyOperatingSurfaces` (`getOperatingSurface()` → `EmergencyOperatingSurfacesService.getSurface()` → assembles real patients/alerts/capacity/EMS/queues/analytics/referrals, every one already independently verified real). None of the 5 controller routes carry any feature-flag/Mongoose gate — confirmed by reading each route's decorators directly, only `@RequirePermission`. The 6th named key, `emergencyDispatch`, has no dedicated backend route at all (only referenced as a page-level capability pairing alongside `emergencyOperatingSurfaces` in `pageApiBinding.registry.ts`) — genuinely ambiguous whether it names an independent capability or is a vestigial page-level label; left uninvestigated this round rather than guessed at.
+- **Affected files**: `src/config/backendApiCapabilities.ts`, `src/config/backendApiCapabilities.test.ts` (2 stale assertions corrected, 3 new assertions added for previously-unchecked keys)
+- **Runtime impact**: None (label-only correction; the underlying routes were already always-on and already returning real data — this only fixes what the frontend's capability registry *claims* about them).
+- **AI/ML impact**: N/A.
+- **Affected user profiles**: Any developer/future-audit consulting `backendApiCapabilities.ts` as a source of truth for what's real vs. fixture-backed (this file is the campaign's own primary reference for that question).
+- **Security/privacy impact**: None.
+- **Clinical-safety impact**: None directly — but a stale DEMO label understates real capability, which is the opposite failure mode from the campaign's usual concern (false REAL claims); still worth correcting for the registry's own truthfulness.
+- **Current status**: `VALIDATED`
+- **Dependencies**: None.
+- **Recommended canonical solution**: Applied for the 5 confirmed keys. `emergencyDispatch` and the remaining un-traced `DEMO` keys (`emergencyReassessment`, `emergencyOperationalIntelligence`, `emergencyPatientFlow`, `emergencyWorkflowOrchestration`, `careDroidUnifiedAINode`, `emergencyWorkflowAudit`, `emergencyIntegrationHub`, `emergencyProvincialHealth`, `emergencyCopilotRuntime`, `emergencyAdvancedDecisionSupport`, department-settings keys, fleet/device/surveillance keys, etc.) remain open — do not batch-correct; each needs its own individual trace, per this exact finding's own demonstrated pattern that "DEMO" and "real-but-mislabeled" are not reliably distinguishable without reading the actual service code.
+- **Validation requirements**: Frontend `tsc --noEmit` clean via ad-hoc tsconfig (`vitest` blocked in this sandbox). Empirically verified via a standalone `tsx` script confirming all 5 keys now return `'real'`. Backend regression check: `emergency-os.controller.spec.ts` 25/25 passing (confirms no behavioral change to the underlying routes, consistent with this being a label-only fix).
+- **Commit when resolved**: `TBD` (this round, pending commit).
+- **Scorecard impact when resolved**: Pending next scorecard sync pass.
+
 ### HEAL-001 — Hospital Map capacity KPIs permanently rendered demo data via a disabled-by-default endpoint
 
 - **Severity**: P1_HIGH
@@ -191,14 +209,6 @@
 - **Affected files**: `backend/src/modules/emergency-os/emergency-os.services.ts` (the `envelope()` helper, used by dozens of call sites)
 - **Current status**: `CONFIRMED`, narrowed and downgraded. Grepped the literal string `'backend-fixture'` across the whole frontend: exactly one real (non-test) consumer reads it — `src/pages/integrations/IntegrationHubPage.tsx:67`'s `<small>{envelope?.source || 'backend-fixture'}</small>`, sourced from `fetchIntegrationHub()` → `/api/emergency/integrations` → `IntegrationHubService.getIntegrationHub()`. Read that service directly: it genuinely IS hardcoded fixture data (`fhir-demo`/`hl7-demo`/`device-telemetry-demo`, explicit "External feeds are labeled placeholders until live credentials are configured" copy) — so the hardcoded `'backend-fixture'` label is, coincidentally, accurate for this one confirmed consumer, not actively misleading. No other real frontend page was found reading `.source` off any `EmergencyOsController` envelope (only 2 other hits, both test files). This does not rule out some consumer reading it via a non-literal comparison (e.g. `envelope.source !== 'real'`) that a plain string grep wouldn't catch, but no such pattern was found in a reasonable search.
 - **Recommended canonical solution**: Not urgent. The one confirmed real read is harmless. A full per-call-site truthfulness audit of all ~40+ `envelope()` call sites remains a legitimate but low-urgency P2/P3 cleanup (the field is misleading-by-construction, just not proven to be actively read anywhere it would matter) — fold into a future round rather than a dedicated one.
-
-### HEAL-008 — Possible broader pattern: other `EmergencyOsController` capability keys may share HEAL-002's stale-DEMO-label bug
-
-- **Severity**: P2_MEDIUM
-- **Domain**: Documentation truthfulness / capability registry
-- **Source evidence**: `src/config/backendApiCapabilities.ts` marks `emergencyPatientJourney`, `emergencyQueues`, `emergencyBoarding`, `emergencyEmsRuntime`, `emergencyOperatingSurfaces`, `emergencyDispatch`, and others `DEMO` alongside the just-corrected `emergencyCapacity`. Not yet individually verified whether each is genuinely fixture-backed (many likely are — `EmergencyOsController` has both real-data and genuinely-fixture-backed endpoints) or similarly stale.
-- **Affected files**: `src/config/backendApiCapabilities.ts`
-- **Current status**: `DISCOVERED` — needs a per-key trace (same method used for HEAL-002: read the controller method → service → confirm TypeORM-backed vs. hardcoded fixture data) before correcting any label. Do not batch-correct without individual verification — some of these probably are genuinely demo-only.
 
 ### HEAL-009 — Terminology gap review queue is write-only
 
