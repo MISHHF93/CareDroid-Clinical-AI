@@ -42,7 +42,7 @@ This session found the real root cause: Windows 11 Smart App Control (`VerifiedA
 - **Dependencies**: None. `emergencyWorkflowOrchestration` (and the untyped `workflowOrchestration` string referenced in `pageApiBinding.registry.ts:84` that has no matching key in `backendApiCapabilities.ts` at all — a possible separate small drift) remain untraced, flagged for a future round rather than guessed at here.
 - **Recommended canonical solution**: Applied.
 - **Validation requirements**: `npx vitest run src/config/backendApiCapabilities.test.ts src/config/pageApiBinding.registry.test.ts` — 2/2 files, 10/10 tests passing (first time this ledger has cited a real `vitest run` pass instead of the manual-verification fallback — see infrastructure note above). Full frontend `npx tsc --noEmit -p tsconfig.frontend.json` clean.
-- **Commit when resolved**: (pending — recorded at commit time)
+- **Commit when resolved**: `f66b43e5`
 - **Scorecard impact when resolved**: Pending next scorecard sync pass.
 
 ### HEAL-034 — `unified-navigation.config.test.ts` failed on HEAD: live `NAV_ITEMS` contains an `app-navigator` entry (`/navigator`) not present in the test's own `REQUESTED_ITEMS` canonical baseline — a stale test baseline, not a nav-config bug; test updated
@@ -57,7 +57,7 @@ This session found the real root cause: Windows 11 Smart App Control (`VerifiedA
 - **Dependencies**: None.
 - **Recommended canonical solution**: Applied.
 - **Validation requirements**: `npx vitest run src/config/unified-navigation.config.test.ts` — 14/14 tests passing (was 13/14).
-- **Commit when resolved**: (pending — recorded at commit time)
+- **Commit when resolved**: `f66b43e5`
 - **Scorecard impact when resolved**: Pending next scorecard sync pass.
 
 ### HEAL-037 — `WorkspaceContext.tsx`'s `switchWorkspace()` silently left `activeWorkspace` pointing at the PREVIOUS workspace's data (assistantContext/shortcuts/toolIds/workspaceProfile/etc.) when switching to a workspace that exists only in the local `CARE_WORKSPACES` registry but not in the backend's per-user workspace membership list
@@ -77,7 +77,7 @@ This session found the real root cause: Windows 11 Smart App Control (`VerifiedA
 - **Dependencies**: None.
 - **Recommended canonical solution**: Applied. A more thorough future fix could make `mergeWorkspacesWithRegistry` eagerly include all local-registry workspaces up front (not just enrich existing ones), which would make this particular lazy add-on-switch patch unnecessary — left as a possible follow-up, not required to close this bug.
 - **Validation requirements**: `npx vitest run src/test/WorkspaceContext.backend.test.tsx src/test/WorkspaceContext.test.tsx` — 2/2 files, 25/25 tests passing. `npx vitest run` on 4 other real `useWorkspace()` consumer test files (`OrganizationIntelligenceProfile.test.tsx`, `ProfileToolPreferences.test.tsx`, `ToolsOverview.inventory.test.tsx`, `ToolsOverview.visibility.test.tsx`) — 4/4 files, 33/33 tests passing, zero regressions. Full frontend `npx tsc --noEmit -p tsconfig.frontend.json` clean.
-- **Commit when resolved**: (pending — recorded at commit time)
+- **Commit when resolved**: `f66b43e5`
 - **Scorecard impact when resolved**: Pending next scorecard sync pass — likely a positive callout for Domain "Operational State Architecture"/state-integrity criteria, and the first bug this campaign has both discovered AND confirmed-fixed via a real `vitest run` pass rather than manual source tracing alone.
 
 ### HEAL-036 — `backendHttpRouteInventory.ts` (the static route registry backing `backendFrontendExposure.test.ts`/`backendOrphanAudit.test.ts`'s wiring-contract tests) was missing 6 real, already-live routes — `PATCH /api/emergency/transfers/:id/status`, `PATCH /api/emergency/ems/arrivals/:arrivalId/status`, `POST /api/emergency/waiting-room-safety/escalation-notify`, and all 3 `AppNavigatorController` routes — causing 6 real test failures across 2 files that misreported already-real, already-wired routes as "frontend-visible but backend missing" / "missing from inventory"
@@ -93,7 +93,7 @@ This session found the real root cause: Windows 11 Smart App Control (`VerifiedA
 - **Dependencies**: None.
 - **Recommended canonical solution**: Applied. This registry has now twice needed a manual catch-up fix after a real route shipped (this entry, plus its own history) — worth a future consideration of generating it from a live decorator scan (`backendControllerRouteScan.ts`'s `scanNestControllerRoutes()` already does exactly this) rather than hand-maintaining a parallel static list, though that's a larger refactor than this bounded fix.
 - **Validation requirements**: `npx vitest run src/data/backendFrontendExposure.test.ts src/data/backendOrphanAudit.test.ts src/data/backendFrontendExposure.report.test.ts src/data/backendControllerRouteScan.test.ts` — 4/4 files, all tests passing (was 3 files with 6 failures combined across them before this fix).
-- **Commit when resolved**: (pending — recorded at commit time)
+- **Commit when resolved**: `f66b43e5`
 - **Scorecard impact when resolved**: Pending next scorecard sync pass.
 
 ### HEAL-035 — Backend `express-rate-limit` dependency was unused dead weight — zero imports anywhere in `backend/src`; real rate limiting is done via `@nestjs/throttler`
@@ -108,7 +108,7 @@ This session found the real root cause: Windows 11 Smart App Control (`VerifiedA
 - **Dependencies**: None.
 - **Recommended canonical solution**: Applied — removed.
 - **Validation requirements**: Backend `npx tsc --noEmit -p tsconfig.build.json` clean. Real `npx nest build` succeeded post-removal.
-- **Commit when resolved**: (pending — recorded at commit time)
+- **Commit when resolved**: `f66b43e5`
 - **Scorecard impact when resolved**: Pending next scorecard sync pass.
 
 ### HEAL-EPIC-A category update — "Express/Mongoose runtime" investigated (2026-08-09), the last of the 14 named categories to be checked; comes back almost entirely clean, pointing to existing docs rather than duplicating them
