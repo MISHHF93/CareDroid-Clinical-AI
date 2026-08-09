@@ -135,7 +135,7 @@
 - **Dependencies**: None.
 - **Recommended canonical solution**: Applied — let each heuristic function's own honest `'demo'` default stand everywhere except the deliberate `'simulated'` passthrough case.
 - **Validation requirements**: Backend `native-ai.service.spec.ts` (3/3) + `native-ai.controller-authorization.spec.ts` (13/13 combined) passing via `npx jest native-ai`. Frontend `tsc --noEmit` clean via ad-hoc tsconfig (`vitest` blocked in this sandbox per established constraint). Empirically verified via a standalone `tsx` script exercising the real `buildNativeAiPatientSnapshot()`: default case now returns `routing=demo triage=demo specialists=demo` (previously `live`/`live`/`live`); `sourceState: 'simulated'` still correctly propagates `simulated` to all 3.
-- **Commit when resolved**: pending (this round).
+- **Commit when resolved**: `542bb11a`
 - **Scorecard impact when resolved**: Pending next scorecard sync pass (Domain 12 — AI Governance & Operational Intelligence).
 
 ### HEAL-010b — `RoutingOptimizerService`'s independent re-pick — investigated, real but lower severity than framed, fixed via disclosure not reconciliation
