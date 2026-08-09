@@ -5,13 +5,12 @@
  * compatibility bridges with legacy type definitions.
  *
  * Migration strategy:
- * - New code should import from '@/contracts' or '@/contracts/domains'
+ * - New code should import from '@/contracts'
  * - Legacy code continues to import from '@/types/emergency'
  * - Over time, migrate imports to use these canonical types
  */
 
 // Re-export all canonical types
-export * from './domains';
 export * from './results';
 export * from './accountableAi';
 
