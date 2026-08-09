@@ -28,6 +28,19 @@ function round(value: number, precision = 3): number {
   return Math.round(value * factor) / factor;
 }
 
+/**
+ * Research prototype (backendRouteExposurePolicy.ts: "not exposed in active
+ * ED shell", zero real frontend callers as of 2026-08-08). Despite the class
+ * name, this contains no trained model, no real audio transcription, and no
+ * real ECG signal-morphology analysis -- predictOHCA()/predictECG() are
+ * hand-coded keyword/threshold heuristics, and every branch's `confidence`
+ * value is a hardcoded literal (0.91/0.86/0.82/0.51 for ECG; a weighted-sum
+ * formula for OHCA), not a model-reported uncertainty estimate. Kept as a
+ * deterministic, understandable heuristic deliberately -- the fix here was
+ * removing a fabricated hardcoded fallback transcript (see
+ * transcribeWithNoiseFiltering), not building real ML infrastructure this
+ * research surface doesn't need yet.
+ */
 @Injectable()
 export class AICallInterrogationService {
   private readonly criticalKeywords = [
@@ -109,19 +122,36 @@ export class AICallInterrogationService {
     };
   }
 
+  /**
+   * No real speech-to-text integration exists here -- this is a research
+   * prototype (see backendRouteExposurePolicy.ts: "not exposed in active ED
+   * shell", zero real frontend callers). Decoding an audio Buffer as raw
+   * UTF-8 text only ever produces intelligible output for a caller-supplied
+   * transcriptHint (used for local/test input); real audio bytes are not
+   * valid UTF-8 text, so this path is expected to fail for genuine audio.
+   *
+   * Previously, a failed decode silently fell back to a HARDCODED fake
+   * transcript ("Caller reports patient collapsed and is not breathing
+   * after becoming unconscious.") -- a fixed, maximally-alarming clinical
+   * narrative that would fire for essentially every real (non-hint) call,
+   * since real audio buffers almost never decode to non-empty text this
+   * way. Every downstream consumer (detectOHCA's keyword match, the
+   * probability formula, recommendDispatch's priority-1 escalation) would
+   * then act on fabricated, worst-case-by-construction input rather than
+   * an honest "transcription unavailable" signal. Fails to an explicit
+   * empty transcript instead -- callers must treat that as "no signal",
+   * not as evidence of anything.
+   */
   private async transcribeWithNoiseFiltering(
     audioStream: Buffer,
     transcriptHint?: string,
   ): Promise<string> {
     if (transcriptHint?.trim()) return transcriptHint.trim();
-    const decoded = audioStream
+    return audioStream
       .toString('utf8')
       .replace(/[^\w\s.,!?-]/g, ' ')
       .replace(/\s+/g, ' ')
       .trim();
-    return (
-      decoded || 'Caller reports patient collapsed and is not breathing after becoming unconscious.'
-    );
   }
 
   private async predictOHCA(input: {

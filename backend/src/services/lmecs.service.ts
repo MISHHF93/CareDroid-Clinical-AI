@@ -36,6 +36,21 @@ function round(value: number, precision = 3): number {
   return Math.round(value * factor) / factor;
 }
 
+/**
+ * Research prototype (backendRouteExposurePolicy.ts: "no SPA client is
+ * wired", zero real frontend callers as of 2026-08-08). Despite the name
+ * ("federated learning"), getLocalModel() loads no per-hospital trained
+ * model -- it always runs the same deterministic weighted-sum formula
+ * (scoreSeverity()), with a single-character-derived `hospitalCalibration`
+ * offset (hospitalId.charCodeAt(0) % 5) standing in for real per-hospital
+ * model differentiation. explainSeverity()'s output used to be exposed as
+ * `shapValues` -- a specific, real explainability technique (SHapley
+ * Additive exPlanations) this code does not compute; it's a plain list of
+ * which hand-coded thresholds were crossed. Renamed to avoid the false
+ * claim. Kept as a deterministic heuristic deliberately -- the fix here was
+ * correcting the label, not building real SHAP/federated-learning
+ * infrastructure this research surface doesn't need yet.
+ */
 @Injectable()
 export class LMECSService {
   async selectOptimalClients(clients: HospitalClient[]): Promise<HospitalClient[]> {
@@ -65,7 +80,7 @@ export class LMECSService {
     return {
       severityLevel: this.mapToSeverity(prediction.score),
       confidence: prediction.confidence,
-      contributingFactors: prediction.shapValues,
+      contributingFactors: prediction.explanationFactors,
     };
   }
 
@@ -86,7 +101,7 @@ export class LMECSService {
     predict: (data: SeverityPredictionInput) => Promise<{
       score: number;
       confidence: number;
-      shapValues: string[];
+      explanationFactors: string[];
     }>;
   }> {
     return {
@@ -95,7 +110,7 @@ export class LMECSService {
         return {
           score,
           confidence: round(clamp(0.62 + Math.abs(score - 0.5) * 0.55, 0.58, 0.96)),
-          shapValues: this.explainSeverity(data, score),
+          explanationFactors: this.explainSeverity(data, score),
         };
       },
     };
