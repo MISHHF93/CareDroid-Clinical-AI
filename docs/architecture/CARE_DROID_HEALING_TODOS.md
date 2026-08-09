@@ -131,7 +131,7 @@ Full Explore-agent investigation (see HEAL-035 for the one bounded fix it produc
 - **Dependencies**: None.
 - **Recommended canonical solution**: Applied.
 - **Validation requirements**: `npx vitest run src/pages/organization/OrganizationOnboarding.test.tsx` — 4/4 tests passing (renders required fields; auto-derives slug from name until edited directly; submits the real DTO shape and redirects on success; surfaces the backend error message and does not navigate on failure). Full frontend `npx tsc --noEmit -p tsconfig.frontend.json` and ESLint clean. `npx vitest run src/config/unified-navigation.config.test.ts src/lib/navigation.test.ts src/data/pageDispositionFixture.test.ts` — 3/3 files, all tests passing (after fixing the 2 fixture constants this new page's own addition drifted).
-- **Commit when resolved**: (pending — recorded at commit time)
+- **Commit when resolved**: `5a51624c`
 - **Scorecard impact when resolved**: Pending next scorecard sync pass — a genuine "missing page built" credit, the first of this campaign under the user's 2026-08-09 page-completeness directive.
 
 ### HEAL-046 — Found and removed 8 live, currently-clickable dead `<Link>`s across 2 real, mounted pages (`Settings.tsx`, `OrganizationPages.tsx`) pointing at routes with no backing page anywhere in the codebase
@@ -150,7 +150,7 @@ Full Explore-agent investigation (see HEAL-035 for the one bounded fix it produc
 - **Dependencies**: None. A real "Products" catalog page, "Configuration Studio," "Outcomes" dashboard, "Value tracking" page, "Customer success" page (distinct from the already-tracked orphaned `CustomerSuccessDashboard` component under HEAL-025 — this was a different, never-built page under the same concept name), "Solution Builder," and "Feature management" page all remain unbuilt concepts with no real spec anywhere in the codebase (unlike HEAL-047's `/onboarding`, none of these have a backing backend contract to build a non-speculative page against) — removing the dead links converges the UI to only promise what's real; building any of them for real is a separate, larger, product-scoped undertaking deliberately not attempted here.
 - **Recommended canonical solution**: Applied (removal). Building real replacements for any of these named concepts needs product definition first — not guessed at.
 - **Validation requirements**: `npx tsc --noEmit -p tsconfig.frontend.json` and ESLint clean on both files. `npx vitest run` on all 9 real test files covering these 2 pages (`Settings.test.ts`, `AssetLifecycleAdmin.test.tsx`, `AssetPackMarketplace.test.tsx`, `CustomerSuccessDashboard.test.tsx`, `DepartmentsPage.test.tsx`, `OrganizationIntelligenceProfile.test.tsx`, `PlatformAnalyticsPage.test.tsx`, `ServiceLinesPage.test.tsx`, `TenantAdministrationCenter.test.tsx`) — 9/9 files, 14/14 tests passing, zero regressions.
-- **Commit when resolved**: (pending — recorded at commit time)
+- **Commit when resolved**: `5a51624c`
 - **Scorecard impact when resolved**: Pending next scorecard sync pass.
 
 ### HEAL-045 — `routes.config.ts` contains 2 separate, independently-hand-edited route registries (`CANONICAL_ROUTE_MAP`, the real one driving navigation/authorization, and `ROUTE_RECORDS`, a ~704-line/74-entry duplicate consumed only by self-referential audit/documentation tooling) that have drifted — `ROUTE_RECORDS` both misreports real routes as unbuilt and misreports unbuilt routes as active, actively misleading the campaign's own audit tools
