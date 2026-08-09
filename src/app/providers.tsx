@@ -7,7 +7,6 @@ import { WorkspaceProvider } from '../contexts/WorkspaceContext';
 import { OrganizationContextProvider } from '../contexts/OrganizationContext';
 import { WhiteLabelProvider } from '../contexts/WhiteLabelContext';
 import { UserIdentityProvider } from '../contexts/UserIdentityContext';
-import { CostTrackingProvider } from '../contexts/CostTrackingContext';
 import { SystemConfigProvider } from '../contexts/SystemConfigContext';
 import { TenantContextProvider } from '../contexts/TenantContext';
 import OfflineProvider from '../contexts/OfflineProvider';
@@ -29,28 +28,26 @@ export function AppProviders({ children }: AppProvidersProps) {
     <ThemeProvider>
       <UserProvider>
         <WorkspaceProvider>
-          <CostTrackingProvider>
-            <ToolPreferencesProvider>
-              <TenantContextProvider>
-                <UserIdentityProvider>
-                  <OrganizationContextProvider>
-                    <WhiteLabelProvider>
-                      <ConversationProvider>
-                        <SystemConfigProvider>
-                          <OfflineProvider>
-                            <SimulationModeProvider>
-                              <ThreeMinuteTimerEngineMount />
-                              {children}
-                            </SimulationModeProvider>
-                          </OfflineProvider>
-                        </SystemConfigProvider>
-                      </ConversationProvider>
-                    </WhiteLabelProvider>
-                  </OrganizationContextProvider>
-                </UserIdentityProvider>
-              </TenantContextProvider>
-            </ToolPreferencesProvider>
-          </CostTrackingProvider>
+          <ToolPreferencesProvider>
+            <TenantContextProvider>
+              <UserIdentityProvider>
+                <OrganizationContextProvider>
+                  <WhiteLabelProvider>
+                    <ConversationProvider>
+                      <SystemConfigProvider>
+                        <OfflineProvider>
+                          <SimulationModeProvider>
+                            <ThreeMinuteTimerEngineMount />
+                            {children}
+                          </SimulationModeProvider>
+                        </OfflineProvider>
+                      </SystemConfigProvider>
+                    </ConversationProvider>
+                  </WhiteLabelProvider>
+                </OrganizationContextProvider>
+              </UserIdentityProvider>
+            </TenantContextProvider>
+          </ToolPreferencesProvider>
         </WorkspaceProvider>
       </UserProvider>
     </ThemeProvider>

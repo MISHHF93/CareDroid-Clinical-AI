@@ -129,34 +129,6 @@ vi.mock('../hooks/useRouteScreenMode', () => ({
   default: () => 'clinical_workstation',
 }));
 
-vi.mock('../contexts/CostTrackingContext', () => ({
-  useCostTracking: () => ({
-    costData: {
-      totalCost: 2.5,
-      monthlyCost: 1.25,
-      categoryCosts: { 'AI System': 1.25 },
-      executions: [
-        { id: 'exec-1', toolId: 'ai-gateway', cost: 0.5, timestamp: new Date().toISOString() },
-      ],
-    },
-    costLimit: 10,
-    isLoading: false,
-    getTopSpendingTools: () => [{ toolId: 'ai-gateway', cost: 1.25, executions: 2 }],
-    getCostTrends: () => [{ date: new Date().toISOString(), cost: 1.25 }],
-    updateCostLimit: vi.fn(),
-    resetCostData: vi.fn(),
-    getROIMetrics: () => ({
-      timeSavedHours: '2.0',
-      valueSaved: '15.00',
-      totalCost: '2.50',
-      netValue: '12.50',
-      roi: '500',
-    }),
-    isCostLimitApproaching: () => false,
-    isCostLimitExceeded: () => false,
-  }),
-}));
-
 vi.mock('../contexts/UserIdentityContext', () => ({
   useUserIdentity: () => ({
     userId: '11111111-1111-4111-8111-111111111111',

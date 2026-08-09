@@ -19,6 +19,25 @@
 
 ## VALIDATED (this campaign, most recent first)
 
+### HEAL-018 — `CostTrackingContext.tsx`/`CostTrackingProvider` was globally-mounted dead code, deleted (HEAL-EPIC-A, second bounded slice)
+
+- **Severity**: P3_LOW
+- **Domain**: Dead-code reachability (HEAL-EPIC-A's "old stores/providers" category)
+- **Source evidence**: Found via the same low-consumer-count sweep that surfaced HEAL-017: `src/contexts/CostTrackingContext.tsx` exported `CostTrackingProvider` (mounted at the app root) and `useCostTracking()`. Exhaustive grep for `useCostTracking` found only the context's own dedicated unit test (`renderHook`-based, tests the isolated hook/provider logic, not any real consuming UI) and one defensive `vi.mock(...)` in `routePagesSmoke.test.tsx` that was never actually exercised by any real route component. Unlike `WhiteLabelContext`/`OfflineProvider` (both checked and correctly kept — they mutate `document`/CSS variables or render real UI/perform real side effects independent of any hook consumer), `CostTrackingProvider` has no side effects beyond `localStorage` read of data that only changes via `trackToolCost()`/`updateCostLimit()`/`resetCostData()` — all 3 unreachable, since `useCostTracking()` is the only way to obtain them and it has zero real callers. No dashboard page (`CostAnalyticsDashboard.tsx`, the real, live cost page) actually imports it — confirmed directly, ruling out a `FUTURE_MODULE` classification. Independently corroborated by a separate, pre-existing audit catalog (`src/data/sourceCodeToolDiscovery.ts`) that already tags every tool ID sourced from `CostTrackingContext`'s `TOOL_COSTS`/`TOOL_ID_ALIASES` constants as `status: 'phantom'` — built by unrelated tooling, consistent with this same file never having been wired to anything real.
+- **Affected files**: `src/contexts/CostTrackingContext.tsx` (deleted), `src/test/CostTrackingContext.test.tsx` (deleted — tested only the now-removed isolated logic, no real integration), `src/app/providers.tsx`, `src/routing/canonicalRouteTree.testShared.tsx`, `src/test/pilotWalkthrough.test.tsx` (import + provider-wrap removed), `src/test/routePagesSmoke.test.tsx` (dead defensive mock removed)
+- **Runtime impact**: One fewer Context.Provider re-rendering on every app render for a component tree with zero real consumers.
+- **Frontend impact**: No behavior change for any real user-facing feature (confirmed zero consumers). The real Cost Analytics Dashboard (`src/pages/ai/CostAnalyticsDashboard.tsx`) sources its data elsewhere and is untouched.
+- **AI/ML impact**: N/A.
+- **Affected user profiles**: None directly (invisible dead code).
+- **Security/privacy impact**: None.
+- **Clinical-safety impact**: None.
+- **Current status**: `VALIDATED`
+- **Dependencies**: None.
+- **Recommended canonical solution**: Applied — `DELETE_PROVEN_DEAD` per the epic's own 6-way disposition taxonomy.
+- **Validation requirements**: Full frontend `tsc --noEmit -p tsconfig.frontend.json` clean (whole-repo). ESLint clean on all 4 touched files. `vitest` blocked in this sandbox; change is purely subtractive and a full-repo `tsc` pass would catch any JSX/import mismatch.
+- **Commit when resolved**: `TBD` (this round, pending commit).
+- **Scorecard impact when resolved**: Pending next scorecard sync pass.
+
 ### HEAL-017 — `NotificationContext.tsx`/`NotificationProvider` was globally-mounted dead code, deleted (HEAL-EPIC-A, first bounded slice)
 
 - **Severity**: P3_LOW
@@ -278,7 +297,7 @@ These are each genuinely multi-day/multi-round efforts per the operating directi
 
 ### HEAL-EPIC-A — Dead-code reachability sweep (14 named legacy categories)
 
-Old dashboards, Android/mobile paths, Express/Mongoose runtime, duplicate AI services, unused classifier models, stale symptom datasets, old calculators, prototype workspaces, duplicate AppShells, alternate API clients, old stores/providers, old notification systems, unused route trees, experimental integrations. 6-way disposition required per artifact (KEEP_CANONICAL/MIGRATE_THEN_REMOVE/QUARANTINE/DELETE_PROVEN_DEAD/FUTURE_MODULE/MANUAL_REVIEW), verified via DI/dynamic-import/registry/build-script/test/config evidence, not import counts alone. **Status: first bounded slice complete (HEAL-017, "old notification systems" category — `NotificationContext.tsx` deleted, `DELETE_PROVEN_DEAD`)**; 13 of 14 categories remain unswept. HEAL-004 (`ai/foundation/`, "duplicate AI services") was a separate, earlier, opportunistic instance, not from this systematic sweep either — 2 concrete instances closed opportunistically so far, no category fully audited end-to-end yet.
+Old dashboards, Android/mobile paths, Express/Mongoose runtime, duplicate AI services, unused classifier models, stale symptom datasets, old calculators, prototype workspaces, duplicate AppShells, alternate API clients, old stores/providers, old notification systems, unused route trees, experimental integrations. 6-way disposition required per artifact (KEEP_CANONICAL/MIGRATE_THEN_REMOVE/QUARANTINE/DELETE_PROVEN_DEAD/FUTURE_MODULE/MANUAL_REVIEW), verified via DI/dynamic-import/registry/build-script/test/config evidence, not import counts alone. **Status: 2 bounded slices complete** — HEAL-017 ("old notification systems" — `NotificationContext.tsx` deleted) and HEAL-018 ("old stores/providers" — `CostTrackingContext.tsx` deleted), both `DELETE_PROVEN_DEAD`, both found via the same low-consumer-count sweep of `src/contexts/*`. `WhiteLabelContext`/`OfflineProvider` were also checked in the same sweep and correctly kept (real side effects independent of any hook consumer — CSS variables/document title/favicon, and service-worker/offline-sync/rendered banners respectively). 12 of 14 named categories remain unswept, and `src/contexts/*` itself isn't necessarily exhausted (only checked contexts with suspiciously low consumer counts). HEAL-004 (`ai/foundation/`, "duplicate AI services") was a separate, earlier, opportunistic instance, not from this systematic sweep either.
 
 ### HEAL-EPIC-B — 8-profile end-to-end integration test matrix
 

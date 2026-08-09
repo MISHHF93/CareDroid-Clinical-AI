@@ -11,7 +11,6 @@ import { WorkspaceProvider } from '../contexts/WorkspaceContext';
 import { OrganizationContextProvider } from '../contexts/OrganizationContext';
 import { WhiteLabelProvider } from '../contexts/WhiteLabelContext';
 import { UserIdentityProvider } from '../contexts/UserIdentityContext';
-import { CostTrackingProvider } from '../contexts/CostTrackingContext';
 import { SystemConfigProvider } from '../contexts/SystemConfigContext';
 import { TenantContextProvider } from '../contexts/TenantContext';
 import { useUser } from '../contexts/UserContext';
@@ -172,27 +171,25 @@ function AppRouteHarness({ initialPath = '/emergency/whiteboard' }) {
       <ThemeProvider>
         <UserProvider>
           <WorkspaceProvider>
-            <CostTrackingProvider>
-              <ToolPreferencesProvider>
-                <TenantContextProvider>
-                  <UserIdentityProvider>
-                    <OrganizationContextProvider>
-                      <WhiteLabelProvider>
-                        <ConversationProvider>
-                          <SystemConfigProvider>
-                            <Suspense fallback={<div>Loading route</div>}>
-                              <DemoAccessRole />
-                              <AppRoutes />
-                              <PilotRouteControls />
-                            </Suspense>
-                          </SystemConfigProvider>
-                        </ConversationProvider>
-                      </WhiteLabelProvider>
-                    </OrganizationContextProvider>
-                  </UserIdentityProvider>
-                </TenantContextProvider>
-              </ToolPreferencesProvider>
-            </CostTrackingProvider>
+            <ToolPreferencesProvider>
+              <TenantContextProvider>
+                <UserIdentityProvider>
+                  <OrganizationContextProvider>
+                    <WhiteLabelProvider>
+                      <ConversationProvider>
+                        <SystemConfigProvider>
+                          <Suspense fallback={<div>Loading route</div>}>
+                            <DemoAccessRole />
+                            <AppRoutes />
+                            <PilotRouteControls />
+                          </Suspense>
+                        </SystemConfigProvider>
+                      </ConversationProvider>
+                    </WhiteLabelProvider>
+                  </OrganizationContextProvider>
+                </UserIdentityProvider>
+              </TenantContextProvider>
+            </ToolPreferencesProvider>
           </WorkspaceProvider>
         </UserProvider>
       </ThemeProvider>
