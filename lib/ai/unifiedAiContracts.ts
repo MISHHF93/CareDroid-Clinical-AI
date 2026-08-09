@@ -6,6 +6,8 @@
  * `structuredData` — they wrap them with status, safety, evidence, and audit.
  */
 
+import type { AIResponseSourceCategory, ProvenanceEvidenceItem } from './provenanceContract';
+
 export const CARE_DROID_AI_CHANNELS = [
   'reception',
   'ems',
@@ -146,6 +148,15 @@ export interface CareDroidUnifiedAIResponse {
   structuredData?: unknown;
   evidence: CareDroidEvidenceReference[];
   citations: CareDroidCitationReference[];
+  /**
+   * How this response was actually produced (LLM_GENERATED vs
+   * DETERMINISTIC_RULE vs FIXTURE_DEMO, etc.) -- see
+   * lib/ai/provenanceContract.ts's AIResponseSourceCategory, whose own doc
+   * comment calls this "the single question a clinician most needs
+   * answered." Optional: only set when the underlying node response carries
+   * the canonical provenance contract (see mapHeuristicNodeToUnifiedResponse).
+   */
+  responseSource?: AIResponseSourceCategory;
   confidence?: number;
   uncertainty: string[];
   missingInformation: string[];
@@ -286,6 +297,20 @@ export function buildBlockedUnifiedResponse(input: {
   };
 }
 
+function mapProvenanceEvidenceToUnified(
+  evidence: ProvenanceEvidenceItem[] | undefined,
+): CareDroidEvidenceReference[] {
+  if (!evidence || evidence.length === 0) return [];
+  return evidence.map((item) => ({
+    id: item.id,
+    title: item.title,
+    sourceType: item.kind,
+    url: item.url,
+    snippet: item.excerpt,
+    score: item.score,
+  }));
+}
+
 export function mapHeuristicNodeToUnifiedResponse(input: {
   requestId: string;
   correlationId: string;
@@ -300,6 +325,16 @@ export function mapHeuristicNodeToUnifiedResponse(input: {
   uncertainty?: string[];
   limitations?: string[];
   humanReview?: CareDroidHumanReviewReference;
+  /**
+   * Real provenance carried by the underlying node response, when it has
+   * the canonical contract (lib/ai/provenanceContract.ts). Previously
+   * dropped entirely at this boundary -- evidence/citations were hardcoded
+   * empty and responseSource had nowhere to go -- silently discarding real
+   * data for every /api/ai/unified consumer even when the underlying node
+   * had genuine evidence and a real source category.
+   */
+  evidence?: ProvenanceEvidenceItem[];
+  responseSource?: AIResponseSourceCategory;
 }): CareDroidUnifiedAIResponse {
   const needsReview = input.requiresClinicianReview;
   return {
@@ -309,8 +344,9 @@ export function mapHeuristicNodeToUnifiedResponse(input: {
     responseType: input.status === 'error' ? 'error' : 'recommendation',
     content: input.content,
     structuredData: { intent: input.intent },
-    evidence: [],
+    evidence: mapProvenanceEvidenceToUnified(input.evidence),
     citations: [],
+    responseSource: input.responseSource,
     confidence: input.confidence,
     uncertainty: input.uncertainty || [],
     missingInformation: input.missingInformation || [],

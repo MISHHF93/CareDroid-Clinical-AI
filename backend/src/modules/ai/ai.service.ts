@@ -882,6 +882,8 @@ export class AIService {
         humanReview: nodeResponse.requiresClinicianReview
           ? { status: 'pending', reviewType: 'clinical_ai', severity: 'high' }
           : undefined,
+        evidence: nodeResponse.provenance?.evidence,
+        responseSource: nodeResponse.provenance?.responseSource,
       });
 
       return {
