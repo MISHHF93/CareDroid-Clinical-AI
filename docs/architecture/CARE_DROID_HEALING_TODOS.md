@@ -34,7 +34,7 @@
 - **Dependencies**: None.
 - **Recommended canonical solution**: Applied for the 7 confirmed keys. `emergencyDispatch`, `emergencyOperationalIntelligence`, `emergencyWorkflowOrchestration`, `careDroidUnifiedAINode` (all checked, genuinely mixed/ambiguous, correctly left `DEMO`), and the remaining fully-un-traced `DEMO` keys (`emergencyWorkflowAudit`, `emergencyIntegrationHub` — already separately confirmed genuinely fixture-backed per HEAL-007, `emergencyProvincialHealth`, `emergencyCopilotRuntime`, `emergencyAdvancedDecisionSupport`, department-settings keys, fleet/device/surveillance keys, etc.) remain open — do not batch-correct; each needs its own individual trace, per this exact finding's own demonstrated pattern that "DEMO" and "real-but-mislabeled" are not reliably distinguishable without reading the actual service code.
 - **Validation requirements**: Frontend `tsc --noEmit` clean via ad-hoc tsconfig (`vitest` blocked in this sandbox). Empirically verified via standalone `tsx` scripts confirming all 7 keys now return `'real'`. Backend regression check: full `emergency-os` module suite, 25/25 suites, 189/189 tests passing (confirms no behavioral change to the underlying routes, consistent with this being a label-only fix).
-- **Commit when resolved**: `236647a4` (round 1), `TBD` (round 2, pending commit)
+- **Commit when resolved**: `236647a4` (round 1), `39c6013f` (round 2)
 - **Scorecard impact when resolved**: Pending next scorecard sync pass.
 
 ### HEAL-001 — Hospital Map capacity KPIs permanently rendered demo data via a disabled-by-default endpoint
