@@ -50,8 +50,6 @@ function downloadJsonExport(data) {
 
 const Settings = () => {
   const surfaces = usePractitionerSurfaceVisibility();
-  const [notifications, setNotifications] = useState(true);
-  const [safetyBanner, setSafetyBanner] = useState(true);
   const [privacyDrawerAction, setPrivacyDrawerAction] = useState<any>(null);
   const [privacyLoading, setPrivacyLoading] = useState(false);
   const [privacyStatus, setPrivacyStatus] = useState({ type: 'idle', message: '' });
@@ -393,23 +391,9 @@ const Settings = () => {
               <div className="settings-toggle-row__title">Notifications</div>
               <div className="settings-toggle-row__description">AI results and alerts</div>
             </div>
-            <input
-              type="checkbox"
-              checked={notifications}
-              onChange={() => setNotifications(!notifications)}
-            />
-          </div>
-
-          <div className="settings-toggle-row">
-            <div>
-              <div className="settings-toggle-row__title">Safety banner</div>
-              <div className="settings-toggle-row__description">Always show clinical disclaimer</div>
-            </div>
-            <input
-              type="checkbox"
-              checked={safetyBanner}
-              onChange={() => setSafetyBanner(!safetyBanner)}
-            />
+            <Link to="/notification-preferences">
+              <Button variant="secondary">Manage notification preferences</Button>
+            </Link>
           </div>
 
           <section className="settings-privacy-card" aria-labelledby="privacy-data-title">
