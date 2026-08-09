@@ -1,8 +1,11 @@
-import { Injectable, Logger, NotFoundException, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, OnModuleInit, Optional } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import type { Repository } from 'typeorm';
 import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
 import { randomUUID } from 'crypto';
 import { MoERouterService } from '../moe-router';
+import { TrainingRunEntity } from './entities/training-run.entity';
 import {
   CreateTrainingRunDto,
   EvaluateTrainingRunDto,
@@ -66,10 +69,52 @@ export class TrainingService implements OnModuleInit {
     },
   ];
 
-  constructor(private readonly moeRouter: MoERouterService) {}
+  constructor(
+    private readonly moeRouter: MoERouterService,
+    @Optional()
+    @InjectRepository(TrainingRunEntity)
+    private readonly runRepository?: Repository<TrainingRunEntity>,
+  ) {}
 
-  onModuleInit(): void {
+  async onModuleInit(): Promise<void> {
     this.syncUnifiedModelMetricsFromDisk();
+    await this.rehydrateRunsFromDatabase();
+  }
+
+  /**
+   * Load durable training runs from TypeORM so a real run created/evaluated
+   * via createRun()/evaluateRun() survives a process restart instead of
+   * silently disappearing, along with its provenance -- the same fix
+   * HEAL-020 applied to EvaluationService, this module's structural sibling.
+   * Runs synced from disk metrics above (training-run-baseline,
+   * training-run-artifact-router) are never persisted here and are
+   * deliberately skipped on id collision, so this can never override their
+   * fresh-from-disk values with a stale DB row.
+   */
+  private async rehydrateRunsFromDatabase(): Promise<void> {
+    if (!this.runRepository) return;
+    try {
+      const rows = await this.runRepository.find({ order: { createdAt: 'DESC' } });
+      for (const row of rows) {
+        try {
+          const run = JSON.parse(row.runJson) as TrainingRun;
+          if (this.runs.some((existing) => existing.id === run.id)) continue;
+          this.runs.unshift(run);
+        } catch (parseError) {
+          this.logger.warn(`Failed to parse persisted training run ${row.id}: ${parseError}`);
+        }
+      }
+    } catch (error) {
+      this.logger.warn(`Failed to rehydrate training runs from database: ${error}`);
+    }
+  }
+
+  private persistRunToDatabase(run: TrainingRun): void {
+    if (!this.runRepository) return;
+    const entity = this.runRepository.create({ id: run.id, runJson: JSON.stringify(run) });
+    this.runRepository.save(entity).catch((error) => {
+      this.logger.warn(`Failed to persist training run ${run.id} to database: ${error}`);
+    });
   }
 
   private syncUnifiedModelMetricsFromDisk(): void {
@@ -311,6 +356,7 @@ export class TrainingService implements OnModuleInit {
       provenance: 'UNKNOWN',
     };
     this.runs.unshift(run);
+    this.persistRunToDatabase(run);
     this.logger.log(`Queued training run ${run.id} for ${run.modelName}`);
     return run;
   }
@@ -337,6 +383,7 @@ export class TrainingService implements OnModuleInit {
     // promotion-eligible aggregate. See EvaluateTrainingRunDto.provenance.
     run.provenance = isEvaluationMetricProvenance(dto.provenance) ? dto.provenance : 'UNKNOWN';
     run.updatedAt = new Date().toISOString();
+    this.persistRunToDatabase(run);
     return run;
   }
 
