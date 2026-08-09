@@ -88,6 +88,12 @@ pages-map.txt
 bug-inventory-report.json
 source-dirt-report.json
 
-# Tesseract.js OCR language data (auto-downloaded at runtime, machine-local, safe to regenerate)
+# Tesseract.js OCR language data. eng.traineddata is intentionally committed
+# (see ocr-providers.ts's TesseractOcrProvider) -- without it, a fresh clone
+# silently depends on a first-use network fetch from Tesseract's CDN, which
+# fails in offline/firewalled deployments despite this provider's own doc
+# comment claiming "no external API calls." Any other language file added
+# later should be committed the same way, not auto-ignored here.
 backend/*.traineddata
+!backend/eng.traineddata
 

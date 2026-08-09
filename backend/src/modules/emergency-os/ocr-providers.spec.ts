@@ -90,6 +90,43 @@ describe('TesseractOcrProvider — real image OCR, not text-only parsing', () =>
     expect(tesseractResult.text).toBe(mockResult.text);
     expect(tesseractResult.fields).toEqual(mockResult.fields);
   });
+
+  /**
+   * 2026-08-09: found via a live user report ("OCR doesn't work... in
+   * general") that getWorker() used to call createWorker('eng') with no
+   * path options, which only ever worked because process.cwd() happened to
+   * already have a previously-downloaded eng.traineddata sitting in it in
+   * this sandbox -- a fresh clone has no such file (it was gitignored) and
+   * would fall through to a network fetch from Tesseract's CDN, which fails
+   * in offline/firewalled environments despite this class's own doc
+   * comment claiming no external dependency. Committed backend/eng.traineddata
+   * and pointed getWorker() at it via a path computed from __dirname, not
+   * cwd. This test proves that fix by actually changing cwd mid-test to
+   * somewhere with no traineddata file at all, then confirming OCR still
+   * succeeds -- the exact scenario that would have failed before.
+   */
+  it('resolves language data independent of process.cwd() (regression: used to only work by cwd coincidence)', async () => {
+    const originalCwd = process.cwd();
+    const originalTmpDir = process.env.TEMP || process.env.TMPDIR || '/tmp';
+    process.chdir(originalTmpDir);
+    try {
+      const cwdIndependentProvider = new TesseractOcrProvider();
+      try {
+        const result = await cwdIndependentProvider.extract({
+          rawText: '',
+          dataUrl: fixtureDataUrl('ocr-test-clear-name.png'),
+          mimeType: 'image/png',
+          documentType: 'health_card',
+        });
+        expect(result.text).toMatch(/Alex/i);
+        expect(result.overallConfidence).toBeGreaterThan(0);
+      } finally {
+        await cwdIndependentProvider.terminate();
+      }
+    } finally {
+      process.chdir(originalCwd);
+    }
+  }, 30000);
 });
 
 describe('createOcrProvider', () => {

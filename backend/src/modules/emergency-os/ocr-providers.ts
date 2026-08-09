@@ -1,8 +1,22 @@
+import { existsSync } from 'fs';
+import { join } from 'path';
 import type { Worker } from 'tesseract.js';
 import { getIntakeArtifact } from '../../../../src/config/intakeArtifactRegistry';
 import { parseIdArtifactText } from '../../../../src/utils/idArtifactParser';
 import { parseClinicalArtifactText } from '../../../../src/utils/clinicalArtifactParser';
 import type { OcrProvider, OcrProviderExtractInput, OcrProviderResult } from './ocr-intake.types';
+
+/**
+ * Directory containing the committed eng.traineddata (repo root's
+ * backend/eng.traineddata). Computed relative to this compiled file's own
+ * location rather than process.cwd() -- cwd-relative lookup only works when
+ * the process happens to be launched from backend/ (true for this repo's own
+ * dev-stack.mjs, not guaranteed for every deployment method). Compiled
+ * layout is backend/dist/backend/src/modules/emergency-os/ocr-providers.js
+ * (backend/tsconfig.build.json's rootDir: ".." preserves the full repo-root-
+ * relative path under dist/), so 5 levels up from __dirname reaches backend/.
+ */
+const LOCAL_TESSDATA_DIR = join(__dirname, '..', '..', '..', '..', '..');
 
 const LOW_CONFIDENCE_THRESHOLD = 0.6;
 const IMAGE_DATA_URL_PATTERN = /^data:image\/(png|jpe?g|webp|gif|heic);base64,(.+)$/i;
@@ -137,10 +151,33 @@ export class TesseractOcrProvider implements OcrProvider {
 
   private workerPromise: Promise<Worker> | null = null;
 
+  /**
+   * 2026-08-09: was calling createWorker('eng') with no path options, which
+   * left Tesseract to check a cache at `process.cwd()` (only ever populated
+   * because this sandbox happened to have a previously-downloaded copy
+   * sitting there) before falling back to a network fetch from
+   * cdn.jsdelivr.net -- a real, silent dependency this class's own doc
+   * comment explicitly (and, until now, incorrectly) claimed didn't exist
+   * ("no external API calls"). Any environment without network access to
+   * that CDN and without an already-cached file (every fresh clone, since
+   * the file used to be gitignored) would have OCR fail on first use. Now
+   * points explicitly at the committed backend/eng.traineddata via
+   * LOCAL_TESSDATA_DIR, deterministic regardless of process cwd or launch
+   * method. Falls back to Tesseract's own default (cache-then-network)
+   * behavior only if the committed file is ever missing, rather than
+   * hard-failing.
+   */
   private async getWorker(): Promise<Worker> {
     if (!this.workerPromise) {
-      const { createWorker } = await import('tesseract.js');
-      this.workerPromise = createWorker('eng');
+      const { createWorker, OEM } = await import('tesseract.js');
+      const hasLocalTessdata = existsSync(join(LOCAL_TESSDATA_DIR, 'eng.traineddata'));
+      this.workerPromise = hasLocalTessdata
+        ? createWorker('eng', OEM.LSTM_ONLY, {
+            langPath: LOCAL_TESSDATA_DIR,
+            cachePath: LOCAL_TESSDATA_DIR,
+            gzip: false,
+          })
+        : createWorker('eng');
     }
     return this.workerPromise;
   }
