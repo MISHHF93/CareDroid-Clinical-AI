@@ -6159,7 +6159,20 @@ export const selectQueuePanelRows = (state: EmergencyStoreState): Array<Record<s
       const queueRecord = queue as Record<string, any>;
       const averageWaitMinutes = Number(queueRecord.averageWaitMinutes || 0);
       const oldestWaitMinutes = Number(queueRecord.oldestWaitMinutes || queueRecord.longestWaitMinutes || 0);
-      const targetWaitMinutes = Number(queueRecord.targetWaitMinutes || 30);
+      // Real field is `targetMinutes` (QueueIntelligenceService.getQueues(),
+      // per-queue-type targets 10-120min) -- this used to read the
+      // nonexistent `targetWaitMinutes`, silently falling back to a uniform
+      // 30min for every queue type regardless of the backend's own real,
+      // per-type target.
+      const targetMinutes = Number(queueRecord.targetMinutes || queueRecord.targetWaitMinutes || 30);
+      // Prefer the backend's own computed `breached` boolean over
+      // recomputing an approximation from possibly-defaulted minutes --
+      // this used to always recompute, discarding the real signal even
+      // when it was present.
+      const breached =
+        typeof queueRecord.breached === 'boolean'
+          ? queueRecord.breached
+          : averageWaitMinutes > targetMinutes || oldestWaitMinutes > targetMinutes;
       return {
         ...queueRecord,
         type: queueRecord.type || queueRecord.label,
@@ -6167,12 +6180,13 @@ export const selectQueuePanelRows = (state: EmergencyStoreState): Array<Record<s
         count: Number(queueRecord.count ?? queueRecord.patientIds?.length ?? 0),
         averageWaitMinutes,
         oldestWaitMinutes,
-        health:
-          averageWaitMinutes > targetWaitMinutes || oldestWaitMinutes > targetWaitMinutes * 1.5
-            ? 'red'
-            : averageWaitMinutes > targetWaitMinutes * 0.8
-              ? 'yellow'
-              : 'green',
+        targetMinutes,
+        breached,
+        health: breached
+          ? 'red'
+          : averageWaitMinutes > targetMinutes * 0.8 || oldestWaitMinutes > targetMinutes * 0.8
+            ? 'yellow'
+            : 'green',
       };
     });
   }
