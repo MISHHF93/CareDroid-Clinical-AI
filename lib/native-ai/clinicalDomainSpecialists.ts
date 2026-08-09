@@ -263,7 +263,7 @@ export function runClinicalSpecialistInference(
     modelId: specialist.modelId,
     modelVersion: specialist.modelVersion,
     requiresHumanReview: true,
-    sourceState: options.sourceState || 'live',
+    sourceState: options.sourceState || 'demo',
   };
 }
 

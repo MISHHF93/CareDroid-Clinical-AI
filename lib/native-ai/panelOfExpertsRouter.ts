@@ -98,7 +98,7 @@ export function routePatientToClinicalSpecialists(
     confidence: Number(confidence.toFixed(2)),
     keySignals: primary.signals.slice(0, 6),
     routerModelVersion: ROUTER_VERSION,
-    sourceState: options.sourceState || 'live',
+    sourceState: options.sourceState || 'demo',
     auditEventId: options.auditEventId,
     disclaimer: 'Routed panel-of-experts decision is advisory. Staff must confirm clinical pathway.',
   };

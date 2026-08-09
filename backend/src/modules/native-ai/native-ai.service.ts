@@ -17,6 +17,17 @@ import {
 } from '../../../../lib/native-ai';
 import type { Patient } from '../../../../src/types/emergency';
 
+/**
+ * routePatientToClinicalSpecialists/runRoutedSpecialistPanel/
+ * inferTriageFromExpertSystem are hand-coded heuristic formulas (keyword
+ * matching + vitals thresholds; zero ML/LLM) that already default their own
+ * sourceState to the honest 'demo' label. 2026-08-09: this service used to
+ * override that default with a hardcoded sourceState: 'live' at every call
+ * site here, mislabeling unvalidated heuristics as real live inference for
+ * every consumer of these endpoints. Removed -- let each function's own
+ * honest default stand, matching the equivalent fix already applied to the
+ * frontend orchestrator (src/services/nativeAiCore.ts).
+ */
 @Injectable()
 export class NativeAiService {
   getRegistrySummary() {
@@ -34,7 +45,7 @@ export class NativeAiService {
   }
 
   routePatient(patient: Patient) {
-    const routing = routePatientToClinicalSpecialists(patient, { sourceState: 'live' });
+    const routing = routePatientToClinicalSpecialists(patient);
     return {
       module: 'Native AI Router',
       generatedAt: new Date().toISOString(),
@@ -110,7 +121,7 @@ export class NativeAiService {
   }
 
   evaluateTriage(patient: Patient) {
-    const inference = inferTriageFromExpertSystem(patient, { sourceState: 'live' });
+    const inference = inferTriageFromExpertSystem(patient);
     return {
       module: 'NLP Triage Expert System',
       generatedAt: new Date().toISOString(),
@@ -122,9 +133,8 @@ export class NativeAiService {
   }
 
   inferSpecialists(patient: Patient) {
-    const routing = routePatientToClinicalSpecialists(patient, { sourceState: 'live' });
+    const routing = routePatientToClinicalSpecialists(patient);
     const inferences = runRoutedSpecialistPanel(patient, routing.specialistDomains, {
-      sourceState: 'live',
       routingConfidence: routing.confidence,
     });
     return {

@@ -80,7 +80,7 @@
 - **Source evidence**: `AiRoutingEngineService`/`AiContextManagerService`/`AiResponseComposerService` (1,402 lines/9 files) DI-registered and exported from `AiModule` but zero real callers anywhere in the backend (exhaustive grep, confirmed via `ai.module.ts`'s registration + the module's own 3 spec files only). `AiRoutingEngineService.createRoutePlan()` duplicated `MoERouterService`'s method of the same name — the real, live routing system `chat.service.ts` uses.
 - **Affected files**: `backend/src/modules/ai/ai.module.ts`, `backend/src/modules/ai/foundation/*` (deleted), `AI_ORCHESTRATION_AUDIT.md`
 - **Runtime/data/security impact**: None (dead code removal).
-- **AI/ML impact**: Closes one of the "4 independent model/expert-selection systems" `AI_ORCHESTRATION_AUDIT.md` §3.2 had named; 3 remain (`MoERouterService`+`expert-selector`, `RoutingOptimizerService`, `lib/native-ai/panelOfExpertsRouter.ts` — see HEAL-010).
+- **AI/ML impact**: Closes one of the "4 independent model/expert-selection systems" `AI_ORCHESTRATION_AUDIT.md` §3.2 had named; the other 3 (`MoERouterService`+`expert-selector`, `RoutingOptimizerService`, `lib/native-ai/panelOfExpertsRouter.ts`) were each individually investigated and closed — see HEAL-010b and HEAL-010 — none required deletion; each scores a genuinely different catalog by design.
 - **Current status**: `VALIDATED`
 - **Commit**: `e172a5e9` (code), `f1a1c518` (scorecard)
 - **Scorecard impact**: Domain 12, 16th recurrence, score held flat.
@@ -119,6 +119,56 @@
 - **Commit when resolved**: `001784ba`
 - **Scorecard impact when resolved**: Pending next scorecard sync pass.
 - **Operational note**: The user's already-running dev backend process was started from the pre-fix build; requires a backend restart (`npm run dev:api` / `npm run dev:fullstack`, or however the stack was started) for this fix to take effect in their live session — the running process serves a static compiled snapshot, not a hot-reloaded one.
+
+### HEAL-010 — `panelOfExpertsRouter.ts`/`nlpTriageExpertSystem.ts`/`clinicalDomainSpecialists.ts` leaked `sourceState: 'live'` past an already-partial truthfulness fix
+
+- **Severity**: P1_HIGH (reclassified — the original "frontend-only inert routing decision" framing was disproven; the real finding is a truthfulness/provenance bug, not a dead-code question)
+- **Domain**: AI/ML Core Node — truthfulness/provenance
+- **Source evidence**: The original framing (`lib/native-ai/panelOfExpertsRouter.ts` "is a frontend-only routing decision that never reaches the backend") was **wrong** — full call-graph trace found it reaches the backend directly via `backend/src/modules/native-ai/native-ai.service.ts`'s `routePatient()`/`evaluateTriage()`/`inferSpecialists()`, which are real, authenticated, `READ_PHI`-gated routes on `NativeAiController`. Investigating that call graph surfaced the real bug instead: `routePatientToClinicalSpecialists()` (`panelOfExpertsRouter.ts`), `inferTriageFromExpertSystem()` (`nlpTriageExpertSystem.ts`), and `runClinicalSpecialistInference()`/`runRoutedSpecialistPanel()` (`clinicalDomainSpecialists.ts`) are all pure keyword+vitals-threshold heuristics (zero ML/LLM) that defaulted their own `sourceState` to `'live'` via `options.sourceState || 'live'` — the same bug class already fixed 2026-08-07 for 4 sibling functions (`predictPostEdOrientation`/`predictProlongedEdStay`/`predictAdmissionLikelihoodMl`/`extractMultiChannelClinicalTextFeatures`) in `src/services/nativeAiCore.ts`'s `buildNativeAiPatientSnapshot()`, but never extended to these 3. That orchestrator's `heuristicSourceState()` filter (which forwards only the honest `'simulated'` case, letting each function's own `'demo'` default stand otherwise) was applied to only 4 of 7 heuristic calls — `routing`/`specialistInferences`/`triageInference` received the raw, unfiltered session-level state and inherited `'live'` whenever `resolveSourceState()` defaulted to it. The backend's `native-ai.service.ts` was worse: it hardcoded `sourceState: 'live'` outright at 4 call sites with no filtering logic at all, confirmed by direct read (not inferred from route names).
+- **Affected files**: `lib/native-ai/panelOfExpertsRouter.ts`, `lib/native-ai/nlpTriageExpertSystem.ts`, `lib/native-ai/clinicalDomainSpecialists.ts` (own defaults `'live'` → `'demo'`); `src/services/nativeAiCore.ts` (extended `heuristicSourceState()` filter to all 7 heuristic calls); `backend/src/modules/native-ai/native-ai.service.ts` (removed 4 hardcoded `sourceState: 'live'` overrides); `src/services/nativeAiCore.test.ts` (updated stale assertions that had locked in the bug + added coverage for `triageInference`/`specialistInferences`, previously unasserted); new `backend/src/modules/native-ai/native-ai.service.spec.ts`.
+- **Runtime impact**: Every consumer of `NativeAiController`'s `route`/`triage-rules/evaluate`/`specialists/infer` endpoints, and every frontend consumer of `buildNativeAiPatientSnapshot()` (most visibly `AiTransparencyDashboard`, `NativeAiRoutingBadge`, `TriageExpertBadge`, `SpecialistInferenceBadge`), now correctly see `demo` instead of a false `live` label for these 3 unvalidated heuristic outputs.
+- **AI/ML impact**: Closes a real false-AI-claims gap — these keyword/threshold heuristics were being labeled as real live model inference platform-wide, the exact category this campaign's own priority ordering ranks above authorization/data-integrity issues. Also closes one of the "4 independent model/expert-selection systems" `AI_ORCHESTRATION_AUDIT.md` §3.2 had named — confirmed real, live, and reachable (not dead), just mislabeled; no deletion or reconciliation needed since it scores a different catalog than `MoERouterService` by design.
+- **Affected user profiles**: Physician, Triage Nurse, Charge Nurse (any profile viewing AI Transparency Dashboard, routing badges, triage-expert badges, or specialist-inference badges — previously shown a false "live model" label for a keyword heuristic).
+- **Security/privacy impact**: None (label-only change; no data exposure).
+- **Clinical-safety impact**: Indirect — mislabeling a keyword heuristic as validated live inference could inflate clinician trust in an unvalidated signal; fix restores accurate provenance disclosure.
+- **Current status**: `VALIDATED`
+- **Dependencies**: None.
+- **Recommended canonical solution**: Applied — let each heuristic function's own honest `'demo'` default stand everywhere except the deliberate `'simulated'` passthrough case.
+- **Validation requirements**: Backend `native-ai.service.spec.ts` (3/3) + `native-ai.controller-authorization.spec.ts` (13/13 combined) passing via `npx jest native-ai`. Frontend `tsc --noEmit` clean via ad-hoc tsconfig (`vitest` blocked in this sandbox per established constraint). Empirically verified via a standalone `tsx` script exercising the real `buildNativeAiPatientSnapshot()`: default case now returns `routing=demo triage=demo specialists=demo` (previously `live`/`live`/`live`); `sourceState: 'simulated'` still correctly propagates `simulated` to all 3.
+- **Commit when resolved**: pending (this round).
+- **Scorecard impact when resolved**: Pending next scorecard sync pass (Domain 12 — AI Governance & Operational Intelligence).
+
+### HEAL-010b — `RoutingOptimizerService`'s independent re-pick — investigated, real but lower severity than framed, fixed via disclosure not reconciliation
+
+- **Severity**: P2_MEDIUM (was framed as P1_HIGH "duplicate active architecture" pending investigation)
+- **Domain**: AI/ML Core Node — truthfulness
+- **Source evidence**: `AI_ORCHESTRATION_AUDIT.md` §3.2 originally framed this as `RoutingOptimizerService` "independently re-picking a model after MoE already chose an expert; nothing reconciles the two." Traced precisely: `chat.service.ts`'s real ED Copilot call path (`invokeAnthropicEdCopilot` → `unifiedAIClient.request()`) never reads the `costOptimization` object `RoutingOptimizerService.optimizeRequest()` computes — confirmed by reading the real dispatch call site directly, not inferred. Every real request is served by the same configured provider/model regardless of what "route" (`lightweight_model`/`rag`/`expert_model`) or fictional model name (`caredroid-lightweight-mini` etc.) this service predicts. **The actual bug was narrower than the audit's framing**: no wrong response can ever result (nothing consequential reads the estimate) — but `src/pages/ai/AiCommandCenterDashboard.tsx`'s "Tool Routing" panel rendered these fictional cost-tier route counts with zero disclosure, reading to any Site Admin/Manager viewer as real operational model-dispatch tracking of distinct models that don't actually exist as separate infrastructure.
+- **Affected files**: `backend/src/modules/cost-optimizer/routing-optimizer.service.ts` (new class-level doc comment), `src/pages/ai/AiCommandCenterDashboard.tsx`(+`.css`+`.test.tsx`)
+- **Runtime impact**: None (cosmetic/informational only — no real routing behavior changed, since none ever depended on this).
+- **AI/ML impact**: Closes the "false AI claims" risk of this specific panel; `RoutingOptimizerService` itself kept as-is (real, useful cost-estimation tool for planning), not deleted.
+- **Affected user profiles**: Site Admin, Department Manager/Director (AI Command Center Dashboard viewers).
+- **Current status**: `VALIDATED`
+- **Recommended canonical solution**: Applied — renamed the panel to "Cost-Tier Routing (Estimated)" with an explicit caption; added a class-level doc comment to `RoutingOptimizerService` so this doesn't get re-flagged as a live routing conflict in a future audit.
+- **Validation requirements**: Backend `tsc`/ESLint clean, 5/5 `routing-optimizer` tests + 34/34 `chat` tests passing (confirms the real dispatch path is genuinely untouched). Frontend `tsc`/ESLint clean; new regression test asserts the disclosure renders and the old misleading title is gone (`vitest` blocked in this sandbox per established constraint — manually traced the render logic against the test's own mock data).
+- **Commit when resolved**: `fb67fbcc`
+- **Scorecard impact when resolved**: Pending next scorecard sync pass.
+
+### HEAL-012 — `clinicalIntentRouterBackend.ts` — corrected framing, real live gap closed via stopgap; full relocation deferred
+
+- **Severity**: P2_MEDIUM (was framed as a dead/duplicate-code cleanup; corrected — it's a live-path recognition-accuracy gap)
+- **Domain**: Clinical terminology recognition
+- **Source evidence**: Original framing ("backend has a dead/duplicate router, relocate and delete") was wrong on the "dead" claim — traced the full call graph and found it live: `EmergencyOsController.getPatientOrchestration()` (`GET /emergency/patients/:patientId/orchestration`) → `orchestrationService.buildPatientOrchestration()` → `recommendTools.ts`'s `buildPatientCardOrchestrationContext()` → `ClinicalIntentRouter.routeComplaint()` here → consumed by `CopilotPanel.tsx`/`PatientCardCopilot.tsx`'s tool recommendations via `usePatientOrchestration()`. The real bug: unlike `src/data/clinicalIntentRouter.ts` (which falls back to the canonical `recognizeComplaint()` pipeline when its own alias list misses), this backend mirror had no fallback and could not reach that pipeline at all (`backend/tsconfig.build.json` only allows `lib/`/`src/types/`; the canonical recognizer's dependency chain includes the safety-relevant `src/services/highRiskComplaintFlags.ts`) — so real phrasings the canonical recognizer already knows ("heart attack", "chest tightness", "can't breathe", "septic shock", "acute abdomen") silently failed to route, degrading real Copilot tool recommendations.
+- **Affected files**: `lib/patient-orchestration/clinicalIntentRouterBackend.ts`(+new `.test.ts`)
+- **Runtime/frontend/backend impact**: Copilot tool recommendations (calculators/protocols/referrals suggested) are now more complete for the 5 concepts both registries cover (chest pain, stroke, sepsis, shortness of breath, abdominal pain).
+- **AI/ML impact**: N/A (deterministic keyword routing, not AI).
+- **Affected user profiles**: Physician/NP/PA, Triage Nurse, Charge Nurse (Copilot panel + patient card tool-recommendation viewers).
+- **Clinical-safety impact**: Low-moderate — this is a tool-*recommendation* completeness gap, not a missed safety alert (`highRiskComplaintFlags.ts`'s own fast-flag detection is a separate, unaffected, already-correctly-firing mechanism this router never gated).
+- **Current status**: `VALIDATED` (stopgap fix) / `CONFIRMED` (canonical fix still open, see below)
+- **Recommended canonical solution**: Applied as a stopgap — manually synced alias lists against `HIGH_RISK_COMPLAINT_FLAG_DEFINITIONS`. The proper long-term fix (relocating the shared recognition pipeline into `lib/` so this file can delegate directly instead of a hand-synced mirror) remains open — deliberately deferred since it touches safety-relevant code (`highRiskComplaintFlags.ts`) and needs its own careful, dedicated round, not a rushed multi-file relocation.
+- **Validation requirements**: `tsc`/ESLint clean on both stacks. `vitest` blocked in this sandbox even for `lib/` (confirmed via direct run, not assumed) — verified empirically by copying the exact matcher logic into a standalone Node script and running all 15 test cases directly (all pass). Backend regression check: 74/74 tests passing across the 2 suites covering this endpoint chain.
+- **Commit when resolved**: `d0fbf4d0` (stopgap)
+- **Scorecard impact when resolved**: Pending next scorecard sync pass.
+- **Dependencies**: None blocking — safely schedulable.
 
 ---
 
@@ -161,29 +211,6 @@
 - **Current status**: `CONFIRMED`, deliberately not fixed — same reasoning as HEAL-011 (needs a scope decision, not a unilateral build).
 - **Recommended canonical solution**: `FUTURE_MODULE` — needs product sign-off on whether/when to build the review surface.
 
-### HEAL-010 — `lib/native-ai/panelOfExpertsRouter.ts` is a frontend-only routing decision that never reaches the backend
-
-- **Severity**: P2_MEDIUM (downgraded — see HEAL-010b for why the paired finding turned out lower-severity than framed)
-- **Domain**: AI/ML Core Node — duplicate architecture
-- **Source evidence**: `AI_ORCHESTRATION_AUDIT.md` §3.2's original 4-system list, narrowed by HEAL-004 (deleted `ai/foundation/`) and HEAL-010b (below, `RoutingOptimizerService` reconciled via disclosure, not deletion). Remaining: `lib/native-ai/panelOfExpertsRouter.ts` — real, frontend-only, scores an entirely different catalog (`CLINICAL_DOMAIN_SPECIALISTS`) from `MoERouterService`'s expert set; its decision never reaches the backend.
-- **Current status**: `CONFIRMED`, not yet fixed. Inert, not wrong — it never influences the real backend response, so no patient-facing output can currently disagree with it.
-- **Recommended canonical solution**: Either wire its decision into the real backend path (if there's a genuine reason a frontend-only pre-selection should matter) or explicitly document it as a frontend-only, non-authoritative UI hint (matching HEAL-010b's disclosure pattern) if it's meant to stay presentation-only. Needs direct investigation of what UI actually consumes `panelOfExpertsRouter.ts`'s output before deciding which.
-
-### HEAL-010b — `RoutingOptimizerService`'s independent re-pick — investigated, real but lower severity than framed, fixed via disclosure not reconciliation
-
-- **Severity**: P2_MEDIUM (was framed as P1_HIGH "duplicate active architecture" pending investigation)
-- **Domain**: AI/ML Core Node — truthfulness
-- **Source evidence**: `AI_ORCHESTRATION_AUDIT.md` §3.2 originally framed this as `RoutingOptimizerService` "independently re-picking a model after MoE already chose an expert; nothing reconciles the two." Traced precisely: `chat.service.ts`'s real ED Copilot call path (`invokeAnthropicEdCopilot` → `unifiedAIClient.request()`) never reads the `costOptimization` object `RoutingOptimizerService.optimizeRequest()` computes — confirmed by reading the real dispatch call site directly, not inferred. Every real request is served by the same configured provider/model regardless of what "route" (`lightweight_model`/`rag`/`expert_model`) or fictional model name (`caredroid-lightweight-mini` etc.) this service predicts. **The actual bug was narrower than the audit's framing**: no wrong response can ever result (nothing consequential reads the estimate) — but `src/pages/ai/AiCommandCenterDashboard.tsx`'s "Tool Routing" panel rendered these fictional cost-tier route counts with zero disclosure, reading to any Site Admin/Manager viewer as real operational model-dispatch tracking of distinct models that don't actually exist as separate infrastructure.
-- **Affected files**: `backend/src/modules/cost-optimizer/routing-optimizer.service.ts` (new class-level doc comment), `src/pages/ai/AiCommandCenterDashboard.tsx`(+`.css`+`.test.tsx`)
-- **Runtime impact**: None (cosmetic/informational only — no real routing behavior changed, since none ever depended on this).
-- **AI/ML impact**: Closes the "false AI claims" risk of this specific panel; `RoutingOptimizerService` itself kept as-is (real, useful cost-estimation tool for planning), not deleted.
-- **Affected user profiles**: Site Admin, Department Manager/Director (AI Command Center Dashboard viewers).
-- **Current status**: `VALIDATED`
-- **Recommended canonical solution**: Applied — renamed the panel to "Cost-Tier Routing (Estimated)" with an explicit caption; added a class-level doc comment to `RoutingOptimizerService` so this doesn't get re-flagged as a live routing conflict in a future audit.
-- **Validation requirements**: Backend `tsc`/ESLint clean, 5/5 `routing-optimizer` tests + 34/34 `chat` tests passing (confirms the real dispatch path is genuinely untouched). Frontend `tsc`/ESLint clean; new regression test asserts the disclosure renders and the old misleading title is gone (`vitest` blocked in this sandbox per established constraint — manually traced the render logic against the test's own mock data).
-- **Commit when resolved**: `fb67fbcc`
-- **Scorecard impact when resolved**: Pending next scorecard sync pass.
-
 ### HEAL-011 — User/Role `roleProfileId` vocabulary mismatch (access-widening risk)
 
 - **Severity**: P0_CRITICAL
@@ -193,23 +220,6 @@
 - **Security/privacy impact**: Real, potentially access-widening if fixed incorrectly.
 - **Current status**: `CONFIRMED`, deliberately not fixed. This is the single highest-severity open item in the whole ledger by the campaign's own P0-security-first ranking, but requires a product/security decision on the correct canonical vocabulary (pick one of the 4: backend `UserRole` 5-value, `EmergencyRoleClaimId` 12-value, `SaasUserRole` 22-value, frontend `HospitalRole` 22-value) before any code change — guessing risks a real privilege-escalation regression.
 - **Recommended canonical solution**: `MANUAL_REVIEW` — needs explicit human sign-off on the canonical role vocabulary before implementation.
-
-### HEAL-012 — `clinicalIntentRouterBackend.ts` — corrected framing, real live gap closed via stopgap; full relocation deferred
-
-- **Severity**: P2_MEDIUM (was framed as a dead/duplicate-code cleanup; corrected — it's a live-path recognition-accuracy gap)
-- **Domain**: Clinical terminology recognition
-- **Source evidence**: Original framing ("backend has a dead/duplicate router, relocate and delete") was wrong on the "dead" claim — traced the full call graph and found it live: `EmergencyOsController.getPatientOrchestration()` (`GET /emergency/patients/:patientId/orchestration`) → `orchestrationService.buildPatientOrchestration()` → `recommendTools.ts`'s `buildPatientCardOrchestrationContext()` → `ClinicalIntentRouter.routeComplaint()` here → consumed by `CopilotPanel.tsx`/`PatientCardCopilot.tsx`'s tool recommendations via `usePatientOrchestration()`. The real bug: unlike `src/data/clinicalIntentRouter.ts` (which falls back to the canonical `recognizeComplaint()` pipeline when its own alias list misses), this backend mirror had no fallback and could not reach that pipeline at all (`backend/tsconfig.build.json` only allows `lib/`/`src/types/`; the canonical recognizer's dependency chain includes the safety-relevant `src/services/highRiskComplaintFlags.ts`) — so real phrasings the canonical recognizer already knows ("heart attack", "chest tightness", "can't breathe", "septic shock", "acute abdomen") silently failed to route, degrading real Copilot tool recommendations.
-- **Affected files**: `lib/patient-orchestration/clinicalIntentRouterBackend.ts`(+new `.test.ts`)
-- **Runtime/frontend/backend impact**: Copilot tool recommendations (calculators/protocols/referrals suggested) are now more complete for the 5 concepts both registries cover (chest pain, stroke, sepsis, shortness of breath, abdominal pain).
-- **AI/ML impact**: N/A (deterministic keyword routing, not AI).
-- **Affected user profiles**: Physician/NP/PA, Triage Nurse, Charge Nurse (Copilot panel + patient card tool-recommendation viewers).
-- **Clinical-safety impact**: Low-moderate — this is a tool-*recommendation* completeness gap, not a missed safety alert (`highRiskComplaintFlags.ts`'s own fast-flag detection is a separate, unaffected, already-correctly-firing mechanism this router never gated).
-- **Current status**: `VALIDATED` (stopgap fix) / `CONFIRMED` (canonical fix still open, see below)
-- **Recommended canonical solution**: Applied as a stopgap — manually synced alias lists against `HIGH_RISK_COMPLAINT_FLAG_DEFINITIONS`. The proper long-term fix (relocating the shared recognition pipeline into `lib/` so this file can delegate directly instead of a hand-synced mirror) remains open — deliberately deferred since it touches safety-relevant code (`highRiskComplaintFlags.ts`) and needs its own careful, dedicated round, not a rushed multi-file relocation.
-- **Validation requirements**: `tsc`/ESLint clean on both stacks. `vitest` blocked in this sandbox even for `lib/` (confirmed via direct run, not assumed) — verified empirically by copying the exact matcher logic into a standalone Node script and running all 15 test cases directly (all pass). Backend regression check: 74/74 tests passing across the 2 suites covering this endpoint chain.
-- **Commit when resolved**: `d0fbf4d0` (stopgap)
-- **Scorecard impact when resolved**: Pending next scorecard sync pass.
-- **Dependencies**: None blocking — safely schedulable.
 
 ### HEAL-013 — Capacity Mongoose/TypeORM "fork" — RETRACTED, same correction as HEAL-006
 
@@ -254,14 +264,13 @@ Patient, Encounter, Journey, Complaint/Terminology, Queue, EMS, Reassessment, Ca
 
 ---
 
-## Next steps (as of this ledger's creation, 2026-08-09)
+## Next steps (updated 2026-08-09, after HEAL-010)
 
 Highest-value unstarted work, ranked:
 
 1. HEAL-011 (User/Role mismatch) — P0, but blocked on a human decision; flag prominently rather than guess.
-2. HEAL-007 — determine blast radius of the `envelope()` `source: 'backend-fixture'` hardcode before deciding whether it's worth fixing.
-3. HEAL-010 — reconcile or retire `RoutingOptimizerService`'s independent re-pick.
-4. HEAL-012 — relocate `clinicalConceptTypes.ts`, delete the backend router duplicate.
-5. HEAL-008 — audit remaining `DEMO`-labeled `EmergencyOsController` capability keys individually (do not batch-correct).
+2. HEAL-008 — audit remaining `DEMO`-labeled `EmergencyOsController` capability keys individually (do not batch-correct).
+3. HEAL-009 — terminology-gap review UI — confirmed real, but needs a product scope decision (new UI, not a bug fix).
+4. HEAL-EPIC-A/B/C/D — large multi-round programs (dead-code sweep, 8-profile integration matrix, event/notification audit, persistence-ownership audit), none started.
 
-HEAL-006 is closed as `WONT_FIX_WITH_REASON` (see its entry) — the Mongoose Capacity module turned out to be real, tested, intentional infrastructure, not a retirement candidate.
+Closed this session: HEAL-001 (fixed), HEAL-006/013 (`WONT_FIX_WITH_REASON` — real, tested, intentional dual-persistence infra, not a retirement candidate), HEAL-007 (closed, low urgency — sole real consumer's underlying data is genuinely fixture-backed), HEAL-010 (fixed — truthfulness gap, not the originally-framed dead-code question), HEAL-010b (fixed via disclosure), HEAL-012 (fixed via stopgap alias sync), HEAL-015 (fixed — OCR CDN dependency).

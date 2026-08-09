@@ -9,10 +9,10 @@ import { NativeAiController } from './native-ai.controller';
  * present. routePatient/getClinicalAcuity/evaluateTriage/inferSpecialists all
  * take a real Patient (or Patient[]) request body and run it through
  * routePatientToClinicalSpecialists/buildClinicalAcuityLeaderboard/
- * inferTriageFromExpertSystem with sourceState: 'live' -- confirmed by direct
- * read of native-ai.service.ts, not assumed from the route names -- so any
+ * inferTriageFromExpertSystem -- confirmed by direct read of
+ * native-ai.service.ts, not assumed from the route names -- so any
  * authenticated user, including STUDENT, could submit real patient clinical
- * data and receive real AI-generated routing/acuity/triage/specialist output.
+ * data and receive AI-generated routing/acuity/triage/specialist output.
  * addTriageRule is more severe still: it mutates a global, structured triage
  * rule set (addStructuredTriageRule) that shapes every future triage
  * evaluation platform-wide, not a per-patient record.

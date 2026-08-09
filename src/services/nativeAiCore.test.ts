@@ -26,23 +26,29 @@ afterEach(() => {
   window.localStorage.removeItem(SIMULATION_MODE_STORAGE_KEY);
 });
 
-describe('buildNativeAiPatientSnapshot sourceState honesty (2026-08-07)', () => {
-  // Regression guard: orientation/prolongedStay/admissionMl/textFeatures are
-  // hand-coded heuristic formulas (their own MODEL_VERSION strings admit it:
-  // "*-xgboost-heuristic", "*-roberta-mha-cnn-heuristic") that each default
-  // their own sourceState to 'demo' — an honest self-classification. Before
-  // this fix, buildNativeAiPatientSnapshot passed the session-level
-  // resolveSourceState() result straight through to every sub-prediction,
-  // overriding that honest default with 'live' outside simulation mode —
-  // mislabeling every one of these unvalidated heuristics as real live
-  // inference everywhere the snapshot is consumed, most visibly in
+describe('buildNativeAiPatientSnapshot sourceState honesty (2026-08-07, extended 2026-08-09)', () => {
+  // Regression guard: orientation/prolongedStay/admissionMl/textFeatures/
+  // routing/specialistInferences/triageInference are ALL hand-coded
+  // heuristic formulas (keyword matching + vitals thresholds; zero ML/LLM)
+  // that each default their own sourceState to 'demo' — an honest
+  // self-classification. Before the 2026-08-07 fix, buildNativeAiPatientSnapshot
+  // passed the session-level resolveSourceState() result straight through to
+  // every sub-prediction, overriding that honest default with 'live' outside
+  // simulation mode. That fix only covered 4 of the 7 heuristic calls;
+  // routing/specialistInferences/triageInference still leaked 'live' until
+  // 2026-08-09 — mislabeling every one of these unvalidated heuristics as
+  // real live inference everywhere the snapshot is consumed, most visibly in
   // AiTransparencyDashboard.
 
-  it('reports demo for the 4 heuristic-labeled predictions outside simulation mode, even though the top-level/routing state is live', () => {
+  it('reports demo for all 6 heuristic-labeled predictions outside simulation mode, even though the top-level sourceState is live', () => {
     const snapshot = buildNativeAiPatientSnapshot(patient);
 
     expect(snapshot.sourceState).toBe('live');
-    expect(snapshot.routing.sourceState).toBe('live');
+    expect(snapshot.routing.sourceState).toBe('demo');
+    expect(snapshot.triageInference.sourceState).toBe('demo');
+    expect(snapshot.specialistInferences.every((entry) => entry.sourceState === 'demo')).toBe(
+      true,
+    );
     expect(snapshot.orientation.sourceState).toBe('demo');
     expect(snapshot.prolongedStay.sourceState).toBe('demo');
     expect(snapshot.admissionMl.sourceState).toBe('demo');
@@ -54,6 +60,10 @@ describe('buildNativeAiPatientSnapshot sourceState honesty (2026-08-07)', () => 
 
     expect(snapshot.sourceState).toBe('simulated');
     expect(snapshot.routing.sourceState).toBe('simulated');
+    expect(snapshot.triageInference.sourceState).toBe('simulated');
+    expect(
+      snapshot.specialistInferences.every((entry) => entry.sourceState === 'simulated'),
+    ).toBe(true);
     expect(snapshot.orientation.sourceState).toBe('simulated');
     expect(snapshot.prolongedStay.sourceState).toBe('simulated');
     expect(snapshot.admissionMl.sourceState).toBe('simulated');
@@ -64,6 +74,11 @@ describe('buildNativeAiPatientSnapshot sourceState honesty (2026-08-07)', () => 
     const snapshot = buildNativeAiPatientSnapshot(patient, { sourceState: 'shadow' });
 
     expect(snapshot.sourceState).toBe('shadow');
+    expect(snapshot.routing.sourceState).toBe('demo');
+    expect(snapshot.triageInference.sourceState).toBe('demo');
+    expect(snapshot.specialistInferences.every((entry) => entry.sourceState === 'demo')).toBe(
+      true,
+    );
     expect(snapshot.orientation.sourceState).toBe('demo');
     expect(snapshot.prolongedStay.sourceState).toBe('demo');
     expect(snapshot.admissionMl.sourceState).toBe('demo');

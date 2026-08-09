@@ -193,6 +193,6 @@ export function inferTriageFromExpertSystem(
     confidence: matchedRules.length ? 0.84 : baseline.confidence === 'high' ? 0.78 : 0.62,
     rationale,
     requiresHumanReview: true,
-    sourceState: options.sourceState || 'live',
+    sourceState: options.sourceState || 'demo',
   };
 }

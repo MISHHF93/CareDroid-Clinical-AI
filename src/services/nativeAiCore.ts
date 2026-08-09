@@ -50,16 +50,21 @@ function resolveSourceState(explicit?: NativeAiSourceState): NativeAiSourceState
 
 /**
  * predictPostEdOrientation/predictProlongedEdStay/predictAdmissionLikelihoodMl/
- * extractMultiChannelClinicalTextFeatures are hand-coded heuristic formulas
- * (their own MODEL_VERSION strings say so: "*-xgboost-heuristic",
- * "*-roberta-mha-cnn-heuristic") and each already defaults its own
- * sourceState to 'demo' — an honest, correct self-classification. Passing
- * the session-level resolveSourceState() result straight through overrides
- * that honest default with 'live' outside simulation mode, mislabeling
- * every one of these unvalidated heuristics as real live inference
- * (surfaced most visibly in AiTransparencyDashboard). Only forward the
- * resolved state when it's the (also honest) 'simulated' case; otherwise
- * let each function's own 'demo' default stand.
+ * extractMultiChannelClinicalTextFeatures/routePatientToClinicalSpecialists/
+ * runRoutedSpecialistPanel/inferTriageFromExpertSystem are ALL hand-coded
+ * heuristic formulas (keyword matching + vitals thresholds; zero ML/LLM) and
+ * each already defaults its own sourceState to 'demo' — an honest, correct
+ * self-classification. Passing the session-level resolveSourceState() result
+ * straight through overrides that honest default with 'live' outside
+ * simulation mode, mislabeling every one of these unvalidated heuristics as
+ * real live inference (surfaced most visibly in AiTransparencyDashboard).
+ * Only forward the resolved state when it's the (also honest) 'simulated'
+ * case; otherwise let each function's own 'demo' default stand.
+ *
+ * 2026-08-09: this filter used to only wrap 4 of the 7 heuristic calls below
+ * (orientation/prolongedStay/admissionMl/textFeatures) -- routing,
+ * specialistInferences, and triageInference received the raw sourceState
+ * unfiltered, so they still inherited 'live' by default. Extended to all 7.
  */
 function heuristicSourceState(sourceState: NativeAiSourceState): NativeAiSourceState | undefined {
   return sourceState === 'simulated' ? sourceState : undefined;
@@ -75,13 +80,15 @@ export function buildNativeAiPatientSnapshot(
   } = {},
 ): NativeAiPatientSnapshot {
   const sourceState = resolveSourceState(options.sourceState);
-  const routing = routePatientToClinicalSpecialists(patient, { sourceState });
+  const routing = routePatientToClinicalSpecialists(patient, {
+    sourceState: heuristicSourceState(sourceState),
+  });
   routingAuditLog.unshift(routing);
   if (routingAuditLog.length > 200) routingAuditLog.length = 200;
   appendRoutingAuditEntry(routing);
 
   const specialistInferences = runRoutedSpecialistPanel(patient, routing.specialistDomains, {
-    sourceState,
+    sourceState: heuristicSourceState(sourceState),
     routingConfidence: routing.confidence,
   });
 
@@ -98,7 +105,9 @@ export function buildNativeAiPatientSnapshot(
     sourceState,
     routing,
     specialistInferences,
-    triageInference: inferTriageFromExpertSystem(patient, { sourceState }),
+    triageInference: inferTriageFromExpertSystem(patient, {
+      sourceState: heuristicSourceState(sourceState),
+    }),
     orientation: predictPostEdOrientation(patient, {
       abnormalLabs: options.abnormalLabs,
       sourceState: heuristicSourceState(sourceState),
