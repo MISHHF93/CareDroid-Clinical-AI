@@ -35,7 +35,7 @@
 - **Dependencies**: None.
 - **Recommended canonical solution**: Applied — `DELETE_PROVEN_DEAD` per the epic's own 6-way disposition taxonomy.
 - **Validation requirements**: Full frontend `tsc --noEmit -p tsconfig.frontend.json` clean (whole-repo, not just an ad-hoc subset — confirms no transitive/barrel-export reference survived). ESLint clean on all 3 touched files. `vitest` blocked in this sandbox per established constraint; the change is purely subtractive (removing a provider wrap + its matching close tag), and a full-repo `tsc` pass would have caught any JSX mismatch as a compile error.
-- **Commit when resolved**: `TBD` (this round, pending commit).
+- **Commit when resolved**: `7a5dbaf4`
 - **Scorecard impact when resolved**: Pending next scorecard sync pass.
 
 ### HEAL-008 — 9 of `EmergencyOsController`'s `DEMO`-labeled capability keys traced individually, all found genuinely real (same bug class as HEAL-002)
