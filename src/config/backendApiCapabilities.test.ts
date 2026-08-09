@@ -106,6 +106,10 @@ describe('backendApiCapabilities', () => {
     expect(getBackendCapabilityStatus('emergencyOperatingSurfaces')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
     expect(getBackendCapabilityStatus('emergencyPatientFlow')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
     expect(getBackendCapabilityStatus('emergencyReassessment')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
+    expect(getBackendCapabilityStatus('emergencyCopilotRuntime')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
+    expect(getBackendCapabilityStatus('emergencyDepartmentSettings')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
+    // Correctly still demo -- self-labeled prototype simulation, not a mislabel.
+    expect(getBackendCapabilityStatus('emergencyAdvancedDecisionSupport')).toBe(BACKEND_CAPABILITY_STATUS.DEMO);
     // Corrected 2026-08-09: computes from the real TypeORM patient repository
     // (calculateEmergencyOsCapacity), not a fixture -- see backendApiCapabilities.ts's own comment.
     expect(getBackendCapabilityStatus('emergencyCapacity')).toBe(BACKEND_CAPABILITY_STATUS.REAL);

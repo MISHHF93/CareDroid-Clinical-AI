@@ -170,11 +170,30 @@ export const BACKEND_API_CAPABILITY_STATUS = Object.freeze({
   emergencyOcrIntake: BACKEND_CAPABILITY_STATUS.REAL,
   /** POST /api/emergency/waiting-room-safety/escalation-notify -- real email out-of-band channel. */
   waitingRoomEscalationNotify: BACKEND_CAPABILITY_STATUS.REAL,
-  emergencyCopilotRuntime: BACKEND_CAPABILITY_STATUS.DEMO,
+  /**
+   * Corrected 2026-08-09 (HEAL-008, round 3): EmergencyOsController.queryCopilot()
+   * (POST copilot/query) delegates to ChatService.processMessage() -- the same
+   * real canonical AI dispatcher the live ED Copilot UI uses (post the
+   * 2026-08-08 AI-Runtime Convergence fix) -- not a fixture response.
+   * listCopilotInteractions() (GET copilot/interactions) reads a real,
+   * in-memory interaction log populated by real DTO-driven writes
+   * (ClinicalDecisionSupportService.recordCopilotInteraction()), not seeded
+   * fixture data. No feature-flag/Mongoose gate on either route.
+   */
+  emergencyCopilotRuntime: BACKEND_CAPABILITY_STATUS.REAL,
   /** Optional / absent CareDroid routes; keep frontend clients from calling them until mounted. */
   emergencyCapacityDashboard: BACKEND_CAPABILITY_STATUS.DISABLED,
   emergencyCapacityHistory: BACKEND_CAPABILITY_STATUS.DISABLED,
   emergencyQueueAnalytics: BACKEND_CAPABILITY_STATUS.DISABLED,
+  /**
+   * Checked 2026-08-09 (HEAL-008, round 3) -- correctly left DEMO, not a
+   * mislabel. Covers real simulation/federated-learning/digital-twin
+   * computation, but HybridDigitalTwinService.initialize() defaults its own
+   * twinId to 'ed-hybrid-des-abm-twin-demo' and every response explicitly
+   * carries a self-reported productionGaps() disclosure -- this subsystem
+   * honestly self-classifies as a demo/prototype simulation engine, unlike
+   * the 7 EmergencyPatientService-backed keys corrected above.
+   */
   emergencyAdvancedDecisionSupport: BACKEND_CAPABILITY_STATUS.DEMO,
   emergencyReferralPersistence: BACKEND_CAPABILITY_STATUS.REAL,
   emergencyReferralHistory: BACKEND_CAPABILITY_STATUS.DISABLED,
@@ -186,7 +205,23 @@ export const BACKEND_API_CAPABILITY_STATUS = Object.freeze({
    * been synced only to local Zustand state, never persisted server-side. */
   emergencyTransferWorkflow: BACKEND_CAPABILITY_STATUS.REAL,
   emergencyDiversionStatus: BACKEND_CAPABILITY_STATUS.DISABLED,
-  emergencyDepartmentSettings: BACKEND_CAPABILITY_STATUS.DEMO,
+  /**
+   * Corrected 2026-08-09 (HEAL-008, round 3): EmergencyOsController.getSettings()/
+   * updateSettings() (GET/PATCH settings) read/write EmergencySettingsService's
+   * real, tenant-scoped, in-memory settings store -- the same "in-memory +
+   * real mutation logic = REAL, not a fixture" standard already applied to
+   * emergencyPatients/emergencyReceptionSnapshot elsewhere in this file. No
+   * feature-flag gate.
+   */
+  emergencyDepartmentSettings: BACKEND_CAPABILITY_STATUS.REAL,
+  /**
+   * Checked 2026-08-09 (HEAL-008, round 3) -- correctly left DEMO. Unlike
+   * emergencyDepartmentSettings above (which has real frontend callers --
+   * emergencySettingsApi.js/EmergencySettings.jsx), these 4 keys have zero
+   * references anywhere in the frontend outside this file itself -- no
+   * evidence of what UI/feature they're meant to gate, so no verdict can be
+   * reached without guessing. Left un-traced rather than assumed.
+   */
   emergencyThresholdSettings: BACKEND_CAPABILITY_STATUS.DEMO,
   emergencyAlertRuleSettings: BACKEND_CAPABILITY_STATUS.DEMO,
   emergencyShiftTemplates: BACKEND_CAPABILITY_STATUS.DEMO,
