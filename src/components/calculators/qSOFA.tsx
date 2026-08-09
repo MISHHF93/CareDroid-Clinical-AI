@@ -24,7 +24,7 @@ const emptyCriteria: CriteriaState = {
   systolicBp: false,
 };
 
-function criteriaFromVitals(vitals?: Vitals): CriteriaState {
+export function criteriaFromVitals(vitals?: Vitals): CriteriaState {
   return {
     alteredMentation: vitals?.gcs !== undefined && vitals.gcs < 15,
     respiratoryRate: vitals?.rr !== undefined && vitals.rr >= 22,
@@ -32,7 +32,7 @@ function criteriaFromVitals(vitals?: Vitals): CriteriaState {
   };
 }
 
-function resultFor(total: number) {
+export function resultFor(total: number) {
   if (total === 0) {
     return {
       band: 'Low risk',

@@ -75,7 +75,7 @@ function ageScoreFromDob(dob: string): ScoreValue {
   return 2;
 }
 
-function resultFor(total: number) {
+export function resultFor(total: number) {
   if (total <= 3) {
     return {
       band: 'Low risk',
