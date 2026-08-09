@@ -126,7 +126,7 @@ Full Explore-agent investigation (see HEAL-035 for the one bounded fix it produc
 - **Dependencies**: None.
 - **Recommended canonical solution**: Applied.
 - **Validation requirements**: `npx vitest run src/test/pilotWalkthrough.test.tsx` — 1/1 test passing, run twice independently (with and without a CLI timeout override) to confirm the fix addresses genuine runtime headroom, not just moving the goalposts once. Full frontend `npx tsc --noEmit -p tsconfig.frontend.json` clean.
-- **Commit when resolved**: (pending — recorded at commit time)
+- **Commit when resolved**: `50a55c7f`
 - **Scorecard impact when resolved**: Pending next scorecard sync pass — closes the last of this round's 2 deliberately-deferred `vitest run` findings (the other, HEAL-044, remains open pending a product decision, not a technical question).
 
 ### HEAL-048 — HEAL-008's remaining untraced `DEMO`-labeled capability keys (`integrationStatus`/`integrationTest`, 6 `surveillance*` keys) individually traced and confirmed CORRECTLY labeled — closes this backlog item with a clean negative result; also fixed a real typo (`'workflowOrchestration'` → `'emergencyWorkflowOrchestration'`) in `pageApiBinding.registry.ts`
