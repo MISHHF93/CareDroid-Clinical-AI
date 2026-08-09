@@ -37,7 +37,7 @@
 - **Dependencies**: None.
 - **Recommended canonical solution**: Applied — deleted the orphaned CSS file; removed the 4 stale exclude-glob/test-path lines referencing already-deleted paths from the 3 build-tool config files.
 - **Validation requirements**: Confirmed zero real importers of `src/components/ShiftSummary.css` via repo-wide grep before deletion. Confirmed `src/features/future-modules/_review/`, `src/pages/WorkspaceHome.jsx`, and `src/pages/WorkspaceHome.test.jsx` are all genuinely absent from the working tree before removing their exclude references. `npx tsc --noEmit -p tsconfig.frontend.json` clean after the change. ESLint clean on all touched files.
-- **Commit when resolved**: Pending (staged, not yet committed at ledger-write time).
+- **Commit when resolved**: `dea928af`
 - **Scorecard impact when resolved**: Pending next scorecard sync pass — this closes the "prototype workspaces" HEAL-EPIC-A category with a real (if small) fix, matching HEAL-017/018's disposition shape.
 
 ### HEAL-023 — `ClinicalDecisionSupportService` was entirely in-memory; a real clinical decision-support audit trail (calculator results + every live Copilot interaction) was lost on every backend restart
