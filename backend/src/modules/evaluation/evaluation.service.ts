@@ -1,7 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit, Optional } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import type { Repository } from 'typeorm';
 import { randomUUID } from 'crypto';
 import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
+import { EvaluationRunEntity } from './entities/evaluation-run.entity';
 import {
   CreateEvaluationRunDto,
   EvaluationBenchmark,
@@ -125,8 +128,49 @@ const DEFAULT_METRICS: EvaluationMetrics = {
 const METRIC_IDS: EvaluationMetricId[] = METRIC_DEFINITIONS.map((metric) => metric.id);
 
 @Injectable()
-export class EvaluationService {
+export class EvaluationService implements OnModuleInit {
+  private readonly logger = new Logger(EvaluationService.name);
   private readonly runs: EvaluationRun[] = this.bootstrapRuns();
+
+  constructor(
+    @Optional()
+    @InjectRepository(EvaluationRunEntity)
+    private readonly runRepository?: Repository<EvaluationRunEntity>,
+  ) {}
+
+  /**
+   * Load durable evaluation runs from TypeORM so a real run recorded from a
+   * live ED Copilot conversation (ChatService.recordEvaluationRun()) survives
+   * a process restart instead of silently disappearing, taking its carefully
+   * -tracked provenance with it. Prepended in front of the seed/demo runs
+   * bootstrapRuns() already populated, matching createRun()'s own unshift()
+   * ordering (newest/most-real first).
+   */
+  async onModuleInit(): Promise<void> {
+    if (!this.runRepository) return;
+    try {
+      const rows = await this.runRepository.find({ order: { createdAt: 'DESC' } });
+      for (const row of rows) {
+        try {
+          const run = JSON.parse(row.runJson) as EvaluationRun;
+          if (this.runs.some((existing) => existing.id === run.id)) continue;
+          this.runs.unshift(run);
+        } catch (parseError) {
+          this.logger.warn(`Failed to parse persisted evaluation run ${row.id}: ${parseError}`);
+        }
+      }
+    } catch (error) {
+      this.logger.warn(`Failed to rehydrate evaluation runs from database: ${error}`);
+    }
+  }
+
+  private persistRunToDatabase(run: EvaluationRun): void {
+    if (!this.runRepository) return;
+    const entity = this.runRepository.create({ id: run.id, runJson: JSON.stringify(run) });
+    this.runRepository.save(entity).catch((error) => {
+      this.logger.warn(`Failed to persist evaluation run ${run.id} to database: ${error}`);
+    });
+  }
 
   getMetricDefinitions(): EvaluationMetricDefinition[] {
     return METRIC_DEFINITIONS.map((metric) => ({ ...metric }));
@@ -196,6 +240,7 @@ export class EvaluationService {
     };
 
     this.runs.unshift(run);
+    this.persistRunToDatabase(run);
     return run;
   }
 
