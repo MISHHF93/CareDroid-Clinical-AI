@@ -19,6 +19,7 @@ import {
   type PatientArrivalRecord,
 } from '../types/emergency';
 import { useEmergencyStore } from '../store/emergencyStore';
+import { isEmergencyOsBoarding } from '../../lib/emergency-os/logic';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import {
   EMERGENCY_ACTIONS,
@@ -467,8 +468,7 @@ function PatientCard({
     patient.source === 'EMS';
   const hasLongWait = hasPatientFlag(patient, PatientFlag.LongWait);
   const hasLwbsRisk = hasPatientFlag(patient, PatientFlag.LWBSRisk);
-  const isBoarding =
-    patient.state === PatientState.Admission || hasPatientFlag(patient, PatientFlag.PendingAdmission);
+  const isBoarding = isEmergencyOsBoarding(patient);
   const isDischarged = patient.state === PatientState.Discharge || patient.state === PatientState.Deceased;
   const openReferral = referrals.find(
     (referral) => referral.patientId === patient.id && isOpenReferralStatus(referral.status),

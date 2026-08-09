@@ -1,5 +1,32 @@
 export type EmergencyOsCapacityBand = 'Green' | 'Yellow' | 'Orange' | 'Red';
 
+/**
+ * Canonical "is this patient boarding" predicate. Consolidates 6 previously
+ * independent, disagreeing definitions across the backend and frontend
+ * (found by a repository-wide domain-model audit, 2026-08-08) -- some
+ * missing the Disposition state, some missing the PendingAdmission flag,
+ * one checking a boardingStatus field that doesn't exist on the live
+ * Patient type at all. This is the most complete of the 6: matches the
+ * backend's own EmergencyOsController.isBoarding(), which is what the
+ * always-on, real UI traffic path actually uses.
+ *
+ * Deliberately takes plain state/flags rather than importing either
+ * stack's Patient type, since PatientState/PatientFlag enum members are
+ * these exact string literals -- this works unchanged for both the
+ * frontend's enum-based Patient and the backend's plain-string
+ * EmergencyPatient without either stack importing the other's types.
+ */
+export function isEmergencyOsBoarding(patient: {
+  state: string;
+  flags?: readonly string[] | null;
+}): boolean {
+  return (
+    patient.state === 'Admission' ||
+    patient.state === 'Disposition' ||
+    (patient.flags || []).includes('PendingAdmission')
+  );
+}
+
 export interface EmergencyOsCapacityThresholds {
   warningPercent: number;
   orangePercent: number;

@@ -11,6 +11,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import type { Repository } from 'typeorm';
 import {
   calculateEmergencyOsCapacity,
+  isEmergencyOsBoarding,
   type EmergencyOsCapacityThresholds,
 } from '../../../../lib/emergency-os/logic';
 import { readAIProviderConfig } from '../../../../lib/ai/config';
@@ -97,11 +98,7 @@ function isHighRisk(patient: EmergencyPatient): boolean {
 }
 
 function isBoarding(patient: EmergencyPatient): boolean {
-  return (
-    patient.state === 'Admission' ||
-    patient.state === 'Disposition' ||
-    patient.flags.includes('PendingAdmission')
-  );
+  return isEmergencyOsBoarding(patient);
 }
 
 function isDischargeReady(patient: EmergencyPatient): boolean {

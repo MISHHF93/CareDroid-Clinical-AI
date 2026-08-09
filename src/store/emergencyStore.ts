@@ -90,7 +90,7 @@ import {
 } from '../config/emergencySettings.config';
 import { syncEmergencyAuditEvent } from '../services/emergencyStaffingApi';
 import { calculateNews2FromVitals } from '../utils/news2';
-import { calculateEmergencyOsCapacity } from '../../lib/emergency-os/logic';
+import { calculateEmergencyOsCapacity, isEmergencyOsBoarding } from '../../lib/emergency-os/logic';
 import {
   buildAcknowledgeVitalsAlertPatch,
   buildAddVitalsPatch,
@@ -2107,9 +2107,7 @@ export function workflowLogFromJourneyEvent(
 
 function buildCapacitySnapshot(patients: Patient[], rooms: Room[]): CapacitySnapshot {
   const occupiedRooms = rooms.filter((room) => room.status === 'Occupied').length;
-  const boardingCount = patients.filter((patient) =>
-    [PatientState.Admission, PatientState.Disposition].includes(patient.state),
-  ).length;
+  const boardingCount = patients.filter((patient) => isEmergencyOsBoarding(patient)).length;
   const reassessmentDue = patients.filter((patient) =>
     patient.flags.includes(PatientFlag.ReassessmentDue),
   ).length;
@@ -6286,11 +6284,7 @@ function formatWaitMinutes(minutes: number): string {
 }
 
 function isBoardingPatient(patient: Patient): boolean {
-  return (
-    patient.state === PatientState.Admission ||
-    patient.state === PatientState.Disposition ||
-    hasPatientFlag(patient, PatientFlag.PendingAdmission)
-  );
+  return isEmergencyOsBoarding(patient);
 }
 
 function isPendingReferral(referral: Referral): boolean {

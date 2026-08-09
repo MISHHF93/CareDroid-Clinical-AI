@@ -3,6 +3,7 @@ import {
   EMERGENCY_OS_CAPACITY_INPUT_SCHEMA,
   EMERGENCY_OS_CAPACITY_OUTPUT_SCHEMA,
   calculateEmergencyOsCapacity,
+  isEmergencyOsBoarding,
 } from './logic';
 
 describe('CareDroid shared logic', () => {
@@ -62,5 +63,38 @@ describe('CareDroid shared logic', () => {
     expect(result.occupiedRooms).toBe(10);
     expect(result.totalPatients).toBe(0);
     expect(result.boardingCount).toBe(0);
+  });
+});
+
+/**
+ * Regression coverage for a repository-wide domain-model audit finding
+ * (2026-08-08): 6 independent, disagreeing "is this patient boarding"
+ * definitions existed across the backend and frontend -- some missing
+ * Disposition, some missing the PendingAdmission flag, one checking a
+ * boardingStatus field that doesn't exist on the live Patient type at all.
+ * Consolidated onto this one function, matching the backend's own
+ * canonical definition (the one the always-on, real UI traffic path uses).
+ */
+describe('isEmergencyOsBoarding', () => {
+  it('is true for a patient in Admission state', () => {
+    expect(isEmergencyOsBoarding({ state: 'Admission', flags: [] })).toBe(true);
+  });
+
+  it('is true for a patient in Disposition state (previously missed by 4 of the 6 old definitions)', () => {
+    expect(isEmergencyOsBoarding({ state: 'Disposition', flags: [] })).toBe(true);
+  });
+
+  it('is true for a patient flagged PendingAdmission regardless of state', () => {
+    expect(isEmergencyOsBoarding({ state: 'Waiting', flags: ['PendingAdmission'] })).toBe(true);
+  });
+
+  it('is false for a patient with none of the 3 boarding signals', () => {
+    expect(isEmergencyOsBoarding({ state: 'Triage', flags: [] })).toBe(false);
+    expect(isEmergencyOsBoarding({ state: 'Assessment', flags: ['HighRisk'] })).toBe(false);
+  });
+
+  it('treats a missing flags array as empty rather than throwing', () => {
+    expect(isEmergencyOsBoarding({ state: 'Waiting' })).toBe(false);
+    expect(isEmergencyOsBoarding({ state: 'Admission' })).toBe(true);
   });
 });

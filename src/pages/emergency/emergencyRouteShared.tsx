@@ -5,6 +5,7 @@ import EdJourneyProgressRail from '../../components/emergency/EdJourneyProgressR
 import { useRouteChromeRegistration } from '../../contexts/RouteChromeContext';
 import { OperationalPageTemplate, PageShell } from '../../components/ui/CareDroidPrimitives';
 import { PatientFlag, PatientState } from '../../types/emergency';
+import { isEmergencyOsBoarding } from '../../../lib/emergency-os/logic';
 import { resolveEdDataFreshness, resolveEdSourceLabel } from '../../utils/edDataSource';
 import { usePractitionerSurfaceVisibility } from '../../contexts/PractitionerVisibilityContext';
 import { metricColorForTone } from '../../config/semanticColorSystem';
@@ -443,9 +444,7 @@ export function isHighRisk(patient) {
 }
 
 export function isBoarding(patient) {
-  return (
-    patient.state === PatientState.Admission || patient.flags.includes(PatientFlag.PendingAdmission)
-  );
+  return isEmergencyOsBoarding(patient);
 }
 
 export function displayPatientName(patient) {
