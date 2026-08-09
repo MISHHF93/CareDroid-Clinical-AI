@@ -126,7 +126,7 @@ Full Explore-agent investigation (see HEAL-035 for the one bounded fix it produc
 - **Dependencies**: None.
 - **Recommended canonical solution**: Applied (typo fix). No further action on the capability labels.
 - **Validation requirements**: `npx vitest run src/config/pageApiBinding.registry.test.ts` — 5/5 tests passing. Full frontend `npx tsc --noEmit -p tsconfig.frontend.json` clean.
-- **Commit when resolved**: (pending — recorded at commit time)
+- **Commit when resolved**: `18dfbb54`
 - **Scorecard impact when resolved**: Pending next scorecard sync pass — closes a long-standing backlog item cleanly.
 
 ### HEAL-047 — Built a real, working `/onboarding` page (Organization onboarding) for the first time — a route referenced in 6+ files (including an already-live, fully-wired backend endpoint and an orphaned frontend API client method) but with zero page ever built, per the user's explicit 2026-08-09 directive to find and build missing pages
