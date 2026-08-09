@@ -8,14 +8,28 @@ import {
   type CareDroidScreenMode,
 } from './careDroidScreenModes';
 
+// Kept local (not imported from emergencyRoleScreenMatrix.ts) to avoid a
+// circular dependency: that file already imports coerceScreenModeForRole
+// FROM this one. Previously only 9 of the 12 canonical role ids (missing
+// itAdmin/dispatcher/emsCoordinator) -- normalizeEmergencyRoleId() silently
+// returned null for those 3, which made isRoleAllowedForScreenMode() always
+// false and coerceScreenModeForRole()'s allow-list check a permanent no-op
+// for them (falls through to the unmodified incoming screen mode, neither
+// redirecting nor blocking). Must stay in sync with the other 2 local
+// copies of this same 12-value set (emergencyRoleScreenMatrix.ts,
+// emergencyRolePermissions.ts).
 export const EMERGENCY_ROLE_ID = Object.freeze({
   admin: 'admin',
+  /** Technical admin — no PHI/clinical grants (Stage D alignment). */
+  itAdmin: 'it_admin',
   edManager: 'ed_manager',
   chargeNurse: 'charge_nurse',
   triageNurse: 'triage_nurse',
   physician: 'physician',
   registrationClerk: 'registration_clerk',
   emsUser: 'ems_user',
+  dispatcher: 'dispatcher',
+  emsCoordinator: 'ems_coordinator',
   readOnlyViewer: 'read_only_viewer',
   publicDisplay: 'public_display',
 } as const);
@@ -31,8 +45,11 @@ export const SCREEN_MODE_ROLE_OPTIONS: ReadonlyArray<{
   { id: EMERGENCY_ROLE_ID.chargeNurse, label: 'Charge / flow nurse' },
   { id: EMERGENCY_ROLE_ID.physician, label: 'Physician / NP / PA' },
   { id: EMERGENCY_ROLE_ID.emsUser, label: 'EMS handoff nurse' },
+  { id: EMERGENCY_ROLE_ID.dispatcher, label: 'EMS dispatcher' },
+  { id: EMERGENCY_ROLE_ID.emsCoordinator, label: 'EMS coordinator' },
   { id: EMERGENCY_ROLE_ID.edManager, label: 'Department manager' },
   { id: EMERGENCY_ROLE_ID.admin, label: 'Site admin' },
+  { id: EMERGENCY_ROLE_ID.itAdmin, label: 'IT admin' },
   { id: EMERGENCY_ROLE_ID.readOnlyViewer, label: 'Read-only / wall display' },
   { id: EMERGENCY_ROLE_ID.publicDisplay, label: 'Public waiting display' },
 ]);
@@ -56,6 +73,8 @@ export const DEFAULT_ALLOWED_ROLES_BY_SCREEN_MODE: Readonly<
   ]),
   [CARE_DROID_SCREEN_MODES.ems]: Object.freeze([
     EMERGENCY_ROLE_ID.emsUser,
+    EMERGENCY_ROLE_ID.dispatcher,
+    EMERGENCY_ROLE_ID.emsCoordinator,
     EMERGENCY_ROLE_ID.chargeNurse,
     EMERGENCY_ROLE_ID.edManager,
     EMERGENCY_ROLE_ID.admin,
@@ -91,6 +110,7 @@ export const DEFAULT_ALLOWED_ROLES_BY_SCREEN_MODE: Readonly<
   ]),
   [CARE_DROID_SCREEN_MODES.admin]: Object.freeze([
     EMERGENCY_ROLE_ID.admin,
+    EMERGENCY_ROLE_ID.itAdmin,
     EMERGENCY_ROLE_ID.edManager,
   ]),
 });
