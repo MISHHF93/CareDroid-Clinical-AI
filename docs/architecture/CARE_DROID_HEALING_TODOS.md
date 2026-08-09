@@ -36,7 +36,7 @@
 - **Dependencies**: None.
 - **Recommended canonical solution**: Applied — deleted the component and its CSS; updated the 2 stale references (a test-contract list entry, an AI-instruction doc section).
 - **Validation requirements**: Confirmed zero real importers via repo-wide grep before deletion. `npx tsc --noEmit -p tsconfig.frontend.json` clean. ESLint clean on `platformCohesion.contract.test.ts`.
-- **Commit when resolved**: Pending (staged, not yet committed at ledger-write time).
+- **Commit when resolved**: `cebc920c`
 - **Scorecard impact when resolved**: Pending next scorecard sync pass — closes a small "old dashboards" sub-finding alongside HEAL-022's 4th-file update and HEAL-025's new investigation entry.
 
 ### HEAL-024 — Orphaned, broken-import `ShiftSummary.css` + 3 stale build-config exclude lines left behind by an earlier deletion (HEAL-EPIC-A, "prototype workspaces" category)
