@@ -36,7 +36,7 @@
 - **Dependencies**: None for the 2 fixed pairs. The remaining 3 need the same pattern applied: identify each pair's two implementation files, export any currently-private scoring functions (additive only), write a `*Equivalence.test.ts` file locking them together across their full clinical input range, following `heartScoreEquivalence.test.ts`/`qsofaEquivalence.test.ts`/`news2Equivalence.test.ts` as templates.
 - **Recommended canonical solution**: Applied for HEART/qSOFA. For the remaining 3: same pattern. Longer-term, this whole "2 live implementations of the same calculator" architecture (not just the missing tests) is itself worth a future consolidation decision — see the "old calculators" HEAL-EPIC-A category notes below for the full pair list.
 - **Validation requirements**: `npx tsc --noEmit -p tsconfig.frontend.json` and ESLint clean on all touched/new files. Both new test files' assertions independently hand-verified against each implementation's actual boundary logic (documented in this entry) since `vitest` is blocked in this sandbox (established constraint) — every threshold and boundary claimed above was traced against the real source, not assumed.
-- **Commit when resolved**: Pending (staged, not yet committed at ledger-write time).
+- **Commit when resolved**: `e235ec3b`
 - **Scorecard impact when resolved**: Pending next scorecard sync pass.
 
 ### HEAL-028 — `CommercialPages.tsx` was a dead 3-line re-export barrel kept alive only by one smoke test's import path
