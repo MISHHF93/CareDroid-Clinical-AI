@@ -15,7 +15,13 @@ import {
 // allowedRoles: ALL_USER_PROFILES with no requiredPermissions, consistent with
 // its own 2026-08-06 shipping commit describing it as "a real sidebar entry
 // under Help".
-const ROUTES_WITHOUT_REQUIRED_PERMISSIONS = new Set(['/emergency/help', '/navigator']);
+// '/onboarding' (Organization onboarding): the backend endpoint it submits to
+// (POST /api/organizations/onboarding) only requires @UseGuards(AuthGuard('jwt'))
+// -- no @RequirePermission -- a deliberate self-service "any authenticated user
+// can create their own organization" design, matching CreateOrganizationDto's
+// sibling POST /organizations endpoint. No frontend permission to require here
+// without contradicting that backend design.
+const ROUTES_WITHOUT_REQUIRED_PERMISSIONS = new Set(['/emergency/help', '/navigator', '/onboarding']);
 
 describe('ROUTE_ACCESS_CONFIG', () => {
   it('every entry has required fields', () => {

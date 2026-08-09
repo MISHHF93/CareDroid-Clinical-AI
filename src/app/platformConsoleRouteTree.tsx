@@ -50,6 +50,7 @@ const OrganizationSettingsPage = lazyNamed(
   () => import('../pages/organization/OrganizationPages'),
   'OrganizationSettings',
 );
+const OrganizationOnboardingPage = lazyRoute(() => import('../pages/organization/OrganizationOnboarding'));
 const WorkspaceDependencyGraphPage = lazyNamed(
   () => import('../pages/platform/WorkspaceDependencyGraph'),
   'WorkspaceDependencyGraphPage',
@@ -106,6 +107,7 @@ const PLATFORM_CONSOLE_PAGE_COMPONENTS = Object.freeze({
   departments: DepartmentsPageComponent,
   serviceLines: ServiceLinesPageComponent,
   organizationSettings: OrganizationSettingsPage,
+  organizationOnboarding: OrganizationOnboardingPage,
   workspaceDependencyGraph: WorkspaceDependencyGraphPage,
   workflowMining: WorkflowMiningEnginePage,
   workflowBuilder: WorkflowBuilderPage,

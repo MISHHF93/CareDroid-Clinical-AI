@@ -348,7 +348,7 @@ const Settings = () => {
           <div className="settings-platform-strip">
             <div className="settings-platform-strip__title">Organization platform</div>
             <p className="settings-platform-strip__description">
-              Admin, billing, product, and configuration hubs are separated from normal preferences.
+              Admin and billing hubs are separated from normal preferences.
             </p>
             <div className="settings-platform-strip__actions">
               {hasPermission?.(Permission.VIEW_ANALYTICS) || hasPermission?.(Permission.MANAGE_USERS) ? (
@@ -364,21 +364,6 @@ const Settings = () => {
               {hasPermission?.(Permission.MANAGE_SUBSCRIPTIONS) ? (
                 <Link to="/billing">
                   <Button variant="secondary">Billing</Button>
-                </Link>
-              ) : null}
-              {hasPermission?.(Permission.VIEW_ANALYTICS) ? (
-                <Link to="/products">
-                  <Button variant="ghost">Products</Button>
-                </Link>
-              ) : null}
-              {hasPermission?.(Permission.CONFIGURE_SYSTEM) ? (
-                <Link to="/configuration-studio">
-                  <Button variant="ghost">Configuration studio</Button>
-                </Link>
-              ) : null}
-              {hasPermission?.(Permission.CONFIGURE_SYSTEM) ? (
-                <Link to="/settings/features">
-                  <Button variant="secondary">Feature management</Button>
                 </Link>
               ) : null}
             </div>

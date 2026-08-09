@@ -94,12 +94,6 @@ export function OrganizationDashboard() {
           <Link to="/asset-packs">
             <Button variant="primary">Solution packs</Button>
           </Link>
-          <Link to="/products">
-            <Button variant="secondary">Product catalog</Button>
-          </Link>
-          <Link to="/outcomes">
-            <Button variant="secondary">Outcomes</Button>
-          </Link>
         </ActionRow>
       }
     >
@@ -534,7 +528,6 @@ export function PackMarketplace() {
         </p>
         <div className="org-page-actions">
           <Link to="/settings/organization">← Organization settings</Link>
-          <Link to="/products">Product catalog</Link>
         </div>
       </header>
       {!organization?.id && (
@@ -872,7 +865,6 @@ export function CustomerSuccessDashboard() {
               <option value="month">Month</option>
             </select>
           </label>
-          <Link to="/value-tracking">Value tracking</Link>
           <Link to="/platform-analytics">Platform analytics</Link>
         </div>
       </header>
@@ -1112,7 +1104,6 @@ export function OrganizationIntelligenceProfile() {
         </p>
         <div className="org-page-actions">
           <Link to="/platform-analytics">Platform analytics</Link>
-          <Link to="/customer-success">Customer success</Link>
           <Link to="/tenant-admin">Tenant administration</Link>
           <Link to="/asset-packs">Review packs</Link>
         </div>
@@ -1755,7 +1746,6 @@ export function TenantAdministrationCenter() {
         </p>
         <div className="org-page-actions">
           <Link to="/organization">Organization home</Link>
-          <Link to="/solution-builder">Solution Builder</Link>
           <Link to="/billing">Billing</Link>
         </div>
       </header>
