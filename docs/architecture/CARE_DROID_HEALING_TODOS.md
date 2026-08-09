@@ -37,7 +37,7 @@
 - **Dependencies**: None. The separate, already-documented `format:check` 28-file drift (CI's own non-blocking step) was NOT investigated or touched this round — different gate, different (accepted) disposition, out of scope for this fix.
 - **Recommended canonical solution**: Applied — `node scripts/run-eslint.mjs --fix` (backend), re-verified 0 errors.
 - **Validation requirements**: Backend `npx eslint {src,test}/**/*.ts` (via `npm run lint` in `backend/`) clean, exit 0. Backend `tsc --noEmit -p tsconfig.build.json` clean before and after. Targeted Jest re-run of all 10 touched/related spec suites (`app-navigator` ×2, `role-permissions.read-only-viewer`, `ems-arrival-status-persistence`, `referral-persistence`, `waiting-room-escalation-notification`, `workspace-context.service`, plus the 3 sibling `organizations` suites) — 10/10 suites, 40/40 tests passing, zero regressions. Frontend `eslint src` and `tsc --noEmit -p tsconfig.frontend.json` independently re-confirmed clean (unaffected, checked for completeness of this round's normalization pass).
-- **Commit when resolved**: Pending (this session).
+- **Commit when resolved**: `97d1d202`
 - **Scorecard impact when resolved**: Pending next scorecard sync pass — Domain 8 (Architecture & Repository Convergence) or a build-correctness callout; closes a real, previously-undocumented CI-gate break.
 
 ### HEAL-030 — HEART score, qSOFA, and NIHSS each have 2 live, independently-maintained implementations reachable via different navigation paths with no test guaranteeing they agree; added the missing regression guards for all 3
