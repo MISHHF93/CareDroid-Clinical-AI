@@ -49,6 +49,8 @@ export enum Permission {
   VIEW_AI_SECURITY = 'VIEW_AI_SECURITY',
   MANAGE_AI_SECURITY = 'MANAGE_AI_SECURITY',
   REVIEW_AI_SECURITY_INCIDENTS = 'REVIEW_AI_SECURITY_INCIDENTS',
+  VIEW_AI_TRAINING = 'VIEW_AI_TRAINING', // View model training/evaluation runs and dashboards
+  MANAGE_AI_TRAINING = 'MANAGE_AI_TRAINING', // Create training runs and submit evaluation results
   VIEW_INTEGRATIONS = 'VIEW_INTEGRATIONS',
   MANAGE_INTEGRATIONS = 'MANAGE_INTEGRATIONS',
   IMPORT_PATIENT_DATA = 'IMPORT_PATIENT_DATA',
@@ -283,6 +285,17 @@ export const PermissionMetadata: Record<
     description: 'Review and disposition AI security incidents',
     category: 'AI Security',
     riskLevel: 'critical',
+  },
+  [Permission.VIEW_AI_TRAINING]: {
+    description: 'View model training/evaluation runs, metrics, and dashboards',
+    category: 'AI Training & Evaluation',
+    riskLevel: 'medium',
+  },
+  [Permission.MANAGE_AI_TRAINING]: {
+    description:
+      'Create training runs and submit evaluation results that can feed the model-promotion pool',
+    category: 'AI Training & Evaluation',
+    riskLevel: 'high',
   },
   [Permission.VIEW_INTEGRATIONS]: {
     description: 'View FHIR, HL7, source provenance, and import status',
