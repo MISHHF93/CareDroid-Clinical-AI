@@ -371,9 +371,29 @@ export default function AiCommandCenterDashboard() {
             </SectionCard>
 
             {/* Tool Calls */}
-            <SectionCard title="Tool Routing">
+            <SectionCard title="Cost-Tier Routing (Estimated)">
               {tools ? (
                 <div className="u-flex-col u-gap-8">
+                  {/*
+                    2026-08-09: this panel renders RoutingOptimizerService's
+                    (backend/src/modules/cost-optimizer/) routeCounts, a cost
+                    ESTIMATE computed independently of the real model call --
+                    verified by tracing chat.service.ts's real ED Copilot
+                    path (invokeAnthropicEdCopilot -> unifiedAIClient.request)
+                    and confirming it never reads costOptimization at all.
+                    'lightweight_model'/'rag'/'expert_model' are hypothetical
+                    cost tiers, not distinct real models -- every request is
+                    actually served by the same configured provider/model.
+                    Was titled "Tool Routing" with no disclosure, which read
+                    as real operational model-dispatch tracking. Renamed +
+                    captioned rather than removed: the cost-estimation
+                    feature itself is real and useful for planning, the
+                    truthfulness gap was the missing disclosure.
+                  */}
+                  <p className="ai-cc-section-card__note">
+                    Estimated cost-tier routing, computed independently of the actual model call.
+                    Every request is currently served by the same real provider/model.
+                  </p>
                   <div className="ai-cc-tool-summary-row">
                     <span className="ai-cc-kv-row__label">Total requests</span>
                     <span className="u-fw-700">{tools.totalRequests}</span>

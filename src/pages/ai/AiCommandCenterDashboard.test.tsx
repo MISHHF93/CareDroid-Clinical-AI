@@ -108,4 +108,36 @@ describe('AiCommandCenterDashboard', () => {
     });
     expect(screen.queryByText('CareDroid Unified AI Node')).not.toBeInTheDocument();
   });
+
+  /**
+   * 2026-08-09: this panel renders RoutingOptimizerService's routeCounts
+   * (lightweight_model/rag/expert_model), a cost estimate computed
+   * independently of the real model call -- verified by tracing
+   * chat.service.ts's real ED Copilot path and confirming it never reads
+   * costOptimization. Was titled "Tool Routing" with no disclosure, which
+   * read as real operational model-dispatch tracking to anyone viewing
+   * this dashboard (Site Admin/Manager). Renamed + captioned rather than
+   * removed, since the cost-estimation feature itself is real.
+   */
+  it('discloses that the cost-tier routing panel is an estimate, not real model dispatch tracking', async () => {
+    mockedFetch.mockResolvedValue({
+      ...BASE_SNAPSHOT,
+      toolUsage: {
+        totalRequests: 4,
+        routeCounts: { lightweight_model: 2, rag: 1, expert_model: 1 },
+        complexityCounts: {},
+        successRate: 1,
+        successLabel: '100%',
+      },
+    } as any);
+    render(<AiCommandCenterDashboard />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Cost-Tier Routing (Estimated)')).toBeInTheDocument();
+    });
+    expect(screen.queryByText('Tool Routing')).not.toBeInTheDocument();
+    expect(
+      screen.getByText(/computed independently of the actual model call/i),
+    ).toBeInTheDocument();
+  });
 });

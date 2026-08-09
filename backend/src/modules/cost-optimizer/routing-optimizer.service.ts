@@ -13,6 +13,22 @@ import {
   RoutingStrategy,
 } from './cost-optimizer.types';
 
+/**
+ * Cost-ESTIMATION tool, not a real routing decision. `optimizeRequest()`'s
+ * `RoutingPlan.model`/`.strategy` (`lightweight_model`/`rag`/`expert_model`,
+ * fictional model names like `caredroid-lightweight-mini`) never influence
+ * which real model actually answers a request -- verified 2026-08-09 by
+ * tracing chat.service.ts's real ED Copilot call path
+ * (`invokeAnthropicEdCopilot` -> `unifiedAIClient.request()`), which never
+ * reads the `costOptimization` this service computes. Every real request is
+ * served by the same configured provider/model (`AI_PROVIDER`); this class
+ * predicts what cost/routing WOULD look like under a hypothetical tiered
+ * architecture, for planning/dashboard purposes. `AiCommandCenterDashboard`
+ * discloses this (see its "Cost-Tier Routing (Estimated)" section) --
+ * before that fix, the dashboard's "Tool Routing" panel showed these
+ * fictional tiers with no disclosure, reading as real operational
+ * model-dispatch tracking.
+ */
 @Injectable()
 export class RoutingOptimizerService {
   private totalRequests = 0;

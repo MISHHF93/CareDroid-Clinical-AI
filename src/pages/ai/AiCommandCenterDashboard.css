@@ -115,6 +115,17 @@
   color: #64748b;
 }
 
+.ai-cc-section-card__note {
+  margin: -6px 0 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #64748b;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
 .ai-cc-expert-row {
   display: flex;
   align-items: center;
