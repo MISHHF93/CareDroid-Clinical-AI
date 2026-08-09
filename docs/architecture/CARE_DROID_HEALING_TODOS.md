@@ -194,13 +194,21 @@
 - **Current status**: `CONFIRMED`, deliberately not fixed. This is the single highest-severity open item in the whole ledger by the campaign's own P0-security-first ranking, but requires a product/security decision on the correct canonical vocabulary (pick one of the 4: backend `UserRole` 5-value, `EmergencyRoleClaimId` 12-value, `SaasUserRole` 22-value, frontend `HospitalRole` 22-value) before any code change — guessing risks a real privilege-escalation regression.
 - **Recommended canonical solution**: `MANUAL_REVIEW` — needs explicit human sign-off on the canonical role vocabulary before implementation.
 
-### HEAL-012 — `clinicalIntentRouterBackend.ts` backend-side duplicate
+### HEAL-012 — `clinicalIntentRouterBackend.ts` — corrected framing, real live gap closed via stopgap; full relocation deferred
 
-- **Severity**: P2_MEDIUM
+- **Severity**: P2_MEDIUM (was framed as a dead/duplicate-code cleanup; corrected — it's a live-path recognition-accuracy gap)
 - **Domain**: Clinical terminology recognition
-- **Source evidence**: Backend has its own duplicate of complaint/intent routing logic because it cannot reach `src/data/clinicalTerminology/` (frontend-only path; `backend/tsconfig.build.json` only allows `lib/` and `src/types/`).
-- **Current status**: `CONFIRMED`, not fixed.
-- **Recommended canonical solution**: Relocate `clinicalConceptTypes.ts` (and whatever else is needed) into `lib/` or `src/types/` so both stacks import the same canonical types/logic, then delete the backend duplicate.
+- **Source evidence**: Original framing ("backend has a dead/duplicate router, relocate and delete") was wrong on the "dead" claim — traced the full call graph and found it live: `EmergencyOsController.getPatientOrchestration()` (`GET /emergency/patients/:patientId/orchestration`) → `orchestrationService.buildPatientOrchestration()` → `recommendTools.ts`'s `buildPatientCardOrchestrationContext()` → `ClinicalIntentRouter.routeComplaint()` here → consumed by `CopilotPanel.tsx`/`PatientCardCopilot.tsx`'s tool recommendations via `usePatientOrchestration()`. The real bug: unlike `src/data/clinicalIntentRouter.ts` (which falls back to the canonical `recognizeComplaint()` pipeline when its own alias list misses), this backend mirror had no fallback and could not reach that pipeline at all (`backend/tsconfig.build.json` only allows `lib/`/`src/types/`; the canonical recognizer's dependency chain includes the safety-relevant `src/services/highRiskComplaintFlags.ts`) — so real phrasings the canonical recognizer already knows ("heart attack", "chest tightness", "can't breathe", "septic shock", "acute abdomen") silently failed to route, degrading real Copilot tool recommendations.
+- **Affected files**: `lib/patient-orchestration/clinicalIntentRouterBackend.ts`(+new `.test.ts`)
+- **Runtime/frontend/backend impact**: Copilot tool recommendations (calculators/protocols/referrals suggested) are now more complete for the 5 concepts both registries cover (chest pain, stroke, sepsis, shortness of breath, abdominal pain).
+- **AI/ML impact**: N/A (deterministic keyword routing, not AI).
+- **Affected user profiles**: Physician/NP/PA, Triage Nurse, Charge Nurse (Copilot panel + patient card tool-recommendation viewers).
+- **Clinical-safety impact**: Low-moderate — this is a tool-*recommendation* completeness gap, not a missed safety alert (`highRiskComplaintFlags.ts`'s own fast-flag detection is a separate, unaffected, already-correctly-firing mechanism this router never gated).
+- **Current status**: `VALIDATED` (stopgap fix) / `CONFIRMED` (canonical fix still open, see below)
+- **Recommended canonical solution**: Applied as a stopgap — manually synced alias lists against `HIGH_RISK_COMPLAINT_FLAG_DEFINITIONS`. The proper long-term fix (relocating the shared recognition pipeline into `lib/` so this file can delegate directly instead of a hand-synced mirror) remains open — deliberately deferred since it touches safety-relevant code (`highRiskComplaintFlags.ts`) and needs its own careful, dedicated round, not a rushed multi-file relocation.
+- **Validation requirements**: `tsc`/ESLint clean on both stacks. `vitest` blocked in this sandbox even for `lib/` (confirmed via direct run, not assumed) — verified empirically by copying the exact matcher logic into a standalone Node script and running all 15 test cases directly (all pass). Backend regression check: 74/74 tests passing across the 2 suites covering this endpoint chain.
+- **Commit when resolved**: `d0fbf4d0` (stopgap)
+- **Scorecard impact when resolved**: Pending next scorecard sync pass.
 - **Dependencies**: None blocking — safely schedulable.
 
 ### HEAL-013 — Capacity Mongoose/TypeORM "fork" — RETRACTED, same correction as HEAL-006
