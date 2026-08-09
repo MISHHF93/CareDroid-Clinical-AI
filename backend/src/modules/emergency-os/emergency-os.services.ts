@@ -60,6 +60,7 @@ import { Patient } from './entities/patient.entity';
 import { Alert } from './entities/alert.entity';
 import { Referral as ReferralEntity } from './entities/referral.entity';
 import { EmsArrivalStatus } from './entities/ems-arrival-status.entity';
+import { EmergencyOsSettingsEntity } from './entities/emergency-os-settings.entity';
 import { EmailService } from '../email/email.service';
 import { getEnvironmentConfig } from '../../config/environment.config';
 import { WorkflowActionLogEntry } from './entities/workflow-action-log-entry.entity';
@@ -2707,9 +2708,55 @@ export class CompleteImplementationReadinessService {
 }
 
 @Injectable()
-export class EmergencySettingsService {
+export class EmergencySettingsService implements OnModuleInit {
+  private readonly logger = new Logger(EmergencySettingsService.name);
   private readonly defaultSettings = clone(DEFAULT_EMERGENCY_OS_SETTINGS);
   private readonly byOrganization = new Map<string, EmergencyOsSettingsContract>();
+
+  constructor(
+    @Optional()
+    @InjectRepository(EmergencyOsSettingsEntity)
+    private readonly settingsRepository?: Repository<EmergencyOsSettingsEntity>,
+  ) {}
+
+  /**
+   * Load durable settings overrides from TypeORM so a hospital's tuned
+   * thresholds (reassessment intervals, capacity warnings, EMS offload
+   * targets, etc.) survive a process restart instead of silently reverting
+   * to hardcoded defaults -- previously this service was in-memory only.
+   */
+  async onModuleInit(): Promise<void> {
+    if (!this.settingsRepository) return;
+    try {
+      const rows = await this.settingsRepository.find();
+      for (const row of rows) {
+        try {
+          const persisted = JSON.parse(row.settingsJson) as Partial<EmergencyOsSettingsContract>;
+          this.byOrganization.set(
+            row.organizationId,
+            mergeSettings(this.defaultSettings, persisted),
+          );
+        } catch (parseError) {
+          this.logger.warn(
+            `Failed to parse persisted settings for organization ${row.organizationId}: ${parseError}`,
+          );
+        }
+      }
+    } catch (error) {
+      this.logger.warn(`Failed to rehydrate settings from database: ${error}`);
+    }
+  }
+
+  private persistSettingsToDatabase(key: string, settings: EmergencyOsSettingsContract): void {
+    if (!this.settingsRepository) return;
+    const entity = this.settingsRepository.create({
+      organizationId: key,
+      settingsJson: JSON.stringify(settings),
+    });
+    this.settingsRepository.save(entity).catch((error) => {
+      this.logger.warn(`Failed to persist settings for organization ${key} to database: ${error}`);
+    });
+  }
 
   private organizationKey(organizationId?: string): string {
     const normalized = String(organizationId || '').trim();
@@ -2759,6 +2806,7 @@ export class EmergencySettingsService {
     };
 
     this.byOrganization.set(key, merged);
+    this.persistSettingsToDatabase(key, merged);
     return this.getSettings(organizationId);
   }
 }

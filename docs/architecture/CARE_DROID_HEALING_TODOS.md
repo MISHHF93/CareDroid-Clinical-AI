@@ -19,6 +19,27 @@
 
 ## VALIDATED (this campaign, most recent first)
 
+### HEAL-019 — `EmergencySettingsService` was entirely in-memory; hospital-tuned safety thresholds silently reverted to defaults on every backend restart (HEAL-EPIC-D, first bounded slice)
+
+- **Severity**: P1_HIGH
+- **Domain**: Persistence ownership (HEAL-EPIC-D's "Settings" domain)
+- **Source evidence**: `EmergencySettingsService` (`backend/src/modules/emergency-os/emergency-os.services.ts`) was backed entirely by `private readonly byOrganization = new Map<string, EmergencyOsSettingsContract>()` — no `@InjectRepository`, no database call anywhere. `getSettings()`/`updateSettings()` (real, tenant-scoped, `CONFIGURE_SYSTEM`-gated routes on `EmergencyOsController`) read/write only that in-memory map. `EmergencyOsSettingsContract` includes `reassessmentThresholds` (P1-P5 minute intervals controlling when a patient gets flagged `ReassessmentDue`), `capacityThresholds` (warning/critical percentages), `emsThresholds` (offload target minutes), and `notificationSettings` (escalation minutes) — all safety-relevant operational configuration a hospital could legitimately tune away from defaults. Every one of those customizations was lost on every backend restart/redeploy, silently reverting to hardcoded defaults with no error, no warning, and no way for staff to know their configured thresholds had reverted. Not previously documented anywhere in this campaign's ledger, scorecard, or audit docs — confirmed via direct grep before starting.
+- **Affected files**: `backend/src/modules/emergency-os/entities/emergency-os-settings.entity.ts` (new), `backend/src/database/migrations/1772702100000-CreateEmergencyOsSettings.ts` (new), `backend/src/modules/emergency-os/emergency-os.module.ts` (entity registered in `TypeOrmModule.forFeature`), `backend/src/modules/emergency-os/emergency-os.services.ts` (`EmergencySettingsService` now `implements OnModuleInit`, optional injected repository, rehydration + write-through), `backend/src/modules/emergency-os/emergency-os-settings-persistence.spec.ts` (new, 6 tests)
+- **Runtime impact**: Settings changes now survive a process restart. No behavior change for any caller when the database is unavailable (optional injection, matches `ReferralService`/`EMSIntakeService`'s established graceful-degradation pattern — verified via a dedicated test).
+- **Frontend impact**: None directly — `emergencySettingsApi.tsx`'s existing contract is unchanged; the fix is entirely backend-side persistence.
+- **Backend impact**: New `emergency_os_settings` table (`organizationId` primary key, `settingsJson` text column storing the whole contract as one JSON blob — matching how this service already treats the contract atomically everywhere via `materializeSettings`/`mergeSettings`/`clone`, deliberately not decomposed into dozens of relational columns for an 11-section nested config object). Rehydration on boot deep-merges each persisted row onto today's defaults (`mergeSettings(this.defaultSettings, persisted)`), so a schema change adding new default fields never loses old persisted overrides and never leaves new fields `undefined`.
+- **Data impact**: Real durability added for a domain that previously had none.
+- **AI/ML impact**: N/A.
+- **Affected user profiles**: Site Admin (the only role with `CONFIGURE_SYSTEM`, the sole caller of `updateSettings()`); indirectly every profile whose workflow depends on the tuned thresholds (Triage Nurse/reassessment intervals, Charge Nurse/capacity warnings, EMS Handoff/offload targets).
+- **Security/privacy impact**: None (no PHI in this table).
+- **Clinical-safety impact**: Real — a hospital that had deliberately tightened a P1 reassessment interval for safety reasons would have silently had it widen back to default after any restart, with zero indication to staff. This fix closes that silent-reversion risk.
+- **Current status**: `VALIDATED`
+- **Dependencies**: None.
+- **Recommended canonical solution**: Applied — TypeORM entity + migration + `OnModuleInit` rehydration + fire-and-forget write-through, following the exact established pattern already used by `ReferralService`/`EMSIntakeService`'s `updateArrivalStatus` in the same file.
+- **Validation requirements**: Backend `tsc --noEmit -p tsconfig.build.json` clean. Real `nest build` (not just typecheck) succeeded. Migration verified end-to-end against an isolated throwaway SQLite file (not the real dev database) — `up()` creates the table, insert/select round-trips the JSON blob correctly, `down()` cleanly drops it. New spec file: 6/6 passing (persist-on-update, `__global__` fallback, rehydrate-and-merge-onto-defaults, per-tenant isolation, graceful degradation with no repository, malformed-JSON row doesn't crash boot). Full `emergency-os` backend module suite re-verified: 26/26 suites, 195/195 tests passing. ESLint clean (2 auto-fixed formatting issues).
+- **Commit when resolved**: `TBD` (this round, pending commit).
+- **Scorecard impact when resolved**: Pending next scorecard sync pass.
+
 ### HEAL-018 — `CostTrackingContext.tsx`/`CostTrackingProvider` was globally-mounted dead code, deleted (HEAL-EPIC-A, second bounded slice)
 
 - **Severity**: P3_LOW
@@ -311,7 +332,7 @@ Discover all WebSockets/polling/React subscriptions/Nest event emitters/queues/c
 
 ### HEAL-EPIC-D — Persistence-ownership audit (15 named domains)
 
-Patient, Encounter, Journey, Complaint/Terminology, Queue, EMS, Reassessment, Capacity, Boarding, Referral, Notification, Audit, AI evaluation, Settings, Roles/Permissions — determine canonical owner of truth per domain; add startup diagnostics that fail safely on invalid production persistence configuration. **Status: not started** (HEAL-001/006/013 are one concrete Capacity-domain instance, not the full 15-domain sweep).
+Patient, Encounter, Journey, Complaint/Terminology, Queue, EMS, Reassessment, Capacity, Boarding, Referral, Notification, Audit, AI evaluation, Settings, Roles/Permissions — determine canonical owner of truth per domain; add startup diagnostics that fail safely on invalid production persistence configuration. **Status: 2 domains now have real TypeORM persistence found/fixed as concrete instances, not from a full systematic sweep** — Capacity (HEAL-001/006/013) and now Settings (HEAL-019 — `EmergencySettingsService` was 100% in-memory, hospital-tuned safety thresholds silently reverted to defaults on every restart, fixed with a new `emergency_os_settings` table + `OnModuleInit` rehydration, following the existing `ReferralService`/`EMSIntakeService` pattern). 13 of 15 named domains remain unaudited.
 
 ---
 
