@@ -37,7 +37,7 @@
 - **Dependencies**: None.
 - **Recommended canonical solution**: Applied — TypeORM entity + migration + extended `OnModuleInit` rehydration + fire-and-forget write-through at both mutation points, following the exact `ReferralService`/`EMSIntakeService`/`EmergencySettingsService`/`EvaluationService` pattern.
 - **Validation requirements**: Backend `tsc --noEmit -p tsconfig.build.json` clean. Real `nest build` succeeded. Migration verified end-to-end against an isolated throwaway SQLite file. New spec file: 5/5 passing (persist-on-create, persist-on-evaluate, rehydrate-and-merge, baseline-run-never-overridden-by-stale-DB-row, graceful degradation with no repository). Full `training` module suite re-verified: 4/4 suites, 35/35 tests (including the pre-existing untouched `training.service.spec.ts`/`training.controller-authorization.spec.ts`/`ml-services/nlu/training/training.spec.ts`, confirming no regression). ESLint clean (1 auto-fixed formatting issue).
-- **Commit when resolved**: `TBD` (this round, pending commit).
+- **Commit when resolved**: `43fea8ca`
 - **Scorecard impact when resolved**: Pending next scorecard sync pass.
 
 ### HEAL-020 — `EvaluationService` was entirely in-memory; real AI evaluation runs and their provenance were lost on every backend restart (HEAL-EPIC-D, second bounded slice)
