@@ -236,6 +236,13 @@ const REQUESTED_ITEMS = [
     featureGate: null,
   },
   {
+    id: 'app-navigator',
+    label: 'App navigator',
+    icon: 'search',
+    route: '/navigator',
+    featureGate: null,
+  },
+  {
     id: 'fleet',
     label: 'Fleet',
     icon: 'ambulance',

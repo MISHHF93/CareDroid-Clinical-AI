@@ -286,8 +286,28 @@ export const WorkspaceProvider = ({ children }) => {
           workspace.backendWorkspaceId === workspaceId
       );
       if (!target) {
-        setActiveWorkspaceId(workspaceId || DEFAULT_CARE_WORKSPACE_ID);
+        const resolvedWorkspaceId = workspaceId || DEFAULT_CARE_WORKSPACE_ID;
+        // `workspaces` only ever holds what applyBackendContext() last merged in
+        // (the backend's per-user workspace membership list), which is not
+        // guaranteed to include every id in the local CARE_WORKSPACES registry.
+        // Without adding the local default here, activeWorkspace's own
+        // `workspaces.find(...) || workspaces[0]` fallback below would silently
+        // resolve to whatever workspace happened to be first in `workspaces`
+        // (typically the previously-active one) instead of the workspace the
+        // caller actually asked to switch to -- every field the context exposes
+        // (assistantContext/shortcuts/toolIds/etc.) would then keep showing the
+        // stale workspace's data while activeWorkspaceId already reports the
+        // new one.
+        const localMatch = defaultWorkspaces(clientProfile, user?.role).find(
+          (workspace) => workspace.id === resolvedWorkspaceId || workspace.workspaceKey === resolvedWorkspaceId
+        );
+        setActiveWorkspaceId(resolvedWorkspaceId);
         setWorkspaceContext(null);
+        if (localMatch) {
+          setWorkspaces((prev) =>
+            prev.some((workspace) => workspace.id === localMatch.id) ? prev : [...prev, localMatch]
+          );
+        }
         return { ok: true, data: null, source: 'local' };
       }
 
@@ -320,7 +340,7 @@ export const WorkspaceProvider = ({ children }) => {
         return { ok: false, message };
       }
     },
-    [authToken, isAuthenticated, refreshWorkspaceContext, workspaces]
+    [authToken, isAuthenticated, refreshWorkspaceContext, workspaces, clientProfile, user?.role]
   );
 
   const activeWorkspace = useMemo(

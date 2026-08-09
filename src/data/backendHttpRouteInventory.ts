@@ -23,6 +23,8 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
   { method: 'GET', path: '/api/emergency/patients/:patientId/workflow-logs', controller: 'EmergencyOsController' },
   { method: 'GET', path: '/api/emergency/ems', controller: 'EmergencyOsController' },
   { method: 'POST', path: '/api/emergency/ems/handoff', controller: 'EmergencyOsController' },
+  { method: 'PATCH', path: '/api/emergency/ems/arrivals/:arrivalId/status', controller: 'EmergencyOsController' },
+  { method: 'POST', path: '/api/emergency/waiting-room-safety/escalation-notify', controller: 'EmergencyOsController' },
   { method: 'GET', path: '/api/emergency/intake', controller: 'EmergencyOsController' },
   { method: 'POST', path: '/api/emergency/intake', controller: 'EmergencyOsController' },
   { method: 'POST', path: '/api/emergency/intake/vertical-slice', controller: 'EmergencyOsController' },
@@ -32,6 +34,7 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
   { method: 'GET', path: '/api/emergency/boarding', controller: 'EmergencyOsController' },
   { method: 'GET', path: '/api/emergency/referrals', controller: 'EmergencyOsController' },
   { method: 'POST', path: '/api/emergency/referrals', controller: 'EmergencyOsController' },
+  { method: 'PATCH', path: '/api/emergency/transfers/:id/status', controller: 'EmergencyOsController' },
   { method: 'GET', path: '/api/emergency/provincial-health', controller: 'EmergencyOsController' },
   { method: 'GET', path: '/api/emergency/integrations', controller: 'EmergencyOsController' },
   { method: 'GET', path: '/api/emergency/copilot', controller: 'EmergencyOsController' },
@@ -1178,6 +1181,9 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
     path: '/api/emergency/intake/:sessionId/audit-log',
     controller: 'SmartIntakeController',
   },
+  { method: 'GET', path: '/api/navigator/health', controller: 'AppNavigatorController' },
+  { method: 'GET', path: '/api/navigator/catalog', controller: 'AppNavigatorController' },
+  { method: 'POST', path: '/api/navigator/query', controller: 'AppNavigatorController' },
 ]);
 
 /** @typedef {BackendHttpRoute & { runtime: 'mongoose-emergency-os', mountFlag: string }} OptionalRuntimeBackendRoute */

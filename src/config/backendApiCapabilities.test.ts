@@ -127,6 +127,18 @@ describe('backendApiCapabilities', () => {
     // landed, silently preventing ReferralPanel.tsx from ever calling it.
     expect(getBackendCapabilityStatus('emergencyTransferWorkflow')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
     expect(isBackendCapabilityEnabled('emergencyTransferWorkflow')).toBe(true);
+    // Corrected 2026-08-09 (HEAL-033): all 7 route through
+    // EmergencyOperatingSurfacesService.getSurface(), which derives every
+    // branch from already-verified-real patient/EMS/queue/analytics/referral/
+    // workflow-log services -- no fixture/random data. See
+    // backendApiCapabilities.ts's own comment for the full trace.
+    expect(getBackendCapabilityStatus('emergencyDispatch')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
+    expect(getBackendCapabilityStatus('emergencyDiagnosticsView')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
+    expect(getBackendCapabilityStatus('emergencyHandoffsView')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
+    expect(getBackendCapabilityStatus('emergencyReportsView')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
+    expect(getBackendCapabilityStatus('emergencyPulseView')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
+    expect(getBackendCapabilityStatus('emergencyShiftView')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
+    expect(getBackendCapabilityStatus('emergencyEdReadinessView')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
   });
 
   it('enables read-only live tracking contracts as demo-backed capabilities', () => {

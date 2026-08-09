@@ -123,13 +123,32 @@ export const BACKEND_API_CAPABILITY_STATUS = Object.freeze({
    * backed sources -- no fixture data.
    */
   emergencyOperatingSurfaces: BACKEND_CAPABILITY_STATUS.REAL,
-  emergencyDispatch: BACKEND_CAPABILITY_STATUS.DEMO,
-  emergencyDiagnosticsView: BACKEND_CAPABILITY_STATUS.DEMO,
-  emergencyHandoffsView: BACKEND_CAPABILITY_STATUS.DEMO,
-  emergencyReportsView: BACKEND_CAPABILITY_STATUS.DEMO,
-  emergencyPulseView: BACKEND_CAPABILITY_STATUS.DEMO,
-  emergencyShiftView: BACKEND_CAPABILITY_STATUS.DEMO,
-  emergencyEdReadinessView: BACKEND_CAPABILITY_STATUS.DEMO,
+  /**
+   * Corrected 2026-08-09 (HEAL-033, continuing HEAL-008's per-key trace): all 7
+   * of these route through EmergencyOsController.getOperatingSurface() ->
+   * EmergencyOperatingSurfacesService.getSurface(surfaceId), whose 'dispatch'/
+   * 'diagnostics'/'handoffs'/'reports'/'department-pulse'/'shift-summary'/
+   * 'ed-readiness' switch branches each derive their response exclusively from
+   * baseContext() -- which itself only calls already-verified-real services
+   * (EmergencyPatientService.listPatients()/listStaff()/listAlerts()/
+   * computeCapacity(), EMSIntakeService.getEMSIntake(), QueueIntelligenceService
+   * .getQueues(), EmergencyAnalyticsService.getAnalytics(), ReferralService
+   * .getReferrals(), WorkflowActionLogService.listLogs()). No fixture/random/
+   * seeded values anywhere in the switch statement itself. ('diagnostics'/
+   * 'handoffs' additionally pull workflowTasks from WorkflowOrchestrationService
+   * .getWorkflowOrchestration(), which independently also traces to the same
+   * real patient/referral/EMS sources plus a persisted task queue -- not yet
+   * individually corrected as its own emergencyWorkflowOrchestration key since
+   * that key also has its own separate frontend callers needing their own
+   * trace; flagged for a future round, not guessed at here.)
+   */
+  emergencyDispatch: BACKEND_CAPABILITY_STATUS.REAL,
+  emergencyDiagnosticsView: BACKEND_CAPABILITY_STATUS.REAL,
+  emergencyHandoffsView: BACKEND_CAPABILITY_STATUS.REAL,
+  emergencyReportsView: BACKEND_CAPABILITY_STATUS.REAL,
+  emergencyPulseView: BACKEND_CAPABILITY_STATUS.REAL,
+  emergencyShiftView: BACKEND_CAPABILITY_STATUS.REAL,
+  emergencyEdReadinessView: BACKEND_CAPABILITY_STATUS.REAL,
   /** Snapshot is built from live listPatients + queues after create/handoff. */
   emergencyReceptionSnapshot: BACKEND_CAPABILITY_STATUS.REAL,
   emergencyReceptionHandoff: BACKEND_CAPABILITY_STATUS.REAL,
