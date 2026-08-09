@@ -164,7 +164,7 @@ export const NIHSS_ITEMS: NIHSSItem[] = [
 
 type NIHSSScores = Record<string, number | undefined>;
 
-function severityFor(total: number) {
+export function severityFor(total: number) {
   if (total === 0) return { label: 'No stroke symptoms', color: MEDICAL_THEME.inkSubtle };
   if (total <= 4) return { label: 'Minor stroke', color: '#10B981' };
   if (total <= 15) return { label: 'Moderate stroke', color: '#F59E0B' };
