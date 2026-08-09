@@ -34,6 +34,22 @@ const OrganizationIntelligenceProfilePage = lazyNamed(
   () => import('../pages/organization/OrganizationPages'),
   'OrganizationIntelligenceProfile',
 );
+const PackMarketplacePage = lazyNamed(
+  () => import('../pages/organization/OrganizationPages'),
+  'PackMarketplace',
+);
+const DepartmentsPageComponent = lazyNamed(
+  () => import('../pages/organization/OrganizationPages'),
+  'DepartmentsPage',
+);
+const ServiceLinesPageComponent = lazyNamed(
+  () => import('../pages/organization/OrganizationPages'),
+  'ServiceLinesPage',
+);
+const OrganizationSettingsPage = lazyNamed(
+  () => import('../pages/organization/OrganizationPages'),
+  'OrganizationSettings',
+);
 const WorkspaceDependencyGraphPage = lazyNamed(
   () => import('../pages/platform/WorkspaceDependencyGraph'),
   'WorkspaceDependencyGraphPage',
@@ -86,6 +102,10 @@ const PLATFORM_CONSOLE_PAGE_COMPONENTS = Object.freeze({
   platformSelfDiagnostics: PlatformSelfDiagnosticsPage,
   departmentIntelligence: DepartmentIntelligencePage,
   organizationIntelligence: OrganizationIntelligenceProfilePage,
+  assetPacks: PackMarketplacePage,
+  departments: DepartmentsPageComponent,
+  serviceLines: ServiceLinesPageComponent,
+  organizationSettings: OrganizationSettingsPage,
   workspaceDependencyGraph: WorkspaceDependencyGraphPage,
   workflowMining: WorkflowMiningEnginePage,
   workflowBuilder: WorkflowBuilderPage,

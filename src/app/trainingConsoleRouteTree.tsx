@@ -5,6 +5,7 @@ import { TRAINING_CONSOLE_ROUTES } from '../config/trainingConsoleRoutes';
 
 const lazyRoute = lazyWithRetry;
 
+const TrainingDashboardPage = lazyRoute(() => import('../pages/training/TrainingDashboard'));
 const MedicalSimulationSuitePage = lazyRoute(() => import('../pages/training/MedicalSimulationSuite'));
 const SimulationScenarioPlayerPage = lazyRoute(() => import('../pages/training/SimulationScenarioPlayer'));
 const SimulationOutcomesPage = lazyRoute(() => import('../pages/training/SimulationOutcomes'));
@@ -12,6 +13,7 @@ const CompetenciesPage = lazyRoute(() => import('../pages/training/Competencies'
 const CredentialsPage = lazyRoute(() => import('../pages/training/Credentials'));
 
 const TRAINING_CONSOLE_PAGE_COMPONENTS = Object.freeze({
+  trainingDashboard: TrainingDashboardPage,
   medicalSimulationSuite: MedicalSimulationSuitePage,
   simulationScenarioPlayer: SimulationScenarioPlayerPage,
   simulationOutcomes: SimulationOutcomesPage,

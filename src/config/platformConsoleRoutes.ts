@@ -49,6 +49,10 @@ export const PLATFORM_CONSOLE_ROUTES = Object.freeze<PlatformConsoleRoute[]>([
   ...platformRoutes(CANONICAL_ROUTES.productIntelligence, 'Product intelligence', 'productIntelligence', { wildcard: true }),
   ...platformRoutes(CANONICAL_ROUTES.expansionOpportunities, 'Expansion opportunities', 'expansionOpportunities', { wildcard: true }),
   ...platformRoutes(CANONICAL_ROUTES.maturityAssessment, 'Maturity assessment', 'maturityAssessment', { wildcard: true }),
+  ...platformRoutes(CANONICAL_ROUTES.assetPacks, 'Asset pack marketplace', 'assetPacks', { wildcard: true }),
+  ...platformRoutes(CANONICAL_ROUTES.departments, 'Departments', 'departments', { wildcard: true }),
+  ...platformRoutes(CANONICAL_ROUTES.serviceLines, 'Service lines', 'serviceLines', { wildcard: true }),
+  ...platformRoutes(CANONICAL_ROUTES.organizationSettings, 'Organization settings', 'organizationSettings', { wildcard: true }),
 ]);
 
 export const PLATFORM_CONSOLE_ROUTE_PATHS = Object.freeze(

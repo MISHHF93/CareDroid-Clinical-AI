@@ -8,6 +8,7 @@ export type TrainingConsoleRoute = {
 
 /** Training and simulation surfaces with dedicated in-shell pages. */
 export const TRAINING_CONSOLE_ROUTES = Object.freeze<TrainingConsoleRoute[]>([
+  { path: CANONICAL_ROUTES.trainingDashboard, label: 'AI Training Dashboard', componentKey: 'trainingDashboard' },
   { path: CANONICAL_ROUTES.simulation, label: 'Medical Simulation Suite', componentKey: 'medicalSimulationSuite' },
   {
     path: `${CANONICAL_ROUTES.simulation}/:scenarioId`,

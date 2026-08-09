@@ -71,11 +71,9 @@ import { HealthcareKnowledgeHubPage } from '../pages/platform/HealthcareKnowledg
 import { WorkflowBuilderPage } from '../pages/platform/WorkflowBuilder';
 import { WorkflowMiningEnginePage } from '../pages/platform/WorkflowMiningEngine';
 import { WorkspaceDependencyGraphPage } from '../pages/platform/WorkspaceDependencyGraph';
-import {
-  CustomerExpansionOpportunitiesPage,
-  MaturityAssessmentPage,
-  ProductIntelligenceLayerPage,
-} from '../pages/commercial/CommercialPages';
+import { CustomerExpansionOpportunitiesPage } from '../pages/commercial/ExpansionOpportunities';
+import { MaturityAssessmentPage } from '../pages/commercial/MaturityAssessment';
+import { ProductIntelligenceLayerPage } from '../pages/commercial/ProductIntelligence';
 import { CORE_ROUTE_SMOKE, TIER_A_FORM_SMOKE_SLUGS } from './responsiveRegression.routes';
 
 vi.mock('../pages/tools/Calculators.css', () => ({}));
