@@ -138,7 +138,17 @@ export const BACKEND_API_CAPABILITY_STATUS = Object.freeze({
   emergencyTriageAssist: BACKEND_CAPABILITY_STATUS.REAL,
   emergencyOperationalIntelligence: BACKEND_CAPABILITY_STATUS.DEMO,
   emergencyPatientOrchestration: BACKEND_CAPABILITY_STATUS.REAL,
-  emergencyPatientFlow: BACKEND_CAPABILITY_STATUS.DEMO,
+  /**
+   * Corrected 2026-08-09 (HEAL-008, round 2): EmergencyOsController.getPatientFlow()
+   * calls PatientFlowService.buildSnapshot(), which draws only on real
+   * EmergencyPatientService.listPatients()/listStaff()/computeCapacity() and
+   * ReferralService.getReferrals() -- all already-verified real sources.
+   * buildBackendPatientFlowSnapshot() (emergency-os.flow-snapshots.ts) contains
+   * no fixture/demo/random data. The optional OperationalIntelligenceService
+   * dependency is used only to publish a realtime side-effect signal, never to
+   * source snapshot data.
+   */
+  emergencyPatientFlow: BACKEND_CAPABILITY_STATUS.REAL,
   emergencyWorkflowOrchestration: BACKEND_CAPABILITY_STATUS.DEMO,
   careDroidUnifiedAINode: BACKEND_CAPABILITY_STATUS.DEMO,
   emergencyWorkflowAudit: BACKEND_CAPABILITY_STATUS.DEMO,
@@ -146,7 +156,13 @@ export const BACKEND_API_CAPABILITY_STATUS = Object.freeze({
   emergencyProvincialHealth: BACKEND_CAPABILITY_STATUS.DEMO,
   aiGovernance: BACKEND_CAPABILITY_STATUS.REAL,
   emergencyGovernance: BACKEND_CAPABILITY_STATUS.REAL,
-  emergencyReassessment: BACKEND_CAPABILITY_STATUS.DEMO,
+  /**
+   * Corrected 2026-08-09 (HEAL-008, round 2): EmergencyOsController.getReassessment()
+   * calls ReassessmentService.getReassessmentQueue(), which filters the same
+   * real EmergencyPatientService.listPatients() list by the ReassessmentDue
+   * flag -- no fixture data.
+   */
+  emergencyReassessment: BACKEND_CAPABILITY_STATUS.REAL,
   emergencySurge: BACKEND_CAPABILITY_STATUS.DISABLED,
   /** POST /api/emergency/intake createFromIntake is a real board mutator. */
   emergencySmartIntake: BACKEND_CAPABILITY_STATUS.REAL,
