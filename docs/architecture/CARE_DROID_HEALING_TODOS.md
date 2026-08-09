@@ -37,7 +37,7 @@
 - **Dependencies**: None. Noted but not investigated further: no code anywhere currently reads/writes `reviewedAt`/`reviewedByUserId` to mark an interaction as human-reviewed — the review workflow itself may be unimplemented, a separate finding worth a future round.
 - **Recommended canonical solution**: Applied — TypeORM entities + migration + `OnModuleInit` rehydration + fire-and-forget write-through for both record types, following the exact `ReferralService`/`EmergencySettingsService`/`EvaluationService`/`TrainingService` pattern.
 - **Validation requirements**: Backend `tsc --noEmit -p tsconfig.build.json` clean. Real `nest build` succeeded. Migration verified end-to-end against an isolated throwaway SQLite file (not the real dev database) for both new tables. New spec file: 4/4 passing (persist-on-record for both types including safety-field round-trip, rehydrate-and-list-by-patient for both types, graceful degradation with no repository). Full `emergency-os` backend module suite re-verified: 27/27 suites, 199/199 tests passing (including the pre-existing, untouched `clinical-decision-support.service.spec.ts`). ESLint clean (5 auto-fixed formatting issues).
-- **Commit when resolved**: `TBD` (this round, pending commit).
+- **Commit when resolved**: `1607875a`
 - **Scorecard impact when resolved**: Pending next scorecard sync pass.
 
 ### HEAL-021 — `TrainingService` was entirely in-memory; real training runs and their provenance were lost on every backend restart (HEAL-EPIC-D, third bounded slice)
