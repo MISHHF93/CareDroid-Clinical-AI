@@ -37,7 +37,7 @@
 - **Dependencies**: None.
 - **Recommended canonical solution**: Applied — TypeORM entity + migration + `OnModuleInit` rehydration + fire-and-forget write-through, following the exact established pattern already used by `ReferralService`/`EMSIntakeService`'s `updateArrivalStatus` in the same file.
 - **Validation requirements**: Backend `tsc --noEmit -p tsconfig.build.json` clean. Real `nest build` (not just typecheck) succeeded. Migration verified end-to-end against an isolated throwaway SQLite file (not the real dev database) — `up()` creates the table, insert/select round-trips the JSON blob correctly, `down()` cleanly drops it. New spec file: 6/6 passing (persist-on-update, `__global__` fallback, rehydrate-and-merge-onto-defaults, per-tenant isolation, graceful degradation with no repository, malformed-JSON row doesn't crash boot). Full `emergency-os` backend module suite re-verified: 26/26 suites, 195/195 tests passing. ESLint clean (2 auto-fixed formatting issues).
-- **Commit when resolved**: `TBD` (this round, pending commit).
+- **Commit when resolved**: `f85ced58`
 - **Scorecard impact when resolved**: Pending next scorecard sync pass.
 
 ### HEAL-018 — `CostTrackingContext.tsx`/`CostTrackingProvider` was globally-mounted dead code, deleted (HEAL-EPIC-A, second bounded slice)
