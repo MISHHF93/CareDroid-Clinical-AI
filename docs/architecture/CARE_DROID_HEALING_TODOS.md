@@ -98,6 +98,28 @@
 - **Commit**: `b266269f` (code), `23d44339` (scorecard)
 - **Scorecard impact**: Domain 12, 17th recurrence, score held flat.
 
+### HEAL-015 — OCR silently depended on a network fetch that fails in offline/fresh environments
+
+- **Severity**: P1_HIGH
+- **Domain**: AI/ML Core Node — OCR pipeline reliability / truthfulness
+- **Source evidence**: Live user report ("the OCR model doesn't work in `http://localhost:5190/emergency/reception` or in general") while this session was actively running. Traced `TesseractOcrProvider.getWorker()` (`backend/src/modules/emergency-os/ocr-providers.ts`) calling `createWorker('eng')` with no path options. Read `tesseract.js`'s own source (`worker-script/index.js`): it checks a cache at `process.cwd() + '/eng.traineddata'` first, then falls back to fetching from `cdn.jsdelivr.net`. Confirmed `backend/eng.traineddata` existed in this sandbox only because of a prior session's incidental download, and was gitignored ("auto-downloaded at runtime, machine-local, safe to regenerate") — meaning it does not exist on a fresh clone, so every first real OCR attempt anywhere depends on live network access to that CDN, contradicting the class's own doc comment ("no external API calls"). Reproduced empirically: ran the compiled provider directly with `process.cwd()` set to the repo root (not `backend/`) using the *old* code and confirmed the cache lookup would miss.
+- **Affected files**: `.gitignore`, `backend/eng.traineddata` (newly committed, 5MB), `backend/src/modules/emergency-os/ocr-providers.ts`(+`.spec.ts`)
+- **Runtime impact**: Real OCR (Smart Intake document scanning) could fail on any environment without reliable network access to `cdn.jsdelivr.net`, or on any first-use in a fresh clone/deployment — not limited to the Reception page, since every caller shares the same `TesseractOcrProvider` singleton.
+- **Frontend impact**: None directly — the fix is entirely backend-side; frontend already handled OCR failure gracefully (falls back to manual entry with a warning), it just shouldn't have been failing in the first place.
+- **Backend impact**: `getWorker()` now resolves language data via a path computed from `__dirname` (`LOCAL_TESSDATA_DIR`), correct regardless of process cwd or launch method, falling back to Tesseract's own default behavior only if the committed file is ever missing.
+- **Data impact**: None.
+- **AI/ML impact**: Closes a real gap between this component's claimed provenance (self-hosted, no external dependency) and its actual behavior.
+- **Affected user profiles**: Receptionist/ED Clerk (Smart Intake document capture is a core reception workflow), indirectly any profile that reviews OCR-derived intake data.
+- **Security/privacy impact**: None directly, though a genuinely-offline/firewalled hospital deployment (a real, common healthcare IT posture) would have had zero working OCR with no clear diagnostic signal why.
+- **Clinical-safety impact**: Low — OCR failure already degrades gracefully to manual entry (existing behavior, not part of this fix), so this is an availability/reliability fix, not a safety-critical one.
+- **Current status**: `VALIDATED`
+- **Dependencies**: None.
+- **Recommended canonical solution**: Applied.
+- **Validation requirements**: `tsc --noEmit`/ESLint clean. Empirically verified via direct Node execution of the compiled provider from both `backend/` and repo-root cwd, both producing correct real OCR text ("First name: Alex\nLast name: Chen", 95% confidence) — the repo-root case is exactly the scenario that would have failed under the old code. New regression test in `ocr-providers.spec.ts` changes `process.cwd()` mid-test to a directory with no traineddata file and confirms extraction still succeeds. Full `ocr*` backend suite: 44/44 passing.
+- **Commit when resolved**: `001784ba`
+- **Scorecard impact when resolved**: Pending next scorecard sync pass.
+- **Operational note**: The user's already-running dev backend process was started from the pre-fix build; requires a backend restart (`npm run dev:api` / `npm run dev:fullstack`, or however the stack was started) for this fix to take effect in their live session — the running process serves a static compiled snapshot, not a hot-reloaded one.
+
 ---
 
 ## CONFIRMED — queued, not yet fixed
