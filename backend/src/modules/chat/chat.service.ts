@@ -2022,7 +2022,14 @@ export class ChatService {
     const responseSource: AIResponseSourceCategory = params.responseSource ?? 'DETERMINISTIC_RULE';
     const provenance = buildAiResponseProvenance({
       responseSource,
-      confidence: responseSource === 'LLM_GENERATED' ? 0.9 : undefined,
+      // No `confidence` passed here deliberately: a raw Anthropic chat
+      // completion carries no real numeric certainty signal to report --
+      // the API doesn't return one. This used to hardcode 0.9 for every
+      // LLM_GENERATED response regardless of the actual completion,
+      // presenting fabricated precision. buildAiResponseProvenance()'s own
+      // default (lib/ai/provenanceContract.ts) is more honest: 0.55 when
+      // real evidence is attached, 0.25 otherwise -- an evidence-grounded
+      // heuristic instead of a flat, always-optimistic constant.
       modelOrEngine:
         responseSource === 'LLM_GENERATED'
           ? 'anthropic-unified-ai-client'

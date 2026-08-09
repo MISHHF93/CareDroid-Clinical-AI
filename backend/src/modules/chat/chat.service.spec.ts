@@ -231,7 +231,15 @@ describe('ChatService ED Copilot deterministic dispatch', () => {
 
       expect(result.metadata.provenance.responseSource).toBe('LLM_GENERATED');
       expect(result.metadata.provenance.modelOrEngine).toBe('anthropic-unified-ai-client');
-      expect(result.metadata.provenance.confidence).toBe(0.9);
+      // No confidence is passed to buildAiResponseProvenance() for this path
+      // (a raw Anthropic chat completion has no real numeric certainty
+      // signal to report) -- this used to hardcode 0.9 for every
+      // LLM_GENERATED response regardless of the actual completion, a
+      // fabricated-precision bug found by a repository-wide domain-model
+      // audit (2026-08-08). The value here is the shared provenance
+      // builder's own honest default: 0.55 because real evidence (the
+      // command's structured_rule entry) is attached.
+      expect(result.metadata.provenance.confidence).toBe(0.55);
     });
 
     it('marks the hardcoded fallback message STATIC_CONTENT, not LLM_GENERATED -- it is fixed text, not model output', () => {
