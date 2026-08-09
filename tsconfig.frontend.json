@@ -25,7 +25,6 @@
     "backend",
     "e2e",
     "src/**/*.test.ts",
-    "src/**/*.test.tsx",
-    "src/features/future-modules/_review/**"
+    "src/**/*.test.tsx"
   ]
 }

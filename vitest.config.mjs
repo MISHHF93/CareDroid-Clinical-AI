@@ -36,8 +36,6 @@ export default defineConfig({
       '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build,eslint,prettier}.config.*',
       '**/backend/**',
       '**/e2e/**',
-      '**/features/future-modules/_review/**',
-      'src/pages/WorkspaceHome.test.jsx',
       'tests/integration/**',
     ],
     maxWorkers,
