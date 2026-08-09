@@ -1,5 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger, OnModuleInit, Optional } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import type { Repository } from 'typeorm';
 import { HUMAN_REVIEW_DISCLAIMER } from '../../../../lib/ai/safetyPolicy';
+import { ClinicalCalculatorResultEntity } from './entities/clinical-calculator-result.entity';
+import { CopilotInteractionEntity } from './entities/copilot-interaction.entity';
 import type {
   ClinicalCalculatorResultRecord,
   CopilotInteractionRecord,
@@ -28,9 +32,88 @@ function envelope<T>(
 }
 
 @Injectable()
-export class ClinicalDecisionSupportService {
+export class ClinicalDecisionSupportService implements OnModuleInit {
+  private readonly logger = new Logger(ClinicalDecisionSupportService.name);
   private readonly calculatorResults: ClinicalCalculatorResultRecord[] = [];
   private readonly copilotInteractions: CopilotInteractionRecord[] = [];
+
+  constructor(
+    @Optional()
+    @InjectRepository(ClinicalCalculatorResultEntity)
+    private readonly calculatorResultRepository?: Repository<ClinicalCalculatorResultEntity>,
+    @Optional()
+    @InjectRepository(CopilotInteractionEntity)
+    private readonly copilotInteractionRepository?: Repository<CopilotInteractionEntity>,
+  ) {}
+
+  /**
+   * Load durable calculator results and Copilot interactions from TypeORM so
+   * this real clinical decision-support audit trail (safetyCheckPassed,
+   * requiresHumanReview, reviewedByUserId) survives a process restart
+   * instead of silently disappearing -- previously this service was
+   * in-memory only.
+   */
+  async onModuleInit(): Promise<void> {
+    if (this.calculatorResultRepository) {
+      try {
+        const rows = await this.calculatorResultRepository.find({ order: { createdAt: 'DESC' } });
+        for (const row of rows) {
+          try {
+            this.calculatorResults.push(
+              JSON.parse(row.recordJson) as ClinicalCalculatorResultRecord,
+            );
+          } catch (parseError) {
+            this.logger.warn(
+              `Failed to parse persisted calculator result ${row.id}: ${parseError}`,
+            );
+          }
+        }
+      } catch (error) {
+        this.logger.warn(`Failed to rehydrate calculator results from database: ${error}`);
+      }
+    }
+
+    if (this.copilotInteractionRepository) {
+      try {
+        const rows = await this.copilotInteractionRepository.find({ order: { createdAt: 'DESC' } });
+        for (const row of rows) {
+          try {
+            this.copilotInteractions.push(JSON.parse(row.recordJson) as CopilotInteractionRecord);
+          } catch (parseError) {
+            this.logger.warn(
+              `Failed to parse persisted Copilot interaction ${row.id}: ${parseError}`,
+            );
+          }
+        }
+      } catch (error) {
+        this.logger.warn(`Failed to rehydrate Copilot interactions from database: ${error}`);
+      }
+    }
+  }
+
+  private persistCalculatorResultToDatabase(record: ClinicalCalculatorResultRecord): void {
+    if (!this.calculatorResultRepository) return;
+    const entity = this.calculatorResultRepository.create({
+      id: record.id,
+      patientId: record.patientId,
+      recordJson: JSON.stringify(record),
+    });
+    this.calculatorResultRepository.save(entity).catch((error) => {
+      this.logger.warn(`Failed to persist calculator result ${record.id} to database: ${error}`);
+    });
+  }
+
+  private persistCopilotInteractionToDatabase(record: CopilotInteractionRecord): void {
+    if (!this.copilotInteractionRepository) return;
+    const entity = this.copilotInteractionRepository.create({
+      id: record.id,
+      patientId: record.patientId,
+      recordJson: JSON.stringify(record),
+    });
+    this.copilotInteractionRepository.save(entity).catch((error) => {
+      this.logger.warn(`Failed to persist Copilot interaction ${record.id} to database: ${error}`);
+    });
+  }
 
   recordCalculatorResult(
     dto: RecordClinicalCalculatorDto,
@@ -55,6 +138,7 @@ export class ClinicalDecisionSupportService {
     if (this.calculatorResults.length > 500) {
       this.calculatorResults.length = 500;
     }
+    this.persistCalculatorResultToDatabase(record);
     return envelope('Clinical Calculator Result', record);
   }
 
@@ -96,6 +180,7 @@ export class ClinicalDecisionSupportService {
     if (this.copilotInteractions.length > 500) {
       this.copilotInteractions.length = 500;
     }
+    this.persistCopilotInteractionToDatabase(record);
     return envelope('Copilot Interaction', record);
   }
 
