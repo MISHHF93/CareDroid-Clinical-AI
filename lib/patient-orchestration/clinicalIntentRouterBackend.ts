@@ -1,5 +1,34 @@
 /**
- * Backend-safe complaint routing — mirrors src/data/clinicalIntentRouter.js without ESM/CJS friction at runtime.
+ * Backend-safe complaint routing — mirrors src/data/clinicalIntentRouter.ts's own
+ * CLINICAL_INTENT_ROUTES (renamed from .js at some point; this file's own header
+ * comment was stale). Feeds a real, live path: EmergencyOsController's
+ * GET /emergency/patients/:patientId/orchestration -> orchestration.service.ts's
+ * buildPatientOrchestration() -> recommendTools.ts's buildPatientCardOrchestrationContext()
+ * -> ClinicalIntentRouter.routeComplaint() here -- ultimately consumed by
+ * CopilotPanel.tsx/PatientCardCopilot.tsx's tool recommendations via
+ * usePatientOrchestration(). Not dead code (confirmed 2026-08-09 via full call-
+ * graph trace, correcting an earlier "duplicate, needs deleting" assumption).
+ *
+ * The backend genuinely cannot import the canonical complaint-recognition
+ * pipeline (src/data/clinicalTerminology/recognizeComplaint.ts + its
+ * dependencies, including the safety-relevant src/services/highRiskComplaintFlags.ts)
+ * -- backend/tsconfig.build.json only allows lib/ and src/types/. Unlike
+ * src/data/clinicalIntentRouter.ts, which falls back to recognizeComplaint()
+ * when its own alias list misses a phrasing, this backend mirror has no such
+ * fallback, so it used to silently fail to route complaints the canonical
+ * recognizer already knows (e.g. "heart attack", "chest tightness", "can't
+ * breathe", "septic shock") -- a real recognition gap, not a hypothetical one,
+ * for the live Copilot tool-recommendation surface (not a missed safety alert:
+ * highRiskComplaintFlags.ts's own fast-flag detection is a separate, already-
+ * correctly-firing mechanism this router doesn't gate). 2026-08-09: manually
+ * synced these alias lists against HIGH_RISK_COMPLAINT_FLAG_DEFINITIONS'
+ * keyword regexes for the 5 concepts both registries cover, closing the
+ * verified gap. This is a stopgap, not the canonical fix -- relocating the
+ * shared recognition pipeline into lib/ (so this file could delegate to it
+ * directly instead of a hand-synced mirror) remains the proper long-term fix,
+ * deliberately deferred: it touches highRiskComplaintFlags.ts, which is
+ * safety-relevant, and needs its own careful, dedicated round rather than a
+ * rushed multi-file relocation.
  */
 
 export type ClinicalIntentRoute = {
@@ -18,7 +47,11 @@ const ROUTES: readonly ClinicalIntentRoute[] = Object.freeze([
   {
     routeId: 'chief-complaint-chest-pain',
     complaint: 'Chest Pain',
-    aliases: ['chest pain', 'chest pressure', 'acs concern', 'possible acs', 'cardiac chest pain'],
+    aliases: [
+      'chest pain', 'chest pressure', 'acs concern', 'possible acs', 'cardiac chest pain',
+      'pain in my chest', 'pain in the chest', 'pressure in my chest', 'pressure in the chest',
+      'chest tightness', 'tight chest', 'angina', 'stemi', 'nstemi', 'myocardial infarction', 'heart attack',
+    ],
     calculators: [{ id: 'heart-score', label: 'HEART' }],
     protocols: ['ACS/chest pain pathway', 'ECG and troponin review'],
     workflows: ['ACS Workflow'],
@@ -30,7 +63,11 @@ const ROUTES: readonly ClinicalIntentRoute[] = Object.freeze([
   {
     routeId: 'chief-complaint-stroke-symptoms',
     complaint: 'Stroke Symptoms',
-    aliases: ['stroke symptoms', 'stroke concern', 'weakness', 'facial droop', 'slurred speech', 'neuro deficit'],
+    aliases: [
+      'stroke symptoms', 'stroke concern', 'weakness', 'facial droop', 'slurred speech', 'neuro deficit',
+      'stroke', 'tia', 'aphasia', 'hemiparesis', 'weakness on one side',
+      'neurologic deficit', 'neurological deficit', 'sudden vision loss', 'fast positive',
+    ],
     calculators: [{ id: 'nihss', label: 'NIHSS' }],
     protocols: ['stroke window workflow', 'imaging escalation pathway'],
     workflows: ['Stroke Workflow'],
@@ -42,7 +79,10 @@ const ROUTES: readonly ClinicalIntentRoute[] = Object.freeze([
   {
     routeId: 'chief-complaint-sepsis-concern',
     complaint: 'Sepsis Concern',
-    aliases: ['sepsis concern', 'possible sepsis', 'infection', 'fever hypotension', 'tachypnea infection'],
+    aliases: [
+      'sepsis concern', 'possible sepsis', 'infection', 'fever hypotension', 'tachypnea infection',
+      'sepsis', 'septic', 'septic shock', 'infection concern',
+    ],
     calculators: [
       { id: 'qsofa', label: 'qSOFA' },
       { id: 'news2', label: 'NEWS2' },
@@ -73,7 +113,11 @@ const ROUTES: readonly ClinicalIntentRoute[] = Object.freeze([
   {
     routeId: 'chief-complaint-shortness-of-breath',
     complaint: 'Shortness of Breath',
-    aliases: ['shortness of breath', 'sob', 'dyspnea', 'respiratory distress', 'pe concern'],
+    aliases: [
+      'shortness of breath', 'sob', 'dyspnea', 'respiratory distress', 'pe concern',
+      'short of breath', 'dyspnoea', 'breathing difficulty', 'difficulty breathing', 'trouble breathing',
+      "can't breathe", 'cant breathe', 'cannot breathe', 'hypoxia', 'hypoxic',
+    ],
     calculators: [{ id: 'wells-pe', label: 'Wells PE' }],
     protocols: ['Respiratory Protocol', 'PE evaluation pathway'],
     workflows: ['Respiratory Workflow'],
@@ -85,7 +129,10 @@ const ROUTES: readonly ClinicalIntentRoute[] = Object.freeze([
   {
     routeId: 'chief-complaint-abdominal-pain',
     complaint: 'Abdominal Pain',
-    aliases: ['abdominal pain', 'belly pain', 'gi bleed', 'pancreatitis', 'surgical abdomen', 'vomiting'],
+    aliases: [
+      'abdominal pain', 'belly pain', 'gi bleed', 'pancreatitis', 'surgical abdomen', 'vomiting',
+      'severe abdominal pain', 'acute abdomen', 'ruptured appendix', 'ruptured aortic', 'ruptured ectopic', 'peritonitis',
+    ],
     calculators: [
       { id: 'ranson-criteria', label: 'Ranson Criteria' },
       { id: 'bisap-score', label: 'BISAP' },
