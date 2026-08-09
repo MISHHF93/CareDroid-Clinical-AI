@@ -49,7 +49,7 @@ function patientName(patient: Patient): string {
   return `${patient.firstName} ${patient.lastName}`.trim() || patient.mrn;
 }
 
-function syncReassessmentDueFlag(
+export function syncReassessmentDueFlag(
   patient: Patient,
   now: Date,
   thresholds: ReturnType<typeof useEmergencyStore.getState>['thresholds'],
@@ -64,7 +64,14 @@ function syncReassessmentDueFlag(
     return;
   }
 
-  if (patient.state !== PatientState.Waiting && hasFlag(PatientFlag.ReassessmentDue)) {
+  // Only clear once the patient has actually reached active clinical care
+  // (laterStates, same set Rule 2 below uses for HighRisk) -- not merely
+  // upon leaving Waiting. Smart Intake sets this flag from a real vitals
+  // check (backend requiresReassessment()) and moves the patient straight
+  // to Triage; a bare `state !== Waiting` check fired on the very next tick
+  // for every such patient, silently erasing a genuine, unresolved vitals
+  // concern before any clinician had reassessed them.
+  if (laterStates.includes(patient.state) && hasFlag(PatientFlag.ReassessmentDue)) {
     removeFlag(patient.id, PatientFlag.ReassessmentDue);
   }
 }
