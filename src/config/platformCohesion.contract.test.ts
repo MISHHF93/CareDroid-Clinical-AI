@@ -101,7 +101,6 @@ describe('platform cohesion contract', () => {
   it('routes production permission consumers through useSecurityAccess', () => {
     for (const relPath of [
       'src/components/layout/RoleBasedNav.tsx',
-      'src/components/dashboard/RoleDashboardPanel.tsx',
       'src/pages/ClinicalAlertsPage.tsx',
       'src/hooks/useAiChiefRouting.ts',
     ]) {

@@ -194,14 +194,6 @@ Component aliases at `src/components/auth/`:
 - Applied in `router.tsx` to `/admin/operations` and `/audit` routes.
 - Do NOT apply to `emergency/*` routes — those are handled by `EmergencyRouteGuard`.
 
-### RoleDashboardPanel
-
-`src/components/dashboard/RoleDashboardPanel.tsx` renders role-specific widget cards for the active user:
-- Reads `getDashboardWidgets(role)` from `roleAccess.ts` to get `{ primary, secondary }` widget IDs.
-- Renders titled widget cards in "Primary" and "Secondary" groups.
-- Shows the active role, department, and hospital site from the current demo user profile.
-- Use this component on landing or dashboard pages to provide role-contextual content without hardcoding role checks in page files.
-
 ### ClinicalAlertsPage role gating
 
 `src/pages/ClinicalAlertsPage.tsx` enforces RBAC on alert actions:
