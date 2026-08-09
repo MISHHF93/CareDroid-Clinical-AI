@@ -20,8 +20,31 @@ import { callAI } from '../../../../lib/ai/serverClient';
  */
 
 const STOP_WORDS = new Set([
-  'a', 'an', 'and', 'anything', 'app', 'can', 'do', 'for', 'go', 'how', 'i', 'in', 'is',
-  'it', 'me', 'of', 'on', 'open', 'please', 'show', 'take', 'the', 'this', 'to', 'where',
+  'a',
+  'an',
+  'and',
+  'anything',
+  'app',
+  'can',
+  'do',
+  'for',
+  'go',
+  'how',
+  'i',
+  'in',
+  'is',
+  'it',
+  'me',
+  'of',
+  'on',
+  'open',
+  'please',
+  'show',
+  'take',
+  'the',
+  'this',
+  'to',
+  'where',
 ]);
 
 const EXPANSIONS: Readonly<Record<string, string[]>> = Object.freeze({
@@ -90,12 +113,16 @@ export function normalizeQuery(value: string): string {
 }
 
 function tokenize(value: string): string[] {
-  return normalizeQuery(value).split(' ').filter((term) => term.length > 1 && !STOP_WORDS.has(term));
+  return normalizeQuery(value)
+    .split(' ')
+    .filter((term) => term.length > 1 && !STOP_WORDS.has(term));
 }
 
 function expandQuery(query: string): string[] {
   const base = tokenize(query);
-  return [...new Set(base.flatMap((term) => [term, ...(EXPANSIONS[term] || [])]).flatMap(tokenize))];
+  return [
+    ...new Set(base.flatMap((term) => [term, ...(EXPANSIONS[term] || [])]).flatMap(tokenize)),
+  ];
 }
 
 function buildIndex(records: NavigatorCatalogRecord[]): readonly NavigatorDocument[] {
@@ -179,17 +206,23 @@ function fallbackAnswer(query: string, hits: NavigatorHit[]): string {
     `The best match is ${best.label} (${best.path}).`,
     best.description,
     related.length ? `Related locations: ${related.join(' and ')}.` : '',
-  ].filter(Boolean).join(' ');
+  ]
+    .filter(Boolean)
+    .join(' ');
 }
 
 function groundingPrompt(query: string, hits: NavigatorHit[]): string {
-  const evidence = hits.map((hit, index) => [
-    `[${index + 1}] ${hit.label}`,
-    `route=${hit.path}`,
-    `component=${hit.component}`,
-    `description=${hit.description}`,
-    `owner=${hit.workflowOwner}`,
-  ].join(' | ')).join('\n');
+  const evidence = hits
+    .map((hit, index) =>
+      [
+        `[${index + 1}] ${hit.label}`,
+        `route=${hit.path}`,
+        `component=${hit.component}`,
+        `description=${hit.description}`,
+        `owner=${hit.workflowOwner}`,
+      ].join(' | '),
+    )
+    .join('\n');
   return [
     'You are the CareDroid application navigator, not a clinical decision maker.',
     'Answer only from the verified route evidence below. Never invent a route or capability.',

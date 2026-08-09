@@ -19,6 +19,27 @@
 
 ## VALIDATED (this campaign, most recent first)
 
+### HEAL-032 — `npm run validate:ci` (the actual blocking CI gate on every push/PR to `main`/`develop`) was currently failing on HEAD: backend ESLint had 30 real `prettier/prettier` errors across 11 files
+
+- **Severity**: P2_MEDIUM (build correctness — CI's own blocking gate was red, not a cosmetic style nit; distinct from the already-known, deliberately non-blocking `format:check` step's 28-file drift)
+- **Domain**: Build/CI correctness — found while performing this round's repository-normalization pass (full frontend + backend `tsc --noEmit` and `eslint` re-verification before selecting a new target, per the operating directive's "verify before deciding" instruction)
+- **Source evidence**: Ran the exact commands `validate.yml`'s blocking "Validate (lint, tests, builds)" step invokes: `npm run validate:ci` → `npm run lint:all` → (frontend) `eslint src` clean, zero errors; (backend) `npm run lint` → `node scripts/run-eslint.mjs` → `npx eslint {src,test}/**/*.ts`, which exited **1** with 30 `prettier/prettier` errors across `src/main.ts`, `src/modules/app-navigator/{app-navigator.controller.spec.ts, app-navigator.service.spec.ts, app-navigator.service.ts}`, `src/modules/auth/config/role-permissions.read-only-viewer.spec.ts`, `src/modules/emergency-os/{ems-arrival-status-persistence.spec.ts, referral-persistence.spec.ts, waiting-room-escalation-notification.spec.ts}`, `src/modules/organizations/{dto/update-tenant-administration.dto.ts, organizations.controller.ts}`, `src/modules/workspaces/workspace-context.service.spec.ts`. This is a genuinely different problem from the CI workflow's own documented, intentionally non-blocking `format:check` step (28 files, `continue-on-error: true`, per its own comment) — the backend's `lint` script runs ESLint with `eslint-plugin-prettier`'s `prettier/prettier` rule as an **error**, inside the **blocking** `validate:ci` step, so this was a real, currently-broken CI gate on `main`'s HEAD (`17e4276a` at investigation time), not a known/accepted drift. `git blame` on the affected lines traces back to pre-existing commits (`dc6fdcbe2` 2026-06-11, `d5e4746c6` 2026-08-05, and others) — not a regression introduced by the same-day port-reconfiguration commits (`31f5754f`/`17e4276a`), which were independently verified clean by their own author before landing.
+- **Affected files**: The 11 files listed above — every change is a pure Prettier reflow (line-wrapping array/object literals, adding trailing commas, re-indenting multi-line method chains); zero logic changes.
+- **Runtime impact**: None (formatting-only).
+- **Frontend impact**: None (backend-only files).
+- **Backend impact**: None functionally; `npm run lint:all` (and therefore `npm run validate:ci`, and therefore the CI "Validate" gate) now exits 0.
+- **Data impact**: None.
+- **AI/ML impact**: None.
+- **Affected user profiles**: None directly (build/CI hygiene); indirectly every future contributor whose PR would otherwise inherit this red gate regardless of their own change's quality.
+- **Security/privacy impact**: None.
+- **Clinical-safety impact**: None.
+- **Current status**: `VALIDATED`
+- **Dependencies**: None. The separate, already-documented `format:check` 28-file drift (CI's own non-blocking step) was NOT investigated or touched this round — different gate, different (accepted) disposition, out of scope for this fix.
+- **Recommended canonical solution**: Applied — `node scripts/run-eslint.mjs --fix` (backend), re-verified 0 errors.
+- **Validation requirements**: Backend `npx eslint {src,test}/**/*.ts` (via `npm run lint` in `backend/`) clean, exit 0. Backend `tsc --noEmit -p tsconfig.build.json` clean before and after. Targeted Jest re-run of all 10 touched/related spec suites (`app-navigator` ×2, `role-permissions.read-only-viewer`, `ems-arrival-status-persistence`, `referral-persistence`, `waiting-room-escalation-notification`, `workspace-context.service`, plus the 3 sibling `organizations` suites) — 10/10 suites, 40/40 tests passing, zero regressions. Frontend `eslint src` and `tsc --noEmit -p tsconfig.frontend.json` independently re-confirmed clean (unaffected, checked for completeness of this round's normalization pass).
+- **Commit when resolved**: Pending (this session).
+- **Scorecard impact when resolved**: Pending next scorecard sync pass — Domain 8 (Architecture & Repository Convergence) or a build-correctness callout; closes a real, previously-undocumented CI-gate break.
+
 ### HEAL-030 — HEART score, qSOFA, and NIHSS each have 2 live, independently-maintained implementations reachable via different navigation paths with no test guaranteeing they agree; added the missing regression guards for all 3
 
 - **Severity**: P1_HIGH (patient-safety-adjacent: a future one-sided edit to either implementation's clinical thresholds would silently produce a different risk score depending on which UI card a clinician happened to click, with no test to catch it)

@@ -1,6 +1,10 @@
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Test, TestingModule } from '@nestjs/testing';
-import { EmergencyPatientService, ReferralService, WorkflowActionLogService } from './emergency-os.services';
+import {
+  EmergencyPatientService,
+  ReferralService,
+  WorkflowActionLogService,
+} from './emergency-os.services';
 import { Referral } from './entities/referral.entity';
 
 // Regression coverage for the 2026-08-08 fix: ReferralService.createdReferrals was a
@@ -75,9 +79,7 @@ describe('ReferralService persistence', () => {
     service.updateReferralStatus(referralId, 'accepted');
 
     expect(repository.save).toHaveBeenCalledTimes(1);
-    expect(savedRows[0]).toEqual(
-      expect.objectContaining({ id: referralId, status: 'accepted' }),
-    );
+    expect(savedRows[0]).toEqual(expect.objectContaining({ id: referralId, status: 'accepted' }));
   });
 
   it('rehydrates created referrals from the repository on module init, surviving a restart', async () => {

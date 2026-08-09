@@ -13,9 +13,20 @@ describe('AppNavigatorController', () => {
 
   beforeEach(() => {
     service = {
-      getHealth: jest.fn(() => ({ ok: true, documents: 42, catalogCommit: 'abc123', groqConfigured: false })),
+      getHealth: jest.fn(() => ({
+        ok: true,
+        documents: 42,
+        catalogCommit: 'abc123',
+        groqConfigured: false,
+      })),
       getCatalog: jest.fn(() => ({ generatedAt: '2026-08-06T00:00:00.000Z', records: [] })),
-      query: jest.fn(async () => ({ query: 'x', answer: 'y', source: 'catalog', providerError: null, destinations: [] })),
+      query: jest.fn(async () => ({
+        query: 'x',
+        answer: 'y',
+        source: 'catalog',
+        providerError: null,
+        destinations: [],
+      })),
     };
     controller = new AppNavigatorController(service as unknown as AppNavigatorService);
   });

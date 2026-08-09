@@ -1,6 +1,10 @@
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Test, TestingModule } from '@nestjs/testing';
-import { EMSIntakeService, EmergencyPatientService, WorkflowActionLogService } from './emergency-os.services';
+import {
+  EMSIntakeService,
+  EmergencyPatientService,
+  WorkflowActionLogService,
+} from './emergency-os.services';
 import { EmsArrivalStatus } from './entities/ems-arrival-status.entity';
 
 // Regression coverage for the 2026-08-08 fix: EMSIntakeService.getEMSIntake() used to
@@ -40,17 +44,27 @@ describe('EMSIntakeService arrival status persistence', () => {
   });
 
   it('persists an arrival status update to the repository, not only an in-memory map', () => {
-    service.updateArrivalStatus('ems-arrival-p1', { status: 'Arrived', arrivedAt: '2026-08-08T10:00:00.000Z' });
+    service.updateArrivalStatus('ems-arrival-p1', {
+      status: 'Arrived',
+      arrivedAt: '2026-08-08T10:00:00.000Z',
+    });
 
     expect(repository.create).toHaveBeenCalledTimes(1);
     expect(repository.save).toHaveBeenCalledTimes(1);
     expect(savedRows[0]).toEqual(
-      expect.objectContaining({ id: 'ems-arrival-p1', status: 'Arrived', arrivedAt: '2026-08-08T10:00:00.000Z' }),
+      expect.objectContaining({
+        id: 'ems-arrival-p1',
+        status: 'Arrived',
+        arrivedAt: '2026-08-08T10:00:00.000Z',
+      }),
     );
   });
 
   it('merges a later transition onto an earlier one rather than replacing it', () => {
-    service.updateArrivalStatus('ems-arrival-p2', { status: 'Arrived', arrivedAt: '2026-08-08T10:00:00.000Z' });
+    service.updateArrivalStatus('ems-arrival-p2', {
+      status: 'Arrived',
+      arrivedAt: '2026-08-08T10:00:00.000Z',
+    });
     savedRows.length = 0;
 
     const result = service.updateArrivalStatus('ems-arrival-p2', {
@@ -106,6 +120,8 @@ describe('EMSIntakeService arrival status persistence', () => {
     }).compile();
 
     const bareService = module.get<EMSIntakeService>(EMSIntakeService);
-    expect(() => bareService.updateArrivalStatus('ems-arrival-p4', { status: 'Arrived' })).not.toThrow();
+    expect(() =>
+      bareService.updateArrivalStatus('ems-arrival-p4', { status: 'Arrived' }),
+    ).not.toThrow();
   });
 });

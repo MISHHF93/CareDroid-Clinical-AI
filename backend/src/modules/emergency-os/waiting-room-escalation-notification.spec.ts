@@ -1,5 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { EmergencyPatientService, ReassessmentService, WorkflowActionLogService } from './emergency-os.services';
+import {
+  EmergencyPatientService,
+  ReassessmentService,
+  WorkflowActionLogService,
+} from './emergency-os.services';
 import { EmailService } from '../email/email.service';
 
 // Regression coverage for the 2026-08-08 fix: the Waiting Room Safety domain's own
@@ -43,7 +47,10 @@ describe('ReassessmentService.notifyWaitingRoomEscalation', () => {
 
     expect(sendEmail).toHaveBeenCalledTimes(2);
     expect(sendEmail).toHaveBeenCalledWith(
-      expect.objectContaining({ to: 'charge-nurse@example.com', subject: expect.stringContaining('Waiting room escalation') }),
+      expect.objectContaining({
+        to: 'charge-nurse@example.com',
+        subject: expect.stringContaining('Waiting room escalation'),
+      }),
     );
     expect(result.data.sent).toBe(true);
     expect(result.data.recipientCount).toBe(2);

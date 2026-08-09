@@ -73,7 +73,13 @@ describe('WorkspaceContextService', () => {
     workspacesService.getActiveWorkspaceState.mockResolvedValue({
       workspaces: [emergencyWorkspace],
       memberships: [
-        { id: 'membership-1', workspaceId: 'workspace-1', userId: 'user-1', role: 'clinician', status: 'active' },
+        {
+          id: 'membership-1',
+          workspaceId: 'workspace-1',
+          userId: 'user-1',
+          role: 'clinician',
+          status: 'active',
+        },
       ],
       activeWorkspaceId: 'workspace-1',
       effectivePermissions: ['ACCESS_TOOLS'],

@@ -1,4 +1,12 @@
-import { IsArray, IsEnum, IsObject, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import {
+  IsArray,
+  IsEnum,
+  IsObject,
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 import { OrganizationType } from '../../platform-assets/enums/platform-asset.enums';
 
 /**

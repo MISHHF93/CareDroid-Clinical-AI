@@ -58,7 +58,9 @@ async function registerEmergencyMongooseRuntime(
 
   await mongoose.connect(mongoUri);
   reassessmentScheduler.start();
-  logger.log('Mongoose CareDroid runtime ready: connection established, reassessment scheduler running.');
+  logger.log(
+    'Mongoose CareDroid runtime ready: connection established, reassessment scheduler running.',
+  );
 }
 
 function registerProductionFrontendAssets(app: Awaited<ReturnType<typeof NestFactory.create>>) {

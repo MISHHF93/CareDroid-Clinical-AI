@@ -38,7 +38,9 @@ describe('RolePermissions — READ_ONLY_VIEWER', () => {
   });
 
   it('cannot trigger emergency protocols or override safety checks', () => {
-    expect(hasPermission(UserRole.READ_ONLY_VIEWER, Permission.TRIGGER_EMERGENCY_PROTOCOL)).toBe(false);
+    expect(hasPermission(UserRole.READ_ONLY_VIEWER, Permission.TRIGGER_EMERGENCY_PROTOCOL)).toBe(
+      false,
+    );
     expect(hasPermission(UserRole.READ_ONLY_VIEWER, Permission.OVERRIDE_SAFETY_CHECKS)).toBe(false);
   });
 

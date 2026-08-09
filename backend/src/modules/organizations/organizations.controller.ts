@@ -103,7 +103,9 @@ export class OrganizationsController {
     @Body() dto: UpdateTenantAdministrationDto,
   ) {
     this.assertTenantOrganization(req, organizationId);
-    return this.organizationsService.updateTenantAdministration(req.user, organizationId, { ...dto });
+    return this.organizationsService.updateTenantAdministration(req.user, organizationId, {
+      ...dto,
+    });
   }
 
   @Get(':organizationId/feature-flags')
@@ -147,7 +149,9 @@ export class OrganizationsController {
     @Body() dto: UpdateOrganizationSettingsDto,
   ) {
     this.assertTenantOrganization(req, organizationId);
-    return this.organizationsService.updateOrganizationSettings(req.user, organizationId, { ...dto });
+    return this.organizationsService.updateOrganizationSettings(req.user, organizationId, {
+      ...dto,
+    });
   }
 
   private assertTenantOrganization(req: any, organizationId: string) {

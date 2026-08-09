@@ -52,7 +52,9 @@ describe('AppNavigatorService', () => {
     process.env.GROQ_API_KEY = 'test-key';
     global.fetch = jest.fn(async () => ({
       ok: true,
-      json: async () => ({ choices: [{ message: { content: 'Try the Command Center at /emergency/command-center.' } }] }),
+      json: async () => ({
+        choices: [{ message: { content: 'Try the Command Center at /emergency/command-center.' } }],
+      }),
     })) as unknown as typeof fetch;
 
     const result = await service.query('where do I manage ambulances?');
