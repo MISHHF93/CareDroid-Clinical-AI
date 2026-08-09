@@ -35,7 +35,7 @@
 - **Dependencies**: None.
 - **Recommended canonical solution**: Applied — `DELETE_PROVEN_DEAD` per the epic's own 6-way disposition taxonomy.
 - **Validation requirements**: Full frontend `tsc --noEmit -p tsconfig.frontend.json` clean (whole-repo). ESLint clean on all 4 touched files. `vitest` blocked in this sandbox; change is purely subtractive and a full-repo `tsc` pass would catch any JSX/import mismatch.
-- **Commit when resolved**: `TBD` (this round, pending commit).
+- **Commit when resolved**: `a4d918e9`
 - **Scorecard impact when resolved**: Pending next scorecard sync pass.
 
 ### HEAL-017 — `NotificationContext.tsx`/`NotificationProvider` was globally-mounted dead code, deleted (HEAL-EPIC-A, first bounded slice)
