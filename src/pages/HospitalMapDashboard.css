@@ -158,6 +158,16 @@
   color: var(--medical-text-subtle, var(--app-text-muted));
 }
 
+.hospital-map-page__table-note {
+  margin: 0 0 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--medical-text-subtle, var(--app-text-muted));
+  background: var(--medical-surface-2, var(--app-surface-2));
+}
+
 .hospital-map-page__unit-row {
   padding: 8px 0;
   border-bottom: 1px solid var(--medical-card-border, var(--app-panel-border));

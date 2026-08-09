@@ -54,6 +54,22 @@ const unitStatusColor: Record<string, string> = {
   green: '#22c55e',
 };
 
+/**
+ * Green/Yellow/Orange/Red is this codebase's one canonical capacity-band
+ * vocabulary (lib/emergency-os/logic.ts). Color/severity for real data must
+ * come from `band`, never recomputed from a raw score threshold -- the real
+ * engine's score is a 0-100 pressure value (higher = worse), the opposite
+ * convention from this page's legacy demo-only score/label pair below
+ * (higher = better). Mixing the two threshold systems would silently invert
+ * severity for real data.
+ */
+const BAND_COLOR: Record<string, string> = {
+  Green: '#15803d',
+  Yellow: '#ca8a04',
+  Orange: '#b45309',
+  Red: '#b91c1c',
+};
+
 function UnitRow({ unit }: { unit: BedUnit }) {
   const pct = occupancyPct(unit.occupied, unit.total);
   const color = unitStatusColor[unit.status] || 'var(--medical-text-muted, #64748b)';
@@ -123,18 +139,29 @@ export default function HospitalMapDashboard() {
     return () => clearInterval(interval);
   }, []);
 
+  // Real per-ward bed data isn't tracked by this domain model yet -- capacity.units
+  // is only ever present on the full-demo fallback below, never on live data.
+  const unitsAreIllustrative = !capacity?.units;
   const units: BedUnit[] = capacity?.units ?? DEMO_CAPACITY.units;
   const totalBeds = capacity?.totalBeds ?? DEMO_CAPACITY.totalBeds;
   const occupiedBeds = capacity?.occupiedBeds ?? DEMO_CAPACITY.occupiedBeds;
   const availableBeds = capacity?.availableBeds ?? DEMO_CAPACITY.availableBeds;
   const boarding = capacity?.boardingPatients ?? DEMO_CAPACITY.boardingPatients;
   const capacityScore = capacity?.score ?? DEMO_CAPACITY.score;
+  const capacityBand: string | undefined = capacity?.band;
   const diversion = capacity?.diversion ?? surge?.diversion ?? false;
   const occupancy = occupancyPct(occupiedBeds, totalBeds);
 
-  // WCAG AA large-text ≥3:1 on white (matches .is-critical / .is-warning / .is-good)
-  const scoreColor =
-    capacityScore < 60 ? '#b91c1c' : capacityScore < 78 ? '#b45309' : '#15803d';
+  // WCAG AA large-text ≥3:1 on white (matches .is-critical / .is-warning / .is-good).
+  // Real data: derive color from the canonical band, never from a raw score
+  // threshold (see BAND_COLOR's own comment on why). Demo-only fallback keeps
+  // its legacy score-threshold coloring since it has no band.
+  const scoreColor = capacityBand
+    ? BAND_COLOR[capacityBand] || BAND_COLOR.Green
+    : capacityScore < 60 ? '#b91c1c' : capacityScore < 78 ? '#b45309' : '#15803d';
+  const scoreSubLabel = capacityBand
+    ? `${capacityBand} pressure`
+    : capacity?.label ?? (capacityScore < 60 ? 'Critical' : capacityScore < 78 ? 'Elevated' : 'Normal');
 
   return (
     <main className="hospital-map-page">
@@ -164,9 +191,7 @@ export default function HospitalMapDashboard() {
             {capacityScore}
             <small>/100</small>
           </strong>
-          <span className="hospital-map-page__kpi-sub">
-            {capacity?.label ?? (capacityScore < 60 ? 'Critical' : capacityScore < 78 ? 'Elevated' : 'Normal')}
-          </span>
+          <span className="hospital-map-page__kpi-sub">{scoreSubLabel}</span>
         </article>
 
         <article className="hospital-map-page__kpi">
@@ -213,6 +238,12 @@ export default function HospitalMapDashboard() {
           <span>Board</span>
           <span>Beds</span>
         </div>
+        {unitsAreIllustrative ? (
+          <p className="hospital-map-page__table-note">
+            Illustrative unit breakdown — CareDroid does not yet track per-ward bed counts.
+            The department-level totals above are live.
+          </p>
+        ) : null}
         {units.map((unit) => (
           <UnitRow key={unit.id} unit={unit} />
         ))}

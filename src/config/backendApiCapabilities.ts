@@ -72,7 +72,17 @@ export const BACKEND_API_CAPABILITY_STATUS = Object.freeze({
   emergencyPatients: BACKEND_CAPABILITY_STATUS.REAL,
   emergencyPatientJourney: BACKEND_CAPABILITY_STATUS.DEMO,
   emergencyQueues: BACKEND_CAPABILITY_STATUS.DEMO,
-  emergencyCapacity: BACKEND_CAPABILITY_STATUS.DEMO,
+  /**
+   * Corrected 2026-08-09: EmergencyOsController.getCapacity() calls
+   * CapacityService.getCapacity() (backend/src/modules/emergency-os/
+   * emergency-os.services.ts), which computes capacity from
+   * EmergencyPatientService.computeCapacity() -- the real, always-on
+   * TypeORM patient repository via calculateEmergencyOsCapacity()
+   * (lib/emergency-os/logic.ts), not a fixture. Was mislabeled DEMO
+   * alongside the genuinely-fixture-backed EmergencyOsController siblings;
+   * this one specifically has been directly verified real.
+   */
+  emergencyCapacity: BACKEND_CAPABILITY_STATUS.REAL,
   emergencyBoarding: BACKEND_CAPABILITY_STATUS.DEMO,
   emergencyEmsRuntime: BACKEND_CAPABILITY_STATUS.DEMO,
   emergencyOperatingSurfaces: BACKEND_CAPABILITY_STATUS.DEMO,

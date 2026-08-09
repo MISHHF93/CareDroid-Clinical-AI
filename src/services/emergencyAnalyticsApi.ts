@@ -180,8 +180,54 @@ export function fetchEmergencyCapacityHistory() {
   return guardedJson('emergencyCapacityHistory', '/api/emergency/capacity/history');
 }
 
+/**
+ * Maps EmergencyOsCapacityOutput (lib/emergency-os/logic.ts's
+ * calculateEmergencyOsCapacity, the canonical real-data capacity engine)
+ * onto the flat KPI shape this file's consumers (HospitalMapDashboard.tsx,
+ * useOperationsHubLiveFeeds.ts) render. Deliberately does NOT map the
+ * engine's own `units` field onto the consumer's BedUnit[] concept -- those
+ * are different things with the same name (the engine's `units` is a
+ * measurement-unit label map like `{totalPatients: 'patients'}`; the
+ * consumer's `units` is a per-hospital-ward bed breakdown CareDroid's
+ * domain model does not track at all). `score` is intentionally left as
+ * the engine's own 0-100 pressure value (higher = more pressure, NOT
+ * higher = more available) -- callers must use `band`, not score
+ * thresholds, to determine severity/color.
+ */
+function mapEmergencyOsCapacityToDashboardShape(capacity) {
+  const totalBeds = Math.max(0, Number(capacity?.totalRooms) || 0);
+  const occupiedBeds = Math.max(0, Math.min(Number(capacity?.occupiedRooms) || 0, totalBeds));
+  return {
+    score: Math.round(Number(capacity?.score) || 0),
+    band: capacity?.band || 'Green',
+    diversion: false,
+    totalBeds,
+    occupiedBeds,
+    availableBeds: totalBeds - occupiedBeds,
+    boardingPatients: Math.max(0, Number(capacity?.boardingCount) || 0),
+    source: 'live',
+  };
+}
+
+/**
+ * 2026-08-09: was calling the Mongoose-only /api/emergency/capacity/dashboard
+ * (CapacityController), gated behind ENABLE_MONGOOSE_EMERGENCY_OS (off by
+ * default) and never actually enabled at the frontend capability layer
+ * (emergencyCapacityDashboard: DISABLED) -- this call always short-circuited
+ * before ever reaching the network, so both real consumers permanently
+ * rendered hardcoded demo/placeholder numbers. Repointed to the real,
+ * always-available /api/emergency/capacity (EmergencyOsController, backed
+ * by the canonical TypeORM patient repository, no Mongo dependency).
+ */
 export function fetchEmergencyCapacityDashboard() {
-  return guardedJson('emergencyCapacityDashboard', '/api/emergency/capacity/dashboard');
+  return guardedJson('emergencyCapacity', '/api/emergency/capacity').then((result) => {
+    if (!result.ok) return result;
+    const capacity = result.data?.data?.capacity;
+    if (!capacity) {
+      return { ok: false, data: null, message: 'Capacity payload missing from response.' };
+    }
+    return { ok: true, data: mapEmergencyOsCapacityToDashboardShape(capacity), message: '' };
+  });
 }
 
 export function fetchEmergencyQueueAnalytics() {

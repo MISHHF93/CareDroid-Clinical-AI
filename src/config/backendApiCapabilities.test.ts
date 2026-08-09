@@ -99,7 +99,9 @@ describe('backendApiCapabilities', () => {
     expect(getBackendCapabilityStatus('emergencyCentralNode')).toBe(BACKEND_CAPABILITY_STATUS.DEMO);
     expect(getBackendCapabilityStatus('emergencyPatientJourney')).toBe(BACKEND_CAPABILITY_STATUS.DEMO);
     expect(getBackendCapabilityStatus('emergencyQueues')).toBe(BACKEND_CAPABILITY_STATUS.DEMO);
-    expect(getBackendCapabilityStatus('emergencyCapacity')).toBe(BACKEND_CAPABILITY_STATUS.DEMO);
+    // Corrected 2026-08-09: computes from the real TypeORM patient repository
+    // (calculateEmergencyOsCapacity), not a fixture -- see backendApiCapabilities.ts's own comment.
+    expect(getBackendCapabilityStatus('emergencyCapacity')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
     expect(getBackendCapabilityStatus('emergencyIntegrationHub')).toBe(BACKEND_CAPABILITY_STATUS.DEMO);
     // Create/list/handoff intake path is a real session board mutator (not fixture-only demo).
     expect(getBackendCapabilityStatus('emergencySmartIntake')).toBe(BACKEND_CAPABILITY_STATUS.REAL);
