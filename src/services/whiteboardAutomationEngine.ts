@@ -105,6 +105,31 @@ function latestUnreviewedResult(patient: Patient): JourneyEvent | null {
   );
 }
 
+/**
+ * applyWhiteboardAutomationToPatients calls applyAutomatedStateTransitions and
+ * evaluateWhiteboardAutomation back-to-back on the same patient, and both
+ * independently recomputed latestUnreviewedResult()/the latest
+ * DispositionUpdated event -- each a full scan of patient.timeline (which
+ * grows for the length of an ED stay: vitals, notes, flags, transitions).
+ * Neither function's own mutations touch ResultReceived/DispositionUpdated/
+ * lab-result-reviewed events (applyAutomatedStateTransitions only appends
+ * StateChange events with a DIFFERENT automation metadata value), so these
+ * two lookups stay valid across both calls for the same patient -- safe to
+ * compute once and share, cutting the batch path's per-patient timeline
+ * scans roughly in half without changing any observable behavior.
+ */
+type WhiteboardAutomationContext = {
+  unreviewedResult: JourneyEvent | null;
+  dispositionEvent: JourneyEvent | null;
+};
+
+function computeWhiteboardAutomationContext(patient: Patient): WhiteboardAutomationContext {
+  return {
+    unreviewedResult: latestUnreviewedResult(patient),
+    dispositionEvent: latestTimelineEvent(patient, ['DispositionUpdated']),
+  };
+}
+
 function hasAutomationHandled(
   patient: Patient,
   automation: string,
@@ -182,6 +207,7 @@ export function evaluateWhiteboardAutomation(
   patient: Patient,
   now = new Date(),
   thresholds: WhiteboardAutomationThresholds = DEFAULT_WHITEBOARD_AUTOMATION_THRESHOLDS,
+  context?: WhiteboardAutomationContext,
 ): WhiteboardAutomationSnapshot {
   const events: WhiteboardAutomationTimer[] = [];
   const timestamp = nowIso(now);
@@ -229,7 +255,7 @@ export function evaluateWhiteboardAutomation(
     );
   }
 
-  const unreviewedResult = latestUnreviewedResult(patient);
+  const unreviewedResult = context ? context.unreviewedResult : latestUnreviewedResult(patient);
   if (unreviewedResult) {
     const isCritical = Boolean(unreviewedResult.metadata?.critical);
     events.push(
@@ -259,7 +285,9 @@ export function evaluateWhiteboardAutomation(
     );
   }
 
-  const diagnosisEvent = latestTimelineEvent(patient, ['DispositionUpdated']);
+  const diagnosisEvent = context
+    ? context.dispositionEvent
+    : latestTimelineEvent(patient, ['DispositionUpdated']);
   if (
     diagnosisEvent?.metadata?.diagnosis &&
     [PatientState.Disposition, PatientState.Assessment, PatientState.Results, PatientState.Orders].includes(
@@ -318,27 +346,47 @@ export function evaluateWhiteboardAutomation(
   };
 }
 
+function timersEqual(left: WhiteboardAutomationTimer, right: WhiteboardAutomationTimer): boolean {
+  return (
+    left.id === right.id &&
+    left.label === right.label &&
+    left.dueAt === right.dueAt &&
+    left.triggeredAt === right.triggeredAt &&
+    left.source === right.source &&
+    left.tone === right.tone &&
+    left.overdueMinutes === right.overdueMinutes &&
+    left.remainingMinutes === right.remainingMinutes
+  );
+}
+
 function automationSnapshotsEqual(
   left?: WhiteboardAutomationSnapshot,
   right?: WhiteboardAutomationSnapshot,
 ): boolean {
   if (!left && !right) return true;
   if (!left || !right) return false;
-  return (
-    left.displayState === right.displayState &&
-    JSON.stringify(left.events) === JSON.stringify(right.events)
-  );
+  if (left.displayState !== right.displayState) return false;
+  if (left.events.length !== right.events.length) return false;
+  // Field-by-field comparison, not JSON.stringify: this runs once per active
+  // patient on every 30s global refresh (AppShell's alertsInterval) AND
+  // synchronously on every canonical workflow transition
+  // (unifiedPatientWorkflowOrchestrator -> updateAlerts), so avoiding a full
+  // serialize-both-arrays-then-string-compare here is a real, repeated saving,
+  // not a one-off micro-optimization. WhiteboardAutomationTimer is flat (see
+  // its own type definition) so this stays correct without deep recursion.
+  return left.events.every((event, index) => timersEqual(event, right.events[index]));
 }
 
 function applyAutomatedStateTransitions(
   patient: Patient,
   now: Date,
+  context?: WhiteboardAutomationContext,
 ): { patient: Patient; changed: boolean } {
   let nextPatient = patient;
   let changed = false;
   const timestamp = nowIso(now);
 
-  const latestResult = latestUnreviewedResult(patient);
+  const latestResult = context ? context.unreviewedResult : latestUnreviewedResult(patient);
   if (
     latestResult &&
     patient.state === PatientState.Orders &&
@@ -372,7 +420,9 @@ function applyAutomatedStateTransitions(
     }
   }
 
-  const diagnosisEvent = latestTimelineEvent(patient, ['DispositionUpdated']);
+  const diagnosisEvent = context
+    ? context.dispositionEvent
+    : latestTimelineEvent(patient, ['DispositionUpdated']);
   const diagnosis = String(diagnosisEvent?.metadata?.diagnosis || '').trim();
   if (
     diagnosis &&
@@ -429,11 +479,13 @@ export function applyWhiteboardAutomationToPatients(
       return { ...patient, whiteboardAutomation: undefined };
     }
 
+    const context = computeWhiteboardAutomationContext(patient);
     const { patient: transitioned, changed: transitionChanged } = applyAutomatedStateTransitions(
       patient,
       now,
+      context,
     );
-    const automation = evaluateWhiteboardAutomation(transitioned, now, thresholds);
+    const automation = evaluateWhiteboardAutomation(transitioned, now, thresholds, context);
     const automationChanged = !automationSnapshotsEqual(
       transitioned.whiteboardAutomation,
       automation,

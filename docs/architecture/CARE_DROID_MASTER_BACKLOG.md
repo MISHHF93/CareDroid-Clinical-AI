@@ -9,7 +9,7 @@
 4. Statuses use the established vocabularies only — ledger statuses (`VALIDATED`, `CONFIRMED`, `IN_PROGRESS`, `BLOCKED`, `WONT_FIX_WITH_REASON`, `SUPERSEDED`) and workflow statuses (`FULLY_WIRED`, `PARTIALLY_WIRED`, `FRONTEND_ONLY`, `BACKEND_ONLY`, `FIXTURE_ONLY`, `DUPLICATE`, `LEGACY`, `MISSING`, `NEEDS_VERIFICATION`, `BLOCKED_EXTERNAL`, `MANUAL_REVIEW`, `FUTURE_MODULE`). Priorities P0–P3 per the ledger's severity legend.
 5. A row marked done must cite its evidence (HEAL id, commit, or ledger section) — no unevidenced check-offs, per the campaign's own scoring discipline.
 
-**Last updated**: 2026-08-10 · HEAD `2b727a78` · Campaign state: 61 HEAL fixes (60 validated, 1 confirmed-not-fixed pending human decision), score 731/1000.
+**Last updated**: 2026-08-10 · HEAD `40d4af92` · Campaign state: 62 HEAL fixes (61 validated, 1 confirmed-not-fixed pending human decision), score 731/1000.
 
 ---
 
@@ -205,7 +205,7 @@ The FSM backbone (`src/engine/journeyEngine.ts` `VALID_TRANSITIONS`) + step mode
 | MB-J4 | Hand-maintained mirror registries → generated from source (route inventory, nav baselines, page counts) | `CONFIRMED`, open — structural fragility, 4 stale artifacts from one commit | Infra note recommendation |
 | MB-J5 | Docker compose smoke test | `BLOCKED` — no Docker in environment | HEAL-014 |
 | MB-J6 | Body-validation + calculator-equivalence + chrome + propagation-chain regression guards | `VALIDATED`, permanent | Various |
-| MB-J7 | Continuous performance healing — frontend + backend pipelines measurably faster without compromising clinical safety/data integrity; read-the-actual-code lens every round | `IN_PROGRESS` — first fix landed (HEAL-056: hot-path console object retention in alert lifecycle gated to dev; ReferralPanel render churn fixed earlier); seeded next targets: repo-wide production console sweep, bundle analysis of heaviest lazy chunks (analytics graph measured 7s cold transform), `updateAlerts` recompute frequency audit, backend N+1/hot-path pass | HEAL-056 |
+| MB-J7 | Continuous performance healing — frontend + backend pipelines measurably faster without compromising clinical safety/data integrity; read-the-actual-code lens every round | `IN_PROGRESS` — HEAL-056 (console object retention), HEAL-062 (`updateAlerts` hot path: deduped 2 redundant per-patient timeline scans + replaced `JSON.stringify` equality with field comparison); console sweep confirmed clean beyond HEAL-056. Remaining: bundle analysis of heaviest lazy chunks (analytics graph = 7s cold transform), backend N+1/hot-path pass | HEAL-056, HEAL-062 |
 
 ## K. Production readiness (newest directive — mostly discovery-stage)
 
