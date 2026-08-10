@@ -27,7 +27,7 @@
 - **Fix**: precise codepoint-level find-and-replace (not a blind string-literal patch) restoring each of the 6 corrupted sequences to its correct Unicode character, applied identically across all 3 files. Re-ran the full-tree sweep afterward and confirmed zero remaining instances of the corruption signature anywhere in `src/` or `backend/src/`.
 - **Affected files**: `src/pages/PlatformEntryHub.tsx` (15 instances), `src/components/whiteboard/CommandCenterThroughputScreen.tsx` (4 instances, including 2 found only after the initial fix via a broader lead-byte sweep), `src/pages/fleet/RouteOptimizer.tsx` (2 instances)
 - **Validation**: `npx tsc --noEmit -p tsconfig.json` clean. `npx eslint` clean on all 3 files. `PlatformEntryHub.test.tsx` + `routeOptimizerWiring.test.ts` (10/10) green, no regressions. Verified live against the running dev server: `/workspace` page text confirmed to contain zero mojibake sequences and the correct real em-dash/arrow characters after the fix.
-- **Commit when resolved**: (this commit)
+- **Commit when resolved**: `e440bec`
 - **Scorecard impact when resolved**: closes MB-E16; real text-correctness fix across 3 files/19 instances, found via a repo-wide signature sweep rather than fixing only the one originally-spotted instance.
 
 ### HEAL-073 (P2_MEDIUM, VALIDATED) — the HEAL-069 page-chrome drift bug also affects the admin/governance/training console route trees; fixed the 4 confirmed instances plus a systemic resolver covering all ~26 governance workspace routes at once

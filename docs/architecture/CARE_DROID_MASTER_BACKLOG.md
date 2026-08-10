@@ -9,7 +9,7 @@
 4. Statuses use the established vocabularies only — ledger statuses (`VALIDATED`, `CONFIRMED`, `IN_PROGRESS`, `BLOCKED`, `WONT_FIX_WITH_REASON`, `SUPERSEDED`) and workflow statuses (`FULLY_WIRED`, `PARTIALLY_WIRED`, `FRONTEND_ONLY`, `BACKEND_ONLY`, `FIXTURE_ONLY`, `DUPLICATE`, `LEGACY`, `MISSING`, `NEEDS_VERIFICATION`, `BLOCKED_EXTERNAL`, `MANUAL_REVIEW`, `FUTURE_MODULE`). Priorities P0–P3 per the ledger's severity legend.
 5. A row marked done must cite its evidence (HEAL id, commit, or ledger section) — no unevidenced check-offs, per the campaign's own scoring discipline.
 
-**Last updated**: 2026-08-10 · HEAD (this commit) · Campaign state: 74 HEAL fixes (72 validated, 2 confirmed-not-fixed pending dedicated round — MB-P0-4/HEAL-070 patients-render hang, plus MB-P0-1/2 human-decision blocks). HEAL-074 (new): fixed MB-E16 — 19 instances of literal mojibake (double-encoded UTF-8: em/en-dashes, arrows, middle-dots) across 3 source files, found via a repo-wide corruption-signature sweep, zero remaining. Score 731/1000 (unchanged this round — no scorecard-domain re-scoring performed).
+**Last updated**: 2026-08-10 · HEAD `e440bec` · Campaign state: 74 HEAL fixes (72 validated, 2 confirmed-not-fixed pending dedicated round — MB-P0-4/HEAL-070 patients-render hang, plus MB-P0-1/2 human-decision blocks). HEAL-074 (new): fixed MB-E16 — 19 instances of literal mojibake (double-encoded UTF-8: em/en-dashes, arrows, middle-dots) across 3 source files, found via a repo-wide corruption-signature sweep, zero remaining. Score 731/1000 (unchanged this round — no scorecard-domain re-scoring performed).
 
 ---
 
