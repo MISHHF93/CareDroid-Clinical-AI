@@ -9,7 +9,7 @@
 4. Statuses use the established vocabularies only — ledger statuses (`VALIDATED`, `CONFIRMED`, `IN_PROGRESS`, `BLOCKED`, `WONT_FIX_WITH_REASON`, `SUPERSEDED`) and workflow statuses (`FULLY_WIRED`, `PARTIALLY_WIRED`, `FRONTEND_ONLY`, `BACKEND_ONLY`, `FIXTURE_ONLY`, `DUPLICATE`, `LEGACY`, `MISSING`, `NEEDS_VERIFICATION`, `BLOCKED_EXTERNAL`, `MANUAL_REVIEW`, `FUTURE_MODULE`). Priorities P0–P3 per the ledger's severity legend.
 5. A row marked done must cite its evidence (HEAL id, commit, or ledger section) — no unevidenced check-offs, per the campaign's own scoring discipline.
 
-**Last updated**: 2026-08-10 · HEAD (this commit) · Campaign state: 72 HEAL fixes (70 validated, 2 confirmed-not-fixed pending dedicated round — MB-P0-4/HEAL-070 patients-render hang, plus MB-P0-1/2 human-decision blocks). MB-P0-5/HEAL-072 fully CLOSED this round (request fan-out staggered; unbounded `workflowLogs` capped at all 4 write sites; suspected 3rd cause investigated and disproven — a deliberate, already-deduplicated AI decision batch, not a bug) — removed from standing P0 flags. Score 731/1000 (unchanged this round — no scorecard-domain re-scoring performed).
+**Last updated**: 2026-08-10 · HEAD `ddf72650` · Campaign state: 72 HEAL fixes (70 validated, 2 confirmed-not-fixed pending dedicated round — MB-P0-4/HEAL-070 patients-render hang, plus MB-P0-1/2 human-decision blocks). MB-P0-5/HEAL-072 fully CLOSED this round (request fan-out staggered; unbounded `workflowLogs` capped at all 4 write sites; suspected 3rd cause investigated and disproven — a deliberate, already-deduplicated AI decision batch, not a bug) — removed from standing P0 flags. Score 731/1000 (unchanged this round — no scorecard-domain re-scoring performed).
 
 ---
 
