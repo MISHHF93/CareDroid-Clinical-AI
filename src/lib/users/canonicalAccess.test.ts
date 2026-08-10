@@ -181,6 +181,45 @@ describe('canonical CareDroid access', () => {
     expect(canPerformClinicalAction(physician, EMERGENCY_ACTIONS.writeNote)).toBe(true);
   });
 
+  it('DOCUMENTS a confirmed route-access source conflict on /admin: CANONICAL_ROUTE_MAP.allowedRoles names 5 admin-tier roles, but OPERATIONS_VIEW_ROUTES (emergencyRolePermissions.ts) grants /admin to every role sharing that list, including charge_nurse -- not yet resolved, see HEAL-058', () => {
+    // /admin/tenant (and every other ADMIN_CONSOLE_CHILD_ROUTES path) has no
+    // dedicated CANONICAL_ROUTE_MAP entry -- it resolves via getRouteByPath's
+    // prefix-match fallback against the parent /admin record, whose OWN
+    // allowedRoles is ['super_admin','hospital_admin','ed_director','it_admin',
+    // 'quality_safety_officer']. That part works correctly (an admin role
+    // passes). But canAccessRoute is `routeAllowed || roleAllowed`, and
+    // routeAllowed comes from a SEPARATE, independently-authored source:
+    // OPERATIONS_VIEW_ROUTES in emergencyRolePermissions.ts includes
+    // ROUTES.adminOperations in the SAME broad "operations dashboard
+    // visibility" list as /laboratory, /knowledge-graph, /ai-command-center --
+    // and charge_nurse (plus every other role sharing OPERATIONS_VIEW_ROUTES)
+    // inherits it, independent of the /admin record's own allowedRoles.
+    //
+    // A prior round of this investigation attempted to make allowedRoles
+    // authoritative in canAccessRoute / to allowedRoles-filter permissionRoutes
+    // -- both were reverted after operationalRoleSimulation.test.ts's own
+    // validateAllOperationalRolesCoherent() proved hospital_admin/it_admin/
+    // dispatcher's LEGITIMATE reception/diagnostics/ems/reassessment/referrals/
+    // triage/reports access also flows through this same emergencyRoutes
+    // mechanism -- narrowing it indiscriminately broke real, tested access.
+    // Whether /admin's presence in OPERATIONS_VIEW_ROUTES was deliberate
+    // (broad read-only situational awareness, with sensitive actions gated
+    // elsewhere) or an unreviewed side effect of reusing a shared array is a
+    // product/security question, not a code-reading one -- same standing-P0
+    // caution as HEAL-011: a wrong guess here risks a real privilege change
+    // in either direction. This test documents the CURRENT, factual behavior
+    // as a regression detector (a change to either registry will make this
+    // fail, surfacing the drift for review) rather than asserting a "should".
+    const admin = compileCareDroidAccessProfile(getDemoUserById('demo-riley-thompson')!); // it_admin
+    const chargeNurse = compileCareDroidAccessProfile(getDemoUserById('demo-omar-patel')!); // charge_nurse
+
+    expect(canAccessRoute(admin, CANONICAL_ROUTES.adminOperations)).toBe(true);
+    expect(canAccessRoute(admin, `${CANONICAL_ROUTES.adminOperations}/tenant`)).toBe(true);
+    // Documents the current (unresolved) state -- NOT asserted as correct.
+    expect(canAccessRoute(chargeNurse, CANONICAL_ROUTES.adminOperations)).toBe(true);
+    expect(canAccessRoute(chargeNurse, `${CANONICAL_ROUTES.adminOperations}/tenant`)).toBe(true);
+  });
+
   it('registration clerk cannot review AI, own clinical alerts, or perform clinical actions', () => {
     const clerk = compileCareDroidAccessProfile(getDemoUserById('demo-grace-kim')!);
 
