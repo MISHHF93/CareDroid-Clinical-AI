@@ -27,10 +27,17 @@
 import { describe, expect, it } from 'vitest';
 import { CANONICAL_ROUTES, CANONICAL_ROUTE_MAP } from '../config/routes.config';
 import { GOVERNANCE_WORKSPACE_ROUTES } from '../config/governanceConsoleRoutes';
+import { ADMIN_CONSOLE_CHILD_ROUTES } from '../config/adminConsoleRoutes';
+import { TRAINING_CONSOLE_ROUTES } from '../config/trainingConsoleRoutes';
+import { TOOLS_AI_PAGE_ROUTES, TOOLS_SHORTCUT_PAGE_ROUTES } from '../config/toolsConsoleRoutes';
+import { PROFILE_CONSOLE_ROUTES } from '../config/profileConsoleRoutes';
+import { PUBLIC_CONSOLE_ROUTES } from '../config/publicConsoleRoutes';
+import { OPERATIONS_FLEET_CONSOLE_ROUTES } from '../config/operationsFleetConsoleRoutes';
+import { PLATFORM_CONSOLE_ROUTES } from '../config/platformConsoleRoutes';
 import {
   EMERGENCY_OS_PAGE_SUBTITLES,
   EMERGENCY_OS_PAGE_TITLES,
-  resolveGovernanceWorkspaceLabel,
+  resolveConsoleWorkspaceEntry,
 } from './AppShell';
 
 const realEmergencyPagePaths = CANONICAL_ROUTE_MAP.filter(
@@ -62,14 +69,34 @@ describe('AppShell page-chrome registry drift guard', () => {
 });
 
 /**
- * MB-L4 follow-up: the same drift class also affects the admin/governance/
- * training console route trees, confirmed live on /admin, /governance/registry,
- * /security, and /training. Fixed directly (admin, training) and via a
- * prefix-aware resolver over the governance workspace's own existing
- * `label` registry (resolveGovernanceWorkspaceLabel) so every current and
- * future governance route gets covered without a hand-copied entry per path.
+ * MB-L4: the same drift class affects all 8 console route trees (admin,
+ * governance, training, tools, profile, public, operationsFleet, platform).
+ * Fixed via a single generalized resolver (resolveConsoleWorkspaceEntry)
+ * that consults each registry's own existing `label` data directly, so
+ * every current and future console route gets covered without a
+ * hand-copied entry per path. Originally governance-only
+ * (resolveGovernanceWorkspaceLabel); generalized to cover the remaining 7
+ * registries in the same pass rather than repeating the pattern per tree.
  */
-describe('console route chrome (admin / training / governance)', () => {
+const adminWorkspacePaths = ADMIN_CONSOLE_CHILD_ROUTES.filter((route) => route.path).map(
+  (route) => `${CANONICAL_ROUTES.adminOperations}/${route.path}`,
+);
+
+const CONSOLE_REGISTRY_FIXTURES: Array<{ name: string; paths: string[] }> = [
+  { name: 'governance', paths: GOVERNANCE_WORKSPACE_ROUTES.map((r) => r.path) },
+  { name: 'admin', paths: adminWorkspacePaths },
+  { name: 'training', paths: TRAINING_CONSOLE_ROUTES.map((r) => r.path) },
+  { name: 'tools', paths: [...TOOLS_AI_PAGE_ROUTES, ...TOOLS_SHORTCUT_PAGE_ROUTES].map((r) => r.path) },
+  { name: 'profile', paths: PROFILE_CONSOLE_ROUTES.map((r) => r.path) },
+  {
+    name: 'public (in-shell only)',
+    paths: PUBLIC_CONSOLE_ROUTES.filter((r) => !r.outsideShell).map((r) => r.path),
+  },
+  { name: 'operationsFleet', paths: OPERATIONS_FLEET_CONSOLE_ROUTES.map((r) => r.path) },
+  { name: 'platform', paths: PLATFORM_CONSOLE_ROUTES.map((r) => r.path) },
+];
+
+describe('console route chrome (all 8 console route trees)', () => {
   it('has explicit title + subtitle entries for /admin and /training', () => {
     expect(EMERGENCY_OS_PAGE_TITLES[CANONICAL_ROUTES.adminOperations]).toBeTruthy();
     expect(EMERGENCY_OS_PAGE_SUBTITLES[CANONICAL_ROUTES.adminOperations]).toBeTruthy();
@@ -77,23 +104,33 @@ describe('console route chrome (admin / training / governance)', () => {
     expect(EMERGENCY_OS_PAGE_SUBTITLES[CANONICAL_ROUTES.trainingDashboard]).toBeTruthy();
   });
 
-  it('has at least a handful of real governance workspace routes to check (sanity check on the fixture)', () => {
-    expect(GOVERNANCE_WORKSPACE_ROUTES.length).toBeGreaterThan(10);
+  it('has at least a handful of real routes in each console registry fixture (sanity check on the fixtures)', () => {
+    for (const registry of CONSOLE_REGISTRY_FIXTURES) {
+      expect(registry.paths.length).toBeGreaterThan(0);
+    }
   });
 
-  it.each(GOVERNANCE_WORKSPACE_ROUTES.map((route) => route.path))(
-    'resolveGovernanceWorkspaceLabel resolves a real label for %s',
-    (path) => {
-      expect(resolveGovernanceWorkspaceLabel(path)).toBeTruthy();
-    },
-  );
+  for (const registry of CONSOLE_REGISTRY_FIXTURES) {
+    it.each(registry.paths)(`resolveConsoleWorkspaceEntry resolves a real label for ${registry.name} %s`, (path) => {
+      const entry = resolveConsoleWorkspaceEntry(path);
+      expect(entry?.label).toBeTruthy();
+      expect(entry?.subtitle).toBeTruthy();
+    });
+  }
 
   it('resolves sub-paths under a /* wildcard entry, not just the exact registered paths', () => {
-    expect(resolveGovernanceWorkspaceLabel('/governance/registry')).toBe('Clinical governance');
-    expect(resolveGovernanceWorkspaceLabel('/audit/some-record-id')).toBeTruthy();
+    expect(resolveConsoleWorkspaceEntry('/governance/registry')?.label).toBe('Clinical governance');
+    expect(resolveConsoleWorkspaceEntry('/audit/some-record-id')?.label).toBeTruthy();
+    expect(resolveConsoleWorkspaceEntry('/fleet/some-panel')?.label).toBeTruthy();
   });
 
-  it('returns null for a path with no governance-workspace match (does not falsely claim every path)', () => {
-    expect(resolveGovernanceWorkspaceLabel('/emergency/reception')).toBeNull();
+  it('returns null for a path with no console-workspace match (does not falsely claim every path)', () => {
+    expect(resolveConsoleWorkspaceEntry('/emergency/reception')).toBeNull();
+  });
+
+  it('returns null for outsideShell public routes (they render outside AppShell chrome entirely)', () => {
+    const outsideShellPath = PUBLIC_CONSOLE_ROUTES.find((r) => r.outsideShell)?.path;
+    expect(outsideShellPath).toBeTruthy();
+    expect(resolveConsoleWorkspaceEntry(outsideShellPath as string)).toBeNull();
   });
 });

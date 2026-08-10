@@ -22,6 +22,13 @@ import { bootstrapAiPlatformIntegrations } from '../services/aiPlatformBootstrap
 import { resolveClinicalToolLaunchTarget } from '../services/unifiedClinicalToolsBridge';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { GOVERNANCE_WORKSPACE_ROUTES } from '../config/governanceConsoleRoutes';
+import { ADMIN_CONSOLE_CHILD_ROUTES } from '../config/adminConsoleRoutes';
+import { TRAINING_CONSOLE_ROUTES } from '../config/trainingConsoleRoutes';
+import { TOOLS_AI_PAGE_ROUTES, TOOLS_SHORTCUT_PAGE_ROUTES } from '../config/toolsConsoleRoutes';
+import { PROFILE_CONSOLE_ROUTES } from '../config/profileConsoleRoutes';
+import { PUBLIC_CONSOLE_ROUTES } from '../config/publicConsoleRoutes';
+import { OPERATIONS_FLEET_CONSOLE_ROUTES } from '../config/operationsFleetConsoleRoutes';
+import { PLATFORM_CONSOLE_ROUTES } from '../config/platformConsoleRoutes';
 import { EMERGENCY_OS_BRANDING } from '../config/emergencyOsBranding.config';
 import { isReceptionFirstUxEnabled, RECEPTION_FIRST_UX } from '../config/receptionFirstUx.config';
 import {
@@ -188,33 +195,73 @@ export const EMERGENCY_OS_PAGE_SUBTITLES: Record<string, string> = {
  * console route trees -- confirmed live on /admin, /governance/registry,
  * and /training (all showed generic "CareDroid" + the physician role's
  * blurb instead of real page copy). Those 3 are now fixed directly above.
- * Governance alone has ~26 further sub-routes (/audit, /security,
- * /regulatory, /ai-governance, /human-review, /equity, /privacy,
- * /integrations/*, /review, /operations/observability,
- * /operations/incidents, /system-health, and their /* wildcard forms) that
- * would each need their own hand-copied entry in the maps above to fix the
- * same way -- instead of doing that, this consults
- * GOVERNANCE_WORKSPACE_ROUTES directly (the SAME per-route `label` data
- * `governanceConsoleRouteTree.tsx` already uses to build the route table),
- * so every current and future governance workspace route gets a real
- * title with zero further hand-maintenance. admin's and training's OTHER
- * sub-routes (adminConsoleRoutes.ts, trainingConsoleRoutes.ts) and the
- * tools/profile/public/operationsFleet console trees were not checked this
- * round -- flagged in the master backlog (MB-L4) for a dedicated sweep
- * rather than guessed at here.
+ * Governance and 7 sibling console route trees (admin, training, tools,
+ * profile, public, operationsFleet, platform) each carry ~5-30 further
+ * sub-routes that would need their own hand-copied entry in the maps above
+ * to fix the same way -- instead of doing that, this consults each
+ * registry's OWN per-route `label` data directly (the SAME data each
+ * `*ConsoleRouteTree.tsx` already uses to build its route table), so every
+ * current and future console workspace route gets a real title/subtitle
+ * with zero further hand-maintenance.
  */
-/** Exported for AppShell.pageChrome.test.tsx's registry-drift guard only. */
-export function resolveGovernanceWorkspaceLabel(pathname: string): string | null {
-  const exact = GOVERNANCE_WORKSPACE_ROUTES.find((route) => route.path === pathname);
-  if (exact) return exact.label;
-  const prefixed = GOVERNANCE_WORKSPACE_ROUTES.find(
-    (route) => route.path.endsWith('/*') && pathname.startsWith(route.path.slice(0, -1)),
-  );
-  return prefixed?.label ?? null;
-}
+type ConsoleWorkspaceEntry = { path: string; label: string };
 
-const GOVERNANCE_WORKSPACE_SUBTITLE =
-  'Production readiness, policy state, release gates, and safety blockers for clinical AI operations.';
+const ADMIN_WORKSPACE_ROUTES: ConsoleWorkspaceEntry[] = ADMIN_CONSOLE_CHILD_ROUTES.filter(
+  (route) => route.path,
+).map((route) => ({ path: `${CANONICAL_ROUTES.adminOperations}/${route.path}`, label: route.label }));
+
+const CONSOLE_WORKSPACE_GROUPS: Array<{ routes: readonly ConsoleWorkspaceEntry[]; subtitle: string }> = [
+  {
+    routes: GOVERNANCE_WORKSPACE_ROUTES,
+    subtitle:
+      'Production readiness, policy state, release gates, and safety blockers for clinical AI operations.',
+  },
+  {
+    routes: ADMIN_WORKSPACE_ROUTES,
+    subtitle: 'Staff workflows, tenant administration, and system health for CareDroid operators.',
+  },
+  {
+    routes: TRAINING_CONSOLE_ROUTES,
+    subtitle: 'Simulation, competency, and credentialing surfaces for clinical training.',
+  },
+  {
+    routes: [...TOOLS_AI_PAGE_ROUTES, ...TOOLS_SHORTCUT_PAGE_ROUTES],
+    subtitle: 'AI-assisted clinical tools and calculators for point-of-care decision support.',
+  },
+  {
+    routes: PROFILE_CONSOLE_ROUTES,
+    subtitle: 'Account, notification, and billing settings for your CareDroid profile.',
+  },
+  {
+    routes: PUBLIC_CONSOLE_ROUTES.filter((route) => !route.outsideShell),
+    subtitle: 'Public and consent-facing CareDroid surfaces.',
+  },
+  {
+    routes: OPERATIONS_FLEET_CONSOLE_ROUTES,
+    subtitle: 'Fleet, hospital IoT, and operations command surfaces.',
+  },
+  {
+    routes: PLATFORM_CONSOLE_ROUTES,
+    subtitle: 'Platform intelligence, analytics, and system administration surfaces.',
+  },
+];
+
+/** Exported for AppShell.pageChrome.test.tsx's registry-drift guard. */
+export function resolveConsoleWorkspaceEntry(
+  pathname: string,
+): { label: string; subtitle: string } | null {
+  for (const group of CONSOLE_WORKSPACE_GROUPS) {
+    const exact = group.routes.find((route) => route.path === pathname);
+    if (exact) return { label: exact.label, subtitle: group.subtitle };
+  }
+  for (const group of CONSOLE_WORKSPACE_GROUPS) {
+    const prefixed = group.routes.find(
+      (route) => route.path.endsWith('/*') && pathname.startsWith(route.path.slice(0, -1)),
+    );
+    if (prefixed) return { label: prefixed.label, subtitle: group.subtitle };
+  }
+  return null;
+}
 
 export type AppShellProps = {
   children: ReactNode;
@@ -424,13 +471,14 @@ function AppShellFrame({ children }: AppShellProps) {
     const labelFromTitle = title?.includes(' - ')
       ? title.split(' - ').slice(1).join(' - ')
       : title;
-    const governanceLabel = resolveGovernanceWorkspaceLabel(location.pathname);
+    const consoleWorkspaceEntry = resolveConsoleWorkspaceEntry(location.pathname);
 
     return {
-      label: labelFromTitle || governanceLabel || activeItem?.label || EMERGENCY_OS_BRANDING.productName,
+      label:
+        labelFromTitle || consoleWorkspaceEntry?.label || activeItem?.label || EMERGENCY_OS_BRANDING.productName,
       subtitle:
         EMERGENCY_OS_PAGE_SUBTITLES[location.pathname] ||
-        (governanceLabel && GOVERNANCE_WORKSPACE_SUBTITLE) ||
+        consoleWorkspaceEntry?.subtitle ||
         (activeItem
           ? profileCopy.workspaceDescription || `Open ${activeItem.label} in CareDroid.`
           : profileCopy.workspaceDescription || EMERGENCY_OS_BRANDING.safetyLine),
@@ -706,6 +754,12 @@ function AppShellFrame({ children }: AppShellProps) {
     const configuredTitle = EMERGENCY_OS_PAGE_TITLES[location.pathname];
     if (configuredTitle) {
       document.title = configuredTitle;
+      return;
+    }
+
+    const consoleLabel = resolveConsoleWorkspaceEntry(location.pathname)?.label;
+    if (consoleLabel) {
+      document.title = `${EMERGENCY_OS_BRANDING.productName} - ${consoleLabel}`;
       return;
     }
 
