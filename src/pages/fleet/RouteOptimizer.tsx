@@ -229,7 +229,7 @@ export default function RouteOptimizer() {
                       {leg.stopNumber}. {leg.destination.label}
                     </strong>
                     <span>
-                      Arrival {formatClock(leg.arrivalClockMinutes)} Â· {leg.travelMinutes}m travel Â·{' '}
+                      Arrival {formatClock(leg.arrivalClockMinutes)} · {leg.travelMinutes}m travel ·{' '}
                       {leg.windowStatus}
                     </span>
                   </article>

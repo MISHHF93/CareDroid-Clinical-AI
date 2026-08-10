@@ -40,14 +40,14 @@ export default function PlatformEntryHub() {
     >
       {surfaces.chrome.showEntryHubBackendSync ? (
         <p className="platform-entry__sync" role="status">
-          Profile API {edContext.backendSync.profileWired ? 'connected' : 'offline'} Â· Emergency reads{' '}
-          {edContext.backendSync.emergencyReadWired ? 'via /api/emergency' : 'local'} Â·{' '}
+          Profile API {edContext.backendSync.profileWired ? 'connected' : 'offline'} · Emergency reads{' '}
+          {edContext.backendSync.emergencyReadWired ? 'via /api/emergency' : 'local'} ·{' '}
           {edContext.backendSync.persistenceMode.replace('-', ' ')}
         </p>
       ) : null}
 
       <p className="platform-entry__rebuild-status" role="status">
-        UX rebuild wave 0 active Â· {rebuildCounts[PAGE_REBUILD_STATUS.rebuilt]} rebuilt Â·{' '}
+        UX rebuild wave 0 active · {rebuildCounts[PAGE_REBUILD_STATUS.rebuilt]} rebuilt ·{' '}
         {rebuildCounts[PAGE_REBUILD_STATUS.pending]} queued
       </p>
 
@@ -56,7 +56,7 @@ export default function PlatformEntryHub() {
           <div className="platform-entry__profiles-copy">
             <h2 className="platform-entry__profiles-title">Switch profile before entering ED</h2>
             <p>
-              Pick the lane you want to walk â€” reception, triage, charge, provider, EMS, command, or
+              Pick the lane you want to walk — reception, triage, charge, provider, EMS, command, or
               display views. CareDroid keeps {DEMO_PERSONA.displayName}&apos;s identity while
               permissions and surfaces change.
             </p>
@@ -70,18 +70,18 @@ export default function PlatformEntryHub() {
           className="platform-entry__card platform-entry__card--primary"
           to={CANONICAL_ROUTES.emergencyReception}
         >
-          <h2>Start at reception â€” {DEMO_PERSONA.displayName}</h2>
+          <h2>Start at reception — {DEMO_PERSONA.displayName}</h2>
           <p>
             {getDemoPersonaHeadline()}. Walk reception-first: register arrivals, verify identity,
             hand off to triage, then explore charge nurse, physician, EMS, and command views.
           </p>
-          <span className="platform-entry__cta">Open arrival dashboard â†’</span>
+          <span className="platform-entry__cta">Open arrival dashboard →</span>
         </Link>
 
         <Link className="platform-entry__card" to={clinicalHome}>
           <h2>Clinical workspace</h2>
           <p>Open the emergency workspace matched to your current demo role and assigned profile.</p>
-          <span className="platform-entry__cta">Open clinical home â†’</span>
+          <span className="platform-entry__cta">Open clinical home →</span>
         </Link>
 
         <Link className="platform-entry__card" to={adminHome}>
@@ -90,25 +90,25 @@ export default function PlatformEntryHub() {
             Assign SaaS roles, preview ED workflows, invite staff, and configure tenant settings for
             the emergency department.
           </p>
-          <span className="platform-entry__cta">Open admin console â†’</span>
+          <span className="platform-entry__cta">Open admin console →</span>
         </Link>
 
         <Link className="platform-entry__card platform-entry__card--display" to={waitingRoomPath}>
           <h2>Waiting room display</h2>
-          <p>PHI-safe wall board for posted waiting-room screens â€” wait ranges and crowd level only.</p>
-          <span className="platform-entry__cta">Open public display â†’</span>
+          <p>PHI-safe wall board for posted waiting-room screens — wait ranges and crowd level only.</p>
+          <span className="platform-entry__cta">Open public display →</span>
         </Link>
       </div>
 
       <section className="platform-entry__flow" aria-label="ED workflow A to Z">
-        <strong>Emergency department workflow (Aâ€“Z)</strong>
+        <strong>Emergency department workflow (A–Z)</strong>
         <ol>
           {workflowSteps.map((step) => (
             <li key={step.id}>
               {step.title}
               {step.route ? (
                 <>
-                  {' â€” '}
+                  {' — '}
                   <Link to={step.route}>Open</Link>
                 </>
               ) : null}
@@ -116,11 +116,11 @@ export default function PlatformEntryHub() {
           ))}
         </ol>
         <p className="platform-entry__meta">
-          Demo landing: {edContext.personaLabel} â†’ {edContext.landingRoute}
+          Demo landing: {edContext.personaLabel} → {edContext.landingRoute}
         </p>
         <p className="platform-entry__meta">
           <Link to={CANONICAL_ROUTES.profile}>Profile</Link>
-          {' Â· '}
+          {' · '}
           <Link to={CANONICAL_ROUTES.organization}>Organization</Link>
         </p>
       </section>

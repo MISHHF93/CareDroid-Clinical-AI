@@ -19,6 +19,17 @@
 
 ## VALIDATED (this campaign, most recent first)
 
+### HEAL-074 (P3_LOW, VALIDATED) — 3 files had literal mojibake (double-encoded UTF-8) baked into their source: em-dashes, en-dashes, arrows, and middle-dots all rendered as garbled character sequences instead of the intended punctuation
+
+- **Severity**: P3_LOW (cosmetic/textual correctness, not a functional or safety defect — but genuinely unprofessional-looking, user-visible garbled text on a real page)
+- **Domain**: UX / text correctness (MB-E16, found during the MB-L4 Action Registry page sweep on `/workspace`)
+- **Source evidence**: `/workspace` (`PlatformEntryHub.tsx`) rendered strings like "Pick the lane you want to walk â€" reception..." and "Open arrival dashboard â†'" instead of using an em-dash and a right-arrow. Confirmed this was NOT a runtime rendering/encoding-header bug — the mojibake is literally saved in the source file's bytes. Decoded the exact corrupted byte sequences by codepoint (not guessed): an em-dash (U+2014) UTF-8-encoded then mis-decoded as Windows-1252 produces `â€"` (U+00E2 U+20AC U+201D); an en-dash (U+2013) produces `â€"` with a different third byte (U+201C); a right-arrow (U+2192) produces `â†’` (U+00E2 U+2020 U+2019); up-arrow (U+2191) and down-arrow (U+2193) produce their own distinct 3-byte variants; a middle-dot (·, U+00B7) produces `Â·` (U+00C2 U+00B7) — all 6 confirmed by exact codepoint inspection, not visual guessing. Swept the entire `src/` and `backend/src/` tree for the same corruption signature (any line containing the mojibake lead bytes U+00C2/U+00E2) and found it in 2 more files beyond the one originally spotted: `CommandCenterThroughputScreen.tsx` (a trend-arrow glyph helper — up/down/right arrows) and `RouteOptimizer.tsx` (a middle-dot separator) — 19 total corrupted instances across 3 files.
+- **Fix**: precise codepoint-level find-and-replace (not a blind string-literal patch) restoring each of the 6 corrupted sequences to its correct Unicode character, applied identically across all 3 files. Re-ran the full-tree sweep afterward and confirmed zero remaining instances of the corruption signature anywhere in `src/` or `backend/src/`.
+- **Affected files**: `src/pages/PlatformEntryHub.tsx` (15 instances), `src/components/whiteboard/CommandCenterThroughputScreen.tsx` (4 instances, including 2 found only after the initial fix via a broader lead-byte sweep), `src/pages/fleet/RouteOptimizer.tsx` (2 instances)
+- **Validation**: `npx tsc --noEmit -p tsconfig.json` clean. `npx eslint` clean on all 3 files. `PlatformEntryHub.test.tsx` + `routeOptimizerWiring.test.ts` (10/10) green, no regressions. Verified live against the running dev server: `/workspace` page text confirmed to contain zero mojibake sequences and the correct real em-dash/arrow characters after the fix.
+- **Commit when resolved**: (this commit)
+- **Scorecard impact when resolved**: closes MB-E16; real text-correctness fix across 3 files/19 instances, found via a repo-wide signature sweep rather than fixing only the one originally-spotted instance.
+
 ### HEAL-073 (P2_MEDIUM, VALIDATED) — the HEAL-069 page-chrome drift bug also affects the admin/governance/training console route trees; fixed the 4 confirmed instances plus a systemic resolver covering all ~26 governance workspace routes at once
 
 - **Severity**: P2_MEDIUM (same defect class as HEAL-069 — misleading page identity, not a data-correctness defect — but wider blast radius: an entire route family, not a handful of pages)
