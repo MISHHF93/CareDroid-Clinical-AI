@@ -61,6 +61,18 @@ describe('ambulanceHandoffChecklist', () => {
     );
   });
 
+  it('does not throw when an explicit medications array contains a non-string entry', () => {
+    // Regression (HEAL-078): EMSArrival.medicationsEnRoute is typed string[],
+    // but that's only a compile-time guarantee -- a real/persisted record
+    // with a non-string entry (null, a number, an object) previously crashed
+    // `entry.trim()` here, taking down every page rendering the EMS offload
+    // tracker (buildEmsOffloadTrackerSummary), not just the one bad record.
+    expect(() =>
+      parseMedicationsEnRoute(['Aspirin', null, 42, { name: 'Nitro' }] as never, undefined),
+    ).not.toThrow();
+    expect(parseMedicationsEnRoute(['Aspirin', null, 42] as never)).toEqual(['Aspirin']);
+  });
+
   it('derives patient destination from room, waiting state, and location hints', () => {
     expect(
       deriveAmbulanceHandoffDestination(baseArrival, null, [
@@ -123,6 +135,21 @@ describe('ambulanceHandoffChecklist', () => {
     expect(merged.handoffAccepted).toBe(true);
     expect(merged.handoffAcceptedByStaffName).toBe('Dr. Lee');
     expect(merged.destinationLabel).toBe('Resus 2');
+  });
+
+  it('does not throw when a staff patch carries a non-string medicationsEnRoute entry', () => {
+    // Regression (HEAL-078): same sanitize-at-the-boundary fix applied to the
+    // staff-edit merge path, which has the identical `entry.trim()` shape.
+    const derived = buildAmbulanceHandoffChecklist(baseArrival);
+    expect(() =>
+      mergeAmbulanceHandoffChecklistPatch(derived, {
+        medicationsEnRoute: ['Naloxone', null, 7] as never,
+      }),
+    ).not.toThrow();
+    const merged = mergeAmbulanceHandoffChecklistPatch(derived, {
+      medicationsEnRoute: ['Naloxone', null, 7] as never,
+    });
+    expect(merged.medicationsEnRoute).toEqual(['Naloxone']);
     expect(merged.vitalsReceived).toBe(true);
     expect(merged.complaintSummary).toBe('Chest pain');
   });

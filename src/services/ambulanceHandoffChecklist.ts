@@ -169,8 +169,14 @@ function isEmsPlaceholderPatient(patient?: Patient | null): boolean {
 }
 
 export function parseMedicationsEnRoute(...sources: (string | string[] | undefined | null)[]): string[] {
+  // Sanitize at the boundary: `EMSArrival.medicationsEnRoute` is typed
+  // `string[]`, but real-world/persisted records aren't guaranteed to match
+  // that at runtime (e.g. a non-string entry written by an older code path
+  // or a corrupted persisted record) -- a bad entry here previously crashed
+  // every page rendering the EMS offload tracker (`entry.trim is not a
+  // function`), not just the one malformed record's own detail view.
   const explicit = sources.flatMap((source) =>
-    Array.isArray(source) ? source : [],
+    Array.isArray(source) ? source.filter((entry): entry is string => typeof entry === 'string') : [],
   );
   const text = sources
     .filter((source): source is string => typeof source === 'string')
@@ -445,7 +451,14 @@ export function mergeAmbulanceHandoffChecklistPatch(
     ...current,
     ...patch,
     medicationsEnRoute: patch.medicationsEnRoute?.length
-      ? [...new Set(patch.medicationsEnRoute.map((entry) => entry.trim()).filter(Boolean))]
+      ? [
+          ...new Set(
+            patch.medicationsEnRoute
+              .filter((entry): entry is string => typeof entry === 'string')
+              .map((entry) => entry.trim())
+              .filter(Boolean),
+          ),
+        ]
       : current.medicationsEnRoute,
     updatedAt: timestamp,
   };
