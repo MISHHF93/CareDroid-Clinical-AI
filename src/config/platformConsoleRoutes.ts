@@ -53,6 +53,7 @@ export const PLATFORM_CONSOLE_ROUTES = Object.freeze<PlatformConsoleRoute[]>([
   ...platformRoutes(CANONICAL_ROUTES.departments, 'Departments', 'departments', { wildcard: true }),
   ...platformRoutes(CANONICAL_ROUTES.serviceLines, 'Service lines', 'serviceLines', { wildcard: true }),
   ...platformRoutes(CANONICAL_ROUTES.organizationSettings, 'Organization settings', 'organizationSettings', { wildcard: true }),
+  { path: CANONICAL_ROUTES.organization, label: 'Organization dashboard', componentKey: 'organizationDashboard' },
   { path: CANONICAL_ROUTES.onboarding, label: 'Organization onboarding', componentKey: 'organizationOnboarding' },
 ]);
 

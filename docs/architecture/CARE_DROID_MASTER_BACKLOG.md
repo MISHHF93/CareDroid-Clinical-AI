@@ -9,7 +9,7 @@
 4. Statuses use the established vocabularies only — ledger statuses (`VALIDATED`, `CONFIRMED`, `IN_PROGRESS`, `BLOCKED`, `WONT_FIX_WITH_REASON`, `SUPERSEDED`) and workflow statuses (`FULLY_WIRED`, `PARTIALLY_WIRED`, `FRONTEND_ONLY`, `BACKEND_ONLY`, `FIXTURE_ONLY`, `DUPLICATE`, `LEGACY`, `MISSING`, `NEEDS_VERIFICATION`, `BLOCKED_EXTERNAL`, `MANUAL_REVIEW`, `FUTURE_MODULE`). Priorities P0–P3 per the ledger's severity legend.
 5. A row marked done must cite its evidence (HEAL id, commit, or ledger section) — no unevidenced check-offs, per the campaign's own scoring discipline.
 
-**Last updated**: 2026-08-10 · HEAD `40ec3ff1` · Campaign state: 64 HEAL fixes (63 validated, 1 confirmed-not-fixed pending human decision), score 731/1000.
+**Last updated**: 2026-08-10 · HEAD `PENDING_COMMIT` · Campaign state: 65 HEAL fixes (64 validated, 1 confirmed-not-fixed pending human decision), score 731/1000.
 
 ---
 
@@ -29,7 +29,7 @@
 |----|------|--------|----------------|
 | MB-A1 | ONE repository / frontend / backend — no hidden competing runtimes | `VALIDATED` (re-verified 4+ times; re-check on drift) | Ledger "one repository" entries; memory |
 | MB-A2 | ONE AppShell — no duplicate shells | `VALIDATED` (2 thin re-export wrappers confirmed harmless) | EPIC-A "duplicate AppShells" |
-| MB-A3 | ONE route/navigation architecture — consolidate `ROUTE_RECORDS` vs `CANONICAL_ROUTE_MAP` | `IN_PROGRESS` — status-drift class regression-guarded + 23 entries corrected (HEAL-057); `/tenant-admin` registration traced and confirmed a non-gap (HEAL-058); remaining: full consolidation (derive or migrate 8 consumers) | HEAL-045, HEAL-057, HEAL-058 |
+| MB-A3 | ONE route/navigation architecture — consolidate `ROUTE_RECORDS` vs `CANONICAL_ROUTE_MAP` | `IN_PROGRESS` — status-drift class regression-guarded + 23 entries corrected (HEAL-057); `/tenant-admin` registration traced and confirmed a non-gap (HEAL-058); traced `CANONICAL_ROUTE_MAP` is legitimately scoped to core/emergency routes (NOT exhaustive — 8 `*ConsoleRouteTree.tsx` sub-trees are the real mount points for platform/admin/ops/profile routes, verified 25 of 27 "orphan" candidates were false alarms once checked against the real sub-trees); found + fixed the 1 genuine gap (`/organization` unmounted despite 2 real nav surfaces pointing at it — HEAL-065); remaining: full "one array" consolidation is now a lower-priority nice-to-have (the dangerous failure mode — a claimed-active route with no real mount — is what this round's audit swept for and found only 1 instance of, now fixed), plus 2 small follow-ups (stale `platformAnalytics` componentKey metadata; 2 confirmed-dead `OrganizationPages.tsx` exports) | HEAL-045, HEAL-057, HEAL-058, HEAL-065 |
 | MB-A4 | ROUTE_RECORDS phantom-page cluster | `VALIDATED` — all 21 phantom-active entries (incl. 2 newly found) flipped to honest `future`; drift guard prevents recurrence | HEAL-057 |
 | MB-A5 | ONE `/api/emergency/*` API surface — shallow TypeORM tier always-on, deep Mongoose tier gated | `PARTIALLY_WIRED` by design — needs the standing "unify or bless the gate" decision | EPIC-A Express/Mongoose category; ADR-0002 |
 | MB-A6 | Governed quarantine structure (`archive/quarantine/`) for uncertain historical code | `MISSING` — never built; only needed when a MANUAL_REVIEW deletion is approved | Convergence brief |
@@ -221,4 +221,4 @@ The FSM backbone (`src/engine/journeyEngine.ts` `VALID_TRANSITIONS`) + step mode
 
 ---
 
-**Queue order** (safety-first ranking, re-confirmed 2026-08-10): MB-P0-1/MB-P0-2/MB-P0-3 (surface to humans every round) → MB-A3 route consolidation remainder → MB-D2 provenance labeling → MB-J7 bundle-analysis remainder → MB-E2..E8 CSS cluster → everything else by ledger priority. (MB-J1 closed by HEAL-064.)
+**Queue order** (safety-first ranking, re-confirmed 2026-08-10): MB-P0-1/MB-P0-2/MB-P0-3 (surface to humans every round) → MB-D2 provenance labeling → MB-J7 bundle-analysis remainder → MB-E2..E8 CSS cluster → everything else by ledger priority. (MB-J1 closed by HEAL-064; MB-A3's dangerous-gap sweep substantially closed by HEAL-065 — remaining scope downgraded to small cleanup follow-ups, no longer a top-of-queue item.)
