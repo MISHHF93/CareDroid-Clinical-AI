@@ -3,6 +3,7 @@ import { AUTH_CONFIG } from '../config/auth.config';
 import { API_ROUTES } from '../config/api.config';
 import { BACKEND_PROBE_TIMEOUT_MS, DEV_SESSION_FETCH_TIMEOUT_MS } from '../config/startupTimeouts';
 import { setTenantContext } from './tenantContextStore';
+import { isJwtExpired } from '../utils/jwt';
 
 async function readJsonBody(response, fallback: any = {}) {
   try {
@@ -28,6 +29,22 @@ function looksLikeJwt(token) {
   if (token === BYPASS_TOKEN) return false;
   const parts = token.split('.');
   return parts.length === 3 && parts.every((part) => part.length > 0);
+}
+
+/**
+ * A structurally-valid, but expired, dev-session JWT (real access tokens are
+ * short-lived -- 15 minutes) must NOT be treated as reusable. Without this
+ * check, `resolveDevBackendSession` cached the first JWT it ever fetched and
+ * returned that same token forever (nothing else in the frontend ever calls
+ * `ensureDevBackendSession({ force: true })`), so any session left open past
+ * 15 minutes silently lost every authenticated/realtime call -- observed
+ * live as repeated 401s on `/api/emergency/realtime/stream` and other
+ * endpoints hours into a dev session, made worse by `apiClient.ts`
+ * explicitly silencing 401s in dev as an "expected demo" condition, so
+ * nothing ever surfaced the failure or triggered a refresh.
+ */
+function hasUsableDevSession(token) {
+  return looksLikeJwt(token) && !isJwtExpired(token);
 }
 
 function readStoredToken() {
@@ -82,7 +99,7 @@ async function resolveDevBackendSession({
   if (!isDev) return { token: readStoredToken(), source: 'production' };
 
   const existingToken = readStoredToken();
-  if (!force && looksLikeJwt(existingToken)) {
+  if (!force && hasUsableDevSession(existingToken)) {
     const tenantContext = readDevTenantContext();
     if (tenantContext) setTenantContext(tenantContext);
     return { token: existingToken, source: 'cached-jwt' };

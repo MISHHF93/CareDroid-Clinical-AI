@@ -15,6 +15,7 @@ import { BACKEND_PROBE_TIMEOUT_MS } from '../config/startupTimeouts';
 import { buildTraceHeaders, recordApiTiming } from './apiTelemetryBridge';
 import { isPublicApiPath as isSecurityPublicApiPath } from './securityAccessService';
 import { toUserFacingApiErrorMessage } from '../config/errorRecoveryModel';
+import { isJwtExpired } from '../utils/jwt';
 
 // In development, use empty string to let Vite proxy handle routing.
 // VITE_API_URL is treated as an origin only; request paths own the /api prefix.
@@ -110,13 +111,19 @@ const looksLikeJwt = (token) => {
   return parts.length === 3 && parts.every((part) => part.length > 0);
 };
 
+// A structurally-valid but expired JWT must not short-circuit the dev-session
+// bootstrap below -- see the matching fix + comment in devBackendAuth.ts for
+// the full story (a stale cached token was reused forever, causing silent
+// 401s on every authenticated/realtime call once a session ran past 15min).
+const hasUsableAccessToken = (token) => looksLikeJwt(token) && !isJwtExpired(token);
+
 let devSessionBootstrapPromise: any = null;
 
 async function bootstrapDevSessionIfNeeded(path) {
   if (!isDev) return;
   const apiPath = normalizeApiPath(path);
   if (apiPath === '/api/auth/dev-session') return;
-  if (looksLikeJwt(getStoredAccessToken())) return;
+  if (hasUsableAccessToken(getStoredAccessToken())) return;
 
   if (!devSessionBootstrapPromise) {
     devSessionBootstrapPromise = import('./devBackendAuth')

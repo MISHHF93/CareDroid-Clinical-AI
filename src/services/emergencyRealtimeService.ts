@@ -2,6 +2,7 @@ import { buildApiUrl, buildStreamUrl, getStoredAccessToken } from './apiClient';
 import { probeBackendReachability } from './backendReachability';
 import observabilityService from './observabilityService';
 import { startWorkflowTrace } from './observabilityTrace';
+import { ensureDevBackendSession } from './devBackendAuth';
 
 const DEFAULT_POLL_INTERVAL_MS = 30_000;
 const MIN_RECONNECT_MS = 10_000;
@@ -296,6 +297,16 @@ function startEmergencyRealtimeSession({ onEvent, onStatus, onPoll }: any = {}) 
   const connect = async () => {
     if (stopped) return;
     stopCurrentConnections();
+
+    // EventSource/WebSocket URLs bake the access token into the query string
+    // at connect time and are never re-authenticated afterward, unlike a
+    // regular fetch/axios call — so a stale-but-cached token here doesn't
+    // surface as a retryable 401, it just silently drops every real-time
+    // event until the NEXT reconnect attempt happens to run after some other
+    // API call has refreshed the cached token. Refreshing proactively on
+    // every (re)connect — cheap no-op when the cached token is still fresh —
+    // closes that gap directly instead of relying on that coincidence.
+    await ensureDevBackendSession();
 
     const reachable = await isBackendReachable();
     if (!reachable) {
