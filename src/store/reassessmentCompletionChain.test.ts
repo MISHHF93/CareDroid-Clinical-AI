@@ -213,6 +213,158 @@ describe('reassessment completion propagation chain', () => {
     expect(news2Alert?.title).toMatch(/NEWS2/);
   });
 
+  it('clears DeteriorationRisk and ScoreReassessmentRecommended when the fresh reading is clean (HEAL-054)', () => {
+    seedWaitingPatientWithOverdueReassessment();
+    useEmergencyStore.setState((state) => ({
+      ...state,
+      patients: state.patients.map((patient) =>
+        patient.id === PATIENT_ID
+          ? {
+              ...patient,
+              flags: [
+                ...patient.flags,
+                {
+                  type: PatientFlag.DeteriorationRisk,
+                  reason: 'Critical vitals: SpO2 88%',
+                  severity: 'Critical',
+                  detectedAt: new Date(Date.now() - 50 * 60_000).toISOString(),
+                },
+                {
+                  type: PatientFlag.ScoreReassessmentRecommended,
+                  reason: 'Critical vitals: SpO2 88%',
+                  severity: 'Critical',
+                  detectedAt: new Date(Date.now() - 50 * 60_000).toISOString(),
+                },
+              ],
+            }
+          : patient,
+      ),
+    }) as never);
+
+    useEmergencyStore.getState().addVitals(PATIENT_ID, NORMAL_VITALS);
+
+    const patient = getPatient();
+    expect(hasPatientFlag(patient, PatientFlag.DeteriorationRisk)).toBe(false);
+    expect(hasPatientFlag(patient, PatientFlag.ScoreReassessmentRecommended)).toBe(false);
+    const removedFlags = (patient.timeline || [])
+      .filter((event) => event.type === 'FlagRemoved')
+      .map((event) => event.metadata?.flag);
+    expect(removedFlags).toEqual(
+      expect.arrayContaining([
+        PatientFlag.ReassessmentDue,
+        PatientFlag.DeteriorationRisk,
+        PatientFlag.ScoreReassessmentRecommended,
+      ]),
+    );
+  });
+
+  it('keeps DeteriorationRisk when the fresh reading still meets deterioration criteria, even without a critical per-vital alert', () => {
+    seedWaitingPatientWithOverdueReassessment();
+    useEmergencyStore.setState((state) => ({
+      ...state,
+      patients: state.patients.map((patient) =>
+        patient.id === PATIENT_ID
+          ? {
+              ...patient,
+              flags: [
+                ...patient.flags,
+                {
+                  type: PatientFlag.DeteriorationRisk,
+                  reason: 'Critical vitals: SpO2 88%',
+                  severity: 'Critical',
+                  detectedAt: new Date(Date.now() - 50 * 60_000).toISOString(),
+                },
+              ],
+            }
+          : patient,
+      ),
+    }) as never);
+
+    // HR 125 meets the shared deterioration criteria (hr > 120).
+    useEmergencyStore.getState().addVitals(PATIENT_ID, { ...NORMAL_VITALS, hr: 125 });
+
+    expect(hasPatientFlag(getPatient(), PatientFlag.DeteriorationRisk)).toBe(true);
+  });
+
+  it('re-adds the full risk trio (including ScoreReassessmentRecommended) on a critical fresh reading', () => {
+    seedWaitingPatientWithOverdueReassessment();
+
+    useEmergencyStore.getState().addVitals(PATIENT_ID, { ...NORMAL_VITALS, spo2: 85 });
+
+    const patient = getPatient();
+    expect(hasPatientFlag(patient, PatientFlag.DeteriorationRisk)).toBe(true);
+    expect(hasPatientFlag(patient, PatientFlag.ScoreReassessmentRecommended)).toBe(true);
+    expect(hasPatientFlag(patient, PatientFlag.ReassessmentDue)).toBe(true);
+  });
+
+  it('never auto-clears any escalation-pinned flag while a manual escalation is active, and clears again once cancelled', () => {
+    seedWaitingPatientWithOverdueReassessment();
+    useEmergencyStore.setState((state) => ({
+      ...state,
+      patients: state.patients.map((patient) =>
+        patient.id === PATIENT_ID
+          ? {
+              ...patient,
+              flags: [
+                ...patient.flags,
+                { type: PatientFlag.DeteriorationRisk, reason: 'Manual escalation', severity: 'Critical' },
+                { type: PatientFlag.ScoreReassessmentRecommended, reason: 'Manual escalation', severity: 'Critical' },
+              ],
+              timeline: [
+                ...(patient.timeline || []),
+                {
+                  id: 'evt-esc-1',
+                  patientId: PATIENT_ID,
+                  type: 'ESCALATION',
+                  timestamp: new Date(Date.now() - 10 * 60_000).toISOString(),
+                  summary: 'Manual escalation by charge nurse.',
+                },
+              ],
+            }
+          : patient,
+      ),
+    }) as never);
+
+    useEmergencyStore.getState().addVitals(PATIENT_ID, NORMAL_VITALS);
+
+    let patient = getPatient();
+    expect(hasPatientFlag(patient, PatientFlag.DeteriorationRisk)).toBe(true);
+    expect(hasPatientFlag(patient, PatientFlag.ScoreReassessmentRecommended)).toBe(true);
+    expect(hasPatientFlag(patient, PatientFlag.ReassessmentDue)).toBe(true);
+
+    // Cancel the escalation (timeline event, as cancelEscalation records) and
+    // recheck again: automatic clearing applies once the human override ends.
+    useEmergencyStore.setState((state) => ({
+      ...state,
+      patients: state.patients.map((entry) =>
+        entry.id === PATIENT_ID
+          ? {
+              ...entry,
+              timeline: [
+                ...(entry.timeline || []),
+                {
+                  id: 'evt-esc-cancel-1',
+                  patientId: PATIENT_ID,
+                  type: 'ESCALATION_CANCELLED',
+                  timestamp: new Date().toISOString(),
+                  summary: 'Escalation cancelled by charge nurse.',
+                },
+              ],
+            }
+          : entry,
+      ),
+    }) as never);
+    useEmergencyStore.getState().addVitals(PATIENT_ID, {
+      ...NORMAL_VITALS,
+      recordedAt: new Date().toISOString(),
+    });
+
+    patient = getPatient();
+    expect(hasPatientFlag(patient, PatientFlag.DeteriorationRisk)).toBe(false);
+    expect(hasPatientFlag(patient, PatientFlag.ScoreReassessmentRecommended)).toBe(false);
+    expect(hasPatientFlag(patient, PatientFlag.ReassessmentDue)).toBe(false);
+  });
+
   it('removeFlag removes record-style flags, not only bare string flags', () => {
     seedWaitingPatientWithOverdueReassessment();
 

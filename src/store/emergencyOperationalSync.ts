@@ -20,6 +20,7 @@ import {
 } from '../utils/longWaitRescue';
 import { evaluateVitalsAlerts } from '../utils/vitalsAlertPipeline';
 import { calculateNews2FromVitals } from '../utils/news2';
+import { meetsDeteriorationVitalsCriteria } from '../utils/patientVitals';
 import { REASSESSMENT_REMINDER_WARNING_WINDOW_MS } from '../utils/reassessmentScheduler';
 import { applyWhiteboardAutomationToPatients } from '../services/whiteboardAutomationEngine';
 import { buildBottleneckRegistrySnapshot } from '../services/bottleneckRegistry';
@@ -116,6 +117,30 @@ function makeEvent(
 }
 
 const ACTIVE_REASSESSMENT_REMINDER_STATUSES = new Set(['pending', 'snoozed']);
+
+/** Timeline audit reasons for flags a fresh vitals recheck resolves. */
+const VITALS_RECHECK_FLAG_RESOLUTION_REASONS: Partial<Record<PatientFlag, string>> = {
+  [PatientFlag.ReassessmentDue]: 'Vitals recheck recorded; reassessment no longer outstanding.',
+  [PatientFlag.ScoreReassessmentRecommended]:
+    'Clinical score recomputed with fresh vitals; recommendation satisfied.',
+  [PatientFlag.DeteriorationRisk]:
+    'Fresh vitals no longer meet deterioration criteria; risk restated against current evidence.',
+};
+
+/**
+ * True while the patient has a manual escalation (escalatePatient) that no one
+ * has cancelled — determined from the same ESCALATION/ESCALATION_CANCELLED
+ * timeline events cancelEscalation itself uses.
+ */
+function hasActiveManualEscalation(patient: Patient): boolean {
+  const timeline = patient.timeline || [];
+  for (let index = timeline.length - 1; index >= 0; index--) {
+    const type = timeline[index]?.type;
+    if (type === 'ESCALATION_CANCELLED') return false;
+    if (type === 'ESCALATION') return true;
+  }
+  return false;
+}
 
 export function hasDueReassessmentReminder(patient: Patient, now = new Date()): boolean {
   return (patient.reassessmentReminders || []).some((reminder) => {
@@ -644,15 +669,37 @@ export function buildAddVitalsPatch(
 
   const patients = updatePatients(state.patients, patientId, (current) => {
     // Completion semantics: a fresh vitals recheck resolves the outstanding
-    // "reassessment due" state (flag + satisfied reminders). The pipeline's own
-    // rules below immediately re-flag with a fresh reason when the NEW vitals
-    // are themselves concerning, so a genuine clinical concern is never erased —
-    // it is restated against current evidence instead of pinned to stale state.
-    const hadReassessmentDue = current.flags.some(
-      (flag) => getPatientFlagType(flag) === PatientFlag.ReassessmentDue,
+    // reassessment state — the due flag, satisfied reminders, the score-recheck
+    // recommendation (the score was just recomputed), and, when the NEW reading
+    // is clean, the vitals-derived deterioration flag. The pipeline's own rules
+    // below immediately re-flag with a fresh reason when the NEW vitals are
+    // themselves concerning, so a genuine clinical concern is never erased — it
+    // is restated against current evidence instead of pinned to stale state.
+    //
+    // Manual-escalation guard: escalatePatient() is a deliberate human override
+    // that pins HighRisk/DeteriorationRisk/ReassessmentDue until a human
+    // cancels it (cancelEscalation) — a routine vitals entry must never
+    // auto-dissolve it, so ALL automatic clearing is skipped while an
+    // escalation is active.
+    const escalationActive = hasActiveManualEscalation(current);
+    const newVitalsConcerning =
+      criticalAlerts.length > 0 ||
+      warningAlerts.length > 0 ||
+      news2.total >= 5 ||
+      meetsDeteriorationVitalsCriteria(nextVitals);
+    const flagTypesToClear = new Set<PatientFlag>();
+    if (!escalationActive) {
+      flagTypesToClear.add(PatientFlag.ReassessmentDue);
+      flagTypesToClear.add(PatientFlag.ScoreReassessmentRecommended);
+      if (!newVitalsConcerning) {
+        flagTypesToClear.add(PatientFlag.DeteriorationRisk);
+      }
+    }
+    const clearedFlagTypes = [...flagTypesToClear].filter((type) =>
+      current.flags.some((flag) => getPatientFlagType(flag) === type),
     );
     const baseFlags = current.flags.filter(
-      (flag) => getPatientFlagType(flag) !== PatientFlag.ReassessmentDue,
+      (flag) => !flagTypesToClear.has(getPatientFlagType(flag)),
     );
     const reassessmentReminders = (current.reassessmentReminders || []).map((reminder) =>
       completedReminderIds.has(reminder.id)
@@ -686,33 +733,49 @@ export function buildAddVitalsPatch(
           }),
         );
       }
-      pipelineFlags.push(
-        createPatientFlag(PatientFlag.ReassessmentDue, {
-          reason: criticalReason,
-          severity: 'Critical',
-          detectedAt: timestamp,
-        }),
-      );
+      if (!existingFlagTypes.has(PatientFlag.ScoreReassessmentRecommended)) {
+        // Mirrors reassessment engine Rule 3's flag trio: a critical reading
+        // warrants a fresh clinical score alongside the risk/due flags.
+        pipelineFlags.push(
+          createPatientFlag(PatientFlag.ScoreReassessmentRecommended, {
+            reason: criticalReason,
+            severity: 'Critical',
+            detectedAt: timestamp,
+          }),
+        );
+      }
+      if (!existingFlagTypes.has(PatientFlag.ReassessmentDue)) {
+        pipelineFlags.push(
+          createPatientFlag(PatientFlag.ReassessmentDue, {
+            reason: criticalReason,
+            severity: 'Critical',
+            detectedAt: timestamp,
+          }),
+        );
+      }
     } else if (warningAlerts.length) {
-      pipelineFlags.push(
-        createPatientFlag(PatientFlag.ReassessmentDue, {
-          reason: warningReason,
-          severity: 'Warning',
-          detectedAt: timestamp,
-        }),
-      );
+      if (!existingFlagTypes.has(PatientFlag.ReassessmentDue)) {
+        pipelineFlags.push(
+          createPatientFlag(PatientFlag.ReassessmentDue, {
+            reason: warningReason,
+            severity: 'Warning',
+            detectedAt: timestamp,
+          }),
+        );
+      }
     } else if (news2.total >= 5) {
-      pipelineFlags.push(
-        createPatientFlag(PatientFlag.ReassessmentDue, {
-          reason: `NEWS2 ${news2.total} (${news2.response.band}): repeat observations recommended`,
-          severity: news2.response.alertSeverity === 'Critical' ? 'Critical' : 'Warning',
-          detectedAt: timestamp,
-        }),
-      );
+      if (!existingFlagTypes.has(PatientFlag.ReassessmentDue)) {
+        pipelineFlags.push(
+          createPatientFlag(PatientFlag.ReassessmentDue, {
+            reason: `NEWS2 ${news2.total} (${news2.response.band}): repeat observations recommended`,
+            severity: news2.response.alertSeverity === 'Critical' ? 'Critical' : 'Warning',
+            detectedAt: timestamp,
+          }),
+        );
+      }
     }
-    const reassessmentDueResolved = hadReassessmentDue && !pipelineFlags.some(
-      (flag) => flag.type === PatientFlag.ReassessmentDue,
-    );
+    const readdedFlagTypes = new Set(pipelineFlags.map((flag) => flag.type));
+    const resolvedFlagTypes = clearedFlagTypes.filter((type) => !readdedFlagTypes.has(type));
 
     const existingVitals = Array.isArray(current.vitals)
       ? current.vitals
@@ -745,23 +808,15 @@ export function buildAddVitalsPatch(
             },
           ),
         ),
-        ...(reassessmentDueResolved
-          ? [
-              makeEvent(
-                current.id,
-                'FlagRemoved',
-                `Removed ${PatientFlag.ReassessmentDue} flag.`,
-                timestamp,
-                {
-                  staffId: nextVitals.recordedBy,
-                  metadata: {
-                    flag: PatientFlag.ReassessmentDue,
-                    reason: 'Vitals recheck recorded; reassessment no longer outstanding.',
-                  },
-                },
-              ),
-            ]
-          : []),
+        ...resolvedFlagTypes.map((flagType) =>
+          makeEvent(current.id, 'FlagRemoved', `Removed ${flagType} flag.`, timestamp, {
+            staffId: nextVitals.recordedBy,
+            metadata: {
+              flag: flagType,
+              reason: VITALS_RECHECK_FLAG_RESOLUTION_REASONS[flagType] || 'Resolved by vitals recheck.',
+            },
+          }),
+        ),
         ...vitalsAlerts.map((alert) =>
           makeEvent(
             current.id,

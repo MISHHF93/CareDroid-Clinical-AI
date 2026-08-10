@@ -3,7 +3,7 @@ import { dispatchAlert } from './alertEngine';
 import { longWaitStatus } from '../utils/longWaitRescue';
 import { evaluateReassessmentDueFlag } from './reassessmentTimerEngine';
 import { PatientFlag, PatientState, Priority, type Alert, type Patient } from '../types/emergency';
-import { hasPatientFlag } from '../utils/patientVitals';
+import { hasPatientFlag, meetsDeteriorationVitalsCriteria } from '../utils/patientVitals';
 
 export const REASSESSMENT_FLAG_TYPES = [
   PatientFlag.DeteriorationRisk,
@@ -168,15 +168,12 @@ export function startReassessmentEngine() {
         addFlag(patient.id, PatientFlag.HighRisk);
       }
 
-      // Rule 3: Deterioration signals from vitals
+      // Rule 3: Deterioration signals from vitals (thresholds shared with the
+      // vitals-recording pipeline via meetsDeteriorationVitalsCriteria so the
+      // add/clear lifecycle stays symmetric).
       if (latestVitals) {
         const detFlag = PatientFlag.DeteriorationRisk;
-        const isDeteriorating =
-          (latestVitals.spo2 !== undefined && latestVitals.spo2 < 94) ||
-          (latestVitals.hr !== undefined && (latestVitals.hr > 120 ||
-            latestVitals.hr < 50)) ||
-          (latestVitals.sbp !== undefined && (latestVitals.sbp < 90 ||
-            latestVitals.sbp > 180));
+        const isDeteriorating = meetsDeteriorationVitalsCriteria(latestVitals);
         if (isDeteriorating) {
           if (!hasFlag(detFlag)) {
             addFlag(patient.id, detFlag);
