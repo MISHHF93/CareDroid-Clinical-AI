@@ -686,10 +686,36 @@ export class OrganizationsService {
       organizationType: org.organizationType,
       country: org.country,
       branding: this.normalizeBranding(org.branding, org.name),
-      settings: this.normalizeSettings(org.settings, org.organizationType),
+      settings: this.publicOrganizationSettings(
+        this.normalizeSettings(org.settings, org.organizationType),
+      ),
       createdAt: org.createdAt,
       updatedAt: org.updatedAt,
     };
+  }
+
+  /**
+   * General-member-audience view of org settings (backs the self-service
+   * "list my organizations" and "get organization" routes, neither of which
+   * should require admin membership). An explicit allowlist, not the raw
+   * normalizeSettings() output: that shape's own trailing `...settings`
+   * spread re-includes the FULL settings blob regardless of the fields
+   * enumerated above it -- including permissionsOverrides (who can do what
+   * in this org) and no-code admin configuration (navigation, dashboardLayout)
+   * -- fields that already require real organization-admin/owner membership
+   * to write via updateTenantAdministration/updateOrganization, but had no
+   * equivalent read-side gate (HEAL-059 fixed the same defect shape for the
+   * dedicated tenant-admin endpoint). Callers that genuinely need those
+   * fields use the properly admin-scoped getTenantAdministration instead.
+   */
+  private publicOrganizationSettings(settings: Record<string, any>): Record<string, any> {
+    const {
+      permissionsOverrides: _permissionsOverrides,
+      navigation: _navigation,
+      dashboardLayout: _dashboardLayout,
+      ...publicSettings
+    } = settings;
+    return publicSettings;
   }
 
   private async buildOrganizationEngine(

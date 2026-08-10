@@ -309,6 +309,26 @@ describe('OrganizationsService', () => {
     );
   });
 
+  it('does not leak admin-only settings (permissionsOverrides, navigation, dashboardLayout) through the general-member getForUser response (HEAL-059 follow-up)', async () => {
+    // getForUser backs the self-service GET :organizationId and "list my
+    // organizations" routes, reachable by ANY member -- unlike
+    // getTenantAdministration (admin-scoped, tested separately below), which
+    // legitimately returns these same fields to real org admins/owners.
+    const result = await service.getForUser(user, 'org-1');
+
+    expect(result.settings).not.toHaveProperty('permissionsOverrides');
+    expect(result.settings).not.toHaveProperty('navigation');
+    expect(result.settings).not.toHaveProperty('dashboardLayout');
+    // Confirms the fixture actually carries the sensitive field (so this
+    // test would fail loudly if publicOrganizationSettings stopped filtering
+    // it, rather than passing vacuously because nothing was ever there).
+    expect(org.settings).toHaveProperty('permissionsOverrides');
+    // General-audience fields remain intact.
+    expect(result.settings).toMatchObject({
+      departments: ['emergency', 'icu'],
+    });
+  });
+
   it('builds a tenant administration model for no-code organization management', async () => {
     organizationRepository.findOne.mockResolvedValue({
       ...org,

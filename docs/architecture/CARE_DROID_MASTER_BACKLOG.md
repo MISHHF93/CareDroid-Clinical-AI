@@ -9,7 +9,7 @@
 4. Statuses use the established vocabularies only — ledger statuses (`VALIDATED`, `CONFIRMED`, `IN_PROGRESS`, `BLOCKED`, `WONT_FIX_WITH_REASON`, `SUPERSEDED`) and workflow statuses (`FULLY_WIRED`, `PARTIALLY_WIRED`, `FRONTEND_ONLY`, `BACKEND_ONLY`, `FIXTURE_ONLY`, `DUPLICATE`, `LEGACY`, `MISSING`, `NEEDS_VERIFICATION`, `BLOCKED_EXTERNAL`, `MANUAL_REVIEW`, `FUTURE_MODULE`). Priorities P0–P3 per the ledger's severity legend.
 5. A row marked done must cite its evidence (HEAL id, commit, or ledger section) — no unevidenced check-offs, per the campaign's own scoring discipline.
 
-**Last updated**: 2026-08-10 · HEAD `42fcd8d8` · Campaign state: 59 HEAL fixes (58 validated, 1 confirmed-not-fixed pending human decision), score 731/1000.
+**Last updated**: 2026-08-10 · HEAD `18c2b1ef` · Campaign state: 60 HEAL fixes (59 validated, 1 confirmed-not-fixed pending human decision), score 731/1000.
 
 ---
 
@@ -119,6 +119,8 @@ The FSM backbone (`src/engine/journeyEngine.ts` `VALID_TRANSITIONS`) + step mode
 | MB-C8 | Hidden/disabled buttons are not authorization (server always checks) | `VALIDATED` for traced routes; re-verify per new workflow | Guard audits |
 | MB-C9 | Admin-console route-access drift — two independent route-access sources disagree on charge_nurse (+ OPERATIONS_VIEW_ROUTES-sharing roles) reaching `/admin`; 2 fix attempts reverted after breaking real tested access; frontend nav-intent question still open | `MANUAL_REVIEW` — **see MB-P0-3**; data-exposure risk now bounded by HEAL-059 | HEAL-058, HEAL-059 |
 | MB-C10 | Tenant-admin GET endpoint had no admin-scope check — staff roster + permission overrides + billing config exposed to any org member regardless of role | `VALIDATED` — matched to sibling PATCH's existing `admin: 'organization'` guard | HEAL-059 |
+| MB-C11 | `GET :organizationId` / "list my orgs" leaked `permissionsOverrides`/`navigation`/`dashboardLayout` via an unfiltered settings spread — route audience is genuinely general-member (unlike MB-C10), fixed with a field allowlist not a route gate | `VALIDATED` | HEAL-060 |
+| MB-C12 | `feature-flags` GET/PATCH asymmetry investigated | `VALIDATED` (no fix needed) — low-sensitivity data; PATCH already double-gated (decorator + service-level `assertAdmin`) | HEAL-060 |
 
 ## D. AI/ML wiring
 
