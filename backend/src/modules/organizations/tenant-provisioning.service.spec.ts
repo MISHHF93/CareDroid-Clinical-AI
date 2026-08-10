@@ -28,7 +28,7 @@ describe('TenantProvisioningService', () => {
     save: jest.fn(async (row) => row),
   };
   const workspaceRepository = {
-    findOne: jest.fn(),
+    find: jest.fn(),
   };
   const platformAssetsService = {
     installPackForOrganization: jest.fn(),
@@ -76,7 +76,7 @@ describe('TenantProvisioningService', () => {
       organizationId: null,
       roleProfileId: null,
     });
-    workspaceRepository.findOne.mockResolvedValue(null);
+    workspaceRepository.find.mockResolvedValue([]);
     platformAssetsService.installPackForOrganization.mockResolvedValue({});
     platformAssetsService.getRoleProfile.mockResolvedValue({
       id: 'administrator',
@@ -154,12 +154,31 @@ describe('TenantProvisioningService', () => {
   });
 
   it('does not duplicate existing organization workspaces', async () => {
-    workspaceRepository.findOne.mockResolvedValue({ id: 'workspace-emergency' });
+    workspaceRepository.find.mockResolvedValue([
+      { id: 'workspace-emergency', type: WorkspaceType.EMERGENCY },
+    ]);
 
     await service.provisionOrganization(user, organization, {
       workspaceSetups: [{ type: WorkspaceType.EMERGENCY, name: 'Emergency' }],
     });
 
     expect(workspacesService.createWorkspace).not.toHaveBeenCalled();
+  });
+
+  it('fetches existing workspaces once (batched), not once per candidate workspace', async () => {
+    workspaceRepository.find.mockResolvedValue([]);
+
+    await service.provisionOrganization(user, organization, {
+      workspaceSetups: [
+        { type: WorkspaceType.EMERGENCY, name: 'Emergency' },
+        { type: WorkspaceType.ICU, name: 'ICU' },
+      ],
+    });
+
+    expect(workspaceRepository.find).toHaveBeenCalledTimes(1);
+    expect(workspaceRepository.find).toHaveBeenCalledWith({
+      where: { organizationId: organization.id },
+    });
+    expect(workspacesService.createWorkspace).toHaveBeenCalledTimes(2);
   });
 });

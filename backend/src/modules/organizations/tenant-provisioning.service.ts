@@ -261,11 +261,16 @@ export class TenantProvisioningService {
     >,
   ) {
     const created: Array<Awaited<ReturnType<WorkspacesService['createWorkspace']>>> = [];
+    // One batched fetch instead of one findOne() round trip per candidate
+    // workspace (previously N+1: onboarding a hospital with several default
+    // workspaces meant N sequential DB queries just to check what already
+    // exists, before any of the real per-workspace creation work).
+    const existingWorkspaces = await this.workspaceRepository.find({
+      where: { organizationId: organization.id },
+    });
+    const existingTypes = new Set(existingWorkspaces.map((row) => row.type));
     for (const workspace of workspaceDefaults) {
-      const existing = await this.workspaceRepository.findOne({
-        where: { organizationId: organization.id, type: workspace.type },
-      });
-      if (existing) continue;
+      if (existingTypes.has(workspace.type)) continue;
       try {
         created.push(
           await this.workspacesService.createWorkspace(
@@ -281,6 +286,12 @@ export class TenantProvisioningService {
             { organizationId: organization.id },
           ),
         );
+        // Marked only on success, not before the attempt: preserves the
+        // original per-item-recheck behavior for a workspaceDefaults array
+        // that itself contains a duplicate type -- a failed create is retried
+        // on the next occurrence, same as the old code's fresh findOne would
+        // have found no row and retried too.
+        existingTypes.add(workspace.type);
       } catch (error) {
         this.logger.warn(
           `[TenantProvisioning] Failed to create workspace ${workspace.name}: ${error instanceof Error ? error.message : String(error)}`,
