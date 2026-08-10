@@ -9,7 +9,7 @@
 4. Statuses use the established vocabularies only — ledger statuses (`VALIDATED`, `CONFIRMED`, `IN_PROGRESS`, `BLOCKED`, `WONT_FIX_WITH_REASON`, `SUPERSEDED`) and workflow statuses (`FULLY_WIRED`, `PARTIALLY_WIRED`, `FRONTEND_ONLY`, `BACKEND_ONLY`, `FIXTURE_ONLY`, `DUPLICATE`, `LEGACY`, `MISSING`, `NEEDS_VERIFICATION`, `BLOCKED_EXTERNAL`, `MANUAL_REVIEW`, `FUTURE_MODULE`). Priorities P0–P3 per the ledger's severity legend.
 5. A row marked done must cite its evidence (HEAL id, commit, or ledger section) — no unevidenced check-offs, per the campaign's own scoring discipline.
 
-**Last updated**: 2026-08-10 · HEAD `e9d5748a` · Campaign state: 67 HEAL fixes (65 validated, 2 confirmed-not-fixed pending human decision/dedicated round), score 731/1000.
+**Last updated**: 2026-08-10 · HEAD `PENDING_COMMIT` · Campaign state: 68 HEAL fixes (66 validated, 2 confirmed-not-fixed pending human decision/dedicated round), score 731/1000.
 
 ---
 
@@ -153,7 +153,7 @@ The FSM backbone (`src/engine/journeyEngine.ts` `VALID_TRANSITIONS`) + step mode
 | MB-E10 | Framer-quality polish scanning (standing bar) | `IN_PROGRESS` — continuous | feedback-visual-design-bar |
 | MB-E11 | Presentation contexts: tablet / wallboard / command display / kiosk verification | `PARTIALLY_WIRED` — screen modes real; per-context visual verification open (part of MB-E9) | Screen-mode models |
 | MB-E12 | Contrast/a11y guards (critical-card typography exclusions, axe-core) | `PARTIALLY_WIRED` — CSS contract tests real; live axe-core run never done | Round 33; Domain 9 |
-| MB-E13 | Duplicate/redundant CTA and page-element sweep (user-reported: "create new patient" appeared 3× on Reception in one viewport) | `IN_PROGRESS` — Reception fixed (2 of 3 "New walk-in" buttons were a true duplicate: same handler, both always-visible; the 3rd is a sticky-header button with real distinct scroll-depth value, correctly left alone; 3rd affordance is the real submit CTA, not a duplicate). Other pages not yet swept — user-reported instance, not a full-repo audit | HEAL-067 |
+| MB-E13 | Duplicate/redundant CTA and page-element sweep (user-reported: "create new patient" appeared 3× on Reception in one viewport) | `IN_PROGRESS` — Reception fixed (HEAL-067: 2 of 3 "New walk-in" buttons were a true duplicate, same handler; 3rd is a sticky-header button with real distinct scroll-depth value, left alone). Continued the sweep to Whiteboard/Triage/EMS/Referrals/Reassessment: found + fixed a REAL duplicate-record bug on EMS (HEAL-068 — same workflow_card seeded twice due to a patientId-instability race in the dedup key, not just a visual issue); other 4 pages checked clean this round. Not yet swept: remaining ~30+ pages | HEAL-067, HEAL-068 |
 
 ## F. Backend & API correctness
 

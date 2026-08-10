@@ -30,17 +30,24 @@ export function EmsInteractiveAssistPanel({
       channel="ems"
       purpose="ems_handoff_assist"
       title="EMS Handoff Assist"
-      seedTriggers={[
-        {
-          kind: 'ems_prearrival',
-          summary: emsUnitId
-            ? `EMS unit ${emsUnitId} inbound — prepare handoff and compare ETA with room readiness.`
-            : 'Inbound EMS unit may need ED preparation. Review handoff and ETA freshness.',
-          urgency: 'attention',
-          patientId,
-          metadata: { emsUnitId },
-        },
-      ]}
+      seedTriggers={
+        emsUnitId
+          ? [
+              {
+                kind: 'ems_prearrival',
+                summary: `EMS unit ${emsUnitId} inbound — prepare handoff and compare ETA with room readiness.`,
+                urgency: 'attention',
+                patientId,
+                // sourceId keys this trigger to the EMS unit itself so a
+                // patient-linkage resolving after the unit is already known
+                // (arrivals often report the inbound unit before identity
+                // links a chart) can't defeat dedup and seed a 2nd card for
+                // what is canonically the same inbound event.
+                metadata: { emsUnitId, sourceId: emsUnitId },
+              },
+            ]
+          : []
+      }
     />
   );
 }

@@ -29,6 +29,22 @@ describe('workflowAiCards', () => {
     expect(first?.recommendedActions.some((a) => a.requiresApproval)).toBe(true);
   });
 
+  it('dedupes a source-identified event even when patientId resolves later (EMS unit reports inbound before its patient chart links)', () => {
+    const first = buildWorkflowAiCard({
+      kind: 'ems_prearrival',
+      summary: 'EMS unit EMS-501 inbound — prepare handoff and compare ETA with room readiness.',
+      metadata: { emsUnitId: 'EMS-501', sourceId: 'EMS-501' },
+    });
+    const second = buildWorkflowAiCard({
+      kind: 'ems_prearrival',
+      patientId: 'p1',
+      summary: 'EMS unit EMS-501 inbound — prepare handoff and compare ETA with room readiness.',
+      metadata: { emsUnitId: 'EMS-501', sourceId: 'EMS-501' },
+    });
+    expect(first).not.toBeNull();
+    expect(second).toBeNull();
+  });
+
   it('lists active cards and supports acknowledge/dismiss', () => {
     const card = buildWorkflowAiCard({ kind: 'incomplete_registration', patientId: 'p2' });
     expect(card).not.toBeNull();

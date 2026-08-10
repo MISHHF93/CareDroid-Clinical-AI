@@ -39,11 +39,21 @@ function createId(prefix: string): string {
 }
 
 function dedupeKey(event: WorkflowTriggerEvent): string {
+  const sourceId = event.metadata?.sourceId || event.metadata?.alertId;
+  if (sourceId) {
+    // A source-identified event (one specific EMS unit, one specific alert)
+    // is the same occurrence for the life of that source regardless of
+    // patientId -- patient-chart linkage can resolve a beat after the
+    // source itself is known (e.g. an EMS unit reports inbound before its
+    // patient record links), and keying on patientId too would let that
+    // timing re-seed a duplicate card for what is canonically one event.
+    return [event.kind, event.channel || 'api', String(sourceId)].join('|');
+  }
   return [
     event.kind,
     event.patientId || 'none',
     event.channel || 'api',
-    String(event.metadata?.sourceId || event.metadata?.alertId || event.summary || ''),
+    String(event.summary || ''),
   ].join('|');
 }
 
