@@ -820,7 +820,7 @@
 
 .sepsis-bundle-tracker__header strong {
   color: var(--color-text-primary);
-  font-size: var(--font-size-card-title);
+  font-size: var(--app-card-title-size, var(--font-size-lg));
 }
 
 .sepsis-bundle-progress {

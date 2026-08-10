@@ -73,6 +73,7 @@
   --app-font-family-body:
     'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --app-font-family-mono: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+  --font-mono: var(--app-font-family-mono);
 
   --type-heading-line-height: 1.3;
   --type-subheading-line-height: 1.35;

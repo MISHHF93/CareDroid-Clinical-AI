@@ -192,7 +192,7 @@
   grid-area: count;
   color: var(--color-text-primary);
   font-family: var(--font-mono);
-  font-size: var(--font-size-section);
+  font-size: var(--app-section-title-size, var(--font-size-xl));
   font-variant-numeric: tabular-nums;
   line-height: 1;
 }

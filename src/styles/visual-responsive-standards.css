@@ -26,6 +26,7 @@
   --app-visual-grid-min: minmax(min(100%, 260px), 1fr);
   --app-visual-grid-min-compact: minmax(min(100%, 220px), 1fr);
 
+  --font-size-xs: var(--app-readable-caption-size);
   --font-size-sm: var(--app-readable-small-size);
   --font-size-base: var(--app-readable-body-size);
   --font-size-md: var(--app-readable-body-size);

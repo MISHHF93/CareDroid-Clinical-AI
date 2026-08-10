@@ -323,9 +323,11 @@ html {
   --app-surface-raised: var(--app-surface-elevated);
   --app-border: var(--app-panel-border);
   --app-border-strong: color-mix(in srgb, var(--app-fg) 22%, transparent);
+  --app-text: var(--app-fg);
   --app-text-primary: var(--app-fg);
   --app-text-secondary: color-mix(in srgb, var(--app-fg) 76%, transparent);
   --app-text-muted: var(--app-fg-muted);
+  --app-surface-subtle: var(--app-surface-muted);
   --app-text-link: var(--app-link-fg);
   --app-text-link-hover: var(--app-link-hover);
   --app-accent-action: var(--app-accent-interactive);

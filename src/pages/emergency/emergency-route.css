@@ -159,7 +159,7 @@
   border: 1px solid var(--cdl-clinical-border, var(--ed-border-subtle));
   border-radius: var(--cdl-clinical-radius, var(--radius-lg, 12px));
   background: var(--ed-surface-raised);
-  box-shadow: var(--cdl-clinical-shadow-rest, var(--app-eleaation-card));
+  box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
 }
 
 .emergency-route-maturity-chip {
@@ -412,7 +412,7 @@
     );
   border-radius: var(--cdl-clinical-radius, var(--radius-lg, 12px));
   background: var(--app-surface-1, var(--ed-surface-raised));
-  box-shadow: var(--cdl-clinical-shadow-rest, var(--app-eleaation-card));
+  box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
 }
 
 .emergency-route-queue-row--breached {
@@ -603,7 +603,7 @@
     );
   border-radius: var(--cdl-clinical-radius, var(--radius-lg, 12px));
   background: var(--app-surface-1, var(--ed-surface-raised));
-  box-shadow: var(--cdl-clinical-shadow-rest, var(--app-eleaation-card));
+  box-shadow: var(--cdl-clinical-shadow-rest, var(--app-elevation-card));
 }
 
 .emergency-command-action--critical {
