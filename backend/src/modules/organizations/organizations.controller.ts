@@ -87,7 +87,7 @@ export class OrganizationsController {
   }
 
   @Get(':organizationId/tenant-admin')
-  @OrganizationScoped()
+  @OrganizationScoped({ admin: 'organization' })
   @ApiOperation({ summary: 'Get tenant administration center model for the organization' })
   async getTenantAdministration(@Req() req: any, @Param('organizationId') organizationId: string) {
     this.assertTenantOrganization(req, organizationId);

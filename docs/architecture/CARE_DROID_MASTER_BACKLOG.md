@@ -9,7 +9,7 @@
 4. Statuses use the established vocabularies only — ledger statuses (`VALIDATED`, `CONFIRMED`, `IN_PROGRESS`, `BLOCKED`, `WONT_FIX_WITH_REASON`, `SUPERSEDED`) and workflow statuses (`FULLY_WIRED`, `PARTIALLY_WIRED`, `FRONTEND_ONLY`, `BACKEND_ONLY`, `FIXTURE_ONLY`, `DUPLICATE`, `LEGACY`, `MISSING`, `NEEDS_VERIFICATION`, `BLOCKED_EXTERNAL`, `MANUAL_REVIEW`, `FUTURE_MODULE`). Priorities P0–P3 per the ledger's severity legend.
 5. A row marked done must cite its evidence (HEAL id, commit, or ledger section) — no unevidenced check-offs, per the campaign's own scoring discipline.
 
-**Last updated**: 2026-08-10 · HEAD `ae280122` · Campaign state: 58 HEAL fixes (57 validated, 1 confirmed-not-fixed pending human decision), score 731/1000.
+**Last updated**: 2026-08-10 · HEAD `42fcd8d8` · Campaign state: 59 HEAL fixes (58 validated, 1 confirmed-not-fixed pending human decision), score 731/1000.
 
 ---
 
@@ -19,7 +19,7 @@
 |----|------|--------|-----|
 | MB-P0-1 | **Pediatric dose disagreement** — two live calculators give different Rocuronium/Dextrose doses for the same weight; needs clinical/pharmacy sign-off on the correct table before any code change | `BLOCKED` (clinical review) | HEAL-031 |
 | MB-P0-2 | **Role-vocabulary mismatch** — `roleProfileId` written hyphenated, read underscored; 9 of 12 emergency-role IDs fall through to minimal default; needs a human decision on the canonical role vocabulary (4 candidates) — wrong guess risks privilege escalation | `BLOCKED` (product/security decision) | HEAL-011 |
-| MB-P0-3 | **Admin-console route-access drift** — `charge_nurse` (and every role sharing `OPERATIONS_VIEW_ROUTES`) can reach `/admin` incl. Tenant Administration, bypassing that route's own curated 5-role `allowedRoles` list, via a second independent route-access source (`emergencyRolePermissions.ts`); 2 candidate code fixes tried and reverted after breaking real tested access — needs a decision on whether this reach is intentional (read-only situational awareness) before any fix | `MANUAL_REVIEW` (product/security decision) | HEAL-058 |
+| MB-P0-3 | **Admin-console route-access drift** — `charge_nurse` (and every role sharing `OPERATIONS_VIEW_ROUTES`) can reach the `/admin` frontend page/nav, bypassing that route's own curated 5-role `allowedRoles` list, via a second independent route-access source; 2 candidate code fixes tried and reverted after breaking real tested access — needs a decision on whether this frontend reach is intentional. Blast radius now BOUNDED (HEAL-059 closed the real data-exposure risk: both read and write on the actual tenant-admin data are backend-enforced to real admin/owner membership regardless of frontend reachability) | `MANUAL_REVIEW` (product/security decision on frontend nav intent only) | HEAL-058, HEAL-059 |
 
 ---
 
@@ -117,7 +117,8 @@ The FSM backbone (`src/engine/journeyEngine.ts` `VALID_TRANSITIONS`) + step mode
 | MB-C6 | Per-profile default screens / nav visibility / action availability | `PARTIALLY_WIRED` — models exist + tested per-role; full 8×workflow matrix is MB-C5 | Screen models + role tests |
 | MB-C7 | PHI scopes per profile (public displays zero-PHI confirmed) | `PARTIALLY_WIRED` — public confirmed; systematic per-profile PHI audit not done | Domain 6/7 |
 | MB-C8 | Hidden/disabled buttons are not authorization (server always checks) | `VALIDATED` for traced routes; re-verify per new workflow | Guard audits |
-| MB-C9 | Admin-console route-access drift — two independent route-access sources disagree on charge_nurse (+ OPERATIONS_VIEW_ROUTES-sharing roles) reaching `/admin`; 2 fix attempts reverted after breaking real tested access; backend enforcement for the reached pages not yet traced | `MANUAL_REVIEW` — **see MB-P0-3** | HEAL-058 |
+| MB-C9 | Admin-console route-access drift — two independent route-access sources disagree on charge_nurse (+ OPERATIONS_VIEW_ROUTES-sharing roles) reaching `/admin`; 2 fix attempts reverted after breaking real tested access; frontend nav-intent question still open | `MANUAL_REVIEW` — **see MB-P0-3**; data-exposure risk now bounded by HEAL-059 | HEAL-058, HEAL-059 |
+| MB-C10 | Tenant-admin GET endpoint had no admin-scope check — staff roster + permission overrides + billing config exposed to any org member regardless of role | `VALIDATED` — matched to sibling PATCH's existing `admin: 'organization'` guard | HEAL-059 |
 
 ## D. AI/ML wiring
 
