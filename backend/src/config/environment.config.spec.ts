@@ -71,6 +71,59 @@ describe('environment config', () => {
     expect(() => validateEnvironmentConfig(config)).toThrow('JWT_SECRET is required in production');
   });
 
+  it('rejects disabled tenant isolation in production with no demo escape hatch', () => {
+    const config = getEnvironmentConfig({
+      NODE_ENV: 'production',
+      JWT_SECRET: 'real-production-secret',
+      CAREDROID_TENANT_ISOLATION_DISABLED: 'true',
+      // Even an explicit demo deployment must not disable tenant isolation.
+      ENABLE_DEV_AUTH_BYPASS: 'true',
+      ALLOW_DEMO_AUTH_IN_PRODUCTION: 'true',
+    });
+
+    expect(() => validateEnvironmentConfig(config)).toThrow(
+      'CAREDROID_TENANT_ISOLATION_DISABLED must not be set in production',
+    );
+  });
+
+  it('rejects a lone dev-auth bypass flag in production but allows the explicit two-flag hosted demo', () => {
+    const lone = getEnvironmentConfig({
+      NODE_ENV: 'production',
+      JWT_SECRET: 'real-production-secret',
+      ENABLE_DEV_AUTH_BYPASS: 'true',
+    });
+    expect(() => validateEnvironmentConfig(lone)).toThrow(
+      'ENABLE_DEV_AUTH_BYPASS=true in production also requires ALLOW_DEMO_AUTH_IN_PRODUCTION=true',
+    );
+
+    const hostedDemo = getEnvironmentConfig({
+      NODE_ENV: 'production',
+      JWT_SECRET: 'real-production-secret',
+      ENABLE_DEV_AUTH_BYPASS: 'true',
+      ALLOW_DEMO_AUTH_IN_PRODUCTION: 'true',
+    });
+    expect(() => validateEnvironmentConfig(hostedDemo)).not.toThrow();
+  });
+
+  it('rejects a simulated health status in production unless the deployment is an explicit demo', () => {
+    const simulated = getEnvironmentConfig({
+      NODE_ENV: 'production',
+      JWT_SECRET: 'real-production-secret',
+      SIMULATION_HEALTH_STATUS: 'degraded',
+    });
+    expect(() => validateEnvironmentConfig(simulated)).toThrow(
+      'SIMULATION_HEALTH_STATUS must remain "healthy" in production',
+    );
+
+    const demo = getEnvironmentConfig({
+      NODE_ENV: 'production',
+      JWT_SECRET: 'real-production-secret',
+      SIMULATION_HEALTH_STATUS: 'degraded',
+      ALLOW_DEMO_AUTH_IN_PRODUCTION: 'true',
+    });
+    expect(() => validateEnvironmentConfig(demo)).not.toThrow();
+  });
+
   it('requires feature credentials only when dependent integrations are configured', () => {
     const config = getEnvironmentConfig({
       NODE_ENV: 'development',

@@ -200,14 +200,15 @@ The FSM backbone (`src/engine/journeyEngine.ts` `VALID_TRANSITIONS`) + step mode
 | MB-J4 | Hand-maintained mirror registries → generated from source (route inventory, nav baselines, page counts) | `CONFIRMED`, open — structural fragility, 4 stale artifacts from one commit | Infra note recommendation |
 | MB-J5 | Docker compose smoke test | `BLOCKED` — no Docker in environment | HEAL-014 |
 | MB-J6 | Body-validation + calculator-equivalence + chrome + propagation-chain regression guards | `VALIDATED`, permanent | Various |
+| MB-J7 | Continuous performance healing — frontend + backend processing pipelines made measurably faster without compromising clinical safety/data integrity; every healing round adds a read-the-actual-code performance lens (research-informed: bundle analysis, render/re-render profiling, backend hot paths, query batching) | `MISSING` — new directive demand (2026-08-10); needs a first evidence-based profiling pass to seed concrete rows | Workflows brief + user 2026-08-10 |
 
 ## K. Production readiness (newest directive — mostly discovery-stage)
 
 | ID | Item | Status | Ref |
 |----|------|--------|-----|
-| MB-K1 | Demo-configuration inventory & removal plan (demo personas, `FIXTURE_DEMO` surfaces, demo seeds, simulation engine, scenario data) — enumerate every demo artifact, classify keep-for-demo-mode vs must-not-ship | `MISSING` — discovery not started; NOTE: demo flows are also product features (pilot mode), so this needs an explicit demo-mode boundary, not blanket deletion | Latest brief addition |
-| MB-K2 | Authentication migrated to production mode (open-access/demo auth audit; JWT posture; `runtime-auth.ts`) | `MISSING` — discovery not started | Latest brief addition |
-| MB-K3 | Environment settings production posture (env flags default-off audit: `ENABLE_MONGOOSE_EMERGENCY_OS`, SMTP, Firebase, Sentinel) | `PARTIALLY_WIRED` — flags documented individually; no single production-posture doc | Various |
+| MB-K1 | Demo-configuration inventory & removal plan (demo-mode boundary, not blanket deletion) | `IN_PROGRESS` — first-pass inventory in HEAL-055 (personas/simulation flag-gated; fixtures envelope-labeled via `EdDataSourceBanner`; Smart Intake seeds already fixed); remaining: per-artifact demo-mode boundary doc | HEAL-055 |
+| MB-K2 | Authentication migrated to production mode | `PARTIALLY_WIRED` — backend already postured (JWT-verified runtime-auth, double-gated demo mint, secret sentinel guard) + HEAL-055 boot guards; REMAINING: frontend has no token-acquisition path (auth UI removed, open-access hard-coded in `authSession.ts`) — a real login flow needs a product auth-UX decision | HEAL-055 |
+| MB-K3 | Environment settings production posture (single doc + boot guards) | `PARTIALLY_WIRED` — 3 dangerous flags now fail-at-boot in production (tenant isolation, dev-auth bypass, simulated health — HEAL-055); single posture doc still open | HEAL-055 |
 | MB-K4 | `INCIDENT_ESCALATION_EMAILS` + SMTP configured by default for production deployments | `CONFIRMED`, open | Domain 2 partial; MB-H5 |
 | MB-K5 | End-to-end pipeline validation in production-equivalent environment | `BLOCKED_EXTERNAL` partially (Docker, real infra) + `MISSING` (runbook) | HEAL-014; latest brief |
 | MB-K6 | Pentest / bespoke security review / legal & clinical sign-offs | `BLOCKED_EXTERNAL` | Domain 7/10 gates |

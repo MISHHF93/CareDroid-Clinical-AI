@@ -461,6 +461,41 @@ export function validateEnvironmentConfig(
     errors.push('JWT_SECRET is required in production and must not use the local default');
   }
 
+  // Production demo/tenant posture — fail at boot, not at first request.
+  // Cross-tenant isolation has NO demo escape hatch: PHI boundaries are never
+  // a demo convenience.
+  if (isProduction && config.runtime.tenantIsolationDisabled) {
+    errors.push(
+      'CAREDROID_TENANT_ISOLATION_DISABLED must not be set in production — tenant isolation protects PHI boundaries and has no production override',
+    );
+  }
+
+  // Hosted demos in production are a deliberate TWO-flag decision (matching
+  // AuthService.createDevSession's own runtime rule); a lone dev-bypass flag in
+  // production is a misconfiguration that would otherwise only surface as a
+  // runtime 403 surprise.
+  if (
+    isProduction &&
+    config.auth.enableDevAuthBypass &&
+    !config.auth.allowDemoAuthInProduction
+  ) {
+    errors.push(
+      'ENABLE_DEV_AUTH_BYPASS=true in production also requires ALLOW_DEMO_AUTH_IN_PRODUCTION=true (hosted demo) — otherwise remove the bypass flag',
+    );
+  }
+
+  // A simulated health status in production fabricates the SaaS health report.
+  // Only a demo deployment (explicitly flagged) may simulate degradation.
+  if (
+    isProduction &&
+    config.runtime.simulationHealthStatus !== 'healthy' &&
+    !config.auth.allowDemoAuthInProduction
+  ) {
+    errors.push(
+      'SIMULATION_HEALTH_STATUS must remain "healthy" in production unless ALLOW_DEMO_AUTH_IN_PRODUCTION=true marks this as a demo deployment',
+    );
+  }
+
   if (config.database.enableMongooseEmergencyOs && !config.database.mongodbUri) {
     errors.push('MONGODB_URI is required when ENABLE_MONGOOSE_EMERGENCY_OS=true');
   }
