@@ -4,7 +4,7 @@
 
 **Supersedes** (historical, last touched 2026-07-15/17, pre-dates the current campaign which has run continuously since 2026-08-03 through 45+ commits documented in `CareDroid-Emergency-OS-Master-Scorecard.html`): `MASTER_TODO.md`, `AI_MASTER_TODO.md`. Those files are kept for historical reference only — do not add new entries there. Their OPEN items were not blindly imported here; each was re-verified against current source before being carried forward, and most were not (the codebase has moved substantially since Cycle 82).
 
-**Companion evidence documents**: `CareDroid-Emergency-OS-Master-Scorecard.html` (12-domain, 1000-point scorecard — the primary score-of-record), `AI_ORCHESTRATION_AUDIT.md`, `SOURCE_WIRING_AUDIT.md`, `docs/duplicate-system-audit.md`, `docs/orphan-detection-report.md`, `docs/backend-exposure-report.md`, persistent memory at `project-scorecard-campaign.md`.
+**Companion evidence documents**: `CARE_DROID_MASTER_BACKLOG.md` (the A–Z coverage map — one statused row per user-directive demand, citing this ledger's IDs; updated in the same commit as each round's ledger entry), `CareDroid-Emergency-OS-Master-Scorecard.html` (12-domain, 1000-point scorecard — the primary score-of-record), `AI_ORCHESTRATION_AUDIT.md`, `SOURCE_WIRING_AUDIT.md`, `docs/duplicate-system-audit.md`, `docs/orphan-detection-report.md`, `docs/backend-exposure-report.md`, persistent memory at `project-scorecard-campaign.md`.
 
 ## Status legend
 
@@ -1022,7 +1022,7 @@ No fix needed for any of the 4. This closes the extended search — the in-memor
 
 ---
 
-## Next steps (updated 2026-08-09, after HEAL-052 — workflows round)
+## Next steps (updated 2026-08-10 — see `CARE_DROID_MASTER_BACKLOG.md` for the full A–Z coverage map; its Queue order section is now the canonical prioritization, and its rows are updated in the same commit as each round's ledger entry)
 
 **Workflows-round discovery notes (2026-08-09, user's WORKFLOWS directive):** (a) ~~`pilotWalkthrough.test.tsx` fails again on HEAD `b20c7d25`~~ — **RESOLVED as HEAL-053** (2026-08-09/10): the "New Referral" failure was a real route-chrome clear-vs-registration race (fixed, layout-phase clear + regression tests); a secondary analytics-step failure was vite-node first-import latency (fixed, chunk pre-warm). The test remains env-flaky on machine-level stalls — durable fix is splitting it into per-stage tests, see HEAL-053's follow-ups. (b) The ED Copilot AI split named in the directive is already converged — `ed-copilot.nest-parity.controller.ts` has delegated to the canonical `ChatService.processMessage()` pipeline since 2026-08-08 (its own header documents the keyword-matcher removal); no reachable route serves the old keyword responder. (c) Reception-first chain (`completeIntakeHandoff` → queue assignment → encounter creation → capability-gated backend sync → triage assist → journey orchestrator → capacity/alerts refresh) traced and confirmed genuinely wired with explicit `handoffSyncPending`/`handoffSyncError` recovery state. (d) `CapacityCrisisMode`'s discharge quick-action verified legal-only (offered exclusively for `Disposition`-state patients; FSM allows Disposition→Discharge). (e) `unifiedPatientWorkflowModel` `nextStepIds` model/FSM drift + `DeteriorationRisk` add-only lifecycle + orphaned `completeReassessmentReminder` recorded in HEAL-052's follow-ups.
 
