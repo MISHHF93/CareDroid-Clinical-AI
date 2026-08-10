@@ -126,7 +126,7 @@ Full Explore-agent investigation (see HEAL-035 for the one bounded fix it produc
 - **Dependencies**: None.
 - **Recommended canonical solution**: Applied.
 - **Validation requirements**: Full frontend `npx tsc --noEmit -p tsconfig.frontend.json` clean (no dedicated test file exists for this data file).
-- **Commit when resolved**: (pending — recorded at commit time)
+- **Commit when resolved**: `cf55bcef`
 - **Scorecard impact when resolved**: Pending next scorecard sync pass.
 
 ### HEAL-049 — `pilotWalkthrough.test.tsx`'s full end-to-end pilot walkthrough test had a too-tight explicit 60s timeout for its genuine real runtime (40-65s depending on system load), causing load-dependent flaky timeouts rather than a real functional failure
