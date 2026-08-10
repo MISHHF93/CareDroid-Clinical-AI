@@ -9,7 +9,7 @@
 4. Statuses use the established vocabularies only — ledger statuses (`VALIDATED`, `CONFIRMED`, `IN_PROGRESS`, `BLOCKED`, `WONT_FIX_WITH_REASON`, `SUPERSEDED`) and workflow statuses (`FULLY_WIRED`, `PARTIALLY_WIRED`, `FRONTEND_ONLY`, `BACKEND_ONLY`, `FIXTURE_ONLY`, `DUPLICATE`, `LEGACY`, `MISSING`, `NEEDS_VERIFICATION`, `BLOCKED_EXTERNAL`, `MANUAL_REVIEW`, `FUTURE_MODULE`). Priorities P0–P3 per the ledger's severity legend.
 5. A row marked done must cite its evidence (HEAL id, commit, or ledger section) — no unevidenced check-offs, per the campaign's own scoring discipline.
 
-**Last updated**: 2026-08-10 · HEAD `0d1d7f3f` · Campaign state: 63 HEAL fixes (62 validated, 1 confirmed-not-fixed pending human decision), score 731/1000.
+**Last updated**: 2026-08-10 · HEAD `PENDING_COMMIT` · Campaign state: 64 HEAL fixes (63 validated, 1 confirmed-not-fixed pending human decision), score 731/1000.
 
 ---
 
@@ -199,7 +199,7 @@ The FSM backbone (`src/engine/journeyEngine.ts` `VALID_TRANSITIONS`) + step mode
 
 | ID | Item | Status | Ref |
 |----|------|--------|-----|
-| MB-J1 | Split `pilotWalkthrough` into per-stage tests (durable env-flake fix; no in-process retries) | `CONFIRMED`, open — top test-infra item | HEAL-053 follow-up (a) |
+| MB-J1 | Split `pilotWalkthrough` into per-stage tests (durable env-flake fix; no in-process retries) | `VALIDATED` — 5 independent per-stage tests, each own fresh render; stages 3-5 build preconditions via the real `createPatientAndRouteFromReception` orchestrator instead of re-driving earlier UI; residual flake isolated to 1 heavy stage under full sequential load (traced to `vitest.config.ts`'s deliberate single-worker `pool:'threads'`, not a logic defect) — no longer takes down all 5 stages | HEAL-064 |
 | MB-J2 | Full frontend vitest pass cadence (967/970 last run; re-run after multi-registry commits) | `IN_PROGRESS` — standing practice | Next steps #7 |
 | MB-J3 | Capacity/waiting-count Header KPI: retire test vs restore KPI | `MANUAL_REVIEW` — product decision | HEAL-044 |
 | MB-J4 | Hand-maintained mirror registries → generated from source (route inventory, nav baselines, page counts) | `CONFIRMED`, open — structural fragility, 4 stale artifacts from one commit | Infra note recommendation |
@@ -221,4 +221,4 @@ The FSM backbone (`src/engine/journeyEngine.ts` `VALID_TRANSITIONS`) + step mode
 
 ---
 
-**Queue order** (safety-first ranking, re-confirmed 2026-08-10): MB-P0-1/MB-P0-2/MB-P0-3 (surface to humans every round) → MB-A3 route consolidation remainder → MB-D2 provenance labeling → MB-J1 walkthrough split → MB-J7 performance targets → MB-E2..E8 CSS cluster → everything else by ledger priority.
+**Queue order** (safety-first ranking, re-confirmed 2026-08-10): MB-P0-1/MB-P0-2/MB-P0-3 (surface to humans every round) → MB-A3 route consolidation remainder → MB-D2 provenance labeling → MB-J7 bundle-analysis remainder → MB-E2..E8 CSS cluster → everything else by ledger priority. (MB-J1 closed by HEAL-064.)

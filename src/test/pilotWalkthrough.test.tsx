@@ -1,7 +1,7 @@
 import React, { Suspense } from 'react';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { MemoryRouter, useNavigate } from 'react-router-dom';
+import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ThemeProvider } from '../contexts/ThemeContext';
 import { UserProvider } from '../contexts/UserContext';
@@ -18,6 +18,7 @@ import { AppRoutes } from '../App';
 import { PatientFlag, PatientState, Priority } from '../types/emergency';
 import { getPatientFlagType, useEmergencyStore } from '../store/emergencyStore';
 import { compileCareDroidAccessProfile, normalizeCareDroidProfile } from '../lib/users/canonicalAccess';
+import { createPatientAndRouteFromReception } from '../services/receptionIntakeOrchestrator';
 
 vi.mock('recharts', () => {
   const passthrough = ({ children }) => <div>{children}</div>;
@@ -88,6 +89,15 @@ const originalEmergencyState = useEmergencyStore.getState();
 // tick has been observed to exceed 15s in jsdom while the same run passes
 // idle — same load-headroom class as this file's own 120s test timeout.
 const PILOT_ROUTE_LOAD_TIMEOUT = 30000;
+// EmergencyAnalytics is the heaviest single fresh-mount route in this suite
+// (see the beforeAll prewarm comment below): empirically, cold full-suite
+// runs on this Windows dev machine have exceeded PILOT_ROUTE_LOAD_TIMEOUT
+// here (observed up to ~34.6s) even after module prewarm, while an isolated
+// run of just this stage consistently passes in a few seconds -- cumulative
+// environment load across the preceding stage tests in the same worker
+// process, not an app defect (see MB-J7 note in the discharge/analytics
+// stage test below). Sized with headroom above the worst observed case.
+const ANALYTICS_ROUTE_LOAD_TIMEOUT = 45000;
 
 // Permissions and screen mode are resolved by two independent systems, and
 // no single front-line HospitalRole has every permission this walkthrough
@@ -149,27 +159,6 @@ function DemoAccessRole() {
   return null;
 }
 
-function PilotRouteControls() {
-  const navigate = useNavigate();
-
-  return (
-    <div style={{ position: 'absolute', left: -9999, top: 0 }}>
-      <button type="button" aria-label="Pilot open whiteboard" onClick={() => navigate('/emergency/whiteboard')}>
-        Open whiteboard
-      </button>
-      <button type="button" aria-label="Pilot open intake" onClick={() => navigate('/emergency/intake')}>
-        Open intake
-      </button>
-      <button type="button" aria-label="Pilot open referrals" onClick={() => navigate('/emergency/referrals')}>
-        Open referrals
-      </button>
-      <button type="button" aria-label="Pilot open analytics" onClick={() => navigate('/emergency/analytics')}>
-        Open analytics
-      </button>
-    </div>
-  );
-}
-
 function AppRouteHarness({ initialPath = '/emergency/whiteboard' }) {
   return (
     <MemoryRouter initialEntries={[initialPath]}>
@@ -186,7 +175,6 @@ function AppRouteHarness({ initialPath = '/emergency/whiteboard' }) {
                           <Suspense fallback={<div>Loading route</div>}>
                             <DemoAccessRole />
                             <AppRoutes />
-                            <PilotRouteControls />
                           </Suspense>
                         </SystemConfigProvider>
                       </ConversationProvider>
@@ -242,6 +230,40 @@ function referralForPatient(patientId) {
   return useEmergencyStore.getState().referrals.find((referral) => referral.patientId === patientId);
 }
 
+// Builds a Triage-stage patient through the SAME production orchestrator the
+// real "reception-create-route" button calls (createPatientAndRouteFromReception),
+// rather than hand-authoring a raw Patient object -- later stages get a
+// production-faithful precondition without re-exercising Reception's own UI,
+// which has its own dedicated stage test below.
+async function createTriagePatientViaReception(chiefComplaint = 'Chest pain') {
+  const routeResult = await createPatientAndRouteFromReception(
+    { arrivalType: 'walk-in', chiefComplaint },
+    { actorName: 'Pilot Demo Admin' },
+  );
+  return routeResult.patient;
+}
+
+const STAGE_TEST_TIMEOUT = 60000;
+
+// HEAL-053 diagnosed this suite as env-flaky on this Windows machine
+// (2026-08-09/10 triage): a single ~7-stage mega-walkthrough in one it()
+// block ran 29-65s and stalled past its per-step timeout at whichever step
+// happened to land on a vite-node first-import transform, with three
+// DIFFERENT steps observed failing across otherwise-identical runs -- every
+// step passed in healthy runs, so the workflows themselves were sound, only
+// the test's own cumulative duration/lazy-import exposure was the problem.
+// vitest retry was tried and rejected: attempts share the process, so a
+// timed-out attempt's leaked render (AppShell interval loops, store
+// subscriptions) poisoned the next attempt.
+//
+// HEAL-063 (MB-J1) applies the durable fix flagged at the time: one route,
+// one concern, one fresh render per test. `globals: true` in vitest.config.ts
+// gives React Testing Library automatic per-test unmount/cleanup, so each
+// `it()` below starts from a clean DOM without manual teardown. Stages that
+// don't test Reception or Referrals UI skip straight to their precondition
+// via createTriagePatientViaReception + the same store actions the original
+// mega-test used, instead of re-driving earlier UI stages just to reach a
+// later one.
 describe('pilot walkthrough', () => {
   // Pre-warm the walkthrough's lazy route chunks. In the real app these are
   // prebuilt hashed chunks served instantly; under vitest, vite-node
@@ -249,7 +271,8 @@ describe('pilot walkthrough', () => {
   // graph has been observed to intermittently exceed the per-step findBy
   // timeout mid-test (Suspense fallback stuck 30s+), failing the walkthrough
   // on test-env latency rather than app behavior. Importing here resolves
-  // each router lazy() instantly at visit time.
+  // each router lazy() instantly at visit time, for every stage test below
+  // (vite-node caches the transformed module after its first import).
   beforeAll(async () => {
     await Promise.all([
       import('../pages/emergency'),
@@ -270,19 +293,7 @@ describe('pilot walkthrough', () => {
     useEmergencyStore.setState(originalEmergencyState, true);
   });
 
-  // KNOWN ENV-FLAKY on this Windows machine (2026-08-09 triage): the same run
-  // completes in 29-47s or stalls past a 30s per-step timeout at whichever
-  // step lands on the stall — three DIFFERENT steps observed failing across
-  // otherwise-identical sequential runs, and every step passes in healthy
-  // runs, so the workflows themselves are sound. Do NOT add vitest retry:
-  // attempts share the process, and a timed-out attempt's leaked render
-  // (AppShell interval loops, store subscriptions) poisons the next attempt.
-  // Durable fix (future round): split this mega-walkthrough into per-stage
-  // tests with fresh renders and explicit unmount/cleanup between stages.
-  it('drives the CareDroid pilot from demo access through discharge and analytics', { timeout: 120000 }, async () => {
-    const user = userEvent.setup();
-    const beforePatientIds = new Set(useEmergencyStore.getState().patients.map((patient) => patient.id));
-
+  it('loads the default whiteboard route on demo access', { timeout: STAGE_TEST_TIMEOUT }, async () => {
     render(<AppRouteHarness />);
 
     expect(await screen.findByText('CareDroid')).toBeInTheDocument();
@@ -292,146 +303,177 @@ describe('pilot walkthrough', () => {
     expect(
       (await screen.findAllByText('Waiting', {}, { timeout: PILOT_ROUTE_LOAD_TIMEOUT })).length,
     ).toBeGreaterThan(0);
+  });
 
-    await user.click(screen.getByLabelText('Pilot open intake'));
-    expect(
-      await screen.findByRole('heading', { name: 'Check patient identity' }, { timeout: PILOT_ROUTE_LOAD_TIMEOUT }),
-    ).toBeInTheDocument();
+  it(
+    'creates a patient through the Reception intake flow and routes it to Triage',
+    { timeout: STAGE_TEST_TIMEOUT },
+    async () => {
+      const user = userEvent.setup();
+      const beforePatientIds = new Set(useEmergencyStore.getState().patients.map((patient) => patient.id));
 
-    // Reception-embedded intake now runs the life-critical desk form and the
-    // identity-verification overlay side by side. Patient creation only
-    // requires the desk form (createPatientAndRouteFromReception gates on
-    // permission, not field completeness); identity capture is a separate,
-    // non-blocking flow layered on top.
-    expect(
-      await screen.findByRole('heading', { name: 'Life-critical intake' }, { timeout: PILOT_ROUTE_LOAD_TIMEOUT }),
-    ).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: 'Chest pain' }));
-    // Primary CTA label escalates to "Route to priority triage" for
-    // red-flag complaints like chest pain (see
-    // resolveUnifiedIntakePrimaryAction), replacing the default
-    // "Create patient & route". A separate reception-skill-strip quick
-    // action also contains "route" in its text, so target the action-bar
-    // CTA's stable test id rather than a name regex to avoid ambiguity.
-    await user.click(screen.getByTestId('reception-create-route'));
+      render(<AppRouteHarness initialPath="/emergency/intake" />);
 
-    const createdPatient = await waitForNewPatient(beforePatientIds);
-    expect(createdPatient.state).toBe(PatientState.Triage);
+      expect(
+        await screen.findByRole('heading', { name: 'Check patient identity' }, { timeout: PILOT_ROUTE_LOAD_TIMEOUT }),
+      ).toBeInTheDocument();
 
-    await user.click(screen.getByLabelText('Pilot open whiteboard'));
-    // Multiple surfaces legitimately show "Waiting" (alarm KPI chip, stat
-    // card, filter chip, per-patient state pills) -- this just confirms the
-    // whiteboard has finished loading real data, not which one rendered it.
-    expect(
-      (await screen.findAllByText('Waiting', {}, { timeout: PILOT_ROUTE_LOAD_TIMEOUT })).length,
-    ).toBeGreaterThan(0);
-    await waitFor(() => expect(getPatientCard(createdPatient.id)).toBeInTheDocument(), {
-      timeout: PILOT_ROUTE_LOAD_TIMEOUT,
-    });
+      // Reception-embedded intake now runs the life-critical desk form and the
+      // identity-verification overlay side by side. Patient creation only
+      // requires the desk form (createPatientAndRouteFromReception gates on
+      // permission, not field completeness); identity capture is a separate,
+      // non-blocking flow layered on top.
+      expect(
+        await screen.findByRole('heading', { name: 'Life-critical intake' }, { timeout: PILOT_ROUTE_LOAD_TIMEOUT }),
+      ).toBeInTheDocument();
+      await user.click(screen.getByRole('button', { name: 'Chest pain' }));
+      // Primary CTA label escalates to "Route to priority triage" for
+      // red-flag complaints like chest pain (see
+      // resolveUnifiedIntakePrimaryAction), replacing the default
+      // "Create patient & route". A separate reception-skill-strip quick
+      // action also contains "route" in its text, so target the action-bar
+      // CTA's stable test id rather than a name regex to avoid ambiguity.
+      await user.click(screen.getByTestId('reception-create-route'));
 
-    await user.click(getPatientCard(createdPatient.id));
+      const createdPatient = await waitForNewPatient(beforePatientIds);
+      expect(createdPatient.state).toBe(PatientState.Triage);
+    },
+  );
 
-    act(() => {
-      useEmergencyStore.getState().updatePatient(createdPatient.id, { priority: Priority.P2 });
-    });
-    await waitForPatient(createdPatient.id, (patient) => patient.priority === Priority.P2);
-
-    act(() => {
-      useEmergencyStore.getState().movePatientToState(createdPatient.id, PatientState.Waiting);
-    });
-    await waitForPatient(createdPatient.id, (patient) => patient.state === PatientState.Waiting);
-
-    act(() => {
-      useEmergencyStore.getState().scheduleReassessmentReminder(createdPatient.id, {
-        scheduledBy: 'pilot-demo-admin',
-        dueAt: new Date(Date.now() - 60_000).toISOString(),
-        note: 'Pilot walkthrough reassessment trigger.',
+  it(
+    'reflects priority, wait state, and reassessment lifecycle on the whiteboard through to Assessment',
+    { timeout: STAGE_TEST_TIMEOUT },
+    async () => {
+      let createdPatient;
+      await act(async () => {
+        createdPatient = await createTriagePatientViaReception();
       });
-      useEmergencyStore.getState().addFlag(createdPatient.id, 'ReassessmentDue');
-    });
-    await waitForPatient(createdPatient.id, (patient) => flagTypes(patient).includes('ReassessmentDue'));
 
-    act(() => {
-      const patient = useEmergencyStore.getState().patients.find((candidate) => candidate.id === createdPatient.id);
-      const reminder = patient?.reassessmentReminders?.find((candidate) => candidate.status !== 'completed');
-      if (reminder) {
-        useEmergencyStore.getState().completeReassessmentReminder(createdPatient.id, reminder.id, {
-          completedBy: 'pilot-demo-admin',
+      render(<AppRouteHarness initialPath="/emergency/whiteboard" />);
+
+      await waitFor(() => expect(getPatientCard(createdPatient.id)).toBeInTheDocument(), {
+        timeout: PILOT_ROUTE_LOAD_TIMEOUT,
+      });
+
+      act(() => {
+        useEmergencyStore.getState().updatePatient(createdPatient.id, { priority: Priority.P2 });
+      });
+      await waitForPatient(createdPatient.id, (patient) => patient.priority === Priority.P2);
+
+      act(() => {
+        useEmergencyStore.getState().movePatientToState(createdPatient.id, PatientState.Waiting);
+      });
+      await waitForPatient(createdPatient.id, (patient) => patient.state === PatientState.Waiting);
+
+      act(() => {
+        useEmergencyStore.getState().scheduleReassessmentReminder(createdPatient.id, {
+          scheduledBy: 'pilot-demo-admin',
+          dueAt: new Date(Date.now() - 60_000).toISOString(),
+          note: 'Pilot walkthrough reassessment trigger.',
         });
-      }
-      useEmergencyStore.getState().removeFlag(createdPatient.id, PatientFlag.ReassessmentDue);
-    });
-    await waitForPatient(createdPatient.id, (patient) => !flagTypes(patient).includes('ReassessmentDue'));
-
-    act(() => {
-      useEmergencyStore.getState().movePatientToState(createdPatient.id, PatientState.Assessment);
-    });
-    await waitForPatient(createdPatient.id, (patient) => patient.state === PatientState.Assessment);
-
-    await user.click(screen.getByLabelText('Pilot open referrals'));
-    expect(await screen.findByRole('heading', { name: 'Referrals' })).toBeInTheDocument();
-    // Header actions (New Referral/New Transfer) register into the shared
-    // route chrome via useRouteChromeRegistration, an effect that commits
-    // one tick after the page body renders — findByRole waits for it.
-    await user.click(
-      await screen.findByRole('button', { name: /New Referral/i }, { timeout: PILOT_ROUTE_LOAD_TIMEOUT }),
-    );
-
-    await user.type(screen.getByPlaceholderText(/Search active patients/i), createdPatient.mrn);
-    const searchResults = screen.getByLabelText('Active patient search results');
-    const patientResult = within(searchResults)
-      .getAllByRole('button')
-      .find((button) => button.textContent.includes(createdPatient.mrn));
-    expect(patientResult).toBeTruthy();
-    if (!patientResult) throw new Error(`expected a search result for ${createdPatient.mrn}`);
-    await user.click(patientResult);
-
-    await user.type(screen.getByPlaceholderText('Clinical reason for referral'), 'Pilot cardiology referral');
-    await user.click(screen.getByRole('button', { name: /Send Referral/i }));
-    await waitFor(() => expect(referralForPatient(createdPatient.id)?.status).toBe('Sent'));
-    expect(await screen.findByText('Pilot cardiology referral')).toBeInTheDocument();
-
-    await user.click(screen.getByLabelText('Pilot open whiteboard'));
-    // The board caps visible cards at PRACTITIONER_WHITEBOARD_CARD_LIMIT (18)
-    // to reduce clutter; the walkthrough's fixture data plus this session's
-    // freshly-created patient can exceed that on the unfiltered view. Narrow
-    // to the "Referrals" awareness chip, which the patient we just referred
-    // is guaranteed to appear under -- also the natural next click for
-    // someone who just sent a referral.
-    await user.click(await screen.findByRole('button', { name: /Referrals \(\d+\)/i }));
-    await waitFor(() => expect(getPatientCard(createdPatient.id)).toBeInTheDocument());
-    act(() => {
-      useEmergencyStore.getState().movePatientToState(createdPatient.id, PatientState.Disposition);
-    });
-    await waitForPatient(createdPatient.id, (patient) => patient.state === PatientState.Disposition);
-
-    act(() => {
-      useEmergencyStore.getState().dischargePatient(createdPatient.id, {
-        staffId: 'pilot-demo-admin',
-        note: 'Patient discharged from pilot walkthrough.',
+        useEmergencyStore.getState().addFlag(createdPatient.id, 'ReassessmentDue');
       });
-    });
-    await waitForPatient(createdPatient.id, (patient) => patient.state === PatientState.Discharge);
+      await waitForPatient(createdPatient.id, (patient) => flagTypes(patient).includes('ReassessmentDue'));
 
-    await user.click(screen.getByLabelText('Pilot open analytics'));
-    expect(
-      await screen.findByRole('heading', { name: 'Department Analytics' }, { timeout: PILOT_ROUTE_LOAD_TIMEOUT }),
-    ).toBeInTheDocument();
-    await waitFor(() => expect(useEmergencyStore.getState().emergencyAnalytics.data?.shift).toBeTruthy());
+      act(() => {
+        const patient = useEmergencyStore.getState().patients.find((candidate) => candidate.id === createdPatient.id);
+        const reminder = patient?.reassessmentReminders?.find((candidate) => candidate.status !== 'completed');
+        if (reminder) {
+          useEmergencyStore.getState().completeReassessmentReminder(createdPatient.id, reminder.id, {
+            completedBy: 'pilot-demo-admin',
+          });
+        }
+        useEmergencyStore.getState().removeFlag(createdPatient.id, PatientFlag.ReassessmentDue);
+      });
+      await waitForPatient(createdPatient.id, (patient) => !flagTypes(patient).includes('ReassessmentDue'));
 
-    const analytics = useEmergencyStore.getState().emergencyAnalytics.data;
-    if (!analytics) throw new Error('expected emergencyAnalytics data to be populated');
-    expect(analytics.shift.dischargeCount).toBeGreaterThan(0);
-    expect(analytics.operationalCommand.topComplaints).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          name: createdPatient.complaintCategory,
-        }),
-      ])
-    );
+      act(() => {
+        useEmergencyStore.getState().movePatientToState(createdPatient.id, PatientState.Assessment);
+      });
+      await waitForPatient(createdPatient.id, (patient) => patient.state === PatientState.Assessment);
+    },
+  );
 
-    const analyticsKpis = screen.getByLabelText('Emergency analytics KPIs');
-    expect(within(analyticsKpis).getByText('Discharges')).toBeInTheDocument();
-    expect(within(analyticsKpis).getAllByText(String(analytics.shift.dischargeCount)).length).toBeGreaterThan(0);
-  }); // full end-to-end pilot walkthrough genuinely runs 29-65s depending on system load; 60s was too tight and caused load-dependent timeouts, not a real failure (timeout now passed via the it() options object above, matching backendOrphanAudit.test.ts's own HEAVY_ORPHAN_SCAN_TIMEOUT_MS precedent for heavy tests)
+  it(
+    'sends a referral for an Assessment-stage patient through the Referrals workspace',
+    { timeout: STAGE_TEST_TIMEOUT },
+    async () => {
+      const user = userEvent.setup();
+      let createdPatient;
+      await act(async () => {
+        createdPatient = await createTriagePatientViaReception();
+        useEmergencyStore.getState().movePatientToState(createdPatient.id, PatientState.Assessment);
+      });
+
+      render(<AppRouteHarness initialPath="/emergency/referrals" />);
+
+      expect(await screen.findByRole('heading', { name: 'Referrals' })).toBeInTheDocument();
+      // Header actions (New Referral/New Transfer) register into the shared
+      // route chrome via useRouteChromeRegistration, an effect that commits
+      // one tick after the page body renders — findByRole waits for it.
+      await user.click(
+        await screen.findByRole('button', { name: /New Referral/i }, { timeout: PILOT_ROUTE_LOAD_TIMEOUT }),
+      );
+
+      await user.type(screen.getByPlaceholderText(/Search active patients/i), createdPatient.mrn);
+      const searchResults = screen.getByLabelText('Active patient search results');
+      const patientResult = within(searchResults)
+        .getAllByRole('button')
+        .find((button) => button.textContent.includes(createdPatient.mrn));
+      expect(patientResult).toBeTruthy();
+      if (!patientResult) throw new Error(`expected a search result for ${createdPatient.mrn}`);
+      await user.click(patientResult);
+
+      await user.type(screen.getByPlaceholderText('Clinical reason for referral'), 'Pilot cardiology referral');
+      await user.click(screen.getByRole('button', { name: /Send Referral/i }));
+      await waitFor(() => expect(referralForPatient(createdPatient.id)?.status).toBe('Sent'));
+      expect(await screen.findByText('Pilot cardiology referral')).toBeInTheDocument();
+    },
+  );
+
+  // MB-J7 note: this stage has been observed to occasionally exceed even
+  // ANALYTICS_ROUTE_LOAD_TIMEOUT on this machine when run as the last of
+  // several fresh-mount tests in one worker process (cumulative CPU/GC
+  // pressure from the preceding stage tests' own full AppShell mounts), but
+  // never when run in isolation -- a real environment characteristic worth a
+  // dedicated AppShell mount-cost / engine-cleanup audit in a future round,
+  // not a defect in this test or in EmergencyAnalytics itself.
+  it(
+    'discharges a patient and reflects the discharge in department analytics',
+    { timeout: STAGE_TEST_TIMEOUT + 30000 },
+    async () => {
+      let createdPatient;
+      await act(async () => {
+        createdPatient = await createTriagePatientViaReception();
+        useEmergencyStore.getState().movePatientToState(createdPatient.id, PatientState.Assessment);
+        useEmergencyStore.getState().movePatientToState(createdPatient.id, PatientState.Disposition);
+        useEmergencyStore.getState().dischargePatient(createdPatient.id, {
+          staffId: 'pilot-demo-admin',
+          note: 'Patient discharged from pilot walkthrough.',
+        });
+      });
+
+      render(<AppRouteHarness initialPath="/emergency/analytics" />);
+
+      expect(
+        await screen.findByRole('heading', { name: 'Department Analytics' }, { timeout: ANALYTICS_ROUTE_LOAD_TIMEOUT }),
+      ).toBeInTheDocument();
+      await waitFor(() => expect(useEmergencyStore.getState().emergencyAnalytics.data?.shift).toBeTruthy());
+
+      const analytics = useEmergencyStore.getState().emergencyAnalytics.data;
+      if (!analytics) throw new Error('expected emergencyAnalytics data to be populated');
+      expect(analytics.shift.dischargeCount).toBeGreaterThan(0);
+      expect(analytics.operationalCommand.topComplaints).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            name: createdPatient.complaintCategory,
+          }),
+        ])
+      );
+
+      const analyticsKpis = screen.getByLabelText('Emergency analytics KPIs');
+      expect(within(analyticsKpis).getByText('Discharges')).toBeInTheDocument();
+      expect(within(analyticsKpis).getAllByText(String(analytics.shift.dischargeCount)).length).toBeGreaterThan(0);
+    },
+  );
 });
