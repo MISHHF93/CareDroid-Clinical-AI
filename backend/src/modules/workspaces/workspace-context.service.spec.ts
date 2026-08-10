@@ -127,4 +127,43 @@ describe('WorkspaceContextService', () => {
       workspaceEnabledToolIds: ['qsofa', 'news2'],
     });
   });
+
+  it('does not throw when membership.department/joinedAt/lastAccessedAt are null', async () => {
+    // Regression (HEAL-077): these WorkspaceMembership columns are declared
+    // `nullable: true` in the entity (workspace-membership.entity.ts) -- a
+    // user genuinely may have no department, and joinedAt/lastAccessedAt are
+    // unset until backfilled/first access. TypeORM returns `null` for an
+    // unset nullable column, not `undefined`. WorkspaceContextEnvelopeSchema
+    // previously declared these fields `.optional()` only, which accepts a
+    // missing/undefined key but still rejects an explicit `null` value --
+    // this reproduced a real 500 (ZodError) on GET /api/workspaces/context
+    // for any membership row with an unset department/joinedAt/lastAccessedAt.
+    workspacesService.getActiveWorkspaceState.mockResolvedValue({
+      workspaces: [emergencyWorkspace],
+      memberships: [
+        {
+          id: 'membership-1',
+          workspaceId: 'workspace-1',
+          userId: 'user-1',
+          role: 'clinician',
+          status: 'active',
+          department: null,
+          joinedAt: null,
+          lastAccessedAt: null,
+        },
+      ],
+      activeWorkspaceId: 'workspace-1',
+      effectivePermissions: ['ACCESS_TOOLS'],
+      activeWorkspace: emergencyWorkspace,
+    });
+
+    const context = await service.getCurrentContext(user);
+
+    expect(context.membership).toMatchObject({
+      id: 'membership-1',
+      department: null,
+      joinedAt: null,
+      lastAccessedAt: null,
+    });
+  });
 });

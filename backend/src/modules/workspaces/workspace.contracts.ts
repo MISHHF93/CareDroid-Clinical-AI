@@ -85,10 +85,10 @@ export const WorkspaceMembershipSchema = z.object({
   role: z.string(),
   permissions: z.array(z.string()).default([]),
   teams: z.array(z.string()).default([]),
-  department: z.string().optional(),
+  department: z.string().nullable().optional(),
   status: z.string(),
-  joinedAt: z.union([z.string(), z.date()]).optional(),
-  lastAccessedAt: z.union([z.string(), z.date()]).optional(),
+  joinedAt: z.union([z.string(), z.date()]).nullable().optional(),
+  lastAccessedAt: z.union([z.string(), z.date()]).nullable().optional(),
 });
 export type WorkspaceMembershipContract = z.infer<typeof WorkspaceMembershipSchema>;
 
