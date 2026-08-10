@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useLocation, useNavigate, type To } from 'react-router-dom';
 import CareDroidToastHost from './CareDroidToastHost';
 import { ConfirmDialogProvider } from './ui/ConfirmDialogProvider';
@@ -256,7 +256,15 @@ function RouteChromeReset() {
   const location = useLocation();
   const { clearChrome } = useRouteChrome();
 
-  useEffect(() => {
+  // useLayoutEffect, NOT useEffect: pages register their chrome (title/header
+  // actions) in a passive effect, and layout effects run strictly before
+  // passive effects within a commit. As a passive effect this clear could land
+  // AFTER the incoming route's registration when the lazy chunk was already
+  // cached (both in one commit), erasing freshly-registered header actions
+  // with nothing left to re-register — the pilot walkthrough's intermittently
+  // missing "New Referral" action. Layout-phase clearing makes the order
+  // clear-then-register in every interleaving.
+  useLayoutEffect(() => {
     clearChrome();
   }, [clearChrome, location.pathname]);
 

@@ -54,7 +54,17 @@ export function useRouteChrome() {
   return context;
 }
 
-/** Register route-specific chrome for the permanent shell tab strip; clears on unmount. */
+/**
+ * Register route-specific chrome for the permanent shell tab strip; clears on unmount.
+ *
+ * ORDERING CONTRACT (the fix for the intermittently-vanishing route header
+ * actions, e.g. Referrals' "New Referral"): this registration runs as a
+ * PASSIVE effect, and AppShell's navigation-scoped reset (RouteChromeReset)
+ * must clear in the LAYOUT phase. Layout effects always run before passive
+ * effects in the same commit, so a navigation clear can never land after the
+ * incoming route's registration and silently erase it — which is exactly what
+ * happened (timing-dependent) when both ran as passive effects.
+ */
 export function useRouteChromeRegistration(chrome: RouteChromeState | null | undefined) {
   const { setChrome, clearChrome } = useRouteChrome();
 

@@ -2,7 +2,7 @@ import React, { Suspense } from 'react';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, useNavigate } from 'react-router-dom';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ThemeProvider } from '../contexts/ThemeContext';
 import { UserProvider } from '../contexts/UserContext';
 import { ConversationProvider } from '../contexts/ConversationContext';
@@ -82,7 +82,12 @@ vi.mock('../services/emergencySettingsApi', () => ({
 }));
 
 const originalEmergencyState = useEmergencyStore.getState();
-const PILOT_ROUTE_LOAD_TIMEOUT = 15000;
+// 30s, not 15s: the New Referral header action registers via
+// useRouteChromeRegistration one tick after the referrals page body renders,
+// and under CPU contention (parallel suites, post-full-run settling) that
+// tick has been observed to exceed 15s in jsdom while the same run passes
+// idle — same load-headroom class as this file's own 120s test timeout.
+const PILOT_ROUTE_LOAD_TIMEOUT = 30000;
 
 // Permissions and screen mode are resolved by two independent systems, and
 // no single front-line HospitalRole has every permission this walkthrough
@@ -238,6 +243,23 @@ function referralForPatient(patientId) {
 }
 
 describe('pilot walkthrough', () => {
+  // Pre-warm the walkthrough's lazy route chunks. In the real app these are
+  // prebuilt hashed chunks served instantly; under vitest, vite-node
+  // transforms each module graph on FIRST import, and the analytics page's
+  // graph has been observed to intermittently exceed the per-step findBy
+  // timeout mid-test (Suspense fallback stuck 30s+), failing the walkthrough
+  // on test-env latency rather than app behavior. Importing here resolves
+  // each router lazy() instantly at visit time.
+  beforeAll(async () => {
+    await Promise.all([
+      import('../pages/emergency'),
+      import('../pages/emergency/ReceptionWorkspace'),
+      import('../pages/emergency/SmartIntake'),
+      import('../components/ReferralPanel'),
+      import('../pages/emergency/EmergencyAnalytics'),
+    ]);
+  });
+
   beforeEach(() => {
     useEmergencyStore.setState(originalEmergencyState, true);
     vi.clearAllMocks();
@@ -248,7 +270,16 @@ describe('pilot walkthrough', () => {
     useEmergencyStore.setState(originalEmergencyState, true);
   });
 
-  it('drives the CareDroid pilot from demo access through discharge and analytics', async () => {
+  // KNOWN ENV-FLAKY on this Windows machine (2026-08-09 triage): the same run
+  // completes in 29-47s or stalls past a 30s per-step timeout at whichever
+  // step lands on the stall — three DIFFERENT steps observed failing across
+  // otherwise-identical sequential runs, and every step passes in healthy
+  // runs, so the workflows themselves are sound. Do NOT add vitest retry:
+  // attempts share the process, and a timed-out attempt's leaked render
+  // (AppShell interval loops, store subscriptions) poisons the next attempt.
+  // Durable fix (future round): split this mega-walkthrough into per-stage
+  // tests with fresh renders and explicit unmount/cleanup between stages.
+  it('drives the CareDroid pilot from demo access through discharge and analytics', { timeout: 120000 }, async () => {
     const user = userEvent.setup();
     const beforePatientIds = new Set(useEmergencyStore.getState().patients.map((patient) => patient.id));
 
@@ -402,5 +433,5 @@ describe('pilot walkthrough', () => {
     const analyticsKpis = screen.getByLabelText('Emergency analytics KPIs');
     expect(within(analyticsKpis).getByText('Discharges')).toBeInTheDocument();
     expect(within(analyticsKpis).getAllByText(String(analytics.shift.dischargeCount)).length).toBeGreaterThan(0);
-  }, 120000); // full end-to-end pilot walkthrough genuinely runs 40-65s depending on system load; 60s was too tight and caused load-dependent timeouts, not a real failure (confirmed: passes in ~47s under normal load, matching backendOrphanAudit.test.ts's own HEAVY_ORPHAN_SCAN_TIMEOUT_MS precedent for heavy tests)
+  }); // full end-to-end pilot walkthrough genuinely runs 29-65s depending on system load; 60s was too tight and caused load-dependent timeouts, not a real failure (timeout now passed via the it() options object above, matching backendOrphanAudit.test.ts's own HEAVY_ORPHAN_SCAN_TIMEOUT_MS precedent for heavy tests)
 });
