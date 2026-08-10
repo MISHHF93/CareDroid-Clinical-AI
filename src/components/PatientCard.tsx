@@ -404,9 +404,22 @@ function PatientCard({
 
   useEffect(() => {
     if (!documentArtifactsEnabled) return;
-    if (patient.documentArtifacts?.length) return;
+    // `documentArtifacts` starts `undefined` (never synced) and becomes an
+    // array (possibly empty) once synced — checking `undefined` here, not
+    // `.length`, is deliberate: a patient with zero derivable artifacts
+    // stays a real, terminal `[]` forever. Gating on `.length` instead
+    // treated "synced, found nothing" the same as "not yet synced", so the
+    // sync re-fired every render for any such patient — each call replaces
+    // the store's whole `patients` array, which re-renders every mounted
+    // PatientCard and re-fires this same effect again. With many patients
+    // sharing that (very common) zero-artifact shape, this created a
+    // continuous store-wide re-render loop that never let the page settle,
+    // most visibly on the Patients route, which renders the full roster at
+    // once (found via /emergency/patients being permanently stuck on its
+    // route-level Suspense fallback).
+    if (patient.documentArtifacts !== undefined) return;
     syncDocumentArtifactsFromPatient(patient.id);
-  }, [documentArtifactsEnabled, patient.documentArtifacts?.length, patient.id, syncDocumentArtifactsFromPatient]);
+  }, [documentArtifactsEnabled, patient.documentArtifacts, patient.id, syncDocumentArtifactsFromPatient]);
 
   usePhiViewAudit(patient.id, {
     enabled: !readOnlyDisplay && privacyPolicy.tier !== 'public' && !privacyPolicy.aggregateMetricsOnly,

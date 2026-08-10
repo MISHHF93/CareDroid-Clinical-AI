@@ -99,7 +99,8 @@ function isPatientFlaggedForReassessment(patient: Patient): boolean {
   });
 }
 
-const EMERGENCY_OS_PAGE_TITLES: Record<string, string> = {
+/** Exported for AppShell.pageChrome.test.tsx's registry-drift guard only. */
+export const EMERGENCY_OS_PAGE_TITLES: Record<string, string> = {
   '/emergency': `${EMERGENCY_OS_BRANDING.productName} - Board`,
   [CANONICAL_ROUTES.emergencyWhiteboard]: `${EMERGENCY_OS_BRANDING.productName} - Board`,
   [CANONICAL_ROUTES.emergencyCommandCenter]: `${EMERGENCY_OS_BRANDING.productName} - Hospital Command Center`,
@@ -123,9 +124,18 @@ const EMERGENCY_OS_PAGE_TITLES: Record<string, string> = {
   [CANONICAL_ROUTES.emergencySettings]: `${EMERGENCY_OS_BRANDING.productName} - Settings`,
   [CANONICAL_ROUTES.emergencyPulse]: `${EMERGENCY_OS_BRANDING.productName} - Pulse`,
   [CANONICAL_ROUTES.emergencyShift]: `${EMERGENCY_OS_BRANDING.productName} - Shift`,
+  [CANONICAL_ROUTES.emergencyDispatch]: `${EMERGENCY_OS_BRANDING.productName} - Dispatch Console`,
+  [CANONICAL_ROUTES.emergencyEdReadiness]: `${EMERGENCY_OS_BRANDING.productName} - ED Readiness`,
+  [CANONICAL_ROUTES.emergencyCollaboration]: `${EMERGENCY_OS_BRANDING.productName} - Collaboration Hub`,
+  [CANONICAL_ROUTES.emergencyDocumentation]: `${EMERGENCY_OS_BRANDING.productName} - Clinical Documentation`,
+  [CANONICAL_ROUTES.emergencyDiagnostics]: `${EMERGENCY_OS_BRANDING.productName} - Diagnostics Coordination`,
+  [CANONICAL_ROUTES.emergencyHandoffs]: `${EMERGENCY_OS_BRANDING.productName} - Structured Handoffs`,
+  [CANONICAL_ROUTES.emergencyReports]: `${EMERGENCY_OS_BRANDING.productName} - Operational Reports`,
+  [CANONICAL_ROUTES.emergencyAlerts]: `${EMERGENCY_OS_BRANDING.productName} - Clinical Alerts`,
 };
 
-const EMERGENCY_OS_PAGE_SUBTITLES: Record<string, string> = {
+/** Exported for AppShell.pageChrome.test.tsx's registry-drift guard only. */
+export const EMERGENCY_OS_PAGE_SUBTITLES: Record<string, string> = {
   '/emergency': 'Patient flow, capacity, EMS, and reassessment status.',
   [CANONICAL_ROUTES.emergencyWhiteboard]: 'Operational awareness after reception prepares each patient card.',
   [CANONICAL_ROUTES.emergencyCommandCenter]:
@@ -149,6 +159,19 @@ const EMERGENCY_OS_PAGE_SUBTITLES: Record<string, string> = {
   [CANONICAL_ROUTES.workspaces]: 'Workspace registry and platform operating model.',
   '/settings': 'Tenant, module, AI, integration, and threshold controls.',
   [CANONICAL_ROUTES.emergencySettings]: 'Tenant, module, AI, integration, and threshold controls.',
+  [CANONICAL_ROUTES.emergencyDispatch]: 'Emergency call intake, CAD unit dispatch, and ED pre-alert coordination.',
+  [CANONICAL_ROUTES.emergencyEdReadiness]: 'Bay and room readiness plans, equipment checks, and pre-arrival preparation.',
+  [CANONICAL_ROUTES.emergencyCollaboration]: 'Real-time department channels for cross-role coordination and handoff messaging.',
+  [CANONICAL_ROUTES.emergencyDocumentation]:
+    'Draft SOAP notes, progress notes, discharge summaries, and consultation notes with clinician review before export.',
+  [CANONICAL_ROUTES.emergencyDiagnostics]: 'Lab, imaging, pharmacy, and consult orders — STAT priority and result tracking.',
+  [CANONICAL_ROUTES.emergencyHandoffs]: 'Disposition, admission, and EMS handoff documentation and staff assignment.',
+  [CANONICAL_ROUTES.emergencyReports]: '3-minute response compliance, analytics, and shift-summary reporting surfaces.',
+  [CANONICAL_ROUTES.emergencyAlerts]:
+    'Review, acknowledge, and resolve operational and clinical alerts — one lifecycle, role-aware delivery.',
+  [CANONICAL_ROUTES.emergencyHelp]: 'Role-based process guidance, downtime procedures, and shortcuts reference.',
+  [CANONICAL_ROUTES.emergencyPulse]: 'Live department vital signs — active patients, capacity score, and the attention list.',
+  [CANONICAL_ROUTES.emergencyShift]: 'Shift timer, volume and time metrics, and queue performance for the active shift.',
 };
 
 export type AppShellProps = {
