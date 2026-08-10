@@ -127,7 +127,7 @@ The FSM backbone (`src/engine/journeyEngine.ts` `VALID_TRANSITIONS`) + step mode
 | ID | Item | Status | Ref |
 |----|------|--------|-----|
 | MB-D1 | ONE AI orchestration path (Copilot → `ChatService.processMessage` pipeline) | `VALIDATED` | Converged 2026-08-08 |
-| MB-D2 | Provenance truth-labels on every AI surface (~17–19 of original 38 remain) | `IN_PROGRESS` — rotate search signals (imports / on-screen copy / vocabulary / bare-% without provenance) | Rounds 34–35 recipes, HEAL-061 |
+| MB-D2 | Provenance truth-labels on every AI surface (~17–19 of original 38 remain) | `IN_PROGRESS` — rotate search signals (imports / on-screen copy / vocabulary / bare-% without provenance). 2026-08-10 round: checked `PatientDetailPanel.tsx`'s Upgrade Harness signals (already discloses a `deterministic-*-provider` string per-signal — adequately honest, just not the standardized component), `AccountableRecommendationCard.tsx` (exemplary — model/prompt/corpus version, safety, human-review, already wired into CopilotPanel/InteractiveAIWorkspace), `AiRouteMetadata.tsx` (shows the REAL backend gateway's own self-reported routing confidence, not fabricated) — genuine negative result, no new violation found this round | Rounds 34–35 recipes, HEAL-061 |
 | MB-D3 | Model/tool registry — 2 real trained models (NLU 1.00/n=51; artifact-router 0.947/n=282) documented | `VALIDATED` as inventory | `AI_CONFIGURATION_MAP.md` |
 | MB-D4 | RAG pipeline live + correct embedding model (`RAG_MODEL` env fix landed 2026-07-15) | `NEEDS_VERIFICATION` — re-confirm env fix still deployed | RAG audit memory |
 | MB-D5 | LLM transport timeout (D1 from RAG audit) | `NEEDS_VERIFICATION` — may be stale claim; trace before trusting | 2026-07-15 audit |
