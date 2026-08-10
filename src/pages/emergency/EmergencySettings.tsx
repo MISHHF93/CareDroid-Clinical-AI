@@ -290,6 +290,14 @@ function promptValidationIssues(validation: any = {}) {
   return Object.values(validation).flatMap((result: any) => result?.issues || []);
 }
 
+/** See the comment above these effects' definitions (HEAL-072) for why this exists. */
+const SETTINGS_FETCH_STAGGER_MS = Object.freeze({
+  audit: 300,
+  integrationHub: 600,
+  provincialHealth: 900,
+  aiGovernance: 1200,
+});
+
 export default function EmergencySettings() {
   const surfaces = usePractitionerSurfaceVisibility();
   const storeSettings = useEmergencyStore((state) => state.emergencySettings);
@@ -387,26 +395,43 @@ export default function EmergencySettings() {
     [],
   );
 
+  // These 4 status panels (audit / integration hub / provincial health /
+  // AI governance, 6 HTTP requests total) are secondary, non-blocking
+  // status displays -- unlike the settings fetch above, nothing else on
+  // this page depends on their data. Firing all 6 in the same mount tick,
+  // on top of the ~15-18 requests AppShell/shared hooks already fire on
+  // every page load, blew well past the browser's 6-connections-per-origin
+  // HTTP/1.1 cap (this dev stack has no HTTP/2) and queued for 20-40+
+  // seconds (HEAL-072, MB-P0-5/MB-J7 -- confirmed via network tracing
+  // cross-referenced against backend logs showing each endpoint alone
+  // answers in ~150ms; the delay was 100% client-side queueing). Staggering
+  // their start times gives the page's higher-priority requests (realtime
+  // stream, the actual settings fetch above) first claim on connection
+  // slots, at the cost of an imperceptible few-hundred-ms delay before
+  // these secondary panels start loading.
   useEffect(() => {
     let cancelled = false;
     setAuditStatus('loading');
     setAuditError('');
 
-    fetchEmergencyWorkflowLogs()
-      .then((result) => {
-        if (cancelled) return;
-        const logs = result?.data?.logs || result?.data?.workflowLogs || [];
-        setBackendWorkflowLogs(Array.isArray(logs) ? logs : []);
-        setAuditStatus('ready');
-      })
-      .catch(() => {
-        if (cancelled) return;
-        setAuditError('Workflow audit logs are temporarily unavailable.');
-        setAuditStatus('error');
-      });
+    const timer = window.setTimeout(() => {
+      fetchEmergencyWorkflowLogs()
+        .then((result) => {
+          if (cancelled) return;
+          const logs = result?.data?.logs || result?.data?.workflowLogs || [];
+          setBackendWorkflowLogs(Array.isArray(logs) ? logs : []);
+          setAuditStatus('ready');
+        })
+        .catch(() => {
+          if (cancelled) return;
+          setAuditError('Workflow audit logs are temporarily unavailable.');
+          setAuditStatus('error');
+        });
+    }, SETTINGS_FETCH_STAGGER_MS.audit);
 
     return () => {
       cancelled = true;
+      window.clearTimeout(timer);
     };
   }, []);
 
@@ -415,20 +440,23 @@ export default function EmergencySettings() {
     setIntegrationHubStatus('loading');
     setIntegrationHubError('');
 
-    fetchIntegrationHub()
-      .then((result) => {
-        if (cancelled) return;
-        setIntegrationHubEnvelope(result);
-        setIntegrationHubStatus(result?.remainingGaps?.length ? 'partial' : 'ready');
-      })
-      .catch(() => {
-        if (cancelled) return;
-        setIntegrationHubError('Integration Hub status is temporarily unavailable.');
-        setIntegrationHubStatus('error');
-      });
+    const timer = window.setTimeout(() => {
+      fetchIntegrationHub()
+        .then((result) => {
+          if (cancelled) return;
+          setIntegrationHubEnvelope(result);
+          setIntegrationHubStatus(result?.remainingGaps?.length ? 'partial' : 'ready');
+        })
+        .catch(() => {
+          if (cancelled) return;
+          setIntegrationHubError('Integration Hub status is temporarily unavailable.');
+          setIntegrationHubStatus('error');
+        });
+    }, SETTINGS_FETCH_STAGGER_MS.integrationHub);
 
     return () => {
       cancelled = true;
+      window.clearTimeout(timer);
     };
   }, []);
 
@@ -437,20 +465,23 @@ export default function EmergencySettings() {
     setProvincialHealthStatus('loading');
     setProvincialHealthError('');
 
-    fetchProvincialHealth()
-      .then((result) => {
-        if (cancelled) return;
-        setProvincialHealthEnvelope(result);
-        setProvincialHealthStatus(result?.remainingGaps?.length ? 'partial' : 'ready');
-      })
-      .catch(() => {
-        if (cancelled) return;
-        setProvincialHealthError('Provincial Health connector status is temporarily unavailable.');
-        setProvincialHealthStatus('error');
-      });
+    const timer = window.setTimeout(() => {
+      fetchProvincialHealth()
+        .then((result) => {
+          if (cancelled) return;
+          setProvincialHealthEnvelope(result);
+          setProvincialHealthStatus(result?.remainingGaps?.length ? 'partial' : 'ready');
+        })
+        .catch(() => {
+          if (cancelled) return;
+          setProvincialHealthError('Provincial Health connector status is temporarily unavailable.');
+          setProvincialHealthStatus('error');
+        });
+    }, SETTINGS_FETCH_STAGGER_MS.provincialHealth);
 
     return () => {
       cancelled = true;
+      window.clearTimeout(timer);
     };
   }, []);
 
@@ -459,38 +490,41 @@ export default function EmergencySettings() {
     setAiGovernanceStatus('loading');
     setAiGovernanceError('');
 
-    Promise.allSettled([
-      fetchEmergencyAiGovernanceRegistry(),
-      fetchEmergencyAiGovernanceCompliance(30),
-      validateEmergencyAiGovernancePrompts(),
-    ]).then(([registryResult, complianceResult, validationResult]) => {
-      if (cancelled) return;
+    const timer = window.setTimeout(() => {
+      Promise.allSettled([
+        fetchEmergencyAiGovernanceRegistry(),
+        fetchEmergencyAiGovernanceCompliance(30),
+        validateEmergencyAiGovernancePrompts(),
+      ]).then(([registryResult, complianceResult, validationResult]) => {
+        if (cancelled) return;
 
-      const registry =
-        registryResult.status === 'fulfilled' ? registryResult.value : null;
-      const compliance =
-        complianceResult.status === 'fulfilled' ? complianceResult.value : null;
-      const validation =
-        validationResult.status === 'fulfilled' ? validationResult.value : null;
+        const registry =
+          registryResult.status === 'fulfilled' ? registryResult.value : null;
+        const compliance =
+          complianceResult.status === 'fulfilled' ? complianceResult.value : null;
+        const validation =
+          validationResult.status === 'fulfilled' ? validationResult.value : null;
 
-      if (registry) setAiGovernanceRegistry(registry);
-      if (compliance) setAiGovernanceCompliance(compliance);
-      if (validation) setAiPromptValidation(validation);
+        if (registry) setAiGovernanceRegistry(registry);
+        if (compliance) setAiGovernanceCompliance(compliance);
+        if (validation) setAiPromptValidation(validation);
 
-      const failed = [registryResult, complianceResult, validationResult].find(
-        (result) => result.status === 'rejected',
-      );
-      if (failed) {
-        setAiGovernanceError('AI governance status is partially unavailable.');
-        setAiGovernanceStatus('partial');
-        return;
-      }
+        const failed = [registryResult, complianceResult, validationResult].find(
+          (result) => result.status === 'rejected',
+        );
+        if (failed) {
+          setAiGovernanceError('AI governance status is partially unavailable.');
+          setAiGovernanceStatus('partial');
+          return;
+        }
 
-      setAiGovernanceStatus('ready');
-    });
+        setAiGovernanceStatus('ready');
+      });
+    }, SETTINGS_FETCH_STAGGER_MS.aiGovernance);
 
     return () => {
       cancelled = true;
+      window.clearTimeout(timer);
     };
   }, []);
 

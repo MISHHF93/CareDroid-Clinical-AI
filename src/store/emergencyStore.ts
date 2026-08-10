@@ -1680,14 +1680,31 @@ const mergeById = <T extends { id: string }>(incoming: T[] | undefined, existing
   return [...incoming, ...existing.filter((item) => !incomingIds.has(item.id))];
 };
 
+/**
+ * `workflowLogs` had no cap anywhere it was written -- every automation
+ * tick, journey event, and workflow action appended to it forever, and
+ * every append re-sorted the WHOLE accumulated array. Confirmed live
+ * (HEAL-072 follow-up): 7 -> 19 -> 507 entries in under 3 seconds of a
+ * long-running dev session, with the per-append sort cost growing right
+ * along with it -- the real cause of `/emergency/settings` (the one page
+ * that processes this array for its Audit Log panel) getting progressively
+ * slower/less responsive the longer a session runs, not fixed by the
+ * request-fan-out staggering alone. 500 matches this codebase's own
+ * existing precedent for this exact class of live log buffer
+ * (`PlatformTelemetryService`'s bounded event buffer, `securityAuditService.ts`'s
+ * `MAX_PENDING_AUDIT_ENTRIES`) -- comfortably more than the UI ever displays
+ * at once (Settings' own Audit Log panel filters down to 50).
+ */
+const MAX_WORKFLOW_LOGS = 500;
+
 const mergeWorkflowLogs = (
   incoming: WorkflowActionLog[] | undefined,
   existing: WorkflowActionLog[],
 ): WorkflowActionLog[] => {
   if (!incoming?.length) return existing;
-  return mergeById(incoming, existing).sort(
-    (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
-  );
+  return mergeById(incoming, existing)
+    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+    .slice(0, MAX_WORKFLOW_LOGS);
 };
 
 const emptyCapacityMetrics = (): EmergencyCapacityMetrics => ({
@@ -2076,9 +2093,9 @@ function appendWorkflowLogs(
   const logs = inputs
     .filter(Boolean)
     .map((input) => createWorkflowLog(input as WorkflowActionInput));
-  return [...logs, ...existingLogs].sort(
-    (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
-  );
+  return [...logs, ...existingLogs]
+    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+    .slice(0, MAX_WORKFLOW_LOGS);
 }
 
 export function workflowLogFromJourneyEvent(
@@ -5662,7 +5679,9 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         workflowLogs: [
           log,
           ...state.workflowLogs.filter((candidate) => candidate.id !== log.id),
-        ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()),
+        ]
+          .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+          .slice(0, MAX_WORKFLOW_LOGS),
       }));
       void import('../services/observabilityService').then(({ default: observabilityService }) => {
         observabilityService.recordWorkflowTelemetry({
@@ -5730,7 +5749,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
 
       set((current) => ({
         staffingRequests: [request, ...current.staffingRequests],
-        workflowLogs: [log, ...current.workflowLogs],
+        workflowLogs: [log, ...current.workflowLogs].slice(0, MAX_WORKFLOW_LOGS),
       }));
 
       return request;
