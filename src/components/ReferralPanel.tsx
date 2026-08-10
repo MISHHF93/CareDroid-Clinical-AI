@@ -512,7 +512,13 @@ export default function ReferralPanel() {
     );
   };
 
-  const headerActions = (
+  // Memoized: this element is passed to EmergencyRoutePage's chrome
+  // registration, whose effect re-fires whenever the actions identity changes —
+  // a fresh element every render re-registered the route chrome every render
+  // (HEAL-053's investigation found this churn; harmless under the current
+  // chrome model, but wasteful and a hazard for any future registration model).
+  const headerActions = useMemo(
+    () => (
     <>
       {referralPresentation.visible ? (
         <button
@@ -559,6 +565,15 @@ export default function ReferralPanel() {
         </button>
       ) : null}
     </>
+    ),
+    // setForm/setFormOpen are stable useState setters, deliberately omitted.
+    [
+      referralPresentation.visible,
+      transferPresentation.visible,
+      canManageReferral,
+      canManageTransfer,
+      emergencyRole.roleLabel,
+    ],
   );
 
   return (
