@@ -54,17 +54,6 @@ export default function ReceptionPatientLookup({
             onChange={(event) => setQuery(event.target.value)}
           />
         </label>
-        {onCreateNew ? (
-          <button
-            type="button"
-            className="reception-patient-lookup__new"
-            disabled={disabled}
-            onClick={onCreateNew}
-          >
-            <UserPlus size={16} aria-hidden="true" />
-            New walk-in
-          </button>
-        ) : null}
       </div>
       {query.trim() && !isPatientSearchQueryReady(query) ? (
         <p className="reception-patient-lookup__status" role="status">
@@ -72,8 +61,21 @@ export default function ReceptionPatientLookup({
         </p>
       ) : null}
       {isPatientSearchQueryReady(query) && results.length === 0 ? (
-        <p className="reception-patient-lookup__status" role="status">
-          No matching charts. You can start a new walk-in registration.
+        <p className="reception-patient-lookup__status reception-patient-lookup__status--empty" role="status">
+          No matching charts.
+          {onCreateNew ? (
+            <button
+              type="button"
+              className="reception-patient-lookup__new"
+              disabled={disabled}
+              onClick={onCreateNew}
+            >
+              <UserPlus size={16} aria-hidden="true" />
+              Start a new walk-in registration
+            </button>
+          ) : (
+            ' You can start a new walk-in registration.'
+          )}
         </p>
       ) : null}
       {results.length > 0 ? (

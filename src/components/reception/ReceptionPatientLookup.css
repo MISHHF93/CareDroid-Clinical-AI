@@ -85,6 +85,13 @@
   color: var(--cdl-text-secondary, #64748b);
 }
 
+.reception-patient-lookup__status--empty {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .reception-patient-lookup__results {
   list-style: none;
   margin: 0;

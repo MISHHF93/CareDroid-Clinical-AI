@@ -9,7 +9,7 @@
 4. Statuses use the established vocabularies only — ledger statuses (`VALIDATED`, `CONFIRMED`, `IN_PROGRESS`, `BLOCKED`, `WONT_FIX_WITH_REASON`, `SUPERSEDED`) and workflow statuses (`FULLY_WIRED`, `PARTIALLY_WIRED`, `FRONTEND_ONLY`, `BACKEND_ONLY`, `FIXTURE_ONLY`, `DUPLICATE`, `LEGACY`, `MISSING`, `NEEDS_VERIFICATION`, `BLOCKED_EXTERNAL`, `MANUAL_REVIEW`, `FUTURE_MODULE`). Priorities P0–P3 per the ledger's severity legend.
 5. A row marked done must cite its evidence (HEAL id, commit, or ledger section) — no unevidenced check-offs, per the campaign's own scoring discipline.
 
-**Last updated**: 2026-08-10 · HEAD `8034a630` · Campaign state: 66 HEAL fixes (64 validated, 2 confirmed-not-fixed pending human decision/dedicated round), score 731/1000.
+**Last updated**: 2026-08-10 · HEAD `PENDING_COMMIT` · Campaign state: 67 HEAL fixes (65 validated, 2 confirmed-not-fixed pending human decision/dedicated round), score 731/1000.
 
 ---
 
@@ -152,6 +152,7 @@ The FSM backbone (`src/engine/journeyEngine.ts` `VALID_TRANSITIONS`) + step mode
 | MB-E9 | Visual UI integrity pass — Playwright screenshot sweep of ALL pages (cards/components aligned, no layout drift) | `IN_PROGRESS` — recipe proven (HEAL-051 verified 5 pages); full sweep open | Directive addition; memory recipe |
 | MB-E10 | Framer-quality polish scanning (standing bar) | `IN_PROGRESS` — continuous | feedback-visual-design-bar |
 | MB-E11 | Presentation contexts: tablet / wallboard / command display / kiosk verification | `PARTIALLY_WIRED` — screen modes real; per-context visual verification open (part of MB-E9) | Screen-mode models |
+| MB-E12 | Duplicate/redundant CTA and page-element sweep (user-reported: "create new patient" appeared 3× on Reception in one viewport) | `IN_PROGRESS` — Reception fixed (2 of 3 "New walk-in" buttons were a true duplicate: same handler, both always-visible; the 3rd is a sticky-header button with real distinct scroll-depth value, correctly left alone; 3rd affordance is the real submit CTA, not a duplicate). Other pages not yet swept — user-reported instance, not a full-repo audit | HEAL-067 |
 | MB-E12 | Contrast/a11y guards (critical-card typography exclusions, axe-core) | `PARTIALLY_WIRED` — CSS contract tests real; live axe-core run never done | Round 33; Domain 9 |
 
 ## F. Backend & API correctness
@@ -221,4 +222,4 @@ The FSM backbone (`src/engine/journeyEngine.ts` `VALID_TRANSITIONS`) + step mode
 
 ---
 
-**Queue order** (safety-first ranking, re-confirmed 2026-08-10): MB-P0-1/MB-P0-2/MB-P0-3 (surface to humans every round) → MB-D2 provenance labeling → MB-J7 bundle-analysis remainder → MB-E2..E8 CSS cluster → everything else by ledger priority. (MB-J1 closed by HEAL-064; MB-A3's dangerous-gap sweep substantially closed by HEAL-065 — remaining scope downgraded to small cleanup follow-ups, no longer a top-of-queue item.)
+**Queue order** (safety-first ranking, re-confirmed 2026-08-10): MB-P0-1/MB-P0-2/MB-P0-3 (surface to humans every round) → MB-E12 duplicate-CTA sweep continuation (other pages) → MB-D2 provenance labeling → MB-E2..E8 CSS cluster → everything else by ledger priority. (MB-J1 closed by HEAL-064; MB-A3's dangerous-gap sweep substantially closed by HEAL-065; MB-J7 bundle analysis closed with a CONFIRMED finding by HEAL-066, real fix needs a dedicated round.)
