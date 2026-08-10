@@ -21,6 +21,7 @@ import startEmergencyRealtime from '../services/emergencyRealtimeService';
 import { bootstrapAiPlatformIntegrations } from '../services/aiPlatformBootstrap';
 import { resolveClinicalToolLaunchTarget } from '../services/unifiedClinicalToolsBridge';
 import { CANONICAL_ROUTES } from '../config/routes.config';
+import { GOVERNANCE_WORKSPACE_ROUTES } from '../config/governanceConsoleRoutes';
 import { EMERGENCY_OS_BRANDING } from '../config/emergencyOsBranding.config';
 import { isReceptionFirstUxEnabled, RECEPTION_FIRST_UX } from '../config/receptionFirstUx.config';
 import {
@@ -132,6 +133,8 @@ export const EMERGENCY_OS_PAGE_TITLES: Record<string, string> = {
   [CANONICAL_ROUTES.emergencyHandoffs]: `${EMERGENCY_OS_BRANDING.productName} - Structured Handoffs`,
   [CANONICAL_ROUTES.emergencyReports]: `${EMERGENCY_OS_BRANDING.productName} - Operational Reports`,
   [CANONICAL_ROUTES.emergencyAlerts]: `${EMERGENCY_OS_BRANDING.productName} - Clinical Alerts`,
+  [CANONICAL_ROUTES.adminOperations]: `${EMERGENCY_OS_BRANDING.productName} - Operations Console`,
+  [CANONICAL_ROUTES.trainingDashboard]: `${EMERGENCY_OS_BRANDING.productName} - AI Training`,
 };
 
 /** Exported for AppShell.pageChrome.test.tsx's registry-drift guard only. */
@@ -172,7 +175,46 @@ export const EMERGENCY_OS_PAGE_SUBTITLES: Record<string, string> = {
   [CANONICAL_ROUTES.emergencyHelp]: 'Role-based process guidance, downtime procedures, and shortcuts reference.',
   [CANONICAL_ROUTES.emergencyPulse]: 'Live department vital signs — active patients, capacity score, and the attention list.',
   [CANONICAL_ROUTES.emergencyShift]: 'Shift timer, volume and time metrics, and queue performance for the active shift.',
+  [CANONICAL_ROUTES.adminOperations]:
+    'Role assignments, workflow previews, team invites, and tenant policies.',
+  [CANONICAL_ROUTES.trainingDashboard]:
+    'AI training pipeline — data collection, cleaning, labeling, and evaluation stages.',
 };
+
+/**
+ * MB-L4 (Action Registry directive) follow-up: the same "missing chrome
+ * entry falls back to the CURRENT USER'S ROLE description" bug HEAL-069
+ * fixed for /emergency/* pages also affects the admin/governance/training
+ * console route trees -- confirmed live on /admin, /governance/registry,
+ * and /training (all showed generic "CareDroid" + the physician role's
+ * blurb instead of real page copy). Those 3 are now fixed directly above.
+ * Governance alone has ~26 further sub-routes (/audit, /security,
+ * /regulatory, /ai-governance, /human-review, /equity, /privacy,
+ * /integrations/*, /review, /operations/observability,
+ * /operations/incidents, /system-health, and their /* wildcard forms) that
+ * would each need their own hand-copied entry in the maps above to fix the
+ * same way -- instead of doing that, this consults
+ * GOVERNANCE_WORKSPACE_ROUTES directly (the SAME per-route `label` data
+ * `governanceConsoleRouteTree.tsx` already uses to build the route table),
+ * so every current and future governance workspace route gets a real
+ * title with zero further hand-maintenance. admin's and training's OTHER
+ * sub-routes (adminConsoleRoutes.ts, trainingConsoleRoutes.ts) and the
+ * tools/profile/public/operationsFleet console trees were not checked this
+ * round -- flagged in the master backlog (MB-L4) for a dedicated sweep
+ * rather than guessed at here.
+ */
+/** Exported for AppShell.pageChrome.test.tsx's registry-drift guard only. */
+export function resolveGovernanceWorkspaceLabel(pathname: string): string | null {
+  const exact = GOVERNANCE_WORKSPACE_ROUTES.find((route) => route.path === pathname);
+  if (exact) return exact.label;
+  const prefixed = GOVERNANCE_WORKSPACE_ROUTES.find(
+    (route) => route.path.endsWith('/*') && pathname.startsWith(route.path.slice(0, -1)),
+  );
+  return prefixed?.label ?? null;
+}
+
+const GOVERNANCE_WORKSPACE_SUBTITLE =
+  'Production readiness, policy state, release gates, and safety blockers for clinical AI operations.';
 
 export type AppShellProps = {
   children: ReactNode;
@@ -382,11 +424,13 @@ function AppShellFrame({ children }: AppShellProps) {
     const labelFromTitle = title?.includes(' - ')
       ? title.split(' - ').slice(1).join(' - ')
       : title;
+    const governanceLabel = resolveGovernanceWorkspaceLabel(location.pathname);
 
     return {
-      label: labelFromTitle || activeItem?.label || EMERGENCY_OS_BRANDING.productName,
+      label: labelFromTitle || governanceLabel || activeItem?.label || EMERGENCY_OS_BRANDING.productName,
       subtitle:
         EMERGENCY_OS_PAGE_SUBTITLES[location.pathname] ||
+        (governanceLabel && GOVERNANCE_WORKSPACE_SUBTITLE) ||
         (activeItem
           ? profileCopy.workspaceDescription || `Open ${activeItem.label} in CareDroid.`
           : profileCopy.workspaceDescription || EMERGENCY_OS_BRANDING.safetyLine),
