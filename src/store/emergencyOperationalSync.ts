@@ -19,6 +19,8 @@ import {
   LONG_WAIT_PHASE_RANK,
 } from '../utils/longWaitRescue';
 import { evaluateVitalsAlerts } from '../utils/vitalsAlertPipeline';
+import { calculateNews2FromVitals } from '../utils/news2';
+import { REASSESSMENT_REMINDER_WARNING_WINDOW_MS } from '../utils/reassessmentScheduler';
 import { applyWhiteboardAutomationToPatients } from '../services/whiteboardAutomationEngine';
 import { buildBottleneckRegistrySnapshot } from '../services/bottleneckRegistry';
 import {
@@ -566,7 +568,44 @@ export function buildAddVitalsPatch(
   const warningSummary = warningAlerts.map((alert) => `${alert.vital} ${alert.value}${alert.unit}`).join(', ');
   const criticalReason = criticalSummary ? `Critical vitals: ${criticalSummary}` : 'Critical vitals';
   const warningReason = warningSummary ? `Abnormal vitals: ${warningSummary}` : 'Abnormal vitals';
+  const news2 = calculateNews2FromVitals(nextVitals);
+
+  // Recording vitals IS the reassessment: any active reminder already due (or inside
+  // the warning window) is satisfied by this recheck and must not keep alerting.
+  const completionCutoffMs = new Date(timestamp).getTime() + REASSESSMENT_REMINDER_WARNING_WINDOW_MS;
+  const completedReminderIds = new Set(
+    (patient.reassessmentReminders || [])
+      .filter((reminder) => {
+        if (!ACTIVE_REASSESSMENT_REMINDER_STATUSES.has(reminder.status)) return false;
+        const dueMs = new Date(reminder.dueAt).getTime();
+        return Number.isFinite(dueMs) && dueMs <= completionCutoffMs;
+      })
+      .map((reminder) => reminder.id),
+  );
+
   const nextAlertRecords = [
+    ...(news2.response.alertSeverity
+      ? [
+          normalizeAlert(
+            {
+              id: `alert-news2-${patientId}-${timestamp}`,
+              type: 'Reassessment',
+              severity: news2.response.alertSeverity,
+              title: `NEWS2 ${news2.response.band} deterioration risk`,
+              message: `NEWS2 ${news2.total}: ${news2.response.recommendation}`,
+              patientId,
+              dismissed: false,
+              source: 'news2-auto-score',
+              metadata: {
+                score: news2.total,
+                band: news2.response.band,
+                hasSingleRed: news2.hasSingleRed,
+              },
+            },
+            new Date(timestamp),
+          ),
+        ]
+      : []),
     ...criticalAlerts.map((alert) =>
       normalizeAlert(
         {
@@ -604,7 +643,29 @@ export function buildAddVitalsPatch(
   ];
 
   const patients = updatePatients(state.patients, patientId, (current) => {
-    const existingFlagTypes = new Set(current.flags.map((flag) => getPatientFlagType(flag)));
+    // Completion semantics: a fresh vitals recheck resolves the outstanding
+    // "reassessment due" state (flag + satisfied reminders). The pipeline's own
+    // rules below immediately re-flag with a fresh reason when the NEW vitals
+    // are themselves concerning, so a genuine clinical concern is never erased —
+    // it is restated against current evidence instead of pinned to stale state.
+    const hadReassessmentDue = current.flags.some(
+      (flag) => getPatientFlagType(flag) === PatientFlag.ReassessmentDue,
+    );
+    const baseFlags = current.flags.filter(
+      (flag) => getPatientFlagType(flag) !== PatientFlag.ReassessmentDue,
+    );
+    const reassessmentReminders = (current.reassessmentReminders || []).map((reminder) =>
+      completedReminderIds.has(reminder.id)
+        ? {
+            ...reminder,
+            status: 'completed' as const,
+            completedBy: nextVitals.recordedBy,
+            completedAt: timestamp,
+          }
+        : reminder,
+    );
+
+    const existingFlagTypes = new Set(baseFlags.map((flag) => getPatientFlagType(flag)));
     const pipelineFlags: PatientFlagRecord[] = [];
     if (criticalAlerts.length) {
       if (!existingFlagTypes.has(PatientFlag.HighRisk)) {
@@ -625,16 +686,14 @@ export function buildAddVitalsPatch(
           }),
         );
       }
-      if (!existingFlagTypes.has(PatientFlag.ReassessmentDue)) {
-        pipelineFlags.push(
-          createPatientFlag(PatientFlag.ReassessmentDue, {
-            reason: criticalReason,
-            severity: 'Critical',
-            detectedAt: timestamp,
-          }),
-        );
-      }
-    } else if (warningAlerts.length && !existingFlagTypes.has(PatientFlag.ReassessmentDue)) {
+      pipelineFlags.push(
+        createPatientFlag(PatientFlag.ReassessmentDue, {
+          reason: criticalReason,
+          severity: 'Critical',
+          detectedAt: timestamp,
+        }),
+      );
+    } else if (warningAlerts.length) {
       pipelineFlags.push(
         createPatientFlag(PatientFlag.ReassessmentDue, {
           reason: warningReason,
@@ -642,7 +701,18 @@ export function buildAddVitalsPatch(
           detectedAt: timestamp,
         }),
       );
+    } else if (news2.total >= 5) {
+      pipelineFlags.push(
+        createPatientFlag(PatientFlag.ReassessmentDue, {
+          reason: `NEWS2 ${news2.total} (${news2.response.band}): repeat observations recommended`,
+          severity: news2.response.alertSeverity === 'Critical' ? 'Critical' : 'Warning',
+          detectedAt: timestamp,
+        }),
+      );
     }
+    const reassessmentDueResolved = hadReassessmentDue && !pipelineFlags.some(
+      (flag) => flag.type === PatientFlag.ReassessmentDue,
+    );
 
     const existingVitals = Array.isArray(current.vitals)
       ? current.vitals
@@ -655,13 +725,43 @@ export function buildAddVitalsPatch(
       vitals: [...existingVitals, nextVitals],
       vitalsUpdatedAt: timestamp,
       lastAssessedTime: timestamp,
-      flags: [...current.flags, ...pipelineFlags] as import('../types/emergency').PatientFlag[],
+      reassessmentReminders,
+      flags: [...baseFlags, ...pipelineFlags] as import('../types/emergency').PatientFlag[],
       vitalsAlerts: [...(current.vitalsAlerts || []), ...vitalsAlerts],
       timeline: [
         ...current.timeline,
         makeEvent(current.id, 'VitalsUpdated', 'Updated patient vitals.', timestamp, {
           staffId: nextVitals.recordedBy,
         }),
+        ...Array.from(completedReminderIds).map((reminderId) =>
+          makeEvent(
+            current.id,
+            'ReassessmentReminderCompleted',
+            'Reassessment reminder completed by vitals recheck.',
+            timestamp,
+            {
+              staffId: nextVitals.recordedBy,
+              metadata: { reminderId, completedBy: nextVitals.recordedBy || null },
+            },
+          ),
+        ),
+        ...(reassessmentDueResolved
+          ? [
+              makeEvent(
+                current.id,
+                'FlagRemoved',
+                `Removed ${PatientFlag.ReassessmentDue} flag.`,
+                timestamp,
+                {
+                  staffId: nextVitals.recordedBy,
+                  metadata: {
+                    flag: PatientFlag.ReassessmentDue,
+                    reason: 'Vitals recheck recorded; reassessment no longer outstanding.',
+                  },
+                },
+              ),
+            ]
+          : []),
         ...vitalsAlerts.map((alert) =>
           makeEvent(
             current.id,
@@ -683,9 +783,17 @@ export function buildAddVitalsPatch(
     };
   });
 
+  const settledAlerts = completedReminderIds.size
+    ? state.alerts.map((alert) =>
+        alert.reminderId && completedReminderIds.has(alert.reminderId) && !alert.dismissed
+          ? { ...alert, dismissed: true, dismissedAt: timestamp }
+          : alert,
+      )
+    : state.alerts;
+
   return {
     patients,
-    alerts: [...nextAlertRecords, ...state.alerts].sort(
+    alerts: [...nextAlertRecords, ...settledAlerts].sort(
       (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     ),
     ...(criticalAlerts.length || warningAlerts.length ? { activeQueueFilter: 'Reassessment' } : {}),

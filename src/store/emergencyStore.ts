@@ -3878,12 +3878,19 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
 
     removeFlag: (patientId, flag) =>
       set((state) => {
+        // Flags are stored both as bare strings and as PatientFlagRecord objects
+        // (createPatientFlag adds reason/severity metadata) — match on flag TYPE so
+        // record-style flags are removable too, not only string entries.
         const patients = state.patients.map((patient) =>
           patient.id === patientId
             ? {
                 ...patient,
-                flags: patient.flags.filter((existingFlag) => existingFlag !== flag),
-                timeline: patient.flags.includes(flag)
+                flags: patient.flags.filter(
+                  (existingFlag) => getPatientFlagType(existingFlag) !== getPatientFlagType(flag),
+                ),
+                timeline: patient.flags.some(
+                  (existingFlag) => getPatientFlagType(existingFlag) === getPatientFlagType(flag),
+                )
                   ? [
                       ...patient.timeline,
                       createPatientTimelineEvent(patient, 'FlagRemoved', `Removed ${flag} flag.`, {
@@ -3913,83 +3920,17 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
 
     addVitals: (patientId, vitals) =>
       set((state) => {
+        // Single canonical vitals-recording path (buildAddVitalsPatch): vitals append,
+        // vitals alerts, NEWS2 auto-score, reassessment completion (flag + reminders),
+        // and re-flagging when the new vitals themselves warrant it.
         const pipelinePatch = buildAddVitalsPatch(state, patientId, vitals);
-        if (pipelinePatch?.patients) {
-          const patients = pipelinePatch.patients;
-          return {
-            ...pipelinePatch,
-            ...applyCapacityPatch(state, buildCapacitySnapshot(patients, state.rooms)),
-            auditLog: appendAuditLog(state.auditLog, {
-              action: 'addVitals',
-              patientId,
-              staffId:
-                vitals.recordedBy ||
-                state.patients.find((patient) => patient.id === patientId)?.assignedStaffId ||
-                'system',
-              details: { recordedAt: vitals.recordedAt || null, pipeline: true },
-            }),
-          };
-        }
+        if (!pipelinePatch?.patients) return {};
 
         const news2 = calculateNews2FromVitals(vitals);
-        const shouldFlagForReassessment = news2.total >= 5;
-        const news2Alert: Alert | null = news2.response.alertSeverity
-          ? {
-              id: createId('alert'),
-              type: 'Reassessment',
-              severity: news2.response.alertSeverity,
-              title: `NEWS2 ${news2.response.band} deterioration risk`,
-              message: `NEWS2 ${news2.total}: ${news2.response.recommendation}`,
-              patientId,
-              createdAt: vitals.recordedAt || new Date().toISOString(),
-              dismissed: false,
-              source: 'news2-auto-score',
-              metadata: {
-                score: news2.total,
-                band: news2.response.band,
-                hasSingleRed: news2.hasSingleRed,
-              },
-            }
-          : null;
-        const patients = state.patients.map((patient) => {
-          if (patient.id !== patientId) return patient;
-          const flags =
-            shouldFlagForReassessment && !patient.flags.includes(PatientFlag.ReassessmentDue)
-              ? [...patient.flags, PatientFlag.ReassessmentDue]
-              : patient.flags;
-          return {
-            ...patient,
-            flags,
-            vitals: [...patient.vitals, vitals],
-            timeline: [
-              ...patient.timeline,
-              createPatientTimelineEvent(
-                patient,
-                'VitalsUpdated',
-                'Vitals reassessment recorded.',
-                {
-                  timestamp: vitals.recordedAt,
-                  staffId: vitals.recordedBy,
-                  metadata: {
-                    hr: vitals.hr,
-                    sbp: vitals.sbp,
-                    dbp: vitals.dbp,
-                    spo2: vitals.spo2,
-                    temp: vitals.temp,
-                    rr: vitals.rr,
-                    gcs: vitals.gcs,
-                    pain: vitals.pain,
-                    news2: news2.total,
-                  },
-                },
-              ),
-            ],
-          };
-        });
+        const patients = pipelinePatch.patients;
         return {
-          patients,
+          ...pipelinePatch,
           ...applyCapacityPatch(state, buildCapacitySnapshot(patients, state.rooms)),
-          alerts: news2Alert ? mergeEmergencyAlerts([news2Alert], state.alerts) : state.alerts,
           auditLog: appendAuditLog(state.auditLog, {
             action: 'addVitals',
             patientId,
@@ -3997,11 +3938,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
               vitals.recordedBy ||
               state.patients.find((patient) => patient.id === patientId)?.assignedStaffId ||
               'system',
-            details: {
-              recordedAt: vitals.recordedAt || null,
-              news2: news2.total,
-              reassessmentFlagAdded: shouldFlagForReassessment,
-            },
+            details: { recordedAt: vitals.recordedAt || null, news2: news2.total, pipeline: true },
           }),
           workflowLogs: appendWorkflowLogs(state.workflowLogs, [
             {

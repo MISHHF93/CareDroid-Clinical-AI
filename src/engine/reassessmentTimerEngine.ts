@@ -324,19 +324,30 @@ export function deriveReassessmentSchedule(
   ).toISOString();
 
   if (patient.state === PatientState.Waiting) {
-    const waitAnchor = patient.arrivalTime;
-    const waitDue = new Date(
-      new Date(waitAnchor).getTime() + resolved.waitTimeWarningMin * 60000,
-    ).toISOString();
-    if (new Date(waitDue).getTime() < new Date(dueAt).getTime()) {
-      return {
-        dueAt: waitDue,
-        overdueAt: new Date(
-          new Date(waitDue).getTime() + REASSESSMENT_REMINDER_OVERDUE_MS,
-        ).toISOString(),
-        source: 'wait-threshold',
-        intervalMinutes: resolved.waitTimeWarningMin,
-      };
+    // The wait-threshold guarantee is "no waiting patient goes more than
+    // waitTimeWarningMin without staff contact" — so it re-anchors on the most
+    // recent recheck (completed reassessment or fresh vitals), not permanently
+    // on arrival. Anchoring on arrival alone left every waiting patient past
+    // arrival+threshold flagged overdue forever, even seconds after a recheck.
+    const lastRecheck = deriveLastReassessmentTime(patient) || deriveLastVitalsTime(patient);
+    const arrivalMs = new Date(patient.arrivalTime).getTime();
+    const lastRecheckMs = lastRecheck ? new Date(lastRecheck).getTime() : Number.NaN;
+    const waitAnchorMs = Math.max(
+      Number.isFinite(arrivalMs) ? arrivalMs : Number.NEGATIVE_INFINITY,
+      Number.isFinite(lastRecheckMs) ? lastRecheckMs : Number.NEGATIVE_INFINITY,
+    );
+    if (Number.isFinite(waitAnchorMs)) {
+      const waitDue = new Date(waitAnchorMs + resolved.waitTimeWarningMin * 60000).toISOString();
+      if (new Date(waitDue).getTime() < new Date(dueAt).getTime()) {
+        return {
+          dueAt: waitDue,
+          overdueAt: new Date(
+            new Date(waitDue).getTime() + REASSESSMENT_REMINDER_OVERDUE_MS,
+          ).toISOString(),
+          source: 'wait-threshold',
+          intervalMinutes: resolved.waitTimeWarningMin,
+        };
+      }
     }
   }
 

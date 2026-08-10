@@ -109,7 +109,12 @@ describe('reassessmentTimerEngine', () => {
       { now },
     );
 
-    expect(timers.map((timer) => timer.patientId)).toEqual(['c', 'a']);
+    // Both waiting patients are overdue. 'a' ranks first: its explicit scheduled
+    // reminder was due 09:10 (50m overdue) while 'c' is interval-due at 09:15
+    // (45m overdue) — the wait-threshold anchors on the 08:45 recheck, not on
+    // arrival, so time already spent with staff doesn't inflate overdue rank.
+    expect(timers.map((timer) => timer.patientId)).toEqual(['a', 'c']);
+    expect(timers.every((timer) => timer.isOverdue)).toBe(true);
   });
 
   it('creates notification center alerts for due and overdue timers', () => {
