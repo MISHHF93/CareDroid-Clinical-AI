@@ -9,7 +9,7 @@
 4. Statuses use the established vocabularies only — ledger statuses (`VALIDATED`, `CONFIRMED`, `IN_PROGRESS`, `BLOCKED`, `WONT_FIX_WITH_REASON`, `SUPERSEDED`) and workflow statuses (`FULLY_WIRED`, `PARTIALLY_WIRED`, `FRONTEND_ONLY`, `BACKEND_ONLY`, `FIXTURE_ONLY`, `DUPLICATE`, `LEGACY`, `MISSING`, `NEEDS_VERIFICATION`, `BLOCKED_EXTERNAL`, `MANUAL_REVIEW`, `FUTURE_MODULE`). Priorities P0–P3 per the ledger's severity legend.
 5. A row marked done must cite its evidence (HEAL id, commit, or ledger section) — no unevidenced check-offs, per the campaign's own scoring discipline.
 
-**Last updated**: 2026-08-10 · HEAD `18c2b1ef` · Campaign state: 60 HEAL fixes (59 validated, 1 confirmed-not-fixed pending human decision), score 731/1000.
+**Last updated**: 2026-08-10 · HEAD `2b727a78` · Campaign state: 61 HEAL fixes (60 validated, 1 confirmed-not-fixed pending human decision), score 731/1000.
 
 ---
 
@@ -127,7 +127,7 @@ The FSM backbone (`src/engine/journeyEngine.ts` `VALID_TRANSITIONS`) + step mode
 | ID | Item | Status | Ref |
 |----|------|--------|-----|
 | MB-D1 | ONE AI orchestration path (Copilot → `ChatService.processMessage` pipeline) | `VALIDATED` | Converged 2026-08-08 |
-| MB-D2 | Provenance truth-labels on every AI surface (~18–20 of original 38 remain) | `IN_PROGRESS` — rotate search signals (imports / on-screen copy / vocabulary) | Rounds 34–35 recipes |
+| MB-D2 | Provenance truth-labels on every AI surface (~17–19 of original 38 remain) | `IN_PROGRESS` — rotate search signals (imports / on-screen copy / vocabulary / bare-% without provenance) | Rounds 34–35 recipes, HEAL-061 |
 | MB-D3 | Model/tool registry — 2 real trained models (NLU 1.00/n=51; artifact-router 0.947/n=282) documented | `VALIDATED` as inventory | `AI_CONFIGURATION_MAP.md` |
 | MB-D4 | RAG pipeline live + correct embedding model (`RAG_MODEL` env fix landed 2026-07-15) | `NEEDS_VERIFICATION` — re-confirm env fix still deployed | RAG audit memory |
 | MB-D5 | LLM transport timeout (D1 from RAG audit) | `NEEDS_VERIFICATION` — may be stale claim; trace before trusting | 2026-07-15 audit |

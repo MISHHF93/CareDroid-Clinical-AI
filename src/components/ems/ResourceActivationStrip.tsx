@@ -1,4 +1,5 @@
 import { deriveResourceActivations } from '../../services/resourceActivation';
+import { AiTruthLabel, resourceActivationTruthLabel } from '../ai/AiTruthLabel';
 import type { EMSArrival, Patient } from '../../types/emergency';
 import './ResourceActivationStrip.css';
 
@@ -34,6 +35,7 @@ export default function ResourceActivationStrip({
       aria-label="Recommended resource activations"
     >
       <span className="resource-activation-strip__label">Resource activation</span>
+      <AiTruthLabel {...resourceActivationTruthLabel()} compact />
       <ul>
         {activations.map((entry) => (
           <li

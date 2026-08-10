@@ -275,6 +275,28 @@ export function fromAIResponseSourceCategory(
   };
 }
 
+/**
+ * src/services/resourceActivation.ts's deriveResourceActivations() (rendered
+ * by ems/ResourceActivationStrip.tsx, mounted in EMSPipeline.tsx's inbound-
+ * arrival row details) computes "NN% confidence" resource-activation
+ * recommendations (STEMI/stroke/trauma/OB/sepsis) purely from regex matches
+ * against pre-arrival complaint text, with a fixed hand-authored confidence
+ * constant per rule branch (e.g. 0.95 for a confirmed STEMI checklist entry,
+ * 0.82 for a text-pattern match) -- zero model call, zero native-ai import,
+ * anywhere in the file. Same AI_CONFIGURATION_MAP.md finding as every other
+ * helper in this file: the bare "% confidence" framing reads as probabilistic
+ * model output to EMS/charge-nurse staff, but every value is a fixed literal
+ * chosen when the rule was written, not computed by any model.
+ */
+export function resourceActivationTruthLabel(): AiTruthLabelInfo {
+  return {
+    state: 'Manual',
+    sourceContext:
+      'EMS resource-activation rules — regex complaint matching with fixed per-rule confidence values, not a trained model',
+    reviewRequired: true,
+  };
+}
+
 export type AiTruthLabelProps = AiTruthLabelInfo & {
   compact?: boolean;
   className?: string;
