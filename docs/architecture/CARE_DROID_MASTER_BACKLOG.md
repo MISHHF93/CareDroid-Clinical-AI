@@ -9,7 +9,7 @@
 4. Statuses use the established vocabularies only — ledger statuses (`VALIDATED`, `CONFIRMED`, `IN_PROGRESS`, `BLOCKED`, `WONT_FIX_WITH_REASON`, `SUPERSEDED`) and workflow statuses (`FULLY_WIRED`, `PARTIALLY_WIRED`, `FRONTEND_ONLY`, `BACKEND_ONLY`, `FIXTURE_ONLY`, `DUPLICATE`, `LEGACY`, `MISSING`, `NEEDS_VERIFICATION`, `BLOCKED_EXTERNAL`, `MANUAL_REVIEW`, `FUTURE_MODULE`). Priorities P0–P3 per the ledger's severity legend.
 5. A row marked done must cite its evidence (HEAL id, commit, or ledger section) — no unevidenced check-offs, per the campaign's own scoring discipline.
 
-**Last updated**: 2026-08-10 · HEAD (this commit) · Campaign state: 72 HEAL fixes (69 validated or partially-fixed-with-evidence, 3 confirmed-not-fixed pending dedicated round — MB-P0-4/HEAL-070 patients-render hang, plus MB-P0-1/2 human-decision blocks). MB-P0-5/HEAL-072 downgraded from "not fixed" to "2 of 3 causes fixed" (request fan-out staggered; unbounded `workflowLogs` capped at all 4 write sites) — 1 cause remains (a likely duplicate-refire pattern). Score 731/1000 (unchanged this round — no scorecard-domain re-scoring performed).
+**Last updated**: 2026-08-10 · HEAD `1dea9472` · Campaign state: 72 HEAL fixes (69 validated or partially-fixed-with-evidence, 3 confirmed-not-fixed pending dedicated round — MB-P0-4/HEAL-070 patients-render hang, plus MB-P0-1/2 human-decision blocks). MB-P0-5/HEAL-072 downgraded from "not fixed" to "2 of 3 causes fixed" (request fan-out staggered; unbounded `workflowLogs` capped at all 4 write sites) — 1 cause remains (a likely duplicate-refire pattern). Score 731/1000 (unchanged this round — no scorecard-domain re-scoring performed).
 
 ---
 
