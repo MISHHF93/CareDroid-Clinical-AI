@@ -9,7 +9,7 @@
 4. Statuses use the established vocabularies only — ledger statuses (`VALIDATED`, `CONFIRMED`, `IN_PROGRESS`, `BLOCKED`, `WONT_FIX_WITH_REASON`, `SUPERSEDED`) and workflow statuses (`FULLY_WIRED`, `PARTIALLY_WIRED`, `FRONTEND_ONLY`, `BACKEND_ONLY`, `FIXTURE_ONLY`, `DUPLICATE`, `LEGACY`, `MISSING`, `NEEDS_VERIFICATION`, `BLOCKED_EXTERNAL`, `MANUAL_REVIEW`, `FUTURE_MODULE`). Priorities P0–P3 per the ledger's severity legend.
 5. A row marked done must cite its evidence (HEAL id, commit, or ledger section) — no unevidenced check-offs, per the campaign's own scoring discipline.
 
-**Last updated**: 2026-08-10 · HEAD `8a2bd01b` · Campaign state: 54 HEAL fixes validated, score 731/1000.
+**Last updated**: 2026-08-10 · HEAD `c89e8eaa` · Campaign state: 57 HEAL fixes validated, score 731/1000.
 
 ---
 
@@ -28,8 +28,8 @@
 |----|------|--------|----------------|
 | MB-A1 | ONE repository / frontend / backend — no hidden competing runtimes | `VALIDATED` (re-verified 4+ times; re-check on drift) | Ledger "one repository" entries; memory |
 | MB-A2 | ONE AppShell — no duplicate shells | `VALIDATED` (2 thin re-export wrappers confirmed harmless) | EPIC-A "duplicate AppShells" |
-| MB-A3 | ONE route/navigation architecture — consolidate `ROUTE_RECORDS` vs `CANONICAL_ROUTE_MAP` | `CONFIRMED`, open — top code-closable architecture item | HEAL-045 (investigation notes banked: derived alias exports are audit/test-layer only; live router independent) |
-| MB-A4 | ROUTE_RECORDS phantom-page cluster (~7 `status:'active'` entries with nonexistent components) | `CONFIRMED`, open (doc-layer noise; watch for new live links) | Next steps #6 |
+| MB-A3 | ONE route/navigation architecture — consolidate `ROUTE_RECORDS` vs `CANONICAL_ROUTE_MAP` | `IN_PROGRESS` — drift class now regression-guarded + 23 entries corrected (HEAL-057); remaining: full consolidation (derive or migrate 8 consumers) + verify `/tenant-admin` canonical-map registration gap | HEAL-045, HEAL-057 |
+| MB-A4 | ROUTE_RECORDS phantom-page cluster | `VALIDATED` — all 21 phantom-active entries (incl. 2 newly found) flipped to honest `future`; drift guard prevents recurrence | HEAL-057 |
 | MB-A5 | ONE `/api/emergency/*` API surface — shallow TypeORM tier always-on, deep Mongoose tier gated | `PARTIALLY_WIRED` by design — needs the standing "unify or bless the gate" decision | EPIC-A Express/Mongoose category; ADR-0002 |
 | MB-A6 | Governed quarantine structure (`archive/quarantine/`) for uncertain historical code | `MISSING` — never built; only needed when a MANUAL_REVIEW deletion is approved | Convergence brief |
 | MB-A7 | `lib/ai` vs `src/lib/ai` duplicated AI client layer (deliberate credential isolation, real consolidation candidate) | `MANUAL_REVIEW` — flagged, not single-round-safe | EPIC-A "alternate API clients" |
