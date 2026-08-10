@@ -200,7 +200,7 @@ The FSM backbone (`src/engine/journeyEngine.ts` `VALID_TRANSITIONS`) + step mode
 | MB-J4 | Hand-maintained mirror registries → generated from source (route inventory, nav baselines, page counts) | `CONFIRMED`, open — structural fragility, 4 stale artifacts from one commit | Infra note recommendation |
 | MB-J5 | Docker compose smoke test | `BLOCKED` — no Docker in environment | HEAL-014 |
 | MB-J6 | Body-validation + calculator-equivalence + chrome + propagation-chain regression guards | `VALIDATED`, permanent | Various |
-| MB-J7 | Continuous performance healing — frontend + backend processing pipelines made measurably faster without compromising clinical safety/data integrity; every healing round adds a read-the-actual-code performance lens (research-informed: bundle analysis, render/re-render profiling, backend hot paths, query batching) | `MISSING` — new directive demand (2026-08-10); needs a first evidence-based profiling pass to seed concrete rows | Workflows brief + user 2026-08-10 |
+| MB-J7 | Continuous performance healing — frontend + backend pipelines measurably faster without compromising clinical safety/data integrity; read-the-actual-code lens every round | `IN_PROGRESS` — first fix landed (HEAL-056: hot-path console object retention in alert lifecycle gated to dev; ReferralPanel render churn fixed earlier); seeded next targets: repo-wide production console sweep, bundle analysis of heaviest lazy chunks (analytics graph measured 7s cold transform), `updateAlerts` recompute frequency audit, backend N+1/hot-path pass | HEAL-056 |
 
 ## K. Production readiness (newest directive — mostly discovery-stage)
 

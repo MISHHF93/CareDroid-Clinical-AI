@@ -95,7 +95,12 @@ function recordLifecycleAudit(
   if (lifecycleAuditTrail.length > 500) {
     lifecycleAuditTrail.length = 500;
   }
-  if (typeof console !== 'undefined') {
+  // Dev-only diagnostics: the durable record is lifecycleAuditTrail above (and
+  // the store's own audit log). An unconditional console.info here fired on
+  // EVERY lifecycle action from updateAlerts' hot path — and browsers retain
+  // every object passed to console, so a 24/7 wallboard deployment accumulated
+  // thousands of un-collectable event objects per hour plus formatting cost.
+  if (import.meta.env?.DEV && typeof console !== 'undefined') {
     console.info('[ALERT_LIFECYCLE]', event);
   }
   return event;

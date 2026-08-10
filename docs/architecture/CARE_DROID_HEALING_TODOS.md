@@ -19,6 +19,15 @@
 
 ## VALIDATED (this campaign, most recent first)
 
+### HEAL-056 — First performance-healing fix (MB-J7): the alert-lifecycle orchestrator's unconditional `console.info` on EVERY lifecycle event retained un-collectable objects in browser console memory and paid formatting cost in `updateAlerts`' hot path — now dev-only
+
+- **Severity**: P2_MEDIUM (real, continuous production cost on a 24/7 wallboard/kiosk deployment: browsers retain every object passed to console, so `recordLifecycleEvent`'s per-event `console.info('[ALERT_LIFECYCLE]', event)` — fired from `updateAlerts` after most store mutations plus the 30s interval loops — accumulated thousands of un-GC-able event objects per hour, plus per-call formatting; empirically visible as continuous log flood in this session's own test-run output)
+- **Domain**: Performance healing (new MB-J7 directive: "read the actual code first, then optimize without compromising safety") — the durable audit record was never the console: `lifecycleAuditTrail` (capped 500) and the store's own audit log are untouched
+- **Fix**: `src/services/alertLifecycleOrchestrator.ts` — the console diagnostic is now gated on `import.meta.env?.DEV`; dev/vitest behavior unchanged (the existing test asserting the console call still passes because vitest runs DEV), production builds drop it. Verified: `emergencyStore.ts` itself has zero unconditional `console.log/info/debug` (grep) — the orchestrator was the one hot-path offender.
+- **Validation**: `npx vitest run src/services/alertLifecycleOrchestrator.test.ts src/store/reassessmentCompletionChain.test.ts` — 16/16; frontend `tsc` + ESLint clean.
+- **Current status**: `VALIDATED`. MB-J7 row seeded with the next evidence-based targets (production console sweep repo-wide, bundle analysis of the heaviest lazy chunks — the analytics graph measured a 7s cold transform this session, `updateAlerts` recompute-frequency audit, backend hot-path/N+1 pass).
+- **Commit when resolved**: (this commit)
+
 ### HEAL-055 — Production-posture startup diagnostics: `validateEnvironmentConfig` now fails the boot for three dangerous demo/tenant flag combinations in production; MB-K1/K2 discovery mapped the real auth/demo architecture
 
 - **Severity**: P1_HIGH preventive (no live exploit today — these flags default safe — but each combination, if ever set in a production deployment, is severe: disabled tenant isolation is a cross-tenant PHI boundary removal; a lone dev-auth bypass flag is a contradictory auth posture; a simulated health status fabricates the SaaS health report)
