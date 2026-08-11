@@ -136,3 +136,70 @@ describe('ReferralService persistence', () => {
     ).not.toThrow();
   });
 });
+
+describe('ReferralService realtime broadcast (MB-P0-6 follow-up)', () => {
+  // Before this fix, ReferralService had no EmergencyRealtimeService at all --
+  // neither createReferral nor updateReferralStatus ever reached another
+  // tab/user, only whichever tab made the call (and that tab's own optimistic
+  // local state, not a real backend-originated event). Matches this session's
+  // now-established pattern for patient mutations (HEAL-089/090/092/093).
+  it('broadcasts referral_created with the new referral wrapped as {referral: ...}', async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [WorkflowActionLogService, EmergencyPatientService, ReferralService],
+    }).compile();
+    const service = module.get<ReferralService>(ReferralService);
+    // No EmergencyRealtimeService provider is registered above (it's
+    // @Optional() and this minimal test module mirrors referral-persistence
+    // .spec.ts's own established pattern) -- inject a mock directly onto the
+    // instance to observe what createReferral would really publish once a
+    // real EmergencyRealtimeService IS wired in production.
+    const publish = jest.fn();
+    const publishBoardMutations = jest.fn();
+    (service as unknown as { realtimeService: unknown }).realtimeService = {
+      publish,
+      publishBoardMutations,
+    };
+
+    const result = service.createReferral({
+      patientId: 'patient-broadcast-1',
+      requestingStaffId: 'staff-1',
+      targetDepartment: 'Cardiology',
+      reason: 'Chest pain workup',
+    });
+
+    expect(publish).toHaveBeenCalledWith({
+      type: 'referral_created',
+      payload: { referral: result.data.referral },
+    });
+    expect(publishBoardMutations).toHaveBeenCalledTimes(1);
+  });
+
+  it('broadcasts referral_status_changed with the updated referral wrapped as {referral: ...}', async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [WorkflowActionLogService, EmergencyPatientService, ReferralService],
+    }).compile();
+    const service = module.get<ReferralService>(ReferralService);
+    const createResult = service.createReferral({
+      patientId: 'patient-broadcast-2',
+      requestingStaffId: 'staff-1',
+      targetDepartment: 'Psychiatry',
+      reason: 'Behavioral health consult',
+    });
+    const referralId = (createResult.data.referral as { id: string }).id;
+
+    const publish = jest.fn();
+    const publishBoardMutations = jest.fn();
+    (service as unknown as { realtimeService: unknown }).realtimeService = {
+      publish,
+      publishBoardMutations,
+    };
+
+    const result = service.updateReferralStatus(referralId, 'Accepted');
+
+    expect(publish).toHaveBeenCalledWith({
+      type: 'referral_status_changed',
+      payload: { referral: result.data.referral },
+    });
+    expect(publishBoardMutations).toHaveBeenCalledTimes(1);
+  });
+});

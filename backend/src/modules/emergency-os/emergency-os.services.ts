@@ -2387,6 +2387,7 @@ export class ReferralService implements OnModuleInit {
     @Optional()
     @InjectRepository(ReferralEntity)
     private readonly referralRepository?: Repository<ReferralEntity>,
+    @Optional() private readonly realtimeService?: EmergencyRealtimeService,
   ) {}
 
   private readonly createdReferrals: Array<Record<string, unknown>> = [];
@@ -2505,6 +2506,14 @@ export class ReferralService implements OnModuleInit {
 
     this.createdReferrals.push(referral);
     this.persistReferralToDatabase(referral);
+    // ReferralService had no realtime wiring at all before this -- neither
+    // creation nor status changes ever reached another tab/user, only
+    // whichever tab made the call (and only via that tab's own
+    // self-dispatched local event, not a real backend broadcast). Matches
+    // the same event-type vocabulary the frontend's local-only
+    // createReferral action already uses for its workflow-log entry.
+    this.realtimeService?.publish({ type: 'referral_created', payload: { referral } });
+    this.realtimeService?.publishBoardMutations();
 
     return envelope('Referral Created', {
       referral,
@@ -2523,6 +2532,8 @@ export class ReferralService implements OnModuleInit {
     referral.status = status;
     referral.statusUpdatedAt = new Date().toISOString();
     this.persistReferralToDatabase(referral);
+    this.realtimeService?.publish({ type: 'referral_status_changed', payload: { referral } });
+    this.realtimeService?.publishBoardMutations();
 
     return envelope('Referral Status Updated', {
       referral,

@@ -4842,6 +4842,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
           'reassessment_created',
           'reassessment_completed',
           'referral_created',
+          'referral_status_changed',
         ].includes(type)
       ) {
         const workflowLog = normalizeWorkflowLog({ ...asRecord(payload), type });

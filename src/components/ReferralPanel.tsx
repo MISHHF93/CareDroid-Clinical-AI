@@ -482,21 +482,30 @@ export default function ReferralPanel() {
       return;
     }
     updateReferralStatus(referralId, status, responseNote);
-    if (['TransferRequested', 'TransportArranged', 'PatientDeparted'].includes(status)) {
-      setBackendPending(true);
-      updateEmergencyTransferWorkflow(referralId, status)
-        .then((result) => {
-          setBackendStatus(
-            result.ok
-              ? 'Transfer workflow synced to CareDroid.'
-              : 'Transfer updated for this shift. Live sync is pending.'
-          );
-        })
-        .catch(() => {
-          setBackendStatus('Transfer updated for this shift. Live sync is pending.');
-        })
-        .finally(() => setBackendPending(false));
-    }
+    // Was gated to only the 3 transfer-specific statuses, so a general
+    // referral's status change (Sent -> Accepted/Declined, etc.) never
+    // reached the backend at all -- the backend route (PATCH
+    // emergency/transfers/:id/status -> ReferralService.updateReferralStatus)
+    // is workflow-agnostic and already accepts any referral id/status; the
+    // frontend's own restriction here was incomplete, not intentional. A
+    // synthetic patient-derived referral (never created via a real POST) will
+    // 404 gracefully via guardedJson's existing ok:false handling below --
+    // same degrade-quietly behavior the transfer case already relied on.
+    setBackendPending(true);
+    updateEmergencyTransferWorkflow(referralId, status)
+      .then((result) => {
+        setBackendStatus(
+          result.ok
+            ? `${isTransfer ? 'Transfer workflow' : 'Referral status'} synced to CareDroid.`
+            : `${isTransfer ? 'Transfer' : 'Referral'} updated for this shift. Live sync is pending.`
+        );
+      })
+      .catch(() => {
+        setBackendStatus(
+          `${isTransfer ? 'Transfer' : 'Referral'} updated for this shift. Live sync is pending.`
+        );
+      })
+      .finally(() => setBackendPending(false));
     setResponseNotes((current) => ({ ...current, [referralId]: '' }));
   };
 

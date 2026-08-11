@@ -310,6 +310,41 @@ describe('CareDroid store shim', () => {
     expect(synced?.flags).toEqual(expect.arrayContaining(['HighRisk', 'DeteriorationRisk', 'ReassessmentDue']));
   });
 
+  it('applies a referral_status_changed realtime event (cross-tab referral sync) using its referral-wrapped payload', () => {
+    const store = useEmergencyStore.getState();
+    const existingReferral = store.referrals[0];
+
+    const referral = existingReferral
+      ? { ...existingReferral, status: 'Accepted' }
+      : {
+          id: 'realtime-referral-status-test',
+          patientId: store.patients[0]?.id || 'pt-realtime-referral',
+          targetDepartment: 'Cardiology',
+          service: 'Cardiology',
+          urgency: 'Emergent',
+          reason: 'Realtime referral status sync test.',
+          clinicalSummary: 'Realtime referral status sync test.',
+          status: 'Accepted',
+          workflow: 'Referral',
+          requestedAt: '2026-08-11T00:00:00.000Z',
+          createdAt: '2026-08-11T00:00:00.000Z',
+        };
+
+    // ReferralService.updateReferralStatus's broadcast wraps the updated
+    // referral as `{ referral: updated }`, matching createReferral's own
+    // `referral_created` broadcast shape -- both flow through
+    // buildRealtimeHydrationPayload's extractReferrals `.referral` fallback.
+    store.dispatchWebSocketEvent({
+      type: 'referral_status_changed',
+      payload: { referral },
+    });
+
+    const next = useEmergencyStore.getState();
+    expect(next.referrals.find((candidate) => candidate.id === referral.id)).toEqual(
+      expect.objectContaining({ status: 'Accepted' }),
+    );
+  });
+
   it('handles intake_handoff_complete websocket by selecting patient and triage queue filter', () => {
     const store = useEmergencyStore.getState();
     const patientId = store.patients[0]?.id;
