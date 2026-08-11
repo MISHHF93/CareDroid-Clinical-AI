@@ -241,6 +241,26 @@
   padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px));
 }
 
+/* Reserve clearance for the fixed-position .ed-copilot-launch button (bottom:
+   16px, ~40px tall) so it never sits on top of bottom-anchored page content
+   like a form's primary submit button. margin-bottom (not padding) shrinks
+   this flex item's own rendered box, so the reserved zone is excluded from
+   what's visible without scrolling -- padding-bottom on an overflow:auto
+   container only becomes visible once the user scrolls to the content end,
+   which does nothing for content that already renders inside the initial
+   viewport. */
+.app-shell-main-content--copilot-launcher {
+  margin-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+}
+
+/* Both modifiers present (mobile viewport with Copilot access): the compound
+   selector's higher specificity wins over either rule alone, so this always
+   applies regardless of declaration order, clearing the taller of the two. */
+.app-shell-main-content--mobile-nav.app-shell-main-content--copilot-launcher {
+  padding-bottom: 0;
+  margin-bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+}
+
 .app-shell-main-content:focus {
   outline: none;
 }

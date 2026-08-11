@@ -441,6 +441,11 @@ function AppShellFrame({ children }: AppShellProps) {
   );
   const { active: simulationModeActive } = useSimulationMode();
   const { canUseCopilot, showSessionCopilot, hiddenOnReception } = useCopilotChromeAccess();
+  // The floating launcher is fixed-position and always sits in the bottom-right
+  // corner, so any scroll container's bottom content needs reserved clearance
+  // for it (matches the mobile-nav padding-bottom pattern below).
+  const showCopilotLauncher =
+    canUseCopilot && !useKioskShell && !hiddenOnReception && !copilotOpen && !showSessionCopilot;
   const { saasRole, profileCopy } = useEffectiveUserProfile();
   const copilotChrome = useMemo(() => resolveCopilotChromeLabels(profileCopy), [profileCopy]);
   const profileNavigate = useCallback(
@@ -1078,6 +1083,7 @@ function AppShellFrame({ children }: AppShellProps) {
             className={[
               'app-shell-main-content',
               isMobileViewport ? 'app-shell-main-content--mobile-nav' : '',
+              showCopilotLauncher ? 'app-shell-main-content--copilot-launcher' : '',
             ]
               .filter(Boolean)
               .join(' ')}
@@ -1122,7 +1128,7 @@ function AppShellFrame({ children }: AppShellProps) {
           </Suspense>
         </ErrorBoundary>
       ) : null}
-      {canUseCopilot && !useKioskShell && !hiddenOnReception && !copilotOpen && !showSessionCopilot ? (
+      {showCopilotLauncher ? (
         <button
           type="button"
           className="ed-copilot-launch"
