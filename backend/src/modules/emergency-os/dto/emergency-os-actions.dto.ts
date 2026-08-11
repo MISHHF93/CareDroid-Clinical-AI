@@ -5,6 +5,7 @@ import {
   IsBoolean,
   IsDefined,
   IsIn,
+  IsNotEmpty,
   IsNumber,
   IsObject,
   IsOptional,
@@ -176,6 +177,16 @@ export class PatchEmergencyPatientDto {
   state?: EmergencyPatientState;
   @IsOptional() @IsString() @MaxLength(96) staffId?: string;
   @IsOptional() @IsString() @MaxLength(2000) note?: string;
+}
+
+/**
+ * Staff-assignment is a distinct domain command, not a generic field patch --
+ * it produces its own workflow-log entry (EmergencyPatientService.
+ * assignStaffToPatient) that PatchEmergencyPatientDto's route does not.
+ */
+export class AssignPatientStaffDto {
+  @IsString() @IsNotEmpty() @MaxLength(96) staffId!: string;
+  @IsOptional() @IsString() @MaxLength(96) actorStaffId?: string;
 }
 
 export class PatchEmsArrivalStatusDto {

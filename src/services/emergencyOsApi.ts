@@ -201,6 +201,25 @@ export const patchEmergencyPatient = (patientId: string, payload: Record<string,
     method: 'PATCH',
     body: JSON.stringify(payload),
   });
+/**
+ * Durable staff-assignment persistence (MB-P0-6 follow-up), matching
+ * patchEmergencyPatient's fire-and-forget precedent -- the local optimistic
+ * assignment stays authoritative for immediate UI responsiveness; this call
+ * is what makes it survive a reload or reach a different workstation instead
+ * of silently staying assigned only on the backend's own patient copy.
+ */
+export const assignEmergencyPatientStaff = (
+  patientId: string,
+  staffId: string,
+  actorStaffId?: string,
+) =>
+  requestEmergencyJson(
+    `${EMERGENCY_OS_API_ENDPOINTS.patients}/${encodeURIComponent(patientId)}/staff`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify({ staffId, actorStaffId }),
+    },
+  );
 export const fetchPatientJourney = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.journey);
 export const fetchEMSIntake = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.ems);
 export const postEmsHandoff = (payload) =>

@@ -73,6 +73,7 @@ import {
   postReceptionEscalation,
   patchEmsArrivalStatus,
   patchEmergencyPatient,
+  assignEmergencyPatientStaff,
 } from '../services/emergencyOsApi';
 import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
 import { apiFetch } from '../services/apiClient';
@@ -3647,7 +3648,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
       });
     },
 
-    assignStaff: (patientId, staffId, options: any = {}) =>
+    assignStaff: (patientId, staffId, options: any = {}) => {
       set((state) => {
         const previousStaffId =
           state.patients.find((patient) => patient.id === patientId)?.assignedStaffId ?? null;
@@ -3726,7 +3727,18 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
             },
           ]),
         };
-      }),
+      });
+
+      // Fire-and-forget durable sync (MB-P0-6 follow-up) -- matching
+      // movePatientToState/dischargePatient's precedent: the local optimistic
+      // assignment stays authoritative for immediate UI responsiveness; this
+      // is what makes it survive a reload or reach a different workstation.
+      void assignEmergencyPatientStaff(patientId, staffId, options.actorStaffId).catch(
+        (error) => {
+          logger.warn('[emergencyStore] Failed to sync staff assignment to backend', error);
+        },
+      );
+    },
 
     assignRoom: (patientId, roomId) =>
       set((state) => {
@@ -4813,6 +4825,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
           'audit_event',
           'patient_created',
           'journey_state_changed',
+          'staff_assigned',
           'reassessment_created',
           'reassessment_completed',
           'referral_created',

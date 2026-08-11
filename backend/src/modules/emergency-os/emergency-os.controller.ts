@@ -74,6 +74,7 @@ import {
   ApplyOcrJobToIntakeDto,
   PostEmsHandoffDto,
   PatchEmergencyPatientDto,
+  AssignPatientStaffDto,
   PatchEmsArrivalStatusDto,
   PostWaitingRoomEscalationNotifyDto,
   PostReceptionEscalationDto,
@@ -212,6 +213,31 @@ export class EmergencyOsController {
       // 404 at this HTTP boundary instead of NestJS's default 500, so a
       // caller can tell "you don't have permission" / "transient failure"
       // apart from "this patient id doesn't exist on the backend at all".
+      if (error instanceof Error && /not found/i.test(error.message)) {
+        throw new NotFoundException(error.message);
+      }
+      throw error;
+    }
+  }
+
+  /** Durable staff-assignment persistence -- see MB-P0-6 follow-up: like
+   * movePatientToState/dischargePatient before HEAL-089, the frontend's
+   * assignStaff store action was client-memory-only with no route to reach
+   * EmergencyPatientService.assignStaffToPatient, which already persists,
+   * records a real staff_assigned workflow-log entry, and broadcasts. */
+  @RequirePermission(Permission.WRITE_PHI)
+  @Patch('patients/:patientId/staff')
+  assignPatientStaff(
+    @Param('patientId') patientId: string,
+    @Body() body: AssignPatientStaffDto,
+  ) {
+    try {
+      return this.patientService.assignStaffToPatient(
+        patientId,
+        body.staffId,
+        body.actorStaffId,
+      );
+    } catch (error) {
       if (error instanceof Error && /not found/i.test(error.message)) {
         throw new NotFoundException(error.message);
       }

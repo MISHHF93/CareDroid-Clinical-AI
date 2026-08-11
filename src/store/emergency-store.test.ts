@@ -261,6 +261,31 @@ describe('CareDroid store shim', () => {
     expect(useEmergencyStore.getState().patients).toEqual(before);
   });
 
+  it('applies a staff_assigned realtime event (assignStaff cross-tab sync) using its patient-wrapped payload', () => {
+    const store = useEmergencyStore.getState();
+    const existing = store.patients[0];
+    expect(existing).toBeTruthy();
+
+    store.dispatchWebSocketEvent({
+      type: 'staff_assigned',
+      // EmergencyPatientService.assignStaffToPatient's broadcast wraps the
+      // updated patient as `{ patient: updated, ... }`, matching patient_
+      // created/journey_state_changed -- flows through the existing
+      // buildRealtimeHydrationPayload `.patient` fallback, unlike
+      // patient_updated's raw unwrapped payload.
+      payload: {
+        patientId: existing.id,
+        staffId: 'staff-realtime-sync-test',
+        patient: { ...existing, assignedStaffId: 'staff-realtime-sync-test' },
+      },
+    });
+
+    const next = useEmergencyStore.getState();
+    expect(next.patients.find((candidate) => candidate.id === existing.id)).toEqual(
+      expect.objectContaining({ assignedStaffId: 'staff-realtime-sync-test' }),
+    );
+  });
+
   it('handles intake_handoff_complete websocket by selecting patient and triage queue filter', () => {
     const store = useEmergencyStore.getState();
     const patientId = store.patients[0]?.id;
