@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { apiFetch, getApiErrorMessage, parseApiResponse } from '../services/apiClient';
 import {
   clearTenantContext,
@@ -149,9 +149,19 @@ export function TenantContextProvider({ children }) {
     user,
   ]);
 
+  // See UserIdentityContext's refreshIdentity comment / WorkspaceContext's
+  // refreshWorkspaceContext comment: depending on [refreshTenantContext] re-ran this
+  // effect (re-fetching tenant context) every time ANY of that callback's own
+  // dependencies (including applyTenantContext) got a new reference, not just when
+  // identity/auth actually changed. Depend on the real trigger signals directly.
+  // Contributed to MB-P0-4/HEAL-082's app-wide render churn.
+  const refreshTenantContextRef = useRef(refreshTenantContext);
   useEffect(() => {
-    refreshTenantContext();
+    refreshTenantContextRef.current = refreshTenantContext;
   }, [refreshTenantContext]);
+  useEffect(() => {
+    refreshTenantContextRef.current();
+  }, [authToken, canUseDemoTenant, isAuthenticated, isUserLoading, user]);
 
   useEffect(() => () => clearTenantContext(), []);
 

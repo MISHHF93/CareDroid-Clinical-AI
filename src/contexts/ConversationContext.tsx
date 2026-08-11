@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useMemo, useState, useCallback } from 'react';
 import logger from '../utils/logger';
 
 /**
@@ -149,23 +149,44 @@ export const ConversationProvider = ({ children }) => {
     logger.debug('Tool cleared');
   }, []);
 
-  const value = {
-    conversations,
-    activeConversationId,
-    messages,
-    selectedTool,
-    isLoading,
+  // Was a plain object literal, rebuilt on every render regardless of whether any of
+  // these values actually changed -- same unmemoized-context-value bug fixed for
+  // UserContext/UserIdentityContext/SystemConfigContext/useEmergencyDeviceContext.
+  // Contributed to MB-P0-4/HEAL-082's render churn.
+  const value = useMemo(
+    () => ({
+      conversations,
+      activeConversationId,
+      messages,
+      selectedTool,
+      isLoading,
 
-    addConversation,
-    selectConversation,
-    deleteConversation,
-    addMessage,
-    clearMessages,
-    selectTool,
-    setActiveTool,
-    clearTool,
-    setIsLoading,
-  };
+      addConversation,
+      selectConversation,
+      deleteConversation,
+      addMessage,
+      clearMessages,
+      selectTool,
+      setActiveTool,
+      clearTool,
+      setIsLoading,
+    }),
+    [
+      conversations,
+      activeConversationId,
+      messages,
+      selectedTool,
+      isLoading,
+      addConversation,
+      selectConversation,
+      deleteConversation,
+      addMessage,
+      clearMessages,
+      selectTool,
+      setActiveTool,
+      clearTool,
+    ],
+  );
 
   return (
     <ConversationContext.Provider value={value}>

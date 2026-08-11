@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import {
   CARE_WORKSPACES,
   DEFAULT_CARE_WORKSPACE_ID,
@@ -254,9 +254,20 @@ export const WorkspaceProvider = ({ children }) => {
     }
   }, [applyBackendContext, authToken, isAuthenticated, isUserLoading]);
 
+  // Depending on [refreshWorkspaceContext] re-ran this effect (re-fetching
+  // /api/workspaces/context and re-applying its result via setWorkspaces/
+  // setActiveWorkspaceId/setWorkspaceContext) every time ANY of that callback's own
+  // dependencies got a new reference, not just when auth state actually changed --
+  // same bug class as UserIdentityContext's refreshIdentity effect (see its own comment).
+  // Depend on the real trigger signals directly and read the latest callback via a ref.
+  // Contributed to MB-P0-4/HEAL-082's app-wide render churn.
+  const refreshWorkspaceContextRef = useRef(refreshWorkspaceContext);
   useEffect(() => {
-    refreshWorkspaceContext();
+    refreshWorkspaceContextRef.current = refreshWorkspaceContext;
   }, [refreshWorkspaceContext]);
+  useEffect(() => {
+    refreshWorkspaceContextRef.current();
+  }, [authToken, isAuthenticated, isUserLoading]);
 
   const addWorkspace = (workspace) => {
     setWorkspaces((prev) => [...prev, workspace]);

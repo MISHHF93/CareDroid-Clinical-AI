@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { PlatformAssetsApi } from '../services/platformAssetsApi';
 import { useEmergencyStore } from '../store/emergencyStore';
 import { useUser } from './UserContext';
@@ -79,9 +79,19 @@ export function OrganizationContextProvider({ children }) {
     }
   }, [authToken, isAuthenticated, organization?.id]);
 
+  // See UserIdentityContext's refreshIdentity comment for the full explanation of this
+  // pattern: depending on [refreshOrganizationEngine] re-ran this effect (re-fetching the
+  // organization engine, including a real useEmergencyStore write when emergencyOs
+  // settings are present) every time that callback's own dependencies got a new
+  // reference. Depend on the real trigger signals directly.
+  // Contributed to MB-P0-4/HEAL-082's app-wide render churn.
+  const refreshOrganizationEngineRef = useRef(refreshOrganizationEngine);
   useEffect(() => {
-    refreshOrganizationEngine();
+    refreshOrganizationEngineRef.current = refreshOrganizationEngine;
   }, [refreshOrganizationEngine]);
+  useEffect(() => {
+    refreshOrganizationEngineRef.current();
+  }, [authToken, isAuthenticated, organization?.id]);
 
   const saveOrganizationSettings = useCallback(
     async (updates) => {

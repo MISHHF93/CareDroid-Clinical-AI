@@ -4,7 +4,7 @@
  * Manages RAG status, session timeouts, AI usage, subscription, tools
  */
 
-import { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { createContext, useContext, useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { useUser } from './UserContext';
 import configService from '../services/configService';
 import logger from '../utils/logger';
@@ -113,9 +113,17 @@ export function SystemConfigProvider({ children }) {
     }
   }, [isAuthenticated, isUserLoading]);
 
+  // See UserIdentityContext's refreshIdentity comment. loadSystemConfig's own deps
+  // ([isAuthenticated, isUserLoading]) are already primitives, but depend on the real
+  // trigger signals directly here too rather than the callback reference, for the same
+  // defense-in-depth reason as the other providers fixed alongside this one.
+  const loadSystemConfigRef = useRef(loadSystemConfig);
   useEffect(() => {
-    loadSystemConfig();
+    loadSystemConfigRef.current = loadSystemConfig;
   }, [loadSystemConfig]);
+  useEffect(() => {
+    loadSystemConfigRef.current();
+  }, [isAuthenticated, isUserLoading]);
 
   useEffect(() => {
     if (isUserLoading || !isAuthenticated || loading || configDegraded) {
@@ -131,18 +139,25 @@ export function SystemConfigProvider({ children }) {
     return () => clearInterval(interval);
   }, [configDegraded, isAuthenticated, isUserLoading, loading]);
 
-  const value = {
-    systemConfig,
-    aiUsage,
-    availableTools,
-    subscription,
-    loading,
-    error,
-    configDegraded,
-    refresh: loadSystemConfig,
-    isRagEnabled: systemConfig?.rag?.enabled ?? false,
-    sessionConfig: systemConfig?.session,
-  };
+  // Was a plain object literal, rebuilt on every render regardless of whether any of
+  // these values actually changed -- same unmemoized-context-value bug fixed for
+  // UserContext/UserIdentityContext/useEmergencyDeviceContext (see UserContext.tsx's
+  // comment for the full explanation). Contributed to MB-P0-4/HEAL-082's render churn.
+  const value = useMemo(
+    () => ({
+      systemConfig,
+      aiUsage,
+      availableTools,
+      subscription,
+      loading,
+      error,
+      configDegraded,
+      refresh: loadSystemConfig,
+      isRagEnabled: systemConfig?.rag?.enabled ?? false,
+      sessionConfig: systemConfig?.session,
+    }),
+    [systemConfig, aiUsage, availableTools, subscription, loading, error, configDegraded, loadSystemConfig],
+  );
 
   return <SystemConfigContext.Provider value={value}>{children}</SystemConfigContext.Provider>;
 }

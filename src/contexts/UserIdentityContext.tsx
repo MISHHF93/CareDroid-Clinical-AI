@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useTheme } from './ThemeContext';
 import { useToolPreferences } from './ToolPreferencesContext';
 import { useUser } from './UserContext';
@@ -991,9 +991,21 @@ export const UserIdentityProvider = ({ children }: { children: React.ReactNode }
     refreshPlatformContext,
   ]);
 
+  // Depending on [refreshIdentity] re-ran this effect (and thus refetched the whole
+  // operational profile) every time ANY of refreshIdentity's own dependencies got a new
+  // reference -- including fallbackProfile, which is rebuilt whenever localWorkspaces/
+  // toolPrefs/themePreference change upstream, none of which should re-trigger an identity
+  // fetch. The actual intent is "bootstrap on mount, refetch when auth state changes" --
+  // depend on the real signals directly and read the latest refreshIdentity via a ref so
+  // the effect doesn't need it in its dependency array (same pattern as UserContext's
+  // userRef/authTokenRef above). Contributed to MB-P0-4/HEAL-082's app-wide render churn.
+  const refreshIdentityRef = useRef(refreshIdentity);
   useEffect(() => {
-    refreshIdentity();
+    refreshIdentityRef.current = refreshIdentity;
   }, [refreshIdentity]);
+  useEffect(() => {
+    refreshIdentityRef.current();
+  }, [authToken, isAuthenticated]);
 
   const profile = operationalProfile || fallbackProfile;
   // profile?.workspace and normalizeSaasProfile(...) both fall back to freshly-constructed
