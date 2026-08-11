@@ -72,6 +72,7 @@ import {
   OcrFieldReviewDto,
   ApplyOcrJobToIntakeDto,
   PostEmsHandoffDto,
+  PatchEmergencyPatientDto,
   PatchEmsArrivalStatusDto,
   PostWaitingRoomEscalationNotifyDto,
   PostReceptionEscalationDto,
@@ -186,6 +187,23 @@ export class EmergencyOsController {
   @Post('patients')
   createPatient(@Body() dto: SmartIntakeCreateInput) {
     return this.smartIntakeService.createFromIntake(dto);
+  }
+
+  /** Durable patient state-transition/field persistence -- see MB-P0-6:
+   * the frontend journey state machine (movePatientToState etc.) was
+   * client-memory-only with no route to reach this, even though
+   * EmergencyPatientService.updatePatient already persists + broadcasts. */
+  @RequirePermission(Permission.WRITE_PHI)
+  @Patch('patients/:patientId')
+  patchPatient(
+    @Param('patientId') patientId: string,
+    @Body() body: PatchEmergencyPatientDto,
+  ) {
+    // staffId/note are accepted for future audit-trail use but are not
+    // EmergencyPatient fields -- only forward the real patient field(s).
+    const patch: Partial<import('./emergency-os.types').EmergencyPatient> = {};
+    if (body.state) patch.state = body.state;
+    return this.patientService.updatePatient(patientId, patch);
   }
 
   @RequirePermission(Permission.READ_PHI)

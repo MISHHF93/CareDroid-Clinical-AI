@@ -189,6 +189,18 @@ export const evaluateOperationalIntelligence = (events = [] as any[]) =>
   });
 export const fetchEmergencyPatients = () =>
   requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.patients);
+/**
+ * Durable patient field/state-transition persistence (MB-P0-6). Fire-and-forget
+ * from the store, matching patchEmsArrivalStatus below — the local optimistic
+ * update is the source of truth for immediate UI responsiveness; this call is
+ * what makes a transition survive a reload or reach a different workstation
+ * instead of silently staying registered on the backend's own patient copy.
+ */
+export const patchEmergencyPatient = (patientId: string, payload: Record<string, unknown>) =>
+  requestEmergencyJson(`${EMERGENCY_OS_API_ENDPOINTS.patients}/${encodeURIComponent(patientId)}`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
 export const fetchPatientJourney = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.journey);
 export const fetchEMSIntake = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.ems);
 export const postEmsHandoff = (payload) =>

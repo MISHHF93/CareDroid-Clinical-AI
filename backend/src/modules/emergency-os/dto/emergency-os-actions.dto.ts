@@ -1,4 +1,5 @@
 import { Type } from 'class-transformer';
+import type { EmergencyPatientState } from '../emergency-os.types';
 import {
   IsArray,
   IsBoolean,
@@ -150,6 +151,31 @@ export class PostWaitingRoomEscalationNotifyDto {
   @IsOptional() @IsString() @MaxLength(96) alertId?: string;
   @IsDefined() @IsString() @MaxLength(200) title: string;
   @IsDefined() @IsString() @MaxLength(2000) message: string;
+}
+
+/**
+ * General emergency-patient field patch (state transitions and other
+ * safe, non-identity fields). Deliberately does not accept demographics,
+ * MRN, or other identity fields -- those go through dedicated
+ * verification-aware flows, not a generic patch.
+ */
+export class PatchEmergencyPatientDto {
+  @IsOptional()
+  @IsIn([
+    'Arrival',
+    'Registration',
+    'Triage',
+    'Waiting',
+    'Assessment',
+    'Orders',
+    'Results',
+    'Disposition',
+    'Admission',
+    'Discharge',
+  ])
+  state?: EmergencyPatientState;
+  @IsOptional() @IsString() @MaxLength(96) staffId?: string;
+  @IsOptional() @IsString() @MaxLength(2000) note?: string;
 }
 
 export class PatchEmsArrivalStatusDto {

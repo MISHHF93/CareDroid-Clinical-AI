@@ -72,6 +72,7 @@ import {
   createSmartIntakePatient,
   postReceptionEscalation,
   patchEmsArrivalStatus,
+  patchEmergencyPatient,
 } from '../services/emergencyOsApi';
 import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
 import { apiFetch } from '../services/apiClient';
@@ -889,6 +890,12 @@ const FULL_REFRESH_DATASETS = Object.freeze([
   { key: 'reassessment', label: 'reassessment', fetcher: fetchReassessmentQueue },
   { key: 'referrals', label: 'referrals', fetcher: fetchReferrals },
   { key: 'workflowLogs', label: 'workflow logs', fetcher: fetchEmergencyWorkflowLogs },
+  // Only reception's bundled snapshot carries queues data (see the comment
+  // above) -- every other scope (whiteboard, queues page, charge nurse) never
+  // fetched real queue summaries at all, so state.queues stayed frozen at
+  // whatever it was on first mount. fetchEmergencyQueues was already imported
+  // for exactly this and never wired in.
+  { key: 'queues', label: 'queues', fetcher: fetchEmergencyQueues },
 ] as const);
 
 const loadDatasetWithTimeout = async (
@@ -3571,6 +3578,15 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         ).catch((error) => {
           console.error('[EmergencyStore] afterPatientWorkflowTransition failed:', error);
         });
+
+        // Fire-and-forget durable sync (MB-P0-6) -- matching patchEmsArrivalStatus's
+        // precedent above: the local optimistic update is the source of truth for
+        // immediate UI responsiveness; this is what makes the transition survive a
+        // reload or reach a different workstation instead of staying stuck on
+        // whatever state the backend's own patient copy was last left at.
+        void patchEmergencyPatient(patientId, { state: to }).catch((error) => {
+          logger.warn('[emergencyStore] Failed to sync patient state transition to backend', error);
+        });
       }
     },
 
@@ -3623,6 +3639,11 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         }),
       ).catch((error) => {
         console.error('[EmergencyStore] dischargePatient afterPatientWorkflowTransition failed:', error);
+      });
+
+      // Fire-and-forget durable sync (MB-P0-6) -- see movePatientToState's identical call.
+      void patchEmergencyPatient(patientId, { state: PatientState.Discharge }).catch((error) => {
+        logger.warn('[emergencyStore] Failed to sync patient discharge to backend', error);
       });
     },
 
