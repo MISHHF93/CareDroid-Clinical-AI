@@ -93,17 +93,25 @@ export function useCareDroidCentralNode(options: UseCareDroidCentralNodeOptions 
     ],
   );
 
+  // Depended on the WHOLE emergencyRole object even though only these 5 fields are
+  // actually read below -- emergencyRole carries ~20 other fields (compiledProfile,
+  // securityContext, permissionContext, switchDemoRole, etc.) that can legitimately get
+  // fresh references on renders where role/readOnly/allowedRoutes/can themselves haven't
+  // changed, forcing this snapshot (and the expensive patient duplicate-detection +
+  // hospital-operating-system-model work buildCareDroidCentralNodeSnapshot performs
+  // internally) to recompute far more often than the actual inputs warrant. Depend on
+  // only the fields this memo reads. Part of MB-P0-4/HEAL-082's ongoing investigation and
+  // the standing "keep the globally-mounted Header cheap" requirement.
+  const role = emergencyRole.role;
+  const roleLabel = emergencyRole.roleLabel;
+  const readOnly = emergencyRole.readOnly;
+  const allowedRoutes = emergencyRole.allowedRoutes;
+  const can = emergencyRole.can;
   const snapshot = useMemo(
     () =>
       buildCareDroidCentralNodeSnapshot(
         source,
-        {
-          role: emergencyRole.role,
-          roleLabel: emergencyRole.roleLabel,
-          readOnly: emergencyRole.readOnly,
-          allowedRoutes: emergencyRole.allowedRoutes,
-          can: emergencyRole.can,
-        },
+        { role, roleLabel, readOnly, allowedRoutes, can },
         {
           screenMode: options.screenMode || routeScreenMode,
           source: backendSnapshot ? 'backend-snapshot' : 'store',
@@ -111,7 +119,18 @@ export function useCareDroidCentralNode(options: UseCareDroidCentralNodeOptions 
           pathname: location.pathname,
         },
       ),
-    [backendSnapshot, emergencyRole, location.pathname, options.screenMode, routeScreenMode, source],
+    [
+      allowedRoutes,
+      backendSnapshot,
+      can,
+      location.pathname,
+      options.screenMode,
+      readOnly,
+      role,
+      roleLabel,
+      routeScreenMode,
+      source,
+    ],
   );
 
   const refresh = useCallback(async (): Promise<unknown | null> => {
