@@ -119,3 +119,42 @@ describe('EmergencyPatientService.createPatient — flags normalization', () => 
     expect(patient.flags).toEqual([]);
   });
 });
+
+describe('EmergencyPatientService.escalatePatient — flags match the frontend canonical set', () => {
+  it('adds HighRisk/DeteriorationRisk/ReassessmentDue, not the orphaned "Escalated" string (MB-P0-6 follow-up)', () => {
+    const { service } = makeService();
+    const patient = service.createPatient({
+      firstName: 'Escalation',
+      lastName: 'Target',
+      flags: [],
+    });
+
+    const updated = service.escalatePatient(patient.id, 'staff-charge-nurse');
+
+    // 'Escalated' is not a recognized frontend PatientFlag (src/types/
+    // emergency.ts) -- it rendered no badge and drove no queue/reassessment
+    // logic. The frontend's own local escalation (buildEscalatePatientPatch)
+    // already adds these 3 real flags; the backend must match so a reload
+    // doesn't silently drop real escalation signal.
+    expect(updated.flags).toEqual(
+      expect.arrayContaining(['HighRisk', 'DeteriorationRisk', 'ReassessmentDue']),
+    );
+    expect(updated.flags).not.toContain('Escalated');
+  });
+
+  it('does not duplicate escalation flags already present on the patient', () => {
+    const { service } = makeService();
+    const patient = service.createPatient({
+      firstName: 'Already',
+      lastName: 'HighRisk',
+      flags: ['HighRisk'],
+    });
+
+    const updated = service.escalatePatient(patient.id, 'staff-charge-nurse');
+
+    expect(updated.flags.filter((flag) => flag === 'HighRisk')).toHaveLength(1);
+    expect(updated.flags).toEqual(
+      expect.arrayContaining(['HighRisk', 'DeteriorationRisk', 'ReassessmentDue']),
+    );
+  });
+});

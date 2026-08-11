@@ -220,6 +220,18 @@ export const assignEmergencyPatientStaff = (
       body: JSON.stringify({ staffId, actorStaffId }),
     },
   );
+/**
+ * Durable manual-escalation persistence (MB-P0-6 follow-up), matching
+ * assignEmergencyPatientStaff's fire-and-forget precedent above.
+ */
+export const escalateEmergencyPatient = (patientId: string, actorStaffId: string) =>
+  requestEmergencyJson(
+    `${EMERGENCY_OS_API_ENDPOINTS.patients}/${encodeURIComponent(patientId)}/escalate`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify({ actorStaffId }),
+    },
+  );
 export const fetchPatientJourney = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.journey);
 export const fetchEMSIntake = () => requestEmergencyJson(EMERGENCY_OS_API_ENDPOINTS.ems);
 export const postEmsHandoff = (payload) =>

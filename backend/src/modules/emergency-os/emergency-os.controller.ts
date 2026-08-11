@@ -75,6 +75,7 @@ import {
   PostEmsHandoffDto,
   PatchEmergencyPatientDto,
   AssignPatientStaffDto,
+  EscalatePatientDto,
   PatchEmsArrivalStatusDto,
   PostWaitingRoomEscalationNotifyDto,
   PostReceptionEscalationDto,
@@ -237,6 +238,28 @@ export class EmergencyOsController {
         body.staffId,
         body.actorStaffId,
       );
+    } catch (error) {
+      if (error instanceof Error && /not found/i.test(error.message)) {
+        throw new NotFoundException(error.message);
+      }
+      throw error;
+    }
+  }
+
+  /** Durable manual-escalation persistence -- see MB-P0-6 follow-up: same
+   * gap shape as assignStaff. EmergencyPatientService.escalatePatient
+   * already persists, dispatches a real Critical operational alert, records
+   * a patient_escalated workflow-log entry, and broadcasts -- its only
+   * caller was internal (administrative automation), so a human pressing
+   * "Escalate" in the UI never reached it. */
+  @RequirePermission(Permission.WRITE_PHI)
+  @Patch('patients/:patientId/escalate')
+  escalatePatient(
+    @Param('patientId') patientId: string,
+    @Body() body: EscalatePatientDto,
+  ) {
+    try {
+      return this.patientService.escalatePatient(patientId, body.actorStaffId);
     } catch (error) {
       if (error instanceof Error && /not found/i.test(error.message)) {
         throw new NotFoundException(error.message);

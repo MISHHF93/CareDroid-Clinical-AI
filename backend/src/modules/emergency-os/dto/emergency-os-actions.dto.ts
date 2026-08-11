@@ -189,6 +189,16 @@ export class AssignPatientStaffDto {
   @IsOptional() @IsString() @MaxLength(96) actorStaffId?: string;
 }
 
+/**
+ * Manual clinical escalation is a distinct domain command from a generic
+ * field patch -- it produces a Critical operational alert + a
+ * patient_escalated workflow-log entry (EmergencyPatientService.
+ * escalatePatient) that PatchEmergencyPatientDto's route does not.
+ */
+export class EscalatePatientDto {
+  @IsString() @IsNotEmpty() @MaxLength(96) actorStaffId!: string;
+}
+
 export class PatchEmsArrivalStatusDto {
   @IsOptional() @IsString() @MaxLength(32) status?: string;
   @IsOptional() @IsString() @MaxLength(96) patientId?: string;

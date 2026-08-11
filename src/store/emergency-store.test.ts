@@ -286,6 +286,30 @@ describe('CareDroid store shim', () => {
     );
   });
 
+  it('applies a patient_escalated realtime event (escalatePatient cross-tab sync) using its patient-wrapped payload', () => {
+    const store = useEmergencyStore.getState();
+    const existing = store.patients[0];
+    expect(existing).toBeTruthy();
+
+    // EmergencyPatientService.escalatePatient's broadcast also wraps the
+    // updated patient as `{ patient: updated, ... }`, same shape as
+    // staff_assigned/journey_state_changed.
+    store.dispatchWebSocketEvent({
+      type: 'patient_escalated',
+      payload: {
+        patientId: existing.id,
+        patient: {
+          ...existing,
+          flags: [...existing.flags, 'HighRisk', 'DeteriorationRisk', 'ReassessmentDue'],
+        },
+      },
+    });
+
+    const next = useEmergencyStore.getState();
+    const synced = next.patients.find((candidate) => candidate.id === existing.id);
+    expect(synced?.flags).toEqual(expect.arrayContaining(['HighRisk', 'DeteriorationRisk', 'ReassessmentDue']));
+  });
+
   it('handles intake_handoff_complete websocket by selecting patient and triage queue filter', () => {
     const store = useEmergencyStore.getState();
     const patientId = store.patients[0]?.id;

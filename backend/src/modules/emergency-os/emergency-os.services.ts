@@ -1397,9 +1397,14 @@ export class EmergencyPatientService implements OnModuleInit {
     const index = this.patients.findIndex((patient) => patient.id === patientId);
     if (index === -1) throw new Error(`Emergency patient ${patientId} not found`);
     const patient = this.patients[index];
-    const flags = patient.flags.includes('Escalated')
-      ? patient.flags
-      : [...patient.flags, 'Escalated'];
+    // 'Escalated' is not a recognized frontend PatientFlag (see src/types/
+    // emergency.ts) -- it rendered no badge and drove no queue/reassessment
+    // logic, silently diverging from the frontend's own local escalation
+    // (buildEscalatePatientPatch), which adds these 3 real flags. Match the
+    // frontend's canonical set so a reload doesn't drop real escalation
+    // signal down to nothing recognizable.
+    const ESCALATION_FLAGS = ['HighRisk', 'DeteriorationRisk', 'ReassessmentDue'];
+    const flags = [...new Set([...patient.flags, ...ESCALATION_FLAGS])];
     this.patients[index] = {
       ...patient,
       flags,

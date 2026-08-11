@@ -74,6 +74,7 @@ import {
   patchEmsArrivalStatus,
   patchEmergencyPatient,
   assignEmergencyPatientStaff,
+  escalateEmergencyPatient,
 } from '../services/emergencyOsApi';
 import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
 import { apiFetch } from '../services/apiClient';
@@ -4275,8 +4276,19 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
     snoozeReassessmentReminder: (patientId, reminderId, minutes = 10) =>
       set((state) => buildSnoozeReassessmentReminderPatch(state, patientId, reminderId, minutes) || {}),
 
-    escalatePatient: (patientId, input) =>
-      set((state) => buildEscalatePatientPatch(state, patientId, input) || state),
+    escalatePatient: (patientId, input) => {
+      const patch = buildEscalatePatientPatch(get(), patientId, input);
+      set((state) => patch || state);
+      if (patch) {
+        // Fire-and-forget durable sync (MB-P0-6 follow-up) -- matching
+        // assignStaff's precedent: the local optimistic escalation stays
+        // authoritative for immediate UI responsiveness; this is what makes
+        // it survive a reload or reach a different workstation.
+        void escalateEmergencyPatient(patientId, input.staffId).catch((error) => {
+          logger.warn('[emergencyStore] Failed to sync patient escalation to backend', error);
+        });
+      }
+    },
 
     cancelEscalation: (patientId, input) =>
       set((state) => buildCancelEscalationPatch(state, patientId, input) || state),
@@ -4826,6 +4838,7 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
           'patient_created',
           'journey_state_changed',
           'staff_assigned',
+          'patient_escalated',
           'reassessment_created',
           'reassessment_completed',
           'referral_created',
