@@ -1476,15 +1476,28 @@ export class EmergencyPatientService implements OnModuleInit {
       errors: result.errors,
       updatedAt: result.updatedAt,
     };
-    if (this.lastCapacityScore !== undefined && this.lastCapacityScore !== score) {
+    // publishBoardMutations() -> getWhiteboard() -> computeCapacity() is a real
+    // call cycle (the whiteboard envelope embeds the capacity snapshot), so
+    // this guard must be settled BEFORE triggering any further realtime
+    // side effect. Setting lastCapacityScore after the publishBoardMutations()
+    // call left the "score changed" condition true for every reentrant call
+    // in that cycle, causing genuine infinite recursion (self-terminating
+    // only once V8's stack limit was hit) on every real capacity change --
+    // confirmed live: a single patient state transition through the new
+    // MB-P0-6/HEAL-089 PATCH route hung the backend for 20+ seconds of pure
+    // recursive CPU burn, and repeated transitions could compound into a
+    // full request-queue stall. See MB-P0-6 follow-up.
+    const previousScore = this.lastCapacityScore;
+    this.lastCapacityScore = score;
+    if (previousScore !== undefined && previousScore !== score) {
       this.workflowLogService.record({
         type: 'capacity_score_changed',
         title: 'Capacity score changed',
-        summary: `Capacity score changed from ${this.lastCapacityScore} to ${score}.`,
+        summary: `Capacity score changed from ${previousScore} to ${score}.`,
         source: 'capacity-service',
         severity: band === 'Red' ? 'Critical' : 'Warning',
         metadata: {
-          fromScore: this.lastCapacityScore,
+          fromScore: previousScore,
           toScore: score,
           band,
         },
@@ -1492,7 +1505,6 @@ export class EmergencyPatientService implements OnModuleInit {
       this.realtimeService?.publish({ type: 'capacity_updated', payload: snapshot });
       this.realtimeService?.publishBoardMutations();
     }
-    this.lastCapacityScore = score;
     return snapshot;
   }
 

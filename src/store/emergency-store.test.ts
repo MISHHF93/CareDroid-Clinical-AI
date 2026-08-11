@@ -219,6 +219,48 @@ describe('CareDroid store shim', () => {
     );
   });
 
+  it('applies a patient_updated realtime event (HEAL-089 cross-tab sync) using the raw unwrapped patient as payload', () => {
+    const store = useEmergencyStore.getState();
+    const existing = store.patients[0];
+    expect(existing).toBeTruthy();
+    const otherPatient = store.patients[1];
+
+    store.dispatchWebSocketEvent({
+      type: 'patient_updated',
+      // Unlike patient_created/journey_state_changed, EmergencyPatientService.
+      // updatePatient's realtime broadcast ships the updated patient directly
+      // as `payload`, not wrapped as `{ patient: updated }`.
+      payload: {
+        ...existing,
+        state: 'Assessment',
+        mrn: 'RT-PATIENT-UPDATED-1',
+      },
+    });
+
+    const next = useEmergencyStore.getState();
+    expect(next.patients.find((candidate) => candidate.id === existing.id)).toEqual(
+      expect.objectContaining({ state: 'Assessment', mrn: 'RT-PATIENT-UPDATED-1' }),
+    );
+    if (otherPatient) {
+      expect(next.patients.find((candidate) => candidate.id === otherPatient.id)).toEqual(
+        expect.objectContaining({ id: otherPatient.id }),
+      );
+    }
+    expect(next.patients).toHaveLength(store.patients.length);
+  });
+
+  it('ignores a patient_updated realtime event with no id instead of wiping the patient list', () => {
+    const store = useEmergencyStore.getState();
+    const before = store.patients;
+
+    store.dispatchWebSocketEvent({
+      type: 'patient_updated',
+      payload: { note: 'malformed event, no patient id' },
+    });
+
+    expect(useEmergencyStore.getState().patients).toEqual(before);
+  });
+
   it('handles intake_handoff_complete websocket by selecting patient and triage queue filter', () => {
     const store = useEmergencyStore.getState();
     const patientId = store.patients[0]?.id;

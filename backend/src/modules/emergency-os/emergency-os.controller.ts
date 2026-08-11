@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Logger,
+  NotFoundException,
   Param,
   Patch,
   Post,
@@ -203,7 +204,19 @@ export class EmergencyOsController {
     // EmergencyPatient fields -- only forward the real patient field(s).
     const patch: Partial<import('./emergency-os.types').EmergencyPatient> = {};
     if (body.state) patch.state = body.state;
-    return this.patientService.updatePatient(patientId, patch);
+    try {
+      return this.patientService.updatePatient(patientId, patch);
+    } catch (error) {
+      // updatePatient throws a plain Error for an unknown id (shared with 2
+      // other internal callers, left untouched) -- translate it to a real
+      // 404 at this HTTP boundary instead of NestJS's default 500, so a
+      // caller can tell "you don't have permission" / "transient failure"
+      // apart from "this patient id doesn't exist on the backend at all".
+      if (error instanceof Error && /not found/i.test(error.message)) {
+        throw new NotFoundException(error.message);
+      }
+      throw error;
+    }
   }
 
   @RequirePermission(Permission.READ_PHI)

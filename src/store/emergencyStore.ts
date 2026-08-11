@@ -4788,6 +4788,23 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         return;
       }
 
+      // patient_updated (HEAL-089's own PATCH .../patients/:id, and the 2 other
+      // internal EmergencyPatientService.updatePatient callers) ships the raw
+      // updated patient as `payload` directly -- unlike patient_created/
+      // journey_state_changed, which wrap it as `{ patient: updated, ... }` and
+      // so already flow through buildRealtimeHydrationPayload's `.patient`
+      // fallback below. Without this branch, a transition persisted by one
+      // tab/user was durable but invisible to every OTHER open tab/session
+      // until their next full refresh -- the event was already being
+      // broadcast, nothing was listening for it.
+      if (type === 'patient_updated') {
+        const updatedPatient = asRecord(payload);
+        if (typeof updatedPatient.id === 'string' && updatedPatient.id) {
+          get().hydrateFromApi({ patients: [payload as Patient] });
+        }
+        return;
+      }
+
       if (
         [
           'workflow_log',
