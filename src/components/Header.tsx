@@ -432,14 +432,14 @@ export function Header() {
                 className="caredroid-header__action caredroid-header__action--primary"
                 onClick={openCentralIntake}
                 disabled={!canSubmitCentralIntake}
-                aria-label="Create patient"
+                aria-label="Start a new patient intake"
                 title={
                   canSubmitCentralIntake
-                    ? 'Create a patient intake'
-                    : `${emergencyRole.roleLabel} cannot create patients`
+                    ? 'Start a new patient intake'
+                    : `${emergencyRole.roleLabel} cannot start patient intake`
                 }
               >
-                Create
+                New Patient
               </button>
             </div>
           )}

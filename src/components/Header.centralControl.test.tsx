@@ -36,7 +36,7 @@ describe('Header chrome (caredroid-header)', () => {
     expect(
       within(header).getByRole('searchbox', { name: /operational search|patient search/i }),
     ).toBeInTheDocument();
-    expect(within(header).getByRole('button', { name: /create patient/i })).toBeInTheDocument();
+    expect(within(header).getByRole('button', { name: /start a new patient intake/i })).toBeInTheDocument();
     expect(within(header).getByRole('button', { name: /Account menu for/i })).toBeInTheDocument();
   });
 
@@ -61,7 +61,7 @@ describe('Header chrome (caredroid-header)', () => {
 
     const header = screen.getByRole('banner');
     const search = within(header).getByRole('searchbox');
-    const create = within(header).getByRole('button', { name: /create patient/i });
+    const create = within(header).getByRole('button', { name: /start a new patient intake/i });
     expect(
       Boolean(create.compareDocumentPosition(search) & Node.DOCUMENT_POSITION_FOLLOWING),
     ).toBe(true);
