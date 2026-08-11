@@ -103,4 +103,35 @@ describe('EmergencyPatientService.updatePatient — flags/vitals normalization',
 
     expect(updated.flags).toEqual([]);
   });
+
+  it('MB-P0-6 addVitals: appends a new reading and applies the resulting flag set, matching what PatchEmergencyPatientDto now forwards through the controller', () => {
+    const { service } = makeService();
+    const created = service.createPatient({
+      firstName: 'Vitals',
+      lastName: 'Test',
+      priority: 'P3',
+      vitals: [{ hr: 80, sbp: 118, dbp: 76, spo2: 98, recordedAt: 'x', recordedBy: 'nurse-1' }],
+    });
+    expect(created.vitals).toHaveLength(1);
+
+    // Matches emergencyStore.ts's addVitals action: it sends the FULL
+    // resulting vitals array (existing history + the new appended reading,
+    // already computed by the frontend's own pipeline) and the FULL
+    // resulting flags array (after the pipeline's own clear/re-add logic) --
+    // not a delta. updatePatient's normalizePatientVitals REPLACES the
+    // array wholesale, so sending only the new reading would silently
+    // destroy prior history; this is why the frontend always sends the
+    // complete array.
+    const updated = service.updatePatient(created.id, {
+      vitals: [
+        ...created.vitals,
+        { hr: 130, sbp: 82, dbp: 50, spo2: 89, recordedAt: 'y', recordedBy: 'nurse-2' },
+      ],
+      flags: ['HighRisk', 'ReassessmentDue'],
+    });
+
+    expect(updated.vitals).toHaveLength(2);
+    expect(updated.vitals[1]).toMatchObject({ hr: 130, spo2: 89, recordedBy: 'nurse-2' });
+    expect(updated.flags).toEqual(['HighRisk', 'ReassessmentDue']);
+  });
 });

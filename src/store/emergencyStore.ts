@@ -3969,47 +3969,64 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         };
       }),
 
-    addVitals: (patientId, vitals) =>
-      set((state) => {
-        // Single canonical vitals-recording path (buildAddVitalsPatch): vitals append,
-        // vitals alerts, NEWS2 auto-score, reassessment completion (flag + reminders),
-        // and re-flagging when the new vitals themselves warrant it.
-        const pipelinePatch = buildAddVitalsPatch(state, patientId, vitals);
-        if (!pipelinePatch?.patients) return {};
+    addVitals: (patientId, vitals) => {
+      // Single canonical vitals-recording path (buildAddVitalsPatch): vitals append,
+      // vitals alerts, NEWS2 auto-score, reassessment completion (flag + reminders),
+      // and re-flagging when the new vitals themselves warrant it.
+      const pipelinePatch = buildAddVitalsPatch(get(), patientId, vitals);
+      if (!pipelinePatch?.patients) return;
 
-        const news2 = calculateNews2FromVitals(vitals);
-        const patients = pipelinePatch.patients;
-        return {
-          ...pipelinePatch,
-          ...applyCapacityPatch(state, buildCapacitySnapshot(patients, state.rooms)),
-          auditLog: appendAuditLog(state.auditLog, {
-            action: 'addVitals',
+      const news2 = calculateNews2FromVitals(vitals);
+      const patients = pipelinePatch.patients;
+      set((state) => ({
+        ...pipelinePatch,
+        ...applyCapacityPatch(state, buildCapacitySnapshot(patients, state.rooms)),
+        auditLog: appendAuditLog(state.auditLog, {
+          action: 'addVitals',
+          patientId,
+          staffId:
+            vitals.recordedBy ||
+            state.patients.find((patient) => patient.id === patientId)?.assignedStaffId ||
+            'system',
+          details: { recordedAt: vitals.recordedAt || null, news2: news2.total, pipeline: true },
+        }),
+        workflowLogs: appendWorkflowLogs(state.workflowLogs, [
+          {
+            type: 'reassessment_completed',
+            title: 'Reassessment completed',
+            summary: 'Vitals reassessment recorded.',
             patientId,
-            staffId:
-              vitals.recordedBy ||
-              state.patients.find((patient) => patient.id === patientId)?.assignedStaffId ||
-              'system',
-            details: { recordedAt: vitals.recordedAt || null, news2: news2.total, pipeline: true },
-          }),
-          workflowLogs: appendWorkflowLogs(state.workflowLogs, [
-            {
-              type: 'reassessment_completed',
-              title: 'Reassessment completed',
-              summary: 'Vitals reassessment recorded.',
-              patientId,
-              actorStaffId: vitals.recordedBy,
-              timestamp: vitals.recordedAt,
-              source: 'reassessment-engine',
-              metadata: {
-                hr: vitals.hr ?? null,
-                spo2: vitals.spo2 ?? null,
-                news2: news2.total,
-                communicationKind: 'vitals-repeated',
-              },
+            actorStaffId: vitals.recordedBy,
+            timestamp: vitals.recordedAt,
+            source: 'reassessment-engine',
+            metadata: {
+              hr: vitals.hr ?? null,
+              spo2: vitals.spo2 ?? null,
+              news2: news2.total,
+              communicationKind: 'vitals-repeated',
             },
-          ]),
-        };
-      }),
+          },
+        ]),
+      }));
+
+      // Fire-and-forget durable sync (MB-P0-6 follow-up) -- syncs the RESULT
+      // this pipeline already correctly computed (the appended vitals reading
+      // + the resulting flag set after clearing/re-adding ReassessmentDue/
+      // DeteriorationRisk/etc.), not a reimplementation of the pipeline
+      // itself, which stays frontend-only. Deliberately NOT syncing
+      // reassessmentReminders' individual completion status -- no backend
+      // field exists for it yet; the flags, which drive every visible
+      // reassessment-urgency signal, already carry the safety-relevant part.
+      const updatedPatient = patients.find((patient) => patient.id === patientId);
+      if (updatedPatient) {
+        void patchEmergencyPatient(patientId, {
+          vitals: updatedPatient.vitals,
+          flags: updatedPatient.flags,
+        }).catch((error) => {
+          logger.warn('[emergencyStore] Failed to sync patient vitals to backend', error);
+        });
+      }
+    },
 
     addNote: (patientId, note, staffId) =>
       set((state) => {

@@ -177,6 +177,24 @@ export class PatchEmergencyPatientDto {
   state?: EmergencyPatientState;
   @IsOptional() @IsString() @MaxLength(96) staffId?: string;
   @IsOptional() @IsString() @MaxLength(2000) note?: string;
+  /**
+   * MB-P0-6 follow-up (addVitals): the frontend's vitals-recording pipeline
+   * (NEWS2 scoring, alert generation, reassessment-reminder completion) is
+   * genuinely correct, sophisticated business logic that stays frontend-only
+   * -- these 2 fields exist so the RESULT it already computes (the new
+   * vitals reading appended, and the resulting flag set after clearing/
+   * re-adding ReassessmentDue/DeteriorationRisk/etc.) can be durably synced,
+   * not so the backend recomputes any of it. EmergencyPatientService.
+   * updatePatient already normalizes both via normalizePatientVitals/
+   * normalizePatientFlags -- no new backend logic needed, only exposure.
+   * Deliberately NOT included: reassessmentReminders (their individual
+   * completion status has no backend field yet -- a real schema addition,
+   * scoped out of this round; the FLAGS, which are what actually drive
+   * every visible reassessment-urgency signal across the app, already
+   * carry the safety-relevant signal).
+   */
+  @IsOptional() @IsArray() vitals?: unknown[];
+  @IsOptional() @IsArray() flags?: unknown[];
 }
 
 /**

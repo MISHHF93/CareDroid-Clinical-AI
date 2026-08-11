@@ -206,6 +206,12 @@ export class EmergencyOsController {
     // EmergencyPatient fields -- only forward the real patient field(s).
     const patch: Partial<import('./emergency-os.types').EmergencyPatient> = {};
     if (body.state) patch.state = body.state;
+    // addVitals (MB-P0-6 follow-up): vitals/flags are the RESULT of the
+    // frontend's own vitals-recording pipeline (NEWS2 scoring, alert
+    // generation, reassessment-completion flag clearing) -- updatePatient
+    // already normalizes both, no new backend logic needed.
+    if (body.vitals) patch.vitals = body.vitals as import('./emergency-os.types').EmergencyVitals[];
+    if (body.flags) patch.flags = body.flags as string[];
     try {
       return this.patientService.updatePatient(patientId, patch);
     } catch (error) {
