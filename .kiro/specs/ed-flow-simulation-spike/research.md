@@ -35,33 +35,103 @@
 
 ## 2. Findings — verified gaps
 
-### G1 — [CORRECTION] Every state move fires a floating async audit write that reaches the network **[Constraint · Critical]**
+### G1 — [CORRECTION] Simulated patient IDs are persisted into the production audit table **[Constraint · Critical]**
 
-`movePatientToState` unconditionally calls `appendAuditLog` (`:1068`), which does:
+*Hardened 2026-08-10: client chain, wire payload, and server-side persistence all traced to source.*
+
+`movePatientToState` unconditionally calls `appendAuditLog` (`:1068`). The full path, client through
+database:
 
 ```
-appendAuditLog()
-  -> void import('../services/securityAuditService')      // dynamic import, floating promise
-     .then(ingestEmergencyAuditEntries)
-       -> scheduleAuditSync()                             // setInterval(SYNC_INTERVAL_MS)
-          -> flushPendingSecurityAudits()
-             -> apiFetch(...)                             // network POST, bearer token
+movePatientToState()                        emergencyStore.ts:3456
+ └─ appendAuditLog()                                      :1068
+     └─ void import('../services/securityAuditService')    ← dynamic import, floating promise
+         └─ ingestEmergencyAuditEntries()   securityAuditService.ts:41
+             └─ scheduleAuditSync()                        :55
+                 └─ setInterval(…, 30_000)                 :58
+                     └─ flushPendingSecurityAudits()       :63
+                         └─ apiFetch('POST /api/audit/sync')
+                             └─ AuditController.syncAuditEvent()   backend/…/audit.controller.ts:28
+                                 └─ AuditService.log()
+                                     └─ auditRepository.save()     audit.service.ts:87
 ```
 
-This is not reachable only through opt-in code — it is on the default path of the primary mutator
-the simulator must call.
+This is not opt-in code. It is the default path of the primary mutator the simulator must call.
 
-**The only guard is `typeof window === 'undefined'`** inside `scheduleAuditSync`, plus an
-access-token check inside the flush.
+#### What reaches the database
+
+Wire payload assembled at `securityAuditService.ts:76-90`:
+
+```js
+resourceType: entry.patientId ? 'patient' : 'security',   // → 'patient'
+resourceId:   entry.patientId || entry.id,                // → the simulated patient's ID
+metadata:     { staffId, fromState, toState, phiAccessed: false }
+```
+
+The controller then persists it as `resource: "patient:<simulated-patient-id>"`, stamped with the
+real logged-in user's `userId`, their `organizationId` and `workspaceId`, their IP address, and
+their user agent.
+
+**The failure mode is not a stray network call.** It is synthetic patient identifiers written into
+the production audit log, labelled as patient resources and attributed to a real user and tenant —
+with nothing in the stored row distinguishing them from audit entries about real patients. For a
+product whose entire regulatory position is "synthetic data only, no PHI," an audit table that mixes
+the two is a materially bad artifact to create, and it is not straightforwardly reversible.
+
+`phiAccessed` resolves to `false` (it keys off `action.startsWith('phi.')`). `resourceType: 'patient'`
+does not.
+
+#### The two gates
+
+Independent, and at different layers:
+
+| Gate | Location | Blocks |
+|---|---|---|
+| `typeof window === 'undefined'` | `scheduleAuditSync:56` | the timer — nothing ever flushes |
+| `getStoredAccessToken()` falsy | `flushPendingSecurityAudits:67` | the POST only |
 
 | Environment | Consequence |
 |---|---|
-| Headless Node (`scripts/`) | Safe. No `window`, so no timer and no transmission. |
-| Browser (R6 rendering) | **Violates R7.1** — simulated patient audit entries are queued and POSTed if a token is present. Also starts a `setInterval`, touching R1.1/R1.3. |
-| Vitest `jsdom` | `window` **is** defined — tests inherit the browser behaviour, not the headless behaviour. |
+| Headless Node (`scripts/`) | **Safe.** No `window` → no timer, no transmission. |
+| Browser + active session (R6) | **Violates R7.1.** Neither gate holds. Also starts a `setInterval`, touching R1.1/R1.3. |
+| Vitest `jsdom` | `window` **is** defined — tests inherit the browser path, not the headless one. |
+
+#### Why the obvious fixes are constrained
+
+- **No off switch exists.** `syncTimer` is module-private and `clearInterval` is never called
+  anywhere in `securityAuditService.ts`. Once started, the 30-second interval lives for the page
+  lifetime. The module's full export surface — `recordSecurityAuditEvent`,
+  `ingestEmergencyAuditEntries`, `getPendingSecurityAuditCount`, `flushPendingSecurityAudits` —
+  offers no way to stop it.
+- **A contract test pins the wiring.** `platformCohesion.contract.test.ts:64-68` asserts that
+  `emergencyStore.ts` *source text* contains `ingestEmergencyAuditEntries` and the literal
+  `import('../services/securityAuditService')`. Because the assertion is on source text, a **runtime
+  guard passes**; **deletion breaks the test.** Gating is viable, excision is not.
+- **Volume, on the mutator path.** ~77 patients × ~20 journey stages ≈ 1,500 audit entries per
+  simulated shift against `MAX_PENDING_AUDIT_ENTRIES = 100`. The buffer discards via `slice(-100)`,
+  so most entries are dropped and the surviving 100 POST one-at-a-time in an awaited loop.
+
+#### Blast radius is narrower than it first appears
+
+`setPatients` also audits (`:3195` — one of 23 audit-writing mutators), but its entry carries **no
+`patientId`**, so it degrades to `resourceType: 'security'` with `metadata: { count: N }`. It leaks a
+count, never an identity. A rendering path built on `setPatients` alone therefore starts the timer
+but writes no synthetic patient IDs.
+
+#### Options for R6
+
+| # | Option | Cost | Assessment |
+|---|---|---|---|
+| 1 | Render via projection only — browser path calls `setPatients`, never `movePatientToState` | None; falls out of Option C | **Recommended.** Leaks a count, no identities. |
+| 2 | Runtime guard in `appendAuditLog` skipping the import while a run is active | Small, targeted | Viable (contract test survives). Edits a file §6.3 says to write *through*, not *into*. |
+| 3 | Demo unauthenticated so no token exists | Zero code | **Not a control.** Relies on an unenforceable operational precondition; one login makes it wrong. |
+| 4 | Drop R6; assess face validity from a recording | Requirements change | Costs more than the problem. Face validity is the one thing headless cannot test, and it is the premise the pivot rests on. |
+
+**Recommended: option 1, with option 2 as belt-and-braces if Option C's mutator probe is ever run in
+a browser rather than headless.**
 
 `brief.md` C3 anticipated inbound hydration overwriting simulated state. It did not anticipate
-**outbound** transmission. This is the single most consequential finding in this pass.
+**outbound** transmission, and this is the single most consequential finding in this pass.
 
 ### G2 — [CORRECTION] Byte-identical reproducibility is not reachable through the store's mutators as written **[Constraint · Critical]**
 
@@ -158,6 +228,81 @@ Duplicate implementations also exist (`src/utils/neurologyCalculators.ts`,
 `getInitialEdScenarioId()` reads `localStorage`. It is not a per-run injection point.
 **`setPatients()` is the runtime cohort seam.** `brief.md` F8 overstates this slightly.
 
+### G10 — The calculators consume clinical judgement, not patient data **[Constraint · High]**
+
+*Found during design validation, 2026-08-10.*
+
+`HeartInput` (`src/clinical-calculators/heart.ts:16-22`) is five **pre-scored ordinals**:
+
+```ts
+export type HeartInput = {
+  history: 0 | 1 | 2; ecg: 0 | 1 | 2; age: 0 | 1 | 2;
+  riskFactors: 0 | 1 | 2; troponin: 0 | 1 | 2;
+};
+```
+
+It accepts no observations. Each component is a clinician's judgement already reduced to a band. Of
+the five, **only `age` is derivable from a cohort `Patient`**; history, ECG interpretation,
+risk-factor count, and troponin band are not emitted by Synthea and cannot be inferred from it.
+
+**Design consequence.** A calculator-backed policy cannot be driven from cohort data. The four
+non-derivable components are seeded draws, and they are located in `AcuityAssigner` — never in the
+policy — so that fabrication cannot migrate into the policy layer and defeat 4.4. Provenance is
+tracked **per field**, because collapsing `age` and the other four to one label would overstate how
+much of the decision rests on the cohort.
+
+**Product consequence — revised 2026-08-10 after standards research.** The first version of this
+finding said `history`, `ecg`, `riskFactors` and `troponin` were "irreducibly modelled." **That was
+wrong**, and it was wrong because it reasoned from the repository's bespoke `HeartInput` struct
+instead of from what the standards already specify. Corrected position:
+
+| HEART item | Bands | Status |
+|---|---|---|
+| Age | `<45` / `45–64` / `≥65` | **Derivable** — pure function of `Patient.birthDate` |
+| Risk factors | `0` / `1–2` / `≥3 or known atherosclerotic disease` | **Derivable** — count of SNOMED-coded `Condition` |
+| Troponin | `≤normal` / `1–3×` / `>3× normal` | **Derivable when present** — LOINC `Observation` vs reference range |
+| ECG | `normal` / `non-specific` / `significant ST deviation` | Codeable in LOINC, but Synthea emits no interpretation — generated |
+| History | `slightly` / `moderately` / `highly suspicious` | Genuine clinician gestalt — generated |
+
+Three of five derive from coded data. **One** is irreducibly gestalt, not four.
+
+**The representation was also being invented rather than adopted.** Scored clinical instruments have
+a standard FHIR shape: a `Questionnaire` whose `answerOption`s carry `itemWeight` (formerly
+`ordinalValue`), answered by a `QuestionnaireResponse`, totalled by the SDC `weight()` FHIRPath
+function. The specification's own cited examples are **Apgar and the Glasgow Coma Score** — the same
+class of instrument. The design now uses this and confines the repository's `HeartInput` struct to a
+thin adapter at the calculator's doorstep, so the internal model stays FHIR and the calculator stays
+unmodified.
+
+**Ingestion was targeting a generator rather than a specification.** Synthea emits US Core natively
+(`--exporter.fhir.use_us_core_ig true --exporter.fhir.us_core_version 6.1.0`; supported 6.1.0,
+5.0.1, 4.0.0, 3.1.1). Requirement 4.1 was amended from "Bundles of the form Synthea emits" to "US
+Core conformant Bundles" — so the loader is written against a published profile set, and swapping
+the generator, or later swapping US Core for **CA Core+** (`ca.infoway.io.core`, the FHIR expression
+of CACDI), is configuration rather than a rewrite.
+
+**What remains true.** Generation does not disappear for a synthetic cohort — Synthea emits no HEART
+`QuestionnaireResponse` and no ECG interpretation at any conformance level. What changed is that
+generated values now land in the *same standard resource* as derived ones, marked as generated
+(4.5), so a real response from a live system drops in unchanged and the generated fraction falls
+without any policy changing. **The honest metric is the per-item derived-versus-generated fraction**,
+and 8.5 requires the findings report to publish it.
+
+**Licensing** (checked, nothing blocks this): LOINC free under licence agreement; SNOMED CT free to
+US implementers via the NLM UMLS national licence; US Core, CA Core+ and `ca-baseline` are freely
+downloadable HL7/Infoway packages; Synthea is Apache 2.0.
+
+**Secondary finding — resolved.** `HEART_META.disclaimer` states the score "does not ... recommend
+treatment or disposition," yet a disposition policy thresholds exactly that. Defensible when
+modelling a policy rather than advising care, but not silently: the disclaimer is copied verbatim
+into `RunRecord.policyProvenance` alongside `usage: 'modelled-decision-rule'`, so it travels with
+every result.
+
+Sources: [SDC itemWeight](https://build.fhir.org/ig/HL7/fhir-extensions//StructureDefinition-itemWeight.html),
+[Synthea HL7 FHIR wiki](https://github.com/synthetichealth/synthea/wiki/HL7-FHIR),
+[US Core](https://hl7.org/fhir/us/core/),
+[CA Core+](https://simplifier.net/guide/ca-core).
+
 ---
 
 ## 3. Requirement-to-Asset Map
@@ -167,11 +312,11 @@ Duplicate implementations also exist (`src/utils/neurologyCalculators.ts`,
 | R1 Virtual clock | Injectable engine cores (F7 green) | No event queue or scheduler exists | **Missing** |
 | R1.5 Fail on wall-clock dependence | — | Needs an explicit detection mechanism | **Missing** |
 | R2 Reproducibility | — | `createId` is wall-clock + `Math.random` (G2); no seeded PRNG anywhere | **Missing / Constraint** |
-| R3 Policy substitution | 6 pure calculators; `heart.ts` present | Policy interface absent; TIMI absent (G7) | **Missing** |
+| R3 Policy substitution | 6 pure calculators; `heart.ts` present | Policy interface absent; TIMI absent (G7); calculator inputs are pre-scored judgement, not cohort-derivable (G10) | **Missing / Constraint** |
 | R4 Cohort ingestion | `setPatients` | No FHIR assets (G5); 3 required fields unsourceable (G6) | **Missing / Constraint** |
 | R5 Replications + CIs | — | No batch runner, no statistics helper | **Missing** |
 | R6 Board rendering | Whiteboard surface; `simulationModeService` for display | Gate is browser-only (G4); outbound audit fires (G1) | **Constraint** |
-| R7.1 No transmission | `typeof window` guard | Holds headless; **fails in browser** (G1) | **Constraint** |
+| R7.1 No transmission | `typeof window` guard | Holds headless; **fails in browser with a session** — persists synthetic patient IDs to the audit table (G1) | **Constraint** |
 | R7.2 No inbound overwrite | — | Hook + realtime channel must be suppressed (G8) | **Constraint** |
 | R7.3 Stop existing animator | `stopEmergencySimulation()` (`simulation.ts:756`) | Available as-is | — |
 | R7.5 No store modification | Mutators are sufficient for state | Not sufficient for determinism (G2) | **Constraint** |
@@ -248,9 +393,12 @@ a short shift through the real mutators (Option A) purely to answer Q1 honestly 
 2. **Decide and document the R2.2 comparison artifact explicitly.** Given G2, name exactly what is
    compared — recommended: the simulator's own event log and summary statistics, excluding
    store-generated audit and workflow logs, justified in writing under R2.4.
-3. **Treat G1 as a first-class design constraint for the rendering path.** Establish before the
-   browser demo that no simulated audit entry can be transmitted. The `typeof window` guard does not
-   protect the browser case, which is the case R6 requires.
+3. **Build the rendering path on `setPatients` projection only (G1 option 1).** The browser path
+   must not call `movePatientToState`, because that writes synthetic patient IDs into the production
+   audit table as `resource: "patient:<id>"` against the real user and tenant. The `typeof window`
+   guard does not protect the browser case, which is exactly the case R6 requires. If Option C's
+   mutator probe is ever run in a browser rather than headless, add the runtime guard in
+   `appendAuditLog` as well (option 2) — a contract test permits gating but forbids deletion.
 4. **Separate display gating from run gating (G4).** Reuse `simulationModeService` for the
    indication; own the run-active flag in the simulator. State this in the design so it is not read
    as the parallel-switch pathology.
@@ -262,3 +410,83 @@ a short shift through the real mutators (Option A) purely to answer Q1 honestly 
    repo owner as a downstream question, since the product thesis leans on them.
 7. **Instrument R1.2 early.** Measure the 12-hour run time as soon as D2 exists, before D3 adds
    per-move log writes, so a performance problem is attributable.
+
+---
+
+# Design Discovery & Synthesis — 2026-08-10
+
+*Appended during `/kiro-spec-design`. The gap analysis above supplied the codebase half of discovery; this section records the external research and the synthesis decisions that shaped `design.md`.*
+
+## Discovery scope
+
+Codebase discovery was already complete (G1–G9 above). This pass covered only what was still unknown: external dependency viability and the actual shape of Synthea's FHIR output.
+
+## External investigations
+
+### I1 — Synthea FHIR R4 output structure
+
+| Finding | Design implication |
+|---|---|
+| One file per patient, `Bundle.type = transaction`, `Patient` resource as the **first entry** | The loader keys on entry order rather than searching, and one general mapping is genuinely achievable (4.2) |
+| Followed by Encounter / Condition / Observation / Procedure / MedicationRequest entries, grouped by encounter in chronological order | Vitals selection is "most recent Observation before cohort cutoff", not "first match" |
+| **Organizations and Practitioners exported in separate files** because they are referenced across patients | The loader must classify these as `not-a-patient-bundle` and skip them — otherwise a normal export produces spurious failures. This is why `CohortLoadSkip.reason` includes that variant (4.3) |
+| Resources cross-reference by relative URI / `urn:uuid` | No reference resolution is needed for the spike's narrow subset; noted so it is not attempted |
+| Observations carry LOINC codes | Vitals mapping is a declared LOINC→field table (`loincVitalsMap.ts`), not display-name string matching |
+
+Sources: [MITRE FHIR for Research — Synthea overview](https://mitre.github.io/fhir-for-research/modules/synthea-overview), [FHIR test data from Synthea](https://darrendevitt.com/fhir-test-data-from-synthea/).
+
+### I2 — Seeded PRNG
+
+`pure-rand` (dubzzz, MIT, TypeScript-native, ESM): offers `congruential32`, `mersenne`, `xorshift128plus`, `xoroshiro128plus`, with `xoroshiro128plus` recommended by the maintainers. Actively maintained. Critically, it provides a **jump** operation — jumping in xoroshiro128+ moves 2⁶⁴ generations forward in a 2¹²⁸ sequence — which yields genuinely independent streams per replication.
+
+`seedrandom` (davidbau, 3.0.5) is the better-known alternative but offers no jump primitive. The TC39 `SeededPRNG` proposal (ChaCha12) is not shipped and cannot be relied on.
+
+Sources: [pure-rand](https://github.com/dubzzz/pure-rand), [seedrandom](https://github.com/davidbau/seedrandom), [TC39 proposal-seeded-random](https://tc39.es/proposal-seeded-random/).
+
+### I3 — FHIR TypeScript types
+
+`@types/fhir` (DefinitelyTyped, MIT, updated June 2026) and `@medplum/fhirtypes` (updated June 2026) are both current. `@ahryman40k/ts-fhir-types` was last published four years ago and is rejected. `@types/fhir` is chosen: it is a pure type package, installs as a devDependency, and adds **zero runtime footprint** — which matters in a repo with 12 runtime dependencies.
+
+Sources: [@types/fhir](https://www.npmjs.com/package/@types/fhir), [@medplum/fhirtypes](https://www.npmjs.com/package/@medplum/fhirtypes).
+
+## Synthesis outcomes
+
+### Generalization
+
+- **`DecisionPolicy` is the generalization of requirement 3.** Requirements 3.1–3.6 are variations on one problem: making the clinical decision rule a run parameter. The interface is generalized to admit any disposition rule; only two are implemented. Interface generalized, implementation not — per the synthesis rule.
+- **`IntervalEstimate` generalizes requirement 5.** 5.2 (per-configuration intervals) and 5.3 (paired difference) are the same statistical object at different arities. One type, used twice.
+- **Rejected generalization**: a pluggable "process model" abstraction over `EdFlowModel`. There is exactly one ED process in scope and no second in prospect. Speculative.
+
+### Build vs. adopt
+
+| Component | Decision | Rationale |
+|---|---|---|
+| Seeded PRNG | **Adopt** `pure-rand` | Correct stream independence across 30 replications is the part that is easy to get subtly wrong. Deriving replication streams by `seed + i` produces correlated sequences in LCG-family generators and would silently invalidate every interval in 5.2 — a failure that produces plausible numbers rather than an error. Jump-based derivation is the established fix and is provided. |
+| FHIR types | **Adopt** `@types/fhir` | Type-only, zero runtime cost, actively maintained. Hand-writing R4 shapes is pure toil. |
+| Event queue | **Build** | `tinyqueue` and `heap-js` are battle-tested but do **not** guarantee stable ordering for equal keys. Determinism (2.2) requires a total order, so ties must break on a monotonic sequence number. Adopting would mean wrapping a library to add the property that actually matters. ~60 lines. |
+| Statistics | **Build** | `simple-statistics` supplies the arithmetic but not the type-level constraint that makes 5.5 enforceable — the design makes a bare point estimate *unrepresentable*, which a general library cannot do. CI computation must also be auditable for 8.1/8.2. ~40 lines. |
+| Virtual clock | **Build** | Trivial; no library fits an advance-only simulated instant. |
+
+### Simplification
+
+- **Removed** a `SimulationSession` façade over clock + rng + queue + scheduler. It added a layer without adding a decision.
+- **Removed** a generic `Distribution` abstraction. Only exponential and categorical draws are needed; both are methods on `SeededRng`.
+- **Kept** `StoreProjection` and `MutatorProbe` as two adapters rather than one with a mode flag. They answer different questions, carry different risks, and only one may ever run in a browser — collapsing them would put a boundary violation one boolean away.
+- **Kept** `AcuityAssigner` separate from `SyntheaCohortLoader` despite both producing patient attributes. This seam is what keeps 4.4 honest: the loader maps only cohort data, the assigner produces declared modelling assumptions. Merging them would make fabricated and sourced values indistinguishable — precisely the H-1 failure.
+
+## Architecture pattern evaluation
+
+| Pattern | Verdict |
+|---|---|
+| **Hexagonal** (chosen) | The only pattern that lets one kernel serve a deterministic headless run, a browser projection, and a mutator probe without cross-contamination. The host sits behind adapters, which is exactly where G1 needs to be contained. |
+| Layered / MVC | No natural home for three different host-contact strategies. |
+| Event-sourced | Superficially attractive — `RunRecord` is already an append-only event log — but adds projection and replay machinery for a spike that needs neither. Rejected as speculative. |
+
+## Risks carried into implementation
+
+| Risk | Mitigation |
+|---|---|
+| 1.2's 10-second budget is unverified and may fail once the model writes per-event records | Instrument at the first runnable scheduler, before the model grows, so a regression is attributable |
+| Cohort load time for ≥200 Synthea patients is unmeasured and could dominate a batch | Measure separately from the run budget; load once and reuse across replications |
+| `MutatorProbe` run in a browser by mistake would violate 7.1 | Headless-only is a stated invariant; `storeProjection.isolation.test.ts` guards the projection path |
+| Two policies may produce overlapping intervals | Already resolved in requirements: 5.4 makes a null result valid output, so this is a finding rather than a failure |

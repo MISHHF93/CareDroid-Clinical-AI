@@ -170,14 +170,15 @@ differentiating capability is shown to be mechanically possible.
 
 ### Requirement 4: Synthetic cohort ingestion
 
-**Objective:** As the evaluator running the spike, I want a synthetic patient cohort to load without
-per-patient hand mapping, so that the claim that standards-based patient data gives this product
-leverage is tested rather than assumed.
+**Objective:** As the evaluator running the spike, I want a synthetic patient cohort to load from
+published-profile-conformant data without per-patient hand mapping, so that the claim that
+standards-based patient data gives this product leverage is tested rather than assumed, and so that
+ingestion targets a specification rather than one generator's output shape.
 
 #### Acceptance Criteria
 
-1. The ED Flow Simulator shall load a synthetic patient cohort supplied as FHIR R4 Bundles of the form
-   Synthea emits.
+1. The ED Flow Simulator shall load a synthetic patient cohort supplied as FHIR R4 Bundles conforming
+   to the US Core implementation guide.
 2. When a cohort of at least 200 synthetic patients is supplied, the ED Flow Simulator shall load it
    into the application's patient representation using a single general mapping, with no
    per-patient special-case handling.
@@ -185,6 +186,9 @@ leverage is tested rather than assumed.
    loading, and report the count and reason for every skipped record.
 4. The ED Flow Simulator shall populate only those patient attributes the cohort data actually
    supports, and shall not invent clinical values that the source data does not contain.
+5. Where a clinical decision-rule input is absent from the cohort, the ED Flow Simulator shall record
+   the generated value in the same standard representation it uses for cohort-derived values, marked
+   as generated and distinguishable from derived values on inspection.
 
 ### Requirement 5: Replicated execution and interval reporting
 

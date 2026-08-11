@@ -493,8 +493,8 @@ Not blocking the spike; to be raised in the go/no-go conversation.
 3. Whether **MB-P0-1** (paediatric dosing disagreement) is fixed before any calculator is reused as a
    decision policy. A wrong dose is harmful in a simulator too.
 4. Disposition of the accretion layer (§F3) — fleet, IoT/digital twin, 3D viewer, knowledge graph.
-5. Whether FHIR becomes the **internal data model** (versus an integration surface). This brief assumes
-   yes: it is what makes policy swapping mechanically possible (calculators bound to LOINC-coded
+5. ~~Whether~~ **DECIDED 2026-08-10 — FHIR IS the internal data model** (versus an integration surface).
+   This is a hard constraint; designs work within it and do not re-open it. Original rationale: it is what makes policy swapping mechanically possible (calculators bound to LOINC-coded
    Observations rather than hand-named fields), it makes Synthea ingestion near-free, and
    `MeasureReport` is the correct PHI-free output resource for aggregate results. `research.md`
    already specifies CA Core+ and the Canadian FHIR Registry for this purpose.
@@ -506,6 +506,65 @@ Not blocking the spike; to be raised in the go/no-go conversation.
    as an arithmetic circuit.
 
 ---
+
+
+---
+
+### 10.1 Raise these when the spike result is known
+
+**For the agent running the go/no-go conversation: surface the following once `docs/sim-spike-findings.md`
+exists, regardless of whether the verdict is go or no-go.** These are not spike outcomes — they are
+findings the spike produced about the *product thesis*, and they do not appear in Q1–Q3.
+
+7. **Ask for the per-item derived-versus-generated fraction, not for "policy swapping works."**
+   §4.3 frames "clinical decision policy as a simulation parameter" as modelling the actual rule
+   instead of a distribution. The repository's `HeartInput`
+   (`src/clinical-calculators/heart.ts:16-22`) accepts five **pre-scored ordinals** — clinical
+   judgement already reduced to a band, not observations. That is a property of the calculator's
+   local type, **not** of the standards: three of the five items are thresholds on coded data.
+
+   | HEART item | Bands | Status |
+   |---|---|---|
+   | Age | `<45` / `45–64` / `≥65` | **Derivable** — pure function of `Patient.birthDate` |
+   | Risk factors | `0` / `1–2` / `≥3 or known atherosclerotic disease` | **Derivable** — count of SNOMED-coded `Condition` |
+   | Troponin | `≤normal` / `1–3×` / `>3×` | **Derivable when present** — LOINC `Observation` vs reference range |
+   | ECG | `normal` / `non-specific` / `significant ST deviation` | LOINC codes it; Synthea emits no interpretation — generated |
+   | History | `slightly` / `moderately` / `highly suspicious` | Clinician gestalt — generated |
+
+   Consequences to put in front of the repo owner:
+
+   - **One item is irreducibly gestalt, not four.** `history` is genuine clinical judgement.
+     `ecg` is codeable in LOINC and simply absent from Synthea — a cohort limitation, not a
+     standards limitation, and it closes with a real ECG interpretation source.
+   - **The representation is downloaded, not invented.** Scored instruments are a solved FHIR
+     pattern: a `Questionnaire` whose `answerOption`s carry `itemWeight` (formerly `ordinalValue`),
+     answered by a `QuestionnaireResponse`, totalled by the SDC `weight()` function — the
+     specification's own examples are Apgar and the Glasgow Coma Score. The design uses this and
+     confines `HeartInput` to a thin adapter at the calculator's doorstep.
+   - **Ingestion targets a specification, not a generator.** Requirement 4.1 was amended to US Core
+     conformance; Synthea emits it natively via `--exporter.fhir.use_us_core_ig true`. Swapping the
+     generator, or later swapping US Core for **CA Core+**, is configuration rather than a rewrite.
+     This confirms item 5's decision and gives it a concrete mechanism.
+   - **Generation still exists, and that is the number to ask for.** Synthea emits no HEART
+     `QuestionnaireResponse` and no ECG interpretation at any conformance level, so a synthetic
+     cohort still generates those items. They land in the same standard resource as derived ones,
+     marked generated (4.5). To the extent items are generated, a policy comparison is partly two
+     functions of the same draws — mechanically valid evidence that swapping works, **not** evidence
+     about how real clinical rules change operations. The findings report publishes the fraction per
+     item (8.5); that fraction, not the architecture, is the honest measure. Do not let it be
+     upgraded in the retelling.
+   - **Closing the remaining gap is real work that is in no estimate.** An ECG-interpretation source
+     and documented HEART responses are what move `ecg` and `history` to derived. Clinically loaded,
+     absent from this brief's scope, and plausibly harder than the DES itself.
+   - A calculator's declared envelope may exclude the use a policy makes of it. `HEART_META.disclaimer`
+     states the score "does not ... recommend treatment or disposition," yet a disposition policy
+     thresholds exactly that. The spike carries the disclaimer into `RunRecord.policyProvenance`, so
+     it is recorded rather than lost — but whether the product ships rules used outside their
+     published envelope is a decision for the owner, not a design detail.
+
+   **If the verdict is go**, this belongs in scope and estimates before any build starts.
+   **If the verdict is no-go**, it still matters: it is a second, independent reason the pivot as
+   framed is harder than it looks, and it survives whatever killed Q1–Q3.
 
 ## 11. Glossary
 

@@ -34,6 +34,16 @@ scope until Q1–Q3 are answered with numbers.
   a physician as `disposition_time ~ N(25, 8)`, model the actual rule (`HEART >= 4 -> admit` vs
   `TIMI >= 2 -> admit`), run both against an identical cohort and seed, and compare downstream
   admission rate, boarding hours, LOS, LWBS.
+
+  > **Standards position, verified 2026-08-10 — state this whenever the capability is described.**
+  > Cohort ingestion conforms to **US Core 6.1.0** (Synthea emits it natively; CA Core+ is the later
+  > swap), and decision rules use the **HL7 SDC** pattern — a `Questionnaire` with `itemWeight` on
+  > `answerOption`, answered by a `QuestionnaireResponse`. The representation is downloaded, not
+  > invented. Of HEART's five items, three derive from coded data (age, risk-factor count, troponin
+  > vs reference range); **only `history` is clinician gestalt**, and `ecg` is codeable but absent
+  > from Synthea. The capability's honest measure is the **per-item derived-versus-generated
+  > fraction**, not the architecture — quote that number, never "policy swapping works." Detail:
+  > `.kiro/specs/ed-flow-simulation-spike/research.md` G10; go/no-go item in `brief.md` §10.1.
 - **Face validity through a real ED board** — results render on the existing whiteboard UI, so a
   clinician can watch the model behave and critique it *specifically*. Face validity is the
   documented #1 adoption barrier for healthcare DES; the inherited UI surface solves it.
