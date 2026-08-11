@@ -4956,9 +4956,33 @@ export const useEmergencyStore: UseBoundStore<StoreApi<EmergencyStoreState>> =
         return;
       }
       if (['ems_arrival', 'ems_arrival_created', 'ems_incoming', 'ems_updated'].includes(type)) {
-        const arrival = firstValue(payload, ['arrival', 'patient']) ?? payload;
-        get().upsertEmsIncomingPatient(normalizeEmsIncomingPatient(arrival));
-        get().addEMSArrival(normalizeEmsIncomingPatient(arrival) as unknown as EMSArrival);
+        // 'ems_updated' -- the only one of these 4 the backend ever actually
+        // broadcasts (EmergencyRealtimeService.publishEmsUpdate(), called
+        // whenever a patient update touches an EMS-flagged patient) -- ships
+        // a FULL EMS-intake envelope (EMSIntakeService.getEMSIntake()'s own
+        // output: {data: {emsArrivals: [...], arrivals: [...], ...}}), not a
+        // single arrival record. Treating the whole envelope as if it WERE
+        // one arrival (the previous `firstValue(payload, ['arrival',
+        // 'patient']) ?? payload` fallback) silently upserted a phantom
+        // "arrival" built from top-level envelope fields (module/generatedAt/
+        // source/...) into state.emsArrivals/emsIncomingPatients on every
+        // single EMS-patient update -- a real, live data-corruption bug, not
+        // hypothetical (confirmed via direct trace: publishEmsUpdate fires
+        // routinely since EMS-flagged patients are common in this app's own
+        // data). Parse it the same way buildRealtimeHydrationPayload already
+        // does for every other list-shaped broadcast.
+        const arrivals = extractEmsIncomingPatients(payload);
+        if (arrivals.length) {
+          get().hydrateFromApi({ emsArrivals: arrivals as unknown as EMSArrival[] });
+          set((state) => ({
+            emsIncomingPatients: [
+              ...arrivals,
+              ...state.emsIncomingPatients.filter(
+                (candidate) => !arrivals.some((incoming) => incoming.id === candidate.id),
+              ),
+            ],
+          }));
+        }
         return;
       }
       if (['queue_updated', 'queue_changed', 'queues_updated'].includes(type)) {

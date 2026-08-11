@@ -125,3 +125,43 @@ describe('EMSIntakeService arrival status persistence', () => {
     ).not.toThrow();
   });
 });
+
+describe('EMSIntakeService realtime broadcast (MB-P0-6 follow-up)', () => {
+  // Before this fix, updateArrivalStatus (and completeHandoff, which calls
+  // it internally) persisted an arrival's transition correctly but never
+  // broadcast anything -- EMSIntakeService had no EmergencyRealtimeService
+  // at all, same gap shape ReferralService had before HEAL-094.
+  // publishEmsUpdate() already existed on EmergencyRealtimeService and was
+  // already correctly building a full getEMSIntake() envelope, but was only
+  // ever called from EmergencyPatientService when an EMS-flagged PATIENT
+  // record changed -- never from the one place that mutates an EMS ARRIVAL
+  // record directly.
+  it('calls realtimeService.publishEmsUpdate() after an arrival status change', async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [WorkflowActionLogService, EmergencyPatientService, EMSIntakeService],
+    }).compile();
+    const service = module.get<EMSIntakeService>(EMSIntakeService);
+    const publishEmsUpdate = jest.fn();
+    (service as unknown as { realtimeService: unknown }).realtimeService = { publishEmsUpdate };
+
+    service.updateArrivalStatus('ems-arrival-broadcast-1', { status: 'Arrived' });
+
+    expect(publishEmsUpdate).toHaveBeenCalledTimes(1);
+  });
+
+  it('calls realtimeService.publishEmsUpdate() exactly once for a handoff completion, not twice via the internal updateArrivalStatus call', async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [WorkflowActionLogService, EmergencyPatientService, EMSIntakeService],
+    }).compile();
+    const service = module.get<EMSIntakeService>(EMSIntakeService);
+    const publishEmsUpdate = jest.fn();
+    (service as unknown as { realtimeService: unknown }).realtimeService = { publishEmsUpdate };
+
+    service.completeHandoff({ arrivalId: 'ems-arrival-broadcast-2', unitName: 'Medic 5' });
+
+    // completeHandoff delegates the actual mutation to updateArrivalStatus
+    // internally -- assert the broadcast fires exactly once, not once per
+    // layer of the call chain.
+    expect(publishEmsUpdate).toHaveBeenCalledTimes(1);
+  });
+});

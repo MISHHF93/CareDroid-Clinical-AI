@@ -1579,6 +1579,7 @@ export class EMSIntakeService implements OnModuleInit {
     @Optional()
     @InjectRepository(EmsArrivalStatus)
     private readonly arrivalStatusRepository?: Repository<EmsArrivalStatus>,
+    @Optional() private readonly realtimeService?: EmergencyRealtimeService,
   ) {}
 
   /**
@@ -1651,6 +1652,15 @@ export class EMSIntakeService implements OnModuleInit {
     if (!merged.status) merged.status = existing.status || 'Inbound';
     this.arrivalStatusById.set(id, merged);
     this.persistArrivalStatus(id, merged);
+    // Was silent -- an arrival's Inbound/Arrived/handoff-started/handoff-
+    // completed transition persisted correctly but never told another tab
+    // or user anything changed (same gap shape as ReferralService before
+    // HEAL-094). publishEmsUpdate() already exists and already builds the
+    // correct full-envelope payload (getEMSIntake()'s own output) -- it was
+    // just never called from the one place that actually mutates this
+    // service's own state; only EmergencyPatientService called it, and only
+    // when an EMS-flagged PATIENT record changed, not an EMS ARRIVAL record.
+    this.realtimeService?.publishEmsUpdate();
 
     return envelope('EMS Arrival Status', { ok: true, arrivalId: id, ...merged });
   }

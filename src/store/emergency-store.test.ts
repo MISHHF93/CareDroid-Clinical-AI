@@ -345,6 +345,49 @@ describe('CareDroid store shim', () => {
     );
   });
 
+  it('parses ems_updated as a full EMS-intake envelope, not a phantom single arrival built from envelope fields', () => {
+    const store = useEmergencyStore.getState();
+    const before = store.emsArrivals.length;
+
+    // EmergencyRealtimeService.publishEmsUpdate() broadcasts
+    // EMSIntakeService.getEMSIntake()'s own real output shape -- a full
+    // envelope, not a single arrival record. Before this fix, the handler
+    // treated the WHOLE envelope as if it were one arrival (there's no
+    // top-level `.arrival`/`.patient` key on an envelope), producing a
+    // phantom emsArrivals/emsIncomingPatients entry built from fields like
+    // `module`/`generatedAt`/`source` instead of a real patient.
+    store.dispatchWebSocketEvent({
+      type: 'ems_updated',
+      payload: {
+        module: 'EMS Intake',
+        generatedAt: '2026-08-11T00:00:00.000Z',
+        source: 'backend',
+        status: 'ok',
+        data: {
+          emsArrivals: [
+            {
+              id: 'ems-realtime-sync-test',
+              patientId: 'pt-realtime-ems-test',
+              unitId: 'unit-42',
+              status: 'Arrived',
+            },
+          ],
+        },
+      },
+    });
+
+    const next = useEmergencyStore.getState();
+    // No phantom entry carrying envelope-level fields.
+    expect(next.emsArrivals.some((arrival) => 'module' in arrival || 'generatedAt' in arrival)).toBe(
+      false,
+    );
+    // The real arrival was applied.
+    expect(next.emsArrivals.find((arrival) => arrival.id === 'ems-realtime-sync-test')).toEqual(
+      expect.objectContaining({ status: 'Arrived' }),
+    );
+    expect(next.emsArrivals.length).toBeGreaterThanOrEqual(before);
+  });
+
   it('handles intake_handoff_complete websocket by selecting patient and triage queue filter', () => {
     const store = useEmergencyStore.getState();
     const patientId = store.patients[0]?.id;
