@@ -146,3 +146,32 @@ describe('EmergencySettingsService persistence', () => {
     expect(result.data.tenantName).toBeTruthy();
   });
 });
+
+describe('EmergencySettingsService realtime broadcast (MB-P0-6 follow-up)', () => {
+  // Before this fix, updateSettings() persisted a threshold change (reassessment
+  // intervals, capacity warning bands, EMS offload targets, etc.) correctly, but
+  // EmergencySettingsService had no EmergencyRealtimeService at all -- every
+  // other logged-in user kept computing against their own stale in-memory
+  // settings until their next full reload. The frontend already had a correct
+  // 'settings_updated' handler waiting for this exact envelope shape; it just
+  // never received anything. Same gap shape as ReferralService/EMSIntakeService
+  // before HEAL-094/095.
+  it('broadcasts settings_updated with the same envelope getSettings() itself returns', async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [EmergencySettingsService],
+    }).compile();
+    const service = module.get<EmergencySettingsService>(EmergencySettingsService);
+    const publish = jest.fn();
+    const publishBoardMutations = jest.fn();
+    (service as unknown as { realtimeService: unknown }).realtimeService = {
+      publish,
+      publishBoardMutations,
+    };
+
+    const result = service.updateSettings({ tenantName: 'Broadcast General' }, 'org-broadcast');
+
+    expect(publish).toHaveBeenCalledWith({ type: 'settings_updated', payload: result });
+    expect(publishBoardMutations).toHaveBeenCalledTimes(1);
+    expect((result.data as { tenantName: string }).tenantName).toBe('Broadcast General');
+  });
+});

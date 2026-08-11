@@ -2755,6 +2755,7 @@ export class EmergencySettingsService implements OnModuleInit {
     @Optional()
     @InjectRepository(EmergencyOsSettingsEntity)
     private readonly settingsRepository?: Repository<EmergencyOsSettingsEntity>,
+    @Optional() private readonly realtimeService?: EmergencyRealtimeService,
   ) {}
 
   /**
@@ -2845,7 +2846,19 @@ export class EmergencySettingsService implements OnModuleInit {
 
     this.byOrganization.set(key, merged);
     this.persistSettingsToDatabase(key, merged);
-    return this.getSettings(organizationId);
+    const result = this.getSettings(organizationId);
+    // Was silent -- a threshold change (reassessment intervals, capacity
+    // warning bands, EMS offload targets, etc.) persisted correctly but
+    // every OTHER logged-in user kept computing against their own stale
+    // in-memory settings until their next full reload. The frontend
+    // already had a correct 'settings_updated' handler (dispatchWebSocketEvent
+    // -> saveEmergencySettings) waiting for exactly this envelope shape --
+    // it just never received anything, since this service never broadcast
+    // at all (same gap shape as ReferralService/EMSIntakeService before
+    // HEAL-094/095).
+    this.realtimeService?.publish({ type: 'settings_updated', payload: result });
+    this.realtimeService?.publishBoardMutations();
+    return result;
   }
 }
 
