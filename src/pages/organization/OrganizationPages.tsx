@@ -1,4 +1,5 @@
 import { MEDICAL_THEME } from '../../config/medicalTheme.constants';
+import { CANONICAL_ROUTES } from '../../config/routes.config';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Card from '../../components/ui/card';
@@ -1747,6 +1748,7 @@ export function TenantAdministrationCenter() {
         <div className="org-page-actions">
           <Link to="/organization">Organization home</Link>
           <Link to="/billing">Billing</Link>
+          <Link to={CANONICAL_ROUTES.customerSuccessDashboard}>Customer success dashboard</Link>
         </div>
       </header>
 

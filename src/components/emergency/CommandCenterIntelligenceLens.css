@@ -1,3 +1,10 @@
+.command-center-lens__header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cd-space-2, 8px);
+}
+
 .command-center-lens__panel-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));

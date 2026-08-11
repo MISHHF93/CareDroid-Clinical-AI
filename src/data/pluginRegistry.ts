@@ -77,13 +77,17 @@ export const PLUGIN_REGISTRY = Object.freeze([
       logic: PLUGIN_PERMISSION_LOGIC.ALL,
     },
     inventory: {
-      route: '/tools/catalog',
+      // HEAL-080: this doc comment used to claim '/tools/catalog', a path
+      // that never actually worked (falls through to the /tools/* catch-all
+      // -- see router.tsx's ToolsRedirect). ClinicalToolCatalog.tsx is now a
+      // real route at CANONICAL_ROUTES.clinicalToolCatalog.
+      route: '/clinical-tool-catalog',
       component: 'src/pages/tools/ClinicalToolCatalog.tsx',
       description:
-        'Future calculator plugin registration slot for fluid resuscitation decision-support tools.',
+        'Calculator plugin registration slot for fluid resuscitation decision-support tools.',
       catalogVisible: true,
       sidebarVisible: false,
-      tags: ['calculator', 'plugin', 'future-tool'],
+      tags: ['calculator', 'plugin'],
       testCoverage: ['pluginRegistry.test.ts'],
       riskLevel: 'medium',
     },

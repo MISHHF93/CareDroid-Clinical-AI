@@ -175,12 +175,22 @@ export default function CommandCenterIntelligenceLens({ view }: LensProps) {
             {definition?.description} Progressive disclosure — operational metrics remain primary above.
           </p>
         </div>
-        <Link
-          to={CANONICAL_ROUTES.emergencyCommandCenter}
-          className="emergency-route-filter-banner__btn cd-btn cd-btn--secondary cd-btn--sm"
-        >
-          Default view
-        </Link>
+        <div className="command-center-lens__header-actions">
+          {definition ? (
+            <Link
+              to={definition.fullDashboardPath}
+              className="emergency-route-filter-banner__btn cd-btn cd-btn--secondary cd-btn--sm"
+            >
+              View full dashboard
+            </Link>
+          ) : null}
+          <Link
+            to={CANONICAL_ROUTES.emergencyCommandCenter}
+            className="emergency-route-filter-banner__btn cd-btn cd-btn--secondary cd-btn--sm"
+          >
+            Default view
+          </Link>
+        </div>
       </div>
       <Panel />
     </section>

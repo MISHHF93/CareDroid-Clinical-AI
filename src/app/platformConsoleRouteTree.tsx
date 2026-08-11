@@ -84,6 +84,25 @@ const CareDroidBusinessBrainPage = lazyNamed(
   () => import('../pages/platform/BusinessBrain'),
   'CareDroidBusinessBrainPage',
 );
+const ExecutiveCommandCenterPage = lazyRoute(() => import('../pages/executive/ExecutiveCommandCenter'));
+const CommandDashboardPage = lazyRoute(() => import('../pages/executive/CommandDashboard'));
+const AiCommandCenterDashboardPage = lazyRoute(() => import('../pages/ai/AiCommandCenterDashboard'));
+const PredictiveAnalyticsDashboardPage = lazyRoute(
+  () => import('../pages/analytics/PredictiveAnalyticsDashboard'),
+);
+const AssetLifecycleAdminPage = lazyNamed(
+  () => import('../pages/organization/OrganizationPages'),
+  'AssetLifecycleAdmin',
+);
+const PlatformAnalyticsOrgPage = lazyNamed(
+  () => import('../pages/organization/OrganizationPages'),
+  'PlatformAnalyticsPage',
+);
+const CustomerSuccessDashboardPage = lazyNamed(
+  () => import('../pages/organization/OrganizationPages'),
+  'CustomerSuccessDashboard',
+);
+const ClinicalToolCatalogPage = lazyRoute(() => import('../pages/tools/ClinicalToolCatalog'));
 
 const PLATFORM_CONSOLE_PAGE_COMPONENTS = Object.freeze({
   clinicalDecisionSupport: ClinicalDecisionSupportPage,
@@ -120,6 +139,14 @@ const PLATFORM_CONSOLE_PAGE_COMPONENTS = Object.freeze({
   productIntelligence: ProductIntelligenceLayerPage,
   expansionOpportunities: CustomerExpansionOpportunitiesPage,
   maturityAssessment: MaturityAssessmentPage,
+  executiveDashboard: ExecutiveCommandCenterPage,
+  operationsCommandDashboard: CommandDashboardPage,
+  aiOperationsDashboard: AiCommandCenterDashboardPage,
+  predictiveAnalyticsDashboard: PredictiveAnalyticsDashboardPage,
+  assetLifecycleAdmin: AssetLifecycleAdminPage,
+  organizationAnalytics: PlatformAnalyticsOrgPage,
+  customerSuccessDashboard: CustomerSuccessDashboardPage,
+  clinicalToolCatalog: ClinicalToolCatalogPage,
 } as const);
 
 type LazyRouteProps = {

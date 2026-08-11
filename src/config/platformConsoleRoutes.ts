@@ -55,6 +55,61 @@ export const PLATFORM_CONSOLE_ROUTES = Object.freeze<PlatformConsoleRoute[]>([
   ...platformRoutes(CANONICAL_ROUTES.organizationSettings, 'Organization settings', 'organizationSettings', { wildcard: true }),
   { path: CANONICAL_ROUTES.organization, label: 'Organization dashboard', componentKey: 'organizationDashboard' },
   { path: CANONICAL_ROUTES.onboarding, label: 'Organization onboarding', componentKey: 'organizationOnboarding' },
+  // HEAL-080: full standalone dashboards orphaned by the Hospital Command
+  // Center's condensed intelligence-lens consolidation (HEAL-022). The lens
+  // views remain the default/primary experience; these give the fuller
+  // original content a real, reachable path again rather than deleting it.
+  {
+    path: CANONICAL_ROUTES.executiveDashboard,
+    label: 'Executive command center (full)',
+    componentKey: 'executiveDashboard',
+  },
+  {
+    path: CANONICAL_ROUTES.operationsCommandDashboard,
+    label: 'Operations command dashboard',
+    componentKey: 'operationsCommandDashboard',
+  },
+  {
+    path: CANONICAL_ROUTES.aiOperationsDashboard,
+    label: 'AI operations dashboard (full)',
+    componentKey: 'aiOperationsDashboard',
+  },
+  {
+    path: CANONICAL_ROUTES.predictiveAnalyticsDashboard,
+    label: 'Predictive analytics dashboard (full)',
+    componentKey: 'predictiveAnalyticsDashboard',
+  },
+  // HEAL-080 continuation: HEAL-025's remaining 3 orphaned OrganizationPages.tsx
+  // exports (OrganizationDashboard was already restored separately by
+  // HEAL-065's /organization fix). CustomerSuccessDashboard gets a new path
+  // distinct from /customer-success and /success-center, which stay
+  // redirected to TenantAdministrationCenter -- existing redirect behavior
+  // untouched.
+  {
+    path: CANONICAL_ROUTES.assetLifecycleAdmin,
+    label: 'Asset lifecycle admin',
+    componentKey: 'assetLifecycleAdmin',
+  },
+  {
+    path: CANONICAL_ROUTES.organizationAnalytics,
+    label: 'Organization analytics',
+    componentKey: 'organizationAnalytics',
+  },
+  {
+    path: CANONICAL_ROUTES.customerSuccessDashboard,
+    label: 'Customer success dashboard',
+    componentKey: 'customerSuccessDashboard',
+  },
+  // HEAL-029/HEAL-080: previously had zero route (the only prior "path" was
+  // a plugin-registry doc comment labeling it a "future" slot at /tools/catalog,
+  // which never actually worked -- that path falls through to the /tools/*
+  // catch-all). Given a real, distinct path outside the /tools/* namespace to
+  // avoid touching that existing catch-all's routing logic.
+  {
+    path: CANONICAL_ROUTES.clinicalToolCatalog,
+    label: 'Clinical tool catalog',
+    componentKey: 'clinicalToolCatalog',
+  },
 ]);
 
 export const PLATFORM_CONSOLE_ROUTE_PATHS = Object.freeze(
