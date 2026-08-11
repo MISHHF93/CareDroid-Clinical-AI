@@ -1,0 +1,22 @@
+{
+  "feature_name": "ed-flow-simulation-spike",
+  "created_at": "2026-08-11T02:38:52Z",
+  "updated_at": "2026-08-11T02:45:34Z",
+  "language": "en",
+  "phase": "requirements-generated",
+  "approvals": {
+    "requirements": {
+      "generated": true,
+      "approved": false
+    },
+    "design": {
+      "generated": false,
+      "approved": false
+    },
+    "tasks": {
+      "generated": false,
+      "approved": false
+    }
+  },
+  "ready_for_implementation": false
+}

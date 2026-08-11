@@ -38,6 +38,13 @@ scope until Q1–Q3 are answered with numbers.
   clinician can watch the model behave and critique it *specifically*. Face validity is the
   documented #1 adoption barrier for healthcare DES; the inherited UI surface solves it.
 - **Synthetic cohorts** — Synthea FHIR R4 Bundles as cohort source. No PHI, ever.
+
+> **Verified 2026-08-10 (gap analysis).** The "40 clinical calculators" figure that appeared in
+> earlier documents is not supported in scope: `CLINICAL_CALCULATOR_REGISTRY` holds **6**
+> (`qsofa`, `heart`, `wells-pe`, `gcs`, `news2`, `nihss`). The 39-entry figure is
+> `REGISTERED_EXECUTOR_TOOL_IDS` in the backend tool orchestrator — real, but a mix of calculators
+> and non-calculators, and behind a boundary the current spec excludes. Enough for the spike;
+> not yet enough to carry the product claim.
 - **Interval estimates, not point estimates** — results are reported over replications with
   confidence intervals.
 
@@ -71,7 +78,7 @@ Every liability of the clinical framing inverts into an asset:
 | No EHR integration | A simulator must *not* touch a live EHR — **removed** |
 | NACRS / CIHI reporting | Not a system of record — **removed** |
 | 41 screens, 23 roles, feature sprawl | **Face validity** |
-| 40 clinical calculators | **Swappable decision policies** — the core feature |
+| Clinical calculators | **Swappable decision policies** — the core feature |
 
 ## Hard product boundary (non-negotiable)
 
