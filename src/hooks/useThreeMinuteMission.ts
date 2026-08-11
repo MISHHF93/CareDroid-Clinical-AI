@@ -23,6 +23,14 @@ export function useThreeMinuteMission(options: { realtime?: boolean } = {}) {
     syncThreeMinuteMissionsFromEngine();
   }, [patients, alerts, emsArrivals]);
 
+  // Deliberately depends only on `options.realtime`, not patients/alerts/emsArrivals: this
+  // sets up a plain 1s ticker, which doesn't need to restart when store data changes (the
+  // separate sync effect above already re-syncs on those changes). Including them here
+  // previously tore the interval down and rebuilt it (plus fired an extra sync call)
+  // every time any of those store references changed, however often that happened
+  // elsewhere in the app -- contributing to MB-P0-4's app-wide render churn since every
+  // consumer of this hook (e.g. the globally-mounted OperationsCenterMenu) re-rendered
+  // each time.
   useEffect(() => {
     syncThreeMinuteMissionsFromEngine();
     if (options.realtime === false) return undefined;
@@ -31,7 +39,7 @@ export function useThreeMinuteMission(options: { realtime?: boolean } = {}) {
       syncThreeMinuteMissionsFromEngine();
     }, 1000);
     return () => window.clearInterval(timer);
-  }, [options.realtime, patients, alerts, emsArrivals]);
+  }, [options.realtime]);
 
   const snapshot = useMemo(
     () => buildThreeMinuteMissionSnapshotFromMissions(missions),
