@@ -6,6 +6,7 @@ import PatientDetailPanel from './PatientDetailPanel';
 import PatientCard from './PatientCard';
 import { Header } from './Header';
 import { ThemeProvider } from '../contexts/ThemeContext';
+import { UserProvider } from '../contexts/UserContext';
 import { useEmergencyStore } from '../store/emergencyStore';
 import {
   PatientFlag,
@@ -356,7 +357,9 @@ describe('R12 capacity header flow', () => {
     render(
       <MemoryRouter>
         <ThemeProvider>
-          <Header />
+          <UserProvider>
+            <Header />
+          </UserProvider>
         </ThemeProvider>
       </MemoryRouter>,
     );
