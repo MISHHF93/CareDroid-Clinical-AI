@@ -380,6 +380,89 @@ describe('AuthService', () => {
       );
     });
 
+    it('seeds a freshly-created dev user with an Enterprise subscription, not Free (HEAL-079)', async () => {
+      // Regression: the dev user was previously seeded at SubscriptionTier.FREE,
+      // which caused every subscription-gated AI feature (e.g. POST /api/ai/node,
+      // which requires 'professional'+) to 403 for the dev/demo bypass session --
+      // a local dev session should be able to exercise every feature, not hit
+      // real SaaS billing paywalls.
+      process.env.ENABLE_DEV_AUTH_BYPASS = 'true';
+
+      const devUser = {
+        id: 'dev-user-3',
+        email: 'dev@caredroid.local',
+        role: 'physician',
+        profile: null,
+        subscription: null,
+        twoFactor: null,
+      };
+      const organization = { id: 'org-3', organizationType: 'hospital' };
+
+      mockUserRepository.findOne.mockResolvedValueOnce(null).mockResolvedValueOnce(devUser);
+      mockUserRepository.create.mockReturnValue(devUser);
+      mockUserRepository.save.mockResolvedValue(devUser);
+      mockProfileRepository.create.mockReturnValue({ userId: devUser.id });
+      mockProfileRepository.save.mockResolvedValue({ userId: devUser.id });
+      mockProfileRepository.findOne.mockResolvedValue(null);
+      mockSubscriptionRepository.create.mockReturnValue({ userId: devUser.id, tier: 'enterprise' });
+      mockSubscriptionRepository.save.mockResolvedValue({ userId: devUser.id, tier: 'enterprise' });
+      mockSubscriptionRepository.findOne.mockResolvedValue(null);
+      mockOrganizationRepository.findOne.mockResolvedValue(null);
+      mockOrganizationRepository.create.mockReturnValue(organization);
+      mockOrganizationRepository.save.mockResolvedValue(organization);
+      mockOrganizationMembershipRepository.findOne.mockResolvedValue(null);
+      mockOrganizationMembershipRepository.create.mockReturnValue({});
+      mockOrganizationMembershipRepository.save.mockResolvedValue({});
+      mockWorkspaceRepository.findOne.mockResolvedValue(null);
+      mockWorkspaceRepository.create.mockReturnValue({ id: 'ws-3', name: 'Emergency Operations' });
+      mockWorkspaceRepository.save.mockResolvedValue({ id: 'ws-3', name: 'Emergency Operations' });
+      mockWorkspaceMembershipRepository.findOne.mockResolvedValue(null);
+      mockWorkspaceMembershipRepository.create.mockReturnValue({});
+      mockWorkspaceMembershipRepository.save.mockResolvedValue({});
+      mockJwtService.sign.mockReturnValue('signed-token');
+
+      await service.createDevSession('127.0.0.1', 'test-agent');
+
+      expect(mockSubscriptionRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({ userId: devUser.id, tier: 'enterprise' }),
+      );
+    });
+
+    it('self-heals an existing dev user whose subscription is still on the old Free default', async () => {
+      process.env.ENABLE_DEV_AUTH_BYPASS = 'true';
+
+      const existingSubscription = { userId: 'dev-user-4', tier: 'free' };
+      const devUser = {
+        id: 'dev-user-4',
+        email: 'dev@caredroid.local',
+        role: 'physician',
+        profile: { userId: 'dev-user-4' },
+        subscription: existingSubscription,
+        twoFactor: null,
+      };
+
+      mockUserRepository.findOne.mockResolvedValue(devUser);
+      mockUserRepository.save.mockResolvedValue(devUser);
+      mockSubscriptionRepository.save.mockImplementation((sub: any) => Promise.resolve(sub));
+      mockOrganizationRepository.findOne.mockResolvedValue({
+        id: 'org-4',
+        organizationType: 'hospital',
+      });
+      mockOrganizationMembershipRepository.findOne.mockResolvedValue({ id: 'mem-4' });
+      mockWorkspaceRepository.findOne.mockResolvedValue({
+        id: 'ws-4',
+        name: 'Emergency Operations',
+      });
+      mockWorkspaceMembershipRepository.findOne.mockResolvedValue({ id: 'wmem-4' });
+      mockJwtService.sign.mockReturnValue('signed-token');
+
+      await service.createDevSession('127.0.0.1', 'test-agent');
+
+      expect(mockSubscriptionRepository.save).toHaveBeenCalledWith(
+        expect.objectContaining({ userId: 'dev-user-4', tier: 'enterprise' }),
+      );
+    });
+
     it('does not throw when platformAssetsService is unavailable (optional dependency)', async () => {
       process.env.ENABLE_DEV_AUTH_BYPASS = 'true';
 

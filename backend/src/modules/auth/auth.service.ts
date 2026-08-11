@@ -351,9 +351,16 @@ export class AuthService {
       });
       await this.profileRepository.save(profile);
 
+      // Enterprise, not Free: this is a local dev/demo bypass session, not a
+      // real customer account, and it needs to exercise every entitlement-
+      // gated feature (AI node capabilities require 'professional'+) without
+      // hitting subscription-tier paywalls that only make sense for real
+      // SaaS billing. Matches this codebase's own existing "full access
+      // demo user" convention (workspace-context.service.spec.ts's test
+      // fixture already assumes tier: 'enterprise' for a physician user).
       const subscription = this.subscriptionRepository.create({
         userId: user.id,
-        tier: SubscriptionTier.FREE,
+        tier: SubscriptionTier.ENTERPRISE,
         status: SubscriptionStatus.ACTIVE,
       });
       await this.subscriptionRepository.save(subscription);
@@ -362,6 +369,26 @@ export class AuthService {
         where: { id: user.id },
         relations: ['profile', 'subscription', 'twoFactor'],
       });
+    } else if (!user.subscription) {
+      // Dev user row pre-dates the subscription bootstrap above, or its
+      // subscription was somehow removed -- self-heal rather than leave the
+      // dev session permanently unable to reach entitlement-gated features.
+      const subscription = this.subscriptionRepository.create({
+        userId: user.id,
+        tier: SubscriptionTier.ENTERPRISE,
+        status: SubscriptionStatus.ACTIVE,
+      });
+      await this.subscriptionRepository.save(subscription);
+      user = await this.userRepository.findOne({
+        where: { id: user.id },
+        relations: ['profile', 'subscription', 'twoFactor'],
+      });
+    } else if (user.subscription.tier !== SubscriptionTier.ENTERPRISE) {
+      // Existing dev DBs (this one included) were seeded with the old FREE
+      // default before this fix -- upgrade in place so an already-running
+      // dev session doesn't need a fresh database to pick this up.
+      user.subscription.tier = SubscriptionTier.ENTERPRISE;
+      await this.subscriptionRepository.save(user.subscription);
     }
 
     if (!user) {
