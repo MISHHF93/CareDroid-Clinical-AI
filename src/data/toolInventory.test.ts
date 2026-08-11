@@ -307,7 +307,10 @@ describe('canonical tool inventory', () => {
       expect(userFacingById.get(plugin.id), plugin.id).toBeTruthy();
     }
 
-    expect(resolveToolInventoryRecord('future-tool', records)?.id).toBe(
+    // Alias resolution falls back to a plugin's own name when the id doesn't
+    // match directly (HEAL-080 moved this plugin to a real dedicated route,
+    // so its 'future-tool' placeholder tag no longer applies).
+    expect(resolveToolInventoryRecord('Fluid Resuscitation Calculator Plugin', records)?.id).toBe(
       'plugin-fluid-resuscitation-calculator'
     );
     expect(pluginIds).toContain('plugin-guideline-copilot-extension');

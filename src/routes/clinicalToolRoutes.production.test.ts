@@ -22,6 +22,7 @@ import {
   CALCULATOR_ROUTE_DEFS,
   REQUIRED_PRODUCTION_TOOL_PATHS,
   REGISTRY_TOOL_PATHS,
+  TOOLS_OVERVIEW_PATHS,
   expectedLaunchPath,
   isKnownToolAreaPath,
   isRegisteredCalculatorSlug,
@@ -69,9 +70,13 @@ describe('Production routes — archived calculator route inventory', () => {
 
   it.each(REQUIRED_PRODUCTION_TOOL_PATHS)('registers required production path %s', (path) => {
     const fromCalculatorDefs = CALCULATOR_ROUTE_DEFS.some((d) => d.path === path);
+    const fromOverviewPaths = (TOOLS_OVERVIEW_PATHS as readonly string[]).includes(path);
     if (fromCalculatorDefs) {
       expect(CALCULATOR_ROUTE_DEFS.find((d) => d.path === path)).toBeTruthy();
-    } else {
+    } else if (!fromOverviewPaths) {
+      // Overview paths (e.g. /tools/catalog) are redirect-only entry points,
+      // not tool-registry-backed routes -- they're declared directly in
+      // TOOLS_OVERVIEW_PATHS rather than surfacing in REGISTRY_TOOL_PATHS.
       expect(REGISTRY_TOOL_PATHS).toContain(path);
     }
     expect(isKnownToolAreaPath(path)).toBe(true);
