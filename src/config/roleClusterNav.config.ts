@@ -73,7 +73,7 @@ export const HOSPITAL_ROLE_NAV_IDS: Readonly<Record<string, readonly string[]>> 
 
   // ── Cluster B: Reception & Intake ──────────────────────────────────────────
   registration_clerk: Object.freeze([
-    'reception', 'patients', 'pulse', 'shift', 'alerts', 'collaboration', 'help',
+    'reception', 'patients', 'pulse', 'shift', 'alerts', 'copilot', 'collaboration', 'help',
   ]),
 
   // ── Cluster C: Nursing & Triage ────────────────────────────────────────────

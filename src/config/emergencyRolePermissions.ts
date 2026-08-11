@@ -420,7 +420,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
     label: EMERGENCY_ROLE_LABELS[EMERGENCY_ROLE_IDS.registrationClerk],
     description:
       'Emergency reception role for fast arrival capture, intake drafts, demographics, queue handoff, and critical staff notification without clinical override authority.',
-    routes: [ROUTES.reception, ROUTES.patients, ROUTES.intake, ROUTES.pulse, ROUTES.shift, ROUTES.alerts, ROUTES.collaboration, ROUTES.help],
+    routes: [ROUTES.reception, ROUTES.patients, ROUTES.intake, ROUTES.pulse, ROUTES.shift, ROUTES.alerts, ROUTES.copilot, ROUTES.collaboration, ROUTES.help],
     actions: [
       EMERGENCY_ACTIONS.createPatient,
       EMERGENCY_ACTIONS.editPatientDemographics,
@@ -428,6 +428,7 @@ export const EMERGENCY_ROLE_DEFINITIONS = Object.freeze({
       EMERGENCY_ACTIONS.verifyIntake,
       EMERGENCY_ACTIONS.convertEmsArrival,
       EMERGENCY_ACTIONS.receptionEscalate,
+      EMERGENCY_ACTIONS.useCopilot,
     ],
     defaultRoute: getDefaultRouteForProfile(EMERGENCY_ROLE_IDS.registrationClerk),
   }),

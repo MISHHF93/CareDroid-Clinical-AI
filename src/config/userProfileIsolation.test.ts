@@ -29,7 +29,6 @@ const PROFILE_ROUTE_MATRIX: Readonly<
     ],
     deny: [
       CANONICAL_ROUTES.emergencyWhiteboard,
-      CANONICAL_ROUTES.emergencyCopilot,
       CANONICAL_ROUTES.emergencyAnalytics,
       CANONICAL_ROUTES.trackMindWorkspace,
       CANONICAL_ROUTES.surveillanceNexus,

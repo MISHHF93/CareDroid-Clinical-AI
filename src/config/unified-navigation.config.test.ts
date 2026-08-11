@@ -402,7 +402,7 @@ describe('unified navigation config', () => {
 
   it('hides standalone intake nav for registration clerks', () => {
     const clerkNavIds = getVisibleNavigation('registration_clerk').map((item) => item.id);
-    expect(clerkNavIds).toEqual(['reception', 'patients', 'pulse', 'shift', 'alerts', 'collaboration', 'help']);
+    expect(clerkNavIds).toEqual(['reception', 'patients', 'pulse', 'shift', 'alerts', 'copilot', 'collaboration', 'help']);
     expect(clerkNavIds).not.toContain('whiteboard');
     expect(clerkNavIds).not.toContain('intake');
     expect(clerkNavIds).not.toContain('queues');
@@ -410,11 +410,10 @@ describe('unified navigation config', () => {
     expect(clerkNavIds).not.toContain('platform');
   });
 
-  it('scopes reception clerk pilot nav to front-desk utilities', () => {
+  it('scopes reception clerk pilot nav to front-desk utilities, including Copilot', () => {
     const clerkNavIds = getVisibleNavigationForSaasRole('registration-clerk').map((item) => item.id);
-    expect(clerkNavIds).toEqual(expect.arrayContaining(['reception', 'patients', 'pulse', 'shift']));
+    expect(clerkNavIds).toEqual(expect.arrayContaining(['reception', 'patients', 'pulse', 'shift', 'copilot']));
     expect(clerkNavIds).not.toContain('whiteboard');
-    expect(clerkNavIds).not.toContain('copilot');
   });
 
   it('hides extension integrations nav in pilot while keeping settings', () => {

@@ -257,6 +257,7 @@ export const ROLE_PERMISSION_GRANTS: Record<EmergencyRoleId, readonly string[]> 
     K.intakeVerify,
     K.emsConvertArrival,
     K.receptionEscalate,
+    K.copilotUse,
     K.screenRegistration,
   ]),
   [EMERGENCY_ROLE_ID.emsUser]: Object.freeze([

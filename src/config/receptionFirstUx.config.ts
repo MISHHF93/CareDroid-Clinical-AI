@@ -6,7 +6,7 @@ import { CANONICAL_ROUTES } from './routes.config';
 export const RECEPTION_FIRST_UX = Object.freeze({
   enabled: true,
   platformHomeRoute: CANONICAL_ROUTES.emergencyWhiteboard,
-  hideCopilotOnReception: true,
+  hideCopilotOnReception: false,
   routeAllIntakeThroughReception: true,
   routePatientSearchThroughReception: true,
   demoteCommandCenterInNav: true,
