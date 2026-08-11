@@ -10,7 +10,12 @@ import {
 import { invokeUnifiedAiConversational } from '../../services/careDroidUnifiedAiNode';
 import { getAIPrompt } from '../../lib/ai/promptRegistry';
 import usePatientOrchestration from '../../hooks/usePatientOrchestration';
-import { buildCopilotPatientArtifactContext } from '../../services/patientAiContext';
+import {
+  buildCopilotPatientArtifactContext,
+  scopeCopilotPatientArtifactContextForRole,
+} from '../../services/patientAiContext';
+import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermissions';
+import { EMERGENCY_ACTIONS } from '../../config/emergencyRolePermissions';
 import { launchOrchestrationRecommendation } from '../../services/orchestrationToolLaunch';
 import {
   formatPatientOrchestrationForCopilot,
@@ -52,6 +57,9 @@ export default function PatientCardCopilot({
     },
   ]);
 
+  const emergencyRole = useEmergencyRolePermissions();
+  const includeClinicalDetail = emergencyRole.actionVisible(EMERGENCY_ACTIONS.writeVitals);
+
   const orchestration = usePatientOrchestration(patient);
   const patientContextPrompt = useMemo(
     () => formatPatientOrchestrationForCopilot(orchestration),
@@ -91,7 +99,10 @@ export default function PatientCardCopilot({
       };
 
       const summaryPrompt = getAIPrompt('patient-status-summarizer');
-      const artifactContext = buildCopilotPatientArtifactContext(patient, orchestration);
+      const artifactContext = scopeCopilotPatientArtifactContextForRole(
+        buildCopilotPatientArtifactContext(patient, orchestration),
+        includeClinicalDetail,
+      );
       const systemPrompt = [
         summaryPrompt.prompt,
         summaryPrompt.requiredDisclaimer,
@@ -166,7 +177,7 @@ export default function PatientCardCopilot({
         setLoading(false);
       }
     },
-    [loading, orchestration, patient, patientContextPrompt, toolRecommendationsPrompt],
+    [includeClinicalDetail, loading, orchestration, patient, patientContextPrompt, toolRecommendationsPrompt],
   );
 
   const onSubmit = (event: FormEvent) => {

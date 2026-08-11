@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { PatientState, Priority, type Patient } from '../types/emergency';
-import { buildCopilotPatientArtifactContext } from './patientAiContext';
+import {
+  buildCopilotPatientArtifactContext,
+  scopeCopilotPatientArtifactContextForRole,
+} from './patientAiContext';
 
 describe('buildCopilotPatientArtifactContext', () => {
   it('includes demographics and recent notes for copilot source data', () => {
@@ -114,5 +117,59 @@ describe('buildCopilotPatientArtifactContext', () => {
     const context = buildCopilotPatientArtifactContext(patient, null);
     expect(context?.documentArtifacts).toBeTruthy();
     expect((context?.documentArtifacts as { pendingReviewCount?: number })?.pendingReviewCount).toBe(1);
+  });
+});
+
+describe('scopeCopilotPatientArtifactContextForRole', () => {
+  const patient: Patient = {
+    id: 'p-scope',
+    mrn: 'ED-SCOPE',
+    firstName: 'Jamie',
+    lastName: 'Rivera',
+    dob: '1990-01-01',
+    age: 35,
+    sex: 'F',
+    arrivalTime: '2026-06-24T08:00:00.000Z',
+    chiefComplaint: 'Abdominal pain',
+    complaintCategory: 'Abdominal',
+    state: PatientState.Assessment,
+    priority: Priority.P3,
+    vitals: [{ hr: 92, sbp: 120, recordedAt: '2026-06-24T08:10:00.000Z' }],
+    flags: [],
+    notes: [
+      {
+        id: 'n1',
+        text: 'Pain worsening after meals',
+        createdAt: '2026-06-24T08:12:00.000Z',
+        authorStaffId: 's1',
+      },
+    ],
+    timeline: [],
+  };
+
+  it('passes the context through unchanged for roles with clinical documentation permission', () => {
+    const context = buildCopilotPatientArtifactContext(patient, null);
+    const scoped = scopeCopilotPatientArtifactContextForRole(context, true);
+    expect(scoped).toBe(context);
+  });
+
+  it('strips clinical-judgment fields but keeps identity/complaint/state for non-clinical roles', () => {
+    const context = buildCopilotPatientArtifactContext(patient, null);
+    const scoped = scopeCopilotPatientArtifactContextForRole(context, false) as Record<string, unknown>;
+
+    expect(scoped.vitals).toBeNull();
+    expect(scoped.recentNotes).toEqual([]);
+    expect(scoped.savedScores).toBeNull();
+    expect(scoped.nativeAi).toBeNull();
+
+    expect(scoped.patientId).toBe('p-scope');
+    expect(scoped.mrn).toBe('ED-SCOPE');
+    expect(scoped.demographics).toEqual({ age: 35, sex: 'F', dob: '1990-01-01' });
+    expect(scoped.chiefComplaint).toBe('Abdominal pain');
+    expect(scoped.state).toBe(PatientState.Assessment);
+  });
+
+  it('returns null when there is no context to scope', () => {
+    expect(scopeCopilotPatientArtifactContextForRole(null, false)).toBeNull();
   });
 });

@@ -32,6 +32,7 @@ import { formatWhatHappensNextForCopilot } from '../services/whatHappensNextGuid
 import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
 
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
+import { EMERGENCY_ACTIONS } from '../config/emergencyRolePermissions';
 import { navigateProfileAware } from '../navigation/profileRouteLaunch';
 import usePatientOrchestration from '../hooks/usePatientOrchestration';
 import {
@@ -39,7 +40,10 @@ import {
   formatPatientToolRecommendationsForCopilot,
 } from '@lib/patient-orchestration';
 import { launchOrchestrationRecommendation } from '../services/orchestrationToolLaunch';
-import { buildCopilotPatientArtifactContext } from '../services/patientAiContext';
+import {
+  buildCopilotPatientArtifactContext,
+  scopeCopilotPatientArtifactContextForRole,
+} from '../services/patientAiContext';
 import CopilotRiskLayerPanel from './copilot/CopilotRiskLayerPanel';
 import AiTransparencyDashboard from './copilot/AiTransparencyDashboard';
 import CopilotShell, { type CopilotShellTab } from './copilot/CopilotShell';
@@ -848,9 +852,9 @@ export function CopilotPanel() {
         })),
         { role: 'user' as const, content: promptText },
       ];
-      const patientArtifactContext = buildCopilotPatientArtifactContext(
-        selectedPatient,
-        patientOrchestration,
+      const patientArtifactContext = scopeCopilotPatientArtifactContextForRole(
+        buildCopilotPatientArtifactContext(selectedPatient, patientOrchestration),
+        emergencyRole.actionVisible(EMERGENCY_ACTIONS.writeVitals),
       );
 
       const callerRole = String(emergencyRole.role || saasRole || 'unknown');

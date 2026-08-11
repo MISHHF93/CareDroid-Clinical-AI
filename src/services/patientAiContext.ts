@@ -101,6 +101,44 @@ export function buildCopilotPatientArtifactContext(
   };
 }
 
+/**
+ * Strips clinical-judgment fields (vitals, clinical notes, saved scores, AI
+ * inferences, clinical recommendations) from a Copilot patient artifact
+ * context for roles without clinical documentation permission (e.g.
+ * registration clerks) — they keep identity/demographics/complaint/state for
+ * verification and workflow purposes, not clinical decision-support data.
+ */
+export function scopeCopilotPatientArtifactContextForRole(
+  context: Record<string, unknown> | null,
+  includeClinicalDetail: boolean,
+): Record<string, unknown> | null {
+  if (!context || includeClinicalDetail) return context;
+
+  const { vitals, recentNotes, savedScores, nativeAi, orchestration, ...rest } = context as {
+    vitals?: unknown;
+    recentNotes?: unknown;
+    savedScores?: unknown;
+    nativeAi?: unknown;
+    orchestration?: { stage?: unknown; overlays?: unknown; complaintRoute?: unknown } | null;
+    [key: string]: unknown;
+  };
+
+  return {
+    ...rest,
+    recentNotes: [],
+    vitals: null,
+    savedScores: null,
+    nativeAi: null,
+    orchestration: orchestration
+      ? {
+          stage: orchestration.stage,
+          overlays: orchestration.overlays,
+          complaintRoute: orchestration.complaintRoute,
+        }
+      : null,
+  };
+}
+
 export function buildCalculatorCopilotSeed(
   patient: Patient | undefined,
   calculatorName: string,
