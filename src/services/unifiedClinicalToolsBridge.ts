@@ -212,8 +212,22 @@ export function remapRegistryNavigationForRole(
   const canAccessCopilot = context.emergencyRoleId
     ? canAccessEmergencyRoute(context.emergencyRoleId, CANONICAL_ROUTES.emergencyCopilot)
     : true;
+  // A role may hold general Copilot chat access yet still need this specific
+  // tool/calculator launch embedded on Reception (e.g. a clinical calculator
+  // launched in chat-assisted mode) rather than dropped onto the raw Copilot
+  // route — general chat access and "should this tool launch go through
+  // Copilot" are different questions.
+  const embedToolLaunchOnReception = shouldEmbedToolsOnReception({
+    emergencyRoleId: context.emergencyRoleId,
+    canAccessToolsRoute: context.canAccessToolsRoute,
+    kind: toolId && isCalculatorArtifact(toolId) ? 'calculator' : 'copilot',
+    toolId,
+  });
 
-  if (plan.pathname === CANONICAL_ROUTES.emergencyCopilot && !canAccessCopilot) {
+  if (
+    plan.pathname === CANONICAL_ROUTES.emergencyCopilot &&
+    (!canAccessCopilot || embedToolLaunchOnReception)
+  ) {
     const remapped = resolveClinicalToolLaunchTarget({
       emergencyRoleId: context.emergencyRoleId,
       canAccessToolsRoute: context.canAccessToolsRoute,

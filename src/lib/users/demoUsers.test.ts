@@ -69,7 +69,7 @@ describe('DEMO_USERS', () => {
   // priority-change safety floor ported into handleEdCopilotPriorityChange().
   // Locks in the finding so future permission-table edits can't silently
   // change who gets Copilot access without a test failing here.
-  it('exactly 8 demo profiles are Copilot-authorized (canUseAIChief)', () => {
+  it('exactly 9 demo profiles are Copilot-authorized (canUseAIChief)', () => {
     const authorizedIds = DEMO_USERS.filter((u) => u.canUseAIChief)
       .map((u) => u.id)
       .sort();
@@ -84,16 +84,16 @@ describe('DEMO_USERS', () => {
         'demo-elena-rossi', // specialist (neurologist)
         'demo-jordan-miles', // hospital_admin
         'demo-morgan-ellis', // quality_safety_officer
+        'demo-grace-kim', // registration_clerk (HEAL-083: reception now has scoped Copilot access)
       ].sort(),
     );
   });
 
-  it('the 8 non-Copilot-authorized demo profiles are correctly excluded', () => {
+  it('the 7 non-Copilot-authorized demo profiles are correctly excluded', () => {
     const unauthorizedRoles = DEMO_USERS.filter((u) => !u.canUseAIChief).map((u) => u.role);
 
     expect(new Set(unauthorizedRoles)).toEqual(
       new Set([
-        'registration_clerk',
         'patient_flow_coordinator',
         'pharmacist',
         'lab_technician',
