@@ -14,7 +14,11 @@ import { useEmergencyRolePermissions } from '../../hooks/useEmergencyRolePermiss
 import useEffectiveUserProfile from '../../hooks/useEffectiveUserProfile';
 import { navigateProfileAware } from '../../navigation/profileRouteLaunch';
 import { convertEmsArrivalForReception } from '../../services/receptionIntakeBridge';
-import { getAlertClassificationTier } from '../../engine/alertClassificationModel';
+import {
+  countActionableAlerts,
+  getAlertClassificationTier,
+  isAlertActionable,
+} from '../../engine/alertClassificationModel';
 import { staffDisplayName } from '../../utils/staffManagement';
 import type { Alert } from '../../types/emergency';
 import './OperationalAlarmDock.css';
@@ -104,23 +108,7 @@ type OperationalAlarmDockProps = {
 };
 
 function topDockAlert(alerts: Alert[]): Alert | null {
-  return (
-    alerts.find(
-      (alert) =>
-        !alert.dismissed &&
-        !alert.acknowledged &&
-        ['critical', 'high'].includes(getAlertClassificationTier(alert)),
-    ) || null
-  );
-}
-
-function countActiveAlerts(alerts: Alert[]): number {
-  return alerts.filter(
-    (alert) =>
-      !alert.dismissed &&
-      !alert.acknowledged &&
-      ['critical', 'high', 'medium'].includes(getAlertClassificationTier(alert)),
-  ).length;
+  return alerts.find((alert) => isAlertActionable(alert)) || null;
 }
 
 /**
@@ -156,7 +144,7 @@ export default function OperationalAlarmDock({ showEmsInbound = true }: Operatio
     [visibleNotificationAlerts],
   );
   const alertCount = useMemo(
-    () => countActiveAlerts(visibleNotificationAlerts) + (arrival ? 1 : 0),
+    () => countActionableAlerts(visibleNotificationAlerts) + (arrival ? 1 : 0),
     [visibleNotificationAlerts, arrival],
   );
 

@@ -1,5 +1,4 @@
 import { useRouteChrome } from '../../contexts/RouteChromeContext';
-import ChromeStatusChips from './ChromeStatusChips';
 import './ShellRouteTab.css';
 
 type ShellRouteTabProps = {
@@ -28,7 +27,6 @@ export default function ShellRouteTab({ title, subtitle }: ShellRouteTabProps) {
       </div>
 
       <div className="app-chrome-context__aside">
-        <ChromeStatusChips />
         {pageActions}
       </div>
     </div>

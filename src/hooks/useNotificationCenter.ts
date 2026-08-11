@@ -12,6 +12,7 @@ import {
 } from '../config/operationalMetricsModel';
 import {
   getAlertClassificationTier,
+  isAlertActionable,
   resolveOperationalAlertEnvelope,
   sortAlertsByClassification,
   triageOperationalAlerts,
@@ -295,13 +296,7 @@ export function useNotificationCenter() {
   }, [alertTriage, screenCapabilities.isRegistrationScreen, showInformationalAlerts]);
 
   const unreadAlertCount = useMemo(
-    () =>
-      visibleNotificationAlerts.filter(
-        (alert) =>
-          !alert.read &&
-          !alert.dismissed &&
-          ['critical', 'high'].includes(getAlertClassificationTier(alert)),
-      ).length,
+    () => visibleNotificationAlerts.filter((alert) => isAlertActionable(alert)).length,
     [visibleNotificationAlerts],
   );
 

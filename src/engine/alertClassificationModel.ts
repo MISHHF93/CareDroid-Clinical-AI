@@ -299,7 +299,7 @@ export function triageOperationalAlerts(alerts = [] as any[]) {
     ),
     suppressed,
     counts: Object.freeze(counts),
-    actionableUnreadTier: new Set(['critical', 'high']),
+    actionableUnreadTier: ACTIONABLE_ALERT_TIERS,
   });
 }
 
@@ -322,6 +322,32 @@ export function auditAlertInventory(alerts = [] as any[]) {
 
 export function getAlertClassificationTier(alert) {
   return alert?.metadata?.classification || classifyOperationalAlert(alert);
+}
+
+// Canonical "needs attention" tier set. Both the Sidebar's Alerts badge and the
+// header OperationalAlarmDock's chip must derive their count from this single
+// definition -- they previously used two different, silently-diverging filters
+// (unread-only vs. unacknowledged-plus-medium-tier) that showed different numbers
+// for the same underlying alert list.
+export const ACTIONABLE_ALERT_TIERS = new Set(['critical', 'high']);
+
+// `read` and `acknowledged` are two independent ways a user can clear an alert
+// (Sidebar's alert panel only ever sets `read`; OperationalAlarmDock's own
+// "Acknowledge" button sets `acknowledged`). A count of "alerts needing attention"
+// must treat either signal as clearing, or acting on an alert in one surface
+// silently fails to update the badge on the other.
+export function isAlertActionable(alert) {
+  return (
+    Boolean(alert) &&
+    !alert.dismissed &&
+    !alert.read &&
+    !alert.acknowledged &&
+    ACTIONABLE_ALERT_TIERS.has(getAlertClassificationTier(alert))
+  );
+}
+
+export function countActionableAlerts(alerts = [] as any[]) {
+  return alerts.filter((alert) => isAlertActionable(alert)).length;
 }
 
 export function sortAlertsByClassification(alerts = [] as any[]) {

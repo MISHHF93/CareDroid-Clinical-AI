@@ -62,6 +62,11 @@ vi.mock('../../store/emergencyStore', () => ({
 
 vi.mock('../../engine/alertClassificationModel', () => ({
   getAlertClassificationTier: () => 'critical',
+  isAlertActionable: (alert: any) =>
+    Boolean(alert) && !alert.dismissed && !alert.read && !alert.acknowledged,
+  countActionableAlerts: (alerts: any[]) =>
+    alerts.filter((alert: any) => Boolean(alert) && !alert.dismissed && !alert.read && !alert.acknowledged)
+      .length,
 }));
 
 describe('OperationalAlarmDock floating window', () => {
