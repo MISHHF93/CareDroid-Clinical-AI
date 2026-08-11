@@ -233,21 +233,35 @@ export const UserProvider = ({ children }) => {
     }
   }, [isAuthenticated, isDevAuthBypass, authToken, user]);
 
-  const value = {
-    user,
-    authToken,
-    isAuthenticated,
-    isRealSession,
-    authMode,
-    isDevAuthBypass,
-    isLoading,
-    hasPermission,
-    hasAnyPermission,
-    hasAllPermissions,
-    setUser,
-    setAuthToken,
-    signOut,
-  };
+  const value = useMemo(
+    () => ({
+      user,
+      authToken,
+      isAuthenticated,
+      isRealSession,
+      authMode,
+      isDevAuthBypass,
+      isLoading,
+      hasPermission,
+      hasAnyPermission,
+      hasAllPermissions,
+      setUser,
+      setAuthToken,
+      signOut,
+    }),
+    // hasPermission/hasAnyPermission/hasAllPermissions and signOut are re-created every
+    // render as plain closures, but they only ever read user/securityContext — both
+    // already tracked below — so it's safe to omit them here. Without this useMemo,
+    // `value` was a brand-new object on every render of UserProvider (including renders
+    // triggered by unrelated ancestors), which cascaded through every consumer that
+    // depends on the whole user object (useEmergencyRolePermissions -> role/profile memos
+    // -> useCareDroidCentralNode's snapshot memo, etc.), causing those to recompute and
+    // re-publish store updates on every tick — a self-sustaining render storm that could
+    // starve a freshly-mounting lazy route's Suspense boundary from ever committing
+    // (MB-P0-4 / HEAL-082: /emergency/patients permanently stuck on "Loading patients...").
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [user, authToken, isAuthenticated, isRealSession, authMode, isDevAuthBypass, isLoading, securityContext],
+  );
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };

@@ -97,17 +97,34 @@ export function useEmergencyDeviceContext(): EmergencyDeviceContextState {
     setDeviceContext(null);
   }, [setDeviceContext]);
 
-  return {
-    deviceContextId,
-    definition,
-    screenMode,
-    landingRoute,
-    isKiosk: isDeviceContextKiosk(deviceContextId),
-    isReadOnlyWall: isDeviceContextReadOnlyWall(deviceContextId),
-    options: listEmergencyDeviceContexts(),
-    setDeviceContext,
-    clearDeviceContext,
-  };
+  const isKiosk = isDeviceContextKiosk(deviceContextId);
+  const isReadOnlyWall = isDeviceContextReadOnlyWall(deviceContextId);
+  const options = useMemo(() => listEmergencyDeviceContexts(), []);
+
+  return useMemo(
+    () => ({
+      deviceContextId,
+      definition,
+      screenMode,
+      landingRoute,
+      isKiosk,
+      isReadOnlyWall,
+      options,
+      setDeviceContext,
+      clearDeviceContext,
+    }),
+    [
+      clearDeviceContext,
+      definition,
+      deviceContextId,
+      isKiosk,
+      isReadOnlyWall,
+      landingRoute,
+      options,
+      screenMode,
+      setDeviceContext,
+    ],
+  );
 }
 
 export default useEmergencyDeviceContext;

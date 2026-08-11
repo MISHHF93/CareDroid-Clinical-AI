@@ -996,9 +996,23 @@ export const UserIdentityProvider = ({ children }: { children: React.ReactNode }
   }, [refreshIdentity]);
 
   const profile = operationalProfile || fallbackProfile;
-  const workspaceState = (profile?.workspace || { activeWorkspaceId: '' }) as WorkspaceState;
+  // profile?.workspace and normalizeSaasProfile(...) both fall back to freshly-constructed
+  // object literals when unset (the common demo/dev-profile case), so without memoizing
+  // here `workspaceState`/`saasProfile` were new references every render — poisoning the
+  // `value` useMemo below (both are its dependencies) and cascading through every consumer
+  // of this context on every unrelated render, anywhere in the tree. That churn was a
+  // contributing cause of MB-P0-4/HEAL-082 (/emergency/patients permanently stuck on its
+  // route-level Suspense fallback): a freshly-mounting lazy route's render kept losing the
+  // race to a self-sustaining app-wide re-render storm and never got to commit.
+  const workspaceState = useMemo(
+    () => (profile?.workspace || { activeWorkspaceId: '' }) as WorkspaceState,
+    [profile?.workspace],
+  );
   const activeWorkspace = workspaceState.activeWorkspace;
-  const saasProfile: SaasProfile = profile?.saasProfile || normalizeSaasProfile(profile, workspaceState);
+  const saasProfile: SaasProfile = useMemo(
+    () => profile?.saasProfile || normalizeSaasProfile(profile, workspaceState),
+    [profile, profile?.saasProfile, workspaceState],
+  );
   const enrichedPlatformContext = useMemo(
     () =>
       platformContext
