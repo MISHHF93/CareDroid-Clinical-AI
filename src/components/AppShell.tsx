@@ -519,8 +519,18 @@ function AppShellFrame({ children }: AppShellProps) {
     void (async () => {
       await ensureDevBackendSession();
       const backendReachable = await probeBackendReachability();
+      // Was `||`: since RECEPTION_FIRST_UX.enabled is a hardcoded `true`
+      // constant (never toggled), that made receptionStartup unconditionally
+      // true on EVERY route, so EVERY page load fired the reception-scoped
+      // fetch (whiteboard + receptionSnapshot) AND THEN a separate full-scope
+      // fetch that re-fetches those exact same two datasets again, plus
+      // boarding/reassessment/referrals/workflowLogs/queues -- double
+      // bootstrap network+state-churn on every non-reception page, and the
+      // `else` single-fetch branch below was unreachable dead code. `&&`
+      // restores the real gate: the reception fast-path only applies when
+      // actually on/entering a reception route.
       const receptionStartup =
-        isReceptionFirstUxEnabled() ||
+        isReceptionFirstUxEnabled() &&
         location.pathname.startsWith(CANONICAL_ROUTES.emergencyReception);
       if (backendReachable) {
         if (receptionStartup) {

@@ -212,12 +212,13 @@ describe('AppShell R12 startup wiring', () => {
       </MemoryRouter>,
     );
 
-    // Reception-first UX is always enabled, so AppShell performs a two-phase
-    // startup: a fast reception-scope load followed by a silent full-scope
-    // background load (see receptionFirstUx.config.ts + AppShell.tsx startup effect).
-    await waitFor(() => expect(initializeFromBackend).toHaveBeenCalledTimes(2));
-    expect(initializeFromBackend).toHaveBeenNthCalledWith(1, { scope: 'reception' });
-    expect(initializeFromBackend).toHaveBeenNthCalledWith(2, { scope: 'full', silent: true });
+    // Default MemoryRouter entry is "/", not a reception route -- AppShell
+    // should take the single-full-fetch path (see MB-P0-6-follow-up fix:
+    // this used to unconditionally take the reception two-phase path on
+    // EVERY route since RECEPTION_FIRST_UX.enabled is a hardcoded `true`
+    // constant, doubling bootstrap network/state-churn app-wide).
+    await waitFor(() => expect(initializeFromBackend).toHaveBeenCalledTimes(1));
+    expect(initializeFromBackend).toHaveBeenNthCalledWith(1);
     expect(mocks.startEmergencyRealtime).toHaveBeenCalledTimes(1);
     expect(startReassessmentEngine).toHaveBeenCalledTimes(1);
     expect(startCapacityEngine).toHaveBeenCalledTimes(1);
@@ -235,5 +236,23 @@ describe('AppShell R12 startup wiring', () => {
     expect(clearIntervalSpy).toHaveBeenCalledWith(222);
     expect(stopSimulation).toHaveBeenCalledTimes(1);
     expect(mocks.startEmergencyRealtime.mock.results[0]?.value).toEqual(expect.any(Function));
+  });
+
+  it('keeps the reception two-phase startup (fast reception-scope load, then a silent full-scope backfill) only on reception routes', async () => {
+    const initializeFromBackend = vi
+      .spyOn(useEmergencyStore.getState(), 'initializeFromBackend')
+      .mockResolvedValue({ errors: {} });
+
+    render(
+      <MemoryRouter initialEntries={['/emergency/reception']}>
+        <AppShell>
+          <div>Reception route</div>
+        </AppShell>
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => expect(initializeFromBackend).toHaveBeenCalledTimes(2));
+    expect(initializeFromBackend).toHaveBeenNthCalledWith(1, { scope: 'reception' });
+    expect(initializeFromBackend).toHaveBeenNthCalledWith(2, { scope: 'full', silent: true });
   });
 });
