@@ -44,7 +44,6 @@ import {
 } from '../config/emergencyRolePermissions';
 import { getVisibleNavigation } from '../config/unified-navigation.config';
 import useEffectiveUserProfile from '../hooks/useEffectiveUserProfile';
-import { resolveCopilotChromeLabels } from '../config/profileDesignLanguage.config';
 import { getEmergencySurface } from '../config/emergencyPipelineModel';
 import { useEmergencyRolePermissions } from '../hooks/useEmergencyRolePermissions';
 import useRoleAccentTheme from '../hooks/useRoleAccentTheme';
@@ -421,7 +420,6 @@ function AppShellFrame({ children }: AppShellProps) {
   );
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
   const copilotOpen = useEmergencyStore((state) => state.copilotOpen);
-  const toggleCopilot = useEmergencyStore((state) => state.toggleCopilot);
   const setCopilotOpen = useEmergencyStore((state) => state.setCopilotOpen);
   // Select the raw array (cheap reference-equality check) and memoize the
   // O(n) reduce on it — the previous version ran this reduce inside the
@@ -439,14 +437,8 @@ function AppShellFrame({ children }: AppShellProps) {
     [patientsForReassessmentCount],
   );
   const { active: simulationModeActive } = useSimulationMode();
-  const { canUseCopilot, showSessionCopilot, hiddenOnReception } = useCopilotChromeAccess();
-  // The floating launcher is fixed-position and always sits in the bottom-right
-  // corner, so any scroll container's bottom content needs reserved clearance
-  // for it (matches the mobile-nav padding-bottom pattern below).
-  const showCopilotLauncher =
-    canUseCopilot && !useKioskShell && !hiddenOnReception && !copilotOpen && !showSessionCopilot;
+  const { canUseCopilot, hiddenOnReception } = useCopilotChromeAccess();
   const { saasRole, profileCopy } = useEffectiveUserProfile();
-  const copilotChrome = useMemo(() => resolveCopilotChromeLabels(profileCopy), [profileCopy]);
   const profileNavigate = useCallback(
     (to: To, options?: { replace?: boolean; state?: unknown }) =>
       navigateProfileAware(navigate, to, { saasRole, emergencyRole, ...options }),
@@ -1091,7 +1083,6 @@ function AppShellFrame({ children }: AppShellProps) {
             className={[
               'app-shell-main-content',
               isMobileViewport ? 'app-shell-main-content--mobile-nav' : '',
-              showCopilotLauncher ? 'app-shell-main-content--copilot-launcher' : '',
             ]
               .filter(Boolean)
               .join(' ')}
@@ -1135,17 +1126,6 @@ function AppShellFrame({ children }: AppShellProps) {
             <CopilotPanel />
           </Suspense>
         </ErrorBoundary>
-      ) : null}
-      {showCopilotLauncher ? (
-        <button
-          type="button"
-          className="ed-copilot-launch"
-          onClick={toggleCopilot}
-          aria-label={copilotChrome.openAriaLabel}
-          title={copilotChrome.openTitle}
-        >
-          {copilotChrome.productName}
-        </button>
       ) : null}
       <ErrorBoundary fallbackText="Critical broadcast overlay encountered an error.">
         <Suspense fallback={null}>
