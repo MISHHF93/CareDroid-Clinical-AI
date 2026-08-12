@@ -3,6 +3,7 @@
  * Chart components live in DashboardCharts.tsx so MetricCard importers do not
  * pull the ~vendor-charts bundle onto every operations surface (Cycle 68).
  */
+import { MetricCard as CanonicalMetricCard } from '../ui/CareDroidPrimitives';
 import './DashboardVisualizations.css';
 
 export const CHART_COLORS = Object.freeze([
@@ -39,13 +40,24 @@ export function EmptyChartState({ message = 'No chart data available.' }) {
   );
 }
 
+/**
+ * Delegates to the canonical CareDroidPrimitives MetricCard (Cycle 148 design-
+ * system audit found this file's own reimplementation was a competing
+ * duplicate with ~46 call sites, none of which got the real tone/severity
+ * badge system) rather than every consumer migrating to a new import path.
+ * Same external prop contract as before (`hint`, not `helper`) and the same
+ * accessible name, so every existing call site renders unchanged except for
+ * now picking up the canonical alarm-surface tone styling and severity badge.
+ */
 export function MetricCard({ label, value, hint, tone = 'neutral' }) {
   return (
-    <article className={`dashboard-metric-card dashboard-metric-card--${tone}`} aria-label={`${label}: ${value}`}>
-      <span>{label}</span>
-      <strong>{value}</strong>
-      {hint ? <p>{hint}</p> : null}
-    </article>
+    <CanonicalMetricCard
+      label={label}
+      value={value}
+      helper={hint}
+      tone={tone}
+      aria-label={`${label}: ${value}`}
+    />
   );
 }
 

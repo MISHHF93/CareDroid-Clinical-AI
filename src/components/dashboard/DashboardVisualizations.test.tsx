@@ -21,6 +21,15 @@ describe('dashboard visualization components', () => {
     expect(screen.getByText(/executor-backed tools/i)).toBeInTheDocument();
   });
 
+  it('delegates to the canonical CareDroidPrimitives MetricCard, not a local duplicate', () => {
+    render(<MetricCard label="Delegation check" value={7} hint="Should use canonical styling" tone="critical" />);
+
+    const card = screen.getByLabelText(/delegation check: 7/i);
+    expect(card).toHaveClass('cd-metric-card');
+    expect(card).toHaveClass('alarm-surface--critical');
+    expect(card.querySelector('.cd-metric-card__value')).toHaveTextContent('7');
+  });
+
   it('renders loading, empty, and error chart states', () => {
     render(
       <>
