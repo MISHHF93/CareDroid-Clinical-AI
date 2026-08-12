@@ -6,7 +6,6 @@ import {
 } from './service-registry';
 
 const expectedServiceNames = [
-  'capacityService',
   'emsService',
   'reassessmentService',
   'patientJourneyService',

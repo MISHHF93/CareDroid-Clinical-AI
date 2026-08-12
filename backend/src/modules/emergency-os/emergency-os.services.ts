@@ -2381,13 +2381,16 @@ export class ReassessmentService {
 }
 
 /**
- * KNOWN DUPLICATE, NOT YET RECONCILED (found 2026-08-12, repo-wide export-collision audit):
- * `backend/src/services/capacity.service.ts` independently backs its own `CapacityModule`
- * (registered in AppModule alongside this one), Mongoose-backed against a different
- * `UnifiedPatient` model. This TypeORM-backed one (routed under `EmergencyOsController`,
- * `GET /emergency/capacity`) is the one the real frontend/whiteboard consumes. Same pattern as
- * ReassessmentService above and BoardingService below; see
- * docs/architecture/CARE_DROID_MASTER_BACKLOG.md for the full finding.
+ * This TypeORM-backed service (routed under `EmergencyOsController`, `GET /emergency/capacity`)
+ * is the one the real frontend/whiteboard consumes. A Mongoose-backed duplicate
+ * (`backend/src/services/capacity.service.ts`, its own `CapacityModule`, `GET
+ * /emergency/capacity/dashboard`) was found flagged as a naming collision on 2026-08-12 and
+ * removed on 2026-08-12 (HEAL-138): it required MongoDB (never configured in any deployment this
+ * repo defines -- see docs/architecture/CARE_DROID_MASTER_BACKLOG.md), its frontend capability
+ * flag was already explicitly DISABLED, and its one real caller had already been repointed to
+ * this endpoint on 2026-08-09. Same naming-collision pattern still open for ReassessmentService
+ * above and BoardingService below -- those two have real, non-dead sub-routes beyond the summary
+ * GET, so were left as documented duplicates rather than removed; see the master backlog.
  */
 @Injectable()
 export class CapacityService {

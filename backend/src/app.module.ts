@@ -87,7 +87,6 @@ import { NativeAiModule } from './modules/native-ai/native-ai.module';
 import { UnifiedAiNodeModule } from '../ml-services/unified-ai-node/unified-ai-node.module';
 import { SentinelModule } from './modules/sentinel/sentinel.module';
 import { SurgeModule } from './modules/surge/surge.module';
-import { CapacityModule } from './modules/capacity/capacity.module';
 import { AppNavigatorModule } from './modules/app-navigator/app-navigator.module';
 import { DeteriorationModule } from './modules/deterioration/deterioration.module';
 import { ProtocolModule } from './modules/protocol/protocol.module';
@@ -250,7 +249,6 @@ function resolveDatabaseClient() {
     CigModule,
     SentinelModule,
     SurgeModule,
-    CapacityModule,
     AppNavigatorModule,
     DeteriorationModule,
     ProtocolModule,

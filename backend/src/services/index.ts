@@ -2,7 +2,6 @@ export {
   aiCallInterrogationService,
   aiGovernanceService,
   boardingService,
-  capacityService,
   checkServiceHealth,
   clinicalProtocolService,
   consentService,
@@ -39,7 +38,6 @@ export {
 export { AICallInterrogationService } from './ai-call-interrogation.service';
 export { AIGovernanceService } from './ai-governance.service';
 export { BoardingService } from './boarding.service';
-export { CapacityService } from './capacity.service';
 export { ClinicalProtocolService } from './clinical-protocol.service';
 export { ConsentService } from './consent.service';
 export { DeteriorationPredictionV3Service } from './deterioration-prediction-v3.service';

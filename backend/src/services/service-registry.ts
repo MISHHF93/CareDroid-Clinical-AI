@@ -11,7 +11,6 @@ import {
 import { aiCallInterrogationService } from './ai-call-interrogation.service';
 import { aiGovernanceService } from './ai-governance.service';
 import { boardingService } from './boarding.service';
-import { capacityService } from './capacity.service';
 import { clinicalProtocolService } from './clinical-protocol.service';
 import { consentService } from './consent.service';
 import { deteriorationPredictionV3Service } from './deterioration-prediction-v3.service';
@@ -51,7 +50,6 @@ export {
   aiCallInterrogationService,
   aiGovernanceService,
   boardingService,
-  capacityService,
   clinicalProtocolService,
   consentService,
   deteriorationPredictionV3Service,
@@ -72,7 +70,6 @@ export {
 };
 
 export const emergencyOsServiceRegistry = {
-  capacityService,
   emsService,
   reassessmentService,
   patientJourneyService,

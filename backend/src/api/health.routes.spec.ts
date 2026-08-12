@@ -56,7 +56,7 @@ describe('health routes', () => {
         failed: 0,
       },
       services: {
-        capacityService: {
+        emsService: {
           status: 'ready',
           checkedAt: '2026-06-13T00:00:00.000Z',
         },
@@ -85,7 +85,7 @@ describe('health routes', () => {
         failed: 1,
       },
       services: {
-        capacityService: {
+        emsService: {
           status: 'failed',
           checkedAt: '2026-06-13T00:00:00.000Z',
           error: 'boom',

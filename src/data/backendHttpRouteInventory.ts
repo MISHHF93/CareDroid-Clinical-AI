@@ -1082,7 +1082,6 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
   { method: 'GET', path: '/api/emergency/surge/bottlenecks', controller: 'SurgeController' },
   { method: 'POST', path: '/api/emergency/surge/deactivate', controller: 'SurgeController' },
   { method: 'GET', path: '/api/emergency/surge/status', controller: 'SurgeController' },
-  { method: 'GET', path: '/api/emergency/capacity/dashboard', controller: 'CapacityController' },
   { method: 'GET', path: '/api/deterioration', controller: 'DeteriorationController' },
   { method: 'GET', path: '/api/deterioration/health', controller: 'DeteriorationController' },
   { method: 'POST', path: '/api/deterioration/predict', controller: 'DeteriorationController' },
