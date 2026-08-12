@@ -60,7 +60,7 @@ The FSM backbone (`src/engine/journeyEngine.ts` `VALID_TRANSITIONS`) + step mode
 | MB-W2 | Returning-patient search | `FULLY_WIRED` | `patientSearchActions.ts`; reception traces |
 | MB-W3 | New-patient registration (quick intake / express register) | `FULLY_WIRED` | HEAL-047a; reception rebuild |
 | MB-W4 | Unknown-patient registration (provisional identity) | `FULLY_WIRED` — `provisionalIdentityIntake.ts` | Reception traces |
-| MB-W5 | Duplicate-patient review | `PARTIALLY_WIRED` — match/link real in Smart Intake; dedicated review surface depth unverified | SmartIntake `matchPatient`/`linkPatient` |
+| MB-W5 | Duplicate-patient review | `FULLY_WIRED` — resolved the "depth unverified" uncertainty: `ReceptionDuplicateConfirm.tsx` (wired into `ReceptionWorkspace.tsx`, the live Reception page) and `DuplicateCandidatePanel.tsx` (wired into `PatientVerificationExperience.tsx`, used by both Reception and Smart Intake) both genuinely surface duplicate-match candidates with real open-chart/verify/dismiss actions. Also found and deleted `DuplicateReviewAlert.tsx` — a THIRD, fully unwired duplicate-review component (zero importers anywhere in the app) left behind by an earlier implementation iteration; its one shared utility (`duplicateActionLabel`) is still used by the live `DuplicateCandidatePanel.tsx`, unaffected | SmartIntake `matchPatient`/`linkPatient`, HEAL-142 |
 | MB-W6 | Smart Intake session (identity, fields, verification) | `FULLY_WIRED`; demo-seed bugs fixed | Domain 1 2026-08-07/08 fixes |
 | MB-W7 | ID/document capture | `FULLY_WIRED` — `ReceptionDocumentCapture` → OCR jobs | HEAL-047a |
 | MB-W8 | OCR ingestion → extraction → staff review | `FULLY_WIRED` (Tesseract.js real) | OCR audit 2026-07-14; `OcrIntakeApi` |
