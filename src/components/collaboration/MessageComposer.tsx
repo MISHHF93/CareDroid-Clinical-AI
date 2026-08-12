@@ -5,13 +5,25 @@ import './CollaborationHub.css';
 
 type MessageComposerProps = {
   disabled?: boolean;
+  /** Why the composer is disabled, shown as the input's placeholder. Falls back to a
+   * permission message when omitted, but callers with a different reason (no channel
+   * selected, etc.) should pass their own -- disabled alone can't distinguish "you're
+   * not allowed to post here" from "there's nothing to post to yet". */
+  disabledReason?: string;
   replyingTo?: CollaborationMessage | null;
   onCancelReply?: () => void;
   onSend: (body: string, threadRootId?: string) => Promise<void> | void;
   onTypingChange?: (isTyping: boolean) => void;
 };
 
-export function MessageComposer({ disabled, replyingTo, onCancelReply, onSend, onTypingChange }: MessageComposerProps) {
+export function MessageComposer({
+  disabled,
+  disabledReason,
+  replyingTo,
+  onCancelReply,
+  onSend,
+  onTypingChange,
+}: MessageComposerProps) {
   const [value, setValue] = useState('');
   const [sending, setSending] = useState(false);
   const typingTimeoutRef = useRef<number | null>(null);
@@ -52,7 +64,11 @@ export function MessageComposer({ disabled, replyingTo, onCancelReply, onSend, o
       <Textarea
         value={value}
         disabled={disabled || sending}
-        placeholder={disabled ? 'You do not have permission to post in this channel.' : 'Message this channel…'}
+        placeholder={
+          disabled
+            ? disabledReason || 'You do not have permission to post in this channel.'
+            : 'Message this channel…'
+        }
         rows={2}
         onChange={(event) => {
           setValue(event.target.value);

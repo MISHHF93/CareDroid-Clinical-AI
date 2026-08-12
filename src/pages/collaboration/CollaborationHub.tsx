@@ -367,15 +367,32 @@ export function CollaborationHub() {
             </p>
           ) : null}
         </div>
-        <MessageList
-          messages={activeMessages.filter((m) => !m.threadRootId)}
-          currentUserId={user?.id || null}
-          onReact={handleReact}
-          onDelete={handleDelete}
-          onReply={setReplyingTo}
-        />
+        {loading && !activeChannelId ? (
+          <Text as="p" size="sm" color="secondary" className="cd-collab-hub__loading-state">
+            Loading channels…
+          </Text>
+        ) : !activeChannelId ? (
+          <Text as="p" size="sm" color="secondary" className="cd-collab-hub__loading-state">
+            Select a channel to view messages.
+          </Text>
+        ) : (
+          <MessageList
+            messages={activeMessages.filter((m) => !m.threadRootId)}
+            currentUserId={user?.id || null}
+            onReact={handleReact}
+            onDelete={handleDelete}
+            onReply={setReplyingTo}
+          />
+        )}
         <MessageComposer
           disabled={!canPost || !activeChannelId}
+          disabledReason={
+            !activeChannelId
+              ? 'Select a channel to start messaging.'
+              : !canPost
+                ? 'You do not have permission to post in this channel.'
+                : undefined
+          }
           replyingTo={replyingTo}
           onCancelReply={() => setReplyingTo(null)}
           onSend={handleSend}
