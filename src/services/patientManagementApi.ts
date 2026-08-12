@@ -9,7 +9,6 @@ export const PATIENT_MANAGEMENT_ENDPOINTS = Object.freeze({
   sourceData: (patientId) => `/api/patients/${encodeURIComponent(patientId)}/source-data`,
   reviewItems: (patientId) => `/api/patients/${encodeURIComponent(patientId)}/review-items`,
   privacyAccessLog: (patientId) => `/api/privacy/patient/${encodeURIComponent(patientId)}/access-log`,
-  createPatient: '/api/patients',
   updatePatient: (patientId) => `/api/patients/${encodeURIComponent(patientId)}`,
   importEhrPatient: '/api/patients/import/ehr',
   importLabs: (patientId) => `/api/patients/${encodeURIComponent(patientId)}/import/labs`,
@@ -380,13 +379,6 @@ async function writePatient(endpoint, options) {
       data: null,
     };
   }
-}
-
-export function createEmergencyPatientRecord(patient) {
-  return writePatient(PATIENT_MANAGEMENT_ENDPOINTS.createPatient, {
-    method: 'POST',
-    body: JSON.stringify(patient),
-  });
 }
 
 export function updateEmergencyPatientRecord(patientId, patch) {
