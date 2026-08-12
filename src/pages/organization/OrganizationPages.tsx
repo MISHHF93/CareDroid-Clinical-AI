@@ -1161,7 +1161,12 @@ export function OrganizationIntelligenceProfile() {
           </Card>
           <Card className="org-card">
             <h2>Packs</h2>
-            <p>{profile.packs.filter((pack) => pack.enabled).length} enabled</p>
+            {/* profile.adoption.enabledPackCount (backend-preferred, same value the "Enabled
+                packs" metric above already shows) is used here instead of re-filtering
+                profile.packs locally -- that array is restricted to availablePacks plus
+                dimensions.packUsage/packAdoption, a narrower universe than the backend
+                aggregate, so the two counts could silently disagree. */}
+            <p>{profile.adoption.enabledPackCount} enabled</p>
             <p className="org-pack-meta">{profile.packs.filter((pack) => !pack.enabled).length} missing candidates</p>
           </Card>
         </div>

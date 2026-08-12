@@ -53,6 +53,7 @@ export default function DataLineageExplorer() {
 
       <div className="data-lineage-page__metrics" role="group" aria-label="Data lineage summary metrics">
         <MetricCard label="Flows" value={String(lineage.summary.flows)} hint="Traceable journeys" tone="neutral" />
+        <MetricCard label="Results" value={String(filteredFlows.length)} hint="Matching search/category filters" tone="neutral" />
         <MetricCard label="Transformations" value={String(lineage.summary.transformations)} hint="Stage steps" tone="neutral" />
         <MetricCard label="Models" value={String(lineage.summary.models)} hint="AI touchpoints" tone="warning" />
         <MetricCard label="Backend calls" value={String(lineage.summary.backendTouchpoints)} hint="API-backed flows" tone="neutral" />
