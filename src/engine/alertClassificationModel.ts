@@ -103,7 +103,7 @@ export const ALERT_SOURCE_REGISTRY = Object.freeze([
     domain: 'EMS',
     source: 'alert-ems-critical',
     defaultTier: 'critical',
-    surfaces: ['OperationalAlarmDock', 'SidebarNotificationPanel', 'OperationalHandoffDomainBar'],
+    surfaces: ['EmsCriticalArrivalPrep', 'SidebarNotificationPanel', 'OperationalHandoffDomainBar'],
   }),
   Object.freeze({
     id: 'referral-escalation',
@@ -324,18 +324,16 @@ export function getAlertClassificationTier(alert) {
   return alert?.metadata?.classification || classifyOperationalAlert(alert);
 }
 
-// Canonical "needs attention" tier set. Both the Sidebar's Alerts badge and the
-// header OperationalAlarmDock's chip must derive their count from this single
-// definition -- they previously used two different, silently-diverging filters
-// (unread-only vs. unacknowledged-plus-medium-tier) that showed different numbers
-// for the same underlying alert list.
+// Canonical "needs attention" tier set. Every surface that counts unresolved
+// alerts (Sidebar's Alerts badge, CriticalAlertBanner) must derive from this
+// single definition -- they previously used silently-diverging filters that
+// showed different numbers for the same underlying alert list.
 export const ACTIONABLE_ALERT_TIERS = new Set(['critical', 'high']);
 
-// `read` and `acknowledged` are two independent ways a user can clear an alert
-// (Sidebar's alert panel only ever sets `read`; OperationalAlarmDock's own
-// "Acknowledge" button sets `acknowledged`). A count of "alerts needing attention"
-// must treat either signal as clearing, or acting on an alert in one surface
-// silently fails to update the badge on the other.
+// `read`, `acknowledged`, and `dismissed` are independent ways an alert can be
+// cleared. A count of "alerts needing attention" must treat any of them as
+// clearing, or acting on an alert through one surface silently fails to update
+// a count derived elsewhere.
 export function isAlertActionable(alert) {
   return (
     Boolean(alert) &&

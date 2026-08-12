@@ -56,7 +56,6 @@ import { isSimulationModeActive } from '../services/simulationModeService';
 import SessionChromeBar from './chrome/SessionChromeBar';
 import HospitalJourneyCommandBar from './emergency/HospitalJourneyCommandBar';
 import ShellRouteTab from './chrome/ShellRouteTab';
-import OperationalAlarmDock from './chrome/OperationalAlarmDock';
 import { RouteChromeProvider, useRouteChrome } from '../contexts/RouteChromeContext';
 import { NotificationShellProvider } from '../contexts/NotificationShellContext';
 import SidebarNotificationPanel from './SidebarNotificationPanel';
@@ -1083,7 +1082,6 @@ function AppShellFrame({ children }: AppShellProps) {
               <Header />
               {/* Reception simple-fast density: one route tab only — avoid stacking journey + session bars */}
               <ShellRouteTab title={currentPage.label} subtitle={currentPage.subtitle} />
-              <OperationalAlarmDock showEmsInbound={screenCapabilities.showEmsCriticalOverlay} />
               {!useKioskShell && !isReceptionSimpleDensity ? <HospitalJourneyCommandBar /> : null}
               {!useKioskShell && !isReceptionSimpleDensity ? <SessionChromeBar /> : null}
             </>

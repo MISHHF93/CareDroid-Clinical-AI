@@ -13,6 +13,7 @@ import ReceptionPatientLookup from '../../components/reception/ReceptionPatientL
 import ReceptionSkillStrip from '../../components/reception/ReceptionSkillStrip';
 import ReceptionDuplicateConfirm from '../../components/reception/ReceptionDuplicateConfirm';
 import ReceptionShiftClearance from '../../components/reception/ReceptionShiftClearance';
+import EmsCriticalArrivalPrep from '../../components/reception/EmsCriticalArrivalPrep';
 import { resolveReceptionNextBestAction } from '../../config/receptionSkillModel';
 import { DUPLICATE_HIGH_CONFIDENCE_THRESHOLD } from '../../utils/patientDuplicateDetection';
 import {
@@ -967,6 +968,7 @@ export default function ReceptionWorkspace() {
       }
       mainContent={
         <>
+          <EmsCriticalArrivalPrep />
           <ReceptionContentSection>
             <Stepper draft={draft} aiAssist={aiAssist} result={result} />
 

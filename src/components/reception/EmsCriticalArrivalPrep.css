@@ -1,0 +1,172 @@
+/**
+ * Critical EMS pre-arrival prep card — page content, not header chrome.
+ */
+
+.ems-critical-arrival-prep {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 16px;
+  border: 1px solid var(--status-critical, #ef4444);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--status-critical, #ef4444) 7%, var(--medical-white, #fff));
+  overflow: hidden;
+}
+
+.ems-critical-arrival-prep--complete {
+  border-color: var(--status-success, #22c55e);
+  background: color-mix(in srgb, var(--status-success, #22c55e) 8%, var(--medical-white, #fff));
+}
+
+.ems-critical-arrival-prep__summary {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+}
+
+.ems-critical-arrival-prep__icon {
+  color: var(--status-critical, #ef4444);
+}
+
+.ems-critical-arrival-prep__copy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ems-critical-arrival-prep__copy strong {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--medical-ink, #111827);
+}
+
+.ems-critical-arrival-prep__copy span {
+  font-size: 12px;
+  color: var(--medical-ink-muted, #64748b);
+}
+
+.ems-critical-arrival-prep__actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ems-critical-arrival-prep__actions button,
+.ems-critical-arrival-prep__checklist-actions button {
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--cdl-clinical-border, var(--medical-border, #e2e8f0));
+  border-radius: 8px;
+  background: var(--medical-white, #fff);
+  color: var(--medical-ink, #111827);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.ems-critical-arrival-prep__actions button:hover:not(:disabled),
+.ems-critical-arrival-prep__checklist-actions button:hover:not(:disabled) {
+  border-color: color-mix(in srgb, #374151 42%, var(--medical-border, #e2e8f0));
+  background: color-mix(in srgb, #374151 6%, var(--medical-white, #fff));
+}
+
+.ems-critical-arrival-prep__actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.ems-critical-arrival-prep__checklist {
+  display: grid;
+  gap: 10px;
+  padding: 12px 14px 14px;
+  border-top: 1px solid color-mix(in srgb, var(--status-critical, #ef4444) 30%, transparent);
+  background: var(--medical-slate-50, #f8fafc);
+}
+
+.ems-critical-arrival-prep__checklist-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.ems-critical-arrival-prep__checklist-eyebrow {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--medical-accent-hover, #475569);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ems-critical-arrival-prep__checklist h2 {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+.ems-critical-arrival-prep__checklist p {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--medical-ink-muted, #64748b);
+}
+
+.ems-critical-arrival-prep__checklist-meta {
+  display: grid;
+  gap: 4px;
+  justify-items: end;
+  min-width: 64px;
+}
+
+.ems-critical-arrival-prep__progress {
+  width: 64px;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--medical-border, #e2e8f0) 70%, transparent);
+}
+
+.ems-critical-arrival-prep__progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--medical-accent, #64748b);
+}
+
+.ems-critical-arrival-prep__checklist-items {
+  display: grid;
+  gap: 6px;
+}
+
+.ems-critical-arrival-prep__checklist-items label {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px;
+  align-items: start;
+  padding: 8px 10px;
+  border: 1px solid var(--cdl-clinical-border, var(--medical-border, #e2e8f0));
+  border-radius: 8px;
+  background: var(--medical-white, #fff);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.ems-critical-arrival-prep__item--done {
+  border-color: color-mix(in srgb, var(--status-success, #22c55e) 40%, var(--medical-border, #e2e8f0));
+  background: color-mix(in srgb, var(--status-success, #22c55e) 6%, var(--medical-white, #fff));
+}
+
+.ems-critical-arrival-prep__checklist-actions {
+  display: flex;
+  gap: 8px;
+}
+
+@media (max-width: 720px) {
+  .ems-critical-arrival-prep__summary {
+    grid-template-columns: 1fr;
+  }
+}
