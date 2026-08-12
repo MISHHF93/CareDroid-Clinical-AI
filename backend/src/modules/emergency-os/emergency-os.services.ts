@@ -1132,6 +1132,22 @@ export class EmergencyPatientService implements OnModuleInit {
   }
 
   createPatient(input: Partial<EmergencyPatient>): EmergencyPatient {
+    // Idempotency guard: real frontend callers (receptionIntakeOrchestrator.ts,
+    // QuickIntake.tsx, emergencyStore.ts's fire-and-forget backend sync) send the
+    // client-generated id they already created locally, and the sync call is never
+    // retried through this same id-checked path anywhere else in this service --
+    // unlike updatePatient() above, this method used to push() unconditionally, so
+    // a network retry of the exact same create request (timeout + browser/proxy
+    // retry, or a duplicate dispatch of the store action) produced two identical-id
+    // entries in this.patients, silently diverging the in-memory board from the
+    // single row the DB-side upsert kept. Returning the existing record for a
+    // repeated id makes a retry a no-op instead of a duplicate.
+    if (input.id) {
+      const existing = this.patients.find((patient) => patient.id === input.id);
+      if (existing) {
+        return clone(existing);
+      }
+    }
     const now = new Date().toISOString();
     const normalized = ensurePatientArrivalBlock(input);
     const state = normalized.state || 'Triage';
