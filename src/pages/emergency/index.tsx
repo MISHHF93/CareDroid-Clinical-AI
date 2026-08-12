@@ -122,6 +122,8 @@ import { evaluateWhiteboardOperationalLoad } from '../../components/whiteboard/w
 import { AiTriageAssistPanelForPatientId } from '../../components/reception/AiTriageAssistPanel';
 import EdDataSourceBanner from '../../components/emergency/EdDataSourceBanner';
 import CriticalAlertBanner from '../../components/emergency/CriticalAlertBanner';
+import { useNotificationShellOptional } from '../../contexts/NotificationShellContext';
+import { getAlertClassificationTier, isAlertActionable } from '../../engine/alertClassificationModel';
 import { FIRST_CUSTOMER_DEMO_MODE } from '../../data/firstCustomerDemoMode';
 import { shouldShowWalkthroughActionOnEmptyBoard } from '../../config/practitionerCleanup.config';
 import { mergePractitionerDensityProfile } from '../../config/practitionerRoleSurfacePolicy';
@@ -432,6 +434,7 @@ export default function EmergencyWhiteboard() {
   );
   const operationalIntelligence = useOperationalIntelligence({ screenMode: routeScreenMode });
   const unifiedOperationalIntelligence = useUnifiedOperationalIntelligence();
+  const notificationShell = useNotificationShellOptional();
   const centralSnapshot = operationalIntelligence.centralSnapshot;
   const intelligenceSnapshot = operationalIntelligence.snapshot;
   const isRegistrationClerk = emergencyRole.role === EMERGENCY_ROLE_IDS.registrationClerk;
@@ -446,11 +449,17 @@ export default function EmergencyWhiteboard() {
     [centralSnapshot.operationalSummary.metrics],
   );
   const breachedQueueCount = centralSnapshot.queueHealth.filter((queue) => queue.breached).length;
-  const unacknowledgedCriticalAlertCount = centralSnapshot.bottleneckRegistry.activeBottlenecks.filter(
-    (e) => e.severity === 'critical' && e.status === 'active',
+  // Canonical isAlertActionable/getAlertClassificationTier pipeline -- the same one
+  // the Sidebar badge and OperationalAlarmDock chip already agree on (see HEAL-098).
+  // Previously this banner counted only centralSnapshot.bottleneckRegistry entries,
+  // a narrower, independent source that could show a different number than the rest
+  // of this same screen for the app's highest-severity "response required now" alert.
+  const visibleNotificationAlerts = notificationShell?.visibleNotificationAlerts ?? [];
+  const unacknowledgedCriticalAlertCount = visibleNotificationAlerts.filter(
+    (alert) => isAlertActionable(alert) && getAlertClassificationTier(alert) === 'critical',
   ).length;
-  const unacknowledgedHighAlertCount = centralSnapshot.bottleneckRegistry.activeBottlenecks.filter(
-    (e) => e.severity === 'high' && e.status === 'active',
+  const unacknowledgedHighAlertCount = visibleNotificationAlerts.filter(
+    (alert) => isAlertActionable(alert) && getAlertClassificationTier(alert) === 'high',
   ).length;
   const canUseCentralIntake =
     canMutateWhiteboard &&
