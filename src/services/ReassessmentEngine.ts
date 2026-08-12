@@ -1,5 +1,26 @@
 import { PatientState } from '../types/emergency';
-import { PATIENT_STATE_SEQUENCE } from './PatientJourneyEngine';
+
+// Inlined from the now-deleted services/PatientJourneyEngine.ts (2026-08-12): that file's own
+// transitionPatient/transitionPatientToNextState/validatePatientStateTransition/PatientJourneyEngine
+// export had zero real production callers (only its own test file exercised them) and its name
+// collided with 2 OTHER, unrelated modules both also named/exporting "PatientJourneyEngine" --
+// engine/journeyEngine.ts (the real, branching, actually-wired-to-transitions FSM) and
+// data/patientJourneyEngine.ts (a synthetic dashboard/analytics model). This constant was the
+// dead file's only real, actually-consumed export -- moved here to its one real caller rather
+// than kept in a file whose name invited a future dev to wire the wrong "PatientJourneyEngine"
+// into a real transition and silently bypass engine/journeyEngine.ts's branching rules.
+const PATIENT_STATE_SEQUENCE = Object.freeze([
+  PatientState.Arrival,
+  PatientState.Registration,
+  PatientState.Triage,
+  PatientState.Waiting,
+  PatientState.Assessment,
+  PatientState.Orders,
+  PatientState.Results,
+  PatientState.Disposition,
+  PatientState.Admission,
+  PatientState.Discharge,
+]);
 
 export const REASSESSMENT_INTERVAL_MS = 60000;
 export const WAITING_REASSESSMENT_THRESHOLD_MINUTES = 45;
