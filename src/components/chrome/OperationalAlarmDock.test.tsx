@@ -48,16 +48,18 @@ vi.mock('../../hooks/useEffectiveUserProfile', () => ({
   default: () => ({ saasRole: 'clinician' }),
 }));
 
+const mockStoreState: Record<string, unknown> = {
+  emsArrivals: [] as unknown[],
+  rooms: [],
+  staff: [],
+  activeShift: { staffIds: [], chargeStaffId: null },
+  checkCriticalEMSChecklistItem: vi.fn(),
+  completeCriticalEMSChecklist: vi.fn(),
+};
+
 vi.mock('../../store/emergencyStore', () => ({
   useEmergencyStore: (selector: (state: Record<string, unknown>) => unknown) =>
-    selector({
-      emsArrivals: [],
-      rooms: [],
-      staff: [],
-      activeShift: { staffIds: [], chargeStaffId: null },
-      checkCriticalEMSChecklistItem: vi.fn(),
-      completeCriticalEMSChecklist: vi.fn(),
-    }),
+    selector(mockStoreState),
 }));
 
 vi.mock('../../engine/alertClassificationModel', () => ({
@@ -73,6 +75,7 @@ describe('OperationalAlarmDock floating window', () => {
   beforeEach(() => {
     openPanel.mockClear();
     recordAlertAcknowledged.mockClear();
+    mockStoreState.emsArrivals = [];
   });
 
   it('renders a header-anchored chip (not a floating corner window)', () => {
@@ -109,5 +112,34 @@ describe('OperationalAlarmDock floating window', () => {
     expect(screen.getByRole('button', { name: /acknowledge/i })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /all alerts/i }));
     expect(openPanel).toHaveBeenCalled();
+  });
+
+  // A critical EMS pre-arrival isn't part of the canonical alert pipeline
+  // (visibleNotificationAlerts), so it must not inflate this chip's numeric
+  // count past what the Sidebar badge shows -- the two are supposed to always
+  // agree (see HEAL-098). Regression guard for that specific +1 bug.
+  it('does not add a critical EMS pre-arrival to the numeric alert count', () => {
+    mockStoreState.emsArrivals = [
+      {
+        id: 'ems-1',
+        criticalChecklist: { type: 'stemi', title: 'STEMI prep', completions: [] },
+        patientId: null,
+        status: 'Pending',
+        estimatedArrivalTime: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
+        chiefComplaint: 'Chest pain',
+        unitName: 'Medic 12',
+      },
+    ];
+
+    render(
+      <MemoryRouter>
+        <div className="app-chrome-top__actions">
+          <OperationalAlarmDock />
+        </div>
+      </MemoryRouter>,
+    );
+
+    // 1 mocked visibleNotificationAlerts entry -> chip count must read 1, not 2.
+    expect(document.querySelector('.operational-alarm-dock__chip-count')?.textContent).toBe('1');
   });
 });

@@ -143,9 +143,15 @@ export default function OperationalAlarmDock({ showEmsInbound = true }: Operatio
     () => topDockAlert(visibleNotificationAlerts),
     [visibleNotificationAlerts],
   );
+  // Deliberately NOT + (arrival ? 1 : 0) -- a critical EMS pre-arrival isn't part of
+  // the canonical alert pipeline (useNotificationCenter's visibleNotificationAlerts),
+  // so adding it here would inflate this chip's count 1 higher than the Sidebar badge
+  // and OperationalAlarmDock chip both read from, defeating the count-agreement
+  // guarantee HEAL-098 established. The arrival is still fully represented via
+  // chipLabel's EMS ETA text and its own dedicated prep-checklist card below.
   const alertCount = useMemo(
-    () => countActionableAlerts(visibleNotificationAlerts) + (arrival ? 1 : 0),
-    [visibleNotificationAlerts, arrival],
+    () => countActionableAlerts(visibleNotificationAlerts),
+    [visibleNotificationAlerts],
   );
 
   const [windowOpen, setWindowOpen] = useState(false);
