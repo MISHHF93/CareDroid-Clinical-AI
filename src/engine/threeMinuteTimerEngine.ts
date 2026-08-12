@@ -45,7 +45,7 @@ const ESCALATION_THRESHOLDS = [
     seconds: 120,
     key: 'escalation_l1',
     targetRole: 'charge_nurse',
-    title: '3-Minute Alert: Escalating to charge nurse',
+    title: '2-Minute Alert: Escalating to charge nurse',
     severity: 'Critical' as const,
     newOwnerRole: 'charge_nurse',
   },

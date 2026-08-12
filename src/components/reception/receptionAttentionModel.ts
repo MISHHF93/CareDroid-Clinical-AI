@@ -54,7 +54,30 @@ function severityToTone(severity: Alert['severity'] | string | undefined): Recep
   return 'info';
 }
 
+/**
+ * threeMinuteTimerEngine's escalation alerts (30s/2min/3min/5min thresholds) only
+ * ever fire AFTER their threshold has already elapsed -- they describe a milestone
+ * already in the past, not a deadline still counting down. Applying the generic
+ * 180-second countdown below to one of these (as this function used to do
+ * unconditionally) makes every alert past the 3-minute mark show a permanently
+ * frozen "0:00", which is why a batch of them looks like duplicated, meaningless
+ * notifications rather than distinct, informative escalations.
+ */
+function formatElapsedSinceEscalation(alert: Alert, now: number): { label: string; breached: boolean } {
+  const firedAt = String(alert.createdAt || '');
+  const fired = new Date(firedAt).getTime();
+  if (!Number.isFinite(fired)) return { label: 'Escalated', breached: true };
+  const elapsedSeconds = Math.max(0, Math.floor((now - fired) / 1000));
+  const minutes = Math.floor(elapsedSeconds / 60);
+  const seconds = elapsedSeconds % 60;
+  const label = minutes > 0 ? `${minutes}m ${seconds}s ago` : `${seconds}s ago`;
+  return { label, breached: true };
+}
+
 function formatTimerFromAlert(alert: Alert, now: number): { label: string; breached: boolean } {
+  if (String(alert.source || '') === 'three-minute-timer-engine') {
+    return formatElapsedSinceEscalation(alert, now);
+  }
   const startedAt = String(alert.metadata?.responseStartedAt || alert.createdAt || '');
   const started = new Date(startedAt).getTime();
   if (!Number.isFinite(started)) return { label: '3:00', breached: false };
