@@ -14,7 +14,7 @@
 | NLU intent classifier | MLP head over frozen sentence embeddings | **Yes** | ✅ accuracy 1.00 (n=51) | ✅ `NLU_SERVICE_ENABLED=true` (in-process); backend must be up for HTTP probe |
 | Artifact-type router | MLP head over frozen sentence embeddings | **Yes** | ✅ accuracy **0.9645** (n=310) | Loaded via the same Unified AI Node as above |
 | Foundation LLM (Claude Sonnet 4.6) | Third-party API, not trained by CareDroid | No (provider-managed) | Offline fixture gate only, no live-LLM eval | ❌ no `ANTHROPIC_API_KEY` set, `AI_ENABLED=false` |
-| RAG retrieval | Embedding + vector search + citations | No (retrieval, not training) | Fixture: 5/5 retrieval cases | ⚠️ degraded — see §5 (stale `RAG_MODEL` forces hash embeddings, not semantic) |
+| RAG retrieval | Embedding + vector search + citations | No (retrieval, not training) | Fixture: 5/5 retrieval cases | ✅ `RAG_MODEL=Xenova/all-mpnet-base-v2` (real semantic embeddings, not hash fallback — corrected, see §10) |
 | 39 clinical calculators (tool-orchestrator) | Hand-coded validated clinical formulas | **Never — by design** | Deterministic, unit-tested | ✅ yes, always (no model involved) |
 | Offline AI safety-eval harness | Rule-based scorer over synthetic fixtures | N/A (a test harness, not a model) | 41/41 cases, 14/14 gates pass | ✅ runs via `npm run ai:eval:gate` |
 | Anomaly detection | Was sklearn IsolationForest; now z-score threshold | **No longer** (ML removed) | N/A | Standalone script, not wired into request path |
@@ -102,12 +102,12 @@ Notes:
 Real, wired architecture: `rag.service.ts` orchestrates `EmbeddingService` → `PineconeService` (vector store) → `RetrievalService` → `RerankingService` → `CitationService`, with `ClinicalContextService` assembling the final grounded context.
 
 - **Vector store:** Pinecone if `PINECONE_API_KEY` is set, otherwise falls back to `InMemoryVectorStore` (`vector-db/in-memory-vector.store.ts`). Neither `.env` has a Pinecone key configured → **in-memory store is what's actually running.**
-- **Embeddings — a real config-drift bug found in this environment:**
+- **Embeddings:**
   `backend/src/modules/rag/embeddings/openai-embeddings.service.ts` (class name is legacy/misleading — it never calls OpenAI's API) picks its embedding strategy from the resolved model string:
   - if the model name contains `xenova`/`mpnet`/`minilm`/`semantic-local` → real local transformer embedding via `embedTextWithXenova` (`embeddings/xenova-embeddings.util.ts`)
   - **otherwise → `generateHashEmbedding()`**, a deterministic SHA-256 bag-of-words hash vector — not semantic at all.
 
-  `backend/src/config/rag.config.ts:10-14` resolves the model from `process.env.RAG_MODEL || EMBEDDING_MODEL || AI_EMBEDDING_MODEL || 'Xenova/all-mpnet-base-v2'`. **`backend/.env` currently sets `RAG_MODEL=text-embedding-ada-002`** (a leftover OpenAI-era value) — that string matches none of the Xenova triggers, so retrieval in this exact environment is running on **hash embeddings, not semantic embeddings**, despite the model registry and `.env.example` both stating Xenova is the standard. This degrades retrieval quality silently (no error, no log warning) and should be fixed by clearing `RAG_MODEL` in `backend/.env` or setting it to `Xenova/all-mpnet-base-v2`.
+  `backend/src/config/rag.config.ts:10-14` resolves the model from `process.env.RAG_MODEL || EMBEDDING_MODEL || AI_EMBEDDING_MODEL || 'Xenova/all-mpnet-base-v2'`. **A config-drift bug was found here 2026-07-15** (`backend/.env` set `RAG_MODEL=text-embedding-ada-002`, a leftover OpenAI-era value matching none of the Xenova triggers, silently routing retrieval to hash embeddings) — **re-verified 2026-08-12: `backend/.env` now sets `RAG_MODEL=Xenova/all-mpnet-base-v2`, matching `.env.example`, so retrieval in this environment is running on real semantic embeddings, not the hash fallback.** Fixed by an earlier session; this section is left in place as the historical record per §10.
 - **Reranking:** `RERANK_ENABLED=false` everywhere — the `cohere-ranker.service.ts` exists but is not active.
 - **Knowledge registry** (`data/knowledge-registry/`): 9 accepted artifacts (ACLS cardiac arrest, sepsis hour-1, SOFA overview, warfarin/aspirin, stroke FAST, pediatric fever, pregnancy ED caution, FHIR R4 citation, NEMSIS citation), each with a required SHA-256 content hash, license, provenance chain — validated by `scripts/validate-knowledge-registry.mjs`.
 
@@ -175,12 +175,12 @@ The heuristic-node entry (`careDroidAI-heuristic-node`) is worth calling out on 
 
 These are concrete, file-and-line findings from comparing the real `.env` / `backend/.env` against `.env.example` and the code paths that read them — not documentation gaps:
 
-1. **RAG embeddings silently degraded** — `backend/.env` has `RAG_MODEL=text-embedding-ada-002` (stale OpenAI-era value). Per §5, this routes retrieval to SHA-256 hash embeddings instead of real `Xenova/all-mpnet-base-v2` semantic embeddings, with no error or warning surfaced anywhere. **Fix:** remove the line or set it to `Xenova/all-mpnet-base-v2` (matches `.env.example` and the model registry's documented default).
-2. **Trained NLU classifier not served locally** — `backend/.env` sets `NLU_SERVICE_ENABLED=false`, while `.env.example` documents it as `true` and the in-process architecture note says the old host/port vars are legacy/unused. The 100%-on-51-examples classifier in §2.1 is real and trained but currently switched off in this environment's config.
-3. **No foundation LLM key anywhere** — neither `.env` nor `backend/.env` has a non-empty `ANTHROPIC_API_KEY`; root `.env` doesn't even have the `AI_*` block that `.env.example` ships. Every "active"/"legacy" service in §4 is running in fail-closed/local-adapter mode as a result.
-4. **`OpenAIEmbeddingsService` is a misleading class name** — it never calls OpenAI's API in current code (`generateEmbedding()` branches only between Xenova and a local hash fallback); worth a rename so a future reader doesn't assume a live OpenAI dependency exists.
+1. ~~**RAG embeddings silently degraded**~~ — **CLOSED, re-verified 2026-08-12.** Originally found 2026-07-15: `backend/.env` had `RAG_MODEL=text-embedding-ada-002` (stale OpenAI-era value), routing retrieval to SHA-256 hash embeddings instead of real `Xenova/all-mpnet-base-v2` semantic embeddings, with no error or warning surfaced anywhere. Re-checked `backend/.env` directly on 2026-08-12: `RAG_MODEL=Xenova/all-mpnet-base-v2`, matching `.env.example` — real semantic embeddings are running, not the hash fallback. Fixed by an earlier session.
+2. ~~**Trained NLU classifier not served locally**~~ — **CLOSED, re-verified 2026-08-12.** Originally found 2026-07-15: `backend/.env` had `NLU_SERVICE_ENABLED=false` against `.env.example`'s `true`. Re-checked directly on 2026-08-12: `backend/.env` now sets `NLU_SERVICE_ENABLED=true`, matching `.env.example` — the 100%-on-51-examples classifier in §2.1 is live locally. Fixed by an earlier session (the executive-summary table in §1 already reflected this; this section had drifted behind it).
+3. **No foundation LLM key anywhere** — neither `.env` nor `backend/.env` has a non-empty `ANTHROPIC_API_KEY` (re-checked 2026-08-12, still empty); root `.env` doesn't even have the `AI_*` block that `.env.example` ships. Every "active"/"legacy" service in §4 is running in fail-closed/local-adapter mode as a result. **Not actionable without the user supplying a real API key** — an external-credential blocker, not a code fix.
+4. **`OpenAIEmbeddingsService` is a misleading class name** — it never calls OpenAI's API in current code (`generateEmbedding()` branches only between Xenova and a local hash fallback); worth a rename so a future reader doesn't assume a live OpenAI dependency exists. Still open as of 2026-08-12.
 
-None of these are exotic — they're the kind of thing that's invisible until someone reads the branch logic, which is exactly what finding #1 required.
+Findings #1 and #2 above are the kind of thing that's invisible until someone reads the branch logic, which is exactly what the original audit required — and worth periodically re-verifying against the live `.env` rather than assuming a documented finding stays true forever, since both had already been silently fixed by the time of this re-check.
 
 ---
 
