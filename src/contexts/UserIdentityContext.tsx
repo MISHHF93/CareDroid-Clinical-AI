@@ -1007,7 +1007,20 @@ export const UserIdentityProvider = ({ children }: { children: React.ReactNode }
     refreshIdentityRef.current();
   }, [authToken, isAuthenticated]);
 
-  const profile = operationalProfile || fallbackProfile;
+  const rawProfile = operationalProfile || fallbackProfile;
+  // operationalProfile comes straight from the real backend (GET /api/profile/me) and, for
+  // the dev-bypass/demo-persona session, carries the backend service account's literal raw
+  // name ("Dev Clinician") -- never meant to be user-facing. fallbackProfile already masks
+  // this via enrichDemoIdentityFallback (see buildFallbackProfile above), but operationalProfile
+  // did not go through the same masking, so the displayed clinician identity silently flipped
+  // between "Dr. Cara George" (before the async /api/profile/me fetch resolved) and "Dev
+  // Clinician" (after) with no user action -- the same two-sources-disagree bug shape as
+  // HEAL-098/HEAL-114, just for identity instead of an alert count. Re-applying the same
+  // masking here keeps both sources in agreement regardless of fetch timing.
+  const profile = useMemo(
+    () => enrichDemoIdentityFallback(user, rawProfile) as OperationalProfile,
+    [user, rawProfile],
+  );
   // profile?.workspace and normalizeSaasProfile(...) both fall back to freshly-constructed
   // object literals when unset (the common demo/dev-profile case), so without memoizing
   // here `workspaceState`/`saasProfile` were new references every render — poisoning the
