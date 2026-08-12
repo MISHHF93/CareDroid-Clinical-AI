@@ -17,6 +17,14 @@ const MAX_PENDING_EVENTS = 24;
 let refreshTimerId: number | null = null;
 let lastBackendEventType: string | undefined;
 const pendingEvents: OperationalInputEvent[] = [];
+// The 4 backend operational-intelligence routes require VIEW_OBSERVABILITY, a
+// permission PHYSICIAN/NURSE (the roles this engine is mounted for on every route
+// via AppShell) never hold -- confirmed via role-permissions.config.ts. Rather than
+// duplicate that role/permission decision here (which would drift from the backend's
+// real source of truth), this engine detects the resulting 403 itself and stops
+// retrying for the rest of the session, instead of repeating a doomed authenticated
+// request on every realtime event and every polling tick.
+let permissionDenied = false;
 
 function unwrapEnvelopeData<T>(envelope: unknown): T | null {
   if (!envelope || typeof envelope !== 'object') return null;
@@ -65,6 +73,7 @@ export function queueUnifiedOperationalIntelligenceEvent(
   eventType: string,
   payload?: unknown,
 ): void {
+  if (permissionDenied) return;
   if (!isUnifiedOperationalIntelligenceTriggerEvent(eventType)) return;
   pendingEvents.push(normalizeBackendEvent(eventType, payload));
   if (pendingEvents.length > MAX_PENDING_EVENTS) {
@@ -73,6 +82,7 @@ export function queueUnifiedOperationalIntelligenceEvent(
 }
 
 export function scheduleUnifiedOperationalIntelligenceRefresh(eventType?: string): void {
+  if (permissionDenied) return;
   if (eventType) {
     lastBackendEventType = eventType;
     getUnifiedOperationalIntelligenceStoreState().setLastBackendEventType(eventType);
@@ -125,6 +135,11 @@ export async function refreshUnifiedOperationalIntelligenceFromBackend(
     store.setLastBackendEventType(eventType);
   }
 
+  if (permissionDenied) {
+    trace.end('success', { mode: 'degraded-unauthorized' });
+    return store.backendSnapshot;
+  }
+
   store.setIsRefreshing(true);
   const emergencyState = useEmergencyStore.getState();
   const eventsToEvaluate = [...pendingEvents];
@@ -173,10 +188,18 @@ export async function refreshUnifiedOperationalIntelligenceFromBackend(
   } catch (error: unknown) {
     const message =
       error instanceof Error ? error.message : 'Unable to refresh unified operational intelligence.';
+    if (error && typeof error === 'object' && (error as { status?: unknown }).status === 403) {
+      permissionDenied = true;
+      pendingEvents.length = 0;
+      if (refreshTimerId) {
+        window.clearTimeout(refreshTimerId);
+        refreshTimerId = null;
+      }
+    }
     store.setRefreshError(message);
     await applyUnifiedSnapshot(store.backendSnapshot, store.source, eventType);
     store.setIsRefreshing(false);
-    trace.end('error', { message });
+    trace.end('error', { message, permissionDenied });
     return store.backendSnapshot;
   }
 }

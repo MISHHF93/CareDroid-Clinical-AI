@@ -153,8 +153,9 @@ export const REVIEW_ONLY_EMERGENCY_OS_API_ENDPOINT_KEYS = Object.freeze([
 ]);
 
 async function requestEmergencyJson(path, options: any = {}) {
+  let response: Response | undefined;
   try {
-    const response = await apiFetch(path, {
+    response = await apiFetch(path, {
       ...options,
       headers: {
         Accept: 'application/json',
@@ -164,11 +165,18 @@ async function requestEmergencyJson(path, options: any = {}) {
     });
     const data = await parseApiResponse(response, { fallback: {} });
     if (!response?.ok) {
-      throw new Error(data?.message || getApiErrorMessage(null, response));
+      const httpError: any = new Error(data?.message || getApiErrorMessage(null, response));
+      httpError.status = response.status;
+      throw httpError;
     }
     return data;
   } catch (error: any) {
-    throw new Error(getApiErrorMessage(error));
+    // Preserve the real HTTP status (e.g. 403 vs. a transient network failure) so
+    // callers can distinguish "not authorized, stop retrying" from "backend down,
+    // keep retrying" -- getApiErrorMessage(error) alone loses this once caught.
+    const wrapped: any = new Error(getApiErrorMessage(error, response));
+    wrapped.status = error?.status ?? response?.status;
+    throw wrapped;
   }
 }
 
