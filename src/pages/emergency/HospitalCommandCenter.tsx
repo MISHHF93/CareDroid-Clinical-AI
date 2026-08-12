@@ -218,7 +218,10 @@ export default function HospitalCommandCenter() {
             className={`hospital-command-center__status cdl-surface cdl-surface--operational-status hospital-command-center__status--${snapshot.tone}`}
             role="status"
           >
-            <p className="hospital-command-center__status-line">{snapshot.statusLine}</p>
+            {/* snapshot.statusLine is already shown once above in the "Happening now" situation-brief
+                cell (situationBrief.status) -- repeating it here duplicated the exact same sentence in
+                two stacked banners on the same page. This strip now carries only the info that isn't
+                shown anywhere else on the page. */}
             <div className="hospital-command-center__status-meta">
               <span>{CAREDROID_PRODUCT.safetyShort}</span>
               <span>Role view: {roleLabel}</span>
