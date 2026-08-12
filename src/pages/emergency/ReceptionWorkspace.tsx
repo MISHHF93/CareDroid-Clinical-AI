@@ -857,11 +857,6 @@ export default function ReceptionWorkspace() {
               tone: 'neutral',
             },
             {
-              label: 'Needs attention',
-              value: attention.count,
-              tone: attention.criticalCount > 0 ? 'critical' : attention.count > 0 ? 'warning' : 'neutral',
-            },
-            {
               label: 'Draft flags',
               value: liveRedFlags.length + missingCriticalFields.length,
               tone:
