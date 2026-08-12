@@ -56,7 +56,11 @@ export default function PatientRoomDisplay() {
     <section className="patient-room-display">
       {room && surfaces.patientRoom.showDoorSignDuplicate ? (
         <div className="patient-room-display__door-sign">
-          <DigitalDoorSign room={room} patient={patient} staff={staff} />
+          {/* Care team is already shown below by PatientWhiteboard/PatientRoomWhiteboard
+              ("Your care team") -- hideCareTeam keeps this sign's unique safety content
+              (isolation precautions, fall risk, sepsis alert, allergy flags, reminders)
+              without repeating the roster a second time on the same screen. */}
+          <DigitalDoorSign room={room} patient={patient} staff={staff} hideCareTeam />
         </div>
       ) : null}
       {patient ? (

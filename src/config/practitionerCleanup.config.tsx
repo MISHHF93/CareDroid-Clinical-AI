@@ -151,8 +151,12 @@ export const PRACTITIONER_CLEANUP = Object.freeze({
   suppressCalculatorHubHeroDescription: true,
   suppressCalculatorHubCardDescriptions: true,
   compactCalculatorHubPatientBar: true,
-  /** Patient room display — in-room board only; no duplicate door sign */
-  suppressPatientRoomDoorSignDuplicate: true,
+  /** Patient room display — door sign stays visible; DigitalDoorSign's hideCareTeam
+   *  prop already removes the one part ("Your care team") that duplicates
+   *  PatientWhiteboard/PatientRoomWhiteboard, so isolation precautions, fall risk,
+   *  sepsis alert, allergy flags, and reminders (unique to the door sign, shown
+   *  nowhere else in this view) stay visible instead of disappearing entirely. */
+  suppressPatientRoomDoorSignDuplicate: false,
   /** Hide technical data-source / API freshness lines on frontline screens */
   suppressEdDataSourceBanner: true,
   /** Hide simulation / training banners in session chrome */

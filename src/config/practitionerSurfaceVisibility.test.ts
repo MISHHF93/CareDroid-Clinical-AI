@@ -67,7 +67,10 @@ describe('practitionerSurfaceVisibility', () => {
     expect(surfaces.analytics.showSecondaryCharts).toBe(false);
     expect(surfaces.calculatorHub.showCardDescriptions).toBe(false);
     expect(surfaces.calculatorHub.compactPatientBar).toBe(true);
-    expect(surfaces.patientRoom.showDoorSignDuplicate).toBe(false);
+    // DigitalDoorSign's hideCareTeam prop (applied at the render site) already
+    // removes the one part that duplicated the whiteboard, so pilot mode keeps
+    // the door sign's unique safety flags (isolation, fall risk, allergies) visible.
+    expect(surfaces.patientRoom.showDoorSignDuplicate).toBe(true);
   });
 
   it('practitionerShows reads nested keys', () => {

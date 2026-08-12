@@ -8,6 +8,8 @@ type DigitalDoorSignProps = {
   patient?: Patient | null;
   staff?: Staff[];
   className?: string;
+  /** Suppress the care-team block when a fuller whiteboard already shows it alongside this sign. */
+  hideCareTeam?: boolean;
 };
 
 export default function DigitalDoorSign({
@@ -15,6 +17,7 @@ export default function DigitalDoorSign({
   patient = null,
   staff = [] as any[],
   className = '',
+  hideCareTeam = false,
 }: DigitalDoorSignProps) {
   const snapshot = useMemo(
     () => buildDigitalDoorSignSnapshot(patient, room, staff),
@@ -32,7 +35,7 @@ export default function DigitalDoorSign({
         <span className="digital-door-sign__mrn">MRN {snapshot.mrn}</span>
       </header>
 
-      {snapshot.careTeam.length ? (
+      {snapshot.careTeam.length && !hideCareTeam ? (
         <div className="digital-door-sign__team">
           <span>Care team</span>
           <p>{snapshot.careTeam.join(' · ')}</p>
