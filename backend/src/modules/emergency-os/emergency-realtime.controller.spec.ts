@@ -2,6 +2,7 @@ import { Test } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
 import { EmergencyRealtimeController } from './emergency-realtime.controller';
 import { EmergencyRealtimeService } from './emergency-realtime.service';
+import { AuthorizationGuard } from '../auth/guards/authorization.guard';
 import {
   CareDroidCentralNodeService,
   EmergencyPatientService,
@@ -31,7 +32,17 @@ describe('EmergencyRealtimeController', () => {
           },
         },
       ],
-    }).compile();
+    })
+      // These functional tests exercise the SSE stream directly (controller.stream()), not
+      // through a real HTTP request pipeline, so AuthorizationGuard's own canActivate() never
+      // runs either way -- but Nest's DI container still needs to construct it (per @UseGuards
+      // metadata), which requires Reflector/AuditService that this minimal test module doesn't
+      // provide. Real guard behavior (permission decorator + guard presence) is covered by
+      // emergency-realtime-authorization.spec.ts instead, matching the established pattern in
+      // emergency-os.controller.spec.ts.
+      .overrideGuard(AuthorizationGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     controller = moduleRef.get(EmergencyRealtimeController);
     realtimeService = moduleRef.get(EmergencyRealtimeService);
