@@ -56,9 +56,9 @@ export default function CommandCenterInsightsCharts({
         />
         <MetricCard
           label="Bottlenecks"
-          value={String(snapshot.bottlenecks.length)}
+          value={String(snapshot.bottleneckCount)}
           hint="Service constraints"
-          tone={snapshot.bottlenecks.length > 0 ? 'warning' : 'neutral'}
+          tone={snapshot.bottleneckCount > 0 ? 'warning' : 'neutral'}
         />
         <MetricCard
           label="Graph connections"

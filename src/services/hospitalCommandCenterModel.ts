@@ -64,6 +64,7 @@ export type HospitalCommandCenterSnapshot = Readonly<{
   tone: HospitalCommandTone;
   metrics: readonly HospitalCommandMetric[];
   bottlenecks: readonly HospitalCommandBottleneck[];
+  bottleneckCount: number;
   aiRecommendations: readonly HospitalCommandAiRecommendation[];
   unresolvedAlerts: readonly HospitalCommandAlertItem[];
   unresolvedAlertCount: number;
@@ -270,6 +271,17 @@ export function buildHospitalCommandCenterSnapshot(input: {
           ownerRole: finding.ownerRole,
         }),
       ) || [];
+  // bottleneckFindings is capped to 6 for list rendering (mapUnifiedOperationalBottlenecks'
+  // own .slice(0, 6), mirrored above for the non-backend branch) -- the true total must be
+  // computed separately, the same HEAL-114 pattern as unresolvedAlertCount below, so that
+  // "Bottlenecks" chart/badge consumers reading bottleneckFindings.length don't silently
+  // undercount past 6 while the "Service bottlenecks" metric card (fed from
+  // unifiedMetrics.activeBottlenecks, itself uncapped) keeps climbing past it.
+  const bottleneckCount = useBackendOperationalIntelligence
+    ? unifiedOperational!.insights.filter(
+        (insight) => insight.type === 'bottleneck' || insight.type === 'congestion_prediction',
+      ).length
+    : journey.liveServiceSummaries.bottlenecks?.activeBottlenecks?.length ?? 0;
 
   const flowRecommendations =
     input.patientFlowSnapshot?.aiRecommendations?.slice(0, 5).map((rec) =>
@@ -411,11 +423,16 @@ export function buildHospitalCommandCenterSnapshot(input: {
     {
       id: 'service-bottlenecks',
       label: 'Service bottlenecks',
-      value: unifiedMetrics?.activeBottlenecks ?? bottleneckFindings.length,
+      // Previously read unifiedMetrics?.activeBottlenecks, which filters to type==='bottleneck'
+      // only (excluding 'congestion_prediction') and could disagree with bottleneckCount --
+      // the count every other bottleneck surface on this page (the chart card, the panel-list
+      // badge, and the detail list itself) already uses. Using the same bottleneckCount here
+      // keeps all three "how many bottlenecks" surfaces on this screen in agreement.
+      value: bottleneckCount,
       detail:
         bottleneckFindings[0]?.title ||
         'No active bottleneck signals',
-      tone: metricTone(unifiedMetrics?.activeBottlenecks ?? bottleneckFindings.length, 1, 3),
+      tone: metricTone(bottleneckCount, 1, 3),
       route: CANONICAL_ROUTES.emergencyReports,
     },
     {
@@ -493,6 +510,7 @@ export function buildHospitalCommandCenterSnapshot(input: {
     tone: overallTone,
     metrics: Object.freeze(metrics),
     bottlenecks: Object.freeze(bottleneckFindings),
+    bottleneckCount,
     aiRecommendations: Object.freeze(
       oiRecommendations.map((rec) =>
         Object.freeze({

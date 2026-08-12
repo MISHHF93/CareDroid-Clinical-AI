@@ -200,6 +200,73 @@ describe('hospitalCommandCenterModel', () => {
     expect(snapshot.statusLine).toContain('9 unresolved critical alerts');
   });
 
+  it('reports the true bottleneck count even past the 6-card display cap, and keeps the metric card in agreement (metric-card audit)', () => {
+    // bottlenecks (the list) is deliberately capped at 6 for rendering (mapUnifiedOperationalBottlenecks).
+    // bottleneckCount must stay the real total (bottleneck + congestion_prediction insights),
+    // and the "Service bottlenecks" metric card must read the same count, or the chart card /
+    // panel-list badge / metric card silently disagree once there are more than 6.
+    const insights = Array.from({ length: 5 }, (_, i) => ({
+      id: `bn${i}`,
+      domain: 'patient_flow',
+      type: 'bottleneck' as const,
+      title: `Bottleneck ${i}`,
+      summary: 'Derived from backend evaluate event.',
+      severity: 'warning' as const,
+      ownerRole: 'charge_nurse',
+      reasonCodes: ['queue_breach'],
+      confidence: 0.9,
+      humanReviewRequired: true,
+      advisoryOnly: true,
+      source: 'backend' as const,
+      updatedAt: '2026-07-03T12:00:00.000Z',
+    })).concat(
+      Array.from({ length: 3 }, (_, i) => ({
+        id: `cp${i}`,
+        domain: 'patient_flow',
+        type: 'congestion_prediction' as const,
+        title: `Congestion prediction ${i}`,
+        summary: 'Derived from backend evaluate event.',
+        severity: 'warning' as const,
+        ownerRole: 'charge_nurse',
+        reasonCodes: ['queue_breach'],
+        confidence: 0.9,
+        humanReviewRequired: true,
+        advisoryOnly: true,
+        source: 'backend' as const,
+        updatedAt: '2026-07-03T12:00:00.000Z',
+      })),
+    );
+
+    const snapshot = buildHospitalCommandCenterSnapshot({
+      unifiedOperationalSnapshot: {
+        engineId: 'unified-operational-intelligence',
+        generatedAt: '2026-07-03T12:00:00.000Z',
+        source: 'backend',
+        domainStatuses: [],
+        insights: insights as never[],
+        metrics: {
+          activePatients: 8,
+          waitingPatients: 2,
+          capacityScore: 70,
+          capacityBand: 'Orange',
+          inboundEms: 1,
+          activeBottlenecks: 5,
+          unresolvedAlerts: 0,
+          degradedServices: 0,
+          workflowPendingReview: 0,
+          aiRecommendationCount: 0,
+          congestionPredictions: 3,
+        },
+        safetyStatement: 'Advisory only.',
+        backendEndpoints: [],
+      },
+    });
+
+    expect(snapshot.bottlenecks.length).toBe(6);
+    expect(snapshot.bottleneckCount).toBe(8);
+    expect(snapshot.metrics.find((metric) => metric.id === 'service-bottlenecks')?.value).toBe(8);
+  });
+
   it('filters metrics by role priority order', () => {
     const snapshot = buildHospitalCommandCenterSnapshot();
     const triageIds = resolveHospitalCommandMetricsForRole(EMERGENCY_ROLE_IDS.triageNurse);

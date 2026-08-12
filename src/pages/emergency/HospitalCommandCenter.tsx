@@ -398,7 +398,7 @@ export default function HospitalCommandCenter() {
           <section className="emergency-route-card cd-surface-card">
             <div className="emergency-route-section-card__header">
               <strong>Service bottlenecks</strong>
-              <span className="emergency-route-journey-card__count">{snapshot.bottlenecks.length}</span>
+              <span className="emergency-route-journey-card__count">{snapshot.bottleneckCount}</span>
             </div>
             {snapshot.bottlenecks.length === 0 ? (
               <p className="emergency-route-section-card__lead">No active bottleneck signals.</p>
