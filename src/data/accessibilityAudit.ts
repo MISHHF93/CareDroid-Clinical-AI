@@ -62,7 +62,7 @@ export function buildAccessibilityAudit(sourceSnapshot: any = {}) {
       'Icon-only shell controls expose accessible names',
       has(sidebarTsx, 'aria-label={item.label}') &&
         /aria-label=\{`\$\{item\.label\}.*unread/.test(sidebarTsx) &&
-        has(appShellJsx, 'aria-label={copilotChrome.openAriaLabel}'),
+        has(sidebarTsx, 'aria-label={copilotChrome.shortName}'),
       'Collapsed rail item, unread-alert badge, and Copilot toggle have explicit dynamic labels.',
       'Do not rely on `title` as the accessible name for icon-only controls.'
     ),
