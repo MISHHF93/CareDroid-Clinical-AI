@@ -135,10 +135,17 @@ export class GovernanceController {
   @Get('summary')
   @Permissions(Permission.VIEW_GOVERNANCE)
   async getSummary() {
-    const readiness = await this.platformGovernance.getSummary();
+    const summary = await this.platformGovernance.getSummary();
     return {
-      status: readiness.status,
-      readiness,
+      status: summary.status,
+      generatedAt: summary.generatedAt,
+      // summary.readiness is the flat { criticality, blocked, blockers } object the
+      // frontend's buildPlatformGovernanceSurfaceView reads apiData.readiness.blocked
+      // from -- returning the whole `summary` under this same key (as before) made
+      // that path undefined, silently falling through to render the raw apiData.status
+      // enum ('blocked_until_configured') instead of the human label "Blocked".
+      readiness: summary.readiness,
+      counts: summary.counts,
       panels: {
         modelInventory: this.modelRegistry.listModels(),
         clinicalReview: this.approvalWorkflow.getClinicalReviewPanel(),
