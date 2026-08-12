@@ -2259,9 +2259,12 @@ export default function EmergencyWhiteboard() {
               settings={emergencySettings}
               roleId={emergencyRole.role}
               features={{
-                showTriageBreach:
-                  !((charge.isChargeNurseScreen && !charge.showTriageBreach) ||
-                    (triage.isTriageScreen && !triage.showTriageBreach)),
+                // Triage breach already has its own full-detail strip (TriageBreachStrip,
+                // rendered above under the same visibility condition this chip used to
+                // duplicate) plus the WaitingRoomSafetyBoard header badges -- both driven
+                // by the identical summarizeTriageBreachBoard() computation. The rail chip
+                // added a 3rd, purely redundant copy of the same signal.
+                showTriageBreach: false,
                 showProviderWait: !(charge.isChargeNurseScreen && !charge.showProviderWaitBreaches),
               }}
               onSelectPatient={handleWaitingRoomSafetySelect}

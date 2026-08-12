@@ -128,14 +128,6 @@ export default function WaitingRoomSafetyBoard({
             <strong>{board.summary.fitToWaitUnclassified}</strong>
             <small>Seating review</small>
           </span>
-          <span data-tone={board.summary.triageBreachedCount ? 'critical' : board.summary.triageBreachRiskCount ? 'warning' : 'stable'}>
-            <strong>{board.summary.triageBreachedCount}</strong>
-            <small>Triage breached</small>
-          </span>
-          <span data-tone={board.summary.triageBreachRiskCount ? 'warning' : 'stable'}>
-            <strong>{board.summary.triageBreachRiskCount}</strong>
-            <small>Triage at risk</small>
-          </span>
           <span data-tone={board.summary.providerWaitBreachedCount ? 'critical' : board.summary.providerWaitApproachingCount ? 'warning' : 'stable'}>
             <strong>{board.summary.providerWaitBreachedCount}</strong>
             <small>Provider breached</small>
