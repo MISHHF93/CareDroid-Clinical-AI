@@ -30,6 +30,16 @@ export interface BoardingDecisionResult {
   clinicianId: string;
 }
 
+/**
+ * KNOWN DUPLICATE, NOT CANONICAL (found 2026-08-12, repo-wide export-collision audit): the real
+ * frontend consumer (boardingSignals.ts) reads `GET /emergency/boarding`, which is served by the
+ * OTHER `BoardingService` in `modules/emergency-os/emergency-os.services.ts` (TypeORM-backed,
+ * against `EmergencyPatientService`). This class is Mongoose-backed against a separate
+ * `UnifiedPatient` model with different thresholds and `notifyBedManagement` has zero
+ * subscribers (see below) -- kept mounted via `BoardingModule` in AppModule but not the path real
+ * traffic takes. See docs/architecture/CARE_DROID_MASTER_BACKLOG.md for the full finding before
+ * assuming either side is safe to delete outright.
+ */
 @Injectable()
 export class BoardingService extends EventEmitter {
   private readonly BENCHMARK_MINUTES = 158;

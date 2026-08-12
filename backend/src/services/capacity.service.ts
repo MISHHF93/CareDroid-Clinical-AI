@@ -22,6 +22,14 @@ export interface CapacityResponse {
   timestamp: Date;
 }
 
+/**
+ * KNOWN DUPLICATE, NOT CANONICAL (found 2026-08-12, repo-wide export-collision audit): the real
+ * frontend/whiteboard consumer reads `GET /emergency/capacity`, served by the OTHER
+ * `CapacityService` in `modules/emergency-os/emergency-os.services.ts` (TypeORM-backed, against
+ * `EmergencyPatientService`). This class is Mongoose-backed against a separate `UnifiedPatient`
+ * model -- kept mounted via `CapacityModule` in AppModule but not the path real traffic takes.
+ * See docs/architecture/CARE_DROID_MASTER_BACKLOG.md for the full finding.
+ */
 @Injectable()
 export class CapacityService {
   private theoretical_max = 25; // Configurable per site

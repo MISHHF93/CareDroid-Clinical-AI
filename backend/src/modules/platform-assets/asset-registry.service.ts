@@ -28,6 +28,13 @@ export type PlatformAssetRegistryProjection = PlatformAsset & {
   demoLiveStatus: string;
 };
 
+// KNOWN DUPLICATE, DORMANT (found 2026-08-12, repo-wide export-collision audit):
+// `modules/artifacts/asset-registry.service.ts` also exports `AssetRegistryService` -- an
+// in-memory demo list. This one is the real, TypeORM-backed implementation. Both modules
+// (`ArtifactsModule`/`PlatformAssetsModule`) are imported together into `chat.module.ts`/
+// `memory.module.ts`, but nothing there currently injects either version, so no active bug --
+// a live trap for whichever gets picked up if a future constructor injects `AssetRegistryService`
+// by name in one of those modules. See docs/architecture/CARE_DROID_MASTER_BACKLOG.md.
 @Injectable()
 export class AssetRegistryService {
   constructor(

@@ -46,6 +46,13 @@ const ASSETS: AssetRegistryItem[] = [
   },
 ];
 
+// KNOWN DUPLICATE, DORMANT (found 2026-08-12, repo-wide export-collision audit):
+// `modules/platform-assets/asset-registry.service.ts` also exports `AssetRegistryService`
+// (TypeORM-backed, real) -- this one is an in-memory demo list. Both modules
+// (`ArtifactsModule`/`PlatformAssetsModule`) are imported together into `chat.module.ts`/
+// `memory.module.ts`, but nothing there currently injects either version, so no active bug --
+// a live trap for whichever gets picked up if a future constructor injects `AssetRegistryService`
+// by name in one of those modules. See docs/architecture/CARE_DROID_MASTER_BACKLOG.md.
 @Injectable()
 export class AssetRegistryService {
   listAssets(params: { query?: string; type?: string; includeMissing?: boolean } = {}) {

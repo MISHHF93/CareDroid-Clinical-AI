@@ -7,6 +7,13 @@ import { AuthorizationGuard } from '../auth/guards/authorization.guard';
 import { RequirePermission } from '../auth/decorators/permissions.decorator';
 import { Permission } from '../auth/enums/permission.enum';
 
+// NAME COLLISION, NOT A ROUTE COLLISION (found 2026-08-12, repo-wide export-collision audit):
+// `modules/protocol/protocol.controller.ts` also exports a class named `ProtocolController`,
+// mounted at `/protocol` (singular) -- a genuinely different concept (symptom/vitals-matching
+// decision support) from this one (`/protocols`, plural, content CRUD over ProtocolService).
+// No behavior risk since NestJS routes on the decorated path not the class name, but an
+// auto-import or a search for "ProtocolController" can land on the wrong file -- no disclosing
+// comment existed before this one. See docs/architecture/CARE_DROID_MASTER_BACKLOG.md.
 @ApiTags('protocols')
 @Controller('protocols')
 export class ProtocolController {

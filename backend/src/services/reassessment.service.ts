@@ -4,6 +4,15 @@ import {
   type IUnifiedPatient as IPatient,
 } from '../models/unified-patient.model';
 
+/**
+ * KNOWN DUPLICATE, NOT CANONICAL (found 2026-08-12, repo-wide export-collision audit): the real
+ * frontend consumer (ReassessmentEngine.ts / the reassessment-due UI) reads
+ * `GET /emergency/reassessment`, served by the OTHER `ReassessmentService` in
+ * `modules/emergency-os/emergency-os.services.ts` (TypeORM-backed, against
+ * `EmergencyPatientService`). This class is Mongoose-backed against a separate `UnifiedPatient`
+ * model -- kept mounted via `ReassessmentModule` in AppModule but not the path real traffic
+ * takes. See docs/architecture/CARE_DROID_MASTER_BACKLOG.md for the full finding.
+ */
 @Injectable()
 export class ReassessmentService {
   getReassessmentDueMinutes(dpsScore: number): number {

@@ -2286,6 +2286,17 @@ export class ReceptionWorkspaceService {
   }
 }
 
+/**
+ * KNOWN DUPLICATE, NOT YET RECONCILED (found 2026-08-12, repo-wide export-collision audit):
+ * `backend/src/services/reassessment.service.ts` independently backs its own `ReassessmentModule`
+ * (registered in AppModule alongside this one) with its own Mongoose-backed `ReassessmentService`
+ * against a different `UnifiedPatient` model. This TypeORM-backed one (routed under
+ * `EmergencyOsController`, `GET /emergency/reassessment`) is the one the real frontend consumes
+ * (confirmed via ReassessmentEngine.ts / the reassessment-due UI). Same duplication pattern as
+ * BoardingService/CapacityService below and the already-documented Smart Intake TypeORM/Mongoose
+ * split (patient-onboarding-consolidation audit, HEAL-121-125) -- a larger legacy-stack question
+ * than one round can resolve; see docs/architecture/CARE_DROID_MASTER_BACKLOG.md.
+ */
 @Injectable()
 export class ReassessmentService {
   private readonly logger = new Logger(ReassessmentService.name);
@@ -2369,6 +2380,15 @@ export class ReassessmentService {
   }
 }
 
+/**
+ * KNOWN DUPLICATE, NOT YET RECONCILED (found 2026-08-12, repo-wide export-collision audit):
+ * `backend/src/services/capacity.service.ts` independently backs its own `CapacityModule`
+ * (registered in AppModule alongside this one), Mongoose-backed against a different
+ * `UnifiedPatient` model. This TypeORM-backed one (routed under `EmergencyOsController`,
+ * `GET /emergency/capacity`) is the one the real frontend/whiteboard consumes. Same pattern as
+ * ReassessmentService above and BoardingService below; see
+ * docs/architecture/CARE_DROID_MASTER_BACKLOG.md for the full finding.
+ */
 @Injectable()
 export class CapacityService {
   constructor(private readonly patientService: EmergencyPatientService) {}
@@ -2385,6 +2405,17 @@ export class CapacityService {
   }
 }
 
+/**
+ * KNOWN DUPLICATE, NOT YET RECONCILED (found 2026-08-12, repo-wide export-collision audit):
+ * `backend/src/services/boarding.service.ts` independently backs its own `BoardingModule`
+ * (registered in AppModule alongside this one) -- Mongoose-backed against a different
+ * `UnifiedPatient` model, different boarding thresholds (158/240/360/480 min vs. this file's own),
+ * and a self-documented gap (`notifyBedManagement` has zero subscribers per that file's own
+ * comment). This TypeORM-backed one (routed under `EmergencyOsController`,
+ * `GET /emergency/boarding`) is the one the real frontend consumes (boardingSignals.ts). Same
+ * pattern as ReassessmentService/CapacityService above; see
+ * docs/architecture/CARE_DROID_MASTER_BACKLOG.md for the full finding.
+ */
 @Injectable()
 export class BoardingService {
   constructor(private readonly patientService: EmergencyPatientService) {}
