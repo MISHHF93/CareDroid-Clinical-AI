@@ -140,19 +140,31 @@ function PredictiveLensPanel() {
   const summary = buildPredictiveAnalyticsSummary(DEMO_PREDICTIVE_ANALYTICS_MODELS);
 
   return (
-    <div className="command-center-lens__panel-grid">
-      <LensMetric label="Models active" value={String(summary.modelCount)} />
-      <LensMetric
-        label="High / critical risk"
-        value={String(summary.highOrCriticalCount)}
-        detail={summary.highestRisk?.title}
-      />
-      <LensMetric label="Average risk score" value={`${summary.averageScore}/100`} />
-      <LensMetric
-        label="Highest risk band"
-        value={summary.highestRisk?.band ?? 'low'}
-      />
-    </div>
+    <>
+      {/* Matches the disclosure already shown on the full dashboard this lens links
+          to (PredictiveAnalyticsDashboard.tsx) -- every entry in
+          DEMO_PREDICTIVE_ANALYTICS_MODELS carries modelStatus: 'demo-model' and an
+          authored, not computed, confidence score, but this condensed lens is the
+          more likely first stop from the "Predictive AI" nav item, so it needs the
+          same honest label, not just the page it links onward to. */}
+      <p className="command-center-lens__demo-notice">
+        <span className="command-center-lens__demo-notice-label">Demo models</span> — scores below
+        are not live predictions. Connect live data pipelines to activate real models.
+      </p>
+      <div className="command-center-lens__panel-grid">
+        <LensMetric label="Models active" value={String(summary.modelCount)} />
+        <LensMetric
+          label="High / critical risk"
+          value={String(summary.highOrCriticalCount)}
+          detail={summary.highestRisk?.title}
+        />
+        <LensMetric label="Average risk score" value={`${summary.averageScore}/100`} />
+        <LensMetric
+          label="Highest risk band"
+          value={summary.highestRisk?.band ?? 'low'}
+        />
+      </div>
+    </>
   );
 }
 

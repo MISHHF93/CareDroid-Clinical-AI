@@ -45,3 +45,17 @@
   color: var(--cd-ink-muted, #cbd5e1);
   font-size: 0.875rem;
 }
+
+.command-center-lens__demo-notice {
+  margin: 0 0 var(--cd-space-3, 12px);
+  padding: var(--cd-space-2, 8px) var(--cd-space-3, 12px);
+  border-radius: var(--cd-radius-md, 8px);
+  background: var(--cd-warning-bg-subtle, #fffbeb);
+  border: 1px solid var(--cd-warning-border, #b45309);
+  color: var(--cd-warning-text, #b45309);
+  font-size: 0.75rem;
+}
+
+.command-center-lens__demo-notice-label {
+  font-weight: 700;
+}
